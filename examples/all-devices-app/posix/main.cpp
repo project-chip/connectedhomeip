@@ -128,6 +128,7 @@ public:
         Credentials::DeviceAttestationCredentialsProvider & dacProvider;
         EventManagement & eventManagement;
         TimerDelegate & timerDelegate;
+        uint16_t minGuaranteedSubscriptionsPerFabric;
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -137,26 +138,27 @@ public:
         mContext(context), mDataModelProvider(mContext.storageDelegate, mAttributePersistence),
         mRootNode(
             {
-                .commissioningWindowManager     = mContext.commissioningWindowManager, //
-                    .configurationManager       = mContext.configurationManager,       //
-                    .deviceControlServer        = mContext.deviceControlServer,        //
-                    .fabricTable                = mContext.fabricTable,                //
-                    .accessControl              = mContext.accessControl,              //
-                    .persistentStorage          = mContext.persistentStorage,          //
-                    .failSafeContext            = mContext.failSafeContext,            //
-                    .deviceInstanceInfoProvider = mContext.deviceInstanceInfoProvider, //
-                    .platformManager            = mContext.platformManager,            //
-                    .groupDataProvider          = mContext.groupDataProvider,          //
-                    .sessionManager             = mContext.sessionManager,             //
-                    .dnssdServer                = mContext.dnssdServer,                //
-                    .deviceLoadStatusProvider   = mContext.deviceLoadStatusProvider,   //
-                    .diagnosticDataProvider     = mContext.diagnosticDataProvider,     //
-                    .testEventTriggerDelegate   = mContext.testEventTriggerDelegate,   //
-                    .dacProvider                = mContext.dacProvider,                //
-                    .eventManagement            = mContext.eventManagement,            //
-                    .timerDelegate              = mContext.timerDelegate,              //
+                .commissioningWindowManager              = mContext.commissioningWindowManager, //
+                    .configurationManager                = mContext.configurationManager,       //
+                    .deviceControlServer                 = mContext.deviceControlServer,        //
+                    .fabricTable                         = mContext.fabricTable,                //
+                    .accessControl                       = mContext.accessControl,              //
+                    .persistentStorage                   = mContext.persistentStorage,          //
+                    .failSafeContext                     = mContext.failSafeContext,            //
+                    .deviceInstanceInfoProvider          = mContext.deviceInstanceInfoProvider, //
+                    .platformManager                     = mContext.platformManager,            //
+                    .groupDataProvider                   = mContext.groupDataProvider,          //
+                    .sessionManager                      = mContext.sessionManager,             //
+                    .dnssdServer                         = mContext.dnssdServer,                //
+                    .deviceLoadStatusProvider            = mContext.deviceLoadStatusProvider,   //
+                    .diagnosticDataProvider              = mContext.diagnosticDataProvider,     //
+                    .testEventTriggerDelegate            = mContext.testEventTriggerDelegate,   //
+                    .dacProvider                         = mContext.dacProvider,                //
+                    .eventManagement                     = mContext.eventManagement,            //
+                    .timerDelegate                       = mContext.timerDelegate,              //
+                    .minGuaranteedSubscriptionsPerFabric = mContext.minGuaranteedSubscriptionsPerFabric,
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                    .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
+                .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             },
             []() {
@@ -309,10 +311,15 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     SuccessOrDie(initParams.InitializeStaticResourcesBeforeServerInit());
 
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
-        .groupDataProvider = gGroupDataProvider,                     //
-        .fabricTable       = Server::GetInstance().GetFabricTable(), //
-        .timerDelegate     = gTimerDelegate,                         //
-        .storageDelegate   = *initParams.persistentStorageDelegate,  //
+        .groupDataProvider      = gGroupDataProvider,                     //
+        .fabricTable            = Server::GetInstance().GetFabricTable(), //
+        .timerDelegate          = gTimerDelegate,                         //
+        .storageDelegate        = *initParams.persistentStorageDelegate,  //
+        .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
+        .platformManager        = DeviceLayer::PlatformMgr(),
+        .failSafeContext        = Server::GetInstance().GetFailSafeContext(),
+        .bindingTable           = Binding::Table::GetInstance(),
+        .bindingManager         = Binding::Manager::GetInstance(),
     });
 
     RegisterDeviceFactoryOverrides(gTimerDelegate, initParams.persistentStorageDelegate, gAudioManager);
@@ -370,6 +377,8 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(), //
             .eventManagement            = EventManagement::GetInstance(),                          //
             .timerDelegate              = gTimerDelegate,                                          //
+            .minGuaranteedSubscriptionsPerFabric =
+                InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(), //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),

@@ -23,7 +23,8 @@ namespace chip::app {
 Oven::Oven(TimerDelegate & timerDelegate, Clusters::OnOffDelegate & surfaceOnOff, Clusters::IdentifyDelegate & cavityIdentify,
            Clusters::IdentifyDelegate & surfaceIdentify, const Config & config) :
     DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOven, 1)),
-    mCavity(timerDelegate, config.cavityConfig, cavityIdentify), mSurface(timerDelegate, surfaceOnOff, surfaceIdentify)
+    mCavity(timerDelegate, config.cavityConfig, config.cavityOperationalStateDelegate, cavityIdentify),
+    mSurface(timerDelegate, surfaceOnOff, surfaceIdentify)
 {}
 
 CHIP_ERROR Oven::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider, EndpointComposition composition)

@@ -17,6 +17,9 @@
 
 #pragma once
 
+#include <app/FailSafeContext.h>
+#include <app/clusters/bindings/BindingManager.h>
+#include <app/clusters/bindings/binding-table.h>
 #include <app_config/enabled_devices.h>
 #include <device/types/aggregator/Aggregator.h>
 #include <device/types/air-purifier/impl/LoggingAirPurifier.h>
@@ -32,15 +35,16 @@
 #include <device/types/dimmable-plug-in-unit/DimmablePlugInUnit.h>
 #include <device/types/dishwasher/Dishwasher.h>
 #include <device/types/extended-color-light/ExtendedColorLight.h>
+#include <device/types/dishwasher/impl/EmulatedDishwasher.h>
 #include <device/types/extractor-hood/ExtractorHood.h>
 #include <device/types/fan/impl/LoggingFan.h>
 #include <device/types/flow-sensor/impl/IncreasingFlowSensor.h>
 #include <device/types/generic-switch/GenericSwitch.h>
 #include <device/types/humidity-sensor/impl/IncreasingHumiditySensor.h>
-#include <device/types/laundry-dryer/LaundryDryer.h>
-#include <device/types/laundry-washer/LaundryWasher.h>
+#include <device/types/laundry-dryer/impl/EmulatedLaundryDryer.h>
+#include <device/types/laundry-washer/impl/EmulatedLaundryWasher.h>
 #include <device/types/light-sensor/impl/IncreasingLightSensor.h>
-#include <device/types/microwave-oven/MicrowaveOven.h>
+#include <device/types/microwave-oven/impl/EmulatedMicrowaveOven.h>
 #include <device/types/mounted-dimmable-load-control/MountedDimmableLoadControl.h>
 #include <device/types/mounted-on-off-control/MountedOnOffControl.h>
 #include <device/types/network-infrastructure-manager/NetworkInfrastructureManager.h>
@@ -64,6 +68,8 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <platform/DefaultTimerDelegate.h>
+#include <platform/DiagnosticDataProvider.h>
+#include <platform/PlatformManager.h>
 
 #include <functional>
 #include <map>
@@ -92,6 +98,11 @@ public:
         FabricTable & fabricTable;
         TimerDelegate & timerDelegate;
         PersistentStorageDelegate & storageDelegate;
+        DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
+        DeviceLayer::PlatformManager & platformManager;
+        FailSafeContext & failSafeContext;
+        Clusters::Binding::Table & bindingTable;
+        Clusters::Binding::Manager & bindingManager;
     };
 
     static DeviceFactory & GetInstance()
@@ -335,7 +346,13 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_DISHWASHER)
         {
-            RegisterCreator("dishwasher", []() { return std::make_unique<Dishwasher>(); });
+            RegisterCreator("dishwasher", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<EmulatedDishwasher>(EmulatedDishwasher::Context{
+                    .timerDelegate          = mContext->timerDelegate,
+                    .diagnosticDataProvider = mContext->diagnosticDataProvider,
+                });
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_MOUNTED_DIMMABLE_LOAD_CONTROL)
         {
@@ -365,7 +382,8 @@ private:
         {
             RegisterCreator("network-infrastructure-manager", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<NetworkInfrastructureManager>(mContext->storageDelegate);
+                return std::make_unique<NetworkInfrastructureManager>(mContext->timerDelegate, mContext->storageDelegate,
+                                                                      mContext->platformManager, mContext->failSafeContext);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_LIGHT)
@@ -383,7 +401,8 @@ private:
         {
             RegisterCreator("on-off-light-switch", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<OnOffLightSwitch>(mContext->timerDelegate);
+                return std::make_unique<OnOffLightSwitch>(mContext->timerDelegate, mContext->platformManager,
+                                                          mContext->bindingTable, mContext->bindingManager);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_PLUG_IN_UNIT)
@@ -532,11 +551,20 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_LAUNDRY_DRYER)
         {
-            RegisterCreator("laundry-dryer", []() { return std::make_unique<LaundryDryer>(); });
+            RegisterCreator("laundry-dryer", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<EmulatedLaundryDryer>(mContext->timerDelegate);
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_LAUNDRY_WASHER)
         {
-            RegisterCreator("laundry-washer", []() { return std::make_unique<LaundryWasher>(); });
+            RegisterCreator("laundry-washer", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<EmulatedLaundryWasher>(EmulatedLaundryWasher::Context{
+                    .timerDelegate          = mContext->timerDelegate,
+                    .diagnosticDataProvider = mContext->diagnosticDataProvider,
+                });
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_LIGHT_SENSOR)
         {
@@ -547,7 +575,13 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_MICROWAVE_OVEN)
         {
-            RegisterCreator("microwave-oven", []() { return std::make_unique<MicrowaveOven>(); });
+            RegisterCreator("microwave-oven", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<EmulatedMicrowaveOven>(EmulatedMicrowaveOven::Context{
+                    .timerDelegate          = mContext->timerDelegate,
+                    .diagnosticDataProvider = mContext->diagnosticDataProvider,
+                });
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_PRESSURE_SENSOR)
         {
