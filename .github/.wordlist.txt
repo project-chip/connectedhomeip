@@ -8,6 +8,7 @@
 21
 22
 AAAA
+AAB
 aarch
 abcdef
 abfb
@@ -1176,6 +1177,7 @@ ProductID
 ProductLabel
 ProductName
 ProductURL
+proguard
 proto
 protobuf
 protos
