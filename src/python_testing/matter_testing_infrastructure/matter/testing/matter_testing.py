@@ -1842,6 +1842,11 @@ class MatterBaseTest(base_test.BaseTestClass):
         return self.check_pics('PICS_SDK_CI_ONLY')
 
     @property
+    def data_model(self) -> XmlDataModel:
+        """Accesses the data model object."""
+        return global_stash.unstash_globally(self.user_params.get("data_model"))
+
+    @property
     def default_endpoint(self) -> int:
         return 0
 

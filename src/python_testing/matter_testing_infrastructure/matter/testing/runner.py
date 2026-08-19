@@ -38,12 +38,14 @@ from mobly import signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
 
+import matter.clusters as Clusters
 import matter.testing.global_stash as global_stash
 from matter.clusters import Attribute
 # Add imports for argument parsing dependencies
 from matter.testing.defaults import TestingDefaults
 # Add imports for argument parsing dependencies
 from matter.testing.pics import read_pics_from_file
+from matter.testing.spec_parsing import build_xml_data_model, dm_from_spec_version
 
 try:
     from matter_yamltests.hooks import TestRunnerHooks
@@ -454,8 +456,19 @@ def run_tests_no_exit(
         runner = TestRunner(log_dir=test_config.log_path,
                             testbed_name=test_config.testbed_name)
 
+        stored_global_wildcard = None
+
         with runner.mobly_logger():
             if matter_test_config.commissioning_method is not None:
+                # Populate XML data model
+                if stored_global_wildcard:
+                    try:
+                        spec_version = stored_global_wildcard.attributes[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SpecificationVersion]
+                        dm_directory = dm_from_spec_version(spec_version)
+                        data_model = build_xml_data_model(dm_directory)
+                        test_config.user_params["data_model"] = global_stash.stash_globally(data_model)
+                    except Exception:
+                        LOGGER.warning("Could not populate data model from device spec version")
                 runner.add_test_class(test_config, CommissionDeviceTest, None)
 
             # Add the tests selected unless we have a commission-only request
