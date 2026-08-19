@@ -16,6 +16,7 @@
 
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementCluster.h>
 #include <app/clusters/device-energy-management-server/tests/DeviceEnergyManagementMockDelegate.h>
+#include <system/SystemClock.h>
 
 namespace chip {
 namespace app {
@@ -194,8 +195,17 @@ DeviceEnergyManagementMockDelegate::PowerRangeAdjustRequest(const DataModel::Nul
         return Protocols::InteractionModel::Status::Failure;
     }
 
-    // Set endTime based on duration (in seconds from now)
-    powerRangeAdjustment.endTime = duration;
+    // Set endTime as absolute epoch time (current time + duration in seconds)
+    uint32_t currentTimeS = 0;
+    if (chip::System::Clock::GetClock_MatterEpochS(currentTimeS) == CHIP_NO_ERROR)
+    {
+        powerRangeAdjustment.endTime = currentTimeS + duration;
+    }
+    else
+    {
+        // Fallback: use duration directly if clock is unavailable
+        powerRangeAdjustment.endTime = duration;
+    }
     mPowerRangeAdjustment.SetNonNull(powerRangeAdjustment);
 
     // Only update state after successful validation
