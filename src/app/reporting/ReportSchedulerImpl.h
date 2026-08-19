@@ -82,6 +82,16 @@ public:
      * change), so this method is optional as it might be redundant.
      */
     void OnEnterActiveMode() override;
+    /**
+     * @brief Defer report emission for subscriptions matching the targeted endpoints.
+     *
+     * If targetedEndpoints is empty ({}), the delay applies to all active subscriptions
+     * on the device (e.g. for group invocations or global delay requests).
+     *
+     * @param aDelay The duration of the delay to apply.
+     * @param targetedEndpoints The list of endpoints targeted by the invoke command.
+     *                          Defaults to empty ({}) to defer all subscriptions.
+     */
     void DeferReports(System::Clock::Timeout aDelay, Span<const EndpointId> targetedEndpoints = {}) override;
     void RescheduleAllReports() override;
 
