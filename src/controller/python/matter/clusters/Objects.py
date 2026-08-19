@@ -28596,7 +28596,7 @@ class ElectricalProtectionAlarm(Cluster):
                         ClusterObjectFieldDescriptor(Label="maxVoltageProtection", Tag=4, Type=typing.Optional[int]),
                         ClusterObjectFieldDescriptor(Label="maxTemporaryVoltage", Tag=5, Type=typing.Optional[int]),
                         ClusterObjectFieldDescriptor(Label="nominalDischargeCurrent", Tag=6, Type=typing.Optional[int]),
-                        ClusterObjectFieldDescriptor(Label="maximumDishargeCurrent", Tag=7, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="maximumDischargeCurrent", Tag=7, Type=typing.Optional[int]),
                         ClusterObjectFieldDescriptor(Label="ratedShortCircuitCurrent", Tag=8, Type=typing.Optional[int]),
                         ClusterObjectFieldDescriptor(Label="ratedShortTimeWithstandCurrent", Tag=9, Type=typing.Optional[int]),
                         ClusterObjectFieldDescriptor(Label="energyAbsorptionCapability", Tag=10, Type=typing.Optional[uint]),
@@ -28610,7 +28610,7 @@ class ElectricalProtectionAlarm(Cluster):
             maxVoltageProtection: 'typing.Optional[int]' = None
             maxTemporaryVoltage: 'typing.Optional[int]' = None
             nominalDischargeCurrent: 'typing.Optional[int]' = None
-            maximumDishargeCurrent: 'typing.Optional[int]' = None
+            maximumDischargeCurrent: 'typing.Optional[int]' = None
             ratedShortCircuitCurrent: 'typing.Optional[int]' = None
             ratedShortTimeWithstandCurrent: 'typing.Optional[int]' = None
             energyAbsorptionCapability: 'typing.Optional[uint]' = None
