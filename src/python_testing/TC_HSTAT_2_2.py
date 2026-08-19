@@ -226,7 +226,7 @@ class TC_HSTAT_2_2(MatterBaseTest, HSTATBase):
         # TH sends command SetSettings with the Sleep field set to True
         # Verify DUT responds w/ status SUCCESS(0x00)
         if self.attributes.Sleep.attribute_id not in self.supported_attributes:
-            await self.send_SetSettingsCommand_expect_success(continuous=True)
+            await self.send_SetSettingsCommand_expect_success(sleep=True)
 
         self.step(18)
         # TH sends command SetSettings with the Optimal field set to True
@@ -238,7 +238,7 @@ class TC_HSTAT_2_2(MatterBaseTest, HSTATBase):
         # TH sends command SetSettings with the MistType field set to Cold
         # Verify DUT responds w/ status SUCCESS(0x00)
         if self.attributes.MistType.attribute_id not in self.supported_attributes:
-            await self.send_SetSettingsCommand_expect_success(mistType=True)
+            await self.send_SetSettingsCommand_expect_success(mistType=self.mistBitmap.kMistCold)
 
 
 if __name__ == "__main__":

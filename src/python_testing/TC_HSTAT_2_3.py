@@ -185,9 +185,10 @@ class TC_HSTAT_2_3(MatterBaseTest, HSTATBase):
         dut_Setpoint = await self.read_attribute_expect_success(attribute=self.attributes.UserSetpoint)
         asserts.assert_equal(dut_Setpoint, dut_MinSetpoint+dut_Step, "UserSetpoint is not MinSetpoint+Step as expacted")
         asserts.assert_greater_equal(len(reportsReceived), 0, "No reports received")
-        asserts.assert_equal(reportsReceived[0], dut_MaxSetpoint, "First report is not MaxSetpoint")
-        if len(reportsReceived) > 1:
-            asserts.assert_equal(reportsReceived[1], dut_MinSetpoint+dut_Step, "Second report is not dut_MinSetpoint+dut_Step")
+        asserts.assert_equal(reportsReceived[0], dut_MaxSetpoint, "First report value is not MaxSetpoint")
+        if (dut_MaxSetpoint - dut_MinSetpoint) > dut_Step:
+            asserts.assert_equal(len(reportsReceived), 2, "2 reports expected")
+            asserts.assert_equal(reportsReceived[1], dut_MinSetpoint+dut_Step, "Second report value is not dut_MinSetpoint+dut_Step")
 
         self.step(15)
         # TH sends command SetSettings with the UserSetpoint field set to MinSetpointValue-1
@@ -203,7 +204,7 @@ class TC_HSTAT_2_3(MatterBaseTest, HSTATBase):
         # TH sends command SetSettings with the UserSetpoint field set to MinSetpointValue+1
         # Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)
         if dut_Step > 1:
-            await self.send_SetSettingsCommand_expect_error(userSetpoint=dut_MinSetpoint-1, error=Status.ConstraintError)
+            await self.send_SetSettingsCommand_expect_error(userSetpoint=dut_MinSetpoint+1, error=Status.ConstraintError)
 
 
 if __name__ == '__main__':

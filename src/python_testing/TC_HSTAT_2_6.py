@@ -88,7 +88,7 @@ class TC_HSTAT_2_6(MatterBaseTest, HSTATBase):
 
         # Not sure how to gate this test case with the 'def pics_' statement, so doing that here.
         # This test case should only be executed if both Humidifier and Dehumidiifer are supported
-        if not self.humidifierFeatureSupported and not self.dehumidifierFeatureSupported:
+        if not (self.humidifierFeatureSupported and self.dehumidifierFeatureSupported):
             self.mark_all_remaining_steps_skipped(2)
             return
 
