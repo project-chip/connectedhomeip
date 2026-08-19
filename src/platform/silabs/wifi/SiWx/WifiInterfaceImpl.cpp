@@ -535,7 +535,6 @@ sl_status_t SetWifiConfigurations()
         chip::ByteSpan inBssid(wfx_rsi.ap_bssid.data(), kWiFiBSSIDLength);
         TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(inBssid, bssidSpan);
         // Enabling quick-join since we have the channel and BSSID
-        // TODO: Uncomment this once the quick-join issue is fixed
         join_feature_bitmap |= SL_SI91X_JOIN_FEAT_QUICK_JOIN;
     }
 
@@ -1064,9 +1063,14 @@ CHIP_ERROR WifiInterfaceImpl::StartNetworkScan(chip::ByteSpan ssid, ::ScanCallba
 
     if (!ssid.empty())
     {
-        chip::MutableByteSpan requestedSsidSpan(sNetworkScanCallbackContext.ssid.value,
-                                                sizeof(sNetworkScanCallbackContext.ssid.value));
-        ReturnErrorOnFailure(chip::CopySpanToMutableSpan(ssid, requestedSsidSpan));
+        chip::MutableByteSpan requestedSsidSpan(sNetworkScanCallbackContext.ssid.value, sizeof(sNetworkScanCallbackContext.ssid.value));
+        CHIP_ERROR err = chip::CopySpanToMutableSpan(ssid, requestedSsidSpan);
+        if (err != CHIP_NO_ERROR)
+        {
+            wfx_rsi.dev_state.Clear(WifiInterface::WifiState::kScanStarted);
+            wfx_rsi.scan_cb = nullptr;
+            return err;
+        }
         sNetworkScanCallbackContext.ssid.length = static_cast<uint8_t>(ssid.size());
         requestedSsidPtr                        = &sNetworkScanCallbackContext.ssid;
     }
@@ -1074,7 +1078,15 @@ CHIP_ERROR WifiInterfaceImpl::StartNetworkScan(chip::ByteSpan ssid, ::ScanCallba
     osMutexAcquire(sScanInProgressSemaphore, osWaitForever);
 
     // NOTE: sending requestedSsidPtr as background scan does not filter for SSID
-    sl_wifi_set_scan_callback_v2(BackgroundScanCallback, &sNetworkScanCallbackContext);
+    status = sl_wifi_set_scan_callback_v2(BackgroundScanCallback, &sNetworkScanCallbackContext);
+    if (status != SL_STATUS_OK)
+    {
+        ChipLogError(DeviceLayer, "sl_wifi_set_scan_callback_v2 failed: 0x%" PRIx32, static_cast<uint32_t>(status));
+        osMutexRelease(sScanInProgressSemaphore);
+        wfx_rsi.dev_state.Clear(WifiInterface::WifiState::kScanStarted);
+        wfx_rsi.scan_cb = nullptr;
+        return CHIP_ERROR_INTERNAL;
+    }
     status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, requestedSsidPtr, &wifi_scan_configuration);
 
     if (SL_STATUS_IN_PROGRESS == status)
