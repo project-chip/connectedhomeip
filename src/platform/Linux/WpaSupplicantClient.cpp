@@ -286,7 +286,7 @@ bool WpaSupplicantClient::GetBssInfo(const gchar * inBssPath,
         {
             return res;
         }
-        GAutoPtr<const gchar *> keyMgmts(g_variant_get_strv(keyMgmt.get(), nullptr));
+        GBorrowedStrvPtr keyMgmts(g_variant_get_strv(keyMgmt.get(), nullptr));
         const gchar ** keyMgmtsHandle = keyMgmts.get();
 
         VerifyOrReturnError(keyMgmtsHandle != nullptr, res);
@@ -317,7 +317,7 @@ bool WpaSupplicantClient::GetBssInfo(const gchar * inBssPath,
         {
             return res;
         }
-        GAutoPtr<const gchar *> keyMgmts(g_variant_get_strv(keyMgmt.get(), nullptr));
+        GBorrowedStrvPtr keyMgmts(g_variant_get_strv(keyMgmt.get(), nullptr));
         const gchar ** keyMgmtsHandle = keyMgmts.get();
 
         VerifyOrReturnError(keyMgmtsHandle != nullptr, res);

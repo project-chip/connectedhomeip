@@ -16,7 +16,6 @@
 #
 
 from dataclasses import dataclass, field
-from typing import Optional
 
 from zeroconf.asyncio import AsyncServiceInfo
 
@@ -28,21 +27,21 @@ class MdnsServiceInfo(JsonSerializable):
     service_info: "AsyncServiceInfo" = field(repr=False, compare=False)
 
     @staticmethod
-    def _strip_dot(s: Optional[str]) -> str:
+    def _strip_dot(s: str | None) -> str:
         if not s:
             return ""
         return s[:-1] if s.endswith(".") else s
 
     @property
-    def service_name(self) -> Optional[str]:
+    def service_name(self) -> str | None:
         return getattr(self.service_info, "name", None)
 
     @property
-    def service_type(self) -> Optional[str]:
+    def service_type(self) -> str | None:
         return getattr(self.service_info, "type", None)
 
     @property
-    def instance_name(self) -> Optional[str]:
+    def instance_name(self) -> str | None:
         # Normalize names (remove trailing dot for comparisons)
         name = self._strip_dot(self.service_name)
         stype = self._strip_dot(self.service_type)
@@ -61,11 +60,11 @@ class MdnsServiceInfo(JsonSerializable):
         return name
 
     @property
-    def hostname(self) -> Optional[str]:
+    def hostname(self) -> str | None:
         return getattr(self.service_info, "server", None)
 
     @property
-    def addresses(self) -> Optional[list[str]]:
+    def addresses(self) -> list[str] | None:
         si = self.service_info
         if si and hasattr(si, "parsed_addresses"):
             try:
@@ -75,29 +74,29 @@ class MdnsServiceInfo(JsonSerializable):
         return None
 
     @property
-    def port(self) -> Optional[int]:
+    def port(self) -> int | None:
         return getattr(self.service_info, "port", None)
 
     @property
-    def txt(self) -> Optional[dict[str, str]]:
+    def txt(self) -> dict[str, str] | None:
         return getattr(self.service_info, "decoded_properties", None)
 
     @property
-    def priority(self) -> Optional[int]:
+    def priority(self) -> int | None:
         return getattr(self.service_info, "priority", None)
 
     @property
-    def interface_index(self) -> Optional[int]:
+    def interface_index(self) -> int | None:
         return getattr(self.service_info, "interface_index", None)
 
     @property
-    def weight(self) -> Optional[int]:
+    def weight(self) -> int | None:
         return getattr(self.service_info, "weight", None)
 
     @property
-    def host_ttl(self) -> Optional[int]:
+    def host_ttl(self) -> int | None:
         return getattr(self.service_info, "host_ttl", None)
 
     @property
-    def other_ttl(self) -> Optional[int]:
+    def other_ttl(self) -> int | None:
         return getattr(self.service_info, "other_ttl", None)

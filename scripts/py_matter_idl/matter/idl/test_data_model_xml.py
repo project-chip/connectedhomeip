@@ -18,7 +18,6 @@ import sys
 import unittest
 from difflib import unified_diff
 from pathlib import Path
-from typing import Optional, Union
 
 try:
     from matter.idl.data_model_xml import ParseSource, ParseXmls
@@ -37,7 +36,7 @@ from matter.idl.matter_idl_types import Idl
 class GeneratorContentStorage(GeneratorStorage):
     def __init__(self):
         super().__init__()
-        self.content: Optional[str] = None
+        self.content: str | None = None
 
     def get_existing_data(self, relative_path: str):
         # Force re-generation each time
@@ -56,14 +55,13 @@ def RenderAsIdlTxt(idl: Idl) -> str:
     return storage.content or ""
 
 
-def XmlToIdl(what: Union[str, list[str]]) -> Idl:
+def XmlToIdl(what: str | list[str]) -> Idl:
     if not isinstance(what, list):
         what = [what]
 
     sources = []
     for idx, txt in enumerate(what):
-        sources.append(ParseSource(source=io.StringIO(
-            txt), name=("Input %d" % (idx + 1))))
+        sources.append(ParseSource(source=io.StringIO(txt), name=(f"Input {idx + 1}")))
 
     return ParseXmls(sources, include_meta_data=False)
 

@@ -30,6 +30,8 @@
 #include <clusters/ApplicationBasic/MetadataProvider.h>
 #include <clusters/ApplicationLauncher/Ids.h>
 #include <clusters/ApplicationLauncher/MetadataProvider.h>
+#include <clusters/AudioControl/Ids.h>
+#include <clusters/AudioControl/MetadataProvider.h>
 #include <clusters/AudioOutput/Ids.h>
 #include <clusters/AudioOutput/MetadataProvider.h>
 #include <clusters/AvAnalysis/Ids.h>
@@ -166,6 +168,8 @@
 #include <clusters/LocalizationConfiguration/MetadataProvider.h>
 #include <clusters/LowPower/Ids.h>
 #include <clusters/LowPower/MetadataProvider.h>
+#include <clusters/MediaFileManagement/Ids.h>
+#include <clusters/MediaFileManagement/MetadataProvider.h>
 #include <clusters/MediaInput/Ids.h>
 #include <clusters/MediaInput/MetadataProvider.h>
 #include <clusters/MediaPlayback/Ids.h>
@@ -384,6 +388,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == ApplicationLauncher::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ApplicationLauncher::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == AudioControl::Id) || ...))
+    {
+        if (id == AudioControl::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, AudioControl::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == AudioOutput::Id) || ...))
     {
@@ -728,6 +737,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == LowPower::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, LowPower::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == MediaFileManagement::Id) || ...))
+    {
+        if (id == MediaFileManagement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, MediaFileManagement::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == MediaInput::Id) || ...))
     {

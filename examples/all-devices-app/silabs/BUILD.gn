@@ -113,29 +113,29 @@ silabs_executable("all_devices_app") {
 
     # All devices common targets
     "${chip_root}/examples/all-devices-app/all-devices-common/device-factory",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/aggregator",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/air-purifier",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/boolean-state-sensor",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/chime",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/cooktop",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-energy-management",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/dimmable-light",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/dimmable-plug-in-unit",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/extractor-hood",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/generic-switch",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/mounted-dimmable-load-control",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/mounted-on-off-control",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/occupancy-sensor",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/on-off-light",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/on-off-light-switch",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/on-off-plug-in-unit",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/oven",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/proximity-ranger",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/refrigerator",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/soil-sensor",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/speaker",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/temperature-sensor",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/water-valve",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/aggregator",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/air-purifier",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/boolean-state-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/chime",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/cooktop",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/device-energy-management",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-light",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-plug-in-unit",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/extractor-hood",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/generic-switch",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-dimmable-load-control",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-on-off-control",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/occupancy-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light-switch",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/oven",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/proximity-ranger",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/refrigerator",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/soil-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/speaker",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/temperature-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve",
 
     # Providers
     "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-info-provider",
@@ -146,9 +146,9 @@ silabs_executable("all_devices_app") {
   ]
 
   if (chip_enable_wifi) {
-    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:wifi" ]
+    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:wifi" ]
   } else {
-    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:thread" ]
+    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:thread" ]
   }
 
   deps += [ "${examples_plat_dir}:efr32-common" ]

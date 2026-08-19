@@ -87,6 +87,11 @@ public:
             mModulationType = modulationType;
             return *this;
         }
+        Config & WithAccess()
+        {
+            mFeatureMap.Set(Feature::kAccess);
+            return *this;
+        }
 
         EndpointId mEndpointId;
         ClosureDimensionClusterDelegate & mDelegate;

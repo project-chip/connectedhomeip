@@ -64,4 +64,11 @@ if (pw_enable_fuzz_test_targets) {
       "${chip_root}/src/platform/logging:default",
     ]
   }
+  chip_pw_fuzz_target("fuzz-ota-image-header-pw") {
+    test_source = [ "FuzzOTAImageHeaderPW.cpp" ]
+    public_deps = [
+      "${chip_root}/src/lib/core",
+      "${chip_root}/src/platform/logging:default",
+    ]
+  }
 }
