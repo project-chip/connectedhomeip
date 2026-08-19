@@ -603,5 +603,5 @@ CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementPowerRangeAdjustComplet
 CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementCancelPowerRangeAdjustRequest(CauseEnum cause)
 {
     // Currently not implemented by our EVSE app
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    return CHIP_NO_ERROR;
 }

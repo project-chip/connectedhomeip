@@ -366,7 +366,7 @@ bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)
         SetTestEventTrigger_UserOptOutOptimization(OptOutStateEnum::kLocalOptOut);
         break;
     case DeviceEnergyManagementTrigger::kUserOptOutGridOptimization:
-        ChipLogProgress(Support, "[UserOptOutGrisOptimization-Test-Event] => Simulate user opt-out of Grid Optimization");
+        ChipLogProgress(Support, "[UserOptOutGridOptimization-Test-Event] => Simulate user opt-out of Grid Optimization");
         SetTestEventTrigger_UserOptOutOptimization(OptOutStateEnum::kGridOptOut);
         break;
     case DeviceEnergyManagementTrigger::kUserOptOutClearAll:
