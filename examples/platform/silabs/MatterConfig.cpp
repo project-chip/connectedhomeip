@@ -161,7 +161,7 @@ void UnlockOpenThreadTask(void)
 CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
 {
 
-    ReturnErrorOnFailure(ThreadStackMgr().InitThreadStack()); 
+    ReturnErrorOnFailure(ThreadStackMgr().InitThreadStack());
 
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
     ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router));
