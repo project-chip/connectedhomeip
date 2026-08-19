@@ -507,7 +507,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestPowerRangeAdjustRequest)
     command.maxPower = 1500;
 
     // Valid request with GridOptimization cause - succeeds and state changes to PowerAdjustActive
-    command.cause = AdjustmentCauseEnum::kGridOptimization;
+    command.cause       = AdjustmentCauseEnum::kGridOptimization;
     uint32_t beforeCall = 0;
     EXPECT_EQ(chip::System::Clock::GetClock_MatterEpochS(beforeCall), CHIP_NO_ERROR);
     EXPECT_TRUE(tester.Invoke(Commands::PowerRangeAdjustRequest::Id, command).IsSuccess());
