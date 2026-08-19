@@ -34,14 +34,14 @@ public:
     // EDNS(0) Update Lease option code (RFC 9665/9664).
     static constexpr uint16_t kEdnsOptionUpdateLease = 2;
 
-    // EDNS(0) TTL DNSSEC OK flag bit.
-    static constexpr uint32_t kEdnsTtlDnssecOk = 0x00008000;
+    // EDNS(0) TTL default value.
+    static constexpr uint32_t kEdnsTtlDefault = 0x00000000;
 
     OptLeaseRecord(uint16_t udpPayloadSize, uint32_t leaseSeconds, uint32_t keyLeaseSeconds) :
         ResourceRecord(QType::OPT, FullQName()), mLeaseSeconds(leaseSeconds), mKeyLeaseSeconds(keyLeaseSeconds)
     {
         SetClass(static_cast<QClass>(udpPayloadSize));
-        SetTtl(kEdnsTtlDnssecOk);
+        SetTtl(kEdnsTtlDefault);
     }
 
     uint32_t GetLeaseSeconds() const { return mLeaseSeconds; }
