@@ -1146,8 +1146,6 @@ TimeSynchronizationCluster::HandleSetTrustedTimeSource(CommandHandler * commandO
         Structs::TrustedTimeSourceStruct::Type ts = { commandObj->GetAccessingFabricIndex(), timeSource.Value().nodeID,
                                                       timeSource.Value().endpoint };
         tts.SetNonNull(ts);
-        // TODO: schedule a utctime read from this time source and emit event only on failure to get time
-        EmitTimeFailureEvent(GetDelegate(), GetEventsGenerator());
     }
     else
     {
