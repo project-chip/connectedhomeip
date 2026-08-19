@@ -163,20 +163,20 @@ CHIP_ERROR AvAnalysisCluster::AnalysisSessionStart(uint16_t & aSessionId, DataMo
 }
 
 CHIP_ERROR
-AvAnalysisCluster::InitialTriggeringContextDetected(uint16_t aSessionId,
-                                                    const std::vector<AvAnalysis::Structs::TrackedContext::Type>& aTriggeringContext)
+AvAnalysisCluster::InitialTriggeringContextDetected(
+    uint16_t aSessionId, const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aTriggeringContext)
 {
     return mLogic.InitialTriggeringContextDetected(aSessionId, aTriggeringContext, mContext);
 }
 
 CHIP_ERROR AvAnalysisCluster::NewContextDetected(uint16_t aSessionId,
-                                                 const std::vector<AvAnalysis::Structs::TrackedContext::Type>& aNewContext)
+                                                 const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aNewContext)
 {
     return mLogic.NewContextDetected(aSessionId, aNewContext, mContext);
 }
 
 CHIP_ERROR AvAnalysisCluster::ContextNoLongerDetected(uint16_t aSessionId,
-                                                      const std::vector<AvAnalysis::Structs::TrackedContext::Type>& aOldContext)
+                                                      const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aOldContext)
 {
     return mLogic.ContextNoLongerDetected(aSessionId, aOldContext, mContext);
 }
