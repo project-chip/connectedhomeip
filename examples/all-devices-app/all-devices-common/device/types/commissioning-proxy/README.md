@@ -309,8 +309,8 @@ WiFi-PAF: Starting NAN publish
 Before connecting, a Commissioner can ask the proxy to scan for nearby
 commissionable devices. In these commands `8` is the Wi-Fi PAF transport bit,
 `1998` is the proxy node ID (use whatever you paired in step 5), and `5` is the
-endpoint where the cluster lives. The `--WiFiBands` bitmap is `1` = 2.4 GHz, `4` = 5
-GHz, `5` = both.
+endpoint where the cluster lives. The `--WiFiBands` bitmap is `1` = 2.4 GHz, `4`
+= 5 GHz, `5` = both.
 
 **Foreground (one-shot) scan** — results are returned inline. This command
 carries a large payload, so TCP must be forced:
