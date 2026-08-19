@@ -235,9 +235,10 @@ public:
     // value read out of its mode is never applied on restore.
     uint16_t CurrentX() const;
     uint16_t CurrentY() const;
-    // 8-bit CurrentHue: the high byte of the 16-bit enhanced hue (§3.2.7.12). Read-only; there is no
-    // direct hue setter — hue changes go through the Move/Step command handlers (transition-only contract).
-    uint8_t CurrentHue() const { return static_cast<uint8_t>(GetEnhancedHue() >> 8); }
+    // 8-bit CurrentHue: the high byte of the 16-bit enhanced hue, clamped to the CurrentHue constraint
+    // max (§3.2.7.12). Read-only; there is no direct hue setter — hue changes go through the Move/Step
+    // command handlers (transition-only contract).
+    uint8_t CurrentHue() const { return ColorControl::Hue8FromEnhancedHue(GetEnhancedHue()); }
     uint16_t EnhancedHue() const { return GetEnhancedHue(); }
     uint8_t Saturation() const { return GetSaturation(); }
     uint16_t ColorTempMireds() const;

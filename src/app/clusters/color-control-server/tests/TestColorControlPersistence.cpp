@@ -305,7 +305,9 @@ TEST_F(TestColorControlPersistence, StartUpColorTemperatureWriteSurvivesReboot)
 // §3.2.11.10 null row: a boot whose StartUpColorTemperatureMireds is null owes the PREVIOUS
 // ColorTemperatureMireds. That only holds if the boot which APPLIED a startup value also stored it —
 // otherwise the pre-startup mode is still the newest thing in NVM and the color reverts to it. No command
-// runs here on purpose: Startup() is the only writer under test.
+// runs here on purpose: Startup() is the only writer under test. The null reaches boot 2 through NVM, not
+// through its Config: StartUpColorTemperatureMireds is NVM-backed, so Startup() loads the stored value over
+// the configured one.
 TEST_F(TestColorControlPersistence, StartUpColorTemperatureIsPersistedForTheFollowingNullBoot)
 {
     ColorControlCluster::Config cfg(delegate);
@@ -326,10 +328,11 @@ TEST_F(TestColorControlPersistence, StartUpColorTemperatureIsPersistedForTheFoll
     // itself is never re-stored by it.
     ASSERT_TRUE(tester.WriteAttribute(Attributes::StartUpColorTemperatureMireds::Id, DataModel::Nullable<uint16_t>()).IsSuccess());
 
-    // Boot 2 takes the null path, so it restores purely from NVM: 300 in CT mode is what boot 1 was
-    // showing. Coming up as the configured HueSatColor would mean boot 1 never stored the startup value.
+    // Boot 2's config still names a startup value, and a different one, so that loading the stored null is
+    // the only way to reach 300: 200 means the null never made it out of NVM, and the configured
+    // HueSatColor means boot 1 never stored the startup value it applied.
+    cfg.ctConfig.startUpColorTemperatureMireds.SetNonNull(200); // before constructing b: the cluster copies ctConfig
     ColorControlCluster b(kEp, cfg);
-    cfg.ctConfig.startUpColorTemperatureMireds.SetNonNull(200);
     ASSERT_EQ(b.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
     EXPECT_EQ(b.GetEnhancedColorMode(), EnhancedColorModeEnum::kColorTemperatureMireds);
     EXPECT_EQ(b.ColorTempMireds(), 300u);

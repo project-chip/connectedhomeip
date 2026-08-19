@@ -14,11 +14,15 @@
  *    limitations under the License.
  */
 
-// ColorControl <-> On/Off coupling tests. The coupling is via DIRECT INJECTION (Config.onOff), the same
-// pattern LevelControl uses (WithOnOff) - no registry, no CodegenDataModelProvider::Instance(), no
-// mock_model. We construct both clusters, inject the On/Off cluster, and check ShouldExecuteIfOff (a
-// public method) honors its live state. Only ShouldExecuteIfOff is exercised (it makes no transition,
-// so no DeviceLayer::SystemLayer() is needed).
+// ColorControl coupling tests: to On/Off, and to Level Control.
+//
+// On/Off coupling is via DIRECT INJECTION (Config.onOff), the same pattern LevelControl uses (WithOnOff) -
+// no registry, no CodegenDataModelProvider::Instance(), no mock_model. We construct both clusters, inject
+// the On/Off cluster, and drive the public command handlers to check the ExecuteIfOff gate honors the live
+// On/Off state. Level coupling is driven by calling CoupleColorTempToLevel directly, as the application does.
+//
+// Both exercise real color-temperature transitions, so tests run against a mock clock and drive OnTick()
+// manually; see SetUpTestSuite for why the CHIP stack is brought up.
 
 #include <app/clusters/color-control-server/ColorControlCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>

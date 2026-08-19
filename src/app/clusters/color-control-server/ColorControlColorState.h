@@ -34,6 +34,16 @@ namespace chip::app::Clusters::ColorControl {
 constexpr uint8_t kMinCurrentHue = 0x00;
 constexpr uint8_t kMaxCurrentHue = 0xFE;
 
+// §3.2.7.12: CurrentHue is the most-significant byte of EnhancedCurrentHue. The top byte alone would
+// yield 0xFF for enhanced hues 0xFF00..0xFFFF, which violates the CurrentHue constraint, so the
+// projection saturates at kMaxCurrentHue (a full revolution, i.e. visually the same point as 0x00).
+// Single definition so every CurrentHue producer -- attribute reads, scene serialization, delegate
+// callbacks -- reports the same legal value.
+constexpr uint8_t Hue8FromEnhancedHue(uint16_t enhancedHue)
+{
+    return std::clamp(static_cast<uint8_t>(enhancedHue >> 8), kMinCurrentHue, kMaxCurrentHue);
+}
+
 // CIE xy chromaticity coordinates.
 // §3.2.7 defines no Fallback for CurrentX/CurrentY,
 // default values are matching zap app defaults.
@@ -66,7 +76,7 @@ struct EnhancedHueSatColor
     uint8_t saturation   = 0;
 
     // §3.2.7.12: CurrentHue is the most-significant byte of EnhancedCurrentHue.
-    uint8_t hue8() const { return std::clamp(static_cast<uint8_t>(enhancedHue >> 8), kMinCurrentHue, kMaxCurrentHue); }
+    uint8_t hue8() const { return Hue8FromEnhancedHue(enhancedHue); }
 };
 
 // The single active color value. The alternative held encodes the (Enhanced)ColorMode, so

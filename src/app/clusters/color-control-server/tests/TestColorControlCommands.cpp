@@ -42,9 +42,10 @@ using Status = Protocols::InteractionModel::Status;
 
 constexpr EndpointId kEp = 1;
 
-// Saturation/CIE limits mirrored from the cluster.
-constexpr uint8_t kMaxSat    = 254;
-constexpr uint16_t kMaxCieXy = 0xFEFF;
+// Saturation/CIE/mired limits mirrored from the cluster.
+constexpr uint8_t kMaxSat              = 254;
+constexpr uint16_t kMaxCieXy           = 0xFEFF;
+constexpr uint16_t kMaxColorTempMireds = 0xFEFF;
 
 struct TestColorControlCommands : public ::testing::Test
 {
@@ -483,6 +484,22 @@ TEST_F(TestColorControlCommands, MoveToColorTemperatureClampsToPhysicalRange)
     EXPECT_EQ(c.ColorTempMireds(), 300u);
 }
 
+// The 0xFEFF mireds ceiling is a constraint on the command *field*, separate from the physical range
+// (which clamps rather than rejects, see above). Opening the physical max all the way up isolates it:
+// the exact maximum is accepted and applied verbatim, and only max+1 is refused.
+TEST_F(TestColorControlCommands, MoveToColorTemperatureAcceptsProtocolMaximum)
+{
+    auto config                                = CtConfig();
+    config.ctConfig.colorTempPhysicalMaxMireds = kMaxColorTempMireds;
+    ColorControlCluster c(kEp, config);
+
+    ASSERT_EQ(c.MoveToColorTemp(kMaxColorTempMireds, 0), Status::Success);
+    Complete(c);
+    EXPECT_EQ(c.ColorTempMireds(), kMaxColorTempMireds);
+
+    EXPECT_EQ(c.MoveToColorTemp(kMaxColorTempMireds + 1, 0), Status::ConstraintError);
+}
+
 // ---------------------------------------------------------------------------- Mid-transition interpolation
 
 TEST_F(TestColorControlCommands, TransitionInterpolatesOverTime)
@@ -626,6 +643,27 @@ TEST_F(TestColorControlCommands, LegacyHueCommandsRejectHueAboveMax)
     EXPECT_EQ(c.MoveToHueAndSaturation(254, 200, 10, /*isEnhanced=*/false), Status::Success);
     EXPECT_EQ(c.MoveToHue(255, DirectionEnum::kShortest, 10, /*isEnhanced=*/true), Status::Success);
     EXPECT_EQ(c.MoveToHueAndSaturation(255, 200, 10, /*isEnhanced=*/true), Status::Success);
+}
+
+// §3.2.7.12 makes CurrentHue the high byte of EnhancedCurrentHue, but §3.2.7.11 caps CurrentHue at
+// kMaxCurrentHue (0xFE). An enhanced hue in 0xFF00..0xFFFF — legal, and reachable via EnhancedMoveToHue —
+// would project to the out-of-range 0xFF, so the projection saturates. Both the attribute read and the
+// live-state accessor the scene handler serializes from must report the same legal value.
+TEST_F(TestColorControlCommands, CurrentHueProjectionSaturatesAtConstraintMax)
+{
+    ColorControlCluster c(kEp, EnhancedConfig()); // start enhancedHue 0x1000
+    Testing::ClusterTester tester(c);
+
+    EXPECT_EQ(c.MoveToHue(0xFFFF, DirectionEnum::kShortest, 10, /*isEnhanced=*/true), Status::Success);
+    Complete(c);
+
+    // The 16-bit value itself is untouched — only its 8-bit projection is capped.
+    EXPECT_EQ(c.EnhancedHue(), 0xFFFF);
+    EXPECT_EQ(c.CurrentHue(), kMaxCurrentHue);
+
+    uint8_t currentHue = 0;
+    ASSERT_TRUE(tester.ReadAttribute(Attributes::CurrentHue::Id, currentHue).IsSuccess());
+    EXPECT_EQ(currentHue, c.CurrentHue());
 }
 
 // MoveToHue, EnhancedMoveToHue and EnhancedStepHue each carry a uint16 TransitionTime constrained to
