@@ -2023,7 +2023,7 @@ class XmlDataModel:
     problems: list[ProblemNotice]
 
 
-def build_xml_data_model(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable]) -> XmlDataModel:
+def build_xml_data_model(data_model_directory: typing.Union[PrebuiltDataModelDirectory, Traversable]) -> XmlDataModel:
     """Build the full data model from XML files: clusters, device types, namespaces, and global data types."""
     clusters, problems = build_xml_clusters(data_model_directory)
     device_types, dt_problems = build_xml_device_types(data_model_directory, cluster_definition_xml=clusters)
