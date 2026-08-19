@@ -8454,36 +8454,6 @@ bool emberAfContentAppObserverClusterContentAppMessageCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessage::DecodableType & commandData);
 /**
- * @brief Media File Management Cluster AddFile Command callback (from client)
- */
-bool emberAfMediaFileManagementClusterAddFileCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MediaFileManagement::Commands::AddFile::DecodableType & commandData);
-/**
- * @brief Media File Management Cluster DeleteFile Command callback (from client)
- */
-bool emberAfMediaFileManagementClusterDeleteFileCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MediaFileManagement::Commands::DeleteFile::DecodableType & commandData);
-/**
- * @brief Media File Management Cluster RequestSharedFiles Command callback (from client)
- */
-bool emberAfMediaFileManagementClusterRequestSharedFilesCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MediaFileManagement::Commands::RequestSharedFiles::DecodableType & commandData);
-/**
- * @brief Media File Management Cluster GetSharedFile Command callback (from client)
- */
-bool emberAfMediaFileManagementClusterGetSharedFileCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MediaFileManagement::Commands::GetSharedFile::DecodableType & commandData);
-/**
- * @brief Media File Management Cluster OfferFile Command callback (from client)
- */
-bool emberAfMediaFileManagementClusterOfferFileCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MediaFileManagement::Commands::OfferFile::DecodableType & commandData);
-/**
  * @brief Audio Control Cluster Mute Command callback (from client)
  */
 bool emberAfAudioControlClusterMuteCallback(chip::app::CommandHandler * commandObj,
