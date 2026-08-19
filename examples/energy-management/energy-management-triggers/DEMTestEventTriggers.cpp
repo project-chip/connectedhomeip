@@ -296,8 +296,8 @@ void SetTestEventTrigger_PowerRangeAdjustment()
                   sSavedAbsMaxPowerMw);
 
     // Set test values: AbsMinPower=1kW (1000000 mW), AbsMaxPower=7.6kW (76000000 mW)
-    constexpr int64_t TEST_ABS_MIN_POWER_MW = 1000000;  // 1 kW
-    constexpr int64_t TEST_ABS_MAX_POWER_MW = 76000000; // 7.6 kW
+    constexpr int64_t TEST_ABS_MIN_POWER_MW = 1000000; // 1 kW
+    constexpr int64_t TEST_ABS_MAX_POWER_MW = 7600000; // 7.6 kW
 
     CHIP_ERROR err = GetDEMDelegate()->SetAbsMinPower(TEST_ABS_MIN_POWER_MW);
     if (err != CHIP_NO_ERROR)
