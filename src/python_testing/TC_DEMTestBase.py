@@ -190,16 +190,24 @@ class DEMTestBase:
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
-    async def send_power_range_adjustment_command(self, minPower: int, maxPower: int, duration: int,
+    async def send_power_range_adjustment_command(self, duration: int,
                                                   cause: Clusters.Objects.DeviceEnergyManagement.Enums.CauseEnum,
+                                                  minPower: int = None, maxPower: int = None,
                                                   endpoint: int = None, timedRequestTimeoutMs: int = 3000,
                                                   expected_status: Status = Status.Success):
         try:
+            # Build command with only provided optional parameters
+            cmd_dict = {
+                "duration": duration,
+                "cause": cause,
+            }
+            if minPower is not None:
+                cmd_dict["minPower"] = minPower
+            if maxPower is not None:
+                cmd_dict["maxPower"] = maxPower
+                
             await self.send_single_cmd(cmd=Clusters.DeviceEnergyManagement.Commands.PowerRangeAdjustRequest(
-                minPower=minPower,
-                maxPower=maxPower,
-                duration=duration,
-                cause=cause),
+                **cmd_dict),
                 endpoint=endpoint,
                 timedRequestTimeoutMs=timedRequestTimeoutMs)
 
