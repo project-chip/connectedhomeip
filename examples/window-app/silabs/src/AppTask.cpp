@@ -101,10 +101,10 @@ void AppTask::AppTaskMain(void * pvParameter)
 #ifdef DISPLAY_ENABLED
     WindowManager::sWindow.UpdateLCD();
 #endif // DISPLAY_ENABLED
-=======
+    =======
 >>>>>>> ae1da97b84 ([Silabs] Fix LCD Update after Commissioning (#73440))
 
-    while (true)
+        while (true)
     {
         osStatus_t eventReceived = osMessageQueueGet(sAppEventQueue, &event, NULL, osWaitForever);
         while (eventReceived == osOK)
