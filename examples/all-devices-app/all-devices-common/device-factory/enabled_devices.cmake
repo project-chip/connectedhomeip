@@ -112,7 +112,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     # Baseline for devices (not real device types)
     # keep-sorted: start
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/color-light/ColorLight.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/color-light/LoggingLightDriver.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/color-light/impl/LoggingLightDriver.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/dimmable-load/DimmableLoad.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/dimmable-load/impl/LoggingDimmableLoad.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/fan-load/FanLoad.cpp"
