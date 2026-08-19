@@ -136,10 +136,7 @@ public:
          * @param[in] attributeId The attribute to write to.
          * @return The maximum allowed timeout; nullopt if the request is invalid.
          */
-        virtual std::optional<System::Clock::Milliseconds16> GetMaxAtomicWriteTimeout(chip::AttributeId)
-        {
-            return std::nullopt;
-        }
+        virtual std::optional<System::Clock::Milliseconds16> GetMaxAtomicWriteTimeout(chip::AttributeId) { return std::nullopt; }
     };
 
     ThermostatPresets() = delete;

@@ -170,8 +170,13 @@ private:
 
     Delegate * mDelegate = nullptr;
 
-    Protocols::InteractionModel::Status ExecuteAtomicAction(AtomicAttributes & attributeStatuses, Protocols::InteractionModel::Status (Delegate::*action)(chip::AttributeId));
-    Protocols::InteractionModel::Status ExecuteAtomicAction(AtomicAttributes & attributeStatuses, Protocols::InteractionModel::Status (Delegate::*action)(chip::AttributeId), Optional<Protocols::InteractionModel::Status> statusOverride);
+    Protocols::InteractionModel::Status
+    ExecuteAtomicAction(AtomicAttributes & attributeStatuses,
+                        Protocols::InteractionModel::Status (Delegate::*action)(chip::AttributeId));
+    Protocols::InteractionModel::Status
+    ExecuteAtomicAction(AtomicAttributes & attributeStatuses,
+                        Protocols::InteractionModel::Status (Delegate::*action)(chip::AttributeId),
+                        Optional<Protocols::InteractionModel::Status> statusOverride);
 
     /// @brief Builds the list of attribute statuses to return from an AtomicRequest invocation
     /// @param attributeRequests The list of requested attributes

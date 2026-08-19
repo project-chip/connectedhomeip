@@ -117,7 +117,8 @@ Status AtomicWriteSession::ExecuteAtomicAction(AtomicAttributes & attributeStatu
     return ExecuteAtomicAction(attributeStatuses, action, Optional<Status>());
 }
 
-Status AtomicWriteSession::ExecuteAtomicAction(AtomicAttributes & attributeStatuses, Status (Delegate::*action)(AttributeId), Optional<Status> statusOverride)
+Status AtomicWriteSession::ExecuteAtomicAction(AtomicAttributes & attributeStatuses, Status (Delegate::*action)(AttributeId),
+                                               Optional<Status> statusOverride)
 {
     Status status = Status::Success;
     for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
@@ -175,8 +176,7 @@ bool AtomicWriteSession::InAtomicWrite(CommandHandler * commandObj, Optional<Att
     return mNodeId == sourceNodeId;
 }
 
-bool AtomicWriteSession::InAtomicWrite(CommandHandler * commandObj,
-                                       AtomicAttributes & attributeStatuses)
+bool AtomicWriteSession::InAtomicWrite(CommandHandler * commandObj, AtomicAttributes & attributeStatuses)
 {
 
     if (mState != State::Open)

@@ -36,9 +36,9 @@ namespace Thermostat {
 class ThermostatDelegate : public Delegate
 {
 public:
-    ThermostatDelegate(EndpointId endpoint, AttributePersistenceProvider * provider = nullptr)
-        : mEndpointId(endpoint),
-          mProvider(provider) {}
+    ThermostatDelegate(EndpointId endpoint, AttributePersistenceProvider * provider = nullptr) :
+        mEndpointId(endpoint), mProvider(provider)
+    {}
 
     SystemModeEnum GetSystemMode() const override;
     bool SetSystemMode(SystemModeEnum systemMode) override;
