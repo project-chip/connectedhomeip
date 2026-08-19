@@ -311,11 +311,6 @@ void ThermostatCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricI
 CHIP_ERROR ThermostatCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    if (mFeatures.Has(Feature::kMatterScheduleConfiguration))
-    {
-        ReturnErrorOnFailure(builder.AppendElements({ Commands::SetActiveScheduleRequest::kMetadataEntry }));
-    }
-
     if (mFeatures.Has(Feature::kPresets))
     {
         ReturnErrorOnFailure(builder.AppendElements({ Commands::SetActivePresetRequest::kMetadataEntry }));

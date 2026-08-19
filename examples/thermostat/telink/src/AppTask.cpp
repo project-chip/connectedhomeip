@@ -31,7 +31,7 @@ namespace {
 k_timer sThermostatUpdateTimer;
 constexpr uint16_t kThermostatUpdateTimerPeriodMs = 30000; // 30s timer period
 
-static EndpointId gThermostatEndpoint(1);
+constexpr EndpointId gThermostatEndpoint(1);
 static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
 static Clusters::Thermostat::ThermostatPresetsDelegate gPresetsDelegate(gThermostatEndpoint);
 static Clusters::Thermostat::ThermostatSuggestionsDelegate gSuggestionsDelegate(gThermostatEndpoint, gPresetsDelegate);
