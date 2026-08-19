@@ -1063,7 +1063,8 @@ CHIP_ERROR WifiInterfaceImpl::StartNetworkScan(chip::ByteSpan ssid, ::ScanCallba
 
     if (!ssid.empty())
     {
-        chip::MutableByteSpan requestedSsidSpan(sNetworkScanCallbackContext.ssid.value, sizeof(sNetworkScanCallbackContext.ssid.value));
+        chip::MutableByteSpan requestedSsidSpan(sNetworkScanCallbackContext.ssid.value,
+                                                sizeof(sNetworkScanCallbackContext.ssid.value));
         CHIP_ERROR err = chip::CopySpanToMutableSpan(ssid, requestedSsidSpan);
         if (err != CHIP_NO_ERROR)
         {
