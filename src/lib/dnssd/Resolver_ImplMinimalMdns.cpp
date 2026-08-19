@@ -24,10 +24,10 @@
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/dnssd/minimal_mdns/Logging.h>
 #include <lib/dnssd/minimal_mdns/MinMdnsConfig.h>
-#include <lib/dnssd/minimal_mdns/Parser.h>
 #include <lib/dnssd/minimal_mdns/QueryBuilder.h>
-#include <lib/dnssd/minimal_mdns/RecordData.h>
 #include <lib/dnssd/wire/FlatAllocatedQName.h>
+#include <lib/dnssd/wire/Parser.h>
+#include <lib/dnssd/wire/RecordData.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <tracing/macros.h>
@@ -40,6 +40,7 @@ constexpr size_t kMdnsMaxPacketSize = 1024;
 constexpr uint16_t kMdnsPort        = 5353;
 
 using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 
 /// Handles processing of minmdns packet data.
 ///
@@ -314,14 +315,14 @@ private:
 
     CHIP_ERROR BrowseNodes(DiscoveryType type, DiscoveryFilter subtype);
     template <typename... Args>
-    mdns::Minimal::FullQName CheckAndAllocateQName(Args &&... parts)
+    chip::Dnssd::FullQName CheckAndAllocateQName(Args &&... parts)
     {
-        size_t requiredSize = mdns::Minimal::FlatAllocatedQName::RequiredStorageSize(parts...);
+        size_t requiredSize = chip::Dnssd::FlatAllocatedQName::RequiredStorageSize(parts...);
         if (requiredSize > kMaxQnameSize)
         {
-            return mdns::Minimal::FullQName();
+            return chip::Dnssd::FullQName();
         }
-        return mdns::Minimal::FlatAllocatedQName::Build(qnameStorage, parts...);
+        return chip::Dnssd::FlatAllocatedQName::Build(qnameStorage, parts...);
     }
     static constexpr int kMaxQnameSize = 100;
     char qnameStorage[kMaxQnameSize];
@@ -537,7 +538,7 @@ void MinMdnsResolver::Shutdown()
 CHIP_ERROR MinMdnsResolver::BuildQuery(QueryBuilder & builder, const ActiveResolveAttempts::ScheduledAttempt::Browse & data,
                                        bool firstSend)
 {
-    mdns::Minimal::FullQName qname;
+    chip::Dnssd::FullQName qname;
 
     switch (data.type)
     {
@@ -590,7 +591,7 @@ CHIP_ERROR MinMdnsResolver::BuildQuery(QueryBuilder & builder, const ActiveResol
 
     VerifyOrReturnError(qname.nameCount, CHIP_ERROR_NO_MEMORY);
 
-    mdns::Minimal::Query query(qname);
+    chip::Dnssd::Query query(qname);
     query
         .SetClass(QClass::IN)           //
         .SetType(QType::ANY)            //
