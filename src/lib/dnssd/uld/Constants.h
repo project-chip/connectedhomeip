@@ -23,9 +23,6 @@ namespace chip {
 namespace Dnssd {
 namespace Uld {
 
-// DNS Update opcode (RFC 2136).
-inline constexpr uint8_t kOpcodeUpdate = 5;
-
 // DNSKEY RR / SIG algorithm ECDSA P-256 with SHA-256 (RFC 6605).
 inline constexpr uint8_t kKeyAlgorithmEcdsaP256 = 13;
 

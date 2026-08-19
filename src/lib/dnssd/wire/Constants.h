@@ -70,6 +70,13 @@ enum class QClass : uint16_t
     IN_FLUSH   = IN | kQClassResponseFlushBit,
 };
 
+// DNS header OPCODE field
+enum class Opcode : uint8_t
+{
+    kQuery  = 0,
+    kUpdate = 5,
+};
+
 enum class ResourceType
 {
     kAnswer,

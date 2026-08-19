@@ -63,7 +63,8 @@ protected:
             .Put32(mInception)
             .Put16(mKeyTag);
 
-        out.WriteQName(mSignerName);
+        // RFC 3597 §4: names embedded in SIG RDATA must not be compressed.
+        out.WriteQNameUncompressed(mSignerName);
         out.Writer().Put(mSignature.data(), mSignature.size());
         return out.Fit();
     }

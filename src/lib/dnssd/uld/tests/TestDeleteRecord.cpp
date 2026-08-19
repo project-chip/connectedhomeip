@@ -32,7 +32,7 @@ using namespace chip::Dnssd::Uld;
 
 const QNamePart kNames[] = { "host", "local" };
 
-TEST(TestDeleteRecord, DeleteAllRrsetsWritesEmptyRdata)
+TEST(TestDeleteRecord, DeleteRrsetWritesEmptyRdata)
 {
     uint8_t headerBuffer[HeaderRef::kSizeBytes];
     uint8_t dataBuffer[128];
@@ -43,7 +43,7 @@ TEST(TestDeleteRecord, DeleteAllRrsetsWritesEmptyRdata)
     BufferWriter output(dataBuffer, sizeof(dataBuffer));
     RecordWriter writer(&output);
 
-    DeleteAllRrsetsRecord record(kNames, QType::ANY);
+    DeleteRrsetRecord record(kNames, QType::ANY);
 
     const uint8_t expectedOutput[] = {
         4, 'h', 'o', 's', 't',      //

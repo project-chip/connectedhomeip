@@ -19,7 +19,6 @@
 #include <cstddef>
 #include <cstdint>
 
-#include <lib/dnssd/uld/Constants.h>
 #include <lib/dnssd/wire/DnsHeader.h>
 #include <lib/dnssd/wire/QName.h>
 #include <lib/dnssd/wire/Query.h>
@@ -90,7 +89,7 @@ public:
 
         mHeader.Clear();
         mHeader.SetMessageId(messageId);
-        mHeader.SetAllFlags(BitPackedFlags(0).SetQuery().SetOpcode(kOpcodeUpdate));
+        mHeader.SetAllFlags(BitPackedFlags(0).SetQuery().SetOpcode(Opcode::kUpdate));
 
         mOutput = Encoding::BigEndian::BufferWriter(mBuffer, mSize);
         mOutput.Skip(HeaderRef::kSizeBytes);

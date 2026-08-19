@@ -50,7 +50,7 @@ TEST(TestUpdateBuilder, BeginSetsOpcodeUpdate)
     EXPECT_TRUE(builder.Ok());
     EXPECT_EQ(builder.Header().GetMessageId(), 0x1234);
     EXPECT_TRUE(builder.Header().GetFlags().IsQuery());
-    EXPECT_EQ(builder.Header().GetFlags().GetOpcode(), kOpcodeUpdate);
+    EXPECT_EQ(builder.Header().GetFlags().GetOpcode(), Opcode::kUpdate);
     EXPECT_EQ(builder.PacketSize(), HeaderRef::kSizeBytes);
 }
 
@@ -68,7 +68,7 @@ TEST(TestUpdateBuilder, MinimalUpdateWithZoneDeleteAddOptAndSig)
     UpdateBuilder builder(buffer, sizeof(buffer));
     builder.Begin(0xABCD);
 
-    DeleteAllRrsetsRecord delAny(kHost, QType::ANY);
+    DeleteRrsetRecord delAny(kHost, QType::ANY);
     PtrResourceRecord ptr(kService, kInstance);
     SrvResourceRecord srv(kInstance, kHost, 5540);
     KeyResourceRecord key(kHost, ByteSpan(rawKey));
@@ -96,7 +96,7 @@ TEST(TestUpdateBuilder, RejectsUpdateBeforeZone)
 
     // Query::Append requires no records yet; adding an update first is fine at the
     // ResourceRecord layer, but AddZone after records must fail.
-    DeleteAllRrsetsRecord delAny(kHost, QType::TXT);
+    DeleteRrsetRecord delAny(kHost, QType::TXT);
     builder.AddUpdate(delAny);
     EXPECT_TRUE(builder.Ok());
 
@@ -110,12 +110,12 @@ TEST(TestUpdateBuilder, SectionOrderAnswerBeforeAuthority)
     UpdateBuilder builder(buffer, sizeof(buffer));
     builder.Begin(1).AddZone(kZone);
 
-    DeleteAllRrsetsRecord delAny(kHost, QType::TXT);
+    DeleteRrsetRecord delAny(kHost, QType::TXT);
     builder.AddUpdate(delAny);
     EXPECT_TRUE(builder.Ok());
 
     // Prerequisite (answer) after update (authority) is rejected by ResourceRecord::Append.
-    DeleteAllRrsetsRecord prereq(kHost, QType::TXT);
+    DeleteRrsetRecord prereq(kHost, QType::TXT);
     builder.AddPrerequisite(prereq);
     EXPECT_FALSE(builder.Ok());
 }

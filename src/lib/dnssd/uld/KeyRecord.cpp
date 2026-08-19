@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include <cstring>
 #include <lib/dnssd/uld/KeyRecord.h>
 #include <lib/support/CodeUtils.h>
 

@@ -17,6 +17,7 @@
 #pragma once
 
 #include <lib/core/CHIPEncoding.h>
+#include <lib/dnssd/wire/Constants.h>
 
 namespace chip {
 namespace Dnssd {
@@ -59,21 +60,16 @@ public:
     bool IsTruncated() const { return (mValue & kTruncationMask) != 0; }
     BitPackedFlags & SetTruncated(bool value) { return value ? SetMask(kTruncationMask) : ClearMask(kTruncationMask); }
 
-    uint8_t GetOpcode() const { return static_cast<uint8_t>((mValue & kOpcodeMask) >> kOpcodeShift); }
-    BitPackedFlags & SetOpcode(uint8_t opcode)
+    Opcode GetOpcode() const { return static_cast<Opcode>((mValue & kOpcodeMask) >> kOpcodeShift); }
+    BitPackedFlags & SetOpcode(Opcode opcode)
     {
         ClearMask(kOpcodeMask);
         mValue = static_cast<uint16_t>(mValue | ((static_cast<uint16_t>(opcode) & 0x0F) << kOpcodeShift));
         return *this;
     }
 
-    uint8_t GetResponseCode() const { return static_cast<uint8_t>(mValue & kReturnCodeMask); }
-    BitPackedFlags & SetResponseCode(uint8_t code)
-    {
-        ClearMask(kReturnCodeMask);
-        mValue = static_cast<uint16_t>(mValue | (static_cast<uint16_t>(code) & kReturnCodeMask));
-        return *this;
-    }
+    /// Lower 4 bits of the DNS header RCODE
+    uint8_t GetResponseCodeBits() const { return static_cast<uint8_t>(mValue & kResponseCodeMask); }
 
     /// Full 16-bit flags value, including OPCODE and RCODE.
     /// Prefer this over RawValue() for DNS Update (RFC 2136) and other non-mDNS messages.
@@ -83,7 +79,7 @@ public:
     /// RFC 6762
     // TODO: DNS Update carries an OpCode (5) and often non-zero return code. We will need to change this for ULD/SRP support.
     // (RFC 2136)
-    bool IsValidMdns() const { return (mValue & (kOpcodeMask | kReturnCodeMask)) == 0; }
+    bool IsValidMdns() const { return (mValue & (kOpcodeMask | kResponseCodeMask)) == 0; }
 
 private:
     uint16_t mValue = 0;
@@ -102,10 +98,10 @@ private:
 
     static constexpr uint16_t kAuthoritativeMask = 0x0400;
     static constexpr uint16_t kIsResponseMask    = 0x8000;
-    static constexpr uint16_t kOpcodeMask        = 0x7800;
     static constexpr uint16_t kOpcodeShift       = 11;
+    static constexpr uint16_t kOpcodeMask        = 0x0F << kOpcodeShift;
     static constexpr uint16_t kTruncationMask    = 0x0200;
-    static constexpr uint16_t kReturnCodeMask    = 0x000F;
+    static constexpr uint16_t kResponseCodeMask  = 0x000F;
 
     // Bits preserved by RawValue()/SetFlags for mDNS (RFC 6762: OPCODE/RCODE must be 0).
     static constexpr uint16_t kMdnsNonIgnoredMask = kIsResponseMask | kAuthoritativeMask | kTruncationMask;

@@ -23,12 +23,14 @@ namespace Dnssd {
 namespace Uld {
 
 /**
- * @brief  Delete all RRsets (RFC 2136 §2.5.2: CLASS=ANY, TTL=0, empty RDATA).
+ * @brief Delete an RRset (RFC 2136 §2.5.2: CLASS=ANY, TTL=0, empty RDATA).
+ *
+ * When @p type is QType::ANY this delete all RRsets from a name.
  */
-class DeleteAllRrsetsRecord : public ResourceRecord
+class DeleteRrsetRecord : public ResourceRecord
 {
 public:
-    DeleteAllRrsetsRecord(const FullQName & name, QType type) : ResourceRecord(type, name)
+    DeleteRrsetRecord(const FullQName & name, QType type) : ResourceRecord(type, name)
     {
         SetClass(QClass::ANY);
         SetTtl(0);
