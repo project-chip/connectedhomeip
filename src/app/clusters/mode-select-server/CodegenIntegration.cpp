@@ -207,8 +207,8 @@ void MatterModeSelectPluginServerShutdownCallback() {}
 
 void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId) {}
 void MatterModeSelectClusterServerAttributeChangedCallback(const ConcreteAttributePath &) {}
-Protocols::InteractionModel::Status MatterModeSelectClusterServerPreAttributeChangedCallback(
-    const ConcreteAttributePath &, EmberAfAttributeType, uint16_t, uint8_t *)
+Protocols::InteractionModel::Status
+MatterModeSelectClusterServerPreAttributeChangedCallback(const ConcreteAttributePath &, EmberAfAttributeType, uint16_t, uint8_t *)
 {
     return Protocols::InteractionModel::Status::Success;
 }
