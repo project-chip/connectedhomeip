@@ -59,12 +59,6 @@ chip_test_suite("tests") {
     ]
   }
 
-  if (chip_device_platform == "linux" && chip_crypto != "mbedtls" &&
-      chip_crypto != "psa" && chip_support_thread_meshcop &&
-      current_cpu == host_cpu && current_os == host_os) {
-    test_sources += [ "TestThreadMeshcopCommissionProxy.cpp" ]
-  }
-
   test_sources += [ "TestCommissioningDelegate.cpp" ]
 
   cflags = [ "-Wconversion" ]
@@ -86,4 +80,11 @@ chip_test_suite("tests") {
     "${chip_root}/src/messaging/tests:helpers",
     "${chip_root}/src/transport/raw/tests:helpers",
   ]
+
+  if (chip_device_platform == "linux" && chip_crypto != "mbedtls" &&
+      chip_crypto != "psa" && chip_support_thread_meshcop &&
+      current_cpu == host_cpu && current_os == host_os) {
+    test_sources += [ "TestThreadMeshcopCommissionProxy.cpp" ]
+    public_deps += [ "${chip_root}/third_party/jsoncpp" ]
+  }
 }

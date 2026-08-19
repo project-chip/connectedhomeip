@@ -129,7 +129,8 @@ void ThreadMeshcopCommissionProxy::SetState(State state)
 void ThreadMeshcopCommissionProxy::OnHeader(chip::Dnssd::ConstHeaderRef & header)
 {
     mCurrentPacketIsResponse = header.GetFlags().IsResponse();
-    ChipLogDetail(Controller, "mDNS Response: ID=%u, Answers=%u, Additional=%u", header.GetMessageId(), header.GetAnswerCount(),
+    ChipLogDetail(Controller, "mDNS packet: type=%s, ID=%u, Answers=%u, Additional=%u",
+                  mCurrentPacketIsResponse ? "response" : "query", header.GetMessageId(), header.GetAnswerCount(),
                   header.GetAdditionalCount());
 }
 
