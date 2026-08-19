@@ -171,13 +171,15 @@ openssl verify -CAfile Chip-PAA-Cert.pem -untrusted Chip-PAI-Cert.pem Chip-DAC-C
 
 ## PDC Identity Usage Examples
 
-Example commands to generate a PDC identity (a constrained self-signed certificate):
+Example commands to generate a PDC identity (a constrained self-signed
+certificate):
 
 ```
 ./chip-cert gen-cert --type p --out-key identity-key.pem --out identity.pem --out-format x509-pem
 ```
 
-PDC Identities are usually transferred in (compact) TLV format. Convert to TLV (hex):
+PDC Identities are usually transferred in (compact) TLV format. Convert to TLV
+(hex):
 
 ```
 ./chip-cert convert-cert -x identity.pem identity.hex
