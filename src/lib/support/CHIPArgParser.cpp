@@ -1361,9 +1361,10 @@ static int32_t SplitArgs(char * argStr, char **& argList, char * initialArg)
         if (argListSize == static_cast<size_t>(argCount + 1))
         {
             argListSize *= 2;
-            argList = static_cast<char **>(chip::Platform::MemoryRealloc(argList, sizeof(char *) * argListSize));
-            if (argList == nullptr)
+            char ** newArgList = static_cast<char **>(chip::Platform::MemoryRealloc(argList, sizeof(char *) * argListSize));
+            if (newArgList == nullptr)
                 return -1;
+            argList = newArgList;
         }
 
         // Append the argument.
