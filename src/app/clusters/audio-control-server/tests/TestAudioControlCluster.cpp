@@ -3244,8 +3244,7 @@ TEST_F(TestAudioControlCluster, StartupCorruptedDefaultStepSizeKvsClampedToOne)
     auto key = DefaultStorageKeyAllocator::AttributeValue(kRootEndpointId, AudioControl::Id, DefaultStepSize::Id);
     ASSERT_EQ(testContext.StorageDelegate().SyncSetKeyValue(key.KeyName(), &corruptValue, sizeof(corruptValue)), CHIP_NO_ERROR);
 
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                BasicConfig().WithInitialSoftMuted(false).WithInitialVolume(50));
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithInitialSoftMuted(false).WithInitialVolume(50));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
