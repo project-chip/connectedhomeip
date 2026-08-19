@@ -139,7 +139,7 @@ private:
 
 public:
     virtual ~ActiveAmbientContextSession() = default;
-    ActiveAmbientContextSession() = default;
+    ActiveAmbientContextSession()          = default;
 
     void SetSessionId(uint16_t aSessionId) { mSessionId = aSessionId; }
     uint16_t GetSessionId() const { return mSessionId; }
