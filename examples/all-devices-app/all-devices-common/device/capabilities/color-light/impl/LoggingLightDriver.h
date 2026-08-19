@@ -57,10 +57,14 @@ protected:
     DataModel::ActionReturnStatus TriggerDelayedAllOff(Clusters::OnOff::DelayedAllOffEffectVariantEnum effect) override;
     DataModel::ActionReturnStatus TriggerDyingLight(Clusters::OnOff::DyingLightEffectVariantEnum effect) override;
 
-    // ColorControlDelegate. Only the color temperature output is implemented: the device types
-    // built on this advertise no more than one color representation at a time that needs driving,
-    // so the cluster never asks for a conversion between representations.
+    // ColorControlDelegate. Both representations these device types advertise are driven. The
+    // XY <-> mireds conversions are deliberately not supplied: the mapping between representations
+    // is a product calibration, not something an example can specify. They are overridden only to
+    // log that the cluster asked, which leaves its documented fallback in place.
+    void OnColorXYChanged(uint16_t x, uint16_t y) override;
     void OnColorCTChanged(uint16_t mireds) override;
+    void ConvertXYToMireds(uint16_t x, uint16_t y, uint16_t & outMireds) override;
+    void ConvertMiredsToXY(uint16_t mireds, uint16_t & outX, uint16_t & outY) override;
 
     // IdentifyDelegate. TriggerEffect is mandatory for both device types built on this driver
     // (Color Temperature Light 0x010C and Extended Color Light 0x010D), so it is always enabled.

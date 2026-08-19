@@ -35,8 +35,6 @@
 # ---------------------------------------------------------------------------
 set(ALL_DEVICES_DEVICE_SOURCES
     # keep-sorted: start
-    "${ALL_DEVICES_COMMON_DIR}/oob-accessors/OOBDataSerializer.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/oob-accessors/boolean-state-sensor/BooleanStateSensorAccessor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/aggregator/Aggregator.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/air-purifier/AirPurifier.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/air-purifier/impl/LoggingAirPurifier.cpp"
@@ -54,8 +52,8 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/dimmable-light/impl/LoggingDimmableLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/dimmable-plug-in-unit/DimmablePlugInUnit.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/dishwasher/Dishwasher.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/types/extended-color-light/ExtendedColorLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/dishwasher/impl/EmulatedDishwasher.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/extended-color-light/ExtendedColorLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/extractor-hood/ExtractorHood.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/fan/Fan.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/fan/impl/LoggingFan.cpp"
@@ -77,8 +75,8 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/network-infrastructure-manager/NetworkInfrastructureManager.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/occupancy-sensor/OccupancySensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/occupancy-sensor/impl/LoggingOccupancySensor.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-light/impl/LoggingOnOffLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-light-switch/OnOffLightSwitch.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-light/impl/LoggingOnOffLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-plug-in-unit/OnOffPlugInUnit.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/oven/Oven.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/oven/impl/LoggingOven.cpp"
@@ -87,14 +85,14 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/pressure-sensor/PressureSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/pressure-sensor/impl/IncreasingPressureSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/ProximityRanger.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/impl/LoggingProximityRanger.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/impl/LoggingRangingAdapter.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/refrigerator/Refrigerator.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/refrigerator/impl/LoggingRefrigerator.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/impl/LoggingProximityRanger.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/impl/LoggingRangingAdapter.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/root-node/RootNode.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/types/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarm.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/smoke-co-alarm/SmokeCoAlarm.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarm.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/soil-sensor/SoilSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/speaker/Speaker.cpp"
@@ -104,10 +102,15 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-sensor/TemperatureSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-sensor/impl/IncreasingTemperatureSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/water-valve/WaterValve.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/oob-accessors/OOBDataSerializer.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/oob-accessors/boolean-state-sensor/BooleanStateSensorAccessor.cpp"
     # keep-sorted: end
 
     # Baseline for devices (not real device types)
     # keep-sorted: start
+    "${ALL_DEVICES_COMMON_DIR}/device/api/Interface.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/api/SingleEndpoint.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/api/allocator/DynamicEndpointIdAllocator.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/color-light/ColorLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/color-light/impl/LoggingLightDriver.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/dimmable-load/DimmableLoad.cpp"
@@ -118,9 +121,6 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/on-off-load/impl/LoggingOnOffLoad.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/operational-state/impl/LoggingOperationalStateDelegate.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/operational-state/impl/LoggingRvcOperationalStateDelegate.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/api/allocator/DynamicEndpointIdAllocator.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/api/Interface.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/api/SingleEndpoint.cpp"
     # keep-sorted: end
 )
 
@@ -261,6 +261,6 @@ endif()
 set(ALL_DEVICES_CLUSTER_SOURCES
     "${CHIP_ROOT}/src/app/clusters/bindings/BindingCluster.cpp"
     "${CHIP_ROOT}/src/app/clusters/bindings/BindingManager.cpp"
-    "${CHIP_ROOT}/src/app/clusters/bindings/binding-table.cpp"
     "${CHIP_ROOT}/src/app/clusters/bindings/PendingNotificationMap.cpp"
+    "${CHIP_ROOT}/src/app/clusters/bindings/binding-table.cpp"
 )

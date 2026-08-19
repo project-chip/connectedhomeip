@@ -27,10 +27,10 @@ namespace app {
 // element requirements it shares with the Color Temperature Light are applied by
 // ColorLight::Register() and documented there.
 //
-// Only the two mandatory features are advertised. Adding HueSaturation / EnhancedHue / ColorLoop
-// also requires implementing the matching conversions in LoggingLightDriver: once more than one
-// representation is advertised, the cluster asks the delegate to convert between them on every mode
-// switch and on every read of an inactive mode's attribute.
+// Only the two mandatory features are advertised. Both being advertised, the cluster already asks
+// the delegate to convert between XY and mireds on every mode switch and on every read of the
+// inactive mode's attribute; LoggingLightDriver supplies no conversion, so the cluster's fallback
+// stands. Adding HueSaturation / EnhancedHue / ColorLoop would add the remaining conversion pairs.
 ExtendedColorLight::ExtendedColorLight(const Context & context) :
     LoggingLightDriver(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kExtendedColorLight, 1), context,
                        Conformance{

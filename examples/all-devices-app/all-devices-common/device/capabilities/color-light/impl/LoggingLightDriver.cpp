@@ -120,9 +120,29 @@ DataModel::ActionReturnStatus LoggingLightDriver::TriggerDyingLight(OnOff::Dying
 
 // ColorControlDelegate
 
+void LoggingLightDriver::OnColorXYChanged(uint16_t x, uint16_t y)
+{
+    ChipLogProgress(DeviceLayer, "LoggingLightDriver::OnColorXYChanged() -> x=%u y=%u", x, y);
+}
+
 void LoggingLightDriver::OnColorCTChanged(uint16_t mireds)
 {
     ChipLogProgress(DeviceLayer, "LoggingLightDriver::OnColorCTChanged() -> %u mireds", mireds);
+}
+
+// Both conversions leave their out-params untouched, so the cluster keeps the fallback it passed
+// in. A product replaces them with its own calibration.
+
+void LoggingLightDriver::ConvertXYToMireds(uint16_t x, uint16_t y, uint16_t & outMireds)
+{
+    ChipLogProgress(DeviceLayer, "LoggingLightDriver::ConvertXYToMireds(x=%u, y=%u): no conversion, staying at %u mireds", x, y,
+                    outMireds);
+}
+
+void LoggingLightDriver::ConvertMiredsToXY(uint16_t mireds, uint16_t & outX, uint16_t & outY)
+{
+    ChipLogProgress(DeviceLayer, "LoggingLightDriver::ConvertMiredsToXY(%u mireds): no conversion, staying at x=%u y=%u", mireds,
+                    outX, outY);
 }
 
 void LoggingLightDriver::OnIdentifyStart(Clusters::IdentifyCluster & cluster)
