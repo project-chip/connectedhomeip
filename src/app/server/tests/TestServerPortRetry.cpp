@@ -26,6 +26,8 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 
+#include <errno.h>
+
 #include <functional>
 #include <vector>
 
