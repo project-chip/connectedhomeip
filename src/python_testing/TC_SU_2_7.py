@@ -199,7 +199,6 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         self.step(1)
         # Terminate the provider started during setup_test before launching a new one for this step.
         self.terminate_provider()
-        # set the values of ota image to extra (next version)
 
         self.start_provider(
             provider_app_path=self.provider_app_path,
