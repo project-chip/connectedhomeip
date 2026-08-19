@@ -155,7 +155,16 @@
 
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 #include <inet/EndPointStateOpenThread.h>
+// The simulation and posix OT platforms ship different openthread-system.h
+// headers that declare otSysInit with incompatible signatures; include exactly
+// the one matching the linked platform. CHIP_DEVICE_CONFIG_THREAD_OT_POSIX_MAINLOOP
+// is defined in CHIPDevicePlatformConfig.h (via CHIPDeviceConfig.h).
+#include <platform/CHIPDeviceConfig.h>
+#if CHIP_DEVICE_CONFIG_THREAD_OT_POSIX_MAINLOOP
+#include <openthread/openthread-system.h>
+#else
 #include <openthread-system.h>
+#endif
 #include <openthread/instance.h>
 #endif
 
@@ -262,6 +271,9 @@ void InitNetworkCommissioning()
 #if CHIP_APP_MAIN_HAS_THREAD_DRIVER
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     isThreadEnabled = LinuxDeviceOptions::GetInstance().mThreadNodeId > 0;
+#if CHIP_DEVICE_CONFIG_THREAD_OT_POSIX_MAINLOOP
+    isThreadEnabled = isThreadEnabled || LinuxDeviceOptions::GetInstance().mThreadRadioUrl != nullptr;
+#endif
 #else
     isThreadEnabled = LinuxDeviceOptions::GetInstance().mThread;
 #endif
@@ -741,13 +753,33 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#if CHIP_DEVICE_CONFIG_THREAD_OT_POSIX_MAINLOOP
+    if (LinuxDeviceOptions::GetInstance().mThreadRadioUrl != nullptr)
+#else
     if (LinuxDeviceOptions::GetInstance().mThreadNodeId)
+#endif
     {
-        std::string nodeid  = std::to_string(LinuxDeviceOptions::GetInstance().mThreadNodeId);
+#if CHIP_DEVICE_CONFIG_THREAD_OT_POSIX_MAINLOOP
+        // POSIX platform (real RCP over spinel): otSysInit takes an otPlatformConfig
+        // carrying the radio URL, not the simulation platform's (argc, argv).
+        otPlatformConfig platformConfig{};
+        platformConfig.mCoprocessorUrls.mUrls[0] = LinuxDeviceOptions::GetInstance().mThreadRadioUrl;
+        platformConfig.mCoprocessorUrls.mNum     = 1;
+        platformConfig.mSpeedUpFactor            = 1;
+        // Optional per-instance OT settings directory; null keeps the platform
+        // default. Lets multiple RCP instances on one host avoid a shared store.
+        platformConfig.mDataPath = LinuxDeviceOptions::GetInstance().mThreadDataPath;
+        // mRealTimeSignal left 0: the microsecond timer stays off (CHIP drives the
+        // event loop with millisecond select timeouts), avoiding a SIGRT handler in
+        // the CHIP mainloop. A nonzero value outside [SIGRTMIN,SIGRTMAX] would abort.
+        otSysInit(&platformConfig);
+#else
         std::string logfile = "--log-file=thread.log";
-        char * args[]       = { argv[0], logfile.data(), nodeid.data() };
+        std::string nodeId  = std::to_string(LinuxDeviceOptions::GetInstance().mThreadNodeId);
+        char * args[]       = { argv[0], logfile.data(), nodeId.data() };
 
         otSysInit(MATTER_ARRAY_SIZE(args), args);
+#endif
         SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
         SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().StartThreadTask());
         ChipLogProgress(NotSpecified, "Thread initialized.");

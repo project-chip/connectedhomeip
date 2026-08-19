@@ -60,6 +60,15 @@ struct LinuxDeviceOptions
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     uint16_t mThreadNodeId = 0;
+#if CHIP_DEVICE_CONFIG_THREAD_OT_POSIX_MAINLOOP
+    // RCP radio URL (e.g. "spinel+hdlc+uart:///dev/ttyACM0") selecting the POSIX
+    // platform's real radio. Points into argv, so must outlive otSysInit().
+    const char * mThreadRadioUrl = nullptr;
+    // Optional OpenThread settings directory. Isolates per-instance OT state so
+    // multiple RCP device instances on one host don't share one settings store;
+    // null keeps the platform default. Points into argv, so must outlive otSysInit().
+    const char * mThreadDataPath = nullptr;
+#endif
 #else
     bool mThread = false;
 #endif

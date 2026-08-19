@@ -1,0 +1,24 @@
+# Copyright (c) 2026 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+
+declare_args() {
+  # Drive a real 802.15.4 radio co-processor (RCP) over spinel via OpenThread's
+  # POSIX platform instead of the UDP simulation radio. Only meaningful with the
+  # embedded-OpenThread build (chip_system_config_use_openthread_inet_endpoints).
+  #
+  # Declared in its own .gni because two independent targets must agree on which
+  # OpenThread platform library is linked: src/platform/Linux (the CHIP OpenThread
+  # glue) and examples/platform/linux:app-main. If only one selected the POSIX
+  # platform, both it and the simulation platform would link and their otPlatRadio*
+  # symbols would collide.
+  chip_openthread_linux_use_posix_rcp = false
+}

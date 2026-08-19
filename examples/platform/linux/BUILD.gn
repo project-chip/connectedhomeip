@@ -24,6 +24,7 @@ import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/lib/lib.gni")
+import("${chip_root}/src/platform/Linux/openthread_posix_rcp.gni")
 import("${chip_root}/src/system/system.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
 
@@ -164,6 +165,13 @@ source_set("app-options") {
     defines += [ "PW_RPC_ENABLED" ]
   }
 
+  # Options.cpp gates --thread-radio-url / --thread-data-path on this macro, so it
+  # must agree with app-main (AppMain.cpp) or the posix build would drop the very
+  # options it needs. See src/platform/Linux/BUILD.gn.
+  if (chip_openthread_linux_use_posix_rcp) {
+    configs += [ "${chip_root}/src/platform/Linux:thread_ot_posix_mainloop" ]
+  }
+
   public_configs = [ ":app-main-config" ]
 }
 
@@ -286,7 +294,17 @@ source_set("app-main") {
   ]
 
   if (chip_system_config_use_openthread_inet_endpoints) {
-    deps += [ "${chip_root}/third_party/openthread/platforms/simulation" ]
+    # Must match src/platform/Linux/BUILD.gn: link exactly one OT platform, or
+    # the simulation and posix radios' otPlatRadio* symbols collide.
+    if (chip_openthread_linux_use_posix_rcp) {
+      deps += [ "${chip_root}/src/platform/Linux/openthread_posix_rcp" ]
+
+      # AppMain must build the posix otSysInit(otPlatformConfig*) call (not the
+      # simulation otSysInit(argc, argv)); shares the CHIP glue's select macro.
+      configs += [ "${chip_root}/src/platform/Linux:thread_ot_posix_mainloop" ]
+    } else {
+      deps += [ "${chip_root}/third_party/openthread/platforms/simulation" ]
+    }
   }
   public_configs = [ ":app-main-config" ]
 }

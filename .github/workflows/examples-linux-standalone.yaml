@@ -84,6 +84,12 @@ jobs:
                      "./scripts/build/build_examples.py \
                         --target linux-x64-light-rpc-with-ui \
                         build" && rm -rf out
+            - name: Build example lighting app driving a real RCP via the OpenThread POSIX platform
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-light-thread-rcp \
+                        build" && rm -rf out
             - name: Build example contact sensor with UI
               run: |
                   ./scripts/run_in_build_env.sh \
