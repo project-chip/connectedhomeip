@@ -18,7 +18,7 @@
  */
 
 #include "AppConfig.h"
-#if !defined(SL_MATTER_CUSTOM_APPTASK) || !SL_MATTER_CUSTOM_APTASK
+#if !defined(SL_MATTER_CUSTOM_APPTASK) || !SL_MATTER_CUSTOM_APPTASK
 #include "BaseApplication.h"
 #endif // !SL_MATTER_CUSTOM_APPTASK
 #include <MatterConfig.h>
@@ -161,7 +161,7 @@ void UnlockOpenThreadTask(void)
 CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
 {
 
-    ReturnErrorOnFailure(ThreadStackMgr().InitThreadStack()); // Only need to register on state change callback
+    ReturnErrorOnFailure(ThreadStackMgr().InitThreadStack()); 
 
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
     ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router));
@@ -368,7 +368,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 #endif
 
-#if !defined(SL_MATTER_CUSTOM_APPTASK) || !SL_MATTER_CUSTOM_APTASK
+#if !defined(SL_MATTER_CUSTOM_APPTASK) || !SL_MATTER_CUSTOM_APPTASK
     initParams.appDelegate = &BaseApplication::sAppDelegate;
 #endif // !SL_MATTER_CUSTOM_APPTASK
     // This is needed by localization configuration cluster so we set it before the initialization
