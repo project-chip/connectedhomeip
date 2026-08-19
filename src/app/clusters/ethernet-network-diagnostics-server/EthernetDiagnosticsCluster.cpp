@@ -54,8 +54,8 @@ EthernetDiagnosticsServerCluster::EthernetDiagnosticsServerCluster(EndpointId en
                                                                    DeviceLayer::DiagnosticDataProvider & provider,
                                                                    const BitFlags<Feature> enabledFeatures,
                                                                    OptionalAttributeSet optionalAttributeSet) :
-    DefaultServerCluster({ endpointId, Id }), mProvider(provider), mEnabledFeatures(enabledFeatures),
-    mOptionalAttributeSet(optionalAttributeSet)
+    DefaultServerCluster({ endpointId, Id }),
+    mProvider(provider), mEnabledFeatures(enabledFeatures), mOptionalAttributeSet(optionalAttributeSet)
 {}
 
 DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
