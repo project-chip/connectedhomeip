@@ -1297,6 +1297,7 @@ class PrebuiltDataModelDirectory(Enum):
             return "1.6.1"
         raise KeyError(f"Invalid enum: {self!r}")
 
+
 VERSION_TO_DM = {
     0x01030000: PrebuiltDataModelDirectory.k1_3,
     0x01040000: PrebuiltDataModelDirectory.k1_4,
@@ -1307,6 +1308,7 @@ VERSION_TO_DM = {
     0x01060000: PrebuiltDataModelDirectory.k1_6,
     0x01060100: PrebuiltDataModelDirectory.k1_6_1,
 }
+
 
 class DataModelLevel(Enum):
     kCluster = auto()
@@ -2050,12 +2052,14 @@ def build_xml_data_model(data_model_directory: PrebuiltDataModelDirectory | Trav
         problems=all_problems,
     )
 
+
 def latest_prebuilt_directory() -> PrebuiltDataModelDirectory:
     """Return the newest data model directory registered in spec_parsing.py map.
 
     Ordering is by SpecificationVersion (numeric), not enum declaration order.
     """
     return VERSION_TO_DM[max(VERSION_TO_DM)]
+
 
 def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirectory:
     ''' Returns the data model directory for a given specification revision.
