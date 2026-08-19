@@ -153,7 +153,7 @@ public:
         }
 
         Timestamp GetMinTimestamp() const { return std::max(mMinTimestamp, mDeferralEndTimestamp); }
-        Timestamp GetMaxTimestamp() const { return std::max(mMaxTimestamp, mDeferralEndTimestamp); }
+        Timestamp GetMaxTimestamp() const { return mMaxTimestamp; }
 
         Timestamp GetDeferralEndTimestamp() const { return mDeferralEndTimestamp; }
         void SetDeferralEndTimestamp(const Timestamp & deferralEndTimestamp) { mDeferralEndTimestamp = deferralEndTimestamp; }

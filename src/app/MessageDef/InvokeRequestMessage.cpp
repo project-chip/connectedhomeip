@@ -115,11 +115,12 @@ CHIP_ERROR InvokeRequestMessage::Parser::GetInvokeRequests(InvokeRequests::Parse
 
 CHIP_ERROR InvokeRequestMessage::Parser::GetDelayReportData(std::optional<DelayReportData> & aDelayReportData) const
 {
+    aDelayReportData = std::nullopt;
+
     TLV::TLVReader reader;
     CHIP_ERROR err = mReader.FindElementWithTag(TLV::ContextTag(Tag::kDelayReportData), reader);
     if (err == CHIP_ERROR_TLV_TAG_NOT_FOUND || err == CHIP_END_OF_TLV)
     {
-        aDelayReportData = std::nullopt;
         return CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(err);
