@@ -44,14 +44,15 @@ TEST(TestUpdateBuilder, BeginSetsOpcodeUpdate)
     uint8_t buffer[256];
     UpdateBuilder builder(buffer, sizeof(buffer));
 
-    EXPECT_TRUE(builder.Ok());
     builder.Begin(0x1234);
 
-    EXPECT_TRUE(builder.Ok());
     EXPECT_EQ(builder.Header().GetMessageId(), 0x1234);
     EXPECT_TRUE(builder.Header().GetFlags().IsQuery());
     EXPECT_EQ(builder.Header().GetFlags().GetOpcode(), Opcode::kUpdate);
-    EXPECT_EQ(builder.PacketSize(), HeaderRef::kSizeBytes);
+
+    ByteSpan packet;
+    EXPECT_EQ(builder.GetPacket(packet), CHIP_NO_ERROR);
+    EXPECT_EQ(packet.size(), HeaderRef::kSizeBytes);
 }
 
 TEST(TestUpdateBuilder, MinimalUpdateWithZoneDeleteAddOptAndSig)
@@ -75,9 +76,14 @@ TEST(TestUpdateBuilder, MinimalUpdateWithZoneDeleteAddOptAndSig)
     OptLeaseRecord opt(/*udpPayloadSize=*/1232, /*leaseSeconds=*/7200, /*keyLeaseSeconds=*/86400);
     Sig0ResourceRecord sig(kHost, ByteSpan(signature));
 
-    builder.AddZone(kZone).AddUpdate(delAny).AddUpdate(ptr).AddUpdate(srv).AddUpdate(key).AddAdditional(opt).AddAdditional(sig);
+    builder.AddZone(kZone);
+    builder.AddUpdate(delAny);
+    builder.AddUpdate(ptr);
+    builder.AddUpdate(srv);
+    builder.AddUpdate(key);
+    builder.AddAdditional(opt);
+    builder.AddAdditional(sig);
 
-    EXPECT_TRUE(builder.Ok());
     EXPECT_EQ(builder.Header().GetQueryCount(), 1);      // ZONE
     EXPECT_EQ(builder.Header().GetAnswerCount(), 0);     // Prerequisite
     EXPECT_EQ(builder.Header().GetAuthorityCount(), 4);  // Update
@@ -86,38 +92,47 @@ TEST(TestUpdateBuilder, MinimalUpdateWithZoneDeleteAddOptAndSig)
     // Header flags: opcode UPDATE at offset 2.
     EXPECT_EQ(buffer[2], 0x28); // QR=0, OPCODE=5
     EXPECT_EQ(buffer[3], 0x00);
+
+    ByteSpan packet;
+    EXPECT_EQ(builder.GetPacket(packet), CHIP_NO_ERROR);
+    EXPECT_GT(packet.size(), HeaderRef::kSizeBytes);
+
+    ByteSpan samePacket;
+    EXPECT_EQ(builder.GetPacket(samePacket), CHIP_NO_ERROR);
+    EXPECT_EQ(samePacket.data(), packet.data());
+    EXPECT_EQ(samePacket.size(), packet.size());
 }
 
-TEST(TestUpdateBuilder, RejectsUpdateBeforeZone)
+TEST(TestUpdateBuilder, ReportsBufferTooSmall)
 {
-    uint8_t buffer[256];
+    uint8_t buffer[HeaderRef::kSizeBytes];
     UpdateBuilder builder(buffer, sizeof(buffer));
     builder.Begin(1);
 
-    // Query::Append requires no records yet; adding an update first is fine at the
-    // ResourceRecord layer, but AddZone after records must fail.
-    DeleteRrsetRecord delAny(kHost, QType::TXT);
-    builder.AddUpdate(delAny);
-    EXPECT_TRUE(builder.Ok());
-
     builder.AddZone(kZone);
-    EXPECT_FALSE(builder.Ok());
+
+    ByteSpan packet;
+    EXPECT_EQ(builder.GetPacket(packet), CHIP_ERROR_BUFFER_TOO_SMALL);
 }
 
-TEST(TestUpdateBuilder, SectionOrderAnswerBeforeAuthority)
+TEST(TestUpdateBuilder, BeginClearsBufferOverflow)
 {
-    uint8_t buffer[256];
+    uint8_t buffer[64];
     UpdateBuilder builder(buffer, sizeof(buffer));
-    builder.Begin(1).AddZone(kZone);
+    builder.Begin(1);
+    builder.AddZone(kZone);
 
-    DeleteRrsetRecord delAny(kHost, QType::TXT);
-    builder.AddUpdate(delAny);
-    EXPECT_TRUE(builder.Ok());
+    DeleteRrsetRecord record(kHost, QType::TXT);
+    builder.AddUpdate(record);
+    builder.AddUpdate(record);
 
-    // Prerequisite (answer) after update (authority) is rejected by ResourceRecord::Append.
-    DeleteRrsetRecord prereq(kHost, QType::TXT);
-    builder.AddPrerequisite(prereq);
-    EXPECT_FALSE(builder.Ok());
+    ByteSpan packet;
+    EXPECT_EQ(builder.GetPacket(packet), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    builder.Begin(2);
+    EXPECT_EQ(builder.GetPacket(packet), CHIP_NO_ERROR);
+    EXPECT_EQ(packet.size(), HeaderRef::kSizeBytes);
+    EXPECT_EQ(builder.Header().GetMessageId(), 2);
 }
 
 } // namespace

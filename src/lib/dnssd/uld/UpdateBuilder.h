@@ -19,6 +19,7 @@
 #include <cstddef>
 #include <cstdint>
 
+#include <lib/core/CHIPError.h>
 #include <lib/dnssd/wire/DnsHeader.h>
 #include <lib/dnssd/wire/QName.h>
 #include <lib/dnssd/wire/Query.h>
@@ -43,50 +44,27 @@ namespace Uld {
  * - Authority (nscount) -> Update
  * - Additional (arcount) -> Additional
  *
- * @note : All Add* methods can be chained. On failure they set a sticky "error state";
- *         When in a failed state, all Add* calls are no-ops.
- *         The assembly state can be checked by calling Ok().
- *         Reset()/Begin() clear the error state and allows for a new assembly.
+ * Add* methods have documented ordering preconditions. Not respecting them will result in VerifyOrDie failures.
+ * Buffer overflow is sticky and makes subsequent Add* calls no-ops.
+ * Call GetPacket() to obtain the encoded message or report CHIP_ERROR_BUFFER_TOO_SMALL.
  */
 class UpdateBuilder
 {
 public:
-    UpdateBuilder() : mHeader(nullptr), mOutput(nullptr, 0), mWriter(&mOutput) {}
-
-    UpdateBuilder(uint8_t * buffer, size_t size) : mHeader(nullptr), mOutput(nullptr, 0), mWriter(&mOutput) { Reset(buffer, size); }
-
-    /**
-     * @brief Binds the builder to @p buffer and clears the DNS header.
-     */
-    UpdateBuilder & Reset(uint8_t * buffer, size_t size)
-    {
-        mBuffer  = buffer;
-        mSize    = size;
-        mHeader  = HeaderRef(nullptr);
-        mBuildOk = false;
-
-        if ((buffer != nullptr) && (size >= HeaderRef::kSizeBytes))
-        {
-            mHeader = HeaderRef(buffer);
-            mHeader.Clear();
-            mOutput = Encoding::BigEndian::BufferWriter(buffer, size);
-            mOutput.Skip(HeaderRef::kSizeBytes);
-            mWriter.Reset();
-            mBuildOk = true;
-        }
-
-        return *this;
-    }
+    UpdateBuilder(uint8_t * buffer, size_t size) :
+        mHeader(nullptr), mOutput(nullptr, 0), mWriter(&mOutput), mBuffer(buffer), mSize(size)
+    {}
 
     /**
      * @brief Starts a new UPDATE query with the given message id.
      */
-    UpdateBuilder & Begin(uint16_t messageId)
+    void Begin(uint16_t messageId)
     {
-        // Allow restarting after a previous build failure as long as a valid buffer is bound.
-        VerifyOrReturnValue((mBuffer != nullptr) && (mSize >= HeaderRef::kSizeBytes), *this);
-        mBuildOk = true;
+        mBuildStarted = true;
+        mBuildOk      = (mBuffer != nullptr) && (mSize >= HeaderRef::kSizeBytes);
+        VerifyOrReturn(mBuildOk);
 
+        mHeader = HeaderRef(mBuffer);
         mHeader.Clear();
         mHeader.SetMessageId(messageId);
         mHeader.SetAllFlags(BitPackedFlags(0).SetQuery().SetOpcode(Opcode::kUpdate));
@@ -94,68 +72,88 @@ public:
         mOutput = Encoding::BigEndian::BufferWriter(mBuffer, mSize);
         mOutput.Skip(HeaderRef::kSizeBytes);
         mWriter.Reset();
-        return *this;
     }
 
     /**
-     * @brief Appends the ZONE question (SOA / IN). Must be written before records.
+     * @brief Appends the ZONE question (SOA / IN).
+     *
+     * Shall be called exactly once, before any records are added.
      */
-    UpdateBuilder & AddZone(FullQName zoneName)
+    void AddZone(FullQName zoneName)
     {
-        VerifyOrReturnValue(mBuildOk, *this);
+        VerifyOrDie(mBuildStarted);
+        VerifyOrReturn(mBuildOk);
+        VerifyOrDie((mHeader.GetQueryCount() == 0) && (mHeader.GetAnswerCount() == 0) && (mHeader.GetAuthorityCount() == 0) &&
+                    (mHeader.GetAdditionalCount() == 0));
 
         Query zone(zoneName);
         zone.SetType(QType::SOA).SetClass(QClass::IN).SetAnswerViaUnicast(false);
 
-        if (!zone.Append(mHeader, mWriter))
-        {
-            mBuildOk = false;
-        }
-        return *this;
+        mBuildOk = zone.Append(mHeader, mWriter);
     }
 
-    /** @brief Appends a prerequisite record (answer section). */
-    UpdateBuilder & AddPrerequisite(const ResourceRecord & record) { return AddRecord(ResourceType::kAnswer, record); }
+    /**
+     * @brief Appends a prerequisite record (answer section).
+     *
+     * Shall be called after AddZone() and before AddUpdate() or AddAdditional().
+     */
+    void AddPrerequisite(const ResourceRecord & record) { AddRecord(ResourceType::kAnswer, record); }
 
-    /** @brief Appends an update record (authority section). */
-    UpdateBuilder & AddUpdate(const ResourceRecord & record) { return AddRecord(ResourceType::kAuthority, record); }
+    /**
+     * @brief Appends an update record (authority section).
+     *
+     * Shall be called after AddZone() and before AddAdditional().
+     */
+    void AddUpdate(const ResourceRecord & record) { AddRecord(ResourceType::kAuthority, record); }
 
-    /** @brief Appends an additional record (additional section). */
-    UpdateBuilder & AddAdditional(const ResourceRecord & record) { return AddRecord(ResourceType::kAdditional, record); }
+    /**
+     * @brief Appends an additional record (additional section).
+     *
+     * Shall be called after AddZone().
+     */
+    void AddAdditional(const ResourceRecord & record) { AddRecord(ResourceType::kAdditional, record); }
 
-    HeaderRef & Header() { return mHeader; }
-
-    bool Ok() const { return mBuildOk; }
-
-    /** @brief Total bytes written (header + body). */
-    size_t PacketSize() const { return mOutput.Needed(); }
-
-    /** @brief View of the encoded packet; empty if the builder is not Ok. */
-    ByteSpan Packet() const
+    HeaderRef & Header()
     {
-        VerifyOrReturnValue(mBuildOk && (mBuffer != nullptr), ByteSpan());
-        return ByteSpan(mBuffer, mOutput.Needed());
+        VerifyOrDie(mBuildStarted && mBuildOk);
+        return mHeader;
+    }
+
+    /** @brief Returns the encoded message built so far. */
+    CHIP_ERROR GetPacket(ByteSpan & out) const
+    {
+        VerifyOrReturnError(mBuildOk, CHIP_ERROR_BUFFER_TOO_SMALL);
+        out = ByteSpan(mBuffer, mOutput.Needed());
+        return CHIP_NO_ERROR;
     }
 
 private:
-    UpdateBuilder & AddRecord(ResourceType type, const ResourceRecord & record)
+    void AddRecord(ResourceType type, const ResourceRecord & record)
     {
-        VerifyOrReturnValue(mBuildOk, *this);
+        VerifyOrDie(mBuildStarted);
+        VerifyOrReturn(mBuildOk);
+        VerifyOrDie(mHeader.GetQueryCount() == 1);
 
-        if (!record.Append(mHeader, type, mWriter))
+        if (type == ResourceType::kAnswer)
         {
-            mBuildOk = false;
+            VerifyOrDie((mHeader.GetAuthorityCount() == 0) && (mHeader.GetAdditionalCount() == 0));
         }
-        return *this;
+        else if (type == ResourceType::kAuthority)
+        {
+            VerifyOrDie(mHeader.GetAdditionalCount() == 0);
+        }
+
+        mBuildOk = record.Append(mHeader, type, mWriter);
     }
 
     HeaderRef mHeader;
     Encoding::BigEndian::BufferWriter mOutput;
     RecordWriter mWriter;
 
-    uint8_t * mBuffer = nullptr;
-    size_t mSize      = 0;
-    bool mBuildOk     = false;
+    uint8_t * mBuffer  = nullptr;
+    size_t mSize       = 0;
+    bool mBuildOk      = false;
+    bool mBuildStarted = false;
 };
 
 } // namespace Uld
