@@ -525,9 +525,15 @@ static void OnScanDone(void * /*context*/, const std::vector<chip::DeviceLayer::
 
     // Hand the results to the cluster's scan aggregator; it owns the command
     // handle and emits the combined ProxyScanResponse once every transport's
-    // sub-scan has reported.
+    // sub-scan has reported.  Cap at MaxCachedResults before handing off, as the
+    // BLE driver does, so both transports truncate at the same point.
     if (sHost != nullptr)
     {
+        size_t cap = sHost->GetMaxCachedResults();
+        if (out.size() > cap)
+        {
+            out.resize(cap);
+        }
         sHost->ScanAggregator().Contribute(chip::Span<const ScanResultT>(out.data(), out.size()));
     }
 

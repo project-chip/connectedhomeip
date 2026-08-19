@@ -124,14 +124,19 @@ TEST_F(TestCommissioningProxyClusterCodegenIntegration, TestRegisterTransportRea
     Instance instance(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>()));
 
     instance.RegisterTransport(mockBle);
-    EXPECT_EQ(instance.Init(), CHIP_NO_ERROR);
+    ASSERT_EQ(instance.Init(), CHIP_NO_ERROR);
 
     // Init() registers &mCluster.Cluster(), so the registered interface is this cluster.
     auto * registered = static_cast<CommissioningProxyCluster *>(
         CodegenDataModelProvider::Instance().Registry().Get(ConcreteClusterPath(kTestEndpointId, CommissioningProxy::Id)));
-    ASSERT_NE(registered, nullptr);
-    EXPECT_TRUE(registered->GetSupportedTransports().Has(CapabilitiesBitmap::kBle));
+    EXPECT_NE(registered, nullptr);
+    if (registered != nullptr)
+    {
+        EXPECT_TRUE(registered->GetSupportedTransports().Has(CapabilitiesBitmap::kBle));
+    }
 
+    // Unconditional: a failed expectation above must not leave the cluster registered
+    // for the tests that follow.
     instance.Shutdown();
 }
 

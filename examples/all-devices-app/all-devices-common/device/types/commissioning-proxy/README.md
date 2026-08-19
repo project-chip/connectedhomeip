@@ -308,8 +308,8 @@ WiFi-PAF: Starting NAN publish
 
 Before connecting, a Commissioner can ask the proxy to scan for nearby
 commissionable devices. In these commands `8` is the Wi-Fi PAF transport bit,
-`5` is the proxy node ID (use whatever you paired in step 5), and `5` (endpoint)
-is where the cluster lives. The `--WiFiBands` bitmap is `1` = 2.4 GHz, `4` = 5
+`1998` is the proxy node ID (use whatever you paired in step 5), and `5` is the
+endpoint where the cluster lives. The `--WiFiBands` bitmap is `1` = 2.4 GHz, `4` = 5
 GHz, `5` = both.
 
 **Foreground (one-shot) scan** — results are returned inline. This command
@@ -372,7 +372,7 @@ The transport-agnostic session, scan, and message bookkeeping lives in the
 that implements the `CommissioningProxyTransport` interface; the cluster calls
 into it and the driver reports results back through the cluster's subsystem
 accessors. See
-[`src/app/clusters/commissioning-proxy-server/README.md`](../../../../../src/app/clusters/commissioning-proxy-server/README.md)
+[`src/app/clusters/commissioning-proxy-server/README.md`](../../../../../../src/app/clusters/commissioning-proxy-server/README.md)
 for the full design.
 
 For Wi-Fi PAF the driver is `CommissioningProxyPafTransport`

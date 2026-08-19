@@ -394,11 +394,13 @@ the "radio freed" path could otherwise re-enter the driver.
 transport callback once the operation completes.
 
 To keep the exchange alive across the async operation, store a
-`CommandHandler::Handle` and extend the exchange response timeout:
+`CommandHandler::Handle` in the driver's pending-operation state — not on the
+stack, which unwinds when `InvokeCommand` returns — and extend the exchange
+response timeout:
 
 ```cpp
-// Store the handle before returning nullopt
-CommandHandler::Handle handle(commandObj);
+// mPending outlives InvokeCommand; the handle must live there, not here
+mPending.handle = CommandHandler::Handle(commandObj);
 if (auto * ec = commandObj->GetExchangeContext())
 {
     ec->SetResponseTimeout(chip::System::Clock::Seconds16(responseTimeout + 10));
@@ -406,7 +408,7 @@ if (auto * ec = commandObj->GetExchangeContext())
 // … return std::nullopt from InvokeCommand …
 
 // Later, in your transport callback:
-auto * handler = handle.Get();
+auto * handler = mPending.handle.Get();
 if (handler != nullptr)
 {
     handler->AddResponse(commandPath, response);
@@ -466,5 +468,13 @@ State transitions:
 
 ```text
 ProxyConnectRequest ──► transport connect success ──► kState_CPConnected
+kState_CPConnected  ──► ProxyDisconnectRequest    ──► kState_CPConnected
+                                                      (sessions remain)
 kState_CPConnected  ──► ProxyDisconnectRequest    ──► kState_CPDisconnected
+                        for the last session
 ```
+
+With `MaxSessions > 1` several sessions can be open at once, so a
+`ProxyDisconnectRequest` only returns the cluster to `kState_CPDisconnected` —
+and only notifies the transports via `OnAllSessionsClosed()` — once no session
+is left.
