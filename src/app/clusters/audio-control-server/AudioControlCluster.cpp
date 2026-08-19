@@ -398,7 +398,7 @@ DataModel::ActionReturnStatus AudioControlCluster::WriteAttribute(const DataMode
     case SetVolumeUnmutePolicy::Id: {
         UnmutePolicyEnum value{};
         ReturnErrorOnFailure(decoder.Decode(value));
-        VerifyOrReturnError(value != UnmutePolicyEnum::kUnknownEnumValue, Status::ConstraintError);
+        VerifyOrReturnError(value < UnmutePolicyEnum::kUnknownEnumValue, Status::ConstraintError);
         if (!SetAttributeValue(mSetVolumeUnmutePolicy, value, SetVolumeUnmutePolicy::Id))
         {
             return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
@@ -409,7 +409,7 @@ DataModel::ActionReturnStatus AudioControlCluster::WriteAttribute(const DataMode
     case IncreaseVolumeUnmutePolicy::Id: {
         UnmutePolicyEnum value{};
         ReturnErrorOnFailure(decoder.Decode(value));
-        VerifyOrReturnError(value != UnmutePolicyEnum::kUnknownEnumValue, Status::ConstraintError);
+        VerifyOrReturnError(value < UnmutePolicyEnum::kUnknownEnumValue, Status::ConstraintError);
         if (!SetAttributeValue(mIncreaseVolumeUnmutePolicy, value, IncreaseVolumeUnmutePolicy::Id))
         {
             return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
@@ -420,7 +420,7 @@ DataModel::ActionReturnStatus AudioControlCluster::WriteAttribute(const DataMode
     case IncreaseVolumeUnmuteVolume::Id: {
         UnmuteVolumeEnum value{};
         ReturnErrorOnFailure(decoder.Decode(value));
-        VerifyOrReturnError(value != UnmuteVolumeEnum::kUnknownEnumValue, Status::ConstraintError);
+        VerifyOrReturnError(value < UnmuteVolumeEnum::kUnknownEnumValue, Status::ConstraintError);
         if (!SetAttributeValue(mIncreaseVolumeUnmuteVolume, value, IncreaseVolumeUnmuteVolume::Id))
         {
             return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
@@ -431,7 +431,7 @@ DataModel::ActionReturnStatus AudioControlCluster::WriteAttribute(const DataMode
     case DecreaseVolumeUnmutePolicy::Id: {
         UnmutePolicyEnum value{};
         ReturnErrorOnFailure(decoder.Decode(value));
-        VerifyOrReturnError(value != UnmutePolicyEnum::kUnknownEnumValue, Status::ConstraintError);
+        VerifyOrReturnError(value < UnmutePolicyEnum::kUnknownEnumValue, Status::ConstraintError);
         if (!SetAttributeValue(mDecreaseVolumeUnmutePolicy, value, DecreaseVolumeUnmutePolicy::Id))
         {
             return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
