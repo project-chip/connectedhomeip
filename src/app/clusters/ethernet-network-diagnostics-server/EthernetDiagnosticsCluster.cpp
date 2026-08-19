@@ -50,11 +50,12 @@ CHIP_ERROR EncodeU64Value(uint64_t value, CHIP_ERROR readError, AttributeValueEn
 
 } // anonymous namespace
 
-EthernetDiagnosticsServerCluster::EthernetDiagnosticsServerCluster(DeviceLayer::DiagnosticDataProvider & provider,
+EthernetDiagnosticsServerCluster::EthernetDiagnosticsServerCluster(EndpointId endpointId,
+                                                                   DeviceLayer::DiagnosticDataProvider & provider,
                                                                    const BitFlags<Feature> enabledFeatures,
                                                                    OptionalAttributeSet optionalAttributeSet) :
-    DefaultServerCluster({ kRootEndpointId, Id }),
-    mProvider(provider), mEnabledFeatures(enabledFeatures), mOptionalAttributeSet(optionalAttributeSet)
+    DefaultServerCluster({ endpointId, Id }), mProvider(provider), mEnabledFeatures(enabledFeatures),
+    mOptionalAttributeSet(optionalAttributeSet)
 {}
 
 DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
