@@ -31,6 +31,10 @@ namespace Thermostat {
 
 void ThermostatCluster::GenerateSetpointEvent(AttributeId attributeId, temperature oldTemp, temperature newTemp)
 {
+    if (!mFeatures.Has(Feature::kEvents))
+    {
+        return;
+    }
     switch (attributeId)
     {
     case OccupiedHeatingSetpoint::Id:
@@ -50,6 +54,10 @@ void ThermostatCluster::GenerateSetpointEvent(AttributeId attributeId, temperatu
 
 void ThermostatCluster::GenerateSystemModeChangeEvent(Optional<SystemModeEnum> previousSystemMode, SystemModeEnum currentSystemMode)
 {
+    if (!mFeatures.Has(Feature::kEvents))
+    {
+        return;
+    }
     Events::SystemModeChange::Type event;
     EventNumber eventNumber;
 
@@ -65,6 +73,10 @@ void ThermostatCluster::GenerateSystemModeChangeEvent(Optional<SystemModeEnum> p
 
 void ThermostatCluster::GenerateLocalTemperatureChangeEvent(DataModel::Nullable<int16_t> currentLocalTemperature)
 {
+    if (!mFeatures.Has(Feature::kEvents))
+    {
+        return;
+    }
     Events::LocalTemperatureChange::Type event;
     EventNumber eventNumber;
 
@@ -80,6 +92,10 @@ void ThermostatCluster::GenerateLocalTemperatureChangeEvent(DataModel::Nullable<
 void ThermostatCluster::GenerateOccupancyChangeEvent(Optional<BitMask<OccupancyBitmap>> previousOccupancy,
                                                      BitMask<OccupancyBitmap> currentOccupancy)
 {
+    if (!mFeatures.Has(Feature::kEvents))
+    {
+        return;
+    }
     Events::OccupancyChange::Type event;
     EventNumber eventNumber;
 
@@ -96,6 +112,10 @@ void ThermostatCluster::GenerateOccupancyChangeEvent(Optional<BitMask<OccupancyB
 void ThermostatCluster::GenerateSetpointChangeEvent(SystemModeEnum systemMode, BitMask<OccupancyBitmap> occupancy,
                                                     Optional<temperature> previousSetpoint, temperature currentSetpoint)
 {
+    if (!mFeatures.Has(Feature::kEvents))
+    {
+        return;
+    }
     Events::SetpointChange::Type event;
     EventNumber eventNumber;
 
@@ -114,6 +134,10 @@ void ThermostatCluster::GenerateSetpointChangeEvent(SystemModeEnum systemMode, B
 void ThermostatCluster::GenerateRunningStateChangeEvent(Optional<BitMask<RelayStateBitmap>> previousRunningState,
                                                         BitMask<RelayStateBitmap> currentRunningState)
 {
+    if (!mFeatures.Has(Feature::kEvents))
+    {
+        return;
+    }
     Events::RunningStateChange::Type event;
     EventNumber eventNumber;
 
@@ -130,6 +154,10 @@ void ThermostatCluster::GenerateRunningStateChangeEvent(Optional<BitMask<RelaySt
 void ThermostatCluster::GenerateRunningModeChangeEvent(Optional<ThermostatRunningModeEnum> previousRunningMode,
                                                        ThermostatRunningModeEnum currentRunningMode)
 {
+    if (!mFeatures.Has(Feature::kEvents))
+    {
+        return;
+    }
     Events::RunningModeChange::Type event;
     EventNumber eventNumber;
 
@@ -146,6 +174,10 @@ void ThermostatCluster::GenerateRunningModeChangeEvent(Optional<ThermostatRunnin
 void ThermostatCluster::GenerateActiveScheduleChangeEvent(Optional<DataModel::Nullable<ByteSpan>> previousScheduleHandle,
                                                           DataModel::Nullable<ByteSpan> currentScheduleHandle)
 {
+    if (!mFeatures.Has(Feature::kEvents))
+    {
+        return;
+    }
     Events::ActiveScheduleChange::Type event;
     EventNumber eventNumber;
 
@@ -162,6 +194,10 @@ void ThermostatCluster::GenerateActiveScheduleChangeEvent(Optional<DataModel::Nu
 void ThermostatCluster::GenerateActivePresetChangeEvent(Optional<DataModel::Nullable<ByteSpan>> previousPresetHandle,
                                                         DataModel::Nullable<ByteSpan> currentPresetHandle)
 {
+    if (!mFeatures.Has(Feature::kEvents))
+    {
+        return;
+    }
     Events::ActivePresetChange::Type event;
     EventNumber eventNumber;
 
