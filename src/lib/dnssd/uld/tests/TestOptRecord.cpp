@@ -29,7 +29,7 @@ using namespace chip::Encoding::BigEndian;
 using namespace chip::Dnssd;
 using namespace chip::Dnssd::Uld;
 
-TEST(TestOptRecord, WritesRootNameLeaseOptionAndDnssecOk)
+TEST(TestOptRecord, WritesRootNameLeaseOption)
 {
     uint8_t headerBuffer[HeaderRef::kSizeBytes];
     uint8_t dataBuffer[128];
@@ -46,7 +46,7 @@ TEST(TestOptRecord, WritesRootNameLeaseOptionAndDnssecOk)
         0,                      // root name
         0,    41,               // TYPE OPT
         0x04, 0xD0,             // CLASS = UDP payload 1232
-        0x00, 0x00, 0x80, 0x00, // TTL = DNSSEC OK
+        0x00, 0x00, 0x00, 0x00, // TTL = default
         0,    12,               // RDLENGTH = 12
         0,    2,                // option code Update Lease
         0,    8,                // option length
