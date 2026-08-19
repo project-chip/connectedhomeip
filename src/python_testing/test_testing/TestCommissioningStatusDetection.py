@@ -783,7 +783,7 @@ async def test_commissioning_credentials_discriminator_passcode():
     got = creds.resolve_setup_code(ctrl)
     if got != "MT:YNJV7VSC00KA0648G00":
         return f"Unexpected resolved code: {got!r}"
-    ctrl.CreateManualCode.assert_called_once_with(1234,99999998)
+    ctrl.CreateManualCode.assert_called_once_with(1234, 99999998)
     return None
 
 
@@ -829,7 +829,7 @@ async def test_commissioning_credentials_sdk_pin_with_random_discriminator():
     got = creds.resolve_setup_code(ctrl)
     if got != "MT:YNJV7VSC00KA0648G00":
         return f"Expected synthesized manual code, got {got!r}"
-    ctrl.CreateManualCode.assert_called_once_with(TEST_DISCRIMINATOR,TEST_PASSCODE)
+    ctrl.CreateManualCode.assert_called_once_with(TEST_DISCRIMINATOR, TEST_PASSCODE)
     return None
 
 
