@@ -159,6 +159,10 @@ public class MatterCastingPlayer implements CastingPlayer {
   void setNativeCastingPlayer(long nativePtr) {
     try {
       // Register cleanup before assigning so _cppCastingPlayer stays 0 if registration fails.
+      // SAFETY: The cleanup action does not zero _cppCastingPlayer after freeing the native handle.
+      // This is safe because phantom-reference cleanup can only fire when this object is no longer
+      // strongly reachable. Any JNI method executing on this object holds a strong reference via
+      // its receiver, so the cleanup and a concurrent JNI read of _cppCastingPlayer cannot race.
       MatterCleaner.getInstance().register(this, () -> nativeReleaseCastingPlayer(nativePtr));
       this._cppCastingPlayer = nativePtr;
     } catch (RuntimeException e) {
