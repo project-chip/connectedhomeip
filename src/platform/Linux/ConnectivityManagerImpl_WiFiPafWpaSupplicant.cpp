@@ -672,7 +672,7 @@ void ConnectivityManagerImpl::OnAssociationRequested()
 
 void ConnectivityManagerImpl::OnAssociationStarting()
 {
-    mPafChannelState.store(PafChannelState::kAssociating);
+    mPafChannelState.store(PafChannelState::kConnecting);
 }
 
 void ConnectivityManagerImpl::OnAssociationFailed()

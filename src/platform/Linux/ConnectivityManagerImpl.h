@@ -65,7 +65,8 @@ namespace DeviceLayer {
 enum class PafChannelState : uint8_t
 {
     kAvailable,   // The radio is free and PAF frames may be sent
-    kAssociating, // Association in progress, radio cannot carry PAF frames
+    kConnecting,  // Station connect in progress (scan, authenticate, associate, key handshake),
+                  // during which the radio cannot carry PAF frames
     kAwaitingNan, // STA link up but NAN not yet ready
     kNoInterface, // No wpa_supplicant interface to send on
 };
