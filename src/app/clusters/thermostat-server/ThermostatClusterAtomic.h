@@ -45,6 +45,8 @@ namespace Thermostat {
  * Tracks active atomic write operations associated with a particular subject descriptor,
  * locking out other writers until the write is committed, rolled back, or times out
  ******************************************************************************/
+
+using AtomicAttributes = Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type>;
 class AtomicWriteSession
 {
 public:
@@ -79,9 +81,7 @@ public:
      * @return true if it was able to update the atomic write state
      * @return false if it was unable to update the atomic write state
      */
-    bool
-    SetAtomicWrite(ScopedNodeId originatorNodeId, State state,
-                   Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
+    bool SetAtomicWrite(ScopedNodeId originatorNodeId, State state, AtomicAttributes & attributeStatuses);
 
     /**
      * @brief Processes a request to begin an atomic write operation
@@ -159,9 +159,7 @@ public:
      * @return true if the thermostat cluster has an open atomic write
      * @return false if the thermostat cluster does not have an open atomic write
      */
-    bool
-    InAtomicWrite(CommandHandler * commandObj,
-                  Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
+    bool InAtomicWrite(CommandHandler * commandObj, AtomicAttributes & attributeStatuses);
 
     void OnAtomicWriteTimeout();
 
@@ -174,14 +172,16 @@ private:
 
     Delegate * mDelegate = nullptr;
 
+    Protocols::InteractionModel::Status ExecuteAtomicAction(AtomicAttributes & attributeStatuses, Protocols::InteractionModel::Status (Delegate::*action)(chip::AttributeId));
+    Protocols::InteractionModel::Status ExecuteAtomicAction(AtomicAttributes & attributeStatuses, Protocols::InteractionModel::Status (Delegate::*action)(chip::AttributeId), Optional<Protocols::InteractionModel::Status> statusOverride);
+
     /// @brief Builds the list of attribute statuses to return from an AtomicRequest invocation
     /// @param attributeRequests The list of requested attributes
     /// @param attributeStatusCount The number of attribute statuses in attributeStatuses
     /// @param attributeStatuses The status of each requested attribute, plus additional attributes if needed
     /// @return Status::Success if the request is valid, an error status if it is not
-    Protocols::InteractionModel::Status BuildAttributeStatuses(
-        const DataModel::DecodableList<chip::AttributeId> attributeRequests,
-        Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
+    Protocols::InteractionModel::Status BuildAttributeStatuses(const DataModel::DecodableList<chip::AttributeId> attributeRequests,
+                                                               AtomicAttributes & attributeStatuses);
 };
 
 } // namespace Thermostat
