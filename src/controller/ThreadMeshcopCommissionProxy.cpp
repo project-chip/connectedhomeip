@@ -340,9 +340,11 @@ void ThreadMeshcopCommissionProxy::ProcessAnnouncement(const std::vector<uint8_t
         return;
     }
 
+    auto & commissionData = mNodeData.Get<Dnssd::CommissionNodeData>();
     if (mProxyFd == -1)
     {
-        if (CreateProxySocket(commissionData) != CHIP_NO_ERROR)
+        CHIP_ERROR err = CreateProxySocket(commissionData);
+        if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Failed to setup proxy socket: %" CHIP_ERROR_FORMAT, err.Format());
             SetState(State::kAborted);
