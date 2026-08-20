@@ -68,7 +68,7 @@ public:
 // Most tests pass timeoutSecs == 0 so no lifetime timer is armed and the registry
 // logic is exercised synchronously. The lifetime tests at the end instead arm a timer
 // and advance CommissioningProxyMockTimer's virtual clock.
-constexpr uint16_t kNoTimeout = 0;
+constexpr System::Clock::Seconds16 kNoTimeout{ 0 };
 
 // Every test drives one registry over one mock radio and one virtual clock. Declaration
 // order matters: reg is destroyed first, so its Shutdown() still has both to talk to.
@@ -283,7 +283,7 @@ TEST_F(TestCommissioningProxyBgScanRegistry, RefreshExistingFabricUpdatesBands)
 // automatically stopped when this duration elapses."
 TEST_F(TestCommissioningProxyBgScanRegistry, LifetimeExpiryRemovesFabricAndStopsHardware)
 {
-    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, 30), Status::Success);
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, System::Clock::Seconds16(30)), Status::Success);
     EXPECT_EQ(hw.startCount, 1);
 
     // Still inside the lifetime: nothing changes.
@@ -303,7 +303,7 @@ TEST_F(TestCommissioningProxyBgScanRegistry, LifetimeExpiryRemovesFabricAndStops
 TEST_F(TestCommissioningProxyBgScanRegistry, LifetimeTimerArmFailureRejectsAndCleansUp)
 {
     timers.FailNextStart();
-    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, 30), Status::Failure);
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, System::Clock::Seconds16(30)), Status::Failure);
 
     EXPECT_TRUE(reg.IsEmpty());
     EXPECT_FALSE(reg.IsPaused());
@@ -317,14 +317,14 @@ TEST_F(TestCommissioningProxyBgScanRegistry, LifetimeTimerArmFailureRejectsAndCl
 // fabric registered would scan unbounded — the fabric SHALL be released instead.
 TEST_F(TestCommissioningProxyBgScanRegistry, RefreshTimerArmFailureReleasesTheFabric)
 {
-    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, 30), Status::Success);
-    EXPECT_EQ(reg.Start(kFabric1, kNode2, kPaf, k5g, 60), Status::Success);
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, System::Clock::Seconds16(30)), Status::Success);
+    EXPECT_EQ(reg.Start(kFabric1, kNode2, kPaf, k5g, System::Clock::Seconds16(60)), Status::Success);
     EXPECT_EQ(hw.startCount, 1);
 
     // Node 1 refreshes its own request with a new timeout; re-arming the fabric's
     // lifetime fails, so the fabric goes — node 2's request included.
     timers.FailNextStart();
-    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, 45), Status::Failure);
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, System::Clock::Seconds16(45)), Status::Failure);
 
     EXPECT_TRUE(reg.IsEmpty());
     EXPECT_EQ(hw.stopCount, 1); // nothing is left to scan for
@@ -344,11 +344,11 @@ TEST_F(TestCommissioningProxyBgScanRegistry, RefreshTimerArmFailureReleasesTheFa
 // bands the released requests were the last to want stop being cached.
 TEST_F(TestCommissioningProxyBgScanRegistry, RefreshTimerArmFailureKeepsOtherFabricScanning)
 {
-    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k5g, 30), Status::Success);
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k5g, System::Clock::Seconds16(30)), Status::Success);
     EXPECT_EQ(reg.Start(kFabric2, kNode2, kPaf, k2g4, kNoTimeout), Status::Success);
 
     timers.FailNextStart();
-    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k5g, 45), Status::Failure);
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k5g, System::Clock::Seconds16(45)), Status::Failure);
 
     EXPECT_FALSE(reg.IsEmpty()); // fabric 2 still wants the radio
     EXPECT_EQ(hw.stopCount, 0);
@@ -361,8 +361,8 @@ TEST_F(TestCommissioningProxyBgScanRegistry, RefreshTimerArmFailureKeepsOtherFab
 // fabric keeps the radio running.
 TEST_F(TestCommissioningProxyBgScanRegistry, ReArmFailureOnStopClearsTheReleasedFabricsBands)
 {
-    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, 30), Status::Success);
-    EXPECT_EQ(reg.Start(kFabric1, kNode2, kPaf, k5g, 60), Status::Success);
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, System::Clock::Seconds16(30)), Status::Success);
+    EXPECT_EQ(reg.Start(kFabric1, kNode2, kPaf, k5g, System::Clock::Seconds16(60)), Status::Success);
     EXPECT_EQ(reg.Start(kFabric2, kNode3, kPaf, k2g4, kNoTimeout), Status::Success);
 
     // Node 1 stopping shortens fabric 1 to node 2's deadline; the re-arm fails, so
@@ -380,8 +380,8 @@ TEST_F(TestCommissioningProxyBgScanRegistry, ReArmFailureOnStopClearsTheReleased
 // requests it never made.
 TEST_F(TestCommissioningProxyBgScanRegistry, LifetimeReArmFailureDropsTheFabricsRequests)
 {
-    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, 30), Status::Success);
-    EXPECT_EQ(reg.Start(kFabric1, kNode2, kPaf, k5g, 60), Status::Success);
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, System::Clock::Seconds16(30)), Status::Success);
+    EXPECT_EQ(reg.Start(kFabric1, kNode2, kPaf, k5g, System::Clock::Seconds16(60)), Status::Success);
 
     // Node 1 stopping shortens the fabric to node 2's deadline, so the lifetime is
     // re-armed — and that failing drops the fabric, node 2's request included.
@@ -402,8 +402,8 @@ TEST_F(TestCommissioningProxyBgScanRegistry, LifetimeReArmFailureDropsTheFabrics
 // is therefore independent: expiring one must not disturb another.
 TEST_F(TestCommissioningProxyBgScanRegistry, IndependentLifetimesExpireSeparately)
 {
-    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, 10), Status::Success);
-    EXPECT_EQ(reg.Start(kFabric2, kNode2, kPaf, k2g4, 60), Status::Success);
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, System::Clock::Seconds16(10)), Status::Success);
+    EXPECT_EQ(reg.Start(kFabric2, kNode2, kPaf, k2g4, System::Clock::Seconds16(60)), Status::Success);
     EXPECT_EQ(hw.startCount, 1);
 
     // Fabric 1 expires; fabric 2 still wants the scan, so the radio keeps running.
@@ -484,8 +484,8 @@ TEST_F(TestCommissioningProxyBgScanRegistry, StopLeavesBandsAnotherRequestStillC
 // request does not end the fabric's scan early.
 TEST_F(TestCommissioningProxyBgScanRegistry, FabricTimerUsesLatestDeadline)
 {
-    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, 10), Status::Success);
-    EXPECT_EQ(reg.Start(kFabric1, kNode2, kPaf, k5g, 60), Status::Success);
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, System::Clock::Seconds16(10)), Status::Success);
+    EXPECT_EQ(reg.Start(kFabric1, kNode2, kPaf, k5g, System::Clock::Seconds16(60)), Status::Success);
 
     timers.AdvanceClock(System::Clock::Seconds16(11));
     EXPECT_FALSE(reg.IsEmpty()); // node 2 still has 49s to run
@@ -499,8 +499,8 @@ TEST_F(TestCommissioningProxyBgScanRegistry, FabricTimerUsesLatestDeadline)
 // longest survivor, rather than leave the fabric scanning until the removed deadline.
 TEST_F(TestCommissioningProxyBgScanRegistry, StopShortensFabricTimerToSurvivingRequest)
 {
-    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, 300), Status::Success);
-    EXPECT_EQ(reg.Start(kFabric1, kNode2, kPaf, k5g, 30), Status::Success);
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, System::Clock::Seconds16(300)), Status::Success);
+    EXPECT_EQ(reg.Start(kFabric1, kNode2, kPaf, k5g, System::Clock::Seconds16(30)), Status::Success);
 
     // The 300s request goes; only the 30s one is left.
     EXPECT_EQ(reg.Stop(kFabric1, kNode1, kNoTransport, k2g4), Status::Success);
@@ -514,7 +514,7 @@ TEST_F(TestCommissioningProxyBgScanRegistry, StopShortensFabricTimerToSurvivingR
 // is registered.
 TEST_F(TestCommissioningProxyBgScanRegistry, NoTimeoutRequestSuppressesFabricTimer)
 {
-    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, 30), Status::Success);
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, System::Clock::Seconds16(30)), Status::Success);
     EXPECT_EQ(reg.Start(kFabric1, kNode2, kPaf, k5g, kNoTimeout), Status::Success);
     EXPECT_EQ(timers.ActiveCount(), 0u);
 
@@ -572,7 +572,7 @@ TEST_F(TestCommissioningProxyBgScanRegistry, StopOfSharedBandClearsNothing)
 // surviving fabric covers.
 TEST_F(TestCommissioningProxyBgScanRegistry, LifetimeExpiryClearsOnlyItsOwnBands)
 {
-    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, 30), Status::Success);
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, System::Clock::Seconds16(30)), Status::Success);
     EXPECT_EQ(reg.Start(kFabric2, kNode2, kPaf, k5g, kNoTimeout), Status::Success);
 
     timers.AdvanceClock(System::Clock::Seconds16(31));

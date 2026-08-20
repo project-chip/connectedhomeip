@@ -73,9 +73,9 @@ void CommissioningProxyCluster::OnFabricRemoved(const FabricTable & /*fabricTabl
     (void) CancelPendingConnect(fabricIndex);
 
     // Drain the fabric's sessions, telling the owning transport to drop each link.
-    while (auto sessionId = mSessions.FindAnyOnFabric(fabricIndex))
+    while (auto sessionId = mSessions.FindAnySessionIdOnFabric(fabricIndex))
     {
-        if (auto info = mSessions.Find(*sessionId))
+        if (auto info = mSessions.FindSession(*sessionId))
         {
             if (CommissioningProxyTransport * transport = FindTransport(info->transport))
             {
@@ -288,7 +288,7 @@ CommissioningProxyCluster::HandleProxyConnectRequest(const DataModel::InvokeRequ
     CommissioningProxyTransport * transport = FindTransport(static_cast<CapabilitiesBitmap>(commandData.transport.Raw()));
     VerifyOrReturnValue(transport != nullptr, Status::InvalidTransportType);
 
-    auto status = transport->Connect(handler, request, commandData.discriminator, commandData.timeout);
+    auto status = transport->Connect(handler, request, commandData.discriminator, System::Clock::Seconds16(commandData.timeout));
 
     // On error, surface the status; on success the driver owns the response, so
     // return nullopt to avoid a duplicate framework status.
@@ -313,7 +313,7 @@ CommissioningProxyCluster::HandleProxyDisconnectRequest(const DataModel::InvokeR
     const uint16_t sessionId = commandData.sessionID.Value();
     ChipLogProgress(Zcl, "HandleProxyDisconnectRequest: sessionID=0x%04x", sessionId);
 
-    auto info = mSessions.Find(sessionId);
+    auto info = mSessions.FindSession(sessionId);
     VerifyOrReturnValue(info.has_value(), Status::NotFound);
     // Per spec, a session may only be disconnected by the fabric that owns it.
     VerifyOrReturnValue(request.subjectDescriptor.fabricIndex == info->fabricIndex, Status::NotFound);
@@ -396,7 +396,7 @@ CommissioningProxyCluster::HandleProxyScanRequest(const DataModel::InvokeRequest
         return Status::Busy;
     }
 
-    const uint8_t scanMaxTime = mScanMaxTime;
+    const System::Clock::Seconds16 scanMaxTime{ mScanMaxTime };
     if (CHIP_ERROR err = mScanAggregator.Begin(handler, request.path, scanMaxTime); err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "CommissioningProxy: could not begin scan aggregation: %" CHIP_ERROR_FORMAT, err.Format());
@@ -436,7 +436,7 @@ CommissioningProxyCluster::HandleProxyScanRequest(const DataModel::InvokeRequest
     handler->FlushAcksRightAwayOnSlowCommand();
     if (auto * exchange = handler->GetExchangeContext())
     {
-        exchange->SetResponseTimeout(System::Clock::Seconds16(static_cast<uint16_t>(scanMaxTime) + 5));
+        exchange->SetResponseTimeout(scanMaxTime + System::Clock::Seconds16(5));
     }
 
     // If every started sub-scan already reported synchronously, emit now.
@@ -502,7 +502,7 @@ CommissioningProxyCluster::HandleProxyBackGroundScanStartRequest(const DataModel
         {
             continue;
         }
-        result = transport->BgScanStart(commandData.timeout, wiFiBands, fabricIndex, nodeId);
+        result = transport->BgScanStart(System::Clock::Seconds16(commandData.timeout), wiFiBands, fabricIndex, nodeId);
         if (result != Status::Success)
         {
             break;
@@ -604,7 +604,7 @@ CommissioningProxyCluster::HandleProxyMessageRequest(const DataModel::InvokeRequ
 
     const uint16_t sessionId = commandData.sessionID;
 
-    auto info = mSessions.Find(sessionId);
+    auto info = mSessions.FindSession(sessionId);
     VerifyOrReturnValue(info.has_value(), Status::NotFound);
     // A session's messages may only be forwarded by the fabric that owns it.
     VerifyOrReturnValue(request.subjectDescriptor.fabricIndex == info->fabricIndex, Status::NotFound);

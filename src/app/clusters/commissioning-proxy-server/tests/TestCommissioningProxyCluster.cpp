@@ -2351,12 +2351,12 @@ TEST_F(TestCommissioningProxyCluster, TestOnFabricRemoved_DropsSessionsAndDriver
     ClusterTester tester(cluster);
     tester.SetFabricIndex(1);
     uint16_t sid = OpenSession(tester);
-    EXPECT_TRUE(cluster.Sessions().Find(sid).has_value());
+    EXPECT_TRUE(cluster.Sessions().FindSession(sid).has_value());
 
     // No FabricTable in unit tests, so drive the delegate callback directly.
     cluster.OnFabricRemoved(chip::Server::GetInstance().GetFabricTable(), 1);
 
-    EXPECT_FALSE(cluster.Sessions().Find(sid).has_value());
+    EXPECT_FALSE(cluster.Sessions().FindSession(sid).has_value());
     EXPECT_TRUE(cluster.Sessions().IsEmpty());
     EXPECT_EQ(mockBle.FabricRemovedCount(), 1u);
     EXPECT_EQ(mockPaf.FabricRemovedCount(), 1u);
@@ -2383,8 +2383,8 @@ TEST_F(TestCommissioningProxyCluster, TestOnFabricRemoved_LeavesOtherFabricsAlon
 
     cluster.OnFabricRemoved(chip::Server::GetInstance().GetFabricTable(), 1);
 
-    EXPECT_FALSE(cluster.Sessions().Find(sid1).has_value());
-    EXPECT_TRUE(cluster.Sessions().Find(sid2).has_value());
+    EXPECT_FALSE(cluster.Sessions().FindSession(sid1).has_value());
+    EXPECT_TRUE(cluster.Sessions().FindSession(sid2).has_value());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

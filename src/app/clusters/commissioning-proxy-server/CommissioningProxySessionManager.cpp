@@ -109,7 +109,7 @@ void CommissioningProxySessionManager::RemoveSession(uint16_t sessionId)
     }
 }
 
-std::optional<CommissioningProxySessionManager::SessionInfo> CommissioningProxySessionManager::Find(uint16_t sessionId) const
+std::optional<CommissioningProxySessionManager::SessionInfo> CommissioningProxySessionManager::FindSession(uint16_t sessionId) const
 {
     const SessionSlot * slot = FindSlot(sessionId);
     if (slot == nullptr)
@@ -119,7 +119,7 @@ std::optional<CommissioningProxySessionManager::SessionInfo> CommissioningProxyS
     return slot->info;
 }
 
-std::optional<uint16_t> CommissioningProxySessionManager::FindAnyOnFabric(FabricIndex fabricIndex) const
+std::optional<uint16_t> CommissioningProxySessionManager::FindAnySessionIdOnFabric(FabricIndex fabricIndex) const
 {
     for (const auto & slot : mSessions)
     {
