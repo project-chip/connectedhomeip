@@ -26,6 +26,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Camera AV Settings User Level Management
     - Commodity Price
     - Commodity Tariff
+    - Electrical Distribution
     - Electrical Energy Measurement
     - Joint Fabric Administrator
     - Network Commissioning
