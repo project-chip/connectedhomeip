@@ -14,7 +14,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-source_set("refrigerator-alarm-server") {  
+source_set("refrigerator-alarm-server") {
   sources = [
     "RefrigeratorAlarmCluster.cpp",
     "RefrigeratorAlarmCluster.h",
