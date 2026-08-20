@@ -102,8 +102,8 @@ public:
 
         Config(OptionalAttributes optionalAttributes, DefaultValues defaultValues, FabricTable & fabricTable,
                TimerDelegate & timerDelegate) :
-            mOptionalAttributes(optionalAttributes), mDefaultValues(defaultValues), mFabricTable(fabricTable),
-            mTimerDelegate(timerDelegate)
+            mOptionalAttributes(optionalAttributes),
+            mDefaultValues(defaultValues), mFabricTable(fabricTable), mTimerDelegate(timerDelegate)
         {}
     };
 

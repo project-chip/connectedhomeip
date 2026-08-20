@@ -67,7 +67,8 @@ public:
         const ThermostatCluster::OptionalAttributes optionalAttributes = GetOptionalAttributes(endpointId, features);
         const ThermostatCluster::DefaultValues defaultValues           = LoadDefaultValues(endpointId, features);
 
-        ThermostatCluster::Config config(optionalAttributes, defaultValues, Server::GetInstance().GetFabricTable(), gDefaultTimerDelegate);
+        ThermostatCluster::Config config(optionalAttributes, defaultValues, Server::GetInstance().GetFabricTable(),
+                                         gDefaultTimerDelegate);
 
         ChipLogProgress(Zcl, "Creating thermostat cluster for endpoint %d", endpointId);
         if constexpr (sizeof...(Delegates) > 0)

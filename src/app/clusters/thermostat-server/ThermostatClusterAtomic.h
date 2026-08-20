@@ -32,7 +32,6 @@
 #include <protocols/interaction_model/Constants.h>
 #include <system/SystemClock.h>
 
-
 #include <optional>
 
 namespace chip {
