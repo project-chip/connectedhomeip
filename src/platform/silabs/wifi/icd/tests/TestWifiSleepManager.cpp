@@ -163,29 +163,6 @@ TEST_F(TestWifiSleepManager, TestRemovePerformanceRequestSubMinimum)
     EXPECT_FALSE(mMock.WasConfigurePowerSaveCalled());
 }
 
-// This tests will need to be updated once the High performance req is removed from the WifiSleepManager
-TEST_F(TestWifiSleepManager, TestCommissioningInProgressAndStopped)
-{
-    WifiSleepManager::GetInstance().HandleCommissioningSessionStarted();
-    EXPECT_EQ(mMock.GetLastPowerSaveConfiguration(), PowerSaveInterface::PowerSaveConfiguration::kHighPerformance);
-    EXPECT_TRUE(mMock.WasConfigurePowerSaveCalled());
-
-    WifiSleepManager::GetInstance().HandleCommissioningSessionStopped();
-    EXPECT_EQ(mMock.GetLastPowerSaveConfiguration(), PowerSaveInterface::PowerSaveConfiguration::kDeepSleep);
-    EXPECT_TRUE(mMock.WasConfigurePowerSaveCalled());
-}
-
-TEST_F(TestWifiSleepManager, TestCommissioningInProgressAndCompleted)
-{
-    WifiSleepManager::GetInstance().HandleCommissioningSessionStarted();
-    EXPECT_EQ(mMock.GetLastPowerSaveConfiguration(), PowerSaveInterface::PowerSaveConfiguration::kHighPerformance);
-    EXPECT_TRUE(mMock.WasConfigurePowerSaveCalled());
-
-    WifiSleepManager::GetInstance().HandleCommissioningSessionStopped();
-    EXPECT_EQ(mMock.GetLastPowerSaveConfiguration(), PowerSaveInterface::PowerSaveConfiguration::kDeepSleep);
-    EXPECT_TRUE(mMock.WasConfigurePowerSaveCalled());
-}
-
 TEST_F(TestWifiSleepManager, TestVerifyOrTransitionStandardOperation)
 {
     mMock.SetIsWifiProvisioned(true);

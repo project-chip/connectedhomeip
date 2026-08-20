@@ -490,6 +490,16 @@
 - (MCMediaPlaybackClusterAvailableTextTracksAttribute * _Nullable)availableTextTracksAttribute;
 
 /**
+ * @brief Returns non-nil pointer to MCMediaPlaybackClusterAvailableCommandsAttribute if supported, nil otherwise.
+ */
+- (MCMediaPlaybackClusterAvailableCommandsAttribute * _Nullable)availableCommandsAttribute;
+
+/**
+ * @brief Returns non-nil pointer to MCMediaPlaybackClusterContentInfoAttribute if supported, nil otherwise.
+ */
+- (MCMediaPlaybackClusterContentInfoAttribute * _Nullable)contentInfoAttribute;
+
+/**
  * @brief Returns non-nil pointer to MCMediaPlaybackClusterGeneratedCommandListAttribute if supported, nil otherwise.
  */
 - (MCMediaPlaybackClusterGeneratedCommandListAttribute * _Nullable)generatedCommandListAttribute;
@@ -570,6 +580,16 @@
  */
 - (MCContentLauncherClusterLaunchURLCommand * _Nullable)launchURLCommand;
 
+/**
+ * @brief Returns non-nil pointer to MCContentLauncherClusterContentReplicationRequestCommand if supported, nil otherwise.
+ */
+- (MCContentLauncherClusterContentReplicationRequestCommand * _Nullable)contentReplicationRequestCommand;
+
+/**
+ * @brief Returns non-nil pointer to MCContentLauncherClusterPlayPresetCommand if supported, nil otherwise.
+ */
+- (MCContentLauncherClusterPlayPresetCommand * _Nullable)playPresetCommand;
+
 // ContentLauncher cluster attributes:
 
 /**
@@ -581,6 +601,16 @@
  * @brief Returns non-nil pointer to MCContentLauncherClusterSupportedStreamingProtocolsAttribute if supported, nil otherwise.
  */
 - (MCContentLauncherClusterSupportedStreamingProtocolsAttribute * _Nullable)supportedStreamingProtocolsAttribute;
+
+/**
+ * @brief Returns non-nil pointer to MCContentLauncherClusterMovableAttribute if supported, nil otherwise.
+ */
+- (MCContentLauncherClusterMovableAttribute * _Nullable)movableAttribute;
+
+/**
+ * @brief Returns non-nil pointer to MCContentLauncherClusterPresetsAttribute if supported, nil otherwise.
+ */
+- (MCContentLauncherClusterPresetsAttribute * _Nullable)presetsAttribute;
 
 /**
  * @brief Returns non-nil pointer to MCContentLauncherClusterGeneratedCommandListAttribute if supported, nil otherwise.
@@ -739,6 +769,85 @@
  * @brief Returns non-nil pointer to MCApplicationBasicClusterClusterRevisionAttribute if supported, nil otherwise.
  */
 - (MCApplicationBasicClusterClusterRevisionAttribute * _Nullable)clusterRevisionAttribute;
+@end
+
+// MediaFileManagement cluster:
+
+@interface MCMediaFileManagementCluster : MCCluster
+
+// MediaFileManagement cluster commands:
+
+/**
+ * @brief Returns non-nil pointer to MCMediaFileManagementClusterAddFileCommand if supported, nil otherwise.
+ */
+- (MCMediaFileManagementClusterAddFileCommand * _Nullable)addFileCommand;
+
+/**
+ * @brief Returns non-nil pointer to MCMediaFileManagementClusterDeleteFileCommand if supported, nil otherwise.
+ */
+- (MCMediaFileManagementClusterDeleteFileCommand * _Nullable)deleteFileCommand;
+
+/**
+ * @brief Returns non-nil pointer to MCMediaFileManagementClusterRequestSharedFilesCommand if supported, nil otherwise.
+ */
+- (MCMediaFileManagementClusterRequestSharedFilesCommand * _Nullable)requestSharedFilesCommand;
+
+/**
+ * @brief Returns non-nil pointer to MCMediaFileManagementClusterGetSharedFileCommand if supported, nil otherwise.
+ */
+- (MCMediaFileManagementClusterGetSharedFileCommand * _Nullable)getSharedFileCommand;
+
+/**
+ * @brief Returns non-nil pointer to MCMediaFileManagementClusterOfferFileCommand if supported, nil otherwise.
+ */
+- (MCMediaFileManagementClusterOfferFileCommand * _Nullable)offerFileCommand;
+
+// MediaFileManagement cluster attributes:
+
+/**
+ * @brief Returns non-nil pointer to MCMediaFileManagementClusterTotalStorageAttribute if supported, nil otherwise.
+ */
+- (MCMediaFileManagementClusterTotalStorageAttribute * _Nullable)totalStorageAttribute;
+
+/**
+ * @brief Returns non-nil pointer to MCMediaFileManagementClusterAvailableStorageAttribute if supported, nil otherwise.
+ */
+- (MCMediaFileManagementClusterAvailableStorageAttribute * _Nullable)availableStorageAttribute;
+
+/**
+ * @brief Returns non-nil pointer to MCMediaFileManagementClusterAvailableFilesAttribute if supported, nil otherwise.
+ */
+- (MCMediaFileManagementClusterAvailableFilesAttribute * _Nullable)availableFilesAttribute;
+
+/**
+ * @brief Returns non-nil pointer to MCMediaFileManagementClusterSupportedMimeTypesAttribute if supported, nil otherwise.
+ */
+- (MCMediaFileManagementClusterSupportedMimeTypesAttribute * _Nullable)supportedMimeTypesAttribute;
+
+/**
+ * @brief Returns non-nil pointer to MCMediaFileManagementClusterGeneratedCommandListAttribute if supported, nil otherwise.
+ */
+- (MCMediaFileManagementClusterGeneratedCommandListAttribute * _Nullable)generatedCommandListAttribute;
+
+/**
+ * @brief Returns non-nil pointer to MCMediaFileManagementClusterAcceptedCommandListAttribute if supported, nil otherwise.
+ */
+- (MCMediaFileManagementClusterAcceptedCommandListAttribute * _Nullable)acceptedCommandListAttribute;
+
+/**
+ * @brief Returns non-nil pointer to MCMediaFileManagementClusterAttributeListAttribute if supported, nil otherwise.
+ */
+- (MCMediaFileManagementClusterAttributeListAttribute * _Nullable)attributeListAttribute;
+
+/**
+ * @brief Returns non-nil pointer to MCMediaFileManagementClusterFeatureMapAttribute if supported, nil otherwise.
+ */
+- (MCMediaFileManagementClusterFeatureMapAttribute * _Nullable)featureMapAttribute;
+
+/**
+ * @brief Returns non-nil pointer to MCMediaFileManagementClusterClusterRevisionAttribute if supported, nil otherwise.
+ */
+- (MCMediaFileManagementClusterClusterRevisionAttribute * _Nullable)clusterRevisionAttribute;
 @end
 
 #endif /* MCClusterObjects_h */

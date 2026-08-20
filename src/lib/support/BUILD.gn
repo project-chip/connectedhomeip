@@ -263,6 +263,7 @@ static_library("support") {
     "CHIPCounter.h",
     "CHIPMemString.h",
     "CharSpanToStdString.h",
+    "ChunkSplitter.h",
     "CommonIterator.h",
     "CommonPersistentData.h",
     "DLLUtil.h",

@@ -26,6 +26,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Camera AV Settings User Level Management
     - Commodity Price
     - Commodity Tariff
+    - Electrical Distribution
     - Electrical Energy Measurement
     - Joint Fabric Administrator
     - Network Commissioning
@@ -39,7 +40,6 @@ CommandHandlerInterfaceOnlyClusters:
     - Refrigerator And Temperature Controlled Cabinet Mode
     - Sample MEI
     - Service Area
-    - Soil Measurement
     - Thread Border Router Management
     - Thread Network Directory
     - Water Heater Management
@@ -66,7 +66,6 @@ ClustersWithAttributeChangedFunctions:
     - Door Lock
     - Pump Configuration and Control
     - Thermostat
-    - Window Covering
     # keep-sorted end
 
 ClustersWithShutdownFunctions:
@@ -83,9 +82,6 @@ ClustersWithShutdownFunctions:
 ClustersWithPreAttributeChangeFunctions:
     # keep-sorted start
     - Door Lock
-    - Energy Preference
-    - Laundry Dryer Controls
-    - Laundry Washer Controls
     - Mode Select
     - Pump Configuration and Control
     - Thermostat
@@ -118,9 +114,11 @@ CodeDrivenClusters:
     - Device Energy Management Mode
     - Diagnostic Logs
     - Dishwasher Mode
+    - Dynamic Lighting
     - Electrical Power Measurement
     - Energy EVSE
     - Energy EVSE Mode
+    - Energy Preference
     - Ethernet Network Diagnostics
     - Fan Control
     - Fixed Label
@@ -135,8 +133,11 @@ CodeDrivenClusters:
     - ICD Management
     - Identify
     - Illuminance Measurement
+    - Laundry Dryer Controls
+    - Laundry Washer Controls
     - Laundry Washer Mode
     - Localization Configuration
+    - Media File Management
     - Microwave Oven Control
     - Microwave Oven Mode
     - Network Identity Management
@@ -157,8 +158,10 @@ CodeDrivenClusters:
     - Refrigerator And Temperature Controlled Cabinet Mode
     - Relative Humidity Measurement
     - Scenes Management
+    - Service Area
     - Smoke CO Alarm
     - Software Diagnostics
+    - Soil Measurement
     - Switch
     - TLS Certificate Management
     - TLS Client Management
@@ -174,4 +177,5 @@ CodeDrivenClusters:
     - Water Heater Mode
     - Wi-Fi Network Diagnostics
     - Wi-Fi Network Management
+    - Window Covering
     # keep-sorted end

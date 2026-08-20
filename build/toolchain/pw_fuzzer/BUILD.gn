@@ -32,7 +32,17 @@ declare_args() {
   # (set by the `ubsan` build_examples modifier on a -pw-fuzztest target). Local builds only;
   # under OSS-Fuzz the engine drives sanitizers via $CFLAGS.
   chip_pw_fuzz_ubsan = false
+
+  # Build the local pw_fuzzer / FuzzTest targets with MemorySanitizer instead of the default
+  # ASan (set by the `msan` build_examples modifier on a -pw-fuzztest target). Requires an
+  # instrumented sysroot via msan_sysroot. Local builds only; under OSS-Fuzz the engine
+  # drives sanitizers via $CFLAGS.
+  chip_pw_fuzz_msan = false
 }
+
+assert(
+    !chip_pw_fuzz_msan || msan_sysroot != "",
+    "chip_pw_fuzz_msan=true requires msan_sysroot to be set. Build via " + "scripts/build/build_examples.py --target ...-pw-fuzztest-msan-clang, " + "or set SYSROOT_MSAN before `gn gen`.")
 
 # --- libFuzzer-compatibility-mode support for FuzzTest ---
 # Applied toolchain-wide (via _use_libfuzzer_compat) so the configs below reach the FuzzTest
@@ -150,6 +160,15 @@ gcc_toolchain("chip_pw_fuzztest") {
         "$dir_pw_toolchain/host_clang:sanitize_address",
         "$dir_pw_build:relative_paths",
       ]
+    } else if (chip_pw_fuzz_msan) {
+      # Local MSAN: swap pigweed's plain -fsanitize=address for chip's MemorySanitizer
+      # config (ASan and MSAN are mutually exclusive). sanitize_memory pulls the
+      # MSAN-instrumented libc++ from msan_sysroot and applies msan_ignorelist.txt. Pigweed's
+      # coverage instrumentation ($dir_pw_fuzzer:instrumentation) is compatible with MSAN and
+      # is kept for coverage-guided runs.
+      remove_default_configs +=
+          [ "$dir_pw_toolchain/host_clang:sanitize_address" ]
+      default_configs += [ "//build/config/compiler:sanitize_memory" ]
     } else {
       # Local builds keep pigweed's base -fsanitize=address. Optional UBSan on top via the
       # `ubsan` modifier on a -pw-fuzztest target.

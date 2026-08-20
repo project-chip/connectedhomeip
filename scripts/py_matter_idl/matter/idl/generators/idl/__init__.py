@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import os
-from typing import Union
 
 from matter.idl.generators import CodeGenerator
 from matter.idl.generators.storage import GeneratorStorage
@@ -22,7 +21,7 @@ from matter.idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute
                                          StructTag)
 
 
-def human_text_string(value: Union[StructTag, StructQuality, EventPriority, EventQuality, AccessPrivilege, AttributeQuality, CommandQuality, ApiMaturity, AttributeStorage]) -> str:
+def human_text_string(value: StructTag | StructQuality | EventPriority | EventQuality | AccessPrivilege | AttributeQuality | CommandQuality | ApiMaturity | AttributeStorage) -> str:
     if type(value) is StructTag:
         if value == StructTag.REQUEST:
             return "request"
@@ -103,7 +102,7 @@ def human_text_string(value: Union[StructTag, StructQuality, EventPriority, Even
             return "callback"
 
     # wrong value in general
-    return "Unknown/unsupported: %r" % value
+    return f"Unknown/unsupported: {value!r}"
 
 
 def event_access_string(e: Event) -> str:
@@ -162,7 +161,7 @@ def attribute_access_string(a: Attribute) -> str:
     return f"access({', '.join(result)}) "
 
 
-def render_default(value: Union[str, int, bool]) -> str:
+def render_default(value: str | int | bool) -> str:
     """
     Renders a idl-style default.
 
