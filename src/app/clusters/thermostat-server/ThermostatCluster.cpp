@@ -41,8 +41,8 @@ namespace Thermostat {
 
 ThermostatCluster::ThermostatCluster(EndpointId endpointId, BitFlags<Thermostat::Feature> features, const Config & config,
                                      Thermostat::Delegate & delegate) :
-    DefaultServerCluster({ endpointId, Thermostat::Id }),
-    mFeatures(features), mConfig(config), mDelegate(delegate)
+    DefaultServerCluster({ endpointId, Thermostat::Id }), mFeatures(features), mConfig(config), mDelegate(delegate),
+    mAtomicWriteSession(*this)
 {}
 
 CHIP_ERROR ThermostatCluster::Startup(ServerClusterContext & context)
@@ -53,14 +53,12 @@ CHIP_ERROR ThermostatCluster::Startup(ServerClusterContext & context)
     {
         ChipLogError(Zcl, "Failed to add fabric delegate to Thermostat Cluster");
     }
-    mAtomicWriteSession.SetDelegate(this);
     return CHIP_NO_ERROR;
 }
 
 void ThermostatCluster::Shutdown(ClusterShutdownType type)
 {
     mAtomicWriteSession.ResetAtomicWrite();
-    mAtomicWriteSession.SetDelegate(nullptr);
     DefaultServerCluster::Shutdown(type);
     mConfig.mFabricTable.RemoveFabricDelegate(this);
     ChipLogProgress(Zcl, "Shutting down thermostat server cluster on endpoint %d", mPath.mEndpointId);

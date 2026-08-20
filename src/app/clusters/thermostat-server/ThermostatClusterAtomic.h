@@ -70,6 +70,7 @@ public:
         Open,
     };
 
+    AtomicWriteSession(Delegate & delegate) : mDelegate(delegate) {}
     /**
      * @brief Sets the atomic write state for the given originatorNodeId
      *
@@ -170,14 +171,12 @@ public:
 
     void OnAtomicWriteTimeout();
 
-    void SetDelegate(Delegate * delegate) { mDelegate = delegate; }
-
 private:
     State mState = State::Closed;
     Platform::ScopedMemoryBufferWithSize<AttributeId> mAttributeIds;
     ScopedNodeId mNodeId;
 
-    Delegate * mDelegate = nullptr;
+    Delegate & mDelegate;
 
     Protocols::InteractionModel::Status
     ExecuteAtomicAction(AtomicAttributes & attributeStatuses,

@@ -265,13 +265,6 @@ std::optional<DataModel::ActionReturnStatus>
 AtomicWriteSession::BeginAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                      const Commands::AtomicRequest::DecodableType & commandData)
 {
-
-    if (mDelegate == nullptr)
-    {
-        ChipLogError(Zcl, "AtomicWriteSession Delegate is null");
-        return Status::InvalidInState;
-    }
-
     Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> attributeStatuses;
     auto status = BuildAttributeStatuses(commandData.attributeRequests, attributeStatuses);
     if (status != Status::Success)
@@ -299,7 +292,7 @@ AtomicWriteSession::BeginAtomicWrite(CommandHandler * commandObj, const Concrete
         {
         case Presets::Id:
         case Schedules::Id:
-            auto attributeTimeout = mDelegate->GetMaxAtomicWriteTimeout(attributeId);
+            auto attributeTimeout = mDelegate.GetMaxAtomicWriteTimeout(attributeId);
 
             if (attributeTimeout.has_value())
             {
@@ -370,12 +363,6 @@ std::optional<DataModel::ActionReturnStatus>
 AtomicWriteSession::CommitAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                       const Commands::AtomicRequest::DecodableType & commandData)
 {
-    if (mDelegate == nullptr)
-    {
-        ChipLogError(Zcl, "AtomicWriteSession Delegate is null");
-        return Status::InvalidInState;
-    }
-
     Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> attributeStatuses;
     auto status = BuildAttributeStatuses(commandData.attributeRequests, attributeStatuses);
     if (status != Status::Success)
@@ -404,12 +391,6 @@ std::optional<DataModel::ActionReturnStatus>
 AtomicWriteSession::RollbackAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                         const Commands::AtomicRequest::DecodableType & commandData)
 {
-    if (mDelegate == nullptr)
-    {
-        ChipLogError(Zcl, "AtomicWriteSession Delegate is null");
-        return Status::InvalidInState;
-    }
-
     Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> attributeStatuses;
     auto status = BuildAttributeStatuses(commandData.attributeRequests, attributeStatuses);
     if (status != Status::Success)
@@ -433,14 +414,9 @@ AtomicWriteSession::RollbackAtomicWrite(CommandHandler * commandObj, const Concr
 
 void AtomicWriteSession::OnAtomicWriteTimeout()
 {
-    // If there's no delegate, there's nothing to do
-    if (mDelegate == nullptr)
-    {
-        return;
-    }
     for (size_t i = 0; i < mAttributeIds.AllocatedSize(); ++i)
     {
-        mDelegate->OnAtomicWriteRollback(mAttributeIds[i]);
+        mDelegate.OnAtomicWriteRollback(mAttributeIds[i]);
     }
     ResetAtomicWrite();
 }
@@ -500,7 +476,7 @@ Status AtomicWriteSession::BuildAttributeStatuses(
     for (size_t i = 0; i < index; ++i)
     {
         auto & attributeStatus = attributeStatuses[i];
-        if (mDelegate->HasAttribute(attributeStatus.attributeID))
+        if (mDelegate.HasAttribute(attributeStatus.attributeID))
         {
             // This is definitely an attribute we know about.
             continue;
