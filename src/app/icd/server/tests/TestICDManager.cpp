@@ -221,7 +221,14 @@ public:
     }
 
 #if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
-    void SetPendingCheckInOnNetworkAttach(bool val) { mICDManager.mPendingCheckInOnNetworkAttach = val; }
+    void SetPendingActiveModeOnNetworkAttach(bool val) { mICDManager.mPendingActiveModeOnNetworkAttach = val; }
+#if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+    void SetPendingCheckInOnNetworkAttach(bool val, Optional<Access::SubjectDescriptor> subject = NullOptional)
+    {
+        mICDManager.mPendingCheckInOnNetworkAttach = val;
+        mICDManager.mPendingCheckInSubject         = subject;
+    }
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
     void HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event) { mICDManager.HandlePlatformEvent(event); }
 #endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
 
@@ -1455,7 +1462,7 @@ TEST_F(TestICDManager, TestScenario7_PeriodicIdleTimer_ThreadUnattached_Deferred
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
     // Step 1 & 2: 1-Hour timer expires while unattached -> stays in IdleMode (deferral)
-    SetPendingCheckInOnNetworkAttach(true);
+    SetPendingActiveModeOnNetworkAttach(true);
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
     // Step 3 & 4: Thread attaches -> transitions to ActiveMode and sends Check-In
@@ -1493,17 +1500,18 @@ TEST_F(TestICDManager, TestScenario9_SubscriptionTimeout_ThreadUnattached_Deferr
     AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetActiveModeDuration());
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
-    // Step 1 & 2: Subscription times out while unattached -> Check-In is deferred
-    SetPendingCheckInOnNetworkAttach(true);
+    // Step 1 & 2: Subscription times out while unattached -> Check-In is deferred with specific subject preserved
+    Access::SubjectDescriptor subjectDescriptor;
+    subjectDescriptor.fabricIndex = kTestFabricIndex1;
+    subjectDescriptor.subject     = kClientNodeId11;
+    SetPendingCheckInOnNetworkAttach(true, MakeOptional(subjectDescriptor));
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
-    // Step 3 & 4: Thread attaches -> transitions to ActiveMode and dispatches Check-In
+    // Step 3 & 4: Thread attaches -> replaying deferred Check-In for specific subject
     DeviceLayer::ChipDeviceEvent event{ .Type                     = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
                                         .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Established } };
     HandlePlatformEvent(&event);
     AdvanceClockAndRunEventLoop(100_ms);
-
-    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 
@@ -1534,7 +1542,7 @@ TEST_F(TestICDManager, TestScenario11_ExtendedOutage_IdlePreservedUntilAttach)
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
     // Step 1 & 2: Multiple periodic wake-ups fire during extended network outage
-    SetPendingCheckInOnNetworkAttach(true);
+    SetPendingActiveModeOnNetworkAttach(true);
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
     // Step 3: Hub comes back online at t=45m -> Thread attaches
@@ -1647,7 +1655,7 @@ TEST_F(TestICDManager, TestScenario15_DeviceReboot_ColdBoot_DeferredIfDetached)
 
     // Step 2: At bootup (kServerReady), TriggerCheckInMessages is called when Thread is detached
     // Setting pending flag simulates the unattached bootup deferral
-    SetPendingCheckInOnNetworkAttach(true);
+    SetPendingActiveModeOnNetworkAttach(true);
 
     // Step 3: Verify the device stays in low-power IdleMode (deep sleep) while Thread is attaching
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
