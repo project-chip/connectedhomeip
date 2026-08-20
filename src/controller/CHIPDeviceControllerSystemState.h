@@ -61,6 +61,8 @@
 #endif
 #include <transport/raw/ProxyTransport.h>
 
+#include <type_traits>
+
 namespace chip {
 
 inline constexpr size_t kMaxDeviceTransportBlePendingPackets = 1;
@@ -128,6 +130,17 @@ constexpr size_t kDeviceProxyTransportIndex = 1 /* IPv6 UDP */
     + 1 /* NFC */
 #endif
     ; /* Proxy<> is last */
+
+/**
+ * Compile-time check that the hand-maintained index above still names Proxy<>.  Without
+ * it, adding or gating a transport in DeviceTransportMgr silently makes
+ * GetDeviceProxyTransport() return a different transport.
+ */
+static_assert(
+    std::is_same_v<std::remove_reference_t<
+                       decltype(std::declval<DeviceTransportMgr &>().GetTransport().GetImplAtIndex<kDeviceProxyTransportIndex>())>,
+                   Transport::Proxy<>>,
+    "kDeviceProxyTransportIndex is out of sync with DeviceTransportMgr");
 
 /** Return the ProxyTransportBase embedded in the DeviceTransportMgr. */
 inline Transport::ProxyTransportBase * GetDeviceProxyTransport(DeviceTransportMgr * mgr)
