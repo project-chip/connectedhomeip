@@ -17,6 +17,8 @@
 
 #include "PresetStructWithOwnedMembers.h"
 
+#include <app/data-model/Nullable.h>
+
 using namespace chip::app::Clusters::Thermostat::Structs;
 using namespace chip::app::DataModel;
 
@@ -29,6 +31,14 @@ PresetStructWithOwnedMembers::PresetStructWithOwnedMembers(const PresetStruct::T
 {
     *this = other;
 }
+
+PresetStructWithOwnedMembers::PresetStructWithOwnedMembers(const PresetStructWithOwnedMembers & other) :
+    PresetStructWithOwnedMembers(static_cast<const PresetStruct::Type &>(other))
+{}
+
+PresetStructWithOwnedMembers::PresetStructWithOwnedMembers(PresetStructWithOwnedMembers && other) :
+    PresetStructWithOwnedMembers(static_cast<const PresetStruct::Type &>(other))
+{}
 
 PresetStructWithOwnedMembers & PresetStructWithOwnedMembers::operator=(const PresetStruct::Type & other)
 {
@@ -50,6 +60,16 @@ PresetStructWithOwnedMembers & PresetStructWithOwnedMembers::operator=(const Pre
 }
 
 PresetStructWithOwnedMembers & PresetStructWithOwnedMembers::operator=(const PresetStructWithOwnedMembers & other)
+{
+    if (this == &other)
+    {
+        return *this;
+    }
+    *this = static_cast<const PresetStruct::Type &>(other);
+    return *this;
+}
+
+PresetStructWithOwnedMembers & PresetStructWithOwnedMembers::operator=(PresetStructWithOwnedMembers && other)
 {
     if (this == &other)
     {
@@ -94,7 +114,8 @@ CHIP_ERROR PresetStructWithOwnedMembers::SetName(const Optional<DataModel::Nulla
         name.ClearValue();
         return CHIP_NO_ERROR;
     }
-    if (newName.Value().IsNull()) {
+    if (newName.Value().IsNull())
+    {
         name.SetValue(DataModel::NullNullable);
         return CHIP_NO_ERROR;
     }

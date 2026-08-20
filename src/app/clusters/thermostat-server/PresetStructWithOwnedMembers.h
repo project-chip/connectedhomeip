@@ -44,11 +44,14 @@ struct PresetStructWithOwnedMembers : protected Structs::PresetStruct::Type
 {
 public:
     PresetStructWithOwnedMembers() = default;
+    ~PresetStructWithOwnedMembers() = default;
+    PresetStructWithOwnedMembers(const PresetStructWithOwnedMembers & other);
     PresetStructWithOwnedMembers(const Structs::PresetStruct::Type & other);
-    // Copy construction deleted: a defaulted copy ctor would shallow-copy the inherited spans into the source's buffers.
-    PresetStructWithOwnedMembers(const PresetStructWithOwnedMembers & other) = delete;
+    PresetStructWithOwnedMembers(PresetStructWithOwnedMembers && other);
+
     PresetStructWithOwnedMembers & operator=(const Structs::PresetStruct::Type & other);
     PresetStructWithOwnedMembers & operator=(const PresetStructWithOwnedMembers & other);
+    PresetStructWithOwnedMembers & operator=(PresetStructWithOwnedMembers && other);
 
     void SetPresetScenario(PresetScenarioEnum enumValue);
     CHIP_ERROR SetPresetHandle(const DataModel::Nullable<ByteSpan> & newPresetHandle);
