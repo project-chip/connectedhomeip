@@ -33,7 +33,7 @@ CHIP_ERROR LaundryWasher::Register(EndpointId endpoint, CodeDrivenDataModelProvi
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mOperationalStateCluster.Create(
-        endpoint, &mOperationalStateDelegate,
+        endpoint, mOperationalStateDelegate,
         Clusters::OperationalState::OperationalStateCluster::Config{
             .optionalAttributes = Clusters::OperationalState::OperationalStateCluster::OptionalAttributeSet()
                                       .Set<Clusters::OperationalState::Attributes::CountdownTime::Id>(),

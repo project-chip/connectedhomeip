@@ -17,36 +17,27 @@
 #pragma once
 
 #include <device/api/Interface.h>
-#include <device/types/cooktop/Cooktop.h>
-#include <device/types/temperature-controlled-cabinet/TemperatureControlledCabinetPart.h>
 
 namespace chip::app {
 
 class Oven : public DeviceInterface
 {
 public:
-    struct Config
-    {
-        Clusters::OperationalState::OperationalStateCluster::Delegate & cavityOperationalStateDelegate;
-        TemperatureControlledCabinetPart::Config cavityConfig;
-    };
-
-    Oven(TimerDelegate & timerDelegate, Clusters::OnOffDelegate & surfaceOnOff, Clusters::IdentifyDelegate & cavityIdentify,
-         Clusters::IdentifyDelegate & surfaceIdentify, const Config & config);
+    Oven();
     ~Oven() override = default;
 
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    // Composition getters to expose child endpoints
-    TemperatureControlledCabinetPart & Cavity() { return mCavity; }
-    CookSurfacePart & Surface() { return mSurface; }
+    EndpointId GetEndpointId() const { return mEndpointId; }
+
+protected:
+    virtual CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider) = 0;
+    virtual void UnregisterParts(CodeDrivenDataModelProvider & provider)                                       = 0;
 
 private:
     EndpointId mEndpointId = kInvalidEndpointId;
-    TemperatureControlledCabinetPart mCavity;
-    CookSurfacePart mSurface;
 };
 
 } // namespace chip::app

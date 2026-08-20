@@ -54,22 +54,21 @@ private:
 class Cooktop : public DeviceInterface
 {
 public:
-    Cooktop(TimerDelegate & timerDelegate, Clusters::OnOffDelegate & surface1OnOff, Clusters::OnOffDelegate & surface2OnOff,
-            Clusters::IdentifyDelegate & surface1Identify, Clusters::IdentifyDelegate & surface2Identify);
+    Cooktop();
     ~Cooktop() override = default;
 
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    // Composition getters to expose child endpoints
-    CookSurfacePart & Surface1() { return mSurface1; }
-    CookSurfacePart & Surface2() { return mSurface2; }
+    EndpointId GetEndpointId() const { return mEndpointId; }
+
+protected:
+    virtual CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider) = 0;
+    virtual void UnregisterParts(CodeDrivenDataModelProvider & provider)                                       = 0;
 
 private:
     EndpointId mEndpointId = kInvalidEndpointId;
-    CookSurfacePart mSurface1;
-    CookSurfacePart mSurface2;
 };
 
 } // namespace chip::app

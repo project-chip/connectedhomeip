@@ -35,17 +35,19 @@ using namespace chip::app::Clusters::OperationalState;
 
 // Standalone constructor: creates and owns an OperationalStateCluster.
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, const OperationalStateCluster::Config & config) :
-    mDelegate(aDelegate), mOwnedStorage(Platform::MakeUnique<detail::OperationalInstanceBase>(aDelegate, aEndpointId, config)),
-    mCluster(mOwnedStorage->mCluster.Cluster()), mRegPtr(&mOwnedStorage->mCluster.Registration())
+    mOwnedStorage(Platform::MakeUnique<detail::OperationalInstanceBase>(aDelegate, aEndpointId, config)),
+    mCluster(mOwnedStorage->mCluster.Cluster()), mRegPtr(&mOwnedStorage->mCluster.Registration()),
+    mDelegateWrapperPtr(&mOwnedStorage->mDelegateWrapper)
 {
-    aDelegate->SetInstance(this);
+    mDelegateWrapperPtr->SetInstance(this);
 }
 
 // Protected constructor: cluster storage is owned by the derived class (Rvc, OvenCavity).
-Instance::Instance(OperationalStateCluster & cluster, ServerClusterRegistration & registration, Delegate * aDelegate) :
-    mDelegate(aDelegate), mCluster(cluster), mRegPtr(&registration)
+Instance::Instance(OperationalStateCluster & cluster, ServerClusterRegistration & registration,
+                   detail::InstanceDelegateWrapper & delegateWrapper, Delegate * aDelegate) :
+    mCluster(cluster), mRegPtr(&registration), mDelegateWrapperPtr(&delegateWrapper)
 {
-    aDelegate->SetInstance(this);
+    mDelegateWrapperPtr->SetInstance(this);
 }
 
 Instance::~Instance()
@@ -55,11 +57,24 @@ Instance::~Instance()
         ChipLogError(AppServer, "OperationalState::Instance destroyed without Shutdown(); shutting down now.");
         Shutdown();
     }
-    if (mDelegate)
+    if (mDelegateWrapperPtr != nullptr)
     {
-        mDelegate->SetInstance(nullptr);
+        mDelegateWrapperPtr->SetInstance(nullptr);
     }
     // mOwnedStorage (Platform::UniquePtr) frees the owned cluster automatically.
+}
+
+void Instance::SetDelegate(Delegate * aDelegate)
+{
+    if (mDelegateWrapperPtr != nullptr)
+    {
+        mDelegateWrapperPtr->SetDelegate(aDelegate);
+    }
+}
+
+Delegate * Instance::GetDelegate() const
+{
+    return mDelegateWrapperPtr != nullptr ? mDelegateWrapperPtr->GetDelegate() : nullptr;
 }
 
 CHIP_ERROR Instance::Init()

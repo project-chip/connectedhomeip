@@ -50,10 +50,18 @@ public:
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     // Public cluster getters for programmatic control
-    Clusters::TemperatureControlCluster & TemperatureControlCluster() { return mTemperatureControlCluster.Cluster(); }
-    Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
+    // Values only available after registration.
+    Clusters::TemperatureControlCluster & TemperatureControlCluster() { 
+        VerifyOrDie(mTemperatureControlCluster.IsConstructed());
+        return mTemperatureControlCluster.Cluster(); 
+    }
+    Clusters::IdentifyCluster & IdentifyCluster() {
+        VerifyOrDie(mIdentifyCluster.IsConstructed());
+        return mIdentifyCluster.Cluster(); 
+    }
     Clusters::OvenCavityOperationalState::OvenCavityOperationalStateCluster & OperationalState()
     {
+        VerifyOrDie(mOperationalStateCluster.IsConstructed());
         return mOperationalStateCluster.Cluster();
     }
 

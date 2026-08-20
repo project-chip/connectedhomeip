@@ -49,11 +49,43 @@ void LoggingCookSurfacePart::OnTriggerEffect(Clusters::IdentifyCluster & cluster
     ChipLogProgress(DeviceLayer, "CookSurface (%s): OnTriggerEffect", mName);
 }
 
+namespace {
+
+const Clusters::Globals::Structs::SemanticTagStruct::Type kSurface1Tag = {
+    .mfgCode     = DataModel::NullNullable,
+    .namespaceID = CommonNamespace::kPositionId,
+    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kLeft),
+};
+
+const Clusters::Globals::Structs::SemanticTagStruct::Type kSurface2Tag = {
+    .mfgCode     = DataModel::NullNullable,
+    .namespaceID = CommonNamespace::kPositionId,
+    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kRight),
+};
+
+} // namespace
+
 // LoggingCooktop
 
 LoggingCooktop::LoggingCooktop(TimerDelegate & timerDelegate) :
-    Cooktop(timerDelegate, mLoggingSurface1, mLoggingSurface2, mLoggingSurface1, mLoggingSurface2),
-    mLoggingSurface1(timerDelegate, "Left"), mLoggingSurface2(timerDelegate, "Right")
+    mSurface1(timerDelegate, "Left"), mSurface2(timerDelegate, "Right")
 {}
+
+CHIP_ERROR LoggingCooktop::RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider)
+{
+    ReturnErrorOnFailure(mSurface1.Register(
+        allocator.Allocate(), provider,
+        EndpointComposition(GetEndpointId(), DataModel::EndpointCompositionPattern::kFullFamily, Span(&kSurface1Tag, 1))));
+    ReturnErrorOnFailure(mSurface2.Register(
+        allocator.Allocate(), provider,
+        EndpointComposition(GetEndpointId(), DataModel::EndpointCompositionPattern::kFullFamily, Span(&kSurface2Tag, 1))));
+    return CHIP_NO_ERROR;
+}
+
+void LoggingCooktop::UnregisterParts(CodeDrivenDataModelProvider & provider)
+{
+    mSurface2.Unregister(provider);
+    mSurface1.Unregister(provider);
+}
 
 } // namespace chip::app
