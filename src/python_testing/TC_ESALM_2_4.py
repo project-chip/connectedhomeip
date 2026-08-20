@@ -99,7 +99,7 @@ class TC_ESALM_2_4(MatterBaseTest):
         feature_map = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.FeatureMap)
 
-        self.step(3, "TH reads Supported attribute", "DUT returns map64 AlarmBitmap. Store as SUP.")
+        self.step(3, "TH reads Supported attribute", "DUT returns AlarmBitmap. Store as SUP.")
         supported = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.Supported)
 
