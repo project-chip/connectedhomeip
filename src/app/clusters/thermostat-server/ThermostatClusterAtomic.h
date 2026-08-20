@@ -28,8 +28,10 @@
 #include <app/persistence/AttributePersistence.h>
 #include <lib/core/ScopedNodeId.h>
 #include <lib/support/ScopedMemoryBuffer.h>
+#include <lib/support/TimerDelegate.h>
 #include <protocols/interaction_model/Constants.h>
 #include <system/SystemClock.h>
+
 
 #include <optional>
 
@@ -47,7 +49,7 @@ namespace Thermostat {
  ******************************************************************************/
 
 using AtomicAttributes = Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type>;
-class AtomicWriteSession
+class AtomicWriteSession : public TimerContext
 {
 public:
     class Delegate
@@ -72,7 +74,7 @@ public:
         Open,
     };
 
-    AtomicWriteSession(Delegate & delegate) : mDelegate(delegate) {}
+    AtomicWriteSession(Delegate & delegate, TimerDelegate & timerDelegate) : mDelegate(delegate), mTimerDelegate(timerDelegate) {}
     /**
      * @brief Sets the atomic write state for the given originatorNodeId
      *
@@ -171,7 +173,7 @@ public:
      */
     bool InAtomicWrite(CommandHandler * commandObj, AtomicAttributes & attributeStatuses);
 
-    void OnAtomicWriteTimeout();
+    void TimerFired() override;
 
 private:
     State mState = State::Closed;
@@ -179,6 +181,7 @@ private:
     ScopedNodeId mNodeId;
 
     Delegate & mDelegate;
+    TimerDelegate & mTimerDelegate;
 
     Protocols::InteractionModel::Status
     ExecuteAtomicAction(AtomicAttributes & attributeStatuses,

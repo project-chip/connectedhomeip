@@ -23,6 +23,7 @@
 
 #include <app-common/zap-generated/callback.h>
 #include <lib/core/CHIPEncoding.h>
+#include <platform/DefaultTimerDelegate.h>
 
 #include <app/server/Server.h>
 #include <app/static-cluster-config/Thermostat.h>
@@ -39,6 +40,7 @@ namespace chip::app::Clusters::Thermostat {
 constexpr size_t kThermostatFixedClusterCount = Thermostat::StaticApplicationConfig::kFixedClusterConfig.size();
 constexpr size_t kThermostatEndpointCount     = kThermostatFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
+inline DefaultTimerDelegate gDefaultTimerDelegate;
 class BaseIntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 protected:
@@ -65,7 +67,7 @@ public:
         const ThermostatCluster::OptionalAttributes optionalAttributes = GetOptionalAttributes(endpointId, features);
         const ThermostatCluster::DefaultValues defaultValues           = LoadDefaultValues(endpointId, features);
 
-        ThermostatCluster::Config config(optionalAttributes, defaultValues, Server::GetInstance().GetFabricTable());
+        ThermostatCluster::Config config(optionalAttributes, defaultValues, Server::GetInstance().GetFabricTable(), gDefaultTimerDelegate);
 
         ChipLogProgress(Zcl, "Creating thermostat cluster for endpoint %d", endpointId);
         if constexpr (sizeof...(Delegates) > 0)

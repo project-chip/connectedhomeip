@@ -42,7 +42,7 @@ namespace Thermostat {
 ThermostatCluster::ThermostatCluster(EndpointId endpointId, BitFlags<Thermostat::Feature> features, const Config & config,
                                      Thermostat::Delegate & delegate) :
     DefaultServerCluster({ endpointId, Thermostat::Id }),
-    mFeatures(features), mConfig(config), mDelegate(delegate), mAtomicWriteSession(*this)
+    mFeatures(features), mConfig(config), mDelegate(delegate), mAtomicWriteSession(*this, config.mTimerDelegate)
 {}
 
 CHIP_ERROR ThermostatCluster::Startup(ServerClusterContext & context)

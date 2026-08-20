@@ -33,43 +33,6 @@ namespace Clusters {
 namespace Thermostat {
 
 namespace {
-
-/**
- * @brief Callback that is called when the timeout for editing the presets expires.
- *
- * @param[in] systemLayer The system layer.
- * @param[in] callbackContext The context passed to the timer callback.
- */
-void TimerExpiredCallback(System::Layer * systemLayer, void * callbackContext)
-{
-    AtomicWriteSession * session = static_cast<AtomicWriteSession *>(callbackContext);
-    if (session != nullptr)
-    {
-        session->OnAtomicWriteTimeout();
-    }
-}
-
-/**
- * @brief Schedules a timer for the given timeout in milliseconds.
- *
- * @param[in] session The atomic write session that owns the timer.
- * @param[in] timeout The timeout in milliseconds.
- */
-CHIP_ERROR ScheduleTimer(AtomicWriteSession * session, System::Clock::Milliseconds16 timeout)
-{
-    return DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback, static_cast<void *>(session));
-}
-
-/**
- * @brief Clears the currently scheduled timer.
- *
- * @param[in] session The atomic write session that owns the timer.
- */
-void ClearTimer(AtomicWriteSession * session)
-{
-    DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, static_cast<void *>(session));
-}
-
 /**
  * @brief Get the source scoped node id.
  *
@@ -242,7 +205,7 @@ bool AtomicWriteSession::SetAtomicWrite(ScopedNodeId originatorNodeId, State sta
 
 void AtomicWriteSession::ResetAtomicWrite()
 {
-    ClearTimer(this);
+    mTimerDelegate.CancelTimer(this);
 
     mState  = State::Closed;
     mNodeId = ScopedNodeId();
@@ -346,7 +309,7 @@ AtomicWriteSession::BeginAtomicWrite(CommandHandler * commandObj, const Concrete
             // This is a valid request to open an atomic write. Tell the delegate it
             // needs to keep track of a pending preset list now.
             status = ExecuteAtomicAction(attributeStatuses, &Delegate::OnAtomicWriteBegin);
-            if (status != Status::Success || ScheduleTimer(this, timeout) != CHIP_NO_ERROR)
+            if (status != Status::Success || mTimerDelegate.StartTimer(this, timeout) != CHIP_NO_ERROR)
             {
                 ExecuteAtomicAction(attributeStatuses, &Delegate::OnAtomicWriteRollback, Status::Failure);
                 ResetAtomicWrite();
@@ -412,7 +375,7 @@ AtomicWriteSession::RollbackAtomicWrite(CommandHandler * commandObj, const Concr
     return std::nullopt;
 }
 
-void AtomicWriteSession::OnAtomicWriteTimeout()
+void AtomicWriteSession::TimerFired()
 {
     for (size_t i = 0; i < mAttributeIds.AllocatedSize(); ++i)
     {
