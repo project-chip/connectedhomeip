@@ -205,7 +205,7 @@ class DEMTestBase:
                 cmd_dict["maxPower"] = maxPower
             if duration is not None:
                 cmd_dict["duration"] = duration
-                
+
             await self.send_single_cmd(cmd=Clusters.DeviceEnergyManagement.Commands.PowerRangeAdjustRequest(
                 **cmd_dict),
                 endpoint=endpoint,
