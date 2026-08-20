@@ -111,7 +111,8 @@ void ICDManager::Shutdown()
     mPendingActiveModeOnNetworkAttach = false;
 #if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
     mPendingCheckInOnNetworkAttach    = false;
-    mPendingCheckInSubject.ClearValue();
+    mPendingBroadcastCheckIn          = false;
+    mPendingCheckInSubjectsCount      = 0;
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 #endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     mStateObserverPool.ReleaseAll();
@@ -735,7 +736,39 @@ void ICDManager::OnSendCheckIn(Optional<Access::SubjectDescriptor> specificSubje
     {
         ChipLogProgress(AppServer, "ICDManager: Thread network not attached on send check-in. Deferring until attached.");
         mPendingCheckInOnNetworkAttach = true;
-        mPendingCheckInSubject         = specificSubject;
+        if (specificSubject.HasValue())
+        {
+            const auto & subject = specificSubject.Value();
+            bool isDuplicate     = false;
+            for (size_t i = 0; i < mPendingCheckInSubjectsCount; ++i)
+            {
+                if (mPendingCheckInSubjects[i].fabricIndex == subject.fabricIndex &&
+                    mPendingCheckInSubjects[i].authMode == subject.authMode &&
+                    mPendingCheckInSubjects[i].subject == subject.subject &&
+                    mPendingCheckInSubjects[i].cats.values == subject.cats.values &&
+                    mPendingCheckInSubjects[i].isCommissioning == subject.isCommissioning)
+                {
+                    isDuplicate = true;
+                    break;
+                }
+            }
+
+            if (!isDuplicate)
+            {
+                if (mPendingCheckInSubjectsCount < mPendingCheckInSubjects.size())
+                {
+                    mPendingCheckInSubjects[mPendingCheckInSubjectsCount++] = subject;
+                }
+                else
+                {
+                    ChipLogError(AppServer, "ICDManager: Pending check-in subjects table is full. Subject dropped.");
+                }
+            }
+        }
+        else
+        {
+            mPendingBroadcastCheckIn = true;
+        }
         return;
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -790,10 +823,14 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
         mPendingActiveModeOnNetworkAttach = false;
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
-        bool wasPendingCheckIn                             = mPendingCheckInOnNetworkAttach;
-        Optional<Access::SubjectDescriptor> pendingSubject = mPendingCheckInSubject;
-        mPendingCheckInOnNetworkAttach                     = false;
-        mPendingCheckInSubject.ClearValue();
+        bool wasPendingCheckIn                                                            = mPendingCheckInOnNetworkAttach;
+        bool wasPendingBroadcastCheckIn                                                   = mPendingBroadcastCheckIn;
+        std::array<Access::SubjectDescriptor, kMaxPendingCheckInSubjects> pendingSubjects = mPendingCheckInSubjects;
+        size_t pendingSubjectsCount                                                       = mPendingCheckInSubjectsCount;
+
+        mPendingCheckInOnNetworkAttach = false;
+        mPendingBroadcastCheckIn       = false;
+        mPendingCheckInSubjectsCount   = 0;
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 
         if (wasPendingActiveMode || mOperationalState == OperationalState::ActiveMode)
@@ -806,13 +843,21 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
 #if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
         if (wasPendingCheckIn)
         {
-            // If the deferred Check-In targeted a specific subject, replay it for that subject.
-            // If it was a broadcast Check-In and ActiveMode was not entered above, replay it.
-            // (Note: UpdateOperationState(ActiveMode) already calls SendCheckInMsgs() for broadcast Check-In).
-            if (pendingSubject.HasValue() || (!wasPendingActiveMode && mOperationalState != OperationalState::ActiveMode))
+            // Replay each deferred specific subject Check-In
+            for (size_t i = 0; i < pendingSubjectsCount; ++i)
             {
-                ChipLogProgress(AppServer, "ICDManager: Replaying deferred Check-In message.");
-                SendCheckInMsgs(pendingSubject);
+                ChipLogProgress(AppServer,
+                                "ICDManager: Replaying deferred Check-In message for specific subject: " ChipLogFormatX64,
+                                ChipLogValueX64(pendingSubjects[i].subject));
+                SendCheckInMsgs(MakeOptional(pendingSubjects[i]));
+            }
+
+            // If a broadcast Check-In was requested and ActiveMode was not entered above, replay broadcast Check-In once.
+            // (Note: UpdateOperationState(ActiveMode) already calls SendCheckInMsgs() for broadcast Check-In).
+            if (wasPendingBroadcastCheckIn && !wasPendingActiveMode && mOperationalState != OperationalState::ActiveMode)
+            {
+                ChipLogProgress(AppServer, "ICDManager: Replaying deferred broadcast Check-In message.");
+                SendCheckInMsgs(NullOptional);
             }
         }
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT

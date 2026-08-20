@@ -18,6 +18,8 @@
 
 #include <app/icd/server/ICDServerConfig.h>
 
+#include <array>
+
 #include <app/AppConfig.h>
 #include <app/SubscriptionsInfoProvider.h>
 #include <app/TestEventTriggerDelegate.h>
@@ -383,8 +385,11 @@ private:
 #if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     bool mPendingActiveModeOnNetworkAttach = false;
 #if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
-    bool mPendingCheckInOnNetworkAttach = false;
-    Optional<Access::SubjectDescriptor> mPendingCheckInSubject;
+    static constexpr size_t kMaxPendingCheckInSubjects = CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC * CHIP_CONFIG_MAX_FABRICS;
+    bool mPendingCheckInOnNetworkAttach                = false;
+    bool mPendingBroadcastCheckIn                      = false;
+    std::array<Access::SubjectDescriptor, kMaxPendingCheckInSubjects> mPendingCheckInSubjects;
+    size_t mPendingCheckInSubjectsCount                = 0;
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 #endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     ObjectPool<ObserverPointer, CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE> mStateObserverPool;

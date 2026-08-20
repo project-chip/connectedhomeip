@@ -240,7 +240,15 @@ public:
     bool IsPendingActiveModeOnNetworkAttach() const { return mICDManager.mPendingActiveModeOnNetworkAttach; }
 #if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
     bool IsPendingCheckInOnNetworkAttach() const { return mICDManager.mPendingCheckInOnNetworkAttach; }
-    Optional<Access::SubjectDescriptor> GetPendingCheckInSubject() const { return mICDManager.mPendingCheckInSubject; }
+    size_t GetPendingCheckInSubjectsCount() const { return mICDManager.mPendingCheckInSubjectsCount; }
+    Optional<Access::SubjectDescriptor> GetPendingCheckInSubject(size_t index = 0) const
+    {
+        if (index < mICDManager.mPendingCheckInSubjectsCount)
+        {
+            return MakeOptional(mICDManager.mPendingCheckInSubjects[index]);
+        }
+        return NullOptional;
+    }
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
     void HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event) { mICDManager.HandlePlatformEvent(event); }
 #endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
@@ -1562,6 +1570,53 @@ TEST_F(TestICDManager, TestScenario9_SubscriptionTimeout_ThreadUnattached_Deferr
 
     // Assert pending Check-In flag is consumed
     EXPECT_FALSE(IsPendingCheckInOnNetworkAttach());
+}
+
+TEST_F(TestICDManager, TestScenario9b_SubscriptionTimeout_MultipleSubjects_DeduplicationAndReplay)
+{
+    // Pre-condition: Device in IdleMode deep sleep
+    AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetActiveModeDuration());
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
+
+    // Step 1: Thread network detached
+    SetThreadConnectivityState(true /* enabled */, false /* attached */);
+
+    // Step 2: First subscription timeout for Subject 1
+    Access::SubjectDescriptor subject1;
+    subject1.fabricIndex = kTestFabricIndex1;
+    subject1.subject     = kClientNodeId11;
+    ICDNotifier::GetInstance().NotifySendCheckIn(MakeOptional(subject1));
+
+    // Step 3: Duplicate subscription timeout for Subject 1 (should be deduplicated)
+    ICDNotifier::GetInstance().NotifySendCheckIn(MakeOptional(subject1));
+
+    // Step 4: Second subscription timeout for Subject 2 (distinct fabric/subject)
+    Access::SubjectDescriptor subject2;
+    subject2.fabricIndex = kTestFabricIndex2;
+    subject2.subject     = kClientNodeId12;
+    ICDNotifier::GetInstance().NotifySendCheckIn(MakeOptional(subject2));
+
+    // Assert real deferral: 2 distinct subjects retained, duplicate deduplicated
+    EXPECT_TRUE(IsPendingCheckInOnNetworkAttach());
+    EXPECT_EQ(GetPendingCheckInSubjectsCount(), 2u);
+    EXPECT_TRUE(GetPendingCheckInSubject(0).HasValue());
+    EXPECT_EQ(GetPendingCheckInSubject(0).Value().fabricIndex, kTestFabricIndex1);
+    EXPECT_EQ(GetPendingCheckInSubject(0).Value().subject, kClientNodeId11);
+    EXPECT_TRUE(GetPendingCheckInSubject(1).HasValue());
+    EXPECT_EQ(GetPendingCheckInSubject(1).Value().fabricIndex, kTestFabricIndex2);
+    EXPECT_EQ(GetPendingCheckInSubject(1).Value().subject, kClientNodeId12);
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
+
+    // Step 5: Thread attaches -> replays deferred Check-Ins for both distinct subjects
+    SetThreadConnectivityState(true /* enabled */, true /* attached */);
+    DeviceLayer::ChipDeviceEvent event{ .Type                     = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
+                                        .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Established } };
+    HandlePlatformEvent(&event);
+    AdvanceClockAndRunEventLoop(100_ms);
+
+    // Assert all pending Check-In flags and subjects are consumed
+    EXPECT_FALSE(IsPendingCheckInOnNetworkAttach());
+    EXPECT_EQ(GetPendingCheckInSubjectsCount(), 0u);
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 
