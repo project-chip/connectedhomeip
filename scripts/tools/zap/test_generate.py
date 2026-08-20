@@ -20,7 +20,6 @@ import subprocess
 import sys
 import unittest
 from dataclasses import dataclass, field
-from typing import List, Optional
 
 import yaml
 
@@ -31,7 +30,7 @@ CHIP_ROOT = os.path.abspath(os.path.join(
 
 @dataclass
 class ProgramArguments:
-    stamp_file: Optional[str] = None
+    stamp_file: str | None = None
     regenerate_golden: bool = False
     output_directory: str = ''
 
@@ -48,7 +47,7 @@ class ExpectedOutput:
 @dataclass
 class GeneratorTestCase:
     template: str
-    outputs: List[ExpectedOutput] = field(default_factory=list)
+    outputs: list[ExpectedOutput] = field(default_factory=list)
 
     def add_outputs(self, yaml_outputs_dict):
         for file_name, golden_path in yaml_outputs_dict.items():
@@ -60,7 +59,7 @@ class GeneratorTestCase:
 class GeneratorTest:
     zap: str
     context: ProgramArguments
-    test_cases: List[GeneratorTestCase] = field(default_factory=list)
+    test_cases: list[GeneratorTestCase] = field(default_factory=list)
 
     def add_test_cases(self, yaml_test_case_dict):
         for json, outputs in yaml_test_case_dict.items():
@@ -131,7 +130,7 @@ class GeneratorTest:
                             raise
 
 
-def build_tests(yaml_data, context: ProgramArguments) -> List[GeneratorTest]:
+def build_tests(yaml_data, context: ProgramArguments) -> list[GeneratorTest]:
     """
     Transforms the YAML dictonary (Dict[str, Dict[str, Dict[str,str]]]) into
     a generator test structure.
@@ -148,7 +147,7 @@ def build_tests(yaml_data, context: ProgramArguments) -> List[GeneratorTest]:
 
 class TestGenerators(unittest.TestCase):
     def test_generators(self):
-        with open(os.path.join(TESTS_DIR, "available_tests.yaml"), 'rt') as stream:
+        with open(os.path.join(TESTS_DIR, "available_tests.yaml")) as stream:
             yaml_data = yaml.safe_load(stream)
 
         global PROGRAM_ARGUMENTS

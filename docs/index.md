@@ -5,6 +5,7 @@
 :caption: Contents
 :hidden:
 
+GLOSSARY
 PROJECT_FLOW
 VSCODE_DEVELOPMENT
 contributing/index

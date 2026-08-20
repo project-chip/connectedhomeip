@@ -16,9 +16,20 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
+    "${CLUSTER_DIR}/MigrateBooleanStateConfigurationStorage.cpp"
+    "${CLUSTER_DIR}/MigrateBooleanStateConfigurationStorage.h"
+)
+
+# These are the things that BUILD.gn dependencies would pull
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
     "${CLUSTER_DIR}/BooleanStateConfigurationTestEventTriggerHandler.cpp"
     "${CLUSTER_DIR}/BooleanStateConfigurationTestEventTriggerHandler.h"
     "${CLUSTER_DIR}/boolean-state-configuration-delegate.h"
-    "${CLUSTER_DIR}/boolean-state-configuration-cluster.cpp"
+    "${CLUSTER_DIR}/BooleanStateConfigurationCluster.cpp"
+    "${CLUSTER_DIR}/BooleanStateConfigurationCluster.h"
     "${CLUSTER_DIR}/boolean-state-configuration-server.h"
 )

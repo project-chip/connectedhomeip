@@ -41,12 +41,16 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
+    disable_wildcard_subscription = True
+
     def desc_TC_AVSM_VideoStreamsPersistence(self) -> str:
         return "[TC-AVSM-VideoStreamsPersistence] Validate Video Streams Persistence functionality with Server as DUT"
 
@@ -140,7 +144,7 @@ class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
 
         self.step(1)
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info("Rx'd FeatureMap: %s", aFeatureMap)
         vdoSupport = aFeatureMap & cluster.Bitmaps.Feature.kVideo
         asserts.assert_equal(vdoSupport, cluster.Bitmaps.Feature.kVideo, "Video Feature is not supported.")
 
@@ -148,38 +152,38 @@ class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
-        logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info("Rx'd AllocatedVideoStreams: %s", aAllocatedVideoStreams)
         asserts.assert_equal(len(aAllocatedVideoStreams), 0, "The number of allocated video streams in the list is not 0")
 
         self.step(3)
         aStreamUsagePriorities = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
         )
-        logger.info(f"Rx'd StreamUsagePriorities: {aStreamUsagePriorities}")
+        log.info("Rx'd StreamUsagePriorities: %s", aStreamUsagePriorities)
 
         self.step(4)
         aRateDistortionTradeOffPoints = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.RateDistortionTradeOffPoints
         )
-        logger.info(f"Rx'd RateDistortionTradeOffPoints: {aRateDistortionTradeOffPoints}")
+        log.info("Rx'd RateDistortionTradeOffPoints: %s", aRateDistortionTradeOffPoints)
 
         self.step(5)
         aMinViewportRes = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.MinViewportResolution
         )
-        logger.info(f"Rx'd MinViewportResolution: {aMinViewportRes}")
+        log.info("Rx'd MinViewportResolution: %s", aMinViewportRes)
 
         self.step(6)
         aVideoSensorParams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.VideoSensorParams
         )
-        logger.info(f"Rx'd VideoSensorParams: {aVideoSensorParams}")
+        log.info("Rx'd VideoSensorParams: %s", aVideoSensorParams)
 
         self.step(7)
         aMaxEncodedPixelRate = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.MaxEncodedPixelRate
         )
-        logger.info(f"Rx'd MaxEncodedPixelRate: {aMaxEncodedPixelRate}")
+        log.info("Rx'd MaxEncodedPixelRate: %s", aMaxEncodedPixelRate)
 
         # Check for watermark and OSD features
         self.step(8)
@@ -195,7 +199,7 @@ class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=30,  # An acceptable value for min frame rate
+                minFrameRate=min(self.user_params.get("minFrameRate", 30), aVideoSensorParams.maxFPS),
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -208,7 +212,7 @@ class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
                 OSDEnabled=osd,
             )
             videoStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
-            logger.info(f"Rx'd VideoStreamAllocateResponse: {videoStreamAllocateResponse}")
+            log.info("Rx'd VideoStreamAllocateResponse: %s", videoStreamAllocateResponse)
             asserts.assert_is_not_none(
                 videoStreamAllocateResponse.videoStreamID, "VideoStreamAllocateResponse does not contain StreamID"
             )
@@ -219,11 +223,11 @@ class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
-        logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info("Rx'd AllocatedVideoStreams: %s", aAllocatedVideoStreams)
         asserts.assert_equal(len(aAllocatedVideoStreams), 1, "The number of allocated video streams in the list is not 1")
 
         self.step(12)
-        logging.info("Injecting kFault_ClearInMemoryAllocatedVideoStreams on DUT")
+        log.info("Injecting kFault_ClearInMemoryAllocatedVideoStreams on DUT")
 
         # --- Fault‑Injection cluster (mfg‑specific 0xFFF1_FC06) ---
         # Use FailAtFault to activate the chip‑layer fault exactly once
@@ -250,11 +254,11 @@ class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
-        logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info("Rx'd AllocatedVideoStreams: %s", aAllocatedVideoStreams)
         asserts.assert_equal(len(aAllocatedVideoStreams), 0, "Allocated video streams is not empty")
 
         self.step(14)
-        logging.info("Injecting kFault_LoadPersistentCameraAVSMAttributes on DUT")
+        log.info("Injecting kFault_LoadPersistentCameraAVSMAttributes on DUT")
         # --- Fault‑Injection cluster (mfg‑specific 0xFFF1_FC06) ---
         # Use FailAtFault to activate the chip‑layer fault exactly once
         #
@@ -280,14 +284,17 @@ class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
-        logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info("Rx'd AllocatedVideoStreams: %s", aAllocatedVideoStreams)
         asserts.assert_equal(len(aAllocatedVideoStreams), 1, "Allocated video streams is not empty")
 
         ##### Validate fields in Video Stream that was stored #####
         asserts.assert_equal(aAllocatedVideoStreams[0].streamUsage, aStreamUsagePriorities[0], "Stream Usage does not match")
         asserts.assert_equal(aAllocatedVideoStreams[0].videoCodec,
                              aRateDistortionTradeOffPoints[0].codec, "Video codec does not match")
-        asserts.assert_equal(aAllocatedVideoStreams[0].minFrameRate, 30, "MinFrameRate does not match")
+        asserts.assert_equal(aAllocatedVideoStreams[0].minFrameRate,
+                             min(self.user_params.get("minFrameRate", 30), aVideoSensorParams.maxFPS),
+                             "MinFrameRate does not match")
+
         asserts.assert_equal(aAllocatedVideoStreams[0].maxFrameRate, aVideoSensorParams.maxFPS, "MaxFrameRate does not match")
         asserts.assert_equal(aAllocatedVideoStreams[0].minResolution, aMinViewportRes, "MinResolution does not match")
         asserts.assert_equal(aAllocatedVideoStreams[0].maxResolution.width,

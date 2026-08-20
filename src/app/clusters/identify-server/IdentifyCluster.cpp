@@ -17,6 +17,7 @@
 #include <app/clusters/identify-server/IdentifyCluster.h>
 
 #include <app/InteractionModelEngine.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/Identify/Commands.h>
 #include <clusters/Identify/Metadata.h>
@@ -74,8 +75,7 @@ DataModel::ActionReturnStatus IdentifyCluster::WriteAttribute(const DataModel::W
     case Attributes::IdentifyTime::Id: {
         uint16_t newIdentifyTime;
         ReturnErrorOnFailure(decoder.Decode(newIdentifyTime));
-        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId,
-                                               SetIdentifyTime(IdentifyTimeChangeSource::kClient, newIdentifyTime));
+        return SetIdentifyTime(IdentifyTimeChangeSource::kClient, newIdentifyTime);
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
@@ -90,17 +90,13 @@ CHIP_ERROR IdentifyCluster::Attributes(const ConcreteClusterPath & path, ReadOnl
 
 void IdentifyCluster::TimerFired()
 {
-    if (mIdentifyTime > 0)
-    {
-        NotifyAttributeChangedIfSuccess(
-            Attributes::IdentifyTime::Id,
-            SetIdentifyTime(IdentifyTimeChangeSource::kTimer, static_cast<uint16_t>(mIdentifyTime - 1)));
-    }
+    VerifyOrReturn(mIdentifyTime > 0);
+    SetIdentifyTime(IdentifyTimeChangeSource::kTimer, static_cast<uint16_t>(mIdentifyTime - 1));
 }
 
 void IdentifyCluster::StopIdentifying()
 {
-    NotifyAttributeChangedIfSuccess(Attributes::IdentifyTime::Id, SetIdentifyTime(IdentifyTimeChangeSource::kClient, 0));
+    SetIdentifyTime(IdentifyTimeChangeSource::kClient, 0);
 }
 
 // According to the spec, section 5.1 - IdentifyTime Attribute:
@@ -110,13 +106,17 @@ void IdentifyCluster::StopIdentifying()
 // 3. When the value is set by an Identify command.
 DataModel::ActionReturnStatus IdentifyCluster::SetIdentifyTime(IdentifyTimeChangeSource source, uint16_t newTime)
 {
-    if (mIdentifyTime == newTime)
-    {
-        return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
-    }
-
     uint16_t previousIdentifyTime = mIdentifyTime;
-    mIdentifyTime                 = newTime;
+
+    // timer changes are quiet EXCEPT transitions to/from 0:
+    const DataModel::AttributeChangeType changeType =
+        (newTime == 0) || (mIdentifyTime == 0) || (source != IdentifyTimeChangeSource::kTimer)
+        ? DataModel::AttributeChangeType::kReportable
+        : DataModel::AttributeChangeType::kQuiet;
+
+    // Set the attribute value, return immediately if no actual change.
+    VerifyOrReturnValue(SetAttributeValue(mIdentifyTime, newTime, IdentifyTime::Id, changeType),
+                        DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
 
     if (mIdentifyDelegate)
     {
@@ -158,8 +158,7 @@ IdentifyCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TL
         Identify::Commands::Identify::DecodableType data;
         ReturnErrorOnFailure(data.Decode(input_arguments));
         MATTER_TRACE_SCOPE("IdentifyCommand", "Identify");
-        return NotifyAttributeChangedIfSuccess(Attributes::IdentifyTime::Id,
-                                               SetIdentifyTime(IdentifyTimeChangeSource::kClient, data.identifyTime));
+        return SetIdentifyTime(IdentifyTimeChangeSource::kClient, data.identifyTime);
     }
     case Identify::Commands::TriggerEffect::Id: {
         Identify::Commands::TriggerEffect::DecodableType data;
@@ -187,19 +186,16 @@ IdentifyCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TL
         // Currently identifying: handle stop/finish effects, otherwise cancel Identify process and trigger new effect.
         if (mEffectIdentifier == Identify::EffectIdentifierEnum::kFinishEffect)
         {
-            return NotifyAttributeChangedIfSuccess(Attributes::IdentifyTime::Id,
-                                                   SetIdentifyTime(IdentifyTimeChangeSource::kClient, 1));
+            return SetIdentifyTime(IdentifyTimeChangeSource::kClient, 1);
         }
 
         if (mEffectIdentifier == Identify::EffectIdentifierEnum::kStopEffect)
         {
-            return NotifyAttributeChangedIfSuccess(Attributes::IdentifyTime::Id,
-                                                   SetIdentifyTime(IdentifyTimeChangeSource::kClient, 0));
+            return SetIdentifyTime(IdentifyTimeChangeSource::kClient, 0);
         }
 
         // Other effects: cancel and trigger new effect.
-        auto err = NotifyAttributeChangedIfSuccess(
-            Attributes::IdentifyTime::Id, SetIdentifyTime(IdentifyTimeChangeSource::kClient, 0)); // This will call onIdentifyStop.
+        auto err = SetIdentifyTime(IdentifyTimeChangeSource::kClient, 0); // This will call onIdentifyStop.
         mIdentifyDelegate->OnTriggerEffect(*this);
         return err;
     }

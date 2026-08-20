@@ -19,9 +19,11 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/TLV.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
+#include <lib/support/Span.h>
 
 namespace chip {
-/// @brief Data accessor allowing data to be persisted by PersistentStore to be accessed
+
+/// @brief Data that can be persisted via PersistentStorageDelegate in TLV format.
 struct DataAccessor
 {
     virtual ~DataAccessor()                                     = default;
@@ -29,72 +31,108 @@ struct DataAccessor
     virtual CHIP_ERROR Serialize(TLV::TLVWriter & writer) const = 0;
     virtual CHIP_ERROR Deserialize(TLV::TLVReader & reader)     = 0;
     virtual void Clear()                                        = 0;
-};
 
-/// @brief Interface to PersistentStorageDelegate allowing storage of data of variable size such as TLV, delegating data access
-/// to DataAccessor
-/// @tparam kMaxSerializedSize size of the mBuffer necessary to retrieve an entry from the storage. Varies with the type of data
-/// stored. Will be allocated on the stack so the implementation needs to be aware of this when choosing this value.
-template <size_t kMaxSerializedSize>
-struct PersistentStore
-{
-    virtual ~PersistentStore() = default;
+    /// Non-virtual helper methods ///
 
-    CHIP_ERROR Save(const DataAccessor & persistent, PersistentStorageDelegate * storage)
+    CHIP_ERROR Save(PersistentStorageDelegate * storage, const MutableByteSpan & buffer) const
     {
         VerifyOrReturnError(nullptr != storage, CHIP_ERROR_INVALID_ARGUMENT);
 
         StorageKeyName key = StorageKeyName::Uninitialized();
-        ReturnErrorOnFailure(persistent.UpdateKey(key));
+        ReturnErrorOnFailure(this->UpdateKey(key));
 
         // Serialize the data
         TLV::TLVWriter writer;
-        writer.Init(mBuffer, sizeof(mBuffer));
-
-        ReturnErrorOnFailure(persistent.Serialize(writer));
+        writer.Init(buffer);
+        ReturnErrorOnFailure(this->Serialize(writer));
 
         // Save serialized data
-        return storage->SyncSetKeyValue(key.KeyName(), mBuffer, static_cast<uint16_t>(writer.GetLengthWritten()));
+        return storage->SyncSetKeyValue(key.KeyName(), buffer.data(), static_cast<uint16_t>(writer.GetLengthWritten()));
     }
 
-    CHIP_ERROR Load(DataAccessor & persistent, PersistentStorageDelegate * storage)
+    CHIP_ERROR Load(PersistentStorageDelegate * storage, const MutableByteSpan & buffer)
     {
         VerifyOrReturnError(nullptr != storage, CHIP_ERROR_INVALID_ARGUMENT);
 
         StorageKeyName key = StorageKeyName::Uninitialized();
-
-        // Update storage key
-        ReturnErrorOnFailure(persistent.UpdateKey(key));
+        ReturnErrorOnFailure(this->UpdateKey(key));
 
         // Set data to defaults
-        persistent.Clear();
+        this->Clear();
 
         // Load the serialized data
-        uint16_t size  = static_cast<uint16_t>(sizeof(mBuffer));
-        CHIP_ERROR err = storage->SyncGetKeyValue(key.KeyName(), mBuffer, size);
+        uint16_t size  = (buffer.size() > UINT16_MAX) ? UINT16_MAX : static_cast<uint16_t>(buffer.size());
+        CHIP_ERROR err = storage->SyncGetKeyValue(key.KeyName(), buffer.data(), size);
         VerifyOrReturnError(CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND != err, CHIP_ERROR_NOT_FOUND);
         ReturnErrorOnFailure(err);
 
         // Decode serialized data
         TLV::TLVReader reader;
-        reader.Init(mBuffer, size);
-        return persistent.Deserialize(reader);
+        reader.Init(buffer.data(), size);
+        return this->Deserialize(reader);
     }
 
-    CHIP_ERROR Delete(DataAccessor & persistent, PersistentStorageDelegate * storage)
+    CHIP_ERROR Delete(PersistentStorageDelegate * storage) const
     {
         VerifyOrReturnError(nullptr != storage, CHIP_ERROR_INVALID_ARGUMENT);
 
         StorageKeyName key = StorageKeyName::Uninitialized();
-        ReturnErrorOnFailure(persistent.UpdateKey(key));
+        ReturnErrorOnFailure(this->UpdateKey(key));
 
         return storage->SyncDeleteKeyValue(key.KeyName());
     }
-
-    uint8_t mBuffer[kMaxSerializedSize] = { 0 };
 };
 
-/// @brief Combines PersistentStore and DataAccessor
+/// @brief A buffer to be used when loading or serializing persistent data
+/// @tparam kMaxSerializedSize size of the buffer necessary to retrieve an entry from the storage.
+///
+/// Note: Generic APIs that utilize a persistence buffer should prefer taking
+/// a MutableByteSpan, to avoid unnecessarily templating on the buffer size.
+template <size_t kMaxSerializedSize>
+struct PersistenceBuffer
+{
+    uint8_t mBuffer[kMaxSerializedSize];
+
+    // Returns a MutableByteSpan representing this buffer.
+    MutableByteSpan BufferSpan() { return MutableByteSpan(mBuffer); }
+};
+
+/// @brief A DataAccessor with a built-in buffer.
+/// @tparam kMaxSerializedSize inherited from PersistenceBuffer
+///
+/// Note: Unlike `PersistentData` (deprecated), this class does not make the Load/Save/Delete
+/// methods virtual. PersistableData objects are not intended to be used polymorphically.
+/// It also does not store a PersistentStorageDelegate pointer internally.
+template <size_t kMaxSerializedSize>
+class PersistableData : public DataAccessor, protected PersistenceBuffer<kMaxSerializedSize>
+{
+public:
+    CHIP_ERROR Save(PersistentStorageDelegate * storage) { return DataAccessor::Save(storage, this->BufferSpan()); }
+    CHIP_ERROR Load(PersistentStorageDelegate * storage) { return DataAccessor::Load(storage, this->BufferSpan()); }
+};
+
+///// Deprecated types retained for backward compatibility ////////////////////
+
+// Deprecated: use PersistenceBuffer and DataAccessor separately
+template <size_t kMaxSerializedSize>
+struct PersistentStore : public PersistenceBuffer<kMaxSerializedSize>
+{
+    virtual ~PersistentStore() = default;
+
+    CHIP_ERROR Save(const DataAccessor & persistent, PersistentStorageDelegate * storage)
+    {
+        return persistent.Save(storage, this->BufferSpan());
+    }
+
+    CHIP_ERROR Load(DataAccessor & persistent, PersistentStorageDelegate * storage)
+    {
+        return persistent.Load(storage, this->BufferSpan());
+    }
+
+    CHIP_ERROR Delete(DataAccessor & persistent, PersistentStorageDelegate * storage) { return persistent.Delete(storage); }
+};
+
+// Deprecated: use PersistableData instead
 template <size_t kMaxSerializedSize>
 struct PersistentData : PersistentStore<kMaxSerializedSize>, DataAccessor
 {

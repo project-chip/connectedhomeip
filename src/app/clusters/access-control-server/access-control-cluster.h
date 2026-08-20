@@ -23,6 +23,8 @@
 #include <app/server/Server.h>
 #include <clusters/AccessControl/ClusterId.h>
 #include <clusters/AccessControl/Metadata.h>
+#include <credentials/FabricTable.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <platform/DiagnosticDataProvider.h>
 
 namespace chip {
@@ -37,11 +39,20 @@ class AccessControlCluster : public DefaultServerCluster,
 #endif
 {
 public:
-    constexpr AccessControlCluster() : DefaultServerCluster(ConcreteClusterPath::ConstExpr(kRootEndpointId, AccessControl::Id)) {}
+    struct Context
+    {
+        PersistentStorageDelegate & persistentStorage;
+        FabricTable & fabricTable;
+        Access::AccessControl & accessControl;
+    };
+
+    constexpr AccessControlCluster(const Context & context) :
+        DefaultServerCluster(ConcreteClusterPath::ConstExpr(kRootEndpointId, AccessControl::Id)), mClusterContext(context)
+    {}
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 
-    void Shutdown() override;
+    void Shutdown(ClusterShutdownType type) override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
@@ -81,6 +92,8 @@ private:
     void OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token, Optional<CharSpan> instruction,
                                          Optional<CharSpan> arlRequestFlowUrl) override;
 #endif
+
+    Context mClusterContext;
 };
 
 } // namespace Clusters

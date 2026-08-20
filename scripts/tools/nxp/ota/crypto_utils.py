@@ -393,7 +393,7 @@ def encryptFlashData(nonce, key, data, imageLen):
         # use nonce value to create encrypted chunk
         encryptNonce = ''
         for i in nonce:
-            tempString = "%08x" % i
+            tempString = f"{i:08x}"
             y = 0
             while y < 8:
                 encryptNonce = encryptNonce + chr(int(tempString[y:y+2], 16))
@@ -438,11 +438,10 @@ def aParsePassKeyString(sPassKey):
                 lstu32Passkey[i] = int(lstStrPassKey[i], 10)
 
     logger.info("\t-key: 0x%08X, 0x%08X, 0x%08X, 0x%08X", *lstu32Passkey[0:4])
-    abEncryptKey = struct.pack(">LLLL", lstu32Passkey[0],
-                               lstu32Passkey[1],
-                               lstu32Passkey[2],
-                               lstu32Passkey[3])
-    return abEncryptKey
+    return struct.pack(">LLLL", lstu32Passkey[0],
+                       lstu32Passkey[1],
+                       lstu32Passkey[2],
+                       lstu32Passkey[3])
 
 
 def aParseNonce(sNonceValue):

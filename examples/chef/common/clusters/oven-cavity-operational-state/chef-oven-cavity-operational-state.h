@@ -110,8 +110,6 @@ public:
     uint8_t GetCurrentOperationalState();
 };
 
-void InitChefOvenCavityOperationalStateCluster();
-
 } // namespace OvenCavityOperationalState
 
 } // namespace Clusters

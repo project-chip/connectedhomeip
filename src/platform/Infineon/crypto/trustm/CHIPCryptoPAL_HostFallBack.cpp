@@ -47,7 +47,6 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/BytesToHex.h>
-#include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/SafePointerCast.h>
@@ -248,7 +247,7 @@ CHIP_ERROR ECDH_derive_secret_H(P256KeypairContext * mKeypair, const P256PublicK
 
     result = mbedtls_mpi_write_binary(&mpi_secret, out_secret.Bytes() /*Uint8::to_uchar(out_secret)*/, secret_length);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-    out_secret.SetLength(secret_length);
+    SuccessOrExit(error = out_secret.SetLength(secret_length));
 
 exit:
     keypair = nullptr;
@@ -414,7 +413,7 @@ CHIP_ERROR Serialize_H(const P256KeypairContext mKeypair, const P256PublicKey mP
     bbuf.Put(privkey, sizeof(privkey));
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    output.SetLength(bbuf.Needed());
+    SuccessOrExit(error = output.SetLength(bbuf.Needed()));
 
 exit:
     ClearSecretData(privkey, sizeof(privkey));

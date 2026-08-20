@@ -17,18 +17,19 @@ sample app.
 > Developers can find more resources on the
 > [Silicon Labs Matter Community Page](https://community.silabs.com/s/article/connected-home-over-ip-chip-faq?language=en_US).
 
--   [Introduction](#introduction)
--   [Requirements](#requirements)
-    -   [Hardware Requirements](#hardware-requirements)
-    -   [Software Requirements](#software-requirements)
-    -   [Software Artifacts](#software-artifacts)
--   [Building](#building)
-    -   [Build Script](#build-script)
-    -   [Build Arguments](#build-arguments)
--   [Flashing](#flashing)
-    -   [Flasher Arguments](#flasher-arguments)
--   [Standard Application Behavior](#standard-application-behavior)
--   [Silabs CLI](#silabs-cli)
+-   [Silicon Labs Matter Solution Guide](#silicon-labs-matter-solution-guide)
+    -   [Introduction](#introduction)
+    -   [Requirements](#requirements)
+        -   [Hardware Requirements](#hardware-requirements)
+        -   [Software Requirements](#software-requirements)
+            -   [Software Artifacts](#software-artifacts)
+    -   [Building](#building)
+        -   [Build Script](#build-script)
+            -   [Build Arguments](#build-arguments)
+    -   [Flashing](#flashing)
+        -   [Flasher Arguments](#flasher-arguments)
+    -   [Standard Application Behavior](#standard-application-behavior)
+    -   [Silabs CLI](#silabs-cli)
 
 ## Requirements
 
@@ -79,7 +80,8 @@ offers extra sample applications for different device-types
                 <li> <a href="../../../examples/air-quality-sensor-app/silabs/README.md">Air Quality Sensor App</a></li>
                 <li> <a href="../../../examples/closure-app/silabs/README.md">Closure App</a></li>
                 <li> <a href="../../../examples/dishwasher-app/silabs/README.md">Dishwasher App</a></li>
-                <li> <a href="../../../examples/energy-management-app/silabs/README.md">Energy Management App</a></li>
+                <li> <a href="../../../examples/evse-app/silabs/README.md">EVSE App</a></li>
+                <li> <a href="../../../examples/water-heater-app/silabs/README.md">Water Heater App</a></li>
                 <li> <a href="../../../examples/lit-icd-app/silabs/README.md">LIT ICD App</a></li>
                 <li> <a href="../../../examples/refrigerator-app/silabs/README.md">Refrigerator App</a></li>
                 <li> <a href="../../../examples/window-app/silabs/README.md">Window App</a></li>
@@ -127,16 +129,6 @@ for the BRD4187C is
 > enables the SiWx NCP bluetooth. The MG24 + SiWx NCP combo does not yet support
 > external flash.
 
-To build the lighting app as an Wi-Fi MG24 + wf200 NCP, the default build
-command for the BRD4187C is
-
-```shell
-$ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/lighting-app_wf200 BRD4187C --wifi wf200
-```
-
-> **Note**: The build argument `--wifi wf200` is necessary to build the BRD4187C
-> image with the necessary code for the NCP combo.
-
 #### Build Arguments
 
 The ``gn_silabs_examples.sh` script takes two types of build arguments. The
@@ -156,7 +148,7 @@ Here is a list of some the supported macros and their GN argument equivalent.
 
 |          Macro Name           | Description                                                                                            | GN equivalent                                                                                                                                              |
 | :---------------------------: | :----------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|            --wifi             | Configures an sample app as a Wi-Fi devices.<br /> This macro requires SiWx917 or wf200.               | --wifi SiWx917 : use_SiWx917=true<br /> --wifi wf200 : use_wf200=true<br />                                                                                |
+|            --wifi             | Configures an sample app as a Wi-Fi devices.<br /> This macro requires SiWx917                         | --wifi SiWx917 : use_SiWx917=true<br />                                                                                                                    |
 |             --icd             | Configures the device as an ICD                                                                        | chip_enable_icd_server=true chip_openthread_ftd=false                                                                                                      |
 |          --low-power          | Configures the most power efficient build.<br /> This is used in tandem with the `--icd` macro         | chip_build_libshell=false enable_openthread_cli=false show_qr_code=false disable_lcd=true                                                                  |
 |    --chip_enable_wifi_ipv4    | Enables IPv4 support on Wi-fi configured builds                                                        | chip_enable_wifi_ipv4=true chip_inet_config_enable_ipv4=true                                                                                               |

@@ -18,14 +18,17 @@
 import logging
 import random
 import string
-from typing import Optional
 
 from mobly import asserts
 
 import matter.clusters as Clusters
+import matter.testing.matchers as matchers
 from matter.clusters.Types import NullValue
-from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_feature, matchers,
-                                           run_if_endpoint_matches)
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_CNET_4_4(MatterBaseTest):
@@ -65,18 +68,22 @@ class TC_CNET_4_4(MatterBaseTest):
         connected = [network for network in networks if network.connected is True]
         asserts.assert_greater_equal(len(connected), 1, "Did not find any connected networks on a commissioned device")
         known_ssid = connected[0].networkID
+        # Dynamically compute the interaction timeout based on the DUT's reported max scan time
+        scan_max_time_s = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.ScanMaxTimeSeconds)
+        scan_interaction_timeout_ms = self.default_controller.ComputeRoundTripTimeout(
+            self.dut_node_id, upperLayerProcessingTimeoutMs=scan_max_time_s * 1000)
 
-        async def scan_and_check(ssid_to_scan: Optional[bytes], breadcrumb: int, expect_results: bool = True):
+        async def scan_and_check(ssid_to_scan: bytes | None, breadcrumb: int, expect_results: bool = True):
             all_security = 0
             for security_bitmask in cnet.Bitmaps.WiFiSecurityBitmap:
                 all_security |= security_bitmask
 
             ssid = ssid_to_scan if ssid_to_scan is not None else NullValue
             cmd = cnet.Commands.ScanNetworks(ssid=ssid, breadcrumb=breadcrumb)
-            scan_results = await self.send_single_cmd(cmd=cmd)
+            scan_results = await self.send_single_cmd(cmd=cmd, interactionTimeoutMs=scan_interaction_timeout_ms)
             asserts.assert_true(matchers.is_type(scan_results, cnet.Commands.ScanNetworksResponse),
                                 "Unexpected value returned from scan network")
-            logging.info(f"Scan results: {scan_results}")
+            log.info("Scan results: %s", scan_results)
 
             if scan_results.debugText:
                 debug_text_len = len(scan_results.debug_text)

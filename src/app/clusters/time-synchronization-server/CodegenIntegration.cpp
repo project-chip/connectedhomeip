@@ -16,8 +16,9 @@
  *    limitations under the License.
  */
 
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/time-synchronization-server/CodegenIntegration.h>
-#include <app/clusters/time-synchronization-server/time-synchronization-cluster.h>
+#include <app/clusters/time-synchronization-server/TimeSynchronizationCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/static-cluster-config/TimeSynchronization.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
@@ -42,6 +43,7 @@ static_assert((kTimeSynchronizationFixedClusterCount == 0) ||
 
 LazyRegisteredServerCluster<TimeSynchronizationCluster> gServer;
 
+static std::optional<TimeSourceEnum> gForcedTimeSource;
 TimeSynchronization::Delegate * gDelegate = nullptr;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
@@ -55,34 +57,51 @@ public:
         SupportsDNSResolve::TypeInfo::Type supportsDNSResolve = false;
         if (featureMap.Has(Feature::kNTPClient))
         {
-            VerifyOrDie(SupportsDNSResolve::Get(endpointId, &supportsDNSResolve) == Status::Success);
+            VerifyOrDie(SupportsDNSResolve::GetDefault(endpointId, &supportsDNSResolve) == Status::Success);
         }
 
         TimeZoneDatabaseEnum timeZoneDatabase = TimeZoneDatabaseEnum::kNone;
         if (featureMap.Has(Feature::kTimeZone))
         {
-            VerifyOrDie(TimeZoneDatabase::Get(endpointId, &timeZoneDatabase) == Status::Success);
+            VerifyOrDie(TimeZoneDatabase::GetDefault(endpointId, &timeZoneDatabase) == Status::Success);
         }
 
         TimeSynchronizationCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
         TimeSourceEnum timeSource = TimeSourceEnum::kNone;
-        if (optionalAttributeSet.IsSet(TimeSource::Id))
+        if (gForcedTimeSource.has_value())
         {
-            VerifyOrDie(TimeSource::Get(endpointId, &timeSource) == Status::Success);
+            timeSource = *gForcedTimeSource;
+        }
+        else if (optionalAttributeSet.IsSet(TimeSource::Id))
+        {
+            VerifyOrDie(TimeSource::GetDefault(endpointId, &timeSource) == Status::Success);
         }
 
         NTPServerAvailable::TypeInfo::Type ntpServerAvailable = false;
         if (featureMap.Has(Feature::kNTPServer))
         {
-            VerifyOrDie(SupportsDNSResolve::Get(endpointId, &ntpServerAvailable) == Status::Success);
+            VerifyOrDie(NTPServerAvailable::GetDefault(endpointId, &ntpServerAvailable) == Status::Success);
         }
 
-        gServer.Create(endpointId, featureMap, optionalAttributeSet,
-                       TimeSynchronizationCluster::StartupConfiguration{ .supportsDNSResolve = supportsDNSResolve,
-                                                                         .ntpServerAvailable = ntpServerAvailable,
-                                                                         .timeZoneDatabase   = timeZoneDatabase,
-                                                                         .timeSource         = timeSource,
-                                                                         .delegate = TimeSynchronization::GetDefaultDelegate() });
+        TimeSynchronizationCluster::StartupConfiguration startupConfiguration = { .supportsDNSResolve = supportsDNSResolve,
+                                                                                  .ntpServerAvailable = ntpServerAvailable,
+                                                                                  .timeZoneDatabase   = timeZoneDatabase,
+                                                                                  .timeSource         = timeSource,
+                                                                                  .delegate =
+                                                                                      TimeSynchronization::GetDefaultDelegate() };
+
+        auto * caseSessionManager = Server::GetInstance().GetCASESessionManager();
+        auto * engine             = InteractionModelEngine::GetInstance();
+        VerifyOrDie(caseSessionManager != nullptr && engine != nullptr);
+
+        // TODO: Adding the interaction model engine to the context might not be ideal since this is a massive object,
+        // although we are just passing a reference to the object, we should consider a better solution in the future.
+        TimeSynchronizationCluster::Context context = { .fabricTable            = Server::GetInstance().GetFabricTable(),
+                                                        .caseSessionManager     = *caseSessionManager,
+                                                        .platformManager        = DeviceLayer::PlatformMgr(),
+                                                        .interactionModelEngine = *engine };
+
+        gServer.Create(endpointId, featureMap, optionalAttributeSet, startupConfiguration, context);
         return gServer.Registration();
     }
 
@@ -115,7 +134,7 @@ void MatterTimeSynchronizationClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterTimeSynchronizationClusterShutdownCallback(EndpointId endpointId)
+void MatterTimeSynchronizationClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 
@@ -128,7 +147,7 @@ void MatterTimeSynchronizationClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = kTimeSynchronizationFixedClusterCount,
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterTimeSynchronizationPluginServerInitCallback() {}
@@ -165,6 +184,12 @@ Delegate * GetDefaultDelegate()
         gDelegate = &delegate;
     }
     return gDelegate;
+}
+
+void ForceTimeSource(std::optional<TimeSourceEnum> value)
+{
+    VerifyOrDie(GetClusterInstance() == nullptr);
+    gForcedTimeSource = value;
 }
 
 } // namespace chip::app::Clusters::TimeSynchronization

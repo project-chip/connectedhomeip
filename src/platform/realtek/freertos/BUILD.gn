@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2021-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ declare_args() {
 
 static_library("freertos") {
   sources = [
-    "//src/platform/FreeRTOS/SystemTimeSupport.cpp",
     "//src/platform/SingletonConfigurationManager.cpp",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
@@ -52,10 +51,13 @@ static_library("freertos") {
     "RTKConfig.cpp",
     "RTKConfig.h",
     "SystemPlatformConfig.h",
+    "SystemTimeSupport.cpp",
+    "SystemTimeSupport.h",
   ]
 
   deps = [
     "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app/clusters/ota-requestor:interface",
     "${chip_root}/src/app/common:ids",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/platform/logging:headers",
@@ -68,7 +70,7 @@ static_library("freertos") {
 
   public_configs = []
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [
       "//src/platform/OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
       "//src/platform/OpenThread/GenericNetworkCommissioningThreadDriver.h",

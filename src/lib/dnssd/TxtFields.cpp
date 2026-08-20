@@ -23,6 +23,7 @@
 #include <cstdio>
 #include <inttypes.h>
 #include <limits>
+#include <optional>
 #include <stdlib.h>
 #include <string.h>
 
@@ -110,12 +111,11 @@ bool MakeBoolFromAsciiDecimal(const ByteSpan & val)
 
 std::optional<bool> MakeOptionalBoolFromAsciiDecimal(const ByteSpan & val)
 {
+    VerifyOrReturnValue(val.size() == 1, std::nullopt); // need to be a valid boolean (single char)
+
     char character = static_cast<char>(*val.data());
-    if (val.size() == 1 && ((character == '1') || (character == '0')))
-    {
-        return std::make_optional(character == '1');
-    }
-    return std::nullopt;
+    VerifyOrReturnValue((character == '1') || (character == '0'), std::nullopt); // need to be a valid boolean (single char)
+    return std::make_optional(character == '1');
 }
 
 size_t GetPlusSignIdx(const ByteSpan & value)
@@ -136,7 +136,7 @@ size_t GetPlusSignIdx(const ByteSpan & value)
 uint16_t GetProduct(const ByteSpan & value)
 {
     size_t plussign = GetPlusSignIdx(value);
-    if (plussign < value.size() - 1)
+    if (plussign + 1 < value.size())
     {
         const uint8_t * productStrStart = value.data() + plussign + 1;
         size_t productStrLen            = value.size() - plussign - 1;

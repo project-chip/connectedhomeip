@@ -256,6 +256,32 @@ CHIP_ERROR ConfigurationManagerImpl::StoreProductId(uint16_t productId)
 #endif // CHIP_DISABLE_PLATFORM_KVS
 }
 
+CHIP_ERROR ConfigurationManagerImpl::GetCommissionableDeviceName(char * buf, size_t bufSize)
+{
+    if (mConfigValueProvider != nullptr)
+    {
+        size_t outLen  = 0;
+        CHIP_ERROR err = mConfigValueProvider(PosixConfig::kConfigKey_DeviceName.Namespace, PosixConfig::kConfigKey_DeviceName.Name,
+                                              buf, bufSize, outLen);
+        if (err != CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+        {
+            return err;
+        }
+    }
+
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    size_t outLen  = 0;
+    CHIP_ERROR err = ReadConfigValueStr(PosixConfig::kConfigKey_DeviceName, buf, bufSize, outLen);
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        return GenericConfigurationManagerImpl<PosixConfig>::GetCommissionableDeviceName(buf, bufSize);
+    }
+    return err;
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
 {
 #if CHIP_DISABLE_PLATFORM_KVS

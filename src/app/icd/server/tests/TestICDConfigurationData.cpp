@@ -28,7 +28,7 @@
 #include <system/SystemLayerImpl.h>
 
 using namespace chip;
-using namespace chip::Test;
+using namespace chip::Testing;
 using namespace chip::app;
 using namespace chip::System;
 using namespace chip::System::Clock;
@@ -39,7 +39,7 @@ namespace {} // namespace
 namespace chip {
 namespace app {
 
-class TestICDConfigurationData : public Test::LoopbackMessagingContext
+class TestICDConfigurationData : public LoopbackMessagingContext
 {
 public:
     // Performs shared setup for all tests in the test suite
@@ -75,7 +75,7 @@ public:
 TEST_F(TestICDConfigurationData, TestICDModeSwitching)
 {
     auto & configData = ICDConfigurationData::GetInstance();
-    chip::Test::ICDConfigurationDataTestAccess privateConfigData(&configData);
+    Testing::ICDConfigurationDataTestAccess privateConfigData(&configData);
 
     // Default mode should be SIT
     EXPECT_EQ(configData.GetICDMode(), ICDConfigurationData::ICDMode::SIT);
@@ -91,7 +91,7 @@ TEST_F(TestICDConfigurationData, TestICDModeSwitching)
 
 TEST_F(TestICDConfigurationData, TestSetSITPollingInterval)
 {
-    ICDConfigurationDataTestAccess privateConfigData(&ICDConfigurationData::GetInstance());
+    Testing::ICDConfigurationDataTestAccess privateConfigData(&ICDConfigurationData::GetInstance());
     System::Clock::Milliseconds32 validSITPollInterval(10000);
     System::Clock::Milliseconds32 invalidSITPollInterval =
         privateConfigData.GetSitSlowPollMaximum() + System::Clock::Milliseconds32(1000); // Above SIT threshold
@@ -106,7 +106,7 @@ TEST_F(TestICDConfigurationData, TestSetSITPollingInterval)
 TEST_F(TestICDConfigurationData, TestGetAndSetSlowPollingInterval)
 {
     auto & configData = ICDConfigurationData::GetInstance();
-    ICDConfigurationDataTestAccess privateConfigData(&configData);
+    Testing::ICDConfigurationDataTestAccess privateConfigData(&configData);
 
     // Set featuremap to include LIT support
     using Feature = Clusters::IcdManagement::Feature;
@@ -175,7 +175,7 @@ TEST_F(TestICDConfigurationData, TestGetAndSetSlowPollingInterval)
 TEST_F(TestICDConfigurationData, TestSetModeDurations)
 {
     auto & configData = ICDConfigurationData::GetInstance();
-    ICDConfigurationDataTestAccess privateConfigData(&configData);
+    Testing::ICDConfigurationDataTestAccess privateConfigData(&configData);
     using namespace System::Clock;
 
     // Save original values
@@ -192,6 +192,29 @@ TEST_F(TestICDConfigurationData, TestSetModeDurations)
 
     // Set invalid: active > idle
     EXPECT_EQ(privateConfigData.SetModeDurations(MakeOptional(Milliseconds32(20000)), MakeOptional(Milliseconds32(1000))),
+              CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Test SetModeDurations with shortIdleModeDuration
+    // Valid all three params: active=1500ms, idle=8s, shortIdle=3s
+    EXPECT_EQ(privateConfigData.SetModeDurations(std::optional<Milliseconds32>(Milliseconds32(1500)),
+                                                 std::optional<Seconds32>(Seconds32(8)), std::optional<Seconds32>(Seconds32(3))),
+              CHIP_NO_ERROR);
+    // Invalid: shortIdle > idle (6s > 5s)
+    EXPECT_EQ(privateConfigData.SetModeDurations(std::optional<Milliseconds32>(Milliseconds32(1500)),
+                                                 std::optional<Seconds32>(Seconds32(5)), std::optional<Seconds32>(Seconds32(6))),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    // Omit shortIdle: idle shrinks below previous shortIdle, shortIdle should clamp to new idle (=> equal, so not used)
+    EXPECT_EQ(privateConfigData.SetModeDurations(std::optional<Milliseconds32>(Milliseconds32(1500)),
+                                                 std::optional<Seconds32>(Seconds32(2)), std::nullopt),
+              CHIP_NO_ERROR);
+    // Provide only shortIdle (smaller than current idle=2s is not possible to be <2s unless 1s)
+    EXPECT_EQ(privateConfigData.SetModeDurations(std::nullopt, std::nullopt, std::optional<Seconds32>(Seconds32(1))),
+              CHIP_NO_ERROR);
+    // Error: none provided
+    EXPECT_EQ(privateConfigData.SetModeDurations(std::nullopt, std::nullopt, std::nullopt), CHIP_ERROR_INVALID_ARGUMENT);
+    // Error: active > idle with 3-param API
+    EXPECT_EQ(privateConfigData.SetModeDurations(std::optional<Milliseconds32>(Milliseconds32(9000)),
+                                                 std::optional<Seconds32>(Seconds32(5)), std::optional<Seconds32>(Seconds32(3))),
               CHIP_ERROR_INVALID_ARGUMENT);
 
     // Restore original values

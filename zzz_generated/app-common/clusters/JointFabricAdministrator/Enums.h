@@ -28,6 +28,22 @@ namespace app {
 namespace Clusters {
 namespace JointFabricAdministrator {
 
+// Enum for ICACCSRResponseStatusCodeEnum
+enum class ICACCSRResponseStatusCodeEnum : uint8_t
+{
+    kOk                              = 0x00,
+    kBusy                            = 0x01,
+    kPAKEParameterError              = 0x02,
+    kWindowNotOpen                   = 0x03,
+    kVIDNotVerified                  = 0x04,
+    kInvalidAdministratorFabricIndex = 0x05,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 6,
+};
+
 // Enum for ICACResponseStatusEnum
 enum class ICACResponseStatusEnum : uint8_t
 {
@@ -39,21 +55,6 @@ enum class ICACResponseStatusEnum : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
-};
-
-// Enum for StatusCodeEnum
-enum class StatusCodeEnum : uint8_t
-{
-    kBusy                            = 0x02,
-    kPAKEParameterError              = 0x03,
-    kWindowNotOpen                   = 0x04,
-    kVIDNotVerified                  = 0x05,
-    kInvalidAdministratorFabricIndex = 0x06,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 0,
 };
 
 // Enum for TransferAnchorResponseStatusEnum

@@ -17,7 +17,6 @@ import queue
 import subprocess
 import threading
 import time
-from typing import List
 
 log = logging.getLogger(__name__)
 
@@ -43,7 +42,7 @@ class ProcessOutputCapture:
                break
     """
 
-    def __init__(self, command: List[str], output_path: str):
+    def __init__(self, command: list[str], output_path: str):
         # in/out/err are pipes
         self.command = command
         self.output_file = None  # Output file handle
@@ -98,7 +97,7 @@ class ProcessOutputCapture:
             text=True,
             bufsize=1,  # Enable line buffering for immediate output from subprocess
         )
-        self.output_file = open(self.output_path, "wt", buffering=1)  # Enable line buffering for immediate output
+        self.output_file = open(self.output_path, "w", buffering=1)  # Enable line buffering for immediate output
         self._write_to_file(f"### PROCESS START: {time.ctime()} ###\n")
         self.stdout_thread = threading.Thread(target=self._stdout_thread)
         self.stderr_thread = threading.Thread(target=self._stderr_thread)
@@ -125,7 +124,7 @@ class ProcessOutputCapture:
         if exception_value:
             # When we fail because of an exception, report the entire log content
             log.error("-------- START: LOG DUMP FOR %r -----", self.command)
-            with open(self.output_path, "rt") as f:
+            with open(self.output_path) as f:
                 for output_line in f.readlines():
                     log.error(output_line.strip())
             log.error("-------- END:   LOG DUMP FOR %r -----", self.command)

@@ -25,12 +25,8 @@
 #pragma once
 
 #ifndef SL_LCDCTRL_MUX
-#define SL_LCDCTRL_MUX (EFR32MG24 && SL_WIFI && DISPLAY_ENABLED)
+#define SL_LCDCTRL_MUX (EFR32MG24 && SL_WIFI && SL_MATTER_DISPLAY_ENABLED)
 #endif // SL_LCDCTRL_MUX
-
-#ifndef SL_UARTCTRL_MUX
-#define SL_UARTCTRL_MUX (EFR32MG24 && WF200_WIFI && ENABLE_CHIP_SHELL)
-#endif // SL_UARTCTRL_MUX
 
 #ifndef SL_MX25CTRL_MUX
 #define SL_MX25CTRL_MUX (EFR32MG24 && SL_WIFI && CONFIG_USE_EXTERNAL_FLASH)
@@ -120,7 +116,7 @@ sl_status_t sl_wfx_host_pre_bootloader_spi_transfer(void);
 sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void);
 #endif // SL_BTLCTRL_MUX
 
-#if SL_LCDCTRL_MUX
+#if defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
 /****************************************************************************
  * @fn  sl_status_t sl_wfx_host_pre_lcd_spi_transfer()
  * @brief
@@ -138,7 +134,7 @@ sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void);
  * @return SL_STATUS_OK
  *****************************************************************************/
 sl_status_t sl_wfx_host_post_lcd_spi_transfer(void);
-#endif // SL_LCDCTRL_MUX
+#endif // defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
 
 #if SL_UARTCTRL_MUX
 /****************************************************************************

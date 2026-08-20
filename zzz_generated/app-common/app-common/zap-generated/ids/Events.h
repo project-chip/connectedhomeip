@@ -26,9 +26,13 @@
 #include <clusters/ActivatedCarbonFilterMonitoring/EventIds.h>
 #include <clusters/AdministratorCommissioning/EventIds.h>
 #include <clusters/AirQuality/EventIds.h>
+#include <clusters/AmbientContextSensing/EventIds.h>
+#include <clusters/AmbientSensingUnion/EventIds.h>
 #include <clusters/ApplicationBasic/EventIds.h>
 #include <clusters/ApplicationLauncher/EventIds.h>
+#include <clusters/AudioControl/EventIds.h>
 #include <clusters/AudioOutput/EventIds.h>
+#include <clusters/AvAnalysis/EventIds.h>
 #include <clusters/BallastConfiguration/EventIds.h>
 #include <clusters/BasicInformation/EventIds.h>
 #include <clusters/Binding/EventIds.h>
@@ -45,6 +49,7 @@
 #include <clusters/ClosureDimension/EventIds.h>
 #include <clusters/ColorControl/EventIds.h>
 #include <clusters/CommissionerControl/EventIds.h>
+#include <clusters/CommissioningProxy/EventIds.h>
 #include <clusters/CommodityMetering/EventIds.h>
 #include <clusters/CommodityPrice/EventIds.h>
 #include <clusters/CommodityTariff/EventIds.h>
@@ -58,10 +63,14 @@
 #include <clusters/DishwasherAlarm/EventIds.h>
 #include <clusters/DishwasherMode/EventIds.h>
 #include <clusters/DoorLock/EventIds.h>
+#include <clusters/DynamicLighting/EventIds.h>
 #include <clusters/EcosystemInformation/EventIds.h>
+#include <clusters/ElectricalAlarm/EventIds.h>
+#include <clusters/ElectricalDistribution/EventIds.h>
 #include <clusters/ElectricalEnergyMeasurement/EventIds.h>
 #include <clusters/ElectricalGridConditions/EventIds.h>
 #include <clusters/ElectricalPowerMeasurement/EventIds.h>
+#include <clusters/ElectricalProtectionAlarm/EventIds.h>
 #include <clusters/EnergyEvse/EventIds.h>
 #include <clusters/EnergyEvseMode/EventIds.h>
 #include <clusters/EnergyPreference/EventIds.h>
@@ -77,6 +86,7 @@
 #include <clusters/Groupcast/EventIds.h>
 #include <clusters/Groups/EventIds.h>
 #include <clusters/HepaFilterMonitoring/EventIds.h>
+#include <clusters/Humidistat/EventIds.h>
 #include <clusters/IcdManagement/EventIds.h>
 #include <clusters/Identify/EventIds.h>
 #include <clusters/IlluminanceMeasurement/EventIds.h>
@@ -89,6 +99,7 @@
 #include <clusters/LevelControl/EventIds.h>
 #include <clusters/LocalizationConfiguration/EventIds.h>
 #include <clusters/LowPower/EventIds.h>
+#include <clusters/MediaFileManagement/EventIds.h>
 #include <clusters/MediaInput/EventIds.h>
 #include <clusters/MediaPlayback/EventIds.h>
 #include <clusters/Messages/EventIds.h>
@@ -97,6 +108,7 @@
 #include <clusters/MicrowaveOvenMode/EventIds.h>
 #include <clusters/ModeSelect/EventIds.h>
 #include <clusters/NetworkCommissioning/EventIds.h>
+#include <clusters/NetworkIdentityManagement/EventIds.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/EventIds.h>
 #include <clusters/OccupancySensing/EventIds.h>
 #include <clusters/OnOff/EventIds.h>
@@ -114,6 +126,7 @@
 #include <clusters/PowerSourceConfiguration/EventIds.h>
 #include <clusters/PowerTopology/EventIds.h>
 #include <clusters/PressureMeasurement/EventIds.h>
+#include <clusters/ProximityRanging/EventIds.h>
 #include <clusters/ProxyConfiguration/EventIds.h>
 #include <clusters/ProxyDiscovery/EventIds.h>
 #include <clusters/ProxyValid/EventIds.h>
@@ -131,12 +144,15 @@
 #include <clusters/ScenesManagement/EventIds.h>
 #include <clusters/ServiceArea/EventIds.h>
 #include <clusters/SmokeCoAlarm/EventIds.h>
+#include <clusters/SmokeConcentrationMeasurement/EventIds.h>
 #include <clusters/SoftwareDiagnostics/EventIds.h>
 #include <clusters/SoilMeasurement/EventIds.h>
 #include <clusters/Switch/EventIds.h>
 #include <clusters/TargetNavigator/EventIds.h>
 #include <clusters/TemperatureControl/EventIds.h>
+#include <clusters/TemperatureControlledCabinetTopology/EventIds.h>
 #include <clusters/TemperatureMeasurement/EventIds.h>
+#include <clusters/TestHiddenManufacturerSpecific/EventIds.h>
 #include <clusters/Thermostat/EventIds.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/EventIds.h>
 #include <clusters/ThreadBorderRouterManagement/EventIds.h>
@@ -144,7 +160,6 @@
 #include <clusters/ThreadNetworkDirectory/EventIds.h>
 #include <clusters/TimeFormatLocalization/EventIds.h>
 #include <clusters/TimeSynchronization/EventIds.h>
-#include <clusters/Timer/EventIds.h>
 #include <clusters/TlsCertificateManagement/EventIds.h>
 #include <clusters/TlsClientManagement/EventIds.h>
 #include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/EventIds.h>

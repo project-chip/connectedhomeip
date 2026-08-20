@@ -58,11 +58,12 @@ def main(log_level, rules, idl_path):
 
     lint_rules = []
     log.info("Loading rules from '%s'", rules)
-    lint_rules.extend(CreateParser().parse(open(rules, 'rt').read()))
+    with open(rules) as f:
+        lint_rules.extend(CreateParser().parse(f.read()))
 
     log.info("Parsing idl from '%s'", idl_path)
-    idl_tree = matter_idl_parser.CreateParser().parse(
-        open(idl_path, "rt").read(), file_name=idl_path)
+    with open(idl_path) as f:
+        idl_tree = matter_idl_parser.CreateParser().parse(f.read(), file_name=idl_path)
 
     log.info("Running %d lint rules", len(lint_rules))
 
@@ -87,7 +88,7 @@ def main(log_level, rules, idl_path):
     type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
     help='Determines the verbosity of script output.')
 @click.argument("filename", type=click.Path(exists=True, dir_okay=False))
-def parser(log_level, filename=None):
+def parser(log_level, filename):
     """
     Parse Matter IDL linter RULES file.
     """
@@ -97,7 +98,8 @@ def parser(log_level, filename=None):
     )
 
     log.info("Starting to parse ...")
-    data = CreateParser().parse(open(filename, 'rt').read())
+    with open(filename) as f:
+        data = CreateParser().parse(f.read())
     log.info("Parse completed")
 
     log.info("Data:")

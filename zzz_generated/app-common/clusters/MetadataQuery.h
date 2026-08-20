@@ -22,12 +22,20 @@
 #include <clusters/AdministratorCommissioning/MetadataProvider.h>
 #include <clusters/AirQuality/Ids.h>
 #include <clusters/AirQuality/MetadataProvider.h>
+#include <clusters/AmbientContextSensing/Ids.h>
+#include <clusters/AmbientContextSensing/MetadataProvider.h>
+#include <clusters/AmbientSensingUnion/Ids.h>
+#include <clusters/AmbientSensingUnion/MetadataProvider.h>
 #include <clusters/ApplicationBasic/Ids.h>
 #include <clusters/ApplicationBasic/MetadataProvider.h>
 #include <clusters/ApplicationLauncher/Ids.h>
 #include <clusters/ApplicationLauncher/MetadataProvider.h>
+#include <clusters/AudioControl/Ids.h>
+#include <clusters/AudioControl/MetadataProvider.h>
 #include <clusters/AudioOutput/Ids.h>
 #include <clusters/AudioOutput/MetadataProvider.h>
+#include <clusters/AvAnalysis/Ids.h>
+#include <clusters/AvAnalysis/MetadataProvider.h>
 #include <clusters/BallastConfiguration/Ids.h>
 #include <clusters/BallastConfiguration/MetadataProvider.h>
 #include <clusters/BasicInformation/Ids.h>
@@ -60,6 +68,8 @@
 #include <clusters/ColorControl/MetadataProvider.h>
 #include <clusters/CommissionerControl/Ids.h>
 #include <clusters/CommissionerControl/MetadataProvider.h>
+#include <clusters/CommissioningProxy/Ids.h>
+#include <clusters/CommissioningProxy/MetadataProvider.h>
 #include <clusters/CommodityMetering/Ids.h>
 #include <clusters/CommodityMetering/MetadataProvider.h>
 #include <clusters/CommodityPrice/Ids.h>
@@ -86,14 +96,22 @@
 #include <clusters/DishwasherMode/MetadataProvider.h>
 #include <clusters/DoorLock/Ids.h>
 #include <clusters/DoorLock/MetadataProvider.h>
+#include <clusters/DynamicLighting/Ids.h>
+#include <clusters/DynamicLighting/MetadataProvider.h>
 #include <clusters/EcosystemInformation/Ids.h>
 #include <clusters/EcosystemInformation/MetadataProvider.h>
+#include <clusters/ElectricalAlarm/Ids.h>
+#include <clusters/ElectricalAlarm/MetadataProvider.h>
+#include <clusters/ElectricalDistribution/Ids.h>
+#include <clusters/ElectricalDistribution/MetadataProvider.h>
 #include <clusters/ElectricalEnergyMeasurement/Ids.h>
 #include <clusters/ElectricalEnergyMeasurement/MetadataProvider.h>
 #include <clusters/ElectricalGridConditions/Ids.h>
 #include <clusters/ElectricalGridConditions/MetadataProvider.h>
 #include <clusters/ElectricalPowerMeasurement/Ids.h>
 #include <clusters/ElectricalPowerMeasurement/MetadataProvider.h>
+#include <clusters/ElectricalProtectionAlarm/Ids.h>
+#include <clusters/ElectricalProtectionAlarm/MetadataProvider.h>
 #include <clusters/EnergyEvse/Ids.h>
 #include <clusters/EnergyEvse/MetadataProvider.h>
 #include <clusters/EnergyEvseMode/Ids.h>
@@ -124,6 +142,8 @@
 #include <clusters/Groups/MetadataProvider.h>
 #include <clusters/HepaFilterMonitoring/Ids.h>
 #include <clusters/HepaFilterMonitoring/MetadataProvider.h>
+#include <clusters/Humidistat/Ids.h>
+#include <clusters/Humidistat/MetadataProvider.h>
 #include <clusters/IcdManagement/Ids.h>
 #include <clusters/IcdManagement/MetadataProvider.h>
 #include <clusters/Identify/Ids.h>
@@ -148,6 +168,8 @@
 #include <clusters/LocalizationConfiguration/MetadataProvider.h>
 #include <clusters/LowPower/Ids.h>
 #include <clusters/LowPower/MetadataProvider.h>
+#include <clusters/MediaFileManagement/Ids.h>
+#include <clusters/MediaFileManagement/MetadataProvider.h>
 #include <clusters/MediaInput/Ids.h>
 #include <clusters/MediaInput/MetadataProvider.h>
 #include <clusters/MediaPlayback/Ids.h>
@@ -164,6 +186,8 @@
 #include <clusters/ModeSelect/MetadataProvider.h>
 #include <clusters/NetworkCommissioning/Ids.h>
 #include <clusters/NetworkCommissioning/MetadataProvider.h>
+#include <clusters/NetworkIdentityManagement/Ids.h>
+#include <clusters/NetworkIdentityManagement/MetadataProvider.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/Ids.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/MetadataProvider.h>
 #include <clusters/OccupancySensing/Ids.h>
@@ -198,6 +222,8 @@
 #include <clusters/PowerTopology/MetadataProvider.h>
 #include <clusters/PressureMeasurement/Ids.h>
 #include <clusters/PressureMeasurement/MetadataProvider.h>
+#include <clusters/ProximityRanging/Ids.h>
+#include <clusters/ProximityRanging/MetadataProvider.h>
 #include <clusters/ProxyConfiguration/Ids.h>
 #include <clusters/ProxyConfiguration/MetadataProvider.h>
 #include <clusters/ProxyDiscovery/Ids.h>
@@ -232,6 +258,8 @@
 #include <clusters/ServiceArea/MetadataProvider.h>
 #include <clusters/SmokeCoAlarm/Ids.h>
 #include <clusters/SmokeCoAlarm/MetadataProvider.h>
+#include <clusters/SmokeConcentrationMeasurement/Ids.h>
+#include <clusters/SmokeConcentrationMeasurement/MetadataProvider.h>
 #include <clusters/SoftwareDiagnostics/Ids.h>
 #include <clusters/SoftwareDiagnostics/MetadataProvider.h>
 #include <clusters/SoilMeasurement/Ids.h>
@@ -242,8 +270,12 @@
 #include <clusters/TargetNavigator/MetadataProvider.h>
 #include <clusters/TemperatureControl/Ids.h>
 #include <clusters/TemperatureControl/MetadataProvider.h>
+#include <clusters/TemperatureControlledCabinetTopology/Ids.h>
+#include <clusters/TemperatureControlledCabinetTopology/MetadataProvider.h>
 #include <clusters/TemperatureMeasurement/Ids.h>
 #include <clusters/TemperatureMeasurement/MetadataProvider.h>
+#include <clusters/TestHiddenManufacturerSpecific/Ids.h>
+#include <clusters/TestHiddenManufacturerSpecific/MetadataProvider.h>
 #include <clusters/Thermostat/Ids.h>
 #include <clusters/Thermostat/MetadataProvider.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/Ids.h>
@@ -258,8 +290,6 @@
 #include <clusters/TimeFormatLocalization/MetadataProvider.h>
 #include <clusters/TimeSynchronization/Ids.h>
 #include <clusters/TimeSynchronization/MetadataProvider.h>
-#include <clusters/Timer/Ids.h>
-#include <clusters/Timer/MetadataProvider.h>
 #include <clusters/TlsCertificateManagement/Ids.h>
 #include <clusters/TlsCertificateManagement/MetadataProvider.h>
 #include <clusters/TlsClientManagement/Ids.h>
@@ -339,6 +369,16 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
         if (id == AirQuality::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, AirQuality::Id>::EntryFor(command);
     }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == AmbientContextSensing::Id) || ...))
+    {
+        if (id == AmbientContextSensing::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, AmbientContextSensing::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == AmbientSensingUnion::Id) || ...))
+    {
+        if (id == AmbientSensingUnion::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, AmbientSensingUnion::Id>::EntryFor(command);
+    }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ApplicationBasic::Id) || ...))
     {
         if (id == ApplicationBasic::Id)
@@ -349,10 +389,20 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
         if (id == ApplicationLauncher::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ApplicationLauncher::Id>::EntryFor(command);
     }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == AudioControl::Id) || ...))
+    {
+        if (id == AudioControl::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, AudioControl::Id>::EntryFor(command);
+    }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == AudioOutput::Id) || ...))
     {
         if (id == AudioOutput::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, AudioOutput::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == AvAnalysis::Id) || ...))
+    {
+        if (id == AvAnalysis::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, AvAnalysis::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == BallastConfiguration::Id) || ...))
     {
@@ -437,6 +487,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
         if (id == CommissionerControl::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, CommissionerControl::Id>::EntryFor(command);
     }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == CommissioningProxy::Id) || ...))
+    {
+        if (id == CommissioningProxy::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, CommissioningProxy::Id>::EntryFor(command);
+    }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == CommodityMetering::Id) || ...))
     {
         if (id == CommodityMetering::Id)
@@ -502,10 +557,25 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
         if (id == DoorLock::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, DoorLock::Id>::EntryFor(command);
     }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == DynamicLighting::Id) || ...))
+    {
+        if (id == DynamicLighting::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, DynamicLighting::Id>::EntryFor(command);
+    }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == EcosystemInformation::Id) || ...))
     {
         if (id == EcosystemInformation::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, EcosystemInformation::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ElectricalAlarm::Id) || ...))
+    {
+        if (id == ElectricalAlarm::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ElectricalAlarm::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ElectricalDistribution::Id) || ...))
+    {
+        if (id == ElectricalDistribution::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ElectricalDistribution::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ElectricalEnergyMeasurement::Id) || ...))
     {
@@ -521,6 +591,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == ElectricalPowerMeasurement::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ElectricalPowerMeasurement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ElectricalProtectionAlarm::Id) || ...))
+    {
+        if (id == ElectricalProtectionAlarm::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ElectricalProtectionAlarm::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == EnergyEvse::Id) || ...))
     {
@@ -598,6 +673,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
         if (id == HepaFilterMonitoring::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, HepaFilterMonitoring::Id>::EntryFor(command);
     }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == Humidistat::Id) || ...))
+    {
+        if (id == Humidistat::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Humidistat::Id>::EntryFor(command);
+    }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == IcdManagement::Id) || ...))
     {
         if (id == IcdManagement::Id)
@@ -658,6 +738,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
         if (id == LowPower::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, LowPower::Id>::EntryFor(command);
     }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == MediaFileManagement::Id) || ...))
+    {
+        if (id == MediaFileManagement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, MediaFileManagement::Id>::EntryFor(command);
+    }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == MediaInput::Id) || ...))
     {
         if (id == MediaInput::Id)
@@ -697,6 +782,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == NetworkCommissioning::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, NetworkCommissioning::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == NetworkIdentityManagement::Id) || ...))
+    {
+        if (id == NetworkIdentityManagement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, NetworkIdentityManagement::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == NitrogenDioxideConcentrationMeasurement::Id) || ...))
     {
@@ -784,6 +874,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
         if (id == PressureMeasurement::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, PressureMeasurement::Id>::EntryFor(command);
     }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ProximityRanging::Id) || ...))
+    {
+        if (id == ProximityRanging::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ProximityRanging::Id>::EntryFor(command);
+    }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ProxyConfiguration::Id) || ...))
     {
         if (id == ProxyConfiguration::Id)
@@ -870,6 +965,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
         if (id == SmokeCoAlarm::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, SmokeCoAlarm::Id>::EntryFor(command);
     }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == SmokeConcentrationMeasurement::Id) || ...))
+    {
+        if (id == SmokeConcentrationMeasurement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, SmokeConcentrationMeasurement::Id>::EntryFor(command);
+    }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == SoftwareDiagnostics::Id) || ...))
     {
         if (id == SoftwareDiagnostics::Id)
@@ -895,10 +995,21 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
         if (id == TemperatureControl::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TemperatureControl::Id>::EntryFor(command);
     }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == TemperatureControlledCabinetTopology::Id) || ...))
+    {
+        if (id == TemperatureControlledCabinetTopology::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TemperatureControlledCabinetTopology::Id>::EntryFor(
+                command);
+    }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == TemperatureMeasurement::Id) || ...))
     {
         if (id == TemperatureMeasurement::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TemperatureMeasurement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == TestHiddenManufacturerSpecific::Id) || ...))
+    {
+        if (id == TestHiddenManufacturerSpecific::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TestHiddenManufacturerSpecific::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == Thermostat::Id) || ...))
     {
@@ -930,11 +1041,6 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == TimeFormatLocalization::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TimeFormatLocalization::Id>::EntryFor(command);
-    }
-    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == Timer::Id) || ...))
-    {
-        if (id == Timer::Id)
-            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Timer::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == TimeSynchronization::Id) || ...))
     {

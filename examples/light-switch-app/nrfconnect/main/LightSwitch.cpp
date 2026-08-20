@@ -95,9 +95,13 @@ void LightSwitch::GenericSwitchInitialPress()
         // Press moves Position from 0 (idle) to 1 (press)
         uint8_t newPosition = 1;
 
-        Clusters::Switch::Attributes::CurrentPosition::Set(mLightGenericSwitchEndpointId, newPosition);
-        // InitialPress event takes newPosition as event data
-        Clusters::SwitchServer::Instance().OnInitialPress(mLightGenericSwitchEndpointId, newPosition);
+        auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(mLightGenericSwitchEndpointId);
+        VerifyOrReturn(switchCluster != nullptr);
+
+        CHIP_ERROR status = switchCluster->SetCurrentPosition(newPosition);
+        VerifyOrReturn(CHIP_NO_ERROR == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
+
+        RETURN_SAFELY_IGNORED switchCluster->OnInitialPress(newPosition);
     });
 }
 
@@ -108,8 +112,12 @@ void LightSwitch::GenericSwitchReleasePress()
         uint8_t previousPosition = 1;
         uint8_t newPosition      = 0;
 
-        Clusters::Switch::Attributes::CurrentPosition::Set(mLightGenericSwitchEndpointId, newPosition);
-        // ShortRelease event takes previousPosition as event data
-        Clusters::SwitchServer::Instance().OnShortRelease(mLightGenericSwitchEndpointId, previousPosition);
+        auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(mLightGenericSwitchEndpointId);
+        VerifyOrReturn(switchCluster != nullptr);
+
+        CHIP_ERROR status = switchCluster->SetCurrentPosition(newPosition);
+        VerifyOrReturn(CHIP_NO_ERROR == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
+
+        RETURN_SAFELY_IGNORED switchCluster->OnShortRelease(previousPosition);
     });
 }

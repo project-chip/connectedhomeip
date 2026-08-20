@@ -25,7 +25,6 @@ import subprocess
 import sys
 import tempfile
 import zipfile
-from typing import Optional
 
 import click
 import requests
@@ -51,8 +50,7 @@ class DownloadType(enum.Enum):
 def _GetDefaultExtractRoot():
     if 'PW_ENVIRONMENT_ROOT' in os.environ:
         return os.environ['PW_ENVIRONMENT_ROOT']
-    else:
-        return ".zap"
+    return ".zap"
 
 
 def _LogPipeLines(pipe, prefix):
@@ -76,7 +74,7 @@ def _ExecuteProcess(cmd, cwd):
 
     exitcode = process.wait()
     if exitcode != 0:
-        raise Exception("Error executing process: %d" % exitcode)
+        raise Exception(f"Error executing process: {exitcode}")
 
 
 def _SetupSourceZap(install_directory: str, zap_version: str):
@@ -176,7 +174,8 @@ def _GetZapVersionToUse(project_root) -> str:
 
     zap_version = ""
     zap_path = os.path.join(project_root, "scripts/setup/zap.json")
-    zap_json = json.load(open(zap_path))
+    with open(zap_path) as f:
+        zap_json = json.load(f)
     for package in zap_json.get("packages", []):
         for tag in package.get("tags", []):
             if tag.startswith("version:"):
@@ -221,7 +220,7 @@ def _GetZapVersionToUse(project_root) -> str:
     help='What type of zap download to perform')
 @click.option('--platform', default=_GetDefaultPlatform(), show_default=True, help='ZAP Platform to download')
 @click.option('--arch', default=_GetDefaultArch(), show_default=True, help='ZAP Architecture to download')
-def main(log_level: str, sdk_root: str, extract_root: str, zap_version: Optional[str], zap: DownloadType, platform: str, arch: str):
+def main(log_level: str, sdk_root: str, extract_root: str, zap_version: str | None, zap: DownloadType, platform: str, arch: str):
     if _has_coloredlogs:
         coloredlogs.install(level=log_level, fmt='%(asctime)s %(name)s %(levelname)-7s %(message)s')
     else:

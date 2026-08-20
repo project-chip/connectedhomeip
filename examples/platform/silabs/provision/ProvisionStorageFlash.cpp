@@ -90,7 +90,7 @@ CHIP_ERROR DecodeTotal(Encoding::Buffer & reader, uint16_t & total)
     ReturnErrorOnFailure(reader.Get(sz));
     total     = (0xffff == sz) ? sizeof(uint16_t) : sz;
     reader.in = reader.begin + total;
-    VerifyOrReturnError(reader.in <= reader.end, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(reader.in <= reader.end, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "Invalid page, or corrupted data"));
     return CHIP_NO_ERROR;
 }
 
@@ -244,7 +244,7 @@ CHIP_ERROR Get(uint16_t id, uint8_t * value, size_t max_size, size_t & size)
     Encoding::Version2::Argument arg(temp, sizeof(temp));
     ReturnErrorOnFailure(Get(id, arg));
     VerifyOrReturnError(Encoding::Version2::Type_Binary == arg.type, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(arg.size <= max_size, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(arg.size <= max_size, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(value, arg.value.b, arg.size);
     size = arg.size;
     return CHIP_NO_ERROR;
@@ -257,7 +257,12 @@ CHIP_ERROR Set(uint16_t id, const char * value, size_t size)
 
 CHIP_ERROR Get(uint16_t id, char * value, size_t max_size, size_t & size)
 {
-    return Get(id, (uint8_t *) value, max_size - 1, size);
+    // No room for a NUL-terminated C string; reject before max_size - 1 (avoids underflow) and skip storage.
+    VerifyOrReturnError(max_size > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(Get(id, (uint8_t *) value, max_size - 1, size));
+    // Binary Get does not NUL-terminate; DeviceInstanceInfoProvider requires it on success.
+    value[size] = '\0';
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Flash
@@ -769,7 +774,7 @@ CHIP_ERROR Storage::DecryptUsingOtaTlvEncryptionKey(MutableByteSpan & block, uin
 
     VerifyOrReturnError(keySpan.size() == Silabs::OtaTlvEncryptionKey::kOTAEncryptionKeyLength, CHIP_ERROR_INVALID_ARGUMENT);
 
-    Silabs::OtaTlvEncryptionKey::Decrypt((const ByteSpan) keySpan, block, ivOffset);
+    ReturnErrorOnFailure(Silabs::OtaTlvEncryptionKey::Decrypt((const ByteSpan) keySpan, block, ivOffset));
     return CHIP_NO_ERROR;
 #else  // MBEDTLS_USE_PSA_CRYPTO
     return CHIP_ERROR_NOT_IMPLEMENTED;

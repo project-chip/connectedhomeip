@@ -306,7 +306,7 @@ class TestGenerateFactoryData(unittest.TestCase):
             self.assertTrue(exists(os.path.join(outdir, 'fd.txt')))
             self.assertTrue(exists(os.path.join(outdir, 'fd.png')))
 
-            with open(os.path.join(outdir, 'fd.txt'), 'r') as onboarding_code_file:
+            with open(os.path.join(outdir, 'fd.txt')) as onboarding_code_file:
                 onboarding = onboarding_code_file.readlines()
                 self.assertEqual(onboarding[0][:-1], TEST_MANUAL_CODE)
                 self.assertEqual(onboarding[1], TEST_QR_CODE)

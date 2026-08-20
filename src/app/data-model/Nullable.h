@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/util/attribute-storage-null-handling.h>
+#include <lib/support/attribute-storage-null-handling.h>
 #include <optional>
 #include <type_traits>
 #include <utility>
@@ -128,6 +128,35 @@ template <class T, class... Args>
 constexpr Nullable<T> MakeNullable(Args &&... args)
 {
     return Nullable<T>(std::in_place, std::forward<Args>(args)...);
+}
+
+/// Converts a DataModel::Nullable<T> to its storage representation.
+template <typename T>
+static constexpr void NullableToStorage(const DataModel::Nullable<T> & nullable,
+                                        typename NumericAttributeTraits<T>::StorageType & storage)
+{
+    if (nullable.IsNull())
+    {
+        NumericAttributeTraits<T>::SetNull(storage);
+    }
+    else
+    {
+        NumericAttributeTraits<T>::WorkingToStorage(nullable.Value(), storage);
+    }
+}
+
+/// Converts a storage representation to DataModel::Nullable<T>.
+template <typename T>
+static constexpr void StorageToNullable(typename NumericAttributeTraits<T>::StorageType storage, DataModel::Nullable<T> & nullable)
+{
+    if (NumericAttributeTraits<T>::IsNullValue(storage))
+    {
+        nullable.SetNull();
+    }
+    else
+    {
+        nullable.SetNonNull(NumericAttributeTraits<T>::StorageToWorking(storage));
+    }
 }
 
 } // namespace DataModel

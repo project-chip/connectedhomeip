@@ -54,6 +54,19 @@ class OccupancySensingCluster(
     object SubscriptionEstablished : HoldTimeLimitsAttributeSubscriptionState()
   }
 
+  class PredictedOccupancyAttribute(
+    val value: List<OccupancySensingClusterPredictedOccupancyStruct>?
+  )
+
+  sealed class PredictedOccupancyAttributeSubscriptionState {
+    data class Success(val value: List<OccupancySensingClusterPredictedOccupancyStruct>?) :
+      PredictedOccupancyAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : PredictedOccupancyAttributeSubscriptionState()
+
+    object SubscriptionEstablished : PredictedOccupancyAttributeSubscriptionState()
+  }
+
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
@@ -550,6 +563,113 @@ class OccupancySensingCluster(
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(HoldTimeLimitsAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readPredictedOccupancyAttribute(): PredictedOccupancyAttribute {
+    val ATTRIBUTE_ID: UInt = 5u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Predictedoccupancy attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<OccupancySensingClusterPredictedOccupancyStruct>? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        buildList<OccupancySensingClusterPredictedOccupancyStruct> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(OccupancySensingClusterPredictedOccupancyStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
+      } else {
+        null
+      }
+
+    return PredictedOccupancyAttribute(decodedValue)
+  }
+
+  suspend fun subscribePredictedOccupancyAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<PredictedOccupancyAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 5u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            PredictedOccupancyAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Predictedoccupancy attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<OccupancySensingClusterPredictedOccupancyStruct>? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              buildList<OccupancySensingClusterPredictedOccupancyStruct> {
+                tlvReader.enterArray(AnonymousTag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(
+                    OccupancySensingClusterPredictedOccupancyStruct.fromTlv(AnonymousTag, tlvReader)
+                  )
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(PredictedOccupancyAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(PredictedOccupancyAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

@@ -21,7 +21,7 @@ import os
 import random
 import shutil
 import tempfile
-from typing import Optional
+from enum import StrEnum
 
 import psutil
 import requests
@@ -32,6 +32,14 @@ from TC_TLS_Utils import TLSUtils
 from matter.interaction_model import Status
 from matter.testing.tasks import Subprocess
 
+log = logging.getLogger(__name__)
+
+
+class SupportedIngestInterface(StrEnum):
+    cmaf = "cmaf-ingest"  # Interface 1
+    dash = "dash"  # Interface 2, DASH version
+    hls = "hls"  # Interface 2, HLS version
+
 
 class PushAvServerProcess(Subprocess):
     """Class for starting Push AV Server in a subprocess"""
@@ -41,7 +49,7 @@ class PushAvServerProcess(Subprocess):
 
     # By default this points to the push_av_server in Test Harness
     # TCs utilizing this should expect th_server_app_path otherwise
-    DEFAULT_SERVER_PATH = "/root/apps/push_av_server/server.py"
+    DEFAULT_SERVER_PATH = "/root/apps/push_av_server/src/server.py"
 
     def __init__(
         self,
@@ -51,7 +59,7 @@ class PushAvServerProcess(Subprocess):
         server_ip: str | None = None,
     ):
         if server_path is None:
-            logging.error(f"No path provided for Push AV Server, using the default path for TH: {self.DEFAULT_SERVER_PATH}")
+            log.error("No path provided for Push AV Server, using the default path for TH: %s", self.DEFAULT_SERVER_PATH)
             server_path = self.DEFAULT_SERVER_PATH
         self._working_directory = os.path.join(tempfile.gettempdir(), "pavstest")
         if os.path.exists(self._working_directory):
@@ -99,7 +107,7 @@ class PushAvServerProcess(Subprocess):
         response.raise_for_status()
         return response.json()
 
-    def _post_json(self, endpoint: str, data: Optional[dict] = None) -> dict:
+    def _post_json(self, endpoint: str, data: dict | None = None) -> dict:
         url = f"{self.base_url}{endpoint}"
         response = requests.post(url, json=data or {}, verify=False, timeout=5)
         response.raise_for_status()
@@ -125,17 +133,17 @@ class PushAvServerProcess(Subprocess):
         csr_pem = csr.public_bytes(serialization.Encoding.PEM).decode("utf-8")
         return self._post_json(f"/certs/{device_name}/sign", {"csr": csr_pem})
 
-    def create_stream(self) -> str:
+    def create_stream(self, interface: SupportedIngestInterface) -> str:
         """Request the server to create a new stream."""
-        response = self._post_json("/streams")
-        return response["stream_id"]
+        response = self._post_json(f"/streams?interface={interface}")
+        return response["id"]
 
-    def update_track_name(self, stream_id: str, trackName: str) -> None:
+    def update_expected_track_names(self, stream_id: str, expected_track_names: list[str]) -> None:
         """
-            Request the server to add a track name associated with stream_id.
-            This is required to validate trackName of the segments that are uploaded.
+        Request the server to set the expected track names for a stream.
+        This is required to validate that uploaded track names match the expected list.
         """
-        self._post_json(endpoint=f"/streams/{stream_id}/trackName", data={"trackName": trackName})
+        self._post_json(endpoint=f"/streams/{stream_id}/expectedTrackNames", data={"expected_track_names": expected_track_names})
 
 
 class PAVSTIUtils:
@@ -167,17 +175,18 @@ class PAVSTIUtils:
         raise RuntimeError("No private IP found, specify using --string-arg host_ip <IPv4>")
 
     async def precondition_provision_tls_endpoint(
-        self, endpoint: int, server: PushAvServerProcess, host_ip: str | None = None
+        self, server: PushAvServerProcess, host_ip: str | None = None
     ) -> int:
         """Perform provisioning steps to set up TLS endpoint."""
         if host_ip is None:
             # If no host ip specified, try to get private ip
             # this is mainly required when running TCs in Test Harness
-            logging.error("No host_ip provided in test arguments")
+            log.error("No host_ip provided in test arguments")
             host_ip = self.get_private_ip()
 
-        tls_utils = TLSUtils(self, endpoint=endpoint)
-        logging.info(f"Using IP: {host_ip} as hostname to provision TLS Endpoint")
+        # TLS clusters are always on EP0, per spec
+        tls_utils = TLSUtils(self, endpoint=0)
+        log.info("Using IP: %s as hostname to provision TLS Endpoint", host_ip)
         root_cert_der = server.get_root_cert()
         prc_result = await tls_utils.send_provision_root_command(certificate=root_cert_der)
         tls_utils.assert_valid_caid(prc_result.caid)
@@ -201,3 +210,16 @@ class PAVSTIUtils:
             ccdid=csr_result.ccdid,
         )
         return result.endpointID, host_ip
+
+    async def postcondition_remove_tls_endpoint(self, tlsEndPoint):
+
+        # Make sure the passed in values are not None.
+        # This could happen in the unlikely event the test script fails prior to setting of any of these values (which would
+        # be prior to the TLS EP being set).
+        if tlsEndPoint is None:
+            return
+
+        tls_utils = TLSUtils(self, endpoint=0)
+        await tls_utils.send_remove_tls_endpoint_command(
+            endpoint_id=tlsEndPoint
+        )

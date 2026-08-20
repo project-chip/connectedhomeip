@@ -1,7 +1,7 @@
-# Name,   Type, SubType, Offset,  Size, Flags
-# Note: if you have increased the bootloader size, make sure to update the offsets to avoid overlap
-nvs,      data, nvs,     ,        0xC000,
-otadata,  data, ota,     ,        0x2000,
-phy_init, data, phy,     ,        0x1000,
-ota_0,    app,  ota_0,   ,        1500K,
-ota_1,    app,  ota_1,   ,        1500K,
+# Name,   Type, SubType, Offset,   Size, Flags
+# Thread builds need larger OTA slots than the default 1500K layout.
+nvs,      data, nvs,     0x10000,  0xC000,
+otadata,  data, ota,     ,         0x2000,
+phy_init, data, phy,     ,         0x1000,
+ota_0,    app,  ota_0,   0x20000,  0x1E0000,
+ota_1,    app,  ota_1,   0x200000, 0x1E0000,

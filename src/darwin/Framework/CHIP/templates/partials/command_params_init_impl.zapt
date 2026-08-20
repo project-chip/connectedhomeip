@@ -1,0 +1,17 @@
+- (instancetype)init
+{
+  if (self = [super init]) {
+{{#zcl_command_arguments}}
+
+    {{>init_struct_member label=label type=type cluster=parent.parent.name}}
+{{/zcl_command_arguments}}
+{{#if (or (isStrEqual source "client")
+          (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" (compatClusterNameRemapping parent.name) command=(compatCommandNameRemapping parent.name name)))}}
+    _timedInvokeTimeoutMs = nil;
+{{/if}}
+{{#if (isStrEqual source "client")}}
+    _serverSideProcessingTimeout = nil;
+{{/if}}
+  }
+  return self;
+}

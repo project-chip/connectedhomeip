@@ -64,7 +64,7 @@ void NxpEthDriver::eth_netif_ext_status_callback(struct netif * netif, netif_nsc
         {
             ChipLogError(DeviceLayer, "Failed to schedule work: %" CHIP_ERROR_FORMAT, err.Format());
         }
-        SystemLayer().ScheduleLambda([]() { NxpEthDriver::Instance().OnNetworkStatusChange(); });
+        TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([]() { NxpEthDriver::Instance().OnNetworkStatusChange(); });
     }
 }
 

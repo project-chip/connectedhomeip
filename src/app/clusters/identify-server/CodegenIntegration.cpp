@@ -16,6 +16,7 @@
  */
 
 #include "identify-server.h"
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -26,6 +27,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/util/generic-callbacks.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <data-model-providers/codegen/CodegenProcessingConfig.h>
@@ -167,7 +169,7 @@ Identify::Identify(EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIde
 
 Identify::~Identify()
 {
-    RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
+    RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
     UnregisterLegacyIdentify(this);
 }
 
@@ -183,7 +185,7 @@ void MatterIdentifyClusterInitCallback(EndpointId endpointId)
 #endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
 }
 
-void MatterIdentifyClusterShutdownCallback(EndpointId endpointId) {}
+void MatterIdentifyClusterShutdownCallback(EndpointId, MatterClusterShutdownType) {}
 
 // Legacy PluginServer callback stubs
 void MatterIdentifyPluginServerInitCallback() {}

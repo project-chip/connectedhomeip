@@ -33,6 +33,7 @@ public:
     virtual ~Delegate() = default;
 
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
+    EndpointId GetEndpointId() const { return mEndpointId; }
 
     /**
      * @brief Delegate should implement a handler to begin to adjust client power

@@ -34,8 +34,6 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Switch;
 using namespace chip::DeviceLayer;
 
-using namespace chip::app;
-
 #if CONFIG_ENABLE_PW_RPC
 
 #include "chef-rpc-actions-worker.h"
@@ -68,18 +66,22 @@ void SwitchActionsDelegate::AttributeWriteHandler(chip::EndpointId endpointId, c
     switch (attributeId)
     {
     case Switch::Attributes::NumberOfPositions::Id: {
-        uint8_t data = static_cast<uint8_t>(args[0]);
-        app::Clusters::Switch::Attributes::NumberOfPositions::Set(endpointId, data);
+        // NumberOfPositions is a mandatory attribute that needs to have an appropriate default value in ember (minimum value is 2).
+        // The cluster will take the value as a configuration value that can not be changed.
     }
     break;
     case Switch::Attributes::CurrentPosition::Id: {
         uint8_t data = static_cast<uint8_t>(args[0]);
-        app::Clusters::Switch::Attributes::CurrentPosition::Set(endpointId, data);
+
+        auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
+        VerifyOrReturn(switchCluster != nullptr);
+
+        RETURN_SAFELY_IGNORED switchCluster->SetCurrentPosition(data);
     }
     break;
     case Switch::Attributes::MultiPressMax::Id: {
-        uint8_t data = static_cast<uint8_t>(args[0]);
-        app::Clusters::Switch::Attributes::MultiPressMax::Set(endpointId, data);
+        // MultiPressMax is an optional attribute, it has to be enabled in ember with an appropriate default value (minimum value is
+        // 2). If this attribute is enabled, the cluster will take the value as a configuration value that can not be changed.
     }
     break;
     default:

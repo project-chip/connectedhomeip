@@ -44,7 +44,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(JointFabricDatastore::D
     switch (val)
     {
     case EnumType::kView:
-    case EnumType::kProxyView:
     case EnumType::kOperate:
     case EnumType::kManage:
     case EnumType::kAdminister:

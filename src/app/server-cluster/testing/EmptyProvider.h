@@ -20,7 +20,7 @@
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 /// A provider that is emtpy - it contains no endpoints and most
 /// calls fail with `Unsupported Endpoint`
@@ -51,8 +51,6 @@ public:
                                         FabricIndex accessingFabric) override
     {}
 
-    void Temporary_ReportAttributeChanged(const app::AttributePathParams & path) override;
-
     ActionReturnStatus ReadAttribute(const app::DataModel::ReadAttributeRequest & request,
                                      app::AttributeValueEncoder & encoder) override;
     ActionReturnStatus WriteAttribute(const app::DataModel::WriteAttributeRequest & request,
@@ -61,5 +59,5 @@ public:
                                                     chip::TLV::TLVReader & input_arguments, app::CommandHandler * handler) override;
 };
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

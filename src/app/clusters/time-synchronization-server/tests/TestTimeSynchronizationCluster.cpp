@@ -16,13 +16,16 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTester.h>
-#include <app/clusters/time-synchronization-server/time-synchronization-cluster.h>
+#include <app/clusters/time-synchronization-server/TimeSynchronizationCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/TimeSynchronization/Attributes.h>
+#include <clusters/TimeSynchronization/Commands.h>
 #include <clusters/TimeSynchronization/Enums.h>
+#include <clusters/TimeSynchronization/Events.h>
 #include <clusters/TimeSynchronization/Metadata.h>
 #include <clusters/TimeSynchronization/Structs.h>
 
@@ -33,7 +36,19 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::TimeSynchronization;
 using namespace chip::app::Clusters::TimeSynchronization::Attributes;
-using namespace chip::Test;
+using namespace chip::Testing;
+
+// Test delegate that stubs UpdateTimeFromPlatformSource to prevent AttemptToGetTime() from
+// falling back to AttemptToGetTimeFromTrustedNode() on platforms where GetClock_RealTime() is
+// not implemented (e.g. Zephyr / nrf-native-sim). Falling back would attempt to establish a CASE
+// session via CASESessionManager, which is uninitialized in unit test fixtures and would segfault.
+struct TestTimeSyncDelegate : public TimeSynchronization::DefaultTimeSyncDelegate
+{
+    CHIP_ERROR UpdateTimeFromPlatformSource(chip::Callback::Callback<TimeSynchronization::OnTimeSyncCompletion> * callback) override
+    {
+        return CHIP_NO_ERROR;
+    }
+};
 
 struct TestTimeSynchronizationCluster : public ::testing::Test
 {
@@ -43,8 +58,12 @@ struct TestTimeSynchronizationCluster : public ::testing::Test
 
     TestTimeSynchronizationCluster() {}
 
-    chip::Test::TestServerClusterContext testContext;
-    TimeSynchronization::DefaultTimeSyncDelegate delegate;
+    TestServerClusterContext testContext;
+    TestTimeSyncDelegate delegate;
+    const TimeSynchronizationCluster::Context context = { .fabricTable            = testContext.GetFabricTable(),
+                                                          .caseSessionManager     = testContext.GetCASESessionManager(),
+                                                          .platformManager        = testContext.GetPlatformManager(),
+                                                          .interactionModelEngine = testContext.GetInteractionModelEngine() };
 };
 
 } // namespace
@@ -53,145 +72,111 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
 {
     {
         const BitFlags<Feature> features{ 0U };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
-                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
-                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
+        TimeSynchronizationCluster timeSynchronization(
+            kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+            TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate }, context);
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        ASSERT_EQ(timeSynchronization.Attributes(ConcreteClusterPath(kRootEndpointId, TimeSynchronization::Id), attributes),
-                  CHIP_NO_ERROR);
+        ASSERT_TRUE(IsAttributesListEqualTo(timeSynchronization,
+                                            {
+                                                UTCTime::kMetadataEntry,
+                                                Granularity::kMetadataEntry,
+                                            }));
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), {}), CHIP_NO_ERROR);
-        ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
-        const DataModel::AttributeEntry optionalAttributes[] = { TimeSource::kMetadataEntry };
         TimeSynchronizationCluster::OptionalAttributeSet optionalAttributeSet;
         optionalAttributeSet.Set<TimeSource::Id>();
         const BitFlags<Feature> features{ 0U };
         TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features, optionalAttributeSet,
-                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
+                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate },
+                                                       context);
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        ASSERT_EQ(timeSynchronization.Attributes(ConcreteClusterPath(kRootEndpointId, TimeSynchronization::Id), attributes),
-                  CHIP_NO_ERROR);
+        ASSERT_TRUE(IsAttributesListEqualTo(timeSynchronization,
+                                            {
+                                                UTCTime::kMetadataEntry,
+                                                Granularity::kMetadataEntry,
+                                                TimeSource::kMetadataEntry,
+                                            }));
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet), CHIP_NO_ERROR);
-        ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
         const BitFlags<Feature> features{ Feature::kTimeSyncClient };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
-                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
-                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
+        TimeSynchronizationCluster timeSynchronization(
+            kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+            TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate }, context);
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        ASSERT_EQ(timeSynchronization.Attributes(ConcreteClusterPath(kRootEndpointId, TimeSynchronization::Id), attributes),
-                  CHIP_NO_ERROR);
+        ASSERT_TRUE(IsAttributesListEqualTo(timeSynchronization,
+                                            {
+                                                UTCTime::kMetadataEntry,
+                                                Granularity::kMetadataEntry,
+                                                TrustedTimeSource::kMetadataEntry,
+                                            }));
 
-        const DataModel::AttributeEntry optionalAttributes[] = { TrustedTimeSource::kMetadataEntry };
-        OptionalAttributeSet<TrustedTimeSource::Id> optionalAttributeSet;
-        optionalAttributeSet.Set<TrustedTimeSource::Id>();
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet), CHIP_NO_ERROR);
-        ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
         const BitFlags<Feature> features{ Feature::kNTPClient };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
-                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
-                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
+        TimeSynchronizationCluster timeSynchronization(
+            kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+            TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate }, context);
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        ASSERT_EQ(timeSynchronization.Attributes(ConcreteClusterPath(kRootEndpointId, TimeSynchronization::Id), attributes),
-                  CHIP_NO_ERROR);
+        ASSERT_TRUE(IsAttributesListEqualTo(timeSynchronization,
+                                            {
+                                                UTCTime::kMetadataEntry,
+                                                Granularity::kMetadataEntry,
+                                                DefaultNTP::kMetadataEntry,
+                                                SupportsDNSResolve::kMetadataEntry,
+                                            }));
 
-        const DataModel::AttributeEntry optionalAttributes[] = { DefaultNTP::kMetadataEntry, SupportsDNSResolve::kMetadataEntry };
-        OptionalAttributeSet<DefaultNTP::Id, SupportsDNSResolve::Id> optionalAttributeSet;
-        optionalAttributeSet.Set<DefaultNTP::Id>();
-        optionalAttributeSet.Set<SupportsDNSResolve::Id>();
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet), CHIP_NO_ERROR);
-        ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
         const BitFlags<Feature> features{ Feature::kNTPServer };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
-                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
-                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
+        TimeSynchronizationCluster timeSynchronization(
+            kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+            TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate }, context);
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        ASSERT_EQ(timeSynchronization.Attributes(ConcreteClusterPath(kRootEndpointId, TimeSynchronization::Id), attributes),
-                  CHIP_NO_ERROR);
+        ASSERT_TRUE(IsAttributesListEqualTo(timeSynchronization,
+                                            {
+                                                UTCTime::kMetadataEntry,
+                                                Granularity::kMetadataEntry,
+                                                NTPServerAvailable::kMetadataEntry,
+                                            }));
 
-        const DataModel::AttributeEntry optionalAttributes[] = { NTPServerAvailable::kMetadataEntry };
-        OptionalAttributeSet<NTPServerAvailable::Id> optionalAttributeSet;
-        optionalAttributeSet.Set<NTPServerAvailable::Id>();
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet), CHIP_NO_ERROR);
-        ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
         const BitFlags<Feature> features{ Feature::kTimeZone };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
-                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
-                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
+        TimeSynchronizationCluster timeSynchronization(
+            kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+            TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate }, context);
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        ASSERT_EQ(timeSynchronization.Attributes(ConcreteClusterPath(kRootEndpointId, TimeSynchronization::Id), attributes),
-                  CHIP_NO_ERROR);
+        ASSERT_TRUE(IsAttributesListEqualTo(timeSynchronization,
+                                            {
+                                                UTCTime::kMetadataEntry,
+                                                Granularity::kMetadataEntry,
+                                                TimeZone::kMetadataEntry,
+                                                DSTOffset::kMetadataEntry,
+                                                LocalTime::kMetadataEntry,
+                                                TimeZoneDatabase::kMetadataEntry,
+                                                TimeZoneListMaxSize::kMetadataEntry,
+                                                DSTOffsetListMaxSize::kMetadataEntry,
+                                            }));
 
-        const DataModel::AttributeEntry optionalAttributes[] = {
-            TimeZone::kMetadataEntry,         DSTOffset::kMetadataEntry,           LocalTime::kMetadataEntry,
-            TimeZoneDatabase::kMetadataEntry, TimeZoneListMaxSize::kMetadataEntry, DSTOffsetListMaxSize::kMetadataEntry
-        };
-        OptionalAttributeSet<TimeZone::Id, DSTOffset::Id, LocalTime::Id, TimeZoneDatabase::Id, TimeZoneListMaxSize::Id,
-                             DSTOffsetListMaxSize::Id>
-            optionalAttributeSet;
-        optionalAttributeSet.Set<TimeZone::Id>();
-        optionalAttributeSet.Set<DSTOffset::Id>();
-        optionalAttributeSet.Set<LocalTime::Id>();
-        optionalAttributeSet.Set<TimeZoneDatabase::Id>();
-        optionalAttributeSet.Set<TimeZoneListMaxSize::Id>();
-        optionalAttributeSet.Set<DSTOffsetListMaxSize::Id>();
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet), CHIP_NO_ERROR);
-        ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }
 
@@ -199,9 +184,9 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
 {
     {
         const BitFlags<Feature> features{ 0U };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
-                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
-                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
+        TimeSynchronizationCluster timeSynchronization(
+            kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+            TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate }, context);
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(timeSynchronization);
@@ -218,7 +203,7 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         UTCTime::TypeInfo::DecodableType utcTime{};
         ASSERT_EQ(tester.ReadAttribute(UTCTime::Id, utcTime), CHIP_NO_ERROR);
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -226,7 +211,8 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         optionalAttributeSet.Set<TimeSource::Id>();
         const BitFlags<Feature> features{ 0U };
         TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features, optionalAttributeSet,
-                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
+                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate },
+                                                       context);
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(timeSynchronization);
@@ -246,14 +232,14 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         TimeSourceEnum timeSource{};
         ASSERT_EQ(tester.ReadAttribute(TimeSource::Id, timeSource), CHIP_NO_ERROR);
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
         const BitFlags<Feature> features{ Feature::kTimeSyncClient };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
-                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
-                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
+        TimeSynchronizationCluster timeSynchronization(
+            kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+            TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate }, context);
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(timeSynchronization);
@@ -273,14 +259,14 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         TrustedTimeSource::TypeInfo::DecodableType trustedTimeSource{};
         ASSERT_EQ(tester.ReadAttribute(TrustedTimeSource::Id, trustedTimeSource), CHIP_NO_ERROR);
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
         const BitFlags<Feature> features{ Feature::kNTPClient };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
-                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
-                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
+        TimeSynchronizationCluster timeSynchronization(
+            kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+            TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate }, context);
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(timeSynchronization);
@@ -303,14 +289,14 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         SupportsDNSResolve::TypeInfo::DecodableType supportsDNSResolve{};
         ASSERT_EQ(tester.ReadAttribute(SupportsDNSResolve::Id, supportsDNSResolve), CHIP_NO_ERROR);
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
         const BitFlags<Feature> features{ Feature::kNTPServer };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
-                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
-                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
+        TimeSynchronizationCluster timeSynchronization(
+            kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+            TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate }, context);
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(timeSynchronization);
@@ -330,14 +316,14 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         NTPServerAvailable::TypeInfo::DecodableType ntpServerAvailable{};
         ASSERT_EQ(tester.ReadAttribute(NTPServerAvailable::Id, ntpServerAvailable), CHIP_NO_ERROR);
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
         const BitFlags<Feature> features{ Feature::kTimeZone };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
-                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
-                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
+        TimeSynchronizationCluster timeSynchronization(
+            kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+            TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate }, context);
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(timeSynchronization);
@@ -372,6 +358,61 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         DSTOffsetListMaxSize::TypeInfo::DecodableType dstOffsetListMaxSize{};
         ASSERT_EQ(tester.ReadAttribute(DSTOffsetListMaxSize::Id, dstOffsetListMaxSize), CHIP_NO_ERROR);
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
+}
+
+TEST_F(TestTimeSynchronizationCluster, SetTrustedTimeSourceTest)
+{
+    const BitFlags<Feature> features{ Feature::kTimeSyncClient };
+    TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+                                                   TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate },
+                                                   context);
+    ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(timeSynchronization);
+
+    // 1. Invoke SetTrustedTimeSource with a valid (non-null) time source
+    Commands::SetTrustedTimeSource::Type request;
+    Structs::FabricScopedTrustedTimeSourceStruct::Type tts;
+    tts.nodeID   = 1234;
+    tts.endpoint = 0;
+    request.trustedTimeSource.SetNonNull(tts);
+
+    auto result = tester.Invoke(request);
+    EXPECT_TRUE(result.IsSuccess());
+
+    // Verify that NO event (specifically no TimeFailure event) is emitted on successful configuration
+    EXPECT_FALSE(testContext.EventsGenerator().GetNextEvent().has_value());
+
+    // Verify the attribute was updated
+    TrustedTimeSource::TypeInfo::DecodableType readBackTTS{};
+    ASSERT_EQ(tester.ReadAttribute(TrustedTimeSource::Id, readBackTTS), CHIP_NO_ERROR);
+    ASSERT_FALSE(readBackTTS.IsNull());
+    EXPECT_EQ(readBackTTS.Value().nodeID, 1234u);
+    EXPECT_EQ(readBackTTS.Value().endpoint, 0u);
+
+    // 2. Invoke SetTrustedTimeSource with null to clear the source
+    Commands::SetTrustedTimeSource::Type clearRequest;
+    clearRequest.trustedTimeSource.SetNull();
+
+    auto clearResult = tester.Invoke(clearRequest);
+    EXPECT_TRUE(clearResult.IsSuccess());
+
+    // Verify that MissingTrustedTimeSource event is emitted when set to null
+    auto eventInfo = testContext.EventsGenerator().GetNextEvent();
+    ASSERT_TRUE(eventInfo.has_value());
+    auto & event = *eventInfo; // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(event.eventOptions.mPath.mEventId, Events::MissingTrustedTimeSource::Id);
+    Events::MissingTrustedTimeSource::DecodableType missingEvent;
+    EXPECT_EQ(event.GetEventData(missingEvent), CHIP_NO_ERROR);
+
+    // Verify no further events
+    EXPECT_FALSE(testContext.EventsGenerator().GetNextEvent().has_value());
+
+    // Verify attribute is now null
+    ASSERT_EQ(tester.ReadAttribute(TrustedTimeSource::Id, readBackTTS), CHIP_NO_ERROR);
+    EXPECT_TRUE(readBackTTS.IsNull());
+
+    timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

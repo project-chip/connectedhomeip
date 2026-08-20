@@ -61,7 +61,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SetTemperature.
+} // namespace SetTemperature
 } // namespace Commands
 } // namespace TemperatureControl
 } // namespace Clusters

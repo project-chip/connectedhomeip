@@ -23,6 +23,7 @@
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/Context.h>
@@ -116,6 +117,33 @@ public:
     ///     convenience to make writing Invoke calls easier.
     virtual std::optional<ActionReturnStatus> InvokeCommand(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
                                                             CommandHandler * handler) = 0;
+
+    // Attribute Change Listener Management
+    //
+    // NOTE:
+    //   - Listeners MAY be unregistered at any time, however implementation assumes the processing
+    //     is single threaded (Register/Unregister/Notify MUST be called from the chip event loop).
+    void RegisterAttributeChangeListener(AttributeChangeListener & listener);
+    void UnregisterAttributeChangeListener(AttributeChangeListener & listener);
+    void NotifyAttributeChanged(const ConcreteAttributePath & path, AttributeChangeType type);
+    void NotifyEndpointChanged(EndpointId endpointId, EndpointChangeType type);
+
+private:
+    /// Represents an active iteration over the listener list.
+    /// Since listeners can be unregistered during notification, and notifications
+    /// can be nested, we need to track all active iterators and update them
+    /// if the element they are about to process is removed.
+    ///
+    /// Active iterators are allocated on the stack during Notify* calls and
+    /// registered in the `mActiveIterators` linked list.
+    struct ActiveIterator
+    {
+        AttributeChangeListener * expectedNext; // The next listener this iterator expects to process
+        ActiveIterator * nextIterator;          // Link to the next active iterator in the stack
+    };
+
+    AttributeChangeListener * mAttributeChangeListenersHead = nullptr;
+    ActiveIterator * mActiveIterators                       = nullptr; // Head of the stack of active iterators
 };
 
 } // namespace DataModel

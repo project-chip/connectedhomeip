@@ -28,9 +28,11 @@
 
 #include <lib/core/CHIPCore.h>
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/PairingSession.h>
 #include <system/SystemClock.h>
 #include <system/TLVPacketBufferBackingStore.h>
@@ -386,4 +388,190 @@ TEST_F(TestPairingSession, TestDecodeSessionParameters)
     EXPECT_FALSE(testFailed);
 }
 
-// Test Suite
+// =============================================================================
+// Tests for PairingSession::OnSessionReleased
+// =============================================================================
+//
+// These tests target two properties of PairingSession::OnSessionReleased():
+//
+//   1. Ordering: the delegate is notified *after* the session's own state has
+//      been cleared (verified via the initiator's synchronous path).
+//
+//   2. Lifetime safety (responder path): the scheduled lambda captures the
+//      delegate pointer by value and never touches 'this', so the callback is
+//      safe even if the PairingSession object is freed before the event loop
+//      drains the queued work.
+//
+// The responder tests require the DeviceLayer system layer to dispatch the
+// scheduled lambda, so this fixture initialises the chip stack.
+
+namespace {
+
+// Minimal concrete PairingSession that exposes the protected role and delegate
+// fields so tests can configure them directly, without the overhead of a full
+// CASE or PASE session.
+class FakePairingSession : public PairingSession
+{
+public:
+    Transport::SecureSession::Type GetSecureSessionType() const override { return Transport::SecureSession::Type::kPASE; }
+    ScopedNodeId GetPeer() const override { return ScopedNodeId(); }
+    ScopedNodeId GetLocalScopedNodeId() const override { return ScopedNodeId(); }
+    CATValues GetPeerCATs() const override { return CATValues(); }
+    CHIP_ERROR DeriveSecureSession(CryptoContext &) override { return CHIP_NO_ERROR; }
+
+    void SetAsInitiator() { mRole = CryptoContext::SessionRole::kInitiator; }
+    void SetAsResponder() { mRole = CryptoContext::SessionRole::kResponder; }
+    void SetDelegate(SessionEstablishmentDelegate * delegate) { mDelegate = delegate; }
+    bool HasDelegate() const { return mDelegate != nullptr; }
+
+    // In production, mSystemLayer is set by AllocateSecureSession().  Tests that
+    // exercise the responder async path must supply a system layer directly since
+    // they bypass full session allocation.
+    void SetSystemLayer(System::Layer & layer) { mSystemLayer = &layer; }
+};
+
+class MockDelegate : public SessionEstablishmentDelegate
+{
+public:
+    int callCount        = 0;
+    CHIP_ERROR lastError = CHIP_NO_ERROR;
+
+    void OnSessionEstablishmentError(CHIP_ERROR error, SessionEstablishmentStage) override
+    {
+        ++callCount;
+        lastError = error;
+    }
+};
+
+} // namespace
+
+class TestPairingSessionOnSessionReleased : public ::testing::Test
+{
+public:
+    static void SetUpTestSuite()
+    {
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+        ASSERT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
+    }
+    static void TearDownTestSuite()
+    {
+        chip::DeviceLayer::PlatformMgr().Shutdown();
+        chip::Platform::MemoryShutdown();
+    }
+
+    // Drain all work items already queued on the system layer by scheduling a
+    // stop item immediately after them and running the event loop until it fires.
+    // Both ScheduleLambda and ScheduleWork post to the same FIFO queue, so the
+    // stop is guaranteed to execute after any previously queued lambdas.
+    static void DrainSystemLayer()
+    {
+        EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t) -> void { RETURN_SAFELY_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); }, 0));
+        chip::DeviceLayer::PlatformMgr().RunEventLoop();
+    }
+};
+
+// --- Initiator path (synchronous notification) ---
+
+// The delegate must be called exactly once, synchronously, with CONNECTION_ABORTED.
+// mDelegate is nulled before the call so that re-entrant or repeated invocations
+// of OnSessionReleased cannot produce a second notification.
+TEST_F(TestPairingSessionOnSessionReleased, InitiatorDelegateCalledSynchronously)
+{
+    FakePairingSession session;
+    MockDelegate delegate;
+    session.SetAsInitiator();
+    session.SetDelegate(&delegate);
+
+    session.OnSessionReleased();
+
+    EXPECT_EQ(delegate.callCount, 1);
+    EXPECT_EQ(delegate.lastError, CHIP_ERROR_CONNECTION_ABORTED);
+    // mDelegate must already be null — it is cleared before the callback fires.
+    EXPECT_FALSE(session.HasDelegate());
+}
+
+TEST_F(TestPairingSessionOnSessionReleased, InitiatorNoDoubleNotification)
+{
+    FakePairingSession session;
+    MockDelegate delegate;
+    session.SetAsInitiator();
+    session.SetDelegate(&delegate);
+
+    session.OnSessionReleased();
+    session.OnSessionReleased(); // mDelegate is already null — must be a no-op
+
+    EXPECT_EQ(delegate.callCount, 1);
+}
+
+// --- Responder path (asynchronous notification via ScheduleLambda) ---
+
+// The delegate must not be called until the event loop drains the queued lambda.
+// mDelegate must already be null immediately after OnSessionReleased() returns,
+// proving the delegate was extracted by value before the lambda was queued.
+TEST_F(TestPairingSessionOnSessionReleased, ResponderDelegateCalledAsync)
+{
+    FakePairingSession session;
+    MockDelegate delegate;
+    session.SetAsResponder();
+    session.SetDelegate(&delegate);
+    session.SetSystemLayer(chip::DeviceLayer::SystemLayer());
+
+    session.OnSessionReleased();
+
+    EXPECT_EQ(delegate.callCount, 0);    // not yet fired
+    EXPECT_FALSE(session.HasDelegate()); // already extracted and nulled
+
+    DrainSystemLayer();
+
+    EXPECT_EQ(delegate.callCount, 1);
+    EXPECT_EQ(delegate.lastError, CHIP_ERROR_CONNECTION_ABORTED);
+}
+
+// A second call to OnSessionReleased() before the event loop drains must not
+// queue a second lambda (mDelegate was already nulled by the first call).
+TEST_F(TestPairingSessionOnSessionReleased, ResponderNoDoubleNotification)
+{
+    FakePairingSession session;
+    MockDelegate delegate;
+    session.SetAsResponder();
+    session.SetDelegate(&delegate);
+    session.SetSystemLayer(chip::DeviceLayer::SystemLayer());
+
+    session.OnSessionReleased();
+    session.OnSessionReleased();
+
+    DrainSystemLayer();
+
+    EXPECT_EQ(delegate.callCount, 1);
+}
+
+// Regression test for use-after-free: the old implementation captured 'this'
+// in the responder-path lambda.  PairingSession objects live in a pool and can
+// be recycled immediately after OnSessionReleased() returns, so that lambda
+// would read freed (and potentially reused) memory when the event loop fired.
+//
+// The fix captures only the delegate pointer by value; 'this' is never accessed
+// inside the lambda.  Destroying the session object before DrainSystemLayer()
+// verifies this: under AddressSanitizer the freed memory is poisoned, turning
+// any stale 'this' access into a hard failure rather than silent corruption.
+TEST_F(TestPairingSessionOnSessionReleased, ResponderSafeAfterSessionObjectFreed)
+{
+    MockDelegate delegate;
+
+    auto * session = chip::Platform::New<FakePairingSession>();
+    ASSERT_NE(session, nullptr);
+    session->SetAsResponder();
+    session->SetDelegate(&delegate);
+    session->SetSystemLayer(chip::DeviceLayer::SystemLayer());
+
+    session->OnSessionReleased();
+
+    // Free the session object before the queued lambda has a chance to fire.
+    chip::Platform::Delete(session);
+
+    DrainSystemLayer();
+
+    EXPECT_EQ(delegate.callCount, 1);
+    EXPECT_EQ(delegate.lastError, CHIP_ERROR_CONNECTION_ABORTED);
+}

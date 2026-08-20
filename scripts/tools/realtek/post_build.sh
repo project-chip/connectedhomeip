@@ -45,10 +45,10 @@ arm-none-eabi-objcopy -O binary -S "$OUT_FOLDER/bin/$CMAKE_TARGET" "$TRACE_FILE"
 
 if [ "$(uname -s)" = "Darwin" ]; then
     PREPEND_HEADER="$REALTEK_SDK_PATH/tools/prepend_header/prepend_header.macOS"
-    MD5_TOOL="$REALTEK_SDK_PATH/tools/md5/MD5.macOS"
+    MD5_TOOL="$REALTEK_SDK_PATH/tools/md5/md5.macOS"
 elif [ "$(uname -s)" = "Linux" ]; then
     PREPEND_HEADER="$REALTEK_SDK_PATH/tools/prepend_header/prepend_header"
-    MD5_TOOL="$REALTEK_SDK_PATH/tools/md5/MD5"
+    MD5_TOOL="$REALTEK_SDK_PATH/tools/md5/md5"
 fi
 
 chmod +x "$PREPEND_HEADER"

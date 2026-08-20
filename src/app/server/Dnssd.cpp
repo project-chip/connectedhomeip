@@ -18,7 +18,6 @@
 #include <app/server/Dnssd.h>
 
 #include <app-common/zap-generated/cluster-enums.h>
-#include <inttypes.h>
 #include <lib/core/Optional.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/ServiceNaming.h>
@@ -40,6 +39,11 @@
 #include <system/TimeSource.h>
 
 #include <algorithm>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+#include <app/server/Server.h>
+#include <app/server/ThreadRendezvousAnnouncement.h> // nogncheck
+#endif
 
 using namespace chip;
 using namespace chip::DeviceLayer;
@@ -138,6 +142,16 @@ CHIP_ERROR DnssdServer::GetCommissionableInstanceName(char * buffer, size_t buff
     return mdnsAdvertiser.GetCommissionableInstanceName(buffer, bufferLen);
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+CHIP_ERROR DnssdServer::SendThreadRendezvousAnnouncement(void * context, const Transport::PeerAddress & peerAddr)
+{
+    auto * self = static_cast<DnssdServer *>(context);
+    VerifyOrReturnError(!self->mThreadRendezvousAnnouncement.IsNull(), CHIP_ERROR_INCORRECT_STATE);
+
+    return chip::Server::GetInstance().GetTransportManager().SendMessage(peerAddr, self->mThreadRendezvousAnnouncement.CloneData());
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+
 CHIP_ERROR DnssdServer::SetEphemeralDiscriminator(Optional<uint16_t> discriminator)
 {
     VerifyOrReturnError(discriminator.ValueOr(0) <= kMaxDiscriminatorValue, CHIP_ERROR_INVALID_ARGUMENT);
@@ -182,7 +196,7 @@ void DnssdServer::GetPrimaryOrFallbackMACAddress(MutableByteSpan & mac)
         if (std::all_of(std::begin(mFallbackMAC), std::end(mFallbackMAC), [](uint8_t v) { return v == 0; }))
         {
             ChipLogError(Discovery, "Failed to get primary mac address of device. Generating a random one.");
-            TEMPORARY_RETURN_IGNORED Crypto::DRBG_get_bytes(mFallbackMAC, sizeof(mFallbackMAC));
+            LogErrorOnFailure(Crypto::DRBG_get_bytes(mFallbackMAC, sizeof(mFallbackMAC)));
         }
         VerifyOrDie(mac.size() == sizeof(mFallbackMAC)); // kPrimaryMACAddressLength
         memcpy(mac.data(), mFallbackMAC, sizeof(mFallbackMAC));
@@ -379,17 +393,30 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
 
     auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
 
-    ChipLogProgress(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u cm=%u cp=%u jf=%u",
-                    advertiseParameters.GetVendorId().value_or(0), advertiseParameters.GetProductId().value_or(0),
-                    advertiseParameters.GetLongDiscriminator(), advertiseParameters.GetShortDiscriminator(),
-                    to_underlying(advertiseParameters.GetCommissioningMode()),
-                    advertiseParameters.GetCommissionerPasscodeSupported().value_or(false) ? 1 : 0,
+    ChipLogDetail(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u cm=%u cp=%u jf=%u",
+                  advertiseParameters.GetVendorId().value_or(0), advertiseParameters.GetProductId().value_or(0),
+                  advertiseParameters.GetLongDiscriminator(), advertiseParameters.GetShortDiscriminator(),
+                  to_underlying(advertiseParameters.GetCommissioningMode()),
+                  advertiseParameters.GetCommissionerPasscodeSupported().value_or(false) ? 1 : 0,
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-                    advertiseParameters.GetJointFabricMode().Raw()
+                  advertiseParameters.GetJointFabricMode().Raw()
 #else
-                    0 // Dummy value when Joint Fabric is disabled
+                  0 // Dummy value when Joint Fabric is disabled
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     );
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+    if (commissionableNode && !DeviceLayer::ThreadStackMgr().IsThreadProvisioned())
+    {
+        ReturnErrorOnFailure(BuildThreadRendezvousAnnouncement(advertiseParameters, mThreadRendezvousAnnouncement));
+        return DeviceLayer::ThreadStackMgr().RendezvousStart(SendThreadRendezvousAnnouncement, this);
+    }
+    else
+    {
+        DeviceLayer::ThreadStackMgr().RendezvousStop();
+        mThreadRendezvousAnnouncement = nullptr;
+    }
+#endif
 
     return mdnsAdvertiser.Advertise(advertiseParameters);
 }
@@ -449,16 +476,33 @@ void DnssdServer::StopServer()
 
         Dnssd::ServiceAdvertiser::Instance().Shutdown();
     }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+    DeviceLayer::ThreadStackMgr().RendezvousStop();
+    mThreadRendezvousAnnouncement = nullptr;
+#endif
 }
 
 void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
 {
-    ChipLogProgress(Discovery, "Updating services using commissioning mode %d", static_cast<int>(mode));
-
     TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, 0);
 
-    SuccessOrLog(Dnssd::ServiceAdvertiser::Instance().Init(chip::DeviceLayer::UDPEndPointManager()), Discovery,
-                 "Failed to initialize advertiser");
+    if (Dnssd::ServiceAdvertiser::Instance().Init(chip::DeviceLayer::UDPEndPointManager()) != CHIP_NO_ERROR)
+    {
+        // No need to do anything if init failed device is probably not commissionned/not on network
+        ChipLogError(Discovery, "Failed to initialize advertiser");
+        return;
+    }
+
+    if (!Dnssd::ServiceAdvertiser::Instance().IsInitialized())
+    {
+        // Somehow Init can succeed without being initialized...
+        // Issue #13844
+        ChipLogError(Discovery, "Advertiser not initialized");
+        return;
+    }
+
+    ChipLogProgress(Discovery, "Updating services using commissioning mode %d", static_cast<int>(mode));
 
     SuccessOrLog(Dnssd::ServiceAdvertiser::Instance().RemoveServices(), Discovery, "Failed to remove advertised services");
 

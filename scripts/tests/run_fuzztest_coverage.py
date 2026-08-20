@@ -23,7 +23,6 @@ import shutil
 import subprocess
 import sys
 from dataclasses import dataclass
-from typing import Optional
 
 import click
 import coloredlogs  # type: ignore
@@ -45,9 +44,9 @@ class FuzzTestContext:
     fuzz_test_binary_name: str
     build_target_name: str
     is_coverage_instrumented: bool
-    selected_fuzz_test_case: Optional[str] = None
-    coverage_output_base_name: Optional[str] = None
-    run_mode: Optional[FuzzTestMode] = None
+    selected_fuzz_test_case: str | None = None
+    coverage_output_base_name: str | None = None
+    run_mode: FuzzTestMode | None = None
 
 
 FUZZTEST_TOOLCHAIN_MARKER_DIR = "chip_pw_fuzztest"
@@ -98,12 +97,11 @@ def get_fuzz_test_cases(context):
         if output:
             return re.findall(r'test:\s*(\S+)', output)
 
-        else:
-            log.info("No FUZZ_TESTs (TestCases) found in '%s'", context.fuzz_test_binary_path)
-            raise ValueError(f"FuzzTest Binary outputted the following error: \n{result.stderr}\n")
+        log.info("No FUZZ_TESTs (TestCases) found in '%s'", context.fuzz_test_binary_path)
+        raise ValueError(f"FuzzTest Binary outputted the following error: \n{result.stderr}\n")
 
     except Exception as e:
-        raise Exception(f"Error executing {context.fuzz_test_binary_path}: {e}")
+        raise RuntimeError(f"Error executing {context.fuzz_test_binary_path}: {e}")
 
 
 def check_if_coverage_tools_detected():
@@ -113,8 +111,8 @@ def check_if_coverage_tools_detected():
             missing.append(tool)
 
     if missing:
-        raise Exception("Following required coverage packages not found: " + ", ".join(missing) +
-                        "\nPlease either install them or source the correct environment")
+        raise RuntimeError("Following required coverage packages not found: " + ", ".join(missing) +
+                           "\nPlease either install them or source the correct environment")
 
 
 def run_fuzz_test(context):
@@ -126,10 +124,10 @@ def run_fuzz_test(context):
 
     if context.run_mode == FuzzTestMode.CONTINUOUS_FUZZ_MODE:
         # Use the FuzzTest (Test Case) Name  as the name for coverage output
-        context.coverage_output_base_name = "{}".format(context.selected_fuzz_test_case.replace('.', "_"))
+        context.coverage_output_base_name = context.selected_fuzz_test_case.replace('.', "_")
     elif context.run_mode == FuzzTestMode.UNIT_TEST_MODE:
         # Use the FuzzTest Binary Name  as the name for coverage output
-        context.coverage_output_base_name = "{}".format(context.fuzz_test_binary_name)
+        context.coverage_output_base_name = f"{context.fuzz_test_binary_name}"
 
     env = os.environ.copy()
     if context.is_coverage_instrumented:
@@ -234,9 +232,10 @@ def generate_coverage_report(context, output_dir_arg):
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except FileNotFoundError:
         log.error("genhtml not found. Please install lcov to generate the HTML coverage report")
-        return
+        return None
 
     log.info("Coverage report Generated.")
+    return None
 
 
 def run_script_in_interactive_mode():
@@ -258,8 +257,7 @@ def run_script_in_interactive_mode():
 
         if 1 <= fuzz_choice <= len(fuzz_tests):
             break
-        else:
-            log.error("Invalid choice for fuzz test binary. Please try again")
+        log.error("Invalid choice for fuzz test binary. Please try again")
 
     selected_fuzz = fuzz_tests[fuzz_choice - 1]
     context = FuzzTestContext(
@@ -291,20 +289,19 @@ def run_script_in_interactive_mode():
             context.selected_fuzz_test_case = test_cases[choice - 1]
             break
 
-        elif choice == 0:
+        if choice == 0:
             context.run_mode = FuzzTestMode.UNIT_TEST_MODE
             break
 
-        else:
-            log.info("Invalid choice. Please try again")
+        log.info("Invalid choice. Please try again")
 
     return context
 
 
-def run_script_in_normal_mode(fuzz_test, test_case, list_test_cases, help):
+def run_script_in_normal_mode(fuzz_test, test_case, list_test_cases, show_help):
     fuzz_tests = list_fuzz_test_binaries()
 
-    if help or not fuzz_test:
+    if show_help or not fuzz_test:
         log.info("\nAVAILABLE FUZZTEST BINARIES in 'out' directory (each Binary can have multiple FUZZ_TESTs/TestCases): \n")
         previous_build_target_dir = ""
         for test in fuzz_tests:
@@ -364,9 +361,9 @@ def run_script_in_normal_mode(fuzz_test, test_case, list_test_cases, help):
 @click.option("--test-case", help="Specific test case to run in continuous mode OR add '--test-case all' to run all Testcases for a few seconds.")
 @click.option("--list-test-cases", is_flag=True, help="List available test cases for the given FuzzTest binary and exit.")
 @click.option("--interactive", is_flag=True, help="Run Script in Interactive Mode (automatically lists FuzzTests, TestCases and allows choosing easily).")
-@click.option('--help', is_flag=True, help="Show this message and exit.")
+@click.option('--help', 'show_help', is_flag=True, help="Show this message and exit.")
 @click.option("--output", help="Optional directory for coverage report (auto-generated if not provided).")
-def main(fuzz_test, test_case, list_test_cases, interactive, output, help):
+def main(fuzz_test, test_case, list_test_cases, interactive, output, show_help):
 
     coloredlogs.install(
         level="DEBUG",
@@ -378,7 +375,7 @@ def main(fuzz_test, test_case, list_test_cases, interactive, output, help):
         },
     )
 
-    if help or not fuzz_test:
+    if show_help or not fuzz_test:
         log.info("\nThis Script:")
         log.info("1. Runs Google FuzzTests in CONTINUOUS_FUZZ_MODE or UNIT_TEST_MODE")
         log.info("2. Automatically generates HTML Coverage Report if FuzzTest is coverage-instrumented.\n")
@@ -394,7 +391,7 @@ def main(fuzz_test, test_case, list_test_cases, interactive, output, help):
         if interactive:
             context = run_script_in_interactive_mode()
         else:
-            context = run_script_in_normal_mode(fuzz_test, test_case, list_test_cases, help)
+            context = run_script_in_normal_mode(fuzz_test, test_case, list_test_cases, show_help)
 
     except Exception as e:
         log.exception(e)

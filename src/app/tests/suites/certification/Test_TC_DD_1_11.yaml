@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2021-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,79 +32,106 @@ tests:
           Chip-tool command used below are an example to verify the DUT as commissioner test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
       disabled: true
 
+    - label: "Precondition"
+      verification: |
+          This step is required when using the reference platforms (e.g., RPIs) as devices to be commissioned. Please skip this step when validating with real devices.
+
+          The reference platform advertises only a single QR code per device, which is not sufficient to validate concatenated QR code onboarding payloads. Therefore, QR code payloads must be collected from two separate devices and combined for validation.
+
+          RPI 1:
+          Advertise the TH: ./chip-all-clusters-app --discriminator 3841 --passcode 20202021
+
+          RPI 2:
+          Advertise the TH: ./chip-all-clusters-app --discriminator 3842 --passcode 20202022
+
+          Save the QR code payloads from both devices for future concatenation and validation.
+
+          Example QR code payload: MT:Y.K90-Q000KA0648G00
+      disabled: true
+
     - label:
-          "Step 1: Scan QR code using concatenation (which supports the
-          commissioning of all the TH devices)"
+          "Step 1: Scan concatenated QR code containing multiple onboarding
+          payloads"
       PICS: MCORE.DD.CTRL_CONCATENATED_QR_CODE_1
       verification: |
-          Out of Scope, as Concatenated QR codes are not supported yet
-          https://github.com/project-chip/connectedhomeip/issues/5331
 
-          1. Lauch TH chip-all-clusters-app
-           sudo ./chip-all-clusters-app --wifi
+          Collect the QR codes for the devices to be commissioned (either real devices or RPI), and create a concatenated code out of them,
 
-          [13293:13293] CHIP:DL: Device Configuration:
-          [1653306603.740569][13293:13293] CHIP:DL:   Serial Number: TEST_SN
-          [1653306603.740607][13293:13293] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
-          [1653306603.740644][13293:13293] CHIP:DL:   Product Id: 32769 (0x8001)
-          [1653306603.740676][13293:13293] CHIP:DL:   Hardware Version: 0
-          [1653306603.740700][13293:13293] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
-          [1653306603.740722][13293:13293] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
-          [1653306603.740752][13293:13293] CHIP:DL:   Manufacturing Date: (not set)
-          [1653306603.740777][13293:13293] CHIP:DL:   Device Type: 65535 (0xFFFF)
-          [1653306603.740798][13293:13293] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
-          [1653306603.740846][13293:13293] CHIP:SVR: SetupQRCode: [MT:-24J042C00KA0648G00]
-          [1653306603.740877][13293:13293] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1653306603.740898][13293:13293] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
-          [1653306603.740929][13293:13293] CHIP:SVR: Manual pairing code: [34970112332]
-          [1653306603.740951][13293:13293] CHIP:-: ==== Onboarding payload for Custom Commissioning Flows ====
-          [1653306603.741000][13293:13293] CHIP:SVR: SetupQRCode: [MT:-24J0YXE00KA0648G00]
-          [1653306603.741028][13293:13293] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1653306603.741049][13293:13293] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0YXE00KA0648G00
-          [1653306603.741081][13293:13293] CHIP:SVR: Manual pairing code: [749701123365521327694]
+          e.g. "MT:-24J0CEK01KA0648G00" and "MT:-24J0KQS020O0648G00" get combined into "MT:-24J0CEK01KA0648G00*-24J0KQS020O0648G00"
+
+          Then create a graphic QR code for this combined code
+          (e.g. using https://www.nayuki.io/page/creating-a-qr-code-step-by-step )
+
+          ./chip-tool payload parse-setup-payload "MT:<payload1>*<payload2>"
+
+          Example: ./chip-tool payload parse-setup-payload "MT:-24J0CEK01KA0648G00*-24J0KQS020O0648G00"
+
+          Verify the DUT(chip-tool) is successfully parses all embedded onboarding payloads without error:
+
+          [1774458788.299] [30139:30139] [DL] ChipLinuxStorage::Init: Using KVS config file: /tmp/chip_tool_kvs
+          [1774458788.299] [30139:30139] [SPL] Parsing base38Representation: MT:-24J0CEK01KA0648G00*-24J0KQS020O0648G00
+          [1774458788.299] [30139:30139] [SPL] Version:             0
+          [1774458788.299] [30139:30139] [SPL] VendorID:            65521
+          [1774458788.299] [30139:30139] [SPL] ProductID:           32769
+          [1774458788.299] [30139:30139] [SPL] Custom flow:         0    (STANDARD)
+          [1774458788.299] [30139:30139] [SPL] Discovery Bitmask:   0x02 (BLE)
+          [1774458788.299] [30139:30139] [SPL] Long discriminator:  3841   (0xf01)
+          [1774458788.299] [30139:30139] [SPL] Passcode:            20202021
+          [1774458788.299] [30139:30139] [SPL] ----------
+          [1774458788.299] [30139:30139] [SPL] Version:             0
+          [1774458788.299] [30139:30139] [SPL] VendorID:            65521
+          [1774458788.299] [30139:30139] [SPL] ProductID:           32769
+          [1774458788.299] [30139:30139] [SPL] Custom flow:         0    (STANDARD)
+          [1774458788.299] [30139:30139] [SPL] Discovery Bitmask:   0x02 (BLE)
+          [1774458788.299] [30139:30139] [SPL] Long discriminator:  3842   (0xf02)
+          [1774458788.299] [30139:30139] [SPL] Passcode:            20202022
+
       disabled: true
 
     - label:
-          "Step 2: Verify the DUT follows the correct order of onboarding the TH
-          devices which must be from first to last starting from left to right."
-      PICS: MCORE.DD.CTRL_CONCATENATED_QR_CODE_1_INORDER
+          "Step 2: Commission each TH device one by one using the parsed payload
+          data"
       verification: |
-          Out of Scope for V1.0 as Concatenated QR codes are not supported yet
-          https://github.com/project-chip/connectedhomeip/issues/5331
-          Vendor specific field testcase
+
+          Commission the TH devices one by one by scanning the combined QR code from Step-1 with the DUT (commissioner device/app).
+
+          Example commands to commission the TH devices when using chip-tool as commissioner:
+
+          TH device 1:
+          ./chip-tool pairing onnetwork 1 20202021
+
+          Verify the DUT(chip-tool) successfully commissions the TH device using the parsed payload data.
+
+          [1771308802.157] [9230:9232] [CTL] Commissioning complete for node ID 0x0000000000000001: success
+          [1771308802.157] [9230:9232] [TOO] Device commissioning completed with success
+          [1771308802.157] [9230:9232] [DMG] ICR moving to [AwaitingDe]
+
+          TH device 2:
+          ./chip-tool pairing onnetwork 2 20202022
+
+          Verify the DUT(chip-tool) successfully commissions the TH device using the parsed payload data.
+
+          [1771308802.157] [9230:9232] [CTL] Commissioning complete for node ID 0x0000000000000002: success
+          [1771308802.157] [9230:9232] [TOO] Device commissioning completed with success
+          [1771308802.157] [9230:9232] [DMG] ICR moving to [AwaitingDe]
+
+          Note: Update the passcode values according to the parsed QR payload data of each TH device.
+
       disabled: true
 
     - label:
-          "Step 3: Verify the DUT indicates to the user the need to commission
-          TH devices one by one by scanning their individual QR codes."
+          "Step 3: Verify the DUT indicates to the user that TH devices must be
+          commissioned individually using their separate QR codes or Manual
+          Pairing Codes, when the combined QR code from Step-1 is scanned using
+          the DUT=Commissioner device/app"
       PICS:
           "!(MCORE.DD.CTRL_CONCATENATED_QR_CODE_1) &&
           MCORE.DD.CTRL_CONCATENATED_QR_CODE_2"
       verification: |
-          Out of Scope for V1.0 as Concatenated QR codes are not supported yet
-          https://github.com/project-chip/connectedhomeip/issues/5331
-          Vendor specific field testcase
-      disabled: true
+          The reference platform (Raspberry Pi running sample applications) does not support user-facing commissioning flows or QR scanning behavior associated with MCORE.DD.CTRL_CONCATENATED_QR_CODE_2.
+          Therefore, this test step is not verifiable on the RPI reference platform.
 
-    - label:
-          "Step 4: Verify the DUT does NOT indicate to the user the need to
-          commission TH devices one by one by scanning their individual QR
-          codes, but instead warns the user (in a way described by the provider
-          of the DUT) that the QR code cannot be processed."
-      PICS:
-          "!(MCORE.DD.CTRL_CONCATENATED_QR_CODE_1) &&
-          !(MCORE.DD.CTRL_CONCATENATED_QR_CODE_2)"
-      verification: |
-          Out of Scope for V1.0 as Concatenated QR codes are not supported yet
-          https://github.com/project-chip/connectedhomeip/issues/5331
-          Vendor specific field testcase
-      disabled: true
+          This test step can be validated using real Commissioner devices that support user interaction and concatenated QR code handling when
+          !(MCORE.DD.CTRL_CONCATENATED_QR_CODE_1) && MCORE.DD.CTRL_CONCATENATED_QR_CODE_2.
 
-    - label:
-          "Step 5: Scan QR code using concatenation (which supports the
-          commissioning of all the TH devices)"
-      verification: |
-          Out of Scope, as Concatenated QR codes are not supported yet
-          https://github.com/project-chip/connectedhomeip/issues/5331
-          Vendor specific field testcase
       disabled: true

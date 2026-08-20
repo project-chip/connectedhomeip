@@ -27,7 +27,7 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    CHIP_NO_LOG_TIMESTAMPS: true
+    CHIP_LOG_TIMESTAMPS: false
 
 jobs:
     chef_linux_all_devices:
@@ -37,12 +37,14 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:174
+            image: ghcr.io/project-chip/chip-build:200
+            volumes:
+                - "/:/runner-root-volume"
             options: --user root
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -52,13 +54,18 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci_linux"
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     chef_device_functional_test:
         name: Chef - Device functional tests (Linux)
         if: github.actor != 'restyled-io[bot]'
         timeout-minutes: 90
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/project-chip/chip-build:174
+            image: ghcr.io/project-chip/chip-build:200
             options: >-
                 --privileged
                 --sysctl net.ipv6.conf.all.disable_ipv6=0
@@ -67,7 +74,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -90,18 +97,25 @@ jobs:
                   ./examples/chef/chef.py -br -d rootnode_dimmablelight_bCwGYSDpoe -t linux
                   scripts/run_in_python_env.sh out/python_env './scripts/tests/run_python_test.py --app examples/chef/linux/out/rootnode_dimmablelight_bCwGYSDpoe --factory-reset --script ./examples/chef/tests/dimmablelight_test.py --script-args "--commissioning-method on-network --discriminator 3840 --passcode 20202021" --app-stdin-pipe /tmp/chef_stdin.txt'
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     chef_esp32:
         name: Chef - ESP32 CI Examples
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:174
+            image: ghcr.io/project-chip/chip-build-esp32:200
+            volumes:
+                - "/:/runner-root-volume"
             options: --user root
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
             - name: Checkout submodules
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -112,18 +126,25 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t esp32"
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     chef_nrfconnect:
         name: Chef - NRFConnect CI Examples
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nrf-platform:174
+            image: ghcr.io/project-chip/chip-build-nrf-platform:200
+            volumes:
+                - "/:/runner-root-volume"
             options: --user root
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -133,26 +154,38 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t nrfconnect"
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     chef_telink:
         name: Chef - Telink CI Examples
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:174
+            image: ghcr.io/project-chip/chip-build-telink:200
+            volumes:
+                - "/:/runner-root-volume"
             options: --user root
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: telink
             # - name: Update Zephyr to specific revision (for developers purpose)
             #   shell: bash
-            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 86fb5f1142c99e04abc923f4c0aa5fafb2ea9ace"
+            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 1f4804a19fe7ba792bfc315948043d5515e74cd2"
             - name: CI Examples Telink
               shell: bash
               run: |
                   ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t telink"
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

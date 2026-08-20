@@ -25,9 +25,9 @@ namespace chip {
 namespace DeviceLayer {
 namespace InetUtils {
 
-in6_addr ToZephyrAddr(const Inet::IPAddress & address)
+ZephyrIn6Addr ToZephyrAddr(const Inet::IPAddress & address)
 {
-    in6_addr zephyrAddr;
+    ZephyrIn6Addr zephyrAddr;
 
     static_assert(sizeof(zephyrAddr.s6_addr) == sizeof(address.Addr), "Unexpected address size");
     memcpy(zephyrAddr.s6_addr, address.Addr, sizeof(address.Addr));

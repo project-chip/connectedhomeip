@@ -21,15 +21,42 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "TestZoneManagement"
 
-  test_sources = [ "TestZonePolygon.cpp" ]
-
-  sources = []
+  test_sources = [
+    "TestZoneManagementCluster.cpp",
+    "TestZonePolygon.cpp",
+  ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/app/clusters/testing",
     "${chip_root}/src/app/clusters/zone-management-server",
+    "${chip_root}/src/app/server-cluster/testing",
+    "${chip_root}/src/app/server-cluster/testing:testing",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
+chip_test_suite("tests-backwards-compatibility") {
+  import(
+      "${chip_root}/src/app/clusters/zone-management-server/app_config_dependent_sources.gni")
+
+  output_name = "TestZoneManagementClusterBackwardsCompatibility"
+
+  test_sources = [ "TestZoneManagementClusterBackwardsCompatibility.cpp" ]
+
+  # Prefix app_config_dependent_sources with "../" and add to the sources list.
+  sources = []
+  foreach(file, app_config_dependent_sources) {
+    sources += [ "../" + file ]
+  }
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/app/clusters/zone-management-server",
+    "${chip_root}/src/app/server-cluster/testing",
+    "${chip_root}/src/app/server-cluster/testing:testing",
+    "${chip_root}/src/data-model-providers/codegen/tests:mock_model",
     "${chip_root}/src/lib/support",
   ]
 }

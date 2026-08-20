@@ -22,6 +22,7 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestAttributePersistence.cpp",
+    "TestAttributePersistenceMigration.cpp",
     "TestPascalString.cpp",
     "TestString.cpp",
   ]
@@ -30,6 +31,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/persistence",
     "${chip_root}/src/app/persistence:default",
+    "${chip_root}/src/app/persistence:migration",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support:testing",
   ]

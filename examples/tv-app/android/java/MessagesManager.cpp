@@ -304,7 +304,8 @@ exit:
 CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
     const ByteSpan & messageId, const MessagePriorityEnum & priority, const BitMask<MessageControlBitmap> & messageControl,
     const DataModel::Nullable<uint32_t> & startTime, const DataModel::Nullable<uint64_t> & duration, const CharSpan & messageText,
-    const Optional<DataModel::DecodableList<MessageResponseOption>> & responses)
+    const Optional<DataModel::DecodableList<MessageResponseOption>> & responses, const Optional<CharSpan> & /* languageCode */,
+    const Optional<CharSpan> & /* messageUri */)
 {
     DeviceLayer::StackUnlock unlock;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -325,15 +326,19 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
                 chip::Encoding::BytesToUppercaseHexString(messageId.data(), messageId.size(), hex_buf, sizeof(hex_buf)),
             CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "BytesToUppercaseHexString failed"));
 
-        jstring jid = env->NewStringUTF(hex_buf);
-        if (jid == nullptr)
+        jstring jid    = nullptr;
+        CHIP_ERROR err = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan(hex_buf, strlen(hex_buf)),
+                                                                      reinterpret_cast<jobject &>(jid));
+        if (err != CHIP_NO_ERROR)
         {
             return CHIP_ERROR_INTERNAL;
         }
 
         std::string smessageText(messageText.data(), messageText.size());
-        jstring jmessageText = env->NewStringUTF(smessageText.c_str());
-        if (jmessageText == nullptr)
+        jstring jmessageText = nullptr;
+        err = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan(smessageText.c_str(), smessageText.length()),
+                                                           reinterpret_cast<jobject &>(jmessageText));
+        if (err != CHIP_NO_ERROR)
         {
             return CHIP_ERROR_INTERNAL;
         }
@@ -378,8 +383,10 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
                 auto & response = iter.GetValue();
 
                 std::string label(response.label.Value().data(), response.label.Value().size());
-                jstring jlabel = env->NewStringUTF(label.c_str());
-                if (jlabel == nullptr)
+                jstring jlabel      = nullptr;
+                CHIP_ERROR labelErr = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan(label.c_str(), label.length()),
+                                                                                   reinterpret_cast<jobject &>(jlabel));
+                if (labelErr != CHIP_NO_ERROR)
                 {
                     return CHIP_ERROR_INTERNAL;
                 }
@@ -412,6 +419,16 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR MessagesManager::HandleGetSupportedLanguageCodes(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.EncodeEmptyList();
+}
+
+CHIP_ERROR MessagesManager::HandleGetSupportedMimeTypes(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.EncodeEmptyList();
+}
+
 CHIP_ERROR MessagesManager::HandleCancelMessagesRequest(const DataModel::DecodableList<ByteSpan> & messageIds)
 {
     DeviceLayer::StackUnlock unlock;
@@ -437,8 +454,10 @@ CHIP_ERROR MessagesManager::HandleCancelMessagesRequest(const DataModel::Decodab
                                 chip::Encoding::BytesToUppercaseHexString(id.data(), id.size(), hex_buf, sizeof(hex_buf)),
                             CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "BytesToUppercaseHexString failed"));
 
-        jstring jid = env->NewStringUTF(hex_buf);
-        if (jid == nullptr)
+        jstring jid      = nullptr;
+        CHIP_ERROR idErr = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan(hex_buf, strlen(hex_buf)),
+                                                                        reinterpret_cast<jobject &>(jid));
+        if (idErr != CHIP_NO_ERROR)
         {
             return CHIP_ERROR_INTERNAL;
         }

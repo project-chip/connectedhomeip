@@ -29,7 +29,6 @@ import time
 from dataclasses import dataclass
 from enum import Flag, auto
 from pathlib import Path
-from typing import List
 
 log = logging.getLogger(__name__)
 
@@ -108,7 +107,7 @@ class ZapInput:
 
         return "chef" in self.zap_file
 
-    def build_command(self, script: str) -> List[str]:
+    def build_command(self, script: str) -> list[str]:
         """What command to execute for this zap input. """
         if self.zap_file:
             return [script, self.zap_file]
@@ -147,10 +146,9 @@ class ZAPGenerateTarget:
     def MatterIdlTarget(zap_config: ZapInput, client_side=False, matter_file_name=None):
         if client_side:
             return ZAPGenerateTarget(zap_config, matter_file_name=matter_file_name, template="src/app/zap-templates/matter-idl-client.json", output_dir=None)
-        else:
-            # NOTE: this assumes `src/app/zap-templates/matter-idl-server.json` is the
-            #       DEFAULT generation target and it needs no output_dir
-            return ZAPGenerateTarget(zap_config, matter_file_name=matter_file_name, template=None, output_dir=None)
+        # NOTE: this assumes `src/app/zap-templates/matter-idl-server.json` is the
+        #       DEFAULT generation target and it needs no output_dir
+        return ZAPGenerateTarget(zap_config, matter_file_name=matter_file_name, template=None, output_dir=None)
 
     def __init__(self, zap_config: ZapInput, template, output_dir=None, matter_file_name=None):
         self.script = './scripts/tools/zap/generate.py'
@@ -177,8 +175,7 @@ class ZAPGenerateTarget:
             # directory (e.g. chef) so we claim the zap config is an output directory
             # for uniqueness
             return ZapDistinctOutput(input_template=None, output_directory=self.zap_config.value)
-        else:
-            return ZapDistinctOutput(input_template=self.template, output_directory=self.output_dir)
+        return ZapDistinctOutput(input_template=self.template, output_directory=self.output_dir)
 
     def log_command(self):
         """Log the command that will get run for this target
@@ -230,7 +227,7 @@ class ZAPGenerateTarget:
         )
 
 
-class GoldenTestImageTarget():
+class GoldenTestImageTarget:
     def __init__(self):
         # NOTE: output-path is inside the tree. This is because clang-format
         #       will search for a .clang-format file in the directory tree
@@ -269,7 +266,7 @@ class GoldenTestImageTarget():
         log.info("  %s", shlex.join(self.command))
 
 
-class JinjaCodegenTarget():
+class JinjaCodegenTarget:
     def __init__(self, generator: str, output_directory: str, idl_path: str):
         # This runs a test, but the important bit is we pass `--regenerate`
         # to it and this will cause it to OVERWRITE golden images.
@@ -300,13 +297,6 @@ class JinjaCodegenTarget():
         log.info("  %s", shlex.join(self.command))
 
 
-def checkPythonVersion():
-    if sys.version_info[0] < 3:
-        print('Must use Python 3. Current version is ' +
-              str(sys.version_info[0]))
-        exit(1)
-
-
 def setupArgumentsParser():
     parser = argparse.ArgumentParser(
         description='Generate content from ZAP files')
@@ -316,12 +306,8 @@ def setupArgumentsParser():
                         help="Don't do any generation, just log what targets would be generated (default: False)")
     parser.add_argument('--run-bootstrap', default=None, action='store_true',
                         help='Automatically run ZAP bootstrap. By default the bootstrap is not triggered')
-
-    parser.add_argument('--parallel', action='store_true')
-    parser.add_argument('--no-parallel', action='store_false', dest='parallel')
-    parser.add_argument('--no-rerun-in-env', action='store_false', dest='rerun_in_env')
-    parser.set_defaults(parallel=True, rerun_in_env=True)
-
+    parser.add_argument('--parallel', action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument('--rerun-in-env', action=argparse.BooleanOptionalAction, default=True)
     args = parser.parse_args()
 
     # Convert a list of target_types (as strings)
@@ -417,19 +403,19 @@ def getSpecificTemplatesTargets():
     return targets
 
 
-def getTargets(type):
+def getTargets(target_type):
     targets = []
 
-    if type & TargetType.GLOBAL:
+    if target_type & TargetType.GLOBAL:
         targets.extend(getGlobalTemplatesTargets())
 
-    if type & TargetType.SPECIFIC:
+    if target_type & TargetType.SPECIFIC:
         targets.extend(getSpecificTemplatesTargets())
 
-    if type & TargetType.IDL_CODEGEN:
+    if target_type & TargetType.IDL_CODEGEN:
         targets.extend(getCodegenTemplates())
 
-    if type & TargetType.GOLDEN_TEST_IMAGES:
+    if target_type & TargetType.GOLDEN_TEST_IMAGES:
         targets.extend(getGoldenTestImageTargets())
 
     log.info("Targets to be generated:")
@@ -448,7 +434,7 @@ def getTargets(type):
                 if t.distinct_output() == o:
                     log.error("   %s", t.zap_config)
 
-            raise Exception("Duplicate/overlapping output directory: %r" % o)
+            raise Exception(f"Duplicate/overlapping output directory: {o!r}")
 
         distinct_outputs.add(o)
 
@@ -488,7 +474,6 @@ def main():
             os.execv(launcher, [launcher, shlex.join(what_to_run)])
         sys.exit(1)
 
-    checkPythonVersion()
     os.chdir(CHIP_ROOT_DIR)
     args = setupArgumentsParser()
 
@@ -539,12 +524,9 @@ def main():
             tmpl = tmpl.replace("/zap-templates/", "/../")
             tmpl = tmpl.replace("/templates/", "/../")
 
-        print(" %8d | %50s | %50s" % (
-            timing.generate_time,
-            ".." + timing.config[len(timing.config) -
-                                 48:] if len(timing.config) > 50 else timing.config,
-            ".." + tmpl[len(tmpl) - 48:] if len(tmpl) > 50 else tmpl,
-        ))
+        config = ".." + timing.config[len(timing.config) - 48:] if len(timing.config) > 50 else timing.config
+        template = ".." + tmpl[len(tmpl) - 48:] if len(tmpl) > 50 else tmpl
+        print(f" {timing.generate_time:8} | {config:>50s} | {template:>50s}")
 
 
 if __name__ == '__main__':

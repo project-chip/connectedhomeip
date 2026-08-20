@@ -149,8 +149,8 @@ TEST_F(TestPowerSourceCluster, TestEndpointList)
 
     // we checked earlier that this fit
     // This test just uses endpoints in order, so we want to set endpoints from
-    // 0 to chip::Test::numEndpoints - 1, and use this for overflow checking
-    chip::Test::numEndpoints = static_cast<EndpointId>(powerSourceServer.GetNumSupportedEndpointLists());
+    // 0 to chip::Testing::numEndpoints - 1, and use this for overflow checking
+    chip::Testing::numEndpoints = static_cast<EndpointId>(powerSourceServer.GetNumSupportedEndpointLists());
 
     // Endpoint 0 - list of 5
     err = powerSourceServer.SetEndpointList(0, Span<EndpointId>(list0));
@@ -175,7 +175,7 @@ TEST_F(TestPowerSourceCluster, TestEndpointList)
     }
 
     // Remaining endpoints - list of 1
-    for (EndpointId ep = 2; ep < chip::Test::numEndpoints; ++ep)
+    for (EndpointId ep = 2; ep < chip::Testing::numEndpoints; ++ep)
     {
         err = powerSourceServer.SetEndpointList(ep, Span<EndpointId>(listRest));
         EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -217,7 +217,7 @@ TEST_F(TestPowerSourceCluster, TestEndpointList)
     }
 
     // Remaining endpoints
-    for (EndpointId ep = 2; ep < chip::Test::numEndpoints; ++ep)
+    for (EndpointId ep = 2; ep < chip::Testing::numEndpoints; ++ep)
     {
         readBack = powerSourceServer.GetEndpointList(ep);
         ASSERT_NE(readBack, nullptr);
@@ -242,7 +242,7 @@ TEST_F(TestPowerSourceCluster, TestEndpointList)
     }
 
     // Ensure only the overwritten list was changed, using read interface
-    for (EndpointId ep = 0; ep < chip::Test::numEndpoints + 1; ++ep)
+    for (EndpointId ep = 0; ep < chip::Testing::numEndpoints + 1; ++ep)
     {
         std::vector<EndpointId> vec = ReadEndpointsThroughAttributeReader(ep);
         if (ep == 0)
@@ -253,7 +253,7 @@ TEST_F(TestPowerSourceCluster, TestEndpointList)
                 EXPECT_EQ(vec[j], list0[j]);
             }
         }
-        else if (ep == chip::Test::numEndpoints)
+        else if (ep == chip::Testing::numEndpoints)
         {
             EXPECT_EQ(vec.size(), 0u);
         }
@@ -270,7 +270,7 @@ TEST_F(TestPowerSourceCluster, TestEndpointList)
     // *****************
     // Test removal
     // *****************
-    for (EndpointId ep = 0; ep < chip::Test::numEndpoints; ++ep)
+    for (EndpointId ep = 0; ep < chip::Testing::numEndpoints; ++ep)
     {
         err = powerSourceServer.SetEndpointList(ep, Span<EndpointId>());
         EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -279,7 +279,7 @@ TEST_F(TestPowerSourceCluster, TestEndpointList)
     }
 
     // Check through the read interface
-    for (EndpointId ep = 0; ep < chip::Test::numEndpoints + 1; ++ep)
+    for (EndpointId ep = 0; ep < chip::Testing::numEndpoints + 1; ++ep)
     {
         std::vector<EndpointId> vec = ReadEndpointsThroughAttributeReader(ep);
         EXPECT_EQ(vec.size(), 0u);

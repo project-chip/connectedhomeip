@@ -32,6 +32,23 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs2
+#       --device microwave-oven
+#       --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -39,7 +56,11 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_MWOM_1_2(MatterBaseTest):
@@ -52,18 +73,16 @@ class TC_MWOM_1_2(MatterBaseTest):
         return "[TC-MWOM-1.2] Cluster attributes with DUT as Server"
 
     def steps_TC_MWOM_1_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the SupportedModes attribute"),
             TestStep(3, "Read the CurrentMode attribute"),
         ]
-        return steps
 
     def pics_TC_MWOM_1_2(self) -> list[str]:
-        pics = [
+        return [
             "MWOM.S",
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:
@@ -108,22 +127,22 @@ class TC_MWOM_1_2(MatterBaseTest):
         except AttributeError:
             derivedTags = Clusters.MicrowaveOvenMode.Enums.ModeTag
 
-        logging.info("Derived tags: %s" % derivedTags)
+        log.info("Derived tags: %s", derivedTags)
 
         for m in supported_modes:
             for t in m.modeTags:
-                is_mfg = (0x8000 <= t.value and t.value <= 0xBFFF)
-                asserts.assert_true(t.value in commonTags.keys() or t.value in derivedTags or is_mfg,
+                is_mfg = 0x8000 <= t.value <= 0xBFFF
+                asserts.assert_true(t.value in commonTags or t.value in derivedTags or is_mfg,
                                     "Found a SupportedModes entry with invalid mode tag value!")
                 if t.value == Clusters.MicrowaveOvenMode.Enums.ModeTag.kNormal:
                     normal_present = True
-                    logging.info("Found normal mode tag %s with tag value %s", m.mode, t.value)
+                    log.info("Found normal mode tag %s with tag value %s", m.mode, t.value)
 
         asserts.assert_true(normal_present, "SupportedModes does not have an entry of Normal(0x4000)")
 
         self.step(3)
         current_mode = await self.read_mod_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentMode)
-        logging.info("CurrentMode: %s" % current_mode)
+        log.info("CurrentMode: %s", current_mode)
         asserts.assert_true(current_mode in modes, "CurrentMode is not a supported mode!")
 
 

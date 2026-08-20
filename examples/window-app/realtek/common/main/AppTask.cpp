@@ -18,7 +18,6 @@
 #include <stdlib.h>
 
 #include "AppConfig.h"
-#include "AppEvent.h"
 #include "AppTask.h"
 #include "util/RealtekObserver.h"
 
@@ -43,8 +42,10 @@
 #include <CHIPDeviceManager.h>
 #include <DeviceCallbacks.h>
 
+#include "matter_ble.h"
 #include "matter_gpio.h"
 #include <os_mem.h>
+#include <os_msg.h>
 #include <os_task.h>
 
 #if CONFIG_ENABLE_CHIP_SHELL
@@ -58,15 +59,20 @@ using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::System;
 
+#define MAX_NUMBER_OF_GAP_MESSAGE 0x10                                                     //!<  GAP message queue size
+#define MAX_NUMBER_OF_IO_MESSAGE 0x10                                                      //!<  IO message queue size
+#define MAX_NUMBER_OF_EVENT_MESSAGE (MAX_NUMBER_OF_GAP_MESSAGE + MAX_NUMBER_OF_IO_MESSAGE) //!< Event message queue size
+#define IO_MSG_WAIT_TIMEOUT 500
+
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 5000
 #define RESET_TRIGGER_TIMEOUT 1500
 
 #define APP_TASK_STACK_SIZE (4 * 1024)
 #define APP_TASK_PRIORITY 2
-#define APP_EVENT_QUEUE_SIZE 10
 
-TaskHandle_t sAppTaskHandle;
-QueueHandle_t sAppEventQueue;
+static void * app_task_handle      = NULL; //!< APP Task handle
+static void * app_evt_queue_handle = NULL; //!< Event queue handle
+static void * app_io_queue_handle  = NULL; //!< IO queue handle
 
 static DeviceCallbacks EchoCallbacks;
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
@@ -128,18 +134,33 @@ void UnlockOpenThreadTask(void)
     chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
 }
 
-CHIP_ERROR AppTask::StartAppTask()
+bool AppTask::PostMessage(T_IO_MSG * p_msg)
 {
-    sAppEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
-    if (sAppEventQueue == nullptr)
+    uint8_t event = EVENT_IO_TO_APP;
+
+    if (app_evt_queue_handle == NULL || app_io_queue_handle == NULL)
     {
-        ChipLogError(NotSpecified, "Failed to allocate app event queue");
-        return CHIP_ERROR_NO_MEMORY;
+        return false;
     }
 
-    // Start App task.
-    xTaskCreate(AppTaskMain, APP_TASK_NAME, APP_TASK_STACK_SIZE / sizeof(StackType_t), NULL, APP_TASK_PRIORITY, &sAppTaskHandle);
-    if (sAppTaskHandle == nullptr)
+    if (os_msg_send(app_evt_queue_handle, &event, 0) == false)
+    {
+        ChipLogError(DeviceLayer, "send_evt_msg_to_app fail");
+        return false;
+    }
+
+    if (os_msg_send(app_io_queue_handle, p_msg, 0) == false)
+    {
+        ChipLogError(DeviceLayer, "send_io_msg_to_app fail");
+        return false;
+    }
+
+    return true;
+}
+
+CHIP_ERROR AppTask::StartAppTask()
+{
+    if (!os_task_create(&app_task_handle, APP_TASK_NAME, AppTaskMain, 0, APP_TASK_STACK_SIZE, APP_TASK_PRIORITY))
     {
         return CHIP_ERROR_NO_MEMORY;
     }
@@ -149,25 +170,67 @@ CHIP_ERROR AppTask::StartAppTask()
 
 void AppTask::AppTaskMain(void * pvParameter)
 {
+    uint8_t event;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
 #if defined(FEATURE_TRUSTZONE_ENABLE) && (FEATURE_TRUSTZONE_ENABLE == 1)
     os_alloc_secure_ctx(1024);
 #endif
-    AppEvent event;
 
-    sAppTask.Init();
+    os_msg_queue_create(&app_io_queue_handle, "ioQ", MAX_NUMBER_OF_IO_MESSAGE, sizeof(T_IO_MSG));
+    os_msg_queue_create(&app_evt_queue_handle, "evtQ", MAX_NUMBER_OF_EVENT_MESSAGE, sizeof(uint8_t));
+
+    gap_start_bt_stack(app_evt_queue_handle, app_io_queue_handle, MAX_NUMBER_OF_GAP_MESSAGE);
+    matter_ble_queue_init(app_evt_queue_handle, app_io_queue_handle);
+
+    err = sAppTask.Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "sAppTask.Init() failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return;
+    }
 
     while (true)
     {
-        /* Task pend until we have stuff to do */
-        if (xQueueReceive(sAppEventQueue, &event, portMAX_DELAY) == pdTRUE)
+        if (os_msg_recv(app_evt_queue_handle, &event, 0xFFFFFFFF) == true)
         {
-            sAppTask.DispatchEvent(&event);
+            if (event == EVENT_IO_TO_APP)
+            {
+                T_IO_MSG io_msg;
+                if (os_msg_recv(app_io_queue_handle, &io_msg, IO_MSG_WAIT_TIMEOUT) == true)
+                {
+                    switch (io_msg.type)
+                    {
+                    case IO_MSG_TYPE_GPIO:
+                        ButtonHandler(&io_msg);
+                        break;
+
+                    case IO_MSG_TYPE_TIMER:
+                        FunctionTimerEventHandler(&io_msg);
+                        break;
+
+                    default:
+                        matter_ble_handle_io_msg(&io_msg);
+                        break;
+                    }
+                }
+                else
+                {
+                    ChipLogError(DeviceLayer, "CRITICAL: Received EVENT_IO_TO_APP but failed to retrieve IO message.");
+                }
+            }
+            else
+            {
+                gap_handle_msg(event);
+            }
         }
     }
 }
 
 void AppTask::InitServer(intptr_t context)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
     // Init ZCL Data Model and start server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
@@ -189,55 +252,25 @@ void AppTask::InitServer(intptr_t context)
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
-    chip::Server::GetInstance().Init(initParams);
+    err = chip::Server::GetInstance().Init(initParams);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Server::GetInstance().Init() failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return;
+    }
 
     static RealtekObserver sRealtekObserver;
-    chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sRealtekObserver);
+    err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sRealtekObserver);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "AddFabricDelegate failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
 
     WindowCovering::Instance().PositionLEDUpdate(WindowCovering::MoveType::LIFT);
     WindowCovering::Instance().PositionLEDUpdate(WindowCovering::MoveType::TILT);
-}
-
-void AppTask::PostEvent(const AppEvent * aEvent)
-{
-    if (sAppEventQueue != nullptr)
-    {
-        BaseType_t status;
-        if (xPortIsInsideInterrupt())
-        {
-            BaseType_t higherPrioTaskWoken = pdFALSE;
-            status                         = xQueueSendFromISR(sAppEventQueue, aEvent, &higherPrioTaskWoken);
-            portYIELD_FROM_ISR(higherPrioTaskWoken);
-        }
-        else
-        {
-            status = xQueueSend(sAppEventQueue, aEvent, 1);
-        }
-
-        if (!status)
-        {
-            ChipLogError(NotSpecified, "Failed to post event to app task event queue");
-        }
-    }
-    else
-    {
-        ChipLogError(NotSpecified, "Event Queue is nullptr should never happen");
-    }
-}
-
-void AppTask::DispatchEvent(AppEvent * aEvent)
-{
-    if (aEvent->Handler)
-    {
-        aEvent->Handler(aEvent);
-    }
-    else
-    {
-        ChipLogError(NotSpecified, "Event received with no handler. Dropping event.");
-    }
 }
 
 void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnPressed)
@@ -249,89 +282,24 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnPressed)
 
     ChipLogProgress(NotSpecified, "ButtonEventHandler %d, %d", btnIdx, btnPressed);
 
-    AppEvent button_event              = {};
-    button_event.ButtonEvent.ButtonIdx = btnIdx;
-    button_event.Type                  = AppEvent::kEventType_Button;
-    button_event.ButtonEvent.Action    = btnPressed ? true : false;
+    T_IO_MSG io_msg;
 
-    switch (btnIdx)
-    {
-    case APP_FUNCTION_BUTTON: {
-        // Hand off to Functionality handler - depends on duration of press
-        button_event.Handler = FunctionHandler;
-    }
-    break;
+    io_msg.type    = IO_MSG_TYPE_GPIO;
+    io_msg.subtype = btnIdx;
+    io_msg.u.param = btnPressed;
 
-    case APP_TOGGLE_BUTTON:
-    case APP_CLOSE_BUTTON:
-    case APP_OPEN_BUTTON: {
-        button_event.Handler = WindowActionEventHandler;
-    }
-    break;
-
-    default:
-        return;
-    }
-
-    sAppTask.PostEvent(&button_event);
+    PostMessage(&io_msg);
 }
 
-void AppTask::FunctionHandler(AppEvent * aEvent)
+void AppTask::ButtonHandler(T_IO_MSG * p_msg)
 {
-    if (aEvent->ButtonEvent.ButtonIdx != APP_FUNCTION_BUTTON)
-    {
-        return;
-    }
+    uint8_t key         = p_msg->subtype;
+    uint32_t btnPressed = p_msg->u.param;
 
-    if (aEvent->ButtonEvent.Action == true)
-    {
-        if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_NoneSelected)
-        {
-            ChipLogProgress(NotSpecified, "[BTN] Hold to select function:");
-            ChipLogProgress(NotSpecified, "[BTN] - Reset (0-1.5s)");
-            ChipLogProgress(NotSpecified, "[BTN] - Factory Reset (>6.5s)");
-
-            sAppTask.StartTimer(RESET_TRIGGER_TIMEOUT);
-            sAppTask.mFunction = kFunction_Reset;
-        }
-    }
-    else
-    {
-        // If the button was released before 1.5sec, trigger RESET.
-        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_Reset)
-        {
-            sAppTask.CancelTimer();
-            sAppTask.mFunction = kFunction_NoneSelected;
-
-            chip::DeviceManager::CHIPDeviceManager::GetInstance().Shutdown();
-            WDT_SystemReset(RESET_ALL, SW_RESET_APP_START);
-        }
-        else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
-        {
-            EchoCallbacks.UpdateStatusLED();
-            sAppTask.CancelTimer();
-            sAppTask.mFunction = kFunction_NoneSelected;
-            ChipLogProgress(NotSpecified, "[BTN] Factory Reset has been Canceled");
-        }
-    }
-}
-
-void AppTask::OpenHandler(intptr_t)
-{
-    WindowCovering::Instance().SetSingleStepTarget(OperationalState::MovingUpOrOpen);
-}
-
-void AppTask::CloseHandler(intptr_t)
-{
-    WindowCovering::Instance().SetSingleStepTarget(OperationalState::MovingDownOrClose);
-}
-
-void AppTask::WindowActionEventHandler(AppEvent * aEvent)
-{
-    switch (aEvent->ButtonEvent.ButtonIdx)
+    switch (key)
     {
     case APP_TOGGLE_BUTTON:
-        if (aEvent->ButtonEvent.Action == false)
+        if (btnPressed)
         {
             if (WindowCovering::Instance().GetMoveType() == WindowCovering::MoveType::LIFT)
             {
@@ -347,40 +315,88 @@ void AppTask::WindowActionEventHandler(AppEvent * aEvent)
         break;
 
     case APP_CLOSE_BUTTON:
-        if (aEvent->ButtonEvent.Action == false)
+        if (btnPressed)
         {
-            PlatformMgr().ScheduleWork(CloseHandler);
+            // ScheduleWork is asynchronous and returns immediately.
+            // Failure means the work couldn't be queued, but there's nothing
+            // we can do about it here, so the return value can be safely ignored.
+            RETURN_SAFELY_IGNORED(PlatformMgr().ScheduleWork(CloseHandler));
         }
         break;
 
     case APP_OPEN_BUTTON:
-        if (aEvent->ButtonEvent.Action == false)
+        if (btnPressed)
         {
-            PlatformMgr().ScheduleWork(OpenHandler);
+            // ScheduleWork is asynchronous and returns immediately.
+            // Failure means the work couldn't be queued, but there's nothing
+            // we can do about it here, so the return value can be safely ignored.
+            RETURN_SAFELY_IGNORED(PlatformMgr().ScheduleWork(OpenHandler));
         }
         break;
+
+    case APP_FUNCTION_BUTTON: {
+        if (btnPressed)
+        {
+            if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_NoneSelected)
+            {
+                ChipLogProgress(NotSpecified, "[BTN] Hold to select function:");
+                ChipLogProgress(NotSpecified, "[BTN] - Reset (0-1.5s)");
+                ChipLogProgress(NotSpecified, "[BTN] - Factory Reset (>6.5s)");
+
+                sAppTask.StartTimer(RESET_TRIGGER_TIMEOUT);
+                sAppTask.mFunction = kFunction_Reset;
+            }
+        }
+        else
+        {
+            // If the button was released before 1.5sec, trigger RESET.
+            if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_Reset)
+            {
+                sAppTask.CancelTimer();
+                sAppTask.mFunction = kFunction_NoneSelected;
+
+                chip::DeviceManager::CHIPDeviceManager::GetInstance().Shutdown();
+                WDG_SystemReset(RESET_ALL, SW_RESET_APP_START);
+            }
+            else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
+            {
+                EchoCallbacks.UpdateStatusLED();
+                sAppTask.CancelTimer();
+                sAppTask.mFunction = kFunction_NoneSelected;
+                ChipLogProgress(NotSpecified, "[BTN] Factory Reset has been Canceled");
+            }
+        }
+    }
+    break;
 
     default:
         break;
     }
 }
 
-void AppTask::TimerEventHandler(chip::System::Layer * aLayer, void * aAppState)
+void AppTask::OpenHandler(intptr_t)
 {
-    AppEvent event;
-    event.Type               = AppEvent::kEventType_Timer;
-    event.TimerEvent.Context = aAppState;
-    event.Handler            = FunctionTimerEventHandler;
-    sAppTask.PostEvent(&event);
+    WindowCovering::Instance().SetSingleStepTarget(OperationalState::MovingUpOrOpen);
 }
 
-void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
+void AppTask::CloseHandler(intptr_t)
 {
-    if (aEvent->Type != AppEvent::kEventType_Timer)
-    {
-        return;
-    }
+    WindowCovering::Instance().SetSingleStepTarget(OperationalState::MovingDownOrClose);
+}
 
+void AppTask::TimerEventHandler(chip::System::Layer * aLayer, void * aAppState)
+{
+    T_IO_MSG timer_msg;
+
+    timer_msg.type    = IO_MSG_TYPE_TIMER;
+    timer_msg.subtype = 0;
+    timer_msg.u.buf   = aAppState;
+
+    PostMessage(&timer_msg);
+}
+
+void AppTask::FunctionTimerEventHandler(T_IO_MSG * p_msg)
+{
     // If we reached here, the button was held for factoryreset
     if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_Reset)
     {
@@ -456,7 +472,10 @@ CHIP_ERROR AppTask::Init()
         ChipLogProgress(DeviceLayer, "DeviceManagerInit() - OK");
     }
 
-    PlatformMgr().ScheduleWork(InitServer);
+    // ScheduleWork is asynchronous, failure means work couldn't be queued.
+    // Since this is init time, if it fails the system won't work anyway,
+    // so the return value can be safely ignored.
+    RETURN_SAFELY_IGNORED(PlatformMgr().ScheduleWork(InitServer));
 
 #if CONFIG_ENABLE_CHIP_SHELL
     chip::Shell::Engine::Root().Init();

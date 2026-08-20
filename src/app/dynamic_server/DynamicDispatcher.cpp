@@ -17,6 +17,7 @@
  */
 
 #include "AccessControl.h"
+#include "app/data-model-provider/AttributeChangeListener.h"
 
 #include <access/SubjectDescriptor.h>
 #include <app-common/zap-generated/callback.h>
@@ -28,12 +29,13 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/GlobalAttributes.h>
+#include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/WriteHandler.h>
-#include <app/clusters/ota-provider/ota-provider-cluster.h>
-#include <app/data-model-provider/ProviderChangeListener.h>
+#include <app/clusters/ota-provider/OTAProviderCluster.h>
 #include <app/data-model/Decode.h>
+#include <app/util/attribute-storage-detail.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
 #include <app/util/endpoint-config-api.h>
@@ -89,9 +91,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVRea
 {
     SubjectDescriptor subjectDescriptor = aCommandObj->GetSubjectDescriptor();
 
-    DataModel::InvokeRequest invokeRequest;
-    invokeRequest.path              = aPath;
-    invokeRequest.subjectDescriptor = &subjectDescriptor;
+    DataModel::InvokeRequest invokeRequest(aPath, subjectDescriptor);
 
     std::optional<DataModel::ActionReturnStatus> result = gOtaProviderServer.InvokeCommand(invokeRequest, aReader, aCommandObj);
 
@@ -313,16 +313,11 @@ CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,
     return CHIP_ERROR_NOT_FOUND;
 }
 
-void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                             DataModel::ProviderChangeListener * listener)
+void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
 {
     gMockDataVersion++;
-    listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
-}
-
-void emberAfEndpointChanged(EndpointId endpoint, DataModel::ProviderChangeListener * listener)
-{
-    listener->MarkDirty(AttributePathParams(endpoint));
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->NotifyAttributeChanged(
+        { endpoint, clusterId, attributeId }, DataModel::AttributeChangeType::kReportable);
 }
 
 DataVersion * emberAfDataVersionStorage(const ConcreteClusterPath & aConcreteClusterPath)
@@ -357,4 +352,9 @@ const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpo
 {
     // no known attributes even for OTA
     return nullptr;
+}
+
+void emAfCallShutdowns(MatterClusterShutdownType shutdownType)
+{
+    // No-op for dynamic server: no ember-style cluster init/shutdown.
 }

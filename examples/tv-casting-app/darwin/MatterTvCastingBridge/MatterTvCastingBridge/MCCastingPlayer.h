@@ -45,6 +45,29 @@ typedef enum {
 + (NSInteger)kMinCommissioningWindowTimeoutSec;
 
 /**
+ * @brief Directly sends a User-directed Commissioning request with the provided identificationDeclarationOptions. This
+ *     bypasses additional checks and processes around commissioning like setting up a
+ *     commissioning-window and instead can be used to directly talk to the CastingPlayer.
+ * @param connectionCallbacks contains the connectionCompleteCallback (Required) and
+ *     commissionerDeclarationCallback (Optional) callbacks defined in MCConnectionCallbacks.
+ *     <p>For example: During UDC with NoPasscode (targeted app selection), the
+ *     Commissioner replies with a CommissionerDeclaration message with NoAppsFound and NeedsPasscode
+ *     set indicating if the target app was found.
+ * @param identificationDeclarationOptions (Optional) Parameters in the IdentificationDeclaration
+ *     message sent by the Commissionee to the Commissioner. These parameters specify the
+ *     information relating to the requested commissioning session.
+ *     <p>For example: During the UDC with NoPasscode (targeted app selection) flow,
+ *     the client would call this API with IdentificationDeclarationOptions containing
+ *     NoPasscode set to true. See IdentificationDeclarationOptions for a complete
+ *     list of optional parameters.
+ *     <p>Furthermore, attributes (such as VendorId) describe the TargetApp that the client wants
+ *     to interact with after commissioning.
+ * @return nil if request submitted successfully, otherwise a NSError object corresponding to the error.
+ */
+- (NSError * _Nullable)sendUDCWithCallbacks:(MCConnectionCallbacks * _Nonnull)connectionCallbacks
+           identificationDeclarationOptions:(MCIdentificationDeclarationOptions * _Nullable)identificationDeclarationOptions;
+
+/**
  * @brief Verifies that a connection exists with this CastingPlayer, or triggers a new
  *     commissioning session request. If the CastingApp does not have the nodeId and fabricIndex
  *     of this CastingPlayer cached on disk, this will execute the User Directed Commissioning

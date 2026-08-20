@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024, 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,14 +18,17 @@
 #pragma once
 
 #include <app/clusters/identify-server/identify-server.h>
-#include <src/system/SystemLayer.h>
 
 namespace chip::NXP::App {
 
-// Identify cluster callbacks.
-void OnIdentifyStart(Identify * identify);
-void OnIdentifyStop(Identify * identify);
-void OnTriggerEffect(Identify * identify);
-void OnTriggerEffectComplete(chip::System::Layer * systemLayer, void * appState);
+// MyIdentifyDelegate class declaration
+class IdentifyDelegate : public chip::app::Clusters::IdentifyDelegate
+{
+public:
+    void OnIdentifyStart(chip::app::Clusters::IdentifyCluster & cluster) override;
+    void OnIdentifyStop(chip::app::Clusters::IdentifyCluster & cluster) override;
+    void OnTriggerEffect(chip::app::Clusters::IdentifyCluster & cluster) override;
+    bool IsTriggerEffectEnabled() const override;
+};
 
 } // namespace chip::NXP::App

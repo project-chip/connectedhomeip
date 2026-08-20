@@ -56,7 +56,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ReviewFabricRestrictions.
+} // namespace ReviewFabricRestrictions
 namespace ReviewFabricRestrictionsResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -84,7 +84,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ReviewFabricRestrictionsResponse.
+} // namespace ReviewFabricRestrictionsResponse
 } // namespace Commands
 } // namespace AccessControl
 } // namespace Clusters

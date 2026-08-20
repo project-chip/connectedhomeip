@@ -100,7 +100,7 @@ CHIP_ERROR ExportStoredOpKey(FabricIndex fabricIndex, PersistentStorageDelegate 
     ReturnErrorOnFailure(
         storage->SyncGetKeyValue(DefaultStorageKeyAllocator::FabricOpKey(fabricIndex).KeyName(), buf.Bytes(), size));
 
-    TEMPORARY_RETURN_IGNORED buf.SetLength(static_cast<size_t>(size));
+    ReturnErrorOnFailure(buf.SetLength(static_cast<size_t>(size)));
 
     // Read-out the operational key TLV entry.
     TLV::ContiguousBufferTLVReader reader;
@@ -167,6 +167,11 @@ CHIP_ERROR SignWithStoredOpKey(FabricIndex fabricIndex, PersistentStorageDelegat
 
 } // namespace
 
+bool PersistentStorageOperationalKeystore::HasPendingOpKeypair() const
+{
+    return (mPendingKeypair != nullptr);
+}
+
 bool PersistentStorageOperationalKeystore::HasOpKeypairForFabric(FabricIndex fabricIndex) const
 {
     VerifyOrReturnError(mStorage != nullptr, false);
@@ -210,9 +215,15 @@ CHIP_ERROR PersistentStorageOperationalKeystore::NewOpKeypairForFabric(FabricInd
     mPendingKeypair = Platform::New<Crypto::P256Keypair>();
     VerifyOrReturnError(mPendingKeypair != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    TEMPORARY_RETURN_IGNORED mPendingKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA);
+    CHIP_ERROR err = mPendingKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA);
+    if (err != CHIP_NO_ERROR)
+    {
+        ResetPendingKey();
+        return err;
+    }
+
     size_t csrLength = outCertificateSigningRequest.size();
-    CHIP_ERROR err   = mPendingKeypair->NewCertificateSigningRequest(outCertificateSigningRequest.data(), csrLength);
+    err              = mPendingKeypair->NewCertificateSigningRequest(outCertificateSigningRequest.data(), csrLength);
     if (err != CHIP_NO_ERROR)
     {
         ResetPendingKey();

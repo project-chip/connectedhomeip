@@ -24,6 +24,15 @@ source_set("accessor_updaters") {
   sources = [ "accessor_updaters.h" ]
 }
 
+source_set("weak_ember") {
+  sources = [ "weak_ember.cpp" ]
+
+  deps = [
+    "${chip_root}/src/app/clusters/boolean-state-server",
+    "${chip_root}/src/app/clusters/occupancy-sensor-server",
+  ]
+}
+
 static_library("connectivity") {
   sources = [
     "connectivity.cpp",
@@ -118,6 +127,7 @@ static_library("fan_control") {
   deps = [
     ":accessor_updaters",
     ":windows",
+    "${chip_root}/src/app/clusters/fan-control-server",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/third_party/imgui",
   ]
@@ -147,8 +157,9 @@ static_library("occupancy_sensing") {
   ]
 
   deps = [
+    ":weak_ember",
     ":windows",
-    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/clusters/occupancy-sensor-server",
     "${chip_root}/third_party/imgui",
   ]
 

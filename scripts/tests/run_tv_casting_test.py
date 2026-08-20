@@ -21,7 +21,6 @@ import sys
 import tempfile
 import time
 from dataclasses import dataclass
-from typing import List, Optional
 
 import click
 from linux.log_line_processing import ProcessOutputCapture
@@ -55,7 +54,7 @@ LINUX_TV_CASTING_APP_LOGS = "Linux-tv-casting-app-logs.txt"
 class TestStepException(Exception):
     """Thrown when a test fails, contains information about the test step that faied"""
 
-    def __init__(self, message, sequence_name: str, step: Optional[Step]):
+    def __init__(self, message, sequence_name: str, step: Step | None):
         super().__init__(message)
         self.sequence_name = sequence_name
         self.step = step
@@ -216,7 +215,7 @@ def handle_input_cmd(
 def run_test_sequence_steps(
     current_index: int,
     test_sequence_name: str,
-    test_sequence_steps: List[Step],
+    test_sequence_steps: list[Step],
     processes: RunningProcesses,
 ):
     """Run through the test steps from a test sequence starting from the current index and perform actions based on the presence of `output_msg` or `input_cmd`."""
@@ -350,7 +349,7 @@ def test_casting_fn(
             raise ValueError(
                 f"{test_sequence_name}: The first step in the test sequence must contain `START_APP` as `input_cmd` to indicate starting the tv-app."
             )
-        elif test_sequence_steps[current_index].app != App.TV_APP:
+        if test_sequence_steps[current_index].app != App.TV_APP:
             raise ValueError(
                 f"{test_sequence_name}: The first step in the test sequence must be to start up the tv-app."
             )
@@ -373,7 +372,7 @@ def test_casting_fn(
                 raise ValueError(
                     f"{test_sequence_name}: The third step in the test sequence must contain `START_APP` as `input_cmd` to indicate starting the tv-casting-app."
                 )
-            elif test_sequence_steps[current_index].app != App.TV_CASTING_APP:
+            if test_sequence_steps[current_index].app != App.TV_CASTING_APP:
                 raise ValueError(
                     f"{test_sequence_name}: The third step in the test sequence must be to start up the tv-casting-app."
                 )

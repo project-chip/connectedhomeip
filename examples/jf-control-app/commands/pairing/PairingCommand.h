@@ -31,8 +31,10 @@
 
 #include <optional>
 
-using namespace ::chip;
-using namespace ::chip::Credentials;
+using ::chip::ByteSpan;
+using ::chip::NodeId;
+using ::chip::VendorId;
+using ::chip::Credentials::CertificateKeyId;
 
 using JCMDeviceCommissioner            = chip::Controller::JCM::DeviceCommissioner;
 using JCMTrustVerificationStateMachine = chip::Credentials::JCM::TrustVerificationStateMachine;
@@ -101,6 +103,7 @@ public:
                     "If set, a LIT ICD that is commissioned will be requested to stay active for this many milliseconds");
         AddArgument("anchor", 0, 1, &mAnchor, "If set to true then a NOC with Anchor and Administrator CAT is issued");
         AddArgument("jcm", 0, 1, &mJCM, "Set it to true in order to commission a Joint Fabric Administrator");
+        AddArgument("regular", 0, 1, &mRegularDevice, "Set it to true to commission a regular device");
         switch (networkType)
         {
         case PairingNetworkType::None:
@@ -265,9 +268,10 @@ public:
 
     /////////// JCMTrustVerificationDelegate /////////
     void OnProgressUpdate(JCMTrustVerificationStateMachine & stateMachine, JCMTrustVerificationStage stage,
-                          JCMTrustVerificationInfo & info, JCMTrustVerificationError error);
-    void OnAskUserForConsent(JCMTrustVerificationStateMachine & stateMachine, JCMTrustVerificationInfo & info);
-    CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId, ByteSpan & globallyTrustedRoot);
+                          JCMTrustVerificationInfo & info, JCMTrustVerificationError error) override;
+    void OnAskUserForConsent(JCMTrustVerificationStateMachine & stateMachine, JCMTrustVerificationInfo & info) override;
+    CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId,
+                                              ByteSpan & globallyTrustedRoot) override;
 
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);
@@ -293,6 +297,7 @@ private:
     chip::Optional<bool> mSkipCommissioningComplete;
     chip::Optional<bool> mAnchor;
     chip::Optional<bool> mJCM;
+    chip::Optional<bool> mRegularDevice;
     chip::Optional<bool> mBypassAttestationVerifier;
     chip::Optional<std::vector<uint32_t>> mCASEAuthTags;
     chip::Optional<char *> mCountryCode;

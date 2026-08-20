@@ -15,7 +15,10 @@
 # limitations under the License.
 
 import contextlib
+import dataclasses
 import datetime
+import enum
+import getpass
 import glob
 import io
 import logging
@@ -30,28 +33,31 @@ import threading
 import time
 import typing
 import uuid
+from pathlib import Path
 
 import click
 import coloredlogs
 from colorama import Fore, Style
 
+from matter.testing.defaults import TestingDefaults
 from matter.testing.metadata import Metadata, MetadataReader
+from matter.testing.runner import matter_test_args_parser
 from matter.testing.tasks import Subprocess
 
 log = logging.getLogger(__name__)
 
-DEFAULT_CHIP_ROOT = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..'))
+DEFAULT_CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
 MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
 
+TAG_PROCESS_MON = f"[{Fore.GREEN}MON {Style.RESET_ALL}]".encode()
 TAG_PROCESS_APP = f"[{Fore.GREEN}APP {Style.RESET_ALL}]".encode()
 TAG_PROCESS_TEST = f"[{Fore.GREEN}TEST{Style.RESET_ALL}]".encode()
 TAG_STDOUT = f"[{Fore.YELLOW}STDOUT{Style.RESET_ALL}]".encode()
 TAG_STDERR = f"[{Fore.RED}STDERR{Style.RESET_ALL}]".encode()
 
 # RegExp which matches the timestamp in the output of CHIP application
-OUTPUT_TIMESTAMP_MATCH = re.compile(r'(?P<prefix>.*)\[(?P<ts>\d+\.\d+)\](?P<suffix>\[\d+:\d+\].*)'.encode())
+OUTPUT_TIMESTAMP_MATCH = re.compile(br'(?P<prefix>.*)\[(?P<ts>\d+\.\d+)\](?P<suffix>\[\d+:\d+\].*)')
 
 
 def chip_output_extract_timestamp(line: bytes) -> (float, bytes):
@@ -66,6 +72,10 @@ def process_chip_output(line: bytes, is_stderr: bool, process_tag: bytes = b"") 
     timestamp, line = chip_output_extract_timestamp(line)
     timestamp = datetime.datetime.fromtimestamp(timestamp).isoformat(sep=' ')
     return f"[{timestamp}]".encode() + process_tag + (TAG_STDERR if is_stderr else TAG_STDOUT) + line
+
+
+def process_mon_output(line, is_stderr):
+    return process_chip_output(line, is_stderr, TAG_PROCESS_MON)
 
 
 def process_chip_app_output(line, is_stderr):
@@ -93,33 +103,40 @@ def forward_fifo(path: str, f_out: typing.BinaryIO, stop_event: threading.Event)
         os.unlink(path)
 
 
+@dataclasses.dataclass
+class TestRunConfig:
+    """Configuration for the app under test."""
+    app: str
+    app_args: str
+    script_args: str
+    app_ready_pattern: str | None
+    stream_output: typing.BinaryIO
+    app_stdin_pipe: str | None = None
+
+
 class AppProcessManager:
-    def __init__(self, app: str, app_args: str, app_ready_pattern: typing.Optional[str], stream_output: typing.BinaryIO, app_stdin_pipe: typing.Optional[str] = None):
-        self.app = app
-        self.app_args = app_args
-        self.app_ready_pattern = app_ready_pattern
-        self.stream_output = stream_output
-        self.app_stdin_pipe = app_stdin_pipe
+    def __init__(self, config: TestRunConfig):
+        self.config = config
         self.app_process = None
         self.stdin_thread = None
         self.stdin_stop_event = threading.Event()
 
     def start(self):
-        log.info("Starting app with args: '%s'", self.app_args)
-        if self.app_ready_pattern and isinstance(self.app_ready_pattern, str):
-            ready_pattern = re.compile(self.app_ready_pattern.encode())
+        log.info("Starting app with args: '%s'", self.config.app_args)
+        if self.config.app_ready_pattern and isinstance(self.config.app_ready_pattern, str):
+            ready_pattern = re.compile(self.config.app_ready_pattern.encode())
         else:
-            ready_pattern = self.app_ready_pattern
-        self.app_process = Subprocess(self.app, *shlex.split(self.app_args),
+            ready_pattern = self.config.app_ready_pattern
+        self.app_process = Subprocess(self.config.app, *shlex.split(self.config.app_args),
                                       output_cb=process_chip_app_output,
-                                      f_stdout=self.stream_output,
-                                      f_stderr=self.stream_output)
+                                      f_stdout=self.config.stream_output,
+                                      f_stderr=self.config.stream_output)
         self.app_process.start(expected_output=ready_pattern, timeout=30)
-        if self.app_stdin_pipe:
-            log.info("Forwarding stdin from '%s' to app", self.app_stdin_pipe)
+        if self.config.app_stdin_pipe:
+            log.info("Forwarding stdin from '%s' to app", self.config.app_stdin_pipe)
             self.stdin_stop_event.clear()
             self.stdin_thread = threading.Thread(
-                target=forward_fifo, args=(self.app_stdin_pipe, self.app_process.p.stdin, self.stdin_stop_event))
+                target=forward_fifo, args=(self.config.app_stdin_pipe, self.app_process.p.stdin, self.stdin_stop_event))
             self.stdin_thread.start()
         else:
             self.app_process.p.stdin.close()
@@ -141,6 +158,54 @@ class AppProcessManager:
         return self.app_process
 
 
+class IpPacketCaptureManager:
+    def __init__(self, dump_filename: pathlib.Path):
+        self.tcpdump_process = None
+        self.dump_filename = dump_filename
+        self.interface = 'any'
+        self.keep_dumpfile = True
+
+    def start(self):
+        # Create directory for dump files
+        self.dump_filename.parent.mkdir(parents=True, exist_ok=True)
+
+        cmd = ['tcpdump', '-qn', '-i', self.interface, '-w', str(self.dump_filename), '-Z', getpass.getuser()]
+        if os.getuid() != 0:
+            cmd = ['sudo', '-n'] + cmd
+        self.tcpdump_process = Subprocess(cmd[0], *cmd[1:], output_cb=process_mon_output)
+
+        self.tcpdump_process.start()
+
+    def stop(self):
+        if self.tcpdump_process:
+            self.tcpdump_process.terminate()
+            self.tcpdump_process = None
+        if not self.keep_dumpfile:
+            log.info("Deleting capture file '%s'", self.dump_filename)
+            self.dump_filename.unlink(missing_ok=True)
+
+
+def run_timeout(run: Metadata) -> float:
+    script_timeout = None
+
+    if run.script_args is not None:
+        p = matter_test_args_parser()
+        (args, _) = p.parse_known_args(shlex.split(run.script_args))
+        script_timeout = args.timeout
+
+    if run.timeout is not None and script_timeout is not None:
+        if run.timeout < script_timeout:
+            log.warning("Run timeout for run '%s' (%f s) will expire earlier than script timeout (%d s)",
+                        run.run, run.timeout, script_timeout)
+
+    if run.timeout is not None:
+        return run.timeout
+    if script_timeout is not None:
+        return script_timeout + TestingDefaults.TEST_RUNNER_SLACK_S
+
+    return TestingDefaults.DEFAULT_TIMEOUT_S
+
+
 @click.command()
 @click.option("--app", type=click.Path(exists=True), default=None,
               help='Path to local application to use, omit to use external apps.')
@@ -158,8 +223,8 @@ class AppProcessManager:
                                                                              'src',
                                                                              'controller',
                                                                              'python',
-                                                                             'test',
-                                                                             'test_scripts',
+                                                                             'tests',
+                                                                             'scripts',
                                                                              'mobile-device-test.py'), help='Test script to use.')
 @click.option("--script-args", type=str, default='',
               help='Script arguments, can use placeholders like {SCRIPT_BASE_NAME}.')
@@ -169,10 +234,16 @@ class AppProcessManager:
               help="Do not print output from passing tests. Use this flag in CI to keep GitHub log size manageable.")
 @click.option("--load-from-env", default=None, help="YAML file that contains values for environment variables.")
 @click.option("--run", type=str, multiple=True, help="Run only the specified test run(s).")
+@click.option("--ip-packet-capture/--no-ip-packet-capture", is_flag=True, default=False, help="Enable IP packet capture.")
+@click.option("--ip-packet-capture-dir", type=click.Path(file_okay=False, writable=True, path_type=pathlib.Path),
+              default=pathlib.Path.cwd() / "out/ip_packet_captures", help="Storage for capture files.")
 @click.option("--app-filter", type=str, default=None, help="Run only for the specified app(s). Comma separated.")
+@click.option("--pre-existing-fabric", is_flag=True, default=False,
+              help="Commission app to a chip-tool fabric and open a commissioning window before running test script.")
 def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
          app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
-         script_gdb: bool, quiet: bool, load_from_env, run, app_filter):
+         script_gdb: bool, quiet: bool, load_from_env, run, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
+         app_filter, pre_existing_fabric: bool):
     if load_from_env:
         reader = MetadataReader(load_from_env)
         runs = reader.parse_script(script)
@@ -187,6 +258,7 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
                 app_stdin_pipe=app_stdin_pipe,
                 script_args=script_args,
                 script_gdb=script_gdb,
+                pre_existing_fabric=pre_existing_fabric,
             )
         ]
 
@@ -215,16 +287,86 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
             run.script_gdb = script_gdb
         if quiet is not None:
             run.quiet = quiet
+        if pre_existing_fabric:
+            run.pre_existing_fabric = pre_existing_fabric
 
     for run in runs:
         log.info("Executing '%s' '%s'", run.py_script_path.split('/')[-1], run.run)
         main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "", run.app_ready_pattern,
-                  run.app_stdin_pipe, run.py_script_path, run.script_args or "", run.script_gdb, run.quiet)
+                  run.app_stdin_pipe, run.py_script_path, run.script_args or "", run.script_gdb, ip_packet_capture,
+                  ip_packet_capture_dir, run_timeout(run), run.quiet, run.run, run.pre_existing_fabric)
+
+
+class AppRestartMonitor:
+    """Monitors a temporary flag file to handle factory reset and restart requests from the test script.
+
+    Runs a background daemon thread that periodically checks for the existence of the restart_flag_file.
+    If the file exists, it triggers a factory reset of the app (and optionally controller config/storage)
+    and restarts the app process, then removes the flag file.
+    """
+
+    def __init__(self, restart_flag_file: str):
+        self.restart_flag_file = restart_flag_file
+        self.app_manager_ref: list[AppProcessManager] | None = None
+        self.app_manager_lock: threading.Lock | None = None
+        self.config: TestRunConfig | None = None
+        self.stop_event = threading.Event()
+        self.thread: threading.Thread | None = None
+
+    def start(self, app_manager_ref: list[AppProcessManager], app_manager_lock: threading.Lock,
+              config: TestRunConfig) -> None:
+        self.app_manager_ref = app_manager_ref
+        self.app_manager_lock = app_manager_lock
+        self.config = config
+        self.thread = threading.Thread(target=self._run, daemon=True)
+        self.thread.start()
+
+    def stop(self, timeout_sec: float = 2.0) -> None:
+        if self.thread and self.thread.is_alive():
+            log.info("Stopping app restart monitor thread")
+            self.stop_event.set()
+            self.thread.join(timeout_sec)
+
+    def _run(self) -> None:
+        while not self.stop_event.is_set():
+            # Try to read the restart flag file
+            if not os.path.exists(self.restart_flag_file):
+                self.stop_event.wait(0.5)
+                continue
+
+            with open(self.restart_flag_file) as f:
+                flag_file_content = f.read().strip()
+
+            # Determine reset type and remove app/ctrl config and storage
+            reset_type = None
+            if flag_file_content == "factory reset":
+                reset_type = FactoryResetType.AppAndController
+            elif flag_file_content == "factory reset app only":
+                reset_type = FactoryResetType.AppOnly
+
+            if reset_type:
+                factory_reset_config_removal(self.config.app_args, self.config.script_args, reset_type)
+
+            # Restart the app
+            log.info("Restarting app '%s'...", self.config.app)
+            new_app_manager = AppProcessManager(self.config)
+            self.app_manager_ref[0].stop()
+            with self.app_manager_lock:
+                new_app_manager.start()
+                self.app_manager_ref[0] = new_app_manager
+
+            # Successfully read the flag file, remove to prevent multiple restarts
+            os.unlink(self.restart_flag_file)
+            log.info("%s requested by test script", flag_file_content.capitalize())
+
+            # Action complete, continue monitoring for additional restart requests
+            log.info("%s completed, continuing to monitor for additional requests", flag_file_content.capitalize())
 
 
 def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
               app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
-              script_gdb: bool, quiet: bool):
+              script_gdb: bool, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
+              run_timeout: float, quiet: bool, run_name: str, pre_existing_fabric: bool = False):
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
@@ -233,53 +375,94 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     test_run_id = str(uuid.uuid4())[:8]  # Use first 8 characters for shorter paths
     restart_flag_file = f"/tmp/chip_test_restart_app_{test_run_id}"
 
+    script_name = pathlib.Path(script).name.removesuffix('.py')
+    tcpdump_capture_filename = ip_packet_capture_dir / f"tcpdump_{script_name}-{os.getpid()}-{run_name}.pcap"
+
+    tcpdump = IpPacketCaptureManager(pathlib.Path(tcpdump_capture_filename))
+
+    if ip_packet_capture:
+        tcpdump.start()
+
+    # Remove app config and storage if factory reset is requested
     if factory_reset or factory_reset_app_only:
-        # Remove native app config
-        for path in glob.glob('/tmp/chip*') + glob.glob('/tmp/repl*'):
-            pathlib.Path(path).unlink(missing_ok=True)
-
-        # Remove native app KVS if that was used
-        if match := re.search(r"--KVS (?P<path>[^ ]+)", app_args):
-            log.info("Removing KVS path: '%s'", match.group("path"))
-            pathlib.Path(match.group("path")).unlink(missing_ok=True)
-
-    if factory_reset:
-        # Remove Python test admin storage if provided
-        if match := re.search(r"--storage-path (?P<path>[^ ]+)", script_args):
-            log.info("Removing storage path: '%s'", match.group("path"))
-            pathlib.Path(match.group("path")).unlink(missing_ok=True)
+        reset_type = FactoryResetType.AppAndController if factory_reset else FactoryResetType.AppOnly
+        factory_reset_config_removal(app_args, script_args, reset_type)
 
     app_manager_ref = None
     app_manager_lock = threading.Lock()
-    restart_monitor_thread = None
     app_exit_code = 0
     stream_output = sys.stdout.buffer
     if quiet:
         stream_output = io.BytesIO()
+
+    restart_monitor = AppRestartMonitor(restart_flag_file)
     if app:
         if not os.path.exists(app):
             if app is None:
                 raise FileNotFoundError(f"{app} not found")
-        app_manager = AppProcessManager(app, app_args, app_ready_pattern, stream_output, app_stdin_pipe)
+        app_config = TestRunConfig(app, app_args, script_args, app_ready_pattern, stream_output, app_stdin_pipe)
+        app_manager = AppProcessManager(app_config)
         app_manager.start()
         app_manager_ref = [app_manager]
-        restart_monitor_thread = threading.Thread(
-            target=monitor_app_restart_requests,
-            args=(
-                app_manager_ref,
-                app_manager_lock,
-                app,
-                app_args,
-                app_ready_pattern,
-                stream_output,
-                app_stdin_pipe,
-                restart_flag_file),
-            daemon=True)
-        restart_monitor_thread.start()
+        restart_monitor.start(app_manager_ref, app_manager_lock, app_config)
 
     # TODO: Remove this below workaround once we understand if mobile-device-test needs to be run through Cirque and through this script for CI test pipeline, task PR: https://github.com/project-chip/matter-test-scripts/issues/681
     if "mobile-device-test.py" not in script:
         script_args += f" --restart-flag-file {restart_flag_file}"
+
+    if pre_existing_fabric:
+        # Some devices (custom commissioning) may show up at cert with a fabric already on the device
+        # to simulate this in the CI, this option allows the user to pre-commission the device onto
+        # an ephemeral fabric.
+        # This is done using the commission-only-re-open-window flag in the device testing framework.
+        # That flag commissions the device and then re-opens the commissioning window with the same
+        # discriminator and passcode.
+        p = matter_test_args_parser()
+        args, _ = p.parse_known_args(shlex.split(script_args))
+
+        if not args.commissioning_method or args.commissioning_method != "on-network":
+            raise click.ClickException(
+                "When using --pre-existing-fabric, script-args must include --commissioning-method on-network."
+            )
+
+        commission_tokens = shlex.split(script_args)
+        storage_path_found = False
+        for idx, token in enumerate(commission_tokens):
+            if token == '--storage-path':
+                if idx + 1 < len(commission_tokens):
+                    path_val = commission_tokens[idx + 1]
+                    name, ext = os.path.splitext(path_val)
+                    commission_tokens[idx + 1] = f"{name}_pre{ext}"
+                    storage_path_found = True
+            elif token.startswith('--storage-path='):
+                path_val = token.split('=', 1)[1]
+                name, ext = os.path.splitext(path_val)
+                commission_tokens[idx] = f"--storage-path={name}_pre{ext}"
+                storage_path_found = True
+
+        if not storage_path_found:
+            commission_tokens.extend(['--storage-path', './admin_storage_pre.json'])
+
+        commission_command = [
+            sys.executable, "-X", "faulthandler",
+            script,
+            "--fail-on-skipped",
+            "--paa-trust-store-path",
+            os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
+            "--commission-only-re-open-window"
+        ] + commission_tokens
+
+        log.info(
+            "Running python script to commission device on a pre-existing fabric and "
+            "open commissioning window...")
+        log.info("Command: %s", ' '.join(commission_command))
+        commission_proc = Subprocess(commission_command[0], *commission_command[1:],
+                                     output_cb=process_mon_output, f_stdout=stream_output, f_stderr=stream_output)
+        commission_proc.start()
+        commission_exit = commission_proc.wait(120)
+        if commission_exit != 0:
+            log.error("Commissioning run failed with exit code %d", commission_exit)
+            sys.exit(commission_exit)
 
     script_command = [
         script,
@@ -308,15 +491,16 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     test_script_process.p.stdin.close()
 
     try:
-        test_script_exit_code = test_script_process.wait()
+        try:
+            test_script_exit_code = test_script_process.wait(run_timeout)
+        except TimeoutError as e:
+            log.exception("%r", e)
+            test_script_exit_code = -1  # Trigger error codepath
 
         if test_script_exit_code != 0:
             log.error("Test script exited with returncode %d", test_script_exit_code)
 
-        # Stop the restart monitor thread if it exists
-        if restart_monitor_thread and restart_monitor_thread.is_alive():
-            log.info("Stopping app restart monitor thread")
-            restart_monitor_thread.join(2.0)
+        restart_monitor.stop()
 
         # Get the current app manager if it exists
         current_app_manager = None
@@ -333,6 +517,10 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         # We expect both app and test script should exit with 0
         exit_code = test_script_exit_code or app_exit_code
 
+        if tcpdump and exit_code == 0:
+            # Delete packet captures from successful runs
+            tcpdump.keep_dumpfile = False
+
         if quiet:
             if exit_code:
                 sys.stdout.write(stream_output.getvalue().decode('utf-8', errors='replace'))
@@ -346,10 +534,9 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             sys.exit(exit_code)
 
     finally:
-        # Stop the restart monitor thread if it exists
-        if restart_monitor_thread and restart_monitor_thread.is_alive():
-            log.info("Stopping app restart monitor thread")
-            restart_monitor_thread.join(2.0)
+        restart_monitor.stop()
+
+        tcpdump.stop()
 
         # Clean up any leftover flag files if they exist - ensure this always executes
         log.info("Cleaning up flag files")
@@ -361,35 +548,32 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
                 log.warning("Failed to clean up flag file '%s': %r", restart_flag_file, e)
 
 
-def monitor_app_restart_requests(
-        app_manager_ref,
-        app_manager_lock,
-        app,
-        app_args,
-        app_ready_pattern,
-        stream_output,
-        app_stdin_pipe,
-        restart_flag_file):
-    while True:
-        try:
-            if os.path.exists(restart_flag_file):
-                log.info("App restart requested by test script")
-                # Remove the flag file immediately to prevent multiple restarts
-                os.unlink(restart_flag_file)
+class FactoryResetType(enum.Enum):
+    """Type of factory reset to perform."""
+    AppOnly = 0
+    AppAndController = 1
 
-                new_app_manager = AppProcessManager(app, app_args, app_ready_pattern, stream_output, app_stdin_pipe)
-                new_app_manager.start()
-                with app_manager_lock:
-                    app_manager_ref[0].stop()
-                    app_manager_ref[0] = new_app_manager
+    def config_files(self, app_args: str, script_args: str) -> typing.Generator[str, None, None]:
+        """Yield paths of config/storage files to remove for this reset type."""
 
-                # After restart is complete, we can exit the monitor thread
-                log.info("App restart completed, monitor thread exiting")
-                break
-            else:
-                time.sleep(0.5)
-        except Exception as e:
-            log.error("Error in app restart monitor: %r", e)
+        # App config files and KVS, exclude restart flag file
+        yield from (f for f in glob.glob('/tmp/chip*') if not os.path.basename(f).startswith('chip_test_restart_app'))
+        yield from glob.glob('/tmp/repl*')
+
+        if match := re.search(r"--KVS (?P<path>[^ ]+)", app_args):
+            yield match.group("path")
+
+        if self == FactoryResetType.AppAndController:
+            # Controller storage
+            if match := re.search(r"--storage-path (?P<path>[^ ]+)", script_args):
+                yield match.group("path")
+
+
+def factory_reset_config_removal(app_args: str, script_args: str, reset_type: FactoryResetType = None):
+    """Handles app factory reset requests by removing configuration and storage files."""
+    for path in reset_type.config_files(app_args, script_args):
+        log.info("Removing config/storage file, path: '%s'...", path)
+        pathlib.Path(path).unlink(missing_ok=True)
 
 
 if __name__ == '__main__':

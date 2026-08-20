@@ -705,3 +705,9 @@ tests:
 
           [1657631472.017012][2661:2666] CHIP:DMG:                                        status = 0x00 (SUCCESS),
       disabled: true
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: lock
+      app: lock

@@ -144,6 +144,11 @@ constexpr DataModel::DeviceTypeEntry kAirPurifier = {
     .deviceTypeRevision = kAirPurifierDeviceTypeRevision,
 };
 
+constexpr DataModel::DeviceTypeEntry kIrrigationSystem = {
+    .deviceTypeId       = kIrrigationSystemDeviceTypeId,
+    .deviceTypeRevision = kIrrigationSystemDeviceTypeRevision,
+};
+
 constexpr DataModel::DeviceTypeEntry kWaterFreezeDetector = {
     .deviceTypeId       = kWaterFreezeDetectorDeviceTypeId,
     .deviceTypeRevision = kWaterFreezeDetectorDeviceTypeRevision,
@@ -234,6 +239,11 @@ constexpr DataModel::DeviceTypeEntry kLaundryDryer = {
     .deviceTypeRevision = kLaundryDryerDeviceTypeRevision,
 };
 
+constexpr DataModel::DeviceTypeEntry kHumidifierDehumidifier = {
+    .deviceTypeId       = kHumidifierDehumidifierDeviceTypeId,
+    .deviceTypeRevision = kHumidifierDehumidifierDeviceTypeRevision,
+};
+
 constexpr DataModel::DeviceTypeEntry kNetworkInfrastructureManager = {
     .deviceTypeId       = kNetworkInfrastructureManagerDeviceTypeId,
     .deviceTypeRevision = kNetworkInfrastructureManagerDeviceTypeRevision,
@@ -242,6 +252,11 @@ constexpr DataModel::DeviceTypeEntry kNetworkInfrastructureManager = {
 constexpr DataModel::DeviceTypeEntry kThreadBorderRouter = {
     .deviceTypeId       = kThreadBorderRouterDeviceTypeId,
     .deviceTypeRevision = kThreadBorderRouterDeviceTypeRevision,
+};
+
+constexpr DataModel::DeviceTypeEntry kCommissioningByProxy = {
+    .deviceTypeId       = kCommissioningByProxyDeviceTypeId,
+    .deviceTypeRevision = kCommissioningByProxyDeviceTypeRevision,
 };
 
 constexpr DataModel::DeviceTypeEntry kOnOffLight = {
@@ -359,6 +374,21 @@ constexpr DataModel::DeviceTypeEntry kDoorbell = {
     .deviceTypeRevision = kDoorbellDeviceTypeRevision,
 };
 
+constexpr DataModel::DeviceTypeEntry kAvAnalysisNode = {
+    .deviceTypeId       = kAvAnalysisNodeDeviceTypeId,
+    .deviceTypeRevision = kAvAnalysisNodeDeviceTypeRevision,
+};
+
+constexpr DataModel::DeviceTypeEntry kAmbientContextSensor = {
+    .deviceTypeId       = kAmbientContextSensorDeviceTypeId,
+    .deviceTypeRevision = kAmbientContextSensorDeviceTypeRevision,
+};
+
+constexpr DataModel::DeviceTypeEntry kProximityRanger = {
+    .deviceTypeId       = kProximityRangerDeviceTypeId,
+    .deviceTypeRevision = kProximityRangerDeviceTypeRevision,
+};
+
 constexpr DataModel::DeviceTypeEntry kWindowCovering = {
     .deviceTypeId       = kWindowCoveringDeviceTypeId,
     .deviceTypeRevision = kWindowCoveringDeviceTypeRevision,
@@ -467,6 +497,31 @@ constexpr DataModel::DeviceTypeEntry kElectricalEnergyTariff = {
 constexpr DataModel::DeviceTypeEntry kElectricalMeter = {
     .deviceTypeId       = kElectricalMeterDeviceTypeId,
     .deviceTypeRevision = kElectricalMeterDeviceTypeRevision,
+};
+
+constexpr DataModel::DeviceTypeEntry kArcFaultCircuitInterrupter = {
+    .deviceTypeId       = kArcFaultCircuitInterrupterDeviceTypeId,
+    .deviceTypeRevision = kArcFaultCircuitInterrupterDeviceTypeRevision,
+};
+
+constexpr DataModel::DeviceTypeEntry kElectricalCircuitBreaker = {
+    .deviceTypeId       = kElectricalCircuitBreakerDeviceTypeId,
+    .deviceTypeRevision = kElectricalCircuitBreakerDeviceTypeRevision,
+};
+
+constexpr DataModel::DeviceTypeEntry kElectricalDistributionEnclosure = {
+    .deviceTypeId       = kElectricalDistributionEnclosureDeviceTypeId,
+    .deviceTypeRevision = kElectricalDistributionEnclosureDeviceTypeRevision,
+};
+
+constexpr DataModel::DeviceTypeEntry kElectricalSurgeProtector = {
+    .deviceTypeId       = kElectricalSurgeProtectorDeviceTypeId,
+    .deviceTypeRevision = kElectricalSurgeProtectorDeviceTypeRevision,
+};
+
+constexpr DataModel::DeviceTypeEntry kResidualCurrentCircuitBreaker = {
+    .deviceTypeId       = kResidualCurrentCircuitBreakerDeviceTypeId,
+    .deviceTypeRevision = kResidualCurrentCircuitBreakerDeviceTypeRevision,
 };
 
 constexpr DataModel::DeviceTypeEntry kControlBridge = {

@@ -22,8 +22,13 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Install ccache (Darwin)
+      if: runner.os == 'macOS'
+      shell: bash
+      run: |
+        brew install ccache
     - name: Configure ccache
-      uses: pyTooling/Actions/with-post-step@v0.4.5
+      uses: pyTooling/Actions/with-post-step@6f3d6d20558fd3891554da44666a148767e33a67 # v7.15.0
       with:
         main: |
           mkdir -p .ccache
@@ -63,7 +68,7 @@ runs:
     - name: Restore ccache
       if: ${{ inputs.disable != 'true' }}
       id: ccache-restore
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: .ccache
         key: ${{ env.CCACHE_KEY }}

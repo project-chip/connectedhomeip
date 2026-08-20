@@ -19,7 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-enums.h>
-#include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-cluster.h>
+#include <app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h>
 
 class WebRTCRequestorDelegate : public chip::app::Clusters::WebRTCTransportRequestor::Delegate
 {

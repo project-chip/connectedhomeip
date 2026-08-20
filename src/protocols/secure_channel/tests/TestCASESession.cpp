@@ -40,7 +40,7 @@
 #include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/tests/MessagingContext.h>
@@ -86,7 +86,7 @@ public:
     using CASESession::ParseSigma3TBEData;
 };
 
-class TestCASESession : public Test::LoopbackMessagingContext
+class TestCASESession : public chip::Testing::LoopbackMessagingContext
 {
 public:
     // Performs shared setup for all tests in the test suite
@@ -97,7 +97,7 @@ public:
     virtual void SetUp() override
     {
         ConfigInitializeNodes(false);
-        chip::Test::LoopbackMessagingContext::SetUp();
+        chip::Testing::LoopbackMessagingContext::SetUp();
     }
 
     void ServiceEvents();

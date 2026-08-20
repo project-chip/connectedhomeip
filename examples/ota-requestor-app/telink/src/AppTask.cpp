@@ -24,7 +24,7 @@ AppTask AppTask::sAppTask;
 
 CHIP_ERROR AppTask::Init(void)
 {
-    TEMPORARY_RETURN_IGNORED InitCommonParts();
+    ReturnErrorOnFailure(InitCommonParts());
 
     return CHIP_NO_ERROR;
 }

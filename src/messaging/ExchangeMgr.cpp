@@ -75,6 +75,11 @@ CHIP_ERROR ExchangeManager::Init(SessionManager * sessionManager)
         handler.Reset();
     }
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    // Start from a clean slate: a stale observer must not survive a Shutdown()/re-Init() cycle.
+    mTestOnlyReceivedObserver = nullptr;
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+
     sessionManager->SetMessageDelegate(this);
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -98,6 +103,11 @@ void ExchangeManager::Shutdown()
         mSessionManager->SetMessageDelegate(nullptr);
         mSessionManager = nullptr;
     }
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    // Drop the test-only observer so inbound traffic after a re-Init() cannot dispatch to a now-stale observer.
+    mTestOnlyReceivedObserver = nullptr;
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
     mState = State::kState_NotInitialized;
 }
@@ -269,6 +279,13 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         msgFlags.Set(MessageFlagValues::kDuplicateMessage);
     }
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    if (mTestOnlyReceivedObserver != nullptr)
+    {
+        mTestOnlyReceivedObserver->OnMessageReceived(packetHeader, payloadHeader, msgBuf);
+    }
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+
     // Skip retrieval of exchange for group message since no exchange is stored
     // for group msg (optimization)
     if (!packetHeader.IsGroupSession())
@@ -361,10 +378,11 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     // If we found a handler, create an exchange to handle the message.
     if (matchingUMH != nullptr)
     {
-        ExchangeDelegate * delegate = nullptr;
+        ExchangeDelegate * delegate         = nullptr;
+        UnsolicitedMessageHandler * handler = matchingUMH->Handler;
 
         // Fetch delegate from the handler
-        CHIP_ERROR err = matchingUMH->Handler->OnUnsolicitedMessageReceived(payloadHeader, session, delegate);
+        CHIP_ERROR err = handler->OnUnsolicitedMessageReceived(payloadHeader, session, delegate);
         if (err != CHIP_NO_ERROR)
         {
             // Using same error message for all errors to reduce code size.
@@ -379,7 +397,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         {
             if (delegate != nullptr)
             {
-                matchingUMH->Handler->OnExchangeCreationFailed(delegate);
+                handler->OnExchangeCreationFailed(delegate);
             }
 
             // Using same error message for all errors to reduce code size.
@@ -395,6 +413,13 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         {
             ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %" CHIP_ERROR_FORMAT,
                          CHIP_ERROR_INVALID_MESSAGE_TYPE.Format());
+            if (delegate != nullptr)
+            {
+                // The OnExchangeCreationFailed contract allows the handler to deallocate the delegate.
+                // Clear it from the exchange context first to prevent use-after-free in ec->Close().
+                ec->SetDelegate(nullptr);
+                handler->OnExchangeCreationFailed(delegate);
+            }
             ec->Close();
             SendStandaloneAckIfNeeded(packetHeader, payloadHeader, session, msgFlags, std::move(msgBuf));
             return;

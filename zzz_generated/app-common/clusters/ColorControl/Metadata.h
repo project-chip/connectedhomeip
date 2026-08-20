@@ -17,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace ColorControl {
 
-inline constexpr uint32_t kRevision = 7;
+inline constexpr uint32_t kRevision = 9;
 
 namespace Attributes {
 

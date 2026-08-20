@@ -1,7 +1,7 @@
 /*
  *
- *    Copyright (c) 2022-2024 Project CHIP Authors
- *    Copyright 2023-2024 NXP
+ *    Copyright (c) 2022-2024, 2026 Project CHIP Authors
+ *    Copyright 2023, 2024, 2026 NXP
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -49,14 +49,11 @@ namespace DeviceLayer {
 class FactoryDataProviderImpl : public FactoryDataProvider
 {
 public:
-    static FactoryDataProviderImpl sInstance;
-
     CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
                            uint32_t * contentAddr = NULL);
     ~FactoryDataProviderImpl(){};
 
     CHIP_ERROR Init(void);
-    CHIP_ERROR SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer);
 
     CHIP_ERROR SetKeyType(KeyType type);
 

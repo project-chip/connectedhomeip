@@ -20,10 +20,11 @@
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/icd/server/ICDConfigurationData.h>
 #include <lib/support/BitFlags.h>
+#include <optional>
 #include <system/SystemLayerImpl.h>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 /**
  * @brief Class acts as an accessor to private methods of the ICDConfigurationData class without needing to give friend access to
  *        each individual test.
@@ -43,11 +44,16 @@ public:
     {
         return mData->SetModeDurations(active, idle);
     }
+    CHIP_ERROR SetModeDurations(std::optional<System::Clock::Milliseconds32> active, std::optional<System::Clock::Seconds32> idle,
+                                std::optional<System::Clock::Seconds32> shortIdle)
+    {
+        return mData->SetModeDurations(active, idle, shortIdle);
+    }
     System::Clock::Milliseconds32 GetSitSlowPollMaximum() { return mData->kSitIcdSlowPollMaximum; }
 
 private:
     ICDConfigurationData * mData = nullptr;
 };
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

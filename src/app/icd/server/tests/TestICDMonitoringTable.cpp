@@ -82,13 +82,17 @@ struct TestICDMonitoringTable : public ::testing::Test
     void ValidateHmac128(const Crypto::Hmac128KeyHandle & saved, const Crypto::Hmac128KeyHandle & loaded)
     {
 #if CHIP_CRYPTO_PSA
+        // Under PSA, ICD keys are persisted (and reloaded as a distinct, CHIP-range
+        // PSA key id) only when the Check-In Protocol is enabled, via PersistICDKey().
+        // Without CIP, CreateKey() produces volatile keys that cannot meaningfully
+        // round-trip through storage, so there is nothing to validate here.
+#if CHIP_CONFIG_ENABLE_ICD_CIP
         EXPECT_NE(saved.As<psa_key_id_t>(), loaded.As<psa_key_id_t>());
         EXPECT_GE(loaded.As<psa_key_id_t>(), to_underlying(Crypto::KeyIdBase::ICDKeyRangeStart));
         EXPECT_LE(loaded.As<psa_key_id_t>(), to_underlying(Crypto::KeyIdBase::Maximum));
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 #else
-        EXPECT_EQ(memcmp(saved.As<Crypto::Symmetric128BitsKeyByteArray>(), loaded.As<Crypto::Symmetric128BitsKeyByteArray>(),
-                         sizeof(Crypto::Symmetric128BitsKeyByteArray)),
-                  0);
+        EXPECT_TRUE(saved.OpaqueBytes().data_equal(loaded.OpaqueBytes()));
 #endif
     }
 };

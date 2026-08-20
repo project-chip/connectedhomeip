@@ -36,8 +36,6 @@ namespace DeviceLayer {
 class DiagnosticDataProviderImpl : public DiagnosticDataProvider
 {
 public:
-    static DiagnosticDataProviderImpl & GetDefaultInstance();
-
     // ===== Methods that implement the PlatformManager abstract interface.
 
     bool SupportsWatermarks() override { return true; }
@@ -68,7 +66,8 @@ public:
     CHIP_ERROR GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount) override;
     CHIP_ERROR ResetWiFiNetworkDiagnosticsCounts() override;
     CHIP_ERROR GetWiFiOverrunCount(uint64_t & overrunCount) override;
-    CHIP_ERROR GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastTxCount) override;
+    CHIP_ERROR GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount) override;
+    CHIP_ERROR GetWiFiCurrentMaxRate(uint64_t & currentMaxRate) override;
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
 #if CONFIG_CHIP_ETHERNET
     /**

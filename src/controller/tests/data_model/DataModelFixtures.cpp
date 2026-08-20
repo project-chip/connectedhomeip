@@ -92,9 +92,9 @@ static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubje
                                         bool allowInfiniteReads, const ConcreteReadAttributePath & aPath,
                                         AttributeReportIBs::Builder & aAttributeReports, AttributeEncodeState * apEncoderState)
 {
-    if (aPath.mEndpointId >= chip::Test::kMockEndpointMin)
+    if (aPath.mEndpointId >= chip::Testing::kMockEndpointMin)
     {
-        return chip::Test::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState);
+        return chip::Testing::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState);
     }
 
     if (gReadResponseDirective == ReadResponseDirective::kSendManyDataResponses ||
@@ -332,11 +332,7 @@ ActionReturnStatus CustomDataModel::ReadAttribute(const ReadAttributeRequest & r
 {
     AttributeEncodeState mutableState(&encoder.GetState()); // provide a state copy to start.
 
-    Access::SubjectDescriptor subjectDescriptor;
-    if (request.subjectDescriptor != nullptr)
-    {
-        subjectDescriptor = *request.subjectDescriptor;
-    }
+    Access::SubjectDescriptor subjectDescriptor = request.subjectDescriptor;
 
     CHIP_ERROR err =
         ReadSingleClusterData(subjectDescriptor, request.readFlags.Has(ReadFlags::kFabricFiltered), mAllowInfiniteReads,

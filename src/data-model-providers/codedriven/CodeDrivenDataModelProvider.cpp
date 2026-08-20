@@ -244,16 +244,6 @@ CHIP_ERROR CodeDrivenDataModelProvider::EndpointUniqueID(EndpointId endpointId, 
 }
 #endif
 
-void CodeDrivenDataModelProvider::Temporary_ReportAttributeChanged(const AttributePathParams & path)
-{
-    if (!mInteractionModelContext)
-    {
-        ChipLogError(DataManagement, "Temporary_ReportAttributeChanged called before provider has been started.");
-        return;
-    }
-    mInteractionModelContext->dataModelChangeListener.MarkDirty(path);
-}
-
 CHIP_ERROR CodeDrivenDataModelProvider::AddEndpoint(EndpointInterfaceRegistration & registration)
 {
     VerifyOrReturnError(registration.endpointEntry.id != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
@@ -299,7 +289,7 @@ CHIP_ERROR CodeDrivenDataModelProvider::AddEndpoint(EndpointInterfaceRegistratio
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CodeDrivenDataModelProvider::RemoveEndpoint(EndpointId endpointId)
+CHIP_ERROR CodeDrivenDataModelProvider::RemoveEndpoint(EndpointId endpointId, ClusterShutdownType shutdownType)
 {
     if (mServerClusterContext.has_value())
     {
@@ -325,7 +315,7 @@ CHIP_ERROR CodeDrivenDataModelProvider::RemoveEndpoint(EndpointId endpointId)
             if (clusterIsOnEndpoint && registeredEndpointCount == 1)
             {
                 // This is the last registered endpoint for this cluster. Shut it down.
-                cluster->Shutdown();
+                cluster->Shutdown(shutdownType);
             }
         }
     }
@@ -353,7 +343,7 @@ CHIP_ERROR CodeDrivenDataModelProvider::AddCluster(ServerClusterRegistration & e
     return mServerClusterRegistry.Register(entry);
 }
 
-CHIP_ERROR CodeDrivenDataModelProvider::RemoveCluster(ServerClusterInterface * cluster)
+CHIP_ERROR CodeDrivenDataModelProvider::RemoveCluster(ServerClusterInterface * cluster, ClusterShutdownType shutdownType)
 {
     VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -368,7 +358,7 @@ CHIP_ERROR CodeDrivenDataModelProvider::RemoveCluster(ServerClusterInterface * c
         }
     }
 
-    return mServerClusterRegistry.Unregister(cluster);
+    return mServerClusterRegistry.Unregister(cluster, shutdownType);
 }
 
 EndpointInterface * CodeDrivenDataModelProvider::GetEndpointInterface(EndpointId endpointId)

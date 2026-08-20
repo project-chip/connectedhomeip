@@ -80,7 +80,7 @@ def FindCommand(command):
 
 
 def ReadBuildConfig(build_config):
-    with open(build_config, 'r') as file:
+    with open(build_config) as file:
         return json.load(file)
 
 
@@ -88,8 +88,7 @@ def ComputeClasspath(build_config_json):
     unique_jars = build_config_json['deps_info']['deps_jars']
     if sys.platform == 'win32':
         return ";".join(unique_jars)
-    else:
-        return ":".join(unique_jars)
+    return ":".join(unique_jars)
 
 
 def main():
@@ -134,7 +133,7 @@ def main():
     if retcode != EXIT_SUCCESS:
         return retcode
 
-    with open(args.outfile, 'wt') as f:
+    with open(args.outfile, 'w') as f:
         prefixlen = len(args.classdir) + 1
         for root, dirnames, filenames in os.walk(args.classdir):
             for filename in filenames:

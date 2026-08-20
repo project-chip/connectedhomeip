@@ -89,7 +89,6 @@ public:
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & out) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
     CHIP_ERROR EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo) override;
-    void Temporary_ReportAttributeChanged(const AttributePathParams & path) override;
 
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
     CHIP_ERROR EndpointUniqueID(EndpointId endpointId, MutableCharSpan & EndpointUniqueId) override;
@@ -152,7 +151,7 @@ public:
      *         CHIP_ERROR_NOT_FOUND if no endpoint with the given ID is registered.
      *         CHIP_ERROR_INVALID_ARGUMENT if endpointId is kInvalidEndpointId.
      */
-    CHIP_ERROR RemoveEndpoint(EndpointId endpointId);
+    CHIP_ERROR RemoveEndpoint(EndpointId endpointId, ClusterShutdownType shutdownType = ClusterShutdownType::kClusterShutdown);
 
     /**
      * @brief Add a ServerClusterInterface to the Data Model Provider.
@@ -195,7 +194,8 @@ public:
      *         CHIP_ERROR_NOT_FOUND if the entry is not registered.
      *         CHIP_ERROR_INCORRECT_STATE if an endpoint for one of the cluster paths is still registered.
      */
-    CHIP_ERROR RemoveCluster(ServerClusterInterface * entry);
+    CHIP_ERROR RemoveCluster(ServerClusterInterface * entry,
+                             ClusterShutdownType shutdownType = ClusterShutdownType::kClusterShutdown);
 
 private:
     EndpointInterfaceRegistry mEndpointInterfaceRegistry;

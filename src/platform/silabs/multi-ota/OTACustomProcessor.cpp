@@ -22,6 +22,9 @@
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
 namespace chip {
+namespace DeviceLayer {
+namespace Silabs {
+namespace MultiOTA {
 
 // Define static memebers
 uint8_t OTACustomProcessor::mSlotId                                                  = 0;
@@ -62,4 +65,7 @@ CHIP_ERROR OTACustomProcessor::FinalizeAction()
     return CHIP_NO_ERROR;
 }
 
+} // namespace MultiOTA
+} // namespace Silabs
+} // namespace DeviceLayer
 } // namespace chip

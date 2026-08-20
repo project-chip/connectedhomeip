@@ -27,7 +27,7 @@ LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.INFO)
 
 if TYPE_CHECKING:
-    from matter.testing.matter_testing import MatterTestConfig
+    from matter.testing.matter_test_config import MatterTestConfig
 
 
 class MatterStackState:
@@ -60,7 +60,7 @@ class MatterStackState:
             self._chip_stack = builtins.chipStack
             LOGGER.warning(
                 "Re-using existing ChipStack object found in current interpreter: "
-                "storage path %s will be ignored!" % (self._config.storage_path)
+                "storage path %s will be ignored!", self._config.storage_path
             )
             # TODO: Warn that storage will not follow what we set in config
         else:

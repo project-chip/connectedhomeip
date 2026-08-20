@@ -173,13 +173,9 @@ class ScenesManagementCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
         groupID_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_SCENE_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_SCENE_ID)) {
         sceneID_decoded = tlvReader.getUByte(tag)
       } else {
         tlvReader.skipElement()
@@ -256,17 +252,11 @@ class ScenesManagementCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
         groupID_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_SCENE_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_SCENE_ID)) {
         sceneID_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_TRANSITION_TIME)) {
+      } else if (tag == ContextSpecificTag(TAG_TRANSITION_TIME)) {
         transitionTime_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -278,9 +268,7 @@ class ScenesManagementCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_SCENE_NAME)) {
+      } else if (tag == ContextSpecificTag(TAG_SCENE_NAME)) {
         sceneName_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -292,9 +280,7 @@ class ScenesManagementCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_EXTENSION_FIELD_SET_STRUCTS)) {
+      } else if (tag == ContextSpecificTag(TAG_EXTENSION_FIELD_SET_STRUCTS)) {
         extensionFieldSetStructs_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -386,13 +372,9 @@ class ScenesManagementCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
         groupID_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_SCENE_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_SCENE_ID)) {
         sceneID_decoded = tlvReader.getUByte(tag)
       } else {
         tlvReader.skipElement()
@@ -452,9 +434,7 @@ class ScenesManagementCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
         groupID_decoded = tlvReader.getUShort(tag)
       } else {
         tlvReader.skipElement()
@@ -517,13 +497,9 @@ class ScenesManagementCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
         groupID_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_SCENE_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_SCENE_ID)) {
         sceneID_decoded = tlvReader.getUByte(tag)
       } else {
         tlvReader.skipElement()
@@ -623,9 +599,7 @@ class ScenesManagementCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_CAPACITY)) {
+      } else if (tag == ContextSpecificTag(TAG_CAPACITY)) {
         capacity_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -638,13 +612,9 @@ class ScenesManagementCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
         groupID_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_SCENE_LIST)) {
+      } else if (tag == ContextSpecificTag(TAG_SCENE_LIST)) {
         sceneList_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -740,13 +710,9 @@ class ScenesManagementCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_GROUP_IDENTIFIER_FROM)) {
+      } else if (tag == ContextSpecificTag(TAG_GROUP_IDENTIFIER_FROM)) {
         groupIdentifierFrom_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_SCENE_IDENTIFIER_FROM)) {
+      } else if (tag == ContextSpecificTag(TAG_SCENE_IDENTIFIER_FROM)) {
         sceneIdentifierFrom_decoded = tlvReader.getUByte(tag)
       } else {
         tlvReader.skipElement()

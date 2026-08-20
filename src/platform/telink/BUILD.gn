@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2025 Project CHIP Authors
+# Copyright (c) 2021-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ static_library("telink") {
     "../SingletonConfigurationManager.cpp",
     "../Zephyr/BLEAdvertisingArbiter.cpp",
     "../Zephyr/BLEAdvertisingArbiter.h",
+    "../Zephyr/BLEManagerImpl.cpp",
     "../Zephyr/ConfigurationManagerImpl.cpp",
     "../Zephyr/DiagnosticDataProviderImpl.cpp",
     "../Zephyr/DiagnosticDataProviderImpl.h",
@@ -34,7 +35,6 @@ static_library("telink") {
     "../Zephyr/SystemTimeSupport.cpp",
     "../Zephyr/ZephyrConfig.cpp",
     "../Zephyr/ZephyrConfig.h",
-    "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "BlePlatformConfig.h",
     "CHIPDevicePlatformConfig.h",
@@ -73,17 +73,17 @@ static_library("telink") {
     ]
   }
 
-  if (chip_enable_openthread || chip_enable_wifi) {
+  if (chip_enable_thread || chip_enable_wifi) {
     sources += [
       "../Zephyr/InetUtils.cpp",
       "../Zephyr/InetUtils.h",
     ]
   }
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [
       "../OpenThread/OpenThreadUtils.cpp",
-      "ThreadStackManagerImpl.cpp",
+      "../Zephyr/ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
     deps += [ "${chip_root}/src/app:app_config" ]
@@ -123,6 +123,7 @@ static_library("telink") {
       "OTAImageProcessorImpl.cpp",
       "OTAImageProcessorImpl.h",
     ]
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   }
 }
 

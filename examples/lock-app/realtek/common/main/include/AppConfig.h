@@ -28,6 +28,9 @@
 #define D2_LED 1
 #define D3_LED 2
 
+#define APP_FUNCTION_TIMER_ID 0
+#define BOLT_LOCK_TIMER_ID 1
+
 #define APP_TASK_NAME "APP"
 
 #define APP_LOCK_BUTTON SW1_BUTTON

@@ -19,12 +19,3 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
     "${CLUSTER_DIR}/CodegenIntegration.h"
 )
-
-# These are the things that BUILD.gn dependencies would pull
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/ota-provider-cluster.cpp"
-    "${CLUSTER_DIR}/ota-provider-cluster.h"
-    "${CLUSTER_DIR}/ota-provider-delegate.h"
-)

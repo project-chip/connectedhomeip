@@ -24,18 +24,26 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "AppTask.h"
+#if defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
 #include "OTAConfig.h"
+#endif // SILABS_OTA_ENABLED
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 
 #define APP_ACTION_BUTTON 1
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 #include "lcd.h"
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
 #include "qrcodegen.h"
-#endif // QR_CODE_ENABLED
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
+
+#ifdef ENABLE_CHIP_SHELL
+#if defined(CHIP_CONFIG_ENABLE_READ_CLIENT) && CHIP_CONFIG_ENABLE_READ_CLIENT
+#include <shell/im/IMShellCommands.h> // nogncheck
+#endif                                // CHIP_CONFIG_ENABLE_READ_CLIENT
+#endif                                // ENABLE_CHIP_SHELL
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDNotifier.h> // nogncheck
@@ -44,7 +52,6 @@
 #endif // ENABLE_CHIP_SHELL
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-#include <app/util/attribute-storage.h>
 #include <assert.h>
 #include <headers/ProvisionManager.h>
 #include <lib/support/CodeUtils.h>
@@ -81,6 +88,14 @@
 #ifdef PERFORMANCE_TEST_ENABLED
 #include <performance_test_commands.h>
 #endif // PERFORMANCE_TEST_ENABLED
+
+#ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
+#include <app-common/zap-generated/callback.h>
+#endif
+
+#ifdef CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK
+#include "CustomerAppTask.h"
+#endif // CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK
 
 /**********************************************************
  * Defines and Constants
@@ -121,8 +136,8 @@ osMessageQueueId_t sAppEventQueue;
 LEDWidget sStatusLED;
 #endif // ENABLE_WSTK_LEDS
 
-bool sIsEnabled  = false;
-bool sIsAttached = false;
+[[maybe_unused]] bool sIsEnabled  = false;
+[[maybe_unused]] bool sIsAttached = false;
 
 #if !(CHIP_CONFIG_ENABLE_ICD_SERVER)
 bool sHaveBLEConnections = false;
@@ -147,20 +162,14 @@ constexpr osThreadAttr_t appTaskAttr = { .name       = APP_TASK_NAME,
                                          .stack_size = APP_TASK_STACK_SIZE,
                                          .priority   = osPriorityNormal };
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 SilabsLCD slLCD;
 #endif
 
 #ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
 Clusters::Identify::EffectIdentifierEnum sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 
-Identify gIdentify = {
-    chip::EndpointId{ 1 },
-    BaseApplication::OnIdentifyStart,
-    BaseApplication::OnIdentifyStop,
-    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
-    BaseApplication::OnTriggerIdentifyEffect,
-};
+ObjectPool<Identify, MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT> IdentifyPool;
 
 #endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
 
@@ -174,28 +183,16 @@ BaseApplicationDelegate BaseApplication::sAppDelegate = BaseApplicationDelegate(
 void BaseApplicationDelegate::OnCommissioningSessionStarted()
 {
     isComissioningStarted = true;
-
-#if SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
-    WifiSleepManager::GetInstance().HandleCommissioningSessionStarted();
-#endif // SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
 }
 
 void BaseApplicationDelegate::OnCommissioningSessionStopped()
 {
     isComissioningStarted = false;
-
-#if SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
-    WifiSleepManager::GetInstance().HandleCommissioningSessionStopped();
-#endif // SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
 }
 
 void BaseApplicationDelegate::OnCommissioningSessionEstablishmentError(CHIP_ERROR err)
 {
     isComissioningStarted = false;
-
-#if SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
-    WifiSleepManager::GetInstance().HandleCommissioningSessionStopped();
-#endif // SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
 }
 
 void BaseApplicationDelegate::OnCommissioningWindowClosed()
@@ -205,14 +202,14 @@ void BaseApplicationDelegate::OnCommissioningWindowClosed()
         // After the device is provisioned and the commissioning passed
         // resetting the isCommissioningStarted to false
         isComissioningStarted = false;
-#ifdef DISPLAY_ENABLED
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
         SilabsLCD::Screen_e screen;
         slLCD.GetScreen(screen);
         VerifyOrReturn(screen == SilabsLCD::Screen_e::QRCodeScreen);
         BaseApplication::PostUpdateDisplayEvent(SilabsLCD::Screen_e::DemoScreen);
-#endif // QR_CODE_ENABLED
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
     }
 }
 
@@ -241,6 +238,11 @@ void BaseApplicationDelegate::OnFabricRemoved(const FabricTable & fabricTable, F
 
 CHIP_ERROR BaseApplication::StartAppTask(osThreadFunc_t taskFunction)
 {
+
+    // Fix OTA by registering the EvenHandler sooner
+    // MATTER-4889
+    ReturnErrorOnFailure(PlatformMgr().AddEventHandler(OnPlatformEvent, 0));
+
     sAppEventQueue = osMessageQueueNew(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent), &appEventQueueAttr);
     if (sAppEventQueue == NULL)
     {
@@ -263,7 +265,7 @@ CHIP_ERROR BaseApplication::Init()
     CHIP_ERROR err = BaseInit();
     if (err != CHIP_NO_ERROR)
     {
-        SILABS_LOG("BaseInit() failed");
+        ChipLogError(DeviceLayer, "BaseInit() failed");
         appError(err);
         return err;
     }
@@ -271,11 +273,12 @@ CHIP_ERROR BaseApplication::Init()
     err = AppInit();
     if (err != CHIP_NO_ERROR)
     {
-        SILABS_LOG("AppInit() failed");
+        ChipLogError(DeviceLayer, "AppInit() failed");
         appError(err);
         return err;
     }
 
+    mIsApplicationInitialized = true;
     return err;
 }
 
@@ -283,7 +286,7 @@ CHIP_ERROR BaseApplication::BaseInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     TEMPORARY_RETURN_IGNORED GetLCD().Init((uint8_t *) APP_TASK_NAME);
 #endif
 
@@ -291,12 +294,12 @@ CHIP_ERROR BaseApplication::BaseInit()
     /*
      * Wait for the WiFi to be initialized
      */
-    ChipLogProgress(AppServer, "APP: Wait WiFi Init");
+    ChipLogDetail(AppServer, "APP: Wait WiFi Init");
     while (!WifiInterface::GetInstance().IsStationReady())
     {
         osDelay(pdMS_TO_TICKS(10));
     }
-    ChipLogProgress(AppServer, "APP: Done WiFi Init");
+    ChipLogDetail(AppServer, "APP: Done WiFi Init");
 #endif
 
     // Create cmsis os sw timer for Function Selection.
@@ -326,7 +329,9 @@ CHIP_ERROR BaseApplication::BaseInit()
     ChipLogProgress(AppServer, "Current Software Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
     ChipLogProgress(AppServer, "Current Software Version: %d", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
 
-    ConfigurationMgr().LogDeviceConfig();
+    // TODO FIXME: ConfigurationMgr().LogDeviceConfig() fills the UART log queue.
+    // Write an optimized version to reduce the number of calls to ChipLogProgress.
+    // ConfigurationMgr().LogDeviceConfig();
 
     OutputQrCode(true /*refreshLCD at init*/);
 #if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)))
@@ -335,6 +340,9 @@ CHIP_ERROR BaseApplication::BaseInit()
 #endif // ENABLE_WSTK_LEDS
 
 #ifdef ENABLE_CHIP_SHELL
+#if defined(CHIP_CONFIG_ENABLE_READ_CLIENT) && CHIP_CONFIG_ENABLE_READ_CLIENT
+    IMShellCommands::RegisterCommands();
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     ICDCommands::RegisterCommands();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -344,7 +352,6 @@ CHIP_ERROR BaseApplication::BaseInit()
     RegisterPerfTestCommands();
 #endif // PERFORMANCE_TEST_ENABLED
 
-    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(OnPlatformEvent, 0);
 #ifdef SL_WIFI
     BaseApplication::sIsProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
 #endif /* SL_WIFI */
@@ -395,7 +402,16 @@ bool BaseApplication::ActivateStatusLedPatterns()
     bool isPatternSet = false;
 #if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)))
 #ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
-    if (gIdentify.mActive)
+    bool isIdentifyActive = false;
+    for (const auto & obj : IdentifyPool)
+    {
+        if (obj->mActive)
+        {
+            isIdentifyActive = true;
+            break;
+        }
+    }
+    if (isIdentifyActive)
     {
         // Identify in progress
         // Do a steady blink on the status led
@@ -597,9 +613,9 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
             }
             // Print the QR Code
             OutputQrCode(false);
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
             PostUpdateDisplayEvent(SilabsLCD::Screen_e::CycleScreen);
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
         }
     }
 }
@@ -685,7 +701,7 @@ void BaseApplication::StopStatusLEDTimer()
 #ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
 void BaseApplication::OnIdentifyStart(Identify * identify)
 {
-    ChipLogProgress(Zcl, "onIdentifyStart");
+    ChipLogDetail(Zcl, "onIdentifyStart");
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     StartStatusLEDTimer();
@@ -694,7 +710,7 @@ void BaseApplication::OnIdentifyStart(Identify * identify)
 
 void BaseApplication::OnIdentifyStop(Identify * identify)
 {
-    ChipLogProgress(Zcl, "onIdentifyStop");
+    ChipLogDetail(Zcl, "onIdentifyStop");
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     StopStatusLEDTimer();
@@ -703,7 +719,7 @@ void BaseApplication::OnIdentifyStop(Identify * identify)
 
 void BaseApplication::OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState)
 {
-    ChipLogProgress(Zcl, "Trigger Identify Complete");
+    ChipLogDetail(Zcl, "Trigger Identify Complete");
     sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -746,8 +762,14 @@ void BaseApplication::OnTriggerIdentifyEffect(Identify * identify)
         break;
     default:
         sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
-        ChipLogProgress(Zcl, "No identifier effect");
+        ChipLogDetail(Zcl, "No identifier effect");
     }
+}
+
+void emberAfIdentifyClusterInitCallback(chip::EndpointId endpoint)
+{
+    IdentifyPool.CreateObject(endpoint, BaseApplication::OnIdentifyStart, BaseApplication::OnIdentifyStop,
+                              Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, BaseApplication::OnTriggerIdentifyEffect);
 }
 #endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
 
@@ -756,7 +778,7 @@ void BaseApplication::LightTimerEventHandler(void * timerCbArg)
     LightEventHandler();
 }
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 SilabsLCD & BaseApplication::GetLCD(void)
 {
     return slLCD;
@@ -839,13 +861,13 @@ void BaseApplication::PostEvent(const AppEvent * aEvent)
 
 void BaseApplication::DispatchEvent(AppEvent * aEvent)
 {
-    if (aEvent->Handler)
+    if (aEvent != nullptr && aEvent->Handler)
     {
         aEvent->Handler(aEvent);
     }
     else
     {
-        ChipLogProgress(AppServer, "Event received with no handler. Dropping event.");
+        ChipLogError(AppServer, "Nullptr event received or no handler. Dropping it.");
     }
 }
 
@@ -857,7 +879,7 @@ void BaseApplication::ScheduleFactoryReset()
         {
             TEMPORARY_RETURN_IGNORED Provision::Manager::GetInstance().SetProvisionRequired(true);
         }
-#if SL_WIFI
+#if defined(SL_WIFI) && SL_WIFI
         // Removing the matter services on factory reset
         TEMPORARY_RETURN_IGNORED chip::Dnssd::ServiceAdvertiser::Instance().RemoveServices();
 #endif
@@ -884,7 +906,6 @@ void BaseApplication::DoProvisioningReset()
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-        ChipLogProgress(DeviceLayer, "Clearing WiFi provision");
         chip::DeviceLayer::ConnectivityMgr().ClearWiFiStationProvision();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 
@@ -896,12 +917,12 @@ void BaseApplication::DoProvisioningReset()
     });
 }
 
-#if SILABS_OTA_ENABLED
+#if defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
 void BaseApplication::InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
 {
     OTAConfig::Init();
 }
-#endif
+#endif // defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
 
 void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
 {
@@ -924,7 +945,7 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
             }
         }
 #endif // SL_MATTER_ENABLE_AWS
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
         SilabsLCD::Screen_e screen;
         AppTask::GetLCD().GetScreen(screen);
         // Update the LCD screen with SSID and connected state
@@ -932,11 +953,11 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
         {
             PostUpdateDisplayEvent(SilabsLCD::Screen_e::StatusScreen);
         }
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
         if ((event->ThreadConnectivityChange.Result == kConnectivity_Established) ||
             (event->InternetConnectivityChange.IPv6 == kConnectivity_Established))
         {
-#if SL_WIFI
+#if defined(SL_WIFI) && SL_WIFI
             chip::app::DnssdServer::Instance().StartServer();
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -945,26 +966,26 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif // SL_WIFI
 
-#if SILABS_OTA_ENABLED
+#if defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
             ChipLogProgress(AppServer, "Scheduling OTA Requestor initialization");
             TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
                 chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec), InitOTARequestorHandler, nullptr);
-#endif // SILABS_OTA_ENABLED
+#endif // defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
         }
     }
     break;
 
     case DeviceEventType::kDnssdInitialized: {
-#if SILABS_OTA_ENABLED
+#if defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
         ChipLogProgress(AppServer, "DNS-SD initialized, scheduling OTA Requestor initialization");
         TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
             chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec), InitOTARequestorHandler, nullptr);
-#endif // SILABS_OTA_ENABLED
+#endif // defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
     }
     break;
 
     case DeviceEventType::kCommissioningComplete: {
-#if SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
+#if defined(SL_WIFI) && SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
         TEMPORARY_RETURN_IGNORED WifiSleepManager::GetInstance().VerifyAndTransitionToLowPowerMode(
             WifiSleepManager::PowerEvent::kCommissioningComplete);
 #endif // SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -987,13 +1008,13 @@ void BaseApplication::OutputQrCode(bool refreshLCD)
     if (CHIP_NO_ERROR == err)
     {
         // Print setup info on LCD if available
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
         if (refreshLCD)
         {
             slLCD.SetQRCode((uint8_t *) setupPayload.data(), setupPayload.size());
             slLCD.ShowQRCode(true);
         }
-#endif // QR_CODE_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED
 
         PrintQrCodeURL(setupPayload);
     }
@@ -1007,3 +1028,14 @@ bool BaseApplication::GetProvisionStatus()
 {
     return BaseApplication::sIsProvisioned;
 }
+
+#ifdef CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
+{
+    // Verify that the App layer is initialized before propagating attribute changes callback to it.
+    VerifyOrReturn(CustomerAppTask::GetAppTask().IsApplicationInitialized());
+    // Route through CustomerAppTask / AppTaskImpl (CRTP) so overrides use DMPostAttributeChangeCallbackImpl.
+    CustomerAppTask::GetAppTask().DMPostAttributeChangeCallback(attributePath, type, size, value);
+}
+#endif // CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK

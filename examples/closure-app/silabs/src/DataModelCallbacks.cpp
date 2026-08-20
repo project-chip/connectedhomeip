@@ -31,7 +31,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/clusters/closure-control-server/closure-control-server.h>
+#include <app/clusters/closure-control-server/CodegenIntegration.h>
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters::ClosureControl;
@@ -54,7 +54,7 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attrib
 void MatterClosureControlClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
     ChipLogProgress(Zcl, "Closure Control cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mAttributeId));
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     using namespace chip::app::Clusters::ClosureControl::Attributes;
 
     switch (attributePath.mAttributeId)
@@ -70,7 +70,7 @@ void MatterClosureControlClusterServerAttributeChangedCallback(const app::Concre
     default:
         break;
     }
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 }
 
 void MatterClosureDimensionClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)

@@ -23,7 +23,7 @@
 using namespace chip;
 using namespace chip::Credentials::JCM;
 
-class TestTrustVerification : public chip::Test::AppContext
+class TestTrustVerification : public chip::Testing::AppContext
 {
 public:
     // Performs shared setup for all tests in the test suite.  Run once for the whole suite.
@@ -31,7 +31,7 @@ public:
     {
         ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
 
-        chip::Test::AppContext::SetUpTestSuite();
+        chip::Testing::AppContext::SetUpTestSuite();
     }
 
     // Performs shared teardown for all tests in the test suite.  Run once for the whole suite.

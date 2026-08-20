@@ -30,7 +30,7 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    CHIP_NO_LOG_TIMESTAMPS: true
+    CHIP_LOG_TIMESTAMPS: false
 
 jobs:
     FreeRTOS:
@@ -43,12 +43,13 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp:174
+            image: ghcr.io/project-chip/chip-build-nxp:200
             volumes:
+                - "/:/runner-root-volume"
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -56,12 +57,13 @@ jobs:
                   extra-submodule-parameters: --recursive
 
             - name: Detect changed paths
-              uses: dorny/paths-filter@v3
+              uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4
               id: changed_paths
               with:
                   filters: |
                       nxp:
                         - '**/nxp/**'
+                        - 'third_party/simw-top-mini/**'
 
             - name: Set up environment for size reports
               uses: ./.github/actions/setup-size-reports
@@ -69,25 +71,11 @@ jobs:
               with:
                   gh-context: ${{ toJson(github) }}
 
-            - name: Build MCXW71 examples
-              run: |
-                  scripts/run_in_build_env.sh "\
-                      ./scripts/build/build_examples.py \
-                      --target nxp-mcxw71-freertos-contact-sensor-thread-mtd-low-power-frdm \
-                      build \
-                  "
-            - name: Get MCXW71 contact sensor size stats
-              run: |
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    nxp mcxw71+release contact \
-                    out/nxp-mcxw71-freertos-contact-sensor-thread-mtd-low-power-frdm/app.elf \
-                    /tmp/bloat_reports/
-
             - name: Build MCXW72 examples
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-mcxw72-freertos-contact-sensor-thread-mtd-low-power-frdm \
+                      --target nxp-mcxw72-freertos-contact-sensor-thread-mtd-low-power-frdm-ota-factory \
                       build \
                   "
 
@@ -127,9 +115,11 @@ jobs:
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
                       --target nxp-rw61x-freertos-thermostat-thread-wifi-ota-factory \
-                      --target nxp-rw61x-freertos-thermostat-wifi-se05x \
+                      --target nxp-rw61x-freertos-thermostat-wifi-se05x-factory \
                       build \
                   "
+            - name: clean build
+              run: rm -rf ./out
             - name: Build RW61X thermostat ethernet example app
               run: |
                   scripts/run_in_build_env.sh "\
@@ -146,6 +136,11 @@ jobs:
               if: ${{ !env.ACT }}
               with:
                   platform-name: NXP-FREERTOS
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     zephyr:
         name: ZEPHYR
 
@@ -153,26 +148,31 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp-zephyr:174
+            image: ghcr.io/project-chip/chip-build-nxp-zephyr:203
+            volumes:
+                - "/:/runner-root-volume"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                   platform: nxp
             - name: Detect changed paths
-              uses: dorny/paths-filter@v3
+              uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4
               id: changed_paths
               with:
                   filters: |
                       nxp:
                         - '**/nxp/**'
+                        - '**/Zephyr/**'
+                        - '**/zephyr/**'
+                        - 'third_party/simw-top-mini/**'
                       pigweed:
                         - 'src/pw_backends/**'
                         - 'third_party/pigweed/**'
-            - name: Build NXP Zephyr examples
+            - name: Build NXP Zephyr all-clusters example
               if:
                   github.event_name == 'push' || steps.changed_paths.outputs.nxp
                   == 'true' || steps.changed_paths.outputs.pigweed == 'true'
@@ -180,7 +180,66 @@ jobs:
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
                       --target nxp-rw61x-zephyr-all-clusters \
-                      --target nxp-rw61x-zephyr-thermostat \
+                      build \
+                  "
+
+            - name: clean build
+              run: rm -rf ./out
+
+            - name: Build NXP Zephyr thermostat Wi-Fi OTA example
+              if:
+                  github.event_name == 'push' || steps.changed_paths.outputs.nxp
+                  == 'true' || steps.changed_paths.outputs.pigweed == 'true'
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
+                      --target nxp-rw61x-zephyr-thermostat-ota \
+                      build \
+                  "
+
+            - name: clean build
+              run: rm -rf ./out
+
+            - name: Build NXP Zephyr thermostat Thread example
+              if:
+                  github.event_name == 'push' || steps.changed_paths.outputs.nxp
+                  == 'true' || steps.changed_paths.outputs.pigweed == 'true'
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
+                      --target nxp-rw61x-zephyr-thermostat-thread \
+                      build \
+                  "
+
+            - name: clean build
+              run: rm -rf ./out
+
+            - name: Build NXP Zephyr laundry-washer-factory example
+              if:
+                  github.event_name == 'push' || steps.changed_paths.outputs.nxp
+                  == 'true' || steps.changed_paths.outputs.pigweed == 'true'
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
                       --target nxp-rw61x-zephyr-laundry-washer-factory \
                       build \
                   "
+
+            - name: clean build
+              run: rm -rf ./out
+
+            - name: Build NXP Zephyr Unit Tests
+              if:
+                  github.event_name == 'push' || steps.changed_paths.outputs.nxp
+                  == 'true' || steps.changed_paths.outputs.pigweed == 'true'
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
+                      --target nxp-rw61x-zephyr-unit-test \
+                      build \
+                  "
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

@@ -27,22 +27,19 @@
 #include <crypto/RandUtils.h>
 #include <lib/dnssd/Advertiser_ImplMinimalMdnsAllocator.h>
 #include <lib/dnssd/minimal_mdns/AddressPolicy.h>
+#include <lib/dnssd/minimal_mdns/MinMdnsConfig.h>
 #include <lib/dnssd/minimal_mdns/ResponseSender.h>
 #include <lib/dnssd/minimal_mdns/Server.h>
-#include <lib/dnssd/minimal_mdns/core/FlatAllocatedQName.h>
 #include <lib/dnssd/minimal_mdns/responders/IP.h>
 #include <lib/dnssd/minimal_mdns/responders/Ptr.h>
 #include <lib/dnssd/minimal_mdns/responders/QueryResponder.h>
 #include <lib/dnssd/minimal_mdns/responders/Srv.h>
 #include <lib/dnssd/minimal_mdns/responders/Txt.h>
+#include <lib/dnssd/wire/FlatAllocatedQName.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/StringBuilder.h>
-
-// Enable detailed mDNS logging for received queries
-#undef DETAIL_LOGGING
-// #define DETAIL_LOGGING
 
 namespace chip {
 namespace Dnssd {
@@ -50,8 +47,9 @@ namespace {
 
 using chip::Platform::UniquePtr;
 using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 
-#ifdef DETAIL_LOGGING
+#if CHIP_MINMDNS_HIGH_VERBOSITY
 const char * ToString(QClass qClass)
 {
     switch (qClass)
@@ -100,7 +98,7 @@ void LogQuery(const QueryData & data)
 }
 #else
 void LogQuery(const QueryData & data) {}
-#endif
+#endif // CHIP_MINMDNS_HIGH_VERBOSITY
 
 // Max number of records for operational = PTR, SRV, TXT, A, AAAA, I subtype.
 constexpr size_t kMaxOperationalRecords = 6;
@@ -327,7 +325,7 @@ private:
 
 void AdvertiserMinMdns::OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
 {
-#ifdef DETAIL_LOGGING
+#if CHIP_MINMDNS_HIGH_VERBOSITY
     char srcAddressString[chip::Inet::IPAddress::kMaxStringLength];
     VerifyOrDie(info->SrcAddress.ToString(srcAddressString) != nullptr);
     ChipLogDetail(Discovery, "Received an mDNS query from %s", srcAddressString);
@@ -337,6 +335,10 @@ void AdvertiserMinMdns::OnMdnsPacketData(const BytesRange & data, const chip::In
     if (!ParsePacket(data, this))
     {
         ChipLogError(Discovery, "Failed to parse mDNS query");
+#if CHIP_MINMDNS_HIGH_VERBOSITY
+        ChipLogDetail(Discovery, "Invalid packet content:");
+        ChipLogByteSpan(Discovery, data.AsByteSpan());
+#endif // CHIP_MINMDNS_HIGH_VERBOSITY
     }
     mCurrentSource = nullptr;
 }
@@ -574,6 +576,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
 
     AdvertiseRecords(BroadcastAdvertiseType::kStarted);
 
+    // This message is used as a marker for when the application process has started.
+    // It is watched for by the YAML test toolkit. See: scripts/tests/chiptest/test_definition.py
     ChipLogProgress(Discovery, "mDNS service published: %s.%s", StringOrNullMarker(instanceName.names[1]),
                     StringOrNullMarker(instanceName.names[2]));
 
@@ -785,6 +789,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
     AdvertiseRecords(BroadcastAdvertiseType::kStarted);
 
+    // This message is used as a marker for when the application process has started.
+    // It is watched for by the YAML test toolkit. See: scripts/tests/chiptest/test_definition.py
     ChipLogProgress(Discovery, "mDNS service published: %s.%s", StringOrNullMarker(instanceName.names[1]),
                     StringOrNullMarker(instanceName.names[2]));
 

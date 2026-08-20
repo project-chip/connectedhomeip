@@ -302,14 +302,23 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & re
     {
         // When an ICD operates as a LIT, the DNS-SD advertisement lacks the Session Idle Interval
         // (SII). This would cause mIdleRetransTimeout to be 0, which is not a usable value. Since
-        // CASE is established with LIT ICDs only when they are active, we can base
-        // mIdleRetransTimeout on active mode parameters. To ensure sufficient time for MRP
-        // retransmissions, particularly in Thread networks where mActiveRetransTimeout might be too
-        // small, we use the maximum of config.mActiveRetransTimeout and
-        // mInitParams.minimumLITBackoffInterval
-
-        config.mIdleRetransTimeout =
-            std::max(config.mActiveRetransTimeout, System::Clock::Milliseconds32(mInitParams.minimumLITBackoffInterval.ValueOr(0)));
+        // CASE is established with LIT ICDs only when they are active, we base mIdleRetransTimeout
+        // on active mode parameters. However, in multihop Thread networks, mActiveRetransTimeout is
+        // often too small to accommodate the full Sigma1/Sigma2 round-trip turnaround.
+        //
+        // Specifically, typical CASE establishment latency for a LIT device on Thread includes:
+        // - Crypto Processing (ECDH P-256 point multiplication + key derivation on resource-constrained
+        //   MCUs): ~0.8s to 1.8s
+        // - Multi-hop Thread transport (3–4 hops including MAC CSMA-CA and parent poll timing): ~0.3s to 0.8s
+        // - Total expected round-trip turnaround: ~1.1s to 2.5s
+        //
+        // To prevent spurious MRP retransmissions on low-bandwidth 802.15.4 channels while the remote
+        // device is processing Sigma1, we enforce a minimum LIT backoff interval. If a platform does not
+        // explicitly configure minimumLITBackoffInterval in CASEClientInitParams (e.g., when using
+        // SDK wrappers like Android where custom CASE params are not exposed), we default to 3000 ms.
+        // This 3-second floor provides an adequate safety margin beyond typical ~1.1s–2.5s turnaround time.
+        config.mIdleRetransTimeout = std::max(config.mActiveRetransTimeout,
+                                              System::Clock::Milliseconds32(mInitParams.minimumLITBackoffInterval.ValueOr(3000)));
     }
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (mTransportPayloadCapability == TransportPayloadCapability::kLargePayload)
@@ -579,6 +588,10 @@ OperationalSessionSetup::~OperationalSessionSetup()
     CancelSessionSetupReattempt();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
+#if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
+    CancelFallbackTimer();
+#endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
+
     DequeueConnectionCallbacks(CHIP_ERROR_CANCELLED, ReleaseBehavior::DoNotRelease);
 }
 
@@ -623,7 +636,22 @@ CHIP_ERROR OperationalSessionSetup::LookupPeerAddress()
 
     NodeLookupRequest request(peerId);
 
-    return Resolver::Instance().LookupNode(request, mAddressLookupHandle);
+    CHIP_ERROR err = Resolver::Instance().LookupNode(request, mAddressLookupHandle);
+
+#if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
+    // Start fallback timer if we have a fallback result configured
+    if (err == CHIP_NO_ERROR)
+    {
+        CHIP_ERROR fallbackErr = StartFallbackTimer();
+        if (fallbackErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to start fallback timer: %" CHIP_ERROR_FORMAT, fallbackErr.Format());
+            // Continue anyway - fallback timer is optional
+        }
+    }
+#endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
+
+    return err;
 }
 
 void OperationalSessionSetup::PerformAddressUpdate()
@@ -654,6 +682,11 @@ void OperationalSessionSetup::PerformAddressUpdate()
 
 void OperationalSessionSetup::OnNodeAddressResolved(const PeerId & peerId, const ResolveResult & result)
 {
+#if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
+    // DNS-SD resolution succeeded, cancel the fallback timer
+    CancelFallbackTimer();
+#endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
+
     UpdateDeviceData(result);
 }
 
@@ -898,5 +931,88 @@ void OperationalSessionSetup::NotifyRetryHandlers(CHIP_ERROR error, System::Cloc
     }
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+
+#if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
+void OperationalSessionSetup::SetFallbackResolveResult(const AddressResolve::ResolveResult & result)
+{
+    ChipLogProgress(Discovery, "OperationalSessionSetup[" ChipLogFormatScopedNodeId "]: Setting fallback resolve result",
+                    ChipLogValueScopedNodeId(mPeerId));
+    mFallbackResolveResult.SetValue(result);
+}
+
+System::Layer * OperationalSessionSetup::GetSystemLayer()
+{
+    auto * sessionManager = mInitParams.exchangeMgr->GetSessionManager();
+    if (sessionManager == nullptr)
+    {
+        return nullptr;
+    }
+    return sessionManager->SystemLayer();
+}
+
+CHIP_ERROR OperationalSessionSetup::StartFallbackTimer()
+{
+    if (!mFallbackResolveResult.HasValue())
+    {
+        // No fallback configured, nothing to do
+        return CHIP_NO_ERROR;
+    }
+
+    auto * systemLayer = GetSystemLayer();
+    VerifyOrReturnError(systemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    ChipLogProgress(Discovery, "OperationalSessionSetup[" ChipLogFormatScopedNodeId "]: Starting fallback timer (%u seconds)",
+                    ChipLogValueScopedNodeId(mPeerId),
+                    static_cast<unsigned>(std::chrono::duration_cast<System::Clock::Seconds16>(mFallbackTimeout).count()));
+
+    return systemLayer->StartTimer(mFallbackTimeout, OnFallbackTimeout, this);
+}
+
+void OperationalSessionSetup::CancelFallbackTimer()
+{
+    if (!mFallbackResolveResult.HasValue())
+    {
+        // No fallback configured, nothing to cancel
+        return;
+    }
+
+    auto * systemLayer = GetSystemLayer();
+    VerifyOrReturn(systemLayer != nullptr);
+
+    ChipLogDetail(Discovery, "OperationalSessionSetup[" ChipLogFormatScopedNodeId "]: Cancelling fallback timer",
+                  ChipLogValueScopedNodeId(mPeerId));
+
+    systemLayer->CancelTimer(OnFallbackTimeout, this);
+}
+
+void OperationalSessionSetup::OnFallbackTimeout(System::Layer * systemLayer, void * appState)
+{
+    auto * self = static_cast<OperationalSessionSetup *>(appState);
+
+    ChipLogProgress(Discovery,
+                    "OperationalSessionSetup[" ChipLogFormatScopedNodeId "]: Address resolution timed out, using fallback address",
+                    ChipLogValueScopedNodeId(self->mPeerId));
+
+    // Cancel the ongoing address lookup
+    if (self->mAddressLookupHandle.IsActive())
+    {
+        // Cancel the ongoing DNS-SD lookup using FailureCallback::Skip to prevent double error handling.
+        // If cancellation fails (logged below), we proceed with fallback anyway since the timer has expired.
+        // This is safe because we have a known-good address from the PASE session.
+        CHIP_ERROR err = Resolver::Instance().CancelLookup(self->mAddressLookupHandle, Resolver::FailureCallback::Skip);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to cancel address lookup: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
+
+    // Use the fallback result. This must have a value because StartFallbackTimer only starts
+    // the timer when mFallbackResolveResult has a value. If this fails, it indicates memory
+    // corruption or a serious programming error.
+    VerifyOrDie(self->mFallbackResolveResult.HasValue());
+    self->UpdateDeviceData(self->mFallbackResolveResult.Value());
+    // Do not touch `self` instance anymore; it might have been destroyed in UpdateDeviceData.
+}
+#endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
 
 } // namespace chip

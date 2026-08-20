@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
+#include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 
 namespace chip::app::Clusters::GeneralDiagnostics {
 void GlobalNotifyDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason);

@@ -20,7 +20,6 @@ import os
 import pathlib
 import platform
 import re
-import shlex
 import shutil
 import subprocess
 import sys
@@ -228,7 +227,7 @@ class Flasher(firmware_utils.Flasher):
 
     args = {}
     work_dir = None
-    bouffalo_sdk_chips = ["bl616"]
+    bouffalo_sdk_chips = ["bl616", "bl616cl"]
 
     def __init__(self, **options):
         super().__init__(platform=None, module=__name__, **options)
@@ -245,13 +244,23 @@ class Flasher(firmware_utils.Flasher):
 
         return ret_files
 
+    def run_bouffalo_tool(self, command):
+        command = [str(arg) for arg in command]
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        for line in process.stdout:
+            line = line.rstrip()
+            if line:
+                log.info(line)
+        ret = process.wait()
+        if ret != 0:
+            raise subprocess.CalledProcessError(ret, command)
+
     def parse_mfd(self):
 
         def decrypt_data(data_bytearray, key_bytearray, iv_bytearray):
             data_bytearray += bytes([0] * (16 - (len(data_bytearray) % 16)))
             cryptor = AES.new(key_bytearray, AES.MODE_CBC, iv_bytearray)
-            plaintext = cryptor.decrypt(data_bytearray)
-            return plaintext
+            return cryptor.decrypt(data_bytearray)
 
         self.args["iv"] = None
 
@@ -300,7 +309,7 @@ class Flasher(firmware_utils.Flasher):
             type_id = int.from_bytes(bytes_raw[offset: offset + 2], byteorder='little')
             type_len = int.from_bytes(bytes_raw[offset + 2: offset + 4], byteorder='little')
 
-            if 0x8001 == type_id:
+            if type_id == 0x8001:
                 self.args["iv"] = bytes_raw[offset + 4: offset + 4 + type_len]
 
             if offset + 4 + type_len <= raw_len:
@@ -330,14 +339,14 @@ class Flasher(firmware_utils.Flasher):
         mfd_str = ""
         if dict_sec.keys():
             for idx in range(1, 1 + max(dict_sec.keys())):
-                if idx in dict_sec.keys():
+                if idx in dict_sec:
                     mfd_str += dict_sec[idx] + ","
                 else:
                     mfd_str += ","
 
         mfd_str = mfd_str + ":"
         for idx in range(0x8001, 1 + max(dict_raw.keys())):
-            if idx in dict_raw.keys():
+            if idx in dict_raw:
                 mfd_str += dict_raw[idx] + ","
             else:
                 mfd_str += ","
@@ -359,7 +368,7 @@ class Flasher(firmware_utils.Flasher):
             try:
                 flashtool_exe = flashtool_path + "/" + bflb_tools_dict[sys.platform]["flash_tool"]
             except Exception:
-                raise Exception("Do NOT support {} operating system to program firmware.".format(sys.platform))
+                raise Exception(f"Do NOT support {sys.platform} operating system to program firmware.")
 
             if not os.path.exists(flashtool_exe):
                 log.fatal("*" * 80)
@@ -378,9 +387,8 @@ class Flasher(firmware_utils.Flasher):
 
             if dts:
                 return dts
-            else:
-                return os.path.join(flashtool_path, "chips", self.args["chipname"],
-                                    "device_tree", "bl_factory_params_IoTKitA_{}.dts".format(self.args["xtal"]))
+            return os.path.join(flashtool_path, "chips", self.args["chipname"],
+                                "device_tree", "bl_factory_params_IoTKitA_{}.dts".format(self.args["xtal"]))
 
         def get_boot_image(flashtool_path, boot2_image):
 
@@ -400,7 +408,7 @@ class Flasher(firmware_utils.Flasher):
             return boot2_images[0]
 
         def get_mfd_addr():
-            with open(self.args["pt"], 'r') as file:
+            with open(self.args["pt"]) as file:
                 partition_config = toml.load(file)
 
             mfd_addr = None
@@ -412,8 +420,8 @@ class Flasher(firmware_utils.Flasher):
 
         def exe_gen_ota_image_cmd(flashtool_exe):
 
-            os.system("rm -rf {}/FW_OTA.bin*".format(self.work_dir))
-            os.system("rm -rf {}/ota_images".format(self.work_dir))
+            os.system(f"rm -rf {self.work_dir}/FW_OTA.bin*")
+            os.system(f"rm -rf {self.work_dir}/ota_images")
 
             if not self.args["build_ota"]:
                 return
@@ -431,23 +439,19 @@ class Flasher(firmware_utils.Flasher):
             if self.args["sk"]:
                 gen_ota_img_cmd += ["--sk", self.args["sk"]]
 
-            log.info("ota image generating: %s", shlex.join(gen_ota_img_cmd))
-            process = subprocess.Popen(gen_ota_img_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            while process.poll() is None:
-                line = process.stdout.readline().decode('utf-8').rstrip()
-                if line:
-                    log.info(line)
+            log.info("ota image generating: %s", " ".join(str(arg) for arg in gen_ota_img_cmd))
+            self.run_bouffalo_tool(gen_ota_img_cmd)
 
             fw_ota_images = self.find_file(self.work_dir, r'^FW_OTA.+\.hash$')
-            if not fw_ota_images or 0 == len(fw_ota_images):
+            if not fw_ota_images or len(fw_ota_images) == 0:
                 raise Exception("Failed to generate Bouffalo Lab OTA image.")
 
-            os.system("mkdir -p {}/ota_images".format(self.work_dir))
+            os.system(f"mkdir -p {self.work_dir}/ota_images")
             fw_name = os.path.basename(self.args["firmware"])[:-len(".bin")]
             for img in fw_ota_images:
                 ota_img_name = os.path.basename(img)
                 new_name = os.path.join(self.work_dir, "ota_images", fw_name + ota_img_name[len("FW_OTA"):])
-                os.system("mv {} {}".format(img, new_name))
+                os.system(f"mv {img} {new_name}")
 
         def construct_prog_confg():
 
@@ -474,11 +478,11 @@ class Flasher(firmware_utils.Flasher):
                     "psm_download": False,
                     "key_download": False,
                     "data_download": False,
-                    "factory_download": True if self.args["dts"] else False,
-                    "mfd_download": True if self.args["mfd"] else False,
-                    "boot2_download": True if self.args["boot2"] else False,
+                    "factory_download": bool(self.args["dts"]),
+                    "mfd_download": bool(self.args["mfd"]),
+                    "boot2_download": bool(self.args["boot2"]),
                     "ckb_erase_all": "True" if self.args["erase"] else "False",
-                    "partition_download": True if self.args["pt"] else False,
+                    "partition_download": bool(self.args["pt"]),
                     "encrypt": False,
                     "sign": False,
                     "single_download": False,
@@ -555,14 +559,13 @@ class Flasher(firmware_utils.Flasher):
                 if self.option.erase:
                     prog_cmd += ["--erase"]
 
-            log.info("firmware programming: %s", shlex.join(prog_cmd))
-            process = subprocess.Popen(prog_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            while process.poll() is None:
-                line = process.stdout.readline().decode('utf-8').rstrip()
-                if line:
-                    log.info(line)
+            log.info("firmware programming: %s", " ".join(str(arg) for arg in prog_cmd))
+            self.run_bouffalo_tool(prog_cmd)
 
         flashtool_path, flashtool_exe = get_tools()
+        if not self.args["pt"]:
+            raise Exception("Partition table is required for BL IoT SDK flashing. Please pass --pt or regenerate flash.py.")
+
         self.args["pt"] = os.path.join(os.getcwd(), str(self.args["pt"]))
         mfd_addr = get_mfd_addr()
 
@@ -581,10 +584,10 @@ class Flasher(firmware_utils.Flasher):
             lhex = ((intvalue & 0xff000000) >> 24) | ((intvalue & 0xff0000) >> 8)
             lhex |= ((intvalue & 0xff00) << 8) | ((intvalue & 0xff) << 24)
 
-            return "%08x" % lhex
+            return f"{lhex:08x}"
 
         def get_tools():
-            bflb_tools = os.path.join(MATTER_ROOT, "third_party/bouffalolab/bouffalo_sdk/tools/bflb_tools")
+            bflb_tools = os.path.join(MATTER_ROOT, "third_party/bouffalolab/repo_bouffalo_sdk/tools/bflb_tools")
             bflb_tools_dict = {
                 "linux": {"fw_proc": "bflb_fw_post_proc/bflb_fw_post_proc-ubuntu", "flash_tool": "bouffalo_flash_cube/BLFlashCommand-ubuntu"},
                 "win32": {"fw_proc": "bflb_fw_post_proc/bflb_fw_post_proc.exe", "flash_tool": "bouffalo_flash_cube/BLFlashCommand.exe"},
@@ -595,7 +598,7 @@ class Flasher(firmware_utils.Flasher):
                 fw_proc_exe = os.path.join(bflb_tools, bflb_tools_dict[sys.platform]["fw_proc"])
                 flashtool_exe = os.path.join(bflb_tools, bflb_tools_dict[sys.platform]["flash_tool"])
             except Exception:
-                raise Exception("Do NOT support {} operating system to program firmware.".format(sys.platform))
+                raise Exception(f"Do NOT support {sys.platform} operating system to program firmware.")
 
             if not os.path.exists(flashtool_exe) or not os.path.exists(fw_proc_exe):
                 log.fatal("*" * 80)
@@ -613,7 +616,7 @@ class Flasher(firmware_utils.Flasher):
                 raise Exception("No partition file or one more partition file found.")
 
             partition_file = partition_file[0]
-            with open(partition_file, 'r') as file:
+            with open(partition_file) as file:
                 partition_config = toml.load(file)
 
             part_addr0 = partition_config["pt_table"]["address0"]
@@ -652,7 +655,7 @@ class Flasher(firmware_utils.Flasher):
 
         def exe_proc_cmd(fw_proc_exe):
 
-            os.system("rm -rf {}/ota_images".format(self.work_dir))
+            os.system(f"rm -rf {self.work_dir}/ota_images")
 
             fw_proc_cmd = [
                 fw_proc_exe,
@@ -673,15 +676,11 @@ class Flasher(firmware_utils.Flasher):
                     "--edata", "0x80,{};0x7c,{};0xfc,{}".format(self.args["key"], lock0, lock1)
                 ]
 
-            log.info("firmware process command: %s", shlex.join(fw_proc_cmd))
-            process = subprocess.Popen(fw_proc_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            while process.poll() is None:
-                line = process.stdout.readline().decode('utf-8').rstrip()
-                if line:
-                    log.info(line)
+            log.info("firmware process command: %s", " ".join(str(arg) for arg in fw_proc_cmd))
+            self.run_bouffalo_tool(fw_proc_cmd)
 
-            os.system("mkdir -p {}/ota_images".format(self.work_dir))
-            os.system("mv {}/*.ota {}/ota_images/".format(self.work_dir, self.work_dir))
+            os.system(f"mkdir -p {self.work_dir}/ota_images")
+            os.system(f"mv {self.work_dir}/*.ota {self.work_dir}/ota_images/")
 
         def exe_prog_cmd(flashtool_exe):
             prog_cmd = [
@@ -704,12 +703,8 @@ class Flasher(firmware_utils.Flasher):
                     "--port", self.args["port"],
                 ]
 
-                log.info("firwmare programming: %s", shlex.join(prog_cmd))
-                process = subprocess.Popen(prog_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                while process.poll() is None:
-                    line = process.stdout.readline().decode('utf-8').rstrip()
-                    if line:
-                        log.info(line)
+                log.info("firwmare programming: %s", " ".join(str(arg) for arg in prog_cmd))
+                self.run_bouffalo_tool(prog_cmd)
 
         fw_proc_exe, flashtool_exe = get_tools()
         os.chdir(self.work_dir)
@@ -750,9 +745,9 @@ class Flasher(firmware_utils.Flasher):
             ota_image_tool.generate_image(ota_image_cfg)
 
             if re.match(r".+\.(xz.ota|xz.hash)$", img):
-                self.log(0, 'Matter OTA compressed image generated: {}'.format(ota_image_cfg.output_file))
+                self.log(0, f'Matter OTA compressed image generated: {ota_image_cfg.output_file}')
             else:
-                self.log(0, 'Matter OTA image generated: {}'.format(ota_image_cfg.output_file))
+                self.log(0, f'Matter OTA image generated: {ota_image_cfg.output_file}')
 
     def verify(self):
         """Not supported"""

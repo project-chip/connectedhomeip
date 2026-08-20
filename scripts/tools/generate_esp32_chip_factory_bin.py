@@ -383,13 +383,13 @@ def populate_factory_data(args, spake2p_params):
     #  - st-mfg/<ep>/<index>/<ind>  : semantic tag mfg code key for the endpoint and index and ind
     if (args.supported_modes is not None):
         dictionary = get_supported_modes_dict(args.supported_modes)
-        for ep in dictionary.keys():
+        for ep in dictionary:
             _sz = {
                 'type': 'data',
                 'encoding': 'u32',
                 'value': len(dictionary[ep])
             }
-            FACTORY_DATA.update({'sm-sz/{:x}'.format(int(ep)): _sz})
+            FACTORY_DATA.update({f'sm-sz/{int(ep):x}': _sz})
             for i in range(len(dictionary[ep])):
                 item = dictionary[ep][i]
                 _label = {
@@ -407,9 +407,9 @@ def populate_factory_data(args, spake2p_params):
                     'encoding': 'u32',
                     'value': len(item["Semantic_Tag"])
                 }
-                FACTORY_DATA.update({'sm-label/{:x}/{:x}'.format(int(ep), i): _label})
-                FACTORY_DATA.update({'sm-mode/{:x}/{:x}'.format(int(ep), i): _mode})
-                FACTORY_DATA.update({'sm-st-sz/{:x}/{:x}'.format(int(ep), i): _st_sz})
+                FACTORY_DATA.update({f'sm-label/{int(ep):x}/{i:x}': _label})
+                FACTORY_DATA.update({f'sm-mode/{int(ep):x}/{i:x}': _mode})
+                FACTORY_DATA.update({f'sm-st-sz/{int(ep):x}/{i:x}': _st_sz})
 
                 for j in range(len(item["Semantic_Tag"])):
                     entry = item["Semantic_Tag"][j]
@@ -425,16 +425,16 @@ def populate_factory_data(args, spake2p_params):
                         'value': entry["mfgCode"]
                     }
 
-                    FACTORY_DATA.update({'st-v/{:x}/{:x}/{:x}'.format(int(ep), i, j): _value})
-                    FACTORY_DATA.update({'st-mfg/{:x}/{:x}/{:x}'.format(int(ep), i, j): _mfg_code})
+                    FACTORY_DATA.update({f'st-v/{int(ep):x}/{i:x}/{j:x}': _value})
+                    FACTORY_DATA.update({f'st-mfg/{int(ep):x}/{i:x}/{j:x}': _mfg_code})
 
 
 def gen_raw_ec_keypair_from_der(key_file, pubkey_raw_file, privkey_raw_file):
     with open(key_file, 'rb') as f:
         key_data = f.read()
 
-    log.warning("Leaking of DAC private keys may lead to attestation chain revokation")
-    log.warning("Please make sure the DAC private is key protected using a password")
+    log.warning("Leaking of DAC private keys may lead to attestation chain revocation")
+    log.warning("Please make sure the DAC private key is protected using a password")
 
     # WARNING: Below line assumes that the DAC private key is not protected by a password,
     #          please be careful and use the password-protected key if reusing this code

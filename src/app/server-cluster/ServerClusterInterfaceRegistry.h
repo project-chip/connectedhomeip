@@ -16,10 +16,12 @@
  */
 #pragma once
 
+#include <app/AppConfig.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <cstdint>
 #include <new>
@@ -86,7 +88,16 @@ public:
 
     void Destroy()
     {
-        VerifyOrDie(IsConstructed());
+        if (!IsConstructed())
+        {
+            // Should not happen — Init/Shutdown are paired at the CodegenDataModelProvider level.
+#if CHIP_CONFIG_ENABLE_SERVER_RESTART_SUPPORT
+            ChipLogError(AppServer, "Destroy() called on already-destroyed cluster — this should not happen");
+#else
+            chipDie();
+#endif
+            return;
+        }
         Registration().~ServerClusterRegistration();
         memset(mRegistration, 0, sizeof(mRegistration));
 
@@ -150,7 +161,8 @@ public:
     /// Remove an existing registration
     ///
     /// Will return CHIP_ERROR_NOT_FOUND if the given registration is not found.
-    CHIP_ERROR Unregister(ServerClusterInterface *);
+    CHIP_ERROR Unregister(ServerClusterInterface *,
+                          ClusterShutdownType clusterShutdownType = ClusterShutdownType::kClusterShutdown);
 
     /// Return the interface registered for the given cluster path or nullptr if one does not exist
     ServerClusterInterface * Get(const ConcreteClusterPath & path);

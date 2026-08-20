@@ -23,10 +23,8 @@
 
 #include <functional>
 
-#include "AppEvent.h"
 #include "Globals.h"
 
-// #include "ColorFormat.h"
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
 

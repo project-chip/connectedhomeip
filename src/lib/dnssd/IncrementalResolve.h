@@ -18,9 +18,9 @@
 
 #include <lib/dnssd/Resolver.h>
 #include <lib/dnssd/Types.h>
-#include <lib/dnssd/minimal_mdns/Parser.h>
-#include <lib/dnssd/minimal_mdns/RecordData.h>
-#include <lib/dnssd/minimal_mdns/core/QName.h>
+#include <lib/dnssd/wire/Parser.h>
+#include <lib/dnssd/wire/QName.h>
+#include <lib/dnssd/wire/RecordData.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/Variant.h>
 
@@ -43,13 +43,13 @@ public:
     /// on insufficient storage space.
     ///
     /// If insufficient space, buffer will be cleared.
-    CHIP_ERROR Set(mdns::Minimal::SerializedQNameIterator value);
+    CHIP_ERROR Set(chip::Dnssd::SerializedQNameIterator value);
 
     /// Return the underlying value in this object.
     ///
     /// Value valid as long as this object is valid and underlying Set() is
     /// not called.
-    mdns::Minimal::SerializedQNameIterator Get() const;
+    chip::Dnssd::SerializedQNameIterator Get() const;
 
 private:
     // Try to have space for at least:
@@ -114,9 +114,10 @@ public:
     /// Start parsing a new record. SRV records are the records we are mainly
     /// interested on, after which TXT and A/AAAA are looked for.
     ///
+    /// Returns CHIP_ERROR_UNSUPPORTED_DNSSD_SERVICE_NAME for non-matter service names.
+    ///
     /// If this function returns with error, the object will be in an inactive state.
-    CHIP_ERROR InitializeParsing(mdns::Minimal::SerializedQNameIterator name, const uint64_t ttl,
-                                 const mdns::Minimal::SrvRecord & srv);
+    CHIP_ERROR InitializeParsing(chip::Dnssd::SerializedQNameIterator name, const uint64_t ttl, const chip::Dnssd::SrvRecord & srv);
 
     /// Notify that a new record is being processed.
     /// Will handle filtering and processing of data to determine if the entry is relevant for
@@ -128,8 +129,7 @@ public:
     ///
     /// [data] represents the record received via [interface] and [packetRange] represents the range
     /// of valid bytes within the packet for the purpose of QName parsing
-    CHIP_ERROR OnRecord(Inet::InterfaceId interface, const mdns::Minimal::ResourceData & data,
-                        mdns::Minimal::BytesRange packetRange);
+    CHIP_ERROR OnRecord(Inet::InterfaceId interface, const chip::Dnssd::ResourceData & data, chip::Dnssd::BytesRange packetRange);
 
     /// Return what additional data is required until the object can be extracted
     ///
@@ -141,13 +141,13 @@ public:
     ///
     /// VALIDITY: Data references internal storage of this object and is valid as long
     ///           as this object is valid and InitializeParsing is not called again.
-    mdns::Minimal::SerializedQNameIterator GetTargetHostName() const { return mTargetHostName.Get(); }
+    chip::Dnssd::SerializedQNameIterator GetTargetHostName() const { return mTargetHostName.Get(); }
 
     /// Fetch the record name set by `InitializeParsing`.
     ///
     /// VALIDITY: Data references internal storage of this object and is valid as long
     ///           as this object is valid and InitializeParsing is not called again.
-    mdns::Minimal::SerializedQNameIterator GetRecordName() const { return mRecordName.Get(); }
+    chip::Dnssd::SerializedQNameIterator GetRecordName() const { return mRecordName.Get(); }
 
     /// Take the current value of the object and clear it once returned.
     ///
@@ -176,7 +176,7 @@ private:
     /// Notify that a PTR record can be parsed.
     ///
     /// Input data MUST have GetType() == QType::TXT
-    CHIP_ERROR OnTxtRecord(const mdns::Minimal::ResourceData & data, mdns::Minimal::BytesRange packetRange);
+    CHIP_ERROR OnTxtRecord(const chip::Dnssd::ResourceData & data, chip::Dnssd::BytesRange packetRange);
 
     /// Notify that a new IP address has been found.
     ///

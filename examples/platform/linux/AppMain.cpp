@@ -38,8 +38,12 @@
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/TestGroupData.h>
+#include <platform/CHIPDeviceEvent.h>
+#include <platform/ConnectivityManager.h>
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -54,6 +58,10 @@
 #include "CommissionerMain.h"
 #include <ControllerShellCommands.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+#ifndef CHIP_LINUX_APP_START_COMMISSIONER_AT_BOOT
+#define CHIP_LINUX_APP_START_COMMISSIONER_AT_BOOT 1
+#endif
 
 #if defined(ENABLE_CHIP_SHELL)
 #include <CommissioneeShellCommands.h>
@@ -145,6 +153,12 @@
 #include <platform/Linux/NetworkCommissioningDriver.h>
 #endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#include <inet/EndPointStateOpenThread.h>
+#include <openthread-system.h>
+#include <openthread/instance.h>
+#endif
+
 using namespace chip;
 using namespace chip::ArgParser;
 using namespace chip::Credentials;
@@ -165,7 +179,11 @@ Optional<EndpointId> sSecondaryNetworkCommissioningEndpoint;
 #if CHIP_DEVICE_LAYER_TARGET_LINUX
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #define CHIP_APP_MAIN_HAS_THREAD_DRIVER 1
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+DeviceLayer::NetworkCommissioning::GenericThreadDriver sThreadDriver;
+#else
 DeviceLayer::NetworkCommissioning::LinuxThreadDriver sThreadDriver;
+#endif
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -242,7 +260,11 @@ void InitNetworkCommissioning()
 
     bool isThreadEnabled = false;
 #if CHIP_APP_MAIN_HAS_THREAD_DRIVER
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    isThreadEnabled = LinuxDeviceOptions::GetInstance().mThreadNodeId > 0;
+#else
     isThreadEnabled = LinuxDeviceOptions::GetInstance().mThread;
+#endif
 #endif // CHIP_APP_MAIN_HAS_THREAD_DRIVER
 
     bool isWiFiEnabled = false;
@@ -711,28 +733,50 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
             ChipLogProgress(WiFiPAF, "Wi-Fi Management started");
             DeviceLayer::ConnectivityManager::WiFiPAFAdvertiseParam args;
 
-            args.enable        = LinuxDeviceOptions::GetInstance().mWiFiPAF;
             args.freq_list_len = WiFiPAFGet_FreqList(LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds, args.freq_list);
-            TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().WiFiPAFPublish(args);
-            LinuxDeviceOptions::GetInstance().mPublishId = args.publish_id;
+            DeviceLayer::ConnectivityMgr().WiFiPAFSetParam(args);
         }
     }
 #endif
 
 #if CHIP_ENABLE_OPENTHREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    if (LinuxDeviceOptions::GetInstance().mThreadNodeId)
+    {
+        std::string nodeid  = std::to_string(LinuxDeviceOptions::GetInstance().mThreadNodeId);
+        std::string logfile = "--log-file=thread.log";
+        char * args[]       = { argv[0], logfile.data(), nodeid.data() };
+
+        otSysInit(MATTER_ARRAY_SIZE(args), args);
+        SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
+        SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().StartThreadTask());
+        ChipLogProgress(NotSpecified, "Thread initialized.");
+    }
+#else
     if (LinuxDeviceOptions::GetInstance().mThread)
     {
         SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
+        SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().StartThreadTask());
         ChipLogProgress(NotSpecified, "Thread initialized.");
     }
-#endif // CHIP_ENABLE_OPENTHREAD
+#endif
+#endif
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     if (LinuxDeviceOptions::GetInstance().icdActiveModeDurationMs.HasValue() ||
-        LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.HasValue())
+        LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.HasValue() ||
+        LinuxDeviceOptions::GetInstance().shortIdleModeDurationS.has_value())
     {
-        err = Server::GetInstance().GetICDManager().SetModeDurations(LinuxDeviceOptions::GetInstance().icdActiveModeDurationMs,
-                                                                     LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs);
+        // Convert icdIdleModeDurationMs to seconds for SetModeDurations api
+        std::optional<System::Clock::Seconds32> tmpIdleModeDuration = std::nullopt;
+        if (LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.HasValue())
+            tmpIdleModeDuration = std::chrono::duration_cast<System::Clock::Seconds32>(
+                LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.Value());
+
+        err = Server::GetInstance().GetICDManager().SetModeDurations(
+            LinuxDeviceOptions::GetInstance().icdActiveModeDurationMs.std_optional(), tmpIdleModeDuration,
+            LinuxDeviceOptions::GetInstance().shortIdleModeDurationS);
+
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(NotSpecified, "Invalid arguments to set ICD mode durations");
@@ -775,13 +819,24 @@ exit:
     return 0;
 }
 
-void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
+struct LinuxCommonCaseDeviceServerInitParams final : public chip::CommonCaseDeviceServerInitParams
+{
+    LinuxCommonCaseDeviceServerInitParams()
+    {
+        SuccessOrDie(InitializeStaticResourcesBeforeServerInit());
+        dataModelProvider = app::CodegenDataModelProviderInstance(persistentStorageDelegate);
+    }
+};
+
+chip::CommonCaseDeviceServerInitParams & ChipLinuxDefaultServerInitParams()
+{
+    static LinuxCommonCaseDeviceServerInitParams sInitParams;
+    return sInitParams;
+}
+
+void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplementation * impl)
 {
     gMainLoopImplementation = impl;
-
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
-    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     if (LinuxDeviceOptions::GetInstance().tcVersion.HasValue() && LinuxDeviceOptions::GetInstance().tcRequired.HasValue())
@@ -817,6 +872,11 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     initParams.operationalServicePort        = LinuxDeviceOptions::GetInstance().securedDevicePort;
     initParams.userDirectedCommissioningPort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+#if CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+    // Enable automatic port retry to handle port conflicts
+    initParams.portRetryCount = CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT;
+#endif
 
 #if ENABLE_TRACING
     chip::CommandLineApp::TracingSetup tracing_setup;
@@ -913,10 +973,21 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     initParams.accessRestrictionProvider = exampleAccessRestrictionProvider.get();
 #endif
 
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    nativeParams.lockCb                = []() { chip::DeviceLayer::ThreadStackMgr().LockThreadStack(); };
+    nativeParams.unlockCb              = []() { chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack(); };
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
+#endif
     if (LinuxDeviceOptions::GetInstance().payload.commissioningFlow == CommissioningFlow::kUserActionRequired)
     {
         initParams.advertiseCommissionableIfNoFabrics = false;
     }
+
+    // Set DAC provider before server init because Operational Credentials may snapshot
+    // the provider during cluster construction.
+    SetDeviceAttestationCredentialsProvider(LinuxDeviceOptions::GetInstance().dacProvider);
 
     // Init ZCL Data Model and CHIP App Server
     CHIP_ERROR err = Server::GetInstance().Init(initParams);
@@ -939,17 +1010,6 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
         SuccessOrDie(exampleAccessRestrictionProvider->SetEntries(1, LinuxDeviceOptions::GetInstance().arlEntries.Value()));
     }
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    if (Server::GetInstance().GetFabricTable().FabricCount() != 0)
-    {
-        ChipLogProgress(AppServer, "Fabric already commissioned. Canceling publishing");
-        // TODO #40789: Should we just NOT call WiFiPAFShutdown at startup and instead make sure that WiFiPAF is not published at
-        // all? or Change the handling within WiFiPAFShutdown?
-        // TODO #40814: Check the Return Value of the call to WiFiPAFShutdown
-        TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(LinuxDeviceOptions::GetInstance().mPublishId,
-                                                                                chip::WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher);
-    }
-#endif
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     // Set ReadHandler Capacity for Subscriptions
@@ -970,15 +1030,14 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
 
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(LinuxDeviceOptions::GetInstance().dacProvider);
-
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+#if CHIP_LINUX_APP_START_COMMISSIONER_AT_BOOT
     ChipLogProgress(AppServer, "Starting commissioner");
     VerifyOrReturn(InitCommissioner(LinuxDeviceOptions::GetInstance().securedCommissionerPort,
                                     LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort,
                                     LinuxDeviceOptions::GetInstance().commissionerFabricId) == CHIP_NO_ERROR);
     ChipLogProgress(AppServer, "Started commissioner");
+#endif // CHIP_LINUX_APP_START_COMMISSIONER_AT_BOOT
 #if defined(ENABLE_CHIP_SHELL)
     Shell::RegisterControllerCommands();
 #endif // defined(ENABLE_CHIP_SHELL)
@@ -992,12 +1051,10 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     auto & platformMgr = chip::DeviceLayer::PlatformMgrImpl();
     platformMgr.RegisterSignalHandler(SIGINT, ^{
-        platformMgr.UnregisterAllSignalHandlers();
         StopSignalHandler(SIGINT);
     });
 
     platformMgr.RegisterSignalHandler(SIGTERM, ^{
-        platformMgr.UnregisterAllSignalHandlers();
         StopSignalHandler(SIGTERM);
     });
 #else
@@ -1018,6 +1075,12 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     sigaction(SIGTERM, &sa, nullptr);
 #endif
 
+    // This message is used as a marker for when the application process has started.
+    // See: scripts/tests/chiptest/test_definition.py
+    // TODO: A cleaner and more generic mechanism needs to be developed as a follow-up.
+    // Currently other places (OTA, TV) also scrape logs for information and a better way should be
+    // possible.
+    ChipLogProgress(DeviceLayer, "===== APP STATUS: Starting event loop =====");
     if (impl != nullptr)
     {
         impl->RunMainLoop();
@@ -1034,14 +1097,17 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     shellThread.join();
 #endif
 
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN && CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    platformMgr.UnregisterAllSignalHandlers();
+#endif
+
     Server::GetInstance().Shutdown();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    // Commissioner shutdown call shuts down entire stack, including the platform manager.
     ShutdownCommissioner();
-#else
-    DeviceLayer::PlatformMgr().Shutdown();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+    DeviceLayer::PlatformMgr().Shutdown();
 
 #if ENABLE_TRACING
     tracing_setup.StopTracing();

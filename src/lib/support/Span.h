@@ -355,6 +355,14 @@ private:
     pointer mDataBuf;
 };
 
+// Template deduction guides for FixedSpan
+template <typename T, size_t N>
+FixedSpan(T (&)[N]) -> FixedSpan<T, N>;
+template <typename T, size_t N>
+FixedSpan(std::array<T, N> &) -> FixedSpan<T, N>;
+template <typename T, size_t N>
+FixedSpan(const std::array<T, N> &) -> FixedSpan<const T, N>;
+
 template <class T>
 template <class U, size_t N, typename>
 constexpr Span<T>::Span(const FixedSpan<U, N> & other) : mDataBuf(other.data()), mDataLen(other.size())

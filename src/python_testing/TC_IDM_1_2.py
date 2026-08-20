@@ -30,40 +30,28 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --enable-spec-errata-ci-only-disallowed-for-certification
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import inspect
 import logging
 import random
 from dataclasses import dataclass
 
 from mobly import asserts
+from support_modules.idm_support import IDMBaseTest, client_cmd, get_all_cmds_for_cluster_id
 
 import matter.clusters as Clusters
 import matter.discovery as Discovery
+import matter.testing.matchers as matchers
 from matter import ChipUtility
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+from matter.testing.decorators import async_test_body
+from matter.testing.runner import default_matter_test_main
 
-
-def get_all_cmds_for_cluster_id(cid: int) -> list[Clusters.ClusterObjects.ClusterCommand]:
-    cluster = Clusters.ClusterObjects.ALL_CLUSTERS[cid]
-    try:
-        return inspect.getmembers(cluster.Commands, inspect.isclass)
-    except AttributeError:
-        return []
-
-
-def client_cmd(cmd_class):
-    # Inspect returns all the classes, not just the ones we want, so use a try
-    # here incase we're inspecting a builtin class
-    try:
-        return cmd_class if cmd_class.is_client else None
-    except AttributeError:
-        return None
+log = logging.getLogger(__name__)
 
 # one of the steps in this test requires sending a command that requires a timed interaction
 # without first sending the TimedRequest action
@@ -78,7 +66,7 @@ class FakeRevokeCommissioning(Clusters.AdministratorCommissioning.Commands.Revok
         return False
 
 
-class TC_IDM_1_2(MatterBaseTest):
+class TC_IDM_1_2(IDMBaseTest):
 
     @async_test_body
     async def test_TC_IDM_1_2(self):
@@ -126,7 +114,7 @@ class TC_IDM_1_2(MatterBaseTest):
                     continue
                 # just use the first command with default values
                 name, cmd = members[0]
-                logging.info(f'Sending {name} command to unsupported cluster {cluster} on endpoint {i}')
+                log.info('Sending %s command to unsupported cluster %s on endpoint %s', name, cluster, i)
                 try:
                     await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=i, payload=cmd())
                     asserts.fail("Unexpected success return from sending command to unsupported cluster")
@@ -147,7 +135,7 @@ class TC_IDM_1_2(MatterBaseTest):
                 break
             for cid in supported_clusters[i]:
                 cluster = Clusters.ClusterObjects.ALL_CLUSTERS[cid]
-                logging.info(f'Checking cluster {cluster} ({cid}) on ep {i} for supported commands')
+                log.info('Checking cluster %s (%s) on ep %s for supported commands', cluster, cid, i)
                 members = get_all_cmds_for_cluster_id(cid)
                 if not members:
                     continue
@@ -160,8 +148,8 @@ class TC_IDM_1_2(MatterBaseTest):
                     continue
 
                 # Let's just use the first unsupported command
-                id = unsupported_commands[0]
-                cmd = next(filter(lambda x: x.command_id == id, all_supported_cmds))
+                _id = unsupported_commands[0]
+                cmd = next(filter(lambda x: x.command_id == _id, all_supported_cmds))
                 try:
                     ret = await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=i, payload=cmd())
                     asserts.fail(f'Unexpected success sending unsupported cmd {cmd} to {cluster} cluster on ep {i}')
@@ -173,7 +161,7 @@ class TC_IDM_1_2(MatterBaseTest):
         # It might actually be the case that all the supported clusters support all the commands. In that case, let's just put a warning.
         # We could, in theory, send a command with a fully out of bounds command ID, but that's not supported by the controller
         if not sent:
-            logging.warning("Unable to find a supported cluster with unsupported commands on any endpoint - SKIPPING")
+            log.warning("Unable to find a supported cluster with unsupported commands on any endpoint - SKIPPING")
 
         self.print_step(4, "Setup TH to have no privileges for a cluster, send Invoke")
         # Setup the ACL
@@ -260,7 +248,7 @@ class TC_IDM_1_2(MatterBaseTest):
             await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd, suppressResponse=True)
             # TODO: Once the above issue is resolved, this needs a check to ensure that (always) no response was received.
         except ChipStackError:  # chipstack-ok: Using try/except to validate DUT behavior without failing the test on expected errors, assert_raises would fail the test
-            logging.info("DUT correctly supressed the response")
+            log.info("DUT correctly supressed the response")
 
         # Verify that the command had the correct side effect even if a response was sent
         breadcrumb = await self.read_single_attribute_check_success(

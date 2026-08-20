@@ -80,7 +80,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace AccessControlEntryChanged.
+} // namespace AccessControlEntryChanged
 namespace AccessControlExtensionChanged {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -131,7 +131,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace AccessControlExtensionChanged.
+} // namespace AccessControlExtensionChanged
 namespace FabricRestrictionReviewUpdate {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -177,7 +177,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace FabricRestrictionReviewUpdate.
+} // namespace FabricRestrictionReviewUpdate
 namespace AuxiliaryAccessUpdated {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -213,7 +213,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace AuxiliaryAccessUpdated.
+} // namespace AuxiliaryAccessUpdated
 } // namespace Events
 } // namespace AccessControl
 } // namespace Clusters

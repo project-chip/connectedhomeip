@@ -24,10 +24,11 @@ import inspect
 import logging
 import sys
 from asyncio.futures import Future
+from collections.abc import Callable
 from ctypes import CFUNCTYPE, POINTER, c_bool, c_size_t, c_uint8, c_uint16, c_uint32, c_uint64, c_void_p, cast, py_object
 from dataclasses import dataclass, field
 from enum import Enum, unique
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
+from typing import Any
 
 import construct  # type: ignore
 from rich.pretty import pprint  # type: ignore
@@ -58,9 +59,9 @@ class EventPriority(Enum):
 
 @dataclass(frozen=True)
 class AttributePath:
-    EndpointId: Optional[int] = None
-    ClusterId: Optional[int] = None
-    AttributeId: Optional[int] = None
+    EndpointId: int | None = None
+    ClusterId: int | None = None
+    AttributeId: int | None = None
 
     @staticmethod
     def from_cluster(EndpointId: int, Cluster: Cluster) -> AttributePath:
@@ -80,9 +81,9 @@ class AttributePath:
 
 @dataclass(frozen=True)
 class DataVersionFilter:
-    EndpointId: Optional[int] = None
-    ClusterId: Optional[int] = None
-    DataVersion: Optional[int] = None
+    EndpointId: int | None = None
+    ClusterId: int | None = None
+    DataVersion: int | None = None
 
     @staticmethod
     def from_cluster(EndpointId: int, Cluster: Cluster, DataVersion: int) -> DataVersionFilter:
@@ -99,12 +100,12 @@ class TypedAttributePath:
     ''' Encapsulates an attribute path that has strongly typed references to cluster and attribute
         cluster object types. These types serve as keys into the attribute cache.
     '''
-    ClusterType: Optional[Cluster] = None
-    AttributeType: Optional[ClusterAttributeDescriptor] = None
-    AttributeName: Optional[str] = None
-    Path: Optional[AttributePath] = None
-    ClusterId: Optional[int] = None
-    AttributeId: Optional[int] = None
+    ClusterType: Cluster | None = None
+    AttributeType: ClusterAttributeDescriptor | None = None
+    AttributeName: str | None = None
+    Path: AttributePath | None = None
+    ClusterId: int | None = None
+    AttributeId: int | None = None
 
     def __post_init__(self):
         '''Only one of either ClusterType and AttributeType OR Path may be provided.'''
@@ -149,19 +150,19 @@ class TypedAttributePath:
 
 @dataclass(frozen=True)
 class EventPath:
-    EndpointId: Optional[int] = None
-    ClusterId: Optional[int] = None
-    EventId: Optional[int] = None
-    Urgent: Optional[int] = None
+    EndpointId: int | None = None
+    ClusterId: int | None = None
+    EventId: int | None = None
+    Urgent: int | None = None
 
     @staticmethod
-    def from_cluster(EndpointId: int, Cluster: Cluster, EventId: Optional[int] = None, Urgent: Optional[int] = None) -> "EventPath":
+    def from_cluster(EndpointId: int, Cluster: Cluster, EventId: int | None = None, Urgent: int | None = None) -> EventPath:
         if Cluster is None:
             raise ValueError("Cluster cannot be None")
         return EventPath(EndpointId=EndpointId, ClusterId=Cluster.id, EventId=EventId, Urgent=Urgent)
 
     @staticmethod
-    def from_event(EndpointId: int, Event: ClusterEvent, Urgent: Optional[int] = None) -> "EventPath":
+    def from_event(EndpointId: int, Event: ClusterEvent, Urgent: int | None = None) -> EventPath:
         if Event is None:
             raise ValueError("Event cannot be None")
         return EventPath(EndpointId=EndpointId, ClusterId=Event.cluster_id, EventId=Event.event_id, Urgent=Urgent)
@@ -172,13 +173,13 @@ class EventPath:
 
 @dataclass
 class EventHeader:
-    EndpointId: Optional[int] = None
-    ClusterId: Optional[int] = None
-    EventId: Optional[int] = None
-    EventNumber: Optional[int] = None
-    Priority: Optional[EventPriority] = None
-    Timestamp: Optional[int] = None
-    TimestampType: Optional[EventTimestampType] = None
+    EndpointId: int | None = None
+    ClusterId: int | None = None
+    EventId: int | None = None
+    EventNumber: int | None = None
+    Priority: EventPriority | None = None
+    Timestamp: int | None = None
+    TimestampType: EventTimestampType | None = None
 
     def __str__(self) -> str:
         return (f"{self.EndpointId}/{self.ClusterId}/{self.EventId}/"
@@ -188,7 +189,7 @@ class EventHeader:
 @dataclass
 class AttributeStatus:
     Path: AttributePath
-    Status: Union[InteractionModelStatus, int]
+    Status: InteractionModelStatus | int
 
 
 @dataclass
@@ -236,7 +237,7 @@ class ValueDecodeFailure:
     '''
 
     TLVValue: Any = None
-    Reason: Optional[Exception] = None
+    Reason: Exception | None = None
 
 
 @dataclass
@@ -314,17 +315,17 @@ class AttributeCache:
         This strongly typed keys permit a more natural and safer form of indexing.
     '''
     returnClusterObject: bool = False
-    attributeTLVCache: Dict[int, Dict[int, Dict[int, bytes]]] = field(
+    attributeTLVCache: dict[int, dict[int, dict[int, bytes]]] = field(
         default_factory=lambda: {})
-    versionList: Dict[int, Dict[int, Dict[int, int]]] = field(
+    versionList: dict[int, dict[int, dict[int, int]]] = field(
         default_factory=lambda: {})
 
     _attributeCacheUpdateNeeded: set[AttributePath] = field(
         default_factory=lambda: set())
-    _attributeCache: Dict[int, List[Cluster]] = field(
+    _attributeCache: dict[int, list[Cluster]] = field(
         default_factory=lambda: {})
 
-    def UpdateTLV(self, path: AttributePath, dataVersion: int, data: Union[bytes, ValueDecodeFailure]):
+    def UpdateTLV(self, path: AttributePath, dataVersion: int, data: bytes | ValueDecodeFailure):
         ''' Store data in TLV since that makes it easiest to eventually convert to either the
             cluster or attribute view representations (see below in GetUpdatedAttributeCache()).
         '''
@@ -352,7 +353,7 @@ class AttributeCache:
         # For this path the attribute cache still requires an update.
         self._attributeCacheUpdateNeeded.add(path)
 
-    def GetUpdatedAttributeCache(self) -> Dict[int, List[Cluster]]:
+    def GetUpdatedAttributeCache(self) -> dict[int, list[Cluster]]:
         ''' This converts the raw TLV data into a cluster object format.
 
             Two formats are available:
@@ -446,10 +447,10 @@ class SubscriptionTransaction:
         self._subscriptionId = subscriptionId
         self._devCtrl = devCtrl
         self._isDone = False
-        self._onResubscriptionSucceededCb: Optional[Callable[[
-            SubscriptionTransaction], None]] = None
+        self._onResubscriptionSucceededCb: Callable[[SubscriptionTransaction], None] | None = None
         self._onResubscriptionSucceededCb_isAsync = False
         self._onResubscriptionAttemptedCb_isAsync = False
+        self._nodeId = transaction._nodeId
         builtins.chipStack.RegisterSubscription(self)
 
     def GetAttributes(self):
@@ -464,8 +465,7 @@ class SubscriptionTransaction:
 
         if (self._readTransaction._cache.returnClusterObject):
             return eval(f'data[path.Path.EndpointId][path.ClusterType].{path.AttributeName}')
-        else:
-            return data[path.Path.EndpointId][path.ClusterType][path.AttributeType]
+        return data[path.Path.EndpointId][path.ClusterType][path.AttributeType]
 
     def GetEvents(self):
         return self._readTransaction.GetAllEventValues()
@@ -484,7 +484,7 @@ class SubscriptionTransaction:
                 self._readTransaction._pReadClient, reason.encode("utf-8"))
         )
 
-    def GetReportingIntervalsSeconds(self) -> Tuple[int, int]:
+    def GetReportingIntervalsSeconds(self) -> tuple[int, int]:
         '''
         Retrieve the reporting intervals associated with an active subscription.
         This should only be called if we're of subscription interaction type and after a subscription has been established.
@@ -584,6 +584,16 @@ class SubscriptionTransaction:
         if callback is not None:
             self._onErrorCb = callback
 
+    def SetNotifySubscriptionStillActiveCallback(self, callback: Callable):
+        '''
+        Sets the callback function that gets invoked when a report data message is sent. The callback
+        is expected to have the following signature:
+            def Callback()
+
+        If set to None, the callback will be unset and no longer invoked.
+        '''
+        self._readTransaction.register_notify_subscription_still_active_callback(callback)
+
     @property
     def OnAttributeChangeCb(self) -> Callable[[TypedAttributePath, SubscriptionTransaction], None]:
         return self._onAttributeChangeCb
@@ -607,6 +617,10 @@ class SubscriptionTransaction:
     @property
     def subscriptionId(self) -> int:
         return self._subscriptionId
+
+    @property
+    def nodeId(self) -> int | None:
+        return self._nodeId
 
     def Shutdown(self):
         if self._isDone:
@@ -668,7 +682,7 @@ def _BuildEventIndex():
     for clusterName, obj in inspect.getmembers(sys.modules['matter.clusters.Objects']):
         if ('matter.clusters.Objects' in str(obj)) and inspect.isclass(obj):
             for objName, subclass in inspect.getmembers(obj):
-                if inspect.isclass(subclass) and (('Events' == objName)):
+                if inspect.isclass(subclass) and objName == "Events":
                     for eventName, event in inspect.getmembers(subclass):
                         if inspect.isclass(event):
                             base_classes = inspect.getmro(event)
@@ -690,16 +704,18 @@ class AsyncReadTransaction:
         events: list[ClusterEvent]
         tlvAttributes: dict[int, Any]
 
-    def __init__(self, future: Future, eventLoop, devCtrl, returnClusterObject: bool):
+    def __init__(self, future: Future, eventLoop, devCtrl, returnClusterObject: bool, nodeId: int | None = None):
         self._event_loop = eventLoop
         self._future = future
         self._subscription_handler = None
-        self._events: List[EventReadResult] = []
+        self._events: list[EventReadResult] = []
         self._devCtrl = devCtrl
         self._cache = AttributeCache(returnClusterObject=returnClusterObject)
-        self._changedPathSet: Set[AttributePath] = set()
+        self._changedPathSet: set[AttributePath] = set()
         self._pReadClient = None
-        self._resultError: Optional[PyChipError] = None
+        self._resultError: PyChipError | None = None
+        self._notify_subscription_still_active_callback = None
+        self._nodeId = nodeId
 
     def SetClientObjPointers(self, pReadClient):
         self._pReadClient = pReadClient
@@ -738,7 +754,7 @@ class AsyncReadTransaction:
 
     def handleEventData(self, header: EventHeader, path: EventPath, data: bytes, status: int):
         try:
-            eventType = _EventIndex.get(str(path), None)
+            eventType = _EventIndex.get(str(path))
             eventValue = None
 
             if data:
@@ -752,11 +768,9 @@ class AsyncReadTransaction:
                     try:
                         eventValue = eventType.FromTLV(data)
                     except Exception as ex:
-                        LOGGER.error(
-                            f"Error convering TLV to Cluster Object for path: Endpoint = {path.EndpointId}/"
-                            f"Cluster = {path.ClusterId}/Event = {path.EventId}")
-                        LOGGER.error(
-                            f"Failed Cluster Object: {str(eventType)}")
+                        LOGGER.error("Error converting TLV to Cluster Object for path: Endpoint = %s/Cluster = %s/Event = %s",
+                                     path.EndpointId, path.ClusterId, path.EventId)
+                        LOGGER.error("Failed Cluster Object: %s", eventType)
                         LOGGER.error(ex)
                         eventValue = ValueDecodeFailure(
                             tlvData, ex)
@@ -867,16 +881,22 @@ class AsyncReadTransaction:
         self._handleReportBegin()
 
     def handleReportEnd(self):
-        # self._event_loop.call_soon_threadsafe(self._handleReportEnd)
         self._handleReportEnd()
+
+    def handleNotifySubscriptionStillActive(self):
+        if self._notify_subscription_still_active_callback:
+            self._notify_subscription_still_active_callback()
+
+    def register_notify_subscription_still_active_callback(self, callback):
+        self._notify_subscription_still_active_callback = callback
 
 
 class AsyncWriteTransaction:
     def __init__(self, future: Future, eventLoop):
         self._event_loop = eventLoop
         self._future = future
-        self._resultData: List[AttributeWriteResult] = []
-        self._resultError: Optional[PyChipError] = None
+        self._resultData: list[AttributeWriteResult] = []
+        self._resultError: PyChipError | None = None
 
     def handleResponse(self, path: AttributePath, status: int):
         try:
@@ -932,19 +952,21 @@ _OnReportBeginCallbackFunct = CFUNCTYPE(
     None, py_object)
 _OnReportEndCallbackFunct = CFUNCTYPE(
     None, py_object)
+_OnNotifySubscriptionStillActiveCallbackFunct = CFUNCTYPE(
+    None, py_object)
 
 
 @_OnReadAttributeDataCallbackFunct
-def _OnReadAttributeDataCallback(closure, dataVersion: int, endpoint: int, cluster: int, attribute: int, status, data, len):
-    dataBytes = ctypes.string_at(data, len)
+def _OnReadAttributeDataCallback(closure, dataVersion: int, endpoint: int, cluster: int, attribute: int, status, data, length):
+    dataBytes = ctypes.string_at(data, length)
     closure.handleAttributeData(AttributePath(
         EndpointId=endpoint, ClusterId=cluster, AttributeId=attribute), dataVersion, status, dataBytes[:])
 
 
 @_OnReadEventDataCallbackFunct
 def _OnReadEventDataCallback(closure, endpoint: int, cluster: int, event: c_uint64,
-                             number: int, priority: int, timestamp: int, timestampType: int, data, len, status):
-    dataBytes = ctypes.string_at(data, len)
+                             number: int, priority: int, timestamp: int, timestampType: int, data, length, status):
+    dataBytes = ctypes.string_at(data, length)
     path = EventPath(ClusterId=cluster, EventId=event)
 
     # EventHeader is valid only when successful
@@ -981,6 +1003,11 @@ def _OnReportEndCallback(closure):
     closure.handleReportEnd()
 
 
+@_OnNotifySubscriptionStillActiveCallbackFunct
+def _OnNotifySubscriptionStillActiveCallback(closure):
+    closure.handleNotifySubscriptionStillActive()
+
+
 @_OnReadDoneCallbackFunct
 def _OnReadDoneCallback(closure):
     closure.handleDone()
@@ -1010,7 +1037,7 @@ def _OnWriteDoneCallback(closure):
     closure.handleDone()
 
 
-def _prepare_write_attributes_data(attributes: List[AttributeWriteRequest], must_use_timed_write_check: bool = True, timedRequestTimeoutMs: Union[None, int] = None) -> Tuple[ctypes.Array[PyWriteAttributeData], int]:
+def _prepare_write_attributes_data(attributes: list[AttributeWriteRequest], must_use_timed_write_check: bool = True, timedRequestTimeoutMs: None | int = None) -> tuple[ctypes.Array[PyWriteAttributeData], int]:
     """Helper function to prepare PyWriteAttributeData array from AttributeWriteRequest list."""
     numberOfAttributes = len(attributes)
     pyWriteAttributesArrayType = PyWriteAttributeData * numberOfAttributes
@@ -1035,8 +1062,8 @@ def _prepare_write_attributes_data(attributes: List[AttributeWriteRequest], must
 
 
 def WriteAttributes(future: Future, eventLoop, device,
-                    attributes: List[AttributeWriteRequest], timedRequestTimeoutMs: Union[None, int] = None,
-                    interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None,
+                    attributes: list[AttributeWriteRequest], timedRequestTimeoutMs: None | int = None,
+                    interactionTimeoutMs: None | int = None, busyWaitMs: None | int = None,
                     forceLegacyListEncoding: bool = False) -> PyChipError:
     handle = GetLibraryHandle()
 
@@ -1062,11 +1089,11 @@ def WriteAttributes(future: Future, eventLoop, device,
 
 
 def TestOnlyWriteAttributeWithMismatchedTimedRequestField(future: Future, eventLoop, device,
-                                                          attributes: List[AttributeWriteRequest],
+                                                          attributes: list[AttributeWriteRequest],
                                                           timedRequestTimeoutMs: int,
                                                           timedRequestFieldValue: bool,
-                                                          interactionTimeoutMs: Union[None, int] = None,
-                                                          busyWaitMs: Union[None, int] = None) -> PyChipError:
+                                                          interactionTimeoutMs: None | int = None,
+                                                          busyWaitMs: None | int = None) -> PyChipError:
     '''
     ONLY TO BE USED FOR TEST: Writes attributes with decoupled Timed Request action and TimedRequest field.
     This allows testing TIMED_REQUEST_MISMATCH scenarios:
@@ -1098,7 +1125,7 @@ def TestOnlyWriteAttributeWithMismatchedTimedRequestField(future: Future, eventL
     return res
 
 
-def WriteGroupAttributes(groupId: int, devCtrl: c_void_p, attributes: List[AttributeWriteRequest], busyWaitMs: Union[None, int] = None) -> PyChipError:
+def WriteGroupAttributes(groupId: int, devCtrl: c_void_p, attributes: list[AttributeWriteRequest], busyWaitMs: None | int = None) -> PyChipError:
     handle = GetLibraryHandle()
 
     numberOfAttributes = len(attributes)
@@ -1142,10 +1169,10 @@ _ReadParams = construct.Struct(
 
 
 def Read(transaction: AsyncReadTransaction, device,
-         attributes: Optional[List[AttributePath]] = None, dataVersionFilters: Optional[List[DataVersionFilter]] = None,
-         events: Optional[List[EventPath]] = None, eventNumberFilter: Optional[int] = None,
-         subscriptionParameters: Optional[SubscriptionParameters] = None,
-         fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True, allowLargePayload: Union[None, bool] = None) -> PyChipError:
+         attributes: list[AttributePath] | None = None, dataVersionFilters: list[DataVersionFilter] | None = None,
+         events: list[EventPath] | None = None, eventNumberFilter: int | None = None,
+         subscriptionParameters: SubscriptionParameters | None = None,
+         fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True, allowLargePayload: None | bool = None) -> PyChipError:
     if (not attributes) and dataVersionFilters:
         raise ValueError(
             "Must provide valid attribute list when data version filters is not null")
@@ -1175,27 +1202,26 @@ def Read(transaction: AsyncReadTransaction, device,
         dataVersionFiltersForCffiArrayType = c_void_p * numberOfDataVersionFilters
         dataVersionFiltersForCffi = dataVersionFiltersForCffiArrayType()
         for idx, f in enumerate(dataVersionFilters):
-            filter = DataVersionFilterIBstruct.parse(
+            flt = DataVersionFilterIBstruct.parse(
                 b'\xff' * DataVersionFilterIBstruct.sizeof())
             if f.EndpointId is not None:
-                filter.EndpointId = f.EndpointId
+                flt.EndpointId = f.EndpointId
             else:
                 raise ValueError(
                     "DataVersionFilter must provide EndpointId.")
             if f.ClusterId is not None:
-                filter.ClusterId = f.ClusterId
+                flt.ClusterId = f.ClusterId
             else:
                 raise ValueError(
                     "DataVersionFilter must provide ClusterId.")
             if f.DataVersion is not None:
-                filter.DataVersion = f.DataVersion
+                flt.DataVersion = f.DataVersion
             else:
                 raise ValueError(
                     "DataVersionFilter must provide DataVersion.")
-            filter = DataVersionFilterIBstruct.build(
-                filter)
+            flt = DataVersionFilterIBstruct.build(flt)
             dataVersionFiltersForCffi[idx] = cast(
-                ctypes.c_char_p(filter), c_void_p)
+                ctypes.c_char_p(flt), c_void_p)
 
     eventPathsForCffi = None
     if events is not None:
@@ -1292,14 +1318,15 @@ def Init():
                    _OnReadAttributeDataCallbackFunct, _OnReadEventDataCallbackFunct,
                    _OnSubscriptionEstablishedCallbackFunct, _OnResubscriptionAttemptedCallbackFunct,
                    _OnReadErrorCallbackFunct, _OnReadDoneCallbackFunct,
-                   _OnReportBeginCallbackFunct, _OnReportEndCallbackFunct])
+                   _OnReportBeginCallbackFunct, _OnReportEndCallbackFunct,
+                   _OnNotifySubscriptionStillActiveCallbackFunct])
 
     handle.pychip_WriteClient_InitCallbacks(
         _OnWriteResponseCallback, _OnWriteErrorCallback, _OnWriteDoneCallback)
     handle.pychip_ReadClient_InitCallbacks(
         _OnReadAttributeDataCallback, _OnReadEventDataCallback,
         _OnSubscriptionEstablishedCallback, _OnResubscriptionAttemptedCallback, _OnReadErrorCallback, _OnReadDoneCallback,
-        _OnReportBeginCallback, _OnReportEndCallback)
+        _OnReportBeginCallback, _OnReportEndCallback, _OnNotifySubscriptionStillActiveCallback)
 
     _BuildAttributeIndex()
     _BuildClusterIndex()

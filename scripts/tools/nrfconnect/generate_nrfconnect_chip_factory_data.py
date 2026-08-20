@@ -89,9 +89,7 @@ def get_raw_private_key_der(der_file: str, password: str):
             if password is None:
                 log.warning("KEY password has not been provided. It means that DAC key is not encrypted.")
             keys = load_der_private_key(key_data, password, backend=default_backend())
-            private_key = keys.private_numbers().private_value.to_bytes(32, byteorder='big')
-
-            return private_key
+            return keys.private_numbers().private_value.to_bytes(32, byteorder='big')
 
     except IOError or ValueError:
         return None
@@ -246,7 +244,7 @@ class FactoryDataGenerator:
             try:
                 self._user_data = json.loads(self._args.user)
             except json.decoder.JSONDecodeError as e:
-                raise AssertionError("Provided wrong user data, this is not a JSON format! {}".format(e))
+                raise AssertionError(f"Provided wrong user data, this is not a JSON format! {e}")
         assert self._args.spake2_verifier or self._args.passcode, \
             "Cannot find Spake2+ verifier, to generate a new one please provide passcode (--passcode)"
         assert ((self._args.gen_certs and self._args.chip_cert_path) or (self._args.dac_cert and self._args.pai_cert and self._args.dac_key)), \
@@ -315,7 +313,7 @@ class FactoryDataGenerator:
             sys.exit(-1)
 
         try:
-            json_file = open(self._args.output+".json", "w+")
+            json_file = open(self._args.output+".json", "w+")  # noqa: SIM115
         except FileNotFoundError:
             print("Cannot create JSON file in this location: {}".format(self._args.output+".json"))
             sys.exit(-1)
@@ -365,7 +363,7 @@ class FactoryDataGenerator:
             try:
                 if is_json_valid:
                     json_file.write(json_object)
-            except IOError:
+            except OSError:
                 log.error("Cannot save output file into directory: '%s'", self._args.output)
 
             if self._args.generate_onboarding:
@@ -373,7 +371,7 @@ class FactoryDataGenerator:
 
     def _add_entry(self, name: str, value: any):
         """ Add single entry to list of tuples ("key", "value") """
-        if (isinstance(value, bytes) or isinstance(value, bytearray)):
+        if (isinstance(value, (bytes, bytearray))):
             value = HEX_PREFIX + value.hex()
         if value or (isinstance(value, int) and value == 0):
             log.debug("Adding entry '%s' with size %d and type '%s'", name, sys.getsizeof(value), type(value))
@@ -403,7 +401,7 @@ class FactoryDataGenerator:
                 schema = json.loads(schema_file.read())
                 validator = jsonschema.Draft202012Validator(schema=schema)
                 validator.validate(instance=json.loads(output_json))
-        except IOError:
+        except OSError:
             log.error("Provided JSON schema file is wrong: '%s'", self._args.schema)
             return False
         else:
@@ -414,9 +412,8 @@ class FactoryDataGenerator:
         log.debug("Processing der file...")
         try:
             with open(path, 'rb') as f:
-                data = f.read()
-                return data
-        except IOError as e:
+                return f.read()
+        except OSError as e:
             log.exception(e)
             raise e
 
@@ -569,16 +566,16 @@ def main():
         sys.exit(1)
 
     if args.schema and no_jsonschema_module:
-        log.error(("Requested verification of the JSON file using jsonschema, but the module is not installed. \n"
+        log.error("Requested verification of the JSON file using jsonschema, but the module is not installed. \n"
                   "Install only the module by invoking: pip3 install jsonschema \n"
-                   "Alternatively, install it with all dependencies for Matter by invoking: pip3 install "
-                   "-r ./scripts/setup/requirements.nrfconnect.txt from the Matter root directory."))
+                  "Alternatively, install it with all dependencies for Matter by invoking: pip3 install "
+                  "-r ./scripts/setup/requirements.nrfconnect.txt from the Matter root directory.")
         sys.exit(1)
 
     if args.generate_onboarding and no_onboarding_modules:
-        log.error(("Requested generation of onboarding codes, but the some modules are not installed. \n"
+        log.error("Requested generation of onboarding codes, but the some modules are not installed. \n"
                   "Install all dependencies for Matter by invoking: pip3 install "
-                   "-r ./scripts/setup/requirements.nrfconnect.txt from the Matter root directory."))
+                  "-r ./scripts/setup/requirements.nrfconnect.txt from the Matter root directory.")
         sys.exit(1)
 
     generator = FactoryDataGenerator(args)

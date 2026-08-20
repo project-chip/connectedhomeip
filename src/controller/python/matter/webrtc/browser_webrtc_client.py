@@ -16,20 +16,21 @@
 #
 
 import asyncio
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from .async_websocket_client import AsyncWebSocketClient
 from .types import WebSocketMessage
 
 
 class BrowserWebRTCClient:
-    def __init__(self, ws_client: AsyncWebSocketClient, id: int):
+    def __init__(self, ws_client: AsyncWebSocketClient, id: int):  # noqa: A002
         self.event_callbacks: dict[str, Callable] = {}
         self.ws_client = ws_client
         self.pending_cmd_responses: dict[str, asyncio.Future] = {}
         self.event_loop = asyncio.get_running_loop()
         self._event_callbacks_without_parameter = ("GATHERING_STATE_COMPLETE",)
-        self.id = id
+        self.id = id  # noqa: A001
 
     async def create_peer_connection(self, media_direction: dict[str, str]):
         event = "CREATE_PEER_CONNECTION"
@@ -51,8 +52,8 @@ class BrowserWebRTCClient:
         self.event_callbacks["ANSWER"](answer_sdp)
         return answer_sdp
 
-    async def set_remote_description(self, sdp: str, type: str):
-        event = f"SET_REMOTE_{type.upper()}"
+    async def set_remote_description(self, sdp: str, event_type: str):
+        event = f"SET_REMOTE_{event_type.upper()}"
         return await self.send_message(event, sdp)
 
     async def set_remote_icecandidates(self, candidates):
@@ -72,8 +73,7 @@ class BrowserWebRTCClient:
 
     async def get_peer_connection_state(self):
         event = "GET_PEER_CONNECTION_STATE"
-        state = await self.send_message(event)
-        return state
+        return await self.send_message(event)
 
     def on_gathering_complete(self, callback):
         self.event_callbacks["GATHERING_STATE_COMPLETE"] = callback

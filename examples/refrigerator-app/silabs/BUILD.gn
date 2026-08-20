@@ -56,7 +56,7 @@ declare_args() {
 if (wifi_soc) {
   siwx917_sdk("sdk") {
     sources = [
-      "${examples_common_plat_dir}/FreeRTOSConfig.h",
+      "${examples_common_plat_dir}/freertos_config/FreeRTOSConfig.h",
       "${silabs_project_dir}/include/CHIPProjectConfig.h",
     ]
 
@@ -66,6 +66,8 @@ if (wifi_soc) {
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
+      "${examples_common_plat_dir}/customer",
+      "${examples_common_plat_dir}/freertos_config",
     ]
 
     defines = []
@@ -79,7 +81,7 @@ if (wifi_soc) {
 } else {
   efr32_sdk("sdk") {
     sources = [
-      "${examples_common_plat_dir}/FreeRTOSConfig.h",
+      "${examples_common_plat_dir}/freertos_config/FreeRTOSConfig.h",
       "${silabs_project_dir}/include/CHIPProjectConfig.h",
     ]
 
@@ -89,11 +91,9 @@ if (wifi_soc) {
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
+      "${examples_common_plat_dir}/customer",
+      "${examples_common_plat_dir}/freertos_config",
     ]
-
-    if (use_wf200) {
-      include_dirs += [ "${examples_plat_dir}/wf200" ]
-    }
 
     defines = []
     if (chip_enable_pw_rpc) {
@@ -105,12 +105,12 @@ if (wifi_soc) {
 
     if (use_temp_sensor) {
       include_dirs += [
-        "${efr32_sdk_root}/platform/driver/i2cspm/inc",
-        "${efr32_sdk_root}/app/bluetooth/common/sensor_rht",
-        "${efr32_sdk_root}/app/bluetooth/common/sensor_rht/config",
-        "${efr32_sdk_root}/hardware/driver/si70xx/inc",
-        "${efr32_sdk_root}/app/bluetooth/common/sensor_select",
-        "${efr32_sdk_root}/platform/common/config",
+        "${efr32_sdk_root}/platform_core/platform/driver/i2cspm/inc",
+        "${efr32_sdk_root}/bluetooth_le_middleware/common/sensor_rht",
+        "${efr32_sdk_root}/bluetooth_le_middleware/common/sensor_rht/config",
+        "${efr32_sdk_root}/board_drivers/hardware/driver/si70xx/inc",
+        "${efr32_sdk_root}/platform_common/platform/common/config",
+        "${efr32_sdk_root}/platform_core/platform/common/config/",
       ]
 
       defines += [ "USE_TEMP_SENSOR" ]
@@ -128,11 +128,8 @@ silabs_executable("refrigerator_app") {
 
   sources = [
     "${chip_root}/examples/refrigerator-app/refrigerator-common/src/static-supported-temperature-levels.cpp",
-    "${examples_common_plat_dir}/main.cpp",
+    "${examples_common_plat_dir}/customer/CustomerAppTask.cpp",
     "src/AppTask.cpp",
-    "src/DataModelCallbacks.cpp",
-    "src/RefrigeratorManager.cpp",
-    "src/refrigerator-and-temperature-controlled-cabinet-mode.cpp",
   ]
 
   if (chip_build_libshell) {
@@ -141,10 +138,10 @@ silabs_executable("refrigerator_app") {
 
   if (use_temp_sensor) {
     sources += [
-      "${efr32_sdk_root}/hardware/driver/si70xx/src/sl_si70xx.c",
-      "${efr32_sdk_root}/platform/common/src/sl_status.c",
-      "${efr32_sdk_root}/platform/driver/i2cspm/src/sl_i2cspm.c",
-      "${efr32_sdk_root}/platform/emlib/src/em_i2c.c",
+      "${efr32_sdk_root}/board_drivers/hardware/driver/si70xx/src/sl_si70xx.c",
+      "${efr32_sdk_root}/platform_common/platform/common/src/sl_status.c",
+      "${efr32_sdk_root}/platform_core/platform/driver/i2cspm/src/sl_i2cspm.c",
+      "${efr32_sdk_root}/platform_core/platform/emlib/src/em_i2c.c",
       "${examples_common_plat_dir}/TemperatureSensor.cpp",
       "${matter_support_root}/board-support/efr32/${silabs_family}/${silabs_board}/autogen/sl_i2cspm_init.c",
     ]
@@ -177,8 +174,8 @@ silabs_executable("refrigerator_app") {
     sources += [
       "${chip_root}/examples/common/pigweed/RpcService.cpp",
       "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
-      "${examples_common_plat_dir}/PigweedLogger.cpp",
-      "${examples_common_plat_dir}/Rpc.cpp",
+      "${examples_common_plat_dir}/pigweed_rpc/PigweedLogger.cpp",
+      "${examples_common_plat_dir}/pigweed_rpc/Rpc.cpp",
     ]
 
     deps += [
@@ -206,7 +203,11 @@ silabs_executable("refrigerator_app") {
     ]
   }
 
-  ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+  if (is_clang) {
+    ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}-clang.ld"
+  } else {
+    ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+  }
 
   inputs = [ ldscript ]
 

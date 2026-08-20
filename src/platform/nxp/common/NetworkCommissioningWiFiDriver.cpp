@@ -80,7 +80,9 @@ CHIP_ERROR NXPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
 
     err = PersistedStorage::KeyValueStoreMgr().Get(kWiFiCredentialsKeyName, mSavedNetwork.credentials,
                                                    sizeof(mSavedNetwork.credentials), &credentialsLen);
-    if (err != CHIP_NO_ERROR)
+    /* Password could be empty, do not return error if key not found,
+    password is written in flash before SSID, if SSID is present but not password, it is not an error */
+    if (err != CHIP_NO_ERROR && err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         ChipLogProgress(DeviceLayer, "WiFi network credentials not retrieved from persisted storage: %" CHIP_ERROR_FORMAT,
                         err.Format());
@@ -117,9 +119,9 @@ void NXPWiFiDriver::Shutdown()
 
 CHIP_ERROR NXPWiFiDriver::CommitConfiguration()
 {
-    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Put(kWiFiSSIDKeyName, mStagingNetwork.ssid, mStagingNetwork.ssidLen));
     ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Put(kWiFiCredentialsKeyName, mStagingNetwork.credentials,
                                                                   mStagingNetwork.credentialsLen));
+    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Put(kWiFiSSIDKeyName, mStagingNetwork.ssid, mStagingNetwork.ssidLen));
     mSavedNetwork = mStagingNetwork;
 
     return CHIP_NO_ERROR;
@@ -322,6 +324,9 @@ CHIP_ERROR NXPWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 #endif
     }
 
+    // If already done, will do nothing
+    ConnectivityMgrImpl().StartWiFiManagement();
+
     int status = wlan_scan_with_opt(wlan_scan_param);
     if (status != WM_SUCCESS)
     {
@@ -428,7 +433,8 @@ int NXPWiFiDriver::ScanWiFINetworkDoneFromMatterTaskContext(unsigned int count)
         response.channel  = (uint16_t) res.channel;
         response.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4; // TODO 5 GHz also possible, but results don't
                                                                                      // show this information
-        response.rssi = -static_cast<int8_t>(res.rssi);
+        response.signal.type     = NetworkCommissioning::WirelessSignalType::kdBm;
+        response.signal.strength = -static_cast<int8_t>(res.rssi);
 
         response_list[valid] = response;
 

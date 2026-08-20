@@ -126,7 +126,7 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x
 -   Build Matter-over-Thread configuration with BLE commissioning.
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x$ gn gen --args="chip_enable_openthread=true chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=true" out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x$ gn gen --args="chip_enable_thread=true chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=true" out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x$ ninja -C out/debug
 ```
 
@@ -144,7 +144,7 @@ thermostat application for now.
     (ble-wifi) :
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610$ gn gen --args="chip_enable_wifi=true chip_enable_openthread=true nxp_enable_matter_cli=true" out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610$ gn gen --args="chip_enable_wifi=true chip_enable_thread=true nxp_enable_matter_cli=true" out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610$ ninja -C out/debug
 ```
 
@@ -187,6 +187,64 @@ added to the _gn gen_ command
 
 `ELS` contain concurrent access risks. They must be fixed before enabling it by
 default.
+
+### DAC private key blob generation
+
+The RW61x platform provides a mechanism to protect the DAC (Device Attestation
+Certificate) private key at rest by converting it from a plain 32-byte key
+stored in the factory data partition into a 48-byte ELS (EdgeLock Subsystem)
+hardware-wrapped blob. The wrapped blob is device-unique and can only be
+unwrapped by the same S50 hardware instance that created it, preventing the key
+from being extracted from flash.
+
+This is a provisioning-time operation. It requires a dedicated intermediate
+binary to be flashed on the device. Once the conversion is done and the blob is
+written back to the factory data partition, the real Matter application binary
+(without the blob generation option) is flashed and uses the wrapped key
+directly.
+
+> **Note**: This step requires the factory data binary to already be programmed
+> in flash before proceeding. Refer to the
+> [Manufacturing data](#manufacturing-data) section above for instructions on
+> how to generate and flash the factory data binary. This conversion only needs
+> to be done **once**, unless the factory data partition is overridden.
+
+#### Step-by-step procedure
+
+**Step 1 - Build the blob generation binary**
+
+Build a dedicated Matter application binary with
+`CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION` enabled.
+
+CMake build example:
+
+```
+west build -d build_matter_blob -b frdmrw612 examples/all-clusters-app/nxp \
+    -DCONF_FILE_NAME=prj_wifi_fdata.conf \
+    -DCONFIG_NXP_FACTORY_DAC_BLOB_GENERATION=y
+```
+
+**Step 2 - Flash and run the blob generation binary**
+
+Flash the blob generation binary to the application region of the device (do not
+erase the factory data partition). Boot the device.
+
+The UART log will show the following sequence:
+
+```
+SSS: convert DAC private key to blob
+SSS: extracted blob from DAC private key
+SSS: replaced DAC private key with secured blob
+SSS: updated factory data
+```
+
+**Step 3 - Flash the real Matter application binary**
+
+Flash the final Matter application binary built **without**
+`CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION`. The factory data partition already
+contains the wrapped blob, so no conversion will take place. The application
+uses the S50 hardware to unwrap the blob and perform DAC signing operations
+without the plain key ever being held in accessible memory.
 
 <a name="flashing-and-debugging"></a>
 
@@ -276,12 +334,13 @@ The complete Border Router guide is located [here](./nxp_otbr_guide.md).
 
 -   Connections using OM-SE051ARD board :
 
-    | Signal  | FRDM-RW612 Pin | OM-SE051ARD Pin |
-    | ------- | -------------- | --------------- |
-    | I2C SDA | J1_2           | J2_9            |
-    | I2C SCL | J1_4           | J2_10           |
-    | 3V3     | J3_8           | J8_4            |
-    | GND     | J3_14          | J8_7            |
+    | Signal         | FRDM-RW612 Pin | OM-SE051ARD Pin |
+    | -------------- | -------------- | --------------- |
+    | I2C SDA        | J1_2           | J2_9            |
+    | I2C SCL        | J1_4           | J2_10           |
+    | 3V3            | J3_8           | J8_4            |
+    | GND            | J3_14          | J8_7            |
+    | ENA (optional) | J1_12          | J1_6            |
 
 ### Build options
 
@@ -297,5 +356,10 @@ Example :
 ```
 ubuntu@ubuntu-Latitude-5420:~/matter/connectedhomeip$ west build -d <out_dir> -b frdmrw612 examples/thermostat/nxp/ -DCONF_FILE_NAME=prj_wifi.conf -DCONFIG_CHIP_SE05X=y
 ```
+
+**NOTE** To control secure element using enable pin, ensure to connect jumper
+J14 on OM-SE051ARD board to 3-4 pins. Also build the example with
+-DCONFIG_SE05X_HOST_GPIO=y option to allow frdm-rw61x gpio to control the enable
+pin as required.
 
 Refer [SE05x](nxp_se05x_guide.md) for more details on configurations of SE05x.

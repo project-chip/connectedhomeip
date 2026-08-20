@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.20)
 
 project(chip_main)
 
@@ -121,7 +121,6 @@ list(
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
-    ${chip_dir}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
 )
 endif (matter_enable_ota_requestor)
 
@@ -129,7 +128,6 @@ list(
     APPEND ${list_chip_main_sources}
 
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
-    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp
 
     ${chip_dir}/examples/all-clusters-minimal-app/ameba/main/chipinterface.cpp

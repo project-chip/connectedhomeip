@@ -35,7 +35,7 @@
 #include <transport/raw/UDP.h>
 
 using namespace chip;
-using namespace chip::Test;
+using namespace chip::Testing;
 using namespace chip::Inet;
 
 namespace {

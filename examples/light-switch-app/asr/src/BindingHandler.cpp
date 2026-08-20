@@ -242,8 +242,8 @@ void BindingHandler::InitInternal(intptr_t arg)
 {
     ASR_LOG("Initialize binding Handler");
     auto & server = chip::Server::GetInstance();
-    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().Init(
-        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
+    LogErrorOnFailure(Binding::Manager::GetInstance().Init(
+        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() }));
     Binding::Manager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
     Binding::Manager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
     BindingHandler::GetInstance().PrintBindingTable();

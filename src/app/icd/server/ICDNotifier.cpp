@@ -136,13 +136,13 @@ void ICDNotifier::NotifySubscriptionReport()
 }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
-void ICDNotifier::NotifySendCheckIn(const chip::Access::SubjectDescriptor & subject)
+void ICDNotifier::NotifySendCheckIn(Optional<Access::SubjectDescriptor> specificSubject)
 {
     for (auto subscriber : mSubscribers)
     {
         if (subscriber != nullptr)
         {
-            subscriber->OnSendCheckIn(subject);
+            subscriber->OnSendCheckIn(specificSubject);
         }
     }
 }

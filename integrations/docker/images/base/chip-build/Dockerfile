@@ -49,6 +49,8 @@ RUN set -x \
     git-lfs \
     gperf \
     gstreamer1.0-plugins-base \
+    gstreamer1.0-plugins-good \
+    gstreamer1.0-plugins-ugly \
     gstreamer1.0-tools \
     iproute2 \
     iwyu \
@@ -65,6 +67,7 @@ RUN set -x \
     libdbus-1-dev \
     libdbus-glib-1-dev \
     libdmalloc-dev \
+    libevent-dev \
     libgif-dev \
     libgirepository-1.0-1 \
     libglib2.0-dev \
@@ -82,6 +85,7 @@ RUN set -x \
     libpango1.0-dev \
     libpcsclite-dev \
     libpixman-1-dev \
+    libprotobuf-dev \
     libreadline-dev \
     libsdl2-dev \
     libsdl-pango-dev \
@@ -98,6 +102,7 @@ RUN set -x \
     nodejs \
     patch \
     pkg-config \
+    protobuf-compiler \
     python3 \
     python3-click \
     python3-coloredlogs \
@@ -112,6 +117,7 @@ RUN set -x \
     shellcheck \
     strace \
     systemd \
+    tcpdump \
     udev \
     unzip \
     wget \
@@ -201,7 +207,25 @@ RUN set -x \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
-
-# Some things that save space
-# Protoc goes from 108M to 4.6M
-RUN strip /usr/local/bin/protoc*
+# Build and install OpenSSL 3.5 LTS from source.
+# Ubuntu 24.04 ships OpenSSL 3.0.x via libssl-dev (kept for apt dependency
+# resolution). Installing 3.5 into /usr/local makes it the default for
+# pkg-config based builds (e.g. chip-cert, CHIPCryptoPALOpenSSL) while the
+# system libssl-3 continues to satisfy runtime dependencies of other
+# apt-installed packages.
+# OpenSSL 3.5 is required for native ML-DSA / ML-KEM (post-quantum) support
+# in the default provider (FIPS 204 / FIPS 203).
+ARG OPENSSL_VERSION=3.5.0
+ARG OPENSSL_SHA256=344d0a79f1a9b08029b0744e2cc401a43f9c90acd1044d09a530b4885a8e9fc0
+RUN set -x \
+    && cd /tmp \
+    && wget -q https://github.com/openssl/openssl/releases/download/openssl-${OPENSSL_VERSION}/openssl-${OPENSSL_VERSION}.tar.gz \
+    && echo "${OPENSSL_SHA256}  openssl-${OPENSSL_VERSION}.tar.gz" | sha256sum -c - \
+    && tar xzf openssl-${OPENSSL_VERSION}.tar.gz \
+    && cd openssl-${OPENSSL_VERSION} \
+    && ./Configure --prefix=/usr/local --openssldir=/etc/ssl --libdir=lib \
+    && make -j$(nproc) \
+    && make install_sw \
+    && ldconfig \
+    && cd / && rm -rf /tmp/openssl-${OPENSSL_VERSION}* \
+    && : # last line

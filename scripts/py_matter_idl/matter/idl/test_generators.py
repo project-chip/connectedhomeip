@@ -19,7 +19,6 @@ import sys
 import unittest
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List
 
 import yaml
 
@@ -48,7 +47,7 @@ class ExpectedOutput:
 @dataclass
 class GeneratorTestCase:
     input_idl: str
-    outputs: List[ExpectedOutput] = field(default_factory=list)
+    outputs: list[ExpectedOutput] = field(default_factory=list)
 
     def add_outputs(self, yaml_outputs_dict):
         for file_name, golden_path in yaml_outputs_dict.items():
@@ -68,7 +67,7 @@ class TestCaseStorage(GeneratorStorage):
             if expected.file_name == relative_path:
                 return os.path.join(TESTS_DIR, expected.golden_path)
 
-        self.checker.fail("Expected output %s not found" % relative_path)
+        self.checker.fail(f"Expected output {relative_path} not found")
         return None
 
     def get_existing_data(self, relative_path: str):
@@ -79,22 +78,22 @@ class TestCaseStorage(GeneratorStorage):
             if REGENERATE_GOLDEN_IMAGES and not os.path.exists(path):
                 return ""
 
-            with open(path, 'rt') as golden:
+            with open(path) as golden:
                 return golden.read()
 
         # This will attempt a new write, causing a unit test failure
-        self.checker.fail("Expected output %s not found" % relative_path)
+        self.checker.fail(f"Expected output {relative_path} not found")
         return None
 
     def write_new_data(self, relative_path: str, content: str):
         if REGENERATE_GOLDEN_IMAGES:
-            print("RE-GENERATING %r" % relative_path)
+            print(f"RE-GENERATING {relative_path!r}")
             # Expect writing only on regeneration
             path = os.path.abspath(self.get_existing_data_path(relative_path))
             dir_path = os.path.dirname(path)
             if not os.path.exists(dir_path):
                 os.makedirs(dir_path)
-            with open(path, 'wt') as golden:
+            with open(path, "w") as golden:
                 golden.write(content)
                 return
 
@@ -102,18 +101,17 @@ class TestCaseStorage(GeneratorStorage):
         # to write any new data
 
         # This will display actual diffs in the output files
-        self.checker.assertEqual(
-            self.get_existing_data(relative_path), content, "Content of %s" % relative_path)
+        self.checker.assertEqual(self.get_existing_data(relative_path), content, f"Content of {relative_path}")
 
         # Even if no diff, to be build system friendly, we do NOT expect any
         # actual data writes.
-        raise AssertionError("Unexpected write to %s" % relative_path)
+        raise AssertionError(f"Unexpected write to {relative_path}")
 
 
 @dataclass
 class GeneratorTest:
     generator_name: str
-    test_cases: List[GeneratorTestCase] = field(default_factory=list)
+    test_cases: list[GeneratorTestCase] = field(default_factory=list)
 
     def add_test_cases(self, yaml_test_case_dict):
         for idl_path, outputs in yaml_test_case_dict.items():
@@ -135,15 +133,14 @@ class GeneratorTest:
                 os.path.join(os.path.dirname(__file__), '../../examples')))
             from matter_idl_plugin import CustomGenerator
             return CustomGenerator(storage, idl, package='com.matter.example.proto')
-        else:
-            raise Exception("Unknown generator for testing: %s",
-                            self.generator_name.lower())
+        raise Exception("Unknown generator for testing: %s",
+                        self.generator_name.lower())
 
     def run_test_cases(self, checker: unittest.TestCase):
         for test in self.test_cases:
             with checker.subTest(idl=test.input_idl):
                 storage = TestCaseStorage(test, checker)
-                with open(os.path.join(TESTS_DIR, test.input_idl), 'rt') as stream:
+                with open(os.path.join(TESTS_DIR, test.input_idl)) as stream:
                     idl = CreateParser().parse(stream.read(), file_name=test.input_idl)
 
                 generator = self._create_generator(storage, idl)
@@ -152,7 +149,7 @@ class GeneratorTest:
                 checker.assertEqual(storage.checked_files, {x.file_name for x in test.outputs})
 
 
-def build_tests(yaml_data) -> List[GeneratorTest]:
+def build_tests(yaml_data) -> list[GeneratorTest]:
     """
     Transforms the YAML dictonary (Dict[str, Dict[str, Dict[str,str]]]) into
     a generator test structure.
@@ -170,7 +167,7 @@ def build_tests(yaml_data) -> List[GeneratorTest]:
 class TestGenerators(unittest.TestCase):
     def test_generators(self):
         self.maxDiff = None
-        with open(os.path.join(TESTS_DIR, "available_tests.yaml"), 'rt') as stream:
+        with open(os.path.join(TESTS_DIR, "available_tests.yaml")) as stream:
             yaml_data = yaml.safe_load(stream)
 
         for test in build_tests(yaml_data):

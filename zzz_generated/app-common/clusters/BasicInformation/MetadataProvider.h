@@ -69,6 +69,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::BasicInforma
             return SpecificationVersion::kMetadataEntry;
         case MaxPathsPerInvoke::Id:
             return MaxPathsPerInvoke::kMetadataEntry;
+        case DeviceLocation::Id:
+            return DeviceLocation::kMetadataEntry;
         case ConfigurationVersion::Id:
             return ConfigurationVersion::kMetadataEntry;
         default:

@@ -156,7 +156,6 @@ class WebSocketRunner(TestRunner):
     def _make_server_startup_command(self, path: str, arguments: str, port: int):
         if path is None:
             return None
-        elif arguments is None:
+        if arguments is None:
             return [path] + ['--port', str(port)]
-        else:
-            return [path] + [arg.strip() for arg in arguments.split(' ')] + ['--port', str(port)]
+        return [path] + [arg.strip() for arg in arguments.split(' ')] + ['--port', str(port)]

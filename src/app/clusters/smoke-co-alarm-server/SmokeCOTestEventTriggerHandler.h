@@ -17,8 +17,9 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/TestEventTriggerDelegate.h>
+#include <clusters/SmokeCoAlarm/Attributes.h>
+#include <clusters/SmokeCoAlarm/Events.h>
 
 /**
  * @brief User handler for handling the test event trigger
@@ -52,6 +53,7 @@ enum class SmokeCOTrigger : uint64_t
     kForceSmokeCritical          = 0x005c'0000'0000009c,
     kForceCOCritical             = 0x005c'0000'0000009d,
     kForceLowBatteryCritical     = 0x005c'0000'0000009e,
+    kForceUnmountedState         = 0x005c'0000'0000009f,
     // Clear alarm commands
     kClearSmoke             = 0x005c'0000'000000a0,
     kClearCO                = 0x005c'0000'000000a1,
@@ -62,7 +64,8 @@ enum class SmokeCOTrigger : uint64_t
     kClearContamination     = 0x005c'0000'000000a6,
     kClearSensitivity       = 0x005c'0000'000000a8,
     kClearEndOfLife         = 0x005c'0000'000000aa,
-    kClearSilence           = 0x005c'0000'000000ab
+    kClearSilence           = 0x005c'0000'000000ab,
+    kClearUnmountedState    = 0x005c'0000'000000ac
 };
 
 class SmokeCOTestEventTriggerHandler : public TestEventTriggerHandler

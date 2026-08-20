@@ -33,6 +33,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <openthread_port.h>
+#include <platform/bouffalolab/common/ThreadStackManagerImpl.h>
 #include <utils_list.h>
 #endif
 
@@ -63,7 +64,6 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err;
-    TaskHandle_t backup_eventLoopTask;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     // Initialize LwIP.
@@ -71,12 +71,9 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    otRadio_opt_t opt;
-    opt.bf.isFtd        = true;
-    opt.bf.isCoexEnable = true;
-
+    ReturnErrorOnFailure(Internal::InitThreadPlatform());
     ot_alarmInit();
-    ot_radioInit(opt);
+    ot_radioInit();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     err = chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16);
@@ -84,19 +81,12 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    /** weiyin, backup mEventLoopTask which is reset in _InitChipStack */
-    backup_eventLoopTask = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::mEventLoopTask;
-    err                  = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
+    err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
-    Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::mEventLoopTask = backup_eventLoopTask;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     wifi_start_firmware_task();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
-
-#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
-    ethernetInterface_init();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 
 exit:
     return err;

@@ -31,7 +31,7 @@
 #include <AppEvent.h>
 #include <lib/core/DataModelTypes.h>
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 #include "ClosureUI.h"
 #endif
 
@@ -160,7 +160,7 @@ public:
      */
     const Action_t & GetCurrentAction() const { return mCurrentAction; }
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     /**
      * @brief Gets closure data specifically for UI display.
      *
@@ -168,7 +168,7 @@ public:
      */
     ClosureUIData GetClosureUIData();
 
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 
     /**
      * @brief Checks if a MoveTo action is currently in progress.
@@ -178,14 +178,17 @@ public:
     bool IsClosureControlMotionInProgress() const;
 
     /**
-     * @brief Gets the ClosureControlEndpoint logic for direct access.
+     * @brief Gets the ClosureControlEndpoint cluster for direct access.
      *
-     * This allows direct access to the cluster logic methods (e.g., HandleMoveTo)
+     * This allows direct access to the cluster cluster methods (e.g., HandleMoveTo)
      * when called from chip task context (e.g., via ScheduleWork).
      *
-     * @return Reference to the ClosureControlEndpoint logic.
+     * @return Reference to the ClosureControlEndpoint cluster.
      */
-    chip::app::Clusters::ClosureControl::ClusterLogic & GetClosureControlLogic() { return mClosureEndpoint1.GetLogic(); }
+    chip::app::Clusters::ClosureControl::ClosureControlCluster & GetClosureControlCluster()
+    {
+        return mClosureEndpoint1.GetClusterInstance();
+    }
 
     /**
      * @brief Sets the initial state for the ClosureControlEndpoint.

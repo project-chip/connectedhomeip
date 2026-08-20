@@ -176,6 +176,19 @@
 #undef SUCCESS
 #endif
 #include <lwip/opt.h>
+
+// TODO: this is an awkward workaround for some platforms (AmebaD - platform_stdlib_rtl8721d)
+// defining false as 0, resulting in casting `inconsistent types/ bool and int` errors for
+// lambda argument deduction.
+//
+// Currently this happens as an inclusion of `lwip/opt.h`, so the undefine is added in this header
+#ifdef false
+#undef false
+#endif
+#ifdef true
+#undef true
+#endif
+
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 /* Configuration option variables defined below */

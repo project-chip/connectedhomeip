@@ -27,12 +27,12 @@
 #include <controller/CommissioningDelegate.h>
 #include <credentials/DeviceAttestationConstructor.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 
 namespace chip {
 
-namespace Test {
+namespace Testing {
 // Provides access to private/protected members of AutoCommissioner class for testing
 class AutoCommissionerTestAccess
 {
@@ -103,5 +103,5 @@ private:
     Controller::AutoCommissioner * mCommissioner = nullptr;
 };
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

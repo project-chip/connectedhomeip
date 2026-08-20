@@ -18,7 +18,6 @@
 import datetime
 import logging
 import re
-from typing import Optional, Set
 
 import click
 import coloredlogs
@@ -61,7 +60,7 @@ class Canceller:
 
     def check_pr(self, pr: PullRequest, required_runs):
 
-        last_commit: Optional[Commit] = None
+        last_commit: Commit | None = None
 
         for commit in pr.get_commits():
             log.debug("  Found commit '%s'", commit.sha)
@@ -75,8 +74,8 @@ class Canceller:
 
         log.info("Last commit is: '%s'", last_commit.sha)
 
-        in_progress_workflows: Set[int] = set()
-        failed_check_names: Set[str] = set()
+        in_progress_workflows: set[int] = set()
+        failed_check_names: set[str] = set()
 
         # Gather all workflows along with failed workflow names
         for check_suite in last_commit.get_check_suites():
@@ -121,8 +120,8 @@ class Canceller:
             log.info("No critical failures found")
             return
 
-        for id in in_progress_workflows:
-            workflow = self.repo.get_workflow_run(id)
+        for workflow_id in in_progress_workflows:
+            workflow = self.repo.get_workflow_run(workflow_id)
             if self.dry_run:
                 log.warning("DRY RUN: Will not stop '%s'", workflow.name)
             else:
@@ -163,7 +162,8 @@ def main(
     if gh_api_token:
         gh_token = gh_api_token
     elif token_file:
-        gh_token = open(token_file, "rt").read().strip()
+        with open(token_file) as f:
+            gh_token = f.read().strip()
     else:
         raise Exception("Require a --gh-api-token or --token-file to access github")
 

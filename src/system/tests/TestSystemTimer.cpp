@@ -69,13 +69,13 @@ public:
 };
 #elif CHIP_SYSTEM_CONFIG_USE_SOCKETS
 template <class LayerImpl>
-class LayerEvents<LayerImpl, typename std::enable_if<std::is_base_of<LayerSocketsLoop, LayerImpl>::value>::type>
+class LayerEvents<LayerImpl, typename std::enable_if<std::is_base_of<LayerSelectLoop, LayerImpl>::value>::type>
 {
 public:
     static bool HasServiceEvents() { return true; }
     static void ServiceEvents(Layer & aLayer)
     {
-        LayerSocketsLoop & layer = static_cast<LayerSocketsLoop &>(aLayer);
+        LayerSelectLoop & layer = static_cast<LayerSelectLoop &>(aLayer);
         layer.PrepareEvents();
         layer.WaitForEvents();
         layer.HandleEvents();
@@ -83,7 +83,9 @@ public:
 };
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+// Zephyr uses LayerImplZephyr (not LayerImplFreeRTOS), so exclude it here to
+// avoid referencing the undeclared FreeRTOS type on Thread-only Zephyr targets.
+#if (CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT) && !defined(__ZEPHYR__)
 
 template <class LayerImpl>
 class LayerEvents<LayerImpl, typename std::enable_if<std::is_base_of<LayerImplFreeRTOS, LayerImpl>::value>::type>
@@ -100,7 +102,7 @@ public:
     }
 };
 
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#endif // (CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT) && !defined(__ZEPHYR__)
 
 // Test input vector format.
 static const uint32_t MAX_NUM_TIMERS = 1000;

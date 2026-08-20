@@ -1,0 +1,12 @@
+# MSan ignorelist for Matter builds.
+#
+# libc++ false positives are eliminated by using an MSan-instrumented
+# libc++ (built from the same LLVM source as Pigweed's clang).
+
+# GLib internals (requires glib to be built with this ignorelist baked in).
+# g_io_channel_unix_new uses fstat() which fills a buffer via syscall;
+# MSan cannot track kernel-initialized memory.
+src:*/glib/giounix.c
+
+fun:__interceptor_poll
+fun:__interceptor_ppoll

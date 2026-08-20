@@ -19,6 +19,7 @@
 
 #include <access/examples/PermissiveAccessControlDelegate.h>
 #include <app/AttributeValueEncoder.h>
+#include <app/ClusterStateCache.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/InteractionModelHelper.h>
@@ -60,12 +61,12 @@ uint8_t gInfoEventBuffer[128];
 uint8_t gCritEventBuffer[128];
 chip::app::CircularEventBuffer gCircularEventBuffer[3];
 chip::ClusterId kTestClusterId          = 6; // OnOff, but not used as OnOff directly
-chip::ClusterId kTestEventClusterId     = chip::Test::MockClusterId(1);
+chip::ClusterId kTestEventClusterId     = chip::Testing::MockClusterId(1);
 chip::ClusterId kInvalidTestClusterId   = 7;
 chip::EndpointId kTestEndpointId        = 1;
-chip::EndpointId kTestEventEndpointId   = chip::Test::kMockEndpoint1;
-chip::EventId kTestEventIdDebug         = chip::Test::MockEventId(1);
-chip::EventId kTestEventIdCritical      = chip::Test::MockEventId(2);
+chip::EndpointId kTestEventEndpointId   = chip::Testing::kMockEndpoint1;
+chip::EventId kTestEventIdDebug         = chip::Testing::MockEventId(1);
+chip::EventId kTestEventIdCritical      = chip::Testing::MockEventId(2);
 chip::TLV::Tag kTestEventTag            = chip::TLV::ContextTag(1);
 chip::EndpointId kInvalidTestEndpointId = 3;
 chip::DataVersion kTestDataVersion1     = 3;
@@ -79,13 +80,13 @@ static chip::System::Clock::ClockBase * gRealClock;
 static chip::app::reporting::ReportSchedulerImpl * gReportScheduler;
 static bool sUsingSubSync = false;
 
-const chip::Test::MockNodeConfig & TestMockNodeConfig()
+const chip::Testing::MockNodeConfig & TestMockNodeConfig()
 {
     using namespace chip::app;
-    using namespace chip::Test;
+    using namespace chip::Testing;
 
     // clang-format off
-    static const chip::Test::MockNodeConfig config({
+    static const chip::Testing::MockNodeConfig config({
         MockEndpointConfig(kTestEndpointId, {
             MockClusterConfig(kTestClusterId, {
                 ClusterRevision::Id, FeatureMap::Id,
@@ -118,7 +119,7 @@ const chip::Test::MockNodeConfig & TestMockNodeConfig()
                 ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3),
             }),
         }),
-        MockEndpointConfig(chip::Test::kMockEndpoint3, {
+        MockEndpointConfig(chip::Testing::kMockEndpoint3, {
             MockClusterConfig(MockClusterId(1), {
                 ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
             }),
@@ -471,7 +472,7 @@ namespace app {
 using Seconds16      = System::Clock::Seconds16;
 using Milliseconds32 = System::Clock::Milliseconds32;
 
-class TestReadInteraction : public chip::Test::AppContext
+class TestReadInteraction : public chip::Testing::AppContext
 {
 public:
     static void SetUpTestSuiteCommon(bool syncScheduler = false)
@@ -509,15 +510,15 @@ public:
         chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), MATTER_ARRAY_SIZE(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
-        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
-        chip::Test::SetVersionTo(chip::Test::kTestDataVersion1);
+        chip::Testing::SetMockNodeConfig(TestMockNodeConfig());
+        chip::Testing::SetVersionTo(chip::Testing::kTestDataVersion1);
         chip::DeviceLayer::SetSystemLayerForTesting(&GetSystemLayer());
     }
 
     void TearDown() override
     {
         chip::DeviceLayer::SetSystemLayerForTesting(nullptr);
-        chip::Test::ResetMockNodeConfig();
+        chip::Testing::ResetMockNodeConfig();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         chip::app::EventManagement::DestroyEventManagement();
         AppContext::TearDown();
@@ -562,6 +563,7 @@ public:
     void TestReadUnexpectedSubscriptionId();
     void TestReadWildcard();
     void TestSetDirtyBetweenChunks();
+    void TestReadClientSuppressResponseFlowWithInvalidReport();
     void TestShutdownSubscription();
     void TestSubscribeClientReceiveInvalidReportMessage();
     void TestSubscribeClientReceiveInvalidStatusResponse();
@@ -584,6 +586,7 @@ public:
     void TestSubscribeUrgentWildcardEvent();
     void TestSubscribeWildcard();
     void TestSubscriptionReportWithDefunctSession();
+    void TestSubscribeWithCache();
 
     enum class ReportType : uint8_t
     {
@@ -863,15 +866,22 @@ void TestReadInteraction::TestReadHandlerSetMaxReportingInterval()
         readHandler.GetReportingIntervals(minInterval, maxInterval);
         EXPECT_EQ(kMaxIntervalCeiling, maxInterval);
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        // TC2: MaxInterval == MinIntervalFloor
+        EXPECT_EQ(readHandler.SetMaxReportingInterval(kMinInterval), CHIP_ERROR_INVALID_ARGUMENT);
+#else
         // TC2: MaxInterval == MinIntervalFloor
         EXPECT_EQ(readHandler.SetMaxReportingInterval(kMinInterval), CHIP_NO_ERROR);
-
         readHandler.GetReportingIntervals(minInterval, maxInterval);
         EXPECT_EQ(kMinInterval, maxInterval);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        // TC3: Minterval < MaxInterval < max(GetPublisherSelectedIntervalLimit(), mSubscriberRequestedMaxInterval)
+        EXPECT_EQ(readHandler.SetMaxReportingInterval(kMinInterval + 1), CHIP_ERROR_INVALID_ARGUMENT);
+#else
         // TC3: Minterval < MaxInterval < max(GetPublisherSelectedIntervalLimit(), mSubscriberRequestedMaxInterval)
         EXPECT_EQ(readHandler.SetMaxReportingInterval(kMaxIntervalCeiling), CHIP_NO_ERROR);
-
         readHandler.GetReportingIntervals(minInterval, maxInterval);
         EXPECT_EQ(kMaxIntervalCeiling, maxInterval);
 
@@ -880,6 +890,7 @@ void TestReadInteraction::TestReadHandlerSetMaxReportingInterval()
 
         readHandler.GetReportingIntervals(minInterval, maxInterval);
         EXPECT_EQ(readHandler.GetSubscriberRequestedMaxInterval(), maxInterval);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
         // TC4: MaxInterval == GetPublisherSelectedIntervalLimit()
         EXPECT_EQ(readHandler.SetMaxReportingInterval(readHandler.GetPublisherSelectedIntervalLimit()), CHIP_NO_ERROR);
@@ -977,6 +988,61 @@ void TestReadInteraction::TestReadClientInvalidReport()
 
     EXPECT_EQ(readClient.ProcessReportData(std::move(buf), ReadClient::ReportType::kContinuingTransaction),
               CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadClientSuppressResponseFlowWithInvalidReport)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadClientSuppressResponseFlowWithInvalidReport)
+void TestReadInteraction::TestReadClientSuppressResponseFlowWithInvalidReport()
+{
+    Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+    MockInteractionModelApp delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), gReportScheduler), CHIP_NO_ERROR);
+
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+
+    app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                               chip::app::ReadClient::InteractionType::Read);
+
+    ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+    EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
+
+    // Drop the actual read response from the server
+    GetLoopback().mNumMessagesToDrop = 1;
+    DrainAndServiceIO();
+
+    GenerateReportData(buf, ReportType::kInvalidNoAttributeId, true /* aSuppressResponse*/);
+    PayloadHeader payloadHeader;
+    payloadHeader.SetExchangeID(0);
+    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::ReportData);
+
+    // Since we are dropping packets, things are not getting acked. Set up
+    // our MRP state to look like what it would have looked like if the
+    // packet had not gotten dropped.
+    PretendWeGotReplyFromServer(*this, readClient.mExchange.Get());
+
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = 0;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    GetLoopback().mDroppedMessageCount              = 0;
+
+    EXPECT_EQ(readClient.OnMessageReceived(readClient.mExchange.Get(), payloadHeader, std::move(buf)),
+              CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
+    DrainAndServiceIO();
+
+    // StatusResponse should NOT be sent because of SuppressResponse.
+    EXPECT_EQ(GetLoopback().mSentMessageCount, 1u);
+
+    EXPECT_EQ(delegate.mError, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
+
+    engine->Shutdown();
+    ExpireSessionAliceToBob();
+    ExpireSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadClientInvalidAttributeId)
@@ -1485,8 +1551,8 @@ void TestReadInteraction::TestReadWildcard()
     EXPECT_FALSE(delegate.mGotEventResponse);
 
     chip::app::AttributePathParams attributePathParams[1];
-    attributePathParams[0].mEndpointId = chip::Test::kMockEndpoint2;
-    attributePathParams[0].mClusterId  = chip::Test::MockClusterId(3);
+    attributePathParams[0].mEndpointId = chip::Testing::kMockEndpoint2;
+    attributePathParams[0].mClusterId  = chip::Testing::MockClusterId(3);
 
     ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
     readPrepareParams.mpEventPathParamsList        = nullptr;
@@ -1544,9 +1610,9 @@ void TestReadInteraction::TestReadChunking()
     chip::app::AttributePathParams attributePathParams[1];
     // Mock Attribute 4 is a big attribute, with kMockAttribute4ListLength large
     // OCTET_STRING elements.
-    attributePathParams[0].mEndpointId  = chip::Test::kMockEndpoint3;
-    attributePathParams[0].mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams[0].mAttributeId = chip::Test::MockAttributeId(4);
+    attributePathParams[0].mEndpointId  = chip::Testing::kMockEndpoint3;
+    attributePathParams[0].mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams[0].mAttributeId = chip::Testing::MockAttributeId(4);
 
     ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
     readPrepareParams.mpEventPathParamsList        = nullptr;
@@ -1599,9 +1665,9 @@ void TestReadInteraction::TestSetDirtyBetweenChunks()
     chip::app::AttributePathParams attributePathParams[2];
     for (auto & attributePathParam : attributePathParams)
     {
-        attributePathParam.mEndpointId  = chip::Test::kMockEndpoint3;
-        attributePathParam.mClusterId   = chip::Test::MockClusterId(2);
-        attributePathParam.mAttributeId = chip::Test::MockAttributeId(4);
+        attributePathParam.mEndpointId  = chip::Testing::kMockEndpoint3;
+        attributePathParam.mClusterId   = chip::Testing::MockClusterId(2);
+        attributePathParam.mAttributeId = chip::Testing::MockAttributeId(4);
     }
 
     ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
@@ -1674,9 +1740,9 @@ void TestReadInteraction::TestSetDirtyBetweenChunks()
                     mDidSetDirty = true;
 
                     AttributePathParams dirtyPath;
-                    dirtyPath.mEndpointId  = chip::Test::kMockEndpoint3;
-                    dirtyPath.mClusterId   = chip::Test::MockClusterId(2);
-                    dirtyPath.mAttributeId = chip::Test::MockAttributeId(4);
+                    dirtyPath.mEndpointId  = chip::Testing::kMockEndpoint3;
+                    dirtyPath.mClusterId   = chip::Testing::MockClusterId(2);
+                    dirtyPath.mAttributeId = chip::Testing::MockAttributeId(4);
 
                     if (aPath.mEndpointId == dirtyPath.mEndpointId && aPath.mClusterId == dirtyPath.mClusterId &&
                         aPath.mAttributeId == dirtyPath.mAttributeId)
@@ -1870,13 +1936,18 @@ void TestReadInteraction::TestICDProcessSubscribeRequestSupMaxIntervalCeiling()
         AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
         EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
 
-        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
+        TEMPORARY_RETURN_IGNORED attributePathBuilder.Node(1)
+            .Endpoint(2)
+            .Cluster(3)
+            .Attribute(4)
+            .ListIndex(5)
+            .EndOfAttributePathIB();
         EXPECT_EQ(attributePathBuilder.GetError(), CHIP_NO_ERROR);
 
-        attributePathListBuilder.EndOfAttributePathIBs();
+        TEMPORARY_RETURN_IGNORED attributePathListBuilder.EndOfAttributePathIBs();
         EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
 
-        subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
+        TEMPORARY_RETURN_IGNORED subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
         EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
 
         EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
@@ -1940,13 +2011,18 @@ void TestReadInteraction::TestICDProcessSubscribeRequestInfMaxIntervalCeiling()
         AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
         EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
 
-        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
+        TEMPORARY_RETURN_IGNORED attributePathBuilder.Node(1)
+            .Endpoint(2)
+            .Cluster(3)
+            .Attribute(4)
+            .ListIndex(5)
+            .EndOfAttributePathIB();
         EXPECT_EQ(attributePathBuilder.GetError(), CHIP_NO_ERROR);
 
-        attributePathListBuilder.EndOfAttributePathIBs();
+        TEMPORARY_RETURN_IGNORED attributePathListBuilder.EndOfAttributePathIBs();
         EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
 
-        subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
+        TEMPORARY_RETURN_IGNORED subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
         EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
 
         EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
@@ -2010,13 +2086,18 @@ void TestReadInteraction::TestICDProcessSubscribeRequestSupMinInterval()
         AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
         EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
 
-        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
+        TEMPORARY_RETURN_IGNORED attributePathBuilder.Node(1)
+            .Endpoint(2)
+            .Cluster(3)
+            .Attribute(4)
+            .ListIndex(5)
+            .EndOfAttributePathIB();
         EXPECT_EQ(attributePathBuilder.GetError(), CHIP_NO_ERROR);
 
-        attributePathListBuilder.EndOfAttributePathIBs();
+        TEMPORARY_RETURN_IGNORED attributePathListBuilder.EndOfAttributePathIBs();
         EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
 
-        subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
+        TEMPORARY_RETURN_IGNORED subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
         EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
 
         EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
@@ -2080,13 +2161,18 @@ void TestReadInteraction::TestICDProcessSubscribeRequestMaxMinInterval()
         AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
         EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
 
-        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
+        TEMPORARY_RETURN_IGNORED attributePathBuilder.Node(1)
+            .Endpoint(2)
+            .Cluster(3)
+            .Attribute(4)
+            .ListIndex(5)
+            .EndOfAttributePathIB();
         EXPECT_EQ(attributePathBuilder.GetError(), CHIP_NO_ERROR);
 
-        attributePathListBuilder.EndOfAttributePathIBs();
+        TEMPORARY_RETURN_IGNORED attributePathListBuilder.EndOfAttributePathIBs();
         EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
 
-        subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
+        TEMPORARY_RETURN_IGNORED subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
         EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
 
         EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
@@ -2149,13 +2235,18 @@ void TestReadInteraction::TestICDProcessSubscribeRequestInvalidIdleModeDuration(
         AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
         EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
 
-        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
+        TEMPORARY_RETURN_IGNORED attributePathBuilder.Node(1)
+            .Endpoint(2)
+            .Cluster(3)
+            .Attribute(4)
+            .ListIndex(5)
+            .EndOfAttributePathIB();
         EXPECT_EQ(attributePathBuilder.GetError(), CHIP_NO_ERROR);
 
-        attributePathListBuilder.EndOfAttributePathIBs();
+        TEMPORARY_RETURN_IGNORED attributePathListBuilder.EndOfAttributePathIBs();
         EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
 
-        subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
+        TEMPORARY_RETURN_IGNORED subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
         EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
 
         EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
@@ -2373,6 +2464,167 @@ void TestReadInteraction::TestSubscribeRoundtrip()
     EXPECT_EQ(engine->GetNumActiveReadClients(), 0u);
     engine->Shutdown();
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+class IntegrationCacheCallback : public ClusterStateCache::Callback
+{
+public:
+    void Reset()
+    {
+        mOnDoneCalledCount                        = 0;
+        mOnReportBeginCalledCount                 = 0;
+        mOnReportEndCalledCount                   = 0;
+        mOnAttributeChangedCalledCount            = 0;
+        mNotifySubscriptionStillActiveCalledCount = 0;
+        mOnSubscriptionEstablishedCalledCount     = 0;
+    }
+
+    void OnDone(ReadClient * apReadClient) override { mOnDoneCalledCount++; }
+    void OnReportBegin() override { mOnReportBeginCalledCount++; }
+    void OnReportEnd() override { mOnReportEndCalledCount++; }
+    void OnAttributeChanged(ClusterStateCache * cache, const ConcreteAttributePath & path) override
+    {
+        mOnAttributeChangedCalledCount++;
+    }
+    void NotifySubscriptionStillActive(const ReadClient & aReadClient) override
+    {
+        mNotifySubscriptionStillActiveCalledCount++;
+        System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
+        if (mLastLivenessTime != System::Clock::kZero)
+        {
+            mSubscriptionUptime += std::chrono::duration_cast<System::Clock::Timeout>(now - mLastLivenessTime);
+        }
+        mLastLivenessTime = now;
+    }
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override
+    {
+        mOnSubscriptionEstablishedCalledCount++;
+        mSubscriptionEstablishmentTime = System::SystemClock().GetMonotonicTimestamp();
+        mLastLivenessTime              = mSubscriptionEstablishmentTime;
+        mSubscriptionUptime            = System::Clock::kZero;
+    }
+
+    System::Clock::Timeout GetSubscriptionUptime() const { return mSubscriptionUptime; }
+
+    int mOnDoneCalledCount                        = 0;
+    int mOnReportBeginCalledCount                 = 0;
+    int mOnReportEndCalledCount                   = 0;
+    int mOnAttributeChangedCalledCount            = 0;
+    int mNotifySubscriptionStillActiveCalledCount = 0;
+    int mOnSubscriptionEstablishedCalledCount     = 0;
+
+private:
+    System::Clock::Timestamp mSubscriptionEstablishmentTime = System::Clock::kZero;
+    System::Clock::Timestamp mLastLivenessTime              = System::Clock::kZero;
+    System::Clock::Timeout mSubscriptionUptime              = System::Clock::kZero;
+};
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeWithCache)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeWithCache)
+void TestReadInteraction::TestSubscribeWithCache()
+{
+    // Test that ClusterStateCache correctly forwards all subscription reporting lifecycle callbacks
+    // (such as OnReportBegin, OnReportEnd, OnAttributeChanged, and NotifySubscriptionStillActive)
+    // to the registered application callback. This also verifies that we can track subscription
+    // liveness and uptime from the application callback.
+    IntegrationCacheCallback cacheCallback;
+    ClusterStateCache cache(cacheCallback);
+
+    ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+    chip::app::AttributePathParams attributePathParams[1];
+    readPrepareParams.mpAttributePathParamsList                 = attributePathParams;
+    readPrepareParams.mpAttributePathParamsList[0].mEndpointId  = kTestEndpointId;
+    readPrepareParams.mpAttributePathParamsList[0].mClusterId   = kTestClusterId;
+    readPrepareParams.mpAttributePathParamsList[0].mAttributeId = 1;
+    readPrepareParams.mAttributePathParamsListSize              = 1;
+    readPrepareParams.mMinIntervalFloorSeconds                  = 1;
+    readPrepareParams.mMaxIntervalCeilingSeconds                = 2;
+
+    {
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(),
+                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Subscribe);
+
+        EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
+
+        DrainAndServiceIO();
+
+        auto * engine = chip::app::InteractionModelEngine::GetInstance();
+        EXPECT_EQ(engine->GetNumActiveReadHandlers(), 1u);
+        ASSERT_NE(engine->ActiveHandlerAt(0), nullptr);
+        auto & readHandler = *engine->ActiveHandlerAt(0);
+
+        uint16_t minInterval;
+        uint16_t maxInterval;
+        readHandler.GetReportingIntervals(minInterval, maxInterval);
+
+        // Priming report should have been received.
+        EXPECT_EQ(cacheCallback.mOnReportBeginCalledCount, 1);
+        EXPECT_EQ(cacheCallback.mOnReportEndCalledCount, 1);
+        EXPECT_EQ(cacheCallback.mOnAttributeChangedCalledCount, 1);
+        EXPECT_EQ(cacheCallback.mNotifySubscriptionStillActiveCalledCount, 0); // Not called for priming report
+        EXPECT_EQ(cacheCallback.mOnSubscriptionEstablishedCalledCount, 1);
+
+        // Initial uptime should be 0
+        EXPECT_EQ(cacheCallback.GetSubscriptionUptime(), System::Clock::kZero);
+
+        TLV::TLVReader reader;
+        EXPECT_EQ(cache.Get(ConcreteAttributePath(kTestEndpointId, kTestClusterId, 1), reader), CHIP_NO_ERROR);
+
+        // Case 1: NON-EMPTY report (data update)
+        // Trigger report after subscription established -> should call NotifySubscriptionStillActive
+        System::Clock::Timeout delta1 = System::Clock::Seconds16(minInterval);
+        gMockClock.AdvanceMonotonic(delta1);
+
+        chip::app::AttributePathParams dirtyPath;
+        dirtyPath.mEndpointId  = kTestEndpointId;
+        dirtyPath.mClusterId   = kTestClusterId;
+        dirtyPath.mAttributeId = 1;
+        EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(dirtyPath), CHIP_NO_ERROR);
+
+        cacheCallback.Reset();
+        DrainAndServiceIO();
+
+        EXPECT_EQ(cacheCallback.mNotifySubscriptionStillActiveCalledCount, 1);
+        EXPECT_EQ(cacheCallback.mOnReportBeginCalledCount, 1);
+        EXPECT_EQ(cacheCallback.mOnReportEndCalledCount, 1);
+        EXPECT_EQ(cacheCallback.mOnAttributeChangedCalledCount, 1);
+        EXPECT_EQ(cacheCallback.GetSubscriptionUptime(), delta1);
+
+        // Case 2: EMPTY report (keep-alive)
+        // Advance clock by MaxInterval without making anything dirty -> should trigger keep-alive
+        System::Clock::Timeout delta2 = System::Clock::Seconds16(maxInterval);
+        gMockClock.AdvanceMonotonic(delta2);
+        cacheCallback.Reset();
+        GetIOContext().DriveIO(); // Trigger timer and schedule run
+
+        DrainAndServiceIO();
+
+        EXPECT_EQ(cacheCallback.mNotifySubscriptionStillActiveCalledCount, 1);
+        EXPECT_EQ(cacheCallback.mOnReportBeginCalledCount, 0); // No data, so no ReportBegin
+        EXPECT_EQ(cacheCallback.mOnReportEndCalledCount, 0);   // No data, so no ReportEnd
+        EXPECT_EQ(cacheCallback.mOnAttributeChangedCalledCount, 0);
+        EXPECT_EQ(cacheCallback.GetSubscriptionUptime(), delta1 + delta2);
+
+        // Case 3: Another NON-EMPTY report
+        System::Clock::Timeout delta3 = System::Clock::Seconds16(minInterval);
+        gMockClock.AdvanceMonotonic(delta3);
+        EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(dirtyPath), CHIP_NO_ERROR);
+
+        cacheCallback.Reset();
+        DrainAndServiceIO();
+
+        EXPECT_EQ(cacheCallback.mNotifySubscriptionStillActiveCalledCount, 1);
+        EXPECT_EQ(cacheCallback.mOnReportBeginCalledCount, 1);
+        EXPECT_EQ(cacheCallback.mOnReportEndCalledCount, 1);
+        EXPECT_EQ(cacheCallback.GetSubscriptionUptime(), delta1 + delta2 + delta3);
+
+        chip::app::InteractionModelEngine::GetInstance()->ShutdownAllSubscriptions();
+    }
+
+    DrainAndServiceIO();
+    EXPECT_EQ(cacheCallback.mOnDoneCalledCount, 1);
+
+    chip::app::InteractionModelEngine::GetInstance()->Shutdown();
 }
 
 TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeEarlyReport)
@@ -2791,7 +3043,7 @@ void TestReadInteraction::TestSubscribeWildcard()
     // This test in particular is completely tied to the DefaultMockConfig in the mock
     // attribute storage, so reset to that (figuring out chunking location is extra hard to
     // maintain)
-    chip::Test::ResetMockNodeConfig();
+    chip::Testing::ResetMockNodeConfig();
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
     // Shouldn't have anything in the retransmit table when starting the test.
@@ -2990,9 +3242,9 @@ void TestReadInteraction::TestSubscribeWildcard()
             delegate.mNumAttributeResponse = 0;
 
             AttributePathParams dirtyPath;
-            dirtyPath.mEndpointId  = chip::Test::kMockEndpoint2;
-            dirtyPath.mClusterId   = chip::Test::MockClusterId(3);
-            dirtyPath.mAttributeId = chip::Test::MockAttributeId(1);
+            dirtyPath.mEndpointId  = chip::Testing::kMockEndpoint2;
+            dirtyPath.mClusterId   = chip::Testing::MockClusterId(3);
+            dirtyPath.mAttributeId = chip::Testing::MockAttributeId(1);
 
             EXPECT_EQ(engine->GetReportingEngine().SetDirty(dirtyPath), CHIP_NO_ERROR);
 
@@ -3009,7 +3261,7 @@ void TestReadInteraction::TestSubscribeWildcard()
             delegate.Reset();
 
             AttributePathParams dirtyPath;
-            dirtyPath.mEndpointId = chip::Test::kMockEndpoint3;
+            dirtyPath.mEndpointId = chip::Testing::kMockEndpoint3;
 
             EXPECT_EQ(engine->GetReportingEngine().SetDirty(dirtyPath), CHIP_NO_ERROR);
 
@@ -3116,8 +3368,8 @@ void TestReadInteraction::TestSubscribePartialOverlap()
 
     readPrepareParams.mAttributePathParamsListSize = 1;
     auto attributePathParams = std::make_unique<chip::app::AttributePathParams[]>(readPrepareParams.mAttributePathParamsListSize);
-    attributePathParams[0].mClusterId           = chip::Test::MockClusterId(3);
-    attributePathParams[0].mAttributeId         = chip::Test::MockAttributeId(1);
+    attributePathParams[0].mClusterId           = chip::Testing::MockClusterId(3);
+    attributePathParams[0].mAttributeId         = chip::Testing::MockAttributeId(1);
     readPrepareParams.mpAttributePathParamsList = attributePathParams.get();
 
     readPrepareParams.mMinIntervalFloorSeconds   = 0;
@@ -3148,8 +3400,8 @@ void TestReadInteraction::TestSubscribePartialOverlap()
             delegate.mNumAttributeResponse = 0;
 
             AttributePathParams dirtyPath;
-            dirtyPath.mEndpointId = chip::Test::kMockEndpoint2;
-            dirtyPath.mClusterId  = chip::Test::MockClusterId(3);
+            dirtyPath.mEndpointId = chip::Testing::kMockEndpoint2;
+            dirtyPath.mClusterId  = chip::Testing::MockClusterId(3);
 
             EXPECT_EQ(engine->GetReportingEngine().SetDirty(dirtyPath), CHIP_NO_ERROR);
 
@@ -3157,9 +3409,9 @@ void TestReadInteraction::TestSubscribePartialOverlap()
 
             EXPECT_TRUE(delegate.mGotReport);
             EXPECT_EQ(delegate.mNumAttributeResponse, 1);
-            EXPECT_EQ(delegate.mReceivedAttributePaths[0].mEndpointId, chip::Test::kMockEndpoint2);
-            EXPECT_EQ(delegate.mReceivedAttributePaths[0].mClusterId, chip::Test::MockClusterId(3));
-            EXPECT_EQ(delegate.mReceivedAttributePaths[0].mAttributeId, chip::Test::MockAttributeId(1));
+            EXPECT_EQ(delegate.mReceivedAttributePaths[0].mEndpointId, chip::Testing::kMockEndpoint2);
+            EXPECT_EQ(delegate.mReceivedAttributePaths[0].mClusterId, chip::Testing::MockClusterId(3));
+            EXPECT_EQ(delegate.mReceivedAttributePaths[0].mAttributeId, chip::Testing::MockAttributeId(1));
         }
     }
 
@@ -3188,9 +3440,9 @@ void TestReadInteraction::TestSubscribeSetDirtyFullyOverlap()
 
     readPrepareParams.mAttributePathParamsListSize = 1;
     auto attributePathParams = std::make_unique<chip::app::AttributePathParams[]>(readPrepareParams.mAttributePathParamsListSize);
-    attributePathParams[0].mEndpointId          = chip::Test::kMockEndpoint2;
-    attributePathParams[0].mClusterId           = chip::Test::MockClusterId(3);
-    attributePathParams[0].mAttributeId         = chip::Test::MockAttributeId(1);
+    attributePathParams[0].mEndpointId          = chip::Testing::kMockEndpoint2;
+    attributePathParams[0].mClusterId           = chip::Testing::MockClusterId(3);
+    attributePathParams[0].mAttributeId         = chip::Testing::MockAttributeId(1);
     readPrepareParams.mpAttributePathParamsList = attributePathParams.get();
 
     readPrepareParams.mMinIntervalFloorSeconds   = 0;
@@ -3227,9 +3479,9 @@ void TestReadInteraction::TestSubscribeSetDirtyFullyOverlap()
 
             EXPECT_TRUE(delegate.mGotReport);
             EXPECT_EQ(delegate.mNumAttributeResponse, 1);
-            EXPECT_EQ(delegate.mReceivedAttributePaths[0].mEndpointId, chip::Test::kMockEndpoint2);
-            EXPECT_EQ(delegate.mReceivedAttributePaths[0].mClusterId, chip::Test::MockClusterId(3));
-            EXPECT_EQ(delegate.mReceivedAttributePaths[0].mAttributeId, chip::Test::MockAttributeId(1));
+            EXPECT_EQ(delegate.mReceivedAttributePaths[0].mEndpointId, chip::Testing::kMockEndpoint2);
+            EXPECT_EQ(delegate.mReceivedAttributePaths[0].mClusterId, chip::Testing::MockClusterId(3));
+            EXPECT_EQ(delegate.mReceivedAttributePaths[0].mAttributeId, chip::Testing::MockAttributeId(1));
         }
     }
 
@@ -3656,9 +3908,9 @@ void TestReadInteraction::TestReadChunkingStatusReportTimeout()
 
     chip::app::AttributePathParams attributePathParams[1];
     // Mock Attribute 4 is a big attribute, with 6 large OCTET_STRING
-    attributePathParams[0].mEndpointId  = chip::Test::kMockEndpoint3;
-    attributePathParams[0].mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams[0].mAttributeId = chip::Test::MockAttributeId(4);
+    attributePathParams[0].mEndpointId  = chip::Testing::kMockEndpoint3;
+    attributePathParams[0].mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams[0].mAttributeId = chip::Testing::MockAttributeId(4);
 
     ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
     readPrepareParams.mpEventPathParamsList        = nullptr;
@@ -3707,9 +3959,9 @@ void TestReadInteraction::TestReadReportFailure()
     EXPECT_FALSE(delegate.mGotEventResponse);
 
     chip::app::AttributePathParams attributePathParams[1];
-    attributePathParams[0].mEndpointId  = chip::Test::kMockEndpoint2;
-    attributePathParams[0].mClusterId   = chip::Test::MockClusterId(3);
-    attributePathParams[0].mAttributeId = chip::Test::MockAttributeId(1);
+    attributePathParams[0].mEndpointId  = chip::Testing::kMockEndpoint2;
+    attributePathParams[0].mClusterId   = chip::Testing::MockClusterId(3);
+    attributePathParams[0].mAttributeId = chip::Testing::MockAttributeId(1);
 
     ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
     readPrepareParams.mpEventPathParamsList        = nullptr;
@@ -3767,9 +4019,9 @@ void TestReadInteraction::TestSubscribeRoundtripChunkStatusReportTimeout()
 
     chip::app::AttributePathParams attributePathParams[1];
     // Mock Attribute 4 is a big attribute, with 6 large OCTET_STRING
-    attributePathParams[0].mEndpointId  = chip::Test::kMockEndpoint3;
-    attributePathParams[0].mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams[0].mAttributeId = chip::Test::MockAttributeId(4);
+    attributePathParams[0].mEndpointId  = chip::Testing::kMockEndpoint3;
+    attributePathParams[0].mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams[0].mAttributeId = chip::Testing::MockAttributeId(4);
 
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
     readPrepareParams.mAttributePathParamsListSize = 1;
@@ -3837,9 +4089,9 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkStatusReportTimeout()
 
     chip::app::AttributePathParams attributePathParams[1];
     // Mock Attribute 4 is a big attribute, with 6 large OCTET_STRING
-    attributePathParams[0].mEndpointId  = chip::Test::kMockEndpoint3;
-    attributePathParams[0].mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams[0].mAttributeId = chip::Test::MockAttributeId(4);
+    attributePathParams[0].mEndpointId  = chip::Testing::kMockEndpoint3;
+    attributePathParams[0].mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams[0].mAttributeId = chip::Testing::MockAttributeId(4);
 
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
     readPrepareParams.mAttributePathParamsListSize = 1;
@@ -3869,9 +4121,9 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkStatusReportTimeout()
 
         GenerateEvents();
         chip::app::AttributePathParams dirtyPath1;
-        dirtyPath1.mClusterId   = chip::Test::MockClusterId(2);
-        dirtyPath1.mEndpointId  = chip::Test::kMockEndpoint3;
-        dirtyPath1.mAttributeId = chip::Test::MockAttributeId(4);
+        dirtyPath1.mClusterId   = chip::Testing::MockClusterId(2);
+        dirtyPath1.mEndpointId  = chip::Testing::kMockEndpoint3;
+        dirtyPath1.mAttributeId = chip::Testing::MockAttributeId(4);
 
         gMockClock.AdvanceMonotonic(System::Clock::Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds));
         GetIOContext().DriveIO();
@@ -3938,9 +4190,9 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout()
 
     chip::app::AttributePathParams attributePathParams[1];
     // Mock Attribute 4 is a big attribute, with 6 large OCTET_STRING
-    attributePathParams[0].mEndpointId  = chip::Test::kMockEndpoint3;
-    attributePathParams[0].mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams[0].mAttributeId = chip::Test::MockAttributeId(4);
+    attributePathParams[0].mEndpointId  = chip::Testing::kMockEndpoint3;
+    attributePathParams[0].mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams[0].mAttributeId = chip::Testing::MockAttributeId(4);
 
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
     readPrepareParams.mAttributePathParamsListSize = 1;
@@ -3970,9 +4222,9 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout()
 
         GenerateEvents();
         chip::app::AttributePathParams dirtyPath1;
-        dirtyPath1.mClusterId   = chip::Test::MockClusterId(2);
-        dirtyPath1.mEndpointId  = chip::Test::kMockEndpoint3;
-        dirtyPath1.mAttributeId = chip::Test::MockAttributeId(4);
+        dirtyPath1.mClusterId   = chip::Testing::MockClusterId(2);
+        dirtyPath1.mEndpointId  = chip::Testing::kMockEndpoint3;
+        dirtyPath1.mAttributeId = chip::Testing::MockAttributeId(4);
 
         gMockClock.AdvanceMonotonic(System::Clock::Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds));
         GetIOContext().DriveIO();
@@ -4038,9 +4290,9 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReport()
 
     chip::app::AttributePathParams attributePathParams[1];
     // Mock Attribute 4 is a big attribute, with 6 large OCTET_STRING
-    attributePathParams[0].mEndpointId  = chip::Test::kMockEndpoint3;
-    attributePathParams[0].mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams[0].mAttributeId = chip::Test::MockAttributeId(4);
+    attributePathParams[0].mEndpointId  = chip::Testing::kMockEndpoint3;
+    attributePathParams[0].mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams[0].mAttributeId = chip::Testing::MockAttributeId(4);
 
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
     readPrepareParams.mAttributePathParamsListSize = 1;
@@ -4070,9 +4322,9 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReport()
 
         GenerateEvents();
         chip::app::AttributePathParams dirtyPath1;
-        dirtyPath1.mClusterId   = chip::Test::MockClusterId(2);
-        dirtyPath1.mEndpointId  = chip::Test::kMockEndpoint3;
-        dirtyPath1.mAttributeId = chip::Test::MockAttributeId(4);
+        dirtyPath1.mClusterId   = chip::Testing::MockClusterId(2);
+        dirtyPath1.mEndpointId  = chip::Testing::kMockEndpoint3;
+        dirtyPath1.mAttributeId = chip::Testing::MockAttributeId(4);
 
         EXPECT_SUCCESS(engine->GetReportingEngine().SetDirty(dirtyPath1));
         delegate.mGotReport            = false;
@@ -4111,7 +4363,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReport()
 
 namespace {
 
-void CheckForInvalidAction(Test::MessageCapturer & messageLog)
+void CheckForInvalidAction(Testing::MessageCapturer & messageLog)
 {
     EXPECT_EQ(messageLog.MessageCount(), 1u);
     EXPECT_TRUE(messageLog.IsMessageType(0, Protocols::InteractionModel::MsgType::StatusResponse));
@@ -4178,7 +4430,7 @@ void TestReadInteraction::TestReadClientReceiveInvalidMessage()
         payloadHeader.SetExchangeID(0);
         payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
 
-        chip::Test::MessageCapturer messageLog(*this);
+        chip::Testing::MessageCapturer messageLog(*this);
         messageLog.mCaptureStandaloneAcks = false;
 
         // Since we are dropping packets, things are not getting acked.  Set up
@@ -4755,9 +5007,9 @@ void TestReadInteraction::TestReadChunkingInvalidSubscriptionId()
 
     chip::app::AttributePathParams attributePathParams[1];
     // Mock Attribute 4 is a big attribute, with 6 large OCTET_STRING
-    attributePathParams[0].mEndpointId  = chip::Test::kMockEndpoint3;
-    attributePathParams[0].mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams[0].mAttributeId = chip::Test::MockAttributeId(4);
+    attributePathParams[0].mEndpointId  = chip::Testing::kMockEndpoint3;
+    attributePathParams[0].mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams[0].mAttributeId = chip::Testing::MockAttributeId(4);
 
     ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
     readPrepareParams.mpEventPathParamsList        = nullptr;
@@ -4980,9 +5232,9 @@ void TestReadInteraction::TestSubscribeSendUnknownMessage()
 
     chip::app::AttributePathParams attributePathParams[1];
     // Mock Attribute 4 is a big attribute, with 6 large OCTET_STRING
-    attributePathParams[0].mEndpointId  = chip::Test::kMockEndpoint3;
-    attributePathParams[0].mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams[0].mAttributeId = chip::Test::MockAttributeId(4);
+    attributePathParams[0].mEndpointId  = chip::Testing::kMockEndpoint3;
+    attributePathParams[0].mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams[0].mAttributeId = chip::Testing::MockAttributeId(4);
 
     ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
@@ -5056,9 +5308,9 @@ void TestReadInteraction::TestSubscribeSendInvalidStatusReport()
 
     chip::app::AttributePathParams attributePathParams[1];
     // Mock Attribute 4 is a big attribute, with 6 large OCTET_STRING
-    attributePathParams[0].mEndpointId  = chip::Test::kMockEndpoint3;
-    attributePathParams[0].mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams[0].mAttributeId = chip::Test::MockAttributeId(4);
+    attributePathParams[0].mEndpointId  = chip::Testing::kMockEndpoint3;
+    attributePathParams[0].mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams[0].mAttributeId = chip::Testing::MockAttributeId(4);
 
     ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
@@ -5177,9 +5429,9 @@ void TestReadInteraction::TestSubscribeInvalidateFabric()
 
     readPrepareParams.mAttributePathParamsListSize = 1;
     auto attributePathParams = std::make_unique<chip::app::AttributePathParams[]>(readPrepareParams.mAttributePathParamsListSize);
-    attributePathParams[0].mEndpointId          = chip::Test::kMockEndpoint3;
-    attributePathParams[0].mClusterId           = chip::Test::MockClusterId(2);
-    attributePathParams[0].mAttributeId         = chip::Test::MockAttributeId(1);
+    attributePathParams[0].mEndpointId          = chip::Testing::kMockEndpoint3;
+    attributePathParams[0].mClusterId           = chip::Testing::MockClusterId(2);
+    attributePathParams[0].mAttributeId         = chip::Testing::MockAttributeId(1);
     readPrepareParams.mpAttributePathParamsList = attributePathParams.get();
 
     readPrepareParams.mMinIntervalFloorSeconds   = 0;
@@ -5236,9 +5488,9 @@ void TestReadInteraction::TestShutdownSubscription()
 
     readPrepareParams.mAttributePathParamsListSize = 1;
     auto attributePathParams = std::make_unique<chip::app::AttributePathParams[]>(readPrepareParams.mAttributePathParamsListSize);
-    attributePathParams[0].mEndpointId          = chip::Test::kMockEndpoint3;
-    attributePathParams[0].mClusterId           = chip::Test::MockClusterId(2);
-    attributePathParams[0].mAttributeId         = chip::Test::MockAttributeId(1);
+    attributePathParams[0].mEndpointId          = chip::Testing::kMockEndpoint3;
+    attributePathParams[0].mClusterId           = chip::Testing::MockClusterId(2);
+    attributePathParams[0].mAttributeId         = chip::Testing::MockAttributeId(1);
     readPrepareParams.mpAttributePathParamsList = attributePathParams.get();
 
     readPrepareParams.mMinIntervalFloorSeconds   = 0;
@@ -5285,7 +5537,8 @@ void TestReadInteraction::TestSubscriptionReportWithDefunctSession()
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), gReportScheduler), CHIP_NO_ERROR);
 
-    AttributePathParams subscribePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2), chip::Test::MockAttributeId(1));
+    AttributePathParams subscribePath(chip::Testing::kMockEndpoint3, chip::Testing::MockClusterId(2),
+                                      chip::Testing::MockAttributeId(1));
 
     ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
     readPrepareParams.mpAttributePathParamsList    = &subscribePath;

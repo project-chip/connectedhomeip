@@ -31,6 +31,10 @@
 #include <platform/internal/GenericPlatformManagerImpl_CMSISOS.ipp>
 #include <platform/silabs/DiagnosticDataProviderImpl.h>
 
+#include <lib/core/ErrorStr.h>
+#include <platform/PlatformError.h>
+#include <sl_status.h>
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 #include <platform/silabs/wifi/WifiInterface.h> // nogncheck
 #endif                                          // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
@@ -102,7 +106,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 #endif // !SLI_SI91X_MCU_INTERFACE
     /* Set RNG function for tinycrypt operations. */
     rngMutexHandle = osMutexNew(nullptr);
-    VerifyOrExit((&rngMutexHandle != nullptr), err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit((rngMutexHandle != nullptr), err = CHIP_ERROR_NO_MEMORY);
     uECC_set_rng(PlatformManagerImpl::uECC_RNG_Function);
 #endif // SL_MBEDTLS_USE_TINYCRYPT
 
@@ -110,6 +114,9 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     // to finish the initialization process.
     err = Internal::GenericPlatformManagerImpl_CMSISOS<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
+
+    // Register the Silabs platform error formatter
+    RegisterSilabsPlatformErrorFormatter();
 
     // Start timer to increment TotalOperationalHours every hour
     TEMPORARY_RETURN_IGNORED SystemLayer().StartTimer(System::Clock::Seconds32(kSecondsPerHour), UpdateOperationalHours, NULL);
@@ -139,6 +146,41 @@ void PlatformManagerImpl::_Shutdown()
     Internal::GenericPlatformManagerImpl_CMSISOS<PlatformManagerImpl>::_Shutdown();
 }
 
+bool PlatformManagerImpl::FormatError(char * buf, uint16_t bufSize, CHIP_ERROR err)
+{
+    if (!err.IsRange(ChipError::Range::kPlatformExtended))
+    {
+        return false;
+    }
+
+    const char * desc = nullptr;
+
+#if !CHIP_CONFIG_SHORT_ERROR_STR
+    // Use thread-safe buffer for error description
+#if CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
+    static thread_local char errDescBuf[128];
+#else
+    static char errDescBuf[128];
+#endif
+    sl_status_t slStatus = static_cast<sl_status_t>(err.GetValue());
+    if (sl_status_get_string_n(slStatus, errDescBuf, sizeof(errDescBuf)) > 0)
+    {
+        desc = errDescBuf;
+    }
+#endif // !CHIP_CONFIG_SHORT_ERROR_STR
+
+    chip::FormatError(buf, bufSize, "Silabs", err, desc);
+
+    return true;
+}
+
+void PlatformManagerImpl::RegisterSilabsPlatformErrorFormatter()
+{
+    static ErrorFormatter sErrorFormatter = { PlatformManagerImpl::FormatError, nullptr };
+
+    RegisterErrorFormatter(&sErrorFormatter);
+}
+
 } // namespace DeviceLayer
 } // namespace chip
 
@@ -157,32 +199,29 @@ void HandleWFXSystemEvent(sl_wfx_generic_message_t * eventData)
 
     switch (eventData->header.id)
     {
-// TODO: Work around until we unify the data structures behind a Matter level common structure
-#if WF200_WIFI
-    case SL_WFX_STARTUP_IND_ID:
-#endif
+
     case to_underlying(WifiInterface::WifiEvent::kStartUp):
-        memcpy(&event.Platform.WFXSystemEvent.data.startupEvent, eventData,
-               sizeof(event.Platform.WFXSystemEvent.data.startupEvent));
+        memcpy(&event.Platform.event.WFXSystemEvent.data.startupEvent, eventData,
+               sizeof(event.Platform.event.WFXSystemEvent.data.startupEvent));
         // TODO: This is a workaround until we unify the Matter Data structures
-        event.Platform.WFXSystemEvent.data.startupEvent.header.id = to_underlying(WifiInterface::WifiEvent::kStartUp);
+        event.Platform.event.WFXSystemEvent.data.startupEvent.header.id = to_underlying(WifiInterface::WifiEvent::kStartUp);
         break;
 
     case to_underlying(WifiInterface::WifiEvent::kConnect):
-        memcpy(&event.Platform.WFXSystemEvent.data.connectEvent, eventData,
-               sizeof(event.Platform.WFXSystemEvent.data.connectEvent));
+        memcpy(&event.Platform.event.WFXSystemEvent.data.connectEvent, eventData,
+               sizeof(event.Platform.event.WFXSystemEvent.data.connectEvent));
         break;
 
     case to_underlying(WifiInterface::WifiEvent::kDisconnect):
-        memcpy(&event.Platform.WFXSystemEvent.data.disconnectEvent, eventData,
-               sizeof(event.Platform.WFXSystemEvent.data.disconnectEvent));
+        memcpy(&event.Platform.event.WFXSystemEvent.data.disconnectEvent, eventData,
+               sizeof(event.Platform.event.WFXSystemEvent.data.disconnectEvent));
         break;
 
     case to_underlying(WifiInterface::WifiEvent::kGotIPv4):
     case to_underlying(WifiInterface::WifiEvent::kLostIP):
     case to_underlying(WifiInterface::WifiEvent::kGotIPv6):
-        memcpy(&event.Platform.WFXSystemEvent.data.genericMsgEvent, eventData,
-               sizeof(event.Platform.WFXSystemEvent.data.genericMsgEvent));
+        memcpy(&event.Platform.event.WFXSystemEvent.data.genericMsgEvent, eventData,
+               sizeof(event.Platform.event.WFXSystemEvent.data.genericMsgEvent));
         break;
 
     default:

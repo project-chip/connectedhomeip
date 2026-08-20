@@ -104,6 +104,7 @@ enum class RendezvousInformationFlag : uint8_t
     kOnNetwork = 1 << 2, ///< Device supports Setup on network
     kWiFiPAF   = 1 << 3, ///< Device supports Wi-Fi Public Action Frame for discovery
     kNFC       = 1 << 4, ///< Device supports NFC-based Commissioning
+    kThread    = 1 << 5, ///< Device supports Thread
 };
 using RendezvousInformationFlags = chip::BitFlags<RendezvousInformationFlag, uint8_t>;
 

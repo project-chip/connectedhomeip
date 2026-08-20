@@ -15,10 +15,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 source_set("thermostat-server") {
-  sources = [
-    "ThermostatSuggestionStructWithOwnedMembers.cpp",
-    "ThermostatSuggestionStructWithOwnedMembers.h",
-  ]
+  sources = []
 
   public_deps = [
     "${chip_root}/src/lib/support:span",

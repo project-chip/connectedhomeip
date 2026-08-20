@@ -16,14 +16,11 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/ExtensionFieldSets.h"
-    "${CLUSTER_DIR}/ExtensionFieldSetsImpl.cpp"
-    "${CLUSTER_DIR}/ExtensionFieldSetsImpl.h"
-    "${CLUSTER_DIR}/SceneHandlerImpl.cpp"
-    "${CLUSTER_DIR}/SceneHandlerImpl.h"
-    "${CLUSTER_DIR}/SceneTable.h"
-    "${CLUSTER_DIR}/SceneTableImpl.cpp"
-    "${CLUSTER_DIR}/SceneTableImpl.h"
-    "${CLUSTER_DIR}/scenes-server.cpp"
+    "${CLUSTER_DIR}/CodegenAttributeValuePairValidator.cpp"
+    "${CLUSTER_DIR}/CodegenAttributeValuePairValidator.h"
+    "${CLUSTER_DIR}/CodegenEndpointToIndex.h"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
     "${CLUSTER_DIR}/scenes-server.h"
 )
+

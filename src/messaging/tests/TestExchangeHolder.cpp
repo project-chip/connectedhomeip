@@ -70,7 +70,7 @@ using namespace chip::Messaging;
 using namespace chip::System;
 using namespace chip::Protocols;
 
-using TestExchangeHolder = chip::Test::LoopbackMessagingContext;
+using TestExchangeHolder = chip::Testing::LoopbackMessagingContext;
 
 class MockProtocolResponder : public ExchangeDelegate, public Messaging::UnsolicitedMessageHandler
 {
@@ -352,7 +352,7 @@ TEST_F(TestExchangeHolder, TestExchangeHolder)
 {
     auto sessionHandle = GetSessionAliceToBob();
 
-    SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
+    SetMRPMode(chip::Testing::MessagingContext::MRPMode::kResponsive);
 
     //
     // #1: Initiator (AllocExchange)

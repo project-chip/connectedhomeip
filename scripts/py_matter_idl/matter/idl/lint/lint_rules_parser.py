@@ -15,9 +15,9 @@
 import logging
 import os
 import xml.etree.ElementTree
+from collections.abc import MutableMapping
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import List, MutableMapping, Optional, Tuple, Union
 
 from lark import Lark
 from lark.visitors import Discard, Transformer, v_args
@@ -36,8 +36,7 @@ class ElementNotFoundError(Exception):
 def parseNumberString(n: str) -> int:
     if n.startswith('0x'):
         return int(n[2:], 16)
-    else:
-        return int(n)
+    return int(n)
 
 
 @dataclass
@@ -56,8 +55,8 @@ class RequiredCommand:
 class DecodedCluster:
     name: str
     code: int
-    required_attributes: List[RequiredAttribute]
-    required_commands: List[RequiredCommand]
+    required_attributes: list[RequiredAttribute]
+    required_commands: list[RequiredCommand]
 
 
 class ClusterActionEnum(Enum):
@@ -68,7 +67,7 @@ class ClusterActionEnum(Enum):
 @dataclass
 class ServerClusterRequirement:
     action: ClusterActionEnum
-    id: Union[str, int]
+    id: str | int
 
 
 def _isRequired(attr: xml.etree.ElementTree.Element) -> bool:
@@ -204,11 +203,11 @@ class LintRulesContext:
     def Deny(self, what: ClusterAttributeDeny):
         self._required_attributes_rule.Deny(what)
 
-    def FindClusterCode(self, name: str) -> Optional[Tuple[str, int]]:
+    def FindClusterCode(self, name: str) -> tuple[str, int] | None:
         if name not in self._cluster_codes:
             # Name may be a number. If this can be parsed as a number, accept it anyway
             try:
-                return "ID_%s" % name, parseNumberString(name)
+                return f"ID_{name}", parseNumberString(name)
             except ValueError:
                 log.error("UNKNOWN cluster name '%s'", name)
                 log.error("Known names: '%s'", ",".join(self._cluster_codes.keys()))
@@ -316,14 +315,14 @@ class LintRulesTransformer(Transformer):
     def instruction(self, instruction):
         return Discard
 
-    def all_endpoint_rule(self, rules: List[Union[AttributeRequirement, ClusterAttributeDeny]]):
+    def all_endpoint_rule(self, rules: list[AttributeRequirement | ClusterAttributeDeny]):
         for rule in rules:
             if type(rule) is AttributeRequirement:
                 self.context.RequireAttribute(rule)
             elif type(rule) is ClusterAttributeDeny:
                 self.context.Deny(rule)
             else:
-                raise Exception("Unkown endpoint requirement: %r" % rule)
+                raise Exception(f"Unkown endpoint requirement: {rule!r}")
 
         return Discard
 
@@ -344,18 +343,17 @@ class LintRulesTransformer(Transformer):
             elif requirement.action == ClusterActionEnum.REJECT:
                 self.context.RejectClusterInEndpoint(requirement.id, code)
             else:
-                raise Exception("Unexpected requirement action %r" %
-                                requirement.action)
+                raise Exception(f"Unexpected requirement action {requirement.action!r}")
 
         return Discard
 
     @v_args(inline=True)
-    def required_server_cluster(self, id):
-        return ServerClusterRequirement(ClusterActionEnum.REQUIRE, id)
+    def required_server_cluster(self, cluster_id):
+        return ServerClusterRequirement(ClusterActionEnum.REQUIRE, cluster_id)
 
     @v_args(inline=True)
-    def rejected_server_cluster(self, id):
-        return ServerClusterRequirement(ClusterActionEnum.REJECT, id)
+    def rejected_server_cluster(self, cluster_id):
+        return ServerClusterRequirement(ClusterActionEnum.REJECT, cluster_id)
 
     @v_args(inline=True)
     def denylist_cluster_attribute(self, cluster_id, attribute_id):
@@ -369,9 +367,8 @@ class Parser:
             propagate_positions=True, maybe_placeholders=True)
 
     def parse(self, file: str):
-        data = LintRulesTransformer().transform(
+        return LintRulesTransformer().transform(
             self.parser.parse(file))
-        return data
 
 
 def CreateParser():

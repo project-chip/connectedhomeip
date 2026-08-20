@@ -21,37 +21,4 @@
 
 #pragma once
 
-#include "boolean-state-configuration-delegate.h"
-
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/util/basic-types.h>
-#include <lib/core/DataModelTypes.h>
-#include <protocols/interaction_model/StatusCode.h>
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace BooleanStateConfiguration {
-
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
-Delegate * GetDefaultDelegate(EndpointId endpoint);
-
-CHIP_ERROR SetAlarmsActive(EndpointId ep, chip::BitMask<AlarmModeBitmap> alarms);
-CHIP_ERROR SetAllEnabledAlarmsActive(EndpointId ep);
-CHIP_ERROR ClearAllAlarms(EndpointId ep);
-CHIP_ERROR SuppressAlarms(EndpointId ep, chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarms);
-CHIP_ERROR SetCurrentSensitivityLevel(EndpointId ep, uint8_t level);
-CHIP_ERROR EmitSensorFault(EndpointId ep, chip::BitMask<BooleanStateConfiguration::SensorFaultBitmap> fault);
-
-inline bool HasFeature(EndpointId ep, Feature feature)
-{
-    uint32_t map;
-    bool success = (Attributes::FeatureMap::Get(ep, &map) == Protocols::InteractionModel::Status::Success);
-    return success ? (map & to_underlying(feature)) : false;
-}
-
-} // namespace BooleanStateConfiguration
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+#include <app/clusters/boolean-state-configuration-server/CodegenIntegration.h>

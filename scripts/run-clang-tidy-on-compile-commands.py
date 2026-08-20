@@ -60,7 +60,7 @@ class TidyResult:
         else:
             status = "FAIL"
 
-        return "%s(%s)" % (status, self.path)
+        return f"{status}({self.path})"
 
     def __str__(self):
         return self.__repr__()
@@ -165,7 +165,7 @@ class ClangTidyEntry:
                 for line in err.decode("utf-8").split("\n"):
                     line = line.strip()
 
-                    if any((s in line for s in skip_strings)):
+                    if any(s in line for s in skip_strings):
                         continue
 
                     if not line:
@@ -252,7 +252,8 @@ class ClangTidyRunner:
             log.info("  Chose: '%s'", self.gcc_sysroot)
 
     def AddDatabase(self, compile_commands_json):
-        database = json.load(open(compile_commands_json))
+        with open(compile_commands_json) as f:
+            database = json.load(f)
 
         for entry in database:
             item = ClangTidyEntry(entry, self.gcc_sysroot)
@@ -274,10 +275,9 @@ class ClangTidyRunner:
             # file over and over again, like 'append override' can result in the
             # same override being appended multiple times.
             already_seen = set()
-            for name in glob.iglob(
-                os.path.join(self.fixes_temporary_file_dir.name, "*.yaml")
-            ):
-                content = yaml.safe_load(open(name, "r"))
+            for name in glob.iglob(os.path.join(self.fixes_temporary_file_dir.name, "*.yaml")):
+                with open(name) as f:
+                    content = yaml.safe_load(f)
                 if not content:
                     continue
                 diagnostics = content.get("Diagnostics", [])
@@ -317,11 +317,7 @@ class ClangTidyRunner:
             "Storing temporary fix files into '%s'", self.fixes_temporary_file_dir.name
         )
         for idx, e in enumerate(self.entries):
-            e.ExportFixesTo(
-                os.path.join(
-                    self.fixes_temporary_file_dir.name, "fixes%d.yaml" % (idx + 1,)
-                )
-            )
+            e.ExportFixesTo(os.path.join(self.fixes_temporary_file_dir.name, f"fixes{idx + 1}.yaml"))
 
     def SetChecks(self, checks: str):
         for e in self.entries:
@@ -399,11 +395,9 @@ __LOG_LEVELS__ = logging.getLevelNamesMapping()
     help="Determines the verbosity of script output.",
 )
 @click.option(
-    "--no-log-timestamps",
-    default=False,
-    is_flag=True,
-    help="Skip timestaps in log output",
-)
+    '--log-timestamps/--no-log-timestamps',
+    default=True,
+    help='Show timestamps in log output')
 @click.option(
     "--export-fixes",
     default=None,
@@ -429,14 +423,12 @@ def main(
     file_include_regex,
     file_exclude_regex,
     log_level,
-    no_log_timestamps,
+    log_timestamps,
     export_fixes,
     checks,
     file_list_file,
 ):
-    log_fmt = "%(asctime)s %(levelname)-7s %(message)s"
-    if no_log_timestamps:
-        log_fmt = "%(levelname)-7s %(message)s"
+    log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s' if log_timestamps else '%(levelname)-7s %(message)s'
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
     if not compile_database:
@@ -470,7 +462,7 @@ def main(
 
     if file_list_file:
         acceptable = set()
-        with open(file_list_file, "rt") as f:
+        with open(file_list_file) as f:
             for file_name in f.readlines():
                 acceptable.add(Path(file_name.strip()).resolve().as_posix())
 
@@ -506,8 +498,8 @@ def cmd_fix(context):
 
         if runner.state.failures:
             fixes_yaml = os.path.join(tmpdir, "fixes.yaml")
-            with open(fixes_yaml, "w") as out:
-                out.write(open(runner.fixes_file, "r").read())
+            with open(runner.fixes_file) as f_in, open(fixes_yaml, "w") as f_out:
+                f_out.write(f_in.read())
 
             log.info("Applying fixes in '%s'", tmpdir)
             subprocess.check_call(["clang-apply-replacements", tmpdir])

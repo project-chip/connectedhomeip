@@ -25,13 +25,13 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/MinimalMdnsServer.h>
-#include <lib/dnssd/minimal_mdns/Query.h>
 #include <lib/dnssd/minimal_mdns/QueryBuilder.h>
-#include <lib/dnssd/minimal_mdns/core/QName.h>
-#include <lib/dnssd/minimal_mdns/records/Ptr.h>
-#include <lib/dnssd/minimal_mdns/records/Srv.h>
-#include <lib/dnssd/minimal_mdns/records/Txt.h>
 #include <lib/dnssd/minimal_mdns/tests/CheckOnlyServer.h>
+#include <lib/dnssd/wire/QName.h>
+#include <lib/dnssd/wire/Query.h>
+#include <lib/dnssd/wire/records/Ptr.h>
+#include <lib/dnssd/wire/records/Srv.h>
+#include <lib/dnssd/wire/records/Txt.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <system/SystemPacketBuffer.h>
@@ -217,7 +217,7 @@ TxtResourceRecord txtCommissionableNodeParamsEnhancedAsICDLIT =
 #endif
 
 // Our server doesn't do anything with this, blank is fine.
-Inet::IPPacketInfo packetInfo;
+Inet::IPPacketInfo packetInfo = {};
 
 CHIP_ERROR SendQuery(FullQName qname)
 {
@@ -241,7 +241,7 @@ CHIP_ERROR SendQuery(FullQName qname)
 class TestAdvertiser : public ::testing::Test
 {
 public:
-    static chip::Test::IOContext context;
+    static chip::Testing::IOContext context;
     static CheckOnlyServer server;
     static chip::Dnssd::ServiceAdvertiser * mdnsAdvertiser;
 
@@ -265,7 +265,7 @@ public:
     }
 };
 
-chip::Test::IOContext TestAdvertiser::context;
+chip::Testing::IOContext TestAdvertiser::context;
 CheckOnlyServer TestAdvertiser::server;
 chip::Dnssd::ServiceAdvertiser * TestAdvertiser::mdnsAdvertiser;
 

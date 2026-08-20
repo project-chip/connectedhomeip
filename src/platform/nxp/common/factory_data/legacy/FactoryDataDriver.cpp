@@ -61,7 +61,7 @@ CHIP_ERROR FactoryDataDriver::UpdateValueInRam(uint8_t tag, ByteSpan & newValue)
         header->size = header->size - oldLength + newLength;
 
         uint8_t sha256Output[chip::Crypto::kSHA256_Hash_Length] = { 0 };
-        chip::Crypto::Hash_SHA256(data, header->size, sha256Output);
+        ReturnErrorOnFailure(chip::Crypto::Hash_SHA256(data, header->size, sha256Output));
         memcpy(header->hash, sha256Output, sizeof(header->hash));
 
         ChipLogProgress(DeviceLayer, "Value at tag %d updated successfully.", tag);

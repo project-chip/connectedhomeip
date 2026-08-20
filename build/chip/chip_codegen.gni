@@ -172,15 +172,38 @@ template("_chip_build_time_zapgen") {
       "--output-dir",
       rebase_path(target_gen_dir) + "/zapgen/" + _output_subdir,
 
-      # TODO: lock file support should be removed as this serializes zap
-      # (slower), however this is currently done because on Darwin zap startup
-      # may conflict and error out with:
-      #    Error: EEXIST: file already exists, mkdir '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/pkg/465fcc8a6282e28dc7a166859d5814d34e2fb94249a72fa9229033b5b32dff1a'
-      "--lock-file",
-      rebase_path("${root_out_dir}/zap_gen.lock"),
       "--parallel",
-      _idl_file,
     ]
+
+    if (current_os == "mac") {
+      args += [
+        # TODO: Retries are not ideal, however darwin fails with errors like:
+        #   INFO    Error: async hook stack has become corrupted (actual: 27947, expected: 27947)
+        #   INFO     1: 0x10049e978 node::AsyncHooks::FailWithCorruptedAsyncStack(double) [/Users/runner/work/connectedhomeip/connectedhomeip/.environment/cipd/packages/zap/zap-cli]
+        #   INFO     2: 0x10040304a node::InternalCallbackScope::Close() [/Users/runner/work/connectedhomeip/connectedhomeip/.environment/cipd/packages/zap/zap-cli]
+        #   INFO     3: 0x100402793 node::InternalCallbackScope::Close() [/Users/runner/work/connectedhomeip/connectedhomeip/.environment/cipd/packages/zap/zap-cli]
+        #   INFO     4: 0x1004d83e1 napi_create_async_work [/Users/runner/work/connectedhomeip/connectedhomeip/.environment/cipd/packages/zap/zap-cli]
+        #   INFO     5: 0x10123a1e8 uv_random [/Users/runner/work/connectedhomeip/connectedhomeip/.environment/cipd/packages/zap/zap-cli]
+        #   INFO     6: 0x10123fe6b uv_async_init [/Users/runner/work/connectedhomeip/connectedhomeip/.environment/cipd/packages/zap/zap-cli]
+        #   INFO     7: 0x1012563fa uv_free_interface_addresses [/Users/runner/work/connectedhomeip/connectedhomeip/.environment/cipd/packages/zap/zap-cli]
+        #   INFO     8: 0x101240838 uv_run [/Users/runner/work/connectedhomeip/connectedhomeip/.environment/cipd/packages/zap/zap-cli]
+        #   INFO     9: 0x100404363 node::SpinEventLoop(node::Environment*) [/Users/runner/work/connectedhomeip/connectedhomeip/.environment/cipd/packages/zap/zap-cli]
+        #   INFO    10: 0x10058c7a5 node::NodeMainInstance::Run() [/Users/runner/work/connectedhomeip/connectedhomeip/.environment/cipd/packages/zap/zap-cli]
+        #   INFO    11: 0x1004d4643 node::Start(int, char**) [/Users/runner/work/connectedhomeip/connectedhomeip/.environment/cipd/packages/zap/zap-cli]
+        #   INFO    12: 0x206195781
+        "--retries",
+        "3",
+
+        # TODO: lock file support should be removed as this serializes zap
+        # (slower), however this is currently done because on Darwin zap startup
+        # may conflict and error out with:
+        #    Error: EEXIST: file already exists, mkdir '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/pkg/465fcc8a6282e28dc7a166859d5814d34e2fb94249a72fa9229033b5b32dff1a'
+        "--lock-file",
+        rebase_path("${root_out_dir}/zap_gen.lock"),
+      ]
+    }
+
+    args += [ _idl_file ]
 
     inputs = [
       _idl_file,

@@ -24,7 +24,6 @@ import random
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import IntEnum
-from typing import Optional
 
 from mdns_discovery import mdns_discovery
 from mobly import asserts
@@ -35,6 +34,8 @@ from matter.interaction_model import Status
 from matter.testing.commissioning import CustomCommissioningParameters
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest
+
+log = logging.getLogger(__name__)
 
 
 class CommissioningWindowOption(IntEnum):
@@ -51,26 +52,24 @@ class CADMINBaseTest(MatterBaseTest):
     async def get_fabrics(self, th: ChipDeviceCtrl, fabric_filtered: bool = True) -> int:
         """Get fabrics information from the device."""
         OC_cluster = Clusters.OperationalCredentials
-        fabric_info = await self.read_single_attribute_check_success(
+        return await self.read_single_attribute_check_success(
             dev_ctrl=th,
             fabric_filtered=fabric_filtered,
             endpoint=0,
             cluster=OC_cluster,
             attribute=OC_cluster.Attributes.Fabrics
         )
-        return fabric_info
 
     async def read_currentfabricindex(self, th: ChipDeviceCtrl) -> int:
         """Read the current fabric index from the device."""
         cluster = Clusters.OperationalCredentials
         attribute = Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
-        current_fabric_index = await self.read_single_attribute_check_success(
+        return await self.read_single_attribute_check_success(
             dev_ctrl=th,
             endpoint=0,
             cluster=cluster,
             attribute=attribute
         )
-        return current_fabric_index
 
     def calculate_clock_skew_factor(self, duration_seconds: int) -> int:
         """
@@ -83,8 +82,7 @@ class CADMINBaseTest(MatterBaseTest):
             Clock skew factor in milliseconds (1% of duration or 100ms, whichever is greater)
         """
         skew_percentage = 1 / 100.0
-        skew_ms = max(int(duration_seconds * 1000 * skew_percentage), 100)
-        return skew_ms
+        return max(int(duration_seconds * 1000 * skew_percentage), 100)
 
     async def create_window_status_subscription(
         self,
@@ -116,7 +114,7 @@ class CADMINBaseTest(MatterBaseTest):
             max_interval_sec=max_interval_sec
         )
 
-        logging.info(f"Created WindowStatus subscription for node {node_id}")
+        log.info("Created WindowStatus subscription for node %s", node_id)
         return window_status_accumulator
 
     async def wait_for_window_status_change(
@@ -137,8 +135,8 @@ class CADMINBaseTest(MatterBaseTest):
             AssertionError: If the window status doesn't change to expected value within timeout
         """
         status_name = "CLOSED" if not is_open_expected else "OPEN"
-        logging.info(f"Waiting for window status to change to {status_name} (status={is_open_expected})")
-        logging.info(f"Timeout set to: {timeout_sec}s")
+        log.info("Waiting for window status to change to %s (status=%s)", status_name, is_open_expected)
+        log.info("Timeout set to: %ss", timeout_sec)
 
         status_match = AttributeMatcher.from_callable(
             f"WindowStatus is {is_open_expected}",
@@ -147,10 +145,10 @@ class CADMINBaseTest(MatterBaseTest):
 
         try:
             window_status_accumulator.await_all_expected_report_matches([status_match], timeout_sec=timeout_sec)
-            logging.info(f"✅ Window status changed to {status_name} (status={is_open_expected})")
-        except asyncio.TimeoutError as e:
+            log.info("✅ Window status changed to %s (status=%s)", status_name, is_open_expected)
+        except TimeoutError as e:
             error_msg = f"Timeout waiting for window status {is_open_expected} ({status_name}) after {timeout_sec}s: {e}"
-            logging.error(f"❌ {error_msg}")
+            log.error("❌ %s", error_msg)
             asserts.fail(error_msg)
 
     def log_timing_results(self, results: 'CADMINBaseTest.TimingResults', test_step: str = ""):
@@ -163,9 +161,9 @@ class CADMINBaseTest(MatterBaseTest):
         """
         step_prefix = f"[{test_step}] " if test_step else ""
 
-        logging.info(f"{step_prefix}=== COMMISSIONING WINDOW TIMING RESULTS ===")
-        logging.info(f"{step_prefix}Window closed: ✅ YES")
-        logging.info(f"{step_prefix}Timing valid: {'✅ YES' if results.timing_valid else '❌ NO'}")
+        log.info("%s=== COMMISSIONING WINDOW TIMING RESULTS ===", step_prefix)
+        log.info("%sWindow closed: ✅ YES", step_prefix)
+        log.info("%sTiming valid: %s", step_prefix, '✅ YES' if results.timing_valid else '❌ NO')
 
         if results.actual_duration_seconds is not None:
             actual = results.actual_duration_seconds
@@ -173,27 +171,27 @@ class CADMINBaseTest(MatterBaseTest):
             max_allowed = results.max_allowed_duration_seconds
             skew_ms = results.clock_skew_ms
 
-            logging.info(f"{step_prefix}⏱️  TIMING BREAKDOWN:")
-            logging.info(f"{step_prefix}   Expected duration: {expected}s")
-            logging.info(f"{step_prefix}   Actual duration: {actual:.2f}s")
-            logging.info(f"{step_prefix}   Clock skew applied: {skew_ms}ms")
-            logging.info(f"{step_prefix}   Maximum allowed: {max_allowed:.2f}s")
+            log.info("%s⏱️  TIMING BREAKDOWN:", step_prefix)
+            log.info("%s   Expected duration: %ss", step_prefix, expected)
+            log.info("%s   Actual duration: %.2fs", step_prefix, actual)
+            log.info("%s   Clock skew applied: %sms", step_prefix, skew_ms)
+            log.info("%s   Maximum allowed: %.2fs", step_prefix, max_allowed)
 
             if actual <= expected:
                 early_by = expected - actual
-                logging.info(f"{step_prefix}   ✅ Window closed EARLY by {early_by:.2f}s")
+                log.info("%s   ✅ Window closed EARLY by %.2fs", step_prefix, early_by)
             elif actual <= max_allowed:
                 late_by = actual - expected
-                logging.info(f"{step_prefix}   ⚠️  Window closed LATE but within tolerance by {late_by:.2f}s")
+                log.info("%s   ⚠️  Window closed LATE but within tolerance by %.2fs", step_prefix, late_by)
             else:
                 over_by = actual - max_allowed
-                logging.error(f"{step_prefix}   ❌ Window closed TOO LATE by {over_by:.2f}s")
+                log.error("%s   ❌ Window closed TOO LATE by %.2fs", step_prefix, over_by)
 
-            logging.info(f"{step_prefix}   Start time: {results.start_time}")
-            logging.info(f"{step_prefix}   End time: {results.end_time}")
-            logging.info(f"{step_prefix}   Total monitoring time: {actual:.2f}s")
+            log.info("%s   Start time: %s", step_prefix, results.start_time)
+            log.info("%s   End time: %s", step_prefix, results.end_time)
+            log.info("%s   Total monitoring time: %.2fs", step_prefix, actual)
 
-        logging.info(f"{step_prefix}=== END TIMING RESULTS ===")
+        log.info("%s=== END TIMING RESULTS ===", step_prefix)
 
     async def monitor_commissioning_window_closure_with_subscription(
         self,
@@ -202,7 +200,7 @@ class CADMINBaseTest(MatterBaseTest):
         expected_duration_seconds: int,
         min_interval_sec: int = 0,
         max_interval_sec: int = 30,
-        window_status_accumulator: Optional[AttributeSubscriptionHandler] = None
+        window_status_accumulator: AttributeSubscriptionHandler | None = None
     ) -> 'CADMINBaseTest.TimingResults':
         """
         Monitor commissioning window closure using subscription (replaces hardcoded sleep).
@@ -223,14 +221,14 @@ class CADMINBaseTest(MatterBaseTest):
         max_allowed_duration = expected_duration_seconds + (clock_skew_ms / 1000)
         monitoring_timeout = max_allowed_duration + timeout_buffer_sec
 
-        logging.info("=== COMMISSIONING WINDOW MONITORING STARTED ===")
-        logging.info(f"Monitoring commissioning window closure for node {node_id}")
-        logging.info(f"Expected duration: {expected_duration_seconds}s")
-        logging.info(f"Clock skew factor: {clock_skew_ms}ms")
-        logging.info(f"Maximum allowed duration: {max_allowed_duration:.2f}s")
-        logging.info(f"Monitoring started at: {start_time}")
-        logging.info(f"Expected closure by: {start_time + timedelta(seconds=expected_duration_seconds)}")
-        logging.info(f"Latest acceptable closure: {start_time + timedelta(seconds=max_allowed_duration)}")
+        log.info("=== COMMISSIONING WINDOW MONITORING STARTED ===")
+        log.info("Monitoring commissioning window closure for node %s", node_id)
+        log.info("Expected duration: %ss", expected_duration_seconds)
+        log.info("Clock skew factor: %sms", clock_skew_ms)
+        log.info("Maximum allowed duration: %.2fs", max_allowed_duration)
+        log.info("Monitoring started at: %s", start_time)
+        log.info("Expected closure by: %s", start_time + timedelta(seconds=expected_duration_seconds))
+        log.info("Latest acceptable closure: %s", start_time + timedelta(seconds=max_allowed_duration))
 
         try:
             # Wait for window to close (status = 0) - will assert on timeout
@@ -264,7 +262,7 @@ class CADMINBaseTest(MatterBaseTest):
         finally:
             # Clean up subscription accumulator and return results
             if window_status_accumulator is not None:
-                await window_status_accumulator.cancel()
+                window_status_accumulator.cancel()
             return results
 
     async def open_commissioning_window_with_subscription_monitoring(
@@ -315,7 +313,7 @@ class CADMINBaseTest(MatterBaseTest):
             params = CustomCommissioningParameters(comm_params, discriminator)
 
         except Exception as e:
-            logging.exception('Error running OpenCommissioningWindow %s', e)
+            log.exception('Error running OpenCommissioningWindow %s', e)
             asserts.fail('Failed to open commissioning window')
 
         return params, window_status_accumulator
@@ -334,14 +332,13 @@ class CADMINBaseTest(MatterBaseTest):
     async def get_window_status(self, th: ChipDeviceCtrl) -> int:
         """Get the current commissioning window status."""
         AC_cluster = Clusters.AdministratorCommissioning
-        window_status = await self.read_single_attribute_check_success(
+        return await self.read_single_attribute_check_success(
             dev_ctrl=th,
             fabric_filtered=False,
             endpoint=0,
             cluster=AC_cluster,
             attribute=AC_cluster.Attributes.WindowStatus
         )
-        return window_status
 
     def generate_unique_random_value(self, exclude_value: int) -> int:
         """Generate a random value that's different from the specified value."""
@@ -367,18 +364,18 @@ class CADMINBaseTest(MatterBaseTest):
         """Results from commissioning window timing monitoring."""
         window_closed: bool
         expected_duration_seconds: int
-        actual_duration_seconds: Optional[float]
+        actual_duration_seconds: float | None
         clock_skew_ms: int
         max_allowed_duration_seconds: float
         timing_valid: bool
         start_time: datetime
-        end_time: Optional[datetime] = None
+        end_time: datetime | None = None
 
     @dataclass
     class ParsedService:
         service: mdns_discovery.MdnsServiceInfo
-        cm: Optional[int] = None
-        d: Optional[int] = None
+        cm: int | None = None
+        d: int | None = None
 
         def __post_init__(self):
             # Safely convert CM value to int if present
@@ -387,7 +384,7 @@ class CADMINBaseTest(MatterBaseTest):
                 try:
                     self.cm = int(cm_value)
                 except (ValueError, TypeError):
-                    logging.warning(f"Could not convert CM value '{cm_value}' to integer")
+                    log.warning("Could not convert CM value '%s' to integer", cm_value)
                     self.cm = None
 
             # Safely convert D value to int if present
@@ -396,7 +393,7 @@ class CADMINBaseTest(MatterBaseTest):
                 try:
                     self.d = int(d_value)
                 except (ValueError, TypeError):
-                    logging.warning(f"Could not convert discriminator value '{d_value}' to integer")
+                    log.warning("Could not convert discriminator value '%s' to integer", d_value)
                     self.d = None
 
         def __str__(self) -> str:
@@ -424,23 +421,24 @@ class CADMINBaseTest(MatterBaseTest):
             # Look through all services for a match
             for parsed_service in services:
                 if parsed_service.matches(expected_cm_value, expected_discriminator):
-                    logging.info(f"Found matching service: {parsed_service}")
+                    log.info("Found matching service: %s", parsed_service)
                     return parsed_service.service  # Return the original service object
 
             # Log what we found for debugging purposes
-            logging.info(f"Found {len(services)} services, but none match CM={expected_cm_value}, D={expected_discriminator}")
+            log.info("Found %s services, but none match CM=%s, D=%s", len(services), expected_cm_value, expected_discriminator)
             for service in services:
-                logging.info(f"  {service}")
+                log.info("  %s", service)
             else:
-                logging.info("No services found in this attempt")
+                log.info("No services found in this attempt")
 
             # Not on last attempt, wait and retry
             if attempt < max_attempts - 1:
-                logging.info(f"Waiting for service with CM={expected_cm_value} and D={expected_discriminator}, "
-                             f"attempt {attempt+1}/{max_attempts}")
+                log.info("Waiting for service with CM=%s and D=%s, attempt %s/%s",
+                         expected_cm_value, expected_discriminator, attempt + 1, max_attempts)
                 await asyncio.sleep(delay_sec)
             else:
                 # Final retry attempt failed
                 asserts.fail(f"Failed to find DNS-SD advertisement with CM={expected_cm_value} and "
                              f"discriminator={expected_discriminator} after {max_attempts} attempts. "
                              f"Found services: {[str(s) for s in services]}")
+        return None

@@ -18,7 +18,7 @@
 
 #include "WebSocketServer.h"
 
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <libwebsockets.h>
 
 #include <deque>

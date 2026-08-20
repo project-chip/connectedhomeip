@@ -69,6 +69,8 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
     mCertificateValidityPolicy = params.certificateValidityPolicy;
     mSessionResumptionStorage  = params.sessionResumptionStorage;
     mEnableServerInteractions  = params.enableServerInteractions;
+    mPreventDnssdPortOverwrite = params.preventDnssdPortOverwrite;
+    mDataModelProvider         = params.dataModelProvider;
 
     // Initialize the system state. Note that it is left in a somewhat
     // special state where it is initialized, but has a ref count of 0.
@@ -95,6 +97,7 @@ CHIP_ERROR DeviceControllerFactory::ReinitSystemStateIfNecessary()
     params.interfaceId               = mInterfaceId;
     params.fabricIndependentStorage  = mFabricIndependentStorage;
     params.enableServerInteractions  = mEnableServerInteractions;
+    params.preventDnssdPortOverwrite = mPreventDnssdPortOverwrite;
     params.groupDataProvider         = mSystemState->GetGroupDataProvider();
     params.sessionKeystore           = mSystemState->GetSessionKeystore();
     params.fabricTable               = mSystemState->Fabrics();
@@ -102,10 +105,7 @@ CHIP_ERROR DeviceControllerFactory::ReinitSystemStateIfNecessary()
     params.opCertStore               = mOpCertStore;
     params.certificateValidityPolicy = mCertificateValidityPolicy;
     params.sessionResumptionStorage  = mSessionResumptionStorage;
-
-    // re-initialization keeps any previously initialized values. The only place where
-    // a provider exists is in the InteractionModelEngine, so just say "keep it as is".
-    params.dataModelProvider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    params.dataModelProvider         = mDataModelProvider;
 
     return InitSystemState(params);
 }
@@ -290,15 +290,18 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
             stateParams.exchangeMgr, stateParams.sessionMgr, stateParams.fabricTable, sessionResumptionStorage,
             stateParams.certificateValidityPolicy, stateParams.groupDataProvider));
 
-        // Our IPv6 transport is at index 0.
-        app::DnssdServer::Instance().SetSecuredIPv6Port(
-            stateParams.transportMgr->GetTransport().GetImplAtIndex<0>().GetBoundPort());
+        if (!params.preventDnssdPortOverwrite)
+        {
+            // Our IPv6 transport is at index 0.
+            app::DnssdServer::Instance().SetSecuredIPv6Port(
+                stateParams.transportMgr->GetTransport().GetImplAtIndex<0>().GetBoundPort());
 
 #if INET_CONFIG_ENABLE_IPV4
-        // If enabled, our IPv4 transport is at index 1.
-        app::DnssdServer::Instance().SetSecuredIPv4Port(
-            stateParams.transportMgr->GetTransport().GetImplAtIndex<1>().GetBoundPort());
+            // If enabled, our IPv4 transport is at index 1.
+            app::DnssdServer::Instance().SetSecuredIPv4Port(
+                stateParams.transportMgr->GetTransport().GetImplAtIndex<1>().GetBoundPort());
 #endif // INET_CONFIG_ENABLE_IPV4
+        }
 
         if (params.interfaceId)
         {
@@ -481,6 +484,7 @@ void DeviceControllerFactory::Shutdown()
     mOpCertStore               = nullptr;
     mCertificateValidityPolicy = nullptr;
     mSessionResumptionStorage  = nullptr;
+    mDataModelProvider         = nullptr;
 }
 
 void DeviceControllerSystemState::Shutdown()
@@ -563,6 +567,7 @@ void DeviceControllerSystemState::Shutdown()
 
     // Shut down the interaction model
     app::InteractionModelEngine::GetInstance()->Shutdown();
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(nullptr);
 
     // Shut down the TransportMgr. This holds Inet::UDPEndPoints so it must be shut down
     // before PlatformMgr().Shutdown() shuts down Inet.

@@ -17,6 +17,10 @@
 
 #pragma once
 
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#include "ThreadStackManagerImpl_OpenThread.h"
+#else
+
 #include <memory>
 #include <vector>
 
@@ -106,6 +110,15 @@ public:
 
     CHIP_ERROR _GetThreadVersion(uint16_t & version);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+    CHIP_ERROR _RendezvousStart(RendezvousAnnouncementRequestCallback announcementRequest, void * context)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    void _CancelRendezvousAnnouncement() {}
+    void _RendezvousStop() {}
+#endif
+
     void _ResetThreadNetworkDiagnosticsCounts();
 
     CHIP_ERROR _StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback);
@@ -165,3 +178,4 @@ inline void ThreadStackManagerImpl::_OnThreadAttachFinished(void)
 
 } // namespace DeviceLayer
 } // namespace chip
+#endif // CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT

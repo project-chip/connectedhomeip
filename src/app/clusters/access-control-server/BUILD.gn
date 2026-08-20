@@ -27,6 +27,18 @@ source_set("arl-encoder") {
   ]
 }
 
+source_set("access-control-event-helper") {
+  sources = [
+    "AccessControlEventHelper.cpp",
+    "AccessControlEventHelper.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/zzz_generated/app-common/clusters/AccessControl",
+  ]
+}
+
 source_set("access-control-server") {
   sources = [
     "access-control-cluster.cpp",

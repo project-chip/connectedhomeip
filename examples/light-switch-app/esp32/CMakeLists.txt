@@ -16,7 +16,7 @@
 
 # The following lines of boilerplate have to be in your project's
 # CMakeLists in this exact order for cmake to work correctly
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.20)
 
 set(PROJECT_VER "v1.0")
 set(PROJECT_VER_NUMBER 1)
@@ -43,5 +43,9 @@ idf_build_set_property(COMPILE_OPTIONS "-Wno-format-nonliteral;-Wno-format-secur
 #
 # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80635
 idf_build_set_property(COMPILE_OPTIONS "-Wno-error=maybe-uninitialized" APPEND)
+
+# GCC 15 (ESP-IDF v6.0) is stricter about designated initializers that skip
+# optional fields. Demote to warning until upstream fixes land.
+idf_build_set_property(COMPILE_OPTIONS "-Wno-error=missing-field-initializers" APPEND)
 
 flashing_script()

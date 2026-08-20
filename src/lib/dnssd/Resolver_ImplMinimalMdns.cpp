@@ -23,18 +23,14 @@
 #include <lib/dnssd/MinimalMdnsServer.h>
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/dnssd/minimal_mdns/Logging.h>
-#include <lib/dnssd/minimal_mdns/Parser.h>
+#include <lib/dnssd/minimal_mdns/MinMdnsConfig.h>
 #include <lib/dnssd/minimal_mdns/QueryBuilder.h>
-#include <lib/dnssd/minimal_mdns/RecordData.h>
-#include <lib/dnssd/minimal_mdns/core/FlatAllocatedQName.h>
+#include <lib/dnssd/wire/FlatAllocatedQName.h>
+#include <lib/dnssd/wire/Parser.h>
+#include <lib/dnssd/wire/RecordData.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <tracing/macros.h>
-
-// MDNS servers will receive all broadcast packets over the network.
-// Disable 'invalid packet' messages because the are expected and common
-// These logs are useful for debug only
-#undef MINMDNS_RESOLVER_OVERLY_VERBOSE
 
 namespace chip {
 namespace Dnssd {
@@ -44,6 +40,7 @@ constexpr size_t kMdnsMaxPacketSize = 1024;
 constexpr uint16_t kMdnsPort        = 5353;
 
 using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 
 /// Handles processing of minmdns packet data.
 ///
@@ -109,7 +106,7 @@ void PacketParser::OnHeader(ConstHeaderRef & header)
 {
     mIsResponse = header.GetFlags().IsResponse();
 
-#ifdef MINMDNS_RESOLVER_OVERLY_VERBOSE
+#if CHIP_MINMDNS_HIGH_VERBOSITY
     if (header.GetFlags().IsTruncated())
     {
         // MinMdns does not cache data, so receiving piecewise data does not work
@@ -219,9 +216,11 @@ void PacketParser::ParseSRVResource(const ResourceData & data)
             // Receiving records that we do not need to parse is normal:
             // MinMDNS may receive all DNSSD packets on the network, only
             // interested in a subset that is matter-specific
-#ifdef MINMDNS_RESOLVER_OVERLY_VERBOSE
-            ChipLogError(Discovery, "Could not start SRV record processing: %" CHIP_ERROR_FORMAT, err.Format());
-#endif
+            if (err != CHIP_ERROR_UNSUPPORTED_DNSSD_SERVICE_NAME)
+            {
+                ChipLogError(Discovery, "Could not start SRV record processing: %" CHIP_ERROR_FORMAT, err.Format());
+                ChipLogByteSpan(Discovery, data.GetData().AsByteSpan());
+            }
         }
 
         // Done finding an inactive resolver and attempting to use it.
@@ -316,14 +315,14 @@ private:
 
     CHIP_ERROR BrowseNodes(DiscoveryType type, DiscoveryFilter subtype);
     template <typename... Args>
-    mdns::Minimal::FullQName CheckAndAllocateQName(Args &&... parts)
+    chip::Dnssd::FullQName CheckAndAllocateQName(Args &&... parts)
     {
-        size_t requiredSize = mdns::Minimal::FlatAllocatedQName::RequiredStorageSize(parts...);
+        size_t requiredSize = chip::Dnssd::FlatAllocatedQName::RequiredStorageSize(parts...);
         if (requiredSize > kMaxQnameSize)
         {
-            return mdns::Minimal::FullQName();
+            return chip::Dnssd::FullQName();
         }
-        return mdns::Minimal::FlatAllocatedQName::Build(qnameStorage, parts...);
+        return chip::Dnssd::FlatAllocatedQName::Build(qnameStorage, parts...);
     }
     static constexpr int kMaxQnameSize = 100;
     char qnameStorage[kMaxQnameSize];
@@ -539,7 +538,7 @@ void MinMdnsResolver::Shutdown()
 CHIP_ERROR MinMdnsResolver::BuildQuery(QueryBuilder & builder, const ActiveResolveAttempts::ScheduledAttempt::Browse & data,
                                        bool firstSend)
 {
-    mdns::Minimal::FullQName qname;
+    chip::Dnssd::FullQName qname;
 
     switch (data.type)
     {
@@ -592,7 +591,7 @@ CHIP_ERROR MinMdnsResolver::BuildQuery(QueryBuilder & builder, const ActiveResol
 
     VerifyOrReturnError(qname.nameCount, CHIP_ERROR_NO_MEMORY);
 
-    mdns::Minimal::Query query(qname);
+    chip::Dnssd::Query query(qname);
     query
         .SetClass(QClass::IN)           //
         .SetType(QType::ANY)            //

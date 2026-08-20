@@ -781,7 +781,9 @@ CHIP_ERROR TCPEndPointImplSockets::GetSocket(IPAddressType addrType)
 // static
 void TCPEndPointImplSockets::HandlePendingIO(System::SocketEvents events, intptr_t data)
 {
-    reinterpret_cast<TCPEndPointImplSockets *>(data)->HandlePendingIO(events);
+    auto * endPoint = reinterpret_cast<TCPEndPointImplSockets *>(data);
+    VerifyOrReturn(endPoint != nullptr);
+    endPoint->HandlePendingIO(events);
 }
 
 void TCPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
@@ -1009,6 +1011,12 @@ CHIP_ERROR TCPEndPointImplSockets::HandleIncomingConnection()
 
         return CHIP_ERROR_POSIX(errno);
     }
+
+#ifdef __APPLE__
+    // On Darwin, if the client closes the connection just as it is being accepted, it is
+    // possible for accept() to return a socket but saLen is 0. Ignore the connection.
+    VerifyOrReturnError(saLen != 0, CHIP_NO_ERROR);
+#endif
 
     // If there's no callback available, fail with an error.
     VerifyOrReturnError(OnConnectionReceived != nullptr, CHIP_ERROR_NO_CONNECTION_HANDLER);

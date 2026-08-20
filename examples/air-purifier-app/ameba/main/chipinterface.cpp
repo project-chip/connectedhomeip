@@ -26,9 +26,11 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Server.h>
+#include <credentials/GroupDataProviderImpl.h>
 #if CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION
 #include <app/server/TermsAndConditionsManager.h>
 #endif
+#include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/Instance.h>
 #include <lib/core/ErrorStr.h>
@@ -144,9 +146,9 @@ static void InitServer(intptr_t context)
 
     static AmebaObserver sAmebaObserver;
     initParams.appDelegate = &sAmebaObserver;
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
     chip::Server::GetInstance().Init(initParams);
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     NetWorkCommissioningInstInit();
 
@@ -164,6 +166,9 @@ static void InitServer(intptr_t context)
     }
 
     chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAmebaObserver);
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    chip::Server::GetInstance().GetICDManager().RegisterObserver(&sAmebaObserver);
+#endif
     InitAirPurifierManager();
 }
 
