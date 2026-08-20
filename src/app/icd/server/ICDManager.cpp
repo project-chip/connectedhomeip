@@ -833,8 +833,13 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
         mPendingCheckInSubjectsCount   = 0;
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 
+        bool enteredActiveModeFromIdle = false;
         if (wasPendingActiveMode || mOperationalState == OperationalState::ActiveMode)
         {
+            if (mOperationalState == OperationalState::IdleMode)
+            {
+                enteredActiveModeFromIdle = true;
+            }
             ChipLogProgress(AppServer,
                             "ICDManager: Thread network connectivity established. Triggering/Extending ActiveMode.");
             UpdateOperationState(OperationalState::ActiveMode);
@@ -852,9 +857,9 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
                 SendCheckInMsgs(MakeOptional(pendingSubjects[i]));
             }
 
-            // If a broadcast Check-In was requested and ActiveMode was not entered above, replay broadcast Check-In once.
-            // (Note: UpdateOperationState(ActiveMode) already calls SendCheckInMsgs() for broadcast Check-In).
-            if (wasPendingBroadcastCheckIn && !wasPendingActiveMode && mOperationalState != OperationalState::ActiveMode)
+            // If a broadcast Check-In was requested and UpdateOperationState did NOT perform an IdleMode-to-ActiveMode transition
+            // (which already calls SendCheckInMsgs() during the transition), replay the broadcast Check-In once.
+            if (wasPendingBroadcastCheckIn && !enteredActiveModeFromIdle)
             {
                 ChipLogProgress(AppServer, "ICDManager: Replaying deferred broadcast Check-In message.");
                 SendCheckInMsgs(NullOptional);

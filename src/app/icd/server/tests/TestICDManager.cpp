@@ -240,6 +240,7 @@ public:
     bool IsPendingActiveModeOnNetworkAttach() const { return mICDManager.mPendingActiveModeOnNetworkAttach; }
 #if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
     bool IsPendingCheckInOnNetworkAttach() const { return mICDManager.mPendingCheckInOnNetworkAttach; }
+    bool IsPendingBroadcastCheckInOnNetworkAttach() const { return mICDManager.mPendingBroadcastCheckIn; }
     size_t GetPendingCheckInSubjectsCount() const { return mICDManager.mPendingCheckInSubjectsCount; }
     Optional<Access::SubjectDescriptor> GetPendingCheckInSubject(size_t index = 0) const
     {
@@ -1680,18 +1681,28 @@ TEST_F(TestICDManager, TestScenario12_DeviceAlreadyInActiveMode_WhenThreadAttach
     ICDNotifier::GetInstance().NotifyActiveRequestNotification(ICDListener::KeepActiveFlag::kCommissioningWindowOpen);
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
 
-    // Step 1: Subscription report queued while unattached
+    // Step 1: Thread detaches while in ActiveMode
     SetThreadConnectivityState(true /* enabled */, false /* attached */);
-    ICDNotifier::GetInstance().NotifySubscriptionReport();
 
-    // Step 2: Thread re-attaches before ActiveMode ends
+    // Step 2: Broadcast Check-In requested while unattached
+#if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+    ICDNotifier::GetInstance().NotifySendCheckIn(NullOptional);
+    EXPECT_TRUE(IsPendingCheckInOnNetworkAttach());
+    EXPECT_TRUE(IsPendingBroadcastCheckInOnNetworkAttach());
+#endif
+
+    // Step 3: Thread re-attaches while device is already in ActiveMode
     SetThreadConnectivityState(true /* enabled */, true /* attached */);
     DeviceLayer::ChipDeviceEvent event{ .Type                     = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
                                         .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Established } };
     HandlePlatformEvent(&event);
     AdvanceClockAndRunEventLoop(100_ms);
 
-    // Step 3: Check-In dispatched while remaining in ActiveMode without dropping
+    // Step 4: Pending broadcast Check-In is consumed and replayed while remaining in ActiveMode
+#if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+    EXPECT_FALSE(IsPendingCheckInOnNetworkAttach());
+    EXPECT_FALSE(IsPendingBroadcastCheckInOnNetworkAttach());
+#endif
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
 
     // Cleanup
