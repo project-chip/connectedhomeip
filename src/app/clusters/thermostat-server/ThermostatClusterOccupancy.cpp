@@ -25,6 +25,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
+using namespace chip::Protocols::InteractionModel;
 
 namespace chip {
 namespace app {
@@ -40,6 +41,20 @@ std::optional<DataModel::ActionReturnStatus> ThermostatOccupancy::ReadAttribute(
     }
 
     return std::nullopt;
+}
+
+Status ThermostatOccupancy::SetOccupancy(BitMask<OccupancyBitmap> occupied)
+{
+    bool changed = false;
+    if (auto err = mDelegate.SetOccupancy(occupied, changed); err != Status::Success)
+    {
+        return err;
+    }
+    if (changed)
+    {
+        mCluster.NotifyAttributeChanged(Occupancy::Id);
+    }
+    return Status::Success;
 }
 
 } // namespace Thermostat

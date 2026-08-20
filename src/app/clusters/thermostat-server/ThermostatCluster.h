@@ -22,12 +22,8 @@
 #include "ThermostatClusterAtomic.h"
 #include "ThermostatDelegate.h"
 
-#include "app/ConcreteAttributePath.h"
 #include "app/clusters/thermostat-server/Temperature.h"
 #include "lib/core/DataModelTypes.h"
-#include "lib/support/CodeUtils.h"
-#include <app-common/zap-generated/callback.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>

@@ -40,14 +40,15 @@ SystemModeEnum ThermostatDelegate::GetSystemMode() const
     return mSystemMode;
 }
 
-bool ThermostatDelegate::SetSystemMode(SystemModeEnum systemMode)
+Protocols::InteractionModel::Status ThermostatDelegate::SetSystemMode(SystemModeEnum systemMode, bool & changed)
 {
     if (mSystemMode == systemMode)
     {
-        return false;
+        return Status::Success;
     }
     mSystemMode = systemMode;
-    return true;
+    changed     = true;
+    return Status::Success;
 }
 
 ThermostatRunningModeEnum ThermostatDelegate::GetRunningMode() const
@@ -55,14 +56,15 @@ ThermostatRunningModeEnum ThermostatDelegate::GetRunningMode() const
     return mRunningMode;
 }
 
-bool ThermostatDelegate::SetRunningMode(ThermostatRunningModeEnum runningMode)
+Protocols::InteractionModel::Status ThermostatDelegate::SetRunningMode(ThermostatRunningModeEnum runningMode, bool & changed)
 {
     if (mRunningMode == runningMode)
     {
-        return false;
+        return Status::Success;
     }
     mRunningMode = runningMode;
-    return true;
+    changed      = true;
+    return Status::Success;
 }
 
 BitMask<RelayStateBitmap> ThermostatDelegate::GetRunningState() const
@@ -70,14 +72,15 @@ BitMask<RelayStateBitmap> ThermostatDelegate::GetRunningState() const
     return mRunningState;
 }
 
-bool ThermostatDelegate::SetRunningState(BitMask<RelayStateBitmap> runningState)
+Protocols::InteractionModel::Status ThermostatDelegate::SetRunningState(BitMask<RelayStateBitmap> runningState, bool & changed)
 {
     if (mRunningState == runningState)
     {
-        return false;
+        return Status::Success;
     }
     mRunningState = runningState;
-    return true;
+    changed       = true;
+    return Status::Success;
 }
 
 ControlSequenceOfOperationEnum ThermostatDelegate::GetControlSequenceOfOperation() const
@@ -85,14 +88,16 @@ ControlSequenceOfOperationEnum ThermostatDelegate::GetControlSequenceOfOperation
     return mControlSequenceOfOperation;
 }
 
-bool ThermostatDelegate::SetControlSequenceOfOperation(ControlSequenceOfOperationEnum controlSequenceOfOperation)
+Protocols::InteractionModel::Status ThermostatDelegate::SetControlSequenceOfOperation(ControlSequenceOfOperationEnum seq,
+                                                                                      bool & changed)
 {
-    if (mControlSequenceOfOperation == controlSequenceOfOperation)
+    if (mControlSequenceOfOperation == seq)
     {
-        return false;
+        return Status::Success;
     }
-    mControlSequenceOfOperation = controlSequenceOfOperation;
-    return true;
+    mControlSequenceOfOperation = seq;
+    changed                     = true;
+    return Status::Success;
 }
 
 DataModel::Nullable<temperature> ThermostatDelegate::GetLocalTemperature() const
@@ -100,14 +105,15 @@ DataModel::Nullable<temperature> ThermostatDelegate::GetLocalTemperature() const
     return mLocalTemperature;
 }
 
-bool ThermostatDelegate::SetLocalTemperature(DataModel::Nullable<temperature> localTemperature)
+Protocols::InteractionModel::Status ThermostatDelegate::SetLocalTemperature(DataModel::Nullable<temperature> temp, bool & changed)
 {
-    if (mLocalTemperature == localTemperature)
+    if (mLocalTemperature == temp)
     {
-        return false;
+        return Status::Success;
     }
-    mLocalTemperature = localTemperature;
-    return true;
+    mLocalTemperature = temp;
+    changed           = true;
+    return Status::Success;
 }
 
 int8_t ThermostatDelegate::GetLocalTemperatureCalibration() const
@@ -115,14 +121,15 @@ int8_t ThermostatDelegate::GetLocalTemperatureCalibration() const
     return mLocalTemperatureCalibration;
 }
 
-bool ThermostatDelegate::SetLocalTemperatureCalibration(int8_t localTemperatureCalibration)
+Protocols::InteractionModel::Status ThermostatDelegate::SetLocalTemperatureCalibration(int8_t temp, bool & changed)
 {
-    if (mLocalTemperatureCalibration == localTemperatureCalibration)
+    if (mLocalTemperatureCalibration == temp)
     {
-        return false;
+        return Status::Success;
     }
-    mLocalTemperatureCalibration = localTemperatureCalibration;
-    return true;
+    mLocalTemperatureCalibration = temp;
+    changed                      = true;
+    return Status::Success;
 }
 
 BitMask<RemoteSensingBitmap> ThermostatDelegate::GetRemoteSensing() const
@@ -130,21 +137,22 @@ BitMask<RemoteSensingBitmap> ThermostatDelegate::GetRemoteSensing() const
     return mRemoteSensing;
 }
 
-bool ThermostatDelegate::SetRemoteSensing(BitMask<RemoteSensingBitmap> remoteSensing)
+Protocols::InteractionModel::Status ThermostatDelegate::SetRemoteSensing(BitMask<RemoteSensingBitmap> sensing, bool & changed)
 {
-    if (mRemoteSensing == remoteSensing)
+    if (mRemoteSensing == sensing)
     {
-        return false;
+        return Status::Success;
     }
-    auto remoteSensingValue = remoteSensing.Raw();
+    auto remoteSensingValue = sensing.Raw();
     AttributePersistence persistence(*mProvider);
     CHIP_ERROR result = persistence.StoreNativeEndianValue({ mEndpointId, Thermostat::Id, RemoteSensing::Id }, remoteSensingValue);
     if (result != CHIP_NO_ERROR)
     {
-        return false;
+        return Status::Failure;
     }
-    mRemoteSensing = remoteSensing;
-    return true;
+    mRemoteSensing = sensing;
+    changed        = true;
+    return Status::Success;
 }
 
 TemperatureSetpointHoldEnum ThermostatDelegate::GetTemperatureSetpointHold() const
@@ -152,14 +160,15 @@ TemperatureSetpointHoldEnum ThermostatDelegate::GetTemperatureSetpointHold() con
     return mTemperatureSetpointHold;
 }
 
-bool ThermostatDelegate::SetTemperatureSetpointHold(TemperatureSetpointHoldEnum temperatureSetpointHold)
+Protocols::InteractionModel::Status ThermostatDelegate::SetTemperatureSetpointHold(TemperatureSetpointHoldEnum hold, bool & changed)
 {
-    if (mTemperatureSetpointHold == temperatureSetpointHold)
+    if (mTemperatureSetpointHold == hold)
     {
-        return false;
+        return Status::Success;
     }
-    mTemperatureSetpointHold = temperatureSetpointHold;
-    return true;
+    mTemperatureSetpointHold = hold;
+    changed                  = true;
+    return Status::Success;
 }
 
 DataModel::Nullable<uint16_t> ThermostatDelegate::GetTemperatureSetpointHoldDuration() const
@@ -167,14 +176,16 @@ DataModel::Nullable<uint16_t> ThermostatDelegate::GetTemperatureSetpointHoldDura
     return mTemperatureSetpointHoldDuration;
 }
 
-bool ThermostatDelegate::SetTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> temperatureSetpointHoldDuration)
+Protocols::InteractionModel::Status ThermostatDelegate::SetTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> duration,
+                                                                                           bool & changed)
 {
-    if (mTemperatureSetpointHoldDuration == temperatureSetpointHoldDuration)
+    if (mTemperatureSetpointHoldDuration == duration)
     {
-        return false;
+        return Status::Success;
     }
-    mTemperatureSetpointHoldDuration = temperatureSetpointHoldDuration;
-    return true;
+    mTemperatureSetpointHoldDuration = duration;
+    changed                          = true;
+    return Status::Success;
 }
 
 DataModel::Nullable<uint32_t> ThermostatDelegate::GetSetpointHoldExpiryTimestamp() const
@@ -182,14 +193,16 @@ DataModel::Nullable<uint32_t> ThermostatDelegate::GetSetpointHoldExpiryTimestamp
     return mSetpointHoldExpiryTimestamp;
 }
 
-bool ThermostatDelegate::SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> setpointHoldExpiryTimestamp)
+Protocols::InteractionModel::Status ThermostatDelegate::SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> timestamp,
+                                                                                       bool & changed)
 {
-    if (mSetpointHoldExpiryTimestamp == setpointHoldExpiryTimestamp)
+    if (mSetpointHoldExpiryTimestamp == timestamp)
     {
-        return false;
+        return Status::Success;
     }
-    mSetpointHoldExpiryTimestamp = setpointHoldExpiryTimestamp;
-    return true;
+    mSetpointHoldExpiryTimestamp = timestamp;
+    changed                      = true;
+    return Status::Success;
 }
 
 Protocols::InteractionModel::Status ThermostatDelegate::LoadSetpoints(Setpoints & setpoints)

@@ -30,7 +30,7 @@ public:
     ThermostatOccupancyDelegate() = default;
 
     BitMask<OccupancyBitmap> GetOccupancy() const override;
-    Protocols::InteractionModel::Status SetOccupancy(BitMask<OccupancyBitmap> occupancy) override;
+    Protocols::InteractionModel::Status SetOccupancy(BitMask<OccupancyBitmap> occupancy, bool & changed) override;
 
 private:
     BitMask<OccupancyBitmap> mOccupancy{ OccupancyBitmap::kOccupied };

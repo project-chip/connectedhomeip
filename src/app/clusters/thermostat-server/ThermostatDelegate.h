@@ -36,28 +36,40 @@ public:
     Delegate()          = default;
     virtual ~Delegate() = default;
 
-    virtual SystemModeEnum GetSystemMode() const                                                          = 0;
-    virtual bool SetSystemMode(SystemModeEnum systemMode)                                                 = 0;
-    virtual ControlSequenceOfOperationEnum GetControlSequenceOfOperation() const                          = 0;
-    virtual bool SetControlSequenceOfOperation(ControlSequenceOfOperationEnum controlSequenceOfOperation) = 0;
-    virtual ThermostatRunningModeEnum GetRunningMode() const                                              = 0;
-    virtual bool SetRunningMode(ThermostatRunningModeEnum runningMode)                                    = 0;
-    virtual BitMask<RelayStateBitmap> GetRunningState() const                                             = 0;
-    virtual bool SetRunningState(BitMask<RelayStateBitmap> runningState)                                  = 0;
-    virtual DataModel::Nullable<temperature> GetLocalTemperature() const                                  = 0;
-    virtual bool SetLocalTemperature(DataModel::Nullable<temperature> localTemperature)                   = 0;
-    virtual int8_t GetLocalTemperatureCalibration() const                                                 = 0;
-    virtual bool SetLocalTemperatureCalibration(int8_t localTemperatureCalibration)                       = 0;
+    virtual SystemModeEnum GetSystemMode() const                                                         = 0;
+    virtual Protocols::InteractionModel::Status SetSystemMode(SystemModeEnum systemMode, bool & changed) = 0;
 
-    virtual BitMask<RemoteSensingBitmap> GetRemoteSensing() const             = 0;
-    virtual bool SetRemoteSensing(BitMask<RemoteSensingBitmap> remoteSensing) = 0;
+    virtual ControlSequenceOfOperationEnum GetControlSequenceOfOperation() const = 0;
+    virtual Protocols::InteractionModel::Status
+    SetControlSequenceOfOperation(ControlSequenceOfOperationEnum controlSequenceOfOperation, bool & changed) = 0;
 
-    virtual TemperatureSetpointHoldEnum GetTemperatureSetpointHold() const                                         = 0;
-    virtual bool SetTemperatureSetpointHold(TemperatureSetpointHoldEnum temperatureSetpointHold)                   = 0;
-    virtual DataModel::Nullable<uint16_t> GetTemperatureSetpointHoldDuration() const                               = 0;
-    virtual bool SetTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> temperatureSetpointHoldDuration) = 0;
-    virtual DataModel::Nullable<uint32_t> GetSetpointHoldExpiryTimestamp() const                                   = 0;
-    virtual bool SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> setpointHoldExpiryTimestamp)         = 0;
+    virtual ThermostatRunningModeEnum GetRunningMode() const                                                          = 0;
+    virtual Protocols::InteractionModel::Status SetRunningMode(ThermostatRunningModeEnum runningMode, bool & changed) = 0;
+
+    virtual BitMask<RelayStateBitmap> GetRunningState() const                                                           = 0;
+    virtual Protocols::InteractionModel::Status SetRunningState(BitMask<RelayStateBitmap> runningState, bool & changed) = 0;
+
+    virtual DataModel::Nullable<temperature> GetLocalTemperature() const            = 0;
+    virtual Protocols::InteractionModel::Status SetLocalTemperature(DataModel::Nullable<temperature> localTemperature,
+                                                                    bool & changed) = 0;
+
+    virtual int8_t GetLocalTemperatureCalibration() const                                      = 0;
+    virtual Protocols::InteractionModel::Status SetLocalTemperatureCalibration(int8_t localTemperatureCalibration,
+                                                                               bool & changed) = 0;
+
+    virtual BitMask<RemoteSensingBitmap> GetRemoteSensing() const                                                            = 0;
+    virtual Protocols::InteractionModel::Status SetRemoteSensing(BitMask<RemoteSensingBitmap> remoteSensing, bool & changed) = 0;
+
+    virtual TemperatureSetpointHoldEnum GetTemperatureSetpointHold() const                 = 0;
+    virtual Protocols::InteractionModel::Status SetTemperatureSetpointHold(TemperatureSetpointHoldEnum temperatureSetpointHold,
+                                                                           bool & changed) = 0;
+    virtual DataModel::Nullable<uint16_t> GetTemperatureSetpointHoldDuration() const       = 0;
+    virtual Protocols::InteractionModel::Status
+    SetTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> temperatureSetpointHoldDuration, bool & changed) = 0;
+
+    virtual DataModel::Nullable<uint32_t> GetSetpointHoldExpiryTimestamp() const = 0;
+    virtual Protocols::InteractionModel::Status
+    SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> setpointHoldExpiryTimestamp, bool & changed) = 0;
 
     virtual Protocols::InteractionModel::Status LoadSetpoints(Setpoints & setpoints)                                     = 0;
     virtual Protocols::InteractionModel::Status SaveSetpoint(const Setpoint & oldSetpoint, const Setpoint & newSetpoint) = 0;
