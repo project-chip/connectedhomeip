@@ -256,12 +256,12 @@ private:
     jbyte * operationalDataset         = nullptr;
 
     // Java object containing the ThreadCredentialsNeeded Listener
-    jobject mThreadCredentialsNeededListenerObject = nullptr;
-    jmethodID mThreadCredentialsNeededListener     = nullptr;
+    chip::JniGlobalReference mThreadCredentialsNeededListenerObject;
+    jmethodID mThreadCredentialsNeededListener = nullptr;
 
     // Java object containing the WiFiCredentialsNeeded Listener
-    jobject mWiFiCredentialsNeededListenerObject = nullptr;
-    jmethodID mWiFiCredentialsNeededListener     = nullptr;
+    chip::JniGlobalReference mWiFiCredentialsNeededListenerObject;
+    jmethodID mWiFiCredentialsNeededListener = nullptr;
 
     std::vector<uint8_t> mNocCertificate;
     std::vector<uint8_t> mIcacCertificate;

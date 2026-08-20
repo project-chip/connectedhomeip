@@ -402,24 +402,9 @@ void AndroidDeviceControllerWrapper::Shutdown()
     VerifyOrReturn(mIsInitialized);
 
     // Listener objects are JNI global refs and must be released during teardown.
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env != nullptr)
-    {
-        if (mThreadCredentialsNeededListenerObject != nullptr)
-        {
-            env->DeleteGlobalRef(mThreadCredentialsNeededListenerObject);
-            mThreadCredentialsNeededListenerObject = nullptr;
-        }
-        if (mWiFiCredentialsNeededListenerObject != nullptr)
-        {
-            env->DeleteGlobalRef(mWiFiCredentialsNeededListenerObject);
-            mWiFiCredentialsNeededListenerObject = nullptr;
-        }
-    }
-    else
-    {
-        ChipLogError(Controller, "Could not get JNIEnv for current thread during Shutdown");
-    }
+    // JniGlobalReference handles a missing JNIEnv internally and safely no-ops.
+    mThreadCredentialsNeededListenerObject.Reset();
+    mWiFiCredentialsNeededListenerObject.Reset();
     mThreadCredentialsNeededListener = nullptr;
     mWiFiCredentialsNeededListener   = nullptr;
 
@@ -462,11 +447,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SetThreadCredentialsNeededListener(jo
     // Allow clearing the listener.
     if (listener == nullptr)
     {
-        if (mThreadCredentialsNeededListenerObject != nullptr)
-        {
-            env->DeleteGlobalRef(mThreadCredentialsNeededListenerObject);
-            mThreadCredentialsNeededListenerObject = nullptr;
-        }
+        mThreadCredentialsNeededListenerObject.Reset();
         mThreadCredentialsNeededListener = nullptr;
         return CHIP_NO_ERROR;
     }
@@ -475,13 +456,8 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SetThreadCredentialsNeededListener(jo
     CHIP_ERROR err = chip::JniReferences::GetInstance().FindMethod(env, listener, "onThreadCredentialsNeeded", "(I)V", &method);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
-    jobject globalRef = env->NewGlobalRef(listener);
-    VerifyOrReturnError(globalRef != nullptr && !env->ExceptionCheck(), CHIP_ERROR_NO_MEMORY);
-    if (mThreadCredentialsNeededListenerObject != nullptr)
-    {
-        env->DeleteGlobalRef(mThreadCredentialsNeededListenerObject);
-    }
-    mThreadCredentialsNeededListenerObject = globalRef;
+    mThreadCredentialsNeededListenerObject.Reset();
+    ReturnErrorOnFailure(mThreadCredentialsNeededListenerObject.Init(listener));
     mThreadCredentialsNeededListener       = method;
 
     return CHIP_NO_ERROR;
@@ -496,11 +472,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SetWiFiCredentialsNeededListener(jobj
     // Allow clearing the listener.
     if (listener == nullptr)
     {
-        if (mWiFiCredentialsNeededListenerObject != nullptr)
-        {
-            env->DeleteGlobalRef(mWiFiCredentialsNeededListenerObject);
-            mWiFiCredentialsNeededListenerObject = nullptr;
-        }
+        mWiFiCredentialsNeededListenerObject.Reset();
         mWiFiCredentialsNeededListener = nullptr;
         return CHIP_NO_ERROR;
     }
@@ -509,13 +481,8 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SetWiFiCredentialsNeededListener(jobj
     CHIP_ERROR err = chip::JniReferences::GetInstance().FindMethod(env, listener, "onWiFiCredentialsNeeded", "(I)V", &method);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
-    jobject globalRef = env->NewGlobalRef(listener);
-    VerifyOrReturnError(globalRef != nullptr && !env->ExceptionCheck(), CHIP_ERROR_NO_MEMORY);
-    if (mWiFiCredentialsNeededListenerObject != nullptr)
-    {
-        env->DeleteGlobalRef(mWiFiCredentialsNeededListenerObject);
-    }
-    mWiFiCredentialsNeededListenerObject = globalRef;
+    mWiFiCredentialsNeededListenerObject.Reset();
+    ReturnErrorOnFailure(mWiFiCredentialsNeededListenerObject.Init(listener));
     mWiFiCredentialsNeededListener       = method;
 
     return CHIP_NO_ERROR;
@@ -1235,7 +1202,7 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::ScopedNodeI
 CHIP_ERROR AndroidDeviceControllerWrapper::WiFiCredentialsNeeded(chip::EndpointId endpoint)
 {
     chip::DeviceLayer::StackUnlock unlock;
-    if (mWiFiCredentialsNeededListenerObject == nullptr || mWiFiCredentialsNeededListener == nullptr)
+    if (!mWiFiCredentialsNeededListenerObject.HasValidObjectRef() || mWiFiCredentialsNeededListener == nullptr)
     {
         ChipLogError(Controller, "No listener registered for WiFiCredentialsNeeded");
         return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -1245,7 +1212,8 @@ CHIP_ERROR AndroidDeviceControllerWrapper::WiFiCredentialsNeeded(chip::EndpointI
     VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(Controller, "Could not get JNIEnv for current thread"));
 
-    env->CallVoidMethod(mWiFiCredentialsNeededListenerObject, mWiFiCredentialsNeededListener, static_cast<jint>(endpoint));
+    env->CallVoidMethod(mWiFiCredentialsNeededListenerObject.ObjectRef(), mWiFiCredentialsNeededListener,
+                        static_cast<jint>(endpoint));
     VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
     return CHIP_NO_ERROR;
@@ -1254,7 +1222,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::WiFiCredentialsNeeded(chip::EndpointI
 CHIP_ERROR AndroidDeviceControllerWrapper::ThreadCredentialsNeeded(chip::EndpointId endpoint)
 {
     chip::DeviceLayer::StackUnlock unlock;
-    if (mThreadCredentialsNeededListenerObject == nullptr || mThreadCredentialsNeededListener == nullptr)
+    if (!mThreadCredentialsNeededListenerObject.HasValidObjectRef() || mThreadCredentialsNeededListener == nullptr)
     {
         ChipLogError(Controller, "No listener registered for ThreadCredentialsNeeded");
         return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -1264,7 +1232,8 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ThreadCredentialsNeeded(chip::Endpoin
     VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(Controller, "Could not get JNIEnv for current thread"));
 
-    env->CallVoidMethod(mThreadCredentialsNeededListenerObject, mThreadCredentialsNeededListener, static_cast<jint>(endpoint));
+    env->CallVoidMethod(mThreadCredentialsNeededListenerObject.ObjectRef(), mThreadCredentialsNeededListener,
+                        static_cast<jint>(endpoint));
     VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
     return CHIP_NO_ERROR;
