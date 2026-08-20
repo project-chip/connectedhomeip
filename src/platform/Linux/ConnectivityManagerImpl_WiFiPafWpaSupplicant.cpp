@@ -17,22 +17,14 @@
  *    limitations under the License.
  */
 
-#include <mutex>
-
-#include <stdint.h>
-
-#include <glib.h>
+#include "ConnectivityManagerImpl_WiFiPafWpaSupplicant.h"
 
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
-#include <platform/ConnectivityManager.h>
 #include <platform/DeviceInstanceInfoProvider.h>
-#include <platform/GLibTypeDeleter.h>
+#include <platform/Linux/dbus/wpa/DBusWpaInterface.h>
 #include <platform/PlatformManager.h>
-
-#include "ConnectivityManagerImpl.h"
-#include "WpaSupplicantClient.h"
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 using namespace ::chip::WiFiPAF;
@@ -42,6 +34,11 @@ namespace chip {
 namespace DeviceLayer {
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+
+namespace {
+
+// Global Variables
+
 static const char srv_name[] = "_matterc._udp";
 /*
     NAN-USD Service Protocol Type: ref: Table 58 of Wi-Fi Aware Specificaiton
@@ -65,9 +62,138 @@ enum nan_service_protocol_type
 };
 #pragma pack(pop)
 
-CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAFAdvertiseParam & InArgs)
+} // namespace
+
+// MARK: Function and Method Implementation
+
+// MARK: Matter Linux Connectivity Manager Implementation Wi-Fi
+//       Neighbor Awareness Networking (NAN) Unsynchronized Service
+//       Discovery (USD) / Public Action Frame (PAF) for wpa_supplicant
+
+// MARK: Initialization
+
+CHIP_ERROR ConnectivityManagerImpl_WiFiPafWpaSupplicant::Init(ConnectivityManagerImpl & inConnectivityManagerImpl)
 {
-    CHIP_ERROR result = StartWiFiManagementSync();
+    VerifyOrReturnError(mConnectivityManagerImpl == nullptr, CHIP_ERROR_ALREADY_INITIALIZED);
+
+    // Initialize the base wpa_supplicant class.
+
+    ReturnErrorOnFailure(WpaSupplicantClient::Init(inConnectivityManagerImpl));
+
+    mConnectivityManagerImpl = &inConnectivityManagerImpl;
+
+    mPafChannelAvailable = true;
+
+    return CHIP_NO_ERROR;
+}
+
+// MARK: Introspection
+
+bool ConnectivityManagerImpl_WiFiPafWpaSupplicant::IsWiFiPafResourceAvailable(void) const
+{
+    return mPafChannelAvailable;
+}
+
+// MARK: Mutation
+
+CHIP_ERROR ConnectivityManagerImpl_WiFiPafWpaSupplicant::WiFiPafSetAdvertisingEnabled(bool inEnabled, uint32_t & inOutPublishId)
+{
+    if (inEnabled)
+    {
+        VerifyOrReturnError(mPafAdvertiseParams.freq_list_len > 0, CHIP_ERROR_INCORRECT_STATE);
+
+        auto res = WiFiPafPublish(mPafAdvertiseParams);
+        if ((res == CHIP_NO_ERROR) && (mPafAdvertiseParams.publish_id != WiFiPAF::kUndefinedWiFiPafSessionId))
+        {
+            inOutPublishId = mPafAdvertiseParams.publish_id;
+        }
+
+        return res;
+    }
+
+    // Cancel paf_publish, publish_id should be valid
+
+    VerifyOrReturnError((inOutPublishId != 0) && (inOutPublishId != WiFiPAF::kUndefinedWiFiPafSessionId),
+                        CHIP_ERROR_INCORRECT_STATE);
+
+    return WiFiPafCancelPublish(inOutPublishId);
+}
+
+void ConnectivityManagerImpl_WiFiPafWpaSupplicant::WiFiPafSetParam(
+    const ConnectivityManager::WiFiPAFAdvertiseParam & inWiFiPafAdvertiseParams)
+{
+    mPafAdvertiseParams.freq_list_len = inWiFiPAFAdvertiseParam.freq_list_len;
+    mPafAdvertiseParams.freq_list     = std::make_unique<uint16_t[]>(mPafAdvertiseParam.freq_list_len);
+    for (size_t i = 0; i < mPafAdvertiseParams.freq_list_len; i++)
+    {
+        mPafAdvertiseParams.freq_list[i] = inWiFiPAFAdvertiseParam.freq_list[i];
+    }
+}
+
+CHIP_ERROR ConnectivityManagerImpl_WiFiPafWpaSupplicant::WiFiPafSetResourceAvailable(const bool & inAvailable)
+{
+    mPafChannelAvailable = inAvailable;
+
+    return CHIP_NO_ERROR;
+}
+
+void ConnectivityManagerImpl_WiFiPafWpaSupplicant::WiFiPafSetSubscribeFreq(const uint16_t & inFrequency)
+{
+    mSubscribeFreq = inFrequency;
+}
+
+// MARK: Event Handling
+
+void ConnectivityManagerImpl_WiFiPafWpaSupplicant::OnPlatformEvent(const ChipDeviceEvent & inDeviceEvent)
+{
+    WiFiPAFLayer & WiFiPafLayer = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
+
+    switch (inDeviceEvent.Type)
+    {
+
+    case DeviceEventType::kCHIPoWiFiPAFReceived: {
+        ChipLogProgress(DeviceLayer, "WiFi-PAF: event: kCHIPoWiFiPAFReceived");
+        WiFiPAFSession RxInfo;
+        memcpy(&RxInfo, &inDeviceEvent.CHIPoWiFiPAFReceived.SessionInfo, sizeof(WiFiPAF::WiFiPAFSession));
+        WiFiPafLayer.OnWiFiPAFMessageReceived(RxInfo, System::PacketBufferHandle::Adopt(inDeviceEvent.CHIPoWiFiPAFReceived.Data));
+        break;
+    }
+
+    case DeviceEventType::kCHIPoWiFiPAFConnected: {
+        ChipLogProgress(DeviceLayer, "WiFi-PAF: event: kCHIPoWiFiPAFConnected");
+        WiFiPAF::WiFiPAFSession SessionInfo;
+        memcpy(&SessionInfo, &inDeviceEvent.CHIPoWiFiPAFReceived.SessionInfo, sizeof(WiFiPAF::WiFiPAFSession));
+        WiFiPafLayer.HandleTransportConnectionInitiated(SessionInfo, mOnPafSubscribeComplete, mAppState, mOnPafSubscribeError);
+        break;
+    }
+
+    case DeviceEventType::kCHIPoWiFiPAFCancelConnect: {
+        ChipLogProgress(DeviceLayer, "WiFi-PAF: event: kCHIPoWiFiPAFCancelConnect");
+        if (mOnPafSubscribeError != nullptr)
+        {
+            mOnPafSubscribeError(mAppState, CHIP_ERROR_CANCELLED);
+            mOnPafSubscribeError = nullptr;
+        }
+        break;
+    }
+
+    case DeviceEventType::kCHIPoWiFiPAFWriteDone: {
+        ChipLogProgress(DeviceLayer, "WiFi-PAF: event: kCHIPoWiFiPAFWriteDone");
+        WiFiPAF::WiFiPAFSession TxInfo;
+        memcpy(&TxInfo, &inDeviceEvent.CHIPoWiFiPAFReceived.SessionInfo, sizeof(WiFiPAF::WiFiPAFSession));
+        WiFiPafLayer.HandleWriteConfirmed(TxInfo, inDeviceEvent.CHIPoWiFiPAFReceived.result);
+        break;
+    }
+    }
+}
+
+// MARK: Wi-Fi Neighbor Awareness Networking (NAN) Unsynchronized
+//       Service Discovery (USD) / Public Action Frame (PAF)
+//       Commissioning Transport
+
+CHIP_ERROR ConnectivityManagerImpl_WiFiPafWpaSupplicant::WiFiPafPublish(ConnectivityManager::WiFiPAFAdvertiseParam & InArgs)
+{
+    CHIP_ERROR result = WpaSupplicantClient::StartSync();
     VerifyOrReturnError(result == CHIP_NO_ERROR, result);
 
     GAutoPtr<GError> err;
@@ -127,18 +253,18 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAF
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelPublish(uint32_t PublishId)
+CHIP_ERROR ConnectivityManagerImpl_WiFiPafWpaSupplicant::WiFiPafCancelPublish(const uint32_t & inPublishId)
 {
     GAutoPtr<GError> err;
 
-    ChipLogProgress(DeviceLayer, "WiFi-PAF: cancel publish_id: %d ! ", PublishId);
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: cancel publish_id: %d ! ", inPublishId);
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
     VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "WiFi-PAF: Skip D-Bus 'cancel publish' call since wpa_supplicant is not ready"));
 
-    gboolean result =
-        wpa_supplicant_1_interface_call_nancancel_publish_sync(mWpaSupplicant.iface.get(), PublishId, nullptr, &err.GetReceiver());
+    gboolean result = wpa_supplicant_1_interface_call_nancancel_publish_sync(mWpaSupplicant.iface.get(), inPublishId, nullptr,
+                                                                             &err.GetReceiver());
 
     // TODO #40814: make sure that the callers do check the return values. This doesn't seem to be happening now.
     VerifyOrReturnError(
@@ -151,7 +277,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelPublish(uint32_t PublishId)
 /*
     NAN-USD Service Protocol Type: ref: Table 58 of Wi-Fi Aware Specificaiton
 */
-void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
+void ConnectivityManagerImpl_WiFiPafWpaSupplicant::OnDiscoveryResult(GVariant * discov_info)
 {
     ChipLogProgress(Controller, "WiFi-PAF: OnDiscoveryResult");
     uint32_t subscribe_id;
@@ -198,7 +324,7 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
     auto ssibuf = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
     VerifyOrReturn(bufferLen >= sizeof(PAFPublishSSI), ChipLogError(DeviceLayer, "WiFi-PAF: DiscoveryResult SSI too short"));
     auto pPublishSSI = reinterpret_cast<const PAFPublishSSI *>(ssibuf);
-    GetWiFiPAF()->SetWiFiPAFState(WiFiPAF::State::kConnected);
+    mConnectivityManagerImpl->GetWiFiPAF()->SetWiFiPAFState(WiFiPAF::State::kConnected);
 
     /*
         Error Checking
@@ -250,7 +376,7 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
     PlatformMgr().PostEventOrDie(&event);
 }
 
-void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
+void ConnectivityManagerImpl_WiFiPafWpaSupplicant::OnReplied(GVariant * reply_info)
 {
     ChipLogProgress(Controller, "WiFi-PAF: OnReplied");
     uint32_t publish_id;
@@ -347,7 +473,7 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
     LogErrorOnFailure(PlatformMgr().ScheduleWork(handleInitiated, reinterpret_cast<intptr_t>(pPafInfo)));
 }
 
-void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
+void ConnectivityManagerImpl_WiFiPafWpaSupplicant::OnNanReceive(GVariant * obj)
 {
     if (g_variant_n_children(obj) == 0)
     {
@@ -392,7 +518,7 @@ void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
     PlatformMgr().PostEventOrDie(&event);
 }
 
-void ConnectivityManagerImpl::OnNanPublishTerminated(guint public_id, gchar * reason)
+void ConnectivityManagerImpl_WiFiPafWpaSupplicant::OnNanPublishTerminated(guint public_id, gchar * reason)
 {
     ChipLogProgress(Controller, "WiFi-PAF: Publish terminated (%u, %s)", public_id, reason);
     WiFiPAFSession sessionInfo  = { .id = public_id };
@@ -411,7 +537,7 @@ void ConnectivityManagerImpl::OnNanPublishTerminated(guint public_id, gchar * re
     TEMPORARY_RETURN_IGNORED WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
 }
 
-void ConnectivityManagerImpl::OnNanSubscribeTerminated(guint subscribe_id, gchar * reason)
+void ConnectivityManagerImpl_WiFiPafWpaSupplicant::OnNanSubscribeTerminated(guint subscribe_id, gchar * reason)
 {
     ChipLogProgress(Controller, "WiFi-PAF: Subscription terminated (%u, %s)", subscribe_id, reason);
     WiFiPAFSession sessionInfo  = { .id = subscribe_id };
@@ -435,37 +561,11 @@ void ConnectivityManagerImpl::OnNanSubscribeTerminated(guint subscribe_id, gchar
     PlatformMgr().PostEventOrDie(&event);
 }
 
-void ConnectivityManagerImpl::_WiFiPAFSetParam(const WiFiPAFAdvertiseParam & pafAdvParam)
+CHIP_ERROR ConnectivityManagerImpl_WiFiPafWpaSupplicant::WiFiPafSubscribe(const uint16_t & connDiscriminator, void * appState,
+                                                                          ConnectivityManager::OnConnectionCompleteFunct onSuccess,
+                                                                          ConnectivityManager::OnConnectionErrorFunct onError)
 {
-    mPafAdvParam.freq_list_len = pafAdvParam.freq_list_len;
-    mPafAdvParam.freq_list     = std::make_unique<uint16_t[]>(mPafAdvParam.freq_list_len);
-    for (size_t i = 0; i < mPafAdvParam.freq_list_len; i++)
-    {
-        mPafAdvParam.freq_list[i] = pafAdvParam.freq_list[i];
-    }
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_SetWiFiPAFAdvertisingEnabled(bool enabled, uint32_t & publishId)
-{
-    if (enabled)
-    {
-        VerifyOrReturnError(mPafAdvParam.freq_list_len > 0, CHIP_ERROR_INCORRECT_STATE);
-        auto res = WiFiPAFPublish(mPafAdvParam);
-        if ((res == CHIP_NO_ERROR) && (mPafAdvParam.publish_id != kUndefinedWiFiPafSessionId))
-        {
-            publishId = mPafAdvParam.publish_id;
-        }
-        return res;
-    }
-    // Cancel paf_publish, publish_id should be valid
-    VerifyOrReturnError((publishId != 0) && (publishId != WiFiPAF::kUndefinedWiFiPafSessionId), CHIP_ERROR_INCORRECT_STATE);
-    return WiFiPAFCancelPublish(publishId);
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscriminator, void * appState,
-                                                      OnConnectionCompleteFunct onSuccess, OnConnectionErrorFunct onError)
-{
-    CHIP_ERROR result = StartWiFiManagementSync();
+    CHIP_ERROR result = WpaSupplicantClient::StartSync();
     VerifyOrReturnError(result == CHIP_NO_ERROR, result);
 
     ChipLogProgress(Controller, "WiFi-PAF: Try to subscribe the NAN-USD devices");
@@ -475,8 +575,8 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscr
     enum nan_service_protocol_type srv_proto_type = nan_service_protocol_type::NAN_SRV_PROTO_CSA_MATTER;
     uint8_t is_active                             = 1;
     unsigned int ttl                              = CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT_SECS;
-    unsigned int freq                             = (mApFreq == 0) ? CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL : mApFreq;
-    unsigned int ssi_len                          = sizeof(struct PAFPublishSSI);
+    unsigned int freq    = (mSubscribeFreq == 0) ? CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL : mSubscribeFreq;
+    unsigned int ssi_len = sizeof(struct PAFPublishSSI);
     struct PAFPublishSSI PafPublish_ssi;
 
     mAppState                = appState;
@@ -527,24 +627,26 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscr
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelSubscribe(uint32_t SubscribeId)
+CHIP_ERROR ConnectivityManagerImpl_WiFiPafWpaSupplicant::WiFiPafCancelSubscribe(const uint32_t & inSubscribeId)
 {
     GAutoPtr<GError> err;
 
-    ChipLogProgress(DeviceLayer, "WiFi-PAF: cancel subscribe_id: %d ! ", SubscribeId);
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: cancel subscribe_id: %d ! ", inSubscribeId);
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
-    wpa_supplicant_1_interface_call_nancancel_subscribe_sync(mWpaSupplicant.iface.get(), SubscribeId, nullptr, &err.GetReceiver());
+    wpa_supplicant_1_interface_call_nancancel_subscribe_sync(mWpaSupplicant.iface.get(), inSubscribeId, nullptr,
+                                                             &err.GetReceiver());
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelIncompleteSubscribe()
+CHIP_ERROR ConnectivityManagerImpl_WiFiPafWpaSupplicant::WiFiPafCancelIncompleteSubscribe(void)
 {
     mOnPafSubscribeComplete = nullptr;
     mOnPafSubscribeError    = nullptr;
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSend(const WiFiPAF::WiFiPAFSession & TxInfo, System::PacketBufferHandle && msgBuf)
+CHIP_ERROR ConnectivityManagerImpl_WiFiPafWpaSupplicant::WiFiPafSend(const WiFiPAF::WiFiPAFSession & TxInfo,
+                                                                     System::PacketBufferHandle && msgBuf)
 {
     ChipLogProgress(Controller, "WiFi-PAF: sending PAF Follow-up packets, (%zu)", msgBuf->DataLength());
     CHIP_ERROR ret = CHIP_NO_ERROR;
@@ -608,50 +710,32 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSend(const WiFiPAF::WiFiPAFSession &
     return ret;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiPafRole role)
+CHIP_ERROR ConnectivityManagerImpl_WiFiPafWpaSupplicant::WiFiPafShutdown(const uint32_t & inId,
+                                                                         const WiFiPAF::WiFiPafRole & inWiFiPafRole)
 {
-    VerifyOrReturnError(((id != kUndefinedWiFiPafSessionId) && (id != 0)), CHIP_ERROR_INTERNAL);
-    switch (role)
+    VerifyOrReturnError(((inId != kUndefinedWiFiPafSessionId) && (inId != 0)), CHIP_ERROR_INTERNAL);
+
+    switch (inWiFiPafRole)
     {
     case WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher:
-        return _WiFiPAFCancelPublish(id);
+        return WiFiPafCancelPublish(inId);
     case WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber:
-        return _WiFiPAFCancelSubscribe(id);
+        return WiFiPafCancelSubscribe(inId);
     }
     return CHIP_ERROR_INTERNAL;
 }
 
-void ConnectivityManagerImpl::PostWpaInterfaceProxyReady()
+// wpa_supplicant Base Class Method Overrides
+
+void ConnectivityManagerImpl_WiFiPafWpaSupplicant::OnWiFiMediumAvailable(WpaSupplicantClient & inOutWpaSupplicantClient,
+                                                                         bool inAvailable)
 {
-    g_signal_connect(mWpaSupplicant.iface.get(), "nanreplied",
-                     G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
-                         return self->OnReplied(obj);
-                     }),
-                     this);
-    g_signal_connect(mWpaSupplicant.iface.get(), "nanreceive",
-                     G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
-                         return self->OnNanReceive(obj);
-                     }),
-                     this);
-    g_signal_connect(
-        mWpaSupplicant.iface.get(), "nanpublish-terminated",
-        G_CALLBACK(+[](WpaSupplicant1Interface * proxy, guint term_publish_id, gchar * reason, ConnectivityManagerImpl * self) {
-            return self->OnNanPublishTerminated(term_publish_id, reason);
-        }),
-        this);
-    g_signal_connect(mWpaSupplicant.iface.get(), "nandiscovery-result",
-                     G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
-                         return self->OnDiscoveryResult(obj);
-                     }),
-                     this);
-    g_signal_connect(
-        mWpaSupplicant.iface.get(), "nansubscribe-terminated",
-        G_CALLBACK(+[](WpaSupplicant1Interface * proxy, guint term_subscribe_id, gchar * reason, ConnectivityManagerImpl * self) {
-            return self->OnNanSubscribeTerminated(term_subscribe_id, reason);
-        }),
-        this);
+    RETURN_SAFELY_IGNORED WiFiPafSetResourceAvailable(inAvailable);
 }
 
+void ConnectivityManagerImpl_WiFiPafWpaSupplicant::PostNetworkConnect(void) {}
+
+void ConnectivityManagerImpl_WiFiPafWpaSupplicant::UpdateWiFiNetworkStatus(void) {}
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 
 } // namespace DeviceLayer

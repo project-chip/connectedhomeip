@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,12 @@
 
 #pragma once
 
+#include <memory>
+
+#include <stdint.h>
+
 #include <lib/support/FixedBuffer.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
 #include <platform/internal/GenericConnectivityManagerImpl_UDP.h>
@@ -29,38 +34,51 @@
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.h>
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoBLE.h>
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/internal/GenericConnectivityManagerImpl_Thread.h>
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
-#endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.h>
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-#include <wifipaf/WiFiPAFEndPoint.h>
-#include <wifipaf/WiFiPAFLayer.h>
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
-
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <platform/Linux/NetworkCommissioningDriver.h>
 #include <platform/NetworkCommissioning.h>
-#include <vector>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-#include "WpaSupplicantClient.h"
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+#include "ConnectivityManagerImpl_NetworkManagementDelegate.h"
 
 namespace chip {
 namespace DeviceLayer {
 
+namespace Internal {
+
+// Forward Declarations
+
+class NetworkManagementInterface;
+class WiFiPafInterface;
+
+} // namespace Internal
+
 /**
- * Concrete implementation of the ConnectivityManager singleton object for Linux platforms.
+ *  This provides a concrete implementation of the public Connectivity
+ *  Manager Curiously-recurring Template Pattern (CRTP) singleton
+ *  object interface for Linux platforms.
+ *
+ *  This fans out those CRTP interface methods into one of two
+ *  abstract virtual interfaces:
+ *
+ *    1. High-level network management, if any, that owns network
+ *       policy and state and orchestrates connectivity decisions and
+ *       cross-interface policy.
+ *    2. Wi-Fi Neighbor Awareness Networking (NAN) Unsynchronized
+ *       Service Discovery (USD) / Public Action Frame (PAF)
+ *       commissioning transport management.
+ *
+ *  The implementations of which are allocated, instantiated, and
+ *  initialized in the #Init method.
  */
 class ConnectivityManagerImpl final : public ConnectivityManager,
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -82,74 +100,20 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
                                       public Internal::GenericConnectivityManagerImpl_TCP<ConnectivityManagerImpl>,
 #endif
-                                      public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    ,
-                                      public Internal::WpaSupplicantClient
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+                                      public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
+                                      public Internal::NetworkManagementDelegate
 {
     // Allow the ConnectivityManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend class ConnectivityManager;
 
 public:
+    ConnectivityManagerImpl() = default;
+    ~ConnectivityManagerImpl();
+
     // Singleton
 
-    static ConnectivityManagerImpl & GetDefaultInstance(void);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    CHIP_ERROR ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credentials,
-                                       NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-    CHIP_ERROR ConnectWiFiNetworkWithPDCAsync(ByteSpan ssid, ByteSpan networkIdentity, ByteSpan clientIdentity,
-                                              const Crypto::P256Keypair & clientIdentityKeypair,
-                                              NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    void PostWpaInterfaceProxyReady() CHIP_REQUIRES(mWpaSupplicantMutex);
-    void _WiFiPAFSetParam(const WiFiPAFAdvertiseParam & pafAdvParam);
-    CHIP_ERROR _SetWiFiPAFAdvertisingEnabled(bool enabled, uint32_t & publishId);
-    CHIP_ERROR _WiFiPAFSubscribe(const uint16_t & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
-                                 OnConnectionErrorFunct onError);
-    CHIP_ERROR _WiFiPAFCancelSubscribe(uint32_t SubscribeId);
-    CHIP_ERROR _WiFiPAFCancelIncompleteSubscribe();
-    void OnDiscoveryResult(GVariant * obj);
-    void OnReplied(GVariant * obj);
-    void OnNanReceive(GVariant * obj);
-    void OnNanPublishTerminated(guint public_id, gchar * reason);
-    void OnNanSubscribeTerminated(guint subscribe_id, gchar * reason);
-    CHIP_ERROR _WiFiPAFSend(const WiFiPAF::WiFiPAFSession & TxInfo, chip::System::PacketBufferHandle && msgBuf);
-    void _WiFiPafSetApFreq(const uint16_t freq) { mApFreq = freq; }
-    CHIP_ERROR _WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiPafRole role);
-#else
-    inline void PostWpaInterfaceProxyReady() CHIP_REQUIRES(mWpaSupplicantMutex) {}
-#endif
-
-    void PostNetworkConnect();
-    CHIP_ERROR CommitConfig();
-
-    void StartWiFiManagement();
-    // Release GLib objects before the GLib main loop is quit.
-    // Must be called from PlatformManagerImpl::_Shutdown() before g_main_loop_quit().
-    void StopWiFiManagement();
-    bool IsWiFiManagementStarted();
-    void StartNonConcurrentWiFiManagement();
-    int32_t GetDisconnectReason();
-    CHIP_ERROR GetWiFiBssId(MutableByteSpan & value);
-    CHIP_ERROR GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType);
-    CHIP_ERROR GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wiFiVersion);
-    CHIP_ERROR GetConfiguredNetwork(NetworkCommissioning::Network & network);
-    CHIP_ERROR StartWiFiScan(ByteSpan ssid, NetworkCommissioning::WiFiDriver::ScanCallback * callback);
-
-private:
-    CHIP_ERROR _ConnectWiFiNetworkAsync(GVariant * networkArgs,
-                                        NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback)
-        CHIP_REQUIRES(mWpaSupplicantMutex);
-#endif
-
-public:
-    const char * GetEthernetIfName() { return (mEthIfName[0] == '\0') ? nullptr : mEthIfName; }
-    void UpdateEthernetNetworkingStatus();
+    static ConnectivityManagerImpl & GetDefaultInstance();
 
     using NetworkStatusChangeCallback = NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback;
     using OneShotScanCallback         = NetworkCommissioning::WiFiDriver::ScanCallback;
@@ -159,6 +123,53 @@ public:
     void SetOneShotScanCallback(OneShotScanCallback * inOneShotScanCallback) noexcept;
     void SetNetworkStatusChangeCallback(NetworkStatusChangeCallback * inStatusChangeCallback) noexcept;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+    // Ethernet Control Plane Management
+
+    // Observation
+
+    const char * GetEthernetIfName();
+
+    // Helper
+
+    void UpdateEthernetNetworkingStatus();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    // Wi-Fi Control Plane Management
+
+    // Wi-Fi Station Control Plane Management
+
+    // Introspection
+
+    bool IsWiFiStationConnecting() const noexcept;
+    bool IsWiFiStationScanning() const noexcept;
+    bool IsWiFiManagementStarted();
+
+    // Observation
+
+    CHIP_ERROR GetConfiguredNetwork(NetworkCommissioning::Network & outNetwork);
+    CHIP_ERROR GetWiFiBssId(MutableByteSpan & outBssId);
+    const char * GetWiFiIfName();
+    CHIP_ERROR GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & outSecurityType);
+    CHIP_ERROR GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & outVersion);
+
+    // Worker
+
+    CHIP_ERROR ConnectWiFiNetworkAsync(ByteSpan inSsid, ByteSpan inCredentials,
+                                       NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * inConnectCallback);
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    CHIP_ERROR ConnectWiFiNetworkWithPDCAsync(ByteSpan inSsid, ByteSpan inNetworkIdentity, ByteSpan inClientIdentity,
+                                              const Crypto::P256Keypair & inClientIdentityKeypair,
+                                              NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * inConnectCallback);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+
+    CHIP_ERROR CommitConfig();
+    void StartWiFiManagement();
+    void StopWiFiManagement();
+    CHIP_ERROR StartWiFiScan(ByteSpan inSsid, NetworkCommissioning::WiFiDriver::ScanCallback * inScanCallback);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
     // Network Commissioning Action Delegation Methods
 
     void OnScanFinished(NetworkCommissioning::Status inStatus, CharSpan inDebugText,
@@ -167,107 +178,106 @@ public:
     void OnStatusChange(NetworkCommissioning::Status inCommissioningError, Optional<ByteSpan> inNetworkId,
                         Optional<int32_t> inConnectStatus) noexcept;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    const char * GetWiFiIfName() { return (sWiFiIfName[0] == '\0') ? nullptr : sWiFiIfName; }
-#endif
-
 private:
-    // ===== Members that implement the ConnectivityManager abstract interface.
+    // Curiously-recurring template pattern (CRTP) members that
+    // implement the public Connectivity Manager interface which, on
+    // Linux, are further dispatched via one of two private
+    // implmentation pointer (PImpl) interfaces.
+
+    // Initialization
 
     CHIP_ERROR _Init();
-    void _OnPlatformEvent(const ChipDeviceEvent * event);
+
+    // Event Handling
+
+    void _OnPlatformEvent(const ChipDeviceEvent * inDeviceEvent);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    bool IsWiFiStationConnecting() const noexcept;
-    bool IsWiFiStationScanning() const noexcept;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    // Wi-Fi Control Plane Management
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    WiFiStationMode _GetWiFiStationMode();
-    CHIP_ERROR _SetWiFiStationMode(ConnectivityManager::WiFiStationMode val);
-    System::Clock::Timeout _GetWiFiStationReconnectInterval();
-    CHIP_ERROR _SetWiFiStationReconnectInterval(System::Clock::Timeout val);
-    bool _IsWiFiStationEnabled();
-    bool _IsWiFiStationConnected();
+    // Wi-Fi Station Control Plane Management
+
+    // Introspection
+
     bool _IsWiFiStationApplicationControlled();
-    bool _IsWiFiStationProvisioned();
-    void _ClearWiFiStationProvision();
+    bool _IsWiFiStationConnected();
+    bool _IsWiFiStationEnabled();
+
+    // Observation
+
+    WiFiStationMode _GetWiFiStationMode();
+
+    // Mutation
+
+    CHIP_ERROR _SetWiFiStationMode(ConnectivityManager::WiFiStationMode inWiFiStationMode);
+
+    // Wi-Fi Soft Access Point Control Plane Management
+
+    // Observation
 
     WiFiAPMode _GetWiFiAPMode();
-    CHIP_ERROR _SetWiFiAPMode(WiFiAPMode val);
-    bool _IsWiFiAPActive();
-    bool _IsWiFiAPApplicationControlled();
+
+    // Mutation
+
+    CHIP_ERROR _SetWiFiAPMode(WiFiAPMode inWiFiAPMode);
+
+    // Control
+
     void _DemandStartWiFiAP();
-    void _StopOnDemandWiFiAP();
     void _MaintainOnDemandWiFiAP();
-    System::Clock::Timeout _GetWiFiAPIdleTimeout();
-    void _SetWiFiAPIdleTimeout(System::Clock::Timeout val);
-    void NotifyWiFiConnectivityChange(ConnectivityChange change);
-    void UpdateNetworkStatus();
-    CHIP_ERROR StopAutoScan();
+    void _StopOnDemandWiFiAP();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
-    void _OnWpaProxyReady(GObject * sourceObject, GAsyncResult * res);
-    void _OnWpaInterfaceRemoved(WpaSupplicant1 * proxy, const char * path);
-    void _OnWpaInterfaceAdded(WpaSupplicant1 * proxy, const char * path, GVariant * properties);
-    void _OnWpaPropertiesChanged(WpaSupplicant1Interface * iface, GVariant * properties);
-    void _OnWpaInterfaceScanDone(WpaSupplicant1Interface * iface, gboolean success);
-    void _OnWpaInterfaceReady(GObject * sourceObject, GAsyncResult * res);
-    void _OnWpaInterfaceProxyReady(GObject * sourceObject, GAsyncResult * res);
-    CHIP_ERROR StartWiFiManagementSync();
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    WiFiPAFAdvertiseParam mPafAdvParam;
-    OnConnectionCompleteFunct mOnPafSubscribeComplete;
-    OnConnectionErrorFunct mOnPafSubscribeError;
-    WiFiPAF::WiFiPAFEndPoint mWiFiPAFEndPoint;
-    void * mAppState;
-    uint16_t mApFreq;
-    CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
-    CHIP_ERROR _WiFiPAFCancelPublish(uint32_t PublishId);
-    bool _WiFiPAFResourceAvailable() { return mPafChannelAvailable; };
-    // The resource checking is needed right before sending data packets that they are initialized and connected.
-    bool mPafChannelAvailable = true;
-#endif
+    // Wi-Fi Neighbor Awareness Networking (NAN) Unsynchronized
+    // Service Discovery (USD) / Public Action Frame (PAF)
+    // Commissioning Transport
 
-    CHIP_ERROR _GetBssInfo(const char * bssPath, NetworkCommissioning::WiFiScanResponse & result);
+    // Initialization
 
-    CHIP_ERROR _StartWiFiManagement();
-    CHIP_ERROR _StopWiFiManagement();
+    CHIP_ERROR _WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiPafRole inWiFiPafRole);
 
-    bool mAssociationStarted             = false;
-    unsigned int mAssociationRetriesLeft = 0;
+    // Introspection
 
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+    bool _WiFiPAFResourceAvailable();
+
+    // Mutation
+
+    CHIP_ERROR _SetWiFiPAFAdvertisingEnabled(bool inEnabled, uint32_t & inOutPublishId);
+    void _WiFiPafSetApFreq(const uint16_t inFrequency);
+    void _WiFiPAFSetParam(const WiFiPAFAdvertiseParam & inWiFiPAFAdvertiseParams);
+
+    // Publish-and-subscribe
+
+    CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParam & inWiFiPafAdvertiseParams);
+    CHIP_ERROR _WiFiPAFCancelPublish(uint32_t inPublishId);
+    CHIP_ERROR _WiFiPAFSubscribe(const uint16_t & inConnectionDiscriminator, void * inContext,
+                                 OnConnectionCompleteFunct inOnSuccessFunc, OnConnectionErrorFunct inOnErrorFunc);
+    CHIP_ERROR _WiFiPAFCancelSubscribe(uint32_t inSubscribeId);
+    CHIP_ERROR _WiFiPAFCancelIncompleteSubscribe();
+
+    // Data Transmission
+
+    CHIP_ERROR _WiFiPAFSend(const WiFiPAF::WiFiPAFSession & inWiFiPafSession, chip::System::PacketBufferHandle && inMessageBuffer);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+
+    // Network Management Delegate Method
+
+    void OnWiFiMediumAvailable(Internal::NetworkManagementBasis & inOutNetworkManagement, bool inAvailable) override final;
 
 private:
-    // ==================== ConnectivityManager Private Methods ====================
+    template <typename T>
+    struct Deleter
+    {
+        void operator()(T * inPointer) const noexcept;
+    };
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    void DriveAPState();
-    CHIP_ERROR ConfigureWiFiAP();
-    void ChangeWiFiAPState(WiFiAPState newState);
-    static void DriveAPState(::chip::System::Layer * aLayer, void * aAppState);
-#endif
+    using NetworkManagementUniquePtr =
+        std::unique_ptr<Internal::NetworkManagementInterface, Deleter<Internal::NetworkManagementInterface>>;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    using WiFiPafUniquePtr = std::unique_ptr<Internal::WiFiPafInterface, Deleter<Internal::WiFiPafInterface>>;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 
-    // ===== Private members reserved for use by this class only.
-
-    char mEthIfName[Inet::InterfaceId::kMaxIfNameLength];
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    ConnectivityManager::WiFiStationMode mWiFiStationMode;
-    ConnectivityManager::WiFiAPMode mWiFiAPMode;
-    WiFiAPState mWiFiAPState;
-    System::Clock::Timestamp mLastAPDemandTime;
-    System::Clock::Timeout mWiFiStationReconnectInterval;
-    System::Clock::Timeout mWiFiAPIdleTimeout;
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    char sWiFiIfName[Inet::InterfaceId::kMaxIfNameLength];
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    Internal::WiFiSSIDFixedBuffer mInterestedSSID;
-#endif
     /**
      *  A callback through which, when non-null, the Wi-Fi driver
      *  'OnFinished' method is invoked after a Wi-Fi scan is
@@ -289,6 +299,10 @@ private:
      */
     OneShotConnectCallback * mpOneShotConnectCallback;
     NetworkStatusChangeCallback * mpStatusChangeCallback;
+    NetworkManagementUniquePtr mNetworkManagementImplementation;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    WiFiPafUniquePtr mWiFiPafImplementation;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 };
 
 } // namespace DeviceLayer
