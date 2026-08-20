@@ -92,8 +92,8 @@ using ThermostatClusterType =
 
 void ApplicationShutdown()
 {
-    chip::app::Clusters::Thermostat::ServerShutdown<ThermostatClusterType>(
-        gThermostatEndpoint, MatterClusterShutdownType::kClusterShutdown);
+    chip::app::Clusters::Thermostat::ServerShutdown<ThermostatClusterType>(gThermostatEndpoint,
+                                                                           MatterClusterShutdownType::kClusterShutdown);
 }
 
 int main(int argc, char * argv[])
