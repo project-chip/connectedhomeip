@@ -99,9 +99,8 @@ void ConnectivityManagerImpl::UpdateEthernetNetworkingStatus()
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 CHIP_ERROR ConnectivityManagerImpl::SetWiFiIfName(const char * ifName)
 {
-    VerifyOrReturnError(ifName != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    size_t ifNameLen = strlen(ifName);
-    VerifyOrReturnError(1 <= ifNameLen && ifNameLen < sizeof(sWiFiIfName), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(ifName != nullptr && strlen(ifName) < sizeof(sWiFiIfName), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(ConnectivityUtils::IsValidInterface(ifName), CHIP_ERROR_INVALID_ARGUMENT);
     Platform::CopyString(sWiFiIfName, ifName);
     ChipLogProgress(DeviceLayer, "Using WiFi interface: %s", sWiFiIfName);
     return CHIP_NO_ERROR;

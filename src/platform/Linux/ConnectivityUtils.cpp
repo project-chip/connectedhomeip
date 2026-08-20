@@ -31,6 +31,7 @@
 #include <linux/sockios.h>
 #include <linux/types.h> /* for "caddr_t" et al */
 #include <linux/wireless.h>
+#include <net/if.h>
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -277,6 +278,11 @@ uint8_t MapFrequencyToChannel(const uint16_t frequency)
         return 14;
 
     return frequency / 5 - 1000;
+}
+
+bool IsValidInterface(const char * ifname)
+{
+    return ifname != nullptr && if_nametoindex(ifname) != 0;
 }
 
 InterfaceTypeEnum GetInterfaceConnectionType(const char * ifname)
