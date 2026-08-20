@@ -778,7 +778,9 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
         {
             ChipLogProgress(AppServer,
                             "ICDManager: Thread network connectivity established. Triggering/Extending ActiveMode and Check-In.");
-            bool wasPendingCheckIn         = mPendingCheckInOnNetworkAttach;
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+            bool wasPendingCheckIn = mPendingCheckInOnNetworkAttach;
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
             mPendingCheckInOnNetworkAttach = false;
             UpdateOperationState(OperationalState::ActiveMode);
 #if CHIP_CONFIG_ENABLE_ICD_CIP
@@ -786,7 +788,7 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
             {
                 SendCheckInMsgs();
             }
-#endif
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
         }
     }
 }
