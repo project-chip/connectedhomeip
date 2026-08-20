@@ -394,25 +394,46 @@ if (handler != nullptr)
 
 ## BLE Transport Integration
 
-When the build enables BLE (`CONFIG_NETWORK_LAYER_BLE`) the driver
-(`CommissioningProxyBleTransport`) drives a BTP connection through
-`chip::Ble::BleLayer`. The Linux example
-(`examples/all-devices-app/all-devices-common/device/types/commissioning-proxy/CommissioningProxyBleTransport.cpp`)
-shows the full integration:
+`CommissioningProxyBleTransport` ships with the cluster as the separate
+`ble-transport` target, so an application that proxies over another transport — or a
+platform with no BLE stack — can depend on `commissioning-proxy-server` without
+pulling in `src/ble`. It drives a BTP connection through `chip::Ble::BleLayer`:
 
 -   `Connect()` — on the first BLE connect the proxy flips its own BLE role from
-    peripheral to central via `BLEManagerImpl::SwitchToCentralMode()` (a one-way
-    switch; `IsCentralMode()` reports the state and central-mode advertising is
-    then refused), then calls `BleLayer::NewBleConnectionByDiscriminator()` to
-    open an L2CAP/BTP connection to the commissionee.
+    peripheral to central, then calls
+    `BleLayer::NewBleConnectionByDiscriminator()` to open an L2CAP/BTP connection
+    to the commissionee.
 -   `SendMessage()` — calls `BLEEndPoint::Send()` to push the tunneled
     commissioning packet over BTP.
 -   `Disconnect()` — calls `BLEEndPoint::Close()` to drop the connection.
 
-Incoming BTP messages are routed back to the cluster via a `BleProxyDelegate`
+Incoming BTP messages are routed back to the cluster via a `ProxyBleDelegate`
 (`chip::Ble::BleLayerDelegate`) that wraps the original `BleLayer` transport,
-matches the connection against the active session map, and calls
+matches the connection against the active session slots, and calls
 `host->Sessions().DispatchMessageResponse()`.
+
+### The platform adapter
+
+Two BLE operations have no portable form, so they are not in the transport:
+switching the local BLE role from peripheral to central, and driving a scan for
+commissionable devices. The application supplies both by implementing
+`CommissioningProxyBleAdapter` and passing it to the transport's constructor:
+
+```cpp
+class MyBleProxyAdapter : public CommissioningProxyBleAdapter
+{
+    CHIP_ERROR EnableCentralRole() override;
+    CHIP_ERROR StartScan(DiscoveryCallback cb, void * context) override;
+    void StopScan() override;
+};
+
+MyBleProxyAdapter gBleAdapter;
+CommissioningProxyBleTransport gBleTransport(gBleAdapter, gTimerDelegate);
+```
+
+`examples/all-devices-app/posix/linux/LinuxCommissioningProxyBleAdapter.cpp` is a
+worked implementation over `BLEManagerImpl`, wired up in that app's
+`posix/linux/DeviceFactoryPlatformOverride.cpp`.
 
 ## Wi-Fi PAF Transport Integration (planned)
 

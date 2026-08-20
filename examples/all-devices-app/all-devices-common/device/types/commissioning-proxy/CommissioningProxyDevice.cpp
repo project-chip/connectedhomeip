@@ -30,9 +30,23 @@ using namespace chip::app::Clusters::CommissioningProxy;
 namespace chip {
 namespace app {
 
+namespace {
+// Supplies the cluster's response-timeout, scan-watchdog and cache-sweep timers, and the
+// BLE transport's connect-timeout and scan-window timers. File scope rather than local to
+// Register(), because the transport is constructed with it before Register() runs.
+DefaultTimerDelegate gTimerDelegate;
+} // namespace
+
+#if CONFIG_NETWORK_LAYER_BLE
+CommissioningProxyDevice::CommissioningProxyDevice(Clusters::CommissioningProxy::CommissioningProxyBleAdapter & bleAdapter) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCommissioningByProxy, 1)),
+    mBleTransport(bleAdapter, gTimerDelegate)
+{}
+#else
 CommissioningProxyDevice::CommissioningProxyDevice() :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCommissioningByProxy, 1))
 {}
+#endif
 
 CHIP_ERROR CommissioningProxyDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                               EndpointComposition composition)
@@ -44,12 +58,9 @@ CHIP_ERROR CommissioningProxyDevice::Register(chip::EndpointId endpoint, CodeDri
 
     BitMask<Feature> features(Feature::kBackgroundScan);
 
-    // Supplies the cluster's response-timeout, scan-watchdog and cache-sweep timers.
-    static chip::app::DefaultTimerDelegate sTimerDelegate;
-
     // MaxSessions and MaxCachedResults are Fixed-quality attributes and come from
     // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS / _MAX_CACHED_RESULTS.
-    mCluster.Create(endpoint, Clusters::CommissioningProxy::CommissioningProxyCluster::Config(features), sTimerDelegate,
+    mCluster.Create(endpoint, Clusters::CommissioningProxy::CommissioningProxyCluster::Config(features), gTimerDelegate,
                     &Server::GetInstance().GetFabricTable());
 #if CONFIG_NETWORK_LAYER_BLE
     mCluster.Cluster().RegisterTransport(mBleTransport);

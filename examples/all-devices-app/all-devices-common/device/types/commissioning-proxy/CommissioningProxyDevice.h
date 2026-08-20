@@ -25,7 +25,8 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
-#include "CommissioningProxyBleTransport.h"
+#include <app/clusters/commissioning-proxy-server/CommissioningProxyBleAdapter.h>
+#include <app/clusters/commissioning-proxy-server/CommissioningProxyBleTransport.h>
 #endif
 
 namespace chip {
@@ -34,7 +35,13 @@ namespace app {
 class CommissioningProxyDevice : public SingleEndpoint
 {
 public:
+#if CONFIG_NETWORK_LAYER_BLE
+    /// @param bleAdapter platform BLE hooks for the BLE transport; must outlive this
+    ///                   device. Supplied by the platform device factory.
+    explicit CommissioningProxyDevice(Clusters::CommissioningProxy::CommissioningProxyBleAdapter & bleAdapter);
+#else
     CommissioningProxyDevice();
+#endif
     ~CommissioningProxyDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
