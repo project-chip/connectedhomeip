@@ -378,15 +378,19 @@ private:
     // Initialize mOperationalState to ActiveMode so the init sequence at bootup triggers the IdleMode behaviour first.
     OperationalState mOperationalState  = OperationalState::ActiveMode;
     bool mTransitionToIdleCalled        = false;
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     bool mPendingCheckInOnNetworkAttach = false;
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     ObjectPool<ObserverPointer, CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE> mStateObserverPool;
     uint8_t mOpenExchangeContextCount = 0;
 
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     /**
      * @brief Platform event handler to receive Thread network state and connectivity changes.
      */
     static void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     void HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event);
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
 
 #if CHIP_CONFIG_ENABLE_ICD_DSLS
     bool mSITModeRequested = false;

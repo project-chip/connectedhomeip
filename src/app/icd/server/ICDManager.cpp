@@ -85,7 +85,9 @@ void ICDManager::Init()
 #endif // CHIP_CONFIG_ENABLE_ICD_LIT
 
     SuccessOrDie(ICDNotifier::GetInstance().Subscribe(this));
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     SuccessOrDie(DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEvent, reinterpret_cast<intptr_t>(this)));
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
 
     UpdateICDMode();
     UpdateOperationState(OperationalState::IdleMode);
@@ -93,7 +95,9 @@ void ICDManager::Init()
 
 void ICDManager::Shutdown()
 {
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEvent, reinterpret_cast<intptr_t>(this));
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     ICDNotifier::GetInstance().Unsubscribe(this);
 
     // cancel any running timer of the icd
@@ -103,7 +107,9 @@ void ICDManager::Shutdown()
 
     ICDConfigurationData::GetInstance().SetICDMode(ICDConfigurationData::ICDMode::SIT);
     mOperationalState              = OperationalState::ActiveMode;
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     mPendingCheckInOnNetworkAttach = false;
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     mStateObserverPool.ReleaseAll();
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
@@ -543,7 +549,7 @@ void ICDManager::SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state)
 void ICDManager::OnIdleModeDone(System::Layer * aLayer, void * appState)
 {
     ICDManager * pICDManager = reinterpret_cast<ICDManager *>(appState);
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
     if (DeviceLayer::ConnectivityMgr().IsThreadEnabled() && !DeviceLayer::ConnectivityMgr().IsThreadAttached())
     {
         ChipLogProgress(AppServer,
@@ -551,7 +557,7 @@ void ICDManager::OnIdleModeDone(System::Layer * aLayer, void * appState)
         pICDManager->mPendingCheckInOnNetworkAttach = true;
         return;
     }
-#endif
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
     pICDManager->UpdateOperationState(OperationalState::ActiveMode);
 }
 
@@ -675,7 +681,7 @@ void ICDManager::OnSITModeRequestWithdrawal()
 
 void ICDManager::OnNetworkActivity()
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
     if (DeviceLayer::ConnectivityMgr().IsThreadEnabled() && !DeviceLayer::ConnectivityMgr().IsThreadAttached())
     {
         ChipLogProgress(AppServer,
@@ -683,7 +689,7 @@ void ICDManager::OnNetworkActivity()
         mPendingCheckInOnNetworkAttach = true;
         return;
     }
-#endif
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
     this->UpdateOperationState(OperationalState::ActiveMode);
 }
 
@@ -705,7 +711,7 @@ void ICDManager::OnSubscriptionReport()
     // Since we only mark them dirty when we enter ActiveMode, it is not necessary to update the operational state a second time.
     // Doing so will only add an ActiveModeThreshold to the active time which we don't want to do here.
     VerifyOrReturn(mOperationalState == OperationalState::IdleMode);
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
     if (DeviceLayer::ConnectivityMgr().IsThreadEnabled() && !DeviceLayer::ConnectivityMgr().IsThreadAttached())
     {
         ChipLogProgress(AppServer,
@@ -713,25 +719,26 @@ void ICDManager::OnSubscriptionReport()
         mPendingCheckInOnNetworkAttach = true;
         return;
     }
-#endif
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
     this->UpdateOperationState(OperationalState::ActiveMode);
 }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 void ICDManager::OnSendCheckIn(Optional<Access::SubjectDescriptor> specificSubject)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
     if (DeviceLayer::ConnectivityMgr().IsThreadEnabled() && !DeviceLayer::ConnectivityMgr().IsThreadAttached())
     {
         ChipLogProgress(AppServer, "ICDManager: Thread network not attached on send check-in. Deferring until attached.");
         mPendingCheckInOnNetworkAttach = true;
         return;
     }
-#endif
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
     SendCheckInMsgs(specificSubject);
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
 void ICDManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
     ICDManager * pICDManager = reinterpret_cast<ICDManager *>(arg);
@@ -783,6 +790,7 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
         }
     }
 }
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
 
 void ICDManager::ExtendActiveMode(Milliseconds16 extendDuration)
 {

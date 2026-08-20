@@ -1317,6 +1317,7 @@ TEST_F(TestICDManager, TestShortIdleModeBehaviorSITvsLIT)
 //     ICDConfigurationData::GetInstance().SetModeDurations(MakeOptional(oldActiveModeDuration), NullOptional);
 // }
 
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
 TEST_F(TestICDManager, TestDeferredActiveModeOnThreadAttach)
 {
     // Ensure we start in IdleMode
@@ -1407,6 +1408,7 @@ TEST_F(TestICDManager, TestDeferredActiveModeOnPeriodicIdleWakeUp)
     // ActiveMode should now be triggered upon Thread attach!
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
 }
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
 
 } // namespace app
 } // namespace chip
