@@ -57,26 +57,24 @@ CHIP_ERROR LoggingRvcOperationalStateDelegate::GetOperationalStateAtIndex(size_t
 
 void LoggingRvcOperationalStateDelegate::ClearDockChargingTracking()
 {
-    mCharging = false;
-    mDocked   = false;
+    mPhysicalDockState = PhysicalDockState::kOffDock;
 }
 
 void LoggingRvcOperationalStateDelegate::SetDeviceToIdleState()
 {
     VerifyOrReturn(mCluster != nullptr);
 
-    if (mCharging)
+    switch (mPhysicalDockState)
     {
-        mDocked = true;
+    case PhysicalDockState::kOnDockCharging:
         LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kCharging)));
-    }
-    else if (mDocked)
-    {
+        break;
+    case PhysicalDockState::kOnDock:
         LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kDocked)));
-    }
-    else
-    {
+        break;
+    case PhysicalDockState::kOffDock:
         LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(OperationalStateEnum::kStopped)));
+        break;
     }
 }
 
@@ -182,18 +180,11 @@ void LoggingRvcOperationalStateDelegate::HandleCharged()
         return;
     }
 
-    mCharging = false;
+    mPhysicalDockState = PhysicalDockState::kOnDock;
 
     if (mRunModeCluster && mRunModeCluster->GetCurrentMode() == kRunModeIdle)
     {
-        if (mDocked)
-        {
-            LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kDocked)));
-        }
-        else
-        {
-            LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(OperationalStateEnum::kStopped)));
-        }
+        LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kDocked)));
     }
     else
     {
@@ -211,7 +202,7 @@ void LoggingRvcOperationalStateDelegate::HandleCharging()
         return;
     }
 
-    mCharging = true;
+    mPhysicalDockState = PhysicalDockState::kOnDockCharging;
     LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kCharging)));
 }
 
@@ -225,7 +216,7 @@ void LoggingRvcOperationalStateDelegate::HandleDocked()
         return;
     }
 
-    mDocked = true;
+    mPhysicalDockState = PhysicalDockState::kOnDock;
     LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kDocked)));
 }
 
@@ -239,8 +230,7 @@ void LoggingRvcOperationalStateDelegate::HandleChargerFound()
         return;
     }
 
-    mCharging = true;
-    mDocked   = true;
+    mPhysicalDockState = PhysicalDockState::kOnDockCharging;
     LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kCharging)));
 }
 

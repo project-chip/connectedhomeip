@@ -21,6 +21,7 @@
 #include <app/clusters/service-area-server/ServiceAreaCluster.h>
 #include <clusters/RvcOperationalState/Enums.h>
 #include <device/capabilities/operational-state/impl/LoggingOperationalStateDelegate.h>
+#include <cstdint>
 #include <string>
 
 namespace chip::app::Clusters::ServiceArea {
@@ -28,6 +29,14 @@ class LoggingServiceAreaDelegate;
 } // namespace chip::app::Clusters::ServiceArea
 
 namespace chip::app::Clusters::OperationalState {
+
+// Tracks whether the simulated robot is on the charging dock.
+enum class PhysicalDockState : uint8_t
+{
+    kOffDock,
+    kOnDock,
+    kOnDockCharging,
+};
 
 class LoggingRvcOperationalStateDelegate : public LoggingOperationalStateDelegate
 {
@@ -59,8 +68,7 @@ public:
     void HandleClearError();
     void HandleErrorEvent(const std::string & error);
 
-    // Clears dock/charge simulation flags when leaving dock/charge for Running,
-    // mirroring examples/rvc-app/rvc-common/src/rvc-device.cpp HandleRvcRunChangeToMode().
+    // Clears physical dock state when RunMode leaves dock/charge for Running.
     void ClearDockChargingTracking();
 
 private:
@@ -71,8 +79,7 @@ private:
     ServiceArea::ServiceAreaCluster * mServiceAreaCluster          = nullptr;
     ServiceArea::LoggingServiceAreaDelegate * mServiceAreaDelegate = nullptr;
     uint8_t mStateBeforePause                                      = 0;
-    bool mDocked                                                   = false;
-    bool mCharging                                                 = false;
+    PhysicalDockState mPhysicalDockState                           = PhysicalDockState::kOffDock;
 };
 
 } // namespace chip::app::Clusters::OperationalState
