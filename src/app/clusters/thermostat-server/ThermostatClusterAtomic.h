@@ -36,12 +36,6 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-enum class AtomicWriteState
-{
-    Closed = 0,
-    Open,
-};
-
 class AtomicWriteSession
 {
 public:
@@ -61,6 +55,12 @@ public:
         virtual bool HasAttribute(chip::AttributeId attributeId)                                                     = 0;
     };
 
+    enum class State
+    {
+        Closed = 0,
+        Open,
+    };
+
     /**
      * @brief Sets the atomic write state for the given originatorNodeId
      *
@@ -71,7 +71,7 @@ public:
      * @return false if it was unable to update the atomic write state
      */
     bool
-    SetAtomicWrite(ScopedNodeId originatorNodeId, AtomicWriteState state,
+    SetAtomicWrite(ScopedNodeId originatorNodeId, State state,
                    Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
 
     std::optional<DataModel::ActionReturnStatus> BeginAtomicWrite(CommandHandler * commandObj,
@@ -136,7 +136,7 @@ public:
     void SetDelegate(Delegate * delegate) { mDelegate = delegate; }
 
 private:
-    AtomicWriteState mWriteState = AtomicWriteState::Closed;
+    State mState = State::Closed;
     Platform::ScopedMemoryBufferWithSize<AttributeId> mAttributeIds;
     ScopedNodeId mNodeId;
 

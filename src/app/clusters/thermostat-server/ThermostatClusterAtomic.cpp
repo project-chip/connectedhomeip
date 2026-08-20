@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "ThermostatCluster.h"
+#include "ThermostatClusterAtomic.h"
 
 #include <app/GlobalAttributes.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -115,7 +115,7 @@ bool CountAttributeRequests(const DataModel::DecodableList<chip::AttributeId> at
 bool AtomicWriteSession::InAtomicWrite(Optional<AttributeId> attributeId)
 {
 
-    if (mWriteState != AtomicWriteState::Open)
+    if (mState != State::Open)
     {
         return false;
     }
@@ -157,7 +157,7 @@ bool AtomicWriteSession::InAtomicWrite(CommandHandler * commandObj,
                                        Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> & attributeStatuses)
 {
 
-    if (mWriteState != AtomicWriteState::Open)
+    if (mState != State::Open)
     {
         return false;
     }
@@ -186,19 +186,19 @@ bool AtomicWriteSession::InAtomicWrite(CommandHandler * commandObj,
     return true;
 }
 
-bool AtomicWriteSession::SetAtomicWrite(ScopedNodeId originatorNodeId, AtomicWriteState state,
+bool AtomicWriteSession::SetAtomicWrite(ScopedNodeId originatorNodeId, State state,
                                         Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> & attributeStatuses)
 {
 
     if (!mAttributeIds.Alloc(attributeStatuses.AllocatedSize()))
     {
-        mWriteState = AtomicWriteState::Closed;
-        mNodeId     = ScopedNodeId();
+        mState  = State::Closed;
+        mNodeId = ScopedNodeId();
         return false;
     }
 
-    mWriteState = state;
-    mNodeId     = originatorNodeId;
+    mState  = state;
+    mNodeId = originatorNodeId;
 
     for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
     {
@@ -211,8 +211,8 @@ void AtomicWriteSession::ResetAtomicWrite()
 {
     ClearTimer(this);
 
-    mWriteState = AtomicWriteState::Closed;
-    mNodeId     = ScopedNodeId();
+    mState  = State::Closed;
+    mNodeId = ScopedNodeId();
     mAttributeIds.Free();
 }
 
@@ -307,7 +307,7 @@ AtomicWriteSession::BeginAtomicWrite(CommandHandler * commandObj, const Concrete
 
     if (status == Status::Success)
     {
-        if (!SetAtomicWrite(GetSourceScopedNodeId(commandObj), AtomicWriteState::Open, attributeStatuses))
+        if (!SetAtomicWrite(GetSourceScopedNodeId(commandObj), State::Open, attributeStatuses))
         {
             for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
             {
