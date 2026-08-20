@@ -1015,6 +1015,40 @@ TEST_F(TestAmbientContextSensingCluster, TestObjectCountConfigRequiresLabelWithM
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// A write that changes only mfgCode still changes the attribute: the same tag under a different
+// manufacturer namespace denotes a different object.
+TEST_F(TestAmbientContextSensingCluster, TestObjectCountConfigMfgCodeOnlyChangeIsStored)
+{
+    chip::Testing::TestServerClusterContext context;
+    AmbientContextSensingCluster cluster{ kTestEndpointId,
+                                          AmbientContextSensingCluster::Config{ mMockTimerDelegate }.WithFeatures(
+                                              BitMask<AmbientContextSensing::Feature>(kFeaturesAllForACSTest)) };
+    ASSERT_SUCCESS(cluster.Startup(context.Get()));
+
+    static constexpr char kLabel[] = "counted";
+
+    ObjectCountConfigType config;
+    config.countingObject.mfgCode     = DataModel::MakeNullable(VendorId::TestVendor1);
+    config.countingObject.namespaceID = kNamespaceIdentifiedObject;
+    config.countingObject.tag         = static_cast<uint8_t>(TagIdentifiedObject::kAdult);
+    config.countingObject.label       = MakeOptional(DataModel::MakeNullable(CharSpan::fromCharString(kLabel)));
+    config.objectCountThreshold       = 5;
+    EXPECT_TRUE(cluster.SetObjectCountConfig(config).IsSuccess());
+
+    // Only mfgCode differs from the stored value.
+    config.countingObject.mfgCode = DataModel::MakeNullable(VendorId::TestVendor2);
+    EXPECT_TRUE(cluster.SetObjectCountConfig(config).IsSuccess());
+
+    chip::Testing::ClusterTester tester(cluster);
+    Attributes::ObjectCountConfig::TypeInfo::DecodableType readBack;
+    ASSERT_EQ(tester.ReadAttribute(Attributes::ObjectCountConfig::Id, readBack), CHIP_NO_ERROR);
+
+    ASSERT_FALSE(readBack.countingObject.mfgCode.IsNull());
+    EXPECT_EQ(readBack.countingObject.mfgCode.Value(), VendorId::TestVendor2);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 // A write that changes only the label still changes the attribute and must be stored and reported.
 TEST_F(TestAmbientContextSensingCluster, TestObjectCountConfigLabelOnlyChangeIsStored)
 {

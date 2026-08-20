@@ -39,6 +39,11 @@ bool IsLabelEqual(const Optional<DataModel::Nullable<CharSpan>> & a, const Optio
     return a.Value().IsNull() || a.Value().Value().data_equal(b.Value().Value());
 }
 
+bool IsSemanticTagEqual(const SemanticTagType & a, const SemanticTagType & b)
+{
+    return a.mfgCode == b.mfgCode && a.namespaceID == b.namespaceID && a.tag == b.tag && IsLabelEqual(a.label, b.label);
+}
+
 } // namespace
 
 AmbientContextSensingCluster::AmbientContextSensingCluster(EndpointId endpointId, const Config & config) :
@@ -330,10 +335,8 @@ DataModel::ActionReturnStatus AmbientContextSensingCluster::SetObjectCountConfig
         VerifyOrReturnError(newLabel.size() <= kMaxSemanticTagLabelLength, Protocols::InteractionModel::Status::ConstraintError);
     }
 
-    if (newObjectCountConfig.countingObject.namespaceID != mObjectCountConfig.countingObject.namespaceID ||
-        newObjectCountConfig.countingObject.tag != mObjectCountConfig.countingObject.tag ||
-        newObjectCountConfig.objectCountThreshold != mObjectCountConfig.objectCountThreshold ||
-        !IsLabelEqual(newLabelField, mObjectCountConfig.countingObject.label))
+    if (!IsSemanticTagEqual(newObjectCountConfig.countingObject, mObjectCountConfig.countingObject) ||
+        newObjectCountConfig.objectCountThreshold != mObjectCountConfig.objectCountThreshold)
     {
         mObjectCountConfig = newObjectCountConfig;
 
