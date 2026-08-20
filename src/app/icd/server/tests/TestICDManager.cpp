@@ -1332,7 +1332,7 @@ TEST_F(TestICDManager, TestShortIdleModeBehaviorSITvsLIT)
 
 /**
  * ============================================================================
- * Exhaustive Unit Test Suite Covering All 14 Execution Sequences & Corner Cases
+ * Exhaustive Unit Test Suite Covering All 15 Execution Sequences & Corner Cases
  * (Matter LIT ICD Stability & Thread Network Resilience Architecture)
  * ============================================================================
  */
@@ -1621,6 +1621,38 @@ TEST_F(TestICDManager, TestScenario14_DeviceShutdown_LifecycleReset)
 
     // Step 4: Re-initialize ICDManager
     mICDManager.Init();
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
+}
+
+// ----------------------------------------------------------------------------
+// Group F: ICD Device Reboot & Power Cycle (Sequence 15)
+// ----------------------------------------------------------------------------
+
+TEST_F(TestICDManager, TestScenario15_DeviceReboot_ColdBoot_DeferredIfDetached)
+{
+    // Step 1: Simulate cold boot / reboot initialization (Shutdown -> Init)
+    mICDManager.Shutdown();
+    mICDManager.Init();
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
+
+    // Step 2: At bootup (kServerReady), TriggerCheckInMessages is called when Thread is detached
+    // Setting pending flag simulates the unattached bootup deferral
+    SetPendingCheckInOnNetworkAttach(true);
+
+    // Step 3: Verify the device stays in low-power IdleMode (deep sleep) while Thread is attaching
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
+
+    // Step 4: OpenThread finishes MLE attach in background -> kConnectivity_Established fires
+    DeviceLayer::ChipDeviceEvent event{ .Type                     = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
+                                        .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Established } };
+    HandlePlatformEvent(&event);
+    AdvanceClockAndRunEventLoop(100_ms);
+
+    // Step 5: Verify device enters ActiveMode and flushes the deferred bootup Check-In
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
+
+    // Step 6: ActiveMode completes -> returns to IdleMode
+    AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetActiveModeDuration() + 1_ms32);
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 }
 
