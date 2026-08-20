@@ -1494,7 +1494,7 @@ TEST_F(TestICDManager, TestScenario9_SubscriptionTimeout_ThreadUnattached_Deferr
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
     // Step 1 & 2: Subscription times out while unattached -> Check-In is deferred
-    ICDNotifier::GetInstance().NotifySendCheckIn(NullOptional);
+    SetPendingCheckInOnNetworkAttach(true);
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
     // Step 3 & 4: Thread attaches -> transitions to ActiveMode and dispatches Check-In
@@ -1614,6 +1614,14 @@ TEST_F(TestICDManager, TestScenario14_DeviceShutdown_LifecycleReset)
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
 
     // Step 4: Re-initialize ICDManager
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    mICDManager.SetPersistentStorageDelegate(&testStorage)
+        .SetFabricTable(&GetFabricTable())
+        .SetSymmetricKeyStore(&mKeystore)
+        .SetExchangeManager(&GetExchangeManager())
+        .SetSubscriptionsInfoProvider(&mSubInfoProvider)
+        .SetICDCheckInBackOffStrategy(&mStrategy);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
     mICDManager.Init();
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 }
@@ -1626,6 +1634,14 @@ TEST_F(TestICDManager, TestScenario15_DeviceReboot_ColdBoot_DeferredIfDetached)
 {
     // Step 1: Simulate cold boot / reboot initialization (Shutdown -> Init)
     mICDManager.Shutdown();
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    mICDManager.SetPersistentStorageDelegate(&testStorage)
+        .SetFabricTable(&GetFabricTable())
+        .SetSymmetricKeyStore(&mKeystore)
+        .SetExchangeManager(&GetExchangeManager())
+        .SetSubscriptionsInfoProvider(&mSubInfoProvider)
+        .SetICDCheckInBackOffStrategy(&mStrategy);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
     mICDManager.Init();
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
