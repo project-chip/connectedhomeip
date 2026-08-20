@@ -26,12 +26,14 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <ifaddrs.h>
+#include <net/if.h> // must precede <linux/*.h>
+
 #include <linux/ethtool.h>
 #include <linux/if_link.h>
 #include <linux/sockios.h>
 #include <linux/types.h> /* for "caddr_t" et al */
 #include <linux/wireless.h>
-#include <net/if.h>
+
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
