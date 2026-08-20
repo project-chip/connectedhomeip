@@ -37,6 +37,26 @@ source_set("icd") {
 
   deps = [
     "${chip_root}/src/app/icd/server:notifier",
+<<<<<<< HEAD
     "${shell_dependency_path}:matter-shell",
+=======
+  ]
+}
+
+source_set("im") {
+  sources = [
+    "${chip_root}/examples/platform/silabs/subscription/SubscriptionManager.cpp",
+    "${chip_root}/examples/platform/silabs/subscription/SubscriptionManager.h",
+    "./im/IMShellCommands.cpp",
+    "./im/IMShellCommands.h",
+  ]
+
+  public_configs = [ ":im-shell-config" ]
+
+  deps = [
+    ":matter-shell",
+    "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/server:server",
+>>>>>>> 40c86a30e5 ([silabs] Implement a subscription manager (Auto-merged by platform-bot))
   ]
 }
