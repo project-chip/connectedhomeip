@@ -1124,8 +1124,10 @@ void CommandHandlerImpl::RecordTargetedEndpoint(EndpointId endpointId)
     else
     {
         // This branch should not be reachable in practice:
-        // - For unicast invokes, the number of distinct targeted endpoints cannot exceed the max paths per invoke (kMaxTargetedEndpoints).
-        // - For groupcast invokes, RecordTargetedEndpoint is not called because groupcast defers reports globally via an empty span.
+        // - For unicast invokes, the number of distinct targeted endpoints cannot exceed the max paths per invoke
+        // (kMaxTargetedEndpoints).
+        // - For groupcast invokes, RecordTargetedEndpoint is not called because groupcast defers reports globally via an empty
+        // span.
         ChipLogError(DataManagement, "Too many targeted endpoints in invoke, capping at %u",
                      static_cast<unsigned int>(kMaxTargetedEndpoints));
     }
@@ -1141,9 +1143,8 @@ void CommandHandlerImpl::TriggerDelayReport(const InvokeRequestMessage::DelayRep
         delayMs += (chip::Crypto::GetRandU32() % aDelayReportData.delayJitterWindowMs);
     }
     // An empty targetedEndpoints span indicates a global deferral across all endpoints on the node for groupcast requests.
-    Span<const EndpointId> targetedEndpoints = IsGroupRequest()
-        ? Span<const EndpointId>()
-        : Span<const EndpointId>(mTargetedEndpoints, mNumTargetedEndpoints);
+    Span<const EndpointId> targetedEndpoints =
+        IsGroupRequest() ? Span<const EndpointId>() : Span<const EndpointId>(mTargetedEndpoints, mNumTargetedEndpoints);
     mpCallback->OnDelayReport(System::Clock::Milliseconds32(delayMs), targetedEndpoints);
 }
 
