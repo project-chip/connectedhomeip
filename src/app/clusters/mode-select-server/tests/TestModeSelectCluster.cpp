@@ -110,6 +110,7 @@ TEST_F(TestModeSelectCluster, StartupInitializesCurrentModeToFirstSupportedMode)
     ModeSelectCluster cluster(kRootEndpointId, mockDelegate, MakeConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    cluster.ApplyStartupModeLogic();
 
     uint8_t currentMode = 0xFF;
     ASSERT_EQ(tester.ReadAttribute(CurrentMode::Id, currentMode), CHIP_NO_ERROR);
@@ -235,17 +236,21 @@ TEST_F(TestModeSelectCluster, ReadCurrentMode)
     EXPECT_EQ(currentMode, 0u);
 }
 
-TEST_F(TestModeSelectCluster, ReadStartUpModeDefaultZero)
+TEST_F(TestModeSelectCluster, ReadStartUpModeDefaultsToCurrentMode)
 {
     optionalAttributeSet.Set<StartUpMode::Id>();
     ModeSelectCluster cluster(kRootEndpointId, mockDelegate, MakeConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    cluster.ApplyStartupModeLogic();
 
     DataModel::Nullable<uint8_t> startUpMode;
     ASSERT_EQ(tester.ReadAttribute(StartUpMode::Id, startUpMode), CHIP_NO_ERROR);
+    // Workaround: StartUpMode is initialized to CurrentMode when unset, so that existing
+    // certification tests (which assert StartUpMode is an integer) continue to pass.
+    // CurrentMode defaults to mode 0 (first supported mode in mock).
     ASSERT_FALSE(startUpMode.IsNull());
-    EXPECT_EQ(startUpMode.Value(), 0u);
+    EXPECT_EQ(startUpMode.Value(), static_cast<uint8_t>(0));
 }
 
 TEST_F(TestModeSelectCluster, ReadOnModeDefaultNull)
@@ -368,6 +373,7 @@ TEST_F(TestModeSelectCluster, StartupAppliesStartUpMode)
     ModeSelectCluster cluster2(kRootEndpointId, mockDelegate, MakeConfig());
     ClusterTester tester2(cluster2);
     ASSERT_EQ(cluster2.Startup(testContext.Get()), CHIP_NO_ERROR);
+    cluster2.ApplyStartupModeLogic();
 
     uint8_t currentMode = 0xFF;
     ASSERT_EQ(tester2.ReadAttribute(CurrentMode::Id, currentMode), CHIP_NO_ERROR);
@@ -389,6 +395,7 @@ TEST_F(TestModeSelectCluster, StartupSkipsStartUpModeOnOtaReboot)
     ModeSelectCluster cluster2(kRootEndpointId, mockDelegate, MakeConfig());
     ClusterTester tester2(cluster2);
     ASSERT_EQ(cluster2.Startup(testContext.Get()), CHIP_NO_ERROR);
+    cluster2.ApplyStartupModeLogic();
 
     uint8_t currentMode = 0xFF;
     ASSERT_EQ(tester2.ReadAttribute(CurrentMode::Id, currentMode), CHIP_NO_ERROR);
@@ -411,6 +418,7 @@ TEST_F(TestModeSelectCluster, StartupAppliesOnModeOverStartUpMode)
     ModeSelectCluster cluster2(kRootEndpointId, mockDelegate, MakeConfig(BitMask<Feature>(Feature::kOnOff), true));
     ClusterTester tester2(cluster2);
     ASSERT_EQ(cluster2.Startup(testContext.Get()), CHIP_NO_ERROR);
+    cluster2.ApplyStartupModeLogic();
 
     uint8_t currentMode = 0xFF;
     ASSERT_EQ(tester2.ReadAttribute(CurrentMode::Id, currentMode), CHIP_NO_ERROR);

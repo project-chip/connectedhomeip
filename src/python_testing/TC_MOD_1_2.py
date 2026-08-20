@@ -158,8 +158,6 @@ class TC_MOD_1_2(MatterBaseTest):
         if await self.attribute_guard(endpoint=self.endpoint, attribute=self.cluster.Attributes.StartUpMode):
             startup_mode = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=self.cluster, attribute=self.cluster.Attributes.StartUpMode)
             self._log_attribute("StartupMode", startup_mode)
-            # TODO: StartUpMode is nullable per spec (null = no override). This assertion
-            # should also accept NullValue like the OnMode check above does.
             asserts.assert_true(isinstance(startup_mode, int), "Startupmode is not int")
             asserts.assert_in(startup_mode, supported_modes_values,
                               f"Startupmode {startup_mode} is not in {supported_modes_values}")

@@ -74,11 +74,33 @@ private:
     EndpointId mEndpointId = kInvalidEndpointId;
 };
 
+// Subclass that handles the deferred ApplyStartupModeLogic() call.
+// ModeSelectCluster itself has no knowledge of the global SupportedModesManager
+// or the ordering between Server::Init and ApplicationInit. This subclass
+// encapsulates that codegen-integration-specific concern.
+class CodegenModeSelectCluster : public ModeSelectCluster
+{
+public:
+    using ModeSelectCluster::ModeSelectCluster;
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override
+    {
+        ReturnErrorOnFailure(ModeSelectCluster::Startup(context));
+        // If the global manager is already set (typical case), apply startup logic now.
+        // Otherwise setSupportedModesManager() will call ApplyStartupModeLogic() later.
+        if (sSupportedModesManager != nullptr)
+        {
+            ApplyStartupModeLogic();
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
 struct ModeSelectEntry
 {
     char descriptionBuffer[64]; // persistent backing store for Description attribute
     SupportedModesManagerDelegate delegate;
-    LazyRegisteredServerCluster<ModeSelectCluster> server;
+    LazyRegisteredServerCluster<CodegenModeSelectCluster> server;
 };
 
 constexpr size_t kFixedClusterCount = ModeSelect::StaticApplicationConfig::kFixedClusterConfig.size();

@@ -513,7 +513,6 @@
             "global_struct",
             "nullable_global_struct"
         ],
-        "User Label": ["LabelList", "ClusterRevision", "FeatureMap"],
         "Flow Measurement": ["ClusterRevision", "FeatureMap", "MeasuredValue"],
         "Temperature Measurement": [
             "ClusterRevision",
@@ -1008,6 +1007,7 @@
             "FeatureMap"
         ],
         "Unit Localization": ["ClusterRevision", "TemperatureUnit"],
+        "User Label": ["LabelList", "ClusterRevision", "FeatureMap"],
         "Localization Configuration": ["ClusterRevision", "SupportedLocales"],
         "TLS Certificate Management": [
             "ClusterRevision",
