@@ -49,6 +49,7 @@ namespace app {
 
 // Forward declaration of TestICDManager tests to allow it to be friend with ICDManager
 // Used in unit tests
+class TestICDManager;
 class TestICDManager_TestShouldCheckInMsgsBeSentAtActiveModeFunction_Test;
 
 /**
@@ -269,6 +270,7 @@ public:
 
 private:
     // TODO : Once <gtest/gtest_prod.h> can be included, use FRIEND_TEST for the friend class.
+    friend class TestICDManager;
     friend class TestICDManager_TestShouldCheckInMsgsBeSentAtActiveModeFunction_Test;
 
     /**
