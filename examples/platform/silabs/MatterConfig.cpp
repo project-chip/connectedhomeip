@@ -18,12 +18,15 @@
  */
 
 #include "AppConfig.h"
+#if !defined(SL_MATTER_CUSTOM_APPTASK) || !SL_MATTER_CUSTOM_APPTASK
 #include "BaseApplication.h"
+#endif // !SL_MATTER_CUSTOM_APPTASK
 #include <MatterConfig.h>
 #include <cmsis_os2.h>
 
 #include <mbedtls/platform.h>
 
+<<<<<<< HEAD
 #ifdef SL_WIFI
 #include <platform/silabs/NetworkCommissioningWiFiDriver.h>
 #include <platform/silabs/wifi/WifiInterface.h>
@@ -40,6 +43,26 @@
 
 #if PW_RPC_ENABLED
 #include "Rpc.h"
+=======
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#if defined(SL_MATTER_EM4_SLEEP) && (SL_MATTER_EM4_SLEEP == 1)
+#include "sl_sleeptimer.h"
+#include <app/icd/server/ICDConfigurationData.h> // nogncheck
+
+#include "em_burtc.h"
+#include "em_cmu.h"
+#include "em_emu.h"
+#endif // defined(SL_MATTER_EM4_SLEEP) && (SL_MATTER_EM4_SLEEP == 1)
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+#include <sl_component_catalog.h>
+#ifdef SL_CATALOG_WATCHDOG_MANAGER_PRESENT
+#include <sl_watchdog_manager.h>
+#endif // SL_CATALOG_WATCHDOG_MANAGER_PRESENT
+
+#if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
+#include "pigweed_rpc/Rpc.h"
+>>>>>>> 2e6ff66c11 ([Silabs] Update App logic (#73620))
 #endif
 
 #ifdef ENABLE_CHIP_SHELL
@@ -100,7 +123,20 @@ using namespace ::chip::Credentials;
 using namespace chip::DeviceLayer::Silabs;
 
 #ifdef SL_WIFI
+#include <platform/silabs/NetworkCommissioningWiFiDriver.h>
+#include <platform/silabs/wifi/WifiInterface.h> // nogncheck
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <platform/silabs/wifi/icd/WifiSleepManager.h> // nogncheck
+
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+#if !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::SlWiFiDriver> sWifiNetworkDriver(kRootEndpointId);
+<<<<<<< HEAD
+=======
+#endif // !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
+>>>>>>> 2e6ff66c11 ([Silabs] Update App logic (#73620))
 #endif /* SL_WIFI */
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -137,7 +173,11 @@ void UnlockOpenThreadTask(void)
 // ================================================================================
 CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
 {
+<<<<<<< HEAD
     ChipLogProgress(DeviceLayer, "Initializing OpenThread stack");
+=======
+
+>>>>>>> 2e6ff66c11 ([Silabs] Update App logic (#73620))
     ReturnErrorOnFailure(ThreadStackMgr().InitThreadStack());
 
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
@@ -206,7 +246,20 @@ void ApplicationStart(void * unused)
 
 void SilabsMatterConfig::AppInit()
 {
+<<<<<<< HEAD
     GetPlatform().Init();
+=======
+#ifdef SL_WIFI
+    // Init Chip memory management before the stack for Wi-Fi platforms
+    // Because OpenThread needs to use memory allocation during its Key operations, we initialize the memory management for thread
+    // and set the allocation functions inside sl_ot_create_instance, which is called earlier by sl_system_init.
+    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
+    VerifyOrDie(chip::Platform::MemoryInit() == CHIP_NO_ERROR);
+#endif // SL_WIFI
+
+    TEMPORARY_RETURN_IGNORED GetPlatform().Init();
+
+>>>>>>> 2e6ff66c11 ([Silabs] Update App logic (#73620))
     sMainTaskHandle = osThreadNew(ApplicationStart, nullptr, &kMainTaskAttr);
     ChipLogProgress(DeviceLayer, "Starting scheduler");
     VerifyOrDie(sMainTaskHandle); // We can't proceed if the Main Task creation failed.
@@ -257,10 +310,21 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif // SL_WIFI
 
+<<<<<<< HEAD
     ReturnErrorOnFailure(PlatformMgr().InitChipStack());
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);
 
+=======
+    err = PlatformMgr().InitChipStack();
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err,
+                        ChipLogError(DeviceLayer, "Failed to Init Chip Stack: %" CHIP_ERROR_FORMAT, err.Format()));
+#if CONFIG_NETWORK_LAYER_BLE
+    err = chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err,
+                        ChipLogError(DeviceLayer, "Failed to Set BLE Device Name: %" CHIP_ERROR_FORMAT, err.Format()));
+#endif
+>>>>>>> 2e6ff66c11 ([Silabs] Update App logic (#73620))
     // Provision Manager
     Silabs::Provision::Manager & provision = Silabs::Provision::Manager::GetInstance();
     ReturnErrorOnFailure(provision.Init());
@@ -279,6 +343,32 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     // TODO: replace with our own init param to avoid double allocation in examples
     static chip::CommonCaseDeviceServerInitParams initParams;
 
+<<<<<<< HEAD
+=======
+#if CHIP_ENABLE_OPENTHREAD
+    ReturnErrorOnFailure(InitOpenThread());
+
+    // Set up OpenThread configuration when OpenThread is included
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    nativeParams.lockCb                = LockOpenThreadTask;
+    nativeParams.unlockCb              = UnlockOpenThreadTask;
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
+#endif // CHIP_ENABLE_OPENTHREAD
+#if !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL && defined(SL_WIFI)
+    // This must be initialized after InitWiFiStack and InitChipStack which enable communication between the TA an M4
+    // This is required for TA nvm access used by the sWifiNetworkDriver.
+    ReturnErrorOnFailure(sWifiNetworkDriver.Init());
+#endif // !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL && defined(SL_WIFI)
+
+    // Verify if the platform is updated by reading the NVM3 config value. This needs to be done after the wifi network driver
+    // initialization, as the 917 nvm is accessed through the TA, and the communication between the M4 and the TA is available at
+    // this point. For thread devices, this needs to be after InitChipStack.
+    ReturnErrorOnFailure(GetPlatform().VerifyIfUpdated());
+    // Stop Matter event handling while setting up resources
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+
+>>>>>>> 2e6ff66c11 ([Silabs] Update App logic (#73620))
     // Report scheduler and timer delegate instance
     static DefaultTimerDelegate sTimerDelegate;
 #if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
@@ -316,7 +406,17 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
 #endif
 
+<<<<<<< HEAD
     initParams.appDelegate = &BaseApplication::sAppDelegate;
+=======
+#if !defined(SL_MATTER_CUSTOM_APPTASK) || !SL_MATTER_CUSTOM_APPTASK
+    initParams.appDelegate = &BaseApplication::sAppDelegate;
+#endif // !SL_MATTER_CUSTOM_APPTASK
+    // This is needed by localization configuration cluster so we set it before the initialization
+    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
+>>>>>>> 2e6ff66c11 ([Silabs] Update App logic (#73620))
     // Init Matter Server and Start Event Loop
     err = chip::Server::GetInstance().Init(initParams);
 
