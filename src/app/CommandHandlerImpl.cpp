@@ -1125,6 +1125,11 @@ void CommandHandlerImpl::RecordTargetedEndpoint(EndpointId endpointId)
     }
     else
     {
+        // When the targeted endpoints array overflows, we cap the array and log an error
+        // rather than falling back to deferring all endpoints on the node. Deferring all
+        // endpoints could inadvertently delay critical or safety-sensitive endpoints (such
+        // as locks or alarm sensors on a bridge) that were not targeted by this invoke,
+        // which would present a denial-of-service / responsiveness issue.
         ChipLogError(DataManagement, "Too many targeted endpoints in invoke, capping at %u",
                      static_cast<unsigned int>(kMaxTargetedEndpoints));
     }
