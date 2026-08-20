@@ -210,6 +210,7 @@ void WiFiManagerUbus::OnWirelessNetworksUpdate(blob_attr * msg)
     blob_attr * cur    = nullptr;
     blob_attr * i      = nullptr;
     blob_attr * radio  = nullptr;
+    blob_attr * backup = nullptr;
     int rem            = 0;
     int r              = 0;
 
@@ -258,6 +259,15 @@ void WiFiManagerUbus::OnWirelessNetworksUpdate(blob_attr * msg)
             radio = cur;
             break;
         }
+        if (!radio_is_invalid && backup == nullptr)
+        {
+            backup = cur;
+        }
+    }
+    if (radio == nullptr && backup != nullptr)
+    {
+        ChipLogError(AppServer, "Specified radio %s does not exist, falling back on first valid radio", mDesiredRadio.c_str());
+        radio = backup;
     }
     VerifyOrReturn(radio != nullptr, ChipLogError(AppServer, "No valid radio found!"));
     char * ssid = nullptr;
