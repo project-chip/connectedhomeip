@@ -36,6 +36,13 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
+/****************************************************************************
+ * @file
+ * @brief APIs for managing atomic write sessions for the Thermostat cluster.
+ *
+ * Tracks active atomic write operations associated with a particular subject descriptor,
+ * locking out other writers until the write is committed, rolled back, or times out
+ ******************************************************************************/
 class AtomicWriteSession
 {
 public:
@@ -74,12 +81,35 @@ public:
     SetAtomicWrite(ScopedNodeId originatorNodeId, State state,
                    Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
 
+    /**
+     * @brief Processes a request to begin an atomic write operation
+     * @param[in] commandObj The CommandHandler for the invoked AtomicRequest
+     * @param[in] commandPath The ConcreteCommandPath for the invoked AtomicRequest
+     * @param[in] commandData The DecodableType for the invoked AtomicRequest
+     * @return Success if the atomic write operation was initiated, error code otherwise
+     */
     std::optional<DataModel::ActionReturnStatus> BeginAtomicWrite(CommandHandler * commandObj,
                                                                   const ConcreteCommandPath & commandPath,
                                                                   const Commands::AtomicRequest::DecodableType & commandData);
+
+    /**
+     * @brief Processes a request to commit an atomic write operation
+     * @param[in] commandObj The CommandHandler for the invoked AtomicRequest
+     * @param[in] commandPath The ConcreteCommandPath for the invoked AtomicRequest
+     * @param[in] commandData The DecodableType for the invoked AtomicRequest
+     * @return Success if the atomic write operation was committed, error code otherwise
+     */
     std::optional<DataModel::ActionReturnStatus> CommitAtomicWrite(CommandHandler * commandObj,
                                                                    const ConcreteCommandPath & commandPath,
                                                                    const Commands::AtomicRequest::DecodableType & commandData);
+
+    /**
+     * @brief Processes a request to rollback an atomic write operation
+     * @param[in] commandObj The CommandHandler for the invoked AtomicRequest
+     * @param[in] commandPath The ConcreteCommandPath for the AtomicRequest
+     * @param[in] commandData The DecodableType for the invoked AtomicRequest
+     * @return Success if the atomic write operation was rolled back, error code otherwise
+     */
     std::optional<DataModel::ActionReturnStatus> RollbackAtomicWrite(CommandHandler * commandObj,
                                                                      const ConcreteCommandPath & commandPath,
                                                                      const Commands::AtomicRequest::DecodableType & commandData);
