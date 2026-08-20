@@ -20,6 +20,7 @@
 #include <clusters/CommodityPrice/ClusterId.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
+using chip::Protocols::InteractionModel::ClusterStatusCode;
 using chip::Protocols::InteractionModel::Status;
 
 namespace chip {
@@ -97,8 +98,7 @@ CHIP_ERROR Instance::SetForecast(const DataModel::List<const Structs::CommodityP
 
 Status Instance::GeneratePriceChangeEvent()
 {
-    VerifyOrReturnValue(mCluster.Cluster().GeneratePriceChangeEvent() == CHIP_NO_ERROR, Status::Failure);
-    return Status::Success;
+    return ClusterStatusCode(mCluster.Cluster().GeneratePriceChangeEvent()).GetStatus();
 }
 
 } // namespace CommodityPrice

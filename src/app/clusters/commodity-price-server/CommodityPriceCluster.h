@@ -104,8 +104,6 @@ public:
     /**
      * @brief ServerClusterInterface methods.
      */
-    CHIP_ERROR Startup(ServerClusterContext & context) override;
-
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
@@ -131,8 +129,13 @@ private:
         /// Replaces the contents with a deep copy of `prices`.
         ///
         /// Returns CHIP_IM_GLOBAL_STATUS(ConstraintError) without touching the stored value if any
-        /// entry is invalid, or CHIP_ERROR_NO_MEMORY (leaving the storage empty) if the copy does
-        /// not fit in memory.
+        /// entry is invalid.
+        ///
+        /// Returns CHIP_ERROR_NO_MEMORY if the copy does not fit in memory, in which case the
+        /// storage is left EMPTY rather than holding its previous contents: keeping the old copy
+        /// alive while building the new one would double the peak allocation of a full forecast,
+        /// which is not a good trade on a constrained device. The attribute value therefore does
+        /// change on failure, and the caller owes a NotifyAttributeChanged for it.
         CHIP_ERROR Set(Span<const Structs::CommodityPriceStruct::Type> prices);
 
         void Clear();

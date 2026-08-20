@@ -22,6 +22,7 @@
 #include <clusters/CommodityPrice/Events.h>
 #include <clusters/CommodityPrice/Metadata.h>
 #include <clusters/shared/EnumsCheck.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <cstring>
 
@@ -122,6 +123,8 @@ CHIP_ERROR CommodityPriceCluster::PriceStorage::Set(Span<const Structs::Commodit
         }
     }
 
+    // Past this point the previous contents are gone even if an allocation below fails. See the
+    // declaration for why this is not made atomic.
     Clear();
 
     // Calloc(0) is not portable, so each buffer is only allocated if it holds anything.
@@ -195,11 +198,6 @@ CharSpan CommodityPriceCluster::PriceStorage::CopyDescription(CharSpan descripti
     }
 
     return CharSpan(dest, description.size());
-}
-
-CHIP_ERROR CommodityPriceCluster::Startup(ServerClusterContext & context)
-{
-    return DefaultServerCluster::Startup(context);
 }
 
 CHIP_ERROR CommodityPriceCluster::Attributes(const ConcreteClusterPath & path,
@@ -404,7 +402,15 @@ CHIP_ERROR CommodityPriceCluster::SetCurrentPrice(const DataModel::Nullable<Stru
         price = Span<const Structs::CommodityPriceStruct::Type>(&currentPrice.Value(), 1);
     }
 
-    ReturnErrorOnFailure(mCurrentPrice.Set(price));
+    CHIP_ERROR err = mCurrentPrice.Set(price);
+    if (err == CHIP_ERROR_NO_MEMORY)
+    {
+        // Set dropped the price it held, so the attribute really did change to null. Reporting it
+        // keeps subscribers from holding a value the cluster no longer has. No PriceChange event is
+        // generated here because generating one allocates, which has just failed.
+        NotifyAttributeChanged(Attributes::CurrentPrice::Id);
+    }
+    ReturnErrorOnFailure(err);
 
     // Comparing the previous value would mean a deep comparison of the copy, which is not worth the
     // flash it would cost, so every set is reported.
@@ -427,7 +433,13 @@ CHIP_ERROR CommodityPriceCluster::SetForecast(Span<const Structs::CommodityPrice
     VerifyOrReturnError(HasFeature(Feature::kForecasting), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(priceForecast.size() <= kMaxForecastEntries, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
-    ReturnErrorOnFailure(mPriceForecast.Set(priceForecast));
+    CHIP_ERROR err = mPriceForecast.Set(priceForecast);
+    if (err == CHIP_ERROR_NO_MEMORY)
+    {
+        // Set dropped the forecast it held, so the attribute really did change to an empty list.
+        NotifyAttributeChanged(Attributes::PriceForecast::Id);
+    }
+    ReturnErrorOnFailure(err);
 
     NotifyAttributeChanged(Attributes::PriceForecast::Id);
 

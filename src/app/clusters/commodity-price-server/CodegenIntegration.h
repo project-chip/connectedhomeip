@@ -45,7 +45,7 @@ inline constexpr uint16_t kCurrencyNOK  = 578;
 inline constexpr uint16_t kCurrencySEK  = 752;
 inline constexpr uint16_t kCurrencyUSD  = 840;
 
-/// Place holder that applications derive from. CommodityPriceCluster delegates nothing, so this
+/// Placeholder that applications derive from. CommodityPriceCluster delegates nothing, so this
 /// carries no delegated methods and exists only for backwards compatibility.
 class Delegate
 {
