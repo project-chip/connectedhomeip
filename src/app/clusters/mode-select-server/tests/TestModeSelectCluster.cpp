@@ -235,7 +235,7 @@ TEST_F(TestModeSelectCluster, ReadCurrentMode)
     EXPECT_EQ(currentMode, 0u);
 }
 
-TEST_F(TestModeSelectCluster, ReadStartUpModeDefaultZero)
+TEST_F(TestModeSelectCluster, ReadStartUpModeDefaultNull)
 {
     optionalAttributeSet.Set<StartUpMode::Id>();
     ModeSelectCluster cluster(kRootEndpointId, mockDelegate, MakeConfig());
@@ -244,8 +244,9 @@ TEST_F(TestModeSelectCluster, ReadStartUpModeDefaultZero)
 
     DataModel::Nullable<uint8_t> startUpMode;
     ASSERT_EQ(tester.ReadAttribute(StartUpMode::Id, startUpMode), CHIP_NO_ERROR);
-    ASSERT_FALSE(startUpMode.IsNull());
-    EXPECT_EQ(startUpMode.Value(), 0u);
+    // StartUpMode defaults to null: null means "no override, keep current mode on reboot".
+    // Mode 0 is not a valid default since mode 0 may not exist in the supported modes list.
+    EXPECT_TRUE(startUpMode.IsNull());
 }
 
 TEST_F(TestModeSelectCluster, ReadOnModeDefaultNull)
