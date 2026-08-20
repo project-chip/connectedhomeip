@@ -892,11 +892,11 @@ class IDMBaseTest(BasicCompositionTests):
                     log.info("PASS: %s properly rejected %s", info.path_str, description)
                 elif e.status == Status.Success:
                     log.fail("FAIL: %s returned %s instead of CONSTRAINT_ERROR for %s",
-                              info.path_str, e.status, description)
-                    all_enforced = False                              
+                             info.path_str, e.status, description)
+                    all_enforced = False
                 else:
                     log.warning("Invalid: %s returned %s instead of CONSTRAINT_ERROR for %s",
-                              info.path_str, e.status, description)
+                                info.path_str, e.status, description)
                 continue
 
             # Some commands convey their result in a Status field of their response
@@ -909,12 +909,12 @@ class IDMBaseTest(BasicCompositionTests):
                          info.path_str, description)
             elif embedded_status == Status.Success:
                 log.fail("FAIL: %s returned %s instead of CONSTRAINT_ERROR for %s",
-                            info.path_str, e.status, description)
-                all_enforced = False                              
+                         info.path_str, e.status, description)
+                all_enforced = False
             else:
                 log.warning("Invalid: %s accepted violating payload (%s)%s",
-                          info.path_str, description,
-                          f" with response status {embedded_status}" if embedded_status is not None else "")
+                            info.path_str, description,
+                            f" with response status {embedded_status}" if embedded_status is not None else "")
         return all_enforced
 
     def checkable_attributes(self, cluster_id, cluster, xml_cluster) -> list[uint]:
