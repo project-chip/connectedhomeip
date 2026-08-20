@@ -233,14 +233,14 @@ config CHIP_USE_MARS_SENSOR
 	default n
 
 config CHIP_PERSISTENT_SUBSCRIPTIONS
-	default n if BOARD_TL3218X_RETENTION
+	default n if BOARD_TL3218X_RETENTION || BOARD_TL7218X_RETENTION
 	default y
 	# selecting experimental for this feature since there is an issue with multiple controllers.
 	select EXPERIMENTAL
 
 config CHIP_MAX_FABRICS
 	int "Maximum number of Matter fabrics"
-	default 3 if BOARD_TL3218X_RETENTION
+	default 3 if BOARD_TL3218X_RETENTION || BOARD_TL7218X_RETENTION
 	default 5
 	help
 	  The maximum number of Matter fabrics that device can be joined to.
