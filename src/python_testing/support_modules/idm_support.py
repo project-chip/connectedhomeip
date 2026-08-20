@@ -41,6 +41,7 @@ from matter.testing.event_attribute_reporting import WildcardAttributeSubscripti
 from matter.testing.global_attribute_ids import (GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id,
                                                  is_standard_command_id)
 from matter.testing.matter_testing import compute_mrp_retransmission_timeout_sec
+from matter.testing.problem_notices import CommandPathLocation
 from matter.testing.spec_parsing import ConstraintReference, Constraints, XmlDataTypeComponent
 from matter.tlv import uint
 
@@ -891,12 +892,16 @@ class IDMBaseTest(BasicCompositionTests):
                 if e.status == Status.ConstraintError:
                     log.info("PASS: %s properly rejected %s", info.path_str, description)
                 elif e.status == Status.Success:
-                    log.fail("FAIL: %s returned %s instead of CONSTRAINT_ERROR for %s",
+                    log.error("FAIL: %s returned %s instead of CONSTRAINT_ERROR for %s",
                              info.path_str, e.status, description)
                     all_enforced = False
                 else:
-                    log.warning("Invalid: %s returned %s instead of CONSTRAINT_ERROR for %s",
-                                info.path_str, e.status, description)
+                    self.record_warning(
+                            test_name = self.current_test_info.name,
+                            location=CommandPathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
+                                                 command_id=info.command_id),
+                            problem=(f"{info.path_str} accepted violating payload ({description})"))        
+
                 continue
 
             # Some commands convey their result in a Status field of their response
@@ -908,15 +913,16 @@ class IDMBaseTest(BasicCompositionTests):
                 log.info("PASS: %s properly rejected %s (via response command status)",
                          info.path_str, description)
             elif embedded_status == Status.Success:
-                log.fail("FAIL: %s returned %s instead of CONSTRAINT_ERROR for %s",
-                         info.path_str, e.status, description)
+                log.error("FAIL: %s returned %s instead of CONSTRAINT_ERROR for %s",
+                         info.path_str, embedded_status, description)
                 all_enforced = False
             else:
-                log.warning("Invalid: %s accepted violating payload (%s)%s",
-                            info.path_str, description,
-                            f" with response status {embedded_status}" if embedded_status is not None else "")
+                self.record_warning(
+                            test_name = self.current_test_info.name,
+                            location=CommandPathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
+                                                 command_id=info.command_id),
+                            problem=(f"{info.path_str} accepted violating payload ({description})"))        
         return all_enforced
-
     def checkable_attributes(self, cluster_id, cluster, xml_cluster) -> list[uint]:
         """Get list of attributes that exist on the DUT and have spec/codegen data available."""
         all_attrs = cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID]
