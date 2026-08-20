@@ -458,7 +458,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SetThreadCredentialsNeededListener(jo
 
     mThreadCredentialsNeededListenerObject.Reset();
     ReturnErrorOnFailure(mThreadCredentialsNeededListenerObject.Init(listener));
-    mThreadCredentialsNeededListener       = method;
+    mThreadCredentialsNeededListener = method;
 
     return CHIP_NO_ERROR;
 }
@@ -483,7 +483,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SetWiFiCredentialsNeededListener(jobj
 
     mWiFiCredentialsNeededListenerObject.Reset();
     ReturnErrorOnFailure(mWiFiCredentialsNeededListenerObject.Init(listener));
-    mWiFiCredentialsNeededListener       = method;
+    mWiFiCredentialsNeededListener = method;
 
     return CHIP_NO_ERROR;
 }
