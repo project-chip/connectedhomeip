@@ -89,27 +89,32 @@ CHIP_ERROR PresetStructWithOwnedMembers::SetPresetHandle(const Nullable<ByteSpan
 
 CHIP_ERROR PresetStructWithOwnedMembers::SetName(const Optional<DataModel::Nullable<CharSpan>> & newName)
 {
-    if (newName.HasValue() && !newName.Value().IsNull())
-    {
-        size_t newNameSize = newName.Value().Value().size();
-        if (newNameSize > kPresetNameSize)
-        {
-            ChipLogError(Zcl, "Failed to set Preset name. New name size (%u) > allowed preset name size (%u)",
-                         static_cast<unsigned>(newNameSize), static_cast<unsigned>(kPresetNameSize));
-            return CHIP_ERROR_NO_MEMORY;
-        }
-        MutableCharSpan targetSpan(presetNameData);
-        CharSpan newNameSpan = newName.Value().Value();
-        ReturnErrorOnFailure(CopyCharSpanToMutableCharSpan(newNameSpan, targetSpan));
-
-        DataModel::Nullable<CharSpan> nullableCharSpan;
-        nullableCharSpan.SetNonNull(targetSpan);
-        name.SetValue(nullableCharSpan);
-    }
-    else
+    if (!newName.HasValue())
     {
         name.ClearValue();
+        return CHIP_NO_ERROR;
     }
+    if (newName.Value().IsNull()) {
+        name.SetValue(DataModel::NullNullable);
+        return CHIP_NO_ERROR;
+    }
+
+    size_t newNameSize = newName.Value().Value().size();
+    if (newNameSize > kPresetNameSize)
+    {
+        ChipLogError(Zcl, "Failed to set Preset name. New name size (%u) > allowed preset name size (%u)",
+                     static_cast<unsigned>(newNameSize), static_cast<unsigned>(kPresetNameSize));
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    MutableCharSpan targetSpan(presetNameData);
+    CharSpan newNameSpan = newName.Value().Value();
+    ReturnErrorOnFailure(CopyCharSpanToMutableCharSpan(newNameSpan, targetSpan));
+
+    DataModel::Nullable<CharSpan> nullableCharSpan;
+    nullableCharSpan.SetNonNull(targetSpan);
+    name.SetValue(nullableCharSpan);
+
     return CHIP_NO_ERROR;
 }
 
