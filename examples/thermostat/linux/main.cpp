@@ -88,11 +88,9 @@ void ApplicationInit()
                                      gSensorsDelegate);
 }
 
-using ThermostatClusterType =
-    Clusters::Thermostat::ThermostatClusterWithFeatures<Clusters::Thermostat::ThermostatDelegate,
-                                                        Clusters::Thermostat::ThermostatPresetsDelegate,
-                                                        Clusters::Thermostat::ThermostatSuggestionsDelegate,
-                                                        Clusters::Thermostat::ThermostatSensorsDelegate>;
+using ThermostatClusterType = Clusters::Thermostat::ThermostatClusterWithFeatures<
+    Clusters::Thermostat::ThermostatDelegate, Clusters::Thermostat::ThermostatPresetsDelegate,
+    Clusters::Thermostat::ThermostatSuggestionsDelegate, Clusters::Thermostat::ThermostatSensorsDelegate>;
 
 void ApplicationShutdown()
 {
