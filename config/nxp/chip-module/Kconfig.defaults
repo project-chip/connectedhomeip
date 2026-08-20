@@ -622,6 +622,11 @@ config MBEDTLS_CTR_DRBG_C
 config MBEDTLS_DECLARE_PRIVATE_IDENTIFIERS
 	default y
 
+# CSR parsing is only needed by the unit tests, so gate it to test builds to
+# keep the production image small (mirrors the NXP FreeRTOS mbedtls config).
+config MBEDTLS_X509_CSR_PARSE_C
+	default y if CHIP_BUILD_TESTS
+
 choice CHIP_CRYPTO
     default CHIP_CRYPTO_PSA
 
