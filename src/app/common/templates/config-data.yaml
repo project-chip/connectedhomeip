@@ -39,9 +39,6 @@ CommandHandlerInterfaceOnlyClusters:
     - Refrigerator And Temperature Controlled Cabinet Mode
     - Sample MEI
     - Service Area
-    - Soil Measurement
-    - TLS Certificate Management
-    - TLS Client Management
     - Thermostat
     - Thread Border Router Management
     - Thread Network Directory
