@@ -833,13 +833,18 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
         mPendingCheckInSubjectsCount   = 0;
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
         bool enteredActiveModeFromIdle = false;
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+
         if (wasPendingActiveMode || mOperationalState == OperationalState::ActiveMode)
         {
+#if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
             if (mOperationalState == OperationalState::IdleMode)
             {
                 enteredActiveModeFromIdle = true;
             }
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
             ChipLogProgress(AppServer,
                             "ICDManager: Thread network connectivity established. Triggering/Extending ActiveMode.");
             UpdateOperationState(OperationalState::ActiveMode);
