@@ -26887,25 +26887,25 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
                         value_nominalDischargeCurrentInsideOptional, value_nominalDischargeCurrent);
                 }
-                jobject value_maximumDishargeCurrent;
-                if (!cppValue.Value().maximumDishargeCurrent.HasValue())
+                jobject value_maximumDischargeCurrent;
+                if (!cppValue.Value().maximumDischargeCurrent.HasValue())
                 {
                     TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr,
-                                                                                               value_maximumDishargeCurrent);
+                                                                                               value_maximumDischargeCurrent);
                 }
                 else
                 {
-                    jobject value_maximumDishargeCurrentInsideOptional;
-                    std::string value_maximumDishargeCurrentInsideOptionalClassName     = "java/lang/Long";
-                    std::string value_maximumDishargeCurrentInsideOptionalCtorSignature = "(J)V";
-                    jlong jnivalue_maximumDishargeCurrentInsideOptional =
-                        static_cast<jlong>(cppValue.Value().maximumDishargeCurrent.Value());
+                    jobject value_maximumDischargeCurrentInsideOptional;
+                    std::string value_maximumDischargeCurrentInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_maximumDischargeCurrentInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_maximumDischargeCurrentInsideOptional =
+                        static_cast<jlong>(cppValue.Value().maximumDischargeCurrent.Value());
                     TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                        value_maximumDishargeCurrentInsideOptionalClassName.c_str(),
-                        value_maximumDishargeCurrentInsideOptionalCtorSignature.c_str(),
-                        jnivalue_maximumDishargeCurrentInsideOptional, value_maximumDishargeCurrentInsideOptional);
+                        value_maximumDischargeCurrentInsideOptionalClassName.c_str(),
+                        value_maximumDischargeCurrentInsideOptionalCtorSignature.c_str(),
+                        jnivalue_maximumDischargeCurrentInsideOptional, value_maximumDischargeCurrentInsideOptional);
                     TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
-                        value_maximumDishargeCurrentInsideOptional, value_maximumDishargeCurrent);
+                        value_maximumDischargeCurrentInsideOptional, value_maximumDischargeCurrent);
                 }
                 jobject value_ratedShortCircuitCurrent;
                 if (!cppValue.Value().ratedShortCircuitCurrent.HasValue())
@@ -27016,7 +27016,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         env->NewObject(surgeProtectionRatingsStructStructClass_1, surgeProtectionRatingsStructStructCtor_1,
                                        value_tripMechanism, value_protectionClass, value_protectionType,
                                        value_maxContinuousOperatingVoltage, value_maxVoltageProtection, value_maxTemporaryVoltage,
-                                       value_nominalDischargeCurrent, value_maximumDishargeCurrent, value_ratedShortCircuitCurrent,
+                                       value_nominalDischargeCurrent, value_maximumDischargeCurrent, value_ratedShortCircuitCurrent,
                                        value_ratedShortTimeWithstandCurrent, value_energyAbsorptionCapability, value_responseTime);
                 }
             }
