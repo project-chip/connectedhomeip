@@ -20,6 +20,8 @@
 #include <app/GlobalAttributes.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <functional>
+
 using namespace chip::app::Clusters::Globals::Structs;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 using namespace chip::app::Clusters::Thermostat::Structs;
