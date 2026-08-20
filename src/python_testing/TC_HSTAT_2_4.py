@@ -299,7 +299,7 @@ class TC_HSTAT_2_4(MatterBaseTest, HSTATBase):
             # Verify DUT responds w/ status SUCCESS(0x00).
             await self.allow_optimal_event()
         else:
-            self.mark_step_range_skipped(20, 23)
+            self.mark_step_range_skipped(21, 23)
 
 
 if __name__ == '__main__':
