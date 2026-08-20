@@ -62,6 +62,11 @@ namespace {
 // Endpoint used for the CommissioningProxy cluster when --proxy-endpoint is not given.
 constexpr chip::EndpointId kDefaultProxyEndpointId = 1;
 
+// Upper bound on back-to-back null-Message polls that yield a message but no reply.
+// A conformant proxy drains in a handful; the bound only stops a misbehaving one from
+// spinning the commissioner.
+constexpr uint8_t kMaxConsecutiveProxyPolls = 8;
+
 [[maybe_unused]] CHIP_ERROR ParseSetupPayload(SetupPayload & setupPayload, const char * onboardingPayload)
 {
 
@@ -1029,12 +1034,40 @@ void PairingCommand::OnResponse(chip::app::CommandSender * client, const chip::a
         ProxyMessageResponse::DecodableType response;
         if (data && chip::app::DataModel::Decode(*data, response) == CHIP_NO_ERROR)
         {
-            if (!response.message.IsNull())
+            if (response.message.IsNull())
             {
-                auto * transportMgr   = CurrentCommissioner().GetTransportMgr();
-                auto * proxyTransport = GetDeviceProxyTransport(transportMgr);
-                proxyTransport->OnProxyMessageReceived(response.sessionID, response.message.Value().data(),
-                                                       response.message.Value().size());
+                // Null means the proxy has nothing queued, so the drain is complete.
+                mProxyConsecutivePolls = 0;
+                return;
+            }
+
+            auto * transportMgr   = CurrentCommissioner().GetTransportMgr();
+            auto * proxyTransport = GetDeviceProxyTransport(transportMgr);
+            proxyTransport->OnProxyMessageReceived(response.sessionID, response.message.Value().data(),
+                                                   response.message.Value().size());
+
+            // The injection above may have driven the stack to send a reply, which takes
+            // the outstanding slot and will collect anything else queued.  Only when it
+            // produced nothing does the commissioner have to ask -- the commissionee can
+            // send more than one message per request (retransmits, standalone acks) and
+            // this session carries no MRP to prompt another send.
+            if (mProxyMessageAwaitingResponse)
+            {
+                return;
+            }
+
+            if (++mProxyConsecutivePolls > kMaxConsecutiveProxyPolls)
+            {
+                ChipLogError(chipTool, "PairViaProxy: stopping after %u consecutive queued-message polls",
+                             static_cast<unsigned>(kMaxConsecutiveProxyPolls));
+                mProxyConsecutivePolls = 0;
+                return;
+            }
+
+            CHIP_ERROR pollErr = PollProxyForQueuedMessage();
+            if (pollErr != CHIP_NO_ERROR)
+            {
+                ChipLogError(chipTool, "PairViaProxy: failed to poll for queued messages: %" CHIP_ERROR_FORMAT, pollErr.Format());
             }
         }
         else
@@ -1061,13 +1094,22 @@ void PairingCommand::OnError(const chip::app::CommandSender * client, CHIP_ERROR
         // No response is coming, so stop treating the request as outstanding; otherwise
         // the tunnel would refuse every later message with BUSY.
         mProxyMessageAwaitingResponse = false;
+
+        // The tunnel is the only path to the commissionee and this session has no MRP,
+        // so nothing will retry underneath us.  Tear the proxy session down and report
+        // the real cause rather than letting commissioning stall until something
+        // unrelated times out.
+        ChipLogError(chipTool, "PairViaProxy: ProxyMessageRequest failed, abandoning commissioning");
+        SendProxyDisconnect(error);
         return;
     }
 
     if (client == mProxyConnectCmdSender.get())
     {
-        // ProxyConnectRequest failed — there is no session to tear down, so abort here.
-        SetCommandExitStatus(error);
+        // ProxyConnectRequest failed.  The proxy may still be trying to reach the
+        // commissionee -- with Timeout 0 it will do so indefinitely -- so cancel it
+        // explicitly with a null SessionID before exiting.
+        SendProxyDisconnect(error, /* aCancelPendingConnect */ true);
     }
 }
 
@@ -1100,12 +1142,21 @@ void PairingCommand::OnDone(chip::app::CommandSender * client)
 // Send ProxyDisconnectRequest to clean up the proxy session, then exit.
 // SetCommandExitStatus is deferred until the response (or a timeout) is received so
 // that chip-tool keeps the TCP session alive long enough for the proxy to reply.
-void PairingCommand::SendProxyDisconnect(CHIP_ERROR exitErr)
+void PairingCommand::SendProxyDisconnect(CHIP_ERROR exitErr, bool aCancelPendingConnect)
 {
-    // Guard: only send if we have an active proxy session to disconnect.
-    if (!mProxySessionActive || mProxyExchangeMgr == nullptr || !static_cast<bool>(mProxySession))
+    // A cancel needs no session -- it is precisely for the case where ProxyConnectRequest
+    // never produced one -- but it still needs the CASE session to the proxy.
+    const bool haveSomethingToSend = aCancelPendingConnect || mProxySessionActive;
+    if (!haveSomethingToSend || mProxyExchangeMgr == nullptr || !static_cast<bool>(mProxySession))
     {
         SetCommandExitStatus(exitErr);
+        return;
+    }
+
+    // A disconnect already in flight owns the exit status; a second one would displace
+    // its sender and lose the callback.
+    if (mProxyDisconnectCmdSender)
+    {
         return;
     }
 
@@ -1120,7 +1171,17 @@ void PairingCommand::SendProxyDisconnect(CHIP_ERROR exitErr)
     }
 
     Commands::ProxyDisconnectRequest::Type request;
-    request.sessionID.SetNonNull(mProxySessionId);
+    if (aCancelPendingConnect)
+    {
+        // Spec: "A null value SHALL cancel any ongoing ProxyConnectRequest for the
+        // invoking fabric."
+        request.sessionID.SetNull();
+        ChipLogProgress(chipTool, "PairViaProxy: cancelling any ongoing ProxyConnectRequest");
+    }
+    else
+    {
+        request.sessionID.SetNonNull(mProxySessionId);
+    }
 
     chip::app::CommandPathParams pathParams(mProxyEndpointId.ValueOr(kDefaultProxyEndpointId),
                                             chip::app::Clusters::CommissioningProxy::Id, Commands::ProxyDisconnectRequest::Id,
@@ -1148,6 +1209,20 @@ void PairingCommand::SendProxyDisconnect(CHIP_ERROR exitErr)
 // a commissioning packet to the proxy app via ProxyMessageRequest.
 CHIP_ERROR PairingCommand::SendProxyMessage(uint16_t sessionId, chip::ByteSpan message)
 {
+    // A real outbound message ends any drain in progress.
+    mProxyConsecutivePolls = 0;
+    return SendProxyMessageRequest(sessionId, chip::app::DataModel::MakeNullable(message));
+}
+
+CHIP_ERROR PairingCommand::PollProxyForQueuedMessage()
+{
+    ChipLogDetail(chipTool, "PairViaProxy: polling the proxy for a queued message (session %u)", mProxySessionId);
+    return SendProxyMessageRequest(mProxySessionId, chip::app::DataModel::Nullable<chip::ByteSpan>());
+}
+
+CHIP_ERROR PairingCommand::SendProxyMessageRequest(uint16_t sessionId,
+                                                   const chip::app::DataModel::Nullable<chip::ByteSpan> & message)
+{
     VerifyOrReturnError(mProxyExchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(static_cast<bool>(mProxySession), CHIP_ERROR_INCORRECT_STATE);
 
@@ -1171,7 +1246,7 @@ CHIP_ERROR PairingCommand::SendProxyMessage(uint16_t sessionId, chip::ByteSpan m
     // ConnectNetwork on Linux can take 20-30s (wpa_supplicant scan + join).
     // The proxy exchange must stay open at least this long.
     request.responseTimeout = 60;
-    request.message.SetNonNull(message);
+    request.message         = message;
 
     chip::app::CommandPathParams pathParams(mProxyEndpointId.ValueOr(kDefaultProxyEndpointId),
                                             chip::app::Clusters::CommissioningProxy::Id, Commands::ProxyMessageRequest::Id,

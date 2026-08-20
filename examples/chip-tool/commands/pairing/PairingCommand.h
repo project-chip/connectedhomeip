@@ -160,7 +160,9 @@ public:
             AddArgument("proxy-endpoint", 0, UINT16_MAX, &mProxyEndpointId,
                         "Optional endpoint on the proxy hosting the CommissioningProxy cluster. Defaults to 1.");
             AddArgument("proxy-connect-timeout", 0, UINT16_MAX, &mProxyConnectTimeout,
-                        "Timeout in seconds for the ProxyConnectRequest");
+                        "Seconds the proxy may spend establishing the transport connection to the "
+                        "commissionee. 0 (the default) means no timeout, so the proxy will keep "
+                        "trying until it is cancelled.");
             AddArgument("proxy-transport", &mProxyTransport,
                         "Required: which transport the proxy should use to reach the commissionee. "
                         "One of: ble | wifipaf");
@@ -399,6 +401,18 @@ private:
     // ProxyTransportDelegate — sends ProxyMessageRequest when ProxyTransport needs to forward a packet
     CHIP_ERROR SendProxyMessage(uint16_t sessionId, chip::ByteSpan message) override;
 
+    /**
+     * Issue a ProxyMessageRequest whose Message is null.  Per the spec this asks the
+     * proxy for a queued message from the commissionee, answered with a message or with
+     * null when nothing is available.  Without it, anything the commissionee sends
+     * beyond a one-for-one reply sits on the proxy until the commissioner happens to
+     * send again -- and this session has no MRP to prompt that.
+     */
+    CHIP_ERROR PollProxyForQueuedMessage();
+
+    /** Common body of SendProxyMessage and PollProxyForQueuedMessage. */
+    CHIP_ERROR SendProxyMessageRequest(uint16_t sessionId, const chip::app::DataModel::Nullable<chip::ByteSpan> & message);
+
     // CommandSender::Callback — receives ProxyMessageResponse
     void OnResponse(chip::app::CommandSender * client, const chip::app::ConcreteCommandPath & path,
                     const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override;
@@ -439,6 +453,11 @@ private:
     // second request for the same session with BUSY until the first has been responded to.
     bool mProxyMessageAwaitingResponse = false;
 
+    // Consecutive null-Message polls that produced a message but no outbound reply.
+    // Bounded so a proxy that keeps handing back the same queued message cannot spin
+    // the commissioner forever.
+    uint8_t mProxyConsecutivePolls = 0;
+
     /** True if the sender belongs to the ProxyMessageRequest set. */
     bool IsProxyMessageCmdSender(const chip::app::CommandSender * client) const;
 
@@ -447,8 +466,13 @@ private:
     // Exit status to deliver once the ProxyDisconnectResponse is received (or times out).
     CHIP_ERROR mProxyDisconnectExitErr = CHIP_NO_ERROR;
 
-    /** Send ProxyDisconnectRequest to the proxy then call SetCommandExitStatus(exitErr). */
-    void SendProxyDisconnect(CHIP_ERROR exitErr);
+    /**
+     * Send ProxyDisconnectRequest to the proxy then call SetCommandExitStatus(exitErr).
+     * With aCancelPendingConnect the SessionID is sent as null, which the spec defines as
+     * "cancel any ongoing ProxyConnectRequest for the invoking fabric" -- the only way to
+     * release a proxy left connecting after the commissioner has given up.
+     */
+    void SendProxyDisconnect(CHIP_ERROR exitErr, bool aCancelPendingConnect = false);
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnProxyConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnProxyConnectionFailureCallback;
