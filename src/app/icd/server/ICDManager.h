@@ -378,8 +378,8 @@ private:
     KeepActiveFlags mKeepActiveFlags{ 0 };
 
     // Initialize mOperationalState to ActiveMode so the init sequence at bootup triggers the IdleMode behaviour first.
-    OperationalState mOperationalState  = OperationalState::ActiveMode;
-    bool mTransitionToIdleCalled        = false;
+    OperationalState mOperationalState = OperationalState::ActiveMode;
+    bool mTransitionToIdleCalled       = false;
 #if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     bool mPendingCheckInOnNetworkAttach = false;
 #endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH

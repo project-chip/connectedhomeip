@@ -221,14 +221,8 @@ public:
     }
 
 #if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
-    void SetPendingCheckInOnNetworkAttach(bool val)
-    {
-        mICDManager.mPendingCheckInOnNetworkAttach = val;
-    }
-    void HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
-    {
-        mICDManager.HandlePlatformEvent(event);
-    }
+    void SetPendingCheckInOnNetworkAttach(bool val) { mICDManager.mPendingCheckInOnNetworkAttach = val; }
+    void HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event) { mICDManager.HandlePlatformEvent(event); }
 #endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
 
     TestSessionKeystoreImpl mKeystore;
@@ -1595,7 +1589,7 @@ TEST_F(TestICDManager, TestScenario13_RapidNetworkFlapping_Resilience)
     AdvanceClockAndRunEventLoop(10_ms);
 
     // Flap 2: Immediate Disconnect
-    DeviceLayer::ChipDeviceEvent disconnectEvent{ .Type                     = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
+    DeviceLayer::ChipDeviceEvent disconnectEvent{ .Type = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
                                                   .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Lost } };
     HandlePlatformEvent(&disconnectEvent);
     AdvanceClockAndRunEventLoop(10_ms);

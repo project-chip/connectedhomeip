@@ -106,7 +106,7 @@ void ICDManager::Shutdown()
     DeviceLayer::SystemLayer().CancelTimer(OnTransitionToIdle, this);
 
     ICDConfigurationData::GetInstance().SetICDMode(ICDConfigurationData::ICDMode::SIT);
-    mOperationalState              = OperationalState::ActiveMode;
+    mOperationalState = OperationalState::ActiveMode;
 #if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     mPendingCheckInOnNetworkAttach = false;
 #endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
