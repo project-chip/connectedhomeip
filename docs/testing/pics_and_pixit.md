@@ -146,24 +146,24 @@ These tests run a single set of PICS XML files against an endpoint. The
 
 The `--PICS` flag accepts three input formats, auto-detected from the path:
 
--   A CI-format text file with one `KEY=1` or `KEY=0` per line. Blank lines
-    are skipped and `#` starts a line-end comment. This is the format CI runs
-    check into the repo.
+-   A CI-format text file with one `KEY=1` or `KEY=0` per line. Blank lines are
+    skipped and `#` starts a line-end comment. This is the format CI runs check
+    into the repo.
 -   A directory of PICS XML files. Device-wide XML files (such as `Base.xml`)
     sit at the top of the directory. Per-endpoint XML files sit in a
-    per-endpoint subdirectory whose name is matched case-insensitively
-    against common conventions — `endpoint0`, `Endpoint_0`, `EP0`, `ep 0`,
-    and plain `0` all resolve to endpoint 0.
--   A zip archive with that same layout. Archives whose contents sit inside
-    a single enclosing folder (as macOS Finder, Windows Explorer, and
-    `zip -r <folder>` produce) are handled automatically, so exports from
-    the PICS tool can be passed as-is without re-zipping.
+    per-endpoint subdirectory whose name is matched case-insensitively against
+    common conventions — `endpoint0`, `Endpoint_0`, `EP0`, `ep 0`, and plain `0`
+    all resolve to endpoint 0.
+-   A zip archive with that same layout. Archives whose contents sit inside a
+    single enclosing folder (as macOS Finder, Windows Explorer, and
+    `zip -r <folder>` produce) are handled automatically, so exports from the
+    PICS tool can be passed as-is without re-zipping.
 
 For directory and zip inputs, top-level XML files are always loaded, but
 per-endpoint XML files are only loaded when `--endpoint` is also supplied.
-Non-matching endpoint subdirectories are skipped so per-endpoint checks do
-not see foreign clusters. This means the same PICS bundle can be reused
-across endpoints by varying only `--endpoint`.
+Non-matching endpoint subdirectories are skipped so per-endpoint checks do not
+see foreign clusters. This means the same PICS bundle can be reused across
+endpoints by varying only `--endpoint`.
 
 ## Setting PIXITs for Matter devices
 
