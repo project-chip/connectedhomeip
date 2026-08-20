@@ -245,35 +245,25 @@ public:
         {
             return true;
         }
-        for (auto * path = mpAttributePathList; path != nullptr; path = path->mpNext)
-        {
-            if (path->mValue.HasWildcardEndpointId())
+        auto containsAnyTargetedEndpoint = [&targetedEndpoints](const auto * pathList) {
+            for (const auto * path = pathList; path != nullptr; path = path->mpNext)
             {
-                return true;
-            }
-            for (auto endpointId : targetedEndpoints)
-            {
-                if (path->mValue.mEndpointId == endpointId)
+                if (path->mValue.HasWildcardEndpointId())
                 {
                     return true;
                 }
-            }
-        }
-        for (auto * path = mpEventPathList; path != nullptr; path = path->mpNext)
-        {
-            if (path->mValue.HasWildcardEndpointId())
-            {
-                return true;
-            }
-            for (auto endpointId : targetedEndpoints)
-            {
-                if (path->mValue.mEndpointId == endpointId)
+                for (auto endpointId : targetedEndpoints)
                 {
-                    return true;
+                    if (path->mValue.mEndpointId == endpointId)
+                    {
+                        return true;
+                    }
                 }
             }
-        }
-        return false;
+            return false;
+        };
+
+        return containsAnyTargetedEndpoint(mpAttributePathList) || containsAnyTargetedEndpoint(mpEventPathList);
     }
 
     /**

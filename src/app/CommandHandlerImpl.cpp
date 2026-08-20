@@ -589,8 +589,6 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
             }
         }
 
-        RecordTargetedEndpoint(mapping.endpoint_id);
-
         if ((err = DataModelCallbacks::GetInstance()->PreCommandReceived(concretePath, GetSubjectDescriptor())) == CHIP_NO_ERROR)
         {
             TLV::TLVReader dataReader(commandDataReader);
@@ -1125,11 +1123,9 @@ void CommandHandlerImpl::RecordTargetedEndpoint(EndpointId endpointId)
     }
     else
     {
-        // When the targeted endpoints array overflows, we cap the array and log an error
-        // rather than falling back to deferring all endpoints on the node. Deferring all
-        // endpoints could inadvertently delay critical or safety-sensitive endpoints (such
-        // as locks or alarm sensors on a bridge) that were not targeted by this invoke,
-        // which would present a denial-of-service / responsiveness issue.
+        // This branch should not be reachable in practice:
+        // - For unicast invokes, the number of distinct targeted endpoints cannot exceed the max paths per invoke (kMaxTargetedEndpoints).
+        // - For groupcast invokes, RecordTargetedEndpoint is not called because groupcast defers reports globally via an empty span.
         ChipLogError(DataManagement, "Too many targeted endpoints in invoke, capping at %u",
                      static_cast<unsigned int>(kMaxTargetedEndpoints));
     }
@@ -1144,8 +1140,11 @@ void CommandHandlerImpl::TriggerDelayReport(const InvokeRequestMessage::DelayRep
     {
         delayMs += (chip::Crypto::GetRandU32() % aDelayReportData.delayJitterWindowMs);
     }
-    mpCallback->OnDelayReport(System::Clock::Milliseconds32(delayMs),
-                              Span<const EndpointId>(mTargetedEndpoints, mNumTargetedEndpoints));
+    // An empty targetedEndpoints span indicates a global deferral across all endpoints on the node for groupcast requests.
+    Span<const EndpointId> targetedEndpoints = IsGroupRequest()
+        ? Span<const EndpointId>()
+        : Span<const EndpointId>(mTargetedEndpoints, mNumTargetedEndpoints);
+    mpCallback->OnDelayReport(System::Clock::Milliseconds32(delayMs), targetedEndpoints);
 }
 
 } // namespace app
