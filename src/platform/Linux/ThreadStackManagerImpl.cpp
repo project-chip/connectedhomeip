@@ -316,6 +316,12 @@ void ThreadStackManagerImpl::_ErasePersistentInfo()
 
 bool ThreadStackManagerImpl::_IsThreadEnabled()
 {
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    if (mThreadEnabledForTest.has_value())
+    {
+        return mThreadEnabledForTest.value();
+    }
+#endif
     VerifyOrReturnError(mProxy, false);
 
     GAutoPtr<GError> err;

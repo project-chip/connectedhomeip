@@ -216,18 +216,31 @@ public:
     // Performs teardown for each individual test in the test suite
     void TearDown() override
     {
+        ResetThreadConnectivityState();
         mICDManager.Shutdown();
         LoopbackMessagingContext::TearDown();
     }
 
-#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
-    void SetPendingActiveModeOnNetworkAttach(bool val) { mICDManager.mPendingActiveModeOnNetworkAttach = val; }
-#if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
-    void SetPendingCheckInOnNetworkAttach(bool val, Optional<Access::SubjectDescriptor> subject = NullOptional)
+    void SetThreadConnectivityState(bool enabled, bool attached)
     {
-        mICDManager.mPendingCheckInOnNetworkAttach = val;
-        mICDManager.mPendingCheckInSubject         = subject;
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        DeviceLayer::ThreadStackMgrImpl().SetThreadEnabledForTest(enabled);
+        DeviceLayer::ThreadStackMgrImpl().SetThreadAttachedForTest(attached);
+#endif
     }
+
+    void ResetThreadConnectivityState()
+    {
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        DeviceLayer::ThreadStackMgrImpl().ResetThreadStateForTest();
+#endif
+    }
+
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
+    bool IsPendingActiveModeOnNetworkAttach() const { return mICDManager.mPendingActiveModeOnNetworkAttach; }
+#if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+    bool IsPendingCheckInOnNetworkAttach() const { return mICDManager.mPendingCheckInOnNetworkAttach; }
+    Optional<Access::SubjectDescriptor> GetPendingCheckInSubject() const { return mICDManager.mPendingCheckInSubject; }
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
     void HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event) { mICDManager.HandlePlatformEvent(event); }
 #endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
@@ -1344,7 +1357,8 @@ TEST_F(TestICDManager, TestShortIdleModeBehaviorSITvsLIT)
 
 TEST_F(TestICDManager, TestScenario1_SensorEvent_ThreadAttached_CASEValid)
 {
-    // Pre-condition: Device in IdleMode deep sleep
+    // Pre-condition: Device in IdleMode deep sleep with Thread attached
+    SetThreadConnectivityState(true /* enabled */, true /* attached */);
     AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetActiveModeDuration());
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
@@ -1361,7 +1375,8 @@ TEST_F(TestICDManager, TestScenario1_SensorEvent_ThreadAttached_CASEValid)
 
 TEST_F(TestICDManager, TestScenario2_SensorEvent_ThreadAttached_CASELost)
 {
-    // Pre-condition: Device in IdleMode deep sleep
+    // Pre-condition: Device in IdleMode deep sleep with Thread attached
+    SetThreadConnectivityState(true /* enabled */, true /* attached */);
     AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetActiveModeDuration());
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
@@ -1386,22 +1401,32 @@ TEST_F(TestICDManager, TestScenario3_SensorEvent_ThreadUnattached_Deferred)
     AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetActiveModeDuration());
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
-    // Step 1 & 2: Sensor triggers subscription report while Thread is unattached
+    // Step 1: Thread detached
+    SetThreadConnectivityState(true /* enabled */, false /* attached */);
+
+    // Step 2: Sensor triggers subscription report while Thread is unattached
     ICDNotifier::GetInstance().NotifySubscriptionReport();
 
+    // Assert real deferral: device remains in IdleMode and pending ActiveMode flag is asserted
+    EXPECT_TRUE(IsPendingActiveModeOnNetworkAttach());
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
+
     // Step 3: Thread attaches -> HandlePlatformEvent receives kConnectivity_Established
+    SetThreadConnectivityState(true /* enabled */, true /* attached */);
     DeviceLayer::ChipDeviceEvent event{ .Type                     = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
                                         .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Established } };
     HandlePlatformEvent(&event);
     AdvanceClockAndRunEventLoop(100_ms);
 
-    // Step 4: ActiveMode is triggered upon attach and Check-In is dispatched
+    // Step 4: ActiveMode is triggered upon attach and pending flag is consumed
+    EXPECT_FALSE(IsPendingActiveModeOnNetworkAttach());
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
 }
 
 TEST_F(TestICDManager, TestScenario4_SensorEvent_MACFailure_InstantDetachAndRecover)
 {
     // Step 1: Device enters ActiveMode on sensor trigger
+    SetThreadConnectivityState(true /* enabled */, true /* attached */);
     ICDNotifier::GetInstance().NotifySubscriptionReport();
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
 
@@ -1426,6 +1451,7 @@ TEST_F(TestICDManager, TestScenario4_SensorEvent_MACFailure_InstantDetachAndReco
 TEST_F(TestICDManager, TestScenario5_PeriodicIdleTimer_ThreadAttached_SubscriptionValid)
 {
     // Pre-condition: Device in IdleMode with active subscriptions
+    SetThreadConnectivityState(true /* enabled */, true /* attached */);
     mSubInfoProvider.SetHasActiveSubscription(true);
     AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetActiveModeDuration());
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
@@ -1442,6 +1468,7 @@ TEST_F(TestICDManager, TestScenario5_PeriodicIdleTimer_ThreadAttached_Subscripti
 TEST_F(TestICDManager, TestScenario6_PeriodicIdleTimer_ThreadAttached_SubscriptionLost)
 {
     // Pre-condition: Device in IdleMode with lost subscriptions
+    SetThreadConnectivityState(true /* enabled */, true /* attached */);
     mSubInfoProvider.SetHasActiveSubscription(false);
     AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetActiveModeDuration());
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
@@ -1461,16 +1488,24 @@ TEST_F(TestICDManager, TestScenario7_PeriodicIdleTimer_ThreadUnattached_Deferred
     AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetActiveModeDuration());
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
-    // Step 1 & 2: 1-Hour timer expires while unattached -> stays in IdleMode (deferral)
-    SetPendingActiveModeOnNetworkAttach(true);
+    // Step 1: Thread network detached
+    SetThreadConnectivityState(true /* enabled */, false /* attached */);
+
+    // Step 2: 1-Hour timer expires while unattached -> timer advancement fires real OnIdleModeDone
+    AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetModeBasedIdleModeDuration() + 1_s);
+
+    // Assert real deferral: device remains in IdleMode and pending ActiveMode flag is asserted
+    EXPECT_TRUE(IsPendingActiveModeOnNetworkAttach());
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
-    // Step 3 & 4: Thread attaches -> transitions to ActiveMode and sends Check-In
+    // Step 3 & 4: Thread attaches -> transitions to ActiveMode and consumes pending flag
+    SetThreadConnectivityState(true /* enabled */, true /* attached */);
     DeviceLayer::ChipDeviceEvent event{ .Type                     = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
                                         .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Established } };
     HandlePlatformEvent(&event);
     AdvanceClockAndRunEventLoop(100_ms);
 
+    EXPECT_FALSE(IsPendingActiveModeOnNetworkAttach());
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
 }
 
@@ -1481,7 +1516,8 @@ TEST_F(TestICDManager, TestScenario7_PeriodicIdleTimer_ThreadUnattached_Deferred
 #if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 TEST_F(TestICDManager, TestScenario8_SubscriptionTimeout_ThreadAttached)
 {
-    // Pre-condition: Device in IdleMode deep sleep
+    // Pre-condition: Device in IdleMode deep sleep with Thread attached
+    SetThreadConnectivityState(true /* enabled */, true /* attached */);
     AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetActiveModeDuration());
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
@@ -1492,6 +1528,7 @@ TEST_F(TestICDManager, TestScenario8_SubscriptionTimeout_ThreadAttached)
     ICDNotifier::GetInstance().NotifySendCheckIn(MakeOptional(subjectDescriptor));
 
     AdvanceClockAndRunEventLoop(100_ms);
+    EXPECT_FALSE(IsPendingCheckInOnNetworkAttach());
 }
 
 TEST_F(TestICDManager, TestScenario9_SubscriptionTimeout_ThreadUnattached_Deferred)
@@ -1500,18 +1537,31 @@ TEST_F(TestICDManager, TestScenario9_SubscriptionTimeout_ThreadUnattached_Deferr
     AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetActiveModeDuration());
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
-    // Step 1 & 2: Subscription times out while unattached -> Check-In is deferred with specific subject preserved
+    // Step 1: Thread network detached
+    SetThreadConnectivityState(true /* enabled */, false /* attached */);
+
+    // Step 2: Subscription times out while unattached -> triggers real NotifySendCheckIn with specific subject
     Access::SubjectDescriptor subjectDescriptor;
     subjectDescriptor.fabricIndex = kTestFabricIndex1;
     subjectDescriptor.subject     = kClientNodeId11;
-    SetPendingCheckInOnNetworkAttach(true, MakeOptional(subjectDescriptor));
+    ICDNotifier::GetInstance().NotifySendCheckIn(MakeOptional(subjectDescriptor));
+
+    // Assert real deferral: pending check-in flag is asserted and subject is preserved
+    EXPECT_TRUE(IsPendingCheckInOnNetworkAttach());
+    EXPECT_TRUE(GetPendingCheckInSubject().HasValue());
+    EXPECT_EQ(GetPendingCheckInSubject().Value().fabricIndex, kTestFabricIndex1);
+    EXPECT_EQ(GetPendingCheckInSubject().Value().subject, kClientNodeId11);
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
     // Step 3 & 4: Thread attaches -> replaying deferred Check-In for specific subject
+    SetThreadConnectivityState(true /* enabled */, true /* attached */);
     DeviceLayer::ChipDeviceEvent event{ .Type                     = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
                                         .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Established } };
     HandlePlatformEvent(&event);
     AdvanceClockAndRunEventLoop(100_ms);
+
+    // Assert pending Check-In flag is consumed
+    EXPECT_FALSE(IsPendingCheckInOnNetworkAttach());
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 
@@ -1521,7 +1571,8 @@ TEST_F(TestICDManager, TestScenario9_SubscriptionTimeout_ThreadUnattached_Deferr
 
 TEST_F(TestICDManager, TestScenario10_SilentLinkHealing_BackgroundAttachNoWake)
 {
-    // Pre-condition: Device in IdleMode deep sleep
+    // Pre-condition: Device in IdleMode deep sleep with Thread attached
+    SetThreadConnectivityState(true /* enabled */, true /* attached */);
     AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetActiveModeDuration());
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
@@ -1541,17 +1592,26 @@ TEST_F(TestICDManager, TestScenario11_ExtendedOutage_IdlePreservedUntilAttach)
     AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetActiveModeDuration());
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
-    // Step 1 & 2: Multiple periodic wake-ups fire during extended network outage
-    SetPendingActiveModeOnNetworkAttach(true);
+    // Step 1: Extended network outage occurs
+    SetThreadConnectivityState(true /* enabled */, false /* attached */);
+
+    // Step 2: Multiple periodic wake-ups fire during outage -> all deferred via real triggers
+    AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetModeBasedIdleModeDuration() + 1_s);
+    ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
+
+    // Assert pending state
+    EXPECT_TRUE(IsPendingActiveModeOnNetworkAttach());
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
     // Step 3: Hub comes back online at t=45m -> Thread attaches
+    SetThreadConnectivityState(true /* enabled */, true /* attached */);
     DeviceLayer::ChipDeviceEvent event{ .Type                     = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
                                         .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Established } };
     HandlePlatformEvent(&event);
     AdvanceClockAndRunEventLoop(100_ms);
 
     // Step 4: Device wakes up and executes Check-In upon attach
+    EXPECT_FALSE(IsPendingActiveModeOnNetworkAttach());
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
 }
 
@@ -1566,9 +1626,11 @@ TEST_F(TestICDManager, TestScenario12_DeviceAlreadyInActiveMode_WhenThreadAttach
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
 
     // Step 1: Subscription report queued while unattached
+    SetThreadConnectivityState(true /* enabled */, false /* attached */);
     ICDNotifier::GetInstance().NotifySubscriptionReport();
 
     // Step 2: Thread re-attaches before ActiveMode ends
+    SetThreadConnectivityState(true /* enabled */, true /* attached */);
     DeviceLayer::ChipDeviceEvent event{ .Type                     = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
                                         .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Established } };
     HandlePlatformEvent(&event);
@@ -1587,38 +1649,47 @@ TEST_F(TestICDManager, TestScenario13_RapidNetworkFlapping_Resilience)
     AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetActiveModeDuration());
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
-    // Queue a deferred event
+    // Step 1: Queue a deferred event while unattached
+    SetThreadConnectivityState(true /* enabled */, false /* attached */);
     ICDNotifier::GetInstance().NotifySubscriptionReport();
+    EXPECT_TRUE(IsPendingActiveModeOnNetworkAttach());
 
     // Flap 1: Connect
+    SetThreadConnectivityState(true /* enabled */, true /* attached */);
     DeviceLayer::ChipDeviceEvent connectEvent{ .Type                     = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
                                                .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Established } };
     HandlePlatformEvent(&connectEvent);
     AdvanceClockAndRunEventLoop(10_ms);
 
     // Flap 2: Immediate Disconnect
+    SetThreadConnectivityState(true /* enabled */, false /* attached */);
     DeviceLayer::ChipDeviceEvent disconnectEvent{ .Type = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
                                                   .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Lost } };
     HandlePlatformEvent(&disconnectEvent);
     AdvanceClockAndRunEventLoop(10_ms);
 
     // Flap 3: Re-connect
+    SetThreadConnectivityState(true /* enabled */, true /* attached */);
     HandlePlatformEvent(&connectEvent);
     AdvanceClockAndRunEventLoop(100_ms);
 
     // Verifies clean state recovery without deadlocks
+    EXPECT_FALSE(IsPendingActiveModeOnNetworkAttach());
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
 }
 
 TEST_F(TestICDManager, TestScenario14_DeviceShutdown_LifecycleReset)
 {
-    // Step 1: Queue a deferred event
+    // Step 1: Queue a deferred event while unattached
+    SetThreadConnectivityState(true /* enabled */, false /* attached */);
     ICDNotifier::GetInstance().NotifySubscriptionReport();
+    EXPECT_TRUE(IsPendingActiveModeOnNetworkAttach());
 
     // Step 2: Shutdown device
     mICDManager.Shutdown();
 
-    // Step 3: Verify all timers canceled and state cleanly reset
+    // Step 3: Verify all timers canceled and deferred state cleanly reset
+    EXPECT_FALSE(IsPendingActiveModeOnNetworkAttach());
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
 
     // Step 4: Re-initialize ICDManager
@@ -1653,23 +1724,28 @@ TEST_F(TestICDManager, TestScenario15_DeviceReboot_ColdBoot_DeferredIfDetached)
     mICDManager.Init();
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
-    // Step 2: At bootup (kServerReady), TriggerCheckInMessages is called when Thread is detached
-    // Setting pending flag simulates the unattached bootup deferral
-    SetPendingActiveModeOnNetworkAttach(true);
+    // Step 2: Thread is unattached on cold boot
+    SetThreadConnectivityState(true /* enabled */, false /* attached */);
 
-    // Step 3: Verify the device stays in low-power IdleMode (deep sleep) while Thread is attaching
+    // Step 3: At bootup (kServerReady), TriggerCheckInMessages / network activity is triggered
+    ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
+
+    // Step 4: Verify the device stays in low-power IdleMode (deep sleep) while Thread is attaching
+    EXPECT_TRUE(IsPendingActiveModeOnNetworkAttach());
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
-    // Step 4: OpenThread finishes MLE attach in background -> kConnectivity_Established fires
+    // Step 5: OpenThread finishes MLE attach in background -> kConnectivity_Established fires
+    SetThreadConnectivityState(true /* enabled */, true /* attached */);
     DeviceLayer::ChipDeviceEvent event{ .Type                     = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
                                         .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Established } };
     HandlePlatformEvent(&event);
     AdvanceClockAndRunEventLoop(100_ms);
 
-    // Step 5: Verify device enters ActiveMode and flushes the deferred bootup Check-In
+    // Step 6: Verify device enters ActiveMode and flushes the deferred bootup Check-In
+    EXPECT_FALSE(IsPendingActiveModeOnNetworkAttach());
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
 
-    // Step 6: ActiveMode completes -> returns to IdleMode
+    // Step 7: ActiveMode completes -> returns to IdleMode
     AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetActiveModeDuration() + 1_ms32);
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 }
