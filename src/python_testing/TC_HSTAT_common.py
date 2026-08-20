@@ -16,10 +16,12 @@
 
 
 import logging
+from typing import Any
 
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.clusters.ClusterObjects import ClusterAttributeDescriptor
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest
 
@@ -27,11 +29,19 @@ log = logging.getLogger(__name__)
 
 
 class HSTATBase(MatterBaseTest):
-    """
-    This is a base class for Humidistat cluster tests.
+    """Base class for Humidistat cluster test cases.
+
+    Provides common setup logic, feature support detection, attribute read/write
+    helpers, and command wrappers for testing the Humidistat cluster.
     """
 
-    async def setup(self):
+    async def setup(self) -> None:
+        """Sets up cluster references, reads supported attributes and feature map.
+
+        Initializes references to cluster definitions, queries the FeatureMap and
+        AttributeList to determine supported features, and sets up convenience
+        attributes and enum constants for test cases.
+        """
         self.endpoint = self.get_endpoint()
         self.cluster = Clusters.Humidistat
         self.attributes = self.cluster.Attributes
@@ -73,21 +83,45 @@ class HSTATBase(MatterBaseTest):
         self.stateIdle = self.cluster.Enums.SystemStateEnum.kIdle
         self.ModeEnum = self.cluster.Enums.ModeEnum
 
-    async def read_attribute_expect_success(self, attribute):
+    async def read_attribute_expect_success(self, attribute: type[ClusterAttributeDescriptor]) -> Any:
+        """Reads a single Humidistat attribute from the DUT and asserts success.
+
+        Args:
+            attribute: The Humidistat cluster attribute descriptor class to read.
+
+        Returns:
+            The decoded value of the attribute read from the DUT.
+        """
         cluster = Clusters.Objects.Humidistat
         return await self.read_single_attribute_check_success(endpoint=self.get_endpoint(), cluster=cluster, attribute=attribute)
 
-    async def write_attribute_expect_success(self, attribute):
+    async def write_attribute_expect_success(self, attribute: ClusterAttributeDescriptor) -> None:
+        """Writes a single Humidistat attribute to the DUT and asserts success.
+
+        Args:
+            attribute: The Humidistat cluster attribute descriptor instance containing
+                the value to write.
+        """
         cluster = Clusters.Objects.Humidistat
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.get_endpoint(), attribute)])
         err_msg = f"Received error status {str(result[0].Status)} when writing {str(cluster)}:{str(attribute)}"
         asserts.assert_equal(result[0].Status, Status.Success, err_msg)
 
-    async def send_SetSettingsCommand_expect_success(self, **kwargs) -> None:
+    async def send_SetSettingsCommand_expect_success(self, **kwargs: Any) -> None:
+        """Sends the SetSettings command to the DUT and asserts success.
+
+        Args:
+            **kwargs: Keyword arguments passed to the SetSettings command.
+        """
         await self.send_single_cmd(cmd=self.SetSettings(**kwargs), endpoint=self.get_endpoint(), timedRequestTimeoutMs=1000)
 
-    async def send_SetSettingsCommand_expect_error(self, **kwargs) -> None:
-        error = kwargs.pop("error", Status.Success)
+    async def send_SetSettingsCommand_expect_error(self, error: Status = Status.Success, **kwargs: Any) -> None:
+        """Sends the SetSettings command to the DUT and asserts that an expected error is returned.
+
+        Args:
+            error: The expected InteractionModel Status error code. Defaults to Status.Success.
+            **kwargs: Keyword arguments passed to the SetSettings command.
+        """
         try:
             await self.send_single_cmd(cmd=self.SetSettings(**kwargs), endpoint=self.get_endpoint(), timedRequestTimeoutMs=1000)
             asserts.assert_true(False, "Unexpected command success, for command SetSettings")
@@ -96,7 +130,9 @@ class HSTATBase(MatterBaseTest):
             pass
 
     async def send_onoff_on_cmd_expect_success(self) -> None:
+        """Sends the On command to the OnOff cluster on the DUT endpoint and asserts success."""
         await self.send_single_cmd(cmd=Clusters.OnOff.Commands.On(), endpoint=self.get_endpoint(), timedRequestTimeoutMs=1000)
 
     async def send_onoff_off_cmd_expect_success(self) -> None:
+        """Sends the Off command to the OnOff cluster on the DUT endpoint and asserts success."""
         await self.send_single_cmd(cmd=Clusters.OnOff.Commands.Off(), endpoint=self.get_endpoint(), timedRequestTimeoutMs=1000)
