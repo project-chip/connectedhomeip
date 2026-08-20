@@ -1,0 +1,166 @@
+/*
+ *
+ *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#pragma once
+
+#include <app/CommandHandler.h>
+#include <app/data-model-provider/OperationTypes.h>
+#include <clusters/CommissioningProxy/Enums.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/support/Pool.h>
+#include <lib/support/TimerDelegate.h>
+#include <protocols/interaction_model/StatusCode.h>
+
+#include <cstdint>
+#include <optional>
+#include <utility>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace CommissioningProxy {
+
+/**
+ * @brief Transport-agnostic proxy-session bookkeeping and ProxyMessage routing.
+ *
+ * Owns everything about a live proxy session that does not depend on the physical
+ * transport: session-id allocation, the id → {transport, fabric} table, per-fabric
+ * isolation checks, the active-session count for the MaxSessions gate, and the
+ * pending ProxyMessageRequest exchange (with its response-timeout timer).
+ *
+ * A platform transport calls Alloc()/Register() when a connection completes,
+ * Remove() on teardown, and DispatchMessageResponse()/DispatchMessageFailure() when
+ * a commissionee reply arrives or the link drops. All calls run on the Matter
+ * thread with the stack lock held.
+ */
+class CommissioningProxySessionManager
+{
+public:
+    struct SessionInfo
+    {
+        CapabilitiesBitmap transport;
+        FabricIndex fabricIndex;
+    };
+
+    CommissioningProxySessionManager() = delete;
+    explicit CommissioningProxySessionManager(TimerDelegate & timerDelegate) : mTimerDelegate(timerDelegate) {}
+    ~CommissioningProxySessionManager() = default;
+
+    // --- Session table ------------------------------------------------------
+
+    /// Allocate the next free session id (never 0, never a currently-active id).
+    uint16_t AllocSessionId();
+
+    /// Record an established session. Idempotent overwrite for a re-registered id.
+    void RegisterSession(uint16_t sessionId, CapabilitiesBitmap transport, FabricIndex fabricIndex);
+
+    /// Drop a session record and cancel any pending message for it. Idempotent.
+    void RemoveSession(uint16_t sessionId);
+
+    /// Look up a session, or std::nullopt if unknown.
+    std::optional<SessionInfo> FindSession(uint16_t sessionId) const;
+
+    /// Id of any one session belonging to @p fabricIndex, or std::nullopt. Call
+    /// repeatedly (removing each) to drain a fabric.
+    std::optional<uint16_t> FindAnySessionIdOnFabric(FabricIndex fabricIndex) const;
+
+    /// Number of established sessions (excludes in-flight connects — the cluster
+    /// adds each transport's IsConnectPending() to this for the MaxSessions gate).
+    uint8_t ActiveCount() const;
+
+    bool IsEmpty() const { return ActiveCount() == 0; }
+
+    // --- ProxyMessageRequest routing ----------------------------------------
+
+    /**
+     * @brief Record a pending ProxyMessageRequest so the commissionee reply can be
+     *        matched back to it, keeping the IM exchange open and arming a
+     *        response-timeout timer. Call this only for a non-zero responseTimeout
+     *        (a zero timeout is a fire-and-forget poll the cluster answers directly).
+     *
+     * @return Busy if a live request is already pending for @p sessionId (an already
+     *         expired one is cleaned up first); Success once the pending state is
+     *         armed. The caller then forwards the bytes to the transport, and calls
+     *         AbortPending() if that send fails.
+     */
+    Protocols::InteractionModel::Status BeginMessage(uint16_t sessionId, app::CommandHandler * commandObj,
+                                                     const DataModel::InvokeRequest & request, uint8_t responseTimeoutSeconds);
+
+    /// Tear down pending state for a session without answering the commissioner
+    /// (used to roll back BeginMessage when the transport send fails).
+    void AbortPending(uint16_t sessionId);
+
+    /// Forward a commissionee reply as a ProxyMessageResponse. No-op if nothing is
+    /// pending for @p sessionId.
+    void DispatchMessageResponse(uint16_t sessionId, const uint8_t * data, size_t length);
+
+    /// Fail a pending ProxyMessageRequest (e.g. session dropped mid-message).
+    void DispatchMessageFailure(uint16_t sessionId, Protocols::InteractionModel::Status status);
+
+    /// Cancel every session and pending message (cluster teardown).
+    void Shutdown();
+
+private:
+    // One in-flight ProxyMessageRequest per session: keeps the IM exchange open until
+    // the commissionee replies and the transport hands the bytes back. Each record is its
+    // own TimerContext so that concurrent sessions each get their own response timeout.
+    struct PendingMessage : public TimerContext
+    {
+        PendingMessage(CommissioningProxySessionManager * aOwner, app::CommandHandler::Handle && aHandle,
+                       const app::ConcreteCommandPath & aPath, uint16_t aSessionId) :
+            owner(aOwner),
+            handle(std::move(aHandle)), path(aPath), sessionId(aSessionId)
+        {}
+
+        CommissioningProxySessionManager * owner;
+        app::CommandHandler::Handle handle;
+        app::ConcreteCommandPath path;
+        uint16_t sessionId;
+
+        void TimerFired() override { owner->OnResponseTimeout(this); }
+    };
+
+    /// Resolve the pending request for @p sessionId with Status::Timeout (called by
+    /// PendingMessage::TimerFired).
+    void OnResponseTimeout(PendingMessage * pm);
+
+    /// One established session. `inUse` false marks a free slot; the table is small
+    /// (MaxSessions) so a linear scan beats any index.
+    struct SessionSlot
+    {
+        bool inUse = false;
+        uint16_t sessionId;
+        SessionInfo info;
+        PendingMessage * pending = nullptr; // at most one in-flight request per session
+    };
+
+    SessionSlot * FindSlot(uint16_t sessionId);
+    const SessionSlot * FindSlot(uint16_t sessionId) const;
+
+    TimerDelegate & mTimerDelegate;
+    SessionSlot mSessions[CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS];
+    ObjectPool<PendingMessage, CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS> mPendingPool;
+    uint16_t mNextSessionId = 1;
+};
+
+} // namespace CommissioningProxy
+} // namespace Clusters
+} // namespace app
+} // namespace chip
