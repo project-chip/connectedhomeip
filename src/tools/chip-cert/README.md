@@ -188,8 +188,8 @@ PDC Identities are usually transferred in (compact) TLV format. Convert to TLV
 Either format validates as a self-signed identity:
 
 ```
-./chip-cert validate-cert identity.pem && echo OK
-./chip-cert validate-cert identity.hex && echo OK
+./chip-cert validate-cert -p identity.pem && echo OK
+./chip-cert validate-cert -p identity.hex && echo OK
 ```
 
 ## Command Reference

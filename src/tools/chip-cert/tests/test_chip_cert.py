@@ -123,7 +123,7 @@ class ChipCertTest(unittest.TestCase):
 
 
 class PDCIdentityTest(ChipCertTest):
-    """Tests covering Wi-Fi PDC (Network Client) Identity certificates."""
+    """Tests covering PDC (Network / Client) Identity certificates."""
 
     def assert_is_pdc_identity(self, source):
         """Check the field values the specification mandates for a PDC Identity."""
@@ -137,7 +137,7 @@ class PDCIdentityTest(ChipCertTest):
         self.assertEqual(fields["Not After"], PDC_NOT_AFTER)
         self.assertEqual(fields["Is CA"], "false")
         # validate-cert checks the remaining requirements, including the self-signature.
-        self.run_chip_cert("validate-cert", source)
+        self.run_chip_cert("validate-cert", "--pdc-identity", source)
 
     def test_gen_cert_uses_compact_format(self):
         """gen-cert writes PDC Identities in the compact-pdc-identity format."""
@@ -205,7 +205,7 @@ class PDCIdentityTest(ChipCertTest):
         path = self.tmp_path / "tampered.chip"
         path.write_bytes(bytes(tampered))
 
-        self.run_chip_cert("validate-cert", path, expect_success=False)
+        self.run_chip_cert("validate-cert", "--pdc-identity", path, expect_success=False)
 
     def test_validate_cert_rejects_ca_cert_with_pdc_subject(self):
         """A CN=* CA certificate is recognised as an identity but fails the remaining checks.
@@ -215,7 +215,7 @@ class PDCIdentityTest(ChipCertTest):
         """
         source = self.generate_ca_cert_with_pdc_subject()
 
-        self.run_chip_cert("validate-cert", source, expect_success=False)
+        self.run_chip_cert("validate-cert", "--pdc-identity", source, expect_success=False)
 
 
 class OperationalCertTest(ChipCertTest):
