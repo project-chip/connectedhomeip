@@ -557,6 +557,74 @@ TEST_F(TestRemoteAvAnalysisCluster, ExecuteTrackingEnabledPersistenceTest)
     ASSERT_TRUE(trackingEnabled);
 }
 
+// Simulates the real CommandHandlerImpl handle lifecycle: tracks Handles and can invalidate them,
+// as happens when the invoking client's exchange closes (e.g. client-side timeout).
+class InvalidatableCommandHandler : public Testing::MockCommandHandler
+{
+public:
+    void IncrementHoldOff(CommandHandler::Handle * apHandle) override { mHandles.push_back(apHandle); }
+    void DecrementHoldOff(CommandHandler::Handle * apHandle) override
+    {
+        mHandles.erase(std::remove(mHandles.begin(), mHandles.end(), apHandle), mHandles.end());
+    }
+
+    void InvalidateHandles()
+    {
+        for (auto * handle : mHandles)
+        {
+            handle->Invalidate();
+        }
+        mHandles.clear();
+    }
+
+private:
+    std::vector<CommandHandler::Handle *> mHandles;
+};
+
+TEST_F(TestRemoteAvAnalysisCluster, BusyWhileInteractionInFlightEvenIfCommandExchangeDied)
+{
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EstablishAnalysisStream::Id };
+    Commands::EstablishAnalysisStream::DecodableType commandData;
+    commandData.nodeID = 0x1234;
+
+    // First command parks and starts the camera interaction
+    InvalidatableCommandHandler firstHandler;
+    firstHandler.SetFabricIndex(1);
+    auto firstResponse = mServer.GetLogic().HandleEstablishAnalysisStream(firstHandler, path, commandData);
+    ASSERT_FALSE(firstResponse.has_value());
+    auto * firstCallback = mFakeCameraClient.mLastCallback;
+
+    // The client's exchange dies (e.g. chip-tool timeout) while the camera interaction continues
+    firstHandler.InvalidateHandles();
+
+    // A second command must still be answered Busy:
+    Testing::MockCommandHandler secondHandler;
+    secondHandler.SetFabricIndex(1);
+    auto secondResponse = mServer.GetLogic().HandleEstablishAnalysisStream(secondHandler, path, commandData);
+    if (secondResponse.has_value())
+    {
+        ASSERT_TRUE(secondResponse->GetStatusCode() == Protocols::InteractionModel::ClusterStatusCode(Status::Busy));
+    }
+    else
+    {
+        FAIL();
+    }
+    ASSERT_EQ(mFakeCameraClient.mAllocationRequests, 1);
+
+    // The first interaction's late completion must not answer the second command
+    firstCallback->OnVideoStreamAllocated(Status::Success, 7);
+    ASSERT_FALSE(secondHandler.HasResponse());
+    ASSERT_FALSE(secondHandler.HasStatus());
+
+    // With the interaction complete, a new command is accepted again
+    Testing::MockCommandHandler thirdHandler;
+    thirdHandler.SetFabricIndex(1);
+    auto thirdResponse = mServer.GetLogic().HandleEstablishAnalysisStream(thirdHandler, path, commandData);
+    ASSERT_FALSE(thirdResponse.has_value());
+    mFakeCameraClient.mLastCallback->OnVideoStreamAllocated(Status::Success, 8);
+    ASSERT_TRUE(thirdHandler.HasResponse());
+}
+
 TEST_F(TestRemoteAvAnalysisCluster, ShutdownCancelsPendingCameraInteraction)
 {
     ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EstablishAnalysisStream::Id };

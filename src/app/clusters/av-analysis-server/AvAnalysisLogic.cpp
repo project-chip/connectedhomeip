@@ -92,7 +92,8 @@ void AvAnalysisServerLogic::Shutdown()
     }
 
     // Release any command still waiting on a camera interaction; its exchange dies with the server.
-    mPendingCommandHandle = CommandHandler::Handle();
+    mCameraRequestInFlight = false;
+    mPendingCommandHandle  = CommandHandler::Handle();
 
     if (mDelegate != nullptr)
     {
@@ -114,6 +115,8 @@ void AvAnalysisServerLogic::SetStreamState(AnalysisStreamEntry & aEntry, Analysi
 
 void AvAnalysisServerLogic::OnVideoStreamAllocated(Status aStatus, uint16_t aVideoStreamId)
 {
+    mCameraRequestInFlight = false;
+
     auto handleRef = std::move(mPendingCommandHandle);
     auto * handler = handleRef.Get();
     VerifyOrReturn(handler != nullptr);
@@ -145,6 +148,8 @@ void AvAnalysisServerLogic::OnVideoStreamAllocated(Status aStatus, uint16_t aVid
 
 void AvAnalysisServerLogic::OnVideoStreamDeallocated(Status aStatus, uint16_t aAnalysisStreamId)
 {
+    mCameraRequestInFlight = false;
+
     auto handleRef = std::move(mPendingCommandHandle);
     auto * handler = handleRef.Get();
     VerifyOrReturn(handler != nullptr);
@@ -873,7 +878,10 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleEstabl
                         ChipLogError(Zcl, "AvAnalysis[ep=%d]: no camera client configured", mEndpointId));
 
     // One camera-bound command at a time; the response of this one depends on the camera's answer
-    VerifyOrReturnValue(mPendingCommandHandle.Get() == nullptr, Status::Busy);
+    // One camera-bound command at a time. Gate on the interaction, not the command handle: the
+    // handle can be invalidated (client exchange closed) while the camera interaction is still
+    // in flight, and starting a second interaction then would cross-wire its completion.
+    VerifyOrReturnValue(!mCameraRequestInFlight, Status::Busy);
 
     // The camera SHALL be on the same fabric as the Analysis Node: reach it on the invoking client's fabric
     ScopedNodeId cameraNode(commandData.nodeID, handler.GetAccessingFabricIndex());
@@ -883,12 +891,14 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleEstabl
     mPendingCameraNode    = cameraNode;
     handler.FlushAcksRightAwayOnSlowCommand();
 
-    CHIP_ERROR err = mCameraClient->RequestVideoStreamAllocation(cameraNode, *this);
+    mCameraRequestInFlight = true;
+    CHIP_ERROR err         = mCameraClient->RequestVideoStreamAllocation(cameraNode, *this);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "AvAnalysis[ep=%d]: failed to start stream allocation: %" CHIP_ERROR_FORMAT, mEndpointId, err.Format());
-        mPendingCommandHandle = CommandHandler::Handle();
-        return Status::Failure;
+        mCameraRequestInFlight = false;
+        mPendingCommandHandle  = CommandHandler::Handle();
+        return (err == CHIP_ERROR_BUSY) ? Status::Busy : Status::Failure;
     }
 
     // Response is produced in OnVideoStreamAllocated once the camera answers
@@ -931,18 +941,20 @@ AvAnalysisServerLogic::HandleRemoveAnalysisStream(CommandHandler & handler, cons
                         ChipLogError(Zcl, "AvAnalysis[ep=%d]: no camera client configured", mEndpointId));
 
     // One camera-bound command at a time; the response of this one depends on the camera's answer
-    VerifyOrReturnValue(mPendingCommandHandle.Get() == nullptr, Status::Busy);
+    VerifyOrReturnValue(!mCameraRequestInFlight, Status::Busy);
 
     mPendingCommandHandle = CommandHandler::Handle(&handler);
     mPendingCommandPath   = commandPath;
     handler.FlushAcksRightAwayOnSlowCommand();
 
-    CHIP_ERROR err = mCameraClient->RequestVideoStreamDeallocation(entry->cameraNode, commandData.analysisStreamID, *this);
+    mCameraRequestInFlight = true;
+    CHIP_ERROR err         = mCameraClient->RequestVideoStreamDeallocation(entry->cameraNode, commandData.analysisStreamID, *this);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "AvAnalysis[ep=%d]: failed to start stream deallocation: %" CHIP_ERROR_FORMAT, mEndpointId, err.Format());
-        mPendingCommandHandle = CommandHandler::Handle();
-        return Status::Failure;
+        mCameraRequestInFlight = false;
+        mPendingCommandHandle  = CommandHandler::Handle();
+        return (err == CHIP_ERROR_BUSY) ? Status::Busy : Status::Failure;
     }
 
     // Response is produced in OnVideoStreamDeallocated once the camera answers

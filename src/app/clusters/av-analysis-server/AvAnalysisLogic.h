@@ -151,7 +151,8 @@ private:
     // Backing store for the AnalysisStreams attribute; only initialized when RemoteContextDetection is set.
     AvAnalysis::AnalysisStreamTable mStreamTable;
 
-    // The command whose response is pending on a camera interaction
+    // Whether a camera interaction is in flight.
+    bool mCameraRequestInFlight = false;
     CommandHandler::Handle mPendingCommandHandle;
     ConcreteCommandPath mPendingCommandPath = ConcreteCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
     ScopedNodeId mPendingCameraNode;
