@@ -1,11 +1,11 @@
 # Commissioning Proxy Cluster
 
-The Commissioning Proxy cluster (cluster ID 0x0455) provides a
-proxy service that allows a Commissioner to use commissioning transports not
-supported locally, or to extend its commissioning range. Commissioners can use
-the proxy to discover and establish a connection to commissionable devices that
-are reachable by the proxy. The proxy connection acts as a tunnel through which
-the Commissioner can run a PASE session with the commissionable device and
+The Commissioning Proxy cluster (cluster ID 0x0455) provides a proxy service
+that allows a Commissioner to use commissioning transports not supported
+locally, or to extend its commissioning range. Commissioners can use the proxy
+to discover and establish a connection to commissionable devices that are
+reachable by the proxy. The proxy connection acts as a tunnel through which the
+Commissioner can run a PASE session with the commissionable device and
 ultimately commission it.
 
 ## Overview
@@ -28,8 +28,8 @@ aggregation:
 | `CommissioningProxyScanAggregator` | Combines a multi-transport `ProxyScanRequest` into one `ProxyScanResponse`                                                |
 
 A fourth transport-agnostic component, `CommissioningProxyBgScanRegistry`, ships
-with the cluster but is **instantiated per transport and owned by the
-driver** rather than composed by the cluster:
+with the cluster but is **instantiated per transport and owned by the driver**
+rather than composed by the cluster:
 `ProxyBackGroundScanStartRequest`/`ProxyBackGroundScanStopRequest` fan out to
 every matching driver, so the per-fabric records they arbitrate are necessarily
 transport-local. It holds the per-fabric scan requests and their lifetime
