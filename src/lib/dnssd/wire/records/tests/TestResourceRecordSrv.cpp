@@ -18,7 +18,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <lib/core/StringBuilderAdapters.h>
-#include <lib/dnssd/minimal_mdns/records/Srv.h>
+#include <lib/dnssd/wire/records/Srv.h>
 
 namespace {
 

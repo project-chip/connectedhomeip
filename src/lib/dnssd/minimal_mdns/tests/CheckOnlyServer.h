@@ -28,9 +28,9 @@
 #include <lib/dnssd/MinimalMdnsServer.h>
 #include <lib/dnssd/minimal_mdns/RecordData.h>
 #include <lib/dnssd/minimal_mdns/Server.h>
-#include <lib/dnssd/minimal_mdns/records/Ptr.h>
-#include <lib/dnssd/minimal_mdns/records/Srv.h>
-#include <lib/dnssd/minimal_mdns/records/Txt.h>
+#include <lib/dnssd/wire/records/Ptr.h>
+#include <lib/dnssd/wire/records/Srv.h>
+#include <lib/dnssd/wire/records/Txt.h>
 #include <lib/support/CHIPMemString.h>
 #include <system/SystemMutex.h>
 
