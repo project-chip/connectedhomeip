@@ -19,8 +19,8 @@
 
 #include <system/SystemPacketBuffer.h>
 
-#include <lib/dnssd/minimal_mdns/Query.h>
-#include <lib/dnssd/minimal_mdns/core/DnsHeader.h>
+#include <lib/dnssd/wire/DnsHeader.h>
+#include <lib/dnssd/wire/Query.h>
 
 namespace mdns {
 namespace Minimal {
@@ -34,11 +34,11 @@ public:
     QueryBuilder & Reset(chip::System::PacketBufferHandle && packet)
     {
         mPacket = std::move(packet);
-        mHeader = HeaderRef(mPacket->Start());
+        mHeader = chip::Dnssd::HeaderRef(mPacket->Start());
 
-        if (mPacket->AvailableDataLength() >= HeaderRef::kSizeBytes)
+        if (mPacket->AvailableDataLength() >= chip::Dnssd::HeaderRef::kSizeBytes)
         {
-            mPacket->SetDataLength(HeaderRef::kSizeBytes);
+            mPacket->SetDataLength(chip::Dnssd::HeaderRef::kSizeBytes);
             mHeader.Clear();
         }
         else
@@ -53,14 +53,14 @@ public:
     CHECK_RETURN_VALUE
     chip::System::PacketBufferHandle && ReleasePacket()
     {
-        mHeader       = HeaderRef(nullptr);
+        mHeader       = chip::Dnssd::HeaderRef(nullptr);
         mQueryBuildOk = false;
         return std::move(mPacket);
     }
 
-    HeaderRef & Header() { return mHeader; }
+    chip::Dnssd::HeaderRef & Header() { return mHeader; }
 
-    QueryBuilder & AddQuery(const Query & query)
+    QueryBuilder & AddQuery(const chip::Dnssd::Query & query)
     {
         if (!mQueryBuildOk)
         {
@@ -68,7 +68,7 @@ public:
         }
 
         chip::Encoding::BigEndian::BufferWriter out(mPacket->Start() + mPacket->DataLength(), mPacket->AvailableDataLength());
-        RecordWriter writer(&out);
+        chip::Dnssd::RecordWriter writer(&out);
 
         if (!query.Append(mHeader, writer))
         {
@@ -85,7 +85,7 @@ public:
 
 private:
     chip::System::PacketBufferHandle mPacket;
-    HeaderRef mHeader;
+    chip::Dnssd::HeaderRef mHeader;
     bool mQueryBuildOk = true;
 };
 
