@@ -40,17 +40,16 @@
 import logging
 
 from mobly import asserts
-from TC_HSTAT_Test_Base import HSTATBase
+from TC_HSTAT_common import HSTATBase
 
 from matter.clusters.Types import NullValue
-from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_HSTAT_2_1(MatterBaseTest, HSTATBase):
+class TC_HSTAT_2_1(HSTATBase):
     def pics_TC_HSTAT_2_1(self) -> list[str]:
         return [
             "HSTAT.S",

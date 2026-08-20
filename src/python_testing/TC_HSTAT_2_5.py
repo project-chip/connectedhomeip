@@ -37,13 +37,12 @@
 import logging
 
 from mobly import asserts
-from TC_HSTAT_Test_Base import HSTATBase
+from TC_HSTAT_common import HSTATBase
 
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -51,7 +50,7 @@ log = logging.getLogger(__name__)
 # Auto-generated from test specification: [TC-HSTAT-2.5] Mist functionality with DUT as Server
 
 
-class TC_HSTAT_2_5(MatterBaseTest, HSTATBase):
+class TC_HSTAT_2_5(HSTATBase):
 
     def pics_TC_HSTAT_2_5(self) -> list[str]:
         return [
