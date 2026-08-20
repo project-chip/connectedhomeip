@@ -50,6 +50,7 @@ AvAnalysisServerLogic::~AvAnalysisServerLogic() {}
 
 CHIP_ERROR AvAnalysisServerLogic::Startup(AttributePersistenceProvider & aAttributePersistenceProvider)
 {
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mAttributePersistenceProvider = &aAttributePersistenceProvider;
 
     // Make sure mandated Features are set, one and only one of Local or Remote has to be set
@@ -65,6 +66,8 @@ CHIP_ERROR AvAnalysisServerLogic::Startup(AttributePersistenceProvider & aAttrib
                         ChipLogError(Zcl, "AvAnalysis: If Per Zone Sensitivity is set, Zones must be present, and vice versa"));
 
     LoadPersistentAttributes();
+
+    ChipLogProgress(Zcl, "AvAnalysis Cluster: Startup completed ");
     return CHIP_NO_ERROR;
 }
 
