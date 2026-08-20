@@ -596,6 +596,7 @@ CHIP_ERROR EncodeCompactIdentityCert(ChipCertificateData const & cert, MutableBy
     ReturnErrorOnFailure(writer.Put(ContextTag(kTag_EllipticCurvePublicKey), cert.mPublicKey));
     ReturnErrorOnFailure(writer.Put(ContextTag(kTag_ECDSASignature), cert.mSignature));
     ReturnErrorOnFailure(writer.EndContainer(containerType));
+    ReturnErrorOnFailure(writer.Finalize());
     outCompactCert.reduce_size(writer.GetLengthWritten());
     return CHIP_NO_ERROR;
 }
