@@ -516,9 +516,9 @@ HELP OPTIONS
 
 ```
 $ ./out/debug/standalone/chip-cert validate-cert -h
-Usage: chip-cert validate-cert [ <options...> ] <target-cert-file>
+Usage: chip-cert validate-cert [ <options...> ] <file/str>
 
-Validate a chain of CHIP certificates.
+Validate a chain of CHIP certificates, or a single Wi-Fi PDC Identity.
 
 ARGUMENTS
 
@@ -539,6 +539,11 @@ COMMAND OPTIONS
 
        File or string containing a trusted CHIP certificate to be used during
        validation. Usually, it is trust anchor root certificate (RCAC).
+
+  -p, --pdc-identity
+
+       Validate the certificate as a PDC Identity. No other certificates are
+       involved, so the --cert and --trusted-cert options must not be used.
 
 HELP OPTIONS
 
