@@ -198,8 +198,8 @@ private:
 PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
                                       uint32_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse,
                                       python::TestOnlyPyBatchCommandsOverrides * testOnlyOverrides,
-                                      python::PyInvokeRequestData * batchCommandData, size_t length,
-                                      uint16_t delayMinMs, uint16_t delayJitterWindowMs)
+                                      python::PyInvokeRequestData * batchCommandData, size_t length, uint16_t delayMinMs,
+                                      uint16_t delayJitterWindowMs)
 {
     CommandSender::ConfigParameters config;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -432,10 +432,12 @@ PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProx
                                      testOnlyOverrides, batchCommandData, length, delayMinMs, delayJitterWindowMs);
 }
 
-PyChipError pychip_CommandSender_TestOnlySendBatchCommands(
-    void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs, uint32_t interactionTimeoutMs, uint16_t busyWaitMs,
-    bool suppressResponse, python::TestOnlyPyBatchCommandsOverrides testOnlyOverrides,
-    python::PyInvokeRequestData * batchCommandData, size_t length, uint16_t delayMinMs, uint16_t delayJitterWindowMs)
+PyChipError pychip_CommandSender_TestOnlySendBatchCommands(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
+                                                           uint32_t interactionTimeoutMs, uint16_t busyWaitMs,
+                                                           bool suppressResponse,
+                                                           python::TestOnlyPyBatchCommandsOverrides testOnlyOverrides,
+                                                           python::PyInvokeRequestData * batchCommandData, size_t length,
+                                                           uint16_t delayMinMs, uint16_t delayJitterWindowMs)
 {
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     return SendBatchCommandsInternal(appContext, device, timedRequestTimeoutMs, interactionTimeoutMs, busyWaitMs, suppressResponse,

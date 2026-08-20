@@ -168,7 +168,8 @@ class TC_IDM_1_5(IDMBaseTest):
         try:
             report_recv_time, new_val = await asyncio.to_thread(report_queue.get, timeout=wait_timeout_sec)
         except queue.Empty:
-            asserts.fail(f"Did not receive ReportDataMessage within {wait_timeout_sec:.2f}s following invoke command with DelayReportData")
+            asserts.fail(
+                f"Did not receive ReportDataMessage within {wait_timeout_sec:.2f}s following invoke command with DelayReportData")
 
         delta_t_ms = (report_recv_time - invoke_sent_time) * 1000.0
         log.info("Measured Delta t between sending InvokeRequest and receiving ReportData: %.2f ms (DelayMinMs=%d, Jitter=%d)",
