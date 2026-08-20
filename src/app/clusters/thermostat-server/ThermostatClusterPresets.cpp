@@ -22,6 +22,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <lib/core/Optional.h>
+#include <optional>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using namespace chip::app::Clusters::Globals::Structs;
@@ -268,7 +269,7 @@ std::optional<DataModel::ActionReturnStatus> ThermostatPresets::ReadAttribute(co
         return encoder.Encode(mDelegate.GetNumberOfPresets());
     case Presets::Id: {
         auto & subjectDescriptor = encoder.GetSubjectDescriptor();
-        if (mCluster.GetAtomicWriteSession().InAtomicWrite(subjectDescriptor, MakeOptional(request.path.mAttributeId)))
+        if (mCluster.GetAtomicWriteSession().InAtomicWrite(subjectDescriptor, request.path.mAttributeId))
         {
             return encoder.EncodeList([this](const auto & enc) -> CHIP_ERROR {
                 for (uint8_t i = 0; true; i++)
@@ -322,12 +323,12 @@ std::optional<DataModel::ActionReturnStatus> ThermostatPresets::WriteAttribute(c
     auto & atomicWriteSession = mCluster.GetAtomicWriteSession();
 
     // Presets are not editable, return INVALID_IN_STATE.
-    VerifyOrReturnError(atomicWriteSession.InAtomicWrite(MakeOptional(request.path.mAttributeId)),
+    VerifyOrReturnError(atomicWriteSession.InAtomicWrite(std::make_optional(request.path.mAttributeId)),
                         CHIP_IM_GLOBAL_STATUS(InvalidInState), ChipLogError(Zcl, "Presets are not editable"));
 
     // OK, we're in an atomic write, make sure the requesting node is the same one that started the atomic write,
     // otherwise return BUSY.
-    if (!atomicWriteSession.InAtomicWrite(subjectDescriptor, MakeOptional(request.path.mAttributeId)))
+    if (!atomicWriteSession.InAtomicWrite(subjectDescriptor, request.path.mAttributeId))
     {
         ChipLogError(Zcl, "Another node is editing presets. Server is busy. Try again later");
         return CHIP_IM_GLOBAL_STATUS(Busy);

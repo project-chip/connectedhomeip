@@ -127,7 +127,7 @@ public:
      * @return true if the endpoint has an open atomic write
      * @return false if the endpoint does not have an open atomic write
      */
-    bool InAtomicWrite(Optional<AttributeId> attributeId = NullOptional);
+    bool InAtomicWrite(std::optional<AttributeId> attributeId = std::nullopt);
 
     /**
      * @brief Checks if the thermostat cluster has an atomic write open, filtered by fabric index
@@ -147,7 +147,7 @@ public:
      * @return true if the thermostat cluster has an open atomic write
      * @return false if the thermostat cluster does not have an open atomic write
      */
-    bool InAtomicWrite(const Access::SubjectDescriptor & subjectDescriptor, Optional<AttributeId> attributeId = NullOptional);
+    bool InAtomicWrite(const Access::SubjectDescriptor & subjectDescriptor, std::optional<AttributeId> attributeId = std::nullopt);
 
     /**
      * @brief Checks if a thermostat cluster has an atomic write open for a given command invocation, optionally filtered by an
@@ -158,7 +158,7 @@ public:
      * @return true if the thermostat cluster has an open atomic write
      * @return false if the thermostat cluster does not have an open atomic write
      */
-    bool InAtomicWrite(CommandHandler * commandObj, Optional<AttributeId> attributeId = NullOptional);
+    bool InAtomicWrite(CommandHandler * commandObj, std::optional<AttributeId> attributeId = std::nullopt);
 
     /**
      * @brief Checks if a thermostat cluster has an atomic write open for a given command invocation and a list of attributes
@@ -187,7 +187,7 @@ private:
     Protocols::InteractionModel::Status
     ExecuteAtomicAction(AtomicAttributes & attributeStatuses,
                         Protocols::InteractionModel::Status (Delegate::*action)(chip::AttributeId),
-                        Optional<Protocols::InteractionModel::Status> statusOverride);
+                        std::optional<Protocols::InteractionModel::Status> statusOverride);
 
     /// @brief Builds the list of attribute statuses to return from an AtomicRequest invocation
     /// @param attributeRequests The list of requested attributes

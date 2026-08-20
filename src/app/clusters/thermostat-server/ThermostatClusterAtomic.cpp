@@ -116,11 +116,11 @@ bool CountAttributeRequests(const DataModel::DecodableList<chip::AttributeId> at
 
 Status AtomicWriteSession::ExecuteAtomicAction(AtomicAttributes & attributeStatuses, Status (Delegate::*action)(AttributeId))
 {
-    return ExecuteAtomicAction(attributeStatuses, action, Optional<Status>());
+    return ExecuteAtomicAction(attributeStatuses, action, std::nullopt);
 }
 
 Status AtomicWriteSession::ExecuteAtomicAction(AtomicAttributes & attributeStatuses, Status (Delegate::*action)(AttributeId),
-                                               Optional<Status> statusOverride)
+                                               std::optional<Status> statusOverride)
 {
     Status status = Status::Success;
     for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
@@ -128,7 +128,7 @@ Status AtomicWriteSession::ExecuteAtomicAction(AtomicAttributes & attributeStatu
         auto & attributeStatus = attributeStatuses[i];
         auto actionStatus      = std::invoke(action, mDelegate, attributeStatus.attributeID);
 
-        attributeStatus.statusCode = to_underlying(statusOverride.ValueOr(actionStatus));
+        attributeStatus.statusCode = to_underlying(statusOverride.value_or(actionStatus));
         if (actionStatus != Status::Success)
         {
             status = Status::Failure;
@@ -137,20 +137,20 @@ Status AtomicWriteSession::ExecuteAtomicAction(AtomicAttributes & attributeStatu
     return status;
 }
 
-bool AtomicWriteSession::InAtomicWrite(Optional<AttributeId> attributeId)
+bool AtomicWriteSession::InAtomicWrite(std::optional<AttributeId> attributeId)
 {
 
     if (mState != State::Open)
     {
         return false;
     }
-    if (!attributeId.HasValue())
+    if (!attributeId.has_value())
     {
         return true;
     }
     for (size_t i = 0; i < mAttributeIds.AllocatedSize(); ++i)
     {
-        if (mAttributeIds[i] == attributeId.Value())
+        if (mAttributeIds[i] == attributeId.value())
         {
             return true;
         }
@@ -167,7 +167,7 @@ bool AtomicWriteSession::InAtomicWrite(FabricIndex fabricIndex)
     return mNodeId.GetFabricIndex() == fabricIndex;
 }
 
-bool AtomicWriteSession::InAtomicWrite(const Access::SubjectDescriptor & subjectDescriptor, Optional<AttributeId> attributeId)
+bool AtomicWriteSession::InAtomicWrite(const Access::SubjectDescriptor & subjectDescriptor, std::optional<AttributeId> attributeId)
 {
     if (!InAtomicWrite(attributeId))
     {
@@ -177,7 +177,7 @@ bool AtomicWriteSession::InAtomicWrite(const Access::SubjectDescriptor & subject
         mNodeId == ScopedNodeId(subjectDescriptor.subject, subjectDescriptor.fabricIndex);
 }
 
-bool AtomicWriteSession::InAtomicWrite(CommandHandler * commandObj, Optional<AttributeId> attributeId)
+bool AtomicWriteSession::InAtomicWrite(CommandHandler * commandObj, std::optional<AttributeId> attributeId)
 {
     if (!InAtomicWrite(attributeId))
     {
@@ -323,7 +323,7 @@ AtomicWriteSession::BeginAtomicWrite(CommandHandler * commandObj, const Concrete
         {
         case Presets::Id:
         case Schedules::Id:
-            statusCode = InAtomicWrite(MakeOptional(attributeStatus.attributeID)) ? Status::Busy : Status::Success;
+            statusCode = InAtomicWrite(std::make_optional(attributeStatus.attributeID)) ? Status::Busy : Status::Success;
             break;
         default:
             statusCode = Status::InvalidCommand;
@@ -355,7 +355,7 @@ AtomicWriteSession::BeginAtomicWrite(CommandHandler * commandObj, const Concrete
             status = ExecuteAtomicAction(attributeStatuses, &Delegate::OnAtomicWriteBegin);
             if (status != Status::Success || ScheduleTimer(this, timeout) != CHIP_NO_ERROR)
             {
-                ExecuteAtomicAction(attributeStatuses, &Delegate::OnAtomicWriteRollback, MakeOptional(Status::Failure));
+                ExecuteAtomicAction(attributeStatuses, &Delegate::OnAtomicWriteRollback, Status::Failure);
                 ResetAtomicWrite();
                 status = Status::Failure;
             }
