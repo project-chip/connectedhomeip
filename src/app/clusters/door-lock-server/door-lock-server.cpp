@@ -731,7 +731,7 @@ void DoorLockServer::setCredentialCommandHandler(
     }
 
     // appclusters, SetCredentialResponse Status field (DoorLock.adoc#10211-status-field): return INVALID_COMMAND if
-    // CredentialData violates the uncompressed EC public key requirement in 5.2.6.9 (SEC 1 section 2.3.3).
+    // CredentialData violates the uncompressed EC public key requirement in 5.2.6.9.
     status = aliroCredentialDataValid(credentialType, credentialData);
     if (DlStatus::kSuccess != status)
     {
@@ -1691,8 +1691,8 @@ DlStatus DoorLockServer::aliroCredentialDataValid(CredentialTypeEnum type, const
     case CredentialTypeEnum::kAliroCredentialIssuerKey:
     case CredentialTypeEnum::kAliroEvictableEndpointKey:
     case CredentialTypeEnum::kAliroNonEvictableEndpointKey:
-        if (credentialData.size() == DOOR_LOCK_ALIRO_CREDENTIAL_SIZE &&
-            credentialData[0] != DOOR_LOCK_ALIRO_UNCOMPRESSED_POINT_PREFIX)
+        // Aliro credentials must be an uncompressed EC P-256 public key (0x04 || X || Y).
+        if (credentialData[0] != DOOR_LOCK_ALIRO_UNCOMPRESSED_POINT_PREFIX)
         {
             ChipLogProgress(Zcl,
                             "Aliro credential data must be an uncompressed EC public key "
