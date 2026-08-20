@@ -82,6 +82,11 @@ public:
      */
     virtual CHIP_ERROR RequestVideoStreamDeallocation(const ScopedNodeId & aCameraNode, uint16_t aAnalysisStreamId,
                                                       Callback & aCallback) = 0;
+
+    /**
+     * Abandons any in-flight request
+     */
+    virtual void Cancel() = 0;
 };
 
 } // namespace Clusters

@@ -184,6 +184,22 @@ TEST_F(TestDefaultAvAnalysisCameraClient, CompletionIsDeliveredExactlyOnce)
     EXPECT_EQ(mCallback.mAllocatedCount, 1);
 }
 
+TEST_F(TestDefaultAvAnalysisCameraClient, CancelDropsPendingRequestWithoutCompletion)
+{
+    EXPECT_EQ(mClient.RequestVideoStreamAllocation(kCameraNode, mCallback), CHIP_NO_ERROR);
+
+    mClient.Cancel();
+
+    // Late interaction events after Cancel must not produce a completion
+    mClient.OnError(nullptr, StatusIB(Status::Failure).ToChipError());
+    mClient.OnDone(nullptr);
+    EXPECT_EQ(mCallback.mAllocatedCount, 0);
+
+    // The client accepts a new request after cancellation
+    EXPECT_EQ(mClient.RequestVideoStreamAllocation(kCameraNode, mCallback), CHIP_NO_ERROR);
+    EXPECT_EQ(mClient.mConnectRequests, 2);
+}
+
 TEST_F(TestDefaultAvAnalysisCameraClient, DoneWithoutResponseIsFailure)
 {
     EXPECT_EQ(mClient.RequestVideoStreamAllocation(kCameraNode, mCallback), CHIP_NO_ERROR);

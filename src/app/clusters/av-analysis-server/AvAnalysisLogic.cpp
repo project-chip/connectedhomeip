@@ -85,6 +85,12 @@ CHIP_ERROR AvAnalysisServerLogic::Startup(AttributePersistenceProvider & aAttrib
 
 void AvAnalysisServerLogic::Shutdown()
 {
+    // Abandon any in-flight camera interaction first
+    if (mCameraClient != nullptr)
+    {
+        mCameraClient->Cancel();
+    }
+
     // Release any command still waiting on a camera interaction; its exchange dies with the server.
     mPendingCommandHandle = CommandHandler::Handle();
 

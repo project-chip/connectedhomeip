@@ -67,6 +67,23 @@ CHIP_ERROR DefaultAvAnalysisCameraClient::RequestVideoStreamDeallocation(const S
     return StartRequest(PendingRequest::kDeallocate, aCameraNode, aAnalysisStreamId, aCallback);
 }
 
+void DefaultAvAnalysisCameraClient::Cancel()
+{
+    VerifyOrReturn(mPendingRequest != PendingRequest::kNone);
+
+    // Deregister from a session establishment still in progress
+    mOnConnectedCallback.Cancel();
+    mOnConnectionFailureCallback.Cancel();
+
+    // Abort a command exchange still in progress; its callbacks die with the sender
+    mCommandSender.reset();
+
+    // Forget the pending request without delivering a completion
+    mPendingRequest    = PendingRequest::kNone;
+    mPendingCallback   = nullptr;
+    mResponseDelivered = false;
+}
+
 CHIP_ERROR DefaultAvAnalysisCameraClient::StartRequest(PendingRequest aRequest, const ScopedNodeId & aCameraNode,
                                                        uint16_t aAnalysisStreamId, Callback & aCallback)
 {

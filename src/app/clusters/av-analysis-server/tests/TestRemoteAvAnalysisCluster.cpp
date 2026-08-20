@@ -103,6 +103,14 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
             mLastCallback = &aCallback;
             return CHIP_NO_ERROR;
         }
+
+        void Cancel() override
+        {
+            mCancelCount++;
+            mLastCallback = nullptr;
+        }
+
+        int mCancelCount = 0;
     };
 
     void SetUp() override
@@ -547,6 +555,31 @@ TEST_F(TestRemoteAvAnalysisCluster, ExecuteTrackingEnabledPersistenceTest)
 
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::TrackingEnabled::Id, trackingEnabled), CHIP_NO_ERROR);
     ASSERT_TRUE(trackingEnabled);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, ShutdownCancelsPendingCameraInteraction)
+{
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EstablishAnalysisStream::Id };
+    Commands::EstablishAnalysisStream::DecodableType commandData;
+    commandData.nodeID = 0x1234;
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+
+    auto response = mServer.GetLogic().HandleEstablishAnalysisStream(commandHandler, path, commandData);
+    ASSERT_FALSE(response.has_value()); // Pending on the camera
+    auto * pendingCallback = mFakeCameraClient.mLastCallback;
+    ASSERT_NE(pendingCallback, nullptr);
+
+    // Shutting down with the interaction in flight must cancel it (the callback refers to the logic)
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    ASSERT_GE(mFakeCameraClient.mCancelCount, 1);
+
+    // A stray late completion (contract violation by a client) must be a harmless no-op
+    pendingCallback->OnVideoStreamAllocated(Status::Success, 42);
+    ASSERT_FALSE(commandHandler.HasResponse());
+
+    // Restart so the fixture TearDown shuts down a running server
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
 }
 
 TEST_F(TestRemoteAvAnalysisCluster, AnalysisStreamTableEncodeDecodeTest)
