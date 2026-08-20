@@ -190,7 +190,7 @@ class DEMTestBase:
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
-    async def send_power_range_adjustment_command(self, cause: Clusters.Objects.DeviceEnergyManagement.Enums.CauseEnum,
+    async def send_power_range_adjustment_command(self, cause: Clusters.Objects.DeviceEnergyManagement.Enums.AdjustmentCauseEnum,
                                                   minPower: int = None, maxPower: int = None, duration: int = None,
                                                   endpoint: int = None, timedRequestTimeoutMs: int = 3000,
                                                   expected_status: Status = Status.Success):
