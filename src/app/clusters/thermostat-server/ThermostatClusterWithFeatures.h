@@ -86,7 +86,7 @@ public:
         mPresets(detail::MakeFeature<kHasPresets, ThermostatPresets>(std::forward_as_tuple(delegates...), *this)),
         mSuggestions(
             detail::MakeFeature<kHasSuggestions, ThermostatSuggestions>(std::forward_as_tuple(delegates...), *this, mPresets)),
-        mOccupancy(detail::MakeFeature<kHasOccupancy, ThermostatOccupancy>(std::forward_as_tuple(delegates...)))
+        mOccupancy(detail::MakeFeature<kHasOccupancy, ThermostatOccupancy>(std::forward_as_tuple(delegates...), *this))
     {
         static_assert(detail::kArgsHasDelegate<Thermostat::Delegate, Delegates...>,
                       "Missing Thermostat::Delegate in constructor arguments");
