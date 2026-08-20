@@ -30,7 +30,7 @@ using Status     = Protocols::InteractionModel::Status;
 using ScanResult = Structs::ScanResultStruct::Type;
 
 Status CommissioningProxyMockTransport::Connect(app::CommandHandler * commandObj, const DataModel::InvokeRequest & request,
-                                                uint16_t discriminator, uint16_t timeout)
+                                                uint16_t discriminator, System::Clock::Seconds16 timeout)
 {
     // A forced non-success result models a transport that could not connect: no
     // session is registered and no response is sent (the cluster surfaces the status).
@@ -66,13 +66,13 @@ CHIP_ERROR CommissioningProxyMockTransport::SendMessage(uint16_t sessionId, Syst
     // session's response timer can resolve it.
     if (mAutoRespond)
     {
-        mHost->Sessions().DispatchMessageResponse(sessionId, ByteSpan());
+        mHost->Sessions().DispatchMessageResponse(sessionId, nullptr, 0);
     }
 
     return CHIP_NO_ERROR;
 }
 
-Status CommissioningProxyMockTransport::Scan(uint8_t scanMaxTime)
+Status CommissioningProxyMockTransport::Scan(System::Clock::Seconds16 scanMaxTime)
 {
     if (mScanStatus != Status::Success)
     {

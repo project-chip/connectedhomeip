@@ -210,7 +210,7 @@ public:
             {
                 if (sHost != nullptr)
                 {
-                    sHost->Sessions().DispatchMessageResponse(sid, chip::ByteSpan(msg->Start(), msg->DataLength()));
+                    sHost->Sessions().DispatchMessageResponse(sid, msg->Start(), msg->DataLength());
                 }
                 return CHIP_NO_ERROR;
             }
@@ -555,7 +555,7 @@ void SetHost(CommissioningProxyCluster * host)
 
 chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * commandObj,
                                                   const chip::app::DataModel::InvokeRequest & request, uint16_t discriminator,
-                                                  uint16_t timeout)
+                                                  chip::System::Clock::Seconds16 timeout)
 {
     // Only one PAF connect can be in flight at a time. Reject a second one up front,
     // before pausing the background scan or touching the PAF session pool, so a
@@ -599,7 +599,7 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
 
     // Per spec a Timeout of 0 indicates no timeout: the connect runs until it
     // succeeds, fails, or is cancelled via ProxyDisconnectRequest(null).
-    const bool hasTimeout = (timeout > 0);
+    const bool hasTimeout = (timeout.count() > 0);
 
     auto * ctx         = new ConnectCtx{};
     ctx->handle        = chip::app::CommandHandler::Handle(commandObj);
@@ -616,7 +616,9 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
         // Keep the exchange open until just past the connect timeout, or disable
         // the response timer entirely (kZero) when there is no timeout. Clamp the
         // +5 s margin so a near-max timeout cannot wrap the uint16 seconds field.
-        const uint16_t responseSecs = (timeout > static_cast<uint16_t>(0xFFFF - 5)) ? 0xFFFF : static_cast<uint16_t>(timeout + 5);
+        const uint16_t timeoutSecs = timeout.count();
+        const uint16_t responseSecs =
+            (timeoutSecs > static_cast<uint16_t>(0xFFFF - 5)) ? 0xFFFF : static_cast<uint16_t>(timeoutSecs + 5);
         exchange->SetResponseTimeout(hasTimeout ? chip::System::Clock::Seconds16(responseSecs) : chip::System::Clock::kZero);
     }
 
@@ -640,8 +642,7 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
 
     if (hasTimeout)
     {
-        CHIP_ERROR timerErr =
-            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(timeout), OnConnectTimeout, nullptr);
+        CHIP_ERROR timerErr = chip::DeviceLayer::SystemLayer().StartTimer(timeout, OnConnectTimeout, nullptr);
         if (timerErr != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "ProxyConnectRequest: StartTimer failed: %" CHIP_ERROR_FORMAT, timerErr.Format());
@@ -745,7 +746,7 @@ CHIP_ERROR SendMessage(uint16_t sessionId, chip::System::PacketBufferHandle && b
     return chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().SendMessage(it->second, std::move(buf));
 }
 
-chip::Protocols::InteractionModel::Status Scan(uint8_t scanMaxTime)
+chip::Protocols::InteractionModel::Status Scan(chip::System::Clock::Seconds16 scanMaxTime)
 {
     if (sScanInProgress)
     {
@@ -763,7 +764,10 @@ chip::Protocols::InteractionModel::Status Scan(uint8_t scanMaxTime)
     // OnScanDone resumes it when the foreground scan completes.
     sBgScan.Pause();
 
-    CHIP_ERROR err = chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFScan(scanMaxTime, &OnScanDone, nullptr);
+    // WiFiPAFScan takes the window as uint8 seconds. The cluster's ScanMaxTime attribute
+    // is itself a uint8, so the value cannot exceed what the platform call accepts.
+    CHIP_ERROR err =
+        chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFScan(static_cast<uint8_t>(scanMaxTime.count()), &OnScanDone, nullptr);
     if (err != CHIP_NO_ERROR)
     {
         sScanInProgress = false;
@@ -774,8 +778,9 @@ chip::Protocols::InteractionModel::Status Scan(uint8_t scanMaxTime)
     return chip::Protocols::InteractionModel::Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status BgScanStart(uint16_t timeout, chip::BitMask<WiFiBandBitmap> wiFiBandsMask,
-                                                      chip::FabricIndex fabricIndex, chip::NodeId nodeId)
+chip::Protocols::InteractionModel::Status BgScanStart(chip::System::Clock::Seconds16 timeout,
+                                                      chip::BitMask<WiFiBandBitmap> wiFiBandsMask, chip::FabricIndex fabricIndex,
+                                                      chip::NodeId nodeId)
 {
     // This driver services the kWiFiPAF transport.  The registry starts or defers
     // the hardware scan (StartHardwareScan reports BUSY while a ProxyConnect holds
@@ -889,7 +894,8 @@ void CommissioningProxyPafTransport::SetHost(CommissioningProxyCluster * host)
 
 Protocols::InteractionModel::Status CommissioningProxyPafTransport::Connect(app::CommandHandler * commandObj,
                                                                             const DataModel::InvokeRequest & request,
-                                                                            uint16_t discriminator, uint16_t timeout)
+                                                                            uint16_t discriminator,
+                                                                            System::Clock::Seconds16 timeout)
 {
     return Paf::Connect(commandObj, request, discriminator, timeout);
 }
@@ -909,12 +915,13 @@ CHIP_ERROR CommissioningProxyPafTransport::SendMessage(uint16_t sessionId, Syste
     return Paf::SendMessage(sessionId, std::move(buf));
 }
 
-Protocols::InteractionModel::Status CommissioningProxyPafTransport::Scan(uint8_t scanMaxTime)
+Protocols::InteractionModel::Status CommissioningProxyPafTransport::Scan(System::Clock::Seconds16 scanMaxTime)
 {
     return Paf::Scan(scanMaxTime);
 }
 
-Protocols::InteractionModel::Status CommissioningProxyPafTransport::BgScanStart(uint16_t timeout, BitMask<WiFiBandBitmap> wiFiBands,
+Protocols::InteractionModel::Status CommissioningProxyPafTransport::BgScanStart(System::Clock::Seconds16 timeout,
+                                                                                BitMask<WiFiBandBitmap> wiFiBands,
                                                                                 FabricIndex fabricIndex, NodeId nodeId)
 {
     return Paf::BgScanStart(timeout, wiFiBands, fabricIndex, nodeId);

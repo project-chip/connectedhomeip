@@ -109,7 +109,7 @@ void CommissioningProxySessionManager::RemoveSession(uint16_t sessionId)
     }
 }
 
-std::optional<CommissioningProxySessionManager::SessionInfo> CommissioningProxySessionManager::Find(uint16_t sessionId) const
+std::optional<CommissioningProxySessionManager::SessionInfo> CommissioningProxySessionManager::FindSession(uint16_t sessionId) const
 {
     const SessionSlot * slot = FindSlot(sessionId);
     if (slot == nullptr)
@@ -119,7 +119,7 @@ std::optional<CommissioningProxySessionManager::SessionInfo> CommissioningProxyS
     return slot->info;
 }
 
-std::optional<uint16_t> CommissioningProxySessionManager::FindAnyOnFabric(FabricIndex fabricIndex) const
+std::optional<uint16_t> CommissioningProxySessionManager::FindAnySessionIdOnFabric(FabricIndex fabricIndex) const
 {
     for (const auto & slot : mSessions)
     {
@@ -208,7 +208,7 @@ void CommissioningProxySessionManager::AbortPending(uint16_t sessionId)
     mPendingPool.ReleaseObject(pm);
 }
 
-void CommissioningProxySessionManager::DispatchMessageResponse(uint16_t sessionId, ByteSpan data)
+void CommissioningProxySessionManager::DispatchMessageResponse(uint16_t sessionId, const uint8_t * data, size_t length)
 {
     SessionSlot * slot = FindSlot(sessionId);
     if (slot == nullptr || slot->pending == nullptr)
@@ -225,7 +225,7 @@ void CommissioningProxySessionManager::DispatchMessageResponse(uint16_t sessionI
     {
         Commands::ProxyMessageResponse::Type response;
         response.sessionID = sessionId;
-        response.message.SetNonNull(data);
+        response.message.SetNonNull(ByteSpan(data, length));
         cmd->AddResponse(pm->path, response);
     }
     mPendingPool.ReleaseObject(pm);

@@ -25,6 +25,7 @@
 #include <lib/support/BitMask.h>
 #include <lib/support/TimerDelegate.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <system/SystemClock.h>
 
 #include <cstdint>
 
@@ -101,7 +102,7 @@ public:
      * that node's own request only.
      *
      * The fabric holds one lifetime timer, set to the latest deadline of its requests;
-     * @p timeoutSecs == 0 means that node never expires, which suppresses the timer
+     * a @p timeout of zero means that node never expires, which suppresses the timer
      * entirely. A rejected Start changes nothing.
      *
      * @return RESOURCE_EXHAUSTED once the fabric holds
@@ -110,7 +111,7 @@ public:
      * @p transport SHALL carry only the owning transport's own bit; Stop() relies on it.
      */
     Protocols::InteractionModel::Status Start(FabricIndex fabricIndex, NodeId nodeId, BitMask<CapabilitiesBitmap> transport,
-                                              BitMask<WiFiBandBitmap> wiFiBands, uint16_t timeoutSecs);
+                                              BitMask<WiFiBandBitmap> wiFiBands, System::Clock::Seconds16 timeout);
 
     /**
      * ProxyBackGroundScanStopRequest. Narrows or drops the requesting node's own
@@ -186,7 +187,7 @@ private:
         RequestSlot requests[CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC];
         LifetimeCtx lifetime;
 
-        uint8_t RequestCount() const;
+        size_t RequestCount() const;
         RequestSlot * Find(NodeId nodeId);
         RequestSlot * FindFree();
     };
@@ -194,9 +195,8 @@ private:
     FabricState * FindFabric(FabricIndex fabricIndex);
     bool AnyFabricInUse() const;
 
-    /// Takes the fabric index by value, not the firing LifetimeCtx: that context is a
-    /// member of the fabric slot this call releases, so the slot is looked up again here
-    /// rather than held as a reference that would dangle for the rest of the body.
+    /// By value on purpose: the caller passes its own LifetimeCtx member, which this
+    /// deletes. A reference would dangle for the rest of the body.
     void OnLifetimeExpiry(FabricIndex fabricIndex);
     void CancelLifetime(FabricState & state);
     void OnBecameEmpty(); // stop hardware if owned, then clear cache

@@ -25,7 +25,6 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Pool.h>
-#include <lib/support/Span.h>
 #include <lib/support/TimerDelegate.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -76,11 +75,11 @@ public:
     void RemoveSession(uint16_t sessionId);
 
     /// Look up a session, or std::nullopt if unknown.
-    std::optional<SessionInfo> Find(uint16_t sessionId) const;
+    std::optional<SessionInfo> FindSession(uint16_t sessionId) const;
 
     /// Id of any one session belonging to @p fabricIndex, or std::nullopt. Call
     /// repeatedly (removing each) to drain a fabric.
-    std::optional<uint16_t> FindAnyOnFabric(FabricIndex fabricIndex) const;
+    std::optional<uint16_t> FindAnySessionIdOnFabric(FabricIndex fabricIndex) const;
 
     /// Number of established sessions (excludes in-flight connects — the cluster
     /// adds each transport's IsConnectPending() to this for the MaxSessions gate).
@@ -110,7 +109,7 @@ public:
 
     /// Forward a commissionee reply as a ProxyMessageResponse. No-op if nothing is
     /// pending for @p sessionId.
-    void DispatchMessageResponse(uint16_t sessionId, ByteSpan data);
+    void DispatchMessageResponse(uint16_t sessionId, const uint8_t * data, size_t length);
 
     /// Fail a pending ProxyMessageRequest (e.g. session dropped mid-message).
     void DispatchMessageFailure(uint16_t sessionId, Protocols::InteractionModel::Status status);

@@ -26,16 +26,12 @@ chip_test_suite("tests") {
     "TestCommissioningProxyCluster.cpp",
   ]
 
-  # The cluster itself comes from the source_set below.  CodegenIntegration.cpp
-  # is intentionally not compiled here: it calls
-  # CodegenDataModelProvider::Instance() which requires mock_model (and its
-  # mock_ember transitive dep).  In the Zephyr monolithic test binary,
-  # mock_ember conflicts with real Ember, causing duplicate-symbol linker
-  # errors.  The suite below covers CodegenIntegration.  It is pulled into the
-  # build only as a standalone host binary (chip_link_tests); the monolithic
-  # test aggregation in src/BUILD.gn references only ":tests", so
-  # mock_model/mock_ember never enters the Zephyr binary.
+  # CodegenIntegration.cpp holds only the empty ember init/shutdown callbacks that
+  # an app's ZAP-generated codedriven-init-shutdown.cpp calls. There is no behaviour
+  # to assert, but compiling it here keeps it building in a PR that ships no app.
   sources = [
+    "../CodegenIntegration.cpp",
+    "../CodegenIntegration.h",
     "CommissioningProxyMockTimer.h",
     "CommissioningProxyMockTransport.cpp",
     "CommissioningProxyMockTransport.h",
@@ -52,40 +48,6 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/clusters/commissioning-proxy-server",
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/server-cluster/testing",
-    "${chip_root}/src/lib/support",
-    "${chip_root}/src/lib/support:timer-delegate-mock",
-  ]
-}
-
-# Host-only suite that links the codegen data-model provider (mock_model /
-# mock_ember) to exercise CodegenIntegration.cpp. It cannot join the monolithic
-# single-binary build (ember symbol collisions), so src/BUILD.gn restricts it to
-# linux/darwin.
-chip_test_suite("tests-codegen-integration") {
-  import(
-      "${chip_root}/src/app/clusters/commissioning-proxy-server/app_config_dependent_sources.gni")
-
-  output_name = "TestCommissioningProxyClusterCodegenIntegration"
-
-  test_sources = [ "TestCommissioningProxyClusterCodegenIntegration.cpp" ]
-
-  # Prefix app_config_dependent_sources with "../" and add to the sources list
-  sources = []
-  foreach(file, app_config_dependent_sources) {
-    sources += [ "../" + file ]
-  }
-  sources += [
-    "CommissioningProxyMockTransport.cpp",
-    "CommissioningProxyMockTransport.h",
-  ]
-
-  cflags = [ "-Wconversion" ]
-
-  public_deps = [
-    "${chip_root}/src/app/clusters/commissioning-proxy-server",
-    "${chip_root}/src/app/data-model-provider/tests:encode-decode",
-    "${chip_root}/src/app/server-cluster/testing",
-    "${chip_root}/src/data-model-providers/codegen/tests:mock_model",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/lib/support:timer-delegate-mock",
   ]

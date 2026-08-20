@@ -46,13 +46,13 @@ public:
     void SetHost(CommissioningProxyCluster * host) override;
 
     Protocols::InteractionModel::Status Connect(app::CommandHandler * commandObj, const DataModel::InvokeRequest & request,
-                                                uint16_t discriminator, uint16_t timeout) override;
+                                                uint16_t discriminator, System::Clock::Seconds16 timeout) override;
     Protocols::InteractionModel::Status CancelPendingConnect(FabricIndex fabricIndex) override;
     Protocols::InteractionModel::Status Disconnect(uint16_t sessionId) override;
     CHIP_ERROR SendMessage(uint16_t sessionId, System::PacketBufferHandle && buf) override;
-    Protocols::InteractionModel::Status Scan(uint8_t scanMaxTime) override;
-    Protocols::InteractionModel::Status BgScanStart(uint16_t timeout, BitMask<WiFiBandBitmap> wiFiBands, FabricIndex fabricIndex,
-                                                    NodeId nodeId) override;
+    Protocols::InteractionModel::Status Scan(System::Clock::Seconds16 scanMaxTime) override;
+    Protocols::InteractionModel::Status BgScanStart(System::Clock::Seconds16 timeout, BitMask<WiFiBandBitmap> wiFiBands,
+                                                    FabricIndex fabricIndex, NodeId nodeId) override;
     Protocols::InteractionModel::Status BgScanStop(BitMask<CapabilitiesBitmap> transport, BitMask<WiFiBandBitmap> wiFiBands,
                                                    FabricIndex fabricIndex, NodeId nodeId) override;
     void OnFabricRemoved(FabricIndex fabricIndex) override;

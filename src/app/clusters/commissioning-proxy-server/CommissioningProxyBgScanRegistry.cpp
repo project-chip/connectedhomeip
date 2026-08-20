@@ -39,12 +39,15 @@ System::Clock::Timeout RemainingUntil(System::Clock::Timestamp deadline, System:
 }
 } // namespace
 
-uint8_t CommissioningProxyBgScanRegistry::FabricState::RequestCount() const
+size_t CommissioningProxyBgScanRegistry::FabricState::RequestCount() const
 {
-    uint8_t count = 0;
+    size_t count = 0;
     for (const auto & slot : requests)
     {
-        count = static_cast<uint8_t>(count + (slot.inUse ? 1 : 0));
+        if (slot.inUse)
+        {
+            count++;
+        }
     }
     return count;
 }
@@ -213,7 +216,7 @@ BitMask<WiFiBandBitmap> CommissioningProxyBgScanRegistry::RecomputeFabricLifetim
 }
 
 Status CommissioningProxyBgScanRegistry::Start(FabricIndex fabricIndex, NodeId nodeId, BitMask<CapabilitiesBitmap> transport,
-                                               BitMask<WiFiBandBitmap> wiFiBands, uint16_t timeoutSecs)
+                                               BitMask<WiFiBandBitmap> wiFiBands, System::Clock::Seconds16 timeout)
 {
     const bool wasEmpty = !AnyFabricInUse();
 
@@ -267,8 +270,8 @@ Status CommissioningProxyBgScanRegistry::Start(FabricIndex fabricIndex, NodeId n
     Request incoming;
     incoming.transport  = transport;
     incoming.wiFiBands  = wiFiBands;
-    incoming.hasTimeout = (timeoutSecs > 0);
-    incoming.expiresAt  = now + System::Clock::Seconds16(timeoutSecs);
+    incoming.hasTimeout = (timeout.count() > 0);
+    incoming.expiresAt  = now + timeout;
 
     bool needTimer                    = incoming.hasTimeout;
     System::Clock::Timestamp deadline = incoming.expiresAt;
@@ -353,18 +356,12 @@ Status CommissioningProxyBgScanRegistry::Stop(FabricIndex fabricIndex, NodeId no
                                               BitMask<WiFiBandBitmap> wiFiBands)
 {
     FabricState * fabric = FindFabric(fabricIndex);
-    if (fabric == nullptr)
-    {
-        return Status::NotFound;
-    }
+    VerifyOrReturnValue(fabric != nullptr, Status::NotFound);
 
     // Spec: if the client's NodeID and FabricID do not match those recorded when the
     // scan was started, take no action and reject with NOT_FOUND.
     RequestSlot * slot = fabric->Find(nodeId);
-    if (slot == nullptr)
-    {
-        return Status::NotFound;
-    }
+    VerifyOrReturnValue(slot != nullptr, Status::NotFound);
 
     const uint8_t reqTransportBits = transport.Raw();
     const uint16_t reqBandBits     = wiFiBands.Raw();
@@ -428,10 +425,7 @@ Status CommissioningProxyBgScanRegistry::Stop(FabricIndex fabricIndex, NodeId no
 void CommissioningProxyBgScanRegistry::RemoveFabric(FabricIndex fabricIndex)
 {
     FabricState * fabric = FindFabric(fabricIndex);
-    if (fabric == nullptr)
-    {
-        return;
-    }
+    VerifyOrReturn(fabric != nullptr);
 
     const BitMask<WiFiBandBitmap> removedBands = ReleaseFabric(*fabric);
 
@@ -496,10 +490,7 @@ void CommissioningProxyBgScanRegistry::Shutdown()
 void CommissioningProxyBgScanRegistry::OnLifetimeExpiry(FabricIndex fabricIndex)
 {
     FabricState * fabric = FindFabric(fabricIndex);
-    if (fabric == nullptr)
-    {
-        return;
-    }
+    VerifyOrReturn(fabric != nullptr);
 
     // The fabric's timer sits at the latest deadline of all its requests, so when it
     // fires every one of them has expired and the whole fabric goes. The timer has

@@ -377,7 +377,7 @@ public:
             // synchronously, so msg can be released when this scope returns.
             if (sHost != nullptr)
             {
-                sHost->Sessions().DispatchMessageResponse(sid, chip::ByteSpan(msg->Start(), msg->DataLength()));
+                sHost->Sessions().DispatchMessageResponse(sid, msg->Start(), msg->DataLength());
             }
             return;
         }
@@ -622,7 +622,7 @@ void SetHost(CommissioningProxyCluster * host)
 
 chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * commandObj,
                                                   const chip::app::DataModel::InvokeRequest & request, uint16_t discriminator,
-                                                  uint16_t timeout)
+                                                  chip::System::Clock::Seconds16 timeout)
 {
     if (sPendingConnect != nullptr)
     {
@@ -666,7 +666,7 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
 
     // Per spec a Timeout of 0 indicates no timeout: the connect runs until it
     // succeeds, fails, or is cancelled via ProxyDisconnectRequest(null).
-    const bool hasTimeout = (timeout > 0);
+    const bool hasTimeout = (timeout.count() > 0);
 
     auto * ctx         = new ConnectCtx{};
     ctx->handle        = chip::app::CommandHandler::Handle(commandObj);
@@ -682,7 +682,9 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
         // Keep the exchange open until just past the connect timeout, or disable
         // the response timer entirely (kZero) when there is no timeout. Clamp the
         // +5 s margin so a near-max timeout cannot wrap the uint16 seconds field.
-        const uint16_t responseSecs = (timeout > static_cast<uint16_t>(0xFFFF - 5)) ? 0xFFFF : static_cast<uint16_t>(timeout + 5);
+        const uint16_t timeoutSecs = timeout.count();
+        const uint16_t responseSecs =
+            (timeoutSecs > static_cast<uint16_t>(0xFFFF - 5)) ? 0xFFFF : static_cast<uint16_t>(timeoutSecs + 5);
         exchange->SetResponseTimeout(hasTimeout ? chip::System::Clock::Seconds16(responseSecs) : chip::System::Clock::kZero);
     }
 
@@ -701,8 +703,7 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
 
     if (hasTimeout)
     {
-        CHIP_ERROR timerErr =
-            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(timeout), OnConnectTimeout, nullptr);
+        CHIP_ERROR timerErr = chip::DeviceLayer::SystemLayer().StartTimer(timeout, OnConnectTimeout, nullptr);
         if (timerErr != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "ProxyConnectRequest: StartTimer failed: %" CHIP_ERROR_FORMAT, timerErr.Format());
@@ -808,7 +809,7 @@ CHIP_ERROR SendMessage(uint16_t sessionId, chip::System::PacketBufferHandle && b
     return it->second->Send(std::move(buf));
 }
 
-chip::Protocols::InteractionModel::Status Scan(uint8_t scanMaxTime)
+chip::Protocols::InteractionModel::Status Scan(chip::System::Clock::Seconds16 scanMaxTime)
 {
     if (sScanInProgress)
     {
@@ -831,8 +832,7 @@ chip::Protocols::InteractionModel::Status Scan(uint8_t scanMaxTime)
     }
     sScanInProgress = true;
 
-    CHIP_ERROR timerErr =
-        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(scanMaxTime), OnScanTimer, nullptr);
+    CHIP_ERROR timerErr = chip::DeviceLayer::SystemLayer().StartTimer(scanMaxTime, OnScanTimer, nullptr);
     if (timerErr != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Ble::Scan: StartTimer failed: %" CHIP_ERROR_FORMAT, timerErr.Format());
@@ -842,12 +842,13 @@ chip::Protocols::InteractionModel::Status Scan(uint8_t scanMaxTime)
         return chip::Protocols::InteractionModel::Status::Failure;
     }
 
-    ChipLogProgress(AppServer, "Ble::Scan: started, scanMaxTime=%us", scanMaxTime);
+    ChipLogProgress(AppServer, "Ble::Scan: started, scanMaxTime=%us", scanMaxTime.count());
     return chip::Protocols::InteractionModel::Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status BgScanStart(uint16_t timeout, chip::BitMask<WiFiBandBitmap> /*wiFiBands*/,
-                                                      chip::FabricIndex fabricIndex, chip::NodeId nodeId)
+chip::Protocols::InteractionModel::Status BgScanStart(chip::System::Clock::Seconds16 timeout,
+                                                      chip::BitMask<WiFiBandBitmap> /*wiFiBands*/, chip::FabricIndex fabricIndex,
+                                                      chip::NodeId nodeId)
 {
     // BLE has no Wi-Fi bands: register with the kBle transport and empty bands.
     // The registry starts or defers the hardware scan (StartProxyScan reports BUSY
@@ -983,7 +984,8 @@ void CommissioningProxyBleTransport::SetHost(CommissioningProxyCluster * host)
 
 Protocols::InteractionModel::Status CommissioningProxyBleTransport::Connect(app::CommandHandler * commandObj,
                                                                             const DataModel::InvokeRequest & request,
-                                                                            uint16_t discriminator, uint16_t timeout)
+                                                                            uint16_t discriminator,
+                                                                            System::Clock::Seconds16 timeout)
 {
     return Ble::Connect(commandObj, request, discriminator, timeout);
 }
@@ -1003,12 +1005,13 @@ CHIP_ERROR CommissioningProxyBleTransport::SendMessage(uint16_t sessionId, Syste
     return Ble::SendMessage(sessionId, std::move(buf));
 }
 
-Protocols::InteractionModel::Status CommissioningProxyBleTransport::Scan(uint8_t scanMaxTime)
+Protocols::InteractionModel::Status CommissioningProxyBleTransport::Scan(System::Clock::Seconds16 scanMaxTime)
 {
     return Ble::Scan(scanMaxTime);
 }
 
-Protocols::InteractionModel::Status CommissioningProxyBleTransport::BgScanStart(uint16_t timeout, BitMask<WiFiBandBitmap> wiFiBands,
+Protocols::InteractionModel::Status CommissioningProxyBleTransport::BgScanStart(System::Clock::Seconds16 timeout,
+                                                                                BitMask<WiFiBandBitmap> wiFiBands,
                                                                                 FabricIndex fabricIndex, NodeId nodeId)
 {
     return Ble::BgScanStart(timeout, wiFiBands, fabricIndex, nodeId);

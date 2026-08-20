@@ -32,11 +32,11 @@ namespace CommissioningProxy {
 namespace {
 // Fallback so a sub-scan whose completion callback never fires cannot wedge the
 // aggregator (and thus every future ProxyScanRequest) permanently.
-constexpr uint16_t kScanWatchdogMarginSecs = 5;
+constexpr System::Clock::Seconds16 kScanWatchdogMargin{ 5 };
 } // namespace
 
 CHIP_ERROR CommissioningProxyScanAggregator::Begin(app::CommandHandler * commandObj, const app::ConcreteCommandPath & path,
-                                                   uint8_t scanMaxTime)
+                                                   System::Clock::Seconds16 scanMaxTime)
 {
     mHandle                    = app::CommandHandler::Handle(commandObj);
     mPath                      = path;
@@ -47,8 +47,7 @@ CHIP_ERROR CommissioningProxyScanAggregator::Begin(app::CommandHandler * command
     mInProgress                = true;
     mAllContributorsRegistered = false;
 
-    CHIP_ERROR err =
-        mTimerDelegate.StartTimer(this, System::Clock::Seconds16(static_cast<uint16_t>(scanMaxTime) + kScanWatchdogMarginSecs));
+    CHIP_ERROR err = mTimerDelegate.StartTimer(this, scanMaxTime + kScanWatchdogMargin);
     if (err != CHIP_NO_ERROR)
     {
         // With no watchdog a sub-scan that never reports would leave mInProgress set
