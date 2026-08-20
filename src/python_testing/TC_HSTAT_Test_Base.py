@@ -21,11 +21,12 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest
 
 log = logging.getLogger(__name__)
 
 
-class HSTATBase:
+class HSTATBase(MatterBaseTest):
     """
     This is a base class for Humidistat cluster tests.
     """

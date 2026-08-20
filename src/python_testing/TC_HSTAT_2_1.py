@@ -43,8 +43,8 @@ from mobly import asserts
 from TC_HSTAT_Test_Base import HSTATBase
 
 from matter.clusters.Types import NullValue
-from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)

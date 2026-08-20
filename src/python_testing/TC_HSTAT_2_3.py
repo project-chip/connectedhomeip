@@ -184,12 +184,13 @@ class TC_HSTAT_2_3(MatterBaseTest, HSTATBase):
         # The value for the second report is MinSetpointValue + StepValue.
         dut_Setpoint = await self.read_attribute_expect_success(attribute=self.attributes.UserSetpoint)
         asserts.assert_equal(dut_Setpoint, dut_MinSetpoint+dut_Step, "UserSetpoint is not MinSetpoint+Step as expacted")
-        asserts.assert_greater_equal(len(reportsReceived), 1, "No reports received")
+        setpoint_span = dut_MaxSetpoint - dut_MinSetpoint
+        expected_report_count = 1 if setpoint_span == dut_Step else 2
+        asserts.assert_equal(len(reportsReceived), expected_report_count, "Unexpected report count")
         asserts.assert_equal(reportsReceived[0], dut_MaxSetpoint, "First report value is not MaxSetpoint")
-        if (dut_MaxSetpoint - dut_MinSetpoint) > dut_Step:
-            asserts.assert_equal(len(reportsReceived), 2, "2 reports expected")
-            asserts.assert_equal(reportsReceived[1], dut_MinSetpoint+dut_Step,
-                                 "Second report value is not dut_MinSetpoint+dut_Step")
+        if expected_report_count == 2:
+             asserts.assert_equal(reportsReceived[1], dut_MinSetpoint+dut_Step,
+                                  "Second report value is not MinSetpointValue + StepValue")
 
         self.step(15)
         # TH sends command SetSettings with the UserSetpoint field set to MinSetpointValue-1
