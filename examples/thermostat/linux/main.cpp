@@ -85,9 +85,14 @@ void ApplicationInit()
     Clusters::Thermostat::ServerInit(gThermostatEndpoint, gThermostatDelegate, gPresetsDelegate, gSuggestionsDelegate);
 }
 
+using ThermostatClusterType =
+    Clusters::Thermostat::ThermostatClusterWithFeatures<Clusters::Thermostat::ThermostatDelegate,
+                                                        Clusters::Thermostat::ThermostatPresetsDelegate,
+                                                        Clusters::Thermostat::ThermostatSuggestionsDelegate>;
+
 void ApplicationShutdown()
 {
-    chip::app::Clusters::Thermostat::ServerShutdown<chip::app::Clusters::Thermostat::DefaultThermostatCluster>(
+    chip::app::Clusters::Thermostat::ServerShutdown<ThermostatClusterType>(
         gThermostatEndpoint, MatterClusterShutdownType::kClusterShutdown);
 }
 
