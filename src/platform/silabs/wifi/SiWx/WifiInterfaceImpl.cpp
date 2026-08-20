@@ -847,32 +847,32 @@ CHIP_ERROR WifiInterfaceImpl::ConfigureBroadcastFilter(bool enableBroadcastFilte
         mdnsIpv6McastAddress.type = SL_IPV6;
 >>>>>>> 564138d38a ([Silabs] Migrate SiWx ICD broadcast filter off deprecated WiSeConnect API (#73533))
 
-        sl_ip_address_handle_t allowlistHandle = UINT8_MAX;
-        status                                 = sl_wifi_allowlist_mcast_add_ip(&mdnsIpv6McastAddress, &allowlistHandle);
-        VerifyOrReturnError(
-            status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
-            ChipLogError(DeviceLayer, "sl_wifi_allowlist_mcast_add_ip failed: 0x%" PRIx32, static_cast<uint32_t>(status)));
-    }
-
-    // Multicast filtering stays enabled in both modes; the allowlist controls what passes.
-    sl_wifi_groupcast_filter_config_t groupcastFilterConfig = {};
-    groupcastFilterConfig.enable_bcast_filter               = enableBroadcastFilter ? 1 : 0;
-    groupcastFilterConfig.enable_mcast_filter               = 1;
-    groupcastFilterConfig.filter_mode                       = 0; // default
-
-    status = sl_wifi_set_groupcast_filter_config(&groupcastFilterConfig);
+    sl_ip_address_handle_t allowlistHandle = UINT8_MAX;
+    status                                 = sl_wifi_allowlist_mcast_add_ip(&mdnsIpv6McastAddress, &allowlistHandle);
     VerifyOrReturnError(
         status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
-        ChipLogError(DeviceLayer, "sl_wifi_set_groupcast_filter_config failed: 0x%" PRIx32, static_cast<uint32_t>(status)));
+        ChipLogError(DeviceLayer, "sl_wifi_allowlist_mcast_add_ip failed: 0x%" PRIx32, static_cast<uint32_t>(status)));
+}
 
-    uint16_t beaconDropThreshold = enableBroadcastFilter ? kTimeToFullBeaconReception : 0;
-    status                       = sl_wifi_set_beacon_drop_threshold(SL_WIFI_CLIENT_INTERFACE, beaconDropThreshold);
-    VerifyOrReturnError(
-        status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
-        ChipLogError(DeviceLayer, "sl_wifi_set_beacon_drop_threshold failed: 0x%" PRIx32, static_cast<uint32_t>(status)));
+// Multicast filtering stays enabled in both modes; the allowlist controls what passes.
+sl_wifi_groupcast_filter_config_t groupcastFilterConfig = {};
+groupcastFilterConfig.enable_bcast_filter               = enableBroadcastFilter ? 1 : 0;
+groupcastFilterConfig.enable_mcast_filter               = 1;
+groupcastFilterConfig.filter_mode                       = 0; // default
 
-    mBroadcastFilterEnabled = enableBroadcastFilter;
-    return CHIP_NO_ERROR;
+status = sl_wifi_set_groupcast_filter_config(&groupcastFilterConfig);
+VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
+                    ChipLogError(DeviceLayer, "sl_wifi_set_groupcast_filter_config failed: 0x%" PRIx32,
+                                 static_cast<uint32_t>(status)));
+
+uint16_t beaconDropThreshold = enableBroadcastFilter ? kTimeToFullBeaconReception : 0;
+status                       = sl_wifi_set_beacon_drop_threshold(SL_WIFI_CLIENT_INTERFACE, beaconDropThreshold);
+VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
+                    ChipLogError(DeviceLayer, "sl_wifi_set_beacon_drop_threshold failed: 0x%" PRIx32,
+                                 static_cast<uint32_t>(status)));
+
+mBroadcastFilterEnabled = enableBroadcastFilter;
+return CHIP_NO_ERROR;
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
