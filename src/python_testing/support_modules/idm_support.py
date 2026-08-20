@@ -893,14 +893,14 @@ class IDMBaseTest(BasicCompositionTests):
                     log.info("PASS: %s properly rejected %s", info.path_str, description)
                 elif e.status == Status.Success:
                     log.error("FAIL: %s returned %s instead of CONSTRAINT_ERROR for %s",
-                             info.path_str, e.status, description)
+                              info.path_str, e.status, description)
                     all_enforced = False
                 else:
                     self.record_warning(
-                            test_name = self.current_test_info.name,
-                            location=CommandPathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
-                                                 command_id=info.command_id),
-                            problem=(f"{info.path_str} accepted violating payload ({description})"))        
+                        test_name=self.current_test_info.name,
+                        location=CommandPathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
+                                                     command_id=info.command_id),
+                        problem=(f"{info.path_str} accepted violating payload ({description})"))
 
                 continue
 
@@ -914,15 +914,16 @@ class IDMBaseTest(BasicCompositionTests):
                          info.path_str, description)
             elif embedded_status == Status.Success:
                 log.error("FAIL: %s returned %s instead of CONSTRAINT_ERROR for %s",
-                         info.path_str, embedded_status, description)
+                          info.path_str, embedded_status, description)
                 all_enforced = False
             else:
                 self.record_warning(
-                            test_name = self.current_test_info.name,
-                            location=CommandPathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
+                    test_name=self.current_test_info.name,
+                    location=CommandPathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
                                                  command_id=info.command_id),
-                            problem=(f"{info.path_str} accepted violating payload ({description})"))        
+                    problem=(f"{info.path_str} accepted violating payload ({description})"))
         return all_enforced
+
     def checkable_attributes(self, cluster_id, cluster, xml_cluster) -> list[uint]:
         """Get list of attributes that exist on the DUT and have spec/codegen data available."""
         all_attrs = cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID]
