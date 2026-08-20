@@ -6477,8 +6477,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     __auto_type * injectedReport = @[ @{
         MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(1)
-                                                                 clusterID:@(MTRClusterIDTypeOnOffID)
-                                                               attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID)],
+                                                                  clusterID:@(MTRClusterIDTypeOnOffID)
+                                                                attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID)],
         MTRDataKey : @ {
             MTRTypeKey : MTRUnsignedIntegerValueType,
             MTRValueKey : @(17),
@@ -6566,8 +6566,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // AttributeHasChangesOmittedQuality in MTRDevice_Concrete.mm).
     __auto_type * attributePaths = @[
         [MTRAttributeRequestPath requestPathWithEndpointID:@(0)
-                                                clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID)
-                                              attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeUpTimeID)],
+                                                 clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID)
+                                               attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeUpTimeID)],
     ];
 
     NSDate * beforeRead = [NSDate now];
@@ -6616,8 +6616,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // could use it.
     __auto_type * receiptTime = [NSDate dateWithTimeIntervalSince1970:1750000000];
     __auto_type * path = [MTRAttributePath attributePathWithEndpointID:@(1)
-                                                            clusterID:@(MTRClusterIDTypeOnOffID)
-                                                          attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID)];
+                                                             clusterID:@(MTRClusterIDTypeOnOffID)
+                                                           attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID)];
     __auto_type * responseValue = @{
         MTRAttributePathKey : path,
         MTRDataKey : @ {
