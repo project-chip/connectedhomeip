@@ -761,7 +761,14 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
     {
         if (event->ThreadConnectivityChange.Result == DeviceLayer::kConnectivity_Established)
         {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+            if (DeviceLayer::ConnectivityMgr().IsThreadAttached())
+            {
+                threadEstablished = true;
+            }
+#else
             threadEstablished = true;
+#endif
         }
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kThreadStateChange)
