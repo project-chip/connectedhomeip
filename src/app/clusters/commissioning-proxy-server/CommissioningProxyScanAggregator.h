@@ -25,6 +25,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
 #include <lib/support/TimerDelegate.h>
+#include <system/SystemClock.h>
 
 #include <cstdint>
 
@@ -56,8 +57,8 @@ public:
 
     /**
      * @brief Start a fresh aggregation. Takes ownership of the command handle for
-     *        the combined response and arms a watchdog bounded by @p scanMaxTime
-     *        seconds. The caller must have checked InProgress() == false first.
+     *        the combined response and arms a watchdog bounded by @p scanMaxTime.
+     *        The caller must have checked InProgress() == false first.
      *
      * The number of contributors is not known up front: the caller starts each
      * requested transport's scan and calls AddPendingContributor() for every one
@@ -66,7 +67,7 @@ public:
      * Returns an error (leaving InProgress() false) if the watchdog could not be
      * armed; the caller must reject the command rather than scan unbounded.
      */
-    CHIP_ERROR Begin(app::CommandHandler * commandObj, const app::ConcreteCommandPath & path, uint8_t scanMaxTime);
+    CHIP_ERROR Begin(app::CommandHandler * commandObj, const app::ConcreteCommandPath & path, System::Clock::Seconds16 scanMaxTime);
 
     /// Register one successfully-started sub-scan (increments the expected count).
     void AddPendingContributor();
@@ -130,7 +131,7 @@ private:
     bool mAllContributorsRegistered = false;
     uint8_t mExpected               = 0;
     uint8_t mReported               = 0;
-    uint8_t mScanMaxTime            = 0;
+    System::Clock::Seconds16 mScanMaxTime{ 0 };
     ResultStore mStore[kMaxResults]; // keeps ByteSpan backing alive until emit
     ScanResultEntry mResults[kMaxResults];
     uint8_t mResultCount = 0;

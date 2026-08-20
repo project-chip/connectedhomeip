@@ -15,67 +15,11 @@
  */
 
 #include <app/clusters/commissioning-proxy-server/CodegenIntegration.h>
+#include <app/util/af-types.h>
 
-#include <app/server/Server.h>
-#include <app/util/generic-callbacks.h>
-#include <clusters/CommissioningProxy/Metadata.h>
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <platform/DefaultTimerDelegate.h>
-#include <protocols/interaction_model/StatusCode.h>
+using namespace chip;
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace CommissioningProxy {
-
-namespace {
-// Shared by every codegen-registered CommissioningProxy instance: DefaultTimerDelegate
-// is stateless, forwarding to the system layer and keying timers on the TimerContext.
-DefaultTimerDelegate gDefaultTimerDelegate;
-} // namespace
-
-Instance::Instance(EndpointId aEndpointId, const CommissioningProxyCluster::Config & config) :
-    mCluster(aEndpointId, config, gDefaultTimerDelegate, &Server::GetInstance().GetFabricTable())
-{}
-
-CHIP_ERROR Instance::Init()
-{
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to register cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
-                     mCluster.Cluster().GetPaths()[0].mEndpointId, ChipLogValueMEI(CommissioningProxy::Id), err.Format());
-    }
-    return err;
-}
-
-void Instance::Shutdown()
-{
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to unregister cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
-                     mCluster.Cluster().GetPaths()[0].mEndpointId, ChipLogValueMEI(CommissioningProxy::Id), err.Format());
-    }
-}
-
-bool Instance::HasFeature(Feature aFeature) const
-{
-    return mCluster.Cluster().Features().Has(aFeature);
-}
-
-} // namespace CommissioningProxy
-} // namespace Clusters
-} // namespace app
-} // namespace chip
-
-// The current implementation already manually instantiates and initializes the cluster, so no need for the codegen integration.
-void MatterCommissioningProxyClusterInitCallback(chip::EndpointId) {}
-void MatterCommissioningProxyClusterShutdownCallback(chip::EndpointId, MatterClusterShutdownType) {}
-
-// Legacy callback stubs
+void MatterCommissioningProxyClusterInitCallback(EndpointId endpointId) {}
+void MatterCommissioningProxyClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType) {}
 void MatterCommissioningProxyPluginServerInitCallback() {}
 void MatterCommissioningProxyPluginServerShutdownCallback() {}

@@ -18,35 +18,9 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyCluster.h>
-#include <app/server-cluster/ServerClusterInterface.h>
-#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
-#include <lib/support/LinkedList.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace CommissioningProxy {
-
-class Instance
-{
-public:
-    Instance(EndpointId aEndpointId, const CommissioningProxyCluster::Config & config);
-
-    CHIP_ERROR Init();
-    void Shutdown();
-
-    bool HasFeature(Feature aFeature) const;
-
-    /// Register a platform transport driver on the wrapped cluster (call before Init).
-    void RegisterTransport(CommissioningProxyTransport & transport) { mCluster.Cluster().RegisterTransport(transport); }
-
-private:
-    RegisteredServerCluster<CommissioningProxyCluster> mCluster;
-};
-
-} // namespace CommissioningProxy
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+// CommissioningProxyCluster does not provide a legacy API for ember integration.
+// Applications using the code-gen data model should use RegisteredServerCluster or
+// LazyRegisteredServerCluster to manage a CommissioningProxyCluster instance, and
+// register their transport drivers on it before registering the cluster.

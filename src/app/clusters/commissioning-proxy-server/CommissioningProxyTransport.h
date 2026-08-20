@@ -24,6 +24,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <system/SystemClock.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -89,7 +90,7 @@ public:
      * WiFiBand vs WI feature, MaxSessions gate) before this is called.
      */
     virtual Protocols::InteractionModel::Status Connect(app::CommandHandler * commandObj, const DataModel::InvokeRequest & request,
-                                                        uint16_t discriminator, uint16_t timeout) = 0;
+                                                        uint16_t discriminator, System::Clock::Seconds16 timeout) = 0;
 
     /**
      * @brief Cancel an in-flight Connect for the given fabric (null-SessionID
@@ -115,14 +116,14 @@ public:
     // --- ProxyScanRequest (foreground) --------------------------------------
 
     /**
-     * @brief Start a foreground scan bounded by scanMaxTime seconds.
+     * @brief Start a foreground scan bounded by @p scanMaxTime.
      *
      * When the scan completes the driver reports its results to the host's
      * ScanAggregator() (empty is valid). The aggregator owns the command handle and
      * emits the single combined ProxyScanResponse once every started transport has
      * contributed.
      */
-    virtual Protocols::InteractionModel::Status Scan(uint8_t scanMaxTime) = 0;
+    virtual Protocols::InteractionModel::Status Scan(System::Clock::Seconds16 scanMaxTime) = 0;
 
     // --- ProxyBackgroundScanStart / Stop ------------------------------------
 
@@ -133,7 +134,7 @@ public:
      * MaxCachedResults, and CachedResults/NumCachedResults reporting). @p wiFiBands
      * is ignored by drivers with no band concept (BLE).
      */
-    virtual Protocols::InteractionModel::Status BgScanStart(uint16_t timeout, BitMask<WiFiBandBitmap> wiFiBands,
+    virtual Protocols::InteractionModel::Status BgScanStart(System::Clock::Seconds16 timeout, BitMask<WiFiBandBitmap> wiFiBands,
                                                             FabricIndex fabricIndex, NodeId nodeId) = 0;
 
     /**

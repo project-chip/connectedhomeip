@@ -75,11 +75,11 @@ public:
     void RemoveSession(uint16_t sessionId);
 
     /// Look up a session, or std::nullopt if unknown.
-    std::optional<SessionInfo> Find(uint16_t sessionId) const;
+    std::optional<SessionInfo> FindSession(uint16_t sessionId) const;
 
     /// Id of any one session belonging to @p fabricIndex, or std::nullopt. Call
     /// repeatedly (removing each) to drain a fabric.
-    std::optional<uint16_t> FindAnyOnFabric(FabricIndex fabricIndex) const;
+    std::optional<uint16_t> FindAnySessionIdOnFabric(FabricIndex fabricIndex) const;
 
     /// Number of established sessions (excludes in-flight connects — the cluster
     /// adds each transport's IsConnectPending() to this for the MaxSessions gate).

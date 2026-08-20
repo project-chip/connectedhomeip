@@ -1,11 +1,11 @@
 # Commissioning Proxy Cluster
 
-The Commissioning Proxy cluster (cluster ID 0x0455, Matter spec) provides a
-proxy service that allows a Commissioner to use commissioning transports not
-supported locally, or to extend its commissioning range. Commissioners can use
-the proxy to discover and establish a connection to commissionable devices that
-are reachable by the proxy. The proxy connection acts as a tunnel through which
-the Commissioner can run a PASE session with the commissionable device and
+The Commissioning Proxy cluster (cluster ID 0x0455) provides a proxy service
+that allows a Commissioner to use commissioning transports not supported
+locally, or to extend its commissioning range. Commissioners can use the proxy
+to discover and establish a connection to commissionable devices that are
+reachable by the proxy. The proxy connection acts as a tunnel through which the
+Commissioner can run a PASE session with the commissionable device and
 ultimately commission it.
 
 ## Overview
@@ -28,8 +28,8 @@ aggregation:
 | `CommissioningProxyScanAggregator` | Combines a multi-transport `ProxyScanRequest` into one `ProxyScanResponse`                                                |
 
 A fourth transport-agnostic component, `CommissioningProxyBgScanRegistry`, ships
-with the cluster but is **instantiated one per transport and owned by the
-driver** rather than composed by the cluster:
+with the cluster but is **instantiated per transport and owned by the driver**
+rather than composed by the cluster:
 `ProxyBackGroundScanStartRequest`/`ProxyBackGroundScanStopRequest` fan out to
 every matching driver, so the per-fabric records they arbitrate are necessarily
 transport-local. It holds the per-fabric scan requests and their lifetime
@@ -160,7 +160,7 @@ public:
     // commandObj->AddResponse() with a ProxyConnectResponse carrying the sessionID.
     Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * commandObj,
                                                 const DataModel::InvokeRequest & request, uint16_t discriminator,
-                                                uint16_t timeout) override;
+                                                System::Clock::Seconds16 timeout) override;
 
     // Forward a Matter packet; deliver the reply via
     // mHost->Sessions().DispatchMessageResponse().
@@ -168,12 +168,12 @@ public:
 
     // Report foreground-scan results to mHost->ScanAggregator().Contribute();
     // background-scan results to mHost->ScanCache().Report().
-    Protocols::InteractionModel::Status Scan(uint8_t scanMaxTime) override;
+    Protocols::InteractionModel::Status Scan(System::Clock::Seconds16 scanMaxTime) override;
 
     // Background scan: forward to the driver's CommissioningProxyBgScanRegistry,
     // which owns the per-fabric records, lifetime timers and band arithmetic
     // (see Background scanning below).
-    Protocols::InteractionModel::Status BgScanStart(uint16_t timeout, BitMask<WiFiBandBitmap> wiFiBands,
+    Protocols::InteractionModel::Status BgScanStart(System::Clock::Seconds16 timeout, BitMask<WiFiBandBitmap> wiFiBands,
                                                     FabricIndex fabricIndex, NodeId nodeId) override;
     Protocols::InteractionModel::Status BgScanStop(BitMask<CapabilitiesBitmap> transport, BitMask<WiFiBandBitmap> wiFiBands,
                                                    FabricIndex fabricIndex, NodeId nodeId) override;
@@ -235,28 +235,6 @@ void ApplicationInit()
 For a complete working example of the device wiring plus the BLE driver, see
 `examples/all-devices-app/all-devices-common/device/types/commissioning-proxy/`.
 The Wi-Fi PAF driver joins it in a later PR.
-
-## Codegen integration
-
-For applications that register clusters through the `CodegenDataModelProvider`,
-`CodegenIntegration.{h,cpp}` provide an `Instance` wrapper that constructs a
-`RegisteredServerCluster<CommissioningProxyCluster>` and adds/removes it from
-the provider registry on `Init()`/`Shutdown()`. Transports are registered on it
-before `Init()`:
-
-```cpp
-#include <app/clusters/commissioning-proxy-server/CodegenIntegration.h>
-
-using namespace chip::app::Clusters::CommissioningProxy;
-
-Instance gCPInstance(endpointId, CommissioningProxyCluster::Config(Feature::kWiFiNetworkInterface));
-
-void ApplicationInit()
-{
-    gCPInstance.RegisterTransport(gBleTransport);
-    gCPInstance.Init();
-}
-```
 
 ## Transport driver methods
 
@@ -366,7 +344,8 @@ MyBleBgScanHardware sHardware;
 chip::app::DefaultTimerDelegate sBgScanTimerDelegate;
 CommissioningProxyBgScanRegistry sBgScan(sHardware, sBgScanTimerDelegate);
 
-Status MyBleTransport::BgScanStart(uint16_t timeout, BitMask<WiFiBandBitmap> wiFiBands, FabricIndex fabricIndex, NodeId nodeId)
+Status MyBleTransport::BgScanStart(System::Clock::Seconds16 timeout, BitMask<WiFiBandBitmap> wiFiBands, FabricIndex fabricIndex,
+                                   NodeId nodeId)
 {
     return sBgScan.Start(fabricIndex, nodeId, GetTransportType(), wiFiBands, timeout);
 }
