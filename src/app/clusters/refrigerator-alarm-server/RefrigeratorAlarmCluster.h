@@ -29,7 +29,7 @@ public:
     using Config = AlarmBaseCluster::Config;
 
     RefrigeratorAlarmCluster(EndpointId endpointId, const Config & config) :
-        AlarmBaseCluster(endpointId, RefrigeratorAlarm::Id, config)
+        AlarmBaseCluster(endpointId, { RefrigeratorAlarm::Id, RefrigeratorAlarm::kRevision }, config)
     {}
 
 protected:

@@ -65,7 +65,7 @@ class TestDishwasherAlarmCluster : public AlarmBaseCluster
 {
 public:
     TestDishwasherAlarmCluster(EndpointId endpointId, const AlarmBaseCluster::Config & config) :
-        AlarmBaseCluster(endpointId, DishwasherAlarm::Id, config)
+        AlarmBaseCluster(endpointId, { DishwasherAlarm::Id, DishwasherAlarm::kRevision }, config)
     {}
 
 protected:
@@ -76,7 +76,7 @@ class TestRefrigeratorAlarmCluster : public AlarmBaseCluster
 {
 public:
     TestRefrigeratorAlarmCluster(EndpointId endpointId, const AlarmBaseCluster::Config & config) :
-        AlarmBaseCluster(endpointId, RefrigeratorAlarm::Id, config)
+        AlarmBaseCluster(endpointId, { RefrigeratorAlarm::Id, RefrigeratorAlarm::kRevision }, config)
     {}
 
 protected:
@@ -100,7 +100,6 @@ struct TestAlarmBaseCluster : public ::testing::Test
         return {
             .delegate                    = delegate,
             .feature                     = feature,
-            .clusterRevision             = DishwasherAlarm::kRevision,
             .supported                   = AlarmMap(0x3F),
             .latch                       = AlarmMap(0),
             .supportsModifyEnabledAlarms = withModifyCommand,
@@ -110,9 +109,8 @@ struct TestAlarmBaseCluster : public ::testing::Test
     AlarmBaseCluster::Config MakeRefrigeratorConfig()
     {
         return {
-            .delegate        = defaultDelegate,
-            .clusterRevision = RefrigeratorAlarm::kRevision,
-            .supported       = AlarmMap(0x1),
+            .delegate  = defaultDelegate,
+            .supported = AlarmMap(0x1),
         };
     }
 
@@ -179,17 +177,15 @@ TEST_F(TestAlarmBaseCluster, SetStateValueHonorsSupportedAndMask)
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_EQ(cluster.SetMaskValue(AlarmMap(0x3)), Status::Success);
-    EXPECT_EQ(cluster.SetStateValue(AlarmMap(0x1)), Status::Success);
+    EXPECT_EQ(cluster.SetMask(AlarmMap(0x3)), Status::Success);
+    EXPECT_EQ(cluster.SetState(AlarmMap(0x1)), Status::Success);
 
-    AlarmMap state{};
-    ASSERT_EQ(cluster.GetStateValue(&state), Status::Success);
-    EXPECT_EQ(state.Raw(), 0x1u);
+    EXPECT_EQ(cluster.GetState().Raw(), 0x1u);
 
-    EXPECT_EQ(cluster.SetStateValue(AlarmMap(0x4)), Status::Failure);
+    EXPECT_EQ(cluster.SetState(AlarmMap(0x4)), Status::Failure);
 
-    EXPECT_EQ(cluster.SetMaskValue(AlarmMap(0x1)), Status::Success);
-    EXPECT_EQ(cluster.SetStateValue(AlarmMap(0x3)), Status::Failure);
+    EXPECT_EQ(cluster.SetMask(AlarmMap(0x1)), Status::Success);
+    EXPECT_EQ(cluster.SetState(AlarmMap(0x3)), Status::Failure);
 }
 
 TEST_F(TestAlarmBaseCluster, SetStateValueHonorsLatchUnlessIgnored)
@@ -200,21 +196,17 @@ TEST_F(TestAlarmBaseCluster, SetStateValueHonorsLatchUnlessIgnored)
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_EQ(cluster.SetMaskValue(AlarmMap(0x3)), Status::Success);
-    EXPECT_EQ(cluster.SetStateValue(AlarmMap(0x1)), Status::Success);
+    EXPECT_EQ(cluster.SetMask(AlarmMap(0x3)), Status::Success);
+    EXPECT_EQ(cluster.SetState(AlarmMap(0x1)), Status::Success);
 
-    EXPECT_EQ(cluster.SetStateValue(AlarmMap(0)), Status::Success);
-    AlarmMap state{};
-    ASSERT_EQ(cluster.GetStateValue(&state), Status::Success);
-    EXPECT_EQ(state.Raw(), 0x1u);
+    EXPECT_EQ(cluster.SetState(AlarmMap(0)), Status::Success);
+    EXPECT_EQ(cluster.GetState().Raw(), 0x1u);
 
-    EXPECT_EQ(cluster.SetStateValue(AlarmMap(0x2)), Status::Success);
-    ASSERT_EQ(cluster.GetStateValue(&state), Status::Success);
-    EXPECT_EQ(state.Raw(), 0x3u);
+    EXPECT_EQ(cluster.SetState(AlarmMap(0x2)), Status::Success);
+    EXPECT_EQ(cluster.GetState().Raw(), 0x3u);
 
-    EXPECT_EQ(cluster.SetStateValue(AlarmMap(0), true), Status::Success);
-    ASSERT_EQ(cluster.GetStateValue(&state), Status::Success);
-    EXPECT_EQ(state.Raw(), 0u);
+    EXPECT_EQ(cluster.SetState(AlarmMap(0), true), Status::Success);
+    EXPECT_EQ(cluster.GetState().Raw(), 0u);
 }
 
 TEST_F(TestAlarmBaseCluster, ResetLatchedAlarmsClearsStateBits)
@@ -223,13 +215,11 @@ TEST_F(TestAlarmBaseCluster, ResetLatchedAlarmsClearsStateBits)
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_EQ(cluster.SetMaskValue(AlarmMap(0x3)), Status::Success);
-    EXPECT_EQ(cluster.SetStateValue(AlarmMap(0x3), true), Status::Success);
+    EXPECT_EQ(cluster.SetMask(AlarmMap(0x3)), Status::Success);
+    EXPECT_EQ(cluster.SetState(AlarmMap(0x3), true), Status::Success);
     EXPECT_EQ(cluster.ResetLatchedAlarms(AlarmMap(0x2)), Status::Success);
 
-    AlarmMap state{};
-    ASSERT_EQ(cluster.GetStateValue(&state), Status::Success);
-    EXPECT_EQ(state.Raw(), 0x1u);
+    EXPECT_EQ(cluster.GetState().Raw(), 0x1u);
 }
 
 TEST_F(TestAlarmBaseCluster, AcceptedCommandsWithResetAndModify)
@@ -266,9 +256,7 @@ TEST_F(TestAlarmBaseCluster, ModifyEnabledAlarmsCommandUpdatesMask)
     EXPECT_TRUE(tester.Invoke(command).IsSuccess());
     EXPECT_EQ(delegate.mLastModifyMask.Raw(), 0x3u);
 
-    AlarmMap mask{};
-    ASSERT_EQ(cluster.GetMaskValue(&mask), Status::Success);
-    EXPECT_EQ(mask.Raw(), 0x3u);
+    EXPECT_EQ(cluster.GetMask().Raw(), 0x3u);
 }
 
 TEST_F(TestAlarmBaseCluster, ResetCommandClearsRequestedAlarms)
@@ -277,16 +265,14 @@ TEST_F(TestAlarmBaseCluster, ResetCommandClearsRequestedAlarms)
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_EQ(cluster.SetMaskValue(AlarmMap(0x3)), Status::Success);
-    EXPECT_EQ(cluster.SetStateValue(AlarmMap(0x3), true), Status::Success);
+    EXPECT_EQ(cluster.SetMask(AlarmMap(0x3)), Status::Success);
+    EXPECT_EQ(cluster.SetState(AlarmMap(0x3), true), Status::Success);
 
     Commands::Reset::Type command{ .alarms = BitMask<DishwasherAlarm::AlarmBitmap>(0x2) };
     EXPECT_TRUE(tester.Invoke(command).IsSuccess());
     EXPECT_EQ(delegate.mLastResetAlarms.Raw(), 0x2u);
 
-    AlarmMap state{};
-    ASSERT_EQ(cluster.GetStateValue(&state), Status::Success);
-    EXPECT_EQ(state.Raw(), 0x1u);
+    EXPECT_EQ(cluster.GetState().Raw(), 0x1u);
 }
 
 TEST_F(TestAlarmBaseCluster, DelegateCanRejectModifyEnabledAlarms)

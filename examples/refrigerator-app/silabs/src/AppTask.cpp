@@ -266,11 +266,11 @@ void AppTask::DMPostAttributeChangeCallback(const ConcreteAttributePath & attrib
         {
         case RefAlarmAttr::Mask::Id:
             mMask = static_cast<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>(static_cast<uint32_t>(*value));
-            RefrigeratorAlarmServer::SetMaskValue(endpointId, mMask);
+            RefAlarmAttr::Mask::Set(endpointId, mMask);
             break;
         case RefAlarmAttr::State::Id:
             mState = static_cast<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>(static_cast<uint32_t>(*value));
-            RefrigeratorAlarmServer::SetStateValue(endpointId, mState);
+            RefAlarmAttr::State::Set(endpointId, mState);
             break;
         default:
             ChipLogError(AppServer, "Unhandled Refrigerator Alarm attribute " ChipLogFormatMEI, ChipLogValueMEI(attributeId));

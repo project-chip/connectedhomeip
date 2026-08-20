@@ -27,6 +27,34 @@ namespace chip::app::Clusters::DishwasherAlarm {
 
 DishwasherAlarmCluster * FindClusterOnEndpoint(EndpointId endpointId);
 
+/**
+ * Live Dishwasher Alarm attribute access for the code-driven server cluster.
+ *
+ * For startup values stored in the ZAP/ember attribute store, use the generated `GetDefault` functions in
+ * `app-common/zap-generated/attributes/Accessors.h`.
+ */
+namespace Attributes {
+
+namespace Mask {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, BitMask<AlarmMap> * value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, BitMask<AlarmMap> value);
+} // namespace Mask
+
+namespace Latch {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, BitMask<AlarmMap> * value);
+} // namespace Latch
+
+namespace State {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, BitMask<AlarmMap> * value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, BitMask<AlarmMap> value);
+} // namespace State
+
+namespace Supported {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, BitMask<AlarmMap> * value);
+} // namespace Supported
+
+} // namespace Attributes
+
 class DishwasherAlarmServer
 {
 public:

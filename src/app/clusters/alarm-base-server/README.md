@@ -23,8 +23,7 @@ For that reason, the code-driven Alarm Base implementation:
     (`.supported` and `.latch`) when the cluster is created.
 -   Stores them as `const` members on `AlarmBaseCluster` (`mSupported`,
     `mLatch`).
--   Exposes **read-only** accessors: `GetSupportedValue()` and
-    `GetLatchValue()`.
+-   Exposes **read-only** accessors: `GetSupported()` and `GetLatch()`.
 -   Does **not** implement `WriteAttribute` for these attributes.
 
 ### Removed setters
@@ -36,8 +35,8 @@ fixed attributes, which does not match the Alarm Base specification.
 
 Mutable runtime state remains available through:
 
--   `SetMaskValue()` / `GetMaskValue()`
--   `SetStateValue()` / `GetStateValue()`
+-   `SetMask()` / `GetMask()`
+-   `SetState()` / `GetState()`
 -   `ResetLatchedAlarms()` (when the Reset feature is enabled)
 
 To change Supported or Latch for a product, update the cluster configuration in

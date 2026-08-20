@@ -32,6 +32,12 @@
 
 namespace chip::app::Clusters::AlarmBase {
 
+struct ClusterEntry
+{
+    ClusterId id;
+    uint32_t revision;
+};
+
 // Generic alarm bitmap type shared by all AlarmBase derivations.
 enum class AlarmBitmap : uint32_t
 {

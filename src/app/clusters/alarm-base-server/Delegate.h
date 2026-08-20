@@ -49,7 +49,7 @@ public:
      *              bits that shall be enabled (not suppressed). Each set bit
      *              corresponds to an alarm type defined by the derived cluster
      *              (for example DoorError on Dishwasher Alarm). This is the same
-     *              value the command argument carries and what SetMaskValue()
+     *              value the command argument carries and what SetMask()
      *              would store if the command succeeds.
      *
      * The application may configure hardware or internal policy to match the

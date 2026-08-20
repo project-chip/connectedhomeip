@@ -25,55 +25,29 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace chip::app::Clusters {
 
-AlarmBaseCluster::AlarmBaseCluster(EndpointId endpointId, ClusterId clusterId, const Config & config) :
-    DefaultServerCluster({ endpointId, clusterId }), mFeature(config.feature), mClusterRevision(config.clusterRevision),
+AlarmBaseCluster::AlarmBaseCluster(EndpointId endpointId, ClusterEntry cluster, const Config & config) :
+    DefaultServerCluster({ endpointId, cluster.id }), mFeature(config.feature), mClusterRevision(cluster.revision),
     mSupportsModifyEnabledAlarms(config.supportsModifyEnabledAlarms), mDelegate(config.delegate), mLatch(config.latch),
     mSupported(config.supported)
 {}
 
-Status AlarmBaseCluster::GetMaskValue(AlarmMap * mask) const
-{
-    VerifyOrReturnError(mask != nullptr, Status::Failure);
-    *mask = mMask;
-    return Status::Success;
-}
-
-Status AlarmBaseCluster::GetLatchValue(AlarmMap * latch) const
+Status AlarmBaseCluster::GetLatch(AlarmMap & latch) const
 {
     VerifyOrReturnError(HasResetFeature(), Status::UnsupportedAttribute);
-    VerifyOrReturnError(latch != nullptr, Status::Failure);
-    *latch = mLatch;
+    latch = mLatch;
     return Status::Success;
 }
 
-Status AlarmBaseCluster::GetStateValue(AlarmMap * state) const
-{
-    VerifyOrReturnError(state != nullptr, Status::Failure);
-    *state = mState;
-    return Status::Success;
-}
-
-Status AlarmBaseCluster::GetSupportedValue(AlarmMap * supported) const
-{
-    VerifyOrReturnError(supported != nullptr, Status::Failure);
-    *supported = mSupported;
-    return Status::Success;
-}
-
-Status AlarmBaseCluster::SetMaskValue(const AlarmMap mask)
+Status AlarmBaseCluster::SetMask(AlarmMap mask)
 {
     VerifyOrReturnError(mSupported.HasAll(mask), Status::Failure);
     VerifyOrReturnError(SetAttributeValue(mMask, mask, Mask::Id), Status::Success);
 
-    AlarmMap state;
-    if (GetStateValue(&state) != Status::Success)
-    {
-        return Status::Failure;
-    }
+    AlarmMap state = mState;
     if (!mask.HasAll(state))
     {
         state         = mask & state;
-        Status status = SetStateValue(state, true);
+        Status status = SetState(state, true);
         if (status != Status::Success)
         {
             return status;
@@ -82,7 +56,7 @@ Status AlarmBaseCluster::SetMaskValue(const AlarmMap mask)
     return Status::Success;
 }
 
-Status AlarmBaseCluster::SetStateValue(const AlarmMap newState, bool ignoreLatchState)
+Status AlarmBaseCluster::SetState(AlarmMap newState, bool ignoreLatchState)
 {
     AlarmMap finalNewState = newState;
 
@@ -94,7 +68,7 @@ Status AlarmBaseCluster::SetStateValue(const AlarmMap newState, bool ignoreLatch
     if (!ignoreLatchState)
     {
         AlarmMap latch;
-        if (GetLatchValue(&latch) == Status::Success)
+        if (GetLatch(latch) == Status::Success)
         {
             auto bitsToKeep = latch & currentState;
             finalNewState.Set(bitsToKeep);
@@ -112,17 +86,13 @@ Status AlarmBaseCluster::SetStateValue(const AlarmMap newState, bool ignoreLatch
     return Status::Success;
 }
 
-Status AlarmBaseCluster::ResetLatchedAlarms(const AlarmMap alarms)
+Status AlarmBaseCluster::ResetLatchedAlarms(AlarmMap alarms)
 {
     VerifyOrReturnError(mSupported.HasAll(alarms), Status::Failure);
 
-    AlarmMap state;
-    if (GetStateValue(&state) != Status::Success)
-    {
-        return Status::Failure;
-    }
+    AlarmMap state = mState;
     state.Clear(alarms);
-    return SetStateValue(state, true);
+    return SetState(state, true);
 }
 
 DataModel::ActionReturnStatus AlarmBaseCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -231,7 +201,7 @@ DataModel::ActionReturnStatus AlarmBaseCluster::HandleModifyEnabledAlarms(AlarmM
         return Status::Failure;
     }
 
-    return SetMaskValue(mask);
+    return SetMask(mask);
 }
 
 } // namespace chip::app::Clusters

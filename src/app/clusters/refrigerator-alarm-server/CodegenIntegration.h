@@ -22,25 +22,34 @@
 #include <app/clusters/refrigerator-alarm-server/RefrigeratorAlarmCluster.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+class RefrigeratorAlarmServer;
+
 namespace chip::app::Clusters::RefrigeratorAlarm {
 
 RefrigeratorAlarmCluster * FindClusterOnEndpoint(EndpointId endpointId);
 
-class RefrigeratorAlarmServer
-{
-public:
-    static RefrigeratorAlarmServer & Instance();
+/**
+ * Live Refrigerator Alarm attribute access for the code-driven server cluster.
+ *
+ * For startup values stored in the ZAP/ember attribute store, use the generated `GetDefault` functions in
+ * `app-common/zap-generated/attributes/Accessors.h`.
+ */
+namespace Attributes {
 
-    Protocols::InteractionModel::Status GetMaskValue(EndpointId endpoint, BitMask<AlarmMap> * mask);
-    Protocols::InteractionModel::Status GetStateValue(EndpointId endpoint, BitMask<AlarmMap> * state);
-    Protocols::InteractionModel::Status GetSupportedValue(EndpointId endpoint, BitMask<AlarmMap> * suppported);
+namespace Mask {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, BitMask<AlarmMap> * value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, BitMask<AlarmMap> value);
+} // namespace Mask
 
-    Protocols::InteractionModel::Status SetMaskValue(EndpointId endpoint, const BitMask<AlarmMap> mask);
+namespace State {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, BitMask<AlarmMap> * value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, BitMask<AlarmMap> value);
+} // namespace State
 
-    Protocols::InteractionModel::Status SetStateValue(EndpointId endpoint, BitMask<AlarmMap> newState);
+namespace Supported {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, BitMask<AlarmMap> * value);
+} // namespace Supported
 
-private:
-    static RefrigeratorAlarmServer instance;
-};
+} // namespace Attributes
 
 } // namespace chip::app::Clusters::RefrigeratorAlarm

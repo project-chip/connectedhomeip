@@ -136,7 +136,6 @@ public:
         DishwasherAlarmCluster::Config config{
             .delegate                    = gDishwasherAlarmClusters[clusterInstanceIndex].integrationDelegateWrapper,
             .feature                     = features,
-            .clusterRevision             = DishwasherAlarm::kRevision,
             .supported                   = supported,
             .latch                       = latch,
             .supportsModifyEnabledAlarms = EndpointHasModifyEnabledAlarmsCommand(endpointId),
@@ -151,13 +150,13 @@ public:
         BitMask<DishwasherAlarm::AlarmBitmap> maskDefault{};
         if (Mask::GetDefault(endpointId, &maskDefault) == Status::Success)
         {
-            cluster.SetMaskValue(AlarmBase::AlarmMap(maskDefault.Raw()));
+            cluster.SetMask(AlarmBase::AlarmMap(maskDefault.Raw()));
         }
 
         BitMask<DishwasherAlarm::AlarmBitmap> stateDefault{};
         if (State::GetDefault(endpointId, &stateDefault) == Status::Success)
         {
-            cluster.SetStateValue(AlarmBase::AlarmMap(stateDefault.Raw()), true);
+            cluster.SetState(AlarmBase::AlarmMap(stateDefault.Raw()), true);
         }
 
         return gDishwasherAlarmClusters[clusterInstanceIndex].cluster.Registration();
@@ -253,13 +252,11 @@ Status DishwasherAlarmServer::GetMaskValue(EndpointId endpoint, BitMask<AlarmMap
     DishwasherAlarmCluster * cluster = FindClusterOnEndpoint(endpoint);
     VerifyOrReturnError(cluster != nullptr, Status::UnsupportedEndpoint);
 
-    AlarmBase::AlarmMap value;
-    Status status = cluster->GetMaskValue(&value);
-    if (status == Status::Success && mask != nullptr)
+    if (mask != nullptr)
     {
-        *mask = ToAlarmMap(value);
+        *mask = ToAlarmMap(cluster->GetMask());
     }
-    return status;
+    return Status::Success;
 }
 
 Status DishwasherAlarmServer::GetLatchValue(EndpointId endpoint, BitMask<AlarmMap> * latch)
@@ -268,7 +265,7 @@ Status DishwasherAlarmServer::GetLatchValue(EndpointId endpoint, BitMask<AlarmMa
     VerifyOrReturnError(cluster != nullptr, Status::UnsupportedEndpoint);
 
     AlarmBase::AlarmMap value;
-    Status status = cluster->GetLatchValue(&value);
+    Status status = cluster->GetLatch(value);
     if (status == Status::Success && latch != nullptr)
     {
         *latch = ToAlarmMap(value);
@@ -281,13 +278,11 @@ Status DishwasherAlarmServer::GetStateValue(EndpointId endpoint, BitMask<AlarmMa
     DishwasherAlarmCluster * cluster = FindClusterOnEndpoint(endpoint);
     VerifyOrReturnError(cluster != nullptr, Status::UnsupportedEndpoint);
 
-    AlarmBase::AlarmMap value;
-    Status status = cluster->GetStateValue(&value);
-    if (status == Status::Success && state != nullptr)
+    if (state != nullptr)
     {
-        *state = ToAlarmMap(value);
+        *state = ToAlarmMap(cluster->GetState());
     }
-    return status;
+    return Status::Success;
 }
 
 Status DishwasherAlarmServer::GetSupportedValue(EndpointId endpoint, BitMask<AlarmMap> * supported)
@@ -295,27 +290,25 @@ Status DishwasherAlarmServer::GetSupportedValue(EndpointId endpoint, BitMask<Ala
     DishwasherAlarmCluster * cluster = FindClusterOnEndpoint(endpoint);
     VerifyOrReturnError(cluster != nullptr, Status::UnsupportedEndpoint);
 
-    AlarmBase::AlarmMap value;
-    Status status = cluster->GetSupportedValue(&value);
-    if (status == Status::Success && supported != nullptr)
+    if (supported != nullptr)
     {
-        *supported = ToAlarmMap(value);
+        *supported = ToAlarmMap(cluster->GetSupported());
     }
-    return status;
+    return Status::Success;
 }
 
 Status DishwasherAlarmServer::SetMaskValue(EndpointId endpoint, const BitMask<AlarmMap> mask)
 {
     DishwasherAlarmCluster * cluster = FindClusterOnEndpoint(endpoint);
     VerifyOrReturnError(cluster != nullptr, Status::UnsupportedEndpoint);
-    return cluster->SetMaskValue(FromAlarmMap(mask));
+    return cluster->SetMask(FromAlarmMap(mask));
 }
 
 Status DishwasherAlarmServer::SetStateValue(EndpointId endpoint, const BitMask<AlarmMap> newState, bool ignoreLatchState)
 {
     DishwasherAlarmCluster * cluster = FindClusterOnEndpoint(endpoint);
     VerifyOrReturnError(cluster != nullptr, Status::UnsupportedEndpoint);
-    return cluster->SetStateValue(FromAlarmMap(newState), ignoreLatchState);
+    return cluster->SetState(FromAlarmMap(newState), ignoreLatchState);
 }
 
 Status DishwasherAlarmServer::ResetLatchedAlarms(EndpointId endpoint, const BitMask<AlarmMap> alarms)
@@ -331,5 +324,55 @@ bool DishwasherAlarmServer::HasResetFeature(EndpointId endpoint)
     VerifyOrReturnError(cluster != nullptr, false);
     return cluster->HasResetFeature();
 }
+
+namespace Attributes {
+
+namespace Mask {
+
+Status Get(EndpointId endpoint, BitMask<AlarmMap> * value)
+{
+    return DishwasherAlarmServer::Instance().GetMaskValue(endpoint, value);
+}
+
+Status Set(EndpointId endpoint, BitMask<AlarmMap> value)
+{
+    return DishwasherAlarmServer::Instance().SetMaskValue(endpoint, value);
+}
+
+} // namespace Mask
+
+namespace Latch {
+
+Status Get(EndpointId endpoint, BitMask<AlarmMap> * value)
+{
+    return DishwasherAlarmServer::Instance().GetLatchValue(endpoint, value);
+}
+
+} // namespace Latch
+
+namespace State {
+
+Status Get(EndpointId endpoint, BitMask<AlarmMap> * value)
+{
+    return DishwasherAlarmServer::Instance().GetStateValue(endpoint, value);
+}
+
+Status Set(EndpointId endpoint, BitMask<AlarmMap> value)
+{
+    return DishwasherAlarmServer::Instance().SetStateValue(endpoint, value);
+}
+
+} // namespace State
+
+namespace Supported {
+
+Status Get(EndpointId endpoint, BitMask<AlarmMap> * value)
+{
+    return DishwasherAlarmServer::Instance().GetSupportedValue(endpoint, value);
+}
+
+} // namespace Supported
+
+} // namespace Attributes
 
 } // namespace chip::app::Clusters::DishwasherAlarm

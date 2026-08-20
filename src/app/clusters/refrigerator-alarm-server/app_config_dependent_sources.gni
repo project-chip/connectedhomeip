@@ -14,7 +14,5 @@
 app_config_dependent_sources = [
   "CodegenIntegration.cpp",
   "CodegenIntegration.h",
-  "RefrigeratorAlarmCluster.cpp",
-  "RefrigeratorAlarmCluster.h",
   "refrigerator-alarm-server.h",
 ]

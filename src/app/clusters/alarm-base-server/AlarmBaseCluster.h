@@ -36,13 +36,12 @@ public:
     {
         AlarmBase::Delegate & delegate;
         BitMask<AlarmBase::Feature> feature{};
-        uint32_t clusterRevision = 0;
         AlarmBase::AlarmMap supported{};
         AlarmBase::AlarmMap latch{};
         bool supportsModifyEnabledAlarms = false;
     };
 
-    AlarmBaseCluster(EndpointId endpointId, ClusterId clusterId, const Config & config);
+    AlarmBaseCluster(EndpointId endpointId, AlarmBase::ClusterEntry cluster, const Config & config);
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
@@ -56,14 +55,14 @@ public:
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
     // Application-facing API
-    Protocols::InteractionModel::Status GetMaskValue(AlarmBase::AlarmMap * mask) const;
-    Protocols::InteractionModel::Status GetLatchValue(AlarmBase::AlarmMap * latch) const;
-    Protocols::InteractionModel::Status GetStateValue(AlarmBase::AlarmMap * state) const;
-    Protocols::InteractionModel::Status GetSupportedValue(AlarmBase::AlarmMap * supported) const;
+    AlarmBase::AlarmMap GetMask() const { return mMask; }
+    AlarmBase::AlarmMap GetState() const { return mState; }
+    AlarmBase::AlarmMap GetSupported() const { return mSupported; }
+    Protocols::InteractionModel::Status GetLatch(AlarmBase::AlarmMap & latch) const;
 
-    Protocols::InteractionModel::Status SetMaskValue(const AlarmBase::AlarmMap mask);
-    Protocols::InteractionModel::Status SetStateValue(const AlarmBase::AlarmMap newState, bool ignoreLatchState = false);
-    Protocols::InteractionModel::Status ResetLatchedAlarms(const AlarmBase::AlarmMap alarms);
+    Protocols::InteractionModel::Status SetMask(AlarmBase::AlarmMap mask);
+    Protocols::InteractionModel::Status SetState(AlarmBase::AlarmMap newState, bool ignoreLatchState = false);
+    Protocols::InteractionModel::Status ResetLatchedAlarms(AlarmBase::AlarmMap alarms);
 
     bool HasResetFeature() const { return mFeature.Has(AlarmBase::Feature::kReset); }
 
