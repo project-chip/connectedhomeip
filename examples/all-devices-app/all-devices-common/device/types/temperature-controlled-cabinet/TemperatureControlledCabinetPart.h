@@ -51,13 +51,15 @@ public:
 
     // Public cluster getters for programmatic control
     // Values only available after registration.
-    Clusters::TemperatureControlCluster & TemperatureControlCluster() { 
+    Clusters::TemperatureControlCluster & TemperatureControlCluster()
+    {
         VerifyOrDie(mTemperatureControlCluster.IsConstructed());
-        return mTemperatureControlCluster.Cluster(); 
+        return mTemperatureControlCluster.Cluster();
     }
-    Clusters::IdentifyCluster & IdentifyCluster() {
+    Clusters::IdentifyCluster & IdentifyCluster()
+    {
         VerifyOrDie(mIdentifyCluster.IsConstructed());
-        return mIdentifyCluster.Cluster(); 
+        return mIdentifyCluster.Cluster();
     }
     Clusters::OvenCavityOperationalState::OvenCavityOperationalStateCluster & OperationalState()
     {

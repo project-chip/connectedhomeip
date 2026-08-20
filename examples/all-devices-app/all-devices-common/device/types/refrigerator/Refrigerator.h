@@ -34,7 +34,7 @@ public:
 
 protected:
     virtual CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider) = 0;
-    virtual void UnregisterParts(CodeDrivenDataModelProvider & provider)                                       = 0;
+    virtual void UnregisterParts(CodeDrivenDataModelProvider & provider)                                      = 0;
 
 private:
     EndpointId mEndpointId = kInvalidEndpointId;

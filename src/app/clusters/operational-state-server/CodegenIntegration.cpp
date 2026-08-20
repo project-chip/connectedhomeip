@@ -45,7 +45,8 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, const Operation
 // Protected constructor: cluster storage is owned by the derived class (Rvc, OvenCavity).
 Instance::Instance(OperationalStateCluster & cluster, ServerClusterRegistration & registration,
                    detail::InstanceDelegateWrapper & delegateWrapper, Delegate * aDelegate) :
-    mCluster(cluster), mRegPtr(&registration), mDelegateWrapperPtr(&delegateWrapper)
+    mCluster(cluster),
+    mRegPtr(&registration), mDelegateWrapperPtr(&delegateWrapper)
 {
     mDelegateWrapperPtr->SetInstance(this);
 }

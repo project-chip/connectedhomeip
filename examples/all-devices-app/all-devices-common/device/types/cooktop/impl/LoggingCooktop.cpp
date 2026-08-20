@@ -67,8 +67,7 @@ const Clusters::Globals::Structs::SemanticTagStruct::Type kSurface2Tag = {
 
 // LoggingCooktop
 
-LoggingCooktop::LoggingCooktop(TimerDelegate & timerDelegate) :
-    mSurface1(timerDelegate, "Left"), mSurface2(timerDelegate, "Right")
+LoggingCooktop::LoggingCooktop(TimerDelegate & timerDelegate) : mSurface1(timerDelegate, "Left"), mSurface2(timerDelegate, "Right")
 {}
 
 CHIP_ERROR LoggingCooktop::RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider)

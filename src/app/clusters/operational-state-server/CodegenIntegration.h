@@ -141,7 +141,7 @@ public:
     }
 
 private:
-    Instance * mInstance      = nullptr;
+    Instance * mInstance       = nullptr;
     LegacyDelegate * mDelegate = nullptr;
 };
 
@@ -236,7 +236,8 @@ struct RvcInstanceBase
     RegisteredServerCluster<RvcOperationalStateCluster> mCluster;
     RvcInstanceBase(Delegate * aDelegate, EndpointId aEndpointId,
                     const OperationalState::OperationalStateCluster::Config & config = {}) :
-        mDelegateWrapper(aDelegate), mCluster(aEndpointId, mDelegateWrapper, config)
+        mDelegateWrapper(aDelegate),
+        mCluster(aEndpointId, mDelegateWrapper, config)
     {}
 };
 } // namespace detail
@@ -262,7 +263,8 @@ struct OvenInstanceBase
     RegisteredServerCluster<OvenCavityOperationalStateCluster> mCluster;
     OvenInstanceBase(OperationalState::Delegate * aDelegate, EndpointId aEndpointId,
                      const OperationalState::OperationalStateCluster::Config & config = {}) :
-        mDelegateWrapper(aDelegate), mCluster(aEndpointId, mDelegateWrapper, config)
+        mDelegateWrapper(aDelegate),
+        mCluster(aEndpointId, mDelegateWrapper, config)
     {}
 };
 } // namespace detail
