@@ -20,8 +20,8 @@
 #include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <app/clusters/service-area-server/ServiceAreaCluster.h>
 #include <clusters/RvcOperationalState/Enums.h>
-#include <device/capabilities/operational-state/impl/LoggingOperationalStateDelegate.h>
 #include <cstdint>
+#include <device/capabilities/operational-state/impl/LoggingOperationalStateDelegate.h>
 #include <string>
 
 namespace chip::app::Clusters::ServiceArea {
