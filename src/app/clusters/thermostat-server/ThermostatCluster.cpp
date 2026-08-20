@@ -43,8 +43,7 @@ ThermostatCluster::ThermostatCluster(EndpointId endpointId, BitFlags<Thermostat:
                                      Thermostat::Delegate & delegate) :
     DefaultServerCluster({ endpointId, Thermostat::Id }),
     mFeatures(features), mConfig(config), mDelegate(delegate)
-{
-}
+{}
 
 CHIP_ERROR ThermostatCluster::Startup(ServerClusterContext & context)
 {
