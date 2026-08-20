@@ -1215,7 +1215,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::WiFiCredentialsNeeded(chip::EndpointI
     VerifyOrReturnError(listenerObject != nullptr, CHIP_ERROR_NO_MEMORY);
 
     jmethodID listenerMethod = mWiFiCredentialsNeededListener;
-    bool hasException       = false;
+    bool hasException        = false;
     {
         chip::DeviceLayer::StackUnlock unlock;
         env->CallVoidMethod(listenerObject, listenerMethod, static_cast<jint>(endpoint));
@@ -1243,7 +1243,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ThreadCredentialsNeeded(chip::Endpoin
     VerifyOrReturnError(listenerObject != nullptr, CHIP_ERROR_NO_MEMORY);
 
     jmethodID listenerMethod = mThreadCredentialsNeededListener;
-    bool hasException       = false;
+    bool hasException        = false;
     {
         chip::DeviceLayer::StackUnlock unlock;
         env->CallVoidMethod(listenerObject, listenerMethod, static_cast<jint>(endpoint));
