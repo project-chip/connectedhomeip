@@ -58,7 +58,9 @@ source_set("linux") {
 
   if (chip_config_network_layer_ble) {
     # LinuxCommissioningProxyBleAdapter implements the cluster's BLE adapter interface.
-    deps += [ "${chip_root}/src/app/clusters/commissioning-proxy-server:ble-transport" ]
+    deps += [
+      "${chip_root}/src/app/clusters/commissioning-proxy-server:ble-transport",
+    ]
   }
 
   public_configs = [ ":includes" ]

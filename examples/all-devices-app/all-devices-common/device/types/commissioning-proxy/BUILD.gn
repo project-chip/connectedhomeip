@@ -39,7 +39,9 @@ source_set("commissioning-proxy") {
     # only the platform adapter it needs (posix/linux/LinuxCommissioningProxyBleAdapter).
     # Public because CommissioningProxyDevice.h exposes both the transport and the
     # adapter interface to whoever constructs the device.
-    public_deps = [ "${chip_root}/src/app/clusters/commissioning-proxy-server:ble-transport" ]
+    public_deps = [
+      "${chip_root}/src/app/clusters/commissioning-proxy-server:ble-transport",
+    ]
   }
 
   include_dirs = [ "." ]
