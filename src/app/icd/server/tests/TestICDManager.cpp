@@ -223,15 +223,18 @@ public:
 
     void SetThreadConnectivityState(bool enabled, bool attached)
     {
-#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST && CHIP_DEVICE_CONFIG_ENABLE_THREAD
         DeviceLayer::ThreadStackMgrImpl().SetThreadEnabledForTest(enabled);
         DeviceLayer::ThreadStackMgrImpl().SetThreadAttachedForTest(attached);
+#else
+        (void) enabled;
+        (void) attached;
 #endif
     }
 
     void ResetThreadConnectivityState()
     {
-#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST && CHIP_DEVICE_CONFIG_ENABLE_THREAD
         DeviceLayer::ThreadStackMgrImpl().ResetThreadStateForTest();
 #endif
     }
