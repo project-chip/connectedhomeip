@@ -18,8 +18,8 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/alarm-base-server/alarm-base-cluster-objects.h>
-#include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
 #include <app/clusters/refrigerator-alarm-server/RefrigeratorAlarmCluster.h>
+#include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
 #include <app/static-cluster-config/RefrigeratorAlarm.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/generic-callbacks.h>

@@ -25,12 +25,12 @@ class RefrigeratorAlarmServer
 public:
     static RefrigeratorAlarmServer & Instance();
 
-    chip::Protocols::InteractionModel::Status GetMaskValue(
-        chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * mask);
-    chip::Protocols::InteractionModel::Status GetStateValue(
-        chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * state);
-    chip::Protocols::InteractionModel::Status GetSupportedValue(
-        chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * suppported);
+    chip::Protocols::InteractionModel::Status GetMaskValue(chip::EndpointId endpoint,
+                                                           chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * mask);
+    chip::Protocols::InteractionModel::Status
+    GetStateValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * state);
+    chip::Protocols::InteractionModel::Status
+    GetSupportedValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * suppported);
 
     chip::Protocols::InteractionModel::Status
     SetMaskValue(chip::EndpointId endpoint, const chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> mask);
