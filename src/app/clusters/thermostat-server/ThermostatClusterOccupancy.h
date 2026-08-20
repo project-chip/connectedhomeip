@@ -38,20 +38,21 @@ public:
     public:
         virtual ~Delegate() = default;
 
-        virtual BitMask<OccupancyBitmap> GetOccupancy() const                                       = 0;
-        virtual Protocols::InteractionModel::Status SetOccupancy(BitMask<OccupancyBitmap> occupied) = 0;
+        virtual BitMask<OccupancyBitmap> GetOccupancy() const                                                       = 0;
+        virtual Protocols::InteractionModel::Status SetOccupancy(BitMask<OccupancyBitmap> occupied, bool & changed) = 0;
     };
 
-    ThermostatOccupancy(Delegate & delegate) : mDelegate(delegate) {}
+    ThermostatOccupancy(ThermostatCluster & cluster, Delegate & delegate) : mCluster(cluster), mDelegate(delegate) {}
 
     std::optional<DataModel::ActionReturnStatus> ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                AttributeValueEncoder & encoder);
 
     bool IsOccupied() const { return mDelegate.GetOccupancy().Has(OccupancyBitmap::kOccupied); }
 
-    Protocols::InteractionModel::Status SetOccupancy(BitMask<OccupancyBitmap> occupied) { return mDelegate.SetOccupancy(occupied); }
+    Protocols::InteractionModel::Status SetOccupancy(BitMask<OccupancyBitmap> occupied);
 
 private:
+    ThermostatCluster & mCluster;
     Delegate & mDelegate;
 };
 

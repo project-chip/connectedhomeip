@@ -73,7 +73,12 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
                 return Status::ConstraintError;
             }
         }
-        if (mDelegate.SetRemoteSensing(valueRemoteSensing))
+        bool changed = false;
+        if (auto err = mDelegate.SetRemoteSensing(valueRemoteSensing, changed); err != Status::Success)
+        {
+            return err;
+        }
+        if (changed)
         {
             NotifyAttributeChanged(RemoteSensing::Id);
         }
@@ -100,7 +105,12 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
             ChipLogError(Zcl, "Invalid value for TemperatureSetpointHold: %d", to_underlying(requestedTemperatureSetpointHold));
             return Status::InvalidValue;
         }
-        if (mDelegate.SetTemperatureSetpointHold(requestedTemperatureSetpointHold))
+        bool changed = false;
+        if (auto err = mDelegate.SetTemperatureSetpointHold(requestedTemperatureSetpointHold, changed); err != Status::Success)
+        {
+            return err;
+        }
+        if (changed)
         {
             NotifyAttributeChanged(TemperatureSetpointHold::Id);
         }
@@ -114,7 +124,13 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
         {
             return Status::InvalidValue;
         }
-        if (mDelegate.SetTemperatureSetpointHoldDuration(requestedTemperatureSetpointHoldDuration))
+        bool changed = false;
+        if (auto err = mDelegate.SetTemperatureSetpointHoldDuration(requestedTemperatureSetpointHoldDuration, changed);
+            err != Status::Success)
+        {
+            return err;
+        }
+        if (changed)
         {
             NotifyAttributeChanged(TemperatureSetpointHoldDuration::Id);
         }

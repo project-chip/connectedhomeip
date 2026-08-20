@@ -41,27 +41,36 @@ public:
     {}
 
     SystemModeEnum GetSystemMode() const override;
-    bool SetSystemMode(SystemModeEnum systemMode) override;
+    Protocols::InteractionModel::Status SetSystemMode(SystemModeEnum systemMode, bool & changed) override;
+
     ThermostatRunningModeEnum GetRunningMode() const override;
-    bool SetRunningMode(ThermostatRunningModeEnum runningMode) override;
+    Protocols::InteractionModel::Status SetRunningMode(ThermostatRunningModeEnum runningMode, bool & changed) override;
+
     BitMask<RelayStateBitmap> GetRunningState() const override;
-    bool SetRunningState(BitMask<RelayStateBitmap> runningState) override;
+    Protocols::InteractionModel::Status SetRunningState(BitMask<RelayStateBitmap> runningState, bool & changed) override;
+
     ControlSequenceOfOperationEnum GetControlSequenceOfOperation() const override;
-    bool SetControlSequenceOfOperation(ControlSequenceOfOperationEnum controlSequenceOfOperation) override;
+    Protocols::InteractionModel::Status SetControlSequenceOfOperation(ControlSequenceOfOperationEnum seq, bool & changed) override;
+
     DataModel::Nullable<temperature> GetLocalTemperature() const override;
-    bool SetLocalTemperature(DataModel::Nullable<temperature> localTemperature) override;
+    Protocols::InteractionModel::Status SetLocalTemperature(DataModel::Nullable<temperature> temp, bool & changed) override;
+
     int8_t GetLocalTemperatureCalibration() const override;
-    bool SetLocalTemperatureCalibration(int8_t localTemperatureCalibration) override;
+    Protocols::InteractionModel::Status SetLocalTemperatureCalibration(int8_t temp, bool & changed) override;
 
     BitMask<RemoteSensingBitmap> GetRemoteSensing() const override;
+    Protocols::InteractionModel::Status SetRemoteSensing(BitMask<RemoteSensingBitmap> sensing, bool & changed) override;
 
-    bool SetRemoteSensing(BitMask<RemoteSensingBitmap> remoteSensing) override;
     TemperatureSetpointHoldEnum GetTemperatureSetpointHold() const override;
-    bool SetTemperatureSetpointHold(TemperatureSetpointHoldEnum temperatureSetpointHold) override;
+    Protocols::InteractionModel::Status SetTemperatureSetpointHold(TemperatureSetpointHoldEnum hold, bool & changed) override;
+
     DataModel::Nullable<uint16_t> GetTemperatureSetpointHoldDuration() const override;
-    bool SetTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> temperatureSetpointHoldDuration) override;
+    Protocols::InteractionModel::Status SetTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> duration,
+                                                                           bool & changed) override;
+
     DataModel::Nullable<uint32_t> GetSetpointHoldExpiryTimestamp() const override;
-    bool SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> setpointHoldExpiryTimestamp) override;
+    Protocols::InteractionModel::Status SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> timestamp,
+                                                                       bool & changed) override;
 
     Protocols::InteractionModel::Status LoadSetpoints(Setpoints & setpoints) override;
     Protocols::InteractionModel::Status SaveSetpoint(const Setpoint & oldSetpoint, const Setpoint & newSetpoint) override;

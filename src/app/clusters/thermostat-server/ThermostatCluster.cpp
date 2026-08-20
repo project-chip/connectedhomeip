@@ -140,7 +140,12 @@ ControlSequenceOfOperationEnum ThermostatCluster::GetControlSequenceOfOperation(
 
 Status ThermostatCluster::SetControlSequenceOfOperation(ControlSequenceOfOperationEnum controlSequenceOfOperation)
 {
-    if (mDelegate.SetControlSequenceOfOperation(controlSequenceOfOperation))
+    bool changed = false;
+    if (auto err = mDelegate.SetControlSequenceOfOperation(controlSequenceOfOperation, changed); err != Status::Success)
+    {
+        return err;
+    }
+    if (changed)
     {
         NotifyAttributeChanged(ControlSequenceOfOperation::Id);
     }
@@ -202,7 +207,13 @@ Status ThermostatCluster::SetSystemMode(SystemModeEnum systemMode)
     }
 
     SystemModeEnum oldSystemMode = GetSystemMode();
-    if (mDelegate.SetSystemMode(systemMode))
+
+    bool changed = false;
+    if (auto err = mDelegate.SetSystemMode(systemMode, changed); err != Status::Success)
+    {
+        return err;
+    }
+    if (changed)
     {
         NotifyAttributeChanged(SystemMode::Id);
         GenerateSystemModeChangeEvent(Optional<SystemModeEnum>(oldSystemMode), systemMode);
@@ -218,7 +229,12 @@ DataModel::Nullable<temperature> ThermostatCluster::GetLocalTemperature() const
 Status ThermostatCluster::SetLocalTemperature(DataModel::Nullable<temperature> localTemperature,
                                               DataModel::AttributeChangeType changeType)
 {
-    if (mDelegate.SetLocalTemperature(localTemperature))
+    bool changed = false;
+    if (auto err = mDelegate.SetLocalTemperature(localTemperature, changed); err != Status::Success)
+    {
+        return err;
+    }
+    if (changed)
     {
         NotifyAttributeChanged(LocalTemperature::Id, changeType);
         GenerateLocalTemperatureChangeEvent(localTemperature);
@@ -233,7 +249,12 @@ int8_t ThermostatCluster::GetLocalTemperatureCalibration() const
 
 Status ThermostatCluster::SetLocalTemperatureCalibration(int8_t localTemperatureCalibration)
 {
-    if (mDelegate.SetLocalTemperatureCalibration(localTemperatureCalibration))
+    bool changed = false;
+    if (auto err = mDelegate.SetLocalTemperatureCalibration(localTemperatureCalibration, changed); err != Status::Success)
+    {
+        return err;
+    }
+    if (changed)
     {
         NotifyAttributeChanged(LocalTemperatureCalibration::Id);
     }
@@ -269,7 +290,13 @@ Status ThermostatCluster::SetRunningMode(ThermostatRunningModeEnum runningMode)
         return Status::ConstraintError;
     }
     auto currentRunningMode = GetRunningMode();
-    if (mDelegate.SetRunningMode(runningMode))
+
+    bool changed = false;
+    if (auto err = mDelegate.SetRunningMode(runningMode, changed); err != Status::Success)
+    {
+        return err;
+    }
+    if (changed)
     {
         NotifyAttributeChanged(ThermostatRunningMode::Id);
         GenerateRunningModeChangeEvent(Optional<ThermostatRunningModeEnum>(currentRunningMode), runningMode);
@@ -295,7 +322,13 @@ Status ThermostatCluster::SetRunningState(BitMask<RelayStateBitmap> runningState
         return Status::ConstraintError;
     }
     auto currentRunningState = GetRunningState();
-    if (mDelegate.SetRunningState(runningState))
+
+    bool changed = false;
+    if (auto err = mDelegate.SetRunningState(runningState, changed); err != Status::Success)
+    {
+        return err;
+    }
+    if (changed)
     {
         NotifyAttributeChanged(ThermostatRunningState::Id);
         GenerateRunningStateChangeEvent(Optional<BitMask<RelayStateBitmap>>(currentRunningState), runningState);
