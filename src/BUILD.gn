@@ -74,11 +74,13 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/closure-control-server/tests",
       "${chip_root}/src/app/clusters/closure-dimension-server/tests",
       "${chip_root}/src/app/clusters/commissioner-control-server/tests",
+      "${chip_root}/src/app/clusters/commodity-tariff-server/tests",
       "${chip_root}/src/app/clusters/concentration-measurement-server/tests",
       "${chip_root}/src/app/clusters/content-launch-server/tests",
       "${chip_root}/src/app/clusters/descriptor/tests",
       "${chip_root}/src/app/clusters/device-energy-management-server/tests",
       "${chip_root}/src/app/clusters/dynamic-lighting-server/tests",
+      "${chip_root}/src/app/clusters/electrical-distribution-server/tests",
       "${chip_root}/src/app/clusters/electrical-energy-measurement-server/tests",
       "${chip_root}/src/app/clusters/electrical-power-measurement-server/tests",
       "${chip_root}/src/app/clusters/ethernet-network-diagnostics-server/tests",
@@ -97,6 +99,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/illuminance-measurement-server/tests",
       "${chip_root}/src/app/clusters/relative-humidity-measurement-server/tests",
       "${chip_root}/src/app/clusters/joint-fabric-administrator-server/tests",
+      "${chip_root}/src/app/clusters/laundry-dryer-controls-server/tests",
       "${chip_root}/src/app/clusters/laundry-washer-controls-server/tests",
       "${chip_root}/src/app/clusters/level-control/tests",
       "${chip_root}/src/app/clusters/localization-configuration-server/tests",
@@ -162,6 +165,7 @@ if (chip_build_tests) {
       "${chip_root}/src/lib/dnssd/minimal_mdns/responders/tests",
       "${chip_root}/src/lib/dnssd/minimal_mdns/tests",
       "${chip_root}/src/lib/dnssd/tests",
+      "${chip_root}/src/lib/dnssd/uld/tests",
       "${chip_root}/src/lib/format/tests",
       "${chip_root}/src/lib/support/verhoeff/tests",
       "${chip_root}/src/messaging/tests",
@@ -176,9 +180,6 @@ if (chip_build_tests) {
       "${chip_root}/src/transport/tests",
 
       # keep-sorted: end
-
-      # TODO(#40932): Fix and re-enable the Commodity Tariff unit tests.
-      # "${chip_root}/src/app/clusters/commodity-tariff-server/tests",
     ]
 
     if (chip_enable_push_av_stream_transport) {

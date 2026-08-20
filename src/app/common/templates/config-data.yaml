@@ -26,6 +26,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Camera AV Settings User Level Management
     - Commodity Price
     - Commodity Tariff
+    - Electrical Distribution
     - Electrical Energy Measurement
     - Joint Fabric Administrator
     - Network Commissioning
@@ -81,7 +82,6 @@ ClustersWithShutdownFunctions:
 ClustersWithPreAttributeChangeFunctions:
     # keep-sorted start
     - Door Lock
-    - Laundry Dryer Controls
     - Mode Select
     - Pump Configuration and Control
     - Thermostat
@@ -133,6 +133,7 @@ CodeDrivenClusters:
     - ICD Management
     - Identify
     - Illuminance Measurement
+    - Laundry Dryer Controls
     - Laundry Washer Controls
     - Laundry Washer Mode
     - Localization Configuration

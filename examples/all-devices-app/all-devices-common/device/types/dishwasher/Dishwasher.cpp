@@ -20,7 +20,11 @@
 
 namespace chip::app {
 
-Dishwasher::Dishwasher() : SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDishwasher, 1)) {}
+Dishwasher::Dishwasher(const Config & config) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDishwasher, 1)),
+    mDiagnosticDataProvider(config.diagnosticDataProvider), mOperationalStateDelegate(config.operationalStateDelegate),
+    mDishwasherModeDelegate(config.modeDelegate)
+{}
 
 CHIP_ERROR Dishwasher::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
@@ -28,9 +32,16 @@ CHIP_ERROR Dishwasher::Register(EndpointId endpoint, CodeDrivenDataModelProvider
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mOperationalStateCluster.Create(endpoint, &mDelegate);
-    mDelegate.SetCluster(&mOperationalStateCluster.Cluster());
+    mOperationalStateCluster.Create(endpoint, &mOperationalStateDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mOperationalStateCluster.Registration()));
+
+    mDishwasherModeCluster.Create(endpoint, Clusters::ModeBase::kDishwasherMode,
+                                  Clusters::ModeBaseCluster::Config{
+                                      .feature                = BitFlags<Clusters::ModeBase::Feature>(),
+                                      .appDelegate            = mDishwasherModeDelegate,
+                                      .diagnosticDataProvider = mDiagnosticDataProvider,
+                                  });
+    ReturnErrorOnFailure(provider.AddCluster(mDishwasherModeCluster.Registration()));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 
@@ -41,6 +52,11 @@ CHIP_ERROR Dishwasher::Register(EndpointId endpoint, CodeDrivenDataModelProvider
 void Dishwasher::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
+    if (mDishwasherModeCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mDishwasherModeCluster.Cluster()));
+        mDishwasherModeCluster.Destroy();
+    }
     if (mOperationalStateCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mOperationalStateCluster.Cluster()));
