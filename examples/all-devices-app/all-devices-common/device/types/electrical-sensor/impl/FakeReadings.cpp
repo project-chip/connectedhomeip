@@ -137,7 +137,7 @@ void FakeReadings::FakeReadingsUpdate()
     if (mTimerDelegate)
     {
         mTimerDelegate->CancelTimer(this);
-        mTimerDelegate->StartTimer(this, System::Clock::Seconds16(mInterval_s));
+        LogErrorOnFailure(mTimerDelegate->StartTimer(this, System::Clock::Seconds16(mInterval_s)));
     }
 }
 
