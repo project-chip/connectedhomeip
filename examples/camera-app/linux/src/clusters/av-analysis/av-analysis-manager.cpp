@@ -33,38 +33,6 @@ using namespace chip::app::Clusters::AvAnalysis::Structs;
 void AvAnalysisManager::ShutdownApp() {}
 
 /**
- * Delegate command handlers
- */
-
-/**
- */
-Protocols::InteractionModel::Status AvAnalysisManager::EstablishAnalysisStream()
-{
-    return Protocols::InteractionModel::Status::Success;
-}
-
-/**
- */
-Protocols::InteractionModel::Status AvAnalysisManager::ActivateAnalysisStream()
-{
-    return Protocols::InteractionModel::Status::Success;
-}
-
-/**
- */
-Protocols::InteractionModel::Status AvAnalysisManager::DeactivateAnalysisStream()
-{
-    return Protocols::InteractionModel::Status::Success;
-}
-
-/**
- */
-Protocols::InteractionModel::Status AvAnalysisManager::RemoveAnalysisStream()
-{
-    return Protocols::InteractionModel::Status::Success;
-}
-
-/**
  * Delegate command assists
  */
 CHIP_ERROR AvAnalysisManager::VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs)

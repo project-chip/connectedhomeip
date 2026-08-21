@@ -16,10 +16,15 @@ import("//build_overrides/chip.gni")
 
 source_set("av-analysis-server") {
   sources = [
+    "AvAnalysisCameraClient.h",
     "AvAnalysisCluster.cpp",
     "AvAnalysisCluster.h",
     "AvAnalysisLogic.cpp",
     "AvAnalysisLogic.h",
+    "AvAnalysisStorage.h",
+    "AvAnalysisStreamTable.h",
+    "DefaultAvAnalysisCameraClient.cpp",
+    "DefaultAvAnalysisCameraClient.h",
   ]
 
   deps = [

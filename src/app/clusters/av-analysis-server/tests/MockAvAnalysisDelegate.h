@@ -1,7 +1,5 @@
 /*
- *
  *    Copyright (c) 2025 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,44 +13,28 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
+
 #include <app/clusters/av-analysis-server/AvAnalysisCluster.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace AvAnalysis {
 
-class AvAnalysisManager : public AvAnalysisDelegate
+class MockAvAnalysisDelegate : public AvAnalysisDelegate
 {
-
 public:
-    AvAnalysisManager()  = default;
-    ~AvAnalysisManager() = default;
+    void ShutdownApp() override {}
 
-    /**
-     * Allows the delegate to perform any specific functions such as timer cancellation on a shutdown, this is invoked prior to
-     * the destructor, it shall not be invoked as part of the destructor.
-     */
-    virtual void ShutdownApp() override;
+    CHIP_ERROR VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs) override { return CHIP_NO_ERROR; }
 
-    /**
-     * Delegate command assists
-     */
+    bool CanAddContextTriggers() override { return true; }
 
-    virtual CHIP_ERROR VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs) override;
+    void ActiveAmbientContextTriggersUpdated() override {}
 
-    virtual bool CanAddContextTriggers() override;
-
-    void ActiveAmbientContextTriggersUpdated() override;
-
-    CHIP_ERROR PersistentAttributesLoadedCallback() override;
-
-private:
+    CHIP_ERROR PersistentAttributesLoadedCallback() override { return CHIP_NO_ERROR; }
 };
 
-} // namespace AvAnalysis
 } // namespace Clusters
 } // namespace app
 } // namespace chip
