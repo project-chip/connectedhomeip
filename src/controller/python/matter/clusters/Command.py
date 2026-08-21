@@ -346,7 +346,8 @@ def _BuildPyInvokeRequestData(commands: list[InvokeRequestInfo], timedRequestTim
 
 async def SendBatchCommands(future: Future, eventLoop, device, commands: list[InvokeRequestInfo],
                             timedRequestTimeoutMs: int | None = None, interactionTimeoutMs: int | None = None,
-                            busyWaitMs: int | None = None, suppressResponse: bool | None = None) -> PyChipError:
+                            busyWaitMs: int | None = None, suppressResponse: bool | None = None,
+                            delayReportData: DelayReportData | None = None) -> PyChipError:
     ''' Initiates an InvokeInteraction with the batch commands provided.
 
     Arguments:

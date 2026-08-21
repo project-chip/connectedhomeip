@@ -40,6 +40,8 @@ import logging
 import queue
 import time
 
+from typing import Any
+
 from mobly import asserts
 from support_modules.idm_support import IDMBaseTest
 
@@ -55,11 +57,24 @@ log = logging.getLogger(__name__)
 class AttributeReportTracker:
     """Callback tracker that records received attribute reports with monotonic timestamps."""
 
-    def __init__(self, expected_attribute, output_queue: queue.Queue):
+    def __init__(self, expected_attribute: type[Clusters.ClusterObjects.ClusterAttributeDescriptor],
+                 output_queue: queue.Queue[tuple[float, Any]]) -> None:
+        """Initializes the attribute report tracker.
+
+        Args:
+            expected_attribute: The cluster attribute descriptor type to filter and track.
+            output_queue: Queue where received (timestamp, value) tuples are enqueued.
+        """
         self._expected_attribute = expected_attribute
         self._output_queue = output_queue
 
-    def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
+    def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction) -> None:
+        """Subscription callback invoked on attribute report updates.
+
+        Args:
+            path: The attribute path reported.
+            transaction: The active subscription transaction.
+        """
         if path.AttributeType == self._expected_attribute:
             recv_time = time.monotonic()
             val = transaction.GetAttribute(path)
@@ -71,21 +86,25 @@ class TC_IDM_1_5(IDMBaseTest):
     """[TC-IDM-1.5] DelayReportData Invoke Request Action [DUT as Server]"""
 
     def desc_TC_IDM_1_5(self) -> str:
+        """Returns the description of the test case."""
         return "[TC-IDM-1.5] DelayReportData Invoke Request Action [DUT as Server]"
 
     def pics_TC_IDM_1_5(self) -> list[str]:
+        """Returns the list of PICS required for this test case."""
         return ["MCORE.IDM.S"]
 
     def steps_TC_IDM_1_5(self) -> list[TestStep]:
+        """Returns the list of test steps defined in the test plan."""
         return [
-            TestStep(1, "TH establishes a subscription to a changeable attribute on the DUT with MaxInterval set to a large value (3600 seconds).", is_commissioning=True),
-            TestStep(2, "TH records start time t_invoke_sent and sends an InvokeRequestMessage to the DUT to invoke a command that triggers a change in the subscribed attribute, including DelayReportData parameter (DelayMinMs: 1000 ms, DelayJitterWindowMs: 1000 ms)."),
-            TestStep(3, "TH measures the time delta (Delta t) between sending the InvokeRequestMessage (t_invoke_sent) in Step 2 and receiving the subsequent ReportDataMessage. Verify Delta t >= DelayMinMs (1000 ms)."),
+            TestStep(1, "TH records start time t_sub_start and establishes a subscription to the Breadcrumb attribute of the GeneralCommissioning cluster on Endpoint 0 of the DUT with MaxInterval set to 3600 seconds. TH synchronously awaits and drains the initial prime report from the subscription establishment.", is_commissioning=True),
+            TestStep(2, "TH records start time t_invoke_sent and sends an InvokeRequestMessage to the DUT to invoke the ArmFailSafe command (ExpiryLengthSeconds set to 900, Breadcrumb set to 1) on the GeneralCommissioning cluster (Endpoint 0) with DelayReportData (DelayMinMs: 1000 ms, DelayJitterWindowMs: 1000 ms)."),
+            TestStep(3, "TH measures the time delta (Delta t) between sending the InvokeRequestMessage (t_invoke_sent) in Step 2 and receiving the subsequent ReportDataMessage containing the Breadcrumb attribute change report. Verify Delta t >= DelayMinMs (1000 ms)."),
             TestStep(4, "TH sends an InvokeRequestMessage to the DUT to invoke the ArmFailSafe command (ExpiryLengthSeconds set to 0, Breadcrumb set to 0) to disarm the fail-safe and clean up.")
         ]
 
     @async_test_body
-    async def test_TC_IDM_1_5(self):
+    async def test_TC_IDM_1_5(self) -> None:
+        """Executes the TC-IDM-1.5 test procedure."""
         dev_ctrl = self.default_controller
         dut_node_id = self.dut_node_id
 
@@ -100,18 +119,23 @@ class TC_IDM_1_5(IDMBaseTest):
             self.skip_step(4)
             return
 
-        # GeneralCommissioning cluster is mandatory on Endpoint 0 for all Matter devices
+        # GeneralCommissioning cluster on Endpoint 0 is mandatory for all Matter devices
         endpoint = 0
         target_attribute = Clusters.GeneralCommissioning.Attributes.Breadcrumb
 
         report_queue: queue.Queue = queue.Queue()
         tracker = AttributeReportTracker(target_attribute, report_queue)
 
+        delay_min_ms = 1000
+        delay_jitter_window_ms = 1000
+        min_required_sub_window_sec = (delay_min_ms + delay_jitter_window_ms) / 1000.0 + 5.0
+
+        # Step 1: Establish subscription to Breadcrumb with MaxInterval = 3600s
         self.step(1)
         log.info("Establishing subscription to Breadcrumb attribute on Endpoint 0 with MaxInterval=3600s")
-        sub_start_time = time.monotonic()
+        t_sub_start = time.monotonic()
         subscription = await dev_ctrl.ReadAttribute(
-            nodeid=dut_node_id,
+            nodeId=dut_node_id,
             attributes=[(endpoint, target_attribute)],
             reportInterval=(0, 3600),
             keepSubscriptions=False,
@@ -119,23 +143,22 @@ class TC_IDM_1_5(IDMBaseTest):
         )
         subscription.SetAttributeUpdateCallback(tracker)
 
-        # Synchronously await and drain prime report from subscription establishment
-        try:
-            prime_report = await asyncio.to_thread(report_queue.get, timeout=5.0)
-            log.info("Initial prime report received: %r", prime_report)
-        except queue.Empty:
-            asserts.fail("No prime report received upon subscription establishment")
+        # Synchronously verify initial prime report was received during subscription establishment
+        prime_attrs = subscription.GetAttributes()
+        asserts.assert_in(endpoint, prime_attrs, "Endpoint 0 not found in subscription prime report")
+        asserts.assert_in(Clusters.GeneralCommissioning, prime_attrs[endpoint],
+                          "GeneralCommissioning cluster not found in subscription prime report")
+        asserts.assert_in(target_attribute, prime_attrs[endpoint][Clusters.GeneralCommissioning],
+                          "Breadcrumb attribute not found in subscription prime report")
+        prime_val = prime_attrs[endpoint][Clusters.GeneralCommissioning][target_attribute]
+        log.info("Initial prime report received: Breadcrumb = %r", prime_val)
 
         # Give DUT 1.0s to process StatusResponse ACK and enter quiet active state
         log.info("Waiting 1 second for subscription to settle before Step 2")
         await asyncio.sleep(1.0)
 
-        sub_elapsed_sec = time.monotonic() - sub_start_time
+        sub_elapsed_sec = time.monotonic() - t_sub_start
         remaining_sub_window_sec = 3600.0 - sub_elapsed_sec
-
-        delay_min_ms = 1000
-        delay_jitter_window_ms = 1000
-        min_required_sub_window_sec = (delay_min_ms + delay_jitter_window_ms) / 1000.0 + 5.0
 
         log.info("Subscription established in %.2f s; remaining window: %.2f s (required >= %.2f s)",
                  sub_elapsed_sec, remaining_sub_window_sec, min_required_sub_window_sec)
@@ -143,26 +166,32 @@ class TC_IDM_1_5(IDMBaseTest):
         asserts.assert_greater_equal(
             remaining_sub_window_sec, min_required_sub_window_sec,
             f"Subscription setup took too long ({sub_elapsed_sec:.2f} s); not enough time remaining "
-            f"({remaining_sub_window_sec:.2f} s) to safely measure DelayReportData"
+            f"({remaining_sub_window_sec:.2f} s) before scheduled periodic report"
         )
 
+        # Step 2: Send InvokeRequestMessage for ArmFailSafe with DelayReportData
         self.step(2)
         # Drain any residual queue items before measuring
         while not report_queue.empty():
             report_queue.get_nowait()
 
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=1)
-        log.info("Sending InvokeRequestMessage with DelayReportData (DelayMinMs=%d, DelayJitterWindowMs=%d)",
+        log.info("Sending InvokeRequestMessage for ArmFailSafe with DelayReportData (DelayMinMs=%d, DelayJitterWindowMs=%d)",
                  delay_min_ms, delay_jitter_window_ms)
 
-        invoke_sent_time = time.monotonic()
-        await dev_ctrl.SendCommand(
+        t_invoke_sent = time.monotonic()
+        resp = await dev_ctrl.SendCommand(
             nodeId=dut_node_id,
             endpoint=endpoint,
             payload=cmd,
             delayReportData=ClusterCommand.DelayReportData(delayMinMs=delay_min_ms, delayJitterWindowMs=delay_jitter_window_ms),
         )
+        asserts.assert_is_instance(resp, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse,
+                                   "DUT response should be ArmFailSafeResponse")
+        asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+                             f"ArmFailSafe failed with errorCode: {resp.errorCode}")
 
+        # Step 3: Measure delta t and verify delta t >= DelayMinMs
         self.step(3)
         wait_timeout_sec = (delay_min_ms + delay_jitter_window_ms) / 1000.0 + 5.0
         try:
@@ -171,25 +200,30 @@ class TC_IDM_1_5(IDMBaseTest):
             asserts.fail(
                 f"Did not receive ReportDataMessage within {wait_timeout_sec:.2f}s following invoke command with DelayReportData")
 
-        delta_t_ms = (report_recv_time - invoke_sent_time) * 1000.0
-        log.info("Measured Delta t between sending InvokeRequest and receiving ReportData: %.2f ms (DelayMinMs=%d, Jitter=%d)",
+        asserts.assert_equal(new_val, 1, f"Expected Breadcrumb report value to be 1, got {new_val}")
+
+        delta_t_ms = (report_recv_time - t_invoke_sent) * 1000.0
+        log.info("Measured Delta t between sending InvokeRequest (t_invoke_sent) and receiving ReportData: %.2f ms (DelayMinMs=%d, Jitter=%d)",
                  delta_t_ms, delay_min_ms, delay_jitter_window_ms)
 
         min_expected_delta_ms = float(delay_min_ms)
-
         asserts.assert_greater_equal(
             delta_t_ms, min_expected_delta_ms,
             f"Delta t ({delta_t_ms:.2f} ms) was less than {min_expected_delta_ms:.2f} ms minimum delay"
         )
 
+        # Step 4: Disarm fail-safe and reset Breadcrumb
         self.step(4)
-        # Cleanup: Disarm fail-safe and reset Breadcrumb
         log.info("Cleaning up: disarming fail-safe and resetting Breadcrumb to 0")
-        await dev_ctrl.SendCommand(
+        cleanup_resp = await dev_ctrl.SendCommand(
             nodeId=dut_node_id,
             endpoint=endpoint,
             payload=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
         )
+        asserts.assert_is_instance(cleanup_resp, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse,
+                                   "DUT response should be ArmFailSafeResponse")
+        asserts.assert_equal(cleanup_resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+                             f"ArmFailSafe cleanup failed with errorCode: {cleanup_resp.errorCode}")
 
 
 if __name__ == "__main__":
