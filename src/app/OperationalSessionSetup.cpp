@@ -302,14 +302,23 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & re
     {
         // When an ICD operates as a LIT, the DNS-SD advertisement lacks the Session Idle Interval
         // (SII). This would cause mIdleRetransTimeout to be 0, which is not a usable value. Since
-        // CASE is established with LIT ICDs only when they are active, we can base
-        // mIdleRetransTimeout on active mode parameters. To ensure sufficient time for MRP
-        // retransmissions, particularly in Thread networks where mActiveRetransTimeout might be too
-        // small, we use the maximum of config.mActiveRetransTimeout and
-        // mInitParams.minimumLITBackoffInterval
-
-        config.mIdleRetransTimeout =
-            std::max(config.mActiveRetransTimeout, System::Clock::Milliseconds32(mInitParams.minimumLITBackoffInterval.ValueOr(0)));
+        // CASE is established with LIT ICDs only when they are active, we base mIdleRetransTimeout
+        // on active mode parameters. However, in multihop Thread networks, mActiveRetransTimeout is
+        // often too small to accommodate the full Sigma1/Sigma2 round-trip turnaround.
+        //
+        // Specifically, typical CASE establishment latency for a LIT device on Thread includes:
+        // - Crypto Processing (ECDH P-256 point multiplication + key derivation on resource-constrained
+        //   MCUs): ~0.8s to 1.8s
+        // - Multi-hop Thread transport (3–4 hops including MAC CSMA-CA and parent poll timing): ~0.3s to 0.8s
+        // - Total expected round-trip turnaround: ~1.1s to 2.5s
+        //
+        // To prevent spurious MRP retransmissions on low-bandwidth 802.15.4 channels while the remote
+        // device is processing Sigma1, we enforce a minimum LIT backoff interval. If a platform does not
+        // explicitly configure minimumLITBackoffInterval in CASEClientInitParams (e.g., when using
+        // SDK wrappers like Android where custom CASE params are not exposed), we default to 3000 ms.
+        // This 3-second floor provides an adequate safety margin beyond typical ~1.1s–2.5s turnaround time.
+        config.mIdleRetransTimeout = std::max(config.mActiveRetransTimeout,
+                                              System::Clock::Milliseconds32(mInitParams.minimumLITBackoffInterval.ValueOr(3000)));
     }
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (mTransportPayloadCapability == TransportPayloadCapability::kLargePayload)
