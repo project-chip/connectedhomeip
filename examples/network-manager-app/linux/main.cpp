@@ -30,6 +30,7 @@
 #include <lib/support/Span.h>
 
 #if MATTER_ENABLE_UBUS
+#include "MatterUbusService.h"
 #include "ThreadBROpenThreadUbus.h"
 #include "UbusManager.h"
 #else
@@ -49,6 +50,7 @@ ByteSpan ByteSpanFromCharSpan(CharSpan span)
 
 #if MATTER_ENABLE_UBUS
 ubus::UbusManager gUbusManager{};
+MatterUbusService gMatterUbusService{ gUbusManager };
 #endif
 
 std::optional<DefaultThreadNetworkDirectoryServer> gThreadNetworkDirectoryServer;
@@ -111,6 +113,11 @@ void ApplicationInit()
 {
     TEMPORARY_RETURN_IGNORED gWiFiNetworkManagementServer->SetNetworkCredentials(ByteSpanFromCharSpan("MatterAP"_span),
                                                                                  ByteSpanFromCharSpan("Setec Astronomy"_span));
+#if MATTER_ENABLE_UBUS
+    // Publish the "matter" ubus object once the server is up; its handlers
+    // read commissioning state owned by the server.
+    SuccessOrDie(gMatterUbusService.Init());
+#endif
 }
 
 void ApplicationShutdown()
