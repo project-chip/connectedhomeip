@@ -1292,9 +1292,7 @@ CHIP_ERROR MakeCertTLV(CertType certType, const ToolChipDN * subjectDN, X509 * c
 
             for (uint8_t i = 0; i < futureExtsCount; i++)
             {
-                ReturnErrorOnFailure(
-                    writer.Put(ContextTag(kTag_FutureExtension),
-                               ByteSpan(reinterpret_cast<const uint8_t *>(futureExts[i].info), strlen(futureExts[i].info))));
+                ReturnErrorOnFailure(writer.Put(ContextTag(kTag_FutureExtension), ByteSpan::fromCharString(futureExts[i].info)));
             }
         }
         ReturnErrorOnFailure(writer.EndContainer(containerType2));
