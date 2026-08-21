@@ -64,8 +64,9 @@ protected:
 private:
     Instance * mInstance = nullptr;
 
-    // allow Getinstance access. Essentially we want the wrapper to be able to
-    // preserve invariants.
+    // Allow GetInstance access: we want the wrapper to be able to preserve invariants
+    // of a delegates belonging to a single instance (cannot have a delegate passed
+    // to two instances at the same time, because then SetInstance makes no sense).
     friend class detail::InstanceDelegateWrapper;
 };
 

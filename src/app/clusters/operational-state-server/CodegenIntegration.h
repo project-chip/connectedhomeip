@@ -47,10 +47,10 @@ public:
 
     void SetInstance(Instance * aInstance)
     {
-        /// identical check with OperationalState::Delegate, forcing a 1:1
-        /// between instance and delegate, so that every delegate knows exactly what instance it
-        /// belongs to and every instance is managed by one delegate only. Doing this here
-        /// since mDelegate may not yet be set (and that was the one doing the check before).
+        // Identical check with OperationalState::Delegate, forcing a 1:1
+        // between instance and delegate, so that every delegate knows exactly what instance it
+        // belongs to and every instance is managed by one delegate only. Doing this here
+        // since mDelegate may not yet be set (and that was the one doing the check before).
         VerifyOrDie(mInstance == nullptr || aInstance == nullptr || mInstance == aInstance);
 
         mInstance = aInstance;
@@ -62,21 +62,21 @@ public:
 
     void SetDelegate(LegacyDelegate * aDelegate)
     {
-        /// We expect a general invariant of mDelegate::instance == mInstance.
-        ///
-        /// At the same time though, delegates throughout try to ensure that delegates are not reset and always
-        /// travel through a "SetInstance" from null to a value.
-        ///
-        /// Enforce that the delegates actually match: when we receive the delegate,
-        /// either it has no instance yet (and we can set it to our underlying instance whatever it is)
-        /// or it is already set to the required instance anyway.
-        ///
-        /// What we try to avoid is the case of:
-        ///   - mDelegate instance is FOO
-        ///   - mInstance is BAR
-        /// then:
-        ///   - we would do SetDelegate(nullptr) + SetDelegate(mInstance), effectively switching FOO to BAR
-        ///     without erroring out.
+        // We expect a general invariant of mDelegate::instance == mInstance.
+        //
+        // At the same time though, delegates throughout try to ensure that delegates are not reset and always
+        // travel through a "SetInstance" from null to a value.
+        //
+        // Enforce that the delegates actually match: when we receive the delegate,
+        // either it has no instance yet (and we can set it to our underlying instance whatever it is)
+        // or it is already set to the required instance anyway.
+        //
+        // What we try to avoid is the case of:
+        //   - mDelegate instance is FOO
+        //   - mInstance is BAR
+        // then:
+        //   - we would do SetDelegate(nullptr) + SetDelegate(mInstance), effectively switching FOO to BAR
+        //     without erroring out.
         VerifyOrDie((aDelegate == nullptr) || (aDelegate->GetInstance() == nullptr) || (aDelegate->GetInstance() == mInstance));
 
         if (mDelegate != nullptr)
