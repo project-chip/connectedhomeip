@@ -237,8 +237,8 @@ class TC_HSTAT_2_4(HSTATBase):
             await self.send_SetSettingsCommand_expect_success(optimal=False)
             optimalReportsReceived.append(optimalSubscription.wait_for_attribute_report().value)
             asserts.assert_equal(len(optimalReportsReceived), 2, "Wrong number of reports received for Optimal")
-            asserts.assert_equal(optimalReportsReceived[0], True, "First report for Sleep is not Optimal")
-            asserts.assert_equal(optimalReportsReceived[1], False, "Second report for Sleep is not Optimal")
+            asserts.assert_equal(optimalReportsReceived[0], True, "First report for Optimal is not True")
+            asserts.assert_equal(optimalReportsReceived[1], False, "Second report for Optimal is not False")
         else:
             self.mark_step_range_skipped(12, 14)
 
