@@ -269,7 +269,7 @@ std::optional<DataModel::ActionReturnStatus> ThermostatPresets::ReadAttribute(co
         return encoder.Encode(mDelegate.GetNumberOfPresets());
     case Presets::Id: {
         auto & subjectDescriptor = encoder.GetSubjectDescriptor();
-        if (mCluster.GetAtomicWriteSession().InAtomicWrite(subjectDescriptor, request.path.mAttributeId))
+        if (mAtomicWriteSession.InAtomicWrite(subjectDescriptor, request.path.mAttributeId))
         {
             return encoder.EncodeList([this](const auto & enc) -> CHIP_ERROR {
                 for (uint8_t i = 0; true; i++)
@@ -319,16 +319,15 @@ std::optional<DataModel::ActionReturnStatus> ThermostatPresets::WriteAttribute(c
         return std::nullopt;
     }
 
-    auto & subjectDescriptor  = decoder.GetSubjectDescriptor();
-    auto & atomicWriteSession = mCluster.GetAtomicWriteSession();
+    auto & subjectDescriptor = decoder.GetSubjectDescriptor();
 
     // Presets are not editable, return INVALID_IN_STATE.
-    VerifyOrReturnError(atomicWriteSession.InAtomicWrite(std::make_optional(request.path.mAttributeId)),
+    VerifyOrReturnError(mAtomicWriteSession.InAtomicWrite(std::make_optional(request.path.mAttributeId)),
                         CHIP_IM_GLOBAL_STATUS(InvalidInState), ChipLogError(Zcl, "Presets are not editable"));
 
     // OK, we're in an atomic write, make sure the requesting node is the same one that started the atomic write,
     // otherwise return BUSY.
-    if (!atomicWriteSession.InAtomicWrite(subjectDescriptor, request.path.mAttributeId))
+    if (!mAtomicWriteSession.InAtomicWrite(subjectDescriptor, request.path.mAttributeId))
     {
         ChipLogError(Zcl, "Another node is editing presets. Server is busy. Try again later");
         return CHIP_IM_GLOBAL_STATUS(Busy);

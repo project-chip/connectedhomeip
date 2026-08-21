@@ -17,9 +17,12 @@
 #pragma once
 
 #include "ThermostatCluster.h"
+#include "ThermostatClusterAtomic.h"
 #include "ThermostatClusterOccupancy.h"
 #include "ThermostatClusterPresets.h"
 #include "ThermostatClusterSuggestions.h"
+#include <clusters/Thermostat/Metadata.h>
+#include <credentials/FabricTable.h>
 #include <type_traits>
 #include <variant>
 
@@ -65,31 +68,66 @@ static auto MakeFeature(const std::tuple<DelegateArgs &...> & delegates, ExtraAr
     }
 }
 
+template <bool Enabled>
+static auto MakeAtomicWriteSession(AtomicWriteSession::Delegate & delegate, TimerDelegate & timerDelegate,
+                                   FabricTable * fabricTable)
+{
+    if constexpr (Enabled)
+    {
+        return AtomicWriteSession(delegate, timerDelegate, *fabricTable);
+    }
+    else
+    {
+        return std::monostate{};
+    }
+}
+
 template <typename Target, typename... Args>
 inline constexpr bool kArgsHasDelegate = (std::is_base_of_v<Target, std::decay_t<Args>> || ...);
 
 } // namespace detail
 
 template <typename... Delegates>
-class ThermostatClusterWithFeatures : public ThermostatCluster
+class ThermostatClusterWithFeatures : public ThermostatCluster,
+                                      public AtomicWriteSession::Delegate
 {
 public:
-    static constexpr bool kHasPresets     = (std::is_base_of_v<ThermostatPresets::Delegate, Delegates> || ...);
-    static constexpr bool kHasSuggestions = (std::is_base_of_v<ThermostatSuggestions::Delegate, Delegates> || ...);
-    static constexpr bool kHasOccupancy   = (std::is_base_of_v<ThermostatOccupancy::Delegate, Delegates> || ...);
+    static constexpr bool kHasPresets          = detail::kArgsHasDelegate<ThermostatPresets::Delegate, Delegates...>;
+    static constexpr bool kHasSuggestions      = detail::kArgsHasDelegate<ThermostatSuggestions::Delegate, Delegates...>;
+    static constexpr bool kHasOccupancy        = detail::kArgsHasDelegate<ThermostatOccupancy::Delegate, Delegates...>;
+    static constexpr bool kRequiresAtomicWrite = kHasPresets;
 
     static_assert(!kHasSuggestions || kHasPresets, "Suggestions feature requires Presets feature");
 
     ThermostatClusterWithFeatures(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features, const Config & config,
                                   Delegates &... delegates) :
-        ThermostatCluster(aEndpointId, features, config, detail::FindDelegate<Thermostat::Delegate>(delegates...)),
-        mPresets(detail::MakeFeature<kHasPresets, ThermostatPresets>(std::forward_as_tuple(delegates...), *this)),
-        mSuggestions(
-            detail::MakeFeature<kHasSuggestions, ThermostatSuggestions>(std::forward_as_tuple(delegates...), *this, mPresets)),
-        mOccupancy(detail::MakeFeature<kHasOccupancy, ThermostatOccupancy>(std::forward_as_tuple(delegates...), *this))
+        ThermostatClusterWithFeatures(aEndpointId, features, config, static_cast<FabricTable *>(nullptr), delegates...)
     {
-        static_assert(detail::kArgsHasDelegate<Thermostat::Delegate, Delegates...>,
-                      "Missing Thermostat::Delegate in constructor arguments");
+        static_assert(!kRequiresAtomicWrite, "Features requiring atomic write (e.g. Presets) require a FabricTable");
+    }
+
+    ThermostatClusterWithFeatures(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features, const Config & config,
+                                  FabricTable & fabricTable, Delegates &... delegates) :
+        ThermostatClusterWithFeatures(aEndpointId, features, config, &fabricTable, delegates...)
+    {}
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override
+    {
+        ReturnErrorOnFailure(ThermostatCluster::Startup(context));
+        if constexpr (kRequiresAtomicWrite)
+        {
+            mAtomicWriteSession.Startup();
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    void Shutdown(ClusterShutdownType type) override
+    {
+        if constexpr (kRequiresAtomicWrite)
+        {
+            mAtomicWriteSession.Shutdown();
+        }
+        ThermostatCluster::Shutdown(type);
     }
 
     bool IsOccupied() const override
@@ -144,6 +182,16 @@ public:
                 return *status;
             }
         }
+        if constexpr (kRequiresAtomicWrite)
+        {
+            auto & subjectDescriptor = decoder.GetSubjectDescriptor();
+            if (mAtomicWriteSession.InAtomicWrite(subjectDescriptor))
+            {
+                ChipLogError(Zcl, "Can not write to non-atomic attribute " ChipLogFormatMEI " during atomic write",
+                             ChipLogValueMEI(request.path.mAttributeId));
+                return Protocols::InteractionModel::Status::InvalidInState;
+            }
+        }
         auto status = ThermostatCluster::WriteAttribute(request, decoder);
         if constexpr (kHasPresets)
         {
@@ -159,6 +207,18 @@ public:
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override
     {
+        if constexpr (kRequiresAtomicWrite)
+        {
+            bool handled = false;
+            if (auto status = mAtomicWriteSession.InvokeCommand(request, input_arguments, handler, handled))
+            {
+                return status;
+            }
+            if (handled)
+            {
+                return std::nullopt;
+            }
+        }
         if constexpr (kHasPresets)
         {
             if (auto status = mPresets.InvokeCommand(request, input_arguments, handler))
@@ -181,6 +241,38 @@ public:
         return ThermostatCluster::InvokeCommand(request, input_arguments, handler);
     }
 
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
+    {
+        if constexpr (kRequiresAtomicWrite)
+        {
+            ReturnErrorOnFailure(builder.AppendElements({ Commands::AtomicRequest::kMetadataEntry }));
+        }
+        if constexpr (kHasPresets)
+        {
+            ReturnErrorOnFailure(builder.AppendElements({ Commands::SetActivePresetRequest::kMetadataEntry }));
+        }
+        if constexpr (kHasSuggestions)
+        {
+            ReturnErrorOnFailure(builder.AppendElements(
+                { Commands::AddThermostatSuggestion::kMetadataEntry, Commands::RemoveThermostatSuggestion::kMetadataEntry }));
+        }
+        return ThermostatCluster::AcceptedCommands(path, builder);
+    }
+
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override
+    {
+        if constexpr (kRequiresAtomicWrite)
+        {
+            ReturnErrorOnFailure(builder.AppendElements({ Commands::AtomicResponse::Id }));
+        }
+        if constexpr (kHasSuggestions)
+        {
+            ReturnErrorOnFailure(builder.AppendElements({ Commands::AddThermostatSuggestionResponse::Id }));
+        }
+        return ThermostatCluster::GeneratedCommands(path, builder);
+    }
+
     Protocols::InteractionModel::Status OnAtomicWriteBegin(AttributeId attributeId) override
     {
         if constexpr (kHasPresets)
@@ -190,7 +282,7 @@ public:
                 return *status;
             }
         }
-        return ThermostatCluster::OnAtomicWriteBegin(attributeId);
+        return Protocols::InteractionModel::Status::Success;
     }
 
     Protocols::InteractionModel::Status OnAtomicWritePrecommit(AttributeId attributeId) override
@@ -202,7 +294,7 @@ public:
                 return *status;
             }
         }
-        return ThermostatCluster::OnAtomicWritePrecommit(attributeId);
+        return Protocols::InteractionModel::Status::Success;
     }
 
     Protocols::InteractionModel::Status OnAtomicWriteCommit(AttributeId attributeId) override
@@ -214,7 +306,7 @@ public:
                 return *status;
             }
         }
-        return ThermostatCluster::OnAtomicWriteCommit(attributeId);
+        return Protocols::InteractionModel::Status::Success;
     }
 
     Protocols::InteractionModel::Status OnAtomicWriteRollback(AttributeId attributeId) override
@@ -226,7 +318,7 @@ public:
                 return *status;
             }
         }
-        return ThermostatCluster::OnAtomicWriteRollback(attributeId);
+        return Protocols::InteractionModel::Status::Success;
     }
 
     std::optional<System::Clock::Milliseconds16> GetMaxAtomicWriteTimeout(chip::AttributeId attributeId) override
@@ -238,10 +330,51 @@ public:
                 return timeout;
             }
         }
-        return ThermostatCluster::GetMaxAtomicWriteTimeout(attributeId);
+        return std::nullopt;
+    }
+
+    bool HasAttribute(chip::AttributeId attributeId) override
+    {
+        switch (attributeId)
+        {
+        case Attributes::PresetTypes::Id:
+        case Attributes::NumberOfPresets::Id:
+        case Attributes::ActivePresetHandle::Id:
+        case Attributes::Presets::Id:
+            return mFeatures.Has(Feature::kPresets);
+        case Attributes::ScheduleTypes::Id:
+        case Attributes::NumberOfSchedules::Id:
+        case Attributes::NumberOfScheduleTransitions::Id:
+        case Attributes::NumberOfScheduleTransitionPerDay::Id:
+        case Attributes::ActiveScheduleHandle::Id:
+        case Attributes::Schedules::Id:
+            return mFeatures.Has(Feature::kMatterScheduleConfiguration);
+        case Attributes::MaxThermostatSuggestions::Id:
+        case Attributes::ThermostatSuggestions::Id:
+        case Attributes::CurrentThermostatSuggestion::Id:
+        case Attributes::ThermostatSuggestionNotFollowingReason::Id:
+            return mFeatures.Has(Feature::kThermostatSuggestions);
+        default:
+            return ThermostatCluster::HasAttribute(attributeId);
+        }
     }
 
 private:
+    ThermostatClusterWithFeatures(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features, const Config & config,
+                                  FabricTable * fabricTable, Delegates &... delegates) :
+        ThermostatCluster(aEndpointId, features, config, detail::FindDelegate<Thermostat::Delegate>(delegates...)),
+        mAtomicWriteSession(
+            detail::MakeAtomicWriteSession<kRequiresAtomicWrite>(*this, config.mTimerDelegate, fabricTable)),
+        mPresets(detail::MakeFeature<kHasPresets, ThermostatPresets>(std::forward_as_tuple(delegates...), *this, mAtomicWriteSession)),
+        mSuggestions(
+            detail::MakeFeature<kHasSuggestions, ThermostatSuggestions>(std::forward_as_tuple(delegates...), *this, mPresets)),
+        mOccupancy(detail::MakeFeature<kHasOccupancy, ThermostatOccupancy>(std::forward_as_tuple(delegates...), *this))
+    {
+        static_assert(detail::kArgsHasDelegate<Thermostat::Delegate, Delegates...>,
+                      "Missing Thermostat::Delegate in constructor arguments");
+    }
+
+    CHIP_NO_UNIQUE_ADDRESS std::conditional_t<kRequiresAtomicWrite, AtomicWriteSession, std::monostate> mAtomicWriteSession;
     CHIP_NO_UNIQUE_ADDRESS std::conditional_t<kHasPresets, ThermostatPresets, std::monostate> mPresets;
     CHIP_NO_UNIQUE_ADDRESS std::conditional_t<kHasSuggestions, ThermostatSuggestions, std::monostate> mSuggestions;
     CHIP_NO_UNIQUE_ADDRESS std::conditional_t<kHasOccupancy, ThermostatOccupancy, std::monostate> mOccupancy;
@@ -249,6 +382,11 @@ private:
 
 template <typename... DelegateArgs>
 ThermostatClusterWithFeatures(EndpointId, BitFlags<Thermostat::Feature>, const ThermostatCluster::Config &, DelegateArgs &...)
+    -> ThermostatClusterWithFeatures<std::decay_t<DelegateArgs>...>;
+
+template <typename... DelegateArgs>
+ThermostatClusterWithFeatures(EndpointId, BitFlags<Thermostat::Feature>, const ThermostatCluster::Config &, FabricTable &,
+                              DelegateArgs &...)
     -> ThermostatClusterWithFeatures<std::decay_t<DelegateArgs>...>;
 
 using DefaultThermostatCluster =

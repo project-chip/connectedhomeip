@@ -100,6 +100,20 @@ Status AtomicWriteSession::ExecuteAtomicAction(AtomicAttributes & attributeStatu
     return status;
 }
 
+void AtomicWriteSession::Startup()
+{
+    if (auto status = mFabricTable.AddFabricDelegate(this); status != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to add fabric delegate to Thermostat Cluster");
+    }
+}
+
+void AtomicWriteSession::Shutdown()
+{
+    ResetAtomicWrite();
+    mFabricTable.RemoveFabricDelegate(this);
+}
+
 bool AtomicWriteSession::InAtomicWrite(std::optional<AttributeId> attributeId)
 {
 
@@ -454,6 +468,43 @@ Status AtomicWriteSession::BuildAttributeStatuses(
         return Status::InvalidCommand;
     }
     return Status::Success;
+}
+
+std::optional<DataModel::ActionReturnStatus> AtomicWriteSession::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler,
+                                                               bool & handled) {
+                          
+    switch (request.path.mCommandId)
+    {
+    case Commands::AtomicRequest::Id: {
+        handled = true;
+                Commands::AtomicRequest::DecodableType request_data;
+                ReturnErrorOnFailure(request_data.Decode(input_arguments));
+
+                switch (request_data.requestType)
+                {
+                case Globals::AtomicRequestTypeEnum::kBeginWrite:
+                    return BeginAtomicWrite(handler, request.path, request_data);
+                case Globals::AtomicRequestTypeEnum::kCommitWrite:
+                    return CommitAtomicWrite(handler, request.path, request_data);
+                case Globals::AtomicRequestTypeEnum::kRollbackWrite:
+                    return RollbackAtomicWrite(handler, request.path, request_data);
+                default:
+                    return Protocols::InteractionModel::Status::InvalidCommand;
+                }
+    }
+    default:
+        return std::nullopt;
+    }
+}
+
+
+void AtomicWriteSession::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    if (InAtomicWrite(fabricIndex))
+    {
+        ResetAtomicWrite();
+    }
 }
 
 } // namespace Thermostat

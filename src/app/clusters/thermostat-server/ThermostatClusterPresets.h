@@ -18,6 +18,7 @@
 
 #include "PresetStructWithOwnedMembers.h"
 #include "Setpoints.h"
+#include "ThermostatClusterAtomic.h"
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
@@ -140,7 +141,9 @@ public:
     };
 
     ThermostatPresets() = delete;
-    ThermostatPresets(ThermostatCluster & cluster, Delegate & delegate) : mCluster(cluster), mDelegate(delegate) {}
+    ThermostatPresets(ThermostatCluster & cluster, AtomicWriteSession & atomicWriteSession, Delegate & delegate) :
+        mCluster(cluster), mAtomicWriteSession(atomicWriteSession), mDelegate(delegate)
+    {}
 
     Delegate & GetDelegate() { return mDelegate; }
 
@@ -180,6 +183,7 @@ public:
 
 private:
     ThermostatCluster & mCluster;
+    AtomicWriteSession & mAtomicWriteSession;
     Delegate & mDelegate;
 };
 

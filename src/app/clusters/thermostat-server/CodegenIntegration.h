@@ -67,15 +67,22 @@ public:
         const ThermostatCluster::OptionalAttributes optionalAttributes = GetOptionalAttributes(endpointId, features);
         const ThermostatCluster::DefaultValues defaultValues           = LoadDefaultValues(endpointId, features);
 
-        ThermostatCluster::Config config(optionalAttributes, defaultValues, Server::GetInstance().GetFabricTable(),
-                                         gDefaultTimerDelegate);
+        ThermostatCluster::Config config(optionalAttributes, defaultValues, gDefaultTimerDelegate);
 
         ChipLogProgress(Zcl, "Creating thermostat cluster for endpoint %d", endpointId);
         if constexpr (sizeof...(Delegates) > 0)
         {
             std::apply(
                 [&](auto &... dels) {
-                    ClusterStorage<Size, Cluster>::mClusters[clusterInstanceIndex].Create(endpointId, features, config, dels...);
+                    if constexpr (Cluster::kRequiresAtomicWrite)
+                    {
+                        ClusterStorage<Size, Cluster>::mClusters[clusterInstanceIndex].Create(
+                            endpointId, features, config, Server::GetInstance().GetFabricTable(), dels...);
+                    }
+                    else
+                    {
+                        ClusterStorage<Size, Cluster>::mClusters[clusterInstanceIndex].Create(endpointId, features, config, dels...);
+                    }
                 },
                 mDelegates);
         }

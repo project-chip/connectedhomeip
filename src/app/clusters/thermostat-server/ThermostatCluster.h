@@ -19,7 +19,6 @@
 #include "SetpointRange.h"
 #include "Setpoints.h"
 
-#include "ThermostatClusterAtomic.h"
 #include "ThermostatDelegate.h"
 
 #include "app/clusters/thermostat-server/Temperature.h"
@@ -28,13 +27,14 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <credentials/FabricTable.h>
+#include <lib/support/TimerDelegate.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-class ThermostatCluster : public DefaultServerCluster, public FabricTable::Delegate, public AtomicWriteSession::Delegate
+class ThermostatCluster : public DefaultServerCluster
 {
 public:
     struct OptionalAttributes
@@ -97,13 +97,12 @@ public:
     {
         OptionalAttributes mOptionalAttributes;
         DefaultValues mDefaultValues;
-        FabricTable & mFabricTable;
         TimerDelegate & mTimerDelegate;
 
-        Config(OptionalAttributes optionalAttributes, DefaultValues defaultValues, FabricTable & fabricTable,
-               TimerDelegate & timerDelegate) :
+         Config(OptionalAttributes optionalAttributes, DefaultValues defaultValues, TimerDelegate & timerDelegate) :
             mOptionalAttributes(optionalAttributes),
-            mDefaultValues(defaultValues), mFabricTable(fabricTable), mTimerDelegate(timerDelegate)
+            mDefaultValues(defaultValues),
+            mTimerDelegate(timerDelegate)
         {}
     };
 
@@ -132,19 +131,9 @@ public:
     BitFlags<Thermostat::Feature> Features() const { return mFeatures; }
     void SetFeatures(BitFlags<Thermostat::Feature> features) { mFeatures = features; }
 
-    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
-
     EndpointId Endpoint() const { return mPath.mEndpointId; }
 
-    Protocols::InteractionModel::Status OnAtomicWriteBegin(AttributeId attributeId) override;
-    Protocols::InteractionModel::Status OnAtomicWritePrecommit(AttributeId attributeId) override;
-    Protocols::InteractionModel::Status OnAtomicWriteCommit(AttributeId attributeId) override;
-    Protocols::InteractionModel::Status OnAtomicWriteRollback(AttributeId attributeId) override;
-
-    std::optional<System::Clock::Milliseconds16> GetMaxAtomicWriteTimeout(chip::AttributeId attributeId) override;
-    bool HasAttribute(chip::AttributeId attributeId) override;
-
-    void OnAtomicWriteTimeout();
+    bool HasAttribute(chip::AttributeId attributeId);
 
     SystemModeEnum GetSystemMode() const;
     Protocols::InteractionModel::Status SetSystemMode(SystemModeEnum systemMode);
@@ -168,8 +157,6 @@ public:
 
     DataModel::ActionReturnStatus ChangeSetpointAttribute(const AttributeId attributeId, temperature temp);
 
-    AtomicWriteSession & GetAtomicWriteSession() { return mAtomicWriteSession; }
-    const AtomicWriteSession & GetAtomicWriteSession() const { return mAtomicWriteSession; }
     Setpoints GetSetpoints();
 
     virtual bool IsOccupied() const { return true; }
@@ -180,10 +167,7 @@ protected:
     Config mConfig;
 
     Thermostat::Delegate & mDelegate;
-    AtomicWriteSession mAtomicWriteSession;
 
-    DataModel::ActionReturnStatus WriteNonAtomicAttribute(const DataModel::WriteAttributeRequest & request,
-                                                          AttributeValueDecoder & decoder);
     DataModel::ActionReturnStatus HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId, temperature value,
                                                        SetpointAttributes & changedAttributes);
     DataModel::ActionReturnStatus SetpointRaiseLower(const Commands::SetpointRaiseLower::DecodableType & commandData);

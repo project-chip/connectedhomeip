@@ -33,8 +33,8 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                         AttributeValueDecoder & decoder)
+DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                                AttributeValueDecoder & decoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -140,19 +140,6 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
         ChipLogError(Zcl, "Unsupported Attribute:" ChipLogFormatMEI, ChipLogValueMEI(request.path.mAttributeId));
         return Status::UnsupportedAttribute;
     }
-}
-
-DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                AttributeValueDecoder & decoder)
-{
-    auto & subjectDescriptor = decoder.GetSubjectDescriptor();
-    if (mAtomicWriteSession.InAtomicWrite(subjectDescriptor))
-    {
-        ChipLogError(Zcl, "Can not write to non-atomic attribute " ChipLogFormatMEI " during atomic write",
-                     ChipLogValueMEI(request.path.mAttributeId));
-        return Status::InvalidInState;
-    }
-    return WriteNonAtomicAttribute(request, decoder);
 }
 
 } // namespace Thermostat

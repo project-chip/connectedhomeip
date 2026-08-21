@@ -42,25 +42,18 @@ namespace Thermostat {
 ThermostatCluster::ThermostatCluster(EndpointId endpointId, BitFlags<Thermostat::Feature> features, const Config & config,
                                      Thermostat::Delegate & delegate) :
     DefaultServerCluster({ endpointId, Thermostat::Id }),
-    mFeatures(features), mConfig(config), mDelegate(delegate), mAtomicWriteSession(*this, config.mTimerDelegate)
+    mFeatures(features), mConfig(config), mDelegate(delegate)
 {}
 
 CHIP_ERROR ThermostatCluster::Startup(ServerClusterContext & context)
 {
     ChipLogProgress(Zcl, "Starting up thermostat server cluster on endpoint %d", mPath.mEndpointId);
-    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    if (auto status = mConfig.mFabricTable.AddFabricDelegate(this); status != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "Failed to add fabric delegate to Thermostat Cluster");
-    }
-    return CHIP_NO_ERROR;
+    return DefaultServerCluster::Startup(context);
 }
 
 void ThermostatCluster::Shutdown(ClusterShutdownType type)
 {
-    mAtomicWriteSession.ResetAtomicWrite();
     DefaultServerCluster::Shutdown(type);
-    mConfig.mFabricTable.RemoveFabricDelegate(this);
     ChipLogProgress(Zcl, "Shutting down thermostat server cluster on endpoint %d", mPath.mEndpointId);
 }
 
@@ -333,33 +326,9 @@ Status ThermostatCluster::SetRunningState(BitMask<RelayStateBitmap> runningState
     return Status::Success;
 }
 
-void ThermostatCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
-{
-    if (mAtomicWriteSession.InAtomicWrite(fabricIndex))
-    {
-        mAtomicWriteSession.ResetAtomicWrite();
-    }
-}
-
 CHIP_ERROR ThermostatCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    if (mFeatures.Has(Feature::kPresets))
-    {
-        ReturnErrorOnFailure(builder.AppendElements({ Commands::SetActivePresetRequest::kMetadataEntry }));
-    }
-
-    if (mFeatures.Has(Feature::kPresets) || mFeatures.Has(Feature::kMatterScheduleConfiguration))
-    {
-        ReturnErrorOnFailure(builder.AppendElements({ Commands::AtomicRequest::kMetadataEntry }));
-    }
-
-    if (mFeatures.Has(Feature::kThermostatSuggestions))
-    {
-        ReturnErrorOnFailure(builder.AppendElements(
-            { Commands::AddThermostatSuggestion::kMetadataEntry, Commands::RemoveThermostatSuggestion::kMetadataEntry }));
-    }
-
     return builder.AppendElements({
         Commands::SetpointRaiseLower::kMetadataEntry,
     });
@@ -367,14 +336,6 @@ CHIP_ERROR ThermostatCluster::AcceptedCommands(const ConcreteClusterPath & path,
 
 CHIP_ERROR ThermostatCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
-    if (mFeatures.Has(Feature::kPresets) || mFeatures.Has(Feature::kMatterScheduleConfiguration))
-    {
-        ReturnErrorOnFailure(builder.AppendElements({ Commands::AtomicResponse::Id }));
-    }
-    if (mFeatures.Has(Feature::kThermostatSuggestions))
-    {
-        ReturnErrorOnFailure(builder.AppendElements({ Commands::AddThermostatSuggestionResponse::Id }));
-    }
     return CHIP_NO_ERROR;
 }
 
@@ -389,53 +350,10 @@ std::optional<DataModel::ActionReturnStatus> ThermostatCluster::InvokeCommand(co
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
         return SetpointRaiseLower(request_data);
     }
-    case Commands::AtomicRequest::Id: {
-        Commands::AtomicRequest::DecodableType request_data;
-        ReturnErrorOnFailure(request_data.Decode(input_arguments));
-
-        switch (request_data.requestType)
-        {
-        case Globals::AtomicRequestTypeEnum::kBeginWrite:
-            return mAtomicWriteSession.BeginAtomicWrite(handler, request.path, request_data);
-        case Globals::AtomicRequestTypeEnum::kCommitWrite:
-            return mAtomicWriteSession.CommitAtomicWrite(handler, request.path, request_data);
-        case Globals::AtomicRequestTypeEnum::kRollbackWrite:
-            return mAtomicWriteSession.RollbackAtomicWrite(handler, request.path, request_data);
-        default:
-            return Status::InvalidCommand;
-        }
-    }
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
 }
-
-Status ThermostatCluster::OnAtomicWriteBegin(AttributeId attributeId)
-{
-    return Status::Success;
-}
-
-Status ThermostatCluster::OnAtomicWritePrecommit(AttributeId attributeId)
-{
-    return Status::Success;
-}
-
-Status ThermostatCluster::OnAtomicWriteCommit(AttributeId attributeId)
-{
-    return Status::Success;
-}
-
-Status ThermostatCluster::OnAtomicWriteRollback(AttributeId attributeId)
-{
-    return Status::Success;
-}
-
-std::optional<System::Clock::Milliseconds16> ThermostatCluster::GetMaxAtomicWriteTimeout(chip::AttributeId attributeId)
-{
-    return std::nullopt;
-}
-
-void ThermostatCluster::OnAtomicWriteTimeout() {}
 
 bool ThermostatCluster::IsActiveSetpoint(AttributeId attributeId) const
 {
