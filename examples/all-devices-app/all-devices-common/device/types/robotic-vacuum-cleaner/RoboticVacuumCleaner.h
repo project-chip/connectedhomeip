@@ -17,9 +17,16 @@
 
 #pragma once
 
+#include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
+#include <app/clusters/service-area-server/ServiceAreaCluster.h>
 #include <device/api/SingleEndpoint.h>
-#include <device/capabilities/operational-state/impl/LoggingRvcOperationalStateDelegate.h>
+#include <device/types/robotic-vacuum-cleaner/impl/LoggingRvcCleanModeDelegate.h>
+#include <device/types/robotic-vacuum-cleaner/impl/LoggingRvcOperationalStateDelegate.h>
+#include <device/types/robotic-vacuum-cleaner/impl/LoggingRvcRunModeDelegate.h>
+#include <device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaDelegate.h>
+#include <device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaStorageDelegate.h>
+#include <string>
 
 namespace chip::app {
 
@@ -33,10 +40,24 @@ public:
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     Clusters::RvcOperationalState::RvcOperationalStateCluster & OperationalState() { return mOperationalStateCluster.Cluster(); }
+    Clusters::ServiceArea::ServiceAreaCluster & GetServiceAreaCluster() { return mServiceAreaCluster.Cluster(); }
+    Clusters::ModeBaseCluster & RunMode() { return mRunModeCluster.Cluster(); }
+    Clusters::ModeBaseCluster & CleanMode() { return mCleanModeCluster.Cluster(); }
+    Clusters::OperationalState::LoggingRvcOperationalStateDelegate & OperationalStateDelegate() { return mDelegate; }
 
 private:
     Clusters::OperationalState::LoggingRvcOperationalStateDelegate mDelegate;
     LazyRegisteredServerCluster<Clusters::RvcOperationalState::RvcOperationalStateCluster> mOperationalStateCluster;
+
+    Clusters::ServiceArea::LoggingServiceAreaStorageDelegate mServiceAreaStorageDelegate;
+    Clusters::ServiceArea::LoggingServiceAreaDelegate mServiceAreaDelegate;
+    LazyRegisteredServerCluster<Clusters::ServiceArea::ServiceAreaCluster> mServiceAreaCluster;
+
+    Clusters::RvcRunMode::LoggingRvcRunModeDelegate mRunModeDelegate;
+    LazyRegisteredServerCluster<Clusters::ModeBaseCluster> mRunModeCluster;
+
+    Clusters::RvcCleanMode::LoggingRvcCleanModeDelegate mCleanModeDelegate;
+    LazyRegisteredServerCluster<Clusters::ModeBaseCluster> mCleanModeCluster;
 };
 
 } // namespace chip::app

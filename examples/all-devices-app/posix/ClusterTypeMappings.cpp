@@ -20,8 +20,11 @@
 #include <app/clusters/ambient-context-sensing-server/AmbientContextSensingCluster.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/clusters/boolean-state-server/BooleanStateCluster.h>
+#include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
+#include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
+#include <app/clusters/service-area-server/ServiceAreaCluster.h>
 
 // TODO: We should probably get this to be generated in the header of each
 //       cluster via cluster codegen. This can be done later.
@@ -55,8 +58,27 @@ const char * GetClusterTypeName<chip::app::Clusters::BasicInformationCluster>()
     return "chip::app::Clusters::BasicInformationCluster";
 }
 
+template <>
+const char * GetClusterTypeName<chip::app::Clusters::RvcOperationalState::RvcOperationalStateCluster>()
+{
+    return "chip::app::Clusters::RvcOperationalState::RvcOperationalStateCluster";
+}
+
+template <>
+const char * GetClusterTypeName<chip::app::Clusters::ServiceArea::ServiceAreaCluster>()
+{
+    return "chip::app::Clusters::ServiceArea::ServiceAreaCluster";
+}
+
+template <>
+const char * GetClusterTypeName<chip::app::Clusters::ModeBaseCluster>()
+{
+    return "chip::app::Clusters::ModeBaseCluster";
+}
+
 chip::app::ServerClusterInterface *
-AllDevicesAppClusterImplementationRegistry::GetClusterInterfaceByEndpointAndType(const char * typeName, chip::EndpointId endpoint)
+AllDevicesAppClusterImplementationRegistry::GetClusterInterfaceByEndpointAndType(const char * typeName, chip::EndpointId endpoint,
+                                                                                 std::optional<chip::ClusterId> clusterId)
 {
     auto it = mClusters.find(typeName);
     if (it == mClusters.end())
@@ -69,7 +91,7 @@ AllDevicesAppClusterImplementationRegistry::GetClusterInterfaceByEndpointAndType
         auto paths = cluster->GetPaths();
         for (const auto & path : paths)
         {
-            if (path.mEndpointId == endpoint)
+            if (path.mEndpointId == endpoint && (!clusterId.has_value() || path.mClusterId == *clusterId))
             {
                 return cluster;
             }

@@ -31,6 +31,7 @@ set(PRIV_INCLUDE_DIRS_LIST
                       "${ALL_DEVICES_COMMON_DIR}"
                       "${CHIP_ROOT}/examples/providers"
                       "${CMAKE_CURRENT_BINARY_DIR}"  # for generated app_config/enabled_devices.h
+                      ${ALL_DEVICES_EXTRA_INCLUDE_DIRS}
 )
 
 # Keep top-level src/app files explicit to avoid pulling unrelated src/app/*.cpp.

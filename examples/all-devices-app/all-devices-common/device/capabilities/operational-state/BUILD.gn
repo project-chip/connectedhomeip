@@ -19,8 +19,10 @@ source_set("operational-state-delegate") {
   sources = [
     "impl/LoggingOperationalStateDelegate.cpp",
     "impl/LoggingOperationalStateDelegate.h",
-    "impl/LoggingRvcOperationalStateDelegate.cpp",
-    "impl/LoggingRvcOperationalStateDelegate.h",
+  ]
+
+  public_configs = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/device:includes",
   ]
 
   public_deps = [

@@ -17,6 +17,8 @@
 
 #include "include/AppCommandDelegate.h"
 
+#include "include/RoboticVacuumCleanerNamedPipe.h"
+
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/ambient-context-sensing-server/CodegenIntegration.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
@@ -593,4 +595,16 @@ void AllDevicesAppCommandDelegate::RegisterCommandHandlers()
     RegisterCommandHandler(std::make_unique<SetObjCountCommandHandler>());
     RegisterCommandHandler(std::make_unique<SetBooleanStateCommandHandler>());
     RegisterCommandHandler(std::make_unique<SetOnOffCommandHandler>());
+    RegisterRvcNamedPipeCommandHandlers(*this);
+}
+
+void AllDevicesAppCommandDelegate::RegisterRvcDevice(chip::EndpointId endpoint, chip::app::RoboticVacuumCleaner * device)
+{
+    mRvcDevices[endpoint] = device;
+}
+
+chip::app::RoboticVacuumCleaner * AllDevicesAppCommandDelegate::GetRvcDeviceByEndpoint(chip::EndpointId endpoint)
+{
+    auto it = mRvcDevices.find(endpoint);
+    return (it != mRvcDevices.end()) ? it->second : nullptr;
 }

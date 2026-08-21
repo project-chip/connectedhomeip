@@ -15,19 +15,10 @@
  *    limitations under the License.
  */
 
-#include "LoggingRvcOperationalStateDelegate.h"
-#include <lib/support/logging/CHIPLogging.h>
+#pragma once
 
-namespace chip::app::Clusters::OperationalState {
+class AllDevicesAppCommandDelegate;
 
-void LoggingRvcOperationalStateDelegate::HandleGoHomeCommandCallback(GenericOperationalError & err)
-{
-    ChipLogProgress(Zcl, "LoggingRvcOperationalStateDelegate: Go Home command received.");
-    if (mCluster)
-    {
-        LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(OperationalStateEnum::kStopped)));
-    }
-    err.Set(to_underlying(ErrorStateEnum::kNoError));
-}
-
-} // namespace chip::app::Clusters::OperationalState
+// Registers the named-pipe command handlers (Reset, Charged, AreaComplete, AddMap, ...) that
+// drive the all-devices-app RoboticVacuumCleaner simulation.
+void RegisterRvcNamedPipeCommandHandlers(AllDevicesAppCommandDelegate & delegate);

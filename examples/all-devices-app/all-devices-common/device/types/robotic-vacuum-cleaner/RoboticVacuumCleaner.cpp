@@ -16,9 +16,17 @@
  */
 
 #include <device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.h>
+#include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationLogic.h>
+#include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationTopology.h>
 #include <devices/Types.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <platform/DiagnosticDataProvider.h>
 
 namespace chip::app {
+
+using namespace Clusters::ServiceArea;
+using namespace chip::app::all_devices::rvc_simulation;
+using namespace chip::app::all_devices::rvc_simulation::Topology;
 
 RoboticVacuumCleaner::RoboticVacuumCleaner() :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRoboticVacuumCleaner, 1))
@@ -35,6 +43,58 @@ CHIP_ERROR RoboticVacuumCleaner::Register(EndpointId endpoint, CodeDrivenDataMod
     mDelegate.SetCluster(&mOperationalStateCluster.Cluster());
     ReturnErrorOnFailure(provider.AddCluster(mOperationalStateCluster.Registration()));
 
+    ServiceAreaCluster::OptionalAttributeSet serviceAreaOptionalAttributes;
+    serviceAreaOptionalAttributes.Set<Attributes::SupportedMaps::Id>();
+    serviceAreaOptionalAttributes.Set<Attributes::CurrentArea::Id>();
+    serviceAreaOptionalAttributes.Set<Attributes::EstimatedEndTime::Id>();
+    serviceAreaOptionalAttributes.Set<Attributes::Progress::Id>();
+
+    mServiceAreaCluster.Create(endpoint, mServiceAreaStorageDelegate, mServiceAreaDelegate,
+                               BitMask<Feature>(Feature::kMaps, Feature::kProgressReporting), serviceAreaOptionalAttributes);
+    ReturnErrorOnFailure(provider.AddCluster(mServiceAreaCluster.Registration()));
+
+    mRunModeCluster.Create(endpoint, Clusters::ModeBase::kRvcRunMode,
+                           Clusters::ModeBaseCluster::Config{
+                               .feature                = BitMask<Clusters::ModeBase::Feature>(),
+                               .optionalAttributeSet   = {},
+                               .appDelegate            = mRunModeDelegate,
+                               .onOffValueForStartUp   = false,
+                               .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
+                           });
+    ReturnErrorOnFailure(provider.AddCluster(mRunModeCluster.Registration()));
+
+    mCleanModeCluster.Create(endpoint, Clusters::ModeBase::kRvcCleanMode,
+                             Clusters::ModeBaseCluster::Config{
+                                 .feature                = BitMask<Clusters::ModeBase::Feature>(),
+                                 .optionalAttributeSet   = {},
+                                 .appDelegate            = mCleanModeDelegate,
+                                 .onOffValueForStartUp   = false,
+                                 .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
+                             });
+    ReturnErrorOnFailure(provider.AddCluster(mCleanModeCluster.Registration()));
+
+    mServiceAreaDelegate.SetCluster(&mServiceAreaCluster.Cluster());
+    mServiceAreaDelegate.SetOperationalStateCluster(&mOperationalStateCluster.Cluster());
+    mServiceAreaDelegate.SetActivityCompleteHandler([this]() { mDelegate.HandleActivityComplete(); });
+
+    mRunModeDelegate.SetCluster(&mRunModeCluster.Cluster());
+    mRunModeDelegate.SetOperationalStateCluster(&mOperationalStateCluster.Cluster());
+    mRunModeDelegate.SetClearDockChargingTrackingHandler([this]() { mDelegate.ClearDockChargingTracking(); });
+    mRunModeDelegate.SetServiceAreaDelegate(&mServiceAreaDelegate);
+    mCleanModeDelegate.SetRunModeCluster(&mRunModeCluster.Cluster());
+
+    mDelegate.SetRunModeCluster(&mRunModeCluster.Cluster());
+    mDelegate.SetServiceAreaCluster(&mServiceAreaCluster.Cluster());
+    mDelegate.SetServiceAreaDelegate(&mServiceAreaDelegate);
+
+    ReturnErrorOnFailure(mServiceAreaDelegate.Init());
+
+    mRunModeCluster.Cluster().UpdateCurrentMode(kRunModeIdle);
+    mCleanModeCluster.Cluster().UpdateCurrentMode(kCleanModeQuick);
+    LogErrorOnFailure(mOperationalStateCluster.Cluster().SetOperationalState(
+        to_underlying(Clusters::OperationalState::OperationalStateEnum::kStopped)));
+    LogErrorOnFailure(mOperationalStateCluster.Cluster().SetCurrentPhase(0));
+
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 
     transaction.Commit();
@@ -44,6 +104,21 @@ CHIP_ERROR RoboticVacuumCleaner::Register(EndpointId endpoint, CodeDrivenDataMod
 void RoboticVacuumCleaner::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
+    if (mCleanModeCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mCleanModeCluster.Cluster()));
+        mCleanModeCluster.Destroy();
+    }
+    if (mRunModeCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mRunModeCluster.Cluster()));
+        mRunModeCluster.Destroy();
+    }
+    if (mServiceAreaCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mServiceAreaCluster.Cluster()));
+        mServiceAreaCluster.Destroy();
+    }
     if (mOperationalStateCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mOperationalStateCluster.Cluster()));
