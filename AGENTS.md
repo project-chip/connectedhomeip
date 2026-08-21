@@ -137,10 +137,10 @@ Alternatively, you can activate the environment in your shell:
     -   Compile and run can be separated (e.g. if running under some memory
         debugger or needing to set other options):
 
-            ```bash
-            scripts/run_in_build_env.sh "ninja -C out/linux-x64-tests-clang src/app/clusters/occupancy-sensor-server/tests:TestOccupancySensingCluster"`
-            ./out/linux-x64-tests-clang/tests/TestOccupancySensingCluster
-            ```
+              ```bash
+              scripts/run_in_build_env.sh "ninja -C out/linux-x64-tests-clang src/app/clusters/occupancy-sensor-server/tests:TestOccupancySensingCluster"`
+              ./out/linux-x64-tests-clang/tests/TestOccupancySensingCluster
+              ```
 
 ### Building Common Apps
 
@@ -150,6 +150,74 @@ Alternatively, you can activate the environment in your shell:
     `scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-x64-all-clusters-clang --quiet build"`
 -   **all-devices-app** (Alternative feature-rich simulator):
     `scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-x64-all-devices-clang --quiet build"`
+
+### Building Joint Fabric Apps
+
+-   **jf-admin-app** (Joint Fabric Administrator):
+    `scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-x64-jf-admin-app-clang --quiet build"`
+-   **jf-control-app** (Joint Fabric Controller):
+    `scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-x64-jf-control-app-clang --quiet build"`
+
+### Running Python Integration Tests
+
+Python tests in `src/python_testing/` require a separate venv and built example
+apps. Build the venv (re-run whenever Python bindings change):
+
+```bash
+./scripts/build_python.sh -i out/venv --enable_ipv4 true
+source out/venv/bin/activate
+```
+
+Run tests using the `local.py` harness, mapping CI binary variables to local
+build outputs with `--override-binary-path`:
+
+```bash
+source out/venv/bin/activate
+./scripts/tests/local.py python-tests \
+  --test-filter "TC_JFADMIN*" \
+  --override-binary-path JF_ADMIN_APP     out/linux-x64-jf-admin-app-clang/jfa-app \
+  --override-binary-path JF_CONTROL_APP   out/linux-x64-jf-control-app-clang/jfc-app \
+  --override-binary-path ALL_CLUSTERS_APP out/linux-x64-all-clusters-clang/chip-all-clusters-app
+```
+
+## Pre-commit Test Policy
+
+Before committing or pushing, run the tests that match the scope of changes.
+Rebuild any affected example apps before running Python tests against them.
+
+| Changed area                                            | Tests to run                                                                                  |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `src/app/clusters/joint-fabric-administrator-server/**` | C++ unit tests: `joint-fabric-administrator-server/tests:tests` **and** Python: `TC_JFADMIN*` |
+| `examples/jf-admin-app/**`                              | Rebuild `linux-x64-jf-admin-app-clang`; Python: `TC_JFADMIN*`                                 |
+| `examples/jf-control-app/**`                            | Rebuild `linux-x64-jf-control-app-clang`; Python: `TC_JFADMIN*`, `TC_JFDS*`                   |
+| `examples/common/pigweed/rpc_services/JointFabric.h`    | Rebuild jf-admin-app and jf-control-app; Python: `TC_JFADMIN*`                                |
+| `src/app/server/JointFabricAdministrator.h`             | C++ unit tests: `joint-fabric-administrator-server/tests:tests` **and** Python: `TC_JFADMIN*` |
+| `src/credentials/**`                                    | `ninja -C out/linux-x64-tests-clang src/credentials/tests:tests`                              |
+| `src/app/clusters/<cluster-name>/**`                    | C++ unit tests for that cluster; Python `TC_<CLUSTER>*` if they exist                         |
+| General SDK changes                                     | `./scripts/build/build_examples.py --target linux-x64-tests-clang --quiet build`              |
+
+### Minimum checklist for Joint Fabric changes
+
+```bash
+# 1. Rebuild affected apps
+scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-x64-jf-admin-app-clang --quiet build"
+scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-x64-jf-control-app-clang --quiet build"
+
+# 2. C++ unit tests
+scripts/run_in_build_env.sh "ninja -C out/linux-x64-tests-clang \
+  src/app/clusters/joint-fabric-administrator-server/tests:TestAddICACInstallation.run \
+  src/app/clusters/joint-fabric-administrator-server/tests:TestJCMCommissionee.run"
+
+# 3. Python integration tests
+source out/venv/bin/activate
+./scripts/tests/local.py python-tests \
+  --test-filter "TC_JFADMIN*" \
+  --override-binary-path JF_ADMIN_APP     out/linux-x64-jf-admin-app-clang/jfa-app \
+  --override-binary-path JF_CONTROL_APP   out/linux-x64-jf-control-app-clang/jfc-app \
+  --override-binary-path ALL_CLUSTERS_APP out/linux-x64-all-clusters-clang/chip-all-clusters-app
+```
+
+See also `/home/robert/matter/AGENTS.md` for workspace-level setup instructions.
 
 ## Development Resources
 

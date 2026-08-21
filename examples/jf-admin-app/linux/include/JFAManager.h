@@ -27,6 +27,7 @@
 #include <stdint.h>
 
 #include <lib/core/CHIPError.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 
 #include "JFARpc.h"
 
@@ -47,6 +48,7 @@ public:
 
     /* app::JointFabricAdministrator::Delegate */
     CHIP_ERROR GetIcacCsr(MutableByteSpan & icacCsr) override;
+    CHIP_ERROR StoreCrossSignedICAC(const ByteSpan & crossSignedICAC) override;
 
     CHIP_ERROR GetJointFabricMode(uint8_t & jointFabricMode);
 
@@ -60,6 +62,17 @@ private:
     {
         kStandardCommissioningComplete = 0,
         kJCMCommissioning              = 1,
+    };
+
+    // JCM flow stage, used to prevent out-of-order invocations
+    enum JCMStage
+    {
+        kJCMStageIdle               = 0, ///< No JCM flow active
+        kJCMStageAnnounce           = 1, ///< Sent AnnounceJointFabricAdministrator
+        kJCMStageICACCSRRequest     = 2, ///< Sent ICACCSRRequest, waiting for response
+        kJCMStageCrossSign          = 3, ///< Cross-signing ICAC CSR via RPC
+        kJCMStageAddICAC            = 4, ///< Sent AddICAC, waiting for response
+        kJCMStageCommissionComplete = 5, ///< Sent CommissioningComplete
     };
 
     friend JFAManager & JFAMgr(void);
@@ -77,6 +90,7 @@ private:
     Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
     NodeId mNodeId                               = kUndefinedNodeId;
     OnConnectedAction mOnConnectedAction         = kStandardCommissioningComplete;
+    JCMStage mJCMStage                           = kJCMStageIdle;
     FabricId jfFabricIndex                       = kUndefinedFabricId;
     EndpointId peerAdminJFAdminClusterEndpointId = kInvalidEndpointId;
     Crypto::P256PublicKey peerAdminICACPubKey;
@@ -84,10 +98,31 @@ private:
     size_t mICACBufferLen         = 0;
     bool mCommissionerInitialized = false;
 
+    // JCM state: pending CSR bytes received from commissionee, cleared after cross-signing
+    uint8_t mPendingICACSRBuf[Crypto::kMIN_CSR_Buffer_Size];
+    size_t mPendingICACSRLen = 0;
+
+    // JCM state: cross-signed ICAC to be installed via AddICAC, cleared after installation
+    uint8_t mCrossSignedICACBuf[Credentials::kMaxDERCertLength];
+    size_t mCrossSignedICACLen = 0;
+
     void ConnectToNode(ScopedNodeId scopedNodeId, OnConnectedAction onConnectedAction);
     CHIP_ERROR SendCommissioningComplete();
     CHIP_ERROR AnnounceJointFabricAdministrator();
     CHIP_ERROR SendICACSRRequest();
+
+    /**
+     * Cross-sign the pending ICAC CSR under the anchor root CA via the JFC RPC,
+     * storing the resulting cross-signed ICAC in mCrossSignedICACBuf.
+     * The CSR to sign must have been saved in mPendingICACSRBuf beforehand.
+     */
+    CHIP_ERROR CrossSignICAC();
+
+    /**
+     * Invoke the AddICAC cluster command on the commissionee with the cross-signed
+     * ICAC stored in mCrossSignedICACBuf.
+     */
+    CHIP_ERROR SendAddICAC();
 
     static void OnCommissioningCompleteResponse(
         void * context, const app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data);
@@ -98,6 +133,9 @@ private:
     OnSendICACSRRequestResponse(void * context,
                                 const app::Clusters::JointFabricAdministrator::Commands::ICACCSRResponse::DecodableType & icaccsr);
     static void OnSendICACSRRequestFailure(void * context, CHIP_ERROR error);
+    static void OnAddICACResponse(void * context,
+                                  const app::Clusters::JointFabricAdministrator::Commands::ICACResponse::DecodableType & response);
+    static void OnAddICACFailure(void * context, CHIP_ERROR error);
 
     void ReleaseSession();
 };
