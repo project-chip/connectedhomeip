@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -60,6 +61,18 @@
         android:text="@string/ota_provider_user_consent_needed_text"
         android:textSize="16sp"
         android:layout_below="@id/delayActionTimeTv" />
+
+    <Switch
+        android:id="@+id/enableLargePayload"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:textSize="16sp"
+        android:checked="false"
+        android:text="@string/ota_provider_support_large_payload_text"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/delayActionTimeEd"
+        tools:ignore="UseSwitchCompatOrMaterialXml" />
 
     <Spinner
         android:id="@+id/titleUserConsentNeededSp"
