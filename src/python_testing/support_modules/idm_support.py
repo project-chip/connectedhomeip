@@ -24,7 +24,7 @@ import inspect
 import logging
 import time
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, get_args
 
 from mobly import asserts
 
@@ -32,7 +32,7 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters import ClusterObjects as ClusterObjects
 from matter.clusters.Attribute import AttributePath, TypedAttributePath, ValueDecodeFailure
-from matter.clusters.Types import NullValue
+from matter.clusters.Types import Nullable, NullValue
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import global_attribute_ids
@@ -41,7 +41,7 @@ from matter.testing.event_attribute_reporting import WildcardAttributeSubscripti
 from matter.testing.global_attribute_ids import (GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id,
                                                  is_standard_command_id)
 from matter.testing.matter_testing import compute_mrp_retransmission_timeout_sec
-from matter.testing.problem_notices import CommandPathLocation
+from matter.testing.problem_notices import AttributePathLocation, CommandPathLocation
 from matter.testing.spec_parsing import ConstraintReference, Constraints, XmlDataTypeComponent
 from matter.tlv import uint
 
@@ -194,6 +194,26 @@ _NUMERIC_TYPE_RANGES: dict[str, tuple[int, int]] = {
     'posix-ms': (0, 0xFFFF_FFFF_FFFF_FFFF),
     'temperature': (-27315, 0x7FFF),
 }
+
+
+def _encodable_numeric_range(datatype: str, is_nullable: bool) -> tuple[int, int] | None:
+    """Return the (min, max) values a field of this spec datatype can carry on the wire.
+
+    Returns None for datatypes outside the numeric set (enum/bitmap/struct/list/string).
+    Nullable numerics reserve one end of the value space for null (the type maximum when
+    unsigned, the minimum when signed), so a violation encoded there is rejected by the
+    null encoding rather than by the field's bound.
+    """
+    type_range = _NUMERIC_TYPE_RANGES.get(datatype.lower())
+    if type_range is None:
+        return None
+    type_min, type_max = type_range
+    if is_nullable:
+        if type_min < 0:
+            type_min += 1
+        else:
+            type_max -= 1
+    return type_min, type_max
 
 # ============================================================================
 # Module-Level Utility Functions
@@ -535,6 +555,20 @@ class IDMBaseTest(BasicCompositionTests):
         if not ref_attr:
             return None
 
+        # An optional referenced attribute may simply not be implemented on this
+        # endpoint, in which case the bound cannot be resolved and there is nothing
+        # for the DUT to enforce. That is a coverage gap, not a DUT defect, so record
+        # a warning and leave the bound unresolved (caller skips it) instead of
+        # reading a path the DUT never claimed and recording a read error for it.
+        if ref_attr.attribute_id not in self.endpoints_tlv.get(endpoint_id, {}).get(cluster_class.id, {}):
+            self.record_warning(
+                test_name=self.current_test_info.name,
+                location=AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_class.id,
+                                               attribute_id=ref_attr.attribute_id),
+                problem=(f"Constraint references {cluster_class.__name__}.{ref.attribute}, which is not "
+                         f"implemented on this endpoint; the referenced bound cannot be checked"))
+            return None
+
         # This is an incidental read to resolve a sibling constraint reference, not the
         # value under test. If it can't be read, we can't build a valid payload for the
         # field anyway, so return None (bound left unresolved, caller skips it) rather
@@ -557,30 +591,54 @@ class IDMBaseTest(BasicCompositionTests):
 
         return ref_value if isinstance(ref_value, (int, float)) else None
 
+    @staticmethod
+    def _is_nullable_attribute(attribute: type[ClusterObjects.ClusterAttributeDescriptor]) -> bool:
+        """Whether the attribute's generated type reserves a value for null.
+
+        Read from the generated Python type rather than the spec XML because it is the
+        encoding that matters here: on a nullable numeric, the reserved end of the value
+        space encodes as null instead of as an out-of-bounds value.
+        """
+        return Nullable in get_args(attribute.attribute_type.Type)
+
     def generate_constraint_violation(self, attr_info: WritableAttributeInfo, constraints: Constraints):
-        """Generate a test value that violates the given constraints."""
-        datatype = attr_info.datatype
+        """Generate a test value that violates the given constraints, or None if none can be.
+
+        Bounds that the attribute's own data type already enforces are skipped (e.g.
+        under-min of an unsigned attribute with min 0, or over-max of a bound equal to the
+        type's maximum), since such violations cannot be encoded on the wire: the generated
+        value would be in range and a compliant DUT accepting it would be reported as a
+        failure to enforce the constraint.
+        """
+        datatype = attr_info.datatype.lower()
 
         # String constraints
         if 'string' in datatype or 'octstr' in datatype:
             if constraints.max_length is not None:
                 return 'x' * (constraints.max_length + 1)
-            if constraints.min_length is not None:
-                return 'x' * max(0, constraints.min_length - 1)
+            if constraints.min_length is not None and constraints.min_length > 0:
+                return 'x' * (constraints.min_length - 1)
+            return None
 
-        # List constraints
+        # List constraints. Over-max_count violations are not generated: they would
+        # require synthesizing max_count+1 *valid* elements, which is not safely
+        # possible for arbitrary element types.
         if 'list' in datatype:
-            if constraints.max_count is not None:
-                return [{}] * (constraints.max_count + 1)
-            if constraints.min_count is not None:
-                count = max(0, constraints.min_count - 1)
-                return [{}] * count if count > 0 else []
+            if constraints.min_count is not None and constraints.min_count > 0:
+                return []
+            return None
 
         # Numeric-like constraints (int, uint, percent, elapsed-s, temperature, etc.)
-        if constraints.max_value is not None:
+        type_range = _encodable_numeric_range(datatype, self._is_nullable_attribute(attr_info.attribute))
+        if type_range is None:
+            # Enum/bitmap/struct-typed attributes are out of scope for automated
+            # violation generation.
+            return None
+        type_min, type_max = type_range
+        if constraints.max_value is not None and constraints.max_value < type_max:
             return constraints.max_value + 1
-        if constraints.min_value is not None:
-            return max(0, constraints.min_value - 1)
+        if constraints.min_value is not None and constraints.min_value > type_min:
+            return constraints.min_value - 1
 
         return None
 
@@ -647,8 +705,30 @@ class IDMBaseTest(BasicCompositionTests):
                      attr_info.attribute_name, original_value, test_value)
             return True
 
-        log.error("FAIL: %s.%s got %s instead of CONSTRAINT_ERROR for value %s", attr_info.cluster_name, attr_info.attribute_name,
-                  result_status, test_value)
+        # The DUT did not reject the write. Read back to distinguish a DUT that stored the
+        # out-of-bounds value (and is now holding an illegal one) from one that accepted
+        # the write but ignored or clamped it - both violate the spec, but only the former
+        # leaves the DUT in an illegal state for the remaining steps. Restore the original
+        # value either way so later steps see the device as we found it.
+        stored_value = await self.read_single_attribute_check_success(
+            endpoint=attr_info.endpoint_id,
+            cluster=attr_info.cluster_class,
+            attribute=attr_info.attribute
+        )
+        # Status is an IntEnum, which formats as a bare number under Python 3.11; log the
+        # name alongside it so the failure reads as SUCCESS rather than as "got 0".
+        log.error("FAIL: %s.%s got %s (%s) instead of CONSTRAINT_ERROR for value %s; attribute now reads %s",
+                  attr_info.cluster_name, attr_info.attribute_name, getattr(result_status, 'name', result_status),
+                  int(result_status), test_value, stored_value)
+
+        if stored_value != original_value:
+            restore_result = await self.default_controller.WriteAttribute(
+                nodeId=self.dut_node_id,
+                attributes=[(attr_info.endpoint_id, attr_info.attribute(original_value))]
+            )
+            if restore_result[0].Status != Status.Success:
+                log.warning("Failed to restore %s.%s to %s: %s", attr_info.cluster_name, attr_info.attribute_name,
+                            original_value, restore_result[0].Status)
         return False
 
     # Command Constraint Testing (TC-IDM-9.1 step 1)
@@ -782,20 +862,12 @@ class IDMBaseTest(BasicCompositionTests):
             # not safely possible for arbitrary element types.
             return violations
 
-        type_range = _NUMERIC_TYPE_RANGES.get(datatype)
+        type_range = _encodable_numeric_range(datatype, field.is_nullable)
         if type_range is None:
             # Enum/bitmap/struct-typed fields and 'allowed' *value* constraints on
             # numeric types are out of scope for automated violation generation.
             return violations
         type_min, type_max = type_range
-        if field.is_nullable:
-            # Nullable numerics reserve one end of the value space for null (the type
-            # maximum when unsigned, the minimum when signed), so a violation encoded
-            # there is rejected by the null encoding rather than by the field's bound.
-            if type_min < 0:
-                type_min += 1
-            else:
-                type_max -= 1
         if constraints.max_value is not None and constraints.max_value < type_max:
             violations.append((f"value {constraints.max_value + 1} > max {constraints.max_value}",
                                constraints.max_value + 1))
