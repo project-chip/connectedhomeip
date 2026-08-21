@@ -32,18 +32,20 @@
 
 #include "Temperature.h"
 
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 using namespace chip::Protocols::InteractionModel;
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace Thermostat {
+namespace {
 
-constexpr size_t kThermostatFixedClusterCount = StaticApplicationConfig::kFixedClusterConfig.size();
+constexpr size_t kThermostatFixedClusterCount = Thermostat::StaticApplicationConfig::kFixedClusterConfig.size();
 constexpr size_t kThermostatEndpointCount     = kThermostatFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 LazyRegisteredServerCluster<ThermostatCluster> gClusters[kThermostatEndpointCount];
+
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -269,6 +271,13 @@ private:
     }
 };
 
+} // namespace
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace Thermostat {
+
 Protocols::InteractionModel::Status SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
@@ -309,7 +318,7 @@ using namespace chip::app::Clusters::Thermostat;
 
 void MatterThermostatClusterInitCallback(EndpointId endpointId)
 {
-    chip::app::Clusters::Thermostat::IntegrationDelegate integrationDelegate;
+    IntegrationDelegate integrationDelegate;
 
     CodegenClusterIntegration::RegisterServer(
         {
@@ -327,7 +336,7 @@ void MatterThermostatPluginServerInitCallback() {}
 
 void MatterThermostatClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType clusterShutdownType)
 {
-    chip::app::Clusters::Thermostat::IntegrationDelegate integrationDelegate;
+    IntegrationDelegate integrationDelegate;
 
     CodegenClusterIntegration::UnregisterServer(
         {

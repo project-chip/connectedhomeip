@@ -35,6 +35,8 @@ constexpr temperature kDefaultHeatingSetpoint = 2000;
 constexpr temperature kDefaultCoolingSetpoint = 2600;
 constexpr int8_t kDefaultLocalTemperatureCalibration = 0;
 
+constexpr int8_t kMinDeadBand                             = 0;   // 0.0C
+constexpr int8_t kMaxDeadBand                             = 127; // 12.7C
 constexpr uint16_t kMaxTemperatureSetpointHoldDurationSec = 1440;
 
 } // namespace Thermostat

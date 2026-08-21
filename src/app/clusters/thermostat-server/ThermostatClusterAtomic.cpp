@@ -30,6 +30,8 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
+namespace {
+
 /**
  * @brief Callback that is called when the timeout for editing the presets expires.
  *
@@ -44,8 +46,6 @@ void TimerExpiredCallback(System::Layer * systemLayer, void * callbackContext)
         session->OnAtomicWriteTimeout();
     }
 }
-
-namespace {
 
 /**
  * @brief Schedules a timer for the given timeout in milliseconds.

@@ -253,21 +253,18 @@ void ThermostatCluster::ReEvaluateCurrentSuggestion()
     DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> currentSuggestionAfterReevaluation;
     mDelegate->GetCurrentThermostatSuggestion(currentSuggestionAfterReevaluation);
 
-    if (currentSuggestionBeforeReevaluation.IsNull() && currentSuggestionAfterReevaluation.IsNull())
+    bool suggestionChanged = currentSuggestionBeforeReevaluation.IsNull() != currentSuggestionAfterReevaluation.IsNull();
+    if (!suggestionChanged && !currentSuggestionAfterReevaluation.IsNull())
     {
-        return;
+        suggestionChanged = currentSuggestionBeforeReevaluation.Value().GetUniqueID() !=
+            currentSuggestionAfterReevaluation.Value().GetUniqueID();
     }
 
-    if (!currentSuggestionBeforeReevaluation.IsNull() && !currentSuggestionAfterReevaluation.IsNull())
+    if (suggestionChanged)
     {
-        if (currentSuggestionBeforeReevaluation.Value().GetUniqueID() == currentSuggestionAfterReevaluation.Value().GetUniqueID())
-        {
-            return;
-        }
+        // If the current thermostat suggestion changed, notify the attribute changed.
+        NotifyAttributeChanged(CurrentThermostatSuggestion::Id);
     }
-
-    // If the current thermostat suggestion changed, notify the attribute changed.
-    NotifyAttributeChanged(CurrentThermostatSuggestion::Id);
 
     uint8_t afterReevaluationBuffer[kPresetHandleSize];
     MutableByteSpan afterReevaluationHandleSpan(afterReevaluationBuffer);

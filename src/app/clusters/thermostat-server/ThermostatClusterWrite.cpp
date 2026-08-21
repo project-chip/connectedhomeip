@@ -16,9 +16,8 @@
  */
 
 #include "ThermostatCluster.h"
+#include "app/clusters/thermostat-server/Temperature.h"
 
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 
@@ -60,8 +59,9 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
 
         int16_t db;
         ReturnErrorOnFailure(decoder.Decode(db));
-        if (db < 0 || db > 127)
+        if (db < kMinDeadBand || db > kMaxDeadBand)
         {
+            ChipLogError(Zcl, "Invalid value for Deadband: %d", db);
             return Status::ConstraintError;
         }
         // Per spec change, invisibly swallow valid writes to Deadband
@@ -199,7 +199,7 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel:
     case Schedules::Id:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     default: {
-        if (mAtomicWriteSession.InAtomicWrite(subjectDescriptor, MakeOptional(attributeId)))
+        if (mAtomicWriteSession.InAtomicWrite(subjectDescriptor))
         {
             ChipLogError(Zcl, "Can not write to non-atomic attributes during atomic write");
             return Status::InvalidInState;

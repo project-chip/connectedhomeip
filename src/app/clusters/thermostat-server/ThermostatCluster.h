@@ -81,24 +81,25 @@ public:
 
     struct DefaultValues
     {
-        temperature absMinHeatSetpointLimit;
-        temperature absMaxHeatSetpointLimit;
-        temperature absMinCoolSetpointLimit;
-        temperature absMaxCoolSetpointLimit;
-        int8_t localTemperatureCalibration;
-        temperature occupiedCoolingSetpoint;
-        temperature occupiedHeatingSetpoint;
-        temperature unoccupiedCoolingSetpoint;
-        temperature unoccupiedHeatingSetpoint;
+        temperature absMinHeatSetpointLimit   = kDefaultAbsMinHeatSetpointLimit;
+        temperature absMaxHeatSetpointLimit   = kDefaultAbsMaxHeatSetpointLimit;
+        temperature absMinCoolSetpointLimit   = kDefaultAbsMinCoolSetpointLimit;
+        temperature absMaxCoolSetpointLimit   = kDefaultAbsMaxCoolSetpointLimit;
+        int8_t localTemperatureCalibration    = kDefaultLocalTemperatureCalibration;
+        temperature occupiedCoolingSetpoint   = kDefaultCoolingSetpoint;
+        temperature occupiedHeatingSetpoint   = kDefaultHeatingSetpoint;
+        temperature unoccupiedCoolingSetpoint = kDefaultCoolingSetpoint;
+        temperature unoccupiedHeatingSetpoint = kDefaultHeatingSetpoint;
         Optional<temperature> minHeatSetpointLimit;
         Optional<temperature> maxHeatSetpointLimit;
         Optional<temperature> minCoolSetpointLimit;
         Optional<temperature> maxCoolSetpointLimit;
-        temperature minSetpointDeadBand;
-        ControlSequenceOfOperationEnum controlSequenceOfOperation;
-        SystemModeEnum systemMode;
 
-        TemperatureSetpointHoldEnum temperatureSetpointHold;
+        temperature minSetpointDeadBand                           = kDefaultDeadBand;
+        ControlSequenceOfOperationEnum controlSequenceOfOperation = ControlSequenceOfOperationEnum::kCoolingAndHeating;
+        SystemModeEnum systemMode                                 = SystemModeEnum::kOff;
+
+        TemperatureSetpointHoldEnum temperatureSetpointHold = TemperatureSetpointHoldEnum::kSetpointHoldOff;
         DataModel::Nullable<uint16_t> temperatureSetpointHoldDuration;
         DataModel::Nullable<uint32_t> setpointHoldExpiryTimestamp;
 
@@ -229,8 +230,6 @@ private:
 
     void ReEvaluateCurrentSuggestion();
 };
-
-Protocols::InteractionModel::Status SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
 
 } // namespace Thermostat
 } // namespace Clusters
