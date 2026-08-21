@@ -18,7 +18,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
 chip_test_suite("tests") {
-  output_name = "libMinimalMdnsRecordsTests"
+  output_name = "libDnssdRecordsTests"
 
   test_sources = [
     "TestResourceRecord.cpp",
@@ -33,6 +33,6 @@ chip_test_suite("tests") {
   public_deps = [
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:string-builder-adapters",
-    "${chip_root}/src/lib/dnssd/minimal_mdns/records",
+    "${chip_root}/src/lib/dnssd/wire/records",
   ]
 }
