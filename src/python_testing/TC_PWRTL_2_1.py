@@ -23,6 +23,7 @@
 #   run1:
 #     app: ${EVSE_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-ready-pattern: "APP STATUS: Starting event loop"
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -64,8 +65,12 @@ class TC_PWRTL_2_1(MatterBaseTest):
         AvailableEndpoints and ActiveEndpoints reads, the subset invariant
         (ActiveEndpoints subset of AvailableEndpoints), read-only access on
         both endpoint list attributes, and Non-volatile persistence of
-        ActiveEndpoints across reboot (manual-mode only; CI skips the reboot
-        steps via the is_pics_sdk_ci_only dispatch).
+        ActiveEndpoints across reboot.
+
+        Step numbering matches the test plan one for one.
+
+        Test Plan:
+        https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/cluster/power_topology.adoc#tc-pwrtl-21
         """
         endpoint = self.get_endpoint()
         cluster = Clusters.PowerTopology
@@ -105,7 +110,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
         asserts.assert_equal(reserved_bits, 0,
                              f"Reserved bits set in FeatureMap: 0x{reserved_bits:08X}")
 
-        self.step(5, "TH reads AttributeList; verifies AvailableEndpoints present iff SET, ActiveEndpoints present iff DYPF")
+        self.step(5, "TH reads the AttributeList attribute")
         attribute_list = await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=cluster,
@@ -114,6 +119,8 @@ class TC_PWRTL_2_1(MatterBaseTest):
         log.info("AttributeList: %s", attribute_list)
         avail_ep_id = attributes.AvailableEndpoints.attribute_id
         active_ep_id = attributes.ActiveEndpoints.attribute_id
+
+        self.step(6, "TH verifies the AttributeList composition")
 
         # AvailableEndpoints (0x0000): conformance "SET" — mandatory iff SET feature,
         # disallowed otherwise (bare-symbol form, not bracketed).
@@ -134,7 +141,17 @@ class TC_PWRTL_2_1(MatterBaseTest):
             asserts.assert_not_in(active_ep_id, attribute_list,
                                   "ActiveEndpoints must NOT be in AttributeList when DYPF feature is not set")
 
-        self.step(6, "TH reads AvailableEndpoints (if present in AttributeList)")
+        # ElectricalCircuitNodes (0x0002): conformance "CIRC" (Matter 1.7); mandatory iff CIRC feature,
+        # disallowed otherwise.
+        ecn_id = attributes.ElectricalCircuitNodes.attribute_id
+        if has_circ:
+            asserts.assert_in(ecn_id, attribute_list,
+                              "ElectricalCircuitNodes must be in AttributeList when CIRC feature is set")
+        else:
+            asserts.assert_not_in(ecn_id, attribute_list,
+                                  "ElectricalCircuitNodes must NOT be in AttributeList when CIRC feature is not set")
+
+        self.step(7, "TH reads AvailableEndpoints (if present in AttributeList)")
         avail_eps = None
         if avail_ep_id in attribute_list:
             avail_eps = await self.read_single_attribute_check_success(
@@ -147,7 +164,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
             log.info("AvailableEndpoints not in AttributeList (SET feature not set)")
             self.mark_current_step_skipped()
 
-        self.step(7, "TH reads ActiveEndpoints (if present in AttributeList)")
+        self.step(8, "TH reads ActiveEndpoints (if present in AttributeList)")
         active_eps = None
         if active_ep_id in attribute_list:
             active_eps = await self.read_single_attribute_check_success(
@@ -160,7 +177,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
             log.info("ActiveEndpoints not in AttributeList (DYPF feature not set)")
             self.mark_current_step_skipped()
 
-        self.step(8, "TH verifies ActiveEndpoints is a subset of AvailableEndpoints")
+        self.step(9, "TH verifies ActiveEndpoints is a subset of AvailableEndpoints")
         if avail_eps is not None and active_eps is not None:
             for ep in active_eps:
                 asserts.assert_in(ep, avail_eps,
@@ -170,7 +187,8 @@ class TC_PWRTL_2_1(MatterBaseTest):
             log.info("Skipping subset check (endpoint attributes not present)")
             self.mark_current_step_skipped()
 
-        self.step(9, "TH attempts write to AvailableEndpoints - expect UNSUPPORTED_WRITE")
+        self.step(10, "TH attempts write to AvailableEndpoints and ActiveEndpoints - expect UNSUPPORTED_WRITE")
+        attempted = False
         if avail_eps is not None:
             status = await self.write_single_attribute(
                 attribute_value=attributes.AvailableEndpoints([]),
@@ -178,22 +196,25 @@ class TC_PWRTL_2_1(MatterBaseTest):
                 expect_success=False)
             asserts.assert_equal(status, Status.UnsupportedWrite,
                                  "Write to AvailableEndpoints should return UNSUPPORTED_WRITE")
-        else:
+            attempted = True
+        if active_eps is not None:
+            status = await self.write_single_attribute(
+                attribute_value=attributes.ActiveEndpoints([]),
+                endpoint_id=endpoint,
+                expect_success=False)
+            asserts.assert_equal(status, Status.UnsupportedWrite,
+                                 "Write to ActiveEndpoints should return UNSUPPORTED_WRITE")
+            attempted = True
+        if not attempted:
             self.mark_current_step_skipped()
 
-        self.step(10, "Operator reboots DUT (skipped in CI)")
-        if self.is_pics_sdk_ci_only or active_eps is None:
-            # CI cannot drive an operator reboot, and there are no ActiveEndpoints
-            # to verify Non-volatile persistence against.
+        self.step(11, "Reboot DUT; TH reads ActiveEndpoints - persisted value returned (Non-Volatile)")
+        if active_eps is None:
+            # DYPF not supported, so there is no ActiveEndpoints value whose
+            # Non-Volatile quality could be verified.
             self.mark_current_step_skipped()
         else:
-            self.wait_for_user_input(
-                prompt_msg="Reboot the DUT and wait for it to rejoin the fabric. Press Enter.")
-
-        self.step(11, "TH verifies ActiveEndpoints persists after reboot - Non-volatile (skipped in CI)")
-        if self.is_pics_sdk_ci_only or active_eps is None:
-            self.mark_current_step_skipped()
-        else:
+            await self.request_device_reboot()
             active_eps_post = await self.read_single_attribute_check_success(
                 endpoint=endpoint,
                 cluster=cluster,
