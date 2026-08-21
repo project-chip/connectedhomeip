@@ -4444,10 +4444,10 @@ CHIP_ERROR DataModelLogger::LogValue(
         }
     }
     {
-        CHIP_ERROR err = LogValue("MaximumDishargeCurrent", indent + 1, value.maximumDishargeCurrent);
+        CHIP_ERROR err = LogValue("MaximumDischargeCurrent", indent + 1, value.maximumDischargeCurrent);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaximumDishargeCurrent'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaximumDischargeCurrent'");
             return err;
         }
     }
