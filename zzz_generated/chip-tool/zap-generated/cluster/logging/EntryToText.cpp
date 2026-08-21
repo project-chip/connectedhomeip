@@ -2444,6 +2444,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Messages";
         case chip::app::Clusters::Messages::Attributes::ActiveMessageIDs::Id:
             return "ActiveMessageIDs";
+        case chip::app::Clusters::Messages::Attributes::SupportedLanguageCodes::Id:
+            return "SupportedLanguageCodes";
+        case chip::app::Clusters::Messages::Attributes::SupportedMimeTypes::Id:
+            return "SupportedMimeTypes";
         case chip::app::Clusters::Messages::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::Messages::Attributes::AcceptedCommandList::Id:
@@ -3343,6 +3347,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
     case chip::app::Clusters::Humidistat::Id: {
         switch (id)
         {
+        case chip::app::Clusters::Humidistat::Attributes::SupportedModes::Id:
+            return "SupportedModes";
         case chip::app::Clusters::Humidistat::Attributes::Mode::Id:
             return "Mode";
         case chip::app::Clusters::Humidistat::Attributes::SystemState::Id:
@@ -3365,6 +3371,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Sleep";
         case chip::app::Clusters::Humidistat::Attributes::Optimal::Id:
             return "Optimal";
+        case chip::app::Clusters::Humidistat::Attributes::CondPumpEnabled::Id:
+            return "CondPumpEnabled";
+        case chip::app::Clusters::Humidistat::Attributes::CondRunCount::Id:
+            return "CondRunCount";
         case chip::app::Clusters::Humidistat::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::Humidistat::Attributes::AcceptedCommandList::Id:
@@ -4518,6 +4528,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "ActiveTextTrack";
         case chip::app::Clusters::MediaPlayback::Attributes::AvailableTextTracks::Id:
             return "AvailableTextTracks";
+        case chip::app::Clusters::MediaPlayback::Attributes::AvailableCommands::Id:
+            return "AvailableCommands";
+        case chip::app::Clusters::MediaPlayback::Attributes::ContentInfo::Id:
+            return "ContentInfo";
         case chip::app::Clusters::MediaPlayback::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::MediaPlayback::Attributes::AcceptedCommandList::Id:
@@ -4594,6 +4608,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "AcceptHeader";
         case chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::Id:
             return "SupportedStreamingProtocols";
+        case chip::app::Clusters::ContentLauncher::Attributes::Movable::Id:
+            return "Movable";
+        case chip::app::Clusters::ContentLauncher::Attributes::Presets::Id:
+            return "Presets";
         case chip::app::Clusters::ContentLauncher::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ContentLauncher::Attributes::AcceptedCommandList::Id:
@@ -4686,6 +4704,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
     case chip::app::Clusters::AccountLogin::Id: {
         switch (id)
         {
+        case chip::app::Clusters::AccountLogin::Attributes::OAuthLoggedIn::Id:
+            return "OAuthLoggedIn";
         case chip::app::Clusters::AccountLogin::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::AccountLogin::Attributes::AcceptedCommandList::Id:
@@ -6725,6 +6745,10 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "LaunchContent";
         case chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Id:
             return "LaunchURL";
+        case chip::app::Clusters::ContentLauncher::Commands::ContentReplicationRequest::Id:
+            return "ContentReplicationRequest";
+        case chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Id:
+            return "PlayPreset";
         default:
             return "Unknown";
         }
@@ -6762,6 +6786,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Login";
         case chip::app::Clusters::AccountLogin::Commands::Logout::Id:
             return "Logout";
+        case chip::app::Clusters::AccountLogin::Commands::GetDeviceAuthURI::Id:
+            return "GetDeviceAuthURI";
         default:
             return "Unknown";
         }
@@ -7653,6 +7679,8 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
         {
         case chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::Id:
             return "LauncherResponse";
+        case chip::app::Clusters::ContentLauncher::Commands::ContentReplicationResponse::Id:
+            return "ContentReplicationResponse";
         default:
             return "Unknown";
         }
@@ -7671,6 +7699,8 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
         {
         case chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Id:
             return "GetSetupPINResponse";
+        case chip::app::Clusters::AccountLogin::Commands::GetDeviceAuthURIResponse::Id:
+            return "GetDeviceAuthURIResponse";
         default:
             return "Unknown";
         }
@@ -7925,6 +7955,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Air Quality Sensor";
     case 0x0000002D:
         return "Air Purifier";
+    case 0x00000040:
+        return "Irrigation System";
     case 0x00000041:
         return "Water Freeze Detector";
     case 0x00000042:
@@ -8015,6 +8047,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Camera Controller";
     case 0x00000148:
         return "Doorbell";
+    case 0x00000149:
+        return "AV Analysis Node";
     case 0x00000150:
         return "Ambient Context Sensor";
     case 0x00000152:
@@ -8063,10 +8097,16 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Electrical Energy Tariff";
     case 0x00000514:
         return "Electrical Meter";
+    case 0x00000515:
+        return "Arc Fault Circuit Interrupter";
     case 0x00000516:
         return "Electrical Circuit Breaker";
     case 0x00000517:
         return "Electrical Distribution Enclosure";
+    case 0x00000518:
+        return "Electrical Surge Protector";
+    case 0x00000519:
+        return "Residual Current Circuit Breaker";
     case 0x00000840:
         return "Control Bridge";
     case 0x00000850:

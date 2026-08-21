@@ -3057,6 +3057,12 @@ static BOOL AttributeIsSpecifiedInMessagesCluster(AttributeId aAttributeId)
     case Attributes::ActiveMessageIDs::Id: {
         return YES;
     }
+    case Attributes::SupportedLanguageCodes::Id: {
+        return YES;
+    }
+    case Attributes::SupportedMimeTypes::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -4395,6 +4401,9 @@ static BOOL AttributeIsSpecifiedInHumidistatCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Humidistat;
     switch (aAttributeId) {
+    case Attributes::SupportedModes::Id: {
+        return YES;
+    }
     case Attributes::Mode::Id: {
         return YES;
     }
@@ -4426,6 +4435,12 @@ static BOOL AttributeIsSpecifiedInHumidistatCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::Optimal::Id: {
+        return YES;
+    }
+    case Attributes::CondPumpEnabled::Id: {
+        return YES;
+    }
+    case Attributes::CondRunCount::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -6141,6 +6156,12 @@ static BOOL AttributeIsSpecifiedInMediaPlaybackCluster(AttributeId aAttributeId)
     case Attributes::AvailableTextTracks::Id: {
         return YES;
     }
+    case Attributes::AvailableCommands::Id: {
+        return YES;
+    }
+    case Attributes::ContentInfo::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -6251,6 +6272,12 @@ static BOOL AttributeIsSpecifiedInContentLauncherCluster(AttributeId aAttributeI
         return YES;
     }
     case Attributes::SupportedStreamingProtocols::Id: {
+        return YES;
+    }
+    case Attributes::Movable::Id: {
+        return YES;
+    }
+    case Attributes::Presets::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -6389,6 +6416,9 @@ static BOOL AttributeIsSpecifiedInAccountLoginCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::AccountLogin;
     switch (aAttributeId) {
+    case Attributes::OAuthLoggedIn::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

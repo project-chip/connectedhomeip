@@ -82,8 +82,8 @@ class TC_SC_3_1(MatterBaseTest):
 
         self.step("1d",
                   "Initiator constructs and sends a TLV-encoded Sigma1 to the Responder. "
-                  "Verify I=1, S=0, DSIZ=0, sigma-1-struct TLV, Session Type=0 (Unicast), Protocol ID=0x0000 (SECURE_CHANNEL), Opcode=0x30 (CASE Sigma1). "
-                  "NOTE: This step is done automatically and verified by successful completion of the read in step 1c.")
+                  "Sending Sigma1 is performed automatically as part of the CASE handshake and is not "
+                  "independently captured; its success is confirmed by the successful completion of the read in step 1c.")
 
         self.step(2,
                   "Upon receiving Sigma1, the Responder generates Sigma2.",
@@ -121,9 +121,8 @@ class TC_SC_3_1(MatterBaseTest):
 
         self.step(5,
                   "Initiator constructs and sends a TLV-encoded Sigma3 message. "
-                  "Verify I=1, S=0, DSIZ=0, sigma-3-struct TLV, Session Type=0 (Unicast), "
-                  "Protocol ID=0x0000 (SECURE_CHANNEL), Opcode=0x32 (CASE Sigma3). "
-                  " NOTE: This step is done automatically and verified by successful completion of the read in step 1c.")
+                  "Sending Sigma3 is performed automatically as part of the CASE handshake and is not "
+                  "independently captured; its success is confirmed by the successful completion of the read in step 1c.")
 
         self.step(6,
                   "Session establishment completes.",

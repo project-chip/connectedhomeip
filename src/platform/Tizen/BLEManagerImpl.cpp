@@ -1000,7 +1000,7 @@ CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
                         ChipLogError(DeviceLayer, "bt_adapter_get_name() failed: %s", get_error_message(ret)));
 
     VerifyOrReturnError(deviceName, CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(strlen(deviceName.get()) >= bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(strlen(deviceName.get()) < bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     chip::Platform::CopyString(buf, bufSize, deviceName.get());
     ChipLogProgress(DeviceLayer, "BLE device name: %s", buf);

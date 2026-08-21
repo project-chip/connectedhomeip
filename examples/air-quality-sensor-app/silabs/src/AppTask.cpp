@@ -27,13 +27,13 @@
 
 #include "LEDWidget.h"
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 #include "AirQualitySensorUI.h"
 #include "lcd.h"
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
 #include "qrcodegen.h"
-#endif // QR_CODE_ENABLED
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 
 #include <AirQualityConfig.h>
 #include <air-quality-sensor-manager.h>
@@ -78,7 +78,7 @@ using namespace chip::app::Clusters;
 
 namespace {
 
-CustomerAppTask & appInstance()
+CustomerAppTask & AppInstance()
 {
     return CustomerAppTask::GetAppTask();
 }
@@ -149,7 +149,7 @@ void AppTask::WriteAirQualityToAttribute(intptr_t context)
     AirQualitySensorManager::GetInstance()->OnAirQualityChangeHandler(classifyAirQuality(*air_quality_ptr));
     ChipLogDetail(AppServer, "RAW AirQuality value: %ld and corresponding Enum value : %d", *air_quality_ptr,
                   chip::to_underlying(AirQualitySensorManager::GetInstance()->GetAirQuality()));
-    appInstance().UpdateAirQualitySensorUI();
+    AppInstance().UpdateAirQualitySensorUI();
     delete air_quality_ptr;
 }
 
@@ -223,7 +223,7 @@ CHIP_ERROR AppTask::GetAirQualityValue(int32_t & air_quality)
 void AppTask::SensorTimerEventHandler(void * arg)
 {
     int32_t air_quality = 0;
-    CHIP_ERROR err      = appInstance().GetAirQualityValue(air_quality);
+    CHIP_ERROR err      = AppInstance().GetAirQualityValue(air_quality);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         ChipLogError(AppServer, "GetAirQualityValue() failed: %" CHIP_ERROR_FORMAT ", skipping cluster update", err.Format()));
@@ -237,11 +237,11 @@ CHIP_ERROR AppTask::AppInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(&CustomerAppTask::ButtonEventHandler);
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     GetLCD().SetCustomUI(AirQualitySensorUI::DrawUI);
 #endif
 
-    err = appInstance().InitAirQualitySensor();
+    err = AppInstance().InitAirQualitySensor();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "InitAirQualitySensor() failed");
@@ -261,7 +261,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     AppEvent event;
     osMessageQueueId_t sAppEventQueue = *(static_cast<osMessageQueueId_t *>(pvParameter));
 
-    CHIP_ERROR err = appInstance().Init();
+    CHIP_ERROR err = AppInstance().Init();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "AppTask.Init() failed");
@@ -269,7 +269,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 
 #if !(defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER)
-    appInstance().StartStatusLEDTimer();
+    AppInstance().StartStatusLEDTimer();
 #endif
 
     ChipLogDetail(AppServer, "App Task started");
@@ -278,7 +278,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         osStatus_t eventReceived = osMessageQueueGet(sAppEventQueue, &event, NULL, osWaitForever);
         while (eventReceived == osOK)
         {
-            appInstance().DispatchEvent(&event);
+            AppInstance().DispatchEvent(&event);
             eventReceived = osMessageQueueGet(sAppEventQueue, &event, NULL, 0);
         }
     }
@@ -287,14 +287,14 @@ void AppTask::AppTaskMain(void * pvParameter)
 void AppTask::UpdateAirQualitySensorUI()
 {
 // Update the LCD with the Stored value. Show QR Code if not provisioned
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     GetLCD().WriteDemoUI(false);
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
     if (BaseApplication::GetProvisionStatus())
     {
         GetLCD().ShowQRCode(true);
     }
-#endif // QR_CODE_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED
 #endif
 }
 
@@ -307,7 +307,7 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     if (button == APP_FUNCTION_BUTTON)
     {
         aEvent.Handler = BaseApplication::ButtonHandler;
-        appInstance().PostEvent(&aEvent);
+        AppInstance().PostEvent(&aEvent);
     }
 }
 

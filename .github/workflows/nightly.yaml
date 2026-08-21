@@ -115,7 +115,7 @@ jobs:
 
             - name: Build Software Update ota images with new version.
               run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_ota_images.sh --out-prefix out/su_ota_images_min --max-range 2
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_ota_images.sh --out-prefix out/su_ota_images_min --max-range 3
                   && mv out/su_ota_images_min-v*/*.ota objdir-clone
                   && rm -rf out/su_ota_images_min-v*"
 
@@ -284,6 +284,7 @@ jobs:
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   # SU OTA Images
                   echo "SU_OTA_REQUESTOR_V2: objdir-clone/chip-ota-requestor-app_v2.min.ota" >> /tmp/test_env.yaml
+                  echo "SU_OTA_REQUESTOR_V3: objdir-clone/chip-ota-requestor-app_v3.min.ota" >> /tmp/test_env.yaml
                   
                   # Slow Test Apps
                   echo "ALL_CLUSTERS_APP: objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
@@ -338,6 +339,11 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v7
 
+            # The gh-pages Allure history is handled several times over on this
+            # runner (checkout, history copy, deploy clone), so free up disk first.
+            - name: Maximize runner disk
+              uses: ./.github/actions/maximize-runner-disk
+
             - name: Download all JUnit XML results
               uses: actions/download-artifact@v8
               with:
@@ -360,7 +366,7 @@ jobs:
                   path: gh-pages
 
             - name: Generate Allure Report
-              uses: simple-elf/allure-report-action@v1.14
+              uses: simple-elf/allure-report-action@385367cde61ac68c2568a117f7579f7f148dc459 # v1.15
               with:
                   allure_results: junit-results
                   allure_report: allure-report
@@ -386,7 +392,9 @@ jobs:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
                   publish_dir: allure-history/allure-report/nightly
                   destination_dir: allure-report/nightly
-                  keep_files: true
+                  # keep_files: false prunes reports beyond keep_reports from the
+                  # branch; scoped to destination_dir, so other subfolders are kept.
+                  keep_files: false
 
             - name: Notify Slack on Failure
               if: failure()

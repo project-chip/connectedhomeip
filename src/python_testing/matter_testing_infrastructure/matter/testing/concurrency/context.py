@@ -14,11 +14,14 @@
 
 import contextlib
 import logging
+import os
+import signal
 import subprocess
 import threading
 from abc import abstractmethod
+from collections.abc import Callable
 from types import TracebackType
-from typing import Any, Callable, Generic, Self, TypeVar
+from typing import Any, Generic, Self, TypeVar
 
 log = logging.getLogger(__name__)
 
@@ -44,10 +47,14 @@ class TerminableResourceBase(contextlib.AbstractContextManager, Generic[Internal
         try:
             return resource if (resource := self.resource_start()) is not None else self
         except BaseException as start_ex:
-            log.error("Failed to start resource %s: %r", self._name, start_ex)
-            start_ex.add_note(f"Failure during start of resource {self._name}")
+            if not isinstance(start_ex, KeyboardInterrupt):
+                log.error("Failed to start resource %s: %r", self._name, start_ex)
+                start_ex.add_note(f"Failure during start of resource {self._name}")
+
             try:
                 self.resource_terminate()
+            except KeyboardInterrupt:
+                raise
             except BaseException as term_ex:
                 log.error("Failed to terminate resource %s during start failure: %r", self._name, term_ex)
                 raise term_ex.with_traceback(term_ex.__traceback__) from start_ex
@@ -61,6 +68,8 @@ class TerminableResourceBase(contextlib.AbstractContextManager, Generic[Internal
             self.resource_terminate()
             if self._terminate_debug_logging:
                 log.debug("Terminated %s", self._name)
+        except KeyboardInterrupt:
+            raise
         except BaseException as e:
             log.error("Failed to terminate resource %s: %r", self._name, e)
             e.add_note(f"Failure during termination of resource {self._name}")
@@ -145,6 +154,36 @@ class TerminablePopen(TerminableResourceBase[subprocess.Popen[PopenT]]):
         self._process = self._create_popen()
         return self._process
 
+    @staticmethod
+    def _signal_process_group(process: subprocess.Popen[PopenT], sig: signal.Signals) -> None:
+        """
+        Signal the process group led by `process`, or just the process itself if it does not lead one.
+
+        A subprocess started as its own group leader (`start_new_session=True` or `process_group=0` in Popen) may have spawned
+        children of its own. Signalling only the process itself leaves those children reparented to init, outliving the harness.
+        Processes that were not started in their own group are signalled individually, since signalling their group would hit the
+        harness as well.
+
+        As in Popen.send_signal(), never signal a process already known to have exited: its pid may have been recycled, and for the
+        group case that would mean signalling an unrelated process group.
+        """
+        if process.poll() is not None:
+            return
+
+        try:
+            leads_group = os.getpgid(process.pid) == process.pid
+        except OSError:
+            # The process is gone already. Leave the race handling to send_signal().
+            leads_group = False
+
+        if not leads_group:
+            process.send_signal(sig)
+            return
+
+        with contextlib.suppress(ProcessLookupError):
+            # Same race as above, now between the check and the call. Any other error is a real failure to signal.
+            os.killpg(process.pid, sig)
+
     def resource_terminate(self) -> None:
         if self._process is None:
             return
@@ -158,7 +197,7 @@ class TerminablePopen(TerminableResourceBase[subprocess.Popen[PopenT]]):
             # SIGTERM
             log.debug('Terminating leftover process "%s"', cmd)
             try:
-                self._process.terminate()
+                self._signal_process_group(self._process, signal.SIGTERM)
             except OSError:
                 # Can occur in case of race condition when process exits between poll and terminate.
                 return
@@ -169,7 +208,7 @@ class TerminablePopen(TerminableResourceBase[subprocess.Popen[PopenT]]):
             # SIGKILL
             log.warning('Failed to terminate the process "%s". Killing instead', cmd)
             try:
-                self._process.kill()
+                self._signal_process_group(self._process, signal.SIGKILL)
             except OSError:
                 return
             with contextlib.suppress(subprocess.TimeoutExpired):

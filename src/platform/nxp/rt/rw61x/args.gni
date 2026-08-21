@@ -56,6 +56,12 @@ declare_args() {
 # here we override it to set it to "nvs" for RW61x platform
 nxp_nvm_component = "nvs"
 
+chip_crypto = "psa"
+chip_crypto_keystore = "psa"
+chip_crypto_psa_aead_single_part = true
+chip_crypto_spake2p = "mbedtls"
+nxp_crypto_impl = "psa"
+
 mbedtls_target = "${nxp_sdk_build_root}:nxp_mbedtls"
 
 openthread_external_mbedtls = mbedtls_target
