@@ -182,6 +182,21 @@ TEST_F(TestGroupKeyManagementCluster, AttributesTest)
     ASSERT_TRUE(chip::Testing::IsAttributesListEqualTo(mCluster, expectedAttributes));
 }
 
+TEST_F(TestGroupKeyManagementCluster, TestMaxGroupsPerFabricAttribute)
+{
+    uint16_t maxGroups = 0;
+    // When Groupcast is disabled, MaxGroupsPerFabric returns provider's non-zero value
+    mRealProvider.SetGroupcastEnabled(false);
+    EXPECT_TRUE(tester.ReadAttribute(GroupKeyManagement::Attributes::MaxGroupsPerFabric::Id, maxGroups).IsSuccess());
+    EXPECT_EQ(maxGroups, mRealProvider.GetMaxGroupsPerFabric());
+    EXPECT_NE(maxGroups, 0);
+
+    // When Groupcast is enabled, MaxGroupsPerFabric must return 0 per spec
+    mRealProvider.SetGroupcastEnabled(true);
+    EXPECT_TRUE(tester.ReadAttribute(GroupKeyManagement::Attributes::MaxGroupsPerFabric::Id, maxGroups).IsSuccess());
+    EXPECT_EQ(maxGroups, 0);
+}
+
 // Cluster should accept writing multiple group keys with the same KeySetID but different Group IDs
 TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttributeSameKeySetDifferentGroup)
 {
