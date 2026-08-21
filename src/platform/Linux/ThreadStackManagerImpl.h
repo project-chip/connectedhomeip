@@ -22,6 +22,7 @@
 #else
 
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include <app/icd/server/ICDServerConfig.h>
@@ -46,6 +47,16 @@ class ThreadStackManagerImpl : public ThreadStackManager
 {
 public:
     ThreadStackManagerImpl();
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    void SetThreadEnabledForTest(bool enabled) { mThreadEnabledForTest = enabled; }
+    void SetThreadAttachedForTest(bool attached) { mAttached = attached; }
+    void ResetThreadStateForTest()
+    {
+        mThreadEnabledForTest.reset();
+        mAttached = false;
+    }
+#endif
 
     void
     SetNetworkStatusChangeCallback(NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
@@ -168,6 +179,9 @@ private:
     NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 
     bool mAttached;
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    std::optional<bool> mThreadEnabledForTest;
+#endif
     uint8_t mExtendedAddress[8];
 };
 
