@@ -119,6 +119,8 @@ public:
     }
     bool GetRequestorCanConsent() const { return mRequestorCanConsent; }
     const char * GetLocation() const { return mLocation; }
+    bool GetStartOffsetBitSet() const { return mBdxOtaSender.GetLastReceiveInitStartOffsetBitSet(); }
+    uint32_t GetStartOffset() const { return mBdxOtaSender.GetLastReceiveInitStartOffset(); }
     bool GetUserConsentNeeded() const { return mUserConsentNeeded; }
     uint16_t GetMaxBlockSize() const { return mMaxBDXBlockSize; }
 
