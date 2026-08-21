@@ -32,7 +32,7 @@ namespace OperationalState {
 class Instance;
 
 namespace detail {
-    class InstanceDelegateWrapper;
+class InstanceDelegateWrapper;
 } // namespace detail
 
 /**

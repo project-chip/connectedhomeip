@@ -77,10 +77,7 @@ public:
         /// then:
         ///   - we would do SetDelegate(nullptr) + SetDelegate(mInstance), effectively switching FOO to BAR
         ///     without erroring out.
-        VerifyOrDie(
-            (aDelegate == nullptr) ||
-            (aDelegate->GetInstance() == nullptr) ||
-            (aDelegate->GetInstance() == mInstance)) ;
+        VerifyOrDie((aDelegate == nullptr) || (aDelegate->GetInstance() == nullptr) || (aDelegate->GetInstance() == mInstance));
 
         if (mDelegate != nullptr)
         {
