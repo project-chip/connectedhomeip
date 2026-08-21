@@ -297,6 +297,7 @@ CHIP_ERROR AvAnalysisServerLogic::LoadActiveAmbientContextTriggers()
             {
                 err = trigger.zoneIDs.Value().Value().ComputeSize(&size);
                 VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+                zoneIDs.reserve(size);
 
                 auto zone_iter = trigger.zoneIDs.Value().Value().begin();
 
@@ -428,6 +429,7 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalE
                 {
                     CHIP_ERROR err = contextTrigger.zoneIDs.Value().Value().ComputeSize(&size);
                     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
+                    zoneIDs.reserve(size);
 
                     auto zone_iter = contextTrigger.zoneIDs.Value().Value().begin();
 
@@ -604,6 +606,7 @@ AvAnalysisServerLogic::HandleDisableContextTriggers(CommandHandler & handler, co
 
                     CHIP_ERROR err = contextTrigger.zoneIDs.Value().Value().ComputeSize(&size);
                     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
+                    zoneIDs.reserve(size);
 
                     auto zone_iter = contextTrigger.zoneIDs.Value().Value().begin();
 
