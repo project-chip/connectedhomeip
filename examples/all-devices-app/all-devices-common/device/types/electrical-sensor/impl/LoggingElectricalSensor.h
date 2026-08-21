@@ -61,8 +61,9 @@ public:
     CHIP_ERROR EndRangesRead() override;
 
     CHIP_ERROR StartHarmonicCurrentsRead() override;
-    CHIP_ERROR GetHarmonicCurrentsByIndex(uint8_t index,
-                                          Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type &) override;
+    CHIP_ERROR
+    GetHarmonicCurrentsByIndex(uint8_t index,
+                               Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type &) override;
     CHIP_ERROR EndHarmonicCurrentsRead() override;
 
     CHIP_ERROR StartHarmonicPhasesRead() override;

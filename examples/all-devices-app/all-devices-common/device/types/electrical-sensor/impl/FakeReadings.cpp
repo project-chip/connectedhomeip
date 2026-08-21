@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 #include <app/server/Server.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -57,11 +56,11 @@ void FakeReadings::StartFakeReadings(int64_t power_mW, uint32_t powerRandomness_
                                      uint32_t voltageRandomness_mV, int64_t current_mA, uint32_t currentRandomness_mA,
                                      uint8_t interval_s, bool reset)
 {
-    mBasePower_mW             = power_mW;
+    mBasePower_mW         = power_mW;
     mPowerRandomness_mW   = powerRandomness_mW;
-    mBaseVoltage_mV           = voltage_mV;
+    mBaseVoltage_mV       = voltage_mV;
     mVoltageRandomness_mV = voltageRandomness_mV;
-    mBaseCurrent_mA           = current_mA;
+    mBaseCurrent_mA       = current_mA;
     mCurrentRandomness_mA = currentRandomness_mA;
     mInterval_s           = interval_s;
 

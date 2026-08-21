@@ -47,9 +47,8 @@ public:
      * @param[in]   interval_s  - the callback interval in seconds
      * @param[in]   reset       - boolean: true will reset the energy values to 0
      */
-    void StartFakeReadings(int64_t power_mW, uint32_t powerRandomness_mW, int64_t voltage_mV,
-                           uint32_t voltageRandomness_mV, int64_t current_mA, uint32_t currentRandomness_mA, uint8_t interval_s,
-                           bool reset);
+    void StartFakeReadings(int64_t power_mW, uint32_t powerRandomness_mW, int64_t voltage_mV, uint32_t voltageRandomness_mV,
+                           int64_t current_mA, uint32_t currentRandomness_mA, uint8_t interval_s, bool reset);
 
     /**
      * @brief   Stops any active updates to the fake load data callbacks

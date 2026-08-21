@@ -7,7 +7,7 @@ using namespace chip::app;
 using namespace chip::app::DataModel;
 
 namespace {
-    static FakeReadings gFakeReadings;
+static FakeReadings gFakeReadings;
 }
 
 void SetTestEventTrigger_FakeReadingsLoadStart()
@@ -20,8 +20,8 @@ void SetTestEventTrigger_FakeReadingsLoadStart()
     uint32_t currentRandomness_mA = 500;       // randomness 500mA
     uint8_t interval_s            = 2;         // 2s updates
     bool reset                    = true;
-    gFakeReadings.StartFakeReadings(power_mW, powerRandomness_mW, voltage_mV, voltageRandomness_mV,
-                                                  current_mA, currentRandomness_mA, interval_s, reset);
+    gFakeReadings.StartFakeReadings(power_mW, powerRandomness_mW, voltage_mV, voltageRandomness_mV, current_mA,
+                                    currentRandomness_mA, interval_s, reset);
 }
 
 void SetTestEventTrigger_FakeReadingsGeneratorStart()
@@ -34,8 +34,8 @@ void SetTestEventTrigger_FakeReadingsGeneratorStart()
     uint32_t currentRandomness_mA = 500;        // randomness 500mA
     uint8_t interval_s            = 5;          // 5s updates
     bool reset                    = true;
-    gFakeReadings.StartFakeReadings(power_mW, powerRandomness_mW, voltage_mV, voltageRandomness_mV,
-                                                  current_mA, currentRandomness_mA, interval_s, reset);
+    gFakeReadings.StartFakeReadings(power_mW, powerRandomness_mW, voltage_mV, voltageRandomness_mV, current_mA,
+                                    currentRandomness_mA, interval_s, reset);
 }
 
 void SetTestEventTrigger_FakeReadingsStop()
@@ -76,7 +76,7 @@ LoggingElectricalSensor::LoggingElectricalSensor(TimerDelegate & timerDelegate) 
 };
 
 CHIP_ERROR LoggingElectricalSensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointComposition composition)
+                                             EndpointComposition composition)
 {
     ReturnErrorOnFailure(ElectricalSensor::Register(endpoint, provider, composition));
     gFakeReadings.SetEEMCluster(ElectricalEnergyMeasurementCluster());
@@ -134,23 +134,18 @@ CHIP_ERROR LoggingElectricalSensor::StartAccuracyRead() /* override */
     ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "StartAccuracyRead");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR LoggingElectricalSensor::GetAccuracyByIndex(uint8_t index,
-                                Clusters::ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::Type & val) /* override */
+CHIP_ERROR LoggingElectricalSensor::GetAccuracyByIndex(
+    uint8_t index, Clusters::ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::Type & val) /* override */
 {
     ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerMeasurementCluster, "GetAccuracyByIndex",
                     static_cast<unsigned long long>(index));
-    static Clusters::ElectricalPowerMeasurement::Structs::MeasurementAccuracyRangeStruct::Type accuracyRange = 
-    {
-        .rangeMin = 0,
-        .rangeMax = 10
-    };
-    val = {
-        .measurementType = Clusters::ElectricalPowerMeasurement::MeasurementTypeEnum::kActivePower,
-        .measured = false,
-        .minMeasuredValue = 0,
-        .maxMeasuredValue = 10,
-        .accuracyRanges = Span(&accuracyRange, 1)
-    };
+    static Clusters::ElectricalPowerMeasurement::Structs::MeasurementAccuracyRangeStruct::Type accuracyRange = { .rangeMin = 0,
+                                                                                                                 .rangeMax = 10 };
+    val = { .measurementType  = Clusters::ElectricalPowerMeasurement::MeasurementTypeEnum::kActivePower,
+            .measured         = false,
+            .minMeasuredValue = 0,
+            .maxMeasuredValue = 10,
+            .accuracyRanges   = Span(&accuracyRange, 1) };
     return index == 0 ? CHIP_NO_ERROR : CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 CHIP_ERROR LoggingElectricalSensor::EndAccuracyRead() /* override */
@@ -164,8 +159,8 @@ CHIP_ERROR LoggingElectricalSensor::StartRangesRead() /* override */
     ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "StartRangesRead");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR LoggingElectricalSensor::GetRangeByIndex(uint8_t index,
-                            Clusters::ElectricalPowerMeasurement::Structs::MeasurementRangeStruct::Type &) /* override */
+CHIP_ERROR LoggingElectricalSensor::GetRangeByIndex(
+    uint8_t index, Clusters::ElectricalPowerMeasurement::Structs::MeasurementRangeStruct::Type &) /* override */
 {
     ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerMeasurementCluster, "GetRangeByIndex",
                     static_cast<unsigned long long>(index));
@@ -182,8 +177,8 @@ CHIP_ERROR LoggingElectricalSensor::StartHarmonicCurrentsRead() /* override */
     ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "StartHarmonicCurrentsRead");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR LoggingElectricalSensor::GetHarmonicCurrentsByIndex(uint8_t index,
-                                        Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type &) /* override */
+CHIP_ERROR LoggingElectricalSensor::GetHarmonicCurrentsByIndex(
+    uint8_t index, Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type &) /* override */
 {
     ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerMeasurementCluster, "GetHarmonicCurrentsByIndex",
                     static_cast<unsigned long long>(index));
@@ -200,8 +195,8 @@ CHIP_ERROR LoggingElectricalSensor::StartHarmonicPhasesRead() /* override */
     ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "StartHarmonicPhasesRead");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR LoggingElectricalSensor::GetHarmonicPhasesByIndex(uint8_t index,
-                                    Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type &) /* override */
+CHIP_ERROR LoggingElectricalSensor::GetHarmonicPhasesByIndex(
+    uint8_t index, Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type &) /* override */
 {
     ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerMeasurementCluster, "GetHarmonicPhasesByIndex",
                     static_cast<unsigned long long>(index));
@@ -283,12 +278,14 @@ Nullable<int64_t> LoggingElectricalSensor::GetNeutralCurrent() /* override */
 
 CHIP_ERROR LoggingElectricalSensor::GetAvailableEndpointAtIndex(size_t index, EndpointId & endpointId) /* override */
 {
-    ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerTopologyCluster, "GetAvailableEndpointAtIndex", static_cast<unsigned long long>(index));
+    ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerTopologyCluster, "GetAvailableEndpointAtIndex",
+                    static_cast<unsigned long long>(index));
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 CHIP_ERROR LoggingElectricalSensor::GetActiveEndpointAtIndex(size_t index, EndpointId & endpointId) /* override */
 {
-    ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerTopologyCluster, "GetActiveEndpointAtIndex", static_cast<unsigned long long>(index));
+    ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerTopologyCluster, "GetActiveEndpointAtIndex",
+                    static_cast<unsigned long long>(index));
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 #undef MSG

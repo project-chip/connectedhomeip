@@ -181,8 +181,7 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
     case kOptionEnableKey: {
         constexpr size_t kEnableKeyLength = sizeof(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey);
 
-        if (Encoding::HexToBytes(value, strlen(value), mConfig.testEventTriggerEnableKey,
-                                 kEnableKeyLength) != kEnableKeyLength)
+        if (Encoding::HexToBytes(value, strlen(value), mConfig.testEventTriggerEnableKey, kEnableKeyLength) != kEnableKeyLength)
         {
 
             ChipLogError(Support, "%s: ERROR: invalid value specified for %s\n", program, name);
