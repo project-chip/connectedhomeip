@@ -47,10 +47,41 @@ public:
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
+    // Application-facing accessors. An application that knows of a network by
+    // other means — a border router knows its own — can record and retract it
+    // here. Going through the cluster rather than around it to the storage is
+    // what makes the change visible: subscribers to ThreadNetworks are told,
+    // and the cluster's data version moves.
+    //
+    // Each of these leaves the cluster's invariants intact on its own, so an
+    // application can call them in any order without arranging a moment where
+    // PreferredExtendedPanID names a network that is not in the list.
+
+    // Records a network, replacing any entry with the same Extended PAN ID.
+    // The dataset must carry the sub-TLVs the specification requires of an
+    // entry, the same set AddNetwork checks.
+    CHIP_ERROR AddOrUpdateNetwork(const ThreadNetworkDirectoryStorage::ExtendedPanId & extendedPanId, ByteSpan dataset);
+
+    // Retracts a network. If PreferredExtendedPanID names it, the preference
+    // is cleared first: null means no preference, which is always legal, and
+    // an application that wants to move the preference elsewhere calls
+    // SetPreferredNetwork afterwards.
+    CHIP_ERROR ForgetNetwork(const ThreadNetworkDirectoryStorage::ExtendedPanId & extendedPanId);
+
+    // Reads PreferredExtendedPanID; empty when null.
+    CHIP_ERROR GetPreferredNetwork(std::optional<ThreadNetworkDirectoryStorage::ExtendedPanId> & extendedPanId);
+
+    // Points PreferredExtendedPanID at a network, which must already be in the
+    // list, or clears it when given nothing.
+    CHIP_ERROR SetPreferredNetwork(const ThreadNetworkDirectoryStorage::ExtendedPanId * extendedPanId);
+
 private:
     using ExtendedPanId = ThreadNetworkDirectoryStorage::ExtendedPanId;
 
     // Attribute handling helpers
+    ConcreteDataAttributePath PreferredExtendedPanIdPath() const;
+    // The sub-TLVs the specification requires of a directory entry.
+    static CHIP_ERROR ValidateDatasetForDirectory(ByteSpan dataset, ByteSpan & outExtendedPanId);
     CHIP_ERROR ReadExtendedPanId(const ConcreteDataAttributePath & aPath, std::optional<ExtendedPanId> & outExPanId);
     CHIP_ERROR ReadPreferredExtendedPanId(const ConcreteDataAttributePath & aPath, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadThreadNetworks(const ConcreteDataAttributePath & aPath, AttributeValueEncoder & aEncoder);
