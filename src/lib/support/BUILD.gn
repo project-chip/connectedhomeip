@@ -127,6 +127,7 @@ source_set("memory") {
   sources = [
     "CHIPMem.cpp",
     "CHIPMem.h",
+    "CHIPMemTyped.h",
     "CHIPPlatformMemory.cpp",
     "CHIPPlatformMemory.h",
   ]
