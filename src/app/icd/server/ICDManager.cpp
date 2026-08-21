@@ -828,7 +828,9 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
 #else
     const PendingCheckInType pendingCheckInType = mPendingCheckInType;
     const size_t pendingSubjectsCount           = mPendingCheckInSubjectsCount;
-    // Reset pending state before replaying so any new events generated during processing queue cleanly
+    // Snapshot and reset pending state before replaying to protect against synchronous re-entrant callbacks
+    // (e.g. immediate address resolution failure or delegate notifications) on the single CHIP event loop
+    // without mutating the active replay loop.
     mPendingCheckInType          = PendingCheckInType::kNone;
     mPendingCheckInSubjectsCount = 0;
 

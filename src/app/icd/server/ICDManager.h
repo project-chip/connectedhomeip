@@ -105,6 +105,19 @@ public:
         ICDModeChange,
     };
 
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_CONFIG_ENABLE_ICD_CIP &&                                         \
+    CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+    enum class PendingCheckInType : uint8_t
+    {
+        kNone,
+        kTargeted,
+        kBroadcast,
+    };
+    static constexpr size_t kMaxPendingCheckInSubjects =
+        CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC * CHIP_CONFIG_MAX_FABRICS;
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_CONFIG_ENABLE_ICD_CIP &&
+       // CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+
     /**
      * @brief Verifier template function
      *        This type can be used to implement specific verifiers that can be used in the CheckInMessagesWouldBeSent function.
@@ -385,14 +398,7 @@ private:
 #if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     bool mPendingActiveModeOnNetworkAttach = false;
 #if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
-    enum class PendingCheckInType : uint8_t
-    {
-        kNone,
-        kTargeted,
-        kBroadcast,
-    };
-    static constexpr size_t kMaxPendingCheckInSubjects = CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC * CHIP_CONFIG_MAX_FABRICS;
-    PendingCheckInType mPendingCheckInType             = PendingCheckInType::kNone;
+    PendingCheckInType mPendingCheckInType = PendingCheckInType::kNone;
     std::array<Access::SubjectDescriptor, kMaxPendingCheckInSubjects> mPendingCheckInSubjects;
     size_t mPendingCheckInSubjectsCount = 0;
 
