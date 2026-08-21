@@ -137,8 +137,8 @@ void LightSwitchContextReleaseHandler(void * context)
 void InitBindingHandlerInternal(intptr_t arg)
 {
     auto & server = chip::Server::GetInstance();
-    Binding::Manager::GetInstance().Init(
-        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
+    LogErrorOnFailure(Binding::Manager::GetInstance().Init(
+        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() }));
     Binding::Manager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
     Binding::Manager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
 }
@@ -191,7 +191,7 @@ CHIP_ERROR BindingGroupBindCommandHandler(int argc, char ** argv)
 
     Binding::TableEntry * entry =
         Platform::New<Binding::TableEntry>(atoi(argv[0]), atoi(argv[1]), 1, std::make_optional<ClusterId>(6));
-    DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry)));
     return CHIP_NO_ERROR;
 }
 
@@ -201,7 +201,7 @@ CHIP_ERROR BindingUnicastBindCommandHandler(int argc, char ** argv)
 
     Binding::TableEntry * entry =
         Platform::New<Binding::TableEntry>(atoi(argv[0]), atoi(argv[1]), 1, atoi(argv[2]), std::make_optional<ClusterId>(6));
-    DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry)));
     return CHIP_NO_ERROR;
 }
 
@@ -620,7 +620,8 @@ void SwitchWorkerFunction(intptr_t context)
     VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "SwitchWorkerFunction - Invalid work data"));
 
     BindingCommandData * data = reinterpret_cast<BindingCommandData *>(context);
-    Binding::Manager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId, data->clusterId, static_cast<void *>(data));
+    LogErrorOnFailure(Binding::Manager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId, data->clusterId,
+                                                                                static_cast<void *>(data)));
 }
 
 void BindingWorkerFunction(intptr_t context)
@@ -628,7 +629,7 @@ void BindingWorkerFunction(intptr_t context)
     VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "BindingWorkerFunction - Invalid work data"));
 
     Binding::TableEntry * entry = reinterpret_cast<Binding::TableEntry *>(context);
-    AddBindingEntry(*entry);
+    LogErrorOnFailure(AddBindingEntry(*entry));
 
     Platform::Delete(entry);
 }
@@ -638,7 +639,7 @@ CHIP_ERROR InitBindingHandler()
     // The initialization of binding manager will try establishing connection with unicast peers
     // so it requires the Server instance to be correctly initialized. Post the init function to
     // the event queue so that everything is ready when initialization is conducted.
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitBindingHandlerInternal);
+    LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork(InitBindingHandlerInternal));
 #if CONFIG_ENABLE_CHIP_SHELL
     RegisterSwitchCommands();
 #endif
