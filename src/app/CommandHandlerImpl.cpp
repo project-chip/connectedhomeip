@@ -225,6 +225,9 @@ CHIP_ERROR CommandHandlerImpl::ValidateInvokeRequestMessageAndBuildRegistry(Invo
 
     ReturnErrorOnFailure(TLV::Utilities::Count(invokeRequestsReader, commandCount, false /* recurse */));
 
+    // Reset targeted endpoints before parsing. We populate mTargetedEndpoints during validation
+    // so that when TriggerDelayReport is called prior to command execution, the exact endpoints
+    // targeted by unicast invoke requests are already known.
     mNumTargetedEndpoints = 0;
 
     // If this is a GroupRequest the only thing to check is that there is only one
@@ -255,6 +258,8 @@ CHIP_ERROR CommandHandlerImpl::ValidateInvokeRequestMessageAndBuildRegistry(Invo
         ReturnErrorOnFailure(commandData.GetPath(&commandPath));
         ReturnErrorOnFailure(commandPath.GetConcreteCommandPath(concretePath));
 
+        // Record targeted endpoint during validation so mTargetedEndpoints is fully populated before
+        // TriggerDelayReport and before command handlers execute.
         RecordTargetedEndpoint(concretePath.mEndpointId);
 
         // Grab the CommandRef if there is one, and validate that it's there when it
@@ -284,6 +289,14 @@ CHIP_ERROR CommandHandlerImpl::ValidateInvokeRequestMessageAndBuildRegistry(Invo
     }
     ReturnErrorOnFailure(err);
 
+    // Trigger report deferral BEFORE dispatching commands.
+    // When command handlers execute, they may synchronously modify attributes, calling SetDirty()
+    // and notifying the ReportScheduler via OnBecameReportable(). If report deferral is not applied
+    // beforehand, the scheduler evaluates next timeout as 0 ms, synchronously transitions the node
+    // to TimerFired(), and marks EngineRunScheduled = true. Once EngineRunScheduled is set,
+    // subsequent deferral calls cannot prevent the reporting engine from immediately sending the report
+    // on the next event loop iteration. Triggering report deferral here ensures the deferral window is
+    // active before any attribute mutations occur.
     std::optional<InvokeRequestMessage::DelayReportData> delayReportData;
     ReturnErrorOnFailure(invokeRequestMessage.GetDelayReportData(delayReportData));
     if (delayReportData.has_value())
