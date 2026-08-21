@@ -71,7 +71,8 @@ void FakeReadings::StartFakeReadings(int64_t power_mW, uint32_t powerRandomness_
         // This is statistically more likely when the test runs for a long time
         // or if the seed is not set
 
-        // Disable clang-tidy for this line because it complains that srand(1) will make the random numbers predictable, which is the exact point of this line.
+        // Disable clang-tidy for this line because it complains that srand(1) will make the random numbers predictable, which is
+        // the exact point of this line.
         srand(1); // NOLINT(bugprone-random-generator-seed)
 
         mTotalEnergyImported = 0;
