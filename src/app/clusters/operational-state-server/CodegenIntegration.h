@@ -49,7 +49,7 @@ public:
     {
         /// identical check with OperationalState::Delegate, forcing a 1:1
         /// between instance and delegate, so that every delegate knows exactly what instance it
-        /// belongs do and every instance is managed by one delegate only. Doing this here
+        /// belongs to and every instance is managed by one delegate only. Doing this here
         /// since mDelegate may not yet be set (and that was the one doing the check before).
         VerifyOrDie(mInstance == nullptr || aInstance == nullptr || mInstance == aInstance);
 
@@ -78,8 +78,9 @@ public:
         ///   - we would do SetDelegate(nullptr) + SetDelegate(mInstance), effectively switching FOO to BAR
         ///     without erroring out.
         VerifyOrDie(
-            (mDelegate->GetInstance() == nullptr) ||
-            (mDelegate->GetInstance() == mInstance)) ;
+            (aDelegate == nullptr) ||
+            (aDelegate->GetInstance() == nullptr) ||
+            (aDelegate->GetInstance() == mInstance)) ;
 
         if (mDelegate != nullptr)
         {
