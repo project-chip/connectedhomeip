@@ -429,13 +429,17 @@ private:
      * ProcessCommandDataIB is only called when a unicast invoke command request is received
      * It requires the endpointId in its command path to be able to dispatch the command
      */
-    Protocols::InteractionModel::Status ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement);
+    Protocols::InteractionModel::Status
+    ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement,
+                         const std::optional<InvokeRequestMessage::DelayReportData> & aDelayReportData);
 
     /**
      * ProcessGroupCommandDataIB is only called when a group invoke command request is received
      * It doesn't need the endpointId in it's command path since it uses the GroupId in message metadata to find it
      */
-    Protocols::InteractionModel::Status ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement);
+    Protocols::InteractionModel::Status
+    ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement,
+                              const std::optional<InvokeRequestMessage::DelayReportData> & aDelayReportData);
 
     CHIP_ERROR TryAddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus);
 

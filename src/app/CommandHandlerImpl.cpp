@@ -236,7 +236,7 @@ CHIP_ERROR CommandHandlerImpl::ValidateInvokeRequestMessageAndBuildRegistry(Invo
     // any further validation, we do need to read and populate the registry to help
     // in building the InvokeResponse.
 
-    VerifyOrReturnError(commandCount <= MaxPathsPerInvoke(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(commandCount > 0 && commandCount <= MaxPathsPerInvoke(), CHIP_ERROR_INVALID_ARGUMENT);
 
     // If there is more than one CommandDataIB, spec states that CommandRef must be provided.
     commandRefExpected = commandCount > 1;
@@ -279,6 +279,7 @@ CHIP_ERROR CommandHandlerImpl::ValidateInvokeRequestMessageAndBuildRegistry(Invo
         err = CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(err);
+
     return invokeRequestMessage.ExitContainer();
 }
 
@@ -333,11 +334,11 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
         Status status = Status::Success;
         if (IsGroupRequest())
         {
-            status = ProcessGroupCommandDataIB(commandData);
+            status = ProcessGroupCommandDataIB(commandData, delayReportData);
         }
         else
         {
-            status = ProcessCommandDataIB(commandData);
+            status = ProcessCommandDataIB(commandData, delayReportData);
         }
         if (status != Status::Success)
         {
@@ -352,11 +353,6 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
     }
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.ExitContainer() == CHIP_NO_ERROR, Status::InvalidAction);
-
-    if (delayReportData.has_value())
-    {
-        TriggerDelayReport(delayReportData.value());
-    }
 
     return Status::Success;
 }
@@ -448,7 +444,8 @@ constexpr uint8_t sNoFields[] = {
 };
 } // anonymous namespace
 
-Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement)
+Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement,
+                                                const std::optional<InvokeRequestMessage::DelayReportData> & aDelayReportData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandPathIB::Parser commandPath;
@@ -476,8 +473,6 @@ Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         }
     }
 
-    RecordTargetedEndpoint(concretePath.mEndpointId);
-
     err = aCommandElement.GetFields(&commandDataReader);
     if (CHIP_END_OF_TLV == err)
     {
@@ -492,6 +487,21 @@ Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         ChipLogDetail(DataManagement, "Received command for Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
                       concretePath.mEndpointId, ChipLogValueMEI(concretePath.mClusterId), ChipLogValueMEI(concretePath.mCommandId));
         SuccessOrExit(err = DataModelCallbacks::GetInstance()->PreCommandReceived(concretePath, GetSubjectDescriptor()));
+
+        // Trigger report deferral for this endpoint BEFORE dispatching the command.
+        // When command handlers execute, they may synchronously modify attributes, calling SetDirty()
+        // and notifying the ReportScheduler via OnBecameReportable(). If report deferral is not applied
+        // beforehand, the scheduler evaluates next timeout as 0 ms, synchronously transitions the node
+        // to TimerFired(), and marks EngineRunScheduled = true. Once EngineRunScheduled is set,
+        // subsequent deferral calls cannot prevent the reporting engine from immediately sending the report
+        // on the next event loop iteration. Triggering report deferral here ensures the deferral window is
+        // active before any attribute mutations occur.
+        RecordTargetedEndpoint(concretePath.mEndpointId);
+        if (aDelayReportData.has_value())
+        {
+            TriggerDelayReport(aDelayReportData.value());
+        }
+
         mpCallback->DispatchCommand(*this, concretePath, commandDataReader);
         DataModelCallbacks::GetInstance()->PostCommandReceived(concretePath, GetSubjectDescriptor());
     }
@@ -507,7 +517,8 @@ exit:
     return Status::Success;
 }
 
-Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement)
+Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement,
+                                                     const std::optional<InvokeRequestMessage::DelayReportData> & aDelayReportData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandPathIB::Parser commandPath;
@@ -591,6 +602,11 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
 
         if ((err = DataModelCallbacks::GetInstance()->PreCommandReceived(concretePath, GetSubjectDescriptor())) == CHIP_NO_ERROR)
         {
+            if (aDelayReportData.has_value())
+            {
+                TriggerDelayReport(aDelayReportData.value());
+            }
+
             TLV::TLVReader dataReader(commandDataReader);
             mpCallback->DispatchCommand(*this, concretePath, dataReader);
             DataModelCallbacks::GetInstance()->PostCommandReceived(concretePath, GetSubjectDescriptor());
@@ -1059,7 +1075,6 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
     VerifyOrDieWithMsg(commandCount == 2, DataManagement, "DUT failure: We were strictly expecting exactly 2 InvokeRequests");
     mReserveSpaceForMoreChunkMessages = true;
 
-    mNumTargetedEndpoints = 0;
     {
         // Response path is the same as request path since we are replying with a failure message.
         ConcreteCommandPath concreteResponsePath1;
@@ -1070,9 +1085,6 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
         VerifyOrDieWithMsg(
             TestOnlyExtractCommandPathFromNextInvokeRequest(invokeRequestsReader, concreteResponsePath2) == CHIP_NO_ERROR,
             DataManagement, "DUT Failure: Issues encountered while extracting the ConcreteCommandPath from the second request");
-
-        RecordTargetedEndpoint(concreteResponsePath1.mEndpointId);
-        RecordTargetedEndpoint(concreteResponsePath2.mEndpointId);
 
         if (faultType == NlFaultInjectionType::SeparateResponseMessagesAndInvertedResponseOrder)
         {
@@ -1100,11 +1112,6 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
                        "DUT Failure: Unexpected TLV ending of InvokeRequests");
     VerifyOrDieWithMsg(invokeRequestMessage.ExitContainer() == CHIP_NO_ERROR, DataManagement,
                        "DUT Failure: InvokeRequestMessage TLV is not properly terminated");
-
-    if (delayReportData.has_value())
-    {
-        TriggerDelayReport(delayReportData.value());
-    }
 }
 #endif // CHIP_WITH_NLFAULTINJECTION
 
