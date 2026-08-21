@@ -24,7 +24,7 @@ import inspect
 import logging
 import time
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, get_args
 
 from mobly import asserts
 
@@ -32,15 +32,17 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters import ClusterObjects as ClusterObjects
 from matter.clusters.Attribute import AttributePath, TypedAttributePath, ValueDecodeFailure
-from matter.clusters.Types import NullValue
+from matter.clusters.Types import Nullable, NullValue
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.event_attribute_reporting import WildcardAttributeSubscriptionHandler
-from matter.testing.global_attribute_ids import GlobalAttributeIds, is_standard_attribute_id
+from matter.testing.global_attribute_ids import (GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id,
+                                                 is_standard_command_id)
 from matter.testing.matter_testing import compute_mrp_retransmission_timeout_sec
-from matter.testing.spec_parsing import ConstraintReference, Constraints
+from matter.testing.problem_notices import AttributePathLocation, CommandPathLocation
+from matter.testing.spec_parsing import ConstraintReference, Constraints, XmlDataTypeComponent
 from matter.tlv import uint
 
 log = logging.getLogger(__name__)
@@ -66,6 +68,31 @@ class WritableAttributeInfo:
 
 
 @dataclass
+class CommandFieldInfo:
+    """Describes a single constrained command field discovered on the DUT.
+
+    Aggregates the cluster/command identity, the generated Python command class
+    used to invoke it, and the spec-parsed field metadata (including constraints)
+    needed to synthesize out-of-bounds payloads.
+    """
+    endpoint_id: int
+    cluster_id: int
+    cluster_name: str
+    command_id: int
+    command_name: str
+    command_class: type[ClusterObjects.ClusterCommand]
+    cluster_class: type[ClusterObjects.Cluster]
+    # The constrained field under test (spec-parsed).
+    field: XmlDataTypeComponent
+    # All spec-parsed fields of the command, used to build valid sibling values.
+    all_fields: dict[int, XmlDataTypeComponent]
+
+    @property
+    def path_str(self) -> str:
+        return f"EP{self.endpoint_id} {self.cluster_name}.{self.command_name}.{self.field.name}"
+
+
+@dataclass
 class ChangedAttribute:
     """Record of an attribute write performed by IDM tests for later verification."""
     endpoint: int
@@ -73,6 +100,120 @@ class ChangedAttribute:
     attribute: Any
     old_value: Any
     new_value: Any
+
+
+# Clusters whose commands must never be auto-invoked by IDM constraint fuzzing.
+# Violation payloads are expected to be rejected with CONSTRAINT_ERROR before any
+# execution, but a DUT that fails to enforce a constraint would *execute* the
+# command instead. For these clusters that can break the test session or the
+# device outright (fabric/credential mutation, network credentials, commissioning
+# windows and fail-safe state, OTA flows, ACLs, group keys).
+COMMAND_CONSTRAINT_DENIED_CLUSTERS = frozenset({
+    Clusters.AccessControl.id,
+    Clusters.GeneralCommissioning.id,
+    Clusters.NetworkCommissioning.id,
+    Clusters.AdministratorCommissioning.id,
+    Clusters.OperationalCredentials.id,
+    Clusters.GroupKeyManagement.id,
+    Clusters.OtaSoftwareUpdateProvider.id,
+    Clusters.OtaSoftwareUpdateRequestor.id,
+    Clusters.ThreadBorderRouterManagement.id,
+})
+
+# Individual (cluster_id, command_id) pairs to exclude from constraint fuzzing on
+# clusters that are otherwise safe. Add entries here for commands with disruptive
+# side effects or special state requirements.
+COMMAND_CONSTRAINT_DENIED_COMMANDS: frozenset[tuple[int, int]] = frozenset({
+    # State-gated: validated only while the device is identifying; per the Groups
+    # cluster spec the command is otherwise discarded with SUCCESS, so field
+    # constraints cannot be exercised without an Identify precondition.
+    # Ref: (https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/src/app_clusters/Groups.adoc#76-addgroupifidentifying-command)
+    (Clusters.Groups.id, Clusters.Groups.Commands.AddGroupIfIdentifying.command_id),
+    # State-gated: per the Scenes Management spec (RecallScene, Effect on Receipt),
+    # the Group/Scene Table lookups SHALL be performed first, returning
+    # INVALID_COMMAND / NOT_FOUND before TransitionTime is ever consumed. Exercising
+    # its constraint therefore requires a stored scene as a precondition.
+    # Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/src/app_clusters/Scenes.adoc#912-recallscene-command
+    (Clusters.ScenesManagement.id, Clusters.ScenesManagement.Commands.RecallScene.command_id),
+    # The Thermostat cluster spec mandates INVALID_COMMAND for a handle that is not
+    # present in Presets/Schedules; an out-of-constraint handle is first and foremost
+    # an unknown handle, so CONSTRAINT_ERROR cannot be observed without state setup.
+    # Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/src/app_clusters/Thermostat.adoc#1091-presethandle-field
+    (Clusters.Thermostat.id, Clusters.Thermostat.Commands.SetActivePresetRequest.command_id),
+    (Clusters.Thermostat.id, Clusters.Thermostat.Commands.SetActiveScheduleRequest.command_id),
+    # TODO: Remove once https://github.com/project-chip/connectedhomeip/issues/73090
+    # is fixed. The ember implementation (codegen/level-control.cpp) returns
+    # INVALID_COMMAND instead of CONSTRAINT_ERROR for an out-of-range Level; the
+    # code-driven LevelControlCluster already returns CONSTRAINT_ERROR, so
+    # all-devices-app with --device dimmable-light:1 passes, but all-clusters-app
+    # fails. Both implementations are maintained in parallel (there is no plan to
+    # wire the code-driven version into ember apps), so the ember code needs the
+    # direct fix tracked in the issue above.
+    (Clusters.LevelControl.id, Clusters.LevelControl.Commands.MoveToLevel.command_id),
+    # TODO: Remove once https://github.com/project-chip/connectedhomeip/issues/73090
+    # is fixed. The ember implementation (codegen/on-off-server.cpp) does not
+    # validate OnTime/OffWaitTime <= 0xFFFE; the code-driven OnOffLightingCluster
+    # already does, so all-devices-app with --device dimmable-light:1 passes, but
+    # all-clusters-app fails. Both implementations are maintained in parallel
+    # (there is no plan to wire the code-driven version into ember apps), so the
+    # ember code needs the direct fix tracked in the issue above.
+    (Clusters.OnOff.id, Clusters.OnOff.Commands.OnWithTimedOff.command_id),
+    # TODO: Remove once TransferFileDesignator length handling is resolved (SDK fix
+    # or spec clarification): the data model constraint (maxLength 32) is
+    # unconditional, but DiagnosticLogsCluster only enforces it on the BDX path, so
+    # a >32-char designator with RequestedProtocol=ResponsePayload is accepted. The
+    # spec's Effect on Receipt enumerates its status-code exceptions (e.g.
+    # INVALID_COMMAND for out-of-range Intent/RequestedProtocol) and contains no
+    # carve-out exempting the designator from validation for non-BDX protocols.
+    # Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/src/service_device_management/DiagnosticLogsCluster.adoc#514-effect-on-receipt
+    (Clusters.DiagnosticLogs.id, Clusters.DiagnosticLogs.Commands.RetrieveLogsRequest.command_id),
+    # Value-gated: DurationSeconds is only evaluated when TestOperation enables
+    # testing; with the harness's default TestOperation the field
+    # is ignored and the command returns SUCCESS. Enabling test mode to exercise the
+    # constraint would put a non-compliant DUT into groupcast testing state.
+    # Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/71a64a58ee82ddaa1cebea93b9919f01cfaff280/src/service_device_management/Groupcast.adoc#762-durationseconds-field
+    (Clusters.Groupcast.id, Clusters.Groupcast.Commands.GroupcastTesting.command_id),
+})
+
+# Type-intrinsic value ranges for numeric spec datatypes. Used to skip constraint
+# bounds that the type itself already enforces (e.g. an unsigned type is already
+# bound at 0, so an under-min violation of "min 0" cannot be encoded).
+_NUMERIC_TYPE_RANGES: dict[str, tuple[int, int]] = {
+    'uint8': (0, 0xFF), 'uint16': (0, 0xFFFF), 'uint24': (0, 0xFF_FFFF),
+    'uint32': (0, 0xFFFF_FFFF), 'uint40': (0, 0xFF_FFFF_FFFF), 'uint48': (0, 0xFFFF_FFFF_FFFF),
+    'uint56': (0, 0xFF_FFFF_FFFF_FFFF), 'uint64': (0, 0xFFFF_FFFF_FFFF_FFFF),
+    'int8': (-0x80, 0x7F), 'int16': (-0x8000, 0x7FFF), 'int24': (-0x80_0000, 0x7F_FFFF),
+    'int32': (-0x8000_0000, 0x7FFF_FFFF), 'int40': (-0x80_0000_0000, 0x7F_FFFF_FFFF),
+    'int48': (-0x8000_0000_0000, 0x7FFF_FFFF_FFFF), 'int56': (-0x80_0000_0000_0000, 0x7F_FFFF_FFFF_FFFF),
+    'int64': (-0x8000_0000_0000_0000, 0x7FFF_FFFF_FFFF_FFFF),
+    # Percentages are type-bound at 100 / 10000 per the spec data type definitions.
+    'percent': (0, 100), 'percent100ths': (0, 10000),
+    # Time/identifier types that alias unsigned integers of a fixed width.
+    'elapsed-s': (0, 0xFFFF_FFFF), 'epoch-s': (0, 0xFFFF_FFFF), 'epoch-us': (0, 0xFFFF_FFFF_FFFF_FFFF),
+    'systime-us': (0, 0xFFFF_FFFF_FFFF_FFFF), 'systime-ms': (0, 0xFFFF_FFFF_FFFF_FFFF),
+    'posix-ms': (0, 0xFFFF_FFFF_FFFF_FFFF),
+    'temperature': (-27315, 0x7FFF),
+}
+
+
+def _encodable_numeric_range(datatype: str, is_nullable: bool) -> tuple[int, int] | None:
+    """Return the (min, max) values a field of this spec datatype can carry on the wire.
+
+    Returns None for datatypes outside the numeric set (enum/bitmap/struct/list/string).
+    Nullable numerics reserve one end of the value space for null (the type maximum when
+    unsigned, the minimum when signed), so a violation encoded there is rejected by the
+    null encoding rather than by the field's bound.
+    """
+    type_range = _NUMERIC_TYPE_RANGES.get(datatype.lower())
+    if type_range is None:
+        return None
+    type_min, type_max = type_range
+    if is_nullable:
+        if type_min < 0:
+            type_min += 1
+        else:
+            type_max -= 1
+    return type_min, type_max
 
 # ============================================================================
 # Module-Level Utility Functions
@@ -438,11 +579,33 @@ class IDMBaseTest(BasicCompositionTests):
         if not ref_attr:
             return None
 
+        # An optional referenced attribute may simply not be implemented on this
+        # endpoint, in which case the bound cannot be resolved and there is nothing
+        # for the DUT to enforce. That is a coverage gap, not a DUT defect, so record
+        # a warning and leave the bound unresolved (caller skips it) instead of
+        # reading a path the DUT never claimed and recording a read error for it.
+        if ref_attr.attribute_id not in self.endpoints_tlv.get(endpoint_id, {}).get(cluster_class.id, {}):
+            self.record_warning(
+                test_name=self.current_test_info.name,
+                location=AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_class.id,
+                                               attribute_id=ref_attr.attribute_id),
+                problem=(f"Constraint references {cluster_class.__name__}.{ref.attribute}, which is not "
+                         f"implemented on this endpoint; the referenced bound cannot be checked"))
+            return None
+
+        # This is an incidental read to resolve a sibling constraint reference, not the
+        # value under test. If it can't be read, we can't build a valid payload for the
+        # field anyway, so return None (bound left unresolved, caller skips it) rather
+        # than raising TestFailure and aborting the whole step. Wildcard-subscription
+        # verification stays enabled: a real subscription mismatch still fails the test.
         ref_value = await self.read_single_attribute_check_success(
             endpoint=endpoint_id,
             cluster=cluster_class,
-            attribute=ref_attr
+            attribute=ref_attr,
+            assert_on_error=False
         )
+        if ref_value is None:
+            return None
 
         if ref.field:
             python_field_name = ref.field[0].lower() + ref.field[1:]
@@ -452,30 +615,54 @@ class IDMBaseTest(BasicCompositionTests):
 
         return ref_value if isinstance(ref_value, (int, float)) else None
 
+    @staticmethod
+    def _is_nullable_attribute(attribute: type[ClusterObjects.ClusterAttributeDescriptor]) -> bool:
+        """Whether the attribute's generated type reserves a value for null.
+
+        Read from the generated Python type rather than the spec XML because it is the
+        encoding that matters here: on a nullable numeric, the reserved end of the value
+        space encodes as null instead of as an out-of-bounds value.
+        """
+        return Nullable in get_args(attribute.attribute_type.Type)
+
     def generate_constraint_violation(self, attr_info: WritableAttributeInfo, constraints: Constraints):
-        """Generate a test value that violates the given constraints."""
-        datatype = attr_info.datatype
+        """Generate a test value that violates the given constraints, or None if none can be.
+
+        Bounds that the attribute's own data type already enforces are skipped (e.g.
+        under-min of an unsigned attribute with min 0, or over-max of a bound equal to the
+        type's maximum), since such violations cannot be encoded on the wire: the generated
+        value would be in range and a compliant DUT accepting it would be reported as a
+        failure to enforce the constraint.
+        """
+        datatype = attr_info.datatype.lower()
 
         # String constraints
         if 'string' in datatype or 'octstr' in datatype:
             if constraints.max_length is not None:
                 return 'x' * (constraints.max_length + 1)
-            if constraints.min_length is not None:
-                return 'x' * max(0, constraints.min_length - 1)
+            if constraints.min_length is not None and constraints.min_length > 0:
+                return 'x' * (constraints.min_length - 1)
+            return None
 
-        # List constraints
+        # List constraints. Over-max_count violations are not generated: they would
+        # require synthesizing max_count+1 *valid* elements, which is not safely
+        # possible for arbitrary element types.
         if 'list' in datatype:
-            if constraints.max_count is not None:
-                return [{}] * (constraints.max_count + 1)
-            if constraints.min_count is not None:
-                count = max(0, constraints.min_count - 1)
-                return [{}] * count if count > 0 else []
+            if constraints.min_count is not None and constraints.min_count > 0:
+                return []
+            return None
 
         # Numeric-like constraints (int, uint, percent, elapsed-s, temperature, etc.)
-        if constraints.max_value is not None:
+        type_range = _encodable_numeric_range(datatype, self._is_nullable_attribute(attr_info.attribute))
+        if type_range is None:
+            # Enum/bitmap/struct-typed attributes are out of scope for automated
+            # violation generation.
+            return None
+        type_min, type_max = type_range
+        if constraints.max_value is not None and constraints.max_value < type_max:
             return constraints.max_value + 1
-        if constraints.min_value is not None:
-            return max(0, constraints.min_value - 1)
+        if constraints.min_value is not None and constraints.min_value > type_min:
+            return constraints.min_value - 1
 
         return None
 
@@ -542,9 +729,296 @@ class IDMBaseTest(BasicCompositionTests):
                      attr_info.attribute_name, original_value, test_value)
             return True
 
-        log.error("FAIL: %s.%s got %s instead of CONSTRAINT_ERROR for value %s", attr_info.cluster_name, attr_info.attribute_name,
-                  result_status, test_value)
+        # The DUT did not reject the write. Read back to distinguish a DUT that stored the
+        # out-of-bounds value (and is now holding an illegal one) from one that accepted
+        # the write but ignored or clamped it - both violate the spec, but only the former
+        # leaves the DUT in an illegal state for the remaining steps. Restore the original
+        # value either way so later steps see the device as we found it.
+        stored_value = await self.read_single_attribute_check_success(
+            endpoint=attr_info.endpoint_id,
+            cluster=attr_info.cluster_class,
+            attribute=attr_info.attribute
+        )
+        # Status is an IntEnum, which formats as a bare number under Python 3.11; log the
+        # name alongside it so the failure reads as SUCCESS rather than as "got 0".
+        log.error("FAIL: %s.%s got %s (%s) instead of CONSTRAINT_ERROR for value %s; attribute now reads %s",
+                  attr_info.cluster_name, attr_info.attribute_name, getattr(result_status, 'name', result_status),
+                  int(result_status), test_value, stored_value)
+
+        if stored_value != original_value:
+            restore_result = await self.default_controller.WriteAttribute(
+                nodeId=self.dut_node_id,
+                attributes=[(attr_info.endpoint_id, attr_info.attribute(original_value))]
+            )
+            if restore_result[0].Status != Status.Success:
+                log.warning("Failed to restore %s.%s to %s: %s", attr_info.cluster_name, attr_info.attribute_name,
+                            original_value, restore_result[0].Status)
         return False
+
+    # Command Constraint Testing (TC-IDM-9.1 step 1)
+
+    def discover_constrained_command_fields(self) -> list[CommandFieldInfo]:
+        """Discover all accepted-command fields with spec constraints on the DUT.
+
+        Walks the wildcard-read composition (endpoints_tlv), intersects each
+        cluster's AcceptedCommandList with the spec-parsed command definitions
+        and the generated Python command classes, and returns one entry per
+        constrained field. Clusters/commands on the constraint-fuzzing deny
+        lists are excluded.
+        """
+        infos: list[CommandFieldInfo] = []
+        for endpoint_id, endpoint in self.endpoints_tlv.items():
+            for cluster_id, cluster_data in endpoint.items():
+                if not is_standard_cluster_id(cluster_id):
+                    continue
+                if cluster_id not in self.xml_clusters or cluster_id not in Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS:
+                    continue
+                if cluster_id in COMMAND_CONSTRAINT_DENIED_CLUSTERS:
+                    log.info("Skipping cluster 0x%04X on EP%s: deny-listed for command constraint fuzzing",
+                             cluster_id, endpoint_id)
+                    continue
+
+                xml_cluster = self.xml_clusters[cluster_id]
+                accepted_command_ids = cluster_data.get(GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID, [])
+                for command_id in accepted_command_ids:
+                    if not is_standard_command_id(command_id):
+                        continue
+                    if (cluster_id, command_id) in COMMAND_CONSTRAINT_DENIED_COMMANDS:
+                        log.info("Skipping command 0x%04X:0x%02X on EP%s: deny-listed for command constraint fuzzing",
+                                 cluster_id, command_id, endpoint_id)
+                        continue
+                    xml_command = xml_cluster.accepted_commands.get(command_id)
+                    command_class = Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id].get(command_id)
+                    if xml_command is None or command_class is None:
+                        continue
+
+                    for field in xml_command.fields.values():
+                        if field.constraints is None or not field.constraints.has_constraints():
+                            continue
+                        infos.append(CommandFieldInfo(
+                            endpoint_id=endpoint_id,
+                            cluster_id=cluster_id,
+                            cluster_name=xml_cluster.name,
+                            command_id=command_id,
+                            command_name=xml_command.name,
+                            command_class=command_class,
+                            cluster_class=Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id],
+                            field=field,
+                            all_fields=xml_command.fields,
+                        ))
+        return infos
+
+    @staticmethod
+    def _command_field_label(command_class: type[ClusterObjects.ClusterCommand], field_id: int) -> str | None:
+        """Map a spec field ID to the generated Python dataclass attribute name via the descriptor tags."""
+        for descriptor_field in command_class.descriptor.Fields:
+            if descriptor_field.Tag == field_id:
+                return descriptor_field.Label
+        return None
+
+    @staticmethod
+    def _allowed_lengths(constraints: Constraints) -> list[int] | None:
+        """Interpret an 'allowed' constraint as exact length(s) for string/octstr fields.
+
+        Returns sorted integer lengths, or None if the allowed values are not numeric
+        (e.g. enum member names, which are value constraints rather than lengths).
+        """
+        if not constraints.allowed:
+            return None
+        try:
+            return sorted(int(v, 0) for v in constraints.allowed)
+        except ValueError:
+            return None
+
+    async def _resolved_command_field_constraints(self, info: CommandFieldInfo) -> Constraints:
+        """Return a copy of the field's constraints with dynamic references resolved against the DUT."""
+        constraints = copy.copy(info.field.constraints)
+        if constraints.min_value_ref:
+            constraints.min_value = await self.resolve_dynamic_constraint(
+                info.cluster_class, info.endpoint_id, constraints.min_value_ref)
+        if constraints.max_value_ref:
+            constraints.max_value = await self.resolve_dynamic_constraint(
+                info.cluster_class, info.endpoint_id, constraints.max_value_ref)
+        if constraints.min_count_ref:
+            constraints.min_count = await self.resolve_dynamic_constraint(
+                info.cluster_class, info.endpoint_id, constraints.min_count_ref)
+        if constraints.max_count_ref:
+            constraints.max_count = await self.resolve_dynamic_constraint(
+                info.cluster_class, info.endpoint_id, constraints.max_count_ref)
+        return constraints
+
+    def generate_command_field_violations(self, field: XmlDataTypeComponent,
+                                          constraints: Constraints) -> list[tuple[str, Any]]:
+        """Generate (description, value) pairs that each violate one bound of the field's constraints.
+
+        Bounds that the field's own data type already enforces are skipped (e.g.
+        under-min of an unsigned field with min 0, or over-max of a bound equal to
+        the type's maximum), since such violations cannot be encoded on the wire.
+        """
+        violations: list[tuple[str, Any]] = []
+        datatype = (field.type_info or '').lower()
+
+        if datatype in ('string', 'octstr'):
+            def make(length: int) -> str | bytes:
+                return 'x' * length if datatype == 'string' else b'\x00' * length
+
+            allowed_lengths = self._allowed_lengths(constraints)
+            if allowed_lengths:
+                # 'allowed' on a string/octstr field is an exact-length constraint.
+                violations.append((f"length {allowed_lengths[-1] + 1} > allowed {allowed_lengths}",
+                                   make(allowed_lengths[-1] + 1)))
+                if allowed_lengths[0] > 0:
+                    violations.append((f"length {allowed_lengths[0] - 1} < allowed {allowed_lengths}",
+                                       make(allowed_lengths[0] - 1)))
+            if constraints.max_length is not None:
+                violations.append((f"length {constraints.max_length + 1} > maxLength {constraints.max_length}",
+                                   make(constraints.max_length + 1)))
+            if constraints.min_length is not None and constraints.min_length > 0:
+                violations.append((f"length {constraints.min_length - 1} < minLength {constraints.min_length}",
+                                   make(constraints.min_length - 1)))
+            return violations
+
+        if datatype == 'list':
+            if constraints.min_count is not None and constraints.min_count > 0:
+                violations.append((f"count 0 < minCount {constraints.min_count}", []))
+            # Over-max_count violations are not generated: they would require
+            # synthesizing max_count+1 *valid* list elements generically, which is
+            # not safely possible for arbitrary element types.
+            return violations
+
+        type_range = _encodable_numeric_range(datatype, field.is_nullable)
+        if type_range is None:
+            # Enum/bitmap/struct-typed fields and 'allowed' *value* constraints on
+            # numeric types are out of scope for automated violation generation.
+            return violations
+        type_min, type_max = type_range
+        if constraints.max_value is not None and constraints.max_value < type_max:
+            violations.append((f"value {constraints.max_value + 1} > max {constraints.max_value}",
+                               constraints.max_value + 1))
+        if constraints.min_value is not None and constraints.min_value > type_min:
+            violations.append((f"value {constraints.min_value - 1} < min {constraints.min_value}",
+                               constraints.min_value - 1))
+        return violations
+
+    def _generate_valid_command_field_value(self, field: XmlDataTypeComponent) -> Any | None:
+        """Generate an in-range value for a sibling field, or None if none can be generated.
+
+        Only static constraints are considered; no value can be generated for fields
+        whose bounds depend on unresolved attribute references, or whose types are out
+        of scope here (enum/bitmap/struct/list). A None return for an unconstrained
+        field is harmless (its class default cannot violate anything), but for a
+        constrained field it means the default may itself be out of range, so callers
+        must not attribute a CONSTRAINT_ERROR to the field under test.
+        """
+        constraints = field.constraints
+        if constraints is None or not constraints.has_constraints():
+            return None
+        datatype = (field.type_info or '').lower()
+
+        if datatype in ('string', 'octstr'):
+            allowed_lengths = self._allowed_lengths(constraints)
+            if allowed_lengths:
+                length = allowed_lengths[0]
+            elif constraints.min_length is not None:
+                length = constraints.min_length
+            else:
+                length = 0
+            return 'a' * length if datatype == 'string' else b'\x00' * length
+
+        if datatype in _NUMERIC_TYPE_RANGES:
+            if constraints.min_value is not None:
+                return constraints.min_value
+            if constraints.max_value is not None and constraints.max_value < 0:
+                return constraints.max_value
+        return None
+
+    async def check_command_constraint(self, info: CommandFieldInfo) -> bool | None:
+        """Test a single command field's constraints by sending violating payloads.
+
+        Sends one Invoke per violated bound, with all sibling fields set to
+        in-range values, and expects CONSTRAINT_ERROR for each. Returns True if
+        every generated violation was properly rejected, False if any was not,
+        and None if the field could not be tested: no violation could be generated
+        for it, or a constrained required sibling could not be given a valid value
+        (which would make a CONSTRAINT_ERROR ambiguous).
+        """
+        target_label = self._command_field_label(info.command_class, info.field.value)
+        if target_label is None:
+            log.warning("Skipping %s: field id %s not present in generated command class",
+                        info.path_str, info.field.value)
+            return None
+
+        constraints = await self._resolved_command_field_constraints(info)
+        violations = self.generate_command_field_violations(info.field, constraints)
+        if not violations:
+            return None
+
+        # Build valid values for the other fields so a CONSTRAINT_ERROR can only be
+        # attributed to the field under test. Optional siblings are left unset.
+        base_kwargs: dict[str, Any] = {}
+        for field_id, sibling in info.all_fields.items():
+            if field_id == info.field.value or sibling.is_optional:
+                continue
+            sibling_label = self._command_field_label(info.command_class, field_id)
+            if sibling_label is None:
+                continue
+            valid_value = self._generate_valid_command_field_value(sibling)
+            if valid_value is None:
+                # A required sibling that is itself constrained keeps its generated
+                # class default, which may violate the sibling's own bounds. The DUT
+                # would then return CONSTRAINT_ERROR for the sibling and the target
+                # field would be wrongly credited with enforcing its constraint, so
+                # skip the field rather than report an unobserved pass.
+                if sibling.constraints is not None and sibling.constraints.has_constraints():
+                    log.warning("Skipping %s: cannot generate a valid value for constrained "
+                                "required field %s", info.path_str, sibling_label)
+                    return None
+                continue
+            base_kwargs[sibling_label] = valid_value
+
+        timed_request_timeout_ms = 65535 if info.command_class.must_use_timed_invoke else None
+        all_enforced = True
+        for description, bad_value in violations:
+            command = info.command_class(**base_kwargs, **{target_label: bad_value})
+            try:
+                response = await self.default_controller.SendCommand(
+                    nodeId=self.dut_node_id, endpoint=info.endpoint_id, payload=command,
+                    timedRequestTimeoutMs=timed_request_timeout_ms)
+            except InteractionModelError as e:
+                if e.status == Status.ConstraintError:
+                    log.info("PASS: %s properly rejected %s", info.path_str, description)
+                elif e.status == Status.Success:
+                    log.error("FAIL: %s returned %s instead of CONSTRAINT_ERROR for %s",
+                              info.path_str, e.status, description)
+                    all_enforced = False
+                else:
+                    self.record_warning(
+                        test_name=self.current_test_info.name,
+                        location=CommandPathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
+                                                     command_id=info.command_id),
+                        problem=(f"{info.path_str} accepted violating payload ({description})"))
+
+                continue
+
+            # Some commands convey their result in a Status field of their response
+            # command (e.g. AddGroupResponse.Status, AddSceneResponse.Status) rather
+            # than as an IM status; their cluster specs mandate CONSTRAINT_ERROR be
+            # reported there. Accept that as proper enforcement.
+            embedded_status = getattr(response, 'status', None)
+            if embedded_status == Status.ConstraintError:
+                log.info("PASS: %s properly rejected %s (via response command status)",
+                         info.path_str, description)
+            elif embedded_status == Status.Success:
+                log.error("FAIL: %s returned %s instead of CONSTRAINT_ERROR for %s",
+                          info.path_str, embedded_status, description)
+                all_enforced = False
+            else:
+                self.record_warning(
+                    test_name=self.current_test_info.name,
+                    location=CommandPathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
+                                                 command_id=info.command_id),
+                    problem=(f"{info.path_str} accepted violating payload ({description})"))
+        return all_enforced
 
     def checkable_attributes(self, cluster_id, cluster, xml_cluster) -> list[uint]:
         """Get list of attributes that exist on the DUT and have spec/codegen data available."""
