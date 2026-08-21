@@ -1109,23 +1109,10 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
         ROOT_NODE_DEVICE_TYPE = 0x0016
         SECONDARY_NETWORK_INTERFACE_DEVICE_TYPE = 0x0019
 
-        COMMON_AREA_NAMESPACE_ID = 0x10
-        COMMON_CLOSURE_NAMESPACE_NAMESPACE_ID = 0x01
-        COMMON_COMPASS_DIRECTION_NAMESPACE_ID = 0x02
-        COMMON_COMPASS_LOCATION_NAMESPACE_ID = 0x03
-        COMMON_DIRECTION_NAMESPACE_ID = 0x04
-        COMMON_LANDMARK_NAMESPACE_ID = 0x11
-        COMMON_LEVEL_NAMESPACE_ID = 0x05
-        COMMON_LOCATION_NAMESPACE_ID = 0x06
-        COMMON_NUMBERNAME_SPACE_ID = 0x07
-        COMMON_POSITION_NAMESPACE_ID = 0x08
-        COMMON_RELATIVE_POSITION_ID = 0x12
-        ELECTRICAL_MEASUREMENT_NAMESPACE_ID = 0x0A
-        LAUNDRY_NAMESPACE_ID = 0x0E
-        POWER_SOURCE_NAMESPACE_ID = 0x0F
-        REFRIGERATOR_NAMESPACE_ID = 0x41
-        ROOM_AIRCONDITIONER_NAMESPACE_ID = 0x42
-        SWITCHES_NAMESPACE_ID = 0x43
+        # Namespace IDs accepted for non-manufacturer-specific TagList entries are derived from the
+        # bundled data model's namespaces/*.xml files (self.xml_namespaces), rather than a hand-coded
+        # whitelist, so newly-added namespaces (e.g. the Matter 1.6 Closure family) are picked up
+        # automatically without needing this test to be updated for every spec revision.
 
         END_POINT_UNIQUE_ID_LENGTH_BYTES = 32
 
@@ -1281,23 +1268,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                 self.print_step(5.2, f"verifying namespaceID value falls under defined namespaces for endpoint: {endpoint_id}")
 
                 if isinstance(tag_struct.mfgCode, Nullable):
-                    if tag_struct.namespaceID not in [COMMON_CLOSURE_NAMESPACE_NAMESPACE_ID,
-                                                      COMMON_COMPASS_DIRECTION_NAMESPACE_ID,
-                                                      COMMON_COMPASS_LOCATION_NAMESPACE_ID,
-                                                      COMMON_DIRECTION_NAMESPACE_ID,
-                                                      COMMON_LEVEL_NAMESPACE_ID,
-                                                      COMMON_LOCATION_NAMESPACE_ID,
-                                                      COMMON_NUMBERNAME_SPACE_ID,
-                                                      COMMON_POSITION_NAMESPACE_ID,
-                                                      ELECTRICAL_MEASUREMENT_NAMESPACE_ID,
-                                                      LAUNDRY_NAMESPACE_ID,
-                                                      POWER_SOURCE_NAMESPACE_ID,
-                                                      COMMON_AREA_NAMESPACE_ID,
-                                                      COMMON_LANDMARK_NAMESPACE_ID,
-                                                      COMMON_RELATIVE_POSITION_ID,
-                                                      REFRIGERATOR_NAMESPACE_ID,
-                                                      ROOM_AIRCONDITIONER_NAMESPACE_ID,
-                                                      SWITCHES_NAMESPACE_ID]:
+                    if tag_struct.namespaceID not in self.xml_namespaces:
                         self.fail_current_test("Non manufacturer specific tag is not a tag from namespace defined in spec")
                 else:
 
