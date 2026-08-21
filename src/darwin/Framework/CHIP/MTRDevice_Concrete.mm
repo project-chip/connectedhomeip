@@ -2905,6 +2905,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         }
 
         self->_connectivityMonitor = [[MTRDeviceConnectivityMonitor alloc] initWithCompressedFabricID:compressedFabricID nodeID:self.nodeID];
+        // Note: the handler block below captures `self` weakly via the outer mtr_weakify / inner
+        // mtr_strongify pattern, so there is no retain cycle between the monitor and MTRDevice
+        // (unlike the daemon-lifetime leak this PR fixed in MTRDeviceController_Concrete, where
+        // the equivalent handler captured the monitor by strong name).  Teardown of the monitor
+        // is driven by -_stopConnectivityMonitoring, which is invoked from the subscription
+        // success/reset paths and unconditionally from -invalidate.
         [self->_connectivityMonitor startMonitoringWithHandler:^{
             mtr_strongify(self);
             VerifyOrReturn(self, MTR_LOG_DEBUG("_setupConnectivityMonitoring startMonitoringWithHandler called back with nil MTRDevice"));
