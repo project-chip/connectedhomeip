@@ -20,8 +20,10 @@
 
 #include <memory>
 
+#include <app/BufferedReadCallback.h>
 #include <app/CASESessionManager.h>
 #include <app/CommandSender.h>
+#include <app/ReadClient.h>
 #include <app/clusters/av-analysis-server/AvAnalysisCameraClient.h>
 #include <clusters/CameraAvStreamManagement/Commands.h>
 #include <lib/core/DataModelTypes.h>
@@ -42,7 +44,7 @@ namespace Clusters {
  *   client.Init(Server::GetInstance().GetCASESessionManager(), kCameraAvStreamManagementEndpoint);
  *   cluster.SetCameraClient(&client);
  */
-class DefaultAvAnalysisCameraClient : public AvAnalysisCameraClient, public CommandSender::Callback
+class DefaultAvAnalysisCameraClient : public AvAnalysisCameraClient, public CommandSender::Callback, public ReadClient::Callback
 {
 public:
     /**
@@ -89,9 +91,10 @@ public:
     }
 
     // AvAnalysisCameraClient
-    CHIP_ERROR RequestVideoStreamAllocation(const ScopedNodeId & aCameraNode, Callback & aCallback) override;
+    CHIP_ERROR RequestVideoStreamAllocation(const ScopedNodeId & aCameraNode,
+                                            AvAnalysisCameraClient::Callback & aCallback) override;
     CHIP_ERROR RequestVideoStreamDeallocation(const ScopedNodeId & aCameraNode, uint16_t aAnalysisStreamId,
-                                              Callback & aCallback) override;
+                                              AvAnalysisCameraClient::Callback & aCallback) override;
     void Cancel() override;
 
     // CommandSender::Callback
@@ -99,6 +102,11 @@ public:
                     TLV::TLVReader * apData) override;
     void OnError(const CommandSender * apCommandSender, CHIP_ERROR aError) override;
     void OnDone(CommandSender * apCommandSender) override;
+
+    // ReadClient::Callback (profile discovery reads)
+    void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
+    void OnError(CHIP_ERROR aError) override;
+    void OnDone(ReadClient * apReadClient) override;
 
 protected:
     /**
@@ -128,6 +136,11 @@ protected:
     void FillProfileFromConfiguration(CameraProfile & outProfile) const;
 
     /**
+     * Profile being assembled for the pending request.
+     */
+    const CameraProfile & CurrentProfile() const { return mProfile; }
+
+    /**
      * Builds the VideoStreamAllocate request (StreamUsage Analysis) from a camera profile.
      */
     static CameraAvStreamManagement::Commands::VideoStreamAllocate::Type BuildAllocateRequest(const CameraProfile & aProfile);
@@ -141,7 +154,7 @@ private:
     };
 
     CHIP_ERROR StartRequest(PendingRequest aRequest, const ScopedNodeId & aCameraNode, uint16_t aAnalysisStreamId,
-                            Callback & aCallback);
+                            AvAnalysisCameraClient::Callback & aCallback);
     CHIP_ERROR SendPendingCommand(Messaging::ExchangeManager & aExchangeMgr, const SessionHandle & aSessionHandle);
     void FinishRequest(Protocols::InteractionModel::Status aStatus, uint16_t aStreamId);
 
@@ -153,14 +166,18 @@ private:
     bool mCameraHasWatermark                 = false;
     bool mCameraHasOSD                       = false;
 
-    PendingRequest mPendingRequest = PendingRequest::kNone;
-    uint16_t mPendingStreamId      = 0;
-    Callback * mPendingCallback    = nullptr;
-    bool mResponseDelivered        = false;
+    PendingRequest mPendingRequest                      = PendingRequest::kNone;
+    uint16_t mPendingStreamId                           = 0;
+    AvAnalysisCameraClient::Callback * mPendingCallback = nullptr;
+    bool mResponseDelivered                             = false;
     CameraProfile mProfile;
     // Session/exchange manager held across the discovery phase of the pending request
     SessionHolder mSessionHolder;
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
+    // Discovery read state
+    BufferedReadCallback mBufferedReadCallback{ *this };
+    Platform::UniquePtr<ReadClient> mReadClient;
+    CHIP_ERROR mDiscoveryError = CHIP_NO_ERROR;
     std::unique_ptr<CommandSender> mCommandSender;
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;

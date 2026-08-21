@@ -18,6 +18,8 @@
 #include <app/clusters/av-analysis-server/DefaultAvAnalysisCameraClient.h>
 #include <clusters/CameraAvStreamManagement/Commands.h>
 #include <clusters/CameraAvStreamManagement/Ids.h>
+#include <clusters/Descriptor/Attributes.h>
+#include <clusters/Descriptor/Ids.h>
 #include <lib/core/TLV.h>
 
 namespace {
@@ -125,7 +127,7 @@ TEST_F(TestDefaultAvAnalysisCameraClient, AllocationSuccessDecodesVideoStreamId)
     ConcreteCommandPath responsePath(kCameraEndpoint, CameraAvStreamManagement::Id,
                                      CameraAvStreamManagement::Commands::VideoStreamAllocateResponse::Id);
     mClient.OnResponse(nullptr, responsePath, StatusIB(), &reader);
-    mClient.OnDone(nullptr);
+    mClient.OnDone(static_cast<CommandSender *>(nullptr));
 
     EXPECT_EQ(mCallback.mAllocatedCount, 1);
     EXPECT_EQ(mCallback.mLastStatus, Status::Success);
@@ -142,7 +144,7 @@ TEST_F(TestDefaultAvAnalysisCameraClient, AllocationSuccessWithoutPayloadIsFailu
     ConcreteCommandPath responsePath(kCameraEndpoint, CameraAvStreamManagement::Id,
                                      CameraAvStreamManagement::Commands::VideoStreamAllocateResponse::Id);
     mClient.OnResponse(nullptr, responsePath, StatusIB(), nullptr);
-    mClient.OnDone(nullptr);
+    mClient.OnDone(static_cast<CommandSender *>(nullptr));
 
     EXPECT_EQ(mCallback.mAllocatedCount, 1);
     EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
@@ -154,7 +156,7 @@ TEST_F(TestDefaultAvAnalysisCameraClient, CameraErrorStatusIsPropagated)
 
     // Spec 11.9.8: the camera's status code (e.g. RESOURCE_EXHAUSTED) is propagated verbatim
     mClient.OnError(nullptr, StatusIB(Status::ResourceExhausted).ToChipError());
-    mClient.OnDone(nullptr);
+    mClient.OnDone(static_cast<CommandSender *>(nullptr));
 
     EXPECT_EQ(mCallback.mAllocatedCount, 1);
     EXPECT_EQ(mCallback.mLastStatus, Status::ResourceExhausted);
@@ -167,7 +169,7 @@ TEST_F(TestDefaultAvAnalysisCameraClient, DeallocationSuccessReportsStreamId)
     ConcreteCommandPath responsePath(kCameraEndpoint, CameraAvStreamManagement::Id,
                                      CameraAvStreamManagement::Commands::VideoStreamDeallocate::Id);
     mClient.OnResponse(nullptr, responsePath, StatusIB(), nullptr);
-    mClient.OnDone(nullptr);
+    mClient.OnDone(static_cast<CommandSender *>(nullptr));
 
     EXPECT_EQ(mCallback.mDeallocatedCount, 1);
     EXPECT_EQ(mCallback.mLastStatus, Status::Success);
@@ -179,7 +181,7 @@ TEST_F(TestDefaultAvAnalysisCameraClient, CompletionIsDeliveredExactlyOnce)
     EXPECT_EQ(mClient.RequestVideoStreamAllocation(kCameraNode, mCallback), CHIP_NO_ERROR);
 
     mClient.OnError(nullptr, StatusIB(Status::Failure).ToChipError());
-    mClient.OnDone(nullptr); // OnDone after OnError must not produce a second callback
+    mClient.OnDone(static_cast<CommandSender *>(nullptr)); // OnDone after OnError must not produce a second callback
 
     EXPECT_EQ(mCallback.mAllocatedCount, 1);
 }
@@ -190,6 +192,7 @@ class ProfileTestClient : public DefaultAvAnalysisCameraClient
 public:
     using DefaultAvAnalysisCameraClient::BuildAllocateRequest;
     using DefaultAvAnalysisCameraClient::CameraProfile;
+    using DefaultAvAnalysisCameraClient::CurrentProfile;
     using DefaultAvAnalysisCameraClient::FillProfileFromConfiguration;
     using DefaultAvAnalysisCameraClient::OnProfileDiscoveryComplete;
 
@@ -286,7 +289,7 @@ TEST_F(TestDefaultAvAnalysisCameraClient, CancelDropsPendingRequestWithoutComple
 
     // Late interaction events after Cancel must not produce a completion
     mClient.OnError(nullptr, StatusIB(Status::Failure).ToChipError());
-    mClient.OnDone(nullptr);
+    mClient.OnDone(static_cast<CommandSender *>(nullptr));
     EXPECT_EQ(mCallback.mAllocatedCount, 0);
 
     // The client accepts a new request after cancellation
@@ -294,11 +297,57 @@ TEST_F(TestDefaultAvAnalysisCameraClient, CancelDropsPendingRequestWithoutComple
     EXPECT_EQ(mClient.mConnectRequests, 2);
 }
 
+// Encodes a Descriptor ServerList value (array of cluster ids) into aBuffer and positions aReader on it
+void EncodeServerList(const ClusterId * aClusters, size_t aCount, uint8_t * aBuffer, size_t aBufferSize, TLV::TLVReader & aReader)
+{
+    TLV::TLVWriter writer;
+    writer.Init(aBuffer, aBufferSize);
+    TLV::TLVType containerType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, containerType), CHIP_NO_ERROR);
+    for (size_t i = 0; i < aCount; i++)
+    {
+        ASSERT_EQ(writer.Put(TLV::AnonymousTag(), aClusters[i]), CHIP_NO_ERROR);
+    }
+    ASSERT_EQ(writer.EndContainer(containerType), CHIP_NO_ERROR);
+
+    aReader.Init(aBuffer, writer.GetLengthWritten());
+    ASSERT_EQ(aReader.Next(), CHIP_NO_ERROR);
+}
+
+TEST_F(TestDefaultAvAnalysisCameraClient, DiscoveryFindsAvsmEndpointInServerList)
+{
+    ProfileTestClient client;
+    ASSERT_EQ(client.Init(&mCASESessionManager, kCameraEndpoint), CHIP_NO_ERROR);
+
+    uint8_t buffer[64];
+    TLV::TLVReader reader;
+
+    // Endpoint 0 serves Descriptor but not CameraAVStreamManagement: not a match
+    const ClusterId kRootClusters[] = { Descriptor::Id };
+    EncodeServerList(kRootClusters, MATTER_ARRAY_SIZE(kRootClusters), buffer, sizeof(buffer), reader);
+    ConcreteDataAttributePath rootPath(0, Descriptor::Id, Descriptor::Attributes::ServerList::Id);
+    client.OnAttributeData(rootPath, &reader, StatusIB());
+    EXPECT_EQ(client.CurrentProfile().avsmEndpoint, kInvalidEndpointId);
+
+    // Endpoint 3 serves CameraAVStreamManagement: discovered
+    const ClusterId kCameraClusters[] = { Descriptor::Id, CameraAvStreamManagement::Id };
+    EncodeServerList(kCameraClusters, MATTER_ARRAY_SIZE(kCameraClusters), buffer, sizeof(buffer), reader);
+    ConcreteDataAttributePath cameraPath(3, Descriptor::Id, Descriptor::Attributes::ServerList::Id);
+    client.OnAttributeData(cameraPath, &reader, StatusIB());
+    EXPECT_EQ(client.CurrentProfile().avsmEndpoint, 3);
+
+    // First match wins: a later endpoint with the cluster does not overwrite it
+    EncodeServerList(kCameraClusters, MATTER_ARRAY_SIZE(kCameraClusters), buffer, sizeof(buffer), reader);
+    ConcreteDataAttributePath laterPath(4, Descriptor::Id, Descriptor::Attributes::ServerList::Id);
+    client.OnAttributeData(laterPath, &reader, StatusIB());
+    EXPECT_EQ(client.CurrentProfile().avsmEndpoint, 3);
+}
+
 TEST_F(TestDefaultAvAnalysisCameraClient, DoneWithoutResponseIsFailure)
 {
     EXPECT_EQ(mClient.RequestVideoStreamAllocation(kCameraNode, mCallback), CHIP_NO_ERROR);
 
-    mClient.OnDone(nullptr); // Interaction ended with neither response nor error
+    mClient.OnDone(static_cast<CommandSender *>(nullptr)); // Interaction ended with neither response nor error
 
     EXPECT_EQ(mCallback.mAllocatedCount, 1);
     EXPECT_EQ(mCallback.mLastStatus, Status::Failure);

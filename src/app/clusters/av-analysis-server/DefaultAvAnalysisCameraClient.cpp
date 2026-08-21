@@ -18,8 +18,12 @@
 
 #include <app/clusters/av-analysis-server/DefaultAvAnalysisCameraClient.h>
 
+#include <app/AttributePathParams.h>
+#include <app/InteractionModelEngine.h>
 #include <clusters/CameraAvStreamManagement/Commands.h>
 #include <clusters/CameraAvStreamManagement/Ids.h>
+#include <clusters/Descriptor/Attributes.h>
+#include <clusters/Descriptor/Ids.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -56,13 +60,15 @@ CHIP_ERROR DefaultAvAnalysisCameraClient::Init(CASESessionManager * aCASESession
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DefaultAvAnalysisCameraClient::RequestVideoStreamAllocation(const ScopedNodeId & aCameraNode, Callback & aCallback)
+CHIP_ERROR DefaultAvAnalysisCameraClient::RequestVideoStreamAllocation(const ScopedNodeId & aCameraNode,
+                                                                       AvAnalysisCameraClient::Callback & aCallback)
 {
     return StartRequest(PendingRequest::kAllocate, aCameraNode, 0, aCallback);
 }
 
 CHIP_ERROR DefaultAvAnalysisCameraClient::RequestVideoStreamDeallocation(const ScopedNodeId & aCameraNode,
-                                                                         uint16_t aAnalysisStreamId, Callback & aCallback)
+                                                                         uint16_t aAnalysisStreamId,
+                                                                         AvAnalysisCameraClient::Callback & aCallback)
 {
     return StartRequest(PendingRequest::kDeallocate, aCameraNode, aAnalysisStreamId, aCallback);
 }
@@ -75,7 +81,8 @@ void DefaultAvAnalysisCameraClient::Cancel()
     mOnConnectedCallback.Cancel();
     mOnConnectionFailureCallback.Cancel();
 
-    // Abort a command exchange still in progress; its callbacks die with the sender
+    // Abort a discovery read or command exchange still in progress; callbacks die with them
+    mReadClient.reset();
     mCommandSender.reset();
 
     // Forget the pending request without delivering a completion
@@ -88,7 +95,7 @@ void DefaultAvAnalysisCameraClient::Cancel()
 }
 
 CHIP_ERROR DefaultAvAnalysisCameraClient::StartRequest(PendingRequest aRequest, const ScopedNodeId & aCameraNode,
-                                                       uint16_t aAnalysisStreamId, Callback & aCallback)
+                                                       uint16_t aAnalysisStreamId, AvAnalysisCameraClient::Callback & aCallback)
 {
     VerifyOrReturnError(mCASESessionManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mPendingRequest == PendingRequest::kNone, CHIP_ERROR_BUSY);
@@ -104,7 +111,74 @@ CHIP_ERROR DefaultAvAnalysisCameraClient::StartRequest(PendingRequest aRequest, 
 
 void DefaultAvAnalysisCameraClient::StartProfileDiscovery()
 {
+    // Baseline from configuration; discovered values override below
     FillProfileFromConfiguration(mProfile);
+    mProfile.avsmEndpoint = kInvalidEndpointId;
+    mDiscoveryError       = CHIP_NO_ERROR;
+
+    VerifyOrReturn(mSessionHolder && mExchangeMgr != nullptr, OnProfileDiscoveryComplete(CHIP_ERROR_INCORRECT_STATE));
+
+    // Which endpoint on the camera hosts CameraAVStreamManagement? Read every endpoint's Descriptor
+    // ServerList (wildcard endpoint) and look for the cluster id.
+    AttributePathParams readPaths[1];
+    readPaths[0] = AttributePathParams(Descriptor::Id, Descriptor::Attributes::ServerList::Id);
+
+    ReadPrepareParams readParams(mSessionHolder.Get().Value());
+    readParams.mpAttributePathParamsList    = readPaths;
+    readParams.mAttributePathParamsListSize = 1;
+
+    mReadClient = Platform::MakeUnique<ReadClient>(InteractionModelEngine::GetInstance(), mExchangeMgr, mBufferedReadCallback,
+                                                   ReadClient::InteractionType::Read);
+    VerifyOrReturn(mReadClient != nullptr, OnProfileDiscoveryComplete(CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err = mReadClient->SendRequest(readParams);
+    if (err != CHIP_NO_ERROR)
+    {
+        mReadClient.reset();
+        OnProfileDiscoveryComplete(err);
+    }
+}
+
+void DefaultAvAnalysisCameraClient::OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
+                                                    const StatusIB & aStatus)
+{
+    VerifyOrReturn(aPath.mClusterId == Descriptor::Id && aPath.mAttributeId == Descriptor::Attributes::ServerList::Id);
+    VerifyOrReturn(aStatus.IsSuccess() && apData != nullptr);
+    // First matching endpoint wins
+    VerifyOrReturn(mProfile.avsmEndpoint == kInvalidEndpointId);
+
+    DataModel::DecodableList<ClusterId> serverList;
+    VerifyOrReturn(DataModel::Decode(*apData, serverList) == CHIP_NO_ERROR);
+
+    auto iter = serverList.begin();
+    while (iter.Next())
+    {
+        if (iter.GetValue() == CameraAvStreamManagement::Id)
+        {
+            mProfile.avsmEndpoint = aPath.mEndpointId;
+            return;
+        }
+    }
+}
+
+void DefaultAvAnalysisCameraClient::OnError(CHIP_ERROR aError)
+{
+    mDiscoveryError = aError;
+}
+
+void DefaultAvAnalysisCameraClient::OnDone(ReadClient * apReadClient)
+{
+    mReadClient.reset();
+
+    if (mProfile.avsmEndpoint == kInvalidEndpointId)
+    {
+        ChipLogProgress(Zcl,
+                        "AvAnalysisCameraClient: CameraAVStreamManagement endpoint not discovered (%" CHIP_ERROR_FORMAT
+                        "), using configured endpoint %u",
+                        mDiscoveryError.Format(), mCameraEndpoint);
+        mProfile.avsmEndpoint = mCameraEndpoint;
+    }
+
     OnProfileDiscoveryComplete(CHIP_NO_ERROR);
 }
 
@@ -273,11 +347,11 @@ void DefaultAvAnalysisCameraClient::FinishRequest(Status aStatus, uint16_t aStre
     VerifyOrReturn(!mResponseDelivered && mPendingCallback != nullptr);
     mResponseDelivered = true;
 
-    PendingRequest completed = mPendingRequest;
-    Callback * callback      = mPendingCallback;
-    mPendingRequest          = PendingRequest::kNone;
-    mPendingCallback         = nullptr;
-    mProfile                 = CameraProfile{};
+    PendingRequest completed                    = mPendingRequest;
+    AvAnalysisCameraClient::Callback * callback = mPendingCallback;
+    mPendingRequest                             = PendingRequest::kNone;
+    mPendingCallback                            = nullptr;
+    mProfile                                    = CameraProfile{};
     mSessionHolder.Release();
     mExchangeMgr = nullptr;
 
