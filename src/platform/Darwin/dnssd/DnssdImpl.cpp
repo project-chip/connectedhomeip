@@ -26,6 +26,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Darwin/UserDefaults.h>
 
+#include <atomic>
 #include <string>
 
 using namespace chip::Dnssd;
@@ -38,6 +39,24 @@ constexpr char kLocalDot[] = "local.";
 
 constexpr char kSRPDot[] = "default.service.arpa.";
 
+// Default delay between consumerCounter dropping to 0 and the actual teardown
+// of the underlying DNSServiceRef. This window exists so that any inbound
+// resolve result that has already been written to the dnssd socket but not yet
+// dispatched up to us is still consumed before DNSServiceRefDeallocate is
+// called: per the dnssd contract, DNSServiceRefDeallocate discards any
+// already-queued events on that connection. Without this window we hit a race
+// where an upper-layer consumer cancels the query in the gap between a result
+// being written to the socket and the read indicator firing, and the good
+// resolve result is lost. ~500ms is well beyond the largest gap observed in
+// the field while remaining short enough that an unused ResolveContext does
+// not linger.
+constexpr uint32_t kDefaultResolveDeferredTeardownDelayMs = 500;
+
+// Stored as a raw millisecond count in a std::atomic<uint32_t> so the test
+// thread can update the delay without racing reads on the Matter event-loop
+// thread (TSAN would otherwise flag a data race on a plain non-atomic global).
+std::atomic<uint32_t> gResolveDeferredTeardownDelayMs{ kDefaultResolveDeferredTeardownDelayMs };
+
 bool IsSupportedProtocol(DnssdServiceProtocol protocol)
 {
     return (protocol == DnssdServiceProtocol::kDnssdProtocolUdp) || (protocol == DnssdServiceProtocol::kDnssdProtocolTcp);
@@ -46,6 +65,26 @@ bool IsSupportedProtocol(DnssdServiceProtocol protocol)
 uint32_t GetInterfaceId(chip::Inet::InterfaceId interfaceId)
 {
     return interfaceId.IsPresent() ? interfaceId.GetPlatformInterface() : kDNSServiceInterfaceIndexAny;
+}
+
+// Mirrors the GetProtocol() helper in DnssdContexts.cpp. Kept as a local
+// helper here (rather than shared via the header) so the two files don't
+// have to be refactored to expose what is otherwise a one-line policy.
+DNSServiceProtocol GetDNSServiceProtocolFromAddressType(chip::Inet::IPAddressType addressType)
+{
+#if INET_CONFIG_ENABLE_IPV4
+    if (addressType == chip::Inet::IPAddressType::kIPv4)
+    {
+        return kDNSServiceProtocol_IPv4;
+    }
+    if (addressType == chip::Inet::IPAddressType::kIPv6)
+    {
+        return kDNSServiceProtocol_IPv6;
+    }
+    return kDNSServiceProtocol_IPv4 | kDNSServiceProtocol_IPv6;
+#else
+    return kDNSServiceProtocol_IPv6;
+#endif
 }
 
 std::string GetHostNameWithDomain(const char * hostname)
@@ -133,6 +172,10 @@ namespace Dnssd {
 Global<MdnsContexts> MdnsContexts::sInstance;
 
 namespace {
+
+// Forward declaration so the rescue paths in Resolve() can reference the
+// timer callback without it being part of the public symbol surface.
+void OnResolveDeferredTeardownImpl(chip::System::Layer * aLayer, void * aAppState);
 
 static void OnRegister(DNSServiceRef sdRef, DNSServiceFlags flags, DNSServiceErrorType err, const char * name, const char * type,
                        const char * domain, void * context)
@@ -339,6 +382,13 @@ static CHIP_ERROR Resolve(ResolveContext * sdCtx, uint32_t interfaceId, chip::In
     ChipLogProgress(Discovery, "Resolve type=%s name=%s domain=%s interface=%" PRIu32, StringOrNullMarker(type),
                     StringOrNullMarker(name), StringOrNullMarker(domain), interfaceId);
 
+    // Persist the requested scope so the rescue path in the public Resolve()
+    // overloads can refuse to coalesce a future request with a different
+    // interface, service type, or domain.
+    sdCtx->requestedInterfaceId = interfaceId;
+    sdCtx->requestedType        = (type != nullptr) ? std::string(type) : std::string();
+    sdCtx->requestedDomain      = (domain != nullptr) ? std::string(domain) : std::string();
+
     auto err = DNSServiceCreateConnection(&sdCtx->serviceRef);
     if (err != kDNSServiceErr_NoError)
     {
@@ -372,6 +422,146 @@ static CHIP_ERROR Resolve(ResolveContext * sdCtx, uint32_t interfaceId, chip::In
 static CHIP_ERROR Resolve(void * context, DnssdResolveCallback callback, uint32_t interfaceId,
                           chip::Inet::IPAddressType addressType, const char * type, const char * name, const char * domain)
 {
+    // If there's an existing ResolveContext for this instance name that is
+    // currently in a deferred-teardown window, cancel the timer and reuse it
+    // rather than tearing down its DNSServiceRef and opening a new one. This
+    // is the coalescing half of the deferred-teardown fix: avoid the cancel-
+    // then-restart pattern that drops still-queued resolve results.
+    //
+    // ChipDnssdResolveNoLongerNeeded arms a deferred-teardown timer on EVERY
+    // ResolveContext bound to this instance name (multi-interface scans and
+    // prior-caller leftovers can produce siblings). All sibling contexts for
+    // a given instance name share the same std::shared_ptr<uint32_t>
+    // consumerCounter (see GetCounterHolder), so we must cancel every
+    // sibling's timer and clear its deferredTeardownScheduled flag BEFORE
+    // bumping the shared counter -- otherwise the first iteration would flip
+    // the *consumerCounter == 0 gate, leaving every subsequent sibling
+    // un-rescued. Those un-rescued siblings' timers would still fire and
+    // OnResolveDeferredTeardown would observe a non-zero counter, returning
+    // without finalizing and leaving stale ResolveContexts and DNSServiceRefs
+    // alive (resource leak). Bump the counter exactly once for this logical
+    // Resolve call.
+    // Only coalesce with an existing ResolveContext that was constructed via
+    // the same callback-based overload (callback != nullptr). The two ctors
+    // are mutually exclusive discriminants in DispatchSuccess/DispatchFailure
+    // (callback == nullptr means dispatch via DiscoverNodeDelegate; non-null
+    // means invoke callback(context, ...)). Reusing a delegate-based context
+    // here and assigning a callback into it -- or vice versa in the other
+    // overload -- would silently route results to the wrong consumer and, in
+    // the worst case, type-confuse a DiscoverNodeDelegate* into a void*
+    // user-context arg (UAF / memory corruption). When the kind doesn't
+    // match, leave the existing context alone (its deferred-teardown timer
+    // will fire normally) and fall through to create a fresh context.
+    // Walk every sibling ResolveContext that already exists for this name,
+    // looking for one we can rescue (counter==0, deferred-teardown timer
+    // armed, kind matches). Non-primary siblings that ALSO satisfy the
+    // rescue eligibility predicate must be Finalize()d here -- not merely
+    // had their timer cancelled and flag cleared -- because the new caller
+    // only rebinds callback/context onto a single primary sibling.
+    // Leaving non-primary siblings around with stale callback/context
+    // pointers is a use-after-free hazard the moment any of them later
+    // dispatches (success or the eventual cancel via this code path's own
+    // future ChipDnssdResolveNoLongerNeeded).
+    std::vector<GenericContext *> existingResolves;
+    MdnsContexts::GetInstance().FindAllMatchingPredicate(
+        [name](GenericContext * item) {
+            return item->type == ContextType::Resolve && static_cast<ResolveContext *>(item)->Matches(name);
+        },
+        existingResolves);
+    ResolveContext * primaryCtx    = nullptr;
+    DNSServiceProtocol newProtocol = GetDNSServiceProtocolFromAddressType(addressType);
+    std::string newType            = (type != nullptr) ? std::string(type) : std::string();
+    std::string newDomain          = (domain != nullptr) ? std::string(domain) : std::string();
+    std::vector<ResolveContext *> nonPrimaryToFinalize;
+    for (auto * item : existingResolves)
+    {
+        auto * existingCtx = static_cast<ResolveContext *>(item);
+        if (!existingCtx->deferredTeardownScheduled || *existingCtx->consumerCounter != 0)
+        {
+            continue;
+        }
+        // Kind mismatch: existing was constructed delegate-based.
+        if (existingCtx->callback == nullptr)
+        {
+            continue;
+        }
+        // Scope mismatch: a future StopBrowse on the original browse would
+        // spuriously cancel an unrelated standalone consumer (or vice versa);
+        // and a different interface/protocol/service-type/domain means the
+        // rescued context would silently inherit the previous caller's
+        // subscription scope (or, in the service-type case, hand the new
+        // caller results from a DNSServiceResolve started for the wrong
+        // service type). Refuse to coalesce in any of these cases and fall
+        // through to fresh allocation. The existing context's own deferred-
+        // teardown timer will fire normally.
+        if (existingCtx->browseThatCausedResolve != nullptr)
+        {
+            continue;
+        }
+        if (existingCtx->requestedInterfaceId != interfaceId)
+        {
+            continue;
+        }
+        if (existingCtx->protocol != newProtocol)
+        {
+            continue;
+        }
+        if (existingCtx->requestedType != newType)
+        {
+            continue;
+        }
+        if (existingCtx->requestedDomain != newDomain)
+        {
+            continue;
+        }
+        chip::DeviceLayer::SystemLayer().CancelTimer(OnResolveDeferredTeardownImpl, existingCtx);
+        existingCtx->deferredTeardownScheduled = false;
+        if (primaryCtx == nullptr)
+        {
+            primaryCtx = existingCtx;
+        }
+        else
+        {
+            // Non-primary sibling: schedule Finalize after the rescue commit.
+            // We can't Finalize here because Finalize calls
+            // RemoveWithoutDeleting which would invalidate the iterator on
+            // existingResolves. Defer to a second pass below.
+            nonPrimaryToFinalize.push_back(existingCtx);
+        }
+    }
+    if (primaryCtx != nullptr)
+    {
+        // The previous consumer count dropped to zero, so the original
+        // callback/context pointers may now refer to objects that have been
+        // destroyed. Rebind the dispatch target to the new caller's values
+        // before bumping the counter to avoid invoking a dangling callback or
+        // dereferencing a freed context (UAF).
+        if (primaryCtx->callback != callback || primaryCtx->context != context)
+        {
+            ChipLogDetail(Discovery, "Mdns: Reusing deferred-teardown ResolveContext for %s with new callback/context",
+                          StringOrNullMarker(name));
+            primaryCtx->callback = callback;
+            primaryCtx->context  = context;
+        }
+        // Finalize non-primary siblings with CHIP_ERROR_CANCELLED. They share
+        // the consumerCounter shared_ptr with primaryCtx; Finalize routes
+        // through DispatchFailure which calls back the (possibly-stale) old
+        // callback/context for the SIBLING -- but those are exactly the
+        // already-departed consumer pointers ChipDnssdResolveNoLongerNeeded
+        // is racing to clear, so the dispatch is best-effort and matches the
+        // pre-rescue contract (one CHIP_ERROR_CANCELLED per cancelled
+        // consumer). The single-canonical-context invariant is restored
+        // before we bump the shared counter for the new logical Resolve.
+        for (auto * sibling : nonPrimaryToFinalize)
+        {
+            TEMPORARY_RETURN_IGNORED sibling->Finalize(CHIP_ERROR_CANCELLED);
+        }
+        // Bump the shared consumer counter exactly once for this logical
+        // Resolve call.
+        (*primaryCtx->consumerCounter)++;
+        return CHIP_NO_ERROR;
+    }
+
     auto counterHolder = GetCounterHolder(name);
     auto sdCtx         = chip::Platform::New<ResolveContext>(context, callback, addressType, name,
                                                      BrowseContext::sContextDispatchingSuccess, std::move(counterHolder));
@@ -383,6 +573,87 @@ static CHIP_ERROR Resolve(void * context, DnssdResolveCallback callback, uint32_
 static CHIP_ERROR Resolve(DiscoverNodeDelegate * delegate, uint32_t interfaceId, chip::Inet::IPAddressType addressType,
                           const char * type, const char * name)
 {
+    // Same coalescing path as the callback overload above, including the
+    // kind-match guard: only coalesce with an existing ResolveContext that
+    // was constructed via the delegate-based ctor (callback == nullptr). See
+    // the callback overload for why kind mismatches are unsafe.
+    std::vector<GenericContext *> existingResolves;
+    MdnsContexts::GetInstance().FindAllMatchingPredicate(
+        [name](GenericContext * item) {
+            return item->type == ContextType::Resolve && static_cast<ResolveContext *>(item)->Matches(name);
+        },
+        existingResolves);
+    ResolveContext * primaryCtx    = nullptr;
+    DNSServiceProtocol newProtocol = GetDNSServiceProtocolFromAddressType(addressType);
+    std::string newType            = (type != nullptr) ? std::string(type) : std::string();
+    std::vector<ResolveContext *> nonPrimaryToFinalize;
+    for (auto * item : existingResolves)
+    {
+        auto * existingCtx = static_cast<ResolveContext *>(item);
+        if (!existingCtx->deferredTeardownScheduled || *existingCtx->consumerCounter != 0)
+        {
+            continue;
+        }
+        // Kind mismatch: existing was constructed callback-based.
+        if (existingCtx->callback != nullptr)
+        {
+            continue;
+        }
+        // Scope mismatch checks: see callback overload for rationale.
+        if (existingCtx->browseThatCausedResolve != nullptr)
+        {
+            continue;
+        }
+        if (existingCtx->requestedInterfaceId != interfaceId)
+        {
+            continue;
+        }
+        if (existingCtx->protocol != newProtocol)
+        {
+            continue;
+        }
+        if (existingCtx->requestedType != newType)
+        {
+            continue;
+        }
+        // The delegate overload doesn't take a domain argument; it always
+        // resolves on both kLocalDot and kSRPDot. Rescued contexts created
+        // via the same overload will have an empty domain (we record domain
+        // as empty when the inner Resolve helper is called with domain ==
+        // nullptr). Refuse to coalesce if the existing context has a non-
+        // empty domain (i.e. it was created via a browse-driven path).
+        if (!existingCtx->requestedDomain.empty())
+        {
+            continue;
+        }
+        chip::DeviceLayer::SystemLayer().CancelTimer(OnResolveDeferredTeardownImpl, existingCtx);
+        existingCtx->deferredTeardownScheduled = false;
+        if (primaryCtx == nullptr)
+        {
+            primaryCtx = existingCtx;
+        }
+        else
+        {
+            nonPrimaryToFinalize.push_back(existingCtx);
+        }
+    }
+    if (primaryCtx != nullptr)
+    {
+        // Counter was zero, so the previous delegate may be gone; rebind.
+        if (primaryCtx->context != delegate)
+        {
+            ChipLogDetail(Discovery, "Mdns: Reusing deferred-teardown ResolveContext for %s with a new delegate",
+                          StringOrNullMarker(name));
+            primaryCtx->context = delegate;
+        }
+        for (auto * sibling : nonPrimaryToFinalize)
+        {
+            TEMPORARY_RETURN_IGNORED sibling->Finalize(CHIP_ERROR_CANCELLED);
+        }
+        (*primaryCtx->consumerCounter)++;
+        return CHIP_NO_ERROR;
+    }
+
     auto counterHolder = GetCounterHolder(name);
     auto sdCtx         = chip::Platform::New<ResolveContext>(delegate, addressType, name, std::move(counterHolder));
     VerifyOrReturnError(nullptr != sdCtx, CHIP_ERROR_NO_MEMORY);
@@ -391,6 +662,169 @@ static CHIP_ERROR Resolve(DiscoverNodeDelegate * delegate, uint32_t interfaceId,
 }
 
 } // namespace
+
+#if CHIP_CONFIG_TEST
+chip::System::Clock::Milliseconds32 GetResolveDeferredTeardownDelay()
+{
+    return chip::System::Clock::Milliseconds32(gResolveDeferredTeardownDelayMs.load(std::memory_order_relaxed));
+}
+
+void SetResolveDeferredTeardownDelay(chip::System::Clock::Milliseconds32 delay)
+{
+    gResolveDeferredTeardownDelayMs.store(static_cast<uint32_t>(delay.count()), std::memory_order_relaxed);
+}
+#endif // CHIP_CONFIG_TEST
+
+namespace {
+
+// Fires when the deferred-teardown timer scheduled by
+// ChipDnssdResolveNoLongerNeeded elapses without a new ChipDnssdResolve
+// arriving for the same instance name. At this point we genuinely have no
+// consumers, so dispatch CHIP_ERROR_CANCELLED to flush callback contracts and
+// tear down the underlying DNSServiceRef.
+void OnResolveDeferredTeardownImpl(chip::System::Layer * /* aLayer */, void * aAppState)
+{
+    auto * sdCtx = static_cast<ResolveContext *>(aAppState);
+    // Make sure the context is still tracked (it could have been finalized
+    // out from under us by, e.g., a successful resolve completing in the
+    // meantime).
+    if (MdnsContexts::GetInstance().Has(sdCtx) != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Discovery, "Mdns: Deferred teardown timer fired for context already finalized; ignoring");
+        return;
+    }
+    if (!sdCtx->deferredTeardownScheduled)
+    {
+        // Someone re-armed the context (a new Resolve came in and reused it).
+        ChipLogDetail(Discovery, "Mdns: Deferred teardown timer fired for %s but flag was cleared; ignoring",
+                      sdCtx->instanceName.c_str());
+        return;
+    }
+    if (*sdCtx->consumerCounter != 0)
+    {
+        // A consumer reattached without going through the cancel path. This
+        // is unexpected and likely indicates an upstream state-machine bug
+        // because the only sanctioned re-attach path is the coalescing branch
+        // in Resolve(), which clears deferredTeardownScheduled before
+        // bumping the counter.
+        ChipLogError(Discovery,
+                     "Mdns: Deferred teardown timer fired for %s with non-zero consumerCounter (%u); "
+                     "consumer reattached without going through coalescing path",
+                     sdCtx->instanceName.c_str(), *sdCtx->consumerCounter);
+        sdCtx->deferredTeardownScheduled = false;
+        return;
+    }
+    sdCtx->deferredTeardownScheduled = false;
+    TEMPORARY_RETURN_IGNORED sdCtx->Finalize(CHIP_ERROR_CANCELLED);
+}
+
+// Schedule a deferred-teardown timer against every still-tracked ResolveContext
+// in `resolves`. Contexts whose StartTimer call fails fall back to immediate
+// Finalize(CHIP_ERROR_CANCELLED) so they don't leak. Shared by the two cancel
+// entry points -- ChipDnssdResolveNoLongerNeeded and ChipDnssdStopBrowse's
+// browse-triggered-resolve cleanup -- so both honor the same "don't drop
+// in-flight results queued on the socket" contract.
+//
+// Delegate-based ResolveContexts (callback == nullptr) are deliberately NOT
+// deferred. The MTRCommissionableBrowser flow churns OnBrowseAdd/OnBrowseRemove
+// for the same instance name on the order of microseconds while the device is
+// being discovered. Holding the underlying DNSServiceRef alive across that
+// churn (instead of synchronously tearing it down and starting fresh on the
+// next OnBrowseAdd) starves DNSServiceGetAddrInfo of a chance to deliver its
+// callback before the next remove arrives, and the browse delegate never sees
+// the device as "fully resolved" (observed in
+// MTRCommissionableBrowserTests/test005 under TSAN). The deferred-teardown
+// coalescing was added to fix the NodeID-resolve cancel/restart latency in
+// the callback-based Resolve path; that path uses callback != nullptr and is
+// unaffected by this carve-out.
+void ScheduleDeferredTeardownForResolves(const std::vector<GenericContext *> & resolves, const char * instanceNameForLog)
+{
+    // Track contexts whose StartTimer call failed so we can immediately
+    // Finalize them rather than leaking. Gating the fallback on a global
+    // anyScheduled flag would silently drop the failed-to-schedule
+    // contexts whenever ANY of their siblings successfully scheduled.
+    std::vector<ResolveContext *> failedToSchedule;
+    std::vector<ResolveContext *> delegateBased;
+    for (auto * item : resolves)
+    {
+        auto * rctx = static_cast<ResolveContext *>(item);
+        // Never arm a deferred-teardown timer on a context whose shared
+        // counter is still non-zero (i.e. has a live consumer). Doing so
+        // would corrupt the "deferredTeardownScheduled => no consumers"
+        // invariant the timer callback and the rescue path rely on, and
+        // could cause the rescue path to silently hijack the live
+        // consumer's callback.
+        if (*rctx->consumerCounter != 0)
+        {
+            continue;
+        }
+        if (rctx->deferredTeardownScheduled)
+        {
+            continue;
+        }
+        if (rctx->callback == nullptr)
+        {
+            // Delegate-based: tear down synchronously (see comment above).
+            delegateBased.push_back(rctx);
+            continue;
+        }
+        rctx->deferredTeardownScheduled = true;
+        auto err                        = chip::DeviceLayer::SystemLayer().StartTimer(
+            chip::System::Clock::Milliseconds32(gResolveDeferredTeardownDelayMs.load(std::memory_order_relaxed)),
+            OnResolveDeferredTeardownImpl, rctx);
+        if (err != CHIP_NO_ERROR)
+        {
+            // SystemLayer::StartTimer returns CriticalFailure, which has no Format(); log
+            // without the error code (the failure mode here is timer-pool exhaustion, which
+            // is the only failure StartTimer can return).
+            ChipLogError(Discovery,
+                         "Mdns: StartTimer for deferred teardown of %s failed; "
+                         "falling back to immediate teardown for this context",
+                         StringOrNullMarker(instanceNameForLog));
+            rctx->deferredTeardownScheduled = false;
+            failedToSchedule.push_back(rctx);
+        }
+    }
+
+    // Finalize any contexts that couldn't have a deferred teardown
+    // scheduled, so they don't leak with no consumer and no timer.
+    for (auto * rctx : failedToSchedule)
+    {
+        TEMPORARY_RETURN_IGNORED rctx->Finalize(CHIP_ERROR_CANCELLED);
+    }
+
+    // Delegate-based contexts always tear down synchronously.
+    for (auto * rctx : delegateBased)
+    {
+        TEMPORARY_RETURN_IGNORED rctx->Finalize(CHIP_ERROR_CANCELLED);
+    }
+}
+
+} // namespace
+
+void CancelDeferredTeardownIfScheduled(ResolveContext * rctx)
+{
+    if (rctx == nullptr)
+    {
+        return;
+    }
+    if (rctx->deferredTeardownScheduled)
+    {
+        chip::DeviceLayer::SystemLayer().CancelTimer(OnResolveDeferredTeardownImpl, rctx);
+        rctx->deferredTeardownScheduled = false;
+    }
+}
+
+#if CHIP_CONFIG_TEST
+// Test-only public wrapper for the internal timer callback. Tests synthesize
+// stale-fire scenarios; production code must never call this directly --
+// the timer is armed and disarmed exclusively through
+// ScheduleDeferredTeardownForResolves / CancelDeferredTeardownIfScheduled.
+void OnResolveDeferredTeardown(chip::System::Layer * aLayer, void * aAppState)
+{
+    OnResolveDeferredTeardownImpl(aLayer, aAppState);
+}
+#endif // CHIP_CONFIG_TEST
 
 CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback successCallback, DnssdAsyncReturnCallback errorCallback, void * context)
 {
@@ -485,9 +919,40 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
         },
         resolves);
 
-    for (auto & resolve : resolves)
+    // Decrement the shared consumerCounter for each browse-triggered resolve
+    // we're cancelling (each one bumped the counter by exactly 1 when it was
+    // created in Resolve()). Finalize browse-triggered resolves synchronously
+    // -- StopBrowse callers (per the long-standing pre-PR-72273 contract)
+    // expect the cancel callback to fire before they return so they can
+    // safely free the resolve callback's user-context object.
+    //
+    // The deferred-teardown rescue window only benefits the
+    // ChipDnssdResolveNoLongerNeeded (user-initiated) path, where an
+    // in-flight result already queued on the socket might still be useful to
+    // the same caller (who would re-issue Resolve). A browse cancellation is
+    // a different semantic: the browse-driven consumer is going away, so
+    // immediate teardown is correct.
+    std::vector<ResolveContext *> toFinalize;
+    for (auto * item : resolves)
     {
-        TEMPORARY_RETURN_IGNORED resolve->Finalize(CHIP_ERROR_CANCELLED);
+        auto * rctx = static_cast<ResolveContext *>(item);
+        if (*rctx->consumerCounter == 0)
+        {
+            // Already in the deferred-teardown window (counter previously hit
+            // zero via ChipDnssdResolveNoLongerNeeded). Nothing to decrement;
+            // the existing timer will run to completion.
+            continue;
+        }
+        (*rctx->consumerCounter)--;
+        if (*rctx->consumerCounter == 0)
+        {
+            toFinalize.push_back(rctx);
+        }
+    }
+
+    for (auto * rctx : toFinalize)
+    {
+        TEMPORARY_RETURN_IGNORED rctx->Finalize(CHIP_ERROR_CANCELLED);
     }
 
     TEMPORARY_RETURN_IGNORED ctx->Finalize(CHIP_ERROR_CANCELLED);
@@ -563,14 +1028,27 @@ void ChipDnssdResolveNoLongerNeeded(const char * instanceName)
 
     if (*existingCtx->consumerCounter == 0)
     {
-        // No more consumers; clear out all of these resolves so they don't
-        // stick around.  Dispatch a "cancelled" failure on all of them to make
-        // sure whatever kicked them off cleans up resources as needed.
-        do
-        {
-            TEMPORARY_RETURN_IGNORED existingCtx->Finalize(CHIP_ERROR_CANCELLED);
-            existingCtx = MdnsContexts::GetInstance().GetExistingResolveForInstanceName(instanceName);
-        } while (existingCtx != nullptr);
+        // No more consumers. Per the dnssd contract, calling
+        // DNSServiceRefDeallocate immediately would discard any resolve
+        // result already written to the socket but not yet consumed by us.
+        // Instead, schedule a deferred teardown for every still-tracked
+        // ResolveContext bound to this instance name so that a still-queued
+        // read indicator gets a chance to fire and dispatch the result
+        // through DispatchSuccess (which finalizes the context naturally).
+        // If a new ChipDnssdResolve arrives for the same instance name during
+        // this window, it will reuse the existing context and cancel the
+        // deferred teardown rather than open a fresh
+        // DNSServiceCreateConnection -- per guidance from the mDNSResponder
+        // maintainers that "starting and stopping queries doesn't query
+        // harder".
+        std::vector<GenericContext *> resolves;
+        MdnsContexts::GetInstance().FindAllMatchingPredicate(
+            [instanceName](GenericContext * item) {
+                return item->type == ContextType::Resolve && static_cast<ResolveContext *>(item)->Matches(instanceName);
+            },
+            resolves);
+
+        ScheduleDeferredTeardownForResolves(resolves, instanceName);
     }
 }
 
