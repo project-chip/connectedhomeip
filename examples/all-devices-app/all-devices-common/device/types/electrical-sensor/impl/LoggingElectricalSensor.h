@@ -37,6 +37,7 @@ public:
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
+    void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     // Clusters::ElectricalEnergyMeasurement::Delegate implementation
 

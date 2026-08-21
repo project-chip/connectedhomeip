@@ -79,8 +79,17 @@ CHIP_ERROR LoggingElectricalSensor::Register(chip::EndpointId endpoint, CodeDriv
                                              EndpointComposition composition)
 {
     ReturnErrorOnFailure(ElectricalSensor::Register(endpoint, provider, composition));
-    gFakeReadings.SetEEMCluster(ElectricalEnergyMeasurementCluster());
+    gFakeReadings.SetEEMCluster(&ElectricalEnergyMeasurementCluster());
     return CHIP_NO_ERROR;
+}
+
+void LoggingElectricalSensor::Unregister(CodeDrivenDataModelProvider & provider)
+{
+    if (gFakeReadings.GetEEMCluster() == &ElectricalEnergyMeasurementCluster())
+    {
+        gFakeReadings.SetEEMCluster(nullptr);
+    }
+    ElectricalSensor::Unregister(provider);
 }
 
 // define instead of constexpr static auto because the latter failes on Darwin.

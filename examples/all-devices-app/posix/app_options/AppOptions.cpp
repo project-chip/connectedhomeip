@@ -187,7 +187,7 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
             ChipLogError(Support, "%s: ERROR: invalid value specified for %s\n", program, name);
             return false;
         }
-        ChipLogProgress(AppServer, "TestEventTrigger enable key set to %s", value);
+        ChipLogProgress(AppServer, "TestEventTrigger enable key configured");
         return true;
     }
     default:

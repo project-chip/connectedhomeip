@@ -68,7 +68,8 @@ public:
     int64_t GetCumulativeEnergyImported() { return mTotalEnergyImported; }
     int64_t GetCumulativeEnergyExported() { return mTotalEnergyExported; }
     void SetTimerDelegate(chip::TimerDelegate & timerDelegate);
-    void SetEEMCluster(ElectricalEnergyMeasurementCluster & eemCluster) { mEEMCluster = &eemCluster; }
+    void SetEEMCluster(ElectricalEnergyMeasurementCluster * eemCluster) { mEEMCluster = eemCluster; }
+    ElectricalEnergyMeasurementCluster * GetEEMCluster() { return mEEMCluster; }
 
     // TimerContext override
     void TimerFired() override { FakeReadingsUpdate(); }
