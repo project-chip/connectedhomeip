@@ -23,4 +23,11 @@ config("config") {
 chip_data_model("thermostat-common") {
   zap_file = "thermostat.zap"
   is_server = true
+  sources = [
+    "src/thermostat-delegate-impl.cpp",
+    "src/thermostat-occupancy-delegate-impl.cpp",
+    "src/thermostat-presets-delegate-impl.cpp",
+    "src/thermostat-sensors-delegate-impl.cpp",
+    "src/thermostat-suggestions-delegate-impl.cpp",
+  ]
 }

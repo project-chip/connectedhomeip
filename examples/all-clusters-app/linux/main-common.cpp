@@ -37,6 +37,9 @@
 #include "rvc-operational-state-delegate-impl.h"
 #include "tcc-mode.h"
 #include "thermostat-delegate-impl.h"
+#include "thermostat-presets-delegate-impl.h"
+#include "thermostat-suggestions-delegate-impl.h"
+
 #include "tls-client-management-instance.h"
 #include <app/clusters/window-covering-server/CodegenIntegration.h>
 
@@ -51,6 +54,7 @@
 #include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/temperature-control-server/temperature-control-server.h>
+#include <app/clusters/thermostat-server/CodegenIntegration.h>
 #include <app/clusters/thermostat-server/ThermostatCluster.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-server.h>
 #include <app/clusters/unit-localization-server/unit-localization-server.h>
@@ -184,6 +188,17 @@ RegisteredServerCluster<Clusters::IdentifyCluster>
 LazyRegisteredServerCluster<Clusters::GroupcastCluster> gGroupcastCluster;
 #endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
+constexpr EndpointId gThermostatEndpoint(1);
+static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatPresetsDelegate gThermostatPresetsDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatSuggestionsDelegate gThermostatSuggestionsDelegate(gThermostatEndpoint,
+                                                                                          gThermostatPresetsDelegate);
+
+using ThermostatClusterType =
+    Clusters::Thermostat::ThermostatClusterWithFeatures<Clusters::Thermostat::ThermostatDelegate,
+                                                        Clusters::Thermostat::ThermostatPresetsDelegate,
+                                                        Clusters::Thermostat::ThermostatSuggestionsDelegate>;
+
 } // namespace
 
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
@@ -207,6 +222,9 @@ void ApplicationInit()
 
     Clusters::ValveConfigurationAndControl::SetDefaultDelegate(chip::EndpointId(1), &sValveDelegate);
     Clusters::TimeSynchronization::SetDefaultDelegate(&sTimeSyncDelegate);
+
+    Clusters::Thermostat::ServerInit(gThermostatEndpoint, gThermostatDelegate, gThermostatPresetsDelegate,
+                                     gThermostatSuggestionsDelegate);
 
     Clusters::UnitLocalization::TempUnitEnum supportedUnits[2] = { Clusters::UnitLocalization::TempUnitEnum::kFahrenheit,
                                                                    Clusters::UnitLocalization::TempUnitEnum::kCelsius };
@@ -266,6 +284,8 @@ void ApplicationShutdown()
     Clusters::OvenMode::Shutdown();
     Clusters::OvenCavityOperationalState::Shutdown();
 
+    Clusters::Thermostat::ServerShutdown<ThermostatClusterType>(gThermostatEndpoint, MatterClusterShutdownType::kClusterShutdown);
+
     if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to stop CHIP NamedPipeCommands");
@@ -311,15 +331,6 @@ void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
     logProvider.SetCrashLogFilePath(AppOptions::GetCrashLogFilePath());
 
     DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
-}
-
-using namespace chip::app::Clusters::Thermostat;
-void emberAfThermostatClusterInitCallback(EndpointId endpoint)
-{
-    // Register the delegate for the Thermostat
-    auto & delegate = ThermostatDelegate::GetInstance();
-
-    SetDefaultDelegate(endpoint, &delegate);
 }
 
 Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,

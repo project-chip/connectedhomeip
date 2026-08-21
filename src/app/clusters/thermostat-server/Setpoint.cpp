@@ -17,7 +17,6 @@
 
 #include "Setpoint.h"
 
-using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 
 namespace chip {
@@ -69,6 +68,24 @@ SystemModeEnum Setpoint::Mode() const
     }
 }
 
+CHIP_ERROR OptionalSetpoint::Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
+{
+    return writer.Put(tag, Temperature());
+}
+
+CHIP_ERROR OptionalSetpoint::Decode(chip::TLV::TLVReader & reader)
+{
+    if (reader.GetType() == chip::TLV::kTLVType_Null)
+    {
+        mTemperature.ClearValue();
+        return CHIP_NO_ERROR;
+    }
+    temperature temp;
+    ReturnErrorOnFailure(reader.Get(temp));
+    mTemperature.SetValue(temp);
+    return CHIP_NO_ERROR;
+}
+
 temperature OptionalSetpoint::Temperature() const
 {
     if (mTemperature.HasValue())
@@ -77,7 +94,6 @@ temperature OptionalSetpoint::Temperature() const
     }
     return mAbsoluteSetpoint.Temperature();
 }
-
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app

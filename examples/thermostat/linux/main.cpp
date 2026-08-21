@@ -21,13 +21,16 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/thermostat-server/CodegenIntegration.h>
 #include <app/clusters/thermostat-server/ThermostatCluster.h>
 
 #include "thermostat-delegate-impl.h"
+#include "thermostat-presets-delegate-impl.h"
+#include "thermostat-sensors-delegate-impl.h"
+#include "thermostat-suggestions-delegate-impl.h"
 
 using namespace chip;
 using namespace chip::app;
-// using namespace chip::app::Clusters;
 
 void OnIdentifyStart(Identify *)
 {
@@ -71,22 +74,33 @@ static Identify gIdentify1 = {
     OnTriggerEffect,
 };
 
-void ApplicationInit() {}
+constexpr EndpointId gThermostatEndpoint(1);
+static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatPresetsDelegate gPresetsDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatSuggestionsDelegate gSuggestionsDelegate(gThermostatEndpoint, gPresetsDelegate);
+static Clusters::Thermostat::ThermostatSensorsDelegate gSensorsDelegate(gThermostatEndpoint);
 
-void ApplicationShutdown() {}
+void ApplicationInit()
+{
+    ChipLogProgress(Zcl, "Thermostat application init");
+
+    Clusters::Thermostat::ServerInit(gThermostatEndpoint, gThermostatDelegate, gPresetsDelegate, gSuggestionsDelegate,
+                                     gSensorsDelegate);
+}
+
+using ThermostatClusterType = Clusters::Thermostat::ThermostatClusterWithFeatures<
+    Clusters::Thermostat::ThermostatDelegate, Clusters::Thermostat::ThermostatPresetsDelegate,
+    Clusters::Thermostat::ThermostatSuggestionsDelegate, Clusters::Thermostat::ThermostatSensorsDelegate>;
+
+void ApplicationShutdown()
+{
+    chip::app::Clusters::Thermostat::ServerShutdown<ThermostatClusterType>(gThermostatEndpoint,
+                                                                           MatterClusterShutdownType::kClusterShutdown);
+}
 
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
     ChipLinuxAppMainLoop();
     return 0;
-}
-
-using namespace chip::app::Clusters::Thermostat;
-void emberAfThermostatClusterInitCallback(EndpointId endpoint)
-{
-    // Register the delegate for the Thermostat
-    auto & delegate = ThermostatDelegate::GetInstance();
-
-    SetDefaultDelegate(endpoint, &delegate);
 }

@@ -33,12 +33,18 @@ target_include_directories(app PRIVATE
                            ${TELINK_COMMON}/common/include
                            ${TELINK_COMMON}/util/include
                            ${TELINK_COMMON}/app/include
-                           ${TELINK_COMMON}/zephyr_ext)
+                           ${TELINK_COMMON}/zephyr_ext
+                           ${CMAKE_CURRENT_SOURCE_DIR}/../thermostat-common/include)
 
 target_sources(app PRIVATE
                src/AppTask.cpp
                src/TemperatureManager.cpp
                src/ZclCallbacks.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/../thermostat-common/src/thermostat-delegate-impl.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/../thermostat-common/src/thermostat-occupancy-delegate-impl.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/../thermostat-common/src/thermostat-presets-delegate-impl.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/../thermostat-common/src/thermostat-sensors-delegate-impl.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/../thermostat-common/src/thermostat-suggestions-delegate-impl.cpp
                ${TELINK_COMMON}/common/src/mainCommon.cpp
                ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
                ${TELINK_COMMON}/common/src/SensorManagerCommon.cpp
