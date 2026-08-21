@@ -42049,9 +42049,9 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
         _sdp = @"";
 
-        _streamUsage = @(0);
+        _streamUsage = nil;
 
-        _originatingEndpointID = @(0);
+        _originatingEndpointID = nil;
 
         _videoStreamID = nil;
 
@@ -42122,10 +42122,16 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         encodableStruct.sdp = AsCharSpan(self.sdp);
     }
     {
-        encodableStruct.streamUsage = static_cast<std::remove_reference_t<decltype(encodableStruct.streamUsage)>>(self.streamUsage.unsignedCharValue);
+        if (self.streamUsage != nil) {
+            auto & definedValue_0 = encodableStruct.streamUsage.Emplace();
+            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.streamUsage.unsignedCharValue);
+        }
     }
     {
-        encodableStruct.originatingEndpointID = self.originatingEndpointID.unsignedShortValue;
+        if (self.originatingEndpointID != nil) {
+            auto & definedValue_0 = encodableStruct.originatingEndpointID.Emplace();
+            definedValue_0 = self.originatingEndpointID.unsignedShortValue;
+        }
     }
     {
         if (self.videoStreamID != nil) {
