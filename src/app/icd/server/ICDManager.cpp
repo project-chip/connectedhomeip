@@ -110,9 +110,9 @@ void ICDManager::Shutdown()
 #if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     mPendingActiveModeOnNetworkAttach = false;
 #if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
-    mPendingCheckInOnNetworkAttach    = false;
-    mPendingBroadcastCheckIn          = false;
-    mPendingCheckInSubjectsCount      = 0;
+    mPendingCheckInOnNetworkAttach = false;
+    mPendingBroadcastCheckIn       = false;
+    mPendingCheckInSubjectsCount   = 0;
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 #endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     mStateObserverPool.ReleaseAll();
@@ -845,8 +845,7 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
                 enteredActiveModeFromIdle = true;
             }
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
-            ChipLogProgress(AppServer,
-                            "ICDManager: Thread network connectivity established. Triggering/Extending ActiveMode.");
+            ChipLogProgress(AppServer, "ICDManager: Thread network connectivity established. Triggering/Extending ActiveMode.");
             UpdateOperationState(OperationalState::ActiveMode);
         }
 

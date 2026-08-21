@@ -389,7 +389,7 @@ private:
     bool mPendingCheckInOnNetworkAttach                = false;
     bool mPendingBroadcastCheckIn                      = false;
     std::array<Access::SubjectDescriptor, kMaxPendingCheckInSubjects> mPendingCheckInSubjects;
-    size_t mPendingCheckInSubjectsCount                = 0;
+    size_t mPendingCheckInSubjectsCount = 0;
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 #endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     ObjectPool<ObserverPointer, CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE> mStateObserverPool;
