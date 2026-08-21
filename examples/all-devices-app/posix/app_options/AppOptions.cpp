@@ -58,6 +58,7 @@ constexpr uint16_t kOptionGroupcast     = 0xffda;
 constexpr uint16_t kOptionAppPipe       = 0xffdb;
 constexpr uint16_t kOptionTraceTo       = 0xffdc;
 constexpr uint16_t kOptionDacProvider   = 0xffdd;
+constexpr uint16_t kOptionEnableKey     = 0xffde;
 
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
@@ -177,6 +178,19 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         mConfig.dacProvider = value;
         ChipLogProgress(AppServer, "DAC provider file set to %s", value);
         return true;
+    case kOptionEnableKey: {
+        constexpr size_t kEnableKeyLength = sizeof(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey);
+
+        if (Encoding::HexToBytes(value, strlen(value), mConfig.testEventTriggerEnableKey,
+                                 kEnableKeyLength) != kEnableKeyLength)
+        {
+
+            ChipLogError(Support, "%s: ERROR: invalid value specified for %s\n", program, name);
+            return false;
+        }
+        ChipLogProgress(AppServer, "TestEventTrigger enable key set to %s", value);
+        return true;
+    }
     default:
         ChipLogError(Support, "%s: INTERNAL ERROR: Unhandled option: %s\n", program, name);
         return false;
@@ -205,6 +219,7 @@ OptionSet * AppOptions::GetOptions()
         { "app-pipe", kArgumentRequired, kOptionAppPipe },
         { "trace-to", kArgumentRequired, kOptionTraceTo },
         { "dac_provider", kArgumentRequired, kOptionDacProvider },
+        { "enable-key", kArgumentRequired, kOptionEnableKey },
         {}, // need empty terminator
     };
 
@@ -269,6 +284,9 @@ OptionSet * AppOptions::GetOptions()
 
         result += "  --dac_provider <path>\n";
         result += "       Path to JSON file containing device attestation credentials\n\n";
+
+        result += "  --enable-key <key>\n";
+        result += "       A 16-byte, hex-encoded key, used to validate TestEventTrigger command of General Diagnostics cluster\n\n";
 
         return result;
     }();

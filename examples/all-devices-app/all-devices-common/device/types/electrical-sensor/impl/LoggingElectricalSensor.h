@@ -16,8 +16,10 @@
  */
 #pragma once
 
+#include "FakeReadings.h"
+
 #include <device/types/electrical-sensor/ElectricalSensor.h>
-#include <platform/DefaultTimerDelegate.h>
+#include <lib/support/TimerDelegate.h>
 
 namespace chip::app {
 
@@ -30,210 +32,65 @@ class LoggingElectricalSensor : public ElectricalSensor,
                                 public Clusters::PowerTopology::Delegate
 {
 public:
-    explicit LoggingElectricalSensor(TimerDelegate & timerDelegate) : ElectricalSensor(timerDelegate, *this, *this, *this){};
+    explicit LoggingElectricalSensor(TimerDelegate & timerDelegate);
     ~LoggingElectricalSensor() override = default;
+
+    CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                        EndpointComposition composition = {}) override;
 
     // Clusters::ElectricalEnergyMeasurement::Delegate implementation
 
-    // define instead of constexpr static auto because the latter failes on Darwin.
-#define MSG "%s device: %s cluster: %s called"
-    // for the index format specifier we use the largest unsigned type a size_t can be, and cast everything to it.
-#define MSG_WITH_INDEX "%s device: %s cluster: %s called with index %llu"
-
-    constexpr static auto device                   = "ElectricalSensor";
-    constexpr static auto energyMeasurementCluster = "ElectricalEnergyMeasurement";
-    constexpr static auto powerMeasurementCluster  = "ElectricalPowerMeasurement";
-    constexpr static auto powerTopologyCluster     = "PowerTopology";
-
-    DataModel::Nullable<int64_t> GetCumulativeEnergyImported() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, energyMeasurementCluster, "GetCumulativeEnergyImported");
-        return DataModel::NullNullable;
-    }
-    DataModel::Nullable<int64_t> GetCumulativeEnergyExported() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, energyMeasurementCluster, "GetCumulativeEnergyExported");
-        return DataModel::NullNullable;
-    }
-    DataModel::Nullable<int64_t> GetPeriodicEnergyImported() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, energyMeasurementCluster, "GetPeriodicEnergyImported");
-        return DataModel::NullNullable;
-    }
-    DataModel::Nullable<int64_t> GetPeriodicEnergyExported() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, energyMeasurementCluster, "GetPeriodicEnergyExported");
-        return DataModel::NullNullable;
-    }
+    DataModel::Nullable<int64_t> GetCumulativeEnergyImported() override;
+    DataModel::Nullable<int64_t> GetCumulativeEnergyExported() override;
+    DataModel::Nullable<int64_t> GetPeriodicEnergyImported() override;
+    DataModel::Nullable<int64_t> GetPeriodicEnergyExported() override;
 
     // Clusters::ElectricalPowerMeasurement::Delegate implementation
 
-    Clusters::ElectricalPowerMeasurement::PowerModeEnum GetPowerMode() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "GetPowerMode");
-        return Clusters::ElectricalPowerMeasurement::PowerModeEnum::kUnknown;
-    }
-    uint8_t GetNumberOfMeasurementTypes() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "GetNumberOfMeasurementTypes");
-        return 0;
-    }
+    Clusters::ElectricalPowerMeasurement::PowerModeEnum GetPowerMode() override;
+    uint8_t GetNumberOfMeasurementTypes() override;
 
-    CHIP_ERROR StartAccuracyRead() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "StartAccuracyRead");
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR StartAccuracyRead() override;
     CHIP_ERROR GetAccuracyByIndex(uint8_t index,
-                                  Clusters::ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::Type & val) override
-    {
-        ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerMeasurementCluster, "GetAccuracyByIndex",
-                        static_cast<unsigned long long>(index));
-        val = {};
-        return index == 0 ? CHIP_NO_ERROR : CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-    }
-    CHIP_ERROR EndAccuracyRead() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "EndAccuracyRead");
-        return CHIP_NO_ERROR;
-    }
+                                  Clusters::ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::Type & val) override;
+    CHIP_ERROR EndAccuracyRead() override;
 
-    CHIP_ERROR StartRangesRead() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "StartRangesRead");
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR StartRangesRead() override;
     CHIP_ERROR GetRangeByIndex(uint8_t index,
-                               Clusters::ElectricalPowerMeasurement::Structs::MeasurementRangeStruct::Type &) override
-    {
-        ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerMeasurementCluster, "GetRangeByIndex",
-                        static_cast<unsigned long long>(index));
-        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-    }
-    CHIP_ERROR EndRangesRead() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "EndRangesRead");
-        return CHIP_NO_ERROR;
-    }
+                               Clusters::ElectricalPowerMeasurement::Structs::MeasurementRangeStruct::Type &) override;
+    CHIP_ERROR EndRangesRead() override;
 
-    CHIP_ERROR StartHarmonicCurrentsRead() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "StartHarmonicCurrentsRead");
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR StartHarmonicCurrentsRead() override;
     CHIP_ERROR GetHarmonicCurrentsByIndex(uint8_t index,
-                                          Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type &) override
-    {
-        ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerMeasurementCluster, "GetHarmonicCurrentsByIndex",
-                        static_cast<unsigned long long>(index));
-        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-    }
-    CHIP_ERROR EndHarmonicCurrentsRead() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "EndHarmonicCurrentsRead");
-        return CHIP_NO_ERROR;
-    }
+                                          Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type &) override;
+    CHIP_ERROR EndHarmonicCurrentsRead() override;
 
-    CHIP_ERROR StartHarmonicPhasesRead() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "StartHarmonicPhasesRead");
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR StartHarmonicPhasesRead() override;
     CHIP_ERROR GetHarmonicPhasesByIndex(uint8_t index,
-                                        Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type &) override
-    {
-        ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerMeasurementCluster, "GetHarmonicPhasesByIndex",
-                        static_cast<unsigned long long>(index));
-        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-    }
-    CHIP_ERROR EndHarmonicPhasesRead() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "EndHarmonicPhasesRead");
-        return CHIP_NO_ERROR;
-    }
+                                        Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type &) override;
+    CHIP_ERROR EndHarmonicPhasesRead() override;
 
-    DataModel::Nullable<int64_t> GetVoltage() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "GetVoltage");
-        return DataModel::NullNullable;
-    }
-    DataModel::Nullable<int64_t> GetActiveCurrent() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "GetActiveCurrent");
-        return DataModel::NullNullable;
-    }
-    DataModel::Nullable<int64_t> GetReactiveCurrent() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "GetReactiveCurrent");
-        return DataModel::NullNullable;
-    }
-    DataModel::Nullable<int64_t> GetApparentCurrent() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "GetApparentCurrent");
-        return DataModel::NullNullable;
-    }
-    DataModel::Nullable<int64_t> GetActivePower() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "GetActivePower");
-        return DataModel::NullNullable;
-    }
-    DataModel::Nullable<int64_t> GetReactivePower() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "GetReactivePower");
-        return DataModel::NullNullable;
-    }
-    DataModel::Nullable<int64_t> GetApparentPower() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "GetApparentPower");
-        return DataModel::NullNullable;
-    }
-    DataModel::Nullable<int64_t> GetRMSVoltage() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "GetRMSVoltage");
-        return DataModel::NullNullable;
-    }
-    DataModel::Nullable<int64_t> GetRMSCurrent() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "GetRMSCurrent");
-        return DataModel::NullNullable;
-    }
-    DataModel::Nullable<int64_t> GetRMSPower() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "GetRMSPower");
-        return DataModel::NullNullable;
-    }
-    DataModel::Nullable<int64_t> GetFrequency() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "GetFrequency");
-        return DataModel::NullNullable;
-    }
-    DataModel::Nullable<int64_t> GetPowerFactor() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "GetPowerFactor");
-        return DataModel::NullNullable;
-    }
-    DataModel::Nullable<int64_t> GetNeutralCurrent() override
-    {
-        ChipLogProgress(DeviceLayer, MSG, device, powerMeasurementCluster, "GetNeutralCurrent");
-        return DataModel::NullNullable;
-    }
+    DataModel::Nullable<int64_t> GetVoltage() override;
+    DataModel::Nullable<int64_t> GetActiveCurrent() override;
+    DataModel::Nullable<int64_t> GetReactiveCurrent() override;
+    DataModel::Nullable<int64_t> GetApparentCurrent() override;
+    DataModel::Nullable<int64_t> GetActivePower() override;
+    DataModel::Nullable<int64_t> GetReactivePower() override;
+    DataModel::Nullable<int64_t> GetApparentPower() override;
+    DataModel::Nullable<int64_t> GetRMSVoltage() override;
+    DataModel::Nullable<int64_t> GetRMSCurrent() override;
+    DataModel::Nullable<int64_t> GetRMSPower() override;
+    DataModel::Nullable<int64_t> GetFrequency() override;
+    DataModel::Nullable<int64_t> GetPowerFactor() override;
+    DataModel::Nullable<int64_t> GetNeutralCurrent() override;
 
     // Clusters::PowerTopology::Delegate implementation
 
-    CHIP_ERROR GetAvailableEndpointAtIndex(size_t index, EndpointId & endpointId) override
-    {
-        ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerTopologyCluster, "GetAvailableEndpointAtIndex",
-                        static_cast<unsigned long long>(index));
-        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-    }
-    CHIP_ERROR GetActiveEndpointAtIndex(size_t index, EndpointId & endpointId) override
-    {
-        ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerTopologyCluster, "GetActiveEndpointAtIndex",
-                        static_cast<unsigned long long>(index));
-        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-    }
-#undef MSG
-#undef MSG_WITH_INDEX
+    CHIP_ERROR GetAvailableEndpointAtIndex(size_t index, EndpointId & endpointId) override;
+    CHIP_ERROR GetActiveEndpointAtIndex(size_t index, EndpointId & endpointId) override;
+
+private:
+    FakeReadings mFakeReadings;
 };
 
 } // namespace chip::app
