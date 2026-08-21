@@ -184,13 +184,19 @@ TEST_F(TestDefaultAvAnalysisCameraClient, CompletionIsDeliveredExactlyOnce)
     EXPECT_EQ(mCallback.mAllocatedCount, 1);
 }
 
-// Exposes the protected request builder and profile seam for direct testing
+// Exposes the protected request builder and profile for direct testing
 class ProfileTestClient : public DefaultAvAnalysisCameraClient
 {
 public:
     using DefaultAvAnalysisCameraClient::BuildAllocateRequest;
     using DefaultAvAnalysisCameraClient::CameraProfile;
-    using DefaultAvAnalysisCameraClient::DiscoverCameraProfile;
+    using DefaultAvAnalysisCameraClient::FillProfileFromConfiguration;
+    using DefaultAvAnalysisCameraClient::OnProfileDiscoveryComplete;
+
+protected:
+    // Discovery does not run on its own; the test drives OnProfileDiscoveryComplete explicitly
+    void StartProfileDiscovery() override {}
+    void EstablishSession(const ScopedNodeId & aCameraNode) override {}
 };
 
 TEST_F(TestDefaultAvAnalysisCameraClient, AllocateRequestFollowsProfileBounds)
@@ -231,7 +237,7 @@ TEST_F(TestDefaultAvAnalysisCameraClient, DefaultProfileComesFromConfiguration)
     client.SetCameraVideoTraits(/* aHasWatermark = */ true, /* aHasOSD = */ true);
 
     ProfileTestClient::CameraProfile profile;
-    ASSERT_EQ(client.DiscoverCameraProfile(profile), CHIP_NO_ERROR);
+    client.FillProfileFromConfiguration(profile);
 
     EXPECT_EQ(profile.avsmEndpoint, kCameraEndpoint);
     EXPECT_TRUE(profile.hasWatermark);
@@ -239,6 +245,37 @@ TEST_F(TestDefaultAvAnalysisCameraClient, DefaultProfileComesFromConfiguration)
     EXPECT_GT(profile.maxFrameRate, profile.minFrameRate);
     EXPECT_GT(profile.maxBitRateBps, profile.minBitRateBps);
     EXPECT_GE(profile.maxWidth, profile.minWidth);
+}
+
+TEST_F(TestDefaultAvAnalysisCameraClient, DiscoveryFailureFailsRequest)
+{
+    ProfileTestClient client;
+    ASSERT_EQ(client.Init(&mCASESessionManager, kCameraEndpoint), CHIP_NO_ERROR);
+
+    EXPECT_EQ(client.RequestVideoStreamAllocation(kCameraNode, mCallback), CHIP_NO_ERROR);
+    EXPECT_EQ(mCallback.mAllocatedCount, 0); // Nothing completes until discovery does
+
+    client.OnProfileDiscoveryComplete(CHIP_ERROR_TIMEOUT);
+
+    EXPECT_EQ(mCallback.mAllocatedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
+
+    // Client is reusable after the failed discovery
+    EXPECT_EQ(client.RequestVideoStreamAllocation(kCameraNode, mCallback), CHIP_NO_ERROR);
+}
+
+TEST_F(TestDefaultAvAnalysisCameraClient, DiscoverySuccessWithoutSessionFailsRequest)
+{
+    ProfileTestClient client;
+    ASSERT_EQ(client.Init(&mCASESessionManager, kCameraEndpoint), CHIP_NO_ERROR);
+
+    EXPECT_EQ(client.RequestVideoStreamAllocation(kCameraNode, mCallback), CHIP_NO_ERROR);
+
+    // Discovery reporting success without a held session cannot send the command
+    client.OnProfileDiscoveryComplete(CHIP_NO_ERROR);
+
+    EXPECT_EQ(mCallback.mAllocatedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
 }
 
 TEST_F(TestDefaultAvAnalysisCameraClient, CancelDropsPendingRequestWithoutCompletion)

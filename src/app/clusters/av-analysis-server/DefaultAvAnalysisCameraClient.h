@@ -25,6 +25,7 @@
 #include <app/clusters/av-analysis-server/AvAnalysisCameraClient.h>
 #include <clusters/CameraAvStreamManagement/Commands.h>
 #include <lib/core/DataModelTypes.h>
+#include <transport/SessionHolder.h>
 
 namespace chip {
 namespace app {
@@ -111,9 +112,20 @@ protected:
     }
 
     /**
-     * Determines the camera's profile for the pending request.
+     * Begins profile discovery for the pending request, once the camera session is up.
      */
-    virtual CHIP_ERROR DiscoverCameraProfile(CameraProfile & outProfile);
+    virtual void StartProfileDiscovery();
+
+    /**
+     * Completion of StartProfileDiscovery: on success the pending command is sent on the held session,
+     * otherwise the request fails.
+     */
+    void OnProfileDiscoveryComplete(CHIP_ERROR aError);
+
+    /**
+     * Fills a profile from this client's configuration
+     */
+    void FillProfileFromConfiguration(CameraProfile & outProfile) const;
 
     /**
      * Builds the VideoStreamAllocate request (StreamUsage Analysis) from a camera profile.
@@ -146,6 +158,9 @@ private:
     Callback * mPendingCallback    = nullptr;
     bool mResponseDelivered        = false;
     CameraProfile mProfile;
+    // Session/exchange manager held across the discovery phase of the pending request
+    SessionHolder mSessionHolder;
+    Messaging::ExchangeManager * mExchangeMgr = nullptr;
     std::unique_ptr<CommandSender> mCommandSender;
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;

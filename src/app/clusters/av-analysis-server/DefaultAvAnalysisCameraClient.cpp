@@ -83,6 +83,8 @@ void DefaultAvAnalysisCameraClient::Cancel()
     mPendingCallback   = nullptr;
     mResponseDelivered = false;
     mProfile           = CameraProfile{};
+    mSessionHolder.Release();
+    mExchangeMgr = nullptr;
 }
 
 CHIP_ERROR DefaultAvAnalysisCameraClient::StartRequest(PendingRequest aRequest, const ScopedNodeId & aCameraNode,
@@ -100,7 +102,30 @@ CHIP_ERROR DefaultAvAnalysisCameraClient::StartRequest(PendingRequest aRequest, 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DefaultAvAnalysisCameraClient::DiscoverCameraProfile(CameraProfile & outProfile)
+void DefaultAvAnalysisCameraClient::StartProfileDiscovery()
+{
+    FillProfileFromConfiguration(mProfile);
+    OnProfileDiscoveryComplete(CHIP_NO_ERROR);
+}
+
+void DefaultAvAnalysisCameraClient::OnProfileDiscoveryComplete(CHIP_ERROR aError)
+{
+    if (aError != CHIP_NO_ERROR || !mSessionHolder || mExchangeMgr == nullptr)
+    {
+        ChipLogError(Zcl, "AvAnalysisCameraClient: profile discovery failed: %" CHIP_ERROR_FORMAT, aError.Format());
+        FinishRequest(Status::Failure, mPendingStreamId);
+        return;
+    }
+
+    CHIP_ERROR err = SendPendingCommand(*mExchangeMgr, mSessionHolder.Get().Value());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "AvAnalysisCameraClient: failed to send command: %" CHIP_ERROR_FORMAT, err.Format());
+        FinishRequest(Status::Failure, mPendingStreamId);
+    }
+}
+
+void DefaultAvAnalysisCameraClient::FillProfileFromConfiguration(CameraProfile & outProfile) const
 {
     outProfile.avsmEndpoint  = mCameraEndpoint;
     outProfile.hasWatermark  = mCameraHasWatermark;
@@ -113,7 +138,6 @@ CHIP_ERROR DefaultAvAnalysisCameraClient::DiscoverCameraProfile(CameraProfile & 
     outProfile.maxHeight     = kDefaultMaxResolutionHeight;
     outProfile.minBitRateBps = kDefaultMinBitRateBps;
     outProfile.maxBitRateBps = kDefaultMaxBitRateBps;
-    return CHIP_NO_ERROR;
 }
 
 Commands::VideoStreamAllocate::Type DefaultAvAnalysisCameraClient::BuildAllocateRequest(const CameraProfile & aProfile)
@@ -147,17 +171,10 @@ Commands::VideoStreamAllocate::Type DefaultAvAnalysisCameraClient::BuildAllocate
 void DefaultAvAnalysisCameraClient::OnDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
                                                       const SessionHandle & sessionHandle)
 {
-    auto * self    = static_cast<DefaultAvAnalysisCameraClient *>(context);
-    CHIP_ERROR err = self->DiscoverCameraProfile(self->mProfile);
-    if (err == CHIP_NO_ERROR)
-    {
-        err = self->SendPendingCommand(exchangeMgr, sessionHandle);
-    }
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "AvAnalysisCameraClient: failed to send command: %" CHIP_ERROR_FORMAT, err.Format());
-        self->FinishRequest(Status::Failure, self->mPendingStreamId);
-    }
+    auto * self        = static_cast<DefaultAvAnalysisCameraClient *>(context);
+    self->mExchangeMgr = &exchangeMgr;
+    self->mSessionHolder.Grab(sessionHandle);
+    self->StartProfileDiscovery();
 }
 
 void DefaultAvAnalysisCameraClient::OnDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
@@ -261,6 +278,8 @@ void DefaultAvAnalysisCameraClient::FinishRequest(Status aStatus, uint16_t aStre
     mPendingRequest          = PendingRequest::kNone;
     mPendingCallback         = nullptr;
     mProfile                 = CameraProfile{};
+    mSessionHolder.Release();
+    mExchangeMgr = nullptr;
 
     if (completed == PendingRequest::kAllocate)
     {
