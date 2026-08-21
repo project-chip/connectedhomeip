@@ -225,6 +225,8 @@ CHIP_ERROR CommandHandlerImpl::ValidateInvokeRequestMessageAndBuildRegistry(Invo
 
     ReturnErrorOnFailure(TLV::Utilities::Count(invokeRequestsReader, commandCount, false /* recurse */));
 
+    mNumTargetedEndpoints = 0;
+
     // If this is a GroupRequest the only thing to check is that there is only one
     // CommandDataIB.
     if (IsGroupRequest())
@@ -252,6 +254,8 @@ CHIP_ERROR CommandHandlerImpl::ValidateInvokeRequestMessageAndBuildRegistry(Invo
         ConcreteCommandPath concretePath(0, 0, 0);
         ReturnErrorOnFailure(commandData.GetPath(&commandPath));
         ReturnErrorOnFailure(commandPath.GetConcreteCommandPath(concretePath));
+
+        RecordTargetedEndpoint(concretePath.mEndpointId);
 
         // Grab the CommandRef if there is one, and validate that it's there when it
         // has to be.
@@ -313,6 +317,11 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
                             Status::InvalidAction);
     }
 
+    if (delayReportData.has_value())
+    {
+        TriggerDelayReport(delayReportData.value());
+    }
+
     TLV::TLVReader invokeRequestsReader;
     invokeRequests.GetReader(&invokeRequestsReader);
 
@@ -324,7 +333,6 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
         mReserveSpaceForMoreChunkMessages = true;
     }
 
-    mNumTargetedEndpoints = 0;
     while (CHIP_NO_ERROR == (err = invokeRequestsReader.Next()))
     {
         VerifyOrReturnError(TLV::AnonymousTag() == invokeRequestsReader.GetTag(), Status::InvalidAction);
@@ -352,11 +360,6 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
     }
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.ExitContainer() == CHIP_NO_ERROR, Status::InvalidAction);
-
-    if (delayReportData.has_value())
-    {
-        TriggerDelayReport(delayReportData.value());
-    }
 
     return Status::Success;
 }
@@ -475,8 +478,6 @@ Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
             return FallibleAddStatus(concretePath, preCheckStatus) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
         }
     }
-
-    RecordTargetedEndpoint(concretePath.mEndpointId);
 
     err = aCommandElement.GetFields(&commandDataReader);
     if (CHIP_END_OF_TLV == err)
@@ -1046,6 +1047,11 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
                            DataManagement, "DUT Failure: InvokeRequestMessage contents were invalid");
     }
 
+    if (delayReportData.has_value())
+    {
+        TriggerDelayReport(delayReportData.value());
+    }
+
     TLV::TLVReader invokeRequestsReader;
     invokeRequests.GetReader(&invokeRequestsReader);
 
@@ -1059,7 +1065,6 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
     VerifyOrDieWithMsg(commandCount == 2, DataManagement, "DUT failure: We were strictly expecting exactly 2 InvokeRequests");
     mReserveSpaceForMoreChunkMessages = true;
 
-    mNumTargetedEndpoints = 0;
     {
         // Response path is the same as request path since we are replying with a failure message.
         ConcreteCommandPath concreteResponsePath1;
@@ -1070,9 +1075,6 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
         VerifyOrDieWithMsg(
             TestOnlyExtractCommandPathFromNextInvokeRequest(invokeRequestsReader, concreteResponsePath2) == CHIP_NO_ERROR,
             DataManagement, "DUT Failure: Issues encountered while extracting the ConcreteCommandPath from the second request");
-
-        RecordTargetedEndpoint(concreteResponsePath1.mEndpointId);
-        RecordTargetedEndpoint(concreteResponsePath2.mEndpointId);
 
         if (faultType == NlFaultInjectionType::SeparateResponseMessagesAndInvertedResponseOrder)
         {
@@ -1100,11 +1102,6 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
                        "DUT Failure: Unexpected TLV ending of InvokeRequests");
     VerifyOrDieWithMsg(invokeRequestMessage.ExitContainer() == CHIP_NO_ERROR, DataManagement,
                        "DUT Failure: InvokeRequestMessage TLV is not properly terminated");
-
-    if (delayReportData.has_value())
-    {
-        TriggerDelayReport(delayReportData.value());
-    }
 }
 #endif // CHIP_WITH_NLFAULTINJECTION
 
