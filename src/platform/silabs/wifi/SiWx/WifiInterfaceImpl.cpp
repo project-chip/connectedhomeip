@@ -196,7 +196,7 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_status_t status_cod
     }
 
     VerifyOrReturnError(arg != nullptr, SL_STATUS_INVALID_PARAMETER);
-    auto * scanContext = static_cast<NetworkScanCallbackContext *>(arg);
+    NetworkScanCallbackContext * scanContext = static_cast<NetworkScanCallbackContext *>(arg);
 
     chip::ByteSpan requestedSsidSpan = {};
     if (scanContext->ssid.length > 0)
