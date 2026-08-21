@@ -15,8 +15,6 @@
  *    limitations under the License.
  */
 
-#include <clusters/RvcCleanMode/Metadata.h>
-#include <clusters/RvcRunMode/Metadata.h>
 #include <device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.h>
 #include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationLogic.h>
 #include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationTopology.h>
@@ -55,25 +53,23 @@ CHIP_ERROR RoboticVacuumCleaner::Register(EndpointId endpoint, CodeDrivenDataMod
                                BitMask<Feature>(Feature::kMaps, Feature::kProgressReporting), serviceAreaOptionalAttributes);
     ReturnErrorOnFailure(provider.AddCluster(mServiceAreaCluster.Registration()));
 
-    mRunModeCluster.Create(endpoint, Clusters::RvcRunMode::Id,
+    mRunModeCluster.Create(endpoint, Clusters::ModeBase::kRvcRunMode,
                            Clusters::ModeBaseCluster::Config{
                                .feature                = BitMask<Clusters::ModeBase::Feature>(),
                                .optionalAttributeSet   = {},
                                .appDelegate            = mRunModeDelegate,
                                .onOffValueForStartUp   = false,
                                .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
-                               .clusterRevision        = Clusters::RvcRunMode::kRevision,
                            });
     ReturnErrorOnFailure(provider.AddCluster(mRunModeCluster.Registration()));
 
-    mCleanModeCluster.Create(endpoint, Clusters::RvcCleanMode::Id,
+    mCleanModeCluster.Create(endpoint, Clusters::ModeBase::kRvcCleanMode,
                              Clusters::ModeBaseCluster::Config{
                                  .feature                = BitMask<Clusters::ModeBase::Feature>(),
                                  .optionalAttributeSet   = {},
                                  .appDelegate            = mCleanModeDelegate,
                                  .onOffValueForStartUp   = false,
                                  .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
-                                 .clusterRevision        = Clusters::RvcCleanMode::kRevision,
                              });
     ReturnErrorOnFailure(provider.AddCluster(mCleanModeCluster.Registration()));
 
