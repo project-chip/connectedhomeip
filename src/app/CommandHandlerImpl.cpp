@@ -283,6 +283,14 @@ CHIP_ERROR CommandHandlerImpl::ValidateInvokeRequestMessageAndBuildRegistry(Invo
         err = CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(err);
+
+    std::optional<InvokeRequestMessage::DelayReportData> delayReportData;
+    ReturnErrorOnFailure(invokeRequestMessage.GetDelayReportData(delayReportData));
+    if (delayReportData.has_value())
+    {
+        TriggerDelayReport(delayReportData.value());
+    }
+
     return invokeRequestMessage.ExitContainer();
 }
 
@@ -307,19 +315,12 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
     VerifyOrReturnError(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetTimedRequest(&mTimedRequest) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, Status::InvalidAction);
-    std::optional<InvokeRequestMessage::DelayReportData> delayReportData;
-    VerifyOrReturnError(invokeRequestMessage.GetDelayReportData(delayReportData) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(mTimedRequest == isTimedInvoke, Status::TimedRequestMismatch);
 
     {
         InvokeRequestMessage::Parser validationInvokeRequestMessage = invokeRequestMessage;
         VerifyOrReturnError(ValidateInvokeRequestMessageAndBuildRegistry(validationInvokeRequestMessage) == CHIP_NO_ERROR,
                             Status::InvalidAction);
-    }
-
-    if (delayReportData.has_value())
-    {
-        TriggerDelayReport(delayReportData.value());
     }
 
     TLV::TLVReader invokeRequestsReader;
@@ -1035,9 +1036,6 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
                        "DUT Failure: Mandatory TimedRequest field missing");
     VerifyOrDieWithMsg(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, DataManagement,
                        "DUT Failure: Mandatory InvokeRequests field missing");
-    std::optional<InvokeRequestMessage::DelayReportData> delayReportData;
-    VerifyOrDieWithMsg(invokeRequestMessage.GetDelayReportData(delayReportData) == CHIP_NO_ERROR, DataManagement,
-                       "DUT Failure: Failed to read DelayReportData");
     VerifyOrDieWithMsg(mTimedRequest == isTimedInvoke, DataManagement,
                        "DUT Failure: TimedRequest value in message mismatches action");
 
@@ -1045,11 +1043,6 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
         InvokeRequestMessage::Parser validationInvokeRequestMessage = invokeRequestMessage;
         VerifyOrDieWithMsg(ValidateInvokeRequestMessageAndBuildRegistry(validationInvokeRequestMessage) == CHIP_NO_ERROR,
                            DataManagement, "DUT Failure: InvokeRequestMessage contents were invalid");
-    }
-
-    if (delayReportData.has_value())
-    {
-        TriggerDelayReport(delayReportData.value());
     }
 
     TLV::TLVReader invokeRequestsReader;
