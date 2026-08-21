@@ -1149,9 +1149,8 @@ void CommandHandlerImpl::TriggerDelayReport(const InvokeRequestMessage::DelayRep
     {
         delayMs += (chip::Crypto::GetRandU32() % aDelayReportData.delayJitterWindowMs);
     }
-    Span<const EndpointId> targetedEndpoints = IsGroupRequest()
-        ? Span<const EndpointId>()
-        : Span<const EndpointId>(mTargetedEndpoints, mNumTargetedEndpoints);
+    Span<const EndpointId> targetedEndpoints =
+        IsGroupRequest() ? Span<const EndpointId>() : Span<const EndpointId>(mTargetedEndpoints, mNumTargetedEndpoints);
     mpCallback->OnDelayReport(System::Clock::Milliseconds32(delayMs), targetedEndpoints);
 }
 
