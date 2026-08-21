@@ -45,9 +45,6 @@ config MCUBOOT_SIGNATURE_KEY_FILE
 	default "bootloader/mcuboot/root-ec-p256.pem"
 	depends on BOOTLOADER_MCUBOOT
 
-config CHIP_MALLOC_SYS_HEAP
-	default n if !ARCH_POSIX
-
 config CHIP_TASK_STACK_SIZE
 	int "The Matter thread stack size"
 	default 10240
