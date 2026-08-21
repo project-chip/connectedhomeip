@@ -46,7 +46,6 @@ constexpr size_t kThermostatEndpointCount     = kThermostatFixedClusterCount + C
 
 LazyRegisteredServerCluster<ThermostatCluster> gClusters[kThermostatEndpointCount];
 
-
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:

@@ -256,8 +256,8 @@ void ThermostatCluster::ReEvaluateCurrentSuggestion()
     bool suggestionChanged = currentSuggestionBeforeReevaluation.IsNull() != currentSuggestionAfterReevaluation.IsNull();
     if (!suggestionChanged && !currentSuggestionAfterReevaluation.IsNull())
     {
-        suggestionChanged = currentSuggestionBeforeReevaluation.Value().GetUniqueID() !=
-            currentSuggestionAfterReevaluation.Value().GetUniqueID();
+        suggestionChanged =
+            currentSuggestionBeforeReevaluation.Value().GetUniqueID() != currentSuggestionAfterReevaluation.Value().GetUniqueID();
     }
 
     if (suggestionChanged)
