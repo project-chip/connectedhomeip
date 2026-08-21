@@ -1062,12 +1062,11 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEventGenerationSequence)
     Events::AnalysisSessionEnd::DecodableType endSessionData;
     ASSERT_EQ(endSessionEvent->GetEventData(endSessionData), CHIP_NO_ERROR);
     ASSERT_EQ(endSessionData.sessionID, mSessionId);
-    
+
     // 6. Verify that the session is no longer available, a new context should fail with the no longer valid session id
     ASSERT_EQ(
         mServer.GetLogic().NewContextDetected(mSessionId, testAdditionalTrackedContext, &mClusterTester.GetServerClusterContext()),
         CHIP_ERROR_NOT_FOUND);
-
 }
 
 } // namespace
