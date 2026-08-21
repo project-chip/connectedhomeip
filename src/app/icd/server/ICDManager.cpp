@@ -23,6 +23,7 @@
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/ClusterEnums.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Defer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/LockTracker.h>
@@ -821,14 +822,14 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
         UpdateOperationState(OperationalState::ActiveMode);
     }
 #else
-    const PendingCheckInType pendingCheckInType = mPendingCheckInType;
-    const size_t pendingSubjectsCount           = mPendingCheckInSubjectsCount;
-    mPendingCheckInType                         = PendingCheckInType::kNone;
-    mPendingCheckInSubjectsCount                = 0;
-
     // Early return if there is no pending action
     VerifyOrReturn(wasPendingActiveMode || mOperationalState == OperationalState::ActiveMode ||
-                   pendingCheckInType != PendingCheckInType::kNone);
+                   mPendingCheckInType != PendingCheckInType::kNone);
+
+    auto deferCleanup = MakeDefer([this] {
+        mPendingCheckInType          = PendingCheckInType::kNone;
+        mPendingCheckInSubjectsCount = 0;
+    });
 
     const bool wasInIdleMode = (mOperationalState == OperationalState::IdleMode);
 
@@ -841,9 +842,9 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
     VerifyOrReturn(!wasInIdleMode);
 
     // If the device was already in ActiveMode, UpdateOperationState() only extended active duration, so replay pending check-ins.
-    if (pendingCheckInType == PendingCheckInType::kTargeted)
+    if (mPendingCheckInType == PendingCheckInType::kTargeted)
     {
-        for (size_t i = 0; i < pendingSubjectsCount; ++i)
+        for (size_t i = 0; i < mPendingCheckInSubjectsCount; ++i)
         {
             ChipLogProgress(AppServer,
                             "ICDManager: Replaying deferred Check-In message for specific subject: " ChipLogFormatX64,
@@ -851,7 +852,7 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
             SendCheckInMsgs(MakeOptional(mPendingCheckInSubjects[i]));
         }
     }
-    else if (pendingCheckInType == PendingCheckInType::kBroadcast)
+    else if (mPendingCheckInType == PendingCheckInType::kBroadcast)
     {
         ChipLogProgress(AppServer, "ICDManager: Replaying deferred broadcast Check-In message.");
         SendCheckInMsgs(NullOptional);
