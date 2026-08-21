@@ -425,6 +425,98 @@ public:
 };
 
 /**
+ * Named pipe handler for setting sensor fusion supported
+ *
+ * Usage example:
+ *   echo '{"Name":"SetSensorFusionSupported","EndpointId":1,"AmbientContextType":[{"TypeId":73, "TagId":2},{"TypeId":74,
+ * "TagId":2},{"TypeId":75, "TagId":2}]}'> /tmp/acs_fifo
+ *
+ * JSON Arguments:
+ *   - "Name": Must be "SetSensorFusionSupported"
+ *   - "EndpointId": ID of endpoint
+ *   - "AmbientContextType": array of the supported ambient context sensing type
+ *
+ * @param jsonValue - JSON payload from named pipe
+ */
+class SetSensorFusionSupportedCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "SetSensorFusionSupported"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::AmbientContextSensingCluster>(
+                endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "AmbientContextSensingCluster not found on endpoint %d", endpointId);
+            return;
+        }
+        // Validate AmbientContextType exists and is an array
+        if (!json.isMember("AmbientContextType") || !json["AmbientContextType"].isArray())
+        {
+            std::string inputJson = json.toStyledString();
+            ChipLogError(AppServer, "Missing or invalid AmbientContextType array: %s", inputJson.c_str());
+            return;
+        }
+        const Json::Value & actArray = json["AmbientContextType"];
+        if (actArray.empty())
+        {
+            // Empty array is valid: clears the supported sensor fusion list
+            Span<Globals::Structs::SemanticTagStruct::Type> emptyTags;
+            LogErrorOnFailure(cluster->SetSensorFusionSupported(emptyTags));
+            return;
+        }
+        if (actArray.size() > AmbientContextSensing::kMaxSensorFusionSupported)
+        {
+            ChipLogError(AppServer, "AmbientContextType array too large: %u", static_cast<unsigned>(actArray.size()));
+            return;
+        }
+        Span<Globals::Structs::SemanticTagStruct::Type> semanticTags;
+        std::unique_ptr<Globals::Structs::SemanticTagStruct::Type[]> tagBuf =
+            std::make_unique<Globals::Structs::SemanticTagStruct::Type[]>(actArray.size());
+        for (Json::ArrayIndex i = 0; i < actArray.size(); i++)
+        {
+            Json::Value item = actArray[i];
+            if (!item.isObject() || !item.isMember("TypeId") || !item.isMember("TagId"))
+            {
+                std::string inputJson = json.toStyledString();
+                ChipLogError(AppServer, "AmbientContextType[%u], missing/invalid TypeId/TagId in %s", static_cast<uint16_t>(i),
+                             inputJson.c_str());
+                return;
+            }
+
+            if (!item["TypeId"].isUInt() || !item["TagId"].isUInt())
+            {
+                ChipLogError(AppServer, "AmbientContextType[%u]: TypeId and TagId must be unsigned integers",
+                             static_cast<uint16_t>(i));
+                return;
+            }
+            uint32_t typeIdRaw = item["TypeId"].asUInt();
+            uint32_t tagIdRaw  = item["TagId"].asUInt();
+
+            if (typeIdRaw > std::numeric_limits<uint8_t>::max() || tagIdRaw > std::numeric_limits<uint8_t>::max())
+            {
+                std::string inputJson = json.toStyledString();
+                ChipLogError(AppServer, "AmbientContextType[%u]: TypeId (%u) or TagId (%u) out of uint8_t range in %s",
+                             static_cast<uint16_t>(i), typeIdRaw, tagIdRaw, inputJson.c_str());
+                return;
+            }
+
+            uint8_t typeId = static_cast<uint8_t>(typeIdRaw);
+            uint8_t tagId  = static_cast<uint8_t>(tagIdRaw);
+
+            ChipLogDetail(AppServer, "AmbientContextType[%u] -> (TypeId, TagId) = (%u, %u)", static_cast<unsigned>(i), typeId,
+                          tagId);
+            tagBuf[i].namespaceID = typeId;
+            tagBuf[i].tag         = tagId;
+        }
+        semanticTags = Span<Globals::Structs::SemanticTagStruct::Type>(tagBuf.get(), actArray.size());
+        LogErrorOnFailure(cluster->SetSensorFusionSupported(semanticTags));
+    }
+};
+
+/**
  * Named pipe handler for setting object count
  *
  * Usage example:
@@ -590,6 +682,7 @@ void AllDevicesAppCommandDelegate::RegisterCommandHandlers()
     RegisterCommandHandler(std::make_unique<SetAmbientContextSupportCommandHandler>());
     RegisterCommandHandler(std::make_unique<AddAmbientContextDetectCommandHandler>());
     RegisterCommandHandler(std::make_unique<SetPredictedActivityCommandHandler>());
+    RegisterCommandHandler(std::make_unique<SetSensorFusionSupportedCommandHandler>());
     RegisterCommandHandler(std::make_unique<SetObjCountCommandHandler>());
     RegisterCommandHandler(std::make_unique<SetBooleanStateCommandHandler>());
     RegisterCommandHandler(std::make_unique<SetOnOffCommandHandler>());
