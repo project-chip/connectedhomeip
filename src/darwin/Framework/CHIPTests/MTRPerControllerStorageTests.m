@@ -2971,6 +2971,94 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     XCTAssertFalse([controller isRunning]);
 }
 
+#ifdef DEBUG
+// A one-shot MTRBaseDevice read to a Thread device must not hang forever when the
+// getSessionForNode connectivity monitor does not signal connectivity (as is expected when the
+// device cannot currently be reached, e.g. an idle Thread SED). If an operational CASE session
+// already exists, the read must reuse it instead of being gated behind that monitor.
+- (void)testGetSessionForThreadDeviceReusesActiveSessionWhenConnectivityMonitorNeverFires
+{
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type queue = dispatch_get_main_queue();
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
+
+    NSNumber * fabricID = @(456);
+    NSNumber * nodeID = @(123);
+
+    NSError * error;
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    NSNumber * deviceID = @(17);
+    certificateIssuer.nextNodeID = deviceID;
+    [self commissionWithController:controller newNodeID:deviceID];
+
+    // Register cleanup as a teardown block so it runs even if an assertion below aborts the test
+    // (this class sets continueAfterFailure=NO). Without this, a failure here would leave the
+    // shared commissionee paired and the controller running, poisoning subsequent tests. The
+    // suppression flag is cleared first so the reset/shutdown path can acquire a session normally.
+    __weak __auto_type weakSelf = self;
+    [self addTeardownBlock:^{
+        __auto_type self = weakSelf; // re-bind strongly for the block's duration without retaining the test case
+        if (self == nil) {
+            return;
+        }
+        controller.unitTestSuppressGetSessionConnectivityMonitorFire = NO;
+        __auto_type * resetBaseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+        ResetCommissioneeWithNodeID(resetBaseDevice, queue, self, kTimeoutInSeconds, deviceID);
+        [controller shutdown];
+        XCTAssertFalse([controller isRunning]);
+    }];
+
+    // Bring up an MTRDevice and wait for its subscription to establish, so that an operational
+    // CASE session to the device exists. pretendThreadEnabled forces the Thread getSessionForNode path.
+    __auto_type * subscriptionExpectation = [self expectationWithDescription:@"Subscription established"];
+    subscriptionExpectation.assertForOverFulfill = NO;
+    __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+    };
+    [device setDelegate:delegate queue:queue];
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    // Simulate the condition where the getSessionForNode connectivity monitor does not signal
+    // connectivity -- as expected when the device cannot currently be reached (e.g. an idle Thread
+    // sleepy end device that already has an active CASE session). The monitor's handler never runs,
+    // so the queued work item is never enqueued and a read would otherwise hang here.
+    controller.unitTestSuppressGetSessionConnectivityMonitorFire = YES;
+
+    // A one-shot MTRBaseDevice read must still complete (by reusing the already-active session),
+    // rather than hanging behind the never-firing connectivity monitor.
+    __auto_type * readExpectation = [self expectationWithDescription:@"BaseDevice read completes"];
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+    __auto_type * onOffCluster = [[MTRBaseClusterOnOff alloc] initWithDevice:baseDevice endpointID:@(1) queue:queue];
+    [onOffCluster readAttributeOnOffWithCompletion:^(NSNumber * value, NSError * _Nullable readError) {
+        XCTAssertNil(readError);
+        [readExpectation fulfill];
+    }];
+    // Generous, but far short of an indefinite hang: pre-fix this times out, post-fix it is near-instant.
+    [self waitForExpectations:@[ readExpectation ] timeout:30];
+}
+#endif // DEBUG
+
 - (void)testSubscriptionPool
 {
     // QRCodes generated for discriminators 1111~1115 and passcodes 1001~1005
