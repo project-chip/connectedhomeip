@@ -184,6 +184,7 @@ config INIT_STACKS
 	default y
 
 config NET_MGMT_EVENT_STACK_SIZE
+	default 8192 if OPENTHREAD_BORDER_ROUTER
 	default 1024
 
 config NET_MGMT_EVENT_QUEUE_SIZE
@@ -199,6 +200,7 @@ config NET_IF_MAX_IPV4_COUNT
 	default 2
 
 config NET_IF_MAX_IPV6_COUNT
+	default 8 if OPENTHREAD_BORDER_ROUTER
 	default 2
 
 config NET_TC_TX_COUNT
@@ -234,15 +236,19 @@ config NET_CONTEXT_RECV_PKTINFO
 
 # Network buffers
 config NET_PKT_RX_COUNT
+	default 16 if OPENTHREAD_BORDER_ROUTER
 	default 14
 
 config NET_PKT_TX_COUNT
+	default 16 if OPENTHREAD_BORDER_ROUTER
 	default 14
 
 config NET_BUF_RX_COUNT
+	default 64 if OPENTHREAD_BORDER_ROUTER
 	default 36
 
 config NET_BUF_TX_COUNT
+	default 64 if OPENTHREAD_BORDER_ROUTER
 	default 36
 
 config NET_BUF_DATA_SIZE
@@ -254,7 +260,8 @@ config HDLC_RCP_IF
 	default y if SOC_FAMILY_NXP_RW
 
 config OPENTHREAD_THREAD_STACK_SIZE
-    default 6144
+	default 8192 if OPENTHREAD_BORDER_ROUTER
+	default 6144
 
 # Use the platform-provided heap
 config OPENTHREAD_EXTERNAL_HEAP
@@ -270,6 +277,7 @@ config OPENTHREAD_SLAAC
 
 # Number of message buffers in the buffer pool
 config OPENTHREAD_NUM_MESSAGE_BUFFERS
+	default 512 if OPENTHREAD_BORDER_ROUTER
 	default 30 if SOC_SERIES_MCXW7XX
 	default 256
 
@@ -303,11 +311,11 @@ config OPENTHREAD_MAC_SOFTWARE_TX_SECURITY_ENABLE
 
 # Enable Domain Unicast Address feature
 config OPENTHREAD_DUA
-	default y if SOC_SERIES_MCXW7XX
+	default y if SOC_SERIES_MCXW7XX || OPENTHREAD_BORDER_ROUTER
 
 # Enable Multicast Listener Registration support
 config OPENTHREAD_MLR
-	default y if SOC_SERIES_MCXW7XX
+	default y if SOC_SERIES_MCXW7XX || OPENTHREAD_BORDER_ROUTER
 
 if OPENTHREAD_DEBUG
 
@@ -343,9 +351,237 @@ config OPENTHREAD_MLE_INFORM_PREVIOUS_PARENT_ON_REATTACH
 	default y
 
 config CHIP_USE_OT_ENDPOINT
+	default n if OPENTHREAD_BORDER_ROUTER
 	default y
 
 endif # OPENTHREAD
+
+if OPENTHREAD_BORDER_ROUTER
+
+# Secondary network interface (Wi-Fi alongside Thread for OTBR)
+config CHIP_SECONDARY_NETWORK_IF
+	default y
+
+# OT Border Router feature flags
+
+config OPENTHREAD_BACKBONE_ROUTER
+	default y
+
+config OPENTHREAD_BACKBONE_ROUTER_MULTICAST_ROUTING
+	default y
+
+config OPENTHREAD_ENABLE_SERVICE
+	default y
+
+config OPENTHREAD_BORDER_ROUTING
+	default y
+
+config OPENTHREAD_BORDER_ROUTING_COUNTERS
+	default y
+
+config OPENTHREAD_BORDER_AGENT
+	default y
+
+config OPENTHREAD_BORDER_AGENT_ID
+	default y
+
+config OPENTHREAD_BORDER_AGENT_EPHEMERAL_KEY_ENABLE
+	default y
+
+config OPENTHREAD_BORDER_AGENT_MESHCOP_SERVICE
+	default y
+
+config OPENTHREAD_NETDATA_PUBLISHER
+	default y
+
+config OPENTHREAD_NAT64_TRANSLATOR
+	default y
+
+config OPENTHREAD_DNSSD_SERVER
+	default y
+
+config OPENTHREAD_JOINER
+	default y
+
+config OPENTHREAD_COMMISSIONER
+	default y
+
+config OPENTHREAD_PLATFORM_UDP
+	default y
+
+config OPENTHREAD_MULTICAST_DNS
+	default y
+
+config OPENTHREAD_MAX_STATECHANGE_HANDLERS
+	default 3
+
+config OPENTHREAD_INTERFACE_EARLY_UP
+	default y
+
+config OPENTHREAD_ECDSA
+	default y
+
+config OPENTHREAD_COAP
+	default y
+
+config OPENTHREAD_VERHOEFF_CHECKSUM
+	default y
+
+config OPENTHREAD_TREL
+	default y
+
+config OPENTHREAD_TREL_MANAGE_DNSSD
+	default y
+
+config OPENTHREAD_BORDER_ROUTING_DHCP6_PD
+	default y
+
+config OPENTHREAD_BORDER_ROUTING_DHCP6_PD_CLIENT
+	default y
+
+config OPENTHREAD_DHCP6_CLIENT
+	default y
+
+config OPENTHREAD_DHCP6_SERVER
+	default y
+
+config OPENTHREAD_DNS_UPSTREAM_QUERY
+	default y
+
+config OPENTHREAD_SRP_CLIENT
+	default y
+
+config OPENTHREAD_SRP_SERVER
+	default y
+
+config OPENTHREAD_SRP_ADV_PROXY
+	default y
+
+config OPENTHREAD_DNSSD_DISCOVERY_PROXY
+	default y
+
+config OPENTHREAD_LINK_METRICS_INITIATOR
+	default y
+
+config OPENTHREAD_DNS_CLIENT
+	default y
+
+config OPENTHREAD_DNS_CLIENT_OVER_TCP
+	default y
+
+config OPENTHREAD_TCP_ENABLE
+	default y
+
+config OPENTHREAD_NETDIAG_VENDOR_INFO
+	default y
+
+config OPENTHREAD_LINK_METRICS_SUBJECT
+	default y
+
+config OPENTHREAD_LINK_METRICS_MANAGER
+	default y
+
+config OPENTHREAD_MAC_FILTER
+	default y
+
+config NET_SOCKETS_INET_RAW
+	default y
+
+config OPENTHREAD_ZEPHYR_BORDER_ROUTER_MDNS_AUTO_NAMING
+	default n
+
+config NET_TX_STACK_SIZE
+	default 4096
+
+config NET_RX_STACK_SIZE
+	default 4096
+
+config NET_CONNECTION_MANAGER_MONITOR_STACK_SIZE
+	default 2048
+
+config NET_SOCKETS_SERVICE_STACK_SIZE
+	default 12288
+
+config NET_MAX_CONTEXTS
+	default 15
+
+config NET_CONTEXT_NET_PKT_POOL
+	default y
+
+config NET_MAX_CONN
+	default 16
+
+config NET_MGMT_EVENT_QUEUE_TIMEOUT
+	default 5000
+
+config NET_MAX_MCAST_ROUTES
+	default 14
+
+config NET_ROUTE_MCAST
+	default y
+
+config NET_MCAST_ROUTE_MLD_REPORTS
+	default y
+
+config NET_IPV6_NBR_CACHE
+	default y
+
+config NET_SOCKETS_SERVICE
+	default y
+
+config NET_CONTEXT_RECV_HOPLIMIT
+	default y
+
+config ZVFS_POLL_MAX
+	default 16
+
+config NET_LOG
+	default y
+
+config LOG_PROCESS_THREAD
+	default y
+
+config NET_STATISTICS
+	default y
+
+config STACK_SENTINEL
+	default y
+
+config SHELL_ARGC_MAX
+	default 26
+
+config SHELL_CMD_BUFF_SIZE
+	default 512
+
+config NET_SHELL
+	default y
+
+config NET_L2_WIFI_SHELL
+	default y
+
+# DNS resolver for upstream DNS queries
+config DNS_RESOLVER
+	default y
+
+config DNS_RESOLVER_PACKET_FORWARDING
+	default y
+
+config DNS_RESOLVER_MAX_SERVERS
+	default 5
+
+config DNS_NUM_CONCUR_QUERIES
+	default 8
+
+config DNS_RESOLVER_MAX_NAME_LEN
+	default 128
+
+config DNS_RESOLVER_PRIVATE_RR_SUPPORT
+	default y
+
+config DNS_RESOLVER_QUERY_ALL_AVAILABLE_SERVERS
+	default y
+
+endif # OPENTHREAD_BORDER_ROUTER
 
 # Bluetooth Low Energy configs
 
@@ -505,6 +741,7 @@ config NET_TCP_WORKQ_STACK_SIZE
 
 # align these numbers to match the OpenThread config
 config NET_IF_UNICAST_IPV6_ADDR_COUNT
+	default 8 if OPENTHREAD_BORDER_ROUTER
 	default 6
 
 config NET_IF_MCAST_IPV6_ADDR_COUNT
@@ -540,6 +777,7 @@ config NET_IPV6_FRAGMENT_TIMEOUT
 
 # Neighbor cache: must hold all routers plus active peers without eviction.
 config NET_IPV6_MAX_NEIGHBORS
+	default 14 if OPENTHREAD_BORDER_ROUTER
 	default 32
 
 # Route table: must hold all advertised routes plus the in-use route.
@@ -563,10 +801,12 @@ config ETH_DRIVER
 endif
 
 config SHELL_STACK_SIZE
+	default 5120 if OPENTHREAD_BORDER_ROUTER
 	default 2048 if OPENTHREAD_LOG_LEVEL_DEBG
 	default 1536
 
 config LOG_PROCESS_THREAD_STACK_SIZE
+	default 4096 if OPENTHREAD_BORDER_ROUTER
 	default 1536
 
 config HEAP_MEM_POOL_SIZE
@@ -578,6 +818,7 @@ config CHIP_MALLOC_SYS_HEAP_SIZE
 	default 28672 # 28 kB
 
 config SYSTEM_WORKQUEUE_STACK_SIZE
+	default 4096 if OPENTHREAD_BORDER_ROUTER
 	default 3072 if OPENTHREAD
 	default 2048 if CHIP_WIFI
 
@@ -606,8 +847,9 @@ config MBEDTLS_ENTROPY_C
 	default y
 
 config MBEDTLS_SSL_MAX_CONTENT_LEN
+	#default value set in Zephyr is 1500, enough to accomodate DTLS session communication
 	default 768 if SOC_SERIES_MCXW7XX
-	default 8192
+	default 1500
 
 config MBEDTLS_ENABLE_HEAP
 	default y
