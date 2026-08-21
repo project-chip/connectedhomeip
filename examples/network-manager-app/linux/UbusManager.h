@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2024-2025 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,6 +49,11 @@ public:
     ubus_context & Context() { return *this; }
     void Register(UbusWatch & watch);
     void Unregister(UbusWatch & watch);
+
+    using InvokeCallback = void (*)(ubus_request * req, int type, blob_attr * msg);
+
+    // Invokes a method on a resolved UbusWatch object. Returns UBUS_STATUS_OK on success.
+    int Invoke(UbusWatch & watch, const char * method, blob_attr * args, InvokeCallback cb, void * priv, int timeout);
 
 private:
     const char * const mUbusSocketPath;
