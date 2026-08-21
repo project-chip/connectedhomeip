@@ -26,8 +26,14 @@
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 
+#include <app/CommandSender.h>
+#include <controller/CHIPDeviceControllerSystemState.h>
+#include <transport/Session.h>
+#include <transport/raw/ProxyTransport.h>
+
 #include <optional>
 #include <thread>
+#include <vector>
 
 enum class PairingMode
 {
@@ -44,6 +50,7 @@ enum class PairingMode
     AlreadyDiscoveredByIndexWithCode,
     OnNetwork,
     Nfc,
+    Proxy, ///< Commission via a Commissioning Proxy (ProxyMessageRequest/Response tunnel)
 #if CHIP_SUPPORT_THREAD_MESHCOP
     ThreadMeshcop,
 #endif
@@ -60,7 +67,9 @@ enum class PairingNetworkType
 class PairingCommand : public CHIPCommand,
                        public chip::Controller::DevicePairingDelegate,
                        public chip::Controller::DeviceDiscoveryDelegate,
-                       public chip::Credentials::DeviceAttestationDelegate
+                       public chip::Credentials::DeviceAttestationDelegate,
+                       public chip::Transport::ProxyTransportDelegate,
+                       public chip::app::CommandSender::Callback
 {
 public:
     PairingCommand(const char * commandName, PairingMode mode, PairingNetworkType networkType,
@@ -69,7 +78,9 @@ public:
         CHIPCommand(commandName, credIssuerCmds),
         mPairingMode(mode), mNetworkType(networkType), mFilterType(filterType),
         mRemoteAddr{ IPAddress::Any, chip::Inet::InterfaceId::Null() }, mComplex_TimeZones(&mTimeZoneList),
-        mComplex_DSTOffsets(&mDSTOffsetList), mCurrentFabricRemoveCallback(OnCurrentFabricRemove, this)
+        mComplex_DSTOffsets(&mDSTOffsetList), mCurrentFabricRemoveCallback(OnCurrentFabricRemove, this),
+        mOnProxyConnectedCallback(OnProxyDeviceConnected, this),
+        mOnProxyConnectionFailureCallback(OnProxyDeviceConnectionFailed, this)
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
         AddArgument("bypass-attestation-verifier", 0, 1, &mBypassAttestationVerifier,
@@ -139,6 +150,24 @@ public:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
+            break;
+        case PairingMode::Proxy:
+            AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
+            AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
+            AddArgument("proxy-node-id", 0, UINT64_MAX, &mProxyNodeId,
+                        "Node ID of the commissioning-proxy-app to tunnel packets through");
+            AddArgument("proxy-endpoint", 0, UINT16_MAX, &mProxyEndpointId,
+                        "Optional endpoint on the proxy hosting the CommissioningProxy cluster. Defaults to 1.");
+            AddArgument("proxy-connect-timeout", 0, UINT16_MAX, &mProxyConnectTimeout,
+                        "Seconds the proxy may spend establishing the transport connection to the "
+                        "commissionee. 0 (the default) means no timeout, so the proxy will keep "
+                        "trying until it is cancelled.");
+            AddArgument("proxy-transport", &mProxyTransport,
+                        "Required: which transport the proxy should use to reach the commissionee. "
+                        "One of: ble | wifipaf");
+            AddArgument("proxy-wifi-band", &mProxyWiFiBand,
+                        "Optional WiFi band hint for proxy-transport=wifipaf. One of: 2g4 | 5g");
             break;
         case PairingMode::OnNetwork:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
@@ -353,4 +382,98 @@ private:
     std::string mPromptedSSID;
     std::string mPromptedPassword;
     std::string mPromptedOperationalDataset;
+
+    // ------------------------------------------------------------------
+    // Proxy commissioning support
+    // ------------------------------------------------------------------
+
+    /** Kick off the proxy pairing flow. */
+    CHIP_ERROR PairViaProxy(NodeId remoteId);
+
+    /** Called when CASE session to the proxy is established. */
+    static void OnProxyDeviceConnected(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
+                                       const chip::SessionHandle & sessionHandle);
+    static void OnProxyDeviceConnectionFailed(void * context, const chip::ScopedNodeId & nodeId, CHIP_ERROR error);
+
+    /** Called after ProxyConnectResponse arrives to kick off PairDevice. */
+    void OnProxyConnected(uint16_t sessionId);
+
+    // ProxyTransportDelegate — sends ProxyMessageRequest when ProxyTransport needs to forward a packet
+    CHIP_ERROR SendProxyMessage(uint16_t sessionId, chip::ByteSpan message) override;
+
+    /**
+     * Issue a ProxyMessageRequest whose Message is null.  Per the spec this asks the
+     * proxy for a queued message from the commissionee, answered with a message or with
+     * null when nothing is available.  Without it, anything the commissionee sends
+     * beyond a one-for-one reply sits on the proxy until the commissioner happens to
+     * send again -- and this session has no MRP to prompt that.
+     */
+    CHIP_ERROR PollProxyForQueuedMessage();
+
+    /** Common body of SendProxyMessage and PollProxyForQueuedMessage. */
+    CHIP_ERROR SendProxyMessageRequest(uint16_t sessionId, const chip::app::DataModel::Nullable<chip::ByteSpan> & message);
+
+    // CommandSender::Callback — receives ProxyMessageResponse
+    void OnResponse(chip::app::CommandSender * client, const chip::app::ConcreteCommandPath & path,
+                    const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override;
+    void OnError(const chip::app::CommandSender * client, CHIP_ERROR error) override;
+    void OnDone(chip::app::CommandSender * client) override;
+
+    NodeId mProxyNodeId      = chip::kUndefinedNodeId;
+    uint16_t mProxySessionId = 0;
+    // Tracks whether mProxySessionId names a live session.  A separate flag is required
+    // because 0 is a valid SessionID: ProxyConnectResponse constrains it to max 65534
+    // with no minimum, so it cannot double as a "no session" sentinel.
+    bool mProxySessionActive      = false;
+    uint16_t mProxyConnectTimeout = 0;
+    char * mProxyTransport        = nullptr;
+    // Endpoint on the proxy hosting the CommissioningProxy cluster; optional, defaults
+    // to kDefaultProxyEndpointId when not given on the command line.
+    chip::Optional<chip::EndpointId> mProxyEndpointId;
+    chip::Optional<char *> mProxyWiFiBand;
+
+    // Exchange context to the proxy, kept alive for ProxyMessageRequest invokes.
+    chip::Messaging::ExchangeManager * mProxyExchangeMgr = nullptr;
+    chip::SessionHolder mProxySession;
+
+    // CommandSender for the ProxyConnectRequest.  Kept separate from the
+    // ProxyMessageRequest sender below: PASE starts inside this sender's OnResponse,
+    // so the first ProxyMessageRequest is issued while this one is still on the stack.
+    chip::Platform::UniquePtr<chip::app::CommandSender> mProxyConnectCmdSender;
+
+    // Live ProxyMessageRequest CommandSenders.  A sender stays alive past its own
+    // OnResponse -- the reply is injected into the Matter stack from there, PASE answers
+    // synchronously, and the next request is therefore issued before OnDone retires the
+    // previous sender.  So more than one can exist at a time and none may be destroyed
+    // from inside its own callback; OnDone erases the matching entry.
+    std::vector<chip::Platform::UniquePtr<chip::app::CommandSender>> mProxyMessageCmdSenders;
+
+    // True between sending a ProxyMessageRequest and receiving its response.  This, not
+    // sender lifetime, is what "outstanding" means to the proxy: the spec has it answer a
+    // second request for the same session with BUSY until the first has been responded to.
+    bool mProxyMessageAwaitingResponse = false;
+
+    // Consecutive null-Message polls that produced a message but no outbound reply.
+    // Bounded so a proxy that keeps handing back the same queued message cannot spin
+    // the commissioner forever.
+    uint8_t mProxyConsecutivePolls = 0;
+
+    /** True if the sender belongs to the ProxyMessageRequest set. */
+    bool IsProxyMessageCmdSender(const chip::app::CommandSender * client) const;
+
+    // CommandSender for the teardown ProxyDisconnectRequest.
+    chip::Platform::UniquePtr<chip::app::CommandSender> mProxyDisconnectCmdSender;
+    // Exit status to deliver once the ProxyDisconnectResponse is received (or times out).
+    CHIP_ERROR mProxyDisconnectExitErr = CHIP_NO_ERROR;
+
+    /**
+     * Send ProxyDisconnectRequest to the proxy then call SetCommandExitStatus(exitErr).
+     * With aCancelPendingConnect the SessionID is sent as null, which the spec defines as
+     * "cancel any ongoing ProxyConnectRequest for the invoking fabric" -- the only way to
+     * release a proxy left connecting after the commissioner has given up.
+     */
+    void SendProxyDisconnect(CHIP_ERROR exitErr, bool aCancelPendingConnect = false);
+
+    chip::Callback::Callback<chip::OnDeviceConnected> mOnProxyConnectedCallback;
+    chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnProxyConnectionFailureCallback;
 };
