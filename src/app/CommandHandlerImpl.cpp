@@ -300,8 +300,6 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
         SetGroupRequest(true);
     }
 
-    mNumTargetedEndpoints = 0;
-
     // When updating this code, please remember to make corresponding changes to TestOnlyInvokeCommandRequestWithFaultsInjected.
     VerifyOrReturnError(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetTimedRequest(&mTimedRequest) == CHIP_NO_ERROR, Status::InvalidAction);
@@ -327,6 +325,7 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
         mReserveSpaceForMoreChunkMessages = true;
     }
 
+    mNumTargetedEndpoints = 0;
     while (CHIP_NO_ERROR == (err = invokeRequestsReader.Next()))
     {
         VerifyOrReturnError(TLV::AnonymousTag() == invokeRequestsReader.GetTag(), Status::InvalidAction);
@@ -1051,7 +1050,6 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
                        "DUT Failure: Mandatory TimedRequest field missing");
     VerifyOrDieWithMsg(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, DataManagement,
                        "DUT Failure: Mandatory InvokeRequests field missing");
-    mNumTargetedEndpoints = 0;
     std::optional<InvokeRequestMessage::DelayReportData> delayReportData;
     VerifyOrDieWithMsg(invokeRequestMessage.GetDelayReportData(delayReportData) == CHIP_NO_ERROR, DataManagement,
                        "DUT Failure: Failed to read DelayReportData");
@@ -1151,9 +1149,9 @@ void CommandHandlerImpl::TriggerDelayReport(const InvokeRequestMessage::DelayRep
     {
         delayMs += (chip::Crypto::GetRandU32() % aDelayReportData.delayJitterWindowMs);
     }
-    // An empty targetedEndpoints span indicates a global deferral across all endpoints on the node for groupcast requests.
-    Span<const EndpointId> targetedEndpoints =
-        IsGroupRequest() ? Span<const EndpointId>() : Span<const EndpointId>(mTargetedEndpoints, mNumTargetedEndpoints);
+    Span<const EndpointId> targetedEndpoints = IsGroupRequest()
+        ? Span<const EndpointId>()
+        : Span<const EndpointId>(mTargetedEndpoints, mNumTargetedEndpoints);
     mpCallback->OnDelayReport(System::Clock::Milliseconds32(delayMs), targetedEndpoints);
 }
 
