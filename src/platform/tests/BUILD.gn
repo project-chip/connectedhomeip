@@ -75,6 +75,14 @@ if (chip_device_platform != "none") {
       # configs = [ "//${chip_root}/third_party/ot-br-posix:dbus_config" ]
     }
 
+    if (chip_enable_ble && chip_device_platform == "darwin") {
+      # Pure range-guard logic shared with Darwin's CoreBluetooth -> kOS CHIP_ERROR wrapping
+      # (BleConnectionErrorWrapping.h). No CoreBluetooth / daemon dependency, so this runs as a
+      # plain unit test (unlike TestCHIPoBLEStackMgr below, which needs bluetoothd).
+      test_sources += [ "TestBleConnectionErrorWrapping.cpp" ]
+      public_deps += [ "${chip_root}/src/ble" ]
+    }
+
     if (chip_enable_ble &&
         (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
       # FIXME: TestCHIPoBLEStackMgr requires bluetoothd daemon to be running

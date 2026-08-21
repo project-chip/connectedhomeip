@@ -62,9 +62,6 @@ void MTRDeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(chip::Cont
 
     void * deviceHandle = device;
 
-    // TODO: Consider exposing the actual attestation verification result in MTRDeviceAttestationDeviceInfo; need to
-    // figure out how best to do that.
-
     dispatch_async(mQueue, ^{
         // Hide things that are not passed to us by value, so we don't use them by accident.
         mtr_hide(deviceCommissioner);
@@ -74,6 +71,19 @@ void MTRDeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(chip::Cont
             chip::to_underlying(attestationResult), chip::Credentials::GetAttestationResultDescription(attestationResult));
 
         mResult = attestationResult;
+
+        // Surface the AttestationVerificationResult enum and the VID/PID the device asserts in
+        // its BasicInformation cluster, in NSError userInfo, so callers can disambiguate the
+        // 40+ distinct attestation-failure modes that previously all collapsed to a single
+        // MTRErrorCodeIntegrityCheckFailed. The BasicInformation VID/PID may not match the IDs
+        // in the device's certification declaration — VID/PID mismatch is itself one of the
+        // attestation-failure modes — so the userInfo keys are named to reflect that these are
+        // the device-asserted values, not certified identity.
+        NSDictionary<NSErrorUserInfoKey, id> * attestationUserInfo = @{
+            MTRAttestationVerificationResultKey : @(chip::to_underlying(attestationResult)),
+            MTRDeviceBasicInformationVendorIDKey : basicInformationVendorID,
+            MTRDeviceBasicInformationProductIDKey : basicInformationProductID,
+        };
 
         id<MTRDeviceAttestationDelegate> strongDelegate = mDeviceAttestationDelegate;
         if ([strongDelegate respondsToSelector:@selector(deviceAttestationCompletedForController:opaqueDeviceHandle:attestationDeviceInfo:error:)]
@@ -92,7 +102,9 @@ void MTRDeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(chip::Cont
                                                                basicInformationProductID:basicInformationProductID];
                 NSError * error = (attestationResult == chip::Credentials::AttestationVerificationResult::kSuccess)
                     ? nil
-                    : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTEGRITY_CHECK_FAILED];
+                    : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTEGRITY_CHECK_FAILED
+                                           logContext:nil
+                                   additionalUserInfo:attestationUserInfo];
                 if ([strongDelegate respondsToSelector:@selector(deviceAttestationCompletedForController:opaqueDeviceHandle:attestationDeviceInfo:error:)]) {
                     [strongDelegate deviceAttestationCompletedForController:mDeviceController
                                                          opaqueDeviceHandle:deviceHandle
@@ -111,7 +123,9 @@ void MTRDeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(chip::Cont
 
             MTRDeviceController * strongController = mDeviceController;
             if (strongController) {
-                NSError * error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTEGRITY_CHECK_FAILED];
+                NSError * error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTEGRITY_CHECK_FAILED
+                                                       logContext:nil
+                                               additionalUserInfo:attestationUserInfo];
                 if ([strongDelegate respondsToSelector:@selector(deviceAttestationFailedForController:opaqueDeviceHandle:error:)]) {
                     [strongDelegate deviceAttestationFailedForController:mDeviceController opaqueDeviceHandle:deviceHandle error:error];
                 } else {

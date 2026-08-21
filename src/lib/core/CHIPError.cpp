@@ -478,6 +478,12 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_HANDLER_NOT_SET.AsInteger():
         desc = "Callback function or callable object is not set";
         break;
+    case CHIP_ERROR_DNS_SD_NXDOMAIN.AsInteger():
+        desc = "DNS-SD operational instance does not exist (NXDOMAIN)";
+        break;
+    case CHIP_ERROR_DNS_SD_SERVICE_NOT_RUNNING.AsInteger():
+        desc = "DNS-SD platform service is not running";
+        break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
 

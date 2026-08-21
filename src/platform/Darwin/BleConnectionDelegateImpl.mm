@@ -29,6 +29,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/Darwin/BleConnectionDelegateImpl.h>
+#include <platform/Darwin/BleConnectionErrorWrapping.h>
 #include <platform/Darwin/BleScannerDelegate.h>
 #include <platform/Darwin/BleUtils.h>
 #include <platform/LockTracker.h>
@@ -51,6 +52,25 @@ constexpr uint64_t kScanningWithDiscriminatorTimeoutInSeconds = 60;
 constexpr uint64_t kPreWarmScanTimeoutInSeconds = 120;
 constexpr uint64_t kCachePeripheralTimeoutInSeconds
     = static_cast<uint64_t>(CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX / 1000.0 * 8.0 * 0.625);
+
+// Wrap a CoreBluetooth NSError.code into a kOS-range CHIP_ERROR for triage logging.
+// The kOS range only has 24 bits of value space (see ChipError::MaskValue), so any
+// NSInteger code that does not fit in [0, 0xFFFFFF] would be silently truncated and
+// could collide with unrelated kOS codes. CBError / CBATTError values today are small
+// non-negative integers, but we don't want a future API change to silently corrupt
+// triage data — so guard the cast (via the unit-tested CBErrorCodeFitsInKOSValueRange
+// predicate) and fall back to the caller-provided CHIP_ERROR if the value is out of
+// range. Typical fallbacks are a BLE_ERROR_GATT_* sentinel for GATT-operation metrics,
+// but call sites may also pass a generic code like CHIP_ERROR_INCORRECT_STATE.
+static inline CHIP_ERROR WrapCBErrorCodeAsKOS(NSInteger code, CHIP_ERROR fallback)
+{
+    if (!CBErrorCodeFitsInKOSValueRange(static_cast<int64_t>(code))) {
+        ChipLogError(Ble, "CoreBluetooth error.code %ld out of kOS 24-bit range; falling back to %" CHIP_ERROR_FORMAT,
+            static_cast<long>(code), fallback.Format());
+        return fallback;
+    }
+    return CHIP_ERROR(chip::ChipError::Range::kOS, static_cast<int32_t>(code));
+}
 
 typedef NS_ENUM(uint8_t, BleConnectionMode) {
     kScanning = 1,
@@ -494,7 +514,7 @@ namespace DeviceLayer {
         ChipLogError(Ble, "Failed to discover services: %@", error);
     }
 
-    MATTER_LOG_METRIC_END(kMetricBLEDiscoveredServices, CHIP_ERROR(chip::ChipError::Range::kOS, static_cast<int32_t>(error.code)));
+    MATTER_LOG_METRIC_END(kMetricBLEDiscoveredServices, WrapCBErrorCodeAsKOS(error.code, CHIP_ERROR_INCORRECT_STATE));
 
     for (CBService * service in peripheral.services) {
         if ([service.UUID isEqual:_chipServiceUUID] && !self.found) {
@@ -515,7 +535,7 @@ namespace DeviceLayer {
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error
 {
     assertChipStackLockedByCurrentThread();
-    MATTER_LOG_METRIC_END(kMetricBLEDiscoveredCharacteristics, CHIP_ERROR(chip::ChipError::Range::kOS, static_cast<int32_t>(error.code)));
+    MATTER_LOG_METRIC_END(kMetricBLEDiscoveredCharacteristics, WrapCBErrorCodeAsKOS(error.code, CHIP_ERROR_INCORRECT_STATE));
 
     if (error != nil) {
         ChipLogError(Ble, "Failed to discover characteristics: %@", error);
@@ -536,8 +556,14 @@ namespace DeviceLayer {
         ChipBleUUID charId = BleUUIDFromCBUUD(characteristic.UUID);
         _bleLayer->HandleWriteConfirmation(BleConnObjectFromCBPeripheral(peripheral), &svcId, &charId);
     } else {
+        // Preserve the underlying CoreBluetooth error code via the kOS-range CHIP_ERROR
+        // wrapping pattern used by the service/characteristic discovery metrics above
+        // (see WrapCBErrorCodeAsKOS). The cross-platform BLE_ERROR_GATT_WRITE_FAILED
+        // still flows through HandleConnectionError so non-Darwin consumers see the
+        // existing contract.
         ChipLogError(Ble, "Failed to write characteristic: %@", error);
-        MATTER_LOG_METRIC(kMetricBLEWriteChrValueFailed, BLE_ERROR_GATT_WRITE_FAILED);
+        MATTER_LOG_METRIC(kMetricBLEWriteChrValueFailed,
+            WrapCBErrorCodeAsKOS(error.code, BLE_ERROR_GATT_WRITE_FAILED));
         _bleLayer->HandleConnectionError(BleConnObjectFromCBPeripheral(peripheral), BLE_ERROR_GATT_WRITE_FAILED);
     }
 }
@@ -562,13 +588,17 @@ namespace DeviceLayer {
         ChipLogError(Ble, "BLE:Error subscribing/unsubcribing some characteristic on the device: [%s]",
             [error.localizedDescription UTF8String]);
 
+        // Preserve the underlying CoreBluetooth error code (CBError / CBATTError) in the metric;
+        // distinguishes "remote rejected subscription" from "connection dropped mid-subscribe."
         if (isNotifying) {
-            MATTER_LOG_METRIC(kMetricBLEUpdateNotificationStateForChrFailed, BLE_ERROR_GATT_WRITE_FAILED);
             // we're still notifying, so we must failed the unsubscription
+            MATTER_LOG_METRIC(kMetricBLEUpdateNotificationStateForChrFailed,
+                WrapCBErrorCodeAsKOS(error.code, BLE_ERROR_GATT_UNSUBSCRIBE_FAILED));
             _bleLayer->HandleConnectionError(BleConnObjectFromCBPeripheral(peripheral), BLE_ERROR_GATT_UNSUBSCRIBE_FAILED);
         } else {
             // we're not notifying, so we must failed the subscription
-            MATTER_LOG_METRIC(kMetricBLEUpdateNotificationStateForChrFailed, BLE_ERROR_GATT_SUBSCRIBE_FAILED);
+            MATTER_LOG_METRIC(kMetricBLEUpdateNotificationStateForChrFailed,
+                WrapCBErrorCodeAsKOS(error.code, BLE_ERROR_GATT_SUBSCRIBE_FAILED));
             _bleLayer->HandleConnectionError(BleConnObjectFromCBPeripheral(peripheral), BLE_ERROR_GATT_SUBSCRIBE_FAILED);
         }
     }
@@ -600,7 +630,10 @@ namespace DeviceLayer {
         }
     } else {
         ChipLogError(Ble, "Failed to receive characteristic indication: %@", error);
-        MATTER_LOG_METRIC(kMetricBLEUpdateValueForChrFailed, BLE_ERROR_GATT_INDICATE_FAILED);
+        // Preserve the underlying CoreBluetooth error code (e.g. MTU violation, disconnection
+        // mid-read) for triage; cross-platform path keeps BLE_ERROR_GATT_INDICATE_FAILED.
+        MATTER_LOG_METRIC(kMetricBLEUpdateValueForChrFailed,
+            WrapCBErrorCodeAsKOS(error.code, BLE_ERROR_GATT_INDICATE_FAILED));
         _bleLayer->HandleConnectionError(BleConnObjectFromCBPeripheral(peripheral), BLE_ERROR_GATT_INDICATE_FAILED);
     }
 }
