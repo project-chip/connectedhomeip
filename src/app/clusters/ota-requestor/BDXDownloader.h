@@ -80,9 +80,45 @@ public:
     // If False, there's been progress in the transfer.
     bool HasTransferTimedOut();
 
+    // Most recent download failure cause, so the requestor can route only a true peer abort
+    // (kPeerStatusReport) through the short-retry path rather than the generic kFailure reason that
+    // the downloader funnels every failure mode through.
+    enum class LastFailureCause
+    {
+        kNone,
+        kPeerStatusReport,   // Peer sent a BDX StatusReport mid-transfer (TransferSession::kStatusReceived)
+        kLocalInternalError, // TransferSession::kInternalError (locally-detected protocol/state error)
+        kLocalPrepareFailed, // OnPreparedForDownload(non-CHIP_NO_ERROR) — image processor prepare failed locally
+        kTimeout,            // TransferSession::kTransferTimeout
+    };
+    LastFailureCause GetLastFailureCause() const { return mLastFailureCause; }
+
+    // Human-readable name for the LastFailureCause enum, for logging.
+    static const char * LastFailureCauseToString(LastFailureCause cause)
+    {
+        switch (cause)
+        {
+        case LastFailureCause::kNone:
+            return "kNone";
+        case LastFailureCause::kPeerStatusReport:
+            return "kPeerStatusReport";
+        case LastFailureCause::kLocalInternalError:
+            return "kLocalInternalError";
+        case LastFailureCause::kLocalPrepareFailed:
+            return "kLocalPrepareFailed";
+        case LastFailureCause::kTimeout:
+            return "kTimeout";
+        }
+        return "kUnknown";
+    }
+
 private:
     void PollTransferSession();
-    void CleanupOnError(app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum reason);
+    // Tear down BDX state and transition to kIdle. Reset() clears mLastFailureCause, so the cause
+    // must be passed here (assigned after the resets, before SetState() fires the StateDelegate)
+    // rather than set directly beforehand.
+    void CleanupOnError(app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum reason,
+                        LastFailureCause cause = LastFailureCause::kNone);
     CHIP_ERROR HandleBdxEvent(const chip::bdx::TransferSession::OutputEvent & outEvent);
     void SetState(State state, app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum reason);
     void Reset();
@@ -94,6 +130,9 @@ private:
     System::Clock::Timeout mTimeout = System::Clock::kZero;
     // Tracks the last block counter used during the transfer session as of the previous check.
     uint32_t mPrevBlockCounter = 0;
+    // Records the most recent failure cause so OnDownloadStateChanged consumers can disambiguate
+    // peer-driven aborts from locally-caused failures. Cleared on successful state transitions.
+    LastFailureCause mLastFailureCause = LastFailureCause::kNone;
 };
 
 } // namespace chip
