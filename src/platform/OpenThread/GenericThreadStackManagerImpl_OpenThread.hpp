@@ -50,7 +50,23 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 #include <openthread/srp_client.h>
+// OT defines OPENTHREAD_CONFIG_SRP_CLIENT_BUFFERS_MAX_HOST_ADDRESSES in its internal core
+// config header (third_party/openthread/repo/src/core/config/srp_client.h), which is not on
+// chip's include path. Provide a fallback matching OT's non-reference-device default so the
+// host-address array sizes correctly even when the macro isn't propagated. If the platform's
+// build system overrides via -D, that override wins.
+#ifndef OPENTHREAD_CONFIG_SRP_CLIENT_BUFFERS_MAX_HOST_ADDRESSES
+#define OPENTHREAD_CONFIG_SRP_CLIENT_BUFFERS_MAX_HOST_ADDRESSES 2
 #endif
+#endif
+
+#if CHIP_DEVICE_LAYER_TARGET_ESP32
+#include <esp_netif.h>
+#include <esp_netif_net_stack.h>
+#include <lwip/ip6_addr.h>
+#include <lwip/netif.h>
+#include <platform/ESP32/ESP32Utils.h>
+#endif // CHIP_DEVICE_LAYER_TARGET_ESP32
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPMemString.h>
@@ -212,6 +228,15 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
             if (status == CHIP_NO_ERROR)
             {
                 mIsAttached = isThreadAttached;
+                // Fire the in-flight ConnectNetwork completion now that Thread is attached.
+                // Without this, NetworkCommissioningCluster::OnResult never runs, so
+                // kOperationalNetworkEnabled is never posted and DnssdServer never
+                // re-publishes the operational SRP record (rdar://179244879).
+                // Gated on mpConnectCallback so routine role flaps don't spuriously fire.
+                if (isThreadAttached && mpConnectCallback != nullptr)
+                {
+                    _OnThreadAttachFinished();
+                }
             }
             else
             {
@@ -1476,14 +1501,142 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(co
     VerifyOrExit(aHostName, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(strlen(aHostName) <= Dnssd::kHostNameMaxLength, error = CHIP_ERROR_INVALID_STRING_LENGTH);
 
-    // Avoid adding the same host name multiple times
+    // Set or refresh the host name. Only call otSrpClientSetHostName when it actually
+    // changes (the OT client requires it to be unset before changing).
     if (strcmp(mSrpClient.mHostName, aHostName) != 0)
     {
         strcpy(mSrpClient.mHostName, aHostName);
         error = MapOpenThreadError(otSrpClientSetHostName(mOTInst, mSrpClient.mHostName));
         SuccessOrExit(error);
+    }
 
-        error = MapOpenThreadError(otSrpClientEnableAutoHostAddress(mOTInst));
+    // Re-publish the AAAA address set on every call (not just hostname-change calls)
+    // so that re-advertise triggers (WiFi connect, kInterfaceIpAddressChanged, Thread
+    // attach) actually refresh the SRP host record. Explicitly publish every reachable
+    // IPv6 address rather than calling otSrpClientEnableAutoHostAddress, so the SDK
+    // fully controls the AAAA set and every routable scope (Thread + WiFi + Ethernet)
+    // is advertised.
+    {
+        // Cap mirrors the OT SRP client's actual buffer size (declared in the SrpClient
+        // struct in the header). The address array itself lives in mSrpClient.mHostAddresses
+        // and persists for the lifetime of this impl instance — required because
+        // otSrpClientSetHostAddresses stores a POINTER to the array, not a copy.
+        constexpr uint8_t kMaxSrpHostAddresses = OPENTHREAD_CONFIG_SRP_CLIENT_BUFFERS_MAX_HOST_ADDRESSES;
+        mSrpClient.mHostAddressCount           = 0;
+
+        auto alreadyPresent = [&](const otIp6Address & candidate) -> bool {
+            for (uint8_t i = 0; i < mSrpClient.mHostAddressCount; i++)
+            {
+                if (memcmp(mSrpClient.mHostAddresses[i].mFields.m8, candidate.mFields.m8, sizeof(candidate.mFields.m8)) == 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        // Order per Matter spec recommendation: GUA (most routable) → Mesh-Local EID
+        // (canonical in-mesh) → Link-Local (per-link only). Controllers on external
+        // network segments will preferentially try the GUA first.
+
+        // 1a) Global Unicast / Off-Mesh-Routable addresses — every valid non-RLOC unicast
+        //     that is NEITHER link-local (fe80::/10) NOR within the Thread mesh-local
+        //     prefix. This catches OMR addresses advertised by the Border Router as well
+        //     as any true global IPv6.
+        {
+            const otMeshLocalPrefix * mlPrefix = otThreadGetMeshLocalPrefix(mOTInst);
+            for (const otNetifAddress * a                                               = otIp6GetUnicastAddresses(mOTInst);
+                 a != nullptr && mSrpClient.mHostAddressCount < kMaxSrpHostAddresses; a = a->mNext)
+            {
+                if (!a->mValid)
+                    continue;
+                if (a->mRloc)
+                    continue;
+                // Skip link-local fe80::/10 — added separately in step 1c.
+                if (a->mAddress.mFields.m8[0] == 0xfe && (a->mAddress.mFields.m8[1] & 0xc0) == 0x80)
+                {
+                    continue;
+                }
+                // Skip mesh-local (matches mesh-local /64 prefix) — added in step 1b.
+                if (mlPrefix != nullptr && memcmp(a->mAddress.mFields.m8, mlPrefix->m8, sizeof(mlPrefix->m8)) == 0)
+                {
+                    continue;
+                }
+                if (alreadyPresent(a->mAddress))
+                    continue;
+                mSrpClient.mHostAddresses[mSrpClient.mHostAddressCount++] = a->mAddress;
+            }
+        }
+
+        // 1b) Mesh-Local EID — the canonical in-mesh address.
+        {
+            const otIp6Address * meshLocalEid = otThreadGetMeshLocalEid(mOTInst);
+            if (meshLocalEid != nullptr && !alreadyPresent(*meshLocalEid) && mSrpClient.mHostAddressCount < kMaxSrpHostAddresses)
+            {
+                mSrpClient.mHostAddresses[mSrpClient.mHostAddressCount++] = *meshLocalEid;
+            }
+        }
+
+        // 1c) Thread link-local — per-link reachability fallback.
+        {
+            const otIp6Address * linkLocal = otThreadGetLinkLocalIp6Address(mOTInst);
+            if (linkLocal != nullptr && !alreadyPresent(*linkLocal) && mSrpClient.mHostAddressCount < kMaxSrpHostAddresses)
+            {
+                mSrpClient.mHostAddresses[mSrpClient.mHostAddressCount++] = *linkLocal;
+            }
+        }
+
+#if CHIP_DEVICE_LAYER_TARGET_ESP32
+        // 2) ESP32 WiFi station (and optionally Ethernet) netifs: every valid IPv6
+        //    address (link-local + global / ULA), so a controller resolving via SRP
+        //    sees every reachable path even when the device is dual-homed (WiFi+Thread).
+        //    Re-enabled now that the persistent-buffer fix above prevents stack residue
+        //    from corrupting the cached pointer that OT keeps internally.
+        auto collectFromEspNetif = [&](const char * ifKey) {
+            esp_netif_t * espNetif = esp_netif_get_handle_from_ifkey(ifKey);
+            if (espNetif == nullptr)
+                return;
+            struct netif * lwipNetif = static_cast<struct netif *>(esp_netif_get_netif_impl(espNetif));
+            if (lwipNetif == nullptr)
+                return;
+            for (uint8_t i = 0; i < LWIP_IPV6_NUM_ADDRESSES && mSrpClient.mHostAddressCount < kMaxSrpHostAddresses; i++)
+            {
+                if (!ip6_addr_isvalid(netif_ip6_addr_state(lwipNetif, i)))
+                    continue;
+                const ip6_addr_t * lwipAddr = netif_ip6_addr(lwipNetif, i);
+                otIp6Address otAddr;
+                static_assert(sizeof(otAddr.mFields.m8) == 16, "otIp6Address must be 16 bytes");
+                // LwIP stores IPv6 in network byte order in the addr[] u32 array, so a raw
+                // 16-byte memcpy preserves the wire-format bytes.
+                memcpy(otAddr.mFields.m8, lwipAddr->addr, sizeof(otAddr.mFields.m8));
+                if (alreadyPresent(otAddr))
+                    continue;
+                mSrpClient.mHostAddresses[mSrpClient.mHostAddressCount++] = otAddr;
+            }
+        };
+
+        collectFromEspNetif(Internal::ESP32Utils::kDefaultWiFiStationNetifKey);
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+        collectFromEspNetif(Internal::ESP32Utils::kDefaultEthernetNetifKey);
+#endif
+#endif // CHIP_DEVICE_LAYER_TARGET_ESP32
+
+        // Debug dump: print every address we are about to register so we can verify
+        // what hits the SRP server.
+        ChipLogProgress(DeviceLayer, "SRP host '%s': registering %u address(es)", aHostName,
+                        static_cast<unsigned>(mSrpClient.mHostAddressCount));
+        for (uint8_t i = 0; i < mSrpClient.mHostAddressCount; i++)
+        {
+            char addrStr[OT_IP6_ADDRESS_STRING_SIZE];
+            otIp6AddressToString(&mSrpClient.mHostAddresses[i], addrStr, sizeof(addrStr));
+            ChipLogProgress(DeviceLayer, "SRP host addr[%u] = %s", static_cast<unsigned>(i), addrStr);
+        }
+
+        // Pass the persistent member buffer to OT — the array memory must remain valid and
+        // unchanged for the lifetime of the registration (otSrpClientSetHostAddresses does
+        // not copy).
+        error = MapOpenThreadError(otSrpClientSetHostAddresses(mOTInst, mSrpClient.mHostAddresses, mSrpClient.mHostAddressCount));
+        SuccessOrExit(error);
     }
 
 exit:

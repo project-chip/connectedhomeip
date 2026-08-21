@@ -38,8 +38,14 @@ enum class NodeLookupResult
 struct NodeLookupResults
 {
     ResolveResult results[kNodeLookupResultsLen] = {};
-    uint8_t count                                = 0; // number of valid ResolveResult
-    uint8_t consumed                             = 0; // number of already read ResolveResult
+    // Cache of the original (pre-clear) InterfaceId for each entry in `results`. UpdateResults
+    // clears the InterfaceId on non-link-local addresses (so chip's send path uses the routing
+    // table). That clear destroys the information the transport-tier-aware scorer needs to
+    // re-rank old entries against new ones, so we stash the original InterfaceId here before
+    // clearing and use it when calling ScoreIpAddress for already-stored entries.
+    Inet::InterfaceId originalInterfaces[kNodeLookupResultsLen] = {};
+    uint8_t count                                               = 0; // number of valid ResolveResult
+    uint8_t consumed                                            = 0; // number of already read ResolveResult
 
     bool UpdateResults(const ResolveResult & result, Dnssd::IPAddressSorter::IpScore score);
 

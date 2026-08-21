@@ -25,9 +25,7 @@ namespace IPAddressSorter {
 void Sort(Inet::IPAddress * addresses, size_t count, Inet::InterfaceId interfaceId)
 {
     Sorting::InsertionSort(addresses, count, [interfaceId](const Inet::IPAddress & a, const Inet::IPAddress & b) -> bool {
-        auto scoreA = to_underlying(ScoreIpAddress(a, interfaceId));
-        auto scoreB = to_underlying(ScoreIpAddress(b, interfaceId));
-        return scoreA > scoreB;
+        return ScoreIpAddressWithTransport(a, interfaceId) > ScoreIpAddressWithTransport(b, interfaceId);
     });
 }
 
@@ -35,9 +33,7 @@ void Sort(const Span<Inet::IPAddress> & addresses, Inet::InterfaceId interfaceId
 {
     Sorting::InsertionSort(addresses.data(), addresses.size(),
                            [interfaceId](const Inet::IPAddress & a, const Inet::IPAddress & b) -> bool {
-                               auto scoreA = to_underlying(ScoreIpAddress(a, interfaceId));
-                               auto scoreB = to_underlying(ScoreIpAddress(b, interfaceId));
-                               return scoreA > scoreB;
+                               return ScoreIpAddressWithTransport(a, interfaceId) > ScoreIpAddressWithTransport(b, interfaceId);
                            });
 }
 
@@ -75,6 +71,51 @@ IpScore ScoreIpAddress(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId
     }
 
     return IpScore::kIpv4;
+}
+
+namespace {
+ThreadSubMetricCallback gThreadSubMetricCallback = nullptr;
+
+uint8_t TierForInterface(Inet::InterfaceId interfaceId)
+{
+    if (!interfaceId.IsPresent())
+    {
+        return CompositeScore::kTierUnknown;
+    }
+    Inet::InterfaceType type = Inet::InterfaceType::Unknown;
+    if (interfaceId.GetInterfaceType(type) != CHIP_NO_ERROR)
+    {
+        return CompositeScore::kTierUnknown;
+    }
+    switch (type)
+    {
+    case Inet::InterfaceType::Ethernet:
+        return CompositeScore::kTierEthernet;
+    case Inet::InterfaceType::WiFi:
+        return CompositeScore::kTierWiFi;
+    case Inet::InterfaceType::Thread:
+        return CompositeScore::kTierThread;
+    default:
+        return CompositeScore::kTierUnknown;
+    }
+}
+} // namespace
+
+void SetThreadSubMetricCallback(ThreadSubMetricCallback cb)
+{
+    gThreadSubMetricCallback = cb;
+}
+
+uint32_t ScoreIpAddressWithTransport(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId)
+{
+    const uint16_t classScore = static_cast<uint16_t>(to_underlying(ScoreIpAddress(ip, interfaceId)));
+    const uint8_t tier        = TierForInterface(interfaceId);
+    uint8_t threadSub         = 0;
+    if (tier == CompositeScore::kTierThread && gThreadSubMetricCallback != nullptr)
+    {
+        threadSub = gThreadSubMetricCallback(ip, interfaceId);
+    }
+    return CompositeScore::Encode(tier, threadSub, classScore);
 }
 
 } // namespace IPAddressSorter
