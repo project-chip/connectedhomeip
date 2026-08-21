@@ -28,6 +28,7 @@ import pathlib
 import re
 import select
 import shlex
+import shutil
 import sys
 import threading
 import time
@@ -573,7 +574,15 @@ def factory_reset_config_removal(app_args: str, script_args: str, reset_type: Fa
     """Handles app factory reset requests by removing configuration and storage files."""
     for path in reset_type.config_files(app_args, script_args):
         log.info("Removing config/storage file, path: '%s'...", path)
-        pathlib.Path(path).unlink(missing_ok=True)
+        # Some apps keep storage in a directory under /tmp/chip* (e.g. the tv-app's
+        # media file store at /tmp/chip-media-files), which unlink cannot remove.
+        # An already-missing directory is fine (mirroring unlink's missing_ok);
+        # any other removal error still propagates.
+        if os.path.isdir(path) and not os.path.islink(path):
+            with contextlib.suppress(FileNotFoundError):
+                shutil.rmtree(path)
+        else:
+            pathlib.Path(path).unlink(missing_ok=True)
 
 
 if __name__ == '__main__':
