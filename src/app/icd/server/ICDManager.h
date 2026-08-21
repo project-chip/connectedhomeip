@@ -385,11 +385,19 @@ private:
 #if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     bool mPendingActiveModeOnNetworkAttach = false;
 #if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+    enum class PendingCheckInType : uint8_t
+    {
+        kNone,
+        kTargeted,
+        kBroadcast,
+    };
     static constexpr size_t kMaxPendingCheckInSubjects = CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC * CHIP_CONFIG_MAX_FABRICS;
-    bool mPendingCheckInOnNetworkAttach                = false;
-    bool mPendingBroadcastCheckIn                      = false;
+    PendingCheckInType mPendingCheckInType             = PendingCheckInType::kNone;
     std::array<Access::SubjectDescriptor, kMaxPendingCheckInSubjects> mPendingCheckInSubjects;
     size_t mPendingCheckInSubjectsCount = 0;
+
+    static bool Contains(Span<const Access::SubjectDescriptor> list, const Access::SubjectDescriptor & value);
+    void AppendPendingCheckInSubject(const Access::SubjectDescriptor & subject);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 #endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     ObjectPool<ObserverPointer, CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE> mStateObserverPool;

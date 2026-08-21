@@ -242,8 +242,14 @@ public:
 #if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     bool IsPendingActiveModeOnNetworkAttach() const { return mICDManager.mPendingActiveModeOnNetworkAttach; }
 #if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
-    bool IsPendingCheckInOnNetworkAttach() const { return mICDManager.mPendingCheckInOnNetworkAttach; }
-    bool IsPendingBroadcastCheckInOnNetworkAttach() const { return mICDManager.mPendingBroadcastCheckIn; }
+    bool IsPendingCheckInOnNetworkAttach() const
+    {
+        return mICDManager.mPendingCheckInType != ICDManager::PendingCheckInType::kNone;
+    }
+    bool IsPendingBroadcastCheckInOnNetworkAttach() const
+    {
+        return mICDManager.mPendingCheckInType == ICDManager::PendingCheckInType::kBroadcast;
+    }
     size_t GetPendingCheckInSubjectsCount() const { return mICDManager.mPendingCheckInSubjectsCount; }
     Optional<Access::SubjectDescriptor> GetPendingCheckInSubject(size_t index = 0) const
     {
@@ -1866,6 +1872,49 @@ TEST_F(TestICDManager, TestScenario15_DeviceReboot_ColdBoot_DeferredIfDetached)
     AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetActiveModeDuration() + 1_ms32);
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 }
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+TEST_F(TestICDManager, TestScenario16_PendingSubjectsOverflow_UpgradesToBroadcast)
+{
+    // Pre-condition: Device in IdleMode with Thread unattached
+    AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetActiveModeDuration());
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
+    SetThreadConnectivityState(true /* enabled */, false /* attached */);
+
+    // Step 1: Enqueue distinct subjects up to capacity
+    for (size_t i = 0; i < ICDManager::kMaxPendingCheckInSubjects; ++i)
+    {
+        Access::SubjectDescriptor subject;
+        subject.fabricIndex = static_cast<FabricIndex>(1 + (i % 2));
+        subject.subject     = static_cast<NodeId>(0x1000 + i);
+        ICDNotifier::GetInstance().NotifySendCheckIn(MakeOptional(subject));
+    }
+    EXPECT_TRUE(IsPendingCheckInOnNetworkAttach());
+    EXPECT_FALSE(IsPendingBroadcastCheckInOnNetworkAttach());
+    EXPECT_EQ(GetPendingCheckInSubjectsCount(), ICDManager::kMaxPendingCheckInSubjects);
+
+    // Step 2: Enqueue one more distinct subject beyond capacity -> triggers automatic upgrade to Broadcast Check-In
+    Access::SubjectDescriptor overflowSubject;
+    overflowSubject.fabricIndex = kTestFabricIndex1;
+    overflowSubject.subject     = 0x9999;
+    ICDNotifier::GetInstance().NotifySendCheckIn(MakeOptional(overflowSubject));
+
+    // Verify upgrade to broadcast so no registered clients are missed
+    EXPECT_TRUE(IsPendingCheckInOnNetworkAttach());
+    EXPECT_TRUE(IsPendingBroadcastCheckInOnNetworkAttach());
+    EXPECT_EQ(GetPendingCheckInSubjectsCount(), 0u);
+
+    // Step 3: Thread attaches -> verifies broadcast Check-In is replayed cleanly
+    SetThreadConnectivityState(true /* enabled */, true /* attached */);
+    DeviceLayer::ChipDeviceEvent event{ .Type                     = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
+                                        .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Established } };
+    HandlePlatformEvent(&event);
+    AdvanceClockAndRunEventLoop(100_ms);
+
+    EXPECT_FALSE(IsPendingCheckInOnNetworkAttach());
+    EXPECT_FALSE(IsPendingBroadcastCheckInOnNetworkAttach());
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 
 #endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CONFIG_BUILD_FOR_HOST_UNIT_TEST &&
        // CHIP_DEVICE_CONFIG_ENABLE_THREAD
