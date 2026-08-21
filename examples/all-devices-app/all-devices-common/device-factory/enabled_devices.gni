@@ -67,6 +67,10 @@ _available_devices = [
     "CHIME",
   ],
   [
+    "color-temperature-light",
+    "COLOR_TEMPERATURE_LIGHT",
+  ],
+  [
     "contact-sensor",
     "CONTACT_SENSOR",
   ],
@@ -89,6 +93,10 @@ _available_devices = [
   [
     "dishwasher",
     "DISHWASHER",
+  ],
+  [
+    "extended-color-light",
+    "EXTENDED_COLOR_LIGHT",
   ],
   [
     "extractor-hood",
