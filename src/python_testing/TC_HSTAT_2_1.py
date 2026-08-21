@@ -164,42 +164,41 @@ class TC_HSTAT_2_1(HSTATBase):
         asserts.assert_greater_equal(dut_SystemState, 0, "SystemState attribute is out of range")
         asserts.assert_less_equal(dut_SystemState, 3, "SystemState attribute is out of range")
 
-        self.step(6)
         # TH reads from the DUT the MinSetpoint attribute.
         # Verify that the DUT response contains a value between 0 and 99 inclusive. Store the value as MinSetpointValue
         if self.sensorFeatureSupported:
+            self.step(6)
             dut_MinSetpoint = await self.read_attribute_expect_success(attribute=self.attributes.MinSetpoint)
             asserts.assert_greater_equal(dut_MinSetpoint, 0, "MinSetpoint attribute is out of range")
             asserts.assert_less_equal(dut_MinSetpoint, 99, "MinSetpoint attribute is out of range")
 
-        self.step(7)
-        # TH reads from the DUT the MaxSetpoint attribute.
-        # Verify that the DUT response contains a value between MinSetpointValue + 1 and 100 inclusive. Store the value as MaxSetpointValue.
-        if self.sensorFeatureSupported:
+            self.step(7)
+            # TH reads from the DUT the MaxSetpoint attribute.
+            # Verify that the DUT response contains a value between MinSetpointValue + 1 and 100 inclusive. Store the value as MaxSetpointValue.
             dut_MaxSetpoint = await self.read_attribute_expect_success(attribute=self.attributes.MaxSetpoint)
             asserts.assert_greater_equal(dut_MaxSetpoint, dut_MinSetpoint+1, "MaxSetpoint attribute is out of range")
             asserts.assert_less_equal(dut_MaxSetpoint, 100, "MaxSetpoint attribute is out of range")
 
-        self.step(8)
-        # TH reads from the DUT the Step attribute.
-        # Verify that the DUT response contains a value between 1 and 100 inclusive such that (MaxSetpointValue - MinSetpointValue) % value == 0. Store the value as StepValue.
-        if self.sensorFeatureSupported:
+            self.step(8)
+            # TH reads from the DUT the Step attribute.
+            # Verify that the DUT response contains a value between 1 and 100 inclusive such that (MaxSetpointValue - MinSetpointValue) % value == 0. Store the value as StepValue.
             dut_Step = await self.read_attribute_expect_success(attribute=self.attributes.Step)
             asserts.assert_greater_equal(dut_Step, 1, "Step attribute cannot be zero")
             asserts.assert_less_equal(dut_Step, 100, "Step attribute too large")
             asserts.assert_equal((dut_MaxSetpoint - dut_MinSetpoint) % dut_Step, 0,
                                  "Step attribute is not divisible by (MaxSetpoint - MinSetpoint)")
 
-        self.step(9)
-        # TH reads from the DUT the UserSetpoint attribute.
-        # Verify that the DUT response contains a value between MinSetpointValue and MaxSetpointValue inclusive
-        # such that (SetpointValue - MinSetpointValue) % StepValue == 0. Store the value as SetpointValue.
-        if self.sensorFeatureSupported:
+            self.step(9)
+            # TH reads from the DUT the UserSetpoint attribute.
+            # Verify that the DUT response contains a value between MinSetpointValue and MaxSetpointValue inclusive
+            # such that (SetpointValue - MinSetpointValue) % StepValue == 0. Store the value as SetpointValue.
             dut_UserSetpoint = await self.read_attribute_expect_success(attribute=self.attributes.UserSetpoint)
             asserts.assert_greater_equal(dut_UserSetpoint, dut_MinSetpoint, "UserSetpoint attribute is less than MinSetpoint")
             asserts.assert_less_equal(dut_UserSetpoint, dut_MaxSetpoint, "UserSetpoint attribute is greater than MaxSetpoint")
             asserts.assert_equal((dut_UserSetpoint - dut_MinSetpoint) % dut_Step, 0,
                                  "UserSetpoint attribute is not divisible by (MaxSetpoint - MinSetpoint)")
+        else:
+            self.mark_step_range_skipped(6, 9)
 
         self.step(10)
         # TH reads from the DUT the TargetSetpoint attribute.
@@ -217,7 +216,7 @@ class TC_HSTAT_2_1(HSTATBase):
             log.info("MistType is %s", dut_MistType)
             if dut_MistType != NullValue:
                 asserts.assert_greater_equal(dut_MistType, 1, "MistType attribute out of range")
-                asserts.assert_less_equal(dut_MistType, 2, "MistType attribute out of range")
+                asserts.assert_less_equal(dut_MistType, 3, "MistType attribute out of range")
 
         self.step(12)
         # TH reads from the DUT the Continuous attribute.

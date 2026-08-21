@@ -191,53 +191,69 @@ class TC_HSTAT_2_2(HSTATBase):
         else:
             await self.write_attribute_expect_success(attribute=self.attributes.Mode(self.modeDehumidifier))
 
-        self.step(12)
         # TH sends command SetSettings with the Mode field set to Humidifier
         # Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)
         if not self.humidifierFeatureSupported:
+            self.step(12)
             await self.send_SetSettingsCommand_expect_error(mode=self.modeHumidifier, error=Status.ConstraintError)
+        else:
+            self.skip_step(12)
 
-        self.step(13)
         # TH sends command SetSettings with the Mode field set to Dehumidifier
         # Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)
         if not self.dehumidifierFeatureSupported:
+            self.step(13)
             await self.send_SetSettingsCommand_expect_error(mode=self.modeDehumidifier, error=Status.ConstraintError)
+        else:
+            self.skip_step(13)
 
-        self.step(14)
         # TH sends command SetSettings with the Mode field set to FanOnly
         # Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)
         if not self.fanOnlyFeatureSupported:
+            self.step(14)
             await self.send_SetSettingsCommand_expect_error(mode=self.modeFanOnly, error=Status.ConstraintError)
+        else:
+            self.skip_step(14)
 
-        self.step(15)
         # TH sends command SetSettings with the Mode field set to Auto
         # Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)
         if not self.autoFeatureSupported:
+            self.step(15)
             await self.send_SetSettingsCommand_expect_error(mode=self.modeAuto, error=Status.ConstraintError)
+        else:
+            self.skip_step(15)
 
-        self.step(16)
         # TH sends command SetSettings with the Continuous field set to True
         # Verify DUT responds w/ status SUCCESS(0x00)
         if not self.continuousFeatureSupported:
+            self.step(16)
             await self.send_SetSettingsCommand_expect_success(continuous=True)
+        else:
+            self.skip_step(16)
 
-        self.step(17)
         # TH sends command SetSettings with the Sleep field set to True
         # Verify DUT responds w/ status SUCCESS(0x00)
         if self.attributes.Sleep.attribute_id not in self.supported_attributes:
+            self.step(17)
             await self.send_SetSettingsCommand_expect_success(sleep=True)
+        else:
+            self.skip_step(17)
 
-        self.step(18)
         # TH sends command SetSettings with the Optimal field set to True
         # Verify DUT responds w/ status SUCCESS(0x00)
         if not self.optimalFeatureSupported:
+            self.step(18)
             await self.send_SetSettingsCommand_expect_success(optimal=True)
+        else:
+            self.skip_step(18)
 
-        self.step(19)
         # TH sends command SetSettings with the MistType field set to Cold
         # Verify DUT responds w/ status SUCCESS(0x00)
         if self.attributes.MistType.attribute_id not in self.supported_attributes:
+            self.step(19)
             await self.send_SetSettingsCommand_expect_success(mistType=self.mistBitmap.kMistCold)
+        else:
+            self.skip_step(19)
 
 
 if __name__ == "__main__":
