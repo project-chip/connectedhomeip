@@ -45,11 +45,11 @@ from TC_AVSUMTestBase import AVSUMTestBase
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest
+from matter.testing.matter_testing import AttributeMatcher, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_AVSUM_2_9(MatterBaseTest, AVSUMTestBase):
+class TC_AVSUM_2_9(MatterTestCommissionedDevice, AVSUMTestBase):
 
     def desc_TC_AVSUM_2_9(self) -> str:
         return "[TC-AVSUM-2.9] MptzSetPosition Command Validation"

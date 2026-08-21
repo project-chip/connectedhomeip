@@ -24,7 +24,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_asserts import assert_valid_bool, assert_valid_uint32
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.timeoperations import utc_datetime_from_matter_epoch_us
 
 log = logging.getLogger(__name__)
@@ -35,7 +35,7 @@ class EventDataCheck(Enum):
     IGNORE = auto()
 
 
-class SmokeCoBaseTest(MatterBaseTest):
+class SmokeCoBaseTest(MatterTestCommissionedDevice):
 
     smokeco_cluster = Clusters.SmokeCoAlarm
     smokeco_enums = Clusters.SmokeCoAlarm.Enums

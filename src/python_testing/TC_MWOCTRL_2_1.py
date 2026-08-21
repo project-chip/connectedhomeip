@@ -58,7 +58,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 # This test requires several additional command line arguments
@@ -66,7 +66,7 @@ from matter.testing.runner import TestStep, default_matter_test_main
 # --endpoint endpoint
 
 
-class TC_MWOCTRL_2_1(MatterBaseTest):
+class TC_MWOCTRL_2_1(MatterTestCommissionedDevice):
 
     async def read_mwoctrl_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.MicrowaveOvenControl

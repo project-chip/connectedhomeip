@@ -25,13 +25,13 @@ import matter.clusters as Clusters
 import matter.testing.matchers as matchers
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_CNET_4_4(MatterBaseTest):
+class TC_CNET_4_4(MatterTestCommissionedDevice):
     def steps_TC_CNET_4_4(self):
         return [TestStep("precondition", "TH is commissioned", is_commissioning=True),
                 TestStep(1, 'TH reads from the DUT the Network Commissioning Cluster FeatureMap. If the FeatureMap does not include the WI flag (bit 0), skip the remaining steps in this test case'),

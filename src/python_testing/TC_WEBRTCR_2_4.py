@@ -43,12 +43,13 @@ from TC_WEBRTCRTestBase import WEBRTCRTestBase
 
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_WebRTCR_2_4(WEBRTCRTestBase):
+class TC_WebRTCR_2_4(MatterTestCommissionedDevice, WEBRTCRTestBase):
     def setup_class(self):
         super().setup_class()
 

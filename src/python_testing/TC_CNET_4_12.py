@@ -28,13 +28,13 @@ from mobly import asserts, signals
 import matter.clusters as Clusters
 from matter.exceptions import ChipStackError
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_CNET_4_12(MatterBaseTest):
+class TC_CNET_4_12(MatterTestCommissionedDevice):
     """
     This test verifies the DUT connectivity to the Thread network using the ConnectNetwork Command,
     including validation for two Thread operational datasets.
