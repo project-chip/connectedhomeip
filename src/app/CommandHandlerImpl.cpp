@@ -446,7 +446,7 @@ constexpr uint8_t sNoFields[] = {
 } // anonymous namespace
 
 Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement,
-                                                 const std::optional<InvokeRequestMessage::DelayReportData> & aDelayReportData)
+                                                const std::optional<InvokeRequestMessage::DelayReportData> & aDelayReportData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandPathIB::Parser commandPath;
@@ -519,7 +519,7 @@ exit:
 }
 
 Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement,
-                                                      const std::optional<InvokeRequestMessage::DelayReportData> & aDelayReportData)
+                                                     const std::optional<InvokeRequestMessage::DelayReportData> & aDelayReportData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandPathIB::Parser commandPath;
