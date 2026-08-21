@@ -20,7 +20,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
-#include <app/clusters/thermostat-server/ThermostatCluster.h>
+#include <app/clusters/thermostat-server/CodegenIntegration.h>
 #include <app/server/Server.h>
 #include <lib/support/CHIPMem.h>
 #include <new>
