@@ -25,6 +25,7 @@
 
 #include <limits>
 #include <type_traits>
+#include <utility>
 
 #if !CHIP_CRYPTO_BORINGSSL && defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER >= 0x30200000L
 #include <openssl/core_names.h>
@@ -63,70 +64,36 @@ static inline const EC_KEY * to_const_EC_KEY(const P256KeypairContext * context)
     return *SafePointerCast<const EC_KEY * const *>(context);
 }
 
-// helper function to populate octet key into EVP_PKEY out_evp_pkey. Caller must free out_evp_pkey
-static CHIP_ERROR _create_evp_key_from_binary_p256_key(const P256PublicKey & key, EVP_PKEY ** out_evp_pkey)
+// helper function to populate an octet key into out_evp_pkey. Anything out_evp_pkey already held is
+// released; on failure it is left empty.
+static CHIP_ERROR _create_evp_key_from_binary_p256_key(const P256PublicKey & key, ScopedEvpPkey & out_evp_pkey)
 {
+    out_evp_pkey.reset();
 
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    EC_KEY * ec_key  = nullptr;
-    int result       = -1;
-    EC_POINT * point = nullptr;
-    EC_GROUP * group = nullptr;
-    int nid          = NID_undef;
+    int nid = GetNidForCurve(MapECName(key.Type()));
+    VerifyOrReturnError(nid != NID_undef, CHIP_ERROR_INTERNAL);
 
-    VerifyOrExit(*out_evp_pkey == nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    // EVP_PKEY_set1_EC_KEY takes its own reference to ec_key, so this one is dropped on the way out.
+    ScopedEcKey ec_key(EC_KEY_new_by_curve_name(nid));
+    VerifyOrReturnError(ec_key, CHIP_ERROR_INTERNAL);
 
-    nid = GetNidForCurve(MapECName(key.Type()));
-    VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INTERNAL);
+    ScopedEcGroup group(EC_GROUP_new_by_curve_name(nid));
+    VerifyOrReturnError(group, CHIP_ERROR_INTERNAL);
 
-    ec_key = EC_KEY_new_by_curve_name(nid);
-    VerifyOrExit(ec_key != nullptr, error = CHIP_ERROR_INTERNAL);
+    ScopedEcPoint point(EC_POINT_new(group.get()));
+    VerifyOrReturnError(point, CHIP_ERROR_INTERNAL);
 
-    group = EC_GROUP_new_by_curve_name(nid);
-    VerifyOrExit(group != nullptr, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(EC_POINT_oct2point(group.get(), point.get(), Uint8::to_const_uchar(key), key.Length(), nullptr) == 1,
+                        CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(EC_KEY_set_public_key(ec_key.get(), point.get()) == 1, CHIP_ERROR_INTERNAL);
 
-    point = EC_POINT_new(group);
-    VerifyOrExit(point != nullptr, error = CHIP_ERROR_INTERNAL);
+    ScopedEvpPkey evp_pkey(EVP_PKEY_new());
+    VerifyOrReturnError(evp_pkey, CHIP_ERROR_INTERNAL);
 
-    result = EC_POINT_oct2point(group, point, Uint8::to_const_uchar(key), key.Length(), nullptr);
-    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(EVP_PKEY_set1_EC_KEY(evp_pkey.get(), ec_key.get()) == 1, CHIP_ERROR_INTERNAL);
 
-    result = EC_KEY_set_public_key(ec_key, point);
-
-    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-
-    *out_evp_pkey = EVP_PKEY_new();
-    VerifyOrExit(*out_evp_pkey != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    result = EVP_PKEY_set1_EC_KEY(*out_evp_pkey, ec_key);
-    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-
-exit:
-    if (ec_key != nullptr)
-    {
-        EC_KEY_free(ec_key);
-        ec_key = nullptr;
-    }
-
-    if (error != CHIP_NO_ERROR && *out_evp_pkey)
-    {
-        EVP_PKEY_free(*out_evp_pkey);
-        out_evp_pkey = nullptr;
-    }
-
-    if (point != nullptr)
-    {
-        EC_POINT_free(point);
-        point = nullptr;
-    }
-
-    if (group != nullptr)
-    {
-        EC_GROUP_free(group);
-        group = nullptr;
-    }
-
-    return error;
+    out_evp_pkey = std::move(evp_pkey);
+    return CHIP_NO_ERROR;
 }
 
 // Encode an ECDSA_SIG (r, s) pair as a raw P256ECDSASignature (r || s, each zero-padded to kP256_FE_Length).
@@ -464,65 +431,41 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     ERR_clear_error();
     CHIP_ERROR error      = CHIP_NO_ERROR;
     int result            = -1;
-    EVP_PKEY * local_key  = nullptr;
-    EVP_PKEY * remote_key = nullptr;
+    size_t out_buf_length = 0;
 
-    EVP_PKEY_CTX * context = nullptr;
-    size_t out_buf_length  = 0;
+    ScopedEvpPkey local_key;
+    ScopedEvpPkey remote_key;
+    ScopedEvpPkeyCtx context;
 
-    EC_KEY * ec_key = EC_KEY_dup(to_const_EC_KEY(&mKeypair));
-    VerifyOrExit(ec_key != nullptr, error = CHIP_ERROR_INTERNAL);
+    ScopedEcKey ec_key(EC_KEY_dup(to_const_EC_KEY(&mKeypair)));
+    VerifyOrExit(ec_key, error = CHIP_ERROR_INTERNAL);
 
     VerifyOrExit(mInitialized, error = CHIP_ERROR_UNINITIALIZED);
 
-    local_key = EVP_PKEY_new();
-    VerifyOrExit(local_key != nullptr, error = CHIP_ERROR_INTERNAL);
+    local_key.reset(EVP_PKEY_new());
+    VerifyOrExit(local_key, error = CHIP_ERROR_INTERNAL);
 
-    result = EVP_PKEY_set1_EC_KEY(local_key, ec_key);
+    result = EVP_PKEY_set1_EC_KEY(local_key.get(), ec_key.get());
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
-    error = _create_evp_key_from_binary_p256_key(remote_public_key, &remote_key);
+    error = _create_evp_key_from_binary_p256_key(remote_public_key, remote_key);
     SuccessOrExit(error);
 
-    context = EVP_PKEY_CTX_new(local_key, nullptr);
-    VerifyOrExit(context != nullptr, error = CHIP_ERROR_INTERNAL);
+    context.reset(EVP_PKEY_CTX_new(local_key.get(), nullptr));
+    VerifyOrExit(context, error = CHIP_ERROR_INTERNAL);
 
-    result = EVP_PKEY_derive_init(context);
+    result = EVP_PKEY_derive_init(context.get());
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
-    result = EVP_PKEY_derive_set_peer(context, remote_key);
+    result = EVP_PKEY_derive_set_peer(context.get(), remote_key.get());
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     out_buf_length = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
-    result         = EVP_PKEY_derive(context, out_secret.Bytes(), &out_buf_length);
+    result         = EVP_PKEY_derive(context.get(), out_secret.Bytes(), &out_buf_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
     SuccessOrExit(error = out_secret.SetLength(out_buf_length));
 
 exit:
-    if (ec_key != nullptr)
-    {
-        EC_KEY_free(ec_key);
-        ec_key = nullptr;
-    }
-
-    if (local_key != nullptr)
-    {
-        EVP_PKEY_free(local_key);
-        local_key = nullptr;
-    }
-
-    if (remote_key != nullptr)
-    {
-        EVP_PKEY_free(remote_key);
-        remote_key = nullptr;
-    }
-
-    if (context != nullptr)
-    {
-        EVP_PKEY_CTX_free(context);
-        context = nullptr;
-    }
-
     SSLErrorLog();
     return error;
 }
