@@ -26,7 +26,10 @@
 
 #pragma once
 
-#include <app/util/attribute-storage.h>
+#include <cstddef>
+#include <cstdint>
+
+#include <app-common/zap-generated/cluster-objects.h>
 
 namespace chip {
 namespace app {

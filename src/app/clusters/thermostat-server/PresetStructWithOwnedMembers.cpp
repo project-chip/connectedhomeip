@@ -17,10 +17,8 @@
 
 #include "PresetStructWithOwnedMembers.h"
 
-using namespace chip;
-using namespace chip::app;
-using namespace DataModel;
 using namespace chip::app::Clusters::Thermostat::Structs;
+using namespace chip::app::DataModel;
 
 namespace chip {
 namespace app {
