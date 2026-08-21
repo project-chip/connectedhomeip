@@ -56,6 +56,12 @@ NS_ASSUME_NONNULL_BEGIN
  *                MTREventIsHistoricalKey : NSNumber-wrapped BOOL value.
  *                                          Value is YES if the event is in the far past or not realtime.
  *                                          Only present when MTREventPathKey is present.
+ *                MTRLocalReceiptTimeKey : NSDate object.
+ *                                         The local time at which the value was received from the device.  This is an
+ *                                         observation made by this system, not a timestamp supplied by the device, and is
+ *                                         therefore not comparable to MTREventTimestampDateKey or to any device-reported
+ *                                         time.
+ *                                         Only present when MTRAttributePathKey is present.
  *
  *                Only one of MTREventTimestampDateKey and MTREventSystemUpTimeKey will be present, depending on the value for
  *                MTREventTimeTypeKey.
@@ -146,6 +152,7 @@ MTR_EXTERN NSString * const MTREventTimeTypeKey MTR_AVAILABLE(ios(16.5), macos(1
 MTR_EXTERN NSString * const MTREventSystemUpTimeKey MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 MTR_EXTERN NSString * const MTREventTimestampDateKey MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 MTR_EXTERN NSString * const MTREventIsHistoricalKey MTR_AVAILABLE(ios(17.3), macos(14.3), watchos(10.3), tvos(17.3));
+MTR_EXTERN NSString * const MTRLocalReceiptTimeKey MTR_PROVISIONALLY_AVAILABLE;
 
 @class MTRClusterStateCacheContainer;
 @class MTRAttributeCacheContainer;
@@ -668,6 +675,16 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * path.
  */
 @property (nonatomic, readonly, copy, nullable) NSError * error;
+
+/**
+ * The local time at which this value was received from the device, as described
+ * for MTRLocalReceiptTimeKey in MTRDeviceResponseHandler.
+ *
+ * Nil when the value did not come from the device (locally synthesized expected
+ * values) or came from a local cache, whose age is not tracked.  Nil means "age
+ * unknown", not "just now".
+ */
+@property (nonatomic, readonly, copy, nullable) NSDate * localReceiptTime MTR_PROVISIONALLY_AVAILABLE;
 
 /**
  * Initialize an MTRAttributeReport with a response-value dictionary of the sort
