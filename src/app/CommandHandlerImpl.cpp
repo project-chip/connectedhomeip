@@ -235,59 +235,61 @@ CHIP_ERROR CommandHandlerImpl::ValidateInvokeRequestMessageAndBuildRegistry(Invo
     if (IsGroupRequest())
     {
         VerifyOrReturnError(commandCount == 1, CHIP_ERROR_INVALID_ARGUMENT);
-        return CHIP_NO_ERROR;
     }
-    // While technically any commandCount == 1 should already be unique and does not need
-    // any further validation, we do need to read and populate the registry to help
-    // in building the InvokeResponse.
-
-    VerifyOrReturnError(commandCount <= MaxPathsPerInvoke(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // If there is more than one CommandDataIB, spec states that CommandRef must be provided.
-    commandRefExpected = commandCount > 1;
-
-    while (CHIP_NO_ERROR == (err = invokeRequestsReader.Next()))
+    else
     {
-        VerifyOrReturnError(TLV::AnonymousTag() == invokeRequestsReader.GetTag(), CHIP_ERROR_INVALID_ARGUMENT);
-        CommandDataIB::Parser commandData;
-        ReturnErrorOnFailure(commandData.Init(invokeRequestsReader));
+        // While technically any commandCount == 1 should already be unique and does not need
+        // any further validation, we do need to read and populate the registry to help
+        // in building the InvokeResponse.
 
-        // First validate that we can get a ConcreteCommandPath.
-        CommandPathIB::Parser commandPath;
-        ConcreteCommandPath concretePath(0, 0, 0);
-        ReturnErrorOnFailure(commandData.GetPath(&commandPath));
-        ReturnErrorOnFailure(commandPath.GetConcreteCommandPath(concretePath));
+        VerifyOrReturnError(commandCount <= MaxPathsPerInvoke(), CHIP_ERROR_INVALID_ARGUMENT);
 
-        // Record targeted endpoint during validation so mTargetedEndpoints is fully populated before
-        // TriggerDelayReport and before command handlers execute.
-        RecordTargetedEndpoint(concretePath.mEndpointId);
+        // If there is more than one CommandDataIB, spec states that CommandRef must be provided.
+        commandRefExpected = commandCount > 1;
 
-        // Grab the CommandRef if there is one, and validate that it's there when it
-        // has to be.
-        std::optional<uint16_t> commandRef;
-        uint16_t ref;
-        err = commandData.GetRef(&ref);
-        VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_END_OF_TLV, err);
-        if (err == CHIP_END_OF_TLV && commandRefExpected)
+        while (CHIP_NO_ERROR == (err = invokeRequestsReader.Next()))
         {
-            return CHIP_ERROR_INVALID_ARGUMENT;
+            VerifyOrReturnError(TLV::AnonymousTag() == invokeRequestsReader.GetTag(), CHIP_ERROR_INVALID_ARGUMENT);
+            CommandDataIB::Parser commandData;
+            ReturnErrorOnFailure(commandData.Init(invokeRequestsReader));
+
+            // First validate that we can get a ConcreteCommandPath.
+            CommandPathIB::Parser commandPath;
+            ConcreteCommandPath concretePath(0, 0, 0);
+            ReturnErrorOnFailure(commandData.GetPath(&commandPath));
+            ReturnErrorOnFailure(commandPath.GetConcreteCommandPath(concretePath));
+
+            // Record targeted endpoint during validation so mTargetedEndpoints is fully populated before
+            // TriggerDelayReport and before command handlers execute.
+            RecordTargetedEndpoint(concretePath.mEndpointId);
+
+            // Grab the CommandRef if there is one, and validate that it's there when it
+            // has to be.
+            std::optional<uint16_t> commandRef;
+            uint16_t ref;
+            err = commandData.GetRef(&ref);
+            VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_END_OF_TLV, err);
+            if (err == CHIP_END_OF_TLV && commandRefExpected)
+            {
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            if (err == CHIP_NO_ERROR)
+            {
+                commandRef.emplace(ref);
+            }
+
+            // Adding can fail if concretePath is not unique, or if commandRef is a value
+            // and is not unique, or if we have already added more paths than we support.
+            ReturnErrorOnFailure(GetCommandPathRegistry().Add(concretePath, commandRef));
         }
-        if (err == CHIP_NO_ERROR)
+
+        // It's OK/expected to have reached the end of the container without failure.
+        if (CHIP_END_OF_TLV == err)
         {
-            commandRef.emplace(ref);
+            err = CHIP_NO_ERROR;
         }
-
-        // Adding can fail if concretePath is not unique, or if commandRef is a value
-        // and is not unique, or if we have already added more paths than we support.
-        ReturnErrorOnFailure(GetCommandPathRegistry().Add(concretePath, commandRef));
+        ReturnErrorOnFailure(err);
     }
-
-    // It's OK/expected to have reached the end of the container without failure.
-    if (CHIP_END_OF_TLV == err)
-    {
-        err = CHIP_NO_ERROR;
-    }
-    ReturnErrorOnFailure(err);
 
     // Trigger report deferral BEFORE dispatching commands.
     // When command handlers execute, they may synchronously modify attributes, calling SetDirty()
