@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024-2025 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,509 +16,299 @@
  *    limitations under the License.
  */
 
-#include <thermostat-delegate-impl.h>
+#include "../include/thermostat-delegate-impl.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/thermostat-server/CodegenIntegration.h>
 #include <app/reporting/reporting.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <app/clusters/thermostat-server/ThermostatClusterWithFeatures.h>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::Thermostat;
+using namespace chip::app::Clusters::Thermostat::Attributes;
 using namespace chip::app::Clusters::Thermostat::Structs;
+using namespace Protocols::InteractionModel;
 using namespace System::Clock;
 
-ThermostatDelegate ThermostatDelegate::sInstance;
-
-ThermostatDelegate::ThermostatDelegate()
+SystemModeEnum ThermostatDelegate::GetSystemMode() const
 {
-    mNumberOfPresets                            = kMaxNumberOfPresetsSupported;
-    mNextFreeIndexInPresetsList                 = 0;
-    mNextFreeIndexInPendingPresetsList          = 0;
-    mMaxThermostatSuggestions                   = kMaxNumberOfThermostatSuggestions;
-    mIndexOfCurrentSuggestion                   = mMaxThermostatSuggestions;
-    mNextFreeIndexInThermostatSuggestionsList   = 0;
-    mMaxNumberOfSchedulesAllowedPerScheduleType = kMaxNumberOfSchedulesSupported;
-
-    // Start the unique ID from 0 and it increases montonically.
-    mUniqueID = 0;
-
-    InitializePresets();
-
-    InitializeScheduleTypes();
-
-    memset(mActivePresetHandleData, 0, sizeof(mActivePresetHandleData));
-    mActivePresetHandleDataSize = 0;
+    return mSystemMode;
 }
 
-ThermostatDelegate::~ThermostatDelegate()
+Protocols::InteractionModel::Status ThermostatDelegate::SetSystemMode(SystemModeEnum systemMode, bool & changed)
 {
-    CancelExpirationTimer();
-}
-
-void ThermostatDelegate::InitializePresets()
-{
-    // Initialize the presets with 2 built in presets - occupied and unoccupied.
-    PresetScenarioEnum presetScenarioEnumArray[2] = { PresetScenarioEnum::kOccupied, PresetScenarioEnum::kUnoccupied };
-    static_assert(MATTER_ARRAY_SIZE(presetScenarioEnumArray) <= MATTER_ARRAY_SIZE(mPresets));
-
-    uint8_t index = 0;
-    for (PresetScenarioEnum presetScenario : presetScenarioEnumArray)
+    if (mSystemMode == systemMode)
     {
-        mPresets[index].SetPresetScenario(presetScenario);
+        return Status::Success;
+    }
+    mSystemMode = systemMode;
+    changed     = true;
+    return Status::Success;
+}
 
-        // Set the preset handle to the preset scenario value as a unique id.
-        const uint8_t handle[] = { static_cast<uint8_t>(presetScenario) };
-        TEMPORARY_RETURN_IGNORED mPresets[index].SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle)));
-        TEMPORARY_RETURN_IGNORED mPresets[index].SetName(NullOptional);
-        int16_t coolingSetpointValue = static_cast<int16_t>(2500 + (index * 100));
-        mPresets[index].SetCoolingSetpoint(MakeOptional(coolingSetpointValue));
+ThermostatRunningModeEnum ThermostatDelegate::GetRunningMode() const
+{
+    return mRunningMode;
+}
 
-        int16_t heatingSetpointValue = static_cast<int16_t>(2100 - (index * 100));
-        mPresets[index].SetHeatingSetpoint(MakeOptional(heatingSetpointValue));
-        mPresets[index].SetBuiltIn(DataModel::MakeNullable(true));
-        index++;
+Protocols::InteractionModel::Status ThermostatDelegate::SetRunningMode(ThermostatRunningModeEnum runningMode, bool & changed)
+{
+    if (mRunningMode == runningMode)
+    {
+        return Status::Success;
+    }
+    mRunningMode = runningMode;
+    changed      = true;
+    return Status::Success;
+}
+
+BitMask<RelayStateBitmap> ThermostatDelegate::GetRunningState() const
+{
+    return mRunningState;
+}
+
+Protocols::InteractionModel::Status ThermostatDelegate::SetRunningState(BitMask<RelayStateBitmap> runningState, bool & changed)
+{
+    if (mRunningState == runningState)
+    {
+        return Status::Success;
+    }
+    mRunningState = runningState;
+    changed       = true;
+    return Status::Success;
+}
+
+ControlSequenceOfOperationEnum ThermostatDelegate::GetControlSequenceOfOperation() const
+{
+    return mControlSequenceOfOperation;
+}
+
+Protocols::InteractionModel::Status ThermostatDelegate::SetControlSequenceOfOperation(ControlSequenceOfOperationEnum seq,
+                                                                                      bool & changed)
+{
+    if (mControlSequenceOfOperation == seq)
+    {
+        return Status::Success;
+    }
+    mControlSequenceOfOperation = seq;
+    changed                     = true;
+    return Status::Success;
+}
+
+DataModel::Nullable<temperature> ThermostatDelegate::GetLocalTemperature() const
+{
+    return mLocalTemperature;
+}
+
+Protocols::InteractionModel::Status ThermostatDelegate::SetLocalTemperature(DataModel::Nullable<temperature> temp, bool & changed)
+{
+    if (mLocalTemperature == temp)
+    {
+        return Status::Success;
+    }
+    mLocalTemperature = temp;
+    changed           = true;
+    return Status::Success;
+}
+
+int8_t ThermostatDelegate::GetLocalTemperatureCalibration() const
+{
+    return mLocalTemperatureCalibration;
+}
+
+Protocols::InteractionModel::Status ThermostatDelegate::SetLocalTemperatureCalibration(int8_t temp, bool & changed)
+{
+    if (mLocalTemperatureCalibration == temp)
+    {
+        return Status::Success;
+    }
+    mLocalTemperatureCalibration = temp;
+    changed                      = true;
+    return Status::Success;
+}
+
+BitMask<RemoteSensingBitmap> ThermostatDelegate::GetRemoteSensing() const
+{
+    return mRemoteSensing;
+}
+
+Protocols::InteractionModel::Status ThermostatDelegate::SetRemoteSensing(BitMask<RemoteSensingBitmap> sensing, bool & changed)
+{
+    if (mRemoteSensing == sensing)
+    {
+        return Status::Success;
+    }
+    auto remoteSensingValue = sensing.Raw();
+    AttributePersistence persistence(*mProvider);
+    CHIP_ERROR result = persistence.StoreNativeEndianValue({ mEndpointId, Thermostat::Id, RemoteSensing::Id }, remoteSensingValue);
+    if (result != CHIP_NO_ERROR)
+    {
+        return Status::Failure;
+    }
+    mRemoteSensing = sensing;
+    changed        = true;
+    return Status::Success;
+}
+
+TemperatureSetpointHoldEnum ThermostatDelegate::GetTemperatureSetpointHold() const
+{
+    return mTemperatureSetpointHold;
+}
+
+Protocols::InteractionModel::Status ThermostatDelegate::SetTemperatureSetpointHold(TemperatureSetpointHoldEnum hold, bool & changed)
+{
+    if (mTemperatureSetpointHold == hold)
+    {
+        return Status::Success;
+    }
+    mTemperatureSetpointHold = hold;
+    changed                  = true;
+    return Status::Success;
+}
+
+DataModel::Nullable<uint16_t> ThermostatDelegate::GetTemperatureSetpointHoldDuration() const
+{
+    return mTemperatureSetpointHoldDuration;
+}
+
+Protocols::InteractionModel::Status ThermostatDelegate::SetTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> duration,
+                                                                                           bool & changed)
+{
+    if (mTemperatureSetpointHoldDuration == duration)
+    {
+        return Status::Success;
+    }
+    mTemperatureSetpointHoldDuration = duration;
+    changed                          = true;
+    return Status::Success;
+}
+
+DataModel::Nullable<uint32_t> ThermostatDelegate::GetSetpointHoldExpiryTimestamp() const
+{
+    return mSetpointHoldExpiryTimestamp;
+}
+
+Protocols::InteractionModel::Status ThermostatDelegate::SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> timestamp,
+                                                                                       bool & changed)
+{
+    if (mSetpointHoldExpiryTimestamp == timestamp)
+    {
+        return Status::Success;
+    }
+    mSetpointHoldExpiryTimestamp = timestamp;
+    changed                      = true;
+    return Status::Success;
+}
+
+Protocols::InteractionModel::Status ThermostatDelegate::LoadSetpoints(Setpoints & setpoints)
+{
+    ChipLogDetail(Zcl, "Loading setpoints");
+    AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
+    VerifyOrReturnError(provider != nullptr, Status::Failure);
+    AttributePersistence persistence(*provider);
+
+    if (setpoints.autoSupported)
+    {
+        int8_t deadBand;
+        persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, MinSetpointDeadBand::Id }, deadBand,
+                                          static_cast<int8_t>(kDefaultDeadBand / 10));
+        setpoints.deadBand = static_cast<int16_t>(deadBand * 10);
     }
 
-    // Set the value of the next free index in the presets list.
-    mNextFreeIndexInPresetsList = index;
-}
+    int16_t absMinHeatLimit = kDefaultAbsMinHeatSetpointLimit;
+    persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, AbsMinHeatSetpointLimit::Id }, absMinHeatLimit,
+                                      static_cast<int16_t>(kDefaultAbsMinHeatSetpointLimit));
+    setpoints.absoluteHeatLimits.minimum.SetTemperature(absMinHeatLimit);
 
-CHIP_ERROR ThermostatDelegate::GetPresetTypeAtIndex(size_t index, PresetTypeStruct::Type & presetType)
-{
-    static PresetTypeStruct::Type presetTypes[] = {
-        { .presetScenario     = PresetScenarioEnum::kOccupied,
-          .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
-          .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kAutomatic) },
-        { .presetScenario     = PresetScenarioEnum::kUnoccupied,
-          .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
-          .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kAutomatic) },
-        { .presetScenario     = PresetScenarioEnum::kSleep,
-          .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
-          .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kSupportsNames) },
-        { .presetScenario     = PresetScenarioEnum::kWake,
-          .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
-          .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kSupportsNames) },
-        { .presetScenario     = PresetScenarioEnum::kVacation,
-          .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
-          .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kSupportsNames) },
-        { .presetScenario     = PresetScenarioEnum::kUserDefined,
-          .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
-          .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kSupportsNames) },
-    };
-    if (index < MATTER_ARRAY_SIZE(presetTypes))
+    int16_t absMaxHeatLimit = kDefaultAbsMaxHeatSetpointLimit;
+    persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, AbsMaxHeatSetpointLimit::Id }, absMaxHeatLimit,
+                                      static_cast<int16_t>(kDefaultAbsMaxHeatSetpointLimit));
+    setpoints.absoluteHeatLimits.maximum.SetTemperature(absMaxHeatLimit);
+
+    int16_t absMinCoolLimit = kDefaultAbsMinCoolSetpointLimit;
+    persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, AbsMinCoolSetpointLimit::Id }, absMinCoolLimit,
+                                      static_cast<int16_t>(kDefaultAbsMinCoolSetpointLimit));
+    setpoints.absoluteCoolLimits.minimum.SetTemperature(absMinCoolLimit);
+
+    int16_t absMaxCoolLimit = kDefaultAbsMaxCoolSetpointLimit;
+    persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, AbsMaxCoolSetpointLimit::Id }, absMaxCoolLimit,
+                                      static_cast<int16_t>(kDefaultAbsMaxCoolSetpointLimit));
+    setpoints.absoluteCoolLimits.maximum.SetTemperature(absMaxCoolLimit);
+
+    if (setpoints.heatSupported)
     {
-        presetType = presetTypes[index];
-        return CHIP_NO_ERROR;
-    }
-    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-}
-
-uint8_t ThermostatDelegate::GetNumberOfPresets()
-{
-    return mNumberOfPresets;
-}
-
-CHIP_ERROR ThermostatDelegate::GetPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset)
-{
-    if (index < mNextFreeIndexInPresetsList)
-    {
-        preset = mPresets[index];
-        return CHIP_NO_ERROR;
-    }
-    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-}
-
-CHIP_ERROR ThermostatDelegate::GetActivePresetHandle(DataModel::Nullable<MutableByteSpan> & activePresetHandle)
-{
-    if (!mActivePresetHandleIsNull)
-    {
-        ReturnErrorOnFailure(
-            CopySpanToMutableSpan(ByteSpan(mActivePresetHandleData, mActivePresetHandleDataSize), activePresetHandle.Value()));
-        activePresetHandle.Value().reduce_size(mActivePresetHandleDataSize);
-    }
-    else
-    {
-        activePresetHandle.SetNull();
-    }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & newActivePresetHandle)
-{
-    bool newIsNull = newActivePresetHandle.IsNull();
-    ByteSpan oldHandle(mActivePresetHandleData, mActivePresetHandleDataSize);
-
-    if (mActivePresetHandleIsNull == newIsNull && (newIsNull || oldHandle.data_equal(newActivePresetHandle.Value())))
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    if (!newIsNull)
-    {
-        size_t newActivePresetHandleSize = newActivePresetHandle.Value().size();
-        if (newActivePresetHandleSize > sizeof(mActivePresetHandleData))
+        int16_t minHeatLimit;
+        if (persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, MinHeatSetpointLimit::Id }, minHeatLimit,
+                                              static_cast<int16_t>(0)))
         {
-            ChipLogError(NotSpecified,
-                         "Failed to set ActivePresetHandle. newActivePresetHandle size %u is larger than preset handle size %u",
-                         static_cast<uint8_t>(newActivePresetHandleSize), static_cast<uint8_t>(kPresetHandleSize));
-            return CHIP_ERROR_NO_MEMORY;
+            setpoints.userHeatLimits.minimum.SetTemperature(minHeatLimit);
         }
-        memcpy(mActivePresetHandleData, newActivePresetHandle.Value().data(), newActivePresetHandleSize);
-        mActivePresetHandleDataSize = newActivePresetHandleSize;
-        ChipLogDetail(NotSpecified, "Set ActivePresetHandle to ");
-        ChipLogByteSpan(NotSpecified, newActivePresetHandle.Value());
-    }
-    else
-    {
-        memset(mActivePresetHandleData, 0, sizeof(mActivePresetHandleData));
-        mActivePresetHandleDataSize = 0;
-        ChipLogDetail(NotSpecified, "Clear ActivePresetHandle");
-    }
-
-    mActivePresetHandleIsNull = newIsNull;
-    MatterReportingAttributeChangeCallback(mEndpointId, Thermostat::Id, Attributes::ActivePresetHandle::Id);
-
-    return CHIP_NO_ERROR;
-}
-
-std::optional<System::Clock::Milliseconds16> ThermostatDelegate::GetMaxAtomicWriteTimeout(chip::AttributeId attributeId)
-{
-    switch (attributeId)
-    {
-    case Attributes::Presets::Id:
-        // If the client expects to edit the presets, then we'll give it 3 seconds to do so
-        return std::chrono::milliseconds(3000);
-    case Attributes::Schedules::Id:
-        // If the client expects to edit the schedules, then we'll give it 9 seconds to do so
-        return std::chrono::milliseconds(9000);
-    default:
-        return std::nullopt;
-    }
-}
-
-void ThermostatDelegate::InitializePendingPresets()
-{
-    mNextFreeIndexInPendingPresetsList = 0;
-    for (uint8_t indexInPresets = 0; indexInPresets < mNextFreeIndexInPresetsList; indexInPresets++)
-    {
-        mPendingPresets[mNextFreeIndexInPendingPresetsList] = mPresets[indexInPresets];
-        mNextFreeIndexInPendingPresetsList++;
-    }
-}
-
-CHIP_ERROR ThermostatDelegate::AppendToPendingPresetList(const PresetStructWithOwnedMembers & preset)
-{
-    if (mNextFreeIndexInPendingPresetsList < MATTER_ARRAY_SIZE(mPendingPresets))
-    {
-        mPendingPresets[mNextFreeIndexInPendingPresetsList] = preset;
-        if (preset.GetPresetHandle().IsNull())
+        int16_t maxHeatLimit;
+        if (persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, MaxHeatSetpointLimit::Id }, maxHeatLimit,
+                                              static_cast<int16_t>(0)))
         {
-            // TODO: #34556 Since we support only one preset of each type, using the octet string containing the preset scenario
-            // suffices as the unique preset handle. Need to fix this to actually provide unique handles once multiple presets of
-            // each type are supported.
-            const uint8_t handle[] = { static_cast<uint8_t>(preset.GetPresetScenario()) };
-            TEMPORARY_RETURN_IGNORED mPendingPresets[mNextFreeIndexInPendingPresetsList].SetPresetHandle(
-                DataModel::MakeNullable(ByteSpan(handle)));
-        }
-        mNextFreeIndexInPendingPresetsList++;
-        return CHIP_NO_ERROR;
-    }
-    return CHIP_ERROR_WRITE_FAILED;
-}
-
-CHIP_ERROR ThermostatDelegate::GetPendingPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset)
-{
-    if (index < mNextFreeIndexInPendingPresetsList)
-    {
-        preset = mPendingPresets[index];
-        return CHIP_NO_ERROR;
-    }
-    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-}
-
-CHIP_ERROR ThermostatDelegate::CommitPendingPresets()
-{
-    mNextFreeIndexInPresetsList = 0;
-    for (uint8_t indexInPendingPresets = 0; indexInPendingPresets < mNextFreeIndexInPendingPresetsList; indexInPendingPresets++)
-    {
-        const PresetStructWithOwnedMembers & pendingPreset = mPendingPresets[indexInPendingPresets];
-        mPresets[mNextFreeIndexInPresetsList]              = pendingPreset;
-        mNextFreeIndexInPresetsList++;
-    }
-    return CHIP_NO_ERROR;
-}
-
-void ThermostatDelegate::ClearPendingPresetList()
-{
-    mNextFreeIndexInPendingPresetsList = 0;
-}
-
-uint8_t ThermostatDelegate::GetMaxThermostatSuggestions()
-{
-    return mMaxThermostatSuggestions;
-}
-
-uint8_t ThermostatDelegate::GetNumberOfThermostatSuggestions()
-{
-    return mNextFreeIndexInThermostatSuggestionsList;
-}
-
-CHIP_ERROR ThermostatDelegate::GetThermostatSuggestionAtIndex(size_t index,
-                                                              ThermostatSuggestionStructWithOwnedMembers & thermostatSuggestion)
-{
-    if (index < mNextFreeIndexInThermostatSuggestionsList)
-    {
-        thermostatSuggestion = mThermostatSuggestions[index];
-        return CHIP_NO_ERROR;
-    }
-    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-}
-
-void ThermostatDelegate::GetCurrentThermostatSuggestion(
-    DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> & currentThermostatSuggestion)
-{
-    if (mIndexOfCurrentSuggestion < mNextFreeIndexInThermostatSuggestionsList)
-    {
-        currentThermostatSuggestion.SetNonNull(mThermostatSuggestions[mIndexOfCurrentSuggestion]);
-    }
-    else
-    {
-        currentThermostatSuggestion.SetNull();
-    }
-}
-
-DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> ThermostatDelegate::GetThermostatSuggestionNotFollowingReason()
-{
-    return mThermostatSuggestionNotFollowingReason;
-}
-
-CHIP_ERROR ThermostatDelegate::SetThermostatSuggestionNotFollowingReason(
-    const DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> & thermostatSuggestionNotFollowingReason)
-{
-    bool hasChanged = (mThermostatSuggestionNotFollowingReason != thermostatSuggestionNotFollowingReason);
-
-    if (hasChanged)
-    {
-        mThermostatSuggestionNotFollowingReason = thermostatSuggestionNotFollowingReason;
-        MatterReportingAttributeChangeCallback(mEndpointId, Thermostat::Id, Attributes::ThermostatSuggestionNotFollowingReason::Id);
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-void ThermostatDelegate::SetCurrentThermostatSuggestion(size_t index)
-{
-    // The MaxThermostatSuggestions attribute value is used as an index to set the current thermostat suggestion to null. Hence the
-    // <= check below.
-    if (index <= GetMaxThermostatSuggestions())
-    {
-        bool hasChanged = (mIndexOfCurrentSuggestion != index);
-        if (hasChanged)
-        {
-            mIndexOfCurrentSuggestion = index;
-            MatterReportingAttributeChangeCallback(mEndpointId, Thermostat::Id, Attributes::CurrentThermostatSuggestion::Id);
+            setpoints.userHeatLimits.maximum.SetTemperature(maxHeatLimit);
         }
     }
-}
-
-CHIP_ERROR
-ThermostatDelegate::AppendToThermostatSuggestionsList(const Structs::ThermostatSuggestionStruct::Type & thermostatSuggestion)
-{
-    if (mNextFreeIndexInThermostatSuggestionsList < MATTER_ARRAY_SIZE(mThermostatSuggestions))
+    if (setpoints.coolSupported)
     {
-        mThermostatSuggestions[mNextFreeIndexInThermostatSuggestionsList++] = thermostatSuggestion;
-        return CHIP_NO_ERROR;
-    }
-    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-}
-
-CHIP_ERROR ThermostatDelegate::RemoveFromThermostatSuggestionsList(size_t indexToRemove)
-{
-    if (indexToRemove >= GetNumberOfThermostatSuggestions())
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    // Shift elements to the left to fill the gap.
-    for (size_t index = indexToRemove; index < static_cast<size_t>(mNextFreeIndexInThermostatSuggestionsList - 1); index++)
-    {
-        mThermostatSuggestions[index] = mThermostatSuggestions[index + 1];
-    }
-    if (indexToRemove == mIndexOfCurrentSuggestion)
-    {
-        CancelExpirationTimer();
-        SetCurrentThermostatSuggestion(GetMaxThermostatSuggestions());
-    }
-    mNextFreeIndexInThermostatSuggestionsList--;
-    return CHIP_NO_ERROR;
-}
-
-bool ThermostatDelegate::HaveSuggestionWithID(uint8_t uniqueIDToFind)
-{
-    for (auto & suggestion : Span(mThermostatSuggestions, mNextFreeIndexInThermostatSuggestionsList))
-    {
-        if (uniqueIDToFind == suggestion.GetUniqueID())
+        int16_t minCoolLimit;
+        if (persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, MinCoolSetpointLimit::Id }, minCoolLimit,
+                                              static_cast<int16_t>(0)))
         {
-            return true;
+            setpoints.userCoolLimits.minimum.SetTemperature(minCoolLimit);
         }
-    }
-    return false;
-}
-
-CHIP_ERROR ThermostatDelegate::GetUniqueID(uint8_t & uniqueID)
-{
-    uint8_t maxUniqueId = 0;
-
-    for (auto & suggestion : Span(mThermostatSuggestions, mNextFreeIndexInThermostatSuggestionsList))
-    {
-        uint8_t existingUniqueID = suggestion.GetUniqueID();
-        if (existingUniqueID > maxUniqueId)
+        int16_t maxCoolLimit;
+        if (persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, MaxCoolSetpointLimit::Id }, maxCoolLimit,
+                                              static_cast<int16_t>(0)))
         {
-            maxUniqueId = existingUniqueID;
+            setpoints.userCoolLimits.maximum.SetTemperature(maxCoolLimit);
         }
     }
 
-    uniqueID = maxUniqueId + 1;
+    int16_t occupiedCooling;
+    persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, OccupiedCoolingSetpoint::Id }, occupiedCooling,
+                                      static_cast<int16_t>(kDefaultCoolingSetpoint));
+    setpoints.occupiedRange.cooling.SetTemperature(occupiedCooling);
 
-    // If overflow occurs, check for next available uniqueID.
-    if (uniqueID == 0)
+    int16_t occupiedHeating;
+    persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, OccupiedHeatingSetpoint::Id }, occupiedHeating,
+                                      static_cast<int16_t>(kDefaultHeatingSetpoint));
+    setpoints.occupiedRange.heating.SetTemperature(occupiedHeating);
+
+    if (setpoints.occupancySupported)
     {
-        while (HaveSuggestionWithID(uniqueID))
-        {
-            uniqueID++;
-            if (uniqueID == UINT8_MAX)
-            {
-                return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-            }
-        };
-    }
-    return CHIP_NO_ERROR;
-}
+        int16_t unoccupiedCooling;
+        persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, UnoccupiedCoolingSetpoint::Id }, unoccupiedCooling,
+                                          static_cast<int16_t>(kDefaultCoolingSetpoint));
+        setpoints.unoccupiedRange.cooling.SetTemperature(unoccupiedCooling);
 
-/**
- * @brief Starts a timer to wait for the expiration of the current thermostat suggestion.
- *
- * @param[in] timeoutInSecs The timeout in seconds.
- */
-CHIP_ERROR ThermostatDelegate::StartExpirationTimer(Seconds32 timeout)
-{
-    ChipLogProgress(Zcl, "Starting timer to wait for %" PRIu32 "seconds for the current thermostat suggestion to expire",
-                    timeout.count());
-    mIsExpirationTimerRunning = true;
-    return DeviceLayer::SystemLayer().StartTimer(std::chrono::duration_cast<Milliseconds32>(timeout), TimerExpiredCallback,
-                                                 static_cast<void *>(this));
-}
-
-void ThermostatDelegate::TimerExpiredCallback(System::Layer * systemLayer, void * appState)
-{
-    auto ctx = static_cast<ThermostatDelegate *>(appState);
-    if (ctx == nullptr)
-    {
-        ChipLogError(Zcl, "TimerExpiredCallback: Failed to ReEvaluateCurrentSuggestion since context is null");
-        return;
-    }
-    TEMPORARY_RETURN_IGNORED ctx->ReEvaluateCurrentSuggestion();
-}
-
-void ThermostatDelegate::CancelExpirationTimer()
-{
-    if (mIsExpirationTimerRunning)
-    {
-        ChipLogProgress(Zcl, "Cancelling expiration timer for the current thermostat suggestion");
-        DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, static_cast<void *>(this));
-        mIsExpirationTimerRunning = false;
-    }
-}
-
-CHIP_ERROR ThermostatDelegate::ReEvaluateCurrentSuggestion()
-{
-    CancelExpirationTimer();
-
-    uint32_t currentMatterEpochTimestampInSeconds = 0;
-    CHIP_ERROR err                                = System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "Failed to get the current time stamp with error: %" CHIP_ERROR_FORMAT, err.Format());
-        return err;
+        int16_t unoccupiedHeating;
+        persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, UnoccupiedHeatingSetpoint::Id }, unoccupiedHeating,
+                                          static_cast<int16_t>(kDefaultHeatingSetpoint));
+        setpoints.unoccupiedRange.heating.SetTemperature(unoccupiedHeating);
     }
 
-    Seconds32 currentMatterEpochTimestamp = Seconds32(currentMatterEpochTimestampInSeconds);
-
-    // For the reference thermostat app, we will always choose a suggestion with the earliest effective time.
-    SetCurrentThermostatSuggestion(GetThermostatSuggestionIndexWithEarliestEffectiveTime(currentMatterEpochTimestamp));
-
-    DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> nullableCurrentThermostatSuggestion;
-    GetCurrentThermostatSuggestion(nullableCurrentThermostatSuggestion);
-
-    if (!nullableCurrentThermostatSuggestion.IsNull())
-    {
-
-        ThermostatSuggestionStructWithOwnedMembers & currentThermostatSuggestion = nullableCurrentThermostatSuggestion.Value();
-
-        // TODO: Check if a hold is set and set the ThermostatSuggestionNotFollowingReason to OngoingHold and do not update
-        // ActivePresetHandle. Otherwise set the ActivePresetHandle to the preset handle in the suggestion and set
-        // ThermostatSuggestionNotFollowingReason to null.
-        TEMPORARY_RETURN_IGNORED SetActivePresetHandle(currentThermostatSuggestion.GetPresetHandle());
-        TEMPORARY_RETURN_IGNORED SetThermostatSuggestionNotFollowingReason(DataModel::NullNullable);
-
-        // Start a timer from the timestamp in currentMatterEpochTimestamp to the timestamp in the expiration time.
-        if (currentThermostatSuggestion.GetExpirationTime() > currentMatterEpochTimestamp)
-        {
-            TEMPORARY_RETURN_IGNORED StartExpirationTimer(currentThermostatSuggestion.GetExpirationTime() -
-                                                          currentMatterEpochTimestamp);
-        }
-    }
-
-    return CHIP_NO_ERROR;
+    return Status::Success;
 }
 
-size_t ThermostatDelegate::GetThermostatSuggestionIndexWithEarliestEffectiveTime(Seconds32 currentMatterEpochTimestamp)
+Protocols::InteractionModel::Status ThermostatDelegate::SaveSetpoint(const Setpoint & oldSetpoint, const Setpoint & newSetpoint)
 {
-    uint8_t maxThermostatSuggestions = GetMaxThermostatSuggestions();
-    VerifyOrReturnValue(GetNumberOfThermostatSuggestions() > 0, maxThermostatSuggestions);
+    AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
+    VerifyOrReturnError(provider != nullptr, Status::Failure);
+    AttributePersistence persistence(*provider);
+    temperature newTemp = newSetpoint.Temperature();
 
-    Seconds32 minEffectiveTimeValue        = Seconds32(UINT32_MAX);
-    size_t minEffectiveTimeSuggestionIndex = maxThermostatSuggestions;
-
-    for (size_t index = 0; index < static_cast<size_t>(GetNumberOfThermostatSuggestions()); index++)
+    auto status = persistence.StoreNativeEndianValue({ mEndpointId, Thermostat::Id, oldSetpoint.AttributeId() }, newTemp);
+    if (status != CHIP_NO_ERROR)
     {
-        ThermostatSuggestionStructWithOwnedMembers suggestion;
-        CHIP_ERROR err = GetThermostatSuggestionAtIndex(index, suggestion);
-        VerifyOrReturnValue(err == CHIP_NO_ERROR, maxThermostatSuggestions);
-
-        // Check for the least effective time that is less than the current timestamp.
-        Seconds32 effectiveTime = suggestion.GetEffectiveTime();
-        if (effectiveTime < minEffectiveTimeValue && effectiveTime <= currentMatterEpochTimestamp)
-        {
-            minEffectiveTimeValue           = effectiveTime;
-            minEffectiveTimeSuggestionIndex = index;
-        }
+        return chip::Protocols::InteractionModel::ClusterStatusCode(status).GetStatus();
     }
-    return minEffectiveTimeSuggestionIndex;
-}
 
-void ThermostatDelegate::InitializeScheduleTypes()
-{
-    static_assert(MATTER_ARRAY_SIZE(mScheduleTypes) == 2);
-
-    mScheduleTypes[0] = { .systemMode           = SystemModeEnum::kHeat,
-                          .numberOfSchedules    = mMaxNumberOfSchedulesAllowedPerScheduleType,
-                          .scheduleTypeFeatures = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) };
-
-    mScheduleTypes[1] = { .systemMode           = SystemModeEnum::kCool,
-                          .numberOfSchedules    = mMaxNumberOfSchedulesAllowedPerScheduleType,
-                          .scheduleTypeFeatures = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) };
-}
-
-CHIP_ERROR ThermostatDelegate::GetScheduleTypeAtIndex(size_t index, Structs::ScheduleTypeStruct::Type & scheduleType)
-{
-    if (index < MATTER_ARRAY_SIZE(mScheduleTypes))
-    {
-        scheduleType = mScheduleTypes[index];
-        return CHIP_NO_ERROR;
-    }
-    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    return Status::Success;
 }

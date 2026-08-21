@@ -22,12 +22,20 @@
 #include <app/clusters/thermostat-server/AttributeAccessorShim.h>
 #include <app/clusters/thermostat-server/CodegenIntegration.h>
 #include <thermostat-delegate-impl.h>
+#include <thermostat-presets-delegate-impl.h>
+#include <thermostat-suggestions-delegate-impl.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 namespace {
 k_timer sThermostatUpdateTimer;
 constexpr uint16_t kThermostatUpdateTimerPeriodMs = 30000; // 30s timer period
+
+constexpr EndpointId gThermostatEndpoint(1);
+static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatPresetsDelegate gPresetsDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatSuggestionsDelegate gSuggestionsDelegate(gThermostatEndpoint, gPresetsDelegate);
+
 } // namespace
 
 AppTask AppTask::sAppTask;
@@ -38,12 +46,7 @@ CHIP_ERROR AppTask::Init(void)
 
     ReturnErrorOnFailure(InitCommonParts());
 
-    if (auto status = chip::app::Clusters::Thermostat::SetDefaultDelegate(
-            kExampleEndpointId, &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
-        status != chip::Protocols::InteractionModel::Status::Success)
-    {
-        LOG_ERR("SetDefaultDelegate failed: 0x%02x", chip::to_underlying(status));
-    }
+    Clusters::Thermostat::ServerInit(gThermostatEndpoint, gThermostatDelegate, gPresetsDelegate, gSuggestionsDelegate);
 
     err = SensorMgr().Init();
     if (err != CHIP_NO_ERROR)

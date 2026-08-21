@@ -1,6 +1,5 @@
 /**
- *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,40 +14,28 @@
  *    limitations under the License.
  */
 
-/****************************************************************************
- * @file
- * @brief APIs for the  Thermostat cluster.
- *
- *******************************************************************************
- ******************************************************************************/
-
 #pragma once
 
 #include "SetpointRange.h"
 #include "Setpoints.h"
 
-#include "ThermostatClusterAtomic.h"
 #include "ThermostatDelegate.h"
 
-#include "app/ConcreteAttributePath.h"
 #include "app/clusters/thermostat-server/Temperature.h"
 #include "lib/core/DataModelTypes.h"
-#include "lib/support/CodeUtils.h"
-#include <app-common/zap-generated/callback.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <credentials/FabricTable.h>
+#include <lib/support/TimerDelegate.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-class ThermostatCluster : public DefaultServerCluster, private chip::FabricTable::Delegate, private AtomicWriteSession::Delegate
+class ThermostatCluster : public DefaultServerCluster
 {
-
 public:
     struct OptionalAttributes
     {
@@ -106,11 +93,25 @@ public:
         DefaultValues() = default;
     };
 
-    ThermostatCluster(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features, const OptionalAttributes & optionalAttributes,
-                      const DefaultValues & defaultValues, FabricTable & fabricTable);
+    struct Config
+    {
+        OptionalAttributes mOptionalAttributes;
+        DefaultValues mDefaultValues;
+        TimerDelegate & mTimerDelegate;
+
+        Config(OptionalAttributes optionalAttributes, DefaultValues defaultValues, TimerDelegate & timerDelegate) :
+            mOptionalAttributes(optionalAttributes), mDefaultValues(defaultValues), mTimerDelegate(timerDelegate)
+        {}
+    };
+
+    ThermostatCluster(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features, const Config & config,
+                      Thermostat::Delegate & delegate);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType type) override;
+
+    // Exposing for feature clusters to be able to notify when they change an attribute
+    using DefaultServerCluster::NotifyAttributeChanged;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
@@ -128,107 +129,83 @@ public:
     BitFlags<Thermostat::Feature> Features() const { return mFeatures; }
     void SetFeatures(BitFlags<Thermostat::Feature> features) { mFeatures = features; }
 
-    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
-
     EndpointId Endpoint() const { return mPath.mEndpointId; }
-    void SetDelegate(Thermostat::Delegate * delegate) { mDelegate = delegate; }
 
-    Protocols::InteractionModel::Status OnAtomicWriteBegin(AttributeId attributeId) override;
-    Protocols::InteractionModel::Status OnAtomicWritePrecommit(AttributeId attributeId) override;
-    Protocols::InteractionModel::Status OnAtomicWriteCommit(AttributeId attributeId) override;
-    Protocols::InteractionModel::Status OnAtomicWriteRollback(AttributeId attributeId) override;
+    bool HasAttribute(chip::AttributeId attributeId);
 
-    std::optional<System::Clock::Milliseconds16> GetMaxAtomicWriteTimeout(chip::AttributeId attributeId) override;
-    bool HasAttribute(chip::AttributeId attributeId) override;
-
-    void OnAtomicWriteTimeout();
-
-    SystemModeEnum GetSystemMode() const { return mSystemMode; }
+    SystemModeEnum GetSystemMode() const;
     Protocols::InteractionModel::Status SetSystemMode(SystemModeEnum systemMode);
 
-    ControlSequenceOfOperationEnum GetControlSequenceOfOperation() const { return mControlSequenceOfOperation; }
+    ControlSequenceOfOperationEnum GetControlSequenceOfOperation() const;
     Protocols::InteractionModel::Status SetControlSequenceOfOperation(ControlSequenceOfOperationEnum controlSequenceOfOperation);
 
-    ThermostatRunningModeEnum GetRunningMode() const { return mRunningMode; }
+    ThermostatRunningModeEnum GetRunningMode() const;
     Protocols::InteractionModel::Status SetRunningMode(ThermostatRunningModeEnum runningMode);
 
-    BitMask<RelayStateBitmap> GetRunningState() const { return mRunningState; }
+    BitMask<RelayStateBitmap> GetRunningState() const;
     Protocols::InteractionModel::Status SetRunningState(BitMask<RelayStateBitmap> runningState);
 
-    DataModel::Nullable<int16_t> GetLocalTemperature() const { return mLocalTemperature; }
+    DataModel::Nullable<temperature> GetLocalTemperature() const;
     Protocols::InteractionModel::Status
-    SetLocalTemperature(DataModel::Nullable<int16_t> localTemperature,
+    SetLocalTemperature(DataModel::Nullable<temperature> localTemperature,
                         DataModel::AttributeChangeType changeType = DataModel::AttributeChangeType::kReportable);
+
+    int8_t GetLocalTemperatureCalibration() const;
+    Protocols::InteractionModel::Status SetLocalTemperatureCalibration(int8_t localTemperatureCalibration);
 
     DataModel::ActionReturnStatus ChangeSetpointAttribute(const AttributeId attributeId, temperature temp);
 
-    Setpoints mSetpoints;
+    Setpoints GetSetpoints();
 
-private:
+    virtual bool IsOccupied() const { return true; }
+    virtual bool IsActiveSetpoint(AttributeId attributeId) const;
+
+protected:
     BitFlags<Thermostat::Feature> mFeatures;
-    OptionalAttributes mOptionalAttributes;
-    const DefaultValues mDefaultValues;
-    FabricTable & mFabricTable;
+    Config mConfig;
 
-    ControlSequenceOfOperationEnum mControlSequenceOfOperation = ControlSequenceOfOperationEnum::kCoolingOnly;
-
-    Thermostat::Delegate * mDelegate = nullptr;
-
-    AtomicWriteSession mAtomicWriteSession;
-
-    BitMask<RemoteSensingBitmap> mRemoteSensing = 0;
-    BitMask<OccupancyBitmap> mOccupancy         = 0;
-
-    SystemModeEnum mSystemMode              = SystemModeEnum::kOff;
-    ThermostatRunningModeEnum mRunningMode  = ThermostatRunningModeEnum::kOff;
-    BitMask<RelayStateBitmap> mRunningState = 0;
-    DataModel::Nullable<int16_t> mLocalTemperature;
-    int8_t mLocalTemperatureCalibration = 0;
-
-    TemperatureSetpointHoldEnum mTemperatureSetpointHold           = TemperatureSetpointHoldEnum::kSetpointHoldOff;
-    DataModel::Nullable<uint16_t> mTemperatureSetpointHoldDuration = DataModel::Nullable<uint16_t>(0);
-    DataModel::Nullable<uint32_t> mSetpointHoldExpiryTimestamp     = DataModel::Nullable<uint32_t>(0);
-
-    DataModel::ActionReturnStatus WriteNonAtomicAttribute(const DataModel::WriteAttributeRequest & request,
-                                                          AttributeValueDecoder & decoder);
+    Thermostat::Delegate & mDelegate;
 
     DataModel::ActionReturnStatus HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId, temperature value,
                                                        SetpointAttributes & changedAttributes);
     DataModel::ActionReturnStatus SetpointRaiseLower(const Commands::SetpointRaiseLower::DecodableType & commandData);
 
-    Protocols::InteractionModel::Status LoadSetpoints(Setpoints & setpoints, AttributePersistence & persistence);
+    DataModel::ActionReturnStatus ReadSetpointAttribute(const DataModel::ReadAttributeRequest & request,
+                                                        AttributeValueEncoder & encoder);
+
     Protocols::InteractionModel::Status SaveSetpoint(Setpoint & oldSetpoint, Setpoint & newSetpoint);
     DataModel::ActionReturnStatus SaveSetpoints(Setpoints & setpoints, SetpointAttributes changedAttributes);
 
-    /**
-     * @brief Set the Active Preset to a given preset handle, or null
-     *
-     * @param presetHandle The handle of the preset to set active, or null to clear the active preset
-     * @return Success if the active preset was updated, an error code if not
-     */
-    Protocols::InteractionModel::Status SetActivePreset(DataModel::Nullable<ByteSpan> presetHandle);
-
-    /**
-     * @brief Apply a preset to the pending lists of presets during an atomic write
-     *
-     * @param preset The preset to append
-     * @return CHIP_NO_ERROR if successful, an error code if not
-     */
-    CHIP_ERROR AppendPendingPreset(const Structs::PresetStruct::Type & preset);
-
-    chip::Protocols::InteractionModel::Status PrecommitPresets();
-
     void GenerateSetpointEvent(AttributeId attributeId, temperature oldTemp, temperature newTemp);
 
-    std::optional<DataModel::ActionReturnStatus>
-    AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                            const Commands::AddThermostatSuggestion::DecodableType & commandData);
+    void GenerateSystemModeChangeEvent(chip::Optional<chip::app::Clusters::Thermostat::SystemModeEnum> previousSystemMode,
+                                       chip::app::Clusters::Thermostat::SystemModeEnum currentSystemMode);
 
-    std::optional<DataModel::ActionReturnStatus>
-    RemoveThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                               const Commands::RemoveThermostatSuggestion::DecodableType & commandData);
+    void GenerateLocalTemperatureChangeEvent(chip::app::DataModel::Nullable<int16_t> currentLocalTemperature);
 
-    void ReEvaluateCurrentSuggestion();
+    void
+    GenerateOccupancyChangeEvent(chip::Optional<chip::BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap>> previousOccupancy,
+                                 chip::BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> currentOccupancy);
+
+    void GenerateSetpointChangeEvent(chip::app::Clusters::Thermostat::SystemModeEnum systemMode,
+                                     chip::BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> occupancy,
+                                     chip::Optional<temperature> previousSetpoint, temperature currentSetpoint);
+
+    void GenerateRunningStateChangeEvent(
+        chip::Optional<chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap>> previousRunningState,
+        chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> currentRunningState);
+
+    void
+    GenerateRunningModeChangeEvent(chip::Optional<chip::app::Clusters::Thermostat::ThermostatRunningModeEnum> previousRunningMode,
+                                   chip::app::Clusters::Thermostat::ThermostatRunningModeEnum currentRunningMode);
+
+    void GenerateActiveScheduleChangeEvent(chip::Optional<chip::app::DataModel::Nullable<chip::ByteSpan>> previousScheduleHandle,
+                                           chip::app::DataModel::Nullable<chip::ByteSpan> currentScheduleHandle);
+
+    void GenerateActivePresetChangeEvent(chip::Optional<chip::app::DataModel::Nullable<chip::ByteSpan>> previousPresetHandle,
+                                         chip::app::DataModel::Nullable<chip::ByteSpan> currentPresetHandle);
+
+    friend class ThermostatPresets;
 };
 
 } // namespace Thermostat
