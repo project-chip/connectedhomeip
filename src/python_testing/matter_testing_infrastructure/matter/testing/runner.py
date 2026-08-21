@@ -44,6 +44,7 @@ from matter.clusters import Attribute
 from matter.testing.defaults import TestingDefaults
 # Add imports for argument parsing dependencies
 from matter.testing.pics import read_pics_from_file
+from matter.testing.spec_parsing import build_xml_data_model, latest_prebuilt_directory
 
 try:
     from matter_yamltests.hooks import TestRunnerHooks
@@ -456,6 +457,14 @@ def run_tests_no_exit(
 
         with runner.mobly_logger():
             if matter_test_config.commissioning_method is not None:
+                # Populate XML data model
+                try:
+                    dm_directory = latest_prebuilt_directory()
+                    LOGGER.info("Data model directory: %s", dm_directory)
+                    data_model = build_xml_data_model(dm_directory)
+                    test_config.user_params["data_model"] = global_stash.stash_globally(data_model)
+                except Exception:
+                    LOGGER.warning("Could not populate data model from device spec version")
                 runner.add_test_class(test_config, CommissionDeviceTest, None)
 
             # Add the tests selected unless we have a commission-only request

@@ -1298,6 +1298,18 @@ class PrebuiltDataModelDirectory(Enum):
         raise KeyError(f"Invalid enum: {self!r}")
 
 
+VERSION_TO_DM = {
+    0x01030000: PrebuiltDataModelDirectory.k1_3,
+    0x01040000: PrebuiltDataModelDirectory.k1_4,
+    0x01040100: PrebuiltDataModelDirectory.k1_4_1,
+    0x01040200: PrebuiltDataModelDirectory.k1_4_2,
+    0x01050000: PrebuiltDataModelDirectory.k1_5,
+    0x01050100: PrebuiltDataModelDirectory.k1_5_1,
+    0x01060000: PrebuiltDataModelDirectory.k1_6,
+    0x01060100: PrebuiltDataModelDirectory.k1_6_1,
+}
+
+
 class DataModelLevel(Enum):
     kCluster = auto()
     kDeviceType = auto()
@@ -2014,6 +2026,41 @@ def build_xml_global_data_types(data_model_directory: PrebuiltDataModelDirectory
     return global_data_types, problems
 
 
+@dataclass
+class XmlDataModel:
+    clusters: dict[uint, XmlCluster]
+    device_types: dict[int, XmlDeviceType]
+    namespaces: dict[int, XmlNamespace]
+    global_data_types: dict[str, dict[str, XmlDataType]]
+    problems: list[ProblemNotice]
+
+
+def build_xml_data_model(data_model_directory: PrebuiltDataModelDirectory | Traversable) -> XmlDataModel:
+    """Build the full data model from XML files: clusters, device types, namespaces, and global data types."""
+    clusters, problems = build_xml_clusters(data_model_directory)
+    device_types, dt_problems = build_xml_device_types(data_model_directory, cluster_definition_xml=clusters)
+    namespaces, ns_problems = build_xml_namespaces(data_model_directory)
+    global_data_types, gdt_problems = build_xml_global_data_types(data_model_directory)
+
+    all_problems = problems + dt_problems + ns_problems + gdt_problems
+
+    return XmlDataModel(
+        clusters=clusters,
+        device_types=device_types,
+        namespaces=namespaces,
+        global_data_types=global_data_types,
+        problems=all_problems,
+    )
+
+
+def latest_prebuilt_directory() -> PrebuiltDataModelDirectory:
+    """Return the newest data model directory registered in spec_parsing.py map.
+
+    Ordering is by SpecificationVersion (numeric), not enum declaration order.
+    """
+    return VERSION_TO_DM[max(VERSION_TO_DM)]
+
+
 def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirectory:
     ''' Returns the data model directory for a given specification revision.
 
@@ -2027,18 +2074,7 @@ def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirect
         # The expression (specification_version & uint(0xFFFF00FF)) might be inferred as int by mypy.
         specification_version = typing.cast(uint, specification_version & uint(0xFFFF00FF))
 
-    version_to_dm = {
-        0x01030000: PrebuiltDataModelDirectory.k1_3,
-        0x01040000: PrebuiltDataModelDirectory.k1_4,
-        0x01040100: PrebuiltDataModelDirectory.k1_4_1,
-        0x01040200: PrebuiltDataModelDirectory.k1_4_2,
-        0x01050000: PrebuiltDataModelDirectory.k1_5,
-        0x01050100: PrebuiltDataModelDirectory.k1_5_1,
-        0x01060000: PrebuiltDataModelDirectory.k1_6,
-        0x01060100: PrebuiltDataModelDirectory.k1_6_1,
-    }
-
-    if specification_version not in version_to_dm:
+    if specification_version not in VERSION_TO_DM:
         raise ConformanceException(f"Unknown specification_version 0x{specification_version:08X}")
 
-    return version_to_dm[specification_version]
+    return VERSION_TO_DM[specification_version]

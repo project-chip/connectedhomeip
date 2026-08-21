@@ -71,7 +71,7 @@ from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.pixit import _PIXIT_NO_DEFAULT, get_pixit_definitions
 from matter.testing.problem_notices import AttributePathLocation, ClusterMapper, ProblemLocation, ProblemNotice, ProblemSeverity
 from matter.testing.runner import TestRunnerHooks, TestStep
-from matter.testing.spec_parsing import PrebuiltDataModelDirectory, SpecParsingException, build_xml_clusters
+from matter.testing.spec_parsing import PrebuiltDataModelDirectory, SpecParsingException, XmlDataModel, build_xml_clusters
 from matter.tlv import uint
 
 # TODO: Add utility to commission a device if needed
@@ -1840,6 +1840,11 @@ class MatterBaseTest(base_test.BaseTestClass):
     def is_pics_sdk_ci_only(self) -> bool:
         """Checks if the 'PICS_SDK_CI_ONLY' PICS flag is enabled."""
         return self.check_pics('PICS_SDK_CI_ONLY')
+
+    @property
+    def data_model(self) -> XmlDataModel:
+        """Accesses the data model object."""
+        return global_stash.unstash_globally(self.user_params.get("data_model"))
 
     @property
     def default_endpoint(self) -> int:
