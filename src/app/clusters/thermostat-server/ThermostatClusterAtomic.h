@@ -23,10 +23,9 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/List.h>
-#include <app/data-model-provider/ActionReturnStatus.h>
-#include <app/data-model-provider/OperationTypes.h>
 #include <app/persistence/AttributePersistence.h>
 #include <credentials/FabricTable.h>
 #include <lib/core/ScopedNodeId.h>
@@ -34,7 +33,6 @@
 #include <lib/support/TimerDelegate.h>
 #include <protocols/interaction_model/Constants.h>
 #include <system/SystemClock.h>
-
 
 #include <optional>
 
@@ -77,8 +75,9 @@ public:
         Open,
     };
 
-    AtomicWriteSession(Delegate & delegate, TimerDelegate & timerDelegate, FabricTable & fabricTable)
-        : mDelegate(delegate), mTimerDelegate(timerDelegate), mFabricTable(fabricTable) {}
+    AtomicWriteSession(Delegate & delegate, TimerDelegate & timerDelegate, FabricTable & fabricTable) :
+        mDelegate(delegate), mTimerDelegate(timerDelegate), mFabricTable(fabricTable)
+    {}
 
     void Startup();
 

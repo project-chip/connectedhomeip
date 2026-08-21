@@ -81,7 +81,8 @@ public:
                     }
                     else
                     {
-                        ClusterStorage<Size, Cluster>::mClusters[clusterInstanceIndex].Create(endpointId, features, config, dels...);
+                        ClusterStorage<Size, Cluster>::mClusters[clusterInstanceIndex].Create(endpointId, features, config,
+                                                                                              dels...);
                     }
                 },
                 mDelegates);

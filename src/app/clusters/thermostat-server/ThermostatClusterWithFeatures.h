@@ -88,8 +88,7 @@ inline constexpr bool kArgsHasDelegate = (std::is_base_of_v<Target, std::decay_t
 } // namespace detail
 
 template <typename... Delegates>
-class ThermostatClusterWithFeatures : public ThermostatCluster,
-                                      public AtomicWriteSession::Delegate
+class ThermostatClusterWithFeatures : public ThermostatCluster, public AtomicWriteSession::Delegate
 {
 public:
     static constexpr bool kHasPresets          = detail::kArgsHasDelegate<ThermostatPresets::Delegate, Delegates...>;
@@ -363,9 +362,9 @@ private:
     ThermostatClusterWithFeatures(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features, const Config & config,
                                   FabricTable * fabricTable, Delegates &... delegates) :
         ThermostatCluster(aEndpointId, features, config, detail::FindDelegate<Thermostat::Delegate>(delegates...)),
-        mAtomicWriteSession(
-            detail::MakeAtomicWriteSession<kRequiresAtomicWrite>(*this, config.mTimerDelegate, fabricTable)),
-        mPresets(detail::MakeFeature<kHasPresets, ThermostatPresets>(std::forward_as_tuple(delegates...), *this, mAtomicWriteSession)),
+        mAtomicWriteSession(detail::MakeAtomicWriteSession<kRequiresAtomicWrite>(*this, config.mTimerDelegate, fabricTable)),
+        mPresets(
+            detail::MakeFeature<kHasPresets, ThermostatPresets>(std::forward_as_tuple(delegates...), *this, mAtomicWriteSession)),
         mSuggestions(
             detail::MakeFeature<kHasSuggestions, ThermostatSuggestions>(std::forward_as_tuple(delegates...), *this, mPresets)),
         mOccupancy(detail::MakeFeature<kHasOccupancy, ThermostatOccupancy>(std::forward_as_tuple(delegates...), *this))
@@ -386,8 +385,7 @@ ThermostatClusterWithFeatures(EndpointId, BitFlags<Thermostat::Feature>, const T
 
 template <typename... DelegateArgs>
 ThermostatClusterWithFeatures(EndpointId, BitFlags<Thermostat::Feature>, const ThermostatCluster::Config &, FabricTable &,
-                              DelegateArgs &...)
-    -> ThermostatClusterWithFeatures<std::decay_t<DelegateArgs>...>;
+                              DelegateArgs &...) -> ThermostatClusterWithFeatures<std::decay_t<DelegateArgs>...>;
 
 using DefaultThermostatCluster =
     ThermostatClusterWithFeatures<ThermostatPresets::Delegate, ThermostatSuggestions::Delegate, ThermostatOccupancy::Delegate>;

@@ -99,10 +99,8 @@ public:
         DefaultValues mDefaultValues;
         TimerDelegate & mTimerDelegate;
 
-         Config(OptionalAttributes optionalAttributes, DefaultValues defaultValues, TimerDelegate & timerDelegate) :
-            mOptionalAttributes(optionalAttributes),
-            mDefaultValues(defaultValues),
-            mTimerDelegate(timerDelegate)
+        Config(OptionalAttributes optionalAttributes, DefaultValues defaultValues, TimerDelegate & timerDelegate) :
+            mOptionalAttributes(optionalAttributes), mDefaultValues(defaultValues), mTimerDelegate(timerDelegate)
         {}
     };
 

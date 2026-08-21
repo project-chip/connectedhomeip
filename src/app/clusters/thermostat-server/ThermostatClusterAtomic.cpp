@@ -471,33 +471,33 @@ Status AtomicWriteSession::BuildAttributeStatuses(
 }
 
 std::optional<DataModel::ActionReturnStatus> AtomicWriteSession::InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               TLV::TLVReader & input_arguments, CommandHandler * handler,
-                                                               bool & handled) {
-                          
+                                                                               TLV::TLVReader & input_arguments,
+                                                                               CommandHandler * handler, bool & handled)
+{
+
     switch (request.path.mCommandId)
     {
     case Commands::AtomicRequest::Id: {
         handled = true;
-                Commands::AtomicRequest::DecodableType request_data;
-                ReturnErrorOnFailure(request_data.Decode(input_arguments));
+        Commands::AtomicRequest::DecodableType request_data;
+        ReturnErrorOnFailure(request_data.Decode(input_arguments));
 
-                switch (request_data.requestType)
-                {
-                case Globals::AtomicRequestTypeEnum::kBeginWrite:
-                    return BeginAtomicWrite(handler, request.path, request_data);
-                case Globals::AtomicRequestTypeEnum::kCommitWrite:
-                    return CommitAtomicWrite(handler, request.path, request_data);
-                case Globals::AtomicRequestTypeEnum::kRollbackWrite:
-                    return RollbackAtomicWrite(handler, request.path, request_data);
-                default:
-                    return Protocols::InteractionModel::Status::InvalidCommand;
-                }
+        switch (request_data.requestType)
+        {
+        case Globals::AtomicRequestTypeEnum::kBeginWrite:
+            return BeginAtomicWrite(handler, request.path, request_data);
+        case Globals::AtomicRequestTypeEnum::kCommitWrite:
+            return CommitAtomicWrite(handler, request.path, request_data);
+        case Globals::AtomicRequestTypeEnum::kRollbackWrite:
+            return RollbackAtomicWrite(handler, request.path, request_data);
+        default:
+            return Protocols::InteractionModel::Status::InvalidCommand;
+        }
     }
     default:
         return std::nullopt;
     }
 }
-
 
 void AtomicWriteSession::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
