@@ -19,7 +19,9 @@ import json
 import logging
 import os
 import re
+import tempfile
 import xml.etree.ElementTree as ET
+import zipfile
 from dataclasses import dataclass, field
 
 import matter.clusters as Clusters
@@ -44,6 +46,27 @@ _ROOT_NODE_DEVICE_TYPE_ID = 0x0016
 _ENDPOINT_DIR_PATTERN = re.compile(r'^(?:endpoint|ep)?[\s_-]*(\d+)$', re.IGNORECASE)
 
 
+# Sanity limits for zip extraction. PICS bundles in the wild are on the
+# order of hundreds of KiB across ~100 XML files, so these bounds are
+# very generous while still capping runaway or malformed archives (one
+# with millions of members, or one whose metadata claims tens of GiB).
+# These check *reported* uncompressed sizes; a maliciously crafted zip
+# whose metadata lies about entry size can still exceed the limit at
+# extract time. That's out of scope for a test-harness input reader:
+# the caller controls the file and we're guarding against accidents,
+# not adversarial input.
+_MAX_ZIP_MEMBERS = 1000
+_MAX_ZIP_TOTAL_BYTES = 50 * 1024 * 1024  # 50 MiB
+
+# Archive-metadata names that OS "compress folder" utilities scatter
+# alongside the real payload. Filtered out when detecting a wrapping
+# directory so a macOS-Finder zip (which adds __MACOSX/ next to the
+# compressed folder) is still recognised as single-wrapper.
+_ARCHIVE_METADATA_ENTRIES = frozenset({
+    '__MACOSX', '.DS_Store', 'Thumbs.db', 'desktop.ini',
+})
+
+
 def _find_endpoint_subdir(root_dir: str, endpoint: int) -> str | None:
     """
     Find the subdirectory under root_dir whose name resolves to `endpoint`.
@@ -58,6 +81,88 @@ def _find_endpoint_subdir(root_dir: str, endpoint: int) -> str | None:
         if match and int(match.group(1)) == endpoint:
             return full
     return None
+
+
+def _safe_extract_zip(zip_path: str, dest: str) -> None:
+    """
+    Extract `zip_path` into `dest`, refusing:
+      * entries whose resolved path escapes `dest` (absolute paths or `..`
+        traversal — the "zip slip" pattern),
+      * archives with more than `_MAX_ZIP_MEMBERS` entries, and
+      * archives whose total reported uncompressed size exceeds
+        `_MAX_ZIP_TOTAL_BYTES` (guards against zip-bomb-style disk use).
+
+    Portable pre-check rather than relying on the version-dependent
+    `extractall(filter=...)` behavior added in 3.12.
+    """
+    dest_abs = os.path.abspath(dest)
+    with zipfile.ZipFile(zip_path) as zf:
+        infos = zf.infolist()
+        if len(infos) > _MAX_ZIP_MEMBERS:
+            raise ValueError(
+                f"Zip has {len(infos)} entries; exceeds limit of {_MAX_ZIP_MEMBERS}")
+        total_bytes = 0
+        for info in infos:
+            total_bytes += info.file_size
+            if total_bytes > _MAX_ZIP_TOTAL_BYTES:
+                raise ValueError(
+                    f"Zip total uncompressed size exceeds limit of "
+                    f"{_MAX_ZIP_TOTAL_BYTES} bytes")
+            target = os.path.abspath(os.path.join(dest_abs, info.filename))
+            # dest_abs itself is fine (empty member); everything else must
+            # sit strictly under it.
+            if target != dest_abs and not target.startswith(dest_abs + os.sep):
+                raise ValueError(
+                    f"Refusing to extract zip entry outside destination: "
+                    f"{info.filename!r}")
+        zf.extractall(dest_abs)
+
+
+def _pics_root_within(extract_dir: str) -> str:
+    """
+    Locate the effective PICS root inside an extracted archive.
+
+    OS "compress folder" utilities (macOS Finder, Windows Explorer, `zip -r`
+    when called on a directory) produce archives with everything nested
+    under a single top-level directory. Detect that case and descend one
+    level so users don't have to re-zip. Otherwise use `extract_dir` as-is.
+
+    Known archive-metadata entries (`__MACOSX/`, `.DS_Store`, ...) are
+    ignored when counting; without this a macOS-Finder zip would look like
+    a multi-entry archive (payload + `__MACOSX/`) and never unwrap. A lone
+    directory whose name matches the endpoint pattern is left alone: it IS
+    the per-endpoint subdir the reader is looking for, not a wrapper, and
+    drilling in would demote its per-endpoint PICS to device-wide PICS.
+    """
+    if glob.glob(os.path.join(extract_dir, '*.xml')):
+        return extract_dir
+    entries = [e for e in os.listdir(extract_dir)
+               if e not in _ARCHIVE_METADATA_ENTRIES]
+    if len(entries) == 1:
+        only = os.path.join(extract_dir, entries[0])
+        if os.path.isdir(only) and not _ENDPOINT_DIR_PATTERN.match(entries[0]):
+            return only
+    return extract_dir
+
+
+def _read_pics_from_directory(path: str, endpoint: int | None) -> dict[str, bool]:
+    """
+    Load PICS XML files from a directory tree. See `read_pics_from_file`
+    for the loading rules; this is the shared implementation used both for
+    directory paths and for the temporary directory an archive is
+    extracted into.
+    """
+    pics_dict: dict[str, bool] = {}
+    for filename in glob.glob(f'{path}/*.xml'):
+        with open(filename) as f:
+            pics_dict.update(parse_pics_xml(f.read()))
+    if endpoint is not None:
+        ep_dir = _find_endpoint_subdir(path, endpoint)
+        if ep_dir is not None:
+            for filename in glob.glob(f'{ep_dir}/*.xml'):
+                with open(filename) as f:
+                    pics_dict.update(parse_pics_xml(f.read()))
+    return pics_dict
 
 
 def event_pics_str(pics_base: str, eid: int) -> str:
@@ -133,26 +238,37 @@ def parse_pics_xml(contents: str) -> dict[str, bool]:
 
 def read_pics_from_file(path: str, endpoint: int | None = None) -> dict[str, bool]:
     """
-    Reads PICS from a CI-format text file or a directory of PICS XML files.
-    For directory inputs, top-level *.xml files are always loaded (device-wide
-    codes like MCORE.*). If `endpoint` is supplied, the matching per-endpoint
-    subdirectory's *.xml files are loaded too. Common naming conventions are
-    accepted: `endpoint0`, `Endpoint_0`, `EP0`, `ep 0`, `0`, etc. (case-
-    insensitive). Other endpoint subdirs are skipped so per-endpoint test
-    checks don't see foreign clusters.
+    Reads PICS from one of three source types, auto-detected from `path`:
+      * a CI-format text file (one KEY=0|1 per line),
+      * a directory of PICS XML files, or
+      * a zip archive of PICS XML files.
+
+    For directory and zip inputs, top-level *.xml files are always loaded
+    (device-wide codes like MCORE.*). If `endpoint` is supplied, the matching
+    per-endpoint subdirectory's *.xml files are loaded too. Common naming
+    conventions are accepted: `endpoint0`, `Endpoint_0`, `EP0`, `ep 0`, `0`,
+    etc. (case-insensitive). Other endpoint subdirs are skipped so
+    per-endpoint test checks don't see foreign clusters.
+
+    Zip archives may store the XML files at the archive root or nested
+    inside a single enclosing directory (as OS "compress folder" tools
+    produce); both layouts are handled. Archive entries whose paths would
+    resolve outside the extraction directory are refused.
     """
-    if os.path.isdir(os.path.abspath(path)):
-        pics_dict: dict[str, bool] = {}
-        for filename in glob.glob(f'{path}/*.xml'):
-            with open(filename) as f:
-                pics_dict.update(parse_pics_xml(f.read()))
-        if endpoint is not None:
-            ep_dir = _find_endpoint_subdir(path, endpoint)
-            if ep_dir is not None:
-                for filename in glob.glob(f'{ep_dir}/*.xml'):
-                    with open(filename) as f:
-                        pics_dict.update(parse_pics_xml(f.read()))
-        return pics_dict
+    abs_path = os.path.abspath(path)
+
+    # Directory check comes first: a directory whose name happens to end in
+    # `.zip` is still a directory, not an archive.
+    if os.path.isdir(abs_path):
+        return _read_pics_from_directory(abs_path, endpoint)
+
+    # Zip archives: extract into a temp dir and reuse the directory reader.
+    # Extraction (instead of streaming from the zip) keeps the "single
+    # enclosing folder" and endpoint-subdir logic in one place.
+    if os.path.isfile(abs_path) and zipfile.is_zipfile(abs_path):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            _safe_extract_zip(abs_path, tmp_dir)
+            return _read_pics_from_directory(_pics_root_within(tmp_dir), endpoint)
 
     with open(path) as f:
         return parse_pics(f.readlines())
