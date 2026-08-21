@@ -168,6 +168,12 @@ static const CHIP_ERROR kTestElements[] =
     CHIP_ERROR_BUSY,
     CHIP_ERROR_HANDLER_NOT_SET,
     CHIP_ERROR_IN_PROGRESS,
+    CHIP_ERROR_CASE_WRONG_FABRIC,
+    CHIP_ERROR_CASE_WRONG_PEER_NODEID,
+    CHIP_ERROR_CASE_NOCCHAIN_INVALID,
+    CHIP_ERROR_CASE_SIGMA_DECRYPT_FAILURE,
+    CHIP_ERROR_CASE_SIGNATURE_MISMATCH,
+    CHIP_ERROR_CASE_RESUME_MIC_MISMATCH,
 };
 // clang-format on
 
@@ -285,5 +291,70 @@ TEST(TestCHIPErrorStr, CheckCoreErrorStrStorageWithoutSourceLocation)
     }
 
     // Deregister the layer error formatter
+    DeregisterCHIPLayerErrorFormatter();
+}
+
+// Regression: the six new CASE-specific error codes added in this PR (CASE_WRONG_FABRIC,
+// CASE_WRONG_PEER_NODEID, CASE_NOCCHAIN_INVALID, CASE_SIGMA_DECRYPT_FAILURE,
+// CASE_SIGNATURE_MISMATCH, CASE_RESUME_MIC_MISMATCH) MUST:
+//   1. be pairwise distinct from one another (no two share a hex slot);
+//   2. be distinct from CHIP_ERROR_INVALID_CASE_PARAMETER and from the cert-chain sub-errors
+//      that CHIP_ERROR_CASE_NOCCHAIN_INVALID intentionally subsumes per the PR description
+//      (CERT_NOT_TRUSTED / CERT_EXPIRED / CERT_USAGE_NOT_ALLOWED / WRONG_CERT_DN);
+//   3. each produce a non-empty, registered description string containing the substring
+//      "CASE" so triage tooling and partner-facing log scrapes never see only the bare hex.
+// Without this test, a future commit that accidentally reused a CHIP_CORE_ERROR(0xXX) slot
+// or forgot to register a description in CHIPError.cpp would compile and silently break the
+// caller contract this PR establishes.
+TEST(TestCHIPErrorStr, CheckCaseSpecificErrorCodesDistinctAndDescribed)
+{
+    RegisterCHIPLayerErrorFormatter();
+
+    const CHIP_ERROR kNewCaseCodes[] = {
+        CHIP_ERROR_CASE_WRONG_FABRIC,          CHIP_ERROR_CASE_WRONG_PEER_NODEID,  CHIP_ERROR_CASE_NOCCHAIN_INVALID,
+        CHIP_ERROR_CASE_SIGMA_DECRYPT_FAILURE, CHIP_ERROR_CASE_SIGNATURE_MISMATCH, CHIP_ERROR_CASE_RESUME_MIC_MISMATCH,
+    };
+
+    // (1) Pairwise distinct.
+    constexpr size_t kCount = sizeof(kNewCaseCodes) / sizeof(kNewCaseCodes[0]);
+    for (size_t i = 0; i < kCount; ++i)
+    {
+        for (size_t j = i + 1; j < kCount; ++j)
+        {
+            EXPECT_NE(kNewCaseCodes[i].AsInteger(), kNewCaseCodes[j].AsInteger());
+        }
+    }
+
+    // (2) Distinct from the legacy code they replace at the call sites, and from the
+    // cert-chain sub-errors that NOCCHAIN_INVALID subsumes per the PR description.
+    const CHIP_ERROR kLegacyOverlapCodes[] = {
+        CHIP_ERROR_INVALID_CASE_PARAMETER, CHIP_ERROR_INTEGRITY_CHECK_FAILED, CHIP_ERROR_INTERNAL,
+        CHIP_ERROR_CERT_NOT_TRUSTED,       CHIP_ERROR_CERT_EXPIRED,           CHIP_ERROR_CERT_USAGE_NOT_ALLOWED,
+        CHIP_ERROR_WRONG_CERT_DN,          CHIP_ERROR_INVALID_SIGNATURE,
+    };
+    for (const auto & newCode : kNewCaseCodes)
+    {
+        for (const auto & legacyCode : kLegacyOverlapCodes)
+        {
+            EXPECT_NE(newCode.AsInteger(), legacyCode.AsInteger());
+        }
+    }
+
+    // (3) Each new code must format with a non-empty description containing "CASE", proving
+    // the entry in CHIPError.cpp's FormatCHIPError switch is wired up. ErrorStr falls back
+    // to a bare hex string when no description is registered, so the "CASE" substring check
+    // distinguishes "registered" from "fell through to default".
+    for (const auto & err : kNewCaseCodes)
+    {
+        ErrorStrStorage storage;
+        const char * str = ErrorStr(err, /*withSourceLocation=*/false, storage);
+        ASSERT_NE(str, nullptr);
+        EXPECT_GT(strlen(str), 0u);
+#if !CHIP_CONFIG_SHORT_ERROR_STR
+        EXPECT_NE(strstr(str, "CASE"), nullptr)
+            << "Missing CASE-context description for " << static_cast<uint32_t>(err.AsInteger());
+#endif // !CHIP_CONFIG_SHORT_ERROR_STR
+    }
+
     DeregisterCHIPLayerErrorFormatter();
 }
