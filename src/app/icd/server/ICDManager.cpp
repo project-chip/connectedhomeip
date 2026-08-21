@@ -745,26 +745,23 @@ bool ICDManager::Contains(Span<const Access::SubjectDescriptor> list, const Acce
 void ICDManager::AppendPendingCheckInSubject(const Access::SubjectDescriptor & subject)
 {
     // If broadcast Check-In is already pending, it notifies all clients on all fabrics, so targeted queuing is superseded.
-    if (mPendingCheckInType == PendingCheckInType::kBroadcast)
+    VerifyOrReturn(mPendingCheckInType != PendingCheckInType::kBroadcast);
+
+    // If subject is already pending, no need to add again
+    VerifyOrReturn(
+        !Contains(Span<const Access::SubjectDescriptor>(mPendingCheckInSubjects.data(), mPendingCheckInSubjectsCount), subject));
+
+    if (mPendingCheckInSubjectsCount < mPendingCheckInSubjects.size())
     {
+        mPendingCheckInSubjects[mPendingCheckInSubjectsCount++] = subject;
+        mPendingCheckInType                                     = PendingCheckInType::kTargeted;
         return;
     }
 
-    if (!Contains(Span<const Access::SubjectDescriptor>(mPendingCheckInSubjects.data(), mPendingCheckInSubjectsCount), subject))
-    {
-        if (mPendingCheckInSubjectsCount < mPendingCheckInSubjects.size())
-        {
-            mPendingCheckInSubjects[mPendingCheckInSubjectsCount++] = subject;
-            mPendingCheckInType                                     = PendingCheckInType::kTargeted;
-        }
-        else
-        {
-            // Capacity exceeded: upgrade to broadcast Check-In so no client registration is dropped.
-            ChipLogProgress(AppServer, "ICDManager: Pending check-in table full. Upgrading to broadcast Check-In.");
-            mPendingCheckInType          = PendingCheckInType::kBroadcast;
-            mPendingCheckInSubjectsCount = 0;
-        }
-    }
+    // Capacity exceeded: upgrade to broadcast Check-In so no client registration is dropped.
+    ChipLogProgress(AppServer, "ICDManager: Pending check-in table full. Upgrading to broadcast Check-In.");
+    mPendingCheckInType          = PendingCheckInType::kBroadcast;
+    mPendingCheckInSubjectsCount = 0;
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_CONFIG_ENABLE_ICD_CIP &&
        // CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
