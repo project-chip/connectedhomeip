@@ -243,6 +243,8 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                 .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(), //
                 .eventManagement            = EventManagement::GetInstance(),                          //
                 .timerDelegate              = gTimerDelegate,                                          //
+                .minGuaranteedSubscriptionsPerFabric =
+                    InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(), //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                 .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -296,10 +298,15 @@ void InitServer(intptr_t context)
     }
 
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
-        .groupDataProvider = gGroupDataProvider,                     //
-        .fabricTable       = Server::GetInstance().GetFabricTable(), //
-        .timerDelegate     = gTimerDelegate,                         //
-        .storageDelegate   = *initParams.persistentStorageDelegate,  //
+        .groupDataProvider      = gGroupDataProvider,                     //
+        .fabricTable            = Server::GetInstance().GetFabricTable(), //
+        .timerDelegate          = gTimerDelegate,                         //
+        .storageDelegate        = *initParams.persistentStorageDelegate,  //
+        .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
+        .platformManager        = DeviceLayer::PlatformMgr(),
+        .failSafeContext        = Server::GetInstance().GetFailSafeContext(),
+        .bindingTable           = Clusters::Binding::Table::GetInstance(),
+        .bindingManager         = Clusters::Binding::Manager::GetInstance(),
     });
 
 #if ALL_DEVICES_ENABLE_DIMMABLE_LIGHT

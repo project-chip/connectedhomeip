@@ -168,10 +168,8 @@ DataModel::ActionReturnStatus ValveConfigurationAndControlCluster::WriteImpl(con
         mDefaultOpenDuration = value;
 
         // Persist using AttributePersistence nullable storage representation.
-        NumericAttributeTraits<uint32_t>::StorageType storageValue;
-        NullableToStorage(mDefaultOpenDuration, storageValue);
-        return mContext->attributeStorage.WriteValue(request.path,
-                                                     { reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue) });
+        AttributePersistence attrPersistence{ mContext->attributeStorage };
+        return attrPersistence.StoreNativeEndianValue(request.path, mDefaultOpenDuration);
     }
 
     if (request.path.mAttributeId == ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id)
@@ -187,8 +185,8 @@ DataModel::ActionReturnStatus ValveConfigurationAndControlCluster::WriteImpl(con
         VerifyOrReturnError(ValueCompliesWithLevelStep(defaultOpenLevel), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         mDefaultOpenLevel = defaultOpenLevel;
-        return mContext->attributeStorage.WriteValue(
-            request.path, { reinterpret_cast<const uint8_t *>(&mDefaultOpenLevel), sizeof(mDefaultOpenLevel) });
+        AttributePersistence attrPersistence{ mContext->attributeStorage };
+        return attrPersistence.StoreNativeEndianValue(request.path, mDefaultOpenLevel);
     }
 
     return Status::UnsupportedWrite;
