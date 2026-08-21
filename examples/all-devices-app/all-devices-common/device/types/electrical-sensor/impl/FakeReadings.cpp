@@ -100,10 +100,14 @@ void FakeReadings::FakeReadingsUpdate()
     // Update readings
     // Avoid using floats - so we will do a basic rand() call which will generate a integer value between 0 and RAND_MAX
     // first compute power as a mean + some random value in range +/- mPowerRandomness_mW
-    mPower_mW = mPowerRandomness_mW == 0 ? 0 : (static_cast<int64_t>(rand()) % (2 * static_cast<int64_t>(mPowerRandomness_mW))) - mPowerRandomness_mW;
+    mPower_mW = mPowerRandomness_mW == 0
+        ? 0
+        : (static_cast<int64_t>(rand()) % (2 * static_cast<int64_t>(mPowerRandomness_mW))) - mPowerRandomness_mW;
     mPower_mW += mBasePower_mW; // add in the base power
 
-    mVoltage_mV = mVoltageRandomness_mV == 0 ? 0 : (static_cast<int64_t>(rand()) % (2 * static_cast<int64_t>(mVoltageRandomness_mV))) - mVoltageRandomness_mV;
+    mVoltage_mV = mVoltageRandomness_mV == 0
+        ? 0
+        : (static_cast<int64_t>(rand()) % (2 * static_cast<int64_t>(mVoltageRandomness_mV))) - mVoltageRandomness_mV;
     mVoltage_mV += mBaseVoltage_mV; // add in the base voltage
 
     /* Note: whilst we could compute a current from the power and voltage,
@@ -113,7 +117,9 @@ void FakeReadings::FakeReadingsUpdate()
      * This is meant more as an example to show how to use the APIs, not
      * to be a real representation of laws of physics.
      */
-    mCurrent_mA = mCurrentRandomness_mA == 0 ? 0 : (static_cast<int64_t>(rand()) % (2 * static_cast<int64_t>(mCurrentRandomness_mA))) - mCurrentRandomness_mA;
+    mCurrent_mA = mCurrentRandomness_mA == 0
+        ? 0
+        : (static_cast<int64_t>(rand()) % (2 * static_cast<int64_t>(mCurrentRandomness_mA))) - mCurrentRandomness_mA;
     mCurrent_mA += mBaseCurrent_mA; // add in the base current
 
     // update the energy meter - we'll assume that the power has been constant during the previous interval

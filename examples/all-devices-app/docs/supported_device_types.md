@@ -59,7 +59,7 @@ To update or validate this list manually, follow these steps:
 | 10  | Dimmable Light                 | 257 (0x0101)  |                                                                                                                               |                             |
 | 11  | Dimmable Plug-In Unit          | 267 (0x010B)  |                                                                                                                               |                             |
 | 12  | Dishwasher                     | 117 (0x0075)  | Dishwasher Alarm [O], Dishwasher Mode [O], Temperature Control [O]                                                            | Minimally Ready             |
-| 13  | Electrical Sensor              | 1296 (0x0510) | Electrical Alarm [O]                                                                                                          |  Minimally Ready   |
+| 13  | Electrical Sensor              | 1296 (0x0510) | Electrical Alarm [O]                                                                                                          | Minimally Ready             |
 | 14  | Extractor Hood                 | 122 (0x007A)  |                                                                                                                               |                             |
 | 15  | Fan                            | 43 (0x002B)   |                                                                                                                               |                             |
 | 16  | Flow Sensor                    | 774 (0x0306)  |                                                                                                                               |                             |
