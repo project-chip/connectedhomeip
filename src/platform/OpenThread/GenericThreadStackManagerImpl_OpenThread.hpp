@@ -378,6 +378,49 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadAttached()
 }
 
 template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_FinishGracefulDetach()
+{
+    // NOTE: This callback is triggered by both the timeout and otGracefullDetach.
+    DeviceLayer::SystemLayer().CancelTimer(_OnGracefulDetachTimeout, this);
+    VerifyOrReturn(mIsAttachPending);
+    mIsAttachPending = false;
+
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    ChipLogProgress(DeviceLayer, "Graceful detach finished, applying new configuration");
+
+    SuccessOrExit(error = Impl()->SetThreadEnabled(false));
+    SuccessOrExit(error = Impl()->SetThreadProvision(mPendingDataset.AsByteSpan()));
+
+    if (mPendingDataset.IsCommissioned())
+    {
+        SuccessOrExit(error = Impl()->SetThreadEnabled(true));
+        mpConnectCallback = mPendingCallback;
+    }
+    else if (mPendingCallback != nullptr)
+    {
+        // Uncommissioned (e.g. provision cleared). Detach & clear succeeded.
+        mPendingCallback->OnResult(NetworkCommissioning::Status::kSuccess, ""_span, 0);
+    }
+    mPendingCallback = nullptr;
+    return;
+
+exit:
+    if (mPendingCallback != nullptr)
+    {
+        mPendingCallback->OnResult(NetworkCommissioning::Status::kUnknownError, ""_span, 0);
+        mPendingCallback = nullptr;
+    }
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnGracefulDetachTimeout(System::Layer * aLayer, void * aAppState)
+{
+    auto * self = static_cast<GenericThreadStackManagerImpl_OpenThread<ImplClass> *>(aAppState);
+    ChipLogProgress(DeviceLayer, "Graceful detach timed out, forcing transition");
+    self->_FinishGracefulDetach();
+}
+
+template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadNetwork(
     const Thread::OperationalDataset & dataset, NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
 {
@@ -386,6 +429,49 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadN
     TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().GetThreadProvision(current_dataset);
     if (dataset.AsByteSpan().data_equal(current_dataset.AsByteSpan()) && callback == nullptr)
     {
+        return CHIP_NO_ERROR;
+    }
+
+    VerifyOrReturnError(!mIsAttachPending, CHIP_ERROR_BUSY); // Verify no other attach is currently pending
+
+    if (Impl()->IsThreadAttached())
+    {
+        // Send a detach request to the current parent before switching networks, this ensures we can reattach if fallback timer
+        // triggers.
+        ChipLogProgress(DeviceLayer, "Detaching gracefully before switching networks");
+        mIsAttachPending = true;
+        mPendingDataset  = dataset;
+        mPendingCallback = callback;
+
+        CHIP_ERROR timerErr = DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kGracefulDetachTimeoutMs),
+                                                                    _OnGracefulDetachTimeout, this);
+        if (timerErr != CHIP_NO_ERROR)
+        {
+            mIsAttachPending = false;
+            mPendingCallback = nullptr;
+            return timerErr;
+        }
+
+        Impl()->LockThreadStack();
+        otError otErr = otThreadDetachGracefully(
+            mOTInst,
+            [](void * context) {
+                auto * self = static_cast<GenericThreadStackManagerImpl_OpenThread<ImplClass> *>(context);
+                if (DeviceLayer::SystemLayer().ScheduleLambda([self]() { self->_FinishGracefulDetach(); }) != CHIP_NO_ERROR)
+                {
+                    ChipLogError(DeviceLayer, "Failed to schedule graceful detach finish; relying on timeout");
+                }
+            },
+            this);
+        Impl()->UnlockThreadStack();
+
+        if (otErr != OT_ERROR_NONE)
+        {
+            DeviceLayer::SystemLayer().CancelTimer(_OnGracefulDetachTimeout, this);
+            mIsAttachPending = false;
+            mPendingCallback = nullptr;
+            return MapOpenThreadError(otErr);
+        }
         return CHIP_NO_ERROR;
     }
 
