@@ -113,8 +113,7 @@ public:
         kTargeted,
         kBroadcast,
     };
-    static constexpr size_t kMaxPendingCheckInSubjects =
-        CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC * CHIP_CONFIG_MAX_FABRICS;
+    static constexpr size_t kMaxPendingCheckInSubjects = CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC * CHIP_CONFIG_MAX_FABRICS;
 #endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_CONFIG_ENABLE_ICD_CIP &&
        // CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 
