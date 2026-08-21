@@ -795,9 +795,7 @@ void ICDManager::OnSendCheckIn(Optional<Access::SubjectDescriptor> specificSubje
 #if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
 void ICDManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
-    ICDManager * pICDManager = reinterpret_cast<ICDManager *>(arg);
-    VerifyOrReturn(pICDManager != nullptr);
-    pICDManager->HandlePlatformEvent(event);
+    reinterpret_cast<ICDManager *>(arg)->HandlePlatformEvent(event);
 }
 
 void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
@@ -828,11 +826,8 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
 #else
     const PendingCheckInType pendingCheckInType = mPendingCheckInType;
     const size_t pendingSubjectsCount           = mPendingCheckInSubjectsCount;
-    // Snapshot and reset pending state before replaying to protect against synchronous re-entrant callbacks
-    // (e.g. immediate address resolution failure or delegate notifications) on the single CHIP event loop
-    // without mutating the active replay loop.
-    mPendingCheckInType          = PendingCheckInType::kNone;
-    mPendingCheckInSubjectsCount = 0;
+    mPendingCheckInType                         = PendingCheckInType::kNone;
+    mPendingCheckInSubjectsCount                = 0;
 
     // Early return if there is no pending action
     VerifyOrReturn(wasPendingActiveMode || mOperationalState == OperationalState::ActiveMode ||
@@ -846,24 +841,23 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
 
     // If the device transitioned from IdleMode to ActiveMode, UpdateOperationState() already executed SendCheckInMsgs()
     // (broadcast Check-In to all fabrics), which subsumes both targeted and broadcast check-in requests.
+    VerifyOrReturn(!wasInIdleMode);
+
     // If the device was already in ActiveMode, UpdateOperationState() only extended active duration, so replay pending check-ins.
-    if (!wasInIdleMode)
+    if (pendingCheckInType == PendingCheckInType::kTargeted)
     {
-        if (pendingCheckInType == PendingCheckInType::kTargeted)
+        for (size_t i = 0; i < pendingSubjectsCount; ++i)
         {
-            for (size_t i = 0; i < pendingSubjectsCount; ++i)
-            {
-                ChipLogProgress(AppServer,
-                                "ICDManager: Replaying deferred Check-In message for specific subject: " ChipLogFormatX64,
-                                ChipLogValueX64(mPendingCheckInSubjects[i].subject));
-                SendCheckInMsgs(MakeOptional(mPendingCheckInSubjects[i]));
-            }
+            ChipLogProgress(AppServer,
+                            "ICDManager: Replaying deferred Check-In message for specific subject: " ChipLogFormatX64,
+                            ChipLogValueX64(mPendingCheckInSubjects[i].subject));
+            SendCheckInMsgs(MakeOptional(mPendingCheckInSubjects[i]));
         }
-        else if (pendingCheckInType == PendingCheckInType::kBroadcast)
-        {
-            ChipLogProgress(AppServer, "ICDManager: Replaying deferred broadcast Check-In message.");
-            SendCheckInMsgs(NullOptional);
-        }
+    }
+    else if (pendingCheckInType == PendingCheckInType::kBroadcast)
+    {
+        ChipLogProgress(AppServer, "ICDManager: Replaying deferred broadcast Check-In message.");
+        SendCheckInMsgs(NullOptional);
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 }
