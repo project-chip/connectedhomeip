@@ -39,7 +39,6 @@ import asyncio
 import logging
 import queue
 import time
-
 from typing import Any
 
 from mobly import asserts
