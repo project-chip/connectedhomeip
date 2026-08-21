@@ -287,6 +287,10 @@ void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipe
             gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
                 .RegisterClusterInstance<chip::app::Clusters::AmbientContextSensingCluster>(
                     &ambientContextSensorDevice->AmbientContextSensingCluster());
+
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
+                .RegisterClusterInstance<chip::app::Clusters::AmbientSensingUnionCluster>(
+                    &ambientContextSensorDevice->AmbientSensingUnionCluster());
         }
     }
 

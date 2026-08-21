@@ -18,6 +18,7 @@
 #include "AllDevicesAppClusterImplementationRegistry.h"
 
 #include <app/clusters/ambient-context-sensing-server/AmbientContextSensingCluster.h>
+#include <app/clusters/ambient-sensing-union-server/AmbientSensingUnionCluster.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/clusters/boolean-state-server/BooleanStateCluster.h>
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
@@ -41,6 +42,12 @@ template <>
 const char * GetClusterTypeName<chip::app::Clusters::AmbientContextSensingCluster>()
 {
     return "chip::app::Clusters::AmbientContextSensingCluster";
+}
+
+template <>
+const char * GetClusterTypeName<chip::app::Clusters::AmbientSensingUnionCluster>()
+{
+    return "chip::app::Clusters::AmbientSensingUnionCluster";
 }
 
 template <>
