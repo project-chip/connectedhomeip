@@ -1354,7 +1354,7 @@ TEST_F(TestICDManager, TestShortIdleModeBehaviorSITvsLIT)
 //     ICDConfigurationData::GetInstance().SetModeDurations(MakeOptional(oldActiveModeDuration), NullOptional);
 // }
 
-#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CONFIG_BUILD_FOR_HOST_UNIT_TEST && CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 /**
  * ============================================================================
@@ -1867,7 +1867,7 @@ TEST_F(TestICDManager, TestScenario15_DeviceReboot_ColdBoot_DeferredIfDetached)
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 }
 
-#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CONFIG_BUILD_FOR_HOST_UNIT_TEST && CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 } // namespace app
 } // namespace chip
