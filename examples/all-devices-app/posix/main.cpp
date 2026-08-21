@@ -31,6 +31,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/TestEventTriggerDelegate.h>
+#include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/server/Dnssd.h>
@@ -356,6 +357,13 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     static DeviceLayer::AllDevicesExampleDACProvider sDacProvider;
     SuccessOrDie(sDacProvider.Init(AppOptions::GetConfig().dacProvider));
     SetDeviceAttestationCredentialsProvider(&sDacProvider);
+
+    // Initialize the test event trigger delegate, and add a handler
+    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate;
+    static EnergyReportingTestEventTriggerHandler sEnergyReportingTestEventTriggerHandler;
+    SuccessOrDie(sTestEventTriggerDelegate.Init(ByteSpan(AppOptions::GetConfig().testEventTriggerEnableKey)));
+    SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sEnergyReportingTestEventTriggerHandler));
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     static CodeDrivenDataModelDevices devices({
         .storageDelegate                = *initParams.persistentStorageDelegate,                   //
