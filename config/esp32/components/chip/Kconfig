@@ -297,6 +297,13 @@ menu "CHIP Core"
                 Delta OTA updates allow for smaller, more efficient updates by only
                 sending the changes between the current and new firmware versions.
 
+        config ENABLE_MULTI_IMAGE_OTA
+            bool "Enable multi-image OTA"
+            depends on ENABLE_OTA_REQUESTOR
+            default n
+            help
+                Enable this option to support multiple firmware binaries in a single OTA session.
+
         config OTA_AUTO_REBOOT_ON_APPLY
             bool "Reboot the device after applying the OTA image"
             depends on ENABLE_OTA_REQUESTOR
