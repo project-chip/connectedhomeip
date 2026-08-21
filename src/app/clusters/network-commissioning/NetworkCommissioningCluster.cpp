@@ -226,7 +226,13 @@ void NetworkCommissioningCluster::SendNonConcurrentConnectNetworkResponse()
     }
 
 #if CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    // WiFi PAF in non-concurrent mode: IndicateBleClosing() has no effect since there
+    // is no BLE connection. Directly post the event to trigger the AP connection.
+    LogErrorOnFailure(DeviceLayer::DeviceControlServer::DeviceControlSvr().PostOperationalNetworkStartedEvent());
+#else
     DeviceLayer::ConnectivityMgr().GetBleLayer()->IndicateBleClosing();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 #else
     LogErrorOnFailure(DeviceLayer::DeviceControlServer::DeviceControlSvr().PostOperationalNetworkStartedEvent());
 #endif // CONFIG_NETWORK_LAYER_BLE
