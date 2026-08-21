@@ -578,6 +578,13 @@ public:
         return *this;
     }
 
+    Optional<bool> GetRequiresNetworkSetup() const { return mRequiresNetworkSetup; }
+    CommissioningParameters & SetRequiresNetworkSetup(bool requiresNetworkSetup)
+    {
+        mRequiresNetworkSetup = MakeOptional(requiresNetworkSetup);
+        return *this;
+    }
+
     // Check for matching fabric on target device by reading fabric list and looking for a
     // fabricId and RootCert match. If a match is detected, then use GetNodeId() to
     // access the nodeId for the device on the matching fabric.
@@ -719,6 +726,7 @@ private:
     Optional<bool> mAttemptWiFiNetworkScan;
     Optional<bool> mAttemptThreadNetworkScan; // This automatically gets set to false when a ThreadOperationalDataset is set
     Optional<bool> mSkipCommissioningComplete;
+    Optional<bool> mRequiresNetworkSetup;
 
     Optional<NodeId> mICDCheckInNodeId;
     Optional<uint64_t> mICDMonitoredSubject;
