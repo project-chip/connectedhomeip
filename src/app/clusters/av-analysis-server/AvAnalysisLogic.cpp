@@ -131,7 +131,13 @@ void AvAnalysisServerLogic::OnVideoStreamAllocated(Status aStatus, uint16_t aVid
     AnalysisStreamEntry * entry = mStreamTable.Add(aVideoStreamId);
     if (entry == nullptr)
     {
-        // Full or the camera returned an id that already exists.
+        // Full or the camera returned an id that already exists. Release the just-allocated camera
+        // stream so it does not leak untracked
+        if (mCameraClient != nullptr &&
+            mCameraClient->RequestVideoStreamDeallocation(mPendingCameraNode, aVideoStreamId, *this) == CHIP_NO_ERROR)
+        {
+            mCameraRequestInFlight = true;
+        }
         handler->AddStatus(mPendingCommandPath, Status::ResourceExhausted);
         return;
     }
@@ -878,9 +884,6 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleEstabl
                         ChipLogError(Zcl, "AvAnalysis[ep=%d]: no camera client configured", mEndpointId));
 
     // One camera-bound command at a time; the response of this one depends on the camera's answer
-    // One camera-bound command at a time. Gate on the interaction, not the command handle: the
-    // handle can be invalidated (client exchange closed) while the camera interaction is still
-    // in flight, and starting a second interaction then would cross-wire its completion.
     VerifyOrReturnValue(!mCameraRequestInFlight, Status::Busy);
 
     // The camera SHALL be on the same fabric as the Analysis Node: reach it on the invoking client's fabric

@@ -625,6 +625,31 @@ TEST_F(TestRemoteAvAnalysisCluster, BusyWhileInteractionInFlightEvenIfCommandExc
     ASSERT_TRUE(thirdHandler.HasResponse());
 }
 
+TEST_F(TestRemoteAvAnalysisCluster, EstablishDuplicateIdReleasesOrphanedCameraStream)
+{
+    // First stream established with camera-assigned id 42
+    Testing::MockCommandHandler firstHandler;
+    firstHandler.SetFabricIndex(1);
+    EstablishStream(firstHandler, 0x1234, Status::Success, 42);
+
+    // The camera hands out the same id again: the table rejects it, the command fails, and the
+    // just-allocated camera stream must be released so it does not leak untracked
+    Testing::MockCommandHandler secondHandler;
+    secondHandler.SetFabricIndex(1);
+    EstablishStream(secondHandler, 0x1234, Status::Success, 42);
+
+    ASSERT_TRUE(secondHandler.HasStatus());
+    ASSERT_EQ(secondHandler.GetLastStatus().status.GetStatus(), Status::ResourceExhausted);
+    ASSERT_EQ(mFakeCameraClient.mDeallocationRequests, 1);
+    ASSERT_EQ(mFakeCameraClient.mLastStreamId, 42);
+
+    // Cleanup completion has no pending command to answer and leaves the table untouched
+    mFakeCameraClient.mLastCallback->OnVideoStreamDeallocated(Status::Success, 42);
+    uint8_t currentCount = 0;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::CurrentAnalysisStreamCount::Id, currentCount), CHIP_NO_ERROR);
+    ASSERT_EQ(currentCount, 1);
+}
+
 TEST_F(TestRemoteAvAnalysisCluster, ShutdownCancelsPendingCameraInteraction)
 {
     ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EstablishAnalysisStream::Id };
