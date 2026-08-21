@@ -18,6 +18,9 @@
 
 set -e
 
+# Allow unlimited core dump size
+ulimit -c unlimited
+
 # Print CHIP logs on stdout
 dlogutil CHIP &
 
@@ -27,6 +30,20 @@ export CHIP_TEST_EVENT_LOOP_HANDLER_MAX_DURATION_MS=1000
 # Set the correct path for .gcda files
 export GCOV_PREFIX=/mnt/chip
 export GCOV_PREFIX_STRIP=5
+
+# Create dump directory (may not exist if emu hasn't created it yet)
+mkdir -p /mnt/chip/dump
+
+# Restore the core_pattern configuration file on exit
+if [ -f /proc/sys/kernel/core_pattern ]; then
+    ORIGINAL_CORE_PATTERN=$(cat /proc/sys/kernel/core_pattern 2>/dev/null)
+    trap 'echo "$ORIGINAL_CORE_PATTERN" > /proc/sys/kernel/core_pattern 2>/dev/null' EXIT
+else
+    trap 'rm -f /proc/sys/kernel/core_pattern 2>/dev/null' EXIT
+fi
+
+# Try to apply the custom pattern needed for the test execution
+echo "/mnt/chip/dump/core.%e.%p.%t" >/proc/sys/kernel/core_pattern 2>/dev/null
 
 FAILED=()
 STATUS=0
@@ -47,7 +64,13 @@ while IFS= read -r TEST; do
     else
         FAILED+=("$NAME")
         STATUS=$((STATUS + 1))
-        echo -e "DONE: \e[31mFAIL\e[0m"
+        echo -e "DONE: \e[31mFAIL\e[0m (exit code: $RV)"
+
+        # Raw core dumps are created instantly in /mnt/chip/dump/
+        # No need to wait or copy - they're already on shared filesystem
+        if [ "$RV" -gt 128 ]; then
+            echo "Raw core dump created: /mnt/chip/dump/core.$NAME.*"
+        fi
     fi
 
 done < <(find /mnt/chip/tests -type f -executable ! -name runner.sh)
