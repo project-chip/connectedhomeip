@@ -1971,7 +1971,7 @@ cluster GroupKeyManagement = 63 {
 
 /** Attributes and commands for scene configuration and manipulation. */
 provisional cluster ScenesManagement = 98 {
-  revision 1;
+  revision 2;
 
   bitmap CopyModeBitmap : bitmap8 {
     kCopyAllScenes = 0x1;
