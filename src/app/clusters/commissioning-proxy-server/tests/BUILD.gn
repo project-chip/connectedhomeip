@@ -23,6 +23,7 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestCommissioningProxyBgScanRegistry.cpp",
+    "TestCommissioningProxyBleTransport.cpp",
     "TestCommissioningProxyCluster.cpp",
   ]
 
@@ -46,6 +47,10 @@ chip_test_suite("tests") {
 
   public_deps = [
     "${chip_root}/src/app/clusters/commissioning-proxy-server",
+
+    # Depend on the target rather than listing CommissioningProxyBleTransport.cpp here,
+    # so the driver is compiled once.
+    "${chip_root}/src/app/clusters/commissioning-proxy-server:ble-transport",
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/lib/support",

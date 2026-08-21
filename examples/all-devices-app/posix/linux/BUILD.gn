@@ -14,6 +14,7 @@
 
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/ble/ble.gni")
 
 config("includes") {
   include_dirs = [
@@ -32,9 +33,17 @@ source_set("linux") {
     "TermHandling.cpp",
   ]
 
+  if (chip_config_network_layer_ble) {
+    sources += [
+      "../include/LinuxCommissioningProxyBleAdapter.h",
+      "LinuxCommissioningProxyBleAdapter.cpp",
+    ]
+  }
+
   deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device-factory",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:device-interface",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/commissioning-proxy",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:wifi",
     "${chip_root}/src/app:app_config",
@@ -46,6 +55,13 @@ source_set("linux") {
   ]
 
   deps += [ "${chip_root}/third_party/jsoncpp" ]
+
+  if (chip_config_network_layer_ble) {
+    # LinuxCommissioningProxyBleAdapter implements the cluster's BLE adapter interface.
+    deps += [
+      "${chip_root}/src/app/clusters/commissioning-proxy-server:ble-transport",
+    ]
+  }
 
   public_configs = [ ":includes" ]
 }

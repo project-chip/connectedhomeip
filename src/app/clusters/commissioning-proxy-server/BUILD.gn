@@ -48,3 +48,22 @@ source_set("commissioning-proxy-server") {
     "${chip_root}/zzz_generated/app-common/clusters/CommissioningProxy",
   ]
 }
+
+# BLE (BTP) transport driver. Split out so an application that proxies over another
+# transport only - or a platform with no BLE stack - can depend on
+# commissioning-proxy-server without pulling in src/ble. The platform hooks it needs
+# come from CommissioningProxyBleAdapter, which the application implements.
+source_set("ble-transport") {
+  sources = [
+    "CommissioningProxyBleAdapter.h",
+    "CommissioningProxyBleTransport.cpp",
+    "CommissioningProxyBleTransport.h",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    ":commissioning-proxy-server",
+    "${chip_root}/src/ble",
+  ]
+}

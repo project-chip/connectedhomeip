@@ -20,6 +20,11 @@
 #include <PosixSpeaker.h>
 #include <app_config/enabled_devices.h>
 #include <device-factory/DeviceFactory.h>
+#include <device/types/commissioning-proxy/CommissioningProxyDevice.h>
+
+#if CONFIG_NETWORK_LAYER_BLE
+#include <LinuxCommissioningProxyBleAdapter.h>
+#endif
 
 namespace chip {
 namespace app {
@@ -27,6 +32,20 @@ namespace app {
 void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate,
                                     PosixAudioManager & audioManager)
 {
+    if constexpr (ALL_DEVICES_ENABLE_COMMISSIONING_PROXY)
+    {
+#if CONFIG_NETWORK_LAYER_BLE
+        // Outlives every device the factory creates, as the transport holds a reference.
+        // Stateless apart from the in-flight scan callback, so one instance serves all.
+        static LinuxCommissioningProxyBleAdapter sBleProxyAdapter;
+        DeviceFactory::GetInstance().RegisterCreator("commissioning-proxy",
+                                                     []() { return std::make_unique<CommissioningProxyDevice>(sBleProxyAdapter); });
+#else
+        DeviceFactory::GetInstance().RegisterCreator("commissioning-proxy",
+                                                     []() { return std::make_unique<CommissioningProxyDevice>(); });
+#endif
+    }
+
     if constexpr (ALL_DEVICES_ENABLE_SPEAKER)
     {
         DeviceFactory::GetInstance().RegisterCreator("speaker", [&timerDelegate, &audioManager]() {
