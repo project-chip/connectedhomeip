@@ -121,63 +121,65 @@ class MultiAdminClientFragment : Fragment() {
 
   private suspend fun sendBasicCommissioningCommandClick() {
     val testDuration = binding.timeoutEd.text.toString().toInt()
-    val devicePtr =
-      try {
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
-      } catch (e: IllegalStateException) {
-        Log.d(TAG, "getConnectedDevicePointer exception", e)
-        showMessage("Get DevicePointer fail!")
-        return
-      }
-    deviceController.openPairingWindowCallback(
-      devicePtr,
-      testDuration,
-      object : OpenCommissioningCallback {
-        override fun onError(status: Int, deviceId: Long) {
-          showMessage("OpenBasicCommissioning Fail! \nDevice ID : $deviceId\nErrorCode : $status")
-        }
+    try {
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr
+        ->
+        deviceController.openPairingWindowCallback(
+          devicePtr,
+          testDuration,
+          object : OpenCommissioningCallback {
+            override fun onError(status: Int, deviceId: Long) {
+              showMessage(
+                "OpenBasicCommissioning Fail! \nDevice ID : $deviceId\nErrorCode : $status"
+              )
+            }
 
-        override fun onSuccess(deviceId: Long, manualPairingCode: String?, qrCode: String?) {
-          showMessage("OpenBasicCommissioning Success! \n Node ID: $deviceId")
-        }
+            override fun onSuccess(deviceId: Long, manualPairingCode: String?, qrCode: String?) {
+              showMessage("OpenBasicCommissioning Success! \n Node ID: $deviceId")
+            }
+          }
+        )
       }
-    )
+    } catch (e: IllegalStateException) {
+      Log.d(TAG, "getConnectedDevicePointer exception", e)
+      showMessage("Get DevicePointer fail!")
+    }
   }
 
   private suspend fun sendEnhancedCommissioningCommandClick() {
     val testDuration = binding.timeoutEd.text.toString().toInt()
     val testIteration = 1000
-    val devicePointer =
-      try {
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
-      } catch (e: IllegalStateException) {
-        Log.d(TAG, "getConnectedDevicePointer exception", e)
-        showMessage("Get DevicePointer fail!")
-        return
-      }
 
     var setupPinCode: Long? = null
     if (!binding.setupPinCodeEd.text.toString().isEmpty()) {
       setupPinCode = binding.setupPinCodeEd.text.toString().toULong().toLong()
     }
-    deviceController.openPairingWindowWithPINCallback(
-      devicePointer,
-      testDuration,
-      testIteration.toLong(),
-      binding.discriminatorEd.text.toString().toInt(),
-      setupPinCode,
-      object : OpenCommissioningCallback {
-        override fun onError(status: Int, deviceId: Long) {
-          showMessage("OpenCommissioning Fail! \nDevice ID : $deviceId\nErrorCode : $status")
-        }
+    try {
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) {
+        devicePointer ->
+        deviceController.openPairingWindowWithPINCallback(
+          devicePointer,
+          testDuration,
+          testIteration.toLong(),
+          binding.discriminatorEd.text.toString().toInt(),
+          setupPinCode,
+          object : OpenCommissioningCallback {
+            override fun onError(status: Int, deviceId: Long) {
+              showMessage("OpenCommissioning Fail! \nDevice ID : $deviceId\nErrorCode : $status")
+            }
 
-        override fun onSuccess(deviceId: Long, manualPairingCode: String?, qrCode: String?) {
-          showMessage(
-            "OpenCommissioning Success! \n Node ID: $deviceId\n\tManual : $manualPairingCode\n\tQRCode : $qrCode"
-          )
-        }
+            override fun onSuccess(deviceId: Long, manualPairingCode: String?, qrCode: String?) {
+              showMessage(
+                "OpenCommissioning Success! \n Node ID: $deviceId\n\tManual : $manualPairingCode\n\tQRCode : $qrCode"
+              )
+            }
+          }
+        )
       }
-    )
+    } catch (e: IllegalStateException) {
+      Log.d(TAG, "getConnectedDevicePointer exception", e)
+      showMessage("Get DevicePointer fail!")
+    }
   }
 
   private suspend fun sendRevokeCommandClick() {
@@ -195,31 +197,31 @@ class MultiAdminClientFragment : Fragment() {
         null
       )
 
-    val devicePointer =
-      try {
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
-      } catch (e: IllegalStateException) {
-        Log.d(TAG, "getConnectedDevicePointer exception", e)
-        showMessage("Get DevicePointer fail!")
-        return
-      }
-    deviceController.invoke(
-      object : InvokeCallback {
-        override fun onError(ex: Exception?) {
-          showMessage("Revoke Commissioning  failure $ex")
-          Log.e(TAG, "Revoke Commissioning  failure", ex)
-        }
+    try {
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) {
+        devicePointer ->
+        deviceController.invoke(
+          object : InvokeCallback {
+            override fun onError(ex: Exception?) {
+              showMessage("Revoke Commissioning  failure $ex")
+              Log.e(TAG, "Revoke Commissioning  failure", ex)
+            }
 
-        override fun onResponse(invokeElement: InvokeElement?, successCode: Long) {
-          Log.e(TAG, "onResponse : $invokeElement, Code : $successCode")
-          showMessage("Revoke Commissioning success")
-        }
-      },
-      devicePointer,
-      invokeElement,
-      timedInvokeTimeout,
-      0
-    )
+            override fun onResponse(invokeElement: InvokeElement?, successCode: Long) {
+              Log.e(TAG, "onResponse : $invokeElement, Code : $successCode")
+              showMessage("Revoke Commissioning success")
+            }
+          },
+          devicePointer,
+          invokeElement,
+          timedInvokeTimeout,
+          0
+        )
+      }
+    } catch (e: IllegalStateException) {
+      Log.d(TAG, "getConnectedDevicePointer exception", e)
+      showMessage("Get DevicePointer fail!")
+    }
   }
 
   private suspend fun readAdministratorCommissioningClusterAttributeClick(
@@ -231,41 +233,40 @@ class MultiAdminClientFragment : Fragment() {
     val attributeName = attribute.name
     val attributePath = ChipAttributePath.newInstance(endpointId, clusterId, attributeId)
 
-    val devicePointer =
-      try {
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
-      } catch (e: IllegalStateException) {
-        Log.d(TAG, "getConnectedDevicePointer exception", e)
-        showMessage("Get DevicePointer fail!")
-        return
+    try {
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) {
+        devicePointer ->
+        deviceController.readAttributePath(
+          object : ReportCallback {
+            override fun onReport(nodeState: NodeState?) {
+              val tlv =
+                nodeState
+                  ?.getEndpointState(endpointId)
+                  ?.getClusterState(clusterId)
+                  ?.getAttributeState(attributeId)
+                  ?.tlv
+              val value = tlv?.let { TlvReader(it).toAny() }
+              Log.i(TAG, "read $attributeName: $value")
+              showMessage("read $attributeName: $value")
+            }
+
+            override fun onError(
+              attributePath: ChipAttributePath?,
+              eventPath: ChipEventPath?,
+              e: Exception
+            ) {
+              showMessage("read $attributeName - error : ${e?.message}")
+            }
+          },
+          devicePointer,
+          listOf(attributePath),
+          0
+        )
       }
-
-    deviceController.readAttributePath(
-      object : ReportCallback {
-        override fun onReport(nodeState: NodeState?) {
-          val tlv =
-            nodeState
-              ?.getEndpointState(endpointId)
-              ?.getClusterState(clusterId)
-              ?.getAttributeState(attributeId)
-              ?.tlv
-          val value = tlv?.let { TlvReader(it).toAny() }
-          Log.i(TAG, "read $attributeName: $value")
-          showMessage("read $attributeName: $value")
-        }
-
-        override fun onError(
-          attributePath: ChipAttributePath?,
-          eventPath: ChipEventPath?,
-          e: Exception
-        ) {
-          showMessage("read $attributeName - error : ${e?.message}")
-        }
-      },
-      devicePointer,
-      listOf(attributePath),
-      0
-    )
+    } catch (e: IllegalStateException) {
+      Log.d(TAG, "getConnectedDevicePointer exception", e)
+      showMessage("Get DevicePointer fail!")
+    }
   }
 
   private fun showMessage(msg: String) {
