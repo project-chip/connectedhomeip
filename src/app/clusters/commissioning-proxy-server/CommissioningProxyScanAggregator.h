@@ -53,7 +53,7 @@ public:
 
     CommissioningProxyScanAggregator() = delete;
     explicit CommissioningProxyScanAggregator(TimerDelegate & timerDelegate) : mTimerDelegate(timerDelegate) {}
-    ~CommissioningProxyScanAggregator() override = default;
+    ~CommissioningProxyScanAggregator() override { Abort(); }
 
     /**
      * @brief Start a fresh aggregation. Takes ownership of the command handle for

@@ -63,8 +63,9 @@ device advertises on uses the proxy as a tunnel. The flow is:
    by `SessionID`; the proxy forwards it over the transport and returns the
    device's reply in the `ProxyMessageResponse`. The proxy is a dumb relay — the
    PASE session is end-to-end between the Commissioner and the device.
-4. **Disconnect** — the Commissioner sends `ProxyDisconnectRequest` to cancel an
-   in-flight connect); the proxy tears the transport connection down.
+4. **Disconnect** — the Commissioner sends `ProxyDisconnectRequest` with the
+   `SessionID` to close an established session, or with a null `SessionID` to
+   cancel an in-flight connect; the proxy tears the transport connection down.
 
 The cluster server itself is **transport-agnostic**: it validates the requested
 transport against the set it advertises, then dispatches the work to the
@@ -231,8 +232,9 @@ void ApplicationInit()
 }
 ```
 
-A complete working example (device wiring plus the BLE and Wi-Fi PAF drivers)
-lands with the example-app change later in this series.
+For a complete working example of the device wiring plus the BLE and Wi-Fi PAF
+drivers, see
+`examples/all-devices-app/all-devices-common/device/types/commissioning-proxy/`.
 
 ## Transport driver methods
 
@@ -291,11 +293,11 @@ overlapped, and `NOT_FOUND` only when the fabric has no record at all.
 
 The driver supplies the only transport-specific parts via `HardwareControl`:
 
-| Hook                   | Contract                                                                                                           |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `StartHardwareScan()`  | Start or resume the hardware scan, wiring the driver's own discovery callback (return codes below)                 |
-| `StopHardwareScan()`   | Stop the hardware scan; called only while the registry owns the radio, never while paused                          |
-| `ClearCachedResults()` | Drop this transport's cached results (`host->ScanCache().ClearTransport(...)`) whenever the last record is removed |
+| Hook                   | Contract                                                                                                         |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `StartHardwareScan()`  | Start or resume the hardware scan, wiring the driver's own discovery callback (return codes below)               |
+| `StopHardwareScan()`   | Stop the hardware scan; called only while the registry owns the radio, never while paused                        |
+| `ClearCachedResults()` | Drop cached results for the bands that stopped (`host->ScanCache().ClearTransport(<transport>, bands)`); 0 = all |
 
 `StartHardwareScan()` returns `CHIP_NO_ERROR` when the scan is running,
 `CHIP_ERROR_BUSY` when the radio is currently held — the registry keeps the
@@ -308,21 +310,39 @@ to it:
 
 ```cpp
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyBgScanRegistry.h>
+#include <platform/DefaultTimerDelegate.h>
 
+// The registry drives these hooks from its own lifetime timer and from resume, i.e.
+// outside the driver's call stack, so the hardware object holds its own host pointer.
+// MyBleTransport::SetHost() hands it over: mHost = cluster; sHardware.SetHost(cluster);
 class MyBleBgScanHardware : public CommissioningProxyBgScanRegistry::HardwareControl
 {
 public:
+    void SetHost(CommissioningProxyCluster * host) { mHost = host; }
+
     // Returns CHIP_ERROR_BUSY when the single scanner is held by a connect or a
     // foreground scan; the registry then defers and retries on resume.
     CHIP_ERROR StartHardwareScan() override { return StartMyPlatformScan(OnBgScanDiscovery); }
     void StopHardwareScan() override { StopMyPlatformScan(); }
-    void ClearCachedResults() override { sHost->ScanCache().ClearTransport(CapabilitiesBitmap::kBle); }
+
+    // bands == 0 means the transport stopped entirely; BLE always receives 0.
+    void ClearCachedResults(BitMask<WiFiBandBitmap> bands) override
+    {
+        if (mHost != nullptr)
+        {
+            mHost->ScanCache().ClearTransport(CapabilitiesBitmap::kBle, bands);
+        }
+    }
+
+private:
+    CommissioningProxyCluster * mHost = nullptr;
 };
 
 // Declared before the registry so it outlives it: the registry's destructor may
 // call back into these hooks.
 MyBleBgScanHardware sHardware;
-CommissioningProxyBgScanRegistry sBgScan(sHardware);
+chip::app::DefaultTimerDelegate sBgScanTimerDelegate;
+CommissioningProxyBgScanRegistry sBgScan(sHardware, sBgScanTimerDelegate);
 
 Status MyBleTransport::BgScanStart(System::Clock::Seconds16 timeout, BitMask<WiFiBandBitmap> wiFiBands, FabricIndex fabricIndex,
                                    NodeId nodeId)
@@ -353,11 +373,13 @@ the "radio freed" path could otherwise re-enter the driver.
 transport callback once the operation completes.
 
 To keep the exchange alive across the async operation, store a
-`CommandHandler::Handle` and extend the exchange response timeout:
+`CommandHandler::Handle` in the driver's pending-operation state — not on the
+stack, which unwinds when `InvokeCommand` returns — and extend the exchange
+response timeout:
 
 ```cpp
-// Store the handle before returning nullopt
-CommandHandler::Handle handle(commandObj);
+// mPending outlives InvokeCommand; the handle must live there, not here
+mPending.handle = CommandHandler::Handle(commandObj);
 if (auto * ec = commandObj->GetExchangeContext())
 {
     ec->SetResponseTimeout(chip::System::Clock::Seconds16(responseTimeout + 10));
@@ -365,7 +387,7 @@ if (auto * ec = commandObj->GetExchangeContext())
 // … return std::nullopt from InvokeCommand …
 
 // Later, in your transport callback:
-auto * handler = handle.Get();
+auto * handler = mPending.handle.Get();
 if (handler != nullptr)
 {
     handler->AddResponse(commandPath, response);
@@ -376,8 +398,7 @@ if (handler != nullptr)
 
 When the build enables BLE (`CONFIG_NETWORK_LAYER_BLE`) the driver
 (`CommissioningProxyBleTransport`) drives a BTP connection through
-`chip::Ble::BleLayer`. The Linux example driver, landing with the example-app
-change later in this series,
+`chip::Ble::BleLayer`. The Linux example
 (`examples/all-devices-app/all-devices-common/device/types/commissioning-proxy/CommissioningProxyBleTransport.cpp`)
 shows the full integration:
 
@@ -424,7 +445,15 @@ The cluster tracks proxy state internally:
 
 State transitions:
 
-```
+```text
 ProxyConnectRequest ──► transport connect success ──► kState_CPConnected
+kState_CPConnected  ──► ProxyDisconnectRequest    ──► kState_CPConnected
+                                                      (sessions remain)
 kState_CPConnected  ──► ProxyDisconnectRequest    ──► kState_CPDisconnected
+                        for the last session
 ```
+
+With `MaxSessions > 1` several sessions can be open at once, so a
+`ProxyDisconnectRequest` only returns the cluster to `kState_CPDisconnected` —
+and only notifies the transports via `OnAllSessionsClosed()` — once no session
+is left.

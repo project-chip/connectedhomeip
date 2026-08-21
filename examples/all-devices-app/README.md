@@ -69,6 +69,7 @@ The application supports the following device types (specified via the
 -   `air-quality-sensor`
 -   `bridged-node`
 -   `chime`
+-   `commissioning-proxy`
 -   `contact-sensor`
 -   `cooktop`
 -   `device-energy-management`
@@ -116,7 +117,7 @@ Usage: ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app
 
 PROGRAM OPTIONS
 
-  --device <aggregator|air-purifier|air-quality-sensor|bridged-node|chime|contact-sensor|cooktop|device-energy-management|dimmable-light|dimmable-plug-in-unit|dishwasher|extractor-hood|fan|fan-no-onoff|flow-sensor|generic-switch|humidity-sensor|laundry-dryer|laundry-washer|light-sensor|microwave-oven|mounted-dimmable-load-control|mounted-on-off-control|network-infrastructure-manager|occupancy-sensor|on-off-light|on-off-light-switch|on-off-plug-in-unit|oven|power-source|pressure-sensor|proximity-ranger|rain-sensor|refrigerator|robotic-vacuum-cleaner|smoke-co-alarm|soil-sensor|speaker|temperature-sensor|water-freeze-detector|water-leak-detector|water-valve>
+  --device <aggregator|air-purifier|air-quality-sensor|bridged-node|chime|commissioning-proxy|contact-sensor|cooktop|device-energy-management|dimmable-light|dimmable-plug-in-unit|dishwasher|extractor-hood|fan|fan-no-onoff|flow-sensor|generic-switch|humidity-sensor|laundry-dryer|laundry-washer|light-sensor|microwave-oven|mounted-dimmable-load-control|mounted-on-off-control|network-infrastructure-manager|occupancy-sensor|on-off-light|on-off-light-switch|on-off-plug-in-unit|oven|power-source|pressure-sensor|proximity-ranger|rain-sensor|refrigerator|robotic-vacuum-cleaner|smoke-co-alarm|soil-sensor|speaker|temperature-sensor|water-freeze-detector|water-leak-detector|water-valve>
        Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'
        Can be specified multiple times for multi-endpoint devices.
        Example: --device chime:1 --device speaker:2,parent=1
@@ -228,6 +229,73 @@ device types. When an endpoint is specified, it represents the starting number.
               │      └── Endpoint 7 (contact-sensor)
               └── ...
     ```
+
+## Commissioning Proxy
+
+This example can act as a Commissioning Proxy over WiFi-PAF and/or BLE. The
+`commissioning-proxy` device type implements the Commissioning By Proxy device
+type (`MA-commissioning-by-proxy`, 0x0092) with a Commissioning Proxy cluster
+server. It is available on the Linux (posix) platform only — the device is
+registered from `posix/linux/DeviceFactoryPlatformOverride.cpp`.
+
+Supported commands: `ProxyScanRequest`, the `ProxyConnectRequest` /
+`ProxyMessageRequest` / `ProxyDisconnectRequest` flow, and the BackgroundScan
+feature (`ProxyBackGroundScanStartRequest` / `ProxyBackGroundScanStopRequest`),
+over whichever transport(s) are compiled in. The proxy serves one commissioning
+session at a time across all transports (`MaxSessions` = 1) and caches up to 10
+background-scan results.
+
+Two build switches gate the device itself:
+
+-   `commissioning-proxy` must be in the device-factory enable list. All devices
+    are enabled by default; `all_devices_enabled_devices` in
+    `all-devices-common/device-factory/enabled_devices.gni` selects a subset.
+-   `CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY`, set for this app in
+    `posix/include/CHIPProjectAppConfig.h`, enables the Linux platform support
+    the transports call: the `BLEManagerImpl` proxy scan and peripheral→central
+    role switch, and the `ConnectivityManagerImpl` WiFi-PAF proxy entry points.
+
+The compiled-in transport(s) follow this build configuration:
+
+-   **WiFi-PAF** is included when `chip_device_config_enable_wifipaf` is true
+    (the default for Linux builds with WiFi enabled). When WiFi-PAF is compiled
+    in, the cluster advertises the `WiFiNetworkInterface` feature and the
+    `WiFiBand` attribute; the supported bands are derived from the `freq_list`
+    passed via `--wifipaf`. Note that WiFi-PAF scanning does not work on a stock
+    host: it needs a `wpa_supplicant` built with `CONFIG_NAN_USD` and the
+    `discovery_only` patch. See
+    [wpa_supplicant with the Matter NAN patch](all-devices-common/device/types/commissioning-proxy/README.md#2-wpa_supplicant-with-the-matter-nan-patch-proxy-device).
+-   **BLE** is included when `chip_config_network_layer_ble` is true.
+
+The `-no-ble` build variants disable the BLE transport. With no transport
+compiled in the device type still starts, but every proxy command fails.
+
+To build with both BLE and WiFi-PAF on Linux x86-64 run:
+
+```bash
+./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-x64-all-devices-boringssl build"
+```
+
+To cross-compile for a Raspberry Pi (ARM64), build inside the cross-compile
+container, which supplies the aarch64 sysroot. The ARM and ARM64 boards accept
+`-clang` or `-nodeps` target variants:
+
+```bash
+# From the root of your checkout, on the host:
+docker run -it --user "$(id -u):$(id -g)" -v "$PWD":"$PWD" -w "$PWD" \
+    ghcr.io/project-chip/chip-build-crosscompile:200 /bin/bash
+
+# Then, inside the container:
+./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-arm64-all-devices-boringssl-clang build"
+```
+
+To start the app as a proxy over WiFi-PAF on channel 6 (2437 MHz) on endpoint 5:
+
+```bash
+./out/linux-x64-all-devices-boringssl/all-devices-app --device commissioning-proxy:5 --wifi --wifipaf freq_list=2437
+```
+
+The cluster's attributes and commands can then be exercised on endpoint 5.
 
 ## Testing with chip-tool
 

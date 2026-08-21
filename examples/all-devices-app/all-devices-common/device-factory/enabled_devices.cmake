@@ -163,6 +163,7 @@ foreach(_key
         ambient-context-sensor
         bridged-node
         chime
+        commissioning-proxy
         contact-sensor
         cooktop
         device-energy-management
