@@ -80,6 +80,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/content-launch-server/tests",
       "${chip_root}/src/app/clusters/descriptor/tests",
       "${chip_root}/src/app/clusters/device-energy-management-server/tests",
+      "${chip_root}/src/app/clusters/door-lock-server/tests",
       "${chip_root}/src/app/clusters/dynamic-lighting-server/tests",
       "${chip_root}/src/app/clusters/electrical-distribution-server/tests",
       "${chip_root}/src/app/clusters/electrical-energy-measurement-server/tests",
