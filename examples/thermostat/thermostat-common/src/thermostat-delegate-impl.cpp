@@ -143,11 +143,17 @@ Protocols::InteractionModel::Status ThermostatDelegate::SetRemoteSensing(BitMask
     {
         return Status::Success;
     }
+    if (mProvider == nullptr)
+    {
+        ChipLogError(Zcl, "Invalid state: AttributePersistenceProvider is null");
+        return Status::InvalidInState;
+    }
     auto remoteSensingValue = sensing.Raw();
     AttributePersistence persistence(*mProvider);
     CHIP_ERROR result = persistence.StoreNativeEndianValue({ mEndpointId, Thermostat::Id, RemoteSensing::Id }, remoteSensingValue);
     if (result != CHIP_NO_ERROR)
     {
+        ChipLogError(Zcl, "Failed to store RemoteSensing attribute");
         return Status::Failure;
     }
     mRemoteSensing = sensing;

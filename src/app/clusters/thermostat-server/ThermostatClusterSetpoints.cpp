@@ -175,6 +175,7 @@ DataModel::ActionReturnStatus ThermostatCluster::HandleSetpointChange(Setpoints 
         }
         return setpoints.ChangeLimitMaximum(setpoints.userCoolLimits, setpoints.absoluteCoolLimits, value, changedAttributes);
     case MinSetpointDeadBand::Id:
+        // Note: for backward compatibility, writes to this attribute are allowed but ignored
         return Status::Success;
     default:
         return Status::UnsupportedAttribute;

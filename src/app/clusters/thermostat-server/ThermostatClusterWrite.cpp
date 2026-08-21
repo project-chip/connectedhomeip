@@ -61,6 +61,7 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel:
             ChipLogError(Zcl, "Invalid value for Deadband: %d", db);
             return Status::ConstraintError;
         }
+        // Note: for backwards compatibility, writes to this attribute are allowed (as long as the value is valid) but ignored
         return Status::Success;
     }
     case RemoteSensing::Id: {
