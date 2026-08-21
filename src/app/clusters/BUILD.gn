@@ -44,6 +44,7 @@ source_set("clusters") {
     "electrical-distribution-server",
     "electrical-energy-measurement-server",
     "electrical-power-measurement-server",
+    "electrical-protection-alarm-server",
     "energy-evse-server",
     "energy-preference-server",
     "ethernet-network-diagnostics-server",
