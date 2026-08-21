@@ -23,6 +23,7 @@
 #include <app/CASESessionManager.h>
 #include <app/CommandSender.h>
 #include <app/clusters/av-analysis-server/AvAnalysisCameraClient.h>
+#include <clusters/CameraAvStreamManagement/Commands.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
@@ -43,6 +44,24 @@ namespace Clusters {
 class DefaultAvAnalysisCameraClient : public AvAnalysisCameraClient, public CommandSender::Callback
 {
 public:
+    /**
+     * What the client knows about the camera when building requests toward it.
+     */
+    struct CameraProfile
+    {
+        EndpointId avsmEndpoint = kInvalidEndpointId;
+        bool hasWatermark       = false;
+        bool hasOSD             = false;
+        uint16_t minFrameRate   = 0;
+        uint16_t maxFrameRate   = 0;
+        uint16_t minWidth       = 0;
+        uint16_t minHeight      = 0;
+        uint16_t maxWidth       = 0;
+        uint16_t maxHeight      = 0;
+        uint32_t minBitRateBps  = 0;
+        uint32_t maxBitRateBps  = 0;
+    };
+
     DefaultAvAnalysisCameraClient() :
         mOnConnectedCallback(OnDeviceConnected, this), mOnConnectionFailureCallback(OnDeviceConnectionFailure, this)
     {}
@@ -91,6 +110,16 @@ protected:
         mCASESessionManager->FindOrEstablishSession(aCameraNode, &mOnConnectedCallback, &mOnConnectionFailureCallback);
     }
 
+    /**
+     * Determines the camera's profile for the pending request.
+     */
+    virtual CHIP_ERROR DiscoverCameraProfile(CameraProfile & outProfile);
+
+    /**
+     * Builds the VideoStreamAllocate request (StreamUsage Analysis) from a camera profile.
+     */
+    static CameraAvStreamManagement::Commands::VideoStreamAllocate::Type BuildAllocateRequest(const CameraProfile & aProfile);
+
 private:
     enum class PendingRequest : uint8_t
     {
@@ -116,6 +145,7 @@ private:
     uint16_t mPendingStreamId      = 0;
     Callback * mPendingCallback    = nullptr;
     bool mResponseDelivered        = false;
+    CameraProfile mProfile;
     std::unique_ptr<CommandSender> mCommandSender;
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;

@@ -82,6 +82,7 @@ void DefaultAvAnalysisCameraClient::Cancel()
     mPendingRequest    = PendingRequest::kNone;
     mPendingCallback   = nullptr;
     mResponseDelivered = false;
+    mProfile           = CameraProfile{};
 }
 
 CHIP_ERROR DefaultAvAnalysisCameraClient::StartRequest(PendingRequest aRequest, const ScopedNodeId & aCameraNode,
@@ -99,11 +100,59 @@ CHIP_ERROR DefaultAvAnalysisCameraClient::StartRequest(PendingRequest aRequest, 
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DefaultAvAnalysisCameraClient::DiscoverCameraProfile(CameraProfile & outProfile)
+{
+    outProfile.avsmEndpoint  = mCameraEndpoint;
+    outProfile.hasWatermark  = mCameraHasWatermark;
+    outProfile.hasOSD        = mCameraHasOSD;
+    outProfile.minFrameRate  = kDefaultMinFrameRate;
+    outProfile.maxFrameRate  = kDefaultMaxFrameRate;
+    outProfile.minWidth      = kDefaultMinResolutionWidth;
+    outProfile.minHeight     = kDefaultMinResolutionHeight;
+    outProfile.maxWidth      = kDefaultMaxResolutionWidth;
+    outProfile.maxHeight     = kDefaultMaxResolutionHeight;
+    outProfile.minBitRateBps = kDefaultMinBitRateBps;
+    outProfile.maxBitRateBps = kDefaultMaxBitRateBps;
+    return CHIP_NO_ERROR;
+}
+
+Commands::VideoStreamAllocate::Type DefaultAvAnalysisCameraClient::BuildAllocateRequest(const CameraProfile & aProfile)
+{
+    Commands::VideoStreamAllocate::Type request;
+    request.streamUsage          = Globals::StreamUsageEnum::kAnalysis;
+    request.videoCodec           = VideoCodecEnum::kH264;
+    request.minFrameRate         = aProfile.minFrameRate;
+    request.maxFrameRate         = aProfile.maxFrameRate;
+    request.minResolution.width  = aProfile.minWidth;
+    request.minResolution.height = aProfile.minHeight;
+    request.maxResolution.width  = aProfile.maxWidth;
+    request.maxResolution.height = aProfile.maxHeight;
+    request.minBitRate           = aProfile.minBitRateBps;
+    request.maxBitRate           = aProfile.maxBitRateBps;
+    request.keyFrameInterval     = kDefaultKeyFrameIntervalMilliseconds;
+
+    // Feature-conditional fields: present exactly when the camera supports the feature.
+    if (aProfile.hasWatermark)
+    {
+        request.watermarkEnabled = MakeOptional(false);
+    }
+    if (aProfile.hasOSD)
+    {
+        request.OSDEnabled = MakeOptional(false);
+    }
+
+    return request;
+}
+
 void DefaultAvAnalysisCameraClient::OnDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
                                                       const SessionHandle & sessionHandle)
 {
     auto * self    = static_cast<DefaultAvAnalysisCameraClient *>(context);
-    CHIP_ERROR err = self->SendPendingCommand(exchangeMgr, sessionHandle);
+    CHIP_ERROR err = self->DiscoverCameraProfile(self->mProfile);
+    if (err == CHIP_NO_ERROR)
+    {
+        err = self->SendPendingCommand(exchangeMgr, sessionHandle);
+    }
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "AvAnalysisCameraClient: failed to send command: %" CHIP_ERROR_FORMAT, err.Format());
@@ -126,30 +175,9 @@ CHIP_ERROR DefaultAvAnalysisCameraClient::SendPendingCommand(Messaging::Exchange
 
     if (mPendingRequest == PendingRequest::kAllocate)
     {
-        Commands::VideoStreamAllocate::Type request;
-        request.streamUsage          = Globals::StreamUsageEnum::kAnalysis;
-        request.videoCodec           = VideoCodecEnum::kH264;
-        request.minFrameRate         = kDefaultMinFrameRate;
-        request.maxFrameRate         = kDefaultMaxFrameRate;
-        request.minResolution.width  = kDefaultMinResolutionWidth;
-        request.minResolution.height = kDefaultMinResolutionHeight;
-        request.maxResolution.width  = kDefaultMaxResolutionWidth;
-        request.maxResolution.height = kDefaultMaxResolutionHeight;
-        request.minBitRate           = kDefaultMinBitRateBps;
-        request.maxBitRate           = kDefaultMaxBitRateBps;
-        request.keyFrameInterval     = kDefaultKeyFrameIntervalMilliseconds;
+        Commands::VideoStreamAllocate::Type request = BuildAllocateRequest(mProfile);
 
-        // Feature-conditional fields: present exactly when the camera supports the feature
-        if (mCameraHasWatermark)
-        {
-            request.watermarkEnabled = MakeOptional(false);
-        }
-        if (mCameraHasOSD)
-        {
-            request.OSDEnabled = MakeOptional(false);
-        }
-
-        CommandPathParams commandPath = { mCameraEndpoint, CameraAvStreamManagement::Id, Commands::VideoStreamAllocate::Id,
+        CommandPathParams commandPath = { mProfile.avsmEndpoint, CameraAvStreamManagement::Id, Commands::VideoStreamAllocate::Id,
                                           CommandPathFlags::kEndpointIdValid };
         ReturnErrorOnFailure(mCommandSender->AddRequestData(commandPath, request));
     }
@@ -158,7 +186,7 @@ CHIP_ERROR DefaultAvAnalysisCameraClient::SendPendingCommand(Messaging::Exchange
         Commands::VideoStreamDeallocate::Type request;
         request.videoStreamID = mPendingStreamId;
 
-        CommandPathParams commandPath = { mCameraEndpoint, CameraAvStreamManagement::Id, Commands::VideoStreamDeallocate::Id,
+        CommandPathParams commandPath = { mProfile.avsmEndpoint, CameraAvStreamManagement::Id, Commands::VideoStreamDeallocate::Id,
                                           CommandPathFlags::kEndpointIdValid };
         ReturnErrorOnFailure(mCommandSender->AddRequestData(commandPath, request));
     }
@@ -232,6 +260,7 @@ void DefaultAvAnalysisCameraClient::FinishRequest(Status aStatus, uint16_t aStre
     Callback * callback      = mPendingCallback;
     mPendingRequest          = PendingRequest::kNone;
     mPendingCallback         = nullptr;
+    mProfile                 = CameraProfile{};
 
     if (completed == PendingRequest::kAllocate)
     {

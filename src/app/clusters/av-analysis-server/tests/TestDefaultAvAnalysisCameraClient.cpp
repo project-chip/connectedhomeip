@@ -184,6 +184,63 @@ TEST_F(TestDefaultAvAnalysisCameraClient, CompletionIsDeliveredExactlyOnce)
     EXPECT_EQ(mCallback.mAllocatedCount, 1);
 }
 
+// Exposes the protected request builder and profile seam for direct testing
+class ProfileTestClient : public DefaultAvAnalysisCameraClient
+{
+public:
+    using DefaultAvAnalysisCameraClient::BuildAllocateRequest;
+    using DefaultAvAnalysisCameraClient::CameraProfile;
+    using DefaultAvAnalysisCameraClient::DiscoverCameraProfile;
+};
+
+TEST_F(TestDefaultAvAnalysisCameraClient, AllocateRequestFollowsProfileBounds)
+{
+    ProfileTestClient::CameraProfile profile;
+    profile.avsmEndpoint  = 5;
+    profile.hasWatermark  = true;
+    profile.hasOSD        = false;
+    profile.minFrameRate  = 10;
+    profile.maxFrameRate  = 24;
+    profile.minWidth      = 320;
+    profile.minHeight     = 240;
+    profile.maxWidth      = 1280;
+    profile.maxHeight     = 720;
+    profile.minBitRateBps = 100000;
+    profile.maxBitRateBps = 1500000;
+
+    auto request = ProfileTestClient::BuildAllocateRequest(profile);
+
+    EXPECT_EQ(request.streamUsage, Globals::StreamUsageEnum::kAnalysis);
+    EXPECT_EQ(request.minFrameRate, 10);
+    EXPECT_EQ(request.maxFrameRate, 24);
+    EXPECT_EQ(request.minResolution.width, 320);
+    EXPECT_EQ(request.maxResolution.width, 1280);
+    EXPECT_EQ(request.maxResolution.height, 720);
+    EXPECT_EQ(request.minBitRate, 100000u);
+    EXPECT_EQ(request.maxBitRate, 1500000u);
+
+    ASSERT_TRUE(request.watermarkEnabled.HasValue());
+    EXPECT_FALSE(request.watermarkEnabled.Value());
+    EXPECT_FALSE(request.OSDEnabled.HasValue());
+}
+
+TEST_F(TestDefaultAvAnalysisCameraClient, DefaultProfileComesFromConfiguration)
+{
+    ProfileTestClient client;
+    ASSERT_EQ(client.Init(&mCASESessionManager, kCameraEndpoint), CHIP_NO_ERROR);
+    client.SetCameraVideoTraits(/* aHasWatermark = */ true, /* aHasOSD = */ true);
+
+    ProfileTestClient::CameraProfile profile;
+    ASSERT_EQ(client.DiscoverCameraProfile(profile), CHIP_NO_ERROR);
+
+    EXPECT_EQ(profile.avsmEndpoint, kCameraEndpoint);
+    EXPECT_TRUE(profile.hasWatermark);
+    EXPECT_TRUE(profile.hasOSD);
+    EXPECT_GT(profile.maxFrameRate, profile.minFrameRate);
+    EXPECT_GT(profile.maxBitRateBps, profile.minBitRateBps);
+    EXPECT_GE(profile.maxWidth, profile.minWidth);
+}
+
 TEST_F(TestDefaultAvAnalysisCameraClient, CancelDropsPendingRequestWithoutCompletion)
 {
     EXPECT_EQ(mClient.RequestVideoStreamAllocation(kCameraNode, mCallback), CHIP_NO_ERROR);
