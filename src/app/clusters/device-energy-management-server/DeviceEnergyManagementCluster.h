@@ -43,7 +43,8 @@ private:
     using OptionalAttributesSet = OptionalAttributeSet<                    //
         DeviceEnergyManagement::Attributes::PowerAdjustmentCapability::Id, //
         DeviceEnergyManagement::Attributes::Forecast::Id,                  //
-        DeviceEnergyManagement::Attributes::OptOutState::Id                //
+        DeviceEnergyManagement::Attributes::OptOutState::Id,               //
+        DeviceEnergyManagement::Attributes::PowerRangeAdjustment::Id       //
         >;
 
 public:
@@ -72,9 +73,11 @@ public:
                 config.featureFlags.HasAny(DeviceEnergyManagement::Feature::kPowerForecastReporting,
                                            DeviceEnergyManagement::Feature::kStateForecastReporting));
             attrs.Set<DeviceEnergyManagement::Attributes::OptOutState::Id>(config.featureFlags.HasAny(
-                DeviceEnergyManagement::Feature::kPowerAdjustment, DeviceEnergyManagement::Feature::kStartTimeAdjustment,
-                DeviceEnergyManagement::Feature::kPausable, DeviceEnergyManagement::Feature::kForecastAdjustment,
-                DeviceEnergyManagement::Feature::kConstraintBasedAdjustment));
+                DeviceEnergyManagement::Feature::kPowerAdjustment, DeviceEnergyManagement::Feature::kPowerRangeAdjustment,
+                DeviceEnergyManagement::Feature::kStartTimeAdjustment, DeviceEnergyManagement::Feature::kPausable,
+                DeviceEnergyManagement::Feature::kForecastAdjustment, DeviceEnergyManagement::Feature::kConstraintBasedAdjustment));
+            attrs.Set<DeviceEnergyManagement::Attributes::PowerRangeAdjustment::Id>(
+                config.featureFlags.Has(DeviceEnergyManagement::Feature::kPowerRangeAdjustment));
             return attrs;
         }())
     {
@@ -113,6 +116,10 @@ private:
                                                                        TLV::TLVReader & input_arguments, CommandHandler * handler);
     DataModel::ActionReturnStatus HandleCancelRequest(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
                                                       CommandHandler * handler);
+    DataModel::ActionReturnStatus HandlePowerRangeAdjustRequest(const DataModel::InvokeRequest & request,
+                                                                TLV::TLVReader & input_arguments, CommandHandler * handler);
+    DataModel::ActionReturnStatus HandleCancelPowerRangeAdjustRequest(const DataModel::InvokeRequest & request,
+                                                                      TLV::TLVReader & input_arguments, CommandHandler * handler);
 
     DeviceEnergyManagement::Delegate & mDelegate;
     const BitFlags<DeviceEnergyManagement::Feature> mFeatureFlags;

@@ -167,6 +167,32 @@ public:
      */
     chip::Protocols::InteractionModel::Status CancelRequest() override;
 
+    /**
+     * @brief Handler for PowerRangeAdjustRequest
+     *
+     *   If the ESA supports PRA, and the ESAState is Online or PowerAdjustActive, then the ESA SHALL attempt to
+     *   adjust its power operation to stay within the requested power range for the requested duration.
+     *
+     * @param minPower Minimum power in mW that the ESA can operate at during the adjustment period.
+     * @param maxPower Maximum power in mW that the ESA can operate at during the adjustment period.
+     * @param duration Duration in seconds that the ESA SHALL maintain the power range for.
+     * @param cause Who (Grid/local) is triggering this change.
+     * @return  Success if the power range adjustment is accepted; otherwise the command SHALL be rejected with appropriate error.
+     */
+    chip::Protocols::InteractionModel::Status PowerRangeAdjustRequest(const DataModel::Nullable<int64_t> minPower,
+                                                                      const DataModel::Nullable<int64_t> maxPower,
+                                                                      uint32_t duration, AdjustmentCauseEnum cause) override;
+
+    /**
+     * @brief Handler for CancelPowerRangeAdjustRequest
+     *
+     *   The ESA SHALL update its PowerRangeAdjustment attribute to Null and return to normal (or idle) power levels.
+     *   The ESA SHALL also generate a PowerRangeAdjustEnd Event and the ESAState SHALL be restored to Online.
+     *
+     * @return Success if the power range adjustment is cancelled; otherwise the command SHALL be rejected with appropriate error.
+     */
+    chip::Protocols::InteractionModel::Status CancelPowerRangeAdjustRequest() override;
+
     // ------------------------------------------------------------------
     // Overridden DeviceEnergyManagement::Delegate Get attribute methods
 
@@ -178,6 +204,7 @@ public:
     const DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> & GetPowerAdjustmentCapability() override;
     const DataModel::Nullable<Structs::ForecastStruct::Type> & GetForecast() override;
     OptOutStateEnum GetOptOutState() override;
+    const DataModel::Nullable<Structs::PowerRangeAdjustStruct::Type> & GetPowerRangeAdjustment() override;
 
     // ------------------------------------------------------------------
     // Overridden DeviceEnergyManagement::Delegate Set attribute methods
@@ -266,6 +293,19 @@ private:
     // Method to generate a Paused event
     CHIP_ERROR GenerateResumedEvent(CauseEnum cause);
 
+    // Methods to handle when a PowerRangeAdjustRequest completes
+    static void PowerRangeAdjustTimerExpiry(System::Layer * systemLayer, void * delegate);
+    void HandlePowerRangeAdjustTimerExpiry();
+
+    // Method to handle PowerRangeAdjustRequest failure
+    void HandlePowerRangeAdjustRequestFailure();
+
+    // Method to cancel a PowerRangeAdjustRequest
+    CHIP_ERROR CancelPowerRangeAdjustRequestAndGenerateEvent(CauseEnum cause);
+
+    // Method to generate a PowerRangeAdjustEnd event
+    CHIP_ERROR GeneratePowerRangeAdjustEndEvent(CauseEnum cause);
+
 private:
     // Have a pointer to partner instance object
     DeviceEnergyManagement::Instance * mpDEMInstance;
@@ -284,6 +324,9 @@ private:
 
     DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> mPowerAdjustCapabilityStruct;
 
+    // Power Range Adjustment attribute
+    DataModel::Nullable<Structs::PowerRangeAdjustStruct::Type> mPowerRangeAdjustment;
+
     // See note above on SetForecast() about mForecast memory management
     DataModel::Nullable<Structs::ForecastStruct::Type> mForecast;
 
@@ -295,6 +338,12 @@ private:
 
     // Keep track whether a PauseRequest is in progress
     bool mPauseRequestInProgress;
+
+    // Keep track whether a PowerRangeAdjustment is in progress
+    bool mPowerRangeAdjustmentInProgress;
+
+    // Keep track of when that PowerRangeAdjustment started
+    uint32_t mPowerRangeAdjustmentStartTimeUtc;
 };
 
 } // namespace DeviceEnergyManagement

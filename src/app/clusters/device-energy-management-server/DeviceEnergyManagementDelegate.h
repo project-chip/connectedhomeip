@@ -155,6 +155,28 @@ public:
      */
     virtual Protocols::InteractionModel::Status CancelRequest() = 0;
 
+    /**
+     * @brief Delegate should implement a handler to adjust the power range (min/max) that the ESA can operate within
+     *        for a specified duration.
+     *
+     * @param minPower  Minimum power in milli-Watts the ESA can operate within (nullable).
+     * @param maxPower  Maximum power in milli-Watts the ESA can operate within (nullable).
+     * @param duration  The duration that the ESA SHALL maintain the requested power range for.
+     * @param cause     Who (Grid/local) is triggering this change.
+     * @return  Success if the adjustment is accepted; otherwise the command SHALL be rejected with appropriate error.
+     */
+    virtual Protocols::InteractionModel::Status PowerRangeAdjustRequest(const DataModel::Nullable<int64_t> minPower,
+                                                                        const DataModel::Nullable<int64_t> maxPower,
+                                                                        const uint32_t duration, AdjustmentCauseEnum cause) = 0;
+
+    /**
+     * @brief Delegate SHALL make the ESA end the active power range adjustment session and return to normal operation.
+     *        The ESA SHALL also generate a PowerRangeAdjustEnd Event.
+     *
+     * @return It should report SUCCESS if successful and FAILURE otherwise.
+     */
+    virtual Protocols::InteractionModel::Status CancelPowerRangeAdjustRequest() = 0;
+
     // ------------------------------------------------------------------
     // Get attribute methods
     virtual ESATypeEnum GetESAType()         = 0;
@@ -189,6 +211,19 @@ public:
      * @return  The current Forecast object
      */
     virtual const DataModel::Nullable<Structs::ForecastStruct::Type> & GetForecast() = 0;
+
+    /**
+     * @brief Returns the current PowerRangeAdjustment object
+     *
+     * The reference returned from GetPowerRangeAdjustment() is only valid until the next Matter event
+     * is processed.  Callers must not hold on to that reference for any asynchronous processing.
+     *
+     * Once another Matter event has had a chance to run, the memory associated with the
+     * PowerRangeAdjustStruct is likely to change or be re-allocated, so would become invalid.
+     *
+     * @return  The current PowerRangeAdjustment object
+     */
+    virtual const DataModel::Nullable<Structs::PowerRangeAdjustStruct::Type> & GetPowerRangeAdjustment() = 0;
 
     // ------------------------------------------------------------------
     // Set attribute methods
