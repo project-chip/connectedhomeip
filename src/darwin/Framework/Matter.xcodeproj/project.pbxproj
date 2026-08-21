@@ -195,6 +195,7 @@
 		51445F732E5E565F003C7C98 /* MTRCommissioningOperation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51445F712E5E565F003C7C98 /* MTRCommissioningOperation.mm */; };
 		51445F742E5E565F003C7C98 /* MTRCommissioningOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 51445F702E5E565F003C7C98 /* MTRCommissioningOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		51445F752E5E565F003C7C98 /* MTRCommissioningOperation_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 51445F722E5E565F003C7C98 /* MTRCommissioningOperation_Internal.h */; };
+		51445F802E5E565F003C7C98 /* MTRCommissioningOperation_Test.h in Headers */ = {isa = PBXBuildFile; fileRef = 51445F812E5E565F003C7C98 /* MTRCommissioningOperation_Test.h */; };
 		51445F762E5E565F003C7C98 /* MTRCommissioningDelegate_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 51445F6F2E5E565F003C7C98 /* MTRCommissioningDelegate_Internal.h */; };
 		51445F772E5E565F003C7C98 /* MTRCommissioningDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 51445F6E2E5E565F003C7C98 /* MTRCommissioningDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		51445F792E5F70AF003C7C98 /* MTRDeviceControllerDelegate_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 51445F782E5F70AF003C7C98 /* MTRDeviceControllerDelegate_Internal.h */; };
@@ -848,6 +849,7 @@
 		51445F702E5E565F003C7C98 /* MTRCommissioningOperation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRCommissioningOperation.h; sourceTree = "<group>"; };
 		51445F712E5E565F003C7C98 /* MTRCommissioningOperation.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRCommissioningOperation.mm; sourceTree = "<group>"; };
 		51445F722E5E565F003C7C98 /* MTRCommissioningOperation_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRCommissioningOperation_Internal.h; sourceTree = "<group>"; };
+		51445F812E5E565F003C7C98 /* MTRCommissioningOperation_Test.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRCommissioningOperation_Test.h; sourceTree = "<group>"; };
 		51445F782E5F70AF003C7C98 /* MTRDeviceControllerDelegate_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDeviceControllerDelegate_Internal.h; sourceTree = "<group>"; };
 		514654482A72F9DF00904E61 /* MTRDemuxingStorage.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDemuxingStorage.mm; sourceTree = "<group>"; };
 		5146544A2A72F9F500904E61 /* MTRDemuxingStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDemuxingStorage.h; sourceTree = "<group>"; };
@@ -1866,6 +1868,7 @@
 				51445F6F2E5E565F003C7C98 /* MTRCommissioningDelegate_Internal.h */,
 				51445F702E5E565F003C7C98 /* MTRCommissioningOperation.h */,
 				51445F722E5E565F003C7C98 /* MTRCommissioningOperation_Internal.h */,
+				51445F812E5E565F003C7C98 /* MTRCommissioningOperation_Test.h */,
 				51445F712E5E565F003C7C98 /* MTRCommissioningOperation.mm */,
 				99D466E02798936D0089A18F /* MTRCommissioningParameters.h */,
 				510B18F32E3275D6000F9181 /* MTRCommissioningParameters_Internal.h */,
@@ -2378,6 +2381,7 @@
 				7567A20E2DA5ABCF00D91529 /* DefaultServerCluster.h in Headers */,
 				51445F742E5E565F003C7C98 /* MTRCommissioningOperation.h in Headers */,
 				51445F752E5E565F003C7C98 /* MTRCommissioningOperation_Internal.h in Headers */,
+				51445F802E5E565F003C7C98 /* MTRCommissioningOperation_Test.h in Headers */,
 				51445F762E5E565F003C7C98 /* MTRCommissioningDelegate_Internal.h in Headers */,
 				51445F772E5E565F003C7C98 /* MTRCommissioningDelegate.h in Headers */,
 				3D9F2FC92D1105BA003CA2BB /* MTREndpointInfo_Internal.h in Headers */,
