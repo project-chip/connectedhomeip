@@ -727,7 +727,8 @@ void ICDManager::OnSubscriptionReport()
     this->UpdateOperationState(OperationalState::ActiveMode);
 }
 
-#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_CONFIG_ENABLE_ICD_CIP &&                                         \
+    CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 bool ICDManager::Contains(Span<const Access::SubjectDescriptor> list, const Access::SubjectDescriptor & value)
 {
     for (const auto & item : list)
@@ -754,7 +755,7 @@ void ICDManager::AppendPendingCheckInSubject(const Access::SubjectDescriptor & s
         if (mPendingCheckInSubjectsCount < mPendingCheckInSubjects.size())
         {
             mPendingCheckInSubjects[mPendingCheckInSubjectsCount++] = subject;
-            mPendingCheckInType                                    = PendingCheckInType::kTargeted;
+            mPendingCheckInType                                     = PendingCheckInType::kTargeted;
         }
         else
         {
@@ -765,7 +766,8 @@ void ICDManager::AppendPendingCheckInSubject(const Access::SubjectDescriptor & s
         }
     }
 }
-#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_CONFIG_ENABLE_ICD_CIP &&
+       // CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 void ICDManager::OnSendCheckIn(Optional<Access::SubjectDescriptor> specificSubject)
@@ -801,15 +803,14 @@ void ICDManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event, int
 void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    const bool threadNewConnectionEstablished =
-        (event->Type == DeviceLayer::DeviceEventType::kThreadConnectivityChange &&
-         event->ThreadConnectivityChange.Result == DeviceLayer::kConnectivity_Established);
+    const bool threadNewConnectionEstablished = (event->Type == DeviceLayer::DeviceEventType::kThreadConnectivityChange &&
+                                                 event->ThreadConnectivityChange.Result == DeviceLayer::kConnectivity_Established);
     const bool threadRoleChanged =
         (event->Type == DeviceLayer::DeviceEventType::kThreadStateChange && event->ThreadStateChange.RoleChanged);
     const bool threadEstablished =
         (threadNewConnectionEstablished || threadRoleChanged) && DeviceLayer::ConnectivityMgr().IsThreadAttached();
 #else
-    const bool threadEstablished = false;
+    const bool threadEstablished                = false;
 #endif
 
     // Early return if Thread connectivity is not established
@@ -826,7 +827,7 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
     }
 #else
     const PendingCheckInType pendingCheckInType = mPendingCheckInType;
-    const size_t pendingSubjectsCount          = mPendingCheckInSubjectsCount;
+    const size_t pendingSubjectsCount           = mPendingCheckInSubjectsCount;
     // Reset pending state before replaying so any new events generated during processing queue cleanly
     mPendingCheckInType          = PendingCheckInType::kNone;
     mPendingCheckInSubjectsCount = 0;
