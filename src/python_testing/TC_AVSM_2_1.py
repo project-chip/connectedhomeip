@@ -42,13 +42,13 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing import matter_asserts
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_AVSM_2_1(MatterBaseTest):
+class TC_AVSM_2_1(MatterTestCommissionedDevice):
     def desc_TC_AVSM_2_1(self) -> str:
         return "[TC-AVSM-2.1] Attributes with Server as DUT"
 
@@ -57,7 +57,7 @@ class TC_AVSM_2_1(MatterBaseTest):
 
     def steps_TC_AVSM_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH reads MaxConcurrentEncoders attribute.", "Verify that the DUT response contains an uint8 value."),
             TestStep(3, "TH reads MaxEncodedPixelRate attribute.", "Verify that the DUT response contains an uint32 value."),
             TestStep(

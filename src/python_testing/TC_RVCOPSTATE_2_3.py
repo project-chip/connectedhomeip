@@ -46,7 +46,7 @@ import matter.clusters as Clusters
 import matter.testing.matchers as matchers
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -122,7 +122,7 @@ def error_enum_to_text(error_enum):
     return "UnknownEnumValue"
 
 
-class TC_RVCOPSTATE_2_3(MatterBaseTest):
+class TC_RVCOPSTATE_2_3(MatterTestCommissionedDevice):
 
     def __init__(self, *args):
         super().__init__(*args)

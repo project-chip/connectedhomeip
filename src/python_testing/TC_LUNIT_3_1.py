@@ -38,11 +38,11 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
 from matter.testing.decorators import has_attribute, has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_LUNIT_3_1(MatterBaseTest):
+class TC_LUNIT_3_1(MatterTestCommissionedDevice):
     async def read_lunit_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.UnitLocalization
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -66,7 +66,7 @@ class TC_LUNIT_3_1(MatterBaseTest):
 
     def steps_TC_LUNIT_3_1(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commission DUT if required", is_commissioning=True),
+            TestStep(0, "Commission DUT if required"),
             TestStep(1, "TH reads from the DUT the TemperatureUnit attribute"),
             TestStep(2, "If supported, TH reads from the DUT the SupportedTemperatureUnits attribute",
                      "Verify the list length is between 2 and 3 inclusive.\nVerify that each entry in the list is a valid\nTempUnitEnum value and is unique."),
@@ -93,7 +93,7 @@ class TC_LUNIT_3_1(MatterBaseTest):
         attribute_list = await self.read_lunit_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
         has_supported_temperature_units = attributes.SupportedTemperatureUnits.attribute_id in attribute_list
 
-        # Step 0 - Commissioning, already done", is_commissioning=True)
+        # Step 0 - Commissioning, already done")
 
         self.step(0)  # commissioning - already done
 

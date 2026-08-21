@@ -42,7 +42,7 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest
+from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -72,7 +72,7 @@ def current_latch_matcher(current_latch: bool) -> AttributeMatcher:
     return AttributeMatcher.from_callable(description=f"OverallCurrentState.Latch is {current_latch}", matcher=predicate)
 
 
-class TC_CLCTRL_3_1(MatterBaseTest):
+class TC_CLCTRL_3_1(MatterTestCommissionedDevice):
     async def read_clctrl_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ClosureControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -82,7 +82,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
 
     def steps_TC_CLCTRL_3_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)."),
             TestStep("2a", "TH reads from the DUT the (0xFFFC) FeatureMap attribute"),
             TestStep("2b", "If the CL feature is not supported on the cluster, skip remaining steps and end test case."),
             TestStep("2c", "TH establishes a wildcard subscription to all attributes on the Closure Control Cluster, with MinIntervalFloor = 0, MaxIntervalCeiling = 30 and KeepSubscriptions = false."),

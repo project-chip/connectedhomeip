@@ -43,13 +43,13 @@ from matter import ChipDeviceCtrl
 from matter.exceptions import ChipStackError
 from matter.native import PyChipError
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import CustomCommissioningParameters
+from matter.testing.matter_testing import CustomCommissioningParameters, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_CADMIN_1_9(CADMINBaseTest):
+class TC_CADMIN_1_9(MatterTestCommissionedDevice, CADMINBaseTest):
     async def OpenCommissioningWindowForMaxTime(self) -> CustomCommissioningParameters:
         cluster = Clusters.GeneralCommissioning
         attribute = cluster.Attributes.BasicCommissioningInfo
@@ -94,7 +94,7 @@ class TC_CADMIN_1_9(CADMINBaseTest):
 
     def steps_TC_CADMIN_1_9(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(
                 2, "TH1 opens commissioning window on DUT with duration set to value for maxCumulativeFailsafeSeconds"),
             TestStep(3, "TH2 attempts to connect 20 times to endpoint with incorrect passcode"),

@@ -45,11 +45,11 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest
+from matter.testing.matter_testing import AttributeMatcher, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
+class TC_AVSUM_2_2(MatterTestCommissionedDevice, AVSUMTestBase):
     has_feature_mpan = False
     has_feature_mtilt = False
     has_feature_mzoom = False
@@ -59,7 +59,7 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
 
     def steps_TC_AVSUM_2_2(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read and verify MPTZPosition attribute."),
             TestStep(3, "Send an MPTZSetPosition command with no fields. Verify failure response"),
             TestStep(4, "Establish a subscription to the MovementState attribute"),

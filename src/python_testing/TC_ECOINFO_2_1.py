@@ -71,14 +71,14 @@ from matter.interaction_model import Status
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.commissioning import SetupParameters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import uint
 
 log = logging.getLogger(__name__)
 
 
-class TC_ECOINFO_2_1(MatterBaseTest):
+class TC_ECOINFO_2_1(MatterTestCommissionedDevice):
 
     @async_test_body
     async def setup_class(self):
@@ -241,7 +241,7 @@ class TC_ECOINFO_2_1(MatterBaseTest):
 
     def steps_TC_ECOINFO_2_1(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commission DUT if not done", is_commissioning=True),
+            TestStep(0, "Commission DUT if not done"),
             TestStep(1, "Identify endpoints with Ecosystem Information Cluster"),
             TestStep(2, "Reading DeviceDirectory Attribute"),
             TestStep(3, "Reading LocationDirectory Attribute"),

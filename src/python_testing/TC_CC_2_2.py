@@ -46,13 +46,13 @@ import matter.clusters as Clusters
 from matter.clusters import ClusterObjects as ClusterObjects
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_CC_2_3(MatterBaseTest):
+class TC_CC_2_3(MatterTestCommissionedDevice):
 
     # Test includes several long waits, adjust timeout to accommodate.
     @property
@@ -71,7 +71,7 @@ class TC_CC_2_3(MatterBaseTest):
         def entry_count_verification(reportList: str) -> str:
             return f'_{reportList}_ has 12 or less entries in the list'
 
-        return [TestStep(1, commission_if_required(), is_commissioning=True),
+        return [TestStep(1, commission_if_required()),
                 TestStep(2, read_attribute('FeatureMap')),
                 TestStep(3, read_attribute('AttributeList')),
                 TestStep(4, read_attribute('ServerList', 'Descriptor')),

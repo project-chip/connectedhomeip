@@ -47,13 +47,13 @@ from TC_EnergyReporting_Utils import EnergyReportingBaseTestHelper
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_EEM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
+class TC_EEM_2_1(MatterTestCommissionedDevice, EnergyReportingBaseTestHelper):
 
     def desc_TC_EEM_2_1(self) -> str:
         """Returns a description of this test"""
@@ -65,8 +65,7 @@ class TC_EEM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
 
     def steps_TC_EEM_2_1(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commissioning, already done",
-                     is_commissioning=True),
+            TestStep("1", "Commissioning, already done"),
             TestStep("2", "TH reads Accuracy attribute",
                      "Verify that the DUT response contains a MeasurementAccuracyStruct value."),
             TestStep("3", "TH reads CumulativeEnergyImported attribute",

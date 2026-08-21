@@ -42,19 +42,19 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_PS_2_3(MatterBaseTest):
+class TC_PS_2_3(MatterTestCommissionedDevice):
 
     def pics_TC_PS_2_3(self) -> list[str]:
         return ["PWRTL.S"]
 
     def steps_TC_PS_2_3(self):
-        return [TestStep(1, "Commission DUT to TH", "", is_commissioning=True),
+        return [TestStep(1, "Commission DUT to TH", ""),
                 TestStep(2, "Subscribe to all attributes of the PowerSource Cluster"),
                 TestStep(3, "Accumulate all attribute reports on the endpoint under test for 30 seconds",
                             "For each of the attributes in the set of BatTimeToFullCharge, BatPercentRemaining and BatTimeRemaining, verify that there are not more than 4 reports per attribute where the value is non-null over the period of accumulation.")]

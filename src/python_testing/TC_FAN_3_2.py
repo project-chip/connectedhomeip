@@ -64,7 +64,7 @@ from matter.interaction_model import Status
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_asserts import assert_valid_uint8
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 # Init writes Off or High only (always in supported sequence). Speed iteration uses SPEED tuple only.
@@ -80,12 +80,12 @@ class OrderEnum(Enum):
 log = logging.getLogger(__name__)
 
 
-class TC_FAN_3_2(MatterBaseTest):
+class TC_FAN_3_2(MatterTestCommissionedDevice):
     def desc_TC_FAN_3_2(self) -> str:
         return "[TC-FAN-3.2] Optional speed functionality with DUT as Server"
 
     def steps_TC_FAN_3_2(self):
-        return [TestStep(1, "[FC] Commissioning already done.", is_commissioning=True),
+        return [TestStep(1, "[FC] Commissioning already done."),
                 TestStep(2, "[FC] TH reads the SpeedMax attribute from the DUT. This attribute specifies the the maximum value for SpeedSetting.",
                          "[FC] Verify that the DUT response contains a uint8 value no greater than 100 and store."),
                 TestStep(3, "[FC] TH reads the FanModeSequence attribute from the DUT. This attribute specifies the available fan modes.",

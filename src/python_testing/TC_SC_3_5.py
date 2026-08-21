@@ -42,13 +42,13 @@ from matter.fault_injection import CHIPFaultId
 from matter.interaction_model import InteractionModelError
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissioner
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_SC_3_5(MatterBaseTest):
+class TC_SC_3_5(MatterTestCommissioner):
 
     disable_wildcard_subscription = True
 

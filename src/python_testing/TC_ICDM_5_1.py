@@ -45,7 +45,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 Cluster = Clusters.Objects.IcdManagement
@@ -74,7 +74,7 @@ client1 = Client(
 )
 
 
-class TC_ICDM_5_1(MatterBaseTest):
+class TC_ICDM_5_1(MatterTestCommissionedDevice):
 
     #
     # Class Helper functions
@@ -132,7 +132,7 @@ class TC_ICDM_5_1(MatterBaseTest):
 
     def steps_TC_ICDM_5_1(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(1, "TH reads from the DUT the RegisteredClients attribute"),
             TestStep("2a", "TH reads from the DUT the OperatingMode attribute."),
             TestStep("2b", "Verify that the ICD DNS-SD TXT key is present."),

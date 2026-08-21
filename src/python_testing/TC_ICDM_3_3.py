@@ -43,7 +43,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 kRootEndpointId = 0
@@ -112,7 +112,7 @@ client8 = Client(
 )
 
 
-class TC_ICDM_3_3(MatterBaseTest):
+class TC_ICDM_3_3(MatterTestCommissionedDevice):
 
     #
     # Class Helper functions
@@ -132,7 +132,7 @@ class TC_ICDM_3_3(MatterBaseTest):
 
     def steps_TC_ICDM_3_3(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep("1a", "TH reads from the DUT the RegisteredClients attribute."),
             TestStep("1b", "TH sends UnregisterClient command with CheckInNodeID1, where CheckInNodeID1 can be any random node ID."),
             TestStep("2a", "TH sends RegisterClient command."),

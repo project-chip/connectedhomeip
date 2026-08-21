@@ -42,13 +42,13 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_SOIL_2_2(MatterBaseTest):
+class TC_SOIL_2_2(MatterTestCommissionedDevice):
     async def read_soil_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.SoilMeasurement
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -58,7 +58,7 @@ class TC_SOIL_2_2(MatterBaseTest):
 
     def steps_TC_SOIL_2_2(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Set up a subscription wildcard subscription, with MinIntervalFloor set to 0, MaxIntervalCeiling set to 30 and KeepSubscriptions set to false"),
 
             TestStep(3, "Read SoilMoistureMeasurementLimits attribute, save the MinMeasuredValue field as min_bound and save the MaxMeasuredValue field as max_bound"),

@@ -46,13 +46,13 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 cluster = Clusters.ElectricalGridConditions
 
 
-class TC_EGC_2_1(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
+class TC_EGC_2_1(ElectricalGridConditionsTestBaseHelper, MatterTestCommissionedDevice):
     """Implementation of test case TC_EGC_2_1."""
 
     def desc_TC_EGC_2_1(self) -> str:
@@ -65,8 +65,7 @@ class TC_EGC_2_1(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
 
     def steps_TC_EGC_2_1(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
-                     is_commissioning=True),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)."),
             TestStep("2", "TH reads from the DUT the LocalGenerationAvailable attribute.",
                      "Verify that the DUT response contains either null or a bool value."),
             TestStep("3", "TH reads from the DUT the CurrentConditions attribute.",

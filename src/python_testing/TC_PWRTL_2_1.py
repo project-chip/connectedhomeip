@@ -42,13 +42,13 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body, pics
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_PWRTL_2_1(MatterBaseTest):
+class TC_PWRTL_2_1(MatterTestCommissionedDevice):
 
     @property
     def default_endpoint(self) -> int:
@@ -72,7 +72,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
         attributes = cluster.Attributes
         features = cluster.Bitmaps.Feature
 
-        self.step(1, "Commissioning, already done", is_commissioning=True)
+        self.step(1, "Commissioning, already done")
 
         self.step(2, "TH reads FeatureMap from DUT")
         feature_map = await self.read_single_attribute_check_success(

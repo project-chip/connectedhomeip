@@ -45,7 +45,7 @@ import matter.clusters as Clusters
 import matter.testing.matchers as matchers
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest
+from matter.testing.matter_testing import AttributeMatcher, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -82,7 +82,7 @@ def verify_mode_tag_in_supported_modes(supported_modes, mode_value, expected_tag
     asserts.fail(f"No SupportedModes entry matched CurrentMode value {mode_value}")
 
 
-class TC_RVCOPSTATE_2_5(MatterBaseTest):
+class TC_RVCOPSTATE_2_5(MatterTestCommissionedDevice):
 
     min_report_interval_sec = 0
     max_report_interval_sec = 30
@@ -92,7 +92,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
 
     def steps_TC_RVCOPSTATE_2_5(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
+            TestStep("1", "Commissioning, already done"),
             TestStep(
                 "2", "Manually put the device in a RVC Run Mode cluster mode with the Idle mode tag and in a device state that allows changing to {PIXIT_RUNMODE_CLEANMODE}"),
             TestStep("3", "TH reads the SupportedModes attribute of the RVC Run Mode cluster"),

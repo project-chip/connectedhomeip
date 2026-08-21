@@ -43,11 +43,11 @@ from TC_OpstateCommon import TC_OPSTATE_BASE, TestInfo
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_OVENOPSTATE_2_6(MatterBaseTest, TC_OPSTATE_BASE):
+class TC_OVENOPSTATE_2_6(MatterTestCommissionedDevice, TC_OPSTATE_BASE):
     def __init__(self, *args):
         super().__init__(*args)
 

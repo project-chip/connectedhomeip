@@ -45,11 +45,11 @@ from mobly import asserts
 from TC_EnergyReporting_Utils import EnergyReportingBaseTestHelper
 
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_EEM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
+class TC_EEM_2_2(MatterTestCommissionedDevice, EnergyReportingBaseTestHelper):
 
     def desc_TC_EEM_2_2(self) -> str:
         """Returns a description of this test"""
@@ -61,8 +61,7 @@ class TC_EEM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
 
     def steps_TC_EEM_2_2(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commissioning, already done",
-                     is_commissioning=True),
+            TestStep("1", "Commissioning, already done"),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Verify that TestEventTriggersEnabled attribute has a value of 1 (True)"),
             TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEM.TEST_EVENT_TRIGGER for Start Fake Load Test 1kW Event"),

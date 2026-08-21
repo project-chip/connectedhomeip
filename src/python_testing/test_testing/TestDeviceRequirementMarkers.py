@@ -25,11 +25,17 @@ paths, so they stay meaningful if a class is moved or renamed.
 """
 
 import ast
+import asyncio
 import importlib.util
 import sys
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
+from unittest import mock
 
+from mobly import signals
+
+from matter.testing import matter_testing as matter_testing_module
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.matter_testing import (CertificationUnitTestNoDevice, MatterBaseTest, MatterTestCommissionedDevice,
                                            MatterTestCommissioner, MatterTestUncommissionedDevice, device_requirement)
@@ -59,6 +65,9 @@ _EXPECTED_BY_MARKER: dict[type, list[str]] = {
         "test_testing/TestMatterTestingSupport.py",
         "test_testing/TestMatterDeviceGraph.py",
         "test_testing/TestDecorators.py",
+        # Controller-lifecycle unit test: creates and shuts down fabric admins locally and
+        # never performs DUT I/O. test_metadata.yaml and CI both run it with no app.
+        "test_testing/TestCreateNewController.py",
     ],
     MatterTestCommissionedDevice: [
         "test_testing/TestBatchInvoke.py",
@@ -71,9 +80,15 @@ _EXPECTED_BY_MARKER: dict[type, list[str]] = {
         "test_testing/TestTimeSyncTrustedTimeSource.py",
         "test_testing/test_manufacturer_specific_cluster.py",
         "test_testing/test_ota_version.py",
-        "test_testing/TestCreateNewController.py",
         "test_testing/TestCommissioningTimeSync.py",
         "test_testing/TestCleanupFramework.py",
+        # Representatives of the support-module bases: mixed bases carry the marker on the
+        # concrete class (CADMIN/ICDB_1_x), uniform bases carry it on the base and the tests
+        # single-inherit (SMOKECO/BINFO). All must resolve to Commissioned.
+        "TC_CADMIN_1_10.py",
+        "TC_ICDB_1_1.py",
+        "TC_SMOKECO_2_1.py",
+        "TC_BINFO_2_1.py",
     ],
     MatterTestCommissioner: [
         "test_testing/TestCommissioningStatusDetectionIntegration.py",
@@ -94,6 +109,22 @@ _EXPECTED_BY_MARKER: dict[type, list[str]] = {
         "TC_SC_TC_2_2.py",
         "TC_SC_TC_3_1.py",
         "TC_SC_TC_4_1.py",
+        # commission the primary DUT themselves (ICDB via commission_device; JF via joint-fabric
+        # pairing; SC_3_5 is a DUT-as-commissioner test). ICDB/JFADMIN_2_2 also exercise the mixed
+        # support bases (ICDBaseTest/CADMINBaseTest) that must stay marker-free.
+        "TC_ICDB_2_1_2_2.py",
+        "TC_ICDB_2_3.py",
+        "TC_ICDB_2_4.py", "TC_ICDB_2_5.py",
+        "TC_JFADMIN_1_1.py",
+        "TC_JFADMIN_1_2.py",
+        "TC_JFADMIN_1_4.py",
+        "TC_JFADMIN_2_1.py",
+        "TC_JFADMIN_2_2.py",
+        "TC_JFDS_2_1.py",
+        "TC_JFDS_2_2.py",
+        "TC_JFDS_2_3.py",
+        "TC_JFDS_2_4.py",
+        "TC_SC_3_5.py",
     ],
     MatterTestUncommissionedDevice: [
         "TC_DD_1_16_17.py",
@@ -254,6 +285,251 @@ class TestDeviceRequirementMarkers(unittest.TestCase):
         if source_fallback:
             print(f"\n[TestDeviceRequirementMarkers] source-only (import deps unavailable): {source_fallback}",
                   file=sys.stderr)
+
+    def test_no_concrete_test_inherits_matterbasetest_directly(self):
+        """Coverage guard: every concrete test must declare its device requirement through a
+        marker (or an intermediate base such as BasicCompositionTests), never bare MatterBaseTest.
+
+        AST-scans src/python_testing/TC_*.py and test_testing/*.py (no imports needed, so it is
+        independent of optional dependencies). Any top-level class that both defines a test
+        method (test_/steps_/desc_) and lists MatterBaseTest as a *direct* base is flagged --
+        that is a test sitting on the raw base with no device classification. Mixin/base helpers
+        (no such methods) may still derive from MatterBaseTest directly.
+        """
+        def base_names(class_def):
+            return {base.id if isinstance(base, ast.Name) else base.attr
+                    for base in class_def.bases if isinstance(base, (ast.Name, ast.Attribute))}
+
+        def defines_test(class_def):
+            return any(isinstance(body_node, (ast.FunctionDef, ast.AsyncFunctionDef))
+                       and body_node.name.startswith(("test_", "steps_", "desc_")) for body_node in class_def.body)
+
+        offenders = []
+        for path in sorted(_PY_TESTING.glob("TC_*.py")) + sorted((_PY_TESTING / "test_testing").glob("*.py")):
+            tree = ast.parse(path.read_text())
+            for node in tree.body:
+                if isinstance(node, ast.ClassDef) and defines_test(node) and "MatterBaseTest" in base_names(node):
+                    offenders.append(f"{path.name}:{node.name}")
+        self.assertEqual(offenders, [],
+                         "concrete tests must derive from a device-requirement marker, not bare "
+                         f"MatterBaseTest: {offenders}")
+
+
+_MATTER_TESTING_LOGGER = "matter.testing.matter_testing"
+
+
+def _make_stub(loop, case_reachable: bool = False):
+    """Minimal stand-in for a MatterBaseTest instance, avoiding the heavy Mobly class setup.
+
+    The real _run_blocking / _resolve_dut_commissioned / _is_dut_commissioned_blocking are
+    bound through, so the running-loop detection and the DNS-SD-then-CASE resolution are
+    exercised rather than stubbed out.
+
+    case_reachable controls whether the simulated GetConnectedDevice succeeds, i.e. whether
+    the DUT is reachable over CASE when the DNS-SD probe comes back negative.
+    """
+    controller = mock.MagicMock()
+    if case_reachable:
+        controller.GetConnectedDevice = mock.AsyncMock(return_value=object())
+    else:
+        controller.GetConnectedDevice = mock.AsyncMock(side_effect=TimeoutError("no CASE session"))
+
+    stub = SimpleNamespace(
+        event_loop=loop,
+        default_controller=controller,
+        dut_node_id=1,
+        matter_test_config=SimpleNamespace(commissioning_method=None),
+        _dut_confirmed_available=False,
+    )
+    stub._run_blocking = lambda coro: MatterBaseTest._run_blocking(stub, coro)
+    stub._resolve_dut_commissioned = lambda: MatterBaseTest._resolve_dut_commissioned(stub)
+    stub._is_dut_commissioned_blocking = lambda: MatterBaseTest._is_dut_commissioned_blocking(stub)
+    return stub
+
+
+class TestCommissioningPreconditionChecks(unittest.TestCase):
+    """Behavioral checks for the commissioning-state precondition the device-state markers enforce.
+
+    The precondition delegates to matter.testing.commissioning.is_commissioned (a passive DNS-SD
+    probe). These tests mock it so no device or network is required, and drive the helper directly
+    (avoiding the heavy Mobly class setup) plus verify each marker's setup_class passes the right
+    expectation.
+    """
+
+    def _run_precondition(self, is_commissioned_result: bool, expect_commissioned: bool):
+        """Invoke MatterBaseTest._assert_device_commissioning_precondition against a stub self with
+        is_commissioned mocked to return is_commissioned_result. Raises signals.TestFailure if the
+        precondition fails."""
+        loop = asyncio.new_event_loop()
+        try:
+            stub = _make_stub(loop)
+            with mock.patch.object(matter_testing_module, "is_commissioned",
+                                   new=mock.AsyncMock(return_value=is_commissioned_result)):
+                MatterBaseTest._assert_device_commissioning_precondition(stub, expect_commissioned=expect_commissioned)
+        finally:
+            loop.close()
+
+    def test_commissioned_precondition_passes_when_commissioned(self):
+        """MatterTestCommissionedDevice: a commissioned DUT satisfies the precondition."""
+        self._run_precondition(is_commissioned_result=True, expect_commissioned=True)
+
+    def test_commissioned_precondition_fails_when_not_commissioned(self):
+        """MatterTestCommissionedDevice: an uncommissioned DUT hard-fails class setup."""
+        with self.assertRaises(signals.TestFailure):
+            self._run_precondition(is_commissioned_result=False, expect_commissioned=True)
+
+    def test_uncommissioned_precondition_passes_when_not_commissioned(self):
+        """MatterTestUncommissionedDevice: an uncommissioned DUT satisfies the precondition."""
+        self._run_precondition(is_commissioned_result=False, expect_commissioned=False)
+
+    def test_uncommissioned_precondition_fails_when_commissioned(self):
+        """MatterTestUncommissionedDevice: a DUT already on the fabric hard-fails class setup."""
+        with self.assertRaises(signals.TestFailure):
+            self._run_precondition(is_commissioned_result=True, expect_commissioned=False)
+
+    def test_assert_dut_commissioned_helper(self):
+        """assert_dut_commissioned passes when the DUT is commissioned and fails otherwise."""
+        loop = asyncio.new_event_loop()
+        try:
+            stub = _make_stub(loop)
+            with mock.patch.object(matter_testing_module, "is_commissioned", new=mock.AsyncMock(return_value=True)):
+                MatterBaseTest.assert_dut_commissioned(stub)
+            with mock.patch.object(matter_testing_module, "is_commissioned", new=mock.AsyncMock(return_value=False)), \
+                    self.assertRaises(signals.TestFailure):
+                MatterBaseTest.assert_dut_commissioned(stub)
+        finally:
+            loop.close()
+
+    def test_precondition_works_when_event_loop_already_running(self):
+        """Regression: a setup_class override decorated with @async_test_body calls
+        super().setup_class() from inside a running event loop. The precondition must still
+        run there instead of raising "This event loop is already running"."""
+        loop = asyncio.new_event_loop()
+        try:
+            stub = _make_stub(loop)
+
+            async def call_from_within_loop():
+                # Mirrors @async_test_body: sync framework code reached from a running loop.
+                MatterBaseTest._assert_device_commissioning_precondition(stub, expect_commissioned=True)
+
+            with mock.patch.object(matter_testing_module, "is_commissioned", new=mock.AsyncMock(return_value=True)):
+                loop.run_until_complete(call_from_within_loop())
+        finally:
+            loop.close()
+
+    def test_precondition_still_fails_when_event_loop_already_running(self):
+        """The running-loop path must report a genuine precondition failure, not swallow it."""
+        loop = asyncio.new_event_loop()
+        try:
+            stub = _make_stub(loop)
+
+            async def call_from_within_loop():
+                MatterBaseTest._assert_device_commissioning_precondition(stub, expect_commissioned=True)
+
+            with mock.patch.object(matter_testing_module, "is_commissioned", new=mock.AsyncMock(return_value=False)), \
+                    self.assertRaises(signals.TestFailure):
+                loop.run_until_complete(call_from_within_loop())
+        finally:
+            loop.close()
+
+    def test_dnssd_miss_is_confirmed_over_case(self):
+        """Regression: the DNS-SD probe is IPv6-only and skips loopback, so a commissioned DUT on
+        the same host reads as not commissioned. A reachable CASE session must override that
+        negative rather than hard-failing an already-commissioned DUT."""
+        loop = asyncio.new_event_loop()
+        try:
+            stub = _make_stub(loop, case_reachable=True)
+            # assertLogs keeps the expected diagnostic out of this suite's own output, and doubles
+            # as a check that the CASE override is reported rather than applied silently.
+            with mock.patch.object(matter_testing_module, "is_commissioned", new=mock.AsyncMock(return_value=False)), \
+                    self.assertLogs(_MATTER_TESTING_LOGGER, level="WARNING") as logs:
+                # Would raise before the CASE confirmation was added.
+                MatterBaseTest._assert_device_commissioning_precondition(stub, expect_commissioned=True)
+            self.assertIn("reachable over CASE", "\n".join(logs.output))
+            stub.default_controller.GetConnectedDevice.assert_awaited_once()
+            self.assertFalse(stub.default_controller.GetConnectedDevice.await_args.kwargs["allowPASE"],
+                             "the confirmation must not fall back to PASE, which would mask an "
+                             "uncommissioned DUT in a pairing window as commissioned")
+        finally:
+            loop.close()
+
+    def test_dnssd_hit_skips_the_case_confirmation(self):
+        """A positive DNS-SD result is conclusive, so the CASE round trip must be skipped. This is
+        what keeps the common path (334 MatterTestCommissionedDevice tests) cheap."""
+        loop = asyncio.new_event_loop()
+        try:
+            stub = _make_stub(loop, case_reachable=True)
+            with mock.patch.object(matter_testing_module, "is_commissioned", new=mock.AsyncMock(return_value=True)):
+                MatterBaseTest._assert_device_commissioning_precondition(stub, expect_commissioned=True)
+            stub.default_controller.GetConnectedDevice.assert_not_awaited()
+        finally:
+            loop.close()
+
+    def test_uncommissioned_marker_rejects_a_case_reachable_dut(self):
+        """A DUT that is invisible to DNS-SD but answers CASE is commissioned, so it must fail the
+        MatterTestUncommissionedDevice precondition instead of silently passing it."""
+        loop = asyncio.new_event_loop()
+        try:
+            stub = _make_stub(loop, case_reachable=True)
+            with mock.patch.object(matter_testing_module, "is_commissioned", new=mock.AsyncMock(return_value=False)), \
+                    self.assertLogs(_MATTER_TESTING_LOGGER, level="WARNING"), \
+                    self.assertRaises(signals.TestFailure):
+                MatterBaseTest._assert_device_commissioning_precondition(stub, expect_commissioned=False)
+        finally:
+            loop.close()
+
+    def test_dnssd_probe_failure_falls_through_to_case(self):
+        """Regression: is_commissioned imports mdns_discovery, which ships in src/python_testing
+        rather than in the matter package, so tests under test_testing/ hit ModuleNotFoundError.
+        An unavailable DNS-SD probe is inconclusive and must defer to CASE, not fail setup."""
+        loop = asyncio.new_event_loop()
+        try:
+            stub = _make_stub(loop, case_reachable=True)
+            with mock.patch.object(matter_testing_module, "is_commissioned",
+                                   new=mock.AsyncMock(side_effect=ModuleNotFoundError("No module named 'mdns_discovery'"))), \
+                    self.assertLogs(_MATTER_TESTING_LOGGER, level="INFO") as logs:
+                MatterBaseTest._assert_device_commissioning_precondition(stub, expect_commissioned=True)
+            self.assertIn("mdns_discovery", "\n".join(logs.output),
+                          "the unusable probe should be named in the log so the cause is diagnosable")
+            stub.default_controller.GetConnectedDevice.assert_awaited_once()
+        finally:
+            loop.close()
+
+    def test_dnssd_probe_failure_with_unreachable_dut_still_fails(self):
+        """A broken DNS-SD probe must not turn into a free pass: with no CASE session either, the
+        precondition still has to fail."""
+        loop = asyncio.new_event_loop()
+        try:
+            stub = _make_stub(loop, case_reachable=False)
+            with mock.patch.object(matter_testing_module, "is_commissioned",
+                                   new=mock.AsyncMock(side_effect=ModuleNotFoundError("No module named 'mdns_discovery'"))), \
+                    self.assertRaises(signals.TestFailure):
+                MatterBaseTest._assert_device_commissioning_precondition(stub, expect_commissioned=True)
+        finally:
+            loop.close()
+
+    def test_commissioned_marker_setup_class_enforces_precondition(self):
+        """MatterTestCommissionedDevice.setup_class calls super().setup_class() then asserts the
+        DUT is commissioned."""
+        stub = mock.MagicMock(spec=MatterTestCommissionedDevice)
+        with mock.patch.object(MatterBaseTest, "setup_class") as super_setup:
+            MatterTestCommissionedDevice.setup_class(stub)
+        super_setup.assert_called_once()
+        stub._assert_device_commissioning_precondition.assert_called_once_with(expect_commissioned=True)
+
+    def test_uncommissioned_marker_setup_class_enforces_precondition(self):
+        """MatterTestUncommissionedDevice.setup_class calls super().setup_class() then asserts the
+        DUT is NOT commissioned."""
+        stub = mock.MagicMock(spec=MatterTestUncommissionedDevice)
+        with mock.patch.object(MatterBaseTest, "setup_class") as super_setup:
+            MatterTestUncommissionedDevice.setup_class(stub)
+        super_setup.assert_called_once()
+        stub._assert_device_commissioning_precondition.assert_called_once_with(expect_commissioned=False)
+
+    def test_commissioner_marker_has_no_setup_class_precondition(self):
+        """MatterTestCommissioner does not enforce a setup_class precondition (its DUT is not yet
+        present at class setup); it relies on the opt-in assert_dut_commissioned instead."""
+        self.assertNotIn("setup_class", MatterTestCommissioner.__dict__)
 
 
 if __name__ == "__main__":

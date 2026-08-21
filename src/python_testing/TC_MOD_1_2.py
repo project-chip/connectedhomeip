@@ -42,13 +42,13 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_MOD_1_2(MatterBaseTest):
+class TC_MOD_1_2(MatterTestCommissionedDevice):
     """Proposal test for Mode Select Cluster attributes as a server."""
 
     def desc_TC_MOD_1_2(self) -> str:
@@ -62,7 +62,7 @@ class TC_MOD_1_2(MatterBaseTest):
 
     def steps_TC_MOD_1_2(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)."),
             TestStep(2, "TH reads the SupportedModes attribute from DUT"),
             TestStep(3, "TH reads the CurrentMode attribute from the DUT"),
             TestStep(4, "TH reads the OnMode attribute from the DUT"),

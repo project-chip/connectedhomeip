@@ -46,20 +46,20 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_I_2_4(MatterBaseTest):
+class TC_I_2_4(MatterTestCommissionedDevice):
     def desc_TC_I_2_4(self) -> str:
         return "[TC-I-2.4] Reporting requirements with server as DUT"
 
     def steps_TC_I_2_4(self) -> list[TestStep]:
         THwrite = "TH writes to the DUT the"
         THcommand = "TH sends the command"
-        return [TestStep(1, test_plan_support.commission_if_required(), is_commissioning=True),
+        return [TestStep(1, test_plan_support.commission_if_required()),
                 TestStep(2, "Set up a wildcard subscription for the entire Identify Cluster, with MinIntervalFloor set to 0, MaxIntervalCeiling set to 30 and KeepSubscriptions set to false",
                          "Subscription successfully established"),
                 TestStep(3, f"{THwrite} IdentifyTime attribute to 30.", test_plan_support.verify_success()),

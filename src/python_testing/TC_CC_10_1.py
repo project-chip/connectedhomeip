@@ -43,14 +43,14 @@ from TC_GC_common import is_groupcast_on_root_node
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 kCCAttributeValueIDs = [0x0000, 0x0001, 0x0003, 0x0004, 0x0007, 0x4000, 0x4001, 0x4002, 0x4003, 0x4004]
 kTempTolerance = 0.15
 
 
-class TC_CC_10_1(MatterBaseTest):
+class TC_CC_10_1(MatterTestCommissionedDevice):
 
     #
     # Class Helper functions
@@ -78,7 +78,7 @@ class TC_CC_10_1(MatterBaseTest):
 
     def steps_TC_CC_10_1(self) -> list[TestStep]:
         return [
-            TestStep("0", "Commissioning, already done", is_commissioning=True),
+            TestStep("0", "Commissioning, already done"),
             TestStep("0a", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT using a key that is pre-installed "
                      "on the TH. GroupKeySet fields are as follows: GroupKeySetID: 0x01a1, GroupKeySecurityPolicy: TrustFirst (0), "
                      "EpochKey0: a0a1a2a3a4a5a6a7a8a9aaabacadaeaf, EpochStartTime0: 1110000"),

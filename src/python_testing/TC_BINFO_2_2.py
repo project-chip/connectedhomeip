@@ -54,7 +54,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -64,7 +64,7 @@ attributes = cluster.Attributes
 events = cluster.Events
 
 
-class TC_BINFO_2_2(MatterBaseTest):
+class TC_BINFO_2_2(MatterTestCommissionedDevice):
 
     def teardown_class(self):
         if hasattr(self, 'TH2') and self.TH2 is not None:
@@ -78,7 +78,7 @@ class TC_BINFO_2_2(MatterBaseTest):
 
     def steps_TC_BINFO_2_2(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning, already done.", is_commissioning=True),
+            TestStep("precondition", "Commissioning, already done."),
             TestStep(1, "TH reads from the DUT the SoftwareVersion attribute.",
                      "Store value for later use."),
             TestStep(2, "TH reads the StartUp event from the DUT", """
