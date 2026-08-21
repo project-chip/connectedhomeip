@@ -52,6 +52,9 @@ namespace chip {
 
 class OperationalSessionSetup;
 
+// Test-only access shim (see src/app/tests/OperationalSessionSetupTestAccess.h).
+class OperationalSessionSetupTestAccess;
+
 /**
  * @brief Delegate provided when creating OperationalSessionSetup.
  *
@@ -293,6 +296,10 @@ public:
 #endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
 
 private:
+    // Grants the test access shim access to private state for re-resolve-on-timeout
+    // regression coverage. See src/app/tests/OperationalSessionSetupTestAccess.h.
+    friend class OperationalSessionSetupTestAccess;
+
     enum class State : uint8_t
     {
         Uninitialized,    // Error state: OperationalSessionSetup is useless
