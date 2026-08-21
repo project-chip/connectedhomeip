@@ -447,6 +447,75 @@ class TestPicsHelpers(CertificationUnitTestNoDevice):
                                 'endpoint=5 must resolve a lone endpoint5/ archive as its per-endpoint subdir, '
                                 'not as a wrapping directory')
 
+    def test_read_pics_from_zip_ignores_macos_metadata(self):
+        """
+        Zip archives produced by macOS Finder include a `__MACOSX/`
+        metadata directory alongside the compressed payload folder. That
+        must not defeat the single-wrapping-directory detection, or the
+        very use case the wrapping-directory heuristic exists to serve
+        (users passing Finder-produced zips straight through) breaks.
+        """
+        with tempfile.TemporaryDirectory() as d:
+            zip_path = os.path.join(d, 'finder.zip')
+            with zipfile.ZipFile(zip_path, 'w') as zf:
+                zf.writestr('pics_root/base.xml', _pics_xml('MACOS.BASE'))
+                zf.writestr('pics_root/endpoint0/ep.xml', _pics_xml('MACOS.EP'))
+                # Finder's typical __MACOSX/ mirror of the payload.
+                zf.writestr('__MACOSX/pics_root/._base.xml', b'metadata blob')
+                zf.writestr('__MACOSX/pics_root/endpoint0/._ep.xml', b'metadata blob')
+            pics = read_pics_from_file(zip_path, endpoint=0)
+            asserts.assert_true(pics.get('MACOS.BASE'),
+                                'Base PICS must load past macOS __MACOSX/ metadata')
+            asserts.assert_true(pics.get('MACOS.EP'),
+                                'Per-endpoint PICS must load past macOS __MACOSX/ metadata')
+
+    def test_read_pics_from_zip_ignores_ds_store(self):
+        """
+        A stray `.DS_Store` at the archive root must not block wrapping-
+        directory detection either. Same principle as the __MACOSX/ case;
+        this pins the second common metadata file so a future change to
+        the ignore-list doesn't silently regress on it.
+        """
+        with tempfile.TemporaryDirectory() as d:
+            zip_path = os.path.join(d, 'dsstore.zip')
+            with zipfile.ZipFile(zip_path, 'w') as zf:
+                zf.writestr('.DS_Store', b'\x00' * 32)
+                zf.writestr('pics_root/base.xml', _pics_xml('DS.BASE'))
+            pics = read_pics_from_file(zip_path)
+            asserts.assert_true(pics.get('DS.BASE'),
+                                'Base PICS must load past a top-level .DS_Store')
+
+    def test_read_pics_from_zip_rejects_too_many_members(self):
+        """
+        Zips with excessive member counts are rejected before extraction,
+        so an oversized archive can't tie up the runner's disk/time before
+        anything useful happens.
+        """
+        with tempfile.TemporaryDirectory() as d:
+            zip_path = os.path.join(d, 'many.zip')
+            with zipfile.ZipFile(zip_path, 'w') as zf:
+                # Comfortably over the sanity limit; real PICS bundles are
+                # nowhere near this.
+                for i in range(1500):
+                    zf.writestr(f'entry_{i}.xml', '<x/>')
+            with asserts.assert_raises(ValueError):
+                read_pics_from_file(zip_path)
+
+    def test_read_pics_from_zip_rejects_excessive_uncompressed_size(self):
+        """
+        Zips whose declared uncompressed size exceeds the sanity limit are
+        rejected before extraction. Uses a highly compressible zero-fill
+        blob so the on-disk archive stays small while the metadata still
+        reports the full uncompressed size.
+        """
+        with tempfile.TemporaryDirectory() as d:
+            zip_path = os.path.join(d, 'oversize.zip')
+            with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+                # ~60 MiB uncompressed, well above the 50 MiB total limit.
+                zf.writestr('oversize.xml', b'\x00' * (60 * 1024 * 1024))
+            with asserts.assert_raises(ValueError):
+                read_pics_from_file(zip_path)
+
     def test_read_pics_from_zip_rejects_path_traversal(self):
         """
         Zip entries whose paths resolve outside the extraction destination

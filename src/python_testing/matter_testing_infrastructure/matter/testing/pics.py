@@ -46,6 +46,27 @@ _ROOT_NODE_DEVICE_TYPE_ID = 0x0016
 _ENDPOINT_DIR_PATTERN = re.compile(r'^(?:endpoint|ep)?[\s_-]*(\d+)$', re.IGNORECASE)
 
 
+# Sanity limits for zip extraction. PICS bundles in the wild are on the
+# order of hundreds of KiB across ~100 XML files, so these bounds are
+# very generous while still capping runaway or malformed archives (one
+# with millions of members, or one whose metadata claims tens of GiB).
+# These check *reported* uncompressed sizes; a maliciously crafted zip
+# whose metadata lies about entry size can still exceed the limit at
+# extract time. That's out of scope for a test-harness input reader:
+# the caller controls the file and we're guarding against accidents,
+# not adversarial input.
+_MAX_ZIP_MEMBERS = 1000
+_MAX_ZIP_TOTAL_BYTES = 50 * 1024 * 1024  # 50 MiB
+
+# Archive-metadata names that OS "compress folder" utilities scatter
+# alongside the real payload. Filtered out when detecting a wrapping
+# directory so a macOS-Finder zip (which adds __MACOSX/ next to the
+# compressed folder) is still recognised as single-wrapper.
+_ARCHIVE_METADATA_ENTRIES = frozenset({
+    '__MACOSX', '.DS_Store', 'Thumbs.db', 'desktop.ini',
+})
+
+
 def _find_endpoint_subdir(root_dir: str, endpoint: int) -> str | None:
     """
     Find the subdirectory under root_dir whose name resolves to `endpoint`.
@@ -64,20 +85,36 @@ def _find_endpoint_subdir(root_dir: str, endpoint: int) -> str | None:
 
 def _safe_extract_zip(zip_path: str, dest: str) -> None:
     """
-    Extract `zip_path` into `dest`, refusing any entry whose resolved path
-    escapes `dest` (absolute paths or `..` traversal — the "zip slip"
-    pattern). This is a portable pre-check rather than relying on the
-    version-dependent `extractall(filter=...)` behavior added in 3.12.
+    Extract `zip_path` into `dest`, refusing:
+      * entries whose resolved path escapes `dest` (absolute paths or `..`
+        traversal — the "zip slip" pattern),
+      * archives with more than `_MAX_ZIP_MEMBERS` entries, and
+      * archives whose total reported uncompressed size exceeds
+        `_MAX_ZIP_TOTAL_BYTES` (guards against zip-bomb-style disk use).
+
+    Portable pre-check rather than relying on the version-dependent
+    `extractall(filter=...)` behavior added in 3.12.
     """
     dest_abs = os.path.abspath(dest)
     with zipfile.ZipFile(zip_path) as zf:
-        for member in zf.namelist():
-            target = os.path.abspath(os.path.join(dest_abs, member))
-            # dest_abs itself is fine (empty member), everything else must
+        infos = zf.infolist()
+        if len(infos) > _MAX_ZIP_MEMBERS:
+            raise ValueError(
+                f"Zip has {len(infos)} entries; exceeds limit of {_MAX_ZIP_MEMBERS}")
+        total_bytes = 0
+        for info in infos:
+            total_bytes += info.file_size
+            if total_bytes > _MAX_ZIP_TOTAL_BYTES:
+                raise ValueError(
+                    f"Zip total uncompressed size exceeds limit of "
+                    f"{_MAX_ZIP_TOTAL_BYTES} bytes")
+            target = os.path.abspath(os.path.join(dest_abs, info.filename))
+            # dest_abs itself is fine (empty member); everything else must
             # sit strictly under it.
             if target != dest_abs and not target.startswith(dest_abs + os.sep):
                 raise ValueError(
-                    f"Refusing to extract zip entry outside destination: {member!r}")
+                    f"Refusing to extract zip entry outside destination: "
+                    f"{info.filename!r}")
         zf.extractall(dest_abs)
 
 
@@ -90,13 +127,17 @@ def _pics_root_within(extract_dir: str) -> str:
     under a single top-level directory. Detect that case and descend one
     level so users don't have to re-zip. Otherwise use `extract_dir` as-is.
 
-    A lone directory whose name matches the endpoint pattern is left alone:
-    it IS the per-endpoint subdir the reader is looking for, not a wrapper,
-    and drilling in would demote its per-endpoint PICS to device-wide PICS.
+    Known archive-metadata entries (`__MACOSX/`, `.DS_Store`, ...) are
+    ignored when counting; without this a macOS-Finder zip would look like
+    a multi-entry archive (payload + `__MACOSX/`) and never unwrap. A lone
+    directory whose name matches the endpoint pattern is left alone: it IS
+    the per-endpoint subdir the reader is looking for, not a wrapper, and
+    drilling in would demote its per-endpoint PICS to device-wide PICS.
     """
     if glob.glob(os.path.join(extract_dir, '*.xml')):
         return extract_dir
-    entries = os.listdir(extract_dir)
+    entries = [e for e in os.listdir(extract_dir)
+               if e not in _ARCHIVE_METADATA_ENTRIES]
     if len(entries) == 1:
         only = os.path.join(extract_dir, entries[0])
         if os.path.isdir(only) and not _ENDPOINT_DIR_PATTERN.match(entries[0]):
