@@ -229,6 +229,33 @@ TEST(TestTxtFields, TestGetDeviceType)
     EXPECT_EQ(GetDeviceType(GetSpan(dt)), 0u);
 }
 
+// TXT numeric values are strict decimal ASCII per the spec. A leading sign or
+// whitespace is not a digit and must be rejected rather than silently accepted
+// by strtoul() (e.g. "+5"/" 5" must not parse as 5).
+TEST(TestTxtFields, TestNumericDecimalStrictness)
+{
+    char buf[64];
+
+    strcpy(buf, "+5");
+    EXPECT_EQ(GetLongDiscriminator(GetSpan(buf)), 0);
+    strcpy(buf, " 5");
+    EXPECT_EQ(GetLongDiscriminator(GetSpan(buf)), 0);
+    strcpy(buf, "-5");
+    EXPECT_EQ(GetLongDiscriminator(GetSpan(buf)), 0);
+
+    strcpy(buf, "+5");
+    EXPECT_EQ(GetDeviceType(GetSpan(buf)), 0u);
+    strcpy(buf, " 5");
+    EXPECT_EQ(GetDeviceType(GetSpan(buf)), 0u);
+
+    strcpy(buf, "+1");
+    EXPECT_EQ(GetCommissioningMode(GetSpan(buf)), 0);
+
+    // A well-formed decimal value is still accepted.
+    strcpy(buf, "5");
+    EXPECT_EQ(GetLongDiscriminator(GetSpan(buf)), 5);
+}
+
 TEST(TestTxtFields, TestGetDeviceName)
 {
     char name[kMaxDeviceNameLen + 1] = "";
