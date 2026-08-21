@@ -79,8 +79,8 @@ class _BasePicsFacts(BasePicsFacts):
 
 
 def _extract_event_id(item_number: str | None) -> int | None:
-    """Parse the event id from a PICS itemNumber like 'ACL.S.E01'.
-
+    """
+    Parse the event id from a PICS itemNumber like 'ACL.S.E01'.
     Returns None if item_number is missing or doesn't end in '.E<hex>'.
     """
     if not item_number:
@@ -167,7 +167,7 @@ def GenerateBasePicsXmlFile(facts: _BasePicsFacts, outputPathStr: str) -> None:
     # block by streaming raw lines until we hit the root <generalPICS>, then
     # writing the parsed tree. Matches the style used by GenerateDevicePicsXmlFiles.
     output_file_path = Path(outputPathStr) / _BASE_PICS_TEMPLATE_FILENAME
-    with (open(template_path) as inputFile,
+    with (open(template_path, encoding='utf-8') as inputFile,
           open(output_file_path, "wb") as outputFile):
         header = ""
         line = inputFile.readline()
