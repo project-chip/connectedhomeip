@@ -209,20 +209,45 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoin
 
     while (it->Next(&interfaceId, &addressType))
     {
+        // GetInterfaceName leaves the buffer untouched when it fails, and it fails for exactly the
+        // interface this loop is about to have trouble with: one that has gone away since the
+        // iterator listed it. Name it the way BroadcastImpl below does rather than logging
+        // whatever the stack happened to hold.
+        char interfaceName[chip::Inet::InterfaceId::kMaxIfNameLength];
+        if (interfaceId.GetInterfaceName(interfaceName, sizeof(interfaceName)) != CHIP_NO_ERROR)
+        {
+            strcpy(interfaceName, "???");
+        }
+
+        // Running out of endpoints is a global resource problem rather than something about this
+        // interface, and skipping interfaces would not make it any better, so it stays fatal.
         chip::Inet::UDPEndPointHandle listenUdp;
         ReturnErrorOnFailure(udpEndPointManager->NewEndPoint(listenUdp));
 
-        ReturnErrorOnFailure(listenUdp->Bind(addressType, chip::Inet::IPAddress::Any, port, interfaceId));
+        // Binding and listening, on the other hand, are per-interface: an interface the iterator
+        // reports as usable can still fail here, for instance while it is being reconfigured.
+        // Failing the whole call would leave the server with no endpoints at all, so skip that
+        // interface and keep the ones that do work.
+        CHIP_ERROR err = listenUdp->Bind(addressType, chip::Inet::IPAddress::Any, port, interfaceId);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "MDNS failed to bind to %s for address type %s: %" CHIP_ERROR_FORMAT, interfaceName,
+                         AddressTypeStr(addressType), err.Format());
+            continue;
+        }
 
-        ReturnErrorOnFailure(listenUdp->Listen(OnUdpPacketReceived, nullptr /*OnReceiveError*/, this));
+        err = listenUdp->Listen(OnUdpPacketReceived, nullptr /*OnReceiveError*/, this);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "MDNS failed to listen on %s for address type %s: %" CHIP_ERROR_FORMAT, interfaceName,
+                         AddressTypeStr(addressType), err.Format());
+            continue;
+        }
 
-        CHIP_ERROR err = listenUdp->JoinMulticastGroup(interfaceId, BroadcastIpAddresses::Get(addressType));
+        err = listenUdp->JoinMulticastGroup(interfaceId, BroadcastIpAddresses::Get(addressType));
 
         if (err != CHIP_NO_ERROR)
         {
-            char interfaceName[chip::Inet::InterfaceId::kMaxIfNameLength];
-            TEMPORARY_RETURN_IGNORED interfaceId.GetInterfaceName(interfaceName, sizeof(interfaceName));
-
             // Log only as non-fatal error. Failure to join will mean we reply to unicast queries only.
             ChipLogError(DeviceLayer, "MDNS failed to join multicast group on %s for address type %s: %" CHIP_ERROR_FORMAT,
                          interfaceName, AddressTypeStr(addressType), err.Format());
@@ -236,27 +261,49 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoin
         //   - has a *DRAWBACK* of unicast queries being considered LEGACY by mdns since they do
         //     not originate from 5353 and the answers will include a query section.
         chip::Inet::UDPEndPointHandle unicastQueryUdp;
-        ReturnErrorOnFailure(udpEndPointManager->NewEndPoint(unicastQueryUdp));
-        ReturnErrorOnFailure(unicastQueryUdp->Bind(addressType, chip::Inet::IPAddress::Any, 0, interfaceId));
-        ReturnErrorOnFailure(unicastQueryUdp->Listen(OnUdpPacketReceived, nullptr /*OnReceiveError*/, this));
+        err = udpEndPointManager->NewEndPoint(unicastQueryUdp);
+        if (err == CHIP_NO_ERROR)
+        {
+            err = unicastQueryUdp->Bind(addressType, chip::Inet::IPAddress::Any, 0, interfaceId);
+        }
+        if (err == CHIP_NO_ERROR)
+        {
+            err = unicastQueryUdp->Listen(OnUdpPacketReceived, nullptr /*OnReceiveError*/, this);
+        }
+        if (err != CHIP_NO_ERROR)
+        {
+            // The unicast query port is an optimisation on top of the multicast endpoint, so
+            // giving up here would throw away an endpoint that already works. Answer legacy
+            // unicast queries from port 5353 instead.
+            ChipLogError(DeviceLayer, "MDNS failed to open a unicast query port on %s for address type %s: %" CHIP_ERROR_FORMAT,
+                         interfaceName, AddressTypeStr(addressType), err.Format());
+            unicastQueryUdp.Release();
+        }
 #endif
 
 #if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
-        if (listenUdp || unicastQueryUdp)
+        bool interfaceIsListening = listenUdp || unicastQueryUdp;
+        if (interfaceIsListening)
         {
-            // If allocation fails, the rref will not be consumed, so that the endpoint will also be freed correctly
-            mEndpoints.CreateObject(interfaceId, addressType, std::move(listenUdp), std::move(unicastQueryUdp));
+            // If allocation fails, the rref will not be consumed, so that the endpoint will also be freed correctly.
+            // An interface whose endpoint could not be registered is not listening.
+            interfaceIsListening =
+                mEndpoints.CreateObject(interfaceId, addressType, std::move(listenUdp), std::move(unicastQueryUdp)) != nullptr;
         }
 #else
-        if (listenUdp)
+        bool interfaceIsListening = static_cast<bool>(listenUdp);
+        if (interfaceIsListening)
         {
-            // If allocation fails, the rref will not be consumed, so that the endpoint will also be freed correctly
-            mEndpoints.CreateObject(interfaceId, addressType, std::move(listenUdp));
+            // If allocation fails, the rref will not be consumed, so that the endpoint will also be freed correctly.
+            // An interface whose endpoint could not be registered is not listening.
+            interfaceIsListening = mEndpoints.CreateObject(interfaceId, addressType, std::move(listenUdp)) != nullptr;
         }
 #endif
 
         // If at least one IPv6 interface is used by the mDNS server, notify the application that DNS-SD is ready.
-        if (!mIsInitialized && addressType == chip::Inet::IPAddressType::kIPv6)
+        // Only once an interface actually has an endpoint: now that a failure here is survivable, reaching this
+        // point is no longer proof that one was created.
+        if (interfaceIsListening && !mIsInitialized && addressType == chip::Inet::IPAddressType::kIPv6)
         {
 #if !CHIP_DEVICE_LAYER_NONE
             chip::DeviceLayer::ChipDeviceEvent event{};
