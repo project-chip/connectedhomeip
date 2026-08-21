@@ -19,45 +19,59 @@
 @implementation MTRDeviceTestDelegate
 - (void)device:(MTRDevice *)device stateChanged:(MTRDeviceState)state
 {
-    if (state == MTRDeviceStateReachable && self.onReachable != nil) {
-        self.onReachable();
-    } else if (state != MTRDeviceStateReachable && self.onNotReachable != nil) {
-        self.onNotReachable();
+    // Snapshot atomic block-property to a local before nil-check + invoke,
+    // so the getter's block-copy can't race a concurrent writer that resets
+    // the property to nil between the check and the call.
+    if (state == MTRDeviceStateReachable) {
+        dispatch_block_t block = self.onReachable;
+        if (block != nil) {
+            block();
+        }
+    } else {
+        dispatch_block_t block = self.onNotReachable;
+        if (block != nil) {
+            block();
+        }
     }
 }
 
 - (void)_deviceInternalStateChanged:(MTRDevice *)device
 {
-    if (self.onInternalStateChanged != nil) {
-        self.onInternalStateChanged();
+    dispatch_block_t block = self.onInternalStateChanged;
+    if (block != nil) {
+        block();
     }
 }
 
 - (void)device:(MTRDevice *)device receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
 {
-    if (self.onAttributeDataReceived != nil) {
-        self.onAttributeDataReceived(attributeReport);
+    MTRDeviceTestDelegateDataHandler handler = self.onAttributeDataReceived;
+    if (handler != nil) {
+        handler(attributeReport);
     }
 }
 
 - (void)device:(MTRDevice *)device receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
 {
-    if (self.onEventDataReceived != nil) {
-        self.onEventDataReceived(eventReport);
+    MTRDeviceTestDelegateDataHandler handler = self.onEventDataReceived;
+    if (handler != nil) {
+        handler(eventReport);
     }
 }
 
 - (void)unitTestReportBeginForDevice:(MTRDevice *)device
 {
-    if (self.onReportBegin != nil) {
-        self.onReportBegin();
+    dispatch_block_t block = self.onReportBegin;
+    if (block != nil) {
+        block();
     }
 }
 
 - (void)unitTestReportEndForDevice:(MTRDevice *)device
 {
-    if (self.onReportEnd != nil) {
-        self.onReportEnd();
+    dispatch_block_t block = self.onReportEnd;
+    if (block != nil) {
+        block();
     }
 }
 
@@ -73,8 +87,9 @@
 
 - (void)deviceCachePrimed:(MTRDevice *)device
 {
-    if (self.onDeviceCachePrimed != nil) {
-        self.onDeviceCachePrimed();
+    dispatch_block_t block = self.onDeviceCachePrimed;
+    if (block != nil) {
+        block();
     }
 }
 
@@ -90,8 +105,9 @@
 
 - (void)deviceConfigurationChanged:(MTRDevice *)device
 {
-    if (self.onDeviceConfigurationChanged != nil) {
-        self.onDeviceConfigurationChanged();
+    dispatch_block_t block = self.onDeviceConfigurationChanged;
+    if (block != nil) {
+        block();
     }
 }
 
@@ -100,24 +116,38 @@
     return self.pretendThreadEnabled;
 }
 
+// Tests that mock Thread (pretendThreadEnabled) but want to opt out of the
+// 1s first-Thread-subscribe coldstart deferral can set
+// suppressFirstThreadSubscribeDeferral = YES.  Subscription-pool ordering
+// tests in MTRPerControllerStorageTests rely on the pre-deferral scheduling
+// behavior; the deferral tests in MTRDeviceTests do not set this flag and so
+// continue to exercise the deferral path.  See PR #72268.
+- (BOOL)unitTestSuppressFirstThreadSubscribeDeferral:(MTRDevice *)device
+{
+    return self.suppressFirstThreadSubscribeDeferral;
+}
+
 - (void)unitTestSubscriptionPoolDequeue:(MTRDevice *)device
 {
-    if (self.onSubscriptionPoolDequeue != nil) {
-        self.onSubscriptionPoolDequeue();
+    dispatch_block_t block = self.onSubscriptionPoolDequeue;
+    if (block != nil) {
+        block();
     }
 }
 
 - (void)unitTestSubscriptionPoolWorkComplete:(MTRDevice *)device
 {
-    if (self.onSubscriptionPoolWorkComplete != nil) {
-        self.onSubscriptionPoolWorkComplete();
+    dispatch_block_t block = self.onSubscriptionPoolWorkComplete;
+    if (block != nil) {
+        block();
     }
 }
 
 - (void)unitTestClusterDataPersisted:(MTRDevice *)device
 {
-    if (self.onClusterDataPersisted != nil) {
-        self.onClusterDataPersisted();
+    dispatch_block_t block = self.onClusterDataPersisted;
+    if (block != nil) {
+        block();
     }
 }
 
@@ -132,22 +162,25 @@
 
 - (void)unitTestSubscriptionCallbackDeleteForDevice:(MTRDevice *)device
 {
-    if (self.onSubscriptionCallbackDelete != nil) {
-        self.onSubscriptionCallbackDelete();
+    dispatch_block_t block = self.onSubscriptionCallbackDelete;
+    if (block != nil) {
+        block();
     }
 }
 
 - (void)unitTestSubscriptionResetForDevice:(MTRDevice *)device
 {
-    if (self.onSubscriptionReset != nil) {
-        self.onSubscriptionReset();
+    dispatch_block_t block = self.onSubscriptionReset;
+    if (block != nil) {
+        block();
     }
 }
 
 - (void)unitTestSetUTCTimeInvokedForDevice:(MTRDevice *)device error:(NSError * _Nullable)error
 {
-    if (self.onUTCTimeSet != nil) {
-        self.onUTCTimeSet(error);
+    MTRDeviceTestDelegateHandler handler = self.onUTCTimeSet;
+    if (handler != nil) {
+        handler(error);
     }
 }
 
@@ -163,8 +196,9 @@
 
 - (void)unitTestTimeSynchronizationLossDetectedForDevice:(MTRDevice *)device
 {
-    if (self.onTimeSynchronizationLossDetected != nil) {
-        self.onTimeSynchronizationLossDetected();
+    dispatch_block_t block = self.onTimeSynchronizationLossDetected;
+    if (block != nil) {
+        block();
     }
 }
 
