@@ -122,6 +122,44 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 - (nullable instancetype)initWithPayload:(NSString *)payload MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
+ * Initializes the payload object from the provided QR Code or Manual Pairing
+ * Code string, reporting a fine-grained error on failure.
+ *
+ * Returns nil and populates `error` (if non-nil) if the string is not a valid
+ * payload. The returned error is in MTRErrorDomain and PRESERVES the underlying
+ * parse-failure code rather than flattening it: in particular, a Manual Pairing
+ * Code with an incorrect Verhoeff check digit reports
+ * `MTRErrorCodeIntegrityCheckFailed`, letting a commissioning UI distinguish a
+ * mistyped setup code from other parse failures.
+ *
+ * This is the error-bearing counterpart of -initWithPayload:. Unlike the
+ * deprecated +setupPayloadWithOnboardingPayload:error:, it does not flatten all
+ * failures to MTRErrorCodeInvalidArgument.
+ *
+ * @note MTRErrorCodeInvalidArgument may still be returned for structurally
+ *       valid payloads whose contents fail semantic validation.
+ */
+- (nullable instancetype)initWithPayload:(NSString *)payload
+                                   error:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * Initializes the payload object from the provided Manual Pairing Code string.
+ *
+ * Returns nil and populates `error` (if non-nil) if the string is not a valid
+ * Manual Pairing Code. The returned error is in MTRErrorDomain; in particular,
+ * a Manual Pairing Code with an incorrect Verhoeff check digit will report
+ * `MTRErrorCodeIntegrityCheckFailed`, allowing callers to distinguish a
+ * mistyped setup code from other parse failures.
+ *
+ * @note MTRErrorCodeInvalidArgument may still be returned for structurally
+ *       valid manual codes (e.g. correct Verhoeff digit) whose contents fail
+ *       semantic validation, distinct from MTRErrorCodeIntegrityCheckFailed
+ *       which indicates a check-digit failure.
+ */
+- (nullable instancetype)initWithManualPairingCode:(NSString *)manualCode
+                                             error:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
+/**
  * Whether this object represents a concatenated QR Code payload consisting
  * of two or more underlying payloads. If YES, then:
  *
