@@ -109,7 +109,16 @@ CHIP_ERROR ASN1Reader::GetObjectId(OID & oid)
 {
     VerifyOrReturnError(Value != nullptr, ASN1_ERROR_INVALID_STATE);
     VerifyOrReturnError(ValueLen >= 1, ASN1_ERROR_INVALID_ENCODING);
-    VerifyOrReturnError(mElemStart + mHeadLen + ValueLen <= mContainerEnd, ASN1_ERROR_UNDERRUN);
+    // Mirrors the guard sequence in ASN1Reader::Next() and the other Get* accessors: (1) reject
+    // inconsistent state where mContainerEnd < mElemStart (without this the size_t-widened
+    // subtraction below would underflow to a huge value and the bounds compare would trivially
+    // pass), (2) reject mHeadLen + ValueLen wrap on 32-bit targets where size_t == uint32_t,
+    // (3) bounds-check in integer space instead of pointer space, since mElemStart + mHeadLen +
+    // ValueLen can wrap past the end of the address space on 64-bit targets before the compare runs.
+    VerifyOrReturnError(mContainerEnd >= mElemStart, ASN1_ERROR_INVALID_STATE);
+    VerifyOrReturnError(mHeadLen <= UINT32_MAX - ValueLen, ASN1_ERROR_LENGTH_OVERFLOW);
+    VerifyOrReturnError(static_cast<size_t>(mHeadLen) + ValueLen <= static_cast<size_t>(mContainerEnd - mElemStart),
+                        ASN1_ERROR_UNDERRUN);
     VerifyOrReturnError(CanCastTo<uint16_t>(ValueLen), ASN1_ERROR_INVALID_ENCODING);
     oid = ParseObjectID(Value, static_cast<uint16_t>(ValueLen));
     return CHIP_NO_ERROR;
