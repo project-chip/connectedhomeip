@@ -1148,7 +1148,7 @@ void CommandHandlerImpl::TriggerDelayReport(const InvokeRequestMessage::DelayRep
     if (aDelayReportData.delayJitterWindowMs > 0)
     {
         delayMs += (chip::Crypto::GetRandU32() % aDelayReportData.delayJitterWindowMs);
-    }
+    // An empty targetedEndpoints span indicates a global deferral across all endpoints on the node for groupcast requests.
     Span<const EndpointId> targetedEndpoints =
         IsGroupRequest() ? Span<const EndpointId>() : Span<const EndpointId>(mTargetedEndpoints, mNumTargetedEndpoints);
     mpCallback->OnDelayReport(System::Clock::Milliseconds32(delayMs), targetedEndpoints);
