@@ -1154,6 +1154,8 @@ private:
 
     bool IsAttestationInformationMissing(const CommissioningParameters & params);
 
+    void CommissioningInitialPhaseComplete(DeviceProxy * device);
+
 #if CHIP_SUPPORT_THREAD_MESHCOP
     CHIP_ERROR PairThreadMeshcop(RendezvousParameters & rendezvousParams, CommissioningParameters & commissioningParams);
 

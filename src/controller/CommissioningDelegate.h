@@ -74,6 +74,7 @@ enum CommissioningStage : uint8_t
     kFailsafeBeforeThreadEnable,   ///< Extend the fail-safe before doing kThreadNetworkEnable
     kWiFiNetworkEnable,            ///< Send ConnectNetwork (0x31:6) command to the device for the WiFi network
     kThreadNetworkEnable,          ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
+    kInitialPhaseComplete,         ///< Initial phase of commissioning completed.
     kEvictPreviousCaseSessions,    ///< Evict previous stale case sessions from a commissioned device with this node ID before
     kFindOperationalForStayActive, ///< Perform operational discovery and establish a CASE session with the device for ICD
                                    ///< StayActive command
@@ -100,9 +101,6 @@ enum CommissioningStage : uint8_t
     kRequestWiFiCredentials,          ///< Wi-Fi credentials are needed; ask for those.
     kRequestThreadCredentials,        ///< Thread credentials are needed; ask for those.
     kCleanup,                         ///< Call delegates with status, free memory, clear timers and state.
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
-    kUnpoweredPhaseComplete, ///< Commissioning completed until connect network for unpowered commissioning (NFC)
-#endif
 };
 
 enum class ICDRegistrationStrategy : uint8_t
