@@ -735,7 +735,7 @@ bool ICDManager::Contains(Span<const Access::SubjectDescriptor> list, const Acce
     for (const auto & item : list)
     {
         if (item.fabricIndex == value.fabricIndex && item.authMode == value.authMode && item.subject == value.subject &&
-            item.cats.values == value.cats.values && item.isCommissioning == value.isCommissioning)
+            item.cats == value.cats && item.isCommissioning == value.isCommissioning)
         {
             return true;
         }

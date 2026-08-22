@@ -317,9 +317,9 @@ void ThreadStackManagerImpl::_ErasePersistentInfo()
 bool ThreadStackManagerImpl::_IsThreadEnabled()
 {
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    if (mThreadEnabledForTest.has_value())
+    if (mThreadEnabledForTest.HasValue())
     {
-        return mThreadEnabledForTest.value();
+        return mThreadEnabledForTest.Value();
     }
 #endif
     VerifyOrReturnError(mProxy, false);

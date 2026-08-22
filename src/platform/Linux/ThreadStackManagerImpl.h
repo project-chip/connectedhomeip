@@ -22,10 +22,10 @@
 #else
 
 #include <memory>
-#include <optional>
 #include <vector>
 
 #include <app/icd/server/ICDServerConfig.h>
+#include <lib/core/Optional.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/openthread/DBusOpenthread.h>
@@ -49,11 +49,11 @@ public:
     ThreadStackManagerImpl();
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    void SetThreadEnabledForTest(bool enabled) { mThreadEnabledForTest = enabled; }
+    void SetThreadEnabledForTest(bool enabled) { mThreadEnabledForTest.SetValue(enabled); }
     void SetThreadAttachedForTest(bool attached) { mAttached = attached; }
     void ResetThreadStateForTest()
     {
-        mThreadEnabledForTest.reset();
+        mThreadEnabledForTest.ClearValue();
         mAttached = false;
     }
 #endif
@@ -180,7 +180,7 @@ private:
 
     bool mAttached;
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    std::optional<bool> mThreadEnabledForTest;
+    chip::Optional<bool> mThreadEnabledForTest;
 #endif
     uint8_t mExtendedAddress[8];
 };
