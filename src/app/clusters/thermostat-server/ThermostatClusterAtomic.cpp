@@ -78,7 +78,10 @@ void ClearTimer(AtomicWriteSession * session)
 ScopedNodeId GetSourceScopedNodeId(CommandHandler * commandObj)
 {
     ScopedNodeId sourceNodeId = ScopedNodeId();
-    auto sessionHandle        = commandObj->GetExchangeContext()->GetSessionHandle();
+    auto * exchangeContext    = commandObj->GetExchangeContext();
+    VerifyOrReturnValue(exchangeContext != nullptr, sourceNodeId);
+
+    auto sessionHandle = exchangeContext->GetSessionHandle();
 
     if (sessionHandle->IsSecureSession())
     {

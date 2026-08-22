@@ -18,6 +18,7 @@
 #pragma once
 
 #include "PresetStructWithOwnedMembers.h"
+#include "ScheduleStructWithOwnedMembers.h"
 #include "ThermostatSuggestionStructWithOwnedMembers.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -233,6 +234,98 @@ public:
      * @return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the schedule types list.
      */
     virtual CHIP_ERROR GetScheduleTypeAtIndex(size_t index, Structs::ScheduleTypeStruct::Type & scheduleType) = 0;
+
+    /**
+     * @brief Get the NumberOfSchedules attribute value.
+     *
+     * @return The max number of schedules supported. Return 0 if not set.
+     */
+    virtual uint8_t GetNumberOfSchedules() = 0;
+
+    /**
+     * @brief Get the NumberOfScheduleTransitions attribute value.
+     *
+     * @return The max number of schedule transitions supported across all schedules. Return 0 if not set.
+     */
+    virtual uint8_t GetNumberOfScheduleTransitions() = 0;
+
+    /**
+     * @brief Get the nullable NumberOfScheduleTransitionPerDay attribute value.
+     *
+     * @return The max number of schedule transitions supported per day, or null if there is no such limit.
+     */
+    virtual DataModel::Nullable<uint8_t> GetNumberOfScheduleTransitionsPerDay() = 0;
+
+    /**
+     * @brief Get the schedule at a given index in the Schedules attribute.
+     *
+     * @param[in] index The index of the schedule in the list.
+     * @param[out] schedule The ScheduleStructWithOwnedMembers struct that has the data from the schedule
+     *             at the given index in the Schedules attribute list.
+     * @return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the schedules list.
+     */
+    virtual CHIP_ERROR GetScheduleAtIndex(size_t index, ScheduleStructWithOwnedMembers & schedule) = 0;
+
+    /**
+     * @brief Get the ActiveScheduleHandle attribute value.
+     *
+     * @param[out] activeScheduleHandle The nullable MutableByteSpan to copy the active schedule handle into. On success,
+     *             the size of the activeScheduleHandle is updated to the length of the copied data.
+     */
+    virtual CHIP_ERROR GetActiveScheduleHandle(DataModel::Nullable<MutableByteSpan> & activeScheduleHandle) = 0;
+
+    /**
+     * @brief Set the ActiveScheduleHandle attribute value.
+     *
+     * @param[in] newActiveScheduleHandle The octet string to set the active schedule handle to.
+     */
+    virtual CHIP_ERROR SetActiveScheduleHandle(const DataModel::Nullable<ByteSpan> & newActiveScheduleHandle) = 0;
+
+    /**
+     * @brief Copies existing schedules to the pending schedule list
+     */
+    virtual void InitializePendingSchedules() = 0;
+
+    /**
+     * @brief Appends a schedule to the pending schedules list maintained by the delegate.
+     *        The delegate must ensure it makes a copy of the provided schedule and the data
+     *        of its schedule handle, if any. For example, it could create a ScheduleStructWithOwnedMembers
+     *        from the provided schedule.
+     *
+     * @param[in] schedule The schedule to add to the list.
+     *
+     * @return CHIP_NO_ERROR if the schedule was appended to the list successfully.
+     * @return CHIP_ERROR if there was an error adding the schedule to the list.
+     */
+    virtual CHIP_ERROR AppendToPendingScheduleList(const ScheduleStructWithOwnedMembers & schedule) = 0;
+
+    /**
+     * @brief Get the Schedule at a given index in the pending schedules list.
+     *
+     * @param[in] index The index of the schedule in the list.
+     * @param[out] schedule The ScheduleStructWithOwnedMembers struct that has the data from the pending schedule
+     *             list at the given index.
+     * @return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the pending schedules list.
+     */
+    virtual CHIP_ERROR GetPendingScheduleAtIndex(size_t index, ScheduleStructWithOwnedMembers & schedule) = 0;
+
+    /**
+     * @brief Updates the schedules attribute with the content of the pending schedules list. If the schedule in the pending
+     * schedules list matches i.e. has the same scheduleHandle as an existing entry in the Schedules attribute, the thermostat
+     * will update the entry with the new schedule values, otherwise it will add a new schedule to the Schedules attribute. For
+     * new schedules that get added, it is the responsibility of this API to allocate unique schedule handles to the schedules
+     * before saving the schedule. This will be called when the Thermostat receives a AtomicRequest command of type CommitWrite
+     * to commit the pending schedule changes.
+     *
+     * @return CHIP_NO_ERROR if the updates to the schedules attribute has been committed successfully.
+     * @return CHIP_ERROR if the updates to the schedules attribute failed to commit for some reason.
+     */
+    virtual CHIP_ERROR CommitPendingSchedules() = 0;
+
+    /**
+     * @brief Clears the pending schedules list.
+     */
+    virtual void ClearPendingScheduleList() = 0;
 
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
 

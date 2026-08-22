@@ -196,8 +196,51 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel:
         }
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
-    case Schedules::Id:
+    case Schedules::Id: {
+
+        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        // Schedules are not editable, return INVALID_IN_STATE.
+        VerifyOrReturnError(mAtomicWriteSession.InAtomicWrite(MakeOptional(attributeId)), CHIP_IM_GLOBAL_STATUS(InvalidInState),
+                            ChipLogError(Zcl, "Schedules are not editable"));
+
+        // OK, we're in an atomic write, make sure the requesting node is the same one that started the atomic write,
+        // otherwise return BUSY.
+        if (!mAtomicWriteSession.InAtomicWrite(subjectDescriptor, MakeOptional(attributeId)))
+        {
+            ChipLogError(Zcl, "Another node is editing schedules. Server is busy. Try again later");
+            return CHIP_IM_GLOBAL_STATUS(Busy);
+        }
+
+        // If the list operation is replace all, clear the existing pending list, iterate over the new schedules list
+        // and add to the pending schedules list.
+        if (!request.path.IsListOperation() || request.path.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
+        {
+            // Clear the pending schedules list
+            mDelegate->ClearPendingScheduleList();
+
+            Schedules::TypeInfo::DecodableType newSchedulesList;
+            ReturnErrorOnFailure(decoder.Decode(newSchedulesList));
+
+            // Iterate over the schedules and call the delegate to append to the list of pending schedules.
+            auto iter = newSchedulesList.begin();
+            while (iter.Next())
+            {
+                const ScheduleStruct::DecodableType & schedule = iter.GetValue();
+                ReturnErrorOnFailure(AppendPendingSchedule(schedule));
+            }
+            return iter.GetStatus();
+        }
+
+        // If the list operation is AppendItem, call the delegate to append the item to the list of pending schedules.
+        if (request.path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+        {
+            ScheduleStruct::DecodableType schedule;
+            ReturnErrorOnFailure(decoder.Decode(schedule));
+            return AppendPendingSchedule(schedule);
+        }
         return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
     default: {
         if (mAtomicWriteSession.InAtomicWrite(subjectDescriptor))
         {

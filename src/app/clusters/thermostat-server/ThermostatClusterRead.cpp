@@ -158,11 +158,24 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         ReturnErrorOnFailure(encoder.Encode(mDelegate->GetNumberOfPresets()));
     }
     break;
-    case NumberOfSchedules::Id:
-    case NumberOfScheduleTransitions::Id:
-    case NumberOfScheduleTransitionPerDay::Id:
-        // TODO: implement number of schedules
-        return Status::UnsupportedAttribute;
+    case NumberOfSchedules::Id: {
+        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        ReturnErrorOnFailure(encoder.Encode(mDelegate->GetNumberOfSchedules()));
+    }
+    break;
+    case NumberOfScheduleTransitions::Id: {
+        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        ReturnErrorOnFailure(encoder.Encode(mDelegate->GetNumberOfScheduleTransitions()));
+    }
+    break;
+    case NumberOfScheduleTransitionPerDay::Id: {
+        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        ReturnErrorOnFailure(encoder.Encode(mDelegate->GetNumberOfScheduleTransitionsPerDay()));
+    }
+    break;
     case ActivePresetHandle::Id: {
         VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
@@ -176,9 +189,19 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         ReturnErrorOnFailure(encoder.Encode(activePresetHandle));
     }
     break;
-    case ActiveScheduleHandle::Id:
-        // TODO: implement active schedule handle
-        return Status::UnsupportedAttribute;
+    case ActiveScheduleHandle::Id: {
+        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        uint8_t buffer[kScheduleHandleSize];
+        MutableByteSpan activeScheduleHandleSpan(buffer);
+        auto activeScheduleHandle = DataModel::MakeNullable(activeScheduleHandleSpan);
+
+        CHIP_ERROR err = mDelegate->GetActiveScheduleHandle(activeScheduleHandle);
+        ReturnErrorOnFailure(err);
+
+        ReturnErrorOnFailure(encoder.Encode(activeScheduleHandle));
+    }
+    break;
     case Presets::Id: {
         VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
@@ -216,8 +239,39 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
     }
     break;
     case Schedules::Id: {
-        // TODO: Implement schedule list
-        return encoder.EncodeList([](const auto & enc) -> CHIP_ERROR { return CHIP_NO_ERROR; });
+        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        auto & delegate          = mDelegate;
+        auto & subjectDescriptor = encoder.GetSubjectDescriptor();
+        if (mAtomicWriteSession.InAtomicWrite(subjectDescriptor, MakeOptional(request.path.mAttributeId)))
+        {
+            return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
+                for (uint8_t i = 0; true; i++)
+                {
+                    ScheduleStructWithOwnedMembers schedule;
+                    auto err = delegate->GetPendingScheduleAtIndex(i, schedule);
+                    if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                    {
+                        return CHIP_NO_ERROR;
+                    }
+                    ReturnErrorOnFailure(err);
+                    ReturnErrorOnFailure(enc.Encode(schedule));
+                }
+            });
+        }
+        return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
+            for (uint8_t i = 0; true; i++)
+            {
+                ScheduleStructWithOwnedMembers schedule;
+                auto err = delegate->GetScheduleAtIndex(i, schedule);
+                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                ReturnErrorOnFailure(err);
+                ReturnErrorOnFailure(enc.Encode(schedule));
+            }
+        });
     }
     break;
     case SetpointHoldExpiryTimestamp::Id: {

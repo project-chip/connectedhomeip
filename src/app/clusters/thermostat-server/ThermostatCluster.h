@@ -218,6 +218,24 @@ private:
 
     chip::Protocols::InteractionModel::Status PrecommitPresets();
 
+    /**
+     * @brief Set the Active Schedule to a given schedule handle, or null
+     *
+     * @param scheduleHandle The handle of the schedule to set active, or null to clear the active schedule
+     * @return Success if the active schedule was updated, an error code if not
+     */
+    Protocols::InteractionModel::Status SetActiveSchedule(DataModel::Nullable<ByteSpan> scheduleHandle);
+
+    /**
+     * @brief Apply a schedule to the pending lists of schedules during an atomic write
+     *
+     * @param schedule The schedule to append
+     * @return CHIP_NO_ERROR if successful, an error code if not
+     */
+    CHIP_ERROR AppendPendingSchedule(const Structs::ScheduleStruct::DecodableType & schedule);
+
+    chip::Protocols::InteractionModel::Status PrecommitSchedules();
+
     void GenerateSetpointEvent(AttributeId attributeId, temperature oldTemp, temperature newTemp);
 
     std::optional<DataModel::ActionReturnStatus>
