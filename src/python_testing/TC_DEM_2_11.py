@@ -144,9 +144,8 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
         self.step("6b", "TH reads ESAState", expectation="value is 0x04 (PowerAdjustActive)")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPowerAdjustActive)
 
-        self.step("7", "Wait 5 seconds", expectation="Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=NormalCompletion")
-        await asyncio.sleep(5)
-        event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustEnd)
+        self.step("7", "Wait up to 10 seconds", expectation="Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=NormalCompletion")
+        event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustEnd, timeout_sec=10)
         asserts.assert_equal(event_data.cause, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kNormalCompletion)
 
         self.step("7a", "TH reads PowerRangeAdjustment", expectation="value is null")
@@ -189,9 +188,8 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
         self.step("11a", "TH reads ESAState", expectation="value is 0x04 (PowerAdjustActive)")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPowerAdjustActive)
 
-        self.step("11b", "Wait 5 seconds", expectation="Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=NormalCompletion")
-        await asyncio.sleep(5)
-        event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustEnd)
+        self.step("11b", "Wait up to 10 seconds", expectation="Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=NormalCompletion")
+        event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustEnd, timeout_sec=10)
         asserts.assert_equal(event_data.cause, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kNormalCompletion)
 
         self.step("11c", "TH reads PowerRangeAdjustment", expectation="value is null")
@@ -210,9 +208,8 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
         self.step("12a", "TH reads ESAState", expectation="value is 0x04 (PowerAdjustActive)")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPowerAdjustActive)
 
-        self.step("12b", "Wait 5 seconds", expectation="Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=NormalCompletion")
-        await asyncio.sleep(5)
-        event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustEnd)
+        self.step("12b", "Wait up to 10 seconds", expectation="Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=NormalCompletion")
+        event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustEnd, timeout_sec=10)
         asserts.assert_equal(event_data.cause, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kNormalCompletion)
 
         self.step("12c", "TH reads PowerRangeAdjustment", expectation="value is null")
@@ -355,9 +352,9 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
         self.step("24a", "TH reads ESAState", expectation="value is 0x04 (PowerAdjustActive)")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPowerAdjustActive)
 
-        self.step("24b", "Wait 3 seconds",
-                  expectation="Time elapses (TH waits 3 seconds while LocalOptimization is still active)")
-        await asyncio.sleep(3)
+        self.step("24b", "Wait 2 seconds",
+                  expectation="Time elapses (TH waits 2 seconds while LocalOptimization is still active)")
+        await asyncio.sleep(2)
 
         self.step("25", "TH sends TestEventTrigger command to General Diagnostics Cluster for User Opt-out Local Optimization Test Event",
                   expectation="DUT responds with status SUCCESS and Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=UserOptOut")
