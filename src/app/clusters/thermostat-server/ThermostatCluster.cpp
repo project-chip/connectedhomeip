@@ -43,8 +43,8 @@ namespace Thermostat {
 ThermostatCluster::ThermostatCluster(EndpointId endpointId, BitFlags<Thermostat::Feature> features,
                                      const OptionalAttributes & optionalAttributes, const DefaultValues & defaultValues,
                                      FabricTable & fabricTable) :
-    DefaultServerCluster({ endpointId, Thermostat::Id }), mFeatures(features), mOptionalAttributes(optionalAttributes),
-    mDefaultValues(defaultValues), mFabricTable(fabricTable)
+    DefaultServerCluster({ endpointId, Thermostat::Id }),
+    mFeatures(features), mOptionalAttributes(optionalAttributes), mDefaultValues(defaultValues), mFabricTable(fabricTable)
 {
     mAtomicWriteSession.SetDelegate(this);
 }
