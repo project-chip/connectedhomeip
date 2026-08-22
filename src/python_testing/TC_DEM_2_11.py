@@ -145,7 +145,8 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPowerAdjustActive)
 
         self.step("7", "Wait up to 10 seconds", expectation="Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=NormalCompletion")
-        event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustEnd, timeout_sec=10)
+        event_data = events_callback.wait_for_event_report(
+            Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustEnd, timeout_sec=10)
         asserts.assert_equal(event_data.cause, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kNormalCompletion)
 
         self.step("7a", "TH reads PowerRangeAdjustment", expectation="value is null")
@@ -189,7 +190,8 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPowerAdjustActive)
 
         self.step("11b", "Wait up to 10 seconds", expectation="Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=NormalCompletion")
-        event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustEnd, timeout_sec=10)
+        event_data = events_callback.wait_for_event_report(
+            Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustEnd, timeout_sec=10)
         asserts.assert_equal(event_data.cause, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kNormalCompletion)
 
         self.step("11c", "TH reads PowerRangeAdjustment", expectation="value is null")
@@ -209,7 +211,8 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPowerAdjustActive)
 
         self.step("12b", "Wait up to 10 seconds", expectation="Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=NormalCompletion")
-        event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustEnd, timeout_sec=10)
+        event_data = events_callback.wait_for_event_report(
+            Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustEnd, timeout_sec=10)
         asserts.assert_equal(event_data.cause, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kNormalCompletion)
 
         self.step("12c", "TH reads PowerRangeAdjustment", expectation="value is null")
