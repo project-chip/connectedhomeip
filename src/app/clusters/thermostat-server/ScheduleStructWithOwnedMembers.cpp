@@ -219,9 +219,23 @@ ScheduleStructWithOwnedMembers::SetTransitions(const DataModel::List<const Sched
         return CHIP_ERROR_NO_MEMORY;
     }
 
+    // Validate every transition's preset handle size up front. SetTransitionAtIndex writes into transitionsData as it
+    // goes, so failing partway through would otherwise leave this object with a mix of old and new transitions even
+    // though the function reports an error.
+    for (const auto & transition : newTransitions)
+    {
+        if (transition.presetHandle.HasValue() && transition.presetHandle.Value().size() > kScheduleHandleSize)
+        {
+            ChipLogError(Zcl, "Failed to set Schedule transition preset handle. Size (%u) > allowed size (%u)",
+                         static_cast<unsigned>(transition.presetHandle.Value().size()), static_cast<unsigned>(kScheduleHandleSize));
+            return CHIP_ERROR_NO_MEMORY;
+        }
+    }
+
     size_t index = 0;
     for (const auto & transition : newTransitions)
     {
+        // Cannot fail: count and preset handle sizes were validated above.
         ReturnErrorOnFailure(SetTransitionAtIndex(index, transition));
         index++;
     }
@@ -233,10 +247,38 @@ ScheduleStructWithOwnedMembers::SetTransitions(const DataModel::List<const Sched
 CHIP_ERROR ScheduleStructWithOwnedMembers::SetTransitions(
     const DataModel::DecodableList<ScheduleTransitionStruct::DecodableType> & newTransitions)
 {
+    // Validate the transition count and every preset handle size up front (same rationale as the List<Type> overload
+    // above): SetTransitionAtIndex writes into transitionsData as it goes, so failing partway through would
+    // otherwise leave this object with a mix of old and new transitions even though the function reports an error.
+    {
+        size_t validatedCount = 0;
+        auto validateIter     = newTransitions.begin();
+        while (validateIter.Next())
+        {
+            if (validatedCount >= kScheduleTransitionsMax)
+            {
+                ChipLogError(Zcl, "Failed to set Schedule transitions. Count exceeds allowed count (%u)",
+                             static_cast<unsigned>(kScheduleTransitionsMax));
+                return CHIP_ERROR_NO_MEMORY;
+            }
+            const auto & transition = validateIter.GetValue();
+            if (transition.presetHandle.HasValue() && transition.presetHandle.Value().size() > kScheduleHandleSize)
+            {
+                ChipLogError(Zcl, "Failed to set Schedule transition preset handle. Size (%u) > allowed size (%u)",
+                             static_cast<unsigned>(transition.presetHandle.Value().size()),
+                             static_cast<unsigned>(kScheduleHandleSize));
+                return CHIP_ERROR_NO_MEMORY;
+            }
+            validatedCount++;
+        }
+        ReturnErrorOnFailure(validateIter.GetStatus());
+    }
+
     size_t index = 0;
     auto iter    = newTransitions.begin();
     while (iter.Next())
     {
+        // Cannot fail: count and preset handle sizes were validated above.
         ReturnErrorOnFailure(SetTransitionAtIndex(index, iter.GetValue()));
         index++;
     }

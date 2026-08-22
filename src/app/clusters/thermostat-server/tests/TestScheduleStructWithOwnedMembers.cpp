@@ -29,7 +29,7 @@ using namespace chip::app::Clusters::Thermostat::Structs;
 namespace {
 
 constexpr uint8_t kHandleData[] = { 0x01, 0x02, 0x03, 0x04 };
-constexpr char kNameData[]      = "Weekday schedule";
+constexpr CharSpan kNameData    = "Weekday schedule"_span;
 constexpr uint8_t kPresetData[] = { 0xAA, 0xBB };
 
 ScheduleTransitionStruct::Type MakeTransition(uint16_t transitionTime, const Optional<ByteSpan> & presetHandle = NullOptional)
@@ -48,7 +48,7 @@ ScheduleStruct::Type MakeFullSchedule(std::vector<ScheduleTransitionStruct::Type
     ScheduleStruct::Type schedule;
     schedule.scheduleHandle = DataModel::MakeNullable(ByteSpan(kHandleData));
     schedule.systemMode     = SystemModeEnum::kHeat;
-    schedule.name           = MakeOptional(CharSpan::fromCharString(kNameData));
+    schedule.name           = MakeOptional(kNameData);
     schedule.presetHandle   = MakeOptional(ByteSpan(kPresetData));
     schedule.builtIn        = DataModel::MakeNullable(true);
     schedule.transitions    = DataModel::List<const ScheduleTransitionStruct::Type>(storage.data(), storage.size());
@@ -76,7 +76,7 @@ TEST(TestScheduleStructWithOwnedMembers, ConstructFromTypeCopiesAllFields)
     EXPECT_TRUE(schedule.GetScheduleHandle().Value().data_equal(ByteSpan(kHandleData)));
     EXPECT_EQ(schedule.GetSystemMode(), SystemModeEnum::kHeat);
     ASSERT_TRUE(schedule.GetName().HasValue());
-    EXPECT_TRUE(schedule.GetName().Value().data_equal(CharSpan::fromCharString(kNameData)));
+    EXPECT_TRUE(schedule.GetName().Value().data_equal(kNameData));
     ASSERT_TRUE(schedule.GetPresetHandle().HasValue());
     EXPECT_TRUE(schedule.GetPresetHandle().Value().data_equal(ByteSpan(kPresetData)));
     ASSERT_FALSE(schedule.GetBuiltIn().IsNull());
@@ -87,7 +87,7 @@ TEST(TestScheduleStructWithOwnedMembers, ConstructFromTypeCopiesAllFields)
 
 TEST(TestScheduleStructWithOwnedMembers, CopyAssignmentDeepCopiesBuffers)
 {
-    std::vector<ScheduleTransitionStruct::Type> storage{ MakeTransition(600) };
+    std::vector<ScheduleTransitionStruct::Type> storage{ MakeTransition(600, MakeOptional(ByteSpan(kPresetData))) };
     ScheduleStruct::Type source = MakeFullSchedule(storage);
 
     // Use a temporary that goes out of scope so the copy cannot be aliasing the original's storage.
@@ -99,9 +99,11 @@ TEST(TestScheduleStructWithOwnedMembers, CopyAssignmentDeepCopiesBuffers)
 
     EXPECT_TRUE(copy.GetScheduleHandle().Value().data_equal(ByteSpan(kHandleData)));
     ASSERT_TRUE(copy.GetName().HasValue());
-    EXPECT_TRUE(copy.GetName().Value().data_equal(CharSpan::fromCharString(kNameData)));
+    EXPECT_TRUE(copy.GetName().Value().data_equal(kNameData));
     ASSERT_EQ(copy.GetTransitions().size(), 1u);
     EXPECT_EQ(copy.GetTransitions()[0].transitionTime, 600);
+    ASSERT_TRUE(copy.GetTransitions()[0].presetHandle.HasValue());
+    EXPECT_TRUE(copy.GetTransitions()[0].presetHandle.Value().data_equal(ByteSpan(kPresetData)));
 }
 
 TEST(TestScheduleStructWithOwnedMembers, SelfAssignmentIsNoOp)
@@ -143,7 +145,7 @@ TEST(TestScheduleStructWithOwnedMembers, SetNameTooLargeFails)
 TEST(TestScheduleStructWithOwnedMembers, SetNameClearsWhenNoValue)
 {
     ScheduleStructWithOwnedMembers schedule;
-    EXPECT_EQ(schedule.SetName(MakeOptional(CharSpan::fromCharString(kNameData))), CHIP_NO_ERROR);
+    EXPECT_EQ(schedule.SetName(MakeOptional(kNameData)), CHIP_NO_ERROR);
     EXPECT_TRUE(schedule.GetName().HasValue());
 
     EXPECT_EQ(schedule.SetName(Optional<CharSpan>()), CHIP_NO_ERROR);

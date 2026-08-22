@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include "ThermostatClusterSchedules.h"
 #include "ScheduleStructWithOwnedMembers.h"
 #include "ThermostatCluster.h"
 #include "ThermostatClusterEvents.h"
@@ -49,7 +48,7 @@ bool IsValidScheduleEntry(const ScheduleStructWithOwnedMembers & schedule)
     }
 
     // Ensure we have a valid SystemMode.
-    return (schedule.GetSystemMode() != SystemModeEnum::kUnknownEnumValue);
+    return (EnsureKnownEnumValue(schedule.GetSystemMode()) != SystemModeEnum::kUnknownEnumValue);
 }
 
 /**
@@ -92,9 +91,9 @@ bool MatchingPendingScheduleExists(Delegate * delegate, const ScheduleStructWith
 {
     VerifyOrReturnValue(delegate != nullptr, false);
 
+    ScheduleStructWithOwnedMembers schedule;
     for (uint8_t i = 0; true; i++)
     {
-        ScheduleStructWithOwnedMembers schedule;
         CHIP_ERROR err = delegate->GetPendingScheduleAtIndex(i, schedule);
 
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
@@ -201,12 +200,20 @@ uint8_t CountSchedulesInPendingListWithScheduleHandle(Delegate * delegate, const
     uint8_t count = 0;
     VerifyOrReturnValue(delegate != nullptr, count);
 
+    ScheduleStructWithOwnedMembers schedule;
     for (uint8_t i = 0; true; i++)
     {
-        ScheduleStructWithOwnedMembers schedule;
         auto err = delegate->GetPendingScheduleAtIndex(i, schedule);
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
+            return count;
+        }
         if (err != CHIP_NO_ERROR)
         {
+            ChipLogError(Zcl,
+                         "CountSchedulesInPendingListWithScheduleHandle: GetPendingScheduleAtIndex failed with error "
+                         "%" CHIP_ERROR_FORMAT,
+                         err.Format());
             return count;
         }
 
@@ -290,8 +297,6 @@ CHIP_ERROR ValidateTransitionsPerDay(Delegate * delegate, const ScheduleStructWi
     return CHIP_NO_ERROR;
 }
 
-} // namespace
-
 /**
  * @brief Checks if the given schedule handle is present in the schedules attribute
  * @param[in] delegate The delegate to use.
@@ -328,6 +333,8 @@ bool IsScheduleHandlePresentInSchedules(Delegate * delegate, const ByteSpan & sc
     }
     return false;
 }
+
+} // namespace
 
 Status ThermostatCluster::SetActiveSchedule(DataModel::Nullable<ByteSpan> scheduleHandle)
 {

@@ -39,6 +39,27 @@ constexpr uint8_t kTestMaxSchedules   = 2;
 constexpr uint8_t kTestMaxTransitions = 4;
 constexpr uint8_t kTestMaxPerDay      = 2;
 
+ScheduleTransitionStruct::Type MakeScheduleTransition(uint16_t transitionTime, ScheduleDayOfWeekBitmap day)
+{
+    ScheduleTransitionStruct::Type transition;
+    transition.transitionTime = transitionTime;
+    transition.dayOfWeek      = BitMask<ScheduleDayOfWeekBitmap>(day);
+    return transition;
+}
+
+ScheduleStruct::Type MakeSchedule(DataModel::Nullable<ByteSpan> handle, DataModel::Nullable<bool> builtIn, Optional<CharSpan> name,
+                                  DataModel::List<const ScheduleTransitionStruct::Type> transitions)
+{
+    ScheduleStruct::Type schedule;
+    schedule.scheduleHandle = handle;
+    schedule.systemMode     = SystemModeEnum::kHeat;
+    schedule.name           = name;
+    schedule.presetHandle   = NullOptional;
+    schedule.builtIn        = builtIn;
+    schedule.transitions    = transitions;
+    return schedule;
+}
+
 // A minimal Delegate double. Only the Schedule-related surface has real (array-backed) behavior; every other
 // method returns a safe "empty"/no-op value since these tests do not exercise Presets or ThermostatSuggestions.
 class TestDelegate : public Delegate
@@ -201,6 +222,7 @@ public:
     // "built-in schedules cannot be silently removed" rule has something to exercise.
     void SeedBuiltInSchedule(uint8_t handleByte)
     {
+        ASSERT_LT(mNumSchedules, MATTER_ARRAY_SIZE(mSchedules));
         ScheduleStructWithOwnedMembers schedule;
         schedule.SetSystemMode(SystemModeEnum::kHeat);
         const uint8_t handle[] = { handleByte };
@@ -225,9 +247,9 @@ private:
     uint8_t mNumPendingSchedules = 0;
     uint8_t mNextHandleValue     = 100;
 
-    uint8_t mActiveScheduleHandleData[kScheduleHandleSize];
-    size_t mActiveScheduleHandleSize = 0;
-    bool mActiveScheduleHandleIsNull = true;
+    uint8_t mActiveScheduleHandleData[kScheduleHandleSize] = { 0 };
+    size_t mActiveScheduleHandleSize                       = 0;
+    bool mActiveScheduleHandleIsNull                       = true;
 };
 
 struct TestThermostatClusterSchedules : public ::testing::Test
@@ -273,7 +295,7 @@ struct TestThermostatClusterSchedules : public ::testing::Test
         ASSERT_EQ(mFabricHelper.TearDownTestFabric(mFabricIndex), CHIP_NO_ERROR);
     }
 
-    // Runs a full atomic write cycle (BeginWrite -> mutate -> CommitWrite) against the Schedules attribute.
+    // Builds an AtomicRequest payload of the given request type targeting the Schedules attribute.
     Commands::AtomicRequest::Type MakeAtomicRequest(Globals::AtomicRequestTypeEnum requestType)
     {
         static const AttributeId kAttrs[] = { Schedules::Id };
@@ -282,6 +304,22 @@ struct TestThermostatClusterSchedules : public ::testing::Test
         request.attributeRequests = DataModel::List<const AttributeId>(kAttrs);
         request.timeout           = MakeOptional(static_cast<uint16_t>(3000));
         return request;
+    }
+
+    // `AtomicWriteSession::BeginAtomicWrite` records the write session's owning identity via
+    // `GetSourceScopedNodeId(commandObj)`, which reads the command's real exchange context.
+    // `chip::Testing::MockCommandHandler::GetExchangeContext()` always returns nullptr, so that identity is
+    // always the default `ScopedNodeId()` (NodeId 0 / FabricIndex 0), no matter what subject descriptor
+    // `MockCommandHandler` otherwise carries. `WriteAttribute()`'s `InAtomicWrite(subjectDescriptor, ...)`
+    // check only requires CASE auth mode plus a subject/fabricIndex pair that maps to that same default
+    // `ScopedNodeId()`, so a subject descriptor with CASE auth mode and the (default) zero subject/fabricIndex
+    // makes the two identities match. Call this after BeginWrite to drive the full
+    // `BeginWrite -> WriteAttribute -> CommitWrite` pipeline in a test.
+    void UseAtomicWriteOwnerIdentity()
+    {
+        Access::SubjectDescriptor identity;
+        identity.authMode = Access::AuthMode::kCase;
+        mTester.SetSubjectDescriptor(identity);
     }
 };
 
@@ -326,18 +364,6 @@ TEST_F(TestThermostatClusterSchedules, SetActiveScheduleRequestWithUnknownHandle
     ASSERT_TRUE(result.status.has_value());
     EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::InvalidCommand);
 }
-
-// NOTE: `AtomicWriteSession::BeginAtomicWrite` records the writer's identity from
-// `GetSourceScopedNodeId(commandObj)`, which is derived from the command's real transport session (a CASE/group
-// session peer node ID). `Testing::ClusterTester`'s `WriteAttribute()` derives its subject descriptor independently
-// (not tied to a session either). `chip::Testing::MockCommandHandler::GetExchangeContext()` always returns nullptr
-// by design, so the two identities can never be made to match here, and `WriteAttribute()` on `Schedules` after a
-// real `AtomicRequest`/BeginWrite always observes a different "owner" and gets rejected with Busy. This is a
-// pre-existing gap in the test harness shared with Presets (which has no atomic-write test coverage either), not
-// specific to the Schedules feature, so the full BeginWrite -> WriteAttribute -> CommitWrite round trip isn't
-// exercised here. What *is* covered below: the write-outside-atomic-write rejection, BeginWrite's wiring to
-// InitializePendingSchedules(), and Precommit's built-in-schedule-removal rule (via the public
-// OnAtomicWrite{Begin,Precommit} callbacks directly, which don't depend on session identity).
 
 TEST_F(TestThermostatClusterSchedules, WriteToSchedulesOutsideAtomicWriteIsRejected)
 {
@@ -389,6 +415,197 @@ TEST_F(TestThermostatClusterSchedules, PrecommitSucceedsWhenBuiltInScheduleIsPre
     // InitializePendingSchedules (called by OnAtomicWriteBegin) already copied the built-in schedule into the
     // pending list, so it is preserved by default.
     EXPECT_EQ(mCluster.OnAtomicWritePrecommit(Schedules::Id), Status::Success);
+}
+
+TEST_F(TestThermostatClusterSchedules, AppendPendingScheduleSucceedsAndAddsToPendingList)
+{
+    ASSERT_TRUE(mTester.Invoke(MakeAtomicRequest(Globals::AtomicRequestTypeEnum::kBeginWrite)).IsSuccess());
+    UseAtomicWriteOwnerIdentity();
+
+    ScheduleStruct::Type list[] = { MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
+                                                 DataModel::List<const ScheduleTransitionStruct::Type>()) };
+    auto writeStatus =
+        mTester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list), Testing::ListWritingPattern::ReplaceAll);
+    EXPECT_TRUE(writeStatus.IsSuccess());
+
+    ScheduleStructWithOwnedMembers pending;
+    ASSERT_EQ(mDelegate.GetPendingScheduleAtIndex(0, pending), CHIP_NO_ERROR);
+    // A null handle on input gets a handle auto-assigned by the delegate.
+    EXPECT_FALSE(pending.GetScheduleHandle().IsNull());
+}
+
+TEST_F(TestThermostatClusterSchedules, AppendPendingScheduleRejectsOversizedHandle)
+{
+    ASSERT_TRUE(mTester.Invoke(MakeAtomicRequest(Globals::AtomicRequestTypeEnum::kBeginWrite)).IsSuccess());
+    UseAtomicWriteOwnerIdentity();
+
+    uint8_t oversizedHandle[kScheduleHandleSize + 1] = {};
+    ScheduleStruct::Type list[] = { MakeSchedule(DataModel::MakeNullable(ByteSpan(oversizedHandle)), DataModel::NullNullable,
+                                                 NullOptional, DataModel::List<const ScheduleTransitionStruct::Type>()) };
+    auto writeStatus =
+        mTester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list), Testing::ListWritingPattern::ReplaceAll);
+    EXPECT_EQ(writeStatus, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+}
+
+TEST_F(TestThermostatClusterSchedules, AppendPendingScheduleRejectsOversizedName)
+{
+    ASSERT_TRUE(mTester.Invoke(MakeAtomicRequest(Globals::AtomicRequestTypeEnum::kBeginWrite)).IsSuccess());
+    UseAtomicWriteOwnerIdentity();
+
+    char oversizedName[kScheduleNameSize + 1];
+    memset(oversizedName, 'a', sizeof(oversizedName));
+    ScheduleStruct::Type list[] = { MakeSchedule(DataModel::NullNullable, DataModel::NullNullable,
+                                                 MakeOptional(CharSpan(oversizedName, sizeof(oversizedName))),
+                                                 DataModel::List<const ScheduleTransitionStruct::Type>()) };
+    auto writeStatus =
+        mTester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list), Testing::ListWritingPattern::ReplaceAll);
+    EXPECT_EQ(writeStatus, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+}
+
+TEST_F(TestThermostatClusterSchedules, AppendPendingScheduleRejectsWhenTotalTransitionsExceedMaximum)
+{
+    ASSERT_TRUE(mTester.Invoke(MakeAtomicRequest(Globals::AtomicRequestTypeEnum::kBeginWrite)).IsSuccess());
+    UseAtomicWriteOwnerIdentity();
+
+    // kTestMaxTransitions == 4; 5 transitions on 5 different days stays under the per-day limit (2) but exceeds
+    // the delegate's total transition budget.
+    ScheduleTransitionStruct::Type transitions[] = {
+        MakeScheduleTransition(0, ScheduleDayOfWeekBitmap::kSunday),
+        MakeScheduleTransition(0, ScheduleDayOfWeekBitmap::kMonday),
+        MakeScheduleTransition(0, ScheduleDayOfWeekBitmap::kTuesday),
+        MakeScheduleTransition(0, ScheduleDayOfWeekBitmap::kWednesday),
+        MakeScheduleTransition(0, ScheduleDayOfWeekBitmap::kThursday),
+    };
+    ScheduleStruct::Type list[] = { MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
+                                                 DataModel::List<const ScheduleTransitionStruct::Type>(transitions)) };
+    auto writeStatus =
+        mTester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list), Testing::ListWritingPattern::ReplaceAll);
+    EXPECT_EQ(writeStatus, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
+}
+
+TEST_F(TestThermostatClusterSchedules, AppendPendingScheduleRejectsWhenPerDayTransitionLimitExceeded)
+{
+    ASSERT_TRUE(mTester.Invoke(MakeAtomicRequest(Globals::AtomicRequestTypeEnum::kBeginWrite)).IsSuccess());
+    UseAtomicWriteOwnerIdentity();
+
+    // kTestMaxPerDay == 2; 3 transitions on the same day exceeds the per-day limit.
+    ScheduleTransitionStruct::Type transitions[] = {
+        MakeScheduleTransition(0, ScheduleDayOfWeekBitmap::kMonday),
+        MakeScheduleTransition(100, ScheduleDayOfWeekBitmap::kMonday),
+        MakeScheduleTransition(200, ScheduleDayOfWeekBitmap::kMonday),
+    };
+    ScheduleStruct::Type list[] = { MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
+                                                 DataModel::List<const ScheduleTransitionStruct::Type>(transitions)) };
+    auto writeStatus =
+        mTester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list), Testing::ListWritingPattern::ReplaceAll);
+    EXPECT_EQ(writeStatus, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
+}
+
+TEST_F(TestThermostatClusterSchedules, AppendPendingScheduleRejectsUnknownScheduleHandle)
+{
+    ASSERT_TRUE(mTester.Invoke(MakeAtomicRequest(Globals::AtomicRequestTypeEnum::kBeginWrite)).IsSuccess());
+    UseAtomicWriteOwnerIdentity();
+
+    // Handle doesn't match any entry in the (empty) Schedules attribute list.
+    const uint8_t unknownHandle[] = { 0xFF };
+    ScheduleStruct::Type list[]   = { MakeSchedule(DataModel::MakeNullable(ByteSpan(unknownHandle)), DataModel::NullNullable,
+                                                   NullOptional, DataModel::List<const ScheduleTransitionStruct::Type>()) };
+    auto writeStatus =
+        mTester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list), Testing::ListWritingPattern::ReplaceAll);
+    EXPECT_EQ(writeStatus, CHIP_IM_GLOBAL_STATUS(NotFound));
+}
+
+TEST_F(TestThermostatClusterSchedules, AppendPendingScheduleRejectsBuiltInMismatch)
+{
+    mDelegate.SeedBuiltInSchedule(0x01);
+
+    ASSERT_TRUE(mTester.Invoke(MakeAtomicRequest(Globals::AtomicRequestTypeEnum::kBeginWrite)).IsSuccess());
+    UseAtomicWriteOwnerIdentity();
+
+    // The committed schedule 0x01 is built-in; claiming it is not is a constraint violation.
+    const uint8_t handle[]      = { 0x01 };
+    ScheduleStruct::Type list[] = { MakeSchedule(DataModel::MakeNullable(ByteSpan(handle)), DataModel::MakeNullable(false),
+                                                 NullOptional, DataModel::List<const ScheduleTransitionStruct::Type>()) };
+    auto writeStatus =
+        mTester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list), Testing::ListWritingPattern::ReplaceAll);
+    EXPECT_EQ(writeStatus, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+}
+
+TEST_F(TestThermostatClusterSchedules, AppendPendingScheduleRejectsDuplicatePendingHandle)
+{
+    mDelegate.SeedBuiltInSchedule(0x01);
+
+    ASSERT_TRUE(mTester.Invoke(MakeAtomicRequest(Globals::AtomicRequestTypeEnum::kBeginWrite)).IsSuccess());
+    UseAtomicWriteOwnerIdentity();
+
+    // Both list items reference the same existing schedule handle: ReplaceAll clears the pending list and then
+    // appends the items one by one, so the first append succeeds and the second finds a pending entry with that
+    // handle already there.
+    const uint8_t handle[]      = { 0x01 };
+    ScheduleStruct::Type item   = MakeSchedule(DataModel::MakeNullable(ByteSpan(handle)), DataModel::NullNullable, NullOptional,
+                                               DataModel::List<const ScheduleTransitionStruct::Type>());
+    ScheduleStruct::Type list[] = { item, item };
+    auto writeStatus =
+        mTester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list), Testing::ListWritingPattern::ReplaceAll);
+    EXPECT_EQ(writeStatus, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+}
+
+TEST_F(TestThermostatClusterSchedules, AppendPendingScheduleRejectsWhenScheduleCountExceedsMaximum)
+{
+    ASSERT_TRUE(mTester.Invoke(MakeAtomicRequest(Globals::AtomicRequestTypeEnum::kBeginWrite)).IsSuccess());
+    UseAtomicWriteOwnerIdentity();
+
+    // kTestMaxSchedules == 2; a single ReplaceAll write with 3 new schedules exceeds it on the third entry.
+    ScheduleStruct::Type newSchedule = MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
+                                                    DataModel::List<const ScheduleTransitionStruct::Type>());
+    ScheduleStruct::Type list[]      = { newSchedule, newSchedule, newSchedule };
+    auto writeStatus =
+        mTester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list), Testing::ListWritingPattern::ReplaceAll);
+    EXPECT_EQ(writeStatus, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
+}
+
+TEST_F(TestThermostatClusterSchedules, FullAtomicWriteRoundTripAppendsAndCommitsNewSchedule)
+{
+    ASSERT_TRUE(mTester.Invoke(MakeAtomicRequest(Globals::AtomicRequestTypeEnum::kBeginWrite)).IsSuccess());
+    UseAtomicWriteOwnerIdentity();
+
+    ScheduleStruct::Type list[] = { MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
+                                                 DataModel::List<const ScheduleTransitionStruct::Type>()) };
+    ASSERT_TRUE(
+        mTester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list), Testing::ListWritingPattern::ReplaceAll)
+            .IsSuccess());
+
+    ASSERT_EQ(mCluster.OnAtomicWritePrecommit(Schedules::Id), Status::Success);
+    ASSERT_EQ(mCluster.OnAtomicWriteCommit(Schedules::Id), Status::Success);
+
+    ScheduleStructWithOwnedMembers committed;
+    ASSERT_EQ(mDelegate.GetScheduleAtIndex(0, committed), CHIP_NO_ERROR);
+    EXPECT_FALSE(committed.GetScheduleHandle().IsNull());
+}
+
+TEST_F(TestThermostatClusterSchedules, OnAtomicWriteCommitCommitsPendingSchedulesAndNotifies)
+{
+    mDelegate.SeedBuiltInSchedule(0x01);
+
+    ASSERT_EQ(mCluster.OnAtomicWriteBegin(Schedules::Id), Status::Success);
+    // InitializePendingSchedules (called by OnAtomicWriteBegin) already seeded the pending list from the
+    // existing schedule, so committing without further changes should succeed and leave it unchanged.
+    ASSERT_EQ(mCluster.OnAtomicWritePrecommit(Schedules::Id), Status::Success);
+
+    // mCluster is started against mTestContext (not mTester's own internal context, which FabricTestFixture
+    // doesn't share), so dirty-attribute tracking has to be observed through mTestContext's listener rather
+    // than mTester.IsAttributeDirty().
+    const auto & clusterPath = mCluster.GetPaths()[0];
+    ConcreteAttributePath schedulesPath(clusterPath.mEndpointId, clusterPath.mClusterId, Schedules::Id);
+    EXPECT_FALSE(mTestContext.ChangeListener().IsDirty(schedulesPath));
+    EXPECT_EQ(mCluster.OnAtomicWriteCommit(Schedules::Id), Status::Success);
+    EXPECT_TRUE(mTestContext.ChangeListener().IsDirty(schedulesPath));
+
+    ScheduleStructWithOwnedMembers committed;
+    ASSERT_EQ(mDelegate.GetScheduleAtIndex(0, committed), CHIP_NO_ERROR);
+    ASSERT_FALSE(committed.GetScheduleHandle().IsNull());
+    const uint8_t expectedHandle[] = { 0x01 };
+    EXPECT_TRUE(committed.GetScheduleHandle().Value().data_equal(ByteSpan(expectedHandle)));
 }
 
 TEST_F(TestThermostatClusterSchedules, RollbackWriteClearsPendingScheduleList)
