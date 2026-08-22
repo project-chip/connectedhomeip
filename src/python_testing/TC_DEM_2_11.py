@@ -131,7 +131,7 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
 
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustStart)
         self.validate_power_range_adjust_start_event(event_data, Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kLocalOptimizationAdjustment,
-                                                             expected_min_power=absMinPower, expected_max_power=absMaxPower, expected_duration=5)
+                                                     expected_min_power=absMinPower, expected_max_power=absMaxPower, expected_duration=5)
 
         self.step("6a", "TH reads PowerRangeAdjustment",
                   expectation="value is MinPower=AbsMinPower, MaxPower=AbsMaxPower, Cause=LocalOptimization, and EndTime in future (approximately 5 seconds from now)")
@@ -149,7 +149,8 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
         self.step("7", "Wait up to 10 seconds", expectation="Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=NormalCompletion")
         event_data = events_callback.wait_for_event_report(
             Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustEnd, timeout_sec=10)
-        self.validate_power_range_adjust_end_event(event_data, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kNormalCompletion, expected_duration=5)
+        self.validate_power_range_adjust_end_event(
+            event_data, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kNormalCompletion, expected_duration=5)
 
         self.step("7a", "TH reads PowerRangeAdjustment", expectation="value is null")
         await self.check_dem_attribute("PowerRangeAdjustment", NullValue)
@@ -196,7 +197,8 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
         self.step("11b", "Wait up to 10 seconds", expectation="Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=NormalCompletion")
         event_data = events_callback.wait_for_event_report(
             Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustEnd, timeout_sec=10)
-        self.validate_power_range_adjust_end_event(event_data, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kNormalCompletion, expected_duration=5)
+        self.validate_power_range_adjust_end_event(
+            event_data, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kNormalCompletion, expected_duration=5)
 
         self.step("11c", "TH reads PowerRangeAdjustment", expectation="value is null")
         await self.check_dem_attribute("PowerRangeAdjustment", NullValue)
@@ -219,7 +221,8 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
         self.step("12b", "Wait up to 10 seconds", expectation="Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=NormalCompletion")
         event_data = events_callback.wait_for_event_report(
             Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustEnd, timeout_sec=10)
-        self.validate_power_range_adjust_end_event(event_data, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kNormalCompletion, expected_duration=5)
+        self.validate_power_range_adjust_end_event(
+            event_data, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kNormalCompletion, expected_duration=5)
 
         self.step("12c", "TH reads PowerRangeAdjustment", expectation="value is null")
         await self.check_dem_attribute("PowerRangeAdjustment", NullValue)
@@ -345,7 +348,8 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
                   expectation="DUT responds with status SUCCESS and Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=Cancelled")
         await self.send_cancel_power_range_adjustment_command()
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustEnd)
-        self.validate_power_range_adjust_end_event(event_data, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kCancelled) # Don't validate duration for Cancelled events
+        # Don't validate duration for Cancelled events
+        self.validate_power_range_adjust_end_event(event_data, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kCancelled)
 
         self.step("22a", "TH reads PowerRangeAdjustment", expectation="value is null")
         await self.check_dem_attribute("PowerRangeAdjustment", NullValue)
@@ -377,7 +381,8 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
                   expectation="DUT responds with status SUCCESS and Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=UserOptOut")
         await self.send_test_event_trigger_user_opt_out_local()
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustEnd)
-        self.validate_power_range_adjust_end_event(event_data, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kUserOptOut) # Don't validate duration for UserOptOut events
+        # Don't validate duration for UserOptOut events
+        self.validate_power_range_adjust_end_event(event_data, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kUserOptOut)
 
         self.step("25a", "TH reads ESAState", expectation="value is 0x01 (Online)")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kOnline)
@@ -424,7 +429,8 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
                   expectation="DUT responds with status SUCCESS and Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=Cancelled")
         await self.send_cancel_power_range_adjustment_command()
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustEnd)
-        self.validate_power_range_adjust_end_event(event_data, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kCancelled) # Don't validate duration for Cancelled events
+        # Don't validate duration for Cancelled events
+        self.validate_power_range_adjust_end_event(event_data, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kCancelled)
 
         self.step("29b", "TH sends TestEventTrigger command to General Diagnostics Cluster for User Opt-out Test Event Clear",
                   expectation="DUT responds with status SUCCESS")
@@ -462,7 +468,8 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
                   expectation="DUT responds with status SUCCESS and Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=Cancelled")
         await self.send_cancel_power_range_adjustment_command()
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustEnd)
-        self.validate_power_range_adjust_end_event(event_data, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kCancelled) # Don't validate duration for Cancelled events
+        # Don't validate duration for Cancelled events
+        self.validate_power_range_adjust_end_event(event_data, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kCancelled)
 
         self.step("33", "TH sends TestEventTrigger command to General Diagnostics Cluster for User Opt-out Test Event Clear",
                   expectation="DUT responds with status SUCCESS")

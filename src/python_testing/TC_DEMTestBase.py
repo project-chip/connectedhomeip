@@ -16,7 +16,6 @@
 
 
 import logging
-from typing import Optional
 
 from mobly import asserts
 
@@ -228,13 +227,13 @@ class DEMTestBase:
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
-    def validate_power_range_adjust_start_event(self, event_data, 
+    def validate_power_range_adjust_start_event(self, event_data,
                                                 expected_cause: Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum,
-                                                expected_min_power: Optional[int] = None, 
-                                                expected_max_power: Optional[int] = None, 
-                                                expected_duration: Optional[int] = None):
+                                                expected_min_power: int | None = None,
+                                                expected_max_power: int | None = None,
+                                                expected_duration: int | None = None):
         """Validate PowerRangeAdjustStart event contains expected values.
-        
+
         Args:
             event_data: The event data returned from wait_for_event_report(PowerRangeAdjustStart)
             expected_cause: Expected PowerAdjustReasonEnum value
@@ -243,36 +242,36 @@ class DEMTestBase:
             expected_duration: Expected duration value in seconds
         """
         from matter.clusters.Types import NullValue
-        
+
         asserts.assert_true(hasattr(event_data, 'adjustment'), "Event should have 'adjustment' field")
         asserts.assert_equal(event_data.adjustment.cause, expected_cause,
-                           f"Expected cause {expected_cause}, got {event_data.adjustment.cause}")
-        
+                             f"Expected cause {expected_cause}, got {event_data.adjustment.cause}")
+
         # For minPower: if expected is None, check for NullValue; otherwise check for exact match
         if expected_min_power is None:
             asserts.assert_equal(event_data.adjustment.minPower, NullValue,
-                               f"Expected minPower NullValue, got {event_data.adjustment.minPower}")
+                                 f"Expected minPower NullValue, got {event_data.adjustment.minPower}")
         else:
             asserts.assert_equal(event_data.adjustment.minPower, expected_min_power,
-                               f"Expected minPower {expected_min_power}, got {event_data.adjustment.minPower}")
-        
+                                 f"Expected minPower {expected_min_power}, got {event_data.adjustment.minPower}")
+
         # For maxPower: if expected is None, check for NullValue; otherwise check for exact match
         if expected_max_power is None:
             asserts.assert_equal(event_data.adjustment.maxPower, NullValue,
-                               f"Expected maxPower NullValue, got {event_data.adjustment.maxPower}")
+                                 f"Expected maxPower NullValue, got {event_data.adjustment.maxPower}")
         else:
             asserts.assert_equal(event_data.adjustment.maxPower, expected_max_power,
-                               f"Expected maxPower {expected_max_power}, got {event_data.adjustment.maxPower}")
-        
+                                 f"Expected maxPower {expected_max_power}, got {event_data.adjustment.maxPower}")
+
         if expected_duration is not None:
             asserts.assert_equal(event_data.duration, expected_duration,
-                               f"Expected duration {expected_duration}, got {event_data.duration}")
+                                 f"Expected duration {expected_duration}, got {event_data.duration}")
 
-    def validate_power_range_adjust_end_event(self, event_data, 
-                                              expected_cause: Clusters.DeviceEnergyManagement.Enums.CauseEnum, 
-                                              expected_duration: Optional[int] = None):
+    def validate_power_range_adjust_end_event(self, event_data,
+                                              expected_cause: Clusters.DeviceEnergyManagement.Enums.CauseEnum,
+                                              expected_duration: int | None = None):
         """Validate PowerRangeAdjustEnd event contains expected values.
-        
+
         Args:
             event_data: The event data returned from wait_for_event_report(PowerRangeAdjustEnd)
             expected_cause: Expected CauseEnum value
@@ -282,13 +281,13 @@ class DEMTestBase:
         """
         asserts.assert_true(hasattr(event_data, 'cause'), "Event should have 'cause' field")
         asserts.assert_equal(event_data.cause, expected_cause,
-                           f"Expected cause {expected_cause}, got {event_data.cause}")
-        
+                             f"Expected cause {expected_cause}, got {event_data.cause}")
+
         if expected_duration is not None:
             # Allow up to 2-second tolerance in reported duration due to device timer implementation latency
             max_allowed_duration = expected_duration + 2
             asserts.assert_less_equal(event_data.duration, max_allowed_duration,
-                                     f"Expected duration <= {max_allowed_duration} (approximately {expected_duration}s with 2s tolerance), got {event_data.duration}")
+                                      f"Expected duration <= {max_allowed_duration} (approximately {expected_duration}s with 2s tolerance), got {event_data.duration}")
 
     def print_forecast(self, forecast):
         for index, slot in enumerate(forecast.slots):
