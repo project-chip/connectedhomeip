@@ -17,6 +17,7 @@ details.
     -   [Commandline Arguments](#commandline-arguments)
     -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
     -   [Presets](#presets)
+    -   [ThermostatSuggestions](#thermostatsuggestions)
 
 <hr>
 
@@ -195,4 +196,101 @@ chip-tool-x86-64 thermostat read active-preset-handle <nodeID> 1 | grep TOO
 [1758995260.387] [4613:4615] [TOO]      cluster 0x0000_0201, attribute: 0x0000_004E, endpoint 1
 [1758995260.396] [4613:4615] [TOO] Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_004E DataVersion: 1113257472
 [1758995260.396] [4613:4615] [TOO]   ActivePresetHandle: 02
+```
+
+## ThermostatSuggestions
+
+`AddThermostatSuggestion` requires `PresetHandle` to already exist in the
+`Presets` attribute (see [Write presets](#write-presets)), so run that section
+first.
+
+### Read MaxThermostatSuggestions
+
+```shell
+chip-tool-x86-64 thermostat read max-thermostat-suggestions <nodeID> 1 | grep TOO
+[1758995320.104] [4620:4622] [TOO] Sending command to node 0x1e
+[1758995320.397] [4620:4622] [TOO] Sending ReadAttribute to:
+[1758995320.397] [4620:4622] [TOO]      cluster 0x0000_0201, attribute: 0x0000_0053, endpoint 1
+[1758995320.406] [4620:4622] [TOO] Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_0053 DataVersion: 1113257472
+[1758995320.406] [4620:4622] [TOO]   MaxThermostatSuggestions: 5
+```
+
+### Add a thermostat suggestion
+
+`AddThermostatSuggestion` fails with:
+
+-   `NOT_FOUND` if `PresetHandle` isn't in the `Presets` attribute
+-   `RESOURCE_EXHAUSTED` if `ThermostatSuggestions` is already at
+    `MaxThermostatSuggestions` entries
+-   `INVALID_COMMAND` if `EffectiveTime` is more than 24 hours in the future
+-   `CONSTRAINT_ERROR` if `ExpirationInMinutes` is outside `[30, 1440]`
+
+Add a suggestion for `PresetHandle` `01`, effective now (`EffectiveTime:
+null`), expiring in 60 minutes:
+
+```shell
+chip-tool-x86-64 thermostat add-thermostat-suggestion PresetHandle EffectiveTime ExpirationInMinutes destination-id endpoint-id-ignored-for-group-commands
+chip-tool-x86-64 thermostat add-thermostat-suggestion hex:01 null 60 <nodeID> 1 | grep TOO
+[1758995330.512] [4626:4628] [TOO] Sending command to node 0x1e
+[1758995330.803] [4626:4628] [TOO] Sending cluster (0x00000201) command (0x00000007) on endpoint 1
+[1758995330.810] [4626:4628] [TOO] AddThermostatSuggestionResponse: {
+[1758995330.810] [4626:4628] [TOO]   UniqueID: 1
+[1758995330.810] [4626:4628] [TOO] }
+```
+
+### Read ThermostatSuggestions
+
+```shell
+chip-tool-x86-64 thermostat read thermostat-suggestions <nodeID> 1 | grep TOO
+[1758995340.221] [4632:4634] [TOO] Sending command to node 0x1e
+[1758995340.511] [4632:4634] [TOO] Sending ReadAttribute to:
+[1758995340.511] [4632:4634] [TOO]      cluster 0x0000_0201, attribute: 0x0000_0054, endpoint 1
+[1758995340.519] [4632:4634] [TOO] Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_0054 DataVersion: 1113257473
+[1758995340.519] [4632:4634] [TOO]   ThermostatSuggestions: 1 entries
+[1758995340.519] [4632:4634] [TOO]     [1]: {
+[1758995340.519] [4632:4634] [TOO]       UniqueID: 1
+[1758995340.519] [4632:4634] [TOO]       PresetHandle: 01
+[1758995340.519] [4632:4634] [TOO]       EffectiveTime: 1758995330
+[1758995340.519] [4632:4634] [TOO]       ExpirationTime: 1758998930
+[1758995340.519] [4632:4634] [TOO]      }
+```
+
+### Read CurrentThermostatSuggestion
+
+```shell
+chip-tool-x86-64 thermostat read current-thermostat-suggestion <nodeID> 1 | grep TOO
+[1758995350.221] [4638:4640] [TOO] Sending command to node 0x1e
+[1758995350.511] [4638:4640] [TOO] Sending ReadAttribute to:
+[1758995350.511] [4638:4640] [TOO]      cluster 0x0000_0201, attribute: 0x0000_0055, endpoint 1
+[1758995350.519] [4638:4640] [TOO] Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_0055 DataVersion: 1113257473
+[1758995350.519] [4638:4640] [TOO]   CurrentThermostatSuggestion: {
+[1758995350.519] [4638:4640] [TOO]     UniqueID: 1
+[1758995350.519] [4638:4640] [TOO]     PresetHandle: 01
+[1758995350.519] [4638:4640] [TOO]     EffectiveTime: 1758995330
+[1758995350.519] [4638:4640] [TOO]     ExpirationTime: 1758998930
+[1758995350.519] [4638:4640] [TOO]   }
+```
+
+### Read ThermostatSuggestionNotFollowingReason
+
+`null` while the current suggestion's setpoints are being followed; otherwise
+a `ThermostatSuggestionNotFollowingReasonBitmap` value describing why it isn't
+(e.g. an active hold, schedule, or vacation mode overriding it):
+
+```shell
+chip-tool-x86-64 thermostat read thermostat-suggestion-not-following-reason <nodeID> 1 | grep TOO
+[1758995360.221] [4644:4646] [TOO] Sending command to node 0x1e
+[1758995360.511] [4644:4646] [TOO] Sending ReadAttribute to:
+[1758995360.511] [4644:4646] [TOO]      cluster 0x0000_0201, attribute: 0x0000_0056, endpoint 1
+[1758995360.519] [4644:4646] [TOO] Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_0056 DataVersion: 1113257473
+[1758995360.519] [4644:4646] [TOO]   ThermostatSuggestionNotFollowingReason: null
+```
+
+### Remove a thermostat suggestion
+
+```shell
+chip-tool-x86-64 thermostat remove-thermostat-suggestion UniqueID destination-id endpoint-id-ignored-for-group-commands
+chip-tool-x86-64 thermostat remove-thermostat-suggestion 1 <nodeID> 1 | grep TOO
+[1758995370.221] [4650:4652] [TOO] Sending command to node 0x1e
+[1758995370.511] [4650:4652] [TOO] Sending cluster (0x00000201) command (0x00000008) on endpoint 1
 ```
