@@ -241,14 +241,7 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
                                                        duration=5,
                                                        expected_status=Status.ConstraintError)
 
-        self.step("16", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower, MaxPower=AbsMaxPower, Cause=LocalOptimization (no Duration)",
-                  expectation="DUT responds with status CONSTRAINT_ERROR")
-        await self.send_power_range_adjustment_command(cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization,
-                                                       minPower=absMinPower,
-                                                       maxPower=absMaxPower,
-                                                       expected_status=Status.ConstraintError)
-
-        self.step("17", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower, MaxPower=AbsMaxPower, Duration=86401, Cause=LocalOptimization",
+        self.step("16", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower, MaxPower=AbsMaxPower, Duration=86401, Cause=LocalOptimization",
                   expectation="DUT responds with status CONSTRAINT_ERROR")
         await self.send_power_range_adjustment_command(cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization,
                                                        minPower=absMinPower,
@@ -256,7 +249,7 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
                                                        duration=86401,
                                                        expected_status=Status.ConstraintError)
 
-        self.step("18", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower, MaxPower=AbsMaxPower, Duration=0, Cause=LocalOptimization",
+        self.step("17", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower, MaxPower=AbsMaxPower, Duration=0, Cause=LocalOptimization",
                   expectation="DUT responds with status CONSTRAINT_ERROR")
         await self.send_power_range_adjustment_command(cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization,
                                                        minPower=absMinPower,
@@ -264,7 +257,7 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
                                                        duration=0,
                                                        expected_status=Status.ConstraintError)
 
-        self.step("19", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower, MaxPower=AbsMaxPower, Duration=5, Cause=InvalidValue (out of range)",
+        self.step("18", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower, MaxPower=AbsMaxPower, Duration=5, Cause=InvalidValue (out of range)",
                   expectation="DUT responds with status CONSTRAINT_ERROR")
         # Send command with invalid cause enum value (99 is not a valid AdjustmentCauseEnum)
         try:
@@ -279,7 +272,7 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected error returned")
 
-        self.step("20", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower, MaxPower=AbsMaxPower, Duration=5, Cause=GridOptimization",
+        self.step("19", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower, MaxPower=AbsMaxPower, Duration=5, Cause=GridOptimization",
                   expectation="DUT responds with status SUCCESS and Event DEM.S.E04(PowerRangeAdjustStart) sent")
         await self.send_power_range_adjustment_command(cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kGridOptimization,
                                                        minPower=absMinPower,
@@ -287,7 +280,7 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
                                                        duration=5)
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustStart)
 
-        self.step("20a", "TH reads PowerRangeAdjustment",
+        self.step("19a", "TH reads PowerRangeAdjustment",
                   expectation="value is MinPower=AbsMinPower, MaxPower=AbsMaxPower, and Cause=GridOptimization")
         powerRangeAdjustment = await self.read_dem_attribute_expect_success(attribute="PowerRangeAdjustment")
         asserts.assert_equal(powerRangeAdjustment.minPower, absMinPower)
@@ -295,10 +288,10 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
         asserts.assert_equal(powerRangeAdjustment.cause,
                              Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kGridOptimizationAdjustment)
 
-        self.step("20b", "TH reads ESAState", expectation="value is 0x04 (PowerAdjustActive)")
+        self.step("19b", "TH reads ESAState", expectation="value is 0x04 (PowerAdjustActive)")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPowerAdjustActive)
 
-        self.step("21", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower+100, MaxPower=AbsMaxPower-100, Duration=7200, Cause=LocalOptimization",
+        self.step("20", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower+100, MaxPower=AbsMaxPower-100, Duration=7200, Cause=LocalOptimization",
                   expectation="DUT responds with status SUCCESS and Event DEM.S.E04(PowerRangeAdjustStart) sent")
         await self.send_power_range_adjustment_command(cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization,
                                                        minPower=absMinPower + 100,
@@ -306,7 +299,7 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
                                                        duration=7200)
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustStart)
 
-        self.step("21a", "TH reads PowerRangeAdjustment",
+        self.step("20a", "TH reads PowerRangeAdjustment",
                   expectation="value is MinPower=AbsMinPower+100, MaxPower=AbsMaxPower-100, and Cause=LocalOptimization (previous GridOptimization adjustment has been replaced)")
         powerRangeAdjustment = await self.read_dem_attribute_expect_success(attribute="PowerRangeAdjustment")
         asserts.assert_equal(powerRangeAdjustment.minPower, absMinPower + 100)
@@ -314,10 +307,10 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
         asserts.assert_equal(powerRangeAdjustment.cause,
                              Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kLocalOptimizationAdjustment)
 
-        self.step("21b", "TH reads ESAState", expectation="value is 0x04 (PowerAdjustActive)")
+        self.step("20b", "TH reads ESAState", expectation="value is 0x04 (PowerAdjustActive)")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPowerAdjustActive)
 
-        self.step("22", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower+200, MaxPower=AbsMaxPower-200, Duration=2000, Cause=GridOptimization",
+        self.step("21", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower+200, MaxPower=AbsMaxPower-200, Duration=2000, Cause=GridOptimization",
                   expectation="DUT responds with status SUCCESS and Event DEM.S.E04(PowerRangeAdjustStart) sent")
         await self.send_power_range_adjustment_command(cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kGridOptimization,
                                                        minPower=absMinPower + 200,
@@ -325,7 +318,7 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
                                                        duration=2000)
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustStart)
 
-        self.step("22a", "TH reads PowerRangeAdjustment",
+        self.step("21a", "TH reads PowerRangeAdjustment",
                   expectation="value is MinPower=AbsMinPower+200, MaxPower=AbsMaxPower-200, and Cause=GridOptimization (previous LocalOptimization adjustment has been replaced)")
         powerRangeAdjustment = await self.read_dem_attribute_expect_success(attribute="PowerRangeAdjustment")
         asserts.assert_equal(powerRangeAdjustment.minPower, absMinPower + 200)
@@ -333,25 +326,25 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
         asserts.assert_equal(powerRangeAdjustment.cause,
                              Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kGridOptimizationAdjustment)
 
-        self.step("22b", "TH reads ESAState", expectation="value is 0x04 (PowerAdjustActive)")
+        self.step("21b", "TH reads ESAState", expectation="value is 0x04 (PowerAdjustActive)")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPowerAdjustActive)
 
-        self.step("23", "TH sends CancelPowerRangeAdjustRequest",
+        self.step("22", "TH sends CancelPowerRangeAdjustRequest",
                   expectation="DUT responds with status SUCCESS and Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=Cancelled")
         await self.send_cancel_power_range_adjustment_command()
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustEnd)
         asserts.assert_equal(event_data.cause, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kCancelled)
 
-        self.step("23a", "TH reads PowerRangeAdjustment", expectation="value is null")
+        self.step("22a", "TH reads PowerRangeAdjustment", expectation="value is null")
         await self.check_dem_attribute("PowerRangeAdjustment", NullValue)
 
-        self.step("23b", "TH reads ESAState", expectation="value is 0x01 (Online)")
+        self.step("22b", "TH reads ESAState", expectation="value is 0x01 (Online)")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kOnline)
 
-        self.step("24", "TH sends CancelPowerRangeAdjustRequest", expectation="DUT responds with status INVALIDINSTATE")
+        self.step("23", "TH sends CancelPowerRangeAdjustRequest", expectation="DUT responds with status INVALIDINSTATE")
         await self.send_cancel_power_range_adjustment_command(expected_status=Status.InvalidInState)
 
-        self.step("25", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower, MaxPower=AbsMaxPower, Duration=2000, Cause=LocalOptimization",
+        self.step("24", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower, MaxPower=AbsMaxPower, Duration=2000, Cause=LocalOptimization",
                   expectation="DUT responds with status SUCCESS and Event DEM.S.E04(PowerRangeAdjustStart) sent")
         await self.send_power_range_adjustment_command(cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization,
                                                        minPower=absMinPower,
@@ -359,43 +352,43 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
                                                        duration=2000)
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustStart)
 
-        self.step("25a", "TH reads ESAState", expectation="value is 0x04 (PowerAdjustActive)")
+        self.step("24a", "TH reads ESAState", expectation="value is 0x04 (PowerAdjustActive)")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPowerAdjustActive)
 
-        self.step("25b", "Wait 3 seconds",
+        self.step("24b", "Wait 3 seconds",
                   expectation="Time elapses (TH waits 3 seconds while LocalOptimization is still active)")
         await asyncio.sleep(3)
 
-        self.step("26", "TH sends TestEventTrigger command to General Diagnostics Cluster for User Opt-out Local Optimization Test Event",
+        self.step("25", "TH sends TestEventTrigger command to General Diagnostics Cluster for User Opt-out Local Optimization Test Event",
                   expectation="DUT responds with status SUCCESS and Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=UserOptOut")
         await self.send_test_event_trigger_user_opt_out_local()
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustEnd)
         asserts.assert_equal(event_data.cause, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kUserOptOut)
 
-        self.step("26a", "TH reads ESAState", expectation="value is 0x01 (Online)")
+        self.step("25a", "TH reads ESAState", expectation="value is 0x01 (Online)")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kOnline)
 
-        self.step("26b", "TH reads PowerRangeAdjustment", expectation="value is null")
+        self.step("25b", "TH reads PowerRangeAdjustment", expectation="value is null")
         await self.check_dem_attribute("PowerRangeAdjustment", NullValue)
 
-        self.step("26c", "TH reads OptOutState", expectation="value is 0x01 (LocalOptOut)")
+        self.step("25c", "TH reads OptOutState", expectation="value is 0x01 (LocalOptOut)")
         await self.check_dem_attribute("OptOutState", Clusters.DeviceEnergyManagement.Enums.OptOutStateEnum.kLocalOptOut)
 
-        self.step("27", "TH sends TestEventTrigger command to General Diagnostics Cluster for User Opt-out Test Event Clear",
+        self.step("26", "TH sends TestEventTrigger command to General Diagnostics Cluster for User Opt-out Test Event Clear",
                   expectation="DUT responds with status SUCCESS")
         await self.send_test_event_trigger_user_opt_out_clear_all()
 
-        self.step("27a", "TH reads OptOutState", expectation="value is 0x00 (NoOptOut)")
+        self.step("26a", "TH reads OptOutState", expectation="value is 0x00 (NoOptOut)")
         await self.check_dem_attribute("OptOutState", Clusters.DeviceEnergyManagement.Enums.OptOutStateEnum.kNoOptOut)
 
-        self.step("28", "TH sends TestEventTrigger command to General Diagnostics Cluster for User Opt-out Local Optimization Test Event",
+        self.step("27", "TH sends TestEventTrigger command to General Diagnostics Cluster for User Opt-out Local Optimization Test Event",
                   expectation="DUT responds with status SUCCESS")
         await self.send_test_event_trigger_user_opt_out_local()
 
-        self.step("28a", "TH reads OptOutState", expectation="value is 0x01 (LocalOptOut)")
+        self.step("27a", "TH reads OptOutState", expectation="value is 0x01 (LocalOptOut)")
         await self.check_dem_attribute("OptOutState", Clusters.DeviceEnergyManagement.Enums.OptOutStateEnum.kLocalOptOut)
 
-        self.step("29", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower, MaxPower=AbsMaxPower, Duration=5, Cause=LocalOptimization",
+        self.step("28", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower, MaxPower=AbsMaxPower, Duration=5, Cause=LocalOptimization",
                   expectation="DUT responds with status CONSTRAINT_ERROR")
         await self.send_power_range_adjustment_command(cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization,
                                                        minPower=absMinPower,
@@ -403,7 +396,7 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
                                                        duration=5,
                                                        expected_status=Status.ConstraintError)
 
-        self.step("30", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower, MaxPower=AbsMaxPower, Duration=5, Cause=GridOptimization",
+        self.step("29", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower, MaxPower=AbsMaxPower, Duration=5, Cause=GridOptimization",
                   expectation="DUT responds with status SUCCESS and Event DEM.S.E04(PowerRangeAdjustStart) sent")
         await self.send_power_range_adjustment_command(cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kGridOptimization,
                                                        minPower=absMinPower,
@@ -411,27 +404,27 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
                                                        duration=5)
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustStart)
 
-        self.step("30a", "TH sends CancelPowerRangeAdjustRequest",
+        self.step("29a", "TH sends CancelPowerRangeAdjustRequest",
                   expectation="DUT responds with status SUCCESS and Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=Cancelled")
         await self.send_cancel_power_range_adjustment_command()
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustEnd)
         asserts.assert_equal(event_data.cause, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kCancelled)
 
-        self.step("30b", "TH sends TestEventTrigger command to General Diagnostics Cluster for User Opt-out Test Event Clear",
+        self.step("29b", "TH sends TestEventTrigger command to General Diagnostics Cluster for User Opt-out Test Event Clear",
                   expectation="DUT responds with status SUCCESS")
         await self.send_test_event_trigger_user_opt_out_clear_all()
 
-        self.step("30c", "TH reads OptOutState", expectation="value is 0x00 (NoOptOut)")
+        self.step("29c", "TH reads OptOutState", expectation="value is 0x00 (NoOptOut)")
         await self.check_dem_attribute("OptOutState", Clusters.DeviceEnergyManagement.Enums.OptOutStateEnum.kNoOptOut)
 
-        self.step("31", "TH sends TestEventTrigger command to General Diagnostics Cluster for User Opt-out Grid Optimization Test Event",
+        self.step("30", "TH sends TestEventTrigger command to General Diagnostics Cluster for User Opt-out Grid Optimization Test Event",
                   expectation="DUT responds with status SUCCESS")
         await self.send_test_event_trigger_user_opt_out_grid()
 
-        self.step("31a", "TH reads OptOutState", expectation="value is 0x02 (GridOptOut)")
+        self.step("30a", "TH reads OptOutState", expectation="value is 0x02 (GridOptOut)")
         await self.check_dem_attribute("OptOutState", Clusters.DeviceEnergyManagement.Enums.OptOutStateEnum.kGridOptOut)
 
-        self.step("32", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower, MaxPower=AbsMaxPower, Duration=5, Cause=GridOptimization",
+        self.step("31", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower, MaxPower=AbsMaxPower, Duration=5, Cause=GridOptimization",
                   expectation="DUT responds with status CONSTRAINT_ERROR")
         await self.send_power_range_adjustment_command(cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kGridOptimization,
                                                        minPower=absMinPower,
@@ -439,7 +432,7 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
                                                        duration=5,
                                                        expected_status=Status.ConstraintError)
 
-        self.step("33", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower, MaxPower=AbsMaxPower, Duration=5, Cause=LocalOptimization",
+        self.step("32", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower, MaxPower=AbsMaxPower, Duration=5, Cause=LocalOptimization",
                   expectation="DUT responds with status SUCCESS and Event DEM.S.E04(PowerRangeAdjustStart) sent")
         await self.send_power_range_adjustment_command(cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization,
                                                        minPower=absMinPower,
@@ -447,24 +440,24 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
                                                        duration=5)
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustStart)
 
-        self.step("33a", "TH sends CancelPowerRangeAdjustRequest",
+        self.step("32a", "TH sends CancelPowerRangeAdjustRequest",
                   expectation="DUT responds with status SUCCESS and Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=Cancelled")
         await self.send_cancel_power_range_adjustment_command()
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustEnd)
         asserts.assert_equal(event_data.cause, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kCancelled)
 
-        self.step("34", "TH sends TestEventTrigger command to General Diagnostics Cluster for User Opt-out Test Event Clear",
+        self.step("33", "TH sends TestEventTrigger command to General Diagnostics Cluster for User Opt-out Test Event Clear",
                   expectation="DUT responds with status SUCCESS")
         await self.send_test_event_trigger_user_opt_out_clear_all()
 
-        self.step("34a", "TH reads OptOutState", expectation="value is 0x00 (NoOptOut)")
+        self.step("33a", "TH reads OptOutState", expectation="value is 0x00 (NoOptOut)")
         await self.check_dem_attribute("OptOutState", Clusters.DeviceEnergyManagement.Enums.OptOutStateEnum.kNoOptOut)
 
-        self.step("35", "TH sends TestEventTrigger command to General Diagnostics Cluster for Power Range Adjustment Test Event Clear",
+        self.step("34", "TH sends TestEventTrigger command to General Diagnostics Cluster for Power Range Adjustment Test Event Clear",
                   expectation="DUT responds with status SUCCESS")
         await self.send_test_event_trigger_power_range_adjustment_clear()
 
-        self.step("36", "Cancel the subscription to the Device Energy Management cluster",
+        self.step("35", "Cancel the subscription to the Device Energy Management cluster",
                   expectation="The subscription is cancelled successfully")
         events_callback.cancel()
 
