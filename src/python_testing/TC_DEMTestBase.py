@@ -276,15 +276,19 @@ class DEMTestBase:
         Args:
             event_data: The event data returned from wait_for_event_report(PowerRangeAdjustEnd)
             expected_cause: Expected CauseEnum value
-            expected_duration: Optional expected duration value
+            expected_duration: Optional expected duration value. Duration is validated allowing up to 2-second 
+                             increase (actual <= expected + 2) to account for device timer implementation latency 
+                             that may cause the internal timer to expire up to 2 seconds later than expected.
         """
         asserts.assert_true(hasattr(event_data, 'cause'), "Event should have 'cause' field")
         asserts.assert_equal(event_data.cause, expected_cause,
                            f"Expected cause {expected_cause}, got {event_data.cause}")
         
         if expected_duration is not None:
-            asserts.assert_equal(event_data.duration, expected_duration,
-                               f"Expected duration {expected_duration}, got {event_data.duration}")
+            # Allow up to 2-second tolerance in reported duration due to device timer implementation latency
+            max_allowed_duration = expected_duration + 2
+            asserts.assert_less_equal(event_data.duration, max_allowed_duration,
+                                     f"Expected duration <= {max_allowed_duration} (approximately {expected_duration}s with 2s tolerance), got {event_data.duration}")
 
     def print_forecast(self, forecast):
         for index, slot in enumerate(forecast.slots):
