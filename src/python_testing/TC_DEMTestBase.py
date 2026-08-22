@@ -275,8 +275,8 @@ class DEMTestBase:
         Args:
             event_data: The event data returned from wait_for_event_report(PowerRangeAdjustEnd)
             expected_cause: Expected CauseEnum value
-            expected_duration: Optional expected duration value. Duration is validated allowing up to 2-second 
-                             increase (actual <= expected + 2) to account for device timer implementation latency 
+            expected_duration: Optional expected duration value. Duration is validated allowing up to 2-second
+                             increase (actual <= expected + 2) to account for device timer implementation latency
                              that may cause the internal timer to expire up to 2 seconds later than expected.
         """
         asserts.assert_true(hasattr(event_data, 'cause'), "Event should have 'cause' field")
