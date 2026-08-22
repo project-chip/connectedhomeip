@@ -287,7 +287,7 @@ class DEMTestBase:
             # Allow up to 2-second tolerance in reported duration due to device timer implementation latency
             # that may cause the internal timer to expire up to 2 seconds later than expected.
             asserts.assert_greater_equal(event_data.duration, expected_duration,
-                                       f"Expected duration >= {expected_duration}, got {event_data.duration}")
+                                         f"Expected duration >= {expected_duration}, got {event_data.duration}")
             max_allowed_duration = expected_duration + 2
             asserts.assert_less_equal(event_data.duration, max_allowed_duration,
                                       f"Expected duration <= {max_allowed_duration} (approximately {expected_duration}s with 2s tolerance), got {event_data.duration}")
