@@ -263,10 +263,11 @@ Status ThermostatCluster::SetActivePreset(DataModel::Nullable<ByteSpan> presetHa
         return Status::InvalidInState;
     }
 
+    PresetStructWithOwnedMembers matchingPreset;
+    bool found = false;
+
     if (!presetHandle.IsNull())
     {
-        PresetStructWithOwnedMembers matchingPreset;
-        bool found           = false;
         CHIP_ERROR lookupErr = GetMatchingPresetInPresets(mDelegate, presetHandle.Value(), matchingPreset, found);
         if (lookupErr != CHIP_NO_ERROR)
         {
@@ -278,8 +279,23 @@ Status ThermostatCluster::SetActivePreset(DataModel::Nullable<ByteSpan> presetHa
         {
             return Status::InvalidCommand;
         }
+    }
 
-        // Apply the preset's setpoints to the occupied setpoint range before switching to it.
+    // Switch the active handle before applying the preset's setpoints: SetActivePresetHandle is the more likely of
+    // the two to fail (e.g. a persistent-storage write error), and doing it first means such a failure leaves no
+    // setpoint change behind. The preset's setpoints were already validated when the preset was added/committed, so
+    // ChangeRange/SaveSetpoints failing afterwards is not expected in practice.
+    CHIP_ERROR err = mDelegate->SetActivePresetHandle(presetHandle);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to set ActivePresetHandle with error %" CHIP_ERROR_FORMAT, err.Format());
+        return StatusIB(err).mStatus;
+    }
+
+    if (found)
+    {
+        // Apply the preset's setpoints to the occupied setpoint range now that it's active.
         Optional<int16_t> coolingSetpoint = matchingPreset.GetCoolingSetpoint();
         Optional<int16_t> heatingSetpoint = matchingPreset.GetHeatingSetpoint();
         if (coolingSetpoint.HasValue() || heatingSetpoint.HasValue())
@@ -300,14 +316,6 @@ Status ThermostatCluster::SetActivePreset(DataModel::Nullable<ByteSpan> presetHa
             }
             mSetpoints = setpoints;
         }
-    }
-
-    CHIP_ERROR err = mDelegate->SetActivePresetHandle(presetHandle);
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "Failed to set ActivePresetHandle with error %" CHIP_ERROR_FORMAT, err.Format());
-        return StatusIB(err).mStatus;
     }
 
     NotifyAttributeChanged(ActivePresetHandle::Id);
