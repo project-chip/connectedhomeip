@@ -34,10 +34,10 @@ using namespace chip::Testing;
 
 namespace {
 
-constexpr EndpointId kTestEndpointId    = 1;
-constexpr uint8_t kTestMaxSchedules     = 2;
-constexpr uint8_t kTestMaxTransitions   = 4;
-constexpr uint8_t kTestMaxPerDay        = 2;
+constexpr EndpointId kTestEndpointId  = 1;
+constexpr uint8_t kTestMaxSchedules   = 2;
+constexpr uint8_t kTestMaxTransitions = 4;
+constexpr uint8_t kTestMaxPerDay      = 2;
 
 // A minimal Delegate double. Only the Schedule-related surface has real (array-backed) behavior; every other
 // method returns a safe "empty"/no-op value since these tests do not exercise Presets or ThermostatSuggestions.
@@ -108,10 +108,7 @@ public:
 
     uint8_t GetNumberOfSchedules() override { return kTestMaxSchedules; }
     uint8_t GetNumberOfScheduleTransitions() override { return kTestMaxTransitions; }
-    DataModel::Nullable<uint8_t> GetNumberOfScheduleTransitionsPerDay() override
-    {
-        return DataModel::MakeNullable(kTestMaxPerDay);
-    }
+    DataModel::Nullable<uint8_t> GetNumberOfScheduleTransitionsPerDay() override { return DataModel::MakeNullable(kTestMaxPerDay); }
 
     CHIP_ERROR GetScheduleAtIndex(size_t index, ScheduleStructWithOwnedMembers & schedule) override
     {
@@ -131,8 +128,8 @@ public:
         }
         else
         {
-            ReturnErrorOnFailure(
-                CopySpanToMutableSpan(ByteSpan(mActiveScheduleHandleData, mActiveScheduleHandleSize), activeScheduleHandle.Value()));
+            ReturnErrorOnFailure(CopySpanToMutableSpan(ByteSpan(mActiveScheduleHandleData, mActiveScheduleHandleSize),
+                                                       activeScheduleHandle.Value()));
             activeScheduleHandle.Value().reduce_size(mActiveScheduleHandleSize);
         }
         return CHIP_NO_ERROR;
@@ -169,7 +166,8 @@ public:
         if (schedule.GetScheduleHandle().IsNull())
         {
             const uint8_t handle[] = { static_cast<uint8_t>(mNextHandleValue++) };
-            ReturnErrorOnFailure(mPendingSchedules[mNumPendingSchedules].SetScheduleHandle(DataModel::MakeNullable(ByteSpan(handle))));
+            ReturnErrorOnFailure(
+                mPendingSchedules[mNumPendingSchedules].SetScheduleHandle(DataModel::MakeNullable(ByteSpan(handle))));
         }
         mNumPendingSchedules++;
         return CHIP_NO_ERROR;
@@ -218,7 +216,7 @@ private:
         .systemMode           = SystemModeEnum::kHeat,
         .numberOfSchedules    = kTestMaxSchedules,
         .scheduleTypeFeatures = static_cast<uint16_t>(to_underlying(ScheduleTypeFeaturesBitmap::kSupportsNames) |
-                                                       to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints)),
+                                                      to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints)),
     } };
 
     ScheduleStructWithOwnedMembers mSchedules[kTestMaxSchedules];
@@ -228,8 +226,8 @@ private:
     uint8_t mNextHandleValue     = 100;
 
     uint8_t mActiveScheduleHandleData[kScheduleHandleSize];
-    size_t mActiveScheduleHandleSize    = 0;
-    bool mActiveScheduleHandleIsNull    = true;
+    size_t mActiveScheduleHandleSize = 0;
+    bool mActiveScheduleHandleIsNull = true;
 };
 
 struct TestThermostatClusterSchedules : public ::testing::Test
@@ -280,7 +278,7 @@ struct TestThermostatClusterSchedules : public ::testing::Test
     {
         static const AttributeId kAttrs[] = { Schedules::Id };
         Commands::AtomicRequest::Type request;
-        request.requestType      = requestType;
+        request.requestType       = requestType;
         request.attributeRequests = DataModel::List<const AttributeId>(kAttrs);
         request.timeout           = MakeOptional(static_cast<uint16_t>(3000));
         return request;
@@ -352,8 +350,8 @@ TEST_F(TestThermostatClusterSchedules, WriteToSchedulesOutsideAtomicWriteIsRejec
     schedule.transitions    = DataModel::List<const ScheduleTransitionStruct::Type>();
 
     ScheduleStruct::Type list[] = { schedule };
-    auto writeStatus = mTester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list),
-                                              Testing::ListWritingPattern::ClearAllThenAppendItems);
+    auto writeStatus            = mTester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list),
+                                                         Testing::ListWritingPattern::ClearAllThenAppendItems);
     EXPECT_EQ(writeStatus, CHIP_IM_GLOBAL_STATUS(InvalidInState));
 }
 
