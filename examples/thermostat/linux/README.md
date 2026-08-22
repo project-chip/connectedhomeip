@@ -225,8 +225,8 @@ chip-tool-x86-64 thermostat read max-thermostat-suggestions <nodeID> 1 | grep TO
 -   `INVALID_COMMAND` if `EffectiveTime` is more than 24 hours in the future
 -   `CONSTRAINT_ERROR` if `ExpirationInMinutes` is outside `[30, 1440]`
 
-Add a suggestion for `PresetHandle` `01`, effective now (`EffectiveTime:
-null`), expiring in 60 minutes:
+Add a suggestion for `PresetHandle` `01`, effective now (`EffectiveTime: null`),
+expiring in 60 minutes:
 
 ```shell
 chip-tool-x86-64 thermostat add-thermostat-suggestion PresetHandle EffectiveTime ExpirationInMinutes destination-id endpoint-id-ignored-for-group-commands
@@ -273,8 +273,8 @@ chip-tool-x86-64 thermostat read current-thermostat-suggestion <nodeID> 1 | grep
 
 ### Read ThermostatSuggestionNotFollowingReason
 
-`null` while the current suggestion's setpoints are being followed; otherwise
-a `ThermostatSuggestionNotFollowingReasonBitmap` value describing why it isn't
+`null` while the current suggestion's setpoints are being followed; otherwise a
+`ThermostatSuggestionNotFollowingReasonBitmap` value describing why it isn't
 (e.g. an active hold, schedule, or vacation mode overriding it):
 
 ```shell
