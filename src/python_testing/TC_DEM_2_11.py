@@ -107,7 +107,7 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kOnline)
 
         self.step("5b", "TH reads AbsMinPower and AbsMaxPower",
-                  expectation="DUT replies with with valid values where AbsMinPower < AbsMaxPower. Note AbsMinPower and AbsMaxPower for use in constraints validation.")
+                  expectation="DUT replies with valid values where AbsMinPower < AbsMaxPower. Note AbsMinPower and AbsMaxPower for use in constraints validation.")
         absMinPower = await self.read_dem_attribute_expect_success(attribute="AbsMinPower")
         absMaxPower = await self.read_dem_attribute_expect_success(attribute="AbsMaxPower")
 
@@ -141,7 +141,7 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
                              Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kLocalOptimizationAdjustment)
         asserts.assert_greater(powerRangeAdjustment.endTime, timeNowEpoch + 4)  # Allow 1 second margin for test execution time
 
-        self.step("6b", "TH reads ESAState", expectation="value is 0x04 (PowerAdjustActive)")
+        self.step("6b", "TH reads ESAState", expectation="value is 0x03 (PowerAdjustActive)")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPowerAdjustActive)
 
         self.step("7", "Wait up to 10 seconds", expectation="Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=NormalCompletion")
@@ -186,7 +186,7 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
                                                        duration=5)
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustStart)
 
-        self.step("11a", "TH reads ESAState", expectation="value is 0x04 (PowerAdjustActive)")
+        self.step("11a", "TH reads ESAState", expectation="value is 0x03 (PowerAdjustActive)")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPowerAdjustActive)
 
         self.step("11b", "Wait up to 10 seconds", expectation="Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=NormalCompletion")
@@ -207,7 +207,7 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
                                                        duration=5)
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustStart)
 
-        self.step("12a", "TH reads ESAState", expectation="value is 0x04 (PowerAdjustActive)")
+        self.step("12a", "TH reads ESAState", expectation="value is 0x03 (PowerAdjustActive)")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPowerAdjustActive)
 
         self.step("12b", "Wait up to 10 seconds", expectation="Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=NormalCompletion")
@@ -259,13 +259,13 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
 
         self.step("18", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower, MaxPower=AbsMaxPower, Duration=5, Cause=InvalidValue (out of range)",
                   expectation="DUT responds with status CONSTRAINT_ERROR")
-        # Send command with invalid cause enum value (99 is not a valid AdjustmentCauseEnum)
+        # Send command with invalid cause enum value
         try:
             await self.send_single_cmd(cmd=Clusters.DeviceEnergyManagement.Commands.PowerRangeAdjustRequest(
                 minPower=absMinPower,
                 maxPower=absMaxPower,
                 duration=5,
-                cause=99),  # Invalid enum value
+                cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kUnknownEnumValue),  # Invalid enum value
                 endpoint=self.get_endpoint(),
                 timedRequestTimeoutMs=3000)
             asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
@@ -288,7 +288,7 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
         asserts.assert_equal(powerRangeAdjustment.cause,
                              Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kGridOptimizationAdjustment)
 
-        self.step("19b", "TH reads ESAState", expectation="value is 0x04 (PowerAdjustActive)")
+        self.step("19b", "TH reads ESAState", expectation="value is 0x03 (PowerAdjustActive)")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPowerAdjustActive)
 
         self.step("20", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower+100, MaxPower=AbsMaxPower-100, Duration=7200, Cause=LocalOptimization",
@@ -307,7 +307,7 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
         asserts.assert_equal(powerRangeAdjustment.cause,
                              Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kLocalOptimizationAdjustment)
 
-        self.step("20b", "TH reads ESAState", expectation="value is 0x04 (PowerAdjustActive)")
+        self.step("20b", "TH reads ESAState", expectation="value is 0x03 (PowerAdjustActive)")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPowerAdjustActive)
 
         self.step("21", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower+200, MaxPower=AbsMaxPower-200, Duration=2000, Cause=GridOptimization",
@@ -326,7 +326,7 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
         asserts.assert_equal(powerRangeAdjustment.cause,
                              Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kGridOptimizationAdjustment)
 
-        self.step("21b", "TH reads ESAState", expectation="value is 0x04 (PowerAdjustActive)")
+        self.step("21b", "TH reads ESAState", expectation="value is 0x03 (PowerAdjustActive)")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPowerAdjustActive)
 
         self.step("22", "TH sends CancelPowerRangeAdjustRequest",
@@ -352,7 +352,7 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
                                                        duration=2000)
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustStart)
 
-        self.step("24a", "TH reads ESAState", expectation="value is 0x04 (PowerAdjustActive)")
+        self.step("24a", "TH reads ESAState", expectation="value is 0x03 (PowerAdjustActive)")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPowerAdjustActive)
 
         self.step("24b", "Wait 2 seconds",
