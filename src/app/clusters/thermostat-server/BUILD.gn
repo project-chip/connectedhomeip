@@ -18,6 +18,8 @@ source_set("thermostat-server") {
   sources = [
     "PresetStructWithOwnedMembers.cpp",
     "PresetStructWithOwnedMembers.h",
+    "ScheduleStructWithOwnedMembers.cpp",
+    "ScheduleStructWithOwnedMembers.h",
     "Setpoint.cpp",
     "Setpoint.h",
     "SetpointAttributes.cpp",
@@ -36,6 +38,8 @@ source_set("thermostat-server") {
     "ThermostatClusterPresets.cpp",
     "ThermostatClusterPresets.h",
     "ThermostatClusterRead.cpp",
+    "ThermostatClusterSchedules.cpp",
+    "ThermostatClusterSchedules.h",
     "ThermostatClusterSetpoints.cpp",
     "ThermostatClusterSuggestions.cpp",
     "ThermostatClusterWrite.cpp",

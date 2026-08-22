@@ -320,6 +320,11 @@ std::optional<DataModel::ActionReturnStatus> ThermostatCluster::InvokeCommand(co
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
         return SetActivePreset(request_data.presetHandle);
     }
+    case Commands::SetActiveScheduleRequest::Id: {
+        Commands::SetActiveScheduleRequest::DecodableType request_data;
+        ReturnErrorOnFailure(request_data.Decode(input_arguments));
+        return SetActiveSchedule(DataModel::MakeNullable(request_data.scheduleHandle));
+    }
     case Commands::AtomicRequest::Id: {
         Commands::AtomicRequest::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
@@ -362,6 +367,13 @@ Status ThermostatCluster::OnAtomicWriteBegin(AttributeId attributeId)
         }
         mDelegate->InitializePendingPresets();
         break;
+    case Schedules::Id:
+        if (mDelegate == nullptr)
+        {
+            return Status::InvalidInState;
+        }
+        mDelegate->InitializePendingSchedules();
+        break;
     default:
         break;
     }
@@ -374,6 +386,8 @@ Status ThermostatCluster::OnAtomicWritePrecommit(AttributeId attributeId)
     {
     case Presets::Id:
         return PrecommitPresets();
+    case Schedules::Id:
+        return PrecommitSchedules();
     default:
         break;
     }
@@ -396,6 +410,18 @@ Status ThermostatCluster::OnAtomicWriteCommit(AttributeId attributeId)
         }
         return status.GetStatus();
     }
+    case Schedules::Id: {
+        if (mDelegate == nullptr)
+        {
+            return Status::InvalidInState;
+        }
+        ClusterStatusCode status(mDelegate->CommitPendingSchedules());
+        if (status.IsSuccess())
+        {
+            NotifyAttributeChanged(attributeId);
+        }
+        return status.GetStatus();
+    }
     default:
         break;
     }
@@ -412,6 +438,13 @@ Status ThermostatCluster::OnAtomicWriteRollback(AttributeId attributeId)
             return Status::InvalidInState;
         }
         mDelegate->ClearPendingPresetList();
+        break;
+    case Schedules::Id:
+        if (mDelegate == nullptr)
+        {
+            return Status::InvalidInState;
+        }
+        mDelegate->ClearPendingScheduleList();
         break;
     default:
         break;
