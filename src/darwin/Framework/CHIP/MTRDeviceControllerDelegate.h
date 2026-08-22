@@ -59,8 +59,8 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  */
 - (void)controller:(MTRDeviceController *)controller
     commissioningComplete:(NSError * _Nullable)error
-    MTR_DEPRECATED("Please use controller:commissioningComplete:nodeID:", ios(16.4, 17.0), macos(13.3, 14.0), watchos(9.4, 10.0),
-        tvos(16.4, 17.0));
+    MTR_DEPRECATED_WITH_REPLACEMENT("controller:commissioningComplete:nodeID:",
+        ios(16.4, 17.0), macos(13.3, 14.0), watchos(9.4, 10.0), tvos(16.4, 17.0));
 
 /**
  * Notify the delegate when commissioning is completed.
@@ -84,12 +84,35 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * The metrics object contains information corresponding to the commissioning session.
  *
- * If supported, this selector will be used in preference to controller:commissioningComplete:nodeID:.
+ * This selector will not be used if controller:commissioningComplete:nodeID:metrics:context: is supported.
  */
 - (void)controller:(MTRDeviceController *)controller
     commissioningComplete:(NSError * _Nullable)error
                    nodeID:(NSNumber * _Nullable)nodeID
-                  metrics:(MTRMetrics *)metrics MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+                  metrics:(MTRMetrics *)metrics
+    MTR_DEPRECATED_WITH_REPLACEMENT("controller:commissioningComplete:nodeID:metrics:context:",
+        ios(17.6, 27.0), macos(14.6, 27.0), watchos(10.6, 27.0), tvos(17.6, 27.0));
+
+/**
+ * Notify the delegate when commissioning is completed.
+ *
+ * Exactly one of error and nodeID will be nil.
+ *
+ * If nodeID is not nil, then it represents the node id the node was assigned, as encoded in its operational certificate.
+ *
+ * The metrics object contains information corresponding to the commissioning session.
+ *
+ * The context parameter is a dictionary. See MTRCommissioningDelegate's commissioning:succeededForNodeID:metrics:context:
+ * for the supported keys.
+ *
+ * If supported, this selector will be used in preference to controller:commissioningComplete:nodeID: and
+ * controller:commissioningComplete:nodeID:metrics:.
+ */
+- (void)controller:(MTRDeviceController *)controller
+    commissioningComplete:(NSError * _Nullable)error
+                   nodeID:(NSNumber * _Nullable)nodeID
+                  metrics:(MTRMetrics *)metrics
+                  context:(NSDictionary<NSString *, id> *)context MTR_AVAILABLE(ios(27.0), macos(27.0), watchos(27.0), tvos(27.0));
 
 /**
  * Notify the delegate when commissioning infomation has been read from the commissionee.
