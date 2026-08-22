@@ -806,7 +806,7 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
     const bool threadEstablished =
         (threadNewConnectionEstablished || threadRoleChanged) && DeviceLayer::ConnectivityMgr().IsThreadAttached();
 #else
-    const bool threadEstablished                = false;
+    const bool threadEstablished = false;
 #endif
 
     // Early return if Thread connectivity is not established
@@ -846,8 +846,7 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
     {
         for (size_t i = 0; i < mPendingCheckInSubjectsCount; ++i)
         {
-            ChipLogProgress(AppServer,
-                            "ICDManager: Replaying deferred Check-In message for specific subject: " ChipLogFormatX64,
+            ChipLogProgress(AppServer, "ICDManager: Replaying deferred Check-In message for specific subject: " ChipLogFormatX64,
                             ChipLogValueX64(mPendingCheckInSubjects[i].subject));
             SendCheckInMsgs(MakeOptional(mPendingCheckInSubjects[i]));
         }
