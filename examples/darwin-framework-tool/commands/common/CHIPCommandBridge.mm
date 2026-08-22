@@ -217,6 +217,7 @@ CHIP_ERROR CHIPCommandBridge::SetUpStackWithPerControllerStorage(NSArray<NSData 
         [params setOTAProviderDelegate:mOTADelegate queue:otaDelegateQueue];
 
         params.productAttestationAuthorityCertificates = productAttestationAuthorityCertificates;
+        params.shouldAdvertiseOperational = YES;
 
         MTRDeviceController * controller = nil;
         if (mUseXPC.HasValue()) {
