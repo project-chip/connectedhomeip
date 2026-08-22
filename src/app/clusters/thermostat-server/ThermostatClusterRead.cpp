@@ -110,10 +110,11 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         // TODO: implement thermostat running state
         return Status::UnsupportedAttribute;
     case SetpointChangeSource::Id:
+        return encoder.Encode(mSetpointChangeSource);
     case SetpointChangeAmount::Id:
+        return encoder.Encode(mSetpointChangeAmount);
     case SetpointChangeSourceTimestamp::Id:
-        // TODO: implement setpoint change attributes
-        return Status::UnsupportedAttribute;
+        return encoder.Encode(mSetpointChangeSourceTimestamp);
     case PresetTypes::Id: {
         auto & delegate = mDelegate;
         VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));

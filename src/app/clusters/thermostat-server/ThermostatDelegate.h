@@ -234,6 +234,17 @@ public:
      */
     virtual CHIP_ERROR GetScheduleTypeAtIndex(size_t index, Structs::ScheduleTypeStruct::Type & scheduleType) = 0;
 
+    /**
+     * @brief Get the source to report in SetpointChangeSource for the setpoint change currently being applied.
+     *        Called whenever one of the operational setpoints (Occupied/UnoccupiedHeating/CoolingSetpoint) changes.
+     *        The default implementation always reports Manual, since the cluster itself has no autonomous
+     *        mechanism (e.g. schedule application) that changes setpoints on its own; a delegate driving setpoints
+     *        from such a mechanism should override this to report the appropriate source.
+     *
+     * @return The SetpointChangeSourceEnum value to report.
+     */
+    virtual SetpointChangeSourceEnum GetSetpointChangeSource() { return SetpointChangeSourceEnum::kManual; }
+
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
 
     // This should be removed once #39949 is fixed.

@@ -22,6 +22,9 @@
 #include <clusters/Thermostat/Metadata.h>
 #include <lib/support/Assertions.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <system/SystemClock.h>
+
+#include <limits>
 
 #include "Setpoint.h"
 #include "Temperature.h"
@@ -36,6 +39,26 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace Thermostat {
+
+namespace {
+
+// The setpoint-change tracking attributes (SetpointChangeSource/Amount/SourceTimestamp) only reflect
+// changes to the active operational setpoints, not to the user/absolute setpoint limits.
+bool IsOperationalSetpointAttribute(AttributeId attributeId)
+{
+    switch (attributeId)
+    {
+    case OccupiedHeatingSetpoint::Id:
+    case OccupiedCoolingSetpoint::Id:
+    case UnoccupiedHeatingSetpoint::Id:
+    case UnoccupiedCoolingSetpoint::Id:
+        return true;
+    default:
+        return false;
+    }
+}
+
+} // namespace
 
 DataModel::ActionReturnStatus ThermostatCluster::HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId,
                                                                       temperature value, SetpointAttributes & changedAttributes)
@@ -279,6 +302,10 @@ Protocols::InteractionModel::Status ThermostatCluster::SaveSetpoint(Setpoint & o
     {
         GenerateSetpointEvent(oldSetpoint.AttributeId(), oldSetpoint.Temperature(), newSetpoint.Temperature());
     }
+    if (IsOperationalSetpointAttribute(oldSetpoint.AttributeId()))
+    {
+        UpdateSetpointChangeAttributes(oldSetpoint.Temperature(), newSetpoint.Temperature());
+    }
     oldSetpoint.SetTemperature(newSetpoint.Temperature());
     NotifyAttributeChanged(oldSetpoint.AttributeId());
     return Status::Success;
@@ -345,6 +372,40 @@ DataModel::ActionReturnStatus ThermostatCluster::SaveSetpoints(Setpoints & setpo
         }
     }
     return Status::Success;
+}
+
+void ThermostatCluster::UpdateSetpointChangeAttributes(temperature oldTemp, temperature newTemp)
+{
+    if (mOptionalAttributes.SetpointChangeAmount)
+    {
+        int32_t delta = static_cast<int32_t>(newTemp) - static_cast<int32_t>(oldTemp);
+        if (delta > std::numeric_limits<int16_t>::max())
+        {
+            delta = std::numeric_limits<int16_t>::max();
+        }
+        else if (delta < std::numeric_limits<int16_t>::min())
+        {
+            delta = std::numeric_limits<int16_t>::min();
+        }
+        mSetpointChangeAmount.SetNonNull(static_cast<int16_t>(delta));
+        NotifyAttributeChanged(SetpointChangeAmount::Id);
+    }
+
+    if (mOptionalAttributes.SetpointChangeSource)
+    {
+        mSetpointChangeSource = (mDelegate != nullptr) ? mDelegate->GetSetpointChangeSource() : SetpointChangeSourceEnum::kManual;
+        NotifyAttributeChanged(SetpointChangeSource::Id);
+    }
+
+    if (mOptionalAttributes.SetpointChangeSourceTimestamp)
+    {
+        uint32_t nowSeconds;
+        if (System::Clock::GetClock_MatterEpochS(nowSeconds) == CHIP_NO_ERROR)
+        {
+            mSetpointChangeSourceTimestamp = nowSeconds;
+            NotifyAttributeChanged(SetpointChangeSourceTimestamp::Id);
+        }
+    }
 }
 
 DataModel::ActionReturnStatus ThermostatCluster::ChangeSetpointAttribute(const AttributeId attributeId, temperature temp)
