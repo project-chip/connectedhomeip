@@ -64,6 +64,43 @@ CHIP_ERROR RemoveExpiredSuggestions(Delegate * delegate)
     return err;
 }
 
+/**
+ * @brief Determines whether a preset handle still exists in the Presets attribute list.
+ *
+ * Unlike IsPresetHandlePresentInPresets(), which treats a GetPresetAtIndex() enumeration error the same as "not
+ * found", this distinguishes the two so callers that take a destructive action (e.g. removing a thermostat
+ * suggestion) on "not found" do not do so on a transient enumeration error.
+ *
+ * @param[in]  delegate The delegate to use.
+ * @param[in]  presetHandle The preset handle to look for.
+ * @param[out] exists Set to true if a preset with this handle is present in the Presets attribute list, false
+ *             otherwise.
+ *
+ * @return CHIP_NO_ERROR if the Presets attribute list was enumerated successfully, an error code if not.
+ */
+CHIP_ERROR PresetHandleStillExists(Delegate * delegate, const ByteSpan & presetHandle, bool & exists)
+{
+    exists = false;
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    PresetStructWithOwnedMembers preset;
+    for (uint8_t i = 0; true; i++)
+    {
+        CHIP_ERROR err = delegate->GetPresetAtIndex(i, preset);
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
+            return CHIP_NO_ERROR;
+        }
+        ReturnErrorOnFailure(err);
+
+        if (!preset.GetPresetHandle().IsNull() && preset.GetPresetHandle().Value().data_equal(presetHandle))
+        {
+            exists = true;
+            return CHIP_NO_ERROR;
+        }
+    }
+}
+
 Status RemoveFromThermostatSuggestionsList(Delegate * delegate, uint8_t uniqueIDToRemove)
 {
     VerifyOrReturnValue(delegate != nullptr, Status::Failure);
@@ -291,6 +328,38 @@ void ThermostatCluster::ReEvaluateCurrentSuggestion()
 
     // If the active preset handle changed, notify the attribute changed.
     NotifyAttributeChanged(ActivePresetHandle::Id);
+}
+
+CHIP_ERROR ThermostatCluster::RemoveThermostatSuggestionsForRemovedPresets()
+{
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    bool didRemoveAnEntry = false;
+
+    // Walk backwards so removing an entry does not shift the indices of entries not yet visited.
+    for (int i = static_cast<int>(mDelegate->GetNumberOfThermostatSuggestions()) - 1; i >= 0; i--)
+    {
+        ThermostatSuggestionStructWithOwnedMembers suggestion;
+        CHIP_ERROR err = mDelegate->GetThermostatSuggestionAtIndex(static_cast<size_t>(i), suggestion);
+        ReturnErrorOnFailure(err);
+
+        bool presetStillExists = false;
+        err                    = PresetHandleStillExists(mDelegate, suggestion.GetPresetHandle(), presetStillExists);
+        ReturnErrorOnFailure(err);
+
+        if (!presetStillExists)
+        {
+            ReturnErrorOnFailure(mDelegate->RemoveFromThermostatSuggestionsList(static_cast<size_t>(i)));
+            didRemoveAnEntry = true;
+        }
+    }
+
+    if (didRemoveAnEntry)
+    {
+        NotifyAttributeChanged(ThermostatSuggestions::Id);
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Thermostat

@@ -43,8 +43,8 @@ namespace Thermostat {
 ThermostatCluster::ThermostatCluster(EndpointId endpointId, BitFlags<Thermostat::Feature> features,
                                      const OptionalAttributes & optionalAttributes, const DefaultValues & defaultValues,
                                      FabricTable & fabricTable) :
-    DefaultServerCluster({ endpointId, Thermostat::Id }),
-    mFeatures(features), mOptionalAttributes(optionalAttributes), mDefaultValues(defaultValues), mFabricTable(fabricTable)
+    DefaultServerCluster({ endpointId, Thermostat::Id }), mFeatures(features), mOptionalAttributes(optionalAttributes),
+    mDefaultValues(defaultValues), mFabricTable(fabricTable)
 {
     mAtomicWriteSession.SetDelegate(this);
 }
@@ -393,6 +393,13 @@ Status ThermostatCluster::OnAtomicWriteCommit(AttributeId attributeId)
         if (status.IsSuccess())
         {
             NotifyAttributeChanged(attributeId);
+
+            // Per spec § 4.3.11.50, removing a preset that is referenced by a ThermostatSuggestions entry or by
+            // CurrentThermostatSuggestion must cascade: prune the stale suggestion entries and re-evaluate
+            // CurrentThermostatSuggestion. This is best-effort since the Presets commit above has already taken
+            // effect.
+            LogErrorOnFailure(RemoveThermostatSuggestionsForRemovedPresets());
+            ReEvaluateCurrentSuggestion();
         }
         return status.GetStatus();
     }
