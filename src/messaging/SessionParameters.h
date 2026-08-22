@@ -20,6 +20,7 @@
 
 #include <lib/core/TLV.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
+#include <system/SystemConfig.h>
 
 namespace chip {
 
@@ -41,10 +42,13 @@ public:
     static constexpr size_t kSizeOfInteractionModelRevision = sizeof(uint16_t);
     static constexpr size_t kSizeOfSpecificationVersion     = sizeof(uint32_t);
     static constexpr size_t kSizeOfMaxPathsPerInvoke        = sizeof(uint16_t);
+    static constexpr size_t kSizeOfSupportedTransports      = sizeof(uint16_t);
+    static constexpr size_t kTCPFramingHeaderSize           = 4;
 
-    static constexpr size_t kEstimatedTLVSize = TLV::EstimateStructOverhead(
-        kSizeOfSessionIdleInterval, kSizeOfSessionActiveInterval, kSizeOfSessionActiveThreshold, kSizeOfDataModelRevision,
-        kSizeOfInteractionModelRevision, kSizeOfSpecificationVersion, kSizeOfMaxPathsPerInvoke);
+    static constexpr size_t kEstimatedTLVSize =
+        TLV::EstimateStructOverhead(kSizeOfSessionIdleInterval, kSizeOfSessionActiveInterval, kSizeOfSessionActiveThreshold,
+                                    kSizeOfDataModelRevision, kSizeOfInteractionModelRevision, kSizeOfSpecificationVersion,
+                                    kSizeOfMaxPathsPerInvoke, kSizeOfSupportedTransports, kTCPFramingHeaderSize);
 
     // From Section 4.12.8 "Parameters and Constants" in chapter "Secure Channel".
     enum Tag : uint32_t
@@ -56,6 +60,15 @@ public:
         kInteractionModelRevision = 5,
         kSpecificationVersion     = 6,
         kMaxPathsPerInvoke        = 7,
+        kSupportedTransports      = 8,
+        kMaxTCPPayloadSize        = 9,
+    };
+
+    // From Table 7. "Supported Transport Mode Values" in chapter "Secure Channel".
+    enum class SupportedTransport : uint16_t
+    {
+        kTcpClient = 0x02,
+        kTcpServer = 0x04,
     };
 
     const ReliableMessageProtocolConfig & GetMRPConfig() const { return mMRPConfig; }
@@ -91,6 +104,12 @@ public:
     uint16_t GetMaxPathsPerInvoke() const { return mMaxPathsPerInvoke; }
     void SetMaxPathsPerInvoke(const uint16_t maxPathsPerInvoke) { mMaxPathsPerInvoke = maxPathsPerInvoke; }
 
+    uint16_t GetSupportedTransports() const { return mSupportedTransports; }
+    void SetSupportedTransports(const uint16_t supportedTransports) { mSupportedTransports = supportedTransports; }
+
+    uint32_t GetMaxTCPPayloadSize() const { return mMaxTCPPayloadSize; }
+    void SetMaxTCPPayloadSize(const uint32_t maxTCPPayloadSize) { mMaxTCPPayloadSize = maxTCPPayloadSize; }
+
 private:
     ReliableMessageProtocolConfig mMRPConfig;
     // For legacy reasons if we do not get DataModelRevision it means either 16 or 17. But there isn't
@@ -104,6 +123,12 @@ private:
     Optional<uint32_t> mSpecificationVersion;
     // When maxPathsPerInvoke is not provided legacy is always 1
     uint16_t mMaxPathsPerInvoke = 1;
+
+    // Bitmap of supported transports.
+    uint16_t mSupportedTransports = 0;
+    // Maximum size of the TCP payload that the node is capable of receiving
+    // from its peer.
+    uint32_t mMaxTCPPayloadSize = CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES - kTCPFramingHeaderSize;
 };
 
 } // namespace chip
