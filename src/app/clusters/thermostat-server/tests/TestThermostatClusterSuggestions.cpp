@@ -24,6 +24,8 @@
 #include <lib/support/CodeUtils.h>
 #include <pw_unit_test/framework.h>
 
+#include <algorithm>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -58,6 +60,11 @@ public:
     CHIP_ERROR GetPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset) override
     {
         if (mFailPresetEnumerationAtIndex.has_value() && index == *mFailPresetEnumerationAtIndex)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+        mPresetEnumerationCallCount++;
+        if (mFailPresetEnumerationOnCallNumber.has_value() && mPresetEnumerationCallCount == *mFailPresetEnumerationOnCallNumber)
         {
             return CHIP_ERROR_INTERNAL;
         }
@@ -206,6 +213,11 @@ public:
     // enumeration failure.
     void FailPresetEnumerationAtIndex(size_t index) { mFailPresetEnumerationAtIndex = index; }
 
+    // Makes the Nth call to GetPresetAtIndex() (1-indexed, counted across the whole cascade) fail with a
+    // non-list-exhausted error, regardless of which index is being enumerated. Used to simulate a delegate that
+    // starts failing partway through a cascade that checks multiple suggestions' presets in turn.
+    void FailPresetEnumerationOnCallNumber(int callNumber) { mFailPresetEnumerationOnCallNumber = callNumber; }
+
     bool IsCurrentSuggestionNull() const { return mCurrentSuggestionIsNull; }
 
 private:
@@ -222,6 +234,8 @@ private:
     bool mCurrentSuggestionIsNull = true;
 
     std::optional<size_t> mFailPresetEnumerationAtIndex;
+    std::optional<int> mFailPresetEnumerationOnCallNumber;
+    int mPresetEnumerationCallCount = 0;
 };
 
 struct TestThermostatClusterSuggestions : public ::testing::Test
@@ -291,6 +305,37 @@ TEST_F(TestThermostatClusterSuggestions, CommitAtomicWriteOfPresetsCascadesRemov
     EXPECT_TRUE(mDelegate.IsCurrentSuggestionNull());
 }
 
+// Removing the CurrentThermostatSuggestion's preset with no other suggestion available to replace it must still
+// notify CurrentThermostatSuggestion as changed. ReEvaluateCurrentSuggestion() alone can't detect this transition:
+// by the time it takes its "before" snapshot, the cascade has already nulled the delegate's CurrentThermostatSuggestion.
+TEST_F(TestThermostatClusterSuggestions, CommitAtomicWriteNotifiesCurrentThermostatSuggestionWhenClearedWithNoReplacement)
+{
+    mDelegate.SeedPreset(0x01);
+    mDelegate.SeedPreset(0x02);
+    mDelegate.SeedSuggestion(/* uniqueID = */ 7, /* presetHandleByte = */ 0x02, /* makeCurrent = */ true);
+
+    ASSERT_EQ(mCluster.OnAtomicWriteBegin(Presets::Id), Status::Success);
+    mDelegate.ClearPendingPresetList();
+    PresetStructWithOwnedMembers survivingPreset;
+    survivingPreset.SetPresetScenario(PresetScenarioEnum::kOccupied);
+    const uint8_t survivingHandle[] = { 0x01 };
+    ASSERT_EQ(survivingPreset.SetPresetHandle(DataModel::MakeNullable(ByteSpan(survivingHandle))), CHIP_NO_ERROR);
+    ASSERT_EQ(survivingPreset.SetName(NullOptional), CHIP_NO_ERROR);
+    ASSERT_EQ(mDelegate.AppendToPendingPresetList(survivingPreset), CHIP_NO_ERROR);
+
+    EXPECT_EQ(mCluster.OnAtomicWriteCommit(Presets::Id), Status::Success);
+
+    EXPECT_TRUE(mDelegate.IsCurrentSuggestionNull());
+
+    // mTester (ClusterTester) owns its own TestServerClusterContext, distinct from mTestContext above, which is what
+    // mCluster is actually attached to via Startup(). Check dirty attributes against mTestContext's listener.
+    const auto & dirtyList = mTestContext.ChangeListener().DirtyList();
+    ConcreteAttributePath thermostatSuggestionsPath(kTestEndpointId, Thermostat::Id, ThermostatSuggestions::Id);
+    ConcreteAttributePath currentThermostatSuggestionPath(kTestEndpointId, Thermostat::Id, CurrentThermostatSuggestion::Id);
+    EXPECT_NE(std::find(dirtyList.begin(), dirtyList.end(), thermostatSuggestionsPath), dirtyList.end());
+    EXPECT_NE(std::find(dirtyList.begin(), dirtyList.end(), currentThermostatSuggestionPath), dirtyList.end());
+}
+
 // A suggestion whose preset survives the commit must not be touched by the cascade.
 TEST_F(TestThermostatClusterSuggestions, CommitAtomicWriteOfPresetsPreservesSuggestionsForSurvivingPresets)
 {
@@ -321,6 +366,27 @@ TEST_F(TestThermostatClusterSuggestions, CommitAtomicWriteDoesNotDropSuggestions
 
     EXPECT_EQ(mDelegate.GetNumberOfThermostatSuggestions(), 1);
     EXPECT_FALSE(mDelegate.IsCurrentSuggestionNull());
+}
+
+// If the Presets enumeration fails only partway through a cascade that has to check multiple suggestions, none of
+// the suggestions checked before the failure may be removed either: the cascade must be all-or-nothing, not leave a
+// partially-cleaned ThermostatSuggestions list behind an error.
+TEST_F(TestThermostatClusterSuggestions, CommitAtomicWriteDoesNotPartiallyRemoveSuggestionsWhenLaterEnumerationFails)
+{
+    mDelegate.SeedPreset(0x01);
+    // Both suggestions reference presets that no longer exist (only 0x01 is committed).
+    mDelegate.SeedSuggestion(/* uniqueID = */ 1, /* presetHandleByte = */ 0x02, /* makeCurrent = */ false);
+    mDelegate.SeedSuggestion(/* uniqueID = */ 2, /* presetHandleByte = */ 0x03, /* makeCurrent = */ false);
+    // The first suggestion's preset check takes 2 GetPresetAtIndex() calls to confirm absence (one non-matching
+    // preset, then list-exhausted); the 3rd call, made while checking the second suggestion, fails.
+    mDelegate.FailPresetEnumerationOnCallNumber(3);
+
+    ASSERT_EQ(mCluster.OnAtomicWriteBegin(Presets::Id), Status::Success);
+    EXPECT_EQ(mCluster.OnAtomicWriteCommit(Presets::Id), Status::Success);
+
+    // Neither suggestion was removed: the first suggestion's preset absence was confirmed before the failure, but
+    // must not be acted upon since the cascade as a whole couldn't complete.
+    EXPECT_EQ(mDelegate.GetNumberOfThermostatSuggestions(), 2);
 }
 
 } // namespace

@@ -334,21 +334,47 @@ CHIP_ERROR ThermostatCluster::RemoveThermostatSuggestionsForRemovedPresets()
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    bool didRemoveAnEntry = false;
+    uint8_t numSuggestions = mDelegate->GetNumberOfThermostatSuggestions();
 
-    // Walk backwards so removing an entry does not shift the indices of entries not yet visited.
-    for (int i = static_cast<int>(mDelegate->GetNumberOfThermostatSuggestions()) - 1; i >= 0; i--)
+    // First pass: check every suggestion's preset for existence without mutating ThermostatSuggestions. If any
+    // check fails, abort with no removals at all: an inconclusive answer for one entry must not cause a partial
+    // cleanup of the entries already checked.
+    for (uint8_t i = 0; i < numSuggestions; i++)
     {
         ThermostatSuggestionStructWithOwnedMembers suggestion;
-        CHIP_ERROR err = mDelegate->GetThermostatSuggestionAtIndex(static_cast<size_t>(i), suggestion);
-        ReturnErrorOnFailure(err);
+        ReturnErrorOnFailure(mDelegate->GetThermostatSuggestionAtIndex(i, suggestion));
 
         bool presetStillExists = false;
-        err                    = PresetHandleStillExists(mDelegate, suggestion.GetPresetHandle(), presetStillExists);
-        ReturnErrorOnFailure(err);
+        ReturnErrorOnFailure(PresetHandleStillExists(mDelegate, suggestion.GetPresetHandle(), presetStillExists));
+    }
+
+    // currentUniqueID identifies the CurrentThermostatSuggestion entry, if any, so the second pass can tell whether
+    // it is one of the entries being removed. RemoveFromThermostatSuggestionsList() nulls CurrentThermostatSuggestion
+    // when that happens, but does not itself notify: if no other suggestion later becomes current,
+    // ReEvaluateCurrentSuggestion()'s own before/after diff can't detect the change, since by the time it takes its
+    // "before" snapshot, this cascade has already nulled it out.
+    DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> currentSuggestion;
+    mDelegate->GetCurrentThermostatSuggestion(currentSuggestion);
+
+    bool didRemoveAnEntry           = false;
+    bool didRemoveCurrentSuggestion = false;
+
+    // Second pass: every preset check above succeeded, so it's now safe to actually remove the stale entries. Walk
+    // backwards so removing an entry does not shift the indices of entries not yet visited.
+    for (int i = static_cast<int>(numSuggestions) - 1; i >= 0; i--)
+    {
+        ThermostatSuggestionStructWithOwnedMembers suggestion;
+        ReturnErrorOnFailure(mDelegate->GetThermostatSuggestionAtIndex(static_cast<size_t>(i), suggestion));
+
+        bool presetStillExists = false;
+        ReturnErrorOnFailure(PresetHandleStillExists(mDelegate, suggestion.GetPresetHandle(), presetStillExists));
 
         if (!presetStillExists)
         {
+            if (!currentSuggestion.IsNull() && currentSuggestion.Value().GetUniqueID() == suggestion.GetUniqueID())
+            {
+                didRemoveCurrentSuggestion = true;
+            }
             ReturnErrorOnFailure(mDelegate->RemoveFromThermostatSuggestionsList(static_cast<size_t>(i)));
             didRemoveAnEntry = true;
         }
@@ -357,6 +383,10 @@ CHIP_ERROR ThermostatCluster::RemoveThermostatSuggestionsForRemovedPresets()
     if (didRemoveAnEntry)
     {
         NotifyAttributeChanged(ThermostatSuggestions::Id);
+    }
+    if (didRemoveCurrentSuggestion)
+    {
+        NotifyAttributeChanged(CurrentThermostatSuggestion::Id);
     }
 
     return CHIP_NO_ERROR;

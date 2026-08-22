@@ -398,7 +398,14 @@ Status ThermostatCluster::OnAtomicWriteCommit(AttributeId attributeId)
             // CurrentThermostatSuggestion must cascade: prune the stale suggestion entries and re-evaluate
             // CurrentThermostatSuggestion. This is best-effort since the Presets commit above has already taken
             // effect.
-            LogErrorOnFailure(RemoveThermostatSuggestionsForRemovedPresets());
+            CHIP_ERROR err = RemoveThermostatSuggestionsForRemovedPresets();
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(
+                    Zcl,
+                    "Failed to remove ThermostatSuggestions for removed presets at endpoint %u with error: %" CHIP_ERROR_FORMAT,
+                    mPath.mEndpointId, err.Format());
+            }
             ReEvaluateCurrentSuggestion();
         }
         return status.GetStatus();
