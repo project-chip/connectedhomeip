@@ -47,6 +47,10 @@ public:
              const app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type & bindingEntry,
              std::function<void()> onSuccess) override;
     CHIP_ERROR
+    SyncNode(NodeId nodeId, EndpointId endpointId,
+             std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> & bindingEntries,
+             std::function<void()> onSuccess) override;
+    CHIP_ERROR
     SyncNode(NodeId nodeId,
              std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> & bindingEntries,
              std::function<void()> onSuccess) override;
