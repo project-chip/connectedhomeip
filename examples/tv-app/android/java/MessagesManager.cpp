@@ -326,7 +326,7 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
                 chip::Encoding::BytesToUppercaseHexString(messageId.data(), messageId.size(), hex_buf, sizeof(hex_buf)),
             CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "BytesToUppercaseHexString failed"));
 
-        jstring jid    = nullptr;
+        jstring jid = nullptr;
         CHIP_ERROR err =
             JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(hex_buf), reinterpret_cast<jobject &>(jid));
         if (err != CHIP_NO_ERROR)
@@ -454,7 +454,7 @@ CHIP_ERROR MessagesManager::HandleCancelMessagesRequest(const DataModel::Decodab
                                 chip::Encoding::BytesToUppercaseHexString(id.data(), id.size(), hex_buf, sizeof(hex_buf)),
                             CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "BytesToUppercaseHexString failed"));
 
-        jstring jid      = nullptr;
+        jstring jid = nullptr;
         CHIP_ERROR idErr =
             JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(hex_buf), reinterpret_cast<jobject &>(jid));
         if (idErr != CHIP_NO_ERROR)

@@ -111,8 +111,8 @@ void JNIMyUserPrompter::PromptForCommissionOKPermission(uint16_t vendorId, uint1
 
     {
         jstring jcommissioneeName = nullptr;
-        err = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(commissioneeName),
-                                                           reinterpret_cast<jobject &>(jcommissioneeName));
+        err                       = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(commissioneeName),
+                                                                                 reinterpret_cast<jobject &>(jcommissioneeName));
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not create jstring"));
 
         env->ExceptionClear();
@@ -156,8 +156,8 @@ void JNIMyUserPrompter::PromptForCommissionPasscode(uint16_t vendorId, uint16_t 
 
     {
         jstring jcommissioneeName = nullptr;
-        err = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(commissioneeName),
-                                                           reinterpret_cast<jobject &>(jcommissioneeName));
+        err                       = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(commissioneeName),
+                                                                                 reinterpret_cast<jobject &>(jcommissioneeName));
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not create jstring"));
 
         jstring jpairingInstruction = nullptr;
@@ -207,8 +207,8 @@ void JNIMyUserPrompter::HidePromptsOnCancel(uint16_t vendorId, uint16_t productI
 
     {
         jstring jcommissioneeName = nullptr;
-        err = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(commissioneeName),
-                                                           reinterpret_cast<jobject &>(jcommissioneeName));
+        err                       = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(commissioneeName),
+                                                                                 reinterpret_cast<jobject &>(jcommissioneeName));
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not create jstring"));
 
         env->ExceptionClear();
@@ -263,8 +263,8 @@ void JNIMyUserPrompter::PromptWithCommissionerPasscode(uint16_t vendorId, uint16
 
     {
         jstring jcommissioneeName = nullptr;
-        err = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(commissioneeName),
-                                                           reinterpret_cast<jobject &>(jcommissioneeName));
+        err                       = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(commissioneeName),
+                                                                                 reinterpret_cast<jobject &>(jcommissioneeName));
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not create jstring"));
 
         jstring jpairingInstruction = nullptr;
@@ -311,8 +311,8 @@ void JNIMyUserPrompter::PromptCommissioningStarted(uint16_t vendorId, uint16_t p
 
     {
         jstring jcommissioneeName = nullptr;
-        err = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(commissioneeName),
-                                                           reinterpret_cast<jobject &>(jcommissioneeName));
+        err                       = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(commissioneeName),
+                                                                                 reinterpret_cast<jobject &>(jcommissioneeName));
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not create jstring"));
 
         env->ExceptionClear();
@@ -350,8 +350,8 @@ void JNIMyUserPrompter::PromptCommissioningSucceeded(uint16_t vendorId, uint16_t
 
     {
         jstring jcommissioneeName = nullptr;
-        err = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(commissioneeName),
-                                                           reinterpret_cast<jobject &>(jcommissioneeName));
+        err                       = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(commissioneeName),
+                                                                                 reinterpret_cast<jobject &>(jcommissioneeName));
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not create jstring"));
 
         env->ExceptionClear();
@@ -390,13 +390,13 @@ void JNIMyUserPrompter::PromptCommissioningFailed(const char * commissioneeName,
 
     {
         jstring jcommissioneeError = nullptr;
-        err = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(error.AsString()),
-                                                           reinterpret_cast<jobject &>(jcommissioneeError));
+        err                        = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(error.AsString()),
+                                                                                  reinterpret_cast<jobject &>(jcommissioneeError));
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not create jstring"));
 
         jstring jcommissioneeName = nullptr;
-        err = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(commissioneeName),
-                                                           reinterpret_cast<jobject &>(jcommissioneeName));
+        err                       = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(commissioneeName),
+                                                                                 reinterpret_cast<jobject &>(jcommissioneeName));
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not create jstring"));
 
         env->ExceptionClear();
