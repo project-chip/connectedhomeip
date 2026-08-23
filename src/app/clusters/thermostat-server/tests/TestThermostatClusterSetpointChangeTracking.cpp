@@ -20,6 +20,7 @@
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <credentials/FabricTable.h>
 #include <pw_unit_test/framework.h>
+#include <system/RAIIMockClock.h>
 
 #include <limits>
 
@@ -144,6 +145,12 @@ TEST_F(TestThermostatClusterSetpointChangeTracking, DefaultsBeforeAnyChange)
 
 TEST_F(TestThermostatClusterSetpointChangeTracking, WritingOccupiedHeatingSetpointUpdatesTracking)
 {
+    // SetpointChangeSourceTimestamp requires a synchronized real time clock; mock it so the test
+    // does not depend on the platform's wall-clock time being available (e.g. it is not set on
+    // some embedded simulators).
+    System::Clock::Internal::RAIIMockClock mockClock;
+    ASSERT_EQ(mockClock.SetClock_RealTime(System::Clock::Microseconds64(1700000000000000ULL)), CHIP_NO_ERROR);
+
     TestServerClusterContext context;
     ThermostatCluster cluster{ kTestEndpointId, BitFlags<Feature>(Feature::kHeating), AllSetpointChangeAttributesEnabled(),
                                ThermostatCluster::DefaultValues(), mFabricTable };
@@ -276,6 +283,7 @@ TEST_F(TestThermostatClusterSetpointChangeTracking, SetpointRaiseLowerUpdatesTra
 
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.status.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_TRUE(result.status->IsSuccess());
 
     DataModel::Nullable<int16_t> amount;
