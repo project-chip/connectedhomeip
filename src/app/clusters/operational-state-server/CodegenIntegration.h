@@ -75,7 +75,7 @@ public:
         //   - mDelegate instance is FOO
         //   - mInstance is BAR
         // then:
-        //   - we would do SetDelegate(nullptr) + SetDelegate(mInstance), effectively switching FOO to BAR
+        //   - we would do SetInstance(nullptr) + SetInstance(mInstance), effectively switching FOO to BAR
         //     without erroring out.
         VerifyOrDie((aDelegate == nullptr) || (aDelegate->GetInstance() == nullptr) || (aDelegate->GetInstance() == mInstance));
 
