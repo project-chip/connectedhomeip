@@ -217,8 +217,9 @@ chip-tool-x86-64 thermostat read max-thermostat-suggestions <nodeID> 1 | grep TO
 
 ### Add a thermostat suggestion
 
-`AddThermostatSuggestion` fails with:
+`AddThermostatSuggestion` can fail with:
 
+-   `INVALID_IN_STATE` if Matter time isn't synchronized yet
 -   `NOT_FOUND` if `PresetHandle` isn't in the `Presets` attribute
 -   `RESOURCE_EXHAUSTED` if `ThermostatSuggestions` is already at
     `MaxThermostatSuggestions` entries
