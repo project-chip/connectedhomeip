@@ -228,7 +228,7 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("9")
         has_pref = await self.feature_guard(endpoint=endpoint, cluster=cluster,
-                                      feature_int=Clusters.EnergyEvse.Bitmaps.Feature.kChargingPreferences)
+                                            feature_int=Clusters.EnergyEvse.Bitmaps.Feature.kChargingPreferences)
 
         if not has_pref:
             self.mark_all_remaining_steps_skipped("10")

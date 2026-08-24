@@ -2288,11 +2288,11 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def _populate_wildcard(self):
         """Populates the stored global wildcard through the stash if not already filled.
-    
+
         Called by attribute_guard / command_guard / feature_guard before consulting
         the wildcard. Cheap when the value is already present, so calling it from
         every guard entry point is fine.
-    
+
         Value resolution, in order:
           1. Stash already populated (either by the runner's _prepopulate_global_wildcard
              on the default path, or by a prior on-demand read in this same test).
@@ -2306,7 +2306,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         if self.stored_global_wildcard is not None:
             return
-    
+
         # Local import: runner.py imports symbols defined here, so a top-level
         # import would form a cycle.
         from matter.testing.runner import read_global_wildcard_async
