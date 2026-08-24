@@ -22,6 +22,7 @@
 #include <clusters/GroupKeyManagement/ClusterId.h>
 #include <clusters/GroupKeyManagement/Metadata.h>
 #include <lib/support/AutoRelease.h>
+#include <clusters/Groups/Metadata.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -35,6 +36,7 @@ using chip::Protocols::InteractionModel::Status;
 namespace {
 
 [[maybe_unused]] constexpr uint32_t kGroupKeyClusterRevisionBeforeGroupcast = 2;
+constexpr uint32_t kGroupsClusterRevisionBeforeGroupcast                   = 4;
 
 struct GroupTableCodec
 {
@@ -135,8 +137,15 @@ struct KeySetReadAllIndicesResponse
         return CHIP_NO_ERROR;
     }
 };
+
 CHIP_ERROR ReadGroupKeyMap(FabricTable & fabricTable, GroupDataProvider & provider, AttributeValueEncoder & aEncoder)
 {
+    // If the GCAST feature is set, and Group Revision >= 4, this attribute SHALL be empty
+    if (provider.IsGroupcastEnabled() && GroupKeyManagementCluster::IsGroupcastAdopted())
+    {
+        return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
+    }
+
     return aEncoder.EncodeList([&fabricTable, &provider](const auto & encoder) -> CHIP_ERROR {
         for (auto & fabric : fabricTable)
         {
@@ -162,6 +171,12 @@ CHIP_ERROR ReadGroupKeyMap(FabricTable & fabricTable, GroupDataProvider & provid
 CHIP_ERROR WriteGroupKeyMap(GroupDataProvider & provider, const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
     auto fabric_index = aDecoder.AccessingFabricIndex();
+
+    // If the GCAST feature is set, and Group Revision >= 4, this attribute cannot be written
+    if (provider.IsGroupcastEnabled() && GroupKeyManagementCluster::IsGroupcastAdopted())
+    {
+        return CHIP_IM_GLOBAL_STATUS(InvalidInState);
+    }
 
     if (!aPath.IsListItemOperation())
     {
@@ -218,6 +233,12 @@ CHIP_ERROR WriteGroupKeyMap(GroupDataProvider & provider, const ConcreteDataAttr
 
 CHIP_ERROR ReadGroupTable(FabricTable & fabricTable, GroupDataProvider & provider, AttributeValueEncoder & aEncoder)
 {
+    // If the GCAST feature is set, and Group Revision >= 4, this attribute SHALL be empty
+    if (provider.IsGroupcastEnabled() && GroupKeyManagementCluster::IsGroupcastAdopted())
+    {
+        return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
+    }
+
     return aEncoder.EncodeList([&fabricTable, &provider](const auto & encoder) -> CHIP_ERROR {
         for (auto & fabric : fabricTable)
         {
@@ -238,6 +259,11 @@ CHIP_ERROR ReadGroupTable(FabricTable & fabricTable, GroupDataProvider & provide
 
 CHIP_ERROR ReadMaxGroupsPerFabric(GroupDataProvider & provider, AttributeValueEncoder & aEncoder)
 {
+    // If the GCAST feature is set, return 0
+    if (provider.IsGroupcastEnabled())
+    {
+        return aEncoder.Encode(static_cast<uint16_t>(0));
+    }
     return aEncoder.Encode(provider.GetMaxGroupsPerFabric());
 }
 
@@ -559,11 +585,18 @@ HandleKeySetReadAllIndices(CommandHandler * commandObj, const ConcreteCommandPat
     commandObj->AddResponse(commandPath, KeySetReadAllIndicesResponse(&*keysIt));
     return std::nullopt;
 }
+
 } // namespace
 
 namespace chip {
 namespace app {
 namespace Clusters {
+
+GroupKeyManagementCluster::GroupKeyManagementCluster(Context && context, BitFlags<GroupKeyManagement::Feature> features) :
+    DefaultServerCluster({ kRootEndpointId, GroupKeyManagement::Id }), mContext(std::move(context))
+{
+    mContext.groupDataProvider.SetGroupcastEnabled(features.Has(GroupKeyManagement::Feature::kGroupcast));
+}
 
 std::optional<DataModel::ActionReturnStatus> GroupKeyManagementCluster::InvokeCommand(const DataModel::InvokeRequest & request,
                                                                                       chip::TLV::TLVReader & input_arguments,
@@ -690,6 +723,12 @@ CHIP_ERROR GroupKeyManagementCluster::GeneratedCommands(const ConcreteClusterPat
     };
     return builder.ReferenceExisting(kGeneratedCommands);
 }
+
+bool GroupKeyManagementCluster::GroupKeyManagementCluster::IsGroupcastAdopted()
+{
+    return Groups::kRevision > kGroupsClusterRevisionBeforeGroupcast;
+}
+
 
 } // namespace Clusters
 } // namespace app
