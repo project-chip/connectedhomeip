@@ -47,6 +47,8 @@ source_set("icd") {
 
 source_set("im") {
   sources = [
+    "${chip_root}/examples/platform/silabs/subscription/SubscriptionManager.cpp",
+    "${chip_root}/examples/platform/silabs/subscription/SubscriptionManager.h",
     "./im/IMShellCommands.cpp",
     "./im/IMShellCommands.h",
   ]
