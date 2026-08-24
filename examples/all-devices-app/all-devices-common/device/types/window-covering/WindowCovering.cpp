@@ -23,8 +23,8 @@ namespace app {
 
 WindowCovering::WindowCovering(Clusters::WindowCovering::WindowCoveringDelegate & delegate,
                                Clusters::IdentifyDelegate & identifyDelegate, const Context & context) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWindowCovering, 1)), mWindowCoveringDelegate(delegate),
-    mIdentifyDelegate(identifyDelegate), mContext(context)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWindowCovering, 1)),
+    mWindowCoveringDelegate(delegate), mIdentifyDelegate(identifyDelegate), mContext(context)
 {}
 
 CHIP_ERROR WindowCovering::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -62,11 +62,13 @@ CHIP_ERROR WindowCovering::Register(chip::EndpointId endpoint, CodeDrivenDataMod
     auto & cluster = mWindowCoveringCluster.Cluster();
     if (cluster.GetCurrentPositionLiftPercent100ths().IsNull())
     {
-        cluster.SetCurrentPositionLiftPercent100ths(DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
+        cluster.SetCurrentPositionLiftPercent100ths(
+            DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
     }
     if (cluster.GetCurrentPositionTiltPercent100ths().IsNull())
     {
-        cluster.SetCurrentPositionTiltPercent100ths(DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
+        cluster.SetCurrentPositionTiltPercent100ths(
+            DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
     }
 
     ReturnErrorOnFailure(provider.AddCluster(mWindowCoveringCluster.Registration()));
