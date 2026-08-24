@@ -34,6 +34,7 @@ source_set("thermostat-server") {
     "ThermostatClusterSetpointsBase.cpp",
     "ThermostatClusterSuggestions.cpp",
     "ThermostatClusterWrite.cpp",
+    "ThermostatDelegate.cpp",
     "ThermostatSuggestionStructWithOwnedMembers.cpp",
   ]
 

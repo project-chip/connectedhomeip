@@ -16,6 +16,7 @@
 
 #include "ThermostatClusterCore.h"
 #include "PresetStructWithOwnedMembers.h"
+#include "lib/support/logging/TextOnlyLogging.h"
 
 #include <app/persistence/AttributePersistence.h>
 #include <app/persistence/AttributePersistenceProvider.h>
@@ -204,7 +205,11 @@ Status ThermostatClusterCore::SetLocalTemperatureCalibration(int8_t localTempera
 
 ThermostatRunningModeEnum ThermostatClusterCore::GetRunningMode() const
 {
-    return mDelegate.GetRunningMode();
+    ThermostatRunningModeEnum runningMode;
+    if (auto status = mDelegate.GetRunningMode(runningMode); status != Status::Success) {
+        ChipLogError(Zcl, "Failed to get running mode");
+    }
+    return runningMode;
 }
 
 Status ThermostatClusterCore::SetRunningMode(ThermostatRunningModeEnum runningMode)
@@ -247,7 +252,11 @@ Status ThermostatClusterCore::SetRunningMode(ThermostatRunningModeEnum runningMo
 
 BitMask<RelayStateBitmap> ThermostatClusterCore::GetRunningState() const
 {
-    return mDelegate.GetRunningState();
+    BitMask<RelayStateBitmap> runningState;
+    if (auto status = mDelegate.GetRunningState(runningState); status != Status::Success) {
+        ChipLogError(Zcl, "Failed to get running state");
+    }
+    return runningState;
 }
 
 Status ThermostatClusterCore::SetRunningState(BitMask<RelayStateBitmap> runningState)

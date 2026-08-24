@@ -41,6 +41,8 @@ public:
     virtual Protocols::InteractionModel::Status SetLocalTemperature(DataModel::Nullable<temperature> localTemperature,
                                                                     bool & changed) = 0;
 
+    virtual Protocols::InteractionModel::Status GetOutdoorTemperature(DataModel::Nullable<temperature> & outdoorTemp) const;
+
     virtual SystemModeEnum GetSystemMode() const                                                         = 0;
     virtual Protocols::InteractionModel::Status SetSystemMode(SystemModeEnum systemMode, bool & changed) = 0;
 
@@ -48,10 +50,10 @@ public:
     virtual Protocols::InteractionModel::Status
     SetControlSequenceOfOperation(ControlSequenceOfOperationEnum controlSequenceOfOperation, bool & changed) = 0;
 
-    virtual ThermostatRunningModeEnum GetRunningMode() const                                                          = 0;
+    virtual Protocols::InteractionModel::Status GetRunningMode(ThermostatRunningModeEnum & runningMode) const = 0;
     virtual Protocols::InteractionModel::Status SetRunningMode(ThermostatRunningModeEnum runningMode, bool & changed) = 0;
 
-    virtual BitMask<RelayStateBitmap> GetRunningState() const                                                           = 0;
+    virtual Protocols::InteractionModel::Status GetRunningState(BitMask<RelayStateBitmap> & runningState) const = 0;
     virtual Protocols::InteractionModel::Status SetRunningState(BitMask<RelayStateBitmap> runningState, bool & changed) = 0;
 
     virtual int8_t GetLocalTemperatureCalibration() const { return 0; };
@@ -61,7 +63,7 @@ public:
         return Protocols::InteractionModel::Status::Success;
     };
 
-    virtual BitMask<RemoteSensingBitmap> GetRemoteSensing() const                                                            = 0;
+    virtual Protocols::InteractionModel::Status GetRemoteSensing(BitMask<RemoteSensingBitmap> & remoteSensing) const;
     virtual Protocols::InteractionModel::Status SetRemoteSensing(BitMask<RemoteSensingBitmap> remoteSensing, bool & changed) = 0;
 };
 

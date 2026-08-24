@@ -389,13 +389,18 @@ AtomicWriteSession::RollbackAtomicWrite(CommandHandler * commandObj, const Concr
     return std::nullopt;
 }
 
-void AtomicWriteSession::TimerFired()
+void AtomicWriteSession::Rollback()
 {
     for (size_t i = 0; i < mAttributeIds.AllocatedSize(); ++i)
     {
         mDelegate.OnAtomicWriteRollback(mAttributeIds[i]);
     }
     ResetAtomicWrite();
+}
+
+void AtomicWriteSession::TimerFired()
+{
+    Rollback();
 }
 
 /// @brief Builds the list of attribute statuses to return from an AtomicRequest invocation
@@ -503,7 +508,7 @@ void AtomicWriteSession::OnFabricRemoved(const FabricTable & fabricTable, Fabric
 {
     if (InAtomicWrite(fabricIndex))
     {
-        ResetAtomicWrite();
+        Rollback();
     }
 }
 

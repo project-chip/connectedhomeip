@@ -39,10 +39,10 @@ public:
     SystemModeEnum GetSystemMode() const override;
     Protocols::InteractionModel::Status SetSystemMode(SystemModeEnum systemMode, bool & changed) override;
 
-    ThermostatRunningModeEnum GetRunningMode() const override;
+    Protocols::InteractionModel::Status GetRunningMode(ThermostatRunningModeEnum & runningMode) const override;
     Protocols::InteractionModel::Status SetRunningMode(ThermostatRunningModeEnum runningMode, bool & changed) override;
 
-    BitMask<RelayStateBitmap> GetRunningState() const override;
+    Protocols::InteractionModel::Status GetRunningState(BitMask<RelayStateBitmap> & runningState) const override;
     Protocols::InteractionModel::Status SetRunningState(BitMask<RelayStateBitmap> runningState, bool & changed) override;
 
     ControlSequenceOfOperationEnum GetControlSequenceOfOperation() const override;
@@ -51,10 +51,12 @@ public:
     DataModel::Nullable<temperature> GetLocalTemperature() const override;
     Protocols::InteractionModel::Status SetLocalTemperature(DataModel::Nullable<temperature> temp, bool & changed) override;
 
+    Protocols::InteractionModel::Status GetOutdoorTemperature(DataModel::Nullable<temperature> & outdoorTemp) const override;
+
     int8_t GetLocalTemperatureCalibration() const override;
     Protocols::InteractionModel::Status SetLocalTemperatureCalibration(int8_t temp, bool & changed) override;
 
-    BitMask<RemoteSensingBitmap> GetRemoteSensing() const override;
+    Protocols::InteractionModel::Status GetRemoteSensing(BitMask<RemoteSensingBitmap> & remoteSensing) const override;
     Protocols::InteractionModel::Status SetRemoteSensing(BitMask<RemoteSensingBitmap> sensing, bool & changed) override;
 
     Protocols::InteractionModel::Status Init();

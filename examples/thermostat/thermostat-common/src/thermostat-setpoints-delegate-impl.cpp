@@ -67,21 +67,7 @@ Protocols::InteractionModel::Status ThermostatSetpointsDelegate::Init()
     persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, MaxCoolSetpointLimit::Id }, mMaxCoolSetpointLimit,
                                       defaultMaxCoolLimit);
 
-    temperature defaultMinHeatLimit;
-    if (auto status = MinHeatSetpointLimit::GetDefault(mEndpointId, &defaultMinHeatLimit); status != Status::Success)
-    {
-        defaultMinHeatLimit = mAbsMinHeatSetpointLimit;
-    }
-    persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, MinHeatSetpointLimit::Id }, mMinHeatSetpointLimit,
-                                      defaultMinHeatLimit);
 
-    temperature defaultMaxHeatLimit;
-    if (auto status = MaxHeatSetpointLimit::GetDefault(mEndpointId, &defaultMaxHeatLimit); status != Status::Success)
-    {
-        defaultMaxHeatLimit = mAbsMaxHeatSetpointLimit;
-    }
-    persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, MaxHeatSetpointLimit::Id }, mMaxHeatSetpointLimit,
-                                      defaultMaxHeatLimit);
 
     if (auto status = UnoccupiedCoolingSetpoint::GetDefault(mEndpointId, &mUnoccupiedCoolingSetpoint); status != Status::Success)
     {
@@ -103,25 +89,37 @@ Protocols::InteractionModel::Status ThermostatSetpointsDelegate::Init()
         mAbsMaxHeatSetpointLimit = kDefaultAbsMaxHeatSetpointLimit;
     }
 
-    if (auto status = MinHeatSetpointLimit::GetDefault(mEndpointId, &mMinHeatSetpointLimit); status != Status::Success)
+    temperature defaultMinHeatLimit;
+    if (auto status = MinHeatSetpointLimit::GetDefault(mEndpointId, &defaultMinHeatLimit); status != Status::Success)
     {
-        mMinHeatSetpointLimit = mAbsMinHeatSetpointLimit;
+        defaultMinHeatLimit = mAbsMinHeatSetpointLimit;
     }
+    persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, MinHeatSetpointLimit::Id }, mMinHeatSetpointLimit,
+                                      defaultMinHeatLimit);
 
-    if (auto status = MaxHeatSetpointLimit::GetDefault(mEndpointId, &mMaxHeatSetpointLimit); status != Status::Success)
+    temperature defaultMaxHeatLimit;
+    if (auto status = MaxHeatSetpointLimit::GetDefault(mEndpointId, &defaultMaxHeatLimit); status != Status::Success)
     {
-        mMaxHeatSetpointLimit = mAbsMaxHeatSetpointLimit;
+        defaultMaxHeatLimit = mAbsMaxHeatSetpointLimit;
     }
+    persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, MaxHeatSetpointLimit::Id }, mMaxHeatSetpointLimit,
+                                      defaultMaxHeatLimit);
 
     if (auto status = OccupiedHeatingSetpoint::GetDefault(mEndpointId, &mOccupiedHeatingSetpoint); status != Status::Success)
     {
         mOccupiedHeatingSetpoint = kDefaultHeatingSetpoint;
     }
+    persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, OccupiedHeatingSetpoint::Id }, mOccupiedHeatingSetpoint,
+                                      mOccupiedHeatingSetpoint);
+
 
     if (auto status = UnoccupiedHeatingSetpoint::GetDefault(mEndpointId, &mUnoccupiedHeatingSetpoint); status != Status::Success)
     {
         mUnoccupiedHeatingSetpoint = kDefaultHeatingSetpoint;
     }
+    persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, UnoccupiedHeatingSetpoint::Id }, mUnoccupiedHeatingSetpoint,
+                                      mUnoccupiedHeatingSetpoint);
+
     return Status::Success;
 }
 

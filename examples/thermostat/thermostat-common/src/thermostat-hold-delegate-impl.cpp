@@ -57,8 +57,7 @@ Protocols::InteractionModel::Status ThermostatHoldDelegate::SetTemperatureSetpoi
     AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
     VerifyOrReturnError(provider != nullptr, Status::Failure);
     AttributePersistence persistence(*provider);
-    if (auto err = persistence.StoreNativeEndianValue({ mEndpointId, Thermostat::Id, TemperatureSetpointHold::Id },
-                                                      mTemperatureSetpointHold);
+    if (auto err = persistence.StoreNativeEndianValue({ mEndpointId, Thermostat::Id, TemperatureSetpointHold::Id }, hold);
         err != CHIP_NO_ERROR)
     {
         return ClusterStatusCode(err).GetStatus();
@@ -83,8 +82,7 @@ ThermostatHoldDelegate::SetTemperatureSetpointHoldDuration(DataModel::Nullable<u
     AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
     VerifyOrReturnError(provider != nullptr, Status::Failure);
     AttributePersistence persistence(*provider);
-    if (auto err = persistence.StoreNativeEndianValue({ mEndpointId, Thermostat::Id, TemperatureSetpointHoldDuration::Id },
-                                                      mTemperatureSetpointHoldDuration);
+    if (auto err = persistence.StoreNativeEndianValue({ mEndpointId, Thermostat::Id, TemperatureSetpointHoldDuration::Id }, duration);
         err != CHIP_NO_ERROR)
     {
         return ClusterStatusCode(err).GetStatus();
@@ -109,8 +107,7 @@ Protocols::InteractionModel::Status ThermostatHoldDelegate::SetSetpointHoldExpir
     AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
     VerifyOrReturnError(provider != nullptr, Status::Failure);
     AttributePersistence persistence(*provider);
-    if (auto err = persistence.StoreNativeEndianValue({ mEndpointId, Thermostat::Id, SetpointHoldExpiryTimestamp::Id },
-                                                      mSetpointHoldExpiryTimestamp);
+    if (auto err = persistence.StoreNativeEndianValue({ mEndpointId, Thermostat::Id, SetpointHoldExpiryTimestamp::Id }, timestamp);
         err != CHIP_NO_ERROR)
     {
         return ClusterStatusCode(err).GetStatus();

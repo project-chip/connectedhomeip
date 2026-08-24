@@ -44,14 +44,6 @@ public:
 
         virtual BitMask<OccupancyBitmap> GetOccupancy() const                                                       = 0;
         virtual Protocols::InteractionModel::Status SetOccupancy(BitMask<OccupancyBitmap> occupied, bool & changed) = 0;
-
-        virtual std::optional<temperature> GetUnoccupiedHeatingSetpoint() const;
-        virtual Protocols::InteractionModel::Status
-        SetUnoccupiedHeatingSetpoint(std::optional<temperature> unoccupiedHeatingSetpoint, bool & changed);
-
-        virtual std::optional<temperature> GetUnoccupiedCoolingSetpoint() const;
-        virtual Protocols::InteractionModel::Status
-        SetUnoccupiedCoolingSetpoint(std::optional<temperature> unoccupiedCoolingSetpoint, bool & changed);
     };
 
     ThermostatOccupancy(ThermostatClusterCore & cluster, Delegate & delegate) : mCluster(cluster), mDelegate(delegate) {}

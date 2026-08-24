@@ -46,7 +46,6 @@ public:
     const OptionalAttributes & GetOptionalAttributes() const;
     const BitFlags<Thermostat::Feature> & Features() const;
 
-    virtual Setpoints GetSetpoints();
     virtual Protocols::InteractionModel::Status SaveSetpoints(const Setpoints & setpoints,
                                                               SetpointAttributes changedAttributes) = 0;
     void GenerateSetpointEvent(AttributeId attributeId, temperature oldTemp, temperature newTemp) const;
@@ -56,7 +55,9 @@ public:
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler);
 
 protected:
-    ThermostatClusterCore & mCluster;
+    ThermostatClusterCore & mCluster; 
+    
+    virtual Setpoints GetSetpoints();   
 };
 
 } // namespace Thermostat

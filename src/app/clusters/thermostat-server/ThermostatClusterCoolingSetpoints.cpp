@@ -79,11 +79,12 @@ Status ThermostatCoolingSetpoints::Delegate::SetUnoccupiedCoolingSetpoint(temper
     return Status::UnsupportedAttribute;
 };
 
-bool ThermostatCoolingSetpoints::HasAttribute(AttributeId attributeId)
+bool ThermostatCoolingSetpoints::HandlesAttribute(AttributeId attributeId)
 {
     switch (attributeId)
     {
     case OccupiedCoolingSetpoint::Id:
+    case UnoccupiedCoolingSetpoint::Id:
     case AbsMinCoolSetpointLimit::Id:
     case AbsMaxCoolSetpointLimit::Id:
     case MinCoolSetpointLimit::Id:
@@ -248,7 +249,7 @@ std::optional<DataModel::ActionReturnStatus>
 ThermostatCoolingSetpoints::WriteAttribute(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder,
                                            Setpoints & setpoints, SetpointAttributes & changedAttributes)
 {
-    if (!HasAttribute(request.path.mAttributeId))
+    if (!HandlesAttribute(request.path.mAttributeId))
     {
         return std::nullopt;
     }
@@ -291,16 +292,14 @@ ThermostatCoolingSetpoints::WriteAttribute(const DataModel::WriteAttributeReques
 CHIP_ERROR ThermostatCoolingSetpoints::Attributes(const ConcreteClusterPath & path,
                                                   ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
+    auto attributes = mSetpoints.GetOptionalAttributes();
     AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
-        { HasAttribute(OccupiedCoolingSetpoint::Id), OccupiedCoolingSetpoint::kMetadataEntry },
-        { HasAttribute(UnoccupiedCoolingSetpoint::Id), UnoccupiedCoolingSetpoint::kMetadataEntry },
-        { HasAttribute(AbsMinCoolSetpointLimit::Id), AbsMinCoolSetpointLimit::kMetadataEntry },
-        { HasAttribute(AbsMaxCoolSetpointLimit::Id), AbsMaxCoolSetpointLimit::kMetadataEntry },
-        { HasAttribute(MinCoolSetpointLimit::Id), MinCoolSetpointLimit::kMetadataEntry },
-        { HasAttribute(MaxCoolSetpointLimit::Id), MaxCoolSetpointLimit::kMetadataEntry },
-        { HasAttribute(SetpointChangeSource::Id), SetpointChangeSource::kMetadataEntry },
-        { HasAttribute(SetpointChangeAmount::Id), SetpointChangeAmount::kMetadataEntry },
-        { HasAttribute(SetpointChangeSourceTimestamp::Id), SetpointChangeSourceTimestamp::kMetadataEntry },
+        { true, OccupiedCoolingSetpoint::kMetadataEntry },
+        { mSetpoints.Features().Has(Feature::kOccupancy), UnoccupiedCoolingSetpoint::kMetadataEntry },
+        { attributes.AbsMinCoolSetpointLimit, AbsMinCoolSetpointLimit::kMetadataEntry },
+        { attributes.AbsMaxCoolSetpointLimit, AbsMaxCoolSetpointLimit::kMetadataEntry },
+        { attributes.MinCoolSetpointLimit, MinCoolSetpointLimit::kMetadataEntry },
+        { attributes.MaxCoolSetpointLimit, MaxCoolSetpointLimit::kMetadataEntry },
     };
 
     return AppendOptionalAttributes(builder, Span(optionalAttributes));

@@ -33,30 +33,6 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-std::optional<temperature> ThermostatOccupancy::Delegate::GetUnoccupiedHeatingSetpoint() const
-{
-    return std::nullopt;
-}
-
-Protocols::InteractionModel::Status
-ThermostatOccupancy::Delegate::SetUnoccupiedHeatingSetpoint(std::optional<temperature> unoccupiedHeatingSetpoint, bool & changed)
-{
-    changed = false;
-    return Status::Success;
-}
-
-std::optional<temperature> ThermostatOccupancy::Delegate::GetUnoccupiedCoolingSetpoint() const
-{
-    return std::nullopt;
-}
-
-Protocols::InteractionModel::Status
-ThermostatOccupancy::Delegate::SetUnoccupiedCoolingSetpoint(std::optional<temperature> unoccupiedCoolingSetpoint, bool & changed)
-{
-    changed = false;
-    return Status::Success;
-}
-
 std::optional<DataModel::ActionReturnStatus> ThermostatOccupancy::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                                 AttributeValueEncoder & encoder)
 {

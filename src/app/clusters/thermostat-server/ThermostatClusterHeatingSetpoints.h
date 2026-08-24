@@ -72,7 +72,7 @@ public:
     DataModel::ActionReturnStatus SaveSetpoints(const Setpoints & currentSetpoints, const Setpoints & changedSetpoints,
                                                 SetpointAttributes & changedAttributes);
 
-    bool HasAttribute(AttributeId attributeId);
+    bool HandlesAttribute(AttributeId attributeId);
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder);
     std::optional<DataModel::ActionReturnStatus> ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                AttributeValueEncoder & encoder);

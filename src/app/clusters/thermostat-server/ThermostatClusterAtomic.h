@@ -206,6 +206,8 @@ private:
                         Protocols::InteractionModel::Status (Delegate::*action)(chip::AttributeId),
                         std::optional<Protocols::InteractionModel::Status> statusOverride);
 
+    void Rollback();
+
     /// @brief Builds the list of attribute statuses to return from an AtomicRequest invocation
     /// @param attributeRequests The list of requested attributes
     /// @param attributeStatusCount The number of attribute statuses in attributeStatuses

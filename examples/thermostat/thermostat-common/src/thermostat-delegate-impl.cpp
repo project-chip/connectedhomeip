@@ -17,6 +17,7 @@
  */
 
 #include "../include/thermostat-delegate-impl.h"
+#include "app/data-model/Nullable.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/reporting/reporting.h>
@@ -68,9 +69,10 @@ Protocols::InteractionModel::Status ThermostatDelegate::SetSystemMode(SystemMode
     return Status::Success;
 }
 
-ThermostatRunningModeEnum ThermostatDelegate::GetRunningMode() const
+Protocols::InteractionModel::Status ThermostatDelegate::GetRunningMode(ThermostatRunningModeEnum & runningMode) const
 {
-    return mRunningMode;
+    runningMode = mRunningMode;
+    return Status::Success;
 }
 
 Protocols::InteractionModel::Status ThermostatDelegate::SetRunningMode(ThermostatRunningModeEnum runningMode, bool & changed)
@@ -84,9 +86,10 @@ Protocols::InteractionModel::Status ThermostatDelegate::SetRunningMode(Thermosta
     return Status::Success;
 }
 
-BitMask<RelayStateBitmap> ThermostatDelegate::GetRunningState() const
+Protocols::InteractionModel::Status ThermostatDelegate::GetRunningState(BitMask<RelayStateBitmap> & runningState) const
 {
-    return mRunningState;
+    runningState = mRunningState;
+    return Status::Success;
 }
 
 Protocols::InteractionModel::Status ThermostatDelegate::SetRunningState(BitMask<RelayStateBitmap> runningState, bool & changed)
@@ -133,6 +136,13 @@ Protocols::InteractionModel::Status ThermostatDelegate::SetLocalTemperature(Data
     return Status::Success;
 }
 
+Protocols::InteractionModel::Status ThermostatDelegate::GetOutdoorTemperature(DataModel::Nullable<temperature> & outdoorTemp) const
+{
+    outdoorTemp = DataModel::NullNullable;
+    return Status::Success;
+}
+
+
 int8_t ThermostatDelegate::GetLocalTemperatureCalibration() const
 {
     return mLocalTemperatureCalibration;
@@ -149,9 +159,10 @@ Protocols::InteractionModel::Status ThermostatDelegate::SetLocalTemperatureCalib
     return Status::Success;
 }
 
-BitMask<RemoteSensingBitmap> ThermostatDelegate::GetRemoteSensing() const
+Protocols::InteractionModel::Status ThermostatDelegate::GetRemoteSensing(BitMask<RemoteSensingBitmap> & remoteSensing) const
 {
-    return mRemoteSensing;
+    remoteSensing = mRemoteSensing;
+    return Status::Success;
 }
 
 Protocols::InteractionModel::Status ThermostatDelegate::SetRemoteSensing(BitMask<RemoteSensingBitmap> sensing, bool & changed)
@@ -160,14 +171,10 @@ Protocols::InteractionModel::Status ThermostatDelegate::SetRemoteSensing(BitMask
     {
         return Status::Success;
     }
-    if (mProvider == nullptr)
-    {
-        ChipLogError(Zcl, "Invalid state: AttributePersistenceProvider is null");
-        return Status::InvalidInState;
-    }
-    auto remoteSensingValue = sensing.Raw();
+    AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
+    VerifyOrReturnError(provider != nullptr, Status::InvalidInState);
     AttributePersistence persistence(*mProvider);
-    CHIP_ERROR result = persistence.StoreNativeEndianValue({ mEndpointId, Thermostat::Id, RemoteSensing::Id }, remoteSensingValue);
+    CHIP_ERROR result = persistence.StoreNativeEndianValue({ mEndpointId, Thermostat::Id, RemoteSensing::Id }, sensing.Raw());
     if (result != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Failed to store RemoteSensing attribute");

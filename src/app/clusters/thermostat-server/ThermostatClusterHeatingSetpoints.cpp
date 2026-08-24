@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024-2025 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@
 
 #include "Setpoints.h"
 #include "app/clusters/thermostat-server/ThermostatClusterAttributes.h"
+#include "clusters/Thermostat/Enums.h"
 
 using namespace chip::app::Clusters::Thermostat::Attributes;
 using namespace chip::app::Clusters::Thermostat::Commands;
@@ -77,11 +78,12 @@ Status ThermostatHeatingSetpoints::Delegate::SetMaxHeatSetpointLimit(temperature
     return Status::UnsupportedAttribute;
 };
 
-bool ThermostatHeatingSetpoints::HasAttribute(AttributeId attributeId)
+bool ThermostatHeatingSetpoints::HandlesAttribute(AttributeId attributeId)
 {
     switch (attributeId)
     {
     case OccupiedHeatingSetpoint::Id:
+    case UnoccupiedHeatingSetpoint::Id:
     case AbsMinHeatSetpointLimit::Id:
     case AbsMaxHeatSetpointLimit::Id:
     case MinHeatSetpointLimit::Id:
@@ -276,7 +278,7 @@ std::optional<DataModel::ActionReturnStatus>
 ThermostatHeatingSetpoints::WriteAttribute(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder,
                                            Setpoints & setpoints, SetpointAttributes & changedAttributes)
 {
-    if (!HasAttribute(request.path.mAttributeId))
+    if (!HandlesAttribute(request.path.mAttributeId))
     {
         return std::nullopt;
     }
@@ -319,16 +321,19 @@ ThermostatHeatingSetpoints::WriteAttribute(const DataModel::WriteAttributeReques
 CHIP_ERROR ThermostatHeatingSetpoints::Attributes(const ConcreteClusterPath & path,
                                                   ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
-        { HasAttribute(OccupiedHeatingSetpoint::Id), OccupiedHeatingSetpoint::kMetadataEntry },
-        { HasAttribute(UnoccupiedHeatingSetpoint::Id), UnoccupiedHeatingSetpoint::kMetadataEntry },
-        { HasAttribute(AbsMinHeatSetpointLimit::Id), AbsMinHeatSetpointLimit::kMetadataEntry },
-        { HasAttribute(AbsMaxHeatSetpointLimit::Id), AbsMaxHeatSetpointLimit::kMetadataEntry },
-        { HasAttribute(MinHeatSetpointLimit::Id), MinHeatSetpointLimit::kMetadataEntry },
-        { HasAttribute(MaxHeatSetpointLimit::Id), MaxHeatSetpointLimit::kMetadataEntry },
+
+    auto optionalAttributes = mSetpoints.GetOptionalAttributes();
+
+    AttributeListBuilder::OptionalAttributeEntry attributes[] = {
+        { true, OccupiedHeatingSetpoint::kMetadataEntry },
+        { mSetpoints.Features().Has(Feature::kOccupancy), UnoccupiedHeatingSetpoint::kMetadataEntry },
+        { optionalAttributes.AbsMinHeatSetpointLimit, AbsMinHeatSetpointLimit::kMetadataEntry },
+        { optionalAttributes.AbsMaxHeatSetpointLimit, AbsMaxHeatSetpointLimit::kMetadataEntry },
+        { optionalAttributes.MinHeatSetpointLimit, MinHeatSetpointLimit::kMetadataEntry },
+        { optionalAttributes.MaxHeatSetpointLimit, MaxHeatSetpointLimit::kMetadataEntry },
     };
 
-    return AppendOptionalAttributes(builder, Span(optionalAttributes));
+    return AppendOptionalAttributes(builder, Span(attributes));
 }
 
 } // namespace Thermostat

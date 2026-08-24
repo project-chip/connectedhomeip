@@ -1,5 +1,5 @@
 /**
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 #include "DelegateResolution.h"
 #include "Setpoints.h"
 #include "Temperature.h"
-#include "ThermostatClusterAttributes.h"
 #include "ThermostatClusterCoolingSetpoints.h"
 #include "ThermostatClusterCore.h"
 #include "ThermostatClusterHeatingSetpoints.h"
@@ -144,11 +143,11 @@ public:
         bool hasAttribute = false;
         if constexpr (kHasCooling)
         {
-            hasAttribute = mCooling.HasAttribute(request.path.mAttributeId);
+            hasAttribute = mCooling.HandlesAttribute(request.path.mAttributeId);
         }
         if constexpr (kHasHeating)
         {
-            hasAttribute = hasAttribute || mHeating.HasAttribute(request.path.mAttributeId);
+            hasAttribute = hasAttribute || mHeating.HandlesAttribute(request.path.mAttributeId);
         }
         if (!hasAttribute)
         {

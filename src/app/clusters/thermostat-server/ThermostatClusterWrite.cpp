@@ -51,7 +51,10 @@ DataModel::ActionReturnStatus ThermostatClusterCore::WriteAttribute(const DataMo
         {
             return err;
         }
-        NotifyAttributeChanged(LocalTemperatureCalibration::Id);
+        if (changed)
+        {
+            NotifyAttributeChanged(LocalTemperatureCalibration::Id);
+        }
         return Status::Success;
     }
     case MinSetpointDeadBand::Id: {

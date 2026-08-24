@@ -1,6 +1,6 @@
 /*
+ *
  *    Copyright (c) 2026 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,29 +15,24 @@
  *    limitations under the License.
  */
 
-#pragma once
-
-#include <app/persistence/AttributePersistenceProvider.h>
-#include <app/persistence/AttributePersistenceProviderInstance.h>
-
-#include <app/clusters/thermostat-server/ThermostatClusterOccupancy.h>
+#include "ThermostatDelegate.h"
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-class ThermostatOccupancyDelegate : public ThermostatOccupancy::Delegate
+using namespace Protocols::InteractionModel;
+
+Protocols::InteractionModel::Status Delegate::GetOutdoorTemperature(DataModel::Nullable<temperature> & outdoorTemp) const
 {
-public:
-    ThermostatOccupancyDelegate() = default;
+    return Status::UnsupportedAttribute;
+}
 
-    BitMask<OccupancyBitmap> GetOccupancy() const override;
-    Protocols::InteractionModel::Status SetOccupancy(BitMask<OccupancyBitmap> occupancy, bool & changed) override;
-
-private:
-    BitMask<OccupancyBitmap> mOccupancy{ OccupancyBitmap::kOccupied };
-};
+Protocols::InteractionModel::Status Delegate::GetRemoteSensing(BitMask<RemoteSensingBitmap> & remoteSensing) const
+{
+    return Status::UnsupportedAttribute;
+}
 
 } // namespace Thermostat
 } // namespace Clusters
