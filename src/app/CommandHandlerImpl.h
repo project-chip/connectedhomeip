@@ -439,7 +439,7 @@ private:
 
     Protocols::InteractionModel::Status ValidateCommandCanBeDispatched(const ConcreteCommandPath & aConcretePath);
     Protocols::InteractionModel::Status ValidateUnicastCommand(CommandDataIB::Parser & aCommandElement,
-                                                              ConcreteCommandPath & aOutPath);
+                                                               ConcreteCommandPath & aOutPath);
     bool HasValidGroupEndpoints(CommandDataIB::Parser & aCommandElement);
 
     CHIP_ERROR TryAddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus);

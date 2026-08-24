@@ -395,9 +395,8 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
         if (hasValidCommands)
         {
             // An empty targetedEndpoints span indicates a global deferral across all endpoints on the node for groupcast requests.
-            Span<const EndpointId> endpointsSpan = IsGroupRequest()
-                ? Span<const EndpointId>()
-                : Span<const EndpointId>(targetedEndpoints, numTargetedEndpoints);
+            Span<const EndpointId> endpointsSpan =
+                IsGroupRequest() ? Span<const EndpointId>() : Span<const EndpointId>(targetedEndpoints, numTargetedEndpoints);
             TriggerDelayReport(delayReportData.value(), endpointsSpan);
         }
     }
