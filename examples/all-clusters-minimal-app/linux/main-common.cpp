@@ -49,9 +49,9 @@ Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 
 constexpr EndpointId gThermostatEndpoint(1);
 static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
-static Clusters::Thermostat::ThermostatHoldDelegate gHoldDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatHoldDelegate gThermostatHoldDelegate(gThermostatEndpoint);
 static Clusters::Thermostat::ThermostatPresetsDelegate gThermostatPresetsDelegate(gThermostatEndpoint);
-static Clusters::Thermostat::ThermostatSetpointsDelegate gSetpointsDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatSetpointsDelegate gThermostatSetpointsDelegate(gThermostatEndpoint);
 static Clusters::Thermostat::ThermostatSuggestionsDelegate gThermostatSuggestionsDelegate(gThermostatEndpoint,
                                                                                           gThermostatPresetsDelegate);
 
@@ -103,10 +103,10 @@ void ApplicationInit()
     Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
 
     gThermostatDelegate.Init();
-    gHoldDelegate.Init();
-    gSetpointsDelegate.Init();
-    Clusters::Thermostat::ServerInit<ThermostatClusterType>(gThermostatEndpoint, gThermostatDelegate, gSetpointsDelegate,
-                                                            gHoldDelegate, gThermostatPresetsDelegate,
+    gThermostatHoldDelegate.Init();
+    gThermostatSetpointsDelegate.Init();
+    Clusters::Thermostat::ServerInit<ThermostatClusterType>(gThermostatEndpoint, gThermostatDelegate, gThermostatSetpointsDelegate,
+                                                            gThermostatHoldDelegate, gThermostatPresetsDelegate,
                                                             gThermostatSuggestionsDelegate);
 }
 

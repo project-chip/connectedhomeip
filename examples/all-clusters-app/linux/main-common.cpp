@@ -229,8 +229,7 @@ void ApplicationInit()
     gSetpointsDelegate.Init();
     gHoldDelegate.Init();
     Clusters::Thermostat::ServerInit<ThermostatClusterType>(gThermostatEndpoint, gThermostatDelegate, gSetpointsDelegate,
-                                                            gHoldDelegate, gThermostatPresetsDelegate,
-                                                            gThermostatSuggestionsDelegate);
+                                                            gHoldDelegate, gPresetsDelegate, gSuggestionsDelegate);
 
     Clusters::UnitLocalization::TempUnitEnum supportedUnits[2] = { Clusters::UnitLocalization::TempUnitEnum::kFahrenheit,
                                                                    Clusters::UnitLocalization::TempUnitEnum::kCelsius };
