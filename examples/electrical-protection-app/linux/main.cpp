@@ -17,6 +17,7 @@
  */
 #include <AppMain.h>
 #include <electrical-distribution-stub.h>
+#include <power-topology-stub.h>
 
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <lib/support/CodeUtils.h>
@@ -36,10 +37,14 @@ void ApplicationInit()
     // Electrical Distribution describes the enclosure's physical characteristics. Its generated
     // Init callback is a no-op, so the app owns the instance and registers it imperatively.
     VerifyOrDie(ElectricalDistribution::ElectricalDistributionInit(kEnclosureEndpointId) == CHIP_NO_ERROR);
+
+    // Power Topology is mandatory on the enclosure device type. Same imperative registration.
+    VerifyOrDie(PowerTopology::PowerTopologyInit(kEnclosureEndpointId) == CHIP_NO_ERROR);
 }
 
 void ApplicationShutdown()
 {
+    PowerTopology::PowerTopologyShutdown();
     ElectricalDistribution::ElectricalDistributionShutdown();
 }
 

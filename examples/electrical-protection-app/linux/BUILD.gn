@@ -25,6 +25,7 @@ config("includes") {
 executable("chip-electrical-protection-app") {
   sources = [
     "${chip_root}/examples/electrical-protection-app/electrical-protection-common/src/electrical-distribution-stub.cpp",
+    "${chip_root}/examples/electrical-protection-app/electrical-protection-common/src/power-topology-stub.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]
