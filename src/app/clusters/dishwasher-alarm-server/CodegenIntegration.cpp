@@ -234,8 +234,7 @@ Delegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, DishwasherAlarm::Id,
                                                        MATTER_DM_DISHWASHER_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return (ep >= kDishwasherAlarmMaxClusterCount ? nullptr
-                                                  : gDishwasherAlarmClusters[ep].integrationDelegateWrapper.GetWrapped());
+    return (ep >= kDishwasherAlarmMaxClusterCount ? nullptr : gDishwasherAlarmClusters[ep].integrationDelegateWrapper.GetWrapped());
 }
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
