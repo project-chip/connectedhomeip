@@ -127,6 +127,7 @@ class TC_EPALM_2_3(MatterBaseTest):
                 log.info("Feature %s: present, alarm bit %s verified in Supported", feature_bit.name, alarm_bit.name)
             else:
                 log.info("Feature %s: not present, skipping", feature_bit.name)
+                self.mark_current_step_skipped()
             step_num += 1
 
         self.step(11)
@@ -134,7 +135,12 @@ class TC_EPALM_2_3(MatterBaseTest):
                           alarm_bits.kOverVoltageFault | alarm_bits.kVoltageSurgeFault |
                           alarm_bits.kResidualCurrentFault | alarm_bits.kArcFault |
                           alarm_bits.kSelfTest)
-        orphan_bits = supported_val & ~all_alarm_bits
+        # The int() casts are load-bearing. AlarmBitmap is an IntFlag whose members cover
+        # exactly bits 0..6, so ~all_alarm_bits complements only within that mask and
+        # evaluates to 0, which would make the assertion below unconditionally true.
+        # Casting to int complements over the full width, so a genuine orphan bit such as
+        # Supported=0x80 is actually caught.
+        orphan_bits = int(supported_val) & ~int(all_alarm_bits)
         asserts.assert_equal(orphan_bits, 0,
                              f"Supported has bits 0x{orphan_bits:08X} not mapped to any known alarm")
 
