@@ -129,7 +129,11 @@ CommissioningProxyBleTransport::ScanResultT CommissioningProxyBleTransport::Make
 
 void CommissioningProxyBleTransport::FailPendingConnect(Status status)
 {
-    // Caller has already verified a connect is pending.
+    // Every caller has already verified a connect is pending; the check is repeated here
+    // because bugprone-unchecked-optional-access does not reason across functions, and the
+    // dereference below would otherwise fail the clang-tidy gate.
+    VerifyOrReturn(mPendingConnect.has_value());
+
     mTimerDelegate.CancelTimer(&mConnectTimer);
 
     // Move out and reset before answering, so a re-entrant callback sees no pending

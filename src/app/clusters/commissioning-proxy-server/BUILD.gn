@@ -13,6 +13,7 @@
 # limitations under the License.
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/ble/ble.gni")
 
 source_set("commissioning-proxy-server") {
   # The cluster and its subsystems are independent of the application
@@ -53,17 +54,23 @@ source_set("commissioning-proxy-server") {
 # transport only - or a platform with no BLE stack - can depend on
 # commissioning-proxy-server without pulling in src/ble. The platform hooks it needs
 # come from CommissioningProxyBleAdapter, which the application implements.
-source_set("ble-transport") {
-  sources = [
-    "CommissioningProxyBleAdapter.h",
-    "CommissioningProxyBleTransport.cpp",
-    "CommissioningProxyBleTransport.h",
-  ]
+#
+# Only defined when BLE is enabled: src/ble builds BLEEndPoint and BleLayer only under
+# the same condition, so on a no-BLE platform this driver would reference symbols that
+# were never compiled.
+if (chip_config_network_layer_ble) {
+  source_set("ble-transport") {
+    sources = [
+      "CommissioningProxyBleAdapter.h",
+      "CommissioningProxyBleTransport.cpp",
+      "CommissioningProxyBleTransport.h",
+    ]
 
-  cflags = [ "-Wconversion" ]
+    cflags = [ "-Wconversion" ]
 
-  public_deps = [
-    ":commissioning-proxy-server",
-    "${chip_root}/src/ble",
-  ]
+    public_deps = [
+      ":commissioning-proxy-server",
+      "${chip_root}/src/ble",
+    ]
+  }
 }

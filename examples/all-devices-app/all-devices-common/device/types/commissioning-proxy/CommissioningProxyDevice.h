@@ -25,8 +25,11 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
-#include <app/clusters/commissioning-proxy-server/CommissioningProxyBleAdapter.h>
-#include <app/clusters/commissioning-proxy-server/CommissioningProxyBleTransport.h>
+// The ble-transport dependency in BUILD.gn is conditional on chip_config_network_layer_ble
+// The gn check does not evaluate the preprocessor, hence the use of nogncheck below
+// Otherwise the CI, REPL Tests Linux (BUILD) will fail
+#include <app/clusters/commissioning-proxy-server/CommissioningProxyBleAdapter.h>   // nogncheck
+#include <app/clusters/commissioning-proxy-server/CommissioningProxyBleTransport.h> // nogncheck
 #endif
 
 namespace chip {
