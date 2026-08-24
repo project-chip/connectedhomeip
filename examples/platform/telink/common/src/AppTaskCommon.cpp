@@ -27,6 +27,9 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include "ThreadUtil.h"
+#if CONFIG_OPENTHREAD_SNTP_CLIENT
+#include "ThreadTimeSync.h"
+#endif
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <platform/Zephyr/InetUtils.h>
 #include <platform/telink/wifi/TelinkWiFiDriver.h>
@@ -96,6 +99,17 @@ bool sIsNetworkProvisioned = false;
 bool sIsNetworkEnabled     = false;
 bool sIsNetworkAttached    = false;
 bool sHaveBLEConnections   = false;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
+void EnablePostCommissioningBle(intptr_t)
+{
+    CHIP_ERROR err = ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to enable post-commissioning BLE advertising: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+#endif
 
 #if APP_SET_DEVICE_INFO_PROVIDER
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
@@ -309,6 +323,13 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // ZAP/codegen applications use the generated data model.
     initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
+
+#if CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
+    if (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0)
+    {
+        LogErrorOnFailure(PlatformMgr().ScheduleWork(EnablePostCommissioningBle, 0));
+    }
+#endif
 
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
@@ -545,10 +566,24 @@ void AppTaskCommon::StartBleAdvHandler(AppEvent * aEvent)
 {
     LOG_INF("StartBleAdvHandler");
 
-    // Disable manual Matter service BLE advertising after device provisioning.
     if (sIsNetworkProvisioned)
     {
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        // Concurrent idle mode: toggle BLE advertising on demand so that
+        // BLE (e.g. Channel Sounding) becomes accessible on button press.
+        if (ConnectivityMgr().IsBLEAdvertisingEnabled())
+        {
+            LOG_INF("Disabling BLE adv");
+            ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+        }
+        else
+        {
+            LOG_INF("Enabling BLE adv");
+            ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+        }
+#else
         LOG_INF("Device already commissioned");
+#endif
         return;
     }
 
@@ -766,10 +801,23 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
         break;
     case DeviceEventType::kCHIPoBLEConnectionClosed:
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        // NOTE: Telink builds configure CONFIG_BT_MAX_CONN=1, so during
+        // commissioning the single BLE connection slot is always the
+        // commissioning connection. Any BLE disconnect while the fail-safe
+        // is armed therefore corresponds to the commissioning connection.
+        // If CONFIG_BT_MAX_CONN is ever raised, the disconnected connection
+        // identifier must be plumbed through kCHIPoBLEConnectionClosed and
+        // matched here before expiring the fail-safe.
         if (chip::Server::GetInstance().GetFailSafeContext().IsFailSafeArmed())
+        {
+            // Unexpected BLE disconnect during commissioning
+            ChipLogDetail(DeviceLayer, "BLE disconnected during commissioning");
+            chip::Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
+        }
+        // Concurrent mode: do NOT call bt_disable() — BLE scheduler must stay
+        // active for Telink TLX BLE+802.15.4 hardware coexistence.
 #else
         if (ConnectivityMgr().GetBleLayer()->IsInitialized())
-#endif
         {
             // Unexpected BLE disconnect during commissioning
             ChipLogDetail(DeviceLayer, "BLE disconnected during commissioning");
@@ -796,7 +844,13 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
             }
 #endif
         }
+#endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
         break;
+#if CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
+    case DeviceEventType::kCommissioningComplete:
+        LogErrorOnFailure(PlatformMgr().ScheduleWork(EnablePostCommissioningBle, 0));
+        break;
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     case DeviceEventType::kDnssdInitialized:
 #if CONFIG_CHIP_OTA_REQUESTOR
@@ -812,6 +866,12 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
 #endif
         break;
     case DeviceEventType::kThreadStateChange:
+#if CONFIG_OPENTHREAD_SNTP_CLIENT
+        if (ConnectivityMgr().IsThreadAttached())
+        {
+            ThreadTimeSync::getInstance().sync_dns("pool.ntp.org");
+        }
+#endif
         sIsNetworkProvisioned = ConnectivityMgr().IsThreadProvisioned();
         sIsNetworkEnabled     = ConnectivityMgr().IsThreadEnabled();
         sIsNetworkAttached    = ConnectivityMgr().IsThreadAttached();

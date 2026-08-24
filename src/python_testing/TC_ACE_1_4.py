@@ -91,14 +91,14 @@ class TC_ACE_1_4(MatterBaseTest):
         return await self.default_controller.ReadAttribute(self.dut_node_id, [(attribute)])
 
     def check_read_success(self, results: object, endpoint: int, cluster: object, attribute: object) -> None:
-        err_msg = "Results not returned for ep {}".format(str(endpoint))
+        err_msg = f"Results not returned for ep {str(endpoint)}"
         asserts.assert_true(endpoint in results, err_msg)
-        err_msg = "Results not returned for cluster {} on ep {}".format(str(cluster), str(endpoint))
+        err_msg = f"Results not returned for cluster {str(cluster)} on ep {str(endpoint)}"
         asserts.assert_true(cluster in results[endpoint], err_msg)
-        err_msg = "Results not returned for attribute {} on ep {}".format(str(attribute), str(endpoint))
+        err_msg = f"Results not returned for attribute {str(attribute)} on ep {str(endpoint)}"
         asserts.assert_true(attribute in results[endpoint][cluster], err_msg)
         attr_ret = results[endpoint][cluster][attribute]
-        err_msg = "Error reading {}:{}".format(str(cluster), str(attribute))
+        err_msg = f"Error reading {str(cluster)}:{str(attribute)}"
         asserts.assert_true(attr_ret is not None, err_msg)
         asserts.assert_false(isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure), err_msg)
 

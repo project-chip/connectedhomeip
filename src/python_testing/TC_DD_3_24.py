@@ -22,13 +22,13 @@ import matter.testing.nfc
 from matter.ChipDeviceCtrl import _DevicePairingDelegate_OnCommissioningStageStartFunct
 from matter.setup_payload import SetupPayload
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.matter_testing import MatterTestCommissioner, TestStep
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_DD_3_24(MatterBaseTest):
+class TC_DD_3_24(MatterTestCommissioner):
     runner_prepopulates_global_wildcard = False
     disable_wildcard_subscription = True
 

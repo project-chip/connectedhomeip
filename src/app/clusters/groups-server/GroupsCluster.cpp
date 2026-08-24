@@ -24,6 +24,7 @@
 #include <clusters/Groups/Commands.h>
 #include <clusters/Groups/Metadata.h>
 #include <clusters/Groups/Structs.h>
+#include <lib/support/AutoRelease.h>
 #include <tracing/macros.h>
 
 using namespace chip::app::Clusters::Groups;
@@ -59,32 +60,13 @@ void NotifyGroupTableChanged(ServerClusterContext * context)
     context->provider.NotifyAttributeChanged(kGroupKeyGroupTableAttributePath, DataModel::AttributeChangeType::kReportable);
 }
 
-class AutoReleaseIterator
-{
-public:
-    AutoReleaseIterator(GroupDataProvider & provider, FabricIndex fabricIndex) : mIterator(provider.IterateGroupKeys(fabricIndex))
-    {}
-    ~AutoReleaseIterator()
-    {
-        if (mIterator != nullptr)
-        {
-            mIterator->Release();
-        }
-    }
-    bool Valid() const { return mIterator != nullptr; }
-    GroupDataProvider::GroupKeyIterator * operator->() { return mIterator; }
-
-private:
-    GroupDataProvider::GroupKeyIterator * mIterator;
-};
-
 /**
  * @brief Checks if there are key set associated with the given GroupId
  */
 bool KeyExists(GroupDataProvider & provider, FabricIndex fabricIndex, GroupId groupId)
 {
-    AutoReleaseIterator it(provider, fabricIndex);
-    VerifyOrReturnValue(it.Valid(), false);
+    AutoRelease it(provider.IterateGroupKeys(fabricIndex));
+    VerifyOrReturnValue(!it.IsNull(), false);
 
     GroupDataProvider::GroupKey key;
     while (it->Next(key))
@@ -287,11 +269,10 @@ GroupsCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVR
         GetGroupMembership::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments, fabricIndex));
 
-        GroupDataProvider::EndpointIterator * iter = mGroupDataProvider.IterateEndpoints(fabricIndex);
-        VerifyOrReturnError(nullptr != iter, Status::Failure);
+        AutoRelease iter(mGroupDataProvider.IterateEndpoints(fabricIndex));
+        VerifyOrReturnError(!iter.IsNull(), Status::Failure);
 
-        handler->AddResponse(request.path, GroupMembershipResponse(request_data, mPath.mEndpointId, iter));
-        iter->Release();
+        handler->AddResponse(request.path, GroupMembershipResponse(request_data, mPath.mEndpointId, &*iter));
         return std::nullopt;
     }
     case RemoveGroup::Id: {
@@ -339,10 +320,10 @@ GroupsCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVR
 
         if (mScenesIntegration != nullptr)
         {
-            GroupDataProvider::EndpointIterator * iter = mGroupDataProvider.IterateEndpoints(fabricIndex);
+            AutoRelease iter(mGroupDataProvider.IterateEndpoints(fabricIndex));
             GroupDataProvider::GroupEndpoint mapping;
 
-            VerifyOrReturnError(nullptr != iter, Status::Failure);
+            VerifyOrReturnError(!iter.IsNull(), Status::Failure);
             while (iter->Next(mapping))
             {
                 if (mPath.mEndpointId == mapping.endpoint_id)
@@ -350,7 +331,6 @@ GroupsCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVR
                     LogIfFailure(mScenesIntegration->GroupWillBeRemoved(fabricIndex, mapping.group_id));
                 }
             }
-            iter->Release();
             LogIfFailure(mScenesIntegration->GroupWillBeRemoved(fabricIndex, scenes::kGlobalSceneGroupId));
         }
 

@@ -22,6 +22,7 @@
 #include <app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-delegate.h>
 #include <app/util/config.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 
 #if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT > 0

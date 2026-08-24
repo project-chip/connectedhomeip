@@ -29,6 +29,7 @@ class MatterTestConfig:
     paa_trust_store_path: pathlib.Path | None = None
     ble_controller: int | None = None
     commission_only: bool = False
+    commission_only_re_open_window: bool = False
     spec_errata_path: str | Traversable | None = None
 
     admin_vendor_id: int = TestingDefaults.ADMIN_VENDOR_ID

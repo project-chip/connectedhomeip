@@ -182,6 +182,8 @@ CHIP_ERROR ContentLauncherAttrAccess::Read(const app::ConcreteReadAttributePath 
         return ReadFeatureFlagAttribute(endpoint, aEncoder, delegate);
     }
     case app::Clusters::ContentLauncher::Attributes::ClusterRevision::Id: {
+        VerifyOrReturnError(!isDelegateNull(delegate, endpoint), CHIP_NO_ERROR);
+
         return ReadRevisionAttribute(endpoint, aEncoder, delegate);
     }
     default:
@@ -326,8 +328,6 @@ bool emberAfContentLauncherClusterPlayPresetCallback(CommandHandler * commandObj
 {
     EndpointId endpoint = commandPath.mEndpointId;
 
-    app::CommandResponseHelper<Commands::LauncherResponse::Type> responder(commandObj, commandPath);
-
     Delegate * delegate = GetDelegate(endpoint);
     if (isDelegateNull(delegate, endpoint) || !delegate->HasFeature(endpoint, Feature::kPresets))
     {
@@ -335,12 +335,7 @@ bool emberAfContentLauncherClusterPlayPresetCallback(CommandHandler * commandObj
         return true;
     }
 
-    delegate->HandlePlayPreset(responder, commandData.presetID);
-
-    if (!responder.HasSentResponse())
-    {
-        commandObj->AddStatus(commandPath, Status::Failure);
-    }
+    delegate->HandlePlayPreset(commandObj, commandPath, commandData.presetID);
 
     return true;
 }
