@@ -544,12 +544,6 @@ class MatterBaseTest(base_test.BaseTestClass):
     """
     requires_dut: bool = True
 
-    # Runner respects this before the pre-PASE global wildcard read.
-    # Set to False in tests that verify the device's own advertising state
-    # (e.g. TC_DD_*), because opening a PASE session suppresses
-    # commissionable advertisement.
-    runner_prepopulates_global_wildcard: bool = True
-
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
         if 'teardown_test' in cls.__dict__:
@@ -2297,10 +2291,9 @@ class MatterBaseTest(base_test.BaseTestClass):
           1. Stash already populated (either by the runner's _prepopulate_global_wildcard
              on the default path, or by a prior on-demand read in this same test).
           2. On-demand read from the DUT. Reached when the runner deliberately
-             skipped pre-populate: the test class opted out via
-             runner_prepopulates_global_wildcard=False, the CLI passed
-             --skip-global-wildcard-population, or the runner's attempt failed
-             (e.g. NFC in-test commissioning, file-based BasicComposition).
+             skipped pre-populate: the CLI passed --skip-global-wildcard-population,
+             or the runner's attempt failed (e.g. NFC in-test commissioning,
+             file-based BasicComposition).
              The result is written back to the stash so subsequent guard calls
              (and the stored_global_wildcard property) see it without re-reading.
         """

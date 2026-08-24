@@ -582,31 +582,15 @@ def run_tests_no_exit(
             #
             # Three mutually exclusive branches, evaluated in order:
             #
-            #  1. Test class opts out via runner_prepopulates_global_wildcard = False.
-            #     Discovery tests (TC_DD_*) verify the device's advertising state
-            #     directly. Opening a PASE session from the runner would suppress
-            #     commissionable advertisement and cause those tests to fail, so
-            #     skip the pre-PASE wildcard read for them entirely.
-            #
-            #  2. CLI escape hatch --skip-global-wildcard-population is set. Used for
+            #  1. CLI escape hatch --skip-global-wildcard-population is set. Used for
             #     ad-hoc runs and for flows where the DUT is not reachable at runner
             #     time (e.g. NFC in-test commissioning, file-based BasicComposition):
             #     the populate must happen later, once the test itself can drive it.
             #
-            #  3. Default: pre-populate now via CASE or PASE depending on commissioning
+            #  2. Default: pre-populate now via CASE or PASE depending on commissioning
             #     status. Guards will find the value in the stash and never trigger
             #     the on-demand read.
-            #
-            # In cases 1 and 2 the stash stays empty for "stored_global_wildcard".
-            # MatterBaseTest._populate_wildcard is idempotent and will do the read
-            # on-demand the first time a guard needs it.
-            if not getattr(test_class, "runner_prepopulates_global_wildcard", True):
-                LOGGER.info(
-                    "%s opted out of the pre-PASE wildcard read; skipping so the "
-                    "device remains free to advertise",
-                    test_class.__name__
-                )
-            elif getattr(matter_test_config, "skip_global_wildcard_population", False):
+            if getattr(matter_test_config, "skip_global_wildcard_population", False):
                 LOGGER.info(
                     "--skip-global-wildcard-population set; skipping runner pre-populate. "
                     "Guards will populate the global wildcard on-demand when first called."
