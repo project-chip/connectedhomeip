@@ -41,7 +41,7 @@ namespace Clusters {
  * CHIP_ERROR_BUSY.
  *
  * The application creates one instance at startup and hands it to the cluster:
- *   client.Init(Server::GetInstance().GetCASESessionManager(), kCameraAvStreamManagementEndpoint);
+ *   client.Init(Server::GetInstance().GetCASESessionManager());
  *   cluster.SetCameraClient(&client);
  */
 class DefaultAvAnalysisCameraClient : public AvAnalysisCameraClient, public CommandSender::Callback, public ReadClient::Callback
@@ -71,25 +71,11 @@ public:
 
     /**
      * @param aCASESessionManager Used to reach the camera node; must outlive this instance.
-     * @param aCameraEndpoint     Endpoint on the camera hosting the CameraAVStreamManagement cluster.
-     *                            The EstablishAnalysisStream command only carries the camera's NodeID
-     *                            (spec 11.9.8), so the endpoint is configuration.
+     *
+     * Everything camera-specific — the CameraAVStreamManagement endpoint, its features, and its
+     * stream constraints — is discovered from the camera itself per request.
      */
-    CHIP_ERROR Init(CASESessionManager * aCASESessionManager, EndpointId aCameraEndpoint);
-
-    /**
-     * Declares whether the camera's CameraAVStreamManagement cluster has the Watermark and
-     * OnScreenDisplay features. VideoStreamAllocate requires the WatermarkEnabled/OSDEnabled fields
-     * to be present exactly when the respective feature is supported (feature-conditional
-     * conformance), so the client must know them. Defaults to absent.
-     * The camera's FeatureMap, when discovered, overrides these; they are the fallback when the
-     * discovery read fails.
-     */
-    void SetCameraVideoTraits(bool aHasWatermark, bool aHasOSD)
-    {
-        mCameraHasWatermark = aHasWatermark;
-        mCameraHasOSD       = aHasOSD;
-    }
+    CHIP_ERROR Init(CASESessionManager * aCASESessionManager);
 
     // AvAnalysisCameraClient
     CHIP_ERROR RequestVideoStreamAllocation(const ScopedNodeId & aCameraNode,
@@ -132,9 +118,10 @@ protected:
     void OnProfileDiscoveryComplete(CHIP_ERROR aError);
 
     /**
-     * Fills a profile from this client's configuration
+     * Fills a profile with the built-in default stream constraints; discovery overrides them with
+     * camera-reported values.
      */
-    void FillProfileFromConfiguration(CameraProfile & outProfile) const;
+    static void FillProfileDefaults(CameraProfile & outProfile);
 
     /**
      * Profile being assembled for the pending request.
@@ -184,9 +171,6 @@ private:
     static void OnDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     CASESessionManager * mCASESessionManager = nullptr;
-    EndpointId mCameraEndpoint               = kInvalidEndpointId;
-    bool mCameraHasWatermark                 = false;
-    bool mCameraHasOSD                       = false;
 
     PendingRequest mPendingRequest                      = PendingRequest::kNone;
     uint16_t mPendingStreamId                           = 0;

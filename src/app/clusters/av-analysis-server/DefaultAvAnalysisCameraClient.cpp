@@ -53,12 +53,10 @@ constexpr uint16_t kDefaultKeyFrameIntervalMilliseconds = 4000;
 
 } // namespace
 
-CHIP_ERROR DefaultAvAnalysisCameraClient::Init(CASESessionManager * aCASESessionManager, EndpointId aCameraEndpoint)
+CHIP_ERROR DefaultAvAnalysisCameraClient::Init(CASESessionManager * aCASESessionManager)
 {
     VerifyOrReturnError(aCASESessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(aCameraEndpoint != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
     mCASESessionManager = aCASESessionManager;
-    mCameraEndpoint     = aCameraEndpoint;
     return CHIP_NO_ERROR;
 }
 
@@ -114,9 +112,8 @@ CHIP_ERROR DefaultAvAnalysisCameraClient::StartRequest(PendingRequest aRequest, 
 
 void DefaultAvAnalysisCameraClient::StartProfileDiscovery()
 {
-    // Baseline from configuration; discovered values override as the two discovery reads complete
-    FillProfileFromConfiguration(mProfile);
-    mProfile.avsmEndpoint   = kInvalidEndpointId;
+    // Built-in defaults; discovered values override as the two discovery reads complete
+    FillProfileDefaults(mProfile);
     mDiscoveryError         = CHIP_NO_ERROR;
     mAnalysisUsageSupported = true;
 
@@ -310,11 +307,12 @@ void DefaultAvAnalysisCameraClient::OnDone(ReadClient * apReadClient)
     {
         if (mProfile.avsmEndpoint == kInvalidEndpointId)
         {
-            ChipLogProgress(Zcl,
-                            "AvAnalysisCameraClient: CameraAVStreamManagement endpoint not discovered (%" CHIP_ERROR_FORMAT
-                            "), using configured endpoint %u",
-                            mDiscoveryError.Format(), mCameraEndpoint);
-            mProfile.avsmEndpoint = mCameraEndpoint;
+            // Without a CameraAVStreamManagement endpoint there is nothing to send commands to
+            ChipLogError(Zcl, "AvAnalysisCameraClient: no CameraAVStreamManagement endpoint on the camera (%" CHIP_ERROR_FORMAT ")",
+                         mDiscoveryError.Format());
+            mDiscoveryPhase = DiscoveryPhase::kIdle;
+            FinishRequest(Status::Failure, mPendingStreamId);
+            return;
         }
         StartCapabilitiesRead();
         return;
@@ -351,11 +349,11 @@ void DefaultAvAnalysisCameraClient::OnProfileDiscoveryComplete(CHIP_ERROR aError
     }
 }
 
-void DefaultAvAnalysisCameraClient::FillProfileFromConfiguration(CameraProfile & outProfile) const
+void DefaultAvAnalysisCameraClient::FillProfileDefaults(CameraProfile & outProfile)
 {
-    outProfile.avsmEndpoint  = mCameraEndpoint;
-    outProfile.hasWatermark  = mCameraHasWatermark;
-    outProfile.hasOSD        = mCameraHasOSD;
+    outProfile.avsmEndpoint  = kInvalidEndpointId;
+    outProfile.hasWatermark  = false;
+    outProfile.hasOSD        = false;
     outProfile.minFrameRate  = kDefaultMinFrameRate;
     outProfile.maxFrameRate  = kDefaultMaxFrameRate;
     outProfile.minWidth      = kDefaultMinResolutionWidth;

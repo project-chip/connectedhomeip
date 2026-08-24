@@ -76,7 +76,7 @@ struct TestDefaultAvAnalysisCameraClient : public ::testing::Test
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    void SetUp() override { ASSERT_EQ(mClient.Init(&mCASESessionManager, kCameraEndpoint), CHIP_NO_ERROR); }
+    void SetUp() override { ASSERT_EQ(mClient.Init(&mCASESessionManager), CHIP_NO_ERROR); }
 
     // Never used for real sessions: InterceptingCameraClient overrides EstablishSession.
     CASESessionManager mCASESessionManager;
@@ -87,9 +87,8 @@ struct TestDefaultAvAnalysisCameraClient : public ::testing::Test
 TEST_F(TestDefaultAvAnalysisCameraClient, InitArgumentValidation)
 {
     DefaultAvAnalysisCameraClient client;
-    EXPECT_EQ(client.Init(nullptr, kCameraEndpoint), CHIP_ERROR_INVALID_ARGUMENT);
-    EXPECT_EQ(client.Init(&mCASESessionManager, kInvalidEndpointId), CHIP_ERROR_INVALID_ARGUMENT);
-    EXPECT_EQ(client.Init(&mCASESessionManager, kCameraEndpoint), CHIP_NO_ERROR);
+    EXPECT_EQ(client.Init(nullptr), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(client.Init(&mCASESessionManager), CHIP_NO_ERROR);
 }
 
 TEST_F(TestDefaultAvAnalysisCameraClient, RequestStartsSessionEstablishment)
@@ -194,7 +193,7 @@ public:
     using DefaultAvAnalysisCameraClient::BuildAllocateRequest;
     using DefaultAvAnalysisCameraClient::CameraProfile;
     using DefaultAvAnalysisCameraClient::CurrentProfile;
-    using DefaultAvAnalysisCameraClient::FillProfileFromConfiguration;
+    using DefaultAvAnalysisCameraClient::FillProfileDefaults;
     using DefaultAvAnalysisCameraClient::HandleCapabilityReport;
     using DefaultAvAnalysisCameraClient::HandleServerListReport;
     using DefaultAvAnalysisCameraClient::OnProfileDiscoveryComplete;
@@ -236,18 +235,15 @@ TEST_F(TestDefaultAvAnalysisCameraClient, AllocateRequestFollowsProfileBounds)
     EXPECT_FALSE(request.OSDEnabled.HasValue());
 }
 
-TEST_F(TestDefaultAvAnalysisCameraClient, DefaultProfileComesFromConfiguration)
+TEST_F(TestDefaultAvAnalysisCameraClient, DefaultProfileHasSaneBoundsAndNoCameraSpecifics)
 {
-    ProfileTestClient client;
-    ASSERT_EQ(client.Init(&mCASESessionManager, kCameraEndpoint), CHIP_NO_ERROR);
-    client.SetCameraVideoTraits(/* aHasWatermark = */ true, /* aHasOSD = */ true);
-
     ProfileTestClient::CameraProfile profile;
-    client.FillProfileFromConfiguration(profile);
+    ProfileTestClient::FillProfileDefaults(profile);
 
-    EXPECT_EQ(profile.avsmEndpoint, kCameraEndpoint);
-    EXPECT_TRUE(profile.hasWatermark);
-    EXPECT_TRUE(profile.hasOSD);
+    // Camera-specific values come only from discovery
+    EXPECT_EQ(profile.avsmEndpoint, kInvalidEndpointId);
+    EXPECT_FALSE(profile.hasWatermark);
+    EXPECT_FALSE(profile.hasOSD);
     EXPECT_GT(profile.maxFrameRate, profile.minFrameRate);
     EXPECT_GT(profile.maxBitRateBps, profile.minBitRateBps);
     EXPECT_GE(profile.maxWidth, profile.minWidth);
@@ -256,7 +252,7 @@ TEST_F(TestDefaultAvAnalysisCameraClient, DefaultProfileComesFromConfiguration)
 TEST_F(TestDefaultAvAnalysisCameraClient, DiscoveryFailureFailsRequest)
 {
     ProfileTestClient client;
-    ASSERT_EQ(client.Init(&mCASESessionManager, kCameraEndpoint), CHIP_NO_ERROR);
+    ASSERT_EQ(client.Init(&mCASESessionManager), CHIP_NO_ERROR);
 
     EXPECT_EQ(client.RequestVideoStreamAllocation(kCameraNode, mCallback), CHIP_NO_ERROR);
     EXPECT_EQ(mCallback.mAllocatedCount, 0); // Nothing completes until discovery does
@@ -273,7 +269,7 @@ TEST_F(TestDefaultAvAnalysisCameraClient, DiscoveryFailureFailsRequest)
 TEST_F(TestDefaultAvAnalysisCameraClient, DiscoverySuccessWithoutSessionFailsRequest)
 {
     ProfileTestClient client;
-    ASSERT_EQ(client.Init(&mCASESessionManager, kCameraEndpoint), CHIP_NO_ERROR);
+    ASSERT_EQ(client.Init(&mCASESessionManager), CHIP_NO_ERROR);
 
     EXPECT_EQ(client.RequestVideoStreamAllocation(kCameraNode, mCallback), CHIP_NO_ERROR);
 
@@ -320,7 +316,7 @@ void EncodeServerList(const ClusterId * aClusters, size_t aCount, uint8_t * aBuf
 TEST_F(TestDefaultAvAnalysisCameraClient, DiscoveryFindsAvsmEndpointInServerList)
 {
     ProfileTestClient client;
-    ASSERT_EQ(client.Init(&mCASESessionManager, kCameraEndpoint), CHIP_NO_ERROR);
+    ASSERT_EQ(client.Init(&mCASESessionManager), CHIP_NO_ERROR);
 
     uint8_t buffer[64];
     TLV::TLVReader reader;
@@ -360,7 +356,7 @@ void EncodeTlv(uint8_t * aBuffer, size_t aBufferSize, TLV::TLVReader & aReader, 
 TEST_F(TestDefaultAvAnalysisCameraClient, CapabilityReadDerivesTraitsFromFeatureMap)
 {
     ProfileTestClient client;
-    ASSERT_EQ(client.Init(&mCASESessionManager, kCameraEndpoint), CHIP_NO_ERROR);
+    ASSERT_EQ(client.Init(&mCASESessionManager), CHIP_NO_ERROR);
 
     uint8_t buffer[64];
     TLV::TLVReader reader;
@@ -379,7 +375,7 @@ TEST_F(TestDefaultAvAnalysisCameraClient, CapabilityReadDerivesTraitsFromFeature
 TEST_F(TestDefaultAvAnalysisCameraClient, CapabilityReadBoundsResolutionAndFrameRate)
 {
     ProfileTestClient client;
-    ASSERT_EQ(client.Init(&mCASESessionManager, kCameraEndpoint), CHIP_NO_ERROR);
+    ASSERT_EQ(client.Init(&mCASESessionManager), CHIP_NO_ERROR);
 
     uint8_t buffer[64];
     TLV::TLVReader reader;
@@ -405,7 +401,7 @@ TEST_F(TestDefaultAvAnalysisCameraClient, CapabilityReadBoundsResolutionAndFrame
 TEST_F(TestDefaultAvAnalysisCameraClient, CapabilityReadTakesMinimumsFromTradeOffPoints)
 {
     ProfileTestClient client;
-    ASSERT_EQ(client.Init(&mCASESessionManager, kCameraEndpoint), CHIP_NO_ERROR);
+    ASSERT_EQ(client.Init(&mCASESessionManager), CHIP_NO_ERROR);
 
     CameraAvStreamManagement::Structs::RateDistortionTradeOffPointsStruct::Type points[2];
     points[0].codec             = CameraAvStreamManagement::VideoCodecEnum::kH264;
@@ -442,7 +438,7 @@ TEST_F(TestDefaultAvAnalysisCameraClient, CapabilityReadTakesMinimumsFromTradeOf
 TEST_F(TestDefaultAvAnalysisCameraClient, CapabilityReadDetectsMissingAnalysisUsage)
 {
     ProfileTestClient client;
-    ASSERT_EQ(client.Init(&mCASESessionManager, kCameraEndpoint), CHIP_NO_ERROR);
+    ASSERT_EQ(client.Init(&mCASESessionManager), CHIP_NO_ERROR);
     EXPECT_TRUE(client.AnalysisUsageSupported());
 
     uint8_t buffer[32];
