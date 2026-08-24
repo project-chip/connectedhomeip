@@ -63,5 +63,5 @@ CHIP_ERROR AppendOptionalAttributes(ReadOnlyBufferBuilder<DataModel::AttributeEn
 
 } // namespace Thermostat
 } // namespace Clusters
-} // namespace App
-} // namespace Chip
+} // namespace app
+} // namespace chip

@@ -77,8 +77,8 @@ public:
 
     Setpoints(const Setpoints & spl) :
         autoSupported(spl.autoSupported), heatSupported(spl.heatSupported), coolSupported(spl.coolSupported),
-        occupancySupported(spl.occupancySupported),
-        absoluteHeatLimits(spl.absoluteHeatLimits), absoluteCoolLimits(spl.absoluteCoolLimits),
+        occupancySupported(spl.occupancySupported), absoluteHeatLimits(spl.absoluteHeatLimits),
+        absoluteCoolLimits(spl.absoluteCoolLimits),
         userHeatLimits(OptionalSetpoint(spl.userHeatLimits.minimum, absoluteHeatLimits.minimum),
                        OptionalSetpoint(spl.userHeatLimits.maximum, absoluteHeatLimits.maximum)),
         userCoolLimits(OptionalSetpoint(spl.userCoolLimits.minimum, absoluteCoolLimits.minimum),

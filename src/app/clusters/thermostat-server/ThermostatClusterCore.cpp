@@ -39,9 +39,10 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-ThermostatClusterCore::ThermostatClusterCore(EndpointId endpointId, const BitFlags<Thermostat::Feature> features, const Config & config,
-                                             Thermostat::Delegate & delegate)
-    : DefaultServerCluster({ endpointId, Thermostat::Id }), mFeatures(features), mConfig(config), mDelegate(delegate)
+ThermostatClusterCore::ThermostatClusterCore(EndpointId endpointId, const BitFlags<Thermostat::Feature> features,
+                                             const Config & config, Thermostat::Delegate & delegate) :
+    DefaultServerCluster({ endpointId, Thermostat::Id }),
+    mFeatures(features), mConfig(config), mDelegate(delegate)
 {
     ChipLogProgress(Zcl, "Starting up thermostat server cluster on endpoint %d", mPath.mEndpointId);
 }
@@ -59,7 +60,7 @@ void ThermostatClusterCore::Shutdown(ClusterShutdownType type)
 }
 
 CHIP_ERROR ThermostatClusterCore::Attributes(const ConcreteClusterPath & path,
-                                         ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+                                             ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
         { HasAttribute(LocalTemperatureCalibration::Id), LocalTemperatureCalibration::kMetadataEntry },
@@ -167,7 +168,7 @@ DataModel::Nullable<temperature> ThermostatClusterCore::GetLocalTemperature() co
 }
 
 Status ThermostatClusterCore::SetLocalTemperature(DataModel::Nullable<temperature> localTemperature,
-                                              DataModel::AttributeChangeType changeType)
+                                                  DataModel::AttributeChangeType changeType)
 {
     bool changed = false;
     if (auto err = mDelegate.SetLocalTemperature(localTemperature, changed); err != Status::Success)
@@ -277,7 +278,7 @@ Status ThermostatClusterCore::SetRunningState(BitMask<RelayStateBitmap> runningS
 }
 
 CHIP_ERROR ThermostatClusterCore::AcceptedCommands(const ConcreteClusterPath & path,
-                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+                                                   ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     return builder.AppendElements({
         Commands::SetpointRaiseLower::kMetadataEntry,

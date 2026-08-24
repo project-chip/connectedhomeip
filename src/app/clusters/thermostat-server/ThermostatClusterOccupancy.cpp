@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#include "ThermostatClusterCore.h"
 #include "ThermostatClusterOccupancy.h"
+#include "ThermostatClusterCore.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -38,7 +38,8 @@ std::optional<temperature> ThermostatOccupancy::Delegate::GetUnoccupiedHeatingSe
     return std::nullopt;
 }
 
-Protocols::InteractionModel::Status ThermostatOccupancy::Delegate::SetUnoccupiedHeatingSetpoint(std::optional<temperature> unoccupiedHeatingSetpoint, bool & changed)
+Protocols::InteractionModel::Status
+ThermostatOccupancy::Delegate::SetUnoccupiedHeatingSetpoint(std::optional<temperature> unoccupiedHeatingSetpoint, bool & changed)
 {
     changed = false;
     return Status::Success;
@@ -49,7 +50,8 @@ std::optional<temperature> ThermostatOccupancy::Delegate::GetUnoccupiedCoolingSe
     return std::nullopt;
 }
 
-Protocols::InteractionModel::Status ThermostatOccupancy::Delegate::SetUnoccupiedCoolingSetpoint(std::optional<temperature> unoccupiedCoolingSetpoint, bool & changed)
+Protocols::InteractionModel::Status
+ThermostatOccupancy::Delegate::SetUnoccupiedCoolingSetpoint(std::optional<temperature> unoccupiedCoolingSetpoint, bool & changed)
 {
     changed = false;
     return Status::Success;

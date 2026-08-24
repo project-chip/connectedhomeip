@@ -228,7 +228,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
         return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
-   // cluster->SetFeatures(BitFlags<Thermostat::Feature>(value));
+    // cluster->SetFeatures(BitFlags<Thermostat::Feature>(value));
     return Status::Success;
 }
 } // namespace FeatureMap

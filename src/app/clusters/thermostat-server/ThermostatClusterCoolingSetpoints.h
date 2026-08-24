@@ -38,50 +38,50 @@ namespace Thermostat {
 
 class ThermostatClusterCore;
 
-class ThermostatCoolingSetpoints {
+class ThermostatCoolingSetpoints
+{
 public:
-    class Delegate {
+    class Delegate
+    {
     public:
         Delegate()          = default;
         virtual ~Delegate() = default;
 
         virtual Protocols::InteractionModel::Status GetOccupiedCoolingSetpoint(temperature & occupiedCoolingSetpoint) const = 0;
         virtual Protocols::InteractionModel::Status SetOccupiedCoolingSetpoint(temperature occupiedCoolingSetpoint,
-                                                                            bool & changed) = 0;
+                                                                               bool & changed)                              = 0;
 
         virtual Protocols::InteractionModel::Status GetAbsMinCoolSetpointLimit(temperature & absMinCoolSetpointLimit) const;
         virtual Protocols::InteractionModel::Status GetAbsMaxCoolSetpointLimit(temperature & absMaxCoolSetpointLimit) const;
 
         virtual Protocols::InteractionModel::Status GetMinCoolSetpointLimit(temperature & minCoolSetpointLimit) const;
-        virtual Protocols::InteractionModel::Status SetMinCoolSetpointLimit(temperature minCoolSetpointLimit,
-                                                                            bool & changed);
+        virtual Protocols::InteractionModel::Status SetMinCoolSetpointLimit(temperature minCoolSetpointLimit, bool & changed);
 
         virtual Protocols::InteractionModel::Status GetMaxCoolSetpointLimit(temperature & maxCoolSetpointLimit) const;
-        virtual Protocols::InteractionModel::Status SetMaxCoolSetpointLimit(temperature maxCoolSetpointLimit,
-                                                                            bool & changed);
+        virtual Protocols::InteractionModel::Status SetMaxCoolSetpointLimit(temperature maxCoolSetpointLimit, bool & changed);
 
         virtual Protocols::InteractionModel::Status GetUnoccupiedCoolingSetpoint(temperature & unoccupiedCoolingSetpoint) const;
         virtual Protocols::InteractionModel::Status SetUnoccupiedCoolingSetpoint(temperature unoccupiedCoolingSetpoint,
-                                                                                bool & changed);
+                                                                                 bool & changed);
     };
 
-    ThermostatCoolingSetpoints(const ThermostatSetpointsBase & setpoints, Delegate & delegate) 
-        : mSetpoints(setpoints), mDelegate(delegate) {}
+    ThermostatCoolingSetpoints(const ThermostatSetpointsBase & setpoints, Delegate & delegate) :
+        mSetpoints(setpoints), mDelegate(delegate)
+    {}
 
     Protocols::InteractionModel::Status LoadSetpoints(Setpoints & setpoints);
-    DataModel::ActionReturnStatus SaveSetpoints(const Setpoints & currentSetpoints, const Setpoints & changedSetpoints, SetpointAttributes & changedAttributes);
+    DataModel::ActionReturnStatus SaveSetpoints(const Setpoints & currentSetpoints, const Setpoints & changedSetpoints,
+                                                SetpointAttributes & changedAttributes);
 
-    
     bool HasAttribute(AttributeId attributeId);
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder);
     std::optional<DataModel::ActionReturnStatus> ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                AttributeValueEncoder & encoder);
     std::optional<DataModel::ActionReturnStatus> WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                AttributeValueDecoder & decoder,
-                                                                Setpoints & setpoints,
+                                                                AttributeValueDecoder & decoder, Setpoints & setpoints,
                                                                 SetpointAttributes & changedAttributes);
 
-    private:
+private:
     const ThermostatSetpointsBase & mSetpoints;
     Delegate & mDelegate;
 };

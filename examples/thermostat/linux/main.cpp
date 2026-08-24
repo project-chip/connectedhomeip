@@ -82,13 +82,10 @@ static Clusters::Thermostat::ThermostatHoldDelegate gHoldDelegate(gThermostatEnd
 static Clusters::Thermostat::ThermostatPresetsDelegate gPresetsDelegate(gThermostatEndpoint);
 static Clusters::Thermostat::ThermostatSuggestionsDelegate gSuggestionsDelegate(gThermostatEndpoint, gPresetsDelegate);
 
-
-
-using ThermostatClusterType = Clusters::Thermostat::ThermostatCluster<Clusters::Thermostat::ThermostatDelegate,
-                                                                      Clusters::Thermostat::ThermostatSetpointsDelegate,
-                                                                      Clusters::Thermostat::ThermostatHoldDelegate,
-                                                                      Clusters::Thermostat::ThermostatPresetsDelegate,
-                                                                      Clusters::Thermostat::ThermostatSuggestionsDelegate>;
+using ThermostatClusterType = Clusters::Thermostat::ThermostatCluster<
+    Clusters::Thermostat::ThermostatDelegate, Clusters::Thermostat::ThermostatSetpointsDelegate,
+    Clusters::Thermostat::ThermostatHoldDelegate, Clusters::Thermostat::ThermostatPresetsDelegate,
+    Clusters::Thermostat::ThermostatSuggestionsDelegate>;
 
 void ApplicationInit()
 {
@@ -97,7 +94,8 @@ void ApplicationInit()
     gThermostatDelegate.Init();
     gSetpointsDelegate.Init();
     gHoldDelegate.Init();
-    Clusters::Thermostat::ServerInit<ThermostatClusterType>(gThermostatEndpoint, gThermostatDelegate, gSetpointsDelegate, gHoldDelegate, gPresetsDelegate, gSuggestionsDelegate);
+    Clusters::Thermostat::ServerInit<ThermostatClusterType>(gThermostatEndpoint, gThermostatDelegate, gSetpointsDelegate,
+                                                            gHoldDelegate, gPresetsDelegate, gSuggestionsDelegate);
 }
 
 void ApplicationShutdown()

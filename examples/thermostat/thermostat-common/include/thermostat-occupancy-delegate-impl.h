@@ -30,7 +30,6 @@ namespace Thermostat {
 class ThermostatOccupancyDelegate : public ThermostatOccupancy::Delegate
 {
 public:
-
     ThermostatOccupancyDelegate(EndpointId endpoint, AttributePersistenceProvider * provider = nullptr) :
         mEndpointId(endpoint), mProvider(provider)
     {}
@@ -40,11 +39,12 @@ public:
 
     std::optional<temperature> GetUnoccupiedHeatingSetpoint() const override;
     Protocols::InteractionModel::Status SetUnoccupiedHeatingSetpoint(std::optional<temperature> unoccupiedHeatingSetpoint,
-                                                                        bool & changed) override;
+                                                                     bool & changed) override;
 
     std::optional<temperature> GetUnoccupiedCoolingSetpoint() const override;
     Protocols::InteractionModel::Status SetUnoccupiedCoolingSetpoint(std::optional<temperature> unoccupiedCoolingSetpoint,
-                                                                        bool & changed) override;
+                                                                     bool & changed) override;
+
 private:
     EndpointId mEndpointId;
     AttributePersistenceProvider * mProvider = nullptr;

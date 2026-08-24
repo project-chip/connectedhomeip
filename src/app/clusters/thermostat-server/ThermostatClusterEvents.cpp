@@ -29,8 +29,8 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-
-void ThermostatClusterCore::GenerateSystemModeChangeEvent(Optional<SystemModeEnum> previousSystemMode, SystemModeEnum currentSystemMode)
+void ThermostatClusterCore::GenerateSystemModeChangeEvent(Optional<SystemModeEnum> previousSystemMode,
+                                                          SystemModeEnum currentSystemMode)
 {
     if (!mFeatures.Has(Feature::kEvents))
     {
@@ -68,7 +68,7 @@ void ThermostatClusterCore::GenerateLocalTemperatureChangeEvent(DataModel::Nulla
 }
 
 void ThermostatClusterCore::GenerateOccupancyChangeEvent(Optional<BitMask<OccupancyBitmap>> previousOccupancy,
-                                                     BitMask<OccupancyBitmap> currentOccupancy)
+                                                         BitMask<OccupancyBitmap> currentOccupancy)
 {
     if (!mFeatures.Has(Feature::kEvents))
     {
@@ -88,7 +88,7 @@ void ThermostatClusterCore::GenerateOccupancyChangeEvent(Optional<BitMask<Occupa
 }
 
 void ThermostatClusterCore::GenerateSetpointChangeEvent(SystemModeEnum systemMode, BitMask<OccupancyBitmap> occupancy,
-                                                    Optional<temperature> previousSetpoint, temperature currentSetpoint)
+                                                        Optional<temperature> previousSetpoint, temperature currentSetpoint)
 {
     if (!mFeatures.Has(Feature::kEvents))
     {
@@ -110,7 +110,7 @@ void ThermostatClusterCore::GenerateSetpointChangeEvent(SystemModeEnum systemMod
 }
 
 void ThermostatClusterCore::GenerateRunningStateChangeEvent(Optional<BitMask<RelayStateBitmap>> previousRunningState,
-                                                        BitMask<RelayStateBitmap> currentRunningState)
+                                                            BitMask<RelayStateBitmap> currentRunningState)
 {
     if (!mFeatures.Has(Feature::kEvents))
     {
@@ -130,7 +130,7 @@ void ThermostatClusterCore::GenerateRunningStateChangeEvent(Optional<BitMask<Rel
 }
 
 void ThermostatClusterCore::GenerateRunningModeChangeEvent(Optional<ThermostatRunningModeEnum> previousRunningMode,
-                                                       ThermostatRunningModeEnum currentRunningMode)
+                                                           ThermostatRunningModeEnum currentRunningMode)
 {
     if (!mFeatures.Has(Feature::kEvents))
     {
@@ -150,7 +150,7 @@ void ThermostatClusterCore::GenerateRunningModeChangeEvent(Optional<ThermostatRu
 }
 
 void ThermostatClusterCore::GenerateActiveScheduleChangeEvent(Optional<DataModel::Nullable<ByteSpan>> previousScheduleHandle,
-                                                          DataModel::Nullable<ByteSpan> currentScheduleHandle)
+                                                              DataModel::Nullable<ByteSpan> currentScheduleHandle)
 {
     if (!mFeatures.Has(Feature::kEvents))
     {
@@ -170,7 +170,7 @@ void ThermostatClusterCore::GenerateActiveScheduleChangeEvent(Optional<DataModel
 }
 
 void ThermostatClusterCore::GenerateActivePresetChangeEvent(Optional<DataModel::Nullable<ByteSpan>> previousPresetHandle,
-                                                        DataModel::Nullable<ByteSpan> currentPresetHandle)
+                                                            DataModel::Nullable<ByteSpan> currentPresetHandle)
 {
     if (!mFeatures.Has(Feature::kEvents))
     {

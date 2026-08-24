@@ -17,9 +17,9 @@
 #include "ThermostatClusterHold.h"
 #include "ThermostatClusterCore.h"
 
-#include <app/server-cluster/AttributeListBuilder.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/Thermostat/Metadata.h>
 #include <optional>
 
@@ -36,7 +36,7 @@ namespace Clusters {
 namespace Thermostat {
 
 std::optional<DataModel::ActionReturnStatus> ThermostatHold::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                                                AttributeValueEncoder & encoder)
+                                                                           AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -52,76 +52,71 @@ std::optional<DataModel::ActionReturnStatus> ThermostatHold::ReadAttribute(const
 }
 
 std::optional<DataModel::ActionReturnStatus> ThermostatHold::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                      AttributeValueDecoder & decoder)
+                                                                            AttributeValueDecoder & decoder)
 {
     switch (request.path.mAttributeId)
     {
-    case TemperatureSetpointHold::Id:
+    case TemperatureSetpointHold::Id: {
+        TemperatureSetpointHoldEnum requestedTemperatureSetpointHold;
+        ReturnErrorOnFailure(decoder.Decode(requestedTemperatureSetpointHold));
+        if (EnsureKnownEnumValue(requestedTemperatureSetpointHold) == TemperatureSetpointHoldEnum::kUnknownEnumValue)
         {
-            TemperatureSetpointHoldEnum requestedTemperatureSetpointHold;
-            ReturnErrorOnFailure(decoder.Decode(requestedTemperatureSetpointHold));
-            if (EnsureKnownEnumValue(requestedTemperatureSetpointHold) == TemperatureSetpointHoldEnum::kUnknownEnumValue)
-            {
-                ChipLogError(Zcl, "Invalid value for TemperatureSetpointHold: %d", to_underlying(requestedTemperatureSetpointHold));
-                return Status::InvalidValue;
-            }
-            bool changed = false;
-            if (auto err = mDelegate.SetTemperatureSetpointHold(requestedTemperatureSetpointHold, changed); err != Status::Success)
-            {
-                return err;
-            }
-            if (changed)
-            {
-                mCluster.NotifyAttributeChanged(TemperatureSetpointHold::Id);
-            }
-            return Status::Success;
+            ChipLogError(Zcl, "Invalid value for TemperatureSetpointHold: %d", to_underlying(requestedTemperatureSetpointHold));
+            return Status::InvalidValue;
         }
-    case TemperatureSetpointHoldDuration::Id:
+        bool changed = false;
+        if (auto err = mDelegate.SetTemperatureSetpointHold(requestedTemperatureSetpointHold, changed); err != Status::Success)
         {
-            DataModel::Nullable<uint16_t> requestedTemperatureSetpointHoldDuration;
-            ReturnErrorOnFailure(decoder.Decode(requestedTemperatureSetpointHoldDuration));
-            if (!requestedTemperatureSetpointHoldDuration.IsNull() &&
-                requestedTemperatureSetpointHoldDuration.Value() > kMaxTemperatureSetpointHoldDurationMin)
-            {
-                return Status::InvalidValue;
-            }
-            bool changed = false;
-            if (auto err = mDelegate.SetTemperatureSetpointHoldDuration(requestedTemperatureSetpointHoldDuration, changed);
-                err != Status::Success)
-            {
-                return err;
-            }
-            if (changed)
-            {
-                mCluster.NotifyAttributeChanged(TemperatureSetpointHoldDuration::Id);
-            }
-            return Status::Success;
+            return err;
         }
-    case SetpointHoldExpiryTimestamp::Id:
+        if (changed)
         {
-            DataModel::Nullable<uint32_t> setpointHoldExpiryTimestamp;
-            ReturnErrorOnFailure(decoder.Decode(setpointHoldExpiryTimestamp));
-            bool changed = false;
-            if (auto err = mDelegate.SetSetpointHoldExpiryTimestamp(setpointHoldExpiryTimestamp, changed);
-                err != Status::Success)
-            {
-                return err;
-            }
-            if (changed)
-            {
-                mCluster.NotifyAttributeChanged(SetpointHoldExpiryTimestamp::Id);
-            }
-            return Status::Success;
+            mCluster.NotifyAttributeChanged(TemperatureSetpointHold::Id);
         }
+        return Status::Success;
+    }
+    case TemperatureSetpointHoldDuration::Id: {
+        DataModel::Nullable<uint16_t> requestedTemperatureSetpointHoldDuration;
+        ReturnErrorOnFailure(decoder.Decode(requestedTemperatureSetpointHoldDuration));
+        if (!requestedTemperatureSetpointHoldDuration.IsNull() &&
+            requestedTemperatureSetpointHoldDuration.Value() > kMaxTemperatureSetpointHoldDurationMin)
+        {
+            return Status::InvalidValue;
+        }
+        bool changed = false;
+        if (auto err = mDelegate.SetTemperatureSetpointHoldDuration(requestedTemperatureSetpointHoldDuration, changed);
+            err != Status::Success)
+        {
+            return err;
+        }
+        if (changed)
+        {
+            mCluster.NotifyAttributeChanged(TemperatureSetpointHoldDuration::Id);
+        }
+        return Status::Success;
+    }
+    case SetpointHoldExpiryTimestamp::Id: {
+        DataModel::Nullable<uint32_t> setpointHoldExpiryTimestamp;
+        ReturnErrorOnFailure(decoder.Decode(setpointHoldExpiryTimestamp));
+        bool changed = false;
+        if (auto err = mDelegate.SetSetpointHoldExpiryTimestamp(setpointHoldExpiryTimestamp, changed); err != Status::Success)
+        {
+            return err;
+        }
+        if (changed)
+        {
+            mCluster.NotifyAttributeChanged(SetpointHoldExpiryTimestamp::Id);
+        }
+        return Status::Success;
+    }
     default:
         return std::nullopt;
     }
 }
 
-CHIP_ERROR ThermostatHold::Attributes(const ConcreteClusterPath & path,
-                                      ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+CHIP_ERROR ThermostatHold::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    const auto & optionalAttributes = mCluster.OptionalAttributes();
+    const auto & optionalAttributes                              = mCluster.OptionalAttributes();
     const AttributeListBuilder::OptionalAttributeEntry entries[] = {
         { optionalAttributes.TemperatureSetpointHold, TemperatureSetpointHold::kMetadataEntry },
         { optionalAttributes.TemperatureSetpointHoldDuration, TemperatureSetpointHoldDuration::kMetadataEntry },

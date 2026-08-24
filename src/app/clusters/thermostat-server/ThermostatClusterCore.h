@@ -38,7 +38,6 @@ namespace Thermostat {
 class ThermostatClusterCore : public DefaultServerCluster
 {
 public:
-
     struct Config
     {
         const OptionalAttributes mOptionalAttributes;
@@ -48,7 +47,6 @@ public:
             mOptionalAttributes(optionalAttributes), mTimerDelegate(timerDelegate)
         {}
     };
-
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType type) override;
@@ -74,7 +72,7 @@ public:
 
     bool HasAttribute(chip::AttributeId attributeId);
 
-        DataModel::Nullable<temperature> GetLocalTemperature() const;
+    DataModel::Nullable<temperature> GetLocalTemperature() const;
     Protocols::InteractionModel::Status
     SetLocalTemperature(DataModel::Nullable<temperature> localTemperature,
                         DataModel::AttributeChangeType changeType = DataModel::AttributeChangeType::kReportable);
@@ -85,13 +83,11 @@ public:
     SystemModeEnum GetSystemMode() const;
     Protocols::InteractionModel::Status SetSystemMode(SystemModeEnum systemMode);
 
-
     ThermostatRunningModeEnum GetRunningMode() const;
     Protocols::InteractionModel::Status SetRunningMode(ThermostatRunningModeEnum runningMode);
 
     BitMask<RelayStateBitmap> GetRunningState() const;
     Protocols::InteractionModel::Status SetRunningState(BitMask<RelayStateBitmap> runningState);
-
 
     int8_t GetLocalTemperatureCalibration() const;
     Protocols::InteractionModel::Status SetLocalTemperatureCalibration(int8_t localTemperatureCalibration);
@@ -102,8 +98,6 @@ public:
     virtual bool IsActiveSetpoint(AttributeId attributeId) const;
 
 protected:
-
-
     ThermostatClusterCore(EndpointId endpointId, const BitFlags<Thermostat::Feature> features, const Config & config,
                           Thermostat::Delegate & delegate);
 

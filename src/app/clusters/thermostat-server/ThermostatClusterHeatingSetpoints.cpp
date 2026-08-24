@@ -40,37 +40,45 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-Status ThermostatHeatingSetpoints::Delegate::GetUnoccupiedHeatingSetpoint(temperature & unoccupiedHeatingSetpoint) const {
+Status ThermostatHeatingSetpoints::Delegate::GetUnoccupiedHeatingSetpoint(temperature & unoccupiedHeatingSetpoint) const
+{
     return Status::UnsupportedAttribute;
 };
 
-Status ThermostatHeatingSetpoints::Delegate::SetUnoccupiedHeatingSetpoint(temperature unoccupiedHeatingSetpoint, bool & changed) {
+Status ThermostatHeatingSetpoints::Delegate::SetUnoccupiedHeatingSetpoint(temperature unoccupiedHeatingSetpoint, bool & changed)
+{
     return Status::UnsupportedAttribute;
 };
 
-Status ThermostatHeatingSetpoints::Delegate::GetAbsMinHeatSetpointLimit(temperature & absMinHeatSetpointLimit) const {
+Status ThermostatHeatingSetpoints::Delegate::GetAbsMinHeatSetpointLimit(temperature & absMinHeatSetpointLimit) const
+{
     return Status::UnsupportedAttribute;
 };
-Status ThermostatHeatingSetpoints::Delegate::GetAbsMaxHeatSetpointLimit(temperature & absMaxHeatSetpointLimit) const {
-    return Status::UnsupportedAttribute;
-};
-
-Status ThermostatHeatingSetpoints::Delegate::GetMinHeatSetpointLimit(temperature & minHeatSetpointLimit) const {
-    return Status::UnsupportedAttribute;
-};
-Status ThermostatHeatingSetpoints::Delegate::SetMinHeatSetpointLimit(temperature minHeatSetpointLimit, bool & changed) {
+Status ThermostatHeatingSetpoints::Delegate::GetAbsMaxHeatSetpointLimit(temperature & absMaxHeatSetpointLimit) const
+{
     return Status::UnsupportedAttribute;
 };
 
-Status ThermostatHeatingSetpoints::Delegate::GetMaxHeatSetpointLimit(temperature & maxHeatSetpointLimit) const {
+Status ThermostatHeatingSetpoints::Delegate::GetMinHeatSetpointLimit(temperature & minHeatSetpointLimit) const
+{
     return Status::UnsupportedAttribute;
 };
-Status ThermostatHeatingSetpoints::Delegate::SetMaxHeatSetpointLimit(temperature maxHeatSetpointLimit, bool & changed) {
+Status ThermostatHeatingSetpoints::Delegate::SetMinHeatSetpointLimit(temperature minHeatSetpointLimit, bool & changed)
+{
     return Status::UnsupportedAttribute;
 };
 
+Status ThermostatHeatingSetpoints::Delegate::GetMaxHeatSetpointLimit(temperature & maxHeatSetpointLimit) const
+{
+    return Status::UnsupportedAttribute;
+};
+Status ThermostatHeatingSetpoints::Delegate::SetMaxHeatSetpointLimit(temperature maxHeatSetpointLimit, bool & changed)
+{
+    return Status::UnsupportedAttribute;
+};
 
-bool ThermostatHeatingSetpoints::HasAttribute(AttributeId attributeId) {
+bool ThermostatHeatingSetpoints::HasAttribute(AttributeId attributeId)
+{
     switch (attributeId)
     {
     case OccupiedHeatingSetpoint::Id:
@@ -84,7 +92,8 @@ bool ThermostatHeatingSetpoints::HasAttribute(AttributeId attributeId) {
     }
 }
 
-Protocols::InteractionModel::Status ThermostatHeatingSetpoints::LoadSetpoints(Setpoints & setpoints) {
+Protocols::InteractionModel::Status ThermostatHeatingSetpoints::LoadSetpoints(Setpoints & setpoints)
+{
     OptionalAttributes attributes = mSetpoints.OptionalAttributes();
 
     if (attributes.AbsMinHeatSetpointLimit)
@@ -93,27 +102,31 @@ Protocols::InteractionModel::Status ThermostatHeatingSetpoints::LoadSetpoints(Se
         auto status = mDelegate.GetAbsMinHeatSetpointLimit(absMinHeatSetpointLimit);
         VerifyOrReturnValue(status == Status::Success, status);
         setpoints.absoluteHeatLimits.minimum.SetTemperature(absMinHeatSetpointLimit);
-    } else {
+    }
+    else
+    {
         setpoints.absoluteHeatLimits.minimum.SetTemperature(kDefaultAbsMinHeatSetpointLimit);
     }
-   
+
     if (attributes.AbsMaxHeatSetpointLimit)
     {
         temperature absMaxHeatSetpointLimit;
         auto status = mDelegate.GetAbsMaxHeatSetpointLimit(absMaxHeatSetpointLimit);
         VerifyOrReturnValue(status == Status::Success, status);
         setpoints.absoluteHeatLimits.maximum.SetTemperature(absMaxHeatSetpointLimit);
-    } else {
+    }
+    else
+    {
         setpoints.absoluteHeatLimits.maximum.SetTemperature(kDefaultAbsMaxHeatSetpointLimit);
     }
-    
+
     if (attributes.MinHeatSetpointLimit)
     {
         temperature minHeatSetpointLimit;
         auto status = mDelegate.GetMinHeatSetpointLimit(minHeatSetpointLimit);
         VerifyOrReturnValue(status == Status::Success, status);
         setpoints.userHeatLimits.minimum.SetTemperature(minHeatSetpointLimit);
-    } 
+    }
 
     if (attributes.MaxHeatSetpointLimit)
     {
@@ -122,7 +135,7 @@ Protocols::InteractionModel::Status ThermostatHeatingSetpoints::LoadSetpoints(Se
         VerifyOrReturnValue(status == Status::Success, status);
         setpoints.userHeatLimits.maximum.SetTemperature(maxHeatSetpointLimit);
     }
-    
+
     temperature occupiedHeatingSetpoint;
     auto status = mDelegate.GetOccupiedHeatingSetpoint(occupiedHeatingSetpoint);
     VerifyOrReturnValue(status == Status::Success, status);
@@ -138,7 +151,9 @@ Protocols::InteractionModel::Status ThermostatHeatingSetpoints::LoadSetpoints(Se
     return Status::Success;
 }
 
-DataModel::ActionReturnStatus ThermostatHeatingSetpoints::SaveSetpoints(const Setpoints & currentSetpoints, const Setpoints & changedSetpoints, SetpointAttributes & changedAttributes)
+DataModel::ActionReturnStatus ThermostatHeatingSetpoints::SaveSetpoints(const Setpoints & currentSetpoints,
+                                                                        const Setpoints & changedSetpoints,
+                                                                        SetpointAttributes & changedAttributes)
 {
     if (!changedSetpoints.Valid())
     {
@@ -146,7 +161,7 @@ DataModel::ActionReturnStatus ThermostatHeatingSetpoints::SaveSetpoints(const Se
     }
 
     Status status = Status::Success;
-   
+
     if (changedAttributes.Has(MinHeatSetpointLimit::Id) && changedSetpoints.userHeatLimits.minimum.HasTemperature())
     {
         bool changed;
@@ -155,8 +170,11 @@ DataModel::ActionReturnStatus ThermostatHeatingSetpoints::SaveSetpoints(const Se
         if (!changed)
         {
             changedAttributes.Clear(MinHeatSetpointLimit::Id);
-        } else {
-            mSetpoints.GenerateSetpointEvent(MinHeatSetpointLimit::Id, currentSetpoints.userHeatLimits.minimum.Temperature(), changedSetpoints.userHeatLimits.minimum.Temperature());
+        }
+        else
+        {
+            mSetpoints.GenerateSetpointEvent(MinHeatSetpointLimit::Id, currentSetpoints.userHeatLimits.minimum.Temperature(),
+                                             changedSetpoints.userHeatLimits.minimum.Temperature());
         }
     }
     if (changedAttributes.Has(MaxHeatSetpointLimit::Id) && changedSetpoints.userHeatLimits.maximum.HasTemperature())
@@ -167,8 +185,11 @@ DataModel::ActionReturnStatus ThermostatHeatingSetpoints::SaveSetpoints(const Se
         if (!changed)
         {
             changedAttributes.Clear(MaxHeatSetpointLimit::Id);
-        } else {
-            mSetpoints.GenerateSetpointEvent(MaxHeatSetpointLimit::Id, currentSetpoints.userHeatLimits.maximum.Temperature(), changedSetpoints.userHeatLimits.maximum.Temperature());
+        }
+        else
+        {
+            mSetpoints.GenerateSetpointEvent(MaxHeatSetpointLimit::Id, currentSetpoints.userHeatLimits.maximum.Temperature(),
+                                             changedSetpoints.userHeatLimits.maximum.Temperature());
         }
     }
     if (changedAttributes.Has(OccupiedHeatingSetpoint::Id) && changedSetpoints.occupiedRange.heating.HasTemperature())
@@ -179,8 +200,11 @@ DataModel::ActionReturnStatus ThermostatHeatingSetpoints::SaveSetpoints(const Se
         if (!changed)
         {
             changedAttributes.Clear(OccupiedHeatingSetpoint::Id);
-        } else {
-            mSetpoints.GenerateSetpointEvent(OccupiedHeatingSetpoint::Id, currentSetpoints.occupiedRange.heating.Temperature(), changedSetpoints.occupiedRange.heating.Temperature());
+        }
+        else
+        {
+            mSetpoints.GenerateSetpointEvent(OccupiedHeatingSetpoint::Id, currentSetpoints.occupiedRange.heating.Temperature(),
+                                             changedSetpoints.occupiedRange.heating.Temperature());
         }
     }
     if (changedAttributes.Has(UnoccupiedHeatingSetpoint::Id) && changedSetpoints.unoccupiedRange.heating.HasTemperature())
@@ -191,56 +215,53 @@ DataModel::ActionReturnStatus ThermostatHeatingSetpoints::SaveSetpoints(const Se
         if (!changed)
         {
             changedAttributes.Clear(UnoccupiedHeatingSetpoint::Id);
-        } else {
-            mSetpoints.GenerateSetpointEvent(UnoccupiedHeatingSetpoint::Id, currentSetpoints.unoccupiedRange.heating.Temperature(), changedSetpoints.unoccupiedRange.heating.Temperature());
+        }
+        else
+        {
+            mSetpoints.GenerateSetpointEvent(UnoccupiedHeatingSetpoint::Id, currentSetpoints.unoccupiedRange.heating.Temperature(),
+                                             changedSetpoints.unoccupiedRange.heating.Temperature());
         }
     }
 
     return Status::Success;
 }
 
-std::optional<DataModel::ActionReturnStatus> ThermostatHeatingSetpoints::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                                                  AttributeValueEncoder & encoder)
+std::optional<DataModel::ActionReturnStatus>
+ThermostatHeatingSetpoints::ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
     {
-    case OccupiedHeatingSetpoint::Id:
-    {
+    case OccupiedHeatingSetpoint::Id: {
         temperature occupiedHeatingSetpoint;
         auto status = mDelegate.GetOccupiedHeatingSetpoint(occupiedHeatingSetpoint);
         VerifyOrReturnValue(status == Status::Success, status);
         return encoder.Encode(occupiedHeatingSetpoint);
     }
-    case UnoccupiedHeatingSetpoint::Id:
-    {
+    case UnoccupiedHeatingSetpoint::Id: {
         temperature unoccupiedHeatingSetpoint;
         auto status = mDelegate.GetUnoccupiedHeatingSetpoint(unoccupiedHeatingSetpoint);
         VerifyOrReturnValue(status == Status::Success, status);
         return encoder.Encode(unoccupiedHeatingSetpoint);
     }
-    case AbsMinHeatSetpointLimit::Id:
-    {
+    case AbsMinHeatSetpointLimit::Id: {
         temperature absMinHeatSetpointLimit;
         auto status = mDelegate.GetAbsMinHeatSetpointLimit(absMinHeatSetpointLimit);
         VerifyOrReturnValue(status == Status::Success, status);
         return encoder.Encode(absMinHeatSetpointLimit);
     }
-    case AbsMaxHeatSetpointLimit::Id:
-    {
+    case AbsMaxHeatSetpointLimit::Id: {
         temperature absMaxHeatSetpointLimit;
         auto status = mDelegate.GetAbsMaxHeatSetpointLimit(absMaxHeatSetpointLimit);
         VerifyOrReturnValue(status == Status::Success, status);
         return encoder.Encode(absMaxHeatSetpointLimit);
     }
-    case MinHeatSetpointLimit::Id:
-    {
+    case MinHeatSetpointLimit::Id: {
         temperature minHeatSetpointLimit;
         auto status = mDelegate.GetMinHeatSetpointLimit(minHeatSetpointLimit);
         VerifyOrReturnValue(status == Status::Success, status);
         return encoder.Encode(minHeatSetpointLimit);
     }
-    case MaxHeatSetpointLimit::Id:
-    {
+    case MaxHeatSetpointLimit::Id: {
         temperature maxHeatSetpointLimit;
         auto status = mDelegate.GetMaxHeatSetpointLimit(maxHeatSetpointLimit);
         VerifyOrReturnValue(status == Status::Success, status);
@@ -251,8 +272,9 @@ std::optional<DataModel::ActionReturnStatus> ThermostatHeatingSetpoints::ReadAtt
     }
 }
 
-std::optional<DataModel::ActionReturnStatus> ThermostatHeatingSetpoints::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                                 AttributeValueDecoder & decoder, Setpoints & setpoints, SetpointAttributes & changedAttributes)
+std::optional<DataModel::ActionReturnStatus>
+ThermostatHeatingSetpoints::WriteAttribute(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder,
+                                           Setpoints & setpoints, SetpointAttributes & changedAttributes)
 {
     if (!HasAttribute(request.path.mAttributeId))
     {
@@ -261,7 +283,7 @@ std::optional<DataModel::ActionReturnStatus> ThermostatHeatingSetpoints::WriteAt
 
     temperature setpoint;
     ReturnErrorOnFailure(decoder.Decode(setpoint));
-    
+
     switch (request.path.mAttributeId)
     {
     case OccupiedHeatingSetpoint::Id:
@@ -275,7 +297,8 @@ std::optional<DataModel::ActionReturnStatus> ThermostatHeatingSetpoints::WriteAt
         {
             return Status::UnsupportedAttribute;
         }
-        return setpoints.ChangeRangeHeating(setpoints.unoccupiedRange, setpoint, Setpoints::ClampMode::kDontClamp, changedAttributes);
+        return setpoints.ChangeRangeHeating(setpoints.unoccupiedRange, setpoint, Setpoints::ClampMode::kDontClamp,
+                                            changedAttributes);
     case MinHeatSetpointLimit::Id:
         if (!setpoints.heatSupported)
         {

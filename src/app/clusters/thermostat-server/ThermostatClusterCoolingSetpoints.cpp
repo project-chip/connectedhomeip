@@ -39,39 +39,48 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-Status ThermostatCoolingSetpoints::Delegate::GetAbsMinCoolSetpointLimit(temperature & absMinCoolSetpointLimit) const {
+Status ThermostatCoolingSetpoints::Delegate::GetAbsMinCoolSetpointLimit(temperature & absMinCoolSetpointLimit) const
+{
     return Status::UnsupportedAttribute;
 };
 
-Status ThermostatCoolingSetpoints::Delegate::GetAbsMaxCoolSetpointLimit(temperature & absMaxCoolSetpointLimit) const {
+Status ThermostatCoolingSetpoints::Delegate::GetAbsMaxCoolSetpointLimit(temperature & absMaxCoolSetpointLimit) const
+{
     return Status::UnsupportedAttribute;
 };
 
-Status ThermostatCoolingSetpoints::Delegate::GetMinCoolSetpointLimit(temperature & minCoolSetpointLimit) const {
+Status ThermostatCoolingSetpoints::Delegate::GetMinCoolSetpointLimit(temperature & minCoolSetpointLimit) const
+{
     return Status::UnsupportedAttribute;
 };
 
-Status ThermostatCoolingSetpoints::Delegate::SetMinCoolSetpointLimit(temperature minCoolSetpointLimit, bool & changed) {
+Status ThermostatCoolingSetpoints::Delegate::SetMinCoolSetpointLimit(temperature minCoolSetpointLimit, bool & changed)
+{
     return Status::UnsupportedAttribute;
 };
 
-Status ThermostatCoolingSetpoints::Delegate::GetMaxCoolSetpointLimit(temperature & maxCoolSetpointLimit) const {
+Status ThermostatCoolingSetpoints::Delegate::GetMaxCoolSetpointLimit(temperature & maxCoolSetpointLimit) const
+{
     return Status::UnsupportedAttribute;
 };
 
-Status ThermostatCoolingSetpoints::Delegate::SetMaxCoolSetpointLimit(temperature maxCoolSetpointLimit, bool & changed) {
+Status ThermostatCoolingSetpoints::Delegate::SetMaxCoolSetpointLimit(temperature maxCoolSetpointLimit, bool & changed)
+{
     return Status::UnsupportedAttribute;
 };
 
-Status ThermostatCoolingSetpoints::Delegate::GetUnoccupiedCoolingSetpoint(temperature & unoccupiedCoolingSetpoint) const {
+Status ThermostatCoolingSetpoints::Delegate::GetUnoccupiedCoolingSetpoint(temperature & unoccupiedCoolingSetpoint) const
+{
     return Status::UnsupportedAttribute;
 };
 
-Status ThermostatCoolingSetpoints::Delegate::SetUnoccupiedCoolingSetpoint(temperature unoccupiedCoolingSetpoint, bool & changed) {
+Status ThermostatCoolingSetpoints::Delegate::SetUnoccupiedCoolingSetpoint(temperature unoccupiedCoolingSetpoint, bool & changed)
+{
     return Status::UnsupportedAttribute;
 };
 
-bool ThermostatCoolingSetpoints::HasAttribute(AttributeId attributeId) {
+bool ThermostatCoolingSetpoints::HasAttribute(AttributeId attributeId)
+{
     switch (attributeId)
     {
     case OccupiedCoolingSetpoint::Id:
@@ -85,41 +94,36 @@ bool ThermostatCoolingSetpoints::HasAttribute(AttributeId attributeId) {
     }
 }
 
-std::optional<DataModel::ActionReturnStatus> ThermostatCoolingSetpoints::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                                                  AttributeValueEncoder & encoder)
+std::optional<DataModel::ActionReturnStatus>
+ThermostatCoolingSetpoints::ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
     {
-    case OccupiedCoolingSetpoint::Id:
-    {
+    case OccupiedCoolingSetpoint::Id: {
         temperature coolingSetpoint;
         auto status = mDelegate.GetOccupiedCoolingSetpoint(coolingSetpoint);
         VerifyOrReturnValue(status == Status::Success, status);
         return encoder.Encode(coolingSetpoint);
     }
-    case MinCoolSetpointLimit::Id:
-    {
+    case MinCoolSetpointLimit::Id: {
         temperature minCoolSetpointLimit;
         auto status = mDelegate.GetMinCoolSetpointLimit(minCoolSetpointLimit);
         VerifyOrReturnValue(status == Status::Success, status);
         return encoder.Encode(minCoolSetpointLimit);
     }
-    case MaxCoolSetpointLimit::Id:
-    {
+    case MaxCoolSetpointLimit::Id: {
         temperature maxCoolSetpointLimit;
         auto status = mDelegate.GetMaxCoolSetpointLimit(maxCoolSetpointLimit);
         VerifyOrReturnValue(status == Status::Success, status);
         return encoder.Encode(maxCoolSetpointLimit);
     }
-    case AbsMinCoolSetpointLimit::Id:
-    {
+    case AbsMinCoolSetpointLimit::Id: {
         temperature absMinCoolSetpointLimit;
         auto status = mDelegate.GetAbsMinCoolSetpointLimit(absMinCoolSetpointLimit);
         VerifyOrReturnValue(status == Status::Success, status);
         return encoder.Encode(absMinCoolSetpointLimit);
     }
-    case AbsMaxCoolSetpointLimit::Id:
-    {
+    case AbsMaxCoolSetpointLimit::Id: {
         temperature absMaxCoolSetpointLimit;
         auto status = mDelegate.GetAbsMaxCoolSetpointLimit(absMaxCoolSetpointLimit);
         VerifyOrReturnValue(status == Status::Success, status);
@@ -131,28 +135,33 @@ std::optional<DataModel::ActionReturnStatus> ThermostatCoolingSetpoints::ReadAtt
     }
 }
 
-Protocols::InteractionModel::Status ThermostatCoolingSetpoints::LoadSetpoints(Setpoints & setpoints) {
+Protocols::InteractionModel::Status ThermostatCoolingSetpoints::LoadSetpoints(Setpoints & setpoints)
+{
     auto & optionalAttributes = mSetpoints.OptionalAttributes();
-    if (optionalAttributes.AbsMinCoolSetpointLimit) 
+    if (optionalAttributes.AbsMinCoolSetpointLimit)
     {
         temperature absMinCoolSetpointLimit;
         auto status = mDelegate.GetAbsMinCoolSetpointLimit(absMinCoolSetpointLimit);
         VerifyOrReturnValue(status == Status::Success, status);
         setpoints.absoluteCoolLimits.minimum.SetTemperature(absMinCoolSetpointLimit);
-    } else {
+    }
+    else
+    {
         setpoints.absoluteCoolLimits.minimum.SetTemperature(kDefaultAbsMinCoolSetpointLimit);
     }
-   
+
     if (optionalAttributes.AbsMaxCoolSetpointLimit)
     {
         temperature absMaxCoolSetpointLimit;
         auto status = mDelegate.GetAbsMaxCoolSetpointLimit(absMaxCoolSetpointLimit);
         VerifyOrReturnValue(status == Status::Success, status);
         setpoints.absoluteCoolLimits.maximum.SetTemperature(absMaxCoolSetpointLimit);
-    } else {
+    }
+    else
+    {
         setpoints.absoluteCoolLimits.maximum.SetTemperature(kDefaultAbsMaxCoolSetpointLimit);
     }
-    
+
     if (optionalAttributes.MinCoolSetpointLimit)
     {
         temperature minCoolSetpointLimit;
@@ -176,7 +185,9 @@ Protocols::InteractionModel::Status ThermostatCoolingSetpoints::LoadSetpoints(Se
     return Status::Success;
 }
 
-DataModel::ActionReturnStatus ThermostatCoolingSetpoints::SaveSetpoints(const Setpoints & currentSetpoints, const Setpoints & changedSetpoints, SetpointAttributes & changedAttributes)
+DataModel::ActionReturnStatus ThermostatCoolingSetpoints::SaveSetpoints(const Setpoints & currentSetpoints,
+                                                                        const Setpoints & changedSetpoints,
+                                                                        SetpointAttributes & changedAttributes)
 {
     if (!changedSetpoints.Valid())
     {
@@ -184,7 +195,7 @@ DataModel::ActionReturnStatus ThermostatCoolingSetpoints::SaveSetpoints(const Se
     }
 
     Status status = Status::Success;
-   
+
     if (changedAttributes.Has(MinCoolSetpointLimit::Id) && changedSetpoints.userCoolLimits.minimum.HasTemperature())
     {
         bool changed;
@@ -193,8 +204,11 @@ DataModel::ActionReturnStatus ThermostatCoolingSetpoints::SaveSetpoints(const Se
         if (!changed)
         {
             changedAttributes.Clear(MinCoolSetpointLimit::Id);
-        } else {
-            mSetpoints.GenerateSetpointEvent(MinCoolSetpointLimit::Id, currentSetpoints.userCoolLimits.minimum.Temperature(), changedSetpoints.userCoolLimits.minimum.Temperature());
+        }
+        else
+        {
+            mSetpoints.GenerateSetpointEvent(MinCoolSetpointLimit::Id, currentSetpoints.userCoolLimits.minimum.Temperature(),
+                                             changedSetpoints.userCoolLimits.minimum.Temperature());
         }
     }
     if (changedAttributes.Has(MaxCoolSetpointLimit::Id) && changedSetpoints.userCoolLimits.maximum.HasTemperature())
@@ -205,8 +219,11 @@ DataModel::ActionReturnStatus ThermostatCoolingSetpoints::SaveSetpoints(const Se
         if (!changed)
         {
             changedAttributes.Clear(MaxCoolSetpointLimit::Id);
-        } else {
-            mSetpoints.GenerateSetpointEvent(MaxCoolSetpointLimit::Id, currentSetpoints.userCoolLimits.maximum.Temperature(), changedSetpoints.userCoolLimits.maximum.Temperature());
+        }
+        else
+        {
+            mSetpoints.GenerateSetpointEvent(MaxCoolSetpointLimit::Id, currentSetpoints.userCoolLimits.maximum.Temperature(),
+                                             changedSetpoints.userCoolLimits.maximum.Temperature());
         }
     }
     if (changedAttributes.Has(OccupiedCoolingSetpoint::Id) && changedSetpoints.occupiedRange.cooling.HasTemperature())
@@ -217,17 +234,19 @@ DataModel::ActionReturnStatus ThermostatCoolingSetpoints::SaveSetpoints(const Se
         if (!changed)
         {
             changedAttributes.Clear(OccupiedCoolingSetpoint::Id);
-        } else {
-            mSetpoints.GenerateSetpointEvent(OccupiedCoolingSetpoint::Id, currentSetpoints.occupiedRange.cooling.Temperature(), changedSetpoints.occupiedRange.cooling.Temperature());
+        }
+        else
+        {
+            mSetpoints.GenerateSetpointEvent(OccupiedCoolingSetpoint::Id, currentSetpoints.occupiedRange.cooling.Temperature(),
+                                             changedSetpoints.occupiedRange.cooling.Temperature());
         }
     }
     return Status::Success;
 }
 
 std::optional<DataModel::ActionReturnStatus>
-ThermostatCoolingSetpoints::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                           AttributeValueDecoder & decoder, Setpoints & setpoints,
-                                           SetpointAttributes & changedAttributes)
+ThermostatCoolingSetpoints::WriteAttribute(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder,
+                                           Setpoints & setpoints, SetpointAttributes & changedAttributes)
 {
     if (!HasAttribute(request.path.mAttributeId))
     {
@@ -250,7 +269,8 @@ ThermostatCoolingSetpoints::WriteAttribute(const DataModel::WriteAttributeReques
         {
             return Status::UnsupportedAttribute;
         }
-        return setpoints.ChangeRangeCooling(setpoints.unoccupiedRange, setpoint, Setpoints::ClampMode::kDontClamp, changedAttributes);
+        return setpoints.ChangeRangeCooling(setpoints.unoccupiedRange, setpoint, Setpoints::ClampMode::kDontClamp,
+                                            changedAttributes);
     case MinCoolSetpointLimit::Id:
         if (!setpoints.coolSupported)
         {

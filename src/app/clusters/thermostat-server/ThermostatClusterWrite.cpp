@@ -34,7 +34,7 @@ namespace Clusters {
 namespace Thermostat {
 
 DataModel::ActionReturnStatus ThermostatClusterCore::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                AttributeValueDecoder & decoder)
+                                                                    AttributeValueDecoder & decoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -47,7 +47,8 @@ DataModel::ActionReturnStatus ThermostatClusterCore::WriteAttribute(const DataMo
             return Status::ConstraintError;
         }
         bool changed = false;
-        if (auto err = mDelegate.SetLocalTemperatureCalibration(static_cast<int8_t>(cal), changed); err != Status::Success) {
+        if (auto err = mDelegate.SetLocalTemperatureCalibration(static_cast<int8_t>(cal), changed); err != Status::Success)
+        {
             return err;
         }
         NotifyAttributeChanged(LocalTemperatureCalibration::Id);

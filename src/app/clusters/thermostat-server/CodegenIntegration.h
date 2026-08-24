@@ -65,7 +65,7 @@ public:
         const BitFlags<Thermostat::Feature> features(featureMap);
         const OptionalAttributes optionalAttributes = GetOptionalAttributes(endpointId, features);
 
-        ThermostatClusterCore::Config config(optionalAttributes,  gDefaultTimerDelegate);
+        ThermostatClusterCore::Config config(optionalAttributes, gDefaultTimerDelegate);
 
         ChipLogProgress(Zcl, "Creating thermostat cluster for endpoint %d", endpointId);
         if constexpr (sizeof...(Delegates) > 0)

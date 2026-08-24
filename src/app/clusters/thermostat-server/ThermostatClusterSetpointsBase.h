@@ -35,24 +35,26 @@ namespace Thermostat {
 
 class ThermostatClusterCore;
 
-class ThermostatSetpointsBase {
+class ThermostatSetpointsBase
+{
 public:
     ThermostatSetpointsBase(ThermostatClusterCore & cluster) : mCluster(cluster) {}
     virtual ~ThermostatSetpointsBase() = default;
-    
+
     virtual Protocols::InteractionModel::Status LoadSetpoints(Setpoints & setpoints) = 0;
 
     const OptionalAttributes & OptionalAttributes() const;
     const BitFlags<Thermostat::Feature> & Features() const;
 
     virtual Setpoints GetSetpoints();
-    virtual Protocols::InteractionModel::Status SaveSetpoints(const Setpoints & setpoints, SetpointAttributes changedAttributes) = 0;  
+    virtual Protocols::InteractionModel::Status SaveSetpoints(const Setpoints & setpoints,
+                                                              SetpointAttributes changedAttributes) = 0;
     void GenerateSetpointEvent(AttributeId attributeId, temperature oldTemp, temperature newTemp) const;
     void NotifyAttributesChanged(const SetpointAttributes & changedAttributes);
 
-
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler);
+
 protected:
     ThermostatClusterCore & mCluster;
 };

@@ -39,17 +39,20 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-const OptionalAttributes & ThermostatSetpointsBase::OptionalAttributes() const {
+const OptionalAttributes & ThermostatSetpointsBase::OptionalAttributes() const
+{
     return mCluster.OptionalAttributes();
 }
 
-const BitFlags<Thermostat::Feature> & ThermostatSetpointsBase::Features() const {
+const BitFlags<Thermostat::Feature> & ThermostatSetpointsBase::Features() const
+{
     return mCluster.Features();
 }
 
-Setpoints ThermostatSetpointsBase::GetSetpoints() {
+Setpoints ThermostatSetpointsBase::GetSetpoints()
+{
     Setpoints setpoints;
-    auto features = mCluster.Features();
+    auto features                = mCluster.Features();
     setpoints.autoSupported      = features.Has(Feature::kAutoMode);
     setpoints.heatSupported      = features.Has(Feature::kHeating);
     setpoints.coolSupported      = features.Has(Feature::kCooling);
@@ -92,69 +95,70 @@ void ThermostatSetpointsBase::NotifyAttributesChanged(const SetpointAttributes &
 }
 
 std::optional<DataModel::ActionReturnStatus> ThermostatSetpointsBase::InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) {
+                                                                                    TLV::TLVReader & input_arguments,
+                                                                                    CommandHandler * handler)
+{
 
     switch (request.path.mCommandId)
     {
-    case SetpointRaiseLower::Id:
+    case SetpointRaiseLower::Id: {
+        Commands::SetpointRaiseLower::DecodableType request_data;
+        ReturnErrorOnFailure(request_data.Decode(input_arguments));
+
+        Setpoints currentSetpoints = GetSetpoints();
+        Setpoints setpoints        = currentSetpoints;
+
+        OccupancyBitmap isOccupied = mCluster.IsOccupied() ? OccupancyBitmap::kOccupied : OccupancyBitmap(0);
+
+        auto & range      = setpoints.GetRange(isOccupied);
+        temperature delta = static_cast<temperature>(request_data.amount * 10);
+
+        chip::Optional<temperature> heat;
+        chip::Optional<temperature> cool;
+
+        switch (request_data.mode)
         {
-            Commands::SetpointRaiseLower::DecodableType request_data;
-            ReturnErrorOnFailure(request_data.Decode(input_arguments));
-            
-            Setpoints currentSetpoints = GetSetpoints();
-            Setpoints setpoints        = currentSetpoints;
-
-            OccupancyBitmap isOccupied = mCluster.IsOccupied() ? OccupancyBitmap::kOccupied : OccupancyBitmap(0);
-
-            auto & range = setpoints.GetRange(isOccupied);
-            temperature delta = static_cast<temperature>(request_data.amount * 10);
-
-            chip::Optional<temperature> heat;
-            chip::Optional<temperature> cool;
-
-            switch (request_data.mode)
+        case SetpointRaiseLowerModeEnum::kBoth:
+            if (setpoints.heatSupported)
             {
-            case SetpointRaiseLowerModeEnum::kBoth:
-                if (setpoints.heatSupported)
-                {
-                    heat.SetValue(static_cast<temperature>(range.heating.Temperature() + delta));
-                }
-                if (setpoints.coolSupported)
-                {
-                    cool.SetValue(static_cast<temperature>(range.cooling.Temperature() + delta));
-                }
-                break;
-            case SetpointRaiseLowerModeEnum::kHeat:
-                if (setpoints.heatSupported)
-                {
-                    heat.SetValue(static_cast<temperature>(range.heating.Temperature() + delta));
-                }
-                break;
-            case SetpointRaiseLowerModeEnum::kCool:
-                if (setpoints.coolSupported)
-                {
-                    cool.SetValue(static_cast<temperature>(range.cooling.Temperature() + delta));
-                }
-                break;
-            default:
-                return Status::InvalidCommand;
+                heat.SetValue(static_cast<temperature>(range.heating.Temperature() + delta));
             }
+            if (setpoints.coolSupported)
+            {
+                cool.SetValue(static_cast<temperature>(range.cooling.Temperature() + delta));
+            }
+            break;
+        case SetpointRaiseLowerModeEnum::kHeat:
+            if (setpoints.heatSupported)
+            {
+                heat.SetValue(static_cast<temperature>(range.heating.Temperature() + delta));
+            }
+            break;
+        case SetpointRaiseLowerModeEnum::kCool:
+            if (setpoints.coolSupported)
+            {
+                cool.SetValue(static_cast<temperature>(range.cooling.Temperature() + delta));
+            }
+            break;
+        default:
+            return Status::InvalidCommand;
+        }
 
-            if (!heat.HasValue() && !cool.HasValue())
-            {
-                return Status::InvalidCommand;
-            }
-            SetpointAttributes changedAttributes;
-            auto status = setpoints.ChangeRange(range, heat, cool, Setpoints::ClampMode::kClamp, changedAttributes);
-            if (status != Status::Success)
-            {
-                return status;
-            }
-            return SaveSetpoints(setpoints, changedAttributes);
-        }    
+        if (!heat.HasValue() && !cool.HasValue())
+        {
+            return Status::InvalidCommand;
+        }
+        SetpointAttributes changedAttributes;
+        auto status = setpoints.ChangeRange(range, heat, cool, Setpoints::ClampMode::kClamp, changedAttributes);
+        if (status != Status::Success)
+        {
+            return status;
+        }
+        return SaveSetpoints(setpoints, changedAttributes);
+    }
     }
 
-    return std::nullopt;                                                               
+    return std::nullopt;
 }
 
 } // namespace Thermostat

@@ -20,8 +20,8 @@
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/persistence/AttributePersistenceProviderInstance.h>
 
-#include <app/clusters/thermostat-server/ThermostatClusterHold.h>
 #include <app/clusters/thermostat-server/ThermostatCluster.h>
+#include <app/clusters/thermostat-server/ThermostatClusterHold.h>
 #include <app/clusters/thermostat-server/ThermostatDelegate.h>
 
 namespace chip {
@@ -33,8 +33,8 @@ class ThermostatHoldDelegate : public ThermostatHold::Delegate
 {
 public:
     ThermostatHoldDelegate(EndpointId endpoint, AttributePersistenceProvider * provider = nullptr) :
-        mEndpointId(endpoint),
-        mProvider(provider) {}
+        mEndpointId(endpoint), mProvider(provider)
+    {}
 
     TemperatureSetpointHoldEnum GetTemperatureSetpointHold() const override;
     Protocols::InteractionModel::Status SetTemperatureSetpointHold(TemperatureSetpointHoldEnum hold, bool & changed) override;

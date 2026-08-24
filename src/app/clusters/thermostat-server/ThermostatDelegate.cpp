@@ -23,32 +23,60 @@ namespace Thermostat {
 
 using Protocols::InteractionModel::Status;
 
-std::optional<temperature> CoolingDelegate::GetAbsMinCoolSetpointLimit() const { return {}; };
-std::optional<temperature> CoolingDelegate::GetAbsMaxCoolSetpointLimit() const { return {}; };
+std::optional<temperature> CoolingDelegate::GetAbsMinCoolSetpointLimit() const
+{
+    return {};
+};
+std::optional<temperature> CoolingDelegate::GetAbsMaxCoolSetpointLimit() const
+{
+    return {};
+};
 
-std::optional<temperature> CoolingDelegate::GetMinCoolSetpointLimit() const { return {}; };
-Status CoolingDelegate::SetMinCoolSetpointLimit(std::optional<temperature> minCoolSetpointLimit, bool & changed) {
+std::optional<temperature> CoolingDelegate::GetMinCoolSetpointLimit() const
+{
+    return {};
+};
+Status CoolingDelegate::SetMinCoolSetpointLimit(std::optional<temperature> minCoolSetpointLimit, bool & changed)
+{
     changed = false;
     return Status::Success;
 };
 
-std::optional<temperature> CoolingDelegate::GetMaxCoolSetpointLimit() const { return {}; };
-Status CoolingDelegate::SetMaxCoolSetpointLimit(std::optional<temperature> maxCoolSetpointLimit, bool & changed) {
+std::optional<temperature> CoolingDelegate::GetMaxCoolSetpointLimit() const
+{
+    return {};
+};
+Status CoolingDelegate::SetMaxCoolSetpointLimit(std::optional<temperature> maxCoolSetpointLimit, bool & changed)
+{
     changed = false;
     return Status::Success;
 };
 
-std::optional<temperature> HeatingDelegate::GetAbsMinHeatSetpointLimit() const { return {}; };
-std::optional<temperature> HeatingDelegate::GetAbsMaxHeatSetpointLimit() const { return {}; };
+std::optional<temperature> HeatingDelegate::GetAbsMinHeatSetpointLimit() const
+{
+    return {};
+};
+std::optional<temperature> HeatingDelegate::GetAbsMaxHeatSetpointLimit() const
+{
+    return {};
+};
 
-std::optional<temperature> HeatingDelegate::GetMinHeatSetpointLimit() const { return {}; };
-Status HeatingDelegate::SetMinHeatSetpointLimit(std::optional<temperature> minHeatSetpointLimit, bool & changed) {
+std::optional<temperature> HeatingDelegate::GetMinHeatSetpointLimit() const
+{
+    return {};
+};
+Status HeatingDelegate::SetMinHeatSetpointLimit(std::optional<temperature> minHeatSetpointLimit, bool & changed)
+{
     changed = false;
     return Status::Success;
 };
 
-std::optional<temperature> HeatingDelegate::GetMaxHeatSetpointLimit() const { return {}; };
-Status HeatingDelegate::SetMaxHeatSetpointLimit(std::optional<temperature> maxHeatSetpointLimit, bool & changed) {
+std::optional<temperature> HeatingDelegate::GetMaxHeatSetpointLimit() const
+{
+    return {};
+};
+Status HeatingDelegate::SetMaxHeatSetpointLimit(std::optional<temperature> maxHeatSetpointLimit, bool & changed)
+{
     changed = false;
     return Status::Success;
 };

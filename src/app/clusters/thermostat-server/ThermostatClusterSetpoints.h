@@ -20,10 +20,10 @@
 #include "Setpoints.h"
 #include "Temperature.h"
 #include "ThermostatClusterAttributes.h"
-#include "ThermostatClusterCore.h"
-#include "ThermostatClusterSetpointsBase.h"
 #include "ThermostatClusterCoolingSetpoints.h"
+#include "ThermostatClusterCore.h"
 #include "ThermostatClusterHeatingSetpoints.h"
+#include "ThermostatClusterSetpointsBase.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeValueEncoder.h>
@@ -41,9 +41,11 @@ namespace Thermostat {
 
 class ThermostatClusterCore;
 
-class ThermostatAutoSetpoints {
-    public:
- class Delegate {
+class ThermostatAutoSetpoints
+{
+public:
+    class Delegate
+    {
     public:
         Delegate()          = default;
         virtual ~Delegate() = default;
@@ -61,13 +63,11 @@ class ThermostatAutoSetpoints {
                                                                 AttributeValueDecoder & decoder);
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder);
 
-    private:
+private:
     Delegate & mDelegate;
 
     Protocols::InteractionModel::Status LoadDeadband(temperature & minDeadband);
 };
-
-
 
 template <typename... Delegates>
 class ThermostatSetpoints : public ThermostatSetpointsBase
@@ -75,13 +75,14 @@ class ThermostatSetpoints : public ThermostatSetpointsBase
 public:
     static constexpr bool kHasCooling = detail::kArgsHasDelegate<ThermostatCoolingSetpoints::Delegate, Delegates...>;
     static constexpr bool kHasHeating = detail::kArgsHasDelegate<ThermostatHeatingSetpoints::Delegate, Delegates...>;
-    static constexpr bool kHasAuto = detail::kArgsHasDelegate<ThermostatAutoSetpoints::Delegate, Delegates...>;
+    static constexpr bool kHasAuto    = detail::kArgsHasDelegate<ThermostatAutoSetpoints::Delegate, Delegates...>;
 
     ThermostatSetpoints(ThermostatClusterCore & cluster, Delegates &... delegates) :
-        ThermostatSetpointsBase(cluster), 
+        ThermostatSetpointsBase(cluster),
         mCooling(detail::MakeFeature<kHasCooling, ThermostatCoolingSetpoints>(std::forward_as_tuple(delegates...), *this)),
         mHeating(detail::MakeFeature<kHasHeating, ThermostatHeatingSetpoints>(std::forward_as_tuple(delegates...), *this)),
-        mAuto(detail::MakeFeature<kHasAuto, ThermostatAutoSetpoints>(std::forward_as_tuple(delegates...))) {}
+        mAuto(detail::MakeFeature<kHasAuto, ThermostatAutoSetpoints>(std::forward_as_tuple(delegates...)))
+    {}
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
     {
@@ -130,9 +131,8 @@ public:
     }
 
     std::optional<DataModel::ActionReturnStatus> WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                AttributeValueDecoder & decoder) 
+                                                                AttributeValueDecoder & decoder)
     {
-
 
         if constexpr (kHasAuto)
         {
@@ -156,7 +156,7 @@ public:
         }
 
         Setpoints setpoints = GetSetpoints();
-        
+
         SetpointAttributes changedAttributes;
         std::optional<DataModel::ActionReturnStatus> status;
         if constexpr (kHasCooling)
@@ -165,35 +165,42 @@ public:
         }
         if constexpr (kHasHeating)
         {
-            if (!status) {
+            if (!status)
+            {
                 status = mHeating.WriteAttribute(request, decoder, setpoints, changedAttributes);
             }
         }
 
-        if (!status) {
+        if (!status)
+        {
             return status;
         }
-        if (status == Protocols::InteractionModel::Status::Success) {
+        if (status == Protocols::InteractionModel::Status::Success)
+        {
             return SaveSetpoints(setpoints, changedAttributes);
         }
         return status;
     }
 
-    Protocols::InteractionModel::Status LoadSetpoints(Setpoints & setpoints) override {
-        if constexpr (kHasCooling) {
-            if (auto status = mCooling.LoadSetpoints(setpoints); status !=Protocols::InteractionModel::Status::Success)
+    Protocols::InteractionModel::Status LoadSetpoints(Setpoints & setpoints) override
+    {
+        if constexpr (kHasCooling)
+        {
+            if (auto status = mCooling.LoadSetpoints(setpoints); status != Protocols::InteractionModel::Status::Success)
             {
                 return status;
             }
         }
 
-        if constexpr (kHasHeating) {
-            if (auto status = mHeating.LoadSetpoints(setpoints); status !=Protocols::InteractionModel::Status::Success)
+        if constexpr (kHasHeating)
+        {
+            if (auto status = mHeating.LoadSetpoints(setpoints); status != Protocols::InteractionModel::Status::Success)
             {
                 return status;
             }
         }
-        if constexpr (kHasAuto) {
+        if constexpr (kHasAuto)
+        {
             if (auto status = mAuto.LoadSetpoints(setpoints); status != Protocols::InteractionModel::Status::Success)
             {
                 return status;
@@ -202,18 +209,22 @@ public:
         return Protocols::InteractionModel::Status::Success;
     }
 
-    Setpoints GetSetpoints() override { 
+    Setpoints GetSetpoints() override
+    {
         Setpoints setpoints = ThermostatSetpointsBase::GetSetpoints();
-        if constexpr (kHasCooling) {
+        if constexpr (kHasCooling)
+        {
             mCooling.LoadSetpoints(setpoints);
         }
-        if constexpr (kHasHeating) {
+        if constexpr (kHasHeating)
+        {
             mHeating.LoadSetpoints(setpoints);
         }
-        if constexpr (kHasAuto) {
+        if constexpr (kHasAuto)
+        {
             mAuto.LoadSetpoints(setpoints);
         }
-        return setpoints; 
+        return setpoints;
     }
 
     Protocols::InteractionModel::Status SaveSetpoints(const Setpoints & setpoints, SetpointAttributes changedAttributes) override
@@ -221,14 +232,16 @@ public:
         Setpoints currentSetpoints = GetSetpoints();
         if constexpr (kHasCooling)
         {
-            if (auto status = mCooling.SaveSetpoints(currentSetpoints, setpoints, changedAttributes); status != Protocols::InteractionModel::Status::Success)
+            if (auto status = mCooling.SaveSetpoints(currentSetpoints, setpoints, changedAttributes);
+                status != Protocols::InteractionModel::Status::Success)
             {
                 return status.GetStatusCode().GetStatus();
             }
         }
         if constexpr (kHasHeating)
         {
-            if (auto status = mHeating.SaveSetpoints(currentSetpoints, setpoints, changedAttributes); status != Protocols::InteractionModel::Status::Success)
+            if (auto status = mHeating.SaveSetpoints(currentSetpoints, setpoints, changedAttributes);
+                status != Protocols::InteractionModel::Status::Success)
             {
                 return status.GetStatusCode().GetStatus();
             }
@@ -238,7 +251,6 @@ public:
     }
 
 private:
-
     CHIP_NO_UNIQUE_ADDRESS std::conditional_t<kHasCooling, ThermostatCoolingSetpoints, std::monostate> mCooling;
     CHIP_NO_UNIQUE_ADDRESS std::conditional_t<kHasHeating, ThermostatHeatingSetpoints, std::monostate> mHeating;
     CHIP_NO_UNIQUE_ADDRESS std::conditional_t<kHasAuto, ThermostatAutoSetpoints, std::monostate> mAuto;

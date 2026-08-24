@@ -15,14 +15,12 @@
  *    limitations under the License.
  */
 
-
 #include "ThermostatClusterAttributes.h"
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace Thermostat {
-
 
 CHIP_ERROR AppendOptionalAttributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder,
                                     Span<const AttributeListBuilder::OptionalAttributeEntry> entries)
@@ -39,5 +37,5 @@ CHIP_ERROR AppendOptionalAttributes(ReadOnlyBufferBuilder<DataModel::AttributeEn
 
 } // namespace Thermostat
 } // namespace Clusters
-} // namespace App
-} // namespace Chip
+} // namespace app
+} // namespace chip

@@ -44,7 +44,8 @@ Status ThermostatAutoSetpoints::Delegate::GetMinDeadband(temperature & minDeadba
     return Status::UnsupportedAttribute;
 }
 
-Status ThermostatAutoSetpoints::LoadDeadband(temperature & deadband) {
+Status ThermostatAutoSetpoints::LoadDeadband(temperature & deadband)
+{
     auto status = mDelegate.GetMinDeadband(deadband);
     VerifyOrReturnValue(status == Status::Success, status);
     if (deadband < kMinDeadBand * 10 || deadband > kMaxDeadBand * 10)
@@ -55,7 +56,8 @@ Status ThermostatAutoSetpoints::LoadDeadband(temperature & deadband) {
     return Status::Success;
 }
 
-Status ThermostatAutoSetpoints::LoadSetpoints(Setpoints & setpoints) {
+Status ThermostatAutoSetpoints::LoadSetpoints(Setpoints & setpoints)
+{
     temperature deadband;
     auto status = LoadDeadband(deadband);
     VerifyOrReturnValue(status == Status::Success, status);
@@ -64,7 +66,7 @@ Status ThermostatAutoSetpoints::LoadSetpoints(Setpoints & setpoints) {
 }
 
 std::optional<DataModel::ActionReturnStatus> ThermostatAutoSetpoints::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                                                  AttributeValueEncoder & encoder)
+                                                                                    AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -79,23 +81,22 @@ std::optional<DataModel::ActionReturnStatus> ThermostatAutoSetpoints::ReadAttrib
     }
 }
 
-std::optional<DataModel::ActionReturnStatus> ThermostatAutoSetpoints::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                                  AttributeValueDecoder & decoder)
+std::optional<DataModel::ActionReturnStatus>
+ThermostatAutoSetpoints::WriteAttribute(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder)
 {
     switch (request.path.mAttributeId)
     {
-    case MinSetpointDeadBand::Id:
+    case MinSetpointDeadBand::Id: {
+        int16_t db;
+        ReturnErrorOnFailure(decoder.Decode(db));
+        if (db < kMinDeadBand || db > kMaxDeadBand)
         {
-            int16_t db;
-            ReturnErrorOnFailure(decoder.Decode(db));
-            if (db < kMinDeadBand || db > kMaxDeadBand)
-            {
-                ChipLogError(Zcl, "Invalid value for Deadband: %d", db);
-                return Status::ConstraintError;
-            }
-            // Note: for backwards compatibility, writes to this attribute are allowed (as long as the value is valid) but ignored
-            return Status::Success;
+            ChipLogError(Zcl, "Invalid value for Deadband: %d", db);
+            return Status::ConstraintError;
         }
+        // Note: for backwards compatibility, writes to this attribute are allowed (as long as the value is valid) but ignored
+        return Status::Success;
+    }
     default:
         return std::nullopt;
     }

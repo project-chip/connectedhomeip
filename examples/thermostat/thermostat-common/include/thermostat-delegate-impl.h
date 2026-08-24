@@ -72,11 +72,9 @@ private:
     int8_t mLocalTemperatureCalibration                = 0;
 
     BitMask<RemoteSensingBitmap> mRemoteSensing = BitMask<RemoteSensingBitmap>(0);
-
-
 };
 
-}  // namespace Thermostat
+} // namespace Thermostat
 } // namespace Clusters
 } // namespace app
 } // namespace chip

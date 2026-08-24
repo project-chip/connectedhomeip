@@ -55,25 +55,25 @@ public:
     virtual Protocols::InteractionModel::Status SetRunningState(BitMask<RelayStateBitmap> runningState, bool & changed) = 0;
 
     virtual int8_t GetLocalTemperatureCalibration() const { return 0; };
-    virtual Protocols::InteractionModel::Status SetLocalTemperatureCalibration(int8_t localTemperatureCalibration,
-                                                                               bool & changed) { changed = false; return Protocols::InteractionModel::Status::Success; };
+    virtual Protocols::InteractionModel::Status SetLocalTemperatureCalibration(int8_t localTemperatureCalibration, bool & changed)
+    {
+        changed = false;
+        return Protocols::InteractionModel::Status::Success;
+    };
 
     virtual BitMask<RemoteSensingBitmap> GetRemoteSensing() const                                                            = 0;
     virtual Protocols::InteractionModel::Status SetRemoteSensing(BitMask<RemoteSensingBitmap> remoteSensing, bool & changed) = 0;
-
 };
 
-
-
-
-class UnoccupiedHeatingDelegate {
+class UnoccupiedHeatingDelegate
+{
 public:
     UnoccupiedHeatingDelegate()          = default;
     virtual ~UnoccupiedHeatingDelegate() = default;
 
-    virtual std::optional<temperature> GetUnoccupiedHeatingSetpoint() const                                                  = 0;
+    virtual std::optional<temperature> GetUnoccupiedHeatingSetpoint() const                  = 0;
     virtual Protocols::InteractionModel::Status SetUnoccupiedHeatingSetpoint(std::optional<temperature> unoccupiedHeatingSetpoint,
-                                                                              bool & changed) = 0;
+                                                                             bool & changed) = 0;
 };
 
 } // namespace Thermostat

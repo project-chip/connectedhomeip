@@ -37,19 +37,22 @@ namespace Thermostat {
 
 class ThermostatClusterCore;
 
-
-class ThermostatHeatingSetpoints {
-    public:
- class Delegate {
+class ThermostatHeatingSetpoints
+{
+public:
+    class Delegate
+    {
     public:
         Delegate()          = default;
         virtual ~Delegate() = default;
 
         virtual Protocols::InteractionModel::Status GetOccupiedHeatingSetpoint(temperature & occupiedHeatingSetpoint) const = 0;
-        virtual Protocols::InteractionModel::Status SetOccupiedHeatingSetpoint(temperature occupiedHeatingSetpoint, bool & changed) = 0;
+        virtual Protocols::InteractionModel::Status SetOccupiedHeatingSetpoint(temperature occupiedHeatingSetpoint,
+                                                                               bool & changed)                              = 0;
 
         virtual Protocols::InteractionModel::Status GetUnoccupiedHeatingSetpoint(temperature & unoccupiedHeatingSetpoint) const;
-        virtual Protocols::InteractionModel::Status SetUnoccupiedHeatingSetpoint(temperature unoccupiedHeatingSetpoint, bool & changed);
+        virtual Protocols::InteractionModel::Status SetUnoccupiedHeatingSetpoint(temperature unoccupiedHeatingSetpoint,
+                                                                                 bool & changed);
 
         virtual Protocols::InteractionModel::Status GetAbsMinHeatSetpointLimit(temperature & absMinHeatSetpointLimit) const;
         virtual Protocols::InteractionModel::Status GetAbsMaxHeatSetpointLimit(temperature & absMaxHeatSetpointLimit) const;
@@ -61,22 +64,23 @@ class ThermostatHeatingSetpoints {
         virtual Protocols::InteractionModel::Status SetMaxHeatSetpointLimit(temperature maxHeatSetpointLimit, bool & changed);
     };
 
-    ThermostatHeatingSetpoints(ThermostatSetpointsBase & setpoints, Delegate & delegate) 
-    : mSetpoints(setpoints), mDelegate(delegate) {}
+    ThermostatHeatingSetpoints(ThermostatSetpointsBase & setpoints, Delegate & delegate) :
+        mSetpoints(setpoints), mDelegate(delegate)
+    {}
 
     Protocols::InteractionModel::Status LoadSetpoints(Setpoints & setpoints);
-    DataModel::ActionReturnStatus SaveSetpoints(const Setpoints & currentSetpoints, const Setpoints & changedSetpoints, SetpointAttributes & changedAttributes);
+    DataModel::ActionReturnStatus SaveSetpoints(const Setpoints & currentSetpoints, const Setpoints & changedSetpoints,
+                                                SetpointAttributes & changedAttributes);
 
     bool HasAttribute(AttributeId attributeId);
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder);
     std::optional<DataModel::ActionReturnStatus> ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                AttributeValueEncoder & encoder);
     std::optional<DataModel::ActionReturnStatus> WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                AttributeValueDecoder & decoder,
-                                                                Setpoints & setpoints,
+                                                                AttributeValueDecoder & decoder, Setpoints & setpoints,
                                                                 SetpointAttributes & changedAttributes);
 
-    private:
+private:
     ThermostatSetpointsBase & mSetpoints;
     Delegate & mDelegate;
 };

@@ -42,18 +42,15 @@ public:
 
         virtual TemperatureSetpointHoldEnum GetTemperatureSetpointHold() const                 = 0;
         virtual Protocols::InteractionModel::Status SetTemperatureSetpointHold(TemperatureSetpointHoldEnum temperatureSetpointHold,
-                                                                           bool & changed) = 0;
+                                                                               bool & changed) = 0;
 
-        virtual DataModel::Nullable<uint16_t> GetTemperatureSetpointHoldDuration() const       = 0;
+        virtual DataModel::Nullable<uint16_t> GetTemperatureSetpointHoldDuration() const = 0;
         virtual Protocols::InteractionModel::Status
-        SetTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> temperatureSetpointHoldDuration,
-                                           bool & changed) = 0;
+        SetTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> temperatureSetpointHoldDuration, bool & changed) = 0;
 
         virtual DataModel::Nullable<uint32_t> GetSetpointHoldExpiryTimestamp() const = 0;
         virtual Protocols::InteractionModel::Status
-        SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> setpointHoldExpiryTimestamp,
-                                           bool & changed) = 0;
-
+        SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> setpointHoldExpiryTimestamp, bool & changed) = 0;
     };
 
     ThermostatHold(ThermostatClusterCore & cluster, Delegate & delegate) : mCluster(cluster), mDelegate(delegate) {}
@@ -64,6 +61,7 @@ public:
                                                                 AttributeValueDecoder & decoder);
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder);
+
 private:
     ThermostatClusterCore & mCluster;
     Delegate & mDelegate;

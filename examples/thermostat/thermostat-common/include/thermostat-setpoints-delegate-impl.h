@@ -36,52 +36,44 @@ class ThermostatSetpointsDelegate : public ThermostatCoolingSetpoints::Delegate,
 {
 public:
     ThermostatSetpointsDelegate(EndpointId endpoint, AttributePersistenceProvider * provider = nullptr) :
-        mEndpointId(endpoint),
-        mProvider(provider) {}
+        mEndpointId(endpoint), mProvider(provider)
+    {}
 
     Protocols::InteractionModel::Status Init();
 
     Protocols::InteractionModel::Status GetMinDeadband(temperature & minDeadband) const override;
 
     Protocols::InteractionModel::Status GetOccupiedCoolingSetpoint(temperature & occupiedCoolingSetpoint) const override;
-    Protocols::InteractionModel::Status SetOccupiedCoolingSetpoint(temperature occupiedCoolingSetpoint,
-                                                                        bool & changed) override;
+    Protocols::InteractionModel::Status SetOccupiedCoolingSetpoint(temperature occupiedCoolingSetpoint, bool & changed) override;
 
     Protocols::InteractionModel::Status GetUnoccupiedCoolingSetpoint(temperature & unoccupiedCoolingSetpoint) const override;
     Protocols::InteractionModel::Status SetUnoccupiedCoolingSetpoint(temperature unoccupiedCoolingSetpoint,
-                                                                                bool & changed) override;
+                                                                     bool & changed) override;
 
     Protocols::InteractionModel::Status GetAbsMinCoolSetpointLimit(temperature & absMinCoolSetpointLimit) const override;
     Protocols::InteractionModel::Status GetAbsMaxCoolSetpointLimit(temperature & absMaxCoolSetpointLimit) const override;
 
     Protocols::InteractionModel::Status GetMinCoolSetpointLimit(temperature & minCoolSetpointLimit) const override;
-    Protocols::InteractionModel::Status SetMinCoolSetpointLimit(temperature minCoolSetpointLimit,
-                                                                            bool & changed) override;
+    Protocols::InteractionModel::Status SetMinCoolSetpointLimit(temperature minCoolSetpointLimit, bool & changed) override;
 
     Protocols::InteractionModel::Status GetMaxCoolSetpointLimit(temperature & maxCoolSetpointLimit) const override;
-    Protocols::InteractionModel::Status SetMaxCoolSetpointLimit(temperature maxCoolSetpointLimit,
-                                                                            bool & changed) override;
+    Protocols::InteractionModel::Status SetMaxCoolSetpointLimit(temperature maxCoolSetpointLimit, bool & changed) override;
 
-
-    
     Protocols::InteractionModel::Status GetOccupiedHeatingSetpoint(temperature & occupiedHeatingSetpoint) const override;
-    Protocols::InteractionModel::Status SetOccupiedHeatingSetpoint(temperature occupiedHeatingSetpoint,
-                                                                        bool & changed) override;
+    Protocols::InteractionModel::Status SetOccupiedHeatingSetpoint(temperature occupiedHeatingSetpoint, bool & changed) override;
 
     Protocols::InteractionModel::Status GetUnoccupiedHeatingSetpoint(temperature & unoccupiedHeatingSetpoint) const override;
     Protocols::InteractionModel::Status SetUnoccupiedHeatingSetpoint(temperature unoccupiedHeatingSetpoint,
-                                                                                bool & changed) override;
+                                                                     bool & changed) override;
 
     Protocols::InteractionModel::Status GetAbsMinHeatSetpointLimit(temperature & absMinHeatSetpointLimit) const override;
     Protocols::InteractionModel::Status GetAbsMaxHeatSetpointLimit(temperature & absMaxHeatSetpointLimit) const override;
 
     Protocols::InteractionModel::Status GetMinHeatSetpointLimit(temperature & minHeatSetpointLimit) const override;
-    Protocols::InteractionModel::Status SetMinHeatSetpointLimit(temperature minHeatSetpointLimit,
-                                                                            bool & changed) override;
+    Protocols::InteractionModel::Status SetMinHeatSetpointLimit(temperature minHeatSetpointLimit, bool & changed) override;
 
     Protocols::InteractionModel::Status GetMaxHeatSetpointLimit(temperature & maxHeatSetpointLimit) const override;
-    Protocols::InteractionModel::Status SetMaxHeatSetpointLimit(temperature maxHeatSetpointLimit,
-                                                                            bool & changed) override;
+    Protocols::InteractionModel::Status SetMaxHeatSetpointLimit(temperature maxHeatSetpointLimit, bool & changed) override;
 
 private:
     EndpointId mEndpointId;

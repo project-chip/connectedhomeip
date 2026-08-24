@@ -98,7 +98,8 @@ public:
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override
     {
-        if (auto status = mSetpoints.ReadAttribute(request, encoder)) {
+        if (auto status = mSetpoints.ReadAttribute(request, encoder))
+        {
             return *status;
         }
         if constexpr (kHasHold)
@@ -152,7 +153,8 @@ public:
                 return Protocols::InteractionModel::Status::InvalidInState;
             }
         }
-        if (auto status = mSetpoints.WriteAttribute(request, decoder)) {
+        if (auto status = mSetpoints.WriteAttribute(request, decoder))
+        {
             if constexpr (kHasPresets)
             {
                 if (status->IsSuccess() && IsActiveSetpoint(request.path.mAttributeId))
@@ -165,7 +167,8 @@ public:
         }
         if constexpr (kHasHold)
         {
-            if (auto status = mHold.WriteAttribute(request, decoder)) {
+            if (auto status = mHold.WriteAttribute(request, decoder))
+            {
                 return *status;
             }
         }
@@ -175,7 +178,8 @@ public:
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override
     {
-        if (auto status = mSetpoints.InvokeCommand(request, input_arguments, handler)) {
+        if (auto status = mSetpoints.InvokeCommand(request, input_arguments, handler))
+        {
             return status;
         }
         if constexpr (kRequiresAtomicWrite)
@@ -394,13 +398,12 @@ ThermostatCluster(EndpointId, BitFlags<Thermostat::Feature>, const ThermostatClu
     -> ThermostatCluster<std::decay_t<DelegateArgs>...>;
 
 template <typename... DelegateArgs>
-ThermostatCluster(EndpointId, BitFlags<Thermostat::Feature>, const ThermostatClusterCore::Config &, FabricTable &, DelegateArgs &...)
-    -> ThermostatCluster<std::decay_t<DelegateArgs>...>;
+ThermostatCluster(EndpointId, BitFlags<Thermostat::Feature>, const ThermostatClusterCore::Config &, FabricTable &,
+                  DelegateArgs &...) -> ThermostatCluster<std::decay_t<DelegateArgs>...>;
 
 using FullFeaturedThermostatCluster =
-    ThermostatCluster<ThermostatHeatingSetpoints::Delegate, ThermostatCoolingSetpoints::Delegate,
-                      ThermostatHold::Delegate, ThermostatPresets::Delegate,
-                      ThermostatSuggestions::Delegate, ThermostatOccupancy::Delegate>;
+    ThermostatCluster<ThermostatHeatingSetpoints::Delegate, ThermostatCoolingSetpoints::Delegate, ThermostatHold::Delegate,
+                      ThermostatPresets::Delegate, ThermostatSuggestions::Delegate, ThermostatOccupancy::Delegate>;
 
 } // namespace Thermostat
 } // namespace Clusters

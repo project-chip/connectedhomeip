@@ -34,15 +34,17 @@ using namespace chip::app::Clusters::Thermostat::Structs;
 using namespace Protocols::InteractionModel;
 using namespace System::Clock;
 
-Protocols::InteractionModel::Status ThermostatDelegate::Init() {
+Protocols::InteractionModel::Status ThermostatDelegate::Init()
+{
     AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
     VerifyOrReturnError(provider != nullptr, Status::Failure);
     AttributePersistence persistence(*provider);
 
-    persistence.LoadNativeEndianValue({mEndpointId, Thermostat::Id, SystemMode::Id}, mSystemMode, mSystemMode);
-    persistence.LoadNativeEndianValue({mEndpointId, Thermostat::Id, ControlSequenceOfOperation::Id}, mControlSequenceOfOperation, mControlSequenceOfOperation);
+    persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, SystemMode::Id }, mSystemMode, mSystemMode);
+    persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, ControlSequenceOfOperation::Id }, mControlSequenceOfOperation,
+                                      mControlSequenceOfOperation);
     uint8_t remoteSensing = 0;
-    if (persistence.LoadNativeEndianValue({mEndpointId, Thermostat::Id, RemoteSensing::Id}, remoteSensing, remoteSensing))
+    if (persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, RemoteSensing::Id }, remoteSensing, remoteSensing))
     {
         mRemoteSensing = BitMask<RemoteSensingBitmap>(remoteSensing);
     }
