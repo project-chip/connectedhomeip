@@ -32,6 +32,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/MessageDef/StatusIB.h>
 #include <app/clusters/thermostat-server/AttributeAccessorShim.h>
 #include <app/clusters/thermostat-server/CodegenIntegration.h>
 #include <app/server/Server.h>
@@ -104,10 +105,14 @@ CHIP_ERROR AppTask::AppInit()
     GetLCD().SetCustomUI(ThermostatUI::DrawUI);
 #endif
 
-    auto status = Thermostat::SetDefaultDelegate(kThermostatEndpoint, &Thermostat::ThermostatDelegate::GetInstance());
+    Protocols::InteractionModel::Status status =
+        Thermostat::SetDefaultDelegate(kThermostatEndpoint, &Thermostat::ThermostatDelegate::GetInstance());
     if (status != Protocols::InteractionModel::Status::Success)
     {
         ChipLogError(AppServer, "SetDefaultDelegate failed: 0x%02x", to_underlying(status));
+        err = StatusIB(status).ToChipError();
+        appError(err);
+        return err;
     }
 
     err = AppInstance().InitThermostat();
