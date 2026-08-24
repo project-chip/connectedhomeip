@@ -33,7 +33,7 @@
 #include <data-model-providers/codegen/CodegenProcessingConfig.h>
 
 #include "ThermostatCluster.h"
-#include "ThermostatClusterWithFeatures.h"
+#include "ThermostatClusterCore.h"
 
 namespace chip::app::Clusters::Thermostat {
 
@@ -44,8 +44,7 @@ inline DefaultTimerDelegate gDefaultTimerDelegate;
 class BaseIntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 protected:
-    ThermostatCluster::OptionalAttributes GetOptionalAttributes(EndpointId endpointId, BitFlags<Thermostat::Feature> features);
-    ThermostatCluster::DefaultValues LoadDefaultValues(EndpointId endpointId, const BitFlags<Thermostat::Feature> & features);
+    OptionalAttributes GetOptionalAttributes(EndpointId endpointId, BitFlags<Thermostat::Feature> features);
 };
 
 template <std::size_t Size, typename Cluster>
@@ -64,10 +63,9 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         const BitFlags<Thermostat::Feature> features(featureMap);
-        const ThermostatCluster::OptionalAttributes optionalAttributes = GetOptionalAttributes(endpointId, features);
-        const ThermostatCluster::DefaultValues defaultValues           = LoadDefaultValues(endpointId, features);
+        const OptionalAttributes optionalAttributes = GetOptionalAttributes(endpointId, features);
 
-        ThermostatCluster::Config config(optionalAttributes, defaultValues, gDefaultTimerDelegate);
+        ThermostatClusterCore::Config config(optionalAttributes,  gDefaultTimerDelegate);
 
         ChipLogProgress(Zcl, "Creating thermostat cluster for endpoint %d", endpointId);
         if constexpr (sizeof...(Delegates) > 0)
@@ -140,7 +138,7 @@ void ServerInit(EndpointId endpointId, DelegateArgs &... delegates)
 template <typename... DelegateArgs>
 void ServerInit(EndpointId endpointId, DelegateArgs &... delegates)
 {
-    ServerInit<ThermostatClusterWithFeatures<std::decay_t<DelegateArgs>...>, DelegateArgs...>(endpointId, delegates...);
+    ServerInit<ThermostatCluster, DelegateArgs...>(endpointId, delegates...);
 }
 
 template <typename ClusterT>

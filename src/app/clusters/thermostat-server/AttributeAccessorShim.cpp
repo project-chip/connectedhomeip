@@ -31,7 +31,7 @@ namespace ControlSequenceOfOperation {
 Protocols::InteractionModel::Status
 Get(EndpointId endpoint, chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum * value) // ControlSequenceOfOperationEnum
 {
-    auto cluster = Thermostat::FindClusterOnEndpoint<DefaultThermostatCluster>(endpoint);
+    auto cluster = Thermostat::FindClusterOnEndpoint<FullFeaturedThermostatCluster>(endpoint);
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
@@ -43,7 +43,7 @@ Get(EndpointId endpoint, chip::app::Clusters::Thermostat::ControlSequenceOfOpera
 
 Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum value)
 {
-    auto cluster = Thermostat::FindClusterOnEndpoint<DefaultThermostatCluster>(endpoint);
+    auto cluster = Thermostat::FindClusterOnEndpoint<FullFeaturedThermostatCluster>(endpoint);
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
@@ -57,7 +57,7 @@ namespace LocalTemperature {
 
 Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value)
 {
-    auto cluster = Thermostat::FindClusterOnEndpoint<DefaultThermostatCluster>(endpoint);
+    auto cluster = Thermostat::FindClusterOnEndpoint<FullFeaturedThermostatCluster>(endpoint);
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
@@ -69,7 +69,7 @@ Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value)
 
 Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty)
 {
-    auto cluster = Thermostat::FindClusterOnEndpoint<DefaultThermostatCluster>(endpoint);
+    auto cluster = Thermostat::FindClusterOnEndpoint<FullFeaturedThermostatCluster>(endpoint);
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
@@ -91,7 +91,7 @@ namespace SystemMode {
 
 Status Get(EndpointId endpoint, chip::app::Clusters::Thermostat::SystemModeEnum * value)
 {
-    auto cluster = Thermostat::FindClusterOnEndpoint<DefaultThermostatCluster>(endpoint);
+    auto cluster = Thermostat::FindClusterOnEndpoint<FullFeaturedThermostatCluster>(endpoint);
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
@@ -103,7 +103,7 @@ Status Get(EndpointId endpoint, chip::app::Clusters::Thermostat::SystemModeEnum 
 
 Status Set(EndpointId endpoint, chip::app::Clusters::Thermostat::SystemModeEnum value)
 {
-    auto cluster = Thermostat::FindClusterOnEndpoint<DefaultThermostatCluster>(endpoint);
+    auto cluster = Thermostat::FindClusterOnEndpoint<FullFeaturedThermostatCluster>(endpoint);
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
@@ -117,7 +117,7 @@ namespace ThermostatRunningMode {
 
 Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Thermostat::ThermostatRunningModeEnum value)
 {
-    auto cluster = Thermostat::FindClusterOnEndpoint<DefaultThermostatCluster>(endpoint);
+    auto cluster = Thermostat::FindClusterOnEndpoint<FullFeaturedThermostatCluster>(endpoint);
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
@@ -132,7 +132,7 @@ namespace ThermostatRunningState {
 
 Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> value)
 {
-    auto cluster = Thermostat::FindClusterOnEndpoint<DefaultThermostatCluster>(endpoint);
+    auto cluster = Thermostat::FindClusterOnEndpoint<FullFeaturedThermostatCluster>(endpoint);
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
@@ -145,7 +145,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip:
 namespace AbsMinHeatSetpointLimit {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value)
 {
-    auto cluster = Thermostat::FindClusterOnEndpoint<DefaultThermostatCluster>(endpoint);
+    auto cluster = Thermostat::FindClusterOnEndpoint<FullFeaturedThermostatCluster>(endpoint);
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
@@ -157,20 +157,14 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value)
 
 Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
 {
-    auto cluster = Thermostat::FindClusterOnEndpoint<DefaultThermostatCluster>(endpoint);
-    if (cluster == nullptr)
-    {
-        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
-    }
-    return cluster->ChangeSetpointAttribute(Id, value).GetStatusCode().GetStatus();
+    return Protocols::InteractionModel::Status::UnsupportedWrite;
 }
 } // namespace AbsMinHeatSetpointLimit
 
 namespace AbsMaxHeatSetpointLimit {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value)
 {
-    auto cluster = Thermostat::FindClusterOnEndpoint<DefaultThermostatCluster>(endpoint);
+    auto cluster = Thermostat::FindClusterOnEndpoint<FullFeaturedThermostatCluster>(endpoint);
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
@@ -181,13 +175,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value)
 }
 Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
 {
-    auto cluster = Thermostat::FindClusterOnEndpoint<DefaultThermostatCluster>(endpoint);
-    if (cluster == nullptr)
-    {
-        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
-    }
-    return cluster->ChangeSetpointAttribute(Id, value).GetStatusCode().GetStatus();
+    return Protocols::InteractionModel::Status::UnsupportedWrite;
 }
 } // namespace AbsMaxHeatSetpointLimit
 
@@ -195,7 +183,7 @@ namespace OccupiedCoolingSetpoint {
 
 Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value)
 {
-    auto cluster = Thermostat::FindClusterOnEndpoint<DefaultThermostatCluster>(endpoint);
+    auto cluster = Thermostat::FindClusterOnEndpoint<FullFeaturedThermostatCluster>(endpoint);
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
@@ -206,13 +194,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value)
 }
 Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
 {
-    auto cluster = Thermostat::FindClusterOnEndpoint<DefaultThermostatCluster>(endpoint);
-    if (cluster == nullptr)
-    {
-        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
-    }
-    return cluster->ChangeSetpointAttribute(Id, value).GetStatusCode().GetStatus();
+    return Protocols::InteractionModel::Status::UnsupportedWrite;
 }
 
 } // namespace OccupiedCoolingSetpoint
@@ -221,7 +203,7 @@ namespace OccupiedHeatingSetpoint {
 
 Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value)
 {
-    auto cluster = Thermostat::FindClusterOnEndpoint<DefaultThermostatCluster>(endpoint);
+    auto cluster = Thermostat::FindClusterOnEndpoint<FullFeaturedThermostatCluster>(endpoint);
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
@@ -232,13 +214,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value)
 }
 Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
 {
-    auto cluster = Thermostat::FindClusterOnEndpoint<DefaultThermostatCluster>(endpoint);
-    if (cluster == nullptr)
-    {
-        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
-    }
-    return cluster->ChangeSetpointAttribute(Id, value).GetStatusCode().GetStatus();
+    return Protocols::InteractionModel::Status::UnsupportedWrite;
 }
 
 } // namespace OccupiedHeatingSetpoint
@@ -246,13 +222,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
 namespace FeatureMap {
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 {
-    auto cluster = Thermostat::FindClusterOnEndpoint<DefaultThermostatCluster>(endpoint);
+    auto cluster = Thermostat::FindClusterOnEndpoint<FullFeaturedThermostatCluster>(endpoint);
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
         return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
-    cluster->SetFeatures(BitFlags<Thermostat::Feature>(value));
+   // cluster->SetFeatures(BitFlags<Thermostat::Feature>(value));
     return Status::Success;
 }
 } // namespace FeatureMap

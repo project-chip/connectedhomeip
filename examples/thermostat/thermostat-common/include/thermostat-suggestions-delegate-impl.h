@@ -23,10 +23,8 @@
 #include <app/persistence/AttributePersistenceProviderInstance.h>
 
 #include <app/clusters/thermostat-server/PresetStructWithOwnedMembers.h>
-#include <app/clusters/thermostat-server/ThermostatClusterOccupancy.h>
 #include <app/clusters/thermostat-server/ThermostatClusterPresets.h>
 #include <app/clusters/thermostat-server/ThermostatClusterSuggestions.h>
-#include <app/clusters/thermostat-server/ThermostatClusterWithFeatures.h>
 #include <app/clusters/thermostat-server/ThermostatDelegate.h>
 #include <app/clusters/thermostat-server/ThermostatSuggestionStructWithOwnedMembers.h>
 

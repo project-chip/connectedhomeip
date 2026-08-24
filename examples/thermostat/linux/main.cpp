@@ -78,17 +78,18 @@ static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatE
 static Clusters::Thermostat::ThermostatPresetsDelegate gPresetsDelegate(gThermostatEndpoint);
 static Clusters::Thermostat::ThermostatSuggestionsDelegate gSuggestionsDelegate(gThermostatEndpoint, gPresetsDelegate);
 
+
+
+using ThermostatClusterType = Clusters::Thermostat::ThermostatCluster<Clusters::Thermostat::ThermostatDelegate,
+                                                                     Clusters::Thermostat::ThermostatPresetsDelegate,
+                                                                     Clusters::Thermostat::ThermostatSuggestionsDelegate>;
+
 void ApplicationInit()
 {
     ChipLogProgress(Zcl, "Thermostat application init");
 
-    Clusters::Thermostat::ServerInit(gThermostatEndpoint, gThermostatDelegate, gPresetsDelegate, gSuggestionsDelegate);
+    Clusters::Thermostat::ServerInit<ThermostatClusterType>(gThermostatEndpoint, gThermostatDelegate, gPresetsDelegate, gSuggestionsDelegate);
 }
-
-using ThermostatClusterType =
-    Clusters::Thermostat::ThermostatClusterWithFeatures<Clusters::Thermostat::ThermostatDelegate,
-                                                        Clusters::Thermostat::ThermostatPresetsDelegate,
-                                                        Clusters::Thermostat::ThermostatSuggestionsDelegate>;
 
 void ApplicationShutdown()
 {

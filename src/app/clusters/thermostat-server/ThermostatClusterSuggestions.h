@@ -23,14 +23,16 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
+#include <lib/support/ReadOnlyBuffer.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-class ThermostatCluster;
+class ThermostatClusterCore;
 
 class ThermostatSuggestions
 {
@@ -131,12 +133,13 @@ public:
     };
 
     ThermostatSuggestions() = delete;
-    ThermostatSuggestions(ThermostatCluster & cluster, ThermostatPresets & presets, Delegate & delegate) :
+    ThermostatSuggestions(ThermostatClusterCore & cluster, ThermostatPresets & presets, Delegate & delegate) :
         mCluster(cluster), mDelegate(delegate), mPresets(presets)
     {}
 
     std::optional<DataModel::ActionReturnStatus> ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                AttributeValueEncoder & encoder);
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder);
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler,
                                                                bool & handled);
@@ -152,7 +155,7 @@ public:
     void ReEvaluateCurrentSuggestion();
 
 private:
-    ThermostatCluster & mCluster;
+    ThermostatClusterCore & mCluster;
     Delegate & mDelegate;
     ThermostatPresets & mPresets;
 };

@@ -714,6 +714,17 @@ Status ThermostatPresets::PrecommitPresets()
     return Status::Success;
 }
 
+CHIP_ERROR ThermostatPresets::Attributes(const ConcreteClusterPath & path,
+                                         ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    return builder.AppendElements({
+        PresetTypes::kMetadataEntry,
+        NumberOfPresets::kMetadataEntry,
+        ActivePresetHandle::kMetadataEntry,
+        Presets::kMetadataEntry,
+    });
+}
+
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app

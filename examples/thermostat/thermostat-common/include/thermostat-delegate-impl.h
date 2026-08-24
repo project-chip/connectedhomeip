@@ -17,16 +17,12 @@
 
 #pragma once
 
+#include "app/clusters/thermostat-server/Temperature.h"
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/persistence/AttributePersistenceProviderInstance.h>
 
-#include <app/clusters/thermostat-server/PresetStructWithOwnedMembers.h>
-#include <app/clusters/thermostat-server/ThermostatClusterOccupancy.h>
-#include <app/clusters/thermostat-server/ThermostatClusterPresets.h>
-#include <app/clusters/thermostat-server/ThermostatClusterSuggestions.h>
-#include <app/clusters/thermostat-server/ThermostatClusterWithFeatures.h>
+#include <app/clusters/thermostat-server/ThermostatCluster.h>
 #include <app/clusters/thermostat-server/ThermostatDelegate.h>
-#include <app/clusters/thermostat-server/ThermostatSuggestionStructWithOwnedMembers.h>
 
 namespace chip {
 namespace app {
@@ -61,20 +57,6 @@ public:
     BitMask<RemoteSensingBitmap> GetRemoteSensing() const override;
     Protocols::InteractionModel::Status SetRemoteSensing(BitMask<RemoteSensingBitmap> sensing, bool & changed) override;
 
-    TemperatureSetpointHoldEnum GetTemperatureSetpointHold() const override;
-    Protocols::InteractionModel::Status SetTemperatureSetpointHold(TemperatureSetpointHoldEnum hold, bool & changed) override;
-
-    DataModel::Nullable<uint16_t> GetTemperatureSetpointHoldDuration() const override;
-    Protocols::InteractionModel::Status SetTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> duration,
-                                                                           bool & changed) override;
-
-    DataModel::Nullable<uint32_t> GetSetpointHoldExpiryTimestamp() const override;
-    Protocols::InteractionModel::Status SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> timestamp,
-                                                                       bool & changed) override;
-
-    Protocols::InteractionModel::Status LoadSetpoints(Setpoints & setpoints) override;
-    Protocols::InteractionModel::Status SaveSetpoint(const Setpoint & oldSetpoint, const Setpoint & newSetpoint) override;
-
 private:
     EndpointId mEndpointId;
     AttributePersistenceProvider * mProvider = nullptr;
@@ -89,12 +71,10 @@ private:
 
     BitMask<RemoteSensingBitmap> mRemoteSensing = BitMask<RemoteSensingBitmap>(0);
 
-    TemperatureSetpointHoldEnum mTemperatureSetpointHold = TemperatureSetpointHoldEnum::kSetpointHoldOff;
-    DataModel::Nullable<uint16_t> mTemperatureSetpointHoldDuration;
-    DataModel::Nullable<uint32_t> mSetpointHoldExpiryTimestamp;
+
 };
 
-} // namespace Thermostat
+}  // namespace Thermostat
 } // namespace Clusters
 } // namespace app
 } // namespace chip

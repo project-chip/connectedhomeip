@@ -20,6 +20,7 @@
 #include <protocols/interaction_model/StatusCode.h>
 
 #include "Setpoints.h"
+#include "Temperature.h"
 
 namespace chip {
 namespace app {
@@ -36,6 +37,10 @@ public:
     Delegate()          = default;
     virtual ~Delegate() = default;
 
+    virtual DataModel::Nullable<temperature> GetLocalTemperature() const            = 0;
+    virtual Protocols::InteractionModel::Status SetLocalTemperature(DataModel::Nullable<temperature> localTemperature,
+                                                                    bool & changed) = 0;
+
     virtual SystemModeEnum GetSystemMode() const                                                         = 0;
     virtual Protocols::InteractionModel::Status SetSystemMode(SystemModeEnum systemMode, bool & changed) = 0;
 
@@ -49,30 +54,26 @@ public:
     virtual BitMask<RelayStateBitmap> GetRunningState() const                                                           = 0;
     virtual Protocols::InteractionModel::Status SetRunningState(BitMask<RelayStateBitmap> runningState, bool & changed) = 0;
 
-    virtual DataModel::Nullable<temperature> GetLocalTemperature() const            = 0;
-    virtual Protocols::InteractionModel::Status SetLocalTemperature(DataModel::Nullable<temperature> localTemperature,
-                                                                    bool & changed) = 0;
-
-    virtual int8_t GetLocalTemperatureCalibration() const                                      = 0;
+    virtual int8_t GetLocalTemperatureCalibration() const { return 0; };
     virtual Protocols::InteractionModel::Status SetLocalTemperatureCalibration(int8_t localTemperatureCalibration,
-                                                                               bool & changed) = 0;
+                                                                               bool & changed) { changed = false; return Protocols::InteractionModel::Status::Success; };
 
     virtual BitMask<RemoteSensingBitmap> GetRemoteSensing() const                                                            = 0;
     virtual Protocols::InteractionModel::Status SetRemoteSensing(BitMask<RemoteSensingBitmap> remoteSensing, bool & changed) = 0;
 
-    virtual TemperatureSetpointHoldEnum GetTemperatureSetpointHold() const                 = 0;
-    virtual Protocols::InteractionModel::Status SetTemperatureSetpointHold(TemperatureSetpointHoldEnum temperatureSetpointHold,
-                                                                           bool & changed) = 0;
-    virtual DataModel::Nullable<uint16_t> GetTemperatureSetpointHoldDuration() const       = 0;
-    virtual Protocols::InteractionModel::Status
-    SetTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> temperatureSetpointHoldDuration, bool & changed) = 0;
+};
 
-    virtual DataModel::Nullable<uint32_t> GetSetpointHoldExpiryTimestamp() const = 0;
-    virtual Protocols::InteractionModel::Status
-    SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> setpointHoldExpiryTimestamp, bool & changed) = 0;
 
-    virtual Protocols::InteractionModel::Status LoadSetpoints(Setpoints & setpoints)                                     = 0;
-    virtual Protocols::InteractionModel::Status SaveSetpoint(const Setpoint & oldSetpoint, const Setpoint & newSetpoint) = 0;
+
+
+class UnoccupiedHeatingDelegate {
+public:
+    UnoccupiedHeatingDelegate()          = default;
+    virtual ~UnoccupiedHeatingDelegate() = default;
+
+    virtual std::optional<temperature> GetUnoccupiedHeatingSetpoint() const                                                  = 0;
+    virtual Protocols::InteractionModel::Status SetUnoccupiedHeatingSetpoint(std::optional<temperature> unoccupiedHeatingSetpoint,
+                                                                              bool & changed) = 0;
 };
 
 } // namespace Thermostat

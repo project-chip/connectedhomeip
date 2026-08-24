@@ -47,7 +47,6 @@ public:
     bool heatSupported      = false;
     bool coolSupported      = false;
     bool occupancySupported = false;
-    bool eventsSupported    = false;
 
     AbsoluteSetpointLimits absoluteHeatLimits;
     AbsoluteSetpointLimits absoluteCoolLimits;
@@ -78,7 +77,7 @@ public:
 
     Setpoints(const Setpoints & spl) :
         autoSupported(spl.autoSupported), heatSupported(spl.heatSupported), coolSupported(spl.coolSupported),
-        occupancySupported(spl.occupancySupported), eventsSupported(spl.eventsSupported),
+        occupancySupported(spl.occupancySupported),
         absoluteHeatLimits(spl.absoluteHeatLimits), absoluteCoolLimits(spl.absoluteCoolLimits),
         userHeatLimits(OptionalSetpoint(spl.userHeatLimits.minimum, absoluteHeatLimits.minimum),
                        OptionalSetpoint(spl.userHeatLimits.maximum, absoluteHeatLimits.maximum)),
@@ -98,7 +97,6 @@ public:
         heatSupported      = other.heatSupported;
         coolSupported      = other.coolSupported;
         occupancySupported = other.occupancySupported;
-        eventsSupported    = other.eventsSupported;
 
         absoluteHeatLimits = other.absoluteHeatLimits;
         absoluteCoolLimits = other.absoluteCoolLimits;
@@ -118,7 +116,7 @@ public:
     /*
     Checks to make sure that the setpoints follow the rules from the Matter spec
     */
-    bool Valid();
+    bool Valid() const;
 
     /*
     Get the appropriate setpoint range, based on occupancy.

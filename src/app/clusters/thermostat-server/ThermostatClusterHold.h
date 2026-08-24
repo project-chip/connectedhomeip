@@ -16,15 +16,13 @@
 
 #pragma once
 
-#include "Temperature.h"
-
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
-#include <lib/support/BitMask.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
 namespace chip {
@@ -34,7 +32,7 @@ namespace Thermostat {
 
 class ThermostatClusterCore;
 
-class ThermostatOccupancy
+class ThermostatHold
 {
 public:
     class Delegate
@@ -42,29 +40,30 @@ public:
     public:
         virtual ~Delegate() = default;
 
-        virtual BitMask<OccupancyBitmap> GetOccupancy() const                                                       = 0;
-        virtual Protocols::InteractionModel::Status SetOccupancy(BitMask<OccupancyBitmap> occupied, bool & changed) = 0;
+        virtual TemperatureSetpointHoldEnum GetTemperatureSetpointHold() const                 = 0;
+        virtual Protocols::InteractionModel::Status SetTemperatureSetpointHold(TemperatureSetpointHoldEnum temperatureSetpointHold,
+                                                                           bool & changed) = 0;
 
-        virtual std::optional<temperature> GetUnoccupiedHeatingSetpoint() const;
-        virtual Protocols::InteractionModel::Status SetUnoccupiedHeatingSetpoint(std::optional<temperature> unoccupiedHeatingSetpoint,
-                                                                                bool & changed);
+        virtual DataModel::Nullable<uint16_t> GetTemperatureSetpointHoldDuration() const       = 0;
+        virtual Protocols::InteractionModel::Status
+        SetTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> temperatureSetpointHoldDuration,
+                                           bool & changed) = 0;
 
-        virtual std::optional<temperature> GetUnoccupiedCoolingSetpoint() const;
-        virtual Protocols::InteractionModel::Status SetUnoccupiedCoolingSetpoint(std::optional<temperature> unoccupiedCoolingSetpoint,
-                                                                                bool & changed);
+        virtual DataModel::Nullable<uint32_t> GetSetpointHoldExpiryTimestamp() const = 0;
+        virtual Protocols::InteractionModel::Status
+        SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> setpointHoldExpiryTimestamp,
+                                           bool & changed) = 0;
+
     };
 
-    ThermostatOccupancy(ThermostatClusterCore & cluster, Delegate & delegate) : mCluster(cluster), mDelegate(delegate) {}
+    ThermostatHold(ThermostatClusterCore & cluster, Delegate & delegate) : mCluster(cluster), mDelegate(delegate) {}
 
     std::optional<DataModel::ActionReturnStatus> ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                AttributeValueEncoder & encoder);
-
-    bool IsOccupied() const { return mDelegate.GetOccupancy().Has(OccupancyBitmap::kOccupied); }
+    std::optional<DataModel::ActionReturnStatus> WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                                AttributeValueDecoder & decoder);
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder);
-
-    Protocols::InteractionModel::Status SetOccupancy(BitMask<OccupancyBitmap> occupied);
-
 private:
     ThermostatClusterCore & mCluster;
     Delegate & mDelegate;

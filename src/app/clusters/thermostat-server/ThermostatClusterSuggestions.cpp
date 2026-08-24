@@ -332,6 +332,17 @@ void ThermostatSuggestions::ReEvaluateCurrentSuggestion()
     mCluster.NotifyAttributeChanged(ActivePresetHandle::Id);
 }
 
+CHIP_ERROR ThermostatSuggestions::Attributes(const ConcreteClusterPath & path,
+                                             ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    return builder.AppendElements({
+        MaxThermostatSuggestions::kMetadataEntry,
+        Attributes::ThermostatSuggestions::kMetadataEntry,
+        CurrentThermostatSuggestion::kMetadataEntry,
+        ThermostatSuggestionNotFollowingReason::kMetadataEntry,
+    });
+}
+
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app

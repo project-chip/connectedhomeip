@@ -25,14 +25,16 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
+#include <lib/support/ReadOnlyBuffer.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-class ThermostatCluster;
+class ThermostatClusterCore;
 
 class ThermostatPresets
 {
@@ -141,7 +143,7 @@ public:
     };
 
     ThermostatPresets() = delete;
-    ThermostatPresets(ThermostatCluster & cluster, AtomicWriteSession & atomicWriteSession, Delegate & delegate) :
+    ThermostatPresets(ThermostatClusterCore & cluster, AtomicWriteSession & atomicWriteSession, Delegate & delegate) :
         mCluster(cluster), mAtomicWriteSession(atomicWriteSession), mDelegate(delegate)
     {}
 
@@ -153,6 +155,7 @@ public:
                                                                 AttributeValueDecoder & decoder);
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler);
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder);
 
     std::optional<Protocols::InteractionModel::Status> OnAtomicWriteBegin(AttributeId attributeId);
     std::optional<Protocols::InteractionModel::Status> OnAtomicWritePrecommit(AttributeId attributeId);
@@ -182,7 +185,7 @@ public:
     bool IsPresetHandlePresentInPresets(const ByteSpan & presetHandleToMatch);
 
 private:
-    ThermostatCluster & mCluster;
+    ThermostatClusterCore & mCluster;
     AtomicWriteSession & mAtomicWriteSession;
     Delegate & mDelegate;
 };

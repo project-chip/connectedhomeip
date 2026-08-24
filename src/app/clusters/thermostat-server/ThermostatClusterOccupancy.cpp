@@ -14,11 +14,12 @@
  *    limitations under the License.
  */
 
+#include "ThermostatClusterCore.h"
 #include "ThermostatClusterOccupancy.h"
-#include "ThermostatCluster.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <clusters/Thermostat/Metadata.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -32,11 +33,34 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
+std::optional<temperature> ThermostatOccupancy::Delegate::GetUnoccupiedHeatingSetpoint() const
+{
+    return std::nullopt;
+}
+
+Protocols::InteractionModel::Status ThermostatOccupancy::Delegate::SetUnoccupiedHeatingSetpoint(std::optional<temperature> unoccupiedHeatingSetpoint, bool & changed)
+{
+    changed = false;
+    return Status::Success;
+}
+
+std::optional<temperature> ThermostatOccupancy::Delegate::GetUnoccupiedCoolingSetpoint() const
+{
+    return std::nullopt;
+}
+
+Protocols::InteractionModel::Status ThermostatOccupancy::Delegate::SetUnoccupiedCoolingSetpoint(std::optional<temperature> unoccupiedCoolingSetpoint, bool & changed)
+{
+    changed = false;
+    return Status::Success;
+}
+
 std::optional<DataModel::ActionReturnStatus> ThermostatOccupancy::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                                 AttributeValueEncoder & encoder)
 {
-    if (request.path.mAttributeId == Occupancy::Id)
+    switch (request.path.mAttributeId)
     {
+    case Occupancy::Id:
         return encoder.Encode(mDelegate.GetOccupancy());
     }
 
@@ -55,6 +79,12 @@ Status ThermostatOccupancy::SetOccupancy(BitMask<OccupancyBitmap> occupied)
         mCluster.NotifyAttributeChanged(Occupancy::Id);
     }
     return Status::Success;
+}
+
+CHIP_ERROR ThermostatOccupancy::Attributes(const ConcreteClusterPath & path,
+                                           ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    return builder.AppendElements({ Occupancy::kMetadataEntry });
 }
 
 } // namespace Thermostat

@@ -17,7 +17,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 
-#include "ThermostatCluster.h"
+#include "ThermostatClusterCore.h"
 #include <app/EventLogging.h>
 
 #include <limits>
@@ -29,30 +29,8 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-void ThermostatCluster::GenerateSetpointEvent(AttributeId attributeId, temperature oldTemp, temperature newTemp)
-{
-    if (!mFeatures.Has(Feature::kEvents))
-    {
-        return;
-    }
-    switch (attributeId)
-    {
-    case OccupiedHeatingSetpoint::Id:
-        GenerateSetpointChangeEvent(SystemModeEnum::kHeat, OccupancyBitmap::kOccupied, MakeOptional(oldTemp), newTemp);
-        break;
-    case UnoccupiedHeatingSetpoint::Id:
-        GenerateSetpointChangeEvent(SystemModeEnum::kHeat, BitMask<OccupancyBitmap>(), MakeOptional(oldTemp), newTemp);
-        break;
-    case OccupiedCoolingSetpoint::Id:
-        GenerateSetpointChangeEvent(SystemModeEnum::kCool, OccupancyBitmap::kOccupied, MakeOptional(oldTemp), newTemp);
-        break;
-    case UnoccupiedCoolingSetpoint::Id:
-        GenerateSetpointChangeEvent(SystemModeEnum::kCool, BitMask<OccupancyBitmap>(), MakeOptional(oldTemp), newTemp);
-        break;
-    }
-}
 
-void ThermostatCluster::GenerateSystemModeChangeEvent(Optional<SystemModeEnum> previousSystemMode, SystemModeEnum currentSystemMode)
+void ThermostatClusterCore::GenerateSystemModeChangeEvent(Optional<SystemModeEnum> previousSystemMode, SystemModeEnum currentSystemMode)
 {
     if (!mFeatures.Has(Feature::kEvents))
     {
@@ -71,7 +49,7 @@ void ThermostatCluster::GenerateSystemModeChangeEvent(Optional<SystemModeEnum> p
     }
 }
 
-void ThermostatCluster::GenerateLocalTemperatureChangeEvent(DataModel::Nullable<int16_t> currentLocalTemperature)
+void ThermostatClusterCore::GenerateLocalTemperatureChangeEvent(DataModel::Nullable<int16_t> currentLocalTemperature)
 {
     if (!mFeatures.Has(Feature::kEvents))
     {
@@ -89,7 +67,7 @@ void ThermostatCluster::GenerateLocalTemperatureChangeEvent(DataModel::Nullable<
     }
 }
 
-void ThermostatCluster::GenerateOccupancyChangeEvent(Optional<BitMask<OccupancyBitmap>> previousOccupancy,
+void ThermostatClusterCore::GenerateOccupancyChangeEvent(Optional<BitMask<OccupancyBitmap>> previousOccupancy,
                                                      BitMask<OccupancyBitmap> currentOccupancy)
 {
     if (!mFeatures.Has(Feature::kEvents))
@@ -109,7 +87,7 @@ void ThermostatCluster::GenerateOccupancyChangeEvent(Optional<BitMask<OccupancyB
     }
 }
 
-void ThermostatCluster::GenerateSetpointChangeEvent(SystemModeEnum systemMode, BitMask<OccupancyBitmap> occupancy,
+void ThermostatClusterCore::GenerateSetpointChangeEvent(SystemModeEnum systemMode, BitMask<OccupancyBitmap> occupancy,
                                                     Optional<temperature> previousSetpoint, temperature currentSetpoint)
 {
     if (!mFeatures.Has(Feature::kEvents))
@@ -131,7 +109,7 @@ void ThermostatCluster::GenerateSetpointChangeEvent(SystemModeEnum systemMode, B
     }
 }
 
-void ThermostatCluster::GenerateRunningStateChangeEvent(Optional<BitMask<RelayStateBitmap>> previousRunningState,
+void ThermostatClusterCore::GenerateRunningStateChangeEvent(Optional<BitMask<RelayStateBitmap>> previousRunningState,
                                                         BitMask<RelayStateBitmap> currentRunningState)
 {
     if (!mFeatures.Has(Feature::kEvents))
@@ -151,7 +129,7 @@ void ThermostatCluster::GenerateRunningStateChangeEvent(Optional<BitMask<RelaySt
     }
 }
 
-void ThermostatCluster::GenerateRunningModeChangeEvent(Optional<ThermostatRunningModeEnum> previousRunningMode,
+void ThermostatClusterCore::GenerateRunningModeChangeEvent(Optional<ThermostatRunningModeEnum> previousRunningMode,
                                                        ThermostatRunningModeEnum currentRunningMode)
 {
     if (!mFeatures.Has(Feature::kEvents))
@@ -171,7 +149,7 @@ void ThermostatCluster::GenerateRunningModeChangeEvent(Optional<ThermostatRunnin
     }
 }
 
-void ThermostatCluster::GenerateActiveScheduleChangeEvent(Optional<DataModel::Nullable<ByteSpan>> previousScheduleHandle,
+void ThermostatClusterCore::GenerateActiveScheduleChangeEvent(Optional<DataModel::Nullable<ByteSpan>> previousScheduleHandle,
                                                           DataModel::Nullable<ByteSpan> currentScheduleHandle)
 {
     if (!mFeatures.Has(Feature::kEvents))
@@ -191,7 +169,7 @@ void ThermostatCluster::GenerateActiveScheduleChangeEvent(Optional<DataModel::Nu
     }
 }
 
-void ThermostatCluster::GenerateActivePresetChangeEvent(Optional<DataModel::Nullable<ByteSpan>> previousPresetHandle,
+void ThermostatClusterCore::GenerateActivePresetChangeEvent(Optional<DataModel::Nullable<ByteSpan>> previousPresetHandle,
                                                         DataModel::Nullable<ByteSpan> currentPresetHandle)
 {
     if (!mFeatures.Has(Feature::kEvents))

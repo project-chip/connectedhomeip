@@ -19,13 +19,12 @@
 #include "../include/thermostat-delegate-impl.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/thermostat-server/CodegenIntegration.h>
 #include <app/reporting/reporting.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <app/clusters/thermostat-server/ThermostatClusterWithFeatures.h>
+#include <app/clusters/thermostat-server/Temperature.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -160,57 +159,7 @@ Protocols::InteractionModel::Status ThermostatDelegate::SetRemoteSensing(BitMask
     changed        = true;
     return Status::Success;
 }
-
-TemperatureSetpointHoldEnum ThermostatDelegate::GetTemperatureSetpointHold() const
-{
-    return mTemperatureSetpointHold;
-}
-
-Protocols::InteractionModel::Status ThermostatDelegate::SetTemperatureSetpointHold(TemperatureSetpointHoldEnum hold, bool & changed)
-{
-    if (mTemperatureSetpointHold == hold)
-    {
-        return Status::Success;
-    }
-    mTemperatureSetpointHold = hold;
-    changed                  = true;
-    return Status::Success;
-}
-
-DataModel::Nullable<uint16_t> ThermostatDelegate::GetTemperatureSetpointHoldDuration() const
-{
-    return mTemperatureSetpointHoldDuration;
-}
-
-Protocols::InteractionModel::Status ThermostatDelegate::SetTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> duration,
-                                                                                           bool & changed)
-{
-    if (mTemperatureSetpointHoldDuration == duration)
-    {
-        return Status::Success;
-    }
-    mTemperatureSetpointHoldDuration = duration;
-    changed                          = true;
-    return Status::Success;
-}
-
-DataModel::Nullable<uint32_t> ThermostatDelegate::GetSetpointHoldExpiryTimestamp() const
-{
-    return mSetpointHoldExpiryTimestamp;
-}
-
-Protocols::InteractionModel::Status ThermostatDelegate::SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> timestamp,
-                                                                                       bool & changed)
-{
-    if (mSetpointHoldExpiryTimestamp == timestamp)
-    {
-        return Status::Success;
-    }
-    mSetpointHoldExpiryTimestamp = timestamp;
-    changed                      = true;
-    return Status::Success;
-}
-
+/*
 Protocols::InteractionModel::Status ThermostatDelegate::LoadSetpoints(Setpoints & setpoints)
 {
     ChipLogDetail(Zcl, "Loading setpoints");
@@ -318,3 +267,4 @@ Protocols::InteractionModel::Status ThermostatDelegate::SaveSetpoint(const Setpo
 
     return Status::Success;
 }
+*/

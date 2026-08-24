@@ -33,7 +33,7 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+DataModel::ActionReturnStatus ThermostatClusterCore::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
@@ -64,30 +64,10 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         return encoder.Encode(mDelegate.GetControlSequenceOfOperation());
     case LocalTemperatureCalibration::Id:
         return encoder.Encode(mDelegate.GetLocalTemperatureCalibration());
-    case OccupiedHeatingSetpoint::Id:
-    case OccupiedCoolingSetpoint::Id:
-    case UnoccupiedHeatingSetpoint::Id:
-    case UnoccupiedCoolingSetpoint::Id:
-    case AbsMinHeatSetpointLimit::Id:
-    case AbsMaxHeatSetpointLimit::Id:
-    case AbsMinCoolSetpointLimit::Id:
-    case AbsMaxCoolSetpointLimit::Id:
-    case MinHeatSetpointLimit::Id:
-    case MaxHeatSetpointLimit::Id:
-    case MinCoolSetpointLimit::Id:
-    case MaxCoolSetpointLimit::Id:
-    case MinSetpointDeadBand::Id:
-        return ReadSetpointAttribute(request, encoder);
-    case TemperatureSetpointHold::Id:
-        return encoder.Encode(mDelegate.GetTemperatureSetpointHold());
-    case TemperatureSetpointHoldDuration::Id:
-        return encoder.Encode(mDelegate.GetTemperatureSetpointHoldDuration());
+
     case Schedules::Id: {
         // TODO: Implement schedule list
         return encoder.EncodeList([](const auto & enc) -> CHIP_ERROR { return CHIP_NO_ERROR; });
-    }
-    case SetpointHoldExpiryTimestamp::Id: {
-        return encoder.Encode(mDelegate.GetSetpointHoldExpiryTimestamp());
     }
     default:
         ChipLogError(Zcl, "Unsupported Attribute:" ChipLogFormatMEI, ChipLogValueMEI(request.path.mAttributeId));

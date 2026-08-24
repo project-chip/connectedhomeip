@@ -33,25 +33,25 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+DataModel::ActionReturnStatus ThermostatClusterCore::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                 AttributeValueDecoder & decoder)
 {
     switch (request.path.mAttributeId)
     {
-    case LocalTemperatureCalibration::Id:
-        // TODO: implement local temperature calibration
-        return Status::UnsupportedAttribute;
-    case OccupiedCoolingSetpoint::Id:
-    case OccupiedHeatingSetpoint::Id:
-    case UnoccupiedCoolingSetpoint::Id:
-    case UnoccupiedHeatingSetpoint::Id:
-    case MinHeatSetpointLimit::Id:
-    case MaxHeatSetpointLimit::Id:
-    case MinCoolSetpointLimit::Id:
-    case MaxCoolSetpointLimit::Id: {
-        temperature setpoint;
-        ReturnErrorOnFailure(decoder.Decode(setpoint));
-        return ChangeSetpointAttribute(request.path.mAttributeId, setpoint);
+    case LocalTemperatureCalibration::Id: {
+        int16_t cal;
+        ReturnErrorOnFailure(decoder.Decode(cal));
+        if (cal < std::numeric_limits<int8_t>::min() || cal > std::numeric_limits<int8_t>::max())
+        {
+            ChipLogError(Zcl, "Invalid value for LocalTemperatureCalibration: %d", cal);
+            return Status::ConstraintError;
+        }
+        bool changed = false;
+        if (auto err = mDelegate.SetLocalTemperatureCalibration(static_cast<int8_t>(cal), changed); err != Status::Success) {
+            return err;
+        }
+        NotifyAttributeChanged(LocalTemperatureCalibration::Id);
+        return Status::Success;
     }
     case MinSetpointDeadBand::Id: {
         int16_t db;
@@ -97,45 +97,6 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel:
             return Status::InvalidValue;
         }
         return SetSystemMode(requestedSystemMode);
-    }
-    case TemperatureSetpointHold::Id: {
-        TemperatureSetpointHoldEnum requestedTemperatureSetpointHold;
-        ReturnErrorOnFailure(decoder.Decode(requestedTemperatureSetpointHold));
-        if (EnsureKnownEnumValue(requestedTemperatureSetpointHold) == TemperatureSetpointHoldEnum::kUnknownEnumValue)
-        {
-            ChipLogError(Zcl, "Invalid value for TemperatureSetpointHold: %d", to_underlying(requestedTemperatureSetpointHold));
-            return Status::InvalidValue;
-        }
-        bool changed = false;
-        if (auto err = mDelegate.SetTemperatureSetpointHold(requestedTemperatureSetpointHold, changed); err != Status::Success)
-        {
-            return err;
-        }
-        if (changed)
-        {
-            NotifyAttributeChanged(TemperatureSetpointHold::Id);
-        }
-        return Status::Success;
-    }
-    case TemperatureSetpointHoldDuration::Id: {
-        DataModel::Nullable<uint16_t> requestedTemperatureSetpointHoldDuration;
-        ReturnErrorOnFailure(decoder.Decode(requestedTemperatureSetpointHoldDuration));
-        if (!requestedTemperatureSetpointHoldDuration.IsNull() &&
-            requestedTemperatureSetpointHoldDuration.Value() > kMaxTemperatureSetpointHoldDurationMin)
-        {
-            return Status::InvalidValue;
-        }
-        bool changed = false;
-        if (auto err = mDelegate.SetTemperatureSetpointHoldDuration(requestedTemperatureSetpointHoldDuration, changed);
-            err != Status::Success)
-        {
-            return err;
-        }
-        if (changed)
-        {
-            NotifyAttributeChanged(TemperatureSetpointHoldDuration::Id);
-        }
-        return Status::Success;
     }
     default:
         ChipLogError(Zcl, "Unsupported Attribute:" ChipLogFormatMEI, ChipLogValueMEI(request.path.mAttributeId));

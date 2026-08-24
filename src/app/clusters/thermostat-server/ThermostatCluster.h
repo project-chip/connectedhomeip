@@ -16,197 +16,382 @@
 
 #pragma once
 
-#include "SetpointRange.h"
-#include "Setpoints.h"
-
-#include "ThermostatDelegate.h"
-
-#include "app/clusters/thermostat-server/Temperature.h"
-#include "lib/core/DataModelTypes.h"
-#include <app/CommandHandler.h>
-#include <app/server-cluster/DefaultServerCluster.h>
-#include <app/server-cluster/OptionalAttributeSet.h>
+#include "DelegateResolution.h"
+#include "ThermostatClusterAtomic.h"
+#include "ThermostatClusterCore.h"
+#include "ThermostatClusterHold.h"
+#include "ThermostatClusterOccupancy.h"
+#include "ThermostatClusterPresets.h"
+#include "ThermostatClusterSetpoints.h"
+#include "ThermostatClusterSuggestions.h"
+#include <clusters/Thermostat/Metadata.h>
 #include <credentials/FabricTable.h>
-#include <lib/support/TimerDelegate.h>
+#include <type_traits>
+#include <variant>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-class ThermostatCluster : public DefaultServerCluster
+template <typename... Delegates>
+class ThermostatCluster : public ThermostatClusterCore, public AtomicWriteSession::Delegate
 {
 public:
-    struct OptionalAttributes
-    {
-        bool AbsMinHeatSetpointLimit = false;
-        bool AbsMaxHeatSetpointLimit = false;
-        bool AbsMinCoolSetpointLimit = false;
-        bool AbsMaxCoolSetpointLimit = false;
+    static constexpr bool kHasHeating          = detail::kArgsHasDelegate<ThermostatHeatingSetpoints::Delegate, Delegates...>;
+    static constexpr bool kHasCooling          = detail::kArgsHasDelegate<ThermostatCoolingSetpoints::Delegate, Delegates...>;
+    static constexpr bool kHasPresets          = detail::kArgsHasDelegate<ThermostatPresets::Delegate, Delegates...>;
+    static constexpr bool kHasHold             = detail::kArgsHasDelegate<ThermostatHold::Delegate, Delegates...>;
+    static constexpr bool kHasSuggestions      = detail::kArgsHasDelegate<ThermostatSuggestions::Delegate, Delegates...>;
+    static constexpr bool kHasOccupancy        = detail::kArgsHasDelegate<ThermostatOccupancy::Delegate, Delegates...>;
+    static constexpr bool kRequiresAtomicWrite = kHasPresets;
 
-        bool LocalTemperatureCalibration = false;
-
-        bool MinHeatSetpointLimit = false;
-        bool MaxHeatSetpointLimit = false;
-        bool MinCoolSetpointLimit = false;
-        bool MaxCoolSetpointLimit = false;
-
-        bool RemoteSensing                   = false;
-        bool ThermostatRunningMode           = false;
-        bool TemperatureSetpointHold         = false;
-        bool TemperatureSetpointHoldDuration = false;
-        bool ThermostatRunningState          = false;
-        bool SetpointChangeSource            = false;
-        bool SetpointChangeAmount            = false;
-        bool SetpointChangeSourceTimestamp   = false;
-
-        bool SetpointHoldExpiryTimestamp = false;
-        bool OutdoorTemperature          = false;
-
-        OptionalAttributes() = default;
-    };
-
-    struct DefaultValues
-    {
-        temperature absMinHeatSetpointLimit   = kDefaultAbsMinHeatSetpointLimit;
-        temperature absMaxHeatSetpointLimit   = kDefaultAbsMaxHeatSetpointLimit;
-        temperature absMinCoolSetpointLimit   = kDefaultAbsMinCoolSetpointLimit;
-        temperature absMaxCoolSetpointLimit   = kDefaultAbsMaxCoolSetpointLimit;
-        int8_t localTemperatureCalibration    = kDefaultLocalTemperatureCalibration;
-        temperature occupiedCoolingSetpoint   = kDefaultCoolingSetpoint;
-        temperature occupiedHeatingSetpoint   = kDefaultHeatingSetpoint;
-        temperature unoccupiedCoolingSetpoint = kDefaultCoolingSetpoint;
-        temperature unoccupiedHeatingSetpoint = kDefaultHeatingSetpoint;
-        Optional<temperature> minHeatSetpointLimit;
-        Optional<temperature> maxHeatSetpointLimit;
-        Optional<temperature> minCoolSetpointLimit;
-        Optional<temperature> maxCoolSetpointLimit;
-
-        temperature minSetpointDeadBand                           = kDefaultDeadBand;
-        ControlSequenceOfOperationEnum controlSequenceOfOperation = ControlSequenceOfOperationEnum::kCoolingAndHeating;
-        SystemModeEnum systemMode                                 = SystemModeEnum::kOff;
-
-        TemperatureSetpointHoldEnum temperatureSetpointHold = TemperatureSetpointHoldEnum::kSetpointHoldOff;
-        DataModel::Nullable<uint16_t> temperatureSetpointHoldDuration;
-        DataModel::Nullable<uint32_t> setpointHoldExpiryTimestamp;
-
-        DefaultValues() = default;
-    };
-
-    struct Config
-    {
-        OptionalAttributes mOptionalAttributes;
-        DefaultValues mDefaultValues;
-        TimerDelegate & mTimerDelegate;
-
-        Config(OptionalAttributes optionalAttributes, DefaultValues defaultValues, TimerDelegate & timerDelegate) :
-            mOptionalAttributes(optionalAttributes), mDefaultValues(defaultValues), mTimerDelegate(timerDelegate)
-        {}
-    };
+    static_assert(!kHasSuggestions || kHasPresets, "Suggestions feature requires Presets feature");
+    static_assert(!kHasHeating || !kHasCooling, "Thermostat cluster must implement either heating or cooling");
 
     ThermostatCluster(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features, const Config & config,
-                      Thermostat::Delegate & delegate);
+                      Delegates &... delegates) :
+        ThermostatCluster(aEndpointId, features, config, static_cast<FabricTable *>(nullptr), delegates...)
+    {
+        static_assert(!kRequiresAtomicWrite, "Features requiring atomic write (e.g. Presets) require a FabricTable");
+    }
 
-    CHIP_ERROR Startup(ServerClusterContext & context) override;
-    void Shutdown(ClusterShutdownType type) override;
+    ThermostatCluster(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features, const Config & config,
+                      FabricTable & fabricTable, Delegates &... delegates) :
+        ThermostatCluster(aEndpointId, features, config, &fabricTable, delegates...)
+    {}
 
-    // Exposing for feature clusters to be able to notify when they change an attribute
-    using DefaultServerCluster::NotifyAttributeChanged;
+    CHIP_ERROR Startup(ServerClusterContext & context) override
+    {
+        ReturnErrorOnFailure(ThermostatClusterCore::Startup(context));
+        if constexpr (kRequiresAtomicWrite)
+        {
+            mAtomicWriteSession.Startup();
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    void Shutdown(ClusterShutdownType type) override
+    {
+        if constexpr (kRequiresAtomicWrite)
+        {
+            mAtomicWriteSession.Shutdown();
+        }
+        ThermostatClusterCore::Shutdown(type);
+    }
+
+    bool IsOccupied() const override
+    {
+        if constexpr (kHasOccupancy)
+        {
+            return mOccupancy.IsOccupied();
+        }
+        return ThermostatClusterCore::IsOccupied();
+    }
+
+    template <bool Cond = kHasOccupancy, typename std::enable_if_t<Cond, int> = 0>
+    Protocols::InteractionModel::Status SetOccupied(BitMask<OccupancyBitmap> occupied)
+    {
+        return mOccupancy.SetOccupied(occupied);
+    }
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                AttributeValueEncoder & encoder) override;
+                                                AttributeValueEncoder & encoder) override
+    {
+        if (auto status = mSetpoints.ReadAttribute(request, encoder)) {
+            return *status;
+        }
+        if constexpr (kHasOccupancy)
+        {
+            if (auto status = mOccupancy.ReadAttribute(request, encoder))
+            {
+                return *status;
+            }
+        }
+        if constexpr (kHasPresets)
+        {
+            if (auto status = mPresets.ReadAttribute(request, encoder))
+            {
+                return *status;
+            }
+        }
+        if constexpr (kHasSuggestions)
+        {
+            if (auto status = mSuggestions.ReadAttribute(request, encoder))
+            {
+                return *status;
+            }
+        }
+        return ThermostatCluster::ReadAttribute(request, encoder);
+    }
+
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                 AttributeValueDecoder & decoder) override;
+                                                 AttributeValueDecoder & decoder) override
+    {
+        if constexpr (kHasPresets)
+        {
+            if (auto status = mPresets.WriteAttribute(request, decoder))
+            {
+                return *status;
+            }
+        }
+        if constexpr (kRequiresAtomicWrite)
+        {
+            auto & subjectDescriptor = decoder.GetSubjectDescriptor();
+            if (mAtomicWriteSession.InAtomicWrite(subjectDescriptor))
+            {
+                ChipLogError(Zcl, "Can not write to non-atomic attribute " ChipLogFormatMEI " during atomic write",
+                             ChipLogValueMEI(request.path.mAttributeId));
+                return Protocols::InteractionModel::Status::InvalidInState;
+            }
+        }
+        if (auto status = mSetpoints.WriteAttribute(request, decoder)) {
+            if constexpr (kHasPresets)
+            {
+                if (status->IsSuccess() && IsActiveSetpoint(request.path.mAttributeId))
+                {
+                    ChipLogProgress(Zcl, "Setting active preset to null");
+                    mPresets.SetActivePreset(DataModel::NullNullable);
+                }
+            }
+            return *status;
+        }
+        if constexpr (kHasHold)
+        {
+            if (auto status = mHold.WriteAttribute(request, decoder)) {
+                return *status;
+            }
+        }
+        return ThermostatClusterCore::WriteAttribute(request, decoder);
+    }
+
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override
+    {
+        if (auto status = mSetpoints.InvokeCommand(request, input_arguments, handler)) {
+            return status;
+        }
+        if constexpr (kRequiresAtomicWrite)
+        {
+            bool handled = false;
+            if (auto status = mAtomicWriteSession.InvokeCommand(request, input_arguments, handler, handled))
+            {
+                return status;
+            }
+            if (handled)
+            {
+                return std::nullopt;
+            }
+        }
+        if constexpr (kHasPresets)
+        {
+            if (auto status = mPresets.InvokeCommand(request, input_arguments, handler))
+            {
+                return status;
+            }
+        }
+        if constexpr (kHasSuggestions)
+        {
+            bool handled = false;
+            if (auto status = mSuggestions.InvokeCommand(request, input_arguments, handler, handled))
+            {
+                return status;
+            }
+            if (handled)
+            {
+                return std::nullopt;
+            }
+        }
+        return ThermostatCluster::InvokeCommand(request, input_arguments, handler);
+    }
 
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
-                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
-    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
-    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override;
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
+    {
+        if constexpr (kRequiresAtomicWrite)
+        {
+            ReturnErrorOnFailure(builder.AppendElements({ Commands::AtomicRequest::kMetadataEntry }));
+        }
+        if constexpr (kHasPresets)
+        {
+            ReturnErrorOnFailure(builder.AppendElements({ Commands::SetActivePresetRequest::kMetadataEntry }));
+        }
+        if constexpr (kHasSuggestions)
+        {
+            ReturnErrorOnFailure(builder.AppendElements(
+                { Commands::AddThermostatSuggestion::kMetadataEntry, Commands::RemoveThermostatSuggestion::kMetadataEntry }));
+        }
+        return ThermostatClusterCore::AcceptedCommands(path, builder);
+    }
 
-    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override
+    {
+        if constexpr (kRequiresAtomicWrite)
+        {
+            ReturnErrorOnFailure(builder.AppendElements({ Commands::AtomicResponse::Id }));
+        }
+        if constexpr (kHasSuggestions)
+        {
+            ReturnErrorOnFailure(builder.AppendElements({ Commands::AddThermostatSuggestionResponse::Id }));
+        }
+        return ThermostatClusterCore::GeneratedCommands(path, builder);
+    }
 
-    BitFlags<Thermostat::Feature> Features() const { return mFeatures; }
-    void SetFeatures(BitFlags<Thermostat::Feature> features) { mFeatures = features; }
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override
+    {
+        ReturnErrorOnFailure(ThermostatClusterCore::Attributes(path, builder));
+        ReturnErrorOnFailure(mSetpoints.Attributes(path, builder));
+        if constexpr (kHasHold)
+        {
+            ReturnErrorOnFailure(mHold.Attributes(path, builder));
+        }
+        if constexpr (kHasPresets)
+        {
+            ReturnErrorOnFailure(mPresets.Attributes(path, builder));
+        }
+        if constexpr (kHasSuggestions)
+        {
+            ReturnErrorOnFailure(mSuggestions.Attributes(path, builder));
+        }
+        if constexpr (kHasOccupancy)
+        {
+            ReturnErrorOnFailure(mOccupancy.Attributes(path, builder));
+        }
+        return CHIP_NO_ERROR;
+    }
 
-    EndpointId Endpoint() const { return mPath.mEndpointId; }
+    Setpoints GetSetpoints() override
+    {
+        Setpoints setpoints;
+        setpoints.autoSupported      = mFeatures.Has(Feature::kAutoMode);
+        setpoints.heatSupported      = mFeatures.Has(Feature::kHeating);
+        setpoints.coolSupported      = mFeatures.Has(Feature::kCooling);
+        setpoints.occupancySupported = mFeatures.Has(Feature::kOccupancy);
+        mSetpoints.LoadSetpoints(setpoints);
+        return setpoints;
+    }
 
-    bool HasAttribute(chip::AttributeId attributeId);
+    Protocols::InteractionModel::Status OnAtomicWriteBegin(AttributeId attributeId) override
+    {
+        if constexpr (kHasPresets)
+        {
+            if (auto status = mPresets.OnAtomicWriteBegin(attributeId))
+            {
+                return *status;
+            }
+        }
+        return Protocols::InteractionModel::Status::Success;
+    }
 
-    SystemModeEnum GetSystemMode() const;
-    Protocols::InteractionModel::Status SetSystemMode(SystemModeEnum systemMode);
+    Protocols::InteractionModel::Status OnAtomicWritePrecommit(AttributeId attributeId) override
+    {
+        if constexpr (kHasPresets)
+        {
+            if (auto status = mPresets.OnAtomicWritePrecommit(attributeId))
+            {
+                return *status;
+            }
+        }
+        return Protocols::InteractionModel::Status::Success;
+    }
 
-    ControlSequenceOfOperationEnum GetControlSequenceOfOperation() const;
-    Protocols::InteractionModel::Status SetControlSequenceOfOperation(ControlSequenceOfOperationEnum controlSequenceOfOperation);
+    Protocols::InteractionModel::Status OnAtomicWriteCommit(AttributeId attributeId) override
+    {
+        if constexpr (kHasPresets)
+        {
+            if (auto status = mPresets.OnAtomicWriteCommit(attributeId))
+            {
+                return *status;
+            }
+        }
+        return Protocols::InteractionModel::Status::Success;
+    }
 
-    ThermostatRunningModeEnum GetRunningMode() const;
-    Protocols::InteractionModel::Status SetRunningMode(ThermostatRunningModeEnum runningMode);
+    Protocols::InteractionModel::Status OnAtomicWriteRollback(AttributeId attributeId) override
+    {
+        if constexpr (kHasPresets)
+        {
+            if (auto status = mPresets.OnAtomicWriteRollback(attributeId))
+            {
+                return *status;
+            }
+        }
+        return Protocols::InteractionModel::Status::Success;
+    }
 
-    BitMask<RelayStateBitmap> GetRunningState() const;
-    Protocols::InteractionModel::Status SetRunningState(BitMask<RelayStateBitmap> runningState);
+    std::optional<System::Clock::Milliseconds16> GetMaxAtomicWriteTimeout(chip::AttributeId attributeId) override
+    {
+        if constexpr (kHasPresets)
+        {
+            if (auto timeout = mPresets.GetMaxAtomicWriteTimeout(attributeId))
+            {
+                return timeout;
+            }
+        }
+        return std::nullopt;
+    }
 
-    DataModel::Nullable<temperature> GetLocalTemperature() const;
-    Protocols::InteractionModel::Status
-    SetLocalTemperature(DataModel::Nullable<temperature> localTemperature,
-                        DataModel::AttributeChangeType changeType = DataModel::AttributeChangeType::kReportable);
+    bool HasAttribute(chip::AttributeId attributeId) override
+    {
+        switch (attributeId)
+        {
+        case Attributes::PresetTypes::Id:
+        case Attributes::NumberOfPresets::Id:
+        case Attributes::ActivePresetHandle::Id:
+        case Attributes::Presets::Id:
+            return mFeatures.Has(Feature::kPresets);
+        case Attributes::ScheduleTypes::Id:
+        case Attributes::NumberOfSchedules::Id:
+        case Attributes::NumberOfScheduleTransitions::Id:
+        case Attributes::NumberOfScheduleTransitionPerDay::Id:
+        case Attributes::ActiveScheduleHandle::Id:
+        case Attributes::Schedules::Id:
+            return mFeatures.Has(Feature::kMatterScheduleConfiguration);
+        case Attributes::MaxThermostatSuggestions::Id:
+        case Attributes::ThermostatSuggestions::Id:
+        case Attributes::CurrentThermostatSuggestion::Id:
+        case Attributes::ThermostatSuggestionNotFollowingReason::Id:
+            return mFeatures.Has(Feature::kThermostatSuggestions);
+        default:
+            return ThermostatCluster::HasAttribute(attributeId);
+        }
+    }
 
-    int8_t GetLocalTemperatureCalibration() const;
-    Protocols::InteractionModel::Status SetLocalTemperatureCalibration(int8_t localTemperatureCalibration);
+private:
+    ThermostatCluster(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features, const Config & config,
+                      FabricTable * fabricTable, Delegates &... delegates) :
+        ThermostatClusterCore(aEndpointId, features, config, detail::FindDelegate<Thermostat::Delegate>(delegates...)),
+        mSetpoints(*this, delegates...),
+        mAtomicWriteSession(detail::MakeAtomicWriteSession<kRequiresAtomicWrite>(*this, config.mTimerDelegate, fabricTable)),
+        mHold(detail::MakeFeature<kHasHold, ThermostatHold>(std::forward_as_tuple(delegates...), *this)),
+        mPresets(
+            detail::MakeFeature<kHasPresets, ThermostatPresets>(std::forward_as_tuple(delegates...), *this, mAtomicWriteSession)),
+        mSuggestions(
+            detail::MakeFeature<kHasSuggestions, ThermostatSuggestions>(std::forward_as_tuple(delegates...), *this, mPresets)),
+        mOccupancy(detail::MakeFeature<kHasOccupancy, ThermostatOccupancy>(std::forward_as_tuple(delegates...), *this))
+    {
+        static_assert(detail::kArgsHasDelegate<Thermostat::Delegate, Delegates...>,
+                      "Missing Thermostat::Delegate in constructor arguments");
+    }
 
-    DataModel::ActionReturnStatus ChangeSetpointAttribute(const AttributeId attributeId, temperature temp);
-
-    Setpoints GetSetpoints();
-
-    virtual bool IsOccupied() const { return true; }
-    virtual bool IsActiveSetpoint(AttributeId attributeId) const;
-
-protected:
-    BitFlags<Thermostat::Feature> mFeatures;
-    Config mConfig;
-
-    Thermostat::Delegate & mDelegate;
-
-    DataModel::ActionReturnStatus HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId, temperature value,
-                                                       SetpointAttributes & changedAttributes);
-    DataModel::ActionReturnStatus SetpointRaiseLower(const Commands::SetpointRaiseLower::DecodableType & commandData);
-
-    DataModel::ActionReturnStatus ReadSetpointAttribute(const DataModel::ReadAttributeRequest & request,
-                                                        AttributeValueEncoder & encoder);
-
-    Protocols::InteractionModel::Status SaveSetpoint(Setpoint & oldSetpoint, Setpoint & newSetpoint);
-    DataModel::ActionReturnStatus SaveSetpoints(Setpoints & setpoints, SetpointAttributes changedAttributes);
-
-    void GenerateSetpointEvent(AttributeId attributeId, temperature oldTemp, temperature newTemp);
-
-    void GenerateSystemModeChangeEvent(chip::Optional<chip::app::Clusters::Thermostat::SystemModeEnum> previousSystemMode,
-                                       chip::app::Clusters::Thermostat::SystemModeEnum currentSystemMode);
-
-    void GenerateLocalTemperatureChangeEvent(chip::app::DataModel::Nullable<int16_t> currentLocalTemperature);
-
-    void
-    GenerateOccupancyChangeEvent(chip::Optional<chip::BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap>> previousOccupancy,
-                                 chip::BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> currentOccupancy);
-
-    void GenerateSetpointChangeEvent(chip::app::Clusters::Thermostat::SystemModeEnum systemMode,
-                                     chip::BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> occupancy,
-                                     chip::Optional<temperature> previousSetpoint, temperature currentSetpoint);
-
-    void GenerateRunningStateChangeEvent(
-        chip::Optional<chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap>> previousRunningState,
-        chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> currentRunningState);
-
-    void
-    GenerateRunningModeChangeEvent(chip::Optional<chip::app::Clusters::Thermostat::ThermostatRunningModeEnum> previousRunningMode,
-                                   chip::app::Clusters::Thermostat::ThermostatRunningModeEnum currentRunningMode);
-
-    void GenerateActiveScheduleChangeEvent(chip::Optional<chip::app::DataModel::Nullable<chip::ByteSpan>> previousScheduleHandle,
-                                           chip::app::DataModel::Nullable<chip::ByteSpan> currentScheduleHandle);
-
-    void GenerateActivePresetChangeEvent(chip::Optional<chip::app::DataModel::Nullable<chip::ByteSpan>> previousPresetHandle,
-                                         chip::app::DataModel::Nullable<chip::ByteSpan> currentPresetHandle);
-
-    friend class ThermostatPresets;
+    ThermostatSetpoints<Delegates...> mSetpoints;
+    CHIP_NO_UNIQUE_ADDRESS std::conditional_t<kRequiresAtomicWrite, AtomicWriteSession, std::monostate> mAtomicWriteSession;
+    CHIP_NO_UNIQUE_ADDRESS std::conditional_t<kHasHold, ThermostatHold, std::monostate> mHold;
+    CHIP_NO_UNIQUE_ADDRESS std::conditional_t<kHasPresets, ThermostatPresets, std::monostate> mPresets;
+    CHIP_NO_UNIQUE_ADDRESS std::conditional_t<kHasSuggestions, ThermostatSuggestions, std::monostate> mSuggestions;
+    CHIP_NO_UNIQUE_ADDRESS std::conditional_t<kHasOccupancy, ThermostatOccupancy, std::monostate> mOccupancy;
 };
+
+template <typename... DelegateArgs>
+ThermostatCluster(EndpointId, BitFlags<Thermostat::Feature>, const ThermostatClusterCore::Config &, DelegateArgs &...)
+    -> ThermostatCluster<std::decay_t<DelegateArgs>...>;
+
+template <typename... DelegateArgs>
+ThermostatCluster(EndpointId, BitFlags<Thermostat::Feature>, const ThermostatClusterCore::Config &, FabricTable &, DelegateArgs &...)
+    -> ThermostatCluster<std::decay_t<DelegateArgs>...>;
+
+using FullFeaturedThermostatCluster =
+    ThermostatCluster<ThermostatPresets::Delegate, ThermostatSuggestions::Delegate, ThermostatOccupancy::Delegate>;
 
 } // namespace Thermostat
 } // namespace Clusters
