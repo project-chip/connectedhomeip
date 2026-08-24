@@ -131,13 +131,8 @@ void AvAnalysisServerLogic::OnVideoStreamAllocated(Status aStatus, uint16_t aVid
     AnalysisStreamEntry * entry = mStreamTable.Add(aVideoStreamId);
     if (entry == nullptr)
     {
-        // Full or the camera returned an id that already exists. Release the just-allocated camera
-        // stream so it does not leak untracked
-        if (mCameraClient != nullptr &&
-            mCameraClient->RequestVideoStreamDeallocation(mPendingCameraNode, aVideoStreamId, *this) == CHIP_NO_ERROR)
-        {
-            mCameraRequestInFlight = true;
-        }
+        ChipLogError(Zcl, "AvAnalysis[ep=%d]: camera-assigned stream id %u collides with an existing entry", mEndpointId,
+                     aVideoStreamId);
         handler->AddStatus(mPendingCommandPath, Status::ResourceExhausted);
         return;
     }

@@ -625,26 +625,25 @@ TEST_F(TestRemoteAvAnalysisCluster, BusyWhileInteractionInFlightEvenIfCommandExc
     ASSERT_TRUE(thirdHandler.HasResponse());
 }
 
-TEST_F(TestRemoteAvAnalysisCluster, EstablishDuplicateIdReleasesOrphanedCameraStream)
+TEST_F(TestRemoteAvAnalysisCluster, EstablishDuplicateIdFailsWithoutTouchingCameraStream)
 {
     // First stream established with camera-assigned id 42
     Testing::MockCommandHandler firstHandler;
     firstHandler.SetFabricIndex(1);
     EstablishStream(firstHandler, 0x1234, Status::Success, 42);
 
-    // The camera hands out the same id again: the table rejects it, the command fails, and the
-    // just-allocated camera stream must be released so it does not leak untracked
+    // The camera hands out the same id again (per AVSM it re-uses the matching stream): the command
+    // fails, and no deallocation may be sent -- it would tear down the live stream backing the
+    // existing entry
     Testing::MockCommandHandler secondHandler;
     secondHandler.SetFabricIndex(1);
     EstablishStream(secondHandler, 0x1234, Status::Success, 42);
 
     ASSERT_TRUE(secondHandler.HasStatus());
     ASSERT_EQ(secondHandler.GetLastStatus().status.GetStatus(), Status::ResourceExhausted);
-    ASSERT_EQ(mFakeCameraClient.mDeallocationRequests, 1);
-    ASSERT_EQ(mFakeCameraClient.mLastStreamId, 42);
+    ASSERT_EQ(mFakeCameraClient.mDeallocationRequests, 0);
 
-    // Cleanup completion has no pending command to answer and leaves the table untouched
-    mFakeCameraClient.mLastCallback->OnVideoStreamDeallocated(Status::Success, 42);
+    // The existing entry is untouched
     uint8_t currentCount = 0;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::CurrentAnalysisStreamCount::Id, currentCount), CHIP_NO_ERROR);
     ASSERT_EQ(currentCount, 1);
