@@ -42,9 +42,6 @@ private:
     // Maximum number of concurrently established analysis streams (MaxAnalysisStreamCount, Fixed)
     static constexpr uint8_t kMaxAnalysisStreams = 2;
 
-    // Endpoint on the camera node hosting the CameraAVStreamManagement cluster
-    static constexpr EndpointId kCameraAvStreamManagementEndpoint = 1;
-
     EndpointId mEndpointId = kInvalidEndpointId;
 
     AnalysisDelegate mAnalysisDelegate;
