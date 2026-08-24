@@ -449,10 +449,10 @@ a worked implementation over `BLEManagerImpl`, wired up in that app's
 ## Wi-Fi PAF Transport Integration
 
 `CommissioningProxyPafTransport` ships with the cluster as the separate
-`paf-transport` target, on the same terms as `ble-transport`: an application that
-proxies over BLE only — or a platform with no Wi-Fi PAF stack — can depend on
-`commissioning-proxy-server` without pulling in `src/wifipaf`. It drives NAN and
-PAFTP sessions through `chip::WiFiPAF::WiFiPAFLayer`:
+`paf-transport` target, on the same terms as `ble-transport`: an application
+that proxies over BLE only — or a platform with no Wi-Fi PAF stack — can depend
+on `commissioning-proxy-server` without pulling in `src/wifipaf`. It drives NAN
+and PAFTP sessions through `chip::WiFiPAF::WiFiPAFLayer`:
 
 -   `Connect()` — calls `ConnectivityMgr().WiFiPAFSubscribe()` to open a PAF
     session to the commissionee discriminator.
@@ -471,9 +471,9 @@ matches the peer against the active session slots, and calls
 
 Session setup and teardown above are portable — they go through the generic
 `ConnectivityManager` facade. Discovery is not, so it is not in the transport:
-scanning for commissionable devices, and recovering the subscribe id the platform
-assigned to a request, both need the platform implementation. The application
-supplies them by implementing `CommissioningProxyPafAdapter`:
+scanning for commissionable devices, and recovering the subscribe id the
+platform assigned to a request, both need the platform implementation. The
+application supplies them by implementing `CommissioningProxyPafAdapter`:
 
 ```cpp
 class MyPafProxyAdapter : public CommissioningProxyPafAdapter
@@ -491,8 +491,9 @@ CommissioningProxyPafTransport gPafTransport(gPafAdapter, gTimerDelegate);
 
 Unlike BLE, the platform owns the scan window: `StartForegroundScan()` takes the
 duration and the adapter signals completion, so the transport arms no scan timer
-of its own. `examples/all-devices-app/posix/linux/LinuxCommissioningProxyPafAdapter.cpp`
-is a worked implementation over `ConnectivityManagerImpl`, and is also where the
+of its own.
+`examples/all-devices-app/posix/linux/LinuxCommissioningProxyPafAdapter.cpp` is
+a worked implementation over `ConnectivityManagerImpl`, and is also where the
 platform's peer descriptor is unpacked into the interface's scalars so no
 platform type reaches the cluster.
 

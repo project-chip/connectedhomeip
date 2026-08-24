@@ -394,11 +394,11 @@ the platform implementation. Those four operations are the
 `CommissioningProxyPafAdapter` interface, and this app implements it in
 [`posix/linux/LinuxCommissioningProxyPafAdapter.cpp`](../../../../posix/linux/LinuxCommissioningProxyPafAdapter.cpp):
 
-| Adapter method | Linux implementation |
-| --- | --- |
-| `StartForegroundScan()` | `ConnectivityMgrImpl().WiFiPAFScan()` |
-| `StartBackgroundScan()` | `ConnectivityMgrImpl().WiFiPAFStartBackgroundScan()` |
-| `StopBackgroundScan()` | `ConnectivityMgrImpl().WiFiPAFStopBackgroundScan()` |
+| Adapter method                | Linux implementation                                   |
+| ----------------------------- | ------------------------------------------------------ |
+| `StartForegroundScan()`       | `ConnectivityMgrImpl().WiFiPAFScan()`                  |
+| `StartBackgroundScan()`       | `ConnectivityMgrImpl().WiFiPAFStartBackgroundScan()`   |
+| `StopBackgroundScan()`        | `ConnectivityMgrImpl().WiFiPAFStopBackgroundScan()`    |
 | `PendingConnectSubscribeId()` | `ConnectivityMgrImpl().GetPendingConnectSubscribeId()` |
 
 The adapter is also where the platform's peer descriptor is unpacked.
@@ -408,10 +408,10 @@ cluster.
 
 Two details worth knowing when reading the code:
 
--   **The platform owns the scan window.** `WiFiPAFScan()` takes the duration and
-    reports the whole result set when it expires, so the PAF driver arms no scan
-    timer of its own — it waits for the adapter's completion callback. (The BLE
-    driver is the other way round: it times its own window.)
+-   **The platform owns the scan window.** `WiFiPAFScan()` takes the duration
+    and reports the whole result set when it expires, so the PAF driver arms no
+    scan timer of its own — it waits for the adapter's completion callback. (The
+    BLE driver is the other way round: it times its own window.)
 -   **One NAN subscribe slot** is shared by the foreground scan, the background
     scan and connect. The driver pauses the background scan before a foreground
     scan or a connect and resumes it afterwards; `StartHardwareScan()` also
