@@ -31,6 +31,10 @@ namespace OperationalState {
 
 class Instance;
 
+namespace detail {
+class InstanceDelegateWrapper;
+} // namespace detail
+
 /**
  * Backward-compat delegate for OperationalState clusters using the old Instance wrappers.
  * Extends OperationalStateCluster::Delegate with SetInstance/GetInstance for lifecycle binding.
@@ -59,6 +63,11 @@ protected:
 
 private:
     Instance * mInstance = nullptr;
+
+    // Allow GetInstance access: we want the wrapper to be able to preserve invariants
+    // of a delegates belonging to a single instance (cannot have a delegate passed
+    // to two instances at the same time, because then SetInstance makes no sense).
+    friend class detail::InstanceDelegateWrapper;
 };
 
 } // namespace OperationalState

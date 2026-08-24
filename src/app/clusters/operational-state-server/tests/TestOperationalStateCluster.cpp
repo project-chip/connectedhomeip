@@ -121,7 +121,7 @@ public:
     void SetUp() override
     {
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
-        mCluster = std::make_unique<TestableOperationalStateCluster>(kTestEndpoint, &mDelegate);
+        mCluster = std::make_unique<TestableOperationalStateCluster>(kTestEndpoint, mDelegate);
         mTester  = std::make_unique<Testing::ClusterTester>(*mCluster);
         ASSERT_EQ(mCluster->Startup(mTester->GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -181,7 +181,7 @@ TEST_F(OperationalStateClusterTest, AttributeList_WithCountdownTime)
 {
     OperationalStateCluster::Config cfg;
     cfg.optionalAttributes.Set<CountdownTime::Id>();
-    TestableOperationalStateCluster clusterWithCountdown(kTestEndpoint, &mDelegate, cfg);
+    TestableOperationalStateCluster clusterWithCountdown(kTestEndpoint, mDelegate, cfg);
     Testing::ClusterTester tester(clusterWithCountdown);
     ASSERT_EQ(clusterWithCountdown.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
     EXPECT_EQ(clusterWithCountdown.SetOperationalState(to_underlying(OperationalStateEnum::kStopped)), CHIP_NO_ERROR);
@@ -303,7 +303,7 @@ TEST_F(OperationalStateClusterTest, SetOperationalState_PausedReportsCountdownTi
 {
     OperationalStateCluster::Config cfg;
     cfg.optionalAttributes.Set<CountdownTime::Id>();
-    TestableOperationalStateCluster clusterWithCountdown(kTestEndpoint, &mDelegate, cfg);
+    TestableOperationalStateCluster clusterWithCountdown(kTestEndpoint, mDelegate, cfg);
     Testing::ClusterTester tester(clusterWithCountdown);
     ASSERT_EQ(clusterWithCountdown.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -554,7 +554,7 @@ TEST(RvcOperationalStateClusterTest, AcceptedCommands_RvcSet)
     ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
 
     MockRvcDelegate delegate;
-    RvcOperationalStateCluster cluster(1, &delegate);
+    RvcOperationalStateCluster cluster(1, delegate);
     Testing::ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
     ASSERT_EQ(cluster.SetOperationalState(to_underlying(OperationalStateEnum::kStopped)), CHIP_NO_ERROR);
@@ -587,7 +587,7 @@ TEST(RvcOperationalStateClusterTest, InvokeGoHome_CallsDelegate)
     ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
     {
         MockRvcDelegate delegate;
-        RvcOperationalStateCluster cluster(1, &delegate);
+        RvcOperationalStateCluster cluster(1, delegate);
         Testing::ClusterTester tester(cluster);
         ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
         ASSERT_EQ(cluster.SetOperationalState(to_underlying(OperationalStateEnum::kRunning)), CHIP_NO_ERROR);
@@ -665,7 +665,7 @@ TEST(OvenCavityOperationalStateClusterTest, AcceptedCommands_OvenSet)
     ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
 
     MockOvenDelegate delegate;
-    OvenCavityOperationalStateCluster cluster(1, &delegate);
+    OvenCavityOperationalStateCluster cluster(1, delegate);
     Testing::ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
     ASSERT_EQ(cluster.SetOperationalState(to_underlying(OperationalStateEnum::kStopped)), CHIP_NO_ERROR);
@@ -697,7 +697,7 @@ TEST(OvenCavityOperationalStateClusterTest, ClusterRevision_IsTwo)
     ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
 
     MockOvenDelegate delegate;
-    OvenCavityOperationalStateCluster cluster(1, &delegate);
+    OvenCavityOperationalStateCluster cluster(1, delegate);
     Testing::ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
     ASSERT_EQ(cluster.SetOperationalState(to_underlying(OperationalStateEnum::kStopped)), CHIP_NO_ERROR);

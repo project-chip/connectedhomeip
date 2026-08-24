@@ -21,6 +21,7 @@
 #include <app/persistence/String.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/LocalizationConfiguration/Metadata.h>
+#include <lib/support/AutoRelease.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
@@ -30,35 +31,6 @@ using namespace chip::app::Clusters::LocalizationConfiguration;
 using namespace chip::app::Clusters::LocalizationConfiguration::Attributes;
 
 using Protocols::InteractionModel::Status;
-
-namespace {
-class AutoReleaseIterator
-{
-public:
-    using Iterator = DeviceLayer::DeviceInfoProvider::SupportedLocalesIterator;
-
-    explicit AutoReleaseIterator(DeviceLayer::DeviceInfoProvider * provider) :
-        mIterator(provider != nullptr ? provider->IterateSupportedLocales() : nullptr)
-    {}
-    ~AutoReleaseIterator()
-    {
-        if (mIterator != nullptr)
-        {
-            mIterator->Release();
-        }
-    }
-
-    // Delete copy constructor and assignment
-    AutoReleaseIterator(const AutoReleaseIterator &)             = delete;
-    AutoReleaseIterator & operator=(const AutoReleaseIterator &) = delete;
-
-    bool IsValid() const { return mIterator != nullptr; }
-    bool Next(CharSpan & value) { return (mIterator == nullptr) ? false : mIterator->Next(value); }
-
-private:
-    Iterator * mIterator;
-};
-} // namespace
 
 namespace chip::app::Clusters {
 
@@ -182,13 +154,13 @@ CharSpan LocalizationConfigurationCluster::GetActiveLocale()
 
 CHIP_ERROR LocalizationConfigurationCluster::ReadSupportedLocales(AttributeValueEncoder & aEncoder)
 {
-    AutoReleaseIterator it(&mDeviceInfoProvider);
-    VerifyOrReturnValue(it.IsValid(), aEncoder.EncodeEmptyList());
+    AutoRelease it(mDeviceInfoProvider.IterateSupportedLocales());
+    VerifyOrReturnValue(!it.IsNull(), aEncoder.EncodeEmptyList());
 
     return aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
         CharSpan supportedLocale;
 
-        while (it.Next(supportedLocale))
+        while (it->Next(supportedLocale))
         {
             ReturnErrorOnFailure(encoder.Encode(supportedLocale));
         }
@@ -199,14 +171,11 @@ CHIP_ERROR LocalizationConfigurationCluster::ReadSupportedLocales(AttributeValue
 
 bool LocalizationConfigurationCluster::IsSupportedLocale(CharSpan newLangTag) const
 {
-    AutoReleaseIterator it(&mDeviceInfoProvider);
-    if (!it.IsValid())
-    {
-        return false;
-    }
+    AutoRelease it(mDeviceInfoProvider.IterateSupportedLocales());
+    VerifyOrReturnValue(!it.IsNull(), false);
 
     CharSpan outLocale;
-    while (it.Next(outLocale))
+    while (it->Next(outLocale))
     {
         if (outLocale.data_equal(newLangTag))
         {
@@ -219,14 +188,11 @@ bool LocalizationConfigurationCluster::IsSupportedLocale(CharSpan newLangTag) co
 
 bool LocalizationConfigurationCluster::GetDefaultLocale(MutableCharSpan & outLocale)
 {
-    AutoReleaseIterator it(&mDeviceInfoProvider);
-    if (!it.IsValid())
-    {
-        return false;
-    }
+    AutoRelease it(mDeviceInfoProvider.IterateSupportedLocales());
+    VerifyOrReturnValue(!it.IsNull(), false);
 
     CharSpan tempLocale;
-    bool found = it.Next(tempLocale);
+    bool found = it->Next(tempLocale);
     VerifyOrReturnValue(CopyCharSpanToMutableCharSpan(tempLocale, outLocale) == CHIP_NO_ERROR, false);
 
     return found;
