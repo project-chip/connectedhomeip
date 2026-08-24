@@ -32,6 +32,12 @@ public:
         AlarmBaseCluster(endpointId, { DishwasherAlarm::Id, DishwasherAlarm::kRevision }, config)
     {}
 
+    /// For integration use when SetStateValue(..., ignoreLatchState=true).
+    Protocols::InteractionModel::Status SetStateIgnoringLatch(const AlarmBase::AlarmMap & newState)
+    {
+        return AlarmBaseCluster::SetStateIgnoringLatch(newState);
+    }
+
 protected:
     void SendNotifyEvent(AlarmBase::AlarmMap becameActive, AlarmBase::AlarmMap becameInactive, AlarmBase::AlarmMap newState,
                          AlarmBase::AlarmMap mask) override;
