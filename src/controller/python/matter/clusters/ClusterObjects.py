@@ -16,9 +16,11 @@
 #
 
 import enum
+import types
 import typing
+from collections.abc import Mapping
 from dataclasses import asdict, dataclass, field, make_dataclass
-from typing import Any, ClassVar, Dict, List, Mapping, Union
+from typing import Any, ClassVar
 
 from dacite import from_dict  # type: ignore
 
@@ -33,7 +35,7 @@ def GetUnionUnderlyingType(typeToCheck, matchingType=None):
         If that is 'None' (not to be confused with NoneType), then it will retrieve
         the 'real' type behind the union, i.e not Nullable && not None
     '''
-    if typing.get_origin(typeToCheck) != typing.Union:
+    if typing.get_origin(typeToCheck) not in (typing.Union, types.UnionType):
         return None
 
     for t in typing.get_args(typeToCheck):
@@ -53,7 +55,7 @@ def GetUnionUnderlyingType(typeToCheck, matchingType=None):
 @dataclass
 class ClusterObjectFieldDescriptor:
     Label: str = ''
-    Tag: typing.Optional[int] = None
+    Tag: int | None = None
     Type: type = type(None)
 
     def _PutSingleElementToTLV(self, tag, val, elementType, writer: tlv.TLVWriter, debugPath: str = '?'):
@@ -93,7 +95,7 @@ class ClusterObjectFieldDescriptor:
             if (elementType is None):
                 elementType = self.Type
 
-            if not isinstance(val, List):
+            if not isinstance(val, list):
                 self._PutSingleElementToTLV(
                     tag, val, elementType, writer, debugPath)
                 return
@@ -117,15 +119,15 @@ class ClusterObjectFieldDescriptor:
 
 @dataclass
 class ClusterObjectDescriptor:
-    Fields: List[ClusterObjectFieldDescriptor]
+    Fields: list[ClusterObjectFieldDescriptor]
 
-    def GetFieldByTag(self, tag: int) -> typing.Optional[ClusterObjectFieldDescriptor]:
+    def GetFieldByTag(self, tag: int) -> ClusterObjectFieldDescriptor | None:
         for _field in self.Fields:
             if _field.Tag == tag:
                 return _field
         return None
 
-    def GetFieldByLabel(self, label: str) -> typing.Optional[ClusterObjectFieldDescriptor]:
+    def GetFieldByLabel(self, label: str) -> ClusterObjectFieldDescriptor | None:
         for _field in self.Fields:
             if _field.Label == label:
                 return _field
@@ -145,8 +147,8 @@ class ClusterObjectDescriptor:
                 f"Failed to decode field {debugPath}, struct expected.")
         return elementType.descriptor.TagDictToLabelDict(debugPath, value)
 
-    def TagDictToLabelDict(self, debugPath: str, tlvData: Dict[int, Any]) -> Dict[str, Any]:
-        ret: typing.Dict[Any, Any] = {}
+    def TagDictToLabelDict(self, debugPath: str, tlvData: dict[int, Any]) -> dict[str, Any]:
+        ret: dict[Any, Any] = {}
         for tag, value in tlvData.items():
             descriptor = self.GetFieldByTag(tag)
             if not descriptor:
@@ -158,7 +160,7 @@ class ClusterObjectDescriptor:
                 ret[descriptor.Label] = NullValue
                 continue
 
-            if (typing.get_origin(descriptor.Type) == typing.Union):
+            if (typing.get_origin(descriptor.Type) in (typing.Union, types.UnionType)):
                 realType = GetUnionUnderlyingType(descriptor.Type)
                 if (realType is None):
                     raise ValueError(
@@ -179,7 +181,7 @@ class ClusterObjectDescriptor:
                 f'{debugPath}.{descriptor.Label}', valueType, value)
         return ret
 
-    def TLVToDict(self, tlvBuf: bytes) -> Dict[str, Any]:
+    def TLVToDict(self, tlvBuf: bytes) -> dict[str, Any]:
         tlvData = tlv.TLVReader(tlvBuf).get().get('Any', {})
         return self.TagDictToLabelDict('', tlvData)
 
@@ -215,12 +217,12 @@ class ClusterObject:
 
 # The below dictionaries will be filled dynamically
 # and are used for quick lookup/mapping from cluster/attribute id to the correct class
-ALL_CLUSTERS: typing.Dict = {}
-ALL_ATTRIBUTES: typing.Dict = {}
+ALL_CLUSTERS: dict = {}
+ALL_ATTRIBUTES: dict = {}
 # These need to be separate because there can be overlap in command ids for commands and responses.
-ALL_ACCEPTED_COMMANDS: typing.Dict = {}
-ALL_GENERATED_COMMANDS: typing.Dict = {}
-ALL_EVENTS: typing.Dict = {}
+ALL_ACCEPTED_COMMANDS: dict = {}
+ALL_GENERATED_COMMANDS: dict = {}
+ALL_EVENTS: dict = {}
 
 
 class ClusterCommand(ClusterObject):
@@ -314,7 +316,7 @@ class ClusterAttributeDescriptor:
             ALL_ATTRIBUTES[cls.cluster_id][cls.attribute_id] = cls
 
     @classmethod
-    def ToTLV(cls, tag: Union[int, None], value):
+    def ToTLV(cls, tag: int | None, value):
         writer = tlv.TLVWriter()
         wrapped_value = cls._cluster_object(Value=value)
         cls.attribute_type.PutFieldToTLV(tag,

@@ -17,7 +17,9 @@ import os
 import shlex
 from enum import Enum, auto
 
-from .builder import Builder, BuilderOutput
+from runner.runner import Runner
+
+from .builder import Builder, BuilderOutput, OutDirLock, lock_output_dir
 
 log = logging.getLogger(__name__)
 
@@ -55,7 +57,7 @@ class NrfApp(Enum):
             return 'examples/window-app'
         if self == NrfApp.UNIT_TESTS:
             return 'src/test_driver'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def AppNamePrefix(self):
         if self == NrfApp.ALL_CLUSTERS:
@@ -78,7 +80,7 @@ class NrfApp(Enum):
             return 'chip-nrf-window-example'
         if self == NrfApp.UNIT_TESTS:
             return 'chip-nrf-unit-tests'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def _FlashBundlePrefix(self):
         if self == NrfApp.ALL_CLUSTERS:
@@ -102,7 +104,7 @@ class NrfApp(Enum):
         if self == NrfApp.UNIT_TESTS:
             raise Exception(
                 'Unit tests compile natively and do not have a flashbundle')
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def FlashBundleName(self):
         '''
@@ -127,19 +129,20 @@ class NrfBoard(Enum):
             return 'nrf5340dk/nrf5340cpuapp'
         if self == NrfBoard.NATIVE_SIM:
             return 'native_sim'
-        raise Exception('Unknown board type: %r' % self)
+        raise Exception(f'Unknown board type: {self!r}')
 
 
 class NrfConnectBuilder(Builder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: NrfApp = NrfApp.LIGHT,
                  board: NrfBoard = NrfBoard.NRF52840DK,
                  enable_rpcs: bool = False,
                  ):
-        super(NrfConnectBuilder, self).__init__(root, runner)
+        super().__init__(root, runner, output_dir_lock)
         self.app = app
         self.board = board
         self.enable_rpcs = enable_rpcs
@@ -157,11 +160,11 @@ class NrfConnectBuilder(Builder):
             raise Exception('ZEPHYR_BASE validation failed')
 
     def _prepare_environment(self):
-        # Source the zephyr-env.sh script to set up the environment
-        # The zephyr-env.sh script changes the python environment, so we need to
-        # source the activate.sh script after zephyr-env.sh to ensure that the
+        # Source the zephyrrc to set up the environment
+        # The zephyrrc changes the python environment, so we need to
+        # source the activate.sh script after zephyrrc to ensure that the
         # all python packages and dependencies are available.
-        return 'source "$ZEPHYR_BASE/zephyr-env.sh";\nsource scripts/activate.sh;\n'
+        return 'source "$ZEPHYR_BASE/../.zephyrrc";\nsource scripts/activate.sh;\n'
 
     def _get_build_flags(self):
         flags = []
@@ -173,6 +176,7 @@ class NrfConnectBuilder(Builder):
 
         return " -- " + " ".join(flags) if len(flags) > 0 else ""
 
+    @lock_output_dir
     def generate(self):
         if not os.path.exists(self.output_dir):
             if not self._runner.dry_run:
@@ -185,7 +189,7 @@ class NrfConnectBuilder(Builder):
                 # overall perform a git fetch on that location
                 if not os.access(nrfconnect_sdk, os.W_OK):
                     raise Exception(
-                        "Directory %s not writable. NRFConnect builds require updates to this directory." % nrfconnect_sdk)
+                        f"Directory {nrfconnect_sdk} not writable. NRFConnect builds require updates to this directory.")
 
             cmd = self._prepare_environment()
 
@@ -199,6 +203,7 @@ class NrfConnectBuilder(Builder):
             self._Execute(['bash', '-c', cmd.strip()],
                           title='Generating ' + self.identifier)
 
+    @lock_output_dir
     def _build(self):
         log.info('Compiling NrfConnect at %s', self.output_dir)
 
@@ -217,21 +222,22 @@ class NrfConnectBuilder(Builder):
             self._Execute(['ctest', '--build-nocmake', '-V', '--output-on-failure', '--test-dir', os.path.join(self.output_dir, 'nrfconnect'), '--no-tests=error'],
                           title='Run Tests ' + self.identifier)
 
+    @lock_output_dir
     def _bundle(self):
-        log.info(f'Generating flashbundle at {self.output_dir}')
+        log.info('Generating flashbundle at %s', self.output_dir)
 
         self._Execute(['ninja', '-C', os.path.join(self.output_dir, 'nrfconnect'), 'flashing_script'],
                       title='Generating flashable files of ' + self.identifier)
 
+    @lock_output_dir
     def build_outputs(self):
         yield BuilderOutput(
-            os.path.join(self.output_dir, 'nrfconnect', 'zephyr', 'zephyr.elf'),
-            '%s.elf' % self.app.AppNamePrefix())
+            os.path.join(self.output_dir, 'nrfconnect', 'zephyr', 'zephyr.elf'), f'{self.app.AppNamePrefix()}.elf')
         if self.options.enable_link_map_file:
             yield BuilderOutput(
-                os.path.join(self.output_dir, 'nrfconnect', 'zephyr', 'zephyr.map'),
-                '%s.map' % self.app.AppNamePrefix())
+                os.path.join(self.output_dir, 'nrfconnect', 'zephyr', 'zephyr.map'), f'{self.app.AppNamePrefix()}.map')
 
+    @lock_output_dir
     def bundle_outputs(self):
         if self.app == NrfApp.UNIT_TESTS:
             return

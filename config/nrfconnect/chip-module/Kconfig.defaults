@@ -25,7 +25,12 @@ if CHIP
 # ==============================================================================
 
 choice LIBC_IMPLEMENTATION
-    default NEWLIB_LIBC
+    default PICOLIBC
+endchoice
+
+choice POSIX_SYSCONF_IMPL_CHOICE
+    default POSIX_SYSCONF_IMPL_MACRO if PICOLIBC
+
 endchoice
 
 config ASSERT
@@ -41,7 +46,7 @@ config HW_STACK_PROTECTION
     default y
 
 config ZVFS_OPEN_MAX
-    default 16
+    default 30
 
 config MAIN_STACK_SIZE
     default 6144
@@ -57,6 +62,7 @@ if CHIP_WIFI
 
 config HEAP_MEM_POOL_SIZE
     default 48336 if BUILD_WITH_TFM
+    default 43008 if CHIP_WIFI
     default 40144
 
 config NRF_WIFI_DATA_HEAP_SIZE
@@ -69,11 +75,11 @@ config HEAP_MEM_POOL_IGNORE_MIN
     default y if CHIP_WIFI
 
 config CHIP_MALLOC_SYS_HEAP_SIZE
-    default 10240 if SOC_SERIES_NRF54LX # nRF54L requires more memory due to crypto backend
-    default 8192 if NET_L2_OPENTHREAD
+    default 14336 if CHIP_WIFI
+    default 10240
 
 config MPSL_WORK_STACK_SIZE
-    default 2048 if SOC_SERIES_NRF54LX # nRF54L requires more memory due to crypto backend
+    default 2048 if SOC_SERIES_NRF54L # nRF54L requires more memory due to crypto backend
 
 # We use sys_heap based allocators, so make sure we don't reserve unused libc heap anyway
 config COMMON_LIBC_MALLOC_ARENA_SIZE
@@ -88,6 +94,8 @@ config ZMS_LOOKUP_CACHE_SIZE
 # ==============================================================================
 # Zephyr networking configuration
 # ==============================================================================
+
+if NETWORKING
 
 config NET_IPV6_MLD
     default y
@@ -119,6 +127,8 @@ config NET_BUF_TX_COUNT
 
 config NET_SOCKETS_POLL_MAX
     default 6 if CHIP_WIFI
+
+endif # NETWORKING
 
 # ==============================================================================
 # Bluetooth Low Energy configuration
@@ -179,7 +189,7 @@ config BT_RX_STACK_SIZE
 
 # Increase maximum data length of PDU supported in the Controller
 config BT_CTLR_DATA_LENGTH_MAX
-    default 251 if SOC_SERIES_NRF52X
+    default 251 if SOC_SERIES_NRF52
 
 config BT_CTLR_ECDH
     default n
@@ -218,25 +228,12 @@ config NFC_THREAD_CALLBACK
 config CHIP_OTA_REQUESTOR
     default y
 
-# All boards except nRF7002DK use QSPI NOR external flash
-config CHIP_QSPI_NOR
-    default y if BOARD_NRF5340DK_NRF5340_CPUAPP || BOARD_NRF52840DK_NRF52840
-
-# nRF7002DK uses SPI NOR external flash
-
-if BOARD_NRF7002DK_NRF5340_CPUAPP || BOARD_NRF7002DK_NRF5340_CPUAPP_NRF7001 || BOARD_NRF54L15DK
-
-config CHIP_SPI_NOR
-    default y
-
-endif # BOARD_NRF7002DK_NRF5340_CPUAPP || BOARD_NRF7002DK_NRF5340_CPUAPP_NRF7001 || BOARD_NRF54L15DK
-
 config BOOT_IMAGE_ACCESS_HOOKS
-    default y if SOC_SERIES_NRF53X
+    default y if SOC_SERIES_NRF53
 
 config UPDATEABLE_IMAGE_NUMBER
     default 3 if NRF_WIFI_PATCHES_EXT_FLASH_STORE
-    default 2 if SOC_SERIES_NRF53X
+    default 2 if SOC_SERIES_NRF53
 
 config DFU_MULTI_IMAGE_MAX_IMAGE_COUNT
     default 3 if NRF_WIFI_PATCHES_EXT_FLASH_STORE
@@ -245,11 +242,11 @@ config NRF_WIFI_FW_PATCH_DFU
     default y if NRF_WIFI_PATCHES_EXT_FLASH_STORE
 
 # ==============================================================================
-# OpenThread configuration
+# OpenThread L2 configuration
 # ==============================================================================
 
 config NET_L2_OPENTHREAD
-    default y if !WIFI_NRF70 && NETWORKING
+    default y if !CHIP_WIFI && NETWORKING
 
 if NET_L2_OPENTHREAD
 
@@ -257,16 +254,33 @@ if NET_L2_OPENTHREAD
 config IEEE802154_NRF5_RX_STACK_SIZE
     default 1024
 
+endif # NET_L2_OPENTHREAD
+
+config CHIP_SYSTEM_USE_ZEPHYR_SOCKET_EXTENSIONS
+    default n if !NET_L2_OPENTHREAD
+
+# ==============================================================================
+# OpenThread configuration
+# ==============================================================================
+
+config OPENTHREAD
+    default y if !CHIP_WIFI
+
+if OPENTHREAD
+
 config OPENTHREAD_THREAD_STACK_SIZE
     default 6144 if (PSA_CRYPTO_DRIVER_CC3XX && PSA_CRYPTO_DRIVER_OBERON) || PSA_CRYPTO_DRIVER_CRACEN
     default 4096
 
 config OPENTHREAD_DEFAULT_TX_POWER
     default 20 if MPSL_FEM
-    default 3 if SOC_SERIES_NRF53X
-    default 8 if SOC_SERIES_NRF52X || SOC_SERIES_NRF54LX
+    default 3 if SOC_SERIES_NRF53
+    default 8 if SOC_SERIES_NRF52 || SOC_SERIES_NRF54L
 
-endif # NET_L2_OPENTHREAD
+endif # OPENTHREAD
+
+config CHIP_USE_ZEPHYR_NETWORKING
+    default n
 
 # ==============================================================================
 # ICD configuration
@@ -344,7 +358,7 @@ choice OPENTHREAD_SECURITY
 endchoice
 
 choice RNG_GENERATOR_CHOICE
-    default XOSHIRO_RANDOM_GENERATOR if SOC_SERIES_NRF53X
+    default XOSHIRO_RANDOM_GENERATOR if SOC_SERIES_NRF53
 endchoice
 
 config MBEDTLS_ENABLE_HEAP
@@ -357,7 +371,7 @@ config MBEDTLS_HEAP_SIZE
 # Enable PSA Crypto dependencies for Matter
 
 choice CHIP_CRYPTO
-    default CHIP_CRYPTO_PSA if !CHIP_WIFI
+    default CHIP_CRYPTO_PSA
 
 endchoice
 
@@ -368,16 +382,16 @@ config CHIP_CRYPTO_PSA
 if CHIP_CRYPTO_PSA
 
 config CHIP_CRYPTO_PSA_AEAD_SINGLE_PART
-    default y if SOC_SERIES_NRF54LX
+    default y if SOC_SERIES_NRF54L
 
 config PSA_CRYPTO_DRIVER_OBERON
-    default y if (SOC_SERIES_NRF52X || SOC_SERIES_NRF53X)
+    default y if (SOC_SERIES_NRF52 || SOC_SERIES_NRF53)
 
 config PSA_CRYPTO_DRIVER_CC3XX
     default n
 
 config PSA_CRYPTO_DRIVER_CRACEN
-    default y if SOC_SERIES_NRF54LX
+    default y if SOC_SERIES_NRF54L
 
 config PSA_WANT_ALG_SHA_224
     default n
@@ -521,7 +535,19 @@ endif # LOG
 # ==============================================================================
 
 config SHELL
-    default y
+    default y if CHIP_LIB_SHELL
+
+if CHIP_LIB_SHELL
+
+# Currently the CHIPArgParser uses the standard getopt() API. Building with Zephyr's
+# shim getopt (which uses Zephyr's sys_getopt) does not work for this. So let's disable
+# it, and use directly the C library standard getopt.
+choice POSIX_AEP_CHOICE
+	default POSIX_AEP_CHOICE_NONE
+
+endchoice 
+
+endif # CHIP_LIB_SHELL
 
 if SHELL
 

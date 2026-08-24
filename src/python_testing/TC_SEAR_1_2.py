@@ -72,7 +72,7 @@ class TC_SEAR_1_2(MatterBaseTest):
         self.print_step(step, "Read SupportedMaps attribute")
         supported_maps = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SupportedMaps)
-        log.info("SupportedMaps: %s" % supported_maps)
+        log.info("SupportedMaps: %s", supported_maps)
         asserts.assert_less_equal(len(supported_maps), 255,
                                   "SupportedMaps should have max 255 entries")
 
@@ -89,7 +89,7 @@ class TC_SEAR_1_2(MatterBaseTest):
         self.print_step(step, "Read SupportedAreas attribute")
         supported_areas = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SupportedAreas)
-        log.info("SupportedAreas: %s" % supported_areas)
+        log.info("SupportedAreas: %s", supported_areas)
         asserts.assert_less_equal(len(supported_areas), 255,
                                   "SupportedAreas should have max 255 entries")
         areaid_list = []
@@ -132,7 +132,7 @@ class TC_SEAR_1_2(MatterBaseTest):
         self.print_step(step, "Read SelectedAreas attribute")
         selected_areas = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SelectedAreas)
-        log.info(f"SelectedAreas {selected_areas}")
+        log.info("SelectedAreas %s", selected_areas)
 
         # TODO how to check if all entries are uint32?
 
@@ -151,7 +151,7 @@ class TC_SEAR_1_2(MatterBaseTest):
         self.print_step(step, "Read CurrentArea attribute")
         current_area = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.CurrentArea)
-        log.info(f"CurrentArea {current_area}")
+        log.info("CurrentArea %s", current_area)
 
         if current_area is not NullValue:
             asserts.assert_true(current_area in self.areaid_list,
@@ -166,7 +166,7 @@ class TC_SEAR_1_2(MatterBaseTest):
         self.print_step(step, "Read EstimatedEndTime attribute")
         estimated_end_time = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.EstimatedEndTime)
-        log.info(f"EstimatedEndTime {estimated_end_time}")
+        log.info("EstimatedEndTime %s", estimated_end_time)
 
         if self.current_area is NullValue:
             asserts.assert_true(estimated_end_time is NullValue,
@@ -181,7 +181,7 @@ class TC_SEAR_1_2(MatterBaseTest):
         self.print_step(step, "Read Progress attribute")
         progress = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.Progress)
-        log.info(f"Progress {progress}")
+        log.info("Progress %s", progress)
 
         asserts.assert_true(len(progress) <= len(self.areaid_list),
                             f"Progress(len {len(progress)}) should have at most {len(self.areaid_list)} entries")

@@ -59,9 +59,15 @@ CHIP_ERROR ClosureDimensionEndpoint::Init()
         .Set(Feature::kRotation);
 
     ClusterInitParameters clusterInitParameters;
+    clusterInitParameters.resolution           = 100;
+    clusterInitParameters.stepValue            = 1000;
+    clusterInitParameters.unit                 = ClosureUnitEnum::kMillimeter;
     clusterInitParameters.translationDirection = TranslationDirectionEnum::kDownward;
     clusterInitParameters.rotationAxis         = RotationAxisEnum::kCenteredVertical;
+    clusterInitParameters.overflow             = OverflowEnum::kTopInside;
     clusterInitParameters.modulationType       = ModulationTypeEnum::kVentilation;
+    clusterInitParameters.latchControlModes.Set(LatchControlModesBitmap::kRemoteLatching)
+        .Set(LatchControlModesBitmap::kRemoteUnlatching);
 
     ReturnErrorOnFailure(mInterface.Init(conformance, clusterInitParameters));
     ReturnErrorOnFailure(mInterface.Init());

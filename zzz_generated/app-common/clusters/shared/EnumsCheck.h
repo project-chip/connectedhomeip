@@ -118,6 +118,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnit
     case EnumType::kNgm3:
     case EnumType::kPm3:
     case EnumType::kBqm3:
+    case EnumType::kDbpm:
+    case EnumType::kPcft:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

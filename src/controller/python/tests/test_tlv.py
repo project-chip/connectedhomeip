@@ -132,8 +132,8 @@ class TestTLVWriter(unittest.TestCase):
 
 
 class TestTLVReader(unittest.TestCase):
-    def _read_case(self, input, answer):
-        decoded = TLVReader(bytearray(input)).get()["Any"]
+    def _read_case(self, data, answer):
+        decoded = TLVReader(bytearray(data)).get()["Any"]
         self.assertEqual(type(decoded), type(answer))
         self.assertEqual(decoded, answer)
 

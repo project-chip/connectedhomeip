@@ -31,6 +31,7 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Server.h>
+#include <credentials/GroupDataProviderImpl.h>
 #if CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION
 #include <app/server/TermsAndConditionsManager.h>
 #endif
@@ -177,6 +178,9 @@ static void InitServer(intptr_t context)
 #endif
 
     chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAmebaObserver);
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    chip::Server::GetInstance().GetICDManager().RegisterObserver(&sAmebaObserver);
+#endif
 }
 
 extern "C" void ChipTest(void)

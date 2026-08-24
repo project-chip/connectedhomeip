@@ -333,6 +333,18 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::OperationSour
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::StatusCodeEnum val)
+{
+    using EnumType = DoorLock::StatusCodeEnum;
+    switch (val)
+    {
+    case EnumType::kDuplicate:
+    case EnumType::kOccupied:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::UserStatusEnum val)
 {
     using EnumType = DoorLock::UserStatusEnum;

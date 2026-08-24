@@ -46,6 +46,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Global.h>
 #include <lib/core/TLVUtilities.h>
+#include <lib/support/AutoRelease.h>
 #include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/FibonacciUtils.h>
@@ -167,25 +168,6 @@ bool IsAccessibleAttributeEntry(const ConcreteAttributePath & path, const Access
 
 } // namespace
 
-class AutoReleaseSubscriptionInfoIterator
-{
-public:
-    AutoReleaseSubscriptionInfoIterator(SubscriptionResumptionStorage::SubscriptionInfoIterator * iterator) : mIterator(iterator){};
-    ~AutoReleaseSubscriptionInfoIterator()
-    {
-        if (mIterator)
-        {
-            mIterator->Release();
-        }
-    }
-
-    explicit operator bool() const { return mIterator != nullptr; }
-    SubscriptionResumptionStorage::SubscriptionInfoIterator * operator->() const { return mIterator; }
-
-private:
-    SubscriptionResumptionStorage::SubscriptionInfoIterator * mIterator;
-};
-
 using Protocols::InteractionModel::Status;
 
 Global<InteractionModelEngine> sInteractionModelEngine;
@@ -284,7 +266,6 @@ void InteractionModelEngine::Shutdown()
             writeHandler.Close();
         }
     }
-
     mReportingEngine.Shutdown();
     mAttributePathPool.ReleaseAll();
     mEventPathPool.ReleaseAll();
@@ -300,6 +281,17 @@ void InteractionModelEngine::Shutdown()
     //
     // mpFabricTable    = nullptr;
     // mpExchangeMgr    = nullptr;
+
+    // Shutdown the data model provider and mark it as needing re-startup so that
+    // SetDataModelProvider() with the same pointer re-calls Startup() on the next
+    // Server::Init() cycle. We keep the pointer (rather than nulling it) so the
+    // provider remains accessible between Shutdown() and the next Init().
+    if (mDataModelProvider != nullptr)
+    {
+        ChipLogProgress(InteractionModel, "Shutting down data model provider %p", mDataModelProvider);
+        LogErrorOnFailure(mDataModelProvider->Shutdown());
+        mDataModelProviderNeedsStartup = true;
+    }
 
     mState = State::kUninitialized;
 }
@@ -1112,18 +1104,11 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
         auto & testing = Groupcast::GetTesting();
         if (testing.IsEnabled() && testing.IsFabricUnderTest(apExchangeContext->GetSessionHandle()->GetFabricIndex()))
         {
-            Clusters::Groupcast::Events::GroupcastTesting::Type event;
             if ((testing.GetTestResultEnum() == Groupcast::Testing::Result::kSuccess) && (status != Status::Success))
             {
                 testing.SetTestResult(Groupcast::Testing::Result::kGeneralError);
             }
-            // Convert to event type
-            testing.ToEventType(event);
-            testing.Clear();
-            // Generate event
-            DataModel::EventsGenerator & eventGenerator = EventManagement::GetInstance();
-            eventGenerator.GenerateEvent(event, kRootEndpointId);
-            eventGenerator.ScheduleUrgentEventDeliverySync();
+            testing.NotifyDelegate();
         }
     }
 
@@ -1852,10 +1837,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
     if (testing.IsEnabled() && testing.IsFabricUnderTest(request.GetAccessingFabricIndex()))
     {
         testing.SetAccessAllowed(Status::Success == accessStatus);
-        if (!testing.GetAccessAllowed().ValueOr(false))
-        {
-            testing.SetTestResult(Groupcast::Testing::Result::kFailedAuth);
-        }
+        testing.SetTestResult(Groupcast::Testing::Result::kSuccess);
     }
     VerifyOrReturnValue(accessStatus == Status::Success, accessStatus);
 
@@ -1949,19 +1931,31 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     // Altering data model should not be done while IM is actively handling requests.
     VerifyOrDie(mReadHandlers.begin() == mReadHandlers.end());
 
+    DataModel::Provider * oldModel = mDataModelProvider;
+
     if (model == mDataModelProvider)
     {
-        // no-op, just return
-        return model;
-    }
-
-    DataModel::Provider * oldModel = mDataModelProvider;
-    if (oldModel != nullptr)
-    {
-        CHIP_ERROR err = oldModel->Shutdown();
-        if (err != CHIP_NO_ERROR)
+        if (!mDataModelProviderNeedsStartup)
         {
-            ChipLogError(InteractionModel, "Failure on interaction model shutdown: %" CHIP_ERROR_FORMAT, err.Format());
+            // Same provider, already running — no-op.
+            return model;
+        }
+        // Same provider but it was shut down (e.g. Server restart cycle).
+        // Don't call Shutdown() again — just proceed to re-call Startup() below.
+        ChipLogProgress(InteractionModel, "Re-starting data model provider %p (server restart cycle)", model);
+    }
+    else if (oldModel != nullptr)
+    {
+        // Different provider replacing the current one — shut down the old one first.
+        oldModel->UnregisterAttributeChangeListener(mReportingEngine);
+        if (!mDataModelProviderNeedsStartup)
+        {
+            // Only shut down if not already shut down by InteractionModelEngine::Shutdown().
+            CHIP_ERROR err = oldModel->Shutdown();
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(InteractionModel, "Failure on interaction model shutdown: %" CHIP_ERROR_FORMAT, err.Format());
+            }
         }
     }
 
@@ -1969,13 +1963,19 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     if (mDataModelProvider != nullptr)
     {
         CHIP_ERROR err = mDataModelProvider->Startup({
-            .eventsGenerator         = EventManagement::GetInstance(),
-            .dataModelChangeListener = mReportingEngine,
-            .actionContext           = *this,
+            .eventsGenerator = EventManagement::GetInstance(),
+            .actionContext   = *this,
         });
+
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(InteractionModel, "Failure on interaction model startup: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        mDataModelProviderNeedsStartup = false;
+        // Register to the new model (skip if same provider — already registered)
+        if (model != oldModel)
+        {
+            mDataModelProvider->RegisterAttributeChangeListener(mReportingEngine);
         }
     }
 
@@ -2182,8 +2182,8 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
     bool resumedSubscriptions                  = false;
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
-    AutoReleaseSubscriptionInfoIterator iterator(imEngine->mpSubscriptionResumptionStorage->IterateSubscriptions());
-    VerifyOrReturn(iterator, ChipLogError(InteractionModel, "Failed to allocate subscription resumption iterator"));
+    AutoRelease iterator(imEngine->mpSubscriptionResumptionStorage->IterateSubscriptions());
+    VerifyOrReturn(!iterator.IsNull(), ChipLogError(InteractionModel, "Failed to allocate subscription resumption iterator"));
     while (iterator->Next(subscriptionInfo))
     {
         // If subscription happens between reboot and this timer callback, it's already live and should skip resumption

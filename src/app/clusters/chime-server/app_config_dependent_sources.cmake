@@ -18,6 +18,7 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/CodegenIntegration.h"
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/MigrateChimeServerStorage.h"
+    "${CLUSTER_DIR}/MigrateChimeServerStorage.cpp"
     "${CLUSTER_DIR}/chime-server.h"
 )
-

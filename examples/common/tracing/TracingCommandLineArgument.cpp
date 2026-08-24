@@ -75,7 +75,7 @@ void TracingSetup::EnableTracingFor(const char * cliArg)
             chip::Tracing::Register(mJsonBackend);
         }
 #if ENABLE_PERFETTO_TRACING
-        else if (value.data_equal(CharSpan::fromCharString("perfetto")))
+        else if (value.data_equal("perfetto"_span))
         {
             chip::Tracing::Perfetto::Initialize(perfetto::kSystemBackend);
             chip::Tracing::Perfetto::RegisterEventTrackingStorage();

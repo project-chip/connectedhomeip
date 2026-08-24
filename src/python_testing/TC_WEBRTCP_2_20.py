@@ -136,7 +136,7 @@ class TC_WEBRTCP_2_20(MatterBaseTest, WEBRTCPTestBase):
 
         session_id = provide_offer_response.webRTCSessionID
         asserts.assert_true(session_id >= 0, f"Invalid session ID: {session_id}")
-        log.info(f"DUT allocated WebRTCSessionID: {session_id}")
+        log.info("DUT allocated WebRTCSessionID: %s", session_id)
 
         webrtc_manager.session_id_created(session_id, self.dut_node_id)
 
@@ -149,7 +149,7 @@ class TC_WEBRTCP_2_20(MatterBaseTest, WEBRTCPTestBase):
         asserts.assert_equal(session_id, answer_session_id,
                              f"Answer invoked with wrong session ID. Expected {session_id}, got {answer_session_id}")
         asserts.assert_true(len(answer) > 0, "Invalid answer SDP received - empty string")
-        log.info(f"Received valid Answer for session {answer_session_id}")
+        log.info("Received valid Answer for session %s", answer_session_id)
 
         # Set the remote answer to continue the WebRTC handshake
         webrtc_peer.set_remote_answer(answer)
@@ -165,7 +165,7 @@ class TC_WEBRTCP_2_20(MatterBaseTest, WEBRTCPTestBase):
             Clusters.Globals.Structs.ICECandidateStruct(candidate=cand.candidate) for cand in local_candidates
         ]
 
-        log.info(f"Sending {len(local_candidates_struct_list)} ICE candidates to DUT")
+        log.info("Sending %s ICE candidates to DUT", len(local_candidates_struct_list))
 
         await self.send_single_cmd(
             cmd=Clusters.WebRTCTransportProvider.Commands.ProvideICECandidates(
@@ -179,7 +179,7 @@ class TC_WEBRTCP_2_20(MatterBaseTest, WEBRTCPTestBase):
 
         self.step(5)
         # Send EndSession command to terminate the WebRTC session
-        log.info(f"Sending EndSession command for session {session_id}")
+        log.info("Sending EndSession command for session %s", session_id)
 
         await self.send_single_cmd(
             cmd=Clusters.WebRTCTransportProvider.Commands.EndSession(
@@ -189,7 +189,7 @@ class TC_WEBRTCP_2_20(MatterBaseTest, WEBRTCPTestBase):
             endpoint=endpoint,
         )
 
-        log.info(f"Successfully ended WebRTC session {session_id}")
+        log.info("Successfully ended WebRTC session %s", session_id)
 
         self.step(6)
         # Deallocate the Audio and Video streams to return DUT to known state
@@ -202,7 +202,7 @@ class TC_WEBRTCP_2_20(MatterBaseTest, WEBRTCPTestBase):
             ),
             endpoint=endpoint,
         )
-        log.info(f"Successfully deallocated audio stream {audio_stream_id}")
+        log.info("Successfully deallocated audio stream %s", audio_stream_id)
 
         # Deallocate video stream
         await self.send_single_cmd(
@@ -211,7 +211,7 @@ class TC_WEBRTCP_2_20(MatterBaseTest, WEBRTCPTestBase):
             ),
             endpoint=endpoint,
         )
-        log.info(f"Successfully deallocated video stream {video_stream_id}")
+        log.info("Successfully deallocated video stream %s", video_stream_id)
 
         # Clean up
         await webrtc_manager.close_all()

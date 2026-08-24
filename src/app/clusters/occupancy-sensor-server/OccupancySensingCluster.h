@@ -77,10 +77,10 @@ public:
         }
 
         EndpointId mEndpointId;
-        BitFlags<OccupancySensing::Feature> mFeatureMap = OccupancySensing::Feature::kOccupancyEvent;
-        bool mShowDeprecatedAttributes                  = true;
-        uint16_t mHoldTime;
-        OccupancySensing::Structs::HoldTimeLimitsStruct::Type mHoldTimeLimits;
+        BitFlags<OccupancySensing::Feature> mFeatureMap                       = OccupancySensing::Feature::kOccupancyEvent;
+        bool mShowDeprecatedAttributes                                        = true;
+        uint16_t mHoldTime                                                    = 0;
+        OccupancySensing::Structs::HoldTimeLimitsStruct::Type mHoldTimeLimits = {};
         // The presence of mHoldTimeDelegate indicates that hold time limits are enforced and hold time functionality is active.
         TimerDelegate * mHoldTimeDelegate    = nullptr;
         OccupancySensingDelegate * mDelegate = nullptr;
@@ -120,10 +120,10 @@ private:
     OccupancySensingDelegate * mDelegate;
     const BitFlags<OccupancySensing::Feature> mFeatureMap;
     const bool mShowDeprecatedAttributes;
-    uint16_t mHoldTime;
-    OccupancySensing::Structs::HoldTimeLimitsStruct::Type mHoldTimeLimits;
-    BitMask<OccupancySensing::OccupancyBitmap> mOccupancy = 0;
-    System::Clock::Timestamp mTimerStartedTimestamp       = System::Clock::Milliseconds64(0);
+    uint16_t mHoldTime                                                    = 0;
+    OccupancySensing::Structs::HoldTimeLimitsStruct::Type mHoldTimeLimits = {};
+    BitMask<OccupancySensing::OccupancyBitmap> mOccupancy                 = 0;
+    System::Clock::Timestamp mTimerStartedTimestamp                       = System::Clock::Milliseconds64(0);
 };
 
 } // namespace chip::app::Clusters

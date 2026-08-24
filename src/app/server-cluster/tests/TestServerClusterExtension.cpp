@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <access/Privilege.h>
@@ -189,21 +190,19 @@ TEST_F(TestServerClusterExtension, TestGetDataVersion)
 
     TestableServerClusterExtension extension(mockPath, underlying);
 
+    TestServerClusterContext context;
+    // Startup MUST be called before calling GetDataVersion() since Data Version must be randomly initialized within it.
+    ASSERT_SUCCESS(extension.Startup(context.Get()));
+
     // Initially, version is the same as underlying (since mVersionDelta is 0).
     ASSERT_EQ(extension.GetDataVersion(mockPath), underlying.GetDataVersion(mockPath));
 
-    // Without a context, there is no need to increment (and cannot mark dirty).
-    extension.TestNotifyAttributeChanged(4);
-    ASSERT_EQ(extension.GetDataVersion(mockPath),
-              underlying.GetDataVersion(mockPath)); // Should still be the same as no context is set
-
-    // Set a context and then notify change. This time mVersionDelta should increment.
-    TestServerClusterContext context;
-    ASSERT_EQ(extension.Startup(context.Get()), CHIP_NO_ERROR);
-
+    // After notify change, mVersionDelta should increment.
     DataVersion oldVersion = extension.GetDataVersion(mockPath);
     extension.TestNotifyAttributeChanged(5);
     ASSERT_EQ(extension.GetDataVersion(mockPath), oldVersion + 1);
+
+    extension.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestServerClusterExtension, TestNotifyAttributeChangedWithContext)
@@ -232,7 +231,7 @@ TEST_F(TestServerClusterExtension, TestNotifyAttributeChangedWithContext)
     ASSERT_EQ(extension.GetDataVersion(mockPath2), oldVersion);
 
     ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
-    ASSERT_EQ(context.ChangeListener().DirtyList()[0], AttributePathParams(mockPath.mEndpointId, mockPath.mClusterId, 234));
+    ASSERT_EQ(context.ChangeListener().DirtyList()[0], ConcreteAttributePath(mockPath.mEndpointId, mockPath.mClusterId, 234));
 }
 
 TEST_F(TestServerClusterExtension, TestExtensionAttributes)

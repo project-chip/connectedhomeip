@@ -494,14 +494,14 @@ IPAddress IPAddress::MakeIPv6PrefixMulticast(uint8_t aScope, uint8_t aPrefixLeng
     return (MakeIPv6TransientMulticast(lFlags, aScope, lGroupId));
 }
 
-IPAddress IPAddress::MakeIPv4Broadcast()
+IPAddress IPAddress::MakeIPv6MatterIANAMulticastAddr()
 {
-    IPAddress ipAddr;
-    ipAddr.Addr[0] = 0;
-    ipAddr.Addr[1] = 0;
-    ipAddr.Addr[2] = htonl(0xFFFF);
-    ipAddr.Addr[3] = 0xFFFFFFFF;
-    return ipAddr;
+    IPAddress addr;
+    addr.Addr[0] = htonl(0xFF050000);
+    addr.Addr[1] = 0;
+    addr.Addr[2] = 0;
+    addr.Addr[3] = htonl(0xFA);
+    return addr;
 }
 
 IPAddress IPAddress::Loopback(IPAddressType type)

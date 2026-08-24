@@ -29,7 +29,9 @@ from matter.testing.runner import MockTestRunner
 # Vendor ID is included on ON in the PICS file
 
 
-def create_read(include_reachable: bool = False, include_max_paths: bool = False, include_vendor_id: bool = True, device_type: int = 0x01) -> Attribute.AsyncReadTransaction.ReadResponse:
+def create_read(include_reachable: bool = False, include_max_paths: bool = False, include_vendor_id: bool = True,
+                device_type: int = 0x01, include_aggregator_ep1: bool = False, include_ota_requestor: bool = False,
+                groups_on_two_endpoints: bool = False) -> Attribute.AsyncReadTransaction.ReadResponse:
     # Attribute read here is set to match the example_pics_xml_basic_info.xml in this directory
     bi = Clusters.BasicInformation.Attributes
     lvl = Clusters.LevelControl.Attributes
@@ -87,8 +89,67 @@ def create_read(include_reachable: bool = False, include_max_paths: bool = False
     resp.tlvAttributes = {0: {Clusters.Descriptor.id: tlv_attrs_desc,
                               Clusters.BasicInformation.id: tlv_attrs_bi, Clusters.LevelControl.id: tlv_attrs_lvl}}
 
+    # Optional extras driving the new Base/MCORE consistency step.
+    if include_ota_requestor:
+        # OtaSoftwareUpdateRequestor server cluster on EP0 -> MCORE.OTA.Requestor.
+        ota = Clusters.OtaSoftwareUpdateRequestor
+        empty_globals = {
+            ota.Attributes.AttributeList.attribute_id: [],
+            ota.Attributes.AcceptedCommandList.attribute_id: [],
+            ota.Attributes.GeneratedCommandList.attribute_id: [],
+            ota.Attributes.FeatureMap.attribute_id: 0,
+            ota.Attributes.ClusterRevision.attribute_id: 1,
+        }
+        resp.tlvAttributes[0][ota.id] = empty_globals
+        resp.attributes[0][ota] = {}
+
+    if include_aggregator_ep1:
+        # Aggregator device type on EP1 -> MCORE.BRIDGE.
+        ep1_desc = {desc.DeviceTypeList: [Clusters.Descriptor.Structs.DeviceTypeStruct(deviceType=0x000E, revision=1)],
+                    desc.AttributeList: [], desc.AcceptedCommandList: [],
+                    desc.GeneratedCommandList: [], desc.FeatureMap: 0}
+        resp.attributes[1] = {Clusters.Descriptor: ep1_desc}
+        ep1_tlv_desc = {desc.AttributeList.attribute_id: [],
+                        desc.AcceptedCommandList.attribute_id: [],
+                        desc.GeneratedCommandList.attribute_id: [],
+                        desc.FeatureMap.attribute_id: 0,
+                        desc.DeviceTypeList.attribute_id: [d.ToTLV() for d in ep1_desc[desc.DeviceTypeList]]}
+        resp.tlvAttributes[1] = {Clusters.Descriptor.id: ep1_tlv_desc}
+
+    if groups_on_two_endpoints:
+        # Groups cluster on EP1 and EP2 -> MCORE.G.MULTIENDPOINT (needs >= 2).
+        groups = Clusters.Groups
+        groups_globals = {
+            groups.Attributes.AttributeList.attribute_id: [],
+            groups.Attributes.AcceptedCommandList.attribute_id: [],
+            groups.Attributes.GeneratedCommandList.attribute_id: [],
+            groups.Attributes.FeatureMap.attribute_id: 0,
+            groups.Attributes.ClusterRevision.attribute_id: 1,
+        }
+        bare_desc_attrs = {desc.DeviceTypeList: [], desc.AttributeList: [],
+                           desc.AcceptedCommandList: [], desc.GeneratedCommandList: [],
+                           desc.FeatureMap: 0}
+        bare_desc_tlv = {desc.AttributeList.attribute_id: [],
+                         desc.AcceptedCommandList.attribute_id: [],
+                         desc.GeneratedCommandList.attribute_id: [],
+                         desc.FeatureMap.attribute_id: 0,
+                         desc.DeviceTypeList.attribute_id: []}
+        for ep in (1, 2):
+            resp.attributes.setdefault(ep, {})[Clusters.Descriptor] = bare_desc_attrs
+            resp.attributes[ep][groups] = {}
+            resp.tlvAttributes.setdefault(ep, {})[Clusters.Descriptor.id] = bare_desc_tlv
+            resp.tlvAttributes[ep][groups.id] = groups_globals
+
     print(resp)
     return resp
+
+
+def _load_baseline_pics() -> dict:
+    """Re-read the example PICS file each time so test cases that mutate the
+    dict don't leak state into one another."""
+    script_dir = Path(__file__).resolve().parent
+    with open(script_dir / 'example_pics_xml_basic_info.xml') as f:
+        return parse_pics_xml(f.read())
 
 
 def main():
@@ -97,8 +158,7 @@ def main():
     ROOT_NODE_DEVICE_TYPE = 0x16
 
     script_dir = Path(__file__).resolve().parent
-    with open(script_dir / 'example_pics_xml_basic_info.xml') as f:
-        pics = parse_pics_xml(f.read())
+    pics = _load_baseline_pics()
     test_runner = MockTestRunner(script_dir / '../TC_pics_checker.py',
                                  'TC_PICS_Checker', 'test_TC_IDM_10_4', 0, pics)
     failures = []
@@ -178,6 +238,50 @@ def main():
     resp = create_read(device_type=ROOT_NODE_DEVICE_TYPE)
     if test_runner.run_test_with_mock_read(resp):
         failures.append("Test case failure: SDK CI PICS is included - expected failure")
+
+    # ===== New Base/MCORE consistency cases (test step 10). =====
+    # Reset PICS to the example baseline (which already includes MCORE.IDM.S).
+    base_pics = _load_baseline_pics()
+
+    # Bridge: aggregator device type on EP1 must require MCORE.BRIDGE=1.
+    test_runner.config.pics = dict(base_pics)
+    resp = create_read(include_aggregator_ep1=True)
+    if test_runner.run_test_with_mock_read(resp):
+        failures.append("Test case failure: Aggregator EP without MCORE.BRIDGE - expected failure")
+
+    test_runner.config.pics = dict(base_pics, **{"MCORE.BRIDGE": True})
+    resp = create_read(include_aggregator_ep1=True)
+    if not test_runner.run_test_with_mock_read(resp):
+        failures.append("Test case failure: Aggregator EP with MCORE.BRIDGE - expected success")
+
+    # PICS file claims MCORE.BRIDGE=1 but device does not expose Aggregator
+    # device type. Step 10 must catch the lie.
+    test_runner.config.pics = dict(base_pics, **{"MCORE.BRIDGE": True})
+    resp = create_read()
+    if test_runner.run_test_with_mock_read(resp):
+        failures.append("Test case failure: MCORE.BRIDGE claimed but device has no Aggregator - expected failure")
+
+    # OTA Requestor on EP0 must require MCORE.OTA.Requestor=1.
+    test_runner.config.pics = dict(base_pics)
+    resp = create_read(include_ota_requestor=True)
+    if test_runner.run_test_with_mock_read(resp):
+        failures.append("Test case failure: OTA Requestor cluster without MCORE.OTA.Requestor - expected failure")
+
+    test_runner.config.pics = dict(base_pics, **{"MCORE.OTA.Requestor": True})
+    resp = create_read(include_ota_requestor=True)
+    if not test_runner.run_test_with_mock_read(resp):
+        failures.append("Test case failure: OTA Requestor cluster with MCORE.OTA.Requestor - expected success")
+
+    # Groups on two endpoints must require MCORE.G.MULTIENDPOINT=1.
+    test_runner.config.pics = dict(base_pics)
+    resp = create_read(groups_on_two_endpoints=True)
+    if test_runner.run_test_with_mock_read(resp):
+        failures.append("Test case failure: Groups on 2 endpoints without MCORE.G.MULTIENDPOINT - expected failure")
+
+    test_runner.config.pics = dict(base_pics, **{"MCORE.G.MULTIENDPOINT": True})
+    resp = create_read(groups_on_two_endpoints=True)
+    if not test_runner.run_test_with_mock_read(resp):
+        failures.append("Test case failure: Groups on 2 endpoints with MCORE.G.MULTIENDPOINT - expected success")
 
     test_runner.Shutdown()
 

@@ -113,6 +113,7 @@ public:
         case PairingMode::ThreadMeshcop:
             AddArgument("thread-ba-host", &mThreadBaHost, "Thread Border Agent host");
             AddArgument("thread-ba-port", 0, UINT16_MAX, &mThreadBaPort, "Thread Border Agent port");
+            AddArgument("pase-only", 0, 1, &mPaseOnly);
             FALLTHROUGH;
 #endif
         case PairingMode::Code:
@@ -279,6 +280,8 @@ private:
     CHIP_ERROR Unpair(NodeId remoteId);
     chip::Controller::CommissioningParameters GetCommissioningParameters();
     CHIP_ERROR MaybeDisplayTermsAndConditions(chip::Controller::CommissioningParameters & params);
+    CHIP_ERROR
+    GetMeshcopCommissionParams(chip::Controller::SetUpCodePairer::ThreadMeshcopCommissionParameters & meshcopCommissionParams);
 
     const PairingMode mPairingMode;
     const PairingNetworkType mNetworkType;

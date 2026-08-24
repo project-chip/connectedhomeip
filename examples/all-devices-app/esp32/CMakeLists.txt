@@ -16,7 +16,7 @@
 
 # The following lines of boilerplate have to be in your project's
 # CMakeLists in this exact order for cmake to work correctly
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.20)
 
 set(PROJECT_VER "v1.0")
 set(PROJECT_VER_NUMBER 1)
@@ -31,9 +31,27 @@ include(${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/cm
 # - config/esp32/components: Provides the 'chip' component (GN build wrapper)
 set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/config/esp32/components"
+    "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/platform/esp32/led_widget"
 )
 
-project(chip-all-devices-app)
+# Compute project (output binary) name from the device selection.
+# ALL_DEVICES_ENABLED_DEVICES and ALL_DEVICES_APP_NAME may be passed as -D flags;
+# this mirrors the three-way logic in enabled_devices.cmake / enabled_devices.gni.
+if(ALL_DEVICES_APP_NAME)
+    set(_all_devices_project_name "${ALL_DEVICES_APP_NAME}")
+elseif(ALL_DEVICES_ENABLED_DEVICES)
+    set(_all_devices_project_name "example-device-app")
+else()
+    set(_all_devices_project_name "all-devices-app")
+endif()
+
+# NOTE: esp_example.sh build wants to find the output name and generally uses
+#       the result of parsing `project(<NAME>)`. This does NOT work here, so we
+#       provide the comments below for choices to use.
+#
+# esp_example:project_name_choice: all-devices-app
+# esp_example:project_name_choice: example-device-app
+project(${_all_devices_project_name})
 
 # C++17 is required for the code-driven data model.
 idf_build_set_property(CXX_COMPILE_OPTIONS "-std=gnu++17;-Os;-DCHIP_HAVE_CONFIG_H" APPEND)

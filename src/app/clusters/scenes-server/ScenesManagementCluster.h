@@ -45,6 +45,47 @@ public:
     virtual void Release(ScenesManagementSceneTable *) = 0;
 };
 
+/// RAII for a scenes management table provider:
+///    - does a `Take()` to get a ScenesManagementSceneTable at creation
+///    - ensures `Release()` is called on destruction
+///
+/// Use this for operating on scenes tables provided by a scene management table provider.
+/// This objects asserts that scene provider `Take` does NOT fail with nullptr.
+///
+/// For example to register a cluster for scene processing:
+///
+///    ScopedSceneTable  table(sceneTableProvider);
+///    table->RegisterHandler(&cluster)
+///
+/// And to unregister:
+///
+///    ScopedSceneTable  table(sceneTableProvider);
+///    table->UnregisterHandler(&cluster)
+///
+class ScopedSceneTable
+{
+public:
+    ScopedSceneTable(const ScopedSceneTable &)             = delete;
+    ScopedSceneTable & operator=(const ScopedSceneTable &) = delete;
+
+    explicit ScopedSceneTable(ScenesManagementTableProvider & provider) : mProvider(provider), mTable(provider.Take())
+    {
+        /// Users of this class DO NOT expect the scene provider to fail. This is generally the case
+        /// as existing implementations re-use a global static scene object.
+        VerifyOrDie(mTable != nullptr);
+    }
+    ~ScopedSceneTable() { mProvider.Release(mTable); }
+
+    ScenesManagementSceneTable * operator->() { return mTable; }
+    const ScenesManagementSceneTable * operator->() const { return mTable; }
+
+    operator bool() const { return mTable != nullptr; }
+
+private:
+    ScenesManagementTableProvider & mProvider;
+    ScenesManagementSceneTable * mTable;
+};
+
 class ScenesManagementCluster : public DefaultServerCluster, public FabricTable::Delegate, public scenes::ScenesIntegrationDelegate
 {
 public:
@@ -119,6 +160,7 @@ public:
 
     // FabricTable::Delegate implementation
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
+    void OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
     /// Removes the data persisted for this cluster
     ///
@@ -129,10 +171,8 @@ public:
     CHIP_ERROR StoreCurrentGlobalScene(FabricIndex fabricIndex) override;
     CHIP_ERROR RecallGlobalScene(FabricIndex fabricIndex) override;
     CHIP_ERROR GroupWillBeRemoved(FabricIndex fabricIndex, GroupId groupId) override;
-    CHIP_ERROR MakeSceneInvalidForAllFabrics() override;
 
     // Integration methods for other cluster integrations
-    CHIP_ERROR MakeSceneInvalid(FabricIndex aFabricIdx);
     CHIP_ERROR StoreCurrentScene(FabricIndex aFabricIx, GroupId aGroupId, SceneId aSceneId);
     CHIP_ERROR RecallScene(FabricIndex aFabricIx, GroupId aGroupId, SceneId aSceneId);
     CHIP_ERROR RemoveFabric(FabricIndex aFabricIndex);
@@ -152,8 +192,7 @@ private:
         return mFabricSceneInfo.SetSceneInfoStruct(fabric, sceneInfoStruct);
     }
 
-    CHIP_ERROR UpdateFabricSceneInfo(FabricIndex fabric, Optional<GroupId> group, Optional<SceneId> scene,
-                                     Optional<bool> sceneValid);
+    CHIP_ERROR UpdateFabricSceneInfo(FabricIndex fabric);
 
     CHIP_ERROR StoreSceneParse(const FabricIndex & fabricIdx, const GroupId & groupID, const SceneId & sceneID);
 

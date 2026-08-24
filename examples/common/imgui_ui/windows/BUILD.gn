@@ -127,6 +127,7 @@ static_library("fan_control") {
   deps = [
     ":accessor_updaters",
     ":windows",
+    "${chip_root}/src/app/clusters/fan-control-server",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/third_party/imgui",
   ]

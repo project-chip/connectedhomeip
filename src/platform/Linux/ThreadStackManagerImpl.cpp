@@ -103,7 +103,7 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 
     // If get property is called inside dbus thread (we are going to make it so), XXX_get_XXX can be used instead of XXX_dup_XXX
     // which is a little bit faster and the returned object doesn't need to be freed. Same for all following get properties.
-    GAutoPtr<char> role(openthread_border_router_dup_device_role(mProxy.get()));
+    GCharPtr role(openthread_border_router_dup_device_role(mProxy.get()));
     if (role)
     {
         ThreadDeviceRoleChangedHandler(role.get());
@@ -440,7 +440,7 @@ ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceTy
         return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
     }
 
-    GAutoPtr<char> role(openthread_border_router_dup_device_role(mProxy.get()));
+    GCharPtr role(openthread_border_router_dup_device_role(mProxy.get()));
     if (!role)
         return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
     if (strcmp(role.get(), kOpenthreadDeviceRoleDetached) == 0 || strcmp(role.get(), kOpenthreadDeviceRoleDisabled) == 0)

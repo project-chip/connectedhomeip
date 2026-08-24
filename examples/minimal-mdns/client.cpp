@@ -21,13 +21,14 @@
 #include <vector>
 
 #include <TracingCommandLineArgument.h>
+#include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/dnssd/MinimalMdnsServer.h>
 #include <lib/dnssd/minimal_mdns/AddressPolicy.h>
 #include <lib/dnssd/minimal_mdns/QueryBuilder.h>
 #include <lib/dnssd/minimal_mdns/Server.h>
-#include <lib/dnssd/minimal_mdns/core/QName.h>
+#include <lib/dnssd/wire/QName.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -41,12 +42,12 @@ namespace {
 
 struct Options
 {
-    bool unicastAnswers       = true;
-    uint32_t runtimeMs        = 500;
-    uint16_t querySendPort    = 5353;
-    uint16_t listenPort       = 5388;
-    const char * query        = "_services._dns-sd._udp.local";
-    mdns::Minimal::QType type = mdns::Minimal::QType::ANY;
+    bool unicastAnswers     = true;
+    uint32_t runtimeMs      = 500;
+    uint16_t querySendPort  = 5353;
+    uint16_t listenPort     = 5388;
+    const char * query      = "_services._dns-sd._udp.local";
+    chip::Dnssd::QType type = chip::Dnssd::QType::ANY;
 } gOptions;
 
 constexpr uint32_t kTestMessageId   = 0;
@@ -87,31 +88,31 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     case kOptionType:
         if (strcasecmp(aValue, "ANY") == 0)
         {
-            gOptions.type = mdns::Minimal::QType::ANY;
+            gOptions.type = chip::Dnssd::QType::ANY;
         }
         else if (strcasecmp(aValue, "A") == 0)
         {
-            gOptions.type = mdns::Minimal::QType::A;
+            gOptions.type = chip::Dnssd::QType::A;
         }
         else if (strcasecmp(aValue, "AAAA") == 0)
         {
-            gOptions.type = mdns::Minimal::QType::AAAA;
+            gOptions.type = chip::Dnssd::QType::AAAA;
         }
         else if (strcasecmp(aValue, "PTR") == 0)
         {
-            gOptions.type = mdns::Minimal::QType::PTR;
+            gOptions.type = chip::Dnssd::QType::PTR;
         }
         else if (strcasecmp(aValue, "TXT") == 0)
         {
-            gOptions.type = mdns::Minimal::QType::TXT;
+            gOptions.type = chip::Dnssd::QType::TXT;
         }
         else if (strcasecmp(aValue, "SRV") == 0)
         {
-            gOptions.type = mdns::Minimal::QType::SRV;
+            gOptions.type = chip::Dnssd::QType::SRV;
         }
         else if (strcasecmp(aValue, "CNAME") == 0)
         {
-            gOptions.type = mdns::Minimal::QType::CNAME;
+            gOptions.type = chip::Dnssd::QType::CNAME;
         }
         else
         {
@@ -183,7 +184,7 @@ OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
 class ReportDelegate : public mdns::Minimal::ServerDelegate
 {
 public:
-    void OnQuery(const mdns::Minimal::BytesRange & data, const chip::Inet::IPPacketInfo * info) override
+    void OnQuery(const chip::Dnssd::BytesRange & data, const chip::Inet::IPPacketInfo * info) override
     {
         char addr[Inet::IPAddress::kMaxStringLength];
         info->SrcAddress.ToString(addr, sizeof(addr));
@@ -195,7 +196,7 @@ public:
         Report("QUERY: ", data);
     }
 
-    void OnResponse(const mdns::Minimal::BytesRange & data, const chip::Inet::IPPacketInfo * info) override
+    void OnResponse(const chip::Dnssd::BytesRange & data, const chip::Inet::IPPacketInfo * info) override
     {
         char addr[Inet::IPAddress::kMaxStringLength];
         info->SrcAddress.ToString(addr, sizeof(addr));
@@ -208,10 +209,10 @@ public:
     }
 
 private:
-    void Report(const char * prefix, const mdns::Minimal::BytesRange & data)
+    void Report(const char * prefix, const chip::Dnssd::BytesRange & data)
     {
         MdnsExample::PacketReporter reporter(prefix, data);
-        if (!mdns::Minimal::ParsePacket(data, &reporter))
+        if (!chip::Dnssd::ParsePacket(data, &reporter))
         {
             printf("INVALID PACKET!!!!!!\n");
         }
@@ -241,18 +242,18 @@ public:
         }
     }
 
-    mdns::Minimal::Query MdnsQuery() const
+    chip::Dnssd::Query MdnsQuery() const
     {
-        mdns::Minimal::FullQName qName;
+        chip::Dnssd::FullQName qName;
 
         qName.nameCount = mParts.size();
         qName.names     = mParts.data();
 
-        return mdns::Minimal::Query(qName);
+        return chip::Dnssd::Query(qName);
     }
 
 private:
-    std::vector<mdns::Minimal::QNamePart> mParts;
+    std::vector<chip::Dnssd::QNamePart> mParts;
     std::vector<std::string> mStorage;
 };
 
@@ -269,7 +270,7 @@ void BroadcastPacket(mdns::Minimal::ServerBase * server)
     builder.Header().SetMessageId(kTestMessageId);
     builder.AddQuery(query
                          .MdnsQuery()                                  //
-                         .SetClass(mdns::Minimal::QClass::IN)          //
+                         .SetClass(chip::Dnssd::QClass::IN)            //
                          .SetType(gOptions.type)                       //
                          .SetAnswerViaUnicast(gOptions.unicastAnswers) //
     );

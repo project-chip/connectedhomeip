@@ -49,8 +49,8 @@ class LibdatachannelWebRTCClient:
         self._lib.pychip_webrtc_client_add_ice_candidate(self._handle, candidate.encode("utf-8"), mid.encode("utf-8"))
 
     def on_local_description(self, callback):
-        def c_callback(sdp, type, user_data):
-            callback(sdp.decode("utf-8"), type.decode("utf-8"))
+        def c_callback(sdp, event_type, user_data):
+            callback(sdp.decode("utf-8"), event_type.decode("utf-8"))
 
         self._local_desc_cb = LocalDescriptionCallbackType(c_callback)
         self._lib.pychip_webrtc_client_set_local_description_callback(self._handle, self._local_desc_cb, None)

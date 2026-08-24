@@ -78,7 +78,7 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
     @async_test_body
     async def teardown_test(self):
-        await self.postcondition_remove_tls_endpoint(self.endpoint, self.tlsEndpointId)
+        await self.postcondition_remove_tls_endpoint(self.tlsEndpointId)
         super().teardown_test()
 
     async def privacy_setting_test(self, endpoint, aConnectionID, aTransportStatus):
@@ -166,8 +166,8 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
         self.step("precondition")
         host_ip = self.user_params.get("host_ip", None)
-        self.tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server, host_ip=host_ip)
-        uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf.value)
+        self.tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(server=self.server, host_ip=host_ip)
+        uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf)
 
         self.step(1)
         # Commission DUT - already done
@@ -266,7 +266,7 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             "DUT responds with SUCCESS status code.")
         # TH verifies that a PushTransportBegin Event was received.
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportBegin, timeout_sec=5)
-        log.info(f"Event data {event_data}")
+        log.info("Event data %s", event_data)
         asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
 
         self.step(7)

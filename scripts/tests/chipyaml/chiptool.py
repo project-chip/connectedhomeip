@@ -17,7 +17,6 @@
 import relative_importer  # isort: split # noqa: F401
 
 import sys
-from typing import List
 
 import chiptest
 import click
@@ -84,7 +83,7 @@ def maybe_update_stop_on_error(ctx):
 @click.argument('commands', nargs=-1)
 @chiptool_runner_options
 @click.pass_context
-def chiptool_py(ctx, commands: List[str], server_path: str, server_name: str, server_arguments: str, show_adapter_logs: bool, trace_file: str, trace_decode: bool, delay_in_ms: int, continueonfailure: bool, specifications_paths: str, pics: str, additional_pseudo_clusters_directory: str):
+def chiptool_py(ctx, commands: list[str], server_path: str, server_name: str, server_arguments: str, show_adapter_logs: bool, trace_file: str, trace_decode: bool, delay_in_ms: int, continueonfailure: bool, specifications_paths: str, pics: str, additional_pseudo_clusters_directory: str):
     success = False
 
     server_arguments = maybe_update_server_arguments(ctx)

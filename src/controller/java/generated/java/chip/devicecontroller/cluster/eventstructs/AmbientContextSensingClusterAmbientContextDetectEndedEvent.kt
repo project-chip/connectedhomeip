@@ -17,39 +17,66 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class AmbientContextSensingClusterAmbientContextDetectEndedEvent(val eventStartTime: ULong) {
+class AmbientContextSensingClusterAmbientContextDetectEndedEvent(
+  val eventStartTimePos: Optional<ULong>,
+  val eventStartTimeSys: Optional<ULong>,
+) {
   override fun toString(): String = buildString {
     append("AmbientContextSensingClusterAmbientContextDetectEndedEvent {\n")
-    append("\teventStartTime : $eventStartTime\n")
+    append("\teventStartTimePos : $eventStartTimePos\n")
+    append("\teventStartTimeSys : $eventStartTimeSys\n")
     append("}\n")
   }
 
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_EVENT_START_TIME), eventStartTime)
+      if (eventStartTimePos.isPresent) {
+        val opteventStartTimePos = eventStartTimePos.get()
+        put(ContextSpecificTag(TAG_EVENT_START_TIME_POS), opteventStartTimePos)
+      }
+      if (eventStartTimeSys.isPresent) {
+        val opteventStartTimeSys = eventStartTimeSys.get()
+        put(ContextSpecificTag(TAG_EVENT_START_TIME_SYS), opteventStartTimeSys)
+      }
       endStructure()
     }
   }
 
   companion object {
-    private const val TAG_EVENT_START_TIME = 0
+    private const val TAG_EVENT_START_TIME_POS = 0
+    private const val TAG_EVENT_START_TIME_SYS = 1
 
     fun fromTlv(
       tlvTag: Tag,
       tlvReader: TlvReader,
     ): AmbientContextSensingClusterAmbientContextDetectEndedEvent {
       tlvReader.enterStructure(tlvTag)
-      val eventStartTime = tlvReader.getULong(ContextSpecificTag(TAG_EVENT_START_TIME))
+      val eventStartTimePos =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_EVENT_START_TIME_POS))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_EVENT_START_TIME_POS)))
+        } else {
+          Optional.empty()
+        }
+      val eventStartTimeSys =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_EVENT_START_TIME_SYS))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_EVENT_START_TIME_SYS)))
+        } else {
+          Optional.empty()
+        }
 
       tlvReader.exitContainer()
 
-      return AmbientContextSensingClusterAmbientContextDetectEndedEvent(eventStartTime)
+      return AmbientContextSensingClusterAmbientContextDetectEndedEvent(
+        eventStartTimePos,
+        eventStartTimeSys,
+      )
     }
   }
 }

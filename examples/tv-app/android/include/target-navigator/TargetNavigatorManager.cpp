@@ -16,15 +16,18 @@
  */
 
 #include "TargetNavigatorManager.h"
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
 #include <json/json.h>
+#include <lib/support/Span.h>
 
 #include <list>
 #include <string>
 
 using namespace chip::app;
 using namespace chip::app::Clusters::TargetNavigator;
+using namespace chip::literals;
 using ContentAppAttributeDelegate = chip::AppPlatform::ContentAppAttributeDelegate;
 
 TargetNavigatorManager::TargetNavigatorManager(ContentAppAttributeDelegate * attributeDelegate, std::list<std::string> targets,
@@ -134,14 +137,14 @@ void TargetNavigatorManager::HandleNavigateTarget(CommandResponseHelper<Navigate
     NavigateTargetResponseType response;
     if (target == kNoCurrentTarget || target > mTargets.size())
     {
-        response.data   = chip::MakeOptional(CharSpan::fromCharString("error"));
+        response.data   = chip::MakeOptional("error"_span);
         response.status = StatusEnum::kTargetNotFound;
         TEMPORARY_RETURN_IGNORED helper.Success(response);
         return;
     }
     mCurrentTarget = static_cast<uint8_t>(target);
 
-    response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
+    response.data   = chip::MakeOptional("data response"_span);
     response.status = StatusEnum::kSuccess;
     TEMPORARY_RETURN_IGNORED helper.Success(response);
 }

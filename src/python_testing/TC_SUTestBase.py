@@ -16,11 +16,11 @@
 
 
 import logging
+import struct
 import subprocess
 import tempfile
 from os import path
 from time import sleep
-from typing import Optional
 
 from mobly import asserts
 
@@ -30,6 +30,7 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.apps import OtaImagePath, OTAProviderSubprocess
 from matter.testing.matter_testing import MatterBaseTest
+from matter.tlv import TLVReader
 
 # Type aliases for AccessControl cluster types
 AccessControlCluster = Clusters.AccessControl
@@ -43,8 +44,8 @@ log = logging.getLogger(__name__)
 
 class SoftwareUpdateBaseTest(MatterBaseTest):
     """This is the base test class for SoftwareUpdate Test Cases"""
-    current_provider_app_proc: Optional[OTAProviderSubprocess] = None
-    provider_app_path: Optional[str] = None
+    current_provider_app_proc: OTAProviderSubprocess | None = None
+    provider_app_path: str | None = None
 
     def start_provider(self,
                        provider_app_path: str = "",
@@ -54,8 +55,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                        port: int = 5541,
                        storage_dir='/tmp',
                        extra_args: list = [],
-                       kvs_path: Optional[str] = None,
-                       log_file: Optional[str] = None, expected_output: str = "Server initialization complete",
+                       kvs_path: str | None = None,
+                       log_file: str | None = None, expected_output: str = "Server initialization complete",
                        timeout: int = 30):
         """Start the provider process using the provided configuration.
 
@@ -72,7 +73,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             expected_output (str): Expected string to see after a default timeout. Defaults to "Server initialization complete".
             timeout (int): Timeout to wait for the expected output. Defaults to 10 seconds
         """
-        log.info(f"Launching provider app with with ota image {ota_image_path}")
+        log.info("Launching provider app with with ota image %s", ota_image_path)
         # Image to launch
         self.provider_app_path = provider_app_path
         if not path.exists(provider_app_path):
@@ -89,9 +90,9 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             # Assign the file descriptor to log_file
             log_file = tempfile.NamedTemporaryFile(  # noqa: SIM115
                 dir=storage_dir, prefix='provider_', suffix='.log', mode='ab')
-            log.info(f"Writing Provider logs at :{log_file.name}")
+            log.info("Writing Provider logs at :%s", log_file.name)
         else:
-            log.info(f"Writing Provider logs at : {log_file}")
+            log.info("Writing Provider logs at : %s", log_file)
         # Launch the Provider subprocess using the Wrapper
         proc = OTAProviderSubprocess(
             provider_app_path,
@@ -109,7 +110,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             timeout=timeout)
 
         self.current_provider_app_proc = proc
-        log.info(f"Provider started with PID:  {self.current_provider_app_proc.get_pid()}")
+        log.info("Provider started with PID:  %s", self.current_provider_app_proc.get_pid())
 
     def terminate_provider(self):
         if hasattr(self, "current_provider_app_proc") and self.current_provider_app_proc is not None:
@@ -120,7 +121,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             log.warning("Provider process not found. Unable to terminate.")
 
     async def announce_ota_provider(self,
-                                    controller: ChipDeviceCtrl,
+                                    controller: ChipDeviceCtrl.ChipDeviceController,
                                     provider_node_id: int,
                                     requestor_node_id: int,
                                     reason: Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum = Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUpdateAvailable,
@@ -153,10 +154,10 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             node_id=requestor_node_id,
             endpoint=endpoint,
         )
-        log.info(f"Announce command sent {cmd_resp}")
+        log.info("AnnounceOTA command sent")
         return cmd_resp
 
-    async def set_default_ota_providers_list(self, controller: ChipDeviceCtrl, provider_node_id: int, requestor_node_id: int, endpoint: int = 0):
+    async def set_default_ota_providers_list(self, controller: ChipDeviceCtrl.ChipDeviceController, provider_node_id: int, requestor_node_id: int, endpoint: int = 0):
         """Write the provider list in the requestor to initiate the Software Update.
 
         Args:
@@ -171,7 +172,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             cluster=Clusters.OtaSoftwareUpdateRequestor,
             attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders
         )
-        log.info(f"OTA Providers: {current_otap_info}")
+        log.info("OTA Providers: %s", current_otap_info)
 
         # Create Provider Location into Requestor
         provider_location_struct = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
@@ -196,9 +197,9 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             cluster=Clusters.OtaSoftwareUpdateRequestor,
             attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders
         )
-        log.info(f"OTA Providers List: {after_otap_info}")
+        log.info("OTA Providers List: %s", after_otap_info)
 
-    async def verify_version_applied_basic_information(self, controller: ChipDeviceCtrl, node_id: int, target_version: int):
+    async def verify_version_applied_basic_information(self, controller: ChipDeviceCtrl.ChipDeviceController, node_id: int, target_version: int):
         """Verify the version from the BasicInformationCluster and compares against the provider target version.
 
         Args:
@@ -233,7 +234,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             ota_image_info['size'] = path.getsize(ota_path)
             ota_image_info['exists'] = True
         except OSError:
-            log.info(f"OTA IMAGE at {ota_path} does not exists")
+            log.info("OTA IMAGE at %s does not exists", ota_path)
             return ota_image_info
 
         return ota_image_info
@@ -242,8 +243,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                                       event_report: Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,
                                       expected_previous_state,
                                       expected_new_state,
-                                      expected_target_version: Optional[int] = None,
-                                      expected_reason: Optional[int] = None):
+                                      expected_target_version: int | None = None,
+                                      expected_reason: int | None = None):
         """Verify the values of the StateTransitionEvent from the EventHandler given the provided arguments.
 
         Args:
@@ -253,7 +254,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             target_version (Optional[int], optional): Software version to verify if not provided ignore this check.. Defaults to None.
             reason (Optional[int], optional): UpdateStateEnum reason of the event, if not provided ignore. Defaults to None.
         """
-        log.info(f"Verifying the event {event_report}")
+        log.info("Verifying the event %s", event_report)
         asserts.assert_equal(event_report.previousState, expected_previous_state,
                              f"Previous state was not {expected_previous_state}")
         asserts.assert_equal(event_report.newState,  expected_new_state, f"New state is not {expected_new_state}")
@@ -266,8 +267,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
     def create_acl_entry(self,
                          dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
                          provider_node_id: int,
-                         requestor_node_id: Optional[int] = None,
-                         acl_entries: Optional[list[AccessControlEntryStruct]] = None,
+                         requestor_node_id: int | None = None,
+                         acl_entries: list[AccessControlEntryStruct] | None = None,
                          ):
         """Create ACL entries to allow OTA requestors to access the provider.
 
@@ -320,21 +321,21 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
     def restart_requestor(self, restore: bool = False):
         """This method Reboots or Restore the DUT."""
         restart_flag_file = self.get_restart_flag_file()
-        log.info(f"RESTART FILE at {restart_flag_file}")
+        log.info("RESTART FILE at %s", restart_flag_file)
         if not restart_flag_file:
             action_str = "Reboot"
             prompt_message = "Reboot the DUT. Press Enter when ready.\n"
             if restore:
                 action_str = "Restore"
                 prompt_message = "Manually restore the DUT to it's original version. Please type Enter when its ready.\n"
-            log.info(f"Restart file not found. Entering Manual {action_str}.")
+            log.info("Restart file not found. Entering Manual %s.", action_str)
             # No restart flag file: ask user to manually reboot. For this test will be needed to wipe or
             # restore to the previous software version.
             self.controller.ExpireSessions(self.requestor_node_id)
             self.wait_for_user_input(prompt_msg=prompt_message)
             # After manual reboot, expire previous sessions so that we can re-establish connections
             # In manual reboot or device no sleep is added as the user notify until the Device is ready.
-            log.info(f"Manual device {action_str} completed")
+            log.info("Manual device %s completed", action_str)
         else:
             try:
                 # Create the restart flag file to signal the test runner
@@ -351,7 +352,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             except Exception as e:
                 asserts.fail(f"Requestor restart failed: {e}")
 
-    async def clear_ota_providers(self, controller: ChipDeviceCtrl, requestor_node_id: int):
+    async def clear_ota_providers(self, controller: ChipDeviceCtrl.ChipDeviceController, requestor_node_id: int):
         """
         Clears the DefaultOTAProviders attribute on the Requestor, leaving it empty.
         Args:
@@ -389,4 +390,63 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             raise ValueError(
                 f"kvs_path_prefix must be an absolute path starting with /tmp/ or /private/tmp/, but was: {real_kvs_path_prefix}")
         subprocess.run(['rm', '-rf', f'{real_kvs_path_prefix}*'])
-        log.info(f"Removed all KVS files/folders with prefix: {real_kvs_path_prefix}")
+        log.info("Removed all KVS files/folders with prefix: %s", real_kvs_path_prefix)
+
+    def get_ota_image_software_version(self, ota_image_path: str) -> int:
+        """Parse the OTA image header and return the embedded software version.
+
+        Args:
+            ota_image_path (str): Path to the OTA image file to parse.
+
+        Returns:
+            int: Software version read from the OTA image header (TLV context tag 2).
+        """
+        # Format values taken from src/app/ota_image_tool.py
+        FIXED_HEADER_FORMAT = '<IQI'
+        HEADER_MAGIC = 0x1BEEF11E
+        header_tlv = None
+        version = 0
+        with open(ota_image_path, 'rb') as file:
+            fixed_header = file.read(struct.calcsize(FIXED_HEADER_FORMAT))
+            magic, total_size, header_size = struct.unpack(
+                FIXED_HEADER_FORMAT, fixed_header)
+            if magic != HEADER_MAGIC:
+                asserts.fail("Invalid Ota Image")
+            header_tlv = TLVReader(file.read(header_size)).get()['Any']
+
+        try:
+            # Version has context tag 2
+            version = header_tlv[2]
+        except KeyError:
+            asserts.fail("Unable to retrieve the Software Version from the ota image.")
+
+        return version
+
+    async def check_ota_image_version(self, controller: ChipDeviceCtrl.ChipDeviceController, requestor_node_id: int, ota_image_path: str) -> int:
+        """Verify the OTA image version against the DUT's current software version.
+
+        Reads the software version from the OTA image header and compares it to the
+        SoftwareVersion attribute reported by the DUT, confirming the update can proceed.
+        Fails the test if the OTA image version is not greater than the DUT's current version.
+
+        Args:
+            controller (ChipDeviceCtrl): Controller used to read the DUT's SoftwareVersion attribute.
+            requestor_node_id (int): Node ID of the requestor (DUT) to check the version against.
+            ota_image_path (str): Path to the OTA image file to verify.
+
+        Returns:
+            int: Software version contained in the OTA image, to use as the target update version.
+        """
+
+        ota_version = self.get_ota_image_software_version(ota_image_path=ota_image_path)
+        basicinfo_softwareversion = await self.read_single_attribute_check_success(
+            dev_ctrl=controller,
+            cluster=Clusters.BasicInformation,
+            attribute=Clusters.BasicInformation.Attributes.SoftwareVersion,
+            node_id=requestor_node_id)
+        if ota_version <= basicinfo_softwareversion:
+            asserts.fail(
+                f"Invalid OTA Image with version: {ota_version} to update Device running with version {basicinfo_softwareversion}.")
+
+        log.info("OTA Image version is %s to install on Device with version %s", ota_version, basicinfo_softwareversion)
+        return ota_version

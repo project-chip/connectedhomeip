@@ -34,6 +34,7 @@
 #include "FreeRTOS.h"
 #include "mem_config.h"
 #include "os_mem.h"
+#include "wdt.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -149,17 +150,30 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
 {
-    uint32_t reason = 0;
+    T_SW_RESET_REASON resetReason = reset_reason_get();
 
-    CHIP_ERROR err = ConfigurationMgr().GetBootReason(reason);
+    ChipLogProgress(DeviceLayer, "GetBootReason resetReason=0x%x", resetReason);
 
-    if (err == CHIP_NO_ERROR)
+    switch (resetReason)
     {
-        VerifyOrReturnError(reason <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-        bootReason = static_cast<BootReasonType>(reason);
+    case RESET_REASON_WDT_TIMEOUT:
+        bootReason = BootReasonType::kSoftwareWatchdogReset;
+        break;
+
+    case RESET_REASON_POWER_DOWN:
+        bootReason = BootReasonType::kPowerOnReboot;
+        break;
+
+    case DFU_ACTIVE_RESET:
+        bootReason = BootReasonType::kSoftwareUpdateCompleted;
+        break;
+
+    default:
+        bootReason = BootReasonType::kUnspecified;
+        break;
     }
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetUpTime(uint64_t & upTime)

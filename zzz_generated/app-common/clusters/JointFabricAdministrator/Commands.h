@@ -127,7 +127,8 @@ public:
 namespace ICACCSRResponse {
 enum class Fields : uint8_t
 {
-    kIcaccsr = 0,
+    kStatusCode = 0,
+    kIcaccsr    = 1,
 };
 
 struct Type
@@ -137,7 +138,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ICACCSRResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
 
-    chip::ByteSpan icaccsr;
+    ICACCSRResponseStatusCodeEnum statusCode = static_cast<ICACCSRResponseStatusCodeEnum>(0);
+    Optional<chip::ByteSpan> icaccsr;
 
     CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -152,7 +154,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ICACCSRResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
 
-    chip::ByteSpan icaccsr;
+    ICACCSRResponseStatusCodeEnum statusCode = static_cast<ICACCSRResponseStatusCodeEnum>(0);
+    Optional<chip::ByteSpan> icaccsr;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

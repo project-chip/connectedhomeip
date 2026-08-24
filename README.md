@@ -3,6 +3,8 @@
 -   [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/project-chip/connectedhomeip)
 -   [Matter SDK documentation page](https://project-chip.github.io/connectedhomeip-doc/index.html)
 -   [Matter SDK Coverage Report](https://matter-build-automation.ue.r.appspot.com/)
+-   [CI REPL Tests Dashboard](https://project-chip.github.io/connectedhomeip/allure-report/ci_tests/)
+-   [Nightly Tests Dashboard](https://project-chip.github.io/connectedhomeip/allure-report/nightly/)
 
 # Matter
 
@@ -33,7 +35,7 @@
 **Tests**
 
 [![Tests-Master](https://github.com/project-chip/connectedhomeip/actions/workflows/tests.yaml/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/tests.yaml)
-[![Tests-LTS](https://github.com/project-chip/connectedhomeip/actions/workflows/tests.yaml/badge.svg?branch=v1.4.2-branch)](https://github.com/project-chip/connectedhomeip/actions/workflows/tests.yaml)
+[![Tests-LTS](https://github.com/project-chip/connectedhomeip/actions/workflows/tests.yaml/badge.svg?branch=v1.4.2-branch)](https://github.com/project-chip/connectedhomeip/actions/workflows/tests.yaml?query=branch:v1.4.2-branch)
 [![Unit / Integration Tests](https://github.com/project-chip/connectedhomeip/workflows/Unit%20/%20Integration%20Tests/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/unit_integration_test.yaml)
 [![Cirque](https://github.com/project-chip/connectedhomeip/workflows/Cirque/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/cirque.yaml)
 [![QEMU](https://github.com/project-chip/connectedhomeip/workflows/QEMU/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/qemu.yaml)
@@ -192,6 +194,10 @@ show simple interactions, and are supported on multiple transports -- Wi-Fi and
 Thread -- starting with resource-constrained (i.e., memory, processing) silicon
 platforms to help ensure Matter’s scalability.
 
+> **Note:** The applications under `examples/` are reference implementations
+> intended for development and testing. They are not production-ready and are
+> not intended to be shipped as-is in a commercial product.
+
 # How to Contribute
 
 We welcome your contributions to Matter. Read our contribution guidelines
@@ -212,7 +218,7 @@ The Matter repository is structured as follows:
 | config             | Project configurations                                                                                                                                |
 | credentials        | Development and test credentials                                                                                                                      |
 | docs               | Documentation, including guides. Visit the [Matter SDK documentation page](https://project-chip.github.io/connectedhomeip-doc/index.html) to read it. |
-| examples           | Example firmware applications that demonstrate use of Matter                                                                                          |
+| examples           | Example firmware applications that demonstrate use of Matter (not production-ready)                                                                   |
 | integrations       | 3rd party integrations                                                                                                                                |
 | scripts            | Scripts needed to work with the Matter repository                                                                                                     |
 | src                | Implementation of Matter                                                                                                                              |

@@ -37,6 +37,7 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/ServiceNaming.h>
+#include <lib/support/AutoRelease.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/PersistedCounter.h>
@@ -310,9 +311,20 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         SuccessOrExit(err);
     }
 
+    mGroupsProvider = initParams.groupDataProvider;
+    SetGroupDataProvider(mGroupsProvider);
+    mGroupsProvider->SetGroupcastEnabled(CHIP_CONFIG_ENABLE_GROUPCAST);
+
     SuccessOrExit(err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver));
     if (initParams.groupAuxiliaryAccessControlDelegate != nullptr)
     {
+        // If the application handed us an uninitialized delegate (e.g. the default owned by
+        // CommonCaseDeviceServerInitParams), Initialize it now with the Server's FabricTable
+        // so auxiliary-entry iteration walks only provisioned fabric indices.
+        if (!initParams.groupAuxiliaryAccessControlDelegate->IsInitialized())
+        {
+            SuccessOrExit(err = initParams.groupAuxiliaryAccessControlDelegate->Initialize(mGroupsProvider, &mFabrics));
+        }
         SuccessOrExit(mAccessControl.RegisterGroupAuxiliaryDelegate(initParams.groupAuxiliaryAccessControlDelegate));
     }
     Access::SetAccessControl(mAccessControl);
@@ -326,9 +338,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     mAclStorage = initParams.aclStorage;
     SuccessOrExit(err = mAclStorage->Init(*mDeviceStorage, mFabrics.begin(), mFabrics.end()));
-
-    mGroupsProvider = initParams.groupDataProvider;
-    SetGroupDataProvider(mGroupsProvider);
 
     mReportScheduler = initParams.reportScheduler;
 
@@ -800,8 +809,8 @@ void Server::RejoinExistingMulticastGroups()
     {
         Credentials::GroupDataProvider::GroupInfo groupInfo;
 
-        auto * iterator = mGroupsProvider->IterateGroupInfo(fabric.GetFabricIndex());
-        if (iterator)
+        AutoRelease iterator(mGroupsProvider->IterateGroupInfo(fabric.GetFabricIndex()));
+        if (!iterator.IsNull())
         {
             // GroupDataProvider was able to allocate rescources for an iterator
             while (iterator->Next(groupInfo))
@@ -814,8 +823,8 @@ void Server::RejoinExistingMulticastGroups()
                 }
 
                 const Transport::PeerAddress & address = use_iana_addr
-                    ? Transport::PeerAddress::Groupcast()
-                    : Transport::PeerAddress::Multicast(fabric.GetFabricId(), groupInfo.group_id);
+                    ? Transport::PeerAddress::BuildMatterIanaMulticastAddress()
+                    : Transport::PeerAddress::BuildMatterPerGroupMulticastAddress(fabric.GetFabricId(), groupInfo.group_id);
 
                 err = mTransports.MulticastGroupJoinLeave(address, true);
                 if (err != CHIP_NO_ERROR)
@@ -825,14 +834,11 @@ void Server::RejoinExistingMulticastGroups()
 
                     // We assume the failure is caused by a network issue or a lack of rescources; neither of which will be solved
                     // before the next join. Exit the loop to save rescources.
-                    iterator->Release();
                     return;
                 }
                 if (use_iana_addr)
                     groupcast_joined = true;
             }
-
-            iterator->Release();
         }
     }
 }
@@ -881,7 +887,7 @@ void Server::ScheduleFactoryReset()
 void Server::Shutdown()
 {
     assertChipStackLockedByCurrentThread();
-    PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, 0);
+    PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
     mCASEServer.Shutdown();
     mCASESessionManager.Shutdown();
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -908,6 +914,12 @@ void Server::Shutdown()
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     app::InteractionModelEngine::GetInstance()->SetICDManager(nullptr);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+    // EventManagement::Init() guards against double-init with a state check.
+    // Reset it here (after IME shutdown, which may trigger cluster shutdowns
+    // that access EventManagement) so a subsequent Server::Init() can re-initialize it.
+    app::EventManagement::DestroyEventManagement();
+
     // Shut down any remaining sessions (and hence exchanges) before we do any
     // futher teardown.  CASE handshakes have been shut down already via
     // shutting down mCASESessionManager and mCASEServer above; shutting

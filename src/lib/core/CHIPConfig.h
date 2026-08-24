@@ -39,6 +39,8 @@
 #include <core/CHIPBuildConfig.h>
 #endif
 
+#include <cstddef>
+
 #include <ble/BleConfig.h>
 #include <system/SystemConfig.h>
 
@@ -1049,9 +1051,19 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @def CHIP_CONFIG_LAMBDA_EVENT_ALIGN
  *
  * @brief The maximum alignment of the lambda which can be post into system event queue.
+ *
+ * @note For those platforms in which memory is not constrained,
+ * express the default as an alignment rather than a size, using
+ * alignof. The alignment that, by definition, covers every
+ * fundamental scalar a closure can capture, including `long
+ * double`. Otherwise, default to pointer alignment.
  */
 #ifndef CHIP_CONFIG_LAMBDA_EVENT_ALIGN
-#define CHIP_CONFIG_LAMBDA_EVENT_ALIGN (sizeof(void *))
+#if (defined(__linux__) && __linux__) || (defined(__MACH__) && __MACH__)
+#define CHIP_CONFIG_LAMBDA_EVENT_ALIGN (alignof(std::max_align_t))
+#else
+#define CHIP_CONFIG_LAMBDA_EVENT_ALIGN (alignof(void *))
+#endif
 #endif
 
 /**
@@ -1358,19 +1370,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 #define CHIP_CONFIG_ENABLE_SERVER_IM_EVENT 1
 #endif
-
-/**
- * Accepts receipt of invalid privacy flag usage that affected some early SVE2 test event implementations.
- * When SVE2 started, group messages would be sent with the privacy flag enabled, but without privacy encrypting the message header.
- * The issue was subsequently corrected in master, the 1.0 branch, and the SVE2 branch.
- * This is a temporary workaround for interoperability with those erroneous early-SVE2 implementations.
- * The cost of this compatibity mode is twice as many decryption steps per received group message.
- *
- * TODO(#24573): Remove this workaround once interoperability with legacy pre-SVE2 is no longer required.
- */
-#ifndef CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
-#define CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2 1
-#endif // CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
 
 /**
  *  @def CHIP_RESUBSCRIBE_MAX_RETRY_WAIT_INTERVAL_MS
@@ -2087,6 +2086,65 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS
 
 /**
+ * @def CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS
+ *
+ * @brief The value of the CommissioningProxy cluster's MaxSessions attribute, and the
+ *        number of concurrent proxy sessions the cluster reserves storage for. The
+ *        attribute is Fixed quality, so this is the device's advertised value.
+ *
+ *        A value of 1 means the proxy can commission only one device at a time; supporting
+ *        multiple concurrent sessions is optional. The default is that mandatory minimum
+ *        because every additional session costs fixed storage on every platform that
+ *        compiles the cluster: one SessionSlot plus one PendingMessage pool entry, used or
+ *        not. Products that want concurrent commissioning override this.
+ */
+#ifndef CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS
+#define CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS 1
+#endif // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS
+
+// Zero would declare a zero-length array, which compiles silently and leaves the cluster
+// with no usable session slots. The upper bound is the width of the MaxSessions attribute.
+#if CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS < 1 || CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS > 255
+#error "CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS is not allowed to be a number less than 1 or greater than 255"
+#endif
+
+/**
+ * @def CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS
+ *
+ * @brief The value of the CommissioningProxy cluster's MaxCachedResults attribute, and
+ *        the number of background-scan results the cache reserves storage for. Each
+ *        entry holds the spec's maximum Address (100) and ExtendedData (128) inline.
+ */
+#ifndef CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS
+#define CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS 10
+#endif // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS
+
+// Zero would declare a zero-length array, which compiles silently and leaves the cache
+// with no usable entries. The upper bound is the width of the MaxCachedResults attribute.
+#if CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS < 1 || CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS > 255
+#error "CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS is not allowed to be a number less than 1 or greater than 255"
+#endif
+
+/**
+ * @def CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC
+ *
+ * @brief Concurrent ProxyBackGroundScanStartRequests retained per fabric. Each
+ *        requesting node gets its own record (the spec identifies a Stop by NodeID and
+ *        FabricID), so this bounds what one fabric can occupy.
+ */
+#ifndef CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC
+#define CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC 4
+#endif // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC
+
+// Zero would declare a zero-length array, which compiles silently and leaves no room for
+// any request. The upper bound is the width of the uint8_t per-fabric request count.
+#if CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC < 1 ||                                                          \
+    CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC > 255
+#error                                                                                                                             \
+    "CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC is not allowed to be a number less than 1 or greater than 255"
+#endif
+
+/**
  * @def CHIP_CONFIG_MAX_NUM_ZONES
  *
  * @brief The maximum number of zones
@@ -2094,6 +2152,16 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_MAX_NUM_ZONES
 #define CHIP_CONFIG_MAX_NUM_ZONES 4
 #endif // CHIP_CONFIG_MAX_NUM_ZONES
+
+/**
+ * @def CHIP_MEMORY_SANITIZER_ENABLED
+ *
+ * @brief True when building with Clang MemorySanitizer (MSan).
+ */
+#ifndef CHIP_MEMORY_SANITIZER_ENABLED
+#define CHIP_MEMORY_SANITIZER_ENABLED 0
+#endif
+
 /**
  * @}
  */

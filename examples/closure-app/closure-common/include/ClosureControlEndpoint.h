@@ -86,26 +86,9 @@ private:
 class ClosureControlEndpoint
 {
 public:
-    ClosureControlEndpoint(EndpointId endpoint) : mEndpoint(endpoint), mDelegate(), mClusterInstance(nullptr)
-    {
-        ClusterConformance conformance;
-        conformance.FeatureMap()
-            .Set(Feature::kPositioning)
-            .Set(Feature::kMotionLatching)
-            .Set(Feature::kSpeed)
-            .Set(Feature::kVentilation)
-            .Set(Feature::kPedestrian)
-            .Set(Feature::kCalibration)
-            .Set(Feature::kProtection)
-            .Set(Feature::kManuallyOperable);
-        conformance.OptionalAttributes().Set<Attributes::CountdownTime::Id>();
-
-        ClusterInitParameters initParams;
-
-        MatterClosureControlSetConformance(mEndpoint, conformance);
-        MatterClosureControlSetInitParams(mEndpoint, initParams);
-        MatterClosureControlSetDelegate(mEndpoint, mDelegate);
-    }
+    ClosureControlEndpoint(EndpointId endpoint) :
+        mEndpoint(endpoint), mDelegate(), mClusterInstance(nullptr), mInterface(mEndpoint, mDelegate)
+    {}
 
     /**
      * @brief Initializes the ClosureControlEndpoint instance.
@@ -189,6 +172,7 @@ private:
     EndpointId mEndpoint = kInvalidEndpointId;
     ClosureControlDelegate mDelegate;
     ClosureControlCluster * mClusterInstance;
+    Interface mInterface;
 
     /**
      * @brief Updates the current state of the closure control endpoint from the target state.

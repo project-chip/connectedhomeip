@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <app/data-model-provider/ProviderChangeListener.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/config.h>
@@ -356,26 +356,13 @@ chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpointIndex(unsig
 //
 CHIP_ERROR emberAfSetDeviceTypeList(chip::EndpointId endpoint, chip::Span<const EmberAfDeviceType> deviceTypeList);
 
-/// Returns a change listener that uses the global InteractionModelEngine
-/// instance to report dirty paths
-chip::app::DataModel::ProviderChangeListener * emberAfGlobalInteractionModelAttributesChangedListener();
-
 /// Mark the given attribute as having changed:
-///   - increases the cluster data version for the given cluster
-///   - uses `listener` to `MarkDirty` the given path. This is typically done to mark an
-///     attribute as dirty within the matter attribute reporting engine, so that subscriptions
-///     receive updated attribute values for a cluster.
+///   - Increases the cluster data version for the given cluster.
+///   - Notifies registered AttributeChangeListeners via the active DataModel::Provider.
 ///
-/// This is a convenience function to make it clear when a `emberAfDataVersionStorage` increase
-/// and a `ProviderChangeListener::MarkDirty` always occur in lock-step.
-void emberAfAttributeChanged(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                             chip::app::DataModel::ProviderChangeListener * listener);
-
-/// Mark attributes on the given endpoint as having changed.
-///
-/// Schedules reporting engine to consider the endpoint dirty, however does NOT increase/alter
-/// any cluster data versions.
-void emberAfEndpointChanged(chip::EndpointId endpoint, chip::app::DataModel::ProviderChangeListener * listener);
+/// This function is used by codegen attribute writes to ensure the data version is
+/// incremented and subscribers are notified of the change.
+void emberAfAttributeChanged(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
 
 /// Maintains a increasing index of structural changes within ember
 /// that determine if existing "indexes" and metadata pointers within ember

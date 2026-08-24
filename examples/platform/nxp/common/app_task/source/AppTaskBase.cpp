@@ -2,7 +2,7 @@
  *
  *    Copyright (c) 2021 Project CHIP Authors
  *    Copyright (c) 2021 Google LLC.
- *    Copyright 2024 NXP
+ *    Copyright 2024, 2026 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,12 +40,12 @@
 #include <platform/DeviceInstanceInfoProvider.h>
 
 #if defined(MATTER_DM_PLUGIN_USER_LABEL) || defined(MATTER_DM_PLUGIN_FIXED_LABEL)
-#ifndef CONFIG_DEVICE_INFO_PROVIDER_IMPL
-#define CONFIG_DEVICE_INFO_PROVIDER_IMPL 1
+#ifndef CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
+#define CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER 1
 #endif
 #endif
 
-#if CONFIG_DEVICE_INFO_PROVIDER_IMPL
+#if CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
 #include <DeviceInfoProviderImpl.h>
 #endif
 
@@ -54,7 +54,7 @@
 #include "binding-handler.h"
 #endif
 
-#if CONFIG_NET_L2_OPENTHREAD
+#if CONFIG_OPENTHREAD
 #include <inet/EndPointStateOpenThread.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
@@ -104,6 +104,11 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_TBR
 #include "platform/OpenThread/GenericThreadBorderRouterDelegate.h"
 #include <app/clusters/thread-border-router-management-server/thread-border-router-management-server.h>
+#include <lib/support/BytesToHex.h>
+#include <lib/support/StringBuilder.h>
+#include <openthread/dns.h>
+#include <openthread/link.h>
+#include <platform/ThreadStackManager.h>
 #endif
 
 #ifndef CONFIG_THREAD_DEVICE_TYPE
@@ -114,6 +119,10 @@
 #include <app/reporting/SynchronizedReportSchedulerImpl.h>
 #endif
 
+#if CONFIG_CHIP_CRYPTO_PSA
+#include <crypto/PSAOperationalKeystore.h>
+#endif
+
 #if CONFIG_CHIP_SE05X
 #include "AppSe05x.h"
 #endif
@@ -122,6 +131,10 @@
 #include "ICDUtil.h"
 #endif // CONFIG_NXP_USE_POWER_DOWN
 
+#if CONFIG_CHIP_APP_IDENTIFY
+#include "Identify.h"
+#endif
+
 using namespace chip;
 using namespace chip::TLV;
 using namespace ::chip::Credentials;
@@ -129,11 +142,39 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::app::Clusters;
 
-#if CONFIG_DEVICE_INFO_PROVIDER_IMPL
+namespace {
+
+/**
+ * FabricTable delegate that triggers a factory reset when the last fabric
+ * is removed from the device.
+ */
+class LastFabricRemovedDelegate : public chip::FabricTable::Delegate
+{
+public:
+    void OnFabricRemoved(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
+    {
+        if (fabricTable.FabricCount() == 0)
+        {
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+            /* Trigger factory reset for BLEApplicationManager */
+            chip::NXP::App::BleAppMgr().FactoryReset();
+#endif
+            ChipLogProgress(AppServer, "Last fabric removed - scheduling factory reset");
+            chip::Server::GetInstance().GenerateShutDownEvent();
+            chip::Server::GetInstance().ScheduleFactoryReset();
+        }
+    }
+};
+
+static LastFabricRemovedDelegate sLastFabricRemovedDelegate;
+
+} // namespace
+
+#if CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif
 
-#if CONFIG_NET_L2_OPENTHREAD
+#if CONFIG_OPENTHREAD
 app::Clusters::NetworkCommissioning::InstanceAndDriver<DeviceLayer::NetworkCommissioning::GenericThreadDriver>
     sThreadNetworkDriver(CHIP_DEVICE_CONFIG_THREAD_NETWORK_ENDPOINT_ID /*endpointId*/);
 #endif
@@ -146,8 +187,8 @@ app::Clusters::NetworkCommissioning::Instance
     sNetworkCommissioningInstance(0, chip::NXP::App::GetAppTask().GetEthernetDriverInstance());
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_TBR
-extern const char sBaseServiceInstanceName[];
+#if CONFIG_CHIP_CRYPTO_PSA
+chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
 #endif
 
 #ifdef CONFIG_CHIP_REGISTER_SIMPLE_TEST_EVENT_TRIGGER_DELEGATE
@@ -156,7 +197,17 @@ static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLe
                                                                                           0xcc, 0xdd, 0xee, 0xff };
 #endif
 
-#if CONFIG_NET_L2_OPENTHREAD
+#if CONFIG_CHIP_APP_IDENTIFY
+NXP::App::IdentifyDelegate sIdentifyDelegate;
+static chip::app::DefaultTimerDelegate sTimerDelegateIdentify;
+
+app::RegisteredServerCluster<app::Clusters::IdentifyCluster>
+    gIdentifyCluster(app::Clusters::IdentifyCluster::Config(CONFIG_CHIP_APP_IDENTIFY_ENDPOINT, sTimerDelegateIdentify)
+                         .WithIdentifyType(chip::app::Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator)
+                         .WithDelegate(&sIdentifyDelegate));
+#endif
+
+#if CONFIG_OPENTHREAD
 void LockOpenThreadTask(void)
 {
     chip::NXP::App::GetAppTask().AppMatter_DisallowDeviceToSleep();
@@ -195,17 +246,20 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 
 #if CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE
     initParams.operationalKeystore = chip::NXP::App::OperationalKeystore::GetInstance();
+
+#elif CONFIG_CHIP_CRYPTO_PSA
+    initParams.operationalKeystore = &sPSAOperationalKeystore;
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
-#if CONFIG_DEVICE_INFO_PROVIDER_IMPL
+#if CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 #endif
 
     initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
-#if CONFIG_NET_L2_OPENTHREAD
+#if CONFIG_OPENTHREAD
     // Init ZCL Data Model and start server
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
     nativeParams.lockCb                = LockOpenThreadTask;
@@ -215,6 +269,9 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 #endif
 
     VerifyOrDie((chip::Server::GetInstance().Init(initParams)) == CHIP_NO_ERROR);
+
+    // Register the delegate that triggers a factory reset when the last fabric is removed.
+    VerifyOrDie(chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sLastFabricRemovedDelegate) == CHIP_NO_ERROR);
 
 #if CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE
     auto * persistentStorage = &Server::GetInstance().GetPersistentStorage();
@@ -260,6 +317,11 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
         goto exit;
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    /* BLEApplicationManager implemented per platform or left blank */
+    chip::NXP::App::BleAppMgr().PreMatterStackInit();
+#endif
+
     /*
      * Initialize the CHIP stack.
      * Would also initialize all required platform modules
@@ -295,7 +357,7 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     err = AppMatter_Register();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Error during APP features registration"));
 
-#if CONFIG_NET_L2_OPENTHREAD
+#if CONFIG_OPENTHREAD
     err = ThreadStackMgr().InitThreadStack();
     if (err != CHIP_NO_ERROR)
     {
@@ -333,6 +395,11 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     SuccessOrExit(err);
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    /* BLEApplicationManager implemented per platform or left blank */
+    chip::NXP::App::BleAppMgr().PostMatterStackInit();
+#endif
+
 #if CONFIG_CHIP_WIFI || CHIP_DEVICE_CONFIG_ENABLE_WPA
     TEMPORARY_RETURN_IGNORED sNetworkCommissioningInstance.Init();
 #ifdef ENABLE_CHIP_SHELL
@@ -349,12 +416,32 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     }
 #endif
 
+#if CONFIG_CHIP_APP_IDENTIFY
+    err = chip::app::CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster.Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Error during Register(gIdentifyCluster.Registration()");
+        goto exit;
+    }
+#endif
+
     ConfigurationMgr().LogDeviceConfig();
 
     // QR code will be used with CHIP Tool
     PrintOnboardingInfo();
 
     PrintCurrentVersion();
+
+#if CONFIG_CHIP_SE05X
+    /* Se05x::PostInit() must complete before starting CHIP event loop task to avoid lock contention on se05x library mutexes
+     * between main thread and CHIP thread. */
+    err = chip::NXP::App::Se05x::PostInit();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Error during chip::NXP::App::Se05x::PostInit(): %s", ErrorStr(err));
+        goto exit;
+    }
+#endif
 
     /* Start a task to run the CHIP Device event loop. */
     err = PlatformMgr().StartEventLoopTask();
@@ -364,20 +451,12 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
         goto exit;
     }
 
-#if CONFIG_NET_L2_OPENTHREAD
+#if CONFIG_OPENTHREAD
     // Start OpenThread task
     err = ThreadStackMgrImpl().StartThreadTask();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Error during ThreadStackMgrImpl().StartThreadTask()");
-    }
-#endif
-
-#if CONFIG_CHIP_SE05X
-    err = chip::NXP::App::Se05x::PostInit();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Error during chip::NXP::App::Se05x::PostInit(): %s", ErrorStr(err));
     }
 #endif
 
@@ -515,6 +594,38 @@ void chip::NXP::App::AppTaskBase::PrintCurrentVersion()
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_TBR
+chip::CharSpan chip::NXP::App::AppTaskBase::BuildBorderRouterName(const char * baseName)
+{
+    // OpenThread does not expose the constructed MeshCoP service instance name, so rebuild it here as
+    // base name + extended address hex to match what the border agent advertises.
+
+    static chip::StringBuilder<OT_DNS_MAX_LABEL_SIZE + 1> sBorderAgentName;
+
+    sBorderAgentName.Reset();
+    sBorderAgentName.Add(baseName);
+
+    const otExtAddress * extAddr = otLinkGetExtendedAddress(chip::DeviceLayer::ThreadStackMgrImpl().OTInstance());
+    if (extAddr != nullptr)
+    {
+        char hex[OT_EXT_ADDRESS_SIZE * 2 + 1];
+        if (chip::Encoding::BytesToLowercaseHexString(extAddr->m8, OT_EXT_ADDRESS_SIZE, hex, sizeof(hex)) == CHIP_NO_ERROR)
+        {
+            sBorderAgentName.Add(hex);
+        }
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Failed to get Thread extended address; reporting base border router name only");
+    }
+
+    if (!sBorderAgentName.Fit())
+    {
+        ChipLogError(DeviceLayer, "Border router name truncated to fit the MeshCoP service instance name buffer");
+    }
+
+    return chip::CharSpan::fromCharString(sBorderAgentName.c_str());
+}
+
 void chip::NXP::App::AppTaskBase::EnableTbrManagementCluster()
 {
     if (mTbrmClusterEnabled == false)
@@ -527,7 +638,7 @@ void chip::NXP::App::AppTaskBase::EnableTbrManagementCluster()
                                                                                   Server::GetInstance().GetFailSafeContext());
 
         // Initialize TBR name
-        CharSpan brName(sBaseServiceInstanceName, strlen(sBaseServiceInstanceName));
+        CharSpan brName = GetBorderRouterName();
         sThreadBRDelegate.SetThreadBorderRouterName(brName);
         // Initialize TBR cluster
         TEMPORARY_RETURN_IGNORED sThreadBRMgmtInstance.Init();

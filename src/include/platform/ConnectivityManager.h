@@ -25,6 +25,7 @@
 #include <memory>
 
 #include <app/icd/server/ICDServerConfig.h>
+#include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -185,6 +186,8 @@ public:
     CHIP_ERROR GetAndLogWiFiStatsCounters();
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     struct WiFiPAFAdvertiseParam;
+    void WiFiPAFSetParam(const WiFiPAFAdvertiseParam & pafAdvParam);
+    CHIP_ERROR SetWiFiPAFAdvertisingEnabled(bool enabled, uint32_t & publishId);
     CHIP_ERROR WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
     CHIP_ERROR WiFiPAFCancelPublish(uint32_t PublishId);
     typedef void (*OnConnectionCompleteFunct)(void * appState);
@@ -220,6 +223,10 @@ public:
     bool IsThreadProvisioned();
     void ErasePersistentInfo();
     void ResetThreadNetworkDiagnosticsCounts();
+
+    // Network interface accessors (primarily meaningful on LwIP platforms).
+    Inet::InterfaceId GetThreadInterface();
+    Inet::InterfaceId GetExternalInterface();
 
     CHIP_ERROR SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
 
@@ -300,11 +307,8 @@ struct ConnectivityManager::SEDIntervalsConfig
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 struct ConnectivityManager::WiFiPAFAdvertiseParam
 {
-    /* To enable/disable WiFiPAF Commissioning */
-    bool enable;
-
     /* Frequency list */
-    uint16_t freq_list_len;
+    uint16_t freq_list_len = 0;
     std::unique_ptr<uint16_t[]> freq_list;
     uint32_t publish_id;
 };
@@ -450,6 +454,16 @@ inline CHIP_ERROR ConnectivityManager::GetAndLogWiFiStatsCounters()
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+inline void ConnectivityManager::WiFiPAFSetParam(const WiFiPAFAdvertiseParam & pafAdvParam)
+{
+    return static_cast<ImplClass *>(this)->_WiFiPAFSetParam(pafAdvParam);
+}
+
+inline CHIP_ERROR ConnectivityManager::SetWiFiPAFAdvertisingEnabled(bool enabled, uint32_t & publishId)
+{
+    return static_cast<ImplClass *>(this)->_SetWiFiPAFAdvertisingEnabled(enabled, publishId);
+}
+
 inline CHIP_ERROR ConnectivityManager::WiFiPAFPublish(WiFiPAFAdvertiseParam & args)
 {
     return static_cast<ImplClass *>(this)->_WiFiPAFPublish(args);
@@ -535,6 +549,15 @@ inline void ConnectivityManager::ErasePersistentInfo()
 inline void ConnectivityManager::ResetThreadNetworkDiagnosticsCounts()
 {
     static_cast<ImplClass *>(this)->_ResetThreadNetworkDiagnosticsCounts();
+}
+
+inline Inet::InterfaceId ConnectivityManager::GetThreadInterface()
+{
+    return static_cast<ImplClass *>(this)->_GetThreadInterface();
+}
+inline Inet::InterfaceId ConnectivityManager::GetExternalInterface()
+{
+    return static_cast<ImplClass *>(this)->_GetExternalInterface();
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF

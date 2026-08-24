@@ -294,7 +294,7 @@ TEST_F(TestAccessControlClusterWithMockProvider, ReviewFabricRestrictionsCommand
     // Create a restriction that forbids access to attribute 0x0000
     // This restriction type means attribute reads/writes are forbidden
     AccessControl::Structs::AccessRestrictionStruct::Type restriction;
-    restriction.type = AccessControl::Enums::AccessRestrictionTypeEnum::kAttributeAccessForbidden;
+    restriction.type = AccessControl::AccessRestrictionTypeEnum::kAttributeAccessForbidden;
     restriction.id.SetNonNull(0x0000); // Attribute ID
 
     // Wrap the restriction in a DataModel::List as required by the struct
@@ -327,10 +327,9 @@ TEST_F(TestAccessControlClusterWithMockProvider, ReviewFabricRestrictionsCommand
     // Test the case where an empty ARL list is sent.
     // According to the spec, an empty list means "review all restrictions" for the fabric.
 
-    // Create a request with an empty ARL list
-    // This signals a request to review all restrictions for the accessing fabric
+    // Create a request with an empty ARL list (default-constructed List<> is already empty).
+    // This signals a request to review all restrictions for the accessing fabric.
     AccessControl::Commands::ReviewFabricRestrictions::Type request;
-    request.arl = DataModel::List<const AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::Type>(nullptr, 0);
 
     auto result = mTester.Invoke(AccessControl::Commands::ReviewFabricRestrictions::Id, request);
 
@@ -353,7 +352,7 @@ TEST_F(TestAccessControlClusterWithMockProvider, ReviewFabricRestrictionsCommand
     entries[0].endpoint = 1;
     entries[0].cluster  = OnOff::Id;
     AccessControl::Structs::AccessRestrictionStruct::Type restriction1;
-    restriction1.type = AccessControl::Enums::AccessRestrictionTypeEnum::kAttributeAccessForbidden;
+    restriction1.type = AccessControl::AccessRestrictionTypeEnum::kAttributeAccessForbidden;
     restriction1.id.SetNonNull(0x0000);
     entries[0].restrictions = DataModel::List<const AccessControl::Structs::AccessRestrictionStruct::Type>(&restriction1, 1);
 
@@ -361,7 +360,7 @@ TEST_F(TestAccessControlClusterWithMockProvider, ReviewFabricRestrictionsCommand
     entries[1].endpoint = 2;
     entries[1].cluster  = LevelControl::Id;
     AccessControl::Structs::AccessRestrictionStruct::Type restriction2;
-    restriction2.type = AccessControl::Enums::AccessRestrictionTypeEnum::kCommandForbidden;
+    restriction2.type = AccessControl::AccessRestrictionTypeEnum::kCommandForbidden;
     restriction2.id.SetNonNull(0x0000);
     entries[1].restrictions = DataModel::List<const AccessControl::Structs::AccessRestrictionStruct::Type>(&restriction2, 1);
 
@@ -401,7 +400,7 @@ TEST_F(TestAccessControlClusterWithMockProvider, ReviewFabricRestrictionsCommand
     // Create a restriction with null ID (wildcard)
     // This means "forbid access to all attributes" on this cluster/endpoint
     AccessControl::Structs::AccessRestrictionStruct::Type restriction;
-    restriction.type = AccessControl::Enums::AccessRestrictionTypeEnum::kAttributeAccessForbidden;
+    restriction.type = AccessControl::AccessRestrictionTypeEnum::kAttributeAccessForbidden;
     restriction.id.SetNull(); // Wildcard - applies to all attributes
 
     entry.restrictions = DataModel::List<const AccessControl::Structs::AccessRestrictionStruct::Type>(&restriction, 1);
@@ -429,15 +428,15 @@ TEST_F(TestAccessControlClusterWithMockProvider, ReviewFabricRestrictionsCommand
     AccessControl::Structs::AccessRestrictionStruct::Type restrictions[3];
 
     // First restriction: forbid attribute access for attribute 0x0000
-    restrictions[0].type = AccessControl::Enums::AccessRestrictionTypeEnum::kAttributeAccessForbidden;
+    restrictions[0].type = AccessControl::AccessRestrictionTypeEnum::kAttributeAccessForbidden;
     restrictions[0].id.SetNonNull(0x0000);
 
     // Second restriction: forbid attribute writes for attribute 0x0001
-    restrictions[1].type = AccessControl::Enums::AccessRestrictionTypeEnum::kAttributeWriteForbidden;
+    restrictions[1].type = AccessControl::AccessRestrictionTypeEnum::kAttributeWriteForbidden;
     restrictions[1].id.SetNonNull(0x0001);
 
     // Third restriction: forbid command invocation for command 0x0000
-    restrictions[2].type = AccessControl::Enums::AccessRestrictionTypeEnum::kCommandForbidden;
+    restrictions[2].type = AccessControl::AccessRestrictionTypeEnum::kCommandForbidden;
     restrictions[2].id.SetNonNull(0x0000);
 
     // Wrap all restrictions in a list
@@ -468,14 +467,14 @@ TEST_F(TestAccessControlClusterWithMockProvider, ReviewFabricRestrictionsCommand
     // This simulates a failure scenario (e.g., provider unable to process the request)
     mMockProvider.mReturnError = CHIP_ERROR_INTERNAL;
 
-    // Create a minimal valid request with empty ARL list
+    // Create a minimal valid request with empty ARL list (default-constructed).
     AccessControl::Commands::ReviewFabricRestrictions::Type request;
-    request.arl = DataModel::List<const AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::Type>(nullptr, 0);
 
     auto result = mTester.Invoke(AccessControl::Commands::ReviewFabricRestrictions::Id, request);
 
     ASSERT_TRUE(result.status.has_value());
-    ASSERT_EQ(result.status->GetStatus(), CHIP_ERROR_INTERNAL);
+    ASSERT_FALSE(result.IsSuccess());
+    ASSERT_EQ(result.status->GetUnderlyingError(), CHIP_IM_GLOBAL_STATUS(Failure));
     ASSERT_EQ(mMockProvider.mRequestCount, 1u);
 }
 
@@ -491,17 +490,15 @@ TEST_F(TestAccessControlClusterWithMockProvider, ReviewFabricRestrictionsCommand
 
     const struct
     {
-        AccessControl::Enums::AccessRestrictionTypeEnum dmType;
+        AccessControl::AccessRestrictionTypeEnum dmType;
         Access::AccessRestrictionProvider::Type internalType;
     } typeMappings[kNumRestrictionTypes] = {
-        { AccessControl::Enums::AccessRestrictionTypeEnum::kAttributeAccessForbidden,
+        { AccessControl::AccessRestrictionTypeEnum::kAttributeAccessForbidden,
           Access::AccessRestrictionProvider::Type::kAttributeAccessForbidden },
-        { AccessControl::Enums::AccessRestrictionTypeEnum::kAttributeWriteForbidden,
+        { AccessControl::AccessRestrictionTypeEnum::kAttributeWriteForbidden,
           Access::AccessRestrictionProvider::Type::kAttributeWriteForbidden },
-        { AccessControl::Enums::AccessRestrictionTypeEnum::kCommandForbidden,
-          Access::AccessRestrictionProvider::Type::kCommandForbidden },
-        { AccessControl::Enums::AccessRestrictionTypeEnum::kEventForbidden,
-          Access::AccessRestrictionProvider::Type::kEventForbidden },
+        { AccessControl::AccessRestrictionTypeEnum::kCommandForbidden, Access::AccessRestrictionProvider::Type::kCommandForbidden },
+        { AccessControl::AccessRestrictionTypeEnum::kEventForbidden, Access::AccessRestrictionProvider::Type::kEventForbidden },
     };
 
     for (size_t i = 0; i < kNumRestrictionTypes; ++i)

@@ -24,9 +24,9 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from collections.abc import Generator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Generator, Optional
 
 from clang_format import getClangFormatBinary
 from zap_execution import ZapTool
@@ -39,7 +39,7 @@ DEFAULT_DATA_MODEL_DESCRIPTION_FILE = 'src/app/zap-templates/zcl/zcl.json'
 
 @dataclass
 class CmdLineArgs:
-    zapFile: Optional[str]
+    zapFile: str | None
     zclFile: str
     templateFile: str
     outputDir: str
@@ -48,20 +48,13 @@ class CmdLineArgs:
     parallel: bool = True
     prettify_output: bool = True
     version_check: bool = True
-    lock_file: Optional[str] = None
+    lock_file: str | None = None
     delete_output_dir: bool = False
-    matter_file_name: Optional[str] = None
+    matter_file_name: str | None = None
 
 
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../../..'))
-
-
-def checkPythonVersion():
-    if sys.version_info[0] < 3:
-        print('Must use Python 3. Current version is ' +
-              str(sys.version_info[0]))
-        exit(1)
 
 
 def checkFileExists(path):
@@ -232,7 +225,7 @@ def matterPathFromZapPath(zap_config_path):
     if not target_path.endswith(".matter"):
         # We expect "something.zap" and don't handle corner cases of
         # multiple extensions. This is to work with existing codebase only
-        raise Exception("Unexpected input zap file  %s" % zap_config_path)
+        raise Exception(f"Unexpected input zap file  {zap_config_path}")
 
     return target_path
 
@@ -305,8 +298,7 @@ def expandPlaceholderWildcards(path: str) -> Generator[str, None, None]:
         path = path[:s] + '*' + path[e+1:]
 
     # path is a glob target, expand it
-    for result in glob.glob(path):
-        yield result
+    yield from glob.glob(path)
 
 
 def runClangPrettifier(templates_file, output_dir):
@@ -333,8 +325,9 @@ def runClangPrettifier(templates_file, output_dir):
             args = [clang_format, '-i']
             args.extend(clangOutputs)
             subprocess.check_call(args)
-            print('Formatted %d files using %s (%s)' %
-                  (len(clangOutputs), clang_format, subprocess.check_output([clang_format, '--version'])))
+            print(
+                f"Formatted {len(clangOutputs)} files using {clang_format} ({subprocess.check_output([clang_format, '--version'])})"
+            )
             for outputName in clangOutputs:
                 log.debug("Formatted: '%s'", outputName)
     except subprocess.CalledProcessError as err:
@@ -377,7 +370,6 @@ class LockFileSerializer:
 
 
 def main():
-    checkPythonVersion()
     cmdLineArgs = runArgumentsParser()
 
     with LockFileSerializer(cmdLineArgs.lock_file) as _:
@@ -412,10 +404,11 @@ def main():
             srcDir = f'{cmdLineArgs.outputDir}/{src}'
             if not os.path.exists(srcDir):
                 continue
-            print(f"Moving files from {srcDir} INTO {cmdLineArgs.outputDir}/{dest}")
-            # move all files
+            destDir = os.path.join(cmdLineArgs.outputDir, dest)
+            os.makedirs(destDir, exist_ok=True)
+            print(f"Moving files from {srcDir} INTO {destDir}")
             for name in glob.glob(f'{srcDir}/*'):
-                os.rename(name, f'{cmdLineArgs.outputDir}/{dest}/{os.path.basename(name)}')
+                os.replace(name, os.path.join(destDir, os.path.basename(name)))
             os.rmdir(srcDir)
 
     if cmdLineArgs.prettify_output:
@@ -429,7 +422,7 @@ def main():
     if cmdLineArgs.delete_output_dir:
         shutil.rmtree(cmdLineArgs.outputDir)
     else:
-        print("Files generated in: %s" % cmdLineArgs.outputDir)
+        print(f"Files generated in: {cmdLineArgs.outputDir}")
 
 
 if __name__ == '__main__':

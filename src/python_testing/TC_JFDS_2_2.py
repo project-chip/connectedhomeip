@@ -28,6 +28,7 @@
 #       --string-arg jfc_server_app:${JF_CONTROL_APP}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -90,29 +91,51 @@ class TC_JFDS_2_2(MatterBaseTest):
         # Initialize Ecosystem A
         #
         #####################################################################################################################################
-        self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
+
         self.jfctrl_fabric_a_vid = random.randint(0x0001, 0xFFF0)
         self.jfadmin_fabric_a_node_id = 1
-
-        # Start Fabric A JF-Administrator App
-        self.fabric_a_admin = AppServerSubprocess(
-            jfa_server_app,
-            storage_dir=self.storage_fabric_a,
-            port=random.randint(5001, 5999),
-            discriminator=random.randint(0, 4095),
-            passcode=self.jfadmin_fabric_a_passcode,
-            extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033"])
-        self.fabric_a_admin.start(
-            expected_output="Server initialization complete",
-            timeout=10)
+        self.fabric_a_admin = None
+        # If test is executed in CI environment, start JFA app for Fabric B
+        if self.is_pics_sdk_ci_only:
+            self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
+            self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
+            self.dut_rpc_server_ip = "127.0.0.1"
+            self.dut_rpc_server_port = str(self.get_random_port())
+            # Start Fabric A JF-Administrator App
+            self.fabric_a_admin = AppServerSubprocess(
+                jfa_server_app,
+                storage_dir=self.storage_fabric_a,
+                port=self.get_random_port(),
+                discriminator=self.jfadmin_fabric_a_discriminator,
+                passcode=self.jfadmin_fabric_a_passcode,
+                extra_args=["--capabilities", "0x04", "--rpc-server-port", self.dut_rpc_server_port])
+            self.fabric_a_admin.start(
+                expected_output="Server initialization complete",
+                timeout=10)
+        else:
+            self.dut_rpc_server_ip = self.user_params.get("dut_rpc_server_ip", None)
+            if not self.dut_rpc_server_ip:
+                asserts.fail("DUT RPC server IP must be specified via --string-arg dut_rpc_server_ip:<ip_address>")
+            self.dut_rpc_server_port = self.user_params.get("dut_rpc_server_port", None)
+            if not self.dut_rpc_server_port:
+                asserts.fail("DUT RPC server PORT must be specified via --string-arg dut_rpc_server_port:<port>")
+            self.jfadmin_fabric_a_passcode = self.matter_test_config.setup_passcodes[0]
+            if not self.jfadmin_fabric_a_passcode:
+                asserts.fail(
+                    "JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
+            self.jfadmin_fabric_a_discriminator = self.matter_test_config.discriminators[0]
+            if not self.jfadmin_fabric_a_discriminator:
+                asserts.fail(
+                    "JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
 
         # Start Fabric A JF-Controller App
         self.fabric_a_ctrl = JFControllerSubprocess(
             jfc_server_app,
             "JFC_A",  # Name of the controller instance, used for logging purposes in the JF-Controller app:w
-            rpc_server_port=33033,
+            rpc_server_port=self.dut_rpc_server_port,
             storage_dir=self.storage_fabric_a,
-            vendor_id=self.jfctrl_fabric_a_vid)
+            vendor_id=self.jfctrl_fabric_a_vid,
+            extra_args=["--rpc-server-ip", self.dut_rpc_server_ip])
         self.fabric_a_ctrl.start(
             expected_output="CHIP task running",
             timeout=10)
@@ -228,7 +251,7 @@ class TC_JFDS_2_2(MatterBaseTest):
         for endpoint_id, endpoint_data in descriptor_response.items():
             if Clusters.JointFabricDatastore.id in endpoint_data[Clusters.Descriptor].serverList:
                 jfds_endpoint = endpoint_id
-                log.info(f"Found JointFabricDatastore cluster on endpoint {jfds_endpoint}")
+                log.info("Found JointFabricDatastore cluster on endpoint %s", jfds_endpoint)
                 break
 
         asserts.assert_is_not_none(jfds_endpoint, "JointFabricDatastore cluster not found on any endpoint")
@@ -252,11 +275,11 @@ class TC_JFDS_2_2(MatterBaseTest):
         step2_groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
             groupKeySetID=0x000a,
             groupKeySecurityPolicy=Clusters.JointFabricDatastore.Enums.DatastoreGroupKeySecurityPolicyEnum.kTrustFirst,
-            epochKey0=b'00000000000000000000000000000000',
+            epochKey0=bytes.fromhex('00000000000000000000000000000000'),
             epochStartTime0=2220000,
-            epochKey1=b'11111111111111111111111111111111',
+            epochKey1=bytes.fromhex('11111111111111111111111111111111'),
             epochStartTime1=2220001,
-            epochKey2=b'22222222222222222222222222222222',
+            epochKey2=bytes.fromhex('22222222222222222222222222222222'),
             epochStartTime2=2220002)
         cmd = Clusters.JointFabricDatastore.Commands.AddKeySet(step2_groupKeySet)
         try:
@@ -283,11 +306,11 @@ class TC_JFDS_2_2(MatterBaseTest):
         step4_groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
             groupKeySetID=0x000a,
             groupKeySecurityPolicy=Clusters.JointFabricDatastore.Enums.DatastoreGroupKeySecurityPolicyEnum.kTrustFirst,
-            epochKey0=b'00000000000000000000000000000000',
+            epochKey0=bytes.fromhex('00000000000000000000000000000000'),
             epochStartTime0=2220000,
-            epochKey1=b'11111111111111111111111111111111',
+            epochKey1=bytes.fromhex('11111111111111111111111111111111'),
             epochStartTime1=2220001,
-            epochKey2=b'99999999999999999999999999999999',
+            epochKey2=bytes.fromhex('99999999999999999999999999999999'),
             epochStartTime2=2220002)
         cmd = Clusters.JointFabricDatastore.Commands.AddKeySet(step4_groupKeySet)
         # Verify that the DUT responds with Status as CONSTRAINT_ERROR
@@ -302,11 +325,11 @@ class TC_JFDS_2_2(MatterBaseTest):
         step5_groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
             groupKeySetID=0x000a,
             groupKeySecurityPolicy=Clusters.JointFabricDatastore.Enums.DatastoreGroupKeySecurityPolicyEnum.kTrustFirst,
-            epochKey0=b'00000000000000000000000000000000',
+            epochKey0=bytes.fromhex('00000000000000000000000000000000'),
             epochStartTime0=2220001,
-            epochKey1=b'11111111111111111111111111111111',
+            epochKey1=bytes.fromhex('11111111111111111111111111111111'),
             epochStartTime1=2220002,
-            epochKey2=b'99999999999999999999999999999999',
+            epochKey2=bytes.fromhex('99999999999999999999999999999999'),
             epochStartTime2=2220003)
         cmd = Clusters.JointFabricDatastore.Commands.UpdateKeySet(step5_groupKeySet)
         try:
@@ -318,11 +341,11 @@ class TC_JFDS_2_2(MatterBaseTest):
         step6_groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
             groupKeySetID=0x000a,
             groupKeySecurityPolicy=2,
-            epochKey0=b'00000000000000000000000000000000',
+            epochKey0=bytes.fromhex('00000000000000000000000000000000'),
             epochStartTime0=2220001,
-            epochKey1=b'11111111111111111111111111111111',
+            epochKey1=bytes.fromhex('11111111111111111111111111111111'),
             epochStartTime1=2220002,
-            epochKey2=b'99999999999999999999999999999999',
+            epochKey2=bytes.fromhex('99999999999999999999999999999999'),
             epochStartTime2=2220003)
         cmd = Clusters.JointFabricDatastore.Commands.UpdateKeySet(step6_groupKeySet)
         try:
@@ -350,11 +373,11 @@ class TC_JFDS_2_2(MatterBaseTest):
         step8_groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
             groupKeySetID=0x0FFF,
             groupKeySecurityPolicy=Clusters.JointFabricDatastore.Enums.DatastoreGroupKeySecurityPolicyEnum.kTrustFirst,
-            epochKey0=b'00000000000000000000000000000000',
+            epochKey0=bytes.fromhex('00000000000000000000000000000000'),
             epochStartTime0=2220001,
-            epochKey1=b'11111111111111111111111111111111',
+            epochKey1=bytes.fromhex('11111111111111111111111111111111'),
             epochStartTime1=2220002,
-            epochKey2=b'99999999999999999999999999999999',
+            epochKey2=bytes.fromhex('99999999999999999999999999999999'),
             epochStartTime2=2220003)
         cmd = Clusters.JointFabricDatastore.Commands.UpdateKeySet(step8_groupKeySet)
         try:
@@ -406,11 +429,11 @@ class TC_JFDS_2_2(MatterBaseTest):
         _groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
             groupKeySetID=0x0000,
             groupKeySecurityPolicy=Clusters.JointFabricDatastore.Enums.DatastoreGroupKeySecurityPolicyEnum.kTrustFirst,
-            epochKey0=b'00000000000000000000000000000000',
+            epochKey0=bytes.fromhex('00000000000000000000000000000000'),
             epochStartTime0=2220000,
-            epochKey1=b'11111111111111111111111111111111',
+            epochKey1=bytes.fromhex('11111111111111111111111111111111'),
             epochStartTime1=2220001,
-            epochKey2=b'22222222222222222222222222222222',
+            epochKey2=bytes.fromhex('22222222222222222222222222222222'),
             epochStartTime2=2220002)
         cmd = Clusters.JointFabricDatastore.Commands.AddKeySet(_groupKeySet)
         try:

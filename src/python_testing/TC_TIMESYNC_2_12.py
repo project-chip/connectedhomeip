@@ -38,8 +38,7 @@
 import asyncio
 import contextlib
 import queue
-import typing
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from mobly import asserts
 
@@ -56,10 +55,10 @@ from matter.tlv import uint
 
 
 class TC_TIMESYNC_2_12(MatterBaseTest):
-    async def send_set_time_zone_cmd(self, tz: typing.List[Clusters.Objects.TimeSynchronization.Structs.TimeZoneStruct]) -> Clusters.Objects.TimeSynchronization.Commands.SetTimeZoneResponse:
+    async def send_set_time_zone_cmd(self, tz: list[Clusters.Objects.TimeSynchronization.Structs.TimeZoneStruct]) -> Clusters.Objects.TimeSynchronization.Commands.SetTimeZoneResponse:
         return await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetTimeZone(timeZone=tz), endpoint=self.endpoint)
 
-    async def send_set_dst_cmd(self, dst: typing.List[Clusters.Objects.TimeSynchronization.Structs.DSTOffsetStruct]) -> None:
+    async def send_set_dst_cmd(self, dst: list[Clusters.Objects.TimeSynchronization.Structs.DSTOffsetStruct]) -> None:
         await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetDSTOffset(DSTOffset=dst))
 
     async def send_set_utc_cmd(self, utc: uint) -> None:
@@ -128,10 +127,10 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
         asserts.assert_greater_equal(tz_list_size, 1, "Invalid tz list size")
 
         self.print_step(5, "TH sets two TZ items if dst_list_size > 1")
-        th_utc = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc))
+        th_utc = utc_time_in_matter_epoch(datetime.now(tz=UTC))
         tz_first = tz_struct(offset=3600, validAt=0, name="Not/Real")
         if tz_list_size > 1:
-            valid_second = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=10))
+            valid_second = utc_time_in_matter_epoch(datetime.now(tz=UTC) + timedelta(seconds=10))
             tz_second = tz_struct(offset=7200, validAt=valid_second, name="Un/Real")
             tz = [tz_first, tz_second]
             await self.send_set_time_zone_cmd(tz)

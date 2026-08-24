@@ -80,24 +80,6 @@ public:
     virtual CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                         ReadOnlyBufferBuilder<AcceptedCommandEntry> & builder)                         = 0;
 
-    /// Workaround function to report attribute change.
-    ///
-    /// When this is invoked, the caller is expected to increment the cluster data version, and the attribute path
-    /// should be marked as `dirty` by the data model provider listener so that the reporter can notify the subscriber
-    /// of attribute changes.
-    /// This function should be invoked when attribute managed by attribute access interface is modified but not
-    /// through an actual Write interaction.
-    /// For example, if the LastNetworkingStatus attribute changes because the NetworkCommissioning driver detects a
-    /// network connection status change and calls SetLastNetworkingStatusValue(). The data model provider can recognize
-    /// this change by invoking this function at the point of change.
-    ///
-    /// This is a workaround function as we cannot notify the attribute change to the data model provider. The provider
-    /// should own its data and versions.
-    ///
-    /// TODO: We should remove this function when the AttributeAccessInterface/CommandHandlerInterface is able to report
-    /// the attribute changes.
-    virtual void Temporary_ReportAttributeChanged(const AttributePathParams & path) = 0;
-
     // "convenience" functions that just return the data and ignore the error
     // This returns the `ReadOnlyBufferBuilder<..>::TakeBuffer` from their equivalent fuctions as-is,
     // even after an error (e.g. not found would return empty data).

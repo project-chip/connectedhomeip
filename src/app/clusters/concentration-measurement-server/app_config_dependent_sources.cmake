@@ -16,6 +16,6 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/concentration-measurement-cluster-objects.h"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
     "${CLUSTER_DIR}/concentration-measurement-server.h"
 )

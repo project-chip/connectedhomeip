@@ -16,10 +16,11 @@ import glob
 import logging
 import os
 import shlex
-import subprocess
 from enum import Enum, auto
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
 
 log = logging.getLogger(__name__)
@@ -37,6 +38,8 @@ class Efr32App(Enum):
     UNIT_TEST = auto()
     AIR_QUALITY_SENSOR = auto()
     CLOSURE = auto()
+    SMOKE_CO_ALARM = auto()
+    ALL_DEVICES = auto()
 
     def ExampleName(self):
         if self == Efr32App.EVSE:
@@ -59,7 +62,11 @@ class Efr32App(Enum):
             return 'air-quality-sensor-app'
         if self == Efr32App.CLOSURE:
             return 'closure-app'
-        raise Exception('Unknown app type: %r' % self)
+        if self == Efr32App.SMOKE_CO_ALARM:
+            return 'smoke-co-alarm-app'
+        if self == Efr32App.ALL_DEVICES:
+            return 'all-devices-app'
+        raise Exception(f'Unknown app type: {self!r}')
 
     def AppNamePrefix(self):
         if self == Efr32App.EVSE:
@@ -84,7 +91,11 @@ class Efr32App(Enum):
             return 'matter-silabs-air-quality-sensor-example'
         if self == Efr32App.CLOSURE:
             return 'matter-silabs-closure-example'
-        raise Exception('Unknown app type: %r' % self)
+        if self == Efr32App.SMOKE_CO_ALARM:
+            return 'matter-silabs-smoke-co-alarm-example'
+        if self == Efr32App.ALL_DEVICES:
+            return 'matter-silabs-all-devices-example'
+        raise Exception(f'Unknown app type: {self!r}')
 
     def FlashBundleName(self):
         if self == Efr32App.EVSE:
@@ -109,7 +120,11 @@ class Efr32App(Enum):
             return 'air_quality_sensor_app.flashbundle.txt'
         if self == Efr32App.CLOSURE:
             return 'closure_app.flashbundle.txt'
-        raise Exception('Unknown app type: %r' % self)
+        if self == Efr32App.SMOKE_CO_ALARM:
+            return 'smoke_co_alarm_app.flashbundle.txt'
+        if self == Efr32App.ALL_DEVICES:
+            return 'all_devices_app.flashbundle.txt'
+        raise Exception(f'Unknown app type: {self!r}')
 
     def BuildRoot(self, root):
         if self == Efr32App.UNIT_TEST:
@@ -123,18 +138,15 @@ class Efr32Board(Enum):
     BRD4317A = 3
     BRD4318A = 4
     BRD4319A = 5
-    BRD4186A = 6
-    BRD4187A = 7
-    BRD2601B = 8
-    BRD4187C = 9
-    BRD4186C = 10
-    BRD4338A = 11
-    BRD2703A = 12
-    BRD2605A = 13
-    BRD4343A = 14
-    BRD4342A = 15
-    BRD2708A = 16
-    BRD2911A = 17
+    BRD4187C = 6
+    BRD4186C = 7
+    BRD4338A = 8
+    BRD2703A = 9
+    BRD2605A = 10
+    BRD4343A = 11
+    BRD4342A = 12
+    BRD2708A = 13
+    BRD2911A = 14
 
     def GnArgName(self):
         if self == Efr32Board.BRD2704B:
@@ -147,12 +159,6 @@ class Efr32Board(Enum):
             return 'BRD4318A'
         if self == Efr32Board.BRD4319A:
             return 'BRD4319A'
-        if self == Efr32Board.BRD4186A:
-            return 'BRD4186A'
-        if self == Efr32Board.BRD4187A:
-            return 'BRD4187A'
-        if self == Efr32Board.BRD2601B:
-            return 'BRD2601B'
         if self == Efr32Board.BRD4186C:
             return 'BRD4186C'
         if self == Efr32Board.BRD4187C:
@@ -171,14 +177,15 @@ class Efr32Board(Enum):
             return 'BRD2708A'
         if self == Efr32Board.BRD2911A:
             return 'BRD2911A'
-        raise Exception('Unknown board #: %r' % self)
+        raise Exception(f'Unknown board #: {self!r}')
 
 
 class Efr32Builder(GnBuilder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: Efr32App = Efr32App.LIGHT,
                  board: Efr32Board = Efr32Board.BRD4187C,
                  chip_build_libshell: bool = False,
@@ -192,21 +199,23 @@ class Efr32Builder(GnBuilder):
                  enable_icd: bool = False,
                  enable_low_power: bool = False,
                  enable_wifi: bool = False,
-                 enable_wf200: bool = False,
                  enable_917_ncp: bool = False,
                  enable_wifi_ipv4: bool = False,
                  enable_additional_data_advertising: bool = False,
                  enable_ot_lib: bool = False,
                  enable_ot_coap_lib: bool = False,
-                 no_version: bool = False,
                  enable_917_soc: bool = False,
-                 use_rps_extension: bool = True
+                 use_rps_extension: bool = True,
+                 uart_log: bool = False,
+                 all_devices_enabled_devices=None
                  ):
-        super(Efr32Builder, self).__init__(
-            root=app.BuildRoot(root),
-            runner=runner)
+        super().__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
         self.app = app
-        self.extra_gn_options = ['silabs_board="%s"' % board.GnArgName()]
+        self.extra_gn_options = [f'silabs_board="{board.GnArgName()}"']
+        self.all_devices_enabled_devices = all_devices_enabled_devices or []
+        if self.all_devices_enabled_devices:
+            devices_str = '[' + ','.join(f'\"{d}\"' for d in self.all_devices_enabled_devices) + ']'
+            self.extra_gn_options.append(f'all_devices_enabled_devices={devices_str}')
         self.dotfile = ''
 
         if enable_rpcs:
@@ -246,12 +255,10 @@ class Efr32Builder(GnBuilder):
                 # Wifi SoC platform
                 self.extra_gn_options.append('chip_device_platform=\"SiWx917\"')
             else:
-                if enable_wf200:
-                    self.extra_gn_options.append('use_wf200=true chip_device_platform =\"efr32\"')
-                elif enable_917_ncp:
+                if enable_917_ncp:
                     self.extra_gn_options.append('use_SiWx917=true chip_device_platform =\"efr32\"')
                 else:
-                    raise Exception('Wifi usage: ...-wifi-[wf200|siwx917]-...')
+                    raise Exception('Wifi usage: ...-wifi-[siwx917]-...')
 
         if enable_wifi_ipv4:
             self.extra_gn_options.append('chip_enable_wifi_ipv4=true')
@@ -268,15 +275,11 @@ class Efr32Builder(GnBuilder):
                 'use_silabs_thread_lib=true chip_openthread_target="../silabs:ot-efr32-cert" '
                 'use_thread_coap_lib=true openthread_external_platform=""')
 
-        if not no_version:
-            shortCommitSha = subprocess.check_output(
-                ['git', 'describe', '--always', '--dirty', '--exclude', '*']).decode('ascii').strip()
-            branchName = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).decode('ascii').strip()
-            self.extra_gn_options.append(
-                'sl_matter_version_str="v1.3-%s-%s"' % (branchName, shortCommitSha))
-
         if use_rps_extension is False:
             self.extra_gn_options.append('use_rps_extension=false')
+
+        if uart_log is True:
+            self.extra_gn_options.append('sl_uart_log_output=true')
 
         if "GSDK_ROOT" in os.environ:
             # EFR32 SDK is very large. If the SDK path is already known (the
@@ -296,11 +299,12 @@ class Efr32Builder(GnBuilder):
         args.extend(self.extra_gn_options)
         return args
 
+    @lock_output_dir
     def _bundle(self):
         # Only unit-test needs to generate the flashbundle here.  All other examples will generate a flashbundle via the silabs_executable template.
         if self.app == Efr32App.UNIT_TEST:
             flash_bundle_path = os.path.join(self.output_dir, self.app.FlashBundleName())
-            log.info(f'Generating flashbundle {flash_bundle_path}')
+            log.info('Generating flashbundle %s', flash_bundle_path)
 
             patterns = [
                 os.path.join(self.output_dir, "tests", "*.flash.py"),
@@ -318,6 +322,7 @@ class Efr32Builder(GnBuilder):
             with open(flash_bundle_path, 'w') as bundle_file:
                 bundle_file.write("\n".join(files))
 
+    @lock_output_dir
     def build_outputs(self):
         extensions = ["out", "hex"]
         if self.options.enable_link_map_file:
@@ -343,6 +348,7 @@ class Efr32Builder(GnBuilder):
                         os.path.join(root, file),
                         os.path.join("chip_pw_test_runner_wheels", file))
 
+    @lock_output_dir
     def bundle_outputs(self):
         # If flashbundle creation is enabled, the outputs will include the s37 and flash.py files, plus the two firmware utils scripts that support flash.py.
         # For the unit-test example, there will be a s37 and flash.py file for each unit test source.
@@ -356,17 +362,18 @@ class Efr32Builder(GnBuilder):
                     sourcepath,
                     os.path.join("flashbundle", name))
 
+    @lock_output_dir
     def generate(self, dedup=False):
         cmd = [
             'gn', 'gen', '--check', '--fail-on-unused-args',
             '--add-export-compile-commands=*',
-            '--root=%s' % self.root
+            f'--root={self.root}'
         ]
         if self.dotfile:
-            cmd += ['--dotfile=%s' % self.dotfile]
+            cmd += [f'--dotfile={self.dotfile}']
 
         if args := self.GnBuildArgs():
-            cmd += ['--args=%s' % ' '.join(args)]
+            cmd += [f"--args={' '.join(args)}"]
 
         cmd += [self.output_dir]
 
@@ -375,7 +382,7 @@ class Efr32Builder(GnBuilder):
             # setting environment variables
             cmd = [
                 'bash', '-c', '\n' + ' '.join(
-                    ['%s="%s" \\\n' % (key, value) for key, value in env.items()] +
+                    [f'{key}="{value}" \\\n' for key, value in env.items()] +
                     [shlex.join(cmd)]
                 )
             ]

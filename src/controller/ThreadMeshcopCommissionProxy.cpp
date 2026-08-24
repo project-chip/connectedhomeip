@@ -20,11 +20,14 @@
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/dnssd/TxtFields.h>
-#include <lib/dnssd/minimal_mdns/core/QNameString.h> // nogncheck
+#include <lib/dnssd/wire/QNameString.h> // nogncheck
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <transport/raw/MessageHeader.h>
+
+#include <json/json.h>
 
 #include <errno.h>
 #include <inttypes.h>
@@ -64,6 +67,7 @@ std::vector<uint8_t> DiscoveryCodeToVector(Thread::DiscoveryCode code)
     Encoding::BigEndian::Put64(bytes, code.AsUInt64());
     return std::vector<uint8_t>(bytes, bytes + sizeof(bytes));
 }
+
 } // namespace
 
 namespace chip {
@@ -76,7 +80,7 @@ ThreadMeshcopCommissionProxy::ThreadMeshcopCommissionProxy() : mState(State::kCo
 
 ThreadMeshcopCommissionProxy::~ThreadMeshcopCommissionProxy()
 {
-    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    std::unique_lock<std::recursive_mutex> lock(mMutex);
     if (mProxyFd != -1)
     {
         if (shutdown(mProxyFd, SHUT_RDWR) == 0 || errno != EBADF)
@@ -89,8 +93,32 @@ ThreadMeshcopCommissionProxy::~ThreadMeshcopCommissionProxy()
 
     if (mProxyThread.joinable())
     {
+        lock.unlock();
         mProxyThread.join();
     }
+}
+
+void ThreadMeshcopCommissionProxy::ResetCommissionerForDiscovery()
+{
+    std::unique_lock<std::recursive_mutex> lock(mMutex);
+    if (mProxyFd != -1)
+    {
+        if (shutdown(mProxyFd, SHUT_RDWR) == 0 || errno != EBADF)
+        {
+            close(mProxyFd);
+        }
+        mProxyFd = -1;
+    }
+
+    if (mProxyThread.joinable())
+    {
+        lock.unlock();
+        mProxyThread.join();
+        lock.lock();
+    }
+
+    mServicePort  = 0;
+    mCommissioner = ot::commissioner::Commissioner::Create(*this);
 }
 
 void ThreadMeshcopCommissionProxy::SetState(State state)
@@ -98,44 +126,44 @@ void ThreadMeshcopCommissionProxy::SetState(State state)
     mState = state;
 }
 
-void ThreadMeshcopCommissionProxy::OnHeader(mdns::Minimal::ConstHeaderRef & header)
+void ThreadMeshcopCommissionProxy::OnHeader(chip::Dnssd::ConstHeaderRef & header)
 {
     ChipLogDetail(Controller, "mDNS Response: ID=%u, Answers=%u, Additional=%u", header.GetMessageId(), header.GetAnswerCount(),
                   header.GetAdditionalCount());
 }
 
-void ThreadMeshcopCommissionProxy::OnQuery(const mdns::Minimal::QueryData & data)
+void ThreadMeshcopCommissionProxy::OnQuery(const chip::Dnssd::QueryData & data)
 {
     if (mState != State::kDiscovering)
     {
         ChipLogProgress(Controller, "Received mDNS query but proxy is not in discovery state");
     }
 
-    ChipLogDetail(Controller, "mDNS query: %s", mdns::Minimal::QNameString(data.GetName()).c_str());
+    ChipLogDetail(Controller, "mDNS query: %s", chip::Dnssd::QNameString(data.GetName()).c_str());
     mNodeData.Set<Dnssd::CommissionNodeData>();
 }
 
-void ThreadMeshcopCommissionProxy::OnResource(mdns::Minimal::ResourceType section, const mdns::Minimal::ResourceData & data)
+void ThreadMeshcopCommissionProxy::OnResource(chip::Dnssd::ResourceType section, const chip::Dnssd::ResourceData & data)
 {
     if (mState != State::kDiscovering)
     {
         return;
     }
 
-    auto name             = mdns::Minimal::QNameString(data.GetName());
+    auto name             = chip::Dnssd::QNameString(data.GetName());
     auto & commissionData = mNodeData.Get<Dnssd::CommissionNodeData>();
 
     commissionData.threadMeshcop = true;
 
     switch (data.GetType())
     {
-    case mdns::Minimal::QType::A:
-    case mdns::Minimal::QType::AAAA:
+    case chip::Dnssd::QType::A:
+    case chip::Dnssd::QType::AAAA:
         Platform::CopyString(commissionData.hostName, name.c_str());
         break;
 
-    case mdns::Minimal::QType::SRV: {
-        mdns::Minimal::SrvRecord srv;
+    case chip::Dnssd::QType::SRV: {
+        chip::Dnssd::SrvRecord srv;
         if (!srv.Parse(data.GetData(), mDnsPacket))
         {
             ChipLogError(Controller, "Failed to parse mDNS SRV record");
@@ -171,8 +199,8 @@ void ThreadMeshcopCommissionProxy::OnResource(mdns::Minimal::ResourceType sectio
         break;
     }
 
-    case mdns::Minimal::QType::TXT:
-        mdns::Minimal::ParseTxtRecord(data.GetData(), this);
+    case chip::Dnssd::QType::TXT:
+        chip::Dnssd::ParseTxtRecord(data.GetData(), this);
         break;
 
     default:
@@ -214,7 +242,62 @@ CHIP_ERROR ThreadMeshcopCommissionProxy::CreateProxySocket(chip::Dnssd::Commissi
     return CHIP_NO_ERROR;
 }
 
-void ThreadMeshcopCommissionProxy::OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value)
+std::string ThreadMeshcopCommissionProxy::GetLastDiscoveryDiagnosticJson()
+{
+    DiscoveryDiagnostic diagnostic;
+    {
+        std::lock_guard<std::recursive_mutex> lock(mMutex);
+        diagnostic = mLastDiscoveryDiagnostic;
+    }
+
+    Json::Value root(Json::objectValue);
+    Json::StreamWriterBuilder writerBuilder;
+
+    char steeringDataHex[ot::commissioner::kMaxSteeringDataLength * 2 + 1];
+    char rotatingIdHex[Dnssd::kMaxRotatingIdLen * 2 + 1];
+    if (Encoding::BytesToUppercaseHexString(diagnostic.steeringData.data(), diagnostic.steeringData.size(), steeringDataHex,
+                                            sizeof(steeringDataHex)) != CHIP_NO_ERROR)
+    {
+        diagnostic.valid = false;
+    }
+    if (Encoding::BytesToUppercaseHexString(diagnostic.commissionData.rotatingId, diagnostic.commissionData.rotatingIdLen,
+                                            rotatingIdHex, sizeof(rotatingIdHex)) != CHIP_NO_ERROR)
+    {
+        diagnostic.valid = false;
+    }
+    root["valid"] = diagnostic.valid;
+    if (!diagnostic.valid)
+    {
+        return Json::writeString(writerBuilder, root);
+    }
+
+    root["requested_discriminator_type"] = diagnostic.requestedShort ? "short" : "long";
+    root["requested_discriminator"]      = static_cast<Json::Value::UInt>(diagnostic.requestedValue);
+    root["expected_long_discriminator"]  = static_cast<Json::Value::UInt>(diagnostic.expectedLongValue);
+    root["discovery_code"]               = static_cast<Json::Value::UInt64>(diagnostic.discoveryCode);
+    root["steering_data_hex"]            = steeringDataHex;
+    root["joiner_id"]                    = static_cast<Json::Value::UInt64>(diagnostic.joinerId);
+    root["joiner_udp_port"]              = static_cast<Json::Value::UInt>(diagnostic.joinerUdpPort);
+
+    Json::Value dnsAnnouncement(Json::objectValue);
+    dnsAnnouncement["long_discriminator"] = static_cast<Json::Value::UInt>(diagnostic.commissionData.longDiscriminator);
+    dnsAnnouncement["commissioning_mode"] = static_cast<Json::Value::UInt>(diagnostic.commissionData.commissioningMode);
+    dnsAnnouncement["device_type"]        = static_cast<Json::Value::UInt>(diagnostic.commissionData.deviceType);
+    dnsAnnouncement["vendor_id"]          = static_cast<Json::Value::UInt>(diagnostic.commissionData.vendorId);
+    dnsAnnouncement["product_id"]         = static_cast<Json::Value::UInt>(diagnostic.commissionData.productId);
+    dnsAnnouncement["pairing_hint"]       = static_cast<Json::Value::UInt>(diagnostic.commissionData.pairingHint);
+    dnsAnnouncement["service_port"]       = static_cast<Json::Value::UInt>(diagnostic.matterUdpPort);
+    dnsAnnouncement["thread_meshcop"]     = diagnostic.commissionData.threadMeshcop;
+    dnsAnnouncement["supports_commissioner_generated_passcode"] = diagnostic.commissionData.supportsCommissionerGeneratedPasscode;
+    dnsAnnouncement["instance_name"]                            = diagnostic.commissionData.instanceName;
+    dnsAnnouncement["hostname"]                                 = diagnostic.commissionData.hostName;
+    dnsAnnouncement["rotating_id_hex"]                          = rotatingIdHex;
+    root["dns_announcement"]                                    = dnsAnnouncement;
+
+    return Json::writeString(writerBuilder, root);
+}
+
+void ThreadMeshcopCommissionProxy::OnRecord(const chip::Dnssd::BytesRange & name, const chip::Dnssd::BytesRange & value)
 {
     ByteSpan key(name.Start(), name.Size());
     ByteSpan val(value.Start(), value.Size());
@@ -233,9 +316,9 @@ void ThreadMeshcopCommissionProxy::ProcessAnnouncement(const std::vector<uint8_t
     }
 
     mNodeData.Set<Dnssd::CommissionNodeData>();
-    mDnsPacket = mdns::Minimal::BytesRange(payload.data(), payload.data() + payload.size());
+    mDnsPacket = chip::Dnssd::BytesRange(payload.data(), payload.data() + payload.size());
 
-    if (!mdns::Minimal::ParsePacket(mDnsPacket, this))
+    if (!chip::Dnssd::ParsePacket(mDnsPacket, this))
     {
         ChipLogError(Controller, "Failed to parse joiner mDNS announcement");
         return;
@@ -253,6 +336,12 @@ void ThreadMeshcopCommissionProxy::ProcessAnnouncement(const std::vector<uint8_t
 
     mDiscoveredNodePromise.set_value(mNodeData);
     mPromiseFulfilled = true;
+
+    mLastDiscoveryDiagnostic.valid          = true;
+    mLastDiscoveryDiagnostic.joinerId       = JoinerIdFromBytes(joinerIdBytes);
+    mLastDiscoveryDiagnostic.joinerUdpPort  = joinerPort;
+    mLastDiscoveryDiagnostic.matterUdpPort  = mServicePort;
+    mLastDiscoveryDiagnostic.commissionData = mNodeData.Get<Dnssd::CommissionNodeData>();
 
     SetState(State::kDiscovered);
 
@@ -399,6 +488,7 @@ CHIP_ERROR ThreadMeshcopCommissionProxy::Discover(ByteSpan & pskc, const Transpo
     using ot::commissioner::Error;
 
     Error error;
+    ResetCommissionerForDiscovery();
 
     // Reset the promise and state for a new discovery session
     std::future<Dnssd::DiscoveredNodeData> future;
@@ -406,10 +496,17 @@ CHIP_ERROR ThreadMeshcopCommissionProxy::Discover(ByteSpan & pskc, const Transpo
         std::lock_guard<std::recursive_mutex> lock(mMutex);
         mExpectedDiscriminator = expectedDiscriminator;
         SetState(State::kConnecting);
-        mDiscoveredNodePromise = std::promise<Dnssd::DiscoveredNodeData>();
-        future                 = mDiscoveredNodePromise.get_future();
-        mPromiseFulfilled      = false;
-        mJoinerId              = 0;
+        mDiscoveredNodePromise                  = std::promise<Dnssd::DiscoveredNodeData>();
+        future                                  = mDiscoveredNodePromise.get_future();
+        mPromiseFulfilled                       = false;
+        mJoinerId                               = 0;
+        mLastDiscoveryDiagnostic                = DiscoveryDiagnostic();
+        mLastDiscoveryDiagnostic.requestedShort = expectedDiscriminator.IsShortDiscriminator();
+        mLastDiscoveryDiagnostic.requestedValue =
+            mLastDiscoveryDiagnostic.requestedShort ? expectedDiscriminator.GetShortValue() : expectedDiscriminator.GetLongValue();
+        mLastDiscoveryDiagnostic.expectedLongValue =
+            expectedDiscriminator.IsShortDiscriminator() ? 0 : expectedDiscriminator.GetLongValue();
+        mLastDiscoveryDiagnostic.discoveryCode = code.AsUInt64();
     }
 
     ReturnErrorOnFailure(InitializeCommissioner(pskc));
@@ -431,7 +528,13 @@ CHIP_ERROR ThreadMeshcopCommissionProxy::Discover(ByteSpan & pskc, const Transpo
         ChipLogProgress(Controller, "Thread Commissioner active with ID: %s", id.c_str());
     }
 
-    error = mCommissioner->SetCommissionerDataset(MakeCommissionerDataset(code));
+    auto commissionerDataset = MakeCommissionerDataset(code);
+    {
+        std::lock_guard<std::recursive_mutex> lock(mMutex);
+        mLastDiscoveryDiagnostic.steeringData = commissionerDataset.mSteeringData;
+    }
+
+    error = mCommissioner->SetCommissionerDataset(commissionerDataset);
     if (error != ot::commissioner::ErrorCode::kNone)
     {
         ChipLogError(Controller, "Failed to set Steering Data: %s", error.GetMessage().c_str());

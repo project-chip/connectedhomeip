@@ -74,7 +74,7 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         uint16_t endpointTableSize = 0;
-        VerifyOrDie(Attributes::SceneTableSize::Get(endpointId, &endpointTableSize) ==
+        VerifyOrDie(Attributes::SceneTableSize::GetDefault(endpointId, &endpointTableSize) ==
                     Protocols::InteractionModel::Status::Success);
 
         // Guaranteed non-null: if CreateRegistration is called, this means the ember cluster
@@ -168,21 +168,6 @@ void ScenesServer::GroupWillBeRemoved(FabricIndex aFabricIx, EndpointId aEndpoin
     VerifyOrReturn(cluster != nullptr);
 
     LogErrorOnFailure(cluster->GroupWillBeRemoved(aFabricIx, aGroupId));
-}
-
-void ScenesServer::MakeSceneInvalid(EndpointId aEndpointId, FabricIndex aFabricIx)
-{
-    ScenesManagementCluster * cluster = FindClusterOnEndpoint(aEndpointId);
-    VerifyOrReturn(cluster != nullptr);
-
-    LogErrorOnFailure(cluster->MakeSceneInvalid(aFabricIx));
-}
-
-void ScenesServer::MakeSceneInvalidForAllFabrics(EndpointId aEndpointId)
-{
-    ScenesManagementCluster * cluster = FindClusterOnEndpoint(aEndpointId);
-    VerifyOrReturn(cluster != nullptr);
-    LogErrorOnFailure(cluster->MakeSceneInvalidForAllFabrics());
 }
 
 void ScenesServer::StoreCurrentScene(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId, SceneId aSceneId)

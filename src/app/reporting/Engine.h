@@ -24,11 +24,11 @@
 
 #pragma once
 
+#include "app/data-model-provider/AttributeChangeListener.h"
 #include <access/AccessControl.h>
 #include <app/EventReporter.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/ReadHandler.h>
-#include <app/data-model-provider/ProviderChangeListener.h>
 #include <app/reporting/Generations.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
@@ -58,7 +58,7 @@ namespace reporting {
  *         At its core, it  tries to gather and pack as much relevant attributes changes and/or events as possible into a report
  * message before sending that to the reader. It continues to do so until it has no more work to do.
  */
-class Engine : public DataModel::ProviderChangeListener, public EventReporter
+class Engine : public EventReporter, public DataModel::AttributeChangeListener
 {
 public:
     /**
@@ -131,8 +131,9 @@ public:
     size_t GetGlobalDirtySetSize() { return mGlobalDirtySet.Allocated(); }
 #endif
 
-    /* ProviderChangeListener implementation */
-    void MarkDirty(const AttributePathParams & path) override;
+    // DataModel::AttributeChangeListener implementation
+    void OnAttributeChanged(const ConcreteAttributePath & path, DataModel::AttributeChangeType type) override;
+    void OnEndpointChanged(EndpointId endpointId, DataModel::EndpointChangeType type) override;
 
 private:
     /**

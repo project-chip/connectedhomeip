@@ -51,8 +51,6 @@ public:
                                         FabricIndex accessingFabric) override
     {}
 
-    void Temporary_ReportAttributeChanged(const app::AttributePathParams & path) override;
-
     ActionReturnStatus ReadAttribute(const app::DataModel::ReadAttributeRequest & request,
                                      app::AttributeValueEncoder & encoder) override;
     ActionReturnStatus WriteAttribute(const app::DataModel::WriteAttributeRequest & request,

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -87,15 +87,16 @@ void EnergyEvseMode::Shutdown()
     gEnergyEvseModeDelegate.reset();
 }
 
-void emberAfEnergyEvseModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterEnergyEvseModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(!gEnergyEvseModeDelegate && !gEnergyEvseModeInstance);
     gEnergyEvseModeDelegate = std::make_unique<EnergyEvseMode::EnergyEvseModeDelegate>();
-    gEnergyEvseModeInstance = std::make_unique<ModeBase::Instance>(gEnergyEvseModeDelegate.get(), 0x1, EnergyEvseMode::Id, 0);
+    gEnergyEvseModeInstance =
+        std::make_unique<ModeBase::Instance>(gEnergyEvseModeDelegate.get(), endpointId, EnergyEvseMode::Id, 0);
     TEMPORARY_RETURN_IGNORED gEnergyEvseModeInstance->Init();
 }
 
-void emberAfEnergyEvseModeClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterEnergyEvseModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     if (gEnergyEvseModeInstance)
     {

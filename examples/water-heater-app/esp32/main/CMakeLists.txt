@@ -52,5 +52,10 @@ idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
 
 target_compile_options(${COMPONENT_LIB} PRIVATE "-Wno-format-nonliteral")
 
+include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
+chip_configure_data_model(${COMPONENT_LIB}
+    ZAP_FILE ${WATER_HEATER_COMMON_DIR}/water-heater-app.zap
+)
+
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
 target_compile_options(${COMPONENT_LIB} PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:-std=gnu++17>")

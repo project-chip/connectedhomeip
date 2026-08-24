@@ -14,6 +14,7 @@ Property 4: Decode logic equivalence for casting clusters
 
 import os
 import re
+from pathlib import Path
 
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
@@ -22,14 +23,14 @@ from hypothesis import strategies as st
 # Paths
 # ---------------------------------------------------------------------------
 
-REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+REPO_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
 SLIM_ATTR_DECODER = os.path.join(
     REPO_ROOT,
     "examples",
     "tv-casting-app",
     "tv-casting-common",
-    "casting-CHIPAttributeTLVValueDecoder.cpp",
+    "CHIPAttributeTLVValueDecoder-override.cpp",
 )
 
 FULL_ATTR_DECODER = os.path.join(
@@ -46,7 +47,7 @@ SLIM_EVENT_DECODER = os.path.join(
     "examples",
     "tv-casting-app",
     "tv-casting-common",
-    "casting-CHIPEventTLVValueDecoder.cpp",
+    "CHIPEventTLVValueDecoder-override.cpp",
 )
 
 FULL_EVENT_DECODER = os.path.join(

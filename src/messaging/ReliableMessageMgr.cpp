@@ -540,21 +540,30 @@ void ReliableMessageMgr::SetAdditionalMRPBackoffTime(const Optional<System::Cloc
 
 void ReliableMessageMgr::CalculateNextRetransTime(RetransTableEntry & entry)
 {
-    System::Clock::Timeout baseTimeout = System::Clock::Timeout(0);
-    const auto sessionHandle           = entry.ec->GetSessionHandle();
+    const auto sessionHandle = entry.ec->GetSessionHandle();
 
-    // Check if we have received at least one application-level message
-    if (entry.ec->HasReceivedAtLeastOneMessage())
-    {
-        // If we have received at least one message, assume peer is active and use ActiveRetransTimeout
-        baseTimeout = sessionHandle->GetRemoteMRPConfig().mActiveRetransTimeout;
-    }
-    else
-    {
-        // If we haven't received at least one message
-        // Choose active/idle timeout from PeerActiveMode of session per 4.11.2.1. Retransmissions.
-        baseTimeout = sessionHandle->GetMRPBaseTimeout();
-    }
+    // Per Matter Core spec §4.11.2.1 Retransmissions: choose the Active or Idle
+    // base timeout based on the peer's CURRENT activity mode at the moment we
+    // schedule the retransmit. The peer may have been Active when it last sent
+    // us a message in this exchange, but transitioned back to Idle once its
+    // Session Active Threshold (SAT) elapsed.
+    //
+    // For Intermittently Connected Devices (ICDs) where SAI ≪ SII, an earlier
+    // shortcut here pinned to ActiveRetransTimeout (SAI) for the remainder of
+    // the exchange as soon as one message had been received. That caused every
+    // subsequent retransmit to be scheduled well inside the peer's sleep
+    // window, defeating reliable delivery. A common failure mode is CASE Sigma3
+    // to a sleepy device: the just-received Sigma2 marks the exchange "has
+    // received a message", so Sigma3 retransmits were spaced on SAI-derived
+    // backoff (sub-second to a few seconds) instead of the SII-derived spacing
+    // the ICD actually polls on (multiple seconds), and the device never
+    // observed any of them.
+    //
+    // GetMRPBaseTimeout() re-evaluates IsPeerActive() against SAT on every
+    // call, returning ActiveRetransTimeout (SAI) while the peer is in its
+    // Active window and IdleRetransTimeout (SII) afterward, which is the
+    // behavior the spec actually prescribes.
+    System::Clock::Timeout baseTimeout = sessionHandle->GetMRPBaseTimeout();
 
     System::Clock::Timeout backoff = ReliableMessageMgr::GetBackoff(baseTimeout, entry.sendCount);
     entry.nextRetransTime          = System::SystemClock().GetMonotonicTimestamp() + backoff;

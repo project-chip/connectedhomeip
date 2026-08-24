@@ -32,4 +32,11 @@ id _Nullable MTRDecodeAttributeValue(const chip::app::ConcreteAttributePath & aP
 id _Nullable MTRDecodeAttributeValue(const chip::app::ConcreteAttributePath & aPath, const chip::app::ClusterStateCache & aCache,
                                      CHIP_ERROR * aError);
 
+// Decodes an attribute value for private clusters or private extensions on spec clusters.
+// Returns CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB in *aError for unknown paths, matching
+// MTRDecodeAttributeValue's convention. Call as a fallback only when MTRDecodeAttributeValue
+// has already reported CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB.
+id _Nullable MTRPrivateDecodeAttributeValue(const chip::app::ConcreteAttributePath & aPath, chip::TLV::TLVReader & aReader,
+                                            CHIP_ERROR * aError);
+
 NS_ASSUME_NONNULL_END

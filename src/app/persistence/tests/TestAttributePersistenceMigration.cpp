@@ -17,32 +17,66 @@
 
 #include <app/ConcreteAttributePath.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
+#include <app/data-model/Nullable.h>
 #include <app/persistence/AttributePersistenceMigration.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
-#include <lib/support/DefaultStorageKeyAllocator.h>
-#include <lib/support/Scoped.h>
 #include <lib/support/Span.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+
+#include <cstring>
 
 namespace {
 
 using namespace chip;
 using namespace chip::app;
 
-// Used by TestMigrationDeletesFromSafeOnWriteFailure to poison the normal-provider
-// key after the initial ReadValue check has already passed.
-TestPersistentStorageDelegate * sStorageDelegateForPoisoning = nullptr;
-
-CHIP_ERROR PoisonAfterReadMigrator(const ConcreteAttributePath & attrPath, SafeAttributePersistenceProvider & provider,
-                                   MutableByteSpan & buffer)
+// A test-only provider that always fails on WriteValue, used to verify
+// that the safe value is deleted even when the destination write fails.
+class WriteFailingAttributeProvider : public DefaultAttributePersistenceProvider
 {
-    CHIP_ERROR err = DefaultMigrators::ScalarValue<uint32_t>(attrPath, provider, buffer);
-    // Poison the normal provider key now, after ReadValue already returned CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND
-    sStorageDelegateForPoisoning->AddPoisonKey(
-        DefaultStorageKeyAllocator::AttributeValue(attrPath.mEndpointId, attrPath.mClusterId, attrPath.mAttributeId).KeyName());
-    return err;
+public:
+    CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) override
+    {
+        return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    }
+};
+
+void ExpectSafeReadNotFound(DefaultSafeAttributePersistenceProvider & provider, const ConcreteAttributePath & path)
+{
+    uint8_t readBuf[sizeof(uint8_t)] = {};
+    MutableByteSpan readBuffer(readBuf);
+    EXPECT_EQ(provider.SafeReadValue(path, readBuffer), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+}
+
+void ExpectDstReadNotFound(DefaultAttributePersistenceProvider & provider, const ConcreteAttributePath & path)
+{
+    uint8_t readBuf[sizeof(uint8_t)] = {};
+    MutableByteSpan readBuffer(readBuf);
+    EXPECT_EQ(provider.ReadValue(path, readBuffer), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+}
+
+void ExpectDstUint8(DefaultAttributePersistenceProvider & provider, const ConcreteAttributePath & path, uint8_t expected)
+{
+    uint8_t readBuf[sizeof(uint8_t)] = {};
+    MutableByteSpan readBuffer(readBuf);
+    EXPECT_EQ(provider.ReadValue(path, readBuffer), CHIP_NO_ERROR);
+    ASSERT_EQ(readBuffer.size(), sizeof(uint8_t));
+    EXPECT_EQ(readBuffer.data()[0], expected);
+}
+
+void ExpectDstNullableUint8(DefaultAttributePersistenceProvider & provider, const ConcreteAttributePath & path,
+                            const DataModel::Nullable<uint8_t> & expected)
+{
+    NumericAttributeTraits<uint8_t>::StorageType expectedStorage;
+    DataModel::NullableToStorage(expected, expectedStorage);
+
+    uint8_t readBuf[sizeof(uint8_t)] = {};
+    MutableByteSpan readBuffer(readBuf);
+    EXPECT_EQ(provider.ReadValue(path, readBuffer), CHIP_NO_ERROR);
+    ASSERT_EQ(readBuffer.size(), sizeof(uint8_t));
+    EXPECT_EQ(readBuffer.data()[0], expectedStorage);
 }
 
 // Single attribute migrated successfully: value appears in AttributePersistence, deleted from SafeAttribute.
@@ -63,7 +97,7 @@ TEST(TestAttributePersistenceMigration, TestMigrationSuccess)
 
     // Run migration
     const AttrMigrationData attributesToMigrate[] = {
-        { 3, &DefaultMigrators::ScalarValue<uint32_t> },
+        { 3, sizeof(uint32_t), true },
     };
     uint8_t buf[128] = {};
     MutableByteSpan buffer(buf);
@@ -105,7 +139,7 @@ TEST(TestAttributePersistenceMigration, TestMigrationSkipsAbsentAttribute)
     // Don't write anything to the safe provider
 
     const AttrMigrationData attributesToMigrate[] = {
-        { 3, &DefaultMigrators::ScalarValue<uint32_t> },
+        { 3, sizeof(uint32_t), true },
     };
     uint8_t buf[128] = {};
     MutableByteSpan buffer(buf);
@@ -128,11 +162,9 @@ TEST(TestAttributePersistenceMigration, TestMigrationSkipsAbsentAttribute)
 TEST(TestAttributePersistenceMigration, TestMigrationDeletesFromSafeOnWriteFailure)
 {
     TestPersistentStorageDelegate storageDelegate;
-    ScopedChange ptrGuard(sStorageDelegateForPoisoning, &storageDelegate);
-
-    DefaultAttributePersistenceProvider ramProvider;
+    WriteFailingAttributeProvider failingProvider;
     DefaultSafeAttributePersistenceProvider safeRamProvider;
-    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+    ASSERT_EQ(failingProvider.Init(&storageDelegate), CHIP_NO_ERROR);
     ASSERT_EQ(safeRamProvider.Init(&storageDelegate), CHIP_NO_ERROR);
 
     const ConcreteAttributePath path(1, 2, 3);
@@ -143,12 +175,12 @@ TEST(TestAttributePersistenceMigration, TestMigrationDeletesFromSafeOnWriteFailu
     ASSERT_EQ(safeRamProvider.WriteScalarValue(path, kValueToStore), CHIP_NO_ERROR);
 
     const AttrMigrationData attributesToMigrate[] = {
-        { 3, &PoisonAfterReadMigrator },
+        { 3, sizeof(uint32_t), true },
     };
     uint8_t buf[128] = {};
     MutableByteSpan buffer(buf);
     EXPECT_NE(
-        MigrateFromSafeToAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
+        MigrateFromSafeToAttributePersistenceProvider(safeRamProvider, failingProvider, cluster, Span(attributesToMigrate), buffer),
         CHIP_NO_ERROR);
 
     // Value should still be deleted from the safe provider
@@ -175,7 +207,7 @@ TEST(TestAttributePersistenceMigration, TestMigrationTwice)
     ASSERT_EQ(safeRamProvider.WriteScalarValue(path, kValueToStore), CHIP_NO_ERROR);
 
     const AttrMigrationData attributesToMigrate[] = {
-        { 3, &DefaultMigrators::ScalarValue<uint32_t> },
+        { 3, sizeof(uint32_t), true },
     };
     uint8_t buf[128] = {};
     MutableByteSpan buffer(buf);
@@ -226,8 +258,8 @@ TEST(TestAttributePersistenceMigration, TestMultipleAttributesMixedPresence)
     ASSERT_EQ(safeRamProvider.WriteScalarValue(pathB, kValueB), CHIP_NO_ERROR);
 
     const AttrMigrationData attributesToMigrate[] = {
-        { 3, &DefaultMigrators::ScalarValue<uint32_t> },
-        { 4, &DefaultMigrators::ScalarValue<uint32_t> },
+        { 3, sizeof(uint32_t), true },
+        { 4, sizeof(uint32_t), true },
     };
     uint8_t buf[128] = {};
     MutableByteSpan buffer(buf);
@@ -281,8 +313,8 @@ TEST(TestAttributePersistenceMigration, TestMultipleAttributesAllPresent)
     ASSERT_EQ(safeRamProvider.WriteScalarValue(pathB, kValueB), CHIP_NO_ERROR);
 
     const AttrMigrationData attributesToMigrate[] = {
-        { 3, &DefaultMigrators::ScalarValue<uint32_t> },
-        { 4, &DefaultMigrators::ScalarValue<uint32_t> },
+        { 3, sizeof(uint32_t), true },
+        { 4, sizeof(uint32_t), true },
     };
     uint8_t buf[128] = {};
     MutableByteSpan buffer(buf);
@@ -359,9 +391,9 @@ TEST(TestAttributePersistenceMigration, TestMigrationWithSafeValueMigrator)
     const uint8_t kRawValue[] = { 0xDE, 0xAD, 0xBE, 0xEF };
     ASSERT_EQ(safeRamProvider.SafeWriteValue(path, ByteSpan(kRawValue)), CHIP_NO_ERROR);
 
-    // Migrate using SafeValue (raw byte migrator)
+    // Migrate raw bytes using AttrMigrationData { valueSize, isScalar }.
     const AttrMigrationData attributesToMigrate[] = {
-        { 3, &DefaultMigrators::SafeValue },
+        { 3, sizeof(kRawValue), false },
     };
     uint8_t buf[128] = {};
     MutableByteSpan buffer(buf);
@@ -386,8 +418,8 @@ TEST(TestAttributePersistenceMigration, TestMigrationWithSafeValueMigrator)
     }
 }
 
-// Null migrator: reports failure for the null entry but still migrates the valid entry.
-TEST(TestAttributePersistenceMigration, TestMigrationWithNullMigrator)
+// Invalid scalar size: reports failure for the invalid entry but still migrates the valid entry.
+TEST(TestAttributePersistenceMigration, TestMigrationWithInvalidScalarSize)
 {
     TestPersistentStorageDelegate storageDelegate;
     DefaultAttributePersistenceProvider ramProvider;
@@ -400,17 +432,19 @@ TEST(TestAttributePersistenceMigration, TestMigrationWithNullMigrator)
     const ConcreteClusterPath cluster(1, 2);
     constexpr uint32_t kValueB = 55;
 
-    // Only attribute B has a value in the safe provider
+    // Store 3 raw bytes for attribute A (unsupported scalar size)
+    const uint8_t kRawA[] = { 0x01, 0x02, 0x03 };
+    ASSERT_EQ(safeRamProvider.SafeWriteValue(pathA, ByteSpan(kRawA)), CHIP_NO_ERROR);
     ASSERT_EQ(safeRamProvider.WriteScalarValue(pathB, kValueB), CHIP_NO_ERROR);
 
-    // Attribute A has a null migrator, attribute B has a valid one
+    // Attribute A has an invalid 3-byte scalar size, attribute B is valid
     const AttrMigrationData attributesToMigrate[] = {
-        { 3, nullptr },
-        { 4, &DefaultMigrators::ScalarValue<uint32_t> },
+        { 3, 3, true },
+        { 4, sizeof(uint32_t), true },
     };
     uint8_t buf[128] = {};
     MutableByteSpan buffer(buf);
-    // Should report failure due to null migrator
+    // Should report failure due to invalid scalar size on attribute A
     EXPECT_EQ(
         MigrateFromSafeToAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
         CHIP_ERROR_HAD_FAILURES);
@@ -440,6 +474,176 @@ TEST(TestAttributePersistenceMigration, TestMigrationWithNullMigrator)
         MutableByteSpan readBuffer(readBuf);
         EXPECT_EQ(safeRamProvider.SafeReadValue(pathB, readBuffer), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     }
+}
+
+// Three uint8_t attributes (one scalar, two nullable): all present in SafeAttribute and migrated.
+TEST(TestAttributePersistenceMigration, TestMigrationMultipleUint8ScalarsIncludingNullable)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    DefaultSafeAttributePersistenceProvider safeRamProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+    ASSERT_EQ(safeRamProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    const ConcreteAttributePath scalarPath(1, 2, 3);
+    const ConcreteAttributePath nullablePathA(1, 2, 4);
+    const ConcreteAttributePath nullablePathB(1, 2, 5);
+    const ConcreteClusterPath cluster(1, 2);
+    constexpr uint8_t kScalarValue = 2;
+    const DataModel::Nullable<uint8_t> kNullableValueA(1);
+    const DataModel::Nullable<uint8_t> kNullableValueB(0);
+
+    ASSERT_EQ(safeRamProvider.WriteScalarValue(scalarPath, kScalarValue), CHIP_NO_ERROR);
+    ASSERT_EQ(safeRamProvider.WriteScalarValue(nullablePathA, kNullableValueA), CHIP_NO_ERROR);
+    ASSERT_EQ(safeRamProvider.WriteScalarValue(nullablePathB, kNullableValueB), CHIP_NO_ERROR);
+
+    const AttrMigrationData attributesToMigrate[] = {
+        { 3, sizeof(uint8_t), true },
+        { 4, sizeof(uint8_t), true },
+        { 5, sizeof(uint8_t), true },
+    };
+    uint8_t buf[128] = {};
+    MutableByteSpan buffer(buf);
+    EXPECT_EQ(
+        MigrateFromSafeToAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
+        CHIP_NO_ERROR);
+
+    ExpectDstUint8(ramProvider, scalarPath, kScalarValue);
+    ExpectDstNullableUint8(ramProvider, nullablePathA, kNullableValueA);
+    ExpectDstNullableUint8(ramProvider, nullablePathB, kNullableValueB);
+
+    ExpectSafeReadNotFound(safeRamProvider, scalarPath);
+    ExpectSafeReadNotFound(safeRamProvider, nullablePathA);
+    ExpectSafeReadNotFound(safeRamProvider, nullablePathB);
+}
+
+// Nullable uint8_t null sentinel values are preserved during migration.
+TEST(TestAttributePersistenceMigration, TestMigrationNullableNullUint8Values)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    DefaultSafeAttributePersistenceProvider safeRamProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+    ASSERT_EQ(safeRamProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    const ConcreteAttributePath scalarPath(1, 2, 3);
+    const ConcreteAttributePath nullablePathA(1, 2, 4);
+    const ConcreteAttributePath nullablePathB(1, 2, 5);
+    const ConcreteClusterPath cluster(1, 2);
+    constexpr uint8_t kScalarValue = 1;
+    DataModel::Nullable<uint8_t> nullNullableValueA;
+    DataModel::Nullable<uint8_t> nullNullableValueB;
+    nullNullableValueA.SetNull();
+    nullNullableValueB.SetNull();
+
+    ASSERT_EQ(safeRamProvider.WriteScalarValue(scalarPath, kScalarValue), CHIP_NO_ERROR);
+    ASSERT_EQ(safeRamProvider.WriteScalarValue(nullablePathA, nullNullableValueA), CHIP_NO_ERROR);
+    ASSERT_EQ(safeRamProvider.WriteScalarValue(nullablePathB, nullNullableValueB), CHIP_NO_ERROR);
+
+    const AttrMigrationData attributesToMigrate[] = {
+        { 3, sizeof(uint8_t), true },
+        { 4, sizeof(uint8_t), true },
+        { 5, sizeof(uint8_t), true },
+    };
+    uint8_t buf[128] = {};
+    MutableByteSpan buffer(buf);
+    EXPECT_EQ(
+        MigrateFromSafeToAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
+        CHIP_NO_ERROR);
+
+    ExpectDstUint8(ramProvider, scalarPath, kScalarValue);
+    ExpectDstNullableUint8(ramProvider, nullablePathA, nullNullableValueA);
+    ExpectDstNullableUint8(ramProvider, nullablePathB, nullNullableValueB);
+
+    ExpectSafeReadNotFound(safeRamProvider, nullablePathA);
+    ExpectSafeReadNotFound(safeRamProvider, nullablePathB);
+}
+
+// Scalar attribute migrated; nullable attributes absent from SafeAttribute are skipped.
+TEST(TestAttributePersistenceMigration, TestMigrationSkipsAbsentNullableUint8Attributes)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    DefaultSafeAttributePersistenceProvider safeRamProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+    ASSERT_EQ(safeRamProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    const ConcreteAttributePath scalarPath(1, 2, 3);
+    const ConcreteAttributePath nullablePathA(1, 2, 4);
+    const ConcreteAttributePath nullablePathB(1, 2, 5);
+    const ConcreteClusterPath cluster(1, 2);
+    constexpr uint8_t kScalarValue = 1;
+
+    ASSERT_EQ(safeRamProvider.WriteScalarValue(scalarPath, kScalarValue), CHIP_NO_ERROR);
+
+    const AttrMigrationData attributesToMigrate[] = {
+        { 3, sizeof(uint8_t), true },
+        { 4, sizeof(uint8_t), true },
+        { 5, sizeof(uint8_t), true },
+    };
+    uint8_t buf[128] = {};
+    MutableByteSpan buffer(buf);
+    EXPECT_EQ(
+        MigrateFromSafeToAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
+        CHIP_NO_ERROR);
+
+    ExpectDstUint8(ramProvider, scalarPath, kScalarValue);
+    ExpectDstReadNotFound(ramProvider, nullablePathA);
+    ExpectDstReadNotFound(ramProvider, nullablePathB);
+
+    ExpectSafeReadNotFound(safeRamProvider, scalarPath);
+}
+
+// Attributes already present in AttributePersistence are not overwritten; skipped safe values remain.
+TEST(TestAttributePersistenceMigration, TestMigrationSkipsWhenDestinationAlreadyHasNullableUint8)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    DefaultSafeAttributePersistenceProvider safeRamProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+    ASSERT_EQ(safeRamProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    const ConcreteAttributePath scalarPath(1, 2, 3);
+    const ConcreteAttributePath nullablePathA(1, 2, 4);
+    const ConcreteClusterPath cluster(1, 2);
+    constexpr uint8_t kSafeScalarValue = 2;
+    constexpr uint8_t kDstScalarValue  = 5;
+    const DataModel::Nullable<uint8_t> kSafeNullableValueA(1);
+    const DataModel::Nullable<uint8_t> kDstNullableValueA(3);
+
+    ASSERT_EQ(safeRamProvider.WriteScalarValue(scalarPath, kSafeScalarValue), CHIP_NO_ERROR);
+    ASSERT_EQ(safeRamProvider.WriteScalarValue(nullablePathA, kSafeNullableValueA), CHIP_NO_ERROR);
+
+    ASSERT_EQ(
+        ramProvider.WriteValue(scalarPath, ByteSpan(reinterpret_cast<const uint8_t *>(&kDstScalarValue), sizeof(kDstScalarValue))),
+        CHIP_NO_ERROR);
+    NumericAttributeTraits<uint8_t>::StorageType dstNullableStorageValue;
+    DataModel::NullableToStorage(kDstNullableValueA, dstNullableStorageValue);
+    ASSERT_EQ(
+        ramProvider.WriteValue(
+            nullablePathA, ByteSpan(reinterpret_cast<const uint8_t *>(&dstNullableStorageValue), sizeof(dstNullableStorageValue))),
+        CHIP_NO_ERROR);
+
+    const AttrMigrationData attributesToMigrate[] = {
+        { 3, sizeof(uint8_t), true },
+        { 4, sizeof(uint8_t), true },
+    };
+    uint8_t buf[128] = {};
+    MutableByteSpan buffer(buf);
+    EXPECT_EQ(
+        MigrateFromSafeToAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
+        CHIP_NO_ERROR);
+
+    ExpectDstUint8(ramProvider, scalarPath, kDstScalarValue);
+    ExpectDstNullableUint8(ramProvider, nullablePathA, kDstNullableValueA);
+
+    uint8_t safeScalarValue = 0;
+    ASSERT_EQ(safeRamProvider.ReadScalarValue(scalarPath, safeScalarValue), CHIP_NO_ERROR);
+    EXPECT_EQ(safeScalarValue, kSafeScalarValue);
+
+    DataModel::Nullable<uint8_t> safeNullableValueA;
+    ASSERT_EQ(safeRamProvider.ReadScalarValue(nullablePathA, safeNullableValueA), CHIP_NO_ERROR);
+    EXPECT_EQ(safeNullableValueA, kSafeNullableValueA);
 }
 
 } // namespace

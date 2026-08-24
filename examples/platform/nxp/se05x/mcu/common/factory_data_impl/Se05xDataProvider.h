@@ -20,6 +20,8 @@
 #include <platform/nxp/rt/rw61x/FactoryDataProviderImpl.h>
 #elif CONFIG_CHIP_NXP_PLATFORM_RT1060
 #include <platform/nxp/rt/rt1060/FactoryDataProviderImpl.h>
+#elif CONFIG_CHIP_NXP_PLATFORM_MCXW72
+#include <platform/nxp/common/factory_data/legacy/FactoryDataProviderImpl.h>
 #else
 #error "The selected platform is not supported for SE05x data provider"
 #endif
@@ -45,6 +47,7 @@ public:
     CHIP_ERROR GetSpake2pSalt(MutableByteSpan & saltBuf) override;
     CHIP_ERROR GetSetupPasscode(uint32_t & setupPasscode) override;
     CHIP_ERROR GetSpake2pIterationCount(uint32_t & iterationCount) override;
+    CHIP_ERROR GetSpake2pVerifier(MutableByteSpan & verifierBuf, size_t & verifierLen) override;
 #endif
 
 #if CONFIG_CHIP_SE05X_DEVICE_ATTESTATION

@@ -49,8 +49,6 @@ using namespace chip::app::Clusters;
 
 namespace {
 
-uint32_t gIterationCount = 0;
-
 //
 // The generated endpoint_config for the controller app has Endpoint 1
 // already used in the fixed endpoint set of size 1. Consequently, let's use the next
@@ -384,8 +382,6 @@ TEST_F(TestWriteChunking, TestListChunking)
 
             ChipLogDetail(DataManagement, "Running iteration %d\n", static_cast<int>(i));
 
-            gIterationCount = i;
-
             app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
                                          static_cast<uint16_t>(minReservationSize + i) /* reserved buffer size */);
 
@@ -567,8 +563,6 @@ TEST_F(TestWriteChunking, TestBadChunking)
         TestWriteCallback writeCallback;
 
         ChipLogDetail(DataManagement, "Running iteration with OCTET_STRING length = %d\n", i);
-
-        gIterationCount = (uint32_t) i;
 
         app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing());
 
@@ -1041,7 +1035,7 @@ void TestWriteChunking::RunTest(Instructions instructions, EncodingMethod encodi
     };
 
     ByteSpan list[kTestListLength];
-    uint8_t badList[kTestListLength];
+    uint8_t badList[kTestListLength] = {};
 
     if (instructions.data.size() == 0)
     {
@@ -1296,7 +1290,7 @@ void TestWriteChunking::RunTest_NonEmptyReplaceAll(Instructions instructions,
     constexpr uint8_t kTestListLength2 = 10;
 
     ByteSpan list[kTestListLength2];
-    uint8_t badList[kTestListLength2];
+    uint8_t badList[kTestListLength2] = {};
 
     if (instructions.data.size() == 0)
     {

@@ -20,9 +20,9 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/GlobalAttributes.h>
 #include <app/RequiredPrivilege.h>
-#include <app/data-model-provider/ProviderChangeListener.h>
 #include <app/data-model/FabricScoped.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-types.h>
@@ -96,10 +96,9 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
         {
             if (*aai_result == CHIP_NO_ERROR)
             {
-                // TODO: this is awkward since it provides AAI no control over this, specifically
-                //       AAI may not want to increase versions for some attributes that are Q
-                emberAfAttributeChanged(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId,
-                                        &mContext->dataModelChangeListener);
+                // AAI write was successful. We still need to bump the version and notify our listeners.
+                // ember attribute changed will increase version and call back the global codegen provider (which should be `this`)
+                emberAfAttributeChanged(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
             }
             return *aai_result;
         }
@@ -132,7 +131,6 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
 
     EmberAfWriteDataInput dataInput(dataBuffer.data(), attributeMetadata->attributeType);
 
-    dataInput.SetChangeListener(&mContext->dataModelChangeListener);
     // TODO: dataInput.SetMarkDirty() should be according to `ChangesOmmited`
 
     if (request.subjectDescriptor.authMode == Access::AuthMode::kInternalDeviceAccess)
@@ -190,24 +188,6 @@ void CodegenDataModelProvider::ListAttributeWriteNotification(const ConcreteAttr
     {
         cluster->ListAttributeWriteNotification(aPath, opType, accessingFabric);
         return;
-    }
-}
-
-void CodegenDataModelProvider::Temporary_ReportAttributeChanged(const AttributePathParams & path)
-{
-    // we must be started up to process changes since we use the context
-    VerifyOrReturn(mContext.has_value());
-
-    if (path.mClusterId != kInvalidClusterId)
-    {
-        emberAfAttributeChanged(path.mEndpointId, path.mClusterId, path.mAttributeId, &mContext->dataModelChangeListener);
-    }
-    else
-    {
-        // When the path has wildcard cluster Id, call the emberAfEndpointChanged to mark attributes on the given endpoint
-        // as having changing, but do NOT increase/alter any cluster data versions, as this happens when a bridged endpoint is
-        // added or removed from a bridge and the cluster data is not changed during the process.
-        emberAfEndpointChanged(path.mEndpointId, &mContext->dataModelChangeListener);
     }
 }
 

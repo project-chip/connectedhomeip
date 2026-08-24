@@ -37,7 +37,6 @@
 
 import asyncio
 import contextlib
-import typing
 from datetime import timedelta
 
 from mobly import asserts
@@ -59,13 +58,13 @@ class TC_TIMESYNC_2_7(MatterBaseTest):
         cluster = Clusters.Objects.TimeSynchronization
         return await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=cluster, attribute=attribute)
 
-    async def send_set_time_zone_cmd(self, tz: typing.List[Clusters.Objects.TimeSynchronization.Structs.TimeZoneStruct]) -> Clusters.Objects.TimeSynchronization.Commands.SetTimeZoneResponse:
+    async def send_set_time_zone_cmd(self, tz: list[Clusters.Objects.TimeSynchronization.Structs.TimeZoneStruct]) -> Clusters.Objects.TimeSynchronization.Commands.SetTimeZoneResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetTimeZone(timeZone=tz), endpoint=self.endpoint)
         asserts.assert_true(matchers.is_type(ret, Clusters.Objects.TimeSynchronization.Commands.SetTimeZoneResponse),
                             "Unexpected return type for SetTimeZone")
         return ret
 
-    async def send_set_dst_cmd(self, dst: typing.List[Clusters.Objects.TimeSynchronization.Structs.DSTOffsetStruct]) -> None:
+    async def send_set_dst_cmd(self, dst: list[Clusters.Objects.TimeSynchronization.Structs.DSTOffsetStruct]) -> None:
         await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetDSTOffset(DSTOffset=dst))
 
     async def send_set_utc_cmd(self, utc: uint) -> None:

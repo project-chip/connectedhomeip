@@ -72,8 +72,6 @@ CHIP_ERROR EmptyProvider::AcceptedCommands(const app::ConcreteClusterPath & path
     return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
 }
 
-void EmptyProvider::Temporary_ReportAttributeChanged(const app::AttributePathParams & path) {}
-
 ActionReturnStatus EmptyProvider::ReadAttribute(const app::DataModel::ReadAttributeRequest & request,
                                                 app::AttributeValueEncoder & encoder)
 {

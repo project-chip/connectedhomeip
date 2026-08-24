@@ -17,19 +17,10 @@
  */
 
 #pragma once
-
-#include "CommodityTariffConsts.h"
-#include <app-common/zap-generated/cluster-enums.h>
-#include <app-common/zap-generated/cluster-objects.h>
+#include "CommodityTariffContainers.h"
 #include <platform/LockTracker.h>
 
 #include <atomic>
-#include <cassert>
-#include <map>
-#include <set>
-#include <string>
-#include <unordered_map>
-#include <unordered_set>
 
 namespace chip {
 
@@ -198,129 +189,58 @@ inline bool operator!=(const Type & lhs, const Type & rhs)
 
 namespace CommodityTariffAttrsDataMgmt {
 
-/// @brief Helper for copying spans to Matter data model lists
-/// @tparam T Type of elements to copy
-template <typename T>
+/// @brief Specialization for character spans with consistent maxCount semantics
 struct SpanCopier
 {
-    /// @brief Copies span data to a newly allocated list
-    /// @param source Input span to copy from
-    /// @param destination Output list to populate
-    /// @param maxCount Maximum number of elements to copy (default: unlimited)
-    /// @return CHIP_NO_ERROR if copy succeeded, error code on failure
-    static CHIP_ERROR Copy(const Span<const T> & source, DataModel::List<const T> & destination,
-                           size_t maxCount = std::numeric_limits<size_t>::max())
+    /**
+     * @brief Copies character span to a nullable CharSpan
+     * @param source Input span to copy from
+     * @param destination Output nullable span to populate (will be allocated)
+     * @param maxCount Maximum number of characters to copy
+     * @return CHIP_NO_ERROR if copy succeeded
+     *
+     * @note Memory Management:
+     * - Allocates new memory via Platform::MemoryCalloc
+     * - Previous destination memory (if any) is not reused
+     * - Memory is automatically freed by CleanupStruct() when:
+     *   - Attribute value is replaced via UpdateFinish()
+     *   - CTC_BaseDataClass object is destroyed
+     *   - Cleanup() is explicitly called
+     *
+     * @warning The caller must ensure symmetric CopyData()/CleanupStruct() pairs exist
+     */
+    static CHIP_ERROR CopyToNullable(const CharSpan source, DataModel::Nullable<CharSpan> & destination,
+                                     size_t maxCount = std::numeric_limits<size_t>::max())
     {
         if (source.empty())
         {
-            destination = DataModel::List<const T>();
+            destination.SetNonNull(CharSpan());
             return CHIP_NO_ERROR;
         }
 
-        const size_t elementsToCopy = std::min(source.size(), maxCount);
-        auto * buffer               = static_cast<T *>(Platform::MemoryCalloc(elementsToCopy, sizeof(T)));
+        VerifyOrReturnError(source.size() <= maxCount, CHIP_ERROR_INVALID_STRING_LENGTH);
 
-        if (!buffer)
-            return CHIP_ERROR_NO_MEMORY;
+        // ScopedMemoryBufferWithSize tracks the allocated size
+        Platform::ScopedMemoryBufferWithSize<char> buffer;
+        buffer.CopyFromSpan(chip::Span<const char>(source.data(), source.size()));
+        VerifyOrReturnError(buffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
 
-        std::copy(source.begin(), source.begin() + elementsToCopy, buffer);
-        destination = DataModel::List<const T>(Span<const T>(buffer, elementsToCopy));
+        // Transfer ownership to destination
+        size_t size = buffer.AllocatedSize();
+        CharSpan tmpSpan(buffer.Release(), size);
+        destination.SetNonNull(tmpSpan);
+
         return CHIP_NO_ERROR;
     }
 };
 
-/// @brief Specialization for character spans with consistent maxCount semantics
-template <>
-struct SpanCopier<char>
-{
-    /// @brief Copies character span to a nullable CharSpan
-    /// @param source Input span to copy from
-    /// @param destination Output span to populate
-    /// @param maxCount Maximum number of characters to copy (default: unlimited)
-    /// @return CHIP_NO_ERROR if copy succeeded, error code on failure
-    static CHIP_ERROR Copy(const CharSpan & source, DataModel::Nullable<CharSpan> & destination,
-                           size_t maxCount = std::numeric_limits<size_t>::max())
-    {
-        if (source.size() > maxCount)
-        {
-            return CHIP_ERROR_INVALID_STRING_LENGTH;
-        }
-
-        if (source.empty())
-        {
-            destination.SetNull();
-            return CHIP_NO_ERROR;
-        }
-
-        char * buffer = static_cast<char *>(Platform::MemoryCalloc(1, source.size()));
-        if (!buffer)
-            return CHIP_ERROR_NO_MEMORY;
-
-        std::copy(source.begin(), source.end(), buffer);
-        destination.SetNonNull(CharSpan(buffer, source.size()));
-        return CHIP_NO_ERROR;
-    }
-};
-
-/// @brief Helper for string to span conversions
-struct StrToSpan
-{
-    /// @brief Copies std::string to a CharSpan
-    /// @param source Input string to copy from
-    /// @param destination Output span to populate
-    /// @param maxCount Maximum number of characters to copy (default: unlimited)
-    /// @return CHIP_NO_ERROR on success, error code on failure
-    static CHIP_ERROR Copy(const std::string & source, CharSpan & destination,
-                           size_t maxCount = CommodityTariffConsts::kDefaultStringValuesMaxBufLength)
-    {
-        if (source.empty())
-        {
-            destination = CharSpan();
-            return CHIP_NO_ERROR;
-        }
-
-        if (source.size() > maxCount)
-        {
-            return CHIP_ERROR_INVALID_STRING_LENGTH;
-        }
-
-        char * buffer = static_cast<char *>(Platform::MemoryAlloc(source.size()));
-        if (!buffer)
-            return CHIP_ERROR_NO_MEMORY;
-
-        memcpy(buffer, source.data(), source.size());
-        destination = CharSpan(buffer, source.size());
-        return CHIP_NO_ERROR;
-    }
-
-    /// @brief Releases memory allocated by a CharSpan
-    static void Release(CharSpan & span)
-    {
-        if (!span.empty())
-        {
-            Platform::MemoryFree(const_cast<char *>(span.data()));
-            span = CharSpan();
-        }
-    }
-};
-
-template <typename T, auto X>
-void ListToMap(const DataModel::List<T> & aList, std::map<uint32_t, const T *> & aMap)
+template <typename T, auto X, size_t Capacity>
+void ListToMap(const DataModel::List<T> & aList, CommodityTariffContainers::CTC_UnorderedMap<uint32_t, const T *, Capacity> & aMap)
 {
     for (const auto & item : aList)
     {
         // Insert into map with specified entry as key
-        aMap.emplace(item.*X, &item);
-    }
-}
-
-template <typename T, auto X>
-void ListToMap(const DataModel::List<T> & aList, std::unordered_map<uint32_t, const T *> & aMap)
-{
-    for (const auto & item : aList)
-    {
-        // Insert into map with specified entry as key
-        aMap.emplace(item.*X, &item);
+        aMap.insert(item.*X, &item);
     }
 }
 
@@ -424,14 +344,14 @@ using ExtractNestedType_t = typename ExtractNestedType<U>::type;
  *   * Manages memory allocation/deallocation
  *   * Provides element-wise copy and cleanup
  * - For struct types:
- *   * Uses type-specific CopyData and CleanupStructValue specializations
+ *   * Uses type-specific CopyData and CleanupStruct specializations
  * - For primitive types:
  *   * Simple value storage with atomic update support
  *
  * @section memory_management Memory Management
  * The class handles automatic cleanup for:
  * - List memory (allocated via Platform::MemoryCalloc)
- * - Nested structs (via CleanupStructValue template)
+ * - Nested structs (via CleanupStruct template)
  * - Nullable state transitions
  *
  * @section usage_patterns Usage Patterns
@@ -486,19 +406,45 @@ public:
     virtual ~CTC_BaseDataClassBase() = default;
 
     // Common interface
-    virtual bool IsValid() const                   = 0;
-    virtual bool HasValue() const                  = 0;
-    virtual bool HasNewValue() const               = 0;
-    virtual CHIP_ERROR MarkAsAssigned()            = 0;
-    virtual CHIP_ERROR UpdateBegin(void * aUpdCtx) = 0;
-    virtual bool UpdateFinish(bool aUpdateAllow)   = 0;
-    virtual bool Cleanup()                         = 0;
-    virtual AttributeId GetAttrId() const          = 0;
+    virtual bool IsValid() const { return false; }
+    virtual bool HasValue() const { return false; }
+    virtual bool HasNewValue() const { return false; }
+    virtual CHIP_ERROR MarkAsAssigned() { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR UpdateBegin(void * aUpdCtx) { return CHIP_NO_ERROR; }
+    virtual bool UpdateFinish(bool aUpdateAllow) { return false; }
+    virtual bool Cleanup() { return false; }
+    virtual AttributeId GetAttrId() const = 0;
 
     // Type-erased methods for generic access
-    virtual CHIP_ERROR GetValueAsVoid(void *& outValue)        = 0;
-    virtual CHIP_ERROR GetNewValueAsVoid(void *& outValue)     = 0;
-    virtual CHIP_ERROR SetNewValueFromVoid(const void * value) = 0;
+    // Must be overridden in child template classes to provide type-safe access
+    /**
+     * @brief Gets a pointer to the internal current value storage.
+     * @param[out] outValue Set to point to the internal current value object.
+     *                      The pointer remains valid only while this object exists.
+     *                      Cast back to the specific type based on the child class's template specialization.
+     */
+    virtual CHIP_ERROR GetValueAsVoid(void *& outValue)
+    {
+        outValue = nullptr;
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    /**
+     * @brief Gets a pointer to the internal pending new value storage during updates.
+     * @param[out] outValue Set to point to the internal pending value object.
+     *                      Cast back to the specific type based on the child class's template specialization.
+     */
+    virtual CHIP_ERROR GetNewValueAsVoid(void *& outValue)
+    {
+        outValue = nullptr;
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    /**
+     * @brief Copies data from external source to internal pending storage.
+     * @param[in] value Pointer to external source data of the type matching the child class's template specialization.
+     */
+    virtual CHIP_ERROR SetNewValueFromVoid(const void * value) { return CHIP_ERROR_NOT_IMPLEMENTED; };
 };
 
 template <typename T>
@@ -856,13 +802,13 @@ public:
 
     /**
      * @brief Completes the update process
-     * @param[in] aUpdateAllow Whether to commit the changes
+     * @param[in] aUpdateAllowed Whether to commit the changes
      * @return true if value changed, false otherwise
      *
      * @post Always transitions state to kIdle
      * @note Performs cleanup of unused storage
      */
-    bool UpdateFinish(bool aUpdateAllow) override
+    bool UpdateFinish(bool aUpdateAllowed) override
     {
         bool ret = false;
         /* Skip if the attribute object has no new attached data */
@@ -871,15 +817,13 @@ public:
             return false;
         }
 
-        if (aUpdateAllow && (mUpdateState.load() == UpdateState::kValidated))
+        if (aUpdateAllowed && (mUpdateState.load() == UpdateState::kValidated) && HasChanged())
         {
             SwapActiveValueStorage();
-
-            ret = HasChanged();
+            ret = true;
         }
 
         CleanupByIdx(1 - mActiveValueIdx.load());
-
         mUpdateState.store(UpdateState::kIdle);
 
         return ret;
@@ -904,30 +848,33 @@ public:
     }
 
     /**
-     * @brief Cleans up an external list entry
-     * @param[in,out] entry The list entry to clean up
-     */
-    void CleanupExtListEntry(ListEntryType & entry) { CleanupStruct(entry); }
-
-    /**
      * @brief Gets the attribute ID
      * @return The attribute ID this instance manages
      */
     AttributeId GetAttrId() const override { return mAttrId; }
 
     // Type-erased implementations
+    /**
+     * @brief Returns a pointer to the current typed value
+     */
     CHIP_ERROR GetValueAsVoid(void *& outValue) override
     {
         outValue = static_cast<void *>(&GetValueRef());
         return CHIP_NO_ERROR;
     }
 
+    /**
+     * @brief Returns a pointer to the pending new typed value
+     */
     CHIP_ERROR GetNewValueAsVoid(void *& outValue) override
     {
         outValue = static_cast<void *>(&GetNewValueRef());
         return CHIP_NO_ERROR;
     }
 
+    /**
+     * @brief Sets new value from typed pointer
+     */
     CHIP_ERROR SetNewValueFromVoid(const void * value) override
     {
         if (value == nullptr)
@@ -1155,10 +1102,6 @@ private:
      */
     void CleanupStruct(StructType & aValue);
 
-    //{
-    // CleanupStructValue<StructType>(aValue);
-    //}
-
     void * mAuxData = nullptr; ///< Validation context data
     const AttributeId mAttrId; ///< Managed attribute ID
 };
@@ -1167,108 +1110,6 @@ private:
 
 namespace Clusters {
 namespace CommodityTariff {
-/**
- * @struct TariffUpdateCtx
- * @brief Context for validating tariff attribute updates and maintaining referential integrity
- *
- * This structure tracks relationships between tariff components during attribute updates
- * to ensure all references are valid and consistent. It serves as a validation context
- * that collects all IDs and references before checking their consistency.
- *
- * @section references Referential Integrity Tracking
- * The context maintains several sets of IDs to validate that:
- * - All referenced DayEntry IDs exist in the master set
- * - All referenced TariffComponent IDs exist in the master set
- * - All referenced DayPattern IDs exist in the master set
- * - No dangling references exist between tariff components
- *
- * @section lifecycle Lifecycle
- * - Created at the start of a tariff update operation
- * - Populated during attribute parsing/processing
- * - Used for validation before committing changes
- * - Destroyed after update completion
- */
-struct TariffUpdateCtx
-{
-    BlockModeEnum blockMode;
-
-    /**
-     * @brief Reference to the tariff's start timestamp
-     * @note This is a reference to allow validation against the actual attribute value
-     */
-    DataModel::Nullable<uint32_t> & TariffStartTimestamp;
-
-    /// @name DayEntry ID Tracking
-    /// @{
-    /**
-     * @brief Master set of all valid DayEntry IDs
-     * @details Contains all DayEntry IDs that exist in the tariff definition
-     */
-    std::unordered_set<uint32_t> DayEntryKeyIDs;
-
-    /**
-     * @brief DayEntry IDs referenced by DayPattern items
-     * @details Collected separately for reference validation
-     */
-    std::unordered_set<uint32_t> DayPatternsDayEntryIDs;
-
-    /**
-     * @brief DayEntry IDs referenced by IndividualDays items
-     * @details Collected separately for reference validation
-     */
-    std::unordered_set<uint32_t> IndividualDaysDayEntryIDs;
-
-    /**
-     * @brief DayEntry IDs referenced by TariffPeriod items
-     * @details Collected separately for reference validation
-     */
-    std::unordered_set<uint32_t> TariffPeriodsDayEntryIDs;
-
-    /// @}
-
-    /// @name TariffComponent ID Tracking
-    /// @{
-    /**
-     * @brief Master set of all valid TariffComponent IDs
-     * @details Contains all TariffComponent IDs that exist in the tariff definition
-     */
-    std::unordered_map<uint32_t, uint32_t> TariffComponentKeyIDsFeatureMap;
-
-    /**
-     * @brief TariffComponent IDs referenced by TariffPeriod items
-     * @details Collected for validating period->component references
-     */
-    std::unordered_set<uint32_t> TariffPeriodsTariffComponentIDs;
-    /// @}
-
-    /// @name DayPattern ID Tracking
-    /// @{
-    /**
-     * @brief Master set of all valid DayPattern IDs
-     * @details Contains all DayPattern IDs that exist in the tariff definition
-     */
-    std::unordered_set<uint32_t> DayPatternKeyIDs;
-
-    /**
-     * @brief DayPattern IDs referenced by CalendarPeriod items
-     * @details Collected for validating calendar->pattern references
-     */
-    std::unordered_set<uint32_t> CalendarPeriodsDayPatternIDs;
-    /// @}
-
-    /**
-     * @brief Bitmask of active tariff features
-     * @details Used to validate feature-dependent constraints
-     */
-    BitMask<Feature> mFeature;
-
-    /**
-     * @brief Timestamp when the tariff update was initiated
-     * @note Used for change tracking and versioning
-     */
-    uint32_t TariffUpdateTimestamp;
-};
-
 /**
  * @brief Primary attributes for Commodity Tariff
  *

@@ -111,7 +111,7 @@ class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
         # Get the feature map for later
         self.step("2")
         feature_map = await self.read_dem_attribute_expect_success(attribute="FeatureMap")
-        log.info(f"FeatureMap: {feature_map}")
+        log.info("FeatureMap: %s", feature_map)
 
         self.step("3")
         esa_type = await self.read_dem_attribute_expect_success(attribute="ESAType")
@@ -135,7 +135,7 @@ class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
 
         self.step("5")
         esa_state = await self.read_dem_attribute_expect_success(attribute="ESAState")
-        log.info(f"ESAState is {esa_state}")
+        log.info("ESAState is %s", esa_state)
         asserts.assert_is_instance(esa_state, Clusters.DeviceEnergyManagement.Enums.ESAStateEnum)
 
         self.step("6")
@@ -166,7 +166,7 @@ class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
         self.step("8")
         if Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPowerAdjustment & feature_map:
             power_adjustment_capability = await self.read_dem_attribute_expect_success(attribute="PowerAdjustmentCapability")
-            log.info(f"PowerAdjustmentCapability is {power_adjustment_capability}")
+            log.info("PowerAdjustmentCapability is %s", power_adjustment_capability)
 
             if power_adjustment_capability is not NullValue:
                 asserts.assert_is_instance(power_adjustment_capability,
@@ -185,7 +185,7 @@ class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
         if Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPowerForecastReporting & feature_map or \
                 Clusters.DeviceEnergyManagement.Bitmaps.Feature.kStateForecastReporting & feature_map:
             forecast = await self.read_dem_attribute_expect_success(attribute="Forecast")
-            log.info(f"Forecast is {forecast}")
+            log.info("Forecast is %s", forecast)
 
             if forecast is not NullValue:
                 asserts.assert_is_instance(forecast,
@@ -198,7 +198,7 @@ class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
                 Clusters.DeviceEnergyManagement.Bitmaps.Feature.kForecastAdjustment & feature_map or \
                 Clusters.DeviceEnergyManagement.Bitmaps.Feature.kConstraintBasedAdjustment & feature_map:
             opt_out_state = await self.read_dem_attribute_expect_success(attribute="OptOutState")
-            log.info(f"OptOutState is {opt_out_state.name}:{opt_out_state}")
+            log.info("OptOutState is %s:%s", opt_out_state.name, opt_out_state)
 
 
 if __name__ == "__main__":

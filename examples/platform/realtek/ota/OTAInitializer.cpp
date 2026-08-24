@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #include "OTAInitializer.h"
 #include "app/clusters/ota-requestor/DefaultOTARequestorStorage.h"
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/CodegenIntegration.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <platform/realtek/freertos/OTAImageProcessorImpl.h>
@@ -40,7 +41,8 @@ void OTAInitializer::InitOTARequestor(void)
 
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
     // Set server instance used for session establishment
-    CHIP_ERROR err = gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+    CHIP_ERROR err = gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader,
+                                         GetOTARequestorAttributes(), GetDefaultOTARequestorEventGenerator());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "Failed to initialize OTA Requestor: %" CHIP_ERROR_FORMAT, err.Format());

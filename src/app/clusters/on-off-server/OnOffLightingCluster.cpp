@@ -28,6 +28,8 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <cstdint>
+
 using namespace chip::app::Clusters::OnOff;
 using chip::Protocols::InteractionModel::Status;
 
@@ -96,9 +98,8 @@ CHIP_ERROR OnOffLightingCluster::Startup(ServerClusterContext & context)
                 // If startup value modified the state, make sure we also persist it.
                 // In practice this means "toggle" will flip it on every reboot.
                 mOnOff = targetState;
-                LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-                    ConcreteAttributePath(mPath.mEndpointId, Clusters::OnOff::Id, Attributes::OnOff::Id),
-                    ByteSpan(reinterpret_cast<const uint8_t *>(&mOnOff), sizeof(mOnOff))));
+                LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
+                    ConcreteAttributePath(mPath.mEndpointId, Clusters::OnOff::Id, Attributes::OnOff::Id), mOnOff));
             }
         }
     }
@@ -236,12 +237,9 @@ CHIP_ERROR OnOffLightingCluster::SetStartupOnOff(DataModel::Nullable<OnOff::Star
 
     if (mContext != nullptr)
     {
-        NumericAttributeTraits<OnOff::StartUpOnOffEnum>::StorageType storageValue;
-        DataModel::NullableToStorage(mStartUpOnOff, storageValue);
-
+        AttributePersistence persistence(mContext->attributeStorage);
         ReturnErrorOnFailure(
-            mContext->attributeStorage.WriteValue({ mPath.mEndpointId, OnOff::Id, Attributes::StartUpOnOff::Id },
-                                                  { reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue) }));
+            persistence.StoreNativeEndianValue({ mPath.mEndpointId, OnOff::Id, Attributes::StartUpOnOff::Id }, mStartUpOnOff));
     }
 
     return CHIP_NO_ERROR;
@@ -333,22 +331,15 @@ void OnOffLightingCluster::UpdateTimer()
 
 DataModel::ActionReturnStatus OnOffLightingCluster::HandleOff()
 {
-    bool wasOn = GetOnOff();
     ReturnErrorOnFailure(SetOnOffFromCommand(false));
 
-    if (wasOn && mScenesIntegrationDelegate != nullptr)
-    {
-        LogErrorOnFailure(mScenesIntegrationDelegate->MakeSceneInvalidForAllFabrics());
-    }
-
-    SetAttributeValue<uint16_t>(mOnTime, 0, Attributes::OnTime::Id);
+    SetAttributeValue<uint16_t, uint16_t>(mOnTime, 0, Attributes::OnTime::Id);
     UpdateTimer();
     return Status::Success;
 }
 
 DataModel::ActionReturnStatus OnOffLightingCluster::HandleOn()
 {
-    bool wasOff = !GetOnOff();
     ReturnErrorOnFailure(SetOnOffFromCommand(true));
 
     // Spec requirement:
@@ -356,14 +347,9 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOn()
     //   causes the OnOff attribute to be set to TRUE;
     SetAttributeValue(mGlobalSceneControl, true, Attributes::GlobalSceneControl::Id);
 
-    if (wasOff && mScenesIntegrationDelegate != nullptr)
-    {
-        LogErrorOnFailure(mScenesIntegrationDelegate->MakeSceneInvalidForAllFabrics());
-    }
-
     if (mOnTime == 0)
     {
-        SetAttributeValue<uint16_t>(mOffWaitTime, 0, Attributes::OffWaitTime::Id);
+        SetAttributeValue<uint16_t, uint16_t>(mOffWaitTime, 0, Attributes::OffWaitTime::Id);
     }
     UpdateTimer();
     return Status::Success;
@@ -403,7 +389,7 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOffWithEffect(const Da
 
         ReturnErrorOnFailure(SetOnOffFromCommand(false));
 
-        SetAttributeValue<uint16_t>(mOnTime, 0, Attributes::OnTime::Id);
+        SetAttributeValue<uint16_t, uint16_t>(mOnTime, 0, Attributes::OnTime::Id);
 
         UpdateTimer();
         return Status::Success;
@@ -441,7 +427,7 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOnWithRecallGlobalScen
 
     if (mOnTime == 0)
     {
-        SetAttributeValue<uint16_t>(mOffWaitTime, 0, Attributes::OffWaitTime::Id);
+        SetAttributeValue<uint16_t, uint16_t>(mOffWaitTime, 0, Attributes::OffWaitTime::Id);
     }
     UpdateTimer();
 
