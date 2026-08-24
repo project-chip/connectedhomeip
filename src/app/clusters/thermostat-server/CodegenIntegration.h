@@ -70,20 +70,20 @@ public:
         ChipLogProgress(Zcl, "Creating thermostat cluster for endpoint %d", endpointId);
         if constexpr (sizeof...(Delegates) > 0)
         {
-        std::apply(
-            [&](auto &... dels) {
-                if constexpr (Cluster::kRequiresAtomicWrite)
-                {
-                    ClusterStorage<Size, Cluster>::mClusters[clusterInstanceIndex].Create(
-                        endpointId, features, config, Server::GetInstance().GetFabricTable(), dels...);
-                }
-                else
-                {
-                    ClusterStorage<Size, Cluster>::mClusters[clusterInstanceIndex].Create(endpointId, features, config,
-                                                                                          dels...);
-                }
-            },
-            mDelegates);
+            std::apply(
+                [&](auto &... dels) {
+                    if constexpr (Cluster::kRequiresAtomicWrite)
+                    {
+                        ClusterStorage<Size, Cluster>::mClusters[clusterInstanceIndex].Create(
+                            endpointId, features, config, Server::GetInstance().GetFabricTable(), dels...);
+                    }
+                    else
+                    {
+                        ClusterStorage<Size, Cluster>::mClusters[clusterInstanceIndex].Create(endpointId, features, config,
+                                                                                              dels...);
+                    }
+                },
+                mDelegates);
         }
         return ClusterStorage<Size, Cluster>::mClusters[clusterInstanceIndex].Registration();
     }
