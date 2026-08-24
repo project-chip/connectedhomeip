@@ -82,7 +82,8 @@ public:
      * OnScreenDisplay features. VideoStreamAllocate requires the WatermarkEnabled/OSDEnabled fields
      * to be present exactly when the respective feature is supported (feature-conditional
      * conformance), so the client must know them. Defaults to absent.
-     * TODO: discover from the camera's FeatureMap instead of configuration.
+     * The camera's FeatureMap, when discovered, overrides these; they are the fallback when the
+     * discovery read fails.
      */
     void SetCameraVideoTraits(bool aHasWatermark, bool aHasOSD)
     {
@@ -145,6 +146,18 @@ protected:
      */
     static CameraAvStreamManagement::Commands::VideoStreamAllocate::Type BuildAllocateRequest(const CameraProfile & aProfile);
 
+    /**
+     * Discovery report decoders, dispatched from OnAttributeData by discovery phase. Protected so
+     * unit tests can feed crafted reports without a live read.
+     */
+    void HandleServerListReport(const ConcreteDataAttributePath & aPath, TLV::TLVReader & aData);
+    void HandleCapabilityReport(const ConcreteDataAttributePath & aPath, TLV::TLVReader & aData);
+
+    /**
+     * False only when SupportedStreamUsages was read successfully and lacks Analysis.
+     */
+    bool AnalysisUsageSupported() const { return mAnalysisUsageSupported; }
+
 private:
     enum class PendingRequest : uint8_t
     {
@@ -153,9 +166,18 @@ private:
         kDeallocate,
     };
 
+    enum class DiscoveryPhase : uint8_t
+    {
+        kIdle,
+        kFindEndpoint,     // Wildcard Descriptor ServerList read locating the AVSM endpoint
+        kReadCapabilities, // Targeted read of the AVSM capability attributes on that endpoint
+    };
+
     CHIP_ERROR StartRequest(PendingRequest aRequest, const ScopedNodeId & aCameraNode, uint16_t aAnalysisStreamId,
                             AvAnalysisCameraClient::Callback & aCallback);
     CHIP_ERROR SendPendingCommand(Messaging::ExchangeManager & aExchangeMgr, const SessionHandle & aSessionHandle);
+    CHIP_ERROR SendDiscoveryRead(AttributePathParams * aPaths, size_t aPathCount);
+    void StartCapabilitiesRead();
     void FinishRequest(Protocols::InteractionModel::Status aStatus, uint16_t aStreamId);
 
     static void OnDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
@@ -177,7 +199,10 @@ private:
     // Discovery read state
     BufferedReadCallback mBufferedReadCallback{ *this };
     Platform::UniquePtr<ReadClient> mReadClient;
-    CHIP_ERROR mDiscoveryError = CHIP_NO_ERROR;
+    CHIP_ERROR mDiscoveryError     = CHIP_NO_ERROR;
+    DiscoveryPhase mDiscoveryPhase = DiscoveryPhase::kIdle;
+    // False only when SupportedStreamUsages was read successfully and lacks Analysis
+    bool mAnalysisUsageSupported = true;
     std::unique_ptr<CommandSender> mCommandSender;
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;

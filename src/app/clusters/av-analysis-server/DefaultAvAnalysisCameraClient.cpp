@@ -22,8 +22,10 @@
 #include <app/InteractionModelEngine.h>
 #include <clusters/CameraAvStreamManagement/Commands.h>
 #include <clusters/CameraAvStreamManagement/Ids.h>
+#include <clusters/CameraAvStreamManagement/Structs.h>
 #include <clusters/Descriptor/Attributes.h>
 #include <clusters/Descriptor/Ids.h>
+#include <clusters/shared/GlobalIds.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -90,6 +92,7 @@ void DefaultAvAnalysisCameraClient::Cancel()
     mPendingCallback   = nullptr;
     mResponseDelivered = false;
     mProfile           = CameraProfile{};
+    mDiscoveryPhase    = DiscoveryPhase::kIdle;
     mSessionHolder.Release();
     mExchangeMgr = nullptr;
 }
@@ -111,44 +114,94 @@ CHIP_ERROR DefaultAvAnalysisCameraClient::StartRequest(PendingRequest aRequest, 
 
 void DefaultAvAnalysisCameraClient::StartProfileDiscovery()
 {
-    // Baseline from configuration; discovered values override below
+    // Baseline from configuration; discovered values override as the two discovery reads complete
     FillProfileFromConfiguration(mProfile);
-    mProfile.avsmEndpoint = kInvalidEndpointId;
-    mDiscoveryError       = CHIP_NO_ERROR;
+    mProfile.avsmEndpoint   = kInvalidEndpointId;
+    mDiscoveryError         = CHIP_NO_ERROR;
+    mAnalysisUsageSupported = true;
 
     VerifyOrReturn(mSessionHolder && mExchangeMgr != nullptr, OnProfileDiscoveryComplete(CHIP_ERROR_INCORRECT_STATE));
 
-    // Which endpoint on the camera hosts CameraAVStreamManagement? Read every endpoint's Descriptor
-    // ServerList (wildcard endpoint) and look for the cluster id.
+    // Phase 1: which endpoint on the camera hosts CameraAVStreamManagement? Read every endpoint's
+    // Descriptor ServerList (wildcard endpoint) and look for the cluster id.
+    mDiscoveryPhase = DiscoveryPhase::kFindEndpoint;
     AttributePathParams readPaths[1];
     readPaths[0] = AttributePathParams(Descriptor::Id, Descriptor::Attributes::ServerList::Id);
 
+    CHIP_ERROR err = SendDiscoveryRead(readPaths, MATTER_ARRAY_SIZE(readPaths));
+    if (err != CHIP_NO_ERROR)
+    {
+        mDiscoveryPhase = DiscoveryPhase::kIdle;
+        OnProfileDiscoveryComplete(err);
+    }
+}
+
+CHIP_ERROR DefaultAvAnalysisCameraClient::SendDiscoveryRead(AttributePathParams * aPaths, size_t aPathCount)
+{
     ReadPrepareParams readParams(mSessionHolder.Get().Value());
-    readParams.mpAttributePathParamsList    = readPaths;
-    readParams.mAttributePathParamsListSize = 1;
+    readParams.mpAttributePathParamsList    = aPaths;
+    readParams.mAttributePathParamsListSize = aPathCount;
 
     mReadClient = Platform::MakeUnique<ReadClient>(InteractionModelEngine::GetInstance(), mExchangeMgr, mBufferedReadCallback,
                                                    ReadClient::InteractionType::Read);
-    VerifyOrReturn(mReadClient != nullptr, OnProfileDiscoveryComplete(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(mReadClient != nullptr, CHIP_ERROR_NO_MEMORY);
 
     CHIP_ERROR err = mReadClient->SendRequest(readParams);
     if (err != CHIP_NO_ERROR)
     {
         mReadClient.reset();
-        OnProfileDiscoveryComplete(err);
+    }
+    return err;
+}
+
+void DefaultAvAnalysisCameraClient::StartCapabilitiesRead()
+{
+    // Phase 2: read the AVSM capability attributes from the discovered endpoint. Each field falls
+    // back to its configured default when the camera does not report it.
+    mDiscoveryPhase = DiscoveryPhase::kReadCapabilities;
+    AttributePathParams readPaths[4];
+    readPaths[0] = AttributePathParams(mProfile.avsmEndpoint, CameraAvStreamManagement::Id, Globals::Attributes::FeatureMap::Id);
+    readPaths[1] = AttributePathParams(mProfile.avsmEndpoint, CameraAvStreamManagement::Id, Attributes::VideoSensorParams::Id);
+    readPaths[2] =
+        AttributePathParams(mProfile.avsmEndpoint, CameraAvStreamManagement::Id, Attributes::RateDistortionTradeOffPoints::Id);
+    readPaths[3] = AttributePathParams(mProfile.avsmEndpoint, CameraAvStreamManagement::Id, Attributes::SupportedStreamUsages::Id);
+
+    CHIP_ERROR err = SendDiscoveryRead(readPaths, MATTER_ARRAY_SIZE(readPaths));
+    if (err != CHIP_NO_ERROR)
+    {
+        // Proceed on the configured baseline rather than failing the request
+        ChipLogProgress(Zcl, "AvAnalysisCameraClient: capabilities read not started: %" CHIP_ERROR_FORMAT, err.Format());
+        mDiscoveryPhase = DiscoveryPhase::kIdle;
+        OnProfileDiscoveryComplete(CHIP_NO_ERROR);
     }
 }
 
 void DefaultAvAnalysisCameraClient::OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                                                     const StatusIB & aStatus)
 {
-    VerifyOrReturn(aPath.mClusterId == Descriptor::Id && aPath.mAttributeId == Descriptor::Attributes::ServerList::Id);
     VerifyOrReturn(aStatus.IsSuccess() && apData != nullptr);
+
+    switch (mDiscoveryPhase)
+    {
+    case DiscoveryPhase::kFindEndpoint:
+        HandleServerListReport(aPath, *apData);
+        break;
+    case DiscoveryPhase::kReadCapabilities:
+        HandleCapabilityReport(aPath, *apData);
+        break;
+    default:
+        break;
+    }
+}
+
+void DefaultAvAnalysisCameraClient::HandleServerListReport(const ConcreteDataAttributePath & aPath, TLV::TLVReader & aData)
+{
+    VerifyOrReturn(aPath.mClusterId == Descriptor::Id && aPath.mAttributeId == Descriptor::Attributes::ServerList::Id);
     // First matching endpoint wins
     VerifyOrReturn(mProfile.avsmEndpoint == kInvalidEndpointId);
 
     DataModel::DecodableList<ClusterId> serverList;
-    VerifyOrReturn(DataModel::Decode(*apData, serverList) == CHIP_NO_ERROR);
+    VerifyOrReturn(DataModel::Decode(aData, serverList) == CHIP_NO_ERROR);
 
     auto iter = serverList.begin();
     while (iter.Next())
@@ -161,6 +214,89 @@ void DefaultAvAnalysisCameraClient::OnAttributeData(const ConcreteDataAttributeP
     }
 }
 
+void DefaultAvAnalysisCameraClient::HandleCapabilityReport(const ConcreteDataAttributePath & aPath, TLV::TLVReader & aData)
+{
+    VerifyOrReturn(aPath.mClusterId == CameraAvStreamManagement::Id && aPath.mEndpointId == mProfile.avsmEndpoint);
+
+    switch (aPath.mAttributeId)
+    {
+    case Globals::Attributes::FeatureMap::Id: {
+        uint32_t featureMap = 0;
+        VerifyOrReturn(DataModel::Decode(aData, featureMap) == CHIP_NO_ERROR);
+        mProfile.hasWatermark = (featureMap & to_underlying(Feature::kWatermark)) != 0;
+        mProfile.hasOSD       = (featureMap & to_underlying(Feature::kOnScreenDisplay)) != 0;
+        break;
+    }
+    case Attributes::VideoSensorParams::Id: {
+        Structs::VideoSensorParamsStruct::DecodableType sensorParams;
+        VerifyOrReturn(DataModel::Decode(aData, sensorParams) == CHIP_NO_ERROR);
+        mProfile.maxWidth     = sensorParams.sensorWidth;
+        mProfile.maxHeight    = sensorParams.sensorHeight;
+        mProfile.maxFrameRate = sensorParams.maxFPS;
+        mProfile.minWidth     = std::min(mProfile.minWidth, mProfile.maxWidth);
+        mProfile.minHeight    = std::min(mProfile.minHeight, mProfile.maxHeight);
+        mProfile.minFrameRate = std::min(mProfile.minFrameRate, mProfile.maxFrameRate);
+        break;
+    }
+    case Attributes::RateDistortionTradeOffPoints::Id: {
+        DataModel::DecodableList<Structs::RateDistortionTradeOffPointsStruct::DecodableType> points;
+        VerifyOrReturn(DataModel::Decode(aData, points) == CHIP_NO_ERROR);
+
+        // Lowest H.264 trade-off point bounds the smallest stream the camera encodes
+        bool found          = false;
+        uint32_t minBitRate = 0;
+        uint16_t minWidth   = 0;
+        uint16_t minHeight  = 0;
+        auto iter           = points.begin();
+        while (iter.Next())
+        {
+            const auto & point = iter.GetValue();
+            if (point.codec != VideoCodecEnum::kH264)
+            {
+                continue;
+            }
+            if (!found || point.minBitRate < minBitRate)
+            {
+                minBitRate = point.minBitRate;
+            }
+            if (!found || point.resolution.width < minWidth)
+            {
+                minWidth  = point.resolution.width;
+                minHeight = point.resolution.height;
+            }
+            found = true;
+        }
+        if (found)
+        {
+            mProfile.minBitRateBps = minBitRate;
+            mProfile.minWidth      = minWidth;
+            mProfile.minHeight     = minHeight;
+            mProfile.maxBitRateBps = std::max(mProfile.maxBitRateBps, mProfile.minBitRateBps);
+        }
+        break;
+    }
+    case Attributes::SupportedStreamUsages::Id: {
+        DataModel::DecodableList<Globals::StreamUsageEnum> usages;
+        VerifyOrReturn(DataModel::Decode(aData, usages) == CHIP_NO_ERROR);
+
+        bool analysisSupported = false;
+        auto iter              = usages.begin();
+        while (iter.Next())
+        {
+            if (iter.GetValue() == Globals::StreamUsageEnum::kAnalysis)
+            {
+                analysisSupported = true;
+                break;
+            }
+        }
+        mAnalysisUsageSupported = analysisSupported;
+        break;
+    }
+    default:
+        break;
+    }
+}
+
 void DefaultAvAnalysisCameraClient::OnError(CHIP_ERROR aError)
 {
     mDiscoveryError = aError;
@@ -170,13 +306,29 @@ void DefaultAvAnalysisCameraClient::OnDone(ReadClient * apReadClient)
 {
     mReadClient.reset();
 
-    if (mProfile.avsmEndpoint == kInvalidEndpointId)
+    if (mDiscoveryPhase == DiscoveryPhase::kFindEndpoint)
     {
-        ChipLogProgress(Zcl,
-                        "AvAnalysisCameraClient: CameraAVStreamManagement endpoint not discovered (%" CHIP_ERROR_FORMAT
-                        "), using configured endpoint %u",
-                        mDiscoveryError.Format(), mCameraEndpoint);
-        mProfile.avsmEndpoint = mCameraEndpoint;
+        if (mProfile.avsmEndpoint == kInvalidEndpointId)
+        {
+            ChipLogProgress(Zcl,
+                            "AvAnalysisCameraClient: CameraAVStreamManagement endpoint not discovered (%" CHIP_ERROR_FORMAT
+                            "), using configured endpoint %u",
+                            mDiscoveryError.Format(), mCameraEndpoint);
+            mProfile.avsmEndpoint = mCameraEndpoint;
+        }
+        StartCapabilitiesRead();
+        return;
+    }
+
+    mDiscoveryPhase = DiscoveryPhase::kIdle;
+
+    // A camera without Analysis stream usage cannot serve this stream; fail before allocating
+    // anything. Deallocation must still work regardless of the advertised usages.
+    if (!mAnalysisUsageSupported && mPendingRequest == PendingRequest::kAllocate)
+    {
+        ChipLogError(Zcl, "AvAnalysisCameraClient: camera does not support the Analysis stream usage");
+        FinishRequest(Status::InvalidInState, mPendingStreamId);
+        return;
     }
 
     OnProfileDiscoveryComplete(CHIP_NO_ERROR);

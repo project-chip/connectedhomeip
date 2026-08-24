@@ -190,10 +190,13 @@ TEST_F(TestDefaultAvAnalysisCameraClient, CompletionIsDeliveredExactlyOnce)
 class ProfileTestClient : public DefaultAvAnalysisCameraClient
 {
 public:
+    using DefaultAvAnalysisCameraClient::AnalysisUsageSupported;
     using DefaultAvAnalysisCameraClient::BuildAllocateRequest;
     using DefaultAvAnalysisCameraClient::CameraProfile;
     using DefaultAvAnalysisCameraClient::CurrentProfile;
     using DefaultAvAnalysisCameraClient::FillProfileFromConfiguration;
+    using DefaultAvAnalysisCameraClient::HandleCapabilityReport;
+    using DefaultAvAnalysisCameraClient::HandleServerListReport;
     using DefaultAvAnalysisCameraClient::OnProfileDiscoveryComplete;
 
 protected:
@@ -326,21 +329,137 @@ TEST_F(TestDefaultAvAnalysisCameraClient, DiscoveryFindsAvsmEndpointInServerList
     const ClusterId kRootClusters[] = { Descriptor::Id };
     EncodeServerList(kRootClusters, MATTER_ARRAY_SIZE(kRootClusters), buffer, sizeof(buffer), reader);
     ConcreteDataAttributePath rootPath(0, Descriptor::Id, Descriptor::Attributes::ServerList::Id);
-    client.OnAttributeData(rootPath, &reader, StatusIB());
+    client.HandleServerListReport(rootPath, reader);
     EXPECT_EQ(client.CurrentProfile().avsmEndpoint, kInvalidEndpointId);
 
     // Endpoint 3 serves CameraAVStreamManagement: discovered
     const ClusterId kCameraClusters[] = { Descriptor::Id, CameraAvStreamManagement::Id };
     EncodeServerList(kCameraClusters, MATTER_ARRAY_SIZE(kCameraClusters), buffer, sizeof(buffer), reader);
     ConcreteDataAttributePath cameraPath(3, Descriptor::Id, Descriptor::Attributes::ServerList::Id);
-    client.OnAttributeData(cameraPath, &reader, StatusIB());
+    client.HandleServerListReport(cameraPath, reader);
     EXPECT_EQ(client.CurrentProfile().avsmEndpoint, 3);
 
     // First match wins: a later endpoint with the cluster does not overwrite it
     EncodeServerList(kCameraClusters, MATTER_ARRAY_SIZE(kCameraClusters), buffer, sizeof(buffer), reader);
     ConcreteDataAttributePath laterPath(4, Descriptor::Id, Descriptor::Attributes::ServerList::Id);
-    client.OnAttributeData(laterPath, &reader, StatusIB());
+    client.HandleServerListReport(laterPath, reader);
     EXPECT_EQ(client.CurrentProfile().avsmEndpoint, 3);
+}
+
+// Positions aReader on an anonymous TLV element encoded by aEncode
+template <typename EncodeFn>
+void EncodeTlv(uint8_t * aBuffer, size_t aBufferSize, TLV::TLVReader & aReader, EncodeFn aEncode)
+{
+    TLV::TLVWriter writer;
+    writer.Init(aBuffer, aBufferSize);
+    ASSERT_EQ(aEncode(writer), CHIP_NO_ERROR);
+    aReader.Init(aBuffer, writer.GetLengthWritten());
+    ASSERT_EQ(aReader.Next(), CHIP_NO_ERROR);
+}
+
+TEST_F(TestDefaultAvAnalysisCameraClient, CapabilityReadDerivesTraitsFromFeatureMap)
+{
+    ProfileTestClient client;
+    ASSERT_EQ(client.Init(&mCASESessionManager, kCameraEndpoint), CHIP_NO_ERROR);
+
+    uint8_t buffer[64];
+    TLV::TLVReader reader;
+    const uint32_t featureMap = to_underlying(CameraAvStreamManagement::Feature::kWatermark);
+    EncodeTlv(buffer, sizeof(buffer), reader, [&](TLV::TLVWriter & w) { return w.Put(TLV::AnonymousTag(), featureMap); });
+
+    // The profile's endpoint is unset (kInvalidEndpointId), so the report
+    // path must use the same endpoint to be accepted
+    ConcreteDataAttributePath path(kInvalidEndpointId, CameraAvStreamManagement::Id, Globals::Attributes::FeatureMap::Id);
+    client.HandleCapabilityReport(path, reader);
+
+    EXPECT_TRUE(client.CurrentProfile().hasWatermark);
+    EXPECT_FALSE(client.CurrentProfile().hasOSD);
+}
+
+TEST_F(TestDefaultAvAnalysisCameraClient, CapabilityReadBoundsResolutionAndFrameRate)
+{
+    ProfileTestClient client;
+    ASSERT_EQ(client.Init(&mCASESessionManager, kCameraEndpoint), CHIP_NO_ERROR);
+
+    uint8_t buffer[64];
+    TLV::TLVReader reader;
+    CameraAvStreamManagement::Structs::VideoSensorParamsStruct::Type sensorParams;
+    sensorParams.sensorWidth  = 1280;
+    sensorParams.sensorHeight = 720;
+    sensorParams.maxFPS       = 25;
+    EncodeTlv(buffer, sizeof(buffer), reader,
+              [&](TLV::TLVWriter & w) { return DataModel::Encode(w, TLV::AnonymousTag(), sensorParams); });
+
+    ConcreteDataAttributePath path(kInvalidEndpointId, CameraAvStreamManagement::Id,
+                                   CameraAvStreamManagement::Attributes::VideoSensorParams::Id);
+    client.HandleCapabilityReport(path, reader);
+
+    EXPECT_EQ(client.CurrentProfile().maxWidth, 1280);
+    EXPECT_EQ(client.CurrentProfile().maxHeight, 720);
+    EXPECT_EQ(client.CurrentProfile().maxFrameRate, 25);
+    // Min bounds never exceed the discovered max
+    EXPECT_LE(client.CurrentProfile().minWidth, client.CurrentProfile().maxWidth);
+    EXPECT_LE(client.CurrentProfile().minFrameRate, client.CurrentProfile().maxFrameRate);
+}
+
+TEST_F(TestDefaultAvAnalysisCameraClient, CapabilityReadTakesMinimumsFromTradeOffPoints)
+{
+    ProfileTestClient client;
+    ASSERT_EQ(client.Init(&mCASESessionManager, kCameraEndpoint), CHIP_NO_ERROR);
+
+    CameraAvStreamManagement::Structs::RateDistortionTradeOffPointsStruct::Type points[2];
+    points[0].codec             = CameraAvStreamManagement::VideoCodecEnum::kH264;
+    points[0].resolution.width  = 640;
+    points[0].resolution.height = 360;
+    points[0].minBitRate        = 250000;
+    points[1].codec             = CameraAvStreamManagement::VideoCodecEnum::kHevc;
+    points[1].resolution.width  = 320;
+    points[1].resolution.height = 180;
+    points[1].minBitRate        = 100000;
+
+    uint8_t buffer[128];
+    TLV::TLVReader reader;
+    EncodeTlv(buffer, sizeof(buffer), reader, [&](TLV::TLVWriter & w) {
+        TLV::TLVType outer;
+        ReturnErrorOnFailure(w.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outer));
+        for (const auto & point : points)
+        {
+            ReturnErrorOnFailure(DataModel::Encode(w, TLV::AnonymousTag(), point));
+        }
+        return w.EndContainer(outer);
+    });
+
+    ConcreteDataAttributePath path(kInvalidEndpointId, CameraAvStreamManagement::Id,
+                                   CameraAvStreamManagement::Attributes::RateDistortionTradeOffPoints::Id);
+    client.HandleCapabilityReport(path, reader);
+
+    // Only the H.264 point counts; the HEVC one must be ignored
+    EXPECT_EQ(client.CurrentProfile().minBitRateBps, 250000u);
+    EXPECT_EQ(client.CurrentProfile().minWidth, 640);
+    EXPECT_EQ(client.CurrentProfile().minHeight, 360);
+}
+
+TEST_F(TestDefaultAvAnalysisCameraClient, CapabilityReadDetectsMissingAnalysisUsage)
+{
+    ProfileTestClient client;
+    ASSERT_EQ(client.Init(&mCASESessionManager, kCameraEndpoint), CHIP_NO_ERROR);
+    EXPECT_TRUE(client.AnalysisUsageSupported());
+
+    uint8_t buffer[32];
+    TLV::TLVReader reader;
+    EncodeTlv(buffer, sizeof(buffer), reader, [](TLV::TLVWriter & w) {
+        TLV::TLVType outer;
+        ReturnErrorOnFailure(w.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outer));
+        ReturnErrorOnFailure(w.Put(TLV::AnonymousTag(), Globals::StreamUsageEnum::kLiveView));
+        ReturnErrorOnFailure(w.Put(TLV::AnonymousTag(), Globals::StreamUsageEnum::kRecording));
+        return w.EndContainer(outer);
+    });
+
+    ConcreteDataAttributePath path(kInvalidEndpointId, CameraAvStreamManagement::Id,
+                                   CameraAvStreamManagement::Attributes::SupportedStreamUsages::Id);
+    client.HandleCapabilityReport(path, reader);
+
+    EXPECT_FALSE(client.AnalysisUsageSupported());
 }
 
 TEST_F(TestDefaultAvAnalysisCameraClient, DoneWithoutResponseIsFailure)
