@@ -58,6 +58,11 @@ AudioControlCluster::AudioControlCluster(EndpointId endpointId, AudioControlDele
         VerifyOrDie(!mOptionalAttributeSet.IsSet(MaxDeviceVolumeDB::Id));
     }
 
+    VerifyOrDie(config.mSetVolumeUnmutePolicy < UnmutePolicyEnum::kUnknownEnumValue);
+    VerifyOrDie(config.mIncreaseVolumeUnmutePolicy < UnmutePolicyEnum::kUnknownEnumValue);
+    VerifyOrDie(config.mIncreaseVolumeUnmuteVolume < UnmuteVolumeEnum::kUnknownEnumValue);
+    VerifyOrDie(config.mDecreaseVolumeUnmutePolicy < UnmutePolicyEnum::kUnknownEnumValue);
+
     mSoftMuted                  = config.mSoftMuted;
     mPhysicallyMuted            = config.mPhysicallyMuted;
     mVolume                     = config.mVolume;
