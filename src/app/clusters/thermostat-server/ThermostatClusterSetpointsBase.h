@@ -43,7 +43,7 @@ public:
 
     virtual Protocols::InteractionModel::Status LoadSetpoints(Setpoints & setpoints) = 0;
 
-    const OptionalAttributes & OptionalAttributes() const;
+    const OptionalAttributes & GetOptionalAttributes() const;
     const BitFlags<Thermostat::Feature> & Features() const;
 
     virtual Setpoints GetSetpoints();

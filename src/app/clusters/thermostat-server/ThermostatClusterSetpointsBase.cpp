@@ -39,9 +39,9 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-const OptionalAttributes & ThermostatSetpointsBase::OptionalAttributes() const
+const OptionalAttributes & ThermostatSetpointsBase::GetOptionalAttributes() const
 {
-    return mCluster.OptionalAttributes();
+    return mCluster.GetOptionalAttributes();
 }
 
 const BitFlags<Thermostat::Feature> & ThermostatSetpointsBase::Features() const

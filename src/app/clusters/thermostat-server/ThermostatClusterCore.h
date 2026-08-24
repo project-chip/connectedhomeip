@@ -66,7 +66,7 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     const BitFlags<Thermostat::Feature> & Features() const { return mFeatures; }
-    const OptionalAttributes & OptionalAttributes() const { return mConfig.mOptionalAttributes; }
+    const OptionalAttributes & GetOptionalAttributes() const { return mConfig.mOptionalAttributes; }
 
     EndpointId Endpoint() const { return mPath.mEndpointId; }
 

@@ -116,7 +116,7 @@ std::optional<DataModel::ActionReturnStatus> ThermostatHold::WriteAttribute(cons
 
 CHIP_ERROR ThermostatHold::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    const auto & optionalAttributes                              = mCluster.OptionalAttributes();
+    const auto & optionalAttributes                              = mCluster.GetOptionalAttributes();
     const AttributeListBuilder::OptionalAttributeEntry entries[] = {
         { optionalAttributes.TemperatureSetpointHold, TemperatureSetpointHold::kMetadataEntry },
         { optionalAttributes.TemperatureSetpointHoldDuration, TemperatureSetpointHoldDuration::kMetadataEntry },

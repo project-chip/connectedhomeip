@@ -137,7 +137,7 @@ ThermostatCoolingSetpoints::ReadAttribute(const DataModel::ReadAttributeRequest 
 
 Protocols::InteractionModel::Status ThermostatCoolingSetpoints::LoadSetpoints(Setpoints & setpoints)
 {
-    auto & optionalAttributes = mSetpoints.OptionalAttributes();
+    auto & optionalAttributes = mSetpoints.GetOptionalAttributes();
     if (optionalAttributes.AbsMinCoolSetpointLimit)
     {
         temperature absMinCoolSetpointLimit;

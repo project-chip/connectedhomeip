@@ -94,7 +94,7 @@ bool ThermostatHeatingSetpoints::HasAttribute(AttributeId attributeId)
 
 Protocols::InteractionModel::Status ThermostatHeatingSetpoints::LoadSetpoints(Setpoints & setpoints)
 {
-    OptionalAttributes attributes = mSetpoints.OptionalAttributes();
+    OptionalAttributes attributes = mSetpoints.GetOptionalAttributes();
 
     if (attributes.AbsMinHeatSetpointLimit)
     {
