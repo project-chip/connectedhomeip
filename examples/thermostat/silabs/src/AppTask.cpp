@@ -28,12 +28,12 @@
 #include "lcd.h"
 #endif // SL_MATTER_DISPLAY_ENABLED
 
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/thermostat-server/ThermostatCluster.h>
+#include <app/clusters/thermostat-server/AttributeAccessorShim.h>
+#include <app/clusters/thermostat-server/CodegenIntegration.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <cmsis_os2.h>
@@ -104,9 +104,11 @@ CHIP_ERROR AppTask::AppInit()
     GetLCD().SetCustomUI(ThermostatUI::DrawUI);
 #endif
 
-    using namespace chip::app::Clusters::Thermostat;
-    auto & delegate = ThermostatDelegate::GetInstance();
-    SetDefaultDelegate(kThermostatEndpoint, &delegate);
+    auto status = Thermostat::SetDefaultDelegate(kThermostatEndpoint, &Thermostat::ThermostatDelegate::GetInstance());
+    if (status != Protocols::InteractionModel::Status::Success)
+    {
+        ChipLogError(AppServer, "SetDefaultDelegate failed: 0x%02x", to_underlying(status));
+    }
 
     err = AppInstance().InitThermostat();
     if (err != CHIP_NO_ERROR)
