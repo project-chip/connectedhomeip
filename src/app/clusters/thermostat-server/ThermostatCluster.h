@@ -381,6 +381,7 @@ private:
             detail::MakeFeature<kHasSuggestions, ThermostatSuggestions>(std::forward_as_tuple(delegates...), *this, mPresets)),
         mOccupancy(detail::MakeFeature<kHasOccupancy, ThermostatOccupancy>(std::forward_as_tuple(delegates...), *this))
     {
+        static_assert(sizeof...(Delegates) > 0, "ThermostatCluster requires at least one delegate");
         static_assert(detail::kArgsHasDelegate<Thermostat::Delegate, Delegates...>,
                       "Missing Thermostat::Delegate in constructor arguments");
     }
@@ -402,8 +403,9 @@ ThermostatCluster(EndpointId, BitFlags<Thermostat::Feature>, const ThermostatClu
                   DelegateArgs &...) -> ThermostatCluster<std::decay_t<DelegateArgs>...>;
 
 using FullFeaturedThermostatCluster =
-    ThermostatCluster<ThermostatHeatingSetpoints::Delegate, ThermostatCoolingSetpoints::Delegate, ThermostatAutoSetpoints::Delegate, ThermostatHold::Delegate,
-                      ThermostatPresets::Delegate, ThermostatSuggestions::Delegate, ThermostatOccupancy::Delegate>;
+    ThermostatCluster<Thermostat::Delegate, ThermostatHeatingSetpoints::Delegate, ThermostatCoolingSetpoints::Delegate,
+                      ThermostatAutoSetpoints::Delegate, ThermostatHold::Delegate, ThermostatPresets::Delegate,
+                      ThermostatSuggestions::Delegate, ThermostatOccupancy::Delegate>;
 
 } // namespace Thermostat
 } // namespace Clusters

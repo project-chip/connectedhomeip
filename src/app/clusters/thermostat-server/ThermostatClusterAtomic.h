@@ -200,11 +200,8 @@ private:
 
     Protocols::InteractionModel::Status
     ExecuteAtomicAction(AtomicAttributes & attributeStatuses,
-                        Protocols::InteractionModel::Status (Delegate::*action)(chip::AttributeId));
-    Protocols::InteractionModel::Status
-    ExecuteAtomicAction(AtomicAttributes & attributeStatuses,
                         Protocols::InteractionModel::Status (Delegate::*action)(chip::AttributeId),
-                        std::optional<Protocols::InteractionModel::Status> statusOverride);
+                        std::optional<Protocols::InteractionModel::Status> statusOverride = std::nullopt);
 
     void Rollback();
 

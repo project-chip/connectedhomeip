@@ -35,8 +35,6 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-class ThermostatClusterCore;
-
 class ThermostatHeatingSetpoints
 {
 public:

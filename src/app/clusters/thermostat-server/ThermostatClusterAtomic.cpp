@@ -77,11 +77,6 @@ bool CountAttributeRequests(const DataModel::DecodableList<chip::AttributeId> at
 
 } // anonymous namespace
 
-Status AtomicWriteSession::ExecuteAtomicAction(AtomicAttributes & attributeStatuses, Status (Delegate::*action)(AttributeId))
-{
-    return ExecuteAtomicAction(attributeStatuses, action, std::nullopt);
-}
-
 Status AtomicWriteSession::ExecuteAtomicAction(AtomicAttributes & attributeStatuses, Status (Delegate::*action)(AttributeId),
                                                std::optional<Status> statusOverride)
 {

@@ -24,12 +24,12 @@ namespace Thermostat {
 
 using namespace Protocols::InteractionModel;
 
-Protocols::InteractionModel::Status Delegate::GetOutdoorTemperature(DataModel::Nullable<temperature> & outdoorTemp) const
+Protocols::InteractionModel::Status Delegate::GetOutdoorTemperature(DataModel::Nullable<temperature> &) const
 {
     return Status::UnsupportedAttribute;
 }
 
-Protocols::InteractionModel::Status Delegate::GetRemoteSensing(BitMask<RemoteSensingBitmap> & remoteSensing) const
+Protocols::InteractionModel::Status Delegate::GetRemoteSensing(BitMask<RemoteSensingBitmap> &) const
 {
     return Status::UnsupportedAttribute;
 }

@@ -30,8 +30,6 @@ namespace Thermostat {
 
 static constexpr uint8_t kMaxNumberOfPresetTypes = 6;
 
-static constexpr uint8_t kMaxNumberOfScheduleTypes = 2;
-
 // TODO: #34556 Support multiple presets/schedules of each type.
 // We will support only one preset of each preset/schedule type.
 static constexpr uint8_t kMaxNumberOfPresetsOfEachType = 1;
@@ -65,11 +63,6 @@ private:
      * @brief Initializes the presets array with some sample presets for testing.
      */
     void InitializePresets();
-
-    /**
-     * @brief Initializes the schedules types array with example schedule types.
-     */
-    void InitializeScheduleTypes();
 
     uint8_t mNumberOfPresets;
     Structs::PresetTypeStruct::Type mPresetTypes[kMaxNumberOfPresetTypes];
