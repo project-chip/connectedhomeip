@@ -59,17 +59,7 @@ struct OptionalAttributes
 };
 
 CHIP_ERROR AppendOptionalAttributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder,
-                                    Span<const AttributeListBuilder::OptionalAttributeEntry> entries)
-{
-    for (const auto & entry : entries)
-    {
-        if (entry.enabled)
-        {
-            ReturnErrorOnFailure(builder.AppendElements({ entry.metadata }));
-        }
-    }
-    return CHIP_NO_ERROR;
-}
+                                    Span<const AttributeListBuilder::OptionalAttributeEntry> entries);
 
 } // namespace Thermostat
 } // namespace Clusters

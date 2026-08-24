@@ -39,23 +39,28 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-Protocols::InteractionModel::Status ThermostatAutoSetpoints::LoadDeadband(std::optional<temperature> & deadband) {
-    auto status = mDelegate.GetMinDeadband(deadband);
-    VerifyOrReturnValue(status == Status::Success, status);
-    if (deadband.has_value() && (deadband.value() < kMinDeadBand || deadband.value() > kMaxDeadBand))
-    {
-        ChipLogError(Zcl, "Invalid value for Deadband: %u", deadband.value());
-        return Status::ConstraintError;
-    }
-    return Protocols::InteractionModel::Status::Success;
+Status ThermostatAutoSetpoints::Delegate::GetMinDeadband(temperature & minDeadband) const
+{
+    return Status::UnsupportedAttribute;
 }
 
-Protocols::InteractionModel::Status ThermostatAutoSetpoints::LoadSetpoints(Setpoints & setpoints) {
-    std::optional<temperature> minDeadband;
-    auto status = LoadDeadband(minDeadband);
+Status ThermostatAutoSetpoints::LoadDeadband(temperature & deadband) {
+    auto status = mDelegate.GetMinDeadband(deadband);
     VerifyOrReturnValue(status == Status::Success, status);
-    setpoints.deadBand = minDeadband.value_or(kDefaultDeadBand);
-    return Protocols::InteractionModel::Status::Success;
+    if (deadband < kMinDeadBand * 10 || deadband > kMaxDeadBand * 10)
+    {
+        ChipLogError(Zcl, "Invalid value for Deadband: %d", deadband);
+        return Status::ConstraintError;
+    }
+    return Status::Success;
+}
+
+Status ThermostatAutoSetpoints::LoadSetpoints(Setpoints & setpoints) {
+    temperature deadband;
+    auto status = LoadDeadband(deadband);
+    VerifyOrReturnValue(status == Status::Success, status);
+    setpoints.deadBand = deadband;
+    return Status::Success;
 }
 
 std::optional<DataModel::ActionReturnStatus> ThermostatAutoSetpoints::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -64,10 +69,10 @@ std::optional<DataModel::ActionReturnStatus> ThermostatAutoSetpoints::ReadAttrib
     switch (request.path.mAttributeId)
     {
     case MinSetpointDeadBand::Id: {
-        std::optional<temperature> deadband;
+        temperature deadband;
         auto status = LoadDeadband(deadband);
         VerifyOrReturnValue(status == Status::Success, status);
-        return encoder.Encode(static_cast<int8_t>(deadband.value_or(kDefaultDeadBand) / 10));
+        return encoder.Encode(static_cast<int8_t>(deadband / 10));
     }
     default:
         return std::nullopt;

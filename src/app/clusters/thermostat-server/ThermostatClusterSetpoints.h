@@ -48,7 +48,7 @@ class ThermostatAutoSetpoints {
         Delegate()          = default;
         virtual ~Delegate() = default;
 
-        virtual Protocols::InteractionModel::Status GetMinDeadband(std::optional<temperature> & minDeadband) const;
+        virtual Protocols::InteractionModel::Status GetMinDeadband(temperature & minDeadband) const;
     };
 
     ThermostatAutoSetpoints(Delegate & delegate) : mDelegate(delegate) {}
@@ -64,7 +64,7 @@ class ThermostatAutoSetpoints {
     private:
     Delegate & mDelegate;
 
-    Protocols::InteractionModel::Status LoadDeadband(std::optional<temperature> & minDeadband);
+    Protocols::InteractionModel::Status LoadDeadband(temperature & minDeadband);
 };
 
 
@@ -79,9 +79,9 @@ public:
 
     ThermostatSetpoints(ThermostatClusterCore & cluster, Delegates &... delegates) :
         ThermostatSetpointsBase(cluster), 
-        mCooling(detail::MakeFeature<kHasCooling, ThermostatCoolingSetpoints>(std::forward_as_tuple(delegates...), *this, cluster)),
-        mHeating(detail::MakeFeature<kHasHeating, ThermostatHeatingSetpoints>(std::forward_as_tuple(delegates...), *this, cluster)),
-        mAuto(detail::MakeFeature<kHasAuto, ThermostatAutoSetpoints>(std::forward_as_tuple(delegates...), *this, cluster)) {}
+        mCooling(detail::MakeFeature<kHasCooling, ThermostatCoolingSetpoints>(std::forward_as_tuple(delegates...), *this)),
+        mHeating(detail::MakeFeature<kHasHeating, ThermostatHeatingSetpoints>(std::forward_as_tuple(delegates...), *this)),
+        mAuto(detail::MakeFeature<kHasAuto, ThermostatAutoSetpoints>(std::forward_as_tuple(delegates...))) {}
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
     {
@@ -174,15 +174,7 @@ public:
             return status;
         }
         if (status == Protocols::InteractionModel::Status::Success) {
-            Setpoints currentSetpoints = GetSetpoints();
-            if constexpr (kHasCooling)
-            {
-                status = mCooling.SaveSetpoints(currentSetpoints, setpoints, changedAttributes);
-            }
-            if constexpr (kHasHeating)
-            {
-                status = mHeating.SaveSetpoints(currentSetpoints, setpoints, changedAttributes);
-            }
+            return SaveSetpoints(setpoints, changedAttributes);
         }
         return status;
     }
@@ -241,6 +233,7 @@ public:
                 return status.GetStatusCode().GetStatus();
             }
         }
+        NotifyAttributesChanged(changedAttributes);
         return Protocols::InteractionModel::Status::Success;
     }
 

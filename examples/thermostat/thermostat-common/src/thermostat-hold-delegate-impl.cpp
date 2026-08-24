@@ -17,6 +17,8 @@
  */
 
 #include "../include/thermostat-hold-delegate-impl.h"
+#include "app/data-model/Nullable.h"
+#include <cstdint>
 
 using namespace chip;
 using namespace chip::app;
@@ -24,6 +26,17 @@ using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 using namespace chip::app::Clusters::Thermostat::Structs;
 using namespace Protocols::InteractionModel;
+
+Status ThermostatHoldDelegate::Init() {
+    AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
+    VerifyOrReturnError(provider != nullptr, Status::Failure);
+    AttributePersistence persistence(*provider);
+
+    persistence.LoadNativeEndianValue({mEndpointId, Thermostat::Id, TemperatureSetpointHold::Id}, mTemperatureSetpointHold, TemperatureSetpointHoldEnum::kSetpointHoldOff);
+    persistence.LoadNativeEndianValue<uint16_t>({mEndpointId, Thermostat::Id, TemperatureSetpointHoldDuration::Id}, mTemperatureSetpointHoldDuration, DataModel::NullNullable);
+    persistence.LoadNativeEndianValue<uint32_t>({mEndpointId, Thermostat::Id, SetpointHoldExpiryTimestamp::Id}, mSetpointHoldExpiryTimestamp, DataModel::NullNullable);
+    return Status::Success;
+}
 
 TemperatureSetpointHoldEnum ThermostatHoldDelegate::GetTemperatureSetpointHold() const
 {
@@ -35,6 +48,12 @@ Protocols::InteractionModel::Status ThermostatHoldDelegate::SetTemperatureSetpoi
     if (mTemperatureSetpointHold == hold)
     {
         return Status::Success;
+    }
+    AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
+    VerifyOrReturnError(provider != nullptr, Status::Failure);
+    AttributePersistence persistence(*provider);
+    if (auto err = persistence.StoreNativeEndianValue({mEndpointId, Thermostat::Id, TemperatureSetpointHold::Id}, mTemperatureSetpointHold); err != CHIP_NO_ERROR) {
+        return ClusterStatusCode(err).GetStatus();
     }
     mTemperatureSetpointHold = hold;
     changed                  = true;
@@ -53,6 +72,12 @@ Protocols::InteractionModel::Status ThermostatHoldDelegate::SetTemperatureSetpoi
     {
         return Status::Success;
     }
+    AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
+    VerifyOrReturnError(provider != nullptr, Status::Failure);
+    AttributePersistence persistence(*provider);
+    if (auto err = persistence.StoreNativeEndianValue({mEndpointId, Thermostat::Id, TemperatureSetpointHoldDuration::Id}, mTemperatureSetpointHoldDuration); err != CHIP_NO_ERROR) {
+        return ClusterStatusCode(err).GetStatus();
+    }
     mTemperatureSetpointHoldDuration = duration;
     changed                          = true;
     return Status::Success;
@@ -69,6 +94,12 @@ Protocols::InteractionModel::Status ThermostatHoldDelegate::SetSetpointHoldExpir
     if (mSetpointHoldExpiryTimestamp == timestamp)
     {
         return Status::Success;
+    }
+    AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
+    VerifyOrReturnError(provider != nullptr, Status::Failure);
+    AttributePersistence persistence(*provider);
+    if (auto err = persistence.StoreNativeEndianValue({mEndpointId, Thermostat::Id, SetpointHoldExpiryTimestamp::Id}, mSetpointHoldExpiryTimestamp); err != CHIP_NO_ERROR) {
+        return ClusterStatusCode(err).GetStatus();
     }
     mSetpointHoldExpiryTimestamp = timestamp;
     changed                      = true;

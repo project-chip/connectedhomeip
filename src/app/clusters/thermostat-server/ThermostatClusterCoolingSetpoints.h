@@ -45,9 +45,9 @@ public:
         Delegate()          = default;
         virtual ~Delegate() = default;
 
-        virtual Protocols::InteractionModel::Status GetOccupiedCoolingSetpoint(temperature & occupiedCoolingSetpoint) const;
+        virtual Protocols::InteractionModel::Status GetOccupiedCoolingSetpoint(temperature & occupiedCoolingSetpoint) const = 0;
         virtual Protocols::InteractionModel::Status SetOccupiedCoolingSetpoint(temperature occupiedCoolingSetpoint,
-                                                                            bool & changed);
+                                                                            bool & changed) = 0;
 
         virtual Protocols::InteractionModel::Status GetAbsMinCoolSetpointLimit(temperature & absMinCoolSetpointLimit) const;
         virtual Protocols::InteractionModel::Status GetAbsMaxCoolSetpointLimit(temperature & absMaxCoolSetpointLimit) const;

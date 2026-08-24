@@ -19,6 +19,7 @@
 
 #include <app/clusters/thermostat-server/ThermostatClusterCoolingSetpoints.h>
 #include <app/clusters/thermostat-server/ThermostatClusterHeatingSetpoints.h>
+#include <app/clusters/thermostat-server/ThermostatClusterSetpoints.h>
 #include <app/clusters/thermostat-server/ThermostatDelegate.h>
 
 #include <app/persistence/AttributePersistenceProvider.h>
@@ -29,14 +30,18 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-class ThermostatSetpointsDelegate : public ThermostatCoolingSetpoints::Delegate, public ThermostatHeatingSetpoints::Delegate
+class ThermostatSetpointsDelegate : public ThermostatCoolingSetpoints::Delegate,
+                                    public ThermostatHeatingSetpoints::Delegate,
+                                    public ThermostatAutoSetpoints::Delegate
 {
 public:
-    ThermostatSetpointsDelegate(EndpointId endpoint, AttributePersistenceProvider * provider) :
+    ThermostatSetpointsDelegate(EndpointId endpoint, AttributePersistenceProvider * provider = nullptr) :
         mEndpointId(endpoint),
         mProvider(provider) {}
 
     Protocols::InteractionModel::Status Init();
+
+    Protocols::InteractionModel::Status GetMinDeadband(temperature & minDeadband) const override;
 
     Protocols::InteractionModel::Status GetOccupiedCoolingSetpoint(temperature & occupiedCoolingSetpoint) const override;
     Protocols::InteractionModel::Status SetOccupiedCoolingSetpoint(temperature occupiedCoolingSetpoint,

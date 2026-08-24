@@ -43,6 +43,10 @@ const OptionalAttributes & ThermostatSetpointsBase::OptionalAttributes() const {
     return mCluster.OptionalAttributes();
 }
 
+const BitFlags<Thermostat::Feature> & ThermostatSetpointsBase::Features() const {
+    return mCluster.Features();
+}
+
 Setpoints ThermostatSetpointsBase::GetSetpoints() {
     Setpoints setpoints;
     auto features = mCluster.Features();
@@ -76,6 +80,17 @@ void ThermostatSetpointsBase::GenerateSetpointEvent(AttributeId attributeId, tem
     }
 }
 
+void ThermostatSetpointsBase::NotifyAttributesChanged(const SetpointAttributes & changedAttributes)
+{
+    for (AttributeId id = 0; id < 32; ++id)
+    {
+        if (changedAttributes.Has(id))
+        {
+            mCluster.NotifyAttributeChanged(id);
+        }
+    }
+}
+
 std::optional<DataModel::ActionReturnStatus> ThermostatSetpointsBase::InvokeCommand(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) {
 
@@ -92,7 +107,7 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSetpointsBase::InvokeComm
             OccupancyBitmap isOccupied = mCluster.IsOccupied() ? OccupancyBitmap::kOccupied : OccupancyBitmap(0);
 
             auto & range = setpoints.GetRange(isOccupied);
-            int8_t amount = request_data.amount;
+            temperature delta = static_cast<temperature>(request_data.amount * 10);
 
             chip::Optional<temperature> heat;
             chip::Optional<temperature> cool;
@@ -102,23 +117,23 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSetpointsBase::InvokeComm
             case SetpointRaiseLowerModeEnum::kBoth:
                 if (setpoints.heatSupported)
                 {
-                    heat.SetValue(static_cast<temperature>(range.heating.Temperature() + amount));
+                    heat.SetValue(static_cast<temperature>(range.heating.Temperature() + delta));
                 }
                 if (setpoints.coolSupported)
                 {
-                    cool.SetValue(static_cast<temperature>(range.cooling.Temperature() + amount));
+                    cool.SetValue(static_cast<temperature>(range.cooling.Temperature() + delta));
                 }
                 break;
             case SetpointRaiseLowerModeEnum::kHeat:
                 if (setpoints.heatSupported)
                 {
-                    heat.SetValue(static_cast<temperature>(range.heating.Temperature() + amount));
+                    heat.SetValue(static_cast<temperature>(range.heating.Temperature() + delta));
                 }
                 break;
             case SetpointRaiseLowerModeEnum::kCool:
                 if (setpoints.coolSupported)
                 {
-                    cool.SetValue(static_cast<temperature>(range.cooling.Temperature() + amount));
+                    cool.SetValue(static_cast<temperature>(range.cooling.Temperature() + delta));
                 }
                 break;
             default:

@@ -21,6 +21,7 @@ source_set("thermostat-server") {
     "SetpointAttributes.cpp",
     "Setpoints.cpp",
     "ThermostatClusterAtomic.cpp",
+    "ThermostatClusterAttributes.cpp",
     "ThermostatClusterCoolingSetpoints.cpp",
     "ThermostatClusterCore.cpp",
     "ThermostatClusterEvents.cpp",

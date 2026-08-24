@@ -47,7 +47,7 @@ public:
     static constexpr bool kRequiresAtomicWrite = kHasPresets;
 
     static_assert(!kHasSuggestions || kHasPresets, "Suggestions feature requires Presets feature");
-    static_assert(!kHasHeating || !kHasCooling, "Thermostat cluster must implement either heating or cooling");
+    static_assert(kHasHeating || kHasCooling, "Thermostat cluster must implement either heating or cooling");
 
     ThermostatCluster(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features, const Config & config,
                       Delegates &... delegates) :
@@ -101,6 +101,13 @@ public:
         if (auto status = mSetpoints.ReadAttribute(request, encoder)) {
             return *status;
         }
+        if constexpr (kHasHold)
+        {
+            if (auto status = mHold.ReadAttribute(request, encoder))
+            {
+                return *status;
+            }
+        }
         if constexpr (kHasOccupancy)
         {
             if (auto status = mOccupancy.ReadAttribute(request, encoder))
@@ -122,7 +129,7 @@ public:
                 return *status;
             }
         }
-        return ThermostatCluster::ReadAttribute(request, encoder);
+        return ThermostatClusterCore::ReadAttribute(request, encoder);
     }
 
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
@@ -202,7 +209,7 @@ public:
                 return std::nullopt;
             }
         }
-        return ThermostatCluster::InvokeCommand(request, input_arguments, handler);
+        return ThermostatClusterCore::InvokeCommand(request, input_arguments, handler);
     }
 
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
@@ -353,7 +360,7 @@ public:
         case Attributes::ThermostatSuggestionNotFollowingReason::Id:
             return mFeatures.Has(Feature::kThermostatSuggestions);
         default:
-            return ThermostatCluster::HasAttribute(attributeId);
+            return ThermostatClusterCore::HasAttribute(attributeId);
         }
     }
 
@@ -391,7 +398,9 @@ ThermostatCluster(EndpointId, BitFlags<Thermostat::Feature>, const ThermostatClu
     -> ThermostatCluster<std::decay_t<DelegateArgs>...>;
 
 using FullFeaturedThermostatCluster =
-    ThermostatCluster<ThermostatPresets::Delegate, ThermostatSuggestions::Delegate, ThermostatOccupancy::Delegate>;
+    ThermostatCluster<ThermostatHeatingSetpoints::Delegate, ThermostatCoolingSetpoints::Delegate,
+                      ThermostatHold::Delegate, ThermostatPresets::Delegate,
+                      ThermostatSuggestions::Delegate, ThermostatOccupancy::Delegate>;
 
 } // namespace Thermostat
 } // namespace Clusters

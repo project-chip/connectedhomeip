@@ -141,6 +141,19 @@ Protocols::InteractionModel::Status ThermostatSetpointsDelegate::Init()
     return Status::Success;
 }
 
+Protocols::InteractionModel::Status ThermostatSetpointsDelegate::GetMinDeadband(temperature & minDeadband) const
+{
+    AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
+    VerifyOrReturnError(provider != nullptr, Status::Failure);
+    AttributePersistence persistence(*provider);
+
+    int8_t deadBand = static_cast<int8_t>(kDefaultDeadBand / 10);
+    MinSetpointDeadBand::GetDefault(mEndpointId, &deadBand);
+    persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, MinSetpointDeadBand::Id }, deadBand, deadBand);
+    minDeadband = static_cast<int16_t>(deadBand * 10);
+    return Status::Success;
+}
+
 Protocols::InteractionModel::Status ThermostatSetpointsDelegate::SaveSetpoint(AttributeId attributeId, temperature value) {
     AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
     VerifyOrReturnError(provider != nullptr, Status::Failure);

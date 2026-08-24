@@ -34,6 +34,22 @@ using namespace chip::app::Clusters::Thermostat::Structs;
 using namespace Protocols::InteractionModel;
 using namespace System::Clock;
 
+Protocols::InteractionModel::Status ThermostatDelegate::Init() {
+    AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
+    VerifyOrReturnError(provider != nullptr, Status::Failure);
+    AttributePersistence persistence(*provider);
+
+    persistence.LoadNativeEndianValue({mEndpointId, Thermostat::Id, SystemMode::Id}, mSystemMode, mSystemMode);
+    persistence.LoadNativeEndianValue({mEndpointId, Thermostat::Id, ControlSequenceOfOperation::Id}, mControlSequenceOfOperation, mControlSequenceOfOperation);
+    uint8_t remoteSensing = 0;
+    if (persistence.LoadNativeEndianValue({mEndpointId, Thermostat::Id, RemoteSensing::Id}, remoteSensing, remoteSensing))
+    {
+        mRemoteSensing = BitMask<RemoteSensingBitmap>(remoteSensing);
+    }
+
+    return Status::Success;
+}
+
 SystemModeEnum ThermostatDelegate::GetSystemMode() const
 {
     return mSystemMode;
@@ -159,112 +175,3 @@ Protocols::InteractionModel::Status ThermostatDelegate::SetRemoteSensing(BitMask
     changed        = true;
     return Status::Success;
 }
-/*
-Protocols::InteractionModel::Status ThermostatDelegate::LoadSetpoints(Setpoints & setpoints)
-{
-    ChipLogDetail(Zcl, "Loading setpoints");
-    AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
-    VerifyOrReturnError(provider != nullptr, Status::Failure);
-    AttributePersistence persistence(*provider);
-
-    if (setpoints.autoSupported)
-    {
-        int8_t deadBand;
-        persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, MinSetpointDeadBand::Id }, deadBand,
-                                          static_cast<int8_t>(kDefaultDeadBand / 10));
-        setpoints.deadBand = static_cast<int16_t>(deadBand * 10);
-    }
-
-    int16_t absMinHeatLimit = kDefaultAbsMinHeatSetpointLimit;
-    persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, AbsMinHeatSetpointLimit::Id }, absMinHeatLimit,
-                                      static_cast<int16_t>(kDefaultAbsMinHeatSetpointLimit));
-    setpoints.absoluteHeatLimits.minimum.SetTemperature(absMinHeatLimit);
-
-    int16_t absMaxHeatLimit = kDefaultAbsMaxHeatSetpointLimit;
-    persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, AbsMaxHeatSetpointLimit::Id }, absMaxHeatLimit,
-                                      static_cast<int16_t>(kDefaultAbsMaxHeatSetpointLimit));
-    setpoints.absoluteHeatLimits.maximum.SetTemperature(absMaxHeatLimit);
-
-    int16_t absMinCoolLimit = kDefaultAbsMinCoolSetpointLimit;
-    persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, AbsMinCoolSetpointLimit::Id }, absMinCoolLimit,
-                                      static_cast<int16_t>(kDefaultAbsMinCoolSetpointLimit));
-    setpoints.absoluteCoolLimits.minimum.SetTemperature(absMinCoolLimit);
-
-    int16_t absMaxCoolLimit = kDefaultAbsMaxCoolSetpointLimit;
-    persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, AbsMaxCoolSetpointLimit::Id }, absMaxCoolLimit,
-                                      static_cast<int16_t>(kDefaultAbsMaxCoolSetpointLimit));
-    setpoints.absoluteCoolLimits.maximum.SetTemperature(absMaxCoolLimit);
-
-    if (setpoints.heatSupported)
-    {
-        int16_t minHeatLimit;
-        if (persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, MinHeatSetpointLimit::Id }, minHeatLimit,
-                                              static_cast<int16_t>(0)))
-        {
-            setpoints.userHeatLimits.minimum.SetTemperature(minHeatLimit);
-        }
-        int16_t maxHeatLimit;
-        if (persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, MaxHeatSetpointLimit::Id }, maxHeatLimit,
-                                              static_cast<int16_t>(0)))
-        {
-            setpoints.userHeatLimits.maximum.SetTemperature(maxHeatLimit);
-        }
-    }
-    if (setpoints.coolSupported)
-    {
-        int16_t minCoolLimit;
-        if (persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, MinCoolSetpointLimit::Id }, minCoolLimit,
-                                              static_cast<int16_t>(0)))
-        {
-            setpoints.userCoolLimits.minimum.SetTemperature(minCoolLimit);
-        }
-        int16_t maxCoolLimit;
-        if (persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, MaxCoolSetpointLimit::Id }, maxCoolLimit,
-                                              static_cast<int16_t>(0)))
-        {
-            setpoints.userCoolLimits.maximum.SetTemperature(maxCoolLimit);
-        }
-    }
-
-    int16_t occupiedCooling;
-    persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, OccupiedCoolingSetpoint::Id }, occupiedCooling,
-                                      static_cast<int16_t>(kDefaultCoolingSetpoint));
-    setpoints.occupiedRange.cooling.SetTemperature(occupiedCooling);
-
-    int16_t occupiedHeating;
-    persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, OccupiedHeatingSetpoint::Id }, occupiedHeating,
-                                      static_cast<int16_t>(kDefaultHeatingSetpoint));
-    setpoints.occupiedRange.heating.SetTemperature(occupiedHeating);
-
-    if (setpoints.occupancySupported)
-    {
-        int16_t unoccupiedCooling;
-        persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, UnoccupiedCoolingSetpoint::Id }, unoccupiedCooling,
-                                          static_cast<int16_t>(kDefaultCoolingSetpoint));
-        setpoints.unoccupiedRange.cooling.SetTemperature(unoccupiedCooling);
-
-        int16_t unoccupiedHeating;
-        persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, UnoccupiedHeatingSetpoint::Id }, unoccupiedHeating,
-                                          static_cast<int16_t>(kDefaultHeatingSetpoint));
-        setpoints.unoccupiedRange.heating.SetTemperature(unoccupiedHeating);
-    }
-
-    return Status::Success;
-}
-
-Protocols::InteractionModel::Status ThermostatDelegate::SaveSetpoint(const Setpoint & oldSetpoint, const Setpoint & newSetpoint)
-{
-    AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
-    VerifyOrReturnError(provider != nullptr, Status::Failure);
-    AttributePersistence persistence(*provider);
-    temperature newTemp = newSetpoint.Temperature();
-
-    auto status = persistence.StoreNativeEndianValue({ mEndpointId, Thermostat::Id, oldSetpoint.AttributeId() }, newTemp);
-    if (status != CHIP_NO_ERROR)
-    {
-        return chip::Protocols::InteractionModel::ClusterStatusCode(status).GetStatus();
-    }
-
-    return Status::Success;
-}
-*/

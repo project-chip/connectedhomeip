@@ -224,6 +224,50 @@ DataModel::ActionReturnStatus ThermostatCoolingSetpoints::SaveSetpoints(const Se
     return Status::Success;
 }
 
+std::optional<DataModel::ActionReturnStatus>
+ThermostatCoolingSetpoints::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                           AttributeValueDecoder & decoder, Setpoints & setpoints,
+                                           SetpointAttributes & changedAttributes)
+{
+    if (!HasAttribute(request.path.mAttributeId))
+    {
+        return std::nullopt;
+    }
+
+    temperature setpoint;
+    ReturnErrorOnFailure(decoder.Decode(setpoint));
+
+    switch (request.path.mAttributeId)
+    {
+    case OccupiedCoolingSetpoint::Id:
+        if (!setpoints.coolSupported)
+        {
+            return Status::UnsupportedAttribute;
+        }
+        return setpoints.ChangeRangeCooling(setpoints.occupiedRange, setpoint, Setpoints::ClampMode::kDontClamp, changedAttributes);
+    case UnoccupiedCoolingSetpoint::Id:
+        if (!setpoints.occupancySupported)
+        {
+            return Status::UnsupportedAttribute;
+        }
+        return setpoints.ChangeRangeCooling(setpoints.unoccupiedRange, setpoint, Setpoints::ClampMode::kDontClamp, changedAttributes);
+    case MinCoolSetpointLimit::Id:
+        if (!setpoints.coolSupported)
+        {
+            return Status::UnsupportedAttribute;
+        }
+        return setpoints.ChangeLimitMinimum(setpoints.userCoolLimits, setpoints.absoluteCoolLimits, setpoint, changedAttributes);
+    case MaxCoolSetpointLimit::Id:
+        if (!setpoints.coolSupported)
+        {
+            return Status::UnsupportedAttribute;
+        }
+        return setpoints.ChangeLimitMaximum(setpoints.userCoolLimits, setpoints.absoluteCoolLimits, setpoint, changedAttributes);
+    default:
+        return std::nullopt;
+    }
+}
+
 CHIP_ERROR ThermostatCoolingSetpoints::Attributes(const ConcreteClusterPath & path,
                                                   ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {

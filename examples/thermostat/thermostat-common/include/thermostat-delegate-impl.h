@@ -57,6 +57,8 @@ public:
     BitMask<RemoteSensingBitmap> GetRemoteSensing() const override;
     Protocols::InteractionModel::Status SetRemoteSensing(BitMask<RemoteSensingBitmap> sensing, bool & changed) override;
 
+    Protocols::InteractionModel::Status Init();
+
 private:
     EndpointId mEndpointId;
     AttributePersistenceProvider * mProvider = nullptr;

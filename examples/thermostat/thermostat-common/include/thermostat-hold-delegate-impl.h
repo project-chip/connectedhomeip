@@ -32,7 +32,9 @@ namespace Thermostat {
 class ThermostatHoldDelegate : public ThermostatHold::Delegate
 {
 public:
-    ThermostatHoldDelegate() {}
+    ThermostatHoldDelegate(EndpointId endpoint, AttributePersistenceProvider * provider = nullptr) :
+        mEndpointId(endpoint),
+        mProvider(provider) {}
 
     TemperatureSetpointHoldEnum GetTemperatureSetpointHold() const override;
     Protocols::InteractionModel::Status SetTemperatureSetpointHold(TemperatureSetpointHoldEnum hold, bool & changed) override;
@@ -44,7 +46,13 @@ public:
     DataModel::Nullable<uint32_t> GetSetpointHoldExpiryTimestamp() const override;
     Protocols::InteractionModel::Status SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> timestamp,
                                                                        bool & changed) override;
+
+    Protocols::InteractionModel::Status Init();
+
 private:
+    EndpointId mEndpointId;
+    AttributePersistenceProvider * mProvider;
+
     TemperatureSetpointHoldEnum mTemperatureSetpointHold = TemperatureSetpointHoldEnum::kSetpointHoldOff;
     DataModel::Nullable<uint16_t> mTemperatureSetpointHoldDuration;
     DataModel::Nullable<uint32_t> mSetpointHoldExpiryTimestamp;
