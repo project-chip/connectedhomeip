@@ -141,9 +141,9 @@ register the cluster directly. This provides the most flexibility and control.
 ### 1. Implement a transport driver
 
 BLE needs no driver of your own — register the cluster's own
-`CommissioningProxyBleTransport` (see [BLE Transport
-Integration](#ble-transport-integration)). For a transport the SDK does not
-ship, create a class that inherits from
+`CommissioningProxyBleTransport` (see
+[BLE Transport Integration](#ble-transport-integration)). For a transport the
+SDK does not ship, create a class that inherits from
 `chip::app::Clusters::CommissioningProxy::CommissioningProxyTransport` and
 implement its virtual methods — one class per physical transport; Wi-Fi PAF is
 the example below. A driver only handles the transport-specific work; the
