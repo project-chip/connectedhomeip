@@ -328,7 +328,7 @@ TEST_F(TestCommissioningProxyBleTransport, CancelPendingConnectWithNothingPendin
     EXPECT_FALSE(transport.IsConnectPending());
 }
 
-TEST_F(TestCommissioningProxyBleTransport, ShutdownStopsAnInFlightScanAndIsIdempotent)
+TEST_F(TestCommissioningProxyBleTransport, ShutdownStopsAnInFlightScanAndCanRunTwice)
 {
     ASSERT_EQ(transport.Scan(System::Clock::Seconds16(10)), Status::Success);
     ASSERT_TRUE(adapter.IsScanning());

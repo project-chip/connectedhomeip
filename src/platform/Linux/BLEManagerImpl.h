@@ -106,7 +106,7 @@ public:
     // central mode.
     //
     // Behaviour:
-    //   - Idempotent: returns CHIP_NO_ERROR if already central.
+    //   - Returns CHIP_NO_ERROR if already central.
     //   - Returns CHIP_ERROR_BUSY if any BLE connection is still tracked (eg. a
     //     commissioning session has not closed yet) — caller should retry later.
     //   - After this returns success, the CP can no longer be commissioned over

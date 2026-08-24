@@ -65,8 +65,8 @@ public:
      *
      * A commissioning proxy advertises as a peripheral so it can be commissioned onto
      * the fabric itself, then has to act as a central to reach the device it proxies
-     * for. Called on the first ProxyConnectRequest over BLE and expected to be
-     * idempotent, since later requests call it again.
+     * for. Called on the first ProxyConnectRequest over BLE, and again on later ones,
+     * so it must succeed when the stack is already central.
      *
      *   - CHIP_NO_ERROR:   the stack is in central role.
      *   - CHIP_ERROR_BUSY: prior peripheral activity is still winding down; the

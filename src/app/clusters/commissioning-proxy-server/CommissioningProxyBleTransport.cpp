@@ -46,7 +46,7 @@ CommissioningProxyBleTransport::CommissioningProxyBleTransport(CommissioningProx
 
 CommissioningProxyBleTransport::~CommissioningProxyBleTransport()
 {
-    // Idempotent, and required if the owner never called it: the timers and the
+    // Safe to run twice, and required if the owner never called it: the timers and the
     // installed BleLayer delegate would otherwise outlive this object.
     Shutdown();
 }
@@ -192,7 +192,7 @@ void CommissioningProxyBleTransport::ProxyBleDelegate::OnBleConnectionComplete(B
     if (mOwner.mPendingConnect.has_value() && mOwner.mPendingConnect->endpoint == nullptr)
     {
         mOwner.mPendingConnect->endpoint = endpoint;
-        mOwner.mBtpHandshakeEndpoint     = endpoint;
+        mOwner.mSessionlessEndpoint      = endpoint;
         CHIP_ERROR err                   = endpoint->StartConnect();
         if (err != CHIP_NO_ERROR)
         {
@@ -251,7 +251,7 @@ void CommissioningProxyBleTransport::ProxyBleDelegate::OnEndPointConnectComplete
             // BTP failure), OnEndPointConnectionClosed already cleared it; if Close() was
             // a no-op (StartConnect failed internally and the endpoint was already
             // kState_Closed), the sentinel remains stale and must be cleared here.
-            mOwner.mBtpHandshakeEndpoint = nullptr;
+            mOwner.mSessionlessEndpoint = nullptr;
             // BTP handshake failed: no session was established, so release the scanner
             // back to a background scan paused for this connect.
             mOwner.ResumeBgScanIfNeeded();
@@ -265,7 +265,7 @@ void CommissioningProxyBleTransport::ProxyBleDelegate::OnEndPointConnectComplete
             {
                 endpoint->Close();
             }
-            mOwner.mBtpHandshakeEndpoint = nullptr;
+            mOwner.mSessionlessEndpoint = nullptr;
             cmd->AddStatus(ctx.path, Status::Failure);
             mOwner.ResumeBgScanIfNeeded();
             return;
@@ -281,17 +281,17 @@ void CommissioningProxyBleTransport::ProxyBleDelegate::OnEndPointConnectComplete
             {
                 endpoint->Close();
             }
-            mOwner.mBtpHandshakeEndpoint = nullptr;
+            mOwner.mSessionlessEndpoint = nullptr;
             cmd->AddStatus(ctx.path, Status::ResourceExhausted);
             mOwner.ResumeBgScanIfNeeded();
             return;
         }
 
-        mOwner.mBtpHandshakeEndpoint = nullptr; // ownership moves to the slot below
-        uint16_t sessionId           = ctx.cluster->Sessions().AllocSessionId();
-        slot->inUse                  = true;
-        slot->sessionId              = sessionId;
-        slot->endpoint               = endpoint;
+        mOwner.mSessionlessEndpoint = nullptr; // ownership moves to the slot below
+        uint16_t sessionId          = ctx.cluster->Sessions().AllocSessionId();
+        slot->inUse                 = true;
+        slot->sessionId             = sessionId;
+        slot->endpoint              = endpoint;
         ctx.cluster->Sessions().RegisterSession(sessionId, CapabilitiesBitmap::kBle, ctx.fabricIndex);
 
         ChipLogProgress(AppServer, "ProxyConnectRequest: BLE connected, proxy session %u (disc %u)", sessionId, ctx.discriminator);
@@ -359,12 +359,12 @@ void CommissioningProxyBleTransport::ProxyBleDelegate::OnEndPointConnectionClose
         }
         return;
     }
-    // Endpoint was mid-BTP-handshake and closed by timeout/cancel/failure before a
-    // session was established. It was never passed to mOriginalTransport, so do not
-    // forward the close notification to it.
-    if (endpoint != nullptr && endpoint == mOwner.mBtpHandshakeEndpoint)
+    // A close this transport initiated: a mid-BTP-handshake endpoint torn down by
+    // timeout/cancel/failure, or a promoted session closed by Disconnect(). Neither was
+    // passed to mOriginalTransport, so do not forward the close notification to it.
+    if (endpoint != nullptr && endpoint == mOwner.mSessionlessEndpoint)
     {
-        mOwner.mBtpHandshakeEndpoint = nullptr;
+        mOwner.mSessionlessEndpoint = nullptr;
         return;
     }
     if (mOriginalTransport != nullptr)
@@ -543,13 +543,16 @@ void CommissioningProxyBleTransport::OnConnectTimeout()
         }
     }
 
-    // If the endpoint was already created (BTP handshake in flight), close it. Leave
-    // mBtpHandshakeEndpoint set: OnEndPointConnectionClosed checks it to suppress
-    // forwarding the close to mOriginalTransport. The callback clears it.
+    // If the endpoint was already created (BTP handshake in flight), close it.
+    // OnEndPointConnectionClosed checks mSessionlessEndpoint to keep the close away from
+    // mOriginalTransport, and clears it. Clear it here too: Close() does nothing on an
+    // endpoint that is already closed or still draining its tx queue, and a pointer left
+    // set would match a later endpoint recycled to the same pool address.
     if (ctx.endpoint != nullptr)
     {
         ctx.endpoint->Close();
     }
+    mSessionlessEndpoint = nullptr;
 
     if (app::CommandHandler * cmd = ctx.handle.Get())
     {
@@ -614,7 +617,7 @@ Status CommissioningProxyBleTransport::Connect(app::CommandHandler * commandObj,
     // Sequential mode switch: the CP started in BLE peripheral mode so it could be
     // commissioned onto the fabric (Step 1). The first BLE ProxyConnectRequest
     // transitions BLE to central role so we can scan / connect to the commissionee
-    // (Step 2). Idempotent — subsequent ProxyConnectRequest calls are no-ops.
+    // (Step 2). Subsequent ProxyConnectRequest calls are no-ops.
     {
         CHIP_ERROR switchErr = mAdapter.EnableCentralRole();
         if (switchErr == CHIP_ERROR_BUSY)
@@ -629,7 +632,7 @@ Status CommissioningProxyBleTransport::Connect(app::CommandHandler * commandObj,
         }
     }
 
-    // Install our BleLayerDelegate wrapper (idempotent).
+    // Install our BleLayerDelegate wrapper; a second call does nothing.
     mProxyDelegate.Install();
 
     // The connect's NewBleConnectionByDiscriminator uses the single BLE scanner. Pause
@@ -719,12 +722,15 @@ Status CommissioningProxyBleTransport::CancelPendingConnect(FabricIndex fabricIn
         }
     }
 
-    // Leave mBtpHandshakeEndpoint set so OnEndPointConnectionClosed suppresses
-    // forwarding the close to mOriginalTransport. The callback clears it.
+    // Close() lets OnEndPointConnectionClosed suppress forwarding to mOriginalTransport,
+    // and that callback clears the sentinel. Clear it here too: Close() does nothing on an
+    // endpoint that is already closed or still draining its tx queue, and a pointer left
+    // set would match a later endpoint recycled to the same pool address.
     if (ctx.endpoint != nullptr)
     {
         ctx.endpoint->Close();
     }
+    mSessionlessEndpoint = nullptr;
 
     if (app::CommandHandler * cmd = ctx.handle.Get())
     {
@@ -748,17 +754,17 @@ Status CommissioningProxyBleTransport::Disconnect(uint16_t sessionId)
 
     // Free the slot before Close so OnEndPointConnectionClosed (which fires
     // synchronously) finds no matching session and does not call DispatchMessageFailure
-    // for this local-initiated disconnect. Set the BTP sentinel so the close is not
-    // forwarded to mOriginalTransport.
+    // for this local-initiated disconnect. The endpoint is sessionless from here, so
+    // record it as such and the close is not forwarded to mOriginalTransport.
     *slot = EndpointSlot{};
 
     if (ep != nullptr)
     {
-        mBtpHandshakeEndpoint = ep;
+        mSessionlessEndpoint = ep;
         ep->Close();
-        // Close() fires synchronously; the callback clears mBtpHandshakeEndpoint. Clear
+        // Close() fires synchronously; the callback clears mSessionlessEndpoint. Clear
         // explicitly here in case Close() was a no-op (already-closed endpoint).
-        mBtpHandshakeEndpoint = nullptr;
+        mSessionlessEndpoint = nullptr;
     }
 
     return Status::Success;
@@ -910,17 +916,14 @@ void CommissioningProxyBleTransport::Shutdown()
         }
 
         // A BTP handshake in flight has an endpoint that was not in a slot, so the loop
-        // above did not close it. Leave mBtpHandshakeEndpoint set as in OnConnectTimeout:
-        // OnEndPointConnectionClosed matches it to suppress forwarding the close to
-        // mOriginalTransport, and clears it.
+        // above did not close it. Clear the sentinel either way, as in OnConnectTimeout:
+        // Close() does nothing on an endpoint that is already closed or still draining its
+        // tx queue, so the callback that would normally clear it may never run.
         if (ctx.endpoint != nullptr)
         {
             ctx.endpoint->Close();
         }
-        else
-        {
-            mBtpHandshakeEndpoint = nullptr;
-        }
+        mSessionlessEndpoint = nullptr;
 
         if (app::CommandHandler * cmd = ctx.handle.Get())
         {

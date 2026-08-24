@@ -34,8 +34,8 @@ constexpr size_t kBleAddressLength = 6;
 CHIP_ERROR LinuxCommissioningProxyBleAdapter::EnableCentralRole()
 {
     // One-way switch: tears down peripheral advertising and re-inits BlueZ as a central.
-    // Idempotent, and reports CHIP_ERROR_BUSY while prior peripheral activity is still
-    // winding down, which is exactly what the interface asks for.
+    // Safe to call when already central; reports CHIP_ERROR_BUSY while prior peripheral
+    // activity is still winding down.
     return DeviceLayer::Internal::BLEMgrImpl().SwitchToCentralMode();
 }
 

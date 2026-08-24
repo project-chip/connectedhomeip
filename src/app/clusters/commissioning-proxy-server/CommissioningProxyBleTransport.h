@@ -240,10 +240,12 @@ private:
     EndpointSlot mEndpoints[kMaxSessions];
     std::optional<ConnectCtx> mPendingConnect;
 
-    /// Endpoint whose close this transport initiated and does not want forwarded to the
-    /// original delegate: either mid-BTP-handshake teardown, or a promoted session being
-    /// closed by Disconnect(). OnEndPointConnectionClosed matches it and returns early.
-    Ble::BLEEndPoint * mBtpHandshakeEndpoint = nullptr;
+    /// The endpoint this transport owns that carries no session: during the BTP handshake,
+    /// before a SessionID exists, and inside Disconnect() after the slot is freed but
+    /// before Close() returns. Endpoints carrying a session live in mEndpoints instead.
+    /// OnEndPointConnectionClosed consults both; one matching neither belongs to the
+    /// application, and its close is forwarded to the original delegate.
+    Ble::BLEEndPoint * mSessionlessEndpoint = nullptr;
 
     ScanRecord mScanResults[kMaxScanResults];
     size_t mScanResultCount = 0;
