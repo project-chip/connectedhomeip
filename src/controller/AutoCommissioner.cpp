@@ -81,6 +81,7 @@ namespace {
 template <typename T, size_t N>
 CHIP_ERROR RelocateSpan(Span<const T> & inOutSpan, T (&buffer)[N], bool exactSize = false)
 {
+    static_assert(std::is_trivially_copyable_v<T>);
     size_t actualSize = inOutSpan.size();
     VerifyOrReturnError(exactSize ? actualSize == N : actualSize <= N, CHIP_ERROR_INVALID_ARGUMENT);
     if (actualSize > 0) // data() can be nullptr if size() == 0, and memmove(buffer, nullptr, 0) would be UB
