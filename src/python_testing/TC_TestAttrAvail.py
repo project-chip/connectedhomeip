@@ -108,8 +108,7 @@ class TC_TestAttrAvail(BasicCompositionTests):
         self.print_step("Operational Resume Command available ", cmd_should_be_there)
 
         self.step(4)
-        feat_should_be_there = await self.feature_guard(endpoint=self.endpoint, cluster=Clusters.BooleanStateConfiguration,
-                                                  feature_int=Clusters.BooleanStateConfiguration.Bitmaps.Feature.kAudible)
+        feat_should_be_there = await self.feature_guard(endpoint=self.endpoint, cluster=Clusters.BooleanStateConfiguration, feature_int=Clusters.BooleanStateConfiguration.Bitmaps.Feature.kAudible)
         asserts.assert_true(feat_should_be_there, True)
         self.print_step("Boolean State Config Audio Feature available ", feat_should_be_there)
 

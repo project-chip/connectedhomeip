@@ -191,7 +191,7 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
 
         # InterconnectedSmokeAlarmHandler is optional
         self.step(2)
-        if await self.feature_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.InterconnectSmokeAlarm):
+        if await self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.InterconnectSmokeAlarm):
             interconnected_smoke_alarm_handler = AttributeSubscriptionHandler(
                 expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.InterconnectSmokeAlarm)
             await interconnected_smoke_alarm_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
@@ -234,7 +234,7 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
 
         # InterconnectedCOAlarmHandler is Optional
         self.step(13)
-        if await self.feature_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.InterconnectCOAlarm):
+        if await self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.InterconnectCOAlarm):
 
             interconnected_co_alarm_handler = AttributeSubscriptionHandler(
                 expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.InterconnectCOAlarm)

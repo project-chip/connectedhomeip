@@ -940,7 +940,7 @@ Example:
 
 ```python
 self.step(<STEP_NUMBER>)
-if await self.attribute_guard(endpoint=self.endpoint, cluster=Clusters.BooleanStateConfiguration, feature_int=Clusters.BooleanStateConfiguration.Bitmaps.Feature.kAudible):
+if await self.feature_guard(endpoint=self.endpoint, cluster=Clusters.BooleanStateConfiguration, feature_int=Clusters.BooleanStateConfiguration.Bitmaps.Feature.kAudible):
     # IF feature available then do test step, else test step is skipped.
 ```
 
