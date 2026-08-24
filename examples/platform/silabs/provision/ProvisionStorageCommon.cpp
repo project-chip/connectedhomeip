@@ -37,7 +37,7 @@ namespace Provision {
 
 CHIP_ERROR Storage::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
 {
-    constexpr uint8_t kDateStringLength        = 8;  // YYYYMMDD
+    constexpr uint8_t kDateLength        = 8;  // YYYYMMDD
     constexpr uint8_t kLegacyDateLength        = 10; // YYYY-MM-DD
     char date[kManufacturingDateLengthMax + 1] = { 0 };
     char temp[kManufacturingDateLengthMax + 1] = { 0 };
@@ -49,12 +49,12 @@ CHIP_ERROR Storage::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8
     // Convert legacy date format to new date format
     if ((kLegacyDateLength == date_len) && ('-' == date[4]) && ('-' == date[7]))
     {
-        date_len = kDateStringLength;
+        date_len = kDateLength;
         snprintf(temp, sizeof(temp), "%.4s%.2s%.2s", date, date + 5, date + 8);
         memcpy(date, temp, date_len);
         ReturnErrorOnFailure(SetManufacturingDate(date, date_len));
     }
-    VerifyOrExit(date_len >= kDateStringLength, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(date_len >= kDateLength, err = CHIP_ERROR_INVALID_ARGUMENT);
     // Year
     memcpy(temp, date, 4); // yyyy
     temp[4] = 0;
