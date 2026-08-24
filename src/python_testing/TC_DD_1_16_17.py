@@ -34,6 +34,7 @@
 #       --qr-code MT:-24J0MH312-10648G00
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --app-pipe /tmp/tmp_pipe
+#       --skip-global-wildcard-population
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
