@@ -954,7 +954,6 @@ bool AvAnalysisServerLogic::IsContextPartOfActiveContextTriggers(
     const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aContext)
 {
     // Are the contexts part of our active set
-    bool notFound = false;
     for (const auto & contextTrigger : aContext)
     {
         auto trigger_it = std::find_if(mActiveAmbientContextTriggers.begin(), mActiveAmbientContextTriggers.end(),
@@ -965,15 +964,10 @@ bool AvAnalysisServerLogic::IsContextPartOfActiveContextTriggers(
 
         if (trigger_it == mActiveAmbientContextTriggers.end())
         {
-            notFound = true;
-            break;
+            return false;
         }
     }
 
-    if (notFound)
-    {
-        return false;
-    }
     return true;
 }
 
