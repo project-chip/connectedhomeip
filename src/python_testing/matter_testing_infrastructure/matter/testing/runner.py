@@ -40,6 +40,7 @@ from mobly.test_runner import TestRunner
 
 import matter.clusters as Clusters
 import matter.testing.global_stash as global_stash
+from matter import ChipDeviceCtrl
 from matter.clusters import Attribute
 # Add imports for argument parsing dependencies
 from matter.testing.defaults import TestingDefaults
