@@ -65,17 +65,6 @@ public:
     virtual Protocols::InteractionModel::Status SetRemoteSensing(BitMask<RemoteSensingBitmap> remoteSensing, bool & changed) = 0;
 };
 
-class UnoccupiedHeatingDelegate
-{
-public:
-    UnoccupiedHeatingDelegate()          = default;
-    virtual ~UnoccupiedHeatingDelegate() = default;
-
-    virtual std::optional<temperature> GetUnoccupiedHeatingSetpoint() const                  = 0;
-    virtual Protocols::InteractionModel::Status SetUnoccupiedHeatingSetpoint(std::optional<temperature> unoccupiedHeatingSetpoint,
-                                                                             bool & changed) = 0;
-};
-
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app
