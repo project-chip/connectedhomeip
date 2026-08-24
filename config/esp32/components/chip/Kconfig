@@ -206,6 +206,13 @@ menu "CHIP Core"
 
         endchoice # CHIP_MEM_ALLOC_MODE
 
+        config CHIP_ENABLE_GROUPCAST
+            bool "Enable groupcast support"
+            default y
+            help
+                Enables the groupcast feature, which internally enables auxiliary access
+                control feature.
+
     endmenu # "General Options"
 
     menu "Networking Options"
