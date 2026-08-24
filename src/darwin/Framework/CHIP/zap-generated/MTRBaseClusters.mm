@@ -52,7 +52,7 @@ typedef void (*DefaultSuccessCallbackType)(void *);
 class MTRDefaultSuccessCallbackBridge : public MTRCallbackBridge<DefaultSuccessCallback> {
 public:
     MTRDefaultSuccessCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action)
-        : MTRCallbackBridge<DefaultSuccessCallback>(queue, handler, action, OnSuccessFn) { };
+        : MTRCallbackBridge<DefaultSuccessCallback>(queue, handler, action, OnSuccessFn) {};
 
     static void OnSuccessFn(void * context)
     {
@@ -93721,7 +93721,7 @@ public:
 
 @implementation MTRBaseClusterProximityRanging
 
-- (void)startRangingRequestWithParams:(MTRProximityRangingClusterStartRangingRequestParams *)params completion:(void (^)(MTRProximityRangingClusterStartRangingResponseParams * _Nullable data, NSError * _Nullable error))completion
+- (void)startRangingRequestWithParams:(MTRProximityRangingClusterStartRangingRequestParams *)params completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
         params = [[MTRProximityRangingClusterStartRangingRequestParams
@@ -93729,7 +93729,7 @@ public:
     }
 
     auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        completion(response, error);
+        completion(error);
     };
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
@@ -93741,7 +93741,7 @@ public:
                                     commandPayload:params
                                 timedInvokeTimeout:timedInvokeTimeoutMs
                        serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:MTRProximityRangingClusterStartRangingResponseParams.class
+                                     responseClass:nil
                                              queue:self.callbackQueue
                                         completion:responseHandler];
 }
@@ -94014,6 +94014,42 @@ public:
 + (void)readAttributeSessionIDListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = ProximityRanging::Attributes::SessionIDList::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeRangingConstraintsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ProximityRanging::Attributes::RangingConstraints::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeRangingConstraintsWithParams:(MTRSubscribeParams * _Nonnull)params
+                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                         reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = ProximityRanging::Attributes::RangingConstraints::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeRangingConstraintsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ProximityRanging::Attributes::RangingConstraints::TypeInfo;
     [clusterStateCacheContainer
         _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
                                       clusterID:TypeInfo::GetClusterId()

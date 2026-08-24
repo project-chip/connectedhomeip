@@ -9599,6 +9599,10 @@ NS_ASSUME_NONNULL_BEGIN
         _role = @(0);
 
         _peerBLEDeviceID = @(0);
+
+        _blerbcSecurityMode = @(0);
+
+        _sessionKey = nil;
     }
     return self;
 }
@@ -9609,13 +9613,15 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.role = self.role;
     other.peerBLEDeviceID = self.peerBLEDeviceID;
+    other.blerbcSecurityMode = self.blerbcSecurityMode;
+    other.sessionKey = self.sessionKey;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: role:%@; peerBLEDeviceID:%@; >", NSStringFromClass([self class]), _role, _peerBLEDeviceID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: role:%@; peerBLEDeviceID:%@; blerbcSecurityMode:%@; sessionKey:%@; >", NSStringFromClass([self class]), _role, _peerBLEDeviceID, _blerbcSecurityMode, [_sessionKey base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -9632,9 +9638,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _bltcsMode = nil;
 
-        _bltcsSecurityLevel = nil;
+        _bltcsSecurityLevel = @(0);
 
-        _ltk = nil;
+        _ltk = [NSData data];
     }
     return self;
 }
@@ -9669,7 +9675,15 @@ NS_ASSUME_NONNULL_BEGIN
 
         _frequencyBand = @(0);
 
+        _bandwidth = @(0);
+
+        _supportedRangingRoles = @(0);
+
+        _rdrCapability = @(0);
+
         _periodicRangingSupport = @(0);
+
+        _maxConcurrentSessions = nil;
     }
     return self;
 }
@@ -9680,14 +9694,60 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.technology = self.technology;
     other.frequencyBand = self.frequencyBand;
+    other.bandwidth = self.bandwidth;
+    other.supportedRangingRoles = self.supportedRangingRoles;
+    other.rdrCapability = self.rdrCapability;
     other.periodicRangingSupport = self.periodicRangingSupport;
+    other.maxConcurrentSessions = self.maxConcurrentSessions;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: technology:%@; frequencyBand:%@; periodicRangingSupport:%@; >", NSStringFromClass([self class]), _technology, _frequencyBand, _periodicRangingSupport];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: technology:%@; frequencyBand:%@; bandwidth:%@; supportedRangingRoles:%@; rdrCapability:%@; periodicRangingSupport:%@; maxConcurrentSessions:%@; >", NSStringFromClass([self class]), _technology, _frequencyBand, _bandwidth, _supportedRangingRoles, _rdrCapability, _periodicRangingSupport, _maxConcurrentSessions];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRProximityRangingClusterRangingConstraintStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _technology = @(0);
+
+        _role = @(0);
+
+        _enabled = nil;
+
+        _minRangingInterval = nil;
+
+        _maxSessionDuration = nil;
+
+        _maxRangingInstances = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRProximityRangingClusterRangingConstraintStruct alloc] init];
+
+    other.technology = self.technology;
+    other.role = self.role;
+    other.enabled = self.enabled;
+    other.minRangingInterval = self.minRangingInterval;
+    other.maxSessionDuration = self.maxSessionDuration;
+    other.maxRangingInstances = self.maxRangingInstances;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: technology:%@; role:%@; enabled:%@; minRangingInterval:%@; maxSessionDuration:%@; maxRangingInstances:%@; >", NSStringFromClass([self class]), _technology, _role, _enabled, _minRangingInterval, _maxSessionDuration, _maxRangingInstances];
     return descriptionString;
 }
 
@@ -9768,7 +9828,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _peerWiFiDevIK = [NSData data];
 
-        _pmk = nil;
+        _pmk = [NSData data];
     }
     return self;
 }

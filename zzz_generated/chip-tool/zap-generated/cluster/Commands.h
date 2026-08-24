@@ -12125,6 +12125,7 @@ private:
 | * BLTCSSecurityLevel                                                | 0x0004 |
 | * BLTCSModeCapability                                               | 0x0005 |
 | * SessionIDList                                                     | 0x0006 |
+| * RangingConstraints                                                | 0x0007 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -12155,7 +12156,6 @@ public:
         AddArgument("BLTChannelSoundingDeviceRoleConfig", &mComplex_BLTChannelSoundingDeviceRoleConfig, "", Argument::kOptional);
         AddArgument("FrequencyBand", 0, UINT16_MAX, &mRequest.frequencyBand);
         AddArgument("Bandwidth", 0, UINT32_MAX, &mRequest.bandwidth);
-        AddArgument("SecurityMode", 0, UINT8_MAX, &mRequest.securityMode);
         AddArgument("Trigger", &mComplex_Trigger);
         AddArgument("ReportingCondition", &mComplex_ReportingCondition, "", Argument::kOptional);
         ClusterCommand::AddArguments();
@@ -32123,6 +32123,7 @@ void registerClusterProximityRanging(Commands & commands, CredentialIssuerComman
         make_unique<ReadAttribute>(Id, "bltcssecurity-level", Attributes::BLTCSSecurityLevel::Id, credsIssuerConfig),      //
         make_unique<ReadAttribute>(Id, "bltcsmode-capability", Attributes::BLTCSModeCapability::Id, credsIssuerConfig),    //
         make_unique<ReadAttribute>(Id, "session-idlist", Attributes::SessionIDList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "ranging-constraints", Attributes::RangingConstraints::Id, credsIssuerConfig),      //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -32144,8 +32145,11 @@ void registerClusterProximityRanging(Commands & commands, CredentialIssuerComman
         make_unique<WriteAttribute<chip::app::Clusters::ProximityRanging::BLTCSModeEnum>>(
             Id, "bltcsmode-capability", 0, UINT8_MAX, Attributes::BLTCSModeCapability::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<chip::app::DataModel::List<const uint8_t>>>>(
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const uint8_t>>>(
             Id, "session-idlist", Attributes::SessionIDList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::ProximityRanging::Structs::RangingConstraintStruct::Type>>>(
+            Id, "ranging-constraints", Attributes::RangingConstraints::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -32165,6 +32169,7 @@ void registerClusterProximityRanging(Commands & commands, CredentialIssuerComman
         make_unique<SubscribeAttribute>(Id, "bltcssecurity-level", Attributes::BLTCSSecurityLevel::Id, credsIssuerConfig),      //
         make_unique<SubscribeAttribute>(Id, "bltcsmode-capability", Attributes::BLTCSModeCapability::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "session-idlist", Attributes::SessionIDList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "ranging-constraints", Attributes::RangingConstraints::Id, credsIssuerConfig),      //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //

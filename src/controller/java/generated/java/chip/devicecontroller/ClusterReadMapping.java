@@ -17110,6 +17110,17 @@ public class ClusterReadMapping {
           readProximityRangingSessionIDListCommandParams
         );
         result.put("readSessionIDListAttribute", readProximityRangingSessionIDListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readProximityRangingRangingConstraintsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readProximityRangingRangingConstraintsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ProximityRangingCluster) cluster).readRangingConstraintsAttribute(
+              (ChipClusters.ProximityRangingCluster.RangingConstraintsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedProximityRangingClusterRangingConstraintsAttributeCallback(),
+          readProximityRangingRangingConstraintsCommandParams
+        );
+        result.put("readRangingConstraintsAttribute", readProximityRangingRangingConstraintsAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readProximityRangingGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readProximityRangingGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

@@ -6433,6 +6433,8 @@ ComplexArgumentParser::Setup(const char * label,
         ComplexArgumentParser::EnsureMemberExist("BLERangingDeviceRoleConfigStruct.role", "role", value.isMember("role")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("BLERangingDeviceRoleConfigStruct.peerBLEDeviceID",
                                                                   "peerBLEDeviceID", value.isMember("peerBLEDeviceID")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("BLERangingDeviceRoleConfigStruct.BLERBCSecurityMode",
+                                                                  "BLERBCSecurityMode", value.isMember("BLERBCSecurityMode")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "role");
@@ -6443,6 +6445,17 @@ ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.peerBLEDeviceID, value["peerBLEDeviceID"]));
     valueCopy.removeMember("peerBLEDeviceID");
 
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "BLERBCSecurityMode");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.BLERBCSecurityMode, value["BLERBCSecurityMode"]));
+    valueCopy.removeMember("BLERBCSecurityMode");
+
+    if (value.isMember("sessionKey"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "sessionKey");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.sessionKey, value["sessionKey"]));
+    }
+    valueCopy.removeMember("sessionKey");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -6451,6 +6464,8 @@ void ComplexArgumentParser::Finalize(
 {
     ComplexArgumentParser::Finalize(request.role);
     ComplexArgumentParser::Finalize(request.peerBLEDeviceID);
+    ComplexArgumentParser::Finalize(request.BLERBCSecurityMode);
+    ComplexArgumentParser::Finalize(request.sessionKey);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(
@@ -6466,6 +6481,10 @@ CHIP_ERROR ComplexArgumentParser::Setup(
         ComplexArgumentParser::EnsureMemberExist("BLTChannelSoundingDeviceRoleConfigStruct.role", "role", value.isMember("role")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("BLTChannelSoundingDeviceRoleConfigStruct.peerBLTDevIK",
                                                                   "peerBLTDevIK", value.isMember("peerBLTDevIK")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("BLTChannelSoundingDeviceRoleConfigStruct.BLTCSSecurityLevel",
+                                                                  "BLTCSSecurityLevel", value.isMember("BLTCSSecurityLevel")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("BLTChannelSoundingDeviceRoleConfigStruct.ltk", "ltk", value.isMember("ltk")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "role");
@@ -6483,19 +6502,12 @@ CHIP_ERROR ComplexArgumentParser::Setup(
     }
     valueCopy.removeMember("BLTCSMode");
 
-    if (value.isMember("BLTCSSecurityLevel"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "BLTCSSecurityLevel");
-        ReturnErrorOnFailure(
-            ComplexArgumentParser::Setup(labelWithMember, request.BLTCSSecurityLevel, value["BLTCSSecurityLevel"]));
-    }
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "BLTCSSecurityLevel");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.BLTCSSecurityLevel, value["BLTCSSecurityLevel"]));
     valueCopy.removeMember("BLTCSSecurityLevel");
 
-    if (value.isMember("ltk"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "ltk");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.ltk, value["ltk"]));
-    }
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "ltk");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.ltk, value["ltk"]));
     valueCopy.removeMember("ltk");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
@@ -6524,6 +6536,12 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                                                   value.isMember("technology")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("RangingCapabilitiesStruct.frequencyBand", "frequencyBand",
                                                                   value.isMember("frequencyBand")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("RangingCapabilitiesStruct.bandwidth", "bandwidth", value.isMember("bandwidth")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
+        "RangingCapabilitiesStruct.supportedRangingRoles", "supportedRangingRoles", value.isMember("supportedRangingRoles")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("RangingCapabilitiesStruct.RDRCapability", "RDRCapability",
+                                                                  value.isMember("RDRCapability")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
         "RangingCapabilitiesStruct.periodicRangingSupport", "periodicRangingSupport", value.isMember("periodicRangingSupport")));
 
@@ -6536,10 +6554,31 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.frequencyBand, value["frequencyBand"]));
     valueCopy.removeMember("frequencyBand");
 
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "bandwidth");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.bandwidth, value["bandwidth"]));
+    valueCopy.removeMember("bandwidth");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "supportedRangingRoles");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.supportedRangingRoles, value["supportedRangingRoles"]));
+    valueCopy.removeMember("supportedRangingRoles");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "RDRCapability");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.RDRCapability, value["RDRCapability"]));
+    valueCopy.removeMember("RDRCapability");
+
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "periodicRangingSupport");
     ReturnErrorOnFailure(
         ComplexArgumentParser::Setup(labelWithMember, request.periodicRangingSupport, value["periodicRangingSupport"]));
     valueCopy.removeMember("periodicRangingSupport");
+
+    if (value.isMember("maxConcurrentSessions"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "maxConcurrentSessions");
+        ReturnErrorOnFailure(
+            ComplexArgumentParser::Setup(labelWithMember, request.maxConcurrentSessions, value["maxConcurrentSessions"]));
+    }
+    valueCopy.removeMember("maxConcurrentSessions");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
@@ -6548,7 +6587,77 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ProximityRanging::Stru
 {
     ComplexArgumentParser::Finalize(request.technology);
     ComplexArgumentParser::Finalize(request.frequencyBand);
+    ComplexArgumentParser::Finalize(request.bandwidth);
+    ComplexArgumentParser::Finalize(request.supportedRangingRoles);
+    ComplexArgumentParser::Finalize(request.RDRCapability);
     ComplexArgumentParser::Finalize(request.periodicRangingSupport);
+    ComplexArgumentParser::Finalize(request.maxConcurrentSessions);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::ProximityRanging::Structs::RangingConstraintStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("RangingConstraintStruct.technology", "technology", value.isMember("technology")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("RangingConstraintStruct.role", "role", value.isMember("role")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "technology");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.technology, value["technology"]));
+    valueCopy.removeMember("technology");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "role");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.role, value["role"]));
+    valueCopy.removeMember("role");
+
+    if (value.isMember("enabled"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "enabled");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.enabled, value["enabled"]));
+    }
+    valueCopy.removeMember("enabled");
+
+    if (value.isMember("minRangingInterval"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "minRangingInterval");
+        ReturnErrorOnFailure(
+            ComplexArgumentParser::Setup(labelWithMember, request.minRangingInterval, value["minRangingInterval"]));
+    }
+    valueCopy.removeMember("minRangingInterval");
+
+    if (value.isMember("maxSessionDuration"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "maxSessionDuration");
+        ReturnErrorOnFailure(
+            ComplexArgumentParser::Setup(labelWithMember, request.maxSessionDuration, value["maxSessionDuration"]));
+    }
+    valueCopy.removeMember("maxSessionDuration");
+
+    if (value.isMember("maxRangingInstances"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "maxRangingInstances");
+        ReturnErrorOnFailure(
+            ComplexArgumentParser::Setup(labelWithMember, request.maxRangingInstances, value["maxRangingInstances"]));
+    }
+    valueCopy.removeMember("maxRangingInstances");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ProximityRanging::Structs::RangingConstraintStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.technology);
+    ComplexArgumentParser::Finalize(request.role);
+    ComplexArgumentParser::Finalize(request.enabled);
+    ComplexArgumentParser::Finalize(request.minRangingInterval);
+    ComplexArgumentParser::Finalize(request.maxSessionDuration);
+    ComplexArgumentParser::Finalize(request.maxRangingInstances);
 }
 
 CHIP_ERROR
@@ -6651,6 +6760,8 @@ ComplexArgumentParser::Setup(const char * label,
         ComplexArgumentParser::EnsureMemberExist("WiFiRangingDeviceRoleConfigStruct.role", "role", value.isMember("role")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("WiFiRangingDeviceRoleConfigStruct.peerWiFiDevIK",
                                                                   "peerWiFiDevIK", value.isMember("peerWiFiDevIK")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("WiFiRangingDeviceRoleConfigStruct.pmk", "pmk", value.isMember("pmk")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "role");
@@ -6661,11 +6772,8 @@ ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.peerWiFiDevIK, value["peerWiFiDevIK"]));
     valueCopy.removeMember("peerWiFiDevIK");
 
-    if (value.isMember("pmk"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "pmk");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.pmk, value["pmk"]));
-    }
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "pmk");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.pmk, value["pmk"]));
     valueCopy.removeMember("pmk");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);

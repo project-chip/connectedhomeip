@@ -28,6 +28,8 @@
 #include <clusters/ProximityRanging/Events.h>
 #include <clusters/ProximityRanging/Metadata.h>
 #include <lib/support/TimerDelegateMock.h>
+#include <lib/support/TypeTraits.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #include <vector>
 
@@ -37,6 +39,8 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ProximityRanging;
+using chip::Protocols::InteractionModel::ClusterStatusCode;
+using chip::Protocols::InteractionModel::Status;
 using chip::Testing::ClusterTester;
 using chip::Testing::IsAcceptedCommandsListEqualTo;
 using chip::Testing::IsAttributesListEqualTo;
@@ -44,6 +48,21 @@ using chip::Testing::IsGeneratedCommandsListEqualTo;
 using chip::Testing::TestServerClusterContext;
 
 constexpr EndpointId kTestEndpointId = 1;
+
+// A StartRangingRequest rejection now surfaces as the command's status code (a
+// cluster-specific StatusCodeEnum value) with no StartRangingResponse payload,
+// per the spec. Assert that shape uniformly. Templated because the caller's
+// InvokeResult is parameterized on the (unused) response type.
+template <typename ResultT>
+void ExpectStartRejected(const ResultT & result, StatusCodeEnum expected)
+{
+    EXPECT_FALSE(result.IsSuccess());
+    auto statusCode = result.GetStatusCode();
+    ASSERT_TRUE(statusCode.has_value());
+    EXPECT_EQ(statusCode->GetStatus(), Status::Failure);
+    ASSERT_TRUE(statusCode->GetClusterSpecificCode().has_value());
+    EXPECT_EQ(statusCode->GetClusterSpecificCode().value(), chip::to_underlying(expected));
+}
 
 class MockRangingAdapter : public RangingAdapter
 {
@@ -59,12 +78,12 @@ public:
         return cap;
     }
 
-    ResultCodeEnum PrepareSession(uint8_t sessionId, const StartSessionParams & params) override
+    ClusterStatusCode PrepareSession(uint8_t sessionId, const StartSessionParams & params) override
     {
         mLastPrepareSessionId = sessionId;
         mLastPrepareParams    = params;
         mPrepareCalls++;
-        if (mPrepareResult == ResultCodeEnum::kAccepted)
+        if (mPrepareResult.IsSuccess())
         {
             mPreparedIds.push_back(sessionId);
         }
@@ -135,14 +154,14 @@ public:
     Callback * GetCallback() const { return mCallback; }
 
     // Test control
-    ResultCodeEnum mPrepareResult = ResultCodeEnum::kAccepted;
-    CHIP_ERROR mStartError        = CHIP_NO_ERROR;
-    CHIP_ERROR mStopError         = CHIP_NO_ERROR;
-    uint8_t mLastPrepareSessionId = 0;
-    uint8_t mLastStartSessionId   = 0;
-    uint8_t mLastStopSessionId    = 0;
-    int mPrepareCalls             = 0;
-    int mStartCalls               = 0;
+    ClusterStatusCode mPrepareResult = ClusterStatusCode(Status::Success);
+    CHIP_ERROR mStartError           = CHIP_NO_ERROR;
+    CHIP_ERROR mStopError            = CHIP_NO_ERROR;
+    uint8_t mLastPrepareSessionId    = 0;
+    uint8_t mLastStartSessionId      = 0;
+    uint8_t mLastStopSessionId       = 0;
+    int mPrepareCalls                = 0;
+    int mStartCalls                  = 0;
     StartSessionParams mLastPrepareParams{};
     /// Sessions for which PrepareSession returned kAccepted and StopSession
     /// has not yet been invoked.
@@ -391,10 +410,9 @@ TEST_F(TestProximityRangingCluster, TestReadSessionIdListEmpty)
 
     Attributes::SessionIDList::TypeInfo::DecodableType sessionList;
     EXPECT_EQ(tester.ReadAttribute(Attributes::SessionIDList::Id, sessionList), CHIP_NO_ERROR);
-    EXPECT_FALSE(sessionList.IsNull());
 
     size_t count = 0;
-    EXPECT_EQ(sessionList.Value().ComputeSize(&count), CHIP_NO_ERROR);
+    EXPECT_EQ(sessionList.ComputeSize(&count), CHIP_NO_ERROR);
     EXPECT_EQ(count, 0u);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -518,22 +536,16 @@ TEST_F(TestProximityRangingCluster, TestStartRangingAccepted)
 
     auto request = MakeValidBleBeaconRequest();
 
-    auto result = tester.Invoke(request);
+    auto result = tester.Invoke<Commands::StartRangingRequest::Type, Commands::StartRangingResponse::DecodableType>(
+        Commands::StartRangingRequest::Id, request);
     ASSERT_TRUE(result.IsSuccess());
-    if (result.response.has_value())
-    {
-        auto & response = *result.response;
-        EXPECT_EQ(response.resultCode, ResultCodeEnum::kAccepted);
-        EXPECT_FALSE(response.sessionID.IsNull());
-        EXPECT_NE(response.sessionID.Value(), 0);
-        // startTime == 0 → driver invokes Prepare and Start synchronously.
-        EXPECT_EQ(bleAdapter.mPrepareCalls, 1);
-        EXPECT_EQ(bleAdapter.mStartCalls, 1);
-    }
-    else
-    {
-        FAIL();
-    }
+    ASSERT_TRUE(result.response.has_value());
+    auto & response = *result.response;
+    EXPECT_FALSE(response.sessionID.IsNull());
+    EXPECT_NE(response.sessionID.Value(), 0);
+    // startTime == 0 → driver invokes Prepare and Start synchronously.
+    EXPECT_EQ(bleAdapter.mPrepareCalls, 1);
+    EXPECT_EQ(bleAdapter.mStartCalls, 1);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -543,7 +555,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingAdapterRejects)
     TestServerClusterContext context;
     TimerDelegateMock timer;
     MockRangingAdapter bleAdapter(RangingTechEnum::kBLEBeaconRSSIRanging);
-    bleAdapter.mPrepareResult   = ResultCodeEnum::kRejectedInfeasibleRanging;
+    bleAdapter.mPrepareResult   = ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kRejectedInfeasibleRanging);
     RangingAdapter * adapters[] = { &bleAdapter };
 
     ProximityRangingCluster cluster(kTestEndpointId,
@@ -556,15 +568,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingAdapterRejects)
     auto request = MakeValidBleBeaconRequest();
 
     auto result = tester.Invoke(request);
-    ASSERT_TRUE(result.IsSuccess());
-    if (result.response.has_value())
-    {
-        EXPECT_EQ(result.response->resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
-    }
-    else
-    {
-        FAIL();
-    }
+    ExpectStartRejected(result, StatusCodeEnum::kRejectedInfeasibleRanging);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -591,11 +595,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingTechnologyNotInFeatureMap)
     request.BLTChannelSoundingDeviceRoleConfig.SetValue(role);
 
     auto result = tester.Invoke(request);
-    ASSERT_TRUE(result.IsSuccess());
-    ASSERT_TRUE(result.response.has_value());
-    auto & response = *result.response;
-    EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
-    EXPECT_TRUE(response.sessionID.IsNull());
+    ExpectStartRejected(result, StatusCodeEnum::kRejectedInfeasibleRanging);
     EXPECT_EQ(bleAdapter.mPrepareCalls, 0);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -620,11 +620,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingMissingMatchingRoleConfig)
     request.technology = RangingTechEnum::kBLEBeaconRSSIRanging;
 
     auto result = tester.Invoke(request);
-    ASSERT_TRUE(result.IsSuccess());
-    ASSERT_TRUE(result.response.has_value());
-    auto & response = *result.response;
-    EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
-    EXPECT_TRUE(response.sessionID.IsNull());
+    ExpectStartRejected(result, StatusCodeEnum::kRejectedInfeasibleRanging);
     EXPECT_EQ(bleAdapter.mPrepareCalls, 0);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -654,11 +650,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingMismatchedRoleConfig)
     request.BLTChannelSoundingDeviceRoleConfig.SetValue(role);
 
     auto result = tester.Invoke(request);
-    ASSERT_TRUE(result.IsSuccess());
-    ASSERT_TRUE(result.response.has_value());
-    auto & response = *result.response;
-    EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
-    EXPECT_TRUE(response.sessionID.IsNull());
+    ExpectStartRejected(result, StatusCodeEnum::kRejectedInfeasibleRanging);
     EXPECT_EQ(bleAdapter.mPrepareCalls, 0);
     EXPECT_EQ(bltAdapter.mPrepareCalls, 0);
 
@@ -684,10 +676,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingTriggerEndTimeNotAfterStart)
     request.trigger.endTime   = 10;
 
     auto result = tester.Invoke(request);
-    ASSERT_TRUE(result.IsSuccess());
-    ASSERT_TRUE(result.response.has_value());
-    auto & response = *result.response;
-    EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRangingTriggers);
+    ExpectStartRejected(result, StatusCodeEnum::kRejectedInfeasibleRangingTriggers);
     EXPECT_EQ(bleAdapter.mPrepareCalls, 0);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -711,10 +700,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingTriggerIntervalZero)
     request.trigger.rangingInstanceInterval.SetValue(0);
 
     auto result = tester.Invoke(request);
-    ASSERT_TRUE(result.IsSuccess());
-    ASSERT_TRUE(result.response.has_value());
-    auto & response = *result.response;
-    EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRangingTriggers);
+    ExpectStartRejected(result, StatusCodeEnum::kRejectedInfeasibleRangingTriggers);
     EXPECT_EQ(bleAdapter.mPrepareCalls, 0);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -741,10 +727,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingReportingMinDistanceGreaterT
     request.reportingCondition.SetValue(rc);
 
     auto result = tester.Invoke(request);
-    ASSERT_TRUE(result.IsSuccess());
-    ASSERT_TRUE(result.response.has_value());
-    auto & response = *result.response;
-    EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
+    ExpectStartRejected(result, StatusCodeEnum::kRejectedInfeasibleRanging);
     EXPECT_EQ(bleAdapter.mPrepareCalls, 0);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -768,9 +751,6 @@ TEST_F(TestProximityRangingCluster, TestStopRangingSuccess)
     {
         auto startResult = tester.Invoke(MakeValidBleBeaconRequest());
         ASSERT_TRUE(startResult.IsSuccess());
-        ASSERT_TRUE(startResult.response.has_value());
-        auto & startResponse = *startResult.response;
-        EXPECT_EQ(startResponse.resultCode, ResultCodeEnum::kAccepted);
     }
 
     Commands::StopRangingRequest::Type stopReq;
@@ -825,10 +805,10 @@ TEST_F(TestProximityRangingCluster, TestOnMeasurementDataEvent)
 
     // Drive a StartRangingRequest end-to-end to register a session inside the
     // cluster's owned driver; capture the session ID assigned by the cluster.
-    auto startResult = tester.Invoke(MakeValidBleBeaconRequest());
+    auto startResult = tester.Invoke<Commands::StartRangingRequest::Type, Commands::StartRangingResponse::DecodableType>(
+        Commands::StartRangingRequest::Id, MakeValidBleBeaconRequest());
     ASSERT_TRUE(startResult.IsSuccess());
     ASSERT_TRUE(startResult.response.has_value());
-    ASSERT_EQ(startResult.response->resultCode, ResultCodeEnum::kAccepted);
     ASSERT_FALSE(startResult.response->sessionID.IsNull());
     const uint8_t sessionId = startResult.response->sessionID.Value();
 
@@ -872,10 +852,10 @@ TEST_F(TestProximityRangingCluster, TestOnSessionStoppedEvent)
     ClusterTester tester(cluster);
 
     // Drive StartRangingRequest end-to-end; capture the assigned session ID.
-    auto startResult = tester.Invoke(MakeValidBleBeaconRequest());
+    auto startResult = tester.Invoke<Commands::StartRangingRequest::Type, Commands::StartRangingResponse::DecodableType>(
+        Commands::StartRangingRequest::Id, MakeValidBleBeaconRequest());
     ASSERT_TRUE(startResult.IsSuccess());
     ASSERT_TRUE(startResult.response.has_value());
-    ASSERT_EQ(startResult.response->resultCode, ResultCodeEnum::kAccepted);
     ASSERT_FALSE(startResult.response->sessionID.IsNull());
     const uint8_t sessionId = startResult.response->sessionID.Value();
 
@@ -957,19 +937,15 @@ TEST_F(TestProximityRangingCluster, TestReadSessionIdListNonEmpty)
 
     auto startResult = tester.Invoke(MakeValidBleBeaconRequest());
     ASSERT_TRUE(startResult.IsSuccess());
-    ASSERT_TRUE(startResult.response.has_value());
-    auto & response = *startResult.response;
-    ASSERT_EQ(response.resultCode, ResultCodeEnum::kAccepted);
 
     Attributes::SessionIDList::TypeInfo::DecodableType sessionList;
     EXPECT_EQ(tester.ReadAttribute(Attributes::SessionIDList::Id, sessionList), CHIP_NO_ERROR);
-    ASSERT_FALSE(sessionList.IsNull());
 
     size_t count = 0;
-    EXPECT_EQ(sessionList.Value().ComputeSize(&count), CHIP_NO_ERROR);
+    EXPECT_EQ(sessionList.ComputeSize(&count), CHIP_NO_ERROR);
     EXPECT_EQ(count, 1u);
 
-    auto iter = sessionList.Value().begin();
+    auto iter = sessionList.begin();
     ASSERT_TRUE(iter.Next());
     EXPECT_EQ(iter.GetValue(), bleAdapter.mLastStartSessionId);
 
@@ -1029,10 +1005,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingInvalidBleRole)
     request.BLERangingDeviceRoleConfig.Value().role = RangingRoleEnum::kWiFiPublisherRole; // wrong role family
 
     auto result = tester.Invoke(request);
-    ASSERT_TRUE(result.IsSuccess());
-    ASSERT_TRUE(result.response.has_value());
-    auto & response = *result.response;
-    EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
+    ExpectStartRejected(result, StatusCodeEnum::kRejectedInfeasibleRanging);
     EXPECT_EQ(bleAdapter.mPrepareCalls, 0);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -1061,10 +1034,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingInvalidWiFiRole)
     request.wiFiRangingDeviceRoleConfig.SetValue(role);
 
     auto result = tester.Invoke(request);
-    ASSERT_TRUE(result.IsSuccess());
-    ASSERT_TRUE(result.response.has_value());
-    auto & response = *result.response;
-    EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
+    ExpectStartRejected(result, StatusCodeEnum::kRejectedInfeasibleRanging);
     EXPECT_EQ(wifiAdapter.mPrepareCalls, 0);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -1093,10 +1063,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingInvalidBltRole)
     request.BLTChannelSoundingDeviceRoleConfig.SetValue(role);
 
     auto result = tester.Invoke(request);
-    ASSERT_TRUE(result.IsSuccess());
-    ASSERT_TRUE(result.response.has_value());
-    auto & response = *result.response;
-    EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
+    ExpectStartRejected(result, StatusCodeEnum::kRejectedInfeasibleRanging);
     EXPECT_EQ(bltAdapter.mPrepareCalls, 0);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -1126,10 +1093,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingExtraRoleConfigPresent)
     request.BLTChannelSoundingDeviceRoleConfig.SetValue(extraRole);
 
     auto result = tester.Invoke(request);
-    ASSERT_TRUE(result.IsSuccess());
-    ASSERT_TRUE(result.response.has_value());
-    auto & response = *result.response;
-    EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
+    ExpectStartRejected(result, StatusCodeEnum::kRejectedInfeasibleRanging);
     EXPECT_EQ(bleAdapter.mPrepareCalls, 0);
     EXPECT_EQ(bltAdapter.mPrepareCalls, 0);
 
@@ -1156,10 +1120,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingReportingMinDistanceZero)
     request.reportingCondition.SetValue(rc);
 
     auto result = tester.Invoke(request);
-    ASSERT_TRUE(result.IsSuccess());
-    ASSERT_TRUE(result.response.has_value());
-    auto & response = *result.response;
-    EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
+    ExpectStartRejected(result, StatusCodeEnum::kRejectedInfeasibleRanging);
     EXPECT_EQ(bleAdapter.mPrepareCalls, 0);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -1185,10 +1146,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingReportingMaxDistanceZero)
     request.reportingCondition.SetValue(rc);
 
     auto result = tester.Invoke(request);
-    ASSERT_TRUE(result.IsSuccess());
-    ASSERT_TRUE(result.response.has_value());
-    auto & response = *result.response;
-    EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
+    ExpectStartRejected(result, StatusCodeEnum::kRejectedInfeasibleRanging);
     EXPECT_EQ(bleAdapter.mPrepareCalls, 0);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);

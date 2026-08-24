@@ -7984,6 +7984,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"SessionIDList";
             break;
 
+        case MTRAttributeIDTypeClusterProximityRangingAttributeRangingConstraintsID:
+            result = @"RangingConstraints";
+            break;
+
         case MTRAttributeIDTypeClusterProximityRangingAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
