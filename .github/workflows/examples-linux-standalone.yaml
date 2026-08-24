@@ -48,12 +48,15 @@ jobs:
               with:
                 platform: linux
 
-            - name: Build Standalone cert tool
+            - name: Build and test Standalone cert tool
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-cert \
-                        build" && rm -rf out
+                        build"
+                  CHIP_CERT=out/linux-x64-chip-cert/chip-cert \
+                      python3 src/tools/chip-cert/tests/test_chip_cert.py
+                  rm -rf out
             - name: Build minmdns example with platform dns
               run: |
                   ./scripts/run_in_build_env.sh \

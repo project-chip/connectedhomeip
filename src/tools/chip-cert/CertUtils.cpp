@@ -587,6 +587,20 @@ exit:
     return res;
 }
 
+CHIP_ERROR EncodeCompactIdentityCert(ChipCertificateData const & cert, MutableByteSpan & outCompactCert)
+{
+    TLVWriter writer;
+    writer.Init(outCompactCert);
+    TLVType containerType;
+    ReturnErrorOnFailure(writer.StartContainer(AnonymousTag(), kTLVType_Structure, containerType));
+    ReturnErrorOnFailure(writer.Put(ContextTag(kTag_EllipticCurvePublicKey), cert.mPublicKey));
+    ReturnErrorOnFailure(writer.Put(ContextTag(kTag_ECDSASignature), cert.mSignature));
+    ReturnErrorOnFailure(writer.EndContainer(containerType));
+    ReturnErrorOnFailure(writer.Finalize());
+    outCompactCert.reduce_size(writer.GetLengthWritten());
+    return CHIP_NO_ERROR;
+}
+
 } // namespace
 
 bool ReadCert(const char * fileNameOrStr, std::unique_ptr<X509, void (*)(X509 *)> & cert)
@@ -799,6 +813,23 @@ bool WriteCert(const char * fileName, X509 * cert, CertFormat certFmt)
 
         VerifyOrReturnError(X509ToChipCert(cert, chipCert), false);
 
+        // Parse the CHIP certificate again to determine if it is a PDC Identity certificate,
+        // and if so re-encode it in compact format. This is a little clunky, but CHIPCert.h
+        // does not expose any APIs to do this directly, as this conversion is not needed
+        // in normal operation. Note that the certificate type is determined from the Subject
+        // DN field; it does not validate the remainder of PDC Identity requirements.
+        ChipCertificateData certData;
+        CertType certType;
+        if (DecodeChipCert(chipCert, certData) == CHIP_NO_ERROR && certData.mSubjectDN.GetCertType(certType) == CHIP_NO_ERROR &&
+            certType == CertType::kNetworkIdentity)
+        {
+            fprintf(stderr, "Subject DN identifies a PDC Identity, using compact TLV format\n");
+            uint8_t compactCertBuf[kMaxCHIPCompactNetworkIdentityLength];
+            MutableByteSpan compactCert(compactCertBuf);
+            ReturnValueOnFailure(EncodeCompactIdentityCert(certData, compactCert), false);
+            return WriteChipCert(fileName, compactCert, certFmt);
+        }
+
         return WriteChipCert(fileName, chipCert, certFmt);
     }
 
@@ -886,10 +917,11 @@ bool MakeCert(CertType certType, const ToolChipDN * subjectDN, X509 * caCert, EV
     }
 
     // Set the issuer name for the certificate. In the case of a self-signed cert, this will be
-    // the new cert's subject name.
+    // the new cert's subject name. Note that the subject DN is only applied to `newCert` further
+    // below, so for a self-signed cert it must be taken from `subjectDN` rather than from `caCert`.
     if (certConfig.IsIssuerPresent())
     {
-        if (certType == CertType::kRoot)
+        if (certType == CertType::kRoot || caCert == newCert)
         {
             res = subjectDN->SetCertIssuerDN(newCert);
             VerifyTrueOrExit(res);
