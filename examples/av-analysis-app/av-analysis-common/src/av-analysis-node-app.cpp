@@ -43,8 +43,8 @@ CHIP_ERROR AvAnalysisNodeApp::Init()
 {
     ChipLogProgress(AppServer, "AvAnalysisNodeApp: Init on endpoint %u", mEndpointId);
 
-    ReturnErrorOnFailure(mCameraClient.Init(Server::GetInstance().GetCASESessionManager(), kCameraAvStreamManagementEndpoint));
-    mCameraClient.SetCameraVideoTraits(/* aHasWatermark = */ true, /* aHasOSD = */ true);
+    // The camera's AVSM endpoint, features and stream constraints are discovered from the camera
+    ReturnErrorOnFailure(mCameraClient.Init(Server::GetInstance().GetCASESessionManager()));
 
     // No Zone Management cluster on this endpoint: PerZoneContextDetection is off and MaxZones is Null
     mAvAnalysisServer.Create(mEndpointId, BitFlags<AvAnalysis::Feature>(AvAnalysis::Feature::kRemoteContextDetection),
