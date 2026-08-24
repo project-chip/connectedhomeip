@@ -26,7 +26,7 @@
 #include <psa/crypto.h>
 #include <zephyr/settings/settings.h>
 
-#if SL_PROVISION_GENERATOR == 1
+#if SL_PROVISION_GENERATOR
 #include <settings/settings_nvs.h>
 #endif
 
@@ -85,7 +85,7 @@ bool sInitialized = false;
 
 CHIP_ERROR Storage::Initialize(uint32_t flash_addr, uint32_t flash_size)
 {
-#if SL_PROVISION_GENERATOR == 1
+#if SL_PROVISION_GENERATOR
     // flash_addr is the offset to the start of the storage area, and flash_size is the total size of the storage area.
     VerifyOrReturnError(settings_nvs_set_runtime_geometry(static_cast<off_t>(flash_addr), flash_size) == 0,
                         CHIP_ERROR_PERSISTED_STORAGE_FAILED);
@@ -95,7 +95,7 @@ CHIP_ERROR Storage::Initialize(uint32_t flash_addr, uint32_t flash_size)
     (void) flash_size;
     ReturnErrorOnFailure(ZephyrConfig::Init());
     VerifyOrDo(DacPsaKeyExists(), ChipLogError(DeviceLayer, "DAC PSA key id %u missing", kDacPsaKeyId));
-#endif // SL_PROVISION_GENERATOR == 1
+#endif // SL_PROVISION_GENERATOR
     sInitialized = true;
     return CHIP_NO_ERROR;
 }
@@ -497,7 +497,7 @@ CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 }
 
 // ProvisionStorage functions for Zephyr settings backend, provided by provision libraries for other ProvisionStorage backends.
-#if SL_PROVISION_GENERATOR == 0
+#if !SL_PROVISION_GENERATOR
 
 CHIP_ERROR Storage::Set(uint16_t id, const uint8_t * value)
 {
@@ -572,7 +572,7 @@ CHIP_ERROR Storage::Set(uint16_t id, const uint8_t * value, size_t size)
     return CHIP_ERROR_UNKNOWN_RESOURCE_ID;
 }
 
-#endif // SL_PROVISION_GENERATOR == 0
+#endif // !SL_PROVISION_GENERATOR
 
 } // namespace Provision
 } // namespace Silabs
