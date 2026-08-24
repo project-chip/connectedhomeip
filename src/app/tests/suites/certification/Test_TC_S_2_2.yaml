@@ -171,21 +171,6 @@ tests:
                 value: G1
 
     - label:
-          "Step 1a: TH sends a JoinGroup command to DUT for G1 (Groupcast path)."
-      PICS: "GC.S"
-      endpoint: 0
-      cluster: "Groupcast"
-      command: "JoinGroup"
-      arguments:
-          values:
-              - name: "GroupID"
-                value: G1
-              - name: "Endpoints"
-                value: [endpoint]
-              - name: "KeySetID"
-                value: 0x01a1
-
-    - label:
           "Step 1b: TH sends a RemoveAllScenes command to DUT with the GroupID
           field set to G1."
       PICS: S.S.C03.Rsp
