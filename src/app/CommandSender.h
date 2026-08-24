@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <optional>
 #include <type_traits>
 
 #include "CommandSenderLegacyCallback.h"
@@ -358,6 +359,11 @@ public:
      */
     CHIP_ERROR SetCommandSenderConfig(ConfigParameters & aConfigParams);
 
+    void SetDelayReportData(const std::optional<InvokeRequestMessage::DelayReportData> & aDelayReportData)
+    {
+        mDelayReportData = aDelayReportData;
+    }
+
     CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, PrepareCommandParameters & aPrepareCommandParams);
 
     [[deprecated("PrepareCommand should migrate to calling PrepareCommand with PrepareCommandParameters")]] CHIP_ERROR
@@ -675,6 +681,7 @@ private:
     bool mBatchCommandsEnabled  = false;
     bool mUseExtendableCallback = false;
     bool mAllowLargePayload     = false;
+    std::optional<InvokeRequestMessage::DelayReportData> mDelayReportData;
 };
 
 } // namespace app

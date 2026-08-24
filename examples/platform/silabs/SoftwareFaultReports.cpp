@@ -79,7 +79,7 @@ void OnSoftwareFaultEventHandler(const char * faultRecordString)
     SoftwareDiagnostics::Events::SoftwareFault::Type softwareFault;
     softwareFault.name.SetValue(CharSpan::fromCharString(threadName));
     softwareFault.id = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(threadId));
-    softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(faultRecordString), strlen(faultRecordString)));
+    softwareFault.faultRecording.SetValue(ByteSpan::fromCharString(faultRecordString));
 
     TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda(
         [&softwareFault] { Clusters::SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(softwareFault); });
