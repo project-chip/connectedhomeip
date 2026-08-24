@@ -174,9 +174,11 @@ menu "CHIP Core"
 
         config MAX_GROUP_KEYS_PER_FABRIC
             int "Maximum Number of Group Key Sets per Fabric"
-            default 3
+            default 4
             help
                 Specifies the maximum number of group key sets supported per fabric.
+                The default matches the core CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC
+                default (3 key sets + IPK)
 
         config CHIP_DEVICE_ENABLE_DYNAMIC_SERVER
             bool "Enable dynamic server"
