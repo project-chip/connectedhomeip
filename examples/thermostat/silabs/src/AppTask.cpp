@@ -119,8 +119,8 @@ CHIP_ERROR AppTask::AppInit()
     kThermostatDelegate.Init();
     kHoldDelegate.Init();
     kSetpointsDelegate.Init();
-    Clusters::Thermostat::ServerInit(kThermostatEndpoint, kThermostatDelegate, kSetpointsDelegate, kHoldDelegate,
-                                     kPresetsDelegate, kSuggestionsDelegate);
+    Clusters::Thermostat::ServerInit(kThermostatEndpoint, kThermostatDelegate, kSetpointsDelegate, kHoldDelegate, kPresetsDelegate,
+                                     kSuggestionsDelegate);
 
     err = AppInstance().InitThermostat();
     if (err != CHIP_NO_ERROR)

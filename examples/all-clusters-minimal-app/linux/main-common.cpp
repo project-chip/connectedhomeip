@@ -55,12 +55,10 @@ static Clusters::Thermostat::ThermostatSetpointsDelegate gSetpointsDelegate(gThe
 static Clusters::Thermostat::ThermostatSuggestionsDelegate gThermostatSuggestionsDelegate(gThermostatEndpoint,
                                                                                           gThermostatPresetsDelegate);
 
-using ThermostatClusterType =
-    Clusters::Thermostat::ThermostatClusterWithFeatures<Clusters::Thermostat::ThermostatDelegate,
-                                                        Clusters::Thermostat::ThermostatSetpointsDelegate,
-                                                        Clusters::Thermostat::ThermostatHoldDelegate,
-                                                        Clusters::Thermostat::ThermostatPresetsDelegate,
-                                                        Clusters::Thermostat::ThermostatSuggestionsDelegate>;
+using ThermostatClusterType = Clusters::Thermostat::ThermostatClusterWithFeatures<
+    Clusters::Thermostat::ThermostatDelegate, Clusters::Thermostat::ThermostatSetpointsDelegate,
+    Clusters::Thermostat::ThermostatHoldDelegate, Clusters::Thermostat::ThermostatPresetsDelegate,
+    Clusters::Thermostat::ThermostatSuggestionsDelegate>;
 } // namespace
 
 void OnIdentifyStart(::Identify *)

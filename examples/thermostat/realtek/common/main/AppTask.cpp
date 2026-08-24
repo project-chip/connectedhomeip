@@ -304,8 +304,8 @@ void AppTask::InitServer(intptr_t arg)
     gThermostatDelegate.Init();
     gHoldDelegate.Init();
     gSetpointsDelegate.Init();
-    Clusters::Thermostat::ServerInit(gThermostatEndpoint, gThermostatDelegate, gSetpointsDelegate, gHoldDelegate,
-                                     gPresetsDelegate, gSuggestionsDelegate);
+    Clusters::Thermostat::ServerInit(gThermostatEndpoint, gThermostatDelegate, gSetpointsDelegate, gHoldDelegate, gPresetsDelegate,
+                                     gSuggestionsDelegate);
 
     static RealtekObserver sRealtekObserver;
     err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sRealtekObserver);

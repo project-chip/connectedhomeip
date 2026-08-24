@@ -53,8 +53,8 @@ CHIP_ERROR AppTask::Init(void)
     gThermostatDelegate.Init();
     gSetpointsDelegate.Init();
     gHoldDelegate.Init();
-    Clusters::Thermostat::ServerInit(gThermostatEndpoint, gThermostatDelegate, gSetpointsDelegate, gHoldDelegate,
-                                     gPresetsDelegate, gSuggestionsDelegate);
+    Clusters::Thermostat::ServerInit(gThermostatEndpoint, gThermostatDelegate, gSetpointsDelegate, gHoldDelegate, gPresetsDelegate,
+                                     gSuggestionsDelegate);
 
     err = SensorMgr().Init();
     if (err != CHIP_NO_ERROR)
