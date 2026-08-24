@@ -108,3 +108,6 @@ class MatterTestConfig:
 
     # Debug mode to capture attribute dump at end of test modules
     debug: bool = False
+
+    # Skip the global wildcard population step in runner file. If you skip this step you can populate the global wildcard on-demand
+    skip_global_wildcard_population: bool = False

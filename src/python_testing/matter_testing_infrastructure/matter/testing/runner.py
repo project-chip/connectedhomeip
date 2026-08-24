@@ -369,6 +369,13 @@ def get_test_info(test_class, matter_test_config) -> list[TestInfo]:
 async def read_global_wildcard_async(default_controller, node_id):
     """Perform the global wildcard read (Descriptor cluster + AttributeList / FeatureMap /
     AcceptedCommandList on every endpoint) with a 60-second timeout.
+
+    Reusable by both the runner (pre-populate path) and MatterBaseTest guards
+    (on-demand fallback when --skip-global-wildcard-population is set, when the test
+    class opts out of pre-populate, or when the DUT was simply not reachable at
+    runner time — e.g. NFC in-test commissioning or file-based BasicComposition).
+    Keeping the Read in a single function means the attribute set and timeout stay
+    in lockstep between the two entry points.
     """
     return await asyncio.wait_for(
         default_controller.Read(
@@ -571,15 +578,38 @@ def run_tests_no_exit(
 
             node_id = matter_test_config.dut_node_ids[0]
 
-            # Discovery tests (TC_DD_*) verify the device's advertising state
-            # directly. Opening a PASE session from the runner would suppress
-            # commissionable advertisement and cause those tests to fail, so
-            # skip the pre-PASE wildcard read for them entirely.
+            # Decide whether to pre-populate the global wildcard from the runner.
+            #
+            # Three mutually exclusive branches, evaluated in order:
+            #
+            #  1. Test class opts out via runner_prepopulates_global_wildcard = False.
+            #     Discovery tests (TC_DD_*) verify the device's advertising state
+            #     directly. Opening a PASE session from the runner would suppress
+            #     commissionable advertisement and cause those tests to fail, so
+            #     skip the pre-PASE wildcard read for them entirely.
+            #
+            #  2. CLI escape hatch --skip-global-wildcard-population is set. Used for
+            #     ad-hoc runs and for flows where the DUT is not reachable at runner
+            #     time (e.g. NFC in-test commissioning, file-based BasicComposition):
+            #     the populate must happen later, once the test itself can drive it.
+            #
+            #  3. Default: pre-populate now via CASE or PASE depending on commissioning
+            #     status. Guards will find the value in the stash and never trigger
+            #     the on-demand read.
+            #
+            # In cases 1 and 2 the stash stays empty for "stored_global_wildcard".
+            # MatterBaseTest._populate_wildcard is idempotent and will do the read
+            # on-demand the first time a guard needs it.
             if not getattr(test_class, "runner_prepopulates_global_wildcard", True):
                 LOGGER.info(
                     "%s opted out of the pre-PASE wildcard read; skipping so the "
                     "device remains free to advertise",
                     test_class.__name__
+                )
+            elif getattr(matter_test_config, "skip_global_wildcard_population", False):
+                LOGGER.info(
+                    "--skip-global-wildcard-population set; skipping runner pre-populate. "
+                    "Guards will populate the global wildcard on-demand when first called."
                 )
             else:
                 event_loop.run_until_complete(
@@ -938,6 +968,8 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     config.legacy = args.use_legacy_test_event_triggers
     config.no_wildcard_subscription = args.no_wildcard_subscription
 
+    config.skip_global_wildcard_population = args.skip_global_wildcard_population
+
     config.controller_node_id = args.controller_node_id
     config.trace_to = args.trace_to
 
@@ -1118,6 +1150,9 @@ def matter_test_args_parser() -> argparse.ArgumentParser:
                              help="Skip the background wildcard attribute subscription that is normally started "
                                   "before each test.  Prefer setting disable_wildcard_subscription = True on the "
                                   "test class (MatterBaseTest) for certification; this flag overrides for ad-hoc runs.")
+    basic_group.add_argument("--skip-global-wildcard-population", action="store_true", default=False,
+                             help="Skip the global wildcard population step in runner file. If you skip this step "
+                                  "you can populate the global wildcard on-demand")
 
     commission_group = parser.add_argument_group(title="Commissioning", description="Arguments to commission a node")
 
