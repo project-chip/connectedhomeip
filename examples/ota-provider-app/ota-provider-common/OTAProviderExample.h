@@ -84,6 +84,9 @@ public:
     void SetIgnoreQueryImageCount(uint32_t count) { mIgnoreQueryImageCount = count; }
     void SetIgnoreApplyUpdateCount(uint32_t count) { mIgnoreApplyUpdateCount = count; }
     void SetQueryImageStatus(OTAQueryStatus status) { mQueryImageStatus = status; }
+    // When enabled, the configured QueryImageStatus (and its DelayedActionTime) is kept for
+    // every QueryImageResponse instead of reverting to UpdateAvailable after the first one.
+    void SetPersistQueryImageStatus(bool persist) { mPersistQueryImageStatus = persist; }
     void SetApplyUpdateAction(chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction action)
     {
         mUpdateAction = action;
@@ -152,6 +155,7 @@ private:
     char mImageUri[kUriMaxLen];
     bool mImageUriIsSupplied = false;
     OTAQueryStatus mQueryImageStatus;
+    bool mPersistQueryImageStatus = false;
     OTAApplyUpdateAction mUpdateAction;
     uint32_t mIgnoreQueryImageCount;
     uint32_t mIgnoreApplyUpdateCount;

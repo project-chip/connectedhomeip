@@ -27,7 +27,7 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
-from matter.testing.apps import OtaImagePath, OTAProviderSubprocess
+from matter.testing.apps import ImageListPath, OtaImagePath, OTAProviderSubprocess
 from matter.testing.matter_testing import MatterBaseTest
 
 # Type aliases for AccessControl cluster types
@@ -87,7 +87,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                        extra_args: list = [],
                        kvs_path: str | None = None,
                        log_file: str | None = None, expected_output: str = "Server initialization complete",
-                       timeout: int = 30):
+                       timeout: int = 30,
+                       ota_image_list_path: str | None = None):
         """Start the provider process using the provided configuration.
 
         Args:
@@ -102,18 +103,26 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             log_file (Optional[str], optional): Destination for the app process logs. Defaults to None.
             expected_output (str): Expected string to see after a default timeout. Defaults to "Server initialization complete".
             timeout (int): Timeout to wait for the expected output. Defaults to 10 seconds
+            ota_image_list_path (Optional[str]): Path to an OTA image-list JSON (``--otaImageList``). When
+                given, the provider serves from this list (a stateless, version-based query response
+                recomputed per request) instead of the single ``ota_image_path`` file, and
+                ``ota_image_path`` is ignored.
         """
-        log.info("Launching provider app with with ota image %s", ota_image_path)
+        log.info("Launching provider app with with ota image %s", ota_image_list_path or ota_image_path)
         # Image to launch
         self.provider_app_path = provider_app_path
         if not path.exists(provider_app_path):
             raise FileNotFoundError(f"Provider app not found {provider_app_path}")
 
-        if not path.exists(ota_image_path):
-            raise FileNotFoundError(f"Ota image provided does not exists {ota_image_path}")
-
-        # Ota image
-        ota_image_path = OtaImagePath(path=ota_image_path)
+        # OTA source: either a single image file (default) or a stateless image-list JSON.
+        if ota_image_list_path is not None:
+            if not path.exists(ota_image_list_path):
+                raise FileNotFoundError(f"Ota image list provided does not exists {ota_image_list_path}")
+            ota_image_path = ImageListPath(path=ota_image_list_path)
+        else:
+            if not path.exists(ota_image_path):
+                raise FileNotFoundError(f"Ota image provided does not exists {ota_image_path}")
+            ota_image_path = OtaImagePath(path=ota_image_path)
         # Ideally we send the logs to a fixed location to avoid conflicts
 
         if log_file is None:

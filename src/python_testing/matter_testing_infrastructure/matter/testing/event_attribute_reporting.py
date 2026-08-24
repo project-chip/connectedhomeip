@@ -46,6 +46,31 @@ from matter.testing.matter_testing import AttributeMatcher, AttributeValue
 
 LOGGER = logging.getLogger(__name__)
 
+# Default upper bound for how long cancel() will block on a subscription teardown
+# before giving up and letting the test proceed. Normal shutdown is near-instant;
+# this only matters when the DUT is unreachable at cancel time.
+_DEFAULT_SHUTDOWN_TIMEOUT_SEC = 30.0
+
+
+def _cancel_subscription_bounded(subscription: SubscriptionTransaction, timeout_sec: float) -> None:
+    """Shut down a subscription without blocking indefinitely.
+
+    ``SubscriptionTransaction.Shutdown()`` posts the teardown to the Matter mainloop
+    and waits for it with no timeout. If the DUT is unreachable when cancel is called
+    (e.g. a power-saving device mid-blip while ``autoResubscribe`` is retrying CASE),
+    that wait can stall and hang the test. Run ``Shutdown()`` on a daemon thread and
+    stop waiting after ``timeout_sec`` so the test can proceed; the abandoned thread
+    finishes when the mainloop drains and cannot outlive the process.
+    """
+    shutdown_thread = threading.Thread(target=subscription.Shutdown, daemon=True)
+    shutdown_thread.start()
+    shutdown_thread.join(timeout_sec)
+    if shutdown_thread.is_alive():
+        LOGGER.warning(
+            "Subscription shutdown did not complete within %.0fs; proceeding without blocking "
+            "(DUT likely unreachable). Teardown will finish when the Matter mainloop drains.",
+            timeout_sec)
+
 
 @dataclass(frozen=True)
 class WildcardAttributeReport:
@@ -125,9 +150,9 @@ class EventSubscriptionHandler:
         self._subscription.SetEventUpdateCallback(self.__call__)
         return self._subscription
 
-    def cancel(self):
-        """This cancels a subscription."""
-        self._subscription.Shutdown()
+    def cancel(self, shutdown_timeout_sec: float = _DEFAULT_SHUTDOWN_TIMEOUT_SEC):
+        """This cancels a subscription, bounding the wait so a stalled teardown cannot hang the test."""
+        _cancel_subscription_bounded(self._subscription, shutdown_timeout_sec)
 
     def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout_sec: float = 10.0) -> Any:
         """This function allows a test script to block waiting for the specific event to be the next event
@@ -292,9 +317,9 @@ class AttributeSubscriptionHandler:
         self._subscription.SetAttributeUpdateCallback(self.__call__)
         return self._subscription
 
-    def cancel(self):
-        """This cancels a subscription."""
-        self._subscription.Shutdown()
+    def cancel(self, shutdown_timeout_sec: float = _DEFAULT_SHUTDOWN_TIMEOUT_SEC):
+        """This cancels a subscription, bounding the wait so a stalled teardown cannot hang the test."""
+        _cancel_subscription_bounded(self._subscription, shutdown_timeout_sec)
 
     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
         """
@@ -891,7 +916,7 @@ class WildcardAttributeSubscriptionHandler:
         """Get the underlying subscription transaction object."""
         return self._subscription
 
-    def shutdown(self) -> None:
-        """Shutdown the subscription."""
+    def shutdown(self, shutdown_timeout_sec: float = _DEFAULT_SHUTDOWN_TIMEOUT_SEC) -> None:
+        """Shutdown the subscription, bounding the wait so a stalled teardown cannot hang the test."""
         if self._subscription:
-            self._subscription.Shutdown()
+            _cancel_subscription_bounded(self._subscription, shutdown_timeout_sec)
