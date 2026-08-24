@@ -125,13 +125,11 @@ class TestCleanupFramework(MatterBaseTest):
         await self._run_framework_cleanup()
         super().teardown_test()
 
-    def _find_endpoint_with_cluster(self, cluster) -> int | None:
+    async def _find_endpoint_with_cluster(self, cluster) -> int | None:
         """Returns the first endpoint that has the given cluster, or None."""
-        wildcard = self.stored_global_wildcard()
-        if wildcard is None:
-            return None
-        for ep in wildcard.attributes:
-            if _has_cluster(wildcard, ep, cluster):
+        await self._populate_wildcard()
+        for ep in self.stored_global_wildcard.attributes:
+            if _has_cluster(self.stored_global_wildcard, ep, cluster):
                 return ep
         return None
 
@@ -237,7 +235,7 @@ class TestCleanupFramework(MatterBaseTest):
     @async_test_body
     async def test_group_membership_cleanup(self):
         logger.info("--- Scenario: group membership (Groups cluster) ---")
-        ep = self._find_endpoint_with_cluster(Clusters.Groups)
+        ep = await self._find_endpoint_with_cluster(Clusters.Groups)
         if ep is None:
             logger.info("Groups cluster not present on DUT — skipping")
             return
@@ -254,12 +252,11 @@ class TestCleanupFramework(MatterBaseTest):
     @async_test_body
     async def test_scenes_cleanup(self):
         logger.info("--- Scenario: scene entry (ScenesManagement cluster) ---")
-        ep = self._find_endpoint_with_cluster(Clusters.ScenesManagement)
+        ep = await self._find_endpoint_with_cluster(Clusters.ScenesManagement)
         if ep is None:
             logger.info("ScenesManagement cluster not present on DUT — skipping")
             return
-        wildcard = self.stored_global_wildcard()
-        if wildcard is None or not _has_cluster(wildcard, ep, Clusters.Groups):
+        if not _has_cluster(self.stored_global_wildcard, ep, Clusters.Groups):
             logger.info("Groups cluster not present on endpoint %d — skipping scenes scenario", ep)
             return
 
@@ -284,7 +281,7 @@ class TestCleanupFramework(MatterBaseTest):
     @async_test_body
     async def test_doorlock_cleanup(self):
         logger.info("--- Scenario: DoorLock credential and user ---")
-        ep = self._find_endpoint_with_cluster(Clusters.DoorLock)
+        ep = await self._find_endpoint_with_cluster(Clusters.DoorLock)
         if ep is None:
             logger.info("DoorLock cluster not present on DUT — skipping")
             return
@@ -311,9 +308,8 @@ class TestCleanupFramework(MatterBaseTest):
     @async_test_body
     async def test_icd_client_cleanup(self):
         logger.info("--- Scenario: ICD client registration ---")
-        wildcard = self.stored_global_wildcard()
-        if not _has_attribute(wildcard=wildcard, endpoint=0,
-                              attribute=Clusters.IcdManagement.Attributes.RegisteredClients):
+        await self._populate_wildcard()
+        if not _has_attribute(wildcard=self.stored_global_wildcard, endpoint=0, attribute=Clusters.IcdManagement.Attributes.RegisteredClients):
             logger.info("ICD Management cluster not present on DUT — skipping")
             return
 
@@ -334,12 +330,11 @@ class TestCleanupFramework(MatterBaseTest):
     @async_test_body
     async def test_tls_endpoints_cleanup(self):
         logger.info("--- Scenario: TLS endpoint provisioning (TlsClientManagement) ---")
-        ep = self._find_endpoint_with_cluster(Clusters.TlsClientManagement)
+        ep = await self._find_endpoint_with_cluster(Clusters.TlsClientManagement)
         if ep is None:
             logger.info("TlsClientManagement cluster not present on DUT — skipping")
             return
-        wildcard = self.stored_global_wildcard()
-        if wildcard is None or not _has_cluster(wildcard, ep, Clusters.TlsCertificateManagement):
+        if not _has_cluster(self.stored_global_wildcard, ep, Clusters.TlsCertificateManagement):
             logger.info("TlsCertificateManagement cluster not present on endpoint %d — skipping", ep)
             return
 
