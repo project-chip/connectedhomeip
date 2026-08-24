@@ -18,8 +18,6 @@ source_set("window-covering") {
   sources = [
     "WindowCovering.cpp",
     "WindowCovering.h",
-    "impl/LoggingWindowCovering.cpp",
-    "impl/LoggingWindowCovering.h",
   ]
 
   public_deps = [
@@ -31,5 +29,12 @@ source_set("window-covering") {
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
     "${chip_root}/zzz_generated/app-common/devices/",
+  ]
+}
+
+source_set("logging") {
+  sources = [
+    "impl/LoggingWindowCovering.cpp",
+    "impl/LoggingWindowCovering.h",
   ]
 }
