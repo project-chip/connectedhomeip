@@ -43,12 +43,13 @@ public:
     static constexpr size_t kSizeOfSpecificationVersion     = sizeof(uint32_t);
     static constexpr size_t kSizeOfMaxPathsPerInvoke        = sizeof(uint16_t);
     static constexpr size_t kSizeOfSupportedTransports      = sizeof(uint16_t);
+    static constexpr size_t kSizeOfMaxTCPPayloadSize        = sizeof(uint32_t);
     static constexpr size_t kTCPFramingHeaderSize           = 4;
 
     static constexpr size_t kEstimatedTLVSize =
         TLV::EstimateStructOverhead(kSizeOfSessionIdleInterval, kSizeOfSessionActiveInterval, kSizeOfSessionActiveThreshold,
                                     kSizeOfDataModelRevision, kSizeOfInteractionModelRevision, kSizeOfSpecificationVersion,
-                                    kSizeOfMaxPathsPerInvoke, kSizeOfSupportedTransports, kTCPFramingHeaderSize);
+                                    kSizeOfMaxPathsPerInvoke, kSizeOfSupportedTransports, kSizeOfMaxTCPPayloadSize);
 
     // From Section 4.12.8 "Parameters and Constants" in chapter "Secure Channel".
     enum Tag : uint32_t
@@ -127,8 +128,8 @@ private:
     // Bitmap of supported transports.
     uint16_t mSupportedTransports = 0;
     // Maximum size of the TCP payload that the node is capable of receiving
-    // from its peer.
-    uint32_t mMaxTCPPayloadSize = CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES - kTCPFramingHeaderSize;
+    // from its peer (0 indicates unadvertised / legacy).
+    uint32_t mMaxTCPPayloadSize = 0;
 };
 
 } // namespace chip

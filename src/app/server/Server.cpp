@@ -611,6 +611,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SuccessOrExit(err);
 
     mCASEServer.SetLocalSessionParameters(localSessionParams);
+    mCommissioningWindowManager.SetLocalSessionParameters(localSessionParams);
 
     err = app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), mReportScheduler, &mCASESessionManager,
                                                            mSubscriptionResumptionStorage);

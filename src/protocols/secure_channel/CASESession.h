@@ -170,8 +170,6 @@ public:
      **/
     void Clear();
 
-    void SetLocalSessionParameters(const SessionParameters & sessionParams) { mLocalSessionParams = sessionParams; }
-
     enum class State : uint8_t
     {
         kInitialized         = 0,
@@ -591,8 +589,6 @@ private:
     Platform::SharedPtr<WorkHelper<HandleSigma3Data>> mHandleSigma3Helper;
 
     State mState;
-
-    SessionParameters mLocalSessionParams;
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     Optional<State> mStopHandshakeAtState = Optional<State>::Missing();

@@ -102,6 +102,9 @@ public:
     const SessionParameters & GetRemoteSessionParameters() const { return mRemoteSessionParams; }
     void SetRemoteMRPConfig(const ReliableMessageProtocolConfig & config) { mRemoteSessionParams.SetMRPConfig(config); }
 
+    const SessionParameters & GetLocalSessionParameters() const { return mLocalSessionParams; }
+    void SetLocalSessionParameters(const SessionParameters & sessionParams) { mLocalSessionParams = sessionParams; }
+
     /**
      * Encode the Session Parameters using the provided TLV tag.
      */
@@ -240,6 +243,7 @@ protected:
     // mRemoteSessionParams is received from other end and set to our session.
     // It is set the first time that session establishment is initiated.
     Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
+    SessionParameters mLocalSessionParams;
     SessionParameters mRemoteSessionParams;
 
 private:
