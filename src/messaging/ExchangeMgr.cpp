@@ -361,10 +361,11 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     // If we found a handler, create an exchange to handle the message.
     if (matchingUMH != nullptr)
     {
-        ExchangeDelegate * delegate = nullptr;
+        ExchangeDelegate * delegate         = nullptr;
+        UnsolicitedMessageHandler * handler = matchingUMH->Handler;
 
         // Fetch delegate from the handler
-        CHIP_ERROR err = matchingUMH->Handler->OnUnsolicitedMessageReceived(payloadHeader, session, delegate);
+        CHIP_ERROR err = handler->OnUnsolicitedMessageReceived(payloadHeader, session, delegate);
         if (err != CHIP_NO_ERROR)
         {
             // Using same error message for all errors to reduce code size.
@@ -379,7 +380,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         {
             if (delegate != nullptr)
             {
-                matchingUMH->Handler->OnExchangeCreationFailed(delegate);
+                handler->OnExchangeCreationFailed(delegate);
             }
 
             // Using same error message for all errors to reduce code size.
@@ -395,6 +396,13 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         {
             ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %" CHIP_ERROR_FORMAT,
                          CHIP_ERROR_INVALID_MESSAGE_TYPE.Format());
+            if (delegate != nullptr)
+            {
+                // The OnExchangeCreationFailed contract allows the handler to deallocate the delegate.
+                // Clear it from the exchange context first to prevent use-after-free in ec->Close().
+                ec->SetDelegate(nullptr);
+                handler->OnExchangeCreationFailed(delegate);
+            }
             ec->Close();
             SendStandaloneAckIfNeeded(packetHeader, payloadHeader, session, msgFlags, std::move(msgBuf));
             return;
