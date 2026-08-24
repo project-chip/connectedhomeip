@@ -58,6 +58,11 @@ void RecordTargetedEndpoint(EndpointId * endpoints, size_t & count, size_t maxCo
     }
     else
     {
+        // This branch should not be reachable in practice:
+        // - For unicast invokes, the number of distinct targeted endpoints cannot exceed the max paths per invoke
+        // (kMaxTargetedEndpoints).
+        // - For groupcast invokes, RecordTargetedEndpoint is not called because groupcast defers reports globally via an empty
+        // span.
         ChipLogError(DataManagement, "Too many targeted endpoints in invoke, capping at %u", static_cast<unsigned int>(maxCount));
     }
 }
@@ -349,40 +354,6 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
     {
         EndpointId targetedEndpoints[CHIP_CONFIG_MAX_PATHS_PER_INVOKE];
         size_t numTargetedEndpoints = 0;
-        bool hasValidCommands       = false;
-
-        TLV::TLVReader preCheckReader;
-        invokeRequests.GetReader(&preCheckReader);
-        while (CHIP_NO_ERROR == preCheckReader.Next())
-        {
-            if (TLV::AnonymousTag() != preCheckReader.GetTag())
-            {
-                continue;
-            }
-            CommandDataIB::Parser commandData;
-            if (commandData.Init(preCheckReader) != CHIP_NO_ERROR)
-            {
-                continue;
-            }
-            if (IsGroupRequest())
-            {
-                if (HasValidGroupEndpoints(commandData))
-                {
-                    hasValidCommands = true;
-                    break;
-                }
-            }
-            else
-            {
-                ConcreteCommandPath concretePath(0, 0, 0);
-                if (ValidateUnicastCommand(commandData, concretePath) == Status::Success)
-                {
-                    hasValidCommands = true;
-                    RecordTargetedEndpoint(targetedEndpoints, numTargetedEndpoints, CHIP_CONFIG_MAX_PATHS_PER_INVOKE,
-                                           concretePath.mEndpointId);
-                }
-            }
-        }
 
         // Trigger report deferral for all valid targeted endpoints BEFORE dispatching any commands.
         // When command handlers execute, they may synchronously modify attributes, calling SetDirty()
@@ -392,7 +363,7 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
         // subsequent deferral calls cannot prevent the reporting engine from immediately sending the report
         // on the next event loop iteration. Triggering report deferral here ensures the deferral window is
         // active before any attribute mutations occur.
-        if (hasValidCommands)
+        if (PopulateTargetedEndpoints(invokeRequests, targetedEndpoints, numTargetedEndpoints, CHIP_CONFIG_MAX_PATHS_PER_INVOKE))
         {
             // An empty targetedEndpoints span indicates a global deferral across all endpoints on the node for groupcast requests.
             Span<const EndpointId> endpointsSpan =
@@ -563,6 +534,44 @@ bool CommandHandlerImpl::HasValidGroupEndpoints(CommandDataIB::Parser & aCommand
         }
     }
     return false;
+}
+
+bool CommandHandlerImpl::PopulateTargetedEndpoints(InvokeRequests::Parser aInvokeRequests, EndpointId * aEndpoints,
+                                                   size_t & aCount, size_t aMaxCount)
+{
+    bool hasValidCommands = false;
+    TLV::TLVReader preCheckReader;
+    aInvokeRequests.GetReader(&preCheckReader);
+    while (CHIP_NO_ERROR == preCheckReader.Next())
+    {
+        if (TLV::AnonymousTag() != preCheckReader.GetTag())
+        {
+            continue;
+        }
+        CommandDataIB::Parser commandData;
+        if (commandData.Init(preCheckReader) != CHIP_NO_ERROR)
+        {
+            continue;
+        }
+        if (IsGroupRequest())
+        {
+            if (HasValidGroupEndpoints(commandData))
+            {
+                hasValidCommands = true;
+                break;
+            }
+        }
+        else
+        {
+            ConcreteCommandPath concretePath(0, 0, 0);
+            if (ValidateUnicastCommand(commandData, concretePath) == Status::Success)
+            {
+                hasValidCommands = true;
+                RecordTargetedEndpoint(aEndpoints, aCount, aMaxCount, concretePath.mEndpointId);
+            }
+        }
+    }
+    return hasValidCommands;
 }
 
 Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement)
