@@ -55,7 +55,7 @@ static Clusters::Thermostat::ThermostatSetpointsDelegate gThermostatSetpointsDel
 static Clusters::Thermostat::ThermostatSuggestionsDelegate gThermostatSuggestionsDelegate(gThermostatEndpoint,
                                                                                           gThermostatPresetsDelegate);
 
-using ThermostatClusterType = Clusters::Thermostat::ThermostatClusterWithFeatures<
+using ThermostatClusterType = Clusters::Thermostat::ThermostatCluster<
     Clusters::Thermostat::ThermostatDelegate, Clusters::Thermostat::ThermostatSetpointsDelegate,
     Clusters::Thermostat::ThermostatHoldDelegate, Clusters::Thermostat::ThermostatPresetsDelegate,
     Clusters::Thermostat::ThermostatSuggestionsDelegate>;
