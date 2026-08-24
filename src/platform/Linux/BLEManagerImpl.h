@@ -112,10 +112,6 @@ public:
     //   - After this returns success, the CP can no longer be commissioned over
     //     BLE until the process restarts.
     CHIP_ERROR SwitchToCentralMode();
-
-    // True after SwitchToCentralMode has completed.  Lets the proxy transport
-    // skip the switch on subsequent BLE proxy operations.
-    bool IsCentralMode() const { return mIsCentral; }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 
     // Driven by BlueZ IO
