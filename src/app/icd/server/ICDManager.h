@@ -18,6 +18,8 @@
 
 #include <app/icd/server/ICDServerConfig.h>
 
+#include <array>
+
 #include <app/AppConfig.h>
 #include <app/SubscriptionsInfoProvider.h>
 #include <app/TestEventTriggerDelegate.h>
@@ -49,6 +51,7 @@ namespace app {
 
 // Forward declaration of TestICDManager tests to allow it to be friend with ICDManager
 // Used in unit tests
+class TestICDManager;
 class TestICDManager_TestShouldCheckInMsgsBeSentAtActiveModeFunction_Test;
 
 /**
@@ -101,6 +104,18 @@ public:
         TransitionToIdle,
         ICDModeChange,
     };
+
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_CONFIG_ENABLE_ICD_CIP &&                                         \
+    CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+    enum class PendingCheckInType : uint8_t
+    {
+        kNone,
+        kTargeted,
+        kBroadcast,
+    };
+    static constexpr size_t kMaxPendingCheckInSubjects = CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC * CHIP_CONFIG_MAX_FABRICS;
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_CONFIG_ENABLE_ICD_CIP &&
+       // CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 
     /**
      * @brief Verifier template function
@@ -255,6 +270,7 @@ public:
 
 private:
     // TODO : Once <gtest/gtest_prod.h> can be included, use FRIEND_TEST for the friend class.
+    friend class TestICDManager;
     friend class TestICDManager_TestShouldCheckInMsgsBeSentAtActiveModeFunction_Test;
 
     /**
@@ -364,8 +380,27 @@ private:
     // Initialize mOperationalState to ActiveMode so the init sequence at bootup triggers the IdleMode behaviour first.
     OperationalState mOperationalState = OperationalState::ActiveMode;
     bool mTransitionToIdleCalled       = false;
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
+    bool mPendingActiveModeOnNetworkAttach = false;
+#if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+    PendingCheckInType mPendingCheckInType = PendingCheckInType::kNone;
+    std::array<Access::SubjectDescriptor, kMaxPendingCheckInSubjects> mPendingCheckInSubjects;
+    size_t mPendingCheckInSubjectsCount = 0;
+
+    static bool Contains(Span<const Access::SubjectDescriptor> list, const Access::SubjectDescriptor & value);
+    void AppendPendingCheckInSubject(const Access::SubjectDescriptor & subject);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     ObjectPool<ObserverPointer, CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE> mStateObserverPool;
     uint8_t mOpenExchangeContextCount = 0;
+
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
+    /**
+     * @brief Platform event handler to receive Thread network state and connectivity changes.
+     */
+    static void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+    void HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event);
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
 
 #if CHIP_CONFIG_ENABLE_ICD_DSLS
     bool mSITModeRequested = false;
