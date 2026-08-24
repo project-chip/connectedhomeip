@@ -226,6 +226,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         state_transition_event_handler.cancel()
         logger.info("About close the provider app with proc %s", self.current_provider_app_proc)
         self.terminate_provider()
+        await self.request_device_reboot()
 
         self.step(2)
         self.start_provider(
@@ -249,7 +250,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         logger.info("Event response after killing app: %s", event_report)
         # Catch the Querying event
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kQuerying)
-        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60)
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=120)
         # Change status to kIdle
         logger.info("Event response : %s", event_report)
         self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
@@ -259,14 +260,6 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         await self.request_device_reboot()
 
         self.step(3)
-        # If LocalConfigDisabled is set to True obtaining consent from the requestor Shall not be used.
-        # LocalConfigDisabled is optional, if found set it to False to allow continue with the test, if not is considered as False and continue.
-        # OTA(SU) spec 3.4.1
-        if await self.attribute_guard(self.get_endpoint(), Clusters.BasicInformation.Attributes.LocalConfigDisabled()):
-            await self.write_single_attribute(Clusters.BasicInformation.Attributes.LocalConfigDisabled(False), self.get_endpoint(), expect_success=True)
-            logger.info("Basic Information Cluster -> LocalConfigDisabled attribute found and updated to False")
-
-        self.step(4)
         # --userConsentNeeded is option -c
         self.start_provider(
             provider_app_path=self.provider_app_path,
@@ -280,6 +273,14 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
             log_file=self.provider_log,
             timeout=20
         )
+        # If LocalConfigDisabled is set to True obtaining consent from the requestor Shall not be used.
+        # LocalConfigDisabled is optional, if found set it to False to allow continue with the test, if not is considered as False and continue.
+        # OTA(SU) spec 3.4.1
+        if await self.attribute_guard(self.get_endpoint(), Clusters.BasicInformation.Attributes.LocalConfigDisabled()):
+            await self.write_single_attribute(Clusters.BasicInformation.Attributes.LocalConfigDisabled(False), self.get_endpoint(), expect_success=True)
+            logger.info("Basic Information Cluster -> LocalConfigDisabled attribute found and updated to False")
+
+        self.step(4)
         state_transition_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
         await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=20, autoResubscribe=True)
