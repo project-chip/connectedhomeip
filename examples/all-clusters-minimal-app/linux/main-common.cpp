@@ -32,7 +32,9 @@
 #include <transport/raw/PeerAddress.h>
 
 #include "thermostat-delegate-impl.h"
+#include "thermostat-hold-delegate-impl.h"
 #include "thermostat-presets-delegate-impl.h"
+#include "thermostat-setpoints-delegate-impl.h"
 #include "thermostat-suggestions-delegate-impl.h"
 
 #include <Options.h>
@@ -47,12 +49,16 @@ Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 
 constexpr EndpointId gThermostatEndpoint(1);
 static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatHoldDelegate gHoldDelegate(gThermostatEndpoint);
 static Clusters::Thermostat::ThermostatPresetsDelegate gThermostatPresetsDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatSetpointsDelegate gSetpointsDelegate(gThermostatEndpoint);
 static Clusters::Thermostat::ThermostatSuggestionsDelegate gThermostatSuggestionsDelegate(gThermostatEndpoint,
                                                                                           gThermostatPresetsDelegate);
 
 using ThermostatClusterType =
     Clusters::Thermostat::ThermostatClusterWithFeatures<Clusters::Thermostat::ThermostatDelegate,
+                                                        Clusters::Thermostat::ThermostatSetpointsDelegate,
+                                                        Clusters::Thermostat::ThermostatHoldDelegate,
                                                         Clusters::Thermostat::ThermostatPresetsDelegate,
                                                         Clusters::Thermostat::ThermostatSuggestionsDelegate>;
 } // namespace
@@ -97,7 +103,12 @@ static Identify gIdentify1 = {
 void ApplicationInit()
 {
     Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
-    Clusters::Thermostat::ServerInit<ThermostatClusterType>(gThermostatEndpoint, gThermostatDelegate, gThermostatPresetsDelegate,
+
+    gThermostatDelegate.Init();
+    gHoldDelegate.Init();
+    gSetpointsDelegate.Init();
+    Clusters::Thermostat::ServerInit<ThermostatClusterType>(gThermostatEndpoint, gThermostatDelegate, gSetpointsDelegate,
+                                                            gHoldDelegate, gThermostatPresetsDelegate,
                                                             gThermostatSuggestionsDelegate);
 }
 

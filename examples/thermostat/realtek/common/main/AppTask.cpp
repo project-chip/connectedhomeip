@@ -41,7 +41,9 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 #include <thermostat-delegate-impl.h>
+#include <thermostat-hold-delegate-impl.h>
 #include <thermostat-presets-delegate-impl.h>
+#include <thermostat-setpoints-delegate-impl.h>
 #include <thermostat-suggestions-delegate-impl.h>
 
 #include "matter_ble.h"
@@ -89,7 +91,9 @@ chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 constexpr EndpointId gThermostatEndpoint(1);
 static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatHoldDelegate gHoldDelegate(gThermostatEndpoint);
 static Clusters::Thermostat::ThermostatPresetsDelegate gPresetsDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatSetpointsDelegate gSetpointsDelegate(gThermostatEndpoint);
 static Clusters::Thermostat::ThermostatSuggestionsDelegate gSuggestionsDelegate(gThermostatEndpoint, gPresetsDelegate);
 
 } // namespace
@@ -297,7 +301,11 @@ void AppTask::InitServer(intptr_t arg)
         return;
     }
 
-    Clusters::Thermostat::ServerInit(gThermostatEndpoint, gThermostatDelegate, gPresetsDelegate, gSuggestionsDelegate);
+    gThermostatDelegate.Init();
+    gHoldDelegate.Init();
+    gSetpointsDelegate.Init();
+    Clusters::Thermostat::ServerInit(gThermostatEndpoint, gThermostatDelegate, gSetpointsDelegate, gHoldDelegate,
+                                     gPresetsDelegate, gSuggestionsDelegate);
 
     static RealtekObserver sRealtekObserver;
     err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sRealtekObserver);

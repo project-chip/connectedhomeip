@@ -42,8 +42,10 @@ list(
     ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
     ${chip_dir}/examples/platform/realtek/dac_provider/CommonDACProvider.cpp
     ${chip_dir}/examples/thermostat/thermostat-common/src/thermostat-delegate-impl.cpp
+    ${chip_dir}/examples/thermostat/thermostat-common/src/thermostat-hold-delegate-impl.cpp
     ${chip_dir}/examples/thermostat/thermostat-common/src/thermostat-occupancy-delegate-impl.cpp
     ${chip_dir}/examples/thermostat/thermostat-common/src/thermostat-presets-delegate-impl.cpp
+    ${chip_dir}/examples/thermostat/thermostat-common/src/thermostat-setpoints-delegate-impl.cpp
     ${chip_dir}/examples/thermostat/thermostat-common/src/thermostat-suggestions-delegate-impl.cpp
 )
 
