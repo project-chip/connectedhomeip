@@ -51,6 +51,7 @@ macro(chip_add_tv_app_common target)
             ${CHIP_TV_COMMON_BASE_DIR}/src/ZCLCallbacks.cpp
 
             ${CHIP_TV_COMMON_BASE_DIR}/clusters/account-login/AccountLoginManager.cpp
+            ${CHIP_TV_COMMON_BASE_DIR}/clusters/account-login/OAuthAccountLoginManager.cpp
             ${CHIP_TV_COMMON_BASE_DIR}/clusters/application-basic/ApplicationBasicManager.cpp
             ${CHIP_TV_COMMON_BASE_DIR}/clusters/application-launcher/ApplicationLauncherManager.cpp
             ${CHIP_TV_COMMON_BASE_DIR}/clusters/audio-output/AudioOutputManager.cpp

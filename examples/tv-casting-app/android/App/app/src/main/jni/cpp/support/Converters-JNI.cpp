@@ -182,7 +182,7 @@ jobject convertCastingPlayerFromCppToJava(matter::casting::memory::Strong<core::
             char addrCString[chip::Inet::IPAddress::kMaxStringLength];
             ipAddresses[i].ToString(addrCString, chip::Inet::IPAddress::kMaxStringLength);
             jstring jIPAddressStr = nullptr;
-            CHIP_ERROR err        = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan(addrCString, strlen(addrCString)),
+            CHIP_ERROR err        = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(addrCString),
                                                                                  reinterpret_cast<jobject &>(jIPAddressStr));
             if (err != CHIP_NO_ERROR)
             {
@@ -206,14 +206,14 @@ jobject convertCastingPlayerFromCppToJava(matter::casting::memory::Strong<core::
     jstring jDeviceName          = nullptr;
     jstring jInstanceName        = nullptr;
 
-    CHIP_ERROR idErr   = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan(player->GetId(), strlen(player->GetId())),
-                                                                      reinterpret_cast<jobject &>(jId));
-    CHIP_ERROR hostErr = JniReferences::GetInstance().CharToStringUTF(
-        chip::CharSpan(player->GetHostName(), strlen(player->GetHostName())), reinterpret_cast<jobject &>(jHostName));
-    CHIP_ERROR deviceErr = JniReferences::GetInstance().CharToStringUTF(
-        chip::CharSpan(player->GetDeviceName(), strlen(player->GetDeviceName())), reinterpret_cast<jobject &>(jDeviceName));
-    CHIP_ERROR instanceErr = JniReferences::GetInstance().CharToStringUTF(
-        chip::CharSpan(player->GetInstanceName(), strlen(player->GetInstanceName())), reinterpret_cast<jobject &>(jInstanceName));
+    CHIP_ERROR idErr       = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(player->GetId()),
+                                                                          reinterpret_cast<jobject &>(jId));
+    CHIP_ERROR hostErr     = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(player->GetHostName()),
+                                                                          reinterpret_cast<jobject &>(jHostName));
+    CHIP_ERROR deviceErr   = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(player->GetDeviceName()),
+                                                                          reinterpret_cast<jobject &>(jDeviceName));
+    CHIP_ERROR instanceErr = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(player->GetInstanceName()),
+                                                                          reinterpret_cast<jobject &>(jInstanceName));
 
     if (idErr != CHIP_NO_ERROR || hostErr != CHIP_NO_ERROR || deviceErr != CHIP_NO_ERROR || instanceErr != CHIP_NO_ERROR)
     {

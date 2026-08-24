@@ -527,13 +527,15 @@ class MatterBaseTest(base_test.BaseTestClass):
     Wildcard subscription (see setup_test), a SEPARATE concern from device classification:
 
     * Set class attribute requires_dut = False for tests that do not interact with a
-      real DUT (e.g. parser/conformance unit tests under test_testing/).  Such tests
-      will skip the background wildcard subscription so they don't try to subscribe to a
-      device that isn't there.  Default is True. This flag is independent of the
-      device-STATE markers (MatterTestCommissionedDevice / MatterTestUncommissionedDevice /
-      MatterTestCommissioner); do not derive one from the other. The sole exception is
-      CertificationUnitTestNoDevice, which sets requires_dut = False on the base since a
-      no-device test can never use the subscription.
+      DUT (e.g. parser/conformance unit tests under test_testing/).  Such tests
+      will skip the background wildcard subscription and the pre-test DUT-state capture,
+      so they don't attempt network operations against a device that isn't there.
+      Default is True. This flag is independent of the device-STATE markers
+      (MatterTestCommissionedDevice / MatterTestUncommissionedDevice / MatterTestCommissioner);
+      do not derive one from the other. The sole exception is CertificationUnitTestNoDevice,
+      which sets requires_dut = False on the base since a no-device test can never use
+      the subscription.
+
     * Set class attribute disable_wildcard_subscription = True to skip the background
       wildcard subscription and its ACL side effects — same effect as --no-wildcard-subscription.
     * When a wildcard subscription is active, read_single_attribute_check_success compares
@@ -564,10 +566,13 @@ class MatterBaseTest(base_test.BaseTestClass):
         self._extra_controllers: list[ChipDeviceCtrl.ChipDeviceController] = []
         self._extra_cas: list[matter.CertificateAuthority.CertificateAuthority] = []
         self._original_acl = None
-        self._framework_cleanup_done = False
-        # Set to True by commission_devices() on success; gates the per-test ACL read in
-        # setup_test so unit tests (which never commission) incur zero network overhead.
+        # Class-baseline snapshot of the DUT's fabric identities
+        self._original_fabrics = None
+        # Evidence that this test commissioned the DUT via a framework helper; used with
+        # commissioning_method in setup_test to pick the timeout of the CASE session
+        # check that gates the ACL baseline capture.
         self._dut_confirmed_available = False
+        self._framework_cleanup_done = False
         # Prevents double-execution when the override calls super().teardown_test()
         # and __init_subclass__ also calls it afterward.
         self._teardown_ran = False
@@ -911,11 +916,29 @@ class MatterBaseTest(base_test.BaseTestClass):
         self._framework_cleanup_done = True
         await self.async_teardown_test()
 
-        # If setup_test could not read the ACL, the DUT was unreachable at test
-        # start, skip DUT cleanup to avoid a slow network discovery attempt.
+        # The ACL baseline is only captured over a CASE session. If it was never
+        # captured, the DUT was never commissioned during this class run (PASE-only
+        # or no DUT), so there is no DUT state to clean up and no session to do it
+        # over. Skip DUT cleanup.
         dut_reachable = self._original_acl is not None
+        # commissioning_method may also be set by in-test commissioning flows, so the
+        # warning stays neutral about who commissioned. is_commissioning classes skip
+        # capture by design and must not warn.
+        if not dut_reachable and not self.is_commissioning:
+            if self.matter_test_config.commissioning_method is not None:
+                LOGGER.warning("[CLN] Class finished without a DUT baseline although commissioning "
+                               "was configured; DUT cleanup skipped")
+            else:
+                LOGGER.info("[CLN] No DUT baseline captured during this class run; skipping DUT "
+                            "cleanup. If a commissioned DUT was expected, likely causes: the DUT "
+                            "was unreachable, or it needed more time to establish a CASE session.")
         if dut_reachable:
             try:
+                # Bound session re-establishment before the reachability read: after a
+                # mid-class factory reset the DUT may be gone, and a bare Read would
+                # block on operational discovery far longer than this.
+                await self.default_controller.GetConnectedDevice(
+                    nodeId=self.dut_node_id, allowPASE=False, timeoutMs=10000)
                 # Lightweight reachability check, confirm the DUT is still alive before attempting cleanup.
                 await self.default_controller.Read(
                     self.dut_node_id,
@@ -1065,16 +1088,26 @@ class MatterBaseTest(base_test.BaseTestClass):
             LOGGER.warning("[CLN] ACL reset failed: %s", e)
 
     async def _remove_extra_fabrics(self) -> None:
-        """Removes any fabric on the DUT that is not the default controller's fabric."""
-        try:
-            # Read TH1's fabric index on the DUT via the default controller
-            th1_fabric_index = await self.read_single_attribute_check_success(
-                cluster=Clusters.OperationalCredentials,  # type: ignore[arg-type]
-                attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex,
-                endpoint=0
-            )
+        """Removes fabrics added to the DUT during the test, preserving pre-existing fabrics.
 
-            # Read all fabrics unfiltered so we see every fabric, not just TH1's
+           Each fabric falls into one of two cases:
+
+           (1) Fabrics captured in the pre-test snapshot (pre-existing), these are preserved
+           (2) Fabrics added during the test (not in the pre-test snapshot), these are removed
+
+           Identity is keyed on (rootPublicKey, fabricID) rather than fabricIndex so the decision
+           survives a mid-test factory reset (which wipes fabrics and lets re-commissioning reuse indices).
+
+           Removal is skipped when the snapshot is missing (the DUT was not reachable at setup), or the
+           snapshot exists but no fabrics were added during the test.
+        """
+        if self._original_fabrics is None:
+            LOGGER.info(
+                "[CLN] No fabric snapshot (DUT not reachable at setup): skipping fabric removal (cannot distinguish test-added from pre-existing fabrics)")
+            return
+
+        try:
+            # Read all fabrics unfiltered so we see every fabric, not just the default controller's
             fabrics = typing.cast(
                 list[Clusters.OperationalCredentials.Structs.FabricDescriptorStruct],
                 await self.read_single_attribute_check_success(
@@ -1089,7 +1122,11 @@ class MatterBaseTest(base_test.BaseTestClass):
                 "[CLN] could not read fabric list (DUT unreachable, session expired, or attribute read error), skipping fabric removal: %s", e)
             return
 
-        extra_fabric_indices = [f.fabricIndex for f in fabrics if f.fabricIndex != th1_fabric_index]
+        # Remove (by fabricIndex) only fabrics whose identity was not present before the test ran.
+        extra_fabric_indices = [
+            f.fabricIndex for f in fabrics
+            if (bytes(f.rootPublicKey), f.fabricID) not in self._original_fabrics
+        ]
 
         if not extra_fabric_indices:
             LOGGER.info("[CLN] no extra fabrics to remove")
@@ -1156,10 +1193,12 @@ class MatterBaseTest(base_test.BaseTestClass):
             LOGGER.info("[CLN] wildcard not available, skipping scene cleanup")
             return
 
+        found_any = False
         for endpoint_id in self.stored_global_wildcard.attributes:
             if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
                                 cluster=Clusters.ScenesManagement):  # type: ignore[arg-type]
                 continue
+            found_any = True
             if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
                                 cluster=Clusters.Groups):  # type: ignore[arg-type]
                 continue
@@ -1183,6 +1222,8 @@ class MatterBaseTest(base_test.BaseTestClass):
                 LOGGER.info("[CLN] scenes cleared on endpoint %d", endpoint_id)
             except Exception as e:  # DUT may be unreachable or the group may have been removed by the test
                 LOGGER.warning("[CLN] scene removal failed on endpoint %d: %s", endpoint_id, e)
+        if not found_any:
+            LOGGER.info("[CLN] ScenesManagement cluster not present on any endpoint, skipping scene cleanup")
 
     async def _purge_group_memberships(self) -> None:
         """Removes all group memberships from the DUT's group table.
@@ -1420,6 +1461,89 @@ class MatterBaseTest(base_test.BaseTestClass):
             LOGGER.info('%s%s', start_tag, line)
         LOGGER.info('%sEND ====', start_tag)
 
+    def _capture_dut_baseline(self):
+        """Capture the DUT baseline (ACL, fabric set) once per class so framework cleanup
+        can restore it at teardown.
+
+        Runs before each test until the baseline is fully captured, so mid-class
+        commissioning and transient capture failures are still covered.
+        """
+        if self.is_commissioning or not self.requires_dut:
+            # No DUT to snapshot: unit tests / file mode, or the DUT is not on the fabric yet.
+            return
+
+        if self._original_acl is not None and self._original_fabrics is not None:
+            # Baseline already captured earlier in this class run. The two captures retry
+            # independently, so skip only when both are present.
+            return
+
+        # Deadline for the GetConnectedDevice call below, not a fixed wait; with a CASE
+        # session already cached it returns immediately.
+        # - 5s when there is evidence of a commissioned DUT: gives a real DUT room to
+        #   establish a new session.
+        # - 0.5s when there is no evidence: the call is expected to fail regardless of
+        #   the wait, so the short deadline just keeps that failure cheap.
+        commissioning_configured = self.matter_test_config.commissioning_method is not None
+        dut_evidence = commissioning_configured or self._dut_confirmed_available
+        case_timeout_ms = 5000 if dut_evidence else 500
+
+        evidence = "" if not dut_evidence else (", commissioning was configured" if commissioning_configured
+                                                else ", commissioned by framework during this run")
+        LOGGER.info("[CLN] DUT evidence found: %s%s. CASE timeout set to %dms",
+                    dut_evidence, evidence, case_timeout_ms)
+
+        # Try to establish a CASE session with the DUT
+        case_check_start = time.monotonic()
+        try:
+            self.event_loop.run_until_complete(
+                self.default_controller.GetConnectedDevice(
+                    nodeId=self.dut_node_id, allowPASE=False, timeoutMs=case_timeout_ms))
+        except Exception as e:
+            elapsed_ms = int((time.monotonic() - case_check_start) * 1000)
+            LOGGER.info("[CLN] No CASE session to the DUT after %dms (not commissioned, or "
+                        "unreachable), skipping pre-test ACL capture: %s", elapsed_ms, e)
+            return
+
+        # Capture the original ACL and Fabrics
+        if self._original_acl is None:
+            self._capture_original_acl()
+        if self._original_fabrics is None:
+            self._capture_original_fabrics()
+
+    def _capture_original_acl(self):
+        """Read and store the endpoint 0 ACL that _reset_acls_to_default restores at teardown."""
+        try:
+            self._original_acl = self.event_loop.run_until_complete(
+                self.read_single_attribute_check_success(
+                    cluster=Clusters.AccessControl,
+                    attribute=Clusters.AccessControl.Attributes.Acl,
+                    endpoint=0
+                )
+            )
+            LOGGER.info("[CLN] Pre-test ACL captured (%d entries)", len(self._original_acl))
+        except Exception as e:
+            LOGGER.warning("[CLN] Pre-test ACL capture failed, will retry next test: %s", e)
+            self._original_acl = None
+
+    def _capture_original_fabrics(self):
+        """Read and store the pre-existing fabric identities.
+
+        _remove_extra_fabrics uses this snapshot so that only fabrics added during the
+        test are removed.
+        """
+        try:
+            fabrics = self.event_loop.run_until_complete(
+                self.read_single_attribute_check_success(
+                    cluster=Clusters.OperationalCredentials,
+                    attribute=Clusters.OperationalCredentials.Attributes.Fabrics,
+                    endpoint=0,
+                    fabric_filtered=False
+                )
+            )
+            self._original_fabrics = {(bytes(f.rootPublicKey), f.fabricID) for f in fabrics}
+        except Exception:
+            self._original_fabrics = None
+
     def setup_test(self):
         """Set up for each individual test execution.
 
@@ -1443,37 +1567,11 @@ class MatterBaseTest(base_test.BaseTestClass):
         self._framework_cleanup_done = False
         self.cleanup_config = TestCleanupConfig()
         self._validate_test_parameters()
-        # Capture the ACL before the test runs so _reset_acls_to_default can restore it
-        # in teardown_class. Skip when the DUT is not known to be available: unit tests
-        # never commission a device so _dut_confirmed_available stays False, and
-        # commissioning_method is None, eliminating any network overhead for them.
-        # For runner-commissioned tests commissioning_method is set; for in-test
-        # commissioning the flag is set by commission_devices() on success.
-        # is_commissioning is True for CommissionDeviceTest, where the DUT is not yet
-        # on the fabric, an operational read there would send CASE Sigma1 to an
-        # uncommissioned device, triggering unexpected DUT behaviour.
-        dut_expected = (
-            not self.is_commissioning
-            and (
-                self._dut_confirmed_available
-                or self.matter_test_config.commissioning_method is not None
-            )
-        )
-        if dut_expected:
-            try:
-                self._original_acl = self.event_loop.run_until_complete(
-                    self.read_single_attribute_check_success(
-                        cluster=Clusters.AccessControl,
-                        attribute=Clusters.AccessControl.Attributes.Acl,
-                        endpoint=0
-                    )
-                )
-            except Exception:
-                self._original_acl = None
+        self._capture_dut_baseline()
 
         if self.runner_hook and not self.is_commissioning:
             # Start the background wildcard subscription only for tests that interact with a
-            # real DUT (requires_dut = True, the default) and unless the test has opted out
+            # DUT (requires_dut = True, the default) and unless the test has opted out
             # via --no-wildcard-subscription or disable_wildcard_subscription = True on
             # the test class (e.g. tests that directly manipulate the ACL or tests that count
             # the TH entries).
@@ -2256,8 +2354,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         )
 
         result = await commission_devices(dev_ctrl, dut_node_ids, setup_payloads, commissioning_info)
-        if result:
-            self._dut_confirmed_available = True
+        # This flag only ever moves from False to True: one successful commissioning
+        # proves a DUT exists for the rest of the class run.
+        self._dut_confirmed_available = self._dut_confirmed_available or bool(result)
         return result
 
     async def commission_ntl_device(self, setup_payload: SetupPayload) -> bool:
@@ -2326,8 +2425,8 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         pairing_status = await commission_device(dev_ctrl, dut_node_id, ntl_setup_payload_info, commissioning_info)
         result = bool(pairing_status)
-        if result:
-            self._dut_confirmed_available = True
+        # Only ever moves from False to True, see commission_devices.
+        self._dut_confirmed_available = self._dut_confirmed_available or result
         return result
 
     async def open_commissioning_window(self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None, timeout: int = 900) -> CustomCommissioningParameters:
@@ -2952,6 +3051,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             self, cmd: Clusters.ClusterObjects.ClusterCommand,
             dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None, endpoint: int | None = None,
             timedRequestTimeoutMs: OptionalTimeout = None,
+            interactionTimeoutMs: OptionalTimeout = None,
             payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
         """Send a single command to a Matter device.
 
@@ -2961,6 +3061,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             node_id: Target node ID, defaults to dut_node_id.
             endpoint: Target endpoint, defaults to configured endpoint.
             timedRequestTimeoutMs: Timeout for timed requests in milliseconds.
+            interactionTimeoutMs: Overall interaction timeout in milliseconds. Defaults to an SDK-computed timeout.
             payloadCapability: Transport payload capability setting.
 
         Returns:
@@ -2974,7 +3075,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             endpoint = self.get_endpoint()
 
         return await dev_ctrl.SendCommand(nodeId=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs,
-                                          payloadCapability=payloadCapability)
+                                          interactionTimeoutMs=interactionTimeoutMs, payloadCapability=payloadCapability)
 
     async def send_test_event_triggers(self, eventTrigger: int, enableKey: bytes | None = None):
         """This helper function sends a test event trigger to the General Diagnostics cluster on endpoint 0
