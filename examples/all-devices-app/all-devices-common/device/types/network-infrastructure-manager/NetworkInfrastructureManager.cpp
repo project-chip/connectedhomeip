@@ -27,11 +27,6 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-inline ByteSpan ByteSpanFromCharSpan(CharSpan span)
-{
-    return ByteSpan(Uint8::from_const_char(span.data()), span.size());
-}
-
 namespace {
 constexpr uint16_t kThreadVersionForThread_1_3_1 = 5;
 } // namespace
@@ -67,7 +62,7 @@ CHIP_ERROR NetworkInfrastructureManager::Register(chip::EndpointId endpoint, Cod
     mWiFiNetworkManagementCluster.Create(endpoint);
     ReturnErrorOnFailure(provider.AddCluster(mWiFiNetworkManagementCluster.Registration()));
     ReturnErrorOnFailure(mWiFiNetworkManagementCluster.Cluster().SetNetworkCredentials(
-        ByteSpanFromCharSpan("MatterAP"_span), ByteSpanFromCharSpan("Setec Astronomy"_span)));
+        ByteSpan::fromCharSpan("MatterAP"_span), ByteSpan::fromCharSpan("Setec Astronomy"_span)));
 
     // 3. Thread Network Directory
     mThreadNetworkDirectoryCluster.Create(endpoint, mThreadNetworkDirectoryStorage);
