@@ -11017,10 +11017,10 @@ static id _Nullable DecodeAttributeValueForElectricalProtectionAlarmCluster(Attr
             } else {
                 value.nominalDischargeCurrent = nil;
             }
-            if (cppValue.Value().maximumDishargeCurrent.HasValue()) {
-                value.maximumDishargeCurrent = [NSNumber numberWithLongLong:cppValue.Value().maximumDishargeCurrent.Value()];
+            if (cppValue.Value().maximumDischargeCurrent.HasValue()) {
+                value.maximumDischargeCurrent = [NSNumber numberWithLongLong:cppValue.Value().maximumDischargeCurrent.Value()];
             } else {
-                value.maximumDishargeCurrent = nil;
+                value.maximumDischargeCurrent = nil;
             }
             if (cppValue.Value().ratedShortCircuitCurrent.HasValue()) {
                 value.ratedShortCircuitCurrent = [NSNumber numberWithLongLong:cppValue.Value().ratedShortCircuitCurrent.Value()];
