@@ -19,6 +19,8 @@
 
 #include <app/server/ThreadRendezvousAnnouncement.h>
 #include <lib/core/CHIPError.h>
+#include <lib/dnssd/wire/Parser.h>
+#include <lib/dnssd/wire/RecordData.h>
 #include <lib/support/CodeUtils.h>
 
 #include <optional>
@@ -29,6 +31,45 @@ using namespace chip::app;
 class TestThreadRendezvousAnnouncement : public ::testing::Test
 {
 };
+
+namespace {
+
+class AnnouncementParser : public Dnssd::ParserDelegate
+{
+public:
+    explicit AnnouncementParser(const Dnssd::BytesRange & packet) : mPacket(packet) {}
+
+    void OnHeader(Dnssd::ConstHeaderRef &) override {}
+    void OnQuery(const Dnssd::QueryData &) override {}
+
+    void OnResource(Dnssd::ResourceType, const Dnssd::ResourceData & data) override
+    {
+        mResourceCount++;
+        if (data.GetType() != Dnssd::QType::SRV)
+        {
+            return;
+        }
+
+        Dnssd::SrvRecord srv;
+        mSrvParsed = srv.Parse(data.GetData(), mPacket);
+        if (mSrvParsed)
+        {
+            mSrvPort = srv.GetPort();
+        }
+    }
+
+    size_t GetResourceCount() const { return mResourceCount; }
+    bool SrvParsed() const { return mSrvParsed; }
+    uint16_t GetSrvPort() const { return mSrvPort; }
+
+private:
+    Dnssd::BytesRange mPacket;
+    size_t mResourceCount = 0;
+    bool mSrvParsed       = false;
+    uint16_t mSrvPort     = 0;
+};
+
+} // namespace
 
 TEST_F(TestThreadRendezvousAnnouncement, TxtStringsBuilder)
 {
@@ -81,8 +122,6 @@ TEST_F(TestThreadRendezvousAnnouncement, TxtStringsBuilderOverflow)
     EXPECT_EQ(err, CHIP_ERROR_BUFFER_TOO_SMALL);
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
-
 TEST_F(TestThreadRendezvousAnnouncement, BuildThreadRendezvousAnnouncement)
 {
     Dnssd::CommissionAdvertisingParameters params;
@@ -91,8 +130,13 @@ TEST_F(TestThreadRendezvousAnnouncement, BuildThreadRendezvousAnnouncement)
 
     System::PacketBufferHandle buffer;
     CHIP_ERROR err = BuildThreadRendezvousAnnouncement(params, buffer);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-    EXPECT_FALSE(buffer.IsNull());
-}
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+    ASSERT_FALSE(buffer.IsNull());
 
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+    Dnssd::BytesRange packet(buffer->Start(), buffer->Start() + buffer->DataLength());
+    AnnouncementParser parser(packet);
+    ASSERT_TRUE(Dnssd::ParsePacket(packet, &parser));
+    EXPECT_EQ(parser.GetResourceCount(), 2u);
+    EXPECT_TRUE(parser.SrvParsed());
+    EXPECT_EQ(parser.GetSrvPort(), 5540u);
+}
