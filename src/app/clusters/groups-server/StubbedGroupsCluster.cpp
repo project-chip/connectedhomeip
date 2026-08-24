@@ -15,6 +15,7 @@
  */
 #include <app/clusters/groups-server/StubbedGroupsCluster.h>
 
+#include <app/clusters/access-control-server/AccessControlEventHelper.h>
 #include <app/clusters/scenes-server/Constants.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/Groups/Attributes.h>
@@ -78,10 +79,11 @@ DataModel::ActionReturnStatus StubbedGroupsCluster::ReadAttribute(const DataMode
 
     switch (request.path.mAttributeId)
     {
-    case ClusterRevision::Id:
+    case ClusterRevision::Id: {
         // TODO : Remove this, only use kRevision (from metadata) when Datamodel is updated with the new revision.
         constexpr uint16_t enforcedRev = kRevision < 5 ? 5 : kRevision;
         return encoder.Encode(enforcedRev);
+    }
     case FeatureMap::Id:
         // Group names is hardcoded (feature is M conformance in the spec)
         return encoder.Encode(Feature::kGroupNames);
@@ -153,7 +155,11 @@ std::optional<DataModel::ActionReturnStatus> StubbedGroupsCluster::InvokeCommand
     case RemoveAllGroups::Id: {
         MATTER_TRACE_SCOPE("RemoveAllGroups", "Groups");
 
-        LogIfFailure(mGroupDataProvider.RemoveEndpoint(fabricIndex, mPath.mEndpointId));
+        CHIP_ERROR err = mGroupDataProvider.RemoveEndpoint(fabricIndex, mPath.mEndpointId);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to remove all groups: %s", ErrorStr(err));
+        }
 
         if (mGroupDataProvider.ConsumeAuxAclNotificationNeeded())
         {

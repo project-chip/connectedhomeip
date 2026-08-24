@@ -36,7 +36,7 @@
 #     quiet: true
 #   run2:
 #     app: ${ALL_DEVICES_APP}
-#     app-args: --device on-off-light --discriminator 1234 --KVS kvs1
+#     app-args: --device on-off-light --discriminator 1234 --groupcast--KVS kvs1
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -155,7 +155,7 @@ class TC_G_2_2(MatterBaseTest):
         th1 = self.default_controller
 
         cluster_revision = await self.read_single_attribute_check_success(
-            cluster=Clusters.Objects.Groups, attribute=Clusters.Groups.Attributes.ClusterRevision
+            cluster=Clusters.Groups, attribute=Clusters.Groups.Attributes.ClusterRevision
         )
         if cluster_revision < 5:
             maxgroups: int = await self.read_single_attribute_check_success(
@@ -448,7 +448,7 @@ class TC_G_2_2(MatterBaseTest):
                 all(entry.endpoint != self.matter_test_config.endpoint for entry in groupTableList),
                 f"Unexpected group entries found for endpoint {self.matter_test_config.endpoint}: {groupTableList}",
             )
-            self.mark_all_remaining_steps_skipped()
+            self.mark_all_remaining_steps_skipped("25")
         # Cluster revision >= 5
         else:
             self.mark_step_range_skipped("1a", "24")
@@ -458,7 +458,7 @@ class TC_G_2_2(MatterBaseTest):
             self.step("25")
             # Cleanup any existing groups and KeySetID on the DUT.
             membership = await self.read_single_attribute_check_success(
-                endpoint=0, cluster=Clusters.Objects.Groupcast, attribute=Clusters.Groupcast.Attributes.Membership
+                endpoint=0, cluster=Clusters.Groupcast, attribute=Clusters.Groupcast.Attributes.Membership
             )
             if membership:
                 # LeaveGroup with groupID 0 will leave all groups on the fabric.
@@ -510,7 +510,7 @@ class TC_G_2_2(MatterBaseTest):
             await self.send_single_cmd(Clusters.Groups.Commands.RemoveGroup(kGroupId1))
             self.step("31")
             membership = await self.read_single_attribute_check_success(
-                endpoint=0, cluster=Clusters.Objects.Groupcast, attribute=Clusters.Groupcast.Attributes.Membership
+                endpoint=0, cluster=Clusters.Groupcast, attribute=Clusters.Groupcast.Attributes.Membership
             )
             asserts.assert_true(len(membership) == 1, "Groupcast membership should contain only 1 entry")
             asserts.assert_equal(
@@ -525,7 +525,7 @@ class TC_G_2_2(MatterBaseTest):
             await self.send_single_cmd(Clusters.Groups.Commands.RemoveAllGroups())
             self.step("33")
             membership = await self.read_single_attribute_check_success(
-                endpoint=0, cluster=Clusters.Objects.Groupcast, attribute=Clusters.Groupcast.Attributes.Membership
+                endpoint=0, cluster=Clusters.Groupcast, attribute=Clusters.Groupcast.Attributes.Membership
             )
             asserts.assert_true(len(membership) == 0, "Groupcast membership should be empty")
 
