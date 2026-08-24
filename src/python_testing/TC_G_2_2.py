@@ -50,8 +50,9 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from mobly import asserts
 import secrets
+
+from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
