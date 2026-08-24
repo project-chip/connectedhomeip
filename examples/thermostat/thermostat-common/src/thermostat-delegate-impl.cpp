@@ -172,7 +172,7 @@ Protocols::InteractionModel::Status ThermostatDelegate::SetRemoteSensing(BitMask
     }
     AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
     VerifyOrReturnError(provider != nullptr, Status::InvalidInState);
-    AttributePersistence persistence(*mProvider);
+    AttributePersistence persistence(*provider);
     CHIP_ERROR result = persistence.StoreNativeEndianValue({ mEndpointId, Thermostat::Id, RemoteSensing::Id }, sensing.Raw());
     if (result != CHIP_NO_ERROR)
     {
