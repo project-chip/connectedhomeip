@@ -68,3 +68,13 @@
     {                                                                                                                              \
         test_name();                                                                                                               \
     }
+
+/**
+ * Shorthand for EXPECT_EQ(expr, CHIP_NO_ERROR)
+ */
+#define EXPECT_SUCCESS(expr) EXPECT_EQ((expr), CHIP_NO_ERROR)
+
+/**
+ * Shorthand for ASSERT_EQ(expr, CHIP_NO_ERROR)
+ */
+#define ASSERT_SUCCESS(expr) ASSERT_EQ((expr), CHIP_NO_ERROR)
