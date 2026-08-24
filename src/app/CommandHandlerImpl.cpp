@@ -371,8 +371,7 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
         }
         else
         {
-            VerifyOrReturnError(PopulateTargetedEndpoints(invokeRequests, endpointsSpan) == CHIP_NO_ERROR,
-                                Status::InvalidAction);
+            VerifyOrReturnError(PopulateTargetedEndpoints(invokeRequests, endpointsSpan) == CHIP_NO_ERROR, Status::InvalidAction);
         }
 
         if (IsGroupRequest() || !endpointsSpan.empty())
