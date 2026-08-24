@@ -292,7 +292,7 @@ ThermostatCoolingSetpoints::WriteAttribute(const DataModel::WriteAttributeReques
 CHIP_ERROR ThermostatCoolingSetpoints::Attributes(const ConcreteClusterPath & path,
                                                   ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    auto attributes = mSetpoints.GetOptionalAttributes();
+    auto attributes                                                   = mSetpoints.GetOptionalAttributes();
     AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
         { true, OccupiedCoolingSetpoint::kMetadataEntry },
         { mSetpoints.Features().Has(Feature::kOccupancy), UnoccupiedCoolingSetpoint::kMetadataEntry },

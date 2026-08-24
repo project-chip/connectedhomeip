@@ -48,36 +48,36 @@ DataModel::ActionReturnStatus ThermostatClusterCore::ReadAttribute(const DataMod
             return encoder.EncodeNull();
         }
         return encoder.Encode(GetLocalTemperature());
-    case OutdoorTemperature::Id:
-    {
+    case OutdoorTemperature::Id: {
         DataModel::Nullable<temperature> outdoorTemp;
-        if (auto status = mDelegate.GetOutdoorTemperature(outdoorTemp); status != Status::Success) {
+        if (auto status = mDelegate.GetOutdoorTemperature(outdoorTemp); status != Status::Success)
+        {
             return status;
         }
         return encoder.Encode(outdoorTemp);
     }
     case SystemMode::Id:
         return encoder.Encode(GetSystemMode());
-    case ThermostatRunningMode::Id:
-    {
+    case ThermostatRunningMode::Id: {
         ThermostatRunningModeEnum runningMode;
-        if (auto status = mDelegate.GetRunningMode(runningMode); status != Status::Success) {
+        if (auto status = mDelegate.GetRunningMode(runningMode); status != Status::Success)
+        {
             return status;
         }
         return encoder.Encode(runningMode);
     }
-    case ThermostatRunningState::Id:
-    {
+    case ThermostatRunningState::Id: {
         BitMask<RelayStateBitmap> runningState;
-        if (auto status = mDelegate.GetRunningState(runningState); status != Status::Success) {
+        if (auto status = mDelegate.GetRunningState(runningState); status != Status::Success)
+        {
             return status;
         }
         return encoder.Encode(runningState);
     }
-    case RemoteSensing::Id:
-    {
+    case RemoteSensing::Id: {
         BitMask<RemoteSensingBitmap> remoteSensing;
-        if (auto status = mDelegate.GetRemoteSensing(remoteSensing); status != Status::Success) {
+        if (auto status = mDelegate.GetRemoteSensing(remoteSensing); status != Status::Success)
+        {
             return status;
         }
         if (mFeatures.Has(Feature::kLocalTemperatureNotExposed))

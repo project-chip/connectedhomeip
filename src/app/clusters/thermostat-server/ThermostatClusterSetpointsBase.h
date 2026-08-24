@@ -55,9 +55,9 @@ public:
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler);
 
 protected:
-    ThermostatClusterCore & mCluster; 
-    
-    virtual Setpoints GetSetpoints();   
+    ThermostatClusterCore & mCluster;
+
+    virtual Setpoints GetSetpoints();
 };
 
 } // namespace Thermostat

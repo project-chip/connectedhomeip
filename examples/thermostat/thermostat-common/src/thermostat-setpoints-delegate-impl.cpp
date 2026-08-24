@@ -67,8 +67,6 @@ Protocols::InteractionModel::Status ThermostatSetpointsDelegate::Init()
     persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, MaxCoolSetpointLimit::Id }, mMaxCoolSetpointLimit,
                                       defaultMaxCoolLimit);
 
-
-
     if (auto status = UnoccupiedCoolingSetpoint::GetDefault(mEndpointId, &mUnoccupiedCoolingSetpoint); status != Status::Success)
     {
         mUnoccupiedCoolingSetpoint = kDefaultCoolingSetpoint;
@@ -111,7 +109,6 @@ Protocols::InteractionModel::Status ThermostatSetpointsDelegate::Init()
     }
     persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, OccupiedHeatingSetpoint::Id }, mOccupiedHeatingSetpoint,
                                       mOccupiedHeatingSetpoint);
-
 
     if (auto status = UnoccupiedHeatingSetpoint::GetDefault(mEndpointId, &mUnoccupiedHeatingSetpoint); status != Status::Success)
     {

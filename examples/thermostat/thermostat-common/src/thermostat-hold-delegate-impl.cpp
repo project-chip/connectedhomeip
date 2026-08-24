@@ -82,7 +82,8 @@ ThermostatHoldDelegate::SetTemperatureSetpointHoldDuration(DataModel::Nullable<u
     AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
     VerifyOrReturnError(provider != nullptr, Status::Failure);
     AttributePersistence persistence(*provider);
-    if (auto err = persistence.StoreNativeEndianValue({ mEndpointId, Thermostat::Id, TemperatureSetpointHoldDuration::Id }, duration);
+    if (auto err =
+            persistence.StoreNativeEndianValue({ mEndpointId, Thermostat::Id, TemperatureSetpointHoldDuration::Id }, duration);
         err != CHIP_NO_ERROR)
     {
         return ClusterStatusCode(err).GetStatus();

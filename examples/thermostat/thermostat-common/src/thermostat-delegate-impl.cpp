@@ -142,7 +142,6 @@ Protocols::InteractionModel::Status ThermostatDelegate::GetOutdoorTemperature(Da
     return Status::Success;
 }
 
-
 int8_t ThermostatDelegate::GetLocalTemperatureCalibration() const
 {
     return mLocalTemperatureCalibration;
