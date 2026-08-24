@@ -36,7 +36,7 @@
 #     quiet: true
 #   run2:
 #     app: ${ALL_DEVICES_APP}
-#     app-args: --device on-off-light --discriminator 1234 --groupcast--KVS kvs1
+#     app-args: --device on-off-light --discriminator 1234 --groupcast --KVS kvs1
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
