@@ -39,7 +39,6 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/dishwasher-alarm-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/dishwasher-mode.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/electrical-protection-alarm-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/energy-preference-delegate.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-dryer-controls-delegate-impl.cpp",
