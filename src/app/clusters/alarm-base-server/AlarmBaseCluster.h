@@ -61,7 +61,7 @@ public:
     AlarmBase::AlarmMap GetLatch() const { return mLatch; }
 
     Protocols::InteractionModel::Status SetMask(const AlarmBase::AlarmMap & mask);
-    Protocols::InteractionModel::Status SetState(const AlarmBase::AlarmMap & newState, bool ignoreLatchState = false);
+    Protocols::InteractionModel::Status SetState(const AlarmBase::AlarmMap & newState);
     Protocols::InteractionModel::Status ResetLatchedAlarms(const AlarmBase::AlarmMap & alarms);
 
     bool HasResetFeature() const { return mFeature.Has(AlarmBase::Feature::kReset); }
@@ -69,6 +69,10 @@ public:
 protected:
     virtual void SendNotifyEvent(AlarmBase::AlarmMap becameActive, AlarmBase::AlarmMap becameInactive, AlarmBase::AlarmMap newState,
                                  AlarmBase::AlarmMap mask) = 0;
+
+    /// Used when the Latch attribute must not prevent state updates (mask adjustment, reset, integration init).
+    /// Applications should use SetState() or ResetLatchedAlarms() instead.
+    Protocols::InteractionModel::Status SetStateIgnoringLatch(const AlarmBase::AlarmMap & newState);
 
 private:
     const BitMask<AlarmBase::Feature> mFeature;
@@ -80,6 +84,8 @@ private:
     const AlarmBase::AlarmMap mLatch;
     AlarmBase::AlarmMap mState{};
     const AlarmBase::AlarmMap mSupported;
+
+    Protocols::InteractionModel::Status SetStateInternal(const AlarmBase::AlarmMap & newState, bool ignoreLatchState);
 
     DataModel::ActionReturnStatus HandleReset(const AlarmBase::AlarmMap & alarms);
 

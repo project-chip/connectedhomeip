@@ -164,7 +164,7 @@ public:
         BitMask<DishwasherAlarm::AlarmBitmap> stateDefault{};
         if (State::GetDefault(endpointId, &stateDefault) == Status::Success)
         {
-            cluster.SetState(AlarmBase::AlarmMap(stateDefault.Raw()), true);
+            cluster.SetState(AlarmBase::AlarmMap(stateDefault.Raw()));
         }
 
         return gDishwasherAlarmClusters[clusterInstanceIndex].cluster.Registration();
@@ -315,7 +315,11 @@ Status DishwasherAlarmServer::SetStateValue(EndpointId endpoint, const BitMask<A
 {
     DishwasherAlarmCluster * cluster = FindClusterOnEndpoint(endpoint);
     VerifyOrReturnError(cluster != nullptr, Status::UnsupportedEndpoint);
-    return cluster->SetState(FromAlarmMap(newState), ignoreLatchState);
+    if (ignoreLatchState)
+    {
+        return cluster->SetStateIgnoringLatch(FromAlarmMap(newState));
+    }
+    return cluster->SetState(FromAlarmMap(newState));
 }
 
 Status DishwasherAlarmServer::ResetLatchedAlarms(EndpointId endpoint, const BitMask<AlarmMap> alarms)

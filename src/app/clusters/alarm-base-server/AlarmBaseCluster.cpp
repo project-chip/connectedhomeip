@@ -39,17 +39,23 @@ Status AlarmBaseCluster::SetMask(const AlarmMap & mask)
     AlarmMap state = mState;
     if (!mask.HasAll(state))
     {
-        state         = mask & state;
-        Status status = SetState(state, true);
-        if (status != Status::Success)
-        {
-            return status;
-        }
+        state = mask & state;
+        return SetStateIgnoringLatch(state);
     }
     return Status::Success;
 }
 
-Status AlarmBaseCluster::SetState(const AlarmMap & newState, bool ignoreLatchState)
+Status AlarmBaseCluster::SetState(const AlarmMap & newState)
+{
+    return SetStateInternal(newState, false);
+}
+
+Status AlarmBaseCluster::SetStateIgnoringLatch(const AlarmMap & newState)
+{
+    return SetStateInternal(newState, true);
+}
+
+Status AlarmBaseCluster::SetStateInternal(const AlarmMap & newState, bool ignoreLatchState)
 {
     AlarmMap finalNewState = newState;
 
@@ -81,7 +87,7 @@ Status AlarmBaseCluster::ResetLatchedAlarms(const AlarmMap & alarms)
 
     AlarmMap state = mState;
     state.Clear(alarms);
-    return SetState(state, true);
+    return SetStateIgnoringLatch(state);
 }
 
 DataModel::ActionReturnStatus AlarmBaseCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,

@@ -97,7 +97,7 @@ public:
         BitMask<RefrigeratorAlarm::AlarmBitmap> stateDefault{};
         if (State::GetDefault(endpointId, &stateDefault) == Status::Success)
         {
-            cluster.SetState(AlarmBase::AlarmMap(stateDefault.Raw()), true);
+            cluster.SetState(AlarmBase::AlarmMap(stateDefault.Raw()));
         }
 
         return gRefrigeratorAlarmClusters[clusterInstanceIndex].cluster.Registration();

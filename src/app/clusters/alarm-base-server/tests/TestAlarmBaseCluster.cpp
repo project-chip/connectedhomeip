@@ -205,7 +205,7 @@ TEST_F(TestAlarmBaseCluster, SetStateValueHonorsLatchUnlessIgnored)
     EXPECT_EQ(cluster.SetState(AlarmMap(0x2)), Status::Success);
     EXPECT_EQ(cluster.GetState().Raw(), 0x3u);
 
-    EXPECT_EQ(cluster.SetState(AlarmMap(0), true), Status::Success);
+    EXPECT_EQ(cluster.ResetLatchedAlarms(AlarmMap(0x3)), Status::Success);
     EXPECT_EQ(cluster.GetState().Raw(), 0u);
 }
 
@@ -216,7 +216,7 @@ TEST_F(TestAlarmBaseCluster, ResetLatchedAlarmsClearsStateBits)
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster.SetMask(AlarmMap(0x3)), Status::Success);
-    EXPECT_EQ(cluster.SetState(AlarmMap(0x3), true), Status::Success);
+    EXPECT_EQ(cluster.SetState(AlarmMap(0x3)), Status::Success);
     EXPECT_EQ(cluster.ResetLatchedAlarms(AlarmMap(0x2)), Status::Success);
 
     EXPECT_EQ(cluster.GetState().Raw(), 0x1u);
@@ -266,7 +266,7 @@ TEST_F(TestAlarmBaseCluster, ResetCommandClearsRequestedAlarms)
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster.SetMask(AlarmMap(0x3)), Status::Success);
-    EXPECT_EQ(cluster.SetState(AlarmMap(0x3), true), Status::Success);
+    EXPECT_EQ(cluster.SetState(AlarmMap(0x3)), Status::Success);
 
     Commands::Reset::Type command{ .alarms = BitMask<DishwasherAlarm::AlarmBitmap>(0x2) };
     EXPECT_TRUE(tester.Invoke(command).IsSuccess());
