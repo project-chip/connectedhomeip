@@ -218,7 +218,6 @@ class TC_G_2_2(MatterBaseTest):
             asserts.assert_true(len(matched_entries) > 0, f"No GroupTable entry found with groupId={expected_group_id}")
 
             # Verify if is supported groupName feature
-            # Verify if is supported groupName feature
             feature_map: int = await self.read_single_attribute_check_success(
                 cluster=Clusters.Groups, attribute=Clusters.Groups.Attributes.FeatureMap, endpoint=self.matter_test_config.endpoint
             )

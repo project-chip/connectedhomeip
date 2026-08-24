@@ -72,7 +72,7 @@ public:
     Clusters::OnOffLightingCluster & OnOffCluster() { return mOnOffCluster.Cluster(); }
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
     Clusters::ScenesManagementCluster & ScenesManagementCluster() { return mScenesManagementCluster.Cluster(); }
-    Clusters::GroupsCluster & GroupsCluster() { return mGroupsCluster.Cluster(); }
+    Clusters::StubbedGroupsCluster & GroupsCluster() { return mGroupsCluster.Cluster(); }
 
 protected:
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,

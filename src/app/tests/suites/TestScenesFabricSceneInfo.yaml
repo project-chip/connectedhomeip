@@ -128,7 +128,7 @@ tests:
                     }
 
     - label: "Preparation step for using the Write Group Keys command."
-      PICS: "GC.S"
+      PICS: "!GC.S"
       cluster: "Group Key Management"
       endpoint: 0
       command: "writeAttribute"
