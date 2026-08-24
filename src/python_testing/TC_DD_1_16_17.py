@@ -89,7 +89,6 @@ class TC_DD_1_16_17(MatterTestUncommissionedDevice):
         from the manual pairing code. That check is done in TC-DD-1.16
     '''
 
-
     def steps_TC_DD_1_16(self):
         return [TestStep(1, "TH parses the QR code"),
                 TestStep(2, "If the Custom Flow field is set to 0, this device uses standard flow. Verify that the DUT is advertising as Commissionable",

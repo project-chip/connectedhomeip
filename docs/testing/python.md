@@ -841,37 +841,40 @@ For example, to run TC-ACE-1.2 tests against the linux `chip-lighting-app`:
 
 ## Runner Global Wildcard Pre-Population
 
-By default, `run_tests_no_exit` performs a **global wildcard read** against the DUT
-before any test class runs, and stores the result in global storage so downstream
-guards (`attribute_guard`, `command_guard`, `feature_guard`) can consult it without
-issuing their own reads. The read covers the `Descriptor` cluster plus the
-`AttributeList`, `FeatureMap`, and `AcceptedCommandList` global attributes on every
-endpoint, and is dispatched over CASE if the device is already commissioned or over
-PASE otherwise.
+By default, `run_tests_no_exit` performs a **global wildcard read** against the
+DUT before any test class runs, and stores the result in global storage so
+downstream guards (`attribute_guard`, `command_guard`, `feature_guard`) can
+consult it without issuing their own reads. The read covers the `Descriptor`
+cluster plus the `AttributeList`, `FeatureMap`, and `AcceptedCommandList` global
+attributes on every endpoint, and is dispatched over CASE if the device is
+already commissioned or over PASE otherwise.
 
 Centralizing the read in the runner means:
 
-- Each test pays for the wildcard read **once per run**, not once per guard call.
-- When PASE is used, the session is kept alive so `CommissionDeviceTest` and
-  `BasicCompositionTests.setup_class_helper` can reuse it instead of forcing the
-  device to reopen its commissioning window.
-- Guards read a known-populated value from the stash rather than triggering an
-  on-demand read from inside a test step.
+-   Each test pays for the wildcard read **once per run**, not once per guard
+    call.
+-   When PASE is used, the session is kept alive so `CommissionDeviceTest` and
+    `BasicCompositionTests.setup_class_helper` can reuse it instead of forcing
+    the device to reopen its commissioning window.
+-   Guards read a known-populated value from the stash rather than triggering an
+    on-demand read from inside a test step.
 
 ### The `--skip-global-wildcard-population` flag
 
-There are cases where the runner **cannot** or **should not** perform the pre-populate:
+There are cases where the runner **cannot** or **should not** perform the
+pre-populate:
 
-- **Discovery tests (`TC_DD_*`).** These verify the device's advertising state
-  directly. Opening a PASE session from the runner would suppress commissionable
-  advertisement and cause the tests to fail.
-- **NFC in-test commissioning.** The onboarding data is read from the NFC tag from
-  within the test body, so at runner time there is no reachable DUT to read from.
-- **File-based `BasicComposition` runs.** The wildcard comes from a pre-recorded
-  file rather than a live device.
-- **Ad-hoc runs** where the extra read at startup is unwanted (for example, quick
-  local iterations against a device whose state you do not want the runner to
-  disturb).
+-   **Discovery tests (`TC_DD_*`).** These verify the device's advertising state
+    directly. Opening a PASE session from the runner would suppress
+    commissionable advertisement and cause the tests to fail.
+-   **NFC in-test commissioning.** The onboarding data is read from the NFC tag
+    from within the test body, so at runner time there is no reachable DUT to
+    read from.
+-   **File-based `BasicComposition` runs.** The wildcard comes from a
+    pre-recorded file rather than a live device.
+-   **Ad-hoc runs** where the extra read at startup is unwanted (for example,
+    quick local iterations against a device whose state you do not want the
+    runner to disturb).
 
 For these cases, pass `--skip-global-wildcard-population` on the CLI:
 
@@ -883,16 +886,16 @@ For these cases, pass `--skip-global-wildcard-population` on the CLI:
 
 With the flag set, the runner logs a message and leaves the stash empty for
 `stored_global_wildcard`. The first guard call inside a test triggers
-`MatterBaseTest._populate_wildcard`, which performs the read on-demand — at which
-point the DUT is guaranteed to be reachable — and writes the result to the stash
-so subsequent guard calls reuse it.
+`MatterBaseTest._populate_wildcard`, which performs the read on-demand — at
+which point the DUT is guaranteed to be reachable — and writes the result to the
+stash so subsequent guard calls reuse it.
 
 Functionally the two paths produce the same behaviour: guards see a populated
 wildcard when they need one. The only difference is **when** the read happens.
 
 Tests that always need the flag (discovery, NFC, file-based `BasicComposition`)
-have it wired into their CI invocation. When adding a new test that falls into one
-of those categories, update the CI configuration to pass
+have it wired into their CI invocation. When adding a new test that falls into
+one of those categories, update the CI configuration to pass
 `--skip-global-wildcard-population` for that test.
 
 # Running tests in CI
