@@ -255,6 +255,48 @@ void WiFiPAFLayer::Shutdown()
     }
 }
 
+void WiFiPAFLayer::FlushPendingAcks()
+{
+    for (uint8_t i = 0; i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; i++)
+    {
+        WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Get(i);
+        if ((endPoint == nullptr) || (endPoint->mWiFiPafLayer != this) || !endPoint->IsConnected(endPoint->mState))
+        {
+            continue;
+        }
+        if (!endPoint->mTimerStateFlags.Has(WiFiPAFEndPoint::TimerStateFlag::kSendAckTimerRunning))
+        {
+            continue;
+        }
+
+        ChipLogProgress(WiFiPAF, "WiFiPAF: flushing pending ack on session id: %u", endPoint->mSessionInfo.id);
+        CHIP_ERROR err = endPoint->DriveStandAloneAck();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(WiFiPAF, "WiFiPAF: failed to flush pending ack: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
+}
+
+void WiFiPAFLayer::DrivePendingSends()
+{
+    for (uint8_t i = 0; i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; i++)
+    {
+        WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Get(i);
+        if ((endPoint == nullptr) || (endPoint->mWiFiPafLayer != this) || !endPoint->IsConnected(endPoint->mState))
+        {
+            continue;
+        }
+
+        CHIP_ERROR err = endPoint->DriveSending();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(WiFiPAF, "WiFiPAF: failed to drive pending sends: %" CHIP_ERROR_FORMAT, err.Format());
+            endPoint->DoClose(kWiFiPAFCloseFlag_AbortTransmission, err);
+        }
+    }
+}
+
 bool WiFiPAFLayer::OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg)
 {
     WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Find(reinterpret_cast<WIFIPAF_CONNECTION_OBJECT>(&RxInfo));
