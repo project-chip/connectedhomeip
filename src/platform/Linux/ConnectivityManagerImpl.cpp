@@ -20,6 +20,7 @@
 #include <string.h>
 
 #include <lib/core/Optional.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -110,6 +111,17 @@ void ConnectivityManagerImpl::UpdateEthernetNetworkingStatus()
     }
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+CHIP_ERROR ConnectivityManagerImpl::SetWiFiIfName(const char * ifName)
+{
+    VerifyOrReturnError(ifName != nullptr && strlen(ifName) < sizeof(sWiFiIfName), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(ConnectivityUtils::IsValidInterface(ifName), CHIP_ERROR_INVALID_ARGUMENT);
+    Platform::CopyString(sWiFiIfName, ifName);
+    ChipLogProgress(DeviceLayer, "Using WiFi interface: %s", sWiFiIfName);
+    return CHIP_NO_ERROR;
+}
+#endif
+
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -145,7 +157,14 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    if (ConnectivityUtils::GetWiFiInterfaceName(sWiFiIfName, Inet::InterfaceId::kMaxIfNameLength) == CHIP_NO_ERROR)
+    // A WiFi interface name may have been configured explicitly (e.g. via the --wifi=<interface>
+    // command line option), in which case it has already been stored in sWiFiIfName. Only fall
+    // back to auto-detection when no interface has been set.
+    if (sWiFiIfName[0] != '\0')
+    {
+        ChipLogProgress(DeviceLayer, "Using WiFi interface: %s", sWiFiIfName);
+    }
+    else if (ConnectivityUtils::GetWiFiInterfaceName(sWiFiIfName, Inet::InterfaceId::kMaxIfNameLength) == CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "Got WiFi interface: %s", sWiFiIfName);
     }
