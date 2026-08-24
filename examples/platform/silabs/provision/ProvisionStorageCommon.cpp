@@ -37,7 +37,7 @@ namespace Provision {
 
 CHIP_ERROR Storage::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
 {
-    constexpr uint8_t kDateLength        = 8;  // YYYYMMDD
+    constexpr uint8_t kDateLength              = 8;  // YYYYMMDD
     constexpr uint8_t kLegacyDateLength        = 10; // YYYY-MM-DD
     char date[kManufacturingDateLengthMax + 1] = { 0 };
     char temp[kManufacturingDateLengthMax + 1] = { 0 };
