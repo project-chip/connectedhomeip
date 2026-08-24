@@ -111,7 +111,7 @@ class TC_MTRID_2_1(MeterIdentificationTestBaseHelper):
         await self.check_meter_serial_number_attribute(endpoint)
 
         # Checks if ProtocolVersion attribute is supported
-        if await self.feature_guard(endpoint=endpoint, attribute=cluster.Attributes.ProtocolVersion):
+        if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.ProtocolVersion):
 
             self.step("5")
 

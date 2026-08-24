@@ -115,7 +115,7 @@ class TC_SMOKECO_2_1(SmokeCoBaseTest):
         await self.read_attribute_check_range(self.smokeco_cluster.Attributes.BatteryAlert, enum=self.smokeco_enums.AlarmStateEnum)
 
         self.step(6)
-        if await self.feature_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.DeviceMuted):
+        if await self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.DeviceMuted):
             await self.read_attribute_check_range(self.smokeco_cluster.Attributes.DeviceMuted, enum=self.smokeco_enums.MuteStateEnum)
 
         self.step(7)
@@ -128,11 +128,11 @@ class TC_SMOKECO_2_1(SmokeCoBaseTest):
         await self.read_attribute_check_range(self.smokeco_cluster.Attributes.EndOfServiceAlert, self.smokeco_enums.EndOfServiceEnum)
 
         self.step(10)
-        if await self.feature_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.InterconnectSmokeAlarm):
+        if await self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.InterconnectSmokeAlarm):
             await self.read_attribute_check_range(self.smokeco_cluster.Attributes.InterconnectSmokeAlarm, enum=self.smokeco_enums.AlarmStateEnum)
 
         self.step(11)
-        if await self.feature_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.InterconnectCOAlarm):
+        if await self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.InterconnectCOAlarm):
             await self.read_attribute_check_range(self.smokeco_cluster.Attributes.InterconnectCOAlarm, enum=self.smokeco_enums.AlarmStateEnum)
 
         if await self.feature_guard(endpoint=self.get_endpoint(), cluster=Clusters.SmokeCoAlarm, feature_int=Clusters.SmokeCoAlarm.Bitmaps.Feature.kSmokeAlarm):
@@ -148,7 +148,7 @@ class TC_SMOKECO_2_1(SmokeCoBaseTest):
             self.skip_step(13)
 
         self.step(14)
-        if await self.feature_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.ExpiryDate):
+        if await self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.ExpiryDate):
             expiry_date = await self.read_attribute_check_epoch(self.smokeco_cluster.Attributes.ExpiryDate, check_expired=True)
             # Verify when is not running on CI the ExpiryDate date is no the default as default_ci_expiry_date
             if not self.is_pics_sdk_ci_only:
@@ -156,7 +156,7 @@ class TC_SMOKECO_2_1(SmokeCoBaseTest):
                                          f"The current ExpiryDate is the same as the default ExpiryDate ({self.default_ci_expiry_date}).")
 
         self.step(15)
-        if await self.feature_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.Unmounted):
+        if await self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.Unmounted):
             await self.read_attribute_check_bool(self.smokeco_cluster.Attributes.Unmounted)
 
 

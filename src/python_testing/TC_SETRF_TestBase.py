@@ -954,7 +954,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
         self.defaultRandomizationOffset = attribute_value
         if self.defaultRandomizationOffset is None:
-            if await self.feature_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationOffset):
+            if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationOffset):
                 self.defaultRandomizationOffset = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DefaultRandomizationOffset)
 
         log.info("DefaultRandomizationOffset attribute value is: %s", self.defaultRandomizationOffset)
@@ -986,7 +986,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
         self.defaultRandomizationType = attribute_value
         if self.defaultRandomizationType is None:
-            if await self.feature_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType):
+            if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType):
                 self.defaultRandomizationType = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DefaultRandomizationType)
 
         log.info("DefaultRandomizationType attribute value is: %s", self.defaultRandomizationType)
