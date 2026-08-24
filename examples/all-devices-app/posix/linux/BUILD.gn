@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/ble/ble.gni")
+import("${chip_root}/src/platform/device.gni")
 
 config("includes") {
   include_dirs = [
@@ -40,6 +41,13 @@ source_set("linux") {
     ]
   }
 
+  if (chip_device_config_enable_wifipaf) {
+    sources += [
+      "../include/LinuxCommissioningProxyPafAdapter.h",
+      "LinuxCommissioningProxyPafAdapter.cpp",
+    ]
+  }
+
   deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device-factory",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:device-interface",
@@ -60,6 +68,13 @@ source_set("linux") {
     # LinuxCommissioningProxyBleAdapter implements the cluster's BLE adapter interface.
     deps += [
       "${chip_root}/src/app/clusters/commissioning-proxy-server:ble-transport",
+    ]
+  }
+
+  if (chip_device_config_enable_wifipaf) {
+    # LinuxCommissioningProxyPafAdapter implements the cluster's PAF adapter interface.
+    deps += [
+      "${chip_root}/src/app/clusters/commissioning-proxy-server:paf-transport",
     ]
   }
 

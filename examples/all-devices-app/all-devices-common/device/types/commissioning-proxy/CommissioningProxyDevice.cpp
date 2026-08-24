@@ -43,10 +43,21 @@ namespace {
 DefaultTimerDelegate gTimerDelegate;
 } // namespace
 
-#if CONFIG_NETWORK_LAYER_BLE
+#if CONFIG_NETWORK_LAYER_BLE && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+CommissioningProxyDevice::CommissioningProxyDevice(Clusters::CommissioningProxy::CommissioningProxyBleAdapter & bleAdapter,
+                                                   Clusters::CommissioningProxy::CommissioningProxyPafAdapter & pafAdapter) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCommissioningByProxy, 1)),
+    mBleTransport(bleAdapter, gTimerDelegate), mPafTransport(pafAdapter, gTimerDelegate)
+{}
+#elif CONFIG_NETWORK_LAYER_BLE
 CommissioningProxyDevice::CommissioningProxyDevice(Clusters::CommissioningProxy::CommissioningProxyBleAdapter & bleAdapter) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCommissioningByProxy, 1)),
     mBleTransport(bleAdapter, gTimerDelegate)
+{}
+#elif CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+CommissioningProxyDevice::CommissioningProxyDevice(Clusters::CommissioningProxy::CommissioningProxyPafAdapter & pafAdapter) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCommissioningByProxy, 1)),
+    mPafTransport(pafAdapter, gTimerDelegate)
 {}
 #else
 CommissioningProxyDevice::CommissioningProxyDevice() :

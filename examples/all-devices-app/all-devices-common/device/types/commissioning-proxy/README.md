@@ -368,28 +368,59 @@ Example — commission device node 1999 onto network "MyNetwork" via proxy 1998:
 ## 9. How Wi-Fi PAF is wired into the CP device
 
 The transport-agnostic session, scan, and message bookkeeping lives in the
-`commissioning-proxy-server` cluster. A build only supplies a transport driver
-that implements the `CommissioningProxyTransport` interface; the cluster calls
-into it and the driver reports results back through the cluster's subsystem
-accessors. See
+`commissioning-proxy-server` cluster, and so does the Wi-Fi PAF driver itself:
+`CommissioningProxyPafTransport` ships with the cluster as the separate
+`paf-transport` target, so a build that proxies over BLE only — or a platform
+with no Wi-Fi PAF stack — can leave it out. See
 [`src/app/clusters/commissioning-proxy-server/README.md`](../../../../../../src/app/clusters/commissioning-proxy-server/README.md)
 for the full design.
 
-For Wi-Fi PAF the driver is `CommissioningProxyPafTransport`
-(`GetTransportType()` returns `kWiFiPAF`). It bridges the cluster to the
-platform Wi-Fi PAF layer:
+The driver (`GetTransportType()` returns `kWiFiPAF`) bridges the cluster to the
+portable Wi-Fi PAF layer:
 
 -   `Connect()` → `ConnectivityMgr().WiFiPAFSubscribe()` to open a NAN session
     to the discriminator of the commissionee.
 -   `SendMessage()` → `WiFiPAFLayer::SendMessage()` to tunnel a commissioning
     packet over PAFTP (the PAFTP endpoint, not the raw NAN transmit).
--   `Scan()` / `BgScanStart()` / `BgScanStop()` → `WiFiPAFScan()` /
-    `WiFiPAFStartBackgroundScan()` / `WiFiPAFStopBackgroundScan()`.
 -   `Disconnect()` / `CancelPendingConnect()` → `RmPafSession()` and
     `WiFiPAFCancelSubscribe()` / `WiFiPAFCancelIncompleteSubscribe()` to release
     the session.
 
-The driver is registered in `CommissioningProxyDevice::Register()`, guarded by
+### What this app has to supply
+
+Everything above is portable. Discovery is not: scanning for commissionable
+devices, and recovering the NAN subscribe id the platform assigned, both need
+the platform implementation. Those four operations are the
+`CommissioningProxyPafAdapter` interface, and this app implements it in
+[`posix/linux/LinuxCommissioningProxyPafAdapter.cpp`](../../../../posix/linux/LinuxCommissioningProxyPafAdapter.cpp):
+
+| Adapter method | Linux implementation |
+| --- | --- |
+| `StartForegroundScan()` | `ConnectivityMgrImpl().WiFiPAFScan()` |
+| `StartBackgroundScan()` | `ConnectivityMgrImpl().WiFiPAFStartBackgroundScan()` |
+| `StopBackgroundScan()` | `ConnectivityMgrImpl().WiFiPAFStopBackgroundScan()` |
+| `PendingConnectSubscribeId()` | `ConnectivityMgrImpl().GetPendingConnectSubscribeId()` |
+
+The adapter is also where the platform's peer descriptor is unpacked.
+`NanPeerInfo` is Linux-only and owns heap storage for its extended data, so the
+adapter reports each peer as plain scalars and that type never reaches the
+cluster.
+
+Two details worth knowing when reading the code:
+
+-   **The platform owns the scan window.** `WiFiPAFScan()` takes the duration and
+    reports the whole result set when it expires, so the PAF driver arms no scan
+    timer of its own — it waits for the adapter's completion callback. (The BLE
+    driver is the other way round: it times its own window.)
+-   **One NAN subscribe slot** is shared by the foreground scan, the background
+    scan and connect. The driver pauses the background scan before a foreground
+    scan or a connect and resumes it afterwards; `StartHardwareScan()` also
+    reports `CHIP_ERROR_BUSY` while a connect is pending, which the shared
+    background-scan registry treats as "defer and retry".
+
+The driver and its adapter are constructed in
+`posix/linux/DeviceFactoryPlatformOverride.cpp` and registered on the cluster by
+`CommissioningProxyDevice::Register()`, guarded by
 `#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF`, which also sets the
 `WiFiNetworkInterface` cluster feature and derives the advertised `WiFiBand`
 from `--wifipaf freq_list=`.

@@ -25,6 +25,9 @@
 #if CONFIG_NETWORK_LAYER_BLE
 #include <LinuxCommissioningProxyBleAdapter.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <LinuxCommissioningProxyPafAdapter.h>
+#endif
 
 namespace chip {
 namespace app {
@@ -34,12 +37,24 @@ void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentSto
 {
     if constexpr (ALL_DEVICES_ENABLE_COMMISSIONING_PROXY)
     {
+        // These outlive every device the factory creates, as the transports hold
+        // references. Each is stateless apart from its in-flight scan callback, so one
+        // instance serves all.
 #if CONFIG_NETWORK_LAYER_BLE
-        // Outlives every device the factory creates, as the transport holds a reference.
-        // Stateless apart from the in-flight scan callback, so one instance serves all.
         static LinuxCommissioningProxyBleAdapter sBleProxyAdapter;
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        static LinuxCommissioningProxyPafAdapter sPafProxyAdapter;
+#endif
+#if CONFIG_NETWORK_LAYER_BLE && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        DeviceFactory::GetInstance().RegisterCreator(
+            "commissioning-proxy", []() { return std::make_unique<CommissioningProxyDevice>(sBleProxyAdapter, sPafProxyAdapter); });
+#elif CONFIG_NETWORK_LAYER_BLE
         DeviceFactory::GetInstance().RegisterCreator("commissioning-proxy",
                                                      []() { return std::make_unique<CommissioningProxyDevice>(sBleProxyAdapter); });
+#elif CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        DeviceFactory::GetInstance().RegisterCreator("commissioning-proxy",
+                                                     []() { return std::make_unique<CommissioningProxyDevice>(sPafProxyAdapter); });
 #else
         DeviceFactory::GetInstance().RegisterCreator("commissioning-proxy",
                                                      []() { return std::make_unique<CommissioningProxyDevice>(); });

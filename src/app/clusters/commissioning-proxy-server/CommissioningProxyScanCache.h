@@ -106,6 +106,12 @@ public:
 
     void TimerFired() override { OnSweep(); }
 
+    // ScanResultStruct constrains Address to 100 bytes and ExtendedData to 128. Public
+    // because any component that materialises a ScanResultStruct needs the same bounds -
+    // the PAF transport holds its scan results inline before contributing them.
+    static constexpr size_t kMaxAddressBytes      = 100;
+    static constexpr size_t kMaxExtendedDataBytes = 128;
+
 private:
     // A device is unique per discriminator/VendorID/ProductID/Transport (spec).
     struct Key
@@ -116,11 +122,6 @@ private:
         uint16_t pid;
         bool operator==(const Key & o) const;
     };
-
-    // ScanResultStruct constrains Address to 100 bytes and ExtendedData to 128, so both
-    // are held inline rather than heap-allocated per entry.
-    static constexpr size_t kMaxAddressBytes      = 100;
-    static constexpr size_t kMaxExtendedDataBytes = 128;
 
     // Self-owned copy of a ScanResultStruct so its ByteSpans survive in the cache.
     // `inUse` false marks a free slot; the table is small (MaxCachedResults).

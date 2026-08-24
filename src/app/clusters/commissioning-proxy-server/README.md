@@ -241,8 +241,8 @@ void ApplicationInit()
 For a complete working example of the device wiring, see
 `examples/all-devices-app/all-devices-common/device/types/commissioning-proxy/`.
 It registers the cluster's `CommissioningProxyBleTransport` and supplies the
-platform adapter from `examples/all-devices-app/posix/linux/`, alongside its own
-Wi-Fi PAF driver.
+platform adapters for both transports from
+`examples/all-devices-app/posix/linux/`.
 
 ## Transport driver methods
 
@@ -448,22 +448,53 @@ a worked implementation over `BLEManagerImpl`, wired up in that app's
 
 ## Wi-Fi PAF Transport Integration
 
-When the build enables Wi-Fi PAF (`CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF`) the
-driver (`CommissioningProxyPafTransport`) interacts with
-`chip::WiFiPAF::WiFiPAFLayer` to open, send over, receive from, and close PAF
-(NAN) sessions:
+`CommissioningProxyPafTransport` ships with the cluster as the separate
+`paf-transport` target, on the same terms as `ble-transport`: an application that
+proxies over BLE only — or a platform with no Wi-Fi PAF stack — can depend on
+`commissioning-proxy-server` without pulling in `src/wifipaf`. It drives NAN and
+PAFTP sessions through `chip::WiFiPAF::WiFiPAFLayer`:
 
--   `Connect()` — calls `WiFiPAFLayer::WiFiPAFSubscribe()` to open a PAF session
-    identified by the commissionee discriminator and peer address.
+-   `Connect()` — calls `ConnectivityMgr().WiFiPAFSubscribe()` to open a PAF
+    session to the commissionee discriminator.
 -   `SendMessage()` — calls `WiFiPAFLayer::SendMessage()` to send the tunneled
-    commissioning packet over PAFTP.
--   `Disconnect()` — calls `WiFiPAFLayer::RmPafSession()` to release the PAF
-    session.
+    commissioning packet over PAFTP (the PAFTP endpoint, not the raw NAN
+    transmit, which would bypass framing).
+-   `Disconnect()` — calls `WiFiPAFLayer::RmPafSession()`, closes the PAFTP
+    endpoint, and cancels the NAN subscribe that backed the session.
 
-Incoming PAF messages are routed back to the cluster via a
-`WiFiPAFLayerDelegate` subclass that intercepts `WiFiPAFMessageReceived`,
-matches the peer against the active session map, and calls
+Incoming PAF messages are routed back to the cluster via a `ProxyPafDelegate`
+(`chip::WiFiPAF::WiFiPAFLayerDelegate`) that wraps the original transport,
+matches the peer against the active session slots, and calls
 `host->Sessions().DispatchMessageResponse()`.
+
+### The platform adapter
+
+Session setup and teardown above are portable — they go through the generic
+`ConnectivityManager` facade. Discovery is not, so it is not in the transport:
+scanning for commissionable devices, and recovering the subscribe id the platform
+assigned to a request, both need the platform implementation. The application
+supplies them by implementing `CommissioningProxyPafAdapter`:
+
+```cpp
+class MyPafProxyAdapter : public CommissioningProxyPafAdapter
+{
+    CHIP_ERROR StartForegroundScan(System::Clock::Seconds16 window, DiscoveryCallback onDevice,
+                                   ScanCompleteCallback onDone, void * context) override;
+    CHIP_ERROR StartBackgroundScan(DiscoveryCallback cb, void * context) override;
+    void StopBackgroundScan() override;
+    uint32_t PendingConnectSubscribeId() const override;
+};
+
+MyPafProxyAdapter gPafAdapter;
+CommissioningProxyPafTransport gPafTransport(gPafAdapter, gTimerDelegate);
+```
+
+Unlike BLE, the platform owns the scan window: `StartForegroundScan()` takes the
+duration and the adapter signals completion, so the transport arms no scan timer
+of its own. `examples/all-devices-app/posix/linux/LinuxCommissioningProxyPafAdapter.cpp`
+is a worked implementation over `ConnectivityManagerImpl`, and is also where the
+platform's peer descriptor is unpacked into the interface's scalars so no
+platform type reaches the cluster.
 
 ## Cluster State
 

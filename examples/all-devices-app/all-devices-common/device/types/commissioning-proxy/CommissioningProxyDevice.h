@@ -32,7 +32,10 @@
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyBleTransport.h> // nogncheck
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-#include "CommissioningProxyPafTransport.h"
+// Same nogncheck rationale as the BLE headers above: the paf-transport dependency is
+// conditional on chip_device_config_enable_wifipaf, which gn check cannot evaluate.
+#include <app/clusters/commissioning-proxy-server/CommissioningProxyPafAdapter.h>   // nogncheck
+#include <app/clusters/commissioning-proxy-server/CommissioningProxyPafTransport.h> // nogncheck
 #endif
 
 namespace chip {
@@ -41,10 +44,15 @@ namespace app {
 class CommissioningProxyDevice : public SingleEndpoint
 {
 public:
-#if CONFIG_NETWORK_LAYER_BLE
-    /// @param bleAdapter platform BLE hooks for the BLE transport; must outlive this
-    ///                   device. Supplied by the platform device factory.
+    /// The platform adapters the compiled-in transports need. Supplied by the platform
+    /// device factory; each must outlive this device.
+#if CONFIG_NETWORK_LAYER_BLE && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    CommissioningProxyDevice(Clusters::CommissioningProxy::CommissioningProxyBleAdapter & bleAdapter,
+                             Clusters::CommissioningProxy::CommissioningProxyPafAdapter & pafAdapter);
+#elif CONFIG_NETWORK_LAYER_BLE
     explicit CommissioningProxyDevice(Clusters::CommissioningProxy::CommissioningProxyBleAdapter & bleAdapter);
+#elif CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    explicit CommissioningProxyDevice(Clusters::CommissioningProxy::CommissioningProxyPafAdapter & pafAdapter);
 #else
     CommissioningProxyDevice();
 #endif

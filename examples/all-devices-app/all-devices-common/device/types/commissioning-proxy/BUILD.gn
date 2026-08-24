@@ -27,15 +27,6 @@ source_set("commissioning-proxy") {
     "CommissioningProxyDevice.h",
   ]
 
-  # The Wi-Fi PAF driver still lives here; the BLE driver moved to the cluster's
-  # ble-transport target and this app supplies only its platform adapter.
-  if (chip_device_config_enable_wifipaf) {
-    sources += [
-      "CommissioningProxyPafTransport.cpp",
-      "CommissioningProxyPafTransport.h",
-    ]
-  }
-
   deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
     "${chip_root}/src/app/clusters/commissioning-proxy-server",
@@ -43,19 +34,23 @@ source_set("commissioning-proxy") {
     "${chip_root}/zzz_generated/app-common/devices",
   ]
 
+  # Each transport driver lives with the cluster; this app supplies only its platform
+  # adapter. Public because CommissioningProxyDevice.h exposes both the transports and the
+  # adapter interfaces to whoever constructs the device.
+  public_deps = []
+
+  if (chip_config_network_layer_ble) {
+    public_deps += [
+      "${chip_root}/src/app/clusters/commissioning-proxy-server:ble-transport",
+    ]
+  }
+
   if (chip_device_config_enable_wifipaf) {
     deps += [
       "${chip_root}/examples/all-devices-app/posix/app_options:app-options",
     ]
-  }
-
-  if (chip_config_network_layer_ble) {
-    # The BLE transport driver itself lives with the cluster in src/; this app supplies
-    # only the platform adapter it needs (posix/linux/LinuxCommissioningProxyBleAdapter).
-    # Public because CommissioningProxyDevice.h exposes both the transport and the
-    # adapter interface to whoever constructs the device.
-    public_deps = [
-      "${chip_root}/src/app/clusters/commissioning-proxy-server:ble-transport",
+    public_deps += [
+      "${chip_root}/src/app/clusters/commissioning-proxy-server:paf-transport",
     ]
   }
 
