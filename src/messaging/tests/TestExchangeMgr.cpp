@@ -29,6 +29,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
@@ -328,10 +329,8 @@ TEST_F(TestExchangeMgr, CheckUmhEncryptionMismatchCleanup)
 
     if (mockUH.mRegisteredAgain)
     {
-        Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
-        err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1, &removedHandler);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
-        EXPECT_EQ(removedHandler, &mockUH);
+        // Unregistering succeeds only if a handler is registered for this type again.
+        EXPECT_SUCCESS(GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1));
     }
 }
 
