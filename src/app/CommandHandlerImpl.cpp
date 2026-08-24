@@ -43,7 +43,7 @@ namespace app {
 using Status = Protocols::InteractionModel::Status;
 
 namespace {
-void RecordTargetedEndpoint(EndpointId * endpoints, size_t & count, size_t maxCount, EndpointId endpointId)
+void RecordTargetedEndpoint(Span<EndpointId> & endpoints, size_t & count, EndpointId endpointId)
 {
     for (size_t i = 0; i < count; ++i)
     {
@@ -52,7 +52,7 @@ void RecordTargetedEndpoint(EndpointId * endpoints, size_t & count, size_t maxCo
             return;
         }
     }
-    if (count < maxCount)
+    if (count < endpoints.size())
     {
         endpoints[count++] = endpointId;
     }
@@ -63,7 +63,8 @@ void RecordTargetedEndpoint(EndpointId * endpoints, size_t & count, size_t maxCo
         // (kMaxTargetedEndpoints).
         // - For groupcast invokes, RecordTargetedEndpoint is not called because groupcast defers reports globally via an empty
         // span.
-        ChipLogError(DataManagement, "Too many targeted endpoints in invoke, capping at %u", static_cast<unsigned int>(maxCount));
+        ChipLogError(DataManagement, "Too many targeted endpoints in invoke, capping at %u",
+                     static_cast<unsigned int>(endpoints.size()));
     }
 }
 } // anonymous namespace
@@ -353,9 +354,9 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
     if (delayReportData.has_value())
     {
         EndpointId targetedEndpoints[CHIP_CONFIG_MAX_PATHS_PER_INVOKE];
-        size_t numTargetedEndpoints = 0;
+        Span<EndpointId> endpointsSpan(targetedEndpoints);
 
-        // Trigger report deferral for all valid targeted endpoints BEFORE dispatching any commands.
+        // Trigger report deferral BEFORE dispatching any commands.
         // When command handlers execute, they may synchronously modify attributes, calling SetDirty()
         // and notifying the ReportScheduler via OnBecameReportable(). If report deferral is not applied
         // beforehand, the scheduler evaluates next timeout as 0 ms, synchronously transitions the node
@@ -363,11 +364,19 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
         // subsequent deferral calls cannot prevent the reporting engine from immediately sending the report
         // on the next event loop iteration. Triggering report deferral here ensures the deferral window is
         // active before any attribute mutations occur.
-        if (PopulateTargetedEndpoints(invokeRequests, targetedEndpoints, numTargetedEndpoints, CHIP_CONFIG_MAX_PATHS_PER_INVOKE))
+        if (IsGroupRequest())
         {
-            // An empty targetedEndpoints span indicates a global deferral across all endpoints on the node for groupcast requests.
-            Span<const EndpointId> endpointsSpan =
-                IsGroupRequest() ? Span<const EndpointId>() : Span<const EndpointId>(targetedEndpoints, numTargetedEndpoints);
+            // An empty endpointsSpan indicates a global deferral across all endpoints on the node for groupcast requests.
+            endpointsSpan.reduce_size(0);
+        }
+        else
+        {
+            VerifyOrReturnError(PopulateTargetedEndpoints(invokeRequests, endpointsSpan) == CHIP_NO_ERROR,
+                                Status::InvalidAction);
+        }
+
+        if (IsGroupRequest() || !endpointsSpan.empty())
+        {
             TriggerDelayReport(delayReportData.value(), endpointsSpan);
         }
     }
@@ -507,71 +516,39 @@ Status CommandHandlerImpl::ValidateUnicastCommand(CommandDataIB::Parser & aComma
     return ValidateCommandCanBeDispatched(aOutPath);
 }
 
-bool CommandHandlerImpl::HasValidGroupEndpoints(CommandDataIB::Parser & aCommandElement)
+CHIP_ERROR CommandHandlerImpl::PopulateTargetedEndpoints(InvokeRequests::Parser aInvokeRequests,
+                                                         Span<EndpointId> & aTargetedEndpoints)
 {
-    CommandPathIB::Parser commandPath;
-    ClusterId clusterId;
-    CommandId commandId;
-    VerifyOrReturnValue(aCommandElement.GetPath(&commandPath) == CHIP_NO_ERROR, false);
-    VerifyOrReturnValue(commandPath.GetGroupCommandPath(&clusterId, &commandId) == CHIP_NO_ERROR, false);
-
-    VerifyOrReturnValue(mpResponder && mpResponder->GetGroupId().HasValue(), false);
-    GroupId groupId                                    = mpResponder->GetGroupId().Value();
-    FabricIndex fabric                                 = GetAccessingFabricIndex();
-    Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
-    Credentials::GroupDataProvider::GroupEndpoint mapping;
-    AutoRelease iterator(groupDataProvider->IterateEndpoints(fabric));
-    VerifyOrReturnValue(!iterator.IsNull(), false);
-
-    while (iterator->Next(mapping))
-    {
-        if (groupId == mapping.group_id)
-        {
-            if (ValidateCommandCanBeDispatched(ConcreteCommandPath(mapping.endpoint_id, clusterId, commandId)) == Status::Success)
-            {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-bool CommandHandlerImpl::PopulateTargetedEndpoints(InvokeRequests::Parser aInvokeRequests, EndpointId * aEndpoints, size_t & aCount,
-                                                   size_t aMaxCount)
-{
-    bool hasValidCommands = false;
+    size_t count = 0;
     TLV::TLVReader preCheckReader;
     aInvokeRequests.GetReader(&preCheckReader);
-    while (CHIP_NO_ERROR == preCheckReader.Next())
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    while (CHIP_NO_ERROR == (err = preCheckReader.Next()))
     {
-        if (TLV::AnonymousTag() != preCheckReader.GetTag())
-        {
-            continue;
-        }
+        VerifyOrReturnError(TLV::AnonymousTag() == preCheckReader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
         CommandDataIB::Parser commandData;
-        if (commandData.Init(preCheckReader) != CHIP_NO_ERROR)
+        ReturnErrorOnFailure(commandData.Init(preCheckReader));
+
+        ConcreteCommandPath concretePath(0, 0, 0);
+        if (ValidateUnicastCommand(commandData, concretePath) == Status::Success)
         {
-            continue;
-        }
-        if (IsGroupRequest())
-        {
-            if (HasValidGroupEndpoints(commandData))
-            {
-                hasValidCommands = true;
-                break;
-            }
-        }
-        else
-        {
-            ConcreteCommandPath concretePath(0, 0, 0);
-            if (ValidateUnicastCommand(commandData, concretePath) == Status::Success)
-            {
-                hasValidCommands = true;
-                RecordTargetedEndpoint(aEndpoints, aCount, aMaxCount, concretePath.mEndpointId);
-            }
+            RecordTargetedEndpoint(aTargetedEndpoints, count, concretePath.mEndpointId);
         }
     }
-    return hasValidCommands;
+
+    if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
+    // If no valid commands were found, count will be 0 (aTargetedEndpoints.empty() == true).
+    // We do not treat this as a message-level error because individual command failures
+    // (such as UnsupportedEndpoint or UnsupportedAccess) must be processed during the dispatch
+    // loop in ProcessCommandDataIB to return proper CommandStatusIB error responses to the client.
+    aTargetedEndpoints.reduce_size(count);
+    return CHIP_NO_ERROR;
 }
 
 Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement)
