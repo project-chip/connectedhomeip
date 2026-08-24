@@ -43,6 +43,9 @@ namespace app {
 using Status = Protocols::InteractionModel::Status;
 
 namespace {
+constexpr size_t kMaxTargetedEndpoints =
+    std::max<size_t>(CHIP_CONFIG_MAX_PATHS_PER_INVOKE, CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC);
+
 void RecordTargetedEndpoint(Span<EndpointId> & endpoints, size_t & count, EndpointId endpointId)
 {
     for (size_t i = 0; i < count; ++i)
@@ -59,10 +62,8 @@ void RecordTargetedEndpoint(Span<EndpointId> & endpoints, size_t & count, Endpoi
     else
     {
         // This branch should not be reachable in practice:
-        // - For unicast invokes, the number of distinct targeted endpoints cannot exceed the max paths per invoke
-        // (kMaxTargetedEndpoints).
-        // - For groupcast invokes, RecordTargetedEndpoint is not called because groupcast defers reports globally via an empty
-        // span.
+        // - For unicast invokes, the number of distinct targeted endpoints cannot exceed the max paths per invoke.
+        // - For groupcast invokes, the number of distinct targeted endpoints is bounded by the number of endpoints in the group.
         ChipLogError(DataManagement, "Too many targeted endpoints in invoke, capping at %u",
                      static_cast<unsigned int>(endpoints.size()));
     }
@@ -353,7 +354,7 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
 
     if (delayReportData.has_value())
     {
-        EndpointId targetedEndpoints[CHIP_CONFIG_MAX_PATHS_PER_INVOKE];
+        EndpointId targetedEndpoints[kMaxTargetedEndpoints];
         Span<EndpointId> endpointsSpan(targetedEndpoints);
 
         // Trigger report deferral BEFORE dispatching any commands.
@@ -366,15 +367,15 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
         // active before any attribute mutations occur.
         if (IsGroupRequest())
         {
-            // An empty endpointsSpan indicates a global deferral across all endpoints on the node for groupcast requests.
-            endpointsSpan.reduce_size(0);
+            VerifyOrReturnError(PopulateGroupTargetedEndpoints(invokeRequests, endpointsSpan) == CHIP_NO_ERROR,
+                                Status::InvalidAction);
         }
         else
         {
             VerifyOrReturnError(PopulateTargetedEndpoints(invokeRequests, endpointsSpan) == CHIP_NO_ERROR, Status::InvalidAction);
         }
 
-        if (IsGroupRequest() || !endpointsSpan.empty())
+        if (!endpointsSpan.empty())
         {
             TriggerDelayReport(delayReportData.value(), endpointsSpan);
         }
@@ -546,6 +547,59 @@ CHIP_ERROR CommandHandlerImpl::PopulateTargetedEndpoints(InvokeRequests::Parser 
     // We do not treat this as a message-level error because individual command failures
     // (such as UnsupportedEndpoint or UnsupportedAccess) must be processed during the dispatch
     // loop in ProcessCommandDataIB to return proper CommandStatusIB error responses to the client.
+    aTargetedEndpoints.reduce_size(count);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CommandHandlerImpl::PopulateGroupTargetedEndpoints(InvokeRequests::Parser aInvokeRequests,
+                                                              Span<EndpointId> & aTargetedEndpoints)
+{
+    VerifyOrReturnError(mpResponder && mpResponder->GetGroupId().HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    GroupId groupId                                    = mpResponder->GetGroupId().Value();
+    FabricIndex fabric                                 = GetAccessingFabricIndex();
+    Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
+    VerifyOrReturnError(groupDataProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    size_t count   = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVReader preCheckReader;
+    aInvokeRequests.GetReader(&preCheckReader);
+
+    while (CHIP_NO_ERROR == (err = preCheckReader.Next()))
+    {
+        VerifyOrReturnError(TLV::AnonymousTag() == preCheckReader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
+        CommandDataIB::Parser commandData;
+        ReturnErrorOnFailure(commandData.Init(preCheckReader));
+
+        CommandPathIB::Parser commandPath;
+        ReturnErrorOnFailure(commandData.GetPath(&commandPath));
+        ClusterId clusterId;
+        CommandId commandId;
+        ReturnErrorOnFailure(commandPath.GetGroupCommandPath(&clusterId, &commandId));
+
+        Credentials::GroupDataProvider::GroupEndpoint mapping;
+        AutoRelease iterator(groupDataProvider->IterateEndpoints(fabric));
+        VerifyOrReturnError(!iterator.IsNull(), CHIP_ERROR_NO_MEMORY);
+
+        while (iterator->Next(mapping))
+        {
+            if (groupId == mapping.group_id)
+            {
+                const ConcreteCommandPath concretePath(mapping.endpoint_id, clusterId, commandId);
+                if (ValidateCommandCanBeDispatched(concretePath) == Status::Success)
+                {
+                    RecordTargetedEndpoint(aTargetedEndpoints, count, concretePath.mEndpointId);
+                }
+            }
+        }
+    }
+
+    if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
     aTargetedEndpoints.reduce_size(count);
     return CHIP_NO_ERROR;
 }

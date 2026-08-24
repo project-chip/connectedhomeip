@@ -441,6 +441,7 @@ private:
     Protocols::InteractionModel::Status ValidateUnicastCommand(CommandDataIB::Parser & aCommandElement,
                                                                ConcreteCommandPath & aOutPath);
     CHIP_ERROR PopulateTargetedEndpoints(InvokeRequests::Parser aInvokeRequests, Span<EndpointId> & aTargetedEndpoints);
+    CHIP_ERROR PopulateGroupTargetedEndpoints(InvokeRequests::Parser aInvokeRequests, Span<EndpointId> & aTargetedEndpoints);
 
     CHIP_ERROR TryAddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus);
 
