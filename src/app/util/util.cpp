@@ -134,6 +134,7 @@ void MatterMicrowaveOvenModePluginServerInitCallback() {}
 void MatterDeviceEnergyManagementModePluginServerInitCallback() {}
 void MatterEnergyEvseModePluginServerInitCallback() {}
 void MatterPowerTopologyPluginServerInitCallback() {}
+void MatterElectricalDistributionPluginServerInitCallback() {}
 void MatterElectricalEnergyMeasurementPluginServerInitCallback() {}
 void MatterElectricalPowerMeasurementPluginServerInitCallback() {}
 void MatterServiceAreaPluginServerInitCallback() {}

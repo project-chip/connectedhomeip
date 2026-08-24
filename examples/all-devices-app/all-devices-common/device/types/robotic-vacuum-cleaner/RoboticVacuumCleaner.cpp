@@ -31,7 +31,7 @@ CHIP_ERROR RoboticVacuumCleaner::Register(EndpointId endpoint, CodeDrivenDataMod
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mOperationalStateCluster.Create(endpoint, &mDelegate);
+    mOperationalStateCluster.Create(endpoint, mDelegate);
     mDelegate.SetCluster(&mOperationalStateCluster.Cluster());
     ReturnErrorOnFailure(provider.AddCluster(mOperationalStateCluster.Registration()));
 

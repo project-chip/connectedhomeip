@@ -52,7 +52,7 @@
 #include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/temperature-control-server/temperature-control-server.h>
-#include <app/clusters/thermostat-server/ThermostatCluster.h>
+#include <app/clusters/thermostat-server/CodegenIntegration.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-server.h>
 #include <app/clusters/unit-localization-server/unit-localization-server.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
@@ -208,6 +208,8 @@ void ApplicationInit()
 
     Clusters::ValveConfigurationAndControl::SetDefaultDelegate(chip::EndpointId(1), &sValveDelegate);
     Clusters::TimeSynchronization::SetDefaultDelegate(&sTimeSyncDelegate);
+    Clusters::Thermostat::SetDefaultDelegate(chip::EndpointId(1),
+                                             &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
 
     Clusters::UnitLocalization::TempUnitEnum supportedUnits[2] = { Clusters::UnitLocalization::TempUnitEnum::kFahrenheit,
                                                                    Clusters::UnitLocalization::TempUnitEnum::kCelsius };
@@ -317,15 +319,6 @@ void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
     logProvider.SetCrashLogFilePath(AppOptions::GetCrashLogFilePath());
 
     DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
-}
-
-using namespace chip::app::Clusters::Thermostat;
-void emberAfThermostatClusterInitCallback(EndpointId endpoint)
-{
-    // Register the delegate for the Thermostat
-    auto & delegate = ThermostatDelegate::GetInstance();
-
-    SetDefaultDelegate(endpoint, &delegate);
 }
 
 Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,

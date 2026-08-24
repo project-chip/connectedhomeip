@@ -216,7 +216,7 @@
         "COLOR_CONTROL_CLUSTER": ["color-control-server"],
         "COMMISSIONER_CONTROL_CLUSTER": ["commissioner-control-server"],
         "COMMISSIONING_CLUSTER": [],
-        "COMMISSIONING_PROXY_CLUSTER": [],
+        "COMMISSIONING_PROXY_CLUSTER": ["commissioning-proxy-server"],
         "COMMODITY_METERING_CLUSTER": ["commodity-metering-server"],
         "COMMODITY_PRICE_CLUSTER": ["commodity-price-server"],
         "COMMODITY_TARIFF_CLUSTER": ["commodity-tariff-server"],
@@ -232,7 +232,7 @@
         "DISHWASHER_MODE_CLUSTER": ["mode-base-server"],
         "DYNAMIC_LIGHTING_CLUSTER": ["dynamic-lighting-server"],
         "ELECTRICAL_ALARM_CLUSTER": [],
-        "ELECTRICAL_DISTRIBUTION_CLUSTER": [],
+        "ELECTRICAL_DISTRIBUTION_CLUSTER": ["electrical-distribution-server"],
         "ELECTRICAL_GRID_CONDITIONS_CLUSTER": [
             "electrical-grid-conditions-server"
         ],
