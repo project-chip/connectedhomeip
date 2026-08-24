@@ -454,7 +454,7 @@ TEST_F(TestPASESession, SecurePairingHandshakeTCPParamsTest)
     accessorySessionParams.SetMaxTCPPayloadSize(50000);
     pairingAccessory.SetLocalSessionParameters(accessorySessionParams);
 
-    auto & loopback            = GetLoopback();
+    auto & loopback = GetLoopback();
     loopback.Reset();
     loopback.mSentMessageCount = 0;
 
