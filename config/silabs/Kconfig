@@ -158,11 +158,6 @@ config SYSTEM_WORKQUEUE_STACK_SIZE
 	default 2560 if CHIP_WIFI
 	default 2048 if CHIP_ICD_LIT_SUPPORT
 
-config HEAP_MEM_POOL_IGNORE_MIN
-	default y if CHIP_WIFI
-
-#We use sys_heap based allocators, so make sure we don't reserve unused libc heap anyway
-
 config NVS_LOOKUP_CACHE_SIZE
 	default 512 if NVS
 
