@@ -70,6 +70,7 @@ static_library("controller") {
     "DeviceDiscoveryDelegate.h",
     "DevicePairingDelegate.h",
     "ExampleOperationalCredentialsIssuer.h",
+    "NetworkIdentityRegistrar.h",
     "SetUpCodePairer.h",
   ]
 
@@ -87,6 +88,7 @@ static_library("controller") {
       "CommissionerDiscoveryController.h",
       "CommissioningDelegate.cpp",
       "ExampleOperationalCredentialsIssuer.cpp",
+      "NetworkIdentityRegistrar.h",
       "SetUpCodePairer.cpp",
     ]
 
