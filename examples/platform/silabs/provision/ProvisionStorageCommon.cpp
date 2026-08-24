@@ -102,7 +102,7 @@ CHIP_ERROR Storage::GetRotatingDeviceIdUniqueId(MutableByteSpan & value)
     size_t size = 0;
 
     CHIP_ERROR err = GetPersistentUniqueId(value.data(), value.size(), size);
-#if defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID) && CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
+#if defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
     {
         constexpr uint8_t unique_id[] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
