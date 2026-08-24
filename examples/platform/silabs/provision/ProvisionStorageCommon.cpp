@@ -87,8 +87,10 @@ CHIP_ERROR Storage::GetManufacturingDateSuffix(MutableCharSpan & suffixBuffer)
     ReturnErrorOnFailure(GetManufacturingDate((uint8_t *) date, sizeof(date), date_len));
     if (date_len > 8)
     {
-        memcpy(suffixBuffer.data(), date + 8, date_len - 8);
-        suffixBuffer.reduce_size(date_len - 8);
+        const size_t suffixLen = date_len - 8;
+        VerifyOrReturnError(suffixLen <= suffixBuffer.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(suffixBuffer.data(), date + 8, suffixLen);
+        suffixBuffer.reduce_size(suffixLen);
         return CHIP_NO_ERROR;
     }
     suffixBuffer.reduce_size(0);
@@ -140,6 +142,9 @@ CHIP_ERROR Storage::GetSpake2pSalt(MutableByteSpan & value)
     // Decode
     uint8_t salt[chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length] = { 0 };
     size_t size                                                = chip::Base64Decode32(salt_b64, size_b64, salt);
+    VerifyOrReturnError(size >= chip::Crypto::kSpake2p_Min_PBKDF_Salt_Length &&
+                            size <= chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length,
+                        CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(size <= value.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Copy
@@ -170,6 +175,7 @@ CHIP_ERROR Storage::GetSpake2pVerifier(MutableByteSpan & out_value, size_t & out
 
     // Decode
     out_size = chip::Base64Decode32(verifier_b64, size_b64, out_value.data());
+    VerifyOrReturnError(out_size == chip::Crypto::kSpake2p_VerifierSerialized_Length, CHIP_ERROR_INVALID_ARGUMENT);
     out_value.reduce_size(out_size);
     return CHIP_NO_ERROR;
 }
