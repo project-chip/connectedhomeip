@@ -536,8 +536,8 @@ bool CommandHandlerImpl::HasValidGroupEndpoints(CommandDataIB::Parser & aCommand
     return false;
 }
 
-bool CommandHandlerImpl::PopulateTargetedEndpoints(InvokeRequests::Parser aInvokeRequests, EndpointId * aEndpoints,
-                                                   size_t & aCount, size_t aMaxCount)
+bool CommandHandlerImpl::PopulateTargetedEndpoints(InvokeRequests::Parser aInvokeRequests, EndpointId * aEndpoints, size_t & aCount,
+                                                   size_t aMaxCount)
 {
     bool hasValidCommands = false;
     TLV::TLVReader preCheckReader;
