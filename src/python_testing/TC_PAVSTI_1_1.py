@@ -56,7 +56,7 @@ log = logging.getLogger(__name__)
 
 class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
     def desc_TC_PAVSTI_1_1(self) -> str:
-        return "[TC-PAVSTI-1.1] Verify transmission when trigger type is Manual."
+        return "[TC-PAVSTI-1.1] Verify CMAF Interface-2 DASH-based ingestion with manual trigger type."
 
     def pics_TC_PAVSTI_1_1(self):
         return ["PAVST.S"]
@@ -111,8 +111,8 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             ),
             TestStep(
                 5,
-                "TH sends the AllocatePushTransport command with valid parameters and TriggerType = Command",
-                "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID, TransportOptions, and TransportStatus in the TransportConfigurationStruct.",
+                "TH sends the AllocatePushTransport command with valid parameters including TriggerType = Command, StreamUsage = Recording and CMAFInterface = Interface2DASH for the CMAF container options.",
+                "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID, TransportOptions. Store ConnectionID as aConnectionID.",
             ),
             TestStep(
                 6,
@@ -121,7 +121,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             TestStep(
                 7,
                 "TH sends the SetTransportStatus command with ConnectionID = aConnectionID and TransportStatus = Active.",
-                "DUT responds with SUCCESS status code.",
+                "DUT responds with SUCCESS status code and the transport status is set to Active.",
             ),
             TestStep(
                 8,
@@ -185,23 +185,23 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             ),
             TestStep(
                 20,
-                "View the video stream in TH UI",
-                "Verify the transmitted video stream is of CMAF Format.",
+                "TH displays the video playback prompt. The prompt must list all uploaded content and identify any non-conforming uploads.",
+                "Upload sequence must conform to Matter and CMAF Interface-2 DASH specification.",
             ),
             TestStep(
                 21,
                 "TH sends the SetTransportStatus command with ConnectionID = aConnectionID and TransportStatus = Inactive.",
-                "DUT responds with SUCCESS status code",
+                "DUT responds with SUCCESS status code and stops transmission.",
             ),
             TestStep(
                 22,
-                "View the video stream in TH UI",
-                "Verify the transmission of video stream has stopped.",
+                "TH verifies that a PushTransportEnd Event was received.",
+                "TH validates that the connectionID = aConnectionID.",
             ),
             TestStep(
                 23,
-                "TH verifies that a PushTransportEnd Event was received.",
-                "TH validates that the connectionID = aConnectionID.",
+                "TH displays the video playback prompt again. The prompt must list all uploaded content and identify any non-conforming uploads.",
+                "CMAF content must play successfully from uploaded files. DUT shall not upload any new files. All extended paths must conform to the Matter-specified format.",
             ),
         ]
 
@@ -295,12 +295,14 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         audioStreamId = allocatedAudioStream.audioStreamID
 
         self.step(5)
-        trackName = "media"
-        self.server.update_track_name(uploadStreamId, trackName)
+        videoStreamName = "video"
+        audioStreamName = "audio"
+        self.server.update_expected_track_names(uploadStreamId, [videoStreamName, audioStreamName])
+        # TODO: The testing framework currently treats sessionGroup and trackName as mandatory. Remove once fixed.
         transportOptions = {
             "streamUsage": Globals.Enums.StreamUsageEnum.kRecording,
-            "videoStreamID": videoStreamId,
-            "audioStreamID": audioStreamId,
+            "videoStreams": [{"videoStreamID": videoStreamId, "videoStreamName": videoStreamName}],
+            "audioStreams": [{"audioStreamID": audioStreamId, "audioStreamName": audioStreamName}],
             "TLSEndpointID": self.tlsEndpointId,
             "url": f"https://{self.host_ip}:1234/streams/{uploadStreamId}/",
             "triggerOptions": {"triggerType": pushavCluster.Enums.TransportTriggerTypeEnum.kCommand, "maxPreRollLen": 10000},
@@ -308,7 +310,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             "containerFormat": pushavCluster.Enums.ContainerFormatEnum.kCmaf,
             "containerOptions": {
                 "containerType": pushavCluster.Enums.ContainerFormatEnum.kCmaf,
-                "CMAFContainerOptions": {"CMAFInterface": pushavCluster.Enums.CMAFInterfaceEnum.kInterface2DASH, "segmentDuration": 4000, "chunkDuration": 2000, "sessionGroup": 1, "trackName": trackName},
+                "CMAFContainerOptions": {"CMAFInterface": pushavCluster.Enums.CMAFInterfaceEnum.kInterface2DASH, "segmentDuration": 4000, "chunkDuration": 2000, "sessionGroup": 1, "trackName": "media"},
             },
         }
         allocatePushTransportResponse = await self.send_single_cmd(
@@ -433,14 +435,9 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             result = await self.write_single_attribute(
                 avsmAttr.SoftRecordingPrivacyModeEnabled(False), endpoint_id=endpoint
             )
-        else:
-            self.skip_step(11)
-            self.skip_step(12)
-            self.skip_step(13)
 
-        # Modify transport to set streamUsage to Livestream and validate privacy mode
-        if self.pics_guard(self.check_pics(PICS_PRIVACY)):
             self.step(14)
+            # Modify transport to set streamUsage to Livestream and validate privacy mode
             transportOptions['streamUsage'] = Globals.Enums.StreamUsageEnum.kLiveView
             await self.send_single_cmd(
                 cmd=pushavCluster.Commands.ModifyPushTransport(
@@ -487,10 +484,21 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
                 avsmAttr.SoftLivestreamPrivacyModeEnabled(False), endpoint_id=endpoint
             )
         else:
+            self.skip_step(11)
+            self.skip_step(12)
+            self.skip_step(13)
             self.skip_step(14)
             self.skip_step(15)
             self.skip_step(16)
             self.skip_step(17)
+            transportOptions['streamUsage'] = Globals.Enums.StreamUsageEnum.kLiveView
+            await self.send_single_cmd(
+                cmd=pushavCluster.Commands.ModifyPushTransport(
+                    connectionID=aConnectionID,
+                    transportOptions=transportOptions
+                ),
+                endpoint=endpoint,
+            )
 
         self.step(18)
         await self.send_single_cmd(
@@ -520,13 +528,16 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         self.step(20)
         if not self.check_pics("PICS_SDK_CI_ONLY"):
             skipped = self.user_verify_push_av_stream(
-                prompt_msg="Verify the video stream is being transmitted by playing the live video and viewing the uploaded contents."
+                prompt_msg=(
+                    "Verify the video stream is being transmitted by playing the live video and\nviewing the uploaded contents.\n"
+                    "Verify that there are no non-conforming uploads."
+                )
             )
             if skipped:
                 # For when running in CLI
-                prompt = ("Verify the video segments are being received by the server by viewing the logs with [PUSH_AV_SERVER] tag.\n"
-                          "The uploaded content must be accepted by the server without any errors.\n"
-                          "Enter 'y' to confirm.")
+                prompt = ("\nVerify the video segments are being received by the server by viewing the logs with [PUSH_AV_SERVER] tag."
+                          "\nThe uploaded content must be accepted by the server without any errors."
+                          "\nEnter 'y' to confirm.")
                 user_response = self.wait_for_user_input(
                     prompt_msg=prompt,
                     prompt_msg_placeholder="y",
@@ -542,30 +553,36 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         )
 
         self.step(22)
+        # Verify event received
+        event_data = event_callback.wait_for_event_report(pushavCluster.Events.PushTransportEnd, timeout_sec=5)
+        log.info("Event data %s", event_data)
+        asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
+
+        self.step(23)
         if not self.check_pics("PICS_SDK_CI_ONLY"):
-            prompt = ("Verify the video stream uploaded can be played. Verify that DUT has stopped uploading by viewing the uploaded content and ensure no new files are received.\n"
-                      "Click on the 'Refresh Streams' button to view the latest uploaded contents"
-                      "The uploaded segment's extended path must conform to the Matter's extended path format")
+            prompt = ("Verify the uploaded CMAF content by:\n"
+                      "1. Playing back the video and audio from uploaded files\n"
+                      "2. Verifying DUT has stopped uploading (no new files appearing)\n"
+                      "3. Clicking the 'Refresh Streams' button to see the latest uploads\n\n"
+                      "- Both 'video' and 'audio' track content must play correctly\n"
+                      "- All uploaded files must conform to Matter specification\n"
+                      "- If any uploads are marked as non-conforming, review the reasons listed\n"
+                      "- No new segments should be uploaded.")
             skipped = self.user_verify_push_av_stream(
                 prompt_msg=prompt
             )
             if skipped:
                 # For when running in CLI
-                prompt = ("Verify that DUT has stopped transmitting content by viewing the server logs with [PUSH_AV_SERVER] tag."
-                          "No new segments should be received."
-                          "Enter 'y' to confirm.")
+                prompt = ("\nVerify that DUT has stopped transmitting:"
+                          "\nCheck server logs with [PUSH_AV_SERVER] tag - no new uploads"
+                          "\nEnsure no new segment files are being added"
+                          "\nEnter 'y' to confirm transmission has stopped.")
                 user_response = self.wait_for_user_input(
                     prompt_msg=prompt,
                     prompt_msg_placeholder="y",
                     default_value="y",
                 )
                 asserts.assert_equal(user_response.lower(), "y")
-
-        self.step(23)
-        # Verify event received
-        event_data = event_callback.wait_for_event_report(pushavCluster.Events.PushTransportEnd, timeout_sec=5)
-        log.info("Event data %s", event_data)
-        asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
 
 
 if __name__ == "__main__":

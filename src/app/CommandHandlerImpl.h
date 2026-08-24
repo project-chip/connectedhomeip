@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <optional>
+
 #include <app/CommandHandler.h>
 
 #include <app/CommandHandlerExchangeInterface.h>
@@ -28,6 +30,7 @@
 #include <lib/core/TLVDebug.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/Scoped.h>
+#include <lib/support/Span.h>
 #include <messaging/ExchangeHolder.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
@@ -76,6 +79,8 @@ public:
          */
         virtual void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                                      TLV::TLVReader & apPayload) = 0;
+
+        virtual void OnDelayReport(System::Clock::Timeout aDelay, Span<const EndpointId> targetedEndpoints) {}
     };
 
     struct InvokeResponseParameters
@@ -137,10 +142,19 @@ public:
     void AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::ClusterStatusCode & aStatus,
                    const char * context = nullptr) override;
 
+    /// Encodes response data via the polymorphic EncodableToTLV virtual interface.
+    /// Supports dynamic or custom encodables that implement EncodableToTLV.
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                const DataModel::EncodableToTLV & aEncodable) override;
     void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                      const DataModel::EncodableToTLV & aEncodable) override;
+
+    /// Encodes response data via the non-virtual EncodableResponsePayload callback descriptor.
+    /// Avoids virtual table and RTTI overhead for concrete response command structs.
+    CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                               const EncodableResponsePayload & aPayload) override;
+    void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                     const EncodableResponsePayload & aPayload) override;
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override;
     FabricIndex GetAccessingFabricIndex() const override;
@@ -259,7 +273,12 @@ public:
     /**
      * Check whether the InvokeRequest we are handling is targeted to a group.
      */
-    bool IsGroupRequest() { return mGroupRequest; }
+    bool IsGroupRequest() const { return mGroupRequest; }
+
+    /**
+     * Check whether the SuppressResponse flag is set.
+     */
+    bool IsResponseSuppressed() const { return mSuppressResponse; }
 
 protected:
     // Lifetime management for CommandHandler::Handle
@@ -433,10 +452,12 @@ private:
      */
     CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                   const DataModel::EncodableToTLV & aEncodable);
+    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                                  const EncodableResponsePayload & aPayload);
 
     void SetExchangeInterface(CommandHandlerExchangeInterface * commandResponder);
 
-    bool ResponsesAccepted() { return mpResponder != nullptr && !mGroupRequest; }
+    bool ResponsesAccepted() { return mpResponder != nullptr && !mGroupRequest && !mSuppressResponse; }
 
     /**
      * Sets the state flag to keep the information that request we are handling is targeted to a group.
@@ -452,6 +473,8 @@ private:
     void RemoveFromHandleList(Handle * handle);
 
     void InvalidateHandles();
+
+    void TriggerDelayReport(const InvokeRequestMessage::DelayReportData & aDelayReportData);
 
     bool TestOnlyIsInIdleState() const { return mState == State::Idle; }
 
@@ -499,6 +522,11 @@ private:
     // incoming invoke.  After this point, our session could go away at any
     // time.
     bool mGoneAsync = false;
+
+    static constexpr size_t kMaxTargetedEndpoints = CHIP_CONFIG_MAX_PATHS_PER_INVOKE;
+    uint16_t mNumTargetedEndpoints                = 0;
+    EndpointId mTargetedEndpoints[kMaxTargetedEndpoints];
+    void RecordTargetedEndpoint(EndpointId endpointId);
 };
 } // namespace app
 } // namespace chip

@@ -56,7 +56,7 @@ bool ValidEndpointForSoilMeasurement(EndpointId endpoint)
 
 } // namespace
 
-void emberAfSoilMeasurementClusterInitCallback(EndpointId endpoint)
+void MatterSoilMeasurementClusterInitCallback(EndpointId endpoint)
 {
     VerifyOrReturn(ValidEndpointForSoilMeasurement(endpoint));
 
@@ -68,7 +68,7 @@ void emberAfSoilMeasurementClusterInitCallback(EndpointId endpoint)
     LogErrorOnFailure(gServer.Cluster().SetSoilMoistureMeasuredValue(kDefaultSoilMoistureMeasurementLimits.minMeasuredValue));
 }
 
-void emberAfSoilMeasurementClusterShutdownCallback(EndpointId endpoint)
+void MatterSoilMeasurementClusterShutdownCallback(EndpointId endpoint, MatterClusterShutdownType)
 {
     VerifyOrReturn(ValidEndpointForSoilMeasurement(endpoint));
     LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster()));

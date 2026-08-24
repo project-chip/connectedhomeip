@@ -1281,6 +1281,9 @@ static BOOL CommandNeedsTimedInvokeInAccountLoginCluster(AttributeId aAttributeI
     case Commands::Logout::Id: {
         return YES;
     }
+    case Commands::GetDeviceAuthURI::Id: {
+        return YES;
+    }
     default: {
         return NO;
     }
@@ -1310,6 +1313,24 @@ static BOOL CommandNeedsTimedInvokeInContentControlCluster(AttributeId aAttribut
 static BOOL CommandNeedsTimedInvokeInContentAppObserverCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ContentAppObserver;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInMediaFileManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::MediaFileManagement;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInAudioControlCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::AudioControl;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -1901,6 +1922,12 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ContentAppObserver::Id: {
         return CommandNeedsTimedInvokeInContentAppObserverCluster(commandID);
+    }
+    case Clusters::MediaFileManagement::Id: {
+        return CommandNeedsTimedInvokeInMediaFileManagementCluster(commandID);
+    }
+    case Clusters::AudioControl::Id: {
+        return CommandNeedsTimedInvokeInAudioControlCluster(commandID);
     }
     case Clusters::ZoneManagement::Id: {
         return CommandNeedsTimedInvokeInZoneManagementCluster(commandID);

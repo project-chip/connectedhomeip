@@ -16,7 +16,7 @@
 """Collect information from various sources into Memory Map DataFrames."""
 
 import bisect
-from typing import Callable, Mapping, Optional, Sequence
+from collections.abc import Callable, Mapping, Sequence
 
 import memdf.collector.bloaty
 import memdf.collector.csv
@@ -302,8 +302,8 @@ FILE_READERS: dict[str, FileReader] = {
 
 
 def collect_files(config: Config,
-                  files: Optional[list[str]] = None,
-                  method: Optional[str] = None) -> DFs:
+                  files: list[str] | None = None,
+                  method: str | None = None) -> DFs:
     """Read a filtered memory map from a set of files."""
     filenames = files if files else config.get('args.inputs', [])
     if method is None:

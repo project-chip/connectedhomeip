@@ -38,19 +38,20 @@
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
 #include <device-factory/DeviceFactory.h>
-#include <devices/endpoint-id-allocator/DynamicEndpointIdAllocator.h>
-#include <devices/root-node/RootNodeDevice.h>
+#include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
+#include <device/types/root-node/RootNode.h>
 
 #if CHIP_ENABLE_OPENTHREAD
-#include <devices/root-node/ThreadRootNodeDevice.h>
+#include <device/types/root-node/ThreadRootNode.h>
 #include <platform/NetworkCommissioning.h>
 #endif
 
 #if defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <devices/root-node/WifiRootNodeDevice.h>           // nogncheck
+#include <device/types/root-node/WifiRootNode.h>            // nogncheck
 #include <platform/silabs/NetworkCommissioningWiFiDriver.h> // nogncheck
 #endif
 
@@ -67,7 +68,7 @@ namespace {
 chip::app::DefaultAttributePersistenceProvider sAttributePersistenceProvider;
 chip::app::DefaultSafeAttributePersistenceProvider sSafeAttributePersistenceProvider;
 std::unique_ptr<chip::app::CodeDrivenDataModelProvider> sDataModelProvider;
-std::unique_ptr<chip::app::DeviceInterface> sRootNodeDevice;
+std::unique_ptr<chip::app::DeviceInterface> sRootNode;
 std::unique_ptr<chip::app::DeviceInterface> sConstructedDevice;
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -148,54 +149,59 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
 
     static chip::app::DefaultTimerDelegate sTimerDelegate;
 
-    chip::app::RootNodeDevice::Context rootNodeContext = {
-        .commissioningWindowManager       = chip::Server::GetInstance().GetCommissioningWindowManager(),
-        .configurationManager             = chip::DeviceLayer::ConfigurationMgr(),
-        .deviceControlServer              = chip::DeviceLayer::DeviceControlServer::DeviceControlSvr(),
-        .fabricTable                      = chip::Server::GetInstance().GetFabricTable(),
-        .accessControl                    = chip::Server::GetInstance().GetAccessControl(),
-        .persistentStorage                = storage,
-        .failSafeContext                  = chip::Server::GetInstance().GetFailSafeContext(),
-        .deviceInstanceInfoProvider       = *deviceInfoProvider,
-        .platformManager                  = chip::DeviceLayer::PlatformMgr(),
-        .groupDataProvider                = *groupDataProvider,
-        .sessionManager                   = chip::Server::GetInstance().GetSecureSessionManager(),
-        .dnssdServer                      = chip::app::DnssdServer::Instance(),
-        .deviceLoadStatusProvider         = *chip::app::InteractionModelEngine::GetInstance(),
-        .diagnosticDataProvider           = chip::DeviceLayer::GetDiagnosticDataProvider(),
-        .testEventTriggerDelegate         = nullptr,
-        .dacProvider                      = *chip::Credentials::GetDeviceAttestationCredentialsProvider(),
-        .eventManagement                  = chip::app::EventManagement::GetInstance(),
-        .safeAttributePersistenceProvider = sSafeAttributePersistenceProvider,
-        .timerDelegate                    = sTimerDelegate,
+    chip::app::RootNode::Context rootNodeContext = {
+        .commissioningWindowManager = chip::Server::GetInstance().GetCommissioningWindowManager(),
+        .configurationManager       = chip::DeviceLayer::ConfigurationMgr(),
+        .deviceControlServer        = chip::DeviceLayer::DeviceControlServer::DeviceControlSvr(),
+        .fabricTable                = chip::Server::GetInstance().GetFabricTable(),
+        .accessControl              = chip::Server::GetInstance().GetAccessControl(),
+        .persistentStorage          = storage,
+        .failSafeContext            = chip::Server::GetInstance().GetFailSafeContext(),
+        .deviceInstanceInfoProvider = *deviceInfoProvider,
+        .platformManager            = chip::DeviceLayer::PlatformMgr(),
+        .groupDataProvider          = *groupDataProvider,
+        .sessionManager             = chip::Server::GetInstance().GetSecureSessionManager(),
+        .dnssdServer                = chip::app::DnssdServer::Instance(),
+        .deviceLoadStatusProvider   = *chip::app::InteractionModelEngine::GetInstance(),
+        .diagnosticDataProvider     = chip::DeviceLayer::GetDiagnosticDataProvider(),
+        .testEventTriggerDelegate   = nullptr,
+        .dacProvider                = *chip::Credentials::GetDeviceAttestationCredentialsProvider(),
+        .eventManagement            = chip::app::EventManagement::GetInstance(),
+        .timerDelegate              = sTimerDelegate,
+        .minGuaranteedSubscriptionsPerFabric =
+            chip::app::InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(),
     };
 
 #if CHIP_ENABLE_OPENTHREAD
-    sRootNodeDevice = std::make_unique<chip::app::ThreadRootNodeDevice>(rootNodeContext,
-                                                                        chip::app::ThreadRootNodeDevice::ThreadContext{
-                                                                            .threadDriver = sThreadDriver,
-                                                                        });
+    sRootNode = std::make_unique<chip::app::ThreadRootNode>(rootNodeContext,
+                                                            chip::app::ThreadRootNode::ThreadContext{
+                                                                .threadDriver = sThreadDriver,
+                                                            });
 #elif defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    sRootNodeDevice = std::make_unique<chip::app::WifiRootNodeDevice>(
+    sRootNode = std::make_unique<chip::app::WifiRootNode>(
         rootNodeContext,
-        chip::app::WifiRootNodeDevice::WifiContext{
+        chip::app::WifiRootNode::WifiContext{
             .wifiDriver = *chip::DeviceLayer::NetworkCommissioning::SlWiFiDriver::GetInstance(),
         });
 #else
-    sRootNodeDevice = std::make_unique<chip::app::RootNodeDevice>(rootNodeContext);
+    sRootNode = std::make_unique<chip::app::RootNode>(rootNodeContext);
 #endif
 
-    VerifyOrReturnError(sRootNodeDevice != nullptr, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(sRootNode != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    chip::app::DynamicEndpointIdAllocator endpointIdAllocator({ kRootEndpointId, kDeviceEndpointId });
-    endpointIdAllocator.ForceNext(kRootEndpointId);
-    ReturnErrorOnFailure(sRootNodeDevice->Register(endpointIdAllocator, *sDataModelProvider));
+    chip::app::ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
+    ReturnErrorOnFailure(sRootNode->Register(rootAllocator, *sDataModelProvider));
 
     chip::app::DeviceFactory::GetInstance().Init(chip::app::DeviceFactory::Context{
-        .groupDataProvider = *groupDataProvider,
-        .fabricTable       = chip::Server::GetInstance().GetFabricTable(),
-        .timerDelegate     = sTimerDelegate,
-        .storageDelegate   = storage,
+        .groupDataProvider      = *groupDataProvider,
+        .fabricTable            = chip::Server::GetInstance().GetFabricTable(),
+        .timerDelegate          = sTimerDelegate,
+        .storageDelegate        = storage,
+        .diagnosticDataProvider = chip::DeviceLayer::GetDiagnosticDataProvider(),
+        .platformManager        = chip::DeviceLayer::PlatformMgr(),
+        .failSafeContext        = chip::Server::GetInstance().GetFailSafeContext(),
+        .bindingTable           = chip::app::Clusters::Binding::Table::GetInstance(),
+        .bindingManager         = chip::app::Clusters::Binding::Manager::GetInstance(),
     });
 
     std::string deviceType = chip::app::DeviceFactory::GetInstance().GetDefaultDevice();
@@ -218,8 +224,8 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     sConstructedDevice = deviceFactory.Create(deviceType);
     VerifyOrReturnError(sConstructedDevice != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    endpointIdAllocator.ForceNext(kDeviceEndpointId);
-    ReturnErrorOnFailure(sConstructedDevice->Register(endpointIdAllocator, *sDataModelProvider, chip::kInvalidEndpointId));
+    ConsecutiveEndpointIdAllocator allocator(kDeviceEndpointId);
+    ReturnErrorOnFailure(sConstructedDevice->Register(allocator, *sDataModelProvider));
 
     return CHIP_NO_ERROR;
 }

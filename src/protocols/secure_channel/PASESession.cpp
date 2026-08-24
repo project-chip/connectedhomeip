@@ -33,7 +33,6 @@
 #include <string.h>
 
 #include <lib/core/CHIPEncoding.h>
-#include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -168,7 +167,7 @@ CHIP_ERROR PASESession::Init(SessionManager & sessionManager, uint32_t setupCode
     Clear();
 
     ReturnErrorOnFailure(mCommissioningHash.Begin());
-    ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ Uint8::from_const_char(kSpake2pContext), strlen(kSpake2pContext) }));
+    ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan::fromCharString(kSpake2pContext)));
 
     mDelegate = delegate;
     ReturnErrorOnFailure(AllocateSecureSession(sessionManager));
@@ -547,6 +546,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
 
     // Initiator's random value
     SuccessOrExit(err = tlvReader.Next(AsTlvContextTag(PBKDFParamResponseTags::kInitiatorRandom)));
+    VerifyOrExit(tlvReader.GetLength() == kPBKDFParamRandomNumberSize, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
     SuccessOrExit(err = tlvReader.GetBytes(random, sizeof(random)));
     VerifyOrExit(ByteSpan(random).data_equal(ByteSpan(mPBKDFLocalRandomData)), err = CHIP_ERROR_INVALID_PASE_PARAMETER);
 

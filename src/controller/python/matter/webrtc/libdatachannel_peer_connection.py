@@ -17,7 +17,6 @@
 
 import asyncio
 import logging
-from typing import Optional
 
 from .command import WebRTCProviderCommand
 from .libdatachannel_webrtc_client import LibdatachannelWebRTCClient
@@ -43,7 +42,7 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         PeerConnection
     """
 
-    def __init__(self, node_id: int, fabric_index: int, endpoint: int, event_loop: Optional[asyncio.AbstractEventLoop] = None):
+    def __init__(self, node_id: int, fabric_index: int, endpoint: int, event_loop: asyncio.AbstractEventLoop | None = None):
         super().__init__()
         self.event_loop = event_loop or asyncio.get_running_loop()
 
@@ -86,7 +85,7 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         default_stun_url = "stun:stun.l.google.com:19302"
         self.create_peer_connection(stun_url=default_stun_url)
 
-    async def get_local_ice_candidates(self, timeout_s: Optional[int] = None) -> list[IceCandidate]:
+    async def get_local_ice_candidates(self, timeout_s: int | None = None) -> list[IceCandidate]:
         """Retrieves the local ICE candidates for the WebRTC peer connection.
 
         Waits for gathering complete to return ice candidates.
@@ -123,7 +122,7 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         for candidate in remote_candidates:
             self.add_ice_candidate(candidate.candidate, candidate.sdpMid or "video")
 
-    async def get_local_answer(self, timeout_sec: Optional[int] = None) -> str:
+    async def get_local_answer(self, timeout_sec: int | None = None) -> str:
         """Fetches the local SDP answer for the WebRTC peer connection.
 
         Args:
@@ -161,7 +160,7 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         """
         self.set_remote_description(answer_sdp, "answer")
 
-    async def get_local_offer(self, timeout_sec: Optional[int] = None) -> str:
+    async def get_local_offer(self, timeout_sec: int | None = None) -> str:
         """Fetches the local SDP offer for the WebRTC peer connection.
 
         Args:
@@ -184,7 +183,7 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         """
         self.set_remote_description(offer_sdp, "offer")
 
-    async def get_remote_offer(self, timeout_s: Optional[int] = None) -> tuple[int, str]:
+    async def get_remote_offer(self, timeout_s: int | None = None) -> tuple[int, str]:
         """Waits for a remote SDP offer to be received through a matter command.
 
         Args:
@@ -200,7 +199,7 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         LOGGER.debug("Waiting for remote offer")
         return await self._remote_events[Events.OFFER].get(timeout_s)
 
-    async def get_remote_answer(self, timeout_s: Optional[int] = None) -> tuple[int, str]:
+    async def get_remote_answer(self, timeout_s: int | None = None) -> tuple[int, str]:
         """Waits for a remote SDP answer to be received through a matter command.
 
         Args:
@@ -216,7 +215,7 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         LOGGER.debug("Waiting for remote answer")
         return await self._remote_events[Events.ANSWER].get(timeout_s)
 
-    async def get_remote_ice_candidates(self, timeout_s: Optional[int] = None) -> tuple[int, list[IceCandidate]]:
+    async def get_remote_ice_candidates(self, timeout_s: int | None = None) -> tuple[int, list[IceCandidate]]:
         """Waits for a list of remote ICE Candidates to be received through a matter command.
 
         Args:

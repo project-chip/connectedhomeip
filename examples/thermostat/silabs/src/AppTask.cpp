@@ -23,16 +23,18 @@
 #include "CustomerAppTask.h"
 #include "ThermostatConfig.h"
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 #include "ThermostatUI.h"
 #include "lcd.h"
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 
-#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/thermostat-server/ThermostatCluster.h>
+#include <app/MessageDef/StatusIB.h>
+#include <app/clusters/thermostat-server/AttributeAccessorShim.h>
+#include <app/clusters/thermostat-server/CodegenIntegration.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <cmsis_os2.h>
@@ -42,6 +44,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformError.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+#include <thermostat-delegate-impl.h>
 
 #if defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
 #include "Si70xxSensor.h"
@@ -98,9 +101,19 @@ CHIP_ERROR AppTask::AppInit()
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(&CustomerAppTask::ButtonEventHandler);
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     GetLCD().SetCustomUI(ThermostatUI::DrawUI);
 #endif
+
+    Protocols::InteractionModel::Status status =
+        Thermostat::SetDefaultDelegate(kThermostatEndpoint, &Thermostat::ThermostatDelegate::GetInstance());
+    if (status != Protocols::InteractionModel::Status::Success)
+    {
+        ChipLogError(AppServer, "SetDefaultDelegate failed: 0x%02x", to_underlying(status));
+        err = StatusIB(status).ToChipError();
+        appError(err);
+        return err;
+    }
 
     err = AppInstance().InitThermostat();
     if (err != CHIP_NO_ERROR)
@@ -198,7 +211,7 @@ void AppTask::UpdateThermoStatUI()
     const int8_t heatingC     = ConvertToPrintableTemp(heatingSetpointRaw);
     const uint8_t modeForUi   = chip::to_underlying(systemMode);
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     ThermostatUI::SetMode(modeForUi);
     ThermostatUI::SetHeatingSetPoint(heatingC);
     ThermostatUI::SetCoolingSetPoint(coolingC);
@@ -210,7 +223,7 @@ void AppTask::UpdateThermoStatUI()
     }
 #else
     ChipLogProgress(AppServer, "Thermostat Status - M:%d T:%d'C H:%d'C C:%d'C", modeForUi, currentTempC, heatingC, coolingC);
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 }
 
 void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
@@ -302,14 +315,14 @@ CHIP_ERROR AppTask::GetTemperature(int16_t & temperature)
     return CHIP_NO_ERROR;
 }
 
-void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+void AppTask::DMPostAttributeChangeCallback(const ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                             uint8_t * value)
 {
     ClusterId clusterId     = attributePath.mClusterId;
     AttributeId attributeId = attributePath.mAttributeId;
     ChipLogDetail(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
-    if (clusterId == Identify::Id)
+    if (clusterId == Clusters::Identify::Id)
     {
         ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
