@@ -42,6 +42,27 @@ namespace chip {
 namespace app {
 using Status = Protocols::InteractionModel::Status;
 
+namespace {
+void RecordTargetedEndpoint(EndpointId * endpoints, size_t & count, size_t maxCount, EndpointId endpointId)
+{
+    for (size_t i = 0; i < count; ++i)
+    {
+        if (endpoints[i] == endpointId)
+        {
+            return;
+        }
+    }
+    if (count < maxCount)
+    {
+        endpoints[count++] = endpointId;
+    }
+    else
+    {
+        ChipLogError(DataManagement, "Too many targeted endpoints in invoke, capping at %u", static_cast<unsigned int>(maxCount));
+    }
+}
+} // anonymous namespace
+
 CommandHandlerImpl::CommandHandlerImpl(Callback * apCallback) : mpCallback(apCallback), mSuppressResponse(false) {}
 
 CommandHandlerImpl::CommandHandlerImpl(TestOnlyOverrides & aTestOverride, Callback * apCallback) : CommandHandlerImpl(apCallback)
@@ -279,7 +300,6 @@ CHIP_ERROR CommandHandlerImpl::ValidateInvokeRequestMessageAndBuildRegistry(Invo
         err = CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(err);
-
     return invokeRequestMessage.ExitContainer();
 }
 
@@ -325,7 +345,64 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
         mReserveSpaceForMoreChunkMessages = true;
     }
 
-    mNumTargetedEndpoints = 0;
+    if (delayReportData.has_value())
+    {
+        EndpointId targetedEndpoints[CHIP_CONFIG_MAX_PATHS_PER_INVOKE];
+        size_t numTargetedEndpoints = 0;
+        bool hasValidCommands       = false;
+
+        TLV::TLVReader preCheckReader;
+        invokeRequests.GetReader(&preCheckReader);
+        while (CHIP_NO_ERROR == preCheckReader.Next())
+        {
+            if (TLV::AnonymousTag() != preCheckReader.GetTag())
+            {
+                continue;
+            }
+            CommandDataIB::Parser commandData;
+            if (commandData.Init(preCheckReader) != CHIP_NO_ERROR)
+            {
+                continue;
+            }
+            if (IsGroupRequest())
+            {
+                if (HasValidGroupEndpoints(commandData))
+                {
+                    hasValidCommands = true;
+                    break;
+                }
+            }
+            else
+            {
+                ConcreteCommandPath concretePath(0, 0, 0);
+                if (ValidateUnicastCommand(commandData, concretePath) == Status::Success)
+                {
+                    hasValidCommands = true;
+                    RecordTargetedEndpoint(targetedEndpoints, numTargetedEndpoints, CHIP_CONFIG_MAX_PATHS_PER_INVOKE,
+                                           concretePath.mEndpointId);
+                }
+            }
+        }
+
+        // Trigger report deferral for all valid targeted endpoints BEFORE dispatching any commands.
+        // When command handlers execute, they may synchronously modify attributes, calling SetDirty()
+        // and notifying the ReportScheduler via OnBecameReportable(). If report deferral is not applied
+        // beforehand, the scheduler evaluates next timeout as 0 ms, synchronously transitions the node
+        // to TimerFired(), and marks EngineRunScheduled = true. Once EngineRunScheduled is set,
+        // subsequent deferral calls cannot prevent the reporting engine from immediately sending the report
+        // on the next event loop iteration. Triggering report deferral here ensures the deferral window is
+        // active before any attribute mutations occur.
+        if (hasValidCommands)
+        {
+            // An empty targetedEndpoints span indicates a global deferral across all endpoints on the node for groupcast requests.
+            Span<const EndpointId> endpointsSpan = IsGroupRequest()
+                ? Span<const EndpointId>()
+                : Span<const EndpointId>(targetedEndpoints, numTargetedEndpoints);
+            TriggerDelayReport(delayReportData.value(), endpointsSpan);
+        }
+    }
+
+    invokeRequests.GetReader(&invokeRequestsReader);
     while (CHIP_NO_ERROR == (err = invokeRequestsReader.Next()))
     {
         VerifyOrReturnError(TLV::AnonymousTag() == invokeRequestsReader.GetTag(), Status::InvalidAction);
@@ -334,11 +411,11 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
         Status status = Status::Success;
         if (IsGroupRequest())
         {
-            status = ProcessGroupCommandDataIB(commandData, delayReportData);
+            status = ProcessGroupCommandDataIB(commandData);
         }
         else
         {
-            status = ProcessCommandDataIB(commandData, delayReportData);
+            status = ProcessCommandDataIB(commandData);
         }
         if (status != Status::Success)
         {
@@ -444,33 +521,62 @@ constexpr uint8_t sNoFields[] = {
 };
 } // anonymous namespace
 
-Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement,
-                                                const std::optional<InvokeRequestMessage::DelayReportData> & aDelayReportData)
+Status CommandHandlerImpl::ValidateCommandCanBeDispatched(const ConcreteCommandPath & aConcretePath)
+{
+    Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
+    DataModel::InvokeRequest request(aConcretePath, subjectDescriptor);
+    request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, IsTimedInvoke());
+    return mpCallback->ValidateCommandCanBeDispatched(request);
+}
+
+Status CommandHandlerImpl::ValidateUnicastCommand(CommandDataIB::Parser & aCommandElement, ConcreteCommandPath & aOutPath)
+{
+    CommandPathIB::Parser commandPath;
+    VerifyOrReturnError(aCommandElement.GetPath(&commandPath) == CHIP_NO_ERROR, Status::InvalidAction);
+    VerifyOrReturnError(commandPath.GetConcreteCommandPath(aOutPath) == CHIP_NO_ERROR, Status::InvalidAction);
+    return ValidateCommandCanBeDispatched(aOutPath);
+}
+
+bool CommandHandlerImpl::HasValidGroupEndpoints(CommandDataIB::Parser & aCommandElement)
+{
+    CommandPathIB::Parser commandPath;
+    ClusterId clusterId;
+    CommandId commandId;
+    VerifyOrReturnValue(aCommandElement.GetPath(&commandPath) == CHIP_NO_ERROR, false);
+    VerifyOrReturnValue(commandPath.GetGroupCommandPath(&clusterId, &commandId) == CHIP_NO_ERROR, false);
+
+    VerifyOrReturnValue(mpResponder && mpResponder->GetGroupId().HasValue(), false);
+    GroupId groupId                                    = mpResponder->GetGroupId().Value();
+    FabricIndex fabric                                 = GetAccessingFabricIndex();
+    Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
+    Credentials::GroupDataProvider::GroupEndpoint mapping;
+    AutoRelease iterator(groupDataProvider->IterateEndpoints(fabric));
+    VerifyOrReturnValue(!iterator.IsNull(), false);
+
+    while (iterator->Next(mapping))
+    {
+        if (groupId == mapping.group_id)
+        {
+            if (ValidateCommandCanBeDispatched(ConcreteCommandPath(mapping.endpoint_id, clusterId, commandId)) == Status::Success)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    CommandPathIB::Parser commandPath;
     ConcreteCommandPath concretePath(0, 0, 0);
     TLV::TLVReader commandDataReader;
 
     // NOTE: errors may occur before the concrete command path is even fully decoded.
-
-    err = aCommandElement.GetPath(&commandPath);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
-
-    err = commandPath.GetConcreteCommandPath(concretePath);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
-
+    Status preCheckStatus = ValidateUnicastCommand(aCommandElement, concretePath);
+    if (preCheckStatus != Status::Success)
     {
-        Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
-        DataModel::InvokeRequest request(concretePath, subjectDescriptor);
-
-        request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, IsTimedInvoke());
-
-        Status preCheckStatus = mpCallback->ValidateCommandCanBeDispatched(request);
-        if (preCheckStatus != Status::Success)
-        {
-            return FallibleAddStatus(concretePath, preCheckStatus) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
-        }
+        return FallibleAddStatus(concretePath, preCheckStatus) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
     }
 
     err = aCommandElement.GetFields(&commandDataReader);
@@ -488,20 +594,6 @@ Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
                       concretePath.mEndpointId, ChipLogValueMEI(concretePath.mClusterId), ChipLogValueMEI(concretePath.mCommandId));
         SuccessOrExit(err = DataModelCallbacks::GetInstance()->PreCommandReceived(concretePath, GetSubjectDescriptor()));
 
-        // Trigger report deferral for this endpoint BEFORE dispatching the command.
-        // When command handlers execute, they may synchronously modify attributes, calling SetDirty()
-        // and notifying the ReportScheduler via OnBecameReportable(). If report deferral is not applied
-        // beforehand, the scheduler evaluates next timeout as 0 ms, synchronously transitions the node
-        // to TimerFired(), and marks EngineRunScheduled = true. Once EngineRunScheduled is set,
-        // subsequent deferral calls cannot prevent the reporting engine from immediately sending the report
-        // on the next event loop iteration. Triggering report deferral here ensures the deferral window is
-        // active before any attribute mutations occur.
-        RecordTargetedEndpoint(concretePath.mEndpointId);
-        if (aDelayReportData.has_value())
-        {
-            TriggerDelayReport(aDelayReportData.value());
-        }
-
         mpCallback->DispatchCommand(*this, concretePath, commandDataReader);
         DataModelCallbacks::GetInstance()->PostCommandReceived(concretePath, GetSubjectDescriptor());
     }
@@ -517,8 +609,7 @@ exit:
     return Status::Success;
 }
 
-Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement,
-                                                     const std::optional<InvokeRequestMessage::DelayReportData> & aDelayReportData)
+Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandPathIB::Parser commandPath;
@@ -586,27 +677,14 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
             testing.SetElementID(static_cast<uint32_t>(commandId));
         }
 
+        if (ValidateCommandCanBeDispatched(concretePath) != Status::Success)
         {
-            Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
-            DataModel::InvokeRequest request(concretePath, subjectDescriptor);
-
-            request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, IsTimedInvoke());
-
-            Status preCheckStatus = mpCallback->ValidateCommandCanBeDispatched(request);
-            if (preCheckStatus != Status::Success)
-            {
-                // Command failed for a specific path, but keep trying the rest of the paths.
-                continue;
-            }
+            // Command failed for a specific path, but keep trying the rest of the paths.
+            continue;
         }
 
         if ((err = DataModelCallbacks::GetInstance()->PreCommandReceived(concretePath, GetSubjectDescriptor())) == CHIP_NO_ERROR)
         {
-            if (aDelayReportData.has_value())
-            {
-                TriggerDelayReport(aDelayReportData.value());
-            }
-
             TLV::TLVReader dataReader(commandDataReader);
             mpCallback->DispatchCommand(*this, concretePath, dataReader);
             DataModelCallbacks::GetInstance()->PostCommandReceived(concretePath, GetSubjectDescriptor());
@@ -1115,32 +1193,8 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
 }
 #endif // CHIP_WITH_NLFAULTINJECTION
 
-void CommandHandlerImpl::RecordTargetedEndpoint(EndpointId endpointId)
-{
-    for (size_t i = 0; i < mNumTargetedEndpoints; ++i)
-    {
-        if (mTargetedEndpoints[i] == endpointId)
-        {
-            return;
-        }
-    }
-    if (mNumTargetedEndpoints < kMaxTargetedEndpoints)
-    {
-        mTargetedEndpoints[mNumTargetedEndpoints++] = endpointId;
-    }
-    else
-    {
-        // This branch should not be reachable in practice:
-        // - For unicast invokes, the number of distinct targeted endpoints cannot exceed the max paths per invoke
-        // (kMaxTargetedEndpoints).
-        // - For groupcast invokes, RecordTargetedEndpoint is not called because groupcast defers reports globally via an empty
-        // span.
-        ChipLogError(DataManagement, "Too many targeted endpoints in invoke, capping at %u",
-                     static_cast<unsigned int>(kMaxTargetedEndpoints));
-    }
-}
-
-void CommandHandlerImpl::TriggerDelayReport(const InvokeRequestMessage::DelayReportData & aDelayReportData)
+void CommandHandlerImpl::TriggerDelayReport(const InvokeRequestMessage::DelayReportData & aDelayReportData,
+                                            Span<const EndpointId> aTargetedEndpoints)
 {
     VerifyOrReturn(mpCallback != nullptr);
 
@@ -1149,10 +1203,7 @@ void CommandHandlerImpl::TriggerDelayReport(const InvokeRequestMessage::DelayRep
     {
         delayMs += (chip::Crypto::GetRandU32() % aDelayReportData.delayJitterWindowMs);
     }
-    // An empty targetedEndpoints span indicates a global deferral across all endpoints on the node for groupcast requests.
-    Span<const EndpointId> targetedEndpoints =
-        IsGroupRequest() ? Span<const EndpointId>() : Span<const EndpointId>(mTargetedEndpoints, mNumTargetedEndpoints);
-    mpCallback->OnDelayReport(System::Clock::Milliseconds32(delayMs), targetedEndpoints);
+    mpCallback->OnDelayReport(System::Clock::Milliseconds32(delayMs), aTargetedEndpoints);
 }
 
 } // namespace app
