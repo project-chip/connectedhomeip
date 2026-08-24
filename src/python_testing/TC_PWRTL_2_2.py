@@ -72,8 +72,8 @@ class TC_PWRTL_2_2(MatterBaseTest):
         across DUT reboot (Non-Volatile quality); and subscription reporting.
 
         Steps 8-9 (TH2 fabric-isolation) and step 11 (subscription) are
-        scaffolded as self.skip_step() calls pending the test-harness
-        primitives. Steps 1-7 (single-fabric writes + constraint negatives)
+        scaffolded as self.mark_current_step_skipped() calls pending the
+        test-harness primitives. Steps 1-7 (single-fabric writes + constraint negatives)
         and step 10 (reboot via self.request_device_reboot()) are
         implemented for real.
 
