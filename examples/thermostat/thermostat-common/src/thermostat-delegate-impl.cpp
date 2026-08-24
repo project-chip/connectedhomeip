@@ -64,6 +64,15 @@ Protocols::InteractionModel::Status ThermostatDelegate::SetSystemMode(SystemMode
     {
         return Status::Success;
     }
+    AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
+    VerifyOrReturnError(provider != nullptr, Status::InvalidInState);
+    AttributePersistence persistence(*provider);
+    CHIP_ERROR result = persistence.StoreNativeEndianValue({ mEndpointId, Thermostat::Id, SystemMode::Id }, systemMode);
+    if (result != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to store SystemMode attribute");
+        return Status::Failure;
+    }
     mSystemMode = systemMode;
     changed     = true;
     return Status::Success;
@@ -114,6 +123,15 @@ Protocols::InteractionModel::Status ThermostatDelegate::SetControlSequenceOfOper
     if (mControlSequenceOfOperation == seq)
     {
         return Status::Success;
+    }
+    AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
+    VerifyOrReturnError(provider != nullptr, Status::InvalidInState);
+    AttributePersistence persistence(*provider);
+    CHIP_ERROR result = persistence.StoreNativeEndianValue({ mEndpointId, Thermostat::Id, ControlSequenceOfOperation::Id }, seq);
+    if (result != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to store ControlSequenceOfOperation attribute");
+        return Status::Failure;
     }
     mControlSequenceOfOperation = seq;
     changed                     = true;

@@ -383,7 +383,7 @@ AtomicWriteSession::RollbackAtomicWrite(CommandHandler * commandObj, const Concr
 
     ResetAtomicWrite();
 
-    ExecuteAtomicAction(attributeStatuses, &Delegate::OnAtomicWriteRollback);
+    status = ExecuteAtomicAction(attributeStatuses, &Delegate::OnAtomicWriteRollback);
 
     SendAtomicResponse(commandObj, commandPath, status, attributeStatuses);
     return std::nullopt;

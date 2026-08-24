@@ -402,7 +402,7 @@ ThermostatCluster(EndpointId, BitFlags<Thermostat::Feature>, const ThermostatClu
                   DelegateArgs &...) -> ThermostatCluster<std::decay_t<DelegateArgs>...>;
 
 using FullFeaturedThermostatCluster =
-    ThermostatCluster<ThermostatHeatingSetpoints::Delegate, ThermostatCoolingSetpoints::Delegate, ThermostatHold::Delegate,
+    ThermostatCluster<ThermostatHeatingSetpoints::Delegate, ThermostatCoolingSetpoints::Delegate, ThermostatAutoSetpoints::Delegate, ThermostatHold::Delegate,
                       ThermostatPresets::Delegate, ThermostatSuggestions::Delegate, ThermostatOccupancy::Delegate>;
 
 } // namespace Thermostat

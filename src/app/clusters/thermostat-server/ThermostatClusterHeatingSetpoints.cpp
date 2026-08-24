@@ -283,6 +283,15 @@ ThermostatHeatingSetpoints::WriteAttribute(const DataModel::WriteAttributeReques
         return std::nullopt;
     }
 
+    switch (request.path.mAttributeId)
+    {
+    case AbsMinHeatSetpointLimit::Id:
+    case AbsMaxHeatSetpointLimit::Id:
+        return Status::UnsupportedWrite;
+    default:
+        break;
+    }
+
     temperature setpoint;
     ReturnErrorOnFailure(decoder.Decode(setpoint));
 
