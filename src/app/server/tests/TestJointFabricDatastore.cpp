@@ -46,73 +46,76 @@ class TrackingDelegate : public JointFabricDatastore::Delegate
 {
 public:
     CHIP_ERROR SyncNode(NodeId nodeId, const EndpointGroupIdEntryType & endpointGroupIDEntry,
-                        std::function<void()> onSuccess) override
+                        std::function<void(CHIP_ERROR)> onSuccess) override
     {
         lastEndpointGroupSync    = endpointGroupIDEntry;
         hasLastEndpointGroupSync = true;
         if (onSuccess)
         {
-            onSuccess();
+            onSuccess(CHIP_NO_ERROR);
         }
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SyncNode(NodeId nodeId, const NodeKeySetEntryType & nodeKeySetEntry, std::function<void()> onSuccess) override
+    CHIP_ERROR SyncNode(NodeId nodeId, const NodeKeySetEntryType & nodeKeySetEntry,
+                        std::function<void(CHIP_ERROR)> onSuccess) override
     {
         lastNodeKeySetSync    = nodeKeySetEntry;
         hasLastNodeKeySetSync = true;
         if (onSuccess)
         {
-            onSuccess();
+            onSuccess(CHIP_NO_ERROR);
         }
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SyncNode(NodeId nodeId, const BindingEntryType & bindingEntry, std::function<void()> onSuccess) override
+    CHIP_ERROR SyncNode(NodeId nodeId, const BindingEntryType & bindingEntry, std::function<void(CHIP_ERROR)> onSuccess) override
     {
         lastBindingSync    = bindingEntry;
         hasLastBindingSync = true;
         if (onSuccess)
         {
-            onSuccess();
+            onSuccess(CHIP_NO_ERROR);
         }
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SyncNode(NodeId nodeId, std::vector<BindingEntryType> & bindingEntries, std::function<void()> onSuccess) override
+    CHIP_ERROR SyncNode(NodeId nodeId, std::vector<BindingEntryType> & bindingEntries,
+                        std::function<void(CHIP_ERROR)> onSuccess) override
     {
         if (onSuccess)
         {
-            onSuccess();
+            onSuccess(CHIP_NO_ERROR);
         }
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SyncNode(NodeId nodeId, const ACLEntryType & aclEntry, std::function<void()> onSuccess) override
+    CHIP_ERROR SyncNode(NodeId nodeId, const ACLEntryType & aclEntry, std::function<void(CHIP_ERROR)> onSuccess) override
     {
         lastAclSync    = aclEntry;
         hasLastAclSync = true;
         if (onSuccess)
         {
-            onSuccess();
+            onSuccess(CHIP_NO_ERROR);
         }
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SyncNode(NodeId nodeId, const std::vector<ACLEntryType> & aclEntries, std::function<void()> onSuccess) override
+    CHIP_ERROR SyncNode(NodeId nodeId, const std::vector<ACLEntryType> & aclEntries,
+                        std::function<void(CHIP_ERROR)> onSuccess) override
     {
         if (onSuccess)
         {
-            onSuccess();
+            onSuccess(CHIP_NO_ERROR);
         }
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SyncNode(NodeId nodeId, const GroupKeySetType & groupKeySet, std::function<void()> onSuccess) override
+    CHIP_ERROR SyncNode(NodeId nodeId, const GroupKeySetType & groupKeySet, std::function<void(CHIP_ERROR)> onSuccess) override
     {
         if (onSuccess)
         {
-            onSuccess();
+            onSuccess(CHIP_NO_ERROR);
         }
         return CHIP_NO_ERROR;
     }
@@ -675,9 +678,9 @@ class DeferringBindingDelegate : public TrackingDelegate
 public:
     bool deferNext   = false;
     bool hasDeferred = false;
-    std::function<void()> deferred;
+    std::function<void(CHIP_ERROR)> deferred;
 
-    CHIP_ERROR SyncNode(NodeId nodeId, const BindingEntryType & bindingEntry, std::function<void()> onSuccess) override
+    CHIP_ERROR SyncNode(NodeId nodeId, const BindingEntryType & bindingEntry, std::function<void(CHIP_ERROR)> onSuccess) override
     {
         if (deferNext)
         {
@@ -688,7 +691,7 @@ public:
         }
         if (onSuccess)
         {
-            onSuccess();
+            onSuccess(CHIP_NO_ERROR);
         }
         return CHIP_NO_ERROR;
     }
@@ -697,7 +700,7 @@ public:
     {
         if (hasDeferred && deferred)
         {
-            deferred();
+            deferred(CHIP_NO_ERROR);
         }
     }
 };
@@ -754,9 +757,9 @@ class DeferringAclDelegate : public TrackingDelegate
 public:
     bool deferNext   = false;
     bool hasDeferred = false;
-    std::function<void()> deferred;
+    std::function<void(CHIP_ERROR)> deferred;
 
-    CHIP_ERROR SyncNode(NodeId nodeId, const ACLEntryType & aclEntry, std::function<void()> onSuccess) override
+    CHIP_ERROR SyncNode(NodeId nodeId, const ACLEntryType & aclEntry, std::function<void(CHIP_ERROR)> onSuccess) override
     {
         if (deferNext)
         {
@@ -767,7 +770,7 @@ public:
         }
         if (onSuccess)
         {
-            onSuccess();
+            onSuccess(CHIP_NO_ERROR);
         }
         return CHIP_NO_ERROR;
     }
@@ -776,7 +779,7 @@ public:
     {
         if (hasDeferred && deferred)
         {
-            deferred();
+            deferred(CHIP_NO_ERROR);
         }
     }
 };
