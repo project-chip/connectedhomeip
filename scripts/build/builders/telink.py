@@ -184,6 +184,7 @@ class TelinkBuilder(Builder):
                  mars_board_config: bool = False,
                  usb_board_config: bool = False,
                  compress_lzma_config: bool = False,
+                 enable_concurrent_connection: bool = False,
                  thread_analyzer_config: bool = False,
                  precompiled_ot_config: bool = False,
                  tflm_config: bool = False,
@@ -203,6 +204,7 @@ class TelinkBuilder(Builder):
         self.mars_board_config = mars_board_config
         self.usb_board_config = usb_board_config
         self.compress_lzma_config = compress_lzma_config
+        self.enable_concurrent_connection = enable_concurrent_connection
         self.thread_analyzer_config = thread_analyzer_config
         self.precompiled_ot_config = precompiled_ot_config
         self.tflm_config = tflm_config
@@ -255,6 +257,10 @@ class TelinkBuilder(Builder):
 
         if self.compress_lzma_config:
             flags.append("-DCONFIG_COMPRESS_LZMA=y")
+
+        if self.enable_concurrent_connection:
+            flags.append("-DCONFIG_CHIP_ENABLE_CONCURRENT_CONNECTION=y")
+            flags.append("-DCONFIG_CHIP_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING=y")
 
         if self.chip_enable_nfc_onboarding_payload:
             flags.append("-DCONFIG_CHIP_NFC_ONBOARDING_PAYLOAD=y")

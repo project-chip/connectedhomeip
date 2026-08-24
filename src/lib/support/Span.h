@@ -140,13 +140,13 @@ public:
     {
         VerifyOrDie(offset <= mDataLen);
         VerifyOrDie(length <= mDataLen - offset);
-        return Span(mDataBuf + offset, length);
+        return Span(Unchecked, mDataBuf + offset, length);
     }
 
     Span SubSpan(size_t offset) const
     {
         VerifyOrDie(offset <= mDataLen);
-        return Span(mDataBuf + offset, mDataLen - offset);
+        return Span(Unchecked, mDataBuf + offset, mDataLen - offset);
     }
 
     // Allow reducing the size of a span.
@@ -156,31 +156,39 @@ public:
         mDataLen = new_size;
     }
 
-    // Allow creating ByteSpans and CharSpans from ZCL octet strings, so we
-    // don't have to reinvent it various places.
+    // Creates a ByteSpan or CharSpan from a ZCL octet string.
+    // A null pointer is treated as an empty string, yielding an empty span.
     template <class U,
               typename = std::enable_if_t<std::is_same<uint8_t, std::remove_const_t<U>>::value &&
                                           (std::is_same<const uint8_t, T>::value || std::is_same<const char, T>::value)>>
     static Span fromZclString(U * bytes)
     {
+        VerifyOrReturnValue(bytes != nullptr, Span());
         size_t length = bytes[0];
-        // Treat 0xFF (aka "null string") as zero-length.
-        if (length == 0xFF)
-        {
-            length = 0;
-        }
-        // Need reinterpret_cast if we're a CharSpan.
-        return Span(reinterpret_cast<T *>(&bytes[1]), length);
+        // Unchecked since we already checked. Treat 0xFF (aka "null string") as zero-length.
+        return Span(Unchecked, reinterpret_cast<T *>(&bytes[1]), (length != 0xFF) ? length : 0);
     }
 
-    // Creates a CharSpan from a null-terminated C character string.
+    // Creates a CharSpan or ByteSpan from a null-terminated C character string.
+    // A null pointer is treated as an empty string, yielding an empty span.
     //
     // Note that for string literals, the user-defined `_span` string
     // literal operator should be used instead, e.g. `"Hello"_span`.
-    template <class U, typename = std::enable_if_t<std::is_same<T, const U>::value && std::is_same<const char, T>::value>>
+    template <class U,
+              typename = std::enable_if_t<std::is_same<char, std::remove_const_t<U>>::value &&
+                                          (std::is_same<const uint8_t, T>::value || std::is_same<const char, T>::value)>>
     static Span fromCharString(U * chars)
     {
-        return Span(chars, strlen(chars));
+        // Unchecked since we already checked.  Need reinterpret_cast if we're a ByteSpan.
+        return (chars != nullptr) ? Span(Unchecked, reinterpret_cast<T *>(chars), strlen(chars)) : Span();
+    }
+
+    // Creates a ByteSpan that reinterprets the contents of a CharSpan as bytes.
+    template <class U = T, typename = std::enable_if_t<std::is_same<U, T>::value && std::is_same<const uint8_t, T>::value>>
+    static Span fromCharSpan(Span<const char> chars)
+    {
+        // Unchecked, the source span already guarantees data != nullptr unless size == 0.
+        return Span(Unchecked, reinterpret_cast<T *>(chars.data()), chars.size());
     }
 
     // operator== explicitly not implemented on Span, because its meaning
