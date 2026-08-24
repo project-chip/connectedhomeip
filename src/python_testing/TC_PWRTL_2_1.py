@@ -106,7 +106,11 @@ class TC_PWRTL_2_1(MatterBaseTest):
         KNOWN_BITS_MASK = (features.kNodeTopology | features.kTreeTopology |
                            features.kSetTopology | features.kDynamicPowerFlow |
                            features.kElectricalCircuit)
-        reserved_bits = feature_map & ~KNOWN_BITS_MASK
+        # The int() casts are load-bearing. Feature is an IntFlag whose members cover
+        # exactly bits 0..4, so ~KNOWN_BITS_MASK complements only within that mask and
+        # evaluates to 0, which would make the assertion below unconditionally true and
+        # leave bits 5..31 unchecked. Casting to int complements over the full width.
+        reserved_bits = int(feature_map) & ~int(KNOWN_BITS_MASK)
         asserts.assert_equal(reserved_bits, 0,
                              f"Reserved bits set in FeatureMap: 0x{reserved_bits:08X}")
 
