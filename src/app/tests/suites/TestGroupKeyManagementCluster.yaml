@@ -21,9 +21,6 @@ config:
     payload:
         type: char_string
         defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
-    hasGroupcast:
-        type: boolean
-        defaultValue: true
 
 tests:
     - label: "Wait for the commissioned device to be retrieved for alpha"
@@ -33,20 +30,6 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
-
-    - label: "Set noGroupcast flag"
-      cluster: "EqualityCommands"
-      command: "BooleanEquals"
-      arguments:
-          values:
-              - name: "Value1"
-                value: hasGroupcast
-              - name: "Value2"
-                value: false
-      response:
-          - values:
-                - name: "Equals"
-                  saveAs: noGroupcast
 
     - label: "Open Commissioning Window from alpha"
       cluster: "Administrator Commissioning"
@@ -107,7 +90,7 @@ tests:
                 value: nodeId
 
     - label: "Read maxGroupsPerFabric when Groups is used"
-      runIf: noGroupcast
+      PICS: "!GC.S"
       command: "readAttribute"
       attribute: "MaxGroupsPerFabric"
       response:
@@ -115,7 +98,7 @@ tests:
               minValue: 4
 
     - label: "Read maxGroupsPerFabric when Groupcast is used"
-      runIf: hasGroupcast
+      PICS: "GC.S"
       command: "readAttribute"
       attribute: "MaxGroupsPerFabric"
       response:
@@ -780,7 +763,7 @@ tests:
 
     - label: "Add Group 1"
       cluster: "Groups"
-      runIf: noGroupcast
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -797,7 +780,7 @@ tests:
                 value: 0x0101
 
     - label: "Groupcast JoinGroup 1"
-      runIf: hasGroupcast
+      PICS: "GC.S"
       cluster: "Groupcast"
       endpoint: 0
       command: "JoinGroup"
@@ -812,7 +795,7 @@ tests:
 
     - label: "Add Group 2"
       cluster: "Groups"
-      runIf: noGroupcast
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -829,7 +812,7 @@ tests:
                 value: 0x0102
 
     - label: "Groupcast JoinGroup 2"
-      runIf: hasGroupcast
+      PICS: "GC.S"
       cluster: "Groupcast"
       endpoint: 0
       command: "JoinGroup"
@@ -844,7 +827,7 @@ tests:
 
     - label: "Add Group 3"
       cluster: "Groups"
-      runIf: noGroupcast
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -861,7 +844,7 @@ tests:
                 value: 0x0103
 
     - label: "Groupcast JoinGroup 3"
-      runIf: hasGroupcast
+      PICS: "GC.S"
       cluster: "Groupcast"
       endpoint: 0
       command: "JoinGroup"
@@ -876,7 +859,7 @@ tests:
 
     - label: "Add Group 4"
       cluster: "Groups"
-      runIf: noGroupcast
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -893,7 +876,7 @@ tests:
                 value: 0x0104
 
     - label: "Groupcast JoinGroup 4"
-      runIf: hasGroupcast
+      PICS: "GC.S"
       cluster: "Groupcast"
       endpoint: 0
       command: "JoinGroup"
@@ -909,7 +892,7 @@ tests:
     - label: "Add Group 5"
       identity: "beta"
       cluster: "Groups"
-      runIf: noGroupcast
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -926,7 +909,7 @@ tests:
                 value: 0x0105
 
     - label: "Groupcast JoinGroup 5"
-      runIf: hasGroupcast
+      PICS: "GC.S"
       identity: "beta"
       cluster: "Groupcast"
       endpoint: 0
@@ -941,7 +924,7 @@ tests:
                 value: 0x01a3
 
     - label: "Read GroupTable from alpha"
-      runIf: noGroupcast
+      PICS: "!GC.S"
       command: "readAttribute"
       attribute: "GroupTable"
       response:
@@ -974,7 +957,7 @@ tests:
               ]
 
     - label: "Read GroupTable from alpha"
-      runIf: hasGroupcast
+      PICS: "GC.S"
       command: "readAttribute"
       attribute: "GroupTable"
       response:
@@ -987,7 +970,7 @@ tests:
               ]
 
     - label: "Read GroupTable from alpha without fabric filtering"
-      runIf: noGroupcast
+      PICS: "!GC.S"
       command: "readAttribute"
       attribute: "GroupTable"
       fabricFiltered: false
@@ -1027,7 +1010,7 @@ tests:
               ]
 
     - label: "Read GroupTable from alpha without fabric filtering"
-      runIf: hasGroupcast
+      PICS: "GC.S"
       command: "readAttribute"
       attribute: "GroupTable"
       fabricFiltered: false
@@ -1043,7 +1026,7 @@ tests:
 
     - label: "Read GroupTable from beta"
       identity: "beta"
-      runIf: noGroupcast
+      PICS: "!GC.S"
       command: "readAttribute"
       attribute: "GroupTable"
       response:
@@ -1059,7 +1042,7 @@ tests:
 
     - label: "Read GroupTable from beta"
       identity: "beta"
-      runIf: hasGroupcast
+      PICS: "GC.S"
       command: "readAttribute"
       attribute: "GroupTable"
       response:
@@ -1067,7 +1050,7 @@ tests:
 
     - label: "Read GroupTable from beta without fabric filtering"
       identity: "beta"
-      runIf: noGroupcast
+      PICS: "!GC.S"
       command: "readAttribute"
       attribute: "GroupTable"
       fabricFiltered: false
@@ -1108,7 +1091,7 @@ tests:
 
     - label: "Read GroupTable from beta without fabric filtering"
       identity: "beta"
-      runIf: hasGroupcast
+      PICS: "GC.S"
       command: "readAttribute"
       attribute: "GroupTable"
       fabricFiltered: false
@@ -1150,7 +1133,7 @@ tests:
     - label: "Add Group 1 on gamma"
       identity: "gamma"
       cluster: "Groups"
-      runIf: noGroupcast
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -1167,7 +1150,7 @@ tests:
                 value: 0x0101
 
     - label: "Groupcast JoinGroup 1 on gamma"
-      runIf: hasGroupcast
+      PICS: "GC.S"
       identity: "gamma"
       cluster: "Groupcast"
       endpoint: 0
@@ -1184,7 +1167,7 @@ tests:
     - label: "Add Group 2 on gamma"
       identity: "gamma"
       cluster: "Groups"
-      runIf: noGroupcast
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -1201,7 +1184,7 @@ tests:
                 value: 0x0102
 
     - label: "Groupcast JoinGroup 2 on gamma"
-      runIf: hasGroupcast
+      PICS: "GC.S"
       identity: "gamma"
       cluster: "Groupcast"
       endpoint: 0
@@ -1218,7 +1201,7 @@ tests:
     - label: "Add Group 3 on gamma"
       identity: "gamma"
       cluster: "Groups"
-      runIf: noGroupcast
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -1235,7 +1218,7 @@ tests:
                 value: 0x0103
 
     - label: "Groupcast JoinGroup 3 on gamma"
-      runIf: hasGroupcast
+      PICS: "GC.S"
       identity: "gamma"
       cluster: "Groupcast"
       endpoint: 0
@@ -1252,7 +1235,7 @@ tests:
     - label: "Add Group 4 on gamma"
       identity: "gamma"
       cluster: "Groups"
-      runIf: noGroupcast
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -1269,7 +1252,7 @@ tests:
                 value: 0x0104
 
     - label: "Groupcast JoinGroup 4 on gamma"
-      runIf: hasGroupcast
+      PICS: "GC.S"
       identity: "gamma"
       cluster: "Groupcast"
       endpoint: 0
@@ -1286,7 +1269,7 @@ tests:
     - label: "Add Group 5 on gamma"
       identity: "gamma"
       cluster: "Groups"
-      runIf: noGroupcast
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -1303,7 +1286,7 @@ tests:
                 value: 0x0105
 
     - label: "Groupcast JoinGroup 5 on gamma"
-      runIf: hasGroupcast
+      PICS: "GC.S"
       identity: "gamma"
       cluster: "Groupcast"
       endpoint: 0
@@ -1320,7 +1303,7 @@ tests:
     - label: "Add Group 6 on gamma"
       identity: "gamma"
       cluster: "Groups"
-      runIf: noGroupcast
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -1337,7 +1320,7 @@ tests:
                 value: 0x0106
 
     - label: "Groupcast JoinGroup 6 on gamma"
-      runIf: hasGroupcast
+      PICS: "GC.S"
       identity: "gamma"
       cluster: "Groupcast"
       endpoint: 0
@@ -1354,7 +1337,7 @@ tests:
     - label: "Add Group 7 on gamma"
       identity: "gamma"
       cluster: "Groups"
-      runIf: noGroupcast
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -1371,7 +1354,7 @@ tests:
                 value: 0x0107
 
     - label: "Groupcast JoinGroup 7 on gamma"
-      runIf: hasGroupcast
+      PICS: "GC.S"
       identity: "gamma"
       cluster: "Groupcast"
       endpoint: 0
@@ -1388,7 +1371,7 @@ tests:
     - label: "Add Group 8 on gamma"
       identity: "gamma"
       cluster: "Groups"
-      runIf: noGroupcast
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -1405,7 +1388,7 @@ tests:
                 value: 0x0108
 
     - label: "Groupcast JoinGroup 8 on gamma"
-      runIf: hasGroupcast
+      PICS: "GC.S"
       identity: "gamma"
       cluster: "Groupcast"
       endpoint: 0
@@ -1422,7 +1405,7 @@ tests:
     - label: "Add Group 9 on gamma"
       identity: "gamma"
       cluster: "Groups"
-      runIf: noGroupcast
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -1439,7 +1422,7 @@ tests:
                 value: 0x0109
 
     - label: "Groupcast JoinGroup 9 on gamma"
-      runIf: hasGroupcast
+      PICS: "GC.S"
       identity: "gamma"
       cluster: "Groupcast"
       endpoint: 0
@@ -1456,7 +1439,7 @@ tests:
     - label: "Add Group 10 on gamma"
       identity: "gamma"
       cluster: "Groups"
-      runIf: noGroupcast
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -1473,7 +1456,7 @@ tests:
                 value: 0x010a
 
     - label: "Groupcast JoinGroup 10 on gamma"
-      runIf: hasGroupcast
+      PICS: "GC.S"
       identity: "gamma"
       cluster: "Groupcast"
       endpoint: 0
@@ -1490,7 +1473,7 @@ tests:
     - label: "Add Group 11 on gamma"
       identity: "gamma"
       cluster: "Groups"
-      runIf: noGroupcast
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -1507,7 +1490,7 @@ tests:
                 value: 0x010b
 
     - label: "Groupcast JoinGroup 11 on gamma"
-      runIf: hasGroupcast
+      PICS: "GC.S"
       identity: "gamma"
       cluster: "Groupcast"
       endpoint: 0
@@ -1524,7 +1507,7 @@ tests:
     - label: "Add Group 12 on gamma"
       identity: "gamma"
       cluster: "Groups"
-      runIf: noGroupcast
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -1541,7 +1524,7 @@ tests:
                 value: 0x010c
 
     - label: "Groupcast JoinGroup 12 on gamma"
-      runIf: hasGroupcast
+      PICS: "GC.S"
       identity: "gamma"
       cluster: "Groupcast"
       endpoint: 0
@@ -1557,7 +1540,7 @@ tests:
 
     - label: "Read GroupTable from gamma without fabric filtering"
       identity: "gamma"
-      runIf: noGroupcast
+      PICS: "!GC.S"
       command: "readAttribute"
       attribute: "GroupTable"
       fabricFiltered: false
@@ -1670,7 +1653,7 @@ tests:
 
     - label: "Read GroupTable from gamma without fabric filtering"
       identity: "gamma"
-      runIf: hasGroupcast
+      PICS: "GC.S"
       command: "readAttribute"
       attribute: "GroupTable"
       fabricFiltered: false
@@ -1772,7 +1755,7 @@ tests:
                 value: 0x0101
 
     - label: "Read GroupTable 2"
-      runIf: noGroupcast
+      PICS: "!GC.S"
       command: "readAttribute"
       attribute: "GroupTable"
       response:
@@ -1799,7 +1782,7 @@ tests:
               ]
 
     - label: "Read GroupTable 2"
-      runIf: hasGroupcast
+      PICS: "GC.S"
       command: "readAttribute"
       attribute: "GroupTable"
       response:

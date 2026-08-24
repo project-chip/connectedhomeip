@@ -46,9 +46,6 @@ config:
     G2:
         type: group_id
         defaultValue: 0x0002
-    hasGroupcast:
-        type: boolean
-        defaultValue: true
 
 tests:
     - label: "Commission DUT to TH1"
@@ -58,20 +55,6 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
-
-    - label: "Set noGroupcast flag"
-      cluster: "EqualityCommands"
-      command: "BooleanEquals"
-      arguments:
-          values:
-              - name: "Value1"
-                value: hasGroupcast
-              - name: "Value2"
-                value: false
-      response:
-          - values:
-                - name: "Equals"
-                  saveAs: noGroupcast
 
     - label: "TH1 reads the fabric index"
       cluster: "Operational Credentials"
@@ -223,7 +206,7 @@ tests:
                     }
 
     - label: "Preparation step TH1 Map KeySets to GroupId."
-      runIf: noGroupcast
+      PICS: "!GC.S"
       cluster: "Group Key Management"
       endpoint: 0
       command: "writeAttribute"
@@ -236,12 +219,12 @@ tests:
               ]
 
     - label: "TH1 sends a RemoveAllGroups command to DUT."
-      runIf: noGroupcast
+      PICS: "!GC.S"
       cluster: "Groups"
       command: "RemoveAllGroups"
 
     - label: "TH1 sends a AddGroup command to DUT for G1."
-      runIf: noGroupcast
+      PICS: "!GC.S"
       cluster: "Groups"
       command: "AddGroup"
       arguments:
@@ -258,7 +241,7 @@ tests:
                 value: G1
 
     - label: "TH1 sends a JoinGroup command to DUT for G1."
-      runIf: hasGroupcast
+      PICS: "GC.S"
       endpoint: 0
       cluster: "Groupcast"
       command: "JoinGroup"
@@ -272,7 +255,7 @@ tests:
                 value: 0x01a1
 
     - label: "TH1 sends a AddGroup command to DUT for G2."
-      runIf: noGroupcast
+      PICS: "!GC.S"
       cluster: "Groups"
       command: "AddGroup"
       arguments:
@@ -289,7 +272,7 @@ tests:
                 value: G2
 
     - label: "TH1 sends a JoinGroup command to DUT for G2."
-      runIf: hasGroupcast
+      PICS: "GC.S"
       endpoint: 0
       cluster: "Groupcast"
       command: "JoinGroup"
@@ -324,7 +307,7 @@ tests:
 
     - label: "Preparation step TH1 Map KeySets to GroupId."
       identity: "beta"
-      runIf: noGroupcast
+      PICS: "!GC.S"
       cluster: "Group Key Management"
       endpoint: 0
       command: "writeAttribute"
@@ -333,7 +316,7 @@ tests:
           value: [{ FabricIndex: 0, GroupId: G1, GroupKeySetID: 0x01a2 }]
 
     - label: "TH2 sends a AddGroup command to DUT for G1."
-      runIf: noGroupcast
+      PICS: "!GC.S"
       identity: "beta"
       cluster: "Groups"
       command: "AddGroup"
@@ -351,7 +334,7 @@ tests:
                 value: G1
 
     - label: "TH2 sends a JoinGroup command to DUT for G1."
-      runIf: hasGroupcast
+      PICS: "GC.S"
       endpoint: 0
       identity: "beta"
       cluster: "Groupcast"
