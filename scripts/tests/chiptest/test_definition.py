@@ -111,6 +111,8 @@ class App:
 
         for path in self.kvsPathSet | PERSISTENT_CONFIG_PATHS:
             Path(path).unlink(missing_ok=True)
+        Path("thread.log").unlink(missing_ok=True)
+        Path("/run/thread.log").unlink(missing_ok=True)
 
         if wasRunning:
             return self.start()
