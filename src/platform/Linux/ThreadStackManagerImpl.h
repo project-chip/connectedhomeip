@@ -21,6 +21,7 @@
 #include <vector>
 
 #include <app/icd/server/ICDServerConfig.h>
+#include <lib/core/Optional.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/openthread/DBusOpenthread.h>
@@ -42,6 +43,16 @@ class ThreadStackManagerImpl : public ThreadStackManager
 {
 public:
     ThreadStackManagerImpl();
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    void SetThreadEnabledForTest(bool enabled) { mThreadEnabledForTest.SetValue(enabled); }
+    void SetThreadAttachedForTest(bool attached) { mAttached = attached; }
+    void ResetThreadStateForTest()
+    {
+        mThreadEnabledForTest.ClearValue();
+        mAttached = false;
+    }
+#endif
 
     void
     SetNetworkStatusChangeCallback(NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
@@ -155,6 +166,9 @@ private:
     NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 
     bool mAttached;
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    chip::Optional<bool> mThreadEnabledForTest;
+#endif
     uint8_t mExtendedAddress[8];
 };
 
