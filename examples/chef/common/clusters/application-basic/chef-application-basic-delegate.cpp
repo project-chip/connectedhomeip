@@ -38,13 +38,13 @@ ChefDelegate::ChefDelegate(EndpointId endpointId, const char * vendorName, uint1
 CHIP_ERROR ChefDelegate::HandleGetApplicationName(app::AttributeValueEncoder & aEncoder)
 {
     ChipLogProgress(Zcl, "ApplicationBasic::Chef::ChefDelegate::HandleGetApplicationName %s", mApplicationName);
-    return aEncoder.Encode(chip::CharSpan(mApplicationName, strlen(mApplicationName)));
+    return aEncoder.Encode(chip::CharSpan::fromCharString(mApplicationName));
 }
 
 CHIP_ERROR ChefDelegate::HandleGetApplicationVersion(app::AttributeValueEncoder & aEncoder)
 {
     ChipLogProgress(Zcl, "ApplicationBasic::Chef::ChefDelegate::HandleGetApplicationVersion %s", mApplicationVersion);
-    return aEncoder.Encode(chip::CharSpan(mApplicationVersion, strlen(mApplicationVersion)));
+    return aEncoder.Encode(chip::CharSpan::fromCharString(mApplicationVersion));
 }
 
 CHIP_ERROR ChefDelegate::HandleGetAllowedVendorList(app::AttributeValueEncoder & aEncoder)
@@ -62,7 +62,7 @@ CHIP_ERROR ChefDelegate::HandleGetAllowedVendorList(app::AttributeValueEncoder &
 CHIP_ERROR ChefDelegate::HandleGetVendorName(app::AttributeValueEncoder & aEncoder)
 {
     ChipLogProgress(Zcl, "ApplicationBasic::Chef::ChefDelegate::HandleGetVendorName %s", mVendorName);
-    return aEncoder.Encode(chip::CharSpan(mVendorName, strlen(mVendorName)));
+    return aEncoder.Encode(chip::CharSpan::fromCharString(mVendorName));
 }
 
 uint16_t ChefDelegate::HandleGetVendorId()
