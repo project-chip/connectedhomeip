@@ -73,10 +73,23 @@ bool EndpointHasModifyEnabledAlarmsCommand(EndpointId endpointId)
     return false;
 }
 
+// Proxy delegate used only by the codegen integration layer.
+//
+// AlarmBaseCluster is constructed with a mandatory AlarmBase::Delegate& (no nullptr). Apps may register
+// a DishwasherAlarm::Delegate later (or never) via SetDefaultDelegate, so the cluster cannot assume an
+// application delegate exists at construction time.
+//
+// This wrapper is the object passed into AlarmBaseCluster::Config: it lives for the endpoint slot and
+// holds an optional pointer to the application delegate. When registered, command callbacks are forwarded
+// to the app. When mWrapped is null, ModifyEnabledAlarms and ResetAlarms return true so the cluster still
+// updates Matter attributes. That matches master Ember behavior (GetDelegate() == nullptr skipped the
+// callback and allowed the attribute update) and lets example/simulator apps work without product logic.
 class DishwasherAlarmIntegrationDelegateWrapper final : public AlarmBase::Delegate
 {
 public:
-    void Init(DishwasherAlarm::Delegate * wrapped) { mWrapped = wrapped; }
+    void SetWrapped(DishwasherAlarm::Delegate * wrapped) { mWrapped = wrapped; }
+
+    DishwasherAlarm::Delegate * GetWrapped() const { return mWrapped; }
 
     bool ModifyEnabledAlarms(AlarmBase::AlarmMap mask) override
     {
@@ -104,7 +117,6 @@ struct DishwasherAlarmClusterSlot
 {
     LazyRegisteredServerCluster<DishwasherAlarmCluster> cluster;
     DishwasherAlarmIntegrationDelegateWrapper integrationDelegateWrapper;
-    DishwasherAlarm::Delegate * userDelegate = nullptr;
 };
 
 DishwasherAlarmClusterSlot gDishwasherAlarmClusters[kDishwasherAlarmMaxClusterCount];
@@ -112,11 +124,9 @@ DishwasherAlarmClusterSlot gDishwasherAlarmClusters[kDishwasherAlarmMaxClusterCo
 class DishwasherAlarmIntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
-    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
-                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex, uint32_t,
+                                                   uint32_t featureMap) override
     {
-        (void) optionalAttributeBits;
-
         BitFlags<DishwasherAlarm::Feature> features(featureMap);
 
         AlarmBase::AlarmMap supported{};
@@ -141,8 +151,6 @@ public:
             .supportsModifyEnabledAlarms = EndpointHasModifyEnabledAlarmsCommand(endpointId),
         };
 
-        gDishwasherAlarmClusters[clusterInstanceIndex].integrationDelegateWrapper.Init(
-            gDishwasherAlarmClusters[clusterInstanceIndex].userDelegate);
         gDishwasherAlarmClusters[clusterInstanceIndex].cluster.Create(endpointId, config);
 
         DishwasherAlarmCluster & cluster = gDishwasherAlarmClusters[clusterInstanceIndex].cluster.Cluster();
@@ -226,7 +234,8 @@ Delegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, DishwasherAlarm::Id,
                                                        MATTER_DM_DISHWASHER_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return (ep >= kDishwasherAlarmMaxClusterCount ? nullptr : gDishwasherAlarmClusters[ep].userDelegate);
+    return (ep >= kDishwasherAlarmMaxClusterCount ? nullptr
+                                                  : gDishwasherAlarmClusters[ep].integrationDelegateWrapper.GetWrapped());
 }
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
@@ -235,8 +244,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
                                                        MATTER_DM_DISHWASHER_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT);
     if (ep < kDishwasherAlarmMaxClusterCount)
     {
-        gDishwasherAlarmClusters[ep].userDelegate = delegate;
-        gDishwasherAlarmClusters[ep].integrationDelegateWrapper.Init(delegate);
+        gDishwasherAlarmClusters[ep].integrationDelegateWrapper.SetWrapped(delegate);
     }
 }
 
@@ -263,14 +271,13 @@ Status DishwasherAlarmServer::GetLatchValue(EndpointId endpoint, BitMask<AlarmMa
 {
     DishwasherAlarmCluster * cluster = FindClusterOnEndpoint(endpoint);
     VerifyOrReturnError(cluster != nullptr, Status::UnsupportedEndpoint);
+    VerifyOrReturnError(cluster->HasResetFeature(), Status::UnsupportedAttribute);
 
-    AlarmBase::AlarmMap value;
-    Status status = cluster->GetLatch(value);
-    if (status == Status::Success && latch != nullptr)
+    if (latch != nullptr)
     {
-        *latch = ToAlarmMap(value);
+        *latch = ToAlarmMap(cluster->GetLatch());
     }
-    return status;
+    return Status::Success;
 }
 
 Status DishwasherAlarmServer::GetStateValue(EndpointId endpoint, BitMask<AlarmMap> * state)

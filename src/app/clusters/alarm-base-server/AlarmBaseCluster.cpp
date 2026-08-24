@@ -31,14 +31,7 @@ AlarmBaseCluster::AlarmBaseCluster(EndpointId endpointId, ClusterEntry cluster, 
     mSupported(config.supported)
 {}
 
-Status AlarmBaseCluster::GetLatch(AlarmMap & latch) const
-{
-    VerifyOrReturnError(HasResetFeature(), Status::UnsupportedAttribute);
-    latch = mLatch;
-    return Status::Success;
-}
-
-Status AlarmBaseCluster::SetMask(AlarmMap mask)
+Status AlarmBaseCluster::SetMask(const AlarmMap & mask)
 {
     VerifyOrReturnError(mSupported.HasAll(mask), Status::Failure);
     VerifyOrReturnError(SetAttributeValue(mMask, mask, Mask::Id), Status::Success);
@@ -56,7 +49,7 @@ Status AlarmBaseCluster::SetMask(AlarmMap mask)
     return Status::Success;
 }
 
-Status AlarmBaseCluster::SetState(AlarmMap newState, bool ignoreLatchState)
+Status AlarmBaseCluster::SetState(const AlarmMap & newState, bool ignoreLatchState)
 {
     AlarmMap finalNewState = newState;
 
@@ -65,14 +58,10 @@ Status AlarmBaseCluster::SetState(AlarmMap newState, bool ignoreLatchState)
 
     AlarmMap currentState = mState;
 
-    if (!ignoreLatchState)
+    if (!ignoreLatchState && HasResetFeature())
     {
-        AlarmMap latch;
-        if (GetLatch(latch) == Status::Success)
-        {
-            auto bitsToKeep = latch & currentState;
-            finalNewState.Set(bitsToKeep);
-        }
+        auto bitsToKeep = GetLatch() & currentState;
+        finalNewState.Set(bitsToKeep);
     }
 
     VerifyOrReturnError(SetAttributeValue(mState, finalNewState, State::Id), Status::Success);
@@ -86,7 +75,7 @@ Status AlarmBaseCluster::SetState(AlarmMap newState, bool ignoreLatchState)
     return Status::Success;
 }
 
-Status AlarmBaseCluster::ResetLatchedAlarms(AlarmMap alarms)
+Status AlarmBaseCluster::ResetLatchedAlarms(const AlarmMap & alarms)
 {
     VerifyOrReturnError(mSupported.HasAll(alarms), Status::Failure);
 
@@ -164,13 +153,8 @@ std::optional<DataModel::ActionReturnStatus> AlarmBaseCluster::InvokeCommand(con
     }
 }
 
-DataModel::ActionReturnStatus AlarmBaseCluster::HandleReset(AlarmMap alarms)
+DataModel::ActionReturnStatus AlarmBaseCluster::HandleReset(const AlarmMap & alarms)
 {
-    if (!HasResetFeature())
-    {
-        return Status::UnsupportedCommand;
-    }
-
     if (!mSupported.HasAll(alarms))
     {
         return Status::InvalidCommand;
@@ -184,13 +168,8 @@ DataModel::ActionReturnStatus AlarmBaseCluster::HandleReset(AlarmMap alarms)
     return ResetLatchedAlarms(alarms);
 }
 
-DataModel::ActionReturnStatus AlarmBaseCluster::HandleModifyEnabledAlarms(AlarmMap mask)
+DataModel::ActionReturnStatus AlarmBaseCluster::HandleModifyEnabledAlarms(const AlarmMap & mask)
 {
-    if (!mSupportsModifyEnabledAlarms)
-    {
-        return Status::UnsupportedCommand;
-    }
-
     if (!mSupported.HasAll(mask))
     {
         return Status::InvalidCommand;

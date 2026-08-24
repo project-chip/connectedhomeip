@@ -58,11 +58,11 @@ public:
     AlarmBase::AlarmMap GetMask() const { return mMask; }
     AlarmBase::AlarmMap GetState() const { return mState; }
     AlarmBase::AlarmMap GetSupported() const { return mSupported; }
-    Protocols::InteractionModel::Status GetLatch(AlarmBase::AlarmMap & latch) const;
+    AlarmBase::AlarmMap GetLatch() const { return mLatch; }
 
-    Protocols::InteractionModel::Status SetMask(AlarmBase::AlarmMap mask);
-    Protocols::InteractionModel::Status SetState(AlarmBase::AlarmMap newState, bool ignoreLatchState = false);
-    Protocols::InteractionModel::Status ResetLatchedAlarms(AlarmBase::AlarmMap alarms);
+    Protocols::InteractionModel::Status SetMask(const AlarmBase::AlarmMap & mask);
+    Protocols::InteractionModel::Status SetState(const AlarmBase::AlarmMap & newState, bool ignoreLatchState = false);
+    Protocols::InteractionModel::Status ResetLatchedAlarms(const AlarmBase::AlarmMap & alarms);
 
     bool HasResetFeature() const { return mFeature.Has(AlarmBase::Feature::kReset); }
 
@@ -81,9 +81,9 @@ private:
     AlarmBase::AlarmMap mState{};
     const AlarmBase::AlarmMap mSupported;
 
-    DataModel::ActionReturnStatus HandleReset(AlarmBase::AlarmMap alarms);
+    DataModel::ActionReturnStatus HandleReset(const AlarmBase::AlarmMap & alarms);
 
-    DataModel::ActionReturnStatus HandleModifyEnabledAlarms(AlarmBase::AlarmMap mask);
+    DataModel::ActionReturnStatus HandleModifyEnabledAlarms(const AlarmBase::AlarmMap & mask);
 };
 
 } // namespace chip::app::Clusters

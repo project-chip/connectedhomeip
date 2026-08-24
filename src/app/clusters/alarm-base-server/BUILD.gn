@@ -25,5 +25,6 @@ source_set("alarm-base-server") {
   public_deps = [
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/server-cluster",
+    "${chip_root}/zzz_generated/app-common/clusters/DishwasherAlarm",
   ]
 }

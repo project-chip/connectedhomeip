@@ -67,12 +67,9 @@ RefrigeratorAlarmClusterSlot gRefrigeratorAlarmClusters[kRefrigeratorAlarmMaxClu
 class RefrigeratorAlarmIntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
-    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
-                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex, uint32_t,
+                                                   uint32_t) override
     {
-        (void) optionalAttributeBits;
-        (void) featureMap;
-
         AlarmBase::AlarmMap supported{};
         BitMask<RefrigeratorAlarm::AlarmBitmap> supportedDefault{};
         if (Supported::GetDefault(endpointId, &supportedDefault) == Status::Success)
@@ -129,7 +126,7 @@ void MatterRefrigeratorAlarmClusterInitCallback(EndpointId endpointId)
             .clusterId                 = RefrigeratorAlarm::Id,
             .fixedClusterInstanceCount = kRefrigeratorAlarmFixedClusterCount,
             .maxClusterInstanceCount   = kRefrigeratorAlarmMaxClusterCount,
-            .fetchFeatureMap           = true,
+            .fetchFeatureMap           = false,
             .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
