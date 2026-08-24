@@ -138,7 +138,8 @@ void ServerInit(EndpointId endpointId, DelegateArgs &... delegates)
 template <typename... DelegateArgs>
 void ServerInit(EndpointId endpointId, DelegateArgs &... delegates)
 {
-    ServerInit<ThermostatCluster<std::decay_t<DelegateArgs>...>, DelegateArgs...>(endpointId, std::forward<DelegateArgs &>(delegates)...);
+    ServerInit<ThermostatCluster<std::decay_t<DelegateArgs>...>, DelegateArgs...>(endpointId,
+                                                                                  std::forward<DelegateArgs &>(delegates)...);
 }
 
 template <typename ClusterT>
