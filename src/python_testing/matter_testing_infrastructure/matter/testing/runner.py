@@ -366,7 +366,7 @@ def get_test_info(test_class, matter_test_config) -> list[TestInfo]:
     return info
 
 
-async def read_global_wildcard_async(default_controller, node_id):
+async def read_global_wildcard_async(default_controller: ChipDeviceCtrl.ChipDeviceController, node_id: int) -> Attribute.AsyncReadTransaction.ReadResponse:
     """Perform the global wildcard read (Descriptor cluster + AttributeList / FeatureMap /
     AcceptedCommandList on every endpoint) with a 60-second timeout.
 
@@ -391,7 +391,7 @@ async def read_global_wildcard_async(default_controller, node_id):
     )
 
 
-def read_global_wildcard(event_loop, default_controller, node_id):
+def read_global_wildcard(event_loop: asyncio.AbstractEventLoop, default_controller: ChipDeviceCtrl.ChipDeviceController, node_id: int) -> Attribute.AsyncReadTransaction.ReadResponse:
     """Sync wrapper around :func:`read_global_wildcard_async` for callers outside an event loop."""
     return event_loop.run_until_complete(
         read_global_wildcard_async(default_controller, node_id)

@@ -2085,36 +2085,35 @@ class MatterBaseTest(base_test.BaseTestClass):
         return pics_condition
 
     async def _populate_wildcard(self):
-        """Populates self.stored_global_wildcard if not already filled.
-
+        """Populates the stored global wildcard through the stash if not already filled.
+    
         Called by attribute_guard / command_guard / feature_guard before consulting
         the wildcard. Cheap when the value is already present, so calling it from
         every guard entry point is fine.
-
+    
         Value resolution, in order:
-          1. Instance attribute already set (previous guard call did the work).
-          2. Stash populated by the runner (default path — the runner's
-             _prepopulate_global_wildcard finished successfully).
-          3. On-demand read from the DUT. Reached when the runner deliberately
+          1. Stash already populated (either by the runner's _prepopulate_global_wildcard
+             on the default path, or by a prior on-demand read in this same test).
+          2. On-demand read from the DUT. Reached when the runner deliberately
              skipped pre-populate: the test class opted out via
              runner_prepopulates_global_wildcard=False, the CLI passed
              --skip-global-wildcard-population, or the runner's attempt failed
              (e.g. NFC in-test commissioning, file-based BasicComposition).
+             The result is written back to the stash so subsequent guard calls
+             (and the stored_global_wildcard property) see it without re-reading.
         """
-        if getattr(self, 'stored_global_wildcard', None) is not None:
+        if self.stored_global_wildcard is not None:
             return
-
-        stashed = global_stash.unstash_globally(
-            self.user_params.get("stored_global_wildcard"))
-        if stashed is not None:
-            self.stored_global_wildcard = stashed
-            return
-
+    
         # Local import: runner.py imports symbols defined here, so a top-level
         # import would form a cycle.
         from matter.testing.runner import read_global_wildcard_async
-        self.stored_global_wildcard = await read_global_wildcard_async(
+        wildcard = await read_global_wildcard_async(
             self.default_controller, self.dut_node_id)
+        # Write through the stash where stored_global_wildcard reads from — the
+        # property has no setter, so assigning to self.stored_global_wildcard
+        # would raise AttributeError.
+        self.user_params["stored_global_wildcard"] = global_stash.stash_globally(wildcard)
 
     async def attribute_guard(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor):
         """Similar to pics_guard above, except checks a condition and if False marks the test step as skipped and
