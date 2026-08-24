@@ -18,6 +18,9 @@
 
 #pragma once
 
+#include <cstdint>
+#include <vector>
+
 #include <app/clusters/av-analysis-server/AvAnalysisCluster.h>
 
 namespace chip {
@@ -33,7 +36,7 @@ class AnalysisDelegate : public Clusters::AvAnalysisDelegate
 public:
     void ShutdownApp() override {}
 
-    CHIP_ERROR VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR VerifyZoneIDsAreValid(const std::vector<uint16_t> & aZoneIDs) override { return CHIP_NO_ERROR; }
 
     bool CanAddContextTriggers() override { return true; }
 
