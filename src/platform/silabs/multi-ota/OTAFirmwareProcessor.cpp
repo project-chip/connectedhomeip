@@ -18,6 +18,7 @@
 
 #include <platform/silabs/multi-ota/OTAFirmwareProcessor.h>
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
+#include <platform/silabs/BootloaderError.h>
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
@@ -112,7 +113,7 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
 #endif // SL_BTLCTRL_MUX
             if (err)
             {
-                ChipLogError(SoftwareUpdate, "bootloader_eraseWriteStorage() error: %" PRIu32, err);
+                LogBootloaderApiError("bootloader_eraseWriteStorage", static_cast<int32_t>(err));
                 return CHIP_ERROR_CANCELLED;
             }
             mWriteOffset += kAlignmentBytes;
@@ -148,7 +149,7 @@ CHIP_ERROR OTAFirmwareProcessor::ApplyAction()
     CORE_CRITICAL_SECTION(err = bootloader_verifyImage(mSlotId, NULL);)
     if (err != SL_BOOTLOADER_OK)
     {
-        ChipLogError(SoftwareUpdate, "bootloader_verifyImage() error: %" PRIu32, err);
+        LogBootloaderApiError("bootloader_verifyImage", static_cast<int32_t>(err));
         // Call the OTARequestor API to reset the state
         GetRequestorInstance()->CancelImageUpdate();
 #if SL_BTLCTRL_MUX
@@ -165,7 +166,7 @@ CHIP_ERROR OTAFirmwareProcessor::ApplyAction()
     CORE_CRITICAL_SECTION(err = bootloader_setImageToBootload(mSlotId);)
     if (err != SL_BOOTLOADER_OK)
     {
-        ChipLogError(SoftwareUpdate, "bootloader_setImageToBootload() error: %" PRIu32, err);
+        LogBootloaderApiError("bootloader_setImageToBootload", static_cast<int32_t>(err));
         // Call the OTARequestor API to reset the state
         GetRequestorInstance()->CancelImageUpdate();
 #if SL_BTLCTRL_MUX
