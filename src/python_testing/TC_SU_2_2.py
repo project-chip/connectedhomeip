@@ -83,9 +83,10 @@ STEP_RESERVE_SEC = 60
 STEP2_SETTLE_SEC = 20
 # Upper bound for observing Step 6's kQuerying→kIdle cycle via subscription reports. The
 # cycle completes within ~1s of the announce on any DUT (a same-version query is answered
-# and rejected immediately), so this is a generous safety bound, not an expected duration:
-# if the transient kQuerying report is ever coalesced away by the subscription the step
-# falls back to a direct UpdateState read instead of waiting on the full test budget.
+# and rejected immediately), so this is a generous safety bound, not an expected duration.
+# It also bounds the failure case: if the transient kQuerying report is ever coalesced away
+# by the subscription, Phase A fails fast at this timeout instead of waiting on the full
+# test budget.
 STEP6_CYCLE_TIMEOUT_SEC = 120
 
 
@@ -234,8 +235,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
     @async_test_body
     async def test_TC_SU_2_2(self):
         # Each provider (re)start writes to its own log file under this directory instead of
-        # appending to a single shared log, so a step's provider activity — including the
-        # guard's mid-step restarts — can be inspected in isolation. See _next_provider_log_path.
+        # appending to a single shared log, so each step's provider activity can be inspected
+        # in isolation. See _next_provider_log_path.
         self.PROVIDER_LOG_DIR = "provider_logs"
         self._provider_start_count = 0
         os.makedirs(self.PROVIDER_LOG_DIR, exist_ok=True)
@@ -271,7 +272,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         provider_port = self.user_params.get('ota_provider_port', 5541)
 
         # Stored so restart_provider_not_available() can rebuild the provider on the same node
-        # (KVS-persisted commissioning) when absorbing the DUT's autonomous re-queries.
+        # (KVS-persisted commissioning) when switching it to NotAvailable for Step 2.
         self._provider_setup_pincode = provider_setup_pincode
         self._provider_discriminator = provider_discriminator
         self._provider_port = provider_port
@@ -331,13 +332,12 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         #   Phase A — wait for kDelayedOnQuery to confirm the DUT received the Busy/60s
         #             response.  kDownloading before kDelayedOnQuery is an immediate fail.
         #
-        #   Phase B — absorb the DUT's autonomous re-query: swap in a fresh updateNotAvailable
-        #             provider (so the re-query is answered NotAvailable rather than served an
-        #             image — the example provider returns updateAvailable on every response
-        #             after the first), then verify the re-query happened no earlier than the
-        #             120s minimum interval and the DUT settled back to kIdle.  This both checks
-        #             the spec minimum-interval directly and leaves the DUT quiescent so no
-        #             download leaks into Step 2.  kDownloading/kApplying are forbidden throughout.
+        #   Phase B — STRICTLY verify the DUT issues no new QueryImage within the 120s spec
+        #             minimum. The provider serves Busy on every query (--persistQueryImageStatus)
+        #             and is NOT restarted, so the DUT's CASE session stays valid and it simply
+        #             stays in kDelayedOnQuery until it re-queries at ~120s (Busy again — never a
+        #             download). Any kQuerying inside the guard window is a genuine early re-query
+        #             and hard-fails; kDownloading/kApplying also fail.
         # ------------------------------------------------------------------------------------
         step_number_s1 = "[STEP_1]"
         logger.info('%s: Prerequisite #1.0 - Requestor (DUT), NodeID: %s, FabricId: %s',
@@ -614,8 +614,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         self.current_provider_app_proc.terminate()
 
         # kIdle wait removed: when the provider is killed mid-BDX the DUT can take many
-        # minutes to recover (BDX timeout + retry backoff). Step 5 handles any stale
-        # StateTransition events by filtering them in a loop (see Option B comments there).
+        # minutes to recover (BDX timeout + retry backoff). Step 4 tolerates any stale
+        # StateTransition events left behind by filtering them out in its event loop.
 
         self.step(4)
         # ------------------------------------------------------------------------------------
