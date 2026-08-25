@@ -79,7 +79,12 @@ die() {
 # Always succeeds: an unknown tag is an answer, not an error, and the callers
 # run under set -e where a non-zero status would abort the script.
 remote_digest() {
-    docker buildx imagetools inspect --format '{{.Manifest.Digest}}' "$1" 2>/dev/null || true
+    # Parse the Digest line rather than asking for it with --format: older
+    # buildx ignores the flag and prints the whole human readable record, which
+    # still compares as non-empty and so silently defeats any comparison
+    # between two of these. The unformatted output has carried a "Digest:" line
+    # across versions.
+    docker buildx imagetools inspect "$1" 2>/dev/null | awk '$1 == "Digest:" { print $2; exit }'
 }
 
 set -ex

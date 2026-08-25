@@ -30,8 +30,8 @@ CHIP_ERROR WifiConnectAtboot(chip::DeviceLayer::NetworkCommissioning::WiFiDriver
     VerifyOrReturnError(wifiDriver != nullptr, CHIP_ERROR_NOT_IMPLEMENTED);
 
     /* In case WiFi connect at boot is enabled try to set SSID to the predefined value */
-    ByteSpan ssidSpan     = ByteSpan(Uint8::from_const_char(CONFIG_CHIP_APP_WIFI_SSID), strlen(CONFIG_CHIP_APP_WIFI_SSID));
-    ByteSpan passwordSpan = ByteSpan(Uint8::from_const_char(CONFIG_CHIP_APP_WIFI_PASSWORD), strlen(CONFIG_CHIP_APP_WIFI_PASSWORD));
+    ByteSpan ssidSpan     = ByteSpan::fromCharString(CONFIG_CHIP_APP_WIFI_SSID);
+    ByteSpan passwordSpan = ByteSpan::fromCharString(CONFIG_CHIP_APP_WIFI_PASSWORD);
     VerifyOrReturnError(IsSpanUsable(ssidSpan) && IsSpanUsable(passwordSpan), CHIP_ERROR_INVALID_ARGUMENT);
 
     chip::DeviceLayer::NetworkCommissioning::NetworkIterator * networks = wifiDriver->GetNetworks();

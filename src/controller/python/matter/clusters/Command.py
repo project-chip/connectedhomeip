@@ -272,8 +272,8 @@ def TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(future: Future, eventLo
 
 async def SendCommand(future: Future, eventLoop, responseType: type[ClusterCommand] | None,
                       device, commandPath: CommandPath, payload: ClusterCommand, timedRequestTimeoutMs: None | int = None,
-                      interactionTimeoutMs: None | int = None, busyWaitMs: None | int = None, suppressResponse: None | bool = None,
-                      allowLargePayload: None | bool = None) -> PyChipError:
+                      interactionTimeoutMs: None | int = None, busyWaitMs: None | int = None, suppressResponse: bool = False,
+                      allowLargePayload: bool = False) -> PyChipError:
     ''' Send a cluster-object encapsulated command to a device and does the following:
             - On receipt of a successful data response, returns the cluster-object equivalent through the provided future.
             - None (on a successful response containing no data)

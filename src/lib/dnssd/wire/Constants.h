@@ -37,10 +37,16 @@ enum class QType : uint16_t
     MX        = 15,
     TXT       = 16,
     ISDN      = 20,
-    AAAA      = 28,
-    SRV       = 33,
-    DNAM      = 39,
-    ANY       = 255,
+    // RFC 2535 / RFC 2931 — used by SIG(0) for DNS Update authentication.
+    SIG = 24,
+    // RFC 2535 / RFC 3445 — public key used by SRP / ULD.
+    KEY  = 25,
+    AAAA = 28,
+    SRV  = 33,
+    DNAM = 39,
+    // RFC 6891 — EDNS(0) OPT pseudo-RR.
+    OPT = 41,
+    ANY = 255,
 };
 
 /// Flag encoded in QCLASS requesting unicast answers
@@ -62,6 +68,13 @@ enum class QClass : uint16_t
     // Unicast version for the class
     IN_UNICAST = IN | kQClassUnicastAnswerFlag,
     IN_FLUSH   = IN | kQClassResponseFlushBit,
+};
+
+// DNS header OPCODE field
+enum class Opcode : uint8_t
+{
+    kQuery  = 0,
+    kUpdate = 5,
 };
 
 enum class ResourceType
