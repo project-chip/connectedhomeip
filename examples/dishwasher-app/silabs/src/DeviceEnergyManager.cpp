@@ -16,10 +16,10 @@
  *    limitations under the License.
  */
 
+#include "DeviceEnergyManager.h"
 #include "AppConfig.h"
 #include "DataModelHelper.h"
 #include "DeviceEnergyManagementDelegateImpl.h"
-#include "DeviceEnergyManager.h"
 #include "DishwasherManager.h"
 
 using namespace chip;

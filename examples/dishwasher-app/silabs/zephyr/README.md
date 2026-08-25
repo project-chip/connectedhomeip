@@ -368,8 +368,8 @@ This example has the following limitations:
    EFR32MG24 boards; the two cannot be combined in a single image.
 
 3. **Memory Constraints:** Both SoCs have limited RAM and flash memory. The
-   four-endpoint dishwasher data model may require stack/heap tuning relative
-   to the lighting example.
+   four-endpoint dishwasher data model may require stack/heap tuning relative to
+   the lighting example.
 
 4. **Power Management:** Advanced power management features available in other
    Silicon Labs SDKs may not yet be exposed in this Zephyr-based example.

@@ -115,9 +115,8 @@ void ElectricalEnergyMeasurementInstance::Shutdown()
 
 void ElectricalEnergyMeasurementInstance::StartTimer(uint32_t aTimeoutMs)
 {
-    mTimerActive = true;
-    CHIP_ERROR err =
-        SystemLayer().StartTimer(System::Clock::Milliseconds32(aTimeoutMs), TimerEventHandler, this);
+    mTimerActive   = true;
+    CHIP_ERROR err = SystemLayer().StartTimer(System::Clock::Milliseconds32(aTimeoutMs), TimerEventHandler, this);
     if (err != CHIP_NO_ERROR)
     {
         mTimerActive = false;

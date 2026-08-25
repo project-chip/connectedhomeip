@@ -217,17 +217,16 @@ CHIP_ERROR InitElectricalSensorManager()
     VerifyOrReturnError(gESManager, CHIP_ERROR_NO_MEMORY);
 
     ElectricalSensorManager::EpmConfig epmConfig{
-        .features = BitMask<ElectricalPowerMeasurement::Feature, uint32_t>(ElectricalPowerMeasurement::Feature::kDirectCurrent,
-                                                                           ElectricalPowerMeasurement::Feature::kAlternatingCurrent),
-        .optionalAttributes =
-            BitMask<ElectricalPowerMeasurement::OptionalAttributes, uint32_t>(
-                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeVoltage,
-                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeActiveCurrent),
+        .features = BitMask<ElectricalPowerMeasurement::Feature, uint32_t>(
+            ElectricalPowerMeasurement::Feature::kDirectCurrent, ElectricalPowerMeasurement::Feature::kAlternatingCurrent),
+        .optionalAttributes = BitMask<ElectricalPowerMeasurement::OptionalAttributes, uint32_t>(
+            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeVoltage,
+            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeActiveCurrent),
     };
 
     ElectricalSensorManager::EemConfig eemConfig{
-        .features = BitMask<ElectricalEnergyMeasurement::Feature, uint32_t>(ElectricalEnergyMeasurement::Feature::kImportedEnergy,
-                                                                            ElectricalEnergyMeasurement::Feature::kCumulativeEnergy),
+        .features = BitMask<ElectricalEnergyMeasurement::Feature, uint32_t>(
+            ElectricalEnergyMeasurement::Feature::kImportedEnergy, ElectricalEnergyMeasurement::Feature::kCumulativeEnergy),
         .optionalAttributes = ElectricalEnergyMeasurement::ElectricalEnergyMeasurementCluster::OptionalAttributesSet()
                                   .Set<ElectricalEnergyMeasurement::Attributes::CumulativeEnergyReset::Id>(),
         .accuracyStruct = kMeasurementAccuracy,
@@ -427,8 +426,7 @@ void AppTask::PostInitMatterServerInstance()
 
     GetDishwasherManager()->SetCallbacks(ActionInitiated, ActionCompleted);
 
-    OperationalStateEnum state =
-        static_cast<OperationalStateEnum>(OperationalState::GetInstance()->GetCurrentOperationalState());
+    OperationalStateEnum state = static_cast<OperationalStateEnum>(OperationalState::GetInstance()->GetCurrentOperationalState());
     GetDishwasherManager()->UpdateOperationState(state);
     UpdateEpmAttributesForOperationalState(state);
 }

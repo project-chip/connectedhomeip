@@ -41,7 +41,7 @@ void DishwasherApp::DeviceCallbacks::PostAttributeChangeCallback(chip::EndpointI
             return;
         }
 
-        auto state = static_cast<OperationalState::OperationalStateEnum>(*value);
+        auto state              = static_cast<OperationalState::OperationalStateEnum>(*value);
         DishwasherManager * mgr = GetDishwasherManager();
         if (mgr != nullptr)
         {
