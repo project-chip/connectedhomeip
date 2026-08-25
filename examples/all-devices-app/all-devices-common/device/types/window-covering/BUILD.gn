@@ -37,4 +37,6 @@ source_set("logging") {
     "impl/LoggingWindowCovering.cpp",
     "impl/LoggingWindowCovering.h",
   ]
+
+  public_deps = [ ":window-covering" ]
 }
