@@ -688,4 +688,42 @@ TEST_F(AutoCommissionerTest, IsSecondaryNetworkSupportedCombinations)
         EXPECT_EQ(result, c.isSecondaryNetworkSupported);
     }
 }
+
+TEST_F(AutoCommissionerTest, SetCommissioningParametersCopiesSpans)
+{
+    uint8_t source[32]{ 0xde, 0xad }; // length 32 is valid for all these except country code
+    ByteSpan sourceSpan32(source);
+    CharSpan sourceCountryCode = "XX"_span;
+
+    CommissioningParameters params{};
+    params.SetAttestationNonce(sourceSpan32);
+    params.SetCSRNonce(sourceSpan32);
+    params.SetThreadOperationalDataset(sourceSpan32);
+    params.SetWiFiCredentials(WiFiCredentials(sourceSpan32, sourceSpan32));
+    params.SetCountryCode(sourceCountryCode);
+    EXPECT_EQ(mCommissioner.SetCommissioningParameters(params), CHIP_NO_ERROR);
+
+    CommissioningParameters storedParams = mCommissioner.GetCommissioningParameters();
+    ASSERT_TRUE(storedParams.GetAttestationNonce().HasValue());
+    EXPECT_NE(storedParams.GetAttestationNonce().Value().data(), sourceSpan32.data());
+    EXPECT_TRUE(storedParams.GetAttestationNonce().Value().data_equal(sourceSpan32));
+
+    ASSERT_TRUE(storedParams.GetCSRNonce().HasValue());
+    EXPECT_NE(storedParams.GetCSRNonce().Value().data(), sourceSpan32.data());
+    EXPECT_TRUE(storedParams.GetCSRNonce().Value().data_equal(sourceSpan32));
+
+    ASSERT_TRUE(storedParams.GetThreadOperationalDataset().HasValue());
+    EXPECT_NE(storedParams.GetThreadOperationalDataset().Value().data(), sourceSpan32.data());
+    EXPECT_TRUE(storedParams.GetThreadOperationalDataset().Value().data_equal(sourceSpan32));
+
+    ASSERT_TRUE(storedParams.GetWiFiCredentials().HasValue());
+    EXPECT_NE(storedParams.GetWiFiCredentials().Value().ssid.data(), sourceSpan32.data());
+    EXPECT_TRUE(storedParams.GetWiFiCredentials().Value().ssid.data_equal(sourceSpan32));
+    EXPECT_NE(storedParams.GetWiFiCredentials().Value().credentials.data(), sourceSpan32.data());
+    EXPECT_TRUE(storedParams.GetWiFiCredentials().Value().credentials.data_equal(sourceSpan32));
+
+    ASSERT_TRUE(storedParams.GetCountryCode().HasValue());
+    EXPECT_NE(storedParams.GetCountryCode().Value().data(), sourceCountryCode.data());
+    EXPECT_TRUE(storedParams.GetCountryCode().Value().data_equal(sourceCountryCode));
+}
 } // namespace
