@@ -440,8 +440,8 @@ MyBleProxyAdapter gBleAdapter;
 CommissioningProxyBleTransport gBleTransport(gBleAdapter, gTimerDelegate);
 ```
 
-`examples/all-devices-app/posix/linux/CommissioningProxyBleAdapter.cpp` is
-a worked implementation over `BLEManagerImpl`, wired up in that app's
+`examples/all-devices-app/posix/linux/CommissioningProxyBleAdapter.cpp` is a
+worked implementation over `BLEManagerImpl`, wired up in that app's
 `posix/linux/DeviceFactoryPlatformOverride.cpp`.
 
 ## Wi-Fi PAF Transport Integration (planned)
