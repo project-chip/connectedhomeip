@@ -64,7 +64,7 @@ Status AlarmBaseCluster::SetStateInternal(const AlarmMap & newState, bool ignore
 
     AlarmMap currentState = mState;
 
-    if (!ignoreLatchState && HasResetFeature())
+    if (!ignoreLatchState && mFeature.Has(Feature::kReset))
     {
         auto bitsToKeep = GetLatch() & currentState;
         finalNewState.Set(bitsToKeep);
@@ -118,7 +118,7 @@ CHIP_ERROR AlarmBaseCluster::Attributes(const ConcreteClusterPath & path,
     AttributeListBuilder listBuilder(builder);
 
     const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
-        { HasResetFeature(), Latch::kMetadataEntry },
+        { mFeature.Has(Feature::kReset), Latch::kMetadataEntry },
     };
 
     return listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes));
@@ -127,7 +127,7 @@ CHIP_ERROR AlarmBaseCluster::Attributes(const ConcreteClusterPath & path,
 CHIP_ERROR AlarmBaseCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    if (HasResetFeature())
+    if (mFeature.Has(Feature::kReset))
     {
         ReturnErrorOnFailure(builder.AppendElements({ Commands::Reset::kMetadataEntry }));
     }

@@ -270,7 +270,7 @@ Status DishwasherAlarmServer::GetLatchValue(EndpointId endpoint, BitMask<AlarmMa
 {
     DishwasherAlarmCluster * cluster = FindClusterOnEndpoint(endpoint);
     VerifyOrReturnError(cluster != nullptr, Status::UnsupportedEndpoint);
-    VerifyOrReturnError(cluster->HasResetFeature(), Status::UnsupportedAttribute);
+    VerifyOrReturnError(HasResetFeature(endpoint), Status::UnsupportedAttribute);
 
     if (latch != nullptr)
     {
@@ -332,7 +332,7 @@ bool DishwasherAlarmServer::HasResetFeature(EndpointId endpoint)
 {
     DishwasherAlarmCluster * cluster = FindClusterOnEndpoint(endpoint);
     VerifyOrReturnError(cluster != nullptr, false);
-    return cluster->HasResetFeature();
+    return cluster->GetFeatures().Has(Feature::kReset);
 }
 
 namespace Attributes {

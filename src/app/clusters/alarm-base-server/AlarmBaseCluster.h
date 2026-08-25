@@ -59,12 +59,11 @@ public:
     AlarmBase::AlarmMap GetState() const { return mState; }
     AlarmBase::AlarmMap GetSupported() const { return mSupported; }
     AlarmBase::AlarmMap GetLatch() const { return mLatch; }
+    BitMask<AlarmBase::Feature> GetFeatures() const { return mFeature; }
 
     Protocols::InteractionModel::Status SetMask(const AlarmBase::AlarmMap & mask);
     Protocols::InteractionModel::Status SetState(const AlarmBase::AlarmMap & newState);
     Protocols::InteractionModel::Status ResetLatchedAlarms(const AlarmBase::AlarmMap & alarms);
-
-    bool HasResetFeature() const { return mFeature.Has(AlarmBase::Feature::kReset); }
 
 protected:
     virtual void SendNotifyEvent(AlarmBase::AlarmMap becameActive, AlarmBase::AlarmMap becameInactive, AlarmBase::AlarmMap newState,
