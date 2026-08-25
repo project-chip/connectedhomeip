@@ -34,9 +34,16 @@ public:
     LoggingOven(TimerDelegate & timerDelegate, Config config);
     ~LoggingOven() override = default;
 
+    LoggingTemperatureControlledCabinetPart & Cavity() { return mCavity; }
+    LoggingCookSurfacePart & Surface() { return mSurface; }
+
+protected:
+    CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider) override;
+    void UnregisterParts(CodeDrivenDataModelProvider & provider) override;
+
 private:
-    LoggingTemperatureControlledCabinetPart mLoggingCavity;
-    LoggingCookSurfacePart mLoggingSurface;
+    LoggingTemperatureControlledCabinetPart mCavity;
+    LoggingCookSurfacePart mSurface;
 };
 
 } // namespace chip::app
