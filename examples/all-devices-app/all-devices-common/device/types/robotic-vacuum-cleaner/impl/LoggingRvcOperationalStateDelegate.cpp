@@ -131,6 +131,11 @@ void LoggingRvcOperationalStateDelegate::HandleResumeStateCallback(GenericOperat
         return;
     }
 
+    if (targetState == to_underlying(OperationalStateEnum::kRunning))
+    {
+        ClearDockChargingTracking();
+    }
+
     auto error = mCluster->SetOperationalState(targetState);
     err.Set((error == CHIP_NO_ERROR) ? to_underlying(ErrorStateEnum::kNoError)
                                      : to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
@@ -188,6 +193,7 @@ void LoggingRvcOperationalStateDelegate::HandleCharged()
     }
     else
     {
+        ClearDockChargingTracking();
         LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(OperationalStateEnum::kRunning)));
     }
 }
