@@ -94,6 +94,20 @@ target_sources(app
     ${ZEPHYR_PLATFORM_COMMON}/DataModelCallbacks.cpp
 )
 
+if(CONFIG_CHIP_FACTORY_DATA)
+    target_sources(app PRIVATE
+                    ${CHIP_ROOT}/examples/platform/silabs/provision/ProvisionStorageZephyr.cpp
+                    ${CHIP_ROOT}/examples/platform/silabs/provision/ProvisionStorageCommon.cpp
+                    ${CHIP_ROOT}/examples/platform/silabs/provision/ProvisionStorageCustom.cpp
+    )
+    target_include_directories(app PRIVATE
+                    ${CHIP_ROOT}/third_party/silabs/matter_support/provision
+    )
+    target_compile_definitions(app PRIVATE
+        SL_PROVISION_GENERATOR=0
+    )
+endif()
+
 if(CONFIG_CHIP_OTA_REQUESTOR)
     target_sources(app PRIVATE
                     ${ZEPHYR_PLATFORM_COMMON}/ota_requestor/source/OTARequestorInitiatorCommon.cpp
