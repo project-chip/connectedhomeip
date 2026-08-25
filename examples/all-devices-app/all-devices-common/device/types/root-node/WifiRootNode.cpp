@@ -29,7 +29,7 @@ CHIP_ERROR WifiRootNode::Register(EndpointId endpointId, CodeDrivenDataModelProv
 {
     ReturnErrorOnFailure(RootNode::Register(endpointId, provider, composition));
 
-    mWifiDiagnosticsCluster.Create(endpointId, DeviceLayer::GetDiagnosticDataProvider(),
+    mWifiDiagnosticsCluster.Create(endpointId, mContext.diagnosticDataProvider,
                                    WiFiDiagnosticsServerCluster::OptionalAttributeSet{},
                                    BitFlags<WiFiNetworkDiagnostics::Feature>{});
     ReturnErrorOnFailure(provider.AddCluster(mWifiDiagnosticsCluster.Registration()));

@@ -20,7 +20,11 @@
 
 namespace chip::app {
 
-LaundryWasher::LaundryWasher() : SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kLaundryWasher, 1)) {}
+LaundryWasher::LaundryWasher(const Config & config) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kLaundryWasher, 1)),
+    mDiagnosticDataProvider(config.diagnosticDataProvider), mOperationalStateDelegate(config.operationalStateDelegate),
+    mLaundryWasherControlsDelegate(config.controlsDelegate), mLaundryWasherModeDelegate(config.modeDelegate)
+{}
 
 CHIP_ERROR LaundryWasher::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
@@ -28,9 +32,29 @@ CHIP_ERROR LaundryWasher::Register(EndpointId endpoint, CodeDrivenDataModelProvi
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mOperationalStateCluster.Create(endpoint, &mDelegate);
-    mDelegate.SetCluster(&mOperationalStateCluster.Cluster());
+    mOperationalStateCluster.Create(
+        endpoint, mOperationalStateDelegate,
+        Clusters::OperationalState::OperationalStateCluster::Config{
+            .optionalAttributes = Clusters::OperationalState::OperationalStateCluster::OptionalAttributeSet()
+                                      .Set<Clusters::OperationalState::Attributes::CountdownTime::Id>(),
+        });
     ReturnErrorOnFailure(provider.AddCluster(mOperationalStateCluster.Registration()));
+
+    mLaundryWasherControlsCluster.Create(
+        endpoint,
+        Clusters::LaundryWasherControlsCluster::Config(
+            BitFlags<Clusters::LaundryWasherControls::Feature>(Clusters::LaundryWasherControls::Feature::kSpin,
+                                                               Clusters::LaundryWasherControls::Feature::kRinse),
+            mLaundryWasherControlsDelegate));
+    ReturnErrorOnFailure(provider.AddCluster(mLaundryWasherControlsCluster.Registration()));
+
+    mLaundryWasherModeCluster.Create(endpoint, Clusters::ModeBase::kLaundryWasherMode,
+                                     Clusters::ModeBaseCluster::Config{
+                                         .feature                = BitFlags<Clusters::ModeBase::Feature>(),
+                                         .appDelegate            = mLaundryWasherModeDelegate,
+                                         .diagnosticDataProvider = mDiagnosticDataProvider,
+                                     });
+    ReturnErrorOnFailure(provider.AddCluster(mLaundryWasherModeCluster.Registration()));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 
@@ -41,6 +65,16 @@ CHIP_ERROR LaundryWasher::Register(EndpointId endpoint, CodeDrivenDataModelProvi
 void LaundryWasher::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
+    if (mLaundryWasherModeCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mLaundryWasherModeCluster.Cluster()));
+        mLaundryWasherModeCluster.Destroy();
+    }
+    if (mLaundryWasherControlsCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mLaundryWasherControlsCluster.Cluster()));
+        mLaundryWasherControlsCluster.Destroy();
+    }
     if (mOperationalStateCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mOperationalStateCluster.Cluster()));

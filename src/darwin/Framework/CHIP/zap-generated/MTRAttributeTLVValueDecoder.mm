@@ -11017,10 +11017,10 @@ static id _Nullable DecodeAttributeValueForElectricalProtectionAlarmCluster(Attr
             } else {
                 value.nominalDischargeCurrent = nil;
             }
-            if (cppValue.Value().maximumDishargeCurrent.HasValue()) {
-                value.maximumDishargeCurrent = [NSNumber numberWithLongLong:cppValue.Value().maximumDishargeCurrent.Value()];
+            if (cppValue.Value().maximumDischargeCurrent.HasValue()) {
+                value.maximumDischargeCurrent = [NSNumber numberWithLongLong:cppValue.Value().maximumDischargeCurrent.Value()];
             } else {
-                value.maximumDishargeCurrent = nil;
+                value.maximumDischargeCurrent = nil;
             }
             if (cppValue.Value().ratedShortCircuitCurrent.HasValue()) {
                 value.ratedShortCircuitCurrent = [NSNumber numberWithLongLong:cppValue.Value().ratedShortCircuitCurrent.Value()];
@@ -22237,6 +22237,21 @@ static id _Nullable DecodeAttributeValueForPushAVStreamTransportCluster(Attribut
                 return nil;
             }
             value = array_0;
+        }
+        return value;
+    }
+    case Attributes::MaxZones::Id: {
+        using TypeInfo = Attributes::MaxZones::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
         }
         return value;
     }

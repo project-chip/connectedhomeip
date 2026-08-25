@@ -435,6 +435,11 @@
             "MeasuredValue"
         ],
         "Joint Fabric Datastore": ["Status"],
+        "Laundry Dryer Controls": [
+            "ClusterRevision",
+            "SelectedDrynessLevel",
+            "FeatureMap"
+        ],
         "Laundry Washer Controls": [
             "ClusterRevision",
             "SpinSpeeds",
@@ -630,6 +635,7 @@
             "SupportedTemperatureLevels",
             "ClusterRevision"
         ],
+        "Dishwasher Alarm": ["ClusterRevision"],
         "Dishwasher Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Control": [
@@ -647,6 +653,7 @@
         ],
         "Laundry Washer Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "Refrigerator Alarm": ["ClusterRevision"],
         "Refrigerator And Temperature Controlled Cabinet Mode": [
             "SupportedModes",
             "CurrentMode",
