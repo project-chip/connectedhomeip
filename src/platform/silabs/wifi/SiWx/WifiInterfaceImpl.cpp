@@ -416,7 +416,14 @@ sl_status_t SetWifiConfigurations()
             .security = security,
             .encryption = SL_WIFI_DEFAULT_ENCRYPTION,
             .client_options = SL_WIFI_JOIN_WITH_SCAN,
+<<<<<<< HEAD
             .credential_id = SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID,
+=======
+            .credential_id = (security == SL_WIFI_OPEN) ? SL_NET_NO_CREDENTIAL_ID : SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID,
+            .channel_bitmap = {
+                .channel_bitmap_2_4 = SL_WIFI_DEFAULT_CHANNEL_BITMAP
+            },
+>>>>>>> caa12d1 ([Silabs] Remove Wi-Fi mUseQuickJoin skip-scan path (#73737))
         },
         .ip = {
             .mode = SL_IP_MANAGEMENT_DHCP,
@@ -426,9 +433,31 @@ sl_status_t SetWifiConfigurations()
         }
     };
 
+<<<<<<< HEAD
     chip::MutableByteSpan output(profile.config.ssid.value, WFX_MAX_SSID_LENGTH);
     chip::ByteSpan input(wfx_rsi.credentials.ssid, wfx_rsi.credentials.ssidLength);
     chip::CopySpanToMutableSpan(input, output);
+=======
+    chip::MutableByteSpan output(profile.config.ssid.value, kMaxWiFiSSIDLength);
+    chip::ByteSpan input(wfx_rsi.credentials.ssid, wfx_rsi.credentials.ssidLen);
+    TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(input, output);
+
+    if (wfx_rsi.ap_chan != SL_WIFI_AUTO_CHANNEL)
+    {
+        // AP channel is known - This indicates that the network scan was done for a specific SSID.
+        // Providing the channel and BSSID in the profile avoids scanning all channels again.
+        profile.config.channel.channel                   = wfx_rsi.ap_chan;
+        profile.config.channel_bitmap.channel_bitmap_2_4 = (1UL << (wfx_rsi.ap_chan - 1));
+
+        chip::MutableByteSpan bssidSpan(profile.config.bssid.octet, kWiFiBSSIDLength);
+        chip::ByteSpan inBssid(wfx_rsi.ap_bssid.data(), kWiFiBSSIDLength);
+        TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(inBssid, bssidSpan);
+    }
+
+    status = sl_wifi_set_join_configuration(SL_WIFI_CLIENT_INTERFACE, join_feature_bitmap);
+    VerifyOrReturnError(status == SL_STATUS_OK, status,
+                        ChipLogError(DeviceLayer, "sl_wifi_set_join_configuration failed: 0x%" PRIx32, status));
+>>>>>>> caa12d1 ([Silabs] Remove Wi-Fi mUseQuickJoin skip-scan path (#73737))
 
     status = sl_net_set_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
     VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "sl_net_set_profile failed: 0x%lx", status));
@@ -844,6 +873,245 @@ CHIP_ERROR WifiInterfaceImpl::ConfigureBroadcastFilter(bool enableBroadcastFilte
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
+<<<<<<< HEAD
+=======
+CHIP_ERROR WifiInterfaceImpl::GetMacAddress(sl_wfx_interface_t interface, chip::MutableByteSpan & address)
+{
+    VerifyOrReturnError(address.size() >= kWiFiMacAddressLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+#ifdef SL_WFX_CONFIG_SOFTAP
+    chip::ByteSpan byteSpan((interface == SL_WFX_SOFTAP_INTERFACE) ? wfx_rsi.softap_mac : wfx_rsi.sta_mac);
+#else
+    chip::ByteSpan byteSpan(wfx_rsi.sta_mac);
+#endif
+
+    return CopySpanToMutableSpan(byteSpan, address);
+}
+
+CHIP_ERROR WifiInterfaceImpl::StartNetworkScan(chip::ByteSpan ssid, ::ScanCallback callback)
+{
+    VerifyOrReturnError(callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!wfx_rsi.dev_state.Has(WifiState::kScanStarted), CHIP_ERROR_IN_PROGRESS);
+
+    // SSID Max Length that is supported by the Wi-Fi SDK is 32
+    VerifyOrReturnError(ssid.size() <= kMaxWiFiSSIDLength, CHIP_ERROR_INVALID_STRING_LENGTH);
+
+    wfx_rsi.dev_state.Set(WifiInterface::WifiState::kScanStarted);
+    wfx_rsi.scan_cb = callback;
+
+    sl_status_t status = SL_STATUS_OK;
+
+    sl_wifi_scan_configuration_t wifi_scan_configuration = default_wifi_scan_configuration;
+    if (wfx_rsi.dev_state.Has(WifiInterface::WifiState::kStationConnected))
+    {
+        /* Terminate with end of scan which is no ap sent back */
+        wifi_scan_configuration.type                   = SL_WIFI_SCAN_TYPE_ADV_SCAN;
+        wifi_scan_configuration.periodic_scan_interval = kAdvScanPeriodicity;
+    }
+
+    sl_wifi_advanced_scan_configuration_t advanced_scan_configuration = {
+        .trigger_level        = kAdvScanThreshold,
+        .trigger_level_change = kAdvRssiToleranceThreshold,
+        .active_channel_time  = kAdvActiveScanDuration,
+        .passive_channel_time = kAdvPassiveScanDuration,
+        .enable_instant_scan  = kAdvEnableInstantbgScan,
+        .enable_multi_probe   = kAdvMultiProbe,
+    };
+
+    status = sl_wifi_set_advanced_scan_configuration(&advanced_scan_configuration);
+
+    if (status != SL_STATUS_OK)
+    {
+        // Since the log is required for debugging and the error log is present in the invoker itself
+        ChipLogDetail(DeviceLayer, "sl_wifi_set_advanced_scan_configuration failed: 0x%" PRIx32, static_cast<uint32_t>(status));
+
+        // Reset the scan state in case of failure
+        wfx_rsi.dev_state.Clear(WifiInterface::WifiState::kScanStarted);
+        wfx_rsi.scan_cb = nullptr;
+
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    // If an ssid was not provided, we need to call sl_wifi_start_scan with nullptr to scan all Wi-Fi networks
+    sl_wifi_ssid_t requestedSsid      = { { 0 } };
+    sl_wifi_ssid_t * requestedSsidPtr = nullptr;
+
+    if (!ssid.empty())
+    {
+        // Copy the requested SSID to the sl_wifi_ssid_t structure
+        chip::MutableByteSpan requestedSsidSpan(requestedSsid.value, sizeof(requestedSsid.value));
+        ReturnErrorOnFailure(chip::CopySpanToMutableSpan(ssid, requestedSsidSpan));
+        // Copy the length of the requested SSID to the sl_wifi_ssid_t structure
+        requestedSsid.length = static_cast<uint8_t>(ssid.size());
+        requestedSsidPtr     = &requestedSsid;
+    }
+
+    osMutexAcquire(sScanInProgressSemaphore, osWaitForever);
+
+    // NOTE: sending requestedSsidPtr as background scan does not filter for SSID
+    sl_wifi_set_scan_callback(BackgroundScanCallback, requestedSsidPtr);
+    status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, requestedSsidPtr, &wifi_scan_configuration);
+
+    if (SL_STATUS_IN_PROGRESS == status)
+    {
+        // NOTE: Intentional to wait for timeout here as the scan completion is indicated by the callback
+        osSemaphoreAcquire(sScanCompleteSemaphore, kWifiScanTimeoutTicks);
+    }
+
+    osMutexRelease(sScanInProgressSemaphore);
+
+    // Check for errors other than in-progress, since the sl_wifi_start_scan can return in-progress as a success code
+    if (status != SL_STATUS_OK && status != SL_STATUS_IN_PROGRESS)
+    {
+        // Since the log is required for debugging and the error log is present in the invoker itself
+        ChipLogDetail(DeviceLayer, "sl_wifi_start_scan failed: 0x04%" PRIx32, static_cast<uint32_t>(status));
+
+        // Reset the scan state in case of failure
+        wfx_rsi.dev_state.Clear(WifiInterface::WifiState::kScanStarted);
+        wfx_rsi.scan_cb = nullptr;
+
+        return CHIP_ERROR_INTERNAL;
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WifiInterfaceImpl::StartWifiTask()
+{
+    // Verify that the Wifi task has not already been started.
+    VerifyOrReturnError(!(wfx_rsi.dev_state.Has(WifiState::kStationStarted)), CHIP_NO_ERROR);
+    wfx_rsi.dev_state.Set(WifiState::kStationStarted);
+
+    // Creating a Wi-Fi task thread
+    sWlanThread = osThreadNew(MatterWifiTask, NULL, &kWlanTaskAttr);
+    VerifyOrReturnError(sWlanThread != NULL, CHIP_ERROR_NO_MEMORY, ChipLogError(DeviceLayer, "Unable to create the WifiTask."););
+
+    return CHIP_NO_ERROR;
+}
+
+void WifiInterfaceImpl::ConfigureStationMode()
+{
+    wfx_rsi.dev_state.Set(WifiState::kStationMode);
+}
+
+bool WifiInterfaceImpl::IsStationModeEnabled()
+{
+    return wfx_rsi.dev_state.Has(WifiState::kStationMode);
+}
+
+bool WifiInterfaceImpl::IsStationConnected()
+{
+    return wfx_rsi.dev_state.Has(WifiState::kStationConnected);
+}
+
+bool WifiInterfaceImpl::IsStationReady()
+{
+    return wfx_rsi.dev_state.Has(WifiState::kStationInit);
+}
+
+void WifiInterfaceImpl::TriggerDisconnection()
+{
+    PostWifiPlatformEvent(WifiPlatformEvent::kStationDisconnect);
+}
+
+void WifiInterfaceImpl::NotifyConnectivity(void)
+{
+    VerifyOrReturn(!mHasNotifiedWifiConnectivity);
+
+    NotifyConnection(wfx_rsi.ap_mac);
+    mHasNotifiedWifiConnectivity = true;
+}
+
+void WifiInterfaceImpl::ResetConnectivityNotificationFlags(void)
+{
+    ResetIPNotificationStates();
+    mHasNotifiedWifiConnectivity = false;
+
+    WifiPlatformEvent event = WifiPlatformEvent::kConnectionComplete;
+    PostWifiPlatformEvent(event);
+}
+
+#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
+void WifiInterface::GotIPv4Address(uint32_t ip)
+{
+    // Acquire the new IP address
+    for (int i = 0; i < 4; ++i)
+    {
+        wfx_rsi.ip4_addr[i] = (ip >> (i * 8)) & 0xFF;
+    }
+
+    ChipLogDetail(DeviceLayer, "DHCP OK: IP=%d.%d.%d.%d", wfx_rsi.ip4_addr[0], wfx_rsi.ip4_addr[1], wfx_rsi.ip4_addr[2],
+                  wfx_rsi.ip4_addr[3]);
+
+    // Notify the Connectivity Manager - via the app
+    wfx_rsi.dev_state.Set(WifiState::kStationDhcpDone).Set(WifiState::kStationReady);
+    NotifyIPv4Change(true);
+}
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
+
+void WifiInterfaceImpl::ClearWifiCredentials()
+{
+    ChipLogProgress(DeviceLayer, "Clear WiFi Provision");
+
+    wfx_rsi.credentials.Clear();
+    wfx_rsi.dev_state.Clear(WifiState::kStationProvisioned);
+}
+
+CHIP_ERROR WifiInterfaceImpl::GetWifiCredentials(WiFiCredentials & credentials)
+{
+    VerifyOrReturnError(wfx_rsi.dev_state.Has(WifiState::kStationProvisioned), CHIP_ERROR_INCORRECT_STATE);
+    credentials = wfx_rsi.credentials;
+
+    return CHIP_NO_ERROR;
+}
+
+bool WifiInterfaceImpl::IsWifiProvisioned()
+{
+    return wfx_rsi.dev_state.Has(WifiState::kStationProvisioned);
+}
+
+CHIP_ERROR WifiInterfaceImpl::SetWifiCredentials(const WiFiCredentials & credentials)
+{
+    VerifyOrReturnError(credentials.ssidLen, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(credentials.ssidLen <= kMaxWiFiSSIDLength, CHIP_ERROR_INVALID_ARGUMENT);
+    wfx_rsi.credentials = credentials;
+    wfx_rsi.dev_state.Set(WifiState::kStationProvisioned);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WifiInterfaceImpl::ConnectToAccessPoint()
+{
+    VerifyOrReturnError(IsWifiProvisioned(), CHIP_ERROR_INCORRECT_STATE);
+
+    ChipLogProgress(DeviceLayer, "connect to access point: %s", wfx_rsi.credentials.ssid);
+
+    PostWifiPlatformEvent(WifiPlatformEvent::kStationStartScan);
+    return CHIP_NO_ERROR;
+}
+
+bool WifiInterfaceImpl::HasAnIPv4Address()
+{
+    bool hasIPv4 = false;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
+    hasIPv4 = wfx_rsi.dev_state.Has(WifiState::kStationDhcpDone);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
+
+    return hasIPv4;
+}
+
+bool WifiInterfaceImpl::HasAnIPv6Address()
+{
+    // TODO: WifiState::kStationConnected does not guarantee SLAAC IPv6 LLA, maybe use a different FLAG
+    // Once connect is sync instead of async, this should be fine
+    return wfx_rsi.dev_state.Has(WifiState::kStationConnected);
+}
+
+void WifiInterfaceImpl::CancelScanNetworks()
+{
+    // TODO: Implement cancel scan
+}
+
+>>>>>>> caa12d1 ([Silabs] Remove Wi-Fi mUseQuickJoin skip-scan path (#73737))
 } // namespace Silabs
 } // namespace DeviceLayer
 } // namespace chip

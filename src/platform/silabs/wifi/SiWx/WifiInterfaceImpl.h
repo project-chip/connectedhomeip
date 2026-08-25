@@ -102,6 +102,10 @@ private:
      */
     void NotifySuccessfulConnection();
 
+<<<<<<< HEAD
+=======
+    bool mHasNotifiedWifiConnectivity = false;
+>>>>>>> caa12d1 ([Silabs] Remove Wi-Fi mUseQuickJoin skip-scan path (#73737))
     static WifiInterfaceImpl mInstance;
 };
 
