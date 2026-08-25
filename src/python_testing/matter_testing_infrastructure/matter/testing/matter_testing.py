@@ -2430,7 +2430,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         self._dut_confirmed_available = self._dut_confirmed_available or result
         return result
 
-
     async def find_or_establish_pase_session_over_ntl(self, setup_payload: SetupPayload, node_id: int) -> DeviceProxyWrapper | None:
         """Establish a PASE session over NTL.
 
