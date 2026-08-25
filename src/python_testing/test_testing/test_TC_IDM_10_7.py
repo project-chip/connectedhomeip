@@ -21,14 +21,11 @@ import sys
 import unittest
 import logging
 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from TC_IDM_10_7 import TC_IDM_10_7
 
 import matter.clusters as Clusters
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
-
-logging.disable(logging.CRITICAL)
 
 
 def make_descriptor_cluster(parts_list=None):
@@ -58,6 +55,9 @@ class TestTCIDM107MandatoryClustersPresence(unittest.TestCase):
 
     def setUp(self):
         self.tc = TC_IDM_10_7.__new__(TC_IDM_10_7)
+        self.tc_logger = logging.getLogger("TC_IDM_10_7")
+        self.previous_tc_logger_level = self.tc_logger.level
+        self.tc_logger.setLevel(logging.CRITICAL + 1)
 
         self.pics = {}
         self.pics['MCORE.DD.QR'] = False
@@ -65,6 +65,9 @@ class TestTCIDM107MandatoryClustersPresence(unittest.TestCase):
         self.pics['MCORE.DD.NFC'] = True
 
         self.tc.check_pics = lambda key: self.pics.get(key, False)
+
+    def tearDown(self):
+        self.tc_logger.setLevel(self.previous_tc_logger_level)
 
     def assert_missing_ep0_cluster_fails(self, cluster):
         ep0 = make_ep0(include_network_commissioning=False, parts_list=[1])

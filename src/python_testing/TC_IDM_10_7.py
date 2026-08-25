@@ -293,6 +293,24 @@ class TC_IDM_10_7(DeviceConformanceTests):
             log.exception("Wildcard read failed for node 0x%X: %s", node_id, e)
             return False
 
+    def _normalize_for_order_insensitive_compare(self, value):
+        if isinstance(value, dict):
+            return (
+                "dict",
+                tuple(
+                    sorted(
+                        ((repr(k), self._normalize_for_order_insensitive_compare(v)) for k, v in value.items()),
+                        key=repr,
+                    )
+                ),
+            )
+
+        if isinstance(value, (list, tuple, set)):
+            normalized_items = [self._normalize_for_order_insensitive_compare(item) for item in value]
+            return ("seq", tuple(sorted(normalized_items, key=repr)))
+
+        return ("scalar", value)
+
     def _compare_descriptor_clusters(self, limited_data_model: dict, full_data_model: dict) -> bool:
         """
         Compare limited_data_model and full_data_model:
@@ -304,24 +322,6 @@ class TC_IDM_10_7(DeviceConformanceTests):
             True if identical, False otherwise.
         """
         try:
-            def _normalize_for_order_insensitive_compare(value):
-                if isinstance(value, dict):
-                    return (
-                        "dict",
-                        tuple(
-                            sorted(
-                                ((repr(k), _normalize_for_order_insensitive_compare(v)) for k, v in value.items()),
-                                key=repr,
-                            )
-                        ),
-                    )
-
-                if isinstance(value, (list, tuple, set)):
-                    normalized_items = [_normalize_for_order_insensitive_compare(item) for item in value]
-                    return ("seq", tuple(sorted(normalized_items, key=repr)))
-
-                return ("scalar", value)
-
             limited_endpoint_ids = set(limited_data_model.keys())
             full_endpoint_ids = set(full_data_model.keys())
 
@@ -391,7 +391,7 @@ class TC_IDM_10_7(DeviceConformanceTests):
 
                     limited_dm_val = limited_dm_descriptor[attr]
                     full_dm_val = full_dm_descriptor[attr]
-                    if _normalize_for_order_insensitive_compare(limited_dm_val) != _normalize_for_order_insensitive_compare(full_dm_val):
+                    if self._normalize_for_order_insensitive_compare(limited_dm_val) != self._normalize_for_order_insensitive_compare(full_dm_val):
                         log.error("Descriptor attribute %s mismatch on endpoint %s: limited=%s, full=%s",
                                 attr, endpoint_id, limited_dm_val, full_dm_val)
                         return False
