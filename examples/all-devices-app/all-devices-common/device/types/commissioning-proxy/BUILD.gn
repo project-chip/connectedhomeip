@@ -13,36 +13,43 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/src/ble/ble.gni")
-import("${chip_root}/src/platform/device.gni")
 
 source_set("commissioning-proxy") {
-  # The cluster, its transport-agnostic bookkeeping and the transport drivers all come
-  # from the commissioning-proxy-server source_sets in deps below, so the example only
-  # supplies the device wiring and the platform adapters.  This app has
-  # no chip_data_model() rule, so CodegenIntegration.cpp is never compiled — it
-  # wires the Ember/codegen path which this app does not use.
+  # The cluster and its transport-agnostic bookkeeping come from the
+  # commissioning-proxy-server source_set in deps below, so the example only supplies
+  # the device wiring.  This app has no chip_data_model() rule, so
+  # CodegenIntegration.cpp is never compiled — it wires the Ember/codegen path which
+  # this app does not use.
+  #
+  # Transport-agnostic: a transport is added by a subclass under impl/, each in its own
+  # source_set, so a platform without that transport never compiles it.
   sources = [
     "CommissioningProxyDevice.cpp",
     "CommissioningProxyDevice.h",
   ]
 
-  deps = [
+  public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
     "${chip_root}/src/app/clusters/commissioning-proxy-server",
     "${chip_root}/src/lib",
     "${chip_root}/zzz_generated/app-common/devices",
   ]
 
-  if (chip_config_network_layer_ble) {
-    # The BLE transport driver itself lives with the cluster in src/; this app supplies
-    # only the platform adapter it needs (posix/linux/LinuxCommissioningProxyBleAdapter).
-    # Public because CommissioningProxyDevice.h exposes both the transport and the
-    # adapter interface to whoever constructs the device.
-    public_deps = [
-      "${chip_root}/src/app/clusters/commissioning-proxy-server:ble-transport",
-    ]
-  }
-
   include_dirs = [ "." ]
+}
+
+# Commissioning proxy over BLE.  Depend on this only from a target that is itself
+# conditional on chip_config_network_layer_ble; the BLE transport driver lives with the
+# cluster in src/, and this app supplies the platform adapter it needs
+# (posix/linux/CommissioningProxyBleAdapter).
+source_set("ble") {
+  sources = [
+    "impl/CommissioningProxyBleDevice.cpp",
+    "impl/CommissioningProxyBleDevice.h",
+  ]
+
+  public_deps = [
+    ":commissioning-proxy",
+    "${chip_root}/src/app/clusters/commissioning-proxy-server:ble-transport",
+  ]
 }

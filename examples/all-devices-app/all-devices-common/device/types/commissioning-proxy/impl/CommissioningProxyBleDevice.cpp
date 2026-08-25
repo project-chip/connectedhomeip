@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,19 +15,21 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#pragma once
 
-#include <credentials/FabricTable.h>
-#include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <lib/support/TimerDelegate.h>
-
-#include <PosixAudioManager.h>
+#include "CommissioningProxyBleDevice.h"
 
 namespace chip {
 namespace app {
 
-void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, FabricTable & fabricTable,
-                                    PersistentStorageDelegate * storageDelegate, PosixAudioManager & audioManager);
+CommissioningProxyBleDevice::CommissioningProxyBleDevice(
+    const Context & context, Clusters::CommissioningProxy::CommissioningProxyBleAdapter & bleAdapter,
+    const Clusters::CommissioningProxy::CommissioningProxyCluster::Config & config) :
+    CommissioningProxyDevice(context, config), mBleTransport(bleAdapter, context.timerDelegate)
+{
+    // From the constructor body, not the initializer list: mBleTransport is a member of
+    // this class and so is constructed after the base.
+    AddTransport(mBleTransport);
+}
 
 } // namespace app
 } // namespace chip

@@ -23,26 +23,37 @@
 #include <device/types/commissioning-proxy/CommissioningProxyDevice.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
-#include <LinuxCommissioningProxyBleAdapter.h>
+#include <CommissioningProxyBleAdapter.h>
+// The :ble dependency in BUILD.gn is conditional on chip_config_network_layer_ble, which
+// gn check cannot evaluate, hence the nogncheck below.
+#include <device/types/commissioning-proxy/impl/CommissioningProxyBleDevice.h> // nogncheck
 #endif
 
 namespace chip {
 namespace app {
 
-void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate,
-                                    PosixAudioManager & audioManager)
+void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, FabricTable & fabricTable,
+                                    PersistentStorageDelegate * storageDelegate, PosixAudioManager & audioManager)
 {
     if constexpr (ALL_DEVICES_ENABLE_COMMISSIONING_PROXY)
     {
+        const CommissioningProxyDevice::Context proxyContext{ fabricTable, timerDelegate };
 #if CONFIG_NETWORK_LAYER_BLE
         // Outlives every device the factory creates, as the transport holds a reference.
         // Stateless apart from the in-flight scan callback, so one instance serves all.
-        static LinuxCommissioningProxyBleAdapter sBleProxyAdapter;
-        DeviceFactory::GetInstance().RegisterCreator("commissioning-proxy",
-                                                     []() { return std::make_unique<CommissioningProxyDevice>(sBleProxyAdapter); });
+        static CommissioningProxyBleAdapter sBleProxyAdapter;
+        DeviceFactory::GetInstance().RegisterCreator("commissioning-proxy", [proxyContext]() {
+            return std::make_unique<CommissioningProxyBleDevice>(proxyContext, sBleProxyAdapter);
+        });
 #else
-        DeviceFactory::GetInstance().RegisterCreator("commissioning-proxy",
-                                                     []() { return std::make_unique<CommissioningProxyDevice>(); });
+        // No transport is compiled in, so this proxy reports no capabilities and fails
+        // every connect and scan request. Registered anyway so a no-BLE build of the
+        // commissioning-proxy device still produces a usable binary.
+        DeviceFactory::GetInstance().RegisterCreator("commissioning-proxy", [proxyContext]() {
+            return std::make_unique<CommissioningProxyDevice>(
+                proxyContext,
+                Clusters::CommissioningProxy::CommissioningProxyCluster::Config(BitMask<Clusters::CommissioningProxy::Feature>()));
+        });
 #endif
     }
 

@@ -19,45 +19,87 @@
 #pragma once
 
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyCluster.h>
+#include <app/clusters/commissioning-proxy-server/CommissioningProxyTransport.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <credentials/FabricTable.h>
 #include <device/api/SingleEndpoint.h>
-#include <platform/CHIPDeviceConfig.h>
-#include <platform/CHIPDeviceLayer.h>
+#include <lib/support/TimerDelegate.h>
 
-#if CONFIG_NETWORK_LAYER_BLE
-// The ble-transport dependency in BUILD.gn is conditional on chip_config_network_layer_ble
-// The gn check does not evaluate the preprocessor, hence the use of nogncheck below
-// Otherwise the CI, REPL Tests Linux (BUILD) will fail
-#include <app/clusters/commissioning-proxy-server/CommissioningProxyBleAdapter.h>   // nogncheck
-#include <app/clusters/commissioning-proxy-server/CommissioningProxyBleTransport.h> // nogncheck
-#endif
+#include <cstddef>
 
 namespace chip {
 namespace app {
 
+/**
+ * @brief Generic Commissioning Proxy device.
+ *
+ * A commissioning proxy relays commissioning traffic for a device the commissioner
+ * cannot reach directly, over a transport that is not IP: BLE today, Wi-Fi PAF next.
+ * It is not an on-network path — a proxy with no transport registered still answers
+ * reads, but reports an empty Capabilities and fails every ProxyConnectRequest and
+ * ProxyScanRequest. Such a build is only useful to keep a no-transport configuration
+ * compiling; a real product registers at least one transport.
+ *
+ * Transports are supplied by subclasses, one per transport the platform has: see
+ * impl/CommissioningProxyBleDevice.h. A subclass owns its transport as a member and
+ * hands it to AddTransport() from its constructor body.
+ */
 class CommissioningProxyDevice : public SingleEndpoint
 {
 public:
-#if CONFIG_NETWORK_LAYER_BLE
-    /// @param bleAdapter platform BLE hooks for the BLE transport; must outlive this
-    ///                   device. Supplied by the platform device factory.
-    explicit CommissioningProxyDevice(Clusters::CommissioningProxy::CommissioningProxyBleAdapter & bleAdapter);
-#else
-    CommissioningProxyDevice();
-#endif
+    struct Context
+    {
+        /// Watched by the cluster so a removed fabric's sessions and background scans
+        /// go with it.
+        FabricTable & fabricTable;
+        /// Supplies the cluster's response-timeout, scan-watchdog and cache-sweep
+        /// timers, and any timer a registered transport needs.
+        TimerDelegate & timerDelegate;
+    };
+
+    /// @param config the cluster's feature map and supported Wi-Fi bands. Injected
+    ///               rather than fixed here because which features a proxy offers is a
+    ///               product decision; subclasses supply a default that matches the
+    ///               transport they add.
+    CommissioningProxyDevice(const Context & context,
+                             const Clusters::CommissioningProxy::CommissioningProxyCluster::Config & config);
     ~CommissioningProxyDevice() override = default;
+
+    // Non-copyable / non-movable: subclasses pass AddTransport() a reference to a
+    // transport they own as a member, and copying the device would leave that
+    // reference pointing at the original's member.
+    CommissioningProxyDevice(const CommissioningProxyDevice &)             = delete;
+    CommissioningProxyDevice & operator=(const CommissioningProxyDevice &) = delete;
+    CommissioningProxyDevice(CommissioningProxyDevice &&)                  = delete;
+    CommissioningProxyDevice & operator=(CommissioningProxyDevice &&)      = delete;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-private:
-    LazyRegisteredServerCluster<Clusters::CommissioningProxy::CommissioningProxyCluster> mCluster;
+protected:
+    /**
+     * Add a transport this device will expose, to be registered on the cluster when
+     * the device is registered.
+     *
+     * Call this from a subclass constructor body, not from its member initializer
+     * list: the transport is a subclass member and so is constructed after this base.
+     * @p transport must outlive the device.
+     */
+    void AddTransport(Clusters::CommissioningProxy::CommissioningProxyTransport & transport);
 
-    // Platform transport drivers registered on the cluster (owned here).
-#if CONFIG_NETWORK_LAYER_BLE
-    Clusters::CommissioningProxy::CommissioningProxyBleTransport mBleTransport;
-#endif
+private:
+    // One slot per transport type; matches CommissioningProxyCluster's own limit.
+    static constexpr size_t kMaxTransports = 3;
+
+    const Context mContext;
+
+    const Clusters::CommissioningProxy::CommissioningProxyCluster::Config mConfig;
+
+    Clusters::CommissioningProxy::CommissioningProxyTransport * mTransports[kMaxTransports] = {};
+    size_t mTransportCount                                                                  = 0;
+
+    LazyRegisteredServerCluster<Clusters::CommissioningProxy::CommissioningProxyCluster> mCluster;
 };
 
 } // namespace app

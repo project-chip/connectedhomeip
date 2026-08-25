@@ -322,7 +322,8 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         .bindingManager         = Binding::Manager::GetInstance(),
     });
 
-    RegisterDeviceFactoryOverrides(gTimerDelegate, initParams.persistentStorageDelegate, gAudioManager);
+    RegisterDeviceFactoryOverrides(gTimerDelegate, Server::GetInstance().GetFabricTable(), initParams.persistentStorageDelegate,
+                                   gAudioManager);
 
 #if CHIP_CONFIG_ENABLE_GROUPCAST
     // TODO(#72056): Once groupcast is enabled by default, this should not be dependent on the app argument.

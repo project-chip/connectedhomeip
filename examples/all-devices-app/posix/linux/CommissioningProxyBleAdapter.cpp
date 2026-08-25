@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <LinuxCommissioningProxyBleAdapter.h>
+#include "CommissioningProxyBleAdapter.h"
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
@@ -31,7 +31,7 @@ namespace {
 constexpr size_t kBleAddressLength = 6;
 } // namespace
 
-CHIP_ERROR LinuxCommissioningProxyBleAdapter::EnableCentralRole()
+CHIP_ERROR CommissioningProxyBleAdapter::EnableCentralRole()
 {
     // One-way switch: tears down peripheral advertising and re-inits BlueZ as a central.
     // Safe to call when already central; reports CHIP_ERROR_BUSY while prior peripheral
@@ -39,7 +39,7 @@ CHIP_ERROR LinuxCommissioningProxyBleAdapter::EnableCentralRole()
     return DeviceLayer::Internal::BLEMgrImpl().SwitchToCentralMode();
 }
 
-CHIP_ERROR LinuxCommissioningProxyBleAdapter::StartScan(DiscoveryCallback cb, void * context)
+CHIP_ERROR CommissioningProxyBleAdapter::StartScan(DiscoveryCallback cb, void * context)
 {
     VerifyOrReturnError(cb != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -57,17 +57,17 @@ CHIP_ERROR LinuxCommissioningProxyBleAdapter::StartScan(DiscoveryCallback cb, vo
     return err;
 }
 
-void LinuxCommissioningProxyBleAdapter::StopScan()
+void CommissioningProxyBleAdapter::StopScan()
 {
     (void) DeviceLayer::Internal::BLEMgrImpl().StopProxyScan();
     mCallback = nullptr;
     mContext  = nullptr;
 }
 
-void LinuxCommissioningProxyBleAdapter::OnPlatformScanResult(void * context, const uint8_t bdAddr[6], uint16_t discriminator,
-                                                             uint16_t vendorId, uint16_t productId)
+void CommissioningProxyBleAdapter::OnPlatformScanResult(void * context, const uint8_t bdAddr[6], uint16_t discriminator,
+                                                        uint16_t vendorId, uint16_t productId)
 {
-    auto * self = static_cast<LinuxCommissioningProxyBleAdapter *>(context);
+    auto * self = static_cast<CommissioningProxyBleAdapter *>(context);
     VerifyOrReturn(self != nullptr && self->mCallback != nullptr);
 
     self->mCallback(self->mContext, ByteSpan(bdAddr, kBleAddressLength), discriminator, vendorId, productId);

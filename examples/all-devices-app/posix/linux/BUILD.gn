@@ -35,8 +35,8 @@ source_set("linux") {
 
   if (chip_config_network_layer_ble) {
     sources += [
-      "../include/LinuxCommissioningProxyBleAdapter.h",
-      "LinuxCommissioningProxyBleAdapter.cpp",
+      "CommissioningProxyBleAdapter.cpp",
+      "CommissioningProxyBleAdapter.h",
     ]
   }
 
@@ -57,8 +57,10 @@ source_set("linux") {
   deps += [ "${chip_root}/third_party/jsoncpp" ]
 
   if (chip_config_network_layer_ble) {
-    # LinuxCommissioningProxyBleAdapter implements the cluster's BLE adapter interface.
+    # CommissioningProxyBleAdapter implements the cluster's BLE adapter interface,
+    # and the BLE proxy device is the one this platform registers.
     deps += [
+      "${chip_root}/examples/all-devices-app/all-devices-common/device/types/commissioning-proxy:ble",
       "${chip_root}/src/app/clusters/commissioning-proxy-server:ble-transport",
     ]
   }

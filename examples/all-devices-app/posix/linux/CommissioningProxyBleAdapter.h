@@ -34,7 +34,7 @@ namespace app {
  * scan callback it has to remember: the platform scan API hands back one void*,
  * so this holds the caller's callback and context and passes itself instead.
  */
-class LinuxCommissioningProxyBleAdapter : public Clusters::CommissioningProxy::CommissioningProxyBleAdapter
+class CommissioningProxyBleAdapter : public Clusters::CommissioningProxy::CommissioningProxyBleAdapter
 {
 public:
     CHIP_ERROR EnableCentralRole() override;

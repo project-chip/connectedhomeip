@@ -18,35 +18,25 @@
 
 #include "CommissioningProxyDevice.h"
 
-#include <app/server/Server.h>
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/DefaultTimerDelegate.h>
-#include <platform/PlatformManager.h>
-
-using namespace chip::app::Clusters::CommissioningProxy;
 
 namespace chip {
 namespace app {
 
-namespace {
-// Supplies the cluster's response-timeout, scan-watchdog and cache-sweep timers, and the
-// BLE transport's connect-timeout and scan-window timers. File scope rather than local to
-// Register(), because the transport is constructed with it before Register() runs.
-DefaultTimerDelegate gTimerDelegate;
-} // namespace
+CommissioningProxyDevice::CommissioningProxyDevice(const Context & context,
+                                                   const Clusters::CommissioningProxy::CommissioningProxyCluster::Config & config) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCommissioningByProxy, 1)), mContext(context),
+    mConfig(config)
+{}
 
-#if CONFIG_NETWORK_LAYER_BLE
-CommissioningProxyDevice::CommissioningProxyDevice(Clusters::CommissioningProxy::CommissioningProxyBleAdapter & bleAdapter) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCommissioningByProxy, 1)),
-    mBleTransport(bleAdapter, gTimerDelegate)
-{}
-#else
-CommissioningProxyDevice::CommissioningProxyDevice() :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCommissioningByProxy, 1))
-{}
-#endif
+void CommissioningProxyDevice::AddTransport(Clusters::CommissioningProxy::CommissioningProxyTransport & transport)
+{
+    VerifyOrDie(mTransportCount < kMaxTransports);
+    mTransports[mTransportCount++] = &transport;
+}
 
 CHIP_ERROR CommissioningProxyDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                               EndpointComposition composition)
@@ -56,15 +46,22 @@ CHIP_ERROR CommissioningProxyDevice::Register(chip::EndpointId endpoint, CodeDri
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    BitMask<Feature> features(Feature::kBackgroundScan);
+    if (mTransportCount == 0)
+    {
+        ChipLogError(AppServer,
+                     "Commissioning proxy on endpoint %u has no transport: it will report no capabilities and fail every "
+                     "connect and scan request",
+                     endpoint);
+    }
 
     // MaxSessions and MaxCachedResults are Fixed-quality attributes and come from
     // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS / _MAX_CACHED_RESULTS.
-    mCluster.Create(endpoint, Clusters::CommissioningProxy::CommissioningProxyCluster::Config(features), gTimerDelegate,
-                    &Server::GetInstance().GetFabricTable());
-#if CONFIG_NETWORK_LAYER_BLE
-    mCluster.Cluster().RegisterTransport(mBleTransport);
-#endif
+    mCluster.Create(endpoint, mConfig, mContext.timerDelegate, &mContext.fabricTable);
+
+    for (size_t i = 0; i < mTransportCount; i++)
+    {
+        mCluster.Cluster().RegisterTransport(*mTransports[i]);
+    }
 
     ReturnErrorOnFailure(provider.AddCluster(mCluster.Registration()));
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
