@@ -21,6 +21,7 @@
 #include <app_config/enabled_devices.h>
 #include <device-factory/DeviceFactory.h>
 #include <device/types/commissioning-proxy/CommissioningProxyDevice.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <CommissioningProxyBleAdapter.h>
@@ -137,16 +138,30 @@ void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, FabricTable &
 
         const Clusters::CommissioningProxy::CommissioningProxyCluster::Config proxyConfig(proxyFeatures, proxyBands);
 
-        DeviceFactory::GetInstance().RegisterCreator("commissioning-proxy", [proxyContext, proxyConfig]() {
-            auto device = std::make_unique<CommissioningProxyDevice>(proxyContext, proxyConfig);
+        DeviceFactory::GetInstance().RegisterCreator(
+            "commissioning-proxy", [proxyContext, proxyConfig]() -> std::unique_ptr<DeviceInterface> {
+                // Refuse a second proxy. The drivers above are single instances because
+                // the radios they drive are: one BLE scanner, one NAN subscribe slot.
+                // Handing them to a second device would take them over from the first,
+                // leaving it registered but unreachable, and two proxies could not both
+                // work on one radio anyway.
+                static bool sProxyDeviceCreated = false;
+                if (sProxyDeviceCreated)
+                {
+                    ChipLogError(AppServer, "Only one commissioning-proxy device is supported: its transports drive single radios");
+                    return nullptr;
+                }
+                sProxyDeviceCreated = true;
+
+                auto device = std::make_unique<CommissioningProxyDevice>(proxyContext, proxyConfig);
 #if CONFIG_NETWORK_LAYER_BLE
-            device->AddTransport(sBleProxyTransport);
+                device->AddTransport(sBleProxyTransport);
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-            device->AddTransport(sPafProxyTransport);
+                device->AddTransport(sPafProxyTransport);
 #endif
-            return device;
-        });
+                return device;
+            });
     }
 
     if constexpr (ALL_DEVICES_ENABLE_SPEAKER)

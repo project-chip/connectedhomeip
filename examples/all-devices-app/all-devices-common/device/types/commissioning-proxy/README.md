@@ -432,9 +432,9 @@ supporting another technology is one more transport driver and one more
 
 The proxy's own publish lifecycle belongs to the driver, not the device.
 `CommissioningProxyPafTransport` takes the `FabricTable` and calls
-`DisconnectPublishReceiveHandler()` once the proxy is on a fabric: straight
-away if it is already commissioned when the transport is registered, otherwise
-on the commissioning-complete event.
+`DisconnectPublishReceiveHandler()` once the proxy is on a fabric. This app
+registers its transports before `Server::Init()`, so the fabric table is always
+empty at that point and the call happens on the commissioning-complete event.
 
 <hr>
 

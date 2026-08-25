@@ -596,7 +596,10 @@ void CommissioningProxyPafTransport::SetHost(CommissioningProxyCluster * host)
 
     if (mFabricTable->FabricCount() > 0)
     {
-        // Already commissioned, so it will never publish again.
+        // Registered after the fabric table was loaded, and already commissioned, so the
+        // proxy will never publish again. Applications that register their transports
+        // before Server::Init() — all-devices-app among them — always take the branch
+        // below instead, because the fabric table is still empty at that point.
         mAdapter.DisconnectPublishReceiveHandler();
         return;
     }
