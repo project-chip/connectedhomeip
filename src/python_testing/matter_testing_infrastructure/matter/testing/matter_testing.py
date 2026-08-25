@@ -2431,7 +2431,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return result
 
 
-    async def find_or_establish_pase_session_over_ntl(self, setup_payload: SetupPayload, node_id: int) -> DeviceProxyWrapper | None:
+    async def find_or_establish_pase_session_over_ntl(self, setup_payload: SetupPayload, node_id: int) -> ChipDeviceCtrl.DeviceProxyWrapper | None:
         """Establish a PASE session over NTL.
 
         Args:
@@ -2454,11 +2454,11 @@ class MatterBaseTest(base_test.BaseTestClass):
         LOGGER.info("ntl_onboarding_data: %s", ntl_onboarding_data)
 
         # Setup a PASE only session over NTL
-        commissionee = await self.default_controller.FindOrEstablishPASESession(
+        return await self.default_controller.FindOrEstablishPASESession(
             setupCode=ntl_onboarding_data,
             nodeId=node_id
         )
-        return commissionee
+
 
     async def open_commissioning_window(self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None, timeout: int = 900) -> CustomCommissioningParameters:
         """Open a commissioning window on the target device.
