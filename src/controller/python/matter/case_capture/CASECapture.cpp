@@ -638,7 +638,7 @@ private:
     // Ignored if the field was already set: an MRP retransmission or a duplicate delivery
     // must not move the timestamp of the first occurrence. Returns true only on the transition,
     // so a caller can act once on a handshake reaching a given state.
-    static bool RecordTimestamp(PychipCASEHandshakeMetricsRecord & record, uint64_t PychipCASEHandshakeMetricsRecord::* field,
+    static bool RecordTimestamp(PychipCASEHandshakeMetricsRecord & record, uint64_t PychipCASEHandshakeMetricsRecord::*field,
                                 uint8_t bit, uint64_t now)
     {
         VerifyOrReturnValue((record.recordedFields & bit) == 0, false);
