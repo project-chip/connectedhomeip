@@ -68,53 +68,11 @@ class TC_IDM_10_7(DeviceConformanceTests):
 
         self.step(1)    # Perform a 'PASE only' session, over NTL
 
-        nfc_reader_index = self.user_params.get("NFC_Reader_index", 0)
-        reader = matter.testing.nfc.NFCReader(nfc_reader_index)
-
-        nfc_onboarding_data = reader.read_nfc_tag_data()
-        log.info("NFC Tag data : '%s'", nfc_onboarding_data)
-        asserts.assert_true(
-            reader.is_onboarding_data(nfc_onboarding_data),
-            f"'{nfc_onboarding_data}' is not a valid Matter URI"
-        )
-        self.matter_test_config.qr_code_content.append(nfc_onboarding_data)
-
-        # Read the NFC onboarding data
-        payload = SetupPayload().ParseQrCode(nfc_onboarding_data)
-        asserts.assert_true(payload.supports_nfc_commissioning, "Device does not Support NFC Commissioning")
-
-        commissioning_method = self.matter_test_config.in_test_commissioning_method
-        asserts.assert_is_not_none(commissioning_method, "in_test_commissioning_method must not be None")
-        asserts.assert_true(
-            str(commissioning_method).startswith("nfc-"),
-            f"Expected in_test_commissioning_method to start with 'nfc-', got: {commissioning_method}"
-        )
-
         log.info("dut_node_ids 0x%X", node_id)
-        log.info("nfc_onboarding_data: %s", nfc_onboarding_data)
 
-        self.matter_test_config.commissioning_method = commissioning_method
-        nfc_setup_payload = SetupPayload().ParseQrCode(nfc_onboarding_data)
-
-        # Create a new onboarding_data where only the NTL bit (0b10000) is kept in the discovery capabilities bitmask
-        ntl_onboarding_data = SetupPayload().GenerateQrCode(
-            passcode=nfc_setup_payload.setup_passcode,
-            vendorId=nfc_setup_payload.vendor_id,
-            productId=nfc_setup_payload.product_id,
-            discriminator=nfc_setup_payload.long_discriminator,
-            customFlow=nfc_setup_payload.commissioning_flow,
-            capabilities=0b10000,
-            version=nfc_setup_payload.version
-        )
-        log.info("ntl_onboarding_data: %s", ntl_onboarding_data)
-
-        # Setup a PASE only session over NTL
-        commissionee = await self.default_controller.FindOrEstablishPASESession(
-            setupCode=ntl_onboarding_data,
-            nodeId=node_id
-        )
+        commissionee = await self.find_or_establish_pase_session_over_ntl(node_id)
         if commissionee is None:
-            raise RuntimeError("Failed to find or establish PASE session")
+            raise RuntimeError("Failed to find or establish PASE session over NTL")
 
         self.step(2)    # Read of Limited Data Model
 

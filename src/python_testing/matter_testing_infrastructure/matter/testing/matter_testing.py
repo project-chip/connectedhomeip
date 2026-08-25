@@ -32,6 +32,7 @@ import textwrap
 import threading
 import time
 import typing
+import matter.testing.nfc
 from collections.abc import Callable
 from dataclasses import asdict, dataclass, fields
 from datetime import UTC, datetime, timedelta
@@ -2428,6 +2429,62 @@ class MatterBaseTest(base_test.BaseTestClass):
         # Only ever moves from False to True, see commission_devices.
         self._dut_confirmed_available = self._dut_confirmed_available or result
         return result
+
+    async def find_or_establish_pase_session_over_ntl(self, node_id: int) -> DeviceProxyWrapper | None:
+        """Establish a PASE session over NTL.
+
+        Args:
+            node_id: Node ID of target device.
+
+        Returns:
+            DeviceProxyWrapper if PASE session was successfully established, None otherwise.
+        """
+        nfc_reader_index = self.user_params.get("NFC_Reader_index", 0)
+        reader = matter.testing.nfc.NFCReader(nfc_reader_index)
+
+        nfc_onboarding_data = reader.read_nfc_tag_data()
+        LOGGER.info("NFC Tag data : '%s'", nfc_onboarding_data)
+        asserts.assert_true(
+            reader.is_onboarding_data(nfc_onboarding_data),
+            f"'{nfc_onboarding_data}' is not a valid Matter URI"
+        )
+        self.matter_test_config.qr_code_content.append(nfc_onboarding_data)
+
+        # Read the NFC onboarding data
+        payload = SetupPayload().ParseQrCode(nfc_onboarding_data)
+        asserts.assert_true(payload.supports_nfc_commissioning, "Device does not Support NFC Commissioning")
+
+        commissioning_method = self.matter_test_config.in_test_commissioning_method
+        asserts.assert_is_not_none(commissioning_method, "in_test_commissioning_method must not be None")
+        asserts.assert_true(
+            str(commissioning_method).startswith("nfc-"),
+            f"Expected in_test_commissioning_method to start with 'nfc-', got: {commissioning_method}"
+        )
+
+        LOGGER.info("nfc_onboarding_data: %s", nfc_onboarding_data)
+
+        self.matter_test_config.commissioning_method = commissioning_method
+        nfc_setup_payload = SetupPayload().ParseQrCode(nfc_onboarding_data)
+
+        # Create a new onboarding_data where only the NTL bit (0b10000) is kept in the discovery capabilities bitmask
+        ntl_onboarding_data = SetupPayload().GenerateQrCode(
+            passcode=nfc_setup_payload.setup_passcode,
+            vendorId=nfc_setup_payload.vendor_id,
+            productId=nfc_setup_payload.product_id,
+            discriminator=nfc_setup_payload.long_discriminator,
+            customFlow=nfc_setup_payload.commissioning_flow,
+            capabilities=0b10000,
+            version=nfc_setup_payload.version
+        )
+        LOGGER.info("ntl_onboarding_data: %s", ntl_onboarding_data)
+
+        # Setup a PASE only session over NTL
+        commissionee = await self.default_controller.FindOrEstablishPASESession(
+            setupCode=ntl_onboarding_data,
+            nodeId=node_id
+        )
+        return commissionee
+
 
     async def open_commissioning_window(self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None, timeout: int = 900) -> CustomCommissioningParameters:
         """Open a commissioning window on the target device.
