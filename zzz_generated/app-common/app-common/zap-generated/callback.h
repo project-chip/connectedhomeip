@@ -7813,12 +7813,6 @@ bool emberAfElectricalAlarmClusterSetElectricalAlarmThresholdsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ElectricalAlarm::Commands::SetElectricalAlarmThresholds::DecodableType & commandData);
 /**
- * @brief Electrical Protection Alarm Cluster ModifyEnabledAlarms Command callback (from client)
- */
-bool emberAfElectricalProtectionAlarmClusterModifyEnabledAlarmsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ElectricalProtectionAlarm::Commands::ModifyEnabledAlarms::DecodableType & commandData);
-/**
  * @brief Door Lock Cluster LockDoor Command callback (from client)
  */
 bool emberAfDoorLockClusterLockDoorCallback(chip::app::CommandHandler * commandObj,

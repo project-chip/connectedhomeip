@@ -1859,58 +1859,27 @@ namespace Attributes {
 
 namespace Mask {
 Protocols::InteractionModel::Status
-Get(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap> * value); // AlarmBitmap
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap> value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap> value,
-                                        MarkAttributeDirty markDirty);
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap> * value); // AlarmBitmap
 } // namespace Mask
 
 namespace State {
 Protocols::InteractionModel::Status
-Get(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap> * value); // AlarmBitmap
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap> value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap> value,
-                                        MarkAttributeDirty markDirty);
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap> * value); // AlarmBitmap
 } // namespace State
 
 namespace Supported {
 Protocols::InteractionModel::Status
-Get(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap> * value); // AlarmBitmap
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap> value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap> value,
-                                        MarkAttributeDirty markDirty);
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap> * value); // AlarmBitmap
 } // namespace Supported
 
 namespace ArcCause {
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint,
+Protocols::InteractionModel::Status GetDefault(
+    EndpointId endpoint,
     DataModel::Nullable<chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::ArcCauseBitmap>> & value); // ArcCauseBitmap
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::ArcCauseBitmap> value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::ArcCauseBitmap> value,
-                                        MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::ArcCauseBitmap>> & value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::ArcCauseBitmap>> & value,
-    MarkAttributeDirty markDirty);
 } // namespace ArcCause
 
 namespace ClusterRevision {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value); // int16u
 } // namespace ClusterRevision
 
 } // namespace Attributes
@@ -4778,6 +4747,10 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 
 namespace PushAvStreamTransport {
 namespace Attributes {
+
+namespace MaxZones {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
+} // namespace MaxZones
 
 namespace FeatureMap {
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // bitmap32
