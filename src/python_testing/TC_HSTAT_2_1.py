@@ -44,6 +44,7 @@ from TC_HSTAT_common import HSTATBase
 
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_asserts import assert_valid_uint16
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -90,7 +91,7 @@ class TC_HSTAT_2_1(HSTATBase):
             TestStep(15, "TH reads from the DUT the CondPumpEnabled attribute.",
                      "Verify that the DUT response contains a Boolean."),
             TestStep(16, "TH reads from the DUT the CondRunCount attribute.",
-                     "Verify that the DUT response contains an unsigned integer value."),
+                     "Verify that the DUT response contains a uint16."),
         ]
 
     @property
@@ -248,10 +249,10 @@ class TC_HSTAT_2_1(HSTATBase):
 
         self.step(16)
         # TH reads from the DUT the CondRunCount attribute.
-        # Verify that the DUT response contains an unsigned integer value.
+        # Verify that the DUT response contains a uint16.
         if self.condPumpFeatureSupported:
             dut_CondRunCount = await self.read_attribute_expect_success(attribute=self.attributes.CondRunCount)
-            asserts.assert_greater_equal(dut_CondRunCount, 0, "CondRunCount attribute out of range")
+            assert_valid_uint16(dut_CondRunCount, "CondRunCount")
 
 
 if __name__ == "__main__":
