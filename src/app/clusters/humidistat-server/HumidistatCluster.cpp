@@ -103,6 +103,25 @@ Humidistat::SystemStateEnum DefaultSystemStateForMode(Humidistat::ModeEnum mode)
     }
 }
 
+void ApplyDefaultMistTypeFromFeatures(BitFlags<Humidistat::Feature> features,
+                                      DataModel::Nullable<chip::BitMask<MistTypeBitmap>> & mistType)
+{
+    if (!mistType.IsNull() && mistType.Value().HasAny())
+    {
+        return;
+    }
+
+    mistType = DataModel::NullNullable;
+    if (features.Has(Feature::kColdMist))
+    {
+        mistType.SetNonNull(chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold));
+    }
+    else if (features.Has(Feature::kWarmMist))
+    {
+        mistType.SetNonNull(chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistWarm));
+    }
+}
+
 CHIP_ERROR EncodeSupportedModes(BitFlags<Humidistat::Feature> features, const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
     if (features.Has(Feature::kHumidifier))
@@ -144,18 +163,13 @@ HumidistatCluster::HumidistatCluster(EndpointId endpointId, BitFlags<Humidistat:
 {
     VerifyOrDie(IsFeatureConfigurationValid(mFeatures));
 
-    if ((mMode == ModeEnum::kHumidifier) && (mMistType.IsNull() || !mMistType.Value().HasAny()))
+    if (mSystemState == SystemStateEnum::kHumidifying)
     {
-        ChipLogDetail(Zcl, "Humidistat: Startup MistType null/empty in Humidifier mode, applying feature default");
-        mMistType.SetNonNull();
-        if (mFeatures.Has(Feature::kColdMist))
-        {
-            mMistType.Value().Set(MistTypeBitmap::kMistCold);
-        }
-        else if (mFeatures.Has(Feature::kWarmMist))
-        {
-            mMistType.Value().Set(MistTypeBitmap::kMistWarm);
-        }
+        ApplyDefaultMistTypeFromFeatures(mFeatures, mMistType);
+    }
+    else
+    {
+        mMistType = DataModel::NullNullable;
     }
 
     // Spec constraints on Quality F (fixed) setpoint attributes.
@@ -164,7 +178,7 @@ HumidistatCluster::HumidistatCluster(EndpointId endpointId, BitFlags<Humidistat:
     VerifyOrDie(config.step >= 1 && config.step <= static_cast<chip::Percent>(config.maxSetpoint - config.minSetpoint));
     VerifyOrDie((config.maxSetpoint - config.minSetpoint) % config.step == 0);
     VerifyOrDie(IsMistTypeSupportable(mMistType));
-    VerifyOrDie(IsMistTypeConsistentWithMode(mMode, mMistType));
+    VerifyOrDie(IsMistTypeConsistentWithSystemState(mSystemState, mMistType));
 
     // Snap initial setpoints to the valid step grid.
     mUserSetpoint   = SnapToNearestStep(mUserSetpoint);
@@ -252,18 +266,15 @@ void HumidistatCluster::LoadPersistentAttributes()
         {
             loadedMistType.Value().Clear(MistTypeBitmap::kMistWarm);
         }
-        // Spec: MistType SHALL be zero when Mode is not Humidifier.
-        if (mMode != ModeEnum::kHumidifier)
+        // Spec: MistType SHALL be null when SystemState is not Humidifying.
+        if (mSystemState != SystemStateEnum::kHumidifying)
         {
-            if (!loadedMistType.IsNull())
-            {
-                loadedMistType.Value().ClearAll();
-            }
+            loadedMistType = DataModel::NullNullable;
         }
         else if (loadedMistType.IsNull() || !loadedMistType.Value().HasAny())
         {
-            ChipLogDetail(Zcl, "Humidistat: Loaded null/empty MistType in Humidifier mode, using startup default");
-            loadedMistType = mMistType;
+            ChipLogDetail(Zcl, "Humidistat: Loaded null/empty MistType in Humidifying state, using feature default");
+            ApplyDefaultMistTypeFromFeatures(mFeatures, loadedMistType);
         }
         mMistType = loadedMistType;
     }
@@ -356,20 +367,15 @@ bool HumidistatCluster::IsSystemStateSupported(Humidistat::SystemStateEnum syste
     }
 }
 
-bool HumidistatCluster::IsMistTypeConsistentWithMode(Humidistat::ModeEnum mode,
-                                                     DataModel::Nullable<chip::BitMask<Humidistat::MistTypeBitmap>> mistType) const
+bool HumidistatCluster::IsMistTypeConsistentWithSystemState(
+    Humidistat::SystemStateEnum systemState, DataModel::Nullable<chip::BitMask<Humidistat::MistTypeBitmap>> mistType) const
 {
-    if (mistType.IsNull())
+    if (systemState == SystemStateEnum::kHumidifying)
     {
-        return true;
+        return !mistType.IsNull() && mistType.Value().HasAny();
     }
 
-    if (mode == ModeEnum::kHumidifier)
-    {
-        return mistType.Value().HasAny();
-    }
-
-    return !mistType.Value().HasAny();
+    return mistType.IsNull();
 }
 
 bool HumidistatCluster::ShouldTargetSetpointMatchUserSetpoint() const
@@ -462,9 +468,6 @@ CHIP_ERROR HumidistatCluster::SetMode(Humidistat::ModeEnum mode)
 {
     VerifyOrReturnError(IsModeSupported(mode), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
-    const bool shouldClearMistType =
-        mFeatures.Has(Feature::kHumidifier) && (mode != ModeEnum::kHumidifier) && !mMistType.IsNull() && mMistType.Value().HasAny();
-
     if (SetAttributeValue(mMode, mode, Mode::Id))
     {
         if (mContext != nullptr)
@@ -480,10 +483,7 @@ CHIP_ERROR HumidistatCluster::SetMode(Humidistat::ModeEnum mode)
         }
     }
 
-    VerifyOrReturnValue(shouldClearMistType, CHIP_NO_ERROR);
-
-    // Spec: "If the value of Mode is not set to Humidifier, all bits of MistType SHALL be set to zero."
-    return SetMistType(chip::BitMask<MistTypeBitmap>{});
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR HumidistatCluster::SetSystemState(Humidistat::SystemStateEnum systemState)
@@ -501,6 +501,21 @@ CHIP_ERROR HumidistatCluster::SetSystemState(Humidistat::SystemStateEnum systemS
     if (mDelegate != nullptr)
     {
         mDelegate->OnSystemStateChanged(mSystemState);
+    }
+
+    if (mFeatures.Has(Feature::kHumidifier) && (mSystemState != SystemStateEnum::kHumidifying))
+    {
+        LogErrorOnFailure(SetMistType(DataModel::NullNullable));
+        return CHIP_NO_ERROR;
+    }
+
+    if (mFeatures.Has(Feature::kHumidifier) && (mSystemState == SystemStateEnum::kHumidifying) &&
+        (mMistType.IsNull() || !mMistType.Value().HasAny()))
+    {
+        DataModel::Nullable<chip::BitMask<MistTypeBitmap>> defaultMistType = DataModel::NullNullable;
+        ApplyDefaultMistTypeFromFeatures(mFeatures, defaultMistType);
+        LogErrorOnFailure(SetMistType(defaultMistType));
+        return CHIP_NO_ERROR;
     }
 
     return CHIP_NO_ERROR;
@@ -558,8 +573,10 @@ CHIP_ERROR HumidistatCluster::SetUserSetpoint(chip::Percent userSetpoint)
 CHIP_ERROR HumidistatCluster::SetMistType(DataModel::Nullable<chip::BitMask<Humidistat::MistTypeBitmap>> mistType)
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kHumidifier), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    VerifyOrReturnError(IsMistTypeConsistentWithMode(mMode, mistType), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    VerifyOrReturnError(IsMistTypeSupportable(mistType), CHIP_IM_GLOBAL_STATUS(InvalidInState));
+    // Reject non-null MistType when not humidifying (e.g. dehumidifying mode).
+    VerifyOrReturnError(IsMistTypeConsistentWithSystemState(mSystemState, mistType), CHIP_IM_GLOBAL_STATUS(InvalidInState));
+    // Reject bits for mist types whose feature flag is absent (e.g. kMistWarm without kWarmMist).
+    VerifyOrReturnError(IsMistTypeSupportable(mistType), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     if (mistType.IsNull())
     {
@@ -888,20 +905,19 @@ DataModel::ActionReturnStatus HumidistatCluster::HandleSetSettings(chip::TLV::TL
     Commands::SetSettings::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments));
 
-    ModeEnum effectiveMode = mMode;
     if (commandData.mode.HasValue())
     {
         VerifyOrReturnError(IsModeSupported(commandData.mode.Value()), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-        effectiveMode = commandData.mode.Value();
     }
 
-    // Spec: "If the value of Mode is not set to Humidifier, all bits of MistType SHALL be set to zero."
+    // Spec: MistType SHALL be null when SystemState is not Humidifying.
     if (commandData.mistType.HasValue() && mFeatures.Has(Feature::kHumidifier))
     {
-        VerifyOrReturnError(IsMistTypeConsistentWithMode(effectiveMode, commandData.mistType.Value()),
-                            CHIP_IM_GLOBAL_STATUS(ConstraintError));
-        // Spec: unsupported bits SHALL result in INVALID_IN_STATE.
-        VerifyOrReturnError(IsMistTypeSupportable(commandData.mistType.Value()), CHIP_IM_GLOBAL_STATUS(InvalidInState));
+        // Reject non-null MistType when not humidifying (e.g. dehumidifying mode).
+        VerifyOrReturnError(IsMistTypeConsistentWithSystemState(mSystemState, commandData.mistType.Value()),
+                            CHIP_IM_GLOBAL_STATUS(InvalidInState));
+        // Reject bits for mist types whose feature flag is absent (e.g. kMistWarm without kWarmMist).
+        VerifyOrReturnError(IsMistTypeSupportable(commandData.mistType.Value()), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
 
     if (commandData.userSetpoint.HasValue() && mFeatures.Has(Feature::kSensor))
