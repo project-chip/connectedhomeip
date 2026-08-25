@@ -22,7 +22,7 @@
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
-#       --endpoint 0
+#       --endpoint 1
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
@@ -170,7 +170,7 @@ class TC_HSTAT_2_3(HSTATBase):
         self.step(13)
         # TH writes to the DUT the UserSetpoint attribute with MinSetpointValue + StepValue.
         # Verify DUT responds w/ status SUCCESS(0x00)
-        await self.send_SetSettingsCommand_expect_success(userSetpoint=dut_MinSetpoint+dut_Step)
+        await self.write_attribute_expect_success(attribute=self.attributes.UserSetpoint(dut_MinSetpoint+dut_Step))
         if dut_Setpoint != dut_MinSetpoint+dut_Step:
             reportsReceived.append(userSetpointSubscription.wait_for_attribute_report().value)
 
@@ -204,12 +204,13 @@ class TC_HSTAT_2_3(HSTATBase):
         # TH sends command SetSettings with the UserSetpoint field set to MinSetpointValue+1
         # Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)
         if dut_Step > 1:
+            self.step(17)
             # when dut_Step is greater than 1, dut_MinSetpoint + 1 falls within the allowed range
             # but violates the required step alignment, so Status.ConstraintError is expected
             # per the specification.
             await self.send_SetSettingsCommand_expect_error(userSetpoint=dut_MinSetpoint+1, error=Status.ConstraintError)
         else:
-            self.step(17)
+            self.skip_step(17)
 
 
 if __name__ == '__main__':

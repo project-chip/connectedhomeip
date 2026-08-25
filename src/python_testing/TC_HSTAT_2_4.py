@@ -22,7 +22,7 @@
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
-#       --endpoint 0
+#       --endpoint 1
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
@@ -186,7 +186,7 @@ class TC_HSTAT_2_4(HSTATBase):
             self.step(8)
             # TH writes to the DUT the Continuous attribute with False.
             # Verify DUT responds w/ status SUCCESS(0x00) Confirm 2 attribute reports for Continuous with the first having a value of True and the second having a value of False.
-            await self.send_SetSettingsCommand_expect_success(continuous=False)
+            await self.write_attribute_expect_success(attribute=self.attributes.Continuous(False))
             continuousReportsReceived.append(continuousSubscription.wait_for_attribute_report().value)
             asserts.assert_equal(len(continuousReportsReceived), 2, "Wrong number of reports received for Continuous")
             asserts.assert_equal(continuousReportsReceived[0], True, "First report for Continuous is not True")
@@ -210,7 +210,7 @@ class TC_HSTAT_2_4(HSTATBase):
             self.step(11)
             # TH writes to the DUT the Sleep attribute with False.
             # Verify DUT responds w/ status SUCCESS(0x00) Confirm 2 attribute reports for Sleep with the first having a value of True and the second having a value of False.
-            await self.send_SetSettingsCommand_expect_success(sleep=False)
+            await self.write_attribute_expect_success(attribute=self.attributes.Sleep(False))
             sleepReportsReceived.append(sleepSubscription.wait_for_attribute_report().value)
             asserts.assert_equal(len(sleepReportsReceived), 2, "Wrong number of reports received for Sleep")
             asserts.assert_equal(sleepReportsReceived[0], True, "First report for Sleep is not True")
@@ -234,7 +234,7 @@ class TC_HSTAT_2_4(HSTATBase):
             self.step(14)
             # TH writes to the DUT the Optimal attribute with False.
             # Verify DUT responds w/ status SUCCESS(0x00) Confirm 2 attribute reports for Optimal with the first having a value of True and the second having a value of False.
-            await self.send_SetSettingsCommand_expect_success(optimal=False)
+            await self.write_attribute_expect_success(attribute=self.attributes.Optimal(False))
             optimalReportsReceived.append(optimalSubscription.wait_for_attribute_report().value)
             asserts.assert_equal(len(optimalReportsReceived), 2, "Wrong number of reports received for Optimal")
             asserts.assert_equal(optimalReportsReceived[0], True, "First report for Optimal is not True")
@@ -255,7 +255,7 @@ class TC_HSTAT_2_4(HSTATBase):
             self.step(16)
             # TH sends command SetSettings with the Continuous field set to True
             # Verify DUT responds w/ status INVALID_IN_STATE(0xcb)
-            await self.send_SetSettingsCommand_expect_error(continuous=True, error=Status.INVALID_IN_STATE)
+            await self.send_SetSettingsCommand_expect_error(continuous=True, error=Status.InvalidInState)
 
             self.step(17)
             # TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER for AllowContinuous event.
@@ -273,7 +273,7 @@ class TC_HSTAT_2_4(HSTATBase):
             self.step(19)
             # TH sends command SetSettings with the Sleep field set to True
             # Verify DUT responds w/ status INVALID_IN_STATE(0xcb)
-            await self.send_SetSettingsCommand_expect_error(sleep=True, error=Status.INVALID_IN_STATE)
+            await self.send_SetSettingsCommand_expect_error(sleep=True, error=Status.InvalidInState)
 
             self.step(20)
             # TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER for AllowSleep event.
@@ -291,7 +291,7 @@ class TC_HSTAT_2_4(HSTATBase):
             self.step(22)
             # TH sends command SetSettings with the Optimal field set to True
             # Verify DUT responds w/ status INVALID_IN_STATE(0xcb)
-            await self.send_SetSettingsCommand_expect_error(optimal=True, error=Status.INVALID_IN_STATE)
+            await self.send_SetSettingsCommand_expect_error(optimal=True, error=Status.InvalidInState)
 
             self.step(23)
             # TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER for AllowOptimal event.

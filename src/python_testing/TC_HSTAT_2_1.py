@@ -24,7 +24,7 @@
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
-#       --endpoint 0
+#       --endpoint 1
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
@@ -199,60 +199,78 @@ class TC_HSTAT_2_1(HSTATBase):
             asserts.assert_equal((dut_UserSetpoint - dut_MinSetpoint) % dut_Step, 0,
                                  "UserSetpoint attribute is not divisible by (MaxSetpoint - MinSetpoint)")
         else:
+            # Initialize to keep linters happy
+            dut_MinSetpoint = 10
+            dut_MaxSetpoint = 90
+            dut_Step = 10
             self.mark_step_range_skipped(6, 9)
 
-        self.step(10)
         # TH reads from the DUT the TargetSetpoint attribute.
         # Verify that the DUT response contains a value between MinSetpointValue and MaxSetpointValue inclusive.
         if self.optimalFeatureSupported or (self.sensorFeatureSupported and self.attributes.TargetSetpoint.attribute_id in self.supported_attributes):
+            self.step(10)
             dut_TargetSetpoint = await self.read_attribute_expect_success(attribute=self.attributes.TargetSetpoint)
             asserts.assert_greater_equal(dut_TargetSetpoint, dut_MinSetpoint, "TargetSetpoint attribute is less than MinSetpoint")
             asserts.assert_less_equal(dut_TargetSetpoint, dut_MaxSetpoint, "TargetSetpoint attribute is greater than MaxSetpoint")
+        else:
+            self.skip_step(10)
 
-        self.step(11)
         # TH reads from the DUT the MistType attribute.
         # Verify that the DUT response contains a value with at most the 2 least significant bits set.
         if self.humidifierFeatureSupported:
+            self.step(11)
             dut_MistType = await self.read_attribute_expect_success(attribute=self.attributes.MistType)
             log.info("MistType is %s", dut_MistType)
             if dut_MistType != NullValue:
                 asserts.assert_greater_equal(dut_MistType, 1, "MistType attribute out of range")
                 asserts.assert_less_equal(dut_MistType, 3, "MistType attribute out of range")
+        else:
+            self.skip_step(11)
 
-        self.step(12)
         # TH reads from the DUT the Continuous attribute.
         # Verify that the DUT response contains a Boolean.
         if self.continuousFeatureSupported:
+            self.step(12)
             dut_Continuous = await self.read_attribute_expect_success(attribute=self.attributes.Continuous)
             asserts.assert_true(isinstance(dut_Continuous, bool), "Continuous attribute must be a Boolean")
+        else:
+            self.skip_step(12)
 
-        self.step(13)
         # TH reads from the DUT the Sleep attribute.
         # Verify that the DUT response contains a Boolean.
         if self.attributes.Sleep.attribute_id in self.supported_attributes:
+            self.step(13)
             dut_Sleep = await self.read_attribute_expect_success(attribute=self.attributes.Sleep)
             asserts.assert_true(isinstance(dut_Sleep, bool), "Sleep attribute must be a Boolean")
+        else:
+            self.skip_step(13)
 
-        self.step(14)
         # TH reads from the DUT the Optimal attribute.
         # Verify that the DUT response contains a Boolean.
         if self.optimalFeatureSupported:
+            self.step(14)
             dut_Optimal = await self.read_attribute_expect_success(attribute=self.attributes.Optimal)
             asserts.assert_true(isinstance(dut_Optimal, bool), "Optimal attribute must be a Boolean")
+        else:
+            self.skip_step(14)
 
-        self.step(15)
         # TH reads from the DUT the CondPumpEnabled attribute.
         # Verify that the DUT response contains a Boolean.
         if self.condPumpFeatureSupported:
+            self.step(15)
             dut_CondPumpEnabled = await self.read_attribute_expect_success(attribute=self.attributes.CondPumpEnabled)
             asserts.assert_true(isinstance(dut_CondPumpEnabled, bool), "CondPumpEnabled attribute must be a Boolean")
+        else:
+            self.skip_step(15)
 
-        self.step(16)
         # TH reads from the DUT the CondRunCount attribute.
         # Verify that the DUT response contains a uint16.
         if self.condPumpFeatureSupported:
+            self.step(16)
             dut_CondRunCount = await self.read_attribute_expect_success(attribute=self.attributes.CondRunCount)
             assert_valid_uint16(dut_CondRunCount, "CondRunCount")
+        else:
+            self.skip_step(16)
 
 
 if __name__ == "__main__":

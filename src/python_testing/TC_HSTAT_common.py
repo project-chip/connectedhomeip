@@ -115,11 +115,11 @@ class HSTATBase(MatterBaseTest):
         """
         await self.send_single_cmd(cmd=self.SetSettings(**kwargs), endpoint=self.get_endpoint(), timedRequestTimeoutMs=1000)
 
-    async def send_SetSettingsCommand_expect_error(self, error: Status = Status.Success, **kwargs: Any) -> None:
+    async def send_SetSettingsCommand_expect_error(self, error: Status, **kwargs: Any) -> None:
         """Sends the SetSettings command to the DUT and asserts that an expected error is returned.
 
         Args:
-            error: The expected InteractionModel Status error code. Defaults to Status.Success.
+            error: The expected InteractionModel Status error code.
             **kwargs: Keyword arguments passed to the SetSettings command.
         """
         try:

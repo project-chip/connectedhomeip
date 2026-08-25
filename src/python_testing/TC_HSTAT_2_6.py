@@ -22,7 +22,7 @@
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
-#       --endpoint 0
+#       --endpoint 1
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
@@ -109,12 +109,12 @@ class TC_HSTAT_2_6(HSTATBase):
         self.step(5)
         # TH sends command SetSettings with the MistType field set to MistCold
         # Verify DUT responds w/ status INVALID_IN_STATE(0xcb)
-        await self.send_SetSettingsCommand_expect_error(mistType=self.mistBitmap.kMistCold, error=Status.INVALID_IN_STATE)
+        await self.send_SetSettingsCommand_expect_error(mistType=self.mistBitmap.kMistCold, error=Status.InvalidInState)
 
         self.step(6)
         # TH sends command SetSettings with the MistType field set to MistWarm
         # Verify DUT responds w/ status INVALID_IN_STATE(0xcb)
-        await self.send_SetSettingsCommand_expect_error(mistType=self.mistBitmap.kMistWarm, error=Status.INVALID_IN_STATE)
+        await self.send_SetSettingsCommand_expect_error(mistType=self.mistBitmap.kMistWarm, error=Status.InvalidInState)
 
         self.step(7)
         # TH reads from the DUT the MistType attribute.

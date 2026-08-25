@@ -22,7 +22,7 @@
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
-#       --endpoint 0
+#       --endpoint 1
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
@@ -128,7 +128,7 @@ class TC_HSTAT_2_5(HSTATBase):
             self.step(6)
             # TH writes to the DUT the MistType attribute with only the MistCold bit set
             # Verify DUT responds w/ status SUCCESS(0x00)
-            await self.send_SetSettingsCommand_expect_success(mistType=self.mistBitmap.kMistCold)
+            await self.write_attribute_expect_success(attribute=self.attributes.MistType(self.mistBitmap.kMistCold))
 
             self.step(7)
             # TH reads from the DUT the MistType attribute.
@@ -158,7 +158,7 @@ class TC_HSTAT_2_5(HSTATBase):
             self.step(10)
             # TH sends command SetSettings with the MistType field set to MistWarm
             # Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)
-            await self.send_SetSettingsCommand_expect_error(mistType=self.mistBitmap.kMistWarm, error=Status.CONSTRAINT_ERROR)
+            await self.send_SetSettingsCommand_expect_error(mistType=self.mistBitmap.kMistWarm, error=Status.ConstraintError)
         else:
             self.skip_step(10)
 
@@ -166,7 +166,7 @@ class TC_HSTAT_2_5(HSTATBase):
             self.step(11)
             # TH sends command SetSettings with the MistType field set to MistCold
             # Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)
-            await self.send_SetSettingsCommand_expect_error(mistType=self.mistBitmap.kMistCold, error=Status.CONSTRAINT_ERROR)
+            await self.send_SetSettingsCommand_expect_error(mistType=self.mistBitmap.kMistCold, error=Status.ConstraintError)
         else:
             self.skip_step(11)
 

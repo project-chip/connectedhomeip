@@ -24,7 +24,7 @@
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
-#       --endpoint 0
+#       --endpoint 1
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
@@ -187,9 +187,9 @@ class TC_HSTAT_2_2(HSTATBase):
         # TH sends command SetSettings with the Mode field to humidifier or dehumidifier
         # Verify DUT responds w/ status SUCCESS(0x00)
         if self.humidifierFeatureSupported:
-            await self.write_attribute_expect_success(attribute=self.attributes.Mode(self.modeHumidifier))
+            await self.send_SetSettingsCommand_expect_success(mode=self.modeHumidifier)
         else:
-            await self.write_attribute_expect_success(attribute=self.attributes.Mode(self.modeDehumidifier))
+            await self.send_SetSettingsCommand_expect_success(mode=self.modeDehumidifier)
 
         # TH sends command SetSettings with the Mode field set to Humidifier
         # Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)
