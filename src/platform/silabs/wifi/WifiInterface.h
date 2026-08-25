@@ -296,7 +296,6 @@ public:
      *        connection attempt was successful or not.
      *
      *        The returned error code only indicates if the connection attempt was triggered or not.
-     *        On retry after failure, the implementation may use quick join (no scan) when channel/BSSID are known.
      *
      * @return CHIP_ERROR CHIP_NO_ERROR, the connection attempt was succesfully triggered
      *                    CHIP_ERROR_INCORRECT_STATE, the Wi-Fi station does not have any Wi-Fi credentials
