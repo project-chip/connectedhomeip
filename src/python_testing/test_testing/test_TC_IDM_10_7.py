@@ -16,10 +16,10 @@
 #    limitations under the License.
 #
 
+import logging
 import os
 import sys
 import unittest
-import logging
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
