@@ -16,10 +16,10 @@
 #    limitations under the License.
 #
 
+import logging
 import os
 import sys
 import unittest
-import logging
 
 from TC_IDM_10_7 import TC_IDM_10_7
 
