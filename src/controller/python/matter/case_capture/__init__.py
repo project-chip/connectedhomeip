@@ -42,6 +42,7 @@ import ctypes
 import logging
 import queue
 import threading
+from collections.abc import Callable
 from dataclasses import dataclass
 
 from ..native import GetLibraryHandle, HandleFlags, NativeLibraryHandleMethodArguments, PyChipError
@@ -159,7 +160,7 @@ class PyCASEHandshakeMetricsRecord(ctypes.Structure):
 class CASEHandshakeMetrics:
     """One initiator-side CASE handshake.
 
-    Three durations, all in milliseconds and all None when the handshake did not reach
+    Four durations, all in milliseconds and all None when the handshake did not reach
     that point:
 
         device_discovery_duration_ms          operational discovery, before any Sigma message
@@ -280,7 +281,7 @@ class CASEHandshakeMetrics:
         """True if a full Sigma1/Sigma2/Sigma3 handshake ran to its StatusReport.
 
         Structural only: it says the four messages were exchanged, not that the peer
-        accepted Sigma3. See success for that."""
+        accepted Sigma3. See case_handshake_succeeded for that."""
         return all(value is not None for value in (
             self.sigma1_sent_timestamp_us, self.sigma2_received_timestamp_us,
             self.sigma3_sent_timestamp_us, self.status_report_received_timestamp_us))
@@ -298,12 +299,16 @@ class CASEHandshakeMetrics:
         """True only when the StatusReport closing Sigma3 carried a success code.
 
         A resumed handshake reports False because it has no Sigma3 and so no closing
-        report; check resumed to tell that apart from a real rejection."""
+        report; check used_session_resumption to tell that apart from a real rejection."""
         return self.all_messages_exchanged and self._status_report_indicates_success is True
 
     @property
     def sigma3_rejection_reason(self) -> str | None:
         """The Sigma3 rejection reason, or None when Sigma3 was accepted.
+
+        Also None when no StatusReport codes were decoded, either because the report never
+        arrived or because its body was too short to read, so None on its own does not prove
+        the handshake was accepted; use case_handshake_succeeded for that.
 
         Reads as 'general=<code> protocol=<code>'. General code 0 is success and 1 is a
         generic failure, with the protocol code carrying the CASE-specific detail."""
@@ -428,6 +433,10 @@ def GetDroppedCASEHandshakeNotificationCount() -> int:
 # check whether it has been asked to stop, so this only bounds shutdown latency.
 _DELIVERY_WAIT_MS = 200
 
+# How long shutdown waits for the delivery threads to finish. Comfortably longer than a single
+# wait above, but bounded so a listener that never returns cannot hang the caller.
+_SHUTDOWN_JOIN_TIMEOUT_S = 5.0
+
 # Messages a listener may fall behind by before its oldest are discarded. Bounded on purpose: a
 # listener that never keeps up would otherwise grow memory until the process died.
 LISTENER_NOTIFICATION_QUEUE_DEPTH = 256
@@ -439,7 +448,7 @@ logger = logging.getLogger(__name__)
 class _RegisteredListener:
     """One registered function, its notification queue, and the thread that delivers to it."""
 
-    def __init__(self, listener_id: int, listener, shared: bool):
+    def __init__(self, listener_id: int, listener: "CASEHandshakeListener", shared: bool):
         self.listener_id = listener_id
         self.listener = listener
         self.shared = shared
@@ -448,6 +457,24 @@ class _RegisteredListener:
         self.dropped = 0
         self.worker: threading.Thread | None = None
         self.active = True
+
+    def release_worker(self) -> None:
+        """Wake this listener's worker so it can exit, even when its queue is full.
+
+        The queue is bounded, so pushing the sentinel can fail. Discarding the oldest entry to
+        make room is safe here because the listener has already been deregistered and nothing
+        further will be delivered to it; the alternative is an exception that would abandon the
+        rest of the removal and leave the native notifications running.
+        """
+        while True:
+            try:
+                self.pending_notifications.put_nowait(None)
+                return
+            except queue.Full:
+                try:
+                    self.pending_notifications.get_nowait()
+                except queue.Empty:
+                    pass  # Drained by the worker in the meantime; try to push again.
 
     def enqueue_notification(self, metrics: "CASEHandshakeMetrics") -> None:
         """Hand over a completed handshake without ever blocking the caller."""
@@ -486,7 +513,7 @@ class _ListenerRegistry:
 
     # -- registration ----------------------------------------------------------------
 
-    def add(self, listener, own_thread: bool) -> int:
+    def add(self, listener: "CASEHandshakeListener", own_thread: bool) -> int:
         if not callable(listener):
             raise TypeError("listener must be callable")
         with self._lock:
@@ -512,7 +539,7 @@ class _ListenerRegistry:
             # would hang the caller.
             registered.active = False
             should_stop = not self._listeners
-        registered.pending_notifications.put_nowait(None)  # release its worker, if it has one
+        registered.release_worker()
         if should_stop:
             self._stop()
 
@@ -523,7 +550,7 @@ class _ListenerRegistry:
             for registered in registered_all:
                 registered.active = False
         for registered in registered_all:
-            registered.pending_notifications.put_nowait(None)
+            registered.release_worker()
         self._stop()
 
     def stats(self, listener_id: int) -> "CASEHandshakeListenerStats":
@@ -546,15 +573,21 @@ class _ListenerRegistry:
         """Start notifying and start the threads on the first registration."""
         if self._running:
             return
-        # Opening switches the whole thing on: it registers the backend so handshakes are timed,
-        # and starts queueing the ones that complete.
+        # Starting switches the whole thing on: it registers the backend so handshakes are
+        # timed, and starts queueing the ones that complete.
         StartCASEHandshakeNotifications()
         self._running = True
+        # A fresh queue for this run. Reusing the previous one risks handing a stop sentinel
+        # left over from the last shutdown to the new worker, which would exit immediately and
+        # leave every shared listener registered but never called.
+        self._shared_delivery_queue = queue.Queue()
         self._delivery_thread = threading.Thread(
-            target=self._dispatch_notifications, name="case-metrics-delivery", daemon=True)
+            target=self._dispatch_notifications, args=(self._shared_delivery_queue,),
+            name="case-metrics-delivery", daemon=True)
         self._delivery_thread.start()
         self._shared_worker = threading.Thread(
-            target=self._deliver_on_shared_thread, name="case-listener-shared", daemon=True)
+            target=self._deliver_on_shared_thread, args=(self._shared_delivery_queue,),
+            name="case-listener-shared", daemon=True)
         self._shared_worker.start()
 
     def _stop(self) -> None:
@@ -562,11 +595,23 @@ class _ListenerRegistry:
             if not self._running:
                 return
             self._running = False
-        # Closing wakes the delivery thread so it can see it should exit.
+            delivery_thread, shared_worker = self._delivery_thread, self._shared_worker
+            shared_queue = self._shared_delivery_queue
+            self._delivery_thread = self._shared_worker = None
+        # Stopping wakes the delivery thread so it can see it should exit.
         StopCASEHandshakeNotifications()
-        self._shared_delivery_queue.put(None)
+        shared_queue.put(None)
+        # Wait for both to finish before any restart can begin, so a later run never competes
+        # with threads from this one. Bounded, so a listener that will not return cannot hang
+        # the caller for ever.
+        for worker in (delivery_thread, shared_worker):
+            if worker is not None and worker is not threading.current_thread():
+                worker.join(timeout=_SHUTDOWN_JOIN_TIMEOUT_S)
+                if worker.is_alive():
+                    logger.warning("CASE handshake %s did not stop within %.0f s",
+                                   worker.name, _SHUTDOWN_JOIN_TIMEOUT_S)
 
-    def _dispatch_notifications(self) -> None:
+    def _dispatch_notifications(self, shared_delivery_queue: queue.Queue) -> None:
         while True:
             with self._lock:
                 if not self._running:
@@ -582,12 +627,12 @@ class _ListenerRegistry:
             for registered in targets:
                 registered.enqueue_notification(metrics)
                 if registered.shared:
-                    self._shared_delivery_queue.put(registered)
+                    shared_delivery_queue.put(registered)
 
-    def _deliver_on_shared_thread(self) -> None:
+    def _deliver_on_shared_thread(self, shared_delivery_queue: queue.Queue) -> None:
         """Runs the cheap listeners in turn on one thread."""
         while True:
-            registered = self._shared_delivery_queue.get()
+            registered = shared_delivery_queue.get()
             if registered is None:
                 return
             try:
@@ -607,6 +652,11 @@ class _ListenerRegistry:
                 registered.invoke_listener(metrics)
 
 
+# What a listener must look like: it is handed the metrics for one completed handshake and
+# returns nothing.
+CASEHandshakeListener = Callable[["CASEHandshakeMetrics"], None]
+
+
 @dataclass(frozen=True)
 class CASEHandshakeListenerStats:
     """How a listener is keeping up. A non-zero dropped count means it fell far enough behind
@@ -622,7 +672,7 @@ class CASEHandshakeListenerStats:
 _listener_registry = _ListenerRegistry()
 
 
-def AddCASEHandshakeListener(listener, own_thread: bool = False) -> int:
+def AddCASEHandshakeListener(listener: CASEHandshakeListener, own_thread: bool = False) -> int:
     """Register a function to be called with the metrics for every completed handshake.
 
     The function is handed one CASEHandshakeMetrics argument, and keeps being called until it is
