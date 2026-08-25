@@ -29,12 +29,6 @@ struct TableEntry;
 } // namespace Binding
 } // namespace chip
 
-CHIP_ERROR InitBindingHandler();
-CHIP_ERROR ScheduleSwitchCommandWork(BindingCommandData * data);
-CHIP_ERROR ScheduleBindingWork(chip::Binding::TableEntry * entry);
-void SwitchWorkerFunction(intptr_t context);
-void BindingWorkerFunction(intptr_t context);
-
 struct BindingCommandData
 {
     chip::AttributeId attributeId;
@@ -45,3 +39,9 @@ struct BindingCommandData
     bool isReadAttribute = false;
     uint32_t args[7];
 };
+
+CHIP_ERROR InitBindingHandler();
+CHIP_ERROR ScheduleSwitchCommandWork(BindingCommandData * data);
+CHIP_ERROR ScheduleBindingWork(chip::Binding::TableEntry * entry);
+void SwitchWorkerFunction(intptr_t context);
+void BindingWorkerFunction(intptr_t context);
