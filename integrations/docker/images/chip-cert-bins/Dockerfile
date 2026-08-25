@@ -167,6 +167,7 @@ RUN printf '%s\n' \
     all-clusters-ipv6only \
     all-clusters-ipv6only-nlfaultinject \
     all-clusters-minimal-ipv6only \
+    all-devices-ipv6only \
     bridge-ipv6only \
     tv-app-ipv6only \
     tv-casting-app-ipv6only \

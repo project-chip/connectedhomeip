@@ -39,12 +39,15 @@ public:
         const chip::CharSpan & messageText,
         const chip::Optional<
             chip::app::DataModel::DecodableList<chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type>> &
-            responses) override;
+            responses,
+        const chip::Optional<chip::CharSpan> & languageCode, const chip::Optional<chip::CharSpan> & messageUri) override;
     CHIP_ERROR HandleCancelMessagesRequest(const chip::app::DataModel::DecodableList<chip::ByteSpan> & messageIds) override;
 
     // Attributes
     CHIP_ERROR HandleGetMessages(chip::app::AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR HandleGetActiveMessageIds(chip::app::AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR HandleGetSupportedLanguageCodes(chip::app::AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR HandleGetSupportedMimeTypes(chip::app::AttributeValueEncoder & aEncoder) override;
 
     // Global Attributes
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
