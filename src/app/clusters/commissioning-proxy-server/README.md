@@ -442,8 +442,8 @@ MyBleProxyAdapter gBleAdapter;
 CommissioningProxyBleTransport gBleTransport(gBleAdapter, gTimerDelegate);
 ```
 
-`examples/all-devices-app/posix/linux/CommissioningProxyBleAdapter.cpp` is
-a worked implementation over `BLEManagerImpl`, wired up in that app's
+`examples/all-devices-app/posix/linux/CommissioningProxyBleAdapter.cpp` is a
+worked implementation over `BLEManagerImpl`, wired up in that app's
 `posix/linux/DeviceFactoryPlatformOverride.cpp`.
 
 ## Wi-Fi PAF Transport Integration
@@ -496,8 +496,8 @@ of its own. `DisconnectPublishReceiveHandler()` is the one non-discovery hook: a
 proxy publishes over NAN so it can be commissioned itself, and that handler has
 to be torn down once it is on a fabric, or a later subscribe leaves the platform
 with two handlers for the same traffic.
-`examples/all-devices-app/posix/linux/CommissioningProxyPafAdapter.cpp` is
-a worked implementation over `ConnectivityManagerImpl`, and is also where the
+`examples/all-devices-app/posix/linux/CommissioningProxyPafAdapter.cpp` is a
+worked implementation over `ConnectivityManagerImpl`, and is also where the
 platform's peer descriptor is unpacked into the interface's scalars so no
 platform type reaches the cluster.
 

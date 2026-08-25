@@ -38,7 +38,8 @@ using Protocols::InteractionModel::Status;
 
 CommissioningProxyPafTransport::CommissioningProxyPafTransport(CommissioningProxyPafAdapter & adapter,
                                                                TimerDelegate & timerDelegate, FabricTable * fabricTable) :
-    mAdapter(adapter), mTimerDelegate(timerDelegate), mBgScan(mBgScanHardware, timerDelegate), mFabricTable(fabricTable)
+    mAdapter(adapter),
+    mTimerDelegate(timerDelegate), mBgScan(mBgScanHardware, timerDelegate), mFabricTable(fabricTable)
 {}
 
 CommissioningProxyPafTransport::~CommissioningProxyPafTransport()
