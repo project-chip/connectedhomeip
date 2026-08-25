@@ -1842,8 +1842,19 @@ class MatterBaseTest(base_test.BaseTestClass):
         return self.check_pics('PICS_SDK_CI_ONLY')
 
     @property
-    def data_model(self) -> XmlDataModel:
-        """Accesses the data model object."""
+    def data_model(self) -> XmlDataModel | None:
+        """Access the XML data model built from the latest prebuilt SDK spec.
+    
+        This is the newest data model bundled with the SDK (see
+        latest_prebuilt_directory), NOT the DUT's SpecificationVersion. Tests
+        that need the model corresponding to a specific device revision must
+        use dm_from_spec_version(), BasicCompositionTests._get_dm(), or
+        build_spec_xmls() directly — otherwise a 1.4 DUT will be validated
+        against 1.6.1 XML.
+    
+        Populated unconditionally in runner.run_tests_no_exit; may be None if
+        that population raised a SpecParsingException or ConformanceException.
+        """
         return global_stash.unstash_globally(self.user_params.get("data_model"))
 
     @property

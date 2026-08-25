@@ -2035,9 +2035,18 @@ class XmlDataModel:
     problems: list[ProblemNotice]
 
 
-def build_xml_data_model(data_model_directory: PrebuiltDataModelDirectory | Traversable) -> XmlDataModel:
-    """Build the full data model from XML files: clusters, device types, namespaces, and global data types."""
-    clusters, problems = build_xml_clusters(data_model_directory)
+def build_xml_data_model(data_model_directory: PrebuiltDataModelDirectory | Traversable,
+                         errata_path: str | Traversable | None = None) -> XmlDataModel:
+    """Build the full data model from XML files: clusters, device types, namespaces, and global data types.
+
+    Args:
+        data_model_directory: Prebuilt DM version or Traversable path.
+        errata_path: Optional errata overlay, forwarded to build_xml_clusters.
+            Callers running under --enable-spec-errata-ci-only-disallowed-for-certification
+            should pass matter_test_config.spec_errata_path here so the overlay is
+            applied to self.data_model.clusters the same way it is for build_spec_xmls.
+    """
+    clusters, problems = build_xml_clusters(data_model_directory, errata_path=errata_path)
     device_types, dt_problems = build_xml_device_types(data_model_directory, cluster_definition_xml=clusters)
     namespaces, ns_problems = build_xml_namespaces(data_model_directory)
     global_data_types, gdt_problems = build_xml_global_data_types(data_model_directory)
