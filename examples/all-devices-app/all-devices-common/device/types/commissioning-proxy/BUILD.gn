@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/ble/ble.gni")
 
 source_set("commissioning-proxy") {
   # The cluster and its transport-agnostic bookkeeping come from the
@@ -38,18 +39,23 @@ source_set("commissioning-proxy") {
   include_dirs = [ "." ]
 }
 
-# Commissioning proxy over BLE.  Depend on this only from a target that is itself
-# conditional on chip_config_network_layer_ble; the BLE transport driver lives with the
-# cluster in src/, and this app supplies the platform adapter it needs
+# Commissioning proxy over BLE.  The BLE transport driver lives with the cluster in
+# src/, and this app supplies the platform adapter it needs
 # (posix/linux/CommissioningProxyBleAdapter).
-source_set("ble") {
-  sources = [
-    "impl/CommissioningProxyBleDevice.cpp",
-    "impl/CommissioningProxyBleDevice.h",
-  ]
+#
+# Only defined when BLE is enabled, matching the ble-transport source_set it depends
+# on: gn resolves every target in a loaded BUILD.gn file, so defining this
+# unconditionally breaks generation for a no-BLE build even when nothing depends on it.
+if (chip_config_network_layer_ble) {
+  source_set("ble") {
+    sources = [
+      "impl/CommissioningProxyBleDevice.cpp",
+      "impl/CommissioningProxyBleDevice.h",
+    ]
 
-  public_deps = [
-    ":commissioning-proxy",
-    "${chip_root}/src/app/clusters/commissioning-proxy-server:ble-transport",
-  ]
+    public_deps = [
+      ":commissioning-proxy",
+      "${chip_root}/src/app/clusters/commissioning-proxy-server:ble-transport",
+    ]
+  }
 }
