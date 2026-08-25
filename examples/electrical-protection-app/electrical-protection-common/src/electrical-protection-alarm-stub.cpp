@@ -49,13 +49,13 @@ BitMask<AlarmBitmap> AllSupportedAlarms()
 // illustrative fixed values, not measurements: the point is that every rating attribute encodes a
 // populated struct so the attribute tests exercise their structure validation instead of taking the
 // null path.
-constexpr int64_t kRatedCurrentMa      = 100000;   // 100 A
-constexpr int64_t kUltimateMaxCurrentMa = 10000000; // 10 kA interrupting capacity
-constexpr int64_t kServiceMaxCurrentMa  = 6000000;  // 6 kA service short-circuit rating
-constexpr int64_t kMaxOperatingVoltageMv = 253000;  // 240 V +5%
-constexpr int64_t kOverVoltageTripMv    = 275000;
-constexpr uint64_t kResponseTimeNs      = 25;       // typical MOV clamping response
-constexpr uint64_t kEnergyAbsorptionJ   = 1200;     // surge energy absorption capability
+constexpr int64_t kRatedCurrentMa        = 100000;   // 100 A
+constexpr int64_t kUltimateMaxCurrentMa  = 10000000; // 10 kA interrupting capacity
+constexpr int64_t kServiceMaxCurrentMa   = 6000000;  // 6 kA service short-circuit rating
+constexpr int64_t kMaxOperatingVoltageMv = 253000;   // 240 V +5%
+constexpr int64_t kOverVoltageTripMv     = 275000;
+constexpr uint64_t kResponseTimeNs       = 25;   // typical MOV clamping response
+constexpr uint64_t kEnergyAbsorptionJ    = 1200; // surge energy absorption capability
 
 Structs::ArcFaultRatingsStruct::Type MakeArcFaultRating()
 {
@@ -73,9 +73,9 @@ Structs::OverLoadRatingsStruct::Type MakeOverLoadRating()
     Structs::OverLoadRatingsStruct::Type r;
     BitMask<CurrentTripMechanismBitmap> mech;
     mech.Set(CurrentTripMechanismBitmap::kThermal).Set(CurrentTripMechanismBitmap::kMagnetic);
-    r.tripCurrent       = MakeOptional(kRatedCurrentMa);
-    r.tripCurve         = MakeOptional(CurrentTripCurveEnum::kTypeC);
-    r.tripMechanism     = MakeOptional(mech);
+    r.tripCurrent        = MakeOptional(kRatedCurrentMa);
+    r.tripCurve          = MakeOptional(CurrentTripCurveEnum::kTypeC);
+    r.tripMechanism      = MakeOptional(mech);
     r.ultimateMaxCurrent = MakeOptional(kUltimateMaxCurrentMa);
     r.serviceMaxCurrent  = MakeOptional(kServiceMaxCurrentMa);
     return r;
@@ -86,10 +86,10 @@ Structs::OverVoltageRatingsStruct::Type MakeOverVoltageRating()
     Structs::OverVoltageRatingsStruct::Type r;
     BitMask<VoltageTripMechanismBitmap> mech;
     mech.Set(VoltageTripMechanismBitmap::kMov);
-    r.tripMechanism                = MakeOptional(mech);
-    r.tripVoltage                  = MakeOptional(kOverVoltageTripMv);
+    r.tripMechanism                 = MakeOptional(mech);
+    r.tripVoltage                   = MakeOptional(kOverVoltageTripMv);
     r.maxContinuousOperatingVoltage = MakeOptional(kMaxOperatingVoltageMv);
-    r.responseTime                 = MakeOptional(kResponseTimeNs);
+    r.responseTime                  = MakeOptional(kResponseTimeNs);
     return r;
 }
 
@@ -102,18 +102,18 @@ Structs::SurgeProtectionRatingsStruct::Type MakeSurgeProtectionRating()
     cls.Set(SurgeProtectionClassBitmap::kClassII);
     BitMask<SurgeProtectionTypeBitmap> type;
     type.Set(SurgeProtectionTypeBitmap::kType2);
-    r.tripMechanism                 = MakeOptional(mech);
-    r.protectionClass               = MakeOptional(cls);
-    r.protectionType                = MakeOptional(type);
-    r.maxContinuousOperatingVoltage = MakeOptional(kOverVoltageTripMv);
-    r.maxVoltageProtection          = MakeOptional<int64_t>(1200000); // 1.2 kV let-through
-    r.maxTemporaryVoltage           = MakeOptional<int64_t>(335000);
-    r.nominalDischargeCurrent       = MakeOptional<int64_t>(20000000); // 20 kA
-    r.maximumDischargeCurrent       = MakeOptional<int64_t>(40000000); // 40 kA
-    r.ratedShortCircuitCurrent      = MakeOptional(kUltimateMaxCurrentMa);
+    r.tripMechanism                  = MakeOptional(mech);
+    r.protectionClass                = MakeOptional(cls);
+    r.protectionType                 = MakeOptional(type);
+    r.maxContinuousOperatingVoltage  = MakeOptional(kOverVoltageTripMv);
+    r.maxVoltageProtection           = MakeOptional<int64_t>(1200000); // 1.2 kV let-through
+    r.maxTemporaryVoltage            = MakeOptional<int64_t>(335000);
+    r.nominalDischargeCurrent        = MakeOptional<int64_t>(20000000); // 20 kA
+    r.maximumDischargeCurrent        = MakeOptional<int64_t>(40000000); // 40 kA
+    r.ratedShortCircuitCurrent       = MakeOptional(kUltimateMaxCurrentMa);
     r.ratedShortTimeWithstandCurrent = MakeOptional(kServiceMaxCurrentMa);
-    r.energyAbsorptionCapability    = MakeOptional(kEnergyAbsorptionJ);
-    r.responseTime                  = MakeOptional(kResponseTimeNs);
+    r.energyAbsorptionCapability     = MakeOptional(kEnergyAbsorptionJ);
+    r.responseTime                   = MakeOptional(kResponseTimeNs);
     return r;
 }
 
@@ -138,14 +138,14 @@ Structs::ResidualCurrentFaultRatingsStruct::Type MakeResidualCurrentRating()
     mech.Set(CurrentTripMechanismBitmap::kElectronic);
     BitMask<TrippingCharacteristicsBitmap> characteristic;
     characteristic.Set(TrippingCharacteristicsBitmap::kSelective);
-    r.currentSensitivity      = MakeOptional<int64_t>(30); // 30 mA
-    r.tripMechanism           = MakeOptional(mech);
-    r.voltageDependent        = MakeOptional(false);
-    r.groundFaultClass        = MakeOptional(GroundFaultClassEnum::kClassA);
-    r.waveform                = MakeOptional(CurrentWaveformEnum::kAc);
-    r.trippingCharacteristic  = MakeOptional(characteristic);
-    r.ultimateMaxCurrent      = MakeOptional(kUltimateMaxCurrentMa);
-    r.serviceMaxCurrent       = MakeOptional(kServiceMaxCurrentMa);
+    r.currentSensitivity     = MakeOptional<int64_t>(30); // 30 mA
+    r.tripMechanism          = MakeOptional(mech);
+    r.voltageDependent       = MakeOptional(false);
+    r.groundFaultClass       = MakeOptional(GroundFaultClassEnum::kClassA);
+    r.waveform               = MakeOptional(CurrentWaveformEnum::kAc);
+    r.trippingCharacteristic = MakeOptional(characteristic);
+    r.ultimateMaxCurrent     = MakeOptional(kUltimateMaxCurrentMa);
+    r.serviceMaxCurrent      = MakeOptional(kServiceMaxCurrentMa);
     return r;
 }
 
