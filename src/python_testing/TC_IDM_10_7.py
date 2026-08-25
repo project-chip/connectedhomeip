@@ -393,7 +393,7 @@ class TC_IDM_10_7(DeviceConformanceTests):
                     full_dm_val = full_dm_descriptor[attr]
                     if self._normalize_for_order_insensitive_compare(limited_dm_val) != self._normalize_for_order_insensitive_compare(full_dm_val):
                         log.error("Descriptor attribute %s mismatch on endpoint %s: limited=%s, full=%s",
-                                attr, endpoint_id, limited_dm_val, full_dm_val)
+                                  attr, endpoint_id, limited_dm_val, full_dm_val)
                         return False
 
             log.info("Limited and Full Data Model Descriptor clusters are identical on all endpoints")
