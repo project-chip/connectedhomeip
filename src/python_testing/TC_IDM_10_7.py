@@ -66,11 +66,31 @@ class TC_IDM_10_7(DeviceConformanceTests):
 
         node_id = self.matter_test_config.dut_node_ids[0]
 
+        commissioning_method = self.matter_test_config.in_test_commissioning_method
+        asserts.assert_is_not_none(commissioning_method, "in_test_commissioning_method must not be None")
+        asserts.assert_true(
+            str(commissioning_method).startswith("nfc-"),
+            f"Expected in_test_commissioning_method to start with 'nfc-', got: {commissioning_method}"
+        )
+
         self.step(1)    # Perform a 'PASE only' session, over NTL
 
         log.info("dut_node_ids 0x%X", node_id)
 
-        commissionee = await self.find_or_establish_pase_session_over_ntl(node_id)
+        nfc_reader_index = self.user_params.get("NFC_Reader_index", 0)
+        reader = matter.testing.nfc.NFCReader(nfc_reader_index)
+
+        nfc_onboarding_data = reader.read_nfc_tag_data()
+        asserts.assert_true(
+            reader.is_onboarding_data(nfc_onboarding_data),
+            f"'{nfc_onboarding_data}' is not a valid Matter URI"
+        )
+        self.matter_test_config.qr_code_content.append(nfc_onboarding_data)
+
+        setupPayload = SetupPayload().ParseQrCode(nfc_onboarding_data)
+        asserts.assert_true(setupPayload.supports_nfc_commissioning, "Device does not Support NFC Commissioning")
+
+        commissionee = await self.find_or_establish_pase_session_over_ntl(setupPayload, node_id)
         if commissionee is None:
             raise RuntimeError("Failed to find or establish PASE session over NTL")
 
@@ -121,7 +141,7 @@ class TC_IDM_10_7(DeviceConformanceTests):
             return
 
         self.step(6)    # Complete the commissioning (over NTL)
-        commissioning_success = await self.commission_ntl_device(payload)
+        commissioning_success = await self.commission_ntl_device(setupPayload)
         if not commissioning_success:
             self.fail_current_test("Commissioning over NTL failed")
             return
