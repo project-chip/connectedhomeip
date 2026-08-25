@@ -116,17 +116,17 @@ public:
 
     struct StartupConfiguration
     {
-        Humidistat::ModeEnum mode               = Humidistat::ModeEnum::kAuto;
-        Humidistat::SystemStateEnum systemState = Humidistat::SystemStateEnum::kIdle;
-        chip::Percent userSetpoint              = 50;
-        chip::Percent minSetpoint               = 0;
-        chip::Percent maxSetpoint               = 100;
-        chip::Percent step                      = 1;
-        chip::Percent targetSetpoint            = 50;
+        Humidistat::ModeEnum mode                                               = Humidistat::ModeEnum::kAuto;
+        Humidistat::SystemStateEnum systemState                                 = Humidistat::SystemStateEnum::kIdle;
+        chip::Percent userSetpoint                                              = 50;
+        chip::Percent minSetpoint                                               = 0;
+        chip::Percent maxSetpoint                                               = 100;
+        chip::Percent step                                                      = 1;
+        chip::Percent targetSetpoint                                            = 50;
         DataModel::Nullable<chip::BitMask<Humidistat::MistTypeBitmap>> mistType = DataModel::NullNullable;
-        bool continuous = false;
-        bool sleep      = false;
-        bool optimal    = false;
+        bool continuous                                                         = false;
+        bool sleep                                                              = false;
+        bool optimal                                                            = false;
     };
 
     /**
