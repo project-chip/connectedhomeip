@@ -877,4 +877,86 @@ TEST_F(TestSessionManagerDispatch, TestUnauthenticMessageDoesNotRebindPeerAddres
     sessionManager.Shutdown();
 }
 
+
+
+// Injects the two halves of a PASE session pair so that a message prepared on
+// `initiator` decrypts on `responder`.
+void InjectSessionPair(SessionManager & sessionManager, SessionHolder & initiator, SessionHolder & responder,
+                       const PeerAddress & peerAddress)
+{
+    ASSERT_SUCCESS(sessionManager.InjectPaseSessionWithTestKey(initiator, 2, 0x0000000000000002ULL, 1, kFabricIndex, peerAddress,
+                                                               CryptoContext::SessionRole::kInitiator));
+    ASSERT_SUCCESS(sessionManager.InjectPaseSessionWithTestKey(responder, 1, 0x0000000000000001ULL, 2, kFabricIndex, peerAddress,
+                                                               CryptoContext::SessionRole::kResponder));
+}
+
+// Prepares an encrypted message on `session` carrying a fixed payload.
+void PrepareTestMessage(SessionManager & sessionManager, const SessionHandle & session, EncryptedPacketBufferHandle & prepared)
+{
+    PayloadHeader payloadHeader;
+    payloadHeader.SetExchangeID(0);
+    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest);
+    payloadHeader.SetInitiator(true);
+
+    const uint8_t kPayload[]           = { 0x11, 0x22, 0x33, 0x44 };
+    System::PacketBufferHandle payload = MessagePacketBuffer::NewWithData(kPayload, sizeof(kPayload));
+    ASSERT_FALSE(payload.IsNull());
+    ASSERT_SUCCESS(sessionManager.PrepareMessage(session, payloadHeader, std::move(payload), prepared));
+}
+
+// A replay of an already accepted message is authentic, so it must not be able to
+// update the session's cached peer address.
+TEST_F(TestSessionManagerDispatch, TestReplayedMessageDoesNotRebindPeerAddress)
+{
+    SessionManager sessionManager;
+    TestSessionManagerInit(mContext, sessionManager, *mResources);
+
+    const PeerAddress establishedAddress = AddressFromString("fe80::1");
+    const PeerAddress replayAddress      = AddressFromString("fe80::2");
+
+    SessionHolder initiator;
+    SessionHolder responder;
+    InjectSessionPair(sessionManager, initiator, responder, establishedAddress);
+    SecureSession * receiver = responder.Get().Value()->AsSecureSession();
+
+    EncryptedPacketBufferHandle prepared;
+    PrepareTestMessage(sessionManager, initiator.Get().Value(), prepared);
+
+    EncryptedPacketBufferHandle firstDelivery = prepared.CloneData();
+    sessionManager.OnMessageReceived(establishedAddress, firstDelivery.CastToWritable());
+    ASSERT_EQ(receiver->GetPeerAddress(), establishedAddress);
+
+    EncryptedPacketBufferHandle replay = prepared.CloneData();
+    sessionManager.OnMessageReceived(replayAddress, replay.CastToWritable());
+
+    EXPECT_EQ(receiver->GetPeerAddress(), establishedAddress);
+
+    sessionManager.Shutdown();
+}
+
+// A peer that moves to a new address is still tracked: the first message that is
+// authentic and not a replay updates the cached address.
+TEST_F(TestSessionManagerDispatch, TestAcceptedMessageFromNewAddressRebindsPeerAddress)
+{
+    SessionManager sessionManager;
+    TestSessionManagerInit(mContext, sessionManager, *mResources);
+
+    const PeerAddress establishedAddress = AddressFromString("fe80::1");
+    const PeerAddress newAddress         = AddressFromString("fe80::2");
+
+    SessionHolder initiator;
+    SessionHolder responder;
+    InjectSessionPair(sessionManager, initiator, responder, establishedAddress);
+    SecureSession * receiver = responder.Get().Value()->AsSecureSession();
+
+    EncryptedPacketBufferHandle prepared;
+    PrepareTestMessage(sessionManager, initiator.Get().Value(), prepared);
+
+    sessionManager.OnMessageReceived(newAddress, prepared.CastToWritable());
+
+    EXPECT_EQ(receiver->GetPeerAddress(), newAddress);
+
+    sessionManager.Shutdown();
+}
+
 } // namespace

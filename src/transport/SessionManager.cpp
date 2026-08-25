@@ -1050,14 +1050,6 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
 
     secureSession->MarkActiveRx();
 
-    // Only update the cached peer address once the message is known to be authentic.
-    Transport::PeerAddress mutablePeerAddress = peerAddress;
-    CorrectPeerAddressInterfaceID(mutablePeerAddress);
-    if (secureSession->GetPeerAddress() != mutablePeerAddress)
-    {
-        secureSession->SetPeerAddress(mutablePeerAddress);
-    }
-
     if (isDuplicate == SessionMessageDelegate::DuplicateMessage::Yes && !payloadHeader.NeedsAck())
     {
         // If it's a duplicate message, but doesn't require an ack, let's drop it right here to save CPU
@@ -1068,6 +1060,15 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
     if (isDuplicate == SessionMessageDelegate::DuplicateMessage::No)
     {
         secureSession->GetSessionMessageCounter().GetPeerMessageCounter().CommitEncryptedUnicast(packetHeader.GetMessageCounter());
+
+        // Only update the cached peer address for a message that is both authentic
+        // and not a replay of one already received.
+        Transport::PeerAddress mutablePeerAddress = peerAddress;
+        CorrectPeerAddressInterfaceID(mutablePeerAddress);
+        if (secureSession->GetPeerAddress() != mutablePeerAddress)
+        {
+            secureSession->SetPeerAddress(mutablePeerAddress);
+        }
     }
 
     if (mCB != nullptr)
