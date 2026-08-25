@@ -38,6 +38,7 @@ Pass own_thread=True for a listener that does something slow, such as writing to
 spreadsheet, so it cannot hold up the others.
 See the CASEHandshakeMetrics class for the phases reported."""
 
+import contextlib
 import ctypes
 import logging
 import queue
@@ -435,6 +436,10 @@ _DELIVERY_WAIT_MS = 200
 # wait above, but bounded so a listener that never returns cannot hang the caller.
 _SHUTDOWN_JOIN_TIMEOUT_S = 5.0
 
+# How long a listener's own thread waits for work before checking whether it has been removed.
+# Only bounds how long an idle thread lingers after removal, so it can be generous.
+_WORKER_IDLE_POLL_S = 0.5
+
 # Messages a listener may fall behind by before its oldest are discarded. Bounded on purpose: a
 # listener that never keeps up would otherwise grow memory until the process died.
 LISTENER_NOTIFICATION_QUEUE_DEPTH = 256
@@ -459,20 +464,13 @@ class _RegisteredListener:
     def release_worker(self) -> None:
         """Wake this listener's worker so it can exit, even when its queue is full.
 
-        The queue is bounded, so pushing the sentinel can fail. Discarding the oldest entry to
-        make room is safe here because the listener has already been deregistered and nothing
-        further will be delivered to it; the alternative is an exception that would abandon the
-        rest of the removal and leave the native notifications running.
+        The queue is bounded, so this can fail when the listener is backlogged. That is not
+        worth retrying or raising over: the worker also gives up once it sees itself inactive,
+        so the sentinel only makes it exit sooner. Raising here would abandon the rest of the
+        removal and leave the native notifications running.
         """
-        while True:
-            try:
-                self.pending_notifications.put_nowait(None)
-                return
-            except queue.Full:
-                try:
-                    self.pending_notifications.get_nowait()
-                except queue.Empty:
-                    pass  # Drained by the worker in the meantime; try to push again.
+        with contextlib.suppress(queue.Full):
+            self.pending_notifications.put_nowait(None)
 
     def enqueue_notification(self, metrics: "CASEHandshakeMetrics") -> None:
         """Hand over a completed handshake without ever blocking the caller."""
@@ -504,6 +502,7 @@ class _ListenerRegistry:
         self._lock = threading.Lock()
         self._listeners: dict[int, _RegisteredListener] = {}
         self._next_id = 1
+        self._run_counter = 0
         self._delivery_thread: threading.Thread | None = None
         self._shared_worker: threading.Thread | None = None
         self._shared_delivery_queue: queue.Queue = queue.Queue()
@@ -575,12 +574,22 @@ class _ListenerRegistry:
         # timed, and starts queueing the ones that complete.
         StartCASEHandshakeNotifications()
         self._running = True
+        # Identifies this run. A thread left over from an earlier one sees the counter has moved
+        # and exits, so a restart never ends up with two dispatchers competing.
+        self._run_counter += 1
+        run = self._run_counter
         # A fresh queue for this run. Reusing the previous one risks handing a stop sentinel
         # left over from the last shutdown to the new worker, which would exit immediately and
         # leave every shared listener registered but never called.
+        #
+        # Deliberately unbounded, unlike the per-listener queues. It holds only which listener
+        # to serve next, and bounding it would mean either blocking the dispatcher, which is the
+        # one thing this design exists to avoid, or dropping an entry and orphaning a
+        # notification that is already queued against its listener. Entries cost a reference
+        # each and drain cheaply once the shared worker catches up, so any growth is transient.
         self._shared_delivery_queue = queue.Queue()
         self._delivery_thread = threading.Thread(
-            target=self._dispatch_notifications, args=(self._shared_delivery_queue,),
+            target=self._dispatch_notifications, args=(self._shared_delivery_queue, run),
             name="case-metrics-delivery", daemon=True)
         self._delivery_thread.start()
         self._shared_worker = threading.Thread(
@@ -594,14 +603,16 @@ class _ListenerRegistry:
                 return
             self._running = False
             delivery_thread, shared_worker = self._delivery_thread, self._shared_worker
-            shared_queue = self._shared_delivery_queue
             self._delivery_thread = self._shared_worker = None
-        # Stopping wakes the delivery thread so it can see it should exit.
-        StopCASEHandshakeNotifications()
-        shared_queue.put(None)
-        # Wait for both to finish before any restart can begin, so a later run never competes
-        # with threads from this one. Bounded, so a listener that will not return cannot hang
-        # the caller for ever.
+            # Both done while holding the lock. Releasing it first would let a registration
+            # slip in, switch notifications back on, and then have this call switch them off
+            # again, leaving listeners registered but never told about anything.
+            StopCASEHandshakeNotifications()
+            self._shared_delivery_queue.put(None)
+        # Joining cannot hold the lock, because the threads being joined take it themselves.
+        # Correctness does not depend on it: a thread from an earlier run exits on its own once
+        # the run counter moves. Bounded, so a listener that never returns cannot hang the
+        # caller.
         for worker in (delivery_thread, shared_worker):
             if worker is not None and worker is not threading.current_thread():
                 worker.join(timeout=_SHUTDOWN_JOIN_TIMEOUT_S)
@@ -609,10 +620,10 @@ class _ListenerRegistry:
                     logger.warning("CASE handshake %s did not stop within %.0f s",
                                    worker.name, _SHUTDOWN_JOIN_TIMEOUT_S)
 
-    def _dispatch_notifications(self, shared_delivery_queue: queue.Queue) -> None:
+    def _dispatch_notifications(self, shared_delivery_queue: queue.Queue, run: int) -> None:
         while True:
             with self._lock:
-                if not self._running:
+                if not self._running or self._run_counter != run:
                     return
             # Parks in native code with the interpreter lock released, so other threads run.
             metrics = _WaitForCompletedCASEHandshake(_DELIVERY_WAIT_MS)
@@ -643,7 +654,14 @@ class _ListenerRegistry:
     def _deliver_on_dedicated_thread(self, registered: _RegisteredListener) -> None:
         """Runs one slow listener on a thread of its own, isolated from the rest."""
         while True:
-            metrics = registered.pending_notifications.get()
+            try:
+                metrics = registered.pending_notifications.get(timeout=_WORKER_IDLE_POLL_S)
+            except queue.Empty:
+                # Nothing waiting. Exit if this listener has since been removed, which is how
+                # the thread ends when the stop sentinel could not fit in a full queue.
+                if not registered.active:
+                    return
+                continue
             if metrics is None:
                 return
             if registered.active:
