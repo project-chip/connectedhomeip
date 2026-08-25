@@ -1191,12 +1191,12 @@ class MatterBaseTest(base_test.BaseTestClass):
             return
 
         found_any = False
-        for endpoint_id in self.stored_global_wildcard.attributes:
-            if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
+        for endpoint_id in wildcard.attributes:
+            if not _has_cluster(wildcard=wildcard, endpoint=endpoint_id,
                                 cluster=Clusters.ScenesManagement):  # type: ignore[arg-type]
                 continue
             found_any = True
-            if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
+            if not _has_cluster(wildcard=wildcard, endpoint=endpoint_id,
                                 cluster=Clusters.Groups):  # type: ignore[arg-type]
                 continue
             try:
