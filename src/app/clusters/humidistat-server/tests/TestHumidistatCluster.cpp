@@ -396,6 +396,7 @@ TEST_F(TestHumidistatCluster, WriteAttributes)
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     EXPECT_EQ(tester.WriteAttribute(Mode::Id, ModeEnum::kHumidifier), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetSystemState(SystemStateEnum::kHumidifying), CHIP_NO_ERROR);
     EXPECT_EQ(tester.WriteAttribute(UserSetpoint::Id, static_cast<chip::Percent>(60)), CHIP_NO_ERROR);
     EXPECT_EQ(tester.WriteAttribute(UserSetpoint::Id, static_cast<chip::Percent>(81)),
               CHIP_IM_GLOBAL_STATUS(ConstraintError)); // out of range
@@ -818,24 +819,27 @@ TEST_F(TestHumidistatCluster, TestPersistence)
     }
 }
 
-TEST_F(TestHumidistatCluster, SetModeClearsMistType)
+TEST_F(TestHumidistatCluster, SetSystemStateClearsMistTypeToNull)
 {
-    // Spec: "If the value of Mode is not set to Humidifier, all bits of MistType SHALL be set to zero."
+    // Spec: MistType SHALL be null when SystemState is not Humidifying.
     const BitFlags<Feature> features{ Feature::kHumidifier, Feature::kDehumidifier, Feature::kColdMist, Feature::kSensor };
     HumidistatCluster cluster(kTestEndpointId, features, {});
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    // Set mode to Humidifier and set MistType
-    ASSERT_EQ(cluster.SetMode(ModeEnum::kHumidifier), CHIP_NO_ERROR);
+    // Set state to Humidifying and set MistType.
+    ASSERT_EQ(cluster.SetSystemState(SystemStateEnum::kHumidifying), CHIP_NO_ERROR);
     ASSERT_EQ(cluster.SetMistType(chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold)), CHIP_NO_ERROR);
     EXPECT_EQ(cluster.GetMistType().Raw(), chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold).Raw());
 
     tester.GetDirtyList().clear();
 
-    // Change mode away from Humidifier — MistType must be cleared.
-    ASSERT_EQ(cluster.SetMode(ModeEnum::kDehumidifier), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.GetMistType().Raw(), 0u);
+    // Change state away from Humidifying — MistType must be null.
+    ASSERT_EQ(cluster.SetSystemState(SystemStateEnum::kIdle), CHIP_NO_ERROR);
+
+    DataModel::Nullable<chip::BitMask<MistTypeBitmap>> readMistType;
+    ASSERT_EQ(tester.ReadAttribute(MistType::Id, readMistType), CHIP_NO_ERROR);
+    EXPECT_TRUE(readMistType.IsNull());
     EXPECT_TRUE(tester.IsAttributeDirty(MistType::Id));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
