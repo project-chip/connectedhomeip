@@ -59,7 +59,7 @@ constexpr uint16_t kOptionIgnoreQueryImage          = 'x';
 constexpr uint16_t kOptionIgnoreApplyUpdate         = 'y';
 constexpr uint16_t kOptionPollInterval              = 'P';
 // Long-only option (no short form): identifier chosen above the printable-char range.
-constexpr uint16_t kOptionPersistQueryImageStatus   = 0x1000;
+constexpr uint16_t kOptionPersistQueryImageStatus = 0x1000;
 
 NamedPipeCommands sChipNamedPipeCommands;
 OtaProviderAppCommandDelegate sOtaProviderAppCommandDelegate;
