@@ -40,10 +40,7 @@ CHIP_ERROR ThermostatHold::Delegate::Startup(ServerClusterContext & context)
     return CHIP_NO_ERROR;
 }
 
-void ThermostatHold::Delegate::Shutdown(ClusterShutdownType type)
-{
-    
-}
+void ThermostatHold::Delegate::Shutdown(ClusterShutdownType type) {}
 
 CHIP_ERROR ThermostatHold::Startup(ServerClusterContext & context)
 {

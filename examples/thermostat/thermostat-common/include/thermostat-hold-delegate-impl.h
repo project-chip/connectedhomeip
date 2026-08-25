@@ -49,7 +49,6 @@ public:
     Protocols::InteractionModel::Status SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> timestamp,
                                                                        bool & changed) override;
 
-
 private:
     EndpointId mEndpointId;
     AttributePersistenceProvider * mProvider;

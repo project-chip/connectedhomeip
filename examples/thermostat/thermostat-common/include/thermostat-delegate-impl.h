@@ -38,7 +38,7 @@ public:
     {}
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
-    
+
     SystemModeEnum GetSystemMode() const override;
     Protocols::InteractionModel::Status SetSystemMode(SystemModeEnum systemMode, bool & changed) override;
 

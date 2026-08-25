@@ -46,7 +46,7 @@ public:
         virtual ~Delegate() = default;
 
         virtual CHIP_ERROR Startup(ServerClusterContext & context);
-        virtual void       Shutdown(ClusterShutdownType type);
+        virtual void Shutdown(ClusterShutdownType type);
 
         virtual Protocols::InteractionModel::Status GetOccupiedCoolingSetpoint(temperature & occupiedCoolingSetpoint) const = 0;
         virtual Protocols::InteractionModel::Status SetOccupiedCoolingSetpoint(temperature occupiedCoolingSetpoint,
@@ -71,7 +71,7 @@ public:
     {}
 
     CHIP_ERROR Startup(ServerClusterContext & context);
-    void       Shutdown(ClusterShutdownType type);
+    void Shutdown(ClusterShutdownType type);
 
     Protocols::InteractionModel::Status LoadSetpoints(Setpoints & setpoints);
     DataModel::ActionReturnStatus SaveSetpoints(const Setpoints & currentSetpoints, const Setpoints & changedSetpoints,

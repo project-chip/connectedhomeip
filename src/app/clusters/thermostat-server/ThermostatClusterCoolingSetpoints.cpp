@@ -44,10 +44,7 @@ CHIP_ERROR ThermostatCoolingSetpoints::Delegate::Startup(ServerClusterContext & 
     return CHIP_NO_ERROR;
 }
 
-void ThermostatCoolingSetpoints::Delegate::Shutdown(ClusterShutdownType type)
-{
-
-}
+void ThermostatCoolingSetpoints::Delegate::Shutdown(ClusterShutdownType type) {}
 
 Status ThermostatCoolingSetpoints::Delegate::GetAbsMinCoolSetpointLimit(temperature & absMinCoolSetpointLimit) const
 {

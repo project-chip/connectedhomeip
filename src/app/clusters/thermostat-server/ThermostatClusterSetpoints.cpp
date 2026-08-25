@@ -44,10 +44,7 @@ CHIP_ERROR ThermostatAutoSetpoints::Delegate::Startup(ServerClusterContext & con
     return CHIP_NO_ERROR;
 }
 
-void ThermostatAutoSetpoints::Delegate::Shutdown(ClusterShutdownType type)
-{
-
-}
+void ThermostatAutoSetpoints::Delegate::Shutdown(ClusterShutdownType type) {}
 
 Status ThermostatAutoSetpoints::Delegate::GetMinDeadband(temperature & minDeadband) const
 {

@@ -79,7 +79,7 @@ public:
 private:
     EndpointId mEndpointId;
     AttributePersistenceProvider * mProvider = nullptr;
-    bool mStarted = false;
+    bool mStarted                            = false;
 
     temperature mOccupiedCoolingSetpoint;
     temperature mUnoccupiedCoolingSetpoint;

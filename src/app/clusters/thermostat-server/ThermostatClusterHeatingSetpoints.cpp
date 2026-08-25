@@ -46,10 +46,7 @@ CHIP_ERROR ThermostatHeatingSetpoints::Delegate::Startup(ServerClusterContext & 
     return CHIP_NO_ERROR;
 }
 
-void ThermostatHeatingSetpoints::Delegate::Shutdown(ClusterShutdownType type)
-{
-    
-}
+void ThermostatHeatingSetpoints::Delegate::Shutdown(ClusterShutdownType type) {}
 
 Status ThermostatHeatingSetpoints::Delegate::GetUnoccupiedHeatingSetpoint(temperature & unoccupiedHeatingSetpoint) const
 {

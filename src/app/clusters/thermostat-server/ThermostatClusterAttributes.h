@@ -49,9 +49,9 @@ struct OptionalAttributes
     bool TemperatureSetpointHoldDuration = false;
     bool ThermostatRunningState          = false;
 
-    bool SetpointChangeSource            = false;
-    bool SetpointChangeAmount            = false;
-    bool SetpointChangeSourceTimestamp   = false;
+    bool SetpointChangeSource          = false;
+    bool SetpointChangeAmount          = false;
+    bool SetpointChangeSourceTimestamp = false;
 
     bool SetpointHoldExpiryTimestamp = false;
     bool OutdoorTemperature          = false;

@@ -37,7 +37,8 @@ using namespace System::Clock;
 
 CHIP_ERROR ThermostatSetpointsDelegate::Startup(ServerClusterContext & context)
 {
-    if (mStarted) {
+    if (mStarted)
+    {
         return CHIP_NO_ERROR;
     }
     AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();

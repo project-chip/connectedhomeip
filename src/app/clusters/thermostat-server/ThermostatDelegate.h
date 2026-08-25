@@ -17,8 +17,8 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <protocols/interaction_model/StatusCode.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #include "Temperature.h"
 
