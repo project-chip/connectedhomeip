@@ -381,7 +381,7 @@ async def read_global_wildcard_async(default_controller: ChipDeviceCtrl.ChipDevi
         default_controller.Read(
             node_id,
             [
-                Clusters.Descriptor,
+                (Clusters.Descriptor),
                 Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
                 Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
                 Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
