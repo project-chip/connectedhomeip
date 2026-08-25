@@ -2454,7 +2454,6 @@ class MatterBaseTest(base_test.BaseTestClass):
             capabilities=0b10000,
             version=setup_payload.version
         )
-        LOGGER.info("ntl_onboarding_data: %s", ntl_onboarding_data)
 
         # Setup a PASE only session over NTL
         return await self.default_controller.FindOrEstablishPASESession(
