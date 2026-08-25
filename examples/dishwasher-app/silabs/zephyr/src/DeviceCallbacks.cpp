@@ -16,21 +16,44 @@
  *    limitations under the License.
  */
 
-#include "DeviceCallbacks.h"
-
 #include <lib/support/logging/CHIPLogging.h>
+
+#include "AppTask.h"
+#include "DeviceCallbacks.h"
+#include "DishwasherManager.h"
+
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+
+using namespace ::chip;
+using namespace ::chip::app::Clusters;
+using namespace ::chip::app::Clusters::DeviceEnergyManagement;
+using namespace ::chip::app::Clusters::OperationalState;
 
 void DishwasherApp::DeviceCallbacks::PostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                                  chip::AttributeId attributeId, uint8_t type, uint16_t size,
                                                                  uint8_t * value)
 {
-    // Skeleton: dishwasher-specific attribute handling added in a follow-up commit.
-    (void) endpoint;
-    (void) clusterId;
-    (void) attributeId;
-    (void) type;
-    (void) size;
-    (void) value;
+    if ((clusterId == OperationalState::Id) && (attributeId == OperationalState::Attributes::OperationalState::Id))
+    {
+        if (value == nullptr)
+        {
+            return;
+        }
+
+        auto state = static_cast<OperationalState::OperationalStateEnum>(*value);
+        DishwasherManager * mgr = GetDishwasherManager();
+        if (mgr != nullptr)
+        {
+            mgr->UpdateOperationState(state);
+        }
+        UpdateEpmAttributesForOperationalState(state);
+    }
+    else if (clusterId == Identify::Id)
+    {
+        ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
+                        ChipLogValueMEI(attributeId), type, *value, size);
+    }
 }
 
 chip::DeviceManager::CHIPDeviceManagerCallbacks & chip::Zephyr::App::GetDeviceCallbacks()

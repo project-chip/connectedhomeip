@@ -16,12 +16,18 @@
  *    limitations under the License.
  */
 
+#ifndef __ZEPHYR__
 #include "LEDWidget.h"
+#endif
 
 #include "AppConfig.h"
 #include "AppTask.h"
 #include "DishwasherManager.h"
 #include "operational-state-delegate-impl.h"
+
+#ifndef __ZEPHYR__
+#include "AppEvent.h"
+#endif
 
 #ifdef SL_CATALOG_SIMPLE_LED_LED1_PRESENT
 #define DW_STATE_LED 1
@@ -29,9 +35,11 @@
 #define DW_STATE_LED 0
 #endif
 
+#ifndef __ZEPHYR__
 namespace {
 LEDWidget sDishwasherLED;
 }
+#endif
 
 using namespace chip;
 using namespace chip::app;
@@ -42,8 +50,10 @@ using namespace chip::DeviceLayer;
 
 CHIP_ERROR DishwasherManager::Init()
 {
+#ifndef __ZEPHYR__
     sDishwasherLED.Init(DW_STATE_LED);
     AppTask::GetAppTask().LinkAppLed(&sDishwasherLED);
+#endif
 
     chip::app::Clusters::DeviceEnergyManagement::DeviceEnergyManagementDelegate * dem = GetDEMDelegate();
     VerifyOrReturnLogError(dem != nullptr, CHIP_ERROR_UNINITIALIZED);
@@ -66,6 +76,9 @@ OperationalStateEnum DishwasherManager::GetOperationalState()
 
 void DishwasherManager::UpdateDishwasherLed()
 {
+#ifdef __ZEPHYR__
+    UpdateOperationalStateLed(GetOperationalState());
+#else
     OperationalStateEnum opState = GetOperationalState();
     sDishwasherLED.Set(false);
 
@@ -83,6 +96,7 @@ void DishwasherManager::UpdateDishwasherLed()
     default:
         break;
     }
+#endif
 }
 
 void DishwasherManager::SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB)
@@ -152,17 +166,18 @@ CHIP_ERROR DishwasherManager::HandleDeviceEnergyManagementCancelPowerAdjustReque
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-// kNoOptOut    = 0x00,
-// kLocalOptOut = 0x01,
-// kGridOptOut  = 0x02,
-// kOptOut      = 0x03,
 CHIP_ERROR DishwasherManager::HandleDeviceEnergyManagementStartTimeAdjustRequest(const uint32_t requestedStartTimeUtc,
                                                                                  AdjustmentCauseEnum cause)
 {
+#ifndef __ZEPHYR__
     AppEvent event;
     event.Type    = AppEvent::kEventType_Timer;
     event.Handler = nullptr;
     AppTask::GetAppTask().PostEvent(&event);
+#else
+    (void) requestedStartTimeUtc;
+    (void) cause;
+#endif
 
     return CHIP_NO_ERROR;
 }

@@ -24,7 +24,6 @@
 #include <lib/core/ClusterEnums.h>
 
 #include "AppConfig.h"
-#include "AppTask.h"
 #include "DataModelHelper.h"
 #include "DishwasherManager.h"
 #include "ElectricalEnergyMeasurementInstance.h"

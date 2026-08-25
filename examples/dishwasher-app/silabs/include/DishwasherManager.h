@@ -18,7 +18,9 @@
 
 #pragma once
 
+#ifndef __ZEPHYR__
 #include "AppEvent.h"
+#endif
 #include <DEMManufacturerDelegate.h>
 #include <DeviceEnergyManagementManager.h>
 #include <app-common/zap-generated/cluster-objects.h>

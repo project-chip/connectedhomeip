@@ -19,6 +19,7 @@ get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../third_party/conn
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 get_filename_component(ZEPHYR_PLATFORM_COMMON ${CHIP_ROOT}/examples/platform/silabs/zephyr REALPATH)
 get_filename_component(SILABS_DISHWASHER_COMMON ${CHIP_ROOT}/examples/dishwasher-app/silabs REALPATH)
+get_filename_component(ENERGY_MGMT_DIR ${CHIP_ROOT}/examples/energy-management REALPATH)
 
 
 # Need this as wiseconnect abstraction is causing a build failure
@@ -74,9 +75,17 @@ project(matter-zephyr-dishwasher)
 include(${CHIP_ROOT}/config/silabs/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 
+# Prefer examples/energy-management electrical-sensor headers over the older
+# FreeRTOS dishwasher copies of the same filenames (ElectricalSensorManager.h,
+# PowerTopologyDelegateImpl.h) so shared FakeReadings/DEM APIs resolve correctly.
 target_include_directories(app
     PRIVATE
     include
+    ${ENERGY_MGMT_DIR}/device-energy-management/include
+    ${ENERGY_MGMT_DIR}/electrical-sensor/include
+    ${ENERGY_MGMT_DIR}/utils/include
+    ${ENERGY_MGMT_DIR}/energy-management-triggers
+    ${SILABS_DISHWASHER_COMMON}/include
     ${ZEPHYR_PLATFORM_COMMON}
 )
 
@@ -91,6 +100,28 @@ target_sources(app
     ${ZEPHYR_PLATFORM_COMMON}/CHIPDeviceManager.cpp
     ${ZEPHYR_PLATFORM_COMMON}/CommonDeviceCallbacks.cpp
     ${ZEPHYR_PLATFORM_COMMON}/DataModelCallbacks.cpp
+
+    # Dishwasher-specific logic (FreeRTOS AppTask/DataModelCallbacks are not used;
+    # Zephyr owns those entry points under src/).
+    ${SILABS_DISHWASHER_COMMON}/src/DataModelHelper.cpp
+    ${SILABS_DISHWASHER_COMMON}/src/DeviceEnergyManager.cpp
+    ${SILABS_DISHWASHER_COMMON}/src/DishwasherManager.cpp
+    ${SILABS_DISHWASHER_COMMON}/src/operational-state-delegate-impl.cpp
+
+    # Shared energy-management (replaces stale energy-management-app/... paths in BUILD.gn)
+    ${ENERGY_MGMT_DIR}/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp
+    ${ENERGY_MGMT_DIR}/device-energy-management/src/DeviceEnergyManagementManager.cpp
+    ${ENERGY_MGMT_DIR}/device-energy-management/src/device-energy-management-mode.cpp
+    ${ENERGY_MGMT_DIR}/electrical-sensor/src/ElectricalEnergyMeasurementDelegateImpl.cpp
+    ${ENERGY_MGMT_DIR}/electrical-sensor/src/ElectricalPowerMeasurementDelegateImpl.cpp
+    ${ENERGY_MGMT_DIR}/electrical-sensor/src/ElectricalSensorManager.cpp
+    ${ENERGY_MGMT_DIR}/electrical-sensor/src/PowerTopologyDelegateImpl.cpp
+    ${ENERGY_MGMT_DIR}/utils/src/EnergyTimeUtils.cpp
+
+    # Test-event triggers (SystemLayer timers; need GetESManager from AppTask)
+    ${ENERGY_MGMT_DIR}/energy-management-triggers/DEMTestEventTriggers.cpp
+    ${ENERGY_MGMT_DIR}/energy-management-triggers/EnergyReportingEventTriggers.cpp
+    ${ENERGY_MGMT_DIR}/energy-management-triggers/FakeReadings.cpp
 )
 
 if(CONFIG_CHIP_FACTORY_DATA)

@@ -17,8 +17,6 @@
  */
 
 #include "AppConfig.h"
-#include "AppTask.h"
-
 #include "DataModelHelper.h"
 #include "DeviceEnergyManagementDelegateImpl.h"
 #include "DeviceEnergyManager.h"

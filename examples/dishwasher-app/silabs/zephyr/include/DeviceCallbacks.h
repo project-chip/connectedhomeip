@@ -19,7 +19,7 @@
 /**
  * @file DeviceCallbacks.h
  *
- * Dishwasher app DeviceManager callbacks (skeleton).
+ * Dishwasher app implementation for the DeviceManager callbacks
  *
  **/
 
@@ -40,7 +40,12 @@ public:
 } // namespace DishwasherApp
 
 namespace chip::Zephyr::App {
-
+/**
+ * Returns the application-specific implementation of the CommonDeviceCallbacks object.
+ *
+ * Applications can use this to gain access to features of the CommonDeviceCallbacks
+ * that are specific to the selected application.
+ */
 chip::DeviceManager::CHIPDeviceManagerCallbacks & GetDeviceCallbacks();
 
 } // namespace chip::Zephyr::App

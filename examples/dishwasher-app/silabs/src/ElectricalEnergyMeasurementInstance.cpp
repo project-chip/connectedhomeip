@@ -24,22 +24,25 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/ClusterEnums.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <system/SystemClock.h>
 
 #include "AppConfig.h"
-#include "AppTask.h"
 #include "ElectricalEnergyMeasurementInstance.h"
+
+#include <ElectricalPowerMeasurementDelegateImpl.h>
 
 #define mWms_TO_mWh(power) ((power) / 3600'000)
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::DeviceEnergyManagement;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Attributes;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Structs;
 using namespace chip::app::DataModel;
+using namespace chip::DeviceLayer;
 
 // Example of setting CumulativeEnergyReset structure - for now set these to 0
 // but the manufacturer may want to store these in non volatile storage for timestamp (based on epoch_s)
@@ -75,10 +78,10 @@ static const EnergyMeasurementStruct::Type sCumulativeExported = {
 };
 
 namespace {
-ElectricalPowerMeasurement::ElectricalPowerMeasurementDelegate * gEPMDelegate;
-EndpointId gEndpointId;
-int64_t sCumulativeActivePower = 0;
-uint8_t sSecondsSinceUpdate    = 0;
+ElectricalPowerMeasurement::ElectricalPowerMeasurementDelegate * gEPMDelegate = nullptr;
+EndpointId gEndpointId                                                        = kInvalidEndpointId;
+int64_t sCumulativeActivePower                                                = 0;
+uint8_t sSecondsSinceUpdate                                                   = 0;
 } // namespace
 
 CHIP_ERROR ElectricalEnergyMeasurementInstance::Init()
@@ -92,18 +95,13 @@ CHIP_ERROR ElectricalEnergyMeasurementInstance::Init()
     gEPMDelegate = GetEPMDelegate();
     gEndpointId  = mEndpointId;
 
-    CHIP_ERROR err;
-
     uint32_t currentTimestamp;
     ReturnErrorOnFailure(System::Clock::GetClock_MatterEpochS(currentTimestamp));
 
     sCumulativeImported.startTimestamp.SetValue(currentTimestamp);
     sCumulativeImported.startSystime.SetValue(System::SystemClock().GetMonotonicTimestamp().count());
 
-    // Initialize and start timer to calculate cumulative energy
-    err = InitTimer();
-    VerifyOrReturnError(CHIP_NO_ERROR == err, err, ChipLogError(AppServer, "Init failed on EEM Timer"));
-
+    // Start Matter SystemLayer timer (CMSIS-free; works on FreeRTOS and Zephyr)
     StartTimer(kTimerPeriodms);
 
     return ElectricalEnergyMeasurementAttrAccess::Init();
@@ -115,41 +113,29 @@ void ElectricalEnergyMeasurementInstance::Shutdown()
     ElectricalEnergyMeasurementAttrAccess::Shutdown();
 }
 
-CHIP_ERROR ElectricalEnergyMeasurementInstance::InitTimer()
-{
-    // Create cmsis os sw timer for EEM Cumulative timer
-    mTimer = osTimerNew(TimerEventHandler, // Timer callback handler
-                        osTimerPeriodic,   // Timer reload
-                        (void *) this,     // Pass the app task obj context
-                        NULL               // No osTimerAttr_t to provide.
-    );
-
-    VerifyOrReturnError(mTimer != NULL, APP_ERROR_CREATE_TIMER_FAILED, SILABS_LOG("Timer create failed"));
-
-    return CHIP_NO_ERROR;
-}
-
 void ElectricalEnergyMeasurementInstance::StartTimer(uint32_t aTimeoutMs)
 {
-    // Start or restart the function timer
-    if (osTimerStart(mTimer, pdMS_TO_TICKS(aTimeoutMs)) != osOK)
+    mTimerActive = true;
+    CHIP_ERROR err =
+        SystemLayer().StartTimer(System::Clock::Milliseconds32(aTimeoutMs), TimerEventHandler, this);
+    if (err != CHIP_NO_ERROR)
     {
-        SILABS_LOG("Timer start failed");
-        appError(APP_ERROR_START_TIMER_FAILED);
+        mTimerActive = false;
+        ChipLogError(AppServer, "EEM SystemLayer StartTimer failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
 void ElectricalEnergyMeasurementInstance::CancelTimer()
 {
-    if (osTimerStop(mTimer) == osError)
-    {
-        SILABS_LOG("Timer stop failed");
-        appError(APP_ERROR_STOP_TIMER_FAILED);
-    }
+    mTimerActive = false;
+    SystemLayer().CancelTimer(TimerEventHandler, this);
 }
 
-void ElectricalEnergyMeasurementInstance::TimerEventHandler(void * timerCbArg)
+void ElectricalEnergyMeasurementInstance::TimerEventHandler(System::Layer * systemLayer, void * appState)
 {
+    auto * self = static_cast<ElectricalEnergyMeasurementInstance *>(appState);
+    VerifyOrReturn(self != nullptr && self->mTimerActive);
+
     // Get different EPM Active Power values according to operational mode change
     Nullable<int64_t> EPMActivePower = gEPMDelegate ? gEPMDelegate->GetActivePower() : Nullable<int64_t>(0);
     int64_t activePower              = (EPMActivePower.IsNull()) ? 0 : EPMActivePower.Value();
@@ -161,16 +147,18 @@ void ElectricalEnergyMeasurementInstance::TimerEventHandler(void * timerCbArg)
     if (sSecondsSinceUpdate >= ElectricalEnergyMeasurementInstance::kAttributeFrequency)
     {
         sSecondsSinceUpdate = 0;
-
-        AppEvent event;
-        event.Type    = AppEvent::kEventType_Timer;
-        event.Handler = UpdateEnergyAttributesAndNotify;
-        AppTask::GetAppTask().PostEvent(&event);
+        // Hop to the Matter/CHIP thread for attribute updates (no FreeRTOS AppTask queue).
+        RETURN_SAFELY_IGNORED PlatformMgr().ScheduleWork(UpdateEnergyAttributesAndNotify, 0);
     }
+
+    // Re-arm periodic timer
+    self->StartTimer(kTimerPeriodms);
 }
 
-void ElectricalEnergyMeasurementInstance::UpdateEnergyAttributesAndNotify(AppEvent * aEvent)
+void ElectricalEnergyMeasurementInstance::UpdateEnergyAttributesAndNotify(intptr_t arg)
 {
+    (void) arg;
+
     // cumulativeImported update code - To update energy (mWs to mWh), startSystime and endSystime
     // Convert the unit : mW * ms -> mWh
     sCumulativeImported.energy = mWms_TO_mWh(sCumulativeActivePower * kTimerPeriodms);
@@ -185,8 +173,6 @@ void ElectricalEnergyMeasurementInstance::UpdateEnergyAttributesAndNotify(AppEve
     sCumulativeImported.endSystime.SetValue(System::SystemClock().GetMonotonicTimestamp().count());
 
     // Call the SDK to update attributes and generate an event
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
     NotifyCumulativeEnergyMeasured(gEndpointId, MakeOptional(sCumulativeImported), MakeOptional(sCumulativeExported));
     MatterReportingAttributeChangeCallback(gEndpointId, ElectricalEnergyMeasurement::Id, CumulativeEnergyImported::Id);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 }

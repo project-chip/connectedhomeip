@@ -20,17 +20,36 @@
 
 #include "AppTaskZephyr.h"
 
+#include <app/clusters/operational-state-server/operational-state-server.h>
+#include <lib/core/ClusterEnums.h>
+
 class AppTask : public chip::Zephyr::App::AppTaskZephyr
 {
 public:
+    using OperationalStateEnum = chip::app::Clusters::OperationalState::OperationalStateEnum;
+
     ~AppTask() override{};
     void PreInitMatterStack(void) override;
     void PostInitMatterStack(void) override;
     void PostInitMatterServerInstance(void) override;
+
     static AppTask & GetDefaultInstance();
 
+    static void ActionInitiated(OperationalStateEnum action);
+    static void ActionCompleted();
+
 private:
-    static AppTask sAppTask;
 };
 
 chip::Zephyr::App::AppTaskBase & GetAppTask();
+
+/**
+ * Drive LED1 from dishwasher operational state (on=Running, blink patterns for Pause/Error).
+ * No-op if LED1 is not available on the board.
+ */
+void UpdateOperationalStateLed(chip::app::Clusters::OperationalState::OperationalStateEnum state);
+
+/**
+ * Apply fake EPM readings for the given operational state (endpoint 2 electrical sensor).
+ */
+void UpdateEpmAttributesForOperationalState(chip::app::Clusters::OperationalState::OperationalStateEnum state);
