@@ -23,6 +23,7 @@
 #include "ThermostatClusterCore.h"
 #include "ThermostatClusterHeatingSetpoints.h"
 #include "ThermostatClusterSetpointsBase.h"
+#include "lib/core/CHIPError.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeValueEncoder.h>
@@ -49,8 +50,14 @@ public:
         Delegate()          = default;
         virtual ~Delegate() = default;
 
+        virtual CHIP_ERROR Startup(ServerClusterContext & context);
+        virtual void Shutdown(ClusterShutdownType type);
+
         virtual Protocols::InteractionModel::Status GetMinDeadband(temperature & minDeadband) const;
     };
+
+    CHIP_ERROR Startup(ServerClusterContext & context);
+    void Shutdown(ClusterShutdownType type);
 
     ThermostatAutoSetpoints(Delegate & delegate) : mDelegate(delegate) {}
 
@@ -82,6 +89,39 @@ public:
         mHeating(detail::MakeFeature<kHasHeating, ThermostatHeatingSetpoints>(std::forward_as_tuple(delegates...), *this)),
         mAuto(detail::MakeFeature<kHasAuto, ThermostatAutoSetpoints>(std::forward_as_tuple(delegates...)))
     {}
+
+    CHIP_ERROR Startup(ServerClusterContext & context)
+    {
+        if constexpr (kHasCooling)
+        {
+            ReturnErrorOnFailure(mCooling.Startup(context));
+        }
+        if constexpr (kHasHeating)
+        {
+            ReturnErrorOnFailure(mHeating.Startup(context));
+        }
+        if constexpr (kHasAuto)
+        {
+            ReturnErrorOnFailure(mAuto.Startup(context));
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    void Shutdown(ClusterShutdownType type)
+    {
+        if constexpr (kHasCooling)
+        {
+            mCooling.Shutdown(type);
+        }
+        if constexpr (kHasHeating)
+        {
+            mHeating.Shutdown(type);
+        }
+        if constexpr (kHasAuto)
+        {
+            mAuto.Shutdown(type);
+        }
+    }
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
     {

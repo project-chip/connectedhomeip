@@ -24,6 +24,16 @@ namespace Thermostat {
 
 using namespace Protocols::InteractionModel;
 
+CHIP_ERROR Delegate::Startup(ServerClusterContext & context)
+{
+    return CHIP_NO_ERROR;
+}
+
+void Delegate::Shutdown(ClusterShutdownType type)
+{
+    
+}
+
 Protocols::InteractionModel::Status Delegate::GetOutdoorTemperature(DataModel::Nullable<temperature> &) const
 {
     return Status::UnsupportedAttribute;

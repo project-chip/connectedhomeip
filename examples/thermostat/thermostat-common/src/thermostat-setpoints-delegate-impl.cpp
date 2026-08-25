@@ -35,10 +35,13 @@ using namespace chip::app::Clusters::Thermostat::Structs;
 using namespace Protocols::InteractionModel;
 using namespace System::Clock;
 
-Protocols::InteractionModel::Status ThermostatSetpointsDelegate::Init()
+CHIP_ERROR ThermostatSetpointsDelegate::Startup(ServerClusterContext & context)
 {
+    if (mStarted) {
+        return CHIP_NO_ERROR;
+    }
     AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
-    VerifyOrReturnError(provider != nullptr, Status::Failure);
+    VerifyOrReturnError(provider != nullptr, CHIP_ERROR_PERSISTED_STORAGE_FAILED);
     AttributePersistence persistence(*provider);
 
     if (auto status = AbsMinCoolSetpointLimit::GetDefault(mEndpointId, &mAbsMinCoolSetpointLimit); status != Status::Success)
@@ -121,7 +124,13 @@ Protocols::InteractionModel::Status ThermostatSetpointsDelegate::Init()
     persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, UnoccupiedHeatingSetpoint::Id }, mUnoccupiedHeatingSetpoint,
                                       mUnoccupiedHeatingSetpoint);
 
-    return Status::Success;
+    mStarted = true;
+    return CHIP_NO_ERROR;
+}
+
+void ThermostatSetpointsDelegate::Shutdown(ClusterShutdownType type)
+{
+    mStarted = false;
 }
 
 Protocols::InteractionModel::Status ThermostatSetpointsDelegate::GetMinDeadband(temperature & minDeadband) const

@@ -18,6 +18,7 @@
 
 #include "../include/thermostat-delegate-impl.h"
 #include "app/data-model/Nullable.h"
+#include "app/server-cluster/ServerClusterContext.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/reporting/reporting.h>
@@ -35,10 +36,10 @@ using namespace chip::app::Clusters::Thermostat::Structs;
 using namespace Protocols::InteractionModel;
 using namespace System::Clock;
 
-Protocols::InteractionModel::Status ThermostatDelegate::Init()
+CHIP_ERROR ThermostatDelegate::Startup(ServerClusterContext & context)
 {
     AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
-    VerifyOrReturnError(provider != nullptr, Status::Failure);
+    VerifyOrReturnError(provider != nullptr, CHIP_ERROR_PERSISTED_STORAGE_FAILED);
     AttributePersistence persistence(*provider);
 
     persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, SystemMode::Id }, mSystemMode, mSystemMode);
@@ -50,7 +51,7 @@ Protocols::InteractionModel::Status ThermostatDelegate::Init()
         mRemoteSensing = BitMask<RemoteSensingBitmap>(remoteSensing);
     }
 
-    return Status::Success;
+    return CHIP_NO_ERROR;
 }
 
 SystemModeEnum ThermostatDelegate::GetSystemMode() const

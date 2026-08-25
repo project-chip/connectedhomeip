@@ -18,8 +18,8 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <app/server-cluster/DefaultServerCluster.h>
 
-#include "Setpoints.h"
 #include "Temperature.h"
 
 namespace chip {
@@ -36,6 +36,9 @@ class Delegate
 public:
     Delegate()          = default;
     virtual ~Delegate() = default;
+
+    virtual CHIP_ERROR Startup(ServerClusterContext & context);
+    virtual void Shutdown(ClusterShutdownType type);
 
     virtual DataModel::Nullable<temperature> GetLocalTemperature() const            = 0;
     virtual Protocols::InteractionModel::Status SetLocalTemperature(DataModel::Nullable<temperature> localTemperature,

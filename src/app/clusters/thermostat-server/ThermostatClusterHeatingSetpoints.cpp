@@ -41,6 +41,16 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
+CHIP_ERROR ThermostatHeatingSetpoints::Delegate::Startup(ServerClusterContext & context)
+{
+    return CHIP_NO_ERROR;
+}
+
+void ThermostatHeatingSetpoints::Delegate::Shutdown(ClusterShutdownType type)
+{
+    
+}
+
 Status ThermostatHeatingSetpoints::Delegate::GetUnoccupiedHeatingSetpoint(temperature & unoccupiedHeatingSetpoint) const
 {
     return Status::UnsupportedAttribute;
@@ -77,6 +87,16 @@ Status ThermostatHeatingSetpoints::Delegate::SetMaxHeatSetpointLimit(temperature
 {
     return Status::UnsupportedAttribute;
 };
+
+CHIP_ERROR ThermostatHeatingSetpoints::Startup(ServerClusterContext & context)
+{
+    return mDelegate.Startup(context);
+}
+
+void ThermostatHeatingSetpoints::Shutdown(ClusterShutdownType type)
+{
+    mDelegate.Shutdown(type);
+}
 
 bool ThermostatHeatingSetpoints::HandlesAttribute(AttributeId attributeId)
 {

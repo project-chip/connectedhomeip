@@ -50,9 +50,6 @@ CHIP_ERROR AppTask::Init(void)
 
     ReturnErrorOnFailure(InitCommonParts());
 
-    gThermostatDelegate.Init();
-    gSetpointsDelegate.Init();
-    gHoldDelegate.Init();
     Clusters::Thermostat::ServerInit(gThermostatEndpoint, gThermostatDelegate, gSetpointsDelegate, gHoldDelegate, gPresetsDelegate,
                                      gSuggestionsDelegate);
 

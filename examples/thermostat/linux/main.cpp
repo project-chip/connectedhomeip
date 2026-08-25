@@ -91,9 +91,6 @@ void ApplicationInit()
 {
     ChipLogProgress(Zcl, "Thermostat application init");
 
-    gThermostatDelegate.Init();
-    gSetpointsDelegate.Init();
-    gHoldDelegate.Init();
     Clusters::Thermostat::ServerInit<ThermostatClusterType>(gThermostatEndpoint, gThermostatDelegate, gSetpointsDelegate,
                                                             gHoldDelegate, gPresetsDelegate, gSuggestionsDelegate);
 }

@@ -36,6 +36,8 @@ public:
         mEndpointId(endpoint), mProvider(provider)
     {}
 
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+
     TemperatureSetpointHoldEnum GetTemperatureSetpointHold() const override;
     Protocols::InteractionModel::Status SetTemperatureSetpointHold(TemperatureSetpointHoldEnum hold, bool & changed) override;
 
@@ -47,7 +49,6 @@ public:
     Protocols::InteractionModel::Status SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> timestamp,
                                                                        bool & changed) override;
 
-    Protocols::InteractionModel::Status Init();
 
 private:
     EndpointId mEndpointId;

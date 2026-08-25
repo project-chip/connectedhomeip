@@ -48,6 +48,7 @@ struct OptionalAttributes
     bool TemperatureSetpointHold         = false;
     bool TemperatureSetpointHoldDuration = false;
     bool ThermostatRunningState          = false;
+
     bool SetpointChangeSource            = false;
     bool SetpointChangeAmount            = false;
     bool SetpointChangeSourceTimestamp   = false;

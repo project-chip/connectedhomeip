@@ -225,9 +225,6 @@ void ApplicationInit()
     Clusters::ValveConfigurationAndControl::SetDefaultDelegate(chip::EndpointId(1), &sValveDelegate);
     Clusters::TimeSynchronization::SetDefaultDelegate(&sTimeSyncDelegate);
 
-    gThermostatDelegate.Init();
-    gSetpointsDelegate.Init();
-    gHoldDelegate.Init();
     Clusters::Thermostat::ServerInit<ThermostatClusterType>(gThermostatEndpoint, gThermostatDelegate, gSetpointsDelegate,
                                                             gHoldDelegate, gPresetsDelegate, gSuggestionsDelegate);
 

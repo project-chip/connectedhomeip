@@ -27,10 +27,10 @@ using namespace chip::app::Clusters::Thermostat::Attributes;
 using namespace chip::app::Clusters::Thermostat::Structs;
 using namespace Protocols::InteractionModel;
 
-Status ThermostatHoldDelegate::Init()
+CHIP_ERROR ThermostatHoldDelegate::Startup(ServerClusterContext & context)
 {
     AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
-    VerifyOrReturnError(provider != nullptr, Status::Failure);
+    VerifyOrReturnError(provider != nullptr, CHIP_ERROR_PERSISTED_STORAGE_FAILED);
     AttributePersistence persistence(*provider);
 
     persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, TemperatureSetpointHold::Id }, mTemperatureSetpointHold,
@@ -39,7 +39,7 @@ Status ThermostatHoldDelegate::Init()
                                                 mTemperatureSetpointHoldDuration, DataModel::NullNullable);
     persistence.LoadNativeEndianValue<uint32_t>({ mEndpointId, Thermostat::Id, SetpointHoldExpiryTimestamp::Id },
                                                 mSetpointHoldExpiryTimestamp, DataModel::NullNullable);
-    return Status::Success;
+    return CHIP_NO_ERROR;
 }
 
 TemperatureSetpointHoldEnum ThermostatHoldDelegate::GetTemperatureSetpointHold() const

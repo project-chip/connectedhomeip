@@ -39,6 +39,16 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
+CHIP_ERROR ThermostatCoolingSetpoints::Delegate::Startup(ServerClusterContext & context)
+{
+    return CHIP_NO_ERROR;
+}
+
+void ThermostatCoolingSetpoints::Delegate::Shutdown(ClusterShutdownType type)
+{
+
+}
+
 Status ThermostatCoolingSetpoints::Delegate::GetAbsMinCoolSetpointLimit(temperature & absMinCoolSetpointLimit) const
 {
     return Status::UnsupportedAttribute;
@@ -78,6 +88,16 @@ Status ThermostatCoolingSetpoints::Delegate::SetUnoccupiedCoolingSetpoint(temper
 {
     return Status::UnsupportedAttribute;
 };
+
+CHIP_ERROR ThermostatCoolingSetpoints::Startup(ServerClusterContext & context)
+{
+    return mDelegate.Startup(context);
+}
+
+void ThermostatCoolingSetpoints::Shutdown(ClusterShutdownType type)
+{
+    mDelegate.Shutdown(type);
+}
 
 bool ThermostatCoolingSetpoints::HandlesAttribute(AttributeId attributeId)
 {

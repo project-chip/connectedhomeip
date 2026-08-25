@@ -39,7 +39,8 @@ public:
         mEndpointId(endpoint), mProvider(provider)
     {}
 
-    Protocols::InteractionModel::Status Init();
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+    void Shutdown(ClusterShutdownType type) override;
 
     Protocols::InteractionModel::Status GetMinDeadband(temperature & minDeadband) const override;
 
@@ -78,6 +79,7 @@ public:
 private:
     EndpointId mEndpointId;
     AttributePersistenceProvider * mProvider = nullptr;
+    bool mStarted = false;
 
     temperature mOccupiedCoolingSetpoint;
     temperature mUnoccupiedCoolingSetpoint;

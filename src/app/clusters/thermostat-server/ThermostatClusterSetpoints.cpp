@@ -39,9 +39,29 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
+CHIP_ERROR ThermostatAutoSetpoints::Delegate::Startup(ServerClusterContext & context)
+{
+    return CHIP_NO_ERROR;
+}
+
+void ThermostatAutoSetpoints::Delegate::Shutdown(ClusterShutdownType type)
+{
+
+}
+
 Status ThermostatAutoSetpoints::Delegate::GetMinDeadband(temperature & minDeadband) const
 {
     return Status::UnsupportedAttribute;
+}
+
+CHIP_ERROR ThermostatAutoSetpoints::Startup(ServerClusterContext & context)
+{
+    return mDelegate.Startup(context);
+}
+
+void ThermostatAutoSetpoints::Shutdown(ClusterShutdownType type)
+{
+    mDelegate.Shutdown(type);
 }
 
 Status ThermostatAutoSetpoints::LoadDeadband(temperature & deadband)

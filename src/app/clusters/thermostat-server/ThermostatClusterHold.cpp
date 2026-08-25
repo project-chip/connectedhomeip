@@ -35,6 +35,26 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
+CHIP_ERROR ThermostatHold::Delegate::Startup(ServerClusterContext & context)
+{
+    return CHIP_NO_ERROR;
+}
+
+void ThermostatHold::Delegate::Shutdown(ClusterShutdownType type)
+{
+    
+}
+
+CHIP_ERROR ThermostatHold::Startup(ServerClusterContext & context)
+{
+    return mDelegate.Startup(context);
+}
+
+void ThermostatHold::Shutdown(ClusterShutdownType type)
+{
+    mDelegate.Shutdown(type);
+}
+
 std::optional<DataModel::ActionReturnStatus> ThermostatHold::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                            AttributeValueEncoder & encoder)
 {

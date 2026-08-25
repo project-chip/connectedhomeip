@@ -64,11 +64,11 @@ CHIP_ERROR ThermostatClusterCore::Attributes(const ConcreteClusterPath & path,
                                              ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
-        { HasAttribute(LocalTemperatureCalibration::Id), LocalTemperatureCalibration::kMetadataEntry },
-        { HasAttribute(OutdoorTemperature::Id), OutdoorTemperature::kMetadataEntry },
-        { HasAttribute(RemoteSensing::Id), RemoteSensing::kMetadataEntry },
-        { HasAttribute(ThermostatRunningMode::Id), ThermostatRunningMode::kMetadataEntry },
-        { HasAttribute(ThermostatRunningState::Id), ThermostatRunningState::kMetadataEntry },
+        { mConfig.mOptionalAttributes.LocalTemperatureCalibration, LocalTemperatureCalibration::kMetadataEntry },
+        { mConfig.mOptionalAttributes.OutdoorTemperature, OutdoorTemperature::kMetadataEntry },
+        { mConfig.mOptionalAttributes.RemoteSensing, RemoteSensing::kMetadataEntry },
+        { mConfig.mOptionalAttributes.ThermostatRunningMode, ThermostatRunningMode::kMetadataEntry },
+        { mConfig.mOptionalAttributes.ThermostatRunningState, ThermostatRunningState::kMetadataEntry },
     };
 
     AttributeListBuilder listBuilder(builder);

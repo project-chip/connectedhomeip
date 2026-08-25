@@ -23,6 +23,7 @@
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
+#include <app/server-cluster/DefaultServerCluster.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
 namespace chip {
@@ -40,6 +41,9 @@ public:
     public:
         virtual ~Delegate() = default;
 
+        virtual CHIP_ERROR Startup(ServerClusterContext & context);
+        virtual void Shutdown(ClusterShutdownType type);
+
         virtual TemperatureSetpointHoldEnum GetTemperatureSetpointHold() const                 = 0;
         virtual Protocols::InteractionModel::Status SetTemperatureSetpointHold(TemperatureSetpointHoldEnum temperatureSetpointHold,
                                                                                bool & changed) = 0;
@@ -52,6 +56,9 @@ public:
         virtual Protocols::InteractionModel::Status
         SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> setpointHoldExpiryTimestamp, bool & changed) = 0;
     };
+
+    CHIP_ERROR Startup(ServerClusterContext & context);
+    void Shutdown(ClusterShutdownType type);
 
     ThermostatHold(ThermostatClusterCore & cluster, Delegate & delegate) : mCluster(cluster), mDelegate(delegate) {}
 

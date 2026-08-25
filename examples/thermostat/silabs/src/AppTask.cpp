@@ -116,9 +116,6 @@ CHIP_ERROR AppTask::AppInit()
     GetLCD().SetCustomUI(ThermostatUI::DrawUI);
 #endif
 
-    kThermostatDelegate.Init();
-    kHoldDelegate.Init();
-    kSetpointsDelegate.Init();
     Clusters::Thermostat::ServerInit(kThermostatEndpoint, kThermostatDelegate, kSetpointsDelegate, kHoldDelegate, kPresetsDelegate,
                                      kSuggestionsDelegate);
 

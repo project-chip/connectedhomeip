@@ -64,15 +64,22 @@ public:
     CHIP_ERROR Startup(ServerClusterContext & context) override
     {
         ReturnErrorOnFailure(ThermostatClusterCore::Startup(context));
+        ReturnErrorOnFailure(mDelegate.Startup(context));
         if constexpr (kRequiresAtomicWrite)
         {
             mAtomicWriteSession.Startup();
+        }
+        ReturnErrorOnFailure(mSetpoints.Startup(context));
+        if constexpr (kHasHold)
+        {
+            ReturnErrorOnFailure(mHold.Startup(context));
         }
         return CHIP_NO_ERROR;
     }
 
     void Shutdown(ClusterShutdownType type) override
     {
+        mDelegate.Shutdown(type);
         if constexpr (kRequiresAtomicWrite)
         {
             mAtomicWriteSession.Shutdown();

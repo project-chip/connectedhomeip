@@ -18,6 +18,7 @@
 #pragma once
 
 #include "app/clusters/thermostat-server/Temperature.h"
+#include "lib/core/CHIPError.h"
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/persistence/AttributePersistenceProviderInstance.h>
 
@@ -36,6 +37,8 @@ public:
         mEndpointId(endpoint), mProvider(provider)
     {}
 
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+    
     SystemModeEnum GetSystemMode() const override;
     Protocols::InteractionModel::Status SetSystemMode(SystemModeEnum systemMode, bool & changed) override;
 
@@ -58,8 +61,6 @@ public:
 
     Protocols::InteractionModel::Status GetRemoteSensing(BitMask<RemoteSensingBitmap> & remoteSensing) const override;
     Protocols::InteractionModel::Status SetRemoteSensing(BitMask<RemoteSensingBitmap> sensing, bool & changed) override;
-
-    Protocols::InteractionModel::Status Init();
 
 private:
     EndpointId mEndpointId;

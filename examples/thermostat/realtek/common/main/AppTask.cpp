@@ -301,9 +301,6 @@ void AppTask::InitServer(intptr_t arg)
         return;
     }
 
-    gThermostatDelegate.Init();
-    gHoldDelegate.Init();
-    gSetpointsDelegate.Init();
     Clusters::Thermostat::ServerInit(gThermostatEndpoint, gThermostatDelegate, gSetpointsDelegate, gHoldDelegate, gPresetsDelegate,
                                      gSuggestionsDelegate);
 

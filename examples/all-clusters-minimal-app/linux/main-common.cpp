@@ -102,9 +102,6 @@ void ApplicationInit()
 {
     Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
 
-    gThermostatDelegate.Init();
-    gThermostatHoldDelegate.Init();
-    gThermostatSetpointsDelegate.Init();
     Clusters::Thermostat::ServerInit<ThermostatClusterType>(gThermostatEndpoint, gThermostatDelegate, gThermostatSetpointsDelegate,
                                                             gThermostatHoldDelegate, gThermostatPresetsDelegate,
                                                             gThermostatSuggestionsDelegate);
