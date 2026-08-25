@@ -75,7 +75,7 @@ def get_host_ipv6_addresses():
     return results
 
 
-async def is_dut_tcp_supported(instance_qname: str):
+async def is_dut_tcp_supported(instance_qname: str) -> bool:
     """
     Determines whether the DUT supports TCP by inspecting its operational service TXT record.
 
