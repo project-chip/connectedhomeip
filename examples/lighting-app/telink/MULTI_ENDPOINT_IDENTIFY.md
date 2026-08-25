@@ -190,18 +190,18 @@ Identify sIdentify6 = {
 > **Important Note**: Why does Identify require per-endpoint instances while
 > On/Off does not?
 >
-> - On/Off/Level/Color Control clusters use **RAM/NVM static storage** - ZAP
->   automatically allocates attribute storage for all endpoints during code
->   generation.
-> - Identify cluster uses **EXTERNAL_STORAGE** - it requires an active C++
->   object instance to manage the countdown timer, effect callbacks, and dynamic
->   state. Each endpoint needs its own instance.
+> -   On/Off/Level/Color Control clusters use **RAM/NVM static storage** - ZAP
+>     automatically allocates attribute storage for all endpoints during code
+>     generation.
+> -   Identify cluster uses **EXTERNAL_STORAGE** - it requires an active C++
+>     object instance to manage the countdown timer, effect callbacks, and
+>     dynamic state. Each endpoint needs its own instance.
 >
 > `FIXED_ENDPOINT_COUNT` includes Endpoint 0, so:
 >
-> - EP0 + EP1 -> `FIXED_ENDPOINT_COUNT == 2`
-> - EP0 + EP1 + EP2 -> `FIXED_ENDPOINT_COUNT == 3`
-> - EP0 + EP1 ... EP6 -> `FIXED_ENDPOINT_COUNT == 7`
+> -   EP0 + EP1 -> `FIXED_ENDPOINT_COUNT == 2`
+> -   EP0 + EP1 + EP2 -> `FIXED_ENDPOINT_COUNT == 3`
+> -   EP0 + EP1 ... EP6 -> `FIXED_ENDPOINT_COUNT == 7`
 
 ---
 
@@ -247,8 +247,8 @@ event.Handler = [](AppEvent * event) {
 
 Make the same changes to the switch-case in `IdentifyStopHandler`:
 
-- For start handler: `setPwmBlink()` to start blinking
-- For stop handler: `setPwm(pwm, false)` to stop blinking
+-   For start handler: `setPwmBlink()` to start blinking
+-   For stop handler: `setPwm(pwm, false)` to stop blinking
 
 ---
 
