@@ -832,9 +832,9 @@ TEST_F(TestSessionManagerDispatch, TestGroupPrepareMessageChainedBufferFailure)
 }
 #endif // !CHIP_CONFIG_SECURITY_TEST_MODE
 
-// An inbound message that fails to authenticate must not change any state on the
+// A message that fails to decrypt must not update the cached peer address of the
 // session it names.
-TEST_F(TestSessionManagerDispatch, TestUnauthenticMessageDoesNotRebindPeerAddress)
+TEST_F(TestSessionManagerDispatch, TestUndecryptableMessageDoesNotRebindPeerAddress)
 {
     SessionManager sessionManager;
     TestSessionManagerInit(mContext, sessionManager, *mResources);
@@ -879,17 +879,18 @@ TEST_F(TestSessionManagerDispatch, TestUnauthenticMessageDoesNotRebindPeerAddres
 
 // Injects the two halves of a PASE session pair so that a message prepared on
 // `initiator` decrypts on `responder`.
-void InjectSessionPair(SessionManager & sessionManager, SessionHolder & initiator, SessionHolder & responder,
-                       const PeerAddress & peerAddress)
+CHIP_ERROR InjectSessionPair(SessionManager & sessionManager, SessionHolder & initiator, SessionHolder & responder,
+                             const PeerAddress & peerAddress)
 {
-    ASSERT_SUCCESS(sessionManager.InjectPaseSessionWithTestKey(initiator, 2, 0x0000000000000002ULL, 1, kFabricIndex, peerAddress,
-                                                               CryptoContext::SessionRole::kInitiator));
-    ASSERT_SUCCESS(sessionManager.InjectPaseSessionWithTestKey(responder, 1, 0x0000000000000001ULL, 2, kFabricIndex, peerAddress,
-                                                               CryptoContext::SessionRole::kResponder));
+    ReturnErrorOnFailure(sessionManager.InjectPaseSessionWithTestKey(initiator, 2, 0x0000000000000002ULL, 1, kFabricIndex,
+                                                                     peerAddress, CryptoContext::SessionRole::kInitiator));
+    return sessionManager.InjectPaseSessionWithTestKey(responder, 1, 0x0000000000000001ULL, 2, kFabricIndex, peerAddress,
+                                                       CryptoContext::SessionRole::kResponder);
 }
 
 // Prepares an encrypted message on `session` carrying a fixed payload.
-void PrepareTestMessage(SessionManager & sessionManager, const SessionHandle & session, EncryptedPacketBufferHandle & prepared)
+CHIP_ERROR PrepareTestMessage(SessionManager & sessionManager, const SessionHandle & session,
+                              EncryptedPacketBufferHandle & prepared)
 {
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(0);
@@ -898,8 +899,8 @@ void PrepareTestMessage(SessionManager & sessionManager, const SessionHandle & s
 
     const uint8_t kPayload[]           = { 0x11, 0x22, 0x33, 0x44 };
     System::PacketBufferHandle payload = MessagePacketBuffer::NewWithData(kPayload, sizeof(kPayload));
-    ASSERT_FALSE(payload.IsNull());
-    ASSERT_SUCCESS(sessionManager.PrepareMessage(session, payloadHeader, std::move(payload), prepared));
+    VerifyOrReturnError(!payload.IsNull(), CHIP_ERROR_NO_MEMORY);
+    return sessionManager.PrepareMessage(session, payloadHeader, std::move(payload), prepared);
 }
 
 // A replay of an already accepted message is authentic, so it must not be able to
@@ -914,11 +915,12 @@ TEST_F(TestSessionManagerDispatch, TestReplayedMessageDoesNotRebindPeerAddress)
 
     SessionHolder initiator;
     SessionHolder responder;
-    InjectSessionPair(sessionManager, initiator, responder, establishedAddress);
+    ASSERT_SUCCESS(InjectSessionPair(sessionManager, initiator, responder, establishedAddress));
     SecureSession * receiver = responder.Get().Value()->AsSecureSession();
 
     EncryptedPacketBufferHandle prepared;
-    PrepareTestMessage(sessionManager, initiator.Get().Value(), prepared);
+    ASSERT_SUCCESS(PrepareTestMessage(sessionManager, initiator.Get().Value(), prepared));
+    ASSERT_FALSE(prepared.IsNull());
 
     EncryptedPacketBufferHandle firstDelivery = prepared.CloneData();
     sessionManager.OnMessageReceived(establishedAddress, firstDelivery.CastToWritable());
@@ -944,11 +946,12 @@ TEST_F(TestSessionManagerDispatch, TestAcceptedMessageFromNewAddressRebindsPeerA
 
     SessionHolder initiator;
     SessionHolder responder;
-    InjectSessionPair(sessionManager, initiator, responder, establishedAddress);
+    ASSERT_SUCCESS(InjectSessionPair(sessionManager, initiator, responder, establishedAddress));
     SecureSession * receiver = responder.Get().Value()->AsSecureSession();
 
     EncryptedPacketBufferHandle prepared;
-    PrepareTestMessage(sessionManager, initiator.Get().Value(), prepared);
+    ASSERT_SUCCESS(PrepareTestMessage(sessionManager, initiator.Get().Value(), prepared));
+    ASSERT_FALSE(prepared.IsNull());
 
     sessionManager.OnMessageReceived(newAddress, prepared.CastToWritable());
 
