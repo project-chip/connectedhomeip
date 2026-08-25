@@ -22,6 +22,7 @@
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/av-analysis-server/AvAnalysisCameraClient.h>
+#include <app/clusters/av-analysis-server/AvAnalysisCameraInteraction.h>
 #include <app/clusters/av-analysis-server/AvAnalysisCluster.h>
 #include <app/clusters/av-analysis-server/AvAnalysisStorage.h>
 #include <app/clusters/av-analysis-server/AvAnalysisStreamTable.h>
@@ -151,11 +152,8 @@ private:
     // Backing store for the AnalysisStreams attribute; only initialized when RemoteContextDetection is set.
     AvAnalysis::AnalysisStreamTable mStreamTable;
 
-    // Whether a camera interaction is in flight.
-    bool mCameraRequestInFlight = false;
-    CommandHandler::Handle mPendingCommandHandle;
-    ConcreteCommandPath mPendingCommandPath = ConcreteCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
-    ScopedNodeId mPendingCameraNode;
+    // The single camera-bound interaction that may be in flight
+    AvAnalysis::CameraInteraction mCameraInteraction;
 
     /**
      * Applies a state transition to a stream entry and reports the AnalysisStreams attribute change.

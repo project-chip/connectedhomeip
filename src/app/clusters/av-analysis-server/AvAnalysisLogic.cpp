@@ -92,8 +92,7 @@ void AvAnalysisServerLogic::Shutdown()
     }
 
     // Release any command still waiting on a camera interaction; its exchange dies with the server.
-    mCameraRequestInFlight = false;
-    mPendingCommandHandle  = CommandHandler::Handle();
+    mCameraInteraction.Abort();
 
     if (mDelegate != nullptr)
     {
@@ -115,16 +114,19 @@ void AvAnalysisServerLogic::SetStreamState(AnalysisStreamEntry & aEntry, Analysi
 
 void AvAnalysisServerLogic::OnVideoStreamAllocated(Status aStatus, uint16_t aVideoStreamId)
 {
-    mCameraRequestInFlight = false;
+    VerifyOrReturn(mCameraInteraction.GetState() == AvAnalysis::CameraInteraction::State::kEstablishing,
+                   ChipLogError(Zcl, "AvAnalysis[ep=%d]: unexpected allocation completion", mEndpointId));
 
-    auto handleRef = std::move(mPendingCommandHandle);
+    ScopedNodeId cameraNode = mCameraInteraction.CameraNode();
+    ConcreteCommandPath commandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
+    auto handleRef = mCameraInteraction.Complete(commandPath);
     auto * handler = handleRef.Get();
     VerifyOrReturn(handler != nullptr);
 
     // a non-SUCCESS camera response is propagated as the command status, no side-effects.
     if (aStatus != Status::Success)
     {
-        handler->AddStatus(mPendingCommandPath, aStatus);
+        handler->AddStatus(commandPath, aStatus);
         return;
     }
 
@@ -133,10 +135,10 @@ void AvAnalysisServerLogic::OnVideoStreamAllocated(Status aStatus, uint16_t aVid
     {
         ChipLogError(Zcl, "AvAnalysis[ep=%d]: camera-assigned stream id %u collides with an existing entry", mEndpointId,
                      aVideoStreamId);
-        handler->AddStatus(mPendingCommandPath, Status::ResourceExhausted);
+        handler->AddStatus(commandPath, Status::ResourceExhausted);
         return;
     }
-    entry->cameraNode = mPendingCameraNode;
+    entry->cameraNode = cameraNode;
 
     MarkDirty(Attributes::CurrentAnalysisStreamCount::Id);
     MarkDirty(Attributes::AnalysisStreams::Id);
@@ -144,21 +146,23 @@ void AvAnalysisServerLogic::OnVideoStreamAllocated(Status aStatus, uint16_t aVid
 
     Commands::EstablishAnalysisStreamResponse::Type response;
     response.analysisStreamID = aVideoStreamId;
-    handler->AddResponse(mPendingCommandPath, response);
+    handler->AddResponse(commandPath, response);
 }
 
 void AvAnalysisServerLogic::OnVideoStreamDeallocated(Status aStatus, uint16_t aAnalysisStreamId)
 {
-    mCameraRequestInFlight = false;
+    VerifyOrReturn(mCameraInteraction.GetState() == AvAnalysis::CameraInteraction::State::kRemoving,
+                   ChipLogError(Zcl, "AvAnalysis[ep=%d]: unexpected deallocation completion", mEndpointId));
 
-    auto handleRef = std::move(mPendingCommandHandle);
+    ConcreteCommandPath commandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
+    auto handleRef = mCameraInteraction.Complete(commandPath);
     auto * handler = handleRef.Get();
     VerifyOrReturn(handler != nullptr);
 
     // A non-SUCCESS camera response is propagated as the command status.
     if (aStatus != Status::Success)
     {
-        handler->AddStatus(mPendingCommandPath, aStatus);
+        handler->AddStatus(commandPath, aStatus);
         return;
     }
 
@@ -169,7 +173,7 @@ void AvAnalysisServerLogic::OnVideoStreamDeallocated(Status aStatus, uint16_t aA
         LogErrorOnFailure(StoreAnalysisStreams());
     }
 
-    handler->AddStatus(mPendingCommandPath, Status::Success);
+    handler->AddStatus(commandPath, Status::Success);
 }
 
 CHIP_ERROR
@@ -879,23 +883,17 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleEstabl
                         ChipLogError(Zcl, "AvAnalysis[ep=%d]: no camera client configured", mEndpointId));
 
     // One camera-bound command at a time; the response of this one depends on the camera's answer
-    VerifyOrReturnValue(!mCameraRequestInFlight, Status::Busy);
+    VerifyOrReturnValue(!mCameraInteraction.InFlight(), Status::Busy);
 
     // The camera SHALL be on the same fabric as the Analysis Node: reach it on the invoking client's fabric
     ScopedNodeId cameraNode(commandData.nodeID, handler.GetAccessingFabricIndex());
 
-    mPendingCommandHandle = CommandHandler::Handle(&handler);
-    mPendingCommandPath   = commandPath;
-    mPendingCameraNode    = cameraNode;
-    handler.FlushAcksRightAwayOnSlowCommand();
-
-    mCameraRequestInFlight = true;
-    CHIP_ERROR err         = mCameraClient->RequestVideoStreamAllocation(cameraNode, *this);
+    mCameraInteraction.Begin(AvAnalysis::CameraInteraction::State::kEstablishing, handler, commandPath, cameraNode);
+    CHIP_ERROR err = mCameraClient->RequestVideoStreamAllocation(cameraNode, *this);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "AvAnalysis[ep=%d]: failed to start stream allocation: %" CHIP_ERROR_FORMAT, mEndpointId, err.Format());
-        mCameraRequestInFlight = false;
-        mPendingCommandHandle  = CommandHandler::Handle();
+        mCameraInteraction.Abort();
         return (err == CHIP_ERROR_BUSY) ? Status::Busy : Status::Failure;
     }
 
@@ -939,19 +937,14 @@ AvAnalysisServerLogic::HandleRemoveAnalysisStream(CommandHandler & handler, cons
                         ChipLogError(Zcl, "AvAnalysis[ep=%d]: no camera client configured", mEndpointId));
 
     // One camera-bound command at a time; the response of this one depends on the camera's answer
-    VerifyOrReturnValue(!mCameraRequestInFlight, Status::Busy);
+    VerifyOrReturnValue(!mCameraInteraction.InFlight(), Status::Busy);
 
-    mPendingCommandHandle = CommandHandler::Handle(&handler);
-    mPendingCommandPath   = commandPath;
-    handler.FlushAcksRightAwayOnSlowCommand();
-
-    mCameraRequestInFlight = true;
-    CHIP_ERROR err         = mCameraClient->RequestVideoStreamDeallocation(entry->cameraNode, commandData.analysisStreamID, *this);
+    mCameraInteraction.Begin(AvAnalysis::CameraInteraction::State::kRemoving, handler, commandPath, entry->cameraNode);
+    CHIP_ERROR err = mCameraClient->RequestVideoStreamDeallocation(entry->cameraNode, commandData.analysisStreamID, *this);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "AvAnalysis[ep=%d]: failed to start stream deallocation: %" CHIP_ERROR_FORMAT, mEndpointId, err.Format());
-        mCameraRequestInFlight = false;
-        mPendingCommandHandle  = CommandHandler::Handle();
+        mCameraInteraction.Abort();
         return (err == CHIP_ERROR_BUSY) ? Status::Busy : Status::Failure;
     }
 
