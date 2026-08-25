@@ -29,12 +29,10 @@
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 
-#include <platform/nxp/common/ConnectivityManagerImpl.h>
-
 #include <openthread/mdns.h>
 #include <openthread/srp_server.h>
 
-#include <DnssdImplBr.h>
+#include <platform/OpenThread/OpenThreadBrDnssdImpl.h>
 
 using namespace ::chip::DeviceLayer;
 using namespace chip::DeviceLayer::Internal;
@@ -162,7 +160,7 @@ otInstance * mOtInstance = nullptr;
 Inet::InterfaceId mExternalNetIf;
 Inet::InterfaceId mThreadNetIf;
 
-// IntrusiveList requires an empty list at destruction time. NxpChipDnssdShutdown()
+// IntrusiveList requires an empty list at destruction time. OpenThreadBrDnssdShutdown()
 // empties both lists, so static storage duration is safe here.
 IntrusiveList<mDnsQueryCtx> mResolveList;
 IntrusiveList<mDnsQueryCtx> mBrowseList;
@@ -172,7 +170,7 @@ IntrusiveList<mDnsQueryCtx> mBrowseList;
 static otMdnsService * mServiceList[kServiceListSize] = {};
 static uint32_t mServiceListFreeIndex;
 
-CHIP_ERROR NxpChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
+CHIP_ERROR OpenThreadBrDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
 {
     mOtInstance = ThreadStackMgrImpl().OTInstance();
 
@@ -230,7 +228,7 @@ CHIP_ERROR NxpChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncRet
     return CHIP_ERROR_INCORRECT_STATE;
 }
 
-void NxpChipDnssdShutdown()
+void OpenThreadBrDnssdShutdown()
 {
     while (!mBrowseList.Empty())
     {
@@ -254,7 +252,7 @@ void NxpChipDnssdShutdown()
     mNetifIndex    = 0;
 }
 
-CHIP_ERROR NxpChipDnssdRemoveServices()
+CHIP_ERROR OpenThreadBrDnssdRemoveServices()
 {
     otMdnsIterator * iterator = nullptr;
     ChipError error           = CHIP_NO_ERROR;
@@ -303,7 +301,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR NxpChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
+CHIP_ERROR OpenThreadBrDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
     VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -327,7 +325,7 @@ CHIP_ERROR NxpChipDnssdPublishService(const DnssdService * service, DnssdPublish
     {
         uint32_t keySize = strlen(service->mTextEntries[i].mKey);
         // add TXT entry len, + 1 is for '='
-        *(txtBuffer + txtBufferOffset++) = keySize + service->mTextEntries[i].mDataSize + 1;
+        *(txtBuffer + txtBufferOffset++) = static_cast<uint8_t>(keySize + service->mTextEntries[i].mDataSize + 1);
 
         // add TXT entry key
         memcpy(txtBuffer + txtBufferOffset, service->mTextEntries[i].mKey, keySize);
@@ -381,11 +379,11 @@ CHIP_ERROR NxpChipDnssdPublishService(const DnssdService * service, DnssdPublish
         otServiceData.mServiceInstance     = service->mName;
         otServiceData.mServiceType         = serviceType;
         otServiceData.mSubTypeLabels       = service->mSubTypes;
-        otServiceData.mSubTypeLabelsLength = service->mSubTypeSize;
+        otServiceData.mSubTypeLabelsLength = static_cast<uint16_t>(service->mSubTypeSize);
         otServiceData.mPort                = service->mPort;
         otServiceData.mTtl                 = service->mTtlSeconds;
         otServiceData.mTxtData             = txtBuffer;
-        otServiceData.mTxtDataLength       = txtBufferOffset;
+        otServiceData.mTxtDataLength       = static_cast<uint16_t>(txtBufferOffset);
 
         otErr = otMdnsRegisterService(mOtInstance, &otServiceData, mRegisterServiceId++, NULL);
     }
@@ -393,7 +391,7 @@ CHIP_ERROR NxpChipDnssdPublishService(const DnssdService * service, DnssdPublish
     return MapOpenThreadError(otErr);
 }
 
-CHIP_ERROR NxpChipDnssdFinalizeServiceUpdate()
+CHIP_ERROR OpenThreadBrDnssdFinalizeServiceUpdate()
 {
     for (uint32_t i = 0; i < mServiceListFreeIndex; i++)
     {
@@ -409,9 +407,9 @@ CHIP_ERROR NxpChipDnssdFinalizeServiceUpdate()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR NxpChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, Inet::IPAddressType addressType,
-                              Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
-                              intptr_t * browseIdentifier)
+CHIP_ERROR OpenThreadBrDnssdBrowse(const char * type, DnssdServiceProtocol protocol, Inet::IPAddressType addressType,
+                                   Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
+                                   intptr_t * browseIdentifier)
 {
     *browseIdentifier             = reinterpret_cast<intptr_t>(nullptr);
     CHIP_ERROR error              = CHIP_NO_ERROR;
@@ -479,7 +477,7 @@ CHIP_ERROR NxpChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, 
     return error;
 }
 
-CHIP_ERROR NxpChipDnssdStopBrowse(intptr_t browseIdentifier)
+CHIP_ERROR OpenThreadBrDnssdStopBrowse(intptr_t browseIdentifier)
 {
     mDnsQueryCtx * pBrowseContext = reinterpret_cast<mDnsQueryCtx *>(browseIdentifier);
     otError error                 = OT_ERROR_INVALID_ARGS;
@@ -509,8 +507,8 @@ CHIP_ERROR NxpChipDnssdStopBrowse(intptr_t browseIdentifier)
     return MapOpenThreadError(error);
 }
 
-CHIP_ERROR NxpChipDnssdResolve(DnssdService * browseResult, Inet::InterfaceId interface, DnssdResolveCallback callback,
-                               void * context)
+CHIP_ERROR OpenThreadBrDnssdResolve(DnssdService * browseResult, Inet::InterfaceId interface, DnssdResolveCallback callback,
+                                    void * context)
 {
     ChipError error                = CHIP_ERROR_NOT_FOUND;
     mDnsQueryCtx * pResolveContext = nullptr;
@@ -558,7 +556,7 @@ CHIP_ERROR NxpChipDnssdResolve(DnssdService * browseResult, Inet::InterfaceId in
 
     return error;
 }
-void NxpChipDnssdResolveNoLongerNeeded(const char * instanceName)
+void OpenThreadBrDnssdResolveNoLongerNeeded(const char * instanceName)
 {
     mDnsQueryCtx * pResolveContext = reinterpret_cast<mDnsQueryCtx *>(GetResolveElement(instanceName, kNameTypeInstance));
     if (pResolveContext != nullptr)
@@ -1098,7 +1096,7 @@ static void DispatchResolve(intptr_t context)
 static void DispatchResolveSrp(intptr_t context)
 {
     // When processing this function, the context is valid and not added to the resolve list. The OpenThread service
-    // resolver was not started, and a call to NxpChipDnssdShutdown or NxpChipDnssdResolveNoLongerNeeded will have
+    // resolver was not started, and a call to OpenThreadBrDnssdShutdown or OpenThreadBrDnssdResolveNoLongerNeeded will have
     // no effect on this context. The only place that the context is being freed is below.
     mDnsQueryCtx * pResolveContext = reinterpret_cast<mDnsQueryCtx *>(context);
     Dnssd::DnssdService & service  = pResolveContext->mMdnsService;
