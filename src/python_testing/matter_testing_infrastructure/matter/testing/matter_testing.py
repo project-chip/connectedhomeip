@@ -2439,12 +2439,17 @@ class MatterBaseTest(base_test.BaseTestClass):
         Returns:
             DeviceProxyWrapper if PASE session was successfully established, None otherwise.
         """
+        # Retrieve the long_discriminator
+        long_discriminator = setup_payload.long_discriminator
+        asserts.assert_is_not_none(long_discriminator, "Expected setup payload to contain a long discriminator")
+        long_discriminator = typing.cast(int, long_discriminator)
+
         # Create a new onboarding_data where only the NTL bit (0b10000) is kept in the discovery capabilities bitmask
         ntl_onboarding_data = SetupPayload().GenerateQrCode(
             passcode=setup_payload.setup_passcode,
             vendorId=setup_payload.vendor_id,
             productId=setup_payload.product_id,
-            discriminator=setup_payload.long_discriminator,
+            discriminator=long_discriminator,
             customFlow=setup_payload.commissioning_flow,
             capabilities=0b10000,
             version=setup_payload.version
