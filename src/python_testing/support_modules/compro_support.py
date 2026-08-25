@@ -733,11 +733,16 @@ class EDFixture:
     async def _run_subprocess(argv: list[str], timeout: int) -> tuple[int, str, str]:
         """Run argv to completion, returning (returncode, stdout, stderr).
 
-        ``asyncio.wait_for`` cancels the ``communicate()`` task but leaves the child
-        running.  An orphaned ``serial_console.py`` keeps the UART (it opens the port
-        with ``exclusive=True``), so every later serial call — including ``stop()`` in
-        teardown — would fail with a port-busy ``SerialException`` and the run could not
-        recover.  Kill the child before propagating the timeout.
+        Cancelling ``communicate()`` — whether by the timeout below or by the caller —
+        leaves the child running.  An orphaned ``serial_console.py`` keeps the UART (it
+        opens the port with ``exclusive=True``), so every later serial call, including
+        ``stop()`` in teardown, would fail with a port-busy ``SerialException`` and the
+        run could not recover.  Kill the child on both exits.
+
+        ``CancelledError`` derives from ``BaseException``, so the timeout handler does
+        not cover it, and it is the likelier of the two here: the framework runs the
+        whole test body inside ``asyncio.wait_for(..., default_timeout)``, so a budget
+        overrun cancels this coroutine wherever it happens to be suspended.
         """
         proc = await asyncio.create_subprocess_exec(
             *argv,
@@ -747,9 +752,10 @@ class EDFixture:
         )
         try:
             stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=timeout)
-        except TimeoutError:
-            proc.kill()
-            await proc.wait()
+        except (TimeoutError, asyncio.CancelledError):
+            if proc.returncode is None:
+                proc.kill()
+                await proc.wait()
             raise
         return proc.returncode, stdout.decode(errors='replace'), stderr.decode(errors='replace')
 

@@ -303,19 +303,16 @@ class TC_COMPRO_2_4(COMPROBaseTest):
 
         # ----------------------------------------------------------------
         # Steps 4–9: iterate once per transport bit in valid_transports.
-        # Each step is registered with the framework exactly once (before
-        # the loop); the loop body runs sequentially for each transport.
-        # When valid_transports has a single bit the loop runs exactly once,
-        # identical to the previous single-transport behaviour.
+        # step() accepts each step exactly once and in order, so the markers cannot
+        # simply move into the loop.  They are issued on the first pass only, each one
+        # immediately before its own work: a failure then reports against the step it
+        # happened in.  Marking all six up front instead made every failure in the loop
+        # report as step 9, which is indistinguishable from a genuine step-9
+        # ProxyDisconnect failure.  A second transport re-runs the same work with the
+        # markers already consumed.
         # ----------------------------------------------------------------
-        self.step(4)
-        self.step(5)
-        self.step(6)
-        self.step(7)
-        self.step(8)
-        self.step(9)
-
         for iteration_index, transport_bit in enumerate(transports_to_test):
+            first_pass = (iteration_index == 0)
             is_wifipaf = (transport_bit == kWiFiPAF_bit)
             transport_label = 'WiFiPAF' if is_wifipaf else 'BLE'
             single_transport = transport_bit
@@ -347,6 +344,8 @@ class TC_COMPRO_2_4(COMPROBaseTest):
             )
 
             # -- Step 4 work: ensure ED commissionable for this transport --
+            if first_pass:
+                self.step(4)
             await self.ensure_ed_commissionable(
                 ed,
                 manual_prompt=(
@@ -359,6 +358,8 @@ class TC_COMPRO_2_4(COMPROBaseTest):
             )
 
             # -- Step 5 work: ProxyConnectRequest --
+            if first_pass:
+                self.step(5)
             logger.info("[%s] Sending ProxyConnectRequest "
                         "(transport=0x%02x discriminator=%d wiFiBand=%s)",
                         transport_label, single_transport, ed_discriminator,
@@ -389,6 +390,8 @@ class TC_COMPRO_2_4(COMPROBaseTest):
             logger.info("[%s] ProxyConnectResponse: sessionID=%d", transport_label, current_session_id)
 
             # -- Step 6 work: ProxyMessageRequest(ResponseTimeout=0, Message=null) --
+            if first_pass:
+                self.step(6)
             # Sent before commissioning so it does not perturb the tunneled flow.
             # Per spec: ResponseTimeout=0 means no response is expected and the
             # proxy responds immediately with success; Message=null means the proxy
@@ -415,6 +418,8 @@ class TC_COMPRO_2_4(COMPROBaseTest):
                         else f"{len(msg_response.message)} bytes")
 
             # -- Step 7 work: CommissionViaProxy --
+            if first_pass:
+                self.step(7)
             self.default_controller.SetWiFiCredentials(wifi_ssid, wifi_password)
 
             logger.info("[%s] Commissioning ED via proxy (sessionID=%d nodeId=0x%04x "
@@ -432,6 +437,8 @@ class TC_COMPRO_2_4(COMPROBaseTest):
                         transport_label, ed_node_id)
 
             # -- Step 8 work: ProxyDisconnect invalid SessionID → NOT_FOUND --
+            if first_pass:
+                self.step(8)
             non_existent_session_id = 0xFFFE
             logger.info("[%s] Sending ProxyDisconnectRequest with non-existent sessionID=%d",
                         transport_label, non_existent_session_id)
@@ -453,6 +460,8 @@ class TC_COMPRO_2_4(COMPROBaseTest):
                             "returned NOT_FOUND", transport_label)
 
             # -- Step 9 work: ProxyDisconnect valid current_session_id → SUCCESS --
+            if first_pass:
+                self.step(9)
             logger.info("[%s] Sending ProxyDisconnectRequest with valid sessionID=%d",
                         transport_label, current_session_id)
             await self.default_controller.SendCommand(

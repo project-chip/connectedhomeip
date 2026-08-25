@@ -93,6 +93,10 @@ logger = logging.getLogger(__name__)
 CONNECT_TIMEOUT_S = 120
 SCAN_TIMEOUT_MARGIN = 1.10  # 10 % tolerance on top of ScanMaxTime
 CACHE_POLL_TIMEOUT_S = 70   # per-fabric NumCachedResults poll in step 13
+# ScanMaxTime is a uint8 with a min of 1 (commissioning-proxy-cluster.xml), so a
+# spec-conformant DUT may report anything up to 255 s.  The framework timeout is
+# fixed before the DUT is read, so it has to cover the largest legal value.
+MAX_SCAN_MAX_TIME_S = 255
 
 
 class TC_COMPRO_2_8(COMPROBaseTest):
@@ -102,13 +106,16 @@ class TC_COMPRO_2_8(COMPROBaseTest):
         # Worst case, all sequential:
         #   step 6  ProxyConnect on fabric A — up to proxy_connect_timeout (120 s default)
         #   step 13 two NumCachedResults polls, one fabric after the other
-        #   step 17 concurrent scan — ScanMaxTime + 10 % + 2 s, ~66 s at a 60 s ScanMaxTime
-        #   fabric-B commissioning, the remaining commands and framework overhead — ~130 s
-        # A fixed budget was previously exceeded by step 6 plus step 13 alone, which
-        # aborts the run with a framework timeout instead of a step result.
+        #   step 17 concurrent scan — the step's own ScanMaxTime + 10 % + 2 s budget, at
+        #           the largest ScanMaxTime the DUT is allowed to report
+        #   fabric-B commissioning, the remaining commands and framework overhead
+        # Overrunning this cancels the test body rather than failing a step, so every
+        # component is sized from a configured or spec-maximum value, never an observed
+        # one: the DUT is not read until the test is already running.
         params = getattr(self, 'user_params', {}) or {}
         proxy_connect_timeout = int(params.get('proxy_connect_timeout', CONNECT_TIMEOUT_S))
-        return proxy_connect_timeout + 2 * CACHE_POLL_TIMEOUT_S + 200
+        concurrent_scan = int(MAX_SCAN_MAX_TIME_S * SCAN_TIMEOUT_MARGIN) + 2
+        return proxy_connect_timeout + 2 * CACHE_POLL_TIMEOUT_S + concurrent_scan + 200
 
     def desc_TC_COMPRO_2_8(self) -> str:
         return "[TC-COMPRO-2.8] Fabric Isolation with DUT as Server"

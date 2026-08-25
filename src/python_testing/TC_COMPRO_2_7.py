@@ -87,15 +87,27 @@ from matter.testing.runner import TestStep, default_matter_test_main
 logger = logging.getLogger(__name__)
 
 CONNECT_TIMEOUT_S = 120
+CONNECT_MARGIN_S = 10       # IM round trip on top of each ProxyConnect timeout
+# MaxSessions is a uint8 with a min of 1 (commissioning-proxy-cluster.xml), so a
+# spec-conformant DUT may report up to 255 -- far more sessions than any rig can
+# open one after another.  The budget is sized for this many instead, and step 2
+# fails with a clear message when the DUT reports more.
+SESSIONS_TESTABLE_DEFAULT = 5
 
 
 class TC_COMPRO_2_7(COMPROBaseTest):
 
     @property
     def default_timeout(self) -> int:
-        # Step 6 connect loop: max_sessions × (proxy_connect_timeout + margin)
-        # Step 7 quick rejection + step 9 disconnects + other steps: ~60 s
-        return 600
+        # Step 6 opens one session per ED, sequentially, each up to
+        # proxy_connect_timeout.  Steps 7-9 and the reads either side add ~4 min.
+        # Overrunning this cancels the test body rather than failing a step, so the
+        # budget is sized from the configured session count -- the DUT's MaxSessions
+        # is not readable until the test is already running.
+        params = getattr(self, 'user_params', {}) or {}
+        proxy_connect_timeout = int(params.get('proxy_connect_timeout', CONNECT_TIMEOUT_S))
+        sessions_testable = int(params.get('sessions_testable', SESSIONS_TESTABLE_DEFAULT))
+        return sessions_testable * (proxy_connect_timeout + CONNECT_MARGIN_S) + 240
 
     def desc_TC_COMPRO_2_7(self) -> str:
         return "[TC-COMPRO-2.7] Multi-Session Support with DUT as Server"
@@ -165,6 +177,18 @@ class TC_COMPRO_2_7(COMPROBaseTest):
         max_sessions = int(await self.read_max_sessions())
         asserts.assert_greater_equal(max_sessions, 1,
                                      f"MaxSessions must be ≥ 1, got {max_sessions}")
+        # Stop here rather than in the middle of step 6: the connect loop is sized into
+        # default_timeout, and exceeding it cancels the test body, which reports as a
+        # framework timeout instead of naming the cause.
+        params = getattr(self, 'user_params', {}) or {}
+        sessions_testable = int(params.get('sessions_testable', SESSIONS_TESTABLE_DEFAULT))
+        asserts.assert_less_equal(
+            max_sessions, sessions_testable,
+            f"DUT reports MaxSessions={max_sessions}, more than this run is budgeted for "
+            f"({sessions_testable}).  Step 6 opens one session per ED sequentially, each up to "
+            f"{int(params.get('proxy_connect_timeout', CONNECT_TIMEOUT_S))} s.  Pass "
+            f"--int-arg sessions_testable:{max_sessions} and supply ed2_*..ed{max_sessions}_* "
+            f"arguments for the extra end devices.")
         logger.info("max_sessions = %d", max_sessions)
 
         # Step 3 — read Transport
