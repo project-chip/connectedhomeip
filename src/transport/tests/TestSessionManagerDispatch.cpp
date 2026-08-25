@@ -877,8 +877,6 @@ TEST_F(TestSessionManagerDispatch, TestUnauthenticMessageDoesNotRebindPeerAddres
     sessionManager.Shutdown();
 }
 
-
-
 // Injects the two halves of a PASE session pair so that a message prepared on
 // `initiator` decrypts on `responder`.
 void InjectSessionPair(SessionManager & sessionManager, SessionHolder & initiator, SessionHolder & responder,
