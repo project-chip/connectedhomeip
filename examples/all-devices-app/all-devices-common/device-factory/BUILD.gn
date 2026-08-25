@@ -72,7 +72,7 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/speaker:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/temperature-sensor:increasing",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve",
-    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/window-covering",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/window-covering:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors:oob-accessors",
     "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/boolean-state-sensor:boolean-state-sensor-accessor",
     "${chip_root}/src/lib/support",
