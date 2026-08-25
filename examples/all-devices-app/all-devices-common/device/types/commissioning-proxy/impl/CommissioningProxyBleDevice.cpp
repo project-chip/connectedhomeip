@@ -24,7 +24,8 @@ namespace app {
 CommissioningProxyBleDevice::CommissioningProxyBleDevice(
     const Context & context, Clusters::CommissioningProxy::CommissioningProxyBleAdapter & bleAdapter,
     const Clusters::CommissioningProxy::CommissioningProxyCluster::Config & config) :
-    CommissioningProxyDevice(context, config), mBleTransport(bleAdapter, context.timerDelegate)
+    CommissioningProxyDevice(context, config),
+    mBleTransport(bleAdapter, context.timerDelegate)
 {
     // From the constructor body, not the initializer list: mBleTransport is a member of
     // this class and so is constructed after the base.

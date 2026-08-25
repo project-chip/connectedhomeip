@@ -28,8 +28,8 @@ namespace app {
 
 CommissioningProxyDevice::CommissioningProxyDevice(const Context & context,
                                                    const Clusters::CommissioningProxy::CommissioningProxyCluster::Config & config) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCommissioningByProxy, 1)), mContext(context),
-    mConfig(config)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCommissioningByProxy, 1)),
+    mContext(context), mConfig(config)
 {}
 
 void CommissioningProxyDevice::AddTransport(Clusters::CommissioningProxy::CommissioningProxyTransport & transport)
