@@ -36,7 +36,8 @@ public:
     // always exist before this delegate is constructed, so they are injected by reference.
     LoggingRvcRunModeDelegate(OperationalState::OperationalStateCluster & operationalStateCluster,
                               ServiceArea::LoggingServiceAreaDelegate & serviceAreaDelegate) :
-        mOperationalStateCluster(operationalStateCluster), mServiceAreaDelegate(serviceAreaDelegate)
+        mOperationalStateCluster(operationalStateCluster),
+        mServiceAreaDelegate(serviceAreaDelegate)
     {}
 
     CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
