@@ -39,7 +39,6 @@ from enum import IntFlag
 from typing import Any, TypeAlias
 
 import matter.testing.matchers as matchers
-import matter.testing.nfc
 
 # isort: off
 
