@@ -191,8 +191,7 @@ CHIP_ERROR BindingGroupBindCommandHandler(int argc, char ** argv)
 
     Binding::TableEntry * entry =
         Platform::New<Binding::TableEntry>(atoi(argv[0]), atoi(argv[1]), 1, std::make_optional<ClusterId>(6));
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry)));
-    return CHIP_NO_ERROR;
+    return ScheduleBindingWork(entry);
 }
 
 CHIP_ERROR BindingUnicastBindCommandHandler(int argc, char ** argv)
@@ -201,8 +200,7 @@ CHIP_ERROR BindingUnicastBindCommandHandler(int argc, char ** argv)
 
     Binding::TableEntry * entry =
         Platform::New<Binding::TableEntry>(atoi(argv[0]), atoi(argv[1]), 1, atoi(argv[2]), std::make_optional<ClusterId>(6));
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry)));
-    return CHIP_NO_ERROR;
+    return ScheduleBindingWork(entry);
 }
 
 /********************************************************
@@ -615,6 +613,30 @@ static void RegisterSwitchCommands()
  * Switch functions
  *********************************************************/
 
+CHIP_ERROR ScheduleSwitchCommandWork(BindingCommandData * data)
+{
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    if (err != CHIP_NO_ERROR)
+    {
+        Platform::Delete(data);
+    }
+    return err;
+}
+
+CHIP_ERROR ScheduleBindingWork(Binding::TableEntry * entry)
+{
+    VerifyOrReturnError(entry != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
+    if (err != CHIP_NO_ERROR)
+    {
+        Platform::Delete(entry);
+    }
+    return err;
+}
+
 void SwitchWorkerFunction(intptr_t context)
 {
     VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "SwitchWorkerFunction - Invalid work data"));
@@ -639,7 +661,7 @@ CHIP_ERROR InitBindingHandler()
     // The initialization of binding manager will try establishing connection with unicast peers
     // so it requires the Server instance to be correctly initialized. Post the init function to
     // the event queue so that everything is ready when initialization is conducted.
-    LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork(InitBindingHandlerInternal));
+    ReturnErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork(InitBindingHandlerInternal));
 #if CONFIG_ENABLE_CHIP_SHELL
     RegisterSwitchCommands();
 #endif

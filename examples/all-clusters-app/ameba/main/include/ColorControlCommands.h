@@ -821,8 +821,7 @@ CHIP_ERROR MoveToHueCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->args[4]             = atoi(argv[4]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR MoveHueCommandHandler(int argc, char ** argv)
@@ -840,8 +839,7 @@ CHIP_ERROR MoveHueCommandHandler(int argc, char ** argv)
     data->args[2]             = atoi(argv[2]);
     data->args[3]             = atoi(argv[3]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR StepHueCommandHandler(int argc, char ** argv)
@@ -860,8 +858,7 @@ CHIP_ERROR StepHueCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->args[4]             = atoi(argv[4]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR MoveToSaturationCommandHandler(int argc, char ** argv)
@@ -879,8 +876,7 @@ CHIP_ERROR MoveToSaturationCommandHandler(int argc, char ** argv)
     data->args[2]             = atoi(argv[2]);
     data->args[3]             = atoi(argv[3]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR MoveSaturationCommandHandler(int argc, char ** argv)
@@ -898,8 +894,7 @@ CHIP_ERROR MoveSaturationCommandHandler(int argc, char ** argv)
     data->args[2]             = atoi(argv[2]);
     data->args[3]             = atoi(argv[3]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR StepSaturationCommandHandler(int argc, char ** argv)
@@ -918,8 +913,7 @@ CHIP_ERROR StepSaturationCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->args[4]             = atoi(argv[4]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR MoveToHueAndSaturationCommandHandler(int argc, char ** argv)
@@ -938,8 +932,7 @@ CHIP_ERROR MoveToHueAndSaturationCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->args[4]             = atoi(argv[4]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR MoveToColorCommandHandler(int argc, char ** argv)
@@ -958,8 +951,7 @@ CHIP_ERROR MoveToColorCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->args[4]             = atoi(argv[4]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR MoveColorCommandHandler(int argc, char ** argv)
@@ -977,8 +969,7 @@ CHIP_ERROR MoveColorCommandHandler(int argc, char ** argv)
     data->args[2]             = atoi(argv[2]);
     data->args[3]             = atoi(argv[3]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR StepColorCommandHandler(int argc, char ** argv)
@@ -997,8 +988,7 @@ CHIP_ERROR StepColorCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->args[4]             = atoi(argv[4]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR MoveToColorTemperatureCommandHandler(int argc, char ** argv)
@@ -1016,8 +1006,7 @@ CHIP_ERROR MoveToColorTemperatureCommandHandler(int argc, char ** argv)
     data->args[2]             = atoi(argv[2]);
     data->args[3]             = atoi(argv[3]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR EnhancedMoveToHueCommandHandler(int argc, char ** argv)
@@ -1036,8 +1025,7 @@ CHIP_ERROR EnhancedMoveToHueCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->args[4]             = atoi(argv[4]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR EnhancedMoveHueCommandHandler(int argc, char ** argv)
@@ -1055,8 +1043,7 @@ CHIP_ERROR EnhancedMoveHueCommandHandler(int argc, char ** argv)
     data->args[2]             = atoi(argv[2]);
     data->args[3]             = atoi(argv[3]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR EnhancedStepHueCommandHandler(int argc, char ** argv)
@@ -1075,8 +1062,7 @@ CHIP_ERROR EnhancedStepHueCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->args[4]             = atoi(argv[4]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR EnhancedMoveToHueAndSaturationCommandHandler(int argc, char ** argv)
@@ -1095,8 +1081,7 @@ CHIP_ERROR EnhancedMoveToHueAndSaturationCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->args[4]             = atoi(argv[4]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorLoopSetCommandHandler(int argc, char ** argv)
@@ -1117,8 +1102,7 @@ CHIP_ERROR ColorLoopSetCommandHandler(int argc, char ** argv)
     data->args[5]             = atoi(argv[5]);
     data->args[6]             = atoi(argv[6]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR StopMoveStepCommandHandler(int argc, char ** argv)
@@ -1134,8 +1118,7 @@ CHIP_ERROR StopMoveStepCommandHandler(int argc, char ** argv)
     data->args[0]             = atoi(argv[0]);
     data->args[1]             = atoi(argv[1]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR MoveColorTemperatureCommandHandler(int argc, char ** argv)
@@ -1155,8 +1138,7 @@ CHIP_ERROR MoveColorTemperatureCommandHandler(int argc, char ** argv)
     data->args[4]             = atoi(argv[4]);
     data->args[5]             = atoi(argv[5]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR StepColorTemperatureCommandHandler(int argc, char ** argv)
@@ -1177,8 +1159,7 @@ CHIP_ERROR StepColorTemperatureCommandHandler(int argc, char ** argv)
     data->args[5]             = atoi(argv[5]);
     data->args[6]             = atoi(argv[6]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 /********************************************************
@@ -1208,8 +1189,7 @@ CHIP_ERROR ColorControlReadAttributeList(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadCurrentHue(int argc, char ** argv)
@@ -1219,8 +1199,7 @@ CHIP_ERROR ColorControlReadCurrentHue(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadCurrentSaturation(int argc, char ** argv)
@@ -1230,8 +1209,7 @@ CHIP_ERROR ColorControlReadCurrentSaturation(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadRemainingTime(int argc, char ** argv)
@@ -1241,8 +1219,7 @@ CHIP_ERROR ColorControlReadRemainingTime(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadCurrentX(int argc, char ** argv)
@@ -1252,8 +1229,7 @@ CHIP_ERROR ColorControlReadCurrentX(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadCurrentY(int argc, char ** argv)
@@ -1263,8 +1239,7 @@ CHIP_ERROR ColorControlReadCurrentY(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadDriftCompensation(int argc, char ** argv)
@@ -1274,8 +1249,7 @@ CHIP_ERROR ColorControlReadDriftCompensation(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadCompensationText(int argc, char ** argv)
@@ -1285,8 +1259,7 @@ CHIP_ERROR ColorControlReadCompensationText(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadColorTemperature(int argc, char ** argv)
@@ -1296,8 +1269,7 @@ CHIP_ERROR ColorControlReadColorTemperature(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadColorMode(int argc, char ** argv)
@@ -1307,8 +1279,7 @@ CHIP_ERROR ColorControlReadColorMode(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadOptions(int argc, char ** argv)
@@ -1318,8 +1289,7 @@ CHIP_ERROR ColorControlReadOptions(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadNumberOfPrimaries(int argc, char ** argv)
@@ -1329,8 +1299,7 @@ CHIP_ERROR ColorControlReadNumberOfPrimaries(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadPrimary1X(int argc, char ** argv)
@@ -1340,8 +1309,7 @@ CHIP_ERROR ColorControlReadPrimary1X(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadPrimary1Y(int argc, char ** argv)
@@ -1351,8 +1319,7 @@ CHIP_ERROR ColorControlReadPrimary1Y(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadPrimary1Intensity(int argc, char ** argv)
@@ -1362,8 +1329,7 @@ CHIP_ERROR ColorControlReadPrimary1Intensity(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadPrimary2X(int argc, char ** argv)
@@ -1373,8 +1339,7 @@ CHIP_ERROR ColorControlReadPrimary2X(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadPrimary2Y(int argc, char ** argv)
@@ -1384,8 +1349,7 @@ CHIP_ERROR ColorControlReadPrimary2Y(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadPrimary2Intensity(int argc, char ** argv)
@@ -1395,8 +1359,7 @@ CHIP_ERROR ColorControlReadPrimary2Intensity(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadPrimary3X(int argc, char ** argv)
@@ -1406,8 +1369,7 @@ CHIP_ERROR ColorControlReadPrimary3X(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadPrimary3Y(int argc, char ** argv)
@@ -1417,8 +1379,7 @@ CHIP_ERROR ColorControlReadPrimary3Y(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadPrimary3Intensity(int argc, char ** argv)
@@ -1428,8 +1389,7 @@ CHIP_ERROR ColorControlReadPrimary3Intensity(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadPrimary4X(int argc, char ** argv)
@@ -1439,8 +1399,7 @@ CHIP_ERROR ColorControlReadPrimary4X(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadPrimary4Y(int argc, char ** argv)
@@ -1450,8 +1409,7 @@ CHIP_ERROR ColorControlReadPrimary4Y(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadPrimary4Intensity(int argc, char ** argv)
@@ -1461,8 +1419,7 @@ CHIP_ERROR ColorControlReadPrimary4Intensity(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadPrimary5X(int argc, char ** argv)
@@ -1472,8 +1429,7 @@ CHIP_ERROR ColorControlReadPrimary5X(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadPrimary5Y(int argc, char ** argv)
@@ -1483,8 +1439,7 @@ CHIP_ERROR ColorControlReadPrimary5Y(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadPrimary5Intensity(int argc, char ** argv)
@@ -1494,8 +1449,7 @@ CHIP_ERROR ColorControlReadPrimary5Intensity(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadPrimary6X(int argc, char ** argv)
@@ -1505,8 +1459,7 @@ CHIP_ERROR ColorControlReadPrimary6X(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadPrimary6Y(int argc, char ** argv)
@@ -1516,8 +1469,7 @@ CHIP_ERROR ColorControlReadPrimary6Y(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadPrimary6Intensity(int argc, char ** argv)
@@ -1527,8 +1479,7 @@ CHIP_ERROR ColorControlReadPrimary6Intensity(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadWhitePointX(int argc, char ** argv)
@@ -1538,8 +1489,7 @@ CHIP_ERROR ColorControlReadWhitePointX(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadWhitePointY(int argc, char ** argv)
@@ -1549,8 +1499,7 @@ CHIP_ERROR ColorControlReadWhitePointY(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadColorPointRX(int argc, char ** argv)
@@ -1560,8 +1509,7 @@ CHIP_ERROR ColorControlReadColorPointRX(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadColorPointRY(int argc, char ** argv)
@@ -1571,8 +1519,7 @@ CHIP_ERROR ColorControlReadColorPointRY(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadColorPointRIntensity(int argc, char ** argv)
@@ -1582,8 +1529,7 @@ CHIP_ERROR ColorControlReadColorPointRIntensity(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadColorPointGX(int argc, char ** argv)
@@ -1593,8 +1539,7 @@ CHIP_ERROR ColorControlReadColorPointGX(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadColorPointGY(int argc, char ** argv)
@@ -1604,8 +1549,7 @@ CHIP_ERROR ColorControlReadColorPointGY(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadColorPointGIntensity(int argc, char ** argv)
@@ -1615,8 +1559,7 @@ CHIP_ERROR ColorControlReadColorPointGIntensity(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadColorPointBX(int argc, char ** argv)
@@ -1626,8 +1569,7 @@ CHIP_ERROR ColorControlReadColorPointBX(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadColorPointBY(int argc, char ** argv)
@@ -1637,8 +1579,7 @@ CHIP_ERROR ColorControlReadColorPointBY(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadColorPointBIntensity(int argc, char ** argv)
@@ -1648,8 +1589,7 @@ CHIP_ERROR ColorControlReadColorPointBIntensity(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadEnhancedCurrentHue(int argc, char ** argv)
@@ -1659,8 +1599,7 @@ CHIP_ERROR ColorControlReadEnhancedCurrentHue(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadEnhancedColorMode(int argc, char ** argv)
@@ -1670,8 +1609,7 @@ CHIP_ERROR ColorControlReadEnhancedColorMode(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadColorLoopActive(int argc, char ** argv)
@@ -1681,8 +1619,7 @@ CHIP_ERROR ColorControlReadColorLoopActive(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadColorLoopDirection(int argc, char ** argv)
@@ -1692,8 +1629,7 @@ CHIP_ERROR ColorControlReadColorLoopDirection(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadColorLoopTime(int argc, char ** argv)
@@ -1703,8 +1639,7 @@ CHIP_ERROR ColorControlReadColorLoopTime(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadColorLoopStartEnhancedHue(int argc, char ** argv)
@@ -1714,8 +1649,7 @@ CHIP_ERROR ColorControlReadColorLoopStartEnhancedHue(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadColorLoopStoredEnhancedHue(int argc, char ** argv)
@@ -1725,8 +1659,7 @@ CHIP_ERROR ColorControlReadColorLoopStoredEnhancedHue(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadColorCapabilities(int argc, char ** argv)
@@ -1736,8 +1669,7 @@ CHIP_ERROR ColorControlReadColorCapabilities(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadColorTempPhysicalMinMireds(int argc, char ** argv)
@@ -1747,8 +1679,7 @@ CHIP_ERROR ColorControlReadColorTempPhysicalMinMireds(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadColorTempPhysicalMaxMireds(int argc, char ** argv)
@@ -1758,8 +1689,7 @@ CHIP_ERROR ColorControlReadColorTempPhysicalMaxMireds(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadCoupleColorTempToLevelMinMireds(int argc, char ** argv)
@@ -1769,8 +1699,7 @@ CHIP_ERROR ColorControlReadCoupleColorTempToLevelMinMireds(int argc, char ** arg
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ColorControlReadStartUpColorTemperatureMireds(int argc, char ** argv)
@@ -1780,8 +1709,7 @@ CHIP_ERROR ColorControlReadStartUpColorTemperatureMireds(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 /********************************************************
@@ -1821,8 +1749,7 @@ CHIP_ERROR GroupsMoveToHueCommandHandler(int argc, char ** argv)
     data->args[4]             = atoi(argv[4]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupsMoveHueCommandHandler(int argc, char ** argv)
@@ -1841,8 +1768,7 @@ CHIP_ERROR GroupsMoveHueCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupsStepHueCommandHandler(int argc, char ** argv)
@@ -1862,8 +1788,7 @@ CHIP_ERROR GroupsStepHueCommandHandler(int argc, char ** argv)
     data->args[4]             = atoi(argv[4]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupsMoveToSaturationCommandHandler(int argc, char ** argv)
@@ -1882,8 +1807,7 @@ CHIP_ERROR GroupsMoveToSaturationCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupsMoveSaturationCommandHandler(int argc, char ** argv)
@@ -1902,8 +1826,7 @@ CHIP_ERROR GroupsMoveSaturationCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupsStepSaturationCommandHandler(int argc, char ** argv)
@@ -1923,8 +1846,7 @@ CHIP_ERROR GroupsStepSaturationCommandHandler(int argc, char ** argv)
     data->args[4]             = atoi(argv[4]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupsMoveToHueAndSaturationCommandHandler(int argc, char ** argv)
@@ -1944,8 +1866,7 @@ CHIP_ERROR GroupsMoveToHueAndSaturationCommandHandler(int argc, char ** argv)
     data->args[4]             = atoi(argv[4]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupsMoveToColorCommandHandler(int argc, char ** argv)
@@ -1965,8 +1886,7 @@ CHIP_ERROR GroupsMoveToColorCommandHandler(int argc, char ** argv)
     data->args[4]             = atoi(argv[4]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupsMoveColorCommandHandler(int argc, char ** argv)
@@ -1985,8 +1905,7 @@ CHIP_ERROR GroupsMoveColorCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupsStepColorCommandHandler(int argc, char ** argv)
@@ -2006,8 +1925,7 @@ CHIP_ERROR GroupsStepColorCommandHandler(int argc, char ** argv)
     data->args[4]             = atoi(argv[4]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupsMoveToColorTemperatureCommandHandler(int argc, char ** argv)
@@ -2026,8 +1944,7 @@ CHIP_ERROR GroupsMoveToColorTemperatureCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupsEnhancedMoveToHueCommandHandler(int argc, char ** argv)
@@ -2047,8 +1964,7 @@ CHIP_ERROR GroupsEnhancedMoveToHueCommandHandler(int argc, char ** argv)
     data->args[4]             = atoi(argv[4]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupsEnhancedMoveHueCommandHandler(int argc, char ** argv)
@@ -2067,8 +1983,7 @@ CHIP_ERROR GroupsEnhancedMoveHueCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupsEnhancedStepHueCommandHandler(int argc, char ** argv)
@@ -2088,8 +2003,7 @@ CHIP_ERROR GroupsEnhancedStepHueCommandHandler(int argc, char ** argv)
     data->args[4]             = atoi(argv[4]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupsEnhancedMoveToHueAndSaturationCommandHandler(int argc, char ** argv)
@@ -2109,8 +2023,7 @@ CHIP_ERROR GroupsEnhancedMoveToHueAndSaturationCommandHandler(int argc, char ** 
     data->args[4]             = atoi(argv[4]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupsColorLoopSetCommandHandler(int argc, char ** argv)
@@ -2132,8 +2045,7 @@ CHIP_ERROR GroupsColorLoopSetCommandHandler(int argc, char ** argv)
     data->args[6]             = atoi(argv[6]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupsStopMoveStepCommandHandler(int argc, char ** argv)
@@ -2150,8 +2062,7 @@ CHIP_ERROR GroupsStopMoveStepCommandHandler(int argc, char ** argv)
     data->args[1]             = atoi(argv[1]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupsMoveColorTemperatureCommandHandler(int argc, char ** argv)
@@ -2172,8 +2083,7 @@ CHIP_ERROR GroupsMoveColorTemperatureCommandHandler(int argc, char ** argv)
     data->args[5]             = atoi(argv[5]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupsStepColorTemperatureCommandHandler(int argc, char ** argv)
@@ -2195,7 +2105,6 @@ CHIP_ERROR GroupsStepColorTemperatureCommandHandler(int argc, char ** argv)
     data->args[6]             = atoi(argv[6]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 #endif // CONFIG_ENABLE_CHIP_SHELL

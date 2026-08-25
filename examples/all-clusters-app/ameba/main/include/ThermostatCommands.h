@@ -215,8 +215,7 @@ CHIP_ERROR SetpointRaiseLowerSwitchCommandHandler(int argc, char ** argv)
     data->args[0]             = atoi(argv[0]);
     data->args[1]             = atoi(argv[1]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 /********************************************************
@@ -246,8 +245,7 @@ CHIP_ERROR ThermostatReadAttributeList(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ThermostatReadLocalTemperature(int argc, char ** argv)
@@ -257,8 +255,7 @@ CHIP_ERROR ThermostatReadLocalTemperature(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ThermostatReadAbsMinHeatSetpointLimit(int argc, char ** argv)
@@ -268,8 +265,7 @@ CHIP_ERROR ThermostatReadAbsMinHeatSetpointLimit(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ThermostatReadAbsMaxHeatSetpointLimit(int argc, char ** argv)
@@ -279,8 +275,7 @@ CHIP_ERROR ThermostatReadAbsMaxHeatSetpointLimit(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ThermostatReadAbsMinCoolSetpointLimit(int argc, char ** argv)
@@ -290,8 +285,7 @@ CHIP_ERROR ThermostatReadAbsMinCoolSetpointLimit(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ThermostatReadAbsMaxCoolSetpointLimit(int argc, char ** argv)
@@ -301,8 +295,7 @@ CHIP_ERROR ThermostatReadAbsMaxCoolSetpointLimit(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ThermostatReadPiCoolingDemand(int argc, char ** argv)
@@ -312,8 +305,7 @@ CHIP_ERROR ThermostatReadPiCoolingDemand(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ThermostatReadPiHeatingDemand(int argc, char ** argv)
@@ -323,8 +315,7 @@ CHIP_ERROR ThermostatReadPiHeatingDemand(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ThermostatReadOccupiedCoolingSetpoint(int argc, char ** argv)
@@ -334,8 +325,7 @@ CHIP_ERROR ThermostatReadOccupiedCoolingSetpoint(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ThermostatReadOccupiedHeatingSetpoint(int argc, char ** argv)
@@ -345,8 +335,7 @@ CHIP_ERROR ThermostatReadOccupiedHeatingSetpoint(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ThermostatReadMinHeatSetpointLimit(int argc, char ** argv)
@@ -356,8 +345,7 @@ CHIP_ERROR ThermostatReadMinHeatSetpointLimit(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ThermostatReadMaxHeatSetpointLimit(int argc, char ** argv)
@@ -367,8 +355,7 @@ CHIP_ERROR ThermostatReadMaxHeatSetpointLimit(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ThermostatReadMinCoolSetpointLimit(int argc, char ** argv)
@@ -378,8 +365,7 @@ CHIP_ERROR ThermostatReadMinCoolSetpointLimit(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ThermostatReadMaxCoolSetpointLimit(int argc, char ** argv)
@@ -389,8 +375,7 @@ CHIP_ERROR ThermostatReadMaxCoolSetpointLimit(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ThermostatReadControlSequenceOfOperation(int argc, char ** argv)
@@ -400,8 +385,7 @@ CHIP_ERROR ThermostatReadControlSequenceOfOperation(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ThermostatReadSystemMode(int argc, char ** argv)
@@ -411,8 +395,7 @@ CHIP_ERROR ThermostatReadSystemMode(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 /********************************************************
@@ -442,7 +425,6 @@ CHIP_ERROR GroupsSetpointRaiseLowerSwitchCommandHandler(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 #endif // CONFIG_ENABLE_CHIP_SHELL

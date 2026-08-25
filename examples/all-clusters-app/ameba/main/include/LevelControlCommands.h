@@ -371,8 +371,7 @@ CHIP_ERROR MoveToLevelSwitchCommandHandler(int argc, char ** argv)
     data->args[2]             = atoi(argv[2]);
     data->args[3]             = atoi(argv[3]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR MoveSwitchCommandHandler(int argc, char ** argv)
@@ -390,8 +389,7 @@ CHIP_ERROR MoveSwitchCommandHandler(int argc, char ** argv)
     data->args[2]             = atoi(argv[2]);
     data->args[3]             = atoi(argv[3]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR StepSwitchCommandHandler(int argc, char ** argv)
@@ -410,8 +408,7 @@ CHIP_ERROR StepSwitchCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->args[4]             = atoi(argv[4]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR StopSwitchCommandHandler(int argc, char ** argv)
@@ -427,8 +424,7 @@ CHIP_ERROR StopSwitchCommandHandler(int argc, char ** argv)
     data->args[0]             = atoi(argv[0]);
     data->args[1]             = atoi(argv[1]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR MoveToLevelWithOnOffSwitchCommandHandler(int argc, char ** argv)
@@ -446,8 +442,7 @@ CHIP_ERROR MoveToLevelWithOnOffSwitchCommandHandler(int argc, char ** argv)
     data->args[2]             = atoi(argv[2]);
     data->args[3]             = atoi(argv[3]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR MoveWithOnOffSwitchCommandHandler(int argc, char ** argv)
@@ -465,8 +460,7 @@ CHIP_ERROR MoveWithOnOffSwitchCommandHandler(int argc, char ** argv)
     data->args[2]             = atoi(argv[2]);
     data->args[3]             = atoi(argv[3]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR StepWithOnOffSwitchCommandHandler(int argc, char ** argv)
@@ -485,8 +479,7 @@ CHIP_ERROR StepWithOnOffSwitchCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->args[4]             = atoi(argv[4]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR StopWithOnOffSwitchCommandHandler(int argc, char ** argv)
@@ -502,8 +495,7 @@ CHIP_ERROR StopWithOnOffSwitchCommandHandler(int argc, char ** argv)
     data->args[0]             = atoi(argv[0]);
     data->args[1]             = atoi(argv[1]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 /********************************************************
@@ -533,8 +525,7 @@ CHIP_ERROR LevelControlReadAttributeList(int argc, char ** argv)
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR LevelControlReadCurrentLevel(int argc, char ** argv)
@@ -545,8 +536,7 @@ CHIP_ERROR LevelControlReadCurrentLevel(int argc, char ** argv)
     data->isReadAttribute     = true;
     ChipLogProgress(NotSpecified, "Read cluster=" ChipLogFormatMEI ", attribute=" ChipLogFormatMEI,
                     ChipLogValueMEI(data->clusterId), ChipLogValueMEI(data->attributeId));
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR LevelControlReadRemainingTime(int argc, char ** argv)
@@ -557,8 +547,7 @@ CHIP_ERROR LevelControlReadRemainingTime(int argc, char ** argv)
     data->isReadAttribute     = true;
     ChipLogProgress(NotSpecified, "Read cluster=" ChipLogFormatMEI ", attribute=" ChipLogFormatMEI,
                     ChipLogValueMEI(data->clusterId), ChipLogValueMEI(data->attributeId));
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR LevelControlReadMinLevel(int argc, char ** argv)
@@ -569,8 +558,7 @@ CHIP_ERROR LevelControlReadMinLevel(int argc, char ** argv)
     data->isReadAttribute     = true;
     ChipLogProgress(NotSpecified, "Read cluster=" ChipLogFormatMEI ", attribute=" ChipLogFormatMEI,
                     ChipLogValueMEI(data->clusterId), ChipLogValueMEI(data->attributeId));
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR LevelControlReadMaxLevel(int argc, char ** argv)
@@ -581,8 +569,7 @@ CHIP_ERROR LevelControlReadMaxLevel(int argc, char ** argv)
     data->isReadAttribute     = true;
     ChipLogProgress(NotSpecified, "Read cluster=" ChipLogFormatMEI ", attribute=" ChipLogFormatMEI,
                     ChipLogValueMEI(data->clusterId), ChipLogValueMEI(data->attributeId));
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR LevelControlReadCurrentFrequency(int argc, char ** argv)
@@ -593,8 +580,7 @@ CHIP_ERROR LevelControlReadCurrentFrequency(int argc, char ** argv)
     data->isReadAttribute     = true;
     ChipLogProgress(NotSpecified, "Read cluster=" ChipLogFormatMEI ", attribute=" ChipLogFormatMEI,
                     ChipLogValueMEI(data->clusterId), ChipLogValueMEI(data->attributeId));
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR LevelControlReadMinFrequency(int argc, char ** argv)
@@ -605,8 +591,7 @@ CHIP_ERROR LevelControlReadMinFrequency(int argc, char ** argv)
     data->isReadAttribute     = true;
     ChipLogProgress(NotSpecified, "Read cluster=" ChipLogFormatMEI ", attribute=" ChipLogFormatMEI,
                     ChipLogValueMEI(data->clusterId), ChipLogValueMEI(data->attributeId));
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR LevelControlReadMaxFrequency(int argc, char ** argv)
@@ -617,8 +602,7 @@ CHIP_ERROR LevelControlReadMaxFrequency(int argc, char ** argv)
     data->isReadAttribute     = true;
     ChipLogProgress(NotSpecified, "Read cluster=" ChipLogFormatMEI ", attribute=" ChipLogFormatMEI,
                     ChipLogValueMEI(data->clusterId), ChipLogValueMEI(data->attributeId));
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR LevelControlReadOptions(int argc, char ** argv)
@@ -629,8 +613,7 @@ CHIP_ERROR LevelControlReadOptions(int argc, char ** argv)
     data->isReadAttribute     = true;
     ChipLogProgress(NotSpecified, "Read cluster=" ChipLogFormatMEI ", attribute=" ChipLogFormatMEI,
                     ChipLogValueMEI(data->clusterId), ChipLogValueMEI(data->attributeId));
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR LevelControlReadOnOffTransitionTime(int argc, char ** argv)
@@ -641,8 +624,7 @@ CHIP_ERROR LevelControlReadOnOffTransitionTime(int argc, char ** argv)
     data->isReadAttribute     = true;
     ChipLogProgress(NotSpecified, "Read cluster=" ChipLogFormatMEI ", attribute=" ChipLogFormatMEI,
                     ChipLogValueMEI(data->clusterId), ChipLogValueMEI(data->attributeId));
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR LevelControlReadOnLevel(int argc, char ** argv)
@@ -653,8 +635,7 @@ CHIP_ERROR LevelControlReadOnLevel(int argc, char ** argv)
     data->isReadAttribute     = true;
     ChipLogProgress(NotSpecified, "Read cluster=" ChipLogFormatMEI ", attribute=" ChipLogFormatMEI,
                     ChipLogValueMEI(data->clusterId), ChipLogValueMEI(data->attributeId));
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR LevelControlReadOnTransitionTime(int argc, char ** argv)
@@ -665,8 +646,7 @@ CHIP_ERROR LevelControlReadOnTransitionTime(int argc, char ** argv)
     data->isReadAttribute     = true;
     ChipLogProgress(NotSpecified, "Read cluster=" ChipLogFormatMEI ", attribute=" ChipLogFormatMEI,
                     ChipLogValueMEI(data->clusterId), ChipLogValueMEI(data->attributeId));
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR LevelControlReadOffTransitionTime(int argc, char ** argv)
@@ -677,8 +657,7 @@ CHIP_ERROR LevelControlReadOffTransitionTime(int argc, char ** argv)
     data->isReadAttribute     = true;
     ChipLogProgress(NotSpecified, "Read cluster=" ChipLogFormatMEI ", attribute=" ChipLogFormatMEI,
                     ChipLogValueMEI(data->clusterId), ChipLogValueMEI(data->attributeId));
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR LevelControlReadDefaultMoveRate(int argc, char ** argv)
@@ -689,8 +668,7 @@ CHIP_ERROR LevelControlReadDefaultMoveRate(int argc, char ** argv)
     data->isReadAttribute     = true;
     ChipLogProgress(NotSpecified, "Read cluster=" ChipLogFormatMEI ", attribute=" ChipLogFormatMEI,
                     ChipLogValueMEI(data->clusterId), ChipLogValueMEI(data->attributeId));
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR LevelControlReadStartUpCurrentLevel(int argc, char ** argv)
@@ -701,8 +679,7 @@ CHIP_ERROR LevelControlReadStartUpCurrentLevel(int argc, char ** argv)
     data->isReadAttribute     = true;
     ChipLogProgress(NotSpecified, "Read cluster=" ChipLogFormatMEI ", attribute=" ChipLogFormatMEI,
                     ChipLogValueMEI(data->clusterId), ChipLogValueMEI(data->attributeId));
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 /********************************************************
@@ -741,8 +718,7 @@ CHIP_ERROR GroupsMoveToLevelSwitchCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupsMoveSwitchCommandHandler(int argc, char ** argv)
@@ -761,8 +737,7 @@ CHIP_ERROR GroupsMoveSwitchCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupsStepSwitchCommandHandler(int argc, char ** argv)
@@ -782,8 +757,7 @@ CHIP_ERROR GroupsStepSwitchCommandHandler(int argc, char ** argv)
     data->args[4]             = atoi(argv[4]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupsStopSwitchCommandHandler(int argc, char ** argv)
@@ -800,8 +774,7 @@ CHIP_ERROR GroupsStopSwitchCommandHandler(int argc, char ** argv)
     data->args[1]             = atoi(argv[1]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupsMoveToLevelWithOnOffSwitchCommandHandler(int argc, char ** argv)
@@ -820,8 +793,7 @@ CHIP_ERROR GroupsMoveToLevelWithOnOffSwitchCommandHandler(int argc, char ** argv
     data->args[3]             = atoi(argv[3]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupsMoveWithOnOffSwitchCommandHandler(int argc, char ** argv)
@@ -840,8 +812,7 @@ CHIP_ERROR GroupsMoveWithOnOffSwitchCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupsStepWithOnOffSwitchCommandHandler(int argc, char ** argv)
@@ -861,8 +832,7 @@ CHIP_ERROR GroupsStepWithOnOffSwitchCommandHandler(int argc, char ** argv)
     data->args[4]             = atoi(argv[4]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupsStopWithOnOffSwitchCommandHandler(int argc, char ** argv)
@@ -879,7 +849,6 @@ CHIP_ERROR GroupsStopWithOnOffSwitchCommandHandler(int argc, char ** argv)
     data->args[1]             = atoi(argv[1]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 #endif // CONFIG_ENABLE_CHIP_SHELL

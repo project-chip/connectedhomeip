@@ -159,8 +159,7 @@ CHIP_ERROR IdentifyCommandHandler(int argc, char ** argv)
     data->clusterId           = Clusters::Identify::Id;
     data->args[0]             = atoi(argv[0]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR TriggerEffectSwitchCommandHandler(int argc, char ** argv)
@@ -171,8 +170,7 @@ CHIP_ERROR TriggerEffectSwitchCommandHandler(int argc, char ** argv)
     data->args[0]             = atoi(argv[0]);
     data->args[1]             = atoi(argv[1]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 /********************************************************
@@ -202,8 +200,7 @@ CHIP_ERROR IdentifyReadAttributeList(int argc, char ** argv)
     data->clusterId           = Clusters::Identify::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR IdentifyReadIdentifyTime(int argc, char ** argv)
@@ -213,8 +210,7 @@ CHIP_ERROR IdentifyReadIdentifyTime(int argc, char ** argv)
     data->clusterId           = Clusters::Identify::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR IdentifyReadIdentifyType(int argc, char ** argv)
@@ -224,8 +220,7 @@ CHIP_ERROR IdentifyReadIdentifyType(int argc, char ** argv)
     data->clusterId           = Clusters::Identify::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 /********************************************************
@@ -256,8 +251,7 @@ CHIP_ERROR GroupIdentifyCommandHandler(int argc, char ** argv)
     data->args[0]             = atoi(argv[0]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupTriggerEffectSwitchCommandHandler(int argc, char ** argv)
@@ -269,7 +263,6 @@ CHIP_ERROR GroupTriggerEffectSwitchCommandHandler(int argc, char ** argv)
     data->args[1]             = atoi(argv[1]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 #endif // CONFIG_ENABLE_CHIP_SHELL

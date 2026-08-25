@@ -226,8 +226,7 @@ CHIP_ERROR OnSwitchCommandHandler(int argc, char ** argv)
     data->commandId           = Clusters::OnOff::Commands::On::Id;
     data->clusterId           = Clusters::OnOff::Id;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR OffSwitchCommandHandler(int argc, char ** argv)
@@ -236,8 +235,7 @@ CHIP_ERROR OffSwitchCommandHandler(int argc, char ** argv)
     data->commandId           = Clusters::OnOff::Commands::Off::Id;
     data->clusterId           = Clusters::OnOff::Id;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ToggleSwitchCommandHandler(int argc, char ** argv)
@@ -246,8 +244,7 @@ CHIP_ERROR ToggleSwitchCommandHandler(int argc, char ** argv)
     data->commandId           = Clusters::OnOff::Commands::Toggle::Id;
     data->clusterId           = Clusters::OnOff::Id;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR OffWithEffectSwitchCommandHandler(int argc, char ** argv)
@@ -263,8 +260,7 @@ CHIP_ERROR OffWithEffectSwitchCommandHandler(int argc, char ** argv)
     data->args[0]             = atoi(argv[0]);
     data->args[1]             = atoi(argv[1]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR OnWithRecallGlobalSceneSwitchCommandHandler(int argc, char ** argv)
@@ -273,8 +269,7 @@ CHIP_ERROR OnWithRecallGlobalSceneSwitchCommandHandler(int argc, char ** argv)
     data->commandId           = Clusters::OnOff::Commands::OnWithRecallGlobalScene::Id;
     data->clusterId           = Clusters::OnOff::Id;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR OnWithTimedOffSwitchCommandHandler(int argc, char ** argv)
@@ -291,8 +286,7 @@ CHIP_ERROR OnWithTimedOffSwitchCommandHandler(int argc, char ** argv)
     data->args[1]             = atoi(argv[1]);
     data->args[2]             = atoi(argv[2]);
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 /********************************************************
@@ -322,8 +316,7 @@ CHIP_ERROR OnOffReadAttributeList(int argc, char ** argv)
     data->clusterId           = Clusters::OnOff::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR OnOffReadOnOff(int argc, char ** argv)
@@ -333,8 +326,7 @@ CHIP_ERROR OnOffReadOnOff(int argc, char ** argv)
     data->clusterId           = Clusters::OnOff::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR OnOffReadGlobalSceneControl(int argc, char ** argv)
@@ -344,8 +336,7 @@ CHIP_ERROR OnOffReadGlobalSceneControl(int argc, char ** argv)
     data->clusterId           = Clusters::OnOff::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR OnOffReadOnTime(int argc, char ** argv)
@@ -355,8 +346,7 @@ CHIP_ERROR OnOffReadOnTime(int argc, char ** argv)
     data->clusterId           = Clusters::OnOff::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR OnOffReadOffWaitTime(int argc, char ** argv)
@@ -366,8 +356,7 @@ CHIP_ERROR OnOffReadOffWaitTime(int argc, char ** argv)
     data->clusterId           = Clusters::OnOff::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR OnOffReadStartUpOnOff(int argc, char ** argv)
@@ -377,8 +366,7 @@ CHIP_ERROR OnOffReadStartUpOnOff(int argc, char ** argv)
     data->clusterId           = Clusters::OnOff::Id;
     data->isReadAttribute     = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 /********************************************************
@@ -408,8 +396,7 @@ CHIP_ERROR GroupOnSwitchCommandHandler(int argc, char ** argv)
     data->clusterId           = Clusters::OnOff::Id;
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupOffSwitchCommandHandler(int argc, char ** argv)
@@ -419,8 +406,7 @@ CHIP_ERROR GroupOffSwitchCommandHandler(int argc, char ** argv)
     data->clusterId           = Clusters::OnOff::Id;
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupToggleSwitchCommandHandler(int argc, char ** argv)
@@ -430,8 +416,7 @@ CHIP_ERROR GroupToggleSwitchCommandHandler(int argc, char ** argv)
     data->clusterId           = Clusters::OnOff::Id;
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupOffWithEffectSwitchCommandHandler(int argc, char ** argv)
@@ -448,8 +433,7 @@ CHIP_ERROR GroupOffWithEffectSwitchCommandHandler(int argc, char ** argv)
     data->args[1]             = atoi(argv[1]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupOnWithRecallGlobalSceneSwitchCommandHandler(int argc, char ** argv)
@@ -459,8 +443,7 @@ CHIP_ERROR GroupOnWithRecallGlobalSceneSwitchCommandHandler(int argc, char ** ar
     data->clusterId           = Clusters::OnOff::Id;
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupOnWithTimedOffSwitchCommandHandler(int argc, char ** argv)
@@ -478,7 +461,6 @@ CHIP_ERROR GroupOnWithTimedOffSwitchCommandHandler(int argc, char ** argv)
     data->args[2]             = atoi(argv[2]);
     data->isGroup             = true;
 
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 #endif // CONFIG_ENABLE_CHIP_SHELL
