@@ -30,7 +30,34 @@ class LoggingServiceAreaDelegate;
 
 namespace chip::app::Clusters::OperationalState {
 
-// Tracks whether the simulated robot is on the charging dock.
+// PhysicalDockState tracks whether the simulated robot is on the charging dock, independently of
+// RvcOperationalState. This is needed because HandleResumeStateCallback() can move the reported
+// operational state straight to Running while the robot is still physically on the dock, so a
+// later HandleCharging()/HandleCharged() call still needs to know the dock contact never changed.
+//
+/*
+ *                                   +-------------------+
+ * +-------------------------------->|     kOffDock      |<---------------------------------------+
+ *                                   +-------------------+
+ * |                 |                                     |                                       |
+ * |                 | Placed on dock manually             | Homing found the charger              |
+ * |                 | (HandleDocked())                    | (HandleChargerFound())                |
+ * |                 v                                     v                                       |
+ * |             +-----------+                           +-----------------+                       |
+ * |             |  kOnDock  |                           | kOnDockCharging |                       |
+ * |             +-----------+                           +-----------------+                       |
+ * |                          -- dock contact made, starts charging -->                            |
+ * |                          (HandleCharging())                                                   |
+ * |                          <- charging finished, robot stays docked --                          |
+ * |                          (HandleCharged(), RunMode == Idle)                                   |
+ * |                 |                                     |                                       |
+ * |                 | Robot leaves the dock to            | Robot leaves the dock to              |
+ * |                 | resume cleaning/mapping             | resume cleaning/mapping               |
+ * |                 | (Resume(), or                       | (Resume(), or                         |
+ * |                 |  HandleCharged() mid-task)          |  HandleCharged() mid-task)            |
+ * +                 +                                     +                                       +
+ * +------------------------------------------------------------------------------------------------
+ */
 enum class PhysicalDockState : uint8_t
 {
     kOffDock,
