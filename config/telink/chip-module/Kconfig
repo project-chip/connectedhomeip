@@ -211,6 +211,22 @@ config CHIP_ENABLE_PM_DURING_BLE
 	help
 	  Enable PM during BLE operation.
 
+config CHIP_ENABLE_CONCURRENT_CONNECTION
+	bool "Enable Concurrent Connection"
+	default y if SOC_RISCV_TELINK_W91
+	default n
+	select IEEE802154_TLX_BLE_COEXIST if !SOC_RISCV_TELINK_W91
+	help
+	  Enable Matter concurrent connection support and BLE/Thread coexistence.
+
+config CHIP_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
+	bool "Enable BLE advertising after commissioning"
+	depends on CHIP_ENABLE_CONCURRENT_CONNECTION
+	default n
+	help
+	  Automatically enable BLE advertising after commissioning and on reboot
+	  when the device is already commissioned.
+
 config SHELL_BACKEND_SERIAL_RX_RING_BUFFER_SIZE
 	default 255 if SHELL_BACKEND_SERIAL
 
@@ -233,14 +249,14 @@ config CHIP_USE_MARS_SENSOR
 	default n
 
 config CHIP_PERSISTENT_SUBSCRIPTIONS
-	default n if BOARD_TL3218X_RETENTION
+	default n if BOARD_TL3218X_RETENTION || BOARD_TL7218X_RETENTION
 	default y
 	# selecting experimental for this feature since there is an issue with multiple controllers.
 	select EXPERIMENTAL
 
 config CHIP_MAX_FABRICS
 	int "Maximum number of Matter fabrics"
-	default 3 if BOARD_TL3218X_RETENTION
+	default 3 if BOARD_TL3218X_RETENTION || BOARD_TL7218X_RETENTION
 	default 5
 	help
 	  The maximum number of Matter fabrics that device can be joined to.

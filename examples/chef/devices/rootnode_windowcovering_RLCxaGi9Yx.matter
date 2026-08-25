@@ -535,10 +535,7 @@ cluster Binding = 30 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** The Access Control Cluster exposes a data model view of a
-      Node's Access Control List (ACL), which codifies the rules used to manage
-      and enforce Access Control for the Node's endpoints and their associated
-      cluster instances. */
+/** The Access Control Cluster exposes a data model view of a Node's Access Control List (ACL), which codifies the rules used to manage and enforce Access Control for the Node's endpoints and their associated cluster instances. */
 cluster AccessControl = 31 {
   revision 3;
 
@@ -1427,7 +1424,7 @@ cluster SoftwareDiagnostics = 52 {
   command access(invoke: manage) ResetWatermarks(): DefaultSuccess = 0;
 }
 
-/** Commands to trigger a Node to allow a new Administrator to commission it. */
+/** This cluster is used to trigger a Node to allow a new Administrator to commission it. */
 cluster AdministratorCommissioning = 60 {
   revision 1;
 
@@ -2103,14 +2100,14 @@ endpoint 1 {
     persist  attribute configStatus default = 0x19;
     persist  attribute currentPositionLiftPercentage default = 0;
     persist  attribute currentPositionTiltPercentage default = 0;
-    ram      attribute operationalStatus default = 0x00;
+    callback attribute operationalStatus;
     ram      attribute targetPositionLiftPercent100ths default = 0;
     ram      attribute targetPositionTiltPercent100ths default = 0;
     ram      attribute endProductType default = 8;
     persist  attribute currentPositionLiftPercent100ths default = 0;
     persist  attribute currentPositionTiltPercent100ths default = 0;
     persist  attribute mode default = 0x00;
-    ram      attribute safetyStatus default = 0x0000;
+    callback attribute safetyStatus;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

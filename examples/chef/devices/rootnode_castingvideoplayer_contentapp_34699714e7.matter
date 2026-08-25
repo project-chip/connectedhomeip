@@ -510,10 +510,7 @@ cluster Descriptor = 29 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** The Access Control Cluster exposes a data model view of a
-      Node's Access Control List (ACL), which codifies the rules used to manage
-      and enforce Access Control for the Node's endpoints and their associated
-      cluster instances. */
+/** The Access Control Cluster exposes a data model view of a Node's Access Control List (ACL), which codifies the rules used to manage and enforce Access Control for the Node's endpoints and their associated cluster instances. */
 cluster AccessControl = 31 {
   revision 3;
 
@@ -1402,7 +1399,7 @@ cluster SoftwareDiagnostics = 52 {
   command access(invoke: manage) ResetWatermarks(): DefaultSuccess = 0;
 }
 
-/** Commands to trigger a Node to allow a new Administrator to commission it. */
+/** This cluster is used to trigger a Node to allow a new Administrator to commission it. */
 cluster AdministratorCommissioning = 60 {
   revision 1;
 
@@ -2511,7 +2508,7 @@ cluster ContentLauncher = 1290 {
   command PlayPreset(PlayPresetRequest): DefaultSuccess = 5;
 }
 
-/** This cluster provides an interface for controlling the Output on a media device such as a TV. */
+/** This cluster provides an interface for controlling the Output on a Video Player device such as a TV. */
 cluster AudioOutput = 1291 {
   revision 1;
 
@@ -2531,7 +2528,7 @@ cluster AudioOutput = 1291 {
   struct OutputInfoStruct {
     int8u index = 0;
     OutputTypeEnum outputType = 1;
-    char_string name = 2;
+    char_string<32> name = 2;
   }
 
   readonly attribute OutputInfoStruct outputList[] = 0;
@@ -2548,7 +2545,7 @@ cluster AudioOutput = 1291 {
 
   request struct RenameOutputRequest {
     int8u index = 0;
-    char_string name = 1;
+    char_string<32> name = 1;
   }
 
   /** Upon receipt, this SHALL change the output on the device to the output at a specific index in the Output List. */
@@ -2557,7 +2554,7 @@ cluster AudioOutput = 1291 {
   command access(invoke: manage) RenameOutput(RenameOutputRequest): DefaultSuccess = 1;
 }
 
-/** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
+/** This cluster provides an interface for launching applications on a Video Player device such as a TV. */
 cluster ApplicationLauncher = 1292 {
   revision 2;
 
@@ -2618,7 +2615,7 @@ cluster ApplicationLauncher = 1292 {
   command HideApp(HideAppRequest): LauncherResponse = 2;
 }
 
-/** This cluster provides information about an application running on a TV or media player device which is represented as an endpoint. */
+/** This cluster provides information about a Content App running on a Video Player device which is represented as an endpoint (see Device Type Library document). */
 cluster ApplicationBasic = 1293 {
   revision 1;
 

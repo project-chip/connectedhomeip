@@ -248,7 +248,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         if not self.provider_app_path or not os.path.exists(self.provider_app_path):
             raise FileNotFoundError(f'Invalid provider_app_path: {self.provider_app_path}.')
 
-        # Validate ota_image
+        # Validate ota_image and check if we can proceed with the image
         if not self.ota_image or not os.path.exists(self.ota_image):
             raise FileNotFoundError(f'Invalid ota_image: {self.ota_image}.')
 
@@ -276,6 +276,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         self._provider_setup_pincode = provider_setup_pincode
         self._provider_discriminator = provider_discriminator
         self._provider_port = provider_port
+        # Validate ota image if is valid and can proceed.
+        await self.check_ota_image_version(controller=controller, requestor_node_id=requestor_node_id, ota_image_path=self.ota_image)
 
         # Pre-define all provider arg sets for reuse across steps
         provider_extra_args_updateAvailable = [

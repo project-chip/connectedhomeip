@@ -172,8 +172,11 @@ CHIP_ERROR WriteClient::StartNewMessage()
         ReturnErrorOnFailure(FinalizeMessage(true));
     }
 
-    // Per Matter specification: a Write Request that is part of a Timed Write Interaction SHALL NOT be chunked.
-    VerifyOrReturnError(!(mTimedWriteTimeoutMs.HasValue() && !mChunks.IsNull()), CHIP_ERROR_NO_MEMORY);
+    // Per the Matter specification a chunked Write Request cannot be part of a Timed Write Interaction, and it cannot
+    // suppress the response: intermediate WriteResponses are required to pace the chunks, so SuppressResponse must be
+    // false when the request is chunked.
+    VerifyOrReturnError(!((mTimedWriteTimeoutMs.HasValue() || mSuppressResponse) && !mChunks.IsNull()),
+                        CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     VerifyOrReturnError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
@@ -527,10 +530,10 @@ CHIP_ERROR WriteClient::SendWriteRequest()
     System::PacketBufferHandle data = mChunks.PopHead();
 
     bool isGroupWrite = mExchangeCtx->IsGroupExchangeContext();
-    if (!mChunks.IsNull() && isGroupWrite)
+    if (!mChunks.IsNull() && (isGroupWrite || mSuppressResponse))
     {
-        // Reject this request if we have more than one chunk (mChunks is not null after PopHead()), and this is a group
-        // exchange context.
+        // Reject this request if we have more than one chunk (mChunks is not null after PopHead()) and either this is a
+        // group exchange context or the response is suppressed; a chunked write requires intermediate WriteResponses.
         return CHIP_ERROR_INCORRECT_STATE;
     }
 

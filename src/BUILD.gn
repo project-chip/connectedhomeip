@@ -61,6 +61,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/administrator-commissioning-server/tests",
       "${chip_root}/src/app/clusters/ambient-context-sensing-server/tests",
       "${chip_root}/src/app/clusters/air-quality-server/tests",
+      "${chip_root}/src/app/clusters/av-analysis-server/tests",
       "${chip_root}/src/app/clusters/basic-information/tests",
       "${chip_root}/src/app/clusters/actions-server/tests",
       "${chip_root}/src/app/clusters/bindings/tests",
@@ -73,13 +74,19 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/closure-control-server/tests",
       "${chip_root}/src/app/clusters/closure-dimension-server/tests",
       "${chip_root}/src/app/clusters/commissioner-control-server/tests",
+      "${chip_root}/src/app/clusters/commissioning-proxy-server/tests",
+      "${chip_root}/src/app/clusters/commodity-tariff-server/tests",
       "${chip_root}/src/app/clusters/concentration-measurement-server/tests",
+      "${chip_root}/src/app/clusters/content-launch-server/tests",
       "${chip_root}/src/app/clusters/descriptor/tests",
       "${chip_root}/src/app/clusters/device-energy-management-server/tests",
+      "${chip_root}/src/app/clusters/dynamic-lighting-server/tests",
+      "${chip_root}/src/app/clusters/electrical-distribution-server/tests",
       "${chip_root}/src/app/clusters/electrical-energy-measurement-server/tests",
       "${chip_root}/src/app/clusters/electrical-power-measurement-server/tests",
       "${chip_root}/src/app/clusters/ethernet-network-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/energy-evse-server/tests",
+      "${chip_root}/src/app/clusters/energy-preference-server/tests",
       "${chip_root}/src/app/clusters/fan-control-server/tests",
       "${chip_root}/src/app/clusters/fixed-label-server/tests",
       "${chip_root}/src/app/clusters/general-commissioning-server/tests",
@@ -93,9 +100,12 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/illuminance-measurement-server/tests",
       "${chip_root}/src/app/clusters/relative-humidity-measurement-server/tests",
       "${chip_root}/src/app/clusters/joint-fabric-administrator-server/tests",
+      "${chip_root}/src/app/clusters/laundry-dryer-controls-server/tests",
       "${chip_root}/src/app/clusters/laundry-washer-controls-server/tests",
       "${chip_root}/src/app/clusters/level-control/tests",
       "${chip_root}/src/app/clusters/localization-configuration-server/tests",
+      "${chip_root}/src/app/clusters/media-file-management-server/tests",
+      "${chip_root}/src/app/clusters/media-playback-server/tests",
       "${chip_root}/src/app/clusters/microwave-oven-control-server/tests",
       "${chip_root}/src/app/clusters/mode-base-server/tests",
       "${chip_root}/src/app/clusters/network-commissioning/tests",
@@ -116,6 +126,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/flow-measurement-server/tests",
       "${chip_root}/src/app/clusters/pressure-measurement-server/tests",
       "${chip_root}/src/app/clusters/software-diagnostics-server/tests",
+      "${chip_root}/src/app/clusters/electrical-protection-alarm-server/tests",
       "${chip_root}/src/app/clusters/soil-measurement-server/tests",
       "${chip_root}/src/app/clusters/switch-server/tests",
       "${chip_root}/src/app/clusters/temperature-control-server/tests",
@@ -133,6 +144,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/water-heater-management-server/tests",
       "${chip_root}/src/app/clusters/webrtc-transport-provider-server/tests",
       "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/tests",
+      "${chip_root}/src/app/clusters/window-covering-server/tests",
       "${chip_root}/src/app/clusters/wifi-network-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/wifi-network-management-server/tests",
       "${chip_root}/src/app/clusters/zone-management-server/tests",
@@ -151,10 +163,11 @@ if (chip_build_tests) {
       "${chip_root}/src/app/server/tests",
       "${chip_root}/src/lib/asn1/tests",
       "${chip_root}/src/lib/core/tests",
-      "${chip_root}/src/lib/dnssd/minimal_mdns/core/tests",
+      "${chip_root}/src/lib/dnssd/wire/tests",
       "${chip_root}/src/lib/dnssd/minimal_mdns/responders/tests",
       "${chip_root}/src/lib/dnssd/minimal_mdns/tests",
       "${chip_root}/src/lib/dnssd/tests",
+      "${chip_root}/src/lib/dnssd/uld/tests",
       "${chip_root}/src/lib/format/tests",
       "${chip_root}/src/lib/support/verhoeff/tests",
       "${chip_root}/src/messaging/tests",
@@ -169,9 +182,6 @@ if (chip_build_tests) {
       "${chip_root}/src/transport/tests",
 
       # keep-sorted: end
-
-      # TODO(#40932): Fix and re-enable the Commodity Tariff unit tests.
-      # "${chip_root}/src/app/clusters/commodity-tariff-server/tests",
     ]
 
     if (chip_enable_push_av_stream_transport) {
@@ -180,11 +190,13 @@ if (chip_build_tests) {
       ]
     }
 
-    # Backwards compatibility uses ember mocks, so they cannot run in a "unified"
-    # test build. Restrict them to specific platforms only
+    # These suites link ember mocks (codegen data-model provider), so they cannot
+    # run in a "unified" single-binary test build. Restrict them to specific
+    # platforms only.
     if (chip_device_platform == "darwin" || chip_device_platform == "linux") {
       tests += [
         # keep-sorted: start
+        "${chip_root}/src/app/clusters/account-login-server/tests",
         "${chip_root}/src/app/clusters/actions-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/chime-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/concentration-measurement-server/tests:tests-backwards-compatibility",
@@ -193,6 +205,7 @@ if (chip_build_tests) {
         "${chip_root}/src/app/clusters/electrical-power-measurement-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/energy-evse-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/identify-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/messages-server/tests",
         "${chip_root}/src/app/clusters/power-topology-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/smoke-co-alarm-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/zone-management-server/tests:tests-backwards-compatibility",
@@ -202,7 +215,7 @@ if (chip_build_tests) {
     }
 
     if (current_os != "zephyr") {
-      tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests" ]
+      tests += [ "${chip_root}/src/lib/dnssd/wire/records/tests" ]
     }
 
     if (current_os != "zephyr") {
@@ -300,6 +313,11 @@ if (chip_build_tests) {
     }
 
     tests += [ "${chip_root}/examples/ota-provider-app/ota-provider-common/tests" ]
+    # tv-app Media File Management delegate test. Excluded on embedded targets
+    # where the example's filesystem-backed delegate has no /tmp to write to.
+    if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
+      tests += [ "${chip_root}/examples/tv-app/tv-common/clusters/media-file-management/tests" ]
+    }
   }
 
   chip_test_group("fake_platform_tests") {
