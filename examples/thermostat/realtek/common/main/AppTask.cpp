@@ -30,6 +30,7 @@
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
+#include <app/clusters/thermostat-server/CodegenIntegration.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -39,6 +40,7 @@
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
+#include <thermostat-delegate-impl.h>
 
 #include "matter_ble.h"
 #include <os_mem.h>
@@ -285,6 +287,13 @@ void AppTask::InitServer(intptr_t arg)
     {
         ChipLogError(NotSpecified, "Server::GetInstance().Init() failed: %" CHIP_ERROR_FORMAT, err.Format());
         return;
+    }
+
+    auto status = chip::app::Clusters::Thermostat::SetDefaultDelegate(
+        Thermostat_ENDPOINT_ID, &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
+    if (status != chip::Protocols::InteractionModel::Status::Success)
+    {
+        ChipLogError(NotSpecified, "SetDefaultDelegate failed: 0x%02x", chip::to_underlying(status));
     }
 
     static RealtekObserver sRealtekObserver;

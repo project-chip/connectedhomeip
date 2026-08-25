@@ -5070,6 +5070,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedFormats";
         case chip::app::Clusters::PushAvStreamTransport::Attributes::CurrentConnections::Id:
             return "CurrentConnections";
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::MaxZones::Id:
+            return "MaxZones";
         case chip::app::Clusters::PushAvStreamTransport::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::PushAvStreamTransport::Attributes::AcceptedCommandList::Id:
@@ -6988,6 +6990,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "ManuallyTriggerTransport";
         case chip::app::Clusters::PushAvStreamTransport::Commands::FindTransport::Id:
             return "FindTransport";
+        case chip::app::Clusters::PushAvStreamTransport::Commands::UpdateMotionZoneOptions::Id:
+            return "UpdateMotionZoneOptions";
         default:
             return "Unknown";
         }
@@ -7955,6 +7959,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Air Quality Sensor";
     case 0x0000002D:
         return "Air Purifier";
+    case 0x00000040:
+        return "Irrigation System";
     case 0x00000041:
         return "Water Freeze Detector";
     case 0x00000042:
@@ -8045,6 +8051,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Camera Controller";
     case 0x00000148:
         return "Doorbell";
+    case 0x00000149:
+        return "AV Analysis Node";
     case 0x00000150:
         return "Ambient Context Sensor";
     case 0x00000152:
@@ -8093,10 +8101,16 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Electrical Energy Tariff";
     case 0x00000514:
         return "Electrical Meter";
+    case 0x00000515:
+        return "Arc Fault Circuit Interrupter";
     case 0x00000516:
         return "Electrical Circuit Breaker";
     case 0x00000517:
         return "Electrical Distribution Enclosure";
+    case 0x00000518:
+        return "Electrical Surge Protector";
+    case 0x00000519:
+        return "Residual Current Circuit Breaker";
     case 0x00000840:
         return "Control Bridge";
     case 0x00000850:
