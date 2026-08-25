@@ -38,6 +38,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <protocols/interaction_model/Constants.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <transport/SessionManager.h>
@@ -830,5 +831,50 @@ TEST_F(TestSessionManagerDispatch, TestGroupPrepareMessageChainedBufferFailure)
     sessionManager.Shutdown();
 }
 #endif // !CHIP_CONFIG_SECURITY_TEST_MODE
+
+// An inbound message that fails to authenticate must not change any state on the
+// session it names.
+TEST_F(TestSessionManagerDispatch, TestUnauthenticMessageDoesNotRebindPeerAddress)
+{
+    SessionManager sessionManager;
+    TestSessionManagerInit(mContext, sessionManager, *mResources);
+
+    constexpr uint16_t kLocalSessionId   = 0x1234;
+    constexpr NodeId kSessionPeerNodeId  = 0x0000000000000002ULL;
+    const PeerAddress establishedAddress = AddressFromString("fe80::1");
+    const PeerAddress spoofedAddress     = AddressFromString("fe80::2");
+
+    SessionHolder sessionHolder;
+    ASSERT_SUCCESS(sessionManager.InjectPaseSessionWithTestKey(sessionHolder, kLocalSessionId, kSessionPeerNodeId, kLocalSessionId,
+                                                               kFabricIndex, establishedAddress,
+                                                               CryptoContext::SessionRole::kResponder));
+
+    SecureSession * secureSession = sessionHolder.Get().Value()->AsSecureSession();
+    ASSERT_EQ(secureSession->GetPeerAddress(), establishedAddress);
+
+    PayloadHeader payloadHeader;
+    payloadHeader.SetExchangeID(0);
+    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest);
+
+    const uint8_t kPayload[]           = { 0x11, 0x22, 0x33, 0x44 };
+    System::PacketBufferHandle payload = MessagePacketBuffer::NewWithData(kPayload, sizeof(kPayload));
+    ASSERT_FALSE(payload.IsNull());
+
+    EncryptedPacketBufferHandle preparedMessage;
+    ASSERT_SUCCESS(sessionManager.PrepareMessage(sessionHolder.Get().Value(), payloadHeader, std::move(payload), preparedMessage));
+
+    // Corrupt the trailing integrity check so the message parses but cannot be
+    // authenticated.
+    System::PacketBufferHandle msg = preparedMessage.CastToWritable();
+    ASSERT_FALSE(msg.IsNull());
+    ASSERT_GT(msg->DataLength(), 0u);
+    msg->Start()[msg->DataLength() - 1] = static_cast<uint8_t>(msg->Start()[msg->DataLength() - 1] ^ 0xff);
+
+    sessionManager.OnMessageReceived(spoofedAddress, std::move(msg));
+
+    EXPECT_EQ(secureSession->GetPeerAddress(), establishedAddress);
+
+    sessionManager.Shutdown();
+}
 
 } // namespace
