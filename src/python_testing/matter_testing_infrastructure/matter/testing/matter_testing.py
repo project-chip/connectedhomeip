@@ -39,6 +39,7 @@ from enum import IntFlag
 from typing import Any, TypeAlias
 
 import matter.testing.matchers as matchers
+import matter.testing.nfc
 
 # isort: off
 
@@ -2458,7 +2459,6 @@ class MatterBaseTest(base_test.BaseTestClass):
             nodeId=node_id
         )
         return commissionee
-
 
     async def open_commissioning_window(self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None, timeout: int = 900) -> CustomCommissioningParameters:
         """Open a commissioning window on the target device.

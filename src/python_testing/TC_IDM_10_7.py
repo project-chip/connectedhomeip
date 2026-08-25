@@ -20,8 +20,6 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
-import matter.testing.nfc
-from matter.setup_payload import SetupPayload
 from matter.testing.decorators import async_test_body
 from matter.testing.device_conformance_tests import DeviceConformanceTests
 from matter.testing.matter_testing import TestStep
