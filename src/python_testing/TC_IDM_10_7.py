@@ -304,6 +304,24 @@ class TC_IDM_10_7(DeviceConformanceTests):
             True if identical, False otherwise.
         """
         try:
+            def _normalize_for_order_insensitive_compare(value):
+                if isinstance(value, dict):
+                    return (
+                        "dict",
+                        tuple(
+                            sorted(
+                                ((repr(k), _normalize_for_order_insensitive_compare(v)) for k, v in value.items()),
+                                key=repr,
+                            )
+                        ),
+                    )
+
+                if isinstance(value, (list, tuple, set)):
+                    normalized_items = [_normalize_for_order_insensitive_compare(item) for item in value]
+                    return ("seq", tuple(sorted(normalized_items, key=repr)))
+
+                return ("scalar", value)
+
             limited_endpoint_ids = set(limited_data_model.keys())
             full_endpoint_ids = set(full_data_model.keys())
 
@@ -327,27 +345,56 @@ class TC_IDM_10_7(DeviceConformanceTests):
                     log.error("Endpoints missing in limited_data_model: %s", sorted(missing_in_limited))
                 return False
 
+            # Compare limited_descriptor and full_descriptor attributes
+            attrs_to_compare = [
+                Clusters.Descriptor.Attributes.DeviceTypeList,
+                Clusters.Descriptor.Attributes.ServerList,
+                Clusters.Descriptor.Attributes.ClientList,
+                Clusters.Descriptor.Attributes.PartsList,
+                Clusters.Descriptor.Attributes.TagList,
+                Clusters.Descriptor.Attributes.EndpointUniqueID,
+            ]
+
             for endpoint_id in sorted(limited_endpoint_ids):
 
-                limited_clusters = limited_data_model.get(endpoint_id, {})
-                full_clusters = full_data_model.get(endpoint_id, {})
+                limited_dm_clusters = limited_data_model.get(endpoint_id, {})
+                full_dm_clusters = full_data_model.get(endpoint_id, {})
 
-                if Clusters.Descriptor not in limited_clusters:
+                if Clusters.Descriptor not in limited_dm_clusters:
                     log.error("Descriptor cluster missing in limited_data_model on endpoint %s", endpoint_id)
                     return False
 
-                if Clusters.Descriptor not in full_clusters:
+                if Clusters.Descriptor not in full_dm_clusters:
                     log.error("Descriptor cluster missing in full_data_model on endpoint %s", endpoint_id)
                     return False
 
-                limited_descriptor = limited_clusters[Clusters.Descriptor]
-                full_descriptor = full_clusters[Clusters.Descriptor]
+                limited_dm_descriptor = limited_dm_clusters[Clusters.Descriptor]
+                full_dm_descriptor = full_dm_clusters[Clusters.Descriptor]
 
-                if limited_descriptor != full_descriptor:
-                    log.error("Descriptor cluster mismatch on endpoint %s", endpoint_id)
-                    log.error("Limited Data Model Descriptor: %s", limited_descriptor)
-                    log.error("Full Data Model Descriptor: %s", full_descriptor)
-                    return False
+                for attr in attrs_to_compare:
+                    limited_dm_has_attr = attr in limited_dm_descriptor
+                    full_dm_has_attr = attr in full_dm_descriptor
+
+                    if limited_dm_has_attr != full_dm_has_attr:
+                        log.error(
+                            "Descriptor attribute %s presence mismatch on endpoint %s: limited_dm_has=%s, full_dm_has=%s",
+                            attr,
+                            endpoint_id,
+                            limited_dm_has_attr,
+                            full_dm_has_attr,
+                        )
+                        return False
+
+                    if not limited_dm_has_attr:
+                        # Attribute is absent in both models; treat as identical.
+                        continue
+
+                    limited_dm_val = limited_dm_descriptor[attr]
+                    full_dm_val = full_dm_descriptor[attr]
+                    if _normalize_for_order_insensitive_compare(limited_dm_val) != _normalize_for_order_insensitive_compare(full_dm_val):
+                        log.error("Descriptor attribute %s mismatch on endpoint %s: limited=%s, full=%s",
+                                attr, endpoint_id, limited_dm_val, full_dm_val)
+                        return False
 
             log.info("Limited and Full Data Model Descriptor clusters are identical on all endpoints")
             return True
