@@ -231,7 +231,7 @@ class TC_COMPRO_2_4(COMPROBaseTest):
         else:
             extra_args = params.get('ble_ed_extra_args', ed_extra_args_fallback)
             ed_transport = 'ble'
-        return EDFixture(
+        return self.track_ed(EDFixture(
             app_path=app_path,
             discriminator=int(params.get('ed_discriminator', 3841)),
             passcode=int(params.get('ed_passcode', 20202021)),
@@ -240,7 +240,7 @@ class TC_COMPRO_2_4(COMPROBaseTest):
             extra_args=extra_args,
             ed_transport=ed_transport,
             serial_port=params.get('ed_serial_port'),
-        )
+        ))
 
     @async_test_body
     async def test_TC_COMPRO_2_4(self):
@@ -253,6 +253,16 @@ class TC_COMPRO_2_4(COMPROBaseTest):
         wifi_ssid = params.get('wifi_ssid')
         wifi_password = params.get('wifi_password', '')
         ed_extra_args_fallback = params.get('ed_extra_args', '')
+
+        # Step 7 commissions the ED through the proxy, which runs the network-setup
+        # stages and needs Wi-Fi credentials.  Without an SSID the commissioner skips
+        # those stages, the ED never joins the operational network, and the run dies
+        # much later in an mDNS resolution timeout.  Fail here instead.
+        asserts.assert_true(
+            bool(wifi_ssid),
+            "wifi_ssid is required: pass --string-arg wifi_ssid:<ssid> (and "
+            "wifi_password:<password>) so the ED can be provisioned onto the "
+            "operational network through the proxy")
 
         # Step 1 — commissioning of the DUT done by the framework
         self.step(1)
@@ -405,8 +415,7 @@ class TC_COMPRO_2_4(COMPROBaseTest):
                         else f"{len(msg_response.message)} bytes")
 
             # -- Step 7 work: CommissionViaProxy --
-            if wifi_ssid:
-                self.default_controller.SetWiFiCredentials(wifi_ssid, wifi_password)
+            self.default_controller.SetWiFiCredentials(wifi_ssid, wifi_password)
 
             logger.info("[%s] Commissioning ED via proxy (sessionID=%d nodeId=0x%04x "
                         "discriminator=%d)",

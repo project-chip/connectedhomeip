@@ -127,11 +127,10 @@ public:
               chip::NodeId proxyNodeId, chip::NodeId remoteNodeId, uint16_t proxySessionId, chip::EndpointId proxyEndpoint,
               uint16_t discriminator, uint32_t setupPinCode)
     {
-        // Guard against re-entrancy: if a previous session is still in flight,
-        // reset it before overwriting state.  Init() is only called from Python
-        // at the start of a fresh CommissionViaProxy (never from within a
-        // CommandSender callback), so clearing the list here cannot destroy a
-        // sender that is mid-callback higher up the stack.
+        // The entry point rejects a call while a flow is in flight, so this only ever runs
+        // between flows and cannot destroy a sender that is mid-callback higher up the
+        // stack.  Deactivating first covers a previous flow that ended abnormally, and
+        // leaves the transport in the inactive state Activate() requires.
         DeactivateProxyTransport();
         mProxyCmdSenders.clear();
 
@@ -145,7 +144,11 @@ public:
         mSetupPinCode     = setupPinCode;
         mProxyExchangeMgr = nullptr;
         mProxySession.Release();
+        mInFlight = true;
     }
+
+    /** True between Init() and the terminal callback of a proxy commissioning flow. */
+    bool IsInFlight() const { return mInFlight; }
 
     CHIP_ERROR Start(chip::Controller::CommissioningParameters & commParams)
     {
@@ -153,8 +156,16 @@ public:
         // Install ourselves as the pairing delegate so we intercept
         // OnCommissioningComplete to deactivate the proxy transport.
         mDevCtrl->RegisterPairingDelegate(this);
-        return mDevCtrl->GetConnectedDevice(mProxyNodeId, &mOnConnectedCallback, &mOnConnectionFailedCallback,
-                                            chip::TransportPayloadCapability::kLargePayload);
+        CHIP_ERROR err = mDevCtrl->GetConnectedDevice(mProxyNodeId, &mOnConnectedCallback, &mOnConnectionFailedCallback,
+                                                      chip::TransportPayloadCapability::kLargePayload);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We are still registered as the pairing delegate but the flow never started.
+            // Leaving it installed would route every later commissioning on this controller
+            // through a proxy commissioner that is not driving it.
+            Finish();
+        }
+        return err;
     }
 
     // --- DevicePairingDelegate: forward everything to mPairingDelegate ----
@@ -168,8 +179,7 @@ public:
     {
         // Deactivate proxy transport regardless of success or failure, then
         // restore the original pairing delegate before forwarding.
-        DeactivateProxyTransport();
-        mDevCtrl->RegisterPairingDelegate(mPairingDelegate);
+        Finish();
         mPairingDelegate->OnCommissioningComplete(deviceId, error);
     }
     void OnCommissioningSuccess(chip::PeerId peerId) override { mPairingDelegate->OnCommissioningSuccess(peerId); }
@@ -232,28 +242,32 @@ public:
     {
         using namespace chip::app::Clusters::CommissioningProxy::Commands;
         if (path.mCommandId != ProxyMessageResponse::Id || data == nullptr)
+        {
             return;
+        }
 
         ProxyMessageResponse::DecodableType response;
         if (chip::app::DataModel::Decode(*data, response) != CHIP_NO_ERROR)
+        {
             return;
+        }
 
         if (!response.message.IsNull())
         {
             auto * proxyTransport = GetDeviceProxyTransport(mDevCtrl->GetTransportMgr());
-            proxyTransport->OnProxyMessageReceived(response.sessionID, response.message.Value().data(),
-                                                   response.message.Value().size());
+            VerifyOrReturn(proxyTransport != nullptr);
+            proxyTransport->OnProxyMessageReceived(response.sessionID, response.message.Value());
         }
     }
 
     void OnError(const chip::app::CommandSender * /*sender*/, CHIP_ERROR error) override
     {
         ChipLogError(Controller, "CommissionViaProxy CommandSender error: %" CHIP_ERROR_FORMAT, error.Format());
+        // The tunnel is dead, so stop the transport carrying any more traffic.  Stay
+        // registered as the pairing delegate: OnCommissioningComplete is the single point
+        // where the flow is wound up and the next CommissionViaProxy is let through, and
+        // the commissioner still reaches it once its own timeout fires.
         DeactivateProxyTransport();
-        // Restore the original pairing delegate immediately so any subsequent
-        // status callbacks (before OnCommissioningComplete fires) are not
-        // routed through sPythonProxyCommissioner.
-        mDevCtrl->RegisterPairingDelegate(mPairingDelegate);
     }
 
     void OnDone(chip::app::CommandSender * sender) override
@@ -265,10 +279,32 @@ public:
     }
 
 private:
+    /**
+     * End the flow: drop the proxy transport, hand the controller its own pairing
+     * delegate back, and allow the next CommissionViaProxy call through.
+     */
+    void Finish()
+    {
+        DeactivateProxyTransport();
+        if (mDevCtrl != nullptr && mPairingDelegate != nullptr)
+        {
+            mDevCtrl->RegisterPairingDelegate(mPairingDelegate);
+        }
+        mInFlight = false;
+    }
+
     void DeactivateProxyTransport()
     {
-        if (mDevCtrl != nullptr)
-            GetDeviceProxyTransport(mDevCtrl->GetTransportMgr())->Deactivate();
+        if (mDevCtrl == nullptr)
+        {
+            return;
+        }
+        // GetTransportMgr() is null once the controller's system state is gone.
+        auto * proxyTransport = GetDeviceProxyTransport(mDevCtrl->GetTransportMgr());
+        if (proxyTransport != nullptr)
+        {
+            proxyTransport->Deactivate();
+        }
     }
 
     // --- Static callbacks for GetConnectedDevice -------------------------
@@ -280,20 +316,24 @@ private:
         self->mProxySession.Grab(sessionHandle);
 
         auto * proxyTransport = GetDeviceProxyTransport(self->mDevCtrl->GetTransportMgr());
-        proxyTransport->Activate(self->mProxySessionId, self);
+        CHIP_ERROR err =
+            (proxyTransport == nullptr) ? CHIP_ERROR_INCORRECT_STATE : proxyTransport->Activate(self->mProxySessionId, self);
 
-        auto rendezvousParams = chip::RendezvousParameters()
-                                    .SetSetupPINCode(self->mSetupPinCode)
-                                    .SetDiscriminator(self->mDiscriminator)
-                                    .SetPeerAddress(chip::Transport::PeerAddress::Proxy(self->mProxySessionId));
+        if (err == CHIP_NO_ERROR)
+        {
+            auto rendezvousParams = chip::RendezvousParameters()
+                                        .SetSetupPINCode(self->mSetupPinCode)
+                                        .SetDiscriminator(self->mDiscriminator)
+                                        .SetPeerAddress(chip::Transport::PeerAddress::Proxy(self->mProxySessionId));
 
-        CHIP_ERROR err = self->mDevCtrl->PairDevice(self->mRemoteNodeId, rendezvousParams, self->mCommParams);
+            err = self->mDevCtrl->PairDevice(self->mRemoteNodeId, rendezvousParams, self->mCommParams);
+        }
+
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "CommissionViaProxy: PairDevice failed: %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(Controller, "CommissionViaProxy: could not start pairing: %" CHIP_ERROR_FORMAT, err.Format());
             // Restore the original delegate and deactivate before reporting failure.
-            proxyTransport->Deactivate();
-            self->mDevCtrl->RegisterPairingDelegate(self->mPairingDelegate);
+            self->Finish();
             self->mPairingDelegate->OnCommissioningComplete(self->mRemoteNodeId, err);
         }
     }
@@ -303,7 +343,7 @@ private:
         auto * self = static_cast<PythonProxyCommissioner *>(context);
         ChipLogError(Controller, "CommissionViaProxy: failed to get CASE session to proxy: %" CHIP_ERROR_FORMAT, error.Format());
         // Restore original delegate before reporting failure (transport was never activated).
-        self->mDevCtrl->RegisterPairingDelegate(self->mPairingDelegate);
+        self->Finish();
         self->mPairingDelegate->OnCommissioningComplete(self->mRemoteNodeId, error);
     }
 
@@ -315,6 +355,7 @@ private:
     chip::EndpointId mProxyEndpoint                                  = 1;
     uint16_t mDiscriminator                                          = 0;
     uint32_t mSetupPinCode                                           = 0;
+    bool mInFlight                                                   = false;
 
     chip::Messaging::ExchangeManager * mProxyExchangeMgr = nullptr;
     chip::SessionHolder mProxySession;
@@ -872,6 +913,15 @@ PyChipError pychip_DeviceController_CommissionViaProxy(chip::Controller::DeviceC
                                                        chip::EndpointId proxyEndpoint, uint16_t discriminator,
                                                        uint32_t setupPinCode)
 {
+    // sPythonProxyCommissioner is process-wide while ChipDeviceController objects are not,
+    // so a second controller starting a proxy flow while one is live would overwrite the
+    // first flow's controller, delegate and session.  Reject rather than reset.
+    if (sPythonProxyCommissioner.IsInFlight())
+    {
+        ChipLogError(Controller, "CommissionViaProxy: a proxy commissioning flow is already in progress");
+        return ToPyChipError(CHIP_ERROR_INCORRECT_STATE);
+    }
+
     // WiFi credentials are expected to have been set already via
     // pychip_DeviceController_SetWiFiCredentials (same pattern as OnNetworkCommission).
     sPythonProxyCommissioner.Init(devCtrl, pairingDelegate, proxyNodeId, remoteNodeId, proxySessionId, proxyEndpoint, discriminator,

@@ -142,9 +142,14 @@ static_assert(
                    Transport::Proxy<>>,
     "kDeviceProxyTransportIndex is out of sync with DeviceTransportMgr");
 
-/** Return the ProxyTransportBase embedded in the DeviceTransportMgr. */
+/**
+ * Return the ProxyTransportBase embedded in the DeviceTransportMgr, or nullptr when there is
+ * no transport manager.  DeviceController::GetTransportMgr() returns nullptr once the system
+ * state is gone, so callers holding a controller across shutdown can land here with nullptr.
+ */
 inline Transport::ProxyTransportBase * GetDeviceProxyTransport(DeviceTransportMgr * mgr)
 {
+    VerifyOrReturnValue(mgr != nullptr, nullptr);
     return &mgr->GetTransport().GetImplAtIndex<kDeviceProxyTransportIndex>();
 }
 

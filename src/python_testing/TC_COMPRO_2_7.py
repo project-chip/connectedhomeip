@@ -135,7 +135,7 @@ class TC_COMPRO_2_7(COMPROBaseTest):
         app_path = params.get(f'{prefix}_app_path')
         if not app_path:
             return None
-        return EDFixture(
+        return self.track_ed(EDFixture(
             app_path=app_path,
             discriminator=int(params.get(f'{prefix}_discriminator', 3840 + n - 1)),
             passcode=int(params.get(f'{prefix}_passcode', 20202021)),
@@ -144,7 +144,7 @@ class TC_COMPRO_2_7(COMPROBaseTest):
             extra_args=params.get(f'{prefix}_extra_args', ''),
             ed_transport=params.get(f'{prefix}_transport', params.get('ed_transport', 'wifipaf')),
             serial_port=params.get(f'{prefix}_serial_port'),
-        )
+        ))
 
     def _discriminator_for_index(self, n: int) -> int:
         params = getattr(self, 'user_params', {}) or {}

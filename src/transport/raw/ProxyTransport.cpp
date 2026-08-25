@@ -23,18 +23,22 @@
 namespace chip {
 namespace Transport {
 
-CHIP_ERROR ProxyTransportBase::Init(const ProxyListenParameters & params)
+CHIP_ERROR ProxyTransportBase::Init(const ProxyListenParameters &)
 {
-    mSystemLayer = params.GetSystemLayer();
+    // No network resources to allocate; the transport stays inert until Activate().
     return CHIP_NO_ERROR;
 }
 
-void ProxyTransportBase::Activate(uint16_t sessionId, ProxyTransportDelegate * delegate)
+CHIP_ERROR ProxyTransportBase::Activate(uint16_t sessionId, ProxyTransportDelegate * delegate)
 {
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!mActive, CHIP_ERROR_INCORRECT_STATE);
+
     ChipLogProgress(Inet, "ProxyTransport: activating session %u", sessionId);
     mSessionId = sessionId;
     mDelegate  = delegate;
     mActive    = true;
+    return CHIP_NO_ERROR;
 }
 
 void ProxyTransportBase::Deactivate()
@@ -52,9 +56,10 @@ void ProxyTransportBase::Close()
 
 bool ProxyTransportBase::CanSendToPeer(const PeerAddress & address)
 {
-    // Only claim a kProxy address while active; SendMessage also gates on mActive,
-    // so an inactive proxy transport should not advertise it can carry the address.
-    return mActive && address.GetTransportType() == Type::kProxy;
+    // Only claim a kProxy address for the active session.  A PeerAddress built from a
+    // previous session id can outlive that session in a SessionHolder or an exchange;
+    // claiming it would tunnel traffic to the wrong commissionee.
+    return mActive && address.GetTransportType() == Type::kProxy && address.GetProxySessionId() == mSessionId;
 }
 
 CHIP_ERROR ProxyTransportBase::SendMessage(const PeerAddress & address, System::PacketBufferHandle && msgBuf)
@@ -64,7 +69,10 @@ CHIP_ERROR ProxyTransportBase::SendMessage(const PeerAddress & address, System::
     VerifyOrReturnError(mActive, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+    // Same reasoning as CanSendToPeer: never forward under a session id other than the
+    // active one.
     uint16_t sessionId = address.GetProxySessionId();
+    VerifyOrReturnError(sessionId == mSessionId, CHIP_ERROR_INCORRECT_STATE);
 
     ChipLogDetail(Inet, "ProxyTransport: forwarding %u bytes for session %u", static_cast<unsigned>(msgBuf->DataLength()),
                   sessionId);
@@ -72,7 +80,7 @@ CHIP_ERROR ProxyTransportBase::SendMessage(const PeerAddress & address, System::
     return mDelegate->SendProxyMessage(sessionId, ByteSpan(msgBuf->Start(), msgBuf->DataLength()));
 }
 
-void ProxyTransportBase::OnProxyMessageReceived(uint16_t sessionId, const uint8_t * data, size_t length)
+void ProxyTransportBase::OnProxyMessageReceived(uint16_t sessionId, ByteSpan message)
 {
     if (!mActive || sessionId != mSessionId)
     {
@@ -81,15 +89,15 @@ void ProxyTransportBase::OnProxyMessageReceived(uint16_t sessionId, const uint8_
         return;
     }
 
-    System::PacketBufferHandle buf = System::PacketBufferHandle::NewWithData(data, length);
+    System::PacketBufferHandle buf = System::PacketBufferHandle::NewWithData(message.data(), message.size());
     if (buf.IsNull())
     {
         ChipLogError(Inet, "ProxyTransport: out of memory for received message");
         return;
     }
 
-    ChipLogDetail(Inet, "ProxyTransport: injecting %u bytes for session %u into Matter stack", static_cast<unsigned>(length),
-                  sessionId);
+    ChipLogDetail(Inet, "ProxyTransport: injecting %u bytes for session %u into Matter stack",
+                  static_cast<unsigned>(message.size()), sessionId);
 
     HandleMessageReceived(PeerAddress::Proxy(sessionId), std::move(buf));
 }

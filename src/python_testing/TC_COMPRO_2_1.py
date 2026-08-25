@@ -242,15 +242,9 @@ class TC_COMPRO_2_1(COMPROBaseTest):
         # The written value must be a *valid* CapabilitiesBitmap (non-zero, within
         # the defined-bit mask) that differs from transport_value, so the rejection
         # is unambiguously UNSUPPORTED_WRITE rather than CONSTRAINT_ERROR (a value of
-        # 0 would violate the min-1 constraint).  Prefer setting an unset defined bit;
-        # if every defined bit is already set, clear the lowest set bit instead.
+        # 0 would violate the min-1 constraint).
         self.step(11)
-        valid_mask = self.valid_transport_mask()
-        unset_defined_bits = valid_mask & ~transport
-        if unset_defined_bits:
-            different_transport = transport | (unset_defined_bits & (-unset_defined_bits))
-        else:
-            different_transport = transport & (transport - 1)
+        different_transport = self.different_valid_bitmap_value(transport, self.valid_transport_mask())
         await self.expect_write_rejected(
             cp.Attributes.Transport(different_transport),
             "Transport")
@@ -295,10 +289,14 @@ class TC_COMPRO_2_1(COMPROBaseTest):
         # Steps 17-18 — WiFiBand (WI: present iff the WI feature is supported,
         # as determined in step 10)
         if has_wi:
-            # Step 17 — write a different value → UNSUPPORTED_WRITE
+            # Step 17 — write a different value → UNSUPPORTED_WRITE.
+            # Same rule as step 11: the written value must stay a valid non-zero
+            # WiFiBandBitmap.  `wifi_band ^ k2g4` is 0 on a 2.4-GHz-only proxy — the
+            # common configuration — which the DUT may reject with CONSTRAINT_ERROR.
             self.step(17)
+            different_band = self.different_valid_bitmap_value(wifi_band, self.valid_wifi_band_mask())
             await self.expect_write_rejected(
-                cp.Attributes.WiFiBand(wifi_band ^ int(cp.Bitmaps.WiFiBandBitmap.k2g4)),
+                cp.Attributes.WiFiBand(different_band),
                 "WiFiBand")
 
             # Step 18 — WiFiBand unchanged after the rejected write

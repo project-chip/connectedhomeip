@@ -99,6 +99,11 @@ TEST(TestPeerAddress, TestToString)
         udp.ToString(buff);
         EXPECT_STREQ(buff, "UDP:[::]:5840");
     }
+
+    {
+        PeerAddress::Proxy(42).ToString(buff);
+        EXPECT_STREQ(buff, "PROXY:42");
+    }
 }
 
 TEST(TestPeerAddress, TestEqualityOperator)
@@ -157,13 +162,26 @@ TEST(TestPeerAddress, TestEqualityOperator)
     PeerAddress wifi3              = PeerAddress::WiFiPAF(nodeId3);
     EXPECT_FALSE(wifi1 == wifi3);
 
-    // 10. Cross-type comparisons: BLE != NFC, BLE != UDP, BLE != TCP, NFC != UDP, NFC != TCP, UDP != WiFiPAF
+    // 10. Proxy transport with same session ID ? equal, and the session ID round-trips
+    PeerAddress proxy1 = PeerAddress::Proxy(7);
+    PeerAddress proxy2 = PeerAddress::Proxy(7);
+    EXPECT_EQ(proxy1.GetTransportType(), Type::kProxy);
+    EXPECT_EQ(proxy1.GetProxySessionId(), 7);
+    EXPECT_TRUE(proxy1 == proxy2);
+
+    // 11. Proxy transport with different session ID ? not equal
+    PeerAddress proxy3 = PeerAddress::Proxy(8);
+    EXPECT_FALSE(proxy1 == proxy3);
+
+    // 12. Cross-type comparisons: BLE != NFC, BLE != UDP, BLE != TCP, NFC != UDP, NFC != TCP,
+    //     UDP != WiFiPAF, Proxy != WiFiPAF (same underlying remote-id field)
     EXPECT_FALSE(ble1 == nfc1);
     EXPECT_FALSE(ble1 == udp1);
     EXPECT_FALSE(ble1 == tcp1);
     EXPECT_FALSE(nfc1 == udp1);
     EXPECT_FALSE(nfc1 == tcp1);
     EXPECT_FALSE(udp1 == wifi1);
+    EXPECT_FALSE(proxy1 == PeerAddress::WiFiPAF(7));
 }
 
 } // namespace

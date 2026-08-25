@@ -729,42 +729,59 @@ class EDFixture:
             return await self._serial(remote_cmd)
         return await self._ssh(remote_cmd)
 
-    async def _serial(self, remote_cmd: str) -> str:
-        """Run a command on the ED over its serial console, return stdout."""
+    @staticmethod
+    async def _run_subprocess(argv: list[str], timeout: int) -> tuple[int, str, str]:
+        """Run argv to completion, returning (returncode, stdout, stderr).
+
+        ``asyncio.wait_for`` cancels the ``communicate()`` task but leaves the child
+        running.  An orphaned ``serial_console.py`` keeps the UART (it opens the port
+        with ``exclusive=True``), so every later serial call — including ``stop()`` in
+        teardown — would fail with a port-busy ``SerialException`` and the run could not
+        recover.  Kill the child before propagating the timeout.
+        """
         proc = await asyncio.create_subprocess_exec(
-            sys.executable, ED_SERIAL_CLI,
-            "--port", self._serial_port, "--baud", str(self._serial_baud),
-            "--timeout", "45", "run", remote_cmd,
+            *argv,
             stdin=asyncio.subprocess.DEVNULL,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )
-        stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=130)
-        if proc.returncode != 0:
+        try:
+            stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=timeout)
+        except TimeoutError:
+            proc.kill()
+            await proc.wait()
+            raise
+        return proc.returncode, stdout.decode(errors='replace'), stderr.decode(errors='replace')
+
+    async def _serial(self, remote_cmd: str) -> str:
+        """Run a command on the ED over its serial console, return stdout."""
+        returncode, stdout, stderr = await self._run_subprocess(
+            [sys.executable, ED_SERIAL_CLI,
+             "--port", self._serial_port, "--baud", str(self._serial_baud),
+             "--timeout", "45", "run", remote_cmd],
+            timeout=130,
+        )
+        if returncode != 0:
             raise RuntimeError(
-                f"Serial command failed (exit={proc.returncode}): {remote_cmd!r}\n"
-                f"stderr: {stderr.decode(errors='replace')}\n"
-                f"stdout: {stdout.decode(errors='replace')}"
+                f"Serial command failed (exit={returncode}): {remote_cmd!r}\n"
+                f"stderr: {stderr}\n"
+                f"stdout: {stdout}"
             )
-        return stdout.decode(errors='replace')
+        return stdout
 
     async def _ssh(self, remote_cmd: str) -> str:
         """Run a command on the remote host via SSH, return stdout."""
-        proc = await asyncio.create_subprocess_exec(
-            "ssh", "-o", "StrictHostKeyChecking=no", "-o", "BatchMode=yes", "-n",
-            f"{self._ssh_user}@{self._ssh_host}",
-            remote_cmd,
-            stdin=asyncio.subprocess.DEVNULL,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
+        returncode, stdout, stderr = await self._run_subprocess(
+            ["ssh", "-o", "StrictHostKeyChecking=no", "-o", "BatchMode=yes", "-n",
+             f"{self._ssh_user}@{self._ssh_host}", remote_cmd],
+            timeout=30,
         )
-        stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=30)
-        if proc.returncode != 0:
+        if returncode != 0:
             raise RuntimeError(
-                f"SSH command failed (exit={proc.returncode}): {remote_cmd!r}\n"
-                f"stderr: {stderr.decode(errors='replace')}"
+                f"SSH command failed (exit={returncode}): {remote_cmd!r}\n"
+                f"stderr: {stderr}"
             )
-        return stdout.decode(errors='replace')
+        return stdout
 
 
 class COMPROBaseTest(MatterBaseTest):
@@ -862,7 +879,7 @@ class COMPROBaseTest(MatterBaseTest):
         app_path = params.get('ed_app_path')
         if not app_path:
             return None
-        ed = EDFixture(
+        return self.track_ed(EDFixture(
             app_path=app_path,
             discriminator=int(params.get('ed_discriminator', 3841)),
             passcode=int(params.get('ed_passcode', 20202021)),
@@ -871,11 +888,17 @@ class COMPROBaseTest(MatterBaseTest):
             extra_args=params.get('ed_extra_args', ''),
             ed_transport=params.get('ed_transport', 'wifipaf'),
             serial_port=params.get('ed_serial_port'),
-        )
-        # Safety net: stop the ED unconditionally in teardown so that a test which
-        # raises before its own ensure_ed_not_commissionable() does not leave the ED
-        # advertising (and, in remote-SSH mode, the eth0 block engaged) for the next
-        # run.  stop() is idempotent, so the explicit happy-path call is harmless.
+        ))
+
+    def track_ed(self, ed: EDFixture) -> EDFixture:
+        """Register an EDFixture for unconditional teardown and return it.
+
+        Every EDFixture must go through here, including the ones tests build for
+        themselves (TC_COMPRO_2_4 per transport, TC_COMPRO_2_7 per session).  Without
+        it a test that raises before its own ensure_ed_not_commissionable() leaves the
+        ED advertising and, in remote-SSH mode, the eth0 block engaged for the next
+        run.  stop() is idempotent, so the explicit happy-path call is harmless.
+        """
         self._register_cleanup(ed.stop)
         return ed
 
@@ -1078,6 +1101,27 @@ class COMPROBaseTest(MatterBaseTest):
         return (int(cp.Bitmaps.CapabilitiesBitmap.kBle) |
                 int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF) |
                 int(cp.Bitmaps.CapabilitiesBitmap.kNtl))
+
+    def valid_wifi_band_mask(self) -> int:
+        """Mask of every defined WiFiBandBitmap band bit (2G4 and 5G)."""
+        cp = Clusters.CommissioningProxy
+        return (int(cp.Bitmaps.WiFiBandBitmap.k2g4) |
+                int(cp.Bitmaps.WiFiBandBitmap.k5g))
+
+    @staticmethod
+    def different_valid_bitmap_value(value: int, valid_mask: int) -> int:
+        """Return a non-zero value within valid_mask that differs from value.
+
+        Used when writing a read-only Fixed attribute to prove the write is rejected
+        with UNSUPPORTED_WRITE: a value of 0, or one carrying reserved bits, could be
+        rejected with CONSTRAINT_ERROR instead and would not prove anything.  Prefer
+        setting the lowest unset defined bit; if every defined bit is already set,
+        clear the lowest set bit instead.
+        """
+        unset_defined_bits = valid_mask & ~value
+        if unset_defined_bits:
+            return value | (unset_defined_bits & (-unset_defined_bits))
+        return value & (value - 1)
 
     def assert_transport_value_valid(self, transport: int) -> None:
         """Assert a CapabilitiesBitmap value has at least one defined transport

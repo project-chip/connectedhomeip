@@ -200,6 +200,15 @@ class TC_COMPRO_2_3(COMPROBaseTest):
             max_interval_sec=30,
             keepSubscriptions=False,
         )
+        # Cancel unconditionally: steps 6-17 can raise, and the explicit cancel at
+        # step 18 would then never run, leaving the subscription open for the rest of
+        # the process.  Shutdown() warns and returns if already done, so the step-18
+        # call and this one can both fire.
+
+        async def cancel_subscription():
+            handler.cancel()
+
+        self._register_cleanup(cancel_subscription)
         logger.info("Subscription established")
 
         # ------------------------------------------------------------------

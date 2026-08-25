@@ -92,14 +92,23 @@ logger = logging.getLogger(__name__)
 
 CONNECT_TIMEOUT_S = 120
 SCAN_TIMEOUT_MARGIN = 1.10  # 10 % tolerance on top of ScanMaxTime
+CACHE_POLL_TIMEOUT_S = 70   # per-fabric NumCachedResults poll in step 13
 
 
 class TC_COMPRO_2_8(COMPROBaseTest):
 
     @property
     def default_timeout(self) -> int:
-        # Step 6 ProxyConnect: up to CONNECT_TIMEOUT_S; step 13 scan: up to ~60 s
-        return 360
+        # Worst case, all sequential:
+        #   step 6  ProxyConnect on fabric A — up to proxy_connect_timeout (120 s default)
+        #   step 13 two NumCachedResults polls, one fabric after the other
+        #   step 17 concurrent scan — ScanMaxTime + 10 % + 2 s, ~66 s at a 60 s ScanMaxTime
+        #   fabric-B commissioning, the remaining commands and framework overhead — ~130 s
+        # A fixed budget was previously exceeded by step 6 plus step 13 alone, which
+        # aborts the run with a framework timeout instead of a step result.
+        params = getattr(self, 'user_params', {}) or {}
+        proxy_connect_timeout = int(params.get('proxy_connect_timeout', CONNECT_TIMEOUT_S))
+        return proxy_connect_timeout + 2 * CACHE_POLL_TIMEOUT_S + 200
 
     def desc_TC_COMPRO_2_8(self) -> str:
         return "[TC-COMPRO-2.8] Fabric Isolation with DUT as Server"
@@ -328,7 +337,7 @@ class TC_COMPRO_2_8(COMPROBaseTest):
         # ----------------------------------------------------------------
         # Steps 10-16 — BGS fabric isolation (conditional on BGS feature)
         # ----------------------------------------------------------------
-        async def _poll_num_cached_ge1(controller, name, timeout_sec=70):
+        async def _poll_num_cached_ge1(controller, name, timeout_sec=CACHE_POLL_TIMEOUT_S):
             """Poll NumCachedResults on `controller` until >= 1, up to timeout_sec.
 
             The window must exceed the publisher's NAN-USD pauseState: after the
@@ -416,7 +425,7 @@ class TC_COMPRO_2_8(COMPROBaseTest):
 
             # Step 13 — Both fabrics independently see the ED in their cache.
             self.step(13)
-            logger.info("Step 13: polling NumCachedResults on both fabrics (up to 70 s each)")
+            logger.info("Step 13: polling NumCachedResults on both fabrics (up to %d s each)", CACHE_POLL_TIMEOUT_S)
             await _poll_num_cached_ge1(self.default_controller, "TH1 (Fabric A)")
             await _poll_num_cached_ge1(th2, "TH2 (Fabric B)")
 
