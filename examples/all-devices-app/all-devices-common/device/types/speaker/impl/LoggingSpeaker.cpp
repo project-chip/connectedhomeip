@@ -31,9 +31,9 @@ LoggingSpeaker::~LoggingSpeaker() {}
 
 void LoggingSpeaker::OnLevelChanged(uint8_t value)
 {
-    uint8_t min  = LevelControlCluster().GetMinLevel();
-    uint8_t max  = LevelControlCluster().GetMaxLevel();
-    uint32_t pct = (max > min) ? (static_cast<uint32_t>(value - min) * 100) / (max - min) : 0;
+    uint8_t min                   = LevelControlCluster().GetMinLevel();
+    uint8_t max                   = LevelControlCluster().GetMaxLevel();
+    [[maybe_unused]] uint32_t pct = (max > min) ? (static_cast<uint32_t>(value - min) * 100) / (max - min) : 0;
     ChipLogProgress(AppServer, "LoggingSpeaker: Volume set to %u (%" PRIu32 "%%)", value, pct);
 }
 

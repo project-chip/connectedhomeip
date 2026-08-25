@@ -7343,7 +7343,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _nominalDischargeCurrent = nil;
 
-        _maximumDishargeCurrent = nil;
+        _maximumDischargeCurrent = nil;
 
         _ratedShortCircuitCurrent = nil;
 
@@ -7367,7 +7367,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.maxVoltageProtection = self.maxVoltageProtection;
     other.maxTemporaryVoltage = self.maxTemporaryVoltage;
     other.nominalDischargeCurrent = self.nominalDischargeCurrent;
-    other.maximumDishargeCurrent = self.maximumDishargeCurrent;
+    other.maximumDischargeCurrent = self.maximumDischargeCurrent;
     other.ratedShortCircuitCurrent = self.ratedShortCircuitCurrent;
     other.ratedShortTimeWithstandCurrent = self.ratedShortTimeWithstandCurrent;
     other.energyAbsorptionCapability = self.energyAbsorptionCapability;
@@ -7378,7 +7378,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: tripMechanism:%@; protectionClass:%@; protectionType:%@; maxContinuousOperatingVoltage:%@; maxVoltageProtection:%@; maxTemporaryVoltage:%@; nominalDischargeCurrent:%@; maximumDishargeCurrent:%@; ratedShortCircuitCurrent:%@; ratedShortTimeWithstandCurrent:%@; energyAbsorptionCapability:%@; responseTime:%@; >", NSStringFromClass([self class]), _tripMechanism, _protectionClass, _protectionType, _maxContinuousOperatingVoltage, _maxVoltageProtection, _maxTemporaryVoltage, _nominalDischargeCurrent, _maximumDishargeCurrent, _ratedShortCircuitCurrent, _ratedShortTimeWithstandCurrent, _energyAbsorptionCapability, _responseTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: tripMechanism:%@; protectionClass:%@; protectionType:%@; maxContinuousOperatingVoltage:%@; maxVoltageProtection:%@; maxTemporaryVoltage:%@; nominalDischargeCurrent:%@; maximumDischargeCurrent:%@; ratedShortCircuitCurrent:%@; ratedShortTimeWithstandCurrent:%@; energyAbsorptionCapability:%@; responseTime:%@; >", NSStringFromClass([self class]), _tripMechanism, _protectionClass, _protectionType, _maxContinuousOperatingVoltage, _maxVoltageProtection, _maxTemporaryVoltage, _nominalDischargeCurrent, _maximumDischargeCurrent, _ratedShortCircuitCurrent, _ratedShortTimeWithstandCurrent, _energyAbsorptionCapability, _responseTime];
     return descriptionString;
 }
 

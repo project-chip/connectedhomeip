@@ -17,47 +17,27 @@
 #pragma once
 
 #include <device/api/Interface.h>
-#include <device/types/temperature-controlled-cabinet/TemperatureControlledCabinetPart.h>
 
 namespace chip::app {
 
 class Refrigerator : public DeviceInterface
 {
 public:
-    struct Config
-    {
-        TemperatureControlledCabinetPart::Config cabinetConfig;
-
-        // Safe food storage defaults representing a typical domestic refrigerator:
-        // - 4°C is the globally recommended safe temperature to prevent food spoilage.
-        // - 1°C to 7°C represents the typical safe operating boundaries.
-        // - 0.1°C steps provide precise temperature adjustment.
-        // Note: Temperature values are represented in 0.01°C steps.
-        static constexpr Config Default()
-        {
-            return Config{ .cabinetConfig = {
-                               .temperatureSetpoint = 400, // 4.00 °C
-                               .minTemperature      = 100, // 1.00 °C
-                               .maxTemperature      = 700, // 7.00 °C
-                               .step                = 10,  // 0.10 °C
-                           } };
-        }
-    };
-
-    Refrigerator(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & cabinetIdentify,
-                 const Config & config = Config::Default());
+    Refrigerator();
     ~Refrigerator() override = default;
 
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    // Composition getters to expose child endpoints
-    TemperatureControlledCabinetPart & Cabinet() { return mCabinet; }
+    EndpointId GetEndpointId() const { return mEndpointId; }
+
+protected:
+    virtual CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider) = 0;
+    virtual void UnregisterParts(CodeDrivenDataModelProvider & provider)                                      = 0;
 
 private:
     EndpointId mEndpointId = kInvalidEndpointId;
-    TemperatureControlledCabinetPart mCabinet;
 };
 
 } // namespace chip::app

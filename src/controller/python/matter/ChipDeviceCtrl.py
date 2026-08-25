@@ -1359,9 +1359,12 @@ class ChipDeviceControllerBase:
     class CommissioningWindowPasscode(enum.IntEnum):
         kOriginalSetupCode = 0
         kTokenWithRandomPin = 1
+        kTokenWithProvidedPin = 2
 
-    async def OpenCommissioningWindow(self, nodeId: int, timeout: int, iteration: int,
-                                      discriminator: int, option: CommissioningWindowPasscode) -> CommissioningParameters:
+    async def OpenCommissioningWindow(
+            self, nodeId: int, timeout: int, iteration: int,
+            discriminator: int, option: CommissioningWindowPasscode,
+            setupPinCode: int = 0) -> CommissioningParameters:
         '''
         Opens a commissioning window on the device with the given node ID.
 
@@ -1376,6 +1379,8 @@ class ChipDeviceControllerBase:
             option (int):
                 0 = kOriginalSetupCode
                 1 = kTokenWithRandomPIN
+                2 = kTokenWithProvidedPIN
+            setupPinCode (int): The setup PIN code to use. Ignored if option != 2
 
             Returns:
                 CommissioningParameters
@@ -1385,7 +1390,7 @@ class ChipDeviceControllerBase:
         async with self._open_window_context as ctx:
             await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_OpenCommissioningWindow(
-                    self.devCtrl, self.pairingDelegate, nodeId, timeout, iteration, discriminator, option)
+                    self.devCtrl, self.pairingDelegate, nodeId, timeout, iteration, discriminator, option, setupPinCode)
             )
 
             return await asyncio.futures.wrap_future(ctx.future)
@@ -1753,7 +1758,7 @@ class ChipDeviceControllerBase:
     async def TestOnlySendBatchCommands(self, nodeId: int, commands: list[ClusterCommand.InvokeRequestInfo],
                                         timedRequestTimeoutMs: int | None = None,
                                         interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
-                                        suppressResponse: bool | None = None, remoteMaxPathsPerInvoke: int | None = None,
+                                        suppressResponse: bool = False, remoteMaxPathsPerInvoke: int | None = None,
                                         suppressTimedRequestMessage: bool = False, commandRefsOverride: list[int] | None = None):
         '''
         Please see SendBatchCommands for description.
@@ -1879,7 +1884,7 @@ class ChipDeviceControllerBase:
     async def SendCommand(self, nodeId: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None,
                           timedRequestTimeoutMs: int | None = None,
                           interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
-                          suppressResponse: bool | None = None,
+                          suppressResponse: bool = False,
                           payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         '''
         Send a cluster-object encapsulated command to a node and get returned a future that can be awaited upon to receive
@@ -1924,7 +1929,7 @@ class ChipDeviceControllerBase:
     async def SendBatchCommands(self, nodeId: int, commands: list[ClusterCommand.InvokeRequestInfo],
                                 timedRequestTimeoutMs: int | None = None,
                                 interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
-                                suppressResponse: bool | None = None,
+                                suppressResponse: bool = False,
                                 payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         '''
         Send a batch of cluster-object encapsulated commands to a node and get returned a future that can be awaited upon to receive
@@ -1940,7 +1945,7 @@ class ChipDeviceControllerBase:
         suppressResponse: Do not send a response to this action
 
         Returns:
-            - List of command responses in the same order as what was given in `commands`. The type of the response is defined by the command.
+            - None if suppressResponse is True. Otherwise, a list of command responses in the same order as what was given in `commands`. The type of the response is defined by the command.
                       - A value of `None` indicates success.
                       - If only a single command fails, for example with `UNSUPPORTED_COMMAND`, the corresponding index associated with the command will,
                         contain `interaction_model.Status.UnsupportedCommand`.
@@ -1960,6 +1965,8 @@ class ChipDeviceControllerBase:
                 timedRequestTimeoutMs=timedRequestTimeoutMs,
                 interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse)
             res.raise_on_error()
+            if suppressResponse:
+                return None
             return await future
 
         return await self._run_with_session_retry(nodeId, _batch_send_impl)
@@ -1991,7 +1998,8 @@ class ChipDeviceControllerBase:
                              ],
                              timedRequestTimeoutMs: int | None = None,
                              interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
-                             payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
+                             payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD,
+                             suppressResponse: bool = False):
         '''
         Write a list of attributes on a target node.
 
@@ -2000,12 +2008,13 @@ class ChipDeviceControllerBase:
         attributes: A list of tuples of type (endpoint, cluster-object):
         interactionTimeoutMs: Overall timeout for the interaction. Omit or set to 'None' to have the SDK automatically compute the
                               right timeout value based on transport characteristics as well as the responsiveness of the target.
+        suppressResponse: Do not send a response to this action
         E.g
             (1, Clusters.UnitTesting.Attributes.XYZAttribute('hello')) -- Write 'hello'
             to the XYZ attribute on the test cluster to endpoint 1
 
         Returns:
-            [AttributeStatus] (list - one for each path).
+            [AttributeStatus] or None (list - one for each path, or None when suppressResponse is True).
 
         Raises:
             InteractionModelError on error.
@@ -2017,7 +2026,8 @@ class ChipDeviceControllerBase:
                                           interactionTimeoutMs=interactionTimeoutMs,
                                           busyWaitMs=busyWaitMs,
                                           payloadCapability=payloadCapability,
-                                          forceLegacyListEncoding=False)
+                                          forceLegacyListEncoding=False,
+                                          suppressResponse=suppressResponse)
 
     async def _WriteAttribute(self, nodeId: int,
                               attributes: list[
@@ -2026,7 +2036,8 @@ class ChipDeviceControllerBase:
                               ],
                               timedRequestTimeoutMs: int | None = None,
                               interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
-                              payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD, forceLegacyListEncoding: bool = False):
+                              payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD, forceLegacyListEncoding: bool = False,
+                              suppressResponse: bool = False):
 
         self.CheckIsActive()
 
@@ -2038,7 +2049,10 @@ class ChipDeviceControllerBase:
             attrs = self._prepare_write_attribute_requests(attributes)
             ClusterAttribute.WriteAttributes(
                 future, eventLoop, device.deviceProxy, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs,
-                interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, forceLegacyListEncoding=forceLegacyListEncoding).raise_on_error()
+                interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, forceLegacyListEncoding=forceLegacyListEncoding,
+                suppressResponse=suppressResponse).raise_on_error()
+            if suppressResponse:
+                return None
             return await future
 
         return await self._run_with_session_retry(nodeId, _write_impl)
@@ -2935,7 +2949,7 @@ class ChipDeviceControllerBase:
             self._dmLib.pychip_DeviceController_GetCompressedFabricId.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_OpenCommissioningWindow.argtypes = [
-                c_void_p, c_void_p, c_uint64, c_uint16, c_uint32, c_uint16, c_uint8]
+                c_void_p, c_void_p, c_uint64, c_uint16, c_uint32, c_uint16, c_uint8, c_uint32]
             self._dmLib.pychip_DeviceController_OpenCommissioningWindow.restype = PyChipError
 
             try:

@@ -4444,10 +4444,10 @@ CHIP_ERROR DataModelLogger::LogValue(
         }
     }
     {
-        CHIP_ERROR err = LogValue("MaximumDishargeCurrent", indent + 1, value.maximumDishargeCurrent);
+        CHIP_ERROR err = LogValue("MaximumDischargeCurrent", indent + 1, value.maximumDischargeCurrent);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaximumDishargeCurrent'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaximumDischargeCurrent'");
             return err;
         }
     }
@@ -21881,6 +21881,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case Humidistat::Id: {
         switch (path.mAttributeId)
         {
+        case Humidistat::Attributes::SupportedModes::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Humidistat::ModeEnum> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedModes", 1, value);
+        }
         case Humidistat::Attributes::Mode::Id: {
             chip::app::Clusters::Humidistat::ModeEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -21917,7 +21922,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("TargetSetpoint", 1, value);
         }
         case Humidistat::Attributes::MistType::Id: {
-            chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap> value;
+            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap>> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MistType", 1, value);
         }
@@ -21935,6 +21940,16 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Optimal", 1, value);
+        }
+        case Humidistat::Attributes::CondPumpEnabled::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CondPumpEnabled", 1, value);
+        }
+        case Humidistat::Attributes::CondRunCount::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CondRunCount", 1, value);
         }
         case Humidistat::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -25657,6 +25672,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentConnections", 1, value);
+        }
+        case PushAvStreamTransport::Attributes::MaxZones::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxZones", 1, value);
         }
         case PushAvStreamTransport::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;

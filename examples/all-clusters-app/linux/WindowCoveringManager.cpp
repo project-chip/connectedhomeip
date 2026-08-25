@@ -17,6 +17,7 @@
 
 #include "WindowCoveringManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/window-covering-server/CodegenIntegration.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <system/SystemClock.h>
 
@@ -152,6 +153,8 @@ CHIP_ERROR WindowCoveringManager::HandleMovement(WindowCoveringType type)
     }
 
     CHIP_ERROR err = CHIP_NO_ERROR;
+    auto wc        = FindClusterOnEndpoint(mEndpoint);
+    VerifyOrReturnError(wc != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     // At least one of the Lift and Tilt features SHALL be supported.
     if (type == WindowCoveringType::Lift)
@@ -159,8 +162,9 @@ CHIP_ERROR WindowCoveringManager::HandleMovement(WindowCoveringType type)
         // Cancel ongoing window covering movement timer if any.
         DeviceLayer::SystemLayer().CancelTimer(HandleLiftMovementTimer, this);
 
-        Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, mCurrentLiftPosition);
-        Attributes::TargetPositionLiftPercent100ths::Get(mEndpoint, mTargetLiftPosition);
+        mCurrentLiftPosition = wc->GetCurrentPositionLiftPercent100ths();
+
+        mTargetLiftPosition = wc->GetTargetPositionLiftPercent100ths();
 
         VerifyOrReturnError(!mCurrentLiftPosition.IsNull(), CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(!mTargetLiftPosition.IsNull(), CHIP_ERROR_INCORRECT_STATE);
@@ -173,8 +177,8 @@ CHIP_ERROR WindowCoveringManager::HandleMovement(WindowCoveringType type)
         // Cancel ongoing window covering movement timer if any.
         DeviceLayer::SystemLayer().CancelTimer(HandleTiltMovementTimer, this);
 
-        Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, mCurrentTiltPosition);
-        Attributes::TargetPositionTiltPercent100ths::Get(mEndpoint, mTargetTiltPosition);
+        mCurrentTiltPosition = wc->GetCurrentPositionTiltPercent100ths();
+        mTargetTiltPosition  = wc->GetTargetPositionTiltPercent100ths();
 
         VerifyOrReturnError(!mCurrentTiltPosition.IsNull(), CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(!mTargetTiltPosition.IsNull(), CHIP_ERROR_INCORRECT_STATE);

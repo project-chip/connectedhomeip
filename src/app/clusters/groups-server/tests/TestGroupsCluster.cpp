@@ -85,8 +85,6 @@ public:
 
     CHIP_ERROR RecallGlobalScene(FabricIndex fabricIndex) override { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR MakeSceneInvalidForAllFabrics() override { return CHIP_NO_ERROR; }
-
     uint32_t mGroupWillBeRemovedCallCount = 0;
     FabricIndex mLastFabricIndex          = kUndefinedFabricIndex;
     GroupId mLastGroupId                  = kUndefinedGroupId;
@@ -930,7 +928,7 @@ TEST_F(TestGroupsCluster, TestAuxiliaryAccessUpdatedEvent)
         GroupDataProvider::GroupInfo updatedInfo;
         ASSERT_EQ(mGroupDataProvider.GetGroupInfo(kFabricIndex1, kGroupId, updatedInfo), CHIP_NO_ERROR);
         EXPECT_TRUE(updatedInfo.HasAuxiliaryACL());
-        EXPECT_TRUE(CharSpan(updatedInfo.name, strlen(updatedInfo.name)).data_equal("UpdatedName2"_span));
+        EXPECT_TRUE(CharSpan::fromCharString(updatedInfo.name).data_equal("UpdatedName2"_span));
     }
 
     // 5. Call legacy RemoveGroup -> Should generate event because group had HasAuxiliaryACL = true,

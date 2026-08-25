@@ -4990,13 +4990,13 @@ ComplexArgumentParser::Setup(const char * label,
     }
     valueCopy.removeMember("nominalDischargeCurrent");
 
-    if (value.isMember("maximumDishargeCurrent"))
+    if (value.isMember("maximumDischargeCurrent"))
     {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "maximumDishargeCurrent");
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "maximumDischargeCurrent");
         ReturnErrorOnFailure(
-            ComplexArgumentParser::Setup(labelWithMember, request.maximumDishargeCurrent, value["maximumDishargeCurrent"]));
+            ComplexArgumentParser::Setup(labelWithMember, request.maximumDischargeCurrent, value["maximumDischargeCurrent"]));
     }
-    valueCopy.removeMember("maximumDishargeCurrent");
+    valueCopy.removeMember("maximumDischargeCurrent");
 
     if (value.isMember("ratedShortCircuitCurrent"))
     {
@@ -5042,7 +5042,7 @@ void ComplexArgumentParser::Finalize(
     ComplexArgumentParser::Finalize(request.maxVoltageProtection);
     ComplexArgumentParser::Finalize(request.maxTemporaryVoltage);
     ComplexArgumentParser::Finalize(request.nominalDischargeCurrent);
-    ComplexArgumentParser::Finalize(request.maximumDishargeCurrent);
+    ComplexArgumentParser::Finalize(request.maximumDischargeCurrent);
     ComplexArgumentParser::Finalize(request.ratedShortCircuitCurrent);
     ComplexArgumentParser::Finalize(request.ratedShortTimeWithstandCurrent);
     ComplexArgumentParser::Finalize(request.energyAbsorptionCapability);
