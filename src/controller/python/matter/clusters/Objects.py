@@ -45311,10 +45311,10 @@ class ProximityRanging(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="sessionID", Tag=0, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="sessionID", Tag=0, Type=uint),
                     ])
 
-            sessionID: typing.Union[Nullable, uint] = NullValue
+            sessionID: uint = 0
 
         @dataclass
         class StopRangingRequest(ClusterCommand):

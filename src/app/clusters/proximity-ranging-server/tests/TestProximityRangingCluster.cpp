@@ -541,8 +541,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingAccepted)
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
     auto & response = *result.response;
-    EXPECT_FALSE(response.sessionID.IsNull());
-    EXPECT_NE(response.sessionID.Value(), 0);
+    EXPECT_NE(response.sessionID, 0);
     // startTime == 0 → driver invokes Prepare and Start synchronously.
     EXPECT_EQ(bleAdapter.mPrepareCalls, 1);
     EXPECT_EQ(bleAdapter.mStartCalls, 1);
@@ -809,8 +808,7 @@ TEST_F(TestProximityRangingCluster, TestOnMeasurementDataEvent)
         Commands::StartRangingRequest::Id, MakeValidBleBeaconRequest());
     ASSERT_TRUE(startResult.IsSuccess());
     ASSERT_TRUE(startResult.response.has_value());
-    ASSERT_FALSE(startResult.response->sessionID.IsNull());
-    const uint8_t sessionId = startResult.response->sessionID.Value();
+    const uint8_t sessionId = startResult.response->sessionID;
 
     Structs::RangingMeasurementDataStruct::Type measurement;
     measurement.distance.SetNonNull(static_cast<uint16_t>(500));
@@ -856,8 +854,7 @@ TEST_F(TestProximityRangingCluster, TestOnSessionStoppedEvent)
         Commands::StartRangingRequest::Id, MakeValidBleBeaconRequest());
     ASSERT_TRUE(startResult.IsSuccess());
     ASSERT_TRUE(startResult.response.has_value());
-    ASSERT_FALSE(startResult.response->sessionID.IsNull());
-    const uint8_t sessionId = startResult.response->sessionID.Value();
+    const uint8_t sessionId = startResult.response->sessionID;
 
     // Forward a measurement so the driver's peerFound flips true; otherwise
     // the driver remaps kSessionEndTimeReached to kPeerNotFound at stop time.

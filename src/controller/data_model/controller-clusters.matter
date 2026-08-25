@@ -9596,7 +9596,7 @@ provisional cluster ProximityRanging = 1075 {
   }
 
   response struct StartRangingResponse = 1 {
-    nullable int8u sessionID = 0;
+    int8u sessionID = 0;
   }
 
   request struct StopRangingRequestRequest {

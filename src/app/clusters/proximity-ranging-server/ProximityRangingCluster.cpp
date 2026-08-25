@@ -198,7 +198,7 @@ ProximityRangingCluster::HandleStartRangingRequest(const DataModel::InvokeReques
     VerifyOrReturnValue(startStatus.IsSuccess(), DataModel::ActionReturnStatus(startStatus));
 
     Commands::StartRangingResponse::Type response;
-    response.sessionID.SetNonNull(sessionId);
+    response.sessionID = sessionId;
     handler->AddResponse(request.path, response);
     return std::nullopt;
 }

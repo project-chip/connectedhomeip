@@ -133,7 +133,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StartRangingResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ProximityRanging::Id; }
 
-    DataModel::Nullable<uint8_t> sessionID;
+    uint8_t sessionID = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -148,7 +148,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StartRangingResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ProximityRanging::Id; }
 
-    DataModel::Nullable<uint8_t> sessionID;
+    uint8_t sessionID = static_cast<uint8_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

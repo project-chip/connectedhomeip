@@ -28146,7 +28146,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     if (self = [super init]) {
 
-        _sessionID = nil;
+        _sessionID = @(0);
     }
     return self;
 }
@@ -28223,11 +28223,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ProximityRanging::Commands::StartRangingResponse::DecodableType &)decodableStruct
 {
     {
-        if (decodableStruct.sessionID.IsNull()) {
-            self.sessionID = nil;
-        } else {
-            self.sessionID = [NSNumber numberWithUnsignedChar:decodableStruct.sessionID.Value()];
-        }
+        self.sessionID = [NSNumber numberWithUnsignedChar:decodableStruct.sessionID];
     }
     return CHIP_NO_ERROR;
 }
