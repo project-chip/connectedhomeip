@@ -226,6 +226,30 @@ class IDMBaseTest(BasicCompositionTests):
         dut_acl.append(ace)
         await self.write_dut_acl(ctrl=ctrl, acl=dut_acl)
 
+    async def verify_suppress_response_message_count(self, snapshot, action_name: str = "suppressResponse"):
+        """Verify that zero unexpected response packets arrived when suppressResponse=True for Matter 1.7+.
+
+        Reads BasicInformation.SpecificationVersion from the DUT (endpoint 0) to determine
+        the supported Matter release. For Release 1.7 or later (SpecificationVersion >= 0x01070000),
+        asserts that snapshot.totalImResponseCount == 0. For Release 1.6 or earlier, logs the count.
+        """
+        spec_ver = await self.read_single_attribute_check_success(
+            endpoint=self.ROOT_NODE_ENDPOINT_ID,
+            cluster=Clusters.BasicInformation,
+            attribute=Clusters.BasicInformation.Attributes.SpecificationVersion
+        )
+
+        if spec_ver >= 0x01070000:
+            asserts.assert_equal(
+                snapshot.totalImResponseCount, 0,
+                f"DUT supporting Matter specification version 0x{spec_ver:08X} (1.7+) improperly sent "
+                f"{snapshot.totalImResponseCount} response frame(s) when {action_name}=True!"
+            )
+        else:
+            log.info("DUT supporting Matter specification version 0x%08X (pre-1.7) sent %d response frame(s) "
+                     "when %s=True (allowed per pre-1.7 spec)",
+                     spec_ver, snapshot.totalImResponseCount, action_name)
+
     # ========================================================================
     # Attribute Path Utilities
     # ========================================================================
@@ -610,37 +634,56 @@ class IDMBaseTest(BasicCompositionTests):
                     f"Returned attributes don't match AttributeList for cluster {cluster.id} on endpoint {endpoint}")
         return read_request
 
-    async def read_endpoint_all_clusters(self, endpoint):
+    async def read_endpoint_all_clusters(self, endpoint: int) -> dict:
         """Read all attributes from all clusters on an endpoint.
 
         Args:
             endpoint: Endpoint to read from
 
         Returns:
-            Read response dictionary
+            The codegen-parsed attributes mapping from the read response, keyed by
+            endpoint, then cluster class, then attribute class.
         """
-        read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [endpoint])
-        asserts.assert_in(Clusters.Descriptor, read_request[endpoint].keys(), "Descriptor cluster not in output")
-        asserts.assert_in(Clusters.Descriptor.Attributes.ServerList,
-                          read_request[endpoint][Clusters.Descriptor], "ServerList not in output")
+        # Use Read (not ReadAttribute): ReadAttribute returns only the codegen-parsed dict,
+        # whereas Read returns a response object that also carries tlvAttributes.
+        read_request = await self.default_controller.Read(self.dut_node_id, [endpoint])
+
+        # Use tlvAttributes (raw cluster/attribute IDs) rather than the codegen-parsed
+        # .attributes dict. The parsed dict is keyed by generated Cluster classes, so any
+        # cluster the controller has no codegen class for (e.g. a manufacturer-specific
+        # cluster in the 0xVVVV_FC00-0xVVVV_FFFE range) is silently dropped, which would
+        # make the returned cluster set disagree with the DUT's ServerList.
+        tlv_attributes = read_request.tlvAttributes
+        server_list_id = Clusters.Descriptor.Attributes.ServerList.attribute_id
+        attribute_list_id = Clusters.Descriptor.Attributes.AttributeList.attribute_id
+
+        asserts.assert_in(endpoint, tlv_attributes, f"Endpoint {endpoint} not in output")
+        asserts.assert_in(Clusters.Descriptor.id, tlv_attributes[endpoint], "Descriptor cluster not in output")
+        asserts.assert_in(server_list_id, tlv_attributes[endpoint][Clusters.Descriptor.id], "ServerList not in output")
 
         # Verify that returned clusters match the ServerList
-        returned_cluster_ids = sorted([cluster.id for cluster in read_request[endpoint]])
-        server_list = sorted(read_request[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList])
+        returned_cluster_ids = sorted(tlv_attributes[endpoint].keys())
+        server_list = sorted(tlv_attributes[endpoint][Clusters.Descriptor.id][server_list_id])
         asserts.assert_equal(
             returned_cluster_ids,
             server_list,
             f"Returned cluster IDs {returned_cluster_ids} don't match ServerList {server_list} for endpoint {endpoint}")
 
-        for cluster in read_request[endpoint]:
-            attribute_ids = [a.attribute_id for a in read_request[endpoint][cluster]
-                             if a != Clusters.Attribute.DataVersion]
+        for cluster_id in tlv_attributes[endpoint]:
+            # Skip non-standard clusters: the controller has no codegen for them, so
+            # their AttributeList cannot be validated against a known attribute set here.
+            if global_attribute_ids.cluster_id_type(cluster_id) != global_attribute_ids.ClusterIdType.kStandard:
+                continue
+            asserts.assert_in(attribute_list_id, tlv_attributes[endpoint][cluster_id],
+                              f"AttributeList not in output for cluster {cluster_id}")
+            returned_attrs = sorted(tlv_attributes[endpoint][cluster_id].keys())
+            attr_list = sorted(tlv_attributes[endpoint][cluster_id][attribute_list_id])
             asserts.assert_equal(
-                sorted(attribute_ids),
-                sorted(read_request[endpoint][cluster][cluster.Attributes.AttributeList]),
-                f"Expected attribute list does not match for cluster {cluster}"
+                returned_attrs,
+                attr_list,
+                f"Expected attribute list does not match for cluster {cluster_id}"
             )
-        return read_request
+        return read_request.attributes
 
     async def read_unsupported_endpoint(self):
         """Find an unsupported endpoint and attempt to read from it.

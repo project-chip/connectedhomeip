@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 #include <app/CommandHandlerImpl.h>
+#include <crypto/RandUtils.h>
 
 #include <access/AccessControl.h>
 #include <access/SubjectDescriptor.h>
@@ -302,6 +303,8 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
     VerifyOrReturnError(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetTimedRequest(&mTimedRequest) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, Status::InvalidAction);
+    std::optional<InvokeRequestMessage::DelayReportData> delayReportData;
+    VerifyOrReturnError(invokeRequestMessage.GetDelayReportData(delayReportData) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(mTimedRequest == isTimedInvoke, Status::TimedRequestMismatch);
 
     {
@@ -321,6 +324,7 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
         mReserveSpaceForMoreChunkMessages = true;
     }
 
+    mNumTargetedEndpoints = 0;
     while (CHIP_NO_ERROR == (err = invokeRequestsReader.Next()))
     {
         VerifyOrReturnError(TLV::AnonymousTag() == invokeRequestsReader.GetTag(), Status::InvalidAction);
@@ -348,6 +352,12 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
     }
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.ExitContainer() == CHIP_NO_ERROR, Status::InvalidAction);
+
+    if (delayReportData.has_value())
+    {
+        TriggerDelayReport(delayReportData.value());
+    }
+
     return Status::Success;
 }
 
@@ -465,6 +475,8 @@ Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
             return FallibleAddStatus(concretePath, preCheckStatus) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
         }
     }
+
+    RecordTargetedEndpoint(concretePath.mEndpointId);
 
     err = aCommandElement.GetFields(&commandDataReader);
     if (CHIP_END_OF_TLV == err)
@@ -1022,6 +1034,9 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
                        "DUT Failure: Mandatory TimedRequest field missing");
     VerifyOrDieWithMsg(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, DataManagement,
                        "DUT Failure: Mandatory InvokeRequests field missing");
+    std::optional<InvokeRequestMessage::DelayReportData> delayReportData;
+    VerifyOrDieWithMsg(invokeRequestMessage.GetDelayReportData(delayReportData) == CHIP_NO_ERROR, DataManagement,
+                       "DUT Failure: Failed to read DelayReportData");
     VerifyOrDieWithMsg(mTimedRequest == isTimedInvoke, DataManagement,
                        "DUT Failure: TimedRequest value in message mismatches action");
 
@@ -1044,6 +1059,7 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
     VerifyOrDieWithMsg(commandCount == 2, DataManagement, "DUT failure: We were strictly expecting exactly 2 InvokeRequests");
     mReserveSpaceForMoreChunkMessages = true;
 
+    mNumTargetedEndpoints = 0;
     {
         // Response path is the same as request path since we are replying with a failure message.
         ConcreteCommandPath concreteResponsePath1;
@@ -1054,6 +1070,9 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
         VerifyOrDieWithMsg(
             TestOnlyExtractCommandPathFromNextInvokeRequest(invokeRequestsReader, concreteResponsePath2) == CHIP_NO_ERROR,
             DataManagement, "DUT Failure: Issues encountered while extracting the ConcreteCommandPath from the second request");
+
+        RecordTargetedEndpoint(concreteResponsePath1.mEndpointId);
+        RecordTargetedEndpoint(concreteResponsePath2.mEndpointId);
 
         if (faultType == NlFaultInjectionType::SeparateResponseMessagesAndInvertedResponseOrder)
         {
@@ -1081,8 +1100,53 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
                        "DUT Failure: Unexpected TLV ending of InvokeRequests");
     VerifyOrDieWithMsg(invokeRequestMessage.ExitContainer() == CHIP_NO_ERROR, DataManagement,
                        "DUT Failure: InvokeRequestMessage TLV is not properly terminated");
+
+    if (delayReportData.has_value())
+    {
+        TriggerDelayReport(delayReportData.value());
+    }
 }
 #endif // CHIP_WITH_NLFAULTINJECTION
+
+void CommandHandlerImpl::RecordTargetedEndpoint(EndpointId endpointId)
+{
+    for (size_t i = 0; i < mNumTargetedEndpoints; ++i)
+    {
+        if (mTargetedEndpoints[i] == endpointId)
+        {
+            return;
+        }
+    }
+    if (mNumTargetedEndpoints < kMaxTargetedEndpoints)
+    {
+        mTargetedEndpoints[mNumTargetedEndpoints++] = endpointId;
+    }
+    else
+    {
+        // This branch should not be reachable in practice:
+        // - For unicast invokes, the number of distinct targeted endpoints cannot exceed the max paths per invoke
+        // (kMaxTargetedEndpoints).
+        // - For groupcast invokes, RecordTargetedEndpoint is not called because groupcast defers reports globally via an empty
+        // span.
+        ChipLogError(DataManagement, "Too many targeted endpoints in invoke, capping at %u",
+                     static_cast<unsigned int>(kMaxTargetedEndpoints));
+    }
+}
+
+void CommandHandlerImpl::TriggerDelayReport(const InvokeRequestMessage::DelayReportData & aDelayReportData)
+{
+    VerifyOrReturn(mpCallback != nullptr);
+
+    uint32_t delayMs = aDelayReportData.delayMinMs;
+    if (aDelayReportData.delayJitterWindowMs > 0)
+    {
+        delayMs += (chip::Crypto::GetRandU32() % aDelayReportData.delayJitterWindowMs);
+    }
+    // An empty targetedEndpoints span indicates a global deferral across all endpoints on the node for groupcast requests.
+    Span<const EndpointId> targetedEndpoints =
+        IsGroupRequest() ? Span<const EndpointId>() : Span<const EndpointId>(mTargetedEndpoints, mNumTargetedEndpoints);
+    mpCallback->OnDelayReport(System::Clock::Milliseconds32(delayMs), targetedEndpoints);
+}
 
 } // namespace app
 } // namespace chip
