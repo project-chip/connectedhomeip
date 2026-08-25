@@ -768,6 +768,56 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
     break;
     case kRefreshingGroupKeySets: {
         // 4. Ensure per-node key-set entries for each GroupKeySet are synced to devices.
+        if (mRefreshingNodeKeySetDeletions.empty())
+        {
+            for (const auto & groupKeySet : mGroupKeySetList)
+            {
+                for (const auto & nodeKeySetEntry : mNodeKeySetEntries)
+                {
+                    if (nodeKeySetEntry.groupKeySetID == groupKeySet.groupKeySetID &&
+                        nodeKeySetEntry.statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending)
+                    {
+                        mRefreshingNodeKeySetDeletions.emplace_back(nodeKeySetEntry.nodeID, nodeKeySetEntry.groupKeySetID);
+                    }
+                }
+            }
+        }
+
+        if (mRefreshingNodeKeySetDeletionIndex < mRefreshingNodeKeySetDeletions.size())
+        {
+            const auto [nodeIdToErase, groupKeySetIdToErase] = mRefreshingNodeKeySetDeletions[mRefreshingNodeKeySetDeletionIndex];
+            Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type nullEntry{ 0 };
+            CHIP_ERROR syncErr =
+                mDelegate->SyncNode(nodeIdToErase, nullEntry, [this, nodeIdToErase, groupKeySetIdToErase](CHIP_ERROR innerErr) {
+                    if (innerErr == CHIP_NO_ERROR)
+                    {
+                        mNodeKeySetEntries.erase(std::remove_if(mNodeKeySetEntries.begin(), mNodeKeySetEntries.end(),
+                                                                [nodeIdToErase, groupKeySetIdToErase](const auto & entry) {
+                                                                    return entry.nodeID == nodeIdToErase &&
+                                                                        entry.groupKeySetID == groupKeySetIdToErase;
+                                                                }),
+                                                 mNodeKeySetEntries.end());
+                    }
+
+                    ++mRefreshingNodeKeySetDeletionIndex;
+                    if (ContinueRefresh() != CHIP_NO_ERROR)
+                    {
+                        // Ignore errors in continuation from within the callback.
+                    }
+                });
+            if (syncErr != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer,
+                             "Failed deleting group key set during refresh for node 0x" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                             ChipLogValueX64(mRefreshingNodeId), syncErr.Format());
+                mRefreshingNodeId = kUndefinedNodeId;
+                mRefreshState     = kIdle;
+                return syncErr;
+            }
+
+            return CHIP_NO_ERROR;
+        }
+
         for (auto gksIt = mGroupKeySetList.begin(); gksIt != mGroupKeySetList.end(); ++gksIt)
         {
             const uint16_t groupKeySetId = gksIt->groupKeySetID;
@@ -807,37 +857,6 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                         return syncErr;
                     }
                     ++nkIt;
-                }
-                else if (nkIt->statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending)
-                {
-                    // zero-initialized struct to indicate deletion for the SyncNode call
-                    Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type nullEntry{ 0 };
-
-                    auto nodeIdToErase        = nkIt->nodeID;
-                    auto groupKeySetIdToErase = nkIt->groupKeySetID;
-                    CHIP_ERROR syncErr        = mDelegate->SyncNode(
-                        nkIt->nodeID, nullEntry, [this, nodeIdToErase, groupKeySetIdToErase](CHIP_ERROR innerErr) {
-                            if (innerErr != CHIP_NO_ERROR)
-                            {
-                                return;
-                            }
-                            mNodeKeySetEntries.erase(std::remove_if(mNodeKeySetEntries.begin(), mNodeKeySetEntries.end(),
-                                                                           [&](const auto & entry) {
-                                                                        return entry.nodeID == nodeIdToErase &&
-                                                                            entry.groupKeySetID == groupKeySetIdToErase;
-                                                                    }),
-                                                            mNodeKeySetEntries.end());
-                        });
-                    if (syncErr != CHIP_NO_ERROR)
-                    {
-                        ChipLogError(AppServer,
-                                     "Failed deleting group key set during refresh for node 0x" ChipLogFormatX64
-                                     ": %" CHIP_ERROR_FORMAT,
-                                     ChipLogValueX64(mRefreshingNodeId), syncErr.Format());
-                        mRefreshingNodeId = kUndefinedNodeId;
-                        mRefreshState     = kIdle;
-                        return syncErr;
-                    }
                 }
                 else if (nkIt->statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitFailed)
                 {
@@ -883,6 +902,9 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                 }
             }
         }
+
+        mRefreshingNodeKeySetDeletions.clear();
+        mRefreshingNodeKeySetDeletionIndex = 0;
 
         // Request ACL List from the device and transition to kRefreshingACLs.
         ReturnErrorOnFailure(mDelegate->FetchACLList(

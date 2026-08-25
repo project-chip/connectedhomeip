@@ -570,6 +570,8 @@ private:
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type> mEndpointGroupIDEntries;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> mEndpointBindingEntries;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type> mNodeKeySetEntries;
+    std::vector<std::pair<NodeId, uint16_t>> mRefreshingNodeKeySetDeletions;
+    size_t mRefreshingNodeKeySetDeletionIndex = 0;
     std::vector<datastore::ACLEntryStruct> mACLEntries;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type> mEndpointEntries;
     std::map<std::pair<NodeId, EndpointId>, std::vector<char>> mEndpointFriendlyNameStorage;
