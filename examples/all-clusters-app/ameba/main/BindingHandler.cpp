@@ -143,6 +143,18 @@ void InitBindingHandlerInternal(intptr_t arg)
     Binding::Manager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
 }
 
+CHIP_ERROR ScheduleBindingWork(Binding::TableEntry * entry)
+{
+    VerifyOrReturnError(entry != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
+    if (err != CHIP_NO_ERROR)
+    {
+        Platform::Delete(entry);
+    }
+    return err;
+}
+
 #if CONFIG_ENABLE_CHIP_SHELL
 
 /********************************************************
@@ -621,18 +633,6 @@ CHIP_ERROR ScheduleSwitchCommandWork(BindingCommandData * data)
     if (err != CHIP_NO_ERROR)
     {
         Platform::Delete(data);
-    }
-    return err;
-}
-
-CHIP_ERROR ScheduleBindingWork(Binding::TableEntry * entry)
-{
-    VerifyOrReturnError(entry != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
-    if (err != CHIP_NO_ERROR)
-    {
-        Platform::Delete(entry);
     }
     return err;
 }

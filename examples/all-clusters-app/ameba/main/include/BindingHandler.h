@@ -23,12 +23,6 @@
 #include "app-common/zap-generated/ids/Commands.h"
 #include "lib/core/CHIPError.h"
 
-namespace chip {
-namespace Binding {
-struct TableEntry;
-} // namespace Binding
-} // namespace chip
-
 struct BindingCommandData
 {
     chip::AttributeId attributeId;
@@ -42,6 +36,5 @@ struct BindingCommandData
 
 CHIP_ERROR InitBindingHandler();
 CHIP_ERROR ScheduleSwitchCommandWork(BindingCommandData * data);
-CHIP_ERROR ScheduleBindingWork(chip::Binding::TableEntry * entry);
 void SwitchWorkerFunction(intptr_t context);
 void BindingWorkerFunction(intptr_t context);
