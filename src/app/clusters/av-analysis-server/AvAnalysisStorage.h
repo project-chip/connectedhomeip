@@ -144,14 +144,14 @@ public:
     void SetSessionId(uint16_t aSessionId) { mSessionId = aSessionId; }
     uint16_t GetSessionId() const { return mSessionId; }
 
-    void AddTrackedContext(const std::vector<Structs::TrackedContext::Type>& aTrackedContext)
+    void AddTrackedContext(const std::vector<Structs::TrackedContext::Type> & aTrackedContext)
     {
         // Update the current set of tracked contexts with those newly provided
         //
         mTrackedContexts.insert(mTrackedContexts.end(), aTrackedContext.begin(), aTrackedContext.end());
     }
 
-    void RemoveTrackedContext(const std::vector<Structs::TrackedContext::Type>& aTrackedContext)
+    void RemoveTrackedContext(const std::vector<Structs::TrackedContext::Type> & aTrackedContext)
     {
         // Remove the provided contexts from our current set
         mTrackedContexts.erase(std::remove_if(mTrackedContexts.begin(), mTrackedContexts.end(),
