@@ -330,10 +330,7 @@ class CASEHandshakeMetrics:
         return self._status_report_indicates_success is not True
 
 
-
-
 # --- Streaming completed handshakes out of the native layer -------------------------------
-
 # Passed as notification_queue_depth to take the native default depth.
 NOTIFICATION_QUEUE_DEPTH_NATIVE_DEFAULT = 0
 
@@ -423,6 +420,7 @@ def GetDroppedCASEHandshakeNotificationCount() -> int:
 # The event loop never enters Python, so notification costs the handshake nothing however slow
 # or numerous the listeners are. Each listener owns its queue, so a slow one delays only
 # itself.
+
 
 # How long the delivery thread parks in native code before looping. It wakes on its own to
 # check whether it has been asked to stop, so this only bounds shutdown latency.
