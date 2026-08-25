@@ -136,6 +136,10 @@ public:
 
     void MarkAttributeDirty(AttributeId attributeId) { NotifyAttributeChanged(attributeId); }
 
+    /**
+     * Sets the app delegate on the cluster logic; and ensures that the delegate itself has a link to the server
+     * The app must set the delegate prior to registering the cluster instance.
+     */
     void SetDelegate(AvAnalysisDelegate * delegate)
     {
         mLogic.SetDelegate(delegate);
