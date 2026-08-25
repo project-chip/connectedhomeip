@@ -19,6 +19,7 @@
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/TimeFormatLocalization/Metadata.h>
+#include <lib/support/AutoRelease.h>
 #include <tracing/macros.h>
 
 namespace chip {
@@ -26,40 +27,14 @@ namespace app {
 namespace Clusters {
 
 namespace {
-class AutoReleaseIterator
-{
-public:
-    using Iterator = DeviceLayer::DeviceInfoProvider::SupportedCalendarTypesIterator;
-
-    explicit AutoReleaseIterator(DeviceLayer::DeviceInfoProvider & provider) : mIterator(provider.IterateSupportedCalendarTypes())
-    {}
-    ~AutoReleaseIterator()
-    {
-        if (mIterator != nullptr)
-        {
-            mIterator->Release();
-        }
-    }
-
-    // Delete copy constructor and assignment
-    AutoReleaseIterator(const AutoReleaseIterator &)             = delete;
-    AutoReleaseIterator & operator=(const AutoReleaseIterator &) = delete;
-
-    bool IsValid() const { return mIterator != nullptr; }
-    bool Next(TimeFormatLocalization::CalendarTypeEnum & value) { return (mIterator == nullptr) ? false : mIterator->Next(value); }
-
-private:
-    Iterator * mIterator;
-};
-
 bool IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalendar, DeviceLayer::DeviceInfoProvider & provider,
                              TimeFormatLocalization::CalendarTypeEnum * aValidCalendar = nullptr)
 {
-    AutoReleaseIterator it(provider);
-    VerifyOrReturnValue(it.IsValid(), false);
+    AutoRelease it(provider.IterateSupportedCalendarTypes());
+    VerifyOrReturnValue(!it.IsNull(), false);
     TimeFormatLocalization::CalendarTypeEnum type;
 
-    while (it.Next(type))
+    while (it->Next(type))
     {
         // During the first loop, set some valid calendar value if requested
         if (aValidCalendar != nullptr)
@@ -78,13 +53,13 @@ bool IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalenda
 
 CHIP_ERROR GetSupportedCalendarTypes(AttributeValueEncoder & aEncoder, DeviceLayer::DeviceInfoProvider & provider)
 {
-    AutoReleaseIterator it(provider);
-    VerifyOrReturnValue(it.IsValid(), aEncoder.EncodeEmptyList());
+    AutoRelease it(provider.IterateSupportedCalendarTypes());
+    VerifyOrReturnValue(!it.IsNull(), aEncoder.EncodeEmptyList());
 
     return aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
         TimeFormatLocalization::CalendarTypeEnum type;
 
-        while (it.Next(type))
+        while (it->Next(type))
         {
             ReturnErrorOnFailure(encoder.Encode(type));
         }

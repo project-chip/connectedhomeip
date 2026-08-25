@@ -77,6 +77,17 @@ RecordWriter & RecordWriter::WriteQName(const FullQName & qname)
     return *this;
 }
 
+RecordWriter & RecordWriter::WriteQNameUncompressed(const FullQName & qname)
+{
+    for (size_t i = 0; i < qname.nameCount; i++)
+    {
+        mOutput->Put8(static_cast<uint8_t>(strlen(qname.names[i])));
+        mOutput->Put(qname.names[i]);
+    }
+    mOutput->Put8(0);
+    return *this;
+}
+
 RecordWriter & RecordWriter::WriteQName(const SerializedQNameIterator & qname)
 {
     size_t qNameWriteStart = mOutput->WritePos();

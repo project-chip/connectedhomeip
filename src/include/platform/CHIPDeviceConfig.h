@@ -648,6 +648,15 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
+ *
+ * Enable BLE advertising after commissioning completes.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
+#define CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING 0
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART
  *
  * Enable opening pairing window automatically after device power-up.
