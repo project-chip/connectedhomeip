@@ -1,12 +1,7 @@
 from mobly import asserts
 
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.spec_parsing import (
-    PrebuiltDataModelDirectory,
-    VERSION_TO_DM,
-    build_xml_data_model,
-    latest_prebuilt_directory,
-)
+from matter.testing.spec_parsing import VERSION_TO_DM, PrebuiltDataModelDirectory, build_xml_data_model, latest_prebuilt_directory
 
 
 class TestLatestPrebuiltDirectory(MatterBaseTest):

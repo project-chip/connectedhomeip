@@ -45,11 +45,7 @@ from matter.testing.conformance import ConformanceException
 from matter.testing.defaults import TestingDefaults
 # Add imports for argument parsing dependencies
 from matter.testing.pics import read_pics_from_file
-from matter.testing.spec_parsing import (
-    SpecParsingException,
-    build_xml_data_model,
-    latest_prebuilt_directory,
-)
+from matter.testing.spec_parsing import SpecParsingException, build_xml_data_model, latest_prebuilt_directory
 
 try:
     from matter_yamltests.hooks import TestRunnerHooks
