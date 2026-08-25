@@ -30,7 +30,7 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace chip::app::Clusters {
 
-// TODO : Uncomment this when datamodel is updated with the new revision
+// TODO : (#73746) Uncomment this when datamodel is updated with the new revision
 // static_assert(Groups::kRevision >= 5, "This Stubbed Groups cluster implementation is only valid for cluster revision 5 and
 // above");
 
@@ -80,7 +80,7 @@ DataModel::ActionReturnStatus StubbedGroupsCluster::ReadAttribute(const DataMode
     switch (request.path.mAttributeId)
     {
     case ClusterRevision::Id: {
-        // TODO : Remove this, only use kRevision (from metadata) when Datamodel is updated with the new revision.
+        // TODO : (#73746) Remove this, only use kRevision (from metadata) when datamodel is updated with the new revision.
         constexpr uint16_t enforcedRev = kRevision < 5 ? 5 : kRevision;
         return encoder.Encode(enforcedRev);
     }

@@ -106,7 +106,7 @@ TEST_F(TestStubbedGroupsCluster, TestReadAttributes)
 
     uint16_t clusterRevision = 0;
     EXPECT_EQ(mClusterTester->ReadAttribute(Groups::Attributes::ClusterRevision::Id, clusterRevision), CHIP_NO_ERROR);
-    EXPECT_EQ(clusterRevision, Groups::kRevision);
+    EXPECT_EQ(clusterRevision, 5); // TODO: (#73746) Use Groups::kRevision once datamodel is updated with the new revision
 }
 
 TEST_F(TestStubbedGroupsCluster, TestAddGroupReturnsInvalidState)
