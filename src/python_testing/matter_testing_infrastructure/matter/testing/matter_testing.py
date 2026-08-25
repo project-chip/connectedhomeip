@@ -2430,7 +2430,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         self._dut_confirmed_available = self._dut_confirmed_available or result
         return result
 
-
     async def find_or_establish_pase_session_over_ntl(self, setup_payload: SetupPayload, node_id: int) -> ChipDeviceCtrl.DeviceProxyWrapper | None:
         """Establish a PASE session over NTL.
 
@@ -2458,7 +2457,6 @@ class MatterBaseTest(base_test.BaseTestClass):
             setupCode=ntl_onboarding_data,
             nodeId=node_id
         )
-
 
     async def open_commissioning_window(self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None, timeout: int = 900) -> CustomCommissioningParameters:
         """Open a commissioning window on the target device.
