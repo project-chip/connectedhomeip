@@ -88,7 +88,7 @@ void LoggingRvcCleanModeDelegate::HandleChangeToMode(uint8_t newMode, ModeBase::
 {
     ChipLogProgress(Zcl, "LoggingRvcCleanModeDelegate: ChangeToMode(%u) received.", newMode);
 
-    if (mRunModeCluster != nullptr && mRunModeCluster->GetCurrentMode() != kRunModeIdle)
+    if (mRunModeCluster.GetCurrentMode() != kRunModeIdle)
     {
         response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
         response.statusText.SetValue("Change of the cleaning mode is only allowed in Idle."_span);

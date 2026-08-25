@@ -78,13 +78,13 @@ void LoggingRvcRunModeDelegate::HandleChangeToMode(uint8_t newMode, ModeBase::Co
 {
     ChipLogProgress(Zcl, "LoggingRvcRunModeDelegate: ChangeToMode(%u) received.", newMode);
 
-    if (mCluster == nullptr || mOperationalStateCluster == nullptr)
+    if (mCluster == nullptr)
     {
         response.status = to_underlying(ModeBase::StatusCode::kSuccess);
         return;
     }
 
-    uint8_t currentState = mOperationalStateCluster->GetCurrentOperationalState();
+    uint8_t currentState = mOperationalStateCluster.GetCurrentOperationalState();
     uint8_t currentMode  = mCluster->GetCurrentMode();
 
     switch (currentState)
@@ -108,7 +108,7 @@ void LoggingRvcRunModeDelegate::HandleChangeToMode(uint8_t newMode, ModeBase::Co
         {
             mClearDockChargingTrackingHandler();
         }
-        LogErrorOnFailure(mOperationalStateCluster->SetOperationalState(OperationalState::OperationalStateEnum::kRunning));
+        LogErrorOnFailure(mOperationalStateCluster.SetOperationalState(OperationalState::OperationalStateEnum::kRunning));
         if (mServiceAreaDelegate != nullptr)
         {
             mServiceAreaDelegate->SetAttributesAtCleanStart();
@@ -123,7 +123,7 @@ void LoggingRvcRunModeDelegate::HandleChangeToMode(uint8_t newMode, ModeBase::Co
             response.statusText.SetValue("Change to the mapping or cleaning mode is only allowed from idle"_span);
             return;
         }
-        LogErrorOnFailure(mOperationalStateCluster->SetOperationalState(
+        LogErrorOnFailure(mOperationalStateCluster.SetOperationalState(
             to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger)));
         if (mServiceAreaDelegate != nullptr)
         {

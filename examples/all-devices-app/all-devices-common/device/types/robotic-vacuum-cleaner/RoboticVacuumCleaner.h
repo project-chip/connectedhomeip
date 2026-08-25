@@ -26,6 +26,7 @@
 #include <device/types/robotic-vacuum-cleaner/impl/LoggingRvcRunModeDelegate.h>
 #include <device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaDelegate.h>
 #include <device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaStorageDelegate.h>
+#include <optional>
 #include <string>
 
 namespace chip::app {
@@ -53,10 +54,11 @@ private:
     Clusters::ServiceArea::LoggingServiceAreaDelegate mServiceAreaDelegate;
     LazyRegisteredServerCluster<Clusters::ServiceArea::ServiceAreaCluster> mServiceAreaCluster;
 
-    Clusters::RvcRunMode::LoggingRvcRunModeDelegate mRunModeDelegate;
+    // Constructed in Register() once their mandatory cluster dependencies exist.
+    std::optional<Clusters::RvcRunMode::LoggingRvcRunModeDelegate> mRunModeDelegate;
     LazyRegisteredServerCluster<Clusters::ModeBaseCluster> mRunModeCluster;
 
-    Clusters::RvcCleanMode::LoggingRvcCleanModeDelegate mCleanModeDelegate;
+    std::optional<Clusters::RvcCleanMode::LoggingRvcCleanModeDelegate> mCleanModeDelegate;
     LazyRegisteredServerCluster<Clusters::ModeBaseCluster> mCleanModeCluster;
 };
 

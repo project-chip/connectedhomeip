@@ -32,7 +32,11 @@ namespace chip::app::Clusters::RvcRunMode {
 class LoggingRvcRunModeDelegate : public ModeBase::AppDelegate
 {
 public:
-    LoggingRvcRunModeDelegate() = default;
+    // The RVC Operational State cluster is mandatory for this device type and always exists
+    // before this delegate is constructed, so it is injected by reference.
+    explicit LoggingRvcRunModeDelegate(OperationalState::OperationalStateCluster & operationalStateCluster) :
+        mOperationalStateCluster(operationalStateCluster)
+    {}
 
     CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
 
@@ -41,10 +45,9 @@ public:
     CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<detail::Structs::ModeTagStruct::Type> & modeTags) override;
     void HandleChangeToMode(uint8_t newMode, ModeBase::Commands::ChangeToModeResponse::Type & response) override;
 
-    // Bound after construction so ChangeToMode can drive the RVC Operational State cluster the
-    // same way examples/rvc-app/rvc-common/src/rvc-device.cpp's RvcDevice does.
+    // Bound after construction: this delegate is constructed before the RunMode cluster it backs,
+    // so the self-reference cannot be injected at construction time without a cycle.
     void SetCluster(ModeBaseCluster * cluster) { mCluster = cluster; }
-    void SetOperationalStateCluster(OperationalState::OperationalStateCluster * cluster) { mOperationalStateCluster = cluster; }
     void SetServiceAreaDelegate(ServiceArea::LoggingServiceAreaDelegate * serviceAreaDelegate)
     {
         mServiceAreaDelegate = serviceAreaDelegate;
@@ -55,9 +58,9 @@ public:
     }
 
 private:
-    ModeBaseCluster * mCluster                                           = nullptr;
-    OperationalState::OperationalStateCluster * mOperationalStateCluster = nullptr;
-    ServiceArea::LoggingServiceAreaDelegate * mServiceAreaDelegate       = nullptr;
+    ModeBaseCluster * mCluster = nullptr;
+    OperationalState::OperationalStateCluster & mOperationalStateCluster;
+    ServiceArea::LoggingServiceAreaDelegate * mServiceAreaDelegate = nullptr;
     std::function<void()> mClearDockChargingTrackingHandler;
 };
 

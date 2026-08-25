@@ -26,7 +26,9 @@ namespace chip::app::Clusters::RvcCleanMode {
 class LoggingRvcCleanModeDelegate : public ModeBase::AppDelegate
 {
 public:
-    LoggingRvcCleanModeDelegate() = default;
+    // The cleaning mode may only change while the RVC Run Mode cluster is Idle, mirroring
+    // examples/rvc-app/rvc-common/src/rvc-device.cpp's RvcDevice.
+    explicit LoggingRvcCleanModeDelegate(ModeBaseCluster & runModeCluster) : mRunModeCluster(runModeCluster) {}
 
     CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
 
@@ -35,12 +37,8 @@ public:
     CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<detail::Structs::ModeTagStruct::Type> & modeTags) override;
     void HandleChangeToMode(uint8_t newMode, ModeBase::Commands::ChangeToModeResponse::Type & response) override;
 
-    // Bound after construction: the cleaning mode may only change while the RVC Run Mode cluster
-    // is Idle, mirroring examples/rvc-app/rvc-common/src/rvc-device.cpp's RvcDevice.
-    void SetRunModeCluster(ModeBaseCluster * runModeCluster) { mRunModeCluster = runModeCluster; }
-
 private:
-    ModeBaseCluster * mRunModeCluster = nullptr;
+    ModeBaseCluster & mRunModeCluster;
 };
 
 } // namespace chip::app::Clusters::RvcCleanMode
