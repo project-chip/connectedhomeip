@@ -1417,7 +1417,7 @@ async def assert_txt_record_present(instance_name: str, service_type: MdnsServic
 
     Args:
         instance_name (str): The instance name of the DUT.
-        service_type (str): The service type identifying the service to query.
+        service_type (MdnsServiceType): The service type identifying the service to query.
 
     Raises:
         TestFailure: If the TXT record cannot be retrieved from the DUT, or if
