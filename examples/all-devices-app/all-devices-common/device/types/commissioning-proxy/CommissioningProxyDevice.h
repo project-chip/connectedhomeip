@@ -19,63 +19,87 @@
 #pragma once
 
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyCluster.h>
+#include <app/clusters/commissioning-proxy-server/CommissioningProxyTransport.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <credentials/FabricTable.h>
 #include <device/api/SingleEndpoint.h>
-#include <platform/CHIPDeviceConfig.h>
-#include <platform/CHIPDeviceLayer.h>
+#include <lib/support/TimerDelegate.h>
 
-#if CONFIG_NETWORK_LAYER_BLE
-// The ble-transport dependency in BUILD.gn is conditional on chip_config_network_layer_ble
-// The gn check does not evaluate the preprocessor, hence the use of nogncheck below
-// Otherwise the CI, REPL Tests Linux (BUILD) will fail
-#include <app/clusters/commissioning-proxy-server/CommissioningProxyBleAdapter.h>   // nogncheck
-#include <app/clusters/commissioning-proxy-server/CommissioningProxyBleTransport.h> // nogncheck
-#endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-// Same nogncheck rationale as the BLE headers above: the paf-transport dependency is
-// conditional on chip_device_config_enable_wifipaf, which gn check cannot evaluate.
-#include <app/clusters/commissioning-proxy-server/CommissioningProxyPafAdapter.h>   // nogncheck
-#include <app/clusters/commissioning-proxy-server/CommissioningProxyPafTransport.h> // nogncheck
-#endif
+#include <cstddef>
 
 namespace chip {
 namespace app {
 
+/**
+ * @brief Generic Commissioning Proxy device.
+ *
+ * A commissioning proxy relays commissioning traffic for a device the commissioner
+ * cannot reach directly, over a transport that is not IP: BLE today, Wi-Fi PAF next.
+ * It is not an on-network path — a proxy with no transport registered still answers
+ * reads, but reports an empty Capabilities and fails every ProxyConnectRequest and
+ * ProxyScanRequest. Such a build is only useful to keep a no-transport configuration
+ * compiling; a real product registers at least one transport.
+ *
+ * Transports are composed in, not subclassed in: the platform factory override owns one
+ * transport driver per technology it has compiled in and hands each to AddTransport().
+ * Adding a technology is a transport driver plus one more AddTransport() call, with no
+ * new device type and nothing here that knows which technologies exist.
+ */
 class CommissioningProxyDevice : public SingleEndpoint
 {
 public:
-    /// The platform adapters the compiled-in transports need. Supplied by the platform
-    /// device factory; each must outlive this device.
-#if CONFIG_NETWORK_LAYER_BLE && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    CommissioningProxyDevice(Clusters::CommissioningProxy::CommissioningProxyBleAdapter & bleAdapter,
-                             Clusters::CommissioningProxy::CommissioningProxyPafAdapter & pafAdapter);
-#elif CONFIG_NETWORK_LAYER_BLE
-    explicit CommissioningProxyDevice(Clusters::CommissioningProxy::CommissioningProxyBleAdapter & bleAdapter);
-#elif CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    explicit CommissioningProxyDevice(Clusters::CommissioningProxy::CommissioningProxyPafAdapter & pafAdapter);
-#else
-    CommissioningProxyDevice();
-#endif
+    struct Context
+    {
+        /// Watched by the cluster so a removed fabric's sessions and background scans
+        /// go with it.
+        FabricTable & fabricTable;
+        /// Supplies the cluster's response-timeout, scan-watchdog and cache-sweep
+        /// timers, and any timer a registered transport needs.
+        TimerDelegate & timerDelegate;
+    };
+
+    /// @param config the cluster's feature map and supported Wi-Fi bands. Injected
+    ///               rather than fixed here because which features a proxy offers
+    ///               follows from the transports the platform built in, which only the
+    ///               caller knows.
+    CommissioningProxyDevice(const Context & context,
+                             const Clusters::CommissioningProxy::CommissioningProxyCluster::Config & config);
     ~CommissioningProxyDevice() override = default;
+
+    // Non-copyable / non-movable: the device holds pointers to transports it does not
+    // own, and a registered transport holds a pointer back to the cluster this device
+    // creates.
+    CommissioningProxyDevice(const CommissioningProxyDevice &)             = delete;
+    CommissioningProxyDevice & operator=(const CommissioningProxyDevice &) = delete;
+    CommissioningProxyDevice(CommissioningProxyDevice &&)                  = delete;
+    CommissioningProxyDevice & operator=(CommissioningProxyDevice &&)      = delete;
+
+    /**
+     * Add a transport this device will expose. Call once per transport before
+     * Register(); each is registered on the cluster when the device registers.
+     *
+     * The device does not take ownership: @p transport must outlive it, and must not be
+     * shared with another device, since registering hands the transport a pointer back
+     * to this device's cluster.
+     */
+    void AddTransport(Clusters::CommissioningProxy::CommissioningProxyTransport & transport);
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
 private:
+    // One slot per transport type; matches CommissioningProxyCluster's own limit.
+    static constexpr size_t kMaxTransports = 3;
+
+    const Context mContext;
+
+    const Clusters::CommissioningProxy::CommissioningProxyCluster::Config mConfig;
+
+    Clusters::CommissioningProxy::CommissioningProxyTransport * mTransports[kMaxTransports] = {};
+    size_t mTransportCount                                                                  = 0;
+
     LazyRegisteredServerCluster<Clusters::CommissioningProxy::CommissioningProxyCluster> mCluster;
-
-    // Platform transport drivers registered on the cluster (owned here).
-#if CONFIG_NETWORK_LAYER_BLE
-    Clusters::CommissioningProxy::CommissioningProxyBleTransport mBleTransport;
-#endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    Clusters::CommissioningProxy::CommissioningProxyPafTransport mPafTransport;
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    static void OnDeviceEvent(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-#endif
 };
 
 } // namespace app

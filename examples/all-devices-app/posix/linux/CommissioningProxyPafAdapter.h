@@ -45,7 +45,7 @@ namespace app {
  * The platform scan APIs hand back one void*, so this holds the caller's callbacks and
  * context and passes itself instead.
  */
-class LinuxCommissioningProxyPafAdapter : public Clusters::CommissioningProxy::CommissioningProxyPafAdapter
+class CommissioningProxyPafAdapter : public Clusters::CommissioningProxy::CommissioningProxyPafAdapter
 {
 public:
     CHIP_ERROR StartForegroundScan(System::Clock::Seconds16 window, DiscoveryCallback onDevice, ScanCompleteCallback onDone,
@@ -54,6 +54,7 @@ public:
     CHIP_ERROR StartBackgroundScan(DiscoveryCallback cb, void * context) override;
     void StopBackgroundScan() override;
     uint32_t PendingConnectSubscribeId() const override;
+    void DisconnectPublishReceiveHandler() override;
 
 private:
     /// Trampolines matching the platform callback shapes; they re-report each peer in the

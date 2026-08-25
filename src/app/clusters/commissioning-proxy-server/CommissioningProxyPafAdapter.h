@@ -117,6 +117,17 @@ public:
      * Valid only immediately after a successful subscribe; 0 when there is none.
      */
     virtual uint32_t PendingConnectSubscribeId() const = 0;
+
+    /**
+     * Disconnect the publish receive handler the platform registered when the proxy
+     * began publishing over NAN.
+     *
+     * A proxy publishes so it can be commissioned onto a fabric itself. Once it is
+     * commissioned that handler has to go, or a later subscribe leaves the platform with
+     * two handlers for the same traffic. A no-op when none is registered, so the
+     * commissioning-complete path can call it unconditionally.
+     */
+    virtual void DisconnectPublishReceiveHandler() = 0;
 };
 
 } // namespace CommissioningProxy

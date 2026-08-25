@@ -13,46 +13,28 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/src/ble/ble.gni")
-import("${chip_root}/src/platform/device.gni")
 
 source_set("commissioning-proxy") {
-  # The cluster, its transport-agnostic bookkeeping and the transport drivers all come
-  # from the commissioning-proxy-server source_sets in deps below, so the example only
-  # supplies the device wiring and the platform adapters.  This app has
-  # no chip_data_model() rule, so CodegenIntegration.cpp is never compiled — it
-  # wires the Ember/codegen path which this app does not use.
+  # The cluster and its transport-agnostic bookkeeping come from the
+  # commissioning-proxy-server source_set in deps below, so the example only supplies
+  # the device wiring.  This app has no chip_data_model() rule, so
+  # CodegenIntegration.cpp is never compiled — it wires the Ember/codegen path which
+  # this app does not use.
+  #
+  # Transport-agnostic, and no per-transport target here: the platform factory override
+  # depends on the transport drivers it has and composes them onto this device with
+  # AddTransport().
   sources = [
     "CommissioningProxyDevice.cpp",
     "CommissioningProxyDevice.h",
   ]
 
-  deps = [
+  public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
     "${chip_root}/src/app/clusters/commissioning-proxy-server",
     "${chip_root}/src/lib",
     "${chip_root}/zzz_generated/app-common/devices",
   ]
-
-  # Each transport driver lives with the cluster; this app supplies only its platform
-  # adapter. Public because CommissioningProxyDevice.h exposes both the transports and the
-  # adapter interfaces to whoever constructs the device.
-  public_deps = []
-
-  if (chip_config_network_layer_ble) {
-    public_deps += [
-      "${chip_root}/src/app/clusters/commissioning-proxy-server:ble-transport",
-    ]
-  }
-
-  if (chip_device_config_enable_wifipaf) {
-    deps += [
-      "${chip_root}/examples/all-devices-app/posix/app_options:app-options",
-    ]
-    public_deps += [
-      "${chip_root}/src/app/clusters/commissioning-proxy-server:paf-transport",
-    ]
-  }
 
   include_dirs = [ "." ]
 }

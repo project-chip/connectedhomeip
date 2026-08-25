@@ -442,7 +442,7 @@ MyBleProxyAdapter gBleAdapter;
 CommissioningProxyBleTransport gBleTransport(gBleAdapter, gTimerDelegate);
 ```
 
-`examples/all-devices-app/posix/linux/LinuxCommissioningProxyBleAdapter.cpp` is
+`examples/all-devices-app/posix/linux/CommissioningProxyBleAdapter.cpp` is
 a worked implementation over `BLEManagerImpl`, wired up in that app's
 `posix/linux/DeviceFactoryPlatformOverride.cpp`.
 
@@ -483,6 +483,7 @@ class MyPafProxyAdapter : public CommissioningProxyPafAdapter
     CHIP_ERROR StartBackgroundScan(DiscoveryCallback cb, void * context) override;
     void StopBackgroundScan() override;
     uint32_t PendingConnectSubscribeId() const override;
+    void DisconnectPublishReceiveHandler() override;
 };
 
 MyPafProxyAdapter gPafAdapter;
@@ -491,8 +492,11 @@ CommissioningProxyPafTransport gPafTransport(gPafAdapter, gTimerDelegate);
 
 Unlike BLE, the platform owns the scan window: `StartForegroundScan()` takes the
 duration and the adapter signals completion, so the transport arms no scan timer
-of its own.
-`examples/all-devices-app/posix/linux/LinuxCommissioningProxyPafAdapter.cpp` is
+of its own. `DisconnectPublishReceiveHandler()` is the one non-discovery hook: a
+proxy publishes over NAN so it can be commissioned itself, and that handler has
+to be torn down once it is on a fabric, or a later subscribe leaves the platform
+with two handlers for the same traffic.
+`examples/all-devices-app/posix/linux/CommissioningProxyPafAdapter.cpp` is
 a worked implementation over `ConnectivityManagerImpl`, and is also where the
 platform's peer descriptor is unpacked into the interface's scalars so no
 platform type reaches the cluster.

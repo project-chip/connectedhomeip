@@ -390,16 +390,17 @@ portable Wi-Fi PAF layer:
 
 Everything above is portable. Discovery is not: scanning for commissionable
 devices, and recovering the NAN subscribe id the platform assigned, both need
-the platform implementation. Those four operations are the
+the platform implementation. Those operations are the
 `CommissioningProxyPafAdapter` interface, and this app implements it in
-[`posix/linux/LinuxCommissioningProxyPafAdapter.cpp`](../../../../posix/linux/LinuxCommissioningProxyPafAdapter.cpp):
+[`posix/linux/CommissioningProxyPafAdapter.cpp`](../../../../posix/linux/CommissioningProxyPafAdapter.cpp):
 
-| Adapter method                | Linux implementation                                   |
-| ----------------------------- | ------------------------------------------------------ |
-| `StartForegroundScan()`       | `ConnectivityMgrImpl().WiFiPAFScan()`                  |
-| `StartBackgroundScan()`       | `ConnectivityMgrImpl().WiFiPAFStartBackgroundScan()`   |
-| `StopBackgroundScan()`        | `ConnectivityMgrImpl().WiFiPAFStopBackgroundScan()`    |
-| `PendingConnectSubscribeId()` | `ConnectivityMgrImpl().GetPendingConnectSubscribeId()` |
+| Adapter method                      | Linux implementation                                             |
+| ----------------------------------- | ---------------------------------------------------------------- |
+| `StartForegroundScan()`             | `ConnectivityMgrImpl().WiFiPAFScan()`                            |
+| `StartBackgroundScan()`             | `ConnectivityMgrImpl().WiFiPAFStartBackgroundScan()`             |
+| `StopBackgroundScan()`              | `ConnectivityMgrImpl().WiFiPAFStopBackgroundScan()`              |
+| `PendingConnectSubscribeId()`       | `ConnectivityMgrImpl().GetPendingConnectSubscribeId()`           |
+| `DisconnectPublishReceiveHandler()` | `ConnectivityMgrImpl().WiFiPAFDisconnectPublishReceiveHandler()` |
 
 The adapter is also where the platform's peer descriptor is unpacked.
 `NanPeerInfo` is Linux-only and owns heap storage for its extended data, so the
@@ -418,12 +419,22 @@ Two details worth knowing when reading the code:
     reports `CHIP_ERROR_BUSY` while a connect is pending, which the shared
     background-scan registry treats as "defer and retry".
 
-The driver and its adapter are constructed in
-`posix/linux/DeviceFactoryPlatformOverride.cpp` and registered on the cluster by
-`CommissioningProxyDevice::Register()`, guarded by
-`#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF`, which also sets the
-`WiFiNetworkInterface` cluster feature and derives the advertised `WiFiBand`
-from `--wifipaf freq_list=`.
+The adapter is constructed in `posix/linux/DeviceFactoryPlatformOverride.cpp`,
+which is also where the advertised `WiFiBand` is derived from
+`--wifipaf freq_list=` and passed to the device — the device itself reads no
+command line.
+
+The driver is owned by the same override, which composes it onto the single
+`CommissioningProxyDevice` with `AddTransport()`. There is no per-transport
+device type: a build with BLE as well adds the BLE driver the same way, so
+supporting another technology is one more transport driver and one more
+`AddTransport()` call rather than a new class per combination of technologies.
+
+The proxy's own publish lifecycle belongs to the driver, not the device.
+`CommissioningProxyPafTransport` takes the `FabricTable` and calls
+`DisconnectPublishReceiveHandler()` once the proxy is on a fabric: straight
+away if it is already commissioned when the transport is registered, otherwise
+on the commissioning-complete event.
 
 <hr>
 

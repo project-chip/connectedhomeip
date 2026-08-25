@@ -37,9 +37,8 @@ namespace CommissioningProxy {
 using Protocols::InteractionModel::Status;
 
 CommissioningProxyPafTransport::CommissioningProxyPafTransport(CommissioningProxyPafAdapter & adapter,
-                                                               TimerDelegate & timerDelegate) :
-    mAdapter(adapter),
-    mTimerDelegate(timerDelegate), mBgScan(mBgScanHardware, timerDelegate)
+                                                               TimerDelegate & timerDelegate, FabricTable * fabricTable) :
+    mAdapter(adapter), mTimerDelegate(timerDelegate), mBgScan(mBgScanHardware, timerDelegate), mFabricTable(fabricTable)
 {}
 
 CommissioningProxyPafTransport::~CommissioningProxyPafTransport()
@@ -585,6 +584,36 @@ void CommissioningProxyPafTransport::HandleConnectError(void * context, CHIP_ERR
 void CommissioningProxyPafTransport::SetHost(CommissioningProxyCluster * host)
 {
     mHost = host;
+
+    // Teardown passes nullptr, and Shutdown() has already dropped the handler by then.
+    VerifyOrReturn(host != nullptr);
+
+    // A proxy publishes over NAN so it can be commissioned onto a fabric itself. That
+    // publish receive handler has to go once it is commissioned, or a later subscribe
+    // leaves the platform with two handlers for the same traffic. With no fabric table
+    // there is nothing to watch, which is how the unit tests run.
+    VerifyOrReturn(mFabricTable != nullptr);
+
+    if (mFabricTable->FabricCount() > 0)
+    {
+        // Already commissioned, so it will never publish again.
+        mAdapter.DisconnectPublishReceiveHandler();
+        return;
+    }
+
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().AddEventHandler(OnDeviceEvent, reinterpret_cast<intptr_t>(this)));
+    mPublishHandlerArmed = true;
+}
+
+void CommissioningProxyPafTransport::OnDeviceEvent(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+{
+    VerifyOrReturn(event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete);
+
+    auto * self = reinterpret_cast<CommissioningProxyPafTransport *>(arg);
+    VerifyOrReturn(self != nullptr);
+
+    ChipLogProgress(AppServer, "CommissioningProxy: commissioning complete, disconnecting publish receive handler");
+    self->mAdapter.DisconnectPublishReceiveHandler();
 }
 
 Status CommissioningProxyPafTransport::Connect(app::CommandHandler * commandObj, const DataModel::InvokeRequest & request,
@@ -853,6 +882,12 @@ bool CommissioningProxyPafTransport::IsConnectPending() const
 
 void CommissioningProxyPafTransport::Shutdown()
 {
+    if (mPublishHandlerArmed)
+    {
+        DeviceLayer::PlatformMgr().RemoveEventHandler(OnDeviceEvent, reinterpret_cast<intptr_t>(this));
+        mPublishHandlerArmed = false;
+    }
+
     // Close any active PAF sessions: fail in-flight messages, close PAFTP endpoints,
     // cancel NAN subscribes, and remove them from the cluster's session manager. Take the
     // sessions out first so the slots are free if a close fires a callback synchronously.

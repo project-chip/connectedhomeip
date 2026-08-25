@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <LinuxCommissioningProxyPafAdapter.h>
+#include "CommissioningProxyPafAdapter.h"
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
@@ -27,8 +27,8 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR LinuxCommissioningProxyPafAdapter::StartForegroundScan(System::Clock::Seconds16 window, DiscoveryCallback onDevice,
-                                                                  ScanCompleteCallback onDone, void * context)
+CHIP_ERROR CommissioningProxyPafAdapter::StartForegroundScan(System::Clock::Seconds16 window, DiscoveryCallback onDevice,
+                                                             ScanCompleteCallback onDone, void * context)
 {
     VerifyOrReturnError(onDevice != nullptr && onDone != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -51,7 +51,7 @@ CHIP_ERROR LinuxCommissioningProxyPafAdapter::StartForegroundScan(System::Clock:
     return err;
 }
 
-void LinuxCommissioningProxyPafAdapter::StopForegroundScan()
+void CommissioningProxyPafAdapter::StopForegroundScan()
 {
     // ConnectivityManagerImpl exposes no way to abort a one-shot WiFiPAFScan early - the
     // window is owned by wpa_supplicant and FinishWiFiPAFScan is private. Detaching the
@@ -63,7 +63,7 @@ void LinuxCommissioningProxyPafAdapter::StopForegroundScan()
     mForegroundContext  = nullptr;
 }
 
-CHIP_ERROR LinuxCommissioningProxyPafAdapter::StartBackgroundScan(DiscoveryCallback cb, void * context)
+CHIP_ERROR CommissioningProxyPafAdapter::StartBackgroundScan(DiscoveryCallback cb, void * context)
 {
     VerifyOrReturnError(cb != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -79,19 +79,24 @@ CHIP_ERROR LinuxCommissioningProxyPafAdapter::StartBackgroundScan(DiscoveryCallb
     return err;
 }
 
-void LinuxCommissioningProxyPafAdapter::StopBackgroundScan()
+void CommissioningProxyPafAdapter::StopBackgroundScan()
 {
     DeviceLayer::ConnectivityMgrImpl().WiFiPAFStopBackgroundScan();
     mBackgroundCallback = nullptr;
     mBackgroundContext  = nullptr;
 }
 
-uint32_t LinuxCommissioningProxyPafAdapter::PendingConnectSubscribeId() const
+uint32_t CommissioningProxyPafAdapter::PendingConnectSubscribeId() const
 {
     return DeviceLayer::ConnectivityMgrImpl().GetPendingConnectSubscribeId();
 }
 
-void LinuxCommissioningProxyPafAdapter::ReportPeer(DiscoveryCallback cb, void * context, const DeviceLayer::NanPeerInfo & peer)
+void CommissioningProxyPafAdapter::DisconnectPublishReceiveHandler()
+{
+    DeviceLayer::ConnectivityMgrImpl().WiFiPAFDisconnectPublishReceiveHandler();
+}
+
+void CommissioningProxyPafAdapter::ReportPeer(DiscoveryCallback cb, void * context, const DeviceLayer::NanPeerInfo & peer)
 {
     // The platform keeps extended data in a heap buffer; hand it across as a span that is
     // only valid for this call, which is what the interface promises.
@@ -103,9 +108,9 @@ void LinuxCommissioningProxyPafAdapter::ReportPeer(DiscoveryCallback cb, void * 
     cb(context, ByteSpan(peer.mac, sizeof(peer.mac)), peer.discriminator, peer.vid, peer.pid, extendedData, peer.band);
 }
 
-void LinuxCommissioningProxyPafAdapter::OnPlatformScanComplete(void * context, const std::vector<DeviceLayer::NanPeerInfo> & peers)
+void CommissioningProxyPafAdapter::OnPlatformScanComplete(void * context, const std::vector<DeviceLayer::NanPeerInfo> & peers)
 {
-    auto * self = static_cast<LinuxCommissioningProxyPafAdapter *>(context);
+    auto * self = static_cast<CommissioningProxyPafAdapter *>(context);
     VerifyOrReturn(self != nullptr && self->mForegroundCallback != nullptr && self->mForegroundDone != nullptr);
 
     // The platform reports the whole result set at the end of the window; the interface
@@ -123,9 +128,9 @@ void LinuxCommissioningProxyPafAdapter::OnPlatformScanComplete(void * context, c
     onDone(doneContext);
 }
 
-void LinuxCommissioningProxyPafAdapter::OnPlatformBgScanDiscovery(void * context, const DeviceLayer::NanPeerInfo & peer)
+void CommissioningProxyPafAdapter::OnPlatformBgScanDiscovery(void * context, const DeviceLayer::NanPeerInfo & peer)
 {
-    auto * self = static_cast<LinuxCommissioningProxyPafAdapter *>(context);
+    auto * self = static_cast<CommissioningProxyPafAdapter *>(context);
     VerifyOrReturn(self != nullptr && self->mBackgroundCallback != nullptr);
 
     ReportPeer(self->mBackgroundCallback, self->mBackgroundContext, peer);

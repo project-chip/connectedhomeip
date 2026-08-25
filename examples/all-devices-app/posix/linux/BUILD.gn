@@ -36,15 +36,15 @@ source_set("linux") {
 
   if (chip_config_network_layer_ble) {
     sources += [
-      "../include/LinuxCommissioningProxyBleAdapter.h",
-      "LinuxCommissioningProxyBleAdapter.cpp",
+      "CommissioningProxyBleAdapter.cpp",
+      "CommissioningProxyBleAdapter.h",
     ]
   }
 
   if (chip_device_config_enable_wifipaf) {
     sources += [
-      "../include/LinuxCommissioningProxyPafAdapter.h",
-      "LinuxCommissioningProxyPafAdapter.cpp",
+      "CommissioningProxyPafAdapter.cpp",
+      "CommissioningProxyPafAdapter.h",
     ]
   }
 
@@ -65,15 +65,17 @@ source_set("linux") {
   deps += [ "${chip_root}/third_party/jsoncpp" ]
 
   if (chip_config_network_layer_ble) {
-    # LinuxCommissioningProxyBleAdapter implements the cluster's BLE adapter interface.
+    # CommissioningProxyBleAdapter implements the cluster's BLE adapter interface.
     deps += [
       "${chip_root}/src/app/clusters/commissioning-proxy-server:ble-transport",
     ]
   }
 
   if (chip_device_config_enable_wifipaf) {
-    # LinuxCommissioningProxyPafAdapter implements the cluster's PAF adapter interface.
+    # CommissioningProxyPafAdapter implements the cluster's PAF adapter interface, and
+    # the band the proxy advertises is derived here from the app's command line.
     deps += [
+      "${chip_root}/examples/all-devices-app/posix/app_options:app-options",
       "${chip_root}/src/app/clusters/commissioning-proxy-server:paf-transport",
     ]
   }

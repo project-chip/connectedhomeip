@@ -108,6 +108,8 @@ public:
 
     uint32_t PendingConnectSubscribeId() const override { return mSubscribeId; }
 
+    void DisconnectPublishReceiveHandler() override { publishReceiveDisconnectCalls++; }
+
     /// Report a peer to the in-flight foreground scan.
     void ReportForeground(uint16_t discriminator, uint16_t vendorId, uint16_t productId, uint8_t addressTag,
                           ByteSpan extendedData = ByteSpan(), uint16_t wiFiBand = 0)
@@ -154,7 +156,10 @@ public:
     unsigned foregroundStopCalls  = 0;
     unsigned backgroundStartCalls = 0;
     unsigned backgroundStopCalls  = 0;
-    bool backgroundScanning       = false;
+
+    unsigned publishReceiveDisconnectCalls = 0;
+
+    bool backgroundScanning = false;
     System::Clock::Seconds16 lastWindow{ 0 };
 
 private:
@@ -200,6 +205,22 @@ struct HostedTransport
 // ---------------------------------------------------------------------------
 // Foreground scan: the platform owns the window (PAF-specific)
 // ---------------------------------------------------------------------------
+
+/// The proxy's own NAN publish receive handler is torn down once the proxy is on a
+/// fabric, which needs a FabricTable to observe. Constructed without one — as every
+/// test here is, and as the cluster's own `fabricTable = nullptr` convention allows —
+/// registering must leave the handler alone rather than reach for the platform event
+/// loop, which these tests do not start.
+///
+/// The paths that do disconnect the handler (already-commissioned at registration, and
+/// the commissioning-complete event) need both a FabricTable and a running
+/// PlatformManager, so they are exercised on hardware rather than here.
+TEST_F(TestCommissioningProxyPafTransport, RegisteringWithoutAFabricTableLeavesThePublishHandlerAlone)
+{
+    HostedTransport hosted(mockTimer, transport);
+
+    EXPECT_EQ(adapter.publishReceiveDisconnectCalls, 0u);
+}
 
 TEST_F(TestCommissioningProxyPafTransport, ScanPassesTheWindowToThePlatformAndArmsNoTimer)
 {
