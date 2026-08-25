@@ -26,10 +26,9 @@ using namespace chip::app::all_devices::rvc_simulation::Topology;
 
 namespace {
 
-bool IsOperating(OperationalState::OperationalStateCluster * cluster)
+bool IsOperating(OperationalState::OperationalStateCluster & cluster)
 {
-    return cluster != nullptr &&
-        cluster->GetCurrentOperationalState() == to_underlying(OperationalState::OperationalStateEnum::kRunning);
+    return cluster.GetCurrentOperationalState() == to_underlying(OperationalState::OperationalStateEnum::kRunning);
 }
 
 } // namespace

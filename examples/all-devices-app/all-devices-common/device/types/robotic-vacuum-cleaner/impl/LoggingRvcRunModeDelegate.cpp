@@ -109,10 +109,7 @@ void LoggingRvcRunModeDelegate::HandleChangeToMode(uint8_t newMode, ModeBase::Co
             mClearDockChargingTrackingHandler();
         }
         LogErrorOnFailure(mOperationalStateCluster.SetOperationalState(OperationalState::OperationalStateEnum::kRunning));
-        if (mServiceAreaDelegate != nullptr)
-        {
-            mServiceAreaDelegate->SetAttributesAtCleanStart();
-        }
+        mServiceAreaDelegate.SetAttributesAtCleanStart();
         response.status = to_underlying(ModeBase::StatusCode::kSuccess);
         return;
 
@@ -125,10 +122,7 @@ void LoggingRvcRunModeDelegate::HandleChangeToMode(uint8_t newMode, ModeBase::Co
         }
         LogErrorOnFailure(mOperationalStateCluster.SetOperationalState(
             to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger)));
-        if (mServiceAreaDelegate != nullptr)
-        {
-            mServiceAreaDelegate->UpdateProgressOnExit();
-        }
+        mServiceAreaDelegate.UpdateProgressOnExit();
         response.status = to_underlying(ModeBase::StatusCode::kSuccess);
         return;
 

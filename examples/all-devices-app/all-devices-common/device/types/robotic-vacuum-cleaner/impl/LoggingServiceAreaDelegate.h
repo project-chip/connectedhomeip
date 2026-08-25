@@ -29,7 +29,11 @@ namespace chip::app::Clusters::ServiceArea {
 class LoggingServiceAreaDelegate : public Delegate
 {
 public:
-    LoggingServiceAreaDelegate() = default;
+    // The RVC Operational State cluster is mandatory for this device type and always exists
+    // before this delegate is constructed, so it is injected by reference.
+    explicit LoggingServiceAreaDelegate(OperationalState::OperationalStateCluster & operationalStateCluster) :
+        mOperationalStateCluster(operationalStateCluster)
+    {}
 
     CHIP_ERROR Init() override;
 
@@ -40,8 +44,9 @@ public:
     bool IsSupportedAreasChangeAllowed() override;
     bool IsSupportedMapChangeAllowed() override;
 
+    // Bound after construction: this delegate is constructed before the ServiceArea cluster it
+    // backs, so the self-reference cannot be injected at construction time without a cycle.
     void SetCluster(ServiceAreaCluster * cluster) { mCluster = cluster; }
-    void SetOperationalStateCluster(OperationalState::OperationalStateCluster * cluster) { mOperationalStateCluster = cluster; }
 
     // Called when cleaning finishes after the last area is skipped/completed.
     void SetActivityCompleteHandler(std::function<void()> handler) { mActivityCompleteHandler = std::move(handler); }
@@ -52,8 +57,8 @@ public:
     void UpdateProgressOnExit();
 
 private:
-    ServiceAreaCluster * mCluster                                        = nullptr;
-    OperationalState::OperationalStateCluster * mOperationalStateCluster = nullptr;
+    ServiceAreaCluster * mCluster = nullptr;
+    OperationalState::OperationalStateCluster & mOperationalStateCluster;
     std::function<void()> mActivityCompleteHandler;
 };
 

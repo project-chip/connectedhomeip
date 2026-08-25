@@ -32,10 +32,11 @@ namespace chip::app::Clusters::RvcRunMode {
 class LoggingRvcRunModeDelegate : public ModeBase::AppDelegate
 {
 public:
-    // The RVC Operational State cluster is mandatory for this device type and always exists
-    // before this delegate is constructed, so it is injected by reference.
-    explicit LoggingRvcRunModeDelegate(OperationalState::OperationalStateCluster & operationalStateCluster) :
-        mOperationalStateCluster(operationalStateCluster)
+    // The RVC Operational State and Service Area clusters are mandatory for this device type and
+    // always exist before this delegate is constructed, so they are injected by reference.
+    LoggingRvcRunModeDelegate(OperationalState::OperationalStateCluster & operationalStateCluster,
+                              ServiceArea::LoggingServiceAreaDelegate & serviceAreaDelegate) :
+        mOperationalStateCluster(operationalStateCluster), mServiceAreaDelegate(serviceAreaDelegate)
     {}
 
     CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
@@ -48,10 +49,6 @@ public:
     // Bound after construction: this delegate is constructed before the RunMode cluster it backs,
     // so the self-reference cannot be injected at construction time without a cycle.
     void SetCluster(ModeBaseCluster * cluster) { mCluster = cluster; }
-    void SetServiceAreaDelegate(ServiceArea::LoggingServiceAreaDelegate * serviceAreaDelegate)
-    {
-        mServiceAreaDelegate = serviceAreaDelegate;
-    }
     void SetClearDockChargingTrackingHandler(std::function<void()> handler)
     {
         mClearDockChargingTrackingHandler = std::move(handler);
@@ -60,7 +57,7 @@ public:
 private:
     ModeBaseCluster * mCluster = nullptr;
     OperationalState::OperationalStateCluster & mOperationalStateCluster;
-    ServiceArea::LoggingServiceAreaDelegate * mServiceAreaDelegate = nullptr;
+    ServiceArea::LoggingServiceAreaDelegate & mServiceAreaDelegate;
     std::function<void()> mClearDockChargingTrackingHandler;
 };
 

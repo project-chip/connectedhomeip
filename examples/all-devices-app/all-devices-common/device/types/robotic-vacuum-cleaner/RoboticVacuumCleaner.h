@@ -51,10 +51,11 @@ private:
     LazyRegisteredServerCluster<Clusters::RvcOperationalState::RvcOperationalStateCluster> mOperationalStateCluster;
 
     Clusters::ServiceArea::LoggingServiceAreaStorageDelegate mServiceAreaStorageDelegate;
-    Clusters::ServiceArea::LoggingServiceAreaDelegate mServiceAreaDelegate;
-    LazyRegisteredServerCluster<Clusters::ServiceArea::ServiceAreaCluster> mServiceAreaCluster;
 
     // Constructed in Register() once their mandatory cluster dependencies exist.
+    std::optional<Clusters::ServiceArea::LoggingServiceAreaDelegate> mServiceAreaDelegate;
+    LazyRegisteredServerCluster<Clusters::ServiceArea::ServiceAreaCluster> mServiceAreaCluster;
+
     std::optional<Clusters::RvcRunMode::LoggingRvcRunModeDelegate> mRunModeDelegate;
     LazyRegisteredServerCluster<Clusters::ModeBaseCluster> mRunModeCluster;
 
