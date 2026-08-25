@@ -72,7 +72,7 @@ Test Plan
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securechannel.adoc#343-tc-sc-43-discovery-dut_commissionee
 '''
 
-TCP_PICS_STR = "MCORE.SC.TCP"
+TCP_PICS_STR = "MCORE.SC.S.TCP"
 ONE_HOUR_IN_MS = 3600000
 MAX_SAT_VALUE = 65535
 MAX_T_VALUE = 6
@@ -135,14 +135,14 @@ class TC_SC_4_3(MatterBaseTest):
         compressed_fabric_id = self.default_controller.GetCompressedFabricId()
         instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
         if log_result:
-            log.info(f"\n\n\tDUT Instance Name: {instance_name}\n")
+            log.info("\n\n\tDUT Instance Name: %s\n", instance_name)
         return instance_name
 
     def get_operational_subtype(self, log_result: bool = False) -> str:
         compressed_fabric_id = self.default_controller.GetCompressedFabricId()
         operational_subtype = f'_I{compressed_fabric_id:016X}._sub.{MdnsServiceType.OPERATIONAL.value}'
         if log_result:
-            log.info(f"\n\n\tOperational Subtype: {operational_subtype}\n")
+            log.info("\n\n\tOperational Subtype: %s\n", operational_subtype)
         return operational_subtype
 
     @staticmethod
@@ -187,9 +187,9 @@ class TC_SC_4_3(MatterBaseTest):
     #         if self.check_pics(TCP_PICS_STR):
     #             if (T_int & 0x04 != 0):
     #                 return True, f"T value ({t_value}) represents valid TCP support info."
-    #             return False, f"T value ({t_value}) does not have TCP bits set even though the MCORE.SC.TCP PICS indicates it is required."
+    #             return False, f"T value ({t_value}) does not have TCP bits set even though the MCORE.SC.S.TCP PICS indicates it is required."
     #         if (T_int & 0x04 != 0):
-    #             return False, f"T value ({t_value}) has the TCP bits set even though the MCORE.SC.TCP PICS is not set."
+    #             return False, f"T value ({t_value}) has the TCP bits set even though the MCORE.SC.S.TCP PICS is not set."
     #         return True, f"T value ({t_value}) is valid."
     #     except ValueError:
     #         return False, f"T value ({t_value}) is not a valid integer"
@@ -212,7 +212,7 @@ class TC_SC_4_3(MatterBaseTest):
 
         # Check if ep0_servers contain the ICD Management cluster ID (0x0046)
         supports_icd = Clusters.IcdManagement.id in ep0_servers
-        log.info(f"supports_icd: {supports_icd}")
+        log.info("supports_icd: %s", supports_icd)
 
         # *** STEP 3 ***
         # If supports_icd is true, TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves
@@ -220,7 +220,7 @@ class TC_SC_4_3(MatterBaseTest):
         self.step(3)
         if supports_icd:
             active_mode_threshold_ms = await self.get_idle_mode_threshhold_ms()
-        log.info(f"active_mode_threshold_ms: {active_mode_threshold_ms}")
+        log.info("active_mode_threshold_ms: %s", active_mode_threshold_ms)
 
         # *** STEP 4 ***
         # If supports_icd is true, TH reads FeatureMap from the ICD Management cluster on EP0. If the LITS feature
@@ -230,7 +230,7 @@ class TC_SC_4_3(MatterBaseTest):
             feature_map = await self.get_icd_feature_map()
             LITS = Clusters.IcdManagement.Bitmaps.Feature.kLongIdleTimeSupport
             supports_lit = bool(feature_map & LITS == LITS)
-            log.info(f"kLongIdleTimeSupport set: {supports_lit}")
+            log.info("kLongIdleTimeSupport set: %s", supports_lit)
 
         # *** STEP 5 ***
         # TH constructs the instance name for the DUT as the 64-bit compressed Fabric identifier, and the

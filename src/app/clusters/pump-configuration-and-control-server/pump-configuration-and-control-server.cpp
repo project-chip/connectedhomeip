@@ -137,7 +137,7 @@ static void setEffectiveModes(EndpointId endpoint)
             // The ControlMode can be any of the following:
             // ConstantSpeed, ConstantPressure, ProportionalPressure,
             // ConstantFlow, ConstantTemperature or Automatic. The actual ControlMode
-            // which would be the EffectiveControlMode is dependant on the actual
+            // which would be the EffectiveControlMode is dependent on the actual
             // physical pump application running "on-top" of this cluster server.
             Attributes::EffectiveControlMode::Set(endpoint, controlMode);
             if (isPumpStatusAvailable)

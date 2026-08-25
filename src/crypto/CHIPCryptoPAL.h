@@ -1351,7 +1351,7 @@ public:
      *
      *  @param in     The input big endian field element.
      *  @param in_len The size of the input buffer in bytes.
-     *  @param fe     A pointer to an initialized implementation dependant field element.
+     *  @param fe     A pointer to an initialized implementation dependent field element.
      *
      *  @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
@@ -1371,7 +1371,7 @@ public:
     /**
      * @brief Generate a field element.
      *
-     *  @param fe  A pointer to an initialized implementation dependant field element.
+     *  @param fe  A pointer to an initialized implementation dependent field element.
      *
      *  @note The implementation must generate a random element from [0, q) where q is the curve order.
      *
@@ -1382,9 +1382,9 @@ public:
     /**
      * @brief Multiply two field elements, fer = fe1 * fe2.
      *
-     *  @param fer   A pointer to an initialized implementation dependant field element.
-     *  @param fe1  A pointer to an initialized implementation dependant field element.
-     *  @param fe2  A pointer to an initialized implementation dependant field element.
+     *  @param fer   A pointer to an initialized implementation dependent field element.
+     *  @param fe1  A pointer to an initialized implementation dependent field element.
+     *  @param fe2  A pointer to an initialized implementation dependent field element.
      *
      *  @note The result must be a field element (i.e. reduced by the curve order).
      *
@@ -1397,7 +1397,7 @@ public:
      *
      * @param in     Input buffer
      * @param in_len Input buffer length
-     * @param R      A pointer to an initialized implementation dependant point.
+     * @param R      A pointer to an initialized implementation dependent point.
      *
      *  @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
@@ -1406,7 +1406,7 @@ public:
     /**
      * @brief Write a point in 0x04 || X || Y format
      *
-     * @param R       A pointer to an initialized implementation dependant point.
+     * @param R       A pointer to an initialized implementation dependent point.
      * @param out     Output buffer
      * @param out_len Length of the output buffer
      *

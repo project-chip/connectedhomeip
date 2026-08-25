@@ -24,7 +24,8 @@ import tarfile
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Callable, Concatenate, ParamSpec, TypeVar
+from typing import Concatenate, ParamSpec, TypeVar
+from collections.abc import Callable
 
 from runner.runner import Runner
 
@@ -191,7 +192,7 @@ class Builder(ABC):
 
     def CopyArtifacts(self, target_dir: str):
         for output in self.outputs():
-            log.info(f'Copying {output.source} into {output.target}')
+            log.info('Copying %s into %s', output.source, output.target)
 
             target_full_name = os.path.join(target_dir, output.target)
             target_dir_full_name = os.path.dirname(target_full_name)

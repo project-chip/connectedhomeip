@@ -25,7 +25,8 @@ Use `--limit=size` to truncate the tree.
 
 import os
 import sys
-from typing import Dict, Optional, Sequence
+from collections.abc import Sequence
+from typing import Optional
 
 import anytree  # type: ignore
 import memdf.collect
@@ -58,8 +59,8 @@ class SourceTree:
     def __init__(self, name: str):
         self.name = name
         self.root = self.Node(memdf.name.TOTAL)
-        self.source_to_node: Dict[str, SourceTree.Node] = {}
-        self.symbol_to_node: Dict[str, SourceTree.Node] = {}
+        self.source_to_node: dict[str, SourceTree.Node] = {}
+        self.symbol_to_node: dict[str, SourceTree.Node] = {}
 
     def source_node(self, source: str) -> 'SourceTree.Node':
         """Create a SourceTree.Node for a source file."""
@@ -127,8 +128,7 @@ class SourceTree:
         print(self.name)
         for pre, _, node in anytree.render.RenderTree(
                 self.root, childiter=self._render_iter):
-            print('{}{:2.0f}% {} {}'.format(pre, node.percentage(), node.size,
-                                            node.name))
+            print(f'{pre}{node.percentage():2.0f}% {node.size} {node.name}')
 
     @staticmethod
     def _render_iter(nodes: Sequence['SourceTree.Node']

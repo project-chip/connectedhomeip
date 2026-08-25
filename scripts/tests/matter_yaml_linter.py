@@ -21,8 +21,7 @@ from pathlib import Path
 
 from chiptest import AllChipToolYamlTests
 
-DEFAULT_CHIP_ROOT = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..'))
+DEFAULT_CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
 
 def _is_cert_test(path):

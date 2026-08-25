@@ -15,6 +15,7 @@
  */
 
 #include "commodity-tariff-server.h"
+#include "CommodityTariffConsts.h"
 
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
@@ -30,6 +31,7 @@ using namespace chip::app::Clusters::CommodityTariff;
 using namespace chip::app::Clusters::CommodityTariff::Structs;
 using namespace chip::app::Clusters::CommodityTariff::Attributes;
 using namespace CommodityTariffConsts;
+using namespace chip::app::CommodityTariffContainers;
 
 using chip::Protocols::InteractionModel::Status;
 
@@ -37,6 +39,322 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace CommodityTariff {
+
+void Delegate::TariffDataUpdate(uint32_t aNowTimestamp)
+{
+
+    TariffUpdateCtx UpdCtx = {
+        .blockMode = static_cast<BlockModeEnum>(0),
+        .TariffStartTimestamp =
+            static_cast<StartDateDataClass &>(GetMgmtObj(CommodityTariffAttrTypeEnum::kStartDate)).GetNewValue(),
+        .mFeature              = mFeature,
+        .TariffUpdateTimestamp = aNowTimestamp
+    };
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (CHIP_NO_ERROR != (err = TariffDataUpd_Init(UpdCtx)))
+    {
+        ChipLogError(AppServer, "EGW-CTC: New tariff data rejected due to internal inconsistencies");
+    }
+    else if (CHIP_NO_ERROR != (err = TariffDataUpd_CrossValidator(UpdCtx)))
+    {
+        ChipLogError(AppServer, "EGW-CTC: New tariff data rejected due to some cross-fields inconsistencies");
+    }
+    else
+    {
+        if (!UpdCtx.TariffStartTimestamp.IsNull() && (UpdCtx.TariffStartTimestamp.Value() > UpdCtx.TariffUpdateTimestamp))
+        {
+            DelayedTariffUpdateIsActive = true;
+            return;
+        }
+    }
+    TariffDataUpd_Finish(err == CHIP_NO_ERROR);
+}
+
+CHIP_ERROR Delegate::TariffDataUpd_Init(TariffUpdateCtx & UpdCtx)
+{
+    for (uint8_t iter = 0; iter < CommodityTariffAttrTypeEnum::kAttrMax; iter++)
+    {
+        CommodityTariffAttrTypeEnum attr = static_cast<CommodityTariffAttrTypeEnum>(iter);
+        auto & mgmtObj                   = GetMgmtObj(attr);
+        ReturnErrorOnFailure(mgmtObj.UpdateBegin(&UpdCtx));
+    }
+    return CHIP_NO_ERROR;
+}
+
+struct ThresholdsPerFeatureValidationContext
+{
+    struct FeatureEntry
+    {
+        int64_t thresholdVal;
+        BitMask<Feature> featureVal;
+
+        bool operator==(const FeatureEntry & other) const
+        {
+            return (this->thresholdVal == other.thresholdVal) && (this->featureVal == other.featureVal);
+        }
+
+        bool haveJointFeatures(const FeatureEntry & other) const
+        {
+            auto is_have = (this->thresholdVal == other.thresholdVal) && ((this->featureVal.Raw() & other.featureVal.Raw()) != 0);
+
+            ChipLogError(AppServer, "Duplicated threshold value among TCs for the 0x%" PRIx32 " feature in the same tariff period",
+                         other.featureVal.Raw());
+
+            return is_have;
+        }
+    };
+
+    CommodityTariffContainers::CTC_UnorderedSet<FeatureEntry, CommodityTariffConsts::kTariffComponentsAttrMaxLength>
+        featuresPerThreshold;
+
+    CHIP_ERROR AddThreshold(uint32_t feature, int64_t threshold)
+    {
+        FeatureEntry entry = { .thresholdVal = threshold, .featureVal = BitMask<Feature>(feature) };
+
+        for (const auto & existingEntry : featuresPerThreshold)
+        {
+            VerifyOrReturnError(!entry.haveJointFeatures(existingEntry), CHIP_ERROR_DUPLICATE_KEY_ID);
+        }
+
+        VerifyOrReturnError(featuresPerThreshold.insert(entry), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+// Private helper function to build an ID set using CTC_UnorderedSet
+template <typename ListType, typename MemberPtr>
+static CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDefaultListAttrMaxLength>
+BuildIdSetFromList(const ListType & list, MemberPtr member)
+{
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDefaultListAttrMaxLength> idSet;
+    for (const auto & entry : list)
+    {
+        idSet.insert(entry.*member);
+    }
+    return idSet;
+}
+
+CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
+{
+    bool DayEntriesData_is_available = false;
+
+    // Validate required management objects
+    VerifyOrReturnLogError(GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffInfo).IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnLogError(GetMgmtObj(CommodityTariffAttrTypeEnum::kDayEntries).IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnLogError(GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffComponents).IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnLogError(GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffPeriods).IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (GetMgmtObj(CommodityTariffAttrTypeEnum::kStartDate).HasNewValue())
+    {
+        UpdCtx.TariffStartTimestamp =
+            static_cast<StartDateDataClass &>(GetMgmtObj(CommodityTariffAttrTypeEnum::kStartDate)).GetNewValue().Value();
+    }
+
+    const auto & dayEntries =
+        static_cast<DayEntriesDataClass &>(GetMgmtObj(CommodityTariffAttrTypeEnum::kDayEntries)).GetNewValue().Value();
+    const auto & dayPatterns =
+        static_cast<DayPatternsDataClass &>(GetMgmtObj(CommodityTariffAttrTypeEnum::kDayPatterns)).GetNewValue().Value();
+    const auto & tariffComponents =
+        static_cast<TariffComponentsDataClass &>(GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffComponents)).GetNewValue().Value();
+    const auto & tariffPeriods =
+        static_cast<TariffPeriodsDataClass &>(GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffPeriods)).GetNewValue().Value();
+
+    // Build ID sets for O(1) lookups
+    const auto dayEntryIdSet        = BuildIdSetFromList(dayEntries, &DayEntryStruct::Type::dayEntryID);
+    const auto tariffComponentIdSet = BuildIdSetFromList(tariffComponents, &TariffComponentStruct::Type::tariffComponentID);
+    const auto dayPatternIdSet      = BuildIdSetFromList(dayPatterns, &DayPatternStruct::Type::dayPatternID);
+
+    const auto validateIdsInSet = [](const auto & idSet, const auto & idsToValidate) -> CHIP_ERROR {
+        for (uint32_t id : idsToValidate)
+        {
+            VerifyOrReturnLogError(idSet.contains(id), CHIP_ERROR_KEY_NOT_FOUND);
+        }
+        return CHIP_NO_ERROR;
+    };
+
+    // Validate references from TariffPeriods
+    ReturnLogErrorOnFailure(validateIdsInSet(dayEntryIdSet, UpdCtx.RefsToDayEntryIDsFromTariffPeriods));
+    ReturnLogErrorOnFailure(validateIdsInSet(tariffComponentIdSet, UpdCtx.RefsToTariffComponentIDsFromTariffPeriods));
+
+    // Validate DayPatterns references
+    if (GetMgmtObj(CommodityTariffAttrTypeEnum::kDayPatterns).IsValid())
+    {
+        ReturnLogErrorOnFailure(validateIdsInSet(dayEntryIdSet, UpdCtx.RefsToDayEntryIDsFromDays));
+    }
+
+    // Validate IndividualDays references
+    if (GetMgmtObj(CommodityTariffAttrTypeEnum::kIndividualDays).IsValid() &&
+        GetMgmtObj(CommodityTariffAttrTypeEnum::kIndividualDays).HasNewValue())
+    {
+        ReturnLogErrorOnFailure(validateIdsInSet(dayEntryIdSet, UpdCtx.RefsToDayEntryIDsFromDays));
+        DayEntriesData_is_available = true;
+    }
+
+    // Validate CalendarPeriods references
+    if (GetMgmtObj(CommodityTariffAttrTypeEnum::kCalendarPeriods).IsValid() &&
+        GetMgmtObj(CommodityTariffAttrTypeEnum::kCalendarPeriods).HasNewValue())
+    {
+        ReturnLogErrorOnFailure(validateIdsInSet(dayPatternIdSet, UpdCtx.RefsToDayPatternIDsFromCalendarPeriods));
+        DayEntriesData_is_available = true;
+    }
+
+    VerifyOrReturnLogError(DayEntriesData_is_available, CHIP_ERROR_INVALID_DATA_LIST);
+
+    // Create lookup maps with const correctness
+    CTC_UnorderedMap<uint32_t, const Structs::DayEntryStruct::Type *, CommodityTariffConsts::kDayEntriesAttrMaxLength>
+        dayEntriesMap;
+    CTC_UnorderedMap<uint32_t, const Structs::TariffComponentStruct::Type *, CommodityTariffConsts::kTariffComponentsAttrMaxLength>
+        tariffComponentsMap;
+
+    // Populate maps for O(1) lookup
+    for (const auto & entry : dayEntries)
+    {
+        dayEntriesMap.insert(entry.dayEntryID, &entry);
+    }
+
+    for (const auto & component : tariffComponents)
+    {
+        tariffComponentsMap.insert(component.tariffComponentID, &component);
+    }
+
+    struct DeStartDurationPair
+    {
+        uint16_t startTime;
+        uint16_t duration;
+
+        bool operator==(const DeStartDurationPair & other) const
+        {
+            return startTime == other.startTime && duration == other.duration;
+        }
+    };
+
+    for (const auto & period : tariffPeriods)
+    {
+        const auto & deIDs = period.dayEntryIDs;
+        const auto & tcIDs = period.tariffComponentIDs;
+
+        // Validate Day Entries
+        CTC_UnorderedSet<DeStartDurationPair, CommodityTariffConsts::kDayEntriesAttrMaxLength> seenStartDurationPairs;
+
+        for (const uint32_t deID : deIDs)
+        {
+            // Check if DE exists in original context
+            VerifyOrReturnLogError(dayEntryIdSet.contains(deID), CHIP_ERROR_KEY_NOT_FOUND);
+
+            const auto it = dayEntriesMap.find(deID);
+            VerifyOrReturnLogError(it != dayEntriesMap.end(), CHIP_ERROR_KEY_NOT_FOUND);
+
+            const auto dayEntry = dayEntriesMap[deID];
+
+            DeStartDurationPair pair;
+            pair.startTime = dayEntry->startTime;
+            pair.duration =
+                dayEntry->duration.HasValue() ? dayEntry->duration.Value() : CommodityTariffConsts::kDayEntryDurationLimit;
+
+            VerifyOrReturnLogError(seenStartDurationPairs.insert(pair), CHIP_ERROR_DUPLICATE_KEY_ID);
+        }
+
+        // Validate Tariff Components
+        ThresholdsPerFeatureValidationContext validationCtx;
+
+        for (const uint32_t tcID : tcIDs)
+        {
+            // O(1) existence check using set
+            VerifyOrReturnLogError(tariffComponentIdSet.contains(tcID), CHIP_ERROR_KEY_NOT_FOUND);
+
+            VerifyOrReturnLogError(UpdCtx.TariffComponentKeyIDsFeatureMap.find(tcID) !=
+                                       UpdCtx.TariffComponentKeyIDsFeatureMap.end(),
+                                   CHIP_ERROR_KEY_NOT_FOUND);
+
+            const auto it = tariffComponentsMap.find(tcID);
+            VerifyOrReturnLogError(it != tariffComponentsMap.end(), CHIP_ERROR_KEY_NOT_FOUND);
+
+            const auto tariffComponent = it->second;
+            const uint32_t featureID   = UpdCtx.TariffComponentKeyIDsFeatureMap[tcID];
+
+            // Skip validation for null thresholds, predicted components, or invalid feature IDs
+            if (tariffComponent->threshold.IsNull() || tariffComponent->predicted.ValueOr(false) || featureID == 0)
+            {
+                continue;
+            }
+
+            const int64_t thresholdValue = tariffComponent->threshold.Value();
+            ReturnLogErrorOnFailure(validationCtx.AddThreshold(featureID, thresholdValue));
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void Delegate::TariffDataUpd_Finish(bool is_success)
+{
+    AttributeId updatedAttrIds[CommodityTariffAttrTypeEnum::kAttrMax];
+    size_t updatedCount = 0;
+
+    for (uint8_t iter = 0; iter < CommodityTariffAttrTypeEnum::kAttrMax; iter++)
+    {
+        CommodityTariffAttrTypeEnum attr = static_cast<CommodityTariffAttrTypeEnum>(iter);
+        auto & mgmtObj                   = GetMgmtObj(attr);
+        if (mgmtObj.UpdateFinish(is_success))
+        {
+            updatedAttrIds[updatedCount++] = mgmtObj.GetAttrId();
+        }
+    }
+
+    if (mTariffDataUpdatedCb != nullptr && updatedCount > 0)
+    {
+        ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");
+        mTariffDataUpdatedCb(false, updatedAttrIds, updatedCount);
+    }
+    else
+    {
+        ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data does not change");
+    }
+}
+
+void Delegate::TryToActivateDelayedTariff(uint32_t now)
+{
+    if (!DelayedTariffUpdateIsActive)
+    {
+        return;
+    }
+
+    if (now >= static_cast<StartDateDataClass &>(GetMgmtObj(CommodityTariffAttrTypeEnum::kStartDate)).GetNewValue().Value())
+    {
+        TariffDataUpd_Finish(true);
+        DelayedTariffUpdateIsActive = false;
+    }
+}
+
+void Delegate::CleanupTariffData()
+{
+    AttributeId updatedAttrIds[CommodityTariffAttrTypeEnum::kAttrMax];
+    size_t updatedCount = 0;
+
+    for (uint8_t iter = 0; iter < CommodityTariffAttrTypeEnum::kAttrMax; iter++)
+    {
+        CommodityTariffAttrTypeEnum attr = static_cast<CommodityTariffAttrTypeEnum>(iter);
+        auto & mgmtObj                   = GetMgmtObj(attr);
+        if (mgmtObj.Cleanup())
+        {
+            if (updatedCount < CommodityTariffAttrTypeEnum::kAttrMax)
+            {
+                updatedAttrIds[updatedCount++] = mgmtObj.GetAttrId();
+            }
+            else
+            {
+                ChipLogError(NotSpecified, "EGW-CTC: Too many cleaned up attributes");
+                break;
+            }
+        }
+    }
+
+    if (mTariffDataUpdatedCb != nullptr && updatedCount > 0)
+    {
+        mTariffDataUpdatedCb(true, updatedAttrIds, updatedCount);
+    }
+}
 
 CHIP_ERROR Instance::Init()
 {
@@ -333,11 +651,6 @@ const T * GetListEntryById(const DataModel::List<const T> & aList, uint32_t aId)
         {
             return &item;
         }
-        // If list is sorted by ID and we've passed the target, break early
-        if (itemId > aId)
-        {
-            break;
-        }
     }
     return nullptr;
 }
@@ -500,12 +813,14 @@ const Structs::TariffPeriodStruct::Type * FindTariffPeriodByDayEntryId(CurrentTa
     return nullptr;
 }
 
-std::unordered_set<const Structs::TariffPeriodStruct::Type *> FindTariffPeriodsByTariffComponentId(CurrentTariffAttrsCtx & aCtx,
-                                                                                                   uint32_t componentID)
+template <size_t ReturnCapacity = CommodityTariffConsts::kTariffPeriodsAttrMaxLength>
+CTC_UnorderedSet<const Structs::TariffPeriodStruct::Type *, ReturnCapacity>
+FindTariffPeriodsByTariffComponentId(CurrentTariffAttrsCtx & aCtx, uint32_t componentID)
 {
-    std::unordered_set<const Structs::TariffPeriodStruct::Type *> matchingPeriods;
+    const auto & tariffPeriods = aCtx.mTariffProvider->GetTariffPeriods().Value();
+    CTC_UnorderedSet<const Structs::TariffPeriodStruct::Type *, ReturnCapacity> matchingPeriods;
 
-    for (const auto & period : aCtx.mTariffProvider->GetTariffPeriods().Value())
+    for (const auto & period : tariffPeriods)
     {
         if (std::find(period.tariffComponentIDs.begin(), period.tariffComponentIDs.end(), componentID) !=
             period.tariffComponentIDs.end())
@@ -524,25 +839,37 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
     const Structs::TariffPeriodStruct::Type * period = FindTariffPeriodByDayEntryId(aCtx, dayEntryID);
 
     // Use a fixed-size array with maximum expected components
-    constexpr size_t MAX_COMPONENTS = 16; // Adjust this based on your maximum expected components
-    std::array<Structs::TariffComponentStruct::Type, MAX_COMPONENTS> tempArray;
-    size_t componentCount = 0;
+    Platform::ScopedMemoryBufferWithSize<Structs::TariffComponentStruct::Type> tempBuffer;
+    Platform::ScopedMemoryBufferWithSize<char> tempLabelBuffers[kTariffPeriodItemMaxIDs];
 
     if (period == nullptr)
     {
         return CHIP_ERROR_NOT_FOUND;
     }
     const DataModel::List<const uint32_t> & componentIDs = period->tariffComponentIDs;
+    const size_t componentCount                          = componentIDs.size();
 
-    for (const auto & entryID : componentIDs)
+    // Validate component count
+    if (componentCount == 0 || componentCount > kTariffPeriodItemMaxIDs)
+    {
+        return CHIP_ERROR_INVALID_LIST_LENGTH;
+    }
+
+    // Allocate memory for the component array
+    if (!tempBuffer.Calloc(componentCount))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    for (size_t i = 0; i < componentIDs.size(); i++)
     {
         Structs::TariffComponentStruct::Type entry;
-        auto current =
-            GetListEntryById<Structs::TariffComponentStruct::Type>(aCtx.mTariffProvider->GetTariffComponents().Value(), entryID);
+        auto current = GetListEntryById<Structs::TariffComponentStruct::Type>(aCtx.mTariffProvider->GetTariffComponents().Value(),
+                                                                              componentIDs[i]);
         if (current == nullptr)
         {
             err = CHIP_ERROR_NOT_FOUND;
-            goto exit;
+            break;
         }
         entry = *current;
         if (current->label.HasValue())
@@ -552,20 +879,17 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
             if (!current->label.Value().IsNull())
             {
                 chip::CharSpan srcLabelSpan = current->label.Value().Value();
-                if (CHIP_NO_ERROR !=
-                    (err = CommodityTariffAttrsDataMgmt::SpanCopier<char>::Copy(current->label.Value().Value(), tmpNullLabel,
-                                                                                srcLabelSpan.size())))
-                {
-                    goto exit;
-                }
+                tempLabelBuffers[i].CopyFromSpan(srcLabelSpan);
+                tmpNullLabel.SetNonNull(chip::CharSpan(tempLabelBuffers[i].Get(), srcLabelSpan.size()));
             }
             entry.label = MakeOptional(tmpNullLabel);
         }
-        tempArray[componentCount++] = entry;
+        tempBuffer[i] = entry;
     }
+    SuccessOrExit(err);
 
     err =
-        mgmtObj.SetNewValue(MakeNullable(DataModel::List<Structs::TariffComponentStruct::Type>(tempArray.data(), componentCount)));
+        mgmtObj.SetNewValue(MakeNullable(DataModel::List<Structs::TariffComponentStruct::Type>(tempBuffer.Get(), componentCount)));
     SuccessOrExit(err);
 
     err = mgmtObj.UpdateBegin(nullptr);
@@ -577,11 +901,6 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
     }
 
 exit:
-    for (size_t i = 0; i < componentCount; i++)
-    {
-        mgmtObj.CleanupExtListEntry(tempArray[i]);
-    }
-
     return err;
 }
 } // namespace Utils

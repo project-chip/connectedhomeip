@@ -256,6 +256,7 @@ void WebRTCManager::Disconnect()
     // Reset track
     mTrack.reset();
     mAudioTrack.reset();
+    mDataChannel.reset();
 
     // Clear state
     mCurrentVideoStreamId = 0;
@@ -369,6 +370,15 @@ CHIP_ERROR WebRTCManager::Connect(Controller::DeviceCommissioner & commissioner,
                    reinterpret_cast<const struct sockaddr *>(&audioAddr), sizeof(audioAddr));
         },
         nullptr);
+
+    mDataChannel = mPeerConnection->createDataChannel("data");
+    mDataChannel->onMessage([](std::variant<rtc::binary, rtc::string> message) {
+        if (std::holds_alternative<rtc::string>(message))
+        {
+            std::string message_content = std::get<rtc::string>(message);
+            ChipLogProgress(Camera, "DataChannel message: %s", message_content.c_str());
+        }
+    });
 
     // Local description generation is deferred to ProvideOffer or HandleOffer
 

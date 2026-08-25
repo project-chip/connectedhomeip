@@ -145,7 +145,12 @@ CHIP_ERROR CommandSender::SendCommandRequestInternal(const SessionHandle & sessi
         return CHIP_NO_ERROR;
     }
 
-    return SendInvokeRequest();
+    CHIP_ERROR err = SendInvokeRequest();
+    if (err == CHIP_NO_ERROR && mSuppressResponse)
+    {
+        Close();
+    }
+    return err;
 }
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
@@ -174,6 +179,13 @@ CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Opti
             mTimedRequest, mTimedInvokeTimeoutMs.HasValue());
         return CHIP_ERROR_INCORRECT_STATE;
     }
+
+    if (mTimedRequest && mSuppressResponse)
+    {
+        ChipLogError(DataManagement, "TimedRequest cannot be sent with SuppressResponse");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     return SendCommandRequestInternal(session, timeout);
 }
 
@@ -201,8 +213,17 @@ CHIP_ERROR CommandSender::SendInvokeRequest()
     using namespace Protocols::InteractionModel;
     using namespace Messaging;
 
-    ReturnErrorOnFailure(
-        mExchangeCtx->SendMessage(MsgType::InvokeCommandRequest, std::move(mPendingInvokeData), SendMessageFlags::kExpectResponse));
+    SendFlags sendFlags;
+    sendFlags.Set(SendMessageFlags::kExpectResponse, !mSuppressResponse);
+
+    ReturnErrorOnFailure(mExchangeCtx->SendMessage(MsgType::InvokeCommandRequest, std::move(mPendingInvokeData), sendFlags));
+
+    if (mSuppressResponse)
+    {
+        // No response, so we can immediately terminate
+        return CHIP_NO_ERROR;
+    }
+
     MoveToState(State::AwaitingResponse);
 
     return CHIP_NO_ERROR;
@@ -348,6 +369,9 @@ CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && pa
 
 void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
+    // TimedInvoke requires a StatusResponse. So it is wrong to send a TimedInvoke with SuppressResponse.
+    // If the invoke is not TimedRequest and users set SuppressResponse, a timer would NOT be triggered and
+    // OnResponseTimeout would never be called. So we can safely report error without checking mSuppressResponse here.
     ChipLogProgress(DataManagement, "Time out! failed to receive invoke command response from Exchange: " ChipLogFormatExchange,
                     ChipLogValueExchange(apExchangeContext));
 

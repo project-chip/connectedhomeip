@@ -168,10 +168,8 @@ DataModel::ActionReturnStatus ValveConfigurationAndControlCluster::WriteImpl(con
         mDefaultOpenDuration = value;
 
         // Persist using AttributePersistence nullable storage representation.
-        NumericAttributeTraits<uint32_t>::StorageType storageValue;
-        NullableToStorage(mDefaultOpenDuration, storageValue);
-        return mContext->attributeStorage.WriteValue(request.path,
-                                                     { reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue) });
+        AttributePersistence attrPersistence{ mContext->attributeStorage };
+        return attrPersistence.StoreNativeEndianValue(request.path, mDefaultOpenDuration);
     }
 
     if (request.path.mAttributeId == ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id)
@@ -187,8 +185,8 @@ DataModel::ActionReturnStatus ValveConfigurationAndControlCluster::WriteImpl(con
         VerifyOrReturnError(ValueCompliesWithLevelStep(defaultOpenLevel), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         mDefaultOpenLevel = defaultOpenLevel;
-        return mContext->attributeStorage.WriteValue(
-            request.path, { reinterpret_cast<const uint8_t *>(&mDefaultOpenLevel), sizeof(mDefaultOpenLevel) });
+        AttributePersistence attrPersistence{ mContext->attributeStorage };
+        return attrPersistence.StoreNativeEndianValue(request.path, mDefaultOpenLevel);
     }
 
     return Status::UnsupportedWrite;
@@ -398,7 +396,8 @@ CHIP_ERROR ValveConfigurationAndControlCluster::SetAutoCloseTime(DataModel::Null
         ReturnErrorOnFailure(System::SystemClock().GetClock_RealTime(utcTime));
         VerifyOrReturnError(UnixEpochToChipEpochMicros(utcTime.count(), chipEpochTime), CHIP_ERROR_INVALID_TIME);
 
-        uint64_t time = openDuration.Value() * kMicrosecondsPerSecond;
+        // Cast to 64-bit before multiplying: the uint32_t * int product otherwise overflows for durations > ~4294 s.
+        uint64_t time = static_cast<uint64_t>(openDuration.Value()) * kMicrosecondsPerSecond;
         SetAttributeValue(mAutoCloseTime, DataModel::MakeNullable(time + chipEpochTime), Attributes::AutoCloseTime::Id);
     }
     else
@@ -414,7 +413,8 @@ void ValveConfigurationAndControlCluster::UpdateAutoCloseTime(uint64_t epochTime
 {
     if (!mRemainingDuration.value().IsNull() && mRemainingDuration.value().Value() != 0)
     {
-        uint64_t closingTime = mRemainingDuration.value().Value() * kMicrosecondsPerSecond + epochTime;
+        // Cast to 64-bit before multiplying: the uint32_t * int product otherwise overflows for durations > ~4294 s.
+        uint64_t closingTime = static_cast<uint64_t>(mRemainingDuration.value().Value()) * kMicrosecondsPerSecond + epochTime;
         SetAttributeValue(mAutoCloseTime, DataModel::MakeNullable(closingTime), Attributes::AutoCloseTime::Id);
     }
 }

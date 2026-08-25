@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -79,12 +79,3 @@ void Shutdown();
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-#ifdef MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
-chip::Protocols::InteractionModel::Status chefLaundryWasherModeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                             const EmberAfAttributeMetadata * attributeMetadata,
-                                                                             uint8_t * buffer);
-chip::Protocols::InteractionModel::Status chefLaundryWasherModeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                            const EmberAfAttributeMetadata * attributeMetadata,
-                                                                            uint8_t * buffer, uint16_t maxReadLength);
-#endif // MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER

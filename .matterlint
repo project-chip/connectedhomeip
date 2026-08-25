@@ -8,6 +8,7 @@ load "src/app/zap-templates/zcl/data-model/chip/administrator-commissioning-clus
 load "src/app/zap-templates/zcl/data-model/chip/application-basic-cluster.xml";
 load "src/app/zap-templates/zcl/data-model/chip/application-launcher-cluster.xml";
 load "src/app/zap-templates/zcl/data-model/chip/audio-output-cluster.xml";
+load "src/app/zap-templates/zcl/data-model/chip/av-analysis-cluster.xml";
 load "src/app/zap-templates/zcl/data-model/chip/ballast-configuration-cluster.xml";
 load "src/app/zap-templates/zcl/data-model/chip/basic-information-cluster.xml";
 load "src/app/zap-templates/zcl/data-model/chip/binding-cluster.xml";
@@ -111,7 +112,6 @@ load "src/app/zap-templates/zcl/data-model/chip/thread-network-diagnostics-clust
 load "src/app/zap-templates/zcl/data-model/chip/thread-network-directory-cluster.xml";
 load "src/app/zap-templates/zcl/data-model/chip/time-format-localization-cluster.xml";
 load "src/app/zap-templates/zcl/data-model/chip/time-synchronization-cluster.xml";
-load "src/app/zap-templates/zcl/data-model/chip/timer-cluster.xml";
 load "src/app/zap-templates/zcl/data-model/chip/tls-certificate-management-cluster.xml";
 load "src/app/zap-templates/zcl/data-model/chip/tls-client-management-cluster.xml";
 load "src/app/zap-templates/zcl/data-model/chip/unit-localization-cluster.xml";

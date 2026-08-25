@@ -22,7 +22,6 @@ import math
 import re
 import string
 from abc import ABC, abstractmethod
-from typing import List
 
 from .errors import TestStepError
 from .fixes import fix_typed_yaml_value
@@ -922,7 +921,7 @@ class _ConstraintPython(BaseConstraint):
                 {'print': print_to_log})
 
 
-def get_constraints(constraints: dict) -> List[BaseConstraint]:
+def get_constraints(constraints: dict) -> list[BaseConstraint]:
     _constraints = []
     context = constraints
 

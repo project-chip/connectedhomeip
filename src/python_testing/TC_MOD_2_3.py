@@ -37,7 +37,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
-from typing import List
 
 from mobly import asserts
 from TC_GC_common import is_groupcast_on_root_node
@@ -108,7 +107,7 @@ class TC_MOD_2_3(MatterBaseTest):
 
         self.step("0b")
         if not self.groupcast_enabled:
-            mapping_structs: List[Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct] = []
+            mapping_structs: list[Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct] = []
             mapping_structs.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
                 groupId=self.kGroup1,
                 groupKeySetID=self.kGroupKeyset1,

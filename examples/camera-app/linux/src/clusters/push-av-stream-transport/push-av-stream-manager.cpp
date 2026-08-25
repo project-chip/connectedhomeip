@@ -148,7 +148,7 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
                   connectionID, newTransportBandwidthbps, mTotalUsedBandwidthbps);
 
     if (transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion &&
-        transportOptions.triggerOptions.motionZones.HasValue())
+        transportOptions.triggerOptions.motionZones.HasValue() && !transportOptions.triggerOptions.motionZones.Value().IsNull())
     {
         std::vector<std::pair<chip::app::DataModel::Nullable<uint16_t>, uint8_t>> zoneSensitivityList;
 

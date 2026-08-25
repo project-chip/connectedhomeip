@@ -18,7 +18,7 @@
 import functools
 from collections import defaultdict
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Set, Tuple, TypeAlias
+from typing import Any, TypeAlias
 
 import matter.clusters as Clusters
 from matter.clusters.Types import Nullable
@@ -30,11 +30,11 @@ class TagProblem:
     root: int
     missing_attribute: bool
     missing_feature: bool
-    duplicates: Set[int]
-    same_tag: Set[int] = field(default_factory=set)
+    duplicates: set[int]
+    same_tag: set[int] = field(default_factory=set)
 
 
-def separate_endpoint_types(endpoint_dict: Dict[int, Any]) -> Tuple[List[int], List[int]]:
+def separate_endpoint_types(endpoint_dict: dict[int, Any]) -> tuple[list[int], list[int]]:
     """Returns a tuple containing the list of flat endpoints and a list of tree endpoints"""
     flat = []
     tree = []
@@ -53,13 +53,13 @@ def separate_endpoint_types(endpoint_dict: Dict[int, Any]) -> Tuple[List[int], L
     return (flat, tree)
 
 
-def get_all_children(endpoint_id: int, endpoint_dict: Dict[int, Any]) -> Set[int]:
+def get_all_children(endpoint_id: int, endpoint_dict: dict[int, Any]) -> set[int]:
     """Returns all the children (include subchildren) of the given endpoint
        This assumes we've already checked that there are no cycles, so we can do the dumb things and just trace the tree
     """
-    children: Set[int] = set()
+    children: set[int] = set()
 
-    def add_children(endpoint_id: int, children: Set[int]) -> None:
+    def add_children(endpoint_id: int, children: set[int]) -> None:
         immediate_children = endpoint_dict[endpoint_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
         if not immediate_children:
             return
@@ -71,7 +71,7 @@ def get_all_children(endpoint_id: int, endpoint_dict: Dict[int, Any]) -> Set[int
     return children
 
 
-def find_tree_roots(tree_endpoints: List[int], endpoint_dict: Dict[int, Any]) -> Set[int]:
+def find_tree_roots(tree_endpoints: list[int], endpoint_dict: dict[int, Any]) -> set[int]:
     """Returns a set of all the endpoints in tree_endpoints that are roots for a tree (not include singletons)"""
     tree_roots = set()
 
@@ -92,7 +92,7 @@ def find_tree_roots(tree_endpoints: List[int], endpoint_dict: Dict[int, Any]) ->
     return tree_roots
 
 
-def parts_list_problems(tree_endpoints: List[int], endpoint_dict: Dict[int, Any]) -> List[int]:
+def parts_list_problems(tree_endpoints: list[int], endpoint_dict: dict[int, Any]) -> list[int]:
     """Returns a list of all the endpoints in the tree_endpoints list that contain cycles or nodes with multiple paths to the root or non-existent endpoints"""
     def parts_list_problem_detect(visited: set, current_id: int) -> bool:
         if current_id in visited:
@@ -109,17 +109,17 @@ def parts_list_problems(tree_endpoints: List[int], endpoint_dict: Dict[int, Any]
     problems = []
     # This is quick enough that we can do all the endpoints without searching for the roots
     for endpoint_id in tree_endpoints:
-        visited: Set[int] = set()
+        visited: set[int] = set()
         if parts_list_problem_detect(visited, endpoint_id):
             problems.append(endpoint_id)
     return problems
 
 
-def create_device_type_lists(roots: List[int], endpoint_dict: Dict[int, Any]) -> Dict[int, Dict[int, Set[int]]]:
+def create_device_type_lists(roots: list[int], endpoint_dict: dict[int, Any]) -> dict[int, dict[int, set[int]]]:
     """Returns a list of endpoints per device type for each root in the list"""
-    device_types: Dict[int, Dict[int, Set[int]]] = {}
+    device_types: dict[int, dict[int, set[int]]] = {}
     for root in roots:
-        tree_device_types: Dict[int, Set[int]] = defaultdict(set)
+        tree_device_types: dict[int, set[int]] = defaultdict(set)
         eps = get_all_children(root, endpoint_dict)
         eps.add(root)
         for ep in eps:
@@ -130,7 +130,7 @@ def create_device_type_lists(roots: List[int], endpoint_dict: Dict[int, Any]) ->
     return device_types
 
 
-def get_direct_children_of_root(endpoint_dict: Dict[int, Any]) -> Set[int]:
+def get_direct_children_of_root(endpoint_dict: dict[int, Any]) -> set[int]:
     root_children = set(endpoint_dict[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList])
     direct_children = root_children
     for ep in root_children:
@@ -139,7 +139,7 @@ def get_direct_children_of_root(endpoint_dict: Dict[int, Any]) -> Set[int]:
     return direct_children
 
 
-def create_device_type_list_for_root(direct_children: Set[int], endpoint_dict: Dict[int, Any]) -> Dict[int, Set[int]]:
+def create_device_type_list_for_root(direct_children: set[int], endpoint_dict: dict[int, Any]) -> dict[int, set[int]]:
     device_types = defaultdict(set)
     for ep in direct_children:
         for d in endpoint_dict[ep][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]:
@@ -165,7 +165,7 @@ def cmp_tag_list(a: Clusters.Globals.Structs.SemanticTagStruct, b: Clusters.Glob
     return 0
 
 
-def find_tag_list_problems(roots: List[int], device_types: Dict[int, Dict[int, Set[int]]], endpoint_dict: Dict[int, Any]) -> Dict[int, TagProblem]:
+def find_tag_list_problems(roots: list[int], device_types: dict[int, dict[int, set[int]]], endpoint_dict: dict[int, Any]) -> dict[int, TagProblem]:
     """Checks for non-spec compliant tag lists"""
     tag_problems = {}
     for root in roots:
@@ -202,7 +202,7 @@ def find_tag_list_problems(roots: List[int], device_types: Dict[int, Dict[int, S
     return tag_problems
 
 
-def flat_list_ok(flat_endpoint_id_to_check: int, endpoints_dict: Dict[int, Any]) -> bool:
+def flat_list_ok(flat_endpoint_id_to_check: int, endpoints_dict: dict[int, Any]) -> bool:
     '''Checks if the (flat) PartsList on the supplied endpoint contains all the sub-children of its parts.'''
     sub_children = set()
     for child in endpoints_dict[flat_endpoint_id_to_check][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]:

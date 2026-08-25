@@ -97,18 +97,18 @@ class TC_CC_6_5(MatterBaseTest):
         cc_cluster = Clusters.Objects.ColorControl
         cc_attributes = cc_cluster.Attributes
         self.endpoint = self.get_endpoint()
-        log.info(f"Starting test with endpoint {self.endpoint}")
+        log.info("Starting test with endpoint %s", self.endpoint)
 
         # commissioning - already done
         self.step("0")
 
         self.step("0a")
         self.TH1 = self.default_controller
-        log.info(f"Writing Options attribute on endpoint {self.endpoint}")
+        log.info("Writing Options attribute on endpoint %s", self.endpoint)
         await self.write_single_attribute(cc_attributes.Options(0x00), expect_success=True)
 
         self.step("0b")
-        log.info(f"Sending On command to endpoint {self.endpoint}")
+        log.info("Sending On command to endpoint %s", self.endpoint)
 
         await self.send_single_cmd(
             endpoint=self.endpoint,
@@ -119,25 +119,25 @@ class TC_CC_6_5(MatterBaseTest):
         self.step("0c")
         color_temp_mireds = await self.read_single_attribute_check_success(
             cluster=cc_cluster, attribute=cc_attributes.ColorTemperatureMireds, dev_ctrl=self.TH1, endpoint=self.endpoint)
-        log.info(f"Current color temperature response: {color_temp_mireds}")
+        log.info("Current color temperature response: %s", color_temp_mireds)
         matter_asserts.assert_valid_uint16(color_temp_mireds, "Color temperature value should be an integer")
 
         self.step("0d")
         colortemp_physical_min_mireds = await self.read_single_attribute_check_success(
             cc_cluster, cc_attributes.ColorTempPhysicalMinMireds, self.TH1, endpoint=self.endpoint)
-        log.info(f"Extracted min mireds value: {colortemp_physical_min_mireds}")
+        log.info("Extracted min mireds value: %s", colortemp_physical_min_mireds)
         matter_asserts.assert_valid_uint16(colortemp_physical_min_mireds, "Min mireds value should be an integer")
 
         self.step("0e")
         colortemp_physical_max_mireds = await self.read_single_attribute_check_success(
             cc_cluster, cc_attributes.ColorTempPhysicalMaxMireds, self.TH1, endpoint=self.endpoint)
-        log.info(f"Extracted max mireds value: {colortemp_physical_max_mireds}")
+        log.info("Extracted max mireds value: %s", colortemp_physical_max_mireds)
         matter_asserts.assert_valid_uint16(colortemp_physical_max_mireds, "Max mireds value should be an integer")
 
         self.step("1")
         startup_color_temp_mireds = await self.read_single_attribute_check_success(
             cc_cluster, cc_attributes.StartUpColorTemperatureMireds, self.TH1, endpoint=self.endpoint)
-        log.info(f"Extracted startup color temperature value: {startup_color_temp_mireds}")
+        log.info("Extracted startup color temperature value: %s", startup_color_temp_mireds)
 
         # Verify if StartUpColorTemperatureMireds is a int(16) or NullValue
         asserts.assert_true(matter_asserts.is_valid_uint_value(startup_color_temp_mireds, 16) or startup_color_temp_mireds is NullValue,
@@ -158,13 +158,13 @@ class TC_CC_6_5(MatterBaseTest):
             startup_color_temperature_mireds2a = int((colortemp_physical_max_mireds -
                                                       colortemp_physical_min_mireds) // 2 + colortemp_physical_min_mireds)
 
-        log.info(f"Defined new value for StartUpColorTemperatureMireds with value {startup_color_temperature_mireds2a}")
+        log.info("Defined new value for StartUpColorTemperatureMireds with value %s", startup_color_temperature_mireds2a)
         # Write computed StartUpColorTemperatureMireds value to the endpoint
         await self.write_single_attribute(cc_attributes.StartUpColorTemperatureMireds(startup_color_temperature_mireds2a), self.endpoint, expect_success=True)
 
         self.step("2b")
         startup_color_temp_mireds = await self.read_single_attribute_check_success(cc_cluster, cc_attributes.StartUpColorTemperatureMireds, dev_ctrl=self.TH1, endpoint=self.endpoint)
-        log.info(f"Verify startup response: {startup_color_temp_mireds}")
+        log.info("Verify startup response: %s", startup_color_temp_mireds)
         asserts.assert_equal(startup_color_temp_mireds, startup_color_temperature_mireds2a,
                              "Startup color temperature should match target value")
 
@@ -195,14 +195,14 @@ class TC_CC_6_5(MatterBaseTest):
         self.step("5a")
         color_mode = await self.read_single_attribute_check_success(
             cc_cluster, cc_attributes.ColorMode, dev_ctrl=self.TH1, endpoint=self.endpoint)
-        log.info(f"Color mode response: {color_mode}")
+        log.info("Color mode response: %s", color_mode)
         asserts.assert_in(color_mode, range(0, 3), "Value ColorMode in range of [0,2]")
         asserts.assert_equal(color_mode, 2, "Value ColorMode is not 2")
 
         self.step("5b")
         enhanced_color_mode = await self.read_single_attribute_check_success(
             cc_cluster, cc_attributes.EnhancedColorMode, dev_ctrl=self.TH1, endpoint=self.endpoint)
-        log.info(f"Enhanced mode response: {enhanced_color_mode}")
+        log.info("Enhanced mode response: %s", enhanced_color_mode)
         asserts.assert_in(enhanced_color_mode, range(0, 4), "Value EnhancedColorMode in range of [0,3]")
         asserts.assert_equal(enhanced_color_mode, 2, "Value EnhancedColorMode is not 2")
 

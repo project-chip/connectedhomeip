@@ -298,8 +298,8 @@ PICS:
     - label: "Does Device support LwIP stack?"
       id: MCORE.SC.LWIP
 
-    - label: "Does Device support TCP transport?"
-      id: MCORE.SC.TCP
+    - label: "Does the device support a TCP server? "
+      id: MCORE.SC.S.TCP
 
     - label:
           "Does Commissioner notify user that Commissionee is not a fully
@@ -354,6 +354,9 @@ PICS:
     #
     - label: "Does the device implement the ICD Management cluster as a server?"
       id: ICDM.S
+
+    - label: "Does the device implement the ICD Behavior cluster as a server?"
+      id: ICDB.S
 
     - label: "Is the device a Server"
       id: MCORE.IDM.S
@@ -8948,6 +8951,9 @@ PICS:
 
     - label: "Does the device support this specific cluster feature?"
       id: ICDM.S.F02
+
+    - label: "Does the device support this specific cluster feature?"
+      id: ICDM.S.F03
 
     #
     #Commands:

@@ -736,7 +736,7 @@ bool X509ToChipCert(X509 * cert, MutableByteSpan & chipCert)
         ReportOpenSSLErrorAndExit("i2d_X509", res = false);
     }
 
-    VerifyOrReturnError(chip::CanCastTo<size_t>(derCertLen), false);
+    VerifyOrExit(chip::CanCastTo<size_t>(derCertLen), res = false);
 
     err = ConvertX509CertToChipCert(ByteSpan(derCert, static_cast<size_t>(derCertLen)), chipCert);
     if (err != CHIP_NO_ERROR)

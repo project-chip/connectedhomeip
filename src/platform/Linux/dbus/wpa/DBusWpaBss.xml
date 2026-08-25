@@ -20,7 +20,19 @@ limitations under the License.
 
 <node>
     <interface name="fi.w1.wpa_supplicant1.BSS">
+        <property name="SSID" type="ay" access="read">
+            <annotation name="org.gtk.GDBus.C.ForceGVariant" value="true" />
+        </property>
+        <property name="BSSID" type="ay" access="read">
+            <annotation name="org.gtk.GDBus.C.ForceGVariant" value="true" />
+        </property>
         <property name="Signal" type="n" access="read" />
         <property name="Frequency" type="q" access="read" />
+        <property name="WPA" type="a{sv}" access="read">
+            <annotation name="org.gtk.GDBus.C.ForceGVariant" value="true" />
+        </property>
+        <property name="RSN" type="a{sv}" access="read">
+            <annotation name="org.gtk.GDBus.C.ForceGVariant" value="true" />
+        </property>
     </interface>
 </node>

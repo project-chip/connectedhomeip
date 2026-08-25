@@ -51,6 +51,13 @@ bool IsCurrentInterfaceUsable(T & iterator)
         /// local loopback interface is not usable by MDNS
         return false;
     }
+
+    // skip IEEE 802.15.4 / Thread interfaces — not suitable for mDNS
+    if (strncmp(name, "wpan", 4) == 0)
+    {
+        return false;
+    }
+
     return true;
 }
 

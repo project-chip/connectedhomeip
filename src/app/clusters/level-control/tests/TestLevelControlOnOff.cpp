@@ -38,7 +38,7 @@ TEST_F(TestLevelControlOnOff, TestExecuteIfOff)
     chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
     chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
 
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithOnOff(onOffCluster) };
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOff(onOffCluster) };
     onOffCluster.AddDelegate(&cluster);
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -69,7 +69,7 @@ TEST_F(TestLevelControlOnOff, TestExecuteIfOff_OverrideOff)
     chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
     chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
 
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithOnOff(onOffCluster) };
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOff(onOffCluster) };
     onOffCluster.AddDelegate(&cluster);
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -110,7 +110,7 @@ TEST_F(TestLevelControlOnOff, TestWriteOnLevel)
     chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
     chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
 
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithOnOff(onOffCluster) };
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOff(onOffCluster) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
     EXPECT_EQ(onOffCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -125,7 +125,7 @@ TEST_F(TestLevelControlOnOff, TestMoveToLevelWithOnOffCommand)
     chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
     chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
 
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithOnOff(onOffCluster) };
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOff(onOffCluster) };
     onOffCluster.AddDelegate(&cluster);
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -185,7 +185,7 @@ TEST_F(TestLevelControlOnOff, TestMoveWithOnOff)
     chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
     chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
 
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithOnOff(onOffCluster) };
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOff(onOffCluster) };
     onOffCluster.AddDelegate(&cluster);
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -219,7 +219,7 @@ TEST_F(TestLevelControlOnOff, TestStepWithOnOff)
     chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
     chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
 
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithOnOff(onOffCluster) };
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOff(onOffCluster) };
     onOffCluster.AddDelegate(&cluster);
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -257,7 +257,8 @@ TEST_F(TestLevelControlOnOff, TestOnOffAttributes)
     chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
     chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
 
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate)
+    LevelControlCluster cluster{ kTestEndpointId,
+                                 LevelControlCluster::Config(mockTimer, mockDelegate)
                                      .WithOnOff(onOffCluster)
                                      .WithOnOffTransitionTime(0)
                                      .WithOnTransitionTime(0)
@@ -280,7 +281,7 @@ TEST_F(TestLevelControlOnOff, TestOnOffChanged)
 
     // Configure OnOffTransitionTime
     LevelControlCluster cluster{
-        LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithOnOff(onOffCluster).WithOnOffTransitionTime(100)
+        kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOff(onOffCluster).WithOnOffTransitionTime(100)
     }; // 10s
 
     onOffCluster.AddDelegate(&cluster);
@@ -346,7 +347,7 @@ TEST_F(TestLevelControlOnOff, TestOnOffChangedDefaultLevel)
 
     // Test that if OnLevel is null and StoredLevel is unknown (null or 0?), it defaults to MaxLevel.
     LevelControlCluster cluster{
-        LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithOnOff(onOffCluster).WithOnOffTransitionTime(0)
+        kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOff(onOffCluster).WithOnOffTransitionTime(0)
     }; // Immediate
     onOffCluster.AddDelegate(&cluster);
     chip::Testing::ClusterTester tester(cluster);
@@ -379,7 +380,8 @@ TEST_F(TestLevelControlOnOff, TestRestorationBehaviorWhenOnLevelNull)
     // OnLevel is null (default).
     // When turning Off, it should transition to MinLevel but then RESTORE the stored level.
 
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate)
+    LevelControlCluster cluster{ kTestEndpointId,
+                                 LevelControlCluster::Config(mockTimer, mockDelegate)
                                      .WithLighting(DataModel::NullNullable) // MinLevel=1
                                      .WithOnOff(onOffCluster) };            // Dependency active
     onOffCluster.AddDelegate(&cluster);
@@ -412,7 +414,7 @@ TEST_F(TestLevelControlOnOff, TestMoveToLevelWithOnOffReentrancy)
     chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
     chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
 
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithOnOff(onOffCluster) };
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOff(onOffCluster) };
     onOffCluster.AddDelegate(&cluster);
 
     chip::Testing::ClusterTester tester(cluster);
@@ -462,7 +464,7 @@ TEST_F(TestLevelControlOnOff, TestStoredLevelCorruption)
     chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
     chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
 
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithOnOff(onOffCluster) };
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOff(onOffCluster) };
     onOffCluster.AddDelegate(&cluster);
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -532,9 +534,8 @@ TEST_F(TestLevelControlOnOff, TestImmediateMoveToMinLevelWithOnOff)
     chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
     chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
 
-    LevelControlCluster cluster{
-        LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithOnOff(onOffCluster).WithMinLevel(1)
-    };
+    LevelControlCluster cluster{ kTestEndpointId,
+                                 LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOff(onOffCluster).WithMinLevel(1) };
     onOffCluster.AddDelegate(&cluster);
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);

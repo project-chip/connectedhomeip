@@ -28,6 +28,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/TLVData.h>
 #include <lib/core/TLVUtilities.h>
+#include <lib/support/AutoRelease.h>
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/TypeTraits.h>
 #include <messaging/ExchangeContext.h>
@@ -173,6 +174,15 @@ CHIP_ERROR CommandHandlerImpl::TryAddResponseData(const ConcreteCommandPath & aR
     return FinishCommand(/* aEndDataStruct = */ false);
 }
 
+// Encodes response command data using non-virtual EncodableResponsePayload descriptors.
+// Adapts the payload to EncodableToTLV to share framing and session setup logic without duplication.
+CHIP_ERROR CommandHandlerImpl::TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                                                  const EncodableResponsePayload & aPayload)
+{
+    EncodableResponsePayload::Adapter adapter(aPayload);
+    return TryAddResponseData(aRequestCommandPath, aResponseCommandId, adapter);
+}
+
 CHIP_ERROR CommandHandlerImpl::AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                                const DataModel::EncodableToTLV & aEncodable)
 {
@@ -180,6 +190,25 @@ CHIP_ERROR CommandHandlerImpl::AddResponseData(const ConcreteCommandPath & aRequ
     VerifyOrReturnValue(ResponsesAccepted(), CHIP_NO_ERROR);
     return TryAddingResponse(
         [&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, aResponseCommandId, aEncodable); });
+}
+
+CHIP_ERROR CommandHandlerImpl::AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                                               const EncodableResponsePayload & aPayload)
+{
+    // Return early when response should not be sent out.
+    VerifyOrReturnValue(ResponsesAccepted(), CHIP_NO_ERROR);
+    return TryAddingResponse([&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, aResponseCommandId, aPayload); });
+}
+
+void CommandHandlerImpl::AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                                     const EncodableResponsePayload & aPayload)
+{
+    CHIP_ERROR err = AddResponseData(aRequestCommandPath, aResponseCommandId, aPayload);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DataManagement, "Adding response failed: %" CHIP_ERROR_FORMAT ". Returning failure instead.", err.Format());
+        AddStatus(aRequestCommandPath, Protocols::InteractionModel::Status::Failure);
+    }
 }
 
 CHIP_ERROR CommandHandlerImpl::ValidateInvokeRequestMessageAndBuildRegistry(InvokeRequestMessage::Parser & invokeRequestMessage)
@@ -324,8 +353,7 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
 
 void CommandHandlerImpl::Close()
 {
-    mSuppressResponse = false;
-    mpResponder       = nullptr;
+    mpResponder = nullptr;
     MoveToState(State::AwaitingDestruction);
 
     // We must finish all async work before we can shut down a CommandHandlerImpl. The actual CommandHandlerImpl MUST finish their
@@ -479,7 +507,6 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
 
     Credentials::GroupDataProvider::GroupEndpoint mapping;
     Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
-    Credentials::GroupDataProvider::EndpointIterator * iterator;
 
     err = aCommandElement.GetPath(&commandPath);
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
@@ -511,8 +538,8 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
     // always have an accessing fabric, by definition.
 
     // Find which endpoints can process the command, and dispatch to them.
-    iterator = groupDataProvider->IterateEndpoints(fabric);
-    VerifyOrReturnError(iterator != nullptr, Status::Failure);
+    AutoRelease iterator(groupDataProvider->IterateEndpoints(fabric));
+    VerifyOrReturnError(!iterator.IsNull(), Status::Failure);
 
     while (iterator->Next(mapping))
     {
@@ -565,7 +592,6 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
             continue;
         }
     }
-    iterator->Release();
     return Status::Success;
 }
 

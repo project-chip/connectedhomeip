@@ -65,6 +65,10 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Closur
             return SetTarget::kMetadataEntry;
         case Step::Id:
             return Step::kMetadataEntry;
+        case GroupedSetTarget::Id:
+            return GroupedSetTarget::kMetadataEntry;
+        case GroupedStep::Id:
+            return GroupedStep::kMetadataEntry;
 
         default:
             return std::nullopt;

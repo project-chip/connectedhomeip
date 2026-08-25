@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
+#include <app/util/af-types.h>
 
 #include <protocols/interaction_model/StatusCode.h>
 

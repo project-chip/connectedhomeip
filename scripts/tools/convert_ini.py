@@ -19,7 +19,6 @@
 import json
 import logging
 import re
-import typing
 from configparser import ConfigParser
 from os.path import exists
 
@@ -52,7 +51,7 @@ def convert_ini_to_json(ini_dir: str, json_path: str):
         json.dump(python_json_store, f, ensure_ascii=True, indent=4)
 
 
-def create_repl_config_from_init(ini_file: str, json_dict: typing.Dict, replace_suffix: str):
+def create_repl_config_from_init(ini_file: str, json_dict: dict, replace_suffix: str):
     ''' This updates a provided JSON dictionary to create a REPL compliant configuration store that
         contains the correct 'repl-config' and 'sdk-config' keys built from the provided chip-tool
         INI file that contains the root public keys. The INI file will typically be named
@@ -80,7 +79,7 @@ def create_repl_config_from_init(ini_file: str, json_dict: typing.Dict, replace_
     load_ini_into_dict(ini_file=ini_file, json_dict=json_dict['sdk-config'], replace_suffix=replace_suffix)
 
 
-def load_ini_into_dict(ini_file: str, json_dict: typing.Dict, replace_suffix: str):
+def load_ini_into_dict(ini_file: str, json_dict: dict, replace_suffix: str):
     """ Loads the specific INI file containing CA credential information into the provided dictionary. A 'replace_suffix' string
         has to be provided to convert the existing numerical suffix to a different value.
 

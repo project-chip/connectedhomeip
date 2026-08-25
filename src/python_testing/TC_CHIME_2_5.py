@@ -108,7 +108,7 @@ class TC_CHIME_2_5(MatterBaseTest, CHIMETestBase):
                                                      prompt_msg_placeholder="y",
                                                      default_value="y")
             if user_response is not None:
-                log.info(f"TC-CHIME-2.5: response '{user_response}' received on confirmation of no chime sound")
+                log.info("TC-CHIME-2.5: response '%s' received on confirmation of no chime sound", user_response)
                 asserts.assert_equal(user_response.lower(), "y")
             else:
                 log.info("TC-CHIME-2.5: No response received for no chime sound played user prompt")
@@ -134,7 +134,7 @@ class TC_CHIME_2_5(MatterBaseTest, CHIMETestBase):
                                                          prompt_msg_placeholder="y",
                                                          default_value="y")
                 if user_response is not None:
-                    log.info(f"TC-CHIME-2.5: response '{user_response}' received on confirmation of different chime sound")
+                    log.info("TC-CHIME-2.5: response '%s' received on confirmation of different chime sound", user_response)
                     asserts.assert_equal(user_response.lower(), "y")
                 else:
                     log.info("TC-CHIME-2.5: No response received for different chime sound played user prompt")

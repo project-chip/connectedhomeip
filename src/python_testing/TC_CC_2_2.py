@@ -174,7 +174,7 @@ class TC_CC_2_3(MatterBaseTest):
 
         async def accumulate_reports():
             sub_handler.reset()
-            log.info(f"Test will now wait {gather_time} seconds to accumulate reports")
+            log.info("Test will now wait %s seconds to accumulate reports", gather_time)
             await asyncio.sleep(gather_time)
 
         def check_report_counts(attr: ClusterObjects.ClusterAttributeDescriptor):
@@ -321,7 +321,7 @@ class TC_CC_2_3(MatterBaseTest):
         await asyncio.sleep(20)
 
         self.step(40)
-        log.info(f'received reports: {sub_handler.attribute_reports[cc.Attributes.RemainingTime]}')
+        log.info('received reports: %s', sub_handler.attribute_reports[cc.Attributes.RemainingTime])
         count = sub_handler.attribute_report_counts[cc.Attributes.RemainingTime]
         asserts.assert_equal(count, 3, "Unexpected number of reports received")
 

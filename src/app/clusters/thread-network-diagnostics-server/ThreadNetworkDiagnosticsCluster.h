@@ -17,6 +17,7 @@
 #pragma once
 
 #include "lib/support/BitFlags.h"
+#include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsProvider.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <platform/DiagnosticDataProvider.h>
 
@@ -42,7 +43,8 @@ public:
         kFull
     };
 
-    ThreadNetworkDiagnosticsCluster(EndpointId endpointId, ClusterType clusterType);
+    ThreadNetworkDiagnosticsCluster(EndpointId endpointId, ClusterType clusterType,
+                                    ThreadNetworkDiagnostics::ThreadNetworkDiagnosticsProvider & provider);
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -65,6 +67,7 @@ public:
 
 private:
     const ClusterType mClusterType;
+    ThreadNetworkDiagnostics::ThreadNetworkDiagnosticsProvider & mProvider;
 };
 
 } // namespace chip::app::Clusters

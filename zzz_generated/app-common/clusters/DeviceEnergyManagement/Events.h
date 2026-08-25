@@ -171,6 +171,81 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace Resumed
+namespace PowerRangeAdjustStart {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kAdjustment = 0,
+    kDuration   = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::PowerRangeAdjustStart::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    Structs::PowerRangeAdjustStruct::Type adjustment;
+    uint32_t duration = static_cast<uint32_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::PowerRangeAdjustStart::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagement::Id; }
+
+    Structs::PowerRangeAdjustStruct::DecodableType adjustment;
+    uint32_t duration = static_cast<uint32_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace PowerRangeAdjustStart
+namespace PowerRangeAdjustEnd {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kCause     = 0,
+    kDuration  = 1,
+    kEnergyUse = 2,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::PowerRangeAdjustEnd::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CauseEnum cause   = static_cast<CauseEnum>(0);
+    uint32_t duration = static_cast<uint32_t>(0);
+    int64_t energyUse = static_cast<int64_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::PowerRangeAdjustEnd::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagement::Id; }
+
+    CauseEnum cause   = static_cast<CauseEnum>(0);
+    uint32_t duration = static_cast<uint32_t>(0);
+    int64_t energyUse = static_cast<int64_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace PowerRangeAdjustEnd
 } // namespace Events
 } // namespace DeviceEnergyManagement
 } // namespace Clusters

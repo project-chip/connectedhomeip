@@ -25,6 +25,7 @@
 
 #include <inet/InetInterface.h>
 
+#include <inet/IPAddress.h>
 #include <inet/IPPrefix.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
@@ -82,6 +83,12 @@ CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) con
 
     return CHIP_NO_ERROR;
 }
+
+uint32_t InterfaceId::GetInterfaceIndex() const
+{
+    return static_cast<uint32_t>(mPlatformInterface);
+}
+
 CHIP_ERROR InterfaceId::InterfaceNameToId(const char * intfName, InterfaceId & interface)
 {
     if (strlen(intfName) < 3)
@@ -226,6 +233,11 @@ CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) con
     }
     nameBuf[0] = 0;
     return CHIP_NO_ERROR;
+}
+
+uint32_t InterfaceId::GetInterfaceIndex() const
+{
+    return mPlatformInterface ? netif_get_index(mPlatformInterface) : 0;
 }
 
 CHIP_ERROR InterfaceId::InterfaceNameToId(const char * intfName, InterfaceId & interface)
@@ -479,6 +491,11 @@ CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) con
     }
     nameBuf[0] = 0;
     return CHIP_NO_ERROR;
+}
+
+uint32_t InterfaceId::GetInterfaceIndex() const
+{
+    return static_cast<uint32_t>(mPlatformInterface);
 }
 
 CHIP_ERROR InterfaceId::InterfaceNameToId(const char * intfName, InterfaceId & interface)
@@ -836,6 +853,11 @@ CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) con
     }
     nameBuf[0] = 0;
     return CHIP_NO_ERROR;
+}
+
+uint32_t InterfaceId::GetInterfaceIndex() const
+{
+    return static_cast<uint32_t>(mPlatformInterface);
 }
 
 CHIP_ERROR InterfaceId::InterfaceNameToId(const char * intfName, InterfaceId & interface)

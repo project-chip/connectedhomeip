@@ -252,7 +252,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                     timedRequestTimeoutMs=1000)
                 asserts.assert_equal(expected_status, Status.Success)
         except InteractionModelError as e:
-            log.exception(f"Got exception when performing SetAliroReaderConfig {e}")
+            log.exception("Got exception when performing SetAliroReaderConfig %s", e)
             asserts.assert_equal(e.status, expected_status, f"Unexpected error returned: {e}")
 
     async def get_credentials_status(self, credentialIndex: int, credentialType: cluster.Enums.CredentialTypeEnum,
@@ -270,8 +270,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                 asserts.assert_true(matchers.is_type(response, Clusters.DoorLock.Commands.GetCredentialStatusResponse),
                                     "Unexpected return type for GetCredentialStatus")
                 asserts.assert_true(response.credentialExists == credential_exists,
-                                    "Error when executing GetCredentialStatus command, credentialExists={}".format(
-                                        str(response.credentialExists)))
+                                    f"Error when executing GetCredentialStatus command, credentialExists={str(response.credentialExists)}")
                 asserts.assert_equal(userIndex, response.userIndex,
                                      f"User Index is not matching, UserIndex={response.userIndex}")
                 return response
@@ -301,7 +300,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                 asserts.assert_true(matchers.is_type(response, Clusters.Objects.DoorLock.Commands.SetCredentialResponse),
                                     "Unexpected return type for SetCredential")
                 asserts.assert_true(response.status == expected_status,
-                                    "Error sending SetCredential command, status={}".format(str(response.status)))
+                                    f"Error sending SetCredential command, status={str(response.status)}")
             except InteractionModelError as e:
                 log.exception(e)
                 asserts.assert_equal(e.status, Status.Success, f"Unexpected error returned: {e}")
@@ -587,8 +586,8 @@ class TC_DRLK_2_13(MatterBaseTest):
                 endpoint=self.app_cluster_endpoint,
                 cluster=Clusters.Objects.DoorLock,
                 attribute=Clusters.DoorLock.Attributes.NumberOfCredentialsSupportedPerUser)
-        log.info(f"After reading  attribute NumberOfCredentialsSupportedPerUser we get"
-                 f" value {self.numberofcredentialsupportedperuser} ")
+        log.info("After reading  attribute NumberOfCredentialsSupportedPerUser we get value %s ",
+                 self.numberofcredentialsupportedperuser)
         self.step("28b")
         await self.clear_all_aliro_credential()
         await self.send_clear_user_cmd(user_index=1)
@@ -631,7 +630,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                                                   userStatus=NullValue,
                                                   userType=NullValue)
                     start_credential_index += 1
-                    log.info(f"The updated value of start_credential_index is {start_credential_index}")
+                    log.info("The updated value of start_credential_index is %s", start_credential_index)
                 else:
                     break
             self.step("30")

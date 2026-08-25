@@ -17,7 +17,6 @@ import queue
 import subprocess
 import threading
 import time
-from typing import List
 
 log = logging.getLogger(__name__)
 
@@ -43,7 +42,7 @@ class ProcessOutputCapture:
                break
     """
 
-    def __init__(self, command: List[str], output_path: str):
+    def __init__(self, command: list[str], output_path: str):
         # in/out/err are pipes
         self.command = command
         self.output_file = None  # Output file handle

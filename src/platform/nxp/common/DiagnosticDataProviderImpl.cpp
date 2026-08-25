@@ -22,6 +22,7 @@
  *          for nxp platform.
  */
 
+#include <FreeRTOS.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include "DiagnosticDataProviderImpl.h"
@@ -29,6 +30,7 @@
 #include <lib/support/CHIPMemString.h>
 #include <platform/DiagnosticDataProvider.h>
 
+#include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -42,25 +44,18 @@ extern "C" {
 }
 #endif
 
-#if NXP_USE_MML
-#include "fsl_component_mem_manager.h"
-#define GetFreeHeapSize MEM_GetFreeHeapSize
-#define HEAP_SIZE MinimalHeapSize_c
-#define GetMinimumEverFreeHeapSize MEM_GetFreeHeapSizeLowWaterMark
-#else
-#define GetFreeHeapSize xPortGetFreeHeapSize
-#define HEAP_SIZE configTOTAL_HEAP_SIZE
-#define GetMinimumEverFreeHeapSize xPortGetMinimumEverFreeHeapSize
-#endif // NXP_USE_MML
+inline size_t GetFreeHeapSize()
+{
+    return xPortGetFreeHeapSize();
+}
+constexpr size_t HEAP_SIZE = configTOTAL_HEAP_SIZE;
+inline size_t GetMinimumEverFreeHeapSize()
+{
+    return xPortGetMinimumEverFreeHeapSize();
+}
 
 namespace chip {
 namespace DeviceLayer {
-
-DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
-{
-    static DiagnosticDataProviderImpl sInstance;
-    return sInstance;
-}
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
@@ -98,11 +93,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
     // If implemented, the server SHALL set the value of the CurrentHeapHighWatermark attribute to the
     // value of the CurrentHeapUsed.
 
-#if NXP_USE_MML
-    MEM_ResetFreeHeapSizeLowWaterMark();
-#else
     xPortResetHeapMinimumEverFreeHeapSize();
-#endif
     return CHIP_NO_ERROR;
 }
 
@@ -238,7 +229,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 #elif CHIP_DEVICE_CONFIG_ENABLE_WPA
     struct netif * netif = nullptr;
     netif                = static_cast<struct netif *>(net_get_mlan_handle());
-    strncpy(ifp->Name, "wlan0", Inet::InterfaceId::kMaxIfNameLength);
+    chip::Platform::CopyString(ifp->Name, "wlan0");
     ifp->name          = CharSpan(ifp->Name, strlen(ifp->Name));
     ifp->isOperational = true;
     ifp->offPremiseServicesReachableIPv4.SetNull();
@@ -569,10 +560,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetEthNetworkDiagnosticsCounts()
 }
 #endif
 
+#ifndef CONFIG_CHIP_DIAGNOSTIC_DATA_PROVIDER_CUSTOM_SINGLETON_IMPL
 DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
 {
-    return DiagnosticDataProviderImpl::GetDefaultInstance();
+    static DiagnosticDataProviderImpl sInstance;
+    return sInstance;
 }
+#endif /* CONFIG_CHIP_DIAGNOSTIC_DATA_PROVIDER_CUSTOM_SINGLETON_IMPL */
 
 } // namespace DeviceLayer
 } // namespace chip

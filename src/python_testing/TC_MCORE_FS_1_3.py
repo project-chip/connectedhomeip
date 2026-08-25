@@ -193,7 +193,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             # Check if any of the device types is an AGGREGATOR
             if any(device_type.deviceType == _DEVICE_TYPE_AGGREGATOR for device_type in device_type_list):
                 aggregator_endpoint = endpoint
-                log.info(f"Aggregator endpoint found: {aggregator_endpoint}")
+                log.info("Aggregator endpoint found: %s", aggregator_endpoint)
                 break
 
         asserts.assert_not_equal(aggregator_endpoint, 0, "Invalid aggregator endpoint. Cannot proceed with commissioning.")

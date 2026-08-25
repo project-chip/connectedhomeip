@@ -308,6 +308,17 @@ if (CONFIG_CHIP_APP_WIFI_CONNECT)
     )
 endif()
 
+# Disable treating format warnings as errors
+set_source_files_properties(
+     ${CHIP_ROOT}/examples/lock-app/lock-common/src/LockEndpoint.cpp
+     PROPERTIES COMPILE_FLAGS "-Wno-error=format"
+)
+
+set_source_files_properties(
+     ${CHIP_ROOT}/src/app/clusters/door-lock-server/door-lock-server.cpp
+     PROPERTIES COMPILE_FLAGS "-Wno-error=maybe-uninitialized"
+)
+
 # Use MCUX post-build function to convert the executable to binary format
 mcux_convert_binary(
     BINARY ${APPLICATION_BINARY_DIR}/app.bin

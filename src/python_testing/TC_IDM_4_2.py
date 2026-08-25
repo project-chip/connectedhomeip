@@ -30,6 +30,7 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --enable-spec-errata-ci-only-disallowed-for-certification
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -158,7 +159,7 @@ class TC_IDM_4_2(IDMBaseTest):
                                      "SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC must be at least 1")
 
         log.info(
-            f"Set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC to {subscription_max_interval_publisher_limit_sec} seconds")
+            "Set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC to %s seconds", subscription_max_interval_publisher_limit_sec)
 
         # *** Step 2 ***
         # CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value greater than

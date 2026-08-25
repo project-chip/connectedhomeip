@@ -439,10 +439,7 @@ cluster Descriptor = 29 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** The Access Control Cluster exposes a data model view of a
-      Node's Access Control List (ACL), which codifies the rules used to manage
-      and enforce Access Control for the Node's endpoints and their associated
-      cluster instances. */
+/** The Access Control Cluster exposes a data model view of a Node's Access Control List (ACL), which codifies the rules used to manage and enforce Access Control for the Node's endpoints and their associated cluster instances. */
 cluster AccessControl = 31 {
   revision 3;
 
@@ -678,9 +675,9 @@ cluster BasicInformation = 40 {
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
-/** Provides an interface for providing OTA software updates */
+/** This cluster implements the Provider role in the OTA process. */
 cluster OtaSoftwareUpdateProvider = 41 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ApplyUpdateActionEnum : enum8 {
     kProceed = 0;
@@ -716,18 +713,18 @@ cluster OtaSoftwareUpdateProvider = 41 {
     optional int16u hardwareVersion = 4;
     optional char_string<2> location = 5;
     optional boolean requestorCanConsent = 6;
-    optional octet_string<512> metadataForProvider = 7;
+    optional long_octet_string<512> metadataForProvider = 7;
   }
 
   response struct QueryImageResponse = 1 {
     StatusEnum status = 0;
     optional int32u delayedActionTime = 1;
-    optional char_string<256> imageURI = 2;
+    optional long_char_string<256> imageURI = 2;
     optional int32u softwareVersion = 3;
     optional char_string<64> softwareVersionString = 4;
     optional octet_string<32> updateToken = 5;
     optional boolean userConsentNeeded = 6;
-    optional octet_string<512> metadataForRequestor = 7;
+    optional long_octet_string<512> metadataForRequestor = 7;
   }
 
   request struct ApplyUpdateRequestRequest {
@@ -745,17 +742,17 @@ cluster OtaSoftwareUpdateProvider = 41 {
     int32u softwareVersion = 1;
   }
 
-  /** Determine availability of a new Software Image */
+  /** Upon receipt, this command SHALL trigger an attempt to find an updated Software Image by the OTA Provider to match the OTA Requestor's constraints provided in the payload fields. */
   command QueryImage(QueryImageRequest): QueryImageResponse = 0;
-  /** Determine next action to take for a downloaded Software Image */
+  /** This command requests the specified version be installed on the device. */
   command ApplyUpdateRequest(ApplyUpdateRequestRequest): ApplyUpdateResponse = 2;
-  /** Notify OTA Provider that an update was applied */
+  /** This command tells the Provider that the specified update has been applied. */
   command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
 }
 
-/** Provides an interface for downloading and applying OTA software updates */
+/** This cluster implements the Requestor role in the OTA process. */
 cluster OtaSoftwareUpdateRequestor = 42 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum AnnouncementReasonEnum : enum8 {
     kSimpleAnnouncement = 0;
@@ -822,11 +819,11 @@ cluster OtaSoftwareUpdateRequestor = 42 {
     node_id providerNodeID = 0;
     vendor_id vendorID = 1;
     AnnouncementReasonEnum announcementReason = 2;
-    optional octet_string<512> metadataForNode = 3;
+    optional long_octet_string<512> metadataForNode = 3;
     endpoint_no endpoint = 4;
   }
 
-  /** Announce the presence of an OTA Provider */
+  /** This command MAY be invoked by Administrators to announce the presence of a particular OTA Provider. */
   command access(invoke: administer) AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
 }
 
@@ -1361,7 +1358,7 @@ cluster WiFiNetworkDiagnostics = 54 {
   command ResetCounts(): DefaultSuccess = 0;
 }
 
-/** Commands to trigger a Node to allow a new Administrator to commission it. */
+/** This cluster is used to trigger a Node to allow a new Administrator to commission it. */
 cluster AdministratorCommissioning = 60 {
   revision 1;
 
@@ -1560,7 +1557,7 @@ cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
-  revision 3;
+  revision 4;
 
   enum GroupKeyMulticastPolicyEnum : enum8 {
     kPerGroupID = 0;
@@ -1599,7 +1596,6 @@ cluster GroupKeyManagement = 63 {
     nullable epoch_us epochStartTime1 = 5;
     nullable octet_string<16> epochKey2 = 6;
     nullable epoch_us epochStartTime2 = 7;
-    GroupKeyMulticastPolicyEnum groupKeyMulticastPolicy = 8;
   }
 
   fabric_scoped struct GroupcastAdoptionStruct {
@@ -1762,9 +1758,119 @@ cluster IcdManagement = 70 {
   command StayActiveRequest(StayActiveRequestRequest): StayActiveResponse = 3;
 }
 
-/** This cluster provides an interface for controlling a Closure. */
-provisional cluster ClosureControl = 260 {
+/** The Groupcast cluster manages the content of the node-wide multicast Group membership that is part of the underlying interaction layer. */
+provisional cluster Groupcast = 101 {
   revision 1;
+
+  enum GroupcastTestResultEnum : enum8 {
+    kSuccess = 0;
+    kGeneralError = 1;
+    kMessageReplay = 2;
+    kFailedAuth = 3;
+    kNoAvailableKey = 4;
+    kSendFailure = 5;
+  }
+
+  enum GroupcastTestingEnum : enum8 {
+    kDisableTesting = 0;
+    kEnableListenerTesting = 1;
+    kEnableSenderTesting = 2;
+  }
+
+  enum MulticastAddrPolicyEnum : enum8 {
+    kIanaAddr = 0;
+    kPerGroup = 1;
+  }
+
+  bitmap Feature : bitmap32 {
+    kListener = 0x1;
+    kSender = 0x2;
+    kPerGroup = 0x4;
+  }
+
+  fabric_scoped struct MembershipStruct {
+    group_id groupID = 0;
+    optional endpoint_no endpoints[] = 1;
+    fabric_sensitive int16u keySetID = 2;
+    optional boolean hasAuxiliaryACL = 3;
+    MulticastAddrPolicyEnum mcastAddrPolicy = 4;
+    fabric_idx fabricIndex = 254;
+  }
+
+  provisional fabric_sensitive info event access(read: administer) GroupcastTesting = 0 {
+    optional octet_string sourceIpAddress = 0;
+    optional octet_string destinationIpAddress = 1;
+    optional group_id groupID = 2;
+    optional endpoint_no endpointID = 3;
+    optional cluster_id clusterID = 4;
+    optional int32u elementID = 5;
+    optional boolean accessAllowed = 6;
+    GroupcastTestResultEnum groupcastTestResult = 7;
+    fabric_idx fabricIndex = 254;
+  }
+
+  provisional readonly attribute MembershipStruct membership[] = 0;
+  provisional readonly attribute int16u maxMembershipCount = 1;
+  provisional readonly attribute int16u maxMcastAddrCount = 2;
+  provisional readonly attribute int16u usedMcastAddrCount = 3;
+  provisional readonly attribute fabric_idx fabricUnderTest = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct JoinGroupRequest {
+    group_id groupID = 0;
+    endpoint_no endpoints[] = 1;
+    int16u keySetID = 2;
+    optional octet_string<16> key = 3;
+    optional boolean useAuxiliaryACL = 4;
+    optional boolean replaceEndpoints = 5;
+    optional MulticastAddrPolicyEnum mcastAddrPolicy = 6;
+  }
+
+  request struct LeaveGroupRequest {
+    group_id groupID = 0;
+    optional endpoint_no endpoints[] = 1;
+  }
+
+  response struct LeaveGroupResponse = 2 {
+    group_id groupID = 0;
+    endpoint_no endpoints[] = 1;
+  }
+
+  request struct UpdateGroupKeyRequest {
+    group_id groupID = 0;
+    int16u keySetID = 1;
+    optional octet_string<16> key = 2;
+  }
+
+  request struct ConfigureAuxiliaryACLRequest {
+    group_id groupID = 0;
+    boolean useAuxiliaryACL = 1;
+  }
+
+  request struct GroupcastTestingRequest {
+    GroupcastTestingEnum testOperation = 0;
+    optional int16u durationSeconds = 1;
+  }
+
+  /** This command SHALL be used to instruct the server to join a multicast group. */
+  fabric command access(invoke: manage) JoinGroup(JoinGroupRequest): DefaultSuccess = 0;
+  /** This command SHALL allow a maintainer to request that the server withdraws itself or specific endpoints from a specific group or from all groups of this client's fabric. */
+  fabric command access(invoke: manage) LeaveGroup(LeaveGroupRequest): LeaveGroupResponse = 1;
+  /** This command SHALL allow a fabric administrator to update the OperationalGroupKey associated with the existing group identified by GroupID, which is already joined. */
+  fabric command access(invoke: manage) UpdateGroupKey(UpdateGroupKeyRequest): DefaultSuccess = 3;
+  /** This command SHALL allow an Administrator to enable or disable the generation of AuxiliaryACL entries in the Access Control Cluster based on the groups joined (see Groupcast Auxiliary ACL Handling). */
+  fabric command access(invoke: administer) ConfigureAuxiliaryACL(ConfigureAuxiliaryACLRequest): DefaultSuccess = 4;
+  /** This command SHALL allow an Administrator to configure test modes that allow validation of Groupcast communication. */
+  fabric command access(invoke: administer) GroupcastTesting(GroupcastTestingRequest): DefaultSuccess = 5;
+}
+
+/** This cluster provides an interface for controlling a Closure. */
+cluster ClosureControl = 260 {
+  revision 2;
 
   enum ClosureErrorEnum : enum8 {
     kPhysicallyBlocked = 0;
@@ -1812,6 +1918,7 @@ provisional cluster ClosureControl = 260 {
     kCalibration = 0x40;
     kProtection = 0x80;
     kManuallyOperable = 0x100;
+    kAccess = 0x200;
   }
 
   bitmap LatchControlModesBitmap : bitmap8 {
@@ -1865,17 +1972,25 @@ provisional cluster ClosureControl = 260 {
     optional ThreeLevelAutoEnum speed = 2;
   }
 
+  request struct GroupedMoveToRequest {
+    optional TargetPositionEnum position = 0;
+    optional boolean latch = 1;
+    optional ThreeLevelAutoEnum speed = 2;
+  }
+
   /** On receipt of this command, the closure SHALL stop its movement as fast as the closure is able too. */
   command Stop(): DefaultSuccess = 0;
   /** On receipt of this command, the closure SHALL operate to update its position, latch state and/or motion speed. */
   timed command MoveTo(MoveToRequest): DefaultSuccess = 1;
   /** This command is used to trigger a calibration of the closure. */
   timed command access(invoke: manage) Calibrate(): DefaultSuccess = 2;
+  /** This command is intended to be invoked using groupcast addressing to move a group of closures to a target position, latch, and/or perform the movement at a specific speed. */
+  command GroupedMoveTo(GroupedMoveToRequest): DefaultSuccess = 3;
 }
 
 /** This cluster provides an interface to reflect and control a closure's range of movement, usually involving a panel, by using 6-axis framework. */
-provisional cluster ClosureDimension = 261 {
-  revision 1;
+cluster ClosureDimension = 261 {
+  revision 2;
 
   enum ClosureUnitEnum : enum8 {
     kMillimeter = 0;
@@ -1947,6 +2062,7 @@ provisional cluster ClosureDimension = 261 {
     kTranslation = 0x20;
     kRotation = 0x40;
     kModulation = 0x80;
+    kAccess = 0x100;
   }
 
   bitmap LatchControlModesBitmap : bitmap8 {
@@ -2000,14 +2116,30 @@ provisional cluster ClosureDimension = 261 {
     optional ThreeLevelAutoEnum speed = 2;
   }
 
+  request struct GroupedSetTargetRequest {
+    optional percent100ths position = 0;
+    optional boolean latch = 1;
+    optional ThreeLevelAutoEnum speed = 2;
+  }
+
+  request struct GroupedStepRequest {
+    StepDirectionEnum direction = 0;
+    int16u numberOfSteps = 1;
+    optional ThreeLevelAutoEnum speed = 2;
+  }
+
   /** This command is used to move a dimension of the closure to a target position. */
   timed command SetTarget(SetTargetRequest): DefaultSuccess = 0;
   /** This command is used to move a dimension of the closure to a target position by a number of steps. */
   timed command Step(StepRequest): DefaultSuccess = 1;
+  /** This command is intended to be invoked using groupcast addressing to move a group of closures dimensions to a target position, latch, and/or perform the movement at a specific speed. */
+  command GroupedSetTarget(GroupedSetTargetRequest): DefaultSuccess = 2;
+  /** This command is intended to be invoked using groupcast addressing to move a group of closures dimensions to a target position by a number of steps. */
+  command GroupedStep(GroupedStepRequest): DefaultSuccess = 3;
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 4;
+  device type ma_rootdevice = 22, version 5;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -2249,6 +2381,26 @@ endpoint 0 {
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
+
+  server cluster Groupcast {
+    emits event GroupcastTesting;
+    callback attribute membership;
+    callback attribute maxMembershipCount;
+    callback attribute maxMcastAddrCount;
+    callback attribute usedMcastAddrCount;
+    callback attribute fabricUnderTest;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 1;
+    callback attribute clusterRevision default = 1;
+
+    handle command JoinGroup;
+    handle command LeaveGroup;
+    handle command UpdateGroupKey;
+    handle command ConfigureAuxiliaryACL;
+    handle command GroupcastTesting;
+  }
 }
 endpoint 1 {
   device type ma_closure = 560, version 1;
@@ -2337,6 +2489,8 @@ endpoint 2 {
 
     handle command SetTarget;
     handle command Step;
+    handle command GroupedSetTarget;
+    handle command GroupedStep;
   }
 }
 endpoint 3 {
@@ -2375,6 +2529,8 @@ endpoint 3 {
 
     handle command SetTarget;
     handle command Step;
+    handle command GroupedSetTarget;
+    handle command GroupedStep;
   }
 }
 

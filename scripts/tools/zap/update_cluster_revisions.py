@@ -53,13 +53,6 @@ def getTargets(cluster_id: int):
     return targets
 
 
-def checkPythonVersion():
-    if sys.version_info[0] < 3:
-        print('Must use Python 3. Current version is ' +
-              str(sys.version_info[0]))
-        exit(1)
-
-
 def runArgumentsParser():
     parser = argparse.ArgumentParser(
         description='Update the ClusterRevision for a chosen cluster in all .zap files')
@@ -126,8 +119,6 @@ def updateOne(item):
 
 
 def main():
-    checkPythonVersion()
-
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s %(name)s %(levelname)-7s %(message)s'

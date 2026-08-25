@@ -226,7 +226,7 @@ BluezGattCharacteristic1 * BluezEndpoint::CreateGattCharacteristic(BluezGattServ
                                                                    const char * aUUID, const char * const * aFlags)
 {
     const char * servicePath = g_dbus_object_get_object_path(g_dbus_interface_get_object(G_DBUS_INTERFACE(aService)));
-    GAutoPtr<char> charPath(g_strdup_printf("%s/%s", servicePath, aCharName));
+    GCharPtr charPath(g_strdup_printf("%s/%s", servicePath, aCharName));
     BluezObjectSkeleton * object;
     BluezGattCharacteristic1 * characteristic;
 

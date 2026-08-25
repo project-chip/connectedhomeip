@@ -26,6 +26,8 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
+#include "mboard.h"
+
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 

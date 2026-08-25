@@ -56,7 +56,7 @@ CHIP_ERROR UbusManager::Init()
 {
     VerifyOrReturnError(!mInitialized, CHIP_ERROR_INCORRECT_STATE);
 
-    UloopHandler::Register();
+    ReturnErrorOnFailure(UloopHandler::Register());
     if (!Connect())
     {
         UloopHandler::Unregister();

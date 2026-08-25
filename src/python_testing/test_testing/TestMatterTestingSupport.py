@@ -17,7 +17,6 @@
 
 import os
 import time
-import typing
 from datetime import UTC, datetime, timedelta
 
 from mobly import asserts, signals
@@ -26,9 +25,9 @@ import matter.clusters as Clusters
 import matter.testing.matchers as matchers
 from matter.clusters.Types import Nullable, NullValue
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.pics import parse_pics, parse_pics_xml
-from matter.testing.runner import default_matter_test_main, parse_matter_test_args
+from matter.testing.runner import convert_args_to_matter_config, default_matter_test_main, matter_test_args_parser
 from matter.testing.taglist_and_topology_test import (TagProblem, build_tree_for_graph, create_device_type_list_for_root,
                                                       create_device_type_lists, find_tag_list_problems, find_tree_roots,
                                                       flat_list_ok, get_all_children, get_direct_children_of_root,
@@ -46,11 +45,11 @@ def get_raw_type_list():
     double_nested_struct_list = test.Structs.DoubleNestedStructList()
     double_nested_struct_list_type = test.Structs.DoubleNestedStructList
     list_of_uints = [0, 1]
-    list_of_uints_type = typing.List[uint]
+    list_of_uints_type = list[uint]
     list_of_structs = [struct, struct]
-    list_of_structs_type = typing.List[struct_type]
+    list_of_structs_type = list[struct_type]
     list_of_double_nested_struct_list = [double_nested_struct_list, double_nested_struct_list]
-    list_of_double_nested_struct_list_type = typing.List[double_nested_struct_list_type]
+    list_of_double_nested_struct_list_type = list[double_nested_struct_list_type]
 
     # Create a list with all the types and a list of the values that should match for that type
     return {uint: [1],
@@ -67,11 +66,11 @@ def test_type_matching_for_type(test_type, test_nullable: bool = False, test_opt
     vals = get_raw_type_list()
 
     if test_nullable and test_optional:
-        match_type = typing.Union[Nullable, None, test_type]
+        match_type = Nullable | None | test_type
     elif test_nullable:
-        match_type = typing.Union[Nullable, test_type]
+        match_type = Nullable | test_type
     elif test_optional:
-        match_type = typing.Optional[test_type]
+        match_type = test_type | None
     else:
         match_type = test_type
 
@@ -85,19 +84,19 @@ def test_type_matching_for_type(test_type, test_nullable: bool = False, test_opt
 
     # true_list is all the values that should match with the test type
     for i in true_list:
-        asserts.assert_true(matchers.is_type(i, match_type), "{} type checking failure".format(test_type))
+        asserts.assert_true(matchers.is_type(i, match_type), f"{test_type} type checking failure")
 
     # try every value in every type in the remaining dict - they should all fail
     for v in vals.values():
         for i in v:
-            asserts.assert_false(matchers.is_type(i, match_type), "{} falsely matched to type {}".format(i, match_type))
+            asserts.assert_false(matchers.is_type(i, match_type), f"{i} falsely matched to type {match_type}")
 
     # Test the nullables or optionals that aren't supposed to work
     if not test_nullable:
-        asserts.assert_false(matchers.is_type(NullValue, match_type), "NullValue falsely matched to {}".format(match_type))
+        asserts.assert_false(matchers.is_type(NullValue, match_type), f"NullValue falsely matched to {match_type}")
 
     if not test_optional:
-        asserts.assert_false(matchers.is_type(None, match_type), "None falsely matched to {}".format(match_type))
+        asserts.assert_false(matchers.is_type(None, match_type), f"None falsely matched to {match_type}")
 
 
 def run_all_match_tests_for_type(test_type):
@@ -107,7 +106,8 @@ def run_all_match_tests_for_type(test_type):
     test_type_matching_for_type(test_type=test_type, test_nullable=True, test_optional=True)
 
 
-class TestMatterTestingSupport(MatterBaseTest):
+class TestMatterTestingSupport(CertificationUnitTestNoDevice):
+
     @async_test_body
     async def test_matter_epoch_time(self):
         # Matter epoch should return zero
@@ -729,7 +729,8 @@ class TestMatterTestingSupport(MatterBaseTest):
             "--json-arg", "PIXIT.TEST.JSON:{\"key\":\"value\"}",
         ]
 
-        parsed = parse_matter_test_args(args)
+        p = matter_test_args_parser()
+        parsed = convert_args_to_matter_config(p.parse_args(args))
         asserts.assert_equal(parsed.tests, ["TC_1", "TC_2"])
         asserts.assert_equal(parsed.global_test_params.get("PIXIT.TEST.DEC"), 42)
         asserts.assert_equal(parsed.global_test_params.get("PIXIT.TEST.HEX"), 0x1234)

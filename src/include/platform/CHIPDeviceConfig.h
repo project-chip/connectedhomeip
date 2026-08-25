@@ -1228,6 +1228,15 @@ static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN <= CHIP_DEVICE
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART 1
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_THREAD_DISCOVERY_INTERVAL_MS
+ *
+ * The interval in milliseconds between two seeker attempts in Thread Rendezvous.
+ */
+#ifndef CHIP_DEVICE_CONFIG_THREAD_DISCOVERY_INTERVAL_MS
+#define CHIP_DEVICE_CONFIG_THREAD_DISCOVERY_INTERVAL_MS 0
+#endif
+
 // -------------------- Network Telemetry Configuration --------------------
 
 /**

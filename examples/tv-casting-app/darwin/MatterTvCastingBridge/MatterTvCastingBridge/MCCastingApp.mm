@@ -27,9 +27,37 @@
 #import "core/Types.h"
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <lib/support/CHIPMemString.h>
+#include <platform/Darwin/ConfigurationManagerImpl.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 
 #import <Foundation/Foundation.h>
+
+namespace {
+__weak id<MCDeviceInstanceInfoProvider> sDeviceInstanceInfoDelegate = nil;
+
+CHIP_ERROR ConfigValueProviderCallback(const char * configNamespace, const char * name,
+    char * buf, size_t bufSize, size_t & outLen)
+{
+    id<MCDeviceInstanceInfoProvider> delegate = sDeviceInstanceInfoDelegate;
+    if (delegate == nil) {
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+
+    NSString * value = nil;
+    if (strcmp(name, "device-name") == 0 && [delegate respondsToSelector:@selector(deviceName)]) {
+        value = [delegate deviceName];
+    }
+
+    if (value == nil) {
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+
+    chip::Platform::CopyString(buf, bufSize, [value UTF8String]);
+    outLen = strlen(buf);
+    return CHIP_NO_ERROR;
+}
+} // namespace
 
 @interface MCCastingApp ()
 
@@ -96,8 +124,9 @@
     _serverInitParamsProvider = new MCCommonCaseDeviceServerInitParamsProvider();
 
     // Initialize MCDeviceInstanceInfoProviderBridge if the dataSource provides a delegate
+    id<MCDeviceInstanceInfoProvider> infoProvider = nil;
     if ([dataSource respondsToSelector:@selector(castingAppDidReceiveRequestForDeviceInstanceInfoProvider:)]) {
-        id<MCDeviceInstanceInfoProvider> infoProvider = [dataSource castingAppDidReceiveRequestForDeviceInstanceInfoProvider:self];
+        infoProvider = [dataSource castingAppDidReceiveRequestForDeviceInstanceInfoProvider:self];
         if (infoProvider != nil) {
             ChipLogProgress(AppServer, "MCCastingApp.initializeWithDataSource() setting up pull-based MCDeviceInstanceInfoProviderBridge");
             delete _deviceInstanceInfoProvider;
@@ -123,6 +152,11 @@
     if (_deviceInstanceInfoProvider != nullptr) {
         ChipLogProgress(AppServer, "MCCastingApp.initializeWithDataSource() setting custom DeviceInstanceInfoProvider");
         chip::DeviceLayer::SetDeviceInstanceInfoProvider(_deviceInstanceInfoProvider);
+
+        // Register the general-purpose config value provider so platform queries
+        // (e.g. GetCommissionableDeviceName) call through to the delegate at runtime.
+        sDeviceInstanceInfoDelegate = infoProvider;
+        chip::DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance().SetConfigValueProvider(ConfigValueProviderCallback);
     }
 
     // Get and store the CHIP Work queue

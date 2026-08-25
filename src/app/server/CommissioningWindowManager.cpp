@@ -140,6 +140,8 @@ void CommissioningWindowManager::ResetState()
     memset(mECMSalt, 0, sizeof(mECMSalt));
 
     DeviceLayer::SystemLayer().CancelTimer(HandleCommissioningWindowTimeout, this);
+    DeviceLayer::SystemLayer().CancelTimer(HandleSessionEstablishmentTimeout, this);
+
     mCommissioningTimeoutTimerArmed = false;
 }
 

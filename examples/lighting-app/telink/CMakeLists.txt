@@ -61,7 +61,8 @@ target_sources(app PRIVATE
                ${TELINK_COMMON}/zephyr_ext/zephyr_key_matrix.c
                ${TELINK_COMMON}/zephyr_ext/zephyr_key_pool.c
                ${TELINK_COMMON}/zephyr_ext/zephyr_led_pool.c
-               ${TELINK_COMMON}/zephyr_ext/zephyr_ws2812.c)
+               ${TELINK_COMMON}/zephyr_ext/zephyr_ws2812.c
+               ${TELINK_COMMON}/zephyr_ext/zephyr_pm_observer.c)
 
 if(CONFIG_TFLM_FEATURE)
   target_sources(app PRIVATE
@@ -99,3 +100,8 @@ endif()
 if (CONFIG_CHIP_PW_RPC)
   include(${TELINK_COMMON}/Rpc.cmake)
 endif(CONFIG_CHIP_PW_RPC)
+
+if(CONFIG_OPENTHREAD_SNTP_CLIENT)
+  target_sources(app PRIVATE
+                   ${TELINK_COMMON}/util/src/ThreadTimeSync.cpp)
+endif()
