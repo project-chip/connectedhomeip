@@ -112,7 +112,7 @@ TEST_F(TestProxyTransport, InactiveTransportClaimsNoAddress)
 
 TEST_F(TestProxyTransport, ActivateAndDeactivate)
 {
-    mTransport.Activate(kSessionId, &mProxyDelegate);
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
     EXPECT_TRUE(mTransport.IsActive());
     EXPECT_EQ(mTransport.GetSessionId(), kSessionId);
     EXPECT_TRUE(mTransport.CanSendToPeer(PeerAddress::Proxy(kSessionId)));
@@ -124,21 +124,53 @@ TEST_F(TestProxyTransport, ActivateAndDeactivate)
 
 TEST_F(TestProxyTransport, CloseDeactivates)
 {
-    mTransport.Activate(kSessionId, &mProxyDelegate);
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
     mTransport.Close();
     EXPECT_FALSE(mTransport.IsActive());
 }
 
-TEST_F(TestProxyTransport, ActiveTransportOnlyClaimsProxyAddresses)
+TEST_F(TestProxyTransport, ActiveTransportOnlyClaimsItsOwnProxyAddress)
 {
-    mTransport.Activate(kSessionId, &mProxyDelegate);
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
+    EXPECT_TRUE(mTransport.CanSendToPeer(PeerAddress::Proxy(kSessionId)));
+    EXPECT_FALSE(mTransport.CanSendToPeer(PeerAddress::Proxy(kOtherSessionId)));
     EXPECT_FALSE(mTransport.CanSendToPeer(PeerAddress::BLE()));
     EXPECT_FALSE(mTransport.CanSendToPeer(PeerAddress::WiFiPAF(1)));
 }
 
+TEST_F(TestProxyTransport, ActivateRejectsNullDelegate)
+{
+    EXPECT_EQ(mTransport.Activate(kSessionId, nullptr), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_FALSE(mTransport.IsActive());
+}
+
+TEST_F(TestProxyTransport, ActivateRejectsReplacingALiveSession)
+{
+    MockProxyDelegate other;
+
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
+    EXPECT_EQ(mTransport.Activate(kOtherSessionId, &other), CHIP_ERROR_INCORRECT_STATE);
+
+    // The live session is untouched and still the one carrying traffic.
+    EXPECT_EQ(mTransport.GetSessionId(), kSessionId);
+    EXPECT_EQ(mTransport.SendMessage(PeerAddress::Proxy(kSessionId), NewPayload()), CHIP_NO_ERROR);
+    EXPECT_EQ(mProxyDelegate.mCallCount, 1u);
+    EXPECT_EQ(other.mCallCount, 0u);
+}
+
+TEST_F(TestProxyTransport, ActivateSucceedsAgainAfterDeactivate)
+{
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
+    mTransport.Deactivate();
+    EXPECT_EQ(mTransport.GetSessionId(), 0);
+
+    EXPECT_EQ(mTransport.Activate(kOtherSessionId, &mProxyDelegate), CHIP_NO_ERROR);
+    EXPECT_EQ(mTransport.GetSessionId(), kOtherSessionId);
+}
+
 TEST_F(TestProxyTransport, SendMessageForwardsToDelegate)
 {
-    mTransport.Activate(kSessionId, &mProxyDelegate);
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
 
     EXPECT_EQ(mTransport.SendMessage(PeerAddress::Proxy(kSessionId), NewPayload()), CHIP_NO_ERROR);
     EXPECT_EQ(mProxyDelegate.mCallCount, 1u);
@@ -147,18 +179,20 @@ TEST_F(TestProxyTransport, SendMessageForwardsToDelegate)
     EXPECT_EQ(memcmp(mProxyDelegate.mLastMessage.data(), kPayload, sizeof(kPayload)), 0);
 }
 
-TEST_F(TestProxyTransport, SendMessageUsesTheAddressSessionId)
+TEST_F(TestProxyTransport, SendMessageRejectsAStaleSessionId)
 {
-    mTransport.Activate(kSessionId, &mProxyDelegate);
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
 
-    // The session id travels in the PeerAddress, so it is what gets forwarded.
-    EXPECT_EQ(mTransport.SendMessage(PeerAddress::Proxy(kOtherSessionId), NewPayload()), CHIP_NO_ERROR);
-    EXPECT_EQ(mProxyDelegate.mLastSessionId, kOtherSessionId);
+    // A PeerAddress carrying a previous session id can outlive that session in a
+    // SessionHolder or an exchange.  Forwarding it would tunnel commissioning traffic
+    // to the wrong commissionee, so the send is refused.
+    EXPECT_EQ(mTransport.SendMessage(PeerAddress::Proxy(kOtherSessionId), NewPayload()), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(mProxyDelegate.mCallCount, 0u);
 }
 
 TEST_F(TestProxyTransport, SendMessagePropagatesDelegateError)
 {
-    mTransport.Activate(kSessionId, &mProxyDelegate);
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
     mProxyDelegate.mSendResult = CHIP_ERROR_NO_MEMORY;
 
     EXPECT_EQ(mTransport.SendMessage(PeerAddress::Proxy(kSessionId), NewPayload()), CHIP_ERROR_NO_MEMORY);
@@ -166,7 +200,7 @@ TEST_F(TestProxyTransport, SendMessagePropagatesDelegateError)
 
 TEST_F(TestProxyTransport, SendMessageRejectsNonProxyAddress)
 {
-    mTransport.Activate(kSessionId, &mProxyDelegate);
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
 
     EXPECT_EQ(mTransport.SendMessage(PeerAddress::BLE(), NewPayload()), CHIP_ERROR_INCORRECT_STATE);
     EXPECT_EQ(mProxyDelegate.mCallCount, 0u);
@@ -174,7 +208,7 @@ TEST_F(TestProxyTransport, SendMessageRejectsNonProxyAddress)
 
 TEST_F(TestProxyTransport, SendMessageRejectsNullBuffer)
 {
-    mTransport.Activate(kSessionId, &mProxyDelegate);
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
 
     EXPECT_EQ(mTransport.SendMessage(PeerAddress::Proxy(kSessionId), System::PacketBufferHandle()), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_EQ(mProxyDelegate.mCallCount, 0u);
@@ -188,7 +222,7 @@ TEST_F(TestProxyTransport, SendMessageRejectedWhenInactive)
 
 TEST_F(TestProxyTransport, SendMessageRejectedAfterDeactivate)
 {
-    mTransport.Activate(kSessionId, &mProxyDelegate);
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
     mTransport.Deactivate();
 
     EXPECT_EQ(mTransport.SendMessage(PeerAddress::Proxy(kSessionId), NewPayload()), CHIP_ERROR_INCORRECT_STATE);
@@ -197,8 +231,8 @@ TEST_F(TestProxyTransport, SendMessageRejectedAfterDeactivate)
 
 TEST_F(TestProxyTransport, ReceivedMessageIsInjectedIntoTheStack)
 {
-    mTransport.Activate(kSessionId, &mProxyDelegate);
-    mTransport.OnProxyMessageReceived(kSessionId, kPayload, sizeof(kPayload));
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
+    mTransport.OnProxyMessageReceived(kSessionId, ByteSpan(kPayload));
 
     EXPECT_EQ(mRawDelegate.mCallCount, 1u);
     EXPECT_EQ(mRawDelegate.mLastLength, sizeof(kPayload));
@@ -207,15 +241,15 @@ TEST_F(TestProxyTransport, ReceivedMessageIsInjectedIntoTheStack)
 
 TEST_F(TestProxyTransport, ReceivedMessageForOtherSessionIsDropped)
 {
-    mTransport.Activate(kSessionId, &mProxyDelegate);
-    mTransport.OnProxyMessageReceived(kOtherSessionId, kPayload, sizeof(kPayload));
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
+    mTransport.OnProxyMessageReceived(kOtherSessionId, ByteSpan(kPayload));
 
     EXPECT_EQ(mRawDelegate.mCallCount, 0u);
 }
 
 TEST_F(TestProxyTransport, ReceivedMessageWhileInactiveIsDropped)
 {
-    mTransport.OnProxyMessageReceived(kSessionId, kPayload, sizeof(kPayload));
+    mTransport.OnProxyMessageReceived(kSessionId, ByteSpan(kPayload));
     EXPECT_EQ(mRawDelegate.mCallCount, 0u);
 }
 

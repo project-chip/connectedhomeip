@@ -21,21 +21,21 @@
  *   Defines a virtual transport that tunnels Matter commissioning packets
  *   through ProxyMessageRequest / ProxyMessageResponse IM commands.
  *
- *   chip-tool creates a Proxy transport, activates it with the sessionId
- *   returned by ProxyConnectResponse, and then calls PairDevice() with
- *   PeerAddress::Proxy(sessionId).  All subsequent commissioning packets
- *   flow via the ProxyTransportDelegate::SendProxyMessage() callback.
+ *   An initiator activates the Proxy transport with the sessionId returned by
+ *   ProxyConnectResponse, then calls PairDevice() with
+ *   PeerAddress::Proxy(sessionId).  All subsequent commissioning packets flow
+ *   via the ProxyTransportDelegate::SendProxyMessage() callback.
  *
- *   On the commissioning-proxy-app side, packets received from the
- *   commissionee over WiFi-PAF are delivered back to chip-tool by calling
- *   OnProxyMessageReceived(), which injects them into the Matter stack as
- *   if they came directly from the device.
+ *   Packets the commissioning proxy receives from the commissionee come back
+ *   in ProxyMessageResponse; passing them to OnProxyMessageReceived() injects
+ *   them into the Matter stack as if they had arrived from the device.
  */
 
 #pragma once
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/Span.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/Base.h>
@@ -44,7 +44,7 @@
 namespace chip {
 namespace Transport {
 
-/** Init parameters struct (empty — no network setup required). */
+/** Init parameters struct (no network resources are needed). */
 struct ProxyListenParameters
 {
     explicit ProxyListenParameters(chip::System::Layer * layer) : mSystemLayer(layer) {}
@@ -55,8 +55,8 @@ private:
 };
 
 /**
- * Callback interface implemented by chip-tool (or any initiator) to forward
- * a raw Matter packet to the commissioning-proxy-app via ProxyMessageRequest.
+ * Callback interface implemented by the initiator to forward a raw Matter
+ * packet to the commissioning proxy via ProxyMessageRequest.
  */
 class ProxyTransportDelegate
 {
@@ -84,7 +84,7 @@ public:
  *        GetDeviceProxyTransport(transportMgr)->Activate(sessionId, delegate);
  *   3. Call PairDevice(nodeId, PeerAddress::Proxy(sessionId)).
  *   4. When ProxyMessageResponse arrives, call:
- *        OnProxyMessageReceived(sessionId, data, length);
+ *        OnProxyMessageReceived(sessionId, message);
  */
 class DLL_EXPORT ProxyTransportBase : public Base
 {
@@ -99,10 +99,14 @@ public:
     CHIP_ERROR Init(const ProxyListenParameters & params);
 
     /**
-     * Activate this transport for a specific proxy session.
-     * Must be called after ProxyConnectResponse is received.
+     * Activate this transport for a specific proxy session.  Must be called after
+     * ProxyConnectResponse is received, and only while inactive: replacing a live
+     * session would silently retarget in-flight commissioning traffic.
+     *
+     * @return CHIP_ERROR_INVALID_ARGUMENT if delegate is null,
+     *         CHIP_ERROR_INCORRECT_STATE if a session is already active.
      */
-    void Activate(uint16_t sessionId, ProxyTransportDelegate * delegate);
+    CHIP_ERROR Activate(uint16_t sessionId, ProxyTransportDelegate * delegate);
 
     /** Deactivate the proxy session. */
     void Deactivate();
@@ -120,13 +124,13 @@ public:
     /**
      * Called by the ProxyTransportDelegate when ProxyMessageResponse arrives.
      * Injects the bytes back into the Matter stack as a received packet from
-     * the proxy's virtual peer address.
+     * the proxy's virtual peer address.  A message for any session other than
+     * the active one is dropped.
      */
-    void OnProxyMessageReceived(uint16_t sessionId, const uint8_t * data, size_t length);
+    void OnProxyMessageReceived(uint16_t sessionId, ByteSpan message);
 
 private:
     ProxyTransportDelegate * mDelegate = nullptr;
-    chip::System::Layer * mSystemLayer = nullptr;
     uint16_t mSessionId                = 0;
     bool mActive                       = false;
 };

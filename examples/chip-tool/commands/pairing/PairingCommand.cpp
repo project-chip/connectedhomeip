@@ -989,12 +989,20 @@ void PairingCommand::OnProxyConnected(uint16_t sessionId)
     mProxySessionActive = true;
 
     // Activate the ProxyTransport so commissioning packets are routed through it.
+    // GetTransportMgr() is null once the commissioner's system state is gone, and
+    // Activate() refuses to replace a session that is still live.
     auto * transportMgr   = CurrentCommissioner().GetTransportMgr();
     auto * proxyTransport = GetDeviceProxyTransport(transportMgr);
-    proxyTransport->Activate(sessionId, this);
+    CHIP_ERROR err        = (proxyTransport == nullptr) ? CHIP_ERROR_INCORRECT_STATE : proxyTransport->Activate(sessionId, this);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(chipTool, "PairViaProxy: could not activate the proxy transport: %" CHIP_ERROR_FORMAT, err.Format());
+        SetCommandExitStatus(err);
+        return;
+    }
 
     // Step 3: start the commissioning process via the proxy tunnel.
-    CHIP_ERROR err = Pair(mNodeId, chip::Transport::PeerAddress::Proxy(sessionId));
+    err = Pair(mNodeId, chip::Transport::PeerAddress::Proxy(sessionId));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(chipTool, "PairViaProxy: Pair() failed: %" CHIP_ERROR_FORMAT, err.Format());
@@ -1043,8 +1051,8 @@ void PairingCommand::OnResponse(chip::app::CommandSender * client, const chip::a
 
             auto * transportMgr   = CurrentCommissioner().GetTransportMgr();
             auto * proxyTransport = GetDeviceProxyTransport(transportMgr);
-            proxyTransport->OnProxyMessageReceived(response.sessionID, response.message.Value().data(),
-                                                   response.message.Value().size());
+            VerifyOrReturn(proxyTransport != nullptr);
+            proxyTransport->OnProxyMessageReceived(response.sessionID, response.message.Value());
 
             // The injection above may have driven the stack to send a reply, which takes
             // the outstanding slot and will collect anything else queued.  Only when it
@@ -1189,7 +1197,13 @@ void PairingCommand::SendProxyDisconnect(CHIP_ERROR exitErr, bool aCancelPending
 
     // Mark the session dead now so a duplicate call is a no-op.  mProxySessionId is left
     // alone: 0 is a valid SessionID, so it cannot be used to mean "no session".
-    mProxySessionActive     = false;
+    // Deactivating also releases the transport, which Activate() requires to be idle --
+    // in interactive mode a later "pairing proxy" reuses the same instance.
+    mProxySessionActive = false;
+    if (auto * proxyTransport = GetDeviceProxyTransport(CurrentCommissioner().GetTransportMgr()))
+    {
+        proxyTransport->Deactivate();
+    }
     mProxyDisconnectExitErr = exitErr;
 
     if (cmdSender->AddRequestData(pathParams, request) != CHIP_NO_ERROR ||
