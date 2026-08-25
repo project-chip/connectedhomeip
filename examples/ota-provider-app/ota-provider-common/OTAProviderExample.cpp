@@ -494,9 +494,14 @@ void OTAProviderExample::HandleQueryImage(app::CommandHandler * commandObj, cons
     // Guarantees that either a response or an error status is sent
     SendQueryImageResponse(commandObj, commandPath, commandData);
 
-    // After the first response is sent, default to these values for subsequent queries, unless
-    // persistence was requested (then the configured status/DelayedActionTime is kept for every
-    // response, so e.g. Busy or NotAvailable can be served on all queries without a restart).
+    // After the first response is sent, default to UpdateAvailable for subsequent queries
+    // (unless persistence keeps the configured status). Kept in a small method so the
+    // persistence behaviour is unit-testable without the server/BDX machinery above.
+    ApplyQueryImageStatusAfterResponse();
+}
+
+void OTAProviderExample::ApplyQueryImageStatusAfterResponse()
+{
     if (!mPersistQueryImageStatus)
     {
         mQueryImageStatus          = OTAQueryStatus::kUpdateAvailable;
