@@ -168,61 +168,62 @@ class TC_IDM_1_5(IDMBaseTest):
             f"({remaining_sub_window_sec:.2f} s) before scheduled periodic report"
         )
 
-        # Step 2: Send InvokeRequestMessage for ArmFailSafe with DelayReportData
-        self.step(2)
-        # Drain any residual queue items before measuring
-        while not report_queue.empty():
-            report_queue.get_nowait()
-
-        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=1)
-        log.info("Sending InvokeRequestMessage for ArmFailSafe with DelayReportData (DelayMinMs=%d, DelayJitterWindowMs=%d)",
-                 delay_min_ms, delay_jitter_window_ms)
-
-        t_invoke_sent = time.monotonic()
-        resp = await dev_ctrl.SendCommand(
-            nodeId=dut_node_id,
-            endpoint=endpoint,
-            payload=cmd,
-            delayReportData=ClusterCommand.DelayReportData(delayMinMs=delay_min_ms, delayJitterWindowMs=delay_jitter_window_ms),
-        )
-        asserts.assert_is_instance(resp, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse,
-                                   "DUT response should be ArmFailSafeResponse")
-        asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
-                             f"ArmFailSafe failed with errorCode: {resp.errorCode}")
-
-        # Step 3: Measure delta t and verify delta t >= DelayMinMs
-        self.step(3)
-        wait_timeout_sec = (delay_min_ms + delay_jitter_window_ms) / 1000.0 + 5.0
         try:
-            report_recv_time, new_val = await asyncio.to_thread(report_queue.get, timeout=wait_timeout_sec)
-        except queue.Empty:
-            asserts.fail(
-                f"Did not receive ReportDataMessage within {wait_timeout_sec:.2f}s following invoke command with DelayReportData")
+            # Step 2: Send InvokeRequestMessage for ArmFailSafe with DelayReportData
+            self.step(2)
+            # Drain any residual queue items before measuring
+            while not report_queue.empty():
+                report_queue.get_nowait()
 
-        asserts.assert_equal(new_val, 1, f"Expected Breadcrumb report value to be 1, got {new_val}")
+            cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=1)
+            log.info("Sending InvokeRequestMessage for ArmFailSafe with DelayReportData (DelayMinMs=%d, DelayJitterWindowMs=%d)",
+                     delay_min_ms, delay_jitter_window_ms)
 
-        delta_t_ms = (report_recv_time - t_invoke_sent) * 1000.0
-        log.info("Measured Delta t between sending InvokeRequest (t_invoke_sent) and receiving ReportData: %.2f ms (DelayMinMs=%d, Jitter=%d)",
-                 delta_t_ms, delay_min_ms, delay_jitter_window_ms)
+            t_invoke_sent = time.monotonic()
+            resp = await dev_ctrl.SendCommand(
+                nodeId=dut_node_id,
+                endpoint=endpoint,
+                payload=cmd,
+                delayReportData=ClusterCommand.DelayReportData(delayMinMs=delay_min_ms, delayJitterWindowMs=delay_jitter_window_ms),
+            )
+            asserts.assert_is_instance(resp, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse,
+                                       "DUT response should be ArmFailSafeResponse")
+            asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+                                 f"ArmFailSafe failed with errorCode: {resp.errorCode}")
 
-        min_expected_delta_ms = float(delay_min_ms)
-        asserts.assert_greater_equal(
-            delta_t_ms, min_expected_delta_ms,
-            f"Delta t ({delta_t_ms:.2f} ms) was less than {min_expected_delta_ms:.2f} ms minimum delay"
-        )
+            # Step 3: Measure delta t and verify delta t >= DelayMinMs
+            self.step(3)
+            wait_timeout_sec = (delay_min_ms + delay_jitter_window_ms) / 1000.0 + 5.0
+            try:
+                report_recv_time, new_val = await asyncio.to_thread(report_queue.get, timeout=wait_timeout_sec)
+            except queue.Empty:
+                asserts.fail(
+                    f"Did not receive ReportDataMessage within {wait_timeout_sec:.2f}s following invoke command with DelayReportData")
 
-        # Step 4: Disarm fail-safe and reset Breadcrumb
-        self.step(4)
-        log.info("Cleaning up: disarming fail-safe and resetting Breadcrumb to 0")
-        cleanup_resp = await dev_ctrl.SendCommand(
-            nodeId=dut_node_id,
-            endpoint=endpoint,
-            payload=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
-        )
-        asserts.assert_is_instance(cleanup_resp, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse,
-                                   "DUT response should be ArmFailSafeResponse")
-        asserts.assert_equal(cleanup_resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
-                             f"ArmFailSafe cleanup failed with errorCode: {cleanup_resp.errorCode}")
+            asserts.assert_equal(new_val, 1, f"Expected Breadcrumb report value to be 1, got {new_val}")
+
+            delta_t_ms = (report_recv_time - t_invoke_sent) * 1000.0
+            log.info("Measured Delta t between sending InvokeRequest (t_invoke_sent) and receiving ReportData: %.2f ms (DelayMinMs=%d, Jitter=%d)",
+                     delta_t_ms, delay_min_ms, delay_jitter_window_ms)
+
+            min_expected_delta_ms = float(delay_min_ms)
+            asserts.assert_greater_equal(
+                delta_t_ms, min_expected_delta_ms,
+                f"Delta t ({delta_t_ms:.2f} ms) was less than {min_expected_delta_ms:.2f} ms minimum delay"
+            )
+        finally:
+            # Step 4: Disarm fail-safe and reset Breadcrumb
+            self.step(4)
+            log.info("Cleaning up: disarming fail-safe and resetting Breadcrumb to 0")
+            cleanup_resp = await dev_ctrl.SendCommand(
+                nodeId=dut_node_id,
+                endpoint=endpoint,
+                payload=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
+            )
+            asserts.assert_is_instance(cleanup_resp, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse,
+                                       "DUT response should be ArmFailSafeResponse")
+            asserts.assert_equal(cleanup_resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+                                 f"ArmFailSafe cleanup failed with errorCode: {cleanup_resp.errorCode}")
 
 
 if __name__ == "__main__":

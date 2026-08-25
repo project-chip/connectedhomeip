@@ -27,6 +27,7 @@ from ..interaction_model import InteractionModelError, PyInvokeRequestData
 from ..interaction_model import Status as InteractionModelStatus
 from ..interaction_model import TestOnlyPyBatchCommandsOverrides, TestOnlyPyOnDoneInfo
 from ..native import GetLibraryHandle, NativeLibraryHandleMethodArguments, PyChipError
+from ..tlv import UINT16_MAX, uint
 from . import Objects as GeneratedObjects
 from .ClusterObjects import Cluster, ClusterCommand
 
@@ -62,8 +63,14 @@ class TestOnlyBatchCommandResponse:
 
 @dataclass
 class DelayReportData:
-    delayMinMs: int = 0
-    delayJitterWindowMs: int = 0
+    delayMinMs: uint = 0
+    delayJitterWindowMs: uint = 0
+
+    def __post_init__(self):
+        if not (0 <= self.delayMinMs <= UINT16_MAX):
+            raise ValueError(f"delayMinMs must be a uint16 (0 to {UINT16_MAX}), got {self.delayMinMs}")
+        if not (0 <= self.delayJitterWindowMs <= UINT16_MAX):
+            raise ValueError(f"delayJitterWindowMs must be a uint16 (0 to {UINT16_MAX}), got {self.delayJitterWindowMs}")
 
 
 def FindCommandClusterObject(isClientSideCommand: bool, path: CommandPath):
