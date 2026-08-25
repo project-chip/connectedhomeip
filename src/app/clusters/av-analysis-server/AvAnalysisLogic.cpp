@@ -119,13 +119,15 @@ void AvAnalysisServerLogic::OnVideoStreamAllocated(Status aStatus, uint16_t aVid
 
     ScopedNodeId cameraNode = mCameraInteraction.CameraNode();
     ConcreteCommandPath commandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
+    // The client exchange may have died while the camera round-trip was in flight; the camera's
+    // answer is ground truth and is recorded regardless, only the response needs a live handler.
     auto handleRef = mCameraInteraction.Complete(commandPath);
     auto * handler = handleRef.Get();
-    VerifyOrReturn(handler != nullptr);
 
     // a non-SUCCESS camera response is propagated as the command status, no side-effects.
     if (aStatus != Status::Success)
     {
+        VerifyOrReturn(handler != nullptr);
         handler->AddStatus(commandPath, aStatus);
         return;
     }
@@ -135,6 +137,7 @@ void AvAnalysisServerLogic::OnVideoStreamAllocated(Status aStatus, uint16_t aVid
     {
         ChipLogError(Zcl, "AvAnalysis[ep=%d]: camera-assigned stream id %u collides with an existing entry", mEndpointId,
                      aVideoStreamId);
+        VerifyOrReturn(handler != nullptr);
         handler->AddStatus(commandPath, Status::ResourceExhausted);
         return;
     }
@@ -144,6 +147,7 @@ void AvAnalysisServerLogic::OnVideoStreamAllocated(Status aStatus, uint16_t aVid
     MarkDirty(Attributes::AnalysisStreams::Id);
     LogErrorOnFailure(StoreAnalysisStreams());
 
+    VerifyOrReturn(handler != nullptr);
     Commands::EstablishAnalysisStreamResponse::Type response;
     response.analysisStreamID = aVideoStreamId;
     handler->AddResponse(commandPath, response);
@@ -155,13 +159,15 @@ void AvAnalysisServerLogic::OnVideoStreamDeallocated(Status aStatus, uint16_t aA
                    ChipLogError(Zcl, "AvAnalysis[ep=%d]: unexpected deallocation completion", mEndpointId));
 
     ConcreteCommandPath commandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
+    // The camera has completed the deallocation, so the table is reconciled even if the
+    // client exchange died; only the response needs a live handler.
     auto handleRef = mCameraInteraction.Complete(commandPath);
     auto * handler = handleRef.Get();
-    VerifyOrReturn(handler != nullptr);
 
     // A non-SUCCESS camera response is propagated as the command status.
     if (aStatus != Status::Success)
     {
+        VerifyOrReturn(handler != nullptr);
         handler->AddStatus(commandPath, aStatus);
         return;
     }
@@ -173,6 +179,7 @@ void AvAnalysisServerLogic::OnVideoStreamDeallocated(Status aStatus, uint16_t aA
         LogErrorOnFailure(StoreAnalysisStreams());
     }
 
+    VerifyOrReturn(handler != nullptr);
     handler->AddStatus(commandPath, Status::Success);
 }
 

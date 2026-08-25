@@ -625,6 +625,66 @@ TEST_F(TestRemoteAvAnalysisCluster, BusyWhileInteractionInFlightEvenIfCommandExc
     ASSERT_TRUE(thirdHandler.HasResponse());
 }
 
+TEST_F(TestRemoteAvAnalysisCluster, DeadExchangeAllocationStillTracksCameraStream)
+{
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EstablishAnalysisStream::Id };
+    Commands::EstablishAnalysisStream::DecodableType commandData;
+    commandData.nodeID = 0x1234;
+
+    InvalidatableCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+    auto response = mServer.GetLogic().HandleEstablishAnalysisStream(commandHandler, path, commandData);
+    ASSERT_FALSE(response.has_value());
+
+    // The client exchange dies, then the camera completes the allocation successfully. The camera
+    // stream is real regardless of the dead exchange and must be tracked, or it leaks on the camera
+    // with no way to ever remove it.
+    commandHandler.InvalidateHandles();
+    mFakeCameraClient.mLastCallback->OnVideoStreamAllocated(Status::Success, 7);
+
+    uint8_t currentCount = 0;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::CurrentAnalysisStreamCount::Id, currentCount), CHIP_NO_ERROR);
+    ASSERT_EQ(currentCount, 1);
+
+    // The tracked stream can be removed normally afterwards
+    ConcreteCommandPath removePath{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::RemoveAnalysisStream::Id };
+    Commands::RemoveAnalysisStream::DecodableType removeData;
+    removeData.analysisStreamID = 7;
+    Testing::MockCommandHandler removeHandler;
+    removeHandler.SetFabricIndex(1);
+    auto removeResponse = mServer.GetLogic().HandleRemoveAnalysisStream(removeHandler, removePath, removeData);
+    ASSERT_FALSE(removeResponse.has_value());
+    mFakeCameraClient.mLastCallback->OnVideoStreamDeallocated(Status::Success, 7);
+
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::CurrentAnalysisStreamCount::Id, currentCount), CHIP_NO_ERROR);
+    ASSERT_EQ(currentCount, 0);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, DeadExchangeDeallocationStillRemovesEntry)
+{
+    // Establish a stream normally
+    Testing::MockCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, 0x1234, Status::Success, 9);
+
+    // Remove it, but the client exchange dies before the camera answers
+    ConcreteCommandPath removePath{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::RemoveAnalysisStream::Id };
+    Commands::RemoveAnalysisStream::DecodableType removeData;
+    removeData.analysisStreamID = 9;
+    InvalidatableCommandHandler removeHandler;
+    removeHandler.SetFabricIndex(1);
+    auto response = mServer.GetLogic().HandleRemoveAnalysisStream(removeHandler, removePath, removeData);
+    ASSERT_FALSE(response.has_value());
+    removeHandler.InvalidateHandles();
+
+    // The camera has deallocated its stream; the entry must not survive as a permanently stuck slot
+    mFakeCameraClient.mLastCallback->OnVideoStreamDeallocated(Status::Success, 9);
+
+    uint8_t currentCount = 0xFF;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::CurrentAnalysisStreamCount::Id, currentCount), CHIP_NO_ERROR);
+    ASSERT_EQ(currentCount, 0);
+}
+
 TEST_F(TestRemoteAvAnalysisCluster, EstablishDuplicateIdFailsWithoutTouchingCameraStream)
 {
     // First stream established with camera-assigned id 42
