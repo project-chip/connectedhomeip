@@ -20,7 +20,6 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.interaction_model import InteractionModelError, Status
 
 log = logging.getLogger(__name__)
 

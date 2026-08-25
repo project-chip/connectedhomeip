@@ -95,19 +95,19 @@ class TC_AVANALY_2_1(MatterBaseTest, AVANALYTestBase):
             asserts.fail("One of LCLCONDETECT or REMCONDETECT is mandatory")
 
         asserts.assert_in(attributes.SupportedAmbientContexts.attribute_id, attribute_list,
-                              "SupportedAmbientContexts attribute is a mandatory attribute.")
+                          "SupportedAmbientContexts attribute is a mandatory attribute.")
         asserts.assert_in(attributes.ActiveAmbientContextTriggers.attribute_id, attribute_list,
-                              "ActiveAmbientContextTriggers attribute is a mandatory attribute.")
+                          "ActiveAmbientContextTriggers attribute is a mandatory attribute.")
         asserts.assert_in(attributes.TrackingEnabled.attribute_id, attribute_list,
-                              "TrackingEnabled attribute is a mandatory attribute.")
-        
+                          "TrackingEnabled attribute is a mandatory attribute.")
+
         supported_ambient_contexts_dut = await self.read_avanaly_attribute_expect_success(endpoint, attributes.SupportedAmbientContexts)
-                                         
+
         # Make sure all provided contexts are in one of the supported namespaces
         asserts.assert_less_equal(len(supported_ambient_contexts_dut), self.SPEC_MAX_COUNT_SUPPORTEDAMBIENTCONTEXTS,
-                                   "SupportedAmbientContexts size is greater than the allowed max.")
+                                  "SupportedAmbientContexts size is greater than the allowed max.")
         asserts.assert_greater_equal(len(supported_ambient_contexts_dut), 1, "SupportedAmbientContexts cannot be empty.")
-                                                                      
+
         for supportedcontext in supported_ambient_contexts_dut:
             asserts.assert_greater_equal(supportedcontext.namespaceID, 0x49, "NamespaceID is out of range")
             asserts.assert_less_equal(supportedcontext.namespaceID, 0x4b, "NamespaceID is out of range")
@@ -115,27 +115,29 @@ class TC_AVANALY_2_1(MatterBaseTest, AVANALYTestBase):
         self.step(3)
         # On fresh startup the active contexts should be empty
         active_ambient_context_triggers_dut = await self.read_avanaly_attribute_expect_success(endpoint, attributes.ActiveAmbientContextTriggers)
-        asserts.assert_equal(len(active_ambient_context_triggers_dut), 0, "AtiveAmbientContextTriggers should be empty on initial startup.")
+        asserts.assert_equal(len(active_ambient_context_triggers_dut), 0,
+                             "AtiveAmbientContextTriggers should be empty on initial startup.")
 
         if self.has_feature_remcondetect:
             self.step(4)
             max_analysis_stream_count_dut = await self.read_avanaly_attribute_expect_success(endpoint, attributes.MaxAnalysisStreamCount)
             asserts.assert_less_equal(max_analysis_stream_count_dut, 255)
-            
+
             self.step(5)
             current_analysis_stream_count_dut = await self.read_avanaly_attribute_expect_success(endpoint, attributes.CurrentAnalysisStreamCount)
-            asserts.assert_equal(current_analysis_stream_count_dut, 0, "CurrentAnalysisStreamCount should be zero on initial startup")
+            asserts.assert_equal(current_analysis_stream_count_dut, 0,
+                                 "CurrentAnalysisStreamCount should be zero on initial startup")
 
             self.step(6)
             analysis_streams_dut = await self.read_avanaly_attribute_expect_success(endpoint, attributes.AnalysisStreams)
             if analysis_streams_dut is not None:
                 asserts.fail("AnalysisStreams should be empty on initial startup.")
-            
+
         else:
             self.skip_step(4)
             self.skip_step(5)
             self.skip_step(6)
-            
+
         self.step(7)
         tracking_enabled_dut = await self.read_avanaly_attribute_expect_success(endpoint, attributes.TrackingEnabled)
         asserts.assert_false(tracking_enabled_dut, "TrackingEnabled should be false on startup")

@@ -36,7 +36,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import random
 
 from mobly import asserts
 from TC_AVANALYTestBase import AVANALYTestBase
@@ -44,8 +43,7 @@ from TC_AVANALYTestBase import AVANALYTestBase
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest
+from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
@@ -72,23 +70,23 @@ class TC_AVANALY_2_2(MatterBaseTest, AVANALYTestBase):
         cluster = Clusters.Objects.AvAnalysis
         attributes = cluster.Attributes
         endpoint = self.get_endpoint()
-        
+
         self.step(1)  # Already done, immediately go to step 2
 
         self.step(2)
         tracking_enabled_dut = await self.read_avanaly_attribute_expect_success(endpoint, attributes.TrackingEnabled)
         asserts.assert_false(tracking_enabled_dut, "TrackingEnabled should be false on startup")
-        
+
         self.step(3)
         result = await self.write_single_attribute(attributes.TrackingEnabled(not tracking_enabled_dut),
-                                                       endpoint_id=endpoint)
+                                                   endpoint_id=endpoint)
         asserts.assert_equal(result, Status.Success, "Error when trying to write TrackingEnabled")
 
         self.step(4)
         tracking_enabled_dut_new = await self.read_avanaly_attribute_expect_success(endpoint, attributes.TrackingEnabled)
 
         asserts.assert_equal(tracking_enabled_dut_new, not tracking_enabled_dut,
-                                 "Value does not match what was written in step 3")
+                             "Value does not match what was written in step 3")
 
 
 if __name__ == "__main__":
