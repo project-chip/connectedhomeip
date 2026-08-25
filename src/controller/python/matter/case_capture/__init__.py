@@ -21,23 +21,27 @@ Header capture: inbound Sigma2, Sigma2_Resume and StatusReport. Call Reset() bef
 triggering the handshake; check `.present` on each slot to see whether the message was
 observed.
 
-Metrics capture: StartCASEMetricsCapture() begins measuring the handshake in both
-directions, and the results can be read whenever you like:
+Handshake metrics: register a function and it is handed the timings for every CASE handshake
+that completes, until you remove it. There is nothing to start and nothing to poll:
 
-    case_capture.StartCASEMetricsCapture()   # also clears any earlier records
+    def report(metrics):
+        print(metrics.peer_node_id,
+              metrics.device_discovery_duration_ms,
+              metrics.sigma1_sigma2_exchange_duration_ms,
+              metrics.sigma3_exchange_duration_ms)
+
+    listener_id = case_capture.AddCASEHandshakeListener(report)
     await dev_ctrl.GetConnectedDevice(node_id, allowPASE=False)
+    case_capture.RemoveCASEHandshakeListener(listener_id)
 
-    metrics = case_capture.GetLastCASEHandshakeMetrics()
-    print(metrics.device_discovery_duration_ms)
-    print(metrics.sigma1_sigma2_exchange_duration_ms)
-    print(metrics.sigma3_exchange_duration_ms)
-
-Use GetAllCASEHandshakeMetrics() instead when several handshakes ran, and match them up by
-peer_node_id. StopCASEMetricsCapture() is optional; leaving the backend registered costs
-one comparison per message.
+Pass own_thread=True for a listener that does something slow, such as writing to a database or a
+spreadsheet, so it cannot hold up the others.
 See the CASEHandshakeMetrics class for the phases reported."""
 
 import ctypes
+import logging
+import queue
+import threading
 from dataclasses import dataclass
 
 from ..native import GetLibraryHandle, HandleFlags, NativeLibraryHandleMethodArguments, PyChipError
@@ -106,8 +110,8 @@ def GetSnapshot() -> PyCaseCaptureSnapshot:
 # message as SessionManager sends or receives it, so nothing here depends on log text or
 # trace files.
 
-# Must match PYCHIP_CASE_HANDSHAKE_METRICS_PEER_ADDRESS_MAX_LENGTH in CASECapture.h. This is the only size that
-# has to agree between the two sides; how many records exist is decided at runtime.
+# Must match PYCHIP_CASE_HANDSHAKE_METRICS_PEER_ADDRESS_MAX_LENGTH in CASECapture.h. Records cross
+# the boundary one at a time, so this is the only size that has to agree between the two sides.
 PEER_TRANSPORT_ADDRESS_MAX_LENGTH = 80
 
 # The native layer records microseconds, because the Sigma phases are around a millisecond and
@@ -119,17 +123,6 @@ _MICROSECONDS_PER_MILLISECOND = 1000.0
 # and kProtocolCodeSuccess in src/protocols/secure_channel/Constants.h.
 STATUS_REPORT_GENERAL_CODE_SUCCESS = 0
 STATUS_REPORT_PROTOCOL_CODE_SUCCESS = 0
-
-# Passed as max_case_handshakes to StartCASEMetricsCapture to take the native default capacity.
-CASE_HANDSHAKE_CAPTURE_DEFAULT_CAPACITY = 0
-
-# Passed as the capacity to _FetchCASEHandshakeRecords to read the counters without copying any records.
-_READ_COUNTERS_ONLY = 0
-
-# How many times GetAllCASEHandshakeMetrics will resize and refetch when handshakes are being captured while
-# it reads. Each retry uses the count the native side just reported, so it converges at once
-# unless establishment is ongoing.
-_MAX_FETCH_ATTEMPTS = 4
 
 # Must match the PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_* bits in CASECapture.h.
 RECORDED_SIGMA1_SENT = 0x01
@@ -172,7 +165,7 @@ class CASEHandshakeMetrics:
         device_discovery_duration_ms          operational discovery, before any Sigma message
         sigma1_sigma2_exchange_duration_ms    Sigma1 out -> Sigma2 in
         sigma3_exchange_duration_ms           Sigma3 out -> StatusReport in
-        total_case_handshake_duration_ms           discovery start -> StatusReport in
+        total_case_handshake_duration_ms      discovery start -> StatusReport in
 
     The raw microsecond timestamps are kept as fields, so anything else (the local turnaround
     between the two exchanges, an end-to-end total) can be derived from them.
@@ -337,87 +330,329 @@ class CASEHandshakeMetrics:
         return self._status_report_indicates_success is not True
 
 
-def _GetCASEMetricsLibraryHandle() -> ctypes.CDLL:
+
+
+# --- Streaming completed handshakes out of the native layer -------------------------------
+
+# Passed as notification_queue_depth to take the native default depth.
+NOTIFICATION_QUEUE_DEPTH_NATIVE_DEFAULT = 0
+
+# Updated by the delivery thread each time it waits, so a consumer that cannot keep up with the
+# notification queue is visible without consuming a record to find out.
+_dropped_notification_count = 0
+
+
+def _GetNotificationLibraryHandle() -> ctypes.CDLL:
     handle = GetLibraryHandle(HandleFlags(0))
-    if not handle.pychip_case_handshake_metrics_get_records.argtypes:
+    if not handle.pychip_case_handshake_metrics_wait_for_notification.argtypes:
         setter = NativeLibraryHandleMethodArguments(handle)
-        setter.Set('pychip_case_handshake_metrics_start_capture', PyChipError, [ctypes.c_uint32])
-        setter.Set('pychip_case_handshake_metrics_stop_capture', PyChipError, [])
-        setter.Set('pychip_case_handshake_metrics_reset_capture', PyChipError, [])
-        setter.Set('pychip_case_handshake_metrics_get_records', PyChipError,
+        setter.Set('pychip_case_handshake_metrics_start_notifications', PyChipError, [ctypes.c_uint32])
+        setter.Set('pychip_case_handshake_metrics_stop_notifications', PyChipError, [])
+        setter.Set('pychip_case_handshake_metrics_wait_for_notification', PyChipError,
                    [ctypes.POINTER(PyCASEHandshakeMetricsRecord), ctypes.c_uint32,
-                    ctypes.POINTER(ctypes.c_uint32), ctypes.POINTER(ctypes.c_uint32),
-                    ctypes.POINTER(ctypes.c_uint32)])
+                    ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_uint32)])
+        setter.Set('pychip_case_handshake_metrics_get_abandoned_count', PyChipError,
+                   [ctypes.POINTER(ctypes.c_uint32)])
     return handle
 
 
-def StartCASEMetricsCapture(max_case_handshakes: int = CASE_HANDSHAKE_CAPTURE_DEFAULT_CAPACITY) -> None:
-    """Register the timing backend, discarding any previously captured handshakes.
+def StartCASEHandshakeNotifications(notification_queue_depth: int = NOTIFICATION_QUEUE_DEPTH_NATIVE_DEFAULT) -> None:
+    """Start timing handshakes and queueing the completed ones, discarding anything left from
+    before.
 
-    max_case_handshakes is how many handshakes to retain, and CASE_HANDSHAKE_CAPTURE_DEFAULT_CAPACITY takes the native
-    default from PYCHIP_CASE_HANDSHAKE_METRICS_DEFAULT_CAPACITY. Raise it when capturing more
-    handshakes than that between calls, for instance a long run of concurrent establishments
-    with no reset in between; GetDroppedCASEHandshakeCount reports whether the capacity was exceeded.
-
-    Raises if max_case_handshakes exceeds the native ceiling PYCHIP_CASE_HANDSHAKE_METRICS_MAX_CAPACITY, rather
-    than silently retaining fewer than asked for."""
-    _GetCASEMetricsLibraryHandle().pychip_case_handshake_metrics_start_capture(max_case_handshakes).raise_on_error()
+    Called for you when the first listener is registered, so there is rarely a reason to call
+    this directly. notification_queue_depth bounds how many completed handshakes may wait for the
+    delivery thread; NOTIFICATION_QUEUE_DEPTH_NATIVE_DEFAULT takes the native default."""
+    _GetNotificationLibraryHandle().pychip_case_handshake_metrics_start_notifications(notification_queue_depth).raise_on_error()
 
 
-def StopCASEMetricsCapture() -> None:
-    """Unregister the backend. Captured handshakes stay readable until the next start."""
-    _GetCASEMetricsLibraryHandle().pychip_case_handshake_metrics_stop_capture().raise_on_error()
+def StopCASEHandshakeNotifications() -> None:
+    """Stop queueing completed handshakes and release any waiting consumer."""
+    _GetNotificationLibraryHandle().pychip_case_handshake_metrics_stop_notifications().raise_on_error()
 
 
-def ResetCASEMetricsCapture() -> None:
-    """Discard captured handshakes without unregistering the backend."""
-    _GetCASEMetricsLibraryHandle().pychip_case_handshake_metrics_reset_capture().raise_on_error()
+def _WaitForCompletedCASEHandshake(timeout_ms: int) -> "CASEHandshakeMetrics | None":
+    """Block until a handshake completes, or the timeout expires, or notifications are stopped.
 
-
-def _FetchCASEHandshakeRecords(capacity: int) -> tuple[list[PyCASEHandshakeMetricsRecord], int, int]:
-    """Copies up to `capacity` records out of the native buffer.
-
-    Returns the records copied, how many exist in total, and the dropped count. Pass 0 to
-    query the counts without copying anything."""
-    buffer = (PyCASEHandshakeMetricsRecord * capacity)() if capacity > 0 else None
-    written = ctypes.c_uint32(0)
-    available = ctypes.c_uint32(0)
+    The wait happens inside the native call, which releases the interpreter lock, so other
+    Python threads keep running while this one is parked."""
+    global _dropped_notification_count
+    record = PyCASEHandshakeMetricsRecord()
+    received = ctypes.c_uint8(0)
     dropped = ctypes.c_uint32(0)
-    _GetCASEMetricsLibraryHandle().pychip_case_handshake_metrics_get_records(
-        buffer, capacity, ctypes.byref(written), ctypes.byref(available),
+    _GetNotificationLibraryHandle().pychip_case_handshake_metrics_wait_for_notification(
+        ctypes.byref(record), timeout_ms, ctypes.byref(received),
         ctypes.byref(dropped)).raise_on_error()
-    records = [buffer[i] for i in range(written.value)] if buffer is not None else []
-    return records, available.value, dropped.value
+    _dropped_notification_count = dropped.value
+    if not received.value:
+        return None
+    return CASEHandshakeMetrics._from_native_record(record)
 
 
-def GetAllCASEHandshakeMetrics() -> list[CASEHandshakeMetrics]:
-    """Every handshake captured since the last StartCASEMetricsCapture/ResetCASEMetricsCapture, oldest first."""
-    # Sizing the buffer and filling it are two separate calls, so more handshakes can be
-    # captured in between while others are still in flight. Retry on a short buffer rather than
-    # silently returning fewer handshakes than exist.
-    _, capacity, _ = _FetchCASEHandshakeRecords(_READ_COUNTERS_ONLY)
-    for _ in range(_MAX_FETCH_ATTEMPTS):
-        if capacity == 0:
-            return []
-        records, available, _ = _FetchCASEHandshakeRecords(capacity)
-        if available <= capacity:
-            return [CASEHandshakeMetrics._from_native_record(record) for record in records]
-        capacity = available
-    raise RuntimeError(
-        f"handshake count kept growing over {_MAX_FETCH_ATTEMPTS} attempts; capture is still active")
+def GetAbandonedCASEHandshakeCount() -> int:
+    """Handshakes that began but never reached a conclusion, so no listener heard about them.
+
+    A handshake that times out with no reply is the usual cause. This is what explains a run
+    seeing fewer notifications than it ran establishments."""
+    abandoned = ctypes.c_uint32(0)
+    _GetNotificationLibraryHandle().pychip_case_handshake_metrics_get_abandoned_count(
+        ctypes.byref(abandoned)).raise_on_error()
+    return abandoned.value
 
 
-def GetLastCASEHandshakeMetrics() -> CASEHandshakeMetrics | None:
-    """The most recent handshake, or None if none has been captured yet.
+def GetDroppedCASEHandshakeNotificationCount() -> int:
+    """Completed handshakes the notification queue had no room for, because the delivery thread was
+    still busy. Non-zero means notifications were lost before any listener saw them."""
+    return _dropped_notification_count
 
-    With several handshakes in flight this is whichever sent Sigma1 last, which is rarely
-    the one you want; use GetAllCASEHandshakeMetrics and match on peer_node_id instead."""
-    case_handshakes = GetAllCASEHandshakeMetrics()
-    return case_handshakes[-1] if case_handshakes else None
+# --- Listeners: being told about each handshake as it completes ---------------------------
+#
+# Register a function once and it is handed the metrics for every handshake that completes,
+# until you remove it. This is the only way metrics are reported; there is nothing to poll.
+#
+# Delivery is arranged so that no listener can affect the measurements or any other listener:
+#
+#   CHIP event loop       notification queue     delivery thread        listener queues
+#   ───────────────       ──────────────────     ───────────────        ───────────────
+#   handshake ends,  ──►  queued without    ──►  builds one metrics ──► one reference
+#   record copied,        entering Python        object, then hands     queued per
+#   thread returns        or waiting             it to every listener   listener, each
+#                                                without waiting        drained at its
+#                                                                       own pace
+#
+# The event loop never enters Python, so notification costs the handshake nothing however slow
+# or numerous the listeners are. Each listener owns its queue, so a slow one delays only
+# itself.
+
+# How long the delivery thread parks in native code before looping. It wakes on its own to
+# check whether it has been asked to stop, so this only bounds shutdown latency.
+_DELIVERY_WAIT_MS = 200
+
+# Messages a listener may fall behind by before its oldest are discarded. Bounded on purpose: a
+# listener that never keeps up would otherwise grow memory until the process died.
+LISTENER_NOTIFICATION_QUEUE_DEPTH = 256
 
 
-def GetDroppedCASEHandshakeCount() -> int:
-    """Handshakes seen after the capture filled up, and so not recorded. Raise the capacity
-    via StartCASEMetricsCapture(max_case_handshakes=...) if this is ever non-zero."""
-    _, _, dropped = _FetchCASEHandshakeRecords(_READ_COUNTERS_ONLY)
-    return dropped
+logger = logging.getLogger(__name__)
+
+
+class _RegisteredListener:
+    """One registered function, its notification queue, and the thread that delivers to it."""
+
+    def __init__(self, listener_id: int, listener, shared: bool):
+        self.listener_id = listener_id
+        self.listener = listener
+        self.shared = shared
+        self.pending_notifications: queue.Queue = queue.Queue(maxsize=LISTENER_NOTIFICATION_QUEUE_DEPTH)
+        self.delivered = 0
+        self.dropped = 0
+        self.worker: threading.Thread | None = None
+        self.active = True
+
+    def enqueue_notification(self, metrics: "CASEHandshakeMetrics") -> None:
+        """Hand over a completed handshake without ever blocking the caller."""
+        try:
+            self.pending_notifications.put_nowait(metrics)
+        except queue.Full:
+            # Discard this listener's oldest so the newest still gets through, and count it so
+            # falling behind is visible rather than silent.
+            try:
+                self.pending_notifications.get_nowait()
+                self.dropped += 1
+                self.pending_notifications.put_nowait(metrics)
+            except (queue.Empty, queue.Full):
+                self.dropped += 1
+
+    def invoke_listener(self, metrics: "CASEHandshakeMetrics") -> None:
+        """Invoke the registered function, absorbing anything it raises."""
+        try:
+            self.listener(metrics)
+            self.delivered += 1
+        except Exception:
+            logger.exception("CASE handshake listener %d raised; continuing", self.listener_id)
+
+
+class _ListenerRegistry:
+    """Owns the registered listeners, the delivery thread, and the worker threads."""
+
+    def __init__(self):
+        self._lock = threading.Lock()
+        self._listeners: dict[int, _RegisteredListener] = {}
+        self._next_id = 1
+        self._delivery_thread: threading.Thread | None = None
+        self._shared_worker: threading.Thread | None = None
+        self._shared_delivery_queue: queue.Queue = queue.Queue()
+        self._running = False
+
+    # -- registration ----------------------------------------------------------------
+
+    def add(self, listener, own_thread: bool) -> int:
+        if not callable(listener):
+            raise TypeError("listener must be callable")
+        with self._lock:
+            listener_id = self._next_id
+            self._next_id += 1
+            registered = _RegisteredListener(listener_id, listener, shared=not own_thread)
+            self._listeners[listener_id] = registered
+            if own_thread:
+                registered.worker = threading.Thread(
+                    target=self._deliver_on_dedicated_thread, args=(registered,),
+                    name=f"case-listener-{listener_id}", daemon=True)
+                registered.worker.start()
+            self._ensure_running_locked()
+            return listener_id
+
+    def remove(self, listener_id: int) -> None:
+        with self._lock:
+            registered = self._listeners.pop(listener_id, None)
+            if registered is None:
+                raise KeyError(f"no CASE handshake listener with id {listener_id}")
+            # Marked inactive under the lock, so no further delivery can pick it up. A call
+            # already running finishes on its own; we do not wait for it, or a blocked listener
+            # would hang the caller.
+            registered.active = False
+            should_stop = not self._listeners
+        registered.pending_notifications.put_nowait(None)  # release its worker, if it has one
+        if should_stop:
+            self._stop()
+
+    def remove_all(self) -> None:
+        with self._lock:
+            registered_all = list(self._listeners.values())
+            self._listeners.clear()
+            for registered in registered_all:
+                registered.active = False
+        for registered in registered_all:
+            registered.pending_notifications.put_nowait(None)
+        self._stop()
+
+    def stats(self, listener_id: int) -> "CASEHandshakeListenerStats":
+        with self._lock:
+            registered = self._listeners.get(listener_id)
+            if registered is None:
+                raise KeyError(f"no CASE handshake listener with id {listener_id}")
+            return CASEHandshakeListenerStats(
+                listener_id=listener_id, delivered=registered.delivered,
+                backlog=registered.pending_notifications.qsize(), dropped=registered.dropped,
+                has_own_thread=not registered.shared)
+
+    def listener_ids(self) -> list[int]:
+        with self._lock:
+            return sorted(self._listeners)
+
+    # -- delivery --------------------------------------------------------------------
+
+    def _ensure_running_locked(self) -> None:
+        """Start notifying and start the threads on the first registration."""
+        if self._running:
+            return
+        # Opening switches the whole thing on: it registers the backend so handshakes are timed,
+        # and starts queueing the ones that complete.
+        StartCASEHandshakeNotifications()
+        self._running = True
+        self._delivery_thread = threading.Thread(
+            target=self._dispatch_notifications, name="case-metrics-delivery", daemon=True)
+        self._delivery_thread.start()
+        self._shared_worker = threading.Thread(
+            target=self._deliver_on_shared_thread, name="case-listener-shared", daemon=True)
+        self._shared_worker.start()
+
+    def _stop(self) -> None:
+        with self._lock:
+            if not self._running:
+                return
+            self._running = False
+        # Closing wakes the delivery thread so it can see it should exit.
+        StopCASEHandshakeNotifications()
+        self._shared_delivery_queue.put(None)
+
+    def _dispatch_notifications(self) -> None:
+        while True:
+            with self._lock:
+                if not self._running:
+                    return
+            # Parks in native code with the interpreter lock released, so other threads run.
+            metrics = _WaitForCompletedCASEHandshake(_DELIVERY_WAIT_MS)
+            if metrics is None:
+                continue
+            with self._lock:
+                targets = [r for r in self._listeners.values() if r.active]
+            # One immutable metrics object, shared by reference. Offering never blocks, so a
+            # slow listener cannot hold up the others or the next handshake.
+            for registered in targets:
+                registered.enqueue_notification(metrics)
+                if registered.shared:
+                    self._shared_delivery_queue.put(registered)
+
+    def _deliver_on_shared_thread(self) -> None:
+        """Runs the cheap listeners in turn on one thread."""
+        while True:
+            registered = self._shared_delivery_queue.get()
+            if registered is None:
+                return
+            try:
+                metrics = registered.pending_notifications.get_nowait()
+            except queue.Empty:
+                continue
+            if metrics is not None and registered.active:
+                registered.invoke_listener(metrics)
+
+    def _deliver_on_dedicated_thread(self, registered: _RegisteredListener) -> None:
+        """Runs one slow listener on a thread of its own, isolated from the rest."""
+        while True:
+            metrics = registered.pending_notifications.get()
+            if metrics is None:
+                return
+            if registered.active:
+                registered.invoke_listener(metrics)
+
+
+@dataclass(frozen=True)
+class CASEHandshakeListenerStats:
+    """How a listener is keeping up. A non-zero dropped count means it fell far enough behind
+    that some handshakes were discarded for it."""
+
+    listener_id: int
+    delivered: int
+    backlog: int
+    dropped: int
+    has_own_thread: bool
+
+
+_listener_registry = _ListenerRegistry()
+
+
+def AddCASEHandshakeListener(listener, own_thread: bool = False) -> int:
+    """Register a function to be called with the metrics for every completed handshake.
+
+    The function is handed one CASEHandshakeMetrics argument, and keeps being called until it is
+    removed. Registering is all that is needed; there is no separate capture to start.
+
+    Set own_thread for a listener that does something slow, such as writing to a database or a
+    spreadsheet, so it runs on a thread of its own and cannot hold up the others. Cheap listeners
+    should leave it False and share a thread.
+
+    Returns an id to pass to RemoveCASEHandshakeListener."""
+    return _listener_registry.add(listener, own_thread)
+
+
+def RemoveCASEHandshakeListener(listener_id: int) -> None:
+    """Stop calling a listener. Once this returns it receives nothing further, though a call
+    already in progress finishes on its own."""
+    _listener_registry.remove(listener_id)
+
+
+def RemoveAllCASEHandshakeListeners() -> None:
+    """Stop calling every registered listener and shut the delivery threads down."""
+    _listener_registry.remove_all()
+
+
+def GetCASEHandshakeListenerIds() -> list[int]:
+    """The ids of every currently registered listener."""
+    return _listener_registry.listener_ids()
+
+
+def GetCASEHandshakeListenerStats(listener_id: int) -> CASEHandshakeListenerStats:
+    """How many handshakes a listener has been given, how many are waiting, and how many were
+    discarded because it could not keep up."""
+    return _listener_registry.stats(listener_id)

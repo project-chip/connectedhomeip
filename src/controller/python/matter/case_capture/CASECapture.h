@@ -56,18 +56,14 @@ PyChipError pychip_case_capture_get_snapshot(PychipCaseCaptureSnapshot * out);
 // through the tracing hooks in SessionManager, which report both directions, and so can
 // time the outbound Sigma1/Sigma3 that the inbound-only observer cannot see.
 
-// CASE handshakes retained per capture session when the caller does not ask for a specific
-// capacity. Enough for a batch of concurrent handshakes without reserving much; override it
-// via the maxCASEHandshakes argument to pychip_case_handshake_metrics_start_capture when capturing more.
-#define PYCHIP_CASE_HANDSHAKE_METRICS_DEFAULT_CAPACITY 64
+// Handshakes that may be in progress at the same time. A record is scratch space held only
+// between Sigma1 and the handshake concluding, so this bounds concurrency rather than how many
+// handshakes may be run. If every slot is occupied the longest-running one is given up, so a
+// handshake that never concludes cannot hold a slot for ever.
+#define PYCHIP_CASE_HANDSHAKE_METRICS_MAX_IN_FLIGHT 16
 
-// Largest capacity pychip_case_handshake_metrics_start_capture will accept. The records are allocated up front, so
-// this bounds that allocation to roughly 640 kB and keeps a mistyped capacity from exhausting
-// memory. A request above it is rejected rather than silently reduced, so a caller never
-// believes it has more room than it does.
-#define PYCHIP_CASE_HANDSHAKE_METRICS_MAX_CAPACITY 4096
-
-// Bits set in PychipCASEHandshakeMetricsRecord::recordedFields, indicating which timestamps are valid.
+// Bits set in PychipCASEHandshakeMetricsRecord::recordedFields, saying which fields below are valid.
+// Most mark a timestamp; the last two record what the StatusReport said.
 #define PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_SIGMA1_SENT 0x01u
 #define PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_SIGMA2_RECEIVED 0x02u
 #define PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_SIGMA3_SENT 0x04u
@@ -97,8 +93,8 @@ struct PychipCASEHandshakeMetricsRecord
     uint64_t sigma2ResumeReceivedTimestampUs;
     // Operational discovery that resolved this handshake's peer. Recorded before Sigma1 is
     // sent, then attached once the peer replies and its address identifies which lookup it
-    // came from. Left unset when the address was not resolved during this capture, so a span
-    // is never attributed to the wrong handshake.
+    // came from. Left unset when the address was not resolved while listening, so a span is
+    // never attributed to the wrong handshake.
     uint64_t discoveryStartedTimestampUs;
     uint64_t discoveryCompletedTimestampUs;
     // Identifies which handshake a message belongs to, so concurrent handshakes stay
@@ -124,28 +120,54 @@ struct PychipCASEHandshakeMetricsRecord
     char peerTransportAddress[PYCHIP_CASE_HANDSHAKE_METRICS_PEER_ADDRESS_MAX_LENGTH];
 };
 
-// Register the metrics backend and clear any previously captured records. maxCASEHandshakes sets how
-// many handshakes to retain; pass 0 for PYCHIP_CASE_HANDSHAKE_METRICS_DEFAULT_CAPACITY. Returns
-// CHIP_ERROR_INVALID_ARGUMENT if it exceeds PYCHIP_CASE_HANDSHAKE_METRICS_MAX_CAPACITY.
-PyChipError pychip_case_handshake_metrics_start_capture(uint32_t maxCASEHandshakes);
-
-// Unregister the backend. Captured records stay readable until the next start.
-PyChipError pychip_case_handshake_metrics_stop_capture(void);
-
-// Discard all captured records without unregistering.
-PyChipError pychip_case_handshake_metrics_reset_capture(void);
-
-// Copies up to `capacity` records into `out`, oldest first.
+// --- Streaming completed handshakes to listeners -------------------------------------------
 //
-// The caller supplies the buffer, so the record count never has to be agreed between C and
-// the ctypes mirror: only the layout of a single record does.
+// Each handshake that reaches a conclusion is copied into the notification queue below, and a consumer
+// thread waits on it and hands the record to Python listeners.
 //
-//   written   number of records copied, at most `capacity`
-//   available total recorded, so a caller can size a buffer and ask again
-//   dropped   handshakes seen after the capture filled up, and therefore not recorded
+// The split exists to keep the measurement honest. The tracing hooks run inside the code path
+// being timed, so they only append to the notification queue and return; they never enter Python and never
+// wait on a listener. All Python work, including acquiring the interpreter lock, happens on the
+// consumer thread instead. Notification therefore costs the handshake nothing, no matter how
+// slow or how numerous the listeners are.
+
+// Completed handshakes the notification queue holds when the caller does not ask for a specific depth.
+// Deep enough to absorb a burst of concurrent completions while the consumer is busy.
+#define PYCHIP_CASE_HANDSHAKE_METRICS_NOTIFICATION_QUEUE_DEFAULT_DEPTH 256
+
+// Largest notification queue depth accepted, bounding the allocation to roughly 640 kB. A larger request is
+// rejected rather than quietly reduced, so a caller never believes it has more room than it does.
+#define PYCHIP_CASE_HANDSHAKE_METRICS_NOTIFICATION_QUEUE_MAX_DEPTH 4096
+
+// Register the metrics backend and start notifying, so handshakes start being timed and queued.
+// This is the single switch that turns the feature on; there is nothing else to start.
 //
-// `out` may be null when `capacity` is 0, to query the counts alone.
-PyChipError pychip_case_handshake_metrics_get_records(PychipCASEHandshakeMetricsRecord * out, uint32_t capacity, uint32_t * written,
-                                                      uint32_t * available, uint32_t * dropped);
+// Pass 0 for PYCHIP_CASE_HANDSHAKE_METRICS_NOTIFICATION_QUEUE_DEFAULT_DEPTH. Returns
+// CHIP_ERROR_INVALID_ARGUMENT if the depth exceeds PYCHIP_CASE_HANDSHAKE_METRICS_NOTIFICATION_QUEUE_MAX_DEPTH.
+// Starting also clears anything left from a previous run.
+PyChipError pychip_case_handshake_metrics_start_notifications(uint32_t depth);
+
+// Unregister the backend, stop notifying, and wake any waiting consumer so it can exit.
+// Queued records are discarded.
+PyChipError pychip_case_handshake_metrics_stop_notifications(void);
+
+// Waits for the next completed handshake and copies it into `out`.
+//
+// Blocks up to timeoutMs, so the consumer thread parks in native code with the interpreter lock
+// released and other Python threads run freely. Returns with `received` false when the timeout
+// expires or notifications are stopped, which is how a consumer notices it should stop.
+//
+//   received  1 when a record was copied into `out`, 0 when it timed out or notifications were stopped
+//   dropped   running total of completed handshakes the notification queue had no room for, so a consumer
+//             that cannot keep up is visible rather than silently lossy
+//
+// This runs on the calling thread rather than the CHIP event loop, which it would otherwise block.
+PyChipError pychip_case_handshake_metrics_wait_for_notification(PychipCASEHandshakeMetricsRecord * out, uint32_t timeoutMs,
+                                                                uint8_t * received, uint32_t * dropped);
+
+// Handshakes that began but never reached a conclusion, so no listener was ever told about them.
+// A timeout with no reply is the usual cause. This is what explains a run seeing fewer
+// notifications than it ran establishments.
+PyChipError pychip_case_handshake_metrics_get_abandoned_count(uint32_t * abandoned);
 
 } // extern "C"

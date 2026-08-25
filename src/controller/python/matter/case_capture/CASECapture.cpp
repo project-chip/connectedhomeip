@@ -18,9 +18,10 @@
 
 #include <controller/python/matter/case_capture/CASECapture.h>
 
-#include <algorithm>
+#include <condition_variable>
 #include <cstring>
-#include <vector>
+#include <deque>
+#include <mutex>
 
 #include <controller/python/matter/native/ChipMainLoopWork.h>
 #include <lib/address_resolve/TracingStructs.h>
@@ -169,6 +170,83 @@ bool IsStatusReportSuccess(uint16_t generalCode, uint16_t protocolCode)
         protocolCode == chip::Protocols::SecureChannel::kProtocolCodeSuccess;
 }
 
+// Holds handshakes that have reached a conclusion until a consumer thread collects them.
+//
+// The producer is the CHIP event loop inside the tracing hooks, so Publish does the least work
+// that correctness allows: take a short lock, copy, signal, return. It never enters Python and
+// never waits for a consumer, which is what keeps a slow or absent listener from showing up in
+// the timings being measured.
+class CompletedCASEHandshakeQueue
+{
+public:
+    void Open(uint32_t depth)
+    {
+        const std::lock_guard<std::mutex> lock(mMutex);
+        mDepth = depth;
+        mQueue.clear();
+        mDroppedCount = 0;
+        mIsOpen       = true;
+    }
+
+    void Close()
+    {
+        {
+            const std::lock_guard<std::mutex> lock(mMutex);
+            mIsOpen = false;
+            mQueue.clear();
+        }
+        // Wake every waiter so each can see notifications were stopped and unwind.
+        mRecordAvailable.notify_all();
+    }
+
+    // Called on the CHIP event loop thread, from inside the measured path.
+    void Publish(const PychipCASEHandshakeMetricsRecord & record)
+    {
+        {
+            const std::lock_guard<std::mutex> lock(mMutex);
+            if (!mIsOpen)
+            {
+                return;
+            }
+            if (mQueue.size() >= mDepth)
+            {
+                // Drop the oldest rather than block the handshake or grow without bound. The
+                // count is what makes a consumer that cannot keep up visible to the caller.
+                mQueue.pop_front();
+                mDroppedCount++;
+            }
+            mQueue.push_back(record);
+        }
+        mRecordAvailable.notify_one();
+    }
+
+    // Called on a consumer thread with the interpreter lock released.
+    bool Wait(PychipCASEHandshakeMetricsRecord & out, uint32_t timeoutMs, uint32_t & droppedCount)
+    {
+        std::unique_lock<std::mutex> lock(mMutex);
+        mRecordAvailable.wait_for(lock, std::chrono::milliseconds(timeoutMs), [this] { return !mQueue.empty() || !mIsOpen; });
+
+        droppedCount = mDroppedCount;
+        if (mQueue.empty())
+        {
+            return false; // Timed out, or closed while waiting.
+        }
+        out = mQueue.front();
+        mQueue.pop_front();
+        return true;
+    }
+
+private:
+    std::mutex mMutex;
+    std::condition_variable mRecordAvailable;
+    std::deque<PychipCASEHandshakeMetricsRecord> mQueue;
+    size_t mDepth          = PYCHIP_CASE_HANDSHAKE_METRICS_NOTIFICATION_QUEUE_DEFAULT_DEPTH;
+    uint32_t mDroppedCount = 0;
+    bool mIsOpen           = false;
+};
+
+CompletedCASEHandshakeQueue gCompletedCASEHandshakeQueue;
+
 // Times the initiator side of CASE by observing the handshake messages as the transport
 // layer sends and receives them. The tracing hooks in SessionManager are used rather than
 // the received-message observer above because they report both directions: the handshake
@@ -215,6 +293,8 @@ public:
             VerifyOrReturn(ParseStatusReportCodes(info.payload, generalCode, protocolCode));
             if (!IsStatusReportSuccess(generalCode, protocolCode))
             {
+                const bool alreadyRejectedPeer =
+                    (record->recordedFields & PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_THIS_NODE_REJECTED_PEER) != 0;
                 record->recordedFields =
                     static_cast<uint8_t>(record->recordedFields | PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_THIS_NODE_REJECTED_PEER);
 
@@ -229,6 +309,12 @@ public:
                     record->statusReportProtocolCode = protocolCode;
                     record->recordedFields =
                         static_cast<uint8_t>(record->recordedFields | PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_STATUS_REPORT_CODES);
+                }
+
+                // Rejecting the peer ends the handshake from this side too.
+                if (!alreadyRejectedPeer)
+                {
+                    ConcludeCASEHandshake(*record);
                 }
             }
         }
@@ -265,8 +351,13 @@ public:
                             PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_SIGMA2_RECEIVED, now);
             break;
         case MsgType::CASE_Sigma2Resume:
-            RecordTimestamp(*record, &PychipCASEHandshakeMetricsRecord::sigma2ResumeReceivedTimestampUs,
-                            PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_SIGMA2_RESUME_RECEIVED, now);
+            // Resumption exchanges no Sigma2 or Sigma3, so this is where a resumed handshake
+            // concludes for the initiator.
+            if (RecordTimestamp(*record, &PychipCASEHandshakeMetricsRecord::sigma2ResumeReceivedTimestampUs,
+                                PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_SIGMA2_RESUME_RECEIVED, now))
+            {
+                ConcludeCASEHandshake(*record);
+            }
             break;
         case MsgType::StatusReport:
             // Only the report closing out Sigma3 is of interest. A StatusReport arriving at
@@ -274,8 +365,9 @@ public:
             // unmarked so the Python side sees an incomplete record.
             if ((record->recordedFields & PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_SIGMA3_SENT) != 0)
             {
-                RecordTimestamp(*record, &PychipCASEHandshakeMetricsRecord::statusReportReceivedTimestampUs,
-                                PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_STATUS_REPORT_RECEIVED, now);
+                const bool reachedConclusion =
+                    RecordTimestamp(*record, &PychipCASEHandshakeMetricsRecord::statusReportReceivedTimestampUs,
+                                    PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_STATUS_REPORT_RECEIVED, now);
 
                 // The timestamp is kept whether the peer accepted or rejected Sigma3, since
                 // the time to a rejection is still a real measurement. The codes are what
@@ -289,6 +381,13 @@ public:
                     record->statusReportProtocolCode = protocolCode;
                     record->recordedFields =
                         static_cast<uint8_t>(record->recordedFields | PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_STATUS_REPORT_CODES);
+                }
+
+                // The handshake is over, accepted or rejected either way. Publish only on the
+                // transition so listeners are notified exactly once.
+                if (reachedConclusion)
+                {
+                    ConcludeCASEHandshake(*record);
                 }
             }
             break;
@@ -332,37 +431,18 @@ public:
         }
     }
 
-    void ResetWithCapacity(uint32_t maxCASEHandshakes)
-    {
-        mCASEHandshakeRecords.assign(maxCASEHandshakes, PychipCASEHandshakeMetricsRecord{});
-        ClearRecordsAndDiscoveries();
-    }
+    void Reset() { ClearRecordsAndDiscoveries(); }
 
-    // Clears the captured records but keeps whatever capacity the last start asked for.
-    void ClearRecordsKeepingCapacity()
-    {
-        std::fill(mCASEHandshakeRecords.begin(), mCASEHandshakeRecords.end(), PychipCASEHandshakeMetricsRecord{});
-        ClearRecordsAndDiscoveries();
-    }
-
-    // Copies only the records actually captured, so a large capacity costs nothing to read.
-    void CopyCASEHandshakeRecords(PychipCASEHandshakeMetricsRecord * out, uint32_t capacity, uint32_t & written,
-                                  uint32_t & available, uint32_t & dropped) const
-    {
-        available = mRecordedCASEHandshakeCount;
-        dropped   = mDroppedCASEHandshakeCount;
-        written   = std::min(capacity, mRecordedCASEHandshakeCount);
-        if (out != nullptr && written > 0)
-        {
-            std::memcpy(out, mCASEHandshakeRecords.data(), written * sizeof(PychipCASEHandshakeMetricsRecord));
-        }
-    }
+    uint32_t AbandonedCASEHandshakeCount() const { return mAbandonedCASEHandshakeCount; }
 
 private:
     void ClearRecordsAndDiscoveries()
     {
-        mRecordedCASEHandshakeCount = 0;
-        mDroppedCASEHandshakeCount  = 0;
+        for (auto & record : mInFlightCASEHandshakes)
+        {
+            record = PychipCASEHandshakeMetricsRecord{};
+        }
+        mAbandonedCASEHandshakeCount = 0;
         for (auto & pending : mPendingDiscoveries)
         {
             pending = PendingDeviceDiscovery{};
@@ -404,17 +484,29 @@ private:
 
     // Locates the handshake a message belongs to. Searching newest first means a reused
     // exchange id resolves to the current handshake rather than a finished one.
+    // A slot holding nothing is free. A handshake occupies one from Sigma1 until it concludes.
+    static bool IsSlotFree(const PychipCASEHandshakeMetricsRecord & record) { return record.recordedFields == 0; }
+
+    // Locates the in-flight handshake a message belongs to, which is how concurrent handshakes
+    // are kept apart.
     PychipCASEHandshakeMetricsRecord * FindCASEHandshakeRecord(uint16_t exchangeId, chip::NodeId localEphemeralNodeId)
     {
-        for (uint32_t i = mRecordedCASEHandshakeCount; i > 0; i--)
+        for (auto & candidate : mInFlightCASEHandshakes)
         {
-            PychipCASEHandshakeMetricsRecord & record = mCASEHandshakeRecords[i - 1];
-            if (record.exchangeId == exchangeId && record.localEphemeralNodeId == localEphemeralNodeId)
+            if (!IsSlotFree(candidate) && candidate.exchangeId == exchangeId &&
+                candidate.localEphemeralNodeId == localEphemeralNodeId)
             {
-                return &record;
+                return &candidate;
             }
         }
         return nullptr;
+    }
+
+    // Hands a concluded handshake to its listeners and releases its slot.
+    void ConcludeCASEHandshake(PychipCASEHandshakeMetricsRecord & record)
+    {
+        gCompletedCASEHandshakeQueue.Publish(record);
+        record = PychipCASEHandshakeMetricsRecord{};
     }
 
     PendingDeviceDiscovery * FindDiscoveryForPeer(const chip::PeerId & peer)
@@ -431,7 +523,7 @@ private:
 
     // Names the handshake's peer and, when the same lookup produced that peer's address,
     // hands the discovery span to this record. Both stay unset when the address was never
-    // resolved in this capture, e.g. it was already cached: no duration is better than one
+    // resolved while listening, e.g. it was already cached: no duration is better than one
     // belonging to a different handshake.
     void RecordPeerIdentityAndDiscovery(PychipCASEHandshakeMetricsRecord & record, const chip::Transport::PeerAddress & address)
     {
@@ -508,39 +600,57 @@ private:
 
     void BeginCASEHandshakeRecord(uint64_t now, uint16_t exchangeId, chip::NodeId localEphemeralNodeId)
     {
-        if (mRecordedCASEHandshakeCount >= mCASEHandshakeRecords.size())
+        PychipCASEHandshakeMetricsRecord * slot = nullptr;
+        for (auto & candidate : mInFlightCASEHandshakes)
         {
-            mDroppedCASEHandshakeCount++;
-            return;
+            if (IsSlotFree(candidate))
+            {
+                slot = &candidate;
+                break;
+            }
         }
-        PychipCASEHandshakeMetricsRecord & record = mCASEHandshakeRecords[mRecordedCASEHandshakeCount];
-        record                                    = PychipCASEHandshakeMetricsRecord{};
-        record.sigma1SentTimestampUs              = now;
-        record.exchangeId                         = exchangeId;
-        record.localEphemeralNodeId               = localEphemeralNodeId;
-        record.recordedFields                     = PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_SIGMA1_SENT;
 
-        // Discovery is not attached here: which peer this handshake is for is still unknown.
-        // It is attached once the peer replies and its address identifies the lookup.
-        mRecordedCASEHandshakeCount++;
+        if (slot == nullptr)
+        {
+            // Every slot is occupied. A handshake that never concludes, typically one that timed
+            // out with no reply, would otherwise hold its slot for the rest of the run, so give up
+            // whichever has been waiting longest and count it as abandoned.
+            for (auto & candidate : mInFlightCASEHandshakes)
+            {
+                if (slot == nullptr || candidate.sigma1SentTimestampUs < slot->sigma1SentTimestampUs)
+                {
+                    slot = &candidate;
+                }
+            }
+            mAbandonedCASEHandshakeCount++;
+        }
+
+        *slot                       = PychipCASEHandshakeMetricsRecord{};
+        slot->sigma1SentTimestampUs = now;
+        slot->exchangeId            = exchangeId;
+        slot->localEphemeralNodeId  = localEphemeralNodeId;
+        slot->recordedFields        = PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_SIGMA1_SENT;
+
+        // Discovery is not attached here: which peer this handshake is for is still unknown. It is
+        // attached once the peer replies and its address identifies the lookup.
     }
 
     // Ignored if the field was already set: an MRP retransmission or a duplicate delivery
-    // must not move the timestamp of the first occurrence.
-    static void RecordTimestamp(PychipCASEHandshakeMetricsRecord & record, uint64_t PychipCASEHandshakeMetricsRecord::* field,
+    // must not move the timestamp of the first occurrence. Returns true only on the transition,
+    // so a caller can act once on a handshake reaching a given state.
+    static bool RecordTimestamp(PychipCASEHandshakeMetricsRecord & record, uint64_t PychipCASEHandshakeMetricsRecord::* field,
                                 uint8_t bit, uint64_t now)
     {
-        VerifyOrReturn((record.recordedFields & bit) == 0);
+        VerifyOrReturnValue((record.recordedFields & bit) == 0, false);
         record.*field         = now;
         record.recordedFields = static_cast<uint8_t>(record.recordedFields | bit);
+        return true;
     }
 
-    // Heap-allocated so the capture size is the caller's choice rather than a compile-time
-    // constant. Acceptable here because this file is host-test-only, per the static_assert
-    // above; it is not part of any device build.
-    std::vector<PychipCASEHandshakeMetricsRecord> mCASEHandshakeRecords;
-    uint32_t mRecordedCASEHandshakeCount = 0;
-    uint32_t mDroppedCASEHandshakeCount  = 0;
+    // Scratch space for handshakes in progress. Fixed and small, because it holds only what is
+    // currently overlapping rather than a history of everything that has been run.
+    PychipCASEHandshakeMetricsRecord mInFlightCASEHandshakes[PYCHIP_CASE_HANDSHAKE_METRICS_MAX_IN_FLIGHT]{};
+    uint32_t mAbandonedCASEHandshakeCount = 0;
     PendingDeviceDiscovery mPendingDiscoveries[kMaxConcurrentDeviceDiscoveries]{};
 };
 
@@ -579,16 +689,16 @@ PyChipError pychip_case_capture_get_snapshot(PychipCaseCaptureSnapshot * out)
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
-PyChipError pychip_case_handshake_metrics_start_capture(uint32_t maxCASEHandshakes)
+PyChipError pychip_case_handshake_metrics_start_notifications(uint32_t depth)
 {
-    // Rejected here rather than on the main loop, so an oversized request cannot reach the
-    // allocation and take the process down with a bad_alloc the caller cannot handle.
-    VerifyOrReturnError(maxCASEHandshakes <= PYCHIP_CASE_HANDSHAKE_METRICS_MAX_CAPACITY,
+    VerifyOrReturnError(depth <= PYCHIP_CASE_HANDSHAKE_METRICS_NOTIFICATION_QUEUE_MAX_DEPTH,
                         ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
 
-    const uint32_t capacity = (maxCASEHandshakes == 0) ? PYCHIP_CASE_HANDSHAKE_METRICS_DEFAULT_CAPACITY : maxCASEHandshakes;
-    chip::MainLoopWork::ExecuteInMainLoop([capacity] {
-        gCASEHandshakeMetricsBackend.ResetWithCapacity(capacity);
+    // The notification queue carries its own lock, so it is opened on the calling thread. Registering the
+    // backend does go through the event loop, because that is where the tracing registry lives.
+    gCompletedCASEHandshakeQueue.Open(depth == 0 ? PYCHIP_CASE_HANDSHAKE_METRICS_NOTIFICATION_QUEUE_DEFAULT_DEPTH : depth);
+    chip::MainLoopWork::ExecuteInMainLoop([] {
+        gCASEHandshakeMetricsBackend.Reset();
         if (!gCASEHandshakeMetricsBackendRegistered)
         {
             chip::Tracing::Register(gCASEHandshakeMetricsBackend);
@@ -598,8 +708,9 @@ PyChipError pychip_case_handshake_metrics_start_capture(uint32_t maxCASEHandshak
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
-PyChipError pychip_case_handshake_metrics_stop_capture(void)
+PyChipError pychip_case_handshake_metrics_stop_notifications(void)
 {
+    gCompletedCASEHandshakeQueue.Close();
     chip::MainLoopWork::ExecuteInMainLoop([] {
         if (gCASEHandshakeMetricsBackendRegistered)
         {
@@ -610,28 +721,27 @@ PyChipError pychip_case_handshake_metrics_stop_capture(void)
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
-PyChipError pychip_case_handshake_metrics_reset_capture(void)
+PyChipError pychip_case_handshake_metrics_wait_for_notification(PychipCASEHandshakeMetricsRecord * out, uint32_t timeoutMs,
+                                                                uint8_t * received, uint32_t * dropped)
 {
-    chip::MainLoopWork::ExecuteInMainLoop([] { gCASEHandshakeMetricsBackend.ClearRecordsKeepingCapacity(); });
+    VerifyOrReturnError(out != nullptr && received != nullptr && dropped != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    std::memset(out, 0, sizeof(*out));
+    uint32_t droppedCount = 0;
+    const bool gotRecord  = gCompletedCASEHandshakeQueue.Wait(*out, timeoutMs, droppedCount);
+
+    *received = gotRecord ? 1u : 0u;
+    *dropped  = droppedCount;
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
-PyChipError pychip_case_handshake_metrics_get_records(PychipCASEHandshakeMetricsRecord * out, uint32_t capacity, uint32_t * written,
-                                                      uint32_t * available, uint32_t * dropped)
+PyChipError pychip_case_handshake_metrics_get_abandoned_count(uint32_t * abandoned)
 {
-    VerifyOrReturnError(written != nullptr && available != nullptr && dropped != nullptr,
-                        ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
-    VerifyOrReturnError(out != nullptr || capacity == 0, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(abandoned != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
 
-    uint32_t writtenCount   = 0;
-    uint32_t availableCount = 0;
-    uint32_t droppedCount   = 0;
-    chip::MainLoopWork::ExecuteInMainLoop(
-        [&] { gCASEHandshakeMetricsBackend.CopyCASEHandshakeRecords(out, capacity, writtenCount, availableCount, droppedCount); });
-
-    *written   = writtenCount;
-    *available = availableCount;
-    *dropped   = droppedCount;
+    uint32_t count = 0;
+    chip::MainLoopWork::ExecuteInMainLoop([&] { count = gCASEHandshakeMetricsBackend.AbandonedCASEHandshakeCount(); });
+    *abandoned = count;
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
