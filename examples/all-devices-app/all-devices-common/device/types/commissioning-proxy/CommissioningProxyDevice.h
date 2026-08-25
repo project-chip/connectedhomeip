@@ -40,9 +40,10 @@ namespace app {
  * ProxyScanRequest. Such a build is only useful to keep a no-transport configuration
  * compiling; a real product registers at least one transport.
  *
- * Transports are supplied by subclasses, one per transport the platform has: see
- * impl/CommissioningProxyBleDevice.h. A subclass owns its transport as a member and
- * hands it to AddTransport() from its constructor body.
+ * Transports are composed in, not subclassed in: the platform factory override owns one
+ * transport driver per technology it has compiled in and hands each to AddTransport().
+ * Adding a technology is a transport driver plus one more AddTransport() call, with no
+ * new device type and nothing here that knows which technologies exist.
  */
 class CommissioningProxyDevice : public SingleEndpoint
 {
@@ -58,35 +59,34 @@ public:
     };
 
     /// @param config the cluster's feature map and supported Wi-Fi bands. Injected
-    ///               rather than fixed here because which features a proxy offers is a
-    ///               product decision; subclasses supply a default that matches the
-    ///               transport they add.
+    ///               rather than fixed here because which features a proxy offers
+    ///               follows from the transports the platform built in, which only the
+    ///               caller knows.
     CommissioningProxyDevice(const Context & context,
                              const Clusters::CommissioningProxy::CommissioningProxyCluster::Config & config);
     ~CommissioningProxyDevice() override = default;
 
-    // Non-copyable / non-movable: subclasses pass AddTransport() a reference to a
-    // transport they own as a member, and copying the device would leave that
-    // reference pointing at the original's member.
+    // Non-copyable / non-movable: the device holds pointers to transports it does not
+    // own, and a registered transport holds a pointer back to the cluster this device
+    // creates.
     CommissioningProxyDevice(const CommissioningProxyDevice &)             = delete;
     CommissioningProxyDevice & operator=(const CommissioningProxyDevice &) = delete;
     CommissioningProxyDevice(CommissioningProxyDevice &&)                  = delete;
     CommissioningProxyDevice & operator=(CommissioningProxyDevice &&)      = delete;
 
+    /**
+     * Add a transport this device will expose. Call once per transport before
+     * Register(); each is registered on the cluster when the device registers.
+     *
+     * The device does not take ownership: @p transport must outlive it, and must not be
+     * shared with another device, since registering hands the transport a pointer back
+     * to this device's cluster.
+     */
+    void AddTransport(Clusters::CommissioningProxy::CommissioningProxyTransport & transport);
+
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
-
-protected:
-    /**
-     * Add a transport this device will expose, to be registered on the cluster when
-     * the device is registered.
-     *
-     * Call this from a subclass constructor body, not from its member initializer
-     * list: the transport is a subclass member and so is constructed after this base.
-     * @p transport must outlive the device.
-     */
-    void AddTransport(Clusters::CommissioningProxy::CommissioningProxyTransport & transport);
 
 private:
     // One slot per transport type; matches CommissioningProxyCluster's own limit.

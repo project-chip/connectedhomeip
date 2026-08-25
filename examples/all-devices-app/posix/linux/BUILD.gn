@@ -57,10 +57,9 @@ source_set("linux") {
   deps += [ "${chip_root}/third_party/jsoncpp" ]
 
   if (chip_config_network_layer_ble) {
-    # CommissioningProxyBleAdapter implements the cluster's BLE adapter interface,
-    # and the BLE proxy device is the one this platform registers.
+    # CommissioningProxyBleAdapter implements the cluster's BLE adapter interface, and
+    # this target owns the BLE transport driver it is composed onto the proxy device with.
     deps += [
-      "${chip_root}/examples/all-devices-app/all-devices-common/device/types/commissioning-proxy:ble",
       "${chip_root}/src/app/clusters/commissioning-proxy-server:ble-transport",
     ]
   }

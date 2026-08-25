@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/src/ble/ble.gni")
 
 source_set("commissioning-proxy") {
   # The cluster and its transport-agnostic bookkeeping come from the
@@ -22,8 +21,9 @@ source_set("commissioning-proxy") {
   # CodegenIntegration.cpp is never compiled — it wires the Ember/codegen path which
   # this app does not use.
   #
-  # Transport-agnostic: a transport is added by a subclass under impl/, each in its own
-  # source_set, so a platform without that transport never compiles it.
+  # Transport-agnostic, and no per-transport target here: the platform factory override
+  # depends on the transport drivers it has and composes them onto this device with
+  # AddTransport().
   sources = [
     "CommissioningProxyDevice.cpp",
     "CommissioningProxyDevice.h",
@@ -37,25 +37,4 @@ source_set("commissioning-proxy") {
   ]
 
   include_dirs = [ "." ]
-}
-
-# Commissioning proxy over BLE.  The BLE transport driver lives with the cluster in
-# src/, and this app supplies the platform adapter it needs
-# (posix/linux/CommissioningProxyBleAdapter).
-#
-# Only defined when BLE is enabled, matching the ble-transport source_set it depends
-# on: gn resolves every target in a loaded BUILD.gn file, so defining this
-# unconditionally breaks generation for a no-BLE build even when nothing depends on it.
-if (chip_config_network_layer_ble) {
-  source_set("ble") {
-    sources = [
-      "impl/CommissioningProxyBleDevice.cpp",
-      "impl/CommissioningProxyBleDevice.h",
-    ]
-
-    public_deps = [
-      ":commissioning-proxy",
-      "${chip_root}/src/app/clusters/commissioning-proxy-server:ble-transport",
-    ]
-  }
 }
