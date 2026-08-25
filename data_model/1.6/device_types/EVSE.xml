@@ -78,29 +78,7 @@ Davis, CA 95616, USA
     </cluster>
   </clusters>
   <composedDeviceTypes>
-    <deviceType deviceTypeId="0x050D" deviceTypeName="Device Energy Management" deviceTypeLocation="childEndpoint">
-      <mandatoryConform/>
-      <constraint>
-        <min value="1"/>
-      </constraint>
-      <clusterRequirements>
-        <cluster id="0x0098" name="Device Energy Management">
-          <features>
-            <feature code="PFR">
-              <mandatoryConform/>
-            </feature>
-            <feature code="PA">
-              <describedConform/>
-            </feature>
-          </features>
-        </cluster>
-      </clusterRequirements>
-    </deviceType>
-    <deviceType deviceTypeId="0x0510" deviceTypeName="Electrical Sensor" deviceTypeLocation="childEndpoint">
-      <mandatoryConform/>
-      <constraint>
-        <min value="1"/>
-      </constraint>
+    <deviceType deviceTypeId="0x0510" deviceTypeName="Electrical Sensor">
       <clusterRequirements>
         <cluster id="0x0090" name="Electrical Power Measurement">
           <mandatoryConform/>
@@ -110,11 +88,19 @@ Davis, CA 95616, USA
         </cluster>
       </clusterRequirements>
     </deviceType>
-    <deviceType deviceTypeId="0x0011" deviceTypeName="Power Source" deviceTypeLocation="childEndpoint">
+  </composedDeviceTypes>
+  <composedDeviceTypes>
+    <cluster id="0x0003" name="Identify" side="server">
+      <optionalConform/>
+    </cluster>
+    <cluster id="0x0099" name="Energy EVSE" side="server">
       <mandatoryConform/>
-      <constraint>
-        <min value="1"/>
-      </constraint>
-    </deviceType>
+    </cluster>
+    <cluster id="0x009D" name="Energy EVSE Mode" side="server">
+      <mandatoryConform/>
+    </cluster>
+    <cluster id="0x0402" name="Temperature Measurement" side="server">
+      <optionalConform/>
+    </cluster>
   </composedDeviceTypes>
 </deviceType>
