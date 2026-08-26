@@ -67,6 +67,7 @@ notifications:
       and merged.
 
 groups:
+<<<<<<< HEAD
   ############################################################
   #  Shared Reviewer Groups
   ############################################################
@@ -244,6 +245,193 @@ groups:
       teams: [reviewers-qorvo]
     reviews:
       request: 0 # Do not auto-add
+=======
+    ############################################################
+    #  Shared Reviewer Groups
+    ############################################################
+    shared-reviewers-amazon:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-amazon]
+        reviews:
+            request: 0 # Do not auto-add
+    shared-reviewers-apple:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-apple]
+        reviews:
+            request: 0 # Do not auto-add
+    shared-reviewers-bosch:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-bosch]
+        reviews:
+            request: 0 # Do not auto-add
+    shared-reviewers-comcast:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-comcast]
+        reviews:
+            request: 0 # Do not auto-add
+    shared-reviewers-cablelabs:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-cablelabs]
+        reviews:
+            request: 0 # Do not auto-add
+    shared-reviewers-espressif:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-espressif]
+        reviews:
+            request: 0 # Do not auto-add
+    shared-reviewers-google:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-google]
+        reviews:
+            request: 0 # Do not auto-add
+    shared-reviewers-geo:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-geo]
+        reviews:
+            request: 0 # Do not auto-add
+    shared-reviewers-grundfos:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-grundfos]
+        reviews:
+            request: 0 # Do not auto-add
+    shared-reviewers-irobot:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-irobot]
+        reviews:
+            request: 0 # Do not auto-add
+    shared-reviewers-ikea:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-ikea]
+        reviews:
+            request: 0 # Do not auto-add
+    shared-reviewers-lg:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-lg]
+        reviews:
+            request: 0 # Do not auto-add
+    shared-reviewers-nordic:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-nordic]
+        reviews:
+            request: 0 # Do not auto-add
+    shared-reviewers-nxp:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-nxp]
+        reviews:
+            request: 0 # Do not auto-add
+    shared-reviewers-samsung:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-samsung]
+        reviews:
+            request: 0 # Do not auto-add
+    shared-reviewers-eve:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-eve]
+        reviews:
+            request: 0 # Do not auto-add
+    # shared-reviewers-signify disabled for now, because the reviewers-signify
+    # team is empty and pullapprove seems to mis-handle that badly and treats
+    # _all_ reviewers as being in this group.
+    #
+    # See https://github.com/dropseed/pullapprove/issues/71
+    #
+    # shared-reviewers-signify:
+    #     type: optional
+    #     conditions:
+    #         - files.include('*')
+    #     reviewers:
+    #         teams: [reviewers-signify]
+    #     reviews:
+    #         request: 0 # Do not auto-add
+    shared-reviewers-silabs:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-silabs]
+        reviews:
+            request: 0 # Do not auto-add
+    shared-reviewers-somfy:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-somfy]
+        reviews:
+            request: 0 # Do not auto-add
+    shared-reviewers-tcl:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-tcl]
+        reviews:
+            request: 0 # Do not auto-add
+    shared-reviewers-qorvo:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-qorvo]
+        reviews:
+            request: 0 # Do not auto-add
+    shared-reviewers-velux:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-velux]
+        reviews:
+            request: 0 # Do not auto-add
+>>>>>>> ac3956e (Remove empty reviewer groups from pullapprove (#73784))
 
   ############################################################
   #  Folder specific review requirements. A PR must meet all
