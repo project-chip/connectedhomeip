@@ -466,7 +466,7 @@ class CTC_BaseDataClass : public CTC_BaseDataClassBase
         kValidated,   // New value validated and ready for commit
     };
 
-    T mValueStorage[2];                                          ///< Double-buffered value storage
+    T mValueStorage[2]{};                                        ///< Double-buffered value storage
     StorageState mHoldState[2] = { StorageState::kEmpty };       ///< Storage state tracking
     std::atomic<UpdateState> mUpdateState{ UpdateState::kIdle }; ///< Current update state
     std::atomic<uint8_t> mActiveValueIdx{ 0 };                   ///< Index of active value storage

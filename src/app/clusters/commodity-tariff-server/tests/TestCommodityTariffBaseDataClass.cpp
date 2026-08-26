@@ -28,6 +28,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
+#include <new>
 
 #include <lib/support/CodeUtils.h>
 
@@ -121,6 +123,34 @@ TEST_F(TestCommodityTariffBaseDataClass, ScalarValueUpdateFlow)
 
     EXPECT_EQ(data.GetValue(), data_sample_2);
     EXPECT_TRUE(data.HasValue());
+}
+
+TEST_F(TestCommodityTariffBaseDataClass, ScalarStorageInitializedOnConstruction)
+{
+    // The double-buffered storage must be initialized by the constructor even when the
+    // object lives in memory that is not zeroed, otherwise the first change detection
+    // compares the incoming value against indeterminate bytes.
+    constexpr uint8_t kFillByte      = 0xAB;
+    constexpr uint32_t kFillAsUint32 = 0xABABABAB;
+
+    alignas(CTC_BaseDataClass<uint32_t>) uint8_t storage[sizeof(CTC_BaseDataClass<uint32_t>)];
+    memset(storage, kFillByte, sizeof(storage));
+
+    auto * data = new (storage) CTC_BaseDataClass<uint32_t>(1);
+
+    // The contract itself: construction initializes the active slot, independent
+    // of how change detection later behaves.
+    EXPECT_EQ(data->GetValue(), 0u);
+    EXPECT_FALSE(data->HasValue());
+
+    EXPECT_EQ(data->SetNewValue(kFillAsUint32), CHIP_NO_ERROR);
+    EXPECT_EQ(data->UpdateBegin(nullptr), CHIP_NO_ERROR);
+    EXPECT_TRUE(data->UpdateFinish(true));
+
+    EXPECT_TRUE(data->HasValue());
+    EXPECT_EQ(data->GetValue(), kFillAsUint32);
+
+    data->~CTC_BaseDataClass();
 }
 
 TEST_F(TestCommodityTariffBaseDataClass, ScalarValueNoChangeDetection)
