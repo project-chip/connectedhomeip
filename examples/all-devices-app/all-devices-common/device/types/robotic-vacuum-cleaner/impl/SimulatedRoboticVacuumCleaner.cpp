@@ -15,11 +15,11 @@
  *    limitations under the License.
  */
 
-#include <device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.h>
-#include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationLogic.h>
-#include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationTopology.h>
 #include <clusters/RvcCleanMode/Enums.h>
 #include <clusters/RvcRunMode/Enums.h>
+#include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationLogic.h>
+#include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationTopology.h>
+#include <device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -53,17 +53,17 @@ const RunModeOption kRunModeOptions[] = {
     { "Mapping"_span, kRunModeMapping, Span<const ModeTagStructType>(kRunModeMappingTags) },
 };
 
-const ModeTagStructType kCleanModeQuickTags[]     = { { .value = to_underlying(RvcCleanMode::ModeTag::kVacuum) },
-                                                      { .value = to_underlying(RvcCleanMode::ModeTag::kQuick) } };
-const ModeTagStructType kCleanModeAutoTags[]      = { { .value = to_underlying(RvcCleanMode::ModeTag::kAuto) },
-                                                      { .value = to_underlying(RvcCleanMode::ModeTag::kVacuum) } };
-const ModeTagStructType kCleanModeDeepCleanTags[] = { { .value = to_underlying(RvcCleanMode::ModeTag::kMop) },
-                                                      { .value = to_underlying(RvcCleanMode::ModeTag::kDeepClean) },
-                                                      { .value = to_underlying(RvcCleanMode::ModeTag::kVacuum) } };
-const ModeTagStructType kCleanModeQuietTags[]     = { { .value = to_underlying(RvcCleanMode::ModeTag::kQuiet) },
-                                                      { .value = to_underlying(RvcCleanMode::ModeTag::kVacuum) } };
-const ModeTagStructType kCleanModeMaxVacTags[]    = { { .value = to_underlying(RvcCleanMode::ModeTag::kVacuum) },
-                                                      { .value = to_underlying(RvcCleanMode::ModeTag::kDeepClean) } };
+const ModeTagStructType kCleanModeQuickTags[]      = { { .value = to_underlying(RvcCleanMode::ModeTag::kVacuum) },
+                                                       { .value = to_underlying(RvcCleanMode::ModeTag::kQuick) } };
+const ModeTagStructType kCleanModeAutoTags[]       = { { .value = to_underlying(RvcCleanMode::ModeTag::kAuto) },
+                                                       { .value = to_underlying(RvcCleanMode::ModeTag::kVacuum) } };
+const ModeTagStructType kCleanModeDeepCleanTags[]  = { { .value = to_underlying(RvcCleanMode::ModeTag::kMop) },
+                                                       { .value = to_underlying(RvcCleanMode::ModeTag::kDeepClean) },
+                                                       { .value = to_underlying(RvcCleanMode::ModeTag::kVacuum) } };
+const ModeTagStructType kCleanModeQuietTags[]      = { { .value = to_underlying(RvcCleanMode::ModeTag::kQuiet) },
+                                                       { .value = to_underlying(RvcCleanMode::ModeTag::kVacuum) } };
+const ModeTagStructType kCleanModeMaxVacTags[]     = { { .value = to_underlying(RvcCleanMode::ModeTag::kVacuum) },
+                                                       { .value = to_underlying(RvcCleanMode::ModeTag::kDeepClean) } };
 const ModeTagStructType kCleanModeVacThenMopTags[] = { { .value = to_underlying(RvcCleanMode::ModeTag::kVacuum) },
                                                        { .value = to_underlying(RvcCleanMode::ModeTag::kMop) },
                                                        { .value = to_underlying(RvcCleanMode::ModeTag::kVacuumThenMop) } };
@@ -193,10 +193,12 @@ void SimulatedRoboticVacuumCleaner::SetDeviceToIdleState()
     switch (mPhysicalDockState)
     {
     case PhysicalDockState::kOnDockCharging:
-        LogErrorOnFailure(OperationalState().SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kCharging)));
+        LogErrorOnFailure(
+            OperationalState().SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kCharging)));
         break;
     case PhysicalDockState::kOnDock:
-        LogErrorOnFailure(OperationalState().SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kDocked)));
+        LogErrorOnFailure(
+            OperationalState().SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kDocked)));
         break;
     case PhysicalDockState::kOffDock:
         LogErrorOnFailure(OperationalState().SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped)));
@@ -212,7 +214,8 @@ void SimulatedRoboticVacuumCleaner::UpdateServiceAreaProgressOnExit()
     Structs::ProgressStruct::Type progressElement;
     while (GetServiceAreaCluster().GetProgressElementByIndex(i, progressElement))
     {
-        if (progressElement.status == OperationalStatusEnum::kOperating || progressElement.status == OperationalStatusEnum::kPending)
+        if (progressElement.status == OperationalStatusEnum::kOperating ||
+            progressElement.status == OperationalStatusEnum::kPending)
         {
             GetServiceAreaCluster().SetProgressStatus(progressElement.areaID, OperationalStatusEnum::kSkipped);
         }
@@ -310,7 +313,8 @@ void SimulatedRoboticVacuumCleaner::HandleGoHomeCommandCallback(OperationalState
         CancelTimer();
         RunMode().UpdateCurrentMode(kRunModeIdle);
 
-        auto error = OperationalState().SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
+        auto error =
+            OperationalState().SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
         err.Set((error == CHIP_NO_ERROR) ? to_underlying(OperationalState::ErrorStateEnum::kNoError)
                                          : to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
         return;
@@ -479,7 +483,7 @@ void SimulatedRoboticVacuumCleaner::SetAttributesAtCleanStart()
 
 void SimulatedRoboticVacuumCleaner::GoToNextArea(OperationalStatusEnum currentAreaOpState, bool & finished)
 {
-    finished = true;
+    finished       = true;
     auto & cluster = GetServiceAreaCluster();
 
     auto currentAreaIdN = cluster.GetCurrentArea();
@@ -613,7 +617,7 @@ CHIP_ERROR SimulatedRoboticVacuumCleaner::CleanModeAppDelegate::GetModeTagsByInd
 }
 
 void SimulatedRoboticVacuumCleaner::HandleRunModeChangeToMode(uint8_t newMode,
-                                                               ModeBase::Commands::ChangeToModeResponse::Type & response)
+                                                              ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
     ChipLogProgress(Zcl, "SimulatedRoboticVacuumCleaner: RunMode ChangeToMode(%u) received.", newMode);
 
@@ -697,7 +701,8 @@ void SimulatedRoboticVacuumCleaner::HandleCharged()
     if (RunMode().GetCurrentMode() == kRunModeIdle)
     {
         CancelTimer();
-        LogErrorOnFailure(OperationalState().SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kDocked)));
+        LogErrorOnFailure(
+            OperationalState().SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kDocked)));
     }
     else
     {
@@ -734,7 +739,8 @@ void SimulatedRoboticVacuumCleaner::HandleDocked()
 
 void SimulatedRoboticVacuumCleaner::HandleChargerFound()
 {
-    if (OperationalState().GetCurrentOperationalState() != to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger))
+    if (OperationalState().GetCurrentOperationalState() !=
+        to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger))
     {
         ChipLogError(Zcl, "'ChargerFound' is only accepted when the device is in the 'SeekingCharger' state.");
         return;
@@ -754,7 +760,8 @@ void SimulatedRoboticVacuumCleaner::HandleLowCharge()
     }
 
     CancelTimer();
-    LogErrorOnFailure(OperationalState().SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger)));
+    LogErrorOnFailure(
+        OperationalState().SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger)));
 }
 
 void SimulatedRoboticVacuumCleaner::HandleActivityComplete()

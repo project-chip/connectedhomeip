@@ -103,8 +103,8 @@ public:
     // -- ServiceArea::Delegate --
     CHIP_ERROR Init() override;
     bool IsSetSelectedAreasAllowed(MutableCharSpan & statusText) override;
-    bool IsValidSelectAreasSet(const Span<const uint32_t> & selectedAreas, Clusters::ServiceArea::SelectAreasStatus & locationStatus,
-                               MutableCharSpan & statusText) override;
+    bool IsValidSelectAreasSet(const Span<const uint32_t> & selectedAreas,
+                               Clusters::ServiceArea::SelectAreasStatus & locationStatus, MutableCharSpan & statusText) override;
     bool HandleSkipArea(uint32_t skippedArea, MutableCharSpan & skipStatusText) override;
     bool IsSupportedAreasChangeAllowed() override;
     bool IsSupportedMapChangeAllowed() override;
