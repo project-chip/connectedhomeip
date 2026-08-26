@@ -92,53 +92,39 @@ class TC_IDM_10_7(DeviceConformanceTests):
             self.fail_current_test("Failed to find or establish PASE session over NTL")
 
         self.step(2)    # Read of Limited Data Model
-
-        wildcard_success = await self._wildcard_read(node_id)
-        if not wildcard_success:
-            self.fail_current_test("Wildcard read of Limited Data Model failed!")
+        await self._wildcard_read(node_id)
 
         limited_data_model = self.endpoints
         log.debug("limited_data_model: %s", limited_data_model)
         self.build_spec_xmls()
 
         self.step(3)    # Limited Data Model : Check clusters presence
-        mandatory_clusters_success = self._check_mandatory_clusters_presence(limited_data_model)
-        if not mandatory_clusters_success:
-            self.fail_current_test("Missing mandatory clusters in Limited Data Model")
+        self._check_mandatory_clusters_presence(limited_data_model)
 
         self.step(4)    # Limited Data Model : Check clusters revisions
-        revisions_success = self._check_revisions()
-        if not revisions_success:
-            self.fail_current_test("Problems with cluster revision on at least one cluster")
+        self._check_revisions()
 
         self.step(5)    # Limited Data Model : Check clusters conformance
-        conformance_success = self._check_conformance()
-        if not conformance_success:
-            self.fail_current_test("Problems with Limited Data Model conformance")
+        self._check_conformance()
 
         self.step(6)    # Complete the commissioning (over NTL)
         commissioning_success = await self.commission_ntl_device(setupPayload)
-        if not commissioning_success:
-            self.fail_current_test("Commissioning over NTL failed")
+        asserts.assert_true(commissioning_success, "Commissioning over NTL failed")
 
         self.step(7)    # Discovery of full Data Model
-        wildcard_success = await self._wildcard_read(node_id)
-        if not wildcard_success:
-            self.fail_current_test("Wildcard read of full Data Model failed!")
+        await self._wildcard_read(node_id)
 
         full_data_model = self.endpoints
         log.debug("full_data_model: %s", full_data_model)
 
         self.step(8)    # Limited and Full Data Model comparison
-        descriptor_compare_success = self._compare_descriptor_clusters(
+        self._compare_descriptor_clusters(
             limited_data_model=limited_data_model,
             full_data_model=full_data_model
         )
-        if not descriptor_compare_success:
-            self.fail_current_test("Limited and Full Data Model Descriptor clusters differ")
 
 
-    def _check_mandatory_clusters_presence(self, endpoints: dict) -> bool:
+    def _check_mandatory_clusters_presence(self, endpoints: dict) -> None:
         """
         Check that the limited data model contains the mandatory clusters:
         - On Endpoint 0:
@@ -151,154 +137,114 @@ class TC_IDM_10_7(DeviceConformanceTests):
         - On every endpoint listed in Endpoint 0 Descriptor.PartsList:
             Descriptor
 
-        Returns:
-            True if all required clusters are present, False otherwise.
+        Fails the test if required clusters are missing.
         """
-        try:
-            if endpoints is None:
-                log.error("endpoints is not available")
-                return False
+        asserts.assert_is_not_none(endpoints, "endpoints is not available")
 
-            # Check clusters presence on Endpoint 0
-            if 0 not in endpoints:
-                log.error("Endpoint 0 is missing from endpoints")
-                return False
+        # Check clusters presence on Endpoint 0
+        asserts.assert_true(0 in endpoints, "Endpoint 0 is missing from endpoints")
 
-            ep0 = endpoints[0]
+        ep0 = endpoints[0]
 
-            mandatory_ep0_clusters = [
-                Clusters.Descriptor,
-                Clusters.AccessControl,
-                Clusters.BasicInformation,
-                Clusters.GeneralCommissioning,
-                Clusters.OperationalCredentials,
-            ]
+        mandatory_ep0_clusters = [
+            Clusters.Descriptor,
+            Clusters.AccessControl,
+            Clusters.BasicInformation,
+            Clusters.GeneralCommissioning,
+            Clusters.OperationalCredentials,
+        ]
 
-            if self.check_pics("MCORE.COM.WIFI") or self.check_pics("MCORE.COM.THR"):
-                mandatory_ep0_clusters.append(Clusters.NetworkCommissioning)
+        if self.check_pics("MCORE.COM.WIFI") or self.check_pics("MCORE.COM.THR"):
+            mandatory_ep0_clusters.append(Clusters.NetworkCommissioning)
 
-            for cluster in mandatory_ep0_clusters:
-                if cluster not in ep0:
-                    log.error("Mandatory cluster missing on Endpoint 0: %s", cluster)
-                    return False
+        for cluster in mandatory_ep0_clusters:
+            asserts.assert_true(cluster in ep0, f"Mandatory cluster missing on Endpoint 0: {cluster}")
 
-            descriptor_cluster = ep0.get(Clusters.Descriptor)
-            if descriptor_cluster is None:
-                log.error("Descriptor cluster missing on Endpoint 0")
-                return False
+        descriptor_cluster = ep0.get(Clusters.Descriptor)
+        asserts.assert_is_not_none(descriptor_cluster, "Descriptor cluster missing on Endpoint 0")
 
-            if Clusters.Descriptor.Attributes.PartsList not in descriptor_cluster:
-                log.error("Endpoint 0 PartsList is missing")
-                return False
-            parts_list = descriptor_cluster[Clusters.Descriptor.Attributes.PartsList]
-            log.info("Endpoint 0 PartsList: %s", parts_list)
+        asserts.assert_true(
+            Clusters.Descriptor.Attributes.PartsList in descriptor_cluster,
+            "Endpoint 0 PartsList is missing"
+        )
+        parts_list = descriptor_cluster[Clusters.Descriptor.Attributes.PartsList]
+        log.info("Endpoint 0 PartsList: %s", parts_list)
 
-            # Check that every other Endpoints (listed in PartsList of EP0 descriptor) have a Descriptor cluster:
-            for endpoint_id in parts_list:
-                if endpoint_id == 0:
-                    log.error("Endpoint 0 must not be listed in Endpoint 0 PartsList")
-                    return False
+        # Check that every other endpoint listed in EP0 PartsList has a Descriptor cluster.
+        for endpoint_id in parts_list:
+            asserts.assert_true(endpoint_id != 0, "Endpoint 0 must not be listed in Endpoint 0 PartsList")
+            asserts.assert_true(endpoint_id in endpoints, f"Endpoint {endpoint_id} (listed in PartsList) is missing")
 
-                if endpoint_id not in endpoints:
-                    log.error("Endpoint %s (listed in PartsList) is missing", endpoint_id)
-                    return False
-
-                endpoint_clusters = endpoints[endpoint_id]
-                if Clusters.Descriptor not in endpoint_clusters:
-                    log.error("Descriptor cluster missing on Endpoint %s", endpoint_id)
-                    return False
-
-            # If EP0 contains Clusters.NetworkCommissioning, check that MCORE.COM.WIFI and MCORE.COM.THR are set consistently
-            ep0 = endpoints.get(0, {})
-            if Clusters.NetworkCommissioning in ep0:
-                asserts.assert_true(
-                    self.check_pics("MCORE.COM.WIFI") or self.check_pics("MCORE.COM.THR"),
-                    "Clusters.NetworkCommissioning is present in limited_data_model, "
-                    "so at least one of MCORE.COM.WIFI or MCORE.COM.THR must be true."
-                )
-            else:
-                asserts.assert_true(
-                    not self.check_pics("MCORE.COM.WIFI") and not self.check_pics("MCORE.COM.THR"),
-                    "Clusters.NetworkCommissioning is not present in limited_data_model, "
-                    "so both MCORE.COM.WIFI and MCORE.COM.THR must be false."
-                )
-
-            return True
-
-        except Exception:
-            log.exception("Mandatory clusters presence check failed")
-            return False
-
-    def _check_conformance(self) -> bool:
-        """
-        Run conformance checks, store problems, and return True on success or False on failure.
-        """
-        try:
-            ignore_in_progress_test_event_only_disallowed_for_certification = self.user_params.get(
-                "ignore_in_progress_test_event_only_disallowed_for_certification", True
-            )
-            allow_provisional_test_event_only_disallowed_for_certification = self.user_params.get(
-                "allow_provisional_test_event_only_disallowed_for_certification", False
+            endpoint_clusters = endpoints[endpoint_id]
+            asserts.assert_true(
+                Clusters.Descriptor in endpoint_clusters,
+                f"Descriptor cluster missing on Endpoint {endpoint_id}"
             )
 
-            success, problems = self.check_conformance(
-                ignore_in_progress_test_event_only_disallowed_for_certification,
-                self.is_pics_sdk_ci_only,
-                allow_provisional_test_event_only_disallowed_for_certification
+        # If EP0 contains NetworkCommissioning, PICS must indicate Thread or Wi-Fi support.
+        ep0 = endpoints.get(0, {})
+        if Clusters.NetworkCommissioning in ep0:
+            asserts.assert_true(
+                self.check_pics("MCORE.COM.WIFI") or self.check_pics("MCORE.COM.THR"),
+                "Clusters.NetworkCommissioning is present in limited_data_model, "
+                "so at least one of MCORE.COM.WIFI or MCORE.COM.THR must be true."
+            )
+        else:
+            asserts.assert_true(
+                not self.check_pics("MCORE.COM.WIFI") and not self.check_pics("MCORE.COM.THR"),
+                "Clusters.NetworkCommissioning is not present in limited_data_model, "
+                "so both MCORE.COM.WIFI and MCORE.COM.THR must be false."
             )
 
-            self.problems.extend(problems)
-            return success
-
-        except Exception:
-            log.exception("Conformance check failed with exception")
-            return False
-
-    def _check_revisions(self) -> bool:
+    def _check_conformance(self) -> None:
         """
-        Run revision checks, store problems, and return True on success or False on failure.
+        Run conformance checks, store problems, and fail the test on errors.
         """
-        try:
-            ignore_in_progress_test_event_only_disallowed_for_certification = self.user_params.get(
-                "ignore_in_progress_test_event_only_disallowed_for_certification", False
-            )
-            success, problems = self.check_revisions(
-                ignore_in_progress_test_event_only_disallowed_for_certification
-            )
-            self.problems.extend(problems)
-            return success
+        ignore_in_progress_test_event_only_disallowed_for_certification = self.user_params.get(
+            "ignore_in_progress_test_event_only_disallowed_for_certification", True
+        )
+        allow_provisional_test_event_only_disallowed_for_certification = self.user_params.get(
+            "allow_provisional_test_event_only_disallowed_for_certification", False
+        )
 
-        except Exception:
-            log.exception("Revision check failed with exception")
-            return False
+        success, problems = self.check_conformance(
+            ignore_in_progress_test_event_only_disallowed_for_certification,
+            self.is_pics_sdk_ci_only,
+            allow_provisional_test_event_only_disallowed_for_certification
+        )
 
-    async def _wildcard_read(self, node_id: int) -> bool:
+        self.problems.extend(problems)
+        asserts.assert_true(success, "Problems with Limited Data Model conformance")
+
+    def _check_revisions(self) -> None:
+        """
+        Run revision checks, store problems, and fail the test on errors.
+        """
+        ignore_in_progress_test_event_only_disallowed_for_certification = self.user_params.get(
+            "ignore_in_progress_test_event_only_disallowed_for_certification", False
+        )
+        success, problems = self.check_revisions(
+            ignore_in_progress_test_event_only_disallowed_for_certification
+        )
+        self.problems.extend(problems)
+        asserts.assert_true(success, "Problems with cluster revision on at least one cluster")
+
+    async def _wildcard_read(self, node_id: int) -> None:
         """
         Perform a wildcard read on the node and populate:
         - self.endpoints
         - self.endpoints_tlv
-
-        Returns:
-            True if the wildcard read succeeded, False otherwise.
         """
         log.info("wildcard_read")
+        wildcard_read = await self.default_controller.Read(node_id, [()])
 
-        try:
-            wildcard_read = await self.default_controller.Read(node_id, [()])
+        # All endpoints in "full object" indexing format
+        self.endpoints = wildcard_read.attributes
+        log.debug("self.endpoints: %s", self.endpoints)
 
-            # All endpoints in "full object" indexing format
-            self.endpoints = wildcard_read.attributes
-            log.debug("self.endpoints: %s", self.endpoints)
-
-            # All endpoints in raw TLV format
-            self.endpoints_tlv = wildcard_read.tlvAttributes
-            log.debug("self.endpoints_tlv: %s", self.endpoints_tlv)
-
-            return True
-
-        except Exception:
-            log.exception("Wildcard read failed for node 0x%X", node_id)
-            return False
+        # All endpoints in raw TLV format
+        self.endpoints_tlv = wildcard_read.tlvAttributes
+        log.debug("self.endpoints_tlv: %s", self.endpoints_tlv)
 
     def _normalize_for_order_insensitive_compare(self, value):
         if isinstance(value, dict):
@@ -318,97 +264,90 @@ class TC_IDM_10_7(DeviceConformanceTests):
 
         return ("scalar", value)
 
-    def _compare_descriptor_clusters(self, limited_data_model: dict, full_data_model: dict) -> bool:
+    def _compare_descriptor_clusters(self, limited_data_model: dict, full_data_model: dict) -> None:
         """
         Compare limited_data_model and full_data_model:
         - same number of endpoints
         - same endpoint IDs
         - for each endpoint, Descriptor cluster must be identical
 
-        Returns:
-            True if identical, False otherwise.
+        Fails the test if the descriptor clusters are not identical.
         """
-        try:
-            limited_endpoint_ids = set(limited_data_model.keys())
-            full_endpoint_ids = set(full_data_model.keys())
+        limited_endpoint_ids = set(limited_data_model.keys())
+        full_endpoint_ids = set(full_data_model.keys())
 
-            log.debug("Limited Data Model endpoints: %s", sorted(limited_endpoint_ids))
-            log.debug("Full Data Model endpoints: %s", sorted(full_endpoint_ids))
+        log.debug("Limited Data Model endpoints: %s", sorted(limited_endpoint_ids))
+        log.debug("Full Data Model endpoints: %s", sorted(full_endpoint_ids))
 
-            if len(limited_endpoint_ids) != len(full_endpoint_ids):
-                log.error(
-                    "Endpoint count mismatch: limited=%d full=%d",
-                    len(limited_endpoint_ids), len(full_endpoint_ids)
+        asserts.assert_equal(
+            len(limited_endpoint_ids),
+            len(full_endpoint_ids),
+            f"Endpoint count mismatch: limited={len(limited_endpoint_ids)} full={len(full_endpoint_ids)}"
+        )
+
+        if limited_endpoint_ids != full_endpoint_ids:
+            missing_in_full = limited_endpoint_ids - full_endpoint_ids
+            missing_in_limited = full_endpoint_ids - limited_endpoint_ids
+
+            if missing_in_full:
+                log.error("Endpoints missing in full_data_model: %s", sorted(missing_in_full))
+            if missing_in_limited:
+                log.error("Endpoints missing in limited_data_model: %s", sorted(missing_in_limited))
+            asserts.fail("Limited and full data model endpoint IDs differ")
+
+        # Compare limited_descriptor and full_descriptor attributes
+        attrs_to_compare = [
+            Clusters.Descriptor.Attributes.DeviceTypeList,
+            Clusters.Descriptor.Attributes.ServerList,
+            Clusters.Descriptor.Attributes.ClientList,
+            Clusters.Descriptor.Attributes.PartsList,
+            Clusters.Descriptor.Attributes.TagList,
+            Clusters.Descriptor.Attributes.EndpointUniqueID,
+        ]
+
+        for endpoint_id in sorted(limited_endpoint_ids):
+
+            limited_dm_clusters = limited_data_model.get(endpoint_id, {})
+            full_dm_clusters = full_data_model.get(endpoint_id, {})
+
+            asserts.assert_true(
+                Clusters.Descriptor in limited_dm_clusters,
+                f"Descriptor cluster missing in limited_data_model on endpoint {endpoint_id}"
+            )
+            asserts.assert_true(
+                Clusters.Descriptor in full_dm_clusters,
+                f"Descriptor cluster missing in full_data_model on endpoint {endpoint_id}"
+            )
+
+            limited_dm_descriptor = limited_dm_clusters[Clusters.Descriptor]
+            full_dm_descriptor = full_dm_clusters[Clusters.Descriptor]
+
+            for attr in attrs_to_compare:
+                limited_dm_has_attr = attr in limited_dm_descriptor
+                full_dm_has_attr = attr in full_dm_descriptor
+
+                asserts.assert_equal(
+                    limited_dm_has_attr,
+                    full_dm_has_attr,
+                    "Descriptor attribute "
+                    f"{attr} presence mismatch on endpoint {endpoint_id}: "
+                    f"limited_dm_has={limited_dm_has_attr}, full_dm_has={full_dm_has_attr}"
                 )
-                return False
 
-            if limited_endpoint_ids != full_endpoint_ids:
-                missing_in_full = limited_endpoint_ids - full_endpoint_ids
-                missing_in_limited = full_endpoint_ids - limited_endpoint_ids
+                if not limited_dm_has_attr:
+                    # Attribute is absent in both models; treat as identical.
+                    continue
 
-                if missing_in_full:
-                    log.error("Endpoints missing in full_data_model: %s", sorted(missing_in_full))
-                if missing_in_limited:
-                    log.error("Endpoints missing in limited_data_model: %s", sorted(missing_in_limited))
-                return False
+                limited_dm_val = limited_dm_descriptor[attr]
+                full_dm_val = full_dm_descriptor[attr]
+                asserts.assert_equal(
+                    self._normalize_for_order_insensitive_compare(limited_dm_val),
+                    self._normalize_for_order_insensitive_compare(full_dm_val),
+                    f"Descriptor attribute {attr} mismatch on endpoint {endpoint_id}: "
+                    f"limited={limited_dm_val}, full={full_dm_val}"
+                )
 
-            # Compare limited_descriptor and full_descriptor attributes
-            attrs_to_compare = [
-                Clusters.Descriptor.Attributes.DeviceTypeList,
-                Clusters.Descriptor.Attributes.ServerList,
-                Clusters.Descriptor.Attributes.ClientList,
-                Clusters.Descriptor.Attributes.PartsList,
-                Clusters.Descriptor.Attributes.TagList,
-                Clusters.Descriptor.Attributes.EndpointUniqueID,
-            ]
-
-            for endpoint_id in sorted(limited_endpoint_ids):
-
-                limited_dm_clusters = limited_data_model.get(endpoint_id, {})
-                full_dm_clusters = full_data_model.get(endpoint_id, {})
-
-                if Clusters.Descriptor not in limited_dm_clusters:
-                    log.error("Descriptor cluster missing in limited_data_model on endpoint %s", endpoint_id)
-                    return False
-
-                if Clusters.Descriptor not in full_dm_clusters:
-                    log.error("Descriptor cluster missing in full_data_model on endpoint %s", endpoint_id)
-                    return False
-
-                limited_dm_descriptor = limited_dm_clusters[Clusters.Descriptor]
-                full_dm_descriptor = full_dm_clusters[Clusters.Descriptor]
-
-                for attr in attrs_to_compare:
-                    limited_dm_has_attr = attr in limited_dm_descriptor
-                    full_dm_has_attr = attr in full_dm_descriptor
-
-                    if limited_dm_has_attr != full_dm_has_attr:
-                        log.error(
-                            "Descriptor attribute %s presence mismatch on endpoint %s: limited_dm_has=%s, full_dm_has=%s",
-                            attr,
-                            endpoint_id,
-                            limited_dm_has_attr,
-                            full_dm_has_attr,
-                        )
-                        return False
-
-                    if not limited_dm_has_attr:
-                        # Attribute is absent in both models; treat as identical.
-                        continue
-
-                    limited_dm_val = limited_dm_descriptor[attr]
-                    full_dm_val = full_dm_descriptor[attr]
-                    if self._normalize_for_order_insensitive_compare(limited_dm_val) != self._normalize_for_order_insensitive_compare(full_dm_val):
-                        log.error("Descriptor attribute %s mismatch on endpoint %s: limited=%s, full=%s",
-                                  attr, endpoint_id, limited_dm_val, full_dm_val)
-                        return False
-
-            log.info("Limited and Full Data Model Descriptor clusters are identical on all endpoints")
-            return True
-
-        except Exception:
-            log.exception("Descriptor cluster comparison failed")
-            return False
+        log.info("Limited and Full Data Model Descriptor clusters are identical on all endpoints")
 
 
 if __name__ == "__main__":
