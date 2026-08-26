@@ -146,7 +146,7 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
         self.step("6b", "TH reads ESAState", expectation="value is 0x03 (PowerAdjustActive)")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPowerAdjustActive)
 
-        self.step("7", "Wait up to 10 seconds", expectation="Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=NormalCompletion")
+        self.step("7", "Wait up to 10 seconds", expectation="Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=NormalCompletion, Duration >= 5 and Duration <= 7 (expected 5 seconds, allowing 2-second tolerance for device timer latency)")
         event_data = events_callback.wait_for_event_report(
             Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustEnd, timeout_sec=10)
         self.validate_power_range_adjust_end_event(
@@ -194,7 +194,7 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
         self.step("11a", "TH reads ESAState", expectation="value is 0x03 (PowerAdjustActive)")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPowerAdjustActive)
 
-        self.step("11b", "Wait up to 10 seconds", expectation="Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=NormalCompletion")
+        self.step("11b", "Wait up to 10 seconds", expectation="Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=NormalCompletion, Duration >= 5 and Duration <= 7 (expected 5 seconds, allowing 2-second tolerance for device timer latency)")
         event_data = events_callback.wait_for_event_report(
             Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustEnd, timeout_sec=10)
         self.validate_power_range_adjust_end_event(
@@ -218,7 +218,7 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
         self.step("12a", "TH reads ESAState", expectation="value is 0x03 (PowerAdjustActive)")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPowerAdjustActive)
 
-        self.step("12b", "Wait up to 10 seconds", expectation="Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=NormalCompletion")
+        self.step("12b", "Wait up to 10 seconds", expectation="Event DEM.S.E05(PowerRangeAdjustEnd) sent with Cause=NormalCompletion, Duration >= 5 and Duration <= 7 (expected 5 seconds, allowing 2-second tolerance for device timer latency)")
         event_data = events_callback.wait_for_event_report(
             Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustEnd, timeout_sec=10)
         self.validate_power_range_adjust_end_event(
