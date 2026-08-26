@@ -244,6 +244,8 @@ class DEMTestBase:
         from matter.clusters.Types import NullValue
 
         asserts.assert_true(hasattr(event_data, 'adjustment'), "Event should have 'adjustment' field")
+        asserts.assert_true(hasattr(event_data, 'duration'), "Event should have 'duration' field")
+
         asserts.assert_equal(event_data.adjustment.cause, expected_cause,
                              f"Expected cause {expected_cause}, got {event_data.adjustment.cause}")
 
@@ -280,6 +282,8 @@ class DEMTestBase:
                              that may cause the internal timer to expire up to 2 seconds later than expected.
         """
         asserts.assert_true(hasattr(event_data, 'cause'), "Event should have 'cause' field")
+        asserts.assert_true(hasattr(event_data, 'duration'), "Event should have 'duration' field")
+        asserts.assert_true(hasattr(event_data, 'energyUse'), "Event should have 'energyUse' field")
         asserts.assert_equal(event_data.cause, expected_cause,
                              f"Expected cause {expected_cause}, got {event_data.cause}")
 
