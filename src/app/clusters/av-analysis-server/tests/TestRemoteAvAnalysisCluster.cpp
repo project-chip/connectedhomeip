@@ -94,12 +94,12 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
             return CHIP_NO_ERROR;
         }
 
-        CHIP_ERROR RequestVideoStreamDeallocation(const ScopedNodeId & aCameraNode, uint16_t aAnalysisStreamId,
+        CHIP_ERROR RequestVideoStreamDeallocation(const ScopedNodeId & aCameraNode, uint16_t aVideoStreamId,
                                                   Callback & aCallback) override
         {
             mDeallocationRequests++;
             mLastCamera   = aCameraNode;
-            mLastStreamId = aAnalysisStreamId;
+            mLastStreamId = aVideoStreamId;
             mLastCallback = &aCallback;
             return CHIP_NO_ERROR;
         }

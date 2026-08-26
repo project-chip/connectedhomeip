@@ -66,11 +66,10 @@ CHIP_ERROR DefaultAvAnalysisCameraClient::RequestVideoStreamAllocation(const Sco
     return StartRequest(PendingRequest::kAllocate, aCameraNode, 0, aCallback);
 }
 
-CHIP_ERROR DefaultAvAnalysisCameraClient::RequestVideoStreamDeallocation(const ScopedNodeId & aCameraNode,
-                                                                         uint16_t aAnalysisStreamId,
+CHIP_ERROR DefaultAvAnalysisCameraClient::RequestVideoStreamDeallocation(const ScopedNodeId & aCameraNode, uint16_t aVideoStreamId,
                                                                          AvAnalysisCameraClient::Callback & aCallback)
 {
-    return StartRequest(PendingRequest::kDeallocate, aCameraNode, aAnalysisStreamId, aCallback);
+    return StartRequest(PendingRequest::kDeallocate, aCameraNode, aVideoStreamId, aCallback);
 }
 
 void DefaultAvAnalysisCameraClient::Cancel()
@@ -96,14 +95,14 @@ void DefaultAvAnalysisCameraClient::Cancel()
 }
 
 CHIP_ERROR DefaultAvAnalysisCameraClient::StartRequest(PendingRequest aRequest, const ScopedNodeId & aCameraNode,
-                                                       uint16_t aAnalysisStreamId, AvAnalysisCameraClient::Callback & aCallback)
+                                                       uint16_t aVideoStreamId, AvAnalysisCameraClient::Callback & aCallback)
 {
     VerifyOrReturnError(mCASESessionManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mPendingRequest == PendingRequest::kNone, CHIP_ERROR_BUSY);
 
-    mPendingRequest  = aRequest;
-    mPendingStreamId = aAnalysisStreamId;
-    mPendingCallback = &aCallback;
+    mPendingRequest       = aRequest;
+    mPendingVideoStreamId = aVideoStreamId;
+    mPendingCallback      = &aCallback;
 
     EstablishSession(aCameraNode);
     return CHIP_NO_ERROR;
@@ -312,7 +311,7 @@ void DefaultAvAnalysisCameraClient::OnDone(ReadClient * apReadClient)
             ChipLogError(Zcl, "AvAnalysisCameraClient: no CameraAVStreamManagement endpoint on the camera (%" CHIP_ERROR_FORMAT ")",
                          mDiscoveryError.Format());
             mDiscoveryPhase = DiscoveryPhase::kIdle;
-            FinishRequest(Status::Failure, mPendingStreamId);
+            FinishRequest(Status::Failure, mPendingVideoStreamId);
             return;
         }
         // Deallocation only needs the endpoint; the capability attributes feed the allocate request
@@ -333,7 +332,7 @@ void DefaultAvAnalysisCameraClient::OnDone(ReadClient * apReadClient)
     if (!mAnalysisUsageSupported && mPendingRequest == PendingRequest::kAllocate)
     {
         ChipLogError(Zcl, "AvAnalysisCameraClient: camera does not support the Analysis stream usage");
-        FinishRequest(Status::InvalidInState, mPendingStreamId);
+        FinishRequest(Status::InvalidInState, mPendingVideoStreamId);
         return;
     }
 
@@ -345,7 +344,7 @@ void DefaultAvAnalysisCameraClient::OnProfileDiscoveryComplete(CHIP_ERROR aError
     if (aError != CHIP_NO_ERROR || !mSessionHolder || mExchangeMgr == nullptr)
     {
         ChipLogError(Zcl, "AvAnalysisCameraClient: profile discovery failed: %" CHIP_ERROR_FORMAT, aError.Format());
-        FinishRequest(Status::Failure, mPendingStreamId);
+        FinishRequest(Status::Failure, mPendingVideoStreamId);
         return;
     }
 
@@ -353,7 +352,7 @@ void DefaultAvAnalysisCameraClient::OnProfileDiscoveryComplete(CHIP_ERROR aError
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "AvAnalysisCameraClient: failed to send command: %" CHIP_ERROR_FORMAT, err.Format());
-        FinishRequest(Status::Failure, mPendingStreamId);
+        FinishRequest(Status::Failure, mPendingVideoStreamId);
     }
 }
 
@@ -413,7 +412,7 @@ void DefaultAvAnalysisCameraClient::OnDeviceConnectionFailure(void * context, co
 {
     auto * self = static_cast<DefaultAvAnalysisCameraClient *>(context);
     ChipLogError(Zcl, "AvAnalysisCameraClient: could not reach camera node: %" CHIP_ERROR_FORMAT, error.Format());
-    self->FinishRequest(Status::Failure, self->mPendingStreamId);
+    self->FinishRequest(Status::Failure, self->mPendingVideoStreamId);
 }
 
 CHIP_ERROR DefaultAvAnalysisCameraClient::SendPendingCommand(Messaging::ExchangeManager & aExchangeMgr,
@@ -435,7 +434,7 @@ CHIP_ERROR DefaultAvAnalysisCameraClient::SendPendingCommand(Messaging::Exchange
     else
     {
         Commands::VideoStreamDeallocate::Type request;
-        request.videoStreamID = mPendingStreamId;
+        request.videoStreamID = mPendingVideoStreamId;
 
         CommandPathParams commandPath = { mProfile.avsmEndpoint, CameraAvStreamManagement::Id, Commands::VideoStreamDeallocate::Id,
                                           CommandPathFlags::kEndpointIdValid };
@@ -477,7 +476,7 @@ void DefaultAvAnalysisCameraClient::OnResponse(CommandSender * apCommandSender, 
     }
     else
     {
-        FinishRequest(aStatusIB.mStatus, mPendingStreamId);
+        FinishRequest(aStatusIB.mStatus, mPendingVideoStreamId);
     }
 }
 
@@ -489,7 +488,7 @@ void DefaultAvAnalysisCameraClient::OnError(const CommandSender * apCommandSende
     {
         status = StatusIB(aError).mStatus;
     }
-    FinishRequest(status, mPendingStreamId);
+    FinishRequest(status, mPendingVideoStreamId);
 }
 
 void DefaultAvAnalysisCameraClient::OnDone(CommandSender * apCommandSender)
@@ -497,7 +496,7 @@ void DefaultAvAnalysisCameraClient::OnDone(CommandSender * apCommandSender)
     // The interaction is complete; if no response/error was seen, report failure (exactly-once contract).
     if (!mResponseDelivered)
     {
-        FinishRequest(Status::Failure, mPendingStreamId);
+        FinishRequest(Status::Failure, mPendingVideoStreamId);
     }
     mCommandSender.reset();
 }

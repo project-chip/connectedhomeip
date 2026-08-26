@@ -80,7 +80,7 @@ public:
     // AvAnalysisCameraClient
     CHIP_ERROR RequestVideoStreamAllocation(const ScopedNodeId & aCameraNode,
                                             AvAnalysisCameraClient::Callback & aCallback) override;
-    CHIP_ERROR RequestVideoStreamDeallocation(const ScopedNodeId & aCameraNode, uint16_t aAnalysisStreamId,
+    CHIP_ERROR RequestVideoStreamDeallocation(const ScopedNodeId & aCameraNode, uint16_t aVideoStreamId,
                                               AvAnalysisCameraClient::Callback & aCallback) override;
     void Cancel() override;
 
@@ -160,7 +160,7 @@ private:
         kReadCapabilities, // Targeted read of the AVSM capability attributes on that endpoint
     };
 
-    CHIP_ERROR StartRequest(PendingRequest aRequest, const ScopedNodeId & aCameraNode, uint16_t aAnalysisStreamId,
+    CHIP_ERROR StartRequest(PendingRequest aRequest, const ScopedNodeId & aCameraNode, uint16_t aVideoStreamId,
                             AvAnalysisCameraClient::Callback & aCallback);
     CHIP_ERROR SendPendingCommand(Messaging::ExchangeManager & aExchangeMgr, const SessionHandle & aSessionHandle);
     CHIP_ERROR SendDiscoveryRead(AttributePathParams * aPaths, size_t aPathCount);
@@ -173,7 +173,7 @@ private:
     CASESessionManager * mCASESessionManager = nullptr;
 
     PendingRequest mPendingRequest                      = PendingRequest::kNone;
-    uint16_t mPendingStreamId                           = 0;
+    uint16_t mPendingVideoStreamId                      = 0;
     AvAnalysisCameraClient::Callback * mPendingCallback = nullptr;
     bool mResponseDelivered                             = false;
     CameraProfile mProfile;

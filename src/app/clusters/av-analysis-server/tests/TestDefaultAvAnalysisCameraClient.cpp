@@ -63,11 +63,11 @@ public:
         mLastStreamId = aVideoStreamId;
     }
 
-    void OnVideoStreamDeallocated(Status aStatus, uint16_t aAnalysisStreamId) override
+    void OnVideoStreamDeallocated(Status aStatus, uint16_t aVideoStreamId) override
     {
         mDeallocatedCount++;
         mLastStatus   = aStatus;
-        mLastStreamId = aAnalysisStreamId;
+        mLastStreamId = aVideoStreamId;
     }
 };
 

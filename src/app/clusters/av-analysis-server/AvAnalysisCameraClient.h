@@ -48,17 +48,16 @@ public:
 
         /**
          * Outcome of RequestVideoStreamAllocation. On Status::Success, aVideoStreamId is the camera-assigned
-         * VideoStreamID, which becomes the AnalysisStreamID of the new analysis stream.
-         * Any other status is the camera's response status, to be propagated as the EstablishAnalysisStream
-         * command status.
+         * VideoStreamID of the allocated stream; Any other status is the camera's response status, to be propagated as the
+         * EstablishAnalysisStream command status.
          */
         virtual void OnVideoStreamAllocated(Protocols::InteractionModel::Status aStatus, uint16_t aVideoStreamId) = 0;
 
         /**
-         * Outcome of RequestVideoStreamDeallocation for the given analysis stream. A non-Success status is
-         * the camera's response status, to be propagated as the RemoveAnalysisStream command status.
+         * Outcome of RequestVideoStreamDeallocation for the camera stream aVideoStreamId. A non-Success
+         * status is the camera's response status, to be propagated as the RemoveAnalysisStream command status.
          */
-        virtual void OnVideoStreamDeallocated(Protocols::InteractionModel::Status aStatus, uint16_t aAnalysisStreamId) = 0;
+        virtual void OnVideoStreamDeallocated(Protocols::InteractionModel::Status aStatus, uint16_t aVideoStreamId) = 0;
     };
 
     virtual ~AvAnalysisCameraClient() = default;
@@ -74,13 +73,14 @@ public:
     virtual CHIP_ERROR RequestVideoStreamAllocation(const ScopedNodeId & aCameraNode, Callback & aCallback) = 0;
 
     /**
-     * Sends VideoStreamDeallocate with VideoStreamID = aAnalysisStreamId to the given camera node.
+     * Sends VideoStreamDeallocate for the given camera stream to the given camera node.
      *
-     * @param aCameraNode       The camera the stream was allocated on.
-     * @param aAnalysisStreamId The analysis stream (camera VideoStreamID) to deallocate.
-     * @param aCallback         Receives the outcome; must outlive the request.
+     * @param aCameraNode    The camera the stream was allocated on.
+     * @param aVideoStreamId The camera-assigned VideoStreamID to deallocate, as reported by
+     *                       OnVideoStreamAllocated.
+     * @param aCallback      Receives the outcome; must outlive the request.
      */
-    virtual CHIP_ERROR RequestVideoStreamDeallocation(const ScopedNodeId & aCameraNode, uint16_t aAnalysisStreamId,
+    virtual CHIP_ERROR RequestVideoStreamDeallocation(const ScopedNodeId & aCameraNode, uint16_t aVideoStreamId,
                                                       Callback & aCallback) = 0;
 
     /**
