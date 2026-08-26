@@ -123,7 +123,6 @@ class TC_IDM_10_7(DeviceConformanceTests):
             full_data_model=full_data_model
         )
 
-
     def _check_mandatory_clusters_presence(self, endpoints: dict) -> None:
         """
         Check that the limited data model contains the mandatory clusters:
