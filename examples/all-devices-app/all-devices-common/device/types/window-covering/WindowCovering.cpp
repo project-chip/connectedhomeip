@@ -22,8 +22,10 @@ namespace chip {
 namespace app {
 
 WindowCovering::WindowCovering(Clusters::WindowCovering::WindowCoveringDelegate & delegate,
-                               Clusters::IdentifyDelegate & identifyDelegate, const Context & context) :
+                               Clusters::IdentifyDelegate & identifyDelegate, const Context & context,
+                               Clusters::WindowCovering::OptionalAttributeSet optionalAttributes) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWindowCovering, 1)),
+    mTimerDelegate(context.timerDelegate), mOptionalAttributes(optionalAttributes),
     mWindowCoveringDelegate(delegate), mIdentifyDelegate(identifyDelegate), mContext(context)
 {}
 
@@ -42,34 +44,13 @@ CHIP_ERROR WindowCovering::Register(chip::EndpointId endpoint, CodeDrivenDataMod
     // The WindowCoveringDelegate is mandatory and must be supplied at construction time.
     mWindowCoveringDelegate.SetEndpoint(endpoint);
 
-    // Configure all optional attributes supported by this simulated Lift + Tilt device
-    Clusters::WindowCovering::OptionalAttributeSet optionals;
-    optionals.Set<Clusters::WindowCovering::Attributes::NumberOfActuationsLift::Id>()
-        .Set<Clusters::WindowCovering::Attributes::NumberOfActuationsTilt::Id>()
-        .Set<Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::Id>()
-        .Set<Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::Id>()
-        .Set<Clusters::WindowCovering::Attributes::SafetyStatus::Id>();
-
     Clusters::WindowCovering::WindowCoveringCluster::Config config(mWindowCoveringDelegate);
     config
         .WithFeatures(BitFlags<Clusters::WindowCovering::Feature>(
             Clusters::WindowCovering::Feature::kLift, Clusters::WindowCovering::Feature::kPositionAwareLift,
             Clusters::WindowCovering::Feature::kTilt, Clusters::WindowCovering::Feature::kPositionAwareTilt))
-        .WithOptionalAttributes(optionals);
+        .WithOptionalAttributes(mOptionalAttributes);
     mWindowCoveringCluster.Create(endpoint, config);
-
-    // Initialize default position values for simulation if they are currently null/uninitialized
-    auto & cluster = mWindowCoveringCluster.Cluster();
-    if (cluster.GetCurrentPositionLiftPercent100ths().IsNull())
-    {
-        cluster.SetCurrentPositionLiftPercent100ths(
-            DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
-    }
-    if (cluster.GetCurrentPositionTiltPercent100ths().IsNull())
-    {
-        cluster.SetCurrentPositionTiltPercent100ths(
-            DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
-    }
 
     ReturnErrorOnFailure(provider.AddCluster(mWindowCoveringCluster.Registration()));
 
