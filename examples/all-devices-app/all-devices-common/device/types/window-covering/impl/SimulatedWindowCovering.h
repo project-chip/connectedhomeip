@@ -18,17 +18,23 @@
 
 #include <device/types/window-covering/WindowCovering.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/DefaultTimerDelegate.h>
 
 namespace chip {
 namespace app {
 
-class LoggingWindowCovering : public WindowCovering,
-                              public Clusters::IdentifyDelegate,
-                              public Clusters::WindowCovering::WindowCoveringDelegate
+class SimulatedWindowCovering : public WindowCovering,
+                                public Clusters::IdentifyDelegate,
+                                public Clusters::WindowCovering::WindowCoveringDelegate,
+                                public TimerContext
 {
 public:
-    explicit LoggingWindowCovering(const Context & context);
-    ~LoggingWindowCovering() override = default;
+    explicit SimulatedWindowCovering(const Context & context);
+    ~SimulatedWindowCovering() override;
+
+    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                        EndpointComposition composition = {}) override;
+    void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     // IdentifyDelegate implementation
     void OnIdentifyStart(Clusters::IdentifyCluster & cluster) override;
@@ -41,6 +47,13 @@ public:
     CHIP_ERROR HandleStopMotion() override;
     void OnTargetPositionLiftChanged(DataModel::Nullable<Percent100ths> newTargetLift) override;
     void OnTargetPositionTiltChanged(DataModel::Nullable<Percent100ths> newTargetTilt) override;
+
+    // TimerContext
+    void TimerFired() override;
+
+private:
+    bool mMovingLift = false;
+    bool mMovingTilt = false;
 };
 
 } // namespace app
