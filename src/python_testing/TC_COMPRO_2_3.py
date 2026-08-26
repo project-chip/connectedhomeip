@@ -255,15 +255,12 @@ class TC_COMPRO_2_3(COMPROBaseTest):
 
         # Step 6 — send ProxyBackGroundScanStartRequest (Timeout=0: infinite)
         self.step(6)
-        await self.default_controller.SendCommand(
-            nodeId=self.dut_node_id,
-            endpoint=self.cp_endpoint,
-            payload=cp.Commands.ProxyBackGroundScanStartRequest(
+        await self.send_cp_command(
+            cp.Commands.ProxyBackGroundScanStartRequest(
                 transport=valid_transports,
                 timeout=0,
                 wiFiBands=valid_bands if has_wi else None,
-            ),
-        )
+            ))
         logger.info("ProxyBackGroundScanStartRequest sent (Timeout=0, infinite)")
 
         # Step 7 — verify cache stays empty for 40 s via subscription monitoring.
@@ -364,14 +361,11 @@ class TC_COMPRO_2_3(COMPROBaseTest):
 
         # Step 15 — stop the background scan
         self.step(15)
-        await self.default_controller.SendCommand(
-            nodeId=self.dut_node_id,
-            endpoint=self.cp_endpoint,
-            payload=cp.Commands.ProxyBackGroundScanStopRequest(
+        await self.send_cp_command(
+            cp.Commands.ProxyBackGroundScanStopRequest(
                 transport=valid_transports,
                 wiFiBands=valid_bands if has_wi else None,
-            ),
-        )
+            ))
         logger.info("ProxyBackGroundScanStopRequest sent")
 
         # Step 16 — verify cache clears immediately after stop
@@ -405,27 +399,18 @@ class TC_COMPRO_2_3(COMPROBaseTest):
             start_bands = valid_bands if has_wi and start_transport == kWiFiPAF_bit else None
             logger.info("Step 17: start BGS on transport 0x%02x, then stop non-overlapping "
                         "transport 0x%02x", start_transport, stop_transport)
-            await self.default_controller.SendCommand(
-                nodeId=self.dut_node_id,
-                endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyBackGroundScanStartRequest(
-                    transport=start_transport, timeout=0, wiFiBands=start_bands),
-            )
+            await self.send_cp_command(
+                cp.Commands.ProxyBackGroundScanStartRequest(
+                    transport=start_transport, timeout=0, wiFiBands=start_bands))
             # Stopping a different, non-overlapping supported transport returns SUCCESS.
-            await self.default_controller.SendCommand(
-                nodeId=self.dut_node_id,
-                endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyBackGroundScanStopRequest(
-                    transport=stop_transport, wiFiBands=None),
-            )
+            await self.send_cp_command(
+                cp.Commands.ProxyBackGroundScanStopRequest(
+                    transport=stop_transport, wiFiBands=None))
             logger.info("Step 17: stop of a non-active transport returned SUCCESS")
             # Clean up the scan started for this sub-test so later steps start fresh.
-            await self.default_controller.SendCommand(
-                nodeId=self.dut_node_id,
-                endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyBackGroundScanStopRequest(
-                    transport=start_transport, wiFiBands=start_bands),
-            )
+            await self.send_cp_command(
+                cp.Commands.ProxyBackGroundScanStopRequest(
+                    transport=start_transport, wiFiBands=start_bands))
 
         # Step 18 — terminate subscription
         self.step(18)
@@ -488,15 +473,12 @@ class TC_COMPRO_2_3(COMPROBaseTest):
         # auto-clear when the Timeout fires, testing both the cache-fill and
         # cache-clear-on-stop paths in a single window.
         self.step(21)
-        await self.default_controller.SendCommand(
-            nodeId=self.dut_node_id,
-            endpoint=self.cp_endpoint,
-            payload=cp.Commands.ProxyBackGroundScanStartRequest(
+        await self.send_cp_command(
+            cp.Commands.ProxyBackGroundScanStartRequest(
                 transport=valid_transports,
                 timeout=10,
                 wiFiBands=valid_bands if has_wi else None,
-            ),
-        )
+            ))
         logger.info("ProxyBackGroundScanStartRequest sent (Timeout=10 s)")
 
         # Step 22 — after 20 s (2× Timeout) the scan must have auto-stopped and the

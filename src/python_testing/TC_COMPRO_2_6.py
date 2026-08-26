@@ -339,10 +339,8 @@ class TC_COMPRO_2_6(COMPROBaseTest):
         self.step(11)
         logger.info("Step 11: ProxyConnectRequest (transport=0x%02x discriminator=%d)",
                     proxy_transport, ed_discriminator)
-        connect_response = await self.default_controller.SendCommand(
-            nodeId=self.dut_node_id,
-            endpoint=self.cp_endpoint,
-            payload=cp.Commands.ProxyConnectRequest(
+        connect_response = await self.send_cp_command(
+            cp.Commands.ProxyConnectRequest(
                 address=NullValue,
                 transport=proxy_transport,
                 discriminator=ed_discriminator,
@@ -356,8 +354,7 @@ class TC_COMPRO_2_6(COMPROBaseTest):
             # interactionTimeoutMs, so it must cover proxy_connect_timeout;
             # otherwise the invoke times out (~10.5s MRP default) before a
             # slower-but-valid connect completes.
-            interactionTimeoutMs=proxy_connect_timeout * 1000 + 10000,
-        )
+            timeout_ms=proxy_connect_timeout * 1000 + 10000)
         session_a = connect_response.sessionID
         asserts.assert_true(
             0x0001 <= session_a <= 0xFFFE,
@@ -380,16 +377,13 @@ class TC_COMPRO_2_6(COMPROBaseTest):
 
         async def _first_msg():
             try:
-                return await self.default_controller.SendCommand(
-                    nodeId=self.dut_node_id,
-                    endpoint=self.cp_endpoint,
-                    payload=cp.Commands.ProxyMessageRequest(
+                return await self.send_cp_command(
+                    cp.Commands.ProxyMessageRequest(
                         sessionID=session_a,
                         responseTimeout=10,
                         message=_MINIMAL_MATTER_MSG,
                     ),
-                    interactionTimeoutMs=35000,
-                )
+                    timeout_ms=35000)
             except InteractionModelError as e:
                 return e
 
@@ -415,11 +409,8 @@ class TC_COMPRO_2_6(COMPROBaseTest):
         # ----------------------------------------------------------------
         self.step(13)
         logger.info("Step 13: ProxyDisconnectRequest(sessionID=%d)", session_a)
-        await self.default_controller.SendCommand(
-            nodeId=self.dut_node_id,
-            endpoint=self.cp_endpoint,
-            payload=cp.Commands.ProxyDisconnectRequest(sessionID=session_a),
-        )
+        await self.send_cp_command(
+            cp.Commands.ProxyDisconnectRequest(sessionID=session_a))
         logger.info("Step 13: ProxyDisconnectRequest succeeded for session_a=%d", session_a)
 
         # Cleanup

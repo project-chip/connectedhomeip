@@ -265,10 +265,8 @@ class TC_COMPRO_2_8(COMPROBaseTest):
 
         logger.info("Step 6: ProxyConnectRequest (transport=0x%02x, discriminator=%d)",
                     proxy_transport, ed_discriminator)
-        connect_response = await self.default_controller.SendCommand(
-            nodeId=self.dut_node_id,
-            endpoint=self.cp_endpoint,
-            payload=cp.Commands.ProxyConnectRequest(
+        connect_response = await self.send_cp_command(
+            cp.Commands.ProxyConnectRequest(
                 address=NullValue,
                 transport=proxy_transport,
                 discriminator=ed_discriminator,
@@ -281,8 +279,7 @@ class TC_COMPRO_2_8(COMPROBaseTest):
             # interactionTimeoutMs, so it must cover proxy_connect_timeout;
             # None caps it at the ~10.5s MRP default and guillotines
             # slower-but-valid transport connects.
-            interactionTimeoutMs=proxy_connect_timeout * 1000 + 10000,
-        )
+            timeout_ms=proxy_connect_timeout * 1000 + 10000)
         fabric_a_session = connect_response.sessionID
         asserts.assert_true(
             0x0001 <= fabric_a_session <= 0xFFFE,
@@ -320,11 +317,8 @@ class TC_COMPRO_2_8(COMPROBaseTest):
         # ----------------------------------------------------------------
         self.step(9)
         logger.info("Step 9: TH1 ProxyDisconnectRequest(sessionID=%d)", fabric_a_session)
-        await self.default_controller.SendCommand(
-            nodeId=self.dut_node_id,
-            endpoint=self.cp_endpoint,
-            payload=cp.Commands.ProxyDisconnectRequest(sessionID=fabric_a_session),
-        )
+        await self.send_cp_command(
+            cp.Commands.ProxyDisconnectRequest(sessionID=fabric_a_session))
         logger.info("Step 9: ProxyDisconnectRequest succeeded")
 
         # ----------------------------------------------------------------
@@ -370,15 +364,12 @@ class TC_COMPRO_2_8(COMPROBaseTest):
             # Step 10 — TH1 ProxyBackGroundScanStartRequest → SUCCESS
             self.step(10)
             logger.info("Step 10: TH1 ProxyBackGroundScanStartRequest (transport=0x%02x)", valid_transports)
-            await self.default_controller.SendCommand(
-                nodeId=self.dut_node_id,
-                endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyBackGroundScanStartRequest(
+            await self.send_cp_command(
+                cp.Commands.ProxyBackGroundScanStartRequest(
                     transport=valid_transports,
                     timeout=0,
                     wiFiBands=wifi_bands_arg,
-                ),
-            )
+                ))
             logger.info("Step 10: ProxyBackGroundScanStartRequest succeeded")
 
             # Step 11 — TH2 ProxyBackGroundScanStopRequest → NOT_FOUND
@@ -398,15 +389,13 @@ class TC_COMPRO_2_8(COMPROBaseTest):
             # The proxy SHALL allow background scans from different fabrics simultaneously.
             self.step(12)
             logger.info("Step 12: TH2 ProxyBackGroundScanStartRequest (transport=0x%02x)", valid_transports)
-            await th2.SendCommand(
-                nodeId=self.dut_node_id,
-                endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyBackGroundScanStartRequest(
+            await self.send_cp_command(
+                cp.Commands.ProxyBackGroundScanStartRequest(
                     transport=valid_transports,
                     timeout=0,
                     wiFiBands=wifi_bands_arg,
                 ),
-            )
+                controller=th2)
             logger.info("Step 12: TH2 ProxyBackGroundScanStartRequest succeeded")
 
             # Step 13 — Both fabrics independently see the ED in their cache.
@@ -418,14 +407,12 @@ class TC_COMPRO_2_8(COMPROBaseTest):
             # Step 14 — TH2 stops its own background scan → SUCCESS.
             self.step(14)
             logger.info("Step 14: TH2 ProxyBackGroundScanStopRequest")
-            await th2.SendCommand(
-                nodeId=self.dut_node_id,
-                endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyBackGroundScanStopRequest(
+            await self.send_cp_command(
+                cp.Commands.ProxyBackGroundScanStopRequest(
                     transport=valid_transports,
                     wiFiBands=wifi_bands_arg,
                 ),
-            )
+                controller=th2)
             logger.info("Step 14: TH2 ProxyBackGroundScanStopRequest succeeded")
 
             # Step 15 — Fabric A's scan is unaffected by Fabric B's stop.
@@ -453,14 +440,11 @@ class TC_COMPRO_2_8(COMPROBaseTest):
             # Step 16 — TH1 stops its background scan → SUCCESS
             self.step(16)
             logger.info("Step 16: TH1 ProxyBackGroundScanStopRequest (transport=0x%02x)", valid_transports)
-            await self.default_controller.SendCommand(
-                nodeId=self.dut_node_id,
-                endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyBackGroundScanStopRequest(
+            await self.send_cp_command(
+                cp.Commands.ProxyBackGroundScanStopRequest(
                     transport=valid_transports,
                     wiFiBands=wifi_bands_arg,
-                ),
-            )
+                ))
             logger.info("Step 16: ProxyBackGroundScanStopRequest succeeded")
 
         # ----------------------------------------------------------------
@@ -477,15 +461,13 @@ class TC_COMPRO_2_8(COMPROBaseTest):
 
         async def _scan(controller, name):
             try:
-                return await controller.SendCommand(
-                    nodeId=self.dut_node_id,
-                    endpoint=self.cp_endpoint,
-                    payload=cp.Commands.ProxyScanRequest(
+                return await self.send_cp_command(
+                    cp.Commands.ProxyScanRequest(
                         transport=valid_transports,
                         wiFiBands=wifi_bands_arg,
                     ),
-                    interactionTimeoutMs=concurrent_timeout_ms,
-                )
+                    controller=controller,
+                    timeout_ms=concurrent_timeout_ms)
             except InteractionModelError as e:
                 return e
 

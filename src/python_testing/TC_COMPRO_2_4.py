@@ -363,10 +363,8 @@ class TC_COMPRO_2_4(COMPROBaseTest):
                         "(transport=0x%02x discriminator=%d wiFiBand=%s)",
                         transport_label, single_transport, ed_discriminator,
                         hex(single_band) if single_band is not None else "None")
-            connect_response = await self.default_controller.SendCommand(
-                nodeId=self.dut_node_id,
-                endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyConnectRequest(
+            connect_response = await self.send_cp_command(
+                cp.Commands.ProxyConnectRequest(
                     address=NullValue,
                     transport=single_transport,
                     discriminator=ed_discriminator,
@@ -379,8 +377,7 @@ class TC_COMPRO_2_4(COMPROBaseTest):
                 # interactionTimeoutMs, so it must cover proxy_connect_timeout;
                 # None caps it at the ~13s MRP default and guillotines
                 # slower-but-valid transport connects.
-                interactionTimeoutMs=proxy_connect_timeout * 1000 + 10000,
-            )
+                timeout_ms=proxy_connect_timeout * 1000 + 10000)
             current_session_id = connect_response.sessionID
             asserts.assert_true(
                 current_session_id <= 0xFFFE,
@@ -397,16 +394,13 @@ class TC_COMPRO_2_4(COMPROBaseTest):
             # SHALL NOT forward anything to the Commissionee (it returns a queued
             # message or null).  The two combined verify the immediate-success
             # behaviour without sending any frame to the ED.
-            msg_response = await self.default_controller.SendCommand(
-                nodeId=self.dut_node_id,
-                endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyMessageRequest(
+            msg_response = await self.send_cp_command(
+                cp.Commands.ProxyMessageRequest(
                     sessionID=current_session_id,
                     responseTimeout=0,
                     message=NullValue,
                 ),
-                interactionTimeoutMs=5000,
-            )
+                timeout_ms=5000)
             asserts.assert_equal(
                 msg_response.sessionID, current_session_id,
                 f"[{transport_label}] ProxyMessageResponse sessionID must match request sessionID")
@@ -451,11 +445,8 @@ class TC_COMPRO_2_4(COMPROBaseTest):
                 self.step(9)
             logger.info("[%s] Sending ProxyDisconnectRequest with valid sessionID=%d",
                         transport_label, current_session_id)
-            await self.default_controller.SendCommand(
-                nodeId=self.dut_node_id,
-                endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyDisconnectRequest(sessionID=current_session_id),
-            )
+            await self.send_cp_command(
+                cp.Commands.ProxyDisconnectRequest(sessionID=current_session_id))
             logger.info("[%s] ProxyDisconnectRequest succeeded for sessionID=%d",
                         transport_label, current_session_id)
 
@@ -578,10 +569,8 @@ class TC_COMPRO_2_4(COMPROBaseTest):
 
         async def _pending_connect():
             try:
-                return await self.default_controller.SendCommand(
-                    nodeId=self.dut_node_id,
-                    endpoint=self.cp_endpoint,
-                    payload=cp.Commands.ProxyConnectRequest(
+                return await self.send_cp_command(
+                    cp.Commands.ProxyConnectRequest(
                         address=NullValue,
                         transport=single_transport,
                         discriminator=ed_discriminator,
@@ -590,20 +579,16 @@ class TC_COMPRO_2_4(COMPROBaseTest):
                         timeout=30,
                         wiFiBand=single_band,
                     ),
-                    interactionTimeoutMs=35000,
-                )
+                    timeout_ms=35000)
             except InteractionModelError as e:
                 return e
 
         async def _cancel_pending():
             await asyncio.sleep(2)  # allow the connect request to reach the DUT first
             try:
-                await self.default_controller.SendCommand(
-                    nodeId=self.dut_node_id,
-                    endpoint=self.cp_endpoint,
-                    payload=cp.Commands.ProxyDisconnectRequest(sessionID=NullValue),
-                    interactionTimeoutMs=5000,
-                )
+                await self.send_cp_command(
+                    cp.Commands.ProxyDisconnectRequest(sessionID=NullValue),
+                    timeout_ms=5000)
                 return "SUCCESS"
             except InteractionModelError as e:
                 return e

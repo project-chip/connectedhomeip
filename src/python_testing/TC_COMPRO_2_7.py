@@ -238,10 +238,8 @@ class TC_COMPRO_2_7(COMPROBaseTest):
         for n in range(1, max_sessions + 1):
             disc_n = self._discriminator_for_index(n)
             logger.info("Step 6 [ED #%d]: ProxyConnectRequest (discriminator=%d)", n, disc_n)
-            resp = await self.default_controller.SendCommand(
-                nodeId=self.dut_node_id,
-                endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyConnectRequest(
+            resp = await self.send_cp_command(
+                cp.Commands.ProxyConnectRequest(
                     address=NullValue,
                     transport=proxy_transport,
                     discriminator=disc_n,
@@ -254,8 +252,7 @@ class TC_COMPRO_2_7(COMPROBaseTest):
                 # interactionTimeoutMs, so it must cover proxy_connect_timeout;
                 # None caps it at the ~10-13s MRP default and guillotines
                 # slower-but-valid transport connects.
-                interactionTimeoutMs=proxy_connect_timeout * 1000 + 10000,
-            )
+                timeout_ms=proxy_connect_timeout * 1000 + 10000)
             sess_n = resp.sessionID
             asserts.assert_true(
                 0x0001 <= sess_n <= 0xFFFE,
@@ -310,11 +307,8 @@ class TC_COMPRO_2_7(COMPROBaseTest):
         self.step(9)
         for sess_id in active_sessions:
             logger.info("Step 9: ProxyDisconnectRequest(sessionID=%d)", sess_id)
-            await self.default_controller.SendCommand(
-                nodeId=self.dut_node_id,
-                endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyDisconnectRequest(sessionID=sess_id),
-            )
+            await self.send_cp_command(
+                cp.Commands.ProxyDisconnectRequest(sessionID=sess_id))
             logger.info("Step 9: disconnected session %d", sess_id)
 
         # Cleanup

@@ -315,15 +315,12 @@ class TC_COMPRO_2_2(COMPROBaseTest):
 
         async def _scan_tolerant():
             try:
-                return await self.default_controller.SendCommand(
-                    nodeId=self.dut_node_id,
-                    endpoint=self.cp_endpoint,
-                    payload=cp.Commands.ProxyScanRequest(
+                return await self.send_cp_command(
+                    cp.Commands.ProxyScanRequest(
                         transport=valid_transports,
                         wiFiBands=valid_bands if has_wi else None,
                     ),
-                    interactionTimeoutMs=concurrent_timeout_ms,
-                )
+                    timeout_ms=concurrent_timeout_ms)
             except InteractionModelError as e:
                 return e  # Return so gather captures it; validate below
 
@@ -402,17 +399,13 @@ class TC_COMPRO_2_2(COMPROBaseTest):
         The response is async from the DUT's perspective; we use a generous
         interactionTimeoutMs to cover the full scan window plus margin.
         """
-        cmd = self.cp.Commands.ProxyScanRequest(
-            transport=transport,
-            wiFiBands=wifi_bands,
-        )
         start = time.monotonic()
-        response = await self.default_controller.SendCommand(
-            nodeId=self.dut_node_id,
-            endpoint=self.cp_endpoint,
-            payload=cmd,
-            interactionTimeoutMs=int(timeout_sec * 1000) + 2000,
-        )
+        response = await self.send_cp_command(
+            self.cp.Commands.ProxyScanRequest(
+                transport=transport,
+                wiFiBands=wifi_bands,
+            ),
+            timeout_ms=int(timeout_sec * 1000) + 2000)
         elapsed = time.monotonic() - start
         logger.info("ProxyScanResponse received in %.2f s (deadline %.1f s)", elapsed, timeout_sec)
         asserts.assert_less_equal(elapsed, timeout_sec,

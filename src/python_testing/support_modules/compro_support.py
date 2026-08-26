@@ -726,6 +726,33 @@ class COMPROBaseTest(MatterBaseTest):
         return await self.read_cp_attribute(self.cp.Attributes.MaxSessions)
 
     # ------------------------------------------------------------------
+    # Command helpers
+    # ------------------------------------------------------------------
+
+    async def send_cp_command(
+        self,
+        payload,
+        *,
+        controller=None,
+        node_id: int | None = None,
+        timeout_ms: int | None = None,
+    ):
+        """Send a CommissioningProxy command to the DUT and return the response.
+
+        Defaults to the DUT node id and the cluster's endpoint.  Pass
+        ``controller`` to send from a second fabric's controller, ``node_id`` to
+        send over a PASE session to an uncommissioned DUT, and ``timeout_ms``
+        when the command needs a longer IM timeout than the framework default.
+        """
+        kwargs = {} if timeout_ms is None else {"interactionTimeoutMs": timeout_ms}
+        return await (controller or self.default_controller).SendCommand(
+            nodeId=self.dut_node_id if node_id is None else node_id,
+            endpoint=self.cp_endpoint,
+            payload=payload,
+            **kwargs,
+        )
+
+    # ------------------------------------------------------------------
     # Feature flag helpers
     # ------------------------------------------------------------------
 
@@ -1053,15 +1080,10 @@ class COMPROBaseTest(MatterBaseTest):
 
         Returns the caught error.
         """
-        kwargs = {} if timeout_ms is None else {"interactionTimeoutMs": timeout_ms}
         error: InteractionModelError | None = None
         try:
-            await (controller or self.default_controller).SendCommand(
-                nodeId=self.dut_node_id if node_id is None else node_id,
-                endpoint=self.cp_endpoint,
-                payload=payload,
-                **kwargs,
-            )
+            await self.send_cp_command(payload, controller=controller,
+                                       node_id=node_id, timeout_ms=timeout_ms)
         except InteractionModelError as exc:
             error = exc
 
