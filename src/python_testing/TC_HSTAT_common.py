@@ -46,9 +46,8 @@ class HSTATBase(MatterBaseTest):
         self.cluster = Clusters.Humidistat
         self.attributes = self.cluster.Attributes
         self.features = self.cluster.Bitmaps.Feature
-        self.mistBitmap = self.cluster.Bitmaps.MistTypeBitmap
+        self.MistTypeBitmap = self.cluster.Bitmaps.MistTypeBitmap
         self.SetSettings = self.cluster.Commands.SetSettings
-        self.SystemStatus = self.cluster.Enums.SystemStateEnum
 
         self.supported_attributes = await self.read_attribute_expect_success(attribute=self.attributes.AttributeList)
 
@@ -75,13 +74,14 @@ class HSTATBase(MatterBaseTest):
         log.info("DUT supports the Cold feature: %s", self.coldFeatureSupported)
         log.info("DUT supports the CondPump feature: %s", self.condPumpFeatureSupported)
 
-        # some convenience definions
+        # some convenience definitions
         self.modeHumidifier = self.cluster.Enums.ModeEnum.kHumidifier
         self.modeDehumidifier = self.cluster.Enums.ModeEnum.kDehumidifier
         self.modeAuto = self.cluster.Enums.ModeEnum.kAuto
         self.modeFanOnly = self.cluster.Enums.ModeEnum.kFanOnly
         self.stateIdle = self.cluster.Enums.SystemStateEnum.kIdle
         self.ModeEnum = self.cluster.Enums.ModeEnum
+        self.SystemStateEnum = self.cluster.Enums.SystemStateEnum
 
     async def read_attribute_expect_success(self, attribute: type[ClusterAttributeDescriptor]) -> Any:
         """Reads a single Humidistat attribute from the DUT and asserts success.
@@ -92,20 +92,7 @@ class HSTATBase(MatterBaseTest):
         Returns:
             The decoded value of the attribute read from the DUT.
         """
-        cluster = Clusters.Objects.Humidistat
-        return await self.read_single_attribute_check_success(endpoint=self.get_endpoint(), cluster=cluster, attribute=attribute)
-
-    async def write_attribute_expect_success(self, attribute: ClusterAttributeDescriptor) -> None:
-        """Writes a single Humidistat attribute to the DUT and asserts success.
-
-        Args:
-            attribute: The Humidistat cluster attribute descriptor instance containing
-                the value to write.
-        """
-        cluster = Clusters.Objects.Humidistat
-        result = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.get_endpoint(), attribute)])
-        err_msg = f"Received error status {str(result[0].Status)} when writing {str(cluster)}:{str(attribute)}"
-        asserts.assert_equal(result[0].Status, Status.Success, err_msg)
+        return await self.read_single_attribute_check_success(endpoint=self.get_endpoint(), cluster=self.cluster, attribute=attribute)
 
     async def send_SetSettingsCommand_expect_success(self, **kwargs: Any) -> None:
         """Sends the SetSettings command to the DUT and asserts success.
@@ -124,7 +111,7 @@ class HSTATBase(MatterBaseTest):
         """
         try:
             await self.send_single_cmd(cmd=self.SetSettings(**kwargs), endpoint=self.get_endpoint(), timedRequestTimeoutMs=1000)
-            asserts.assert_true(False, "Unexpected command success, for command SetSettings")
+            asserts.assert_fail("Unexpected command success, for command SetSettings")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, error, "Unexpected error returned")
             pass

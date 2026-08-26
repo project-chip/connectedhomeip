@@ -114,13 +114,13 @@ class TC_HSTAT_2_5(HSTATBase):
             self.step(4)
             # TH sends command SetSettings with only the MistWarm bit of the MistType field set
             # Verify DUT responds w/ status SUCCESS(0x00)
-            await self.send_SetSettingsCommand_expect_success(mistType=self.mistBitmap.kMistWarm)
+            await self.send_SetSettingsCommand_expect_success(mistType=self.MistTypeBitmap.kMistWarm)
 
             self.step(5)
             # TH reads from the DUT the MistType attribute.
             # Verify that the DUT response contains a value with the MistWarm bit set. Store the value as MistSetting
             dut_MistType = await self.read_attribute_expect_success(attribute=self.attributes.MistType)
-            asserts.assert_equal(dut_MistType, self.mistBitmap.kMistWarm, "MistType is not MistWarm as expected")
+            asserts.assert_equal(dut_MistType, self.MistTypeBitmap.kMistWarm, "MistType is not MistWarm as expected")
         else:
             self.mark_step_range_skipped(4, 5)
 
@@ -128,13 +128,13 @@ class TC_HSTAT_2_5(HSTATBase):
             self.step(6)
             # TH writes to the DUT the MistType attribute with only the MistCold bit set
             # Verify DUT responds w/ status SUCCESS(0x00)
-            await self.write_attribute_expect_success(attribute=self.attributes.MistType(self.mistBitmap.kMistCold))
+            await self.write_single_attribute(attribute_value=self.attributes.MistType(self.MistTypeBitmap.kMistCold), expect_success=True)
 
             self.step(7)
             # TH reads from the DUT the MistType attribute.
             # Verify that the DUT response contains a value with the MistCold bit set.
             dut_MistType = await self.read_attribute_expect_success(attribute=self.attributes.MistType)
-            asserts.assert_equal(dut_MistType, self.mistBitmap.kMistCold, "MistType is not MistCold as expected")
+            asserts.assert_equal(dut_MistType, self.MistTypeBitmap.kMistCold, "MistType is not MistCold as expected")
         else:
             self.mark_step_range_skipped(6, 7)
 
@@ -148,9 +148,9 @@ class TC_HSTAT_2_5(HSTATBase):
             self.step(9)
             # TH writes to the DUT the MistType attribute with only the MistWarm bit of the MistType field set
             # Verify that an attribute report was received for MistType and that the value received has only the MistWarm bit set.
-            await self.write_attribute_expect_success(attribute=self.attributes.MistType(self.mistBitmap.kMistWarm))
+            await self.write_single_attribute(attribute_value=self.attributes.MistType(self.MistTypeBitmap.kMistWarm), expect_success=True)
             mistTypeReportValue = mistTypeSubscription.wait_for_attribute_report().value
-            asserts.assert_equal(mistTypeReportValue, self.mistBitmap.kMistWarm, "MistType report is not MistWarm as expected")
+            asserts.assert_equal(mistTypeReportValue, self.MistTypeBitmap.kMistWarm, "MistType report is not MistWarm as expected")
         else:
             self.mark_step_range_skipped(8, 9)
 
@@ -158,7 +158,7 @@ class TC_HSTAT_2_5(HSTATBase):
             self.step(10)
             # TH sends command SetSettings with the MistType field set to MistWarm
             # Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)
-            await self.send_SetSettingsCommand_expect_error(mistType=self.mistBitmap.kMistWarm, error=Status.ConstraintError)
+            await self.send_SetSettingsCommand_expect_error(mistType=self.MistTypeBitmap.kMistWarm, error=Status.ConstraintError)
         else:
             self.skip_step(10)
 
@@ -166,7 +166,7 @@ class TC_HSTAT_2_5(HSTATBase):
             self.step(11)
             # TH sends command SetSettings with the MistType field set to MistCold
             # Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)
-            await self.send_SetSettingsCommand_expect_error(mistType=self.mistBitmap.kMistCold, error=Status.ConstraintError)
+            await self.send_SetSettingsCommand_expect_error(mistType=self.MistTypeBitmap.kMistCold, error=Status.ConstraintError)
         else:
             self.skip_step(11)
 

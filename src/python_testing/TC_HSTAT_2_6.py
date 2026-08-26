@@ -54,6 +54,8 @@ class TC_HSTAT_2_6(HSTATBase):
     def pics_TC_HSTAT_2_6(self) -> list[str]:
         return [
             "HSTAT.S",
+            "HSTAT.S.F00",
+            "HSTAT.S.F01"
         ]
 
     def desc_TC_HSTAT_2_6(self) -> str:
@@ -86,7 +88,7 @@ class TC_HSTAT_2_6(HSTATBase):
         await self.setup()
 
         # Not sure how to gate this test case with the 'def pics_' statement, so doing that here.
-        # This test case should only be executed if both Humidifier and Dehumidiifer are supported
+        # This test case should only be executed if both Humidifier and Dehumidifier are supported
         if not (self.humidifierFeatureSupported and self.dehumidifierFeatureSupported):
             self.mark_all_remaining_steps_skipped(2)
             return
@@ -109,12 +111,12 @@ class TC_HSTAT_2_6(HSTATBase):
         self.step(5)
         # TH sends command SetSettings with the MistType field set to MistCold
         # Verify DUT responds w/ status INVALID_IN_STATE(0xcb)
-        await self.send_SetSettingsCommand_expect_error(mistType=self.mistBitmap.kMistCold, error=Status.InvalidInState)
+        await self.send_SetSettingsCommand_expect_error(mistType=self.MistTypeBitmap.kMistCold, error=Status.InvalidInState)
 
         self.step(6)
         # TH sends command SetSettings with the MistType field set to MistWarm
         # Verify DUT responds w/ status INVALID_IN_STATE(0xcb)
-        await self.send_SetSettingsCommand_expect_error(mistType=self.mistBitmap.kMistWarm, error=Status.InvalidInState)
+        await self.send_SetSettingsCommand_expect_error(mistType=self.MistTypeBitmap.kMistWarm, error=Status.InvalidInState)
 
         self.step(7)
         # TH reads from the DUT the MistType attribute.
