@@ -18,6 +18,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 
+
 class AVANALYTestBase:
     SPEC_MAX_COUNT_SUPPORTEDAMBIENTCONTEXTS = 50
     SPEC_MAX_COUNT_ANALYSIS_STREAMS = 255
