@@ -55,9 +55,6 @@ class TC_IDM_10_7(DeviceConformanceTests):
                      "The Descriptor Clusters should be exactly the same (DeviceTypeList, ServerList, ClientList, PartsList, TagList, EndpointUniqueID)."),
         ]
 
-    def setup_test(self):
-        super().setup_test()
-
     @async_test_body
     async def test_TC_IDM_10_7(self):
 
@@ -92,7 +89,8 @@ class TC_IDM_10_7(DeviceConformanceTests):
 
         commissionee = await self.find_or_establish_pase_session_over_ntl(setupPayload, node_id)
         if commissionee is None:
-            raise RuntimeError("Failed to find or establish PASE session over NTL")
+            self.fail_current_test("Failed to find or establish PASE session over NTL")
+            return
 
         self.step(2)    # Read of Limited Data Model
 
@@ -102,7 +100,7 @@ class TC_IDM_10_7(DeviceConformanceTests):
             return
 
         limited_data_model = self.endpoints
-        log.info("limited_data_model: %s", limited_data_model)
+        log.debug("limited_data_model: %s", limited_data_model)
         self.build_spec_xmls()
 
         self.step(3)    # Limited Data Model : Check clusters presence
@@ -152,7 +150,7 @@ class TC_IDM_10_7(DeviceConformanceTests):
             self.fail_current_test("Wildcard read of full Data Model failed!")
             return
         full_data_model = self.endpoints
-        log.info("full_data_model: %s", full_data_model)
+        log.debug("full_data_model: %s", full_data_model)
 
         self.step(8)    # Limited and Full Data Model comparison
         descriptor_compare_success = self._compare_descriptor_clusters(
@@ -233,11 +231,10 @@ class TC_IDM_10_7(DeviceConformanceTests):
                     log.error("Descriptor cluster missing on Endpoint %s", endpoint_id)
                     return False
 
-            log.info("Mandatory clusters presence check passed")
             return True
 
-        except Exception as e:
-            log.exception("Mandatory clusters presence check failed: %s", e)
+        except Exception:
+            log.exception("Mandatory clusters presence check failed")
             return False
 
     def _check_conformance(self) -> bool:
@@ -261,8 +258,8 @@ class TC_IDM_10_7(DeviceConformanceTests):
             self.problems.extend(problems)
             return success
 
-        except Exception as e:
-            log.exception("Conformance check failed with exception: %s", e)
+        except Exception:
+            log.exception("Conformance check failed with exception")
             return False
 
     async def _wildcard_read(self, node_id: int) -> bool:
@@ -281,16 +278,16 @@ class TC_IDM_10_7(DeviceConformanceTests):
 
             # All endpoints in "full object" indexing format
             self.endpoints = wildcard_read.attributes
-            log.info("self.endpoints: %s", self.endpoints)
+            log.debug("self.endpoints: %s", self.endpoints)
 
             # All endpoints in raw TLV format
             self.endpoints_tlv = wildcard_read.tlvAttributes
-            log.info("self.endpoints_tlv: %s", self.endpoints_tlv)
+            log.debug("self.endpoints_tlv: %s", self.endpoints_tlv)
 
             return True
 
-        except Exception as e:
-            log.exception("Wildcard read failed for node 0x%X: %s", node_id, e)
+        except Exception:
+            log.exception("Wildcard read failed for node 0x%X", node_id)
             return False
 
     def _normalize_for_order_insensitive_compare(self, value):
@@ -325,8 +322,8 @@ class TC_IDM_10_7(DeviceConformanceTests):
             limited_endpoint_ids = set(limited_data_model.keys())
             full_endpoint_ids = set(full_data_model.keys())
 
-            log.info("Limited Data Model endpoints: %s", sorted(limited_endpoint_ids))
-            log.info("Full Data Model endpoints: %s", sorted(full_endpoint_ids))
+            log.debug("Limited Data Model endpoints: %s", sorted(limited_endpoint_ids))
+            log.debug("Full Data Model endpoints: %s", sorted(full_endpoint_ids))
 
             if len(limited_endpoint_ids) != len(full_endpoint_ids):
                 log.error(
@@ -399,8 +396,8 @@ class TC_IDM_10_7(DeviceConformanceTests):
             log.info("Limited and Full Data Model Descriptor clusters are identical on all endpoints")
             return True
 
-        except Exception as e:
-            log.exception("Descriptor cluster comparison failed: %s", e)
+        except Exception:
+            log.exception("Descriptor cluster comparison failed")
             return False
 
 
