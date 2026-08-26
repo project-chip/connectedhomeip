@@ -177,7 +177,7 @@ class TC_IDM_10_7(DeviceConformanceTests):
         Run conformance checks, store problems, and fail the test on errors.
         """
         ignore_in_progress_test_event_only_disallowed_for_certification = self.user_params.get(
-            "ignore_in_progress_test_event_only_disallowed_for_certification", True
+            "ignore_in_progress_test_event_only_disallowed_for_certification", False
         )
         allow_provisional_test_event_only_disallowed_for_certification = self.user_params.get(
             "allow_provisional_test_event_only_disallowed_for_certification", False
