@@ -17,10 +17,12 @@
 
 """Scriptable serial-console control for a Matter ED (Raspberry Pi) over UART.
 
-This is the out-of-band control channel used by ``run-cert-test.sh`` and the
-TC_COMPRO EDFixture when the ED runs in ``standalone-serial`` mode: eth0 is
-physically disconnected, so the device is driven entirely over its serial
+This is the out-of-band control channel used by the TC_COMPRO ``EDFixture`` (and
+by any rig dispatcher driving it) when the ED runs in ``standalone-serial`` mode:
+eth0 is physically disconnected, so the device is driven entirely over its serial
 login console (``serial-getty@ttyS0`` at 115200, with autologin for ``ubuntu``).
+See the "Standalone-serial ED" section of ``support_modules/compro_support.py``
+for the one-time TH and ED setup this assumes.
 
 Commands are framed with per-call BEGIN/END markers so that kernel console
 spew (``console=ttyS0``) and shell echo can be reliably stripped, and the

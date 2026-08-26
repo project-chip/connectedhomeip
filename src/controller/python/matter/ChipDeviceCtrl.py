@@ -3543,7 +3543,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
             return await asyncio.futures.wrap_future(ctx.future)
 
-    async def CommissionViaProxy(self, proxyNodeId: int, proxySessionId: int,
+    async def CommissionViaProxy(self, *, proxyNodeId: int, proxySessionId: int,
                                  remoteNodeId: int, discriminator: int,
                                  setupPinCode: int, proxyEndpoint: int = 1) -> int:
         '''Commission a device through a Commissioning Proxy.
