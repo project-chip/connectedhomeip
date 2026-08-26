@@ -1,7 +1,7 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
- *    Copyright 2024 NXP
+ *    Copyright (c) 2024, 2026 Project CHIP Authors
+ *    Copyright 2024, 2026  NXP
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include <DnssdImplBr.h>
+#include <platform/OpenThread/OpenThreadBrDnssdImpl.h>
 #include <platform/OpenThread/OpenThreadDnssdImpl.h>
 
 using namespace ::chip::DeviceLayer;
@@ -37,7 +37,7 @@ CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturn
 
     if (ConnectivityMgr().IsWiFiStationProvisioned())
     {
-        error = NxpChipDnssdInit(initCallback, errorCallback, context);
+        error = OpenThreadBrDnssdInit(initCallback, errorCallback, context);
     }
     else if (ConnectivityMgr().IsThreadProvisioned())
     {
@@ -49,14 +49,14 @@ CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturn
 
 void ChipDnssdShutdown()
 {
-    NxpChipDnssdShutdown();
+    OpenThreadBrDnssdShutdown();
 }
 
 CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
     if (ConnectivityMgr().IsWiFiStationProvisioned())
     {
-        ReturnErrorOnFailure(NxpChipDnssdPublishService(service, callback, context));
+        ReturnErrorOnFailure(OpenThreadBrDnssdPublishService(service, callback, context));
     }
     else if (ConnectivityMgr().IsThreadProvisioned())
     {
@@ -70,7 +70,7 @@ CHIP_ERROR ChipDnssdRemoveServices()
 {
     if (ConnectivityMgr().IsWiFiStationProvisioned())
     {
-        ReturnErrorOnFailure(NxpChipDnssdRemoveServices());
+        ReturnErrorOnFailure(OpenThreadBrDnssdRemoveServices());
     }
     else if (ConnectivityMgr().IsThreadProvisioned())
     {
@@ -84,7 +84,7 @@ CHIP_ERROR ChipDnssdFinalizeServiceUpdate()
 {
     if (ConnectivityMgr().IsWiFiStationProvisioned())
     {
-        ReturnErrorOnFailure(NxpChipDnssdFinalizeServiceUpdate());
+        ReturnErrorOnFailure(OpenThreadBrDnssdFinalizeServiceUpdate());
     }
     else if (ConnectivityMgr().IsThreadProvisioned())
     {
@@ -99,7 +99,7 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
 {
     if (ConnectivityMgr().IsWiFiStationProvisioned())
     {
-        ReturnErrorOnFailure(NxpChipDnssdBrowse(type, protocol, addressType, interface, callback, context, browseIdentifier));
+        ReturnErrorOnFailure(OpenThreadBrDnssdBrowse(type, protocol, addressType, interface, callback, context, browseIdentifier));
     }
     else if (ConnectivityMgr().IsThreadProvisioned())
     {
@@ -111,7 +111,7 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
 
 CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
 {
-    return NxpChipDnssdStopBrowse(browseIdentifier);
+    return OpenThreadBrDnssdStopBrowse(browseIdentifier);
 }
 
 CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
@@ -119,7 +119,7 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId inte
 {
     if (ConnectivityMgr().IsWiFiStationProvisioned())
     {
-        ReturnErrorOnFailure(NxpChipDnssdResolve(service, interface, callback, context));
+        ReturnErrorOnFailure(OpenThreadBrDnssdResolve(service, interface, callback, context));
     }
     else if (ConnectivityMgr().IsThreadProvisioned())
     {
@@ -131,7 +131,7 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId inte
 
 void ChipDnssdResolveNoLongerNeeded(const char * instanceName)
 {
-    NxpChipDnssdResolveNoLongerNeeded(instanceName);
+    OpenThreadBrDnssdResolveNoLongerNeeded(instanceName);
 }
 
 CHIP_ERROR ChipDnssdReconfirmRecord(const char * hostname, chip::Inet::IPAddress address, chip::Inet::InterfaceId interface)
