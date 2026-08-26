@@ -315,6 +315,13 @@ void DefaultAvAnalysisCameraClient::OnDone(ReadClient * apReadClient)
             FinishRequest(Status::Failure, mPendingStreamId);
             return;
         }
+        // Deallocation only needs the endpoint; the capability attributes feed the allocate request
+        if (mPendingRequest == PendingRequest::kDeallocate)
+        {
+            mDiscoveryPhase = DiscoveryPhase::kIdle;
+            OnProfileDiscoveryComplete(CHIP_NO_ERROR);
+            return;
+        }
         StartCapabilitiesRead();
         return;
     }
