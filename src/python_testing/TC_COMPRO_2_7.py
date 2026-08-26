@@ -72,9 +72,14 @@ For max_sessions > 1 supply additional EDs via ed2_*, ed3_*, ... arguments:
         ed2_serial_port:/dev/ttyUSB1 'ed2_extra_args:--wifi --wifipaf freq_list=2437' \\
     --int-arg ed2_discriminator:3842 ed2_passcode:20202021
     ```
+
+Each ED may use its own transport: ed2_transport:ble overrides the run-wide
+ed_transport for ED #2 only, and step 6 sends that ED's ProxyConnectRequest over
+the matching transport.
 """
 
 import logging
+from typing import Any
 
 from mobly import asserts
 from support_modules.compro_support import COMPROBaseTest, EDFixture, commission_if_needed
@@ -136,30 +141,44 @@ class TC_COMPRO_2_7(COMPROBaseTest):
                      "Each disconnect returns SUCCESS"),
         ]
 
-    def _ed_fixture_for_index(self, n: int) -> EDFixture | None:
-        """Build an EDFixture for ED #n (1-based) from user params.
+    def _param_for_index(self, n: int, name: str, default: Any = None) -> Any:
+        """Read the ``name`` user param for ED #n (1-based).
 
         ED #1 uses the standard ed_* params; ED #2+ use ed2_*, ed3_*, etc.
-        Returns None if the relevant app_path param is absent (operator prompted).
         """
         params = getattr(self, 'user_params', {}) or {}
         prefix = 'ed' if n == 1 else f'ed{n}'
-        app_path = params.get(f'{prefix}_app_path')
+        return params.get(f'{prefix}_{name}', default)
+
+    def _ed_fixture_for_index(self, n: int) -> EDFixture | None:
+        """Build an EDFixture for ED #n (1-based) from user params.
+
+        Returns None if the relevant app_path param is absent (operator prompted).
+        """
+        app_path = self._param_for_index(n, 'app_path')
         if not app_path:
             return None
         return self.track_ed(EDFixture(
             app_path=app_path,
-            discriminator=int(params.get(f'{prefix}_discriminator', 3840 + n - 1)),
-            passcode=int(params.get(f'{prefix}_passcode', 20202021)),
-            extra_args=params.get(f'{prefix}_extra_args', ''),
-            ed_transport=params.get(f'{prefix}_transport', params.get('ed_transport', 'wifipaf')),
-            serial_port=params.get(f'{prefix}_serial_port'),
+            discriminator=self._discriminator_for_index(n),
+            passcode=int(self._param_for_index(n, 'passcode', 20202021)),
+            extra_args=self._param_for_index(n, 'extra_args', ''),
+            ed_transport=self._transport_for_index(n),
+            serial_port=self._param_for_index(n, 'serial_port'),
         ))
 
     def _discriminator_for_index(self, n: int) -> int:
+        return int(self._param_for_index(n, 'discriminator', 3840 + n - 1))
+
+    def _transport_for_index(self, n: int) -> str:
+        """Transport ED #n is configured for: edN_transport, else ed_transport.
+
+        Each ED can use a different transport, so every ProxyConnectRequest has to
+        take its transport (and WiFiBand) from the ED it targets, not from a single
+        run-wide value.
+        """
         params = getattr(self, 'user_params', {}) or {}
-        prefix = 'ed' if n == 1 else f'ed{n}'
-        return int(params.get(f'{prefix}_discriminator', 3840 + n - 1))
+        return self._param_for_index(n, 'transport', params.get('ed_transport', 'wifipaf'))
 
     @async_test_body
     async def test_TC_COMPRO_2_7(self):
@@ -207,12 +226,16 @@ class TC_COMPRO_2_7(COMPROBaseTest):
 
         # For ProxyConnectRequest commands, select the transport that matches the
         # actual ED transport type so wiFiBand is not sent with a non-WiFiPAF
-        # transport (which would cause INVALID_COMMAND).
-        ed_transport_type = params.get('ed_transport', 'wifipaf')
-        proxy_transport = self.pick_proxy_transport(valid_transports, ed_transport_type)
-        proxy_wifi_band = (self.pick_single_transport_bit(valid_bands)
-                           if has_wi and proxy_transport == int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF)
-                           else None)
+        # transport (which would cause INVALID_COMMAND).  Each ED is configured
+        # separately (edN_transport), so this is per ED: sending one run-wide
+        # transport would fail the connect for any ED using the other one, before
+        # the multi-session check this test exists to make.
+        def proxy_transport_for(n: int) -> tuple[int, int | None]:
+            bit = self.pick_proxy_transport(valid_transports, self._transport_for_index(n))
+            band = (self.pick_single_transport_bit(valid_bands)
+                    if has_wi and bit == int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF)
+                    else None)
+            return bit, band
 
         # Step 5 — ensure max_sessions EDs commissionable simultaneously
         self.step(5)
@@ -224,7 +247,7 @@ class TC_COMPRO_2_7(COMPROBaseTest):
             await self.ensure_ed_commissionable(
                 ed_n,
                 manual_prompt=(
-                    f"Ensure ED #{n} is commissionable via WiFiPAF "
+                    f"Ensure ED #{n} is commissionable via {self._transport_for_index(n)} "
                     f"(discriminator={disc_n}). Press Enter when ready."
                 ),
             )
@@ -237,16 +260,18 @@ class TC_COMPRO_2_7(COMPROBaseTest):
 
         for n in range(1, max_sessions + 1):
             disc_n = self._discriminator_for_index(n)
-            logger.info("Step 6 [ED #%d]: ProxyConnectRequest (discriminator=%d)", n, disc_n)
+            transport_n, band_n = proxy_transport_for(n)
+            logger.info("Step 6 [ED #%d]: ProxyConnectRequest (discriminator=%d, transport=0x%02x)",
+                        n, disc_n, transport_n)
             resp = await self.send_cp_command(
                 cp.Commands.ProxyConnectRequest(
                     address=NullValue,
-                    transport=proxy_transport,
+                    transport=transport_n,
                     discriminator=disc_n,
                     vendorID=0,
                     productID=0,
                     timeout=proxy_connect_timeout,
-                    wiFiBand=proxy_wifi_band,
+                    wiFiBand=band_n,
                 ),
                 # Async ProxyConnect: the invoke wait is governed by
                 # interactionTimeoutMs, so it must cover proxy_connect_timeout;
@@ -259,6 +284,9 @@ class TC_COMPRO_2_7(COMPROBaseTest):
                 f"session_{n} {sess_n:#06x} must be in range 0x0001–0xFFFE")
             logger.info("Step 6 [ED #%d]: session_%d = %d (0x%04x)", n, n, sess_n, sess_n)
             active_sessions.append(sess_n)
+            # Steps 7 and 8 sit between these sessions and their step-9 disconnect;
+            # abandoning them leaves the DUT's session table full for the next test.
+            self.register_session_disconnect(sess_n)
 
         # ------------------------------------------------------------------
         # Step 7 — one more ProxyConnectRequest → RESOURCE_EXHAUSTED
@@ -273,17 +301,20 @@ class TC_COMPRO_2_7(COMPROBaseTest):
         # the session-count gate. 4095 is the max valid value and is clear of the
         # 3840-based discriminators used to fill the sessions in step 6.
         overflow_disc = int(params.get('overflow_discriminator', 4095))
+        # Any one valid transport will do; ED #1's is known valid because step 6
+        # connected over it.
+        overflow_transport, overflow_band = proxy_transport_for(1)
         logger.info("Step 7: ProxyConnectRequest (discriminator=%d, expect RESOURCE_EXHAUSTED)",
                     overflow_disc)
         await self.expect_command_rejected(
             cp.Commands.ProxyConnectRequest(
                 address=NullValue,
-                transport=proxy_transport,
+                transport=overflow_transport,
                 discriminator=overflow_disc,
                 vendorID=0,
                 productID=0,
                 timeout=30,
-                wiFiBand=proxy_wifi_band,
+                wiFiBand=overflow_band,
             ),
             Status.ResourceExhausted,
             "Step 7 ProxyConnectRequest with the session table full",

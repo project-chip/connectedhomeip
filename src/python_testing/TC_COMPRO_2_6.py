@@ -104,6 +104,10 @@ logger = logging.getLogger(__name__)
 
 # Timeout for ProxyConnectRequest (seconds)
 CONNECT_TIMEOUT_S = 120
+CONNECT_MARGIN_S = 10       # IM round trip on top of the ProxyConnect timeout
+COMMISSION_BUDGET_S = 120   # step 6 commissioning plus the step-2 PASE
+BUSY_BUDGET_S = 30          # step 12: ResponseTimeout=10 s, IM margin, 2 s sleep
+REMAINING_STEPS_BUDGET_S = 120
 
 # Minimal placeholder message (8 zero bytes) for negative-path ProxyMessageRequest
 # tests.  This is NOT a well-formed Matter frame; it is sufficient only because the
@@ -121,11 +125,15 @@ class TC_COMPRO_2_6(COMPROBaseTest):
 
     @property
     def default_timeout(self) -> int:
-        # Step 6 commissions the DUT (~30-60 s).
-        # Step 11 ProxyConnect: up to proxy_connect_timeout (default 120 s) + margin.
-        # Step 12 BUSY test: ResponseTimeout=10 s + IM margin + 2 s sleep.
-        # PASE + remaining steps: ~30 s.
-        return 400
+        # Step 6 commissions the DUT; step 11 ProxyConnect runs up to
+        # proxy_connect_timeout; step 12's BUSY test adds its ResponseTimeout.
+        # Overrunning this cancels the test body rather than failing a step, so the
+        # budget is sized from the configured connect timeout rather than its
+        # default, which a longer --int-arg proxy_connect_timeout would exceed.
+        params = getattr(self, 'user_params', {}) or {}
+        proxy_connect_timeout = int(params.get('proxy_connect_timeout', CONNECT_TIMEOUT_S))
+        return (proxy_connect_timeout + CONNECT_MARGIN_S + COMMISSION_BUDGET_S
+                + BUSY_BUDGET_S + REMAINING_STEPS_BUDGET_S)
 
     def desc_TC_COMPRO_2_6(self) -> str:
         return "[TC-COMPRO-2.6] Error Handling with DUT as Server"
@@ -360,6 +368,8 @@ class TC_COMPRO_2_6(COMPROBaseTest):
             0x0001 <= session_a <= 0xFFFE,
             f"session_a {session_a:#06x} must be in range 0x0001–0xFFFE")
         logger.info("Step 11: session_a = %d (0x%04x)", session_a, session_a)
+        # Step 12 sits between this session and its step-13 disconnect.
+        self.register_session_disconnect(session_a)
 
         # ----------------------------------------------------------------
         # Step 12: BUSY — two concurrent ProxyMessageRequests for session_a.

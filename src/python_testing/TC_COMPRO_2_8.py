@@ -285,6 +285,8 @@ class TC_COMPRO_2_8(COMPROBaseTest):
             0x0001 <= fabric_a_session <= 0xFFFE,
             f"fabric_a_session {fabric_a_session:#06x} must be in range 0x0001–0xFFFE")
         logger.info("Step 6: fabric_a_session = %d (0x%04x)", fabric_a_session, fabric_a_session)
+        # Steps 7 and 8 sit between this session and its step-9 disconnect.
+        self.register_session_disconnect(fabric_a_session)
 
         # ----------------------------------------------------------------
         # Step 7 — TH2 ProxyMessageRequest(fabric_a_session) → NOT_FOUND
@@ -371,6 +373,8 @@ class TC_COMPRO_2_8(COMPROBaseTest):
                     wiFiBands=wifi_bands_arg,
                 ))
             logger.info("Step 10: ProxyBackGroundScanStartRequest succeeded")
+            # Timeout=0 runs until stopped, and step 16 is six steps away.
+            self.register_bgscan_stop(valid_transports, wifi_bands_arg)
 
             # Step 11 — TH2 ProxyBackGroundScanStopRequest → NOT_FOUND
             # (Fabric B has not started a background scan.)
@@ -397,6 +401,7 @@ class TC_COMPRO_2_8(COMPROBaseTest):
                 ),
                 controller=th2)
             logger.info("Step 12: TH2 ProxyBackGroundScanStartRequest succeeded")
+            self.register_bgscan_stop(valid_transports, wifi_bands_arg, controller=th2)
 
             # Step 13 — Both fabrics independently see the ED in their cache.
             self.step(13)

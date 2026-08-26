@@ -141,6 +141,12 @@ logger = logging.getLogger(__name__)
 
 # Timeout for ProxyConnectRequest (seconds)
 CONNECT_TIMEOUT_S = 120
+CONNECT_MARGIN_S = 10        # IM round trip on top of each ProxyConnect timeout
+COMMISSION_BUDGET_S = 120    # step 6 CommissionViaProxy, per transport iteration
+STEPS_10_14_BUDGET_S = 100   # steps 10-14 plus framework overhead
+# Steps 4-9 repeat once per supported transport.  Only kBle and kWiFiPAF are
+# candidates (see transports_to_test below), so the loop runs at most twice.
+TRANSPORT_ITERATIONS_MAX = 2
 
 # Base node ID for EDs commissioned via proxy; each transport iteration uses
 # ED_NODE_ID + iteration_index to avoid fabric storage collisions.
@@ -157,13 +163,17 @@ class TC_COMPRO_2_4(COMPROBaseTest):
 
     @property
     def default_timeout(self) -> int:
-        # Steps 4–9 run once per transport (up to 2 iterations):
-        #   Step 5 ProxyConnect: proxy_connect_timeout (default 120 s) + margin
+        # Steps 4–9 run once per transport (up to TRANSPORT_ITERATIONS_MAX):
+        #   Step 5 ProxyConnect: proxy_connect_timeout + margin
         #   Step 6 CommissionViaProxy: PASE + commissioning ~30–60 s
-        # Step 10 ProxyConnect Timeout=1: ~2 s
-        # Step 14 asyncio.gather: ~5 s
-        # 2 iterations × ~200 s + steps 10–14 overhead ~30 s
-        return 600
+        # Step 10 ProxyConnect Timeout=1: ~2 s; step 14 asyncio.gather: ~5 s.
+        # Overrunning this cancels the test body rather than failing a step, so the
+        # budget is sized from the configured connect timeout rather than its
+        # default, which a longer --int-arg proxy_connect_timeout would exceed.
+        params = getattr(self, 'user_params', {}) or {}
+        proxy_connect_timeout = int(params.get('proxy_connect_timeout', CONNECT_TIMEOUT_S))
+        per_transport = proxy_connect_timeout + CONNECT_MARGIN_S + COMMISSION_BUDGET_S
+        return TRANSPORT_ITERATIONS_MAX * per_transport + STEPS_10_14_BUDGET_S
 
     def desc_TC_COMPRO_2_4(self) -> str:
         return "[TC-COMPRO-2.4] Proxy Connect, Message and Disconnect feature functionality"
@@ -384,6 +394,8 @@ class TC_COMPRO_2_4(COMPROBaseTest):
                 f"[{transport_label}] SessionID {current_session_id:#06x} must be "
                 "≤ 0xFFFE (ProxyConnectResponse SessionID constraint is max 65534)")
             logger.info("[%s] ProxyConnectResponse: sessionID=%d", transport_label, current_session_id)
+            # Steps 7 and 8 sit between this session and its step-9 disconnect.
+            self.register_session_disconnect(current_session_id)
 
             # -- Step 6 work: ProxyMessageRequest(ResponseTimeout=0, Message=null) --
             if first_pass:

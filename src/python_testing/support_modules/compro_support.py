@@ -313,6 +313,7 @@ import logging
 import os
 import sys
 from collections.abc import Awaitable, Callable
+from typing import Any
 
 from mobly import asserts
 
@@ -459,6 +460,7 @@ class EDFixture:
 
     @property
     def ed_transport(self) -> str:
+        """Transport this ED is configured for: ``'wifipaf'`` or ``'ble'``."""
         return self._ed_transport
 
     def _validate_extra_args_for_transport(self):
@@ -481,14 +483,14 @@ class EDFixture:
             raise ValueError(
                 f"Unknown ed_transport '{self._ed_transport}'; expected 'ble' or 'wifipaf'.")
 
-    async def start(self):
+    async def start(self) -> None:
         """Start the ED app so it is commissionable."""
         if self._remote:
             await self._start_remote()
         else:
             await self._start_local()
 
-    async def stop(self):
+    async def stop(self) -> None:
         """Stop the ED app so it is no longer commissionable."""
         if self._remote:
             await self._stop_remote()
@@ -497,6 +499,7 @@ class EDFixture:
 
     @property
     def is_running(self) -> bool:
+        """True once ``start()`` has launched the ED app and ``stop()`` has not run."""
         if self._remote:
             return self._remote_pid is not None
         return self._process is not None
@@ -598,7 +601,7 @@ class EDFixture:
         await asyncio.sleep(1)
         logger.info("Remote ED fixture stopped")
 
-    async def renew_environment(self):
+    async def renew_environment(self) -> None:
         """Reset the ED's Wi-Fi/NAN environment via ``~/script/renew-comee_env.sh``.
 
         The script (CSA-supplied, see "Helper scripts" above) restores a pristine
@@ -679,7 +682,7 @@ class COMPROBaseTest(MatterBaseTest):
     # ------------------------------------------------------------------
 
     @property
-    def cp(self):
+    def cp(self) -> type[Clusters.CommissioningProxy]:
         """Shortcut to the CommissioningProxy cluster class."""
         return Clusters.CommissioningProxy
 
@@ -698,7 +701,7 @@ class COMPROBaseTest(MatterBaseTest):
     # Attribute helpers
     # ------------------------------------------------------------------
 
-    async def read_cp_attribute(self, attribute):
+    async def read_cp_attribute(self, attribute) -> Any:
         """Read a single CommissioningProxy attribute, asserting success."""
         return await self.read_single_attribute_check_success(
             endpoint=self.cp_endpoint,
@@ -735,7 +738,7 @@ class COMPROBaseTest(MatterBaseTest):
         controller=None,
         node_id: int | None = None,
         timeout_ms: int | None = None,
-    ):
+    ) -> Any:
         """Send a CommissioningProxy command to the DUT and return the response.
 
         Defaults to the DUT node id and the cluster's endpoint.  Pass
@@ -812,6 +815,46 @@ class COMPROBaseTest(MatterBaseTest):
     # Unconditional per-test cleanup
     # ------------------------------------------------------------------
 
+    def register_bgscan_stop(self, transport: int, wifi_bands: int | None, controller=None) -> None:
+        """Stop this background scan in teardown, even if a later step raises.
+
+        A background scan started with Timeout=0 runs until it is stopped, so a
+        test that fails between its start and its stop leaves the DUT scanning
+        into whatever runs next.  NOT_FOUND is ignored because the happy path
+        normally stops the scan first.
+        """
+        async def stop_bgscan():
+            try:
+                await self.send_cp_command(
+                    self.cp.Commands.ProxyBackGroundScanStopRequest(
+                        transport=transport,
+                        wiFiBands=wifi_bands,
+                    ),
+                    controller=controller)
+            except InteractionModelError as exc:
+                if exc.status != Status.NotFound:
+                    raise
+
+        self._register_cleanup(stop_bgscan)
+
+    def register_session_disconnect(self, session_id: int, controller=None) -> None:
+        """Disconnect this proxy session in teardown, even if a later step raises.
+
+        Sessions occupy the DUT's session table until they are disconnected or
+        time out, so an abandoned one can exhaust the table for the next test.
+        NOT_FOUND is ignored because the happy path normally disconnects first.
+        """
+        async def disconnect_session():
+            try:
+                await self.send_cp_command(
+                    self.cp.Commands.ProxyDisconnectRequest(sessionID=session_id),
+                    controller=controller)
+            except InteractionModelError as exc:
+                if exc.status != Status.NotFound:
+                    raise
+
+        self._register_cleanup(disconnect_session)
+
     def _register_cleanup(self, coro_factory: Callable[[], Awaitable]) -> None:
         """Register a zero-arg async callable to run in teardown_test (LIFO).
 
@@ -823,7 +866,7 @@ class COMPROBaseTest(MatterBaseTest):
             self._compro_cleanups = []
         self._compro_cleanups.append(coro_factory)
 
-    def teardown_test(self):
+    def teardown_test(self) -> None:
         # Run registered cleanups newest-first, each guarded so one failure does
         # not skip the rest, before the framework's own teardown.
         for factory in reversed(getattr(self, "_compro_cleanups", [])):
@@ -838,7 +881,7 @@ class COMPROBaseTest(MatterBaseTest):
         self,
         ed: EDFixture | None,
         manual_prompt: str | None = None,
-    ):
+    ) -> None:
         """Ensure the ED is in commissionable state (automated or manual).
 
         When ``ed`` is None (no ed_app_path provided) the operator is prompted via
@@ -858,7 +901,7 @@ class COMPROBaseTest(MatterBaseTest):
         self,
         ed: EDFixture | None,
         manual_prompt: str | None = None,
-    ):
+    ) -> None:
         """Ensure the ED is NOT in commissionable state (automated or manual).
 
         When ``ed`` is None (no ed_app_path provided) the operator is prompted via
@@ -878,7 +921,7 @@ class COMPROBaseTest(MatterBaseTest):
         self,
         ed: EDFixture | None,
         manual_prompt: str | None = None,
-    ):
+    ) -> None:
         """Reset the ED's Wi-Fi/NAN environment (automated or manual).
 
         Clears any Wi-Fi credential the ED stored during an earlier commissioning

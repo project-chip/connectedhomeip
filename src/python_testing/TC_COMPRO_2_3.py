@@ -61,6 +61,10 @@ Example usage:
     ```
     If ``ed_app_path`` is omitted the test pauses and prompts the operator to
     make the ED commissionable/not commissionable at each relevant step.
+
+Pass ``--int-arg cache_timeout_testable:<seconds>`` when the DUT reports a
+CacheTimeout longer than the default budget; step 12 waits that long for the
+cache to expire, so the framework timeout is sized from it.
 """
 
 import asyncio
@@ -79,17 +83,34 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
+# CacheTimeout is a uint16 with a min of 1 (commissioning-proxy-cluster.xml), so a
+# spec-conformant DUT may report anything up to 65535 s -- far longer than a test
+# run can wait for the cache to expire.  The framework timeout is sized for this
+# many seconds instead, and step 10 fails with a clear message when the DUT
+# reports more.
+CACHE_TIMEOUT_TESTABLE_DEFAULT = 150
+CACHE_EXPIRY_MARGIN_S = 10   # step 12 waits cache_timeout + this
+FIXED_WAITS_S = 140          # step 7 (40 s), steps 9/14 polls (40 s each), step 22 (20 s)
+FRAMEWORK_OVERHEAD_S = 90    # commissioning, the remaining reads and framework overhead
+
 
 class TC_COMPRO_2_3(COMPROBaseTest):
 
     @property
     def default_timeout(self) -> int:
-        # Step 7 sleeps 40 s; step 12 waits up to cache_timeout + 10 s (the value
-        # the DUT reports for CacheTimeout — the spec mandates no fixed default,
-        # but implementations typically use ~120 s); steps 9/14 poll up to 40 s
-        # each; step 22 sleeps 20 s.
-        # Worst-case sequential total ≈ 270 s; 360 s gives comfortable headroom.
-        return 360
+        # Step 7 sleeps 40 s; step 12 waits up to cache_timeout + 10 s; steps 9/14
+        # poll up to 40 s each; step 22 sleeps 20 s.  Overrunning this cancels the
+        # test body rather than failing a step, so the cache-expiry wait is sized
+        # from cache_timeout_testable -- the DUT's CacheTimeout is not readable
+        # until step 10, by which point the budget is already fixed.
+        return (self.cache_timeout_testable + CACHE_EXPIRY_MARGIN_S
+                + FIXED_WAITS_S + FRAMEWORK_OVERHEAD_S)
+
+    @property
+    def cache_timeout_testable(self) -> int:
+        """Longest CacheTimeout this run will wait out, from cache_timeout_testable."""
+        params = getattr(self, 'user_params', {}) or {}
+        return int(params.get('cache_timeout_testable', CACHE_TIMEOUT_TESTABLE_DEFAULT))
 
     def desc_TC_COMPRO_2_3(self) -> str:
         return "[TC-COMPRO-2.3] Proxy Background Scan feature functionality"
@@ -262,6 +283,8 @@ class TC_COMPRO_2_3(COMPROBaseTest):
                 wiFiBands=valid_bands if has_wi else None,
             ))
         logger.info("ProxyBackGroundScanStartRequest sent (Timeout=0, infinite)")
+        # Timeout=0 runs until stopped, and step 15 is eight steps away.
+        self.register_bgscan_stop(valid_transports, valid_bands if has_wi else None)
 
         # Step 7 — verify cache stays empty for 40 s via subscription monitoring.
         # Any subscription report with NumCachedResults != 0 fails the step immediately.
@@ -329,6 +352,15 @@ class TC_COMPRO_2_3(COMPROBaseTest):
         self.step(10)
         cache_timeout = await self.read_cache_timeout()
         logger.info("CacheTimeout = %d s", cache_timeout)
+        # Stop here rather than in the middle of step 12: the expiry wait is sized
+        # into default_timeout, and exceeding it cancels the test body, which reports
+        # as a framework timeout instead of naming the cause.
+        asserts.assert_less_equal(
+            cache_timeout, self.cache_timeout_testable,
+            f"DUT reports CacheTimeout={cache_timeout} s, more than this run is budgeted for "
+            f"({self.cache_timeout_testable} s).  Step 12 waits that long plus "
+            f"{CACHE_EXPIRY_MARGIN_S} s for the cache to expire.  Pass "
+            f"--int-arg cache_timeout_testable:{cache_timeout} to allow it.")
 
         # Step 11 — make ED not commissionable to trigger TTL expiry
         self.step(11)
@@ -402,6 +434,8 @@ class TC_COMPRO_2_3(COMPROBaseTest):
             await self.send_cp_command(
                 cp.Commands.ProxyBackGroundScanStartRequest(
                     transport=start_transport, timeout=0, wiFiBands=start_bands))
+            # The stop below can fail, leaving this Timeout=0 scan running.
+            self.register_bgscan_stop(start_transport, start_bands)
             # Stopping a different, non-overlapping supported transport returns SUCCESS.
             await self.send_cp_command(
                 cp.Commands.ProxyBackGroundScanStopRequest(
