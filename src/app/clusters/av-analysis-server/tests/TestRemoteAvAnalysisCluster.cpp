@@ -691,7 +691,7 @@ TEST_F(TestRemoteAvAnalysisCluster, EstablishSameCameraStreamIsIdempotent)
     firstHandler.SetFabricIndex(1);
     EstablishStream(firstHandler, 0x1234, Status::Success, 42);
 
-    // The camera hands out the same id again, the retry is answered with the existing analysis stream 
+    // The camera hands out the same id again, the retry is answered with the existing analysis stream
     // instead of creating a second entry over the same camera stream
     Testing::MockCommandHandler secondHandler;
     secondHandler.SetFabricIndex(1);
