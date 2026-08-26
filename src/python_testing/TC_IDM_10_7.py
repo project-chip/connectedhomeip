@@ -107,11 +107,8 @@ class TC_IDM_10_7(DeviceConformanceTests):
             self.fail_current_test("Missing mandatory clusters in Limited Data Model")
 
         self.step(4)    # Limited Data Model : Check clusters revisions
-        ignore_in_progress_test_event_only_disallowed_for_certification = self.user_params.get(
-            "ignore_in_progress_test_event_only_disallowed_for_certification", False)
-        success, problems = self.check_revisions(ignore_in_progress_test_event_only_disallowed_for_certification)
-        self.problems.extend(problems)
-        if not success:
+        revisions_success = self._check_revisions()
+        if not revisions_success:
             self.fail_current_test("Problems with cluster revision on at least one cluster")
 
         self.step(5)    # Limited Data Model : Check clusters conformance
@@ -255,6 +252,24 @@ class TC_IDM_10_7(DeviceConformanceTests):
 
         except Exception:
             log.exception("Conformance check failed with exception")
+            return False
+
+    def _check_revisions(self) -> bool:
+        """
+        Run revision checks, store problems, and return True on success or False on failure.
+        """
+        try:
+            ignore_in_progress_test_event_only_disallowed_for_certification = self.user_params.get(
+                "ignore_in_progress_test_event_only_disallowed_for_certification", False
+            )
+            success, problems = self.check_revisions(
+                ignore_in_progress_test_event_only_disallowed_for_certification
+            )
+            self.problems.extend(problems)
+            return success
+
+        except Exception:
+            log.exception("Revision check failed with exception")
             return False
 
     async def _wildcard_read(self, node_id: int) -> bool:
