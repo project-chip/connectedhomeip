@@ -277,7 +277,6 @@ class TC_CNET_4_24(MatterBaseTest):
         network_id_1 = get_thread_tlv(incorrect_thread_dataset_1,
                                       tlv_type=EXTENDED_PAN_ID_TLV_TYPE, expected_length=8)
 
-
         # PASE, SupportsConcurrentConnection gate, and fail-safe.
         self.step(0)
 
