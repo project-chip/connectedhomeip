@@ -168,8 +168,11 @@ CHIP_ERROR CommodityPriceCluster::PriceStorage::Set(Span<const Structs::Commodit
                 }
             }
 
-            dest.components.SetValue(DataModel::List<const Structs::CommodityPriceComponentStruct::Type>(
-                mComponents.Get() + componentOffset, components.size()));
+            const Structs::CommodityPriceComponentStruct::Type * destComponents =
+                components.empty() ? nullptr : mComponents.Get() + componentOffset;
+
+            dest.components.SetValue(
+                DataModel::List<const Structs::CommodityPriceComponentStruct::Type>(destComponents, components.size()));
             componentOffset += components.size();
         }
     }
@@ -189,13 +192,13 @@ void CommodityPriceCluster::PriceStorage::Clear()
 
 CharSpan CommodityPriceCluster::PriceStorage::CopyDescription(CharSpan description, size_t & offset)
 {
+    // Offsetting a null buffer is undefined even by zero, so there is nothing to copy into.
+    VerifyOrReturnValue(!description.empty(), CharSpan());
+
     char * dest = mDescriptions.Get() + offset;
 
-    if (!description.empty())
-    {
-        memcpy(dest, description.data(), description.size());
-        offset += description.size();
-    }
+    memcpy(dest, description.data(), description.size());
+    offset += description.size();
 
     return CharSpan(dest, description.size());
 }
@@ -416,14 +419,9 @@ CHIP_ERROR CommodityPriceCluster::SetCurrentPrice(const DataModel::Nullable<Stru
     // flash it would cost, so every set is reported.
     NotifyAttributeChanged(Attributes::CurrentPrice::Id);
 
-    // The attribute is already updated at this point, so a failure to report the change to
-    // subscribers is logged rather than handed back to the caller.
-    CHIP_ERROR eventError = GeneratePriceChangeEvent();
-    if (eventError != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Endpoint %u - unable to generate PriceChange event: %" CHIP_ERROR_FORMAT, mPath.mEndpointId,
-                     eventError.Format());
-    }
+    // The attribute is already updated at this point, so a failure to generate the event is not
+    // handed back to the caller.
+    (void) GeneratePriceChangeEvent();
 
     return CHIP_NO_ERROR;
 }

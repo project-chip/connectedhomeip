@@ -60,7 +60,6 @@ CHIP_ERROR Instance::Init()
 void Instance::Shutdown()
 {
     VerifyOrReturn(mRegistered);
-    mRegistered = false;
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
 
@@ -68,7 +67,10 @@ void Instance::Shutdown()
     {
         ChipLogError(AppServer, "Failed to unregister cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
                      mCluster.Cluster().GetPaths()[0].mEndpointId, ChipLogValueMEI(CommodityPrice::Id), err.Format());
+        return;
     }
+
+    mRegistered = false;
 }
 
 bool Instance::HasFeature(Feature aFeature) const

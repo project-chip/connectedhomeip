@@ -433,6 +433,37 @@ TEST_F(TestCommodityPriceCluster, SetCurrentPriceKeepsThePreviousValueOnRejectio
     EXPECT_EQ(currentPrice.Value().periodStart, kPeriodStart);
 }
 
+// A description and a component list that are present but empty take up no room in the storage
+// buffers, which are then never allocated. The copy still has to hold on to the distinction between
+// an absent optional and an empty one.
+TEST_F(TestCommodityPriceCluster, SetCurrentPriceWithEmptyOptionalDetails)
+{
+    Structs::CommodityPriceStruct::Type price = MakePrice();
+    price.description.SetValue(""_span);
+    price.components.SetValue(DataModel::List<const Structs::CommodityPriceComponentStruct::Type>());
+
+    ASSERT_EQ(mCluster.SetCurrentPrice(price), CHIP_NO_ERROR);
+
+    Commands::GetDetailedPriceRequest::Type request;
+    request.details = AllDetails();
+
+    auto result = mTester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access): IsSuccess() implies a response
+    const auto & storedPrice = result.response->currentPrice;
+    ASSERT_FALSE(storedPrice.IsNull());
+    EXPECT_EQ(storedPrice.Value().periodStart, kPeriodStart);
+
+    ASSERT_TRUE(storedPrice.Value().description.HasValue());
+    EXPECT_TRUE(storedPrice.Value().description.Value().empty());
+
+    ASSERT_TRUE(storedPrice.Value().components.HasValue());
+    auto components = storedPrice.Value().components.Value().begin();
+    EXPECT_FALSE(components.Next());
+    EXPECT_EQ(components.GetStatus(), CHIP_NO_ERROR);
+}
+
 TEST_F(TestCommodityPriceCluster, SetForecastUpdatesTheAttribute)
 {
     // The entries are deep copied, so they and everything they point at are gone by the time the
@@ -487,6 +518,57 @@ TEST_F(TestCommodityPriceCluster, SetForecastToAnEmptyList)
     auto iter = priceForecast.begin();
     EXPECT_FALSE(iter.Next());
     EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
+}
+
+// An entry whose details are empty sits alongside one that fills the shared buffers, so here the
+// buffers do exist and the empty entry must neither consume nor skip any room in them.
+TEST_F(TestCommodityPriceCluster, SetForecastMixesEmptyAndPopulatedDetails)
+{
+    Structs::CommodityPriceComponentStruct::Type component;
+    component.price = kComponentPrice;
+    component.description.SetValue(kComponentDescription);
+
+    Structs::CommodityPriceStruct::Type entries[2];
+    entries[0] = MakePrice();
+    entries[0].description.SetValue(""_span);
+    entries[0].components.SetValue(DataModel::List<const Structs::CommodityPriceComponentStruct::Type>());
+    entries[1] = MakePrice(kPeriodStart + kPeriodDuration, kPrice * 2);
+    entries[1].description.SetValue(kPriceDescription);
+    entries[1].components.SetValue(DataModel::List<const Structs::CommodityPriceComponentStruct::Type>(&component, 1));
+
+    ASSERT_EQ(mCluster.SetForecast(Span<const Structs::CommodityPriceStruct::Type>(entries, 2)), CHIP_NO_ERROR);
+
+    Commands::GetDetailedForecastRequest::Type request;
+    request.details = AllDetails();
+
+    auto result = mTester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access): IsSuccess() implies a response
+    auto forecast = result.response->priceForecast.begin();
+
+    ASSERT_TRUE(forecast.Next());
+    EXPECT_EQ(forecast.GetValue().periodStart, kPeriodStart);
+    ASSERT_TRUE(forecast.GetValue().description.HasValue());
+    EXPECT_TRUE(forecast.GetValue().description.Value().empty());
+    ASSERT_TRUE(forecast.GetValue().components.HasValue());
+    auto emptyComponents = forecast.GetValue().components.Value().begin();
+    EXPECT_FALSE(emptyComponents.Next());
+
+    ASSERT_TRUE(forecast.Next());
+    EXPECT_EQ(forecast.GetValue().periodStart, kPeriodStart + kPeriodDuration);
+    ASSERT_TRUE(forecast.GetValue().description.HasValue());
+    EXPECT_TRUE(forecast.GetValue().description.Value().data_equal(kPriceDescription));
+    ASSERT_TRUE(forecast.GetValue().components.HasValue());
+    auto components = forecast.GetValue().components.Value().begin();
+    ASSERT_TRUE(components.Next());
+    EXPECT_EQ(components.GetValue().price, kComponentPrice);
+    ASSERT_TRUE(components.GetValue().description.HasValue());
+    EXPECT_TRUE(components.GetValue().description.Value().data_equal(kComponentDescription));
+    EXPECT_FALSE(components.Next());
+
+    EXPECT_FALSE(forecast.Next());
+    EXPECT_EQ(forecast.GetStatus(), CHIP_NO_ERROR);
 }
 
 TEST_F(TestCommodityPriceCluster, SetForecastRejectsTooManyEntries)
