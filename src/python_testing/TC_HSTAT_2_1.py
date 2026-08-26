@@ -234,7 +234,8 @@ class TC_HSTAT_2_1(HSTATBase):
             log.info("MistType is %s", dut_MistType)
             if dut_MistType != NullValue:
                 asserts.assert_greater_equal(dut_MistType, self.MistTypeBitmap.kMistCold, "MistType attribute out of range")
-                asserts.assert_less_equal(dut_MistType, self.MistTypeBitmap.kMistCold+self.MistTypeBitmap.kMistWarm, "MistType attribute out of range")
+                asserts.assert_less_equal(dut_MistType, self.MistTypeBitmap.kMistCold +
+                                          self.MistTypeBitmap.kMistWarm, "MistType attribute out of range")
         else:
             self.skip_step(11)
 
