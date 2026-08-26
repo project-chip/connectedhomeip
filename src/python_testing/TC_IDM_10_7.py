@@ -39,7 +39,7 @@ class TC_IDM_10_7(DeviceConformanceTests):
     def steps_TC_IDM_10_7(self) -> list[TestStep]:
         return [
             TestStep(1, "Perform a 'PASE only' session, over NTL", "PASE successful", is_commissioning=False),
-            TestStep(2, "Perform a wildcard read on Endpoint 0 over NTL and save the result as limited_data_model.",
+            TestStep(2, "Perform a wildcard read over NTL and save the result as limited_data_model.",
                      "Wildcard read successful."),
             TestStep(3, "Limited Data Model : Check clusters presence",
                      "All the mandatory clusters should be present."),
@@ -88,8 +88,7 @@ class TC_IDM_10_7(DeviceConformanceTests):
         asserts.assert_true(setupPayload.supports_nfc_commissioning, "Device does not Support NFC Commissioning")
 
         commissionee = await self.find_or_establish_pase_session_over_ntl(setupPayload, node_id)
-        if commissionee is None:
-            self.fail_current_test("Failed to find or establish PASE session over NTL")
+        asserts.assert_is_not_none(commissionee, "Failed to find or establish PASE session over NTL")
 
         self.step(2)    # Read of Limited Data Model
         await self._wildcard_read(node_id)
