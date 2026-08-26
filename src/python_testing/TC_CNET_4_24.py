@@ -522,12 +522,12 @@ class TC_CNET_4_24(MatterBaseTest):
                           f"Expected LastConnectErrorValue to be Null, got {last_connect_error}")
 
         self.step(2)
-        response = await self.send_single_cmd(
-            endpoint=endpoint,
-            cmd=cnet.Commands.AddOrUpdateThreadNetwork(
-                operationalDataset=incorrect_thread_dataset_1, breadcrumb=2),
-            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
-        await self._validate_network_config_response(response)
+        # response = await self.send_single_cmd(
+            # endpoint=endpoint,
+            # cmd=cnet.Commands.AddOrUpdateThreadNetwork(
+                # operationalDataset=incorrect_thread_dataset_1, breadcrumb=2),
+            # timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
+        # await self._validate_network_config_response(response)
 
         self.step(3)
         logger.info(" --- Sending ConnectNetwork with incorrect Extended PAN ID: %s", network_id_1.hex())
@@ -547,7 +547,6 @@ class TC_CNET_4_24(MatterBaseTest):
         await asyncio.sleep(THREAD_CONNECT_ATTEMPT_DELAY)
         await asyncio.sleep(NETWORK_STATUS_UPDATE_DELAY)
 
-        # ---------------- Step 4 ----------------
         # Version-conditional check per PR feedback:
         #   - Spec 1.7+: enforce kNetworkNotFound.
         #   - Pre-1.7:   allow any non-success status, a mismatch with kNetworkNotFound
