@@ -303,6 +303,24 @@ TEST_F(TestCommodityPriceCluster, SetCurrencyUpdatesTheAttribute)
     EXPECT_TRUE(mTester.IsAttributeDirty(Currency::Id));
 }
 
+TEST_F(TestCommodityPriceCluster, SetCurrencyToTheSameValueIsNotReported)
+{
+    Globals::Structs::CurrencyStruct::Type euro;
+    euro.currency      = kCurrencyEuro;
+    euro.decimalPoints = kCurrencyDecimals;
+
+    ASSERT_EQ(mCluster.SetCurrency(euro), CHIP_NO_ERROR);
+    mTester.GetDirtyList().clear();
+
+    ASSERT_EQ(mCluster.SetCurrency(euro), CHIP_NO_ERROR);
+    EXPECT_FALSE(mTester.IsAttributeDirty(Currency::Id));
+
+    // A change limited to the decimal points is still a change.
+    euro.decimalPoints = kCurrencyDecimals + 1;
+    ASSERT_EQ(mCluster.SetCurrency(euro), CHIP_NO_ERROR);
+    EXPECT_TRUE(mTester.IsAttributeDirty(Currency::Id));
+}
+
 // The spec caps the currency code at 999, the highest ISO 4217 numeric code.
 TEST_F(TestCommodityPriceCluster, SetCurrencyRejectsAnOutOfRangeCode)
 {

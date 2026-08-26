@@ -31,6 +31,19 @@ using chip::Protocols::InteractionModel::Status;
 namespace chip {
 namespace app {
 namespace Clusters {
+namespace Globals {
+namespace Structs {
+namespace CurrencyStruct {
+
+inline bool operator==(const Type & lhs, const Type & rhs)
+{
+    return (lhs.currency == rhs.currency) && (lhs.decimalPoints == rhs.decimalPoints);
+}
+
+} // namespace CurrencyStruct
+} // namespace Structs
+} // namespace Globals
+
 namespace CommodityPrice {
 namespace {
 
@@ -380,18 +393,10 @@ CHIP_ERROR CommodityPriceCluster::SetCurrency(const DataModel::Nullable<Globals:
 
     VerifyOrReturnError(currency.Value().currency <= kMaxCurrencyValue, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
-    // CurrencyStruct has no equality operator, so the change detection SetAttributeValue would do is
-    // spelled out here.
-    const bool changed = mCurrency.IsNull() || (mCurrency.Value().currency != currency.Value().currency) ||
-        (mCurrency.Value().decimalPoints != currency.Value().decimalPoints);
-
-    mCurrency.SetNonNull(currency.Value());
-
-    if (changed)
+    if (SetAttributeValue(mCurrency, currency.Value(), Attributes::Currency::Id))
     {
         ChipLogDetail(AppServer, "Endpoint %u - Currency updated to %u with %u decimal points", mPath.mEndpointId,
                       mCurrency.Value().currency, mCurrency.Value().decimalPoints);
-        NotifyAttributeChanged(Attributes::Currency::Id);
     }
 
     return CHIP_NO_ERROR;
