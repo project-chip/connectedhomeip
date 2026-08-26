@@ -930,6 +930,7 @@ std::optional<DataModel::ActionReturnStatus>
 AvAnalysisServerLogic::HandleActivateAnalysisStream(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                                     const AvAnalysis::Commands::ActivateAnalysisStream::DecodableType & commandData)
 {
+    VerifyOrReturnValue(mStreamTable.Find(commandData.analysisStreamID) != nullptr, Status::NotFound);
     return Status::InvalidInState;
 }
 
@@ -941,6 +942,7 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleDeacti
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const AvAnalysis::Commands::DeactivateAnalysisStream::DecodableType & commandData)
 {
+    VerifyOrReturnValue(mStreamTable.Find(commandData.analysisStreamID) != nullptr, Status::NotFound);
     return Status::InvalidInState;
 }
 

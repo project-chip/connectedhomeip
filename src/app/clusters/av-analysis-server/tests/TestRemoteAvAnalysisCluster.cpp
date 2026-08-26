@@ -391,10 +391,24 @@ TEST_F(TestRemoteAvAnalysisCluster, ExecuteActivateAnalysisStreamCommandTest)
     ConcreteCommandPath kCommandPath{ 1, Clusters::AvAnalysis::Id, Commands::ActivateAnalysisStream::Id };
     Commands::ActivateAnalysisStream::DecodableType commandData;
 
-    auto response = mServer.GetLogic().HandleActivateAnalysisStream(commandHandler, kCommandPath, commandData);
+    commandData.analysisStreamID = 77;
+    auto response                = mServer.GetLogic().HandleActivateAnalysisStream(commandHandler, kCommandPath, commandData);
+    if (response.has_value())
+    {
+        ASSERT_TRUE(response->GetStatusCode() == Protocols::InteractionModel::ClusterStatusCode(Status::NotFound));
+    }
+    else
+    {
+        FAIL();
+    }
 
     // TODO: activation is not implemented yet; no stream can leave PendingInitiation,
-    // so the placeholder responds INVALID_IN_STATE.
+    // so the placeholder responds INVALID_IN_STATE for a known stream.
+    Testing::MockCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, 0x1234, Status::Success, 42);
+    commandData.analysisStreamID = 1;
+    response                     = mServer.GetLogic().HandleActivateAnalysisStream(commandHandler, kCommandPath, commandData);
     if (response.has_value())
     {
         ASSERT_TRUE(response->GetStatusCode() == Protocols::InteractionModel::ClusterStatusCode(Status::InvalidInState));
@@ -412,10 +426,25 @@ TEST_F(TestRemoteAvAnalysisCluster, ExecuteDeactivateAnalysisStreamCommandTest)
     ConcreteCommandPath kCommandPath{ 1, Clusters::AvAnalysis::Id, Commands::DeactivateAnalysisStream::Id };
     Commands::DeactivateAnalysisStream::DecodableType commandData;
 
-    auto response = mServer.GetLogic().HandleDeactivateAnalysisStream(commandHandler, kCommandPath, commandData);
+    // Spec 11.9.8.6.2: an unknown AnalysisStreamID is NOT_FOUND before any state gating
+    commandData.analysisStreamID = 77;
+    auto response                = mServer.GetLogic().HandleDeactivateAnalysisStream(commandHandler, kCommandPath, commandData);
+    if (response.has_value())
+    {
+        ASSERT_TRUE(response->GetStatusCode() == Protocols::InteractionModel::ClusterStatusCode(Status::NotFound));
+    }
+    else
+    {
+        FAIL();
+    }
 
     // TODO: deactivation is not implemented yet; no stream can be in an active state,
-    // so INVALID_IN_STATE is sent as response.
+    // so INVALID_IN_STATE is sent as response for a known stream.
+    Testing::MockCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, 0x1234, Status::Success, 42);
+    commandData.analysisStreamID = 1;
+    response                     = mServer.GetLogic().HandleDeactivateAnalysisStream(commandHandler, kCommandPath, commandData);
     if (response.has_value())
     {
         ASSERT_TRUE(response->GetStatusCode() == Protocols::InteractionModel::ClusterStatusCode(Status::InvalidInState));
@@ -691,7 +720,7 @@ TEST_F(TestRemoteAvAnalysisCluster, EstablishSameCameraStreamIsIdempotent)
     firstHandler.SetFabricIndex(1);
     EstablishStream(firstHandler, 0x1234, Status::Success, 42);
 
-    // The camera hands out the same id again, the retry is answered with the existing analysis stream 
+    // The camera hands out the same id again, the retry is answered with the existing analysis stream
     // instead of creating a second entry over the same camera stream
     Testing::MockCommandHandler secondHandler;
     secondHandler.SetFabricIndex(1);
