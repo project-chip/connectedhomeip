@@ -51,7 +51,7 @@ commissioning sessions up to the MaxSessions limit.
 
 Test plan reference: TC-COMPRO-2.7 (PROVISIONAL)
 
-Example — automated with remote ED RPi (max_sessions == 1):
+Example — automated with a serial-driven ED RPi (max_sessions == 1):
     ```bash
     python3 TC_COMPRO_2_7.py \\
         --commissioning-method on-network \\
@@ -61,7 +61,7 @@ Example — automated with remote ED RPi (max_sessions == 1):
         --paa-trust-store-path ~/matter_tests/paa-trust-store \\
         --endpoint 5 \\
         --string-arg ed_app_path:/home/ubuntu/apps/chip-lighting-app \\
-        --string-arg ed_ssh_host:192.168.1.10 \\
+        --string-arg ed_serial_port:/dev/ttyUSB0 \\
         --string-arg 'ed_extra_args:--wifi --wifipaf freq_list=2437' \\
         --int-arg ed_discriminator:3841 ed_passcode:20202021
     ```
@@ -69,7 +69,7 @@ Example — automated with remote ED RPi (max_sessions == 1):
 For max_sessions > 1 supply additional EDs via ed2_*, ed3_*, ... arguments:
     ```
     --string-arg ed2_app_path:/home/ubuntu/apps/chip-lighting-app \\
-        ed2_ssh_host:192.168.1.11 'ed2_extra_args:--wifi --wifipaf freq_list=2437' \\
+        ed2_serial_port:/dev/ttyUSB1 'ed2_extra_args:--wifi --wifipaf freq_list=2437' \\
     --int-arg ed2_discriminator:3842 ed2_passcode:20202021
     ```
 """
@@ -151,8 +151,6 @@ class TC_COMPRO_2_7(COMPROBaseTest):
             app_path=app_path,
             discriminator=int(params.get(f'{prefix}_discriminator', 3840 + n - 1)),
             passcode=int(params.get(f'{prefix}_passcode', 20202021)),
-            ssh_host=params.get(f'{prefix}_ssh_host'),
-            ssh_user=params.get(f'{prefix}_ssh_user', 'ubuntu'),
             extra_args=params.get(f'{prefix}_extra_args', ''),
             ed_transport=params.get(f'{prefix}_transport', params.get('ed_transport', 'wifipaf')),
             serial_port=params.get(f'{prefix}_serial_port'),

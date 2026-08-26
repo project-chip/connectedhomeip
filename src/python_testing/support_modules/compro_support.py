@@ -107,7 +107,7 @@ the CommissioningProxy cluster on endpoint 5, so pass ``--endpoint 5``
       --endpoint 5 \\
       --string-arg wifi_ssid:MyNetwork wifi_password:MyPassword \\
       --string-arg ed_app_path:/home/ubuntu/apps/chip-lighting-app \\
-      --string-arg ed_ssh_host:<ED-ip> \\
+      --string-arg ed_serial_port:/dev/ttyUSB0 \\
       --string-arg 'ed_extra_args:--wifi --wifipaf freq_list=2437' \\
       --int-arg ed_discriminator:3840 ed_passcode:20202021
 
@@ -125,15 +125,9 @@ file in a full checkout.
 ED reachability (why the extra plumbing)
 ----------------------------------------
 For the test to prove the proxy path — and not silently commission the ED over a
-stray Ethernet link — the ED must be reachable ONLY via the proxy transport:
-
-* In remote-SSH mode ``EDFixture`` runs a script on the ED via passwordless sudo
-  that iptables-blocks the commissioner's eth0 path for the duration of the test
-  and clears it afterwards.  It is not shipped (it hardcodes host paths and the
-  commissioner IP); build your own — see "Remote-SSH ED — eth0 block (minimum to
-  rebuild)" below.
-* In standalone-serial mode eth0 is *physically* disconnected and the ED is driven
-  over its UART login console, so no iptables block is needed.
+stray Ethernet link — the ED must be reachable ONLY via the proxy transport.  In
+standalone-serial mode eth0 is *physically* disconnected and the ED is driven over
+its UART login console.
 
 Helper scripts (what runs where, and what this repo contains)
 -------------------------------------------------------------
@@ -149,20 +143,16 @@ Shipped in this repo (runs on the TH):
   used by ``EDFixture`` standalone-serial mode.  Portable and invoked by the
   tests, so it lives in the repo.
 
-Rig provisioning you supply yourself (not shipped) — build only what your chosen
-ED mode needs:
+Rig provisioning you supply yourself (not shipped):
 
 * **TH — dispatcher (optional).**  A small script that resets the proxy
   KVS, launches the proxy with the transport flags matching its build, applies the
-  ED-reachability convention below, then loops ``python3 TC_COMPRO_2_x.py ...`` N
+  ED-reachability convention above, then loops ``python3 TC_COMPRO_2_x.py ...`` N
   times and collects logs.  Convenient for soak runs; the single-invocation command
   under "Running a test" is the ground truth, so this is purely a convenience you
   can write for your rig.
 * **CP — none.**  The proxy/DUT only runs the commissioning-proxy app binary; it
   needs no helper scripts.
-* **ED — for remote-SSH mode:** an eth0-block script invoked by ``EDFixture`` via
-  passwordless sudo, plus a matching sudoers drop-in.  See "Remote-SSH ED — eth0
-  block (minimum to rebuild)" below.
 * **ED — for standalone-serial mode:** a ``serial-getty@ttyS0`` autologin drop-in
   (``agetty --autologin``) with ``enable_uart=1`` / ``console=ttyS0,115200`` so
   ``serial_console.py`` can log in, and pyserial installed in the Python that runs
@@ -173,35 +163,10 @@ ED mode needs:
   Both come from the CSA "Wi-Fi PAF Commissioning Test Guide" archive, alongside
   ``config_paf_env.sh`` for the one-time comee/comer setup.  Invoked by
   ``EDFixture.renew_environment``, which needs passwordless sudo for it (the
-  script sudoes internally): without a sudoers drop-in the SSH run fails outright
-  and the serial run stalls on the password prompt until it times out.
+  script sudoes internally): without a sudoers drop-in the run stalls on the
+  password prompt until it times out.
 * **ED — Wi-Fi-PAF hardware:** if the ED uses a separate Wi-Fi-PAF radio, whatever
   init your hardware needs to bring the NAN interface up before the test.
-
-Remote-SSH ED — eth0 block (minimum to rebuild)
------------------------------------------------
-``EDFixture`` (SSH mode) runs a script on the ED via passwordless sudo — at the
-path in ``EDFixture._BLOCK_SCRIPT`` — with ``up`` when a test starts and ``down``
-when it stops.  It is not shipped because it hardcodes the commissioner IP and host
-paths.  The minimum a replacement must do, all interface-scoped to eth0 so only the
-proxy path is exercised:
-
-* ``up`` — keep SSH from the commissioner, drop the rest of the commissioner's eth0
-  ingress, and drop eth0 mDNS in both directions (``--dport 5353`` and
-  ``--sport 5353``; repeat with ``ip6tables`` for IPv6)::
-
-    iptables  -I INPUT  -i eth0 -s <commissioner-ip> -p tcp --dport 22 -j ACCEPT
-    iptables  -I INPUT  -i eth0 -s <commissioner-ip> -j DROP
-    iptables  -I OUTPUT -o eth0 -p udp --dport 5353 -j DROP
-    iptables  -I OUTPUT -o eth0 -p udp --sport 5353 -j DROP
-
-* ``down`` — remove exactly those rules (SSH must keep working).
-* Recommended: self-disarm on a timer (drop the rules after, say, 20 min) so a
-  crashed test cannot strand the ED off-network.
-
-Grant the test user passwordless sudo for just this script (a sudoers drop-in).
-The block is optional hardening — without it the ED is still commissioned; you only
-lose the guarantee that the proxy transport (not eth0) carried the commissioning.
 
 Standalone-serial ED — RPi step-by-step setup
 ---------------------------------------------
@@ -255,10 +220,10 @@ it exclusively::
   python3 support_modules/serial_console.py --port /dev/ttyUSB0 wait-shell
   python3 support_modules/serial_console.py --port /dev/ttyUSB0 run "hostname; whoami"
 
-Then run any ED test as shown under "Running a test", replacing the
-``ed_ssh_host:<ED-ip>`` argument with ``ed_serial_port:/dev/ttyUSB0``.  ``EDFixture``
-finds the CLI via the ``ED_SERIAL_CLI`` env var, defaulting to the
-``serial_console.py`` shipped next to this module.
+Then run any ED test as shown under "Running a test", passing
+``ed_serial_port:/dev/ttyUSB0``.  ``EDFixture`` finds the CLI via the
+``ED_SERIAL_CLI`` env var, defaulting to the ``serial_console.py`` shipped next to
+this module.
 
 Troubleshooting:
 
@@ -315,16 +280,15 @@ End Device (ED) fixture control
 --------------------------------
 Tests that require an ED in commissionable state accept an optional ``ed_app_path``
 argument.  When provided, the fixture starts/stops the ED automatically: locally as
-a subprocess, over SSH when ``ed_ssh_host`` is set, or over the ED's serial login
-console when ``ed_serial_port`` is set.  When omitted, the test pauses and prompts
-the operator at the relevant steps.
+a subprocess, or over the ED's serial login console when ``ed_serial_port`` is set.
+When omitted, the test pauses and prompts the operator at the relevant steps.
 
 Pass arguments on the command line with ``--string-arg`` / ``--int-arg``, e.g.:
 
 WiFi-PAF ED::
 
-  --string-arg ed_app_path:/path/to/ed-app ed_ssh_host:192.168.1.10
-  --string-arg ed_ssh_user:ubuntu 'ed_extra_args:--wifi --wifipaf freq_list=2437'
+  --string-arg ed_app_path:/path/to/ed-app ed_serial_port:/dev/ttyUSB0
+  --string-arg 'ed_extra_args:--wifi --wifipaf freq_list=2437'
   --string-arg ed_transport:wifipaf
   --int-arg ed_discriminator:3841 ed_passcode:20202021
 
@@ -332,17 +296,9 @@ BLE ED (note: ``--wifi`` is required so the ED can complete
 AddOrUpdateWifiNetwork + ConnectNetwork after the BLE channel comes up;
 ``--wifipaf`` must be absent)::
 
-  --string-arg ed_app_path:/path/to/ed-app ed_ssh_host:192.168.1.10
-  --string-arg ed_ssh_user:ubuntu ed_extra_args:--wifi
-  --string-arg ed_transport:ble
-  --int-arg ed_discriminator:3841 ed_passcode:20202021
-
-Standalone-serial ED (eth0 physically disconnected; the ED is driven entirely
-over its UART login console.  ``ed_serial_port`` takes precedence over
-``ed_ssh_host``)::
-
   --string-arg ed_app_path:/path/to/ed-app ed_serial_port:/dev/ttyUSB0
-  --string-arg ed_transport:wifipaf 'ed_extra_args:--wifi --wifipaf freq_list=2437'
+  --string-arg ed_extra_args:--wifi
+  --string-arg ed_transport:ble
   --int-arg ed_discriminator:3841 ed_passcode:20202021
 
 ``ed_transport`` defaults to ``wifipaf`` when omitted.
@@ -464,19 +420,14 @@ ED_SERIAL_CLI = os.environ.get(
 class EDFixture:
     """Controls a Matter end device for use as the commissionable ED.
 
-    Three modes are supported:
+    Two modes are supported:
 
-    **Local mode** (``ssh_host`` and ``serial_port`` both unset): the ED binary
-    runs as a subprocess on the same machine as the test.  Suitable for
-    simulated/CI environments.
-
-    **Remote-SSH mode** (``ssh_host`` set): the ED binary is started/stopped over
-    SSH on a remote host (e.g., a Raspberry Pi on the same LAN).  The ED's eth0
-    is masked from the commissioner (iptables) so the WiFi path is exercised.
+    **Local mode** (``serial_port`` unset): the ED binary runs as a subprocess on
+    the same machine as the test.  Suitable for simulated/CI environments.
 
     **Standalone-serial mode** (``serial_port`` set): the ED is driven entirely
     over its UART login console (``serial_console.py``), with eth0 *physically*
-    disconnected.  No eth0 iptables block is needed or applied.
+    disconnected, so nothing has to mask the Ethernet path.
 
     In all modes:
     - ``start()`` makes the device commissionable (starts advertising via NAN/WiFiPAF).
@@ -488,8 +439,6 @@ class EDFixture:
         app_path: str,
         discriminator: int,
         passcode: int,
-        ssh_host: str | None = None,
-        ssh_user: str = "ubuntu",
         extra_args: str = "",
         ed_transport: str = "wifipaf",
         serial_port: str | None = None,
@@ -498,15 +447,13 @@ class EDFixture:
         self._app_path = app_path
         self._discriminator = discriminator
         self._passcode = passcode
-        self._ssh_host = ssh_host
-        self._ssh_user = ssh_user
         self._extra_args = extra_args
         self._ed_transport = ed_transport
         self._serial_port = serial_port
         self._serial_baud = serial_baud
-        # "remote" == not an in-process subprocess: driven over SSH or serial.
-        self._remote = bool(ssh_host or serial_port)
-        self._remote_desc = ssh_host or (f"serial:{serial_port}" if serial_port else "local")
+        # "remote" == not an in-process subprocess: driven over the serial console.
+        self._remote = bool(serial_port)
+        self._remote_desc = f"serial:{serial_port}" if serial_port else "local"
         self._process: asyncio.subprocess.Process | None = None
         self._remote_pid: int | None = None
         self._validate_extra_args_for_transport()
@@ -537,36 +484,17 @@ class EDFixture:
 
     async def start(self):
         """Start the ED app so it is commissionable."""
-        if not self._remote:
+        if self._remote:
+            await self._start_remote()
+        else:
             await self._start_local()
-            return
-        # The eth0 iptables block only applies in remote-SSH mode; standalone-
-        # serial has eth0 physically disconnected, so there is nothing to block.
-        if self._serial_port:
-            await self._start_remote()
-            return
-        # Block the commissioner's eth0 path *before* launching the ED so no
-        # mDNS leak window exists.  If the ED start then fails, undo the block
-        # so the rig is left clean.
-        await self._block_eth0_up()
-        try:
-            await self._start_remote()
-        except Exception:
-            await self._block_eth0_down()
-            raise
 
     async def stop(self):
         """Stop the ED app so it is no longer commissionable."""
-        if not self._remote:
+        if self._remote:
+            await self._stop_remote()
+        else:
             await self._stop_local()
-            return
-        if self._serial_port:
-            await self._stop_remote()
-            return
-        try:
-            await self._stop_remote()
-        finally:
-            await self._block_eth0_down()
 
     @property
     def is_running(self) -> bool:
@@ -618,7 +546,7 @@ class EDFixture:
         logger.info("Local ED fixture stopped")
 
     # ------------------------------------------------------------------
-    # Remote SSH implementation
+    # Serial-console implementation
     # ------------------------------------------------------------------
 
     async def _start_remote(self):
@@ -632,7 +560,7 @@ class EDFixture:
         # matches the actual app process.  Without the anchor, pkill -f would
         # also match the shell that is *running* this command (because the
         # shell's /proc/PID/cmdline contains the full -c argument string which
-        # includes the app path), killing the SSH session with exit-signal.
+        # includes the app path), killing the login shell driving the console.
         app_cmd = (
             f"pkill -f '^{self._app_path}' 2>/dev/null || true; "
             f"sleep 1; "
@@ -644,9 +572,9 @@ class EDFixture:
             f"{self._extra_args} "
             f"> /tmp/ed_app.log 2>&1 & echo $!"
         )
-        pid_str = await self._exec(app_cmd)
-        # Take the last all-digits line to skip any SSH banner / serial console
-        # or kernel-log noise that may precede the echoed PID.
+        pid_str = await self._serial(app_cmd)
+        # Take the last all-digits line to skip any serial console or kernel-log
+        # noise that may precede the echoed PID.
         lines = [line.strip() for line in pid_str.splitlines() if line.strip().isdigit()]
         if not lines:
             raise RuntimeError(f"Remote ED start did not return a PID; output: {pid_str!r}")
@@ -656,46 +584,20 @@ class EDFixture:
         # wpa_supplicant's NAN context enough time to be fully ready for sustained
         # data transfer, not just handshake-sized packets.
         await asyncio.sleep(5)
-        logger.info("Remote ED fixture started (PID=%d, discriminator=%d, host=%s)",
+        logger.info("Remote ED fixture started (PID=%d, discriminator=%d, channel=%s)",
                     self._remote_pid, self._discriminator, self._remote_desc)
 
     async def _stop_remote(self):
         if self._remote_pid is None:
             # No tracked PID — kill any stale instance from a previous run by app path.
-            await self._exec(f"pkill -f '^{self._app_path}' 2>/dev/null || true")
+            await self._serial(f"pkill -f '^{self._app_path}' 2>/dev/null || true")
             await asyncio.sleep(1)
             return
         logger.info("Stopping remote ED fixture (PID=%d) on %s", self._remote_pid, self._remote_desc)
-        await self._exec(f"kill {self._remote_pid} 2>/dev/null || true; sleep 1")
+        await self._serial(f"kill {self._remote_pid} 2>/dev/null || true; sleep 1")
         self._remote_pid = None
         await asyncio.sleep(1)
         logger.info("Remote ED fixture stopped")
-
-    # ------------------------------------------------------------------
-    # eth0 block — hide the ED's eth0 from the commissioner while a test
-    # runs so the commissioner is forced onto the WiFi path post-
-    # ConnectNetwork.  Without this, TC_COMPRO_2_4 (and friends) can
-    # silently pass over eth0 even when WiFi association never happened.
-    # The ED-side script (see _BLOCK_SCRIPT below) is idempotent and
-    # self-disarms after ~20 min of inactivity, so a crashed test won't
-    # leave the rig stuck.
-    # ------------------------------------------------------------------
-
-    _BLOCK_SCRIPT = "/home/ubuntu/scripts/block-eth0-from-commissioner.sh"
-
-    async def _block_eth0_up(self):
-        try:
-            await self._ssh(f"sudo -n {self._BLOCK_SCRIPT} up")
-        except Exception as exc:
-            logger.warning("Could not engage eth0 block on %s (continuing): %s",
-                           self._ssh_host, exc)
-
-    async def _block_eth0_down(self):
-        try:
-            await self._ssh(f"sudo -n {self._BLOCK_SCRIPT} down")
-        except Exception as exc:
-            logger.warning("Could not clear eth0 block on %s: %s",
-                           self._ssh_host, exc)
 
     async def renew_environment(self):
         """Reset the ED's Wi-Fi/NAN environment via ``~/script/renew-comee_env.sh``.
@@ -707,10 +609,6 @@ class EDFixture:
         ini files, not this fixture's ``--KVS`` file, which ``_start_remote``
         deletes on every start.
 
-        In SSH mode the ED must be reachable over a *wired* address: the restart
-        drops the Wi-Fi link, taking the SSH channel with it if ``ed_ssh_host`` is
-        the ED's Wi-Fi/ULA address.
-
         Must run while the ED app is stopped — restarting wpa_supplicant breaks
         the app's D-Bus connection to it.  No-op for a local ED.
         """
@@ -720,14 +618,8 @@ class EDFixture:
         logger.info("Renewing ED Wi-Fi/NAN environment on %s", self._remote_desc)
         # renew-comee_env.sh copies wpa_supplicant-def_comee.conf by *relative*
         # path, so it only works when run from ~/script.
-        output = await self._exec("cd ~/script && ./renew-comee_env.sh")
+        output = await self._serial("cd ~/script && ./renew-comee_env.sh")
         logger.debug("ED environment renewal output: %s", output.strip())
-
-    async def _exec(self, remote_cmd: str) -> str:
-        """Run a command on the ED over whichever channel is configured."""
-        if self._serial_port:
-            return await self._serial(remote_cmd)
-        return await self._ssh(remote_cmd)
 
     @staticmethod
     async def _run_subprocess(argv: list[str], timeout: int) -> tuple[int, str, str]:
@@ -772,20 +664,6 @@ class EDFixture:
                 f"Serial command failed (exit={returncode}): {remote_cmd!r}\n"
                 f"stderr: {stderr}\n"
                 f"stdout: {stdout}"
-            )
-        return stdout
-
-    async def _ssh(self, remote_cmd: str) -> str:
-        """Run a command on the remote host via SSH, return stdout."""
-        returncode, stdout, stderr = await self._run_subprocess(
-            ["ssh", "-o", "StrictHostKeyChecking=no", "-o", "BatchMode=yes", "-n",
-             f"{self._ssh_user}@{self._ssh_host}", remote_cmd],
-            timeout=30,
-        )
-        if returncode != 0:
-            raise RuntimeError(
-                f"SSH command failed (exit={returncode}): {remote_cmd!r}\n"
-                f"stderr: {stderr}"
             )
         return stdout
 
@@ -870,11 +748,9 @@ class COMPROBaseTest(MatterBaseTest):
           ed_app_path        — path to the ED binary (local or remote)
           ed_discriminator   — discriminator (default 3841)
           ed_passcode        — passcode (default 20202021)
-          ed_ssh_host        — if set, start/stop the ED via SSH on this host
-          ed_ssh_user        — SSH username (default: ubuntu)
           ed_serial_port     — if set, drive the ED over this serial console
                                (standalone-serial mode; eth0 physically out).
-                               Takes precedence over ed_ssh_host.
+                               Otherwise the ED runs as a local subprocess.
           ed_extra_args      — extra CLI args forwarded to the ED app
                                (e.g. "--wifi --wifipaf freq_list=2437")
           ed_transport       — 'wifipaf' (default) or 'ble'.  Selects which
@@ -889,8 +765,6 @@ class COMPROBaseTest(MatterBaseTest):
             app_path=app_path,
             discriminator=int(params.get('ed_discriminator', 3841)),
             passcode=int(params.get('ed_passcode', 20202021)),
-            ssh_host=params.get('ed_ssh_host'),
-            ssh_user=params.get('ed_ssh_user', 'ubuntu'),
             extra_args=params.get('ed_extra_args', ''),
             ed_transport=params.get('ed_transport', 'wifipaf'),
             serial_port=params.get('ed_serial_port'),
@@ -902,8 +776,8 @@ class COMPROBaseTest(MatterBaseTest):
         Every EDFixture must go through here, including the ones tests build for
         themselves (TC_COMPRO_2_4 per transport, TC_COMPRO_2_7 per session).  Without
         it a test that raises before its own ensure_ed_not_commissionable() leaves the
-        ED advertising and, in remote-SSH mode, the eth0 block engaged for the next
-        run.  stop() is idempotent, so the explicit happy-path call is harmless.
+        ED advertising into the next run.  stop() is idempotent, so the explicit
+        happy-path call is harmless.
         """
         self._register_cleanup(ed.stop)
         return ed

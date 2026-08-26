@@ -59,7 +59,7 @@ by a different fabric.
 
 Test plan reference: TC-COMPRO-2.8
 
-Example — automated with remote ED RPi:
+Example — automated with a serial-driven ED RPi:
     ```bash
     python3 TC_COMPRO_2_8.py \\
         --commissioning-method on-network \\
@@ -69,7 +69,7 @@ Example — automated with remote ED RPi:
         --paa-trust-store-path ~/matter_tests/paa-trust-store \\
         --endpoint 5 \\
         --string-arg ed_app_path:/home/ubuntu/apps/chip-lighting-app \\
-        --string-arg ed_ssh_host:192.168.1.10 \\
+        --string-arg ed_serial_port:/dev/ttyUSB0 \\
         --string-arg 'ed_extra_args:--wifi --wifipaf freq_list=2437' \\
         --int-arg ed_discriminator:3841 ed_passcode:20202021
     ```

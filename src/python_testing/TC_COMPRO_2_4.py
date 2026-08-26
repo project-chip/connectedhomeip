@@ -62,8 +62,9 @@ by the DUT.  Steps 4–9 iterate once per transport bit in valid_transports
 ED control modes
 -----------------
 Automated (recommended for CI / RPi lab):
-  Provide ``ed_app_path`` (and optionally ``ed_ssh_host`` for a remote RPi).  The test
-  starts and stops the ED app automatically for each transport iteration.
+  Provide ``ed_app_path`` (and optionally ``ed_serial_port`` to drive an ED whose
+  Ethernet is disconnected over its UART login console).  The test starts and stops
+  the ED app automatically for each transport iteration.
 
 Manual (physical hardware):
   Omit ``ed_app_path``.  The test will pause at each iteration and prompt the operator
@@ -75,8 +76,8 @@ User-defined arguments (all via --string-arg / --int-arg NAME:VALUE):
   ed_discriminator       — ED commissionable discriminator (default: 3841)
   ed_passcode            — ED PASE passcode (default: 20202021)
   ed_app_path            — path to the ED binary; if omitted the test prompts the operator
-  ed_ssh_host            — IP/hostname of a remote host on which to run the ED binary over SSH
-  ed_ssh_user            — SSH username for ed_ssh_host (default: ubuntu)
+  ed_serial_port         — serial port of the ED's UART login console; when set the ED
+                           binary is started/stopped over that console instead of locally
   ed_extra_args          — fallback extra CLI args for the ED app when transport-specific
                            args are not provided
   wifipaf_ed_extra_args  — extra CLI args for the ED when testing the WiFiPAF transport
@@ -91,7 +92,7 @@ User-defined arguments (all via --string-arg / --int-arg NAME:VALUE):
 
 Test plan reference: TC-COMPRO-2.4
 
-Example — both transports, remote ED RPi:
+Example — both transports, serial-driven ED RPi:
     ```bash
     python3 TC_COMPRO_2_4.py \\
         --commissioning-method on-network \\
@@ -102,13 +103,13 @@ Example — both transports, remote ED RPi:
         --endpoint 5 \\
         --string-arg wifi_ssid:MyNetwork wifi_password:MyPassword \\
         --string-arg ed_app_path:/home/ubuntu/apps/chip-lighting-app \\
-        --string-arg ed_ssh_host:172.16.62.110 \\
+        --string-arg ed_serial_port:/dev/ttyUSB0 \\
         --string-arg 'wifipaf_ed_extra_args:--wifi --wifipaf freq_list=2437' \\
         --string-arg 'ble_ed_extra_args:--wifi' \\
         --int-arg ed_discriminator:3840 ed_passcode:20202021
     ```
 
-Example — WiFiPAF only (single transport), remote ED RPi:
+Example — WiFiPAF only (single transport), serial-driven ED RPi:
     ```bash
     python3 TC_COMPRO_2_4.py \\
         --commissioning-method on-network \\
@@ -119,7 +120,7 @@ Example — WiFiPAF only (single transport), remote ED RPi:
         --endpoint 5 \\
         --string-arg wifi_ssid:MyNetwork wifi_password:MyPassword \\
         --string-arg ed_app_path:/home/ubuntu/apps/chip-lighting-app \\
-        --string-arg ed_ssh_host:172.16.62.110 \\
+        --string-arg ed_serial_port:/dev/ttyUSB0 \\
         --string-arg 'ed_extra_args:--wifi --wifipaf freq_list=2437' \\
         --int-arg ed_discriminator:3840 ed_passcode:20202021
     ```
@@ -235,8 +236,6 @@ class TC_COMPRO_2_4(COMPROBaseTest):
             app_path=app_path,
             discriminator=int(params.get('ed_discriminator', 3841)),
             passcode=int(params.get('ed_passcode', 20202021)),
-            ssh_host=params.get('ed_ssh_host'),
-            ssh_user=params.get('ed_ssh_user', 'ubuntu'),
             extra_args=extra_args,
             ed_transport=ed_transport,
             serial_port=params.get('ed_serial_port'),
@@ -478,7 +477,7 @@ class TC_COMPRO_2_4(COMPROBaseTest):
             logger.info("[%s] Unpairing ED (nodeId=0x%04x) from controller fabric",
                         transport_label, ed_node_id)
             await self.default_controller.UnpairDevice(ed_node_id)
-            # Now stop the ED and clear the eth0 block for the next iteration.
+            # Now stop the ED so the next iteration starts from a clean state.
             await self.ensure_ed_not_commissionable(
                 ed,
                 manual_prompt=(
