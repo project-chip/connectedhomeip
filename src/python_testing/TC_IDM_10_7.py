@@ -90,39 +90,21 @@ class TC_IDM_10_7(DeviceConformanceTests):
         commissionee = await self.find_or_establish_pase_session_over_ntl(setupPayload, node_id)
         if commissionee is None:
             self.fail_current_test("Failed to find or establish PASE session over NTL")
-            return
 
         self.step(2)    # Read of Limited Data Model
 
         wildcard_success = await self._wildcard_read(node_id)
         if not wildcard_success:
             self.fail_current_test("Wildcard read of Limited Data Model failed!")
-            return
 
         limited_data_model = self.endpoints
         log.debug("limited_data_model: %s", limited_data_model)
         self.build_spec_xmls()
 
         self.step(3)    # Limited Data Model : Check clusters presence
-        mandatory_clusters_success = self._check_mandatory_clusters_presence()
+        mandatory_clusters_success = self._check_mandatory_clusters_presence(limited_data_model)
         if not mandatory_clusters_success:
             self.fail_current_test("Missing mandatory clusters in Limited Data Model")
-            return
-
-        # If EP0 contains Clusters.NetworkCommissioning, check that MCORE.COM.WIFI and MCORE.COM.THR are set consistently
-        ep0 = limited_data_model.get(0, {})
-        if Clusters.NetworkCommissioning in ep0:
-            asserts.assert_true(
-                self.check_pics("MCORE.COM.WIFI") or self.check_pics("MCORE.COM.THR"),
-                "Clusters.NetworkCommissioning is present in limited_data_model, "
-                "so at least one of MCORE.COM.WIFI or MCORE.COM.THR must be true."
-            )
-        else:
-            asserts.assert_true(
-                not self.check_pics("MCORE.COM.WIFI") and not self.check_pics("MCORE.COM.THR"),
-                "Clusters.NetworkCommissioning is not present in limited_data_model, "
-                "so both MCORE.COM.WIFI and MCORE.COM.THR must be false."
-            )
 
         self.step(4)    # Limited Data Model : Check clusters revisions
         ignore_in_progress_test_event_only_disallowed_for_certification = self.user_params.get(
@@ -136,19 +118,17 @@ class TC_IDM_10_7(DeviceConformanceTests):
         conformance_success = self._check_conformance()
         if not conformance_success:
             self.fail_current_test("Problems with Limited Data Model conformance")
-            return
 
         self.step(6)    # Complete the commissioning (over NTL)
         commissioning_success = await self.commission_ntl_device(setupPayload)
         if not commissioning_success:
             self.fail_current_test("Commissioning over NTL failed")
-            return
 
         self.step(7)    # Discovery of full Data Model
         wildcard_success = await self._wildcard_read(node_id)
         if not wildcard_success:
             self.fail_current_test("Wildcard read of full Data Model failed!")
-            return
+
         full_data_model = self.endpoints
         log.debug("full_data_model: %s", full_data_model)
 
@@ -159,9 +139,9 @@ class TC_IDM_10_7(DeviceConformanceTests):
         )
         if not descriptor_compare_success:
             self.fail_current_test("Limited and Full Data Model Descriptor clusters differ")
-            return
 
-    def _check_mandatory_clusters_presence(self) -> bool:
+
+    def _check_mandatory_clusters_presence(self, endpoints: dict) -> bool:
         """
         Check that the limited data model contains the mandatory clusters:
         - On Endpoint 0:
@@ -178,16 +158,16 @@ class TC_IDM_10_7(DeviceConformanceTests):
             True if all required clusters are present, False otherwise.
         """
         try:
-            if not hasattr(self, "endpoints") or self.endpoints is None:
-                log.error("self.endpoints is not available")
+            if endpoints is None:
+                log.error("endpoints is not available")
                 return False
 
             # Check clusters presence on Endpoint 0
-            if 0 not in self.endpoints:
-                log.error("Endpoint 0 is missing from self.endpoints")
+            if 0 not in endpoints:
+                log.error("Endpoint 0 is missing from endpoints")
                 return False
 
-            ep0 = self.endpoints[0]
+            ep0 = endpoints[0]
 
             mandatory_ep0_clusters = [
                 Clusters.Descriptor,
@@ -222,14 +202,29 @@ class TC_IDM_10_7(DeviceConformanceTests):
                     log.error("Endpoint 0 must not be listed in Endpoint 0 PartsList")
                     return False
 
-                if endpoint_id not in self.endpoints:
-                    log.error("Endpoint %s listed in PartsList is missing from self.endpoints", endpoint_id)
+                if endpoint_id not in endpoints:
+                    log.error("Endpoint %s (listed in PartsList) is missing", endpoint_id)
                     return False
 
-                endpoint_clusters = self.endpoints[endpoint_id]
+                endpoint_clusters = endpoints[endpoint_id]
                 if Clusters.Descriptor not in endpoint_clusters:
                     log.error("Descriptor cluster missing on Endpoint %s", endpoint_id)
                     return False
+
+            # If EP0 contains Clusters.NetworkCommissioning, check that MCORE.COM.WIFI and MCORE.COM.THR are set consistently
+            ep0 = endpoints.get(0, {})
+            if Clusters.NetworkCommissioning in ep0:
+                asserts.assert_true(
+                    self.check_pics("MCORE.COM.WIFI") or self.check_pics("MCORE.COM.THR"),
+                    "Clusters.NetworkCommissioning is present in limited_data_model, "
+                    "so at least one of MCORE.COM.WIFI or MCORE.COM.THR must be true."
+                )
+            else:
+                asserts.assert_true(
+                    not self.check_pics("MCORE.COM.WIFI") and not self.check_pics("MCORE.COM.THR"),
+                    "Clusters.NetworkCommissioning is not present in limited_data_model, "
+                    "so both MCORE.COM.WIFI and MCORE.COM.THR must be false."
+                )
 
             return True
 

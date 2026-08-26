@@ -279,7 +279,7 @@ class DeviceConformanceTests(BasicCompositionTests):
         success = True
 
         def record_problem(location, problem, severity):
-            problems.append(ProblemNotice("IDM-10.3", location, severity, problem, ""))
+            problems.append(ProblemNotice("Check revisions test", location, severity, problem, ""))
 
         def record_error(location, problem):
             nonlocal success
