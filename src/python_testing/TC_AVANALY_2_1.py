@@ -121,7 +121,7 @@ class TC_AVANALY_2_1(MatterBaseTest, AVANALYTestBase):
         if self.has_feature_remcondetect:
             self.step(4)
             max_analysis_stream_count_dut = await self.read_avanaly_attribute_expect_success(endpoint, attributes.MaxAnalysisStreamCount)
-            asserts.assert_less_equal(max_analysis_stream_count_dut, 255)
+            asserts.assert_less_equal(max_analysis_stream_count_dut, self.SPEC_MAX_COUNT_ANALYSIS_STREAMS)
 
             self.step(5)
             current_analysis_stream_count_dut = await self.read_avanaly_attribute_expect_success(endpoint, attributes.CurrentAnalysisStreamCount)
@@ -130,9 +130,8 @@ class TC_AVANALY_2_1(MatterBaseTest, AVANALYTestBase):
 
             self.step(6)
             analysis_streams_dut = await self.read_avanaly_attribute_expect_success(endpoint, attributes.AnalysisStreams)
-            if analysis_streams_dut is not None:
-                asserts.fail("AnalysisStreams should be empty on initial startup.")
-
+            asserts.assert_equal(len(active_ambient_context_triggers_dut), 0, 
+                                 "AnalysisStreams should be empty on initial startup.")
         else:
             self.skip_step(4)
             self.skip_step(5)
