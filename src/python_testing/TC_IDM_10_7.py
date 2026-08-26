@@ -137,7 +137,6 @@ class TC_IDM_10_7(DeviceConformanceTests):
         if not descriptor_compare_success:
             self.fail_current_test("Limited and Full Data Model Descriptor clusters differ")
 
-
     def _check_mandatory_clusters_presence(self, endpoints: dict) -> bool:
         """
         Check that the limited data model contains the mandatory clusters:
