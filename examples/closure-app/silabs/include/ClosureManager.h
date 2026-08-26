@@ -147,9 +147,18 @@ public:
     /**
      * @brief Sets the current action being performed by the closure device.
      *
+     * Also bumps the action generation counter, so any ScheduleWork() callback captured
+     * for a previous action (identified by both action and generation) can be recognized
+     * as stale even if the new action happens to be the same Action_t value. See
+     * GetCurrentActionGeneration().
+     *
      * @param action The action to set, represented as chip::app::Clusters::ClosureControl::Action_t.
      */
-    void SetCurrentAction(Action_t newAction) { mCurrentAction = newAction; }
+    void SetCurrentAction(Action_t newAction)
+    {
+        mCurrentAction = newAction;
+        ++mActionGeneration;
+    }
 
     /**
      * @brief Retrieves the current action being performed by the closure device.
@@ -157,6 +166,18 @@ public:
      * @return The current action as defined by chip::app::Clusters::ClosureControl::Action_t.
      */
     const Action_t & GetCurrentAction() const { return mCurrentAction; }
+
+    /**
+     * @brief Retrieves the generation counter for the current action.
+     *
+     * Incremented every time SetCurrentAction() is called, so it uniquely identifies a
+     * specific action instance even across two calls with the same Action_t value (e.g. a
+     * Stop immediately followed by a new action of the same type). Used to detect and skip
+     * stale ScheduleWork() callbacks scheduled for a since-superseded action.
+     *
+     * @return The generation counter for the current action.
+     */
+    uint32_t GetCurrentActionGeneration() const { return mActionGeneration; }
 
 #if SL_MATTER_DISPLAY_ENABLED
     /**
@@ -332,6 +353,9 @@ protected:
     Action_t mCurrentAction                   = Action_t::INVALID_ACTION;
     chip::EndpointId mCurrentActionEndpointId = chip::kInvalidEndpointId;
 
+    // Bumped by SetCurrentAction() on every action transition. See GetCurrentActionGeneration().
+    uint32_t mActionGeneration = 0;
+
     /**
      * @brief Initiates a closure action based on the provided application event.
      *
@@ -353,16 +377,19 @@ protected:
     static void HandleClosureActionCompleteEvent(AppEvent * event);
 
     /**
-     * @brief ScheduleWork handlers. `arg` is the expected Action_t at schedule time; work is
-     * skipped if the current action no longer matches (e.g. after Stop). Panel handlers read
-     * `mCurrentActionEndpointId` when the work runs, not a snapshotted endpoint.
+     * @brief ScheduleWork handlers. `actionToken` packs the expected Action_t together with the
+     * action generation counter captured at schedule time (see GetCurrentActionGeneration());
+     * work is skipped unless both still match the current action (e.g. after a Stop is
+     * immediately followed by a new action of the same Action_t value, the generation mismatch
+     * identifies the callback as stale). Panel handlers read `mCurrentActionEndpointId` when the
+     * work runs, not a snapshotted endpoint.
      */
-    static void HandleScheduledCalibrateComplete(intptr_t expectedAction);
-    static void HandleScheduledClosureMotion(intptr_t expectedAction);
-    static void HandleScheduledClosureUnlatch(intptr_t expectedAction);
-    static void HandleScheduledPanelSetTarget(intptr_t expectedAction);
-    static void HandleScheduledPanelUnlatch(intptr_t expectedAction);
-    static void HandleScheduledPanelStep(intptr_t expectedAction);
+    static void HandleScheduledCalibrateComplete(intptr_t actionToken);
+    static void HandleScheduledClosureMotion(intptr_t actionToken);
+    static void HandleScheduledClosureUnlatch(intptr_t actionToken);
+    static void HandleScheduledPanelSetTarget(intptr_t actionToken);
+    static void HandleScheduledPanelUnlatch(intptr_t actionToken);
+    static void HandleScheduledPanelStep(intptr_t actionToken);
 
     /**
      * @brief Timer event handler for the ClosureManager.

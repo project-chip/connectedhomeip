@@ -45,6 +45,37 @@ CustomerAppManager & AppManagerInstance()
     return CustomerAppManager::GetInstance();
 }
 
+// Packs an Action_t together with the action generation counter captured at ScheduleWork()
+// time, so a stale callback (e.g. scheduled for a MoveTo that was Stopped and immediately
+// replaced by a new MoveTo) can be told apart from the current action even though both share
+// the same Action_t value. Action_t values fit comfortably in kActionBits.
+constexpr uint32_t kActionBits = 8;
+constexpr uint32_t kActionMask = (1u << kActionBits) - 1;
+
+intptr_t PackActionToken(ClosureManager::Action_t action, uint32_t generation)
+{
+    uint32_t token = (generation << kActionBits) | (static_cast<uint32_t>(action) & kActionMask);
+    return static_cast<intptr_t>(token);
+}
+
+void UnpackActionToken(intptr_t actionToken, ClosureManager::Action_t & action, uint32_t & generation)
+{
+    uint32_t token = static_cast<uint32_t>(actionToken);
+    action         = static_cast<ClosureManager::Action_t>(token & kActionMask);
+    generation     = token >> kActionBits;
+}
+
+// Returns true if `actionToken` (as captured by PackActionToken() when the work was scheduled)
+// still matches the ClosureManager's current action and generation, i.e. the action has not
+// been superseded (e.g. by a Stop followed by a new action) since the work was scheduled.
+bool IsActionTokenCurrent(ClosureManager & instance, intptr_t actionToken)
+{
+    ClosureManager::Action_t expectedAction;
+    uint32_t expectedGeneration;
+    UnpackActionToken(actionToken, expectedAction, expectedGeneration);
+    return instance.GetCurrentAction() == expectedAction && instance.GetCurrentActionGeneration() == expectedGeneration;
+}
+
 // Define the Namespace and Tag for the endpoint
 // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure.adoc
 constexpr uint8_t kNamespaceClosure   = 0x44;
@@ -322,70 +353,74 @@ void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
                    ChipLogError(AppServer, "Got Event for %d in InitiateAction while current ongoing action is %d",
                                 to_underlying(currentAction), to_underlying(instance.GetCurrentAction())));
 
-    const intptr_t expectedAction = static_cast<intptr_t>(currentAction);
+    // Pack the action together with its generation counter so a stale callback can be
+    // distinguished from a new action of the same Action_t value (see PackActionToken()).
+    const intptr_t actionToken = PackActionToken(currentAction, instance.GetCurrentActionGeneration());
 
     switch (currentAction)
     {
     case Action_t::CALIBRATE_ACTION:
-        LogErrorOnFailure(PlatformMgr().ScheduleWork(HandleScheduledCalibrateComplete, expectedAction));
+        LogErrorOnFailure(PlatformMgr().ScheduleWork(HandleScheduledCalibrateComplete, actionToken));
         break;
     case Action_t::MOVE_TO_ACTION:
-        LogErrorOnFailure(PlatformMgr().ScheduleWork(HandleScheduledClosureMotion, expectedAction));
+        LogErrorOnFailure(PlatformMgr().ScheduleWork(HandleScheduledClosureMotion, actionToken));
         break;
     case Action_t::UNLATCH_ACTION:
-        LogErrorOnFailure(PlatformMgr().ScheduleWork(HandleScheduledClosureUnlatch, expectedAction));
+        LogErrorOnFailure(PlatformMgr().ScheduleWork(HandleScheduledClosureUnlatch, actionToken));
         break;
     case Action_t::SET_TARGET_ACTION:
-        LogErrorOnFailure(PlatformMgr().ScheduleWork(HandleScheduledPanelSetTarget, expectedAction));
+        LogErrorOnFailure(PlatformMgr().ScheduleWork(HandleScheduledPanelSetTarget, actionToken));
         break;
     case Action_t::PANEL_UNLATCH_ACTION:
-        LogErrorOnFailure(PlatformMgr().ScheduleWork(HandleScheduledPanelUnlatch, expectedAction));
+        LogErrorOnFailure(PlatformMgr().ScheduleWork(HandleScheduledPanelUnlatch, actionToken));
         break;
     case Action_t::PANEL_STEP_ACTION:
-        LogErrorOnFailure(PlatformMgr().ScheduleWork(HandleScheduledPanelStep, expectedAction));
+        LogErrorOnFailure(PlatformMgr().ScheduleWork(HandleScheduledPanelStep, actionToken));
         break;
     default:
         break;
     }
 }
 
-void ClosureManager::HandleScheduledCalibrateComplete(intptr_t expectedAction)
+void ClosureManager::HandleScheduledCalibrateComplete(intptr_t actionToken)
 {
     ClosureManager & instance = GetInstance();
-    VerifyOrReturn(instance.GetCurrentAction() == static_cast<Action_t>(expectedAction));
+    VerifyOrReturn(IsActionTokenCurrent(instance, actionToken));
     AppManagerInstance().HandleClosureActionComplete(instance.GetCurrentAction());
 }
 
-void ClosureManager::HandleScheduledClosureMotion(intptr_t expectedAction)
+void ClosureManager::HandleScheduledClosureMotion(intptr_t actionToken)
 {
-    VerifyOrReturn(GetInstance().GetCurrentAction() == static_cast<Action_t>(expectedAction));
+    ClosureManager & instance = GetInstance();
+    VerifyOrReturn(IsActionTokenCurrent(instance, actionToken));
     AppManagerInstance().HandleClosureMotionAction();
 }
 
-void ClosureManager::HandleScheduledClosureUnlatch(intptr_t expectedAction)
+void ClosureManager::HandleScheduledClosureUnlatch(intptr_t actionToken)
 {
-    VerifyOrReturn(GetInstance().GetCurrentAction() == static_cast<Action_t>(expectedAction));
+    ClosureManager & instance = GetInstance();
+    VerifyOrReturn(IsActionTokenCurrent(instance, actionToken));
     AppManagerInstance().HandleClosureUnlatchAction();
 }
 
-void ClosureManager::HandleScheduledPanelSetTarget(intptr_t expectedAction)
+void ClosureManager::HandleScheduledPanelSetTarget(intptr_t actionToken)
 {
     ClosureManager & instance = GetInstance();
-    VerifyOrReturn(instance.GetCurrentAction() == static_cast<Action_t>(expectedAction));
+    VerifyOrReturn(IsActionTokenCurrent(instance, actionToken));
     AppManagerInstance().HandlePanelSetTargetAction(instance.mCurrentActionEndpointId);
 }
 
-void ClosureManager::HandleScheduledPanelUnlatch(intptr_t expectedAction)
+void ClosureManager::HandleScheduledPanelUnlatch(intptr_t actionToken)
 {
     ClosureManager & instance = GetInstance();
-    VerifyOrReturn(instance.GetCurrentAction() == static_cast<Action_t>(expectedAction));
+    VerifyOrReturn(IsActionTokenCurrent(instance, actionToken));
     AppManagerInstance().HandlePanelUnlatchAction(instance.mCurrentActionEndpointId);
 }
 
-void ClosureManager::HandleScheduledPanelStep(intptr_t expectedAction)
+void ClosureManager::HandleScheduledPanelStep(intptr_t actionToken)
 {
     ClosureManager & instance = GetInstance();
-    VerifyOrReturn(instance.GetCurrentAction() == static_cast<Action_t>(expectedAction));
+    VerifyOrReturn(IsActionTokenCurrent(instance, actionToken));
     AppManagerInstance().HandlePanelStepAction(instance.mCurrentActionEndpointId);
 }
 
