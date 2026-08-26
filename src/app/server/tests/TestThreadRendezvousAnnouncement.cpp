@@ -21,6 +21,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/dnssd/wire/Parser.h>
 #include <lib/dnssd/wire/RecordData.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 
 #include <optional>
@@ -30,6 +31,9 @@ using namespace chip::app;
 
 class TestThreadRendezvousAnnouncement : public ::testing::Test
 {
+public:
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
 namespace {
