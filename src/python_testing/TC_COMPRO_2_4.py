@@ -444,7 +444,12 @@ class TC_COMPRO_2_4(COMPROBaseTest):
             # -- Step 8 work: ProxyDisconnect invalid SessionID → NOT_FOUND --
             if first_pass:
                 self.step(8)
-            non_existent_session_id = 0xFFFE
+            # 0xFFFE is the largest legal SessionID (ProxyConnectResponse constrains it
+            # to max 65534), so a conformant DUT may have handed it to the session opened
+            # above.  Disconnecting that would return SUCCESS instead of NOT_FOUND and
+            # would take away the session step 9 needs.  Only one session is open here,
+            # so a single alternative cannot collide either.
+            non_existent_session_id = 0xFFFE if current_session_id != 0xFFFE else 0xFFFD
             logger.info("[%s] Sending ProxyDisconnectRequest with non-existent sessionID=%d",
                         transport_label, non_existent_session_id)
             await self.expect_command_rejected(
