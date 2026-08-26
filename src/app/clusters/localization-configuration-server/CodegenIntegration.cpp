@@ -46,8 +46,7 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        char outBuf[Attributes::ActiveLocale::TypeInfo::MaxLength()];
-        MutableCharSpan activeLocale(outBuf);
+        CharSpan activeLocale;
         Status status = ActiveLocale::GetDefault(endpointId, activeLocale);
         if (status != Status::Success)
         {

@@ -23,9 +23,9 @@
 // at construction time to read the initial URL from Ember RAM. In tests there is no Ember
 // storage, so we return an empty string to simulate "attribute not populated".
 namespace chip::app::Clusters::Actions::Attributes::SetupURL {
-chip::Protocols::InteractionModel::Status GetDefault(chip::EndpointId, chip::MutableCharSpan & value)
+chip::Protocols::InteractionModel::Status GetDefault(chip::EndpointId, chip::CharSpan & value)
 {
-    value.reduce_size(0);
+    value = chip::CharSpan();
     return chip::Protocols::InteractionModel::Status::Success;
 }
 } // namespace chip::app::Clusters::Actions::Attributes::SetupURL

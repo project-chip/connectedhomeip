@@ -16,6 +16,7 @@
  */
 #include <app/util/attribute-storage.h>
 
+#include <algorithm>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
@@ -1632,3 +1633,211 @@ void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, Attribute
     emberAfIncreaseDataVersion(path);
     CodegenDataModelProvider::Instance().NotifyAttributeChanged(path, chip::app::DataModel::AttributeChangeType::kReportable);
 }
+
+namespace chip {
+namespace app {
+
+CharSpan AttributeDefaultValue::ToCharSpan() const
+{
+    VerifyOrReturnValue(!rawData.empty(), CharSpan());
+    if (emberAfIsLongStringAttributeType(type))
+    {
+        VerifyOrReturnValue(rawData.size() >= 2, CharSpan());
+        uint16_t len = Encoding::LittleEndian::Get16(rawData.data());
+        VerifyOrReturnValue(len != 0xFFFF, CharSpan());
+        VerifyOrReturnValue(rawData.size() >= static_cast<size_t>(2 + len), CharSpan());
+        return CharSpan(reinterpret_cast<const char *>(rawData.data() + 2), len);
+    }
+    if (emberAfIsStringAttributeType(type))
+    {
+        VerifyOrReturnValue(rawData.size() >= 1, CharSpan());
+        uint8_t len = rawData[0];
+        VerifyOrReturnValue(len != 0xFF, CharSpan());
+        VerifyOrReturnValue(rawData.size() >= static_cast<size_t>(1 + len), CharSpan());
+        return CharSpan(reinterpret_cast<const char *>(rawData.data() + 1), len);
+    }
+    return CharSpan();
+}
+
+ByteSpan AttributeDefaultValue::ToByteSpan() const
+{
+    VerifyOrReturnValue(!rawData.empty(), ByteSpan());
+    if (emberAfIsLongStringAttributeType(type))
+    {
+        VerifyOrReturnValue(rawData.size() >= 2, ByteSpan());
+        uint16_t len = Encoding::LittleEndian::Get16(rawData.data());
+        VerifyOrReturnValue(len != 0xFFFF, ByteSpan());
+        VerifyOrReturnValue(rawData.size() >= static_cast<size_t>(2 + len), ByteSpan());
+        return ByteSpan(rawData.data() + 2, len);
+    }
+    if (emberAfIsStringAttributeType(type))
+    {
+        VerifyOrReturnValue(rawData.size() >= 1, ByteSpan());
+        uint8_t len = rawData[0];
+        VerifyOrReturnValue(len != 0xFF, ByteSpan());
+        VerifyOrReturnValue(rawData.size() >= static_cast<size_t>(1 + len), ByteSpan());
+        return ByteSpan(rawData.data() + 1, len);
+    }
+    return ByteSpan();
+}
+
+DataModel::Nullable<CharSpan> AttributeDefaultValue::ToNullableCharSpan() const
+{
+    VerifyOrReturnValue(!rawData.empty(), DataModel::Nullable<CharSpan>(CharSpan()));
+    if (emberAfIsLongStringAttributeType(type))
+    {
+        VerifyOrReturnValue(rawData.size() >= 2, DataModel::Nullable<CharSpan>(CharSpan()));
+        uint16_t len = Encoding::LittleEndian::Get16(rawData.data());
+        if (len == 0xFFFF)
+        {
+            return DataModel::Nullable<CharSpan>();
+        }
+        VerifyOrReturnValue(rawData.size() >= static_cast<size_t>(2 + len), DataModel::Nullable<CharSpan>(CharSpan()));
+        return DataModel::Nullable<CharSpan>(CharSpan(reinterpret_cast<const char *>(rawData.data() + 2), len));
+    }
+    if (emberAfIsStringAttributeType(type))
+    {
+        VerifyOrReturnValue(rawData.size() >= 1, DataModel::Nullable<CharSpan>(CharSpan()));
+        uint8_t len = rawData[0];
+        if (len == 0xFF)
+        {
+            return DataModel::Nullable<CharSpan>();
+        }
+        VerifyOrReturnValue(rawData.size() >= static_cast<size_t>(1 + len), DataModel::Nullable<CharSpan>(CharSpan()));
+        return DataModel::Nullable<CharSpan>(CharSpan(reinterpret_cast<const char *>(rawData.data() + 1), len));
+    }
+    return DataModel::Nullable<CharSpan>(CharSpan());
+}
+
+DataModel::Nullable<ByteSpan> AttributeDefaultValue::ToNullableByteSpan() const
+{
+    VerifyOrReturnValue(!rawData.empty(), DataModel::Nullable<ByteSpan>(ByteSpan()));
+    if (emberAfIsLongStringAttributeType(type))
+    {
+        VerifyOrReturnValue(rawData.size() >= 2, DataModel::Nullable<ByteSpan>(ByteSpan()));
+        uint16_t len = Encoding::LittleEndian::Get16(rawData.data());
+        if (len == 0xFFFF)
+        {
+            return DataModel::Nullable<ByteSpan>();
+        }
+        VerifyOrReturnValue(rawData.size() >= static_cast<size_t>(2 + len), DataModel::Nullable<ByteSpan>(ByteSpan()));
+        return DataModel::Nullable<ByteSpan>(ByteSpan(rawData.data() + 2, len));
+    }
+    if (emberAfIsStringAttributeType(type))
+    {
+        VerifyOrReturnValue(rawData.size() >= 1, DataModel::Nullable<ByteSpan>(ByteSpan()));
+        uint8_t len = rawData[0];
+        if (len == 0xFF)
+        {
+            return DataModel::Nullable<ByteSpan>();
+        }
+        VerifyOrReturnValue(rawData.size() >= static_cast<size_t>(1 + len), DataModel::Nullable<ByteSpan>(ByteSpan()));
+        return DataModel::Nullable<ByteSpan>(ByteSpan(rawData.data() + 1, len));
+    }
+    return DataModel::Nullable<ByteSpan>(ByteSpan());
+}
+
+void AttributeDefaultValue::CopyScalar(void * outBuffer, size_t bufferSize) const
+{
+    if (outBuffer == nullptr || bufferSize == 0)
+    {
+        return;
+    }
+    if (rawData.empty())
+    {
+        memset(outBuffer, 0, bufferSize);
+        return;
+    }
+    size_t copySize = std::min(bufferSize, rawData.size());
+    memcpy(outBuffer, rawData.data(), copySize);
+    if (copySize < bufferSize)
+    {
+        memset(reinterpret_cast<uint8_t *>(outBuffer) + copySize, 0, bufferSize - copySize);
+    }
+}
+
+Status emberAfGetAttributeDefaultValue(const EmberAfAttributeMetadata * am, AttributeDefaultValue & outDefault)
+{
+    VerifyOrReturnError(am != nullptr, Status::UnsupportedAttribute);
+
+    outDefault.type = am->attributeType;
+
+    const uint8_t * ptr                       = nullptr;
+    size_t defaultValueSizeForBigEndianNudger = 0;
+    (void) defaultValueSizeForBigEndianNudger;
+
+    if ((am->mask & MATTER_ATTRIBUTE_FLAG_MIN_MAX) != 0U)
+    {
+        if (emberAfAttributeSize(am) <= 2)
+        {
+            ptr = reinterpret_cast<const uint8_t *>(&(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue));
+            defaultValueSizeForBigEndianNudger = sizeof(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue);
+        }
+        else
+        {
+            ptr = am->defaultValue.ptrToMinMaxValue->defaultValue.ptrToDefaultValue;
+        }
+    }
+    else
+    {
+        if ((emberAfAttributeSize(am) <= 4) && !emberAfIsStringAttributeType(am->attributeType))
+        {
+            ptr                                = reinterpret_cast<const uint8_t *>(&(am->defaultValue.defaultValue));
+            defaultValueSizeForBigEndianNudger = sizeof(am->defaultValue.defaultValue);
+        }
+        else
+        {
+            ptr = am->defaultValue.ptrToDefaultValue;
+        }
+    }
+
+#if (CHIP_CONFIG_BIG_ENDIAN_TARGET)
+    if (emberAfAttributeSize(am) < defaultValueSizeForBigEndianNudger && ptr != nullptr)
+    {
+        ptr += (defaultValueSizeForBigEndianNudger - emberAfAttributeSize(am));
+    }
+#endif
+
+    if (ptr == nullptr)
+    {
+        outDefault.rawData = ByteSpan();
+    }
+    else if (emberAfIsLongStringAttributeType(am->attributeType))
+    {
+        uint16_t len       = Encoding::LittleEndian::Get16(ptr);
+        size_t totalSize   = (len == 0xFFFF) ? 2 : static_cast<size_t>(2 + len);
+        outDefault.rawData = ByteSpan(ptr, totalSize);
+    }
+    else if (emberAfIsStringAttributeType(am->attributeType))
+    {
+        uint8_t len        = ptr[0];
+        size_t totalSize   = (len == 0xFF) ? 1 : static_cast<size_t>(1 + len);
+        outDefault.rawData = ByteSpan(ptr, totalSize);
+    }
+    else
+    {
+        outDefault.rawData = ByteSpan(ptr, am->size);
+    }
+
+    return Status::Success;
+}
+
+Status emberAfGetAttributeDefaultValue(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
+                                       AttributeDefaultValue & outDefault)
+{
+    const EmberAfCluster * cluster = emberAfFindServerCluster(endpoint, clusterId);
+    VerifyOrReturnError(cluster != nullptr, Status::UnsupportedCluster);
+
+    for (uint16_t i = 0; i < cluster->attributeCount; ++i)
+    {
+        if (cluster->attributes[i].attributeId == attributeId)
+        {
+            return emberAfGetAttributeDefaultValue(&cluster->attributes[i], outDefault);
+        }
+    }
+
+    return Status::UnsupportedAttribute;
+}
+
+} // namespace app
+} // namespace chip

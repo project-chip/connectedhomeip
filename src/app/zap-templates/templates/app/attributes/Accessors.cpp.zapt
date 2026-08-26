@@ -11,6 +11,7 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
 #include <app/util/ember-strings.h>
 #include <lib/support/odd-sized-integers.h>
@@ -28,16 +29,58 @@ namespace {{asUpperCamelCase parent.label}} {
 namespace Attributes {
 
 {{/first}}
-{{#unless (isStrEqual storagePolicy "attributeAccessInterface")}}
+{{#unless isArray}}
 {{#if_is_struct type}}
+{{#unless (isStrEqual storagePolicy "attributeAccessInterface")}}
 #error Attribute "{{name}}" in cluster "{{../name}}" is struct-typed and must be added to the attributeAccessInterfaceAttributes object in src/app/zap-templates/zcl/zcl.json and src/app/zap-templates/zcl/zcl-with-test-extensions.json
-{{/if_is_struct}}
+{{/unless}}
+{{else}}
 namespace {{asUpperCamelCase label}} {
 
 {{#*inline "clusterId"}}Clusters::{{asUpperCamelCase parent.label}}::Id{{/inline}}
 {{#*inline "sizingBytes"}}{{#if (isShortString type)}}1{{else}}2{{/if}}{{/inline}}
 
-Protocols::InteractionModel::Status Get{{#if (isInConfigList parent.name "CodeDrivenClusters")}}Default{{/if}}(EndpointId endpoint, {{accessorGetterType this}} value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, {{#if (isString type)}}{{#if isNullable}}DataModel::Nullable<chip::{{#if (isOctetString type)}}Byte{{else}}Char{{/if}}Span> &{{else}}chip::{{#if (isOctetString type)}}Byte{{else}}Char{{/if}}Span &{{/if}}{{else}}{{accessorGetterType this}}{{/if}} value)
+{
+    AttributeDefaultValue defaultVal;
+    Protocols::InteractionModel::Status status =
+        emberAfGetAttributeDefaultValue(endpoint, {{>clusterId}}, Id, defaultVal);
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+
+    {{~#if (isString type)}}
+    {{#if isNullable}}
+    value = defaultVal.ToNullable{{#if (isOctetString type)}}Byte{{else}}Char{{/if}}Span();
+    {{else}}
+    value = defaultVal.To{{#if (isOctetString type)}}Byte{{else}}Char{{/if}}Span();
+    {{/if}}
+    return Protocols::InteractionModel::Status::Success;
+    {{else}}
+    using Traits = NumericAttributeTraits<{{accessorTraitType type}}>;
+    typename Traits::StorageType temp;
+    defaultVal.CopyScalar(&temp, sizeof(temp));
+    {{#if isNullable}}
+    if (Traits::IsNullValue(temp))
+    {
+        value.SetNull();
+    }
+    else
+    {
+        value.SetNonNull() = Traits::StorageToWorking(temp);
+    }
+    {{else}}
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    *value = Traits::StorageToWorking(temp);
+    {{/if}}
+    return Protocols::InteractionModel::Status::Success;
+    {{/if}}
+}
+
+{{#unless (isStrEqual storagePolicy "attributeAccessInterface")}}
+{{#unless (isInConfigList parent.name "CodeDrivenClusters")}}
+Protocols::InteractionModel::Status Get(EndpointId endpoint, {{accessorGetterType this}} value)
 {
     {{~#if (isString type)}}
     {{#if isNullable}}
@@ -135,7 +178,6 @@ Protocols::InteractionModel::Status Get{{#if (isInConfigList parent.name "CodeDr
     {{/if}}
     {{/if}}
 {{/inline}}
-{{#unless (isInConfigList parent.name "CodeDrivenClusters")}}
 
 Protocols::InteractionModel::Status Set(EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} value, MarkAttributeDirty markDirty)
 {
@@ -203,9 +245,11 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, {{zapTypeToEncodabl
 }
 {{/if}}
 {{/unless}}
+{{/unless}}
 
 } // namespace {{asUpperCamelCase label}}
 
+{{/if_is_struct}}
 {{/unless}}
 {{#last}}
 } // namespace Attributes
@@ -218,3 +262,4 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, {{zapTypeToEncodabl
 } // Clusters
 } // app
 } // chip
+
