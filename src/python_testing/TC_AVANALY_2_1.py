@@ -130,7 +130,7 @@ class TC_AVANALY_2_1(MatterBaseTest, AVANALYTestBase):
 
             self.step(6)
             analysis_streams_dut = await self.read_avanaly_attribute_expect_success(endpoint, attributes.AnalysisStreams)
-            asserts.assert_equal(len(active_ambient_context_triggers_dut), 0, 
+            asserts.assert_equal(len(analysis_streams_dut), 0, 
                                  "AnalysisStreams should be empty on initial startup.")
         else:
             self.skip_step(4)
