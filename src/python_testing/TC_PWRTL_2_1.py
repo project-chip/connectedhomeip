@@ -85,10 +85,9 @@ class TC_PWRTL_2_1(MatterBaseTest):
             log.info("AvailableEndpoints: %s", avail_eps)
             asserts.assert_less_equal(len(avail_eps), 20,
                                       "AvailableEndpoints exceeds its max 20 constraint")
-        else:
-            self.mark_current_step_skipped()
 
         self.step(3, "TH reads ActiveEndpoints and verifies it is a subset of AvailableEndpoints")
+        active_eps = None
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.ActiveEndpoints):
             active_eps = await self.read_single_attribute_check_success(
                 endpoint=endpoint,
@@ -105,23 +104,23 @@ class TC_PWRTL_2_1(MatterBaseTest):
             for ep in active_eps:
                 asserts.assert_in(ep, avail_eps,
                                   f"ActiveEndpoint {ep} is not in AvailableEndpoints")
-        else:
-            self.mark_current_step_skipped()
 
         self.step(4, "TH writes each endpoint list attribute - expect UNSUPPORTED_WRITE")
-        wrote_any = False
-        for attribute in (attributes.AvailableEndpoints, attributes.ActiveEndpoints):
-            if not await self.attribute_guard(endpoint=endpoint, attribute=attribute):
-                continue
+        # Availability is already established by steps 2 and 3. attribute_guard is not used here:
+        # it marks the current step skipped on a miss, which would record this step as skipped even
+        # when the other attribute is present and its write was checked.
+        writable = [attr for attr, present in ((attributes.AvailableEndpoints, avail_eps is not None),
+                                               (attributes.ActiveEndpoints, active_eps is not None))
+                    if present]
+        if not writable:
+            self.mark_current_step_skipped()
+        for attribute in writable:
             status = await self.write_single_attribute(
                 attribute_value=attribute([]),
                 endpoint_id=endpoint,
                 expect_success=False)
             asserts.assert_equal(status, Status.UnsupportedWrite,
                                  f"Write to {attribute.__name__} should return UNSUPPORTED_WRITE")
-            wrote_any = True
-        if not wrote_any:
-            self.mark_current_step_skipped()
 
         self.step(5, "TH verifies ElectricalCircuitNodes presence matches the CIRC feature")
         feature_map = await self.read_single_attribute_check_success(
