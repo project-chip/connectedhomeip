@@ -164,7 +164,12 @@ CHIP_ERROR AudioControlCluster::Startup(ServerClusterContext & context)
             ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::StartUpMuted::Id), mStartUpMuted, mStartUpMuted);
         if (!mStartUpMuted.IsNull())
         {
-            mSoftMuted = mStartUpMuted.Value();
+            const bool startUpMuted = mStartUpMuted.Value();
+            if (mSoftMuted != startUpMuted)
+            {
+                mSoftMuted = startUpMuted;
+                StoreSoftMuted();
+            }
         }
     }
 
