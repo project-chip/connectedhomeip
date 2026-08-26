@@ -52,6 +52,10 @@ from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
+# amperage-mA and voltage-mV fields in this cluster are declared min 1, max 0x3FFFFFFFFFFFFFFF.
+# matter_asserts.assert_valid_int64 alone permits up to 0x7FFFFFFFFFFFFFFF.
+MEASUREMENT_MAX = 0x3FFFFFFFFFFFFFFF
+
 cluster = Clusters.ElectricalProtectionAlarm
 
 
@@ -219,10 +223,14 @@ class TC_EPALM_2_1(MatterBaseTest):
             matter_asserts.assert_valid_int64(
                 s.seriesArcCurrentSensitivity, 'SeriesArcCurrentSensitivity must be an int64')
             asserts.assert_greater_equal(s.seriesArcCurrentSensitivity, 1)
+            asserts.assert_less_equal(s.seriesArcCurrentSensitivity, MEASUREMENT_MAX,
+                                      'SeriesArcCurrentSensitivity must not exceed the data model maximum')
         if s.parallelArcCurrentSensitivity is not None:
             matter_asserts.assert_valid_int64(
                 s.parallelArcCurrentSensitivity, 'ParallelArcCurrentSensitivity must be an int64')
             asserts.assert_greater_equal(s.parallelArcCurrentSensitivity, 1)
+            asserts.assert_less_equal(s.parallelArcCurrentSensitivity, MEASUREMENT_MAX,
+                                      'ParallelArcCurrentSensitivity must not exceed the data model maximum')
         if s.supportedArcCauses is not None:
             matter_asserts.assert_valid_map8(s.supportedArcCauses, 'SupportedArcCauses must be a valid map8')
             asserts.assert_less_equal(s.supportedArcCauses, 7,
@@ -233,6 +241,8 @@ class TC_EPALM_2_1(MatterBaseTest):
         if s.tripCurrent is not None:
             matter_asserts.assert_valid_int64(s.tripCurrent, 'TripCurrent must be an int64')
             asserts.assert_greater_equal(s.tripCurrent, 1)
+            asserts.assert_less_equal(s.tripCurrent, MEASUREMENT_MAX,
+                                      'TripCurrent must not exceed the data model maximum')
         if s.tripCurve is not None:
             matter_asserts.assert_valid_enum(
                 s.tripCurve, 'TripCurve must be a CurrentTripCurveEnum', cluster.Enums.CurrentTripCurveEnum)
@@ -243,9 +253,13 @@ class TC_EPALM_2_1(MatterBaseTest):
         if s.ultimateMaxCurrent is not None:
             matter_asserts.assert_valid_int64(s.ultimateMaxCurrent, 'UltimateMaxCurrent must be an int64')
             asserts.assert_greater_equal(s.ultimateMaxCurrent, 1)
+            asserts.assert_less_equal(s.ultimateMaxCurrent, MEASUREMENT_MAX,
+                                      'UltimateMaxCurrent must not exceed the data model maximum')
         if s.serviceMaxCurrent is not None:
             matter_asserts.assert_valid_int64(s.serviceMaxCurrent, 'ServiceMaxCurrent must be an int64')
             asserts.assert_greater_equal(s.serviceMaxCurrent, 1)
+            asserts.assert_less_equal(s.serviceMaxCurrent, MEASUREMENT_MAX,
+                                      'ServiceMaxCurrent must not exceed the data model maximum')
 
     def _check_over_voltage_ratings_struct(
             self, s: 'cluster.Structs.OverVoltageRatingsStruct') -> None:
@@ -256,10 +270,14 @@ class TC_EPALM_2_1(MatterBaseTest):
         if s.tripVoltage is not None:
             matter_asserts.assert_valid_int64(s.tripVoltage, 'TripVoltage must be an int64')
             asserts.assert_greater_equal(s.tripVoltage, 1)
+            asserts.assert_less_equal(s.tripVoltage, MEASUREMENT_MAX,
+                                      'TripVoltage must not exceed the data model maximum')
         if s.maxContinuousOperatingVoltage is not None:
             matter_asserts.assert_valid_int64(
                 s.maxContinuousOperatingVoltage, 'MaxContinuousOperatingVoltage must be an int64')
             asserts.assert_greater_equal(s.maxContinuousOperatingVoltage, 1)
+            asserts.assert_less_equal(s.maxContinuousOperatingVoltage, MEASUREMENT_MAX,
+                                      'MaxContinuousOperatingVoltage must not exceed the data model maximum')
         if s.responseTime is not None:
             matter_asserts.assert_valid_uint64(s.responseTime, 'ResponseTime must be a uint64')
             asserts.assert_greater_equal(s.responseTime, 1)
@@ -269,6 +287,8 @@ class TC_EPALM_2_1(MatterBaseTest):
         if s.currentSensitivity is not None:
             matter_asserts.assert_valid_int64(s.currentSensitivity, 'CurrentSensitivity must be an int64')
             asserts.assert_greater_equal(s.currentSensitivity, 1)
+            asserts.assert_less_equal(s.currentSensitivity, MEASUREMENT_MAX,
+                                      'CurrentSensitivity must not exceed the data model maximum')
         if s.tripMechanism is not None:
             matter_asserts.assert_valid_map8(s.tripMechanism, 'TripMechanism must be a valid map8')
             asserts.assert_less_equal(s.tripMechanism, 7,
@@ -305,15 +325,21 @@ class TC_EPALM_2_1(MatterBaseTest):
         if s.ultimateMaxCurrent is not None:
             matter_asserts.assert_valid_int64(s.ultimateMaxCurrent, 'UltimateMaxCurrent must be an int64')
             asserts.assert_greater_equal(s.ultimateMaxCurrent, 1)
+            asserts.assert_less_equal(s.ultimateMaxCurrent, MEASUREMENT_MAX,
+                                      'UltimateMaxCurrent must not exceed the data model maximum')
         if s.serviceMaxCurrent is not None:
             matter_asserts.assert_valid_int64(s.serviceMaxCurrent, 'ServiceMaxCurrent must be an int64')
             asserts.assert_greater_equal(s.serviceMaxCurrent, 1)
+            asserts.assert_less_equal(s.serviceMaxCurrent, MEASUREMENT_MAX,
+                                      'ServiceMaxCurrent must not exceed the data model maximum')
 
     def _check_short_circuit_ratings_struct(
             self, s: 'cluster.Structs.ShortCircuitRatingsStruct') -> None:
         if s.tripCurrent is not None:
             matter_asserts.assert_valid_int64(s.tripCurrent, 'TripCurrent must be an int64')
             asserts.assert_greater_equal(s.tripCurrent, 1)
+            asserts.assert_less_equal(s.tripCurrent, MEASUREMENT_MAX,
+                                      'TripCurrent must not exceed the data model maximum')
         if s.tripMechanism is not None:
             matter_asserts.assert_valid_map8(s.tripMechanism, 'TripMechanism must be a valid map8')
             asserts.assert_less_equal(s.tripMechanism, 7,
@@ -325,12 +351,18 @@ class TC_EPALM_2_1(MatterBaseTest):
         if s.ultimateMaxCurrent is not None:
             matter_asserts.assert_valid_int64(s.ultimateMaxCurrent, 'UltimateMaxCurrent must be an int64')
             asserts.assert_greater_equal(s.ultimateMaxCurrent, 1)
+            asserts.assert_less_equal(s.ultimateMaxCurrent, MEASUREMENT_MAX,
+                                      'UltimateMaxCurrent must not exceed the data model maximum')
         if s.serviceMaxCurrent is not None:
             matter_asserts.assert_valid_int64(s.serviceMaxCurrent, 'ServiceMaxCurrent must be an int64')
             asserts.assert_greater_equal(s.serviceMaxCurrent, 1)
+            asserts.assert_less_equal(s.serviceMaxCurrent, MEASUREMENT_MAX,
+                                      'ServiceMaxCurrent must not exceed the data model maximum')
         if s.maxCurrent is not None:
             matter_asserts.assert_valid_int64(s.maxCurrent, 'MaxCurrent must be an int64')
             asserts.assert_greater_equal(s.maxCurrent, 1)
+            asserts.assert_less_equal(s.maxCurrent, MEASUREMENT_MAX,
+                                      'MaxCurrent must not exceed the data model maximum')
 
     def _check_surge_protection_ratings_struct(
             self, s: 'cluster.Structs.SurgeProtectionRatingsStruct') -> None:
@@ -350,30 +382,44 @@ class TC_EPALM_2_1(MatterBaseTest):
             matter_asserts.assert_valid_int64(
                 s.maxContinuousOperatingVoltage, 'MaxContinuousOperatingVoltage must be an int64')
             asserts.assert_greater_equal(s.maxContinuousOperatingVoltage, 1)
+            asserts.assert_less_equal(s.maxContinuousOperatingVoltage, MEASUREMENT_MAX,
+                                      'MaxContinuousOperatingVoltage must not exceed the data model maximum')
         if s.maxVoltageProtection is not None:
             matter_asserts.assert_valid_int64(
                 s.maxVoltageProtection, 'MaxVoltageProtection must be an int64')
             asserts.assert_greater_equal(s.maxVoltageProtection, 1)
+            asserts.assert_less_equal(s.maxVoltageProtection, MEASUREMENT_MAX,
+                                      'MaxVoltageProtection must not exceed the data model maximum')
         if s.maxTemporaryVoltage is not None:
             matter_asserts.assert_valid_int64(
                 s.maxTemporaryVoltage, 'MaxTemporaryVoltage must be an int64')
             asserts.assert_greater_equal(s.maxTemporaryVoltage, 1)
+            asserts.assert_less_equal(s.maxTemporaryVoltage, MEASUREMENT_MAX,
+                                      'MaxTemporaryVoltage must not exceed the data model maximum')
         if s.nominalDischargeCurrent is not None:
             matter_asserts.assert_valid_int64(
                 s.nominalDischargeCurrent, 'NominalDischargeCurrent must be an int64')
             asserts.assert_greater_equal(s.nominalDischargeCurrent, 1)
+            asserts.assert_less_equal(s.nominalDischargeCurrent, MEASUREMENT_MAX,
+                                      'NominalDischargeCurrent must not exceed the data model maximum')
         if s.maximumDischargeCurrent is not None:
             matter_asserts.assert_valid_int64(
                 s.maximumDischargeCurrent, 'MaximumDischargeCurrent must be an int64')
             asserts.assert_greater_equal(s.maximumDischargeCurrent, 1)
+            asserts.assert_less_equal(s.maximumDischargeCurrent, MEASUREMENT_MAX,
+                                      'MaximumDischargeCurrent must not exceed the data model maximum')
         if s.ratedShortCircuitCurrent is not None:
             matter_asserts.assert_valid_int64(
                 s.ratedShortCircuitCurrent, 'RatedShortCircuitCurrent must be an int64')
             asserts.assert_greater_equal(s.ratedShortCircuitCurrent, 1)
+            asserts.assert_less_equal(s.ratedShortCircuitCurrent, MEASUREMENT_MAX,
+                                      'RatedShortCircuitCurrent must not exceed the data model maximum')
         if s.ratedShortTimeWithstandCurrent is not None:
             matter_asserts.assert_valid_int64(
                 s.ratedShortTimeWithstandCurrent, 'RatedShortTimeWithstandCurrent must be an int64')
             asserts.assert_greater_equal(s.ratedShortTimeWithstandCurrent, 1)
+            asserts.assert_less_equal(s.ratedShortTimeWithstandCurrent, MEASUREMENT_MAX,
+                                      'RatedShortTimeWithstandCurrent must not exceed the data model maximum')
         if s.energyAbsorptionCapability is not None:
             matter_asserts.assert_valid_uint64(
                 s.energyAbsorptionCapability, 'EnergyAbsorptionCapability must be a uint64')
