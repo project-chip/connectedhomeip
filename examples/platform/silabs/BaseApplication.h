@@ -63,8 +63,7 @@
 #define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
 #define APP_ERROR_ALLOCATION_FAILED CHIP_APPLICATION_ERROR(0x07)
 
-    class BaseApplicationDelegate : public AppDelegate,
-                                    public chip::FabricTable::Delegate
+class BaseApplicationDelegate : public AppDelegate, public chip::FabricTable::Delegate
 {
 public:
     bool isCommissioningInProgress() { return isComissioningStarted; }

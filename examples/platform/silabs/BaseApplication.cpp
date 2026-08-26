@@ -116,7 +116,7 @@
 #endif // ENABLE_WSTK_LEDS
 #define APP_FUNCTION_BUTTON 0
 
-    using namespace chip;
+using namespace chip;
 using namespace chip::app;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;

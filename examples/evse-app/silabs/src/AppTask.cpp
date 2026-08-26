@@ -172,9 +172,9 @@ CHIP_ERROR AppTask::AppInit()
 #if SL_MATTER_DISPLAY_ENABLED
 #if SL_MATTER_QR_CODE_ENABLED
 #ifdef SL_WIFI
-        if (!chip::DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned())
+    if (!chip::DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned())
 #else
-        if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
+    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
 #endif /* !SL_WIFI */
     {
         GetLCD().ShowQRCode(true);

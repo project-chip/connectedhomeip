@@ -64,14 +64,13 @@
 
 #define SYSTEM_STATE_LED &sl_led_led0
 
-    namespace
-{
-    constexpr chip::EndpointId kLightSwitchEndpoint   = 1;
-    constexpr chip::EndpointId kGenericSwitchEndpoint = 2;
+namespace {
+constexpr chip::EndpointId kLightSwitchEndpoint   = 1;
+constexpr chip::EndpointId kGenericSwitchEndpoint = 2;
 
-    constexpr chip::app::Clusters::LevelControl::Commands::Step::Type kStepCommand = {
-        .stepSize = 1, .transitionTime = 0, .optionsMask = 0, .optionsOverride = 0
-    };
+constexpr chip::app::Clusters::LevelControl::Commands::Step::Type kStepCommand = {
+    .stepSize = 1, .transitionTime = 0, .optionsMask = 0, .optionsOverride = 0
+};
 } // namespace
 
 using namespace chip;

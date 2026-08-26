@@ -69,7 +69,7 @@
 
 #define APP_FUNCTION_BUTTON 0
 
-    using namespace chip;
+using namespace chip;
 using namespace chip::app;
 using namespace chip::TLV;
 using namespace chip::DeviceLayer;

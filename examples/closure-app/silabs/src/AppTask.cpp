@@ -55,7 +55,7 @@
 #define APP_FUNCTION_BUTTON 0
 #define APP_CLOSURE_BUTTON 1
 
-    using namespace chip;
+using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace ::chip::DeviceLayer;
@@ -105,7 +105,7 @@ CHIP_ERROR AppTask::AppInit()
 #endif // SL_MATTER_QR_CODE_ENABLED
 #endif // SL_MATTER_DISPLAY_ENABLED
 
-        return err;
+    return err;
 }
 
 CHIP_ERROR AppTask::StartAppTask()

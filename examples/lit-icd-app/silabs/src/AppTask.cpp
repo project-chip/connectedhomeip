@@ -58,7 +58,7 @@
 #define APP_FUNCTION_BUTTON 0
 #define APP_USER_ACTION 1
 
-    using namespace chip;
+using namespace chip;
 using namespace chip::app;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;

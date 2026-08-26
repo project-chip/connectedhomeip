@@ -60,7 +60,7 @@
 #define APP_FUNCTION_BUTTON 0
 #define APP_REFRIGERATOR 1
 
-    using namespace chip;
+using namespace chip;
 using namespace chip::app;
 using namespace chip::TLV;
 using namespace ::chip::DeviceLayer;
