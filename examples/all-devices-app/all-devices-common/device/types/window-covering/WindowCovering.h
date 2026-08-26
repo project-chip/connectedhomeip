@@ -35,7 +35,7 @@ public:
     };
 
     WindowCovering(Clusters::WindowCovering::WindowCoveringDelegate & delegate, Clusters::IdentifyDelegate & identifyDelegate,
-                   const Context & context);
+                   const Context & context, Clusters::WindowCovering::OptionalAttributeSet optionalAttributes = {});
     ~WindowCovering() override = default;
 
     // DeviceInterface pure virtual lifecycle hooks
@@ -47,6 +47,10 @@ public:
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
     Clusters::WindowCovering::WindowCoveringCluster & WindowCoveringCluster() { return mWindowCoveringCluster.Cluster(); }
     Clusters::GroupsCluster & GroupsCluster() { return mGroupsCluster.Cluster(); }
+
+protected:
+    TimerDelegate & mTimerDelegate;
+    const Clusters::WindowCovering::OptionalAttributeSet mOptionalAttributes;
 
 private:
     Clusters::WindowCovering::WindowCoveringDelegate & mWindowCoveringDelegate;
