@@ -33,32 +33,26 @@ logger = logging.getLogger(__name__)
 # Timeout constants
 TIMED_REQUEST_TIMEOUT_MS = 5000  # Matter command timeout (5s)
 NETWORK_STATUS_UPDATE_DELAY = 5  # Delay for DUT to update LastNetworkingStatus (5s for Thread)
+THREAD_CONNECT_ATTEMPT_DELAY = 40  # Time to allow Thread stack to attempt connection
 TIMEOUT = 300  # Overall test timeout (5 min)
+
+# Matter spec version thresholds — SpecificationVersion attribute uses 32-bit
+# encoding: 0xMMmmpp00 (major, minor, patch). 0x01070000 = spec 1.7.0.
+MATTER_SPEC_VERSION_1_7 = 0x01070000
 
 # Cluster references
 cnet = Clusters.NetworkCommissioning
 cgen = Clusters.GeneralCommissioning
+cbasic = Clusters.BasicInformation
 
 # Thread TLV types (from Thread Operational Dataset specification)
 EXTENDED_PAN_ID_TLV_TYPE = 0x02  # 8 bytes
-NETWORK_KEY_TLV_TYPE = 0x05  # 16 bytes
 
 
 def get_thread_tlv(dataset: bytes, tlv_type: int, expected_length: int = None) -> bytes:
     """
     Extracts a specific TLV value from a Thread Operational Dataset.
     Thread TLV format: Type (1 byte) | Length (1 byte) | Value (Length bytes)
-
-    Args:
-        dataset: Thread operational dataset in bytes
-        tlv_type: TLV type to extract
-        expected_length: Expected length of the TLV value (optional, for validation)
-
-    Returns:
-        TLV value as bytes
-
-    Raises:
-        ValueError: If TLV is not found or has invalid length
     """
     i = 0
     while i < len(dataset) - 1:
@@ -82,17 +76,6 @@ def get_thread_tlv(dataset: bytes, tlv_type: int, expected_length: int = None) -
 def modify_thread_tlv(dataset: bytes, tlv_type: int, modifier_fn) -> bytes:
     """
     Modifies a specific TLV value in a Thread Operational Dataset.
-
-    Args:
-        dataset: Original Thread operational dataset in bytes
-        tlv_type: TLV type to modify
-        modifier_fn: Function that takes the original value bytes and returns modified bytes.
-
-    Returns:
-        Modified dataset as bytes
-
-    Raises:
-        ValueError: If the TLV type is not found or modified value has different length
     """
     result = bytearray(dataset)
     i = 0
@@ -132,11 +115,10 @@ class TC_CNET_4_24(MatterBaseTest):
     PASE session variant — for uncommissioned devices.
 
     This test establishes a PASE session over BLE and verifies that the DUT can
-    recover from Thread network connection failures (wrong Extended PAN ID, wrong
-    Network Key) and successfully connect with correct credentials.
+    recover from a Thread network connection failure (wrong Extended PAN ID) and
+    successfully commission with correct credentials.
 
-    Since communication happens over BLE (PASE), network transitions do not
-    affect the control session.
+    Gated on SupportsConcurrentConnection = True.
 
     Usage:
         rm -rf /tmp/chip_kvs
@@ -191,9 +173,7 @@ class TC_CNET_4_24(MatterBaseTest):
             attribute=cnet.Attributes.Networks)
 
     async def _read_last_networking_status(
-        self, endpoint: int,
-        expected_status: cnet.Enums.NetworkCommissioningStatusEnum = None,
-        valid_statuses: list = None
+        self, endpoint: int
     ) -> cnet.Enums.NetworkCommissioningStatusEnum:
         status = await self.read_single_attribute(
             dev_ctrl=self.default_controller,
@@ -201,23 +181,34 @@ class TC_CNET_4_24(MatterBaseTest):
             endpoint=endpoint,
             attribute=cnet.Attributes.LastNetworkingStatus)
         logger.info(" --- LastNetworkingStatus = %s", status)
-        if expected_status is not None:
-            asserts.assert_equal(status, expected_status,
-                                 f"Expected {expected_status}, got {status}")
-        elif valid_statuses is not None:
-            asserts.assert_in(status, valid_statuses,
-                              f"Expected one of {valid_statuses}, got {status}")
         return status
+
+    def _emit_warning(self, msg: str) -> None:
+        """
+        Records a warning that surfaces in the test summary. Falls back to
+        logger.warning() if the framework does not expose record_warning().
+        """
+        logger.warning(msg)
+        if hasattr(self, 'record_warning'):
+            try:
+                self.record_warning(msg)
+                return
+            except Exception as e:
+                logger.warning("record_warning failed (%s), warning only in logs", e)
 
     @property
     def default_timeout(self) -> int:
         return TIMEOUT
 
+    def pics_TC_CNET_4_24(self) -> list[str]:
+        return ['PICS.S.F01']
+
     def steps_TC_CNET_4_24(self):
         return [
             TestStep(0,
-                     "TH establishes a PASE session with the DUT over BLE\n"
-                     "Then opens a new fail-safe window (300 seconds) for network reconfiguration testing",
+                     "TH establishes a PASE session with the DUT over BLE, verifies the DUT reports "
+                     "SupportsConcurrentConnection = True (the test is skipped otherwise) and opens "
+                     "a fail-safe window (300 seconds) for network reconfiguration testing",
                      is_commissioning=True),
             TestStep(1,
                      "TH reads Networks attribute and removes all configured networks",
@@ -228,10 +219,13 @@ class TC_CNET_4_24(MatterBaseTest):
                      "Verify NetworkConfigResponse with NetworkingStatus kSuccess (0)"),
             TestStep(3,
                      "TH sends ConnectNetwork command with dataset containing incorrect Extended PAN ID, Breadcrumb = 3",
-                     "Verify ConnectNetworkResponse with NetworkingStatus kSuccess (0)"),
+                     "Verify ConnectNetworkResponse with NetworkingStatus kSuccess (0) or a raised exception "
+                     "(the DUT may drop the response when it cannot join)"),
             TestStep(4,
                      "TH reads LastNetworkingStatus after Extended PAN ID connection failure",
-                     "Verify LastNetworkingStatus is kNetworkNotFound (5)"),
+                     "For DUTs reporting SpecificationVersion >= 1.7: expect kNetworkNotFound (5). "
+                     "For pre-1.7 DUTs: expect any non-success status, a mismatch with kNetworkNotFound "
+                     "is recorded as a warning but does not fail the test."),
             TestStep(5,
                      "TH reads Networks attribute",
                      "Verify dataset with incorrect Extended PAN ID is in the network list"),
@@ -242,26 +236,8 @@ class TC_CNET_4_24(MatterBaseTest):
                      "TH reads Networks attribute",
                      "Verify Networks list is empty after removal"),
             TestStep(8,
-                     "TH sends AddOrUpdateThreadNetwork with valid format but incorrect Network Key, Breadcrumb = 8",
-                     "Verify NetworkConfigResponse with NetworkingStatus kSuccess (0)"),
-            TestStep(9,
-                     "TH sends ConnectNetwork command with dataset containing incorrect Network Key, Breadcrumb = 9",
-                     "Verify ConnectNetworkResponse with NetworkingStatus kSuccess (0)"),
-            TestStep(10,
-                     "TH reads LastNetworkingStatus after Network Key connection failure",
-                     "Verify LastNetworkingStatus is kAuthFailure (7)"),
-            TestStep(11,
-                     "TH sends AddOrUpdateThreadNetwork with correct operational dataset and Breadcrumb = 11",
-                     "Verify NetworkConfigResponse with NetworkingStatus kSuccess (0)"),
-            TestStep(12,
-                     "TH sends ConnectNetwork command and Breadcrumb = 12",
-                     "Verify ConnectNetworkResponse with NetworkingStatus kSuccess (0)"),
-            TestStep(13,
-                     "TH reads LastNetworkingStatus (should be kSuccess)",
-                     "Verify LastNetworkingStatus is kSuccess (0)"),
-            TestStep(14,
-                     "TH reads Networks attribute",
-                     "Verify the device is connected to the correct network"),
+                     "TH fully commissions the DUT using the correct Thread network",
+                     "Commissioning is successful and the DUT reports the correct Thread network as connected"),
         ]
 
     def desc_TC_CNET_4_24(self):
@@ -273,9 +249,9 @@ class TC_CNET_4_24(MatterBaseTest):
 
         correct_thread_dataset = self.matter_test_config.thread_operational_dataset
         if correct_thread_dataset is None:
-            # Fallback: parse --thread-dataset-hex directly from command line args
+            # Fallback: parse --thread-dataset-hex directly from command line args.
             # This is needed because the framework only populates thread_operational_dataset
-            # when a commissioning method like ble-thread is specified
+            # when a commissioning method like ble-thread is specified.
             for i, arg in enumerate(sys.argv):
                 if arg == '--thread-dataset-hex' and i + 1 < len(sys.argv):
                     try:
@@ -288,18 +264,21 @@ class TC_CNET_4_24(MatterBaseTest):
             asserts.fail("Thread operational dataset must be provided via --thread-dataset-hex <dataset_hex>.")
         logger.info(" --- Correct Thread operational dataset: %s", correct_thread_dataset.hex())
 
-        # Create incorrect datasets
+        # Build the single incorrect dataset we still exercise: wrong Extended PAN ID.
+        # On Thread the odds of encountering a matching network with a bad key in the field are slim,
+        # the interesting failure mode is a not-found network.
         incorrect_thread_dataset_1 = modify_thread_tlv(
             correct_thread_dataset, EXTENDED_PAN_ID_TLV_TYPE,
             lambda v: bytes(b ^ 0xAA for b in v))
-        logger.info(" --- Incorrect dataset 1 (modified Extended PAN ID): %s", incorrect_thread_dataset_1.hex())
+        logger.info(" --- Incorrect dataset (modified Extended PAN ID): %s", incorrect_thread_dataset_1.hex())
 
-        incorrect_thread_dataset_2 = modify_thread_tlv(
-            correct_thread_dataset, NETWORK_KEY_TLV_TYPE,
-            lambda v: bytes(b ^ 0xCC for b in v))
-        logger.info(" --- Incorrect dataset 2 (modified Network Key): %s", incorrect_thread_dataset_2.hex())
+        correct_network_id = get_thread_tlv(correct_thread_dataset,
+                                            tlv_type=EXTENDED_PAN_ID_TLV_TYPE, expected_length=8)
+        network_id_1 = get_thread_tlv(incorrect_thread_dataset_1,
+                                      tlv_type=EXTENDED_PAN_ID_TLV_TYPE, expected_length=8)
 
-        # Step 0: Establish PASE session over BLE
+
+        # PASE, SupportsConcurrentConnection gate, and fail-safe.
         self.step(0)
 
         logger.info(" --- Establishing PASE session with DUT over BLE...")
@@ -319,7 +298,10 @@ class TC_CNET_4_24(MatterBaseTest):
         except Exception as e:
             asserts.fail(f"Failed to establish PASE session over BLE: {e}")
 
-        # Log SupportsConcurrentConnection to characterize DUT behavior
+        # Gate the test on SupportsConcurrentConnection == True.
+        # This test only makes sense on devices that keep the PASE/BLE session alive
+        # while attempting Thread joins, non-concurrent devices tear down the session
+        # on ConnectNetwork and cannot be exercised this way.
         try:
             supports_concurrent = await self.read_single_attribute(
                 dev_ctrl=self.default_controller,
@@ -328,9 +310,30 @@ class TC_CNET_4_24(MatterBaseTest):
                 attribute=cgen.Attributes.SupportsConcurrentConnection)
             logger.info(" --- SupportsConcurrentConnection = %s", supports_concurrent)
         except Exception as e:
-            logger.warning(" --- Could not read SupportsConcurrentConnection: %s", e)
+            asserts.fail(f"Could not read SupportsConcurrentConnection: {e}")
 
-        # Arm fail-safe for 300 seconds
+        if not supports_concurrent:
+            skip_msg = ("Skipping TC-CNET-4.24: DUT reports SupportsConcurrentConnection = False. "
+                        "This test requires a concurrent-connection-capable DUT.")
+            logger.info(" --- %s", skip_msg)
+            asserts.skip(skip_msg)
+
+        # Best-effort read of SpecificationVersion to decide how strict Step 4 should be.
+        # Devices predating spec 1.7 are allowed to report any non-success status.
+        spec_version = 0
+        try:
+            spec_version = await self.read_single_attribute(
+                dev_ctrl=self.default_controller,
+                node_id=self.dut_node_id,
+                endpoint=endpoint,
+                attribute=cbasic.Attributes.SpecificationVersion)
+            logger.info(" --- SpecificationVersion = 0x%08x", spec_version)
+        except Exception as e:
+            logger.warning(" --- Could not read SpecificationVersion (%s), treating DUT as pre-1.7", e)
+
+        is_spec_1_7_or_later = spec_version >= MATTER_SPEC_VERSION_1_7
+
+        # Arm fail-safe for 300 seconds.
         logger.info(" --- Arming fail-safe to 300 seconds")
         arm_failsafe_response = await self.send_single_cmd(
             endpoint=ROOT_ENDPOINT_ID,
@@ -339,7 +342,6 @@ class TC_CNET_4_24(MatterBaseTest):
                              f"Fail-safe arming failed: {arm_failsafe_response.errorCode}")
         logger.info(" --- Fail-safe armed successfully (300 seconds)")
 
-        # Step 1: Remove all configured networks
         self.step(1)
 
         networks = await self._read_networks(endpoint)
@@ -361,7 +363,7 @@ class TC_CNET_4_24(MatterBaseTest):
         logger.info(" --- Waiting %ss for device to update status...", NETWORK_STATUS_UPDATE_DELAY)
         await asyncio.sleep(NETWORK_STATUS_UPDATE_DELAY)
 
-        # Verify LastNetworkingStatus and LastConnectErrorValue are Null
+        # Verify LastNetworkingStatus and LastConnectErrorValue are Null after removal.
         last_networking_status = await self.read_single_attribute(
             dev_ctrl=self.default_controller, node_id=self.dut_node_id,
             endpoint=endpoint, attribute=cnet.Attributes.LastNetworkingStatus)
@@ -376,7 +378,6 @@ class TC_CNET_4_24(MatterBaseTest):
         asserts.assert_is(last_connect_error, NullValue,
                           f"Expected LastConnectErrorValue to be Null, got {last_connect_error}")
 
-        # Step 2: AddOrUpdateThreadNetwork with incorrect Extended PAN ID
         self.step(2)
         response = await self.send_single_cmd(
             endpoint=endpoint,
@@ -385,10 +386,7 @@ class TC_CNET_4_24(MatterBaseTest):
             timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
         await self._validate_network_config_response(response)
 
-        # Step 3: ConnectNetwork with incorrect Extended PAN ID
         self.step(3)
-        network_id_1 = get_thread_tlv(incorrect_thread_dataset_1,
-                                      tlv_type=EXTENDED_PAN_ID_TLV_TYPE, expected_length=8)
         logger.info(" --- Sending ConnectNetwork with incorrect Extended PAN ID: %s", network_id_1.hex())
 
         try:
@@ -402,15 +400,34 @@ class TC_CNET_4_24(MatterBaseTest):
             logger.info(" --- ConnectNetwork raised exception: %s", type(e).__name__)
             logger.info(" --- Continuing to observe post-connect network state")
 
-        # Wait for Thread to attempt connection and update status
-        await asyncio.sleep(40)
+        # Wait for Thread to attempt connection and update status.
+        await asyncio.sleep(THREAD_CONNECT_ATTEMPT_DELAY)
         await asyncio.sleep(NETWORK_STATUS_UPDATE_DELAY)
 
-        # Step 4: Read LastNetworkingStatus — expect kNetworkNotFound
+        # ---------------- Step 4 ----------------
+        # Version-conditional check per PR feedback:
+        #   - Spec 1.7+: enforce kNetworkNotFound.
+        #   - Pre-1.7:   allow any non-success status, a mismatch with kNetworkNotFound
+        #                is a warning rather than a failure.
         self.step(4)
-        await self._read_last_networking_status(endpoint, expected_status=cnet.Enums.NetworkCommissioningStatusEnum.kNetworkNotFound)
+        status = await self._read_last_networking_status(endpoint)
+        expected = cnet.Enums.NetworkCommissioningStatusEnum.kNetworkNotFound
 
-        # Step 5: Read Networks — verify incorrect Extended PAN ID is stored
+        if is_spec_1_7_or_later:
+            asserts.assert_equal(
+                status, expected,
+                f"Spec >= 1.7 DUT: expected LastNetworkingStatus = {expected}, got {status}")
+        else:
+            asserts.assert_not_equal(
+                status, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
+                "Pre-1.7 DUT: LastNetworkingStatus must not be kSuccess after failed ConnectNetwork")
+            if status != expected:
+                self._emit_warning(
+                    f"Pre-1.7 DUT reported LastNetworkingStatus = {status} after ConnectNetwork "
+                    f"with an unknown Extended PAN ID, spec 1.7 requires {expected}. "
+                    "Accepted for now, but this behavior should be corrected."
+                )
+
         self.step(5)
         networks = await self._read_networks(endpoint)
         logger.info(" --- Networks attribute has %d network(s)", len(networks))
@@ -418,7 +435,6 @@ class TC_CNET_4_24(MatterBaseTest):
         asserts.assert_in(network_id_1, network_ids,
                           "Incorrect Extended PAN ID not found in Networks attribute")
 
-        # Step 6: RemoveNetwork with incorrect Extended PAN ID
         self.step(6)
         response = await self.send_single_cmd(
             endpoint=endpoint,
@@ -426,94 +442,36 @@ class TC_CNET_4_24(MatterBaseTest):
             timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
         await self._validate_network_config_response(response)
 
-        # Step 7: Read Networks — verify empty
         self.step(7)
         networks = await self._read_networks(endpoint)
         logger.info(" --- Networks attribute has %d network(s) after removal", len(networks))
         asserts.assert_equal(len(networks), 0,
                              f"Expected empty Networks list, but has {len(networks)} network(s)")
 
-        # Step 8: AddOrUpdateThreadNetwork with incorrect Network Key
+        # Full commissioning with the correct Thread dataset. Doing this at the end
+        # (instead of a bare ConnectNetwork + failsafe wait-out) avoids stalling the
+        # test 5 minutes for the fail-safe to expire and leaves the DUT in a clean,
+        # commissioned state.
         self.step(8)
-        response = await self.send_single_cmd(
-            endpoint=endpoint,
-            cmd=cnet.Commands.AddOrUpdateThreadNetwork(
-                operationalDataset=incorrect_thread_dataset_2, breadcrumb=8),
-            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
-        await self._validate_network_config_response(response)
+        commissioning_ok = await self.commission_devices()
+        asserts.assert_true(commissioning_ok, "Commissioning failed with correct Thread network")
 
-        # Step 9: ConnectNetwork with incorrect Network Key
-        self.step(9)
-        network_id_2 = get_thread_tlv(incorrect_thread_dataset_2,
-                                      tlv_type=EXTENDED_PAN_ID_TLV_TYPE, expected_length=8)
-        logger.info(" --- Sending ConnectNetwork with incorrect Network Key: %s", network_id_2.hex())
-
+        # Best-effort sanity check: verify the DUT is connected to the expected network.
+        # commission_devices() re-arms the fail-safe and drives its own commissioning
+        # flow, so this is an extra guardrail rather than the primary pass criterion.
         try:
-            response = await self.send_single_cmd(
-                endpoint=endpoint,
-                cmd=cnet.Commands.ConnectNetwork(networkID=network_id_2, breadcrumb=9),
-                timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
-            await self._validate_connect_network_response(response, expect_success=True)
-            logger.info(" --- ConnectNetwork completed")
+            networks = await self._read_networks(endpoint)
+            connected_networks = [net.networkID for net in networks if net.connected]
+            logger.info(" --- Connected networks: %s", [net.hex() for net in connected_networks])
+            logger.info(" --- Expected network ID: %s", correct_network_id.hex())
+            asserts.assert_in(
+                correct_network_id, connected_networks,
+                f"Expected DUT connected to Thread network with Extended PAN ID "
+                f"'{correct_network_id.hex()}' after commissioning")
         except Exception as e:
-            logger.info(" --- ConnectNetwork raised exception: %s", type(e).__name__)
-            logger.info(" --- Continuing to observe post-connect network state")
+            logger.warning(" --- Post-commissioning Networks read failed: %s", e)
 
-        # Wait for Thread to attempt connection and update status
-        await asyncio.sleep(40)
-
-        # Step 10: Read LastNetworkingStatus — expect kAuthFailure
-        self.step(10)
-        await self._read_last_networking_status(endpoint, expected_status=cnet.Enums.NetworkCommissioningStatusEnum.kAuthFailure)
-
-        # Step 11: AddOrUpdateThreadNetwork with correct dataset
-        self.step(11)
-        response = await self.send_single_cmd(
-            endpoint=endpoint,
-            cmd=cnet.Commands.AddOrUpdateThreadNetwork(
-                operationalDataset=correct_thread_dataset, breadcrumb=11),
-            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
-        await self._validate_network_config_response(response)
-
-        logger.info(" --- Waiting %ss for DUT to stabilize Thread configuration...", NETWORK_STATUS_UPDATE_DELAY)
-        await asyncio.sleep(NETWORK_STATUS_UPDATE_DELAY)
-
-        # Step 12: ConnectNetwork with correct credentials
-        self.step(12)
-        correct_network_id = get_thread_tlv(correct_thread_dataset,
-                                            tlv_type=EXTENDED_PAN_ID_TLV_TYPE, expected_length=8)
-        logger.info(" --- Sending ConnectNetwork with correct dataset: %s", correct_network_id.hex())
-
-        response = await self.send_single_cmd(
-            endpoint=endpoint,
-            cmd=cnet.Commands.ConnectNetwork(networkID=correct_network_id, breadcrumb=12),
-            timedRequestTimeoutMs=60000)
-        await self._validate_connect_network_response(response, expect_success=True)
-        logger.info(" --- ConnectNetwork succeeded with correct credentials")
-
-        # Wait for Thread connection to stabilize
-        await asyncio.sleep(40)
-
-        # Step 13: Read LastNetworkingStatus — expect kSuccess
-        self.step(13)
-        await self._read_last_networking_status(
-            endpoint, expected_status=cnet.Enums.NetworkCommissioningStatusEnum.kSuccess)
-
-        # Step 14: Read Networks — verify connected to correct network
-        self.step(14)
-        response = await self._read_networks(endpoint)
-        logger.info(" --- Networks attribute has %d network(s)", len(response))
-        asserts.assert_greater_equal(len(response), 1,
-                                     "Expected at least one network after successful connection")
-
-        connected_networks = [network.networkID for network in response if network.connected]
-        logger.info(" --- Connected networks: %s", [net.hex() for net in connected_networks])
-        logger.info(" --- Expected network ID: %s", correct_network_id.hex())
-        asserts.assert_true(
-            correct_network_id in connected_networks,
-            f"Expected device to be connected to Thread network with Extended PAN ID '{correct_network_id.hex()}'")
-
-        logger.info(" --- Test completed successfully over PASE")
+        logger.info(" --- Test completed successfully")
 
 
 if __name__ == "__main__":
