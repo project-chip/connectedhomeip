@@ -43,6 +43,17 @@ from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
+# UnknownProblemLocation is used to attach a location-less warning to record_warning().
+# Different framework versions expose it in different modules, so we try each and fall
+# back to None (in which case _emit_warning skips the record_warning path).
+try:
+    from matter.testing.matter_testing import UnknownProblemLocation
+except ImportError:
+    try:
+        from matter.testing.problem_notices import UnknownProblemLocation  # type: ignore
+    except ImportError:
+        UnknownProblemLocation = None  # type: ignore
+
 logger = logging.getLogger(__name__)
 
 # Timeout constants
@@ -290,21 +301,28 @@ class TC_CNET_4_24(MatterBaseTest):
     def _emit_warning(self, msg: str) -> None:
         """Record a non-fatal warning that surfaces in the test summary.
 
-        Uses ``self.record_warning`` when the base test class exposes it, so
-        the warning appears in the framework's post-run report. Falls back to
-        a plain ``logger.warning`` when the method is not available (older
-        framework versions or a stubbed harness).
+        Uses ``self.record_warning`` with the framework's expected keyword
+        signature (``test_name``, ``location``, ``problem``) so the warning
+        appears in the post-run report. Falls back to ``logger.warning``
+        alone when the method or its supporting types are not available
+        (older framework versions, stubbed harness, or unexpected signature).
 
         Args:
             msg: Human-readable warning message.
         """
         logger.warning(msg)
-        if hasattr(self, 'record_warning'):
-            try:
-                self.record_warning(msg)
-                return
-            except Exception as e:
-                logger.warning("record_warning failed (%s), warning only in logs", e)
+        if not hasattr(self, 'record_warning') or UnknownProblemLocation is None:
+            return
+        test_info = getattr(self, 'current_test_info', None)
+        test_name = getattr(test_info, 'name', self.__class__.__name__)
+        try:
+            self.record_warning(
+                test_name=test_name,
+                location=UnknownProblemLocation(),
+                problem=msg,
+            )
+        except Exception as e:
+            logger.warning("record_warning failed (%s), warning only in logs", e)
 
     @property
     def default_timeout(self) -> int:
@@ -312,13 +330,8 @@ class TC_CNET_4_24(MatterBaseTest):
         return TIMEOUT
 
     def pics_TC_CNET_4_24(self) -> list[str]:
-        """Return the PICS codes required for this test to be applicable.
-
-        ``PICS.S.F01`` corresponds to the NetworkCommissioning cluster
-        Thread-networking feature bit — the test is only meaningful on
-        Thread-capable DUTs.
-        """
-        return ['PICS.S.F01']
+        """Return the PICS codes required for this test to be applicable."""
+        return ['CNET.S.F01']
 
     def steps_TC_CNET_4_24(self) -> list[TestStep]:
         """Declare the ordered list of test steps shown in the run report."""
@@ -406,7 +419,13 @@ class TC_CNET_4_24(MatterBaseTest):
                     break
         if correct_thread_dataset is None:
             asserts.fail("Thread operational dataset must be provided via --thread-dataset-hex <dataset_hex>.")
-        logger.info(" --- Correct Thread operational dataset: %s", correct_thread_dataset.hex())
+
+        # Extract Extended PAN IDs up-front so we can reference them in logs
+        # without ever emitting the full dataset (which contains the Network Key).
+        correct_network_id: bytes = get_thread_tlv(correct_thread_dataset,
+                                                   tlv_type=EXTENDED_PAN_ID_TLV_TYPE, expected_length=8)
+        logger.info(" --- Correct Thread dataset: %d bytes, Extended PAN ID: %s",
+                    len(correct_thread_dataset), correct_network_id.hex())
 
         # Build the single incorrect dataset we still exercise: wrong Extended PAN ID.
         # On Thread the odds of encountering a matching network with a bad key in the field are slim,
@@ -414,12 +433,10 @@ class TC_CNET_4_24(MatterBaseTest):
         incorrect_thread_dataset_1: bytes = modify_thread_tlv(
             correct_thread_dataset, EXTENDED_PAN_ID_TLV_TYPE,
             lambda v: bytes(b ^ 0xAA for b in v))
-        logger.info(" --- Incorrect dataset (modified Extended PAN ID): %s", incorrect_thread_dataset_1.hex())
-
-        correct_network_id: bytes = get_thread_tlv(correct_thread_dataset,
-                                                   tlv_type=EXTENDED_PAN_ID_TLV_TYPE, expected_length=8)
         network_id_1: bytes = get_thread_tlv(incorrect_thread_dataset_1,
                                              tlv_type=EXTENDED_PAN_ID_TLV_TYPE, expected_length=8)
+        logger.info(" --- Incorrect Thread dataset: %d bytes, Extended PAN ID: %s (modified)",
+                    len(incorrect_thread_dataset_1), network_id_1.hex())
 
         # PASE, SupportsConcurrentConnection gate, and fail-safe.
         self.step(0)
@@ -461,18 +478,21 @@ class TC_CNET_4_24(MatterBaseTest):
             logger.info(" --- %s", skip_msg)
             asserts.skip(skip_msg)
 
-        # Best-effort read of SpecificationVersion to decide how strict Step 4 should be.
-        # Devices predating spec 1.7 are allowed to report any non-success status.
-        spec_version: int = 0
+        # Read SpecificationVersion to decide how strict Step 4 should be.
+        # A failure here is treated as a hard error rather than silently defaulting to
+        # pre-1.7 leniency, since that would let a buggy 1.7+ DUT pass a check that
+        # should have been strict.
         try:
-            spec_version = await self.read_single_attribute(
+            spec_version: int = await self.read_single_attribute(
                 dev_ctrl=self.default_controller,
                 node_id=self.dut_node_id,
                 endpoint=endpoint,
                 attribute=cbasic.Attributes.SpecificationVersion)
             logger.info(" --- SpecificationVersion = 0x%08x", spec_version)
         except Exception as e:
-            logger.warning(" --- Could not read SpecificationVersion (%s), treating DUT as pre-1.7", e)
+            asserts.fail(
+                f"Could not read BasicInformation.SpecificationVersion, cannot decide "
+                f"spec-version strictness for Step 4: {e}")
 
         is_spec_1_7_or_later: bool = spec_version >= MATTER_SPEC_VERSION_1_7
 
@@ -598,20 +618,17 @@ class TC_CNET_4_24(MatterBaseTest):
         commissioning_ok: bool = await self.commission_devices()
         asserts.assert_true(commissioning_ok, "Commissioning failed with correct Thread network")
 
-        # Best-effort sanity check: verify the DUT is connected to the expected network.
-        # commission_devices() re-arms the fail-safe and drives its own commissioning
-        # flow, so this is an extra guardrail rather than the primary pass criterion.
-        try:
-            networks = await self._read_networks(endpoint)
-            connected_networks: list = [net.networkID for net in networks if net.connected]
-            logger.info(" --- Connected networks: %s", [net.hex() for net in connected_networks])
-            logger.info(" --- Expected network ID: %s", correct_network_id.hex())
-            asserts.assert_in(
-                correct_network_id, connected_networks,
-                f"Expected DUT connected to Thread network with Extended PAN ID "
-                f"'{correct_network_id.hex()}' after commissioning")
-        except Exception as e:
-            logger.warning(" --- Post-commissioning Networks read failed: %s", e)
+        # Verify the DUT is connected to the expected network. This is not just a
+        # guardrail — Step 8's declared outcome requires this, so a failure here
+        # must fail the test rather than be swallowed.
+        networks = await self._read_networks(endpoint)
+        connected_networks: list = [net.networkID for net in networks if net.connected]
+        logger.info(" --- Connected networks: %s", [net.hex() for net in connected_networks])
+        logger.info(" --- Expected network ID: %s", correct_network_id.hex())
+        asserts.assert_in(
+            correct_network_id, connected_networks,
+            f"Expected DUT connected to Thread network with Extended PAN ID "
+            f"'{correct_network_id.hex()}' after commissioning")
 
         logger.info(" --- Test completed successfully")
 
