@@ -84,7 +84,7 @@ class TC_HSTAT_2_3(HSTATBase):
                      "Verify that the DUT response contains a value of MaxSetpointValue"),
             TestStep(13, "TH writes to the DUT the UserSetpoint attribute with MinSetpointValue + StepValue.",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
-            TestStep(14, "TH reads from the DUT the UserSetpoint attribute.", 
+            TestStep(14, "TH reads from the DUT the UserSetpoint attribute.",
                      "Verify that the DUT response contains a value of MinSetpointValue + StepValue. "
                      "Verify: If no reports were received, fail the test. "
                      "If (MaxSetpointValue - MinSetpointValue) = StepValue, verify 1 report was received and the value is MaxSetpointValue. "
