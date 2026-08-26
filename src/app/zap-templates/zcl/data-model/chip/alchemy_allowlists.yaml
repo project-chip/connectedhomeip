@@ -37,7 +37,6 @@ MANUAL_ALLOWLIST:
 
 INCOMPLETE_METADATA_ALLOWLIST:
     - commodity-price-cluster.xml
-    - diagnostic-logs-cluster.xml
     - dishwasher-alarm-cluster.xml
     - electrical-energy-measurement-cluster.xml
     - electrical-grid-conditions-cluster.xml
