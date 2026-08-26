@@ -22,11 +22,11 @@ import sys
 import unittest
 
 from mobly import signals
-from TC_IDM_10_7 import TC_IDM_10_7
 
 import matter.clusters as Clusters
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from TC_IDM_10_7 import TC_IDM_10_7 # noqa: E402 isort:skip
 
 
 def make_descriptor_cluster(parts_list=None):
