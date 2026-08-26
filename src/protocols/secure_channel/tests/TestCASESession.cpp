@@ -174,6 +174,7 @@ public:
     void OnSessionEstablishmentError(CHIP_ERROR error) override
     {
         mNumPairingErrors++;
+        mLastError = error;
         if (error == CHIP_ERROR_BUSY)
         {
             mNumBusyResponses++;
@@ -181,6 +182,30 @@ public:
         if (error == CHIP_ERROR_INVALID_CASE_PARAMETER)
         {
             mNumInvalidParamResponse++;
+        }
+        if (error == CHIP_ERROR_CASE_SIGNATURE_MISMATCH)
+        {
+            mNumSignatureMismatch++;
+        }
+        if (error == CHIP_ERROR_CASE_NOCCHAIN_INVALID)
+        {
+            mNumNOCChainInvalid++;
+        }
+        if (error == CHIP_ERROR_CASE_SIGMA_DECRYPT_FAILURE)
+        {
+            mNumSigmaDecryptFailure++;
+        }
+        if (error == CHIP_ERROR_CASE_WRONG_FABRIC)
+        {
+            mNumWrongFabric++;
+        }
+        if (error == CHIP_ERROR_CASE_WRONG_PEER_NODEID)
+        {
+            mNumWrongPeerNodeId++;
+        }
+        if (error == CHIP_ERROR_CASE_RESUME_MIC_MISMATCH)
+        {
+            mNumResumeMicMismatch++;
         }
     }
 
@@ -199,6 +224,13 @@ public:
     uint32_t mNumPairingComplete      = 0;
     uint32_t mNumBusyResponses        = 0;
     uint32_t mNumInvalidParamResponse = 0;
+    uint32_t mNumSignatureMismatch    = 0;
+    uint32_t mNumNOCChainInvalid      = 0;
+    uint32_t mNumSigmaDecryptFailure  = 0;
+    uint32_t mNumWrongFabric          = 0;
+    uint32_t mNumWrongPeerNodeId      = 0;
+    uint32_t mNumResumeMicMismatch    = 0;
+    CHIP_ERROR mLastError             = CHIP_NO_ERROR;
 };
 
 class TestOperationalKeystore : public chip::Crypto::OperationalKeystore
@@ -687,14 +719,330 @@ TEST_F(TestCASESession, BadSignatureFailsCASE)
 
         if (faultInjectionID == FaultInjection::kFault_CASECorruptSigma2Signature)
         {
+            // Sigma2 is sent by the responder; the initiator validates the ECDSA signature and
+            // now surfaces CHIP_ERROR_CASE_SIGNATURE_MISMATCH locally (was previously the
+            // generic CHIP_ERROR_INVALID_CASE_PARAMETER). The initiator also sends a status
+            // report back to the responder with kProtocolCodeInvalidParam — the responder's
+            // delegate continues to see CHIP_ERROR_INVALID_CASE_PARAMETER as before.
+            EXPECT_EQ(delegateInitiator.mNumSignatureMismatch, 1u);
+            EXPECT_EQ(delegateInitiator.mLastError, CHIP_ERROR_CASE_SIGNATURE_MISMATCH);
             EXPECT_EQ(delegateResponder.mNumInvalidParamResponse, 1u);
         }
         if (faultInjectionID == FaultInjection::kFault_CASECorruptSigma3Signature)
         {
+            // Sigma3 is sent by the initiator; the responder validates the signature locally.
+            // Same split as above with roles swapped.
+            EXPECT_EQ(delegateResponder.mNumSignatureMismatch, 1u);
+            EXPECT_EQ(delegateResponder.mLastError, CHIP_ERROR_CASE_SIGNATURE_MISMATCH);
             EXPECT_EQ(delegateInitiator.mNumInvalidParamResponse, 1u);
         }
     }
 }
+
+// Exercises CHIP_ERROR_CASE_NOCCHAIN_INVALID and CHIP_ERROR_CASE_SIGMA_DECRYPT_FAILURE by
+// fault-injecting NOC and TBE-encrypted-payload corruption. These codes give consumers a
+// CASE-context signal beyond the generic CHIP_ERROR_INVALID_CASE_PARAMETER that the peer
+// status report still carries; without the local code, callers had no way to tell NOC-chain
+// validation failures apart from decrypt failures or generic Sigma decode errors.
+TEST_F(TestCASESession, FaultInjectedSigma2NOCCorruptionSurfacesCaseSpecificCode)
+{
+    TemporarySessionManager sessionManager(*this);
+    TestCASESecurePairingDelegate delegateInitiator;
+    TestCASESecurePairingDelegate delegateResponder;
+    CASESession pairingInitiator;
+    CASESession pairingResponder;
+
+    EXPECT_EQ(FaultInjection::GetManager().FailAtFault(FaultInjection::kFault_CASECorruptSigma2NOC, 0, 1),
+              kFaultInjectionSuccessCode);
+
+    pairingInitiator.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+    ExchangeContext * contextInitiator = NewUnauthenticatedExchangeToBob(&pairingInitiator);
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingResponder),
+              CHIP_NO_ERROR);
+    pairingResponder.SetGroupDataProvider(&gDeviceGroupDataProvider);
+
+    EXPECT_SUCCESS(pairingResponder.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr,
+                                                                   &delegateResponder, ScopedNodeId(),
+                                                                   Optional<ReliableMessageProtocolConfig>::Missing()));
+    EXPECT_SUCCESS(pairingInitiator.EstablishSession(
+        sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextInitiator, nullptr,
+        nullptr, &delegateInitiator, Optional<ReliableMessageProtocolConfig>::Missing()));
+
+    ServiceEvents();
+
+    EXPECT_EQ(delegateInitiator.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateResponder.mNumPairingComplete, 0u);
+    // Initiator validates the (corrupted) responder NOC chain locally and surfaces the
+    // CASE-specific NOCCHAIN_INVALID code. Responder gets INVALID_CASE_PARAMETER via the
+    // status report.
+    EXPECT_EQ(delegateInitiator.mNumNOCChainInvalid, 1u);
+    EXPECT_EQ(delegateInitiator.mLastError, CHIP_ERROR_CASE_NOCCHAIN_INVALID);
+    EXPECT_EQ(delegateResponder.mNumInvalidParamResponse, 1u);
+}
+
+TEST_F(TestCASESession, FaultInjectedSigma2DecryptCorruptionSurfacesCaseSpecificCode)
+{
+    TemporarySessionManager sessionManager(*this);
+    TestCASESecurePairingDelegate delegateInitiator;
+    TestCASESecurePairingDelegate delegateResponder;
+    CASESession pairingInitiator;
+    CASESession pairingResponder;
+
+    EXPECT_EQ(FaultInjection::GetManager().FailAtFault(FaultInjection::kFault_CASECorruptTBEData2Encrypted, 0, 1),
+              kFaultInjectionSuccessCode);
+
+    pairingInitiator.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+    ExchangeContext * contextInitiator = NewUnauthenticatedExchangeToBob(&pairingInitiator);
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingResponder),
+              CHIP_NO_ERROR);
+    pairingResponder.SetGroupDataProvider(&gDeviceGroupDataProvider);
+
+    EXPECT_SUCCESS(pairingResponder.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr,
+                                                                   &delegateResponder, ScopedNodeId(),
+                                                                   Optional<ReliableMessageProtocolConfig>::Missing()));
+    EXPECT_SUCCESS(pairingInitiator.EstablishSession(
+        sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextInitiator, nullptr,
+        nullptr, &delegateInitiator, Optional<ReliableMessageProtocolConfig>::Missing()));
+
+    ServiceEvents();
+
+    EXPECT_EQ(delegateInitiator.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateResponder.mNumPairingComplete, 0u);
+    // Initiator attempts to AES-CCM-decrypt the (corrupted) TBE2 payload, MIC check fails, and
+    // the new CASE-specific decrypt-failure code is surfaced.
+    EXPECT_EQ(delegateInitiator.mNumSigmaDecryptFailure, 1u);
+    EXPECT_EQ(delegateInitiator.mLastError, CHIP_ERROR_CASE_SIGMA_DECRYPT_FAILURE);
+    EXPECT_EQ(delegateResponder.mNumInvalidParamResponse, 1u);
+}
+
+TEST_F(TestCASESession, FaultInjectedSigma2WrongFabricIdSurfacesCaseSpecificCode)
+{
+    TemporarySessionManager sessionManager(*this);
+    TestCASESecurePairingDelegate delegateInitiator;
+    TestCASESecurePairingDelegate delegateResponder;
+    CASESession pairingInitiator;
+    CASESession pairingResponder;
+
+    // The fault flips the local responderFabricId after VerifyCredentials succeeds, so the
+    // subsequent VerifyOrReturnError(fabricId == responderFabricId, CHIP_ERROR_CASE_WRONG_FABRIC)
+    // fails on a value mismatch. Distinct from a NOC-corruption fault, which would fail inside
+    // VerifyCredentials and surface CHIP_ERROR_CASE_NOCCHAIN_INVALID.
+    EXPECT_EQ(FaultInjection::GetManager().FailAtFault(FaultInjection::kFault_CASESigma2WrongFabricId, 0, 1),
+              kFaultInjectionSuccessCode);
+
+    pairingInitiator.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+    ExchangeContext * contextInitiator = NewUnauthenticatedExchangeToBob(&pairingInitiator);
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingResponder),
+              CHIP_NO_ERROR);
+    pairingResponder.SetGroupDataProvider(&gDeviceGroupDataProvider);
+
+    EXPECT_SUCCESS(pairingResponder.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr,
+                                                                   &delegateResponder, ScopedNodeId(),
+                                                                   Optional<ReliableMessageProtocolConfig>::Missing()));
+    EXPECT_SUCCESS(pairingInitiator.EstablishSession(
+        sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextInitiator, nullptr,
+        nullptr, &delegateInitiator, Optional<ReliableMessageProtocolConfig>::Missing()));
+
+    ServiceEvents();
+
+    EXPECT_EQ(delegateInitiator.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateResponder.mNumPairingComplete, 0u);
+    // Initiator's VerifyOrReturnError fires with the new CASE-specific WRONG_FABRIC code; the
+    // responder sees INVALID_CASE_PARAMETER via the status report (peer-side wire protocol
+    // unchanged).
+    EXPECT_EQ(delegateInitiator.mNumWrongFabric, 1u);
+    EXPECT_EQ(delegateInitiator.mLastError, CHIP_ERROR_CASE_WRONG_FABRIC);
+    EXPECT_EQ(delegateResponder.mNumInvalidParamResponse, 1u);
+}
+
+TEST_F(TestCASESession, FaultInjectedSigma2WrongPeerNodeIdSurfacesCaseSpecificCode)
+{
+    TemporarySessionManager sessionManager(*this);
+    TestCASESecurePairingDelegate delegateInitiator;
+    TestCASESecurePairingDelegate delegateResponder;
+    CASESession pairingInitiator;
+    CASESession pairingResponder;
+
+    // The fault flips the local responderNodeId after VerifyCredentials succeeds, so the
+    // subsequent VerifyOrReturnError(mPeerNodeId == responderNodeId, CHIP_ERROR_CASE_WRONG_PEER_NODEID)
+    // fails on a value mismatch.
+    EXPECT_EQ(FaultInjection::GetManager().FailAtFault(FaultInjection::kFault_CASESigma2WrongPeerNodeId, 0, 1),
+              kFaultInjectionSuccessCode);
+
+    pairingInitiator.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+    ExchangeContext * contextInitiator = NewUnauthenticatedExchangeToBob(&pairingInitiator);
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingResponder),
+              CHIP_NO_ERROR);
+    pairingResponder.SetGroupDataProvider(&gDeviceGroupDataProvider);
+
+    EXPECT_SUCCESS(pairingResponder.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr,
+                                                                   &delegateResponder, ScopedNodeId(),
+                                                                   Optional<ReliableMessageProtocolConfig>::Missing()));
+    EXPECT_SUCCESS(pairingInitiator.EstablishSession(
+        sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextInitiator, nullptr,
+        nullptr, &delegateInitiator, Optional<ReliableMessageProtocolConfig>::Missing()));
+
+    ServiceEvents();
+
+    EXPECT_EQ(delegateInitiator.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateResponder.mNumPairingComplete, 0u);
+    // Initiator's VerifyOrReturnError fires with the CASE-specific WRONG_PEER_NODEID code; the
+    // responder sees INVALID_CASE_PARAMETER via the status report.
+    EXPECT_EQ(delegateInitiator.mNumWrongPeerNodeId, 1u);
+    EXPECT_EQ(delegateInitiator.mLastError, CHIP_ERROR_CASE_WRONG_PEER_NODEID);
+    EXPECT_EQ(delegateResponder.mNumInvalidParamResponse, 1u);
+}
+
+// Sigma3-side mirrors of the Sigma2 NOC / decrypt cases above. Sigma3 is sent by the
+// initiator, so the responder is the one detecting the injected corruption locally and
+// surfacing the new CASE-specific code; the initiator sees only the wire-level
+// INVALID_CASE_PARAMETER status report. Without these mirrors the Sigma3 decode paths in
+// HandleSigma3a (TBE3 AES-CCM decrypt) and HandleSigma3b (FabricTable::VerifyCredentials on
+// the initiator's NOC chain) were not exercising the new error remappings.
+TEST_F(TestCASESession, FaultInjectedSigma3NOCCorruptionSurfacesCaseSpecificCode)
+{
+    TemporarySessionManager sessionManager(*this);
+    TestCASESecurePairingDelegate delegateInitiator;
+    TestCASESecurePairingDelegate delegateResponder;
+    CASESession pairingInitiator;
+    CASESession pairingResponder;
+
+    EXPECT_EQ(FaultInjection::GetManager().FailAtFault(FaultInjection::kFault_CASECorruptSigma3NOC, 0, 1),
+              kFaultInjectionSuccessCode);
+
+    pairingInitiator.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+    ExchangeContext * contextInitiator = NewUnauthenticatedExchangeToBob(&pairingInitiator);
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingResponder),
+              CHIP_NO_ERROR);
+    pairingResponder.SetGroupDataProvider(&gDeviceGroupDataProvider);
+
+    EXPECT_SUCCESS(pairingResponder.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr,
+                                                                   &delegateResponder, ScopedNodeId(),
+                                                                   Optional<ReliableMessageProtocolConfig>::Missing()));
+    EXPECT_SUCCESS(pairingInitiator.EstablishSession(
+        sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextInitiator, nullptr,
+        nullptr, &delegateInitiator, Optional<ReliableMessageProtocolConfig>::Missing()));
+
+    ServiceEvents();
+
+    EXPECT_EQ(delegateInitiator.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateResponder.mNumPairingComplete, 0u);
+    // Responder validates the (corrupted) initiator NOC chain in HandleSigma3b and surfaces
+    // the CASE-specific NOCCHAIN_INVALID code locally. Initiator sees INVALID_CASE_PARAMETER
+    // via the peer status report.
+    EXPECT_EQ(delegateResponder.mNumNOCChainInvalid, 1u);
+    EXPECT_EQ(delegateResponder.mLastError, CHIP_ERROR_CASE_NOCCHAIN_INVALID);
+    // NOCCHAIN_INVALID intentionally subsumes the legacy cert-specific codes
+    // (CERT_NOT_TRUSTED / CERT_EXPIRED / WRONG_CERT_DN / etc.) that VerifyCredentials can
+    // return — consumers branching on the new code must see it instead of any legacy cert code.
+    EXPECT_NE(delegateResponder.mLastError, CHIP_ERROR_INVALID_CASE_PARAMETER);
+    EXPECT_NE(delegateResponder.mLastError, CHIP_ERROR_CERT_NOT_TRUSTED);
+    EXPECT_NE(delegateResponder.mLastError, CHIP_ERROR_CERT_EXPIRED);
+    EXPECT_NE(delegateResponder.mLastError, CHIP_ERROR_WRONG_CERT_DN);
+    EXPECT_EQ(delegateInitiator.mNumInvalidParamResponse, 1u);
+    EXPECT_EQ(delegateInitiator.mNumNOCChainInvalid, 0u);
+}
+
+TEST_F(TestCASESession, FaultInjectedSigma3WrongFabricIdSurfacesCaseSpecificCode)
+{
+    TemporarySessionManager sessionManager(*this);
+    TestCASESecurePairingDelegate delegateInitiator;
+    TestCASESecurePairingDelegate delegateResponder;
+    CASESession pairingInitiator;
+    CASESession pairingResponder;
+
+    // The fault flips the local initiatorFabricId after VerifyCredentials succeeds in
+    // HandleSigma3b, so the subsequent
+    // VerifyOrReturnError(data.fabricId == initiatorFabricId, CHIP_ERROR_CASE_WRONG_FABRIC)
+    // fails on a value mismatch. Distinct from a NOC-corruption fault, which would fail inside
+    // VerifyCredentials and surface CHIP_ERROR_CASE_NOCCHAIN_INVALID. This exercises the
+    // responder-side propagation path through the WorkHelper -> HandleSigma3c ->
+    // AbortPendingEstablish chain to ensure CHIP_ERROR_CASE_WRONG_FABRIC surfaces locally.
+    EXPECT_EQ(FaultInjection::GetManager().FailAtFault(FaultInjection::kFault_CASESigma3WrongFabricId, 0, 1),
+              kFaultInjectionSuccessCode);
+
+    pairingInitiator.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+    ExchangeContext * contextInitiator = NewUnauthenticatedExchangeToBob(&pairingInitiator);
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingResponder),
+              CHIP_NO_ERROR);
+    pairingResponder.SetGroupDataProvider(&gDeviceGroupDataProvider);
+
+    EXPECT_SUCCESS(pairingResponder.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr,
+                                                                   &delegateResponder, ScopedNodeId(),
+                                                                   Optional<ReliableMessageProtocolConfig>::Missing()));
+    EXPECT_SUCCESS(pairingInitiator.EstablishSession(
+        sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextInitiator, nullptr,
+        nullptr, &delegateInitiator, Optional<ReliableMessageProtocolConfig>::Missing()));
+
+    ServiceEvents();
+
+    EXPECT_EQ(delegateInitiator.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateResponder.mNumPairingComplete, 0u);
+    // Responder's VerifyOrReturnError fires with the new CASE-specific WRONG_FABRIC code; the
+    // initiator sees INVALID_CASE_PARAMETER via the status report (peer-side wire protocol
+    // unchanged).
+    EXPECT_EQ(delegateResponder.mNumWrongFabric, 1u);
+    EXPECT_EQ(delegateResponder.mLastError, CHIP_ERROR_CASE_WRONG_FABRIC);
+    EXPECT_EQ(delegateInitiator.mNumInvalidParamResponse, 1u);
+}
+
+TEST_F(TestCASESession, FaultInjectedSigma3DecryptCorruptionSurfacesCaseSpecificCode)
+{
+    TemporarySessionManager sessionManager(*this);
+    TestCASESecurePairingDelegate delegateInitiator;
+    TestCASESecurePairingDelegate delegateResponder;
+    CASESession pairingInitiator;
+    CASESession pairingResponder;
+
+    EXPECT_EQ(FaultInjection::GetManager().FailAtFault(FaultInjection::kFault_CASECorruptTBEData3Encrypted, 0, 1),
+              kFaultInjectionSuccessCode);
+
+    pairingInitiator.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+    ExchangeContext * contextInitiator = NewUnauthenticatedExchangeToBob(&pairingInitiator);
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingResponder),
+              CHIP_NO_ERROR);
+    pairingResponder.SetGroupDataProvider(&gDeviceGroupDataProvider);
+
+    EXPECT_SUCCESS(pairingResponder.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr,
+                                                                   &delegateResponder, ScopedNodeId(),
+                                                                   Optional<ReliableMessageProtocolConfig>::Missing()));
+    EXPECT_SUCCESS(pairingInitiator.EstablishSession(
+        sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextInitiator, nullptr,
+        nullptr, &delegateInitiator, Optional<ReliableMessageProtocolConfig>::Missing()));
+
+    ServiceEvents();
+
+    EXPECT_EQ(delegateInitiator.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateResponder.mNumPairingComplete, 0u);
+    // Responder attempts to AES-CCM-decrypt the (corrupted) TBE3 payload in HandleSigma3a,
+    // MIC check fails, and the new CASE-specific decrypt-failure code is surfaced.
+    EXPECT_EQ(delegateResponder.mNumSigmaDecryptFailure, 1u);
+    EXPECT_EQ(delegateResponder.mLastError, CHIP_ERROR_CASE_SIGMA_DECRYPT_FAILURE);
+    EXPECT_EQ(delegateInitiator.mNumInvalidParamResponse, 1u);
+}
+
+// Regression coverage for ICAC-only corruption (separate from the NOC corruption test above)
+// is intentionally not exercised here: the test commissioner fabric (sTestCert_Node01_02_Chip)
+// is issued by sTestCert_Root01_Chip directly without an ICAC (see SetUp comment), so the
+// kFault_CASECorruptSigma3ICAC hook at CASESession.cpp has no bytes to flip on the initiator
+// side and the fault is a no-op. The Sigma3 NOC test above covers the same HandleSigma3b
+// translation path (FabricTable::VerifyCredentials -> CHIP_ERROR_CASE_NOCCHAIN_INVALID) and
+// the EXPECT_NE assertions there guarantee the new code is not collapsed to any of the legacy
+// cert-specific codes the PR subsumes.
 #endif // CHIP_WITH_NLFAULTINJECTION
 
 struct Sigma1Params
@@ -1761,6 +2109,129 @@ TEST_F(TestCASESession, SessionResumptionStorage)
         gPairingServer.Shutdown();
     }
 }
+
+// Regression for the HandleSigma1 silent-fallback path.
+//
+// The PR description explicitly carves out that the responder-side TryResumeSession failure
+// inside HandleSigma1 is NOT remapped to CHIP_ERROR_CASE_RESUME_MIC_MISMATCH — it falls
+// back silently to full Sigma2 and the pairing must still complete cleanly. Without this
+// test, a future refactor that hoists the resume-MIC remapping up into HandleSigma1 (which
+// would be a natural symmetry mistake) would silently break the fallback contract: callers
+// would start seeing CASE_RESUME_MIC_MISMATCH on every routine cold-start handshake against
+// a peer whose resumption state has been evicted.
+//
+// Setup: initiator HAS a resumption record, responder does NOT (KEY_NOT_FOUND). This drives
+// HandleSigma1 -> TryResumeSession -> non-CHIP_NO_ERROR, taking the new logged-fallback
+// branch. Pairing must succeed via full Sigma2, and the delegate must see ZERO
+// CHIP_ERROR_CASE_RESUME_MIC_MISMATCH events.
+TEST_F(TestCASESession, Sigma1ResumptionFallbackDoesNotSurfaceResumeMicMismatch)
+{
+    TestCASESecurePairingDelegate delegateCommissioner;
+    chip::SessionResumptionStorage::ResumptionIdStorage resumptionId;
+    chip::Crypto::P256ECDHDerivedSecret sharedSecret;
+
+    const FabricInfo * fabricInfo = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
+    ASSERT_NE(fabricInfo, nullptr);
+    ScopedNodeId responder = fabricInfo->GetScopedNodeIdForNode(Node01_01);
+
+    EXPECT_EQ(chip::Crypto::DRBG_get_bytes(resumptionId.data(), resumptionId.size()), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(sharedSecret.SetLength(sharedSecret.Capacity()));
+    EXPECT_EQ(chip::Crypto::DRBG_get_bytes(sharedSecret.Bytes(), sharedSecret.Length()), CHIP_NO_ERROR);
+
+    // Asymmetric storage: initiator advertises a resumption ID in Sigma1; responder has no
+    // matching record so its TryResumeSession returns KEY_NOT_FOUND.
+    SessionResumptionTestStorage initiatorStorage(CHIP_NO_ERROR, responder, &resumptionId, &sharedSecret);
+    SessionResumptionTestStorage responderStorage(CHIP_ERROR_KEY_NOT_FOUND);
+
+    auto * pairingCommissioner = chip::Platform::New<CASESession>();
+    pairingCommissioner->SetGroupDataProvider(&gCommissionerGroupDataProvider);
+    auto & loopback            = GetLoopback();
+    loopback.mSentMessageCount = 0;
+
+    EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
+                                                           &responderStorage, nullptr, &gDeviceGroupDataProvider),
+              CHIP_NO_ERROR);
+
+    ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(pairingCommissioner);
+    EXPECT_EQ(pairingCommissioner->EstablishSession(GetSecureSessionManager(), &gCommissionerFabrics,
+                                                    ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
+                                                    &initiatorStorage, nullptr, &delegateCommissioner,
+                                                    Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+    ServiceEvents();
+
+    // Pairing must succeed via full Sigma2 fallback, and the silent-fallback contract holds:
+    // no CASE_RESUME_MIC_MISMATCH error must be surfaced to the delegate.
+    EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 1u);
+    EXPECT_EQ(delegateCommissioner.mNumPairingErrors, 0u);
+    EXPECT_EQ(delegateCommissioner.mNumResumeMicMismatch, 0u);
+    EXPECT_EQ(delegateCommissioner.mNumSigmaDecryptFailure, 0u);
+    EXPECT_EQ(delegateCommissioner.mLastError, CHIP_NO_ERROR);
+
+    chip::Platform::Delete(pairingCommissioner);
+    gPairingServer.Shutdown();
+}
+
+#if CHIP_WITH_NLFAULTINJECTION
+// Exercises CHIP_ERROR_CASE_RESUME_MIC_MISMATCH on the initiator side.
+//
+// Setup: matching SessionResumptionStorage entries on both sides so the responder accepts
+// resumption and sends Sigma2Resume. The fault flips the first byte of the responder's
+// sigma2ResumeMIC just after it is generated in PrepareSigma2Resume. When the initiator
+// reaches HandleSigma2Resume and runs ValidateSigmaResumeMIC, the AES-CCM MIC check fails;
+// the call site translates the generic decrypt failure into the new CASE-specific code so
+// callers can distinguish a stale resumption state from generic CASE parameter errors.
+TEST_F(TestCASESession, FaultInjectedSigma2ResumeMICCorruptionSurfacesCaseSpecificCode)
+{
+    TestCASESecurePairingDelegate delegateCommissioner;
+
+    chip::SessionResumptionStorage::ResumptionIdStorage resumptionId;
+    chip::Crypto::P256ECDHDerivedSecret sharedSecret;
+
+    const FabricInfo * fabricInfo = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
+    ASSERT_NE(fabricInfo, nullptr);
+    ScopedNodeId initiator = fabricInfo->GetScopedNodeIdForNode(Node01_02);
+    ScopedNodeId responder = fabricInfo->GetScopedNodeIdForNode(Node01_01);
+
+    EXPECT_EQ(chip::Crypto::DRBG_get_bytes(resumptionId.data(), resumptionId.size()), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(sharedSecret.SetLength(sharedSecret.Capacity()));
+    EXPECT_EQ(chip::Crypto::DRBG_get_bytes(sharedSecret.Bytes(), sharedSecret.Length()), CHIP_NO_ERROR);
+
+    // Both peers agree on the resumption record so the responder elects Sigma2Resume.
+    SessionResumptionTestStorage initiatorStorage(CHIP_NO_ERROR, responder, &resumptionId, &sharedSecret);
+    SessionResumptionTestStorage responderStorage(CHIP_NO_ERROR, initiator, &resumptionId, &sharedSecret);
+
+    // Inject the fault: corrupt the responder's outgoing sigma2ResumeMIC after it is generated.
+    EXPECT_EQ(FaultInjection::GetManager().FailAtFault(FaultInjection::kFault_CASECorruptSigma2ResumeMIC, 0, 1),
+              kFaultInjectionSuccessCode);
+
+    auto * pairingCommissioner = chip::Platform::New<CASESession>();
+    pairingCommissioner->SetGroupDataProvider(&gCommissionerGroupDataProvider);
+
+    auto & loopback            = GetLoopback();
+    loopback.mSentMessageCount = 0;
+
+    EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
+                                                           &responderStorage, nullptr, &gDeviceGroupDataProvider),
+              CHIP_NO_ERROR);
+
+    ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(pairingCommissioner);
+    EXPECT_EQ(pairingCommissioner->EstablishSession(GetSecureSessionManager(), &gCommissionerFabrics,
+                                                    ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
+                                                    &initiatorStorage, nullptr, &delegateCommissioner,
+                                                    Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+    ServiceEvents();
+
+    // Pairing must not complete — handshake must fail with the new specific code on the initiator.
+    EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateCommissioner.mNumResumeMicMismatch, 1u);
+    EXPECT_EQ(delegateCommissioner.mLastError, CHIP_ERROR_CASE_RESUME_MIC_MISMATCH);
+
+    chip::Platform::Delete(pairingCommissioner);
+    gPairingServer.Shutdown();
+}
+#endif // CHIP_WITH_NLFAULTINJECTION
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
 TEST_F_FROM_FIXTURE(TestCASESession, SimulateUpdateNOCInvalidatePendingEstablishment)
