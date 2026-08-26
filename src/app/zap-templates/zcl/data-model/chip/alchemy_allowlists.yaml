@@ -36,21 +36,7 @@ MANUAL_ALLOWLIST:
     - wake-on-lan-cluster.xml
 
 INCOMPLETE_METADATA_ALLOWLIST:
-    - account-login-cluster.xml
-    - access-control-cluster.xml
-    - actions-cluster.xml
-    - air-quality-cluster.xml
-    - audio-output-cluster.xml
-    - binding-cluster.xml
-    - camera-av-stream-management-cluster.xml
-    - closure-control-cluster.xml
-    - closure-dimension-cluster.xml
-    - commissioner-control-cluster.xml
     - commodity-price-cluster.xml
-    - concentration-measurement-cluster.xml
-    - descriptor-cluster.xml
-    - device-energy-management-cluster.xml
-    - device-energy-management-mode-cluster.xml
     - diagnostic-logs-cluster.xml
     - dishwasher-alarm-cluster.xml
     - electrical-energy-measurement-cluster.xml
