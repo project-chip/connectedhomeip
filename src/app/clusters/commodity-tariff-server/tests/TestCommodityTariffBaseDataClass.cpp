@@ -127,9 +127,9 @@ TEST_F(TestCommodityTariffBaseDataClass, ScalarValueUpdateFlow)
 
 TEST_F(TestCommodityTariffBaseDataClass, ScalarStorageInitializedOnConstruction)
 {
-    // The double-buffered storage must be initialized by the constructor even when the
-    // object lives in memory that is not zeroed, otherwise the first change detection
-    // compares the incoming value against indeterminate bytes.
+    // A scalar value type's storage must be initialized by the constructor even when
+    // the object lives in memory that is not zeroed, otherwise the first change
+    // detection compares the incoming value against indeterminate bytes.
     constexpr uint8_t kFillByte      = 0xAB;
     constexpr uint32_t kFillAsUint32 = 0xABABABAB;
 
@@ -138,8 +138,8 @@ TEST_F(TestCommodityTariffBaseDataClass, ScalarStorageInitializedOnConstruction)
 
     auto * data = new (storage) CTC_BaseDataClass<uint32_t>(1);
 
-    // The contract itself: construction initializes the active slot, independent
-    // of how change detection later behaves.
+    // Pin the initialization itself rather than only its effect on the update flow:
+    // a value initialized scalar slot reads zero whatever change detection does.
     EXPECT_EQ(data->GetValue(), 0u);
     EXPECT_FALSE(data->HasValue());
 

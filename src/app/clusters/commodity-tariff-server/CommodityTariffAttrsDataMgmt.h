@@ -491,7 +491,7 @@ public:
      * @post Initializes storage based on type:
      * - Nullable types: set to null
      * - List types: initialized as empty list
-     * - Others: default initialized
+     * - Others: value initialized
      * - Update state set to kIdle
      */
     explicit CTC_BaseDataClass(AttributeId aAttrId) : mAttrId(aAttrId)
