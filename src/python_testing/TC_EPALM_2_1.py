@@ -235,6 +235,8 @@ class TC_EPALM_2_1(MatterBaseTest):
             matter_asserts.assert_valid_map8(s.supportedArcCauses, 'SupportedArcCauses must be a valid map8')
             asserts.assert_less_equal(s.supportedArcCauses, 7,
                                       'SupportedArcCauses may only set ArcCauseBitmap bits 0..2')
+            asserts.assert_greater_equal(s.supportedArcCauses, 1,
+                                         'SupportedArcCauses must have at least one bit set')
 
     def _check_over_load_ratings_struct(
             self, s: 'cluster.Structs.OverLoadRatingsStruct') -> None:
@@ -250,6 +252,8 @@ class TC_EPALM_2_1(MatterBaseTest):
             matter_asserts.assert_valid_map8(s.tripMechanism, 'TripMechanism must be a valid map8')
             asserts.assert_less_equal(s.tripMechanism, 7,
                                       'TripMechanism may only set CurrentTripMechanismBitmap bits 0..2')
+            asserts.assert_greater_equal(s.tripMechanism, 1,
+                                         'TripMechanism must have at least one bit set')
         if s.ultimateMaxCurrent is not None:
             matter_asserts.assert_valid_int64(s.ultimateMaxCurrent, 'UltimateMaxCurrent must be an int64')
             asserts.assert_greater_equal(s.ultimateMaxCurrent, 1)
@@ -267,6 +271,8 @@ class TC_EPALM_2_1(MatterBaseTest):
             matter_asserts.assert_valid_map8(s.tripMechanism, 'TripMechanism must be a valid map8')
             asserts.assert_less_equal(s.tripMechanism, 7,
                                       'TripMechanism may only set VoltageTripMechanismBitmap bits 0..2 (MOV/SAD/GDT)')
+            asserts.assert_greater_equal(s.tripMechanism, 1,
+                                         'TripMechanism must have at least one bit set')
         if s.tripVoltage is not None:
             matter_asserts.assert_valid_int64(s.tripVoltage, 'TripVoltage must be an int64')
             asserts.assert_greater_equal(s.tripVoltage, 1)
@@ -293,6 +299,8 @@ class TC_EPALM_2_1(MatterBaseTest):
             matter_asserts.assert_valid_map8(s.tripMechanism, 'TripMechanism must be a valid map8')
             asserts.assert_less_equal(s.tripMechanism, 7,
                                       'TripMechanism may only set CurrentTripMechanismBitmap bits 0..2')
+            asserts.assert_greater_equal(s.tripMechanism, 1,
+                                         'TripMechanism must have at least one bit set')
         if s.voltageDependent is not None:
             matter_asserts.assert_valid_bool(s.voltageDependent, 'VoltageDependent must be a bool')
         if s.groundFaultClass is not None:
@@ -370,6 +378,8 @@ class TC_EPALM_2_1(MatterBaseTest):
             matter_asserts.assert_valid_map8(s.tripMechanism, 'TripMechanism must be a valid map8')
             asserts.assert_less_equal(s.tripMechanism, 7,
                                       'TripMechanism may only set VoltageTripMechanismBitmap bits 0..2 (MOV/SAD/GDT)')
+            asserts.assert_greater_equal(s.tripMechanism, 1,
+                                         'TripMechanism must have at least one bit set')
         if s.protectionClass is not None:
             matter_asserts.assert_valid_map8(s.protectionClass, 'ProtectionClass must be a valid map8')
             asserts.assert_less_equal(s.protectionClass, 7,
