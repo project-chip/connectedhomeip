@@ -216,7 +216,7 @@
         "COLOR_CONTROL_CLUSTER": ["color-control-server"],
         "COMMISSIONER_CONTROL_CLUSTER": ["commissioner-control-server"],
         "COMMISSIONING_CLUSTER": [],
-        "COMMISSIONING_PROXY_CLUSTER": [],
+        "COMMISSIONING_PROXY_CLUSTER": ["commissioning-proxy-server"],
         "COMMODITY_METERING_CLUSTER": ["commodity-metering-server"],
         "COMMODITY_PRICE_CLUSTER": ["commodity-price-server"],
         "COMMODITY_TARIFF_CLUSTER": ["commodity-tariff-server"],
@@ -236,7 +236,9 @@
         "ELECTRICAL_GRID_CONDITIONS_CLUSTER": [
             "electrical-grid-conditions-server"
         ],
-        "ELECTRICAL_PROTECTION_ALARM_CLUSTER": [],
+        "ELECTRICAL_PROTECTION_ALARM_CLUSTER": [
+            "electrical-protection-alarm-server"
+        ],
         "GROUPCAST_CLUSTER": ["groupcast"],
         "HUMIDISTAT_CLUSTER": ["humidistat-server"],
         "MEDIA_FILE_MANAGEMENT_CLUSTER": ["media-file-management-server"],

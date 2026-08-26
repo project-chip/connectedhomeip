@@ -29,6 +29,7 @@
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/persistence/AttributePersistenceProvider.h>
+#include <app/server-cluster/DefaultServerCluster.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -144,10 +145,29 @@ public:
     HandleRemoveAnalysisStream(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                const AvAnalysis::Commands::RemoveAnalysisStream::DecodableType & commandData);
 
+    // Active context tracking and events
+    CHIP_ERROR AnalysisSessionStart(uint16_t & aSessionId, const DataModel::Nullable<std::vector<uint16_t>> & aZoneList,
+                                    ServerClusterContext * aContext);
+
+    CHIP_ERROR InitialTriggeringContextDetected(uint16_t aSessionId,
+                                                const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aTriggeringContext,
+                                                ServerClusterContext * aContext);
+
+    CHIP_ERROR NewContextDetected(uint16_t aSessionId, const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aNewContext,
+                                  ServerClusterContext * aContext);
+
+    CHIP_ERROR ContextNoLongerDetected(uint16_t aSessionId,
+                                       const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aOldContext,
+                                       ServerClusterContext * aContext);
+
+    CHIP_ERROR AnalysisSessionEnd(uint16_t aSessionId, ServerClusterContext * aContext);
+
 private:
     AvAnalysisDelegate * mDelegate                               = nullptr;
     AvAnalysisCameraClient * mCameraClient                       = nullptr;
     AttributePersistenceProvider * mAttributePersistenceProvider = nullptr;
+    uint16_t mNextAnalysisSessionID                              = 0;
+    std::vector<AvAnalysis::ActiveAmbientContextSession> mActiveSessions;
 
     // Backing store for the AnalysisStreams attribute; only initialized when RemoteContextDetection is set.
     AvAnalysis::AnalysisStreamTable mStreamTable;
@@ -178,9 +198,10 @@ private:
                                       const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData);
 
     /*
-     * Command handler helper methods
+     * Command and event handler helper methods
      */
     bool ZoneIDListContains(const DataModel::DecodableList<uint16_t> list, uint16_t value);
+    bool IsContextPartOfActiveContextTriggers(const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aContext);
 
     /**
      * Helper functions to handle persistent data and the KVS.

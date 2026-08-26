@@ -41,7 +41,7 @@ public:
      * Delegate command assists
      */
 
-    virtual CHIP_ERROR VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs) override;
+    virtual CHIP_ERROR VerifyZoneIDsAreValid(const std::vector<uint16_t> & aZoneIDs) override;
 
     virtual bool CanAddContextTriggers() override;
 

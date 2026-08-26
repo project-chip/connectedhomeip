@@ -47,6 +47,7 @@ config CHIP_TASK_PRIORITY
 	default 5
 
 config CHIP_TASK_STACK_SIZE
+	default 7168 if SOC_MCXW70AC
 	default 16384 if CHIP_SE05X  # Increase is due to the additional middle-ware APDU buffers and Zephyr
 	default 10240
 
@@ -99,14 +100,18 @@ config BOOTLOADER_MCUBOOT
 config NET_L2_OPENTHREAD
 	default n
 
+config CHIP_LIB_SHELL
+	default n if SOC_MCXW70AC
+	default y
+
 config LOG
 	default y
 
 if LOG
 
 choice LOG_MODE
-	default LOG_MODE_MINIMAL if !NET_L2_OPENTHREAD
-	default LOG_MODE_DEFERRED
+	default LOG_MODE_DEFERRED if SOC_FAMILY_NXP_RW && OPENTHREAD
+	default LOG_MODE_MINIMAL
 endchoice
 
 if LOG_MODE_DEFERRED
@@ -118,11 +123,13 @@ config SHELL_LOG_BACKEND
 	default n
 
 config LOG_RUNTIME_DEFAULT_LEVEL
+	default 3 if SOC_MCXW70AC
 	default 4 #debug
 
 endif # LOG_MODE_DEFERRED
 
 config LOG_BUFFER_SIZE
+	default 2048 if SOC_MCXW70AC
 	default 6144 if OPENTHREAD
 
 choice MATTER_LOG_LEVEL_CHOICE
@@ -130,7 +137,11 @@ choice MATTER_LOG_LEVEL_CHOICE
 endchoice
 
 config CHIP_APP_LOG_LEVEL
+	default 3 if SOC_MCXW70AC
 	default 4 # debug
+
+config MATTER_LOG_LEVEL
+	default 3 if SOC_MCXW70AC
 
 config LOG_DEFAULT_LEVEL
 	default 1 # error
@@ -139,6 +150,12 @@ config CHIP_LOG_SIZE_OPTIMIZATION
 	default y
 
 endif # LOG
+
+config CHIP_OPTIMIZE_DEBUG_LEVEL
+	default "g" if SOC_MCXW70AC
+
+config FLASH_LOAD_SIZE
+	default 0x122000 if SOC_MCXW70AC
 
 config PRINTK_SYNC
 	default y
@@ -159,6 +176,7 @@ config FPU
 	default y
 
 config SHELL
+	default n if SOC_MCXW70AC
 	default y
 
 config PTHREAD_IPC
@@ -171,6 +189,7 @@ config POSIX_MAX_FDS
 
 # Application stack size
 config MAIN_STACK_SIZE
+	default 5120 if SOC_MCXW70AC
 	default 16384 if CHIP_SE05X  # Increase is due to the additional middle-ware APDU buffers and Zephyr
 	default 6144 if OPENTHREAD
 	default 3072
@@ -253,8 +272,17 @@ if OPENTHREAD
 config HDLC_RCP_IF
 	default y if SOC_FAMILY_NXP_RW
 
+config CHIP_OPENTHREAD_FTD
+	default n if SOC_MCXW70AC
+
+choice OPENTHREAD_DEVICE_TYPE
+	default OPENTHREAD_MTD if SOC_MCXW70AC
+	default OPENTHREAD_FTD
+endchoice
+
 config OPENTHREAD_THREAD_STACK_SIZE
-    default 6144
+    default 3584 if SOC_MCXW70AC
+	default 6144
 
 # Use the platform-provided heap
 config OPENTHREAD_EXTERNAL_HEAP
@@ -404,6 +432,7 @@ config BT_RX_STACK_SIZE
 	default 1700
 
 config BT_LONG_WQ_STACK_SIZE
+	default 3072 if SOC_MCXW70AC
 	default 2560
 
 config BT_DEVICE_NAME_GATT_WRITABLE
@@ -430,11 +459,22 @@ config CHIP_DEVICE_SOFTWARE_VERSION
 config CHIP_EXTENDED_DISCOVERY
 	default y
 
+config CHIP_ENABLE_PAIRING_AUTOSTART
+	default n if SOC_MCXW727C
+	default y
+
 config NVS_LOOKUP_CACHE
 	default y
 
 config NVS_LOOKUP_CACHE_SIZE
+	default 128 if SOC_MCXW70AC
 	default 1024
+
+# NVS/Settings storage. The 24KB (0x6000) storage_partition holds 3 8KB
+# sectors. 3 sectors (~16KB usable after GC scratch) are needed to persist
+# >= 5 Matter fabrics.
+config SETTINGS_NVS_SECTOR_COUNT
+	default 3 if SOC_MCXW70AC
 
 if CHIP_WIFI
 
@@ -567,9 +607,11 @@ config SHELL_STACK_SIZE
 	default 1536
 
 config LOG_PROCESS_THREAD_STACK_SIZE
+	default 768 if SOC_MCXW70AC
 	default 1536
 
 config HEAP_MEM_POOL_SIZE
+	default 10240 if SOC_MCXW70AC
 	default 25600 if SOC_SERIES_MCXW7XX
 	default 122880
 
@@ -578,6 +620,7 @@ config CHIP_MALLOC_SYS_HEAP_SIZE
 	default 28672 # 28 kB
 
 config SYSTEM_WORKQUEUE_STACK_SIZE
+	default 1536 if SOC_MCXW70AC
 	default 3072 if OPENTHREAD
 	default 2048 if CHIP_WIFI
 
@@ -621,6 +664,11 @@ config MBEDTLS_CTR_DRBG_C
 
 config MBEDTLS_DECLARE_PRIVATE_IDENTIFIERS
 	default y
+
+# CSR parsing is only needed by the unit tests, so gate it to test builds to
+# keep the production image small (mirrors the NXP FreeRTOS mbedtls config).
+config MBEDTLS_X509_CSR_PARSE_C
+	default y if CHIP_BUILD_TESTS
 
 choice CHIP_CRYPTO
     default CHIP_CRYPTO_PSA

@@ -35,7 +35,7 @@ void AvAnalysisManager::ShutdownApp() {}
 /**
  * Delegate command assists
  */
-CHIP_ERROR AvAnalysisManager::VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs)
+CHIP_ERROR AvAnalysisManager::VerifyZoneIDsAreValid(const std::vector<uint16_t> & aZoneIDs)
 {
     return CHIP_NO_ERROR;
 }

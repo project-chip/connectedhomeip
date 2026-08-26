@@ -26,7 +26,7 @@ class MockAvAnalysisDelegate : public AvAnalysisDelegate
 public:
     void ShutdownApp() override {}
 
-    CHIP_ERROR VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR VerifyZoneIDsAreValid(const std::vector<uint16_t> & aZoneIDs) override { return CHIP_NO_ERROR; }
 
     bool CanAddContextTriggers() override { return true; }
 
