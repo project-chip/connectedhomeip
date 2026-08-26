@@ -23,9 +23,8 @@ for the rig topology, the Python wheel requirement, and how to run the suite.
 Test rig topology
 -----------------
 The suite exercises commissioning *through a proxy*, so it needs three separate
-Matter roles.  This is based on three Raspberry Pis (but can be other devices),
-any mix works as long as the three roles are distinct.  All IPs below are
-examples — the rig is DHCP, so confirm current addresses before every run.
+Matter roles.  This is based on three Raspberry Pis (but can be other devices);
+any mix works as long as the three roles are distinct.
 
 ===================  ================================  =========================================
 Role                 What runs on it                   Why it is separate
@@ -45,11 +44,11 @@ CP (the DUT)         The commissioning-proxy app:       This is the device under
                      cluster.                           matching its build (``--wifi
                                                         --wifipaf freq_list=2437`` for PAF;
                                                         none for a BLE-only build).
-ED (end device)      ``chip-lighting-app`` with the     The commissionable target.  Tests
-                     transport under test (``--wifipaf  toggle it commissionable/not at
-                     ``/``--wifi``/BLE).  Driven by     specific steps, and it must be
-                     ``EDFixture`` (below).             reachable *only* via the proxy path
-                                                        (see ED reachability, below).
+ED (end device)      Any commissionable app (e.g.       The commissionable target.  Tests
+                     ``chip-lighting-app``) with the    toggle it commissionable/not at
+                     transport under test (``--wifipaf  specific steps, and it must be
+                     ``/``--wifi``/BLE).  Driven by     reachable *only* via the proxy path
+                     ``EDFixture`` (below).             (see ED reachability, below).
 ===================  ================================  =========================================
 
 Python environment and wheels (on the TH)
@@ -901,9 +900,9 @@ class COMPROBaseTest(MatterBaseTest):
             self.wait_for_user_input(prompt)
 
     # ------------------------------------------------------------------
-    # PASE-first commissioning lifecycle (TC-COMPRO-2.6 / 2.9)
+    # PASE-first commissioning lifecycle (TC-COMPRO-2.6)
     #
-    # These tests verify that the three fabric-scoped (O F) commands
+    # TC-COMPRO-2.6 verifies that the three fabric-scoped (O F) commands
     # (ProxyConnectRequest, ProxyDisconnectRequest, ProxyMessageRequest) are
     # rejected with UNSUPPORTED_ACCESS when they are not executed via a CASE
     # session.  The cluster spec states this rule explicitly for each of those
@@ -912,11 +911,11 @@ class COMPROBaseTest(MatterBaseTest):
     # established to it, the reject-tests run over that PASE, and the DUT is then
     # commissioned so the remaining CASE steps can run.
     #
-    # Run these tests with --in-test-commissioning-method (NOT
-    # --commissioning-method); the latter makes the harness auto-commission the
-    # DUT before the test body runs, which defeats the PASE-first premise.  The
-    # DUT MUST start factory-reset / uncommissioned on every run, so these two
-    # tests do not call commission_if_needed().
+    # Run it with --in-test-commissioning-method (NOT --commissioning-method);
+    # the latter makes the harness auto-commission the DUT before the test body
+    # runs, which defeats the PASE-first premise.  The DUT MUST start
+    # factory-reset / uncommissioned on every run, so 2.6 does not call
+    # commission_if_needed().
     # ------------------------------------------------------------------
 
     async def establish_pase_to_dut(self, node_id: int | None = None) -> int:
