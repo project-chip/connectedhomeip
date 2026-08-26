@@ -118,8 +118,10 @@ private:
 
     uint64_t mJoinerId = 0;
 
-    bool mCurrentPacketIsResponse   = false;
-    bool mCurrentPacketHasMatterSrv = false;
+    bool mCurrentPacketIsResponse          = false;
+    bool mCurrentPacketHasMatterSrv        = false;
+    bool mCurrentPacketHasDiscriminator    = false;
+    bool mCurrentTxtRecordHasDiscriminator = false;
 
     std::recursive_mutex mMutex;
     bool mPromiseFulfilled = false;

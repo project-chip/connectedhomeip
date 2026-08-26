@@ -197,7 +197,11 @@ void ThreadMeshcopCommissionProxy::OnResource(chip::Dnssd::ResourceType section,
             break;
         }
 
-        chip::Dnssd::ParseTxtRecord(data.GetData(), this);
+        mCurrentTxtRecordHasDiscriminator = false;
+        if (chip::Dnssd::ParseTxtRecord(data.GetData(), this) && mCurrentTxtRecordHasDiscriminator)
+        {
+            mCurrentPacketHasDiscriminator = true;
+        }
         break;
     }
 
@@ -301,6 +305,11 @@ void ThreadMeshcopCommissionProxy::OnRecord(const chip::Dnssd::BytesRange & name
     ByteSpan val(value.Start(), value.Size());
 
     Dnssd::FillNodeDataFromTxt(key, val, mNodeData.Get<Dnssd::CommissionNodeData>());
+
+    if (name.Size() == 1 && (name.Start()[0] == 'D' || name.Start()[0] == 'd'))
+    {
+        mCurrentTxtRecordHasDiscriminator = true;
+    }
 }
 
 void ThreadMeshcopCommissionProxy::ProcessAnnouncement(const std::vector<uint8_t> & joinerIdBytes, uint16_t joinerPort,
@@ -314,10 +323,12 @@ void ThreadMeshcopCommissionProxy::ProcessAnnouncement(const std::vector<uint8_t
     }
 
     mNodeData.Set<Dnssd::CommissionNodeData>();
-    mServicePort               = 0;
-    mCurrentPacketIsResponse   = false;
-    mCurrentPacketHasMatterSrv = false;
-    mDnsPacket                 = chip::Dnssd::BytesRange(payload.data(), payload.data() + payload.size());
+    mServicePort                      = 0;
+    mCurrentPacketIsResponse          = false;
+    mCurrentPacketHasMatterSrv        = false;
+    mCurrentPacketHasDiscriminator    = false;
+    mCurrentTxtRecordHasDiscriminator = false;
+    mDnsPacket                        = chip::Dnssd::BytesRange(payload.data(), payload.data() + payload.size());
 
     if (!chip::Dnssd::ParsePacket(mDnsPacket, this))
     {
@@ -325,7 +336,7 @@ void ThreadMeshcopCommissionProxy::ProcessAnnouncement(const std::vector<uint8_t
         return;
     }
 
-    if (!mCurrentPacketIsResponse || !mCurrentPacketHasMatterSrv || mServicePort == 0)
+    if (!mCurrentPacketIsResponse || !mCurrentPacketHasMatterSrv || !mCurrentPacketHasDiscriminator || mServicePort == 0)
     {
         ChipLogDetail(Controller, "Ignoring incomplete joiner mDNS announcement");
         return;

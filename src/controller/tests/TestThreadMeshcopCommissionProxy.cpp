@@ -47,6 +47,16 @@ constexpr uint8_t kMalformedMattercSrvResponse[] = {
     0x00, 0x00, 0x00, 0x78, 0x00, 0x01, 0x00,                               // TTL, invalid one-byte SRV data
 };
 
+constexpr uint8_t kMattercSrvOnlyResponse[] = {
+    0x00, 0x00, 0x84, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, // DNS response header
+    0x08, '_',  'm',  'a',  't',  't',  'e',  'r',  'c',                    // _matterc
+    0x04, '_',  'u',  'd',  'p',                                            // _udp
+    0x05, 'l',  'o',  'c',  'a',  'l',                                      // local
+    0x00, 0x00, 0x21, 0x00, 0x01,                                           // SRV, IN
+    0x00, 0x00, 0x00, 0x78, 0x00, 0x07,                                     // TTL, data length
+    0x00, 0x00, 0x00, 0x00, 0x15, 0xa4, 0x00,                               // priority, weight, port, root target
+};
+
 constexpr uint8_t kCompleteMattercResponse[] = {
     0x00, 0x00, 0x84, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, // DNS response header
     0x08, '_',  'm',  'a',  't',  't',  'e',  'r',  'c',                    // _matterc
@@ -96,6 +106,17 @@ TEST(TestThreadMeshcopCommissionProxy, WaitsForCompleteResponseAfterMalformedSrv
     ThreadMeshcopCommissionProxy proxy;
 
     SendJoinerPacket(proxy, kMalformedMattercSrvResponse);
+    EXPECT_FALSE(LastDiscoveryIsValid(proxy));
+
+    SendJoinerPacket(proxy, kCompleteMattercResponse);
+    EXPECT_TRUE(LastDiscoveryIsValid(proxy));
+}
+
+TEST(TestThreadMeshcopCommissionProxy, WaitsForCompleteResponseAfterSrvOnlyResponse)
+{
+    ThreadMeshcopCommissionProxy proxy;
+
+    SendJoinerPacket(proxy, kMattercSrvOnlyResponse);
     EXPECT_FALSE(LastDiscoveryIsValid(proxy));
 
     SendJoinerPacket(proxy, kCompleteMattercResponse);
