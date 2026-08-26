@@ -47,6 +47,7 @@ struct AnalysisStreamEntry
     AnalysisStreamStateEnum state = AnalysisStreamStateEnum::kPendingInitiation;
 
     ScopedNodeId cameraNode;
+    uint16_t videoStreamID = 0;
 
     Structs::AnalysisStreamStruct::Type ToEncodableStruct() const
     {
@@ -85,20 +86,35 @@ public:
     bool IsFull() const { return mCount == mCapacity; }
 
     /**
-     * Adds an entry in PendingInitiation state for the given AnalysisStreamID. The id is the VideoStreamID
-     * returned by the camera's VideoStreamAllocate command (spec: AnalysisStreamID field), not locally minted.
-     * Returns the new entry, or nullptr if the table is full, not initialized, or the id is already present.
+     * Adds an entry in PendingInitiation state for a camera stream, generating a new AnalysisStreamID
+     * Returns the new entry, or nullptr if the table is full or not initialized.
      */
-    AnalysisStreamEntry * Add(uint16_t aAnalysisStreamId)
+    AnalysisStreamEntry * Add(uint16_t aVideoStreamId, const ScopedNodeId & aCameraNode)
     {
         VerifyOrReturnValue(mEntries.Get() != nullptr && !IsFull(), nullptr);
-        VerifyOrReturnValue(Find(aAnalysisStreamId) == nullptr, nullptr);
 
         AnalysisStreamEntry & entry = mEntries[mCount];
         entry                       = AnalysisStreamEntry{};
-        entry.analysisStreamID      = aAnalysisStreamId;
+        entry.analysisStreamID      = GenerateAnalysisStreamId();
+        entry.videoStreamID         = aVideoStreamId;
+        entry.cameraNode            = aCameraNode;
         mCount++;
         return &entry;
+    }
+
+    /**
+     * Finds the entry backed by the given camera stream, if any.
+     */
+    AnalysisStreamEntry * FindByCameraStream(const ScopedNodeId & aCameraNode, uint16_t aVideoStreamId)
+    {
+        for (uint8_t i = 0; i < mCount; i++)
+        {
+            if (mEntries[i].cameraNode == aCameraNode && mEntries[i].videoStreamID == aVideoStreamId)
+            {
+                return &mEntries[i];
+            }
+        }
+        return nullptr;
     }
 
     AnalysisStreamEntry * Find(uint16_t aAnalysisStreamId)
@@ -140,20 +156,25 @@ public:
     const AnalysisStreamEntry * begin() const { return mEntries.Get(); }
     const AnalysisStreamEntry * end() const { return mEntries.Get() + mCount; }
 
-    // Worst-case TLV size of one persisted entry (id + camera node id + fabric index).
+    // Worst-case TLV size of one persisted entry (analysis id + camera node id + fabric + video id).
     static constexpr size_t kEntrySerializedSize =
-        TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(NodeId), sizeof(FabricIndex));
+        TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(NodeId), sizeof(FabricIndex), sizeof(uint16_t));
 
-    // TLV overhead of the enclosing anonymous array container written by Encode().
-    static constexpr size_t kArraySerializedOverhead = 4;
+    // TLV overhead of the enclosing structure written by Encode(): the outer container, the
+    // next-AnalysisStreamID field and the entry array container.
+    static constexpr size_t kArraySerializedOverhead = 16;
 
     /**
-     * Writes the in-use entries as an anonymous TLV array of {AnalysisStreamID, camera NodeId, fabric}.
+     * Writes the next-AnalysisStreamID counter and the in-use entries as one anonymous TLV structure.
      */
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter) const
     {
+        TLV::TLVType outerType;
+        ReturnErrorOnFailure(aWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+        ReturnErrorOnFailure(aWriter.Put(TLV::ContextTag(kPersistedTagNextStreamId), mNextAnalysisStreamId));
+
         TLV::TLVType arrayType;
-        ReturnErrorOnFailure(aWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType));
+        ReturnErrorOnFailure(aWriter.StartContainer(TLV::ContextTag(kPersistedTagEntries), TLV::kTLVType_Array, arrayType));
         for (const auto & entry : *this)
         {
             TLV::TLVType entryType;
@@ -161,18 +182,27 @@ public:
             ReturnErrorOnFailure(aWriter.Put(TLV::ContextTag(kPersistedTagStreamId), entry.analysisStreamID));
             ReturnErrorOnFailure(aWriter.Put(TLV::ContextTag(kPersistedTagCameraNodeId), entry.cameraNode.GetNodeId()));
             ReturnErrorOnFailure(aWriter.Put(TLV::ContextTag(kPersistedTagCameraFabric), entry.cameraNode.GetFabricIndex()));
+            ReturnErrorOnFailure(aWriter.Put(TLV::ContextTag(kPersistedTagVideoStreamId), entry.videoStreamID));
             ReturnErrorOnFailure(aWriter.EndContainer(entryType));
         }
-        return aWriter.EndContainer(arrayType);
+        ReturnErrorOnFailure(aWriter.EndContainer(arrayType));
+        return aWriter.EndContainer(outerType);
     }
 
     /**
-     * Replaces the table contents from a TLV array written by Encode(). Restored entries restart in
-     * PendingInitiation state.
+     * Replaces the table contents and the next-AnalysisStreamID counter from TLV written by Encode().
+     * Restored entries restart in PendingInitiation state.
      */
     CHIP_ERROR Decode(TLV::TLVReader & aReader)
     {
-        ReturnErrorOnFailure(aReader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
+        ReturnErrorOnFailure(aReader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+        TLV::TLVType outerType;
+        ReturnErrorOnFailure(aReader.EnterContainer(outerType));
+
+        ReturnErrorOnFailure(aReader.Next(TLV::ContextTag(kPersistedTagNextStreamId)));
+        ReturnErrorOnFailure(aReader.Get(mNextAnalysisStreamId));
+
+        ReturnErrorOnFailure(aReader.Next(TLV::kTLVType_Array, TLV::ContextTag(kPersistedTagEntries)));
         TLV::TLVType arrayType;
         ReturnErrorOnFailure(aReader.EnterContainer(arrayType));
 
@@ -186,33 +216,56 @@ public:
             uint16_t streamId        = 0;
             NodeId cameraNodeId      = kUndefinedNodeId;
             FabricIndex cameraFabric = kUndefinedFabricIndex;
+            uint16_t videoStreamId   = 0;
             ReturnErrorOnFailure(aReader.Next(TLV::ContextTag(kPersistedTagStreamId)));
             ReturnErrorOnFailure(aReader.Get(streamId));
             ReturnErrorOnFailure(aReader.Next(TLV::ContextTag(kPersistedTagCameraNodeId)));
             ReturnErrorOnFailure(aReader.Get(cameraNodeId));
             ReturnErrorOnFailure(aReader.Next(TLV::ContextTag(kPersistedTagCameraFabric)));
             ReturnErrorOnFailure(aReader.Get(cameraFabric));
+            ReturnErrorOnFailure(aReader.Next(TLV::ContextTag(kPersistedTagVideoStreamId)));
+            ReturnErrorOnFailure(aReader.Get(videoStreamId));
             ReturnErrorOnFailure(aReader.ExitContainer(entryType));
 
-            AnalysisStreamEntry * entry = Add(streamId);
-            VerifyOrReturnError(entry != nullptr, CHIP_ERROR_NO_MEMORY);
-            entry->cameraNode = ScopedNodeId(cameraNodeId, cameraFabric);
+            VerifyOrReturnError(mEntries.Get() != nullptr && !IsFull(), CHIP_ERROR_NO_MEMORY);
+            AnalysisStreamEntry & entry = mEntries[mCount];
+            entry                       = AnalysisStreamEntry{};
+            entry.analysisStreamID      = streamId;
+            entry.videoStreamID         = videoStreamId;
+            entry.cameraNode            = ScopedNodeId(cameraNodeId, cameraFabric);
+            mCount++;
         }
         VerifyOrReturnError(err == CHIP_ERROR_END_OF_TLV, err);
 
         ReturnErrorOnFailure(aReader.ExitContainer(arrayType));
+        ReturnErrorOnFailure(aReader.ExitContainer(outerType));
         return CHIP_NO_ERROR;
     }
 
 private:
-    // Context tags of one persisted entry written by Encode()
-    static constexpr uint8_t kPersistedTagStreamId     = 0;
-    static constexpr uint8_t kPersistedTagCameraNodeId = 1;
-    static constexpr uint8_t kPersistedTagCameraFabric = 2;
+    // Context tags of the persisted blob written by Encode()
+    static constexpr uint8_t kPersistedTagNextStreamId = 0;
+    static constexpr uint8_t kPersistedTagEntries      = 1;
+    // Context tags of one persisted entry
+    static constexpr uint8_t kPersistedTagStreamId      = 0;
+    static constexpr uint8_t kPersistedTagCameraNodeId  = 1;
+    static constexpr uint8_t kPersistedTagCameraFabric  = 2;
+    static constexpr uint8_t kPersistedTagVideoStreamId = 3;
+
+    uint16_t GenerateAnalysisStreamId()
+    {
+        uint16_t id;
+        do
+        {
+            id = mNextAnalysisStreamId++;
+        } while (Find(id) != nullptr);
+        return id;
+    }
 
     Platform::ScopedMemoryBuffer<AnalysisStreamEntry> mEntries;
-    uint8_t mCapacity = 0;
-    uint8_t mCount    = 0;
+    uint8_t mCapacity              = 0;
+    uint8_t mCount                 = 0;
+    uint16_t mNextAnalysisStreamId = 1;
 };
 
 } // namespace AvAnalysis

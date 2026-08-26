@@ -132,32 +132,34 @@ void AvAnalysisServerLogic::OnVideoStreamAllocated(Status aStatus, uint16_t aVid
         return;
     }
 
-    AnalysisStreamEntry * entry = mStreamTable.Add(aVideoStreamId);
+    // The camera answers a matching allocate with the existing VideoStreamID, so
+    // a camera stream this table already tracks means the analysis stream already exists: respond
+    // with its id rather than creating a second entry over the same stream.
+    AnalysisStreamEntry * entry = mStreamTable.FindByCameraStream(cameraNode, aVideoStreamId);
     if (entry == nullptr)
     {
-        ChipLogError(Zcl, "AvAnalysis[ep=%d]: camera-assigned stream id %u collides with an existing entry", mEndpointId,
-                     aVideoStreamId);
-        VerifyOrReturn(handler != nullptr);
-        handler->AddStatus(commandPath, Status::ResourceExhausted);
-        return;
-    }
-    entry->cameraNode = cameraNode;
+        entry = mStreamTable.Add(aVideoStreamId, cameraNode);
+        VerifyOrReturn(entry != nullptr, ChipLogError(Zcl, "AvAnalysis[ep=%d]: stream table rejected entry", mEndpointId));
 
-    MarkDirty(Attributes::CurrentAnalysisStreamCount::Id);
-    MarkDirty(Attributes::AnalysisStreams::Id);
-    LogErrorOnFailure(StoreAnalysisStreams());
+        MarkDirty(Attributes::CurrentAnalysisStreamCount::Id);
+        MarkDirty(Attributes::AnalysisStreams::Id);
+        LogErrorOnFailure(StoreAnalysisStreams());
+    }
 
     VerifyOrReturn(handler != nullptr);
     Commands::EstablishAnalysisStreamResponse::Type response;
-    response.analysisStreamID = aVideoStreamId;
+    response.analysisStreamID = entry->analysisStreamID;
     handler->AddResponse(commandPath, response);
 }
 
-void AvAnalysisServerLogic::OnVideoStreamDeallocated(Status aStatus, uint16_t aAnalysisStreamId)
+void AvAnalysisServerLogic::OnVideoStreamDeallocated(Status aStatus, uint16_t aVideoStreamId)
 {
     VerifyOrReturn(mCameraInteraction.GetState() == AvAnalysis::CameraInteraction::State::kRemoving,
                    ChipLogError(Zcl, "AvAnalysis[ep=%d]: unexpected deallocation completion", mEndpointId));
 
+    // The camera client reports the camera's VideoStreamID; the table entry is keyed by the
+    // AnalysisStreamID recorded when the interaction began
+    uint16_t analysisStreamId = mCameraInteraction.AnalysisStreamId();
     ConcreteCommandPath commandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
     // The camera has completed the deallocation, so the table is reconciled even if the
     // client exchange died; only the response needs a live handler.
@@ -172,7 +174,7 @@ void AvAnalysisServerLogic::OnVideoStreamDeallocated(Status aStatus, uint16_t aA
         return;
     }
 
-    if (mStreamTable.Remove(aAnalysisStreamId))
+    if (mStreamTable.Remove(analysisStreamId))
     {
         MarkDirty(Attributes::CurrentAnalysisStreamCount::Id);
         MarkDirty(Attributes::AnalysisStreams::Id);
@@ -946,8 +948,9 @@ AvAnalysisServerLogic::HandleRemoveAnalysisStream(CommandHandler & handler, cons
     // One camera-bound command at a time; the response of this one depends on the camera's answer
     VerifyOrReturnValue(!mCameraInteraction.InFlight(), Status::Busy);
 
-    mCameraInteraction.Begin(AvAnalysis::CameraInteraction::State::kRemoving, handler, commandPath, entry->cameraNode);
-    CHIP_ERROR err = mCameraClient->RequestVideoStreamDeallocation(entry->cameraNode, commandData.analysisStreamID, *this);
+    mCameraInteraction.Begin(AvAnalysis::CameraInteraction::State::kRemoving, handler, commandPath, entry->cameraNode,
+                             entry->analysisStreamID);
+    CHIP_ERROR err = mCameraClient->RequestVideoStreamDeallocation(entry->cameraNode, entry->videoStreamID, *this);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "AvAnalysis[ep=%d]: failed to start stream deallocation: %" CHIP_ERROR_FORMAT, mEndpointId, err.Format());

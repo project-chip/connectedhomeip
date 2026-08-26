@@ -82,7 +82,7 @@ public:
     void SetCameraClient(AvAnalysisCameraClient * aCameraClient) { mCameraClient = aCameraClient; }
 
     void OnVideoStreamAllocated(Protocols::InteractionModel::Status aStatus, uint16_t aVideoStreamId) override;
-    void OnVideoStreamDeallocated(Protocols::InteractionModel::Status aStatus, uint16_t aAnalysisStreamId) override;
+    void OnVideoStreamDeallocated(Protocols::InteractionModel::Status aStatus, uint16_t aVideoStreamId) override;
 
     EndpointId mEndpointId = kInvalidEndpointId;
 

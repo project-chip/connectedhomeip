@@ -52,14 +52,21 @@ public:
     const ScopedNodeId & CameraNode() const { return mCameraNode; }
 
     /**
+     * The AnalysisStreamID the in-flight interaction is about
+     */
+    uint16_t AnalysisStreamId() const { return mAnalysisStreamId; }
+
+    /**
      * Enters aState, parking the command so it can be answered when the camera responds.
      */
-    void Begin(State aState, CommandHandler & aHandler, const ConcreteCommandPath & aPath, const ScopedNodeId & aCameraNode)
+    void Begin(State aState, CommandHandler & aHandler, const ConcreteCommandPath & aPath, const ScopedNodeId & aCameraNode,
+               uint16_t aAnalysisStreamId = 0)
     {
-        mState      = aState;
-        mHandle     = CommandHandler::Handle(&aHandler);
-        mPath       = aPath;
-        mCameraNode = aCameraNode;
+        mState            = aState;
+        mHandle           = CommandHandler::Handle(&aHandler);
+        mPath             = aPath;
+        mCameraNode       = aCameraNode;
+        mAnalysisStreamId = aAnalysisStreamId;
         aHandler.FlushAcksRightAwayOnSlowCommand();
     }
 
@@ -83,7 +90,8 @@ public:
     }
 
 private:
-    State mState = State::kIdle;
+    State mState               = State::kIdle;
+    uint16_t mAnalysisStreamId = 0;
     CommandHandler::Handle mHandle;
     ConcreteCommandPath mPath = ConcreteCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
     ScopedNodeId mCameraNode;
