@@ -216,9 +216,9 @@ inline void LinkGroup(Cancelable * prev, Cancelable * cancelable)
 // Does NOT touch the state of adjacent nodes.
 inline Cancelable * ClearCancelable(Cancelable * cancelable)
 {
-    auto * next       = cancelable->mNext;
-    cancelable->mPrev = cancelable->mNext = cancelable;
-    cancelable->mCancel                   = nullptr;
+    auto * next         = cancelable->mNext;
+    cancelable->mCancel = nullptr;
+    cancelable->Invalidate();
     return next;
 }
 

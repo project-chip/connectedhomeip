@@ -95,10 +95,17 @@ public:
             CancelFn cancel = mCancel;
             mCancel         = nullptr;
             cancel(this);
+            Invalidate();
         }
         return this;
     }
     ~Cancelable() { Cancel(); }
+
+    /**
+     * Invalidate the callee state. This is semantically a no-op in the sense that it
+     * clears state that by the contract of this class shouldn't be read after this point.
+     */
+    void Invalidate() { mPrev = mNext = nullptr; }
 
     Cancelable(const Cancelable &) = delete;
     // A Cancelable links itself into intrusive cancelable lists via mNext/mPrev, so it must not be
@@ -288,6 +295,7 @@ public:
     {
         _Dequeue(ca);
         ca->mCancel = nullptr;
+        ca->Invalidate();
     }
 
     /**
