@@ -213,18 +213,15 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             asserts.assert_true(matchers.is_type(response, Clusters.DoorLock.Commands.GetUserResponse),
                                 "Unexpected return type for GetUserResponse")
             asserts.assert_true(response.userIndex == userindex,
-                                "Error when executing GetUserResponse command, userIndex={}".format(
-                                    str(response.userIndex)))
+                                f"Error when executing GetUserResponse command, userIndex={str(response.userIndex)}")
             asserts.assert_true(response.userName == username,
-                                "Error when executing GetUserResponse command, userName={}".format(
-                                    str(response.userName)))
+                                f"Error when executing GetUserResponse command, userName={str(response.userName)}")
             asserts.assert_true(response.userUniqueID == useruniqueid,
-                                "Error when executing GetUserResponse command, userUniqueID={}".format(
-                                    str(response.userUniqueID)))
+                                f"Error when executing GetUserResponse command, userUniqueID={str(response.userUniqueID)}")
             log.info("Credentials value is GetUserResponse Command %s", str(response.credentials))
 
-            asserts.assert_equal(len(credentiallist), len(response.credentials),  "Error mismatch in expected credential from GetUserResponse command = {}".format(
-                str(credentiallist)))
+            asserts.assert_equal(len(credentiallist), len(response.credentials),
+                                 f"Error mismatch in expected credential from GetUserResponse command = {str(credentiallist)}")
             # traverse through input credentials and match each value with the resonse credential
             for input_credential_index in range(len(credentiallist)):
                 match_found = False
@@ -232,8 +229,8 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                     if (response.credentials[response_credential_index] == credentiallist[input_credential_index]):
                         match_found = True
                         break
-                asserts.assert_equal(match_found, True,  "Error mismatch in expected credential from GetUserResponse command = {}".format(
-                    str(credentiallist)))
+                asserts.assert_equal(match_found, True,
+                                     f"Error mismatch in expected credential from GetUserResponse command = {str(credentiallist)}")
 
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, f"Unexpected error returned: {e}")
@@ -249,15 +246,12 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             asserts.assert_true(matchers.is_type(response, Clusters.DoorLock.Commands.GetCredentialStatusResponse),
                                 "Unexpected return type for GetCredentialStatus")
             asserts.assert_true(response.credentialExists == credential_exists,
-                                "Error when executing GetCredentialStatus command, credentialExists={}".format(
-                                    str(response.credentialExists)))
+                                f"Error when executing GetCredentialStatus command, credentialExists={str(response.credentialExists)}")
             if (not credential_exists):
                 asserts.assert_true(response.userIndex == NullValue,
-                                    "Error when executing GetCredentialStatus command, userIndex={}".format(
-                                        str(response.userIndex)))
+                                    f"Error when executing GetCredentialStatus command, userIndex={str(response.userIndex)}")
             asserts.assert_true(response.nextCredentialIndex == next_credential_index,
-                                "Error when executing GetCredentialStatus command, nextCredentialIndex={}".format(
-                                    str(response.nextCredentialIndex)))
+                                f"Error when executing GetCredentialStatus command, nextCredentialIndex={str(response.nextCredentialIndex)}")
             return response
         except InteractionModelError as e:
             log.error(e)
@@ -287,10 +281,10 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             asserts.assert_equal(response.userIndex, NullValue)
             if (statuscode != custom_status_code):
                 asserts.assert_true(response.status == statuscode,
-                                    "Error sending SetCredential command, status={}".format(str(response.status)))
+                                    f"Error sending SetCredential command, status={str(response.status)}")
             else:
                 asserts.assert_true(response.status == 2 or response.status == 3,
-                                    "Error sending SetCredential command, status={}".format(str(response.status)))
+                                    f"Error sending SetCredential command, status={str(response.status)}")
             return response.nextCredentialIndex
         except InteractionModelError as e:
             log.exception(e)
@@ -639,7 +633,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                         log.info("The updated value of nextCredentialIndex is %s", nextCredentialIndex)
                         start_credential_index += 1
                         asserts.assert_true(nextCredentialIndex == start_credential_index,
-                                            "Error mismatch in expected nextCredentialIndex={}".format(str(nextCredentialIndex)))
+                                            f"Error mismatch in expected nextCredentialIndex={str(nextCredentialIndex)}")
                         log.info("The updated value of start_credential_index is %s", start_credential_index)
                     else:
                         break

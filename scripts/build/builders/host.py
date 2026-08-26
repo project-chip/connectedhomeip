@@ -92,7 +92,7 @@ class HostCryptoLibrary(Enum):
             # The vendored mbedTLS (2.28) has no multi-part PSA AEAD, so use the
             # one-shot implementation (as ESP32 does).
             return 'chip_crypto="psa" chip_crypto_psa_aead_single_part=true'
-        raise ValueError("Unknown host crypto library: %r" % self)
+        raise ValueError(f"Unknown host crypto library: {self!r}")
 
 
 class HostFuzzingType(Enum):
@@ -135,6 +135,7 @@ class HostApp(Enum):
     KOTLIN_MATTER_CONTROLLER = auto()
     CONTACT_SENSOR = auto()
     DISHWASHER = auto()
+    ELECTRICAL_PROTECTION = auto()
     MICROWAVE_OVEN = auto()
     REFRIGERATOR = auto()
     RVC = auto()
@@ -234,6 +235,8 @@ class HostApp(Enum):
             return 'dishwasher-app/linux'
         if self == HostApp.MICROWAVE_OVEN:
             return 'microwave-oven-app/linux'
+        if self == HostApp.ELECTRICAL_PROTECTION:
+            return 'electrical-protection-app/linux'
         if self == HostApp.REFRIGERATOR:
             return 'refrigerator-app/linux'
         if self == HostApp.RVC:
@@ -266,7 +269,7 @@ class HostApp(Enum):
             return 'jf-admin-app/linux'
         if self == HostApp.CLOSURE:
             return 'closure-app/linux'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def OutputNames(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -368,6 +371,9 @@ class HostApp(Enum):
         elif self == HostApp.MICROWAVE_OVEN:
             yield 'chip-microwave-oven-app'
             yield 'chip-microwave-oven-app.map'
+        elif self == HostApp.ELECTRICAL_PROTECTION:
+            yield 'chip-electrical-protection-app'
+            yield 'chip-electrical-protection-app.map'
         elif self == HostApp.REFRIGERATOR:
             yield 'refrigerator-app'
             yield 'refrigerator-app.map'
@@ -412,7 +418,7 @@ class HostApp(Enum):
             yield 'closure-app'
             yield 'closure-app.map'
         else:
-            raise Exception('Unknown app type: %r' % self)
+            raise Exception(f'Unknown app type: {self!r}')
 
 
 class HostBoard(Enum):
@@ -445,7 +451,7 @@ class HostBoard(Enum):
             return 'arm'
         if self == HostBoard.FAKE:
             return 'fake'
-        raise Exception('Unknown host board type: %r' % self)
+        raise Exception(f'Unknown host board type: {self!r}')
 
     def PlatformName(self):
         if self == HostBoard.NATIVE:
@@ -607,7 +613,7 @@ class HostBuilder(GnBuilder):
         if minmdns_address_policy:
             if use_platform_mdns:
                 raise Exception('Address policy applies to minmdns only')
-            self.extra_gn_options.append('chip_minmdns_default_policy="%s"' % minmdns_address_policy)
+            self.extra_gn_options.append(f'chip_minmdns_default_policy="{minmdns_address_policy}"')
 
         if use_platform_mdns:
             self.extra_gn_options.append('chip_mdns="platform"')
@@ -736,12 +742,12 @@ class HostBuilder(GnBuilder):
             case HostBoard.ARM64:
                 args.extend([
                     'target_cpu="arm64"',
-                    'sysroot="%s"' % self.SysRootPath('SYSROOT_AARCH64')
+                    f'sysroot="{self.SysRootPath("SYSROOT_AARCH64")}"'
                 ])
             case HostBoard.ARM:
                 args.extend([
                     'target_cpu="arm"',
-                    'sysroot="%s"' % self.SysRootPath('SYSROOT_ARMHF'),
+                    f'sysroot="{self.SysRootPath("SYSROOT_ARMHF")}"',
                 ])
             case HostBoard.FAKE:
                 args.extend([
@@ -758,7 +764,7 @@ class HostBuilder(GnBuilder):
             [
                 "chmod",
                 "+x",
-                "%s/bin/%s" % (self.output_dir, java_program),
+                f"{self.output_dir}/bin/{java_program}",
             ],
             title="Make Java program executable",
         )
@@ -790,7 +796,7 @@ class HostBuilder(GnBuilder):
 
     def SysRootPath(self, name):
         if name not in os.environ:
-            raise Exception('Missing environment variable "%s"' % name)
+            raise Exception(f'Missing environment variable "{name}"')
         return os.environ[name]
 
     @lock_output_dir

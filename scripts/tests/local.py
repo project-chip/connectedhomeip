@@ -210,6 +210,15 @@ def _get_targets(coverage: bool | None) -> list[ApplicationTarget]:
     targets.append(
         ApplicationTarget(
             kind=SubprocessKind.APP,
+            env_key="ELECTRICAL_PROTECTION_APP",
+            cli_key="electrical-protection",
+            target=f"{target_prefix}-electrical-protection-{suffix}",
+            binary="chip-electrical-protection-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
             env_key="CLOSURE_APP",
             cli_key="closure",
             target=f"{target_prefix}-closure-{suffix}",
@@ -1002,7 +1011,7 @@ def python_tests(
         app_filter_list = _parse_filters(app_filter)
 
     if skip:
-        print("SKIP IS %r" % skip)
+        print(f"SKIP IS {skip!r}")
         skip = _parse_filters(skip)
 
     if from_filter:
