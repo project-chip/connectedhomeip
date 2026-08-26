@@ -65,15 +65,23 @@ void UnpackActionToken(intptr_t actionToken, ClosureManager::Action_t & action, 
     generation     = token >> kActionBits;
 }
 
+// Returns true if `action`/`generation` (as snapshotted when an AppEvent was posted or work was
+// scheduled) still match the ClosureManager's current action and generation, i.e. the action has
+// not been superseded (e.g. by a Stop followed by a new action of the same Action_t value) since
+// the snapshot was taken.
+bool IsActionGenerationCurrent(ClosureManager & instance, ClosureManager::Action_t action, uint32_t generation)
+{
+    return instance.GetCurrentAction() == action && instance.GetCurrentActionGeneration() == generation;
+}
+
 // Returns true if `actionToken` (as captured by PackActionToken() when the work was scheduled)
-// still matches the ClosureManager's current action and generation, i.e. the action has not
-// been superseded (e.g. by a Stop followed by a new action) since the work was scheduled.
+// still matches the ClosureManager's current action and generation.
 bool IsActionTokenCurrent(ClosureManager & instance, intptr_t actionToken)
 {
     ClosureManager::Action_t expectedAction;
     uint32_t expectedGeneration;
     UnpackActionToken(actionToken, expectedAction, expectedGeneration);
-    return instance.GetCurrentAction() == expectedAction && instance.GetCurrentActionGeneration() == expectedGeneration;
+    return IsActionGenerationCurrent(instance, expectedAction, expectedGeneration);
 }
 
 // Define the Namespace and Tag for the endpoint
@@ -260,16 +268,20 @@ void ClosureManager::CancelTimer()
 
 void ClosureManager::InitiateAction(AppEvent * event)
 {
-    Action_t eventAction = static_cast<Action_t>(event->ClosureEvent.Action);
+    Action_t eventAction     = static_cast<Action_t>(event->ClosureEvent.Action);
+    uint32_t eventGeneration = event->ClosureEvent.Generation;
 
     ClosureManager & instance = ClosureManager::GetInstance();
 
     // We should not receive an event for a different action while another action is ongoing.
     // But due to asynchronous processing of commands and synchronous processing of the stop command,
     // this can happen if stop is received after InitaiteAction event is posted.
+    // Checking the action generation in addition to the action itself catches the case where a
+    // new action of the same Action_t value was started after this event was posted (e.g. Stop
+    // immediately followed by a new action of the same type), which the action check alone would miss.
     // This is a safety check to ensure that we do not initiate a new action while another action is in progress.
     // If this happens, we log an error and do not proceed with initiating the action.
-    VerifyOrReturn(eventAction == instance.GetCurrentAction(),
+    VerifyOrReturn(IsActionGenerationCurrent(instance, eventAction, eventGeneration),
                    ChipLogError(AppServer, "Got Event for %d in InitiateAction while current ongoing action is %d",
                                 to_underlying(eventAction), to_underlying(instance.GetCurrentAction())));
 
@@ -334,28 +346,33 @@ void ClosureManager::TimerEventHandler(void * timerCbArg)
     event.Type                    = AppEvent::kEventType_Closure;
     event.ClosureEvent.Action     = closureManager->GetCurrentAction();
     event.ClosureEvent.EndpointId = closureManager->mCurrentActionEndpointId;
+    event.ClosureEvent.Generation = closureManager->GetCurrentActionGeneration();
     event.Handler                 = HandleClosureActionCompleteEvent;
     AppTask::GetAppTask().PostEvent(&event);
 }
 
 void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
 {
-    Action_t currentAction = static_cast<Action_t>(event->ClosureEvent.Action);
+    Action_t currentAction   = static_cast<Action_t>(event->ClosureEvent.Action);
+    uint32_t eventGeneration = event->ClosureEvent.Generation;
 
     ClosureManager & instance = ClosureManager::GetInstance();
 
     // We should not receive an event for a different action while another action is ongoing.
     // But due to asynchronous processing of commands and synchronous processing of the stop command,
     // this can happen if stop is received after InitaiteAction event is posted.
+    // Checking the action generation in addition to the action itself catches the case where a
+    // new action of the same Action_t value was started after this timer event was posted (e.g.
+    // Stop immediately followed by a new action of the same type), which the action check alone would miss.
     // This is a safety check to ensure that we do not initiate a new action while another action is in progress.
     // If this happens, we log an error and do not proceed with initiating the action.
-    VerifyOrReturn(currentAction == instance.GetCurrentAction(),
+    VerifyOrReturn(IsActionGenerationCurrent(instance, currentAction, eventGeneration),
                    ChipLogError(AppServer, "Got Event for %d in InitiateAction while current ongoing action is %d",
                                 to_underlying(currentAction), to_underlying(instance.GetCurrentAction())));
 
-    // Pack the action together with its generation counter so a stale callback can be
-    // distinguished from a new action of the same Action_t value (see PackActionToken()).
-    const intptr_t actionToken = PackActionToken(currentAction, instance.GetCurrentActionGeneration());
+    // Pack the action together with the generation snapshotted on the event (rather than
+    // re-reading the current generation) so the scheduled work is tied to this specific event.
+    const intptr_t actionToken = PackActionToken(currentAction, eventGeneration);
 
     switch (currentAction)
     {
@@ -541,6 +558,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
     event.Type                    = AppEvent::kEventType_Closure;
     event.ClosureEvent.Action     = GetCurrentAction();
     event.ClosureEvent.EndpointId = mCurrentActionEndpointId;
+    event.ClosureEvent.Generation = GetCurrentActionGeneration();
     event.Handler                 = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);
 
@@ -708,9 +726,10 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnMoveToCommand(const 
     // Post an event to initiate the move to action asynchronously.
     // MoveTo Command can only be initiated from Closure Control Endpoint (Endpoint 1).
     AppEvent event;
-    event.Type                = AppEvent::kEventType_Closure;
-    event.ClosureEvent.Action = mCurrentAction;
-    event.Handler             = InitiateAction;
+    event.Type                    = AppEvent::kEventType_Closure;
+    event.ClosureEvent.Action     = mCurrentAction;
+    event.ClosureEvent.Generation = mActionGeneration;
+    event.Handler                 = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);
 
     return Status::Success;
@@ -939,6 +958,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
     event.Type                    = AppEvent::kEventType_Closure;
     event.ClosureEvent.Action     = mCurrentAction;
     event.ClosureEvent.EndpointId = endpointId;
+    event.ClosureEvent.Generation = mActionGeneration;
     event.Handler                 = InitiateAction;
 
     AppTask::GetAppTask().PostEvent(&event);
@@ -1190,6 +1210,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
     event.Type                    = AppEvent::kEventType_Closure;
     event.ClosureEvent.Action     = mCurrentAction;
     event.ClosureEvent.EndpointId = endpointId;
+    event.ClosureEvent.Generation = mActionGeneration;
     event.Handler                 = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);
 

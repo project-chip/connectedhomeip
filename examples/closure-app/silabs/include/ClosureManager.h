@@ -362,6 +362,11 @@ protected:
      * This method sets the current action according to the action specified in the given AppEvent.
      * It logs the initiation of the corresponding action and, for certain actions, may start a timer.
      *
+     * The event's Action and Generation (see AppEvent::ClosureEvent) are both validated against
+     * the current action/generation before proceeding, so a stale event (e.g. posted just before
+     * a Stop was immediately followed by a new action of the same Action_t value) is dropped
+     * instead of incorrectly initiating the new action's timer.
+     *
      * @param event Pointer to the AppEvent containing the action to initiate.
      */
     static void InitiateAction(AppEvent * event);
@@ -371,6 +376,10 @@ protected:
      *
      * This method processes closure action complete event and schedules the completion of the closure action
      * to be executed asynchronously on the platform manager's work queue.
+     *
+     * The event's Action and Generation (see AppEvent::ClosureEvent, and TimerEventHandler() which
+     * populates them) are both validated against the current action/generation before scheduling
+     * work, so a stale timer event does not schedule completion work for a since-superseded action.
      *
      * @param event Pointer to the AppEvent containing closure event details.
      */
@@ -396,7 +405,9 @@ protected:
      *
      * This static function is called when the closure timer expires. The handler creates an AppEvent and
      * posts the event to the application task queue. This ensures that the closure event is processed in the context of the
-     * application task rather than the timer task.
+     * application task rather than the timer task. The posted event captures the current action generation
+     * (see GetCurrentActionGeneration()) so HandleClosureActionCompleteEvent() can detect if the action was
+     * superseded by the time the event is processed.
      *
      * @param timerCbArg Pointer to the callback argument (unused).
      */
