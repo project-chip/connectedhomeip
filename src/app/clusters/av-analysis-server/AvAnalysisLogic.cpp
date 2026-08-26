@@ -86,14 +86,18 @@ CHIP_ERROR AvAnalysisServerLogic::Startup(AttributePersistenceProvider & aAttrib
 
 void AvAnalysisServerLogic::Shutdown()
 {
-    // Abandon any in-flight camera interaction first
-    if (mCameraClient != nullptr)
+    if (mCameraClient != nullptr && mCameraInteraction.InFlight())
     {
         mCameraClient->Cancel();
     }
 
-    // Release any command still waiting on a camera interaction; its exchange dies with the server.
-    mCameraInteraction.Abort();
+    // A command still waiting on a camera interaction can no longer be completed.
+    ConcreteCommandPath commandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
+    auto handleRef = mCameraInteraction.Complete(commandPath);
+    if (auto * handler = handleRef.Get(); handler != nullptr)
+    {
+        handler->AddStatus(commandPath, Status::Failure);
+    }
 
     if (mDelegate != nullptr)
     {
@@ -140,7 +144,13 @@ void AvAnalysisServerLogic::OnVideoStreamAllocated(Status aStatus, uint16_t aVid
     if (entry == nullptr)
     {
         entry = mStreamTable.Add(aVideoStreamId, cameraNode);
-        VerifyOrReturn(entry != nullptr, ChipLogError(Zcl, "AvAnalysis[ep=%d]: stream table rejected entry", mEndpointId));
+        if (entry == nullptr)
+        {
+            ChipLogError(Zcl, "AvAnalysis[ep=%d]: stream table rejected entry", mEndpointId);
+            VerifyOrReturn(handler != nullptr);
+            handler->AddStatus(commandPath, Status::ResourceExhausted);
+            return;
+        }
 
         MarkDirty(Attributes::CurrentAnalysisStreamCount::Id);
         MarkDirty(Attributes::AnalysisStreams::Id);
@@ -167,8 +177,10 @@ void AvAnalysisServerLogic::OnVideoStreamDeallocated(Status aStatus, uint16_t aV
     auto handleRef = mCameraInteraction.Complete(commandPath);
     auto * handler = handleRef.Get();
 
-    // A non-SUCCESS camera response is propagated as the command status.
-    if (aStatus != Status::Success)
+    // NOT_FOUND means the camera no longer has the stream, so the removal this
+    // command asked for is already true on both sides: retaining it would leave
+    // an entry occupying capacity that no retry could ever remove.
+    if (aStatus != Status::Success && aStatus != Status::NotFound)
     {
         VerifyOrReturn(handler != nullptr);
         handler->AddStatus(commandPath, aStatus);

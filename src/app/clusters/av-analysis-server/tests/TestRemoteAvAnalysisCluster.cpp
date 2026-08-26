@@ -507,6 +507,32 @@ TEST_F(TestRemoteAvAnalysisCluster, RemoveAnalysisStreamUnknownIdIsNotFound)
     ASSERT_EQ(mFakeCameraClient.mDeallocationRequests, 0);
 }
 
+TEST_F(TestRemoteAvAnalysisCluster, RemoveAnalysisStreamRetiresEntryWhenCameraHasNoStream)
+{
+    Testing::MockCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, 0x1234, Status::Success, 42);
+
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::RemoveAnalysisStream::Id };
+    Commands::RemoveAnalysisStream::DecodableType commandData;
+    commandData.analysisStreamID = 1;
+    Testing::MockCommandHandler removeHandler;
+    removeHandler.SetFabricIndex(1);
+
+    auto response = mServer.GetLogic().HandleRemoveAnalysisStream(removeHandler, path, commandData);
+    ASSERT_FALSE(response.has_value());
+
+    // The camera no longer has the stream. Keeping the entry would
+    // occupy capacity that no retry could ever free, so the removal completes.
+    mFakeCameraClient.mLastCallback->OnVideoStreamDeallocated(Status::NotFound, 42);
+
+    ASSERT_EQ(removeHandler.GetLastStatus().status.GetStatus(), Status::Success);
+
+    uint8_t currentCount = 0xFF;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::CurrentAnalysisStreamCount::Id, currentCount), CHIP_NO_ERROR);
+    ASSERT_EQ(currentCount, 0);
+}
+
 TEST_F(TestRemoteAvAnalysisCluster, RemoveAnalysisStreamPropagatesCameraFailure)
 {
     Testing::MockCommandHandler establishHandler;
@@ -747,6 +773,17 @@ TEST_F(TestRemoteAvAnalysisCluster, EstablishSameCameraStreamIsIdempotent)
     ASSERT_EQ(currentCount, 2);
 }
 
+TEST_F(TestRemoteAvAnalysisCluster, ShutdownWithoutInteractionLeavesTheCameraClientAlone)
+{
+    // The camera client may be shared with other AV Analysis endpoints; shutting this cluster down
+    // with nothing of ours in flight must not cancel another endpoint's request.
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    ASSERT_EQ(mFakeCameraClient.mCancelCount, 0);
+
+    // Restart so the fixture TearDown shuts down a running server
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+}
+
 TEST_F(TestRemoteAvAnalysisCluster, ShutdownCancelsPendingCameraInteraction)
 {
     ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EstablishAnalysisStream::Id };
@@ -767,6 +804,28 @@ TEST_F(TestRemoteAvAnalysisCluster, ShutdownCancelsPendingCameraInteraction)
     // A stray late completion (contract violation by a client) must be a harmless no-op
     pendingCallback->OnVideoStreamAllocated(Status::Success, 42);
     ASSERT_FALSE(commandHandler.HasResponse());
+
+    // Restart so the fixture TearDown shuts down a running server
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, ShutdownAnswersTheParkedCommand)
+{
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EstablishAnalysisStream::Id };
+    Commands::EstablishAnalysisStream::DecodableType commandData;
+    commandData.nodeID = 0x1234;
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+
+    auto response = mServer.GetLogic().HandleEstablishAnalysisStream(commandHandler, path, commandData);
+    ASSERT_FALSE(response.has_value()); // Pending on the camera
+
+    // On a cluster-only shutdown the invoking client is still there; it must be answered rather
+    // than left waiting for the interaction to time out
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+
+    ASSERT_TRUE(commandHandler.HasStatus());
+    ASSERT_EQ(commandHandler.GetLastStatus().status.GetStatus(), Status::Failure);
 
     // Restart so the fixture TearDown shuts down a running server
     EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
