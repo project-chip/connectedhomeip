@@ -117,8 +117,6 @@ chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 #ifndef IDENTIFY_CLUSTER_DISABLED
 
-constexpr chip::EndpointId kLightEndpointIds[] = { kExampleEndpointId, 2 };
-
 void OnIdentifyTriggerEffect(Identify * identify)
 {
     chip::EndpointId endpoint = identify->mCluster.Cluster().GetPaths()[0].mEndpointId;
@@ -127,19 +125,17 @@ void OnIdentifyTriggerEffect(Identify * identify)
     AppTaskCommon::IdentifyEffectHandler(identify->mCurrentEffectIdentifier);
 }
 
-Identify sIdentify1 = {
-    kLightEndpointIds[0],         AppTask::IdentifyStartHandler,
-    AppTask::IdentifyStopHandler, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
-    OnIdentifyTriggerEffect,
-};
-
-#if FIXED_ENDPOINT_COUNT > 2
-Identify sIdentify2 = {
-    kLightEndpointIds[1],         AppTask::IdentifyStartHandler,
-    AppTask::IdentifyStopHandler, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
-    OnIdentifyTriggerEffect,
-};
+#ifndef TELINK_APP_IDENTIFY_ENDPOINTS
+#define TELINK_APP_IDENTIFY_ENDPOINTS(X) X(kExampleEndpointId)
 #endif
+
+#define TELINK_IDENTIFY_INSTANCE(endpoint)                                                                                         \
+    { endpoint, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler,                                                       \
+      Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, OnIdentifyTriggerEffect },
+
+Identify sIdentifyInstances[] = { TELINK_APP_IDENTIFY_ENDPOINTS(TELINK_IDENTIFY_INSTANCE) };
+
+#undef TELINK_IDENTIFY_INSTANCE
 
 #endif
 
@@ -390,20 +386,7 @@ void AppTaskCommon::IdentifyStartHandler(Identify * identify)
         chip::EndpointId ep = static_cast<chip::EndpointId>(reinterpret_cast<uintptr_t>(event->TimerEvent.Context));
         ChipLogProgress(Zcl, "OnIdentifyStart for endpoint %u", ep);
 
-        PwmManager::EAppPwm pwm = PwmManager::EAppPwm_Indication;
-        switch (ep)
-        {
-        case kExampleEndpointId:
-            pwm = PwmManager::EAppPwm_Indication;
-            break;
-        case 2:
-            pwm = PwmManager::EAppPwm_Indication;
-            break;
-        default:
-            break;
-        }
-
-        PwmManager::getInstance().setPwmBlink(pwm, kIdentifyBlinkRateMs, kIdentifyBlinkRateMs);
+        PwmManager::getInstance().setPwmBlink(PwmManager::EAppPwm_Indication, kIdentifyBlinkRateMs, kIdentifyBlinkRateMs);
     };
     GetAppTask().PostEvent(&event);
 }
@@ -419,20 +402,7 @@ void AppTaskCommon::IdentifyStopHandler(Identify * identify)
         chip::EndpointId ep = static_cast<chip::EndpointId>(reinterpret_cast<uintptr_t>(event->TimerEvent.Context));
         ChipLogProgress(Zcl, "OnIdentifyStop for endpoint %u", ep);
 
-        PwmManager::EAppPwm pwm = PwmManager::EAppPwm_Indication;
-        switch (ep)
-        {
-        case kExampleEndpointId:
-            pwm = PwmManager::EAppPwm_Indication;
-            break;
-        case 2:
-            pwm = PwmManager::EAppPwm_Indication;
-            break;
-        default:
-            break;
-        }
-
-        PwmManager::getInstance().setPwm(pwm, false);
+        PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Indication, false);
     };
     GetAppTask().PostEvent(&event);
 }
