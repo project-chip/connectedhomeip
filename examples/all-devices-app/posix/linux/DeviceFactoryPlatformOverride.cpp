@@ -20,14 +20,14 @@
 #include <PosixSpeaker.h>
 #include <app_config/enabled_devices.h>
 #include <device-factory/DeviceFactory.h>
-#include <device/types/commissioning-proxy/CommissioningProxyDevice.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <CommissioningProxyBleAdapter.h>
-// The ble-transport dependency in BUILD.gn is conditional on
+// The commissioning-proxy and ble-transport dependencies in BUILD.gn are conditional on
 // chip_config_network_layer_ble, which gn check cannot evaluate, hence the nogncheck.
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyBleTransport.h> // nogncheck
+#include <device/types/commissioning-proxy/CommissioningProxyDevice.h>              // nogncheck
 #endif
 
 namespace chip {
@@ -36,6 +36,8 @@ namespace app {
 void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, FabricTable & fabricTable,
                                     PersistentStorageDelegate * storageDelegate, PosixAudioManager & audioManager)
 {
+    // Registered only when a transport is compiled in.
+#if CONFIG_NETWORK_LAYER_BLE
     if constexpr (ALL_DEVICES_ENABLE_COMMISSIONING_PROXY)
     {
         const CommissioningProxyDevice::Context proxyContext{ fabricTable, timerDelegate };
@@ -44,23 +46,15 @@ void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, FabricTable &
         // because a registered transport holds a pointer back to the device's cluster.
         // Only one commissioning proxy device is ever created, so one instance of each
         // serves it.
-        //
-        // Adding a technology here is one more block like this plus one more
-        // AddTransport() call below; no new device type is involved.
         BitMask<Clusters::CommissioningProxy::Feature> proxyFeatures;
 
-#if CONFIG_NETWORK_LAYER_BLE
         static CommissioningProxyBleAdapter sBleProxyAdapter;
         static Clusters::CommissioningProxy::CommissioningProxyBleTransport sBleProxyTransport(sBleProxyAdapter, timerDelegate);
 
         // Every transport driver implements ProxyBackgroundScanStart/Stop, so the
         // feature follows from having any transport at all.
         proxyFeatures.Set(Clusters::CommissioningProxy::Feature::kBackgroundScan);
-#endif
 
-        // With no transport the feature map stays empty, and the proxy reports no
-        // capabilities and fails every connect and scan request. Registered anyway so a
-        // no-BLE build of the commissioning-proxy device still produces a usable binary.
         const Clusters::CommissioningProxy::CommissioningProxyCluster::Config proxyConfig(proxyFeatures);
 
         DeviceFactory::GetInstance().RegisterCreator(
@@ -78,12 +72,11 @@ void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, FabricTable &
                 sProxyDeviceCreated = true;
 
                 auto device = std::make_unique<CommissioningProxyDevice>(proxyContext, proxyConfig);
-#if CONFIG_NETWORK_LAYER_BLE
                 device->AddTransport(sBleProxyTransport);
-#endif
                 return device;
             });
     }
+#endif // CONFIG_NETWORK_LAYER_BLE
 
     if constexpr (ALL_DEVICES_ENABLE_SPEAKER)
     {

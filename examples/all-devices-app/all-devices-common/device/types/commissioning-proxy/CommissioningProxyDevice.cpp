@@ -21,7 +21,6 @@
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace app {
@@ -42,17 +41,15 @@ CHIP_ERROR CommissioningProxyDevice::Register(chip::EndpointId endpoint, CodeDri
                                               EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+
+    // AddTransport() must have been called at least once: the cluster spec constrains the
+    // Transport attribute to min 1, so a proxy with no transport would report a
+    // non-conformant empty value and fail every connect and scan request.
+    VerifyOrReturnError(mTransportCount > 0, CHIP_ERROR_INCORRECT_STATE);
+
     DeviceRegistrationTransaction transaction(*this, provider);
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
-
-    if (mTransportCount == 0)
-    {
-        ChipLogError(AppServer,
-                     "Commissioning proxy on endpoint %u has no transport: it will report no capabilities and fail every "
-                     "connect and scan request",
-                     endpoint);
-    }
 
     // MaxSessions and MaxCachedResults are Fixed-quality attributes and come from
     // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS / _MAX_CACHED_RESULTS.

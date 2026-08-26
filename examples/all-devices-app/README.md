@@ -255,8 +255,11 @@ Two build switches are involved:
     calls.
 
 The BLE transport is compiled when `chip_config_network_layer_ble` is true, so
-`-no-ble` build variants omit it. The device type still starts in those builds,
-but with no transport registered every proxy command fails.
+build variants that disable BLE — `-no-ble` and `-nodeps` — omit it. With no
+transport compiled in the device is not registered with the factory at all, so
+`--device commissioning-proxy` reports an invalid device type there rather than
+starting a proxy whose every command fails. Darwin behaves the same way, as
+`src/platform/Darwin` has no proxy-capable `BLEManagerImpl`.
 
 To build on Linux x86-64 run:
 
@@ -266,7 +269,8 @@ To build on Linux x86-64 run:
 
 To cross-compile for a Raspberry Pi (ARM64), build inside the cross-compile
 container, which supplies the aarch64 sysroot. The ARM and ARM64 boards accept
-`-clang` or `-nodeps` target variants:
+`-clang` or `-nodeps` target variants; use `-clang`, since `-nodeps` disables BLE
+and so omits the proxy:
 
 ```bash
 # From the root of your checkout, on the host:
