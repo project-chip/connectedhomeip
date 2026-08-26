@@ -783,6 +783,27 @@ TEST_F(TestChipCryptoPAL, TestAsn1Conversions)
     }
 }
 
+TEST_F(TestChipCryptoPAL, TestAsn1SignatureToRawRejectsTrailingData)
+{
+    HeapChecker heapChecker;
+
+    // A minimal well-formed ECDSA signature: SEQUENCE { INTEGER 0x01, INTEGER 0x01 }.
+    // fe_length_bytes of 1 keeps the vector small while exercising the same parser used
+    // for P-256 signatures during attestation and certificate validation.
+    const uint8_t kValidSig[] = { 0x30, 0x06, 0x02, 0x01, 0x01, 0x02, 0x01, 0x01 };
+    // Same R and S, but the SEQUENCE length (0x07) counts an extra trailing byte that R
+    // and S do not consume. This is malformed DER and must be rejected.
+    const uint8_t kTrailingDataSig[] = { 0x30, 0x07, 0x02, 0x01, 0x01, 0x02, 0x01, 0x01, 0x00 };
+
+    uint8_t rawBuf[2] = { 0 };
+
+    MutableByteSpan rawSpan(rawBuf);
+    EXPECT_EQ(EcdsaAsn1SignatureToRaw(1, ByteSpan(kValidSig), rawSpan), CHIP_NO_ERROR);
+
+    rawSpan = MutableByteSpan(rawBuf);
+    EXPECT_EQ(EcdsaAsn1SignatureToRaw(1, ByteSpan(kTrailingDataSig), rawSpan), CHIP_ERROR_INVALID_ARGUMENT);
+}
+
 TEST_F(TestChipCryptoPAL, TestRawIntegerToDerValidCases)
 {
     HeapChecker heapChecker;
