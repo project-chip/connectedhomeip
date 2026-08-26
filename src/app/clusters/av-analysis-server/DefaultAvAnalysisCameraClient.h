@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include <app/BufferedReadCallback.h>
 #include <app/CASESessionManager.h>
 #include <app/CommandSender.h>
@@ -187,7 +185,7 @@ private:
     DiscoveryPhase mDiscoveryPhase = DiscoveryPhase::kIdle;
     // False only when SupportedStreamUsages was read successfully and lacks Analysis
     bool mAnalysisUsageSupported = true;
-    std::unique_ptr<CommandSender> mCommandSender;
+    Platform::UniquePtr<CommandSender> mCommandSender;
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectionFailureCallback;

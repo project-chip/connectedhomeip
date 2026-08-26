@@ -554,7 +554,7 @@ void AvAnalysisServerLogic::LoadPersistentAttributes()
 
     if (HasFeature(Feature::kRemoteContextDetection) && LoadAnalysisStreams() != CHIP_NO_ERROR)
     {
-        ChipLogDetail(Zcl, "AvAnalysis[ep=%d]: Unable to load AnalysisStreams from the KVS.", mEndpointId);
+        ChipLogError(Zcl, "AvAnalysis[ep=%d]: Unable to load AnalysisStreams from the KVS.", mEndpointId);
     }
 
     // Signal delegate that all persistent configuration attributes have been loaded.

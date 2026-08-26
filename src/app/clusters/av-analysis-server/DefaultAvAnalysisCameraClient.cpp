@@ -418,7 +418,7 @@ void DefaultAvAnalysisCameraClient::OnDeviceConnectionFailure(void * context, co
 CHIP_ERROR DefaultAvAnalysisCameraClient::SendPendingCommand(Messaging::ExchangeManager & aExchangeMgr,
                                                              const SessionHandle & aSessionHandle)
 {
-    mCommandSender = std::make_unique<CommandSender>(this, &aExchangeMgr);
+    mCommandSender = Platform::MakeUnique<CommandSender>(this, &aExchangeMgr);
     VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     mResponseDelivered = false;
