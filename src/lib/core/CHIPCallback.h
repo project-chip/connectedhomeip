@@ -27,6 +27,7 @@
 #include <stdint.h>
 
 #include <lib/core/CHIPConfig.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 
@@ -46,11 +47,25 @@ class Cancelable
 public:
     /**
      *  @brief for use by Callback callees, i.e. those that accept callbacks for
-     *   event registration.  The names suggest how to use these members, but
-     *   implementations can choose.
+     *  event registration. When callbacks are enqueued in a CallbackDeque or
+     *  GroupedCallbackList, the mPrev/mNext pointers are used to manage the
+     *  list data structure. Callees that manage callbacks directly are free to
+     *  use either mNext/mPrev or the generic mContextA/mContextB as needed.
+     *
+     *  Unless a callee has ownership (via Cancel() on the Callback, see
+     *  below for details), these fields are indeterminate. The callee must
+     *  explicitly initialize the fields it is going to use.
      */
-    Cancelable * mNext;
-    Cancelable * mPrev;
+    union
+    {
+        Cancelable * mNext;
+        void * mContextA;
+    };
+    union
+    {
+        Cancelable * mPrev;
+        void * mContextB;
+    };
 
     // CHIP_CONFIG_CANCELABLE_HAS_INFO_STRING_FIELD allows consumers that were
     // using this field to opt into having it (and the resulting memory bloat)
@@ -64,13 +79,9 @@ public:
      *   a subsystem and that Cancelable members belong to
      *   that subsystem
      */
-    CancelFn mCancel;
+    CancelFn mCancel = nullptr;
 
-    Cancelable()
-    {
-        mNext = mPrev = this;
-        mCancel       = nullptr;
-    }
+    Cancelable() = default;
 
     /**
      * @brief run whatever function the callee/registrar has specified in order
@@ -110,7 +121,7 @@ typedef void (*CallFn)(void *);
  *     the Callback save usercontext are "owned" by the callee, and should not
  *     be touched unless Cancel() has first been called.
  *    When a callee accepts a Callback for registration, step one is always Cancel(),
- *     in order to take ownership of Cancelable members next, prev, info_ptr, and info_scalar.
+ *     in order to take ownership of Cancelable members next, prev, and info.
  *    This template class also defines a default notification function prototype.
  *
  *   One-shot semantics can be accomplished by calling Cancel() before calling mCall.
@@ -166,7 +177,7 @@ public:
     /**
      * public constructor
      */
-    Callback(T call, void * context) : mContext(context), mCall(call) { Cancelable(); }
+    Callback(T call, void * context) : mContext(context), mCall(call) {}
 
     /**
      * TODO: type-safety? It'd be nice if Cancelables that aren't Callbacks returned null
@@ -177,11 +188,12 @@ public:
 
 /**
  * @brief core of a simple doubly-linked list Callback keeper-tracker-of
- *
  */
-class CallbackDeque : public Cancelable
+class CallbackDeque : protected Cancelable
 {
 public:
+    CallbackDeque() { mNext = mPrev = this; }
+
     /**
      * @brief appends with overridden cancel function, in case the
      *   list change requires some other state update.
@@ -199,8 +211,9 @@ public:
     /**
      * @brief dequeue, but don't cancel, all cas that match the by()
      */
-    void DequeueBy(bool (*by)(uint64_t, const Cancelable *), uint64_t p, Cancelable & dequeued)
+    void DequeueBy(bool (*by)(uint64_t, const Cancelable *), uint64_t p, CallbackDeque & dequeued)
     {
+        VerifyOrDie(&dequeued != this);
         for (Cancelable * ca = mNext; ca != this;)
         {
             Cancelable * next = ca->mNext;
@@ -250,23 +263,21 @@ public:
     /**
      * @brief returns first item unless list is empty, otherwise returns NULL
      */
-    Cancelable * First() { return (mNext != this) ? mNext : nullptr; }
+    Cancelable * First() { return (!IsEmpty()) ? mNext : nullptr; }
 
     /**
-     * @brief Dequeue all, return in a stub. does not cancel the cas, as the list
-     *   members are still in use
+     * @brief Moves all callbacks from this deque to the end of the ready deque, without cancelling them.
      */
-    void DequeueAll(Cancelable & ready)
+    void DequeueAll(CallbackDeque & ready)
     {
-        if (mNext != this)
-        {
-            ready.mNext        = mNext;
-            ready.mPrev        = mPrev;
-            ready.mPrev->mNext = &ready;
-            ready.mNext->mPrev = &ready;
+        VerifyOrReturn(!IsEmpty() && &ready != this);
 
-            mNext = mPrev = this;
-        }
+        mNext->mPrev       = ready.mPrev;
+        ready.mPrev->mNext = mNext;
+        mPrev->mNext       = &ready;
+        ready.mPrev        = mPrev;
+
+        mNext = mPrev = this;
     }
 
     /**
@@ -289,7 +300,6 @@ private:
     {
         ca->mNext->mPrev = ca->mPrev;
         ca->mPrev->mNext = ca->mNext;
-        ca->mNext = ca->mPrev = ca;
     }
     void _InsertBefore(Cancelable * ca, Cancelable * where)
     {

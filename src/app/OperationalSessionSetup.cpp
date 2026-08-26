@@ -905,24 +905,25 @@ void OperationalSessionSetup::NotifyRetryHandlers(CHIP_ERROR error, System::Cloc
     //
     // 2) When planning to notify a handler move it to a new list that contains
     //    just that handler.  This way if it gets canceled as part of the
-    //    notification we can tell it has been canceled.
+    //    notification we can tell it has been canceled *without* dereferencing
+    //    cb after mCall() returns.
     //
     // 3) If notifying the handler does not cancel it, add it back to our list
     //    of handlers so we will notify it on future retries.
 
-    Cancelable retryHandlerListSnapshot;
+    CallbackDeque retryHandlerListSnapshot;
     mConnectionRetry.DequeueAll(retryHandlerListSnapshot);
 
-    while (retryHandlerListSnapshot.mNext != &retryHandlerListSnapshot)
+    while (!retryHandlerListSnapshot.IsEmpty())
     {
-        auto * cb = Callback::Callback<OnDeviceConnectionRetry>::FromCancelable(retryHandlerListSnapshot.mNext);
+        auto * cb = Callback::Callback<OnDeviceConnectionRetry>::FromCancelable(retryHandlerListSnapshot.First());
 
-        Callback::CallbackDeque currentCallbackHolder;
+        CallbackDeque currentCallbackHolder;
         currentCallbackHolder.Enqueue(cb->Cancel());
 
         cb->mCall(cb->mContext, mPeerId, error, timeoutEstimate);
 
-        if (currentCallbackHolder.mNext != &currentCallbackHolder)
+        if (!currentCallbackHolder.IsEmpty())
         {
             // Callback has not been canceled as part of the call, so is still
             // supposed to be registered with us.

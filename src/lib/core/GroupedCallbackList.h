@@ -52,7 +52,7 @@ template <typename... T>
 class GroupedCallbackList : protected Cancelable
 {
 public:
-    GroupedCallbackList() = default;
+    GroupedCallbackList() { mNext = mPrev = this; }
     ~GroupedCallbackList() { Clear(); }
 
     GroupedCallbackList(GroupedCallbackList const &)             = delete;
