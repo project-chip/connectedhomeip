@@ -24,7 +24,6 @@ import matter.testing.nfc
 from matter.setup_payload import SetupPayload
 from matter.testing.decorators import async_test_body
 from matter.testing.device_conformance_tests import DeviceConformanceTests
-from matter.testing.matter_testing import TestStep
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -33,30 +32,9 @@ log = logging.getLogger(__name__)
 class TC_IDM_10_7(DeviceConformanceTests):
     disable_wildcard_subscription = True
 
-    def desc_TC_IDM_10_7(self) -> str:
-        return "[TC-IDM-10.7] Test NFC Limited Data Model [DUT as Commissionee]"
-
-    def steps_TC_IDM_10_7(self) -> list[TestStep]:
-        return [
-            TestStep(1, "Perform a 'PASE only' session, over NTL", "PASE successful", is_commissioning=False),
-            TestStep(2, "Perform a wildcard read over NTL and save the result as limited_data_model.",
-                     "Wildcard read successful."),
-            TestStep(3, "Limited Data Model : Check clusters presence",
-                     "All the mandatory clusters should be present."),
-            TestStep(4, "Limited Data Model : Check clusters revisions.",
-                     "All the clusters revisions should be up-to-date."),
-            TestStep(5, "Limited Data Model : Check clusters conformance.",
-                     "All the clusters should be compliant."),
-            TestStep(6, "Complete the commissioning",
-                     "Commissioning successful."),
-            TestStep(7, "Discovery of full Data Model (over the operational channel) with a wildcard read.",
-                     "Wildcard read successful."),
-            TestStep(8, "Limited and Full Data Model comparison: For each endpoint, compare the Descriptor Cluster present in the Limited Data Model and full Data Model.",
-                     "The Descriptor Clusters should be exactly the same (DeviceTypeList, ServerList, ClientList, PartsList, TagList, EndpointUniqueID)."),
-        ]
-
     @async_test_body
     async def test_TC_IDM_10_7(self):
+        """[TC-IDM-10.7] Test NFC Limited Data Model [DUT as Commissionee]"""
 
         self.wait_for_user_input(prompt_msg="Put the DUT in commissionable mode, bring its NFC interface close to the NFC reader"
                                  " and keep the DUT powered")
@@ -70,7 +48,7 @@ class TC_IDM_10_7(DeviceConformanceTests):
             f"Expected in_test_commissioning_method to start with 'nfc-', got: {commissioning_method}"
         )
 
-        self.step(1)    # Perform a 'PASE only' session, over NTL
+        self.step(1, "Perform a 'PASE only' session, over NTL", is_commissioning=False)
 
         log.info("dut_node_ids 0x%X", node_id)
 
@@ -90,37 +68,38 @@ class TC_IDM_10_7(DeviceConformanceTests):
         commissionee = await self.find_or_establish_pase_session_over_ntl(setupPayload, node_id)
         asserts.assert_is_not_none(commissionee, "Failed to find or establish PASE session over NTL")
 
-        self.step(2)    # Read of Limited Data Model
+        self.step(2, "Perform a wildcard read over NTL and save the result as limited_data_model.")
         await self._wildcard_read(node_id)
 
         limited_data_model = self.endpoints
         log.debug("limited_data_model: %s", limited_data_model)
         self.build_spec_xmls()
 
-        self.step(3)    # Limited Data Model : Check clusters presence
+        self.step(3, "Limited Data Model : Check clusters presence")
         self._check_mandatory_clusters_presence(limited_data_model)
 
-        self.step(4)    # Limited Data Model : Check clusters revisions
+        self.step(4, "Limited Data Model : Check clusters revisions.")
         self._check_revisions()
 
-        self.step(5)    # Limited Data Model : Check clusters conformance
+        self.step(5, "Limited Data Model : Check clusters conformance.")
         self._check_conformance()
 
-        self.step(6)    # Complete the commissioning (over NTL)
+        self.step(6, "Complete the commissioning")
         commissioning_success = await self.commission_ntl_device(setupPayload)
         asserts.assert_true(commissioning_success, "Commissioning over NTL failed")
 
-        self.step(7)    # Discovery of full Data Model
+        self.step(7, "Discovery of full Data Model (over the operational channel) with a wildcard read.")
         await self._wildcard_read(node_id)
 
         full_data_model = self.endpoints
         log.debug("full_data_model: %s", full_data_model)
 
-        self.step(8)    # Limited and Full Data Model comparison
+        self.step(8, "Limited and Full Data Model comparison: For each endpoint, compare the Descriptor Cluster present in the Limited Data Model and full Data Model.")
         self._compare_descriptor_clusters(
             limited_data_model=limited_data_model,
             full_data_model=full_data_model
         )
+
 
     def _check_mandatory_clusters_presence(self, endpoints: dict) -> None:
         """
