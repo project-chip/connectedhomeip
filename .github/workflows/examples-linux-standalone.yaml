@@ -68,6 +68,11 @@ jobs:
                   out/linux-x64-chip-cert/chip-cert
                   out/linux-x64-chip-tool/chip-tool
 
+            - name: Test standalone cert tool
+              run: |
+                  CHIP_CERT=out/linux-x64-chip-cert/chip-cert \
+                      python3 src/tools/chip-cert/tests/test_chip_cert.py
+
             - name: Build minmdns example with platform dns
               run: |
                   ./scripts/run_in_build_env.sh \

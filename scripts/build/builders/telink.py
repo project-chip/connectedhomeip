@@ -86,7 +86,7 @@ class TelinkApp(Enum):
             return 'thermostat'
         if self == TelinkApp.WINDOW_COVERING:
             return 'window-app'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def AppNamePrefix(self):
         if self == TelinkApp.AIR_QUALITY_SENSOR:
@@ -125,7 +125,7 @@ class TelinkApp(Enum):
             return 'chip-telink-thermostat-example'
         if self == TelinkApp.WINDOW_COVERING:
             return 'chip-telink-window-example'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
 
 class TelinkBoard(Enum):
@@ -164,7 +164,7 @@ class TelinkBoard(Enum):
             return 'tl7218x_ml7m'
         if self == TelinkBoard.TL7218X_RETENTION:
             return 'tl7218x_retention'
-        raise Exception('Unknown board type: %r' % self)
+        raise Exception(f'Unknown board type: {self!r}')
 
 
 class TelinkBuilder(Builder):
@@ -184,6 +184,7 @@ class TelinkBuilder(Builder):
                  mars_board_config: bool = False,
                  usb_board_config: bool = False,
                  compress_lzma_config: bool = False,
+                 enable_concurrent_connection: bool = False,
                  thread_analyzer_config: bool = False,
                  precompiled_ot_config: bool = False,
                  tflm_config: bool = False,
@@ -203,6 +204,7 @@ class TelinkBuilder(Builder):
         self.mars_board_config = mars_board_config
         self.usb_board_config = usb_board_config
         self.compress_lzma_config = compress_lzma_config
+        self.enable_concurrent_connection = enable_concurrent_connection
         self.thread_analyzer_config = thread_analyzer_config
         self.precompiled_ot_config = precompiled_ot_config
         self.tflm_config = tflm_config
@@ -256,6 +258,10 @@ class TelinkBuilder(Builder):
         if self.compress_lzma_config:
             flags.append("-DCONFIG_COMPRESS_LZMA=y")
 
+        if self.enable_concurrent_connection:
+            flags.append("-DCONFIG_CHIP_ENABLE_CONCURRENT_CONNECTION=y")
+            flags.append("-DCONFIG_CHIP_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING=y")
+
         if self.chip_enable_nfc_onboarding_payload:
             flags.append("-DCONFIG_CHIP_NFC_ONBOARDING_PAYLOAD=y")
 
@@ -285,7 +291,7 @@ class TelinkBuilder(Builder):
         elif self.log_level == TelinkLogLevel.NONE:
             flags.append("-DTLNK_LOG_LEVEL=none")
         else:
-            raise Exception("Unknown log level: %r" % self.log_level)
+            raise Exception(f"Unknown log level: {self.log_level!r}")
 
         build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
 
@@ -305,10 +311,10 @@ class TelinkBuilder(Builder):
     def _build(self):
         log.info('Compiling Telink at %s', self.output_dir)
 
-        cmd = self.get_cmd_prefixes() + ("ninja -C %s" % self.output_dir)
+        cmd = self.get_cmd_prefixes() + (f"ninja -C {self.output_dir}")
 
         if self.ninja_jobs is not None:
-            cmd += " -j%s" % str(self.ninja_jobs)
+            cmd += f" -j{str(self.ninja_jobs)}"
 
         self._Execute(['bash', '-c', cmd], title='Building ' + self.identifier)
 

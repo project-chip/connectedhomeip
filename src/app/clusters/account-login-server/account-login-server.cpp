@@ -129,6 +129,8 @@ public:
 
 private:
     CHIP_ERROR ReadRevisionAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadOAuthLoggedInAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadFeatureMapAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
 };
 
 AccountLoginAttrAccess gAccountLoginAttrAccess;
@@ -137,11 +139,16 @@ CHIP_ERROR AccountLoginAttrAccess::Read(const app::ConcreteReadAttributePath & a
 {
     EndpointId endpoint = aPath.mEndpointId;
     Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrReturnError(!isDelegateNull(delegate, endpoint), CHIP_NO_ERROR);
 
     switch (aPath.mAttributeId)
     {
     case app::Clusters::AccountLogin::Attributes::ClusterRevision::Id:
         return ReadRevisionAttribute(endpoint, aEncoder, delegate);
+    case app::Clusters::AccountLogin::Attributes::OAuthLoggedIn::Id:
+        return ReadOAuthLoggedInAttribute(endpoint, aEncoder, delegate);
+    case app::Clusters::AccountLogin::Attributes::FeatureMap::Id:
+        return ReadFeatureMapAttribute(endpoint, aEncoder, delegate);
     default:
         break;
     }
@@ -154,6 +161,19 @@ CHIP_ERROR AccountLoginAttrAccess::ReadRevisionAttribute(EndpointId endpoint, ap
 {
     uint16_t clusterRevision = delegate->GetClusterRevision(endpoint);
     return aEncoder.Encode(clusterRevision);
+}
+
+CHIP_ERROR AccountLoginAttrAccess::ReadOAuthLoggedInAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder,
+                                                              Delegate * delegate)
+{
+    return aEncoder.Encode(delegate->GetOAuthLoggedIn(endpoint));
+}
+
+CHIP_ERROR AccountLoginAttrAccess::ReadFeatureMapAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder,
+                                                           Delegate * delegate)
+{
+    uint32_t featureMap = delegate->GetFeatureMap(endpoint);
+    return aEncoder.Encode(featureMap);
 }
 
 } // anonymous namespace
@@ -180,6 +200,31 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfAccountLoginClusterGetSetupPINCallback error: %s", err.AsString());
+
+        command->AddStatus(commandPath, Status::Failure);
+    }
+
+    return true;
+}
+
+bool emberAfAccountLoginClusterGetDeviceAuthURICallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                        const Commands::GetDeviceAuthURI::DecodableType & /* commandData */)
+{
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+    Delegate * delegate = GetDelegate(endpoint);
+    app::CommandResponseHelper<Commands::GetDeviceAuthURIResponse::Type> responder(command, commandPath);
+
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+    {
+        delegate->HandleGetDeviceAuthURI(responder);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfAccountLoginClusterGetDeviceAuthURICallback error: %s", err.AsString());
 
         command->AddStatus(commandPath, Status::Failure);
     }
@@ -244,6 +289,7 @@ exit:
         // NodeId nodeId = getNodeId(commandObj);
         EventNumber eventNumber;
         LoggedOutEvent event{ .node = nodeId };
+        event.fabricIndex        = commandObj->GetAccessingFabricIndex();
         CHIP_ERROR logEventError = LogEvent(event, endpoint, eventNumber);
 
         if (CHIP_NO_ERROR != logEventError)
