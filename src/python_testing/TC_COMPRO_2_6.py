@@ -215,62 +215,44 @@ class TC_COMPRO_2_6(COMPROBaseTest):
         # ----------------------------------------------------------------
         self.step(3)
         logger.info("Step 3: ProxyConnectRequest over PASE (expect UNSUPPORTED_ACCESS)")
-        try:
-            await self.default_controller.SendCommand(
-                nodeId=pase_node_id,
-                endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyConnectRequest(
-                    address=NullValue,
-                    transport=pase_transport,
-                    discriminator=ed_discriminator,
-                    vendorID=0,
-                    productID=0,
-                    timeout=30,
-                ),
-            )
-            asserts.fail("Expected UNSUPPORTED_ACCESS but ProxyConnectRequest over PASE succeeded")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.UnsupportedAccess,
-                                 f"Expected UNSUPPORTED_ACCESS for PASE ProxyConnectRequest, got {e.status}")
-            logger.info("Step 3: correctly got UNSUPPORTED_ACCESS")
+        await self.expect_command_rejected(
+            cp.Commands.ProxyConnectRequest(
+                address=NullValue,
+                transport=pase_transport,
+                discriminator=ed_discriminator,
+                vendorID=0,
+                productID=0,
+                timeout=30,
+            ),
+            Status.UnsupportedAccess,
+            "Step 3 ProxyConnectRequest over PASE",
+            node_id=pase_node_id)
 
         # ----------------------------------------------------------------
         # Step 4: ProxyMessageRequest over PASE — UNSUPPORTED_ACCESS
         # ----------------------------------------------------------------
         self.step(4)
         logger.info("Step 4: ProxyMessageRequest over PASE (expect UNSUPPORTED_ACCESS)")
-        try:
-            await self.default_controller.SendCommand(
-                nodeId=pase_node_id,
-                endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyMessageRequest(
-                    sessionID=0x0001,
-                    responseTimeout=10,
-                    message=_MINIMAL_MATTER_MSG,
-                ),
-            )
-            asserts.fail("Expected UNSUPPORTED_ACCESS but ProxyMessageRequest over PASE succeeded")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.UnsupportedAccess,
-                                 f"Expected UNSUPPORTED_ACCESS for PASE ProxyMessageRequest, got {e.status}")
-            logger.info("Step 4: correctly got UNSUPPORTED_ACCESS")
+        await self.expect_command_rejected(
+            cp.Commands.ProxyMessageRequest(
+                sessionID=0x0001,
+                responseTimeout=10,
+                message=_MINIMAL_MATTER_MSG,
+            ),
+            Status.UnsupportedAccess,
+            "Step 4 ProxyMessageRequest over PASE",
+            node_id=pase_node_id)
 
         # ----------------------------------------------------------------
         # Step 5: ProxyDisconnectRequest over PASE — UNSUPPORTED_ACCESS
         # ----------------------------------------------------------------
         self.step(5)
         logger.info("Step 5: ProxyDisconnectRequest over PASE (expect UNSUPPORTED_ACCESS)")
-        try:
-            await self.default_controller.SendCommand(
-                nodeId=pase_node_id,
-                endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyDisconnectRequest(sessionID=0x0001),
-            )
-            asserts.fail("Expected UNSUPPORTED_ACCESS but ProxyDisconnectRequest over PASE succeeded")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.UnsupportedAccess,
-                                 f"Expected UNSUPPORTED_ACCESS for PASE ProxyDisconnectRequest, got {e.status}")
-            logger.info("Step 5: correctly got UNSUPPORTED_ACCESS")
+        await self.expect_command_rejected(
+            cp.Commands.ProxyDisconnectRequest(sessionID=0x0001),
+            Status.UnsupportedAccess,
+            "Step 5 ProxyDisconnectRequest over PASE",
+            node_id=pase_node_id)
 
         # ================================================================
         # Phase 2 — DUT commissioned to TH: error handling over CASE
@@ -323,47 +305,33 @@ class TC_COMPRO_2_6(COMPROBaseTest):
                            int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF))
         logger.info("Step 9: ProxyConnectRequest multi-transport=0x%02x (expect INVALID_COMMAND)",
                     multi_transport)
-        try:
-            await self.default_controller.SendCommand(
-                nodeId=self.dut_node_id,
-                endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyConnectRequest(
-                    address=NullValue,
-                    transport=multi_transport,
-                    discriminator=ed_discriminator,
-                    vendorID=0,
-                    productID=0,
-                    timeout=30,
-                ),
-                interactionTimeoutMs=10000,
-            )
-            asserts.fail("Expected INVALID_COMMAND but ProxyConnectRequest with multi-bit transport succeeded")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.InvalidCommand,
-                                 f"Expected INVALID_COMMAND for multi-bit transport, got {e.status}")
-            logger.info("Step 9: correctly got INVALID_COMMAND")
+        await self.expect_command_rejected(
+            cp.Commands.ProxyConnectRequest(
+                address=NullValue,
+                transport=multi_transport,
+                discriminator=ed_discriminator,
+                vendorID=0,
+                productID=0,
+                timeout=30,
+            ),
+            Status.InvalidCommand,
+            "Step 9 ProxyConnectRequest with a multi-bit transport",
+            timeout_ms=10000)
 
         # ----------------------------------------------------------------
         # Step 10: ProxyMessageRequest with non-existent SessionID — NOT_FOUND
         # ----------------------------------------------------------------
         self.step(10)
         logger.info("Step 10: ProxyMessageRequest sessionID=0xFFFE (expect NOT_FOUND)")
-        try:
-            await self.default_controller.SendCommand(
-                nodeId=self.dut_node_id,
-                endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyMessageRequest(
-                    sessionID=0xFFFE,
-                    responseTimeout=10,
-                    message=_MINIMAL_MATTER_MSG,
-                ),
-                interactionTimeoutMs=15000,
-            )
-            asserts.fail("Expected NOT_FOUND but ProxyMessageRequest with invalid sessionID succeeded")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.NotFound,
-                                 f"Expected NOT_FOUND for non-existent sessionID, got {e.status}")
-            logger.info("Step 10: correctly got NOT_FOUND")
+        await self.expect_command_rejected(
+            cp.Commands.ProxyMessageRequest(
+                sessionID=0xFFFE,
+                responseTimeout=10,
+                message=_MINIMAL_MATTER_MSG,
+            ),
+            Status.NotFound,
+            "Step 10 ProxyMessageRequest with a non-existent sessionID",
+            timeout_ms=15000)
 
         # ----------------------------------------------------------------
         # Step 11: ProxyConnectRequest — establish session_a
@@ -427,23 +395,15 @@ class TC_COMPRO_2_6(COMPROBaseTest):
 
         async def _second_msg():
             await asyncio.sleep(2)  # let the first request reach the DUT and go in-flight
-            try:
-                await self.default_controller.SendCommand(
-                    nodeId=self.dut_node_id,
-                    endpoint=self.cp_endpoint,
-                    payload=cp.Commands.ProxyMessageRequest(
-                        sessionID=session_a,
-                        responseTimeout=10,
-                        message=_MINIMAL_MATTER_MSG,
-                    ),
-                    interactionTimeoutMs=5000,
-                )
-                asserts.fail("Expected BUSY for concurrent ProxyMessageRequest but command succeeded")
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Busy,
-                                     f"Expected BUSY for duplicate in-flight ProxyMessageRequest, got {e.status}")
-                logger.info("Step 12: second ProxyMessageRequest correctly got BUSY")
-                return e
+            return await self.expect_command_rejected(
+                cp.Commands.ProxyMessageRequest(
+                    sessionID=session_a,
+                    responseTimeout=10,
+                    message=_MINIMAL_MATTER_MSG,
+                ),
+                Status.Busy,
+                "Step 12 duplicate in-flight ProxyMessageRequest",
+                timeout_ms=5000)
 
         first_result, _second_result = await asyncio.gather(_first_msg(), _second_msg())
         logger.info("Step 12: first ProxyMessageRequest resolved with %s",

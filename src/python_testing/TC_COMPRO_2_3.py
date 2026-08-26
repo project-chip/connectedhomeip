@@ -72,7 +72,7 @@ from mobly import asserts
 from support_modules.compro_support import COMPROBaseTest, commission_if_needed
 
 from matter.clusters.Types import NullValue
-from matter.interaction_model import InteractionModelError, Status
+from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.runner import TestStep, default_matter_test_main
@@ -448,21 +448,14 @@ class TC_COMPRO_2_3(COMPROBaseTest):
         else:
             self.step(19)
             logger.info("Using unsupported transport bit 0x%02x for negative test", unsupported_transport)
-            try:
-                await self.default_controller.SendCommand(
-                    nodeId=self.dut_node_id,
-                    endpoint=self.cp_endpoint,
-                    payload=cp.Commands.ProxyBackGroundScanStartRequest(
-                        transport=unsupported_transport,
-                        timeout=0,
-                    ),
-                    interactionTimeoutMs=10000,
-                )
-                asserts.fail("Expected INVALID_TRANSPORT_TYPE but command succeeded")
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.InvalidTransportType,
-                                     f"Expected INVALID_TRANSPORT_TYPE, got {e.status}")
-                logger.info("Got expected INVALID_TRANSPORT_TYPE for unsupported transport")
+            await self.expect_command_rejected(
+                cp.Commands.ProxyBackGroundScanStartRequest(
+                    transport=unsupported_transport,
+                    timeout=0,
+                ),
+                Status.InvalidTransportType,
+                "Step 19 ProxyBackGroundScanStartRequest with an unsupported transport bit",
+                timeout_ms=10000)
 
         # Step 20 — negative: WI feature + band not in valid_bands → INVALID_TRANSPORT_TYPE.
         # Try k5g first (common case: proxy only supports 2.4 GHz).
@@ -480,22 +473,15 @@ class TC_COMPRO_2_3(COMPROBaseTest):
             else:
                 self.step(20)
                 logger.info("Using invalid WiFiBand bit 0x%04x for negative test", invalid_band)
-                try:
-                    await self.default_controller.SendCommand(
-                        nodeId=self.dut_node_id,
-                        endpoint=self.cp_endpoint,
-                        payload=cp.Commands.ProxyBackGroundScanStartRequest(
-                            transport=valid_transports,
-                            timeout=0,
-                            wiFiBands=invalid_band,
-                        ),
-                        interactionTimeoutMs=10000,
-                    )
-                    asserts.fail("Expected INVALID_TRANSPORT_TYPE but command succeeded")
-                except InteractionModelError as e:
-                    asserts.assert_equal(e.status, Status.InvalidTransportType,
-                                         f"Expected INVALID_TRANSPORT_TYPE, got {e.status}")
-                    logger.info("Got expected INVALID_TRANSPORT_TYPE for invalid WiFiBand")
+                await self.expect_command_rejected(
+                    cp.Commands.ProxyBackGroundScanStartRequest(
+                        transport=valid_transports,
+                        timeout=0,
+                        wiFiBands=invalid_band,
+                    ),
+                    Status.InvalidTransportType,
+                    "Step 20 ProxyBackGroundScanStartRequest with a WiFiBand outside valid_bands",
+                    timeout_ms=10000)
 
         # Step 21 — start background scan with Timeout=10 (auto-stops after 10 s).
         # The ED is still commissionable from step 13; results may populate then

@@ -266,18 +266,11 @@ class TC_COMPRO_2_2(COMPROBaseTest):
         else:
             self.step(9)
             logger.info("Using unsupported transport bit 0x%02x for negative test", unsupported_transport)
-            try:
-                await self.default_controller.SendCommand(
-                    nodeId=self.dut_node_id,
-                    endpoint=self.cp_endpoint,
-                    payload=cp.Commands.ProxyScanRequest(transport=unsupported_transport),
-                    interactionTimeoutMs=10000,
-                )
-                asserts.fail("Expected INVALID_TRANSPORT_TYPE but command succeeded")
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.InvalidTransportType,
-                                     f"Expected INVALID_TRANSPORT_TYPE, got {e.status}")
-                logger.info("Got expected INVALID_TRANSPORT_TYPE for unsupported transport")
+            await self.expect_command_rejected(
+                cp.Commands.ProxyScanRequest(transport=unsupported_transport),
+                Status.InvalidTransportType,
+                "Step 9 ProxyScanRequest with an unsupported transport bit",
+                timeout_ms=10000)
 
         # Step 10 — valid WiFiPAF transport + band not in valid_bands → INVALID_TRANSPORT_TYPE
         # Test is meaningful only when the DUT actually advertises kWiFiPAF
@@ -302,21 +295,14 @@ class TC_COMPRO_2_2(COMPROBaseTest):
                 logger.info("Using invalid WiFiBand bit 0x%04x for negative test", invalid_band)
                 # Keep transport as valid (WiFiPAF bit must be set per test plan)
                 wifipaf_transport = int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF)
-                try:
-                    await self.default_controller.SendCommand(
-                        nodeId=self.dut_node_id,
-                        endpoint=self.cp_endpoint,
-                        payload=cp.Commands.ProxyScanRequest(
-                            transport=wifipaf_transport,
-                            wiFiBands=invalid_band,
-                        ),
-                        interactionTimeoutMs=10000,
-                    )
-                    asserts.fail("Expected INVALID_TRANSPORT_TYPE but command succeeded")
-                except InteractionModelError as e:
-                    asserts.assert_equal(e.status, Status.InvalidTransportType,
-                                         f"Expected INVALID_TRANSPORT_TYPE, got {e.status}")
-                    logger.info("Got expected INVALID_TRANSPORT_TYPE for invalid WiFiBand")
+                await self.expect_command_rejected(
+                    cp.Commands.ProxyScanRequest(
+                        transport=wifipaf_transport,
+                        wiFiBands=invalid_band,
+                    ),
+                    Status.InvalidTransportType,
+                    "Step 10 ProxyScanRequest with a WiFiBand outside valid_bands",
+                    timeout_ms=10000)
 
         # Step 11 — two concurrent ProxyScanRequests; DUT must respond to both
         # Both responses arrive within a single scan window (BUSY is immediate; parallel

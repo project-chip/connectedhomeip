@@ -294,40 +294,26 @@ class TC_COMPRO_2_8(COMPROBaseTest):
         # ----------------------------------------------------------------
         self.step(7)
         logger.info("Step 7: TH2 ProxyMessageRequest(sessionID=%d) (expect NOT_FOUND)", fabric_a_session)
-        try:
-            await th2.SendCommand(
-                nodeId=self.dut_node_id,
-                endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyMessageRequest(
-                    sessionID=fabric_a_session,
-                    responseTimeout=10,
-                    message=bytes(8),
-                ),
-            )
-            asserts.fail("Expected NOT_FOUND but TH2 ProxyMessageRequest succeeded")
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status, Status.NotFound,
-                f"Expected NOT_FOUND for Fabric B ProxyMessageRequest, got {e.status}")
-            logger.info("Step 7: TH2 ProxyMessageRequest correctly got NOT_FOUND")
+        await self.expect_command_rejected(
+            cp.Commands.ProxyMessageRequest(
+                sessionID=fabric_a_session,
+                responseTimeout=10,
+                message=bytes(8),
+            ),
+            Status.NotFound,
+            "Step 7 TH2 ProxyMessageRequest for a Fabric A session",
+            controller=th2)
 
         # ----------------------------------------------------------------
         # Step 8 — TH2 ProxyDisconnectRequest(fabric_a_session) → NOT_FOUND
         # ----------------------------------------------------------------
         self.step(8)
         logger.info("Step 8: TH2 ProxyDisconnectRequest(sessionID=%d) (expect NOT_FOUND)", fabric_a_session)
-        try:
-            await th2.SendCommand(
-                nodeId=self.dut_node_id,
-                endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyDisconnectRequest(sessionID=fabric_a_session),
-            )
-            asserts.fail("Expected NOT_FOUND but TH2 ProxyDisconnectRequest succeeded")
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status, Status.NotFound,
-                f"Expected NOT_FOUND for Fabric B ProxyDisconnectRequest, got {e.status}")
-            logger.info("Step 8: TH2 ProxyDisconnectRequest correctly got NOT_FOUND")
+        await self.expect_command_rejected(
+            cp.Commands.ProxyDisconnectRequest(sessionID=fabric_a_session),
+            Status.NotFound,
+            "Step 8 TH2 ProxyDisconnectRequest for a Fabric A session",
+            controller=th2)
 
         # ----------------------------------------------------------------
         # Step 9 — TH1 ProxyDisconnectRequest(fabric_a_session) → SUCCESS
@@ -399,21 +385,14 @@ class TC_COMPRO_2_8(COMPROBaseTest):
             # (Fabric B has not started a background scan.)
             self.step(11)
             logger.info("Step 11: TH2 ProxyBackGroundScanStopRequest (expect NOT_FOUND)")
-            try:
-                await th2.SendCommand(
-                    nodeId=self.dut_node_id,
-                    endpoint=self.cp_endpoint,
-                    payload=cp.Commands.ProxyBackGroundScanStopRequest(
-                        transport=valid_transports,
-                        wiFiBands=wifi_bands_arg,
-                    ),
-                )
-                asserts.fail("Expected NOT_FOUND but TH2 ProxyBackGroundScanStopRequest succeeded")
-            except InteractionModelError as e:
-                asserts.assert_equal(
-                    e.status, Status.NotFound,
-                    f"Expected NOT_FOUND for Fabric B ProxyBackGroundScanStopRequest, got {e.status}")
-                logger.info("Step 11: TH2 ProxyBackGroundScanStopRequest correctly got NOT_FOUND")
+            await self.expect_command_rejected(
+                cp.Commands.ProxyBackGroundScanStopRequest(
+                    transport=valid_transports,
+                    wiFiBands=wifi_bands_arg,
+                ),
+                Status.NotFound,
+                "Step 11 TH2 ProxyBackGroundScanStopRequest for a Fabric A scan",
+                controller=th2)
 
             # Step 12 — TH2 starts its own background scan → SUCCESS.
             # The proxy SHALL allow background scans from different fabrics simultaneously.

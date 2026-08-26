@@ -319,7 +319,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 import matter.discovery as discovery
-from matter.interaction_model import Status
+from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest
 
 logger = logging.getLogger(__name__)
@@ -1031,6 +1031,47 @@ class COMPROBaseTest(MatterBaseTest):
             status, Status.UnsupportedWrite,
             f"{label}: expected UNSUPPORTED_WRITE when writing a read-only "
             f"Fixed (F) attribute, got {status}")
+
+    async def expect_command_rejected(
+        self,
+        payload,
+        expected_status: Status,
+        label: str,
+        *,
+        controller=None,
+        node_id: int | None = None,
+        timeout_ms: int | None = None,
+    ) -> InteractionModelError:
+        """Send a CommissioningProxy command and assert it fails with ``expected_status``.
+
+        ``label`` identifies the step and command in both the failure message and
+        the success log.
+
+        Pass ``controller`` to send from a second fabric's controller, ``node_id``
+        to send over a PASE session to an uncommissioned DUT, and ``timeout_ms``
+        when the command needs a longer IM timeout than the framework default.
+
+        Returns the caught error.
+        """
+        kwargs = {} if timeout_ms is None else {"interactionTimeoutMs": timeout_ms}
+        error: InteractionModelError | None = None
+        try:
+            await (controller or self.default_controller).SendCommand(
+                nodeId=self.dut_node_id if node_id is None else node_id,
+                endpoint=self.cp_endpoint,
+                payload=payload,
+                **kwargs,
+            )
+        except InteractionModelError as exc:
+            error = exc
+
+        if error is None:
+            asserts.fail(f"{label}: expected {expected_status.name} but the command succeeded")
+        asserts.assert_equal(
+            error.status, expected_status,
+            f"{label}: expected {expected_status.name}, got {error.status}")
+        logger.info("%s: correctly got %s", label, expected_status.name)
+        return error
 
     def pick_single_transport_bit(self, transport_bitmap: int) -> int:
         """Return the lowest set bit from a transport bitmap (for use in connect requests)."""

@@ -441,22 +441,10 @@ class TC_COMPRO_2_4(COMPROBaseTest):
             non_existent_session_id = 0xFFFE
             logger.info("[%s] Sending ProxyDisconnectRequest with non-existent sessionID=%d",
                         transport_label, non_existent_session_id)
-            try:
-                await self.default_controller.SendCommand(
-                    nodeId=self.dut_node_id,
-                    endpoint=self.cp_endpoint,
-                    payload=cp.Commands.ProxyDisconnectRequest(
-                        sessionID=non_existent_session_id),
-                )
-                asserts.fail(f"[{transport_label}] Expected NOT_FOUND for non-existent "
-                             "sessionID but command succeeded")
-            except InteractionModelError as e:
-                asserts.assert_equal(
-                    e.status, Status.NotFound,
-                    f"[{transport_label}] Expected NOT_FOUND for non-existent sessionID, "
-                    f"got {e.status}")
-                logger.info("[%s] ProxyDisconnectRequest with invalid sessionID correctly "
-                            "returned NOT_FOUND", transport_label)
+            await self.expect_command_rejected(
+                cp.Commands.ProxyDisconnectRequest(sessionID=non_existent_session_id),
+                Status.NotFound,
+                f"[{transport_label}] Step 8 ProxyDisconnectRequest with a non-existent sessionID")
 
             # -- Step 9 work: ProxyDisconnect valid current_session_id → SUCCESS --
             if first_pass:
@@ -496,26 +484,19 @@ class TC_COMPRO_2_4(COMPROBaseTest):
         # ----------------------------------------------------------------
         self.step(10)
         logger.info("Sending ProxyConnectRequest(Timeout=1) — expecting TIMEOUT")
-        try:
-            await self.default_controller.SendCommand(
-                nodeId=self.dut_node_id,
-                endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyConnectRequest(
-                    address=NullValue,
-                    transport=single_transport,
-                    discriminator=ed_discriminator,
-                    vendorID=0,
-                    productID=0,
-                    timeout=1,
-                    wiFiBand=single_band,
-                ),
-                interactionTimeoutMs=6000,  # 1 s DUT timeout + 5 s IM margin
-            )
-            asserts.fail("Expected TIMEOUT but ProxyConnectRequest succeeded")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Timeout,
-                                 f"Expected TIMEOUT for short-timeout connect, got {e.status}")
-            logger.info("ProxyConnectRequest(Timeout=1) correctly returned TIMEOUT")
+        await self.expect_command_rejected(
+            cp.Commands.ProxyConnectRequest(
+                address=NullValue,
+                transport=single_transport,
+                discriminator=ed_discriminator,
+                vendorID=0,
+                productID=0,
+                timeout=1,
+                wiFiBand=single_band,
+            ),
+            Status.Timeout,
+            "Step 10 ProxyConnectRequest(Timeout=1) with the ED not commissionable",
+            timeout_ms=6000)  # 1 s DUT timeout + 5 s IM margin
 
         # ----------------------------------------------------------------
         # Step 11: ProxyConnectRequest with unsupported Transport bit.
@@ -529,25 +510,18 @@ class TC_COMPRO_2_4(COMPROBaseTest):
         else:
             self.step(11)
             logger.info("Using unsupported transport bit 0x%02x for step 11", unsupported_transport)
-            try:
-                await self.default_controller.SendCommand(
-                    nodeId=self.dut_node_id,
-                    endpoint=self.cp_endpoint,
-                    payload=cp.Commands.ProxyConnectRequest(
-                        address=NullValue,
-                        transport=unsupported_transport,
-                        discriminator=ed_discriminator,
-                        vendorID=0,
-                        productID=0,
-                        timeout=30,
-                    ),
-                    interactionTimeoutMs=10000,
-                )
-                asserts.fail("Expected INVALID_TRANSPORT_TYPE but command succeeded")
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.InvalidTransportType,
-                                     f"Expected INVALID_TRANSPORT_TYPE, got {e.status}")
-                logger.info("Got expected INVALID_TRANSPORT_TYPE for unsupported transport")
+            await self.expect_command_rejected(
+                cp.Commands.ProxyConnectRequest(
+                    address=NullValue,
+                    transport=unsupported_transport,
+                    discriminator=ed_discriminator,
+                    vendorID=0,
+                    productID=0,
+                    timeout=30,
+                ),
+                Status.InvalidTransportType,
+                "Step 11 ProxyConnectRequest with an unsupported transport bit",
+                timeout_ms=10000)
 
         # ----------------------------------------------------------------
         # Step 12: ProxyConnectRequest with WiFiPAF transport and a WiFiBand
@@ -567,48 +541,34 @@ class TC_COMPRO_2_4(COMPROBaseTest):
             else:
                 self.step(12)
                 logger.info("Using invalid WiFiBand bit 0x%04x for step 12", invalid_band)
-                try:
-                    await self.default_controller.SendCommand(
-                        nodeId=self.dut_node_id,
-                        endpoint=self.cp_endpoint,
-                        payload=cp.Commands.ProxyConnectRequest(
-                            address=NullValue,
-                            transport=kWiFiPAF_bit,
-                            discriminator=ed_discriminator,
-                            vendorID=0,
-                            productID=0,
-                            timeout=30,
-                            wiFiBand=invalid_band,
-                        ),
-                        interactionTimeoutMs=10000,
-                    )
-                    asserts.fail("Expected INVALID_TRANSPORT_TYPE but command succeeded")
-                except InteractionModelError as e:
-                    asserts.assert_equal(e.status, Status.InvalidTransportType,
-                                         f"Expected INVALID_TRANSPORT_TYPE, got {e.status}")
-                    logger.info("Got expected INVALID_TRANSPORT_TYPE for invalid WiFiBand")
+                await self.expect_command_rejected(
+                    cp.Commands.ProxyConnectRequest(
+                        address=NullValue,
+                        transport=kWiFiPAF_bit,
+                        discriminator=ed_discriminator,
+                        vendorID=0,
+                        productID=0,
+                        timeout=30,
+                        wiFiBand=invalid_band,
+                    ),
+                    Status.InvalidTransportType,
+                    "Step 12 ProxyConnectRequest with a WiFiBand outside valid_bands",
+                    timeout_ms=10000)
 
         # ----------------------------------------------------------------
         # Step 13: ProxyMessageRequest referencing a non-existent SessionID.
         # ----------------------------------------------------------------
         self.step(13)
         logger.info("Sending ProxyMessageRequest with non-existent sessionID=0xFFFE")
-        try:
-            await self.default_controller.SendCommand(
-                nodeId=self.dut_node_id,
-                endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyMessageRequest(
-                    sessionID=0xFFFE,
-                    responseTimeout=10,
-                    message=_MINIMAL_MATTER_MSG,
-                ),
-                interactionTimeoutMs=15000,
-            )
-            asserts.fail("Expected NOT_FOUND for non-existent sessionID but command succeeded")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.NotFound,
-                                 f"Expected NOT_FOUND for non-existent sessionID, got {e.status}")
-            logger.info("ProxyMessageRequest with non-existent sessionID correctly returned NOT_FOUND")
+        await self.expect_command_rejected(
+            cp.Commands.ProxyMessageRequest(
+                sessionID=0xFFFE,
+                responseTimeout=10,
+                message=_MINIMAL_MATTER_MSG,
+            ),
+            Status.NotFound,
+            "Step 13 ProxyMessageRequest with a non-existent sessionID",
+            timeout_ms=15000)
 
         # ----------------------------------------------------------------
         # Step 14: ProxyDisconnectRequest(SessionID=null) to cancel an

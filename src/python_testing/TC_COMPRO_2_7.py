@@ -80,7 +80,7 @@ from mobly import asserts
 from support_modules.compro_support import COMPROBaseTest, EDFixture, commission_if_needed
 
 from matter.clusters.Types import NullValue
-from matter.interaction_model import InteractionModelError, Status
+from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
 
@@ -278,26 +278,19 @@ class TC_COMPRO_2_7(COMPROBaseTest):
         overflow_disc = int(params.get('overflow_discriminator', 4095))
         logger.info("Step 7: ProxyConnectRequest (discriminator=%d, expect RESOURCE_EXHAUSTED)",
                     overflow_disc)
-        try:
-            await self.default_controller.SendCommand(
-                nodeId=self.dut_node_id,
-                endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyConnectRequest(
-                    address=NullValue,
-                    transport=proxy_transport,
-                    discriminator=overflow_disc,
-                    vendorID=0,
-                    productID=0,
-                    timeout=30,
-                    wiFiBand=proxy_wifi_band,
-                ),
-                interactionTimeoutMs=10000,
-            )
-            asserts.fail("Expected RESOURCE_EXHAUSTED but ProxyConnectRequest succeeded")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ResourceExhausted,
-                                 f"Expected RESOURCE_EXHAUSTED when session table is full, got {e.status}")
-            logger.info("Step 7: correctly got RESOURCE_EXHAUSTED")
+        await self.expect_command_rejected(
+            cp.Commands.ProxyConnectRequest(
+                address=NullValue,
+                transport=proxy_transport,
+                discriminator=overflow_disc,
+                vendorID=0,
+                productID=0,
+                timeout=30,
+                wiFiBand=proxy_wifi_band,
+            ),
+            Status.ResourceExhausted,
+            "Step 7 ProxyConnectRequest with the session table full",
+            timeout_ms=10000)
 
         # ------------------------------------------------------------------
         # Step 8 — verify all session IDs distinct (only meaningful when > 1)
