@@ -522,12 +522,12 @@ class TC_CNET_4_24(MatterBaseTest):
                           f"Expected LastConnectErrorValue to be Null, got {last_connect_error}")
 
         self.step(2)
-        # response = await self.send_single_cmd(
-            # endpoint=endpoint,
-            # cmd=cnet.Commands.AddOrUpdateThreadNetwork(
-                # operationalDataset=incorrect_thread_dataset_1, breadcrumb=2),
-            # timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
-        # await self._validate_network_config_response(response)
+        response = await self.send_single_cmd(
+            endpoint=endpoint,
+            cmd=cnet.Commands.AddOrUpdateThreadNetwork(
+                operationalDataset=incorrect_thread_dataset_1, breadcrumb=2),
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
+        await self._validate_network_config_response(response)
 
         self.step(3)
         logger.info(" --- Sending ConnectNetwork with incorrect Extended PAN ID: %s", network_id_1.hex())
