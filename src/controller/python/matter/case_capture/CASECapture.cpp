@@ -521,31 +521,79 @@ private:
         return nullptr;
     }
 
+    // Whether a resolved address and the address a message arrived from name the same peer.
+    //
+    // Deliberately not PeerAddress::operator==, which for UDP also requires the interface to match.
+    // Address resolution clears the interface for anything other than an IPv6 link-local address, so
+    // that sending follows the routing table, while an inbound packet always carries the interface it
+    // was received on. Comparing the two whole addresses would therefore never match for a peer whose
+    // resolved address is a unique-local or global one, which is every device reached through a
+    // router, and the handshake would report neither its peer nor its discovery. An interface left
+    // unset on either side is read as "not stated" rather than as a difference; the address and port
+    // already say which peer this is.
+    static bool IsSamePeerEndpoint(const chip::Transport::PeerAddress & resolved, const chip::Transport::PeerAddress & observed)
+    {
+        if (resolved.GetTransportType() != observed.GetTransportType() || !(resolved.GetIPAddress() == observed.GetIPAddress()) ||
+            resolved.GetPort() != observed.GetPort())
+        {
+            return false;
+        }
+        if (resolved.GetInterface().IsPresent() && observed.GetInterface().IsPresent())
+        {
+            return resolved.GetInterface() == observed.GetInterface();
+        }
+        return true;
+    }
+
+    // Ranks two lookups that resolved the same address, so the one this handshake followed wins.
+    // A span no handshake has taken yet beats one already taken, and between two of equal standing
+    // the lookup that started later is the newer one.
+    static bool IsCloserDiscoveryMatch(const PendingDeviceDiscovery & candidate, const PendingDeviceDiscovery & incumbent)
+    {
+        const bool candidateUnclaimed = candidate.done && !candidate.used;
+        const bool incumbentUnclaimed = incumbent.done && !incumbent.used;
+        if (candidateUnclaimed != incumbentUnclaimed)
+        {
+            return candidateUnclaimed;
+        }
+        return candidate.startUs > incumbent.startUs;
+    }
+
     // Names the handshake's peer and, when the same lookup produced that peer's address,
     // hands the discovery span to this record. Both stay unset when the address was never
     // resolved while listening, e.g. it was already cached: no duration is better than one
     // belonging to a different handshake.
     void RecordPeerIdentityAndDiscovery(PychipCASEHandshakeMetricsRecord & record, const chip::Transport::PeerAddress & address)
     {
+        // More than one lookup can hold the same address. A device commissioned again under a new
+        // node id keeps the address it had, so an earlier one's span sits in the table beside this
+        // one's. Taking whichever is found first would name this handshake's peer with the earlier
+        // node id and, that span having been claimed already, report no discovery at all, so choose
+        // between them rather than stopping at the first.
+        PendingDeviceDiscovery * closest = nullptr;
         for (auto & pending : mPendingDiscoveries)
         {
-            if (!pending.hasAddress || !(pending.address == address))
+            if (!pending.hasAddress || !IsSamePeerEndpoint(pending.address, address))
             {
                 continue;
             }
-
-            record.peerNodeId = pending.peer.GetNodeId();
-            // Claimed so a later handshake to the same peer waits for its own lookup rather
-            // than reusing this span.
-            if (pending.done && !pending.used)
+            if (closest == nullptr || IsCloserDiscoveryMatch(pending, *closest))
             {
-                pending.used                         = true;
-                record.discoveryStartedTimestampUs   = pending.startUs;
-                record.discoveryCompletedTimestampUs = pending.doneUs;
-                record.recordedFields =
-                    static_cast<uint8_t>(record.recordedFields | PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_DEVICE_DISCOVERY);
+                closest = &pending;
             }
-            return;
+        }
+        VerifyOrReturn(closest != nullptr);
+
+        record.peerNodeId = closest->peer.GetNodeId();
+        // Claimed so a later handshake to the same peer waits for its own lookup rather
+        // than reusing this span.
+        if (closest->done && !closest->used)
+        {
+            closest->used                        = true;
+            record.discoveryStartedTimestampUs   = closest->startUs;
+            record.discoveryCompletedTimestampUs = closest->doneUs;
+            record.recordedFields =
+                static_cast<uint8_t>(record.recordedFields | PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_DEVICE_DISCOVERY);
         }
     }
 
