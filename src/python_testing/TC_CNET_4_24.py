@@ -32,7 +32,7 @@ report SupportsConcurrentConnection = True and is skipped otherwise.
 import asyncio
 import logging
 import sys
-from typing import Callable
+from collections.abc import Callable
 
 from mobly import asserts
 
