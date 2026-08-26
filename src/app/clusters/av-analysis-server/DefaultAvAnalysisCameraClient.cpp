@@ -135,6 +135,8 @@ void DefaultAvAnalysisCameraClient::StartProfileDiscovery()
 
 CHIP_ERROR DefaultAvAnalysisCameraClient::SendDiscoveryRead(AttributePathParams * aPaths, size_t aPathCount)
 {
+    VerifyOrReturnError(mSessionHolder && mExchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     ReadPrepareParams readParams(mSessionHolder.Get().Value());
     readParams.mpAttributePathParamsList    = aPaths;
     readParams.mAttributePathParamsListSize = aPathCount;
