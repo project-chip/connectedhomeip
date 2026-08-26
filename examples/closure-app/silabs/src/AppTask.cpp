@@ -26,15 +26,10 @@
 #include "ClosureUI.h"
 #include "ClosureUIStrings.h"
 #include "lcd.h"
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
 #include "qrcodegen.h"
-<<<<<<< HEAD
-#endif // QR_CODE_ENABLED
-#endif // DISPLAY_ENABLED
-    =======
 #endif // SL_MATTER_QR_CODE_ENABLED
 #endif // SL_MATTER_DISPLAY_ENABLED
-    >>>>>>> f1683e68e0 (update DISPLAY_ENABLED define (#73069))
 
 #include <ClosureManager.h>
 #include <app-common/zap-generated/cluster-enums.h>
@@ -98,7 +93,7 @@ CHIP_ERROR AppTask::AppInit()
 // Update the LCD with the Stored value. Show QR Code if not provisioned
 #if SL_MATTER_DISPLAY_ENABLED
     UpdateClosureUI();
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
 #ifdef SL_WIFI
     if (!ConnectivityMgr().IsWiFiStationProvisioned())
 #else
@@ -107,13 +102,8 @@ CHIP_ERROR AppTask::AppInit()
     {
         GetLCD().ShowQRCode(true);
     }
-<<<<<<< HEAD
-#endif // QR_CODE_ENABLED
-#endif // DISPLAY_ENABLED
-    =======
 #endif // SL_MATTER_QR_CODE_ENABLED
 #endif // SL_MATTER_DISPLAY_ENABLED
-        >>>>>>> f1683e68e0 (update DISPLAY_ENABLED define (#73069))
 
         return err;
 }

@@ -56,9 +56,21 @@ CHIP_ERROR AppTask::AppInit()
     {
         SILABS_LOG("WindowMgr::Init() failed");
         appError(err);
+        return err;
     }
 
-    return err;
+#if SL_MATTER_DISPLAY_ENABLED
+    GetLCD().SetCustomUI(WindowManager::DrawUI);
+    GetLCD().WriteDemoUI(false);
+#if SL_MATTER_QR_CODE_ENABLED
+    if (BaseApplication::sIsProvisioned != true)
+    {
+        GetLCD().ShowQRCode(true);
+    }
+#endif // SL_MATTER_QR_CODE_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR AppTask::StartAppTask()
@@ -85,10 +97,6 @@ void AppTask::AppTaskMain(void * pvParameter)
     SILABS_LOG("App Task started");
 
     WindowManager::sWindow.UpdateLED();
-#if SL_MATTER_DISPLAY_ENABLED
-    WindowManager::sWindow.UpdateLCD();
-#endif // SL_MATTER_DISPLAY_ENABLED
-
     while (true)
     {
         osStatus_t eventReceived = osMessageQueueGet(sAppEventQueue, &event, NULL, osWaitForever);

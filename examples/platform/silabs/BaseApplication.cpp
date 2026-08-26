@@ -34,15 +34,10 @@
 
 #if SL_MATTER_DISPLAY_ENABLED
 #include "lcd.h"
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
 #include "qrcodegen.h"
-<<<<<<< HEAD
-#endif // QR_CODE_ENABLED
-#endif // DISPLAY_ENABLED
-    =======
 #endif // SL_MATTER_QR_CODE_ENABLED
 #endif // SL_MATTER_DISPLAY_ENABLED
-    >>>>>>> f1683e68e0 (update DISPLAY_ENABLED define (#73069))
 
 #ifdef ENABLE_CHIP_SHELL
 #if defined(CHIP_CONFIG_ENABLE_READ_CLIENT) && CHIP_CONFIG_ENABLE_READ_CLIENT
@@ -141,8 +136,8 @@ osMessageQueueId_t sAppEventQueue;
 LEDWidget sStatusLED;
 #endif // ENABLE_WSTK_LEDS
 
-bool sIsEnabled  = false;
-bool sIsAttached = false;
+[[maybe_unused]] bool sIsEnabled  = false;
+[[maybe_unused]] bool sIsAttached = false;
 
 #if !(CHIP_CONFIG_ENABLE_ICD_SERVER)
 bool sHaveBLEConnections = false;
@@ -188,28 +183,16 @@ BaseApplicationDelegate BaseApplication::sAppDelegate = BaseApplicationDelegate(
 void BaseApplicationDelegate::OnCommissioningSessionStarted()
 {
     isComissioningStarted = true;
-
-#if defined(SL_WIFI) && SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
-    WifiSleepManager::GetInstance().HandleCommissioningSessionStarted();
-#endif // SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
 }
 
 void BaseApplicationDelegate::OnCommissioningSessionStopped()
 {
     isComissioningStarted = false;
-
-#if defined(SL_WIFI) && SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
-    WifiSleepManager::GetInstance().HandleCommissioningSessionStopped();
-#endif // SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
 }
 
 void BaseApplicationDelegate::OnCommissioningSessionEstablishmentError(CHIP_ERROR err)
 {
     isComissioningStarted = false;
-
-#if defined(SL_WIFI) && SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
-    WifiSleepManager::GetInstance().HandleCommissioningSessionStopped();
-#endif // SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
 }
 
 void BaseApplicationDelegate::OnCommissioningWindowClosed()
@@ -219,23 +202,15 @@ void BaseApplicationDelegate::OnCommissioningWindowClosed()
         // After the device is provisioned and the commissioning passed
         // resetting the isCommissioningStarted to false
         isComissioningStarted = false;
-<<<<<<< HEAD
-#ifdef DISPLAY_ENABLED
-#ifdef QR_CODE_ENABLED
-        =======
+
 #if SL_MATTER_DISPLAY_ENABLED
 #if SL_MATTER_QR_CODE_ENABLED
-            >>>>>>> f1683e68e0 (update DISPLAY_ENABLED define (#73069)) SilabsLCD::Screen_e screen;
+        SilabsLCD::Screen_e screen;
         slLCD.GetScreen(screen);
         VerifyOrReturn(screen == SilabsLCD::Screen_e::QRCodeScreen);
         BaseApplication::PostUpdateDisplayEvent(SilabsLCD::Screen_e::DemoScreen);
-<<<<<<< HEAD
-#endif // QR_CODE_ENABLED
-#endif // DISPLAY_ENABLED
-        =======
 #endif // SL_MATTER_QR_CODE_ENABLED
 #endif // SL_MATTER_DISPLAY_ENABLED
-            >>>>>>> f1683e68e0 (update DISPLAY_ENABLED define (#73069))
     }
 }
 
@@ -1034,13 +1009,13 @@ void BaseApplication::OutputQrCode(bool refreshLCD)
     if (CHIP_NO_ERROR == err)
     {
         // Print setup info on LCD if available
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
         if (refreshLCD)
         {
             slLCD.SetQRCode((uint8_t *) setupPayload.data(), setupPayload.size());
             slLCD.ShowQRCode(true);
         }
-#endif // QR_CODE_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED
 
         PrintQrCodeURL(setupPayload);
     }

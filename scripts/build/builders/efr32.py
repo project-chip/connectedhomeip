@@ -138,18 +138,15 @@ class Efr32Board(Enum):
     BRD4317A = 3
     BRD4318A = 4
     BRD4319A = 5
-    BRD4186A = 6
-    BRD4187A = 7
-    BRD2601B = 8
-    BRD4187C = 9
-    BRD4186C = 10
-    BRD4338A = 11
-    BRD2703A = 12
-    BRD2605A = 13
-    BRD4343A = 14
-    BRD4342A = 15
-    BRD2708A = 16
-    BRD2911A = 17
+    BRD4187C = 6
+    BRD4186C = 7
+    BRD4338A = 8
+    BRD2703A = 9
+    BRD2605A = 10
+    BRD4343A = 11
+    BRD4342A = 12
+    BRD2708A = 13
+    BRD2911A = 14
 
     def GnArgName(self):
         if self == Efr32Board.BRD2704B:
@@ -162,12 +159,6 @@ class Efr32Board(Enum):
             return 'BRD4318A'
         if self == Efr32Board.BRD4319A:
             return 'BRD4319A'
-        if self == Efr32Board.BRD4186A:
-            return 'BRD4186A'
-        if self == Efr32Board.BRD4187A:
-            return 'BRD4187A'
-        if self == Efr32Board.BRD2601B:
-            return 'BRD2601B'
         if self == Efr32Board.BRD4186C:
             return 'BRD4186C'
         if self == Efr32Board.BRD4187C:
@@ -208,7 +199,6 @@ class Efr32Builder(GnBuilder):
                  enable_icd: bool = False,
                  enable_low_power: bool = False,
                  enable_wifi: bool = False,
-                 enable_wf200: bool = False,
                  enable_917_ncp: bool = False,
                  enable_wifi_ipv4: bool = False,
                  enable_additional_data_advertising: bool = False,
@@ -265,12 +255,10 @@ class Efr32Builder(GnBuilder):
                 # Wifi SoC platform
                 self.extra_gn_options.append('chip_device_platform=\"SiWx917\"')
             else:
-                if enable_wf200:
-                    self.extra_gn_options.append('use_wf200=true chip_device_platform =\"efr32\"')
-                elif enable_917_ncp:
+                if enable_917_ncp:
                     self.extra_gn_options.append('use_SiWx917=true chip_device_platform =\"efr32\"')
                 else:
-                    raise Exception('Wifi usage: ...-wifi-[wf200|siwx917]-...')
+                    raise Exception('Wifi usage: ...-wifi-[siwx917]-...')
 
         if enable_wifi_ipv4:
             self.extra_gn_options.append('chip_enable_wifi_ipv4=true')

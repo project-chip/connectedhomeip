@@ -39,6 +39,7 @@ extern "C" {
 #include "sl_si91x_driver.h"
 #include "sl_si91x_host_interface.h"
 #include "sl_si91x_types.h"
+#include "sl_utility.h"
 #include "sl_wifi.h"
 #include "sl_wifi_callback_framework.h"
 #include "sl_wifi_constants.h"
@@ -99,7 +100,8 @@ constexpr osThreadAttr_t kWlanTaskAttr = { .name       = "wlan_rsi",
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 constexpr uint32_t kTimeToFullBeaconReception = 5000; // 5 seconds
-#endif                                                // CHIP_CONFIG_ENABLE_ICD_SERVER
+constexpr char kMatterMdnsIpv6McastAddress[]  = "ff02::fb";
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 wfx_wifi_scan_ext_t temp_reset;
 
@@ -382,7 +384,7 @@ sl_status_t SetWifiConfigurations()
             .security = security,
             .encryption = SL_WIFI_DEFAULT_ENCRYPTION,
             .client_options = SL_WIFI_JOIN_WITH_SCAN,
-            .credential_id = SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID,
+            .credential_id = (security == SL_WIFI_OPEN) ? SL_NET_NO_CREDENTIAL_ID : SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID,
             .channel_bitmap = {
                 .channel_bitmap_2_4 = SL_WIFI_DEFAULT_CHANNEL_BITMAP
             },
@@ -409,9 +411,6 @@ sl_status_t SetWifiConfigurations()
         chip::MutableByteSpan bssidSpan(profile.config.bssid.octet, kWiFiBSSIDLength);
         chip::ByteSpan inBssid(wfx_rsi.ap_bssid.data(), kWiFiBSSIDLength);
         TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(inBssid, bssidSpan);
-        // Enabling quick-join since we have the channel and BSSID
-        // TODO: Uncomment this once the quick-join issue is fixed
-        // join_feature_bitmap |= SL_SI91X_JOIN_FEAT_QUICK_JOIN;
     }
 
     status = sl_wifi_set_join_configuration(SL_WIFI_CLIENT_INTERFACE, join_feature_bitmap);
@@ -655,7 +654,6 @@ sl_status_t WifiInterfaceImpl::JoinWifiNetwork(void)
     ChipLogError(DeviceLayer, "sl_net_up failed: 0x%lx", static_cast<uint32_t>(status));
 
     wfx_rsi.dev_state.Clear(WifiInterface::WifiState::kStationConnecting).Clear(WifiInterface::WifiState::kStationConnected);
-    mUseQuickJoin = !(status == SL_STATUS_SI91X_NO_AP_FOUND);
     ScheduleConnectionAttempt();
 
     return status;
@@ -684,7 +682,6 @@ sl_status_t WifiInterfaceImpl::JoinCallback(sl_wifi_event_t event, char * result
         ChipLogError(DeviceLayer, "JoinCallback: failed: 0x%lx", status);
         wfx_rsi.dev_state.Clear(WifiInterface::WifiState::kStationConnected);
 
-        mInstance.mUseQuickJoin = !(status == SL_STATUS_SI91X_NO_AP_FOUND);
         mInstance.ScheduleConnectionAttempt();
     }
 
@@ -797,6 +794,9 @@ sl_status_t WifiInterfaceImpl::TriggerPlatformWifiDisconnection()
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 CHIP_ERROR WifiInterfaceImpl::ConfigurePowerSave(PowerSaveInterface::PowerSaveConfiguration configuration, uint32_t listenInterval)
 {
+    // Power save configuration is already set, nothing to do
+    VerifyOrReturnValue(mCurrentPowerSaveConfiguration != configuration, CHIP_NO_ERROR);
+
     int32_t error = rsi_bt_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
     VerifyOrReturnError(error == RSI_SUCCESS, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "rsi_bt_power_save_profile failed: %ld", error));
@@ -809,20 +809,58 @@ CHIP_ERROR WifiInterfaceImpl::ConfigurePowerSave(PowerSaveInterface::PowerSaveCo
     VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "sl_wifi_set_performance_profile_v2 failed: 0x%lx", status));
 
+    mCurrentPowerSaveConfiguration = configuration;
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WifiInterfaceImpl::ConfigureBroadcastFilter(bool enableBroadcastFilter)
 {
-    sl_status_t status = SL_STATUS_OK;
+    // Skip the underlying call if the filter is already in the requested state.
+    VerifyOrReturnValue(mBroadcastFilterEnabled != enableBroadcastFilter, CHIP_NO_ERROR);
 
-    uint16_t beaconDropThreshold = (enableBroadcastFilter) ? kTimeToFullBeaconReception : 0;
-    uint8_t filterBcastInTim     = (enableBroadcastFilter) ? 1 : 0;
+    sl_status_t status = sl_wifi_allowlist_mcast_remove_all();
+    VerifyOrReturnError(
+        status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
+        ChipLogError(DeviceLayer, "sl_wifi_allowlist_mcast_remove_all failed: 0x%" PRIx32, static_cast<uint32_t>(status)));
 
-    status = sl_wifi_filter_broadcast(beaconDropThreshold, filterBcastInTim, 1 /* valid till next update*/);
-    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
-                        ChipLogError(DeviceLayer, "sl_wifi_filter_broadcast failed: 0x%lx", static_cast<uint32_t>(status)));
+    if (!enableBroadcastFilter)
+    {
+        // Filter disabled: allowlist Matter mDNS (ff02::fb) so only that multicast is received.
+        // Use sl_inet_pton6 so the address is in the endianness expected by the NWP.
+        sl_ip_address_t mdnsIpv6McastAddress          = {};
+        uint8_t parsedAddress[SL_IPV6_ADDRESS_LENGTH] = {};
+        const int parseStatus =
+            sl_inet_pton6(kMatterMdnsIpv6McastAddress, kMatterMdnsIpv6McastAddress + sizeof(kMatterMdnsIpv6McastAddress) - 1,
+                          parsedAddress, reinterpret_cast<unsigned int *>(mdnsIpv6McastAddress.ip.v6.value));
+        VerifyOrReturnError(parseStatus == 1, CHIP_ERROR_INTERNAL,
+                            ChipLogError(DeviceLayer, "Failed to parse Matter mDNS IPv6 multicast address"));
+        mdnsIpv6McastAddress.type = SL_IPV6;
 
+        sl_ip_address_handle_t allowlistHandle = UINT8_MAX;
+        status                                 = sl_wifi_allowlist_mcast_add_ip(&mdnsIpv6McastAddress, &allowlistHandle);
+        VerifyOrReturnError(
+            status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
+            ChipLogError(DeviceLayer, "sl_wifi_allowlist_mcast_add_ip failed: 0x%" PRIx32, static_cast<uint32_t>(status)));
+    }
+
+    // Multicast filtering stays enabled in both modes; the allowlist controls what passes.
+    sl_wifi_groupcast_filter_config_t groupcastFilterConfig = {};
+    groupcastFilterConfig.enable_bcast_filter               = enableBroadcastFilter ? 1 : 0;
+    groupcastFilterConfig.enable_mcast_filter               = 1;
+    groupcastFilterConfig.filter_mode                       = 0; // default
+
+    status = sl_wifi_set_groupcast_filter_config(&groupcastFilterConfig);
+    VerifyOrReturnError(
+        status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
+        ChipLogError(DeviceLayer, "sl_wifi_set_groupcast_filter_config failed: 0x%" PRIx32, static_cast<uint32_t>(status)));
+
+    uint16_t beaconDropThreshold = enableBroadcastFilter ? kTimeToFullBeaconReception : 0;
+    status                       = sl_wifi_set_beacon_drop_threshold(SL_WIFI_CLIENT_INTERFACE, beaconDropThreshold);
+    VerifyOrReturnError(
+        status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
+        ChipLogError(DeviceLayer, "sl_wifi_set_beacon_drop_threshold failed: 0x%" PRIx32, static_cast<uint32_t>(status)));
+
+    mBroadcastFilterEnabled = enableBroadcastFilter;
     return CHIP_NO_ERROR;
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -1034,9 +1072,9 @@ CHIP_ERROR WifiInterfaceImpl::ConnectToAccessPoint()
 {
     VerifyOrReturnError(IsWifiProvisioned(), CHIP_ERROR_INCORRECT_STATE);
 
-    ChipLogProgress(DeviceLayer, "%s to access point: %s", mUseQuickJoin ? "quick join" : "connect", wfx_rsi.credentials.ssid);
+    ChipLogProgress(DeviceLayer, "connect to access point: %s", wfx_rsi.credentials.ssid);
 
-    PostWifiPlatformEvent(mUseQuickJoin ? WifiPlatformEvent::kStationStartJoin : WifiPlatformEvent::kStationStartScan);
+    PostWifiPlatformEvent(WifiPlatformEvent::kStationStartScan);
     return CHIP_NO_ERROR;
 }
 
