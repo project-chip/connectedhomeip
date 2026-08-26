@@ -19,18 +19,12 @@ source_set("robotic-vacuum-cleaner") {
   sources = [
     "RoboticVacuumCleaner.cpp",
     "RoboticVacuumCleaner.h",
-    "impl/LoggingRvcCleanModeDelegate.cpp",
-    "impl/LoggingRvcCleanModeDelegate.h",
-    "impl/LoggingRvcOperationalStateDelegate.cpp",
-    "impl/LoggingRvcOperationalStateDelegate.h",
-    "impl/LoggingRvcRunModeDelegate.cpp",
-    "impl/LoggingRvcRunModeDelegate.h",
-    "impl/LoggingServiceAreaDelegate.cpp",
-    "impl/LoggingServiceAreaDelegate.h",
     "impl/LoggingServiceAreaStorageDelegate.cpp",
     "impl/LoggingServiceAreaStorageDelegate.h",
     "impl/RvcSimulationLogic.h",
     "impl/RvcSimulationTopology.h",
+    "impl/SimulatedRoboticVacuumCleaner.cpp",
+    "impl/SimulatedRoboticVacuumCleaner.h",
   ]
 
   public_configs = [
@@ -39,7 +33,6 @@ source_set("robotic-vacuum-cleaner") {
 
   public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
-    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/operational-state:operational-state-delegate",
     "${chip_root}/src/app/clusters/mode-base-server",
     "${chip_root}/src/app/clusters/operational-state-server",
     "${chip_root}/src/app/clusters/service-area-server",

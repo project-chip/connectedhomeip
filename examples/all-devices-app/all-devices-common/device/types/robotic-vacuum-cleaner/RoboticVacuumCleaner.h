@@ -17,24 +17,31 @@
 
 #pragma once
 
+#include <app/clusters/mode-base-server/AppDelegate.h>
 #include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
 #include <app/clusters/service-area-server/ServiceAreaCluster.h>
+#include <app/clusters/service-area-server/service-area-delegate.h>
 #include <device/api/SingleEndpoint.h>
-#include <device/types/robotic-vacuum-cleaner/impl/LoggingRvcCleanModeDelegate.h>
-#include <device/types/robotic-vacuum-cleaner/impl/LoggingRvcOperationalStateDelegate.h>
-#include <device/types/robotic-vacuum-cleaner/impl/LoggingRvcRunModeDelegate.h>
-#include <device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaDelegate.h>
 #include <device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaStorageDelegate.h>
-#include <optional>
-#include <string>
 
 namespace chip::app {
 
+// Generic RVC device: owns the mandatory clusters and wires them to whatever delegate
+// implementation is supplied. All device-specific simulation behavior lives in the delegate
+// implementation (see impl/SimulatedRoboticVacuumCleaner.h), not here.
 class RoboticVacuumCleaner : public SingleEndpoint
 {
 public:
-    RoboticVacuumCleaner();
+    struct Config
+    {
+        Clusters::OperationalState::OperationalStateCluster::Delegate & operationalStateDelegate;
+        Clusters::ServiceArea::Delegate & serviceAreaDelegate;
+        Clusters::ModeBase::AppDelegate & runModeDelegate;
+        Clusters::ModeBase::AppDelegate & cleanModeDelegate;
+    };
+
+    explicit RoboticVacuumCleaner(const Config & config);
     ~RoboticVacuumCleaner() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
@@ -44,22 +51,19 @@ public:
     Clusters::ServiceArea::ServiceAreaCluster & GetServiceAreaCluster() { return mServiceAreaCluster.Cluster(); }
     Clusters::ModeBaseCluster & RunMode() { return mRunModeCluster.Cluster(); }
     Clusters::ModeBaseCluster & CleanMode() { return mCleanModeCluster.Cluster(); }
-    Clusters::OperationalState::LoggingRvcOperationalStateDelegate & OperationalStateDelegate() { return mDelegate; }
 
 private:
-    Clusters::OperationalState::LoggingRvcOperationalStateDelegate mDelegate;
+    Clusters::OperationalState::OperationalStateCluster::Delegate & mOperationalStateDelegate;
     LazyRegisteredServerCluster<Clusters::RvcOperationalState::RvcOperationalStateCluster> mOperationalStateCluster;
 
     Clusters::ServiceArea::LoggingServiceAreaStorageDelegate mServiceAreaStorageDelegate;
-
-    // Constructed in Register() once their mandatory cluster dependencies exist.
-    std::optional<Clusters::ServiceArea::LoggingServiceAreaDelegate> mServiceAreaDelegate;
+    Clusters::ServiceArea::Delegate & mServiceAreaDelegate;
     LazyRegisteredServerCluster<Clusters::ServiceArea::ServiceAreaCluster> mServiceAreaCluster;
 
-    std::optional<Clusters::RvcRunMode::LoggingRvcRunModeDelegate> mRunModeDelegate;
+    Clusters::ModeBase::AppDelegate & mRunModeDelegate;
     LazyRegisteredServerCluster<Clusters::ModeBaseCluster> mRunModeCluster;
 
-    std::optional<Clusters::RvcCleanMode::LoggingRvcCleanModeDelegate> mCleanModeDelegate;
+    Clusters::ModeBase::AppDelegate & mCleanModeDelegate;
     LazyRegisteredServerCluster<Clusters::ModeBaseCluster> mCleanModeCluster;
 };
 

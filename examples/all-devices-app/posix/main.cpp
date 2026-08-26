@@ -64,7 +64,7 @@
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/types/occupancy-sensor/OccupancySensor.h>
 #include <device/types/on-off-light/impl/LoggingOnOffLight.h>
-#include <device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.h>
+#include <device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -291,7 +291,7 @@ void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipe
         }
         else if (config.type == "robotic-vacuum-cleaner")
         {
-            auto * rvcDevice = static_cast<RoboticVacuumCleaner *>(device);
+            auto * rvcDevice = static_cast<SimulatedRoboticVacuumCleaner *>(device);
             gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
                 .RegisterClusterInstance<chip::app::Clusters::RvcOperationalState::RvcOperationalStateCluster>(
                     &rvcDevice->OperationalState());

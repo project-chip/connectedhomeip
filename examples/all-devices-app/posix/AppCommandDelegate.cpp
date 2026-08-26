@@ -598,12 +598,12 @@ void AllDevicesAppCommandDelegate::RegisterCommandHandlers()
     RegisterRvcNamedPipeCommandHandlers(*this);
 }
 
-void AllDevicesAppCommandDelegate::RegisterRvcDevice(chip::EndpointId endpoint, chip::app::RoboticVacuumCleaner * device)
+void AllDevicesAppCommandDelegate::RegisterRvcDevice(chip::EndpointId endpoint, chip::app::SimulatedRoboticVacuumCleaner * device)
 {
     mRvcDevices[endpoint] = device;
 }
 
-chip::app::RoboticVacuumCleaner * AllDevicesAppCommandDelegate::GetRvcDeviceByEndpoint(chip::EndpointId endpoint)
+chip::app::SimulatedRoboticVacuumCleaner * AllDevicesAppCommandDelegate::GetRvcDeviceByEndpoint(chip::EndpointId endpoint)
 {
     auto it = mRvcDevices.find(endpoint);
     return (it != mRvcDevices.end()) ? it->second : nullptr;

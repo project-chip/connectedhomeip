@@ -22,6 +22,7 @@
 #include <device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.h>
 #include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationLogic.h>
 #include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationTopology.h>
+#include <device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -67,43 +68,41 @@ public:
             return;
         }
 
-        auto & opStateDelegate = rvcDevice->OperationalStateDelegate();
-
         if (mCommandName == "Reset")
         {
             HandleReset(*rvcDevice);
         }
         else if (mCommandName == "Charged")
         {
-            opStateDelegate.HandleCharged();
+            rvcDevice->HandleCharged();
         }
         else if (mCommandName == "Charging")
         {
-            opStateDelegate.HandleCharging();
+            rvcDevice->HandleCharging();
         }
         else if (mCommandName == "Docked")
         {
-            opStateDelegate.HandleDocked();
+            rvcDevice->HandleDocked();
         }
         else if (mCommandName == "ChargerFound")
         {
-            opStateDelegate.HandleChargerFound();
+            rvcDevice->HandleChargerFound();
         }
         else if (mCommandName == "LowCharge")
         {
-            opStateDelegate.HandleLowCharge();
+            rvcDevice->HandleLowCharge();
         }
         else if (mCommandName == "ActivityComplete")
         {
-            opStateDelegate.HandleActivityComplete();
+            rvcDevice->HandleActivityComplete();
         }
         else if (mCommandName == "AreaComplete")
         {
-            opStateDelegate.HandleAreaComplete();
+            rvcDevice->HandleAreaComplete();
         }
         else if (mCommandName == "ClearError")
         {
-            opStateDelegate.HandleClearError();
+            rvcDevice->HandleClearError();
         }
         else if (mCommandName == "EmptyingDustBin")
         {
@@ -129,7 +128,7 @@ public:
         {
             if (json.isMember("Error") && json["Error"].isString())
             {
-                opStateDelegate.HandleErrorEvent(json["Error"].asString());
+                rvcDevice->HandleErrorEvent(json["Error"].asString());
             }
         }
         else if (mCommandName == "AddMap")
