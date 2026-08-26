@@ -189,6 +189,13 @@
             "AccessControlEntriesPerFabric",
             "FeatureMap"
         ],
+        "Actions": [
+            "ActionList",
+            "EndpointLists",
+            { "name": "SetupURL", "keepDefault": true },
+            { "name": "FeatureMap", "keepDefault": true },
+            "ClusterRevision"
+        ],
         "Administrator Commissioning": [
             "ClusterRevision",
             "WindowStatus",
