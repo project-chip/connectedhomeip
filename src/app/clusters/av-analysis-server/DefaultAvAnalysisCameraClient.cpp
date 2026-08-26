@@ -101,10 +101,9 @@ CHIP_ERROR DefaultAvAnalysisCameraClient::StartRequest(PendingRequest aRequest, 
     VerifyOrReturnError(mCASESessionManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mPendingRequest == PendingRequest::kNone, CHIP_ERROR_BUSY);
 
-    mPendingRequest    = aRequest;
-    mPendingStreamId   = aAnalysisStreamId;
-    mPendingCallback   = &aCallback;
-    mResponseDelivered = false;
+    mPendingRequest  = aRequest;
+    mPendingStreamId = aAnalysisStreamId;
+    mPendingCallback = &aCallback;
 
     EstablishSession(aCameraNode);
     return CHIP_NO_ERROR;
@@ -416,6 +415,8 @@ CHIP_ERROR DefaultAvAnalysisCameraClient::SendPendingCommand(Messaging::Exchange
     mCommandSender = std::make_unique<CommandSender>(this, &aExchangeMgr);
     VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
+    mResponseDelivered = false;
+
     if (mPendingRequest == PendingRequest::kAllocate)
     {
         Commands::VideoStreamAllocate::Type request = BuildAllocateRequest(mProfile);
@@ -496,7 +497,7 @@ void DefaultAvAnalysisCameraClient::OnDone(CommandSender * apCommandSender)
 
 void DefaultAvAnalysisCameraClient::FinishRequest(Status aStatus, uint16_t aStreamId)
 {
-    VerifyOrReturn(!mResponseDelivered && mPendingCallback != nullptr);
+    VerifyOrReturn(mPendingCallback != nullptr);
     mResponseDelivered = true;
 
     PendingRequest completed                    = mPendingRequest;
