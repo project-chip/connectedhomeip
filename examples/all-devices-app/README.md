@@ -269,8 +269,8 @@ To build on Linux x86-64 run:
 
 To cross-compile for a Raspberry Pi (ARM64), build inside the cross-compile
 container, which supplies the aarch64 sysroot. The ARM and ARM64 boards accept
-`-clang` or `-nodeps` target variants; use `-clang`, since `-nodeps` disables BLE
-and so omits the proxy:
+`-clang` or `-nodeps` target variants; use `-clang`, since `-nodeps` disables
+BLE and so omits the proxy:
 
 ```bash
 # From the root of your checkout, on the host:
