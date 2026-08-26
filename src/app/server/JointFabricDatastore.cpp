@@ -785,7 +785,10 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
 
         if (mRefreshingNodeKeySetDeletionIndex < mRefreshingNodeKeySetDeletions.size())
         {
-            const auto [nodeIdToErase, groupKeySetIdToErase] = mRefreshingNodeKeySetDeletions[mRefreshingNodeKeySetDeletionIndex];
+            // Structured bindings cannot be captured by lambdas prior to C++20.
+            const auto & nodeKeySetDeletion = mRefreshingNodeKeySetDeletions[mRefreshingNodeKeySetDeletionIndex];
+            NodeId nodeIdToErase            = nodeKeySetDeletion.first;
+            uint16_t groupKeySetIdToErase   = nodeKeySetDeletion.second;
             Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type nullEntry{ 0 };
             CHIP_ERROR syncErr =
                 mDelegate->SyncNode(nodeIdToErase, nullEntry, [this, nodeIdToErase, groupKeySetIdToErase](CHIP_ERROR innerErr) {
@@ -810,8 +813,10 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                 ChipLogError(AppServer,
                              "Failed deleting group key set during refresh for node 0x" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
                              ChipLogValueX64(mRefreshingNodeId), syncErr.Format());
-                mRefreshingNodeId = kUndefinedNodeId;
-                mRefreshState     = kIdle;
+                mRefreshingNodeKeySetDeletions.clear();
+                mRefreshingNodeKeySetDeletionIndex = 0;
+                mRefreshingNodeId                  = kUndefinedNodeId;
+                mRefreshState                      = kIdle;
                 return syncErr;
             }
 
@@ -852,8 +857,10 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                                      "Failed syncing group key set during refresh for node 0x" ChipLogFormatX64
                                      ": %" CHIP_ERROR_FORMAT,
                                      ChipLogValueX64(mRefreshingNodeId), syncErr.Format());
-                        mRefreshingNodeId = kUndefinedNodeId;
-                        mRefreshState     = kIdle;
+                        mRefreshingNodeKeySetDeletions.clear();
+                        mRefreshingNodeKeySetDeletionIndex = 0;
+                        mRefreshingNodeId                  = kUndefinedNodeId;
+                        mRefreshState                      = kIdle;
                         return syncErr;
                     }
                     ++nkIt;
@@ -889,8 +896,10 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                                          "Failed retrying group key set during refresh for node 0x" ChipLogFormatX64
                                          ": %" CHIP_ERROR_FORMAT,
                                          ChipLogValueX64(mRefreshingNodeId), syncErr.Format());
-                            mRefreshingNodeId = kUndefinedNodeId;
-                            mRefreshState     = kIdle;
+                            mRefreshingNodeKeySetDeletions.clear();
+                            mRefreshingNodeKeySetDeletionIndex = 0;
+                            mRefreshingNodeId                  = kUndefinedNodeId;
+                            mRefreshState                      = kIdle;
                             return syncErr;
                         }
                         ++nkIt;
