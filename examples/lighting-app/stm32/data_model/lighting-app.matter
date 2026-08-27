@@ -2329,12 +2329,12 @@ endpoint 0 {
   }
 
   server cluster LocalizationConfiguration {
-    persist  attribute activeLocale default = "en-US";
+    callback attribute activeLocale default = "en-US";
     callback attribute supportedLocales;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
   }
 

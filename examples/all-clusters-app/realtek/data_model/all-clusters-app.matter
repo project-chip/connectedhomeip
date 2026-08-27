@@ -7993,7 +7993,7 @@ endpoint 0 {
   }
 
   server cluster LocalizationConfiguration {
-    ram      attribute activeLocale default = "en-US";
+    callback attribute activeLocale default = "en-US";
     callback attribute supportedLocales;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -8479,8 +8479,8 @@ endpoint 1 {
     callback attribute actionList;
     callback attribute endpointLists;
     callback attribute setupURL;
-    ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute featureMap default = 0;
+    callback attribute clusterRevision;
   }
 
   server cluster PowerSource {
@@ -8657,13 +8657,13 @@ endpoint 1 {
 
   server cluster RefrigeratorAlarm {
     emits event Notify;
-    ram      attribute mask default = 1;
-    ram      attribute state default = 0;
-    ram      attribute supported default = 1;
+    callback attribute mask default = 1;
+    callback attribute state default = 0;
+    callback attribute supported default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
   }
 
@@ -8700,36 +8700,36 @@ endpoint 1 {
     emits event InterconnectSmokeAlarm;
     emits event InterconnectCOAlarm;
     emits event AllClear;
-    persist  attribute expressedState default = 0;
-    persist  attribute smokeState default = 0;
-    persist  attribute COState default = 0;
-    persist  attribute batteryAlert default = 0;
-    persist  attribute deviceMuted default = 0;
-    ram      attribute testInProgress default = 0;
-    persist  attribute hardwareFaultAlert default = 0;
-    persist  attribute endOfServiceAlert default = 0;
-    ram      attribute interconnectSmokeAlarm default = 0;
-    ram      attribute interconnectCOAlarm default = 0;
-    ram      attribute contaminationState default = 0;
-    ram      attribute smokeSensitivityLevel default = 1;
-    ram      attribute expiryDate default = 0;
-    ram      attribute unmounted default = 0;
-    ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 0x0002;
+    callback attribute expressedState;
+    callback attribute smokeState;
+    callback attribute COState;
+    callback attribute batteryAlert;
+    callback attribute deviceMuted;
+    callback attribute testInProgress default = 0;
+    callback attribute hardwareFaultAlert;
+    callback attribute endOfServiceAlert;
+    callback attribute interconnectSmokeAlarm default = 0;
+    callback attribute interconnectCOAlarm default = 0;
+    callback attribute contaminationState default = 0;
+    callback attribute smokeSensitivityLevel default = 1;
+    callback attribute expiryDate default = 0;
+    callback attribute unmounted default = 0;
+    callback attribute featureMap default = 3;
+    callback attribute clusterRevision;
 
     handle command SelfTestRequest;
   }
 
   server cluster DishwasherAlarm {
     emits event Notify;
-    ram      attribute mask default = 1;
-    ram      attribute latch default = 1;
-    ram      attribute state default = 0;
-    ram      attribute supported default = 15;
+    callback attribute mask default = 1;
+    callback attribute latch default = 1;
+    callback attribute state default = 0;
+    callback attribute supported default = 15;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
+    callback attribute featureMap default = 1;
     callback attribute clusterRevision;
 
     handle command Reset;

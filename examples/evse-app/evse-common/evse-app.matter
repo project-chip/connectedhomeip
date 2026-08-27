@@ -2678,12 +2678,12 @@ endpoint 0 {
   }
 
   server cluster LocalizationConfiguration {
-    ram      attribute activeLocale;
+    callback attribute activeLocale;
     callback attribute supportedLocales;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
   }
 
