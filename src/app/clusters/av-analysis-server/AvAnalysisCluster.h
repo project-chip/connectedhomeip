@@ -78,6 +78,8 @@ public:
      */
 
     /**
+     * The delegate realizing this method needs to ensure that, 1) the Zone ID is known, and 2) the zone is NOT a privacy zone.
+     * 
      * @param  aZoneIDs  the set of ZoneIDs to be validated against what is defined in the Zone Management Cluster instance
      */
     virtual CHIP_ERROR VerifyZoneIDsAreValid(const std::vector<uint16_t> & aZoneIDs) = 0;

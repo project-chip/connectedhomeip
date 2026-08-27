@@ -46,6 +46,7 @@ using namespace chip::app::Clusters::CameraAvStreamManagement;
 using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
 using namespace chip::app::Clusters::ZoneManagement;
+using namespace chip::app::Clusters::AvAnalysis;
 
 using namespace Camera;
 
@@ -500,6 +501,7 @@ CameraDevice::CameraDevice()
     mZoneManager.SetCameraDevice(this);
     mPushAVTransportManager.SetCameraDevice(this);
     mMediaController.SetCameraDevice(this);
+    mAVAnalysisManager.SetCameraDevice(this);
 }
 
 CameraDevice::~CameraDevice()
@@ -1844,6 +1846,11 @@ CameraError CameraDevice::RemoveZoneTrigger(const uint16_t zoneId)
 {
 
     return CameraError::SUCCESS;
+}
+
+bool CameraDevice::HasZone(const uint16_t zoneId)
+{
+    return mZoneManager.HasZone(zoneId);
 }
 
 void CameraDevice::HandleSimulatedZoneTriggeredEvent(const std::vector<uint16_t> & zoneIds)

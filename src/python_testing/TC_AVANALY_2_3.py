@@ -95,44 +95,10 @@ class TC_AVANALY_2_3(MatterBaseTest, AVANALYTestBase):
         self.step(2)
         supported_ambient_contexts_dut = await self.read_avanaly_attribute_expect_success(endpoint, attributes.SupportedAmbientContexts)
 
-        zones = []
         zoneIDs = []
         if self.has_feature_perzonedetect:
             self.step(3)
-            # pull zone ids from Zone Management, if none, try to create 
-            clusterZM = Clusters.Objects.ZoneManagement
-            attributesZM = clusterZM.Attributes         
-            aFeatureMapZM = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=clusterZM, attribute=attributesZM.FeatureMap)
-            twoDCartSupported = aFeatureMapZM & clusterZM.Bitmaps.Feature.kTwoDimensionalCartesianZone
-            userDefinedSupported = aFeatureMapZM & clusterZM.Bitmaps.Feature.kUserDefined
-            
-            zones = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=clusterZM, attribute=attributesZM.Zones)
-            
-            if len(zones) >= 1:
-                for zone in zones:
-                    zoneIDs.append(zone.zoneID)
-            else:
-                # None on the DUT, create one, but only if possible
-                if twoDCartSupported and userDefinedSupported:
-                    # Form the Create request and send
-                    zoneVertices = [
-                        clusterZM.Structs.TwoDCartesianVertexStruct(10, 10),
-                        clusterZM.Structs.TwoDCartesianVertexStruct(20, 10),
-                        clusterZM.Structs.TwoDCartesianVertexStruct(20, 20),
-                        clusterZM.Structs.TwoDCartesianVertexStruct(10, 20)
-                    ]
-                    zoneToCreate = clusterZM.Structs.TwoDCartesianZoneStruct(
-                        name="Zone1", use=clusterZM.Enums.ZoneUseEnum.kMotion, vertices=zoneVertices,
-                        color="#00FFFF")
-                    createTwoDCartesianCmd = clusterZM.Commands.CreateTwoDCartesianZone(
-                        zone=zoneToCreate
-                    )
-                    cmdResponse = await self.send_single_cmd(endpoint=endpoint, cmd=createTwoDCartesianCmd)
-                    asserts.assert_equal(type(cmdResponse), clusterZM.Commands.CreateTwoDCartesianZoneResponse,
-                                         "Incorrect response type")
-                    asserts.assert_is_not_none(
-                        cmdResponse.zoneID, "CreateTwoDCartesianCmdResponse does not contain ZoneID")
-                    zoneIDs.append(cmdResponse.zoneID)
+            zoneIDs = await self.get_zoneids_from_zone_management(endpoint)
         else:
             self.skip_step(3)        
         
@@ -156,7 +122,7 @@ class TC_AVANALY_2_3(MatterBaseTest, AVANALYTestBase):
             invalid_zone_context_trigger = structs.ContextTriggerStruct(context = supported_ambient_contexts_dut[0], zoneIDs = [zoneIDs[-1] + 1])
             invalid_zone_context_triggers.append(invalid_zone_context_trigger)
             
-            await self.send_enable_context_triggers_command(endpoint, invalid_zone_context_triggers)       
+            await self.send_enable_context_triggers_command(endpoint, invalid_zone_context_triggers, expected_status = Status.NotFound)       
         
         self.step(6)
         # Send an enable with the first from the set of available triggers

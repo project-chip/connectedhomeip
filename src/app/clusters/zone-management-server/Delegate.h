@@ -107,6 +107,8 @@ public:
      */
     virtual Protocols::InteractionModel::Status RemoveTrigger(uint16_t zoneID) = 0;
 
+    virtual bool HasZone(const uint16_t zoneId) = 0;
+    
     /**
      *   @brief Delegate callback for notifying change in an attribute.
      *

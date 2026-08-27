@@ -55,6 +55,8 @@ public:
     Protocols::InteractionModel::Status UpdateTrigger(const ZoneTriggerControlStruct & zoneTrigger) override;
 
     Protocols::InteractionModel::Status RemoveTrigger(uint16_t zoneID) override;
+    
+    bool HasZone(uint16_t zoneId) override;
 
     void OnAttributeChanged(AttributeId attributeId) override;
 

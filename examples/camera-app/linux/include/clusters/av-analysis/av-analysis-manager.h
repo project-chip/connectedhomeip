@@ -18,6 +18,7 @@
 
 #pragma once
 #include <app/clusters/av-analysis-server/AvAnalysisCluster.h>
+#include "camera-device-interface.h"
 
 namespace chip {
 namespace app {
@@ -69,7 +70,13 @@ public:
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
+    /**
+     * Camera App interface
+     */
+    void SetCameraDevice(CameraDeviceInterface * aCameraDevice);
+
 private:
+    CameraDeviceInterface * mCameraDevice = nullptr;
 };
 
 } // namespace AvAnalysis
