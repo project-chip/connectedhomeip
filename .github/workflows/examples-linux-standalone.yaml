@@ -64,6 +64,7 @@ jobs:
               uses: actions/upload-artifact@v7
               with:
                 name: chip-tools-linux-x64
+                retention-days: 7
                 path: |
                   out/linux-x64-chip-cert/chip-cert
                   out/linux-x64-chip-tool/chip-tool
