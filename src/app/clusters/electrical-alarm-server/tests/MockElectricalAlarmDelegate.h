@@ -28,14 +28,14 @@ class MockElectricalAlarmDelegate : public Delegate
 {
 public:
     // Configurable reject flags — set to false to simulate a delegate rejection.
-    bool allowModifyEnabledAlarms    = true;
-    bool allowReset                  = true;
-    bool allowSetThresholds          = true;
+    bool allowModifyEnabledAlarms = true;
+    bool allowReset               = true;
+    bool allowSetThresholds       = true;
 
     // Call counts for assertion in tests.
-    int modifyEnabledAlarmsCallCount    = 0;
-    int resetAlarmsCallCount            = 0;
-    int setThresholdsCallCount          = 0;
+    int modifyEnabledAlarmsCallCount = 0;
+    int resetAlarmsCallCount         = 0;
+    int setThresholdsCallCount       = 0;
 
     bool ModifyEnabledAlarmsCallback(const BitMask<AlarmBitmap> mask) override
     {
@@ -49,8 +49,7 @@ public:
         return allowReset;
     }
 
-    bool SetElectricalAlarmThresholdsCallback(
-        const Commands::SetElectricalAlarmThresholds::DecodableType & commandData) override
+    bool SetElectricalAlarmThresholdsCallback(const Commands::SetElectricalAlarmThresholds::DecodableType & commandData) override
     {
         ++setThresholdsCallCount;
         return allowSetThresholds;

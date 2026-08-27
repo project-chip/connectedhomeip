@@ -49,13 +49,13 @@ CHIP_ERROR ElectricalAlarmCluster::Startup(ServerClusterContext & context)
     // ADJUST feature is only meaningful when at least one alarm-class feature is present.
     if (mFeatureFlags.Has(Feature::kAdjustableThresholds))
     {
-        const bool hasAlarmClass = mFeatureFlags.HasAny(Feature::kOverVoltage, Feature::kUnderVoltage, Feature::kOverFrequency,
-                                                        Feature::kUnderFrequency, Feature::kOverPower, Feature::kUnderPower,
-                                                        Feature::kOverCurrent, Feature::kUnderCurrent, Feature::kPowerImport,
-                                                        Feature::kPowerExport);
+        const bool hasAlarmClass = mFeatureFlags.HasAny(
+            Feature::kOverVoltage, Feature::kUnderVoltage, Feature::kOverFrequency, Feature::kUnderFrequency, Feature::kOverPower,
+            Feature::kUnderPower, Feature::kOverCurrent, Feature::kUnderCurrent, Feature::kPowerImport, Feature::kPowerExport);
         VerifyOrReturnError(hasAlarmClass, CHIP_ERROR_INCORRECT_STATE,
-                            ChipLogError(Zcl, "ElectricalAlarm: AdjustableThresholds feature requires at least one alarm-class "
-                                              "feature to be enabled"));
+                            ChipLogError(Zcl,
+                                         "ElectricalAlarm: AdjustableThresholds feature requires at least one alarm-class "
+                                         "feature to be enabled"));
     }
     return DefaultServerCluster::Startup(context);
 }
@@ -470,8 +470,8 @@ Status ElectricalAlarmCluster::HandleSetThresholds(const Commands::SetElectrical
     // strictOver=true:  over must be strictly > under (voltage, frequency, power, current pairs).
     // strictOver=false: over must be >= under (import/export — both may be 0 simultaneously, since
     //                   import=0 and export=0 is a valid quiescent state per attribute constraints).
-    auto checkPair = [&](const Optional<int64_t> & over, const Optional<int64_t> & under, int64_t storedOver,
-                         bool storedOverSet, int64_t storedUnder, bool storedUnderSet, bool strictOver = true) -> Status {
+    auto checkPair = [&](const Optional<int64_t> & over, const Optional<int64_t> & under, int64_t storedOver, bool storedOverSet,
+                         int64_t storedUnder, bool storedUnderSet, bool strictOver = true) -> Status {
         if (!over.HasValue() && !under.HasValue())
         {
             return Status::Success;
@@ -489,8 +489,8 @@ Status ElectricalAlarmCluster::HandleSetThresholds(const Commands::SetElectrical
     };
 
     Status s;
-    if ((s = checkPair(data.overVoltageThreshold, data.underVoltageThreshold, mOverVoltageThreshold,
-                       mOverVoltageThresholdSet, mUnderVoltageThreshold, mUnderVoltageThresholdSet)) != Status::Success)
+    if ((s = checkPair(data.overVoltageThreshold, data.underVoltageThreshold, mOverVoltageThreshold, mOverVoltageThresholdSet,
+                       mUnderVoltageThreshold, mUnderVoltageThresholdSet)) != Status::Success)
     {
         return s;
     }

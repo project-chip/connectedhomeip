@@ -58,8 +58,10 @@ public:
      *   Default implementation approves all threshold changes; override to add
      *   device-specific validation or to write values to hardware.
      */
-    virtual bool SetElectricalAlarmThresholdsCallback(
-        const Commands::SetElectricalAlarmThresholds::DecodableType & commandData) { return true; }
+    virtual bool SetElectricalAlarmThresholdsCallback(const Commands::SetElectricalAlarmThresholds::DecodableType & commandData)
+    {
+        return true;
+    }
 
     Delegate(EndpointId endpoint) : mEndpoint(endpoint) {}
 
