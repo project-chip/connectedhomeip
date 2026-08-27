@@ -47,7 +47,13 @@ AvAnalysisServerLogic::AvAnalysisServerLogic(
     mMaxZones(aMaxZones)
 {}
 
-AvAnalysisServerLogic::~AvAnalysisServerLogic() {}
+AvAnalysisServerLogic::~AvAnalysisServerLogic()
+{
+    if (mCameraClient != nullptr && mCameraInteraction.InFlight())
+    {
+        mCameraClient->Cancel();
+    }
+}
 
 CHIP_ERROR AvAnalysisServerLogic::Startup(AttributePersistenceProvider & aAttributePersistenceProvider)
 {
@@ -195,7 +201,7 @@ void AvAnalysisServerLogic::OnVideoStreamDeallocated(Status aStatus, uint16_t aV
     }
 
     VerifyOrReturn(handler != nullptr);
-    handler->AddStatus(commandPath, Status::Success);
+    handler->AddStatus(commandPath, aStatus);
 }
 
 CHIP_ERROR
@@ -290,6 +296,8 @@ CHIP_ERROR AvAnalysisServerLogic::ReadAndEncodeAnalysisStreams(AttributeValueEnc
 // Attribute mutators
 CHIP_ERROR AvAnalysisServerLogic::SetTrackingEnabled(bool aTrackingEnabled)
 {
+    VerifyOrReturnValue(mTrackingEnabled != aTrackingEnabled, CHIP_NO_ERROR);
+
     mTrackingEnabled = aTrackingEnabled;
     MarkDirty(AvAnalysis::Attributes::TrackingEnabled::Id);
     LogErrorOnFailure(StoreTrackingEnabled());

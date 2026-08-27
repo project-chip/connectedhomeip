@@ -257,15 +257,18 @@ private:
         uint16_t id;
         do
         {
-            id = mNextAnalysisStreamId++;
+            id                    = mNextAnalysisStreamId;
+            mNextAnalysisStreamId = (id >= kMaxAnalysisStreamId) ? 0 : static_cast<uint16_t>(id + 1);
         } while (Find(id) != nullptr);
         return id;
     }
 
+    static constexpr uint16_t kMaxAnalysisStreamId = 65534;
+
     Platform::ScopedMemoryBuffer<AnalysisStreamEntry> mEntries;
     uint8_t mCapacity              = 0;
     uint8_t mCount                 = 0;
-    uint16_t mNextAnalysisStreamId = 1;
+    uint16_t mNextAnalysisStreamId = 0;
 };
 
 } // namespace AvAnalysis
