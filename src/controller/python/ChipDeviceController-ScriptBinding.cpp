@@ -256,7 +256,13 @@ public:
         {
             auto * proxyTransport = GetDeviceProxyTransport(mDevCtrl->GetTransportMgr());
             VerifyOrReturn(proxyTransport != nullptr);
-            proxyTransport->OnProxyMessageReceived(response.sessionID, response.message.Value());
+            CHIP_ERROR injectErr = proxyTransport->OnProxyMessageReceived(response.sessionID, response.message.Value());
+            if (injectErr != CHIP_NO_ERROR)
+            {
+                ChipLogError(Controller, "CommissionViaProxy: failed to inject proxied message: %" CHIP_ERROR_FORMAT,
+                             injectErr.Format());
+                DeactivateProxyTransport();
+            }
         }
     }
 

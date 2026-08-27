@@ -232,7 +232,7 @@ TEST_F(TestProxyTransport, SendMessageRejectedAfterDeactivate)
 TEST_F(TestProxyTransport, ReceivedMessageIsInjectedIntoTheStack)
 {
     ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
-    mTransport.OnProxyMessageReceived(kSessionId, ByteSpan(kPayload));
+    EXPECT_EQ(mTransport.OnProxyMessageReceived(kSessionId, ByteSpan(kPayload)), CHIP_NO_ERROR);
 
     EXPECT_EQ(mRawDelegate.mCallCount, 1u);
     EXPECT_EQ(mRawDelegate.mLastLength, sizeof(kPayload));
@@ -242,14 +242,24 @@ TEST_F(TestProxyTransport, ReceivedMessageIsInjectedIntoTheStack)
 TEST_F(TestProxyTransport, ReceivedMessageForOtherSessionIsDropped)
 {
     ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
-    mTransport.OnProxyMessageReceived(kOtherSessionId, ByteSpan(kPayload));
+    EXPECT_EQ(mTransport.OnProxyMessageReceived(kOtherSessionId, ByteSpan(kPayload)), CHIP_ERROR_INCORRECT_STATE);
 
     EXPECT_EQ(mRawDelegate.mCallCount, 0u);
 }
 
 TEST_F(TestProxyTransport, ReceivedMessageWhileInactiveIsDropped)
 {
-    mTransport.OnProxyMessageReceived(kSessionId, ByteSpan(kPayload));
+    EXPECT_EQ(mTransport.OnProxyMessageReceived(kSessionId, ByteSpan(kPayload)), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(mRawDelegate.mCallCount, 0u);
+}
+
+// A null Message means "nothing queued" and is handled by the caller; a present but
+// empty one is malformed and must not reach NewWithData(), which would memcpy()
+// from the span's null data pointer.
+TEST_F(TestProxyTransport, ReceivedEmptyMessageIsRejected)
+{
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
+    EXPECT_EQ(mTransport.OnProxyMessageReceived(kSessionId, ByteSpan()), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_EQ(mRawDelegate.mCallCount, 0u);
 }
 
