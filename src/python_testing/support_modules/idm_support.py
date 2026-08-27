@@ -48,6 +48,33 @@ from matter.tlv import uint
 log = logging.getLogger(__name__)
 
 
+# BasicInformation.SpecificationVersion value for Matter 1.7, encoded as 0xMMNNPP00.
+# Matter 1.7 is the first release that requires a DUT to reject every constraint
+# violation; earlier releases are held to the weaker bar described in
+# IDMBaseTest.enforces_constraints_strictly.
+SPEC_VERSION_1_7 = 0x01070000
+
+
+@dataclass
+class ConstraintProbeResult:
+    """Tallies how the DUT answered each violating value probed for one field or attribute.
+
+    A result with `probed == 0` means nothing could be exercised: no violation could
+    be synthesized, or the preconditions for an unambiguous answer were not met.
+    """
+    # Answered with CONSTRAINT_ERROR: the constraint is enforced.
+    rejected: int = 0
+    # Took the violating value: the constraint is not enforced.
+    accepted: int = 0
+    # Rejected with some other status, so enforcement is neither proven nor disproven.
+    other_error: int = 0
+
+    @property
+    def probed(self) -> int:
+        """Number of violating values the DUT actually answered."""
+        return self.rejected + self.accepted + self.other_error
+
+
 @dataclass
 class WritableAttributeInfo:
     """Describes a single writable attribute discovered on the DUT.
@@ -666,8 +693,71 @@ class IDMBaseTest(BasicCompositionTests):
 
         return None
 
-    async def check_attribute_constraint(self, attr_info: WritableAttributeInfo, constraints: Constraints) -> bool:
-        """Test a single attribute's constraint. Returns True if test passed, False otherwise."""
+    # ========================================================================
+    # Constraint Enforcement Policy
+    # ========================================================================
+
+    def dut_spec_version(self) -> int:
+        """Return BasicInformation.SpecificationVersion, or 0 if the DUT does not expose it.
+
+        Taken from the wildcard composition already read during setup rather than
+        with a fresh read. The attribute was added in Matter 1.3, so devices older
+        than that omit it; 0 sorts below every real version and therefore places
+        them on the pre-1.7 path.
+        """
+        root_node = self.endpoints_tlv.get(self.ROOT_NODE_ENDPOINT_ID, {})
+        basic_information = root_node.get(Clusters.BasicInformation.id, {})
+        return basic_information.get(Clusters.BasicInformation.Attributes.SpecificationVersion.attribute_id, 0)
+
+    def enforces_constraints_strictly(self) -> bool:
+        """Whether the DUT must reject every constraint violation it is sent.
+
+        Matter 1.7 onward requires constraint violations to be rejected on every
+        command field and writable attribute, so a DUT that accepts one fails.
+        Earlier releases were only ever verified by hand against a manually chosen
+        command or attribute, so holding them to the full automated sweep would fail
+        devices that were certified as conformant. Those are held to the weaker bar
+        instead: accepted violations are reported as warnings, and the DUT need only
+        demonstrate CONSTRAINT_ERROR enforcement at least once.
+        """
+        return self.dut_spec_version() >= SPEC_VERSION_1_7
+
+    def enforce_constraint_policy(self, subject: str, accepted_paths: list[str], rejected_count: int,
+                                  probed_count: int) -> None:
+        """Fail or pass one step according to the DUT's era. See enforces_constraints_strictly.
+
+        Args:
+            subject: What was probed, for the failure message (e.g. "Command field").
+            accepted_paths: Paths whose violating values the DUT accepted.
+            rejected_count: Violating values the DUT answered with CONSTRAINT_ERROR.
+            probed_count: Violating values the DUT answered at all. Zero means nothing
+                could be exercised, so no conclusion is drawn either way.
+        """
+        if self.enforces_constraints_strictly():
+            if accepted_paths:
+                asserts.fail(f"{subject} constraints not enforced: {', '.join(accepted_paths)}")
+            return
+
+        if accepted_paths:
+            log.warning("DUT predates Matter 1.7 (SpecificationVersion 0x%08X); accepted violating values for "
+                        "%d path(s) reported as warnings: %s", self.dut_spec_version(), len(accepted_paths),
+                        ', '.join(accepted_paths))
+        if probed_count > 0:
+            asserts.assert_greater(
+                rejected_count, 0,
+                f"DUT never returned CONSTRAINT_ERROR for any of the {probed_count} violating "
+                f"value(s) sent, so it has not demonstrated constraint enforcement at all")
+
+    async def check_attribute_constraint(self, attr_info: WritableAttributeInfo,
+                                         constraints: Constraints) -> ConstraintProbeResult:
+        """Write one out-of-bounds value to an attribute and classify the DUT's answer.
+
+        Records a warning for every violation the DUT did not answer with
+        CONSTRAINT_ERROR so the report enumerates them in both eras, and restores the
+        attribute's original value if the DUT stored the violating one. Deciding
+        whether an accepted violation fails the test is left to the caller, which
+        applies enforces_constraints_strictly.
+        """
         # Resolve dynamic constraints if present
         if constraints.min_value_ref or constraints.max_value_ref or constraints.min_count_ref or constraints.max_count_ref:
             cluster_class = attr_info.cluster_class
@@ -695,7 +785,7 @@ class IDMBaseTest(BasicCompositionTests):
         # Generate constraint violation
         test_value = self.generate_constraint_violation(attr_info, constraints)
         if test_value is None:
-            return None  # Unsupported constraint type
+            return ConstraintProbeResult()  # Unsupported constraint type
 
         # Read original value
         original_value = await self.read_single_attribute_check_success(
@@ -712,48 +802,65 @@ class IDMBaseTest(BasicCompositionTests):
         )
         result_status = write_result[0].Status
 
-        if result_status == Status.ConstraintError:
-            # Verify value wasn't set to the violating value
-            new_value = await self.read_single_attribute_check_success(
-                endpoint=attr_info.endpoint_id,
-                cluster=attr_info.cluster_class,
-                attribute=attr_info.attribute
-            )
+        attribute_path = f"{attr_info.cluster_name}.{attr_info.attribute_name}"
+        location = AttributePathLocation(endpoint_id=attr_info.endpoint_id, cluster_id=attr_info.cluster_id,
+                                         attribute_id=attr_info.attribute_id)
 
-            if new_value == test_value:
-                log.error("FAIL: %s.%s was set to invalid value %s despite CONSTRAINT_ERROR", attr_info.cluster_name,
-                          attr_info.attribute_name, test_value)
-                return False
-
-            log.info("PASS: %s.%s constraint properly enforced (original=%s, rejected=%s)", attr_info.cluster_name,
-                     attr_info.attribute_name, original_value, test_value)
-            return True
-
-        # The DUT did not reject the write. Read back to distinguish a DUT that stored the
-        # out-of-bounds value (and is now holding an illegal one) from one that accepted
-        # the write but ignored or clamped it - both violate the spec, but only the former
-        # leaves the DUT in an illegal state for the remaining steps. Restore the original
-        # value either way so later steps see the device as we found it.
+        # Read back to distinguish a DUT that stored the out-of-bounds value (and is now
+        # holding an illegal one) from one that ignored or clamped the write. Restore the
+        # original value whenever it changed so later probes see the device as we found it;
+        # an accepted violation no longer ends the test, so an illegal value left in place
+        # would corrupt every subsequent check.
         stored_value = await self.read_single_attribute_check_success(
             endpoint=attr_info.endpoint_id,
             cluster=attr_info.cluster_class,
             attribute=attr_info.attribute
         )
-        # Status is an IntEnum, which formats as a bare number under Python 3.11; log the
-        # name alongside it so the failure reads as SUCCESS rather than as "got 0".
-        log.error("FAIL: %s.%s got %s (%s) instead of CONSTRAINT_ERROR for value %s; attribute now reads %s",
-                  attr_info.cluster_name, attr_info.attribute_name, getattr(result_status, 'name', result_status),
-                  int(result_status), test_value, stored_value)
-
         if stored_value != original_value:
             restore_result = await self.default_controller.WriteAttribute(
                 nodeId=self.dut_node_id,
                 attributes=[(attr_info.endpoint_id, attr_info.attribute(original_value))]
             )
             if restore_result[0].Status != Status.Success:
-                log.warning("Failed to restore %s.%s to %s: %s", attr_info.cluster_name, attr_info.attribute_name,
-                            original_value, restore_result[0].Status)
-        return False
+                log.warning("Failed to restore %s to %s: %s", attribute_path, original_value,
+                            restore_result[0].Status)
+
+        if result_status == Status.ConstraintError:
+            if stored_value != test_value:
+                log.info("PASS: %s constraint properly enforced (original=%s, rejected=%s)", attribute_path,
+                         original_value, test_value)
+                return ConstraintProbeResult(rejected=1)
+
+            # The DUT reported the write as rejected but stored the violating value anyway,
+            # so the constraint was not enforced regardless of the status it returned.
+            self.record_warning(
+                test_name=self.current_test_info.name,
+                location=location,
+                problem=(f"{attribute_path} was set to out-of-bounds value {test_value} "
+                         f"despite returning CONSTRAINT_ERROR"))
+            return ConstraintProbeResult(accepted=1)
+
+        # Status is an IntEnum, which formats as a bare number under Python 3.11; log the
+        # name alongside it so the result reads as SUCCESS rather than as "got 0".
+        status_name = getattr(result_status, 'name', result_status)
+
+        if result_status != Status.Success:
+            # Rejected, but not with CONSTRAINT_ERROR. The write never took effect, so the
+            # attribute's constraint is neither proven nor disproven by this probe.
+            self.record_warning(
+                test_name=self.current_test_info.name,
+                location=location,
+                problem=(f"{attribute_path} rejected out-of-bounds value {test_value} with "
+                         f"{status_name} instead of CONSTRAINT_ERROR"))
+            return ConstraintProbeResult(other_error=1)
+
+        log.warning("%s got %s (%s) instead of CONSTRAINT_ERROR for value %s; attribute now reads %s",
+                    attribute_path, status_name, int(result_status), test_value, stored_value)
+        self.record_warning(
+            test_name=self.current_test_info.name,
+            location=location,
+            problem=f"{attribute_path} accepted out-of-bounds value {test_value}")
+        return ConstraintProbeResult(accepted=1)
 
     # Command Constraint Testing (TC-IDM-9.1 step 1)
 
@@ -932,26 +1039,29 @@ class IDMBaseTest(BasicCompositionTests):
                 return constraints.max_value
         return None
 
-    async def check_command_constraint(self, info: CommandFieldInfo) -> bool | None:
-        """Test a single command field's constraints by sending violating payloads.
+    async def check_command_constraint(self, info: CommandFieldInfo) -> ConstraintProbeResult:
+        """Invoke a command with violating values for one field and classify each answer.
 
-        Sends one Invoke per violated bound, with all sibling fields set to
-        in-range values, and expects CONSTRAINT_ERROR for each. Returns True if
-        every generated violation was properly rejected, False if any was not,
-        and None if the field could not be tested: no violation could be generated
-        for it, or a constrained required sibling could not be given a valid value
-        (which would make a CONSTRAINT_ERROR ambiguous).
+        Sends one Invoke per violated bound, with all sibling fields set to in-range
+        values so a CONSTRAINT_ERROR can only be attributed to the field under test.
+        Records a warning for every violation the DUT did not answer with
+        CONSTRAINT_ERROR so the report enumerates them in both eras; deciding whether
+        an accepted violation fails the test is left to the caller, which applies
+        enforces_constraints_strictly. A result with `probed == 0` means the field
+        could not be tested: no violation could be generated for it, or a constrained
+        required sibling could not be given a valid value (which would make a
+        CONSTRAINT_ERROR ambiguous).
         """
         target_label = self._command_field_label(info.command_class, info.field.value)
         if target_label is None:
             log.warning("Skipping %s: field id %s not present in generated command class",
                         info.path_str, info.field.value)
-            return None
+            return ConstraintProbeResult()
 
         constraints = await self._resolved_command_field_constraints(info)
         violations = self.generate_command_field_violations(info.field, constraints)
         if not violations:
-            return None
+            return ConstraintProbeResult()
 
         # Build valid values for the other fields so a CONSTRAINT_ERROR can only be
         # attributed to the field under test. Optional siblings are left unset.
@@ -972,12 +1082,14 @@ class IDMBaseTest(BasicCompositionTests):
                 if sibling.constraints is not None and sibling.constraints.has_constraints():
                     log.warning("Skipping %s: cannot generate a valid value for constrained "
                                 "required field %s", info.path_str, sibling_label)
-                    return None
+                    return ConstraintProbeResult()
                 continue
             base_kwargs[sibling_label] = valid_value
 
         timed_request_timeout_ms = 65535 if info.command_class.must_use_timed_invoke else None
-        all_enforced = True
+        location = CommandPathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
+                                       command_id=info.command_id)
+        result = ConstraintProbeResult()
         for description, bad_value in violations:
             command = info.command_class(**base_kwargs, **{target_label: bad_value})
             try:
@@ -987,17 +1099,17 @@ class IDMBaseTest(BasicCompositionTests):
             except InteractionModelError as e:
                 if e.status == Status.ConstraintError:
                     log.info("PASS: %s properly rejected %s", info.path_str, description)
-                elif e.status == Status.Success:
-                    log.error("FAIL: %s returned %s instead of CONSTRAINT_ERROR for %s",
-                              info.path_str, e.status, description)
-                    all_enforced = False
-                else:
-                    self.record_warning(
-                        test_name=self.current_test_info.name,
-                        location=CommandPathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
-                                                     command_id=info.command_id),
-                        problem=(f"{info.path_str} accepted violating payload ({description})"))
+                    result.rejected += 1
+                    continue
 
+                # Rejected, but not with CONSTRAINT_ERROR. The command never ran, so the
+                # field's constraint is neither proven nor disproven by this payload.
+                result.other_error += 1
+                self.record_warning(
+                    test_name=self.current_test_info.name,
+                    location=location,
+                    problem=(f"{info.path_str} rejected violating payload ({description}) with "
+                             f"{getattr(e.status, 'name', e.status)} instead of CONSTRAINT_ERROR"))
                 continue
 
             # Some commands convey their result in a Status field of their response
@@ -1008,17 +1120,19 @@ class IDMBaseTest(BasicCompositionTests):
             if embedded_status == Status.ConstraintError:
                 log.info("PASS: %s properly rejected %s (via response command status)",
                          info.path_str, description)
-            elif embedded_status == Status.Success:
-                log.error("FAIL: %s returned %s instead of CONSTRAINT_ERROR for %s",
-                          info.path_str, embedded_status, description)
-                all_enforced = False
-            else:
-                self.record_warning(
-                    test_name=self.current_test_info.name,
-                    location=CommandPathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
-                                                 command_id=info.command_id),
-                    problem=(f"{info.path_str} accepted violating payload ({description})"))
-        return all_enforced
+                result.rejected += 1
+                continue
+
+            # No IM error and no CONSTRAINT_ERROR in the response payload means the DUT
+            # executed the command. Commands that return no response command at all land
+            # here with a None response, which is the ordinary Invoke success case.
+            result.accepted += 1
+            log.warning("%s accepted violating payload (%s)", info.path_str, description)
+            self.record_warning(
+                test_name=self.current_test_info.name,
+                location=location,
+                problem=f"{info.path_str} accepted violating payload ({description})")
+        return result
 
     def checkable_attributes(self, cluster_id, cluster, xml_cluster) -> list[uint]:
         """Get list of attributes that exist on the DUT and have spec/codegen data available."""
