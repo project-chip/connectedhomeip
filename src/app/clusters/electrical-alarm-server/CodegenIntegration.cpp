@@ -43,6 +43,8 @@ void Instance::Shutdown()
 } // namespace app
 } // namespace chip
 
-void MatterElectricalAlarmClusterInitCallback(chip::EndpointId endpoint) {}
-
-void MatterElectricalAlarmClusterShutdownCallback(chip::EndpointId endpoint, MatterClusterShutdownType) {}
+// Weak stubs — an app that registers ESALM imperatively provides strong overrides.
+__attribute__((weak)) void MatterElectricalAlarmPluginServerInitCallback() {}
+__attribute__((weak)) void MatterElectricalAlarmPluginServerShutdownCallback() {}
+__attribute__((weak)) void MatterElectricalAlarmClusterInitCallback(chip::EndpointId) {}
+__attribute__((weak)) void MatterElectricalAlarmClusterShutdownCallback(chip::EndpointId, MatterClusterShutdownType) {}

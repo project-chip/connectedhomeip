@@ -36,7 +36,7 @@ public:
     struct Config
     {
         EndpointId endpointId;
-        Delegate & delegate;
+        Delegate * delegate = nullptr;
         BitMask<Feature> features;
     };
 
@@ -44,6 +44,8 @@ public:
         DefaultServerCluster({ config.endpointId, ElectricalAlarm::Id }), mDelegate(config.delegate),
         mFeatureFlags(config.features)
     {}
+
+    void SetDelegate(Delegate * delegate) { mDelegate = delegate; }
 
     // DefaultServerCluster overrides
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -95,7 +97,7 @@ private:
     void SendNotifyEvent(BitMask<AlarmBitmap> becameActive, BitMask<AlarmBitmap> becameInactive, BitMask<AlarmBitmap> newState,
                          BitMask<AlarmBitmap> mask);
 
-    Delegate & mDelegate;
+    Delegate * mDelegate;
     const BitMask<Feature> mFeatureFlags;
 
     // Alarm Base attribute state
@@ -105,16 +107,28 @@ private:
     BitMask<AlarmBitmap> mLatch;
 
     // Threshold attribute state (valid only when the corresponding feature is present)
-    int64_t mOverVoltageThreshold   = 0;
-    int64_t mUnderVoltageThreshold  = 0;
-    int64_t mOverFrequencyThreshold = 0;
-    int64_t mUnderFrequencyThreshold  = 0;
-    int64_t mOverPowerThreshold     = 0;
-    int64_t mUnderPowerThreshold    = 0;
-    int64_t mOverCurrentThreshold   = 0;
-    int64_t mUnderCurrentThreshold  = 0;
-    int64_t mPowerImportThreshold   = 0;
-    int64_t mPowerExportThreshold   = 0;
+    int64_t mOverVoltageThreshold    = 0;
+    int64_t mUnderVoltageThreshold   = 0;
+    int64_t mOverFrequencyThreshold  = 0;
+    int64_t mUnderFrequencyThreshold = 0;
+    int64_t mOverPowerThreshold      = 0;
+    int64_t mUnderPowerThreshold     = 0;
+    int64_t mOverCurrentThreshold    = 0;
+    int64_t mUnderCurrentThreshold   = 0;
+    int64_t mPowerImportThreshold    = 0;
+    int64_t mPowerExportThreshold    = 0;
+
+    // Tracks whether each threshold has been explicitly set (0 is a valid threshold value).
+    bool mOverVoltageThresholdSet    = false;
+    bool mUnderVoltageThresholdSet   = false;
+    bool mOverFrequencyThresholdSet  = false;
+    bool mUnderFrequencyThresholdSet = false;
+    bool mOverPowerThresholdSet      = false;
+    bool mUnderPowerThresholdSet     = false;
+    bool mOverCurrentThresholdSet    = false;
+    bool mUnderCurrentThresholdSet   = false;
+    bool mPowerImportThresholdSet    = false;
+    bool mPowerExportThresholdSet    = false;
 };
 
 } // namespace ElectricalAlarm

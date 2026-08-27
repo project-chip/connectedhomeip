@@ -119,6 +119,7 @@ CodeDrivenClusters:
     - Device Energy Management Mode
     - Diagnostic Logs
     - Dishwasher Mode
+    - Electrical Alarm
     - Electrical Power Measurement
     - Energy EVSE
     - Energy EVSE Mode
