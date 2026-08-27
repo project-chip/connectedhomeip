@@ -1201,6 +1201,10 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::ScopedNodeI
 
 CHIP_ERROR AndroidDeviceControllerWrapper::WiFiCredentialsNeeded(chip::EndpointId endpoint)
 {
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+
     if (!mWiFiCredentialsNeededListenerObject.HasValidObjectRef() || mWiFiCredentialsNeededListener == nullptr)
     {
         ChipLogError(Controller, "No listener registered for WiFiCredentialsNeeded");
@@ -1210,12 +1214,17 @@ CHIP_ERROR AndroidDeviceControllerWrapper::WiFiCredentialsNeeded(chip::EndpointI
     auto * context = chip::Platform::New<CredentialsNeededCallbackContext>();
     VerifyOrReturnError(context != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    context->wrapper  = this;
+    CHIP_ERROR err = context->listenerObject.Init(mWiFiCredentialsNeededListenerObject.ObjectRef());
+    if (err != CHIP_NO_ERROR)
+    {
+        chip::Platform::Delete(context);
+        return err;
+    }
+    context->listenerMethod = mWiFiCredentialsNeededListener;
     context->endpoint = endpoint;
     context->isWiFi   = true;
 
-    CHIP_ERROR err =
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(HandleCredentialsNeededCallback, reinterpret_cast<intptr_t>(context));
+    err = chip::DeviceLayer::PlatformMgr().ScheduleWork(HandleCredentialsNeededCallback, reinterpret_cast<intptr_t>(context));
     if (err != CHIP_NO_ERROR)
     {
         chip::Platform::Delete(context);
@@ -1227,6 +1236,10 @@ CHIP_ERROR AndroidDeviceControllerWrapper::WiFiCredentialsNeeded(chip::EndpointI
 
 CHIP_ERROR AndroidDeviceControllerWrapper::ThreadCredentialsNeeded(chip::EndpointId endpoint)
 {
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+
     if (!mThreadCredentialsNeededListenerObject.HasValidObjectRef() || mThreadCredentialsNeededListener == nullptr)
     {
         ChipLogError(Controller, "No listener registered for ThreadCredentialsNeeded");
@@ -1236,12 +1249,17 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ThreadCredentialsNeeded(chip::Endpoin
     auto * context = chip::Platform::New<CredentialsNeededCallbackContext>();
     VerifyOrReturnError(context != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    context->wrapper  = this;
+    CHIP_ERROR err = context->listenerObject.Init(mThreadCredentialsNeededListenerObject.ObjectRef());
+    if (err != CHIP_NO_ERROR)
+    {
+        chip::Platform::Delete(context);
+        return err;
+    }
+    context->listenerMethod = mThreadCredentialsNeededListener;
     context->endpoint = endpoint;
     context->isWiFi   = false;
 
-    CHIP_ERROR err =
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(HandleCredentialsNeededCallback, reinterpret_cast<intptr_t>(context));
+    err = chip::DeviceLayer::PlatformMgr().ScheduleWork(HandleCredentialsNeededCallback, reinterpret_cast<intptr_t>(context));
     if (err != CHIP_NO_ERROR)
     {
         chip::Platform::Delete(context);
@@ -1256,28 +1274,34 @@ void AndroidDeviceControllerWrapper::HandleCredentialsNeededCallback(intptr_t co
     auto * callbackContext = reinterpret_cast<CredentialsNeededCallbackContext *>(context);
     VerifyOrReturn(callbackContext != nullptr);
 
-    auto * wrapper            = callbackContext->wrapper;
-    const EndpointId endpoint = callbackContext->endpoint;
-    const bool isWiFi         = callbackContext->isWiFi;
-    chip::Platform::Delete(callbackContext);
-
-    VerifyOrReturn(wrapper != nullptr, ChipLogError(Controller, "Null wrapper in credentials callback"));
+    const EndpointId endpoint        = callbackContext->endpoint;
+    const bool isWiFi                = callbackContext->isWiFi;
+    const jmethodID listenerMethod   = callbackContext->listenerMethod;
+    jobject listenerGlobalObjectRef  = callbackContext->listenerObject.ObjectRef();
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+    if (env == nullptr)
+    {
+        ChipLogError(Controller, "Could not get JNIEnv for current thread");
+        chip::Platform::Delete(callbackContext);
+        return;
+    }
 
-    const bool listenerRegistered = isWiFi
-        ? (wrapper->mWiFiCredentialsNeededListenerObject.HasValidObjectRef() && wrapper->mWiFiCredentialsNeededListener != nullptr)
-        : (wrapper->mThreadCredentialsNeededListenerObject.HasValidObjectRef() &&
-           wrapper->mThreadCredentialsNeededListener != nullptr);
-    VerifyOrReturn(listenerRegistered,
-                   ChipLogError(Controller, "No listener registered for %sCredentialsNeeded", isWiFi ? "WiFi" : "Thread"));
+    if (listenerGlobalObjectRef == nullptr || listenerMethod == nullptr)
+    {
+        ChipLogError(Controller, "No listener registered for %sCredentialsNeeded", isWiFi ? "WiFi" : "Thread");
+        chip::Platform::Delete(callbackContext);
+        return;
+    }
 
-    jobject listenerObject = env->NewLocalRef(isWiFi ? wrapper->mWiFiCredentialsNeededListenerObject.ObjectRef()
-                                                     : wrapper->mThreadCredentialsNeededListenerObject.ObjectRef());
-    VerifyOrReturn(listenerObject != nullptr, ChipLogError(Controller, "Failed to create local listener reference"));
+    jobject listenerObject = env->NewLocalRef(listenerGlobalObjectRef);
+    if (listenerObject == nullptr)
+    {
+        ChipLogError(Controller, "Failed to create local listener reference");
+        chip::Platform::Delete(callbackContext);
+        return;
+    }
 
-    const jmethodID listenerMethod = isWiFi ? wrapper->mWiFiCredentialsNeededListener : wrapper->mThreadCredentialsNeededListener;
     {
         chip::DeviceLayer::StackUnlock unlock;
         env->CallVoidMethod(listenerObject, listenerMethod, static_cast<jint>(endpoint));
@@ -1291,6 +1315,7 @@ void AndroidDeviceControllerWrapper::HandleCredentialsNeededCallback(intptr_t co
     }
 
     env->DeleteLocalRef(listenerObject);
+    chip::Platform::Delete(callbackContext);
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, void * value, uint16_t & size)

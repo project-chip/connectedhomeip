@@ -225,9 +225,10 @@ public:
 private:
     struct CredentialsNeededCallbackContext
     {
-        AndroidDeviceControllerWrapper * wrapper = nullptr;
-        chip::EndpointId endpoint                = 0;
-        bool isWiFi                              = false;
+        chip::JniGlobalReference listenerObject;
+        jmethodID listenerMethod  = nullptr;
+        chip::EndpointId endpoint = 0;
+        bool isWiFi               = false;
     };
 
     static void HandleCredentialsNeededCallback(intptr_t context);
