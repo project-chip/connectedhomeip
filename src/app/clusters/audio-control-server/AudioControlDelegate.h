@@ -32,6 +32,13 @@ public:
     AudioControlDelegate()          = default;
     virtual ~AudioControlDelegate() = default;
 
+    // Fixed hardware limits, queried once at construction.
+    virtual uint16_t GetMinDeviceVolume() const { return 1; }
+    virtual uint16_t GetMaxDeviceVolume() const { return 100; }
+    virtual uint16_t GetMaxDeviceVolumeDB() const { return 0; }
+    virtual int16_t GetMinCorrection() const { return -10; }
+    virtual int16_t GetMaxCorrection() const { return 10; }
+
     /// Snapshot of all hardware-facing cluster state at startup.
     /// Passed to OnStartup() after all KVS restores, StartUp* overrides, and clamping are complete.
     struct StartupState

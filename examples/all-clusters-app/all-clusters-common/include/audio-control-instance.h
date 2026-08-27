@@ -29,6 +29,7 @@ class AudioControlDelegateImpl : public AudioControlDelegate
 {
 public:
     Protocols::InteractionModel::Status HandleVolumeAndMuteChange(uint16_t newVolume, bool newSoftMuted) override;
+    uint16_t GetMaxDeviceVolumeDB() const override { return 10000; }
 };
 
 } // namespace Clusters

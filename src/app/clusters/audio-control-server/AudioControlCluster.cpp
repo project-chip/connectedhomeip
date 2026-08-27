@@ -36,9 +36,9 @@ using chip::Protocols::InteractionModel::Status;
 
 AudioControlCluster::AudioControlCluster(EndpointId endpointId, AudioControlDelegate & delegate, const Config & config) :
     DefaultServerCluster({ endpointId, AudioControl::Id }), mDelegate(delegate), mFeatures(config.mFeatures),
-    mOptionalAttributeSet(config.mOptionalAttributeSet), mMinDeviceVolume(config.mMinDeviceVolume),
-    mMaxDeviceVolume(config.mMaxDeviceVolume), mMaxDeviceVolumeDB(config.mMaxDeviceVolumeDB), mMinCorrection(config.mMinCorrection),
-    mMaxCorrection(config.mMaxCorrection)
+    mOptionalAttributeSet(config.mOptionalAttributeSet), mMinDeviceVolume(delegate.GetMinDeviceVolume()),
+    mMaxDeviceVolume(delegate.GetMaxDeviceVolume()), mMaxDeviceVolumeDB(delegate.GetMaxDeviceVolumeDB()),
+    mMinCorrection(delegate.GetMinCorrection()), mMaxCorrection(delegate.GetMaxCorrection())
 {
     VerifyOrDie(mMinDeviceVolume >= 1);
     VerifyOrDie(mMaxDeviceVolume >= mMinDeviceVolume);

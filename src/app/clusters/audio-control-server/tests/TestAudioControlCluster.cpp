@@ -46,6 +46,19 @@ public:
     // Configurable return value for the next delegate call.
     Status nextStatus = Status::Success;
 
+    // Fixed hardware limits, queried once at construction.
+    uint16_t minDeviceVolume   = 1;
+    uint16_t maxDeviceVolume   = 100;
+    uint16_t maxDeviceVolumeDB = 0;
+    int16_t minCorrection      = -10;
+    int16_t maxCorrection      = 10;
+
+    uint16_t GetMinDeviceVolume() const override { return minDeviceVolume; }
+    uint16_t GetMaxDeviceVolume() const override { return maxDeviceVolume; }
+    uint16_t GetMaxDeviceVolumeDB() const override { return maxDeviceVolumeDB; }
+    int16_t GetMinCorrection() const override { return minCorrection; }
+    int16_t GetMaxCorrection() const override { return maxCorrection; }
+
     // Call-tracking for OnStartup.
     int startupCalls = 0;
     AudioControlDelegate::StartupState startupState{};
@@ -119,21 +132,18 @@ public:
 
 static AudioControlCluster::Config BasicConfig()
 {
-    return AudioControlCluster::Config{}
-        .WithMinDeviceVolume(1)
-        .WithMaxDeviceVolume(100)
-        .WithInitialVolume(50)
-        .WithInitialDefaultStepSize(10);
+    return AudioControlCluster::Config{}.WithInitialVolume(50).WithInitialDefaultStepSize(10);
 }
 
-static AudioControlCluster::Config BEQAllBandsConfig()
+// Sets a non-default [-5, 5] correction range on delegate and returns the matching Config.
+static AudioControlCluster::Config BEQAllBandsConfig(MockAudioControlDelegate & delegate)
 {
+    delegate.minCorrection = -5;
+    delegate.maxCorrection = 5;
+
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<Bass::Id>().Set<Mid::Id>().Set<Treble::Id>();
-    return BasicConfig()
-        .WithFeatures(BitFlags<Feature>(Feature::kBasicEqualizer))
-        .WithOptionalAttributes(optionalSet)
-        .WithCorrectionRange(-5, 5);
+    return BasicConfig().WithFeatures(BitFlags<Feature>(Feature::kBasicEqualizer)).WithOptionalAttributes(optionalSet);
 }
 
 // ---------------------------------------------------------------------------
@@ -217,11 +227,12 @@ TEST_F(TestAudioControlCluster, AttributeListWithBEQFeature)
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<Bass::Id>().Set<Mid::Id>().Set<Treble::Id>();
 
+    mMockDelegate.minCorrection = -5;
+    mMockDelegate.maxCorrection = 5;
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
                                 BasicConfig()
                                     .WithFeatures(BitFlags<Feature>(Feature::kBasicEqualizer))
-                                    .WithOptionalAttributes(optionalSet)
-                                    .WithCorrectionRange(-5, 5));
+                                    .WithOptionalAttributes(optionalSet));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
@@ -281,11 +292,12 @@ TEST_F(TestAudioControlCluster, BEQFeatureRequiresAtLeastOneBand)
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<Treble::Id>(); // only Treble — satisfies the "at least one" constraint
 
+    mMockDelegate.minCorrection = -5;
+    mMockDelegate.maxCorrection = 5;
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
                                 BasicConfig()
                                     .WithFeatures(BitFlags<Feature>(Feature::kBasicEqualizer))
                                     .WithOptionalAttributes(optionalSet)
-                                    .WithCorrectionRange(-5, 5)
                                     .WithInitialTreble(3));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
@@ -450,7 +462,8 @@ TEST_F(TestAudioControlCluster, InvokeCommandDefaultCaseReturnsUnsupportedComman
 
 TEST_F(TestAudioControlCluster, ReadMaxDeviceVolumeDB)
 {
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithMaxDeviceVolumeDB(1200));
+    mMockDelegate.maxDeviceVolumeDB = 1200;
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig());
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
@@ -485,11 +498,12 @@ TEST_F(TestAudioControlCluster, ReadCorrectionRangeAttributes)
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<Bass::Id>();
 
+    mMockDelegate.minCorrection = -8;
+    mMockDelegate.maxCorrection = 6;
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
                                 BasicConfig()
                                     .WithFeatures(BitFlags<Feature>(Feature::kBasicEqualizer))
-                                    .WithOptionalAttributes(optionalSet)
-                                    .WithCorrectionRange(-8, 6));
+                                    .WithOptionalAttributes(optionalSet));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
@@ -560,12 +574,9 @@ TEST_F(TestAudioControlCluster, SetVolumeNotMuted)
 TEST_F(TestAudioControlCluster, SetVolumeConstraintErrors)
 {
     // MinDeviceVolume=10, MaxDeviceVolume=100
+    mMockDelegate.minDeviceVolume = 10;
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                AudioControlCluster::Config{}
-                                    .WithMinDeviceVolume(10)
-                                    .WithMaxDeviceVolume(100)
-                                    .WithInitialVolume(50)
-                                    .WithInitialDefaultStepSize(5));
+                                AudioControlCluster::Config{}.WithInitialVolume(50).WithInitialDefaultStepSize(5));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
@@ -836,10 +847,9 @@ TEST_F(TestAudioControlCluster, IncreaseVolumeSoftMutedUnmuteOrChangeWithVolumeP
 
 TEST_F(TestAudioControlCluster, IncreaseVolumeSoftMutedUnmuteOrChangeWithMinDeviceVolume)
 {
+    mMockDelegate.minDeviceVolume = 5;
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
                                 AudioControlCluster::Config{}
-                                    .WithMinDeviceVolume(5)
-                                    .WithMaxDeviceVolume(100)
                                     .WithInitialVolume(40)
                                     .WithInitialDefaultStepSize(10)
                                     .WithInitialSoftMuted(true)
@@ -909,8 +919,6 @@ TEST_F(TestAudioControlCluster, IncreaseVolumePhysicallyMutedOnlyUsesVolumeStepS
 
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
                                 AudioControlCluster::Config{}
-                                    .WithMinDeviceVolume(1)
-                                    .WithMaxDeviceVolume(100)
                                     .WithInitialVolume(40)
                                     .WithInitialDefaultStepSize(10)
                                     .WithInitialSoftMuted(false)
@@ -939,8 +947,6 @@ TEST_F(TestAudioControlCluster, IncreaseVolumeBothMutedIgnoresUnmuteVolumeEnum)
 
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
                                 AudioControlCluster::Config{}
-                                    .WithMinDeviceVolume(1)
-                                    .WithMaxDeviceVolume(100)
                                     .WithInitialVolume(40)
                                     .WithInitialDefaultStepSize(10)
                                     .WithInitialSoftMuted(true)
@@ -978,10 +984,9 @@ TEST_F(TestAudioControlCluster, DecreaseVolumeNotMuted)
 TEST_F(TestAudioControlCluster, DecreaseVolumeBelowMinMutesDevice)
 {
     // MinDeviceVolume=10, Volume=15, Step=10 → RequestedVolume=5 < 10 → floor at Min and mute
+    mMockDelegate.minDeviceVolume = 10;
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
                                 AudioControlCluster::Config{}
-                                    .WithMinDeviceVolume(10)
-                                    .WithMaxDeviceVolume(100)
                                     .WithInitialVolume(15)
                                     .WithInitialSoftMuted(false)
                                     .WithInitialDefaultStepSize(10));
@@ -1147,11 +1152,12 @@ TEST_F(TestAudioControlCluster, WriteBassValidatesRange)
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<Bass::Id>();
 
+    mMockDelegate.minCorrection = -5;
+    mMockDelegate.maxCorrection = 5;
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
                                 BasicConfig()
                                     .WithFeatures(BitFlags<Feature>(Feature::kBasicEqualizer))
-                                    .WithOptionalAttributes(optionalSet)
-                                    .WithCorrectionRange(-5, 5));
+                                    .WithOptionalAttributes(optionalSet));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
@@ -1174,11 +1180,12 @@ TEST_F(TestAudioControlCluster, WriteMidValidatesRange)
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<Mid::Id>();
 
+    mMockDelegate.minCorrection = -5;
+    mMockDelegate.maxCorrection = 5;
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
                                 BasicConfig()
                                     .WithFeatures(BitFlags<Feature>(Feature::kBasicEqualizer))
-                                    .WithOptionalAttributes(optionalSet)
-                                    .WithCorrectionRange(-5, 5));
+                                    .WithOptionalAttributes(optionalSet));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
@@ -1200,11 +1207,12 @@ TEST_F(TestAudioControlCluster, WriteTrebleValidatesRange)
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<Treble::Id>();
 
+    mMockDelegate.minCorrection = -5;
+    mMockDelegate.maxCorrection = 5;
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
                                 BasicConfig()
                                     .WithFeatures(BitFlags<Feature>(Feature::kBasicEqualizer))
-                                    .WithOptionalAttributes(optionalSet)
-                                    .WithCorrectionRange(-5, 5));
+                                    .WithOptionalAttributes(optionalSet));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
@@ -1312,7 +1320,7 @@ TEST_F(TestAudioControlCluster, WriteNoOpDecreaseVolumeUnmutePolicy)
 
 TEST_F(TestAudioControlCluster, WriteNoOpBassDoesNotCallDelegate)
 {
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig());
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig(mMockDelegate));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -1328,7 +1336,7 @@ TEST_F(TestAudioControlCluster, WriteNoOpBassDoesNotCallDelegate)
 
 TEST_F(TestAudioControlCluster, WriteNoOpMidDoesNotCallDelegate)
 {
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig());
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig(mMockDelegate));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -1344,7 +1352,7 @@ TEST_F(TestAudioControlCluster, WriteNoOpMidDoesNotCallDelegate)
 
 TEST_F(TestAudioControlCluster, WriteNoOpTrebleDoesNotCallDelegate)
 {
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig());
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig(mMockDelegate));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -1513,11 +1521,12 @@ TEST_F(TestAudioControlCluster, DelegateBassChangedCallback)
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<Bass::Id>();
 
+    mMockDelegate.minCorrection = -5;
+    mMockDelegate.maxCorrection = 5;
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
                                 BasicConfig()
                                     .WithFeatures(BitFlags<Feature>(Feature::kBasicEqualizer))
-                                    .WithOptionalAttributes(optionalSet)
-                                    .WithCorrectionRange(-5, 5));
+                                    .WithOptionalAttributes(optionalSet));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -1665,11 +1674,12 @@ TEST_F(TestAudioControlCluster, DelegateBassVetoLeavesStateUnchanged)
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<Bass::Id>();
 
+    mMockDelegate.minCorrection = -5;
+    mMockDelegate.maxCorrection = 5;
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
                                 BasicConfig()
                                     .WithFeatures(BitFlags<Feature>(Feature::kBasicEqualizer))
                                     .WithOptionalAttributes(optionalSet)
-                                    .WithCorrectionRange(-5, 5)
                                     .WithInitialBass(0));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
@@ -1691,11 +1701,12 @@ TEST_F(TestAudioControlCluster, DelegateMidVetoLeavesStateUnchanged)
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<Mid::Id>();
 
+    mMockDelegate.minCorrection = -5;
+    mMockDelegate.maxCorrection = 5;
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
                                 BasicConfig()
                                     .WithFeatures(BitFlags<Feature>(Feature::kBasicEqualizer))
                                     .WithOptionalAttributes(optionalSet)
-                                    .WithCorrectionRange(-5, 5)
                                     .WithInitialMid(0));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
@@ -1717,11 +1728,12 @@ TEST_F(TestAudioControlCluster, DelegateTrebleVetoLeavesStateUnchanged)
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<Treble::Id>();
 
+    mMockDelegate.minCorrection = -5;
+    mMockDelegate.maxCorrection = 5;
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
                                 BasicConfig()
                                     .WithFeatures(BitFlags<Feature>(Feature::kBasicEqualizer))
                                     .WithOptionalAttributes(optionalSet)
-                                    .WithCorrectionRange(-5, 5)
                                     .WithInitialTreble(0));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
@@ -1883,10 +1895,11 @@ TEST_F(TestAudioControlCluster, PersistenceBass)
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<Bass::Id>();
 
+    mMockDelegate.minCorrection = -5;
+    mMockDelegate.maxCorrection = 5;
     auto cfg = BasicConfig()
                    .WithFeatures(BitFlags<Feature>(Feature::kBasicEqualizer))
                    .WithOptionalAttributes(optionalSet)
-                   .WithCorrectionRange(-5, 5)
                    .WithInitialBass(0);
     {
         AudioControlCluster cluster(kRootEndpointId, mMockDelegate, cfg);
@@ -1912,10 +1925,11 @@ TEST_F(TestAudioControlCluster, PersistenceMid)
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<Mid::Id>();
 
+    mMockDelegate.minCorrection = -5;
+    mMockDelegate.maxCorrection = 5;
     auto cfg = BasicConfig()
                    .WithFeatures(BitFlags<Feature>(Feature::kBasicEqualizer))
                    .WithOptionalAttributes(optionalSet)
-                   .WithCorrectionRange(-5, 5)
                    .WithInitialMid(0);
     {
         AudioControlCluster cluster(kRootEndpointId, mMockDelegate, cfg);
@@ -1941,10 +1955,11 @@ TEST_F(TestAudioControlCluster, PersistenceTreble)
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<Treble::Id>();
 
+    mMockDelegate.minCorrection = -5;
+    mMockDelegate.maxCorrection = 5;
     auto cfg = BasicConfig()
                    .WithFeatures(BitFlags<Feature>(Feature::kBasicEqualizer))
                    .WithOptionalAttributes(optionalSet)
-                   .WithCorrectionRange(-5, 5)
                    .WithInitialTreble(0);
     {
         AudioControlCluster cluster(kRootEndpointId, mMockDelegate, cfg);
@@ -2135,10 +2150,9 @@ TEST_F(TestAudioControlCluster, PersistenceDecreaseVolumeFloorCommand)
     // Floor path → StoreVolume(MinDeviceVolume) + StoreSoftMuted(true).
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<StartUpMuted::Id>();
-    auto cfg = AudioControlCluster::Config{}
+    mMockDelegate.minDeviceVolume = 10;
+    auto cfg                      = AudioControlCluster::Config{}
                    .WithOptionalAttributes(optionalSet)
-                   .WithMinDeviceVolume(10)
-                   .WithMaxDeviceVolume(100)
                    .WithInitialVolume(15)
                    .WithInitialSoftMuted(false)
                    .WithInitialDefaultStepSize(10);
@@ -2346,10 +2360,9 @@ TEST_F(TestAudioControlCluster, SetBassAbsentReturnsError)
     // Bass not in optional set (BEQ feature present, but only Mid enabled) → setter must fail.
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<Mid::Id>();
-    auto cfg = AudioControlCluster::Config{}
-                   .WithFeatures(BitFlags<Feature>(Feature::kBasicEqualizer))
-                   .WithOptionalAttributes(optionalSet)
-                   .WithCorrectionRange(-5, 5);
+    mMockDelegate.minCorrection = -5;
+    mMockDelegate.maxCorrection = 5;
+    auto cfg = AudioControlCluster::Config{}.WithFeatures(BitFlags<Feature>(Feature::kBasicEqualizer)).WithOptionalAttributes(optionalSet);
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate, cfg);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     EXPECT_NE(cluster.SetBass(2), CHIP_NO_ERROR);
@@ -2362,10 +2375,9 @@ TEST_F(TestAudioControlCluster, SetMidAbsentReturnsError)
     // Mid not in optional set (BEQ feature present, only Bass enabled) → setter must fail.
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<Bass::Id>();
-    auto cfg = AudioControlCluster::Config{}
-                   .WithFeatures(BitFlags<Feature>(Feature::kBasicEqualizer))
-                   .WithOptionalAttributes(optionalSet)
-                   .WithCorrectionRange(-5, 5);
+    mMockDelegate.minCorrection = -5;
+    mMockDelegate.maxCorrection = 5;
+    auto cfg = AudioControlCluster::Config{}.WithFeatures(BitFlags<Feature>(Feature::kBasicEqualizer)).WithOptionalAttributes(optionalSet);
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate, cfg);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     EXPECT_NE(cluster.SetMid(2), CHIP_NO_ERROR);
@@ -2378,10 +2390,9 @@ TEST_F(TestAudioControlCluster, SetTrebleAbsentReturnsError)
     // Treble not in optional set (BEQ feature present, only Bass enabled) → setter must fail.
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<Bass::Id>();
-    auto cfg = AudioControlCluster::Config{}
-                   .WithFeatures(BitFlags<Feature>(Feature::kBasicEqualizer))
-                   .WithOptionalAttributes(optionalSet)
-                   .WithCorrectionRange(-5, 5);
+    mMockDelegate.minCorrection = -5;
+    mMockDelegate.maxCorrection = 5;
+    auto cfg = AudioControlCluster::Config{}.WithFeatures(BitFlags<Feature>(Feature::kBasicEqualizer)).WithOptionalAttributes(optionalSet);
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate, cfg);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     EXPECT_NE(cluster.SetTreble(2), CHIP_NO_ERROR);
@@ -2460,7 +2471,7 @@ TEST_F(TestAudioControlCluster, SetPhysicallyMutedDoesNotCallDelegate)
 
 TEST_F(TestAudioControlCluster, SetBassAPI)
 {
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig().WithInitialBass(0));
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig(mMockDelegate).WithInitialBass(0));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -2475,7 +2486,7 @@ TEST_F(TestAudioControlCluster, SetBassAPI)
 
 TEST_F(TestAudioControlCluster, SetBassConstraintError)
 {
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig().WithInitialBass(0));
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig(mMockDelegate).WithInitialBass(0));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     EXPECT_NE(cluster.SetBass(-6), CHIP_NO_ERROR); // below min
@@ -2487,7 +2498,7 @@ TEST_F(TestAudioControlCluster, SetBassConstraintError)
 
 TEST_F(TestAudioControlCluster, SetBassDoesNotCallDelegate)
 {
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig());
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig(mMockDelegate));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     mMockDelegate.Reset();
@@ -2499,7 +2510,7 @@ TEST_F(TestAudioControlCluster, SetBassDoesNotCallDelegate)
 
 TEST_F(TestAudioControlCluster, SetBassPersistence)
 {
-    auto cfg = BEQAllBandsConfig().WithInitialBass(0);
+    auto cfg = BEQAllBandsConfig(mMockDelegate).WithInitialBass(0);
     {
         AudioControlCluster cluster(kRootEndpointId, mMockDelegate, cfg);
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
@@ -2516,7 +2527,7 @@ TEST_F(TestAudioControlCluster, SetBassPersistence)
 
 TEST_F(TestAudioControlCluster, SetMidAPI)
 {
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig().WithInitialMid(0));
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig(mMockDelegate).WithInitialMid(0));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -2531,7 +2542,7 @@ TEST_F(TestAudioControlCluster, SetMidAPI)
 
 TEST_F(TestAudioControlCluster, SetMidConstraintError)
 {
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig().WithInitialMid(0));
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig(mMockDelegate).WithInitialMid(0));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     EXPECT_NE(cluster.SetMid(-6), CHIP_NO_ERROR);
@@ -2543,7 +2554,7 @@ TEST_F(TestAudioControlCluster, SetMidConstraintError)
 
 TEST_F(TestAudioControlCluster, SetMidDoesNotCallDelegate)
 {
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig());
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig(mMockDelegate));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     mMockDelegate.Reset();
@@ -2555,7 +2566,7 @@ TEST_F(TestAudioControlCluster, SetMidDoesNotCallDelegate)
 
 TEST_F(TestAudioControlCluster, SetMidPersistence)
 {
-    auto cfg = BEQAllBandsConfig().WithInitialMid(0);
+    auto cfg = BEQAllBandsConfig(mMockDelegate).WithInitialMid(0);
     {
         AudioControlCluster cluster(kRootEndpointId, mMockDelegate, cfg);
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
@@ -2572,7 +2583,7 @@ TEST_F(TestAudioControlCluster, SetMidPersistence)
 
 TEST_F(TestAudioControlCluster, SetTrebleAPI)
 {
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig().WithInitialTreble(0));
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig(mMockDelegate).WithInitialTreble(0));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -2587,7 +2598,7 @@ TEST_F(TestAudioControlCluster, SetTrebleAPI)
 
 TEST_F(TestAudioControlCluster, SetTrebleConstraintError)
 {
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig().WithInitialTreble(0));
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig(mMockDelegate).WithInitialTreble(0));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     EXPECT_NE(cluster.SetTreble(-6), CHIP_NO_ERROR);
@@ -2599,7 +2610,7 @@ TEST_F(TestAudioControlCluster, SetTrebleConstraintError)
 
 TEST_F(TestAudioControlCluster, SetTrebleDoesNotCallDelegate)
 {
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig());
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig(mMockDelegate));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     mMockDelegate.Reset();
@@ -2611,7 +2622,7 @@ TEST_F(TestAudioControlCluster, SetTrebleDoesNotCallDelegate)
 
 TEST_F(TestAudioControlCluster, SetTreblePersistence)
 {
-    auto cfg = BEQAllBandsConfig().WithInitialTreble(0);
+    auto cfg = BEQAllBandsConfig(mMockDelegate).WithInitialTreble(0);
     {
         AudioControlCluster cluster(kRootEndpointId, mMockDelegate, cfg);
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
@@ -3047,10 +3058,9 @@ TEST_F(TestAudioControlCluster, OnStartupBEQClampedWhenRangeNarrows)
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<Bass::Id>();
     {
-        auto cfg = AudioControlCluster::Config{}
-                       .WithFeatures(BitFlags<Feature>(Feature::kBasicEqualizer))
-                       .WithOptionalAttributes(optionalSet)
-                       .WithCorrectionRange(-5, 5);
+        mMockDelegate.minCorrection = -5;
+        mMockDelegate.maxCorrection = 5;
+        auto cfg = AudioControlCluster::Config{}.WithFeatures(BitFlags<Feature>(Feature::kBasicEqualizer)).WithOptionalAttributes(optionalSet);
         AudioControlCluster cluster(kRootEndpointId, mMockDelegate, cfg);
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
         int16_t val = 4;
@@ -3059,10 +3069,9 @@ TEST_F(TestAudioControlCluster, OnStartupBEQClampedWhenRangeNarrows)
     }
     mMockDelegate.Reset();
     {
-        auto cfg = AudioControlCluster::Config{}
-                       .WithFeatures(BitFlags<Feature>(Feature::kBasicEqualizer))
-                       .WithOptionalAttributes(optionalSet)
-                       .WithCorrectionRange(-3, 3);
+        mMockDelegate.minCorrection = -3;
+        mMockDelegate.maxCorrection = 3;
+        auto cfg = AudioControlCluster::Config{}.WithFeatures(BitFlags<Feature>(Feature::kBasicEqualizer)).WithOptionalAttributes(optionalSet);
         AudioControlCluster cluster(kRootEndpointId, mMockDelegate, cfg);
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
         EXPECT_EQ(mMockDelegate.startupState.bass, 3); // clamped to new max
@@ -3091,7 +3100,7 @@ TEST_F(TestAudioControlCluster, OnStartupBEQCalledWithConfigDefaults)
 {
     // BEQ enabled, no KVS: OnStartup must carry the config-default EQ values.
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                BEQAllBandsConfig().WithInitialBass(2).WithInitialMid(-1).WithInitialTreble(3));
+                                BEQAllBandsConfig(mMockDelegate).WithInitialBass(2).WithInitialMid(-1).WithInitialTreble(3));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(mMockDelegate.startupState.bass, 2);
@@ -3104,7 +3113,7 @@ TEST_F(TestAudioControlCluster, OnStartupBEQCalledWithConfigDefaults)
 TEST_F(TestAudioControlCluster, OnStartupBEQCalledWithPersistedValues)
 {
     // Write Bass=4, Mid=-3, Treble=2, then restart and verify OnStartup carries them.
-    auto cfg = BEQAllBandsConfig();
+    auto cfg = BEQAllBandsConfig(mMockDelegate);
     {
         AudioControlCluster cluster(kRootEndpointId, mMockDelegate, cfg);
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
@@ -3134,10 +3143,11 @@ TEST_F(TestAudioControlCluster, OnStartupBEQPartialBands)
     // constructed alongside the same Config, so it already knows mid/treble are unsupported here.
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<Bass::Id>();
+    mMockDelegate.minCorrection = -5;
+    mMockDelegate.maxCorrection = 5;
     auto cfg = AudioControlCluster::Config{}
                    .WithFeatures(BitFlags<Feature>(Feature::kBasicEqualizer))
                    .WithOptionalAttributes(optionalSet)
-                   .WithCorrectionRange(-5, 5)
                    .WithInitialBass(3);
 
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate, cfg);
@@ -3294,12 +3304,10 @@ TEST_F(TestAudioControlCluster, IncreaseVolumeDegenerateRangeClampsToNoOpSuccess
     // MinDeviceVolume == MaxDeviceVolume -> EffectiveMax == MinDeviceVolume, so there is no room to
     // increase. StepSize is only checked for being >= 1; the resulting volume is clamped to
     // EffectiveMax, so the command succeeds as a no-op rather than failing with ConstraintError.
+    mMockDelegate.minDeviceVolume = 50;
+    mMockDelegate.maxDeviceVolume = 50;
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                AudioControlCluster::Config{}
-                                    .WithMinDeviceVolume(50)
-                                    .WithMaxDeviceVolume(50)
-                                    .WithInitialVolume(50)
-                                    .WithInitialDefaultStepSize(1));
+                                AudioControlCluster::Config{}.WithInitialVolume(50).WithInitialDefaultStepSize(1));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
@@ -3316,12 +3324,10 @@ TEST_F(TestAudioControlCluster, DecreaseVolumeDegenerateRangeClampsToNoOpSuccess
     // Same degenerate range as IncreaseVolumeDegenerateRangeClampsToNoOpSuccess, but for
     // DecreaseVolume: the result floors at MinDeviceVolume (== MaxDeviceVolume here), so the
     // command succeeds, muting the device rather than failing with ConstraintError.
+    mMockDelegate.minDeviceVolume = 50;
+    mMockDelegate.maxDeviceVolume = 50;
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                AudioControlCluster::Config{}
-                                    .WithMinDeviceVolume(50)
-                                    .WithMaxDeviceVolume(50)
-                                    .WithInitialVolume(50)
-                                    .WithInitialDefaultStepSize(1));
+                                AudioControlCluster::Config{}.WithInitialVolume(50).WithInitialDefaultStepSize(1));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);

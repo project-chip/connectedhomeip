@@ -81,9 +81,8 @@ public:
         AudioControlCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
         config.WithOptionalAttributes(optionalAttributeSet);
 
-        // All other attributes (fixed and writable) are attributeAccessInterface-backed, not
-        // Ember RAM-backed, so their initial values come from AudioControlCluster::Config's own
-        // defaults rather than being seeded from zap here.
+        // Fixed hardware limits are supplied by the delegate itself (AudioControlCluster's
+        // constructor queries it directly), not passed through Config here.
 
         AudioControlDelegate * delegate = GetDelegate(endpointId);
         if (delegate == nullptr)

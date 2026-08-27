@@ -49,27 +49,6 @@ public:
             mFeatures = features;
             return *this;
         }
-        Config & WithMinDeviceVolume(uint16_t value)
-        {
-            mMinDeviceVolume = value;
-            return *this;
-        }
-        Config & WithMaxDeviceVolume(uint16_t value)
-        {
-            mMaxDeviceVolume = value;
-            return *this;
-        }
-        Config & WithMaxDeviceVolumeDB(uint16_t value)
-        {
-            mMaxDeviceVolumeDB = value;
-            return *this;
-        }
-        Config & WithCorrectionRange(int16_t minCorrection, int16_t maxCorrection)
-        {
-            mMinCorrection = minCorrection;
-            mMaxCorrection = maxCorrection;
-            return *this;
-        }
         Config & WithOptionalAttributes(OptionalAttributeSet attrs)
         {
             mOptionalAttributeSet = attrs;
@@ -152,11 +131,8 @@ public:
         BitFlags<AudioControl::Feature> mFeatures;
         OptionalAttributeSet mOptionalAttributeSet;
 
-        uint16_t mMinDeviceVolume   = 1;
-        uint16_t mMaxDeviceVolume   = 100;
-        uint16_t mMaxDeviceVolumeDB = 0;
-        int16_t mMinCorrection      = -10;
-        int16_t mMaxCorrection      = 10;
+        // Fixed hardware limits (MinDeviceVolume, MaxDeviceVolume, MaxDeviceVolumeDB,
+        // MinCorrection, MaxCorrection) are supplied by AudioControlDelegate.
 
         bool mSoftMuted           = false;
         bool mPhysicallyMuted     = false;
