@@ -1300,6 +1300,8 @@ void AndroidDeviceControllerWrapper::HandleCredentialsNeededCallback(intptr_t co
         if (listenerObject == nullptr)
         {
             ChipLogError(Controller, "Failed to create local listener reference");
+            callbackContext->listenerObject.Reset();
+            chip::Platform::Delete(callbackContext);
             return;
         }
 
