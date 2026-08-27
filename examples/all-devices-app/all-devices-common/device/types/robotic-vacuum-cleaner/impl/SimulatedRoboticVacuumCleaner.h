@@ -19,6 +19,7 @@
 
 #include <clusters/RvcOperationalState/Enums.h>
 #include <device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.h>
+#include <device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaStorageDelegate.h>
 #include <lib/support/TimerDelegate.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <string>
@@ -184,6 +185,7 @@ private:
     static constexpr uint32_t kChargingSimulationDurationSec = 30;
 
     TimerDelegate & mTimerDelegate;
+    Clusters::ServiceArea::LoggingServiceAreaStorageDelegate mServiceAreaStorageDelegate;
     RunModeAppDelegate mRunModeAppDelegate{ *this };
     CleanModeAppDelegate mCleanModeAppDelegate{ *this };
 

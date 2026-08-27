@@ -29,9 +29,9 @@ using namespace chip::app::all_devices::rvc_simulation::Topology;
 
 RoboticVacuumCleaner::RoboticVacuumCleaner(const Config & config) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRoboticVacuumCleaner, 1)),
-    mOperationalStateDelegate(config.operationalStateDelegate), mServiceAreaDelegate(config.serviceAreaDelegate),
-    mRunModeDelegate(config.runModeDelegate), mCleanModeDelegate(config.cleanModeDelegate),
-    mDiagnosticDataProvider(config.diagnosticDataProvider)
+    mOperationalStateDelegate(config.operationalStateDelegate), mServiceAreaStorageDelegate(config.serviceAreaStorageDelegate),
+    mServiceAreaDelegate(config.serviceAreaDelegate), mRunModeDelegate(config.runModeDelegate),
+    mCleanModeDelegate(config.cleanModeDelegate), mDiagnosticDataProvider(config.diagnosticDataProvider)
 {}
 
 CHIP_ERROR RoboticVacuumCleaner::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,

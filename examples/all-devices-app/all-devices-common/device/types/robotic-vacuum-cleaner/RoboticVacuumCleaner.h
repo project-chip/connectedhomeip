@@ -22,8 +22,8 @@
 #include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
 #include <app/clusters/service-area-server/ServiceAreaCluster.h>
 #include <app/clusters/service-area-server/service-area-delegate.h>
+#include <app/clusters/service-area-server/service-area-storage-delegate.h>
 #include <device/api/SingleEndpoint.h>
-#include <device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaStorageDelegate.h>
 #include <platform/DiagnosticDataProvider.h>
 
 namespace chip::app {
@@ -37,6 +37,7 @@ public:
     struct Config
     {
         Clusters::OperationalState::OperationalStateCluster::Delegate & operationalStateDelegate;
+        Clusters::ServiceArea::StorageDelegate & serviceAreaStorageDelegate;
         Clusters::ServiceArea::Delegate & serviceAreaDelegate;
         Clusters::ModeBase::AppDelegate & runModeDelegate;
         Clusters::ModeBase::AppDelegate & cleanModeDelegate;
@@ -58,7 +59,7 @@ private:
     Clusters::OperationalState::OperationalStateCluster::Delegate & mOperationalStateDelegate;
     LazyRegisteredServerCluster<Clusters::RvcOperationalState::RvcOperationalStateCluster> mOperationalStateCluster;
 
-    Clusters::ServiceArea::LoggingServiceAreaStorageDelegate mServiceAreaStorageDelegate;
+    Clusters::ServiceArea::StorageDelegate & mServiceAreaStorageDelegate;
     Clusters::ServiceArea::Delegate & mServiceAreaDelegate;
     LazyRegisteredServerCluster<Clusters::ServiceArea::ServiceAreaCluster> mServiceAreaCluster;
 

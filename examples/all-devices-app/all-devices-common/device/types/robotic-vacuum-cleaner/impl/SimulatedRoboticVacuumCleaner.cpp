@@ -93,11 +93,12 @@ bool IsOperating(RvcOperationalState::RvcOperationalStateCluster & cluster)
 
 SimulatedRoboticVacuumCleaner::SimulatedRoboticVacuumCleaner(const Context & context) :
     RoboticVacuumCleaner(RoboticVacuumCleaner::Config{
-        .operationalStateDelegate = *this,
-        .serviceAreaDelegate      = *this,
-        .runModeDelegate          = mRunModeAppDelegate,
-        .cleanModeDelegate        = mCleanModeAppDelegate,
-        .diagnosticDataProvider   = context.diagnosticDataProvider,
+        .operationalStateDelegate   = *this,
+        .serviceAreaStorageDelegate = mServiceAreaStorageDelegate,
+        .serviceAreaDelegate        = *this,
+        .runModeDelegate            = mRunModeAppDelegate,
+        .cleanModeDelegate          = mCleanModeAppDelegate,
+        .diagnosticDataProvider     = context.diagnosticDataProvider,
     }),
     mTimerDelegate(context.timerDelegate)
 {}
