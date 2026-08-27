@@ -16,22 +16,19 @@
  */
 
 #include <device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.h>
-#include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationLogic.h>
-#include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationTopology.h>
 #include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip::app {
 
 using namespace Clusters::ServiceArea;
-using namespace chip::app::all_devices::rvc_simulation;
-using namespace chip::app::all_devices::rvc_simulation::Topology;
 
 RoboticVacuumCleaner::RoboticVacuumCleaner(const Config & config) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRoboticVacuumCleaner, 1)),
     mOperationalStateDelegate(config.operationalStateDelegate), mServiceAreaStorageDelegate(config.serviceAreaStorageDelegate),
     mServiceAreaDelegate(config.serviceAreaDelegate), mRunModeDelegate(config.runModeDelegate),
-    mCleanModeDelegate(config.cleanModeDelegate), mDiagnosticDataProvider(config.diagnosticDataProvider)
+    mCleanModeDelegate(config.cleanModeDelegate), mRunModeStartupValue(config.runModeStartupValue),
+    mCleanModeStartupValue(config.cleanModeStartupValue), mDiagnosticDataProvider(config.diagnosticDataProvider)
 {}
 
 CHIP_ERROR RoboticVacuumCleaner::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -76,8 +73,8 @@ CHIP_ERROR RoboticVacuumCleaner::Register(EndpointId endpoint, CodeDrivenDataMod
 
     ReturnErrorOnFailure(mServiceAreaDelegate.Init());
 
-    mRunModeCluster.Cluster().UpdateCurrentMode(kRunModeIdle);
-    mCleanModeCluster.Cluster().UpdateCurrentMode(kCleanModeQuick);
+    mRunModeCluster.Cluster().UpdateCurrentMode(mRunModeStartupValue);
+    mCleanModeCluster.Cluster().UpdateCurrentMode(mCleanModeStartupValue);
     LogErrorOnFailure(mOperationalStateCluster.Cluster().SetOperationalState(
         to_underlying(Clusters::OperationalState::OperationalStateEnum::kStopped)));
     LogErrorOnFailure(mOperationalStateCluster.Cluster().SetCurrentPhase(0));

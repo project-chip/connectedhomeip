@@ -26,6 +26,8 @@
 #include <device/api/SingleEndpoint.h>
 #include <platform/DiagnosticDataProvider.h>
 
+#include <cstdint>
+
 namespace chip::app {
 
 // Generic RVC device: owns the mandatory clusters and wires them to whatever delegate
@@ -41,6 +43,10 @@ public:
         Clusters::ServiceArea::Delegate & serviceAreaDelegate;
         Clusters::ModeBase::AppDelegate & runModeDelegate;
         Clusters::ModeBase::AppDelegate & cleanModeDelegate;
+        // Mode values to report on startup, using the numbering of the concrete run/clean mode
+        // option lists supplied via runModeDelegate/cleanModeDelegate.
+        uint8_t runModeStartupValue;
+        uint8_t cleanModeStartupValue;
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
     };
 
@@ -68,6 +74,9 @@ private:
 
     Clusters::ModeBase::AppDelegate & mCleanModeDelegate;
     LazyRegisteredServerCluster<Clusters::ModeBaseCluster> mCleanModeCluster;
+
+    uint8_t mRunModeStartupValue;
+    uint8_t mCleanModeStartupValue;
 
     DeviceLayer::DiagnosticDataProvider & mDiagnosticDataProvider;
 };
