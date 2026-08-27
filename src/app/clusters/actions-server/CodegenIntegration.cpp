@@ -47,6 +47,7 @@ std::string ReadSetupURL(EndpointId endpointId)
     CharSpan urlSpan;
     VerifyOrReturnValue(Attributes::SetupURL::GetDefault(endpointId, urlSpan) == Protocols::InteractionModel::Status::Success,
                         std::string());
+    VerifyOrReturnValue(!urlSpan.empty() && urlSpan.data() != nullptr, std::string());
     return std::string(urlSpan.data(), urlSpan.size());
 }
 

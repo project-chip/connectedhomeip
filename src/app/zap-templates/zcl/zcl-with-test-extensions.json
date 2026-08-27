@@ -641,7 +641,14 @@
             "SupportedTemperatureLevels",
             "ClusterRevision"
         ],
-        "Dishwasher Alarm": ["ClusterRevision"],
+        "Dishwasher Alarm": [
+            { "name": "Mask", "keepDefault": true },
+            { "name": "Latch", "keepDefault": true },
+            { "name": "State", "keepDefault": true },
+            { "name": "Supported", "keepDefault": true },
+            { "name": "FeatureMap", "keepDefault": true },
+            "ClusterRevision"
+        ],
         "Dishwasher Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Control": [
@@ -659,7 +666,13 @@
         ],
         "Laundry Washer Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
-        "Refrigerator Alarm": ["ClusterRevision"],
+        "Refrigerator Alarm": [
+            { "name": "Mask", "keepDefault": true },
+            { "name": "State", "keepDefault": true },
+            { "name": "Supported", "keepDefault": true },
+            { "name": "FeatureMap", "keepDefault": true },
+            "ClusterRevision"
+        ],
         "Refrigerator And Temperature Controlled Cabinet Mode": [
             "SupportedModes",
             "CurrentMode",
@@ -1012,21 +1025,6 @@
         "Localization Configuration": [
             { "name": "ActiveLocale", "keepDefault": true },
             "SupportedLocales",
-            { "name": "FeatureMap", "keepDefault": true },
-            "ClusterRevision"
-        ],
-        "Dishwasher Alarm": [
-            { "name": "Mask", "keepDefault": true },
-            { "name": "Latch", "keepDefault": true },
-            { "name": "State", "keepDefault": true },
-            { "name": "Supported", "keepDefault": true },
-            { "name": "FeatureMap", "keepDefault": true },
-            "ClusterRevision"
-        ],
-        "Refrigerator Alarm": [
-            { "name": "Mask", "keepDefault": true },
-            { "name": "State", "keepDefault": true },
-            { "name": "Supported", "keepDefault": true },
             { "name": "FeatureMap", "keepDefault": true },
             "ClusterRevision"
         ],
