@@ -911,6 +911,15 @@ CHIP_ERROR PairingCommand::ParseProxyTransportArguments()
 
 CHIP_ERROR PairingCommand::PairViaProxy(NodeId remoteId)
 {
+    // Refuse a new flow while a previous one still has a sender outstanding.  Interactive
+    // mode reuses this instance, and SendProxyDisconnect() only clears mProxySessionActive;
+    // it neither waits for nor clears the message senders.  A sender left over from an
+    // abandoned flow would otherwise run its callback against this flow's session state and
+    // tear down a session it knows nothing about.
+    VerifyOrReturnError(
+        mProxyConnectCmdSender == nullptr && mProxyMessageCmdSenders.empty() && mProxyDisconnectCmdSender == nullptr,
+        CHIP_ERROR_INCORRECT_STATE, ChipLogError(chipTool, "PairViaProxy: a previous proxy flow is still finishing"));
+
     // Validate the command line before the CASE session below: a bad --proxy-transport
     // should not cost a full handshake with the proxy first.
     VerifyOrReturnError(mProxyNodeId != chip::kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT,
@@ -941,6 +950,7 @@ void PairingCommand::OnProxyDeviceConnected(void * context, chip::Messaging::Exc
     if (!cmdSender)
     {
         ChipLogError(chipTool, "PairViaProxy: failed to allocate CommandSender");
+        self->mProxySession.Release();
         self->SetCommandExitStatus(CHIP_ERROR_NO_MEMORY);
         return;
     }
@@ -965,6 +975,7 @@ void PairingCommand::OnProxyDeviceConnected(void * context, chip::Messaging::Exc
     if (cmdSender->AddRequestData(pathParams, request) != CHIP_NO_ERROR)
     {
         ChipLogError(chipTool, "PairViaProxy: AddRequestData failed");
+        self->mProxySession.Release();
         self->SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE);
         return;
     }
@@ -973,6 +984,7 @@ void PairingCommand::OnProxyDeviceConnected(void * context, chip::Messaging::Exc
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(chipTool, "PairViaProxy: SendCommandRequest failed: %" CHIP_ERROR_FORMAT, err.Format());
+        self->mProxySession.Release();
         self->SetCommandExitStatus(err);
         return;
     }
@@ -1063,7 +1075,12 @@ void PairingCommand::OnResponse(chip::app::CommandSender * client, const chip::a
 
             auto * transportMgr   = CurrentCommissioner().GetTransportMgr();
             auto * proxyTransport = GetDeviceProxyTransport(transportMgr);
-            VerifyOrReturn(proxyTransport != nullptr);
+            if (proxyTransport == nullptr)
+            {
+                ChipLogError(chipTool, "PairViaProxy: no proxy transport to inject into");
+                SendProxyDisconnect(CHIP_ERROR_INCORRECT_STATE);
+                return;
+            }
 
             CHIP_ERROR injectErr = proxyTransport->OnProxyMessageReceived(response.sessionID, response.message.Value());
             if (injectErr != CHIP_NO_ERROR)
@@ -1095,6 +1112,7 @@ void PairingCommand::OnResponse(chip::app::CommandSender * client, const chip::a
             if (pollErr != CHIP_NO_ERROR)
             {
                 ChipLogError(chipTool, "PairViaProxy: failed to poll for queued messages: %" CHIP_ERROR_FORMAT, pollErr.Format());
+                SendProxyDisconnect(pollErr);
             }
         }
         else
