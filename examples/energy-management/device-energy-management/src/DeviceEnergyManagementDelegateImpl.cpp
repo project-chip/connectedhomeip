@@ -809,65 +809,69 @@ Status DeviceEnergyManagementDelegate::PowerRangeAdjustRequest(const DataModel::
                   static_cast<long long>(minPower.IsNull() ? 0 : minPower.Value()),
                   static_cast<long long>(maxPower.IsNull() ? 0 : maxPower.Value()), duration, to_underlying(cause));
 
-    // If a timer is running, cancel it so we can start it with the new duration
-    if (mPowerRangeAdjustmentInProgress)
-    {
-        DeviceLayer::SystemLayer().CancelTimer(PowerRangeAdjustTimerExpiry, this);
-    }
-
     // Record when this PowerRangeAdjustment starts (each request restarts the session window)
     CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(mPowerRangeAdjustmentStartTimeUtc);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Unable to get time: %" CHIP_ERROR_FORMAT, err.Format());
-        HandlePowerRangeAdjustRequestFailure();
         return Status::Failure;
     }
 
     // Calculate the end time for the power range adjustment
     uint32_t endTimeUtc = mPowerRangeAdjustmentStartTimeUtc + duration;
 
-    TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kPowerAdjustActive);
-
-    // Update the PowerRangeAdjustment attribute
-    Structs::PowerRangeAdjustStruct::Type powerRangeAdjustment;
-    powerRangeAdjustment.minPower = minPower;
-    powerRangeAdjustment.maxPower = maxPower;
-
-    // Set the cause based on the adjustment cause
+    // Validate and map the cause before any state changes
+    PowerAdjustReasonEnum mappedCause;
     switch (cause)
     {
     case AdjustmentCauseEnum::kLocalOptimization:
-        powerRangeAdjustment.cause = PowerAdjustReasonEnum::kLocalOptimizationAdjustment;
+        mappedCause = PowerAdjustReasonEnum::kLocalOptimizationAdjustment;
         break;
     case AdjustmentCauseEnum::kGridOptimization:
-        powerRangeAdjustment.cause = PowerAdjustReasonEnum::kGridOptimizationAdjustment;
+        mappedCause = PowerAdjustReasonEnum::kGridOptimizationAdjustment;
         break;
     default:
-        HandlePowerRangeAdjustRequestFailure();
+        ChipLogError(AppServer, "PowerRangeAdjustRequest: Invalid cause: %d", to_underlying(cause));
         return Status::Failure;
     }
 
-    powerRangeAdjustment.endTime = endTimeUtc;
+    // Pre-validate with manufacturer delegate before making any state changes
+    // This ensures if the manufacturer callback fails, the cluster state remains unchanged
+    if (mpDEMManufacturerDelegate != nullptr)
+    {
+        err = mpDEMManufacturerDelegate->HandleDeviceEnergyManagementPowerRangeAdjustRequest(minPower, maxPower, duration, cause);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Manufacturer delegate rejected PowerRangeAdjustRequest: %" CHIP_ERROR_FORMAT, err.Format());
+            return Status::Failure;
+        }
+    }
+
+    // All validations passed. Now proceed with state changes.
+    // If a timer is running, cancel it so we can start it with the new duration
+    if (mPowerRangeAdjustmentInProgress)
+    {
+        DeviceLayer::SystemLayer().CancelTimer(PowerRangeAdjustTimerExpiry, this);
+    }
+
+    // Update ESAState to indicate active power range adjustment
+    TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kPowerAdjustActive);
+
+    // Build the PowerRangeAdjustment attribute
+    Structs::PowerRangeAdjustStruct::Type powerRangeAdjustment;
+    powerRangeAdjustment.minPower = minPower;
+    powerRangeAdjustment.maxPower = maxPower;
+    powerRangeAdjustment.cause    = mappedCause;
+    powerRangeAdjustment.endTime  = endTimeUtc;
 
     mPowerRangeAdjustment.SetNonNull(powerRangeAdjustment);
 
     // Report the attribute change
     MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, PowerRangeAdjustment::Id);
 
-    // If manufacturer delegate exists, notify it of the power range adjustment
-    if (mpDEMManufacturerDelegate != nullptr)
-    {
-        err = mpDEMManufacturerDelegate->HandleDeviceEnergyManagementPowerRangeAdjustRequest(minPower, maxPower, duration, cause);
-        if (err != CHIP_NO_ERROR)
-        {
-            HandlePowerRangeAdjustRequestFailure();
-            return Status::Failure;
-        }
-    }
-
     mPowerRangeAdjustmentInProgress = true;
 
+    // Start the timer for the power range adjustment duration
     err = DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(duration), PowerRangeAdjustTimerExpiry, this);
     if (err != CHIP_NO_ERROR)
     {
@@ -897,12 +901,20 @@ Status DeviceEnergyManagementDelegate::PowerRangeAdjustRequest(const DataModel::
 /**
  * @brief Handle a PowerRangeAdjustRequest failing
  *
- *  Cleans up the PowerRangeAdjust state should the request fail.
- *  If the manufacturer was already notified, cancel the adjustment on the manufacturer side before clearing local state.
+ *  Cleans up the PowerRangeAdjust state should the request fail after state changes.
+ *  This is called only when failures occur after ESAState has been set to kPowerAdjustActive
+ *  and the PowerRangeAdjustment attribute has been written (e.g., timer startup failure, event logging failure).
+ *
+ *  Manufacturer callback validation happens BEFORE any state changes, so if that fails,
+ *  this cleanup function is never called and cluster state remains untouched.
+ *
+ *  If the manufacturer was already notified of an active PRA, cancel the adjustment
+ *  on the manufacturer side before clearing local state.
  */
 void DeviceEnergyManagementDelegate::HandlePowerRangeAdjustRequestFailure()
 {
     DeviceLayer::SystemLayer().CancelTimer(PowerRangeAdjustTimerExpiry, this);
+    TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kOnline);
 
     // If the manufacturer was already notified of an active PRA, cancel it before clearing local state
     if (mPowerRangeAdjustmentInProgress && mpDEMManufacturerDelegate != nullptr)
