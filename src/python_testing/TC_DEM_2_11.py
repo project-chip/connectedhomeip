@@ -135,14 +135,16 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
                                                      expected_min_power=absMinPower, expected_max_power=absMaxPower, expected_duration=5)
 
         self.step("6a", "TH reads PowerRangeAdjustment",
-                  expectation="value is MinPower=AbsMinPower, MaxPower=AbsMaxPower, Cause=LocalOptimization, and EndTime in future (approximately 5 seconds from now)")
+                  expectation="value is MinPower=AbsMinPower, MaxPower=AbsMaxPower, Cause=LocalOptimization, and EndTime in future (>4 and <=7 seconds from now)")
         powerRangeAdjustment = await self.read_dem_attribute_expect_success(attribute="PowerRangeAdjustment")
-        # check MinPower=AbsMinPower, MaxPower=AbsMaxPower, Cause=LocalOptimization and EndTime in future (approximately 5 seconds from now)
+        # check MinPower=AbsMinPower, MaxPower=AbsMaxPower, Cause=LocalOptimization and EndTime in future (>4 and <=7 seconds from now)
         asserts.assert_equal(powerRangeAdjustment.minPower, absMinPower)
         asserts.assert_equal(powerRangeAdjustment.maxPower, absMaxPower)
         asserts.assert_equal(powerRangeAdjustment.cause,
                              Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kLocalOptimizationAdjustment)
         asserts.assert_greater(powerRangeAdjustment.endTime, timeNowEpoch + 4)  # Allow 1 second margin for test execution time
+        asserts.assert_less_equal(powerRangeAdjustment.endTime, timeNowEpoch + 7,
+                                  f"Expected endTime approximately 5s from now ({timeNowEpoch}), got {powerRangeAdjustment.endTime}")
 
         self.step("6b", "TH reads ESAState", expectation="value is 0x03 (PowerAdjustActive)")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPowerAdjustActive)
@@ -282,15 +284,15 @@ class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected error returned")
 
-        self.step("19", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower, MaxPower=AbsMaxPower, Duration=5, Cause=GridOptimization",
+        self.step("19", "TH sends PowerRangeAdjustRequest with MinPower=AbsMinPower, MaxPower=AbsMaxPower, Duration=2000, Cause=GridOptimization",
                   expectation="DUT responds with status SUCCESS and Event DEM.S.E04(PowerRangeAdjustStart) sent")
         await self.send_power_range_adjustment_command(cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kGridOptimization,
                                                        minPower=absMinPower,
                                                        maxPower=absMaxPower,
-                                                       duration=5)
+                                                       duration=2000)
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerRangeAdjustStart)
         self.validate_power_range_adjust_start_event(event_data, Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kGridOptimizationAdjustment,
-                                                     expected_min_power=absMinPower, expected_max_power=absMaxPower, expected_duration=5)
+                                                     expected_min_power=absMinPower, expected_max_power=absMaxPower, expected_duration=2000)
 
         self.step("19a", "TH reads PowerRangeAdjustment",
                   expectation="value is MinPower=AbsMinPower, MaxPower=AbsMaxPower, and Cause=GridOptimization")
