@@ -3406,4 +3406,60 @@ TEST_F(TestAudioControlCluster, SoftMutedPersistedWithoutStartUpMuted)
     }
 }
 
+TEST_F(TestAudioControlCluster, StartUpMutedOverridePersistsAcrossReboot)
+{
+    // Boot 1: StartUpMuted=true overrides SoftMuted -> the effective value must be persisted, not
+    // just applied in RAM, so a later boot without the override still sees it.
+    AudioControlCluster::OptionalAttributeSet optionalSet;
+    optionalSet.Set<StartUpMuted::Id>();
+    bool startUpMuted = true;
+    {
+        auto cfg = BasicConfig().WithOptionalAttributes(optionalSet).WithInitialStartUpMuted(DataModel::MakeNullable(startUpMuted));
+        AudioControlCluster cluster(kRootEndpointId, mMockDelegate, cfg);
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+        EXPECT_TRUE(cluster.GetSoftMuted());
+
+        auto key = DefaultStorageKeyAllocator::AttributeValue(kRootEndpointId, AudioControl::Id, SoftMuted::Id);
+        EXPECT_TRUE(testContext.StorageDelegate().SyncDoesKeyExist(key.KeyName()));
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+    // Boot 2: StartUpMuted no longer overrides -> SoftMuted must load the persisted value from
+    // boot 1, not fall back to the config default.
+    {
+        AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig());
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+        EXPECT_TRUE(cluster.GetSoftMuted());
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+}
+
+TEST_F(TestAudioControlCluster, StartUpVolumeOverridePersistsAcrossReboot)
+{
+    // Boot 1: StartUpVolume=75 overrides Volume -> the effective value must be persisted, not just
+    // applied in RAM, so a later boot without the override still sees it.
+    AudioControlCluster::OptionalAttributeSet optionalSet;
+    optionalSet.Set<StartUpVolume::Id>();
+    uint16_t startUpVolume = 75;
+    {
+        auto cfg = BasicConfig().WithOptionalAttributes(optionalSet).WithInitialStartUpVolume(DataModel::MakeNullable(startUpVolume));
+        AudioControlCluster cluster(kRootEndpointId, mMockDelegate, cfg);
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+        EXPECT_EQ(cluster.GetVolume(), 75u);
+
+        auto key = DefaultStorageKeyAllocator::AttributeValue(kRootEndpointId, AudioControl::Id, Volume::Id);
+        EXPECT_TRUE(testContext.StorageDelegate().SyncDoesKeyExist(key.KeyName()));
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+    // Boot 2: StartUpVolume no longer overrides -> Volume must load the persisted value from
+    // boot 1, not fall back to the config default.
+    {
+        AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig());
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+        EXPECT_EQ(cluster.GetVolume(), 75u);
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+}
+
 } // namespace

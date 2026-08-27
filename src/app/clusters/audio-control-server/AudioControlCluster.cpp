@@ -174,6 +174,7 @@ CHIP_ERROR AudioControlCluster::Startup(ServerClusterContext & context)
     }
 
     // Apply StartUpVolume: absent → mVolume stays at the persisted Volume (null-like behavior).
+    const uint16_t persistedVolume = mVolume;
     if (mOptionalAttributeSet.IsSet(StartUpVolume::Id))
     {
         attributePersistence.LoadNativeEndianValue(
@@ -185,6 +186,10 @@ CHIP_ERROR AudioControlCluster::Startup(ServerClusterContext & context)
         }
     }
     mVolume = std::clamp(mVolume, mMinDeviceVolume, EffectiveMaxVolume());
+    if (mVolume != persistedVolume)
+    {
+        StoreVolume();
+    }
 
     if (mFeatures.Has(Feature::kBasicEqualizer))
     {
@@ -675,6 +680,11 @@ DataModel::ActionReturnStatus AudioControlCluster::HandleSetVolume(chip::TLV::TL
     SetVolume::DecodableType req;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, req));
 
+    if (req.unmutePolicy.HasValue())
+    {
+        VerifyOrReturnError(req.unmutePolicy.Value() < UnmutePolicyEnum::kUnknownEnumValue, Status::ConstraintError);
+    }
+
     const uint16_t effectiveMax = EffectiveMaxVolume();
 
     // Constraint: 0 OR [MinDeviceVolume, EffectiveMax]
@@ -714,6 +724,15 @@ DataModel::ActionReturnStatus AudioControlCluster::HandleIncreaseVolume(chip::TL
 {
     IncreaseVolume::DecodableType req;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, req));
+
+    if (req.unmutePolicy.HasValue())
+    {
+        VerifyOrReturnError(req.unmutePolicy.Value() < UnmutePolicyEnum::kUnknownEnumValue, Status::ConstraintError);
+    }
+    if (req.unmuteVolume.HasValue())
+    {
+        VerifyOrReturnError(req.unmuteVolume.Value() < UnmuteVolumeEnum::kUnknownEnumValue, Status::ConstraintError);
+    }
 
     const uint16_t effectiveMax = EffectiveMaxVolume();
     const uint16_t stepSize     = req.stepSize.ValueOr(mDefaultStepSize);
@@ -775,6 +794,11 @@ DataModel::ActionReturnStatus AudioControlCluster::HandleDecreaseVolume(chip::TL
 {
     DecreaseVolume::DecodableType req;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, req));
+
+    if (req.unmutePolicy.HasValue())
+    {
+        VerifyOrReturnError(req.unmutePolicy.Value() < UnmutePolicyEnum::kUnknownEnumValue, Status::ConstraintError);
+    }
 
     const uint16_t stepSize = req.stepSize.ValueOr(mDefaultStepSize);
 

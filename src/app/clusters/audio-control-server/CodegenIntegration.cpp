@@ -133,6 +133,21 @@ void MatterAudioControlClusterShutdownCallback(EndpointId endpointId, MatterClus
             .maxClusterInstanceCount   = kAudioControlMaxClusterCount,
         },
         integrationDelegate, shutdownType);
+
+    // Reclaim the delegate table slot so a permanently-removed endpoint's ID can be reused by a
+    // later SetDelegate() call. Endpoints that are only restarting (kClusterShutdown) keep their
+    // slot, matching MatterAudioControlClusterInitCallback firing again for the same endpoint.
+    if (shutdownType == MatterClusterShutdownType::kPermanentRemove)
+    {
+        for (auto & entry : gDelegateTable)
+        {
+            if (entry.endpointId == endpointId)
+            {
+                entry = DelegateEntry();
+                break;
+            }
+        }
+    }
 }
 
 namespace chip::app::Clusters::AudioControl {
