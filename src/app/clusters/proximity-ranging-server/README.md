@@ -218,10 +218,11 @@ Client                    Cluster                   Driver                Adapte
   │                         ├─ HandleStartRanging ───►│                     │
   │                         │                         ├─ FindAdapter(tech)  │
   │                         │                         ├─ allocate session   │
-  │                         │                         ├─ StartSession ─────►│
+  │                         │                         ├─ PrepareSession ───►│
   │                         │                         │◄─ ClusterStatusCode ┤
   │                         │◄─ ClusterStatusCode ────┤                     │
   │◄─ StartRangingResponse ─┤                         │                     │
+  │                         │                         ├─ StartSession ─────►│
 ```
 
 On success the cluster sends a `StartRangingResponse` carrying the assigned
