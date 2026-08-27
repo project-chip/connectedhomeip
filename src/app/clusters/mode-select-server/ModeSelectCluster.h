@@ -44,6 +44,9 @@ public:
     public:
         virtual ~Delegate()                                                                       = default;
         virtual Span<const ModeSelect::Structs::ModeOptionStruct::Type> GetSupportedModes() const = 0;
+
+        // Called when CurrentMode changes (via ChangeToMode command or startup logic).
+        virtual void OnModeChanged(uint8_t newMode) {}
     };
 
     struct Config
@@ -60,6 +63,7 @@ public:
 
     // ServerClusterInterface overrides
     CHIP_ERROR Startup(ServerClusterContext & context) override;
+    void Shutdown(ClusterShutdownType shutdownType) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
@@ -82,14 +86,16 @@ public:
 
     bool IsSupportedMode(uint8_t mode) const;
 
-    // Called by setSupportedModesManager() when modes become available after Startup().
-    void ApplyStartupModeLogic();
-
     // scenes::SceneHandler overrides
     bool SupportsCluster(EndpointId endpoint, ClusterId cluster) override;
     CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes) override;
     CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
                           scenes::TransitionTimeMs timeMs) override;
+
+protected:
+    // Apply startup mode logic (StartUpMode → CurrentMode, OnMode → CurrentMode).
+    // Called by the integration layer when supported modes become available.
+    void ApplyStartupModeLogic();
 
 private:
     void LoadPersistentAttributes(AttributePersistenceProvider & provider);

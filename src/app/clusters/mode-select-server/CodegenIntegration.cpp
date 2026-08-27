@@ -43,12 +43,22 @@ using namespace chip::app::Clusters::ModeSelect;
 using namespace chip::app::Clusters::ModeSelect::Attributes;
 using Status = Protocols::InteractionModel::Status;
 
+// Forward declaration of the internal registration API defined in SupportedModesManager.cpp.
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ModeSelect {
+namespace internal {
+void RegisterOnManagerSetCallback(void (*cb)(SupportedModesManager * manager));
+} // namespace internal
+} // namespace ModeSelect
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
 namespace {
 
-// Global backward-compat pointer for app code that calls setSupportedModesManager()
-ModeSelect::SupportedModesManager * sSupportedModesManager = nullptr;
-
-// Adapts SupportedModesManager to ModeSelectCluster::Delegate for a single endpoint
+// Adapts SupportedModesManager to ModeSelectCluster::Delegate for a single endpoint.
 class SupportedModesManagerDelegate : public ModeSelectCluster::Delegate
 {
 public:
@@ -56,7 +66,7 @@ public:
 
     Span<const ModeSelect::Structs::ModeOptionStruct::Type> GetSupportedModes() const override
     {
-        const SupportedModesManager * mgr = sSupportedModesManager;
+        const SupportedModesManager * mgr = getSupportedModesManager();
         if (mgr == nullptr)
         {
             return Span<const ModeSelect::Structs::ModeOptionStruct::Type>();
@@ -82,13 +92,15 @@ class CodegenModeSelectCluster : public ModeSelectCluster
 {
 public:
     using ModeSelectCluster::ModeSelectCluster;
+    // Re-expose the protected method as public for use by the codegen integration layer.
+    using ModeSelectCluster::ApplyStartupModeLogic;
 
     CHIP_ERROR Startup(ServerClusterContext & context) override
     {
         ReturnErrorOnFailure(ModeSelectCluster::Startup(context));
         // If the global manager is already set (typical case), apply startup logic now.
-        // Otherwise setSupportedModesManager() will call ApplyStartupModeLogic() later.
-        if (sSupportedModesManager != nullptr)
+        // Otherwise setSupportedModesManager() will trigger it via the registered callback.
+        if (getSupportedModesManager() != nullptr)
         {
             ApplyStartupModeLogic();
         }
@@ -224,7 +236,22 @@ void MatterModeSelectClusterShutdownCallback(EndpointId endpointId, MatterCluste
 
 // ---- Legacy ember callbacks (stubs) ----
 
-void MatterModeSelectPluginServerInitCallback() {}
+static void OnSupportedModesManagerSet(SupportedModesManager *)
+{
+    // Apply deferred startup logic for any clusters that started before the manager was set.
+    for (auto & entry : gEntries)
+    {
+        if (entry.server.IsConstructed())
+        {
+            entry.server.Cluster().ApplyStartupModeLogic();
+        }
+    }
+}
+
+void MatterModeSelectPluginServerInitCallback()
+{
+    ModeSelect::internal::RegisterOnManagerSetCallback(OnSupportedModesManagerSet);
+}
 void MatterModeSelectPluginServerShutdownCallback() {}
 
 void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId) {}
@@ -238,25 +265,6 @@ MatterModeSelectClusterServerPreAttributeChangedCallback(const ConcreteAttribute
 // ---- Backward-compat global API for app code ----
 
 namespace chip::app::Clusters::ModeSelect {
-
-const SupportedModesManager * getSupportedModesManager()
-{
-    return sSupportedModesManager;
-}
-
-void setSupportedModesManager(SupportedModesManager * mgr)
-{
-    sSupportedModesManager = mgr;
-    // Apply startup mode logic to all clusters that started before the manager was set.
-    // (Example apps call this in ApplicationInit, after Server::Init.)
-    for (auto & entry : gEntries)
-    {
-        if (entry.server.IsConstructed())
-        {
-            entry.server.Cluster().ApplyStartupModeLogic();
-        }
-    }
-}
 
 ModeSelectCluster * FindClusterOnEndpoint(EndpointId endpointId)
 {

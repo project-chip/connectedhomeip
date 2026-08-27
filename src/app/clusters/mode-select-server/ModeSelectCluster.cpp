@@ -68,6 +68,12 @@ CHIP_ERROR ModeSelectCluster::Startup(ServerClusterContext & context)
     return CHIP_NO_ERROR;
 }
 
+void ModeSelectCluster::Shutdown(ClusterShutdownType shutdownType)
+{
+    mStartupLogicApplied = false;
+    DefaultServerCluster::Shutdown(shutdownType);
+}
+
 void ModeSelectCluster::ApplyStartupModeLogic()
 {
     if (mContext == nullptr || mStartupLogicApplied)
@@ -87,9 +93,10 @@ void ModeSelectCluster::ApplyStartupModeLogic()
             ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, CurrentMode::Id), mCurrentMode));
     }
 
-    // Workaround: initialize StartUpMode to CurrentMode when it is null (not yet persisted).
-    // StartUpMode is nullable per spec (null = no startup override), but existing certification
-    // tests assert it is always an integer. Until those tests are updated, default to CurrentMode.
+    // TODO: remove this workaround once TC_MOD_1_2.py is updated to accept a null StartUpMode.
+    // StartUpMode is nullable per spec (null = no startup override), but TC_MOD_1_2 step 5 asserts
+    // isinstance(startup_mode, int). Until that test is fixed, default to CurrentMode on first boot.
+    // See https://github.com/project-chip/connectedhomeip/issues/73795
     if (mOptionalAttributeSet.IsSet(StartUpMode::Id) && mStartUpMode.IsNull())
     {
         mStartUpMode.SetNonNull(mCurrentMode);
@@ -166,11 +173,15 @@ Status ModeSelectCluster::UpdateCurrentMode(uint8_t newMode)
 {
     VerifyOrReturnValue(mContext != nullptr, Status::InvalidInState);
     VerifyOrReturnValue(IsSupportedMode(newMode), Status::ConstraintError);
-    VerifyOrReturnValue(SetAttributeValue(mCurrentMode, newMode, CurrentMode::Id), Status::Success);
+    if (!SetAttributeValue(mCurrentMode, newMode, CurrentMode::Id))
+    {
+        return Status::Success;
+    }
 
     AttributePersistence persistence{ mContext->attributeStorage };
     LogErrorOnFailure(persistence.StoreNativeEndianValue(
         ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, CurrentMode::Id), mCurrentMode));
+    mDelegate.OnModeChanged(mCurrentMode);
     return Status::Success;
 }
 

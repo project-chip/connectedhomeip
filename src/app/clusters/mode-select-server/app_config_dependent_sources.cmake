@@ -18,5 +18,6 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
     "${CLUSTER_DIR}/CodegenIntegration.h"
-    "${CLUSTER_DIR}/supported-modes-manager.h"
+    "${CLUSTER_DIR}/SupportedModesManager.cpp"
+    "${CLUSTER_DIR}/SupportedModesManager.h"
 )
