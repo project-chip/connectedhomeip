@@ -600,7 +600,7 @@ TEST_F(TestHumidistatCluster, SetSettingsMistTypeValidation)
 
     tester.GetDirtyList().clear();
 
-    // Setting WarmMist should fail with ConstraintError (feature not supported)
+    // Setting WarmMist should fail with ConstraintError (feature not supported).
     {
         Commands::SetSettings::Type request;
         request.mistType.SetValue(chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistWarm));
@@ -611,7 +611,7 @@ TEST_F(TestHumidistatCluster, SetSettingsMistTypeValidation)
         EXPECT_EQ(cluster.GetMistType().Raw(), chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold).Raw());
     }
 
-    // Setting an empty MistType while mode is Humidifier should fail.
+    // Empty MistType while humidifying is inconsistent with SystemState.
     {
         Commands::SetSettings::Type request;
         request.mistType.SetValue(chip::BitMask<MistTypeBitmap>());
@@ -637,6 +637,22 @@ TEST_F(TestHumidistatCluster, SetMistTypeRequiresAtLeastOneBitWhenHumidifying)
     EXPECT_EQ(cluster.SetMistType(chip::BitMask<MistTypeBitmap>()), CHIP_IM_GLOBAL_STATUS(InvalidInState));
     EXPECT_EQ(cluster.GetMistType().Raw(), chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold).Raw());
     EXPECT_FALSE(tester.IsAttributeDirty(MistType::Id));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestHumidistatCluster, SetSystemStateHumidifyingAllowedWithNoMistFeatures)
+{
+    // kHumidifier without any mist feature: MistType stays null in Humidifying state.
+    const BitFlags<Feature> features{ Feature::kHumidifier };
+    HumidistatCluster cluster(kTestEndpointId, features, {});
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_EQ(cluster.SetSystemState(SystemStateEnum::kHumidifying), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetSystemState(), SystemStateEnum::kHumidifying);
+    // MistType must remain null — no mist type bits are available to set.
+    EXPECT_TRUE(cluster.GetMistType().Raw() == 0);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

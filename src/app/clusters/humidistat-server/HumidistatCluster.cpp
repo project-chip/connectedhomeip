@@ -372,6 +372,11 @@ bool HumidistatCluster::IsMistTypeConsistentWithSystemState(
 {
     if (systemState == SystemStateEnum::kHumidifying)
     {
+        // When no mist feature is supported, null is the only reachable value.
+        if (!mFeatures.Has(Feature::kColdMist) && !mFeatures.Has(Feature::kWarmMist))
+        {
+            return mistType.IsNull();
+        }
         return !mistType.IsNull() && mistType.Value().HasAny();
     }
 
@@ -490,6 +495,20 @@ CHIP_ERROR HumidistatCluster::SetSystemState(Humidistat::SystemStateEnum systemS
 {
     VerifyOrReturnError(IsSystemStateSupported(systemState), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
+    // Pre-compute the MistType that will result from this transition before committing any state.
+    DataModel::Nullable<chip::BitMask<MistTypeBitmap>> newMistType = mMistType;
+    if (mFeatures.Has(Feature::kHumidifier))
+    {
+        if (systemState != SystemStateEnum::kHumidifying)
+        {
+            newMistType = DataModel::NullNullable;
+        }
+        else if (newMistType.IsNull() || !newMistType.Value().HasAny())
+        {
+            ApplyDefaultMistTypeFromFeatures(mFeatures, newMistType);
+        }
+    }
+
     VerifyOrReturnValue(SetAttributeValue(mSystemState, systemState, SystemState::Id), CHIP_NO_ERROR);
     if (mContext != nullptr)
     {
@@ -498,24 +517,15 @@ CHIP_ERROR HumidistatCluster::SetSystemState(Humidistat::SystemStateEnum systemS
             ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, SystemState::Id), mSystemState));
     }
 
+    // Establish the MistType invariant before notifying the delegate.
+    if (mFeatures.Has(Feature::kHumidifier))
+    {
+        ReturnErrorOnFailure(SetMistType(newMistType));
+    }
+
     if (mDelegate != nullptr)
     {
         mDelegate->OnSystemStateChanged(mSystemState);
-    }
-
-    if (mFeatures.Has(Feature::kHumidifier) && (mSystemState != SystemStateEnum::kHumidifying))
-    {
-        LogErrorOnFailure(SetMistType(DataModel::NullNullable));
-        return CHIP_NO_ERROR;
-    }
-
-    if (mFeatures.Has(Feature::kHumidifier) && (mSystemState == SystemStateEnum::kHumidifying) &&
-        (mMistType.IsNull() || !mMistType.Value().HasAny()))
-    {
-        DataModel::Nullable<chip::BitMask<MistTypeBitmap>> defaultMistType = DataModel::NullNullable;
-        ApplyDefaultMistTypeFromFeatures(mFeatures, defaultMistType);
-        LogErrorOnFailure(SetMistType(defaultMistType));
-        return CHIP_NO_ERROR;
     }
 
     return CHIP_NO_ERROR;
