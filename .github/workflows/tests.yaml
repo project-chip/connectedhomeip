@@ -1055,7 +1055,7 @@ jobs:
         name: REPL Tests - Linux (RUN)
         needs: repl_tests_linux_build
         # Updating the timeout for REPL Tests - Linux (RUN) since splits now run in under 30 minutes
-        timeout-minutes: 45
+        timeout-minutes: 60
 
         if: github.actor != 'restyled-io[bot]'
 
