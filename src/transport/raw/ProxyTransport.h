@@ -91,6 +91,10 @@ public:
  * commissionee concurrently through this class.  The CommissioningProxy cluster's
  * MaxSessions attribute is a separate, server-side notion and implies nothing
  * about concurrency here.
+ *
+ * A caller that reuses one instance across commissioning attempts must let the
+ * previous flow finish, including any request still outstanding to the proxy,
+ * before starting the next one.
  */
 class DLL_EXPORT ProxyTransportBase : public Base
 {
