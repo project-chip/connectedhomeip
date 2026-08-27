@@ -275,10 +275,10 @@ The compiled-in transport(s) follow this build configuration:
 -   **BLE** is included when `chip_config_network_layer_ble` is true.
 
 The `-no-ble` build variants disable the BLE transport. With no transport
-compiled in the device is not registered with the factory at all, so `--device
-commissioning-proxy` reports an invalid device type rather than starting a proxy
-whose every command fails. Darwin behaves the same way, as `src/platform/Darwin`
-has no proxy-capable `BLEManagerImpl`.
+compiled in the device is not registered with the factory at all, so
+`--device commissioning-proxy` reports an invalid device type rather than
+starting a proxy whose every command fails. Darwin behaves the same way, as
+`src/platform/Darwin` has no proxy-capable `BLEManagerImpl`.
 
 To build with both BLE and WiFi-PAF on Linux x86-64 run:
 
