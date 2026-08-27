@@ -1008,7 +1008,45 @@
             "FeatureMap"
         ],
         "Unit Localization": ["ClusterRevision", "TemperatureUnit"],
-        "Localization Configuration": ["ClusterRevision", "SupportedLocales"],
+        "Localization Configuration": [
+            { "name": "ActiveLocale", "keepDefault": true },
+            "SupportedLocales",
+            { "name": "FeatureMap", "keepDefault": true },
+            "ClusterRevision"
+        ],
+        "Dishwasher Alarm": [
+            { "name": "Mask", "keepDefault": true },
+            { "name": "Latch", "keepDefault": true },
+            { "name": "State", "keepDefault": true },
+            { "name": "Supported", "keepDefault": true },
+            { "name": "FeatureMap", "keepDefault": true },
+            "ClusterRevision"
+        ],
+        "Refrigerator Alarm": [
+            { "name": "Mask", "keepDefault": true },
+            { "name": "State", "keepDefault": true },
+            { "name": "Supported", "keepDefault": true },
+            { "name": "FeatureMap", "keepDefault": true },
+            "ClusterRevision"
+        ],
+        "Smoke CO Alarm": [
+            "ExpressedState",
+            "SmokeState",
+            "COState",
+            "BatteryAlert",
+            "DeviceMuted",
+            { "name": "TestInProgress", "keepDefault": true },
+            "HardwareFaultAlert",
+            "EndOfServiceAlert",
+            { "name": "InterconnectSmokeAlarm", "keepDefault": true },
+            { "name": "InterconnectCOAlarm", "keepDefault": true },
+            { "name": "ContaminationState", "keepDefault": true },
+            { "name": "SmokeSensitivityLevel", "keepDefault": true },
+            { "name": "ExpiryDate", "keepDefault": true },
+            { "name": "Unmounted", "keepDefault": true },
+            { "name": "FeatureMap", "keepDefault": true },
+            "ClusterRevision"
+        ],
         "TLS Certificate Management": [
             "ClusterRevision",
             "MaxRootCertificates",
