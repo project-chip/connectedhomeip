@@ -85,6 +85,12 @@ public:
  *   3. Call PairDevice(nodeId, PeerAddress::Proxy(sessionId)).
  *   4. When ProxyMessageResponse arrives, call:
  *        OnProxyMessageReceived(sessionId, message);
+ *
+ * Exactly one proxy session is live at a time: Activate() rejects a second
+ * session while one is active, so a commissioner cannot tunnel to more than one
+ * commissionee concurrently through this class.  The CommissioningProxy cluster's
+ * MaxSessions attribute is a separate, server-side notion and implies nothing
+ * about concurrency here.
  */
 class DLL_EXPORT ProxyTransportBase : public Base
 {
