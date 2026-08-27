@@ -27,7 +27,9 @@
 #include <lib/support/ThreadOperationalDataset.h>
 
 #include <app/CommandSender.h>
+#include <clusters/CommissioningProxy/Enums.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
+#include <lib/support/BitMask.h>
 #include <transport/Session.h>
 #include <transport/raw/ProxyTransport.h>
 
@@ -390,6 +392,13 @@ private:
     /** Kick off the proxy pairing flow. */
     CHIP_ERROR PairViaProxy(NodeId remoteId);
 
+    /**
+     * Validate --proxy-transport and --proxy-wifi-band into mProxyTransportBits and
+     * mProxyWiFiBandBits.  Called before the CASE session so a bad command line fails
+     * without any network work.
+     */
+    CHIP_ERROR ParseProxyTransportArguments();
+
     /** Called when CASE session to the proxy is established. */
     static void OnProxyDeviceConnected(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
                                        const chip::SessionHandle & sessionHandle);
@@ -431,6 +440,10 @@ private:
     // to kDefaultProxyEndpointId when not given on the command line.
     chip::Optional<chip::EndpointId> mProxyEndpointId;
     chip::Optional<char *> mProxyWiFiBand;
+
+    // --proxy-transport / --proxy-wifi-band after validation by ParseProxyTransportArguments().
+    chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap> mProxyTransportBits;
+    chip::Optional<chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>> mProxyWiFiBandBits;
 
     // Exchange context to the proxy, kept alive for ProxyMessageRequest invokes.
     chip::Messaging::ExchangeManager * mProxyExchangeMgr = nullptr;

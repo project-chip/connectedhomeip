@@ -124,10 +124,14 @@ public:
     /**
      * Called by the ProxyTransportDelegate when ProxyMessageResponse arrives.
      * Injects the bytes back into the Matter stack as a received packet from
-     * the proxy's virtual peer address.  A message for any session other than
-     * the active one is dropped.
+     * the proxy's virtual peer address.
+     *
+     * @return CHIP_ERROR_INCORRECT_STATE if the transport is inactive or the
+     *         message names another session, CHIP_ERROR_INVALID_ARGUMENT if the
+     *         message is empty, CHIP_ERROR_NO_MEMORY if no packet buffer was
+     *         available.
      */
-    void OnProxyMessageReceived(uint16_t sessionId, ByteSpan message);
+    CHIP_ERROR OnProxyMessageReceived(uint16_t sessionId, ByteSpan message);
 
 private:
     ProxyTransportDelegate * mDelegate = nullptr;

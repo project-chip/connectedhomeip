@@ -80,26 +80,26 @@ CHIP_ERROR ProxyTransportBase::SendMessage(const PeerAddress & address, System::
     return mDelegate->SendProxyMessage(sessionId, ByteSpan(msgBuf->Start(), msgBuf->DataLength()));
 }
 
-void ProxyTransportBase::OnProxyMessageReceived(uint16_t sessionId, ByteSpan message)
+CHIP_ERROR ProxyTransportBase::OnProxyMessageReceived(uint16_t sessionId, ByteSpan message)
 {
-    if (!mActive || sessionId != mSessionId)
-    {
-        ChipLogError(Inet, "ProxyTransport: received message for unknown session %u (active=%d, expected=%u)", sessionId,
-                     (int) mActive, mSessionId);
-        return;
-    }
+    VerifyOrReturnError(mActive && sessionId == mSessionId, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(Inet, "ProxyTransport: received message for unknown session %u (active=%d, expected=%u)",
+                                     sessionId, (int) mActive, mSessionId));
+
+    // NewWithData() memcpy()s from message.data(), which an empty span leaves null, and a
+    // zero-length packet carries nothing for the stack to parse.
+    VerifyOrReturnError(!message.empty(), CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(Inet, "ProxyTransport: empty message for session %u", sessionId));
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::NewWithData(message.data(), message.size());
-    if (buf.IsNull())
-    {
-        ChipLogError(Inet, "ProxyTransport: out of memory for received message");
-        return;
-    }
+    VerifyOrReturnError(!buf.IsNull(), CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(Inet, "ProxyTransport: out of memory for received message"));
 
     ChipLogDetail(Inet, "ProxyTransport: injecting %u bytes for session %u into Matter stack",
                   static_cast<unsigned>(message.size()), sessionId);
 
     HandleMessageReceived(PeerAddress::Proxy(sessionId), std::move(buf));
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Transport
