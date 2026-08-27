@@ -865,6 +865,12 @@ CHIP_ERROR PairingCommand::ParseProxyTransportArguments()
 {
     using namespace chip::app::Clusters::CommissioningProxy;
 
+    // Interactive mode reuses this command instance, and Command::ResetArguments() only
+    // clears registered arguments, not what was derived from them.  Set() ORs, so without
+    // this a second run would send the union of both transports.
+    mProxyTransportBits.ClearAll();
+    mProxyWiFiBandBits.ClearValue();
+
     VerifyOrReturnError(mProxyTransport != nullptr, CHIP_ERROR_INVALID_ARGUMENT,
                         ChipLogError(chipTool, "PairViaProxy: --proxy-transport is required (one of: ble | wifipaf)"));
 
@@ -1001,7 +1007,7 @@ void PairingCommand::OnProxyConnected(uint16_t sessionId)
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(chipTool, "PairViaProxy: could not activate the proxy transport: %" CHIP_ERROR_FORMAT, err.Format());
-        SetCommandExitStatus(err);
+        SendProxyDisconnect(err);
         return;
     }
 
@@ -1010,7 +1016,7 @@ void PairingCommand::OnProxyConnected(uint16_t sessionId)
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(chipTool, "PairViaProxy: Pair() failed: %" CHIP_ERROR_FORMAT, err.Format());
-        SetCommandExitStatus(err);
+        SendProxyDisconnect(err);
     }
 }
 
@@ -1031,7 +1037,9 @@ void PairingCommand::OnResponse(chip::app::CommandSender * client, const chip::a
         else
         {
             ChipLogError(chipTool, "PairViaProxy: failed to decode ProxyConnectResponse");
-            SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE);
+            // The proxy may have accepted the request even though its response was
+            // undecodable, and no SessionID is known, so cancel rather than disconnect.
+            SendProxyDisconnect(CHIP_ERROR_INCORRECT_STATE, /* aCancelPendingConnect */ true);
         }
         return;
     }
@@ -1092,6 +1100,7 @@ void PairingCommand::OnResponse(chip::app::CommandSender * client, const chip::a
         else
         {
             ChipLogError(chipTool, "PairViaProxy: failed to decode ProxyMessageResponse");
+            SendProxyDisconnect(CHIP_ERROR_INCORRECT_STATE);
         }
         return;
     }
