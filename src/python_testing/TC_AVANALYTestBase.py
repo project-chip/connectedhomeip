@@ -46,3 +46,47 @@ class AVANALYTestBase:
         value = await self.read_avanaly_attribute_expect_success(endpoint=endpoint, attribute=attribute)
         asserts.assert_equal(value, expected_value,
                              f"Unexpected '{attribute}' value - expected {expected_value}, was {value}")
+
+    async def read_avanaly_features(self, endpoint):
+        """Read FeatureMap attribute and populate feature flags."""
+        cluster = Clusters.Objects.AvAnalysis
+        attributes = cluster.Attributes
+        feature_map = await self.read_avanaly_attribute_expect_success(endpoint, attributes.FeatureMap)
+        self.has_feature_lclcondetect = (feature_map & cluster.Bitmaps.Feature.kLocalContextDetection) != 0
+        self.has_feature_remcondetect = (feature_map & cluster.Bitmaps.Feature.kRemoteContextDetection) != 0
+        self.has_feature_perzonedetect = (feature_map & cluster.Bitmaps.Feature.kPerZoneContextDetection) != 0
+        return feature_map
+
+    async def send_enable_context_triggers_cmd(self, endpoint, context_triggers=None):
+        """Send EnableContextTriggers command to the AvAnalysis cluster."""
+        cmd = Clusters.Objects.AvAnalysis.Commands.EnableContextTriggers(contextTriggers=context_triggers)
+        return await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+
+    async def send_disable_context_triggers_cmd(self, endpoint, context_triggers=None):
+        """Send DisableContextTriggers command to the AvAnalysis cluster."""
+        cmd = Clusters.Objects.AvAnalysis.Commands.DisableContextTriggers(contextTriggers=context_triggers)
+        return await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+
+    async def send_establish_analysis_stream_cmd(self, endpoint, node_id):
+        """Send EstablishAnalysisStream command to the AvAnalysis cluster."""
+        cmd = Clusters.Objects.AvAnalysis.Commands.EstablishAnalysisStream(nodeID=node_id)
+        return await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+
+    async def send_activate_analysis_stream_cmd(self, endpoint, analysis_stream_id, webrtc_endpoint_id=None, pushav_endpoint_id=None):
+        """Send ActivateAnalysisStream command to the AvAnalysis cluster."""
+        cmd = Clusters.Objects.AvAnalysis.Commands.ActivateAnalysisStream(
+            analysisStreamID=analysis_stream_id,
+            webRTCEndpointID=webrtc_endpoint_id,
+            pushAVEndpointID=pushav_endpoint_id
+        )
+        return await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+
+    async def send_deactivate_analysis_stream_cmd(self, endpoint, analysis_stream_id):
+        """Send DeactivateAnalysisStream command to the AvAnalysis cluster."""
+        cmd = Clusters.Objects.AvAnalysis.Commands.DeactivateAnalysisStream(analysisStreamID=analysis_stream_id)
+        return await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+
+    async def send_remove_analysis_stream_cmd(self, endpoint, analysis_stream_id):
+        """Send RemoveAnalysisStream command to the AvAnalysis cluster."""
+        cmd = Clusters.Objects.AvAnalysis.Commands.RemoveAnalysisStream(analysisStreamID=analysis_stream_id)
+        return await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
