@@ -65,6 +65,7 @@ CHIP_ERROR ModeSelectCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
     LoadPersistentAttributes(context.attributeStorage);
+    ApplyStartupModeLogic();
     return CHIP_NO_ERROR;
 }
 

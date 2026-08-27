@@ -43,19 +43,6 @@ using namespace chip::app::Clusters::ModeSelect;
 using namespace chip::app::Clusters::ModeSelect::Attributes;
 using Status = Protocols::InteractionModel::Status;
 
-// Forward declaration of the internal registration API defined in SupportedModesManager.cpp.
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ModeSelect {
-namespace internal {
-void RegisterOnManagerSetCallback(void (*cb)(SupportedModesManager * manager));
-} // namespace internal
-} // namespace ModeSelect
-} // namespace Clusters
-} // namespace app
-} // namespace chip
-
 namespace {
 
 // Adapts SupportedModesManager to ModeSelectCluster::Delegate for a single endpoint.
@@ -84,28 +71,13 @@ private:
     EndpointId mEndpointId = kInvalidEndpointId;
 };
 
-// Subclass that handles the deferred ApplyStartupModeLogic() call.
-// ModeSelectCluster itself has no knowledge of the global SupportedModesManager
-// or the ordering between Server::Init and ApplicationInit. This subclass
-// encapsulates that codegen-integration-specific concern.
+// Re-exposes ApplyStartupModeLogic() as public so the OnSupportedModesManagerSet
+// callback can call it after the manager becomes available post-Startup.
 class CodegenModeSelectCluster : public ModeSelectCluster
 {
 public:
     using ModeSelectCluster::ModeSelectCluster;
-    // Re-expose the protected method as public for use by the codegen integration layer.
     using ModeSelectCluster::ApplyStartupModeLogic;
-
-    CHIP_ERROR Startup(ServerClusterContext & context) override
-    {
-        ReturnErrorOnFailure(ModeSelectCluster::Startup(context));
-        // If the global manager is already set (typical case), apply startup logic now.
-        // Otherwise setSupportedModesManager() will trigger it via the registered callback.
-        if (getSupportedModesManager() != nullptr)
-        {
-            ApplyStartupModeLogic();
-        }
-        return CHIP_NO_ERROR;
-    }
 };
 
 struct ModeSelectEntry
@@ -256,11 +228,6 @@ void MatterModeSelectPluginServerShutdownCallback() {}
 
 void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId) {}
 void MatterModeSelectClusterServerAttributeChangedCallback(const ConcreteAttributePath &) {}
-Protocols::InteractionModel::Status
-MatterModeSelectClusterServerPreAttributeChangedCallback(const ConcreteAttributePath &, EmberAfAttributeType, uint16_t, uint8_t *)
-{
-    return Protocols::InteractionModel::Status::Success;
-}
 
 // ---- Backward-compat global API for app code ----
 
