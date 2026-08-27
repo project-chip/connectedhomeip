@@ -7780,8 +7780,8 @@ namespace Attributes {
 
 namespace Mask {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> * value)
 {
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap>>;
     Traits::StorageType temp;
@@ -7795,42 +7795,14 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint,
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> value,
-                                        MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap>>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ElectricalAlarm::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> value)
-{
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap>>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalAlarm::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace Mask
 
 namespace Latch {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> * value)
 {
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap>>;
     Traits::StorageType temp;
@@ -7844,42 +7816,14 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint,
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> value,
-                                        MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap>>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ElectricalAlarm::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> value)
-{
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap>>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalAlarm::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace Latch
 
 namespace State {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> * value)
 {
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap>>;
     Traits::StorageType temp;
@@ -7893,42 +7837,14 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint,
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> value,
-                                        MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap>>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ElectricalAlarm::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> value)
-{
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap>>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalAlarm::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace State
 
 namespace Supported {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> * value)
 {
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap>>;
     Traits::StorageType temp;
@@ -7942,41 +7858,13 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint,
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> value,
-                                        MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap>>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ElectricalAlarm::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> value)
-{
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap>>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalAlarm::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace Supported
 
 namespace OverVoltageThreshold {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
 {
     using Traits = NumericAttributeTraits<int64_t>;
     Traits::StorageType temp;
@@ -7990,40 +7878,13 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value)
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<int64_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ElectricalAlarm::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_VOLTAGE_MV_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value)
-{
-    using Traits = NumericAttributeTraits<int64_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalAlarm::Id, Id, writable, ZCL_VOLTAGE_MV_ATTRIBUTE_TYPE);
 }
 
 } // namespace OverVoltageThreshold
 
 namespace UnderVoltageThreshold {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
 {
     using Traits = NumericAttributeTraits<int64_t>;
     Traits::StorageType temp;
@@ -8037,40 +7898,13 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value)
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<int64_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ElectricalAlarm::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_VOLTAGE_MV_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value)
-{
-    using Traits = NumericAttributeTraits<int64_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalAlarm::Id, Id, writable, ZCL_VOLTAGE_MV_ATTRIBUTE_TYPE);
 }
 
 } // namespace UnderVoltageThreshold
 
 namespace OverFrequencyThreshold {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
 {
     using Traits = NumericAttributeTraits<int64_t>;
     Traits::StorageType temp;
@@ -8084,40 +7918,13 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value)
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<int64_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ElectricalAlarm::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_INT64S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value)
-{
-    using Traits = NumericAttributeTraits<int64_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalAlarm::Id, Id, writable, ZCL_INT64S_ATTRIBUTE_TYPE);
 }
 
 } // namespace OverFrequencyThreshold
 
 namespace UnderFrequencyThreshold {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
 {
     using Traits = NumericAttributeTraits<int64_t>;
     Traits::StorageType temp;
@@ -8131,40 +7938,13 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value)
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<int64_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ElectricalAlarm::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_INT64S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value)
-{
-    using Traits = NumericAttributeTraits<int64_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalAlarm::Id, Id, writable, ZCL_INT64S_ATTRIBUTE_TYPE);
 }
 
 } // namespace UnderFrequencyThreshold
 
 namespace OverPowerThreshold {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
 {
     using Traits = NumericAttributeTraits<int64_t>;
     Traits::StorageType temp;
@@ -8178,40 +7958,13 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value)
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<int64_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ElectricalAlarm::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_POWER_MW_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value)
-{
-    using Traits = NumericAttributeTraits<int64_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalAlarm::Id, Id, writable, ZCL_POWER_MW_ATTRIBUTE_TYPE);
 }
 
 } // namespace OverPowerThreshold
 
 namespace UnderPowerThreshold {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
 {
     using Traits = NumericAttributeTraits<int64_t>;
     Traits::StorageType temp;
@@ -8225,40 +7978,13 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value)
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<int64_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ElectricalAlarm::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_POWER_MW_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value)
-{
-    using Traits = NumericAttributeTraits<int64_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalAlarm::Id, Id, writable, ZCL_POWER_MW_ATTRIBUTE_TYPE);
 }
 
 } // namespace UnderPowerThreshold
 
 namespace OverCurrentThreshold {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
 {
     using Traits = NumericAttributeTraits<int64_t>;
     Traits::StorageType temp;
@@ -8272,40 +7998,13 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value)
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<int64_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ElectricalAlarm::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_AMPERAGE_MA_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value)
-{
-    using Traits = NumericAttributeTraits<int64_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalAlarm::Id, Id, writable, ZCL_AMPERAGE_MA_ATTRIBUTE_TYPE);
 }
 
 } // namespace OverCurrentThreshold
 
 namespace UnderCurrentThreshold {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
 {
     using Traits = NumericAttributeTraits<int64_t>;
     Traits::StorageType temp;
@@ -8319,40 +8018,13 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value)
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<int64_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ElectricalAlarm::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_AMPERAGE_MA_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value)
-{
-    using Traits = NumericAttributeTraits<int64_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalAlarm::Id, Id, writable, ZCL_AMPERAGE_MA_ATTRIBUTE_TYPE);
 }
 
 } // namespace UnderCurrentThreshold
 
 namespace PowerImportThreshold {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
 {
     using Traits = NumericAttributeTraits<int64_t>;
     Traits::StorageType temp;
@@ -8366,40 +8038,13 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value)
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<int64_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ElectricalAlarm::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_POWER_MW_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value)
-{
-    using Traits = NumericAttributeTraits<int64_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalAlarm::Id, Id, writable, ZCL_POWER_MW_ATTRIBUTE_TYPE);
 }
 
 } // namespace PowerImportThreshold
 
 namespace PowerExportThreshold {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
 {
     using Traits = NumericAttributeTraits<int64_t>;
     Traits::StorageType temp;
@@ -8413,40 +8058,13 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value)
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<int64_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ElectricalAlarm::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_POWER_MW_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value)
-{
-    using Traits = NumericAttributeTraits<int64_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalAlarm::Id, Id, writable, ZCL_POWER_MW_ATTRIBUTE_TYPE);
 }
 
 } // namespace PowerExportThreshold
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
@@ -8460,40 +8078,13 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ElectricalAlarm::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalAlarm::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -8507,33 +8098,6 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<uint16_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ElectricalAlarm::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
-{
-    using Traits = NumericAttributeTraits<uint16_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalAlarm::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
