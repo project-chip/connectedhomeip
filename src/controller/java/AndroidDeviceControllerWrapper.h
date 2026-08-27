@@ -223,6 +223,15 @@ public:
     void StopDnssd();
 
 private:
+    struct CredentialsNeededCallbackContext
+    {
+        AndroidDeviceControllerWrapper * wrapper = nullptr;
+        chip::EndpointId endpoint                = 0;
+        bool isWiFi                             = false;
+    };
+
+    static void HandleCredentialsNeededCallback(intptr_t context);
+
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
 
     ChipDeviceControllerPtr mController;
