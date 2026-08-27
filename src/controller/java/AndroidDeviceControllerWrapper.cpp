@@ -1221,8 +1221,8 @@ CHIP_ERROR AndroidDeviceControllerWrapper::WiFiCredentialsNeeded(chip::EndpointI
         return err;
     }
     context->listenerMethod = mWiFiCredentialsNeededListener;
-    context->endpoint = endpoint;
-    context->isWiFi   = true;
+    context->endpoint       = endpoint;
+    context->isWiFi         = true;
 
     err = chip::DeviceLayer::PlatformMgr().ScheduleWork(HandleCredentialsNeededCallback, reinterpret_cast<intptr_t>(context));
     if (err != CHIP_NO_ERROR)
@@ -1256,8 +1256,8 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ThreadCredentialsNeeded(chip::Endpoin
         return err;
     }
     context->listenerMethod = mThreadCredentialsNeededListener;
-    context->endpoint = endpoint;
-    context->isWiFi   = false;
+    context->endpoint       = endpoint;
+    context->isWiFi         = false;
 
     err = chip::DeviceLayer::PlatformMgr().ScheduleWork(HandleCredentialsNeededCallback, reinterpret_cast<intptr_t>(context));
     if (err != CHIP_NO_ERROR)
@@ -1274,10 +1274,10 @@ void AndroidDeviceControllerWrapper::HandleCredentialsNeededCallback(intptr_t co
     auto * callbackContext = reinterpret_cast<CredentialsNeededCallbackContext *>(context);
     VerifyOrReturn(callbackContext != nullptr);
 
-    const EndpointId endpoint        = callbackContext->endpoint;
-    const bool isWiFi                = callbackContext->isWiFi;
-    const jmethodID listenerMethod   = callbackContext->listenerMethod;
-    jobject listenerGlobalObjectRef  = callbackContext->listenerObject.ObjectRef();
+    const EndpointId endpoint       = callbackContext->endpoint;
+    const bool isWiFi               = callbackContext->isWiFi;
+    const jmethodID listenerMethod  = callbackContext->listenerMethod;
+    jobject listenerGlobalObjectRef = callbackContext->listenerObject.ObjectRef();
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
