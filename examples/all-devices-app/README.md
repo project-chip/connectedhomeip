@@ -247,9 +247,9 @@ The proxy serves one commissioning session at a time across all transports
 The BLE transport performs a one-way peripheral→central role switch on the CP's
 first `ProxyConnectRequest(BLE)`. After that the CP no longer advertises over
 BLE for its own (re-)commissioning; restart the process to regain peripheral
-mode. An already-commissioned node must announce over DNS-SD rather than BLE,
-so `OpenCommissioningWindow` still works — but it is worth planning
-around when setting a CP device up.
+mode. An already-commissioned node must announce over DNS-SD rather than BLE, so
+`OpenCommissioningWindow` still works — but it is worth planning around when
+setting a CP device up.
 
 Two build switches are involved:
 
