@@ -20,6 +20,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <lib/support/CharSpanToStdString.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;
@@ -47,8 +48,7 @@ std::string ReadSetupURL(EndpointId endpointId)
     CharSpan urlSpan;
     VerifyOrReturnValue(Attributes::SetupURL::GetDefault(endpointId, urlSpan) == Protocols::InteractionModel::Status::Success,
                         std::string());
-    VerifyOrReturnValue(!urlSpan.empty() && urlSpan.data() != nullptr, std::string());
-    return std::string(urlSpan.data(), urlSpan.size());
+    return CharSpanToStdString(urlSpan);
 }
 
 std::optional<CharSpan> SetupURLSpan(const std::string & url)
