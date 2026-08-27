@@ -20,7 +20,6 @@
 #include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationTopology.h>
 #include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/DiagnosticDataProvider.h>
 
 namespace chip::app {
 
@@ -31,7 +30,8 @@ using namespace chip::app::all_devices::rvc_simulation::Topology;
 RoboticVacuumCleaner::RoboticVacuumCleaner(const Config & config) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRoboticVacuumCleaner, 1)),
     mOperationalStateDelegate(config.operationalStateDelegate), mServiceAreaDelegate(config.serviceAreaDelegate),
-    mRunModeDelegate(config.runModeDelegate), mCleanModeDelegate(config.cleanModeDelegate)
+    mRunModeDelegate(config.runModeDelegate), mCleanModeDelegate(config.cleanModeDelegate),
+    mDiagnosticDataProvider(config.diagnosticDataProvider)
 {}
 
 CHIP_ERROR RoboticVacuumCleaner::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -60,7 +60,7 @@ CHIP_ERROR RoboticVacuumCleaner::Register(EndpointId endpoint, CodeDrivenDataMod
                                .optionalAttributeSet   = {},
                                .appDelegate            = mRunModeDelegate,
                                .onOffValueForStartUp   = false,
-                               .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
+                               .diagnosticDataProvider = mDiagnosticDataProvider,
                            });
     ReturnErrorOnFailure(provider.AddCluster(mRunModeCluster.Registration()));
 
@@ -70,7 +70,7 @@ CHIP_ERROR RoboticVacuumCleaner::Register(EndpointId endpoint, CodeDrivenDataMod
                                  .optionalAttributeSet   = {},
                                  .appDelegate            = mCleanModeDelegate,
                                  .onOffValueForStartUp   = false,
-                                 .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
+                                 .diagnosticDataProvider = mDiagnosticDataProvider,
                              });
     ReturnErrorOnFailure(provider.AddCluster(mCleanModeCluster.Registration()));
 

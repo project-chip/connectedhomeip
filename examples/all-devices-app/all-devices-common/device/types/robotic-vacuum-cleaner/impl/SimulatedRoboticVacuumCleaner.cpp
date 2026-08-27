@@ -97,6 +97,7 @@ SimulatedRoboticVacuumCleaner::SimulatedRoboticVacuumCleaner(const Context & con
         .serviceAreaDelegate      = *this,
         .runModeDelegate          = mRunModeAppDelegate,
         .cleanModeDelegate        = mCleanModeAppDelegate,
+        .diagnosticDataProvider   = context.diagnosticDataProvider,
     }),
     mTimerDelegate(context.timerDelegate)
 {}

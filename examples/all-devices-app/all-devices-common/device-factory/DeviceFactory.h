@@ -576,8 +576,10 @@ private:
         {
             RegisterCreator("robotic-vacuum-cleaner", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<SimulatedRoboticVacuumCleaner>(
-                    SimulatedRoboticVacuumCleaner::Context{ .timerDelegate = mContext->timerDelegate });
+                return std::make_unique<SimulatedRoboticVacuumCleaner>(SimulatedRoboticVacuumCleaner::Context{
+                    .timerDelegate          = mContext->timerDelegate,
+                    .diagnosticDataProvider = mContext->diagnosticDataProvider,
+                });
             });
         }
 

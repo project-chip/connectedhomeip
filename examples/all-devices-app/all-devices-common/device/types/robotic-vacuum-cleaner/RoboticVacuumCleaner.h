@@ -24,6 +24,7 @@
 #include <app/clusters/service-area-server/service-area-delegate.h>
 #include <device/api/SingleEndpoint.h>
 #include <device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaStorageDelegate.h>
+#include <platform/DiagnosticDataProvider.h>
 
 namespace chip::app {
 
@@ -39,6 +40,7 @@ public:
         Clusters::ServiceArea::Delegate & serviceAreaDelegate;
         Clusters::ModeBase::AppDelegate & runModeDelegate;
         Clusters::ModeBase::AppDelegate & cleanModeDelegate;
+        DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
     };
 
     explicit RoboticVacuumCleaner(const Config & config);
@@ -65,6 +67,8 @@ private:
 
     Clusters::ModeBase::AppDelegate & mCleanModeDelegate;
     LazyRegisteredServerCluster<Clusters::ModeBaseCluster> mCleanModeCluster;
+
+    DeviceLayer::DiagnosticDataProvider & mDiagnosticDataProvider;
 };
 
 } // namespace chip::app

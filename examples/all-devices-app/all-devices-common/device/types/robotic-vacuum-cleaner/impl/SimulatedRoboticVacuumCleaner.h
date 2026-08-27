@@ -20,6 +20,7 @@
 #include <clusters/RvcOperationalState/Enums.h>
 #include <device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.h>
 #include <lib/support/TimerDelegate.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <string>
 
 namespace chip::app {
@@ -76,6 +77,7 @@ public:
     struct Context
     {
         TimerDelegate & timerDelegate;
+        DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
     };
 
     explicit SimulatedRoboticVacuumCleaner(const Context & context);
