@@ -43,7 +43,7 @@ void ApplicationInit()
     // registration: its generated Init callback is a no-op too.
     VerifyOrDie(ElectricalProtectionAlarm::ElectricalProtectionAlarmInit(kEnclosureEndpointId) == CHIP_NO_ERROR);
 
-    // Power Topology is mandatory on the enclosure device type. Same imperative registration.
+    // Power Topology is mandatory on the enclosure device type.
     VerifyOrDie(PowerTopology::PowerTopologyInit(kEnclosureEndpointId) == CHIP_NO_ERROR);
 }
 

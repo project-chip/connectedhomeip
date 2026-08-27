@@ -28,9 +28,7 @@ using namespace chip::app::Clusters;
 
 namespace {
 
-// TreeTopology gates none of this cluster's attributes: AvailableEndpoints is SET, ActiveEndpoints
-// is DYPF and ElectricalCircuitNodes is CIRC. Neither accessor is reachable, so both report an
-// empty list rather than inventing endpoints this app does not model.
+// TREE gates none of this cluster's attributes, so neither accessor is reachable.
 class EnclosureTopologyDelegate : public PowerTopology::Delegate
 {
 public:

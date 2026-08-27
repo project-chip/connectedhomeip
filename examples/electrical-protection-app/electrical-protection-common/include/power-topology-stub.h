@@ -27,10 +27,6 @@ namespace chip::app::Clusters::PowerTopology {
 
 /// Create and register the Power Topology cluster on `endpointId` with the TreeTopology feature.
 /// Call from ApplicationInit().
-///
-/// Power Topology is mandatory on the Electrical Distribution Enclosure device type (0x0517). Of
-/// the NODE/TREE/SET choice, TREE is the one that describes an enclosure: it provides power to
-/// itself and its child endpoints, which is what the contained breakers are.
 CHIP_ERROR PowerTopologyInit(EndpointId endpointId);
 
 /// Unregister and destroy the cluster. Call from ApplicationShutdown().
