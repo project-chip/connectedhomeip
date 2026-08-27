@@ -37,17 +37,17 @@ namespace chip {
 /// clear all active alarms.
 enum class ElectricalAlarmTrigger : uint64_t
 {
-    kClearAll              = 0x00a1'0000'0000'0000,
-    kSetOverVoltage        = 0x00a1'0000'0000'0001,
-    kSetUnderVoltage       = 0x00a1'0000'0000'0002,
-    kSetOverFrequency      = 0x00a1'0000'0000'0003,
-    kSetUnderFrequency     = 0x00a1'0000'0000'0004,
-    kSetOverPower          = 0x00a1'0000'0000'0005,
-    kSetUnderPower         = 0x00a1'0000'0000'0006,
-    kSetOverCurrent        = 0x00a1'0000'0000'0007,
-    kSetUnderCurrent       = 0x00a1'0000'0000'0008,
-    kSetPowerImport        = 0x00a1'0000'0000'0009,
-    kSetPowerExport        = 0x00a1'0000'0000'000a,
+    kClearAll          = 0x00a1'0000'0000'0000,
+    kSetOverVoltage    = 0x00a1'0000'0000'0001,
+    kSetUnderVoltage   = 0x00a1'0000'0000'0002,
+    kSetOverFrequency  = 0x00a1'0000'0000'0003,
+    kSetUnderFrequency = 0x00a1'0000'0000'0004,
+    kSetOverPower      = 0x00a1'0000'0000'0005,
+    kSetUnderPower     = 0x00a1'0000'0000'0006,
+    kSetOverCurrent    = 0x00a1'0000'0000'0007,
+    kSetUnderCurrent   = 0x00a1'0000'0000'0008,
+    kSetPowerImport    = 0x00a1'0000'0000'0009,
+    kSetPowerExport    = 0x00a1'0000'0000'000a,
 };
 
 class ElectricalAlarmTestEventTriggerHandler : public TestEventTriggerHandler

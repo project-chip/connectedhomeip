@@ -396,7 +396,7 @@ TEST_F(TestElectricalAlarmCluster, ModifyEnabledAlarms_DelegateAccepts)
 
     ClusterTester tester(cluster);
     Commands::ModifyEnabledAlarms::Type cmd;
-    cmd.mask = BitMask<AlarmBitmap>(AlarmBitmap::kOverVoltage);
+    cmd.mask    = BitMask<AlarmBitmap>(AlarmBitmap::kOverVoltage);
     auto result = tester.Invoke(Commands::ModifyEnabledAlarms::Id, cmd);
     EXPECT_TRUE(result.status.has_value() && result.status->IsSuccess());
     EXPECT_EQ(cluster.GetMask(), BitMask<AlarmBitmap>(AlarmBitmap::kOverVoltage));
@@ -419,8 +419,8 @@ TEST_F(TestElectricalAlarmCluster, ModifyEnabledAlarms_DelegateRejects)
 
     ClusterTester tester(cluster);
     Commands::ModifyEnabledAlarms::Type cmd;
-    cmd.mask        = BitMask<AlarmBitmap>();
-    auto result     = tester.Invoke(Commands::ModifyEnabledAlarms::Id, cmd);
+    cmd.mask    = BitMask<AlarmBitmap>();
+    auto result = tester.Invoke(Commands::ModifyEnabledAlarms::Id, cmd);
     EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::Failure);
     // Mask must be unchanged.
     EXPECT_EQ(cluster.GetMask(), supported);
@@ -528,7 +528,7 @@ TEST_F(TestElectricalAlarmCluster, SetThresholds_FeatureAbsent)
 
     ClusterTester tester(cluster);
     Commands::SetElectricalAlarmThresholds::Type cmd;
-    auto result     = tester.Invoke(Commands::SetElectricalAlarmThresholds::Id, cmd);
+    auto result = tester.Invoke(Commands::SetElectricalAlarmThresholds::Id, cmd);
     EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::UnsupportedCommand);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
