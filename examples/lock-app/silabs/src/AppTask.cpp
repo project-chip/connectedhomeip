@@ -32,12 +32,12 @@
 
 #include "LEDWidget.h"
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 #include "lcd.h"
 #if SL_MATTER_QR_CODE_ENABLED
 #include "qrcodegen.h"
 #endif // SL_MATTER_QR_CODE_ENABLED
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -66,6 +66,10 @@
 
 #define APP_FUNCTION_BUTTON 0
 #define APP_LOCK_SWITCH 1
+
+using chip::app::Clusters::DoorLock::DlLockState;
+using chip::app::Clusters::DoorLock::OperationErrorEnum;
+using chip::app::Clusters::DoorLock::OperationSourceEnum;
 
 using namespace chip;
 using namespace chip::app;
@@ -298,7 +302,7 @@ CHIP_ERROR AppTask::InitLock()
                         ChipLogError(AppServer, "sUnlatchTimer timer create failed"));
 
     // Update the LCD with the Stored value. Show QR Code if not provisioned
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     GetLCD().WriteDemoUI(state.Value() != DlLockState::kUnlocked);
 #if SL_MATTER_QR_CODE_ENABLED
 #ifdef SL_WIFI
@@ -734,9 +738,9 @@ bool AppTask::InitiateLockAction(LockAction aAction, bool fromButton)
         ChipLogDetail(Zcl, "%s Action has been initiated", locked ? "Lock" : "Unlock");
         sLockLED.Set(!locked);
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
         AppInstance().GetLCD().WriteDemoUI(locked);
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
     }
     else if (aAction == LockAction::kUnlatch)
     {

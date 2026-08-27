@@ -22,14 +22,14 @@
 #include "AppEvent.h"
 #include "LEDWidget.h"
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 #include "ClosureUI.h"
 #include "ClosureUIStrings.h"
 #include "lcd.h"
 #if SL_MATTER_QR_CODE_ENABLED
 #include "qrcodegen.h"
 #endif // SL_MATTER_QR_CODE_ENABLED
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 
 #include <ClosureManager.h>
 #include <app-common/zap-generated/cluster-enums.h>
@@ -82,7 +82,7 @@ CHIP_ERROR AppTask::AppInit()
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     LogErrorOnFailure(GetLCD().Init((uint8_t *) "Closure-App"));
     GetLCD().SetCustomUI(ClosureUI::DrawUI);
 #endif
@@ -91,7 +91,7 @@ CHIP_ERROR AppTask::AppInit()
     ClosureManager::GetInstance().Init();
 
 // Update the LCD with the Stored value. Show QR Code if not provisioned
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     UpdateClosureUI();
 #if SL_MATTER_QR_CODE_ENABLED
 #ifdef SL_WIFI
@@ -103,7 +103,7 @@ CHIP_ERROR AppTask::AppInit()
         GetLCD().ShowQRCode(true);
     }
 #endif // SL_MATTER_QR_CODE_ENABLED
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 
     return err;
 }
@@ -228,7 +228,7 @@ void AppTask::ClosureButtonActionEventHandler(AppEvent * aEvent)
     }
 }
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 void AppTask::UpdateClosureUIHandler(AppEvent * aEvent)
 {
     if (aEvent->Type == AppEvent::kEventType_UpdateUI)
@@ -326,4 +326,4 @@ void AppTask::UpdateClosureUI()
         AppTask::GetAppTask().GetLCD().WriteDemoUI(false); // State doesn't matter for custom UI
     }
 }
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED

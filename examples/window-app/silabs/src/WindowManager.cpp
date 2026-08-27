@@ -41,7 +41,7 @@
 #include <platform/silabs/wifi/WifiInterface.h>
 #endif
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 #include <LcdPainter.h>
 #endif
 
@@ -190,9 +190,9 @@ void WindowManager::DispatchEventAttributeChange(chip::EndpointId endpoint, chip
     case Attributes::CurrentPositionLiftPercent100ths::Id:
     case Attributes::CurrentPositionTiltPercent100ths::Id:
         UpdateLED();
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
         UpdateLCD();
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
         break;
     default:
         break;
@@ -573,17 +573,17 @@ WindowManager::WindowManager() {}
 
 void WindowManager::OnIconTimeout(WindowManager::Timer & timer)
 {
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     sWindow.mIcon = LcdIcon::None;
     sWindow.UpdateLCD();
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 }
 
 CHIP_ERROR WindowManager::Init()
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     mIconTimer = new Timer(LCD_ICON_TIMEOUT, OnIconTimeout, this);
 #endif
     // Timers
@@ -662,7 +662,7 @@ void WindowManager::UpdateLED()
     }
 }
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 void WindowManager::DrawUI(GLIB_Context_t * glibContext)
 {
     sWindow.UpdateLCD();
@@ -690,7 +690,7 @@ void WindowManager::UpdateLCD()
         }
     }
 }
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 
 // Silabs button callback from button event ISR
 void WindowManager::ButtonEventHandler(uint8_t button, uint8_t btnAction)
@@ -806,7 +806,7 @@ void WindowManager::GeneralEventHandler(AppEvent * aEvent)
         window->DispatchEventAttributeChange(aEvent->mEndpoint, aEvent->mAttributeId);
         break;
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     case AppEvent::kEventType_CoverTypeChange:
         window->UpdateLCD();
         break;
@@ -827,7 +827,7 @@ void WindowManager::GeneralEventHandler(AppEvent * aEvent)
         window->mIcon = window->mTiltMode ? LcdIcon::Tilt : LcdIcon::Lift;
         window->UpdateLCD();
         break;
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 
     default:
         break;

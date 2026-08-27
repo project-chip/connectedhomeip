@@ -59,16 +59,16 @@ CHIP_ERROR AppTask::AppInit()
         return err;
     }
 
-#if defined(DISPLAY_ENABLED) && (DISPLAY_ENABLED)
+#if SL_MATTER_DISPLAY_ENABLED
     GetLCD().SetCustomUI(WindowManager::DrawUI);
     GetLCD().WriteDemoUI(false);
-#if defined(SL_MATTER_QR_CODE_ENABLED) && (SL_MATTER_QR_CODE_ENABLED)
+#if SL_MATTER_QR_CODE_ENABLED
     if (BaseApplication::sIsProvisioned != true)
     {
         GetLCD().ShowQRCode(true);
     }
-#endif // defined(SL_MATTER_QR_CODE_ENABLED) && (SL_MATTER_QR_CODE_ENABLED)
-#endif // defined(DISPLAY_ENABLED) && (DISPLAY_ENABLED)
+#endif // SL_MATTER_QR_CODE_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 
     return CHIP_NO_ERROR;
 }
