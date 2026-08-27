@@ -130,7 +130,6 @@ void MatterRvcOperationalStatePluginServerInitCallback() {}
 void MatterOvenModePluginServerInitCallback() {}
 void MatterOvenCavityOperationalStatePluginServerInitCallback() {}
 void MatterDishwasherAlarmPluginServerInitCallback() {}
-void MatterElectricalAlarmPluginServerInitCallback() {}
 void MatterMicrowaveOvenModePluginServerInitCallback() {}
 void MatterDeviceEnergyManagementModePluginServerInitCallback() {}
 void MatterEnergyEvseModePluginServerInitCallback() {}

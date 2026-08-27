@@ -29,7 +29,7 @@ namespace ElectricalAlarm {
 class Instance
 {
 public:
-    Instance(EndpointId aEndpointId, Delegate & aDelegate, BitMask<Feature> aFeatures) :
+    Instance(EndpointId aEndpointId, Delegate * aDelegate, BitMask<Feature> aFeatures) :
         mCluster(ElectricalAlarmCluster::Config{
             .endpointId = aEndpointId,
             .delegate   = aDelegate,

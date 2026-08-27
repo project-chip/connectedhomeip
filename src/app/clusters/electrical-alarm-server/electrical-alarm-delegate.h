@@ -55,9 +55,11 @@ public:
      *   @param[in] commandData Decoded command fields; absent optionals retain
      *                          their current attribute value.
      *   @return true if the cluster should persist the new thresholds; false to reject.
+     *   Default implementation approves all threshold changes; override to add
+     *   device-specific validation or to write values to hardware.
      */
     virtual bool SetElectricalAlarmThresholdsCallback(
-        const Commands::SetElectricalAlarmThresholds::DecodableType & commandData) = 0;
+        const Commands::SetElectricalAlarmThresholds::DecodableType & commandData) { return true; }
 
     Delegate(EndpointId endpoint) : mEndpoint(endpoint) {}
 

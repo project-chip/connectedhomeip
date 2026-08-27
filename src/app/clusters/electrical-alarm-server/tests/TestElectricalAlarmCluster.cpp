@@ -42,7 +42,7 @@ ElectricalAlarmCluster MakeCluster(MockElectricalAlarmDelegate & delegate, BitMa
 {
     return ElectricalAlarmCluster(ElectricalAlarmCluster::Config{
         .endpointId = kTestEndpointId,
-        .delegate   = delegate,
+        .delegate   = &delegate,
         .features   = features,
     });
 }
