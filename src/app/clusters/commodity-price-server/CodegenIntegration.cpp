@@ -19,6 +19,9 @@
 #include <app/util/generic-callbacks.h>
 #include <clusters/CommodityPrice/ClusterId.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <lib/support/BitMask.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using chip::Protocols::InteractionModel::ClusterStatusCode;
 using chip::Protocols::InteractionModel::Status;

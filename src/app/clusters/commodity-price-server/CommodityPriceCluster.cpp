@@ -140,10 +140,16 @@ CHIP_ERROR CommodityPriceCluster::PriceStorage::Set(Span<const Structs::Commodit
     // declaration for why this is not made atomic.
     Clear();
 
-    // Calloc(0) is not portable, so each buffer is only allocated if it holds anything.
-    VerifyOrReturnError(prices.empty() || mPrices.Calloc(prices.size()), CHIP_ERROR_NO_MEMORY);
-    VerifyOrReturnError(componentCount == 0 || mComponents.Calloc(componentCount), CHIP_ERROR_NO_MEMORY);
-    VerifyOrReturnError(descriptionChars == 0 || mDescriptions.Calloc(descriptionChars), CHIP_ERROR_NO_MEMORY);
+    // Calloc(0) is not portable, so each buffer is only allocated if it holds anything. Running out
+    // of memory part way through hands back whatever was taken before the failure: holding on to it
+    // would strand the bulk of a forecast at the moment the device has none to spare.
+    if ((!prices.empty() && !mPrices.Calloc(prices.size())) ||
+        ((componentCount != 0) && !mComponents.Calloc(componentCount)) ||
+        ((descriptionChars != 0) && !mDescriptions.Calloc(descriptionChars)))
+    {
+        Clear();
+        return CHIP_ERROR_NO_MEMORY;
+    }
 
     size_t componentOffset   = 0;
     size_t descriptionOffset = 0;
