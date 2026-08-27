@@ -30,6 +30,18 @@ namespace app {
 namespace Clusters {
 namespace ElectricalAlarm {
 
+/// Server for the Electrical Alarm cluster (0x00A1).
+///
+/// ESALM is an Alarm Base derived cluster for electrical measurement threshold alarms
+/// (over/under voltage, frequency, power, current, and import/export power). It supports three
+/// command groups: ModifyEnabledAlarms (mask control, always available), Reset (RST feature —
+/// latching alarm acknowledgement), and SetElectricalAlarmThresholds (ADJT feature — writable
+/// thresholds for up to 10 measurement types). The mandatory Notify event is emitted on every
+/// State transition.
+///
+/// Alarm State is driven by the device's own measurement hardware via SetStateValue(),
+/// SetSupportedValue(), and SetMaskValue(). For conformance testing, State can be driven through
+/// General Diagnostics test-event-triggers via ElectricalAlarmTestEventTriggerHandler.
 class ElectricalAlarmCluster : public DefaultServerCluster
 {
 public:

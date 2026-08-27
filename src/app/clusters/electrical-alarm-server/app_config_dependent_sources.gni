@@ -15,5 +15,6 @@
 app_config_dependent_sources = [
   "CodegenIntegration.cpp",
   "CodegenIntegration.h",
+  "ElectricalAlarmTestEventTriggerHandler.h",
   "electrical-alarm-delegate.h",
 ]

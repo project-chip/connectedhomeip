@@ -21,6 +21,7 @@
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/ElectricalAlarm/Attributes.h>
+#include <clusters/ElectricalAlarm/Commands.h>
 #include <clusters/ElectricalAlarm/Metadata.h>
 
 #include <pw_unit_test/framework.h>
@@ -347,6 +348,331 @@ TEST_F(TestElectricalAlarmCluster, ThresholdSetterRejectsWithoutFeature)
 
     EXPECT_EQ(cluster.SetOverVoltageThreshold(100), Status::UnsupportedAttribute);
     EXPECT_EQ(cluster.SetUnderVoltageThreshold(-100), Status::UnsupportedAttribute);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// ---------------------------------------------------------------------------
+// SetSupportedValue with Latch narrowing
+// ---------------------------------------------------------------------------
+
+TEST_F(TestElectricalAlarmCluster, SetSupportedNarrowsLatchAndMask)
+{
+    TestServerClusterContext context;
+    MockElectricalAlarmDelegate delegate;
+    auto cluster = MakeCluster(delegate, BitMask<Feature>(Feature::kReset));
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    BitMask<AlarmBitmap> supported(AlarmBitmap::kOverVoltage, AlarmBitmap::kUnderVoltage);
+    EXPECT_EQ(cluster.SetSupportedValue(supported), Status::Success);
+    EXPECT_EQ(cluster.SetMaskValue(supported), Status::Success);
+
+    // Latch both bits.
+    EXPECT_EQ(cluster.SetLatchValue(supported), Status::Success);
+
+    // Narrow Supported to just kOverVoltage — Latch AND Mask must narrow.
+    BitMask<AlarmBitmap> narrowed(AlarmBitmap::kOverVoltage);
+    EXPECT_EQ(cluster.SetSupportedValue(narrowed), Status::Success);
+    EXPECT_EQ(cluster.GetMask(), narrowed);
+    EXPECT_EQ(cluster.GetLatch(), narrowed);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// ---------------------------------------------------------------------------
+// ModifyEnabledAlarms command
+// ---------------------------------------------------------------------------
+
+TEST_F(TestElectricalAlarmCluster, ModifyEnabledAlarms_DelegateAccepts)
+{
+    TestServerClusterContext context;
+    MockElectricalAlarmDelegate delegate;
+    auto cluster = MakeCluster(delegate, BitMask<Feature>());
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    BitMask<AlarmBitmap> supported(AlarmBitmap::kOverVoltage, AlarmBitmap::kUnderVoltage);
+    EXPECT_EQ(cluster.SetSupportedValue(supported), Status::Success);
+    EXPECT_EQ(cluster.SetMaskValue(supported), Status::Success);
+
+    ClusterTester tester(cluster);
+    Commands::ModifyEnabledAlarms::Type cmd;
+    cmd.mask = BitMask<AlarmBitmap>(AlarmBitmap::kOverVoltage);
+    auto result = tester.Invoke(Commands::ModifyEnabledAlarms::Id, cmd);
+    EXPECT_TRUE(result.status.has_value() && result.status->IsSuccess());
+    EXPECT_EQ(cluster.GetMask(), BitMask<AlarmBitmap>(AlarmBitmap::kOverVoltage));
+    EXPECT_EQ(delegate.modifyEnabledAlarmsCallCount, 1);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestElectricalAlarmCluster, ModifyEnabledAlarms_DelegateRejects)
+{
+    TestServerClusterContext context;
+    MockElectricalAlarmDelegate delegate;
+    delegate.allowModifyEnabledAlarms = false;
+    auto cluster                      = MakeCluster(delegate, BitMask<Feature>());
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    BitMask<AlarmBitmap> supported(AlarmBitmap::kOverVoltage);
+    EXPECT_EQ(cluster.SetSupportedValue(supported), Status::Success);
+    EXPECT_EQ(cluster.SetMaskValue(supported), Status::Success);
+
+    ClusterTester tester(cluster);
+    Commands::ModifyEnabledAlarms::Type cmd;
+    cmd.mask        = BitMask<AlarmBitmap>();
+    auto result     = tester.Invoke(Commands::ModifyEnabledAlarms::Id, cmd);
+    EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::Failure);
+    // Mask must be unchanged.
+    EXPECT_EQ(cluster.GetMask(), supported);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestElectricalAlarmCluster, ModifyEnabledAlarms_UnsupportedBits)
+{
+    TestServerClusterContext context;
+    MockElectricalAlarmDelegate delegate;
+    auto cluster = MakeCluster(delegate, BitMask<Feature>());
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    // Supported is empty; any non-zero mask has unsupported bits.
+    ClusterTester tester(cluster);
+    Commands::ModifyEnabledAlarms::Type cmd;
+    cmd.mask    = BitMask<AlarmBitmap>(AlarmBitmap::kOverVoltage);
+    auto result = tester.Invoke(Commands::ModifyEnabledAlarms::Id, cmd);
+    EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::InvalidCommand);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// ---------------------------------------------------------------------------
+// Reset command
+// ---------------------------------------------------------------------------
+
+TEST_F(TestElectricalAlarmCluster, Reset_FeatureAbsent)
+{
+    TestServerClusterContext context;
+    MockElectricalAlarmDelegate delegate;
+    auto cluster = MakeCluster(delegate, BitMask<Feature>()); // no kReset
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    Commands::Reset::Type cmd;
+    cmd.alarms  = BitMask<AlarmBitmap>();
+    auto result = tester.Invoke(Commands::Reset::Id, cmd);
+    // Command is not in AcceptedCommands — ClusterTester returns UnsupportedCommand.
+    EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::UnsupportedCommand);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestElectricalAlarmCluster, Reset_DelegateAccepts)
+{
+    TestServerClusterContext context;
+    MockElectricalAlarmDelegate delegate;
+    auto cluster = MakeCluster(delegate, BitMask<Feature>(Feature::kReset));
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    BitMask<AlarmBitmap> supported(AlarmBitmap::kOverVoltage);
+    EXPECT_EQ(cluster.SetSupportedValue(supported), Status::Success);
+    EXPECT_EQ(cluster.SetMaskValue(supported), Status::Success);
+    EXPECT_EQ(cluster.SetLatchValue(supported), Status::Success);
+    EXPECT_EQ(cluster.SetStateValue(supported), Status::Success);
+
+    ClusterTester tester(cluster);
+    Commands::Reset::Type cmd;
+    cmd.alarms  = supported;
+    auto result = tester.Invoke(Commands::Reset::Id, cmd);
+    EXPECT_TRUE(result.status.has_value() && result.status->IsSuccess());
+    EXPECT_FALSE(cluster.GetState().Has(AlarmBitmap::kOverVoltage));
+    EXPECT_EQ(delegate.resetAlarmsCallCount, 1);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestElectricalAlarmCluster, Reset_DelegateRejects)
+{
+    TestServerClusterContext context;
+    MockElectricalAlarmDelegate delegate;
+    delegate.allowReset = false;
+    auto cluster        = MakeCluster(delegate, BitMask<Feature>(Feature::kReset));
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    BitMask<AlarmBitmap> supported(AlarmBitmap::kOverVoltage);
+    EXPECT_EQ(cluster.SetSupportedValue(supported), Status::Success);
+    EXPECT_EQ(cluster.SetMaskValue(supported), Status::Success);
+    EXPECT_EQ(cluster.SetLatchValue(supported), Status::Success);
+    EXPECT_EQ(cluster.SetStateValue(supported), Status::Success);
+
+    ClusterTester tester(cluster);
+    Commands::Reset::Type cmd;
+    cmd.alarms  = supported;
+    auto result = tester.Invoke(Commands::Reset::Id, cmd);
+    EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::Failure);
+    // State must be unchanged.
+    EXPECT_TRUE(cluster.GetState().Has(AlarmBitmap::kOverVoltage));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// ---------------------------------------------------------------------------
+// SetElectricalAlarmThresholds command
+// ---------------------------------------------------------------------------
+
+TEST_F(TestElectricalAlarmCluster, SetThresholds_FeatureAbsent)
+{
+    TestServerClusterContext context;
+    MockElectricalAlarmDelegate delegate;
+    auto cluster = MakeCluster(delegate, BitMask<Feature>(Feature::kOverVoltage)); // no kAdjustableThresholds
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    Commands::SetElectricalAlarmThresholds::Type cmd;
+    auto result     = tester.Invoke(Commands::SetElectricalAlarmThresholds::Id, cmd);
+    EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::UnsupportedCommand);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestElectricalAlarmCluster, SetThresholds_CrossPairVoltageViolation)
+{
+    TestServerClusterContext context;
+    MockElectricalAlarmDelegate delegate;
+    BitMask<Feature> features(Feature::kAdjustableThresholds, Feature::kOverVoltage, Feature::kUnderVoltage);
+    auto cluster = MakeCluster(delegate, features);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    Commands::SetElectricalAlarmThresholds::Type cmd;
+    // Over ≤ Under — should be rejected.
+    cmd.overVoltageThreshold  = MakeOptional<int64_t>(1000);
+    cmd.underVoltageThreshold = MakeOptional<int64_t>(2000);
+    auto result               = tester.Invoke(Commands::SetElectricalAlarmThresholds::Id, cmd);
+    EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::ConstraintError);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestElectricalAlarmCluster, SetThresholds_ImportExportBothZero)
+{
+    TestServerClusterContext context;
+    MockElectricalAlarmDelegate delegate;
+    BitMask<Feature> features(Feature::kAdjustableThresholds, Feature::kPowerImport, Feature::kPowerExport);
+    auto cluster = MakeCluster(delegate, features);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    Commands::SetElectricalAlarmThresholds::Type cmd;
+    // Both at zero is a valid quiescent state (import >= export with non-strict check).
+    cmd.powerImportThreshold = MakeOptional<int64_t>(0);
+    cmd.powerExportThreshold = MakeOptional<int64_t>(0);
+    auto result              = tester.Invoke(Commands::SetElectricalAlarmThresholds::Id, cmd);
+    EXPECT_TRUE(result.status.has_value() && result.status->IsSuccess());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestElectricalAlarmCluster, SetThresholds_ValidPairPersisted)
+{
+    TestServerClusterContext context;
+    MockElectricalAlarmDelegate delegate;
+    BitMask<Feature> features(Feature::kAdjustableThresholds, Feature::kOverVoltage, Feature::kUnderVoltage);
+    auto cluster = MakeCluster(delegate, features);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    Commands::SetElectricalAlarmThresholds::Type cmd;
+    cmd.overVoltageThreshold  = MakeOptional<int64_t>(3000);
+    cmd.underVoltageThreshold = MakeOptional<int64_t>(1000);
+    auto result               = tester.Invoke(Commands::SetElectricalAlarmThresholds::Id, cmd);
+    EXPECT_TRUE(result.status.has_value() && result.status->IsSuccess());
+
+    // Verify thresholds were persisted.
+    int64_t val = 0;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::OverVoltageThreshold::Id, val).IsSuccess());
+    EXPECT_EQ(val, 3000);
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::UnderVoltageThreshold::Id, val).IsSuccess());
+    EXPECT_EQ(val, 1000);
+    EXPECT_EQ(delegate.setThresholdsCallCount, 1);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestElectricalAlarmCluster, SetThresholds_SingleSidedWithStoredBaseline)
+{
+    TestServerClusterContext context;
+    MockElectricalAlarmDelegate delegate;
+    BitMask<Feature> features(Feature::kAdjustableThresholds, Feature::kOverVoltage, Feature::kUnderVoltage);
+    auto cluster = MakeCluster(delegate, features);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    // Establish a baseline for under voltage.
+    EXPECT_EQ(cluster.SetUnderVoltageThreshold(500), Status::Success);
+
+    ClusterTester tester(cluster);
+    Commands::SetElectricalAlarmThresholds::Type cmd;
+    // Supply only over; stored under (500) acts as baseline → over (200) ≤ under (500) → ConstraintError.
+    cmd.overVoltageThreshold = MakeOptional<int64_t>(200);
+    auto result              = tester.Invoke(Commands::SetElectricalAlarmThresholds::Id, cmd);
+    EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::ConstraintError);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestElectricalAlarmCluster, SetThresholds_DelegateRejects)
+{
+    TestServerClusterContext context;
+    MockElectricalAlarmDelegate delegate;
+    delegate.allowSetThresholds = false;
+    BitMask<Feature> features(Feature::kAdjustableThresholds, Feature::kOverVoltage);
+    auto cluster = MakeCluster(delegate, features);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    Commands::SetElectricalAlarmThresholds::Type cmd;
+    cmd.overVoltageThreshold = MakeOptional<int64_t>(1000);
+    auto result              = tester.Invoke(Commands::SetElectricalAlarmThresholds::Id, cmd);
+    EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::Failure);
+
+    // Threshold must not have been persisted.
+    int64_t val = 0;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::OverVoltageThreshold::Id, val).IsSuccess());
+    EXPECT_EQ(val, 0);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestElectricalAlarmCluster, SetThresholds_AbsentFeatureFieldRejected)
+{
+    TestServerClusterContext context;
+    MockElectricalAlarmDelegate delegate;
+    // Only kOverVoltage + ADJUST — underVoltage feature is absent.
+    BitMask<Feature> features(Feature::kAdjustableThresholds, Feature::kOverVoltage);
+    auto cluster = MakeCluster(delegate, features);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    Commands::SetElectricalAlarmThresholds::Type cmd;
+    // underVoltageThreshold field present but kUnderVoltage feature absent.
+    cmd.underVoltageThreshold = MakeOptional<int64_t>(500);
+    auto result               = tester.Invoke(Commands::SetElectricalAlarmThresholds::Id, cmd);
+    EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::InvalidCommand);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// ---------------------------------------------------------------------------
+// ResetLatchedAlarms — feature guard on public C++ API
+// ---------------------------------------------------------------------------
+
+TEST_F(TestElectricalAlarmCluster, ResetLatchedAlarms_FeatureAbsent)
+{
+    TestServerClusterContext context;
+    MockElectricalAlarmDelegate delegate;
+    auto cluster = MakeCluster(delegate, BitMask<Feature>()); // no kReset
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    EXPECT_EQ(cluster.ResetLatchedAlarms(BitMask<AlarmBitmap>(AlarmBitmap::kOverVoltage)), Status::UnsupportedCommand);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
