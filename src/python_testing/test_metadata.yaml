@@ -125,6 +125,12 @@ not_automated:
       reason:
           Unit test and shared code for
           scripts/tests/TestTimeSyncTrustedTimeSourceRunner.py
+    - name: TC_AttributeBoundarySweep.py
+      reason:
+          Diagnostic sweep, not a certification test. It writes in-range values
+          and reports the ones a DUT refuses; acceptance of a value at a
+          constraint bound is not universally required by the spec, so results
+          need manual triage rather than a CI pass/fail
     - name: drlk_2_x_common.py
       reason: Shared code for TC_DRLK, not a standalone test
     - name: execute_python_tests.py

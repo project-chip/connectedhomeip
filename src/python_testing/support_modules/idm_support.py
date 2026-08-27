@@ -24,6 +24,7 @@ import inspect
 import logging
 import time
 from dataclasses import dataclass
+from enum import Enum
 from typing import Any, get_args
 
 from mobly import asserts
@@ -100,6 +101,29 @@ class ChangedAttribute:
     attribute: Any
     old_value: Any
     new_value: Any
+
+
+class ProbeMode(Enum):
+    """Which side of a spec constraint bound a generated value sits on."""
+
+    # Just outside the bound: a DUT that enforces the constraint rejects the write
+    # with CONSTRAINT_ERROR.
+    VIOLATE = 'violate'
+    # Exactly on the bound: the value is within what the spec permits, so a DUT that
+    # rejects it with CONSTRAINT_ERROR is over-enforcing. Other spec rules (e.g. the
+    # Valve cluster's LevelStep multiples) can still legitimately reject a value that
+    # sits on a bound, so acceptance is not universally required.
+    AT_BOUND = 'at_bound'
+
+
+@dataclass
+class ConstraintProbe:
+    """One value to write, together with the bound it was derived from."""
+    value: Any
+    # 'min' or 'max': which end of the constraint produced this value.
+    bound: str
+    # Human-readable derivation, e.g. "value 101 > max 100" or "length 16 == maxLength 16".
+    description: str
 
 
 # Clusters whose commands must never be auto-invoked by IDM constraint fuzzing.
@@ -625,46 +649,93 @@ class IDMBaseTest(BasicCompositionTests):
         """
         return Nullable in get_args(attribute.attribute_type.Type)
 
-    def generate_constraint_violation(self, attr_info: WritableAttributeInfo, constraints: Constraints):
-        """Generate a test value that violates the given constraints, or None if none can be.
+    def generate_constraint_probes(self, attr_info: WritableAttributeInfo, constraints: Constraints,
+                                   mode: ProbeMode) -> list[ConstraintProbe]:
+        """Generate the values that exercise an attribute's spec constraint bounds.
 
-        Bounds that the attribute's own data type already enforces are skipped (e.g.
-        under-min of an unsigned attribute with min 0, or over-max of a bound equal to the
-        type's maximum), since such violations cannot be encoded on the wire: the generated
-        value would be in range and a compliant DUT accepting it would be reported as a
-        failure to enforce the constraint.
+        In VIOLATE mode each probe sits just outside a bound, so a DUT that enforces the
+        constraint rejects it. Bounds the attribute's own data type already enforces are
+        skipped (e.g. under-min of an unsigned attribute with min 0, or over-max of a bound
+        equal to the type's maximum): such violations cannot be encoded on the wire, so the
+        generated value would be in range and a compliant DUT accepting it would be
+        misreported as failing to enforce the constraint.
+
+        In AT_BOUND mode each probe sits exactly on a bound and is expected to be accepted.
+        The data-type skips do not apply there - a bound that coincides with the type's own
+        limit is still a perfectly encodable value - so this mode reaches bounds that
+        VIOLATE mode cannot test at all.
+
+        Probes are ordered max bound first, then min bound.
         """
         datatype = attr_info.datatype.lower()
+        probes: list[ConstraintProbe] = []
 
-        # String constraints
+        # Length-constrained types. Octet strings take bytes; character strings take str.
         if 'string' in datatype or 'octstr' in datatype:
+            filler = b'x' if 'octstr' in datatype else 'x'
             if constraints.max_length is not None:
-                return 'x' * (constraints.max_length + 1)
-            if constraints.min_length is not None and constraints.min_length > 0:
-                return 'x' * (constraints.min_length - 1)
-            return None
+                if mode is ProbeMode.AT_BOUND:
+                    probes.append(ConstraintProbe(filler * constraints.max_length, 'max',
+                                                  f'length {constraints.max_length} == maxLength'))
+                else:
+                    probes.append(ConstraintProbe(filler * (constraints.max_length + 1), 'max',
+                                                  f'length {constraints.max_length + 1} > maxLength '
+                                                  f'{constraints.max_length}'))
+            if constraints.min_length is not None:
+                if mode is ProbeMode.AT_BOUND:
+                    probes.append(ConstraintProbe(filler * constraints.min_length, 'min',
+                                                  f'length {constraints.min_length} == minLength'))
+                elif constraints.min_length > 0:
+                    probes.append(ConstraintProbe(filler * (constraints.min_length - 1), 'min',
+                                                  f'length {constraints.min_length - 1} < minLength '
+                                                  f'{constraints.min_length}'))
+            return probes
 
-        # List constraints. Over-max_count violations are not generated: they would
-        # require synthesizing max_count+1 *valid* elements, which is not safely
-        # possible for arbitrary element types.
+        # List constraints. Neither an over-max_count violation nor an at-bound list can be
+        # generated: both need max_count *valid* elements, which is not safely synthesizable
+        # for arbitrary element types. An empty list is only used to violate a non-zero
+        # min_count, never as an at-bound probe, because writing one clears whatever the
+        # DUT is holding.
         if 'list' in datatype:
-            if constraints.min_count is not None and constraints.min_count > 0:
-                return []
-            return None
+            if mode is ProbeMode.VIOLATE and constraints.min_count is not None and constraints.min_count > 0:
+                probes.append(ConstraintProbe([], 'min', f'0 elements < minCount {constraints.min_count}'))
+            return probes
 
         # Numeric-like constraints (int, uint, percent, elapsed-s, temperature, etc.)
         type_range = _encodable_numeric_range(datatype, self._is_nullable_attribute(attr_info.attribute))
         if type_range is None:
             # Enum/bitmap/struct-typed attributes are out of scope for automated
-            # violation generation.
-            return None
+            # value generation.
+            return probes
         type_min, type_max = type_range
-        if constraints.max_value is not None and constraints.max_value < type_max:
-            return constraints.max_value + 1
-        if constraints.min_value is not None and constraints.min_value > type_min:
-            return constraints.min_value - 1
 
-        return None
+        if constraints.max_value is not None:
+            if mode is ProbeMode.AT_BOUND:
+                if type_min <= constraints.max_value <= type_max:
+                    probes.append(ConstraintProbe(constraints.max_value, 'max', f'value == max {constraints.max_value}'))
+            elif constraints.max_value < type_max:
+                probes.append(ConstraintProbe(constraints.max_value + 1, 'max',
+                                              f'value {constraints.max_value + 1} > max {constraints.max_value}'))
+
+        if constraints.min_value is not None:
+            if mode is ProbeMode.AT_BOUND:
+                # A min that equals the max has already been probed above.
+                if type_min <= constraints.min_value <= type_max and constraints.min_value != constraints.max_value:
+                    probes.append(ConstraintProbe(constraints.min_value, 'min', f'value == min {constraints.min_value}'))
+            elif constraints.min_value > type_min:
+                probes.append(ConstraintProbe(constraints.min_value - 1, 'min',
+                                              f'value {constraints.min_value - 1} < min {constraints.min_value}'))
+
+        return probes
+
+    def generate_constraint_violation(self, attr_info: WritableAttributeInfo, constraints: Constraints):
+        """Generate a single test value that violates the given constraints, or None.
+
+        Thin wrapper over generate_constraint_probes(): the first violating probe is the
+        max-bound one when the attribute has a testable max, otherwise the min-bound one.
+        """
+        probes = self.generate_constraint_probes(attr_info, constraints, ProbeMode.VIOLATE)
+        return probes[0].value if probes else None
 
     async def check_attribute_constraint(self, attr_info: WritableAttributeInfo, constraints: Constraints) -> bool:
         """Test a single attribute's constraint. Returns True if test passed, False otherwise."""
