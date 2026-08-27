@@ -185,6 +185,10 @@ Status emberAfGetAttributeDefaultValue(const EmberAfAttributeMetadata * am, Attr
 
     outDefault.type = am->attributeType;
 
+    const bool isLongString  = emberAfIsLongStringAttributeType(am->attributeType);
+    const bool isShortString = emberAfIsStringAttributeType(am->attributeType);
+    const bool isStringType  = isLongString || isShortString;
+
     const uint8_t * ptr                       = nullptr;
     size_t defaultValueSizeForBigEndianNudger = 0;
     (void) defaultValueSizeForBigEndianNudger;
@@ -203,7 +207,10 @@ Status emberAfGetAttributeDefaultValue(const EmberAfAttributeMetadata * am, Attr
     }
     else
     {
-        if ((am->size <= 4) && !emberAfIsStringAttributeType(am->attributeType))
+        // Non-string scalars <= 4 bytes are stored inline in defaultValue.defaultValue.
+        // Strings and long strings always store a pointer in defaultValue.ptrToDefaultValue,
+        // even if their size is <= 4 bytes.
+        if ((am->size <= 4) && !isStringType)
         {
             ptr                                = reinterpret_cast<const uint8_t *>(&(am->defaultValue.defaultValue));
             defaultValueSizeForBigEndianNudger = sizeof(am->defaultValue.defaultValue);
@@ -225,13 +232,13 @@ Status emberAfGetAttributeDefaultValue(const EmberAfAttributeMetadata * am, Attr
     {
         outDefault.rawData = ByteSpan();
     }
-    else if (emberAfIsLongStringAttributeType(am->attributeType))
+    else if (isLongString)
     {
         uint16_t len       = Encoding::LittleEndian::Get16(ptr);
         size_t totalSize   = (len == 0xFFFF) ? 2 : static_cast<size_t>(2 + len);
         outDefault.rawData = ByteSpan(ptr, totalSize);
     }
-    else if (emberAfIsStringAttributeType(am->attributeType))
+    else if (isShortString)
     {
         uint8_t len        = ptr[0];
         size_t totalSize   = (len == 0xFF) ? 1 : static_cast<size_t>(1 + len);
