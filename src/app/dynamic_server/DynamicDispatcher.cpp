@@ -299,6 +299,12 @@ EndpointComposition GetCompositionForEndpointIndex(uint16_t endpointIndex)
     return EndpointComposition::kFullFamily;
 }
 
+Protocols::InteractionModel::Status emberAfGetAttributeDefaultValue(EndpointId endpoint, ClusterId clusterId,
+                                                                    AttributeId attributeId, AttributeDefaultValue & outDefault)
+{
+    return Protocols::InteractionModel::Status::UnsupportedAttribute;
+}
+
 } // namespace app
 } // namespace chip
 

@@ -445,51 +445,9 @@ enum class EndpointComposition : uint8_t
  */
 EndpointComposition GetCompositionForEndpointIndex(uint16_t index);
 
-/**
- * @brief Represents an attribute default value referenced directly from flash metadata.
- *
- * String Storage in Flash:
- * - Non-empty strings are stored in flash with a Pascal length prefix (1 byte for short
- *   strings, 2 bytes in little-endian for long strings).
- * - Empty string defaults (from ZAP_EMPTY_DEFAULT() / nullptr flash pointer) have an empty
- *   rawData ByteSpan (size == 0).
- * - Explicit Null string defaults for nullable strings are stored in flash with the length
- *   sentinel: { 0xFF } for short strings, or { 0xFF, 0xFF } for long strings.
- *
- * Scalar Storage in Flash:
- * - Flash storage for scalars (GENERATED_DEFAULTS and inline union defaultValue) is pre-compiled
- *   in target native-endian format.
- * - CopyScalar copies raw native-endian storage bytes into the destination buffer (or zeroes
- *   the buffer if rawData is empty), which directly maps to NumericAttributeTraits<T>::StorageType.
- */
-struct AttributeDefaultValue
-{
-    ByteSpan rawData;              // Flash pointer and size in bytes (empty span if zero-filled / omitted in flash)
-    EmberAfAttributeType type = 0; // ZCL attribute type (used to distinguish short vs long string prefixes)
-
-    /// Direct zero-copy CharSpan view (returns empty CharSpan() if rawData is empty or length is 0)
-    CharSpan ToCharSpan() const;
-
-    /// Direct zero-copy ByteSpan view (returns empty ByteSpan() if rawData is empty or length is 0)
-    ByteSpan ToByteSpan() const;
-
-    /// Nullable zero-copy CharSpan view (returns Null if length prefix is 0xFF / 0xFFFF)
-    DataModel::Nullable<CharSpan> ToNullableCharSpan() const;
-
-    /// Nullable zero-copy ByteSpan view (returns Null if length prefix is 0xFF / 0xFFFF)
-    DataModel::Nullable<ByteSpan> ToNullableByteSpan() const;
-
-    /// Copies raw native-endian scalar storage bytes into destination buffer (zero-fills if rawData is empty)
-    void CopyScalar(void * outBuffer, size_t bufferSize) const;
-};
-
 /// Lookup default value for an attribute on an endpoint
 Protocols::InteractionModel::Status emberAfGetAttributeDefaultValue(EndpointId endpoint, ClusterId clusterId,
                                                                     AttributeId attributeId, AttributeDefaultValue & outDefault);
-
-/// Extract default value given attribute metadata
-Protocols::InteractionModel::Status emberAfGetAttributeDefaultValue(const EmberAfAttributeMetadata * metadata,
-                                                                    AttributeDefaultValue & outDefault);
 
 } // namespace app
 } // namespace chip
