@@ -161,15 +161,15 @@ TEST(TestDynamicAttributeMetadata, EndpointLevelLookup)
     constexpr ClusterId kTestClusterId   = 0xFFF1'0001;
 
     Testing::MockNodeConfig nodeConfig({
-        Testing::MockEndpointConfig(kTestEndpointId, {
-            Testing::MockClusterConfig(
-                kTestClusterId,
-                {
-                    Testing::MockAttributeConfig(0x0001, sTestDynamicAttrs[0]),
-                    Testing::MockAttributeConfig(0x0002, sTestDynamicAttrs[1]),
-                    Testing::MockAttributeConfig(0x0007, sTestDynamicAttrs[6]),
-                }),
-        }),
+        Testing::MockEndpointConfig(kTestEndpointId,
+                                    {
+                                        Testing::MockClusterConfig(kTestClusterId,
+                                                                   {
+                                                                       Testing::MockAttributeConfig(0x0001, sTestDynamicAttrs[0]),
+                                                                       Testing::MockAttributeConfig(0x0002, sTestDynamicAttrs[1]),
+                                                                       Testing::MockAttributeConfig(0x0007, sTestDynamicAttrs[6]),
+                                                                   }),
+                                    }),
     });
 
     Testing::SetMockNodeConfig(nodeConfig);

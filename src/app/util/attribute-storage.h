@@ -71,7 +71,7 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
  *
  * @param revision Cluster revision integer value.
  */
-#define DECLARE_DYNAMIC_ATTRIBUTE_LIST_END_WITH_REVISION(revision)                                                                  \
+#define DECLARE_DYNAMIC_ATTRIBUTE_LIST_END_WITH_REVISION(revision)                                                                 \
     {                                                                                                                              \
         ZAP_SIMPLE_DEFAULT(revision), 0xFFFD, 2, ZAP_TYPE(INT16U),                                                                 \
             ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE)                                                    \
@@ -137,7 +137,7 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
  * @param attrMask Attribute flags.
  * @param minMaxPtr Pointer to const EmberAfAttributeMinMaxValue struct in flash/ROM.
  */
-#define DECLARE_DYNAMIC_ATTRIBUTE_WITH_MIN_MAX_DEFAULT(attId, attType, attSizeBytes, attrMask, minMaxPtr)                         \
+#define DECLARE_DYNAMIC_ATTRIBUTE_WITH_MIN_MAX_DEFAULT(attId, attType, attSizeBytes, attrMask, minMaxPtr)                          \
     {                                                                                                                              \
         reinterpret_cast<const EmberAfAttributeMinMaxValue *>(minMaxPtr), attId, attSizeBytes, ZAP_TYPE(attType),                  \
             attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(MIN_MAX)           \

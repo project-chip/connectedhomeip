@@ -54,11 +54,11 @@ defined:
 
 -   All attributes defined with these macros will be configured as
     `MATTER_ATTRIBUTE_FLAG_EXTERNAL_STORAGE` in the ZCL database and therefore
-    will rely on the application to maintain storage for the attribute.
-    Default values provided via `_WITH_*_DEFAULT` macros are stored in flash
-    metadata and accessible via `emberAfGetAttributeDefaultValue`.
-    Consequently, reads or writes to these attributes must be handled within the
-    application by the `emberAfExternalAttributeWriteCallback` and
+    will rely on the application to maintain storage for the attribute. Default
+    values provided via `_WITH_*_DEFAULT` macros are stored in flash metadata
+    and accessible via `emberAfGetAttributeDefaultValue`. Consequently, reads or
+    writes to these attributes must be handled within the application by the
+    `emberAfExternalAttributeWriteCallback` and
     `emberAfExternalAttributeReadCallback` functions (or by an
     `AttributeAccessInterface`). See the bridge application's `main.cpp` for an
     example of this implementation.
