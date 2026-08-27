@@ -1214,8 +1214,8 @@ CHIP_ERROR AndroidDeviceControllerWrapper::WiFiCredentialsNeeded(chip::EndpointI
     context->endpoint = endpoint;
     context->isWiFi   = true;
 
-    CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().ScheduleWork(HandleCredentialsNeededCallback,
-                                                                    reinterpret_cast<intptr_t>(context));
+    CHIP_ERROR err =
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(HandleCredentialsNeededCallback, reinterpret_cast<intptr_t>(context));
     if (err != CHIP_NO_ERROR)
     {
         chip::Platform::Delete(context);
@@ -1240,8 +1240,8 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ThreadCredentialsNeeded(chip::Endpoin
     context->endpoint = endpoint;
     context->isWiFi   = false;
 
-    CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().ScheduleWork(HandleCredentialsNeededCallback,
-                                                                    reinterpret_cast<intptr_t>(context));
+    CHIP_ERROR err =
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(HandleCredentialsNeededCallback, reinterpret_cast<intptr_t>(context));
     if (err != CHIP_NO_ERROR)
     {
         chip::Platform::Delete(context);
@@ -1266,10 +1266,10 @@ void AndroidDeviceControllerWrapper::HandleCredentialsNeededCallback(intptr_t co
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
 
-    const bool listenerRegistered = isWiFi ? (wrapper->mWiFiCredentialsNeededListenerObject.HasValidObjectRef() &&
-                                              wrapper->mWiFiCredentialsNeededListener != nullptr)
-                                           : (wrapper->mThreadCredentialsNeededListenerObject.HasValidObjectRef() &&
-                                              wrapper->mThreadCredentialsNeededListener != nullptr);
+    const bool listenerRegistered = isWiFi
+        ? (wrapper->mWiFiCredentialsNeededListenerObject.HasValidObjectRef() && wrapper->mWiFiCredentialsNeededListener != nullptr)
+        : (wrapper->mThreadCredentialsNeededListenerObject.HasValidObjectRef() &&
+           wrapper->mThreadCredentialsNeededListener != nullptr);
     VerifyOrReturn(listenerRegistered,
                    ChipLogError(Controller, "No listener registered for %sCredentialsNeeded", isWiFi ? "WiFi" : "Thread"));
 

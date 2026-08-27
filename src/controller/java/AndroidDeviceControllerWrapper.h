@@ -227,7 +227,7 @@ private:
     {
         AndroidDeviceControllerWrapper * wrapper = nullptr;
         chip::EndpointId endpoint                = 0;
-        bool isWiFi                             = false;
+        bool isWiFi                              = false;
     };
 
     static void HandleCredentialsNeededCallback(intptr_t context);
