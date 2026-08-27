@@ -539,7 +539,7 @@ CHIP_ERROR AudioControlCluster::Attributes(const ConcreteClusterPath & path,
 
     const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
         { mOptionalAttributeSet.IsSet(PhysicallyMuted::Id), PhysicallyMuted::kMetadataEntry },
-        { !mFeatures.Has(Feature::kDecibel), MaxDeviceVolumeDB::kMetadataEntry },
+        { !mFeatures.Has(Feature::kDecibel) && mOptionalAttributeSet.IsSet(MaxDeviceVolumeDB::Id), MaxDeviceVolumeDB::kMetadataEntry },
         { mOptionalAttributeSet.IsSet(MaxUserVolume::Id), MaxUserVolume::kMetadataEntry },
         { mOptionalAttributeSet.IsSet(StartUpMuted::Id), StartUpMuted::kMetadataEntry },
         { mOptionalAttributeSet.IsSet(StartUpVolume::Id), StartUpVolume::kMetadataEntry },

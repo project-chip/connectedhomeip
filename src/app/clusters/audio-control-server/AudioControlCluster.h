@@ -33,8 +33,7 @@ class AudioControlCluster : public DefaultServerCluster
 {
 public:
     /// Bitset of optional attributes that can be individually enabled.
-    /// Feature-gated attributes (MinCorrection, MaxCorrection) are controlled by the feature map,
-    /// not this set.
+    /// MinCorrection/MaxCorrection are controlled solely by the feature map, not this set.
     using OptionalAttributeSet =
         app::OptionalAttributeSet<AudioControl::Attributes::PhysicallyMuted::Id, AudioControl::Attributes::MaxDeviceVolumeDB::Id,
                                   AudioControl::Attributes::MaxUserVolume::Id, AudioControl::Attributes::StartUpMuted::Id,

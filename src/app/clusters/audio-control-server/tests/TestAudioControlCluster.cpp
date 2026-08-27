@@ -169,12 +169,12 @@ TEST_F(TestAudioControlCluster, AttributeListMandatoryOnly)
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
     ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, AudioControl::Id), attributes), CHIP_NO_ERROR);
 
-    // No features, no optional attrs: mandatory + MaxDeviceVolumeDB (because !DB feature) + globals
+    // No features, no optional attrs: mandatory + globals only.
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
     AttributeListBuilder listBuilder(expected);
     const AttributeListBuilder::OptionalAttributeEntry optionals[] = {
         { false, PhysicallyMuted::kMetadataEntry },
-        { true, MaxDeviceVolumeDB::kMetadataEntry }, // present when !DB feature
+        { false, MaxDeviceVolumeDB::kMetadataEntry }, // optional bit not set
         { false, MaxUserVolume::kMetadataEntry },
         { false, StartUpMuted::kMetadataEntry },
         { false, StartUpVolume::kMetadataEntry },
@@ -193,7 +193,11 @@ TEST_F(TestAudioControlCluster, AttributeListMandatoryOnly)
 TEST_F(TestAudioControlCluster, AttributeListWithOptionals)
 {
     AudioControlCluster::OptionalAttributeSet optionalSet;
-    optionalSet.Set<PhysicallyMuted::Id>().Set<MaxUserVolume::Id>().Set<StartUpMuted::Id>().Set<StartUpVolume::Id>();
+    optionalSet.Set<PhysicallyMuted::Id>()
+        .Set<MaxDeviceVolumeDB::Id>()
+        .Set<MaxUserVolume::Id>()
+        .Set<StartUpMuted::Id>()
+        .Set<StartUpVolume::Id>();
 
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
                                 BasicConfig().WithOptionalAttributes(optionalSet).WithInitialMaxUserVolume(80));
@@ -241,7 +245,7 @@ TEST_F(TestAudioControlCluster, AttributeListWithBEQFeature)
     AttributeListBuilder listBuilder(expected);
     const AttributeListBuilder::OptionalAttributeEntry expectedOptionals[] = {
         { false, PhysicallyMuted::kMetadataEntry },
-        { true, MaxDeviceVolumeDB::kMetadataEntry }, // !DB feature
+        { false, MaxDeviceVolumeDB::kMetadataEntry }, // optional bit not set (BEQ is unrelated to DB gating)
         { false, MaxUserVolume::kMetadataEntry },
         { false, StartUpMuted::kMetadataEntry },
         { false, StartUpVolume::kMetadataEntry },
@@ -285,6 +289,24 @@ TEST_F(TestAudioControlCluster, AttributeListDBFeatureHidesMaxDeviceVolumeDB)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(TestAudioControlCluster, MaxDeviceVolumeDBHiddenWhenOptionalBitNotSet)
+{
+    // DB feature off, optional bit not set: MaxDeviceVolumeDB must not be exposed.
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig());
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
+    ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, AudioControl::Id), attributes), CHIP_NO_ERROR);
+
+    auto buf = attributes.TakeBuffer();
+    for (const auto & entry : buf)
+    {
+        EXPECT_NE(entry.attributeId, MaxDeviceVolumeDB::Id);
+    }
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(TestAudioControlCluster, BEQFeatureRequiresAtLeastOneBand)
 {
     // Minimum valid BEQ configuration: exactly one band in OptionalAttributeSet.
@@ -312,9 +334,9 @@ TEST_F(TestAudioControlCluster, BEQFeatureRequiresAtLeastOneBand)
 
 TEST_F(TestAudioControlCluster, DBFeatureProhibitsMaxDeviceVolumeDBConfig)
 {
-    // When DB feature is enabled, MaxDeviceVolumeDB must not be in the optional attribute set
-    // (constructor VerifyOrDie); it is hidden from the attribute list either way.
-    // BasicConfig() never sets MaxDeviceVolumeDB::Id, so this is the valid configuration.
+    // A ZAP config enabling both the DB feature and the MaxDeviceVolumeDB optional bit is invalid
+    // and fatal at construction (constructor VerifyOrDie); BasicConfig() never sets the bit, so this
+    // exercises the valid configuration instead.
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithFeatures(BitFlags<Feature>(Feature::kDecibel)));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
@@ -462,7 +484,10 @@ TEST_F(TestAudioControlCluster, InvokeCommandDefaultCaseReturnsUnsupportedComman
 TEST_F(TestAudioControlCluster, ReadMaxDeviceVolumeDB)
 {
     mMockDelegate.maxDeviceVolumeDB = 1200;
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig());
+
+    AudioControlCluster::OptionalAttributeSet optionalSet;
+    optionalSet.Set<MaxDeviceVolumeDB::Id>();
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithOptionalAttributes(optionalSet));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
