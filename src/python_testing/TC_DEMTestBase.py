@@ -191,9 +191,20 @@ class DEMTestBase:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
     async def send_power_range_adjustment_command(self, cause: Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum,
-                                                  minPower: int = None, maxPower: int = None, duration: int = 3600,
-                                                  endpoint: int = None, timedRequestTimeoutMs: int = 3000,
-                                                  expected_status: Status = Status.Success):
+                                                  minPower: int | None = None, maxPower: int | None = None, duration: int = 3600,
+                                                  endpoint: int | None = None, timedRequestTimeoutMs: int = 3000,
+                                                  expected_status: Status = Status.Success) -> None:
+        """Send a PowerRangeAdjustRequest command to the DUT.
+
+        Args:
+            cause: The AdjustmentCauseEnum value for the power range adjustment.
+            minPower: Optional minimum power in watts. Pass None to omit from command.
+            maxPower: Optional maximum power in watts. Pass None to omit from command.
+            duration: Duration in seconds for the power range adjustment (default: 3600).
+            endpoint: Optional endpoint ID (default: None).
+            timedRequestTimeoutMs: Timed request timeout in milliseconds (default: 3000).
+            expected_status: Expected Status from the response (default: Status.Success).
+        """
         try:
             # Build command with only provided optional parameters
             cmd_dict = {
@@ -215,8 +226,15 @@ class DEMTestBase:
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
-    async def send_cancel_power_range_adjustment_command(self, endpoint: int = None, timedRequestTimeoutMs: int = 3000,
-                                                         expected_status: Status = Status.Success):
+    async def send_cancel_power_range_adjustment_command(self, endpoint: int | None = None, timedRequestTimeoutMs: int = 3000,
+                                                         expected_status: Status = Status.Success) -> None:
+        """Send a CancelPowerRangeAdjustRequest command to the DUT.
+
+        Args:
+            endpoint: Optional endpoint ID (default: None).
+            timedRequestTimeoutMs: Timed request timeout in milliseconds (default: 3000).
+            expected_status: Expected Status from the response (default: Status.Success).
+        """
         try:
             await self.send_single_cmd(cmd=Clusters.DeviceEnergyManagement.Commands.CancelPowerRangeAdjustRequest(),
                                        endpoint=endpoint,
@@ -227,19 +245,19 @@ class DEMTestBase:
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
-    def validate_power_range_adjust_start_event(self, event_data,
+    def validate_power_range_adjust_start_event(self, event_data: object,
                                                 expected_cause: Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum,
                                                 expected_min_power: int | None = None,
                                                 expected_max_power: int | None = None,
-                                                expected_duration: int | None = None):
+                                                expected_duration: int | None = None) -> None:
         """Validate PowerRangeAdjustStart event contains expected values.
 
         Args:
-            event_data: The event data returned from wait_for_event_report(PowerRangeAdjustStart)
-            expected_cause: Expected PowerAdjustReasonEnum value
-            expected_min_power: Expected minPower value. Pass None to expect NullValue, or an int for the expected value
-            expected_max_power: Expected maxPower value. Pass None to expect NullValue, or an int for the expected value
-            expected_duration: Expected duration value in seconds
+            event_data: The event data returned from wait_for_event_report(PowerRangeAdjustStart).
+            expected_cause: Expected PowerAdjustReasonEnum value.
+            expected_min_power: Expected minPower value. Pass None to expect NullValue, or an int for the expected value.
+            expected_max_power: Expected maxPower value. Pass None to expect NullValue, or an int for the expected value.
+            expected_duration: Expected duration value in seconds.
         """
         from matter.clusters.Types import NullValue
 
@@ -269,14 +287,14 @@ class DEMTestBase:
             asserts.assert_equal(event_data.duration, expected_duration,
                                  f"Expected duration {expected_duration}, got {event_data.duration}")
 
-    def validate_power_range_adjust_end_event(self, event_data,
+    def validate_power_range_adjust_end_event(self, event_data: object,
                                               expected_cause: Clusters.DeviceEnergyManagement.Enums.CauseEnum,
-                                              expected_duration: int | None = None):
+                                              expected_duration: int | None = None) -> None:
         """Validate PowerRangeAdjustEnd event contains expected values.
 
         Args:
-            event_data: The event data returned from wait_for_event_report(PowerRangeAdjustEnd)
-            expected_cause: Expected CauseEnum value
+            event_data: The event data returned from wait_for_event_report(PowerRangeAdjustEnd).
+            expected_cause: Expected CauseEnum value.
             expected_duration: Optional expected duration value. Duration is validated allowing up to 2-second
                              increase to account for device timer implementation latency
                              that may cause the internal timer to expire up to 2 seconds later than expected.
@@ -368,8 +386,10 @@ class DEMTestBase:
     async def send_test_event_trigger_forecast_clear(self):
         await self.send_test_event_triggers(eventTrigger=0x0098000000000010)
 
-    async def send_test_event_trigger_power_range_adjustment(self):
+    async def send_test_event_trigger_power_range_adjustment(self) -> None:
+        """Send a test event trigger to activate the power range adjustment feature."""
         await self.send_test_event_triggers(eventTrigger=0x0098000000000011)
 
-    async def send_test_event_trigger_power_range_adjustment_clear(self):
+    async def send_test_event_trigger_power_range_adjustment_clear(self) -> None:
+        """Send a test event trigger to clear the power range adjustment feature."""
         await self.send_test_event_triggers(eventTrigger=0x0098000000000012)

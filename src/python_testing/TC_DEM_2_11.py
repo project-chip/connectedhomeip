@@ -63,7 +63,8 @@ log = logging.getLogger(__name__)
 class TC_DEM_2_11(MatterBaseTest, DEMTestBase):
     """Implementation of test case TC_DEM_2_11."""
 
-    def pics_TC_DEM_2_11(self):
+    @property
+    def pics_TC_DEM_2_11(self) -> list[str]:
         """Return the PICS definitions associated with this test."""
         return [
             "DEM.S.F07",  # Depends on Feature 07 (PowerRangeAdjustment)
