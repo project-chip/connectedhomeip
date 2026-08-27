@@ -1059,7 +1059,7 @@ JNI_METHOD(void, setThreadCredentialsNeededListener)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to set ThreadCredentialsNeeded Listener. : %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Controller, "Failed to set ThreadCredentialsNeeded listener: %" CHIP_ERROR_FORMAT, err.Format());
         if (err != CHIP_JNI_ERROR_EXCEPTION_THROWN)
         {
             JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
