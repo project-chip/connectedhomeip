@@ -52,6 +52,7 @@ class TC_SMOKECO_2_2(SmokeCoBaseTest):
 
     @async_test_body
     async def setup_test(self):
+        await self.smokeco_cluster_checks()
         super().setup_test()
         self.gd_cluster = Clusters.GeneralDiagnostics
 

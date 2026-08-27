@@ -332,3 +332,24 @@ class SmokeCoBaseTest(MatterBaseTest):
         self.step(21)
         # This will fail if AllClearEvent is not retrieved
         await self.read_smokeco_event(self.smokeco_cluster.Events.AllClear)
+
+    async def smokeco_cluster_checks(self):
+        """This method checks that the DUT can perform the test: ExpiryDate is not expired, TestInProgress is False,
+        HardwareFaultAlert is False, and EndOfServiceAlert has not reached kExpired."""
+
+        # Check DUT ExpiryDate is valid
+        expiry_date = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.ExpiryDate)
+        self.is_valid_expired_date(expiry_date)
+
+        # Check if the DUT has a test in progress
+        test_in_progress = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.TestInProgress)
+        asserts.assert_equal(test_in_progress, False, "DUT has a test in progress")
+
+        # Check if DUT has a HardwareFault
+        hardware_fault = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.HardwareFaultAlert)
+        asserts.assert_equal(hardware_fault, False, "DUT has a Hardware Fault")
+
+        # Verify if the DUT EndOfServiceAlert is not equal to kExpired to continue
+        end_of_service_alert = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.EndOfServiceAlert)
+        asserts.assert_not_equal(end_of_service_alert, self.smokeco_enums.EndOfServiceEnum.kExpired,
+                                 "DUT has reached the end of service.")

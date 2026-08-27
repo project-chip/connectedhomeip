@@ -40,25 +40,23 @@
 import logging
 
 from mobly import asserts
+from support_modules.smokeco_support import SmokeCoBaseTest
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_SMOKECO_2_7(MatterBaseTest):
-    def setup_test(self):
+class TC_SMOKECO_2_7(SmokeCoBaseTest):
+
+    @async_test_body
+    async def setup_test(self):
+        await self.smokeco_cluster_checks()
         super().setup_test()
         self.is_ci = self.matter_test_config.global_test_params.get('simulate_mounting', False)
-
-    async def read_smokeco_attribute_expect_success(self, attribute):
-        cluster = Clusters.Objects.SmokeCoAlarm
-        endpoint = self.get_endpoint()
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     def desc_TC_SMOKECO_2_7(self) -> str:
         return "[TC-SMOKECO-2.7] Unmount Attribute with DUT as Server"
