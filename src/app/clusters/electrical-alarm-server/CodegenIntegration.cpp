@@ -26,15 +26,23 @@ namespace ElectricalAlarm {
 
 CHIP_ERROR Instance::Init()
 {
-    return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
+    VerifyOrReturnError(!mRegistered, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration()));
+    mRegistered = true;
+    return CHIP_NO_ERROR;
 }
 
 void Instance::Shutdown()
 {
+    VerifyOrReturn(mRegistered);
+    mRegistered = false;
+
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
     if (err != CHIP_NO_ERROR)
     {
+#if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
         ChipLogError(AppServer, "Failed to unregister Electrical Alarm cluster: %" CHIP_ERROR_FORMAT, err.Format());
+#endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
     }
 }
 

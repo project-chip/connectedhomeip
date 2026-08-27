@@ -16,8 +16,6 @@ import("//build_overrides/chip.gni")
 
 source_set("electrical-alarm-server") {
   sources = [
-    "CodegenIntegration.cpp",
-    "CodegenIntegration.h",
     "ElectricalAlarmCluster.cpp",
     "ElectricalAlarmCluster.h",
     "electrical-alarm-delegate.h",
@@ -27,6 +25,7 @@ source_set("electrical-alarm-server") {
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/lib/support",
     "${chip_root}/zzz_generated/app-common/clusters/ElectricalAlarm",
   ]
 }
