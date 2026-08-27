@@ -45,23 +45,31 @@ defined:
 
 `DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(attrListName)`
 `DECLARE_DYNAMIC_ATTRIBUTE(attId, attType, attSizeBytes, attrMask)`
-`DECLARE_DYNAMIC_ATTRIBUTE_LIST_END(clusterRevision)`
+`DECLARE_DYNAMIC_ATTRIBUTE_WITH_SCALAR_DEFAULT(attId, attType, attSizeBytes, attrMask, defaultVal)`
+`DECLARE_DYNAMIC_ATTRIBUTE_WITH_STRING_DEFAULT(attId, attType, attSizeBytes, attrMask, defaultBytesPtr)`
+`DECLARE_DYNAMIC_ATTRIBUTE_WITH_MIN_MAX_DEFAULT(attId, attType, attSizeBytes, attrMask, minMaxPtr)`
+`DECLARE_DYNAMIC_ATTRIBUTE_LIST_END()`
+`DECLARE_DYNAMIC_ATTRIBUTE_LIST_END_WITH_REVISION(clusterRevision)`
 
--   These three macros are used to declare a list of attributes for use within a
+-   These macros are used to declare a list of attributes for use within a
     cluster. The declaration must begin with the
     `DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN` macro which will define the name of
     the allocated attribute structure. Each attribute is then added by the
-    `DECLARE_DYNAMIC_ATTRIBUTE` macro. Finally,
-    `DECLARE_DYNAMIC_ATTRIBUTE_LIST_END` macro should be used to close the
-    definition.
+    `DECLARE_DYNAMIC_ATTRIBUTE` or `DECLARE_DYNAMIC_ATTRIBUTE_WITH_*_DEFAULT`
+    macros. Finally, `DECLARE_DYNAMIC_ATTRIBUTE_LIST_END` (or
+    `DECLARE_DYNAMIC_ATTRIBUTE_LIST_END_WITH_REVISION`) should be used to close
+    the definition.
 
 -   All attributes defined with these macros will be configured as
     `MATTER_ATTRIBUTE_FLAG_EXTERNAL_STORAGE` in the ZCL database and therefore
     will rely on the application to maintain storage for the attribute.
+    Default values provided via `_WITH_*_DEFAULT` macros are stored in flash
+    metadata and accessible via `emberAfGetAttributeDefaultValue`.
     Consequently, reads or writes to these attributes must be handled within the
     application by the `emberAfExternalAttributeWriteCallback` and
-    `emberAfExternalAttributeReadCallback` functions. See the bridge
-    application's `main.cpp` for an example of this implementation.
+    `emberAfExternalAttributeReadCallback` functions (or by an
+    `AttributeAccessInterface`). See the bridge application's `main.cpp` for an
+    example of this implementation.
 
 `DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(clusterListName)`
 `DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs, role, incomingCommands, outgoingCommands)`
