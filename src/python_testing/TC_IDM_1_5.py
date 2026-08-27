@@ -95,10 +95,11 @@ class TC_IDM_1_5(IDMBaseTest):
     def steps_TC_IDM_1_5(self) -> list[TestStep]:
         """Returns the list of test steps defined in the test plan."""
         return [
-            TestStep(1, "TH records start time t_sub_start and establishes a subscription to the Breadcrumb attribute of the GeneralCommissioning cluster on Endpoint 0 of the DUT with MaxInterval set to 3600 seconds. TH synchronously awaits and drains the initial prime report from the subscription establishment.", is_commissioning=True),
-            TestStep(2, "TH records start time t_invoke_sent and sends an InvokeRequestMessage to the DUT to invoke the ArmFailSafe command (ExpiryLengthSeconds set to 900, Breadcrumb set to 1) on the GeneralCommissioning cluster (Endpoint 0) with DelayReportData (DelayMinMs: 1000 ms, DelayJitterWindowMs: 1000 ms)."),
-            TestStep(3, "TH measures the time delta (Delta t) between sending the InvokeRequestMessage (t_invoke_sent) in Step 2 and receiving the subsequent ReportDataMessage containing the Breadcrumb attribute change report. Verify Delta t >= DelayMinMs (1000 ms)."),
-            TestStep(4, "TH sends an InvokeRequestMessage to the DUT to invoke the ArmFailSafe command (ExpiryLengthSeconds set to 0, Breadcrumb set to 0) to disarm the fail-safe and clean up.")
+            TestStep(1, "Check if this device supports ICD, skip all remaining steps if it does.", is_commissioning=True),
+            TestStep(2, "TH establishes a subscription to the Breadcrumb attribute of the GeneralCommissioning cluster on Endpoint 0 of the DUT with MaxInterval set to 3600 seconds. TH synchronously awaits the initial prime report from the subscription establishment, records the timestamp t_prime, and verifies the negotiated MaxInterval from the SubscribeResponseMessage is 3600 seconds."),
+            TestStep(3, "TH records start time t_invoke_sent and sends an InvokeRequestMessage to the DUT to invoke the ArmFailSafe command (ExpiryLengthSeconds set to 900, Breadcrumb set to 1) on the GeneralCommissioning cluster (Endpoint 0) with DelayReportData (DelayMinMs: 1000 ms, DelayJitterWindowMs: 1000 ms)."),
+            TestStep(4, "TH measures the time delta (Delta t) between sending the InvokeRequestMessage (t_invoke_sent) in Step 3 and receiving the subsequent ReportDataMessage containing the Breadcrumb attribute change report. Verify Delta t >= DelayMinMs (1000 ms)."),
+            TestStep(5, "TH sends an InvokeRequestMessage to the DUT to invoke the ArmFailSafe command (ExpiryLengthSeconds set to 0, Breadcrumb set to 0) to disarm the fail-safe and clean up.")
         ]
 
     @async_test_body
@@ -107,15 +108,15 @@ class TC_IDM_1_5(IDMBaseTest):
         dev_ctrl = self.default_controller
         dut_node_id = self.dut_node_id
 
-        self.print_step(0, "Commissioning - already done")
-
-        # DUT must be a non-ICD device (!ICDM.S)
-        if self.check_pics("ICDM.S"):
-            log.info("DUT is an ICD device (ICDM.S is enabled); skipping test as it requires !ICDM.S")
-            self.skip_step(1)
+        # Step 1: Check if this device supports ICD, skip all remaining steps if it does
+        self.step(1)
+        ep0_servers = await self.get_descriptor_server_list(dev_ctrl, ep=0)
+        if Clusters.IcdManagement.id in ep0_servers:
+            log.info("DUT supports ICD (IcdManagement cluster present on EP0); skipping remaining steps as test requires a non-ICD device")
             self.skip_step(2)
             self.skip_step(3)
             self.skip_step(4)
+            self.skip_step(5)
             return
 
         # GeneralCommissioning cluster on Endpoint 0 is mandatory for all Matter devices
@@ -128,19 +129,30 @@ class TC_IDM_1_5(IDMBaseTest):
         delay_min_ms = 1000
         delay_jitter_window_ms = 1000
         min_required_sub_window_sec = (delay_min_ms + delay_jitter_window_ms) / 1000.0 + 5.0
+        max_interval_ceiling_sec = 3600
 
-        # Step 1: Establish subscription to Breadcrumb with MaxInterval = 3600s
-        self.step(1)
-        log.info("Establishing subscription to Breadcrumb attribute on Endpoint 0 with MaxInterval=3600s")
-        t_sub_start = time.monotonic()
+        # Step 2: Establish subscription to Breadcrumb with MaxInterval = 3600s
+        self.step(2)
+        log.info("Establishing subscription to Breadcrumb attribute on Endpoint 0 with MaxInterval=%ds", max_interval_ceiling_sec)
         subscription = await dev_ctrl.ReadAttribute(
             nodeId=dut_node_id,
             attributes=[(endpoint, target_attribute)],
-            reportInterval=(0, 3600),
+            reportInterval=(0, max_interval_ceiling_sec),
             keepSubscriptions=False,
             autoResubscribe=False
         )
         subscription.SetAttributeUpdateCallback(tracker)
+
+        # Record timestamp t_prime upon receiving the initial priming report / subscription establishment
+        t_prime = time.monotonic()
+
+        # Verify the actual MaxInterval in the SubscribeResponseMessage is 3600s
+        _, negotiated_max_interval_sec = subscription.GetReportingIntervalsSeconds()
+        log.info("Negotiated subscription intervals: MaxInterval = %ds", negotiated_max_interval_sec)
+        asserts.assert_equal(
+            negotiated_max_interval_sec, max_interval_ceiling_sec,
+            f"Negotiated MaxInterval ({negotiated_max_interval_sec}s) did not match expected ({max_interval_ceiling_sec}s)"
+        )
 
         # Synchronously verify initial prime report was received during subscription establishment
         prime_attrs = subscription.GetAttributes()
@@ -150,16 +162,12 @@ class TC_IDM_1_5(IDMBaseTest):
         asserts.assert_in(target_attribute, prime_attrs[endpoint][Clusters.GeneralCommissioning],
                           "Breadcrumb attribute not found in subscription prime report")
         prime_val = prime_attrs[endpoint][Clusters.GeneralCommissioning][target_attribute]
-        log.info("Initial prime report received: Breadcrumb = %r", prime_val)
+        log.info("Initial prime report received: Breadcrumb = %r at timestamp %.6f", prime_val, t_prime)
 
-        # Give DUT 1.0s to process StatusResponse ACK and enter quiet active state
-        log.info("Waiting 1 second for subscription to settle before Step 2")
-        await asyncio.sleep(1.0)
+        sub_elapsed_sec = time.monotonic() - t_prime
+        remaining_sub_window_sec = float(negotiated_max_interval_sec) - sub_elapsed_sec
 
-        sub_elapsed_sec = time.monotonic() - t_sub_start
-        remaining_sub_window_sec = 3600.0 - sub_elapsed_sec
-
-        log.info("Subscription established in %.2f s; remaining window: %.2f s (required >= %.2f s)",
+        log.info("Time elapsed since priming report: %.2f s; remaining window: %.2f s (required >= %.2f s)",
                  sub_elapsed_sec, remaining_sub_window_sec, min_required_sub_window_sec)
 
         asserts.assert_greater_equal(
@@ -169,8 +177,8 @@ class TC_IDM_1_5(IDMBaseTest):
         )
 
         try:
-            # Step 2: Send InvokeRequestMessage for ArmFailSafe with DelayReportData
-            self.step(2)
+            # Step 3: Send InvokeRequestMessage for ArmFailSafe with DelayReportData
+            self.step(3)
             # Drain any residual queue items before measuring
             while not report_queue.empty():
                 report_queue.get_nowait()
@@ -191,8 +199,8 @@ class TC_IDM_1_5(IDMBaseTest):
             asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                                  f"ArmFailSafe failed with errorCode: {resp.errorCode}")
 
-            # Step 3: Measure delta t and verify delta t >= DelayMinMs
-            self.step(3)
+            # Step 4: Measure delta t and verify delta t >= DelayMinMs
+            self.step(4)
             wait_timeout_sec = (delay_min_ms + delay_jitter_window_ms) / 1000.0 + 5.0
             try:
                 report_recv_time, new_val = await asyncio.to_thread(report_queue.get, timeout=wait_timeout_sec)
@@ -212,8 +220,8 @@ class TC_IDM_1_5(IDMBaseTest):
                 f"Delta t ({delta_t_ms:.2f} ms) was less than {min_expected_delta_ms:.2f} ms minimum delay"
             )
         finally:
-            # Step 4: Disarm fail-safe and reset Breadcrumb
-            self.step(4)
+            # Step 5: Disarm fail-safe and reset Breadcrumb
+            self.step(5)
             log.info("Cleaning up: disarming fail-safe and resetting Breadcrumb to 0")
             cleanup_resp = await dev_ctrl.SendCommand(
                 nodeId=dut_node_id,
