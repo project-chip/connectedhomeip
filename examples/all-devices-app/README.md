@@ -245,6 +245,13 @@ over whichever transport(s) are compiled in. The proxy serves one commissioning
 session at a time across all transports (`MaxSessions` = 1) and caches up to 10
 background-scan results.
 
+The BLE transport performs a one-way peripheral→central role switch on the CP's
+first `ProxyConnectRequest(BLE)`. After that the CP no longer advertises over
+BLE for its own (re-)commissioning; restart the process to regain peripheral
+mode. An already-commissioned node must announce over DNS-SD rather than BLE, so
+`OpenCommissioningWindow` still works — but it is worth planning around when
+setting a CP device up. The Wi-Fi PAF transport is unaffected.
+
 Two build switches gate the device itself:
 
 -   `commissioning-proxy` must be in the device-factory enable list. All devices
@@ -268,7 +275,10 @@ The compiled-in transport(s) follow this build configuration:
 -   **BLE** is included when `chip_config_network_layer_ble` is true.
 
 The `-no-ble` build variants disable the BLE transport. With no transport
-compiled in the device type still starts, but every proxy command fails.
+compiled in the device is not registered with the factory at all, so `--device
+commissioning-proxy` reports an invalid device type rather than starting a proxy
+whose every command fails. Darwin behaves the same way, as `src/platform/Darwin`
+has no proxy-capable `BLEManagerImpl`.
 
 To build with both BLE and WiFi-PAF on Linux x86-64 run:
 
@@ -278,7 +288,8 @@ To build with both BLE and WiFi-PAF on Linux x86-64 run:
 
 To cross-compile for a Raspberry Pi (ARM64), build inside the cross-compile
 container, which supplies the aarch64 sysroot. The ARM and ARM64 boards accept
-`-clang` or `-nodeps` target variants:
+`-clang` or `-nodeps` target variants; use `-clang`, since `-nodeps` disables
+BLE and so omits the proxy:
 
 ```bash
 # From the root of your checkout, on the host:

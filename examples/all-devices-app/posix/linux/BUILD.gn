@@ -51,7 +51,6 @@ source_set("linux") {
   deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device-factory",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:device-interface",
-    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/commissioning-proxy",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:wifi",
     "${chip_root}/src/app:app_config",
@@ -64,8 +63,17 @@ source_set("linux") {
 
   deps += [ "${chip_root}/third_party/jsoncpp" ]
 
+  # The proxy device itself is here rather than in the unconditional list because a
+  # build with no transport does not register it with the factory, and linking the
+  # cluster into a binary that cannot reach it only costs flash. Either transport is
+  # enough to make it reachable, so this tracks both.
+  if (chip_config_network_layer_ble || chip_device_config_enable_wifipaf) {
+    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/device/types/commissioning-proxy" ]
+  }
+
   if (chip_config_network_layer_ble) {
-    # CommissioningProxyBleAdapter implements the cluster's BLE adapter interface.
+    # CommissioningProxyBleAdapter implements the cluster's BLE adapter interface, and
+    # this target owns the BLE transport driver it is composed onto the proxy device with.
     deps += [
       "${chip_root}/src/app/clusters/commissioning-proxy-server:ble-transport",
     ]

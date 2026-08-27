@@ -33,12 +33,12 @@ namespace app {
 /**
  * @brief Generic Commissioning Proxy device.
  *
- * A commissioning proxy relays commissioning traffic for a device the commissioner
+ * A commissioning proxy tunnels commissioning traffic for a device the commissioner
  * cannot reach directly, over a transport that is not IP: BLE today, Wi-Fi PAF next.
- * It is not an on-network path — a proxy with no transport registered still answers
- * reads, but reports an empty Capabilities and fails every ProxyConnectRequest and
- * ProxyScanRequest. Such a build is only useful to keep a no-transport configuration
- * compiling; a real product registers at least one transport.
+ * It is not an on-network path.
+ *
+ * At least one transport is required: Register() fails with CHIP_ERROR_INCORRECT_STATE
+ * if none are present.
  *
  * Transports are composed in, not subclassed in: the platform factory override owns one
  * transport driver per technology it has compiled in and hands each to AddTransport().
@@ -75,8 +75,9 @@ public:
     CommissioningProxyDevice & operator=(CommissioningProxyDevice &&)      = delete;
 
     /**
-     * Add a transport this device will expose. Call once per transport before
-     * Register(); each is registered on the cluster when the device registers.
+     * Add a transport this device will expose. Call at least once, and once per
+     * transport, before Register(); each is registered on the cluster when the device
+     * registers.
      *
      * The device does not take ownership: @p transport must outlive it, and must not be
      * shared with another device, since registering hands the transport a pointer back

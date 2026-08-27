@@ -90,19 +90,15 @@ public:
 
     void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override
     {
+        VerifyOrReturn(mCb != nullptr);
+
         const char * addrStr = bluez_device1_get_address(&device);
-        if (addrStr == nullptr)
-        {
-            return;
-        }
+        VerifyOrReturn(addrStr != nullptr);
+
         unsigned int b[6];
         if (sscanf(addrStr, "%02x:%02x:%02x:%02x:%02x:%02x", &b[0], &b[1], &b[2], &b[3], &b[4], &b[5]) != 6)
         {
             ChipLogDetail(DeviceLayer, "ProxyScanForwarder: malformed BD_ADDR '%s', skipping", addrStr);
-            return;
-        }
-        if (mCb == nullptr)
-        {
             return;
         }
         // Schedule the callback onto the Matter event loop so the consumer can
@@ -869,10 +865,7 @@ CHIP_ERROR BLEManagerImpl::CancelConnection()
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 CHIP_ERROR BLEManagerImpl::SwitchToCentralMode()
 {
-    if (mIsCentral)
-    {
-        return CHIP_NO_ERROR;
-    }
+    VerifyOrReturnError(!mIsCentral, CHIP_NO_ERROR);
 
     // Refuse if any BLE connection is still active (e.g. the commissioning
     // session that brought the CP onto the fabric has not closed yet).  Caller

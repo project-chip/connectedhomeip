@@ -20,9 +20,13 @@
 #include <PosixSpeaker.h>
 #include <app_config/enabled_devices.h>
 #include <device-factory/DeviceFactory.h>
-#include <device/types/commissioning-proxy/CommissioningProxyDevice.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+// The commissioning-proxy device target in BUILD.gn is conditional on either
+// transport being enabled, which gn check cannot evaluate, hence the nogncheck.
+#if CONFIG_NETWORK_LAYER_BLE || CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <device/types/commissioning-proxy/CommissioningProxyDevice.h> // nogncheck
+#endif
 #if CONFIG_NETWORK_LAYER_BLE
 #include <CommissioningProxyBleAdapter.h>
 // The ble-transport / paf-transport dependencies in BUILD.gn are conditional on
@@ -101,6 +105,8 @@ BitMask<Clusters::CommissioningProxy::WiFiBandBitmap> ProxyWiFiBands()
 void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, FabricTable & fabricTable,
                                     PersistentStorageDelegate * storageDelegate, PosixAudioManager & audioManager)
 {
+    // Registered only when a transport is compiled in.
+#if CONFIG_NETWORK_LAYER_BLE || CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     if constexpr (ALL_DEVICES_ENABLE_COMMISSIONING_PROXY)
     {
         const CommissioningProxyDevice::Context proxyContext{ fabricTable, timerDelegate };
@@ -163,6 +169,7 @@ void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, FabricTable &
                 return device;
             });
     }
+#endif // CONFIG_NETWORK_LAYER_BLE || CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 
     if constexpr (ALL_DEVICES_ENABLE_SPEAKER)
     {
