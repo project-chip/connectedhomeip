@@ -15,7 +15,7 @@
  */
 
 #include "ThermostatClusterOccupancy.h"
-#include "ThermostatClusterCore.h"
+#include "ThermostatClusterBase.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>

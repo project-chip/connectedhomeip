@@ -32,7 +32,7 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-class ThermostatClusterCore;
+class ThermostatClusterBase;
 
 class ThermostatSuggestions
 {
@@ -133,7 +133,7 @@ public:
     };
 
     ThermostatSuggestions() = delete;
-    ThermostatSuggestions(ThermostatClusterCore & cluster, ThermostatPresets & presets, Delegate & delegate) :
+    ThermostatSuggestions(ThermostatClusterBase & cluster, ThermostatPresets & presets, Delegate & delegate) :
         mCluster(cluster), mDelegate(delegate), mPresets(presets)
     {}
 
@@ -155,7 +155,7 @@ public:
     void ReEvaluateCurrentSuggestion();
 
 private:
-    ThermostatClusterCore & mCluster;
+    ThermostatClusterBase & mCluster;
     Delegate & mDelegate;
     ThermostatPresets & mPresets;
 };

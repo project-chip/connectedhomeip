@@ -33,7 +33,7 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-DataModel::ActionReturnStatus ThermostatClusterCore::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+DataModel::ActionReturnStatus ThermostatClusterBase::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                    AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)

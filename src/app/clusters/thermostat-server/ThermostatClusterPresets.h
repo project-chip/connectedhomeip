@@ -34,7 +34,7 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-class ThermostatClusterCore;
+class ThermostatClusterBase;
 
 class ThermostatPresets
 {
@@ -143,7 +143,7 @@ public:
     };
 
     ThermostatPresets() = delete;
-    ThermostatPresets(ThermostatClusterCore & cluster, AtomicWriteSession & atomicWriteSession, Delegate & delegate) :
+    ThermostatPresets(ThermostatClusterBase & cluster, AtomicWriteSession & atomicWriteSession, Delegate & delegate) :
         mCluster(cluster), mAtomicWriteSession(atomicWriteSession), mDelegate(delegate)
     {}
 
@@ -185,7 +185,7 @@ public:
     bool IsPresetHandlePresentInPresets(const ByteSpan & presetHandleToMatch);
 
 private:
-    ThermostatClusterCore & mCluster;
+    ThermostatClusterBase & mCluster;
     AtomicWriteSession & mAtomicWriteSession;
     Delegate & mDelegate;
 };

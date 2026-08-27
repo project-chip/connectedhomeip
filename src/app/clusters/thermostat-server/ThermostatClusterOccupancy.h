@@ -32,7 +32,7 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-class ThermostatClusterCore;
+class ThermostatClusterBase;
 
 class ThermostatOccupancy
 {
@@ -46,7 +46,7 @@ public:
         virtual Protocols::InteractionModel::Status SetOccupancy(BitMask<OccupancyBitmap> occupied, bool & changed) = 0;
     };
 
-    ThermostatOccupancy(ThermostatClusterCore & cluster, Delegate & delegate) : mCluster(cluster), mDelegate(delegate) {}
+    ThermostatOccupancy(ThermostatClusterBase & cluster, Delegate & delegate) : mCluster(cluster), mDelegate(delegate) {}
 
     std::optional<DataModel::ActionReturnStatus> ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                AttributeValueEncoder & encoder);
@@ -58,7 +58,7 @@ public:
     Protocols::InteractionModel::Status SetOccupancy(BitMask<OccupancyBitmap> occupied);
 
 private:
-    ThermostatClusterCore & mCluster;
+    ThermostatClusterBase & mCluster;
     Delegate & mDelegate;
 };
 

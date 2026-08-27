@@ -33,7 +33,7 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-DataModel::ActionReturnStatus ThermostatClusterCore::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+DataModel::ActionReturnStatus ThermostatClusterBase::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                     AttributeValueDecoder & decoder)
 {
     switch (request.path.mAttributeId)

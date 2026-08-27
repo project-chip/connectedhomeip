@@ -20,7 +20,7 @@
 #include "Setpoints.h"
 #include "Temperature.h"
 #include "ThermostatClusterCoolingSetpoints.h"
-#include "ThermostatClusterCore.h"
+#include "ThermostatClusterBase.h"
 #include "ThermostatClusterHeatingSetpoints.h"
 #include "ThermostatClusterSetpointsBase.h"
 #include "lib/core/CHIPError.h"
@@ -39,7 +39,7 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-class ThermostatClusterCore;
+class ThermostatClusterBase;
 
 class ThermostatAutoSetpoints
 {
@@ -83,7 +83,7 @@ public:
     static constexpr bool kHasHeating = detail::kArgsHasDelegate<ThermostatHeatingSetpoints::Delegate, Delegates...>;
     static constexpr bool kHasAuto    = detail::kArgsHasDelegate<ThermostatAutoSetpoints::Delegate, Delegates...>;
 
-    ThermostatSetpoints(ThermostatClusterCore & cluster, Delegates &... delegates) :
+    ThermostatSetpoints(ThermostatClusterBase & cluster, Delegates &... delegates) :
         ThermostatSetpointsBase(cluster),
         mCooling(detail::MakeFeature<kHasCooling, ThermostatCoolingSetpoints>(std::forward_as_tuple(delegates...), *this)),
         mHeating(detail::MakeFeature<kHasHeating, ThermostatHeatingSetpoints>(std::forward_as_tuple(delegates...), *this)),

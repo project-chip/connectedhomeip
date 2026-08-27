@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include "ThermostatClusterCore.h"
+#include "ThermostatClusterBase.h"
 #include "PresetStructWithOwnedMembers.h"
 #include "lib/support/logging/TextOnlyLogging.h"
 
@@ -40,7 +40,7 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-ThermostatClusterCore::ThermostatClusterCore(EndpointId endpointId, const BitFlags<Thermostat::Feature> features,
+ThermostatClusterBase::ThermostatClusterBase(EndpointId endpointId, const BitFlags<Thermostat::Feature> features,
                                              const Config & config, Thermostat::Delegate & delegate) :
     DefaultServerCluster({ endpointId, Thermostat::Id }),
     mFeatures(features), mConfig(config), mDelegate(delegate)
@@ -48,19 +48,19 @@ ThermostatClusterCore::ThermostatClusterCore(EndpointId endpointId, const BitFla
     ChipLogProgress(Zcl, "Starting up thermostat server cluster on endpoint %d", mPath.mEndpointId);
 }
 
-CHIP_ERROR ThermostatClusterCore::Startup(ServerClusterContext & context)
+CHIP_ERROR ThermostatClusterBase::Startup(ServerClusterContext & context)
 {
     ChipLogProgress(Zcl, "Starting up thermostat server cluster on endpoint %d", mPath.mEndpointId);
     return DefaultServerCluster::Startup(context);
 }
 
-void ThermostatClusterCore::Shutdown(ClusterShutdownType type)
+void ThermostatClusterBase::Shutdown(ClusterShutdownType type)
 {
     DefaultServerCluster::Shutdown(type);
     ChipLogProgress(Zcl, "Shutting down thermostat server cluster on endpoint %d", mPath.mEndpointId);
 }
 
-CHIP_ERROR ThermostatClusterCore::Attributes(const ConcreteClusterPath & path,
+CHIP_ERROR ThermostatClusterBase::Attributes(const ConcreteClusterPath & path,
                                              ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
@@ -75,12 +75,12 @@ CHIP_ERROR ThermostatClusterCore::Attributes(const ConcreteClusterPath & path,
     return listBuilder.Append(Span(Thermostat::Attributes::kMandatoryMetadata), Span(optionalAttributes));
 }
 
-ControlSequenceOfOperationEnum ThermostatClusterCore::GetControlSequenceOfOperation() const
+ControlSequenceOfOperationEnum ThermostatClusterBase::GetControlSequenceOfOperation() const
 {
     return mDelegate.GetControlSequenceOfOperation();
 }
 
-Status ThermostatClusterCore::SetControlSequenceOfOperation(ControlSequenceOfOperationEnum controlSequenceOfOperation)
+Status ThermostatClusterBase::SetControlSequenceOfOperation(ControlSequenceOfOperationEnum controlSequenceOfOperation)
 {
     bool changed = false;
     if (auto err = mDelegate.SetControlSequenceOfOperation(controlSequenceOfOperation, changed); err != Status::Success)
@@ -94,12 +94,12 @@ Status ThermostatClusterCore::SetControlSequenceOfOperation(ControlSequenceOfOpe
     return Status::Success;
 }
 
-SystemModeEnum ThermostatClusterCore::GetSystemMode() const
+SystemModeEnum ThermostatClusterBase::GetSystemMode() const
 {
     return mDelegate.GetSystemMode();
 }
 
-Status ThermostatClusterCore::SetSystemMode(SystemModeEnum systemMode)
+Status ThermostatClusterBase::SetSystemMode(SystemModeEnum systemMode)
 {
     switch (systemMode)
     {
@@ -163,12 +163,12 @@ Status ThermostatClusterCore::SetSystemMode(SystemModeEnum systemMode)
     return Status::Success;
 }
 
-DataModel::Nullable<temperature> ThermostatClusterCore::GetLocalTemperature() const
+DataModel::Nullable<temperature> ThermostatClusterBase::GetLocalTemperature() const
 {
     return mDelegate.GetLocalTemperature();
 }
 
-Status ThermostatClusterCore::SetLocalTemperature(DataModel::Nullable<temperature> localTemperature,
+Status ThermostatClusterBase::SetLocalTemperature(DataModel::Nullable<temperature> localTemperature,
                                                   DataModel::AttributeChangeType changeType)
 {
     bool changed = false;
@@ -184,12 +184,12 @@ Status ThermostatClusterCore::SetLocalTemperature(DataModel::Nullable<temperatur
     return Status::Success;
 }
 
-int8_t ThermostatClusterCore::GetLocalTemperatureCalibration() const
+int8_t ThermostatClusterBase::GetLocalTemperatureCalibration() const
 {
     return mDelegate.GetLocalTemperatureCalibration();
 }
 
-Status ThermostatClusterCore::SetLocalTemperatureCalibration(int8_t localTemperatureCalibration)
+Status ThermostatClusterBase::SetLocalTemperatureCalibration(int8_t localTemperatureCalibration)
 {
     bool changed = false;
     if (auto err = mDelegate.SetLocalTemperatureCalibration(localTemperatureCalibration, changed); err != Status::Success)
@@ -203,7 +203,7 @@ Status ThermostatClusterCore::SetLocalTemperatureCalibration(int8_t localTempera
     return Status::Success;
 }
 
-ThermostatRunningModeEnum ThermostatClusterCore::GetRunningMode() const
+ThermostatRunningModeEnum ThermostatClusterBase::GetRunningMode() const
 {
     ThermostatRunningModeEnum runningMode;
     if (auto status = mDelegate.GetRunningMode(runningMode); status != Status::Success)
@@ -213,7 +213,7 @@ ThermostatRunningModeEnum ThermostatClusterCore::GetRunningMode() const
     return runningMode;
 }
 
-Status ThermostatClusterCore::SetRunningMode(ThermostatRunningModeEnum runningMode)
+Status ThermostatClusterBase::SetRunningMode(ThermostatRunningModeEnum runningMode)
 {
     switch (runningMode)
     {
@@ -251,7 +251,7 @@ Status ThermostatClusterCore::SetRunningMode(ThermostatRunningModeEnum runningMo
     return Status::Success;
 }
 
-BitMask<RelayStateBitmap> ThermostatClusterCore::GetRunningState() const
+BitMask<RelayStateBitmap> ThermostatClusterBase::GetRunningState() const
 {
     BitMask<RelayStateBitmap> runningState;
     if (auto status = mDelegate.GetRunningState(runningState); status != Status::Success)
@@ -261,7 +261,7 @@ BitMask<RelayStateBitmap> ThermostatClusterCore::GetRunningState() const
     return runningState;
 }
 
-Status ThermostatClusterCore::SetRunningState(BitMask<RelayStateBitmap> runningState)
+Status ThermostatClusterBase::SetRunningState(BitMask<RelayStateBitmap> runningState)
 {
     if (runningState.HasAny(RelayStateBitmap::kHeat, RelayStateBitmap::kHeatStage2) && !mFeatures.Has(Feature::kHeating))
     {
@@ -288,7 +288,7 @@ Status ThermostatClusterCore::SetRunningState(BitMask<RelayStateBitmap> runningS
     return Status::Success;
 }
 
-CHIP_ERROR ThermostatClusterCore::AcceptedCommands(const ConcreteClusterPath & path,
+CHIP_ERROR ThermostatClusterBase::AcceptedCommands(const ConcreteClusterPath & path,
                                                    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     return builder.AppendElements({
@@ -296,12 +296,12 @@ CHIP_ERROR ThermostatClusterCore::AcceptedCommands(const ConcreteClusterPath & p
     });
 }
 
-CHIP_ERROR ThermostatClusterCore::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
+CHIP_ERROR ThermostatClusterBase::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
     return CHIP_NO_ERROR;
 }
 
-bool ThermostatClusterCore::IsActiveSetpoint(AttributeId attributeId) const
+bool ThermostatClusterBase::IsActiveSetpoint(AttributeId attributeId) const
 {
     if (IsOccupied())
     {
@@ -310,7 +310,7 @@ bool ThermostatClusterCore::IsActiveSetpoint(AttributeId attributeId) const
     return (attributeId == UnoccupiedHeatingSetpoint::Id || attributeId == UnoccupiedCoolingSetpoint::Id);
 }
 
-bool ThermostatClusterCore::HasAttribute(AttributeId attributeId)
+bool ThermostatClusterBase::HasAttribute(AttributeId attributeId)
 {
     switch (attributeId)
     {

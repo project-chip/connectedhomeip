@@ -31,7 +31,7 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-class ThermostatClusterCore;
+class ThermostatClusterBase;
 
 class ThermostatHold
 {
@@ -60,7 +60,7 @@ public:
     CHIP_ERROR Startup(ServerClusterContext & context);
     void Shutdown(ClusterShutdownType type);
 
-    ThermostatHold(ThermostatClusterCore & cluster, Delegate & delegate) : mCluster(cluster), mDelegate(delegate) {}
+    ThermostatHold(ThermostatClusterBase & cluster, Delegate & delegate) : mCluster(cluster), mDelegate(delegate) {}
 
     std::optional<DataModel::ActionReturnStatus> ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                AttributeValueEncoder & encoder);
@@ -70,7 +70,7 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder);
 
 private:
-    ThermostatClusterCore & mCluster;
+    ThermostatClusterBase & mCluster;
     Delegate & mDelegate;
 };
 

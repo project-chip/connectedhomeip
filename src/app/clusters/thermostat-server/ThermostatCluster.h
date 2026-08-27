@@ -18,7 +18,7 @@
 
 #include "DelegateResolution.h"
 #include "ThermostatClusterAtomic.h"
-#include "ThermostatClusterCore.h"
+#include "ThermostatClusterBase.h"
 #include "ThermostatClusterHold.h"
 #include "ThermostatClusterOccupancy.h"
 #include "ThermostatClusterPresets.h"
@@ -35,7 +35,7 @@ namespace Clusters {
 namespace Thermostat {
 
 template <typename... Delegates>
-class ThermostatCluster : public ThermostatClusterCore, public AtomicWriteSession::Delegate
+class ThermostatCluster : public ThermostatClusterBase, public AtomicWriteSession::Delegate
 {
 public:
     static constexpr bool kHasHeating          = detail::kArgsHasDelegate<ThermostatHeatingSetpoints::Delegate, Delegates...>;
@@ -63,7 +63,7 @@ public:
 
     CHIP_ERROR Startup(ServerClusterContext & context) override
     {
-        ReturnErrorOnFailure(ThermostatClusterCore::Startup(context));
+        ReturnErrorOnFailure(ThermostatClusterBase::Startup(context));
         ReturnErrorOnFailure(mDelegate.Startup(context));
         if constexpr (kRequiresAtomicWrite)
         {
@@ -84,7 +84,7 @@ public:
         {
             mAtomicWriteSession.Shutdown();
         }
-        ThermostatClusterCore::Shutdown(type);
+        ThermostatClusterBase::Shutdown(type);
     }
 
     bool IsOccupied() const override
@@ -93,7 +93,7 @@ public:
         {
             return mOccupancy.IsOccupied();
         }
-        return ThermostatClusterCore::IsOccupied();
+        return ThermostatClusterBase::IsOccupied();
     }
 
     template <bool Cond = kHasOccupancy, typename std::enable_if_t<Cond, int> = 0>
@@ -137,7 +137,7 @@ public:
                 return *status;
             }
         }
-        return ThermostatClusterCore::ReadAttribute(request, encoder);
+        return ThermostatClusterBase::ReadAttribute(request, encoder);
     }
 
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
@@ -179,7 +179,7 @@ public:
                 return *status;
             }
         }
-        return ThermostatClusterCore::WriteAttribute(request, decoder);
+        return ThermostatClusterBase::WriteAttribute(request, decoder);
     }
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
@@ -220,7 +220,7 @@ public:
                 return std::nullopt;
             }
         }
-        return ThermostatClusterCore::InvokeCommand(request, input_arguments, handler);
+        return ThermostatClusterBase::InvokeCommand(request, input_arguments, handler);
     }
 
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
@@ -239,7 +239,7 @@ public:
             ReturnErrorOnFailure(builder.AppendElements(
                 { Commands::AddThermostatSuggestion::kMetadataEntry, Commands::RemoveThermostatSuggestion::kMetadataEntry }));
         }
-        return ThermostatClusterCore::AcceptedCommands(path, builder);
+        return ThermostatClusterBase::AcceptedCommands(path, builder);
     }
 
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override
@@ -252,12 +252,12 @@ public:
         {
             ReturnErrorOnFailure(builder.AppendElements({ Commands::AddThermostatSuggestionResponse::Id }));
         }
-        return ThermostatClusterCore::GeneratedCommands(path, builder);
+        return ThermostatClusterBase::GeneratedCommands(path, builder);
     }
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override
     {
-        ReturnErrorOnFailure(ThermostatClusterCore::Attributes(path, builder));
+        ReturnErrorOnFailure(ThermostatClusterBase::Attributes(path, builder));
         ReturnErrorOnFailure(mSetpoints.Attributes(path, builder));
         if constexpr (kHasHold)
         {
@@ -371,14 +371,14 @@ public:
         case Attributes::ThermostatSuggestionNotFollowingReason::Id:
             return mFeatures.Has(Feature::kThermostatSuggestions);
         default:
-            return ThermostatClusterCore::HasAttribute(attributeId);
+            return ThermostatClusterBase::HasAttribute(attributeId);
         }
     }
 
 private:
     ThermostatCluster(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features, const Config & config,
                       FabricTable * fabricTable, Delegates &... delegates) :
-        ThermostatClusterCore(aEndpointId, features, config, detail::FindDelegate<Thermostat::Delegate>(delegates...)),
+        ThermostatClusterBase(aEndpointId, features, config, detail::FindDelegate<Thermostat::Delegate>(delegates...)),
         mSetpoints(*this, delegates...),
         mAtomicWriteSession(detail::MakeAtomicWriteSession<kRequiresAtomicWrite>(*this, config.mTimerDelegate, fabricTable)),
         mHold(detail::MakeFeature<kHasHold, ThermostatHold>(std::forward_as_tuple(delegates...), *this)),
@@ -402,11 +402,11 @@ private:
 };
 
 template <typename... DelegateArgs>
-ThermostatCluster(EndpointId, BitFlags<Thermostat::Feature>, const ThermostatClusterCore::Config &, DelegateArgs &...)
+ThermostatCluster(EndpointId, BitFlags<Thermostat::Feature>, const ThermostatClusterBase::Config &, DelegateArgs &...)
     -> ThermostatCluster<std::decay_t<DelegateArgs>...>;
 
 template <typename... DelegateArgs>
-ThermostatCluster(EndpointId, BitFlags<Thermostat::Feature>, const ThermostatClusterCore::Config &, FabricTable &,
+ThermostatCluster(EndpointId, BitFlags<Thermostat::Feature>, const ThermostatClusterBase::Config &, FabricTable &,
                   DelegateArgs &...) -> ThermostatCluster<std::decay_t<DelegateArgs>...>;
 
 using FullFeaturedThermostatCluster =

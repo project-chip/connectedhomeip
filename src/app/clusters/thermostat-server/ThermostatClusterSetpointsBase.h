@@ -33,12 +33,12 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-class ThermostatClusterCore;
+class ThermostatClusterBase;
 
 class ThermostatSetpointsBase
 {
 public:
-    ThermostatSetpointsBase(ThermostatClusterCore & cluster) : mCluster(cluster) {}
+    ThermostatSetpointsBase(ThermostatClusterBase & cluster) : mCluster(cluster) {}
     virtual ~ThermostatSetpointsBase() = default;
 
     virtual Protocols::InteractionModel::Status LoadSetpoints(Setpoints & setpoints) = 0;
@@ -55,7 +55,7 @@ public:
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler);
 
 protected:
-    ThermostatClusterCore & mCluster;
+    ThermostatClusterBase & mCluster;
 
     virtual Setpoints GetSetpoints();
 };

@@ -35,7 +35,7 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-class ThermostatClusterCore : public DefaultServerCluster
+class ThermostatClusterBase : public DefaultServerCluster
 {
 public:
     struct Config
@@ -98,7 +98,7 @@ public:
     virtual bool IsActiveSetpoint(AttributeId attributeId) const;
 
 protected:
-    ThermostatClusterCore(EndpointId endpointId, const BitFlags<Thermostat::Feature> features, const Config & config,
+    ThermostatClusterBase(EndpointId endpointId, const BitFlags<Thermostat::Feature> features, const Config & config,
                           Thermostat::Delegate & delegate);
 
     const BitFlags<Thermostat::Feature> mFeatures;

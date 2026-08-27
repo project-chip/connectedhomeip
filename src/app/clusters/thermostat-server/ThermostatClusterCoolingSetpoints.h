@@ -18,7 +18,7 @@
 
 #include "Setpoints.h"
 #include "Temperature.h"
-#include "ThermostatClusterCore.h"
+#include "ThermostatClusterBase.h"
 #include "ThermostatClusterSetpointsBase.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
