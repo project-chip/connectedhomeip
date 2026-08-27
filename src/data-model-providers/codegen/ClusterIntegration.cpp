@@ -51,14 +51,16 @@ bool FindEndpointWithLog(EndpointId endpointId, ClusterId clusterId, uint16_t fi
 uint32_t LoadFeatureMap(EndpointId endpointId, ClusterId clusterId)
 {
     AttributeDefaultValue defaultValue;
-    if (emberAfGetAttributeDefaultValue(endpointId, clusterId, Clusters::Globals::Attributes::FeatureMap::Id, defaultValue) ==
-        Protocols::InteractionModel::Status::Success)
+    Protocols::InteractionModel::Status status =
+        emberAfGetAttributeDefaultValue(endpointId, clusterId, Clusters::Globals::Attributes::FeatureMap::Id, defaultValue);
+    if (status == Protocols::InteractionModel::Status::Success)
     {
         return defaultValue.As<uint32_t>();
     }
 
 #if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-    ChipLogError(AppServer, "Failed to load feature map for %u/" ChipLogFormatMEI, endpointId, ChipLogValueMEI(clusterId));
+    ChipLogError(AppServer, "Failed to load feature map for %u/" ChipLogFormatMEI " (Status %d)", endpointId,
+                 ChipLogValueMEI(clusterId), static_cast<int>(status));
 #endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
     return 0;
 }

@@ -21,6 +21,7 @@
 #include <app/util/basic-types.h>
 #include <cstdint>
 #include <lib/support/Span.h>
+#include <lib/support/attribute-storage-null-handling.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 /**
