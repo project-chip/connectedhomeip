@@ -17,6 +17,8 @@
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+
 
 class AVANALYTestBase:
     SPEC_MAX_COUNT_SUPPORTEDAMBIENTCONTEXTS = 50
@@ -45,3 +47,25 @@ class AVANALYTestBase:
         value = await self.read_avanaly_attribute_expect_success(endpoint=endpoint, attribute=attribute)
         asserts.assert_equal(value, expected_value,
                              f"Unexpected '{attribute}' value - expected {expected_value}, was {value}")
+                             
+    async def send_enable_context_triggers_command(self, endpoint, context_triggers, expected_status: Status = Status.Success):
+        try:
+            await self.send_single_cmd(cmd=Clusters.AvAnalysis.Commands.EnableContextTriggers(
+                contextTriggers=context_triggers),
+                endpoint=endpoint)
+
+            asserts.assert_equal(expected_status, Status.Success)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned on enabling context triggers")
+            
+    async def send_disable_context_triggers_command(self, endpoint, context_triggers, expected_status: Status = Status.Success):
+        try:
+            await self.send_single_cmd(cmd=Clusters.AvAnalysis.Commands.DisableContextTriggers(
+                contextTriggers=context_triggers),
+                endpoint=endpoint)
+
+            asserts.assert_equal(expected_status, Status.Success)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned on disabling context triggers")

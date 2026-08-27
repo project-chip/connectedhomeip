@@ -91,7 +91,11 @@ constexpr uint8_t kMaxZoomValue = 75;
 // detection
 static const std::vector<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> kSupportedAmbientContexts = {
     { std::nullopt, static_cast<uint8_t>(0x49), static_cast<uint8_t>(0x0B),
-      chip::MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>(chip::CharSpan::fromCharString("Object.Package"))) }
+      chip::MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>(chip::CharSpan::fromCharString("Object.Package"))) },
+    { std::nullopt, static_cast<uint8_t>(0x4B), static_cast<uint8_t>(0x08),
+      chip::MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>(chip::CharSpan::fromCharString("Activity.Delivery"))) },
+    { std::nullopt, static_cast<uint8_t>(0x4B), static_cast<uint8_t>(0x09),
+      chip::MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>(chip::CharSpan::fromCharString("Activity.Retrieval"))) }
 };
 
 /**
