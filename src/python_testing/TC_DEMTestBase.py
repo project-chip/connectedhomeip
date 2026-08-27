@@ -262,7 +262,8 @@ class DEMTestBase:
         """
         from matter.clusters.Types import NullValue
 
-        asserts.assert_false(isinstance(event_data, ValueDecodeFailure), "Event data should be properly decoded, not a decode failure")
+        asserts.assert_false(isinstance(event_data, ValueDecodeFailure),
+                             "Event data should be properly decoded, not a decode failure")
         asserts.assert_true(hasattr(event_data, 'adjustment'), "Event should have 'adjustment' field")
         asserts.assert_true(isinstance(event_data.duration, int),
                             f"Duration should be an integer, got {type(event_data.duration).__name__}")
@@ -302,7 +303,8 @@ class DEMTestBase:
                              increase to account for device timer implementation latency
                              that may cause the internal timer to expire up to 2 seconds later than expected.
         """
-        asserts.assert_false(isinstance(event_data, ValueDecodeFailure), "Event data should be properly decoded, not a decode failure")
+        asserts.assert_false(isinstance(event_data, ValueDecodeFailure),
+                             "Event data should be properly decoded, not a decode failure")
         asserts.assert_true(isinstance(event_data.duration, int),
                             f"Duration should be an integer, got {type(event_data.duration).__name__}")
         asserts.assert_true(isinstance(event_data.energyUse, int),
