@@ -420,15 +420,17 @@ public:
         VerifyOrReturn(info.peerId != nullptr);
         PendingDeviceDiscovery * pending = FindDiscoveryForPeer(*info.peerId);
         VerifyOrReturn(pending != nullptr && pending->startUs != kDiscoverySlotUnused);
+        // A completion carrying no address says nothing about what this lookup found, so it ends no
+        // span. Leaving the slot unfinished is what keeps this lookup's duration off an address it
+        // did not resolve, while any address the slot already held stays available for naming the
+        // peer, which is all that address is there for.
+        VerifyOrReturn(info.result != nullptr);
         pending->doneUs = CurrentTimestampUs();
         pending->done   = true;
         // Remember which address belongs to which node, so a handshake can name its peer
         // from the address its replies arrive from.
-        if (info.result != nullptr)
-        {
-            pending->address    = info.result->address;
-            pending->hasAddress = true;
-        }
+        pending->address    = info.result->address;
+        pending->hasAddress = true;
     }
 
     void Reset() { ClearRecordsAndDiscoveries(); }

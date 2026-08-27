@@ -630,6 +630,12 @@ class _ListenerRegistry:
             if metrics is None:
                 continue
             with self._lock:
+                # Asked again, and in the same breath as reading the listeners. The lock is let
+                # go across the wait above, so a stop and a fresh start can both land while this
+                # thread is parked. Reading the listeners without checking would hand this run's
+                # record to the next run's listeners, which registered after it was captured.
+                if not self._running or self._run_counter != run:
+                    return
                 targets = [r for r in self._listeners.values() if r.active]
             # One immutable metrics object, shared by reference. Offering never blocks, so a
             # slow listener cannot hold up the others or the next handshake.
