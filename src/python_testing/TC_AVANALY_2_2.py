@@ -88,10 +88,11 @@ class TC_AVANALY_2_2(MatterBaseTest, AVANALYTestBase):
 
         asserts.assert_equal(tracking_enabled_dut_new, not tracking_enabled_dut,
                              "Value does not match what was written in step 3")
-                             
+
         self.step(5)
         result = await self.write_single_attribute(attributes.TrackingEnabled(tracking_enabled_dut),
                                                    endpoint_id=endpoint)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
