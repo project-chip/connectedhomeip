@@ -1100,6 +1100,14 @@ void PairingCommand::OnResponse(chip::app::CommandSender * client, const chip::a
                 return;
             }
 
+            // Injecting above can complete PASE or commissioning synchronously, and those
+            // callbacks start the disconnect.  Draining further would issue a request against
+            // a session already being torn down, and that sender then blocks the next flow.
+            if (!mProxySessionActive || mProxyDisconnectCmdSender != nullptr)
+            {
+                return;
+            }
+
             if (++mProxyConsecutivePolls > kMaxConsecutiveProxyPolls)
             {
                 ChipLogError(chipTool, "PairViaProxy: stopping after %u consecutive queued-message polls",
@@ -1181,6 +1189,7 @@ void PairingCommand::OnDone(chip::app::CommandSender * client)
     else if (mProxyDisconnectCmdSender.get() == client)
     {
         mProxyDisconnectCmdSender.reset();
+        mProxySession.Release();
         SetCommandExitStatus(mProxyDisconnectExitErr);
     }
 }
@@ -1207,14 +1216,6 @@ void PairingCommand::SendProxyDisconnect(CHIP_ERROR exitErr, bool aCancelPending
     }
 
     using namespace chip::app::Clusters::CommissioningProxy;
-
-    auto cmdSender = chip::Platform::MakeUnique<chip::app::CommandSender>(this, mProxyExchangeMgr);
-    if (cmdSender == nullptr)
-    {
-        ChipLogError(chipTool, "PairViaProxy: failed to allocate CommandSender for ProxyDisconnectRequest");
-        SetCommandExitStatus(exitErr);
-        return;
-    }
 
     Commands::ProxyDisconnectRequest::Type request;
     if (aCancelPendingConnect)
@@ -1244,10 +1245,22 @@ void PairingCommand::SendProxyDisconnect(CHIP_ERROR exitErr, bool aCancelPending
     }
     mProxyDisconnectExitErr = exitErr;
 
+    // Allocate only once the local session is retired: releasing the CASE session while
+    // the transport is still active would leave nothing able to deactivate it.
+    auto cmdSender = chip::Platform::MakeUnique<chip::app::CommandSender>(this, mProxyExchangeMgr);
+    if (cmdSender == nullptr)
+    {
+        ChipLogError(chipTool, "PairViaProxy: failed to allocate CommandSender for ProxyDisconnectRequest");
+        mProxySession.Release();
+        SetCommandExitStatus(exitErr);
+        return;
+    }
+
     if (cmdSender->AddRequestData(pathParams, request) != CHIP_NO_ERROR ||
         cmdSender->SendCommandRequest(mProxySession.Get().Value()) != CHIP_NO_ERROR)
     {
         ChipLogError(chipTool, "PairViaProxy: failed to send ProxyDisconnectRequest");
+        mProxySession.Release();
         SetCommandExitStatus(exitErr);
         return;
     }
@@ -1277,6 +1290,10 @@ CHIP_ERROR PairingCommand::SendProxyMessageRequest(uint16_t sessionId,
 {
     VerifyOrReturnError(mProxyExchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(static_cast<bool>(mProxySession), CHIP_ERROR_INCORRECT_STATE);
+
+    // Nothing may be sent for a session that is closing: the disconnect has already
+    // deactivated the transport, so a request issued now can only outlive the flow.
+    VerifyOrReturnError(mProxySessionActive && mProxyDisconnectCmdSender == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // Only one ProxyMessageRequest may be outstanding per session; the proxy answers a
     // second one with BUSY.  Refuse here so the caller can retry rather than displacing
