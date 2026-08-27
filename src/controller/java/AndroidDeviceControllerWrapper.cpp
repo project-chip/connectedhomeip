@@ -1294,27 +1294,28 @@ void AndroidDeviceControllerWrapper::HandleCredentialsNeededCallback(intptr_t co
         return;
     }
 
-    jobject listenerObject = env->NewLocalRef(listenerGlobalObjectRef);
-    if (listenerObject == nullptr)
-    {
-        ChipLogError(Controller, "Failed to create local listener reference");
-        chip::Platform::Delete(callbackContext);
-        return;
-    }
-
     {
         chip::DeviceLayer::StackUnlock unlock;
+        jobject listenerObject = env->NewLocalRef(listenerGlobalObjectRef);
+        if (listenerObject == nullptr)
+        {
+            ChipLogError(Controller, "Failed to create local listener reference");
+            return;
+        }
+
         env->CallVoidMethod(listenerObject, listenerMethod, static_cast<jint>(endpoint));
+
+        if (env->ExceptionCheck())
+        {
+            ChipLogError(Controller, "Java exception in %sCredentialsNeeded listener", isWiFi ? "WiFi" : "Thread");
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+        }
+
+        env->DeleteLocalRef(listenerObject);
     }
 
-    if (env->ExceptionCheck())
-    {
-        ChipLogError(Controller, "Java exception in %sCredentialsNeeded listener", isWiFi ? "WiFi" : "Thread");
-        env->ExceptionDescribe();
-        env->ExceptionClear();
-    }
-
-    env->DeleteLocalRef(listenerObject);
+    callbackContext->listenerObject.Reset();
     chip::Platform::Delete(callbackContext);
 }
 
