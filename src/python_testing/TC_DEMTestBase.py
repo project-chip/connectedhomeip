@@ -386,10 +386,8 @@ class DEMTestBase:
     async def send_test_event_trigger_forecast_clear(self):
         await self.send_test_event_triggers(eventTrigger=0x0098000000000010)
 
-    async def send_test_event_trigger_power_range_adjustment(self) -> None:
-        """Send a test event trigger to activate the power range adjustment feature."""
+    async def send_test_event_trigger_power_range_adjustment(self):
         await self.send_test_event_triggers(eventTrigger=0x0098000000000011)
 
-    async def send_test_event_trigger_power_range_adjustment_clear(self) -> None:
-        """Send a test event trigger to clear the power range adjustment feature."""
+    async def send_test_event_trigger_power_range_adjustment_clear(self):
         await self.send_test_event_triggers(eventTrigger=0x0098000000000012)
