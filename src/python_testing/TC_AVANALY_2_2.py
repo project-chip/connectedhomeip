@@ -57,7 +57,8 @@ class TC_AVANALY_2_2(MatterBaseTest, AVANALYTestBase):
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH reads the TrackingEnabled attribute. Verify that it is a bool with a value of false. Store in aTrackingEnabled"),
             TestStep(3, "TH writes to TrackingEnabled the value of !aTrackingEnabled. Verify success response."),
-            TestStep(4, "TH reads the TrackingEnabled attribute. Verify that it is set to !aTrackingEnabled.")
+            TestStep(4, "TH reads the TrackingEnabled attribute. Verify that it is set to !aTrackingEnabled."),
+            TestStep(5, "TH resets the TrackingEnabled attribute to its original value.")
         ]
 
     def pics_TC_AVANALY_2_2(self) -> list[str]:
@@ -87,7 +88,10 @@ class TC_AVANALY_2_2(MatterBaseTest, AVANALYTestBase):
 
         asserts.assert_equal(tracking_enabled_dut_new, not tracking_enabled_dut,
                              "Value does not match what was written in step 3")
-
+                             
+        self.step(5)
+        result = await self.write_single_attribute(attributes.TrackingEnabled(tracking_enabled_dut),
+                                                   endpoint_id=endpoint)
 
 if __name__ == "__main__":
     default_matter_test_main()

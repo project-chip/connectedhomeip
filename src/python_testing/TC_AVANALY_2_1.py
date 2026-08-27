@@ -91,7 +91,7 @@ class TC_AVANALY_2_1(MatterBaseTest, AVANALYTestBase):
         attribute_list = await self.read_avanaly_attribute_expect_success(endpoint, attributes.AttributeList)
 
         self.step(2)
-        if not (self.has_feature_lclcondetect | self.has_feature_remcondetect):
+        if not (self.has_feature_lclcondetect or self.has_feature_remcondetect):
             asserts.fail("One of LCLCONDETECT or REMCONDETECT is mandatory")
 
         asserts.assert_in(attributes.SupportedAmbientContexts.attribute_id, attribute_list,
@@ -116,7 +116,7 @@ class TC_AVANALY_2_1(MatterBaseTest, AVANALYTestBase):
         # On fresh startup the active contexts should be empty
         active_ambient_context_triggers_dut = await self.read_avanaly_attribute_expect_success(endpoint, attributes.ActiveAmbientContextTriggers)
         asserts.assert_equal(len(active_ambient_context_triggers_dut), 0,
-                             "AtiveAmbientContextTriggers should be empty on initial startup.")
+                             "ActiveAmbientContextTriggers should be empty on initial startup.")
 
         if self.has_feature_remcondetect:
             self.step(4)
