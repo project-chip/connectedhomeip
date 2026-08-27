@@ -97,10 +97,7 @@ void FakeReadings::StartFakeReadings(Parameters params)
 
 void FakeReadings::StopFakeReadings()
 {
-    if (mTimerDelegate)
-    {
-        mTimerDelegate->CancelTimer(this);
-    }
+    mTimerDelegate.CancelTimer(this);
 }
 
 void FakeReadings::FakeReadingsUpdate()
@@ -143,20 +140,7 @@ void FakeReadings::FakeReadingsUpdate()
         mEEMCluster->GenerateSnapshots();
     }
 
-    // start/restart the timer if can
-    if (mTimerDelegate)
-    {
-        mTimerDelegate->CancelTimer(this);
-        LogErrorOnFailure(mTimerDelegate->StartTimer(this, System::Clock::Seconds16(mInterval_s)));
-    }
-}
-
-void FakeReadings::SetTimerDelegate(chip::TimerDelegate & timerDelegate)
-{
-    // stop previous timer if active
-    if (mTimerDelegate)
-    {
-        StopFakeReadings();
-    }
-    mTimerDelegate = &timerDelegate;
+    // start/restart the timer
+    mTimerDelegate.CancelTimer(this);
+    LogErrorOnFailure(mTimerDelegate.StartTimer(this, System::Clock::Seconds16(mInterval_s)));
 }

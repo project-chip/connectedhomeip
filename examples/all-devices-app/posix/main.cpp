@@ -311,16 +311,22 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     static chip::CommonCaseDeviceServerInitParams initParams;
     SuccessOrDie(initParams.InitializeStaticResourcesBeforeServerInit());
 
+    // Initialize the test event trigger delegate, and add a handler
+    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate;
+    SuccessOrDie(sTestEventTriggerDelegate.Init(ByteSpan(AppOptions::GetConfig().testEventTriggerEnableKey)));
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
+
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
-        .groupDataProvider      = gGroupDataProvider,                     //
-        .fabricTable            = Server::GetInstance().GetFabricTable(), //
-        .timerDelegate          = gTimerDelegate,                         //
-        .storageDelegate        = *initParams.persistentStorageDelegate,  //
-        .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
-        .platformManager        = DeviceLayer::PlatformMgr(),
-        .failSafeContext        = Server::GetInstance().GetFailSafeContext(),
-        .bindingTable           = Binding::Table::GetInstance(),
-        .bindingManager         = Binding::Manager::GetInstance(),
+        .groupDataProvider         = gGroupDataProvider,                     //
+        .fabricTable               = Server::GetInstance().GetFabricTable(), //
+        .timerDelegate             = gTimerDelegate,                         //
+        .storageDelegate           = *initParams.persistentStorageDelegate,  //
+        .diagnosticDataProvider    = DeviceLayer::GetDiagnosticDataProvider(),
+        .platformManager           = DeviceLayer::PlatformMgr(),
+        .failSafeContext           = Server::GetInstance().GetFailSafeContext(),
+        .bindingTable              = Binding::Table::GetInstance(),
+        .bindingManager            = Binding::Manager::GetInstance(),
+        .testEventTriggerDelegate  = *initParams.testEventTriggerDelegate,
     });
 
     RegisterDeviceFactoryOverrides(gTimerDelegate, initParams.persistentStorageDelegate, gAudioManager);
@@ -357,11 +363,6 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     static DeviceLayer::AllDevicesExampleDACProvider sDacProvider;
     SuccessOrDie(sDacProvider.Init(AppOptions::GetConfig().dacProvider));
     SetDeviceAttestationCredentialsProvider(&sDacProvider);
-
-    // Initialize the test event trigger delegate, and add a handler
-    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate;
-    SuccessOrDie(sTestEventTriggerDelegate.Init(ByteSpan(AppOptions::GetConfig().testEventTriggerEnableKey)));
-    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     static CodeDrivenDataModelDevices devices({
         .storageDelegate                = *initParams.persistentStorageDelegate,                   //

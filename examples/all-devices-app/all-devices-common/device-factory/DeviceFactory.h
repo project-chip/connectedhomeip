@@ -101,6 +101,7 @@ public:
         FailSafeContext & failSafeContext;
         Clusters::Binding::Table & bindingTable;
         Clusters::Binding::Manager & bindingManager;
+        TestEventTriggerDelegate & testEventTriggerDelegate;
     };
 
     static DeviceFactory & GetInstance()

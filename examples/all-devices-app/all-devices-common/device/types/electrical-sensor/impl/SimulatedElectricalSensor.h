@@ -45,24 +45,27 @@ public:
 
     DataModel::Nullable<int64_t> GetCumulativeEnergyImported() override
     {
-        return MakeNullable(mFakeReadings.GetCumulativeEnergyImported());
+        return DataModel::MakeNullable(mFakeReadings.GetCumulativeEnergyImported());
     }
     DataModel::Nullable<int64_t> GetCumulativeEnergyExported() override
     {
-        return MakeNullable(mFakeReadings.GetCumulativeEnergyExported());
+        return DataModel::MakeNullable(mFakeReadings.GetCumulativeEnergyExported());
     }
     DataModel::Nullable<int64_t> GetPeriodicEnergyImported() override
     {
-        return MakeNullable(mFakeReadings.GetPeriodicEnergyImported());
+        return DataModel::MakeNullable(mFakeReadings.GetPeriodicEnergyImported());
     }
     DataModel::Nullable<int64_t> GetPeriodicEnergyExported() override
     {
-        return MakeNullable(mFakeReadings.GetPeriodicEnergyExported());
+        return DataModel::MakeNullable(mFakeReadings.GetPeriodicEnergyExported());
     }
 
     // Clusters::ElectricalPowerMeasurement::Delegate implementation
 
-    Clusters::ElectricalPowerMeasurement::PowerModeEnum GetPowerMode() override { return ElectricalPowerMeasurement::PowerModeEnum::kAc; }
+    Clusters::ElectricalPowerMeasurement::PowerModeEnum GetPowerMode() override
+    {
+        return Clusters::ElectricalPowerMeasurement::PowerModeEnum::kAc;
+    }
     uint8_t GetNumberOfMeasurementTypes() override { return 1; }
 
     CHIP_ERROR StartAccuracyRead() override { return CHIP_NO_ERROR; }
@@ -94,19 +97,19 @@ public:
     }
     CHIP_ERROR EndHarmonicPhasesRead() override { return CHIP_NO_ERROR; }
 
-    DataModel::Nullable<int64_t> GetVoltage() override { return MakeNullable(mFakeReadings.GetVoltage()); }
-    DataModel::Nullable<int64_t> GetActiveCurrent() override { return MakeNullable(mFakeReadings.GetActiveCurrent()); }
-    DataModel::Nullable<int64_t> GetReactiveCurrent() override { return NullNullable; }
-    DataModel::Nullable<int64_t> GetApparentCurrent() override { return NullNullable; }
-    DataModel::Nullable<int64_t> GetActivePower() override { return MakeNullable(mFakeReadings.GetActivePower()); }
-    DataModel::Nullable<int64_t> GetReactivePower() override { return NullNullable; }
-    DataModel::Nullable<int64_t> GetApparentPower() override { return NullNullable; }
-    DataModel::Nullable<int64_t> GetRMSVoltage() override { return NullNullable; }
-    DataModel::Nullable<int64_t> GetRMSCurrent() override { return NullNullable; }
-    DataModel::Nullable<int64_t> GetRMSPower() override { return NullNullable; }
-    DataModel::Nullable<int64_t> GetFrequency() override { return NullNullable; }
-    DataModel::Nullable<int64_t> GetPowerFactor() override { return NullNullable; }
-    DataModel::Nullable<int64_t> GetNeutralCurrent() override { return NullNullable; }
+    DataModel::Nullable<int64_t> GetVoltage() override { return DataModel::MakeNullable(mFakeReadings.GetVoltage()); }
+    DataModel::Nullable<int64_t> GetActiveCurrent() override { return DataModel::MakeNullable(mFakeReadings.GetActiveCurrent()); }
+    DataModel::Nullable<int64_t> GetReactiveCurrent() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetApparentCurrent() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetActivePower() override { return DataModel::MakeNullable(mFakeReadings.GetActivePower()); }
+    DataModel::Nullable<int64_t> GetReactivePower() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetApparentPower() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetRMSVoltage() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetRMSCurrent() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetRMSPower() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetFrequency() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetPowerFactor() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetNeutralCurrent() override { return DataModel::NullNullable; }
 
     // Clusters::PowerTopology::Delegate implementation
 

@@ -43,7 +43,7 @@ SimulatedElectricalSensor::SimulatedElectricalSensor(TimerDelegate & timerDelega
         .powerTopologyDelegate = *this,
         .powerTopologyFeatures = BitMask<PowerTopology::Feature>(PowerTopology::Feature::kNodeTopology, PowerTopology::Feature::kElectricalCircuit),
 
-        .timerDelegate = timerDelegate;
+        .timerDelegate = timerDelegate
     }), mFakeReadings(timerDelegate), mTestEventTriggerDelegate(testEventTriggerDelegate)
 {};
 

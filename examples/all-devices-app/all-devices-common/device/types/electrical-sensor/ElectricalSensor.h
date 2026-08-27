@@ -35,16 +35,16 @@ class ElectricalSensor : public SingleEndpoint
 public:
     struct Config
     {
-        ElectricalEnergyMeasurementClusterT::Delegate & electricalEnergyDelegate;
+        Clusters::ElectricalEnergyMeasurement::Delegate & electricalEnergyDelegate;
         BitMask<Clusters::ElectricalEnergyMeasurement::Feature> electricalEnergyMeasurementFeatureFlags;
         ElectricalEnergyMeasurementClusterT::OptionalAttributesSet electricalEnergyMeasurementOptionalAttributes;
-        Structs::MeasurementAccuracyStruct::Type electricalEnergyMeasurementAccuracyStruct;
+        Clusters::ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::Type electricalEnergyMeasurementAccuracyStruct;
 
-        ElectricalPowerMeasurementClusterT::Delegate & electricalPowerDelegate;
+        Clusters::ElectricalPowerMeasurement::Delegate & electricalPowerDelegate;
         BitMask<Clusters::ElectricalPowerMeasurement::Feature> electricalPowerMeasurementFeatureFlags;
         ElectricalPowerMeasurementClusterT::OptionalAttributesSet electricalPowerMeasurementOptionalAttributes;
 
-        PowerTopologyClusterT::Delegate & powerTopologyDelegate;
+        Clusters::PowerTopology::Delegate & powerTopologyDelegate;
         BitMask<Clusters::PowerTopology::Feature> powerTopologyFeatures;
 
         TimerDelegate & timerDelegate;

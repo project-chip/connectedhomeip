@@ -18,12 +18,13 @@
 
 #pragma once
 
+#include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementCluster.h>
 #include <app/util/basic-types.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/TimerDelegate.h>
 
-class FakeReadings : public chip::TimerContext, public TestEventTriggerHandler
+class FakeReadings : public chip::TimerContext, public chip::TestEventTriggerHandler
 {
     enum class EnergyReportingTrigger : uint64_t
     {
@@ -95,7 +96,6 @@ public:
     int64_t GetPeriodicEnergyExported() { return mPeriodicEnergyExported; }
     int64_t GetCumulativeEnergyImported() { return mTotalEnergyImported; }
     int64_t GetCumulativeEnergyExported() { return mTotalEnergyExported; }
-    void SetTimerDelegate(chip::TimerDelegate & timerDelegate);
     void SetEEMCluster(ElectricalEnergyMeasurementCluster * eemCluster) { mEEMCluster = eemCluster; }
     ElectricalEnergyMeasurementCluster * GetEEMCluster() { return mEEMCluster; }
 
