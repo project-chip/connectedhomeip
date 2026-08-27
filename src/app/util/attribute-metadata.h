@@ -259,6 +259,35 @@ struct AttributeDefaultValue
 
     /// Copies raw native-endian scalar storage bytes into destination buffer (zero-fills if rawData is empty)
     void CopyScalar(void * outBuffer, size_t bufferSize) const;
+
+    /// Decodes a non-nullable scalar default (uint8_t..uint64_t, int8_t..int64_t, bool, float, enum, BitMask, OddSizedInteger).
+    template <typename T>
+    typename NumericAttributeTraits<T>::WorkingType As() const
+    {
+        using Traits = NumericAttributeTraits<T>;
+        typename Traits::StorageType temp;
+        CopyScalar(&temp, sizeof(temp));
+        return Traits::StorageToWorking(temp);
+    }
+
+    /// Decodes a nullable scalar default into DataModel::Nullable<WorkingType>.
+    template <typename T>
+    DataModel::Nullable<typename NumericAttributeTraits<T>::WorkingType> AsNullable() const
+    {
+        using Traits = NumericAttributeTraits<T>;
+        typename Traits::StorageType temp;
+        CopyScalar(&temp, sizeof(temp));
+        DataModel::Nullable<typename Traits::WorkingType> value;
+        if (Traits::IsNullValue(temp))
+        {
+            value.SetNull();
+        }
+        else
+        {
+            value.SetNonNull(Traits::StorageToWorking(temp));
+        }
+        return value;
+    }
 };
 
 /// Extract default value given attribute metadata

@@ -54,10 +54,7 @@ uint32_t LoadFeatureMap(EndpointId endpointId, ClusterId clusterId)
     if (emberAfGetAttributeDefaultValue(endpointId, clusterId, Clusters::Globals::Attributes::FeatureMap::Id, defaultValue) ==
         Protocols::InteractionModel::Status::Success)
     {
-        using Traits = NumericAttributeTraits<uint32_t>;
-        Traits::StorageType temp;
-        defaultValue.CopyScalar(&temp, sizeof(temp));
-        return Traits::StorageToWorking(temp);
+        return defaultValue.As<uint32_t>();
     }
 
 #if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS

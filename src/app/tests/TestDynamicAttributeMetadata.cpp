@@ -56,6 +56,8 @@ DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(sTestDynamicAttrs)
     DECLARE_DYNAMIC_ATTRIBUTE_WITH_MIN_MAX_DEFAULT(0x000A, INT16U, 2, 0, &sTestMinMaxInt16),
     DECLARE_DYNAMIC_ATTRIBUTE_WITH_STRING_DEFAULT(0x000B, CHAR_STRING, 16, MATTER_ATTRIBUTE_FLAG_NULLABLE, sTestNullShortStringDefault),
     DECLARE_DYNAMIC_ATTRIBUTE_WITH_STRING_DEFAULT(0x000C, LONG_CHAR_STRING, 64, MATTER_ATTRIBUTE_FLAG_NULLABLE, sTestNullLongStringDefault),
+    DECLARE_DYNAMIC_ATTRIBUTE_WITH_SCALAR_DEFAULT(0x000D, INT8U, 1, MATTER_ATTRIBUTE_FLAG_NULLABLE, 0xFF),
+    DECLARE_DYNAMIC_ATTRIBUTE_WITH_SCALAR_DEFAULT(0x000E, INT8U, 1, MATTER_ATTRIBUTE_FLAG_NULLABLE, 10),
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END_WITH_REVISION(3);
 // clang-format on
 
@@ -63,9 +65,7 @@ TEST(TestDynamicAttributeMetadata, EmptyDefault)
 {
     AttributeDefaultValue val;
     EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[0], val), Protocols::InteractionModel::Status::Success);
-    uint8_t u8Val = 0xFF;
-    val.CopyScalar(&u8Val, sizeof(u8Val));
-    EXPECT_EQ(u8Val, 0);
+    EXPECT_EQ(val.As<uint8_t>(), 0);
 }
 
 TEST(TestDynamicAttributeMetadata, ScalarDefaults)
@@ -74,33 +74,23 @@ TEST(TestDynamicAttributeMetadata, ScalarDefaults)
 
     // INT8U: 42
     EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[1], val), Protocols::InteractionModel::Status::Success);
-    uint8_t u8Val = 0;
-    val.CopyScalar(&u8Val, sizeof(u8Val));
-    EXPECT_EQ(u8Val, 42);
+    EXPECT_EQ(val.As<uint8_t>(), 42);
 
     // INT16U: 0x1234
     EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[2], val), Protocols::InteractionModel::Status::Success);
-    uint16_t u16Val = 0;
-    val.CopyScalar(&u16Val, sizeof(u16Val));
-    EXPECT_EQ(u16Val, 0x1234);
+    EXPECT_EQ(val.As<uint16_t>(), 0x1234);
 
     // INT32U: 0x12345678
     EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[3], val), Protocols::InteractionModel::Status::Success);
-    uint32_t u32Val = 0;
-    val.CopyScalar(&u32Val, sizeof(u32Val));
-    EXPECT_EQ(u32Val, 0x12345678u);
+    EXPECT_EQ(val.As<uint32_t>(), 0x12345678u);
 
     // BOOLEAN: true
     EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[4], val), Protocols::InteractionModel::Status::Success);
-    bool bVal = false;
-    val.CopyScalar(&bVal, sizeof(bVal));
-    EXPECT_TRUE(bVal);
+    EXPECT_TRUE(val.As<bool>());
 
     // INT16S: -100
     EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[5], val), Protocols::InteractionModel::Status::Success);
-    int16_t s16Val = 0;
-    val.CopyScalar(&s16Val, sizeof(s16Val));
-    EXPECT_EQ(s16Val, -100);
+    EXPECT_EQ(val.As<int16_t>(), -100);
 }
 
 TEST(TestDynamicAttributeMetadata, StringDefaults)
@@ -125,12 +115,10 @@ TEST(TestDynamicAttributeMetadata, MinMaxDefault)
 {
     AttributeDefaultValue val;
     EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[9], val), Protocols::InteractionModel::Status::Success);
-    uint16_t u16Val = 0;
-    val.CopyScalar(&u16Val, sizeof(u16Val));
-    EXPECT_EQ(u16Val, 50);
+    EXPECT_EQ(val.As<uint16_t>(), 50);
 }
 
-TEST(TestDynamicAttributeMetadata, NullableStringDefaults)
+TEST(TestDynamicAttributeMetadata, NullableDefaults)
 {
     AttributeDefaultValue val;
 
@@ -143,16 +131,25 @@ TEST(TestDynamicAttributeMetadata, NullableStringDefaults)
     EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[11], val), Protocols::InteractionModel::Status::Success);
     auto nullableLong = val.ToNullableCharSpan();
     EXPECT_TRUE(nullableLong.IsNull());
+
+    // Null scalar
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[12], val), Protocols::InteractionModel::Status::Success);
+    auto nullableU8Null = val.AsNullable<uint8_t>();
+    EXPECT_TRUE(nullableU8Null.IsNull());
+
+    // Non-null nullable scalar
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[13], val), Protocols::InteractionModel::Status::Success);
+    auto nullableU8Val = val.AsNullable<uint8_t>();
+    EXPECT_FALSE(nullableU8Val.IsNull());
+    EXPECT_EQ(nullableU8Val.Value(), 10);
 }
 
 TEST(TestDynamicAttributeMetadata, ClusterRevision)
 {
     AttributeDefaultValue val;
-    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[12], val), Protocols::InteractionModel::Status::Success);
-    EXPECT_EQ(sTestDynamicAttrs[12].attributeId, 0xFFFDu);
-    uint16_t revision = 0;
-    val.CopyScalar(&revision, sizeof(revision));
-    EXPECT_EQ(revision, 3);
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[14], val), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(sTestDynamicAttrs[14].attributeId, 0xFFFDu);
+    EXPECT_EQ(val.As<uint16_t>(), 3);
 }
 
 TEST(TestDynamicAttributeMetadata, EndpointLevelLookup)
@@ -177,9 +174,7 @@ TEST(TestDynamicAttributeMetadata, EndpointLevelLookup)
     AttributeDefaultValue val;
     EXPECT_EQ(emberAfGetAttributeDefaultValue(kTestEndpointId, kTestClusterId, 0x0002, val),
               Protocols::InteractionModel::Status::Success);
-    uint8_t u8Val = 0;
-    val.CopyScalar(&u8Val, sizeof(u8Val));
-    EXPECT_EQ(u8Val, 42);
+    EXPECT_EQ(val.As<uint8_t>(), 42);
 
     EXPECT_EQ(emberAfGetAttributeDefaultValue(kTestEndpointId, kTestClusterId, 0x0007, val),
               Protocols::InteractionModel::Status::Success);

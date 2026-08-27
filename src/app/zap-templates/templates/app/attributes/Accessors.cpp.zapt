@@ -55,24 +55,10 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, {{#if (isStr
     {{/if}}
     return Protocols::InteractionModel::Status::Success;
     {{else}}
-    using Traits = NumericAttributeTraits<{{accessorTraitType type}}>;
-    typename Traits::StorageType temp;
-    defaultVal.CopyScalar(&temp, sizeof(temp));
     {{#if isNullable}}
-    if (Traits::IsNullValue(temp))
-    {
-        value.SetNull();
-    }
-    else
-    {
-        value.SetNonNull() = Traits::StorageToWorking(temp);
-    }
+    value = defaultVal.AsNullable<{{accessorTraitType type}}>();
     {{else}}
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    *value = Traits::StorageToWorking(temp);
+    *value = defaultVal.As<{{accessorTraitType type}}>();
     {{/if}}
     return Protocols::InteractionModel::Status::Success;
     {{/if}}
