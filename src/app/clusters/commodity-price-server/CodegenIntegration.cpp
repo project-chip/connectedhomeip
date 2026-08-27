@@ -31,8 +31,10 @@ namespace {
 
 /// Applications using this compatibility layer support both optionally conformant commands.
 /// GetDetailedForecastRequest is additionally gated on the Forecasting feature by the cluster.
-constexpr BitMask<OptionalCommands> kAllOptionalCommands{ OptionalCommands::kSupportsGetDetailedPriceRequest,
-                                                          OptionalCommands::kSupportsGetDetailedForecastRequest };
+constexpr CommodityPriceCluster::OptionalCommandSet kAllOptionalCommands = //
+    CommodityPriceCluster::OptionalCommandSet()
+        .Set<Commands::GetDetailedPriceRequest::Id>()
+        .Set<Commands::GetDetailedForecastRequest::Id>();
 
 } // namespace
 

@@ -21,7 +21,9 @@
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/CommodityPrice/ClusterId.h>
+#include <clusters/CommodityPrice/CommandIds.h>
 #include <clusters/CommodityPrice/Enums.h>
 #include <clusters/CommodityPrice/Structs.h>
 #include <clusters/shared/Enums.h>
@@ -43,39 +45,33 @@ inline constexpr size_t kMaxDescriptionLength       = 32;
 inline constexpr size_t kMaxComponentsPerPriceEntry = 10;
 inline constexpr uint16_t kMaxCurrencyValue         = 999;
 
-/// Commands that this cluster supports only if the application opts into them.
-///
-/// Both CommodityPrice commands are optionally conformant. GetDetailedForecastRequest is
-/// additionally gated on the Forecasting (FORE) feature.
-enum class OptionalCommands : uint32_t
-{
-    kSupportsGetDetailedPriceRequest    = 0x1,
-    kSupportsGetDetailedForecastRequest = 0x2
-};
-
 class CommodityPriceCluster : public DefaultServerCluster
 {
 public:
+    /// Commands that this cluster supports only if the application opts into them.
+    using OptionalCommandSet =
+        chip::app::OptionalAttributeSet<Commands::GetDetailedPriceRequest::Id, Commands::GetDetailedForecastRequest::Id>;
+
     /**
      * Creates a CommodityPrice cluster instance.
      * @param endpointId The endpoint on which this cluster exists.
      * @param features The FeatureMap value for this instance.
      * @param optionalCommands The optionally conformant commands this instance supports.
      */
-    CommodityPriceCluster(EndpointId endpointId, BitMask<Feature> features, BitMask<OptionalCommands> optionalCommands) :
+    CommodityPriceCluster(EndpointId endpointId, BitMask<Feature> features, const OptionalCommandSet & optionalCommands) :
         DefaultServerCluster({ endpointId, CommodityPrice::Id }), mFeatures(features), mOptionalCommands(optionalCommands)
     {}
 
     bool HasFeature(Feature feature) const { return mFeatures.Has(feature); }
 
     /// GetDetailedPriceRequest and its mandatory GetDetailedPriceResponse are supported together.
-    bool SupportsDetailedPrice() const { return mOptionalCommands.Has(OptionalCommands::kSupportsGetDetailedPriceRequest); }
+    bool SupportsDetailedPrice() const { return mOptionalCommands.IsSet(Commands::GetDetailedPriceRequest::Id); }
 
     /// GetDetailedForecastRequest is optionally conformant only when FORE is supported. Its
     /// GetDetailedForecastResponse is mandatory whenever the request is supported.
     bool SupportsDetailedForecast() const
     {
-        return HasFeature(Feature::kForecasting) && mOptionalCommands.Has(OptionalCommands::kSupportsGetDetailedForecastRequest);
+        return HasFeature(Feature::kForecasting) && mOptionalCommands.IsSet(Commands::GetDetailedForecastRequest::Id);
     }
 
     /**
@@ -164,7 +160,7 @@ private:
                                                                                   CommandHandler * handler) const;
 
     const BitMask<Feature> mFeatures;
-    const BitMask<OptionalCommands> mOptionalCommands;
+    const OptionalCommandSet mOptionalCommands;
 
     Globals::TariffUnitEnum mTariffUnit = Globals::TariffUnitEnum::kKWh;
     DataModel::Nullable<Globals::Structs::CurrencyStruct::Type> mCurrency;
