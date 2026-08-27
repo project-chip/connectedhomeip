@@ -16,10 +16,7 @@
  *    limitations under the License.
  */
 
-#include <app/server/Server.h>
-
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <protocols/interaction_model/StatusCode.h>
+#include <crypto/RandUtils.h>
 
 #include "FakeReadings.h"
 
@@ -33,49 +30,63 @@ using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Structs;
 using namespace chip::app::Clusters::PowerSource;
 using namespace chip::app::Clusters::PowerSource::Attributes;
 
-using Protocols::InteractionModel::Status;
-
-/**
- * @brief   Starts a fake load/generator to periodically callback the power and energy
- *          clusters.
- * @param[in]   power_mW    - the mean power of the load
- *                             Positive power indicates Imported energy (e.g. a load)
- *                             Negative power indicated Exported energy (e.g. a generator)
- * @param[in]   powerRandomness_mW  This is used to define the max randomness of the
- *                             random power values around the mean power of the load
- * @param[in]   voltage_mV  - the nominal voltage measurement
- * @param[in]   voltageRandomness_mV  This is used to define the max randomness of the
- *                             random voltage values
- * @param[in]   current_mA  - the nominal current measurement
- * @param[in]   currentRandomness_mA  This is used to define the max randomness of the
- *                             random current values
- * @param[in]   interval_s  - the callback interval in seconds
- * @param[in]   reset       - boolean: true will reset the energy values to 0
- */
-void FakeReadings::StartFakeReadings(int64_t power_mW, uint32_t powerRandomness_mW, int64_t voltage_mV,
-                                     uint32_t voltageRandomness_mV, int64_t current_mA, uint32_t currentRandomness_mA,
-                                     uint8_t interval_s, bool reset)
+CHIP_ERROR FakeReadings::HandleEventTrigger(uint64_t eventTrigger)
 {
-    VerifyOrDie(interval_s > 0);
-    mBasePower_mW         = power_mW;
-    mPowerRandomness_mW   = powerRandomness_mW;
-    mBaseVoltage_mV       = voltage_mV;
-    mVoltageRandomness_mV = voltageRandomness_mV;
-    mBaseCurrent_mA       = current_mA;
-    mCurrentRandomness_mA = currentRandomness_mA;
-    mInterval_s           = interval_s;
+    EnergyReportingTrigger trigger = static_cast<EnergyReportingTrigger>(clearEndpointInEventTrigger(eventTrigger));
 
-    if (reset)
+    switch (trigger)
     {
-        // Use a fixed random seed to try to avoid random CI test failures
-        // which are caused when the test is checking for 2 different numbers.
-        // This is statistically more likely when the test runs for a long time
-        // or if the seed is not set
+    case EnergyReportingTrigger::kFakeReadingsStop:
+        ChipLogProgress(Support, "[EnergyReporting-Test-Event] => Stop Fake load");
+        StopFakeReadings()
+        break;
+    case EnergyReportingTrigger::kFakeReadingsLoadStart_1kW_2s:
+        ChipLogProgress(Support, "[EnergyReporting-Test-Event] => Start Fake load 1kW @2s Import");
+        StartFakeReadings({
+            .power_mW              = 1'000'000,  // Fake load 1000 W
+            .powerRandomness_mW    = 20'000,     // randomness 20W
+            .voltage_mV            = 230'000,    // Fake Voltage 230V
+            .voltageRandomness_mV  = 1'000,      // randomness 1V
+            .current_mA            = 4'348,      // Fake Current (at 1kW@230V = 4.3478 Amps)
+            .currentRandomness_mA  = 500,        // randomness 500mA
+            .interval_s            = 2,          // 2s updates
+            .reset                 = true
+        });
+        break;
+    case EnergyReportingTrigger::kFakeReadingsGenStart_3kW_5s:
+        ChipLogProgress(Support, "[EnergyReporting-Test-Event] => Start Fake generator 3kW @5s Export");
+        StartFakeReadings({
+            .power_mW              = -3'000'000, // Fake Generator -3000 W
+            .powerRandomness_mW    = 20'000,     // randomness 20W
+            .voltage_mV            = 230'000,    // Fake Voltage 230V
+            .voltageRandomness_mV  = 1'000,      // randomness 1V
+            .current_mA            = -13'043,    // Fake Current (at -3kW@230V = -13.0434 Amps)
+            .currentRandomness_mA  = 500,        // randomness 500mA
+            .interval_s            = 5,          // 5s updates
+            .reset                 = true
+        });
+        break;
 
-        // Disable clang-tidy for this line because it complains that srand(1) will make the random numbers predictable, which is
-        // the exact point of this line.
-        srand(1); // NOLINT(bugprone-random-generator-seed)
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
+    return CHIP_NO_ERROR;
+}
+
+void FakeReadings::StartFakeReadings(Parameters params)
+{
+    VerifyOrDie(params.interval_s > 0);
+    mBasePower_mW         = params.power_mW;
+    mPowerRandomness_mW   = params.powerRandomness_mW;
+    mBaseVoltage_mV       = params.voltage_mV;
+    mVoltageRandomness_mV = params.voltageRandomness_mV;
+    mBaseCurrent_mA       = params.current_mA;
+    mCurrentRandomness_mA = params.currentRandomness_mA;
+    mInterval_s           = params.interval_s;
+
+    if (params.reset)
+    {
         mTotalEnergyImported = 0;
         mTotalEnergyExported = 0;
     }
@@ -92,23 +103,14 @@ void FakeReadings::StopFakeReadings()
     }
 }
 
-/**
- * @brief   Sends fake meter data into the cluster and restarts the timer
- */
 void FakeReadings::FakeReadingsUpdate()
 {
     // Update readings
-    // Avoid using floats - so we will do a basic rand() call which will generate a integer value between 0 and RAND_MAX
-    // first compute power as a mean + some random value in range +/- mPowerRandomness_mW
-    mPower_mW = mPowerRandomness_mW == 0
-        ? 0
-        : (static_cast<int64_t>(rand()) % (2 * static_cast<int64_t>(mPowerRandomness_mW))) - mPowerRandomness_mW;
-    mPower_mW += mBasePower_mW; // add in the base power
 
-    mVoltage_mV = mVoltageRandomness_mV == 0
-        ? 0
-        : (static_cast<int64_t>(rand()) % (2 * static_cast<int64_t>(mVoltageRandomness_mV))) - mVoltageRandomness_mV;
-    mVoltage_mV += mBaseVoltage_mV; // add in the base voltage
+    // base + randomness
+    mPower_mW = mBasePower_mW + mPowerRandomness_mW == 0 ? 0 : (GetRandI64() % (2 * static_cast<int64_t>(mPowerRandomness_mW))) - mPowerRandomness_mW;
+
+    mVoltage_mV = mBaseVoltage_mV + mVoltageRandomness_mV == 0 ? 0 : (GetRandI64() % (2 * static_cast<int64_t>(mVoltageRandomness_mV))) - mVoltageRandomness_mV;
 
     /* Note: whilst we could compute a current from the power and voltage,
      * there will always be some random error from the sensor
@@ -117,10 +119,8 @@ void FakeReadings::FakeReadingsUpdate()
      * This is meant more as an example to show how to use the APIs, not
      * to be a real representation of laws of physics.
      */
-    mCurrent_mA = mCurrentRandomness_mA == 0
-        ? 0
-        : (static_cast<int64_t>(rand()) % (2 * static_cast<int64_t>(mCurrentRandomness_mA))) - mCurrentRandomness_mA;
-    mCurrent_mA += mBaseCurrent_mA; // add in the base current
+
+    mCurrent_mA = mBaseCurrent_mA + mCurrentRandomness_mA == 0 ? 0 : (GetRandI64() % (2 * static_cast<int64_t>(mCurrentRandomness_mA))) - mCurrentRandomness_mA;
 
     // update the energy meter - we'll assume that the power has been constant during the previous interval
     if (mPower_mW > 0)

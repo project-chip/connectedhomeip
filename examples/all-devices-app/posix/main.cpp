@@ -360,9 +360,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 
     // Initialize the test event trigger delegate, and add a handler
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate;
-    static EnergyReportingTestEventTriggerHandler sEnergyReportingTestEventTriggerHandler;
     SuccessOrDie(sTestEventTriggerDelegate.Init(ByteSpan(AppOptions::GetConfig().testEventTriggerEnableKey)));
-    SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sEnergyReportingTestEventTriggerHandler));
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     static CodeDrivenDataModelDevices devices({

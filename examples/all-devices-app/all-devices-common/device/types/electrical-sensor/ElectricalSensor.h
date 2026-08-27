@@ -33,9 +33,23 @@ class ElectricalSensor : public SingleEndpoint
     using PowerTopologyClusterT               = Clusters::PowerTopology::PowerTopologyCluster;
 
 public:
-    ElectricalSensor(TimerDelegate & timerDelegate, Clusters::ElectricalEnergyMeasurement::Delegate & electricalEnergyDelegate,
-                     Clusters::ElectricalPowerMeasurement::Delegate & electricalPowerDelegate,
-                     Clusters::PowerTopology::Delegate & powerTopologyDelegate);
+    struct Config
+    {
+        ElectricalEnergyMeasurementClusterT::Delegate & electricalEnergyDelegate;
+        BitMask<Clusters::ElectricalEnergyMeasurement::Feature> electricalEnergyMeasurementFeatureFlags;
+        ElectricalEnergyMeasurementClusterT::OptionalAttributesSet electricalEnergyMeasurementOptionalAttributes;
+        Structs::MeasurementAccuracyStruct::Type electricalEnergyMeasurementAccuracyStruct;
+
+        ElectricalPowerMeasurementClusterT::Delegate & electricalPowerDelegate;
+        BitMask<Clusters::ElectricalPowerMeasurement::Feature> electricalPowerMeasurementFeatureFlags;
+        ElectricalPowerMeasurementClusterT::OptionalAttributesSet electricalPowerMeasurementOptionalAttributes;
+
+        PowerTopologyClusterT::Delegate & powerTopologyDelegate;
+        BitMask<Clusters::PowerTopology::Feature> powerTopologyFeatures;
+
+        TimerDelegate & timerDelegate;
+    };
+    ElectricalSensor(const Config & config);
     ~ElectricalSensor() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -48,10 +62,7 @@ public:
     PowerTopologyClusterT & PowerTopologyCluster();
 
 protected:
-    TimerDelegate & mTimerDelegate;
-    Clusters::ElectricalEnergyMeasurement::Delegate & mElectricalEnergyDelegate;
-    Clusters::ElectricalPowerMeasurement::Delegate & mElectricalPowerDelegate;
-    Clusters::PowerTopology::Delegate & mPowerTopologyDelegate;
+    Config mConfig;
 
     LazyRegisteredServerCluster<ElectricalEnergyMeasurementClusterT> mElectricalEnergyMeasurementCluster;
     LazyRegisteredServerCluster<ElectricalPowerMeasurementClusterT> mElectricalPowerMeasurementCluster;

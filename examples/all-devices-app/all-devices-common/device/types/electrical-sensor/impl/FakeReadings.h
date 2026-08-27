@@ -23,32 +23,60 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/TimerDelegate.h>
 
-class FakeReadings : public chip::TimerContext
+class FakeReadings : public chip::TimerContext, public TestEventTriggerHandler
 {
+    enum class EnergyReportingTrigger : uint64_t
+    {
+        // Stop Fake readings
+        kFakeReadingsStop = 0x0091'0000'0000'0000,
+        // Fake a load (importing) readings at 1kW 230V 4.34A with 2s updates
+        kFakeReadingsLoadStart_1kW_2s = 0x0091'0000'0000'0001,
+        // Fake a generator (exporting) readings at 3kW 230V 3.33A with 5s updates
+        kFakeReadingsGenStart_3kW_5s = 0x0091'0000'0000'0002
+    };
+    CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
+
     using ElectricalEnergyMeasurementCluster = chip::app::Clusters::ElectricalEnergyMeasurement::ElectricalEnergyMeasurementCluster;
 
 public:
+    FakeReadings(chip::TimerDelegate & timerDelegate) : mTimerDelegate(timerDelegate) {}
     ~FakeReadings() override { StopFakeReadings(); }
 
-    /**
-     * @brief   Starts a fake load/generator to periodically callback the power and energy
-     *          clusters.
-     * @param[in]   power_mW    - the mean power of the load
-     *                             Positive power indicates Imported energy (e.g. a load)
-     *                             Negative power indicated Exported energy (e.g. a generator)
-     * @param[in]   powerRandomness_mW  This is used to define the max randomness of the
-     *                             random power values around the mean power of the load
-     * @param[in]   voltage_mV  - the nominal voltage measurement
-     * @param[in]   voltageRandomness_mV  This is used to define the max randomness of the
-     *                             random voltage values
-     * @param[in]   current_mA  - the nominal current measurement
-     * @param[in]   currentRandomness_mA  This is used to define the max randomness of the
-     *                             random current values
-     * @param[in]   interval_s  - the callback interval in seconds
-     * @param[in]   reset       - boolean: true will reset the energy values to 0
-     */
-    void StartFakeReadings(int64_t power_mW, uint32_t powerRandomness_mW, int64_t voltage_mV, uint32_t voltageRandomness_mV,
-                           int64_t current_mA, uint32_t currentRandomness_mA, uint8_t interval_s, bool reset);
+    struct Parameters
+    {
+        // Starts a fake load/generator to periodically callback the power and energy
+        // clusters.
+        // The mean power of the load
+        // Positive power indicates Imported energy (e.g. a load)
+        // Negative power indicated Exported energy (e.g. a generator)
+        int64_t power_mW;
+
+        // This is used to define the max randomness of the
+        // random power values around the mean power of the load
+        uint32_t powerRandomness_mW;
+
+        // The nominal voltage measurement
+        int64_t voltage_mV;
+
+        // This is used to define the max randomness of the
+        // random voltage values
+        uint32_t voltageRandomness_mV;
+
+        // The nominal current measurement
+        int64_t current_mA;
+
+        // This is used to define the max randomness of the
+        // random current values
+        uint32_t currentRandomness_mA;
+
+        // The callback interval in seconds
+        uint8_t interval_s;
+
+        // If true, will reset the energy values to 0
+        bool reset;
+    };
+
+    void StartFakeReadings(Parameters params);
 
     /**
      * @brief   Stops any active updates to the fake load data callbacks
@@ -122,8 +150,8 @@ private:
     int64_t mPeriodicEnergyExported = 0;
 
     // TimerDelegate running this TimerContext
-    chip::TimerDelegate * mTimerDelegate = nullptr;
+    chip::TimerDelegate & mTimerDelegate;
 
-    // EEM cluster to call GenerateSnapshot() on
+    // EEM cluster to call `GenerateSnapshot()` on
     ElectricalEnergyMeasurementCluster * mEEMCluster = nullptr;
 };

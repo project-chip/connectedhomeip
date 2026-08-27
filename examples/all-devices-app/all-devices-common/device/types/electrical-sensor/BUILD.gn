@@ -37,8 +37,8 @@ source_set("logging") {
   sources = [
     "impl/FakeReadings.cpp",
     "impl/FakeReadings.h",
-    "impl/LoggingElectricalSensor.cpp",
-    "impl/LoggingElectricalSensor.h",
+    "impl/SimulatedElectricalSensor.cpp",
+    "impl/SimulatedElectricalSensor.h",
   ]
 
   public_deps = [ ":electrical-sensor" ]

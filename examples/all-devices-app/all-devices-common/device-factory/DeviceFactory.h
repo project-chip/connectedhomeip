@@ -33,7 +33,7 @@
 #include <device/types/dimmable-light/impl/LoggingDimmableLight.h>
 #include <device/types/dimmable-plug-in-unit/DimmablePlugInUnit.h>
 #include <device/types/dishwasher/impl/EmulatedDishwasher.h>
-#include <device/types/electrical-sensor/impl/LoggingElectricalSensor.h>
+#include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
 #include <device/types/extractor-hood/ExtractorHood.h>
 #include <device/types/fan/impl/LoggingFan.h>
 #include <device/types/flow-sensor/impl/IncreasingFlowSensor.h>
@@ -425,7 +425,7 @@ private:
         {
             RegisterCreator("electrical-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<LoggingElectricalSensor>(mContext->timerDelegate);
+                return std::make_unique<SimulatedElectricalSensor>(mContext->timerDelegate, mContext->testEventTriggerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_EXTRACTOR_HOOD)
