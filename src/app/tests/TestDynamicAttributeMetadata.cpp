@@ -123,6 +123,14 @@ TEST(TestDynamicAttributeMetadata, MinMaxDefault)
     AttributeDefaultValue val;
     EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[9], val), Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(val.As<uint16_t>(), 50);
+    EXPECT_FALSE(sTestDynamicAttrs[9].HasEmptyDefault());
+
+    // Min/max attribute with null pointer does not crash and yields empty rawData
+    EmberAfAttributeMetadata nullMinMaxAttr =
+        DECLARE_DYNAMIC_ATTRIBUTE_WITH_MIN_MAX_DEFAULT(0x000A, INT16U, 2, 0, static_cast<const EmberAfAttributeMinMaxValue *>(nullptr));
+    EXPECT_FALSE(nullMinMaxAttr.HasEmptyDefault());
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(&nullMinMaxAttr, val), Protocols::InteractionModel::Status::Success);
+    EXPECT_TRUE(val.rawData.empty());
 }
 
 TEST(TestDynamicAttributeMetadata, NullableDefaults)

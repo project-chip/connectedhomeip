@@ -201,14 +201,17 @@ Status emberAfGetAttributeDefaultValue(const EmberAfAttributeMetadata * am, Attr
 
     if ((am->mask & MATTER_ATTRIBUTE_FLAG_MIN_MAX) != 0U)
     {
-        if (am->size <= 2)
+        if (am->defaultValue.ptrToMinMaxValue != nullptr)
         {
-            ptr = reinterpret_cast<const uint8_t *>(&(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue));
-            defaultValueSizeForBigEndianNudger = sizeof(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue);
-        }
-        else
-        {
-            ptr = am->defaultValue.ptrToMinMaxValue->defaultValue.ptrToDefaultValue;
+            if (am->size <= 2)
+            {
+                ptr = reinterpret_cast<const uint8_t *>(&(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue));
+                defaultValueSizeForBigEndianNudger = sizeof(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue);
+            }
+            else
+            {
+                ptr = am->defaultValue.ptrToMinMaxValue->defaultValue.ptrToDefaultValue;
+            }
         }
     }
     else
