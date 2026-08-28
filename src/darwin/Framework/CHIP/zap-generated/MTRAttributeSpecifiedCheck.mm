@@ -3057,6 +3057,12 @@ static BOOL AttributeIsSpecifiedInMessagesCluster(AttributeId aAttributeId)
     case Attributes::ActiveMessageIDs::Id: {
         return YES;
     }
+    case Attributes::SupportedLanguageCodes::Id: {
+        return YES;
+    }
+    case Attributes::SupportedMimeTypes::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -4395,6 +4401,9 @@ static BOOL AttributeIsSpecifiedInHumidistatCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Humidistat;
     switch (aAttributeId) {
+    case Attributes::SupportedModes::Id: {
+        return YES;
+    }
     case Attributes::Mode::Id: {
         return YES;
     }
@@ -4426,6 +4435,12 @@ static BOOL AttributeIsSpecifiedInHumidistatCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::Optimal::Id: {
+        return YES;
+    }
+    case Attributes::CondPumpEnabled::Id: {
+        return YES;
+    }
+    case Attributes::CondRunCount::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -6943,6 +6958,9 @@ static BOOL AttributeIsSpecifiedInPushAVStreamTransportCluster(AttributeId aAttr
         return YES;
     }
     case Attributes::CurrentConnections::Id: {
+        return YES;
+    }
+    case Attributes::MaxZones::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {

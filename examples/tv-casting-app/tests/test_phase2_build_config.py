@@ -3,15 +3,22 @@ Phase 2 Build Config Property Tests
 
 Feature: casting-apk-size-reduction-phase2
 
-Property 7: CONFIG_BUILD_FOR_HOST_UNIT_TEST is overridable
+Property 7: CONFIG_BUILD_FOR_HOST_UNIT_TEST is defined consistently
 **Validates: Requirements 4.1, 4.2**
 
 Property 8: ICD client deps are conditional on optimize_apk_size
 **Validates: Requirements 6.1, 6.2**
 
 This test verifies that:
-  - CHIPProjectAppConfig.h uses a #ifndef guard around
-    CONFIG_BUILD_FOR_HOST_UNIT_TEST so the build system can override it to 0.
+  - CHIPProjectAppConfig.h defines CONFIG_BUILD_FOR_HOST_UNIT_TEST to 0 inside a
+    #ifndef guard. This header is the project-config include, so it is seen by
+    EVERY translation unit (app + core src/*). It must resolve to one value
+    across the whole link.
+  - No BUILD.gn adds a per-target `-DCONFIG_BUILD_FOR_HOST_UNIT_TEST=...`
+    override. Such an override reaches only some TUs, so core types (CASESession,
+    and thus the Server singleton and its FabricTable) end up with different
+    layouts per TU -- an ODR violation that crashes at startup in
+    FabricTable::AddFabricDelegate.
   - tv-casting-common/BUILD.gn wraps ICD client deps
     (icd/client:handler, icd/client:manager) inside a !optimize_apk_size
     conditional so they are excluded in size-optimized builds.
@@ -155,7 +162,7 @@ def test_icd_client_deps_not_unconditional():
 
 
 # ---------------------------------------------------------------------------
-# Property 7: CONFIG_BUILD_FOR_HOST_UNIT_TEST is overridable
+# Property 7: CONFIG_BUILD_FOR_HOST_UNIT_TEST is defined consistently
 # ---------------------------------------------------------------------------
 
 
@@ -163,11 +170,12 @@ def test_config_build_for_host_unit_test_has_ifndef_guard():
     """
     **Validates: Requirements 4.1, 4.2**
 
-    Property 7: CONFIG_BUILD_FOR_HOST_UNIT_TEST is overridable
+    Property 7: CONFIG_BUILD_FOR_HOST_UNIT_TEST is defined consistently
 
     The CHIPProjectAppConfig.h header SHALL define CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    using a #ifndef guard so that the build system can override it to 0 for
-    size-optimized builds while defaulting to 1 for standard builds.
+    inside a #ifndef guard. This header is the global project-config include, so
+    the guarded #define is the single source of truth for every translation
+    unit in the build.
     """
     content = _read_file(CHIP_PROJECT_APP_CONFIG_FILE)
 
@@ -195,8 +203,12 @@ def test_config_build_for_host_unit_test_default_value_is_1():
     Property 7 (supplement): Default value is 1
 
     The #define inside the #ifndef guard SHALL set
-    CONFIG_BUILD_FOR_HOST_UNIT_TEST to 1, preserving backward compatibility
-    for non-optimized builds.
+    CONFIG_BUILD_FOR_HOST_UNIT_TEST to 1. This header is seen by every
+    translation unit (app sources and core src/*), so the value must be
+    consistent across the whole link. It is 1 because the non-size-optimized
+    build compiles the legacy chip-tool InteractionModel.cpp, which uses the
+    test-only CommandSender/ReadClient hooks compiled only when this is 1
+    (matching chip-tool's own CHIPProjectAppConfig.h, which shares that code).
     """
     content = _read_file(CHIP_PROJECT_APP_CONFIG_FILE)
 
@@ -215,7 +227,10 @@ def test_config_build_for_host_unit_test_default_value_is_1():
     value = int(match.group(1))
     assert value == 1, (
         f"FAIL: CONFIG_BUILD_FOR_HOST_UNIT_TEST default value is {value}, "
-        f"expected 1. Non-optimized builds must default to 1."
+        f"expected 1. The non-size-optimized build compiles chip-tool's "
+        f"InteractionModel.cpp, which needs the test-only hooks gated by this "
+        f"macro. It must be set here in the shared header (never as a per-target "
+        f"override, which would cause an ODR layout mismatch across TUs)."
     )
 
 
@@ -250,31 +265,42 @@ def test_config_build_for_host_unit_test_no_unguarded_define():
                 )
 
 
-def test_build_gn_defines_config_build_for_host_unit_test_zero():
+def test_build_gn_has_no_per_target_config_build_for_host_unit_test_override():
     """
     **Validates: Requirements 4.1**
 
-    Property 7 (supplement): BUILD.gn overrides CONFIG_BUILD_FOR_HOST_UNIT_TEST=0
+    Property 7 (supplement): BUILD.gn must NOT override
+    CONFIG_BUILD_FOR_HOST_UNIT_TEST per-target.
 
-    The config("config") block in tv-casting-common/BUILD.gn SHALL add
-    CONFIG_BUILD_FOR_HOST_UNIT_TEST=0 to defines when optimize_apk_size is true.
+    A per-target `-DCONFIG_BUILD_FOR_HOST_UNIT_TEST=...` define reaches only the
+    translation units of that target, while the rest of the link (core src/*)
+    picks up the value from CHIPProjectAppConfig.h. Because this macro changes
+    the layout of core types (CASESession, and thus the Server singleton and its
+    FabricTable), such a split produces an ODR violation that crashes at startup
+    in FabricTable::AddFabricDelegate. The value must come solely from the shared
+    header.
     """
     content = _read_file(BUILD_GN_FILE)
 
-    # Find the optimize_apk_size block inside the config("config") section
-    # Look for defines += [ "CONFIG_BUILD_FOR_HOST_UNIT_TEST=0" ] inside
-    # an if (optimize_apk_size) block
-    optimize_blocks = _find_conditional_blocks(content, "optimize_apk_size")
+    # Any occurrence of the macro name in active (non-comment) GN code is an
+    # attempt to configure or define it, whether as a defines/cflags assignment
+    # ("CONFIG_BUILD_FOR_HOST_UNIT_TEST=0") or a value-less define
+    # ("-DCONFIG_BUILD_FOR_HOST_UNIT_TEST"). Since comments are stripped below,
+    # a direct substring check catches every form. The macro name is still
+    # allowed to appear in explanatory comments.
+    offending = []
+    for line in content.split("\n"):
+        # Strip GN line comments so the macro name may appear in prose.
+        code = line.split("#", 1)[0]
+        if "CONFIG_BUILD_FOR_HOST_UNIT_TEST" in code:
+            offending.append(line.strip())
 
-    found = any(
-        "CONFIG_BUILD_FOR_HOST_UNIT_TEST=0" in block
-        for block in optimize_blocks
-    )
-
-    assert found, (
-        "FAIL: BUILD.gn does not define CONFIG_BUILD_FOR_HOST_UNIT_TEST=0 "
-        "inside an if (optimize_apk_size) block. This is needed to override "
-        "the header default for size-optimized builds."
+    assert not offending, (
+        "FAIL: BUILD.gn defines CONFIG_BUILD_FOR_HOST_UNIT_TEST per-target:\n  "
+        + "\n  ".join(offending)
+        + "\nThis macro must be set only in CHIPProjectAppConfig.h (the global "
+        "project-config include), never as a per-target GN define, to avoid an "
+        "ODR layout mismatch across translation units."
     )
 
 
@@ -298,8 +324,8 @@ if __name__ == "__main__":
          test_config_build_for_host_unit_test_default_value_is_1),
         ("Property 7 (supplement) - no unguarded define",
          test_config_build_for_host_unit_test_no_unguarded_define),
-        ("Property 7 (supplement) - BUILD.gn override",
-         test_build_gn_defines_config_build_for_host_unit_test_zero),
+        ("Property 7 (supplement) - no per-target BUILD.gn override",
+         test_build_gn_has_no_per_target_config_build_for_host_unit_test_override),
     ]
 
     for name, test_fn in tests:

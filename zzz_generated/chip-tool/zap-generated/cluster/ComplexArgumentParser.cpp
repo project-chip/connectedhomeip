@@ -3855,6 +3855,20 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
     }
     valueCopy.removeMember("responses");
 
+    if (value.isMember("languageCode"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "languageCode");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.languageCode, value["languageCode"]));
+    }
+    valueCopy.removeMember("languageCode");
+
+    if (value.isMember("messageURI"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "messageURI");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.messageURI, value["messageURI"]));
+    }
+    valueCopy.removeMember("messageURI");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -3867,6 +3881,8 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Messages::Structs::Mes
     ComplexArgumentParser::Finalize(request.duration);
     ComplexArgumentParser::Finalize(request.messageText);
     ComplexArgumentParser::Finalize(request.responses);
+    ComplexArgumentParser::Finalize(request.languageCode);
+    ComplexArgumentParser::Finalize(request.messageURI);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
@@ -4974,13 +4990,13 @@ ComplexArgumentParser::Setup(const char * label,
     }
     valueCopy.removeMember("nominalDischargeCurrent");
 
-    if (value.isMember("maximumDishargeCurrent"))
+    if (value.isMember("maximumDischargeCurrent"))
     {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "maximumDishargeCurrent");
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "maximumDischargeCurrent");
         ReturnErrorOnFailure(
-            ComplexArgumentParser::Setup(labelWithMember, request.maximumDishargeCurrent, value["maximumDishargeCurrent"]));
+            ComplexArgumentParser::Setup(labelWithMember, request.maximumDischargeCurrent, value["maximumDischargeCurrent"]));
     }
-    valueCopy.removeMember("maximumDishargeCurrent");
+    valueCopy.removeMember("maximumDischargeCurrent");
 
     if (value.isMember("ratedShortCircuitCurrent"))
     {
@@ -5026,7 +5042,7 @@ void ComplexArgumentParser::Finalize(
     ComplexArgumentParser::Finalize(request.maxVoltageProtection);
     ComplexArgumentParser::Finalize(request.maxTemporaryVoltage);
     ComplexArgumentParser::Finalize(request.nominalDischargeCurrent);
-    ComplexArgumentParser::Finalize(request.maximumDishargeCurrent);
+    ComplexArgumentParser::Finalize(request.maximumDischargeCurrent);
     ComplexArgumentParser::Finalize(request.ratedShortCircuitCurrent);
     ComplexArgumentParser::Finalize(request.ratedShortTimeWithstandCurrent);
     ComplexArgumentParser::Finalize(request.energyAbsorptionCapability);

@@ -712,7 +712,7 @@ cluster Descriptor = 29 {
   readonly attribute cluster_id clientList[] = 2;
   readonly attribute endpoint_no partsList[] = 3;
   readonly attribute optional SemanticTagStruct tagList[] = 4;
-  provisional readonly attribute optional char_string<32> endpointUniqueID = 5;
+  readonly attribute optional char_string<32> endpointUniqueID = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -740,10 +740,7 @@ cluster Binding = 30 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** The Access Control Cluster exposes a data model view of a
-      Node's Access Control List (ACL), which codifies the rules used to manage
-      and enforce Access Control for the Node's endpoints and their associated
-      cluster instances. */
+/** The Access Control Cluster exposes a data model view of a Node's Access Control List (ACL), which codifies the rules used to manage and enforce Access Control for the Node's endpoints and their associated cluster instances. */
 cluster AccessControl = 31 {
   revision 3;
 
@@ -877,7 +874,7 @@ cluster AccessControl = 31 {
   fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): ReviewFabricRestrictionsResponse = 0;
 }
 
-/** This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information. */
+/** This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose logical grouping and actions. */
 cluster Actions = 37 {
   revision 1;
 
@@ -2750,7 +2747,7 @@ cluster Switch = 59 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** Commands to trigger a Node to allow a new Administrator to commission it. */
+/** This cluster is used to trigger a Node to allow a new Administrator to commission it. */
 cluster AdministratorCommissioning = 60 {
   revision 1;
 
@@ -3789,7 +3786,7 @@ cluster DishwasherMode = 89 {
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
-/** Attributes for reporting air quality classification */
+/** This cluster provides an interface to air quality classification using distinct levels with human-readable labels. */
 cluster AirQuality = 91 {
   revision 1;
 
@@ -5073,7 +5070,7 @@ provisional cluster CommodityPrice = 149 {
 
 /** This cluster provides an interface for passing messages to be presented by a device. */
 cluster Messages = 151 {
-  revision 3;
+  revision 4;
 
   enum FutureMessagePreferenceEnum : enum8 {
     kAllowed = 0;
@@ -5095,6 +5092,9 @@ cluster Messages = 151 {
     kConfirmationResponse = 0x2;
     kConfirmationReply = 0x4;
     kProtectedMessages = 0x8;
+    kSpokenMessages = 0x10;
+    kAudioMessages = 0x20;
+    kMultiModalMessages = 0x40;
   }
 
   bitmap MessageControlBitmap : bitmap8 {
@@ -5103,6 +5103,8 @@ cluster Messages = 151 {
     kReplyMessage = 0x4;
     kMessageConfirmed = 0x8;
     kMessageProtected = 0x10;
+    kSpokenMessage = 0x20;
+    kAudioMessage = 0x40;
   }
 
   struct MessageResponseOptionStruct {
@@ -5118,6 +5120,8 @@ cluster Messages = 151 {
     nullable int64u duration = 4;
     long_char_string<256> messageText = 5;
     optional MessageResponseOptionStruct responses[] = 6;
+    optional fabric_sensitive char_string<32> languageCode = 7;
+    optional fabric_sensitive long_char_string<256> messageURI = 8;
   }
 
   info event MessageQueued = 0 {
@@ -5135,8 +5139,16 @@ cluster Messages = 151 {
     nullable FutureMessagePreferenceEnum futureMessagesPreference = 3;
   }
 
+  provisional fabric_sensitive info event MessageNotPresented = 3 {
+    octet_string messageID = 0;
+    boolean removedFromQueue = 1;
+    fabric_idx fabricIndex = 254;
+  }
+
   readonly attribute MessageStruct messages[] = 0;
   readonly attribute octet_string activeMessageIDs[] = 1;
+  provisional readonly attribute optional char_string supportedLanguageCodes[] = 2;
+  provisional readonly attribute optional char_string supportedMimeTypes[] = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -5151,6 +5163,8 @@ cluster Messages = 151 {
     nullable int64u duration = 4;
     long_char_string<256> messageText = 5;
     optional MessageResponseOptionStruct responses[] = 6;
+    optional char_string<32> languageCode = 7;
+    optional long_char_string<256> messageURI = 8;
   }
 
   request struct CancelMessagesRequestRequest {
@@ -5630,7 +5644,7 @@ provisional cluster EnergyPreference = 155 {
 
 /** The Power Topology Cluster provides a mechanism for expressing how power is flowing between endpoints. */
 cluster PowerTopology = 156 {
-  revision 1;
+  revision 2;
 
   bitmap Feature : bitmap32 {
     kNodeTopology = 0x1;
@@ -5771,7 +5785,7 @@ cluster WaterHeaterMode = 158 {
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
-provisional cluster DeviceEnergyManagementMode = 159 {
+cluster DeviceEnergyManagementMode = 159 {
   revision 2;
 
   enum ModeTag : enum16 {
@@ -5789,10 +5803,6 @@ provisional cluster DeviceEnergyManagementMode = 159 {
     kDeviceOptimization = 16385;
     kLocalOptimization = 16386;
     kGridOptimization = 16387;
-  }
-
-  bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
   }
 
   shared struct ModeTagStruct {
@@ -6112,7 +6122,7 @@ provisional cluster ElectricalProtectionAlarm = 163 {
     optional voltage_mv maxVoltageProtection = 4;
     optional voltage_mv maxTemporaryVoltage = 5;
     optional amperage_ma nominalDischargeCurrent = 6;
-    optional amperage_ma maximumDishargeCurrent = 7;
+    optional amperage_ma maximumDischargeCurrent = 7;
     optional amperage_ma ratedShortCircuitCurrent = 8;
     optional amperage_ma ratedShortTimeWithstandCurrent = 9;
     optional int64u energyAbsorptionCapability = 10;
@@ -8002,19 +8012,17 @@ provisional cluster Humidistat = 517 {
   revision 1;
 
   enum ModeEnum : enum8 {
-    kOff = 0;
-    kHumidifier = 1;
-    kDehumidifier = 2;
-    kAuto = 3;
-    kFanOnly = 4;
+    kHumidifier = 0;
+    kDehumidifier = 1;
+    kAuto = 2;
+    kFanOnly = 3;
   }
 
   enum SystemStateEnum : enum8 {
-    kOff = 0;
-    kHumidifying = 1;
-    kDehumidifying = 2;
-    kFan = 3;
-    kIdle = 4;
+    kHumidifying = 0;
+    kDehumidifying = 1;
+    kFan = 2;
+    kIdle = 3;
   }
 
   bitmap Feature : bitmap32 {
@@ -8027,6 +8035,7 @@ provisional cluster Humidistat = 517 {
     kOptimal = 0x40;
     kWarmMist = 0x80;
     kColdMist = 0x100;
+    kCondPump = 0x200;
   }
 
   bitmap MistTypeBitmap : bitmap8 {
@@ -8034,17 +8043,20 @@ provisional cluster Humidistat = 517 {
     kMistWarm = 0x2;
   }
 
-  readonly attribute ModeEnum mode = 0;
-  readonly attribute SystemStateEnum systemState = 1;
-  readonly attribute optional percent userSetpoint = 2;
-  readonly attribute optional percent minSetpoint = 3;
-  readonly attribute optional percent maxSetpoint = 4;
-  readonly attribute optional percent step = 5;
-  readonly attribute optional percent targetSetpoint = 6;
-  readonly attribute optional MistTypeBitmap mistType = 7;
-  readonly attribute optional boolean continuous = 8;
-  readonly attribute optional boolean sleep = 9;
-  readonly attribute optional boolean optimal = 10;
+  readonly attribute ModeEnum supportedModes[] = 0;
+  attribute ModeEnum mode = 1;
+  readonly attribute SystemStateEnum systemState = 2;
+  attribute optional percent userSetpoint = 3;
+  readonly attribute optional percent minSetpoint = 4;
+  readonly attribute optional percent maxSetpoint = 5;
+  readonly attribute optional percent step = 6;
+  readonly attribute optional percent targetSetpoint = 7;
+  attribute optional nullable MistTypeBitmap mistType = 8;
+  attribute optional boolean continuous = 9;
+  attribute optional boolean sleep = 10;
+  attribute optional boolean optimal = 11;
+  attribute optional boolean condPumpEnabled = 12;
+  readonly attribute optional int16u condRunCount = 13;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -10739,7 +10751,7 @@ cluster ContentLauncher = 1290 {
   command PlayPreset(PlayPresetRequest): DefaultSuccess = 5;
 }
 
-/** This cluster provides an interface for controlling the Output on a media device such as a TV. */
+/** This cluster provides an interface for controlling the Output on a Video Player device such as a TV. */
 cluster AudioOutput = 1291 {
   revision 1;
 
@@ -10759,7 +10771,7 @@ cluster AudioOutput = 1291 {
   struct OutputInfoStruct {
     int8u index = 0;
     OutputTypeEnum outputType = 1;
-    char_string name = 2;
+    char_string<32> name = 2;
   }
 
   readonly attribute OutputInfoStruct outputList[] = 0;
@@ -10776,7 +10788,7 @@ cluster AudioOutput = 1291 {
 
   request struct RenameOutputRequest {
     int8u index = 0;
-    char_string name = 1;
+    char_string<32> name = 1;
   }
 
   /** Upon receipt, this SHALL change the output on the device to the output at a specific index in the Output List. */
@@ -10785,7 +10797,7 @@ cluster AudioOutput = 1291 {
   command access(invoke: manage) RenameOutput(RenameOutputRequest): DefaultSuccess = 1;
 }
 
-/** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
+/** This cluster provides an interface for launching applications on a Video Player device such as a TV. */
 cluster ApplicationLauncher = 1292 {
   revision 2;
 
@@ -10846,7 +10858,7 @@ cluster ApplicationLauncher = 1292 {
   command HideApp(HideAppRequest): LauncherResponse = 2;
 }
 
-/** This cluster provides information about an application running on a TV or media player device which is represented as an endpoint. */
+/** This cluster provides information about a Content App running on a Video Player device which is represented as an endpoint (see Device Type Library document). */
 cluster ApplicationBasic = 1293 {
   revision 1;
 
@@ -11947,7 +11959,7 @@ cluster WebRTCTransportRequestor = 1364 {
 
 /** This cluster implements the upload of Audio and Video streams from the Push AV Stream Transport Cluster using suitable push-based transports. */
 cluster PushAvStreamTransport = 1365 {
-  revision 3;
+  revision 5;
 
   enum CMAFInterfaceEnum : enum8 {
     kInterface1 = 0;
@@ -12088,6 +12100,7 @@ cluster PushAvStreamTransport = 1365 {
 
   readonly attribute SupportedFormatStruct supportedFormats[] = 0;
   readonly attribute TransportConfigurationStruct currentConnections[] = 1;
+  provisional readonly attribute optional nullable int8u maxZones = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -12131,6 +12144,12 @@ cluster PushAvStreamTransport = 1365 {
     TransportConfigurationStruct transportConfigurations[] = 0;
   }
 
+  request struct UpdateMotionZoneOptionsRequest {
+    int16u connectionID = 0;
+    optional nullable TransportZoneOptionsStruct motionZones[] = 1;
+    optional nullable int8u motionSensitivity = 2;
+  }
+
   /** This command SHALL allocate a transport and return a PushTransportConnectionID. */
   fabric command access(invoke: manage) AllocatePushTransport(AllocatePushTransportRequest): AllocatePushTransportResponse = 0;
   /** This command SHALL be generated to request the Node deallocates the specified transport. */
@@ -12143,6 +12162,8 @@ cluster PushAvStreamTransport = 1365 {
   fabric command ManuallyTriggerTransport(ManuallyTriggerTransportRequest): DefaultSuccess = 5;
   /** This command SHALL return the Transport Configuration for the specified push transport or all allocated transports for the fabric if null. */
   fabric command FindTransport(FindTransportRequest): FindTransportResponse = 6;
+  /** This command is used to selectively modify the motion zones and sensitivity values of the trigger options for a specified push transport. */
+  fabric command UpdateMotionZoneOptions(UpdateMotionZoneOptionsRequest): DefaultSuccess = 8;
 }
 
 /** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */
@@ -12538,7 +12559,7 @@ cluster CommissionerControl = 1873 {
 
   response struct ReverseOpenCommissioningWindow = 2 {
     int16u commissioningTimeout = 0;
-    octet_string PAKEPasscodeVerifier = 1;
+    octet_string<97> PAKEPasscodeVerifier = 1;
     int16u discriminator = 2;
     int32u iterations = 3;
     octet_string<32> salt = 4;

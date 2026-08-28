@@ -31,7 +31,7 @@
 #include <AppEvent.h>
 #include <lib/core/DataModelTypes.h>
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 #include "ClosureUI.h"
 #endif
 
@@ -160,7 +160,7 @@ public:
      */
     const Action_t & GetCurrentAction() const { return mCurrentAction; }
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     /**
      * @brief Gets closure data specifically for UI display.
      *
@@ -168,7 +168,7 @@ public:
      */
     ClosureUIData GetClosureUIData();
 
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 
     /**
      * @brief Checks if a MoveTo action is currently in progress.

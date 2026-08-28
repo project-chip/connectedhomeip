@@ -17,7 +17,6 @@
 
 #include <pw_unit_test/framework.h>
 
-#include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
@@ -40,7 +39,7 @@ using Status = Protocols::InteractionModel::Status;
 using ModeTagStructType    = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 using ModeOptionStructType = chip::app::Clusters::detail::Structs::ModeOptionStruct::DecodableType;
 
-constexpr ClusterId kTestClusterId = DishwasherMode::Id;
+constexpr ClusterEntry kTestCluster = kDishwasherMode;
 
 class TestDiagnosticDataProvider : public DeviceLayer::DiagnosticDataProvider
 {
@@ -115,24 +114,20 @@ struct TestModeBaseCluster : public ::testing::Test
         appDelegate.mLastHandledNewMode    = 0xFF;
         diagnosticDataProvider.mBootReason = GeneralDiagnostics::BootReasonEnum::kUnspecified;
         testContext.StorageDelegate().ClearStorage();
-        ASSERT_EQ(persistenceProvider.Init(&testContext.StorageDelegate()), CHIP_NO_ERROR);
     }
 
     ModeBaseCluster::Config MakeConfig(BitMask<Feature> feature = {}, bool onOffValueForStartUp = false)
     {
         return ModeBaseCluster::Config{
-            .feature                          = feature,
-            .optionalAttributeSet             = optionalAttributeSet,
-            .appDelegate                      = appDelegate,
-            .onOffValueForStartUp             = onOffValueForStartUp,
-            .safeAttributePersistenceProvider = persistenceProvider,
-            .diagnosticDataProvider           = diagnosticDataProvider,
-            .clusterRevision                  = DishwasherMode::kRevision,
+            .feature                = feature,
+            .optionalAttributeSet   = optionalAttributeSet,
+            .appDelegate            = appDelegate,
+            .onOffValueForStartUp   = onOffValueForStartUp,
+            .diagnosticDataProvider = diagnosticDataProvider,
         };
     }
 
     TestServerClusterContext testContext;
-    DefaultSafeAttributePersistenceProvider persistenceProvider;
     TestAppDelegate appDelegate;
     TestDiagnosticDataProvider diagnosticDataProvider;
     ModeBaseCluster::OptionalAttributeSet optionalAttributeSet;
@@ -140,7 +135,7 @@ struct TestModeBaseCluster : public ::testing::Test
 
 TEST_F(TestModeBaseCluster, StartupInitializesCurrentModeToFirstSupportedMode)
 {
-    ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig());
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -151,7 +146,7 @@ TEST_F(TestModeBaseCluster, StartupInitializesCurrentModeToFirstSupportedMode)
 
 TEST_F(TestModeBaseCluster, AttributeListMandatoryOnly)
 {
-    ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig());
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -165,7 +160,7 @@ TEST_F(TestModeBaseCluster, AttributeListMandatoryOnly)
 TEST_F(TestModeBaseCluster, AttributeListWithOptionalAttributes)
 {
     optionalAttributeSet.Set<StartUpMode::Id>();
-    ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig(BitMask<Feature>(Feature::kOnOff)));
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig(BitMask<Feature>(Feature::kOnOff)));
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -180,7 +175,7 @@ TEST_F(TestModeBaseCluster, AttributeListWithOptionalAttributes)
 
 TEST_F(TestModeBaseCluster, AcceptedAndGeneratedCommands)
 {
-    ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig());
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -190,7 +185,7 @@ TEST_F(TestModeBaseCluster, AcceptedAndGeneratedCommands)
 
 TEST_F(TestModeBaseCluster, ReadMandatoryAttributes)
 {
-    ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig());
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -224,7 +219,7 @@ TEST_F(TestModeBaseCluster, ReadMandatoryAttributes)
 TEST_F(TestModeBaseCluster, ReadOptionalAttributes)
 {
     optionalAttributeSet.Set<StartUpMode::Id>();
-    ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig(BitMask<Feature>(Feature::kOnOff)));
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig(BitMask<Feature>(Feature::kOnOff)));
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -244,7 +239,7 @@ TEST_F(TestModeBaseCluster, ReadOptionalAttributes)
 TEST_F(TestModeBaseCluster, WriteStartUpModeAndOnMode)
 {
     optionalAttributeSet.Set<StartUpMode::Id>();
-    ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig(BitMask<Feature>(Feature::kOnOff)));
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig(BitMask<Feature>(Feature::kOnOff)));
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -269,7 +264,7 @@ TEST_F(TestModeBaseCluster, WriteStartUpModeAndOnMode)
 
 TEST_F(TestModeBaseCluster, UpdateCurrentModeRejectsUnsupportedMode)
 {
-    ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig());
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -279,7 +274,7 @@ TEST_F(TestModeBaseCluster, UpdateCurrentModeRejectsUnsupportedMode)
 
 TEST_F(TestModeBaseCluster, ChangeToModeUnsupportedMode)
 {
-    ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig());
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -293,7 +288,7 @@ TEST_F(TestModeBaseCluster, ChangeToModeUnsupportedMode)
 
 TEST_F(TestModeBaseCluster, ChangeToModeSameModeReturnsSuccessWithoutUpdating)
 {
-    ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig());
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -308,7 +303,7 @@ TEST_F(TestModeBaseCluster, ChangeToModeSameModeReturnsSuccessWithoutUpdating)
 
 TEST_F(TestModeBaseCluster, ChangeToModeSuccessUpdatesCurrentMode)
 {
-    ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig());
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -324,7 +319,7 @@ TEST_F(TestModeBaseCluster, ChangeToModeSuccessUpdatesCurrentMode)
 
 TEST_F(TestModeBaseCluster, ChangeToModeDelegateFailureLeavesCurrentModeUnchanged)
 {
-    ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig());
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -344,22 +339,30 @@ TEST_F(TestModeBaseCluster, StartupAppliesStartUpModeOnBoot)
     diagnosticDataProvider.mBootReason = GeneralDiagnostics::BootReasonEnum::kPowerOnReboot;
 
     {
-        ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig());
+        ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig());
         ClusterTester tester(cluster);
         ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
         DataModel::Nullable<uint8_t> startUpMode(1);
         ASSERT_TRUE(tester.WriteAttribute(StartUpMode::Id, startUpMode).IsSuccess());
+
+        testContext.StorageDelegate().CopyFrom(tester.GetTestContext().StorageDelegate());
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
-    ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig());
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig());
     ClusterTester tester(cluster);
+    // We are testing reboot behavior here, so we need to copy the storage from the previous step to restore the persisted state.
+    tester.GetTestContext().StorageDelegate().CopyFrom(testContext.StorageDelegate());
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     uint8_t currentMode = 0xFF;
     ASSERT_EQ(tester.ReadAttribute(CurrentMode::Id, currentMode), CHIP_NO_ERROR);
     EXPECT_EQ(currentMode, 1u);
+
+    DataModel::Nullable<uint8_t> startUpMode;
+    ASSERT_EQ(tester.ReadAttribute(StartUpMode::Id, startUpMode), CHIP_NO_ERROR);
+    EXPECT_EQ(startUpMode.Value(), 1u);
 }
 
 TEST_F(TestModeBaseCluster, StartupIgnoresStartUpModeAfterOtaReboot)
@@ -368,45 +371,65 @@ TEST_F(TestModeBaseCluster, StartupIgnoresStartUpModeAfterOtaReboot)
     diagnosticDataProvider.mBootReason = GeneralDiagnostics::BootReasonEnum::kSoftwareUpdateCompleted;
 
     {
-        ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig());
+        ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig());
         ClusterTester tester(cluster);
         ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
         DataModel::Nullable<uint8_t> startUpMode(1);
         ASSERT_TRUE(tester.WriteAttribute(StartUpMode::Id, startUpMode).IsSuccess());
         ASSERT_TRUE(cluster.UpdateCurrentMode(0) == Status::Success);
+
+        testContext.StorageDelegate().CopyFrom(tester.GetTestContext().StorageDelegate());
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
-    ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig());
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig());
     ClusterTester tester(cluster);
+    // We are testing reboot behavior here, so we need to copy the storage from the previous step to restore the persisted state.
+    tester.GetTestContext().StorageDelegate().CopyFrom(testContext.StorageDelegate());
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     uint8_t currentMode = 0xFF;
     ASSERT_EQ(tester.ReadAttribute(CurrentMode::Id, currentMode), CHIP_NO_ERROR);
     EXPECT_EQ(currentMode, 0u);
+
+    DataModel::Nullable<uint8_t> startUpMode;
+    ASSERT_EQ(tester.ReadAttribute(StartUpMode::Id, startUpMode), CHIP_NO_ERROR);
+    EXPECT_EQ(startUpMode.Value(), 1u);
 }
 
 TEST_F(TestModeBaseCluster, StartupAppliesOnModeWhenOnOffFeatureEnabled)
 {
-    ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig(BitMask<Feature>(Feature::kOnOff), true));
+    {
+        ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig(BitMask<Feature>(Feature::kOnOff), true));
+        ClusterTester tester(cluster);
+        ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+        DataModel::Nullable<uint8_t> onMode(1);
+        ASSERT_TRUE(tester.WriteAttribute(OnMode::Id, onMode).IsSuccess());
+
+        testContext.StorageDelegate().CopyFrom(tester.GetTestContext().StorageDelegate());
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig(BitMask<Feature>(Feature::kOnOff), true));
     ClusterTester tester(cluster);
-    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-
-    DataModel::Nullable<uint8_t> onMode(1);
-    ASSERT_TRUE(tester.WriteAttribute(OnMode::Id, onMode).IsSuccess());
-
-    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    // We are testing reboot behavior here, so we need to copy the storage from the previous step to restore the persisted state.
+    tester.GetTestContext().StorageDelegate().CopyFrom(testContext.StorageDelegate());
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     uint8_t currentMode = 0xFF;
     ASSERT_EQ(tester.ReadAttribute(CurrentMode::Id, currentMode), CHIP_NO_ERROR);
     EXPECT_EQ(currentMode, 1u);
+
+    DataModel::Nullable<uint8_t> onMode;
+    ASSERT_EQ(tester.ReadAttribute(OnMode::Id, onMode), CHIP_NO_ERROR);
+    EXPECT_EQ(onMode.Value(), 1u);
 }
 
 TEST_F(TestModeBaseCluster, GetModeValueByModeTag)
 {
-    ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig());
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -419,7 +442,7 @@ TEST_F(TestModeBaseCluster, GetModeValueByModeTag)
 
 TEST_F(TestModeBaseCluster, IsSupportedMode)
 {
-    ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig());
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -430,7 +453,7 @@ TEST_F(TestModeBaseCluster, IsSupportedMode)
 
 TEST_F(TestModeBaseCluster, ReportSupportedModesChangeNotifiesAttribute)
 {
-    ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig());
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 

@@ -3,12 +3,16 @@
 not_automated:
     - name: TC_DD_3_23.py
       reason:
-          NFC-Thread hardware setup needed for running this test-case and CI
-          does not support it
+          NFC Reader needed for running this test-case and CI does not support
+          it
     - name: TC_DD_3_24.py
       reason:
-          NFC-Thread hardware setup needed for running this test-case and CI
-          does not support it
+          NFC Reader needed for running this test-case and CI does not support
+          it
+    - name: TC_IDM_10_7.py
+      reason:
+          NFC Reader needed for running this test-case and CI does not support
+          it
     - name: TC_SC_TC_2_1.py
       reason: Test requires Thread MeshCoP hardware or simulation.
     - name: TC_SC_TC_2_2.py
@@ -46,6 +50,8 @@ not_automated:
     - name: TC_CNET_4_16.py
       reason: Can not run thread CNET tests in CI
     - name: TC_CNET_4_22.py
+      reason: It has no CI execution block, is not executed in CI
+    - name: TC_CNET_4_23.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_DGGEN_3_2.py
       reason:
@@ -172,6 +178,8 @@ not_automated:
       reason: Shared code for TC_TLSCERT, not a standalone test
     - name: TC_TLSCLIENT_Base.py
       reason: Shared code for TC_TLSCLIENT, not a standalone test
+    - name: TC_TSTAT_Utils.py
+      reason: Shared code for TSTAT TCs, not a standalone test.
     - name: TC_DD_1_5.py
       reason:
           No existing app corresponding to the test content (NFC-based

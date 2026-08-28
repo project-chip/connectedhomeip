@@ -57,7 +57,8 @@ class TC_SMOKECO_2_3(SmokeCoBaseTest):
 
     def steps_TC_SMOKECO_2_3(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT to TH"),
+            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).",
+                     "DUT is commissioned to TH.", is_commissioning=True),
             TestStep(2, "TH subscribes to COState attribute from DUT", "Verify that COState attribute has a value of 0 (Normal)"),
             TestStep(3, "TH reads ExpressedState attribute from DUT",
                      "Verify that ExpressedState attribute has a value of 0 (Normal)"),
