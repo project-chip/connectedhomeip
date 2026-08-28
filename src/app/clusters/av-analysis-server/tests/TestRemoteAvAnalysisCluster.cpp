@@ -176,7 +176,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ReadAllAttributesWithClusterTesterTest)
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::SupportedAmbientContexts::Id, aSupportedAmbientContexts), CHIP_NO_ERROR);
 
     // Verify that the entries in the DecodableList match the entries used in construction of the instance by
-    // creating a vactor of the values then comparing the two vectors
+    // creating a vector of the values then comparing the two vectors
     std::vector<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> readContexts;
     auto aContextIterator = aSupportedAmbientContexts.begin();
     while (aContextIterator.Next())
@@ -929,6 +929,34 @@ TEST_F(TestRemoteAvAnalysisCluster, AnalysisStreamTableDecodeRejectsDuplicateIds
 
     // The rejected blob degrades to an empty table, same as any other corruption
     ASSERT_EQ(restored.Count(), 0);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, AnalysisStreamTableDecodeRejectsOutOfRangeIdCounter)
+{
+    // Hand-build a blob in Encode()'s layout whose next-id counter is 65535: the generator never
+    // leaves the counter above 65534 (the AnalysisStreamID ceiling of spec 11.9.5.3), so accepting
+    // such a blob would mint one out-of-range id.
+    uint8_t buffer[32];
+    TLV::TLVWriter writer;
+    writer.Init(buffer, sizeof(buffer));
+    TLV::TLVType outerType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.Put(TLV::ContextTag(0), static_cast<uint16_t>(65535)), CHIP_NO_ERROR);
+    TLV::TLVType arrayType;
+    ASSERT_EQ(writer.StartContainer(TLV::ContextTag(1), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.EndContainer(outerType), CHIP_NO_ERROR);
+
+    AnalysisStreamTable restored;
+    ASSERT_EQ(restored.Init(2), CHIP_NO_ERROR);
+    TLV::TLVReader reader;
+    reader.Init(buffer, writer.GetLengthWritten());
+    ASSERT_EQ(restored.Decode(reader), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // The rejected blob leaves a usable table minting ids from the start again
+    AnalysisStreamEntry * added = restored.Add(10, ScopedNodeId(0xABCD, 1));
+    ASSERT_NE(added, nullptr);
+    ASSERT_EQ(added->analysisStreamID, 0);
 }
 
 TEST_F(TestRemoteAvAnalysisCluster, AnalysisStreamTableDecodeFailureLeavesTableEmpty)

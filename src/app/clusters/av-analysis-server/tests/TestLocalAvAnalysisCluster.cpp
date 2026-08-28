@@ -240,7 +240,7 @@ TEST_F(TestLocalAvAnalysisCluster, ReadAllAttributesWithClusterTesterTest)
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::SupportedAmbientContexts::Id, aSupportedAmbientContexts), CHIP_NO_ERROR);
 
     // Verify that the entries in the DecodableList match the entries used in construction of the instance by
-    // creating a vactor of the values then comparing the two vectors
+    // creating a vector of the values then comparing the two vectors
     std::vector<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> readContexts;
     auto aContextIterator = aSupportedAmbientContexts.begin();
     while (aContextIterator.Next())

@@ -93,7 +93,7 @@ public:
      * called by the interaction model at the appropriate times.
      * @param aEndpointId               The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aFeatures                 The bitflags value that identifies which features are supported by this instance.
-     * @param aSupportedAmbientContexts The set of Ambient Contextx that this server is capable of detecting
+     * @param aSupportedAmbientContexts The set of Ambient Contexts that this server is capable of detecting
      * @param aMaxZones                 The maximum number of zones present on the server. Shall be Null if PerZoneSensitivity is
      * not set.
      * @param aMaxAnalysisStreamCount   The fixed value of the MaxAnalysisStreamCount attribute. Shall be non-zero if
@@ -203,7 +203,7 @@ public:
 
     /**
      * Invoked by the delegate to indicate the conclusion of an analysis session that has been triggered. It is up to the
-     * delegate to determine the criteria for determing that a session has concluded.
+     * delegate to determine the criteria for determining that a session has concluded.
      *
      * @param aSessionId         the sessionId for the current session, the method will fail if this is not known by the server
      */

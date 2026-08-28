@@ -23,7 +23,6 @@
 #include <app/CommandHandler.h>
 #include <app/clusters/av-analysis-server/AvAnalysisCameraClient.h>
 #include <app/clusters/av-analysis-server/AvAnalysisCameraInteraction.h>
-#include <app/clusters/av-analysis-server/AvAnalysisCluster.h>
 #include <app/clusters/av-analysis-server/AvAnalysisStorage.h>
 #include <app/clusters/av-analysis-server/AvAnalysisStreamTable.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
@@ -54,7 +53,7 @@ public:
      * called by the interaction model at the appropriate times.
      * @param aEndpointId               The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aFeatures                 The bitflags value that identifies which features are supported by this instance.
-     * @param aSupportedAmbientContexts The set of Ambient Contextx that this server is capable of detecting
+     * @param aSupportedAmbientContexts The set of Ambient Contexts that this server is capable of detecting
      * @param aMaxZones                 The maximum number of zones present on the server. Shall be Null if PerZoneSensitivity is
      * not set. Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      * @param aMaxAnalysisStreamCount   The fixed value of the MaxAnalysisStreamCount attribute. Shall be non-zero if

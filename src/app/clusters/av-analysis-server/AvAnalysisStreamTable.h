@@ -218,6 +218,7 @@ private:
 
         ReturnErrorOnFailure(aReader.Next(TLV::ContextTag(kPersistedTagNextStreamId)));
         ReturnErrorOnFailure(aReader.Get(mNextAnalysisStreamId));
+        VerifyOrReturnError(mNextAnalysisStreamId <= kMaxAnalysisStreamId, CHIP_ERROR_INVALID_ARGUMENT);
 
         ReturnErrorOnFailure(aReader.Next(TLV::kTLVType_Array, TLV::ContextTag(kPersistedTagEntries)));
         TLV::TLVType arrayType;

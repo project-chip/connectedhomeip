@@ -77,19 +77,29 @@ public:
     {
         mState  = State::kIdle;
         mHandle = CommandHandler::Handle();
+        ClearInteractionState();
     }
 
     /**
-     * Ends the interaction: returns the parked handle
+     * Ends the interaction: returns the parked handle. The camera node and stream id are cleared,
+     * so callers needing them must read them before completing.
      */
     CommandHandler::Handle Complete(ConcreteCommandPath & outPath)
     {
         outPath = mPath;
         mState  = State::kIdle;
+        ClearInteractionState();
         return std::move(mHandle);
     }
 
 private:
+    void ClearInteractionState()
+    {
+        mAnalysisStreamId = 0;
+        mCameraNode       = ScopedNodeId();
+        mPath             = ConcreteCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
+    }
+
     State mState               = State::kIdle;
     uint16_t mAnalysisStreamId = 0;
     CommandHandler::Handle mHandle;

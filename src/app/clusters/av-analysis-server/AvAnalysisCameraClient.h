@@ -84,7 +84,8 @@ public:
                                                       Callback & aCallback) = 0;
 
     /**
-     * Abandons any in-flight request
+     * Abandons any in-flight request; its callback is never delivered. Safe to call from within a
+     * completion callback: the request is already finished by then, making this a no-op.
      */
     virtual void Cancel() = 0;
 };

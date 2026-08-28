@@ -235,7 +235,7 @@ CHIP_ERROR AvAnalysisServerLogic::Attributes(ReadOnlyBufferBuilder<DataModel::At
 {
     AttributeListBuilder listBuilder(builder);
 
-    // Attributes tat are set dependent on the Feature Flags
+    // Attributes that are set dependent on the Feature Flags
     AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
         { HasFeature(Feature::kRemoteContextDetection), MaxAnalysisStreamCount::kMetadataEntry },
         { HasFeature(Feature::kRemoteContextDetection), CurrentAnalysisStreamCount::kMetadataEntry },
@@ -305,7 +305,7 @@ CHIP_ERROR AvAnalysisServerLogic::SetTrackingEnabled(bool aTrackingEnabled)
 }
 
 /**
- * Persistence handling helper, stores the current value of the ActiveAmbientContextTriggers attribiute in the KVS
+ * Persistence handling helper, stores the current value of the ActiveAmbientContextTriggers attribute in the KVS
  */
 CHIP_ERROR AvAnalysisServerLogic::StoreActiveAmbientContextTriggers()
 {
@@ -357,7 +357,7 @@ CHIP_ERROR AvAnalysisServerLogic::StoreActiveAmbientContextTriggers()
 }
 
 /**
- * Persistence handling helper, reads the current value of the ActiveAmbientContextTriggers attribiute from the KVS
+ * Persistence handling helper, reads the current value of the ActiveAmbientContextTriggers attribute from the KVS
  */
 CHIP_ERROR AvAnalysisServerLogic::LoadActiveAmbientContextTriggers()
 {
@@ -628,7 +628,7 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalE
 
             VerifyOrReturnError(it != mSupportedAmbientContexts.end(), Status::ConstraintError);
 
-            // The trigger context is valid, now check the ZoneIDs, which can only be present of PERZONEDETECT is set, likewise,
+            // The trigger context is valid, now check the ZoneIDs, which can only be present if PERZONEDETECT is set, likewise,
             // if we have the feature, then ZoneIDs have to be present
             //
             bool hasZoneIDs        = contextTrigger.zoneIDs.HasValue();
@@ -673,7 +673,7 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalE
             VerifyOrReturnError(mDelegate->CanAddContextTriggers(), Status::ResourceExhausted);
 
             // Update our active trigger set with this new context.
-            // If the context exists, update the zone IDs, otherise add a new entry
+            // If the context exists, update the zone IDs, otherwise add a new entry
             //
             auto it2 = std::find_if(mActiveAmbientContextTriggers.begin(), mActiveAmbientContextTriggers.end(),
                                     [&contextTrigger](AvAnalysis::AmbientContextStorage acs) {
@@ -808,7 +808,7 @@ AvAnalysisServerLogic::HandleDisableContextTriggers(CommandHandler & handler, co
                 return Status::DynamicConstraintError;
             }
 
-            // The trigger context is valid, now check the ZoneIDs, which can only be present of PERZONEDETECT is set, likewise,
+            // The trigger context is valid, now check the ZoneIDs, which can only be present if PERZONEDETECT is set, likewise,
             // if we have the feature, then ZoneIDs have to be present
             //
             bool hasZoneIDs = contextTrigger.zoneIDs.HasValue();
