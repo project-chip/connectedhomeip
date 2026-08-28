@@ -76,8 +76,8 @@ private:
 class CodegenModeSelectCluster : public ModeSelectCluster
 {
 public:
-    using ModeSelectCluster::ModeSelectCluster;
     using ModeSelectCluster::ApplyStartupModeLogic;
+    using ModeSelectCluster::ModeSelectCluster;
 };
 
 struct ModeSelectEntry
