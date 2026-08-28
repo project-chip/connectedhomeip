@@ -77,6 +77,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/commissioner-control-server/tests",
       "${chip_root}/src/app/clusters/commissioning-proxy-server/tests",
       "${chip_root}/src/app/clusters/commodity-tariff-server/tests",
+      "${chip_root}/src/app/clusters/commodity-price-server/tests",
       "${chip_root}/src/app/clusters/concentration-measurement-server/tests",
       "${chip_root}/src/app/clusters/content-launch-server/tests",
       "${chip_root}/src/app/clusters/descriptor/tests",
