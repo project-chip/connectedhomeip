@@ -19,6 +19,7 @@
 
 #include <app/data-model/Nullable.h>
 #include <app/util/basic-types.h>
+#include <app/util/endpoint-config-defines.h>
 #include <cstdint>
 #include <lib/support/Span.h>
 #include <lib/support/attribute-storage-null-handling.h>
@@ -162,6 +163,11 @@ struct EmberAfAttributeMetadata
     EmberAfAttributeMask mask;
 
     /**
+     * Check whether this attribute was declared with an empty default (ZAP_EMPTY_DEFAULT()).
+     */
+    bool HasEmptyDefault() const { return defaultValue.ptrToDefaultValue == &chip::app::sZapEmptyDefaultSentinel; }
+
+    /**
      * Check wether this attribute is a boolean based on its type according to the spec.
      */
     bool IsBoolean() const;
@@ -271,10 +277,14 @@ struct AttributeDefaultValue
         return Traits::StorageToWorking(temp);
     }
 
-    /// Decodes a nullable scalar default into DataModel::Nullable<WorkingType>.
+    /// Decodes a nullable scalar default into DataModel::Nullable<WorkingType> (returns Null if rawData is empty).
     template <typename T>
     DataModel::Nullable<typename NumericAttributeTraits<T>::WorkingType> AsNullable() const
     {
+        if (rawData.empty())
+        {
+            return DataModel::Nullable<typename NumericAttributeTraits<T>::WorkingType>();
+        }
         using Traits = NumericAttributeTraits<T>;
         typename Traits::StorageType temp;
         CopyScalar(&temp, sizeof(temp));

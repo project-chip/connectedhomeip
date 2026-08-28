@@ -58,14 +58,21 @@ DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(sTestDynamicAttrs)
     DECLARE_DYNAMIC_ATTRIBUTE_WITH_STRING_DEFAULT(0x000C, LONG_CHAR_STRING, 64, MATTER_ATTRIBUTE_FLAG_NULLABLE, sTestNullLongStringDefault),
     DECLARE_DYNAMIC_ATTRIBUTE_WITH_SCALAR_DEFAULT(0x000D, INT8U, 1, MATTER_ATTRIBUTE_FLAG_NULLABLE, 0xFF),
     DECLARE_DYNAMIC_ATTRIBUTE_WITH_SCALAR_DEFAULT(0x000E, INT8U, 1, MATTER_ATTRIBUTE_FLAG_NULLABLE, 10),
+    DECLARE_DYNAMIC_ATTRIBUTE(0x000F, INT16S, 2, MATTER_ATTRIBUTE_FLAG_NULLABLE),
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END_WITH_REVISION(3);
 // clang-format on
 
 TEST(TestDynamicAttributeMetadata, EmptyDefault)
 {
     AttributeDefaultValue val;
+    EXPECT_TRUE(sTestDynamicAttrs[0].HasEmptyDefault());
     EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[0], val), Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(val.As<uint8_t>(), 0);
+
+    // Nullable attribute with empty default -> Null
+    EXPECT_TRUE(sTestDynamicAttrs[14].HasEmptyDefault());
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[14], val), Protocols::InteractionModel::Status::Success);
+    EXPECT_TRUE(val.AsNullable<int16_t>().IsNull());
 }
 
 TEST(TestDynamicAttributeMetadata, ScalarDefaults)
@@ -144,11 +151,51 @@ TEST(TestDynamicAttributeMetadata, NullableDefaults)
     EXPECT_EQ(nullableU8Val.Value(), 10);
 }
 
+TEST(TestDynamicAttributeMetadata, EmptyRawDataSemantics)
+{
+    AttributeDefaultValue val;
+    val.rawData = ByteSpan();
+
+    // Non-nullable scalars: 0-fill
+    EXPECT_EQ(val.As<uint8_t>(), 0);
+    EXPECT_EQ(val.As<uint16_t>(), 0);
+    EXPECT_EQ(val.As<uint32_t>(), 0u);
+    EXPECT_EQ(val.As<int16_t>(), 0);
+    EXPECT_FALSE(val.As<bool>());
+
+    // Nullable scalars: Null
+    EXPECT_TRUE(val.AsNullable<uint8_t>().IsNull());
+    EXPECT_TRUE(val.AsNullable<uint16_t>().IsNull());
+    EXPECT_TRUE(val.AsNullable<uint32_t>().IsNull());
+    EXPECT_TRUE(val.AsNullable<int16_t>().IsNull());
+    EXPECT_TRUE(val.AsNullable<bool>().IsNull());
+
+    // Non-nullable strings: empty span
+    val.type = ZCL_CHAR_STRING_ATTRIBUTE_TYPE;
+    EXPECT_TRUE(val.ToCharSpan().empty());
+    val.type = ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE;
+    EXPECT_TRUE(val.ToCharSpan().empty());
+    val.type = ZCL_OCTET_STRING_ATTRIBUTE_TYPE;
+    EXPECT_TRUE(val.ToByteSpan().empty());
+    val.type = ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE;
+    EXPECT_TRUE(val.ToByteSpan().empty());
+
+    // Nullable strings: Null
+    val.type = ZCL_CHAR_STRING_ATTRIBUTE_TYPE;
+    EXPECT_TRUE(val.ToNullableCharSpan().IsNull());
+    val.type = ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE;
+    EXPECT_TRUE(val.ToNullableCharSpan().IsNull());
+    val.type = ZCL_OCTET_STRING_ATTRIBUTE_TYPE;
+    EXPECT_TRUE(val.ToNullableByteSpan().IsNull());
+    val.type = ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE;
+    EXPECT_TRUE(val.ToNullableByteSpan().IsNull());
+}
+
 TEST(TestDynamicAttributeMetadata, ClusterRevision)
 {
     AttributeDefaultValue val;
-    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[14], val), Protocols::InteractionModel::Status::Success);
-    EXPECT_EQ(sTestDynamicAttrs[14].attributeId, 0xFFFDu);
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[15], val), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(sTestDynamicAttrs[15].attributeId, 0xFFFDu);
     EXPECT_EQ(val.As<uint16_t>(), 3);
 }
 

@@ -23,6 +23,12 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
 
+namespace chip {
+namespace app {
+const uint8_t sZapEmptyDefaultSentinel = 0;
+} // namespace app
+} // namespace chip
+
 bool EmberAfAttributeMetadata::IsBoolean() const
 {
     return attributeType == ZCL_BOOLEAN_ATTRIBUTE_TYPE;
@@ -106,58 +112,58 @@ ByteSpan AttributeDefaultValue::ToByteSpan() const
 
 DataModel::Nullable<CharSpan> AttributeDefaultValue::ToNullableCharSpan() const
 {
-    VerifyOrReturnValue(!rawData.empty(), DataModel::Nullable<CharSpan>(CharSpan()));
+    VerifyOrReturnValue(!rawData.empty(), DataModel::Nullable<CharSpan>());
     if (emberAfIsLongStringAttributeType(type))
     {
-        VerifyOrReturnValue(rawData.size() >= 2, DataModel::Nullable<CharSpan>(CharSpan()));
+        VerifyOrReturnValue(rawData.size() >= 2, DataModel::Nullable<CharSpan>());
         uint16_t len = Encoding::LittleEndian::Get16(rawData.data());
         if (len == 0xFFFF)
         {
             return DataModel::Nullable<CharSpan>();
         }
-        VerifyOrReturnValue(rawData.size() >= static_cast<size_t>(2 + len), DataModel::Nullable<CharSpan>(CharSpan()));
+        VerifyOrReturnValue(rawData.size() >= static_cast<size_t>(2 + len), DataModel::Nullable<CharSpan>());
         return DataModel::Nullable<CharSpan>(CharSpan(reinterpret_cast<const char *>(rawData.data() + 2), len));
     }
     if (emberAfIsStringAttributeType(type))
     {
-        VerifyOrReturnValue(rawData.size() >= 1, DataModel::Nullable<CharSpan>(CharSpan()));
+        VerifyOrReturnValue(rawData.size() >= 1, DataModel::Nullable<CharSpan>());
         uint8_t len = rawData[0];
         if (len == 0xFF)
         {
             return DataModel::Nullable<CharSpan>();
         }
-        VerifyOrReturnValue(rawData.size() >= static_cast<size_t>(1 + len), DataModel::Nullable<CharSpan>(CharSpan()));
+        VerifyOrReturnValue(rawData.size() >= static_cast<size_t>(1 + len), DataModel::Nullable<CharSpan>());
         return DataModel::Nullable<CharSpan>(CharSpan(reinterpret_cast<const char *>(rawData.data() + 1), len));
     }
-    return DataModel::Nullable<CharSpan>(CharSpan());
+    return DataModel::Nullable<CharSpan>();
 }
 
 DataModel::Nullable<ByteSpan> AttributeDefaultValue::ToNullableByteSpan() const
 {
-    VerifyOrReturnValue(!rawData.empty(), DataModel::Nullable<ByteSpan>(ByteSpan()));
+    VerifyOrReturnValue(!rawData.empty(), DataModel::Nullable<ByteSpan>());
     if (emberAfIsLongStringAttributeType(type))
     {
-        VerifyOrReturnValue(rawData.size() >= 2, DataModel::Nullable<ByteSpan>(ByteSpan()));
+        VerifyOrReturnValue(rawData.size() >= 2, DataModel::Nullable<ByteSpan>());
         uint16_t len = Encoding::LittleEndian::Get16(rawData.data());
         if (len == 0xFFFF)
         {
             return DataModel::Nullable<ByteSpan>();
         }
-        VerifyOrReturnValue(rawData.size() >= static_cast<size_t>(2 + len), DataModel::Nullable<ByteSpan>(ByteSpan()));
+        VerifyOrReturnValue(rawData.size() >= static_cast<size_t>(2 + len), DataModel::Nullable<ByteSpan>());
         return DataModel::Nullable<ByteSpan>(ByteSpan(rawData.data() + 2, len));
     }
     if (emberAfIsStringAttributeType(type))
     {
-        VerifyOrReturnValue(rawData.size() >= 1, DataModel::Nullable<ByteSpan>(ByteSpan()));
+        VerifyOrReturnValue(rawData.size() >= 1, DataModel::Nullable<ByteSpan>());
         uint8_t len = rawData[0];
         if (len == 0xFF)
         {
             return DataModel::Nullable<ByteSpan>();
         }
-        VerifyOrReturnValue(rawData.size() >= static_cast<size_t>(1 + len), DataModel::Nullable<ByteSpan>(ByteSpan()));
+        VerifyOrReturnValue(rawData.size() >= static_cast<size_t>(1 + len), DataModel::Nullable<ByteSpan>());
         return DataModel::Nullable<ByteSpan>(ByteSpan(rawData.data() + 1, len));
     }
-    return DataModel::Nullable<ByteSpan>(ByteSpan());
+    return DataModel::Nullable<ByteSpan>();
 }
 
 void AttributeDefaultValue::CopyScalar(void * outBuffer, size_t bufferSize) const
@@ -184,6 +190,12 @@ Status emberAfGetAttributeDefaultValue(const EmberAfAttributeMetadata * am, Attr
     VerifyOrReturnError(am != nullptr, Status::UnsupportedAttribute);
 
     outDefault.type = am->attributeType;
+
+    if (am->HasEmptyDefault())
+    {
+        outDefault.rawData = ByteSpan();
+        return Status::Success;
+    }
 
     const bool isLongString  = emberAfIsLongStringAttributeType(am->attributeType);
     const bool isShortString = emberAfIsStringAttributeType(am->attributeType);
