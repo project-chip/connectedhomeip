@@ -36,7 +36,7 @@
 # test-runner-runs:
 #   run2:
 #     app: ${ALL_DEVICES_APP}
-#     app-args:
+#     app-args: >
 #       --device on-off-light:1
 #       --discriminator 1234
 #       --KVS kvs1
