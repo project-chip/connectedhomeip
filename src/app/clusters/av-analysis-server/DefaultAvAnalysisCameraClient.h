@@ -25,6 +25,7 @@
 #include <app/clusters/av-analysis-server/AvAnalysisCameraClient.h>
 #include <clusters/CameraAvStreamManagement/Commands.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/TypeTraits.h>
 #include <transport/SessionHolder.h>
 
 namespace chip {
@@ -50,17 +51,28 @@ public:
      */
     struct CameraProfile
     {
+        static constexpr uint16_t kDefaultMinFrameRate  = 15;
+        static constexpr uint16_t kDefaultMaxFrameRate  = 30;
+        static constexpr uint16_t kDefaultMinWidth      = 640;
+        static constexpr uint16_t kDefaultMinHeight     = 480;
+        static constexpr uint16_t kDefaultMaxWidth      = 1920;
+        static constexpr uint16_t kDefaultMaxHeight     = 1080;
+        static constexpr uint32_t kDefaultMinBitRateBps = 500000;
+        static constexpr uint32_t kDefaultMaxBitRateBps = 2000000;
+
+        // Discovered per request, invalid until the Descriptor read finds the AVSM endpoint
         EndpointId avsmEndpoint = kInvalidEndpointId;
         bool hasWatermark       = false;
         bool hasOSD             = false;
-        uint16_t minFrameRate   = 0;
-        uint16_t maxFrameRate   = 0;
-        uint16_t minWidth       = 0;
-        uint16_t minHeight      = 0;
-        uint16_t maxWidth       = 0;
-        uint16_t maxHeight      = 0;
-        uint32_t minBitRateBps  = 0;
-        uint32_t maxBitRateBps  = 0;
+
+        uint16_t minFrameRate  = kDefaultMinFrameRate;
+        uint16_t maxFrameRate  = kDefaultMaxFrameRate;
+        uint16_t minWidth      = kDefaultMinWidth;
+        uint16_t minHeight     = kDefaultMinHeight;
+        uint16_t maxWidth      = kDefaultMaxWidth;
+        uint16_t maxHeight     = kDefaultMaxHeight;
+        uint32_t minBitRateBps = kDefaultMinBitRateBps;
+        uint32_t maxBitRateBps = kDefaultMaxBitRateBps;
     };
 
     DefaultAvAnalysisCameraClient() :
@@ -116,15 +128,149 @@ protected:
     void OnProfileDiscoveryComplete(CHIP_ERROR aError);
 
     /**
-     * Fills a profile with the built-in default stream constraints; discovery overrides them with
-     * camera-reported values.
+     * One camera request, from the first CASE attempt to the camera's answer.
+     *
+     * Reaching the camera is a multi-step asynchronous sequence, so the phase says which step is
+     * outstanding and therefore which callback is legitimate; the rest is the state that lives
+     * exactly as long as the request does. Exactly one request exists at a time.
+     *
+     *   kIdle -> kConnecting -> kDiscoveringEndpoint -> kDiscoveringCapabilities -> kInvoking -> kIdle
+     *                                    (a deallocation skips the capabilities read)
      */
-    static void FillProfileDefaults(CameraProfile & outProfile);
+    class Request
+    {
+    public:
+        enum class Phase : uint8_t
+        {
+            kIdle,                    // No request in flight
+            kConnecting,              // Awaiting a CASE session with the camera
+            kDiscoveringEndpoint,     // Wildcard Descriptor ServerList read locating the AVSM endpoint
+            kDiscoveringCapabilities, // Targeted read of the AVSM capability attributes
+            kInvoking,                // Command sent, awaiting the camera's answer
+        };
+
+        enum class CommandType : uint8_t
+        {
+            kVideoStreamAllocate,
+            kVideoStreamDeallocate,
+        };
+
+        Phase GetPhase() const { return mPhase; }
+        bool InPhase(Phase aPhase) const { return mPhase == aPhase; }
+        bool InFlight() const { return mPhase != Phase::kIdle; }
+        void Advance(Phase aPhase) { mPhase = aPhase; }
+
+        CommandType GetCommandType() const { return mCommandType; }
+        uint16_t VideoStreamId() const { return mVideoStreamId; }
+        CameraProfile & Profile() { return mProfile; }
+        const CameraProfile & Profile() const { return mProfile; }
+
+        /**
+         * Starts a request in kConnecting. The callback is delivered exactly once, by TakeCallback().
+         */
+        void Begin(CommandType aCommandType, uint16_t aVideoStreamId, AvAnalysisCameraClient::Callback & aCallback)
+        {
+            Reset();
+            mPhase         = Phase::kConnecting;
+            mCommandType   = aCommandType;
+            mVideoStreamId = aVideoStreamId;
+            mCallback      = &aCallback;
+        }
+
+        /**
+         * Returns the callback owed the outcome, or nullptr when it was already delivered (or the
+         * request was cancelled). Delivering is therefore exactly-once by construction.
+         */
+        AvAnalysisCameraClient::Callback * TakeCallback()
+        {
+            auto * callback = mCallback;
+            mCallback       = nullptr;
+            return callback;
+        }
+
+        // Session held from kConnecting until the request ends
+        void HoldSession(const SessionHandle & aSession, Messaging::ExchangeManager & aExchangeMgr)
+        {
+            mSessionHolder.Grab(aSession);
+            mExchangeMgr = &aExchangeMgr;
+        }
+        bool HasSession() const { return mSessionHolder && mExchangeMgr != nullptr; }
+
+        Optional<SessionHandle> Session() const { return mSessionHolder.Get(); }
+        Messaging::ExchangeManager & ExchangeManager() const { return *mExchangeMgr; }
+
+        // The sender this request invoked with, if any. A CommandSender callback that does not
+        // carry this pointer belongs to an interaction this request has already finished with.
+        void SetInvokedSender(CommandSender * aSender) { mInvokedSender = aSender; }
+        bool WasInvokedBy(const CommandSender * aSender) const { return mInvokedSender == aSender; }
+
+        // Discovery outcome; the error only annotates the log, the flag fails an allocation early
+        void SetDiscoveryError(CHIP_ERROR aError) { mDiscoveryError = aError; }
+        CHIP_ERROR DiscoveryError() const { return mDiscoveryError; }
+        void SetAnalysisUsageSupported(bool aSupported) { mAnalysisUsageSupported = aSupported; }
+        bool AnalysisUsageSupported() const { return mAnalysisUsageSupported; }
+
+        /**
+         * Which capability attributes the camera has reported. All of them are Fixed and mandatory
+         * for a camera that serves video (VideoSensorParams and RateDistortionTradeOffPoints under
+         * the AVSM Video feature, SupportedStreamUsages unconditionally), so a missing one means a
+         * lost report or a non-conformant camera, not an attribute the camera opted out of. An
+         * allocation built on the built-in defaults instead would send constraints we invented, and
+         * without the FeatureMap it would omit WatermarkEnabled/OSDEnabled where the camera
+         * requires them, which the camera must reject.
+         */
+        enum class Capability : uint8_t
+        {
+            kFeatureMap                   = 0x01,
+            kVideoSensorParams            = 0x02,
+            kRateDistortionTradeOffPoints = 0x04,
+            kSupportedStreamUsages        = 0x08,
+        };
+        static constexpr uint8_t kAllCapabilities = 0x0F;
+
+        void MarkCapabilityReported(Capability aCapability)
+        {
+            mCapabilitiesSeen = static_cast<uint8_t>(mCapabilitiesSeen | to_underlying(aCapability));
+        }
+        bool AllCapabilitiesReported() const { return mCapabilitiesSeen == kAllCapabilities; }
+        uint8_t MissingCapabilities() const { return static_cast<uint8_t>(kAllCapabilities & ~mCapabilitiesSeen); }
+
+        void Reset() { *this = Request{}; }
+
+    private:
+        Phase mPhase                                 = Phase::kIdle;
+        CommandType mCommandType                     = CommandType::kVideoStreamAllocate;
+        uint16_t mVideoStreamId                      = 0;
+        AvAnalysisCameraClient::Callback * mCallback = nullptr;
+        CameraProfile mProfile;
+        SessionHolder mSessionHolder;
+        Messaging::ExchangeManager * mExchangeMgr = nullptr;
+        CommandSender * mInvokedSender            = nullptr;
+        CHIP_ERROR mDiscoveryError                = CHIP_NO_ERROR;
+        bool mAnalysisUsageSupported              = true;
+        uint8_t mCapabilitiesSeen                 = 0;
+    };
+
+    /**
+     * The request in flight
+     */
+    Request & CurrentRequest() { return mRequest; }
 
     /**
      * Profile being assembled for the pending request.
      */
-    const CameraProfile & CurrentProfile() const { return mProfile; }
+    const CameraProfile & CurrentProfile() const { return mRequest.Profile(); }
+
+    /**
+     * Reconciles the profile's bounds once every capability report is in, so the result does not
+     * depend on the order they arrived in.
+     *
+     * Which side yields depends on where the bound came from. The resolution and frame-rate maximums
+     * are the camera's own VideoSensorParams, a hard ceiling, so a minimum above them yields - asking
+     * for more than the sensor can produce would be rejected. Nothing publishes a maximum bit rate,
+     * so ours is only a preference and it rises to meet a camera-reported minimum instead.
+     */
+    static void NormalizeProfile(CameraProfile & aProfile);
 
     /**
      * Builds the VideoStreamAllocate request (StreamUsage Analysis) from a camera profile.
@@ -132,37 +278,21 @@ protected:
     static CameraAvStreamManagement::Commands::VideoStreamAllocate::Type BuildAllocateRequest(const CameraProfile & aProfile);
 
     /**
-     * Discovery report decoders, dispatched from OnAttributeData by discovery phase. Protected so
-     * unit tests can feed crafted reports without a live read.
+     * Discovery report decoders, dispatched from OnAttributeData by discovery phase
      */
     void HandleServerListReport(const ConcreteDataAttributePath & aPath, TLV::TLVReader & aData);
     void HandleCapabilityReport(const ConcreteDataAttributePath & aPath, TLV::TLVReader & aData);
 
-    /**
-     * False only when SupportedStreamUsages was read successfully and lacks Analysis.
-     */
-    bool AnalysisUsageSupported() const { return mAnalysisUsageSupported; }
-
 private:
-    enum class PendingRequest : uint8_t
-    {
-        kNone,
-        kAllocate,
-        kDeallocate,
-    };
-
-    enum class DiscoveryPhase : uint8_t
-    {
-        kIdle,
-        kFindEndpoint,     // Wildcard Descriptor ServerList read locating the AVSM endpoint
-        kReadCapabilities, // Targeted read of the AVSM capability attributes on that endpoint
-    };
-
-    CHIP_ERROR StartRequest(PendingRequest aRequest, const ScopedNodeId & aCameraNode, uint16_t aVideoStreamId,
+    CHIP_ERROR StartRequest(Request::CommandType aCommandType, const ScopedNodeId & aCameraNode, uint16_t aVideoStreamId,
                             AvAnalysisCameraClient::Callback & aCallback);
-    CHIP_ERROR SendPendingCommand(Messaging::ExchangeManager & aExchangeMgr, const SessionHandle & aSessionHandle);
+    CHIP_ERROR SendPendingCommand();
+    CHIP_ERROR AddPendingCommandData();
     CHIP_ERROR SendDiscoveryRead(AttributePathParams * aPaths, size_t aPathCount);
     void StartCapabilitiesRead();
+    void ResetReadClient();
+    void CompleteEndpointDiscovery();
+    void CompleteCapabilityDiscovery();
     void FinishRequest(Protocols::InteractionModel::Status aStatus, uint16_t aStreamId);
 
     static void OnDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
@@ -170,21 +300,10 @@ private:
 
     CASESessionManager * mCASESessionManager = nullptr;
 
-    PendingRequest mPendingRequest                      = PendingRequest::kNone;
-    uint16_t mPendingVideoStreamId                      = 0;
-    AvAnalysisCameraClient::Callback * mPendingCallback = nullptr;
-    bool mResponseDelivered                             = false;
-    CameraProfile mProfile;
-    // Session/exchange manager held across the discovery phase of the pending request
-    SessionHolder mSessionHolder;
-    Messaging::ExchangeManager * mExchangeMgr = nullptr;
-    // Discovery read state
-    BufferedReadCallback mBufferedReadCallback{ *this };
+    Request mRequest;
+
+    Platform::UniquePtr<BufferedReadCallback> mReadCallback;
     Platform::UniquePtr<ReadClient> mReadClient;
-    CHIP_ERROR mDiscoveryError     = CHIP_NO_ERROR;
-    DiscoveryPhase mDiscoveryPhase = DiscoveryPhase::kIdle;
-    // False only when SupportedStreamUsages was read successfully and lacks Analysis
-    bool mAnalysisUsageSupported = true;
     Platform::UniquePtr<CommandSender> mCommandSender;
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;

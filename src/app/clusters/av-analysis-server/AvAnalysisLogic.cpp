@@ -916,7 +916,6 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleEstabl
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const AvAnalysis::Commands::EstablishAnalysisStream::DecodableType & commandData)
 {
-    // Spec 11.9.8: CurrentAnalysisStreamCount == MaxAnalysisStreamCount -> RESOURCE_EXHAUSTED
     VerifyOrReturnValue(!mStreamTable.IsFull(), Status::ResourceExhausted);
 
     // Without a camera client no camera interaction can be started
