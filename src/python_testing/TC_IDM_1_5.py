@@ -128,55 +128,63 @@ class TC_IDM_1_5(IDMBaseTest):
 
         delay_min_ms = 1000
         delay_jitter_window_ms = 1000
-        min_required_sub_window_sec = (delay_min_ms + delay_jitter_window_ms) / 1000.0 + 5.0
+        mrp_timeout_sec = self.get_mrp_retransmission_timeout_sec(dev_ctrl)
+        # In Step 2: Full end-to-end window requires 2x MRP worst-case retransmissions (Invoke leg + ReportData leg)
+        min_required_sub_window_sec = (delay_min_ms + delay_jitter_window_ms) / 1000.0 + (2 * mrp_timeout_sec)
+        # In Step 4: After command is delivered, waiting only for delay + 1x MRP (ReportData leg)
+        report_wait_timeout_sec = (delay_min_ms + delay_jitter_window_ms) / 1000.0 + mrp_timeout_sec
+        log.info("Computed MRP retransmission timeout: %.2f s (required sub window: %.2f s, report wait timeout: %.2f s)",
+                 mrp_timeout_sec, min_required_sub_window_sec, report_wait_timeout_sec)
         max_interval_ceiling_sec = 3600
 
-        # Step 2: Establish subscription to Breadcrumb with MaxInterval = 3600s
-        self.step(2)
-        log.info("Establishing subscription to Breadcrumb attribute on Endpoint 0 with MaxInterval=%ds", max_interval_ceiling_sec)
-        subscription = await dev_ctrl.ReadAttribute(
-            nodeId=dut_node_id,
-            attributes=[(endpoint, target_attribute)],
-            reportInterval=(0, max_interval_ceiling_sec),
-            keepSubscriptions=False,
-            autoResubscribe=False
-        )
-        subscription.SetAttributeUpdateCallback(tracker)
-
-        # Record timestamp t_prime upon receiving the initial priming report / subscription establishment
-        t_prime = time.monotonic()
-
-        # Verify the actual MaxInterval in the SubscribeResponseMessage is 3600s
-        _, negotiated_max_interval_sec = subscription.GetReportingIntervalsSeconds()
-        log.info("Negotiated subscription intervals: MaxInterval = %ds", negotiated_max_interval_sec)
-        asserts.assert_equal(
-            negotiated_max_interval_sec, max_interval_ceiling_sec,
-            f"Negotiated MaxInterval ({negotiated_max_interval_sec}s) did not match expected ({max_interval_ceiling_sec}s)"
-        )
-
-        # Synchronously verify initial prime report was received during subscription establishment
-        prime_attrs = subscription.GetAttributes()
-        asserts.assert_in(endpoint, prime_attrs, "Endpoint 0 not found in subscription prime report")
-        asserts.assert_in(Clusters.GeneralCommissioning, prime_attrs[endpoint],
-                          "GeneralCommissioning cluster not found in subscription prime report")
-        asserts.assert_in(target_attribute, prime_attrs[endpoint][Clusters.GeneralCommissioning],
-                          "Breadcrumb attribute not found in subscription prime report")
-        prime_val = prime_attrs[endpoint][Clusters.GeneralCommissioning][target_attribute]
-        log.info("Initial prime report received: Breadcrumb = %r at timestamp %.6f", prime_val, t_prime)
-
-        sub_elapsed_sec = time.monotonic() - t_prime
-        remaining_sub_window_sec = float(negotiated_max_interval_sec) - sub_elapsed_sec
-
-        log.info("Time elapsed since priming report: %.2f s; remaining window: %.2f s (required >= %.2f s)",
-                 sub_elapsed_sec, remaining_sub_window_sec, min_required_sub_window_sec)
-
-        asserts.assert_greater_equal(
-            remaining_sub_window_sec, min_required_sub_window_sec,
-            f"Subscription setup took too long ({sub_elapsed_sec:.2f} s); not enough time remaining "
-            f"({remaining_sub_window_sec:.2f} s) before scheduled periodic report"
-        )
-
+        subscription = None
+        failsafe_armed = False
         try:
+            # Step 2: Establish subscription to Breadcrumb with MaxInterval = 3600s
+            self.step(2)
+            log.info("Establishing subscription to Breadcrumb attribute on Endpoint 0 with MaxInterval=%ds", max_interval_ceiling_sec)
+            subscription = await dev_ctrl.ReadAttribute(
+                nodeId=dut_node_id,
+                attributes=[(endpoint, target_attribute)],
+                reportInterval=(0, max_interval_ceiling_sec),
+                keepSubscriptions=False,
+                autoResubscribe=False
+            )
+            subscription.SetAttributeUpdateCallback(tracker)
+
+            # Record timestamp t_prime upon receiving the initial priming report / subscription establishment
+            t_prime = time.monotonic()
+
+            # Verify the actual MaxInterval in the SubscribeResponseMessage is 3600s
+            _, negotiated_max_interval_sec = subscription.GetReportingIntervalsSeconds()
+            log.info("Negotiated subscription intervals: MaxInterval = %ds", negotiated_max_interval_sec)
+            asserts.assert_equal(
+                negotiated_max_interval_sec, max_interval_ceiling_sec,
+                f"Negotiated MaxInterval ({negotiated_max_interval_sec}s) did not match expected ({max_interval_ceiling_sec}s)"
+            )
+
+            # Synchronously verify initial prime report was received during subscription establishment
+            prime_attrs = subscription.GetAttributes()
+            asserts.assert_in(endpoint, prime_attrs, "Endpoint 0 not found in subscription prime report")
+            asserts.assert_in(Clusters.GeneralCommissioning, prime_attrs[endpoint],
+                              "GeneralCommissioning cluster not found in subscription prime report")
+            asserts.assert_in(target_attribute, prime_attrs[endpoint][Clusters.GeneralCommissioning],
+                              "Breadcrumb attribute not found in subscription prime report")
+            prime_val = prime_attrs[endpoint][Clusters.GeneralCommissioning][target_attribute]
+            log.info("Initial prime report received: Breadcrumb = %r at timestamp %.6f", prime_val, t_prime)
+
+            sub_elapsed_sec = time.monotonic() - t_prime
+            remaining_sub_window_sec = float(negotiated_max_interval_sec) - sub_elapsed_sec
+
+            log.info("Time elapsed since priming report: %.2f s; remaining window: %.2f s (required >= %.2f s)",
+                     sub_elapsed_sec, remaining_sub_window_sec, min_required_sub_window_sec)
+
+            asserts.assert_greater_equal(
+                remaining_sub_window_sec, min_required_sub_window_sec,
+                f"Subscription setup took too long ({sub_elapsed_sec:.2f} s); not enough time remaining "
+                f"({remaining_sub_window_sec:.2f} s) before scheduled periodic report"
+            )
+
             # Step 3: Send InvokeRequestMessage for ArmFailSafe with DelayReportData
             self.step(3)
             # Drain any residual queue items before measuring
@@ -198,15 +206,15 @@ class TC_IDM_1_5(IDMBaseTest):
                                        "DUT response should be ArmFailSafeResponse")
             asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                                  f"ArmFailSafe failed with errorCode: {resp.errorCode}")
+            failsafe_armed = True
 
             # Step 4: Measure delta t and verify delta t >= DelayMinMs
             self.step(4)
-            wait_timeout_sec = (delay_min_ms + delay_jitter_window_ms) / 1000.0 + 5.0
             try:
-                report_recv_time, new_val = await asyncio.to_thread(report_queue.get, timeout=wait_timeout_sec)
+                report_recv_time, new_val = await asyncio.to_thread(report_queue.get, timeout=report_wait_timeout_sec)
             except queue.Empty:
                 asserts.fail(
-                    f"Did not receive ReportDataMessage within {wait_timeout_sec:.2f}s following invoke command with DelayReportData")
+                    f"Did not receive ReportDataMessage within {report_wait_timeout_sec:.2f}s following invoke command with DelayReportData")
 
             asserts.assert_equal(new_val, 1, f"Expected Breadcrumb report value to be 1, got {new_val}")
 
@@ -219,7 +227,7 @@ class TC_IDM_1_5(IDMBaseTest):
                 delta_t_ms, min_expected_delta_ms,
                 f"Delta t ({delta_t_ms:.2f} ms) was less than {min_expected_delta_ms:.2f} ms minimum delay"
             )
-        finally:
+
             # Step 5: Disarm fail-safe and reset Breadcrumb
             self.step(5)
             log.info("Cleaning up: disarming fail-safe and resetting Breadcrumb to 0")
@@ -232,6 +240,23 @@ class TC_IDM_1_5(IDMBaseTest):
                                        "DUT response should be ArmFailSafeResponse")
             asserts.assert_equal(cleanup_resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                                  f"ArmFailSafe cleanup failed with errorCode: {cleanup_resp.errorCode}")
+            failsafe_armed = False
+        finally:
+            if subscription is not None:
+                try:
+                    subscription.Shutdown()
+                except Exception:
+                    log.exception("Cleanup: failed to shutdown subscription")
+
+            if failsafe_armed:
+                try:
+                    await dev_ctrl.SendCommand(
+                        nodeId=dut_node_id,
+                        endpoint=endpoint,
+                        payload=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
+                    )
+                except Exception:
+                    log.exception("Cleanup: failed to disarm fail-safe during error recovery")
 
 
 if __name__ == "__main__":
