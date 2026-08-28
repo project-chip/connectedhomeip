@@ -423,7 +423,7 @@ TEST_F(TestElectricalAlarmCluster, ModifyEnabledAlarms_DelegateRejects)
     auto result     = tester.Invoke(Commands::ModifyEnabledAlarms::Id, cmd);
     auto statusCode = result.GetStatusCode();
     ASSERT_TRUE(statusCode.has_value());
-    EXPECT_EQ(statusCode->GetStatus(), Status::Failure);
+    EXPECT_EQ(statusCode.value().GetStatus(), Status::Failure);
     // Mask must be unchanged.
     EXPECT_EQ(cluster.GetMask(), supported);
 
@@ -444,7 +444,7 @@ TEST_F(TestElectricalAlarmCluster, ModifyEnabledAlarms_UnsupportedBits)
     auto result     = tester.Invoke(Commands::ModifyEnabledAlarms::Id, cmd);
     auto statusCode = result.GetStatusCode();
     ASSERT_TRUE(statusCode.has_value());
-    EXPECT_EQ(statusCode->GetStatus(), Status::InvalidCommand);
+    EXPECT_EQ(statusCode.value().GetStatus(), Status::InvalidCommand);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -467,7 +467,7 @@ TEST_F(TestElectricalAlarmCluster, Reset_FeatureAbsent)
     // Command is not in AcceptedCommands — ClusterTester returns UnsupportedCommand.
     auto statusCode = result.GetStatusCode();
     ASSERT_TRUE(statusCode.has_value());
-    EXPECT_EQ(statusCode->GetStatus(), Status::UnsupportedCommand);
+    EXPECT_EQ(statusCode.value().GetStatus(), Status::UnsupportedCommand);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -516,7 +516,7 @@ TEST_F(TestElectricalAlarmCluster, Reset_DelegateRejects)
     auto result     = tester.Invoke(Commands::Reset::Id, cmd);
     auto statusCode = result.GetStatusCode();
     ASSERT_TRUE(statusCode.has_value());
-    EXPECT_EQ(statusCode->GetStatus(), Status::Failure);
+    EXPECT_EQ(statusCode.value().GetStatus(), Status::Failure);
     // State must be unchanged.
     EXPECT_TRUE(cluster.GetState().Has(AlarmBitmap::kOverVoltage));
 
@@ -539,7 +539,7 @@ TEST_F(TestElectricalAlarmCluster, SetThresholds_FeatureAbsent)
     auto result     = tester.Invoke(Commands::SetElectricalAlarmThresholds::Id, cmd);
     auto statusCode = result.GetStatusCode();
     ASSERT_TRUE(statusCode.has_value());
-    EXPECT_EQ(statusCode->GetStatus(), Status::UnsupportedCommand);
+    EXPECT_EQ(statusCode.value().GetStatus(), Status::UnsupportedCommand);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -560,7 +560,7 @@ TEST_F(TestElectricalAlarmCluster, SetThresholds_CrossPairVoltageViolation)
     auto result               = tester.Invoke(Commands::SetElectricalAlarmThresholds::Id, cmd);
     auto statusCode           = result.GetStatusCode();
     ASSERT_TRUE(statusCode.has_value());
-    EXPECT_EQ(statusCode->GetStatus(), Status::ConstraintError);
+    EXPECT_EQ(statusCode.value().GetStatus(), Status::ConstraintError);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -628,7 +628,7 @@ TEST_F(TestElectricalAlarmCluster, SetThresholds_SingleSidedWithStoredBaseline)
     auto result              = tester.Invoke(Commands::SetElectricalAlarmThresholds::Id, cmd);
     auto statusCode          = result.GetStatusCode();
     ASSERT_TRUE(statusCode.has_value());
-    EXPECT_EQ(statusCode->GetStatus(), Status::ConstraintError);
+    EXPECT_EQ(statusCode.value().GetStatus(), Status::ConstraintError);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -648,7 +648,7 @@ TEST_F(TestElectricalAlarmCluster, SetThresholds_DelegateRejects)
     auto result              = tester.Invoke(Commands::SetElectricalAlarmThresholds::Id, cmd);
     auto statusCode          = result.GetStatusCode();
     ASSERT_TRUE(statusCode.has_value());
-    EXPECT_EQ(statusCode->GetStatus(), Status::Failure);
+    EXPECT_EQ(statusCode.value().GetStatus(), Status::Failure);
 
     // Threshold must not have been persisted.
     int64_t val = 0;
@@ -674,7 +674,7 @@ TEST_F(TestElectricalAlarmCluster, SetThresholds_AbsentFeatureFieldRejected)
     auto result               = tester.Invoke(Commands::SetElectricalAlarmThresholds::Id, cmd);
     auto statusCode           = result.GetStatusCode();
     ASSERT_TRUE(statusCode.has_value());
-    EXPECT_EQ(statusCode->GetStatus(), Status::InvalidCommand);
+    EXPECT_EQ(statusCode.value().GetStatus(), Status::InvalidCommand);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
