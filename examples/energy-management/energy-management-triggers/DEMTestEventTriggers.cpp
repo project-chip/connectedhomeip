@@ -35,6 +35,8 @@ constexpr uint16_t MAX_POWER_ADJUSTMENTS = 5;
 // Saved power adjustment values for restore on clear trigger
 int64_t sSavedAbsMinPowerMw = 0;
 int64_t sSavedAbsMaxPowerMw = 0;
+// Flag to ensure we only capture the original limits on first activation
+bool sSavedAbsMinMaxPowerIsValid = false;
 
 chip::app::Clusters::DeviceEnergyManagement::Structs::SlotStruct::Type sSlots[MAX_SLOTS];
 chip::app::Clusters::DeviceEnergyManagement::Structs::ForecastStruct::Type sForecastStruct;
@@ -289,11 +291,16 @@ void SetTestEventTrigger_PowerRangeAdjustment()
 {
     ChipLogProgress(Support, "[PowerRangeAdjustment-Test-Event] => Set AbsMinPower=1kW, AbsMaxPower=7.6kW for testing");
 
-    // Save the current power adjustment limits for restoration later
-    sSavedAbsMinPowerMw = GetDEMDelegate()->GetAbsMinPower();
-    sSavedAbsMaxPowerMw = GetDEMDelegate()->GetAbsMaxPower();
-    ChipLogDetail(Support, "Saved AbsMinPower=% " PRId64 " mW, AbsMaxPower=% " PRId64 " mW", sSavedAbsMinPowerMw,
-                  sSavedAbsMaxPowerMw);
+    // Save the current power adjustment limits for restoration later, but only on first activation.
+    // This prevents overwriting the snapshot if the trigger is activated multiple times without being cleared.
+    if (!sSavedAbsMinMaxPowerIsValid)
+    {
+        sSavedAbsMinPowerMw = GetDEMDelegate()->GetAbsMinPower();
+        sSavedAbsMaxPowerMw = GetDEMDelegate()->GetAbsMaxPower();
+        sSavedAbsMinMaxPowerIsValid = true;
+        ChipLogDetail(Support, "Saved AbsMinPower=% " PRId64 " mW, AbsMaxPower=% " PRId64 " mW", sSavedAbsMinPowerMw,
+                      sSavedAbsMaxPowerMw);
+    }
 
     // Set test values: AbsMinPower=1kW (1000000 mW), AbsMaxPower=7.6kW (7600000 mW)
     constexpr int64_t TEST_ABS_MIN_POWER_MW = 1000000; // 1 kW
@@ -343,6 +350,9 @@ void SetTestEventTrigger_PowerRangeAdjustmentClear()
 
     ChipLogDetail(Support, "Restored AbsMinPower=% " PRId64 " mW, AbsMaxPower=% " PRId64 " mW", sSavedAbsMinPowerMw,
                   sSavedAbsMaxPowerMw);
+
+    // Invalidate the snapshot after restoration so the next activation will capture fresh original values
+    sSavedAbsMinMaxPowerIsValid = false;
 }
 
 bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)
