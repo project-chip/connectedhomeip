@@ -38,6 +38,7 @@ constexpr uint8_t kMaxACSensed                   = 2;
 constexpr uint8_t kMaxACTypeSupported            = 50;
 constexpr uint8_t kMaxSimultaneousDetectionLimit = 10;
 constexpr uint16_t kMinObjectCount               = 1;
+constexpr size_t kMaxSemanticTagLabelLength      = 64;
 constexpr uint8_t kMaxPredictedACType            = 100;
 constexpr uint8_t kMaxPredictedActivity          = 20;
 constexpr uint8_t kMaxSensorFusionSupported      = 50;
