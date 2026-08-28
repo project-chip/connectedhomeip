@@ -39,6 +39,6 @@ source_set("thermostat-delegate-impl") {
 chip_data_model("thermostat-common") {
   zap_file = "thermostat.zap"
   is_server = true
-  
+
   public_deps = [ ":thermostat-delegate-impl" ]
 }
