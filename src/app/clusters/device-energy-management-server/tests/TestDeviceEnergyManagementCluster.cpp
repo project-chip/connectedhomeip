@@ -509,7 +509,8 @@ TEST_F(TestDeviceEnergyManagementCluster, TestPowerRangeAdjustRequest)
     // Valid request with GridOptimization cause - succeeds and state changes to PowerAdjustActive
     command.cause       = AdjustmentCauseEnum::kGridOptimization;
     uint32_t beforeCall = 0;
-    EXPECT_EQ(chip::System::Clock::GetClock_MatterEpochS(beforeCall), CHIP_NO_ERROR);
+    bool timeAvailable  = IsRealTimeClockAvailable() && chip::System::Clock::GetClock_MatterEpochS(beforeCall) == CHIP_NO_ERROR;
+
     EXPECT_TRUE(tester.Invoke(Commands::PowerRangeAdjustRequest::Id, command).IsSuccess());
     EXPECT_EQ(mockDelegate.GetESAState(), ESAStateEnum::kPowerAdjustActive);
 
@@ -520,8 +521,12 @@ TEST_F(TestDeviceEnergyManagementCluster, TestPowerRangeAdjustRequest)
     EXPECT_EQ(powerRangeAdjustment.Value().minPower.Value(), 500);
     EXPECT_EQ(powerRangeAdjustment.Value().maxPower.Value(), 1500);
     // endTime = current_time + duration, so check it's approximately beforeCall + 60
-    EXPECT_GE(powerRangeAdjustment.Value().endTime, beforeCall + 60);
-    EXPECT_LE(powerRangeAdjustment.Value().endTime, beforeCall + 61);
+    // Skip time validation if platform doesn't support real-time clock
+    if (timeAvailable)
+    {
+        EXPECT_GE(powerRangeAdjustment.Value().endTime, beforeCall + 60);
+        EXPECT_LE(powerRangeAdjustment.Value().endTime, beforeCall + 61);
+    }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -542,8 +547,9 @@ TEST_F(TestDeviceEnergyManagementCluster, TestPowerRangeAdjustRequestWithDiffere
     command.cause    = AdjustmentCauseEnum::kGridOptimization;
 
     // Get current time for endTime validation (endTime = current_time + duration)
+    // Skip time-based checks if platform doesn't support real-time clock
     uint32_t startTimeS = 0;
-    EXPECT_EQ(chip::System::Clock::GetClock_MatterEpochS(startTimeS), CHIP_NO_ERROR);
+    bool timeAvailable  = IsRealTimeClockAvailable() && chip::System::Clock::GetClock_MatterEpochS(startTimeS) == CHIP_NO_ERROR;
 
     // Test with short duration
     command.duration = 30;
@@ -551,18 +557,27 @@ TEST_F(TestDeviceEnergyManagementCluster, TestPowerRangeAdjustRequestWithDiffere
     auto powerRangeAdjustment = DataModel::Nullable<Structs::PowerRangeAdjustStruct::Type>();
     ASSERT_EQ(tester.ReadAttribute(Attributes::PowerRangeAdjustment::Id, powerRangeAdjustment), CHIP_NO_ERROR);
     // endTime should be approximately startTimeS + 30 (allow 1 second tolerance for test execution)
-    EXPECT_GE(powerRangeAdjustment.Value().endTime, startTimeS + 30);
-    EXPECT_LE(powerRangeAdjustment.Value().endTime, startTimeS + 31);
+    if (timeAvailable)
+    {
+        EXPECT_GE(powerRangeAdjustment.Value().endTime, startTimeS + 30);
+        EXPECT_LE(powerRangeAdjustment.Value().endTime, startTimeS + 31);
+    }
 
     // Test with long duration
     uint32_t beforeSecondCall = 0;
-    EXPECT_EQ(chip::System::Clock::GetClock_MatterEpochS(beforeSecondCall), CHIP_NO_ERROR);
+    if (timeAvailable && chip::System::Clock::GetClock_MatterEpochS(beforeSecondCall) != CHIP_NO_ERROR)
+    {
+        timeAvailable = false;
+    }
     command.duration = 3600;
     EXPECT_TRUE(tester.Invoke(Commands::PowerRangeAdjustRequest::Id, command).IsSuccess());
     ASSERT_EQ(tester.ReadAttribute(Attributes::PowerRangeAdjustment::Id, powerRangeAdjustment), CHIP_NO_ERROR);
     // endTime should be approximately beforeSecondCall + 3600 (allow 1 second tolerance)
-    EXPECT_GE(powerRangeAdjustment.Value().endTime, beforeSecondCall + 3600);
-    EXPECT_LE(powerRangeAdjustment.Value().endTime, beforeSecondCall + 3601);
+    if (timeAvailable)
+    {
+        EXPECT_GE(powerRangeAdjustment.Value().endTime, beforeSecondCall + 3600);
+        EXPECT_LE(powerRangeAdjustment.Value().endTime, beforeSecondCall + 3601);
+    }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
