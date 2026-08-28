@@ -23,12 +23,6 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
 
-namespace chip {
-namespace app {
-const uint8_t sZapEmptyDefaultSentinel = 0;
-} // namespace app
-} // namespace chip
-
 bool EmberAfAttributeMetadata::IsBoolean() const
 {
     return attributeType == ZCL_BOOLEAN_ATTRIBUTE_TYPE;

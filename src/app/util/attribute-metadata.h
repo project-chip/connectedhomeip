@@ -165,7 +165,7 @@ struct EmberAfAttributeMetadata
     /**
      * Check whether this attribute was declared with an empty default (ZAP_EMPTY_DEFAULT()).
      */
-    bool HasEmptyDefault() const { return defaultValue.ptrToDefaultValue == &chip::app::sZapEmptyDefaultSentinel; }
+    bool HasEmptyDefault() const { return defaultValue.defaultValue == chip::app::kZapEmptyDefaultMarker; }
 
     /**
      * Check wether this attribute is a boolean based on its type according to the spec.

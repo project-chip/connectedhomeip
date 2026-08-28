@@ -1347,7 +1347,11 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, Optional<ClusterId> clusterI
                         size_t defaultValueSizeForBigEndianNudger = 0;
                         // Bypasses compiler warning about unused variable for little endian platforms.
                         (void) defaultValueSizeForBigEndianNudger;
-                        if ((am->mask & MATTER_ATTRIBUTE_FLAG_MIN_MAX) != 0U)
+                        if (am->HasEmptyDefault())
+                        {
+                            ptr = nullptr;
+                        }
+                        else if ((am->mask & MATTER_ATTRIBUTE_FLAG_MIN_MAX) != 0U)
                         {
                             // This is intentionally 2 and not 4 bytes since defaultValue in min/max
                             // attributes is still uint16_t.
