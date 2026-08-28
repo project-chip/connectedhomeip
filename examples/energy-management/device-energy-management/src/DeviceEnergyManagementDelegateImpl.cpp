@@ -1298,9 +1298,9 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetOptOutState(OptOutStateEnum newVal
     // Use bitwise AND to check if the corresponding opt-out flag is set
     if (mPowerAdjustmentInProgress)
     {
-        if (((mOptOutState & OptOutStateEnum::kLocalOptOut) != 0 &&
+        if (((to_underlying(mOptOutState) & to_underlying(OptOutStateEnum::kLocalOptOut)) != 0 &&
              GetPowerAdjustmentCapability().Value().cause == PowerAdjustReasonEnum::kLocalOptimizationAdjustment) ||
-            ((mOptOutState & OptOutStateEnum::kGridOptOut) != 0 &&
+            ((to_underlying(mOptOutState) & to_underlying(OptOutStateEnum::kGridOptOut)) != 0 &&
              GetPowerAdjustmentCapability().Value().cause == PowerAdjustReasonEnum::kGridOptimizationAdjustment))
         {
             err = CancelPowerAdjustRequestAndGenerateEvent(DeviceEnergyManagement::CauseEnum::kUserOptOut);
@@ -1311,9 +1311,9 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetOptOutState(OptOutStateEnum newVal
     if (mPauseRequestInProgress)
     {
         // Cancel any outstanding PauseRequest
-        if (((mOptOutState & OptOutStateEnum::kLocalOptOut) != 0 &&
+        if (((to_underlying(mOptOutState) & to_underlying(OptOutStateEnum::kLocalOptOut)) != 0 &&
              mForecast.Value().forecastUpdateReason == ForecastUpdateReasonEnum::kLocalOptimization) ||
-            ((mOptOutState & OptOutStateEnum::kGridOptOut) != 0 &&
+            ((to_underlying(mOptOutState) & to_underlying(OptOutStateEnum::kGridOptOut)) != 0 &&
              mForecast.Value().forecastUpdateReason == ForecastUpdateReasonEnum::kGridOptimization))
         {
             err = CancelPauseRequestAndGenerateEvent(DeviceEnergyManagement::CauseEnum::kUserOptOut);
@@ -1324,9 +1324,9 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetOptOutState(OptOutStateEnum newVal
     if (mPowerRangeAdjustmentInProgress)
     {
         if (!mPowerRangeAdjustment.IsNull() &&
-            (((mOptOutState & OptOutStateEnum::kLocalOptOut) != 0 &&
+            (((to_underlying(mOptOutState) & to_underlying(OptOutStateEnum::kLocalOptOut)) != 0 &&
               mPowerRangeAdjustment.Value().cause == PowerAdjustReasonEnum::kLocalOptimizationAdjustment) ||
-             ((mOptOutState & OptOutStateEnum::kGridOptOut) != 0 &&
+             ((to_underlying(mOptOutState) & to_underlying(OptOutStateEnum::kGridOptOut)) != 0 &&
               mPowerRangeAdjustment.Value().cause == PowerAdjustReasonEnum::kGridOptimizationAdjustment)))
         {
             err = CancelPowerRangeAdjustRequestAndGenerateEvent(DeviceEnergyManagement::CauseEnum::kUserOptOut);
@@ -1342,7 +1342,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetOptOutState(OptOutStateEnum newVal
             break;
         case ForecastUpdateReasonEnum::kLocalOptimization:
             // Use bitwise AND to check if local optimization is now opted out
-            if ((mOptOutState & OptOutStateEnum::kLocalOptOut) != 0)
+            if ((to_underlying(mOptOutState) & to_underlying(OptOutStateEnum::kLocalOptOut)) != 0)
             {
                 mForecast.Value().forecastUpdateReason = ForecastUpdateReasonEnum::kInternalOptimization;
 
@@ -1353,7 +1353,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetOptOutState(OptOutStateEnum newVal
             break;
         case ForecastUpdateReasonEnum::kGridOptimization:
             // Use bitwise AND to check if grid optimization is now opted out
-            if ((mOptOutState & OptOutStateEnum::kGridOptOut) != 0)
+            if ((to_underlying(mOptOutState) & to_underlying(OptOutStateEnum::kGridOptOut)) != 0)
             {
                 mForecast.Value().forecastUpdateReason = ForecastUpdateReasonEnum::kInternalOptimization;
 
