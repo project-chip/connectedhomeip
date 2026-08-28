@@ -419,8 +419,8 @@ TEST_F(TestElectricalAlarmCluster, ModifyEnabledAlarms_DelegateRejects)
 
     ClusterTester tester(cluster);
     Commands::ModifyEnabledAlarms::Type cmd;
-    cmd.mask    = BitMask<AlarmBitmap>();
-    auto result = tester.Invoke(Commands::ModifyEnabledAlarms::Id, cmd);
+    cmd.mask        = BitMask<AlarmBitmap>();
+    auto result     = tester.Invoke(Commands::ModifyEnabledAlarms::Id, cmd);
     auto statusCode = result.GetStatusCode();
     ASSERT_TRUE(statusCode.has_value());
     EXPECT_EQ(statusCode->GetStatus(), Status::Failure);
@@ -440,8 +440,8 @@ TEST_F(TestElectricalAlarmCluster, ModifyEnabledAlarms_UnsupportedBits)
     // Supported is empty; any non-zero mask has unsupported bits.
     ClusterTester tester(cluster);
     Commands::ModifyEnabledAlarms::Type cmd;
-    cmd.mask    = BitMask<AlarmBitmap>(AlarmBitmap::kOverVoltage);
-    auto result = tester.Invoke(Commands::ModifyEnabledAlarms::Id, cmd);
+    cmd.mask        = BitMask<AlarmBitmap>(AlarmBitmap::kOverVoltage);
+    auto result     = tester.Invoke(Commands::ModifyEnabledAlarms::Id, cmd);
     auto statusCode = result.GetStatusCode();
     ASSERT_TRUE(statusCode.has_value());
     EXPECT_EQ(statusCode->GetStatus(), Status::InvalidCommand);
@@ -512,8 +512,8 @@ TEST_F(TestElectricalAlarmCluster, Reset_DelegateRejects)
 
     ClusterTester tester(cluster);
     Commands::Reset::Type cmd;
-    cmd.alarms  = supported;
-    auto result = tester.Invoke(Commands::Reset::Id, cmd);
+    cmd.alarms      = supported;
+    auto result     = tester.Invoke(Commands::Reset::Id, cmd);
     auto statusCode = result.GetStatusCode();
     ASSERT_TRUE(statusCode.has_value());
     EXPECT_EQ(statusCode->GetStatus(), Status::Failure);
@@ -536,7 +536,7 @@ TEST_F(TestElectricalAlarmCluster, SetThresholds_FeatureAbsent)
 
     ClusterTester tester(cluster);
     Commands::SetElectricalAlarmThresholds::Type cmd;
-    auto result = tester.Invoke(Commands::SetElectricalAlarmThresholds::Id, cmd);
+    auto result     = tester.Invoke(Commands::SetElectricalAlarmThresholds::Id, cmd);
     auto statusCode = result.GetStatusCode();
     ASSERT_TRUE(statusCode.has_value());
     EXPECT_EQ(statusCode->GetStatus(), Status::UnsupportedCommand);
@@ -558,7 +558,7 @@ TEST_F(TestElectricalAlarmCluster, SetThresholds_CrossPairVoltageViolation)
     cmd.overVoltageThreshold  = MakeOptional<int64_t>(1000);
     cmd.underVoltageThreshold = MakeOptional<int64_t>(2000);
     auto result               = tester.Invoke(Commands::SetElectricalAlarmThresholds::Id, cmd);
-    auto statusCode = result.GetStatusCode();
+    auto statusCode           = result.GetStatusCode();
     ASSERT_TRUE(statusCode.has_value());
     EXPECT_EQ(statusCode->GetStatus(), Status::ConstraintError);
 
@@ -626,7 +626,7 @@ TEST_F(TestElectricalAlarmCluster, SetThresholds_SingleSidedWithStoredBaseline)
     // Supply only over; stored under (500) acts as baseline → over (200) ≤ under (500) → ConstraintError.
     cmd.overVoltageThreshold = MakeOptional<int64_t>(200);
     auto result              = tester.Invoke(Commands::SetElectricalAlarmThresholds::Id, cmd);
-    auto statusCode = result.GetStatusCode();
+    auto statusCode          = result.GetStatusCode();
     ASSERT_TRUE(statusCode.has_value());
     EXPECT_EQ(statusCode->GetStatus(), Status::ConstraintError);
 
@@ -646,7 +646,7 @@ TEST_F(TestElectricalAlarmCluster, SetThresholds_DelegateRejects)
     Commands::SetElectricalAlarmThresholds::Type cmd;
     cmd.overVoltageThreshold = MakeOptional<int64_t>(1000);
     auto result              = tester.Invoke(Commands::SetElectricalAlarmThresholds::Id, cmd);
-    auto statusCode = result.GetStatusCode();
+    auto statusCode          = result.GetStatusCode();
     ASSERT_TRUE(statusCode.has_value());
     EXPECT_EQ(statusCode->GetStatus(), Status::Failure);
 
@@ -672,7 +672,7 @@ TEST_F(TestElectricalAlarmCluster, SetThresholds_AbsentFeatureFieldRejected)
     // underVoltageThreshold field present but kUnderVoltage feature absent.
     cmd.underVoltageThreshold = MakeOptional<int64_t>(500);
     auto result               = tester.Invoke(Commands::SetElectricalAlarmThresholds::Id, cmd);
-    auto statusCode = result.GetStatusCode();
+    auto statusCode           = result.GetStatusCode();
     ASSERT_TRUE(statusCode.has_value());
     EXPECT_EQ(statusCode->GetStatus(), Status::InvalidCommand);
 
