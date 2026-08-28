@@ -82,7 +82,7 @@ bool IsWithinRange(const int64_t power, const uint32_t duration,
 }
 
 // Helper function to validate that the ESA is in the expected state before processing a command
-DataModel::ActionReturnStatus ValidateESAState(const DataModel::InvokeRequest & request, CommandHandler * handler,
+DataModel::ActionReturnStatus ValidateESAState(const DataModel::InvokeRequest & request,
                                                DeviceEnergyManagement::Delegate & delegate,
                                                DeviceEnergyManagement::ESAStateEnum expectedState)
 {
@@ -171,34 +171,34 @@ std::optional<DataModel::ActionReturnStatus> DeviceEnergyManagementCluster::Invo
     switch (request.path.mCommandId)
     {
     case PowerAdjustRequest::Id:
-        return HandlePowerAdjustRequest(request, input_arguments, handler);
+        return HandlePowerAdjustRequest(request, input_arguments);
 
     case CancelPowerAdjustRequest::Id:
-        return HandleCancelPowerAdjustRequest(request, input_arguments, handler);
+        return HandleCancelPowerAdjustRequest(request, input_arguments);
 
     case StartTimeAdjustRequest::Id:
-        return HandleStartTimeAdjustRequest(request, input_arguments, handler);
+        return HandleStartTimeAdjustRequest(request, input_arguments);
 
     case PauseRequest::Id:
-        return HandlePauseRequest(request, input_arguments, handler);
+        return HandlePauseRequest(request, input_arguments);
 
     case ResumeRequest::Id:
-        return HandleResumeRequest(request, input_arguments, handler);
+        return HandleResumeRequest(request, input_arguments);
 
     case ModifyForecastRequest::Id:
-        return HandleModifyForecastRequest(request, input_arguments, handler);
+        return HandleModifyForecastRequest(request, input_arguments);
 
     case RequestConstraintBasedForecast::Id:
-        return HandleRequestConstraintBasedForecast(request, input_arguments, handler);
+        return HandleRequestConstraintBasedForecast(request, input_arguments);
 
     case CancelRequest::Id:
-        return HandleCancelRequest(request, input_arguments, handler);
+        return HandleCancelRequest(request, input_arguments);
 
     case PowerRangeAdjustRequest::Id:
-        return HandlePowerRangeAdjustRequest(request, input_arguments, handler);
+        return HandlePowerRangeAdjustRequest(request, input_arguments);
 
     case CancelPowerRangeAdjustRequest::Id:
-        return HandleCancelPowerRangeAdjustRequest(request, input_arguments, handler);
+        return HandleCancelPowerRangeAdjustRequest(request, input_arguments);
 
     default:
         return Status::UnsupportedCommand;
@@ -322,8 +322,7 @@ DeviceEnergyManagementCluster::CheckOptOutAllowsRequest(DeviceEnergyManagement::
 }
 
 DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePowerAdjustRequest(const DataModel::InvokeRequest & request,
-                                                                                      TLV::TLVReader & input_arguments,
-                                                                                      CommandHandler * handler)
+                                                                                      TLV::TLVReader & input_arguments)
 {
     using namespace Commands;
 
@@ -381,14 +380,14 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePowerAdjustRe
 
 DataModel::ActionReturnStatus
 DeviceEnergyManagementCluster::HandleCancelPowerAdjustRequest(const DataModel::InvokeRequest & request,
-                                                              TLV::TLVReader & input_arguments, CommandHandler * handler)
+                                                              TLV::TLVReader & input_arguments)
 {
     using namespace Commands;
 
     CancelPowerAdjustRequest::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
 
-    ReturnErrorOnFailure(ValidateESAState(request, handler, mDelegate, ESAStateEnum::kPowerAdjustActive).GetUnderlyingError());
+    ReturnErrorOnFailure(ValidateESAState(request, mDelegate, ESAStateEnum::kPowerAdjustActive).GetUnderlyingError());
 
     ReturnErrorOnFailure(DataModel::ActionReturnStatus(mDelegate.CancelPowerAdjustRequest()).GetUnderlyingError());
 
@@ -415,8 +414,7 @@ DeviceEnergyManagementCluster::HandleCancelPowerAdjustRequest(const DataModel::I
 }
 
 DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleStartTimeAdjustRequest(const DataModel::InvokeRequest & request,
-                                                                                          TLV::TLVReader & input_arguments,
-                                                                                          CommandHandler * handler)
+                                                                                          TLV::TLVReader & input_arguments)
 {
     using namespace Commands;
 
@@ -522,8 +520,7 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleStartTimeAdju
 }
 
 DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePauseRequest(const DataModel::InvokeRequest & request,
-                                                                                TLV::TLVReader & input_arguments,
-                                                                                CommandHandler * handler)
+                                                                                TLV::TLVReader & input_arguments)
 {
     using namespace Commands;
 
@@ -597,15 +594,14 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePauseRequest(
 }
 
 DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleResumeRequest(const DataModel::InvokeRequest & request,
-                                                                                 TLV::TLVReader & input_arguments,
-                                                                                 CommandHandler * handler)
+                                                                                 TLV::TLVReader & input_arguments)
 {
     using namespace Commands;
 
     ResumeRequest::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
 
-    ReturnErrorOnFailure(ValidateESAState(request, handler, mDelegate, ESAStateEnum::kPaused).GetUnderlyingError());
+    ReturnErrorOnFailure(ValidateESAState(request, mDelegate, ESAStateEnum::kPaused).GetUnderlyingError());
 
     ReturnErrorOnFailure(DataModel::ActionReturnStatus(mDelegate.ResumeRequest()).GetUnderlyingError());
 
@@ -620,8 +616,7 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleResumeRequest
 }
 
 DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleModifyForecastRequest(const DataModel::InvokeRequest & request,
-                                                                                         TLV::TLVReader & input_arguments,
-                                                                                         CommandHandler * handler)
+                                                                                         TLV::TLVReader & input_arguments)
 {
     using namespace Commands;
 
@@ -690,7 +685,7 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleModifyForecas
 
 DataModel::ActionReturnStatus
 DeviceEnergyManagementCluster::HandleRequestConstraintBasedForecast(const DataModel::InvokeRequest & request,
-                                                                    TLV::TLVReader & input_arguments, CommandHandler * handler)
+                                                                    TLV::TLVReader & input_arguments)
 {
     using namespace Commands;
 
@@ -801,8 +796,7 @@ DeviceEnergyManagementCluster::HandleRequestConstraintBasedForecast(const DataMo
 }
 
 DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleCancelRequest(const DataModel::InvokeRequest & request,
-                                                                                 TLV::TLVReader & input_arguments,
-                                                                                 CommandHandler * handler)
+                                                                                 TLV::TLVReader & input_arguments)
 {
     using namespace Commands;
 
@@ -832,8 +826,7 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleCancelRequest
 }
 
 DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePowerRangeAdjustRequest(const DataModel::InvokeRequest & request,
-                                                                                           TLV::TLVReader & input_arguments,
-                                                                                           CommandHandler * handler)
+                                                                                           TLV::TLVReader & input_arguments)
 {
     using namespace Commands;
 
@@ -904,14 +897,14 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePowerRangeAdj
 
 DataModel::ActionReturnStatus
 DeviceEnergyManagementCluster::HandleCancelPowerRangeAdjustRequest(const DataModel::InvokeRequest & request,
-                                                                   TLV::TLVReader & input_arguments, CommandHandler * handler)
+                                                                   TLV::TLVReader & input_arguments)
 {
     using namespace Commands;
 
     CancelPowerRangeAdjustRequest::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
 
-    ReturnErrorOnFailure(ValidateESAState(request, handler, mDelegate, ESAStateEnum::kPowerAdjustActive).GetUnderlyingError());
+    ReturnErrorOnFailure(ValidateESAState(request, mDelegate, ESAStateEnum::kPowerAdjustActive).GetUnderlyingError());
 
     // Call delegate to cancel the power range adjustment
     ReturnErrorOnFailure(DataModel::ActionReturnStatus(mDelegate.CancelPowerRangeAdjustRequest()).GetUnderlyingError());

@@ -101,25 +101,22 @@ public:
 private:
     DataModel::ActionReturnStatus CheckOptOutAllowsRequest(DeviceEnergyManagement::AdjustmentCauseEnum adjustmentCause);
     DataModel::ActionReturnStatus HandlePowerAdjustRequest(const DataModel::InvokeRequest & request,
-                                                           TLV::TLVReader & input_arguments, CommandHandler * handler);
+                                                           TLV::TLVReader & input_arguments);
     DataModel::ActionReturnStatus HandleCancelPowerAdjustRequest(const DataModel::InvokeRequest & request,
-                                                                 TLV::TLVReader & input_arguments, CommandHandler * handler);
+                                                                 TLV::TLVReader & input_arguments);
     DataModel::ActionReturnStatus HandleStartTimeAdjustRequest(const DataModel::InvokeRequest & request,
-                                                               TLV::TLVReader & input_arguments, CommandHandler * handler);
-    DataModel::ActionReturnStatus HandlePauseRequest(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
-                                                     CommandHandler * handler);
-    DataModel::ActionReturnStatus HandleResumeRequest(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
-                                                      CommandHandler * handler);
+                                                               TLV::TLVReader & input_arguments);
+    DataModel::ActionReturnStatus HandlePauseRequest(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments);
+    DataModel::ActionReturnStatus HandleResumeRequest(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments);
     DataModel::ActionReturnStatus HandleModifyForecastRequest(const DataModel::InvokeRequest & request,
-                                                              TLV::TLVReader & input_arguments, CommandHandler * handler);
+                                                              TLV::TLVReader & input_arguments);
     DataModel::ActionReturnStatus HandleRequestConstraintBasedForecast(const DataModel::InvokeRequest & request,
-                                                                       TLV::TLVReader & input_arguments, CommandHandler * handler);
-    DataModel::ActionReturnStatus HandleCancelRequest(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
-                                                      CommandHandler * handler);
+                                                                       TLV::TLVReader & input_arguments);
+    DataModel::ActionReturnStatus HandleCancelRequest(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments);
     DataModel::ActionReturnStatus HandlePowerRangeAdjustRequest(const DataModel::InvokeRequest & request,
-                                                                TLV::TLVReader & input_arguments, CommandHandler * handler);
+                                                                TLV::TLVReader & input_arguments);
     DataModel::ActionReturnStatus HandleCancelPowerRangeAdjustRequest(const DataModel::InvokeRequest & request,
-                                                                      TLV::TLVReader & input_arguments, CommandHandler * handler);
+                                                                      TLV::TLVReader & input_arguments);
 
     DeviceEnergyManagement::Delegate & mDelegate;
     const BitFlags<DeviceEnergyManagement::Feature> mFeatureFlags;
