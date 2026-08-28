@@ -444,6 +444,10 @@ CHIP_ERROR HumidistatCluster::SetSystemState(Humidistat::SystemStateEnum systemS
 
 chip::Percent HumidistatCluster::SnapToNearestStep(chip::Percent value) const
 {
+    if (value < mMinSetpoint)
+    {
+        return mMinSetpoint;
+    }
     if (value > mMaxSetpoint)
     {
         return mMaxSetpoint;
