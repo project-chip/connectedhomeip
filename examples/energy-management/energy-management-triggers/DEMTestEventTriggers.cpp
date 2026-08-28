@@ -332,6 +332,14 @@ void SetTestEventTrigger_PowerRangeAdjustmentClear()
 {
     ChipLogProgress(Support, "[PowerRangeAdjustmentClear-Test-Event] => Restore AbsMinPower and AbsMaxPower to saved values");
 
+    // Only restore if we have a valid snapshot from a prior activation.
+    // If clear is invoked before any activation, there is nothing to restore.
+    if (!sSavedAbsMinMaxPowerIsValid)
+    {
+        ChipLogDetail(Support, "No valid snapshot to restore; clear trigger invoked before activation");
+        return;
+    }
+
     CHIP_ERROR err = GetDEMDelegate()->SetAbsMinPower(sSavedAbsMinPowerMw);
     if (err != CHIP_NO_ERROR)
     {
