@@ -368,10 +368,10 @@ void ThreadMeshcopCommissionProxy::ProcessAnnouncement(const std::vector<uint8_t
 
     if (!mExpectedDiscriminator.MatchesLongDiscriminator(static_cast<uint16_t>(discoveredDiscriminator)))
     {
-        uint16_t expectedDiscriminator = mExpectedDiscriminator.IsShortDiscriminator() ? mExpectedDiscriminator.GetShortValue()
-                                                                                       : mExpectedDiscriminator.GetLongValue();
         ChipLogProgress(Controller, "Discriminator mismatch (Expected %s %u, Got long %u). Ignoring announcement.",
-                        mExpectedDiscriminator.IsShortDiscriminator() ? "short" : "long", expectedDiscriminator,
+                        mExpectedDiscriminator.IsShortDiscriminator() ? "short" : "long",
+                        mExpectedDiscriminator.IsShortDiscriminator() ? mExpectedDiscriminator.GetShortValue()
+                                                                      : mExpectedDiscriminator.GetLongValue(),
                         discoveredDiscriminator);
         return;
     }
