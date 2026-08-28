@@ -864,15 +864,17 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePowerRangeAdj
     }
 
     // Check that the MinPower > AbsMinPower and MaxPower < AbsMaxPower
-    if (!commandData.minPower.IsNull() && commandData.minPower.Value() < mDelegate.GetAbsMinPower())
+    if (!commandData.minPower.IsNull() &&
+        (commandData.minPower.Value() < mDelegate.GetAbsMinPower() || commandData.minPower.Value() > mDelegate.GetAbsMaxPower()))
     {
-        ChipLogError(Zcl, "DEM: MinPower is less than AbsMinPower");
+        ChipLogError(Zcl, "DEM: MinPower is outside the absolute power range");
         return Status::ConstraintError;
     }
 
-    if (!commandData.maxPower.IsNull() && commandData.maxPower.Value() > mDelegate.GetAbsMaxPower())
+    if (!commandData.maxPower.IsNull() &&
+        (commandData.maxPower.Value() < mDelegate.GetAbsMinPower() || commandData.maxPower.Value() > mDelegate.GetAbsMaxPower()))
     {
-        ChipLogError(Zcl, "DEM: MaxPower is greater than AbsMaxPower");
+        ChipLogError(Zcl, "DEM: MaxPower is outside the absolute power range");
         return Status::ConstraintError;
     }
 
