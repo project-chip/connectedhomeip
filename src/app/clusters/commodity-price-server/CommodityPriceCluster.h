@@ -52,14 +52,23 @@ public:
     using OptionalCommandSet =
         chip::app::OptionalAttributeSet<Commands::GetDetailedPriceRequest::Id, Commands::GetDetailedForecastRequest::Id>;
 
+    /// Everything an application chooses about an instance beyond the endpoint it lives on.
+    ///
+    /// Defaults to a cluster carrying no optional feature and accepting no optional command.
+    struct Config
+    {
+        BitMask<Feature> features;
+        OptionalCommandSet optionalCommands;
+    };
+
     /**
      * Creates a CommodityPrice cluster instance.
      * @param endpointId The endpoint on which this cluster exists.
-     * @param features The FeatureMap value for this instance.
-     * @param optionalCommands The optionally conformant commands this instance supports.
+     * @param config The features and optionally conformant commands this instance supports.
      */
-    CommodityPriceCluster(EndpointId endpointId, BitMask<Feature> features, const OptionalCommandSet & optionalCommands) :
-        DefaultServerCluster({ endpointId, CommodityPrice::Id }), mFeatures(features), mOptionalCommands(optionalCommands)
+    CommodityPriceCluster(EndpointId endpointId, const Config & config = {}) :
+        DefaultServerCluster({ endpointId, CommodityPrice::Id }), mFeatures(config.features),
+        mOptionalCommands(config.optionalCommands)
     {}
 
     bool HasFeature(Feature feature) const { return mFeatures.Has(feature); }

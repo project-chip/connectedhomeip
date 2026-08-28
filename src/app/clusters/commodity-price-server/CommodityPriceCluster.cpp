@@ -143,8 +143,7 @@ CHIP_ERROR CommodityPriceCluster::PriceStorage::Set(Span<const Structs::Commodit
     // Calloc(0) is not portable, so each buffer is only allocated if it holds anything. Running out
     // of memory part way through hands back whatever was taken before the failure: holding on to it
     // would strand the bulk of a forecast at the moment the device has none to spare.
-    if ((!prices.empty() && !mPrices.Calloc(prices.size())) ||
-        ((componentCount != 0) && !mComponents.Calloc(componentCount)) ||
+    if ((!prices.empty() && !mPrices.Calloc(prices.size())) || ((componentCount != 0) && !mComponents.Calloc(componentCount)) ||
         ((descriptionChars != 0) && !mDescriptions.Calloc(descriptionChars)))
     {
         Clear();

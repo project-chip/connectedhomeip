@@ -108,7 +108,7 @@ struct TestCommodityPriceCluster : public ::testing::Test
 
     void SetUp() override { ASSERT_EQ(mCluster.Startup(mTester.GetServerClusterContext()), CHIP_NO_ERROR); }
 
-    CommodityPriceCluster mCluster{ kTestEndpointId, BitMask<Feature>(Feature::kForecasting), kAllOptionalCommands };
+    CommodityPriceCluster mCluster{ kTestEndpointId, { BitMask<Feature>(Feature::kForecasting), kAllOptionalCommands } };
     ClusterTester mTester{ mCluster };
 };
 
@@ -139,7 +139,7 @@ TEST_F(TestCommodityPriceCluster, AttributeListWithForecasting)
 
 TEST_F(TestCommodityPriceCluster, AttributeListWithoutForecasting)
 {
-    CommodityPriceCluster cluster{ kTestEndpointId, BitMask<Feature>(), kAllOptionalCommands };
+    CommodityPriceCluster cluster{ kTestEndpointId, { BitMask<Feature>(), kAllOptionalCommands } };
 
     EXPECT_TRUE(IsAttributesListEqualTo(cluster,
                                         std::vector<DataModel::AttributeEntry>{
@@ -161,7 +161,7 @@ TEST_F(TestCommodityPriceCluster, AcceptedCommandsWithAllOptionalCommands)
 // Both commands are optionally conformant, so opting into neither is a valid configuration.
 TEST_F(TestCommodityPriceCluster, AcceptedCommandsWithNoOptionalCommands)
 {
-    CommodityPriceCluster cluster{ kTestEndpointId, BitMask<Feature>(Feature::kForecasting), OptionalCommandSet() };
+    CommodityPriceCluster cluster{ kTestEndpointId, { BitMask<Feature>(Feature::kForecasting), OptionalCommandSet() } };
 
     EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster, std::vector<DataModel::AcceptedCommandEntry>{}));
 }
@@ -170,7 +170,7 @@ TEST_F(TestCommodityPriceCluster, AcceptedCommandsWithNoOptionalCommands)
 // though the application asked for it.
 TEST_F(TestCommodityPriceCluster, AcceptedCommandsWithoutForecastingFeature)
 {
-    CommodityPriceCluster cluster{ kTestEndpointId, BitMask<Feature>(), kAllOptionalCommands };
+    CommodityPriceCluster cluster{ kTestEndpointId, { BitMask<Feature>(), kAllOptionalCommands } };
 
     EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
                                               std::vector<DataModel::AcceptedCommandEntry>{
@@ -180,8 +180,9 @@ TEST_F(TestCommodityPriceCluster, AcceptedCommandsWithoutForecastingFeature)
 
 TEST_F(TestCommodityPriceCluster, AcceptedCommandsWithForecastRequestOnly)
 {
-    CommodityPriceCluster cluster{ kTestEndpointId, BitMask<Feature>(Feature::kForecasting),
-                                   OptionalCommandSet().Set<Commands::GetDetailedForecastRequest::Id>() };
+    CommodityPriceCluster cluster{ kTestEndpointId,
+                                   { BitMask<Feature>(Feature::kForecasting),
+                                     OptionalCommandSet().Set<Commands::GetDetailedForecastRequest::Id>() } };
 
     EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
                                               std::vector<DataModel::AcceptedCommandEntry>{
@@ -200,7 +201,7 @@ TEST_F(TestCommodityPriceCluster, GeneratedCommandsWithAllOptionalCommands)
 
 TEST_F(TestCommodityPriceCluster, GeneratedCommandsWithNoOptionalCommands)
 {
-    CommodityPriceCluster cluster{ kTestEndpointId, BitMask<Feature>(Feature::kForecasting), OptionalCommandSet() };
+    CommodityPriceCluster cluster{ kTestEndpointId, { BitMask<Feature>(Feature::kForecasting), OptionalCommandSet() } };
 
     EXPECT_TRUE(IsGeneratedCommandsListEqualTo(cluster, std::vector<CommandId>{}));
 }
@@ -208,7 +209,7 @@ TEST_F(TestCommodityPriceCluster, GeneratedCommandsWithNoOptionalCommands)
 // GetDetailedForecastResponse follows its request, which requires FORE on top of the opt-in.
 TEST_F(TestCommodityPriceCluster, GeneratedCommandsWithoutForecastingFeature)
 {
-    CommodityPriceCluster cluster{ kTestEndpointId, BitMask<Feature>(), kAllOptionalCommands };
+    CommodityPriceCluster cluster{ kTestEndpointId, { BitMask<Feature>(), kAllOptionalCommands } };
 
     EXPECT_TRUE(IsGeneratedCommandsListEqualTo(cluster,
                                                std::vector<CommandId>{
@@ -218,8 +219,9 @@ TEST_F(TestCommodityPriceCluster, GeneratedCommandsWithoutForecastingFeature)
 
 TEST_F(TestCommodityPriceCluster, GeneratedCommandsWithForecastRequestOnly)
 {
-    CommodityPriceCluster cluster{ kTestEndpointId, BitMask<Feature>(Feature::kForecasting),
-                                   OptionalCommandSet().Set<Commands::GetDetailedForecastRequest::Id>() };
+    CommodityPriceCluster cluster{ kTestEndpointId,
+                                   { BitMask<Feature>(Feature::kForecasting),
+                                     OptionalCommandSet().Set<Commands::GetDetailedForecastRequest::Id>() } };
 
     EXPECT_TRUE(IsGeneratedCommandsListEqualTo(cluster,
                                                std::vector<CommandId>{
@@ -262,7 +264,7 @@ TEST_F(TestCommodityPriceCluster, ReadPriceForecastInitialValueIsEmpty)
 // ever reaches ReadAttribute.
 TEST_F(TestCommodityPriceCluster, ReadPriceForecastWithoutForecastingFeature)
 {
-    CommodityPriceCluster cluster{ kTestEndpointId, BitMask<Feature>(), kAllOptionalCommands };
+    CommodityPriceCluster cluster{ kTestEndpointId, { BitMask<Feature>(), kAllOptionalCommands } };
     ClusterTester tester{ cluster };
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -606,7 +608,7 @@ TEST_F(TestCommodityPriceCluster, SetForecastRejectsTooManyEntries)
 // Without FORE there is no PriceForecast attribute to hold the value.
 TEST_F(TestCommodityPriceCluster, SetForecastRequiresTheForecastingFeature)
 {
-    CommodityPriceCluster cluster{ kTestEndpointId, BitMask<Feature>(), kAllOptionalCommands };
+    CommodityPriceCluster cluster{ kTestEndpointId, { BitMask<Feature>(), kAllOptionalCommands } };
 
     Structs::CommodityPriceStruct::Type entry = MakePrice();
     EXPECT_EQ(cluster.SetForecast(Span<const Structs::CommodityPriceStruct::Type>(&entry, 1)), CHIP_ERROR_INCORRECT_STATE);
@@ -697,7 +699,7 @@ TEST_F(TestCommodityPriceCluster, GetDetailedPriceRequestRejectsUndefinedDetailB
 
 TEST_F(TestCommodityPriceCluster, GetDetailedPriceRequestIsRejectedWhenNotOptedInto)
 {
-    CommodityPriceCluster cluster{ kTestEndpointId, BitMask<Feature>(Feature::kForecasting), OptionalCommandSet() };
+    CommodityPriceCluster cluster{ kTestEndpointId, { BitMask<Feature>(Feature::kForecasting), OptionalCommandSet() } };
     ClusterTester tester{ cluster };
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 

@@ -42,7 +42,7 @@ constexpr CommodityPriceCluster::OptionalCommandSet kAllOptionalCommands = //
 } // namespace
 
 Instance::Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature) :
-    mCluster(aEndpointId, BitMask<Feature>(aFeature), kAllOptionalCommands)
+    mCluster(aEndpointId, { BitMask<Feature>(aFeature), kAllOptionalCommands })
 {
     aDelegate.SetEndpointId(aEndpointId);
 }
