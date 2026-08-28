@@ -529,18 +529,18 @@ TEST_F(TestGroupKeyManagementCluster, TestGroupTableReadReleasesEndpointIterator
     leakCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-
 TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttributeGCAST)
 {
     GroupKeyManagementCluster mockCluster{ { fabricHelper.GetFabricTable(), mRealProvider },
-    BitFlags<GroupKeyManagement::Feature>(GroupKeyManagement::Feature::kGroupcast) };
+                                           BitFlags<GroupKeyManagement::Feature>(GroupKeyManagement::Feature::kGroupcast) };
     ClusterTester tester{ mockCluster };
     tester.SetFabricIndex(kTestFabricIndex);
 
     auto keys        = TestHelpers::CreateGroupKeyMapList(1, kTestFabricIndex);
     auto keysToWrite = app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
 
-    CHIP_ERROR err = tester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, keysToWrite, ListWritingPattern::ReplaceAll)
+    CHIP_ERROR err =
+        tester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, keysToWrite, ListWritingPattern::ReplaceAll)
             .GetUnderlyingError();
     // With GCAST feature ON and Groups cluster Revision > 4, writing GroupKeyMap should be rejected
     EXPECT_EQ(err, GroupKeyManagementCluster::IsGroupcastAdopted() ? CHIP_IM_GLOBAL_STATUS(InvalidInState) : CHIP_NO_ERROR);
@@ -549,13 +549,13 @@ TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttributeGCAST)
 TEST_F(TestGroupKeyManagementCluster, TestReadGroupKeyMapAttributeGCAST)
 {
     GroupKeyManagementCluster mockCluster{ { fabricHelper.GetFabricTable(), mRealProvider },
-                                            BitFlags<GroupKeyManagement::Feature>(GroupKeyManagement::Feature::kGroupcast) };
+                                           BitFlags<GroupKeyManagement::Feature>(GroupKeyManagement::Feature::kGroupcast) };
     ClusterTester tester{ mockCluster };
     tester.SetFabricIndex(kTestFabricIndex);
 
-    ASSERT_EQ(mRealProvider.SetGroupKeyAt(kTestFabricIndex, 0,
-                                          Credentials::GroupDataProvider::GroupKey(kTestGroupId, kTestKeySetId)),
-              CHIP_NO_ERROR);
+    ASSERT_EQ(
+        mRealProvider.SetGroupKeyAt(kTestFabricIndex, 0, Credentials::GroupDataProvider::GroupKey(kTestGroupId, kTestKeySetId)),
+        CHIP_NO_ERROR);
 
     GroupKeyManagement::Attributes::GroupKeyMap::TypeInfo::DecodableType groupKeyMapList;
     CHIP_ERROR err = tester.ReadAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, groupKeyMapList).GetUnderlyingError();
@@ -581,7 +581,8 @@ TEST_F(TestGroupKeyManagementCluster, TestWriteGroupTableAttributeGCAST)
     auto groupTableToWrite = app::DataModel::List<const GroupKeyManagement::Structs::GroupInfoMapStruct::Type>(
         groupTableList.data(), groupTableList.size());
 
-    CHIP_ERROR err = tester.WriteAttribute(GroupKeyManagement::Attributes::GroupTable::Id, groupTableToWrite, ListWritingPattern::ReplaceAll)
+    CHIP_ERROR err =
+        tester.WriteAttribute(GroupKeyManagement::Attributes::GroupTable::Id, groupTableToWrite, ListWritingPattern::ReplaceAll)
             .GetUnderlyingError();
     // GroupTable is read-only; writing it should return UnsupportedWrite regardless of GCAST state
     EXPECT_EQ(err, CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));

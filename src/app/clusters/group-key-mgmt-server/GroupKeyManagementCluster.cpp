@@ -21,8 +21,8 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/GroupKeyManagement/ClusterId.h>
 #include <clusters/GroupKeyManagement/Metadata.h>
-#include <lib/support/AutoRelease.h>
 #include <clusters/Groups/Metadata.h>
+#include <lib/support/AutoRelease.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -36,7 +36,7 @@ using chip::Protocols::InteractionModel::Status;
 namespace {
 
 [[maybe_unused]] constexpr uint32_t kGroupKeyClusterRevisionBeforeGroupcast = 2;
-constexpr uint32_t kGroupsClusterRevisionBeforeGroupcast                   = 4;
+constexpr uint32_t kGroupsClusterRevisionBeforeGroupcast                    = 4;
 
 struct GroupTableCodec
 {
@@ -728,7 +728,6 @@ bool GroupKeyManagementCluster::GroupKeyManagementCluster::IsGroupcastAdopted()
 {
     return Groups::kRevision > kGroupsClusterRevisionBeforeGroupcast;
 }
-
 
 } // namespace Clusters
 } // namespace app
