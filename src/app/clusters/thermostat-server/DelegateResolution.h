@@ -50,13 +50,11 @@ constexpr decltype(auto) FindDelegate(First && first, Rest &&... rest)
 }
 
 template <typename FeatureType, typename Args, typename... DelegateArgs, std::size_t... Index>
-constexpr auto ConstructFeature(Args && args, const std::tuple<DelegateArgs &...> & delegates,
-                                    std::index_sequence<Index...>)
+constexpr auto ConstructFeature(Args && args, const std::tuple<DelegateArgs &...> & delegates, std::index_sequence<Index...>)
 {
     return std::apply(
         [&](auto &... dels) {
-            return FeatureType(std::get<Index>(std::forward<Args>(args))...,
-                               FindDelegate<typename FeatureType::Delegate>(dels...));
+            return FeatureType(std::get<Index>(std::forward<Args>(args))..., FindDelegate<typename FeatureType::Delegate>(dels...));
         },
         delegates);
 }

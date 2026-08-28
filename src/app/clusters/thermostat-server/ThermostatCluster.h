@@ -51,12 +51,11 @@ public:
     ThermostatCluster(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features, const Config & config,
                       Delegates &... delegates) :
         ThermostatClusterBase(aEndpointId, features, config, detail::FindDelegate<Thermostat::Delegate>(delegates...)),
-        mSetpoints(*this, delegates...),
-        mAtomicWriteSession(
-            detail::MakeAtomicWriteSession<kRequiresAtomicWrite>(*this, config.mTimerDelegate, mDelegate.GetFabricTable())),
+        mSetpoints(*this, delegates...), mAtomicWriteSession(detail::MakeAtomicWriteSession<kRequiresAtomicWrite>(
+                                             *this, config.mTimerDelegate, mDelegate.GetFabricTable())),
         mHold(detail::MakeFeature<kHasHold, ThermostatHold>(*this, std::forward_as_tuple(delegates...))),
-        mPresets(detail::MakeFeature<kHasPresets, ThermostatPresets>(*this, mAtomicWriteSession,
-                                                                    std::forward_as_tuple(delegates...))),
+        mPresets(
+            detail::MakeFeature<kHasPresets, ThermostatPresets>(*this, mAtomicWriteSession, std::forward_as_tuple(delegates...))),
         mSuggestions(
             detail::MakeFeature<kHasSuggestions, ThermostatSuggestions>(*this, mPresets, std::forward_as_tuple(delegates...))),
         mOccupancy(detail::MakeFeature<kHasOccupancy, ThermostatOccupancy>(*this, std::forward_as_tuple(delegates...)))

@@ -37,7 +37,8 @@ class ThermostatDelegate : public Delegate
 public:
     ThermostatDelegate(EndpointId endpoint, AttributePersistenceProvider * provider = nullptr,
                        FabricTable * fabricTable = nullptr) :
-        mEndpointId(endpoint), mProvider(provider), mFabricTable(fabricTable)
+        mEndpointId(endpoint),
+        mProvider(provider), mFabricTable(fabricTable)
     {}
 
     FabricTable * GetFabricTable() const override;
