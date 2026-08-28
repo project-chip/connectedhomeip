@@ -40,3 +40,6 @@ class TestLatestPrebuiltDirectory(MatterBaseTest):
         asserts.assert_true(dm.global_data_types.get('structs'), "global structs empty")
         asserts.assert_true(dm.global_data_types.get('enums'), "global enums empty")
         asserts.assert_true(dm.global_data_types.get('bitmaps'), "global bitmaps empty")
+
+if __name__ == "__main__":
+    default_matter_test_main()
