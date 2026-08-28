@@ -94,6 +94,11 @@ public:
             VerifyOrReturnError(value.valueUnsigned16.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
             VerifyOrReturnError(value.valueUnsigned16.Value() <= kMaxCieXyValue, CHIP_ERROR_INVALID_ARGUMENT);
             return CHIP_NO_ERROR;
+        // The two 8-bit color axes share one arm: kMaxCurrentHue and kMaxSaturationValue are the same 0xFE
+        // cap. EnhancedCurrentHue (below) is the one hue representation that spans the full uint16 range.
+        // Bounding hue here is what stops a scene from keeping an out-of-constraint CurrentHue that
+        // ViewScene would later hand straight back to a client.
+        case CurrentHue::Id:
         case CurrentSaturation::Id:
             VerifyOrReturnError(value.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
             VerifyOrReturnError(value.valueUnsigned8.Value() <= kMaxSaturationValue, CHIP_ERROR_INVALID_ARGUMENT);
@@ -112,7 +117,6 @@ public:
         case ColorLoopTime::Id:
             VerifyOrReturnError(value.valueUnsigned16.HasValue(), CHIP_ERROR_INVALID_ARGUMENT); // full uint16 range
             return CHIP_NO_ERROR;
-        case CurrentHue::Id:
         case ColorLoopActive::Id:
             VerifyOrReturnError(value.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT); // full uint8 range
             return CHIP_NO_ERROR;
@@ -759,7 +763,7 @@ bool ColorControlCluster::TickHue(HueTransition & tx, uint64_t now)
     else
     {
         auto & hs = std::get<HueSatColor>(mColorValue);
-        SetAttributeValue(hs.hue, static_cast<uint8_t>(eh >> 8), CurrentHue::Id, change);
+        SetAttributeValue(hs.hue, Hue8FromEnhancedHue(eh), CurrentHue::Id, change);
         NotifyAttributeChanged(EnhancedCurrentHue::Id, change);
         mDelegate.OnColorHSChanged(hs.hue, hs.saturation, !done);
     }
@@ -1001,7 +1005,7 @@ void ColorControlCluster::ApplyModeSwitch(EnhancedColorModeEnum target)
         }
         else
         {
-            mColorValue = HueSatColor{ .hue = static_cast<uint8_t>(eh >> 8), .saturation = sat };
+            mColorValue = HueSatColor{ .hue = Hue8FromEnhancedHue(eh), .saturation = sat };
         }
         NotifyAttributeChanged(EnhancedCurrentHue::Id, AttributeChangeType::kQuiet);
         NotifyAttributeChanged(CurrentHue::Id, AttributeChangeType::kQuiet);
@@ -2541,5 +2545,10 @@ void ColorControlCluster::CoupleColorTempToLevel(uint8_t currentLevel)
 
     // Instantaneous coupling move (transitionTime 0) reusing the fully validated CT move path
     // (mode switch, physical-range clamp, hardware fan-out via the delegate, scene invalidation).
-    MoveToColorTemp(newColorTemp, 0);
+    //
+    // passing ExecuteIfOff in noth the mask and the override pins that bit to 1 whatever the
+    // Options attribute holds, and the ShouldExecuteIfOff gate at the top of MoveToColorTemp always passes.
+
+    MoveToColorTemp(newColorTemp, 0, BitMask<OptionsBitmap>(OptionsBitmap::kExecuteIfOff),
+                    BitMask<OptionsBitmap>(OptionsBitmap::kExecuteIfOff));
 }

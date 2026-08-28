@@ -415,6 +415,37 @@ TEST_F(TestColorControlScenes, SerializeAddRejectsOutOfRangeColorLoopDirection)
     }
 }
 
+// CurrentHue is capped at kMaxCurrentHue (§3.2.7.11), so AddScene must reject a scene carrying 0xFF —
+// EnhancedCurrentHue is the only hue representation spanning the full uint16 range. Without the bound the
+// value is stored verbatim and ViewScene hands it straight back, reporting a CurrentHue the attribute's
+// own constraint forbids. (The live color is safe either way: recall routes the hue through
+// Hue8FromEnhancedHue, which saturates.)
+TEST_F(TestColorControlScenes, SerializeAddRejectsOutOfRangeCurrentHue)
+{
+    ColorControlCluster::Config config(delegate, mockTimer);
+    config.mFeatures.Set(Feature::kHueAndSaturation).Set(Feature::kEnhancedHue);
+    ColorControlCluster cluster(kTestEndpointId, config);
+
+    AttributeValuePair pairs[1];
+    pairs[0].attributeID = Attributes::CurrentHue::Id;
+
+    for (uint8_t hue : { uint8_t{ 0 }, kMaxCurrentHue, static_cast<uint8_t>(kMaxCurrentHue + 1) })
+    {
+        pairs[0].valueUnsigned8.SetValue(hue);
+
+        uint8_t backing[128];
+        MutableByteSpan backingSpan(backing);
+        ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType efs;
+        ASSERT_EQ(MakeDecodableEfs(chip::Span<const AttributeValuePair>(pairs), backingSpan, efs), CHIP_NO_ERROR)
+            << "hue " << static_cast<int>(hue);
+
+        uint8_t out[128];
+        MutableByteSpan outSpan(out);
+        const CHIP_ERROR expected = (hue <= kMaxCurrentHue) ? CHIP_NO_ERROR : CHIP_ERROR_INVALID_ARGUMENT;
+        EXPECT_EQ(cluster.SerializeAdd(kTestEndpointId, efs, outSpan), expected) << "hue " << static_cast<int>(hue);
+    }
+}
+
 // ApplyScene rejects an EnhancedColorMode value outside the defined enum range (0..3): the decode loop
 // caps the mode before building any target.
 TEST_F(TestColorControlScenes, ApplySceneRejectsOutOfRangeMode)

@@ -669,6 +669,39 @@ TEST_F(TestColorControlCommands, CurrentHueProjectionSaturatesAtConstraintMax)
     EXPECT_EQ(currentHue, c.CurrentHue());
 }
 
+// The companion to the projection test above: saturating CurrentHue must not stall the MOVEMENT. The
+// transition is anchored on (startHue, signedDelta, startTime) and every tick re-derives its position from
+// that anchor, so the clamp applies to the stored 8-bit projection only and never feeds back into the hue
+// axis. A legacy rate move therefore reports 254 across the whole 0xFF00..0xFFFF band (~100 ms here) and
+// then carries on past the wrap, rather than latching at the constraint max.
+TEST_F(TestColorControlCommands, LegacyHueRateMoveSweepsThroughConstraintMax)
+{
+    ColorControlCluster c(kEp, HsConfig()); // enhancedHue 0x0A00 == 2560
+    Testing::ClusterTester tester(c);
+    EXPECT_EQ(c.MoveHue(MoveModeEnum::kUp, 10, /*isEnhanced=*/false), Status::Success); // 10 << 8 = 2560/s
+
+    // In legacy mode the attribute read returns the STORED byte verbatim, so this is what TickHue's
+    // saturation protects -- the CurrentHue() accessor projects through Hue8FromEnhancedHue and would
+    // report a legal value either way.
+    auto currentHue = [&tester] {
+        uint8_t hue = 0;
+        EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentHue::Id, hue).IsSuccess());
+        return hue;
+    };
+
+    // 2560 + 2560 * 24.5 = 65280 (0xFF00): the first position whose high byte is the illegal 0xFF.
+    Tick(24500);
+    EXPECT_EQ(currentHue(), kMaxCurrentHue);
+
+    // Still inside the band 50 ms later (0xFF80) — reported value pinned, movement underneath continuing.
+    Tick(50);
+    EXPECT_EQ(currentHue(), kMaxCurrentHue);
+
+    // 2560 + 2560 * 25 = 66560 -> wraps to 1024 (0x0400). Past the band and climbing again, not stuck.
+    Tick(450);
+    EXPECT_EQ(currentHue(), 4);
+}
+
 // MoveToHue, EnhancedMoveToHue and EnhancedStepHue each carry a uint16 TransitionTime constrained to
 // max 65534, so 65535 must be rejected before any transition starts — like every other timed command.
 // (Legacy StepHue's TransitionTime is a uint8 and can never carry an out-of-range value.)
