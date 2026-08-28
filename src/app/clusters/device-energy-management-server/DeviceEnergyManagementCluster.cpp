@@ -849,7 +849,7 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePowerRangeAdj
         return Status::InvalidInState;
     }
 
-    // Check that Duration > 0 && < 86400 (24 hours)
+    // Check that Duration > 0 && <= 86400 (24 hours)
     if ((commandData.duration == 0) || (commandData.duration > 86400))
     {
         ChipLogError(Zcl, "DEM: Duration must be greater than 0 and less than 86400 for PowerRangeAdjustRequest");
