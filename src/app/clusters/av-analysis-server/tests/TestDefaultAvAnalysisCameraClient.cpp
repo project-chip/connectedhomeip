@@ -284,6 +284,23 @@ TEST_F(TestDefaultAvAnalysisCameraClient, DeallocationSuccessReportsStreamId)
     EXPECT_EQ(mCallback.mLastStreamId, 9);
 }
 
+TEST_F(TestDefaultAvAnalysisCameraClient, DeallocationResponseOnAnUnexpectedPathIsAFailure)
+{
+    EXPECT_EQ(mClient.RequestVideoStreamDeallocation(kCameraNode, 9, mCallback), CHIP_NO_ERROR);
+    mClient.SimulateCommandSent(kTestSender);
+
+    // Success echoed on some other command's path is not the camera's answer to our deallocation
+    ConcreteCommandPath foreignPath(kCameraEndpoint, CameraAvStreamManagement::Id,
+                                    CameraAvStreamManagement::Commands::VideoStreamAllocateResponse::Id);
+    mClient.OnResponse(kTestSender, foreignPath, StatusIB(), nullptr);
+    EXPECT_EQ(mCallback.mDeallocatedCount, 0); // Ignored, not taken as the outcome
+
+    // OnDone concludes the interaction: exactly one completion, and it is a failure
+    mClient.OnDone(kTestSender);
+    EXPECT_EQ(mCallback.mDeallocatedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
+}
+
 TEST_F(TestDefaultAvAnalysisCameraClient, CompletionIsDeliveredExactlyOnce)
 {
     EXPECT_EQ(mClient.RequestVideoStreamAllocation(kCameraNode, mCallback), CHIP_NO_ERROR);

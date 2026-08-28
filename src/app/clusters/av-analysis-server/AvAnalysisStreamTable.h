@@ -191,9 +191,26 @@ public:
 
     /**
      * Replaces the table contents and the next-AnalysisStreamID counter from TLV written by Encode().
-     * Restored entries restart in PendingInitiation state.
+     * Restored entries restart in PendingInitiation state. On failure the table is left empty, never
+     * half-loaded.
      */
     CHIP_ERROR Decode(TLV::TLVReader & aReader)
+    {
+        CHIP_ERROR err = DecodeContents(aReader);
+        if (err != CHIP_NO_ERROR)
+        {
+            mCount                = 0;
+            mNextAnalysisStreamId = 0;
+        }
+        return err;
+    }
+
+private:
+    /**
+     * Parses the next-AnalysisStreamID counter and the entry array, populating the table as it goes.
+     * The caller rolls back on failure.
+     */
+    CHIP_ERROR DecodeContents(TLV::TLVReader & aReader)
     {
         ReturnErrorOnFailure(aReader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
         TLV::TLVType outerType;
@@ -228,6 +245,7 @@ public:
             ReturnErrorOnFailure(aReader.ExitContainer(entryType));
 
             VerifyOrReturnError(mEntries.Get() != nullptr && !IsFull(), CHIP_ERROR_NO_MEMORY);
+            VerifyOrReturnError(Find(streamId) == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
             AnalysisStreamEntry & entry = mEntries[mCount];
             entry                       = AnalysisStreamEntry{};
             entry.analysisStreamID      = streamId;
@@ -242,7 +260,6 @@ public:
         return CHIP_NO_ERROR;
     }
 
-private:
     // Context tags of the persisted blob written by Encode()
     static constexpr uint8_t kPersistedTagNextStreamId = 0;
     static constexpr uint8_t kPersistedTagEntries      = 1;

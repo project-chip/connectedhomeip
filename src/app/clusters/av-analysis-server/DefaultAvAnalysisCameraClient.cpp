@@ -512,8 +512,10 @@ void DefaultAvAnalysisCameraClient::OnResponse(CommandSender * apCommandSender, 
         }
         FinishRequest(status, videoStreamId);
     }
-    else
+    else if (mRequest.GetCommandType() == Request::CommandType::kVideoStreamDeallocate)
     {
+        VerifyOrReturn(aPath.mCommandId == Commands::VideoStreamDeallocate::Id,
+                       ChipLogError(Zcl, "AvAnalysisCameraClient: response on an unexpected path"));
         FinishRequest(aStatusIB.mStatus, mRequest.VideoStreamId());
     }
 }

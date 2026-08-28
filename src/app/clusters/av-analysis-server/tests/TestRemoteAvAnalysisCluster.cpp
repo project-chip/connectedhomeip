@@ -904,4 +904,63 @@ TEST_F(TestRemoteAvAnalysisCluster, AnalysisStreamTableEncodeDecodeTest)
     ASSERT_NE(added, nullptr);
     ASSERT_EQ(added->analysisStreamID, 3);
 }
+
+TEST_F(TestRemoteAvAnalysisCluster, AnalysisStreamTableDecodeRejectsDuplicateIds)
+{
+    AnalysisStreamTable table;
+    ASSERT_EQ(table.Init(2), CHIP_NO_ERROR);
+    const ScopedNodeId kCamera(0xABCD, 1);
+    ASSERT_NE(table.Add(10, kCamera), nullptr);
+    ASSERT_NE(table.Add(20, kCamera), nullptr);
+
+    // Forge a blob this code would never write: two entries sharing one AnalysisStreamID
+    table[1].analysisStreamID = table[0].analysisStreamID;
+
+    uint8_t buffer[AnalysisStreamTable::kEntrySerializedSize * 2 + AnalysisStreamTable::kArraySerializedOverhead];
+    TLV::TLVWriter writer;
+    writer.Init(buffer, sizeof(buffer));
+    ASSERT_EQ(table.Encode(writer), CHIP_NO_ERROR);
+
+    AnalysisStreamTable restored;
+    ASSERT_EQ(restored.Init(2), CHIP_NO_ERROR);
+    TLV::TLVReader reader;
+    reader.Init(buffer, writer.GetLengthWritten());
+    ASSERT_EQ(restored.Decode(reader), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // The rejected blob degrades to an empty table, same as any other corruption
+    ASSERT_EQ(restored.Count(), 0);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, AnalysisStreamTableDecodeFailureLeavesTableEmpty)
+{
+    AnalysisStreamTable table;
+    ASSERT_EQ(table.Init(3), CHIP_NO_ERROR);
+    const ScopedNodeId kCamera(0xABCD, 1);
+    ASSERT_NE(table.Add(10, kCamera), nullptr);
+    ASSERT_NE(table.Add(20, kCamera), nullptr);
+    ASSERT_NE(table.Add(30, kCamera), nullptr);
+
+    uint8_t buffer[AnalysisStreamTable::kEntrySerializedSize * 3 + AnalysisStreamTable::kArraySerializedOverhead];
+    TLV::TLVWriter writer;
+    writer.Init(buffer, sizeof(buffer));
+    ASSERT_EQ(table.Encode(writer), CHIP_NO_ERROR);
+
+    // Corrupt the blob: cut it off inside the second entry, after the first decoded cleanly
+    const uint32_t truncatedLength = writer.GetLengthWritten() - AnalysisStreamTable::kEntrySerializedSize;
+
+    AnalysisStreamTable restored;
+    ASSERT_EQ(restored.Init(3), CHIP_NO_ERROR);
+    TLV::TLVReader reader;
+    reader.Init(buffer, truncatedLength);
+    ASSERT_NE(restored.Decode(reader), CHIP_NO_ERROR);
+
+    // A corrupt blob degrades to an empty table, never a half-loaded one
+    ASSERT_EQ(restored.Count(), 0);
+
+    // The reset table is fully usable and mints ids from the start again
+    AnalysisStreamEntry * added = restored.Add(40, kCamera);
+    ASSERT_NE(added, nullptr);
+    ASSERT_EQ(added->analysisStreamID, 0);
+    ASSERT_EQ(restored.Count(), 1);
+}
 } // namespace

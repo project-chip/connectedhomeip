@@ -302,6 +302,8 @@ private:
 
     Request mRequest;
 
+    // mReadCallback is declared before mReadClient on purpose: the ReadClient holds the callback by
+    // reference, and members are destroyed in reverse declaration order, so the callback outlives it.
     Platform::UniquePtr<BufferedReadCallback> mReadCallback;
     Platform::UniquePtr<ReadClient> mReadClient;
     Platform::UniquePtr<CommandSender> mCommandSender;
