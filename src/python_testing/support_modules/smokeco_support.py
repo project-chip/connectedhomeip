@@ -23,9 +23,8 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher
 from matter.testing.matter_asserts import assert_valid_bool, assert_valid_uint32
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest
 from matter.testing.timeoperations import utc_datetime_from_matter_epoch_us
 
 log = logging.getLogger(__name__)
