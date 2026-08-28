@@ -18,12 +18,6 @@ import("${chip_root}/src/platform/nxp/crypto/nxp_crypto.gni")
 
 executable("thermostat-app") {
   sources = [
-    "${chip_root}/examples/thermostat/thermostat-common/src/thermostat-delegate-impl.cpp",
-    "${chip_root}/examples/thermostat/thermostat-common/src/thermostat-hold-delegate-impl.cpp",
-    "${chip_root}/examples/thermostat/thermostat-common/src/thermostat-occupancy-delegate-impl.cpp",
-    "${chip_root}/examples/thermostat/thermostat-common/src/thermostat-presets-delegate-impl.cpp",
-    "${chip_root}/examples/thermostat/thermostat-common/src/thermostat-setpoints-delegate-impl.cpp",
-    "${chip_root}/examples/thermostat/thermostat-common/src/thermostat-suggestions-delegate-impl.cpp",
     "../../linux/include/low-power/LowPowerManager.cpp",
     "../../linux/include/low-power/LowPowerManager.h",
     "../../linux/main.cpp",
