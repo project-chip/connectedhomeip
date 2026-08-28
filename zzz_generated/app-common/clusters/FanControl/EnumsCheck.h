@@ -46,9 +46,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::FanModeEnum
     case EnumType::kLow:
     case EnumType::kMedium:
     case EnumType::kHigh:
-    case EnumType::kOn:
     case EnumType::kAuto:
-    case EnumType::kSmart:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
