@@ -22,6 +22,7 @@
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <clusters/ColorControl/Attributes.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/TimerDelegateMock.h>
 #include <pw_unit_test/framework.h>
 
 namespace {
@@ -40,11 +41,12 @@ struct TestColorControlAttributes : public ::testing::Test
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 
+    TimerDelegateMock mockTimer;
     ColorControlDelegate delegate;
 
     ColorControlCluster::Config CtConfig()
     {
-        ColorControlCluster::Config c(delegate);
+        ColorControlCluster::Config c(delegate, mockTimer);
         c.mFeatures.Set(Feature::kColorTemperature);
         c.mColorValue                         = CTColor{ 250 };
         c.ctConfig.colorTempPhysicalMinMireds = 100;
@@ -149,7 +151,7 @@ TEST_F(TestColorControlAttributes, AttributesListIsFeatureGated)
     }
     // With XY enabled instead, CurrentX/CurrentY appear and color-temp does not.
     {
-        ColorControlCluster::Config config(delegate);
+        ColorControlCluster::Config config(delegate, mockTimer);
         config.mFeatures.Set(Feature::kXy);
         config.mColorValue = XYColor{ 1, 2 };
         ColorControlCluster c(kEp, config);

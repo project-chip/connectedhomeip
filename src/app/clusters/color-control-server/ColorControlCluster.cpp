@@ -24,9 +24,7 @@
 #include <clusters/ColorControl/Metadata.h>
 #include <cstdlib>
 #include <lib/support/TypeTraits.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <system/SystemClock.h>
-#include <type_traits>
 
 using namespace chip;
 using namespace chip::app;
@@ -35,7 +33,6 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::ColorControl;
 using namespace chip::app::Clusters::ColorControl::Attributes;
 using chip::Protocols::InteractionModel::Status;
-using chip::System::SystemClock;
 
 namespace {
 static constexpr uint16_t kMinCieXyValue = 0x0000;
@@ -50,14 +47,10 @@ static constexpr uint16_t kMaxInt16uValue = 0xFFFF; // RemainingTime sentinel fo
 // indefinite-move sentinel above. Mirrors ColorControlCluster::kMaxTransitionTime, which is private.
 static constexpr uint16_t kMaxRemainingTenths = 0xFFFE;
 
-// HueTransition::durationMs sentinel for a MoveHue rate move (no endpoint; runs until StopHueAxis).
-// Safely above any real point-to-point duration (kMaxTransitionTime deciseconds * 100).
-static constexpr uint32_t kIndefiniteHueMoveMs = UINT32_MAX;
-
 // ms → RemainingTime deciseconds, saturating at the attribute's constraint max. Durations are not bounded
 // by kMaxTransitionTime: a rate move covers its whole axis at the commanded rate (up to 0xFEFF units at
-// 1 unit/s ≈ 18 h) and a scene carries a transition time of up to 60000000 ms, either of which overflows
-// uint16 once divided by 100. Every RemainingTime write goes through here.
+// 1 unit/s ≈ 18 h) and a scene's transition time reaches 60000000 ms — either overflows uint16 once
+// divided by 100.
 constexpr uint16_t RemainingTenthsFromMs(uint32_t durationMs)
 {
     return static_cast<uint16_t>(std::min<uint32_t>(durationMs / 100, kMaxRemainingTenths));
@@ -77,14 +70,13 @@ inline uint16_t RemainingTenths(uint64_t startTimeMs, uint32_t durationMs, uint6
     {
         return 0;
     }
-    return RemainingTenthsFromMs(static_cast<uint32_t>(endMs - now)); // or (… + 99)/100 to round up
+    return RemainingTenthsFromMs(static_cast<uint32_t>(endMs - now));
 }
 static constexpr uint8_t kMinCurrentLevel = 0x01;
 static constexpr uint8_t kMaxCurrentLevel = 0xFE;
 
-// Non-codegen scene attribute-value validator (mirrors LevelControl's GlobalLevelControlValidator):
-// accepts exactly the ColorControl scenable attribute IDs. Passed to the DefaultSceneHandlerImpl base
-// from the constructor.
+// Validates the attribute/value pairs a scene stores for ColorControl. Handed to the
+// DefaultSceneHandlerImpl base from the constructor.
 class ColorControlValidator : public scenes::AttributeValuePairValidator
 {
 public:
@@ -92,9 +84,9 @@ public:
                         AttributeValuePairValidator::AttributeValuePairType & value) override
     {
         VerifyOrReturnError(clusterPath.mClusterId == ColorControl::Id, CHIP_ERROR_INVALID_ARGUMENT);
-        // Per-pair validation: the correct value type must be present and within the attribute's range.
-        // (The cross-pair mode<->attribute presence check lives in ColorControlCluster::SerializeAdd, since
-        // a per-pair validator cannot see the EnhancedColorMode and its companions together.)
+        // Per-pair only: correct value type present and within the attribute's range. The cross-pair
+        // mode<->attribute presence check lives in ColorControlCluster::SerializeAdd, which sees the
+        // whole EFS.
         switch (value.attributeID)
         {
         case CurrentX::Id:
@@ -143,21 +135,20 @@ scenes::AttributeValuePairValidator & GlobalColorControlValidator()
 
 using AttributeValuePair = ScenesManagement::Structs::AttributeValuePairStruct::Type;
 
-/// Append one attribute/value pair to the scene array and advance the count.
-template <typename Type>
-void AddAttributeValuePair(AttributeValuePair * pairs, AttributeId id, Type value, size_t & attributeCount)
+/// Append one attribute/value pair to the scene array and advance the count. The overload set is limited
+/// to the two unsigned widths ColorControl scenes use, so any other type is an ambiguous call rather than
+/// a silent conversion.
+void AddAttributeValuePair(AttributeValuePair * pairs, AttributeId id, uint8_t value, size_t & attributeCount)
 {
-    static_assert((std::is_same_v<Type, uint8_t>) || (std::is_same_v<Type, uint16_t>), "Type must be uint8_t or uint16_t");
-
     pairs[attributeCount].attributeID = id;
-    if constexpr (std::is_same_v<Type, uint8_t>)
-    {
-        pairs[attributeCount].valueUnsigned8.SetValue(value);
-    }
-    else if constexpr (std::is_same_v<Type, uint16_t>)
-    {
-        pairs[attributeCount].valueUnsigned16.SetValue(value);
-    }
+    pairs[attributeCount].valueUnsigned8.SetValue(value);
+    attributeCount++;
+}
+
+void AddAttributeValuePair(AttributeValuePair * pairs, AttributeId id, uint16_t value, size_t & attributeCount)
+{
+    pairs[attributeCount].attributeID = id;
+    pairs[attributeCount].valueUnsigned16.SetValue(value);
     attributeCount++;
 }
 
@@ -165,40 +156,35 @@ void AddAttributeValuePair(AttributeValuePair * pairs, AttributeId id, Type valu
 
 ColorControlCluster::ColorControlCluster(EndpointId endpoint, const Config & config) :
     DefaultServerCluster({ endpoint, ColorControl::Id }), scenes::DefaultSceneHandlerImpl(GlobalColorControlValidator()),
-    mDelegate(&config.mDelegate), mFeatures(config.mFeatures), mColorValue(config.mColorValue), mColorLoop(config.mColorLoop),
-    mCT(config.ctConfig), mStaticConfig(config.sc), mOnOff(config.onOff),
-    mIgnoreHueCommandsWhileColorLooping(config.ignoreHueCommandsWhileColorLooping)
-{
-    // ColorCapabilities mirrors the FeatureMap 1:1 (the two bitmaps share bit positions 0x1..0x10).
-    mState.colorCapabilities.SetRaw(static_cast<uint16_t>(mFeatures.Raw()));
+    mDelegate(config.mDelegate), mTimerDelegate(config.mTimerDelegate), mFeatures(config.mFeatures),
+    mColorValue(config.mColorValue), mColorLoop(config.mColorLoop), mCT(config.ctConfig), mStaticConfig(config.sc),
+    mOnOff(config.onOff)
+{}
 
-    // NumberOfPrimaries: count the app-provided fixed primaries; stays null when no StaticConfig is given.
-    if (mStaticConfig != nullptr)
+Nullable<uint8_t> ColorControlCluster::NumberOfPrimaries() const
+{
+    VerifyOrReturnValue(mStaticConfig != nullptr, Nullable<uint8_t>());
+
+    uint8_t count = 0;
+    for (const auto & primary : mStaticConfig->primaries)
     {
-        uint8_t count = 0;
-        for (const auto & primary : mStaticConfig->primaries)
+        if (primary.has_value())
         {
-            if (primary.has_value())
-            {
-                count++;
-            }
+            count++;
         }
-        mState.numberOfPrimaries.SetNonNull(count);
     }
+    return Nullable<uint8_t>(count);
 }
 
 ColorControlCluster::~ColorControlCluster()
 {
-    // Guaranteed cleanup: cancel the tick timer so a callback registered against DeviceLayer::SystemLayer()
-    // with `this` never fires after the object is gone. Shutdown() also cancels it, but is not always called
-    // (e.g. stack-allocated clusters in unit tests), and CancelTimer is a no-op when nothing is armed.
-    DeviceLayer::SystemLayer().CancelTimer(&TimerCallback, this);
+    // Cancel the tick timer so the delegate never calls TimerFired() on a context that is gone. Shutdown()
+    // also cancels it but is not always called (e.g. stack-allocated clusters in unit tests); CancelTimer
+    // is a no-op when nothing is armed.
+    mTimerDelegate.CancelTimer(this);
 }
 
 // ---- Scene handler (scenes::DefaultSceneHandlerImpl) ----
-// This cluster is its own scene handler; the owning application registers it with the endpoint's scene
-// table (table->RegisterHandler(&cluster)). All access is to this cluster's own live state — no registry
-// lookup, no cross-endpoint resolution.
 
 bool ColorControlCluster::SupportsCluster(EndpointId endpoint, ClusterId clusterId)
 {
@@ -216,37 +202,38 @@ CHIP_ERROR ColorControlCluster::SerializeSave(EndpointId endpoint, ClusterId clu
     // (SerializeSave must never change the live color).
     if (HasFeature(Feature::kXy))
     {
-        AddAttributeValuePair<uint16_t>(pairs, Attributes::CurrentX::Id, CurrentX(), attributeCount);
-        AddAttributeValuePair<uint16_t>(pairs, Attributes::CurrentY::Id, CurrentY(), attributeCount);
+        AddAttributeValuePair(pairs, Attributes::CurrentX::Id, CurrentX(), attributeCount);
+        AddAttributeValuePair(pairs, Attributes::CurrentY::Id, CurrentY(), attributeCount);
     }
     if (HasFeature(Feature::kHueAndSaturation))
     {
-        // When EnhancedHue is supported, EnhancedCurrentHue is the 16-bit superset and CurrentHue is just
-        // a projection of it (hue == enhancedHue >> 8).
-        if (HasFeature(Feature::kEnhancedHue))
+        // The hue attribute follows the ACTIVE MODE, not the feature: a scene never carries a hue
+        // representation its declared EnhancedColorMode cannot express, so ApplyScene never has to guess
+        // which of the two was saved.
+        if (GetEnhancedColorMode() == EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation)
         {
-            AddAttributeValuePair<uint16_t>(pairs, Attributes::EnhancedCurrentHue::Id, EnhancedHue(), attributeCount);
+            AddAttributeValuePair(pairs, Attributes::EnhancedCurrentHue::Id, EnhancedHue(), attributeCount);
         }
         else
         {
-            AddAttributeValuePair<uint8_t>(pairs, Attributes::CurrentHue::Id, CurrentHue(), attributeCount);
+            AddAttributeValuePair(pairs, Attributes::CurrentHue::Id, CurrentHue(), attributeCount);
         }
-        AddAttributeValuePair<uint8_t>(pairs, Attributes::CurrentSaturation::Id, Saturation(), attributeCount);
+        AddAttributeValuePair(pairs, Attributes::CurrentSaturation::Id, Saturation(), attributeCount);
     }
     if (HasFeature(Feature::kColorLoop))
     {
-        AddAttributeValuePair<uint8_t>(pairs, Attributes::ColorLoopActive::Id, ColorLoopActive(), attributeCount);
-        AddAttributeValuePair<uint8_t>(pairs, Attributes::ColorLoopDirection::Id, ColorLoopDirection(), attributeCount);
-        AddAttributeValuePair<uint16_t>(pairs, Attributes::ColorLoopTime::Id, ColorLoopTime(), attributeCount);
+        AddAttributeValuePair(pairs, Attributes::ColorLoopActive::Id, ColorLoopActive(), attributeCount);
+        AddAttributeValuePair(pairs, Attributes::ColorLoopDirection::Id, ColorLoopDirection(), attributeCount);
+        AddAttributeValuePair(pairs, Attributes::ColorLoopTime::Id, ColorLoopTime(), attributeCount);
     }
     if (HasFeature(Feature::kColorTemperature))
     {
-        AddAttributeValuePair<uint16_t>(pairs, Attributes::ColorTemperatureMireds::Id, ColorTempMireds(), attributeCount);
+        AddAttributeValuePair(pairs, Attributes::ColorTemperatureMireds::Id, ColorTempMireds(), attributeCount);
     }
 
     // EnhancedColorMode is mandatory and disambiguates which mode the scene captured (§3.2.7.1).
-    AddAttributeValuePair<uint8_t>(pairs, Attributes::EnhancedColorMode::Id,
-                                   static_cast<uint8_t>(to_underlying(GetEnhancedColorMode())), attributeCount);
+    AddAttributeValuePair(pairs, Attributes::EnhancedColorMode::Id, static_cast<uint8_t>(to_underlying(GetEnhancedColorMode())),
+                          attributeCount);
 
     DataModel::List<AttributeValuePair> attributeValueList(pairs, attributeCount);
     return EncodeAttributeValueList(attributeValueList, serializedBytes);
@@ -260,17 +247,12 @@ CHIP_ERROR ColorControlCluster::ApplyScene(EndpointId endpoint, ClusterId cluste
     DataModel::DecodableList<ScenesManagement::Structs::AttributeValuePairStruct::DecodableType> attributeValueList;
     ReturnErrorOnFailure(DecodeAttributeValueList(serializedBytes, attributeValueList));
 
-    size_t attributeCount = 0;
-    ReturnErrorOnFailure(attributeValueList.ComputeSize(&attributeCount));
-    VerifyOrReturnError(attributeCount <= kColorControlScenableAttributesCount, CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    // Decode into flat locals. We build the ColorValue ONCE, after the loop: the EFS carries values for
-    // several modes in arbitrary order, and a std::variant holds only one alternative, so assigning
+    // Decode into flat locals and build the ColorValue ONCE, after the loop: the EFS carries values for
+    // several modes in arbitrary order and a std::variant holds only one alternative, so assigning
     // per-case would drop fields (X then Y) and could build the wrong alternative before EnhancedColorMode
-    // is even seen. No range clamping here: AddScene already rejected out-of-range pairs through
-    // ColorControlValidator, so a stored scene's values are in range by construction. The one exception is
-    // ColorTemperatureMireds, clamped to this endpoint's physical range in StartColorTemperatureTransition —
-    // those bounds are per-device, so the add-time validator cannot enforce them.
+    // is even seen. No range clamping: AddScene already rejected out-of-range pairs through
+    // ColorControlValidator. The one exception is ColorTemperatureMireds, whose bounds are per-device and
+    // so are applied in StartColorTemperatureTransition rather than by the add-time validator.
     auto targetColorMode = EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation;
     uint16_t x           = 0;
     uint16_t y           = 0;
@@ -278,7 +260,6 @@ CHIP_ERROR ColorControlCluster::ApplyScene(EndpointId endpoint, ClusterId cluste
     uint16_t mireds      = 0;
     uint8_t hue          = 0;
     uint8_t saturation   = 0;
-    bool hasCurrentHue   = false;
     ColorLoopState loop;
 
     auto it = attributeValueList.begin();
@@ -300,10 +281,8 @@ CHIP_ERROR ColorControlCluster::ApplyScene(EndpointId endpoint, ClusterId cluste
             enhancedHue = p.valueUnsigned16.Value();
             break;
         case Attributes::CurrentHue::Id:
-            // HS-only devices scene the 8-bit hue directly (they have no EnhancedCurrentHue).
             VerifyOrReturnError(p.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-            hue           = p.valueUnsigned8.Value();
-            hasCurrentHue = true;
+            hue = p.valueUnsigned8.Value();
             break;
         case Attributes::CurrentSaturation::Id:
             VerifyOrReturnError(p.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -336,7 +315,6 @@ CHIP_ERROR ColorControlCluster::ApplyScene(EndpointId endpoint, ClusterId cluste
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
-    ReturnErrorOnFailure(it.GetStatus());
 
     // Build the single alternative matching the scene's declared mode. The color loop can be active in any
     // mode, so it is initialized separately.
@@ -350,9 +328,9 @@ CHIP_ERROR ColorControlCluster::ApplyScene(EndpointId endpoint, ClusterId cluste
         target = EnhancedHueSatColor{ .enhancedHue = enhancedHue, .saturation = saturation };
         break;
     case EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation:
-        // Prefer a directly-scened CurrentHue (HS-only devices); otherwise project from the 16-bit
-        // EnhancedCurrentHue that EnhancedHue devices save.
-        target = HueSatColor{ .hue = hasCurrentHue ? hue : static_cast<uint8_t>(enhancedHue >> 8), .saturation = saturation };
+        // The declared mode names its own attributes: SerializeSave writes CurrentHue in this mode and
+        // SerializeAdd requires it, so there is no second representation to fall back to.
+        target = HueSatColor{ .hue = hue, .saturation = saturation };
         break;
     case EnhancedColorModeEnum::kColorTemperatureMireds:
         target = CTColor{ .mireds = mireds };
@@ -363,15 +341,12 @@ CHIP_ERROR ColorControlCluster::ApplyScene(EndpointId endpoint, ClusterId cluste
 
     VerifyOrReturnError(SupportsMode(targetColorMode), CHIP_ERROR_INVALID_ARGUMENT);
 
-    // The cluster clamps values, switches mode, (re)starts the color loop if active, and starts the
-    // transition over the scene's transition time.
     return HandleApplyScene(targetColorMode, target, loop, timeMs);
 }
 
-// §3.2.7.1.1 scene-specific consistency check for AddScene: the EFS being *defined* must carry the
-// attributes its declared EnhancedColorMode requires. This is a PRESENCE check on the scene data (not the
-// values, not the server's live mode). The per-pair validator can't see the mode and its companions
-// together, so it is done here — the whole-EFS AddScene entry point — before delegating to the base.
+// §3.2.7.1.1 consistency check for AddScene: the EFS being *defined* must carry the attributes its
+// declared EnhancedColorMode requires. A PRESENCE check on the scene data — not the values, not the
+// server's live mode. Done here rather than in the per-pair validator, which sees one pair at a time.
 CHIP_ERROR
 ColorControlCluster::SerializeAdd(EndpointId endpoint,
                                   const ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType & extensionFieldSet,
@@ -457,22 +432,21 @@ CHIP_ERROR ColorControlCluster::Startup(ServerClusterContext & context)
     auto path           = [ep](AttributeId id) { return ConcreteAttributePath(ep, ColorControl::Id, id); };
 
     // The active color is persisted per-axis, but only the active mode's axes are meaningful. The
-    // persisted enhancedColorMode is the single source of truth for WHICH alternative to rebuild
-    // (colorMode is derivable, so we ignore its persisted copy). Rebuild mColorValue from it.
-    // Nothing stored yet (first boot) falls back to the first mode the feature map actually supports, not
-    // to the ZAP default: without the XY feature, CurrentX/CurrentY are not even in the attribute list, so
-    // seeding kCurrentXAndCurrentY would report a mode the endpoint does not have. Enhanced hue/sat is not
-    // a candidate — it also needs HS, which the first branch already picks.
+    // persisted enhancedColorMode decides WHICH alternative to rebuild (colorMode is derivable, so its
+    // persisted copy is ignored). With nothing stored yet, fall back to the first mode the feature map
+    // actually supports rather than the ZAP default: without the XY feature, CurrentX/CurrentY are not
+    // even in the attribute list, so seeding kCurrentXAndCurrentY would report a mode the endpoint does
+    // not have. Enhanced hue/sat is not a candidate — it also needs HS, which the first branch picks.
     EnhancedColorModeEnum mode = HasFeature(Feature::kHueAndSaturation) ? EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation
         : HasFeature(Feature::kXy)                                      ? EnhancedColorModeEnum::kCurrentXAndCurrentY
                                                                         : EnhancedColorModeEnum::kColorTemperatureMireds;
     persistence.LoadNativeEndianValue(path(Attributes::EnhancedColorMode::Id), mode, mode);
     switch (mode)
     {
-    // Each axis is seeded from mColorValue — still the constructor-supplied color at this point — so a
-    // first boot with nothing stored keeps the color the application configured. Seeding only works when
-    // the configured color is of this mode's alternative; a stored mode that differs from the configured
-    // one starts from the type's own defaults and overwrites them with its own stored axes.
+    // Each axis is seeded from mColorValue — still the constructor-supplied color here — so a first boot
+    // with nothing stored keeps the color the application configured. That only applies when the
+    // configured color is of this mode's alternative; a stored mode that differs starts from the type's
+    // own defaults and overwrites them with its stored axes.
     case EnhancedColorModeEnum::kCurrentXAndCurrentY: {
         XYColor c = std::holds_alternative<XYColor>(mColorValue) ? std::get<XYColor>(mColorValue) : XYColor{};
         persistence.LoadNativeEndianValue(path(CurrentX::Id), c.x, c.x);
@@ -523,27 +497,23 @@ CHIP_ERROR ColorControlCluster::Startup(ServerClusterContext & context)
     }
 
     // Resume a color loop that was running at shutdown (§3.2.8.1). Loading ColorLoopActive alone leaves the
-    // loop dormant — nothing drives EnhancedCurrentHue until the next command. Re-arm it here, but only if it
-    // is actually DRIVING: the monotonic clock resets across reboot, so we cannot recover the original phase;
-    // instead re-anchor from the just-restored EnhancedCurrentHue and "now" (drift-free from this point on).
-    // This runs AFTER the startup-CT block on purpose: if StartUpColorTemperatureMireds forced CT mode, the
-    // loop is active-but-dormant (LoopIsDriving() is false), so we correctly do NOT arm the tick.
+    // loop dormant — nothing drives EnhancedCurrentHue until the next command — so re-arm it here, but only
+    // if it is actually DRIVING. The monotonic clock resets across reboot, so the original phase is gone:
+    // re-anchor from the just-restored EnhancedCurrentHue and "now" (drift-free from here on). Runs AFTER
+    // the startup-CT block on purpose: if StartUpColorTemperatureMireds forced CT mode the loop is
+    // active-but-dormant (LoopIsDriving() is false), so the tick is correctly not armed.
     if (HasFeature(Feature::kColorLoop) && LoopIsDriving())
     {
         auto & ehs                   = std::get<EnhancedHueSatColor>(mColorValue);
         mColorLoop.storedEnhancedHue = ehs.enhancedHue; // best-effort restore target (RAM-only, lost on reboot)
         mColorLoopStartHue           = ehs.enhancedHue;
-        mColorLoopStartTimeMs        = SystemClock().GetMonotonicMilliseconds64().count();
+        mColorLoopStartTimeMs        = NowMs();
         LogErrorOnFailure(ArmTick());
     }
 
     return CHIP_NO_ERROR;
 }
 
-// ── Persistence ──────────────────────────────────────────────────────────────────────────────────
-// Mirror of the NVM-flagged attributes restored in Startup(): Startup reads them, these write them back.
-// Writes are settle-triggered (transition end / discrete change), never per-tick — RemainingTime and the
-// in-flight transition are RAM-only, so persisting each intermediate tick would only wear flash.
 template <typename T>
 void ColorControlCluster::PersistValue(AttributeId id, const T & value)
 {
@@ -552,9 +522,8 @@ void ColorControlCluster::PersistValue(AttributeId id, const T & value)
     LogErrorOnFailure(persistence.StoreNativeEndianValue(ConcreteAttributePath(mPath.mEndpointId, ColorControl::Id, id), value));
 }
 
-// Persist EnhancedColorMode (the single source of truth for WHICH alternative to rebuild — colorMode is
-// derived) plus the active mode's stored axes. This is exactly the set Startup() reads to reconstruct
-// mColorValue, at matching native-endian widths.
+// Persist EnhancedColorMode (which decides the alternative to rebuild — colorMode is derived) plus the
+// active mode's stored axes: exactly the set Startup() reads back, at matching native-endian widths.
 void ColorControlCluster::PersistCurrentColor()
 {
     VerifyOrReturn(mContext != nullptr);
@@ -580,16 +549,17 @@ void ColorControlCluster::PersistCurrentColor()
     }
 }
 
-// Stop whatever axes mTransition is driving and freeze the value they stopped at (it won't reach OnTick's
-// settle). Persisting is guarded on a driver actually running: a Stop switches no mode, so an idle Stop has
-// nothing new to store and writing anyway would wear flash on every repeat — same guard as OnTick's
-// hadTransition.
-// Returns whether a driver was actually stopped, so callers can scope side effects that are only owed
-// when the output really moved (scene invalidation) to that case.
+// Freezes the value the stopped axes were at, which would otherwise never reach OnTick's settle. The early
+// return keeps a repeated idle Stop from rewriting unchanged values into flash.
 bool ColorControlCluster::StopTransitionAndFreeze()
 {
     VerifyOrReturnValue(!std::holds_alternative<std::monostate>(mTransition), false);
     mTransition = std::monostate{};
+    // Hardware running its own fade must abort it here, or the cluster freezes its value while the light
+    // keeps moving and the two disagree for good. The frozen value is the last one already fed to the
+    // delegate. Only this cut-short path notifies: a movement that reaches its endpoint ends in OnTick,
+    // whose final On*Changed already carried transitionActive == false.
+    mDelegate.OnTransitionStopped();
     PersistCurrentColor();
     return true;
 }
@@ -608,66 +578,65 @@ void ColorControlCluster::Shutdown(ClusterShutdownType type)
     // application that called table->RegisterHandler(&cluster), so the matching UnregisterHandler() is
     // its responsibility as well (see the class comment) — the scene table keeps a raw handler pointer.
 
-    // Stop the 100ms tick so no callback fires after teardown.
-    DeviceLayer::SystemLayer().CancelTimer(&TimerCallback, this);
+    // Stop the tick so no callback fires after teardown.
+    mTimerDelegate.CancelTimer(this);
     DefaultServerCluster::Shutdown(type);
 }
 
-// Arm the one-shot 100ms tick. Guard against double-arming so a command issued mid-transition
-// doesn't stack a second timer; OnTick re-arms itself while any axis (or the loop) is still moving.
+// Arm the one-shot tick. Guarded against double-arming so a command issued mid-transition doesn't stack
+// a second timer; OnTick re-arms itself while any axis (or the loop) is still moving.
 CHIP_ERROR ColorControlCluster::ArmTick()
 {
-    if (DeviceLayer::SystemLayer().IsTimerActive(&TimerCallback, this))
+    if (mTimerDelegate.IsTimerActive(this))
     {
         return CHIP_NO_ERROR;
     }
-    return DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kTickMs), &TimerCallback, this);
+    return mTimerDelegate.StartTimer(this, System::Clock::Milliseconds32(kTickMs));
 }
 
 bool ColorControlCluster::LoopIsDriving() const
 {
     // Drives only when it holds the green light (not parked by a hue command — see OnTick's latch), is
     // active, and enhanced-HS owns the output (XY / CT / legacy-HS park it via the mode check). The green
-    // light is what a normally-running loop and one parked after a finite move differ by — both otherwise
-    // sit at active==1 / monostate / enhanced-HS, so mTransition alone can't tell them apart.
+    // light is the only thing separating a normally-running loop from one parked after a finite move:
+    // both otherwise sit at active==1 / monostate / enhanced-HS.
     return mColorLoopEngaged && mColorLoop.active == 1 && std::holds_alternative<EnhancedHueSatColor>(mColorValue);
 }
 
-// §3.2.11: while a color loop is active, the manufacturer MAY ignore commands that change hue. This
-// centralizes that choice so every hue-changing command can apply it identically.
+// §3.2.11: while a color loop is active, the manufacturer MAY ignore commands that change hue. Held in
+// one place so every hue-changing command applies the choice identically.
 bool ColorControlCluster::ShouldIgnoreHueCommandNow() const
 {
-    return HasFeature(Feature::kColorLoop) && mColorLoop.active && mIgnoreHueCommandsWhileColorLooping;
+    // No StaticConfig at all means the application never opted in, so the commands are honored.
+    return HasFeature(Feature::kColorLoop) && mColorLoop.active && mStaticConfig != nullptr &&
+        mStaticConfig->ignoreHueCommandsWhileColorLooping;
 }
 
 // RemainingTime store + edge-triggered report (§3.2.7.4): report only when it reaches 0, rises from 0
 // past the 10-tenths threshold, or a fresh command moves it by MORE than 10 tenths; intermediate ticks
-// update the value quietly. The delta gate on the isNewTransition arm is what keeps a short command
-// (e.g. MoveToHue with TransitionTime 5) from reporting — a sub-second transition never clears it.
-// `report` is computed against the OLD value before SetAttributeValue writes.
+// update the value quietly. The delta gate on the isNewTransition arm keeps a short command (e.g.
+// MoveToHue with TransitionTime 5) from reporting. `report` is computed against the OLD value.
 void ColorControlCluster::SetQuietReportRemainingTime(uint16_t newRemainingTime, bool isNewTransition)
 {
     constexpr uint16_t kReportDelta = 10;
-    const uint16_t previous         = mState.remainingTime;
-    const bool commandDeltaExceeded =
-        (newRemainingTime > previous) ? (newRemainingTime - previous > kReportDelta) : (previous - newRemainingTime > kReportDelta);
+    const bool commandDeltaExceeded = std::abs(newRemainingTime - mState.remainingTime) > kReportDelta;
 
-    const bool report =
-        (newRemainingTime == 0) || (previous == 0 && newRemainingTime > kReportDelta) || (isNewTransition && commandDeltaExceeded);
+    const bool report = (newRemainingTime == 0) || (mState.remainingTime == 0 && newRemainingTime > kReportDelta) ||
+        (isNewTransition && commandDeltaExceeded);
     SetAttributeValue(mState.remainingTime, newRemainingTime, RemainingTime::Id,
                       report ? AttributeChangeType::kReportable : AttributeChangeType::kQuiet);
 }
 
 void ColorControlCluster::OnTick()
 {
-    const uint64_t now = SystemClock().GetMonotonicMilliseconds64().count();
+    const uint64_t now = NowMs();
     bool driverActive  = false;
     uint16_t remaining = 0; // 1/10 s, slowest still-active axis; 0 once everything has settled
 
     // Remember whether a driver was running: if it settles this tick we persist the final color once.
     const bool hadTransition = !std::holds_alternative<std::monostate>(mTransition);
 
-    // Green-light latch: once a command's hue transition owns the hue axis, the loop is parked and stays
+    // Green-light latch: once a command's hue transition owns the hue axis, the loop parks and stays
     // parked (ColorLoopActive stays 1) even after that transition clears to monostate — only ColorLoopSet
     // re-engages it. Checked BEFORE the dispatch below so a single-tick (transitionTime == 0) hue command
     // latches it before its transition completes. A sat-only transition has no hue axis → loop keeps hue.
@@ -695,10 +664,9 @@ void ColorControlCluster::OnTick()
     }
     else if (auto * hsx = std::get_if<HueSatTransition>(&mTransition))
     {
-        // Hue and saturation are independent axes (§3.2.5.2): clearing one leaves
-        // the other running. Each Tick* returns false when its axis has finished.
-        // Loop-vs-hue exclusivity is enforced at the commands (they never start a hue
-        // axis while the loop drives), so this branch stays loop-agnostic.
+        // Hue and saturation are independent axes (§3.2.5.2): clearing one leaves the other running.
+        // Each Tick* returns false when its axis has finished. Loop-vs-hue exclusivity is enforced at
+        // the commands, so this branch stays loop-agnostic.
         if (hsx->hue && !TickHue(*hsx->hue, now))
         {
             hsx->hue.reset();
@@ -725,9 +693,8 @@ void ColorControlCluster::OnTick()
     if (!driverActive)
     {
         mTransition = std::monostate{};
-        // A transition that just settled wrote the exact target into mColorValue; persist that final
-        // value so a reboot restores where the light actually ended up. Guarded on hadTransition so idle
-        // ticks (mTransition already monostate) don't write, and it never fires mid-transition.
+        // A transition that just settled wrote the exact target into mColorValue; persist it so a reboot
+        // restores where the light actually ended up. Guarded on hadTransition so idle ticks don't write.
         if (hadTransition)
         {
             PersistCurrentColor();
@@ -743,10 +710,8 @@ void ColorControlCluster::OnTick()
         remaining = kMaxInt16uValue;
     }
 
-    // ONE quiet-report per tick for RemainingTime (§3.2.7.4): the QuieterReporting predicate reports
-    // only when the value hits 0 (transition just finished, since driverActive/loopActive went false
-    // → remaining stayed 0), crosses 0→(>10), or on a command-caused delta (isNewTransition, set by the
-    // command handlers — false here). Mid-transition it is updated quietly, never spamming reports.
+    // ONE RemainingTime write per tick (§3.2.7.4). isNewTransition is false here: only a command can
+    // cause the delta-based report, so a tick reports only on hitting 0 or crossing 0→(>10).
     SetQuietReportRemainingTime(remaining, /*isNewTransition=*/false);
 
     // Re-arm only while something is still moving → zero CPU at steady state.
@@ -756,225 +721,170 @@ void ColorControlCluster::OnTick()
     }
 }
 
-// ── each tick · store the value + report it. Pure math, one clock read in OnTick. ─
-// TickHue: position from wall-clock elapsed, exact endpoint on the last tick, then store + fan-out.
+// ── Tick*: one step of one axis ─────────────────────────────────────────────────────────────────
+// Each interpolates its axis from the wall-clock anchor (landing on the exact endpoint on the last
+// tick), stores the result, fans it out, and returns whether the axis is still moving. OnTick reads
+// the clock once and passes `now` in, so the tick itself is pure math.
+//
+// The two fan-out channels run at different cadences:
+//   * NETWORK REPORTING is throttled (§3.2.7.2) — the kQuiet/kReportable flag each Tick* computes
+//     keeps the wire silent mid-transition and reports on the arriving tick.
+//   * HARDWARE OUTPUT is continuous (§3.2.8) — the delegate owns no timer, so its callbacks fire on
+//     EVERY tick regardless of that flag.
+//
+// Each output callback carries transitionActive == !done for its own axis: true marks an intermediate
+// frame, false the exact endpoint. Hardware ramping natively (see the transition-start notifications on
+// ColorControlDelegate) drops the true frames and applies only the endpoint, which re-syncs it with the
+// cluster's own interpolation.
+
 bool ColorControlCluster::TickHue(HueTransition & tx, uint64_t now)
 {
-    const uint64_t elapsed = now - tx.startTimeMs;
-    uint16_t eh            = 0;
-    bool done              = false;
+    // signedDelta is the signed arc to travel over durationMs — or, for a MoveHue rate move
+    // (durationMs == kIndefiniteHueMoveMs), hue-units per second with no endpoint.
+    const auto [position, done] = Interpolate(tx.startHue, tx.signedDelta, tx.startTimeMs, tx.durationMs, now);
+    const uint16_t eh           = static_cast<uint16_t>(position & 0xFFFF); // hue is circular: mod kHueCircle, never clamped
 
-    if (tx.durationMs == kIndefiniteHueMoveMs)
-    {
-        // Indefinite rate move (MoveHue): signedDelta is hue-units per second, wrapping forever
-        // until StopHueAxis. Position = start + rate * elapsed, taken mod 0x10000 (circular).
-        const int64_t moved = static_cast<int64_t>(tx.signedDelta) * static_cast<int64_t>(elapsed) / 1000;
-        eh                  = static_cast<uint16_t>((static_cast<int64_t>(tx.startHue) + moved) & 0xFFFF);
-        done                = false; // only StopHueAxis / ColorLoop-Deactivate ends it
-    }
-    else
-    {
-        // Point-to-point: signedDelta is the signed arc to travel over durationMs. durationMs == 0
-        // means transitionTime == 0 → jump to the endpoint on the first tick (avoids div-by-zero).
-        done              = (tx.durationMs == 0) || (elapsed >= tx.durationMs);
-        const float t     = done ? 1.f : std::clamp(static_cast<float>(elapsed) / static_cast<float>(tx.durationMs), 0.f, 1.f);
-        const int32_t arc = done ? tx.signedDelta                                                // exact endpoint, no drift
-                                 : static_cast<int32_t>(static_cast<float>(tx.signedDelta) * t); // 16-bit circular interpolation
-        eh                = static_cast<uint16_t>((static_cast<int32_t>(tx.startHue) + arc) & 0xFFFF);
-    }
-
-    // NETWORK REPORTING is throttled (§3.2.7.2): silent mid-transition, report at the end.
     const auto change = done ? AttributeChangeType::kReportable : AttributeChangeType::kQuiet;
 
-    // The transition runs in 16-bit; store into whichever HS alternative is active, at its native
-    // precision, and hand the hardware that same precision. Exactly one of CurrentHue /
-    // EnhancedCurrentHue is a stored field; the other is a projection signalled notify-only
-    // (mode-dependent).
+    // Exactly one of CurrentHue / EnhancedCurrentHue is a stored field and the other is a projection of
+    // it, decided by the active alternative. Store at that alternative's native precision, signal the
+    // projection notify-only, and hand the hardware the same precision.
     if (auto * ehs = std::get_if<EnhancedHueSatColor>(&mColorValue))
     {
-        SetAttributeValue(ehs->enhancedHue, eh, EnhancedCurrentHue::Id, change); // store 16-bit + report
-        NotifyAttributeChanged(CurrentHue::Id, change);                          // projection: hue8() = eh >> 8
-        mDelegate->OnEnhancedHueChanged(ehs->enhancedHue); // 16-bit out; truncating here would drop the EHUE resolution
+        SetAttributeValue(ehs->enhancedHue, eh, EnhancedCurrentHue::Id, change);
+        NotifyAttributeChanged(CurrentHue::Id, change);
+        // 16-bit out; truncating here would drop the EHUE resolution
+        mDelegate.OnEnhancedHueChanged(ehs->enhancedHue, !done);
     }
     else
     {
         auto & hs = std::get<HueSatColor>(mColorValue);
-        SetAttributeValue(hs.hue, static_cast<uint8_t>(eh >> 8), CurrentHue::Id, change); // store 8-bit + report
-        NotifyAttributeChanged(EnhancedCurrentHue::Id, change);                           // projection: enhancedHue() = hue << 8
-        mDelegate->OnColorHSChanged(hs.hue, hs.saturation);
+        SetAttributeValue(hs.hue, static_cast<uint8_t>(eh >> 8), CurrentHue::Id, change);
+        NotifyAttributeChanged(EnhancedCurrentHue::Id, change);
+        mDelegate.OnColorHSChanged(hs.hue, hs.saturation, !done);
     }
 
-    // HARDWARE OUTPUT is continuous, NOT throttled (§3.2.8): the delegate owns no timer, so the hue
-    // callback fires EVERY tick (exact target on the last one) regardless of the kQuiet/kReportable
-    // flag, which governs only network reporting.
-    return !done; // "still active"
+    return !done;
 }
 
-// TickSat: linear position from wall-clock elapsed, exact endpoint on the last tick, then store + fan-out.
 bool ColorControlCluster::TickSat(SatTransition & tx, uint64_t now)
 {
-    const uint64_t elapsed = now - tx.startTimeMs;
-    // transitionTime 0 is an immediate move: land on the target this tick (this is also the 0/0 -> NaN
-    // guard for a same-instant elapsed==0 tick).
-    const float t =
-        (tx.durationMs == 0) ? 1.f : std::clamp(static_cast<float>(elapsed) / static_cast<float>(tx.durationMs), 0.f, 1.f);
-    const bool done = (t >= 1.f);
+    // Saturation is linear (not circular) and 8-bit.
+    const auto [position, done] =
+        Interpolate(tx.startSat, int32_t{ tx.targetSat } - int32_t{ tx.startSat }, tx.startTimeMs, tx.durationMs, now);
+    const uint8_t sat = static_cast<uint8_t>(position);
 
-    // Saturation is linear (not circular) and 8-bit. Exact target on the last tick avoids drift.
-    const uint8_t sat = done
-        ? tx.targetSat
-        : static_cast<uint8_t>(tx.startSat + static_cast<int32_t>(static_cast<float>(int32_t(tx.targetSat) - tx.startSat) * t));
-
-    // NETWORK REPORTING is throttled (§3.2.7.2): silent mid-transition, report at the end.
     const auto change = done ? AttributeChangeType::kReportable : AttributeChangeType::kQuiet;
 
-    // CurrentSaturation is a single stored value shared by legacy and enhanced HS — no projection,
-    // so SetAttributeValue (store + notify) is all it needs. Write into whichever HS alt is active.
+    // CurrentSaturation is one stored value shared by legacy and enhanced HS — no projection to signal.
     if (auto * ehs = std::get_if<EnhancedHueSatColor>(&mColorValue))
     {
         SetAttributeValue(ehs->saturation, sat, CurrentSaturation::Id, change);
         // OnColorHSChanged is the only saturation channel, so it carries the 8-bit hue too. Re-assert
         // the 16-bit hue afterwards: a hue transition running alongside this one feeds the hardware at
         // full precision, and the truncated hue above must not be the last word between its ticks.
-        mDelegate->OnColorHSChanged(ehs->hue8(), ehs->saturation);
-        mDelegate->OnEnhancedHueChanged(ehs->enhancedHue);
+        //
+        // That re-assert describes the HUE axis, so it carries the hue axis's own liveness, not this
+        // axis's `done`: hardware fading the hue must not be snapped to the software position just
+        // because saturation arrived first. OnTick ticks hue before saturation and clears a finished
+        // axis right after its Tick* returns, so hsx->hue reads post-completion here.
+        const auto * hsx     = std::get_if<HueSatTransition>(&mTransition);
+        const bool hueMoving = (hsx != nullptr) && hsx->hue.has_value();
+        mDelegate.OnColorHSChanged(ehs->hue8(), ehs->saturation, !done);
+        mDelegate.OnEnhancedHueChanged(ehs->enhancedHue, hueMoving);
     }
     else
     {
         auto & hs = std::get<HueSatColor>(mColorValue);
         SetAttributeValue(hs.saturation, sat, CurrentSaturation::Id, change);
-        mDelegate->OnColorHSChanged(hs.hue, hs.saturation);
+        mDelegate.OnColorHSChanged(hs.hue, hs.saturation, !done);
     }
 
-    // HARDWARE OUTPUT is continuous, NOT throttled (§3.2.8): the delegate owns no timer, so the
-    // callbacks fire EVERY tick (exact target on the last one) regardless of the kQuiet/kReportable
-    // flag, which governs only network reporting.
-    return !done; // "still active"
+    return !done;
 }
 
-// TickCT: linear position from wall-clock elapsed, exact endpoint on the last tick, then store + fan-out.
 bool ColorControlCluster::TickCT(CTTransition & tx, uint64_t now)
 {
-    const uint64_t elapsed = now - tx.startTimeMs;
-    // transitionTime 0 is an immediate move: land on the target this tick (this is also the 0/0 -> NaN
-    // guard for a same-instant elapsed==0 tick).
-    const float t =
-        (tx.durationMs == 0) ? 1.f : std::clamp(static_cast<float>(elapsed) / static_cast<float>(tx.durationMs), 0.f, 1.f);
-    const bool done = (t >= 1.f);
+    // Color temperature is linear, 16-bit mireds.
+    const auto [position, done] =
+        Interpolate(tx.startMireds, int32_t{ tx.targetMireds } - int32_t{ tx.startMireds }, tx.startTimeMs, tx.durationMs, now);
+    const uint16_t mireds = static_cast<uint16_t>(position);
 
-    // Color temperature is linear, 16-bit mireds. Exact target on the last tick avoids drift.
-    const uint16_t mireds = done
-        ? tx.targetMireds
-        : static_cast<uint16_t>(tx.startMireds +
-                                static_cast<int32_t>(static_cast<float>(int32_t(tx.targetMireds) - tx.startMireds) * t));
-
-    // NETWORK REPORTING is throttled (§3.2.7.2): silent mid-transition, report at the end.
     const auto change = done ? AttributeChangeType::kReportable : AttributeChangeType::kQuiet;
 
-    // ColorTemperatureMireds is a single stored value with no projection, so SetAttributeValue
-    // (store + notify) is all it needs. In CT mode mColorValue is always CTColor (variant/mode kept
-    // in lockstep), so get<> is safe.
+    // In CT mode mColorValue is always CTColor (variant and mode are kept in lockstep), so get<> is safe.
     auto & ct = std::get<CTColor>(mColorValue);
     SetAttributeValue(ct.mireds, mireds, ColorTemperatureMireds::Id, change);
-    mDelegate->OnColorCTChanged(ct.mireds);
+    mDelegate.OnColorCTChanged(ct.mireds, !done);
 
-    // HARDWARE OUTPUT is continuous, NOT throttled (§3.2.8): the delegate owns no timer, so
-    // OnColorCTChanged fires EVERY tick (exact target on the last one) regardless of the
-    // kQuiet/kReportable flag, which governs only network reporting.
-    return !done; // "still active"
+    return !done;
 }
 
-// TickColorLoop: the autonomous enhanced-hue driver. Unlike the axes held in mTransition, the loop
-// is mode-independent and NEVER finishes — it cycles EnhancedCurrentHue around the full [0, 0x10000)
-// circle at a constant rate until ColorLoopSet(Deactivate) (§3.2.8.1). Nothing else stops it.
+// The autonomous enhanced-hue driver. Unlike the axes held in mTransition, the loop is mode-independent
+// and NEVER finishes — it cycles EnhancedCurrentHue around the full [0, kHueCircle) circle at a constant
+// rate until ColorLoopSet(Deactivate) (§3.2.8.1). Nothing else stops it.
 //
 // Position is derived from the wall-clock anchor (mColorLoopStartHue / mColorLoopStartTimeMs) stamped
-// when the loop started, so it is drift-free. Crucially the anchor is NOT re-stamped when the loop
-// goes dormant: its phase keeps advancing with real time even while XY/CT owns the output, so when the
-// mode returns to enhanced HS the hue is already where wall-clock says it should be — no jump.
+// when the loop started, so it is drift-free. Crucially the anchor is NOT re-stamped when the loop goes
+// dormant: its phase keeps advancing with real time even while XY/CT owns the output, so when the mode
+// returns to enhanced HS the hue is already where wall-clock says it should be — no jump.
 bool ColorControlCluster::TickColorLoop(uint64_t now)
 {
-    // Dormancy guard (§3.2.8.1): the loop can be active while XY/CT owns the output. LoopIsDriving()
-    // is true only when ColorLoopActive == 1 AND the active value is EnhancedHueSatColor. When it is
-    // dormant we write nothing and return false — a dormant loop has no reason to keep the tick alive
-    // (whatever command switches the mode back to enhanced HS will re-arm the timer itself).
+    // Dormancy guard (§3.2.8.1): the loop can be active while XY/CT owns the output. A dormant loop
+    // writes nothing and returns false — it has no reason to keep the tick alive, and whatever command
+    // switches the mode back to enhanced HS re-arms the timer itself.
     if (!LoopIsDriving())
     {
         return false;
     }
 
-    // Rate is fixed by ColorLoopTime = seconds for one full 0x10000-unit revolution. Guard timeSec == 0.
+    // Rate is fixed by ColorLoopTime = seconds for one full kHueCircle revolution. Guard timeSec == 0.
     const uint32_t loopTimeSec = (mColorLoop.timeSec == 0) ? 1u : mColorLoop.timeSec;
 
     // Position from the wall-clock anchor. INTEGER math on purpose: the loop never ends, so the
-    // float error every other Tick* tolerates would accumulate without bound here. 0x10000 * elapsed
+    // float error every other Tick* tolerates would accumulate without bound here. kHueCircle * elapsed
     // fits comfortably in int64 for any realistic uptime.
     const uint64_t elapsedMs = now - mColorLoopStartTimeMs;
     const int64_t traveled =
-        static_cast<int64_t>(0x10000) * static_cast<int64_t>(elapsedMs) / (static_cast<int64_t>(loopTimeSec) * 1000);
+        static_cast<int64_t>(kHueCircle) * static_cast<int64_t>(elapsedMs) / (static_cast<int64_t>(loopTimeSec) * 1000);
     // ColorLoopDirection: 1 == increment (up), 0 == decrement (down).
     const int64_t signedTraveled = mColorLoop.direction ? traveled : -traveled;
 
     const uint16_t eh =
-        static_cast<uint16_t>((static_cast<int64_t>(mColorLoopStartHue) + signedTraveled) & 0xFFFF); // wrap mod 0x10000
+        static_cast<uint16_t>((static_cast<int64_t>(mColorLoopStartHue) + signedTraveled) & 0xFFFF); // wrap mod kHueCircle
 
-    // The loop only ever runs in enhanced HS (guaranteed by LoopIsDriving), so get<> is safe and the
-    // legacy-mode branch of TickHue is unreachable here. EnhancedCurrentHue is the stored 16-bit
-    // field; CurrentHue is its projection (hue8() = eh >> 8), signalled notify-only.
-    //
-    // The loop has no "done" tick, so every tick is kQuiet (§3.2.7.2) — reporting is throttled to at
-    // most once per second by the quieter-reporting layer, exactly as TickHue does mid-transition.
-    // HARDWARE OUTPUT is continuous and fires on EVERY tick regardless of the report flag (§3.2.8).
+    // LoopIsDriving() guarantees enhanced HS, so get<> is safe. The loop has no arriving tick, so every
+    // tick is kQuiet and every delegate frame is transitionActive == true: continuous movement that only
+    // ColorLoopSet(Deactivate) ends, with no settled value to apply.
     auto & ehs = std::get<EnhancedHueSatColor>(mColorValue);
-    SetAttributeValue(ehs.enhancedHue, eh, EnhancedCurrentHue::Id, AttributeChangeType::kQuiet); // store 16-bit
-    NotifyAttributeChanged(CurrentHue::Id, AttributeChangeType::kQuiet);                         // projection
-    mDelegate->OnEnhancedHueChanged(ehs.enhancedHue);                                            // 16-bit out, as TickHue does
+    SetAttributeValue(ehs.enhancedHue, eh, EnhancedCurrentHue::Id, AttributeChangeType::kQuiet);
+    NotifyAttributeChanged(CurrentHue::Id, AttributeChangeType::kQuiet); // projection
+    mDelegate.OnEnhancedHueChanged(ehs.enhancedHue, /*transitionActive=*/true);
 
     return true; // keep the tick alive until ColorLoopSet(Deactivate)
 }
 
-// TickXY: linear per-axis position from wall-clock elapsed; X and Y have independent durations.
 bool ColorControlCluster::TickXY(XYTransition & tx, uint64_t now)
 {
-    const uint64_t elapsed = now - tx.startTimeMs; // one start time; axes differ only by duration
+    // CIE X/Y are 16-bit and linear, and the axes ramp independently: one start time, a duration each.
+    const auto [positionX, doneX] =
+        Interpolate(tx.startX, int32_t{ tx.targetX } - int32_t{ tx.startX }, tx.startTimeMs, tx.durationXMs, now);
+    const auto [positionY, doneY] =
+        Interpolate(tx.startY, int32_t{ tx.targetY } - int32_t{ tx.startY }, tx.startTimeMs, tx.durationYMs, now);
 
-    // transitionTime 0 is an immediate move: land on the target this tick (this is also the 0/0 -> NaN
-    // guard for a same-instant elapsed==0 tick).
-    const float tX =
-        (tx.durationXMs == 0) ? 1.f : std::clamp(static_cast<float>(elapsed) / static_cast<float>(tx.durationXMs), 0.f, 1.f);
-    const float tY =
-        (tx.durationYMs == 0) ? 1.f : std::clamp(static_cast<float>(elapsed) / static_cast<float>(tx.durationYMs), 0.f, 1.f);
-    const bool doneX = (tX >= 1.f);
-    const bool doneY = (tY >= 1.f);
+    const uint16_t x = static_cast<uint16_t>(positionX);
+    const uint16_t y = static_cast<uint16_t>(positionY);
     const bool done  = doneX && doneY; // XY is done only when BOTH axes arrive
 
-    // CIE X/Y are 16-bit and linear. Exact target on each axis's last tick avoids drift.
-    const uint16_t x = done
-        ? tx.targetX
-        : static_cast<uint16_t>(tx.startX + static_cast<int32_t>(static_cast<float>(int32_t(tx.targetX) - tx.startX) * tX));
-    const uint16_t y = done
-        ? tx.targetY
-        : static_cast<uint16_t>(tx.startY + static_cast<int32_t>(static_cast<float>(int32_t(tx.targetY) - tx.startY) * tY));
-
-    // NETWORK REPORTING is throttled (3.2.7.2): silent mid-transition, report only when BOTH done.
     const auto change = done ? AttributeChangeType::kReportable : AttributeChangeType::kQuiet;
 
-    // In XY mode mColorValue is always XYColor (variant/mode kept in lockstep), so get<> is safe.
+    // In XY mode mColorValue is always XYColor (variant and mode are kept in lockstep), so get<> is safe.
     auto & xy = std::get<XYColor>(mColorValue);
     SetAttributeValue(xy.x, x, CurrentX::Id, change);
     SetAttributeValue(xy.y, y, CurrentY::Id, change);
-    mDelegate->OnColorXYChanged(xy.x, xy.y);
+    mDelegate.OnColorXYChanged(xy.x, xy.y, !done);
 
-    // HARDWARE OUTPUT is continuous, NOT throttled (3.2.8): the delegate owns no timer, so
-    // OnColorXYChanged fires EVERY tick (exact target on the last one) regardless of the
-    // kQuiet/kReportable flag, which governs only network reporting.
-    return !done; // "still active"
-}
-
-std::optional<ActionReturnStatus> ColorControlCluster::HandleStopMoveStep(const Commands::StopMoveStep::DecodableType & req,
-                                                                          CommandHandler * handler)
-{
-    return StopMoveStep(req.optionsMask, req.optionsOverride);
+    return !done;
 }
 
 ColorControlCluster::Status ColorControlCluster::StopMoveStep(OptMask optionsMask, OptMask optionsOverride)
@@ -986,12 +896,11 @@ ColorControlCluster::Status ColorControlCluster::StopMoveStep(OptMask optionsMas
     }
 
     // Stops only the mTransition-driven axes. §3.2.8.1 ("no effect while a color loop is active") needs no
-    // guard here: a color loop is NOT in mTransition — it is driven from mColorLoop plus its wall-clock
-    // anchor by TickColorLoop — so it is structurally untouched and keeps running. Guarding on
-    // mColorLoop.active instead would over-reach: that attribute stays 1 while the loop is dormant (XY / CT
-    // owns the output, or a hue command parked it), and while the loop drives hue the saturation axis can
-    // still carry an independent transition — in both cases there is a real transition that must stop.
-    // Deliberately does NOT cancel the tick: OnTick self-terminates the timer only once nothing is driving.
+    // guard: a color loop is NOT in mTransition — TickColorLoop drives it from mColorLoop plus its
+    // wall-clock anchor — so it is structurally untouched and keeps running. Guarding on mColorLoop.active
+    // instead would over-reach: that attribute stays 1 while the loop is dormant, and while the loop drives
+    // hue the saturation axis can still carry an independent transition — in both cases a real transition
+    // must stop. Deliberately does NOT cancel the tick: OnTick self-terminates once nothing is driving.
     StopTransitionAndFreeze();
     // A driving loop pins RemainingTime at its max (see OnTick), so only zero it when nothing is left.
     if (!LoopIsDriving())
@@ -1007,52 +916,43 @@ bool ColorControlCluster::ShouldExecuteIfOff(BitMask<OptionsBitmap> mask, BitMas
     BitMask<OptionsBitmap> effective{ static_cast<uint8_t>((mState.options.Raw() & ~mask.Raw()) |
                                                            (optionsOverride.Raw() & mask.Raw())) };
 
-    // Ember-free On/Off coupling via the injected cluster: no injected cluster == no coupling (→ always execute).
+    // On/Off coupling via the injected cluster: no injected cluster == no coupling.
     if (mOnOff == nullptr)
     {
-        return true; // endpoint has no OnOff cluster → always execute
+        return true;
     }
     if (mOnOff->GetOnOff())
     {
-        return true; // device is on → execute
+        return true;
     }
     return effective.Has(OptionsBitmap::kExecuteIfOff);
 }
 
-/**
- * @brief The specification says that if we are transitioning from one color mode
- * into another, we need to compute the new mode's attribute values from the
- * old mode.  However, it also says that if the old mode doesn't translate into
- * the new mode, this must be avoided.
- * I am putting in this function to compute the new attributes based on the old
- * color mode.
- *
- * @param endpoint
- * @param newColorMode
- */
 void ColorControlCluster::ApplyModeSwitch(EnhancedColorModeEnum target)
 {
+    // Each arm converts the current color through the delegate and assigns the new alternative; that
+    // assignment IS the store, since colorMode / enhancedColorMode are derived from which one is active.
     switch (target)
     {
     case EnhancedColorModeEnum::kCurrentXAndCurrentY: {
         if (std::holds_alternative<XYColor>(mColorValue))
         {
-            return; // no-op
+            return;
         }
         XYColor next{};
         if (auto * hs = std::get_if<HueSatColor>(&mColorValue))
         {
-            mDelegate->ConvertHueSatToXY(hs->hue, hs->saturation, next.x, next.y);
+            mDelegate.ConvertHueSatToXY(hs->hue, hs->saturation, next.x, next.y);
         }
         else if (auto * ehs = std::get_if<EnhancedHueSatColor>(&mColorValue))
         {
-            mDelegate->ConvertHueSatToXY(ehs->hue8(), ehs->saturation, next.x, next.y);
+            mDelegate.ConvertHueSatToXY(ehs->hue8(), ehs->saturation, next.x, next.y);
         }
         else if (auto * ct = std::get_if<CTColor>(&mColorValue))
         {
-            mDelegate->ConvertMiredsToXY(ct->mireds, next.x, next.y);
+            mDelegate.ConvertMiredsToXY(ct->mireds, next.x, next.y);
         }
-        mColorValue = next; // the variant assignment IS the store
+        mColorValue = next;
         NotifyAttributeChanged(CurrentX::Id, AttributeChangeType::kQuiet);
         NotifyAttributeChanged(CurrentY::Id, AttributeChangeType::kQuiet);
         break;
@@ -1060,7 +960,7 @@ void ColorControlCluster::ApplyModeSwitch(EnhancedColorModeEnum target)
     case EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation:
     case EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation: {
         const bool toEnhanced = (target == EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation);
-        // no-op only if already in the EXACT target alternative
+        // No-op only when already in the EXACT target alternative: legacy and enhanced HS are distinct modes.
         if (toEnhanced && std::holds_alternative<EnhancedHueSatColor>(mColorValue))
         {
             return;
@@ -1085,13 +985,13 @@ void ColorControlCluster::ApplyModeSwitch(EnhancedColorModeEnum target)
         else if (auto * xy = std::get_if<XYColor>(&mColorValue))
         {
             uint8_t h = 0;
-            mDelegate->ConvertXYToHueSat(xy->x, xy->y, h, sat);
+            mDelegate.ConvertXYToHueSat(xy->x, xy->y, h, sat);
             eh = static_cast<uint16_t>(uint16_t(h) << 8);
         }
         else if (auto * ct = std::get_if<CTColor>(&mColorValue))
         {
             uint8_t h = 0;
-            mDelegate->ConvertMiredsToHueSat(ct->mireds, h, sat);
+            mDelegate.ConvertMiredsToHueSat(ct->mireds, h, sat);
             eh = static_cast<uint16_t>(uint16_t(h) << 8);
         }
 
@@ -1116,17 +1016,17 @@ void ColorControlCluster::ApplyModeSwitch(EnhancedColorModeEnum target)
         CTColor next{};
         if (auto * xy = std::get_if<XYColor>(&mColorValue))
         {
-            mDelegate->ConvertXYToMireds(xy->x, xy->y, next.mireds);
+            mDelegate.ConvertXYToMireds(xy->x, xy->y, next.mireds);
         }
         else if (auto * hs = std::get_if<HueSatColor>(&mColorValue))
         {
-            mDelegate->ConvertHueSatToMireds(hs->hue, hs->saturation, next.mireds);
+            mDelegate.ConvertHueSatToMireds(hs->hue, hs->saturation, next.mireds);
         }
         else if (auto * ehs = std::get_if<EnhancedHueSatColor>(&mColorValue))
         {
-            mDelegate->ConvertHueSatToMireds(ehs->hue8(), ehs->saturation, next.mireds);
+            mDelegate.ConvertHueSatToMireds(ehs->hue8(), ehs->saturation, next.mireds);
         }
-        mColorValue = next; // the variant assignment IS the store
+        mColorValue = next;
         NotifyAttributeChanged(ColorTemperatureMireds::Id, AttributeChangeType::kQuiet);
         break;
     }
@@ -1142,8 +1042,8 @@ void ColorControlCluster::NotifyModeAttributes()
     NotifyAttributeChanged(Attributes::EnhancedColorMode::Id, AttributeChangeType::kReportable);
 }
 
-// Current-color accessors used by command start-values and apply-scene. Callers ApplyModeSwitch to an
-// HS mode first, so mColorValue is a HueSat alternative here; the fallbacks keep them total.
+// Current-color accessors used by command start-values and apply-scene. Callers run ApplyModeSwitch to
+// an HS mode first, so mColorValue is a HueSat alternative here; the fallbacks keep them total.
 uint8_t ColorControlCluster::GetSaturation() const
 {
     if (auto * e = std::get_if<EnhancedHueSatColor>(&mColorValue))
@@ -1224,11 +1124,6 @@ bool ColorControlCluster::SupportsMode(EnhancedColorModeEnum mode) const
     }
 }
 
-/**
- * @brief Configures and launches color loop for a specified endpoint
- *
- * @param startFromStartHue True, start from StartEnhancedHue attribute. False, start from currentEnhancedHue
- */
 void ColorControlCluster::StartColorLoop(bool startFromStartHue)
 {
     // Loop runs in enhanced-hue mode; make sure the value variant matches.
@@ -1254,30 +1149,29 @@ void ColorControlCluster::StartColorLoop(bool startFromStartHue)
         NotifyAttributeChanged(CurrentHue::Id, AttributeChangeType::kReportable); // projection
     }
 
-    // Stamp the wall-clock anchor TickColorLoop interpolates from. Stamped once here and never again
-    // (dormancy does not re-stamp), so the loop's phase tracks real time. Anchor hue = the hue we are
-    // starting from (after the optional jump to startEnhancedHue above).
+    // Stamp the wall-clock anchor TickColorLoop interpolates from: once here and never again (dormancy
+    // does not re-stamp), so the loop's phase tracks real time. The anchor hue is where we start from,
+    // after the optional jump to startEnhancedHue above.
     mColorLoopStartHue    = ehs.enhancedHue;
-    mColorLoopStartTimeMs = SystemClock().GetMonotonicMilliseconds64().count();
+    mColorLoopStartTimeMs = NowMs();
 
     // Scenable loop attributes just changed → kReportable (no quieterReporting quality).
     NotifyAttributeChanged(ColorLoopActive::Id, AttributeChangeType::kReportable);
     NotifyAttributeChanged(Attributes::ColorLoopDirection::Id, AttributeChangeType::kReportable);
     NotifyAttributeChanged(ColorLoopTime::Id, AttributeChangeType::kReportable);
 
-    // Loop start switched to enhanced-HS mode and moved EnhancedCurrentHue → persist the settled color so
-    // a reboot resumes the loop from the right hue (the loop attrs are persisted by the caller/ColorLoopSet).
+    // The start switched to enhanced-HS mode and moved EnhancedCurrentHue → persist the settled color so
+    // a reboot resumes from the right hue. The loop attributes are persisted by the caller.
     PersistCurrentColor();
 
-    LogErrorOnFailure(ArmTick()); // ensure the 100ms timer runs so TickColorLoop advances the hue
+    // Hand the loop to the delegate: hardware able to rotate hue on its own starts here and ignores the
+    // per-tick OnEnhancedHueChanged frames. The anchor stamped just above IS the starting phase, so this
+    // doubles as the re-anchor when ColorLoopSet(Activate) restarts an already-running loop.
+    mDelegate.OnColorLoopStarted(mColorLoopStartHue, mColorLoop.timeSec, mColorLoop.direction != 0);
+
+    LogErrorOnFailure(ArmTick()); // the tick is what advances the hue
 }
 
-/**
- * @brief Executes move to saturation command
- *
- * @param saturation Target saturation
- * @param transitionTime Transition time in 10th of seconds
- */
 Status ColorControlCluster::MoveToSaturation(uint8_t saturation, uint16_t transitionTimeDs, BitMask<OptionsBitmap> optionsMask,
                                              BitMask<OptionsBitmap> optionsOverride)
 {
@@ -1286,21 +1180,22 @@ Status ColorControlCluster::MoveToSaturation(uint8_t saturation, uint16_t transi
     VerifyOrReturnValue(transitionTimeDs <= kMaxTransitionTime, Status::ConstraintError);
 
     // Saturation is flavor-neutral (uint8_t in both hue/sat modes, and MoveToSaturation has no Enhanced*
-    // twin), so this must not choose a hue representation: asking for legacy unconditionally would truncate
-    // EnhancedCurrentHue to its high byte (§3.2.7.12) and, via LoopIsDriving, silently park a running color
-    // loop. Coming from XY / CT the delegate yields an 8-bit hue either way, so legacy stays correct there.
+    // twin), so keep whichever flavor is active: asking for legacy unconditionally would truncate
+    // EnhancedCurrentHue to its high byte (§3.2.7.12) and, via LoopIsDriving, silently park a running
+    // color loop. Coming from XY / CT the delegate yields an 8-bit hue anyway, so legacy is right there.
     ApplyModeSwitch(std::holds_alternative<EnhancedHueSatColor>(mColorValue)
                         ? EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation
                         : EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
-    const uint32_t durationMs = transitionTimeDs * 100u;  // deciseconds → ms
+    const uint32_t durationMs = transitionTimeDs * 100u;
     auto & hs                 = EnsureHueSatTransition(); // HueSatTransition; preserves .hue if already one, replaces XY/CT
     hs.sat                    = SatTransition{
                            .startSat    = GetSaturation(), // read AFTER the mode switch
                            .targetSat   = std::clamp<uint8_t>(saturation, kMinSaturationValue, kMaxSaturationValue),
-                           .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
+                           .startTimeMs = NowMs(),
                            .durationMs  = durationMs,
     };
-    SetQuietReportRemainingTime(RemainingTenthsFromMs(durationMs), /*isNewTransition=*/true); // finite
+    SetQuietReportRemainingTime(RemainingTenthsFromMs(durationMs), /*isNewTransition=*/true);
+    NotifySatTransition(*hs.sat);
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
     return Status::Success;
 }
@@ -1316,15 +1211,7 @@ HueSatTransition & ColorControlCluster::EnsureHueSatTransition()
     }
     return std::get<HueSatTransition>(mTransition);
 }
-/**
- * @brief Executes move to hue and saturatioan command.
- *
- * @param[in] endpoint EndpointId of the recipient Color control cluster.
- * @param[in] hue Target hue.
- * @param[in] saturation Target saturation.
- * @param[in] transitionTime Transition time in 10th of seconds.
- * @param[in] isEnhanced If True, function was called by EnhancedMoveHue command and rate is a uint16 value. If False function
- */
+
 Status ColorControlCluster::MoveToHueAndSaturation(uint16_t hue, uint8_t saturation, uint16_t transitionTimeDs, bool isEnhanced,
                                                    BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride)
 {
@@ -1339,8 +1226,7 @@ Status ColorControlCluster::MoveToHueAndSaturation(uint16_t hue, uint8_t saturat
                                : EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
 
     // Saturation always moves; the hue axis moves unless the manufacturer opted to ignore hue commands
-    // while a color loop runs (§3.2.11). Both axes reuse the shared scene-restore builder, which honors
-    // that choice via its moveHue argument (the ignore decision stays here, not in the builder).
+    // while a color loop runs (§3.2.11). The decision is made here and passed to the builder as moveHue.
     const bool moveHue      = !ShouldIgnoreHueCommandNow();
     const uint8_t targetSat = std::clamp<uint8_t>(saturation, kMinSaturationValue, kMaxSaturationValue);
     const uint32_t timeMs   = transitionTimeDs * 100u;
@@ -1350,22 +1236,54 @@ Status ColorControlCluster::MoveToHueAndSaturation(uint16_t hue, uint8_t saturat
     }
     else
     {
-        // HueSatColor holds the legacy 8-bit hue as-is (it projects up via enhancedHue()), so this axis
-        // takes the command value straight — no shift. The constraint check above already bounded it.
+        // HueSatColor holds the legacy 8-bit hue as-is (enhancedHue() projects it up), so the command
+        // value goes in unshifted; the constraint check above already bounded it.
         StartHueAndSatTransition(HueSatColor{ .hue = static_cast<uint8_t>(hue), .saturation = targetSat }, timeMs, moveHue);
     }
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
     return Status::Success;
 }
 
-// ── Scene-restore transition helpers ────────────────────────────────────────────────────────────
-// The shared "populate mTransition + stamp the clock + set RemainingTime + arm the tick" core. They
-// do NOT switch mode — the caller (HandleApplyScene, or a command) is responsible for calling
-// ApplyModeSwitch first, so on entry mColorValue is already the matching alternative and the start of
-// the transition is whatever the current materialized value is (mid-flight applies pick up from there).
+// ── Transition builders (shared by the commands and scene restore) ──────────────────────────────
+// Each populates mTransition, stamps the clock and sets RemainingTime. They do NOT switch mode — the
+// caller (HandleApplyScene, or a command) runs ApplyModeSwitch first, so mColorValue already holds the
+// matching alternative and its current value is the start of the transition (a mid-flight apply picks up
+// from there) — and they do not arm the tick, which the caller does so a failed arm can be surfaced.
 //
-// `target` is the scene's saved ColorValue (same alternative as the active mode); `timeMs` is the
-// transition time in milliseconds → durationMs directly; RemainingTime is reported in deciseconds.
+// `target` is a ColorValue of the active mode's alternative; `timeMs` is the transition time in
+// milliseconds, used as durationMs directly. RemainingTime is reported in deciseconds.
+
+// ── Transition start notifications (contract documented in the header) ──────────────────────────
+// The zero-duration test lives here, once, so no origin can announce a discrete jump (TransitionTime
+// == 0) as a movement.
+
+void ColorControlCluster::NotifyXYTransition(const XYTransition & tx)
+{
+    // MoveColor gives each axis its own rate, so an idle axis is a 0 duration next to a moving one. Only
+    // both-idle means nothing is actually moving.
+    VerifyOrReturn(tx.durationXMs != 0 || tx.durationYMs != 0);
+    mDelegate.OnXYTransitionStarted(tx.targetX, tx.durationXMs, tx.targetY, tx.durationYMs);
+}
+
+void ColorControlCluster::NotifyCTTransition(const CTTransition & tx)
+{
+    VerifyOrReturn(tx.durationMs != 0);
+    mDelegate.OnCTTransitionStarted(tx.targetMireds, tx.durationMs);
+}
+
+void ColorControlCluster::NotifyHueTransition(const HueTransition & tx)
+{
+    // kIndefiniteHueMoveMs passes the guard: a rate move only ends when a Stop arrives, so it is the most
+    // continuous movement there is and the one hardware most wants to own.
+    VerifyOrReturn(tx.durationMs != 0);
+    mDelegate.OnEnhancedHueTransitionStarted(tx.signedDelta, tx.durationMs);
+}
+
+void ColorControlCluster::NotifySatTransition(const SatTransition & tx)
+{
+    VerifyOrReturn(tx.durationMs != 0);
+    mDelegate.OnSaturationTransitionStarted(tx.targetSat, tx.durationMs);
+}
 
 void ColorControlCluster::StartXYTransition(const ColorControl::ColorValue & target, uint32_t timeMs)
 {
@@ -1379,9 +1297,10 @@ void ColorControlCluster::StartXYTransition(const ColorControl::ColorValue & tar
         .startY      = xy.y,
         .targetY     = tgt.y,
         .durationYMs = timeMs, // one duration → both axes arrive together
-        .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
+        .startTimeMs = NowMs(),
     };
     SetQuietReportRemainingTime(RemainingTenthsFromMs(timeMs), /*isNewTransition=*/true);
+    NotifyXYTransition(std::get<XYTransition>(mTransition));
 }
 
 void ColorControlCluster::StartColorTemperatureTransition(const ColorControl::ColorValue & target, uint32_t timeMs)
@@ -1393,42 +1312,49 @@ void ColorControlCluster::StartColorTemperatureTransition(const ColorControl::Co
         .startMireds  = ct.mireds,
         .targetMireds = std::clamp<uint16_t>(tgt.mireds, mCT.colorTempPhysicalMinMireds,
                                              mCT.colorTempPhysicalMaxMireds), // scenes clamp to physical range
-        .startTimeMs  = SystemClock().GetMonotonicMilliseconds64().count(),
+        .startTimeMs  = NowMs(),
         .durationMs   = timeMs,
     };
     SetQuietReportRemainingTime(RemainingTenthsFromMs(timeMs), /*isNewTransition=*/true);
+    NotifyCTTransition(std::get<CTTransition>(mTransition));
 }
 
 void ColorControlCluster::StartHueAndSatTransition(const ColorControl::ColorValue & target, uint32_t timeMs, bool moveHue)
 {
     const auto & tgt   = std::get<HueSatColor>(target);
     auto & hs          = std::get<HueSatColor>(mColorValue);
-    const uint64_t now = SystemClock().GetMonotonicMilliseconds64().count();
+    const uint64_t now = NowMs();
 
     HueSatTransition next{};
     // Saturation always moves. The hue axis moves only when the caller allows it: a command may defer hue
     // to an active color loop per the manufacturer's choice (§3.2.11); the scene path always passes true.
     if (moveHue)
     {
-        // Hue always runs in 16-bit canonical; legacy hue is the high byte, so project both ends up and
-        // take the shortest arc round the circle (same math the hue commands compute inline).
+        // Hue always runs in 16-bit canonical, and legacy hue is the high byte: project both ends up and
+        // take the shortest arc round the circle (the same math the hue commands compute inline).
         const uint16_t start  = hs.enhancedHue();
         const uint16_t tgtHue = tgt.enhancedHue();
         const uint16_t upArc  = static_cast<uint16_t>(tgtHue - start);
-        const int32_t arc     = (upArc <= 0x8000) ? upArc : (static_cast<int32_t>(upArc) - 0x10000);
+        const int32_t arc     = (upArc <= kHalfHueCircle) ? upArc : (upArc - kHueCircle);
         next.hue              = HueTransition{ start, arc, now, timeMs };
     }
     next.sat    = SatTransition{ .startSat = hs.saturation, .targetSat = tgt.saturation, .startTimeMs = now, .durationMs = timeMs };
     mTransition = next;
 
     SetQuietReportRemainingTime(RemainingTenthsFromMs(timeMs), /*isNewTransition=*/true);
+    // One notification per axis: §3.2.5.2 makes them independent, and `moveHue` may have left hue idle.
+    if (next.hue)
+    {
+        NotifyHueTransition(*next.hue);
+    }
+    NotifySatTransition(*next.sat);
 }
 
 void ColorControlCluster::StartEnhancedHueAndSatTransition(const ColorControl::ColorValue & target, uint32_t timeMs, bool moveHue)
 {
     const auto & tgt   = std::get<EnhancedHueSatColor>(target);
     auto & ehs         = std::get<EnhancedHueSatColor>(mColorValue);
-    const uint64_t now = SystemClock().GetMonotonicMilliseconds64().count();
+    const uint64_t now = NowMs();
 
     HueSatTransition next{};
     // Saturation always moves; the hue axis moves only when the caller allows it (see StartHueAndSatTransition).
@@ -1437,13 +1363,19 @@ void ColorControlCluster::StartEnhancedHueAndSatTransition(const ColorControl::C
         const uint16_t start  = ehs.enhancedHue;
         const uint16_t tgtHue = tgt.enhancedHue;
         const uint16_t upArc  = static_cast<uint16_t>(tgtHue - start);
-        const int32_t arc     = (upArc <= 0x8000) ? upArc : (static_cast<int32_t>(upArc) - 0x10000);
+        const int32_t arc     = (upArc <= kHalfHueCircle) ? upArc : (upArc - kHueCircle);
         next.hue              = HueTransition{ start, arc, now, timeMs };
     }
     next.sat = SatTransition{ .startSat = ehs.saturation, .targetSat = tgt.saturation, .startTimeMs = now, .durationMs = timeMs };
     mTransition = next;
 
     SetQuietReportRemainingTime(RemainingTenthsFromMs(timeMs), /*isNewTransition=*/true);
+    // One notification per axis: §3.2.5.2 makes them independent, and `moveHue` may have left hue idle.
+    if (next.hue)
+    {
+        NotifyHueTransition(*next.hue);
+    }
+    NotifySatTransition(*next.sat);
 }
 
 CHIP_ERROR ColorControlCluster::HandleApplyScene(ColorControl::EnhancedColorModeEnum ColorMode,
@@ -1467,7 +1399,6 @@ CHIP_ERROR ColorControlCluster::HandleApplyScene(ColorControl::EnhancedColorMode
 
     if (HasFeature(Feature::kColorLoop))
     {
-
         StopColorLoop();
         PersistColorLoop();
     }
@@ -1494,22 +1425,11 @@ CHIP_ERROR ColorControlCluster::HandleApplyScene(ColorControl::EnhancedColorMode
         break;
     }
 
-    // The Start* helpers only populated mTransition; arming the tick is the one fallible step (StartTimer),
-    // done here so a failed arm propagates out through ApplyScene rather than leaving a scene un-animated.
+    // Arming the tick is the one fallible step, done here so a failure propagates out through ApplyScene
+    // rather than leaving a scene un-animated.
     return ArmTick();
 }
-/**
- * @brief Executes move Hue Command.
- *
- * @param[in] moveMode
- * @param[in] rate
- * @param[in] optionsMask
- * @param[in] optionsOverride
- * @param[in] isEnhanced If True, function was called by EnhancedMoveHue command and rate is a uint16 value. If False function
- * was called by MoveHue command and rate is a uint8 value.
- * @return Status::Success when successful,
- *         Status::InvalidCommand when Rate is 0 or an unknown moveMode is provided
- */
+
 Status ColorControlCluster::MoveHue(MoveModeEnum moveMode, uint16_t rate, bool isEnhanced, BitMask<OptionsBitmap> optionsMask,
                                     BitMask<OptionsBitmap> optionsOverride)
 {
@@ -1519,11 +1439,9 @@ Status ColorControlCluster::MoveHue(MoveModeEnum moveMode, uint16_t rate, bool i
     if (moveMode == MoveModeEnum::kStop)
     {
         // Stop halts any ongoing hue *and* saturation transition (§3.2.8.5.4): the §3.2.5.2 axis
-        // independence that lets the two overlap governs only MoveMode != Stop. It is scoped to those two
-        // axes though — an XY / CT transition is neither, so it keeps running.
-        // Stop is also a stop-semantic (§3.2.8.1): it must NOT disturb an active color loop. That needs no
-        // guard, because the loop is not in mTransition (TickColorLoop drives it from mColorLoop plus its
-        // wall-clock anchor) and so is structurally untouched here.
+        // independence that lets the two overlap governs only MoveMode != Stop. It is scoped to those
+        // two axes though — an XY / CT transition is neither, so it keeps running. It must also not
+        // disturb an active color loop (§3.2.8.1), which needs no guard: the loop is not in mTransition.
         if (std::holds_alternative<HueSatTransition>(mTransition))
         {
             StopTransitionAndFreeze(); // freeze: persist the hue/saturation the movement stopped at
@@ -1538,7 +1456,7 @@ Status ColorControlCluster::MoveHue(MoveModeEnum moveMode, uint16_t rate, bool i
 
     // Hue-changing move: honored unless the manufacturer opted to ignore hue commands while a loop runs.
     VerifyOrReturnValue(!ShouldIgnoreHueCommandNow(), Status::Success);
-    VerifyOrReturnValue(rate != 0, Status::InvalidCommand); // rate 0 + non-stop → InvalidCommand
+    VerifyOrReturnValue(rate != 0, Status::InvalidCommand);
 
     ApplyModeSwitch(isEnhanced ? EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation
                                : EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
@@ -1550,28 +1468,15 @@ Status ColorControlCluster::MoveHue(MoveModeEnum moveMode, uint16_t rate, bool i
     hs.hue    = HueTransition{
            .startHue    = GetEnhancedHue(), // 16-bit canonical current
            .signedDelta = signedRatePerSec, // hue-units per second; sign = up/down
-           .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
-           .durationMs  = kIndefiniteHueMoveMs, // rate move: runs until StopHueAxis
+           .startTimeMs = NowMs(),
+           .durationMs  = kIndefiniteHueMoveMs, // rate move: runs until a Stop command
     };
-    SetQuietReportRemainingTime(kMaxInt16uValue, /*isNewTransition=*/true); // indefinite
+    SetQuietReportRemainingTime(kMaxInt16uValue, /*isNewTransition=*/true);
+    NotifyHueTransition(*hs.hue);
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
     return Status::Success;
 }
 
-/**
- * @brief Executes move to hue command.
- * * @param[in] hue
- * @param[in] moveDirection
- * @param[in] transitionTime
- * @param[in] optionsMask
- * @param[in] optionsOverride
- * @param[in] isEnhanced If True, function was called by EnhancedMoveHue command and rate is a uint16 value. If False function
- * was called by MoveHue command and rate is a uint8 value.
- * @return Status::Success when successful,
- *         Status::InvalidCommand when Rate is 0 or an unknown moveDirection is provided
- *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a hue transition state,
- *         Status::ConstraintError when the other parameters are outside their defined value range.
- */
 Status ColorControlCluster::MoveToHue(uint16_t hue, DirectionEnum dir, uint16_t transitionTimeDs, bool isEnhanced,
                                       BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride)
 {
@@ -1589,9 +1494,8 @@ Status ColorControlCluster::MoveToHue(uint16_t hue, DirectionEnum dir, uint16_t 
                                : EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
 
     const uint16_t start = GetEnhancedHue(); // 16-bit canonical
-    // The arc math below is all 16-bit, so a legacy hue has to be projected up into that space. The
-    // constraint check above already rejected anything above kMaxCurrentHue (§3.2.7.11), so the shift
-    // lands inside the legacy-representable band. Enhanced hue is already canonical.
+    // The arc math below is all 16-bit, so a legacy hue is projected up into that space; the constraint
+    // check above bounded it at kMaxCurrentHue (§3.2.7.11). Enhanced hue is already canonical.
     const uint16_t target = isEnhanced ? hue : static_cast<uint16_t>(hue << 8);
     const uint16_t upArc  = static_cast<uint16_t>(target - start); // distance going up (wraps)
 
@@ -1604,42 +1508,27 @@ Status ColorControlCluster::MoveToHue(uint16_t hue, DirectionEnum dir, uint16_t 
     case DirectionEnum::kDown:
         up = false;
         break;
-    // On an exact half-circle (upArc == 0x8000) both arcs are the same length, and §3.2.8.4.5 resolves
-    // that tie to Up — hence the inclusive comparison on BOTH arms.
+    // On an exact half-circle both arcs are the same length; §3.2.8.4.5 resolves that tie to Up, hence
+    // the inclusive comparison on BOTH arms.
     case DirectionEnum::kShortest:
-        up = (upArc <= 0x8000);
+        up = (upArc <= kHalfHueCircle);
         break; // up is the shorter arc
     case DirectionEnum::kLongest:
-        up = (upArc >= 0x8000);
+        up = (upArc >= kHalfHueCircle);
         break; // up is the longer arc
     case DirectionEnum::kUnknownEnumValue:
         return Status::InvalidCommand;
     }
-    const int32_t signedArc = up ? upArc : (static_cast<int32_t>(upArc) - 0x10000);
+    const int32_t signedArc = up ? upArc : (upArc - kHueCircle);
 
     auto & hs = EnsureHueSatTransition();
-    hs.hue    = HueTransition{ start, signedArc, SystemClock().GetMonotonicMilliseconds64().count(), transitionTimeDs * 100u };
+    hs.hue    = HueTransition{ start, signedArc, NowMs(), transitionTimeDs * 100u };
     SetQuietReportRemainingTime(transitionTimeDs, /*isNewTransition=*/true);
+    NotifyHueTransition(*hs.hue);
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
     return Status::Success;
 }
 
-/**
- * @brief Executes step hue command.
- *
- * @param[in] endpoint
- * @param[in] stepMode
- * @param[in] stepSize
- * @param[in] transitionTime
- * @param[in] optionsMask
- * @param[in] optionsOverride
- * @param[in] isEnhanced If True, function was called by EnhancedMoveHue command and rate is a uint16 value. If False function
- * was called by MoveHue command and rate is a uint8 value.
- * @return Status::Success when successful,
- *         Status::InvalidCommand when StepSize is 0 or an unknown StepModeEnum is provided
- *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a hue transition state.
- *         Status::ConstraintError when the other parameters are outside their defined value range.
- */
 Status ColorControlCluster::StepHue(StepModeEnum stepMode, uint16_t stepSize, uint16_t transitionTimeDs, bool isEnhanced,
                                     BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride)
 {
@@ -1660,21 +1549,13 @@ Status ColorControlCluster::StepHue(StepModeEnum stepMode, uint16_t stepSize, ui
     const int32_t signedDelta = (stepMode == StepModeEnum::kUp ? +1 : -1) * step16; // sign from stepMode
 
     auto & hs = EnsureHueSatTransition();
-    hs.hue =
-        HueTransition{ GetEnhancedHue(), signedDelta, SystemClock().GetMonotonicMilliseconds64().count(), transitionTimeDs * 100u };
+    hs.hue    = HueTransition{ GetEnhancedHue(), signedDelta, NowMs(), transitionTimeDs * 100u };
     SetQuietReportRemainingTime(transitionTimeDs, /*isNewTransition=*/true);
+    NotifyHueTransition(*hs.hue);
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
     return Status::Success;
 }
 
-/**
- * @brief Executes MoveSaturation command.
- * @param endpoint EndpointId of the recipient Color control cluster.
- * @param commandData Struct containing the parameters of the command.
- * @return Status::Success when successful,
- *         Status::InvalidCommand when a rate of 0 for a non-stop move or an unknown MoveModeEnum is provided
- *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a saturation transition state.
- */
 Status ColorControlCluster::MoveSaturation(MoveModeEnum moveMode, uint8_t rate, BitMask<OptionsBitmap> optionsMask,
                                            BitMask<OptionsBitmap> optionsOverride)
 {
@@ -1683,9 +1564,7 @@ Status ColorControlCluster::MoveSaturation(MoveModeEnum moveMode, uint8_t rate, 
 
     if (moveMode == MoveModeEnum::kStop)
     {
-        // Stop halts any ongoing hue *and* saturation transition (§3.2.8.8.4): the §3.2.5.2 axis
-        // independence that lets the two overlap governs only MoveMode != Stop. Scoped to those two axes
-        // though — an XY / CT transition is neither, so it keeps running. Mirrors MoveHue's Stop exactly.
+        // Halts the hue axis as well as saturation (§3.2.8.8.4); mirrors MoveHue's Stop exactly.
         if (std::holds_alternative<HueSatTransition>(mTransition))
         {
             StopTransitionAndFreeze(); // freeze: persist the hue/saturation the movement stopped at
@@ -1697,11 +1576,10 @@ Status ColorControlCluster::MoveSaturation(MoveModeEnum moveMode, uint8_t rate, 
         }
         return Status::Success;
     }
-    VerifyOrReturnValue(rate != 0, Status::InvalidCommand); // rate 0 + non-stop → InvalidCommand
+    VerifyOrReturnValue(rate != 0, Status::InvalidCommand);
 
-    // Saturation is flavor-neutral (uint8_t in both hue/sat modes, no Enhanced* twin), so this must not pick
-    // a hue representation: asking for legacy unconditionally would truncate EnhancedCurrentHue to its high
-    // byte (§3.2.7.12) and, via LoopIsDriving, silently park a running color loop.
+    // Flavor-neutral like the other saturation commands: preserve enhanced hue/sat rather than demoting
+    // it (see MoveToSaturation).
     ApplyModeSwitch(std::holds_alternative<EnhancedHueSatColor>(mColorValue)
                         ? EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation
                         : EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
@@ -1715,22 +1593,15 @@ Status ColorControlCluster::MoveSaturation(MoveModeEnum moveMode, uint8_t rate, 
     hs.sat    = SatTransition{
            .startSat    = start,
            .targetSat   = target, // the boundary — bounded, so it stops here
-           .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
+           .startTimeMs = NowMs(),
            .durationMs  = durationMs,
     };
-    SetQuietReportRemainingTime(RemainingTenthsFromMs(durationMs), /*isNewTransition=*/true); // finite
+    SetQuietReportRemainingTime(RemainingTenthsFromMs(durationMs), /*isNewTransition=*/true);
+    NotifySatTransition(*hs.sat);
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
     return Status::Success;
 }
 
-/**
- * @brief Executes step saturation command.
- * @param endpoint EndpointId of the recipient Color control cluster.
- * @param commandData Struct containing the parameters of the command.
- * @return Status::Success when successful,
- *         Status::InvalidCommand when a step size of 0 or an unknown StepModeEnum is provided
- *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a saturation transition state,
- */
 Status ColorControlCluster::StepSaturation(StepModeEnum stepMode, uint8_t stepSize, uint16_t transitionTimeDs,
                                            BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride)
 {
@@ -1738,7 +1609,7 @@ Status ColorControlCluster::StepSaturation(StepModeEnum stepMode, uint8_t stepSi
     VerifyOrReturnValue(stepMode != StepModeEnum::kUnknownEnumValue, Status::InvalidCommand);
     VerifyOrReturnValue(stepSize != 0, Status::InvalidCommand);
 
-    // Flavor-neutral like the other two saturation commands: preserve enhanced hue/sat rather than demoting
+    // Flavor-neutral like the other saturation commands: preserve enhanced hue/sat rather than demoting
     // it (see MoveToSaturation).
     ApplyModeSwitch(std::holds_alternative<EnhancedHueSatColor>(mColorValue)
                         ? EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation
@@ -1750,8 +1621,9 @@ Status ColorControlCluster::StepSaturation(StepModeEnum stepMode, uint8_t stepSi
         static_cast<uint8_t>(std::clamp<int32_t>(int32_t(start) + signedDelta, kMinSaturationValue, kMaxSaturationValue));
 
     auto & hs = EnsureHueSatTransition(); // preserve a running HUE axis
-    hs.sat    = SatTransition{ start, target, SystemClock().GetMonotonicMilliseconds64().count(), transitionTimeDs * 100u };
+    hs.sat    = SatTransition{ start, target, NowMs(), transitionTimeDs * 100u };
     SetQuietReportRemainingTime(transitionTimeDs, /*isNewTransition=*/true);
+    NotifySatTransition(*hs.sat);
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
     return Status::Success;
 }
@@ -1772,16 +1644,10 @@ void ColorControlCluster::StopColorLoop()
         ehs->enhancedHue = mColorLoop.storedEnhancedHue;
         NotifyAttributeChanged(EnhancedCurrentHue::Id, AttributeChangeType::kReportable);
     }
+    mDelegate.OnColorLoopStopped(); // hardware rotating hue on its own must stop
     PersistCurrentColor();
 }
 
-/**
- * @brief Executes ColorLoop command.
- * @param endpoint EndpointId of the recipient Color control cluster.
- * @param commandData Struct containing the parameters of the command.
- * @return Status::Success when successful,
- *         Status::InvalidCommand when an unknown action or direction is provided
- */
 Status ColorControlCluster::ColorLoopSet(BitMask<UpdateFlagsBitmap> updateFlags, ColorLoopActionEnum action,
                                          ColorLoopDirectionEnum direction, uint16_t timeSec, uint16_t startHue,
                                          BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride)
@@ -1828,16 +1694,16 @@ Status ColorControlCluster::ColorLoopSet(BitMask<UpdateFlagsBitmap> updateFlags,
             return Status::InvalidCommand;
         }
     }
-    // Persist the loop attrs (ColorLoopActive/Direction/Time are all NVM). Start/StopColorLoop already
-    // persisted the current color when an action switched mode/hue.
+    // ColorLoopActive/Direction/Time are all NVM. Start/StopColorLoop already persisted the current color
+    // if an action switched mode/hue.
     PersistColorLoop();
     return Status::Success;
 }
 
-// Advertise the attributes this cluster actually serves: the always-present mandatory set, the
-// feature-gated optionals, and the Fixed descriptors (primaries / white-point / color-points) — the
-// latter advertised only when the app supplied that descriptor in StaticConfig, matching what
-// ReadAttribute will actually produce (an unsupplied descriptor is absent, not just null).
+// Advertise the attributes this cluster actually serves: the mandatory set, the feature-gated optionals,
+// and the Fixed descriptors (primaries / white-point / color-points). A descriptor is advertised only
+// when the app supplied it in StaticConfig, matching what ReadAttribute produces — an unsupplied
+// descriptor is absent, not null.
 CHIP_ERROR ColorControlCluster::Attributes(const ConcreteClusterPath & path,
                                            ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
@@ -1848,7 +1714,7 @@ CHIP_ERROR ColorControlCluster::Attributes(const ConcreteClusterPath & path,
     const bool cl = HasFeature(Feature::kColorLoop);
 
     // Fixed-descriptor presence: supplied table AND the specific optional engaged. Each primary gates its
-    // X / Y / Intensity together (Intensity's value stays nullable via ChromaticityPoint::intensity).
+    // X / Y / Intensity together; Intensity's value is still nullable via ChromaticityPoint::intensity.
     const StaticConfig * sc = mStaticConfig;
     const bool p1           = sc && sc->primaries[0].has_value();
     const bool p2           = sc && sc->primaries[1].has_value();
@@ -2016,10 +1882,9 @@ DataModel::ActionReturnStatus ColorControlCluster::WriteAttribute(const DataMode
     return Status::UnsupportedWrite;
 }
 
-// Decode each command's payload from the TLV, then hand the fields to the matching handler. The
-// handlers own validation, mode-switch, options gating and the transition itself — InvokeCommand is
-// pure wiring. The Enhanced* commands share a handler with their legacy twin, distinguished by the
-// isEnhanced flag (legacy hue is 8-bit, enhanced is 16-bit; the handler projects accordingly).
+// Pure wiring: decode each command's payload from the TLV and hand the fields to the matching handler,
+// which owns validation, mode-switch, options gating and the transition. The Enhanced* commands share a
+// handler with their legacy twin, distinguished by isEnhanced (legacy hue is 8-bit, enhanced 16-bit).
 std::optional<DataModel::ActionReturnStatus> ColorControlCluster::InvokeCommand(const DataModel::InvokeRequest & request,
                                                                                 chip::TLV::TLVReader & input_arguments,
                                                                                 CommandHandler * handler)
@@ -2131,7 +1996,7 @@ std::optional<DataModel::ActionReturnStatus> ColorControlCluster::InvokeCommand(
     case Commands::StopMoveStep::Id: {
         Commands::StopMoveStep::DecodableType data;
         ReturnErrorOnFailure(data.Decode(input_arguments));
-        return HandleStopMoveStep(data, handler);
+        return StopMoveStep(data.optionsMask, data.optionsOverride);
     }
 
     default:
@@ -2144,8 +2009,8 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
 {
     // Fixed descriptor readers: a descriptor exists only if the app supplied the table (mStaticConfig) AND
     // the specific optional is engaged; otherwise the attribute is genuinely absent → UnsupportedAttribute.
-    // `field` selects one std::optional<ChromaticityPoint> and `proj` picks x / y / intensity off it.
-    auto point = [&](std::optional<ChromaticityPoint> StaticConfig::*field, auto proj) -> DataModel::ActionReturnStatus {
+    // `field` selects one std::optional<ChromaticityPoint>, `proj` picks x / y / intensity off it.
+    auto point = [&](std::optional<ChromaticityPoint> StaticConfig::* field, auto proj) -> DataModel::ActionReturnStatus {
         if (mStaticConfig == nullptr || !(mStaticConfig->*field).has_value())
         {
             return Status::UnsupportedAttribute;
@@ -2164,14 +2029,13 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
     const auto pointY = [](const ChromaticityPoint & p) { return p.y; };
     const auto pointI = [](const ChromaticityPoint & p) { return p.intensity; };
 
-    // Color axes are projected inline: the active mode returns its stored value / projection, the other
-    // modes go through a single Convert*. A read NEVER switches mode (that is a command's job) and NEVER
-    // interpolates (OnTick already materialized the value into mColorValue). Only the requested axis is
-    // converted. EnhancedHue is 16-bit canonical; CurrentHue is its high byte.
+    // Color axes are projected inline: the active mode returns its stored value / projection, any other
+    // mode goes through a single Convert* for the requested axis only. A read NEVER switches mode (that is
+    // a command's job) and NEVER interpolates (OnTick already materialized the value into mColorValue).
     switch (request.path.mAttributeId)
     {
-    // Global attributes the cluster is responsible for serving (like LevelControl/valve). The framework
-    // fills the list globals (AttributeList/AcceptedCommandList/...), but FeatureMap/ClusterRevision are ours.
+    // The framework fills the list globals (AttributeList/AcceptedCommandList/...); FeatureMap and
+    // ClusterRevision are ours to serve.
     case Globals::Attributes::FeatureMap::Id:
         return encoder.Encode(mFeatures);
     case Globals::Attributes::ClusterRevision::Id:
@@ -2189,11 +2053,11 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
         HueSatColor hueSat;
         if (auto * c = std::get_if<XYColor>(&mColorValue))
         {
-            mDelegate->ConvertXYToHueSat(c->x, c->y, hueSat.hue, hueSat.saturation);
+            mDelegate.ConvertXYToHueSat(c->x, c->y, hueSat.hue, hueSat.saturation);
         }
         else
         {
-            mDelegate->ConvertMiredsToHueSat(std::get<CTColor>(mColorValue).mireds, hueSat.hue, hueSat.saturation);
+            mDelegate.ConvertMiredsToHueSat(std::get<CTColor>(mColorValue).mireds, hueSat.hue, hueSat.saturation);
         }
         return encoder.Encode(hueSat.hue);
     }
@@ -2210,11 +2074,11 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
         HueSatColor hueSat;
         if (auto * c = std::get_if<XYColor>(&mColorValue))
         {
-            mDelegate->ConvertXYToHueSat(c->x, c->y, hueSat.hue, hueSat.saturation);
+            mDelegate.ConvertXYToHueSat(c->x, c->y, hueSat.hue, hueSat.saturation);
         }
         else
         {
-            mDelegate->ConvertMiredsToHueSat(std::get<CTColor>(mColorValue).mireds, hueSat.hue, hueSat.saturation);
+            mDelegate.ConvertMiredsToHueSat(std::get<CTColor>(mColorValue).mireds, hueSat.hue, hueSat.saturation);
         }
         return encoder.Encode(hueSat.enhancedHue());
     }
@@ -2231,11 +2095,11 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
         HueSatColor hueSat;
         if (auto * c = std::get_if<XYColor>(&mColorValue))
         {
-            mDelegate->ConvertXYToHueSat(c->x, c->y, hueSat.hue, hueSat.saturation);
+            mDelegate.ConvertXYToHueSat(c->x, c->y, hueSat.hue, hueSat.saturation);
         }
         else
         {
-            mDelegate->ConvertMiredsToHueSat(std::get<CTColor>(mColorValue).mireds, hueSat.hue, hueSat.saturation);
+            mDelegate.ConvertMiredsToHueSat(std::get<CTColor>(mColorValue).mireds, hueSat.hue, hueSat.saturation);
         }
         return encoder.Encode(hueSat.saturation);
     }
@@ -2248,15 +2112,15 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
         XYColor xy;
         if (auto * hs = std::get_if<HueSatColor>(&mColorValue))
         {
-            mDelegate->ConvertHueSatToXY(hs->hue, hs->saturation, xy.x, xy.y);
+            mDelegate.ConvertHueSatToXY(hs->hue, hs->saturation, xy.x, xy.y);
         }
         else if (auto * e = std::get_if<EnhancedHueSatColor>(&mColorValue))
         {
-            mDelegate->ConvertHueSatToXY(e->hue8(), e->saturation, xy.x, xy.y);
+            mDelegate.ConvertHueSatToXY(e->hue8(), e->saturation, xy.x, xy.y);
         }
         else
         {
-            mDelegate->ConvertMiredsToXY(std::get<CTColor>(mColorValue).mireds, xy.x, xy.y);
+            mDelegate.ConvertMiredsToXY(std::get<CTColor>(mColorValue).mireds, xy.x, xy.y);
         }
         return encoder.Encode(xy.x);
     }
@@ -2269,15 +2133,15 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
         XYColor xy;
         if (auto * hs = std::get_if<HueSatColor>(&mColorValue))
         {
-            mDelegate->ConvertHueSatToXY(hs->hue, hs->saturation, xy.x, xy.y);
+            mDelegate.ConvertHueSatToXY(hs->hue, hs->saturation, xy.x, xy.y);
         }
         else if (auto * e = std::get_if<EnhancedHueSatColor>(&mColorValue))
         {
-            mDelegate->ConvertHueSatToXY(e->hue8(), e->saturation, xy.x, xy.y);
+            mDelegate.ConvertHueSatToXY(e->hue8(), e->saturation, xy.x, xy.y);
         }
         else
         {
-            mDelegate->ConvertMiredsToXY(std::get<CTColor>(mColorValue).mireds, xy.x, xy.y);
+            mDelegate.ConvertMiredsToXY(std::get<CTColor>(mColorValue).mireds, xy.x, xy.y);
         }
         return encoder.Encode(xy.y);
     }
@@ -2290,16 +2154,16 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
         CTColor ct;
         if (auto * c = std::get_if<XYColor>(&mColorValue))
         {
-            mDelegate->ConvertXYToMireds(c->x, c->y, ct.mireds);
+            mDelegate.ConvertXYToMireds(c->x, c->y, ct.mireds);
         }
         else if (auto * hs = std::get_if<HueSatColor>(&mColorValue))
         {
-            mDelegate->ConvertHueSatToMireds(hs->hue, hs->saturation, ct.mireds);
+            mDelegate.ConvertHueSatToMireds(hs->hue, hs->saturation, ct.mireds);
         }
         else
         {
             const auto & e = std::get<EnhancedHueSatColor>(mColorValue);
-            mDelegate->ConvertHueSatToMireds(e.hue8(), e.saturation, ct.mireds);
+            mDelegate.ConvertHueSatToMireds(e.hue8(), e.saturation, ct.mireds);
         }
         return encoder.Encode(ct.mireds);
     }
@@ -2311,11 +2175,11 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
                                   : std::holds_alternative<CTColor>(mColorValue) ? ColorModeEnum::kColorTemperatureMireds
                                                                                  : ColorModeEnum::kCurrentHueAndCurrentSaturation);
     case Attributes::EnhancedColorMode::Id:
-        // Derived from the active variant; GetEnhancedColorMode() is the single source of that mapping.
         return encoder.Encode(GetEnhancedColorMode());
 
-    // ---- Drift-compensation reports (§3.2.6.4 / §3.2.7.8): app-owned, read-only. Absent → not reported
-    // (UnsupportedAttribute), which is NOT DriftCompensationEnum::kNone (a positive "no compensation").
+    // ---- Drift-compensation reports (§3.2.6.4 / §3.2.7.8): app-owned, read-only. Absent means not
+    // reported (UnsupportedAttribute), which is NOT DriftCompensationEnum::kNone — that is a positive
+    // "no compensation".
     case DriftCompensation::Id:
         VerifyOrReturnValue(mStaticConfig && mStaticConfig->driftCompensation.has_value(), Status::UnsupportedAttribute);
         return encoder.Encode(mStaticConfig->driftCompensation.value());
@@ -2329,9 +2193,11 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
     case Options::Id:
         return encoder.Encode(mState.options);
     case Attributes::ColorCapabilities::Id:
-        return encoder.Encode(mState.colorCapabilities);
+        // ColorCapabilities mirrors the FeatureMap 1:1 (the two bitmaps share bit positions 0x1..0x10),
+        // so it is derived here rather than stored.
+        return encoder.Encode(BitMask<ColorControl::ColorCapabilitiesBitmap>(static_cast<uint16_t>(mFeatures.Raw())));
     case NumberOfPrimaries::Id:
-        return encoder.Encode(mState.numberOfPrimaries);
+        return encoder.Encode(NumberOfPrimaries());
 
     // ---- color loop ----
     case ColorLoopActive::Id:
@@ -2426,15 +2292,6 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
     }
 }
 
-/**
- * @brief Executes the MoveColor command: continuously moves CurrentX / CurrentY toward the CIE
- *        boundary at the given signed rates (xy-units per second), running until StopMoveStep. A rate
- *        of 0 leaves that axis stationary; both rates 0 stops any active XY movement.
- *
- * @param rateX signed rate for CurrentX in xy-units per second
- * @param rateY signed rate for CurrentY in xy-units per second
- * @return Status::Success (gated by ShouldExecuteIfOff; the command has no out-of-range fields).
- */
 Status ColorControlCluster::MoveColor(int16_t rateX, int16_t rateY, BitMask<OptionsBitmap> optionsMask,
                                       BitMask<OptionsBitmap> optionsOverride)
 {
@@ -2461,23 +2318,16 @@ Status ColorControlCluster::MoveColor(int16_t rateX, int16_t rateY, BitMask<Opti
         .startY      = xy.y,
         .targetY     = targetY,
         .durationYMs = durY,
-        .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
+        .startTimeMs = NowMs(),
     };
     // Fresh-command RemainingTime edge report (§3.2.7.4): the slower axis's time-to-boundary in 1/10 s
     // (an idle axis contributed 0 duration, so max() is the moving axis).
     SetQuietReportRemainingTime(RemainingTenthsFromMs(std::max(durX, durY)), /*isNewTransition=*/true);
+    NotifyXYTransition(std::get<XYTransition>(mTransition));
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
     return Status::Success;
 }
-/**
- * @brief executes step color command
- * @param endpoint endpointId of the recipient Color control cluster
- * @param commandData Struct containing the parameters of the command
- * @return Status::Success when successful,
- *         Status::InvalidCommand when a step X and Y of 0 is provided
- *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a Color XY transition state,
- *         Status::ConstraintError when a command parameter is outside its defined value range.
- */
+
 Status ColorControlCluster::StepColor(int16_t stepX, int16_t stepY, uint16_t transitionTimeDs, BitMask<OptionsBitmap> optionsMask,
                                       BitMask<OptionsBitmap> optionsOverride)
 {
@@ -2499,21 +2349,14 @@ Status ColorControlCluster::StepColor(int16_t stepX, int16_t stepY, uint16_t tra
         .startY      = xy.y,
         .targetY     = targetY,
         .durationYMs = durationMs, // both axes arrive together
-        .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
+        .startTimeMs = NowMs(),
     };
     SetQuietReportRemainingTime(transitionTimeDs, /*isNewTransition=*/true);
+    NotifyXYTransition(std::get<XYTransition>(mTransition));
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
     return Status::Success;
 }
 
-/**
- * @brief Executes move to color temp logic.
- *
- * @param aEndpoint
- * @param colorTemperature
- * @param transitionTime
- * @return Status::Success if successful, Status::UnsupportedEndpoint if the endpoint doesn't support color temperature.
- */
 Status ColorControlCluster::MoveToColorTemp(uint16_t colorTemperature, uint16_t transitionTimeDs,
                                             BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride)
 {
@@ -2528,14 +2371,6 @@ Status ColorControlCluster::MoveToColorTemp(uint16_t colorTemperature, uint16_t 
     return Status::Success;
 }
 
-/**
- * @brief Executes move to color command (absolute CIE xy target over a fixed transition time).
- *
- * @param colorX target CurrentX
- * @param colorY target CurrentY
- * @param transitionTimeDs transition time in 1/10ths of a second
- * @return Status::Success if successful, Status::ConstraintError if a parameter is out of range.
- */
 Status ColorControlCluster::MoveToColor(uint16_t colorX, uint16_t colorY, uint16_t transitionTimeDs,
                                         BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride)
 {
@@ -2554,19 +2389,11 @@ Status ColorControlCluster::MoveToColor(uint16_t colorX, uint16_t colorY, uint16
 
 void ColorControlCluster::ApplyStartUpColorTemperature()
 {
-    // §3.2.11.10 StartUpColorTemperatureMireds Attribute
-    // The StartUpColorTemperatureMireds attribute SHALL define the desired startup color
-    // temperature values a lamp SHALL use when it is supplied with power and this value SHALL
-    // be reflected in the ColorTemperatureMireds attribute. In addition, the ColorMode and
-    // EnhancedColorMode attributes SHALL be set to 2 (color temperature). The values of
-    // the StartUpColorTemperatureMireds attribute are listed in the table below.
-    // Value   Action on power up
-    // 0x0001-0xFEFF Set the ColorTemperatureMireds attribute to this value.
-    // null          Set the ColorTemperatureMireds attribute to its previous value.
-
+    // §3.2.11.10: a concrete StartUpColorTemperatureMireds becomes ColorTemperatureMireds on power up and
+    // forces color-temperature mode; null keeps the previous value.
     if (mCT.startUpColorTemperatureMireds.IsNull())
     {
-        return; // "maintain previous value" — leave the loaded ColorTemperatureMireds
+        return; // leave the ColorTemperatureMireds just loaded by Startup()
     }
 
     const uint16_t physMin = std::max<uint16_t>(1u, mCT.colorTempPhysicalMinMireds); // divide-by-zero guard
@@ -2580,37 +2407,29 @@ void ColorControlCluster::ApplyStartUpColorTemperature()
     }
 
     // Switching the variant to CTColor IS the mode change — colorMode / enhancedColorMode are derived
-    // from the alternative, so there is nothing else to set (they both read as ColorTemperature now).
+    // from the alternative, so there is nothing else to set.
     ApplyModeSwitch(EnhancedColorModeEnum::kColorTemperatureMireds);
     std::get<CTColor>(mColorValue).mireds = startUp;
 
     // Store what the attributes now report, so the persisted color does not lag behind them. Startup()
     // rebuilds mColorValue from the persisted EnhancedColorMode, so leaving the pre-startup mode and axes
     // in storage would resurrect them the first time StartUpColorTemperatureMireds is written null — the
-    // null row owes the PREVIOUS value, and this is it. Only ever reached from Startup(), which has
-    // already let the base class install mContext.
+    // null case owes the PREVIOUS value, and this is it.
     PersistCurrentColor();
 }
 
-/**
- * @brief Executes move color temp command.
- * @param endpoint EndpointId of the recipient Color control cluster.
- * @param commandData Struct containing the parameters of the command.
- * @return Status::Success when successful,
- *         Status::InvalidCommand when a rate of 0 for a non-stop move or an unknown MoveModeEnum is provided
- *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a color temp transition state.
- *         Status::ConstraintError when a command parameter is outside its defined value range.
- */
 Status ColorControlCluster::MoveColorTemp(MoveModeEnum moveMode, uint16_t rate, uint16_t minFieldMireds, uint16_t maxFieldMireds,
                                           BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride)
 {
     VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
     VerifyOrReturnValue(minFieldMireds <= kMaxColorTemperatureMireds, Status::ConstraintError); // fields: max 0xFEFF
     VerifyOrReturnValue(maxFieldMireds <= kMaxColorTemperatureMireds, Status::ConstraintError);
+    // Only when both are set do they describe a window; a crossed one bounds the movement by nothing.
+    VerifyOrReturnValue(minFieldMireds == 0 || maxFieldMireds == 0 || minFieldMireds <= maxFieldMireds, Status::ConstraintError);
     VerifyOrReturnValue(moveMode != MoveModeEnum::kUnknownEnumValue, Status::InvalidCommand);
 
     if (moveMode == MoveModeEnum::kStop)
-    { // Stop: stop movement, rate ignored. CT is single-axis, so clearing the driver is the whole stop.
+    { // rate is ignored. CT is single-axis, so clearing the driver is the whole stop.
         if (std::holds_alternative<CTTransition>(mTransition))
         {
             StopTransitionAndFreeze(); // freeze: persist the mireds the movement stopped at
@@ -2618,7 +2437,7 @@ Status ColorControlCluster::MoveColorTemp(MoveModeEnum moveMode, uint16_t rate, 
         SetQuietReportRemainingTime(0, /*isNewTransition=*/false); // stopped → RemainingTime 0, like MoveHue Stop
         return Status::Success;
     }
-    VerifyOrReturnValue(rate != 0, Status::InvalidCommand); // rate 0 + non-stop → InvalidCommand
+    VerifyOrReturnValue(rate != 0, Status::InvalidCommand);
 
     // §3.2.8.21.3/.4: field==0 → physical limit; else clamp the field into the physical range
     const uint16_t lowerBound =
@@ -2636,21 +2455,15 @@ Status ColorControlCluster::MoveColorTemp(MoveModeEnum moveMode, uint16_t rate, 
     mTransition = CTTransition{
         .startMireds  = ct.mireds,
         .targetMireds = target, // already a legal bound — no extra clamp
-        .startTimeMs  = SystemClock().GetMonotonicMilliseconds64().count(),
+        .startTimeMs  = NowMs(),
         .durationMs   = durationMs,
     };
     SetQuietReportRemainingTime(RemainingTenthsFromMs(durationMs), /*isNewTransition=*/true);
+    NotifyCTTransition(std::get<CTTransition>(mTransition));
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
     return Status::Success;
 }
 
-/**
- * @brief Executes step color temp command.
- * @return Status::Success when successful,
- *         Status::InvalidCommand when stepSize is 0 or an unknown stepMode is provided
- *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a color temp transition state,
- *         Status::ConstraintError when a command parameter is outside its defined value range.
- */
 Status ColorControlCluster::StepColorTemp(StepModeEnum stepMode, uint16_t stepSize, uint16_t transitionTimeDs,
                                           uint16_t minFieldMireds, uint16_t maxFieldMireds, BitMask<OptionsBitmap> optionsMask,
                                           BitMask<OptionsBitmap> optionsOverride)
@@ -2658,6 +2471,7 @@ Status ColorControlCluster::StepColorTemp(StepModeEnum stepMode, uint16_t stepSi
     VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
     VerifyOrReturnValue(minFieldMireds <= kMaxColorTemperatureMireds, Status::ConstraintError);
     VerifyOrReturnValue(maxFieldMireds <= kMaxColorTemperatureMireds, Status::ConstraintError);
+    VerifyOrReturnValue(minFieldMireds == 0 || maxFieldMireds == 0 || minFieldMireds <= maxFieldMireds, Status::ConstraintError);
     VerifyOrReturnValue(transitionTimeDs <= kMaxTransitionTime, Status::ConstraintError);
     VerifyOrReturnValue(stepMode != StepModeEnum::kUnknownEnumValue, Status::InvalidCommand);
     VerifyOrReturnValue(stepSize != 0, Status::InvalidCommand);
@@ -2682,56 +2496,33 @@ Status ColorControlCluster::StepColorTemp(StepModeEnum stepMode, uint16_t stepSi
     mTransition = CTTransition{
         .startMireds  = ct.mireds,
         .targetMireds = target,
-        .startTimeMs  = SystemClock().GetMonotonicMilliseconds64().count(),
+        .startTimeMs  = NowMs(),
         .durationMs   = transitionTimeDs * 100u,
     };
     SetQuietReportRemainingTime(transitionTimeDs, /*isNewTransition=*/true);
+    NotifyCTTransition(std::get<CTTransition>(mTransition));
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
     return Status::Success;
 }
 
 void ColorControlCluster::CoupleColorTempToLevel(uint8_t currentLevel)
 {
-    // Coupling color temperature to Level Control (Color Control cluster)
+    // While Level Control's CoupleColorTempToLevel option is set and the active mode is color temperature,
+    // a change in CurrentLevel SHALL affect ColorTemperatureMireds. The mapping is manufacturer specific,
+    // qualified by: max CurrentLevel corresponds to CoupleColorTempToLevelMinMireds, and a low level maps
+    // to a high mired value (simulating an incandescent bulb). The relationship is one-way — a change to
+    // ColorTemperatureMireds SHALL NOT affect CurrentLevel.
     //
-    // If the Level Control for Lighting cluster identifier 8 is supported
-    // on the same endpoint as the Color Control cluster and color temperature is
-    // supported, it is possible to couple changes in the current level to the
-    // color temperature.
-    //
-    // The CoupleColorTempToLevel bit of the Options attribute of the Level
-    // Control cluster indicates whether the color temperature is to be linked
-    // with the CurrentLevel attribute in the Level Control cluster.
-    //
-    // If the CoupleColorTempToLevel bit of the Options attribute of the Level
-    // Control cluster is equal to 1 and the ColorMode or EnhancedColorMode
-    // attribute is set to 2 (color temperature) then a change in the
-    // CurrentLevel attribute SHALL affect the ColorTemperatureMireds attribute.
-    // This relationship is manufacturer specific, with the qualification that
-    // the maximum value of the CurrentLevel attribute SHALL correspond to a
-    // ColorTemperatureMired attribute value equal to the
-    // CoupleColorTempToLevelMinMireds attribute. This relationship is one-way so
-    // a change to the ColorTemperatureMireds attribute SHALL NOT have any effect
-    // on the CurrentLevel attribute.
-    //
-    // In order to simulate the behavior of an incandescent bulb, a low value of
-    // the CurrentLevel attribute SHALL be associated with a high value of the
-    // ColorTemperatureMireds attribute (i.e., a low value of color temperature
-    // in kelvins).
-    //
-    // If the CoupleColorTempToLevel bit of the Options attribute of the Level
-    // Control cluster is equal to 0, there SHALL be no link between color
-    // temperature and current level. That option gate is enforced by the Level
-    // Control cluster before it notifies us, so here we only honor the coupling
-    // when the active mode is color temperature.
+    // The option-bit gate is enforced by the Level Control cluster before it calls here, so the only
+    // condition left to check is that color temperature owns the output.
     VerifyOrReturn(std::holds_alternative<CTColor>(mColorValue));
 
     const uint16_t tempCoupleMin = std::max<uint16_t>(1u, mCT.coupleColorTempToLevelMinMireds);
     const uint16_t tempPhysMax   = mCT.colorTempPhysicalMaxMireds;
     VerifyOrReturn(tempCoupleMin <= tempPhysMax);
 
-    // Scale color temp between the coupling min and the physical max. Mireds vary inversely with level
-    // (low level -> high mireds): peg the extremes, interpolate the middle (u32 math avoids overflow).
+    // Scale between the coupling min and the physical max. Mireds vary inversely with level, so peg the
+    // extremes and interpolate the middle (u32 math avoids overflow).
     uint16_t newColorTemp;
     if (currentLevel <= kMinCurrentLevel)
     {

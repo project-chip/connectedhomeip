@@ -28,10 +28,9 @@
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/TimerDelegateMock.h>
 #include <lib/support/TypeTraits.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <pw_unit_test/framework.h>
-#include <system/RAIIMockClock.h>
 
 namespace {
 
@@ -47,37 +46,22 @@ constexpr EndpointId kTestEndpointId = 1;
 
 struct TestColorControlScenes : public ::testing::Test
 {
-    // ApplyScene arms the tick via DeviceLayer::SystemLayer().StartTimer(); InitChipStack() brings the layer
-    // up so HandleApplyScene's ArmTick() does not fail. The work queue starts suspended, so the armed timer
-    // never fires on a background thread and cannot race the manual OnTick() calls below.
-    static void SetUpTestSuite()
-    {
-        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
-        ASSERT_EQ(DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
-    }
-    static void TearDownTestSuite()
-    {
-        DeviceLayer::PlatformMgr().Shutdown();
-        Platform::MemoryShutdown();
-    }
+    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 
+    TimerDelegateMock mockTimer;
     ColorControlDelegate delegate;
-    System::Clock::Internal::RAIIMockClock clock;
 
-    // Advance the mock clock well past any transition used here and run one tick, so the transition
+    // Advance well past any transition used here, firing the tick ApplyScene armed, so the transition
     // materializes into the stored color (which CurrentX/Y read).
-    void Complete(ColorControlCluster & c)
-    {
-        clock.AdvanceMonotonic(System::Clock::Milliseconds64(120000));
-        c.OnTick();
-    }
+    void Complete() { mockTimer.AdvanceClock(System::Clock::Milliseconds64(120000)); }
 };
 
 // SupportsCluster is scoped to this cluster's own endpoint and cluster id — no registry, no
 // cross-endpoint resolution.
 TEST_F(TestColorControlScenes, SupportsClusterMatchesOwnEndpointOnly)
 {
-    ColorControlCluster::Config config(delegate);
+    ColorControlCluster::Config config(delegate, mockTimer);
     config.mFeatures.Set(Feature::kXy);
     ColorControlCluster cluster(kTestEndpointId, config);
 
@@ -91,7 +75,7 @@ TEST_F(TestColorControlScenes, SupportsClusterMatchesOwnEndpointOnly)
 // EnhancedColorMode.
 TEST_F(TestColorControlScenes, SerializeSaveCapturesLiveColor)
 {
-    ColorControlCluster::Config config(delegate);
+    ColorControlCluster::Config config(delegate, mockTimer);
     config.mFeatures.Set(Feature::kXy);
     ColorControlCluster cluster(kTestEndpointId, config);
     Testing::ClusterTester tester(cluster);
@@ -99,7 +83,7 @@ TEST_F(TestColorControlScenes, SerializeSaveCapturesLiveColor)
 
     // Drive the live color to a known value (immediate move), independent of what Startup restored.
     EXPECT_EQ(cluster.MoveToColor(30000, 40000, 0), Status::Success);
-    Complete(cluster);
+    Complete();
     ASSERT_EQ(cluster.CurrentX(), 30000u);
 
     uint8_t buffer[128];
@@ -144,7 +128,7 @@ TEST_F(TestColorControlScenes, SerializeSaveCapturesLiveColor)
 // and the resulting transition is drained before asserting the final color.
 TEST_F(TestColorControlScenes, ApplySceneDrivesColorToSavedTarget)
 {
-    ColorControlCluster::Config config(delegate);
+    ColorControlCluster::Config config(delegate, mockTimer);
     config.mFeatures.Set(Feature::kXy);
     ColorControlCluster cluster(kTestEndpointId, config);
     Testing::ClusterTester tester(cluster);
@@ -166,12 +150,12 @@ TEST_F(TestColorControlScenes, ApplySceneDrivesColorToSavedTarget)
 
     // Move the live color away from the scene target first, so ApplyScene has something to change.
     EXPECT_EQ(cluster.MoveToColor(30000, 40000, 0), Status::Success);
-    Complete(cluster);
+    Complete();
     ASSERT_EQ(cluster.CurrentX(), 30000u);
 
     // Apply the scene and drain the transition; the live color reaches the saved target.
     EXPECT_EQ(cluster.ApplyScene(kTestEndpointId, ColorControl::Id, serializedBytes, 0), CHIP_NO_ERROR);
-    Complete(cluster);
+    Complete();
     EXPECT_EQ(cluster.CurrentX(), 100u);
     EXPECT_EQ(cluster.CurrentY(), 200u);
 
@@ -183,7 +167,7 @@ TEST_F(TestColorControlScenes, ApplySceneDrivesColorToSavedTarget)
 // constraint max (0xFFFE) rather than wrap — 600000 tenths would come back as 10176.
 TEST_F(TestColorControlScenes, ApplySceneSaturatesRemainingTime)
 {
-    ColorControlCluster::Config config(delegate);
+    ColorControlCluster::Config config(delegate, mockTimer);
     config.mFeatures.Set(Feature::kXy);
     ColorControlCluster cluster(kTestEndpointId, config);
     Testing::ClusterTester tester(cluster);
@@ -218,7 +202,7 @@ TEST_F(TestColorControlScenes, ApplySceneSaturatesRemainingTime)
 // color restore runs instead.
 TEST_F(TestColorControlScenes, ApplySceneIgnoresColorLoopWithoutFeature)
 {
-    ColorControlCluster::Config config(delegate);
+    ColorControlCluster::Config config(delegate, mockTimer);
     config.mFeatures.Set(Feature::kXy); // no ColorLoop, no EnhancedHue
     ColorControlCluster cluster(kTestEndpointId, config);
     Testing::ClusterTester tester(cluster);
@@ -241,11 +225,11 @@ TEST_F(TestColorControlScenes, ApplySceneIgnoresColorLoopWithoutFeature)
 
     // Move the live color away from the scene target so the restore has something to change.
     EXPECT_EQ(cluster.MoveToColor(30000, 40000, 0), Status::Success);
-    Complete(cluster);
+    Complete();
     ASSERT_EQ(cluster.CurrentX(), 30000u);
 
     EXPECT_EQ(cluster.ApplyScene(kTestEndpointId, ColorControl::Id, serializedBytes, 0), CHIP_NO_ERROR);
-    Complete(cluster);
+    Complete();
 
     EXPECT_EQ(cluster.ColorLoopActive(), 0);
     EXPECT_EQ(cluster.GetEnhancedColorMode(), EnhancedColorModeEnum::kCurrentXAndCurrentY);
@@ -260,7 +244,7 @@ TEST_F(TestColorControlScenes, ApplySceneIgnoresColorLoopWithoutFeature)
 // restored — the loop drives hue itself).
 TEST_F(TestColorControlScenes, ApplySceneStartsColorLoopWhenSupported)
 {
-    ColorControlCluster::Config config(delegate);
+    ColorControlCluster::Config config(delegate, mockTimer);
     config.mFeatures.Set(Feature::kColorLoop).Set(Feature::kEnhancedHue).Set(Feature::kHueAndSaturation);
     config.mColorValue = EnhancedHueSatColor{ 0x1000, 20 };
     ColorControlCluster cluster(kTestEndpointId, config);
@@ -315,7 +299,7 @@ CHIP_ERROR MakeDecodableEfs(chip::Span<const AttributeValuePair> pairs, MutableB
 // requires is rejected (a presence check across the whole EFS, done before delegating to the base handler).
 TEST_F(TestColorControlScenes, SerializeAddRejectsModeMissingRequiredAttributes)
 {
-    ColorControlCluster::Config config(delegate);
+    ColorControlCluster::Config config(delegate, mockTimer);
     config.mFeatures.Set(Feature::kColorTemperature).Set(Feature::kXy).Set(Feature::kHueAndSaturation).Set(Feature::kEnhancedHue);
     ColorControlCluster cluster(kTestEndpointId, config);
 
@@ -362,12 +346,49 @@ TEST_F(TestColorControlScenes, SerializeAddRejectsModeMissingRequiredAttributes)
     }
 }
 
+// SerializeSave picks the hue attribute by the active MODE, not by the feature map: an EnhancedHue device
+// left in legacy HS mode (reachable with the plain, non-enhanced command) saves CurrentHue, not
+// EnhancedCurrentHue. That is what lets ApplyScene read the mode's own attribute without guessing which
+// of the two was stored, and what keeps SerializeAdd's presence check satisfiable by our own output.
+TEST_F(TestColorControlScenes, SerializeSaveWritesCurrentHueInLegacyMode)
+{
+    ColorControlCluster::Config config(delegate, mockTimer);
+    config.mFeatures.Set(Feature::kHueAndSaturation).Set(Feature::kEnhancedHue);
+    ColorControlCluster cluster(kTestEndpointId, config);
+    Testing::ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    ASSERT_EQ(cluster.MoveToHueAndSaturation(200, 150, 0, /*isEnhanced=*/false), Status::Success);
+    Complete();
+
+    uint8_t buffer[128];
+    MutableByteSpan serializedBytes(buffer);
+    ASSERT_EQ(cluster.SerializeSave(kTestEndpointId, ColorControl::Id, serializedBytes), CHIP_NO_ERROR);
+
+    DataModel::DecodableList<ScenesManagement::Structs::AttributeValuePairStruct::DecodableType> list;
+    ASSERT_EQ(cluster.DecodeAttributeValueList(serializedBytes, list), CHIP_NO_ERROR);
+
+    bool sawCurrentHue  = false;
+    bool sawEnhancedHue = false;
+    auto it             = list.begin();
+    while (it.Next())
+    {
+        sawCurrentHue |= (it.GetValue().attributeID == Attributes::CurrentHue::Id);
+        sawEnhancedHue |= (it.GetValue().attributeID == Attributes::EnhancedCurrentHue::Id);
+    }
+    ASSERT_EQ(it.GetStatus(), CHIP_NO_ERROR);
+    EXPECT_TRUE(sawCurrentHue);
+    EXPECT_FALSE(sawEnhancedHue);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 // ColorLoopDirection is constrained to 0..1 (kDecrement/kIncrement), so AddScene must reject a scene
 // carrying an out-of-range direction. Without this bound the value would be stored verbatim and later
 // written straight into the attribute by ApplyScene, making a read report a value the type forbids.
 TEST_F(TestColorControlScenes, SerializeAddRejectsOutOfRangeColorLoopDirection)
 {
-    ColorControlCluster::Config config(delegate);
+    ColorControlCluster::Config config(delegate, mockTimer);
     config.mFeatures.Set(Feature::kColorLoop).Set(Feature::kHueAndSaturation).Set(Feature::kEnhancedHue);
     ColorControlCluster cluster(kTestEndpointId, config);
 
@@ -398,7 +419,7 @@ TEST_F(TestColorControlScenes, SerializeAddRejectsOutOfRangeColorLoopDirection)
 // caps the mode before building any target.
 TEST_F(TestColorControlScenes, ApplySceneRejectsOutOfRangeMode)
 {
-    ColorControlCluster::Config config(delegate);
+    ColorControlCluster::Config config(delegate, mockTimer);
     config.mFeatures.Set(Feature::kXy);
     ColorControlCluster cluster(kTestEndpointId, config);
 
@@ -418,7 +439,7 @@ TEST_F(TestColorControlScenes, ApplySceneRejectsOutOfRangeMode)
 // color-temperature scene (SupportsMode is false).
 TEST_F(TestColorControlScenes, ApplySceneRejectsUnsupportedMode)
 {
-    ColorControlCluster::Config config(delegate);
+    ColorControlCluster::Config config(delegate, mockTimer);
     config.mFeatures.Set(Feature::kXy); // no color-temperature feature
     ColorControlCluster cluster(kTestEndpointId, config);
 

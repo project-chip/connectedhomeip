@@ -21,16 +21,15 @@
 // must survive a reboot. Each test drives a first cluster ("a") that Startup()s against a storage-backed
 // context and settles some state, then constructs a SECOND cluster ("b") on the SAME storage and asserts
 // b.Startup() restores it. A single ClusterTester owns the shared context; b is started with that same
-// context, exactly as a reboot would re-open the same KVS. Transitions are clock-driven (RAIIMockClock),
-// so persistence fires from OnTick's settle path just as it would on a device.
+// context, exactly as a reboot would re-open the same KVS. Transitions are clock-driven off the injected
+// TimerDelegateMock, so persistence fires from the settle path of a real armed tick, as on a device.
 
 #include <app/clusters/color-control-server/ColorControlCluster.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <clusters/ColorControl/Attributes.h>
 #include <lib/support/CHIPMem.h>
-#include <platform/CHIPDeviceLayer.h>
+#include <lib/support/TimerDelegateMock.h>
 #include <pw_unit_test/framework.h>
-#include <system/RAIIMockClock.h>
 
 namespace {
 
@@ -45,33 +44,20 @@ constexpr EndpointId kEp = 1;
 
 struct TestColorControlPersistence : public ::testing::Test
 {
-    // Command handlers arm the tick via DeviceLayer::SystemLayer().StartTimer(); InitChipStack() brings the
-    // layer up so a fresh command doesn't return Status::Failure. The work queue starts suspended, so the
-    // armed timer never fires on a background thread and cannot race the manual OnTick() calls below.
-    static void SetUpTestSuite()
-    {
-        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
-        ASSERT_EQ(DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
-    }
-    static void TearDownTestSuite()
-    {
-        DeviceLayer::PlatformMgr().Shutdown();
-        Platform::MemoryShutdown();
-    }
+    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 
+    TimerDelegateMock mockTimer;
     ColorControlDelegate delegate;
-    System::Clock::Internal::RAIIMockClock clock;
 
-    void Tick(ColorControlCluster & c, uint32_t ms)
-    {
-        clock.AdvanceMonotonic(System::Clock::Milliseconds64(ms));
-        c.OnTick();
-    }
-    void Complete(ColorControlCluster & c) { Tick(c, 120000); }
+    // Fires the tick the cluster under test armed. Both clusters of a reboot pair share this mock, which
+    // is why the pre-reboot one is always shut down (releasing its tick) before the second one boots.
+    void Tick(uint32_t ms) { mockTimer.AdvanceClock(System::Clock::Milliseconds64(ms)); }
+    void Complete() { Tick(120000); }
 
     ColorControlCluster::Config CtConfig()
     {
-        ColorControlCluster::Config c(delegate);
+        ColorControlCluster::Config c(delegate, mockTimer);
         c.mFeatures.Set(Feature::kColorTemperature);
         c.mColorValue                         = CTColor{ 250 };
         c.ctConfig.colorTempPhysicalMinMireds = 100;
@@ -80,21 +66,21 @@ struct TestColorControlPersistence : public ::testing::Test
     }
     ColorControlCluster::Config XyConfig()
     {
-        ColorControlCluster::Config c(delegate);
+        ColorControlCluster::Config c(delegate, mockTimer);
         c.mFeatures.Set(Feature::kXy);
         c.mColorValue = XYColor{ 1000, 2000 };
         return c;
     }
     ColorControlCluster::Config HsConfig()
     {
-        ColorControlCluster::Config c(delegate);
+        ColorControlCluster::Config c(delegate, mockTimer);
         c.mFeatures.Set(Feature::kHueAndSaturation);
         c.mColorValue = HueSatColor{ 10, 20 };
         return c;
     }
     ColorControlCluster::Config LoopConfig()
     {
-        ColorControlCluster::Config c(delegate);
+        ColorControlCluster::Config c(delegate, mockTimer);
         c.mFeatures.Set(Feature::kColorLoop).Set(Feature::kEnhancedHue).Set(Feature::kHueAndSaturation);
         c.mColorValue = EnhancedHueSatColor{ 0x1000, 20 };
         return c;
@@ -112,7 +98,8 @@ struct TestColorControlPersistence : public ::testing::Test
         ASSERT_EQ(a.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
         ASSERT_EQ(drive(a), Status::Success);
-        Complete(a); // settles the target -> OnTick persists it
+        Complete(); // settles the target -> the tick persists it
+        a.Shutdown(ClusterShutdownType::kClusterShutdown);
 
         ColorControlCluster b(kEp, config);
         ASSERT_EQ(b.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -120,7 +107,6 @@ struct TestColorControlPersistence : public ::testing::Test
         verify(b);
 
         b.Shutdown(ClusterShutdownType::kClusterShutdown);
-        a.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 };
 
@@ -178,7 +164,7 @@ TEST_F(TestColorControlPersistence, FirstBootModeFollowsFeatureMap)
 // color is of the stored mode's alternative.
 TEST_F(TestColorControlPersistence, StoredModeOutranksConfiguredColorAlternative)
 {
-    ColorControlCluster::Config config(delegate);
+    ColorControlCluster::Config config(delegate, mockTimer);
     config.mFeatures.Set(Feature::kHueAndSaturation).Set(Feature::kColorTemperature);
     config.mColorValue                         = HueSatColor{ 10, 20 }; // boots in HS
     config.ctConfig.colorTempPhysicalMinMireds = 100;
@@ -219,19 +205,19 @@ TEST_F(TestColorControlPersistence, StopFreezesAndPersistsCurrentValue)
     ASSERT_EQ(a.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     EXPECT_EQ(a.MoveToColorTemp(400, 200), Status::Success); // 20 s transition
-    Tick(a, 10000);                                          // halfway
+    Tick(10000);                                             // halfway
     const uint16_t frozen = a.ColorTempMireds();
     EXPECT_GT(frozen, 250u);
     EXPECT_LT(frozen, 400u);
 
     EXPECT_EQ(a.MoveColorTemp(MoveModeEnum::kStop, 0, 0, 0), Status::Success); // freeze + persist
+    a.Shutdown(ClusterShutdownType::kClusterShutdown);
 
     ColorControlCluster b(kEp, CtConfig());
     ASSERT_EQ(b.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
     EXPECT_EQ(b.ColorTempMireds(), frozen);
 
     b.Shutdown(ClusterShutdownType::kClusterShutdown);
-    a.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // The flip side of the test above: a Stop with nothing transitioning has no new value to freeze (a Stop
@@ -255,7 +241,7 @@ TEST_F(TestColorControlPersistence, IdleStopDoesNotWriteNvm)
 
         // A Stop that does interrupt a transition still persists the value it froze.
         EXPECT_EQ(a.MoveToSaturation(200, 200), Status::Success); // 20 s transition
-        Tick(a, 10000);                                           // halfway
+        Tick(10000);                                              // halfway
         EXPECT_EQ(a.StopMoveStep(), Status::Success);
         EXPECT_GT(storage.GetNumKeys(), 0u);
 
@@ -274,7 +260,7 @@ TEST_F(TestColorControlPersistence, IdleStopDoesNotWriteNvm)
         EXPECT_EQ(storage.GetNumKeys(), 0u);
 
         EXPECT_EQ(a.MoveColor(100, 100), Status::Success); // toward the CIE boundary
-        Tick(a, 10000);
+        Tick(10000);
         EXPECT_EQ(a.MoveColor(0, 0), Status::Success);
         EXPECT_GT(storage.GetNumKeys(), 0u);
 
@@ -293,13 +279,13 @@ TEST_F(TestColorControlPersistence, StartUpColorTemperatureWriteSurvivesReboot)
 
     // Reboot: b's config leaves StartUpColorTemperatureMireds null, so the only way it lands on 320 is
     // by loading the persisted write and applying it (§3.2.11.10 forces CT mode to the startup value).
+    a.Shutdown(ClusterShutdownType::kClusterShutdown);
     ColorControlCluster b(kEp, CtConfig());
     ASSERT_EQ(b.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
     EXPECT_EQ(b.GetEnhancedColorMode(), EnhancedColorModeEnum::kColorTemperatureMireds);
     EXPECT_EQ(b.ColorTempMireds(), 320u);
 
     b.Shutdown(ClusterShutdownType::kClusterShutdown);
-    a.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // §3.2.11.10 null row: a boot whose StartUpColorTemperatureMireds is null owes the PREVIOUS
@@ -310,7 +296,7 @@ TEST_F(TestColorControlPersistence, StartUpColorTemperatureWriteSurvivesReboot)
 // the configured one.
 TEST_F(TestColorControlPersistence, StartUpColorTemperatureIsPersistedForTheFollowingNullBoot)
 {
-    ColorControlCluster::Config cfg(delegate);
+    ColorControlCluster::Config cfg(delegate, mockTimer);
     cfg.mFeatures.Set(Feature::kHueAndSaturation).Set(Feature::kColorTemperature);
     cfg.mColorValue                         = HueSatColor{ 10, 20 };
     cfg.ctConfig.colorTempPhysicalMinMireds = 100;
@@ -332,13 +318,13 @@ TEST_F(TestColorControlPersistence, StartUpColorTemperatureIsPersistedForTheFoll
     // the only way to reach 300: 200 means the null never made it out of NVM, and the configured
     // HueSatColor means boot 1 never stored the startup value it applied.
     cfg.ctConfig.startUpColorTemperatureMireds.SetNonNull(200); // before constructing b: the cluster copies ctConfig
+    a.Shutdown(ClusterShutdownType::kClusterShutdown);
     ColorControlCluster b(kEp, cfg);
     ASSERT_EQ(b.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
     EXPECT_EQ(b.GetEnhancedColorMode(), EnhancedColorModeEnum::kColorTemperatureMireds);
     EXPECT_EQ(b.ColorTempMireds(), 300u);
 
     b.Shutdown(ClusterShutdownType::kClusterShutdown);
-    a.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // Issue 3: a color loop running at shutdown resumes on the next boot instead of lying dormant.
@@ -357,7 +343,9 @@ TEST_F(TestColorControlPersistence, ColorLoopResumesAfterReboot)
               Status::Success);
     ASSERT_EQ(a.ColorLoopActive(), 1);
 
-    // Reboot on the same storage.
+    // Reboot on the same storage. `a` goes down FIRST, as on a device: its loop holds an armed tick, and
+    // the mock (like the system layer) will not hand the resumed loop a tick while that one is still live.
+    a.Shutdown(ClusterShutdownType::kClusterShutdown);
     ColorControlCluster b(kEp, LoopConfig());
     ASSERT_EQ(b.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -369,11 +357,10 @@ TEST_F(TestColorControlPersistence, ColorLoopResumesAfterReboot)
 
     // ...and it is DRIVING again (not dormant): advancing the clock moves EnhancedCurrentHue.
     const uint16_t before = b.EnhancedHue();
-    Tick(b, 1000);
+    Tick(1000);
     EXPECT_NE(b.EnhancedHue(), before);
 
     b.Shutdown(ClusterShutdownType::kClusterShutdown);
-    a.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // A loop that is active but dormant (CT owns the output via StartUpColorTemperatureMireds) must NOT be
@@ -389,6 +376,8 @@ TEST_F(TestColorControlPersistence, DormantColorLoopDoesNotResumeUnderStartupCt)
               Status::Success);
 
     // Reboot with a StartUpColorTemperatureMireds set: §3.2.11.10 forces CT mode, so the loop is dormant.
+    // `a` goes down first so the tick its loop armed cannot be mistaken for b's (see the test above).
+    a.Shutdown(ClusterShutdownType::kClusterShutdown);
     ColorControlCluster::Config bcfg = LoopConfig();
     bcfg.mFeatures.Set(Feature::kColorTemperature);
     bcfg.ctConfig.colorTempPhysicalMinMireds = 100;
@@ -402,11 +391,10 @@ TEST_F(TestColorControlPersistence, DormantColorLoopDoesNotResumeUnderStartupCt)
     EXPECT_EQ(b.ColorTempMireds(), 300u);
 
     const uint16_t before = b.EnhancedHue();
-    Tick(b, 1000);
+    Tick(1000);
     EXPECT_EQ(b.EnhancedHue(), before);
 
     b.Shutdown(ClusterShutdownType::kClusterShutdown);
-    a.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 } // namespace

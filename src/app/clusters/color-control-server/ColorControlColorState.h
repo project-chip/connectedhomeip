@@ -34,6 +34,15 @@ namespace chip::app::Clusters::ColorControl {
 constexpr uint8_t kMinCurrentHue = 0x00;
 constexpr uint8_t kMaxCurrentHue = 0xFE;
 
+// Hue is circular: 0 and kHueCircle are the same color. Arcs between two hues are measured in these
+// units, and at exactly kHalfHueCircle the two ways round are the same length -- the tie the
+// MoveToHue Direction field resolves (§3.2.8.4.5).
+//
+// These describe the CIRCLE, not an attribute constraint: the largest EnhancedCurrentHue that can be
+// stored is kHueCircle - 1, so do not confuse these with the kMaxCurrentHue family above.
+constexpr int32_t kHueCircle     = 0x10000;
+constexpr int32_t kHalfHueCircle = kHueCircle / 2;
+
 // §3.2.7.12: CurrentHue is the most-significant byte of EnhancedCurrentHue. The top byte alone would
 // yield 0xFF for enhanced hues 0xFF00..0xFFFF, which violates the CurrentHue constraint, so the
 // projection saturates at kMaxCurrentHue (a full revolution, i.e. visually the same point as 0x00).

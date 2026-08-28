@@ -15,21 +15,21 @@
  */
 
 // Thorough success-path tests for every ColorControl command. The cluster is clock-driven: a command
-// sets up a transition and the attribute value is a function of the wall clock, applied on OnTick().
-// So each test installs a mock clock (RAIIMockClock == SetSystemClockForTesting), invokes the (public)
-// command handler, advances the clock past the transition, drives OnTick(), and asserts the resulting
-// state accessor. Each cluster is constructed already in the command's target mode so ApplyModeSwitch
-// is a no-op and no delegate colour-conversion is involved (results are exact). No Startup() is needed
-// (OnTick's NotifyAttributeChanged is null-context safe), which also keeps the configured start mode.
+// sets up a transition and the attribute value is a function of the wall clock, applied on the 100ms
+// tick. Both the tick and that clock come from the injected TimerDelegate, so each test hands the
+// cluster a TimerDelegateMock, invokes the (public) command handler, and advances the mock — which
+// fires the tick the command armed — then asserts the resulting state accessor. Each cluster is
+// constructed already in the command's target mode so ApplyModeSwitch is a no-op and no delegate
+// colour-conversion is involved (results are exact). No Startup() is needed (OnTick's
+// NotifyAttributeChanged is null-context safe), which also keeps the configured start mode.
 
 #include <app/clusters/color-control-server/ColorControlCluster.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <clusters/ColorControl/Attributes.h>
 #include <clusters/ColorControl/Commands.h>
 #include <lib/support/CHIPMem.h>
-#include <platform/CHIPDeviceLayer.h>
+#include <lib/support/TimerDelegateMock.h>
 #include <pw_unit_test/framework.h>
-#include <system/RAIIMockClock.h>
 
 namespace {
 
@@ -49,57 +49,44 @@ constexpr uint16_t kMaxColorTempMireds = 0xFEFF;
 
 struct TestColorControlCommands : public ::testing::Test
 {
-    // The command handlers arm the 100 ms tick via DeviceLayer::SystemLayer().StartTimer(), which fails
-    // with CHIP_ERROR_INCORRECT_STATE unless the SystemLayer is initialized — so a fresh command would
-    // return Status::Failure. InitChipStack() brings the layer up; its work queue starts suspended, so the
-    // armed timer never fires on a background thread and cannot race the manual OnTick() calls below.
-    static void SetUpTestSuite()
-    {
-        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
-        ASSERT_EQ(DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
-    }
-    static void TearDownTestSuite()
-    {
-        DeviceLayer::PlatformMgr().Shutdown();
-        Platform::MemoryShutdown();
-    }
+    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 
+    TimerDelegateMock mockTimer;
     ColorControlDelegate delegate;
-    System::Clock::Internal::RAIIMockClock clock;
 
-    // Advance the mock clock by `ms` and run one tick.
-    void Tick(ColorControlCluster & c, uint32_t ms)
-    {
-        clock.AdvanceMonotonic(System::Clock::Milliseconds64(ms));
-        c.OnTick();
-    }
-    // Complete any finite transition (advance well past any duration used here) and tick.
-    void Complete(ColorControlCluster & c) { Tick(c, 120000); }
+    // Advance the mock by `ms`, which fires the tick the command under test armed (the mock delivers one
+    // tick per call, however far time jumps — enough here because every Tick* is a pure function of the
+    // elapsed wall clock, not of how many ticks ran). `ms` must be >= the 100ms tick period or the
+    // deadline is not reached and nothing fires.
+    void Tick(uint32_t ms) { mockTimer.AdvanceClock(System::Clock::Milliseconds64(ms)); }
+    // Complete any finite transition (advance well past any duration used here).
+    void Complete() { Tick(120000); }
 
     ColorControlCluster::Config HsConfig()
     {
-        ColorControlCluster::Config c(delegate);
+        ColorControlCluster::Config c(delegate, mockTimer);
         c.mFeatures.Set(Feature::kHueAndSaturation);
         c.mColorValue = HueSatColor{ 10, 20 };
         return c;
     }
     ColorControlCluster::Config EnhancedConfig()
     {
-        ColorControlCluster::Config c(delegate);
+        ColorControlCluster::Config c(delegate, mockTimer);
         c.mFeatures.Set(Feature::kEnhancedHue).Set(Feature::kHueAndSaturation);
         c.mColorValue = EnhancedHueSatColor{ 0x1000, 20 };
         return c;
     }
     ColorControlCluster::Config XyConfig()
     {
-        ColorControlCluster::Config c(delegate);
+        ColorControlCluster::Config c(delegate, mockTimer);
         c.mFeatures.Set(Feature::kXy);
         c.mColorValue = XYColor{ 1000, 2000 };
         return c;
     }
     ColorControlCluster::Config CtConfig()
     {
-        ColorControlCluster::Config c(delegate);
+        ColorControlCluster::Config c(delegate, mockTimer);
         c.mFeatures.Set(Feature::kColorTemperature);
         c.mColorValue                         = CTColor{ 250 };
         c.ctConfig.colorTempPhysicalMinMireds = 100;
@@ -108,7 +95,7 @@ struct TestColorControlCommands : public ::testing::Test
     }
     ColorControlCluster::Config LoopConfig()
     {
-        ColorControlCluster::Config c(delegate);
+        ColorControlCluster::Config c(delegate, mockTimer);
         c.mFeatures.Set(Feature::kColorLoop).Set(Feature::kEnhancedHue).Set(Feature::kHueAndSaturation);
         c.mColorValue = EnhancedHueSatColor{ 0x1000, 20 };
         return c;
@@ -121,7 +108,7 @@ TEST_F(TestColorControlCommands, MoveToSaturation)
 {
     ColorControlCluster c(kEp, HsConfig());
     EXPECT_EQ(c.MoveToSaturation(200, 10), Status::Success);
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.Saturation(), 200);
 
     // Out-of-range saturation rejected (max is 254).
@@ -132,11 +119,11 @@ TEST_F(TestColorControlCommands, MoveSaturation)
 {
     ColorControlCluster c(kEp, HsConfig()); // start sat 20
     EXPECT_EQ(c.MoveSaturation(MoveModeEnum::kUp, 50), Status::Success);
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.Saturation(), kMaxSat); // moves to the max bound
 
     EXPECT_EQ(c.MoveSaturation(MoveModeEnum::kDown, 50), Status::Success);
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.Saturation(), 0); // moves to the min bound
 
     // rate 0 on a non-stop move is invalid (InvalidCommand, matching MoveColorTemperature); Stop is accepted.
@@ -148,12 +135,12 @@ TEST_F(TestColorControlCommands, StepSaturation)
 {
     ColorControlCluster c(kEp, HsConfig()); // start sat 20
     EXPECT_EQ(c.StepSaturation(StepModeEnum::kUp, 100, 10), Status::Success);
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.Saturation(), 120); // 20 + 100
 
     // Step up beyond max clamps to 254.
     EXPECT_EQ(c.StepSaturation(StepModeEnum::kUp, 250, 10), Status::Success);
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.Saturation(), kMaxSat);
 
     // A step size of 0 is rejected.
@@ -173,19 +160,19 @@ TEST_F(TestColorControlCommands, SaturationCommandsPreserveEnhancedHue)
     ASSERT_EQ(c.GetEnhancedColorMode(), EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation);
 
     EXPECT_EQ(c.MoveToSaturation(200, 10), Status::Success);
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.Saturation(), 200);
     EXPECT_EQ(c.EnhancedHue(), 0x1234); // hue untouched, at full 16-bit precision
     EXPECT_EQ(c.GetEnhancedColorMode(), EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation);
 
     // The other two saturation commands share the same flavor-neutrality.
     EXPECT_EQ(c.StepSaturation(StepModeEnum::kDown, 50, 10), Status::Success);
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.Saturation(), 150);
     EXPECT_EQ(c.EnhancedHue(), 0x1234);
 
     EXPECT_EQ(c.MoveSaturation(MoveModeEnum::kUp, 50), Status::Success);
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.Saturation(), kMaxSat);
     EXPECT_EQ(c.EnhancedHue(), 0x1234);
     EXPECT_EQ(c.GetEnhancedColorMode(), EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation);
@@ -197,7 +184,7 @@ TEST_F(TestColorControlCommands, MoveToHue)
 {
     ColorControlCluster c(kEp, HsConfig()); // start hue 10 (enhanced 0x0A00)
     EXPECT_EQ(c.MoveToHue(100, DirectionEnum::kShortest, 10, /*isEnhanced=*/false), Status::Success);
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.EnhancedHue(), static_cast<uint16_t>(100 << 8)); // CurrentHue == 100
 
     // Unknown direction rejected.
@@ -208,7 +195,7 @@ TEST_F(TestColorControlCommands, EnhancedMoveToHue)
 {
     ColorControlCluster c(kEp, EnhancedConfig()); // start enhancedHue 0x1000
     EXPECT_EQ(c.MoveToHue(0x8000, DirectionEnum::kShortest, 10, /*isEnhanced=*/true), Status::Success);
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.EnhancedHue(), 0x8000); // full 16-bit target applied
 }
 
@@ -225,9 +212,9 @@ TEST_F(TestColorControlCommands, MoveToHueHalfCircleTieGoesUp)
         ASSERT_EQ(c.EnhancedHue(), kStart);
         EXPECT_EQ(c.MoveToHue(kTarget, dir, 200, /*isEnhanced=*/true), Status::Success); // 20 s transition
 
-        Tick(c, 10000);                     // halfway
+        Tick(10000);                        // halfway
         EXPECT_EQ(c.EnhancedHue(), 0x5000); // up: kStart + 0x4000 (going down would read 0xD000 here)
-        Complete(c);
+        Complete();
         EXPECT_EQ(c.EnhancedHue(), kTarget);
     }
 }
@@ -236,7 +223,7 @@ TEST_F(TestColorControlCommands, StepHue)
 {
     ColorControlCluster c(kEp, HsConfig()); // start enhancedHue 0x0A00
     EXPECT_EQ(c.StepHue(StepModeEnum::kUp, 20, 10, /*isEnhanced=*/false), Status::Success);
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.EnhancedHue(), static_cast<uint16_t>(0x0A00 + (20 << 8))); // += 20 in the high byte
 
     EXPECT_EQ(c.StepHue(StepModeEnum::kUnknownEnumValue, 20, 10, false), Status::InvalidCommand);
@@ -249,20 +236,20 @@ TEST_F(TestColorControlCommands, MoveHueRateThenStop)
     ColorControlCluster c(kEp, HsConfig()); // enhancedHue 0x0A00
     // Rate move: 10 (8-bit) -> 10<<8 = 2560 hue-units/sec up. Indefinite (no end).
     EXPECT_EQ(c.MoveHue(MoveModeEnum::kUp, 10, /*isEnhanced=*/false), Status::Success);
-    Tick(c, 1000); // one second
+    Tick(1000); // one second
     EXPECT_EQ(c.EnhancedHue(), static_cast<uint16_t>(0x0A00 + 2560));
 
     // Stop freezes the hue axis where it is.
     const uint16_t frozen = c.EnhancedHue();
     EXPECT_EQ(c.MoveHue(MoveModeEnum::kStop, 0, false), Status::Success);
-    Tick(c, 1000);
+    Tick(1000);
     EXPECT_EQ(c.EnhancedHue(), frozen);
 
     // An undefined MoveMode must not be treated as Down: it is rejected before any transition starts,
     // so the hue axis stays frozen rather than beginning an indefinite move.
     EXPECT_EQ(c.MoveHue(MoveModeEnum::kUnknownEnumValue, 10, /*isEnhanced=*/false), Status::InvalidCommand);
     EXPECT_EQ(c.MoveHue(MoveModeEnum::kUnknownEnumValue, 10, /*isEnhanced=*/true), Status::InvalidCommand);
-    Tick(c, 1000);
+    Tick(1000);
     EXPECT_EQ(c.EnhancedHue(), frozen);
 }
 
@@ -275,14 +262,14 @@ TEST_F(TestColorControlCommands, MoveStopHaltsBothAxes)
         ColorControlCluster c(kEp, HsConfig()); // enhancedHue 0x0A00, sat 20
         EXPECT_EQ(c.MoveHue(MoveModeEnum::kUp, 10, /*isEnhanced=*/false), Status::Success);
         EXPECT_EQ(c.MoveSaturation(MoveModeEnum::kUp, 50), Status::Success); // overlaps the hue move
-        Tick(c, 1000);
+        Tick(1000);
         const uint16_t frozenHue = c.EnhancedHue();
         const uint8_t frozenSat  = c.Saturation();
         EXPECT_LT(frozenSat, kMaxSat); // still en route to the max bound
 
         // MoveHue(Stop) must freeze the saturation axis too.
         EXPECT_EQ(c.MoveHue(MoveModeEnum::kStop, 0, false), Status::Success);
-        Complete(c);
+        Complete();
         EXPECT_EQ(c.EnhancedHue(), frozenHue);
         EXPECT_EQ(c.Saturation(), frozenSat);
     }
@@ -290,13 +277,13 @@ TEST_F(TestColorControlCommands, MoveStopHaltsBothAxes)
         ColorControlCluster c(kEp, HsConfig());
         EXPECT_EQ(c.MoveHue(MoveModeEnum::kUp, 10, /*isEnhanced=*/false), Status::Success);
         EXPECT_EQ(c.MoveSaturation(MoveModeEnum::kUp, 50), Status::Success);
-        Tick(c, 1000);
+        Tick(1000);
         const uint16_t frozenHue = c.EnhancedHue();
         const uint8_t frozenSat  = c.Saturation();
 
         // ...and symmetrically, MoveSaturation(Stop) must freeze the hue axis.
         EXPECT_EQ(c.MoveSaturation(MoveModeEnum::kStop, 0), Status::Success);
-        Complete(c);
+        Complete();
         EXPECT_EQ(c.EnhancedHue(), frozenHue);
         EXPECT_EQ(c.Saturation(), frozenSat);
     }
@@ -311,7 +298,7 @@ TEST_F(TestColorControlCommands, MoveHueRateDownWrapsBelowZero)
     EXPECT_EQ(c.MoveHue(MoveModeEnum::kDown, 10, /*isEnhanced=*/false), Status::Success);
 
     // 1.5 s at -2560/s = -3840, which takes the hue past 0: 2560 - 3840 = -1280 -> 65536 - 1280 = 64256.
-    Tick(c, 1500);
+    Tick(1500);
     EXPECT_EQ(c.EnhancedHue(), 64256u);
 }
 
@@ -327,11 +314,11 @@ TEST_F(TestColorControlCommands, MoveToHueDownwardArc)
         EXPECT_EQ(c.MoveToHue(100, dir, 200, /*isEnhanced=*/false), Status::Success); // 20 s transition
 
         // Halfway: 2560 + (-42496 / 2) = -18688 -> 46848. Going up would read 14080 here.
-        Tick(c, 10000);
+        Tick(10000);
         EXPECT_EQ(c.EnhancedHue(), 46848u);
 
         // Both arcs land on the same target.
-        Complete(c);
+        Complete();
         EXPECT_EQ(c.EnhancedHue(), static_cast<uint16_t>(100 << 8));
     }
 }
@@ -341,7 +328,7 @@ TEST_F(TestColorControlCommands, StepHueDownWrapsBelowZero)
     ColorControlCluster c(kEp, HsConfig()); // enhancedHue 0x0A00 == 2560
     // Legacy step 20 projects to -5120, taking the hue below 0: 2560 - 5120 = -2560 -> 62976.
     EXPECT_EQ(c.StepHue(StepModeEnum::kDown, 20, 10, /*isEnhanced=*/false), Status::Success);
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.EnhancedHue(), 62976u);
 }
 
@@ -350,7 +337,7 @@ TEST_F(TestColorControlCommands, EnhancedMoveHueRate)
     ColorControlCluster c(kEp, EnhancedConfig()); // enhancedHue 0x1000
     // Enhanced rate is a full 16-bit hue-units/sec (no <<8 projection).
     EXPECT_EQ(c.MoveHue(MoveModeEnum::kUp, 2560, /*isEnhanced=*/true), Status::Success);
-    Tick(c, 1000);
+    Tick(1000);
     EXPECT_EQ(c.EnhancedHue(), static_cast<uint16_t>(0x1000 + 2560));
 }
 
@@ -359,7 +346,7 @@ TEST_F(TestColorControlCommands, EnhancedStepHue)
     ColorControlCluster c(kEp, EnhancedConfig()); // enhancedHue 0x1000
     // Enhanced step is a full 16-bit delta.
     EXPECT_EQ(c.StepHue(StepModeEnum::kUp, 0x2000, 10, /*isEnhanced=*/true), Status::Success);
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.EnhancedHue(), 0x3000);
 }
 
@@ -369,7 +356,7 @@ TEST_F(TestColorControlCommands, MoveToHueAndSaturation)
 {
     ColorControlCluster c(kEp, HsConfig());
     EXPECT_EQ(c.MoveToHueAndSaturation(100, 200, 10, /*isEnhanced=*/false), Status::Success);
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.EnhancedHue(), static_cast<uint16_t>(100 << 8));
     EXPECT_EQ(c.Saturation(), 200);
 }
@@ -378,7 +365,7 @@ TEST_F(TestColorControlCommands, EnhancedMoveToHueAndSaturation)
 {
     ColorControlCluster c(kEp, EnhancedConfig());
     EXPECT_EQ(c.MoveToHueAndSaturation(0x4000, 150, 10, /*isEnhanced=*/true), Status::Success);
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.EnhancedHue(), 0x4000);
     EXPECT_EQ(c.Saturation(), 150);
 }
@@ -391,10 +378,10 @@ TEST_F(TestColorControlCommands, EnhancedMoveToHueAndSaturationImmediateDoesNotD
 {
     ColorControlCluster c(kEp, EnhancedConfig()); // start enhancedHue 0x1000
     EXPECT_EQ(c.MoveToHueAndSaturation(20000, 50, /*transitionTimeDs=*/0, /*isEnhanced=*/true), Status::Success);
-    Tick(c, 1); // first tick materializes the immediate move
+    Tick(ColorControlCluster::kTickMs); // first tick materializes the immediate move
     EXPECT_EQ(c.EnhancedHue(), 20000);
     EXPECT_EQ(c.Saturation(), 50);
-    Tick(c, 2000); // seconds later it must not have moved
+    Tick(2000); // seconds later it must not have moved
     EXPECT_EQ(c.EnhancedHue(), 20000);
 }
 
@@ -404,7 +391,7 @@ TEST_F(TestColorControlCommands, MoveToColor)
 {
     ColorControlCluster c(kEp, XyConfig()); // start x=1000 y=2000
     EXPECT_EQ(c.MoveToColor(30000, 40000, 10), Status::Success);
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.CurrentX(), 30000);
     EXPECT_EQ(c.CurrentY(), 40000);
 }
@@ -413,7 +400,7 @@ TEST_F(TestColorControlCommands, StepColor)
 {
     ColorControlCluster c(kEp, XyConfig()); // start x=1000 y=2000
     EXPECT_EQ(c.StepColor(500, -500, 10), Status::Success);
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.CurrentX(), 1500);
     EXPECT_EQ(c.CurrentY(), 1500);
 
@@ -427,7 +414,7 @@ TEST_F(TestColorControlCommands, MoveColorRate)
     // Positive X rate -> moves toward the CIE max; negative Y -> toward 0. Rate is units/sec; pick a rate
     // large enough that both axes complete within Complete()'s advance window.
     EXPECT_EQ(c.MoveColor(2000, -2000, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()), Status::Success);
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.CurrentX(), kMaxCieXy);
     EXPECT_EQ(c.CurrentY(), 0);
 
@@ -442,11 +429,11 @@ TEST_F(TestColorControlCommands, MoveColorTemperature)
     ColorControlCluster c(kEp, CtConfig()); // start 250, physical [100,400]
     // Up increases mireds toward the (clamped) upper field limit; 0 field -> physical max.
     EXPECT_EQ(c.MoveColorTemp(MoveModeEnum::kUp, 50, 0, 0), Status::Success);
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.ColorTempMireds(), 400);
 
     EXPECT_EQ(c.MoveColorTemp(MoveModeEnum::kDown, 50, 0, 0), Status::Success);
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.ColorTempMireds(), 100);
 }
 
@@ -454,12 +441,12 @@ TEST_F(TestColorControlCommands, StepColorTemperature)
 {
     ColorControlCluster c(kEp, CtConfig()); // start 250
     EXPECT_EQ(c.StepColorTemp(StepModeEnum::kUp, 100, 10, 0, 0), Status::Success);
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.ColorTempMireds(), 350); // 250 + 100
 
     // Step up beyond the physical max clamps to 400.
     EXPECT_EQ(c.StepColorTemp(StepModeEnum::kUp, 500, 10, 0, 0), Status::Success);
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.ColorTempMireds(), 400);
 }
 
@@ -470,18 +457,34 @@ TEST_F(TestColorControlCommands, MoveToColorTemperatureClampsToPhysicalRange)
 
     // Above the physical max -> clamped down to it.
     ASSERT_EQ(c.MoveToColorTemp(500, 0), Status::Success);
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.ColorTempMireds(), 400u);
 
     // Below the physical min -> clamped up to it.
     ASSERT_EQ(c.MoveToColorTemp(50, 0), Status::Success);
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.ColorTempMireds(), 100u);
 
     // In-range value -> applied unchanged.
     ASSERT_EQ(c.MoveToColorTemp(300, 0), Status::Success);
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.ColorTempMireds(), 300u);
+}
+
+// A min field above the max field describes no window at all, so both CT movement commands refuse it.
+// A field left at 0 means "physical limit" rather than a bound, so it never participates in the
+// comparison — 0 as the max is not "below" any min.
+TEST_F(TestColorControlCommands, ColorTemperatureMoveAndStepRejectCrossedFieldLimits)
+{
+    ColorControlCluster c(kEp, CtConfig()); // start 250, physical [100,400]
+
+    EXPECT_EQ(c.MoveColorTemp(MoveModeEnum::kUp, 50, 300, 200), Status::ConstraintError);
+    EXPECT_EQ(c.StepColorTemp(StepModeEnum::kUp, 10, 10, 300, 200), Status::ConstraintError);
+
+    // Equal bounds are a legal one-point window, and either field alone stays unconstrained by the other.
+    EXPECT_EQ(c.MoveColorTemp(MoveModeEnum::kUp, 50, 300, 300), Status::Success);
+    EXPECT_EQ(c.MoveColorTemp(MoveModeEnum::kUp, 50, 300, 0), Status::Success);
+    EXPECT_EQ(c.StepColorTemp(StepModeEnum::kUp, 10, 10, 0, 200), Status::Success);
 }
 
 // The 0xFEFF mireds ceiling is a constraint on the command *field*, separate from the physical range
@@ -494,7 +497,7 @@ TEST_F(TestColorControlCommands, MoveToColorTemperatureAcceptsProtocolMaximum)
     ColorControlCluster c(kEp, config);
 
     ASSERT_EQ(c.MoveToColorTemp(kMaxColorTempMireds, 0), Status::Success);
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.ColorTempMireds(), kMaxColorTempMireds);
 
     EXPECT_EQ(c.MoveToColorTemp(kMaxColorTempMireds + 1, 0), Status::ConstraintError);
@@ -507,11 +510,11 @@ TEST_F(TestColorControlCommands, TransitionInterpolatesOverTime)
     ColorControlCluster c(kEp, CtConfig()); // start 250
     // 200 ds = 20 s to reach 400.
     EXPECT_EQ(c.MoveToColorTemp(400, 200), Status::Success);
-    Tick(c, 10000); // halfway (10 s)
+    Tick(10000); // halfway (10 s)
     const uint16_t mid = c.ColorTempMireds();
     EXPECT_GT(mid, 250);
     EXPECT_LT(mid, 400); // partway, not yet at target
-    Complete(c);
+    Complete();
     EXPECT_EQ(c.ColorTempMireds(), 400); // finishes exactly on target
 }
 
@@ -557,7 +560,7 @@ TEST_F(TestColorControlCommands, StopMoveStepFreezesTransition)
     Testing::ClusterTester tester(c);
 
     EXPECT_EQ(c.MoveToColorTemp(400, 200), Status::Success); // 20 s transition
-    Tick(c, 10000);                                          // halfway
+    Tick(10000);                                             // halfway
     const uint16_t frozen = c.ColorTempMireds();
     EXPECT_GT(frozen, 250);
     EXPECT_LT(frozen, 400);
@@ -568,7 +571,7 @@ TEST_F(TestColorControlCommands, StopMoveStepFreezesTransition)
     EXPECT_TRUE(tester.Invoke(Commands::StopMoveStep::Id, stop).IsSuccess());
 
     // After Stop the transition is cleared: further ticks do not advance the value.
-    Tick(c, 60000);
+    Tick(60000);
     EXPECT_EQ(c.ColorTempMireds(), frozen);
 }
 
@@ -597,14 +600,14 @@ TEST_F(TestColorControlCommands, StopMoveStepFreezesTransitionWhileColorLoopDorm
     ASSERT_EQ(c.GetEnhancedColorMode(), EnhancedColorModeEnum::kColorTemperatureMireds);
     ASSERT_EQ(c.ColorLoopActive(), 1); // active, but dormant
 
-    Tick(c, 10000); // halfway
+    Tick(10000); // halfway
     const uint16_t frozen = c.ColorTempMireds();
     EXPECT_GT(frozen, 250u);
     EXPECT_LT(frozen, 400u);
 
     // The dormant loop must not shield the CT transition from StopMoveStep.
     EXPECT_EQ(c.StopMoveStep(), Status::Success);
-    Tick(c, 60000);
+    Tick(60000);
     EXPECT_EQ(c.ColorTempMireds(), frozen);
 }
 
@@ -632,7 +635,7 @@ TEST_F(TestColorControlCommands, LegacyHueCommandsRejectHueAboveMax)
     EXPECT_EQ(c.MoveToHueAndSaturation(255, 200, 10, /*isEnhanced=*/false), Status::ConstraintError);
 
     // Rejected before any mode switch or transition: the hue is untouched and RemainingTime stays 0.
-    Tick(c, 1000);
+    Tick(1000);
     EXPECT_EQ(c.EnhancedHue(), 0x1000);
     uint16_t rt = 0;
     ASSERT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, rt).IsSuccess());
@@ -655,7 +658,7 @@ TEST_F(TestColorControlCommands, CurrentHueProjectionSaturatesAtConstraintMax)
     Testing::ClusterTester tester(c);
 
     EXPECT_EQ(c.MoveToHue(0xFFFF, DirectionEnum::kShortest, 10, /*isEnhanced=*/true), Status::Success);
-    Complete(c);
+    Complete();
 
     // The 16-bit value itself is untouched — only its 8-bit projection is capped.
     EXPECT_EQ(c.EnhancedHue(), 0xFFFF);
@@ -680,7 +683,7 @@ TEST_F(TestColorControlCommands, HueCommandsRejectOutOfRangeTransitionTime)
 
     // Rejected before anything is set up: the hue is untouched and RemainingTime stays 0 — in particular
     // it never reads back as 0xFFFF, which is the indefinite-rate-move sentinel.
-    Tick(c, 1000);
+    Tick(1000);
     EXPECT_EQ(c.EnhancedHue(), 0x1000);
     uint16_t rt = 0;
     ASSERT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, rt).IsSuccess());
@@ -707,13 +710,13 @@ TEST_F(TestColorControlCommands, SlowRateMoveSaturatesRemainingTime)
         EXPECT_EQ(rt, kMaxRemainingTime);
 
         // The per-tick recompute saturates the same way, so RemainingTime cannot walk into the sentinel.
-        Tick(c, 1000);
+        Tick(1000);
         ASSERT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, rt).IsSuccess());
         EXPECT_EQ(rt, kMaxRemainingTime);
     }
     {
         // Physical range 1..65279 so a rate-1 move spans the whole color-temperature axis.
-        ColorControlCluster::Config cfg(delegate);
+        ColorControlCluster::Config cfg(delegate, mockTimer);
         cfg.mFeatures.Set(Feature::kColorTemperature);
         cfg.mColorValue                         = CTColor{ 1 };
         cfg.ctConfig.colorTempPhysicalMinMireds = 1;
@@ -726,7 +729,7 @@ TEST_F(TestColorControlCommands, SlowRateMoveSaturatesRemainingTime)
         ASSERT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, rt).IsSuccess());
         EXPECT_EQ(rt, kMaxRemainingTime);
 
-        Tick(c, 1000);
+        Tick(1000);
         ASSERT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, rt).IsSuccess());
         EXPECT_EQ(rt, kMaxRemainingTime);
     }
@@ -862,12 +865,12 @@ TEST_F(TestColorControlCommands, ColorLoopTickAdvancesEnhancedHueUp)
     EXPECT_EQ(c.EnhancedHue(), 0x1000); // no tick yet → still the anchor
 
     // After 1 s: traveled = 65536 * 1000 / (10 * 1000) = 6553 → 4096 + 6553 = 10649.
-    Tick(c, 1000);
+    Tick(1000);
     EXPECT_EQ(c.EnhancedHue(), 10649u);
 
     // After a further 1 s (2 s total from the anchor): 65536 * 2000 / 10000 = 13107 → 4096 + 13107 = 17203.
     // Proves the position comes from absolute elapsed time, not per-tick accumulation.
-    Tick(c, 1000);
+    Tick(1000);
     EXPECT_EQ(c.EnhancedHue(), 17203u);
 }
 
@@ -882,7 +885,7 @@ TEST_F(TestColorControlCommands, ColorLoopTickDecrementWrapsAroundZero)
               Status::Success);
 
     // After 1 s decrementing: 4096 - 6553 = -2457 → wraps to 65536 - 2457 = 63079.
-    Tick(c, 1000);
+    Tick(1000);
     EXPECT_EQ(c.EnhancedHue(), 63079u);
 }
 
@@ -892,7 +895,7 @@ TEST_F(TestColorControlCommands, ColorLoopTickDecrementWrapsAroundZero)
 // it). This is the "a color loop cannot keep running once someone moves the hue axis" behavior.
 TEST_F(TestColorControlCommands, HueCommandParksRunningColorLoop)
 {
-    ColorControlCluster c(kEp, LoopConfig()); // ignoreHueCommandsWhileColorLooping defaults to false
+    ColorControlCluster c(kEp, LoopConfig()); // no StaticConfig, so the choice sits at its false default
     const auto flags = BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateTime)
                            .Set(UpdateFlagsBitmap::kUpdateDirection)
                            .Set(UpdateFlagsBitmap::kUpdateAction);
@@ -904,11 +907,11 @@ TEST_F(TestColorControlCommands, HueCommandParksRunningColorLoop)
     EXPECT_EQ(c.MoveToHue(0x8000, DirectionEnum::kShortest, 10, /*isEnhanced=*/true), Status::Success);
     EXPECT_EQ(c.ColorLoopActive(), 1); // still "active" as an attribute — parked, not deactivated
 
-    Tick(c, 1000);
+    Tick(1000);
     EXPECT_EQ(c.EnhancedHue(), 0x8000); // followed the command's target, not the loop
 
     // The loop stays parked: further ticks do NOT resume the autonomous hue advance.
-    Tick(c, 2000);
+    Tick(2000);
     EXPECT_EQ(c.EnhancedHue(), 0x8000);
     EXPECT_EQ(c.ColorLoopActive(), 1);
 }
@@ -917,8 +920,13 @@ TEST_F(TestColorControlCommands, HueCommandParksRunningColorLoop)
 // while a loop runs is dropped (returns Success, no effect) and the loop keeps advancing undisturbed.
 TEST_F(TestColorControlCommands, ColorLoopIgnoresHueCommandWhenConfigured)
 {
-    ColorControlCluster::Config config        = LoopConfig();
-    config.ignoreHueCommandsWhileColorLooping = true;
+    // StaticConfig is referenced by the cluster rather than copied, so it must outlive it — hence the
+    // local declared ahead of the cluster.
+    StaticConfig sc;
+    sc.ignoreHueCommandsWhileColorLooping = true;
+
+    ColorControlCluster::Config config = LoopConfig();
+    config.sc                          = &sc;
     ColorControlCluster c(kEp, config);
 
     const auto flags = BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateTime)
@@ -932,7 +940,7 @@ TEST_F(TestColorControlCommands, ColorLoopIgnoresHueCommandWhenConfigured)
     EXPECT_EQ(c.MoveToHue(0x8000, DirectionEnum::kShortest, 10, /*isEnhanced=*/true), Status::Success);
     EXPECT_EQ(c.ColorLoopActive(), 1);
 
-    Tick(c, 1000);
+    Tick(1000);
     EXPECT_EQ(c.EnhancedHue(), 10649u); // still following the loop, not the (ignored) MoveToHue target
 }
 

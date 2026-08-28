@@ -21,17 +21,15 @@
 // the On/Off cluster, and drive the public command handlers to check the ExecuteIfOff gate honors the live
 // On/Off state. Level coupling is driven by calling CoupleColorTempToLevel directly, as the application does.
 //
-// Both exercise real color-temperature transitions, so tests run against a mock clock and drive OnTick()
-// manually; see SetUpTestSuite for why the CHIP stack is brought up.
+// Both exercise real color-temperature transitions, so both clusters take the same injected
+// TimerDelegateMock, which owns the tick and the wall clock the transitions are computed against.
 
 #include <app/clusters/color-control-server/ColorControlCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/TimerDelegateMock.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <pw_unit_test/framework.h>
-#include <system/RAIIMockClock.h>
 
 namespace {
 
@@ -46,30 +44,15 @@ constexpr EndpointId kTestEndpointId = 1;
 
 struct TestColorControlCoupling : public ::testing::Test
 {
-    // Command handlers arm the tick via DeviceLayer::SystemLayer().StartTimer(); InitChipStack() brings the
-    // layer up so a fresh command doesn't return Status::Failure. The work queue starts suspended, so the
-    // armed timer never fires on a background thread and cannot race the manual OnTick() calls below.
-    static void SetUpTestSuite()
-    {
-        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
-        ASSERT_EQ(DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
-    }
-    static void TearDownTestSuite()
-    {
-        DeviceLayer::PlatformMgr().Shutdown();
-        Platform::MemoryShutdown();
-    }
+    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 
     TimerDelegateMock mockTimer;
     ColorControlDelegate delegate;
-    System::Clock::Internal::RAIIMockClock clock;
 
-    // Advance the mock clock well past any transition used here and run one tick.
-    void Complete(ColorControlCluster & c)
-    {
-        clock.AdvanceMonotonic(System::Clock::Milliseconds64(120000));
-        c.OnTick();
-    }
+    // Advance well past any transition used here, firing the tick the command armed. A suppressed
+    // command arms nothing, so this is also what makes "the gate blocked it" observable.
+    void Complete() { mockTimer.AdvanceClock(System::Clock::Milliseconds64(120000)); }
 };
 
 // End-to-end gate: a command handler run while the device is OFF is suppressed (returns Success but
@@ -83,7 +66,7 @@ TEST_F(TestColorControlCoupling, CommandHandlerIsGatedWhileOff)
     Testing::ClusterTester onOffTester(onOff);
     ASSERT_EQ(onOff.Startup(onOffTester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    ColorControlCluster::Config config(delegate);
+    ColorControlCluster::Config config(delegate, mockTimer);
     config.mFeatures.Set(Feature::kColorTemperature);
     config.mColorValue                         = CTColor{ 250 };
     config.ctConfig.colorTempPhysicalMinMireds = 100;
@@ -97,18 +80,18 @@ TEST_F(TestColorControlCoupling, CommandHandlerIsGatedWhileOff)
     // Device OFF, no ExecuteIfOff -> command suppressed: returns Success, color unchanged.
     ASSERT_EQ(onOff.SetOnOff(false), CHIP_NO_ERROR);
     EXPECT_EQ(cluster.MoveToColorTemp(400, 10, none, none), Status::Success);
-    Complete(cluster);
+    Complete();
     EXPECT_EQ(cluster.ColorTempMireds(), 250u); // did NOT move
 
     // Device OFF but ExecuteIfOff overridden on -> command runs.
     EXPECT_EQ(cluster.MoveToColorTemp(400, 10, executeIfOff, executeIfOff), Status::Success);
-    Complete(cluster);
+    Complete();
     EXPECT_EQ(cluster.ColorTempMireds(), 400u); // moved
 
     // Device ON -> command runs regardless of options.
     ASSERT_EQ(onOff.SetOnOff(true), CHIP_NO_ERROR);
     EXPECT_EQ(cluster.MoveToColorTemp(200, 10, none, none), Status::Success);
-    Complete(cluster);
+    Complete();
     EXPECT_EQ(cluster.ColorTempMireds(), 200u);
 
     onOff.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -117,7 +100,7 @@ TEST_F(TestColorControlCoupling, CommandHandlerIsGatedWhileOff)
 TEST_F(TestColorControlCoupling, ShouldExecuteIfOffWithoutInjectionAlwaysExecutes)
 {
     // No On/Off injected (config.onOff stays null) -> coupling absent -> always executes.
-    ColorControlCluster::Config config(delegate);
+    ColorControlCluster::Config config(delegate, mockTimer);
     config.mFeatures.Set(Feature::kColorTemperature);
     config.mColorValue = CTColor{ 250 };
     ColorControlCluster cluster(kTestEndpointId, config);
@@ -130,7 +113,7 @@ TEST_F(TestColorControlCoupling, ShouldExecuteIfOffWithoutInjectionAlwaysExecute
 // mireds end, min level to the physical max, honoring the one-way mapping while in color-temperature mode.
 TEST_F(TestColorControlCoupling, CoupleColorTempToLevelMapsLevelToColorTemp)
 {
-    ColorControlCluster::Config config(delegate);
+    ColorControlCluster::Config config(delegate, mockTimer);
     config.mFeatures.Set(Feature::kColorTemperature);
     config.mColorValue                              = CTColor{ 250 };
     config.ctConfig.colorTempPhysicalMinMireds      = 100;
@@ -140,12 +123,12 @@ TEST_F(TestColorControlCoupling, CoupleColorTempToLevelMapsLevelToColorTemp)
 
     // Max level (0xFE) -> CoupleColorTempToLevelMinMireds.
     cluster.CoupleColorTempToLevel(254);
-    Complete(cluster);
+    Complete();
     EXPECT_EQ(cluster.ColorTempMireds(), 150u);
 
     // Min level (0x01) -> physical max mireds.
     cluster.CoupleColorTempToLevel(1);
-    Complete(cluster);
+    Complete();
     EXPECT_EQ(cluster.ColorTempMireds(), 400u);
 }
 
@@ -153,13 +136,13 @@ TEST_F(TestColorControlCoupling, CoupleColorTempToLevelMapsLevelToColorTemp)
 // a no-op (it must never switch the active mode).
 TEST_F(TestColorControlCoupling, CoupleColorTempToLevelIsNoOpOutsideColorTempMode)
 {
-    ColorControlCluster::Config config(delegate);
+    ColorControlCluster::Config config(delegate, mockTimer);
     config.mFeatures.Set(Feature::kXy);
     config.mColorValue = XYColor{ 100, 200 };
     ColorControlCluster cluster(kTestEndpointId, config);
 
     cluster.CoupleColorTempToLevel(254);
-    Complete(cluster);
+    Complete();
 
     // Still in XY mode, unchanged.
     EXPECT_EQ(cluster.CurrentX(), 100u);
