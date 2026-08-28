@@ -23,6 +23,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import AttributeMatcher
 from matter.testing.matter_asserts import assert_valid_bool, assert_valid_uint32
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.timeoperations import utc_datetime_from_matter_epoch_us
@@ -231,6 +232,10 @@ class SmokeCoBaseTest(MatterBaseTest):
     async def alarm_primary_functionality_base_test(self, state_attribute, alarm_event, expressed_state_enum_value, pixit_warning, pixit_critical, pixit_clear):
         """Define what attributes,events,enum values and pixit to use depending if is smoke alarm or co alarm for tests SMOKECO 2.2 and SMOKECO 2.3."""
         # Step 1, "Commission DUT to TH."
+        expressed_state_handler = AttributeSubscriptionHandler(
+            expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.ExpressedState)
+        await expressed_state_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), min_interval_sec=0, max_interval_sec=1)
+
         self.step(1)  # Commissioning already done
 
         self.step(2)
@@ -266,8 +271,10 @@ class SmokeCoBaseTest(MatterBaseTest):
         asserts.assert_equal(smoke_state_report.value, self.smokeco_cluster.Enums.AlarmStateEnum.kWarning)
 
         self.step(7)
-        expressed_state = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.ExpressedState)
-        asserts.assert_equal(expressed_state, expressed_state_enum_value)
+        expressed_state_matcher = AttributeMatcher.from_callable(
+            "ExpressedState check ",
+            lambda report: report.value == expressed_state_enum_value)
+        expressed_state_handler.await_all_expected_report_matches([expressed_state_matcher], timeout_sec=30)
 
         self.step(8)
         smoke_alarm_event_data = await self.read_smokeco_event(alarm_event)
@@ -282,8 +289,11 @@ class SmokeCoBaseTest(MatterBaseTest):
         self.step(10)
         test_in_progress = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.TestInProgress)
         asserts.assert_false(test_in_progress, "Test is not in progress")
-        expressed_state = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.ExpressedState)
-        asserts.assert_equal(expressed_state, expressed_state_enum_value)
+
+        expressed_state_matcher = AttributeMatcher.from_callable(
+            "ExpressedState check: ",
+            lambda report: report.value == expressed_state_enum_value)
+        expressed_state_handler.await_all_expected_report_matches([expressed_state_matcher], timeout_sec=30)
 
         # Gather these steps
         self.step(11)
@@ -293,8 +303,10 @@ class SmokeCoBaseTest(MatterBaseTest):
             await self.send_single_cmd(self_test_cmd, dev_ctrl=self.default_controller, endpoint=self.get_endpoint(), timedRequestTimeoutMs=5000)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Busy, "Unexpected error returned")
-            expressed_state = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.ExpressedState)
-            asserts.assert_equal(expressed_state, expressed_state_enum_value)
+            expressed_state_matcher = AttributeMatcher.from_callable(
+                "ExpressedState check: ",
+                lambda report: report.value == expressed_state_enum_value)
+            expressed_state_handler.await_all_expected_report_matches([expressed_state_matcher], timeout_sec=30)
 
         self.step(13)
         test_in_progress = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.TestInProgress)
@@ -308,8 +320,10 @@ class SmokeCoBaseTest(MatterBaseTest):
         asserts.assert_equal(smoke_state_report.value, self.smokeco_cluster.Enums.AlarmStateEnum.kCritical)
 
         self.step(16)
-        expressed_state = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.ExpressedState)
-        asserts.assert_equal(expressed_state, expressed_state_enum_value)
+        expressed_state_matcher = AttributeMatcher.from_callable(
+            "ExpressedState check: ",
+            lambda report: report.value == expressed_state_enum_value)
+        expressed_state_handler.await_all_expected_report_matches([expressed_state_matcher], timeout_sec=30)
 
         self.step(17)
         smoke_alarm_event_data = await self.read_smokeco_event(alarm_event)
@@ -326,8 +340,11 @@ class SmokeCoBaseTest(MatterBaseTest):
         smoke_state_handler.cancel()
 
         self.step(20)
-        expressed_state_clear = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.ExpressedState)
-        asserts.assert_equal(expressed_state_clear, self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal)
+        expressed_state_matcher = AttributeMatcher.from_callable(
+            "ExpressedState check to Normal: ",
+            lambda report: report.value == self.smokeco_enums.ExpressedStateEnum.kNormal)
+        expressed_state_handler.await_all_expected_report_matches([expressed_state_matcher], timeout_sec=30)
+        expressed_state_handler.cancel()
 
         self.step(21)
         # This will fail if AllClearEvent is not retrieved
