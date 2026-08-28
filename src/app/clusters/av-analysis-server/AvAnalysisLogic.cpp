@@ -299,8 +299,13 @@ CHIP_ERROR AvAnalysisServerLogic::SetTrackingEnabled(bool aTrackingEnabled)
     VerifyOrReturnValue(mTrackingEnabled != aTrackingEnabled, CHIP_NO_ERROR);
 
     mTrackingEnabled = aTrackingEnabled;
+    CHIP_ERROR err   = StoreTrackingEnabled();
+    if (err != CHIP_NO_ERROR)
+    {
+        mTrackingEnabled = !aTrackingEnabled;
+        return err;
+    }
     MarkDirty(AvAnalysis::Attributes::TrackingEnabled::Id);
-    LogErrorOnFailure(StoreTrackingEnabled());
     return CHIP_NO_ERROR;
 }
 

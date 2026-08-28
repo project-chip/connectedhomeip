@@ -237,6 +237,7 @@ private:
             uint16_t videoStreamId   = 0;
             ReturnErrorOnFailure(aReader.Next(TLV::ContextTag(kPersistedTagStreamId)));
             ReturnErrorOnFailure(aReader.Get(streamId));
+            VerifyOrReturnError(streamId <= kMaxAnalysisStreamId, CHIP_ERROR_INVALID_ARGUMENT);
             ReturnErrorOnFailure(aReader.Next(TLV::ContextTag(kPersistedTagCameraNodeId)));
             ReturnErrorOnFailure(aReader.Get(cameraNodeId));
             ReturnErrorOnFailure(aReader.Next(TLV::ContextTag(kPersistedTagCameraFabric)));

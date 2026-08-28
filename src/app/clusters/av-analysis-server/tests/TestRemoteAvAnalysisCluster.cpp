@@ -31,6 +31,7 @@
 #include <clusters/AvAnalysis/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
 #include "MockAvAnalysisDelegate.h"
@@ -607,6 +608,30 @@ TEST_F(TestRemoteAvAnalysisCluster, WritingTrackingEnabledWithTheSameValueIsNotR
     ASSERT_EQ(mClusterTester.GetDirtyList().size(), dirtyAfterChange);
 }
 
+TEST_F(TestRemoteAvAnalysisCluster, TrackingEnabledWriteFailsWhenPersistenceFails)
+{
+    // Poison the KVS key backing TrackingEnabled so its next write fails
+    const auto key =
+        DefaultStorageKeyAllocator::AttributeValue(kTestEndpointId, Clusters::AvAnalysis::Id, Attributes::TrackingEnabled::Id);
+    mClusterTester.GetTestContext().StorageDelegate().AddPoisonKey(key.KeyName());
+
+    const size_t dirtyBefore = mClusterTester.GetDirtyList().size();
+
+    // The value has quality N: a write that cannot be persisted must fail and change nothing
+    ASSERT_NE(mServer.GetLogic().SetTrackingEnabled(true), CHIP_NO_ERROR);
+
+    bool trackingEnabled = true;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::TrackingEnabled::Id, trackingEnabled), CHIP_NO_ERROR);
+    ASSERT_FALSE(trackingEnabled);
+    ASSERT_EQ(mClusterTester.GetDirtyList().size(), dirtyBefore);
+
+    // With storage healthy again the same write goes through
+    mClusterTester.GetTestContext().StorageDelegate().ClearPoisonKeys();
+    ASSERT_EQ(mServer.GetLogic().SetTrackingEnabled(true), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::TrackingEnabled::Id, trackingEnabled), CHIP_NO_ERROR);
+    ASSERT_TRUE(trackingEnabled);
+}
+
 TEST_F(TestRemoteAvAnalysisCluster, ExecuteTrackingEnabledPersistenceTest)
 {
     // Defaults to false, write true
@@ -903,6 +928,31 @@ TEST_F(TestRemoteAvAnalysisCluster, AnalysisStreamTableEncodeDecodeTest)
     AnalysisStreamEntry * added = restored.Add(50, kCamera);
     ASSERT_NE(added, nullptr);
     ASSERT_EQ(added->analysisStreamID, 3);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, AnalysisStreamTableDecodeRejectsOutOfRangeEntryId)
+{
+    AnalysisStreamTable table;
+    ASSERT_EQ(table.Init(2), CHIP_NO_ERROR);
+    const ScopedNodeId kCamera(0xABCD, 1);
+    ASSERT_NE(table.Add(10, kCamera), nullptr);
+
+    // Forge an entry id the generator can never mint (the ceiling is 65534)
+    table[0].analysisStreamID = 65535;
+
+    uint8_t buffer[AnalysisStreamTable::kEntrySerializedSize * 2 + AnalysisStreamTable::kArraySerializedOverhead];
+    TLV::TLVWriter writer;
+    writer.Init(buffer, sizeof(buffer));
+    ASSERT_EQ(table.Encode(writer), CHIP_NO_ERROR);
+
+    AnalysisStreamTable restored;
+    ASSERT_EQ(restored.Init(2), CHIP_NO_ERROR);
+    TLV::TLVReader reader;
+    reader.Init(buffer, writer.GetLengthWritten());
+    ASSERT_EQ(restored.Decode(reader), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // The rejected blob degrades to an empty table, same as any other corruption
+    ASSERT_EQ(restored.Count(), 0);
 }
 
 TEST_F(TestRemoteAvAnalysisCluster, AnalysisStreamTableDecodeRejectsDuplicateIds)
