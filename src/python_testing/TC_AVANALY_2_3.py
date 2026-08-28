@@ -59,19 +59,20 @@ class TC_AVANALY_2_3(MatterBaseTest, AVANALYTestBase):
     def steps_TC_AVANALY_2_3(self) -> list[TestStep]:
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "Test Step 2"),
-            TestStep(3, "Test Step 3"),
-            TestStep(4, "Test Step 4"),
-            TestStep(5, "Test Step 5"),
-            TestStep(6, "Test Step 6"),
-            TestStep(7, "Test Step 7"),
-            TestStep(8, "Test Step 8"),
-            TestStep(9, "Test Step 9"),
-            TestStep(10, "Test Step 10"),
-            TestStep(11, "Test Step 11"),
-            TestStep(12, "Test Step 12"),
-            TestStep(13, "Test Step 13"),
-            TestStep(14, "Test Step 14"),
+            TestStep(2, "TH reads the SupportedAmbientContexts attribute, save as `supported_ambient_contexts`."),
+            TestStep(3, "If the DUT has feature PerZoneDetect, TH reads the Zones attribute from the ZoneManagement cluster.",
+                        "If there are no zones defined, TH creates one. Save the ZoneIDs as 'zoneIDs'."),
+            TestStep(4, "TH sends an EnableContextTriggers command with `ContextTriggers` containing a context NOT in `supported_ambient_contexts`. Verify DynamicConstraing error."),
+            TestStep(5, "If `zoneIDs` is not empty, TH sends an EnableContextTriggers command with `ContextTriggers` containing a `ZoneID` NOT in `existing_zones` Verify NotFound error."),
+            TestStep(6, "TH sends an EnableContextTriggers command with `ContextTriggers` containing a valid subset of `supported_contexts` and valid `ZoneIDs` (or null if no 'zoneIDs'). Verify Success."),
+            TestStep(7, "TH reads the ActiveAmbientContextTriggers attribute. Verify it contains the contexts provided in step 6."),
+            TestStep(8, "TH sends an EnableContextTriggers command with `ContextTriggers` set to null. Verify success"),
+            TestStep(9, "TH reads the ActiveAmbientContextTriggers attribute. Verify it matches `supported_ambient_contexts`."),
+            TestStep(10, "If 'zoneIDs' is not empty, TH sends a DisableContextTriggers command with `ContextTriggers` containing a subset of enabled contexts and a specified zoneID. Verify DynamicConstraint error."),
+            TestStep(11, "TH sends a DisableContextTriggers command with `ContextTriggers` containing a subset of enabled contexts and Null for zoneIDs. Verify Success."),
+            TestStep(12, "TH reads the ActiveAmbientContextTriggers attribute. Verify the disabled contexts are no longer present."),
+            TestStep(13, "TH sends a DisableContextTriggers command with `ContextTriggers` set to null. Verify Success"),
+            TestStep(14, "TH reads the ActiveAmbientContextTriggers attribute. Verify the list is empty."),
         ]
 
     def pics_TC_AVANALY_2_3(self) -> list[str]:
@@ -143,9 +144,6 @@ class TC_AVANALY_2_3(MatterBaseTest, AVANALYTestBase):
         asserts.assert_equal(valid_context_triggers, active_ambient_context_triggers_dut, "Active triggers should equate to the enabled triggers.")
 
         self.step(8)
-        # Skip zones steps for now
-
-        self.step(9)
         full_set_of_context_triggers = []
         for ambient_context in supported_ambient_contexts_dut:
             zoneID = NullValue if self.has_feature_perzonedetect else None
@@ -154,16 +152,17 @@ class TC_AVANALY_2_3(MatterBaseTest, AVANALYTestBase):
 
         await self.send_enable_context_triggers_command(endpoint, NullValue)
         
-        self.step(10)
+        self.step(9)
         active_ambient_context_triggers_dut = await self.read_avanaly_attribute_expect_success(endpoint, attributes.ActiveAmbientContextTriggers)
         asserts.assert_equal(full_set_of_context_triggers, active_ambient_context_triggers_dut, "Active triggers should equate to the full set of supported contexts.")
 
-        self.step(11)
+        self.step(10)
         # Disable the first item in the full set, as we've set all contexts all zones (Null) as active, we have to have zones as null.
         # First provide a Zone, this should have a DynamicConstraint error.  Only do this if we have zoneIDs
         if len(zoneIDs) >= 1:
             await self.send_disable_context_triggers_command(endpoint, valid_context_triggers, expected_status = Status.DynamicConstraintError)
         
+        self.step(11)
         valid_context_triggers[0].zoneIDs = NullValue
         await self.send_disable_context_triggers_command(endpoint, valid_context_triggers)     
                 
