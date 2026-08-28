@@ -96,6 +96,7 @@ bool HandleElectricalProtectionAlarmTestEventTrigger(uint64_t eventTrigger)
     auto & cluster = gInstance->Cluster();
 
     BitMask<AlarmBitmap> bit;
+    bool activate = true;
     switch (static_cast<ElectricalProtectionAlarmTrigger>(eventTrigger))
     {
     case ElectricalProtectionAlarmTrigger::kClearAll:
@@ -121,9 +122,37 @@ bool HandleElectricalProtectionAlarmTestEventTrigger(uint64_t eventTrigger)
     case ElectricalProtectionAlarmTrigger::kSetSelfTest:
         bit.Set(AlarmBitmap::kSelfTest);
         break;
+    case ElectricalProtectionAlarmTrigger::kClearShortCircuitFault:
+        bit.Set(AlarmBitmap::kShortCircuitFault);
+        activate = false;
+        break;
+    case ElectricalProtectionAlarmTrigger::kClearOverLoadFault:
+        bit.Set(AlarmBitmap::kOverLoadFault);
+        activate = false;
+        break;
+    case ElectricalProtectionAlarmTrigger::kClearOverVoltageFault:
+        bit.Set(AlarmBitmap::kOverVoltageFault);
+        activate = false;
+        break;
+    case ElectricalProtectionAlarmTrigger::kClearVoltageSurgeFault:
+        bit.Set(AlarmBitmap::kVoltageSurgeFault);
+        activate = false;
+        break;
+    case ElectricalProtectionAlarmTrigger::kClearResidualCurrentFault:
+        bit.Set(AlarmBitmap::kResidualCurrentFault);
+        activate = false;
+        break;
+    case ElectricalProtectionAlarmTrigger::kClearArcFault:
+        bit.Set(AlarmBitmap::kArcFault);
+        activate = false;
+        break;
+    case ElectricalProtectionAlarmTrigger::kClearSelfTest:
+        bit.Set(AlarmBitmap::kSelfTest);
+        activate = false;
+        break;
     default:
         return false;
     }
 
-    return cluster.ActivateAlarms(bit) == CHIP_NO_ERROR;
+    return (activate ? cluster.ActivateAlarms(bit) : cluster.DeactivateAlarms(bit)) == CHIP_NO_ERROR;
 }
