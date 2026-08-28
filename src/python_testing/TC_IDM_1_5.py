@@ -47,8 +47,8 @@ from support_modules.idm_support import IDMBaseTest
 import matter.clusters as Clusters
 from matter.clusters import Command as ClusterCommand
 from matter.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
-from matter.testing.decorators import async_test_body
-from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.decorators import async_test_body, pics
+from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -84,32 +84,15 @@ class AttributeReportTracker:
 class TC_IDM_1_5(IDMBaseTest):
     """[TC-IDM-1.5] DelayReportData Invoke Request Action [DUT as Server]"""
 
-    def desc_TC_IDM_1_5(self) -> str:
-        """Returns the description of the test case."""
-        return "[TC-IDM-1.5] DelayReportData Invoke Request Action [DUT as Server]"
-
-    def pics_TC_IDM_1_5(self) -> list[str]:
-        """Returns the list of PICS required for this test case."""
-        return ["MCORE.IDM.S"]
-
-    def steps_TC_IDM_1_5(self) -> list[TestStep]:
-        """Returns the list of test steps defined in the test plan."""
-        return [
-            TestStep(1, "Check if this device supports ICD, skip all remaining steps if it does.", is_commissioning=True),
-            TestStep(2, "TH establishes a subscription to the Breadcrumb attribute of the GeneralCommissioning cluster on Endpoint 0 of the DUT with MaxInterval set to 3600 seconds. TH synchronously awaits the initial prime report from the subscription establishment, records the timestamp t_prime, and verifies the negotiated MaxInterval from the SubscribeResponseMessage is 3600 seconds."),
-            TestStep(3, "TH records start time t_invoke_sent and sends an InvokeRequestMessage to the DUT to invoke the ArmFailSafe command (ExpiryLengthSeconds set to 900, Breadcrumb set to 1) on the GeneralCommissioning cluster (Endpoint 0) with DelayReportData (DelayMinMs: 1000 ms, DelayJitterWindowMs: 1000 ms)."),
-            TestStep(4, "TH measures the time delta (Delta t) between sending the InvokeRequestMessage (t_invoke_sent) in Step 3 and receiving the subsequent ReportDataMessage containing the Breadcrumb attribute change report. Verify Delta t >= DelayMinMs (1000 ms)."),
-            TestStep(5, "TH sends an InvokeRequestMessage to the DUT to invoke the ArmFailSafe command (ExpiryLengthSeconds set to 0, Breadcrumb set to 0) to disarm the fail-safe and clean up.")
-        ]
-
+    @pics("MCORE.IDM.S")
     @async_test_body
     async def test_TC_IDM_1_5(self) -> None:
-        """Executes the TC-IDM-1.5 test procedure."""
+        """[TC-IDM-1.5] DelayReportData Invoke Request Action [DUT as Server]"""
         dev_ctrl = self.default_controller
         dut_node_id = self.dut_node_id
 
         # Step 1: Check if this device supports ICD, skip all remaining steps if it does
-        self.step(1)
+        self.step(1, "Check if this device supports ICD, skip all remaining steps if it does.", is_commissioning=True)
         ep0_servers = await self.get_descriptor_server_list(dev_ctrl, ep=0)
         if Clusters.IcdManagement.id in ep0_servers:
             log.info("DUT supports ICD (IcdManagement cluster present on EP0); skipping remaining steps as test requires a non-ICD device")
@@ -141,7 +124,7 @@ class TC_IDM_1_5(IDMBaseTest):
         failsafe_armed = False
         try:
             # Step 2: Establish subscription to Breadcrumb with MaxInterval = 3600s
-            self.step(2)
+            self.step(2, "TH establishes a subscription to the Breadcrumb attribute of the GeneralCommissioning cluster on Endpoint 0 of the DUT with MaxInterval set to 3600 seconds. TH synchronously awaits the initial prime report from the subscription establishment, records the timestamp t_prime, and verifies the negotiated MaxInterval from the SubscribeResponseMessage is 3600 seconds.")
             log.info("Establishing subscription to Breadcrumb attribute on Endpoint 0 with MaxInterval=%ds", max_interval_ceiling_sec)
             subscription = await dev_ctrl.ReadAttribute(
                 nodeId=dut_node_id,
@@ -186,7 +169,7 @@ class TC_IDM_1_5(IDMBaseTest):
             )
 
             # Step 3: Send InvokeRequestMessage for ArmFailSafe with DelayReportData
-            self.step(3)
+            self.step(3, "TH records start time t_invoke_sent and sends an InvokeRequestMessage to the DUT to invoke the ArmFailSafe command (ExpiryLengthSeconds set to 900, Breadcrumb set to 1) on the GeneralCommissioning cluster (Endpoint 0) with DelayReportData (DelayMinMs: 1000 ms, DelayJitterWindowMs: 1000 ms).")
             # Drain any residual queue items before measuring
             while not report_queue.empty():
                 report_queue.get_nowait()
@@ -209,7 +192,7 @@ class TC_IDM_1_5(IDMBaseTest):
             failsafe_armed = True
 
             # Step 4: Measure delta t and verify delta t >= DelayMinMs
-            self.step(4)
+            self.step(4, "TH measures the time delta (Delta t) between sending the InvokeRequestMessage (t_invoke_sent) in Step 3 and receiving the subsequent ReportDataMessage containing the Breadcrumb attribute change report. Verify Delta t >= DelayMinMs (1000 ms).")
             try:
                 report_recv_time, new_val = await asyncio.to_thread(report_queue.get, timeout=report_wait_timeout_sec)
             except queue.Empty:
@@ -229,7 +212,7 @@ class TC_IDM_1_5(IDMBaseTest):
             )
 
             # Step 5: Disarm fail-safe and reset Breadcrumb
-            self.step(5)
+            self.step(5, "TH sends an InvokeRequestMessage to the DUT to invoke the ArmFailSafe command (ExpiryLengthSeconds set to 0, Breadcrumb set to 0) to disarm the fail-safe and clean up.")
             log.info("Cleaning up: disarming fail-safe and resetting Breadcrumb to 0")
             cleanup_resp = await dev_ctrl.SendCommand(
                 nodeId=dut_node_id,
