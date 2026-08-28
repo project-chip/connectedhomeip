@@ -472,12 +472,15 @@ CHIP_ERROR DefaultAvAnalysisCameraClient::AddPendingCommandData()
         return mCommandSender->AddRequestData(commandPath(Commands::VideoStreamAllocate::Id),
                                               BuildAllocateRequest(mRequest.Profile()));
     }
-    else
+
+    if (mRequest.GetCommandType() == Request::CommandType::kVideoStreamDeallocate)
     {
         Commands::VideoStreamDeallocate::Type request;
         request.videoStreamID = mRequest.VideoStreamId();
         return mCommandSender->AddRequestData(commandPath(Commands::VideoStreamDeallocate::Id), request);
     }
+
+    return CHIP_ERROR_INCORRECT_STATE;
 }
 
 void DefaultAvAnalysisCameraClient::OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath,

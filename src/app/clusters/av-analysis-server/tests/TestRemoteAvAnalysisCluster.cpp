@@ -974,7 +974,7 @@ TEST_F(TestRemoteAvAnalysisCluster, AnalysisStreamTableDecodeFailureLeavesTableE
     ASSERT_EQ(table.Encode(writer), CHIP_NO_ERROR);
 
     // Corrupt the blob: cut it off inside the second entry, after the first decoded cleanly
-    const uint32_t truncatedLength = writer.GetLengthWritten() - AnalysisStreamTable::kEntrySerializedSize;
+    const uint32_t truncatedLength = writer.GetLengthWritten() - static_cast<uint32_t>(AnalysisStreamTable::kEntrySerializedSize);
 
     AnalysisStreamTable restored;
     ASSERT_EQ(restored.Init(3), CHIP_NO_ERROR);
