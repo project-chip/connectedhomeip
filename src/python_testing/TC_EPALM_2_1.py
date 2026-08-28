@@ -56,6 +56,9 @@ log = logging.getLogger(__name__)
 # matter_asserts.assert_valid_int64 alone permits up to 0x7FFFFFFFFFFFFFFF.
 MEASUREMENT_MAX = 0x3FFFFFFFFFFFFFFF
 
+# AlarmBitmap (map32) - set bits limited to the 7 spec-defined fault bits (0..6).
+ALARM_BITMAP_MAX = 0x7F  # ShortCircuit | OverLoad | OverVoltage | VoltageSurge | ResidualCurrent | ArcFault | SelfTest
+
 cluster = Clusters.ElectricalProtectionAlarm
 
 
@@ -90,9 +93,6 @@ class TC_EPALM_2_1(MatterBaseTest):
         asserts.assert_true(matter_asserts.is_valid_int_value(feature_map, bit_count=32),
                             'FeatureMap must be a valid uint32 (map32)')
         log.info('FeatureMap: 0x%08X', feature_map)
-
-        # AlarmBitmap (map32) - set bits limited to the 7 spec-defined fault bits (0..6).
-        ALARM_BITMAP_MAX = 0x7F  # ShortCircuit | OverLoad | OverVoltage | VoltageSurge | ResidualCurrent | ArcFault | SelfTest
 
         self.step(3, "TH reads Mask attribute (inherited from Alarm Base)")
         mask_val = await self.read_single_attribute_check_success(
@@ -191,9 +191,6 @@ class TC_EPALM_2_1(MatterBaseTest):
                 asserts.assert_true(isinstance(val, cluster.Structs.ArcFaultRatingsStruct),
                                     'ArcFaultRating must be an ArcFaultRatingsStruct')
                 self._check_arc_fault_ratings_struct(val)
-
-        # AlarmBitmap (map32) — set bits limited to the 7 spec-defined fault bits (0..6).
-        ALARM_BITMAP_MAX = 0x7F  # ShortCircuit | OverLoad | OverVoltage | VoltageSurge | ResidualCurrent | ArcFault | SelfTest
 
         self.step(14, "TH writes ArcCause - expect UNSUPPORTED_WRITE (read-only access)")
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.ArcCause):
