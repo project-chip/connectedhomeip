@@ -33,6 +33,7 @@ class DeviceEnergyManagementDelegate : public DeviceEnergyManagement::Delegate
 {
 public:
     DeviceEnergyManagementDelegate();
+    ~DeviceEnergyManagementDelegate();
 
     void SetDeviceEnergyManagementInstance(DeviceEnergyManagement::Instance & instance);
 
@@ -253,7 +254,26 @@ public:
     // DEMManufacturerDelegate::HandleModifyForecastRequest cannot be interrupted by any other CHIP task activity.
     CHIP_ERROR SetForecast(const DataModel::Nullable<Structs::ForecastStruct::Type> &);
 
-    CHIP_ERROR SetOptOutState(OptOutStateEnum);
+    /**
+     * @brief Set the OptOutState, implementing cumulative bitwise opt-out logic.
+     *
+     * OptOutStateEnum uses bitwise flags:
+     *   - kNoOptOut = 0x00 (no opt-out)
+     *   - kLocalOptOut = 0x01 (local optimization opted out)
+     *   - kGridOptOut = 0x02 (grid optimization opted out)
+     *   - kOptOut = 0x03 (both opted out - computed as kLocalOptOut | kGridOptOut)
+     *
+     * When setting a new opt-out state:
+     *   - If transitioning from kLocalOptOut to kGridOptOut (or vice versa), the result becomes
+     *     cumulative kOptOut (0x03) to track that BOTH reasons are now opted out.
+     *   - All active PowerAdjustment, PauseRequest, and PowerRangeAdjustment operations matching
+     *     the newly opted-out reason(s) are automatically cancelled.
+     *   - Forecast updates due to the opted-out reason are reverted to InternalOptimization.
+     *
+     * @param newValue The new opt-out state to set.
+     * @return CHIP_NO_ERROR on success; error code if cancellation of active operations fails.
+     */
+    CHIP_ERROR SetOptOutState(OptOutStateEnum newValue);
 
     // Returns whether the DeviceEnergyManagement is supported
     uint32_t HasFeature(Feature feature) const;
