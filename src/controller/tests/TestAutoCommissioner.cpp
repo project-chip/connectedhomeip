@@ -688,4 +688,165 @@ TEST_F(AutoCommissionerTest, IsSecondaryNetworkSupportedCombinations)
         EXPECT_EQ(result, c.isSecondaryNetworkSupported);
     }
 }
+
+TEST_F(AutoCommissionerTest, SetCommissioningParametersCopiesSpans)
+{
+    uint8_t source[32]{ 0xde, 0xad }; // length 32 is valid for all these except country code
+    ByteSpan sourceSpan32(source);
+    CharSpan sourceCountryCode = "XX"_span;
+
+    CommissioningParameters params{};
+    params.SetAttestationNonce(sourceSpan32);
+    params.SetCSRNonce(sourceSpan32);
+    params.SetThreadOperationalDataset(sourceSpan32);
+    params.SetWiFiCredentials(WiFiCredentials(sourceSpan32, sourceSpan32));
+    params.SetCountryCode(sourceCountryCode);
+    EXPECT_EQ(mCommissioner.SetCommissioningParameters(params), CHIP_NO_ERROR);
+
+    CommissioningParameters storedParams = mCommissioner.GetCommissioningParameters();
+    ASSERT_TRUE(storedParams.GetAttestationNonce().HasValue());
+    EXPECT_NE(storedParams.GetAttestationNonce().Value().data(), sourceSpan32.data());
+    EXPECT_TRUE(storedParams.GetAttestationNonce().Value().data_equal(sourceSpan32));
+
+    ASSERT_TRUE(storedParams.GetCSRNonce().HasValue());
+    EXPECT_NE(storedParams.GetCSRNonce().Value().data(), sourceSpan32.data());
+    EXPECT_TRUE(storedParams.GetCSRNonce().Value().data_equal(sourceSpan32));
+
+    ASSERT_TRUE(storedParams.GetThreadOperationalDataset().HasValue());
+    EXPECT_NE(storedParams.GetThreadOperationalDataset().Value().data(), sourceSpan32.data());
+    EXPECT_TRUE(storedParams.GetThreadOperationalDataset().Value().data_equal(sourceSpan32));
+
+    ASSERT_TRUE(storedParams.GetWiFiCredentials().HasValue());
+    EXPECT_NE(storedParams.GetWiFiCredentials().Value().ssid.data(), sourceSpan32.data());
+    EXPECT_TRUE(storedParams.GetWiFiCredentials().Value().ssid.data_equal(sourceSpan32));
+    EXPECT_NE(storedParams.GetWiFiCredentials().Value().credentials.data(), sourceSpan32.data());
+    EXPECT_TRUE(storedParams.GetWiFiCredentials().Value().credentials.data_equal(sourceSpan32));
+
+    ASSERT_TRUE(storedParams.GetCountryCode().HasValue());
+    EXPECT_NE(storedParams.GetCountryCode().Value().data(), sourceCountryCode.data());
+    EXPECT_TRUE(storedParams.GetCountryCode().Value().data_equal(sourceCountryCode));
+}
+
+// ---------------------------------------------------------------------------
+// Failing over from the primary to the secondary network interface
+// ---------------------------------------------------------------------------
+
+// Giving up on the primary network only requires removing its configuration from the commissionee
+// if we actually wrote one. Asking a commissionee to remove a network it does not have fails, which
+// would end the commissioning attempt instead of letting us try the other network technology.
+class AutoCommissionerNetworkFailoverTest : public ::testing::Test
+{
+protected:
+    // A commissionee supporting both Wi-Fi and Thread, with credentials for both, which is what
+    // IsSecondaryNetworkSupported() requires. The interface on the root endpoint is the primary one.
+    void ConfigureDualInterface(EndpointId wifiEndpoint, EndpointId threadEndpoint)
+    {
+        const uint8_t ssid[]       = { 's', 's', 'i', 'd' };
+        const uint8_t passphrase[] = { 'p', 'a', 's', 's' };
+        const uint8_t dataset[]    = { 0x00 };
+
+        CommissioningParameters params;
+        params.SetWiFiCredentials(WiFiCredentials(ByteSpan(ssid), ByteSpan(passphrase)));
+        params.SetThreadOperationalDataset(ByteSpan(dataset));
+        params.SetSupportsConcurrentConnection(true);
+        ASSERT_EQ(mCommissioner.SetCommissioningParameters(params), CHIP_NO_ERROR);
+
+        ReadCommissioningInfo & info = mAccess.GetDeviceCommissioningInfo();
+        info.network.wifi.endpoint   = wifiEndpoint;
+        info.network.thread.endpoint = threadEndpoint;
+        ASSERT_TRUE(mAccess.IsSecondaryNetworkSupported());
+        ASSERT_FALSE(mAccess.WroteNetworkConfig());
+    }
+
+    // Reports a stage as having completed successfully. PerformStep() then fails because this
+    // fixture has no device proxy, by which point everything we care about has already happened.
+    void CompleteStage(CommissioningStage stage)
+    {
+        CommissioningDelegate::CommissioningReport report;
+        report.stageCompleted = stage;
+        EXPECT_EQ(mCommissioner.CommissioningStepFinished(CHIP_NO_ERROR, report), CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    // The stage the flow moves to once the failover has given up on the primary network. Mirrors
+    // what CommissioningStepFinished() does on a network failure: switch, then report the switch.
+    CommissioningStage StageAfterPrimaryNetworkFailed()
+    {
+        mAccess.TrySecondaryNetwork();
+        CHIP_ERROR err          = CHIP_NO_ERROR;
+        CommissioningStage next = mAccess.AccessGetNextCommissioningStageInternal(kPrimaryOperationalNetworkFailed, err);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        return next;
+    }
+
+    AutoCommissioner mCommissioner{};
+    AutoCommissionerTestAccess mAccess{ &mCommissioner };
+};
+
+// AddOrUpdateWiFiNetwork never succeeded, so there is nothing on the commissionee to remove and we
+// go straight to the secondary network.
+TEST_F(AutoCommissionerNetworkFailoverTest, PrimaryWiFiWithoutConfigSkipsRemoval)
+{
+    ConfigureDualInterface(kRootEndpointId, /* threadEndpoint = */ 1);
+
+    EXPECT_EQ(StageAfterPrimaryNetworkFailed(), kThreadNetworkSetup);
+}
+
+// The Wi-Fi configuration was written, so it has to come off before Thread is configured.
+TEST_F(AutoCommissionerNetworkFailoverTest, PrimaryWiFiWithConfigIsRemovedFirst)
+{
+    ConfigureDualInterface(kRootEndpointId, /* threadEndpoint = */ 1);
+    CompleteStage(kWiFiNetworkSetup);
+    ASSERT_TRUE(mAccess.WroteNetworkConfig());
+
+    EXPECT_EQ(StageAfterPrimaryNetworkFailed(), kRemoveWiFiNetworkConfig);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    EXPECT_EQ(mAccess.AccessGetNextCommissioningStageInternal(kRemoveWiFiNetworkConfig, err), kThreadNetworkSetup);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+}
+
+// The same either way round: Thread on the root endpoint is the primary network.
+TEST_F(AutoCommissionerNetworkFailoverTest, PrimaryThreadWithoutConfigSkipsRemoval)
+{
+    ConfigureDualInterface(/* wifiEndpoint = */ 1, kRootEndpointId);
+
+    EXPECT_EQ(StageAfterPrimaryNetworkFailed(), kWiFiNetworkSetup);
+}
+
+TEST_F(AutoCommissionerNetworkFailoverTest, PrimaryThreadWithConfigIsRemovedFirst)
+{
+    ConfigureDualInterface(/* wifiEndpoint = */ 1, kRootEndpointId);
+    CompleteStage(kThreadNetworkSetup);
+    ASSERT_TRUE(mAccess.WroteNetworkConfig());
+
+    EXPECT_EQ(StageAfterPrimaryNetworkFailed(), kRemoveThreadNetworkConfig);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    EXPECT_EQ(mAccess.AccessGetNextCommissioningStageInternal(kRemoveThreadNetworkConfig, err), kWiFiNetworkSetup);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+}
+
+// What we track is what the commissionee is actually holding, so a successful removal clears it
+// again. Nothing in the current stage graph asks twice, but the record would otherwise be wrong.
+TEST_F(AutoCommissionerNetworkFailoverTest, RemovingTheConfigClearsTheRecord)
+{
+    ConfigureDualInterface(kRootEndpointId, /* threadEndpoint = */ 1);
+    CompleteStage(kWiFiNetworkSetup);
+    ASSERT_TRUE(mAccess.WroteNetworkConfig());
+
+    CompleteStage(kRemoveWiFiNetworkConfig);
+    EXPECT_FALSE(mAccess.WroteNetworkConfig());
+}
+
+// An AutoCommissioner is reused across commissioning attempts, so a configuration written during
+// one attempt must not be remembered into the next.
+TEST_F(AutoCommissionerNetworkFailoverTest, CleanupClearsTheRecord)
+{
+    ConfigureDualInterface(kRootEndpointId, /* threadEndpoint = */ 1);
+    CompleteStage(kWiFiNetworkSetup);
+    ASSERT_TRUE(mAccess.WroteNetworkConfig());
+
+    mAccess.CleanupCommissioning();
+    EXPECT_FALSE(mAccess.WroteNetworkConfig());
+}
 } // namespace
