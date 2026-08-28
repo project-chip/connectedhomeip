@@ -431,7 +431,7 @@ cluster Descriptor = 29 {
   readonly attribute cluster_id clientList[] = 2;
   readonly attribute endpoint_no partsList[] = 3;
   readonly attribute optional SemanticTagStruct tagList[] = 4;
-  provisional readonly attribute optional char_string<32> endpointUniqueID = 5;
+  readonly attribute optional char_string<32> endpointUniqueID = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2405,7 +2405,7 @@ cluster PowerTopology = 156 {
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
-provisional cluster DeviceEnergyManagementMode = 159 {
+cluster DeviceEnergyManagementMode = 159 {
   revision 2;
 
   enum ModeTag : enum16 {
@@ -2423,10 +2423,6 @@ provisional cluster DeviceEnergyManagementMode = 159 {
     kDeviceOptimization = 16385;
     kLocalOptimization = 16386;
     kGridOptimization = 16387;
-  }
-
-  bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
   }
 
   shared struct ModeTagStruct {
