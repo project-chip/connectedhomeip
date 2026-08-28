@@ -819,8 +819,11 @@ Status DeviceEnergyManagementDelegate::PowerRangeAdjustRequest(const DataModel::
                   static_cast<long long>(minPower.IsNull() ? 0 : minPower.Value()),
                   static_cast<long long>(maxPower.IsNull() ? 0 : maxPower.Value()), duration, to_underlying(cause));
 
-    // Record when this PowerRangeAdjustment starts (each request restarts the session window)
-    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(mPowerRangeAdjustmentStartTimeUtc);
+    // Get the current time, but store it in a local variable until we confirm this request succeeds.
+    // If a replacement PRA is active and the manufacturer callback rejects the new request, the original
+    // timer remains active and must use the original timestamp for duration calculations.
+    uint32_t newStartTimeUtc;
+    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(newStartTimeUtc);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Unable to get time: %" CHIP_ERROR_FORMAT, err.Format());
@@ -828,7 +831,7 @@ Status DeviceEnergyManagementDelegate::PowerRangeAdjustRequest(const DataModel::
     }
 
     // Calculate the end time for the power range adjustment
-    uint32_t endTimeUtc = mPowerRangeAdjustmentStartTimeUtc + duration;
+    uint32_t endTimeUtc = newStartTimeUtc + duration;
 
     // Validate and map the cause before any state changes
     PowerAdjustReasonEnum mappedCause;
@@ -873,6 +876,9 @@ Status DeviceEnergyManagementDelegate::PowerRangeAdjustRequest(const DataModel::
     }
 
     // Timer started successfully. Now update state.
+    // Commit the new timestamp only after manufacturer callback and timer succeed.
+    mPowerRangeAdjustmentStartTimeUtc = newStartTimeUtc;
+
     // Update ESAState to indicate active power range adjustment
     TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kPowerAdjustActive);
 
