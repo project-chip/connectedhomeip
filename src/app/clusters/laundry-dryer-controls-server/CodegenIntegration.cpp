@@ -92,13 +92,6 @@ class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 } // namespace
 
 void MatterLaundryDryerControlsPluginServerInitCallback() {}
-void MatterLaundryDryerControlsClusterServerAttributeChangedCallback(const ConcreteAttributePath &) {}
-Protocols::InteractionModel::Status
-MatterLaundryDryerControlsClusterServerPreAttributeChangedCallback(const ConcreteAttributePath &, EmberAfAttributeType, uint16_t,
-                                                                   uint8_t *)
-{
-    return Protocols::InteractionModel::Status::Success;
-}
 
 void MatterLaundryDryerControlsClusterInitCallback(EndpointId endpointId)
 {

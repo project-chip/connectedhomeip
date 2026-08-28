@@ -65,14 +65,6 @@ public:
 
 constexpr ModeOptionStructType MockDelegate::kModes[];
 
-// Thin subclass to expose the protected ApplyStartupModeLogic() for white-box testing.
-class TestableModeSelectCluster : public ModeSelectCluster
-{
-public:
-    using ModeSelectCluster::ApplyStartupModeLogic;
-    using ModeSelectCluster::ModeSelectCluster;
-};
-
 struct TestModeSelectCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -115,10 +107,9 @@ TEST_F(TestModeSelectCluster, StartupSucceeds)
 
 TEST_F(TestModeSelectCluster, StartupInitializesCurrentModeToFirstSupportedMode)
 {
-    TestableModeSelectCluster cluster(kRootEndpointId, mockDelegate, MakeConfig());
+    ModeSelectCluster cluster(kRootEndpointId, mockDelegate, MakeConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-    cluster.ApplyStartupModeLogic();
 
     uint8_t currentMode = 0xFF;
     ASSERT_EQ(tester.ReadAttribute(CurrentMode::Id, currentMode), CHIP_NO_ERROR);
@@ -247,10 +238,9 @@ TEST_F(TestModeSelectCluster, ReadCurrentMode)
 TEST_F(TestModeSelectCluster, ReadStartUpModeDefaultsToCurrentMode)
 {
     optionalAttributeSet.Set<StartUpMode::Id>();
-    TestableModeSelectCluster cluster(kRootEndpointId, mockDelegate, MakeConfig());
+    ModeSelectCluster cluster(kRootEndpointId, mockDelegate, MakeConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-    cluster.ApplyStartupModeLogic();
 
     DataModel::Nullable<uint8_t> startUpMode;
     ASSERT_EQ(tester.ReadAttribute(StartUpMode::Id, startUpMode), CHIP_NO_ERROR);
@@ -378,10 +368,9 @@ TEST_F(TestModeSelectCluster, StartupAppliesStartUpMode)
     }
 
     // Re-create cluster to simulate power cycle — same testContext storage.
-    TestableModeSelectCluster cluster2(kRootEndpointId, mockDelegate, MakeConfig());
+    ModeSelectCluster cluster2(kRootEndpointId, mockDelegate, MakeConfig());
     ClusterTester tester2(cluster2);
     ASSERT_EQ(cluster2.Startup(testContext.Get()), CHIP_NO_ERROR);
-    cluster2.ApplyStartupModeLogic();
 
     uint8_t currentMode = 0xFF;
     ASSERT_EQ(tester2.ReadAttribute(CurrentMode::Id, currentMode), CHIP_NO_ERROR);
@@ -400,10 +389,9 @@ TEST_F(TestModeSelectCluster, StartupSkipsStartUpModeOnOtaReboot)
 
     diagnosticDataProvider.mBootReason = GeneralDiagnostics::BootReasonEnum::kSoftwareUpdateCompleted;
 
-    TestableModeSelectCluster cluster2(kRootEndpointId, mockDelegate, MakeConfig());
+    ModeSelectCluster cluster2(kRootEndpointId, mockDelegate, MakeConfig());
     ClusterTester tester2(cluster2);
     ASSERT_EQ(cluster2.Startup(testContext.Get()), CHIP_NO_ERROR);
-    cluster2.ApplyStartupModeLogic();
 
     uint8_t currentMode = 0xFF;
     ASSERT_EQ(tester2.ReadAttribute(CurrentMode::Id, currentMode), CHIP_NO_ERROR);
@@ -423,10 +411,9 @@ TEST_F(TestModeSelectCluster, StartupAppliesOnModeOverStartUpMode)
     }
 
     // Re-create cluster to simulate power cycle — same testContext storage.
-    TestableModeSelectCluster cluster2(kRootEndpointId, mockDelegate, MakeConfig(BitMask<Feature>(Feature::kOnOff), true));
+    ModeSelectCluster cluster2(kRootEndpointId, mockDelegate, MakeConfig(BitMask<Feature>(Feature::kOnOff), true));
     ClusterTester tester2(cluster2);
     ASSERT_EQ(cluster2.Startup(testContext.Get()), CHIP_NO_ERROR);
-    cluster2.ApplyStartupModeLogic();
 
     uint8_t currentMode = 0xFF;
     ASSERT_EQ(tester2.ReadAttribute(CurrentMode::Id, currentMode), CHIP_NO_ERROR);
