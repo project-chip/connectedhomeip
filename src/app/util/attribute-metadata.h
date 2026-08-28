@@ -127,6 +127,8 @@ union EmberAfDefaultOrMinMaxAttributeValue
 #define MATTER_ATTRIBUTE_FLAG_READABLE (0x20)
 // Attribute is nullable
 #define MATTER_ATTRIBUTE_FLAG_NULLABLE (0x40)
+// Attribute has no default value configured
+#define MATTER_ATTRIBUTE_FLAG_NO_DEFAULT_VALUE (0x80)
 
 /**
  * @brief Each attribute has it's metadata stored in such struct.
@@ -163,12 +165,9 @@ struct EmberAfAttributeMetadata
     EmberAfAttributeMask mask;
 
     /**
-     * Check whether this attribute was declared with an empty default (ZAP_EMPTY_DEFAULT()).
+     * Check whether this attribute was declared with no default value.
      */
-    bool HasEmptyDefault() const
-    {
-        return ((mask & MATTER_ATTRIBUTE_FLAG_MIN_MAX) == 0) && (defaultValue.defaultValue == chip::app::kZapEmptyDefaultMarker);
-    }
+    bool HasEmptyDefault() const { return (mask & MATTER_ATTRIBUTE_FLAG_NO_DEFAULT_VALUE) != 0; }
 
     /**
      * Check wether this attribute is a boolean based on its type according to the spec.

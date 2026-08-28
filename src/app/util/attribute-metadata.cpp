@@ -188,7 +188,7 @@ Status emberAfGetAttributeDefaultValue(const EmberAfAttributeMetadata * am, Attr
     if (am->HasEmptyDefault())
     {
         outDefault.rawData = ByteSpan();
-        return Status::Success;
+        return Status::NotFound;
     }
 
     const bool isLongString  = emberAfIsLongStringAttributeType(am->attributeType);
@@ -240,6 +240,7 @@ Status emberAfGetAttributeDefaultValue(const EmberAfAttributeMetadata * am, Attr
     if (ptr == nullptr)
     {
         outDefault.rawData = ByteSpan();
+        return Status::NotFound;
     }
     else if (isLongString)
     {

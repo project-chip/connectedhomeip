@@ -1059,6 +1059,21 @@
             "ClusterRevision"
         ],
         "Time Format Localization": ["ClusterRevision"],
+        "Valve Configuration and Control": [
+            "OpenDuration",
+            { "name": "DefaultOpenDuration", "keepDefault": true },
+            "AutoCloseTime",
+            "RemainingDuration",
+            "CurrentState",
+            "TargetState",
+            "CurrentLevel",
+            "TargetLevel",
+            { "name": "DefaultOpenLevel", "keepDefault": true },
+            { "name": "ValveFault", "keepDefault": true },
+            { "name": "LevelStep", "keepDefault": true },
+            { "name": "FeatureMap", "keepDefault": true },
+            "ClusterRevision"
+        ],
         "Window Covering": [
             "ClusterRevision",
             "OperationalStatus",

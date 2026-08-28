@@ -44,7 +44,7 @@ EmberAfAttributeMinMaxValue sTestMinMaxInt16 = {
 
 // clang-format off
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(sTestDynamicAttrs)
-    DECLARE_DYNAMIC_ATTRIBUTE(0x0001, INT8U, 1, 0),
+    DECLARE_DYNAMIC_ATTRIBUTE(0x0001, INT8U, 1, MATTER_ATTRIBUTE_FLAG_NO_DEFAULT_VALUE),
     DECLARE_DYNAMIC_ATTRIBUTE_WITH_SCALAR_DEFAULT(0x0002, INT8U, 1, 0, 42),
     DECLARE_DYNAMIC_ATTRIBUTE_WITH_SCALAR_DEFAULT(0x0003, INT16U, 2, 0, 0x1234),
     DECLARE_DYNAMIC_ATTRIBUTE_WITH_SCALAR_DEFAULT(0x0004, INT32U, 4, 0, 0x12345678),
@@ -58,7 +58,8 @@ DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(sTestDynamicAttrs)
     DECLARE_DYNAMIC_ATTRIBUTE_WITH_STRING_DEFAULT(0x000C, LONG_CHAR_STRING, 64, MATTER_ATTRIBUTE_FLAG_NULLABLE, sTestNullLongStringDefault),
     DECLARE_DYNAMIC_ATTRIBUTE_WITH_SCALAR_DEFAULT(0x000D, INT8U, 1, MATTER_ATTRIBUTE_FLAG_NULLABLE, 0xFF),
     DECLARE_DYNAMIC_ATTRIBUTE_WITH_SCALAR_DEFAULT(0x000E, INT8U, 1, MATTER_ATTRIBUTE_FLAG_NULLABLE, 10),
-    DECLARE_DYNAMIC_ATTRIBUTE(0x000F, INT16S, 2, MATTER_ATTRIBUTE_FLAG_NULLABLE),
+    DECLARE_DYNAMIC_ATTRIBUTE(0x000F, INT16S, 2, MATTER_ATTRIBUTE_FLAG_NULLABLE | MATTER_ATTRIBUTE_FLAG_NO_DEFAULT_VALUE),
+    DECLARE_DYNAMIC_ATTRIBUTE_WITH_MIN_MAX_DEFAULT(0x0010, INT16U, 2, MATTER_ATTRIBUTE_FLAG_NO_DEFAULT_VALUE, &sTestMinMaxInt16),
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END_WITH_REVISION(3);
 // clang-format on
 
@@ -66,13 +67,20 @@ TEST(TestDynamicAttributeMetadata, EmptyDefault)
 {
     AttributeDefaultValue val;
     EXPECT_TRUE(sTestDynamicAttrs[0].HasEmptyDefault());
-    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[0], val), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[0], val), Protocols::InteractionModel::Status::NotFound);
+    EXPECT_TRUE(val.rawData.empty());
     EXPECT_EQ(val.As<uint8_t>(), 0);
 
     // Nullable attribute with empty default -> Null
     EXPECT_TRUE(sTestDynamicAttrs[14].HasEmptyDefault());
-    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[14], val), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[14], val), Protocols::InteractionModel::Status::NotFound);
+    EXPECT_TRUE(val.rawData.empty());
     EXPECT_TRUE(val.AsNullable<int16_t>().IsNull());
+
+    // Min/max attribute with no default flag -> HasEmptyDefault is true, rawData is empty
+    EXPECT_TRUE(sTestDynamicAttrs[15].HasEmptyDefault());
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[15], val), Protocols::InteractionModel::Status::NotFound);
+    EXPECT_TRUE(val.rawData.empty());
 }
 
 TEST(TestDynamicAttributeMetadata, ScalarDefaults)
@@ -125,11 +133,11 @@ TEST(TestDynamicAttributeMetadata, MinMaxDefault)
     EXPECT_EQ(val.As<uint16_t>(), 50);
     EXPECT_FALSE(sTestDynamicAttrs[9].HasEmptyDefault());
 
-    // Min/max attribute with null pointer does not crash and yields empty rawData
+    // Min/max attribute with null pointer does not crash and returns Status::NotFound with empty rawData
     EmberAfAttributeMetadata nullMinMaxAttr = DECLARE_DYNAMIC_ATTRIBUTE_WITH_MIN_MAX_DEFAULT(
         0x000A, INT16U, 2, 0, static_cast<const EmberAfAttributeMinMaxValue *>(nullptr));
     EXPECT_FALSE(nullMinMaxAttr.HasEmptyDefault());
-    EXPECT_EQ(emberAfGetAttributeDefaultValue(&nullMinMaxAttr, val), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(&nullMinMaxAttr, val), Protocols::InteractionModel::Status::NotFound);
     EXPECT_TRUE(val.rawData.empty());
 }
 
@@ -202,8 +210,8 @@ TEST(TestDynamicAttributeMetadata, EmptyRawDataSemantics)
 TEST(TestDynamicAttributeMetadata, ClusterRevision)
 {
     AttributeDefaultValue val;
-    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[15], val), Protocols::InteractionModel::Status::Success);
-    EXPECT_EQ(sTestDynamicAttrs[15].attributeId, 0xFFFDu);
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[16], val), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(sTestDynamicAttrs[16].attributeId, 0xFFFDu);
     EXPECT_EQ(val.As<uint16_t>(), 3);
 }
 
@@ -227,6 +235,10 @@ TEST(TestDynamicAttributeMetadata, EndpointLevelLookup)
     Testing::SetMockNodeConfig(nodeConfig);
 
     AttributeDefaultValue val;
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(kTestEndpointId, kTestClusterId, 0x0001, val),
+              Protocols::InteractionModel::Status::NotFound);
+    EXPECT_TRUE(val.rawData.empty());
+
     EXPECT_EQ(emberAfGetAttributeDefaultValue(kTestEndpointId, kTestClusterId, 0x0002, val),
               Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(val.As<uint8_t>(), 42);
