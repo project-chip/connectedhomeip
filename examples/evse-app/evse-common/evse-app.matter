@@ -2284,7 +2284,7 @@ cluster DeviceEnergyManagement = 152 {
 
 /** Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management. */
 cluster EnergyEvse = 153 {
-  revision 3;
+  revision 4;
 
   enum EnergyTransferStoppedReasonEnum : enum8 {
     kEVStopped = 0;
