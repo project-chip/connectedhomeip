@@ -199,8 +199,8 @@ class DEMTestBase:
 
         Args:
             cause: The AdjustmentCauseEnum value for the power range adjustment.
-            minPower: Optional minimum power in watts. Pass None to omit from command.
-            maxPower: Optional maximum power in watts. Pass None to omit from command.
+            minPower: Optional minimum power in milliwatts. Pass None to omit from command.
+            maxPower: Optional maximum power in milliwatts. Pass None to omit from command.
             duration: Duration in seconds for the power range adjustment (default: 3600).
             endpoint: Optional endpoint ID (default: None).
             timedRequestTimeoutMs: Timed request timeout in milliseconds (default: 3000).
