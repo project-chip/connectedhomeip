@@ -1093,7 +1093,7 @@ TEST_F(TestAmbientContextSensingCluster, TestObjectCountConfigLabelOnlyChangeIsS
     ASSERT_TRUE(readBack.countingObject.label.HasValue());
     ASSERT_FALSE(readBack.countingObject.label.Value().IsNull());
     EXPECT_TRUE(readBack.countingObject.label.Value().Value().data_equal(CharSpan::fromCharString(kSecondLabel)));
-    
+
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
