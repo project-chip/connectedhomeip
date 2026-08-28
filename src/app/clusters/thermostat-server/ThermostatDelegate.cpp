@@ -31,6 +31,11 @@ CHIP_ERROR Delegate::Startup(ServerClusterContext & context)
 
 void Delegate::Shutdown(ClusterShutdownType type) {}
 
+FabricTable * Delegate::GetFabricTable() const
+{
+    return nullptr;
+}
+
 Protocols::InteractionModel::Status Delegate::GetOutdoorTemperature(DataModel::Nullable<temperature> &) const
 {
     return Status::UnsupportedAttribute;

@@ -75,7 +75,7 @@ public:
         Open,
     };
 
-    AtomicWriteSession(Delegate & delegate, TimerDelegate & timerDelegate, FabricTable & fabricTable) :
+    AtomicWriteSession(Delegate & delegate, TimerDelegate & timerDelegate, FabricTable * fabricTable) :
         mDelegate(delegate), mTimerDelegate(timerDelegate), mFabricTable(fabricTable)
     {}
 
@@ -196,7 +196,7 @@ private:
 
     Delegate & mDelegate;
     TimerDelegate & mTimerDelegate;
-    FabricTable & mFabricTable;
+    FabricTable * mFabricTable = nullptr;
 
     Protocols::InteractionModel::Status
     ExecuteAtomicAction(AtomicAttributes & attributeStatuses,

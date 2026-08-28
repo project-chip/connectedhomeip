@@ -72,16 +72,7 @@ public:
         {
             std::apply(
                 [&](auto &... dels) {
-                    if constexpr (Cluster::kRequiresAtomicWrite)
-                    {
-                        ClusterStorage<Size, Cluster>::mClusters[clusterInstanceIndex].Create(
-                            endpointId, features, config, Server::GetInstance().GetFabricTable(), dels...);
-                    }
-                    else
-                    {
-                        ClusterStorage<Size, Cluster>::mClusters[clusterInstanceIndex].Create(endpointId, features, config,
-                                                                                              dels...);
-                    }
+                    ClusterStorage<Size, Cluster>::mClusters[clusterInstanceIndex].Create(endpointId, features, config, dels...);
                 },
                 mDelegates);
         }

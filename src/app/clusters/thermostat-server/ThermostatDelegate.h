@@ -23,6 +23,8 @@
 #include "Temperature.h"
 
 namespace chip {
+class FabricTable;
+
 namespace app {
 namespace Clusters {
 namespace Thermostat {
@@ -36,6 +38,8 @@ class Delegate
 public:
     Delegate()          = default;
     virtual ~Delegate() = default;
+
+    virtual FabricTable * GetFabricTable() const;
 
     virtual CHIP_ERROR Startup(ServerClusterContext & context);
     virtual void Shutdown(ClusterShutdownType type);

@@ -26,6 +26,8 @@
 #include <app/clusters/thermostat-server/ThermostatDelegate.h>
 
 namespace chip {
+class FabricTable;
+
 namespace app {
 namespace Clusters {
 namespace Thermostat {
@@ -33,9 +35,12 @@ namespace Thermostat {
 class ThermostatDelegate : public Delegate
 {
 public:
-    ThermostatDelegate(EndpointId endpoint, AttributePersistenceProvider * provider = nullptr) :
-        mEndpointId(endpoint), mProvider(provider)
+    ThermostatDelegate(EndpointId endpoint, AttributePersistenceProvider * provider = nullptr,
+                       FabricTable * fabricTable = nullptr) :
+        mEndpointId(endpoint), mProvider(provider), mFabricTable(fabricTable)
     {}
+
+    FabricTable * GetFabricTable() const override;
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 
@@ -65,6 +70,7 @@ public:
 private:
     EndpointId mEndpointId;
     AttributePersistenceProvider * mProvider = nullptr;
+    FabricTable * mFabricTable               = nullptr;
 
     ControlSequenceOfOperationEnum mControlSequenceOfOperation = ControlSequenceOfOperationEnum::kCoolingAndHeating;
 

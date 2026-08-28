@@ -97,16 +97,22 @@ Status AtomicWriteSession::ExecuteAtomicAction(AtomicAttributes & attributeStatu
 
 void AtomicWriteSession::Startup()
 {
-    if (auto status = mFabricTable.AddFabricDelegate(this); status != CHIP_NO_ERROR)
+    if (mFabricTable != nullptr)
     {
-        ChipLogError(Zcl, "Failed to add fabric delegate to Thermostat Cluster");
+        if (auto status = mFabricTable->AddFabricDelegate(this); status != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to add fabric delegate to Thermostat Cluster");
+        }
     }
 }
 
 void AtomicWriteSession::Shutdown()
 {
     ResetAtomicWrite();
-    mFabricTable.RemoveFabricDelegate(this);
+    if (mFabricTable != nullptr)
+    {
+        mFabricTable->RemoveFabricDelegate(this);
+    }
 }
 
 bool AtomicWriteSession::InAtomicWrite(std::optional<AttributeId> attributeId)

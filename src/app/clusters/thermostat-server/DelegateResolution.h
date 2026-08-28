@@ -49,16 +49,27 @@ constexpr decltype(auto) FindDelegate(First && first, Rest &&... rest)
     }
 }
 
-template <bool Enabled, typename FeatureType, typename... DelegateArgs, typename... ExtraArgs>
-static auto MakeFeature(const std::tuple<DelegateArgs &...> & delegates, ExtraArgs &&... extraArgs)
+template <typename FeatureType, typename Args, typename... DelegateArgs, std::size_t... Index>
+constexpr auto ConstructFeature(Args && args, const std::tuple<DelegateArgs &...> & delegates,
+                                    std::index_sequence<Index...>)
+{
+    return std::apply(
+        [&](auto &... dels) {
+            return FeatureType(std::get<Index>(std::forward<Args>(args))...,
+                               FindDelegate<typename FeatureType::Delegate>(dels...));
+        },
+        delegates);
+}
+
+template <bool Enabled, typename FeatureType, typename... Args>
+static auto MakeFeature(Args &&... args)
 {
     if constexpr (Enabled)
     {
-        return std::apply(
-            [&](auto &... dels) {
-                return FeatureType(std::forward<ExtraArgs>(extraArgs)..., FindDelegate<typename FeatureType::Delegate>(dels...));
-            },
-            delegates);
+        constexpr size_t N = sizeof...(Args);
+        static_assert(N >= 1, "MakeFeature requires at least a delegate tuple");
+        auto argsTuple = std::forward_as_tuple(std::forward<Args>(args)...);
+        return ConstructFeature<FeatureType>(argsTuple, std::get<N - 1>(argsTuple), std::make_index_sequence<N - 1>{});
     }
     else
     {
@@ -72,7 +83,7 @@ static auto MakeAtomicWriteSession(AtomicWriteSession::Delegate & delegate, Time
 {
     if constexpr (Enabled)
     {
-        return AtomicWriteSession(delegate, timerDelegate, *fabricTable);
+        return AtomicWriteSession(delegate, timerDelegate, fabricTable);
     }
     else
     {

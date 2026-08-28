@@ -22,6 +22,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/reporting/reporting.h>
+#include <app/server/Server.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -35,6 +36,11 @@ using namespace chip::app::Clusters::Thermostat::Attributes;
 using namespace chip::app::Clusters::Thermostat::Structs;
 using namespace Protocols::InteractionModel;
 using namespace System::Clock;
+
+FabricTable * ThermostatDelegate::GetFabricTable() const
+{
+    return mFabricTable != nullptr ? mFabricTable : &Server::GetInstance().GetFabricTable();
+}
 
 CHIP_ERROR ThermostatDelegate::Startup(ServerClusterContext & context)
 {

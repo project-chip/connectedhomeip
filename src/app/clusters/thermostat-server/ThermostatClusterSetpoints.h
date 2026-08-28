@@ -85,8 +85,8 @@ public:
 
     ThermostatSetpoints(ThermostatClusterBase & cluster, Delegates &... delegates) :
         ThermostatSetpointsBase(cluster),
-        mCooling(detail::MakeFeature<kHasCooling, ThermostatCoolingSetpoints>(std::forward_as_tuple(delegates...), *this)),
-        mHeating(detail::MakeFeature<kHasHeating, ThermostatHeatingSetpoints>(std::forward_as_tuple(delegates...), *this)),
+        mCooling(detail::MakeFeature<kHasCooling, ThermostatCoolingSetpoints>(*this, std::forward_as_tuple(delegates...))),
+        mHeating(detail::MakeFeature<kHasHeating, ThermostatHeatingSetpoints>(*this, std::forward_as_tuple(delegates...))),
         mAuto(detail::MakeFeature<kHasAuto, ThermostatAutoSetpoints>(std::forward_as_tuple(delegates...)))
     {}
 

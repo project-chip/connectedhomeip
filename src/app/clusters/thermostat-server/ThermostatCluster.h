@@ -25,7 +25,6 @@
 #include "ThermostatClusterSetpoints.h"
 #include "ThermostatClusterSuggestions.h"
 #include <clusters/Thermostat/Metadata.h>
-#include <credentials/FabricTable.h>
 #include <type_traits>
 #include <variant>
 
@@ -51,15 +50,21 @@ public:
 
     ThermostatCluster(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features, const Config & config,
                       Delegates &... delegates) :
-        ThermostatCluster(aEndpointId, features, config, static_cast<FabricTable *>(nullptr), delegates...)
+        ThermostatClusterBase(aEndpointId, features, config, detail::FindDelegate<Thermostat::Delegate>(delegates...)),
+        mSetpoints(*this, delegates...),
+        mAtomicWriteSession(
+            detail::MakeAtomicWriteSession<kRequiresAtomicWrite>(*this, config.mTimerDelegate, mDelegate.GetFabricTable())),
+        mHold(detail::MakeFeature<kHasHold, ThermostatHold>(*this, std::forward_as_tuple(delegates...))),
+        mPresets(detail::MakeFeature<kHasPresets, ThermostatPresets>(*this, mAtomicWriteSession,
+                                                                    std::forward_as_tuple(delegates...))),
+        mSuggestions(
+            detail::MakeFeature<kHasSuggestions, ThermostatSuggestions>(*this, mPresets, std::forward_as_tuple(delegates...))),
+        mOccupancy(detail::MakeFeature<kHasOccupancy, ThermostatOccupancy>(*this, std::forward_as_tuple(delegates...)))
     {
-        static_assert(!kRequiresAtomicWrite, "Features requiring atomic write (e.g. Presets) require a FabricTable");
+        static_assert(sizeof...(Delegates) > 0, "ThermostatCluster requires at least one delegate");
+        static_assert(detail::kArgsHasDelegate<Thermostat::Delegate, Delegates...>,
+                      "Missing Thermostat::Delegate in constructor arguments");
     }
-
-    ThermostatCluster(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features, const Config & config,
-                      FabricTable & fabricTable, Delegates &... delegates) :
-        ThermostatCluster(aEndpointId, features, config, &fabricTable, delegates...)
-    {}
 
     CHIP_ERROR Startup(ServerClusterContext & context) override
     {
@@ -376,23 +381,6 @@ public:
     }
 
 private:
-    ThermostatCluster(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features, const Config & config,
-                      FabricTable * fabricTable, Delegates &... delegates) :
-        ThermostatClusterBase(aEndpointId, features, config, detail::FindDelegate<Thermostat::Delegate>(delegates...)),
-        mSetpoints(*this, delegates...),
-        mAtomicWriteSession(detail::MakeAtomicWriteSession<kRequiresAtomicWrite>(*this, config.mTimerDelegate, fabricTable)),
-        mHold(detail::MakeFeature<kHasHold, ThermostatHold>(std::forward_as_tuple(delegates...), *this)),
-        mPresets(
-            detail::MakeFeature<kHasPresets, ThermostatPresets>(std::forward_as_tuple(delegates...), *this, mAtomicWriteSession)),
-        mSuggestions(
-            detail::MakeFeature<kHasSuggestions, ThermostatSuggestions>(std::forward_as_tuple(delegates...), *this, mPresets)),
-        mOccupancy(detail::MakeFeature<kHasOccupancy, ThermostatOccupancy>(std::forward_as_tuple(delegates...), *this))
-    {
-        static_assert(sizeof...(Delegates) > 0, "ThermostatCluster requires at least one delegate");
-        static_assert(detail::kArgsHasDelegate<Thermostat::Delegate, Delegates...>,
-                      "Missing Thermostat::Delegate in constructor arguments");
-    }
-
     ThermostatSetpoints<Delegates...> mSetpoints;
     CHIP_NO_UNIQUE_ADDRESS std::conditional_t<kRequiresAtomicWrite, AtomicWriteSession, std::monostate> mAtomicWriteSession;
     CHIP_NO_UNIQUE_ADDRESS std::conditional_t<kHasHold, ThermostatHold, std::monostate> mHold;
@@ -404,10 +392,6 @@ private:
 template <typename... DelegateArgs>
 ThermostatCluster(EndpointId, BitFlags<Thermostat::Feature>, const ThermostatClusterBase::Config &, DelegateArgs &...)
     -> ThermostatCluster<std::decay_t<DelegateArgs>...>;
-
-template <typename... DelegateArgs>
-ThermostatCluster(EndpointId, BitFlags<Thermostat::Feature>, const ThermostatClusterBase::Config &, FabricTable &,
-                  DelegateArgs &...) -> ThermostatCluster<std::decay_t<DelegateArgs>...>;
 
 using FullFeaturedThermostatCluster =
     ThermostatCluster<Thermostat::Delegate, ThermostatHeatingSetpoints::Delegate, ThermostatCoolingSetpoints::Delegate,
