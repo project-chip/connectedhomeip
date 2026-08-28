@@ -1,6 +1,7 @@
 from mobly import asserts
 
 from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import VERSION_TO_DM, PrebuiltDataModelDirectory, build_xml_data_model, latest_prebuilt_directory
 
 
