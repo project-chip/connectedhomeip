@@ -42,6 +42,16 @@ DeviceEnergyManagementDelegate::DeviceEnergyManagementDelegate() :
     mPowerRangeAdjustmentStartTimeUtc(0)
 {}
 
+DeviceEnergyManagementDelegate::~DeviceEnergyManagementDelegate()
+{
+    // Cancel all pending timers to prevent use-after-free when the delegate is destroyed
+    // while timers are still active. The timer callbacks hold a 'this' pointer that becomes
+    // invalid after the delegate is destroyed.
+    DeviceLayer::SystemLayer().CancelTimer(PowerAdjustTimerExpiry, this);
+    DeviceLayer::SystemLayer().CancelTimer(PauseRequestTimerExpiry, this);
+    DeviceLayer::SystemLayer().CancelTimer(PowerRangeAdjustTimerExpiry, this);
+}
+
 void DeviceEnergyManagementDelegate::SetDeviceEnergyManagementInstance(DeviceEnergyManagement::Instance & instance)
 {
     mpDEMInstance = &instance;
