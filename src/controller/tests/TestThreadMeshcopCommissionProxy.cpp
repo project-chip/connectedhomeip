@@ -22,6 +22,7 @@
 
 #include <cstdint>
 #include <sstream>
+#include <string_view>
 #include <vector>
 
 namespace chip {
@@ -72,8 +73,24 @@ constexpr uint8_t kCompleteMattercResponse[] = {
     0x00, 0x00, 0x00, 0x78, 0x00, 0x04, 0x03, 'D',  '=',  '0',              // TTL and D=0 TXT entry
 };
 
-template <size_t N>
-void SendJoinerPacket(ThreadMeshcopCommissionProxy & proxy, const uint8_t (&packet)[N])
+std::vector<uint8_t> MakeMattercResponseWithDiscriminator(std::string_view discriminator)
+{
+    constexpr size_t kEncodedDiscriminatorTxtRecordSize = 6;
+    std::vector<uint8_t> response(std::begin(kCompleteMattercResponse),
+                                  std::end(kCompleteMattercResponse) - kEncodedDiscriminatorTxtRecordSize);
+    const size_t txtEntrySize = 2 + discriminator.size(); // "D=" and its value
+
+    response.push_back(0);
+    response.push_back(static_cast<uint8_t>(txtEntrySize + 1));
+    response.push_back(static_cast<uint8_t>(txtEntrySize));
+    response.push_back('D');
+    response.push_back('=');
+    response.insert(response.end(), discriminator.begin(), discriminator.end());
+    return response;
+}
+
+template <typename Packet>
+void SendJoinerPacket(ThreadMeshcopCommissionProxy & proxy, const Packet & packet)
 {
     proxy.OnJoinerMessage(std::vector<uint8_t>(std::begin(kJoinerId), std::end(kJoinerId)), 49154,
                           std::vector<uint8_t>(std::begin(packet), std::end(packet)));
@@ -121,6 +138,37 @@ TEST(TestThreadMeshcopCommissionProxy, WaitsForCompleteResponseAfterSrvOnlyRespo
 
     SendJoinerPacket(proxy, kCompleteMattercResponse);
     EXPECT_TRUE(LastDiscoveryIsValid(proxy));
+}
+
+TEST(TestThreadMeshcopCommissionProxy, WaitsForValidDiscriminatorAfterMalformedValues)
+{
+    constexpr std::string_view kMalformedDiscriminators[] = { "", "abc", "0123", "70000" };
+    ThreadMeshcopCommissionProxy proxy;
+
+    for (std::string_view discriminator : kMalformedDiscriminators)
+    {
+        SendJoinerPacket(proxy, MakeMattercResponseWithDiscriminator(discriminator));
+        EXPECT_FALSE(LastDiscoveryIsValid(proxy));
+    }
+
+    SendJoinerPacket(proxy, kCompleteMattercResponse);
+    EXPECT_TRUE(LastDiscoveryIsValid(proxy));
+}
+
+TEST(TestThreadMeshcopCommissionProxy, IgnoresMismatchWithShortDiscriminator)
+{
+    ThreadMeshcopCommissionProxy proxy;
+    SetupDiscriminator expectedDiscriminator;
+    expectedDiscriminator.SetShortValue(1);
+    ByteSpan invalidPskc;
+    Transport::PeerAddress peerAddress;
+    Dnssd::DiscoveredNodeData nodeData;
+
+    EXPECT_EQ(proxy.Discover(invalidPskc, peerAddress, Thread::DiscoveryCode(), expectedDiscriminator, nodeData, 0),
+              CHIP_ERROR_INVALID_ARGUMENT);
+
+    SendJoinerPacket(proxy, kCompleteMattercResponse);
+    EXPECT_FALSE(LastDiscoveryIsValid(proxy));
 }
 
 TEST(TestThreadMeshcopCommissionProxy, AcceptsCompleteResponse)

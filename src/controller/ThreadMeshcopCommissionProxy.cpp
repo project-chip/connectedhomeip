@@ -68,6 +68,27 @@ std::vector<uint8_t> DiscoveryCodeToVector(Thread::DiscoveryCode code)
     return std::vector<uint8_t>(bytes, bytes + sizeof(bytes));
 }
 
+bool IsValidLongDiscriminatorTxtValue(ByteSpan value)
+{
+    if (value.empty() || value.size() > 4 || (value.size() > 1 && value[0] == '0'))
+    {
+        return false;
+    }
+
+    uint16_t discriminator = 0;
+    for (uint8_t digit : value)
+    {
+        if (digit < '0' || digit > '9')
+        {
+            return false;
+        }
+
+        discriminator = static_cast<uint16_t>(discriminator * 10 + digit - '0');
+    }
+
+    return discriminator < (1u << SetupDiscriminator::kLongBits);
+}
+
 } // namespace
 
 namespace chip {
@@ -308,7 +329,7 @@ void ThreadMeshcopCommissionProxy::OnRecord(const chip::Dnssd::BytesRange & name
 
     if (name.Size() == 1 && (name.Start()[0] == 'D' || name.Start()[0] == 'd'))
     {
-        mCurrentTxtRecordHasDiscriminator = true;
+        mCurrentTxtRecordHasDiscriminator = IsValidLongDiscriminatorTxtValue(val);
     }
 }
 
@@ -347,8 +368,11 @@ void ThreadMeshcopCommissionProxy::ProcessAnnouncement(const std::vector<uint8_t
 
     if (!mExpectedDiscriminator.MatchesLongDiscriminator(static_cast<uint16_t>(discoveredDiscriminator)))
     {
-        ChipLogProgress(Controller, "Discriminator mismatch (Expected %u, Got %u). Ignoring announcement.",
-                        mExpectedDiscriminator.GetLongValue(), discoveredDiscriminator);
+        uint16_t expectedDiscriminator = mExpectedDiscriminator.IsShortDiscriminator() ? mExpectedDiscriminator.GetShortValue()
+                                                                                       : mExpectedDiscriminator.GetLongValue();
+        ChipLogProgress(Controller, "Discriminator mismatch (Expected %s %u, Got long %u). Ignoring announcement.",
+                        mExpectedDiscriminator.IsShortDiscriminator() ? "short" : "long", expectedDiscriminator,
+                        discoveredDiscriminator);
         return;
     }
 
