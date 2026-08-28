@@ -80,8 +80,11 @@ ClustersWithShutdownFunctions:
 ClustersWithPreAttributeChangeFunctions:
     # keep-sorted start
     - Door Lock
+    - Energy Preference
     - Laundry Dryer Controls
+    - Laundry Washer Controls
     - Pump Configuration and Control
+    - Thermostat
     - Thermostat User Interface Configuration
     # keep-sorted end
     # Code Driven clusters are clusters that implement the ServerClusterInterface.
