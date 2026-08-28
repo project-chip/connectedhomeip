@@ -99,6 +99,9 @@ config CHIP_CRYPTO_PSA
 	imply PSA_WANT_ALG_HMAC
 	imply PSA_WANT_ALG_ECDSA
 
+config CHIP_CRYPTO_HW_ENGINE
+	bool "Crypto hardware engine for acceleration and key storage"
+
 config CHIP_FACTORY_RESET_ERASE_SETTINGS
 	depends on SETTINGS_NVS || SETTINGS_ZMS
 
