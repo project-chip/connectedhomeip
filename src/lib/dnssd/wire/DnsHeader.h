@@ -17,9 +17,10 @@
 #pragma once
 
 #include <lib/core/CHIPEncoding.h>
+#include <lib/dnssd/wire/Constants.h>
 
-namespace mdns {
-namespace Minimal {
+namespace chip {
+namespace Dnssd {
 
 /**
  * Wrapper around a MDNS bit-packed flags in a DNS header as defined in
@@ -59,11 +60,26 @@ public:
     bool IsTruncated() const { return (mValue & kTruncationMask) != 0; }
     BitPackedFlags & SetTruncated(bool value) { return value ? SetMask(kTruncationMask) : ClearMask(kTruncationMask); }
 
+    Opcode GetOpcode() const { return static_cast<Opcode>((mValue & kOpcodeMask) >> kOpcodeShift); }
+    BitPackedFlags & SetOpcode(Opcode opcode)
+    {
+        ClearMask(kOpcodeMask);
+        mValue = static_cast<uint16_t>(mValue | ((static_cast<uint16_t>(opcode) & 0x0F) << kOpcodeShift));
+        return *this;
+    }
+
+    /// Lower 4 bits of the DNS header RCODE
+    uint8_t GetResponseCodeBits() const { return static_cast<uint8_t>(mValue & kResponseCodeMask); }
+
+    /// Full 16-bit flags value, including OPCODE and RCODE.
+    /// Prefer this over RawValue() for DNS Update (RFC 2136) and other non-mDNS messages.
+    uint16_t FullValue() const { return mValue; }
+
     /// Validates that the message does not need to be ignored according to
     /// RFC 6762
     // TODO: DNS Update carries an OpCode (5) and often non-zero return code. We will need to change this for ULD/SRP support.
     // (RFC 2136)
-    bool IsValidMdns() const { return (mValue & (kOpcodeMask | kReturnCodeMask)) == 0; }
+    bool IsValidMdns() const { return (mValue & (kOpcodeMask | kResponseCodeMask)) == 0; }
 
 private:
     uint16_t mValue = 0;
@@ -80,15 +96,15 @@ private:
         return *this;
     }
 
-    // Mask to limit values to what RFC 6762 consideres useful
-    // 1111 1110 0000 0000 = FE0F
-    // TODO(cecille): need to better document this value. Why is the comment different than the value?
-    static constexpr uint16_t kMdnsNonIgnoredMask = 0x8E08;
-    static constexpr uint16_t kAuthoritativeMask  = 0x0400;
-    static constexpr uint16_t kIsResponseMask     = 0x8000;
-    static constexpr uint16_t kOpcodeMask         = 0x7800;
-    static constexpr uint16_t kTruncationMask     = 0x0200;
-    static constexpr uint16_t kReturnCodeMask     = 0x000F;
+    static constexpr uint16_t kAuthoritativeMask = 0x0400;
+    static constexpr uint16_t kIsResponseMask    = 0x8000;
+    static constexpr uint16_t kOpcodeShift       = 11;
+    static constexpr uint16_t kOpcodeMask        = 0x0F << kOpcodeShift;
+    static constexpr uint16_t kTruncationMask    = 0x0200;
+    static constexpr uint16_t kResponseCodeMask  = 0x000F;
+
+    // Bits preserved by RawValue()/SetFlags for mDNS (RFC 6762: OPCODE/RCODE must be 0).
+    static constexpr uint16_t kMdnsNonIgnoredMask = kIsResponseMask | kAuthoritativeMask | kTruncationMask;
 };
 
 /**
@@ -146,7 +162,13 @@ public:
     }
 
     HeaderRef & SetMessageId(uint16_t value) { return Set16At(kMessageIdOffset, value); }
+
+    /// Writes QR/AA/TC only; OPCODE and RCODE are forced to 0 (RFC 6762).
     HeaderRef & SetFlags(BitPackedFlags flags) { return Set16At(kFlagsOffset, flags.RawValue()); }
+
+    /// Writes the full flags word, including OPCODE and RCODE. Use for DNS Update.
+    HeaderRef & SetAllFlags(BitPackedFlags flags) { return Set16At(kFlagsOffset, flags.FullValue()); }
+
     HeaderRef & SetQueryCount(uint16_t value) { return Set16At(kQueryCountOffset, value); }
     HeaderRef & SetAnswerCount(uint16_t value) { return Set16At(kAnswerCountOffset, value); }
     HeaderRef & SetAuthorityCount(uint16_t value) { return Set16At(kAuthorityCountOffset, value); }
@@ -166,5 +188,5 @@ private:
     HeaderRef & SetRawFlags(uint16_t value) { return Set16At(kFlagsOffset, value); }
 };
 
-} // namespace Minimal
-} // namespace mdns
+} // namespace Dnssd
+} // namespace chip

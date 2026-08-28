@@ -1,0 +1,78 @@
+steps:
+    - name: "ghcr.io/project-chip/chip-build-vscode:206"
+      entrypoint: "bash"
+      args:
+          - "-c"
+          - |
+              git config --global --add safe.directory "*"
+              python scripts/checkout_submodules.py --shallow --recursive --platform esp32 nrfconnect silabs linux android 
+      id: Submodules
+    - name: "ghcr.io/project-chip/chip-build-vscode:206"
+      # NOTE: silabs boostrap is NOT done with the rest as it requests a conflicting
+      #       jinja2 version (asks for 3.1.3 when constraints.txt asks for 3.0.3)
+      env:
+          - PW_ENVIRONMENT_ROOT=/pwenv
+      args:
+          - "-c"
+          - source ./scripts/bootstrap.sh -p all,esp32,nrfconnect,linux,android
+      id: Bootstrap
+      waitFor:
+          - Submodules
+      entrypoint: /usr/bin/bash
+      volumes:
+          - name: pwenv
+            path: /pwenv
+      timeout: 900s
+
+    - name: "ghcr.io/project-chip/chip-build-vscode:206"
+      id: AllDevices
+      env:
+          - PW_ENVIRONMENT_ROOT=/pwenv
+      args:
+          - >-
+              ./scripts/build/build_examples.py
+              --enable-flashbundle
+              --target linux-x64-all-devices-ipv6only-no-ble-no-wifi-rpc-asan-clang-test
+              --target esp32-m5stack-all-devices-ipv6only-rpc
+              build
+              --create-archives /workspace/artifacts/
+      waitFor:
+          - Bootstrap
+      entrypoint: ./scripts/run_in_build_env.sh
+      volumes:
+          - name: pwenv
+            path: /pwenv
+
+    - name: "ghcr.io/project-chip/chip-build-vscode:206"
+      id: Camera
+      env:
+          - PW_ENVIRONMENT_ROOT=/pwenv
+      args:
+          - >- # RPC not supported
+              ./scripts/build/build_examples.py
+              --enable-flashbundle
+              --target linux-x64-camera-ipv6only-no-ble-no-wifi-asan-clang-test
+              build
+              --create-archives /workspace/artifacts/
+      waitFor:
+          - AllDevices
+      entrypoint: ./scripts/run_in_build_env.sh
+      volumes:
+          - name: pwenv
+            path: /pwenv
+
+logsBucket: gs://matter-build-automation-build-logs
+
+# Global timeout for all steps
+timeout: 43200s
+queueTtl: 21600s
+
+artifacts:
+    objects:
+        location: "gs://matter-build-automation-artifacts/$PROJECT_ID/$COMMIT_SHA/"
+        paths: ["/workspace/artifacts/*.tar.gz"]
+
+# Using higher CPU machines generally speeds up builds
+options:
+    machineType: "E2_HIGHCPU_32"
+    diskSizeGb: 500

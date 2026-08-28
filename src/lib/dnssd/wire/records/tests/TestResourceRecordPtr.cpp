@@ -23,7 +23,7 @@
 namespace {
 
 using namespace chip;
-using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 using namespace chip::Encoding;
 
 TEST(TestResourceRecordPtr, TestPtrResourceRecord)
