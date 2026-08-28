@@ -95,5 +95,6 @@ class TC_AVANALY_2_2(MatterBaseTest, AVANALYTestBase):
             result = await self.write_single_attribute(attributes.TrackingEnabled(tracking_enabled_dut),
                                                        endpoint_id=endpoint)
 
+
 if __name__ == "__main__":
     default_matter_test_main()
