@@ -419,8 +419,8 @@ TEST_F(TestElectricalAlarmCluster, ModifyEnabledAlarms_DelegateRejects)
 
     ClusterTester tester(cluster);
     Commands::ModifyEnabledAlarms::Type cmd;
-    cmd.mask        = BitMask<AlarmBitmap>();
-    auto result     = tester.Invoke(Commands::ModifyEnabledAlarms::Id, cmd);
+    cmd.mask    = BitMask<AlarmBitmap>();
+    auto result = tester.Invoke(Commands::ModifyEnabledAlarms::Id, cmd);
     ASSERT_FALSE(result.IsSuccess());
     auto statusCode = result.GetStatusCode();
     if (statusCode.has_value())
@@ -443,8 +443,8 @@ TEST_F(TestElectricalAlarmCluster, ModifyEnabledAlarms_UnsupportedBits)
     // Supported is empty; any non-zero mask has unsupported bits.
     ClusterTester tester(cluster);
     Commands::ModifyEnabledAlarms::Type cmd;
-    cmd.mask        = BitMask<AlarmBitmap>(AlarmBitmap::kOverVoltage);
-    auto result     = tester.Invoke(Commands::ModifyEnabledAlarms::Id, cmd);
+    cmd.mask    = BitMask<AlarmBitmap>(AlarmBitmap::kOverVoltage);
+    auto result = tester.Invoke(Commands::ModifyEnabledAlarms::Id, cmd);
     ASSERT_FALSE(result.IsSuccess());
     auto statusCode = result.GetStatusCode();
     if (statusCode.has_value())
@@ -521,8 +521,8 @@ TEST_F(TestElectricalAlarmCluster, Reset_DelegateRejects)
 
     ClusterTester tester(cluster);
     Commands::Reset::Type cmd;
-    cmd.alarms      = supported;
-    auto result     = tester.Invoke(Commands::Reset::Id, cmd);
+    cmd.alarms  = supported;
+    auto result = tester.Invoke(Commands::Reset::Id, cmd);
     ASSERT_FALSE(result.IsSuccess());
     auto statusCode = result.GetStatusCode();
     if (statusCode.has_value())
@@ -548,7 +548,7 @@ TEST_F(TestElectricalAlarmCluster, SetThresholds_FeatureAbsent)
 
     ClusterTester tester(cluster);
     Commands::SetElectricalAlarmThresholds::Type cmd;
-    auto result     = tester.Invoke(Commands::SetElectricalAlarmThresholds::Id, cmd);
+    auto result = tester.Invoke(Commands::SetElectricalAlarmThresholds::Id, cmd);
     ASSERT_FALSE(result.IsSuccess());
     auto statusCode = result.GetStatusCode();
     if (statusCode.has_value())
