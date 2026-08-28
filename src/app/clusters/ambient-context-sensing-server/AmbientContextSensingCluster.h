@@ -98,6 +98,8 @@ public:
     CHIP_ERROR SetAmbientContextTypeSupported(const Span<AmbientContextSensing::SemanticTagType> & ACTypeList);
     CHIP_ERROR AddDetection(const AmbientContextSensing::AmbientContextSensingType & sensedEvent);
     DataModel::ActionReturnStatus SetObjectCountConfig(const AmbientContextSensing::ObjectCountConfigType & objectCountConfig);
+    // The returned countingObject.label references cluster-owned storage: it is valid only until
+    // the next SetObjectCountConfig call and must not be stored by the caller.
     AmbientContextSensing::ObjectCountConfigType GetObjectCountConfig() { return mObjectCountConfig; }
     CHIP_ERROR SetObjectCount(uint16_t objectCount);
     uint16_t GetObjectCount() { return mObjectCount; }
@@ -152,6 +154,10 @@ private:
             },
             .objectCountThreshold = AmbientContextSensing::kDefaultCountThreshold,
         };
+    // Backing store for mObjectCountConfig.countingObject.label. The decoded CharSpan points into
+    // the write request payload, which is released when the write transaction completes.
+    char mObjectCountConfigLabel[AmbientContextSensing::kMaxSemanticTagLabelLength] = {};
+
     uint16_t mObjectCount = 0;
     System::Clock::Timestamp mObjectCountStartTime;
     uint64_t mObjectCountStartEpoch;

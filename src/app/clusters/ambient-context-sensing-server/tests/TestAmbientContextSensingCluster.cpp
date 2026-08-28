@@ -28,6 +28,9 @@
 #include <clusters/AmbientContextSensing/Attributes.h>
 #include <clusters/AmbientContextSensing/Metadata.h>
 #include <lib/support/TimerDelegateMock.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
+#include <system/SystemPacketBuffer.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -901,4 +904,240 @@ TEST_F(TestAmbientContextSensingCluster, TestPredictActivity)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+<<<<<<< HEAD
+=======
+// The ObjectCountConfig label decodes into a CharSpan that aliases the write request's
+// PacketBuffer, so the cluster must copy it into storage it owns before retaining it.
+TEST_F(TestAmbientContextSensingCluster, TestObjectCountConfigLabelOutlivesRequestBuffer)
+{
+    chip::Testing::TestServerClusterContext context;
+    AmbientContextSensingCluster cluster{ kTestEndpointId,
+                                          AmbientContextSensingCluster::Config{ mMockTimerDelegate }.WithFeatures(
+                                              BitMask<AmbientContextSensing::Feature>(kFeaturesAllForACSTest)) };
+    ASSERT_SUCCESS(cluster.Startup(context.Get()));
+
+    // 64 characters, the longest label the spec allows for a semantic tag.
+    constexpr char kLabel[]       = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+    constexpr size_t kLabelLength = sizeof(kLabel) - 1;
+    static_assert(kLabelLength == 64, "label must exercise the maximum permitted length");
+
+    ObjectCountConfigType configToWrite;
+    // A non-null mfgCode skips the AmbientContextTypeSupported membership check.
+    configToWrite.countingObject.mfgCode     = DataModel::MakeNullable(VendorId::TestVendor1);
+    configToWrite.countingObject.namespaceID = kNamespaceIdentifiedObject;
+    configToWrite.countingObject.tag         = static_cast<uint8_t>(TagIdentifiedObject::kAdult);
+    configToWrite.countingObject.label       = MakeOptional(DataModel::MakeNullable(CharSpan(kLabel, kLabelLength)));
+    configToWrite.objectCountThreshold       = 5;
+
+    constexpr uint16_t kPayloadSize = 128;
+    {
+        // Mirror WriteHandler::ProcessWriteRequest: the payload lives in a PacketBuffer owned by a
+        // PacketBufferTLVReader that is destroyed once the write transaction returns.
+        System::PacketBufferHandle payload = System::PacketBufferHandle::New(kPayloadSize, 0);
+        ASSERT_FALSE(payload.IsNull());
+
+        TLV::TLVWriter writer;
+        writer.Init(payload->Start(), payload->MaxDataLength());
+        ASSERT_SUCCESS(DataModel::Encode(writer, TLV::AnonymousTag(), configToWrite));
+        ASSERT_SUCCESS(writer.Finalize());
+        payload->SetDataLength(static_cast<uint16_t>(writer.GetLengthWritten()));
+
+        System::PacketBufferTLVReader reader;
+        reader.Init(std::move(payload));
+        ASSERT_SUCCESS(reader.Next());
+
+        AttributeValueDecoder decoder(reader, chip::Testing::kAdminSubjectDescriptor);
+        DataModel::WriteAttributeRequest request(
+            ConcreteAttributePath(kTestEndpointId, AmbientContextSensing::Id, Attributes::ObjectCountConfig::Id),
+            chip::Testing::kAdminSubjectDescriptor);
+
+        EXPECT_TRUE(cluster.WriteAttribute(request, decoder).IsSuccess());
+    }
+
+    // Claim the released region so a retained span reads foreign bytes rather than the written
+    // label. Under ASan the quarantine defers reuse and the sanitizer reports the read below
+    // instead.
+    System::PacketBufferHandle reuse = System::PacketBufferHandle::New(kPayloadSize, 0);
+    ASSERT_FALSE(reuse.IsNull());
+    memset(reuse->Start(), 'Z', reuse->MaxDataLength());
+
+    chip::Testing::ClusterTester tester(cluster);
+    Attributes::ObjectCountConfig::TypeInfo::DecodableType readBack;
+    ASSERT_EQ(tester.ReadAttribute(Attributes::ObjectCountConfig::Id, readBack), CHIP_NO_ERROR);
+
+    ASSERT_TRUE(readBack.countingObject.label.HasValue());
+    ASSERT_FALSE(readBack.countingObject.label.Value().IsNull());
+    EXPECT_TRUE(readBack.countingObject.label.Value().Value().data_equal(CharSpan(kLabel, kLabelLength)));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// The spec bounds a semantic tag label at 64 characters.
+TEST_F(TestAmbientContextSensingCluster, TestObjectCountConfigRejectsOverlongLabel)
+{
+    chip::Testing::TestServerClusterContext context;
+    AmbientContextSensingCluster cluster{ kTestEndpointId,
+                                          AmbientContextSensingCluster::Config{ mMockTimerDelegate }.WithFeatures(
+                                              BitMask<AmbientContextSensing::Feature>(kFeaturesAllForACSTest)) };
+    ASSERT_SUCCESS(cluster.Startup(context.Get()));
+
+    static char sOverlongLabel[200];
+    memset(sOverlongLabel, 'a', sizeof(sOverlongLabel));
+
+    ObjectCountConfigType config;
+    config.countingObject.mfgCode     = DataModel::MakeNullable(VendorId::TestVendor1);
+    config.countingObject.namespaceID = kNamespaceIdentifiedObject;
+    config.countingObject.tag         = static_cast<uint8_t>(TagIdentifiedObject::kAdult);
+    config.countingObject.label       = MakeOptional(DataModel::MakeNullable(CharSpan(sOverlongLabel, sizeof(sOverlongLabel))));
+    config.objectCountThreshold       = 5;
+
+    EXPECT_EQ(cluster.SetObjectCountConfig(config), Protocols::InteractionModel::Status::ConstraintError);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// The spec makes Label mandatory when MfgCode is not null.
+TEST_F(TestAmbientContextSensingCluster, TestObjectCountConfigRequiresLabelWithMfgCode)
+{
+    chip::Testing::TestServerClusterContext context;
+    AmbientContextSensingCluster cluster{ kTestEndpointId,
+                                          AmbientContextSensingCluster::Config{ mMockTimerDelegate }.WithFeatures(
+                                              BitMask<AmbientContextSensing::Feature>(kFeaturesAllForACSTest)) };
+    ASSERT_SUCCESS(cluster.Startup(context.Get()));
+
+    ObjectCountConfigType config;
+    config.countingObject.mfgCode     = DataModel::MakeNullable(VendorId::TestVendor1);
+    config.countingObject.namespaceID = kNamespaceIdentifiedObject;
+    config.countingObject.tag         = static_cast<uint8_t>(TagIdentifiedObject::kAdult);
+    config.objectCountThreshold       = 5;
+    // config.countingObject.label deliberately left absent.
+
+    EXPECT_EQ(cluster.SetObjectCountConfig(config), Protocols::InteractionModel::Status::ConstraintError);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// A write that changes only mfgCode still changes the attribute: the same tag under a different
+// manufacturer namespace denotes a different object.
+TEST_F(TestAmbientContextSensingCluster, TestObjectCountConfigMfgCodeOnlyChangeIsStored)
+{
+    chip::Testing::TestServerClusterContext context;
+    AmbientContextSensingCluster cluster{ kTestEndpointId,
+                                          AmbientContextSensingCluster::Config{ mMockTimerDelegate }.WithFeatures(
+                                              BitMask<AmbientContextSensing::Feature>(kFeaturesAllForACSTest)) };
+    ASSERT_SUCCESS(cluster.Startup(context.Get()));
+
+    static constexpr char kLabel[] = "counted";
+
+    ObjectCountConfigType config;
+    config.countingObject.mfgCode     = DataModel::MakeNullable(VendorId::TestVendor1);
+    config.countingObject.namespaceID = kNamespaceIdentifiedObject;
+    config.countingObject.tag         = static_cast<uint8_t>(TagIdentifiedObject::kAdult);
+    config.countingObject.label       = MakeOptional(DataModel::MakeNullable(CharSpan::fromCharString(kLabel)));
+    config.objectCountThreshold       = 5;
+    EXPECT_TRUE(cluster.SetObjectCountConfig(config).IsSuccess());
+
+    // Only mfgCode differs from the stored value.
+    config.countingObject.mfgCode = DataModel::MakeNullable(VendorId::TestVendor2);
+    EXPECT_TRUE(cluster.SetObjectCountConfig(config).IsSuccess());
+
+    chip::Testing::ClusterTester tester(cluster);
+    Attributes::ObjectCountConfig::TypeInfo::DecodableType readBack;
+    ASSERT_EQ(tester.ReadAttribute(Attributes::ObjectCountConfig::Id, readBack), CHIP_NO_ERROR);
+
+    ASSERT_FALSE(readBack.countingObject.mfgCode.IsNull());
+    EXPECT_EQ(readBack.countingObject.mfgCode.Value(), VendorId::TestVendor2);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// A write that changes only the label still changes the attribute and must be stored and reported.
+TEST_F(TestAmbientContextSensingCluster, TestObjectCountConfigLabelOnlyChangeIsStored)
+{
+    chip::Testing::TestServerClusterContext context;
+    AmbientContextSensingCluster cluster{ kTestEndpointId,
+                                          AmbientContextSensingCluster::Config{ mMockTimerDelegate }.WithFeatures(
+                                              BitMask<AmbientContextSensing::Feature>(kFeaturesAllForACSTest)) };
+    ASSERT_SUCCESS(cluster.Startup(context.Get()));
+
+    static constexpr char kFirstLabel[]  = "first";
+    static constexpr char kSecondLabel[] = "second";
+
+    ObjectCountConfigType config;
+    config.countingObject.mfgCode     = DataModel::MakeNullable(VendorId::TestVendor1);
+    config.countingObject.namespaceID = kNamespaceIdentifiedObject;
+    config.countingObject.tag         = static_cast<uint8_t>(TagIdentifiedObject::kAdult);
+    config.countingObject.label       = MakeOptional(DataModel::MakeNullable(CharSpan::fromCharString(kFirstLabel)));
+    config.objectCountThreshold       = 5;
+    EXPECT_TRUE(cluster.SetObjectCountConfig(config).IsSuccess());
+
+    // Only the label differs from the stored value.
+    config.countingObject.label = MakeOptional(DataModel::MakeNullable(CharSpan::fromCharString(kSecondLabel)));
+    EXPECT_TRUE(cluster.SetObjectCountConfig(config).IsSuccess());
+
+    chip::Testing::ClusterTester tester(cluster);
+    Attributes::ObjectCountConfig::TypeInfo::DecodableType readBack;
+    ASSERT_EQ(tester.ReadAttribute(Attributes::ObjectCountConfig::Id, readBack), CHIP_NO_ERROR);
+
+    ASSERT_TRUE(readBack.countingObject.label.HasValue());
+    ASSERT_FALSE(readBack.countingObject.label.Value().IsNull());
+    EXPECT_TRUE(readBack.countingObject.label.Value().Value().data_equal(CharSpan::fromCharString(kSecondLabel)));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestAmbientContextSensingCluster, TestSensorFusionSupported)
+{
+    chip::Testing::TestServerClusterContext context;
+    static TestACSDelegate testACSDelegate;
+    AmbientContextSensingCluster cluster{ kTestEndpointId,
+                                          AmbientContextSensingCluster::Config{ mMockTimerDelegate }.WithFeatures(
+                                              BitMask<AmbientContextSensing::Feature>(kFeaturesAllForACSTest)) };
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    cluster.SetDelegate(&testACSDelegate);
+    chip::Testing::ClusterTester tester(cluster);
+
+    // Set the supported list
+    Span<SemanticTagType> ACTypeList = Span<SemanticTagType>(g_kACTSupportedArray, MATTER_ARRAY_SIZE(g_kACTSupportedArray));
+    EXPECT_EQ(cluster.SetAmbientContextTypeSupported(ACTypeList), CHIP_NO_ERROR);
+
+    SemanticTagType sensorFusionSupportedArray[] = {
+        {
+            .namespaceID = kNamespaceIdentifiedHumanActivity,
+            .tag         = static_cast<uint8_t>(TagIdentifiedHumanActivity::kFall),
+        },
+        {
+            .namespaceID = kNamespaceIdentifiedObject,
+            .tag         = static_cast<uint8_t>(TagIdentifiedObject::kAdult),
+        },
+        {
+            .namespaceID = kNamespaceIdentifiedSound,
+            .tag         = static_cast<uint8_t>(TagIdentifiedSound::kObjectFall),
+        },
+    };
+
+    Span<SemanticTagType> sensorFusionSupported =
+        Span<SemanticTagType>(sensorFusionSupportedArray, MATTER_ARRAY_SIZE(sensorFusionSupportedArray));
+
+    EXPECT_EQ(cluster.SetSensorFusionSupported(sensorFusionSupported), CHIP_NO_ERROR);
+
+    // Readback SensorFusionSupported
+    DecodableList<TagDecodable> out;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::SensorFusionSupported::Id, out), CHIP_NO_ERROR);
+    size_t size = 0;
+    EXPECT_EQ(out.ComputeSize(&size), CHIP_NO_ERROR);
+    ASSERT_EQ(size, std::size(sensorFusionSupportedArray));
+
+    auto it = out.begin();
+    auto i  = size_t(0);
+    while (it.Next() && (i < std::size(sensorFusionSupportedArray)))
+    {
+        EXPECT_EQ(it.GetValue().namespaceID, sensorFusionSupportedArray[i].namespaceID);
+        EXPECT_EQ(it.GetValue().tag, sensorFusionSupportedArray[i].tag);
+        i++;
+    }
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+>>>>>>> 53ebb0c ([AmbientContextSensing] Fix ObjectCountConfig label shallow copy and spec conformance (#73663))
 } // namespace
