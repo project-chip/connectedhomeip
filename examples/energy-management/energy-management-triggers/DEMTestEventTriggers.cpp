@@ -295,8 +295,8 @@ void SetTestEventTrigger_PowerRangeAdjustment()
     // This prevents overwriting the snapshot if the trigger is activated multiple times without being cleared.
     if (!sSavedAbsMinMaxPowerIsValid)
     {
-        sSavedAbsMinPowerMw = GetDEMDelegate()->GetAbsMinPower();
-        sSavedAbsMaxPowerMw = GetDEMDelegate()->GetAbsMaxPower();
+        sSavedAbsMinPowerMw         = GetDEMDelegate()->GetAbsMinPower();
+        sSavedAbsMaxPowerMw         = GetDEMDelegate()->GetAbsMaxPower();
         sSavedAbsMinMaxPowerIsValid = true;
         ChipLogDetail(Support, "Saved AbsMinPower=% " PRId64 " mW, AbsMaxPower=% " PRId64 " mW", sSavedAbsMinPowerMw,
                       sSavedAbsMaxPowerMw);
