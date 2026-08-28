@@ -111,7 +111,7 @@ class HSTATBase(MatterBaseTest):
         """
         try:
             await self.send_single_cmd(cmd=self.SetSettings(**kwargs), endpoint=self.get_endpoint(), timedRequestTimeoutMs=1000)
-            asserts.assert_fail("Unexpected command success, for command SetSettings")
+            asserts.fail("Unexpected command success, for command SetSettings")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, error, "Unexpected error returned")
             pass
