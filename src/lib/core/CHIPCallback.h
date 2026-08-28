@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,8 +17,55 @@
 
 /**
  *  @file
- *    This file contains definitions for Callback objects for registering with
- *     Clusters and the Device
+ *
+ * Cancelable Callbacks
+ * ====================
+ *
+ * Callback<T>, Cancelable, and related classes facilitate a family of asynchronous interaction
+ * patterns, in which one component (the "caller") makes a function call to another component
+ * (referred to as the "callee" or "registrar") to request some asynchronous operation with a
+ * completion callback, or to register interest in some kind of event or notification.
+ *
+ * In contrast to passing a conventional function pointer or std::function, which only provides a
+ * "return" channel from the callee to the caller, a cancelable callback additionally gives the
+ * caller a way to send a cancellation signal to the callee/registrar when it wishes to cancel
+ * the asynchronous operation or notification registration.
+ *
+ * The specific contract around when or how the callee/registrar calls the callback or delivers
+ * events varies between use cases, but cancellation has a very strict contract that MUST be
+ * adhered to by correct implementations of this pattern: Once the caller has called Cancel() on
+ * a callback that it had passed to a callee / registrar, there will be no further invocations of
+ * the callback. This means that the callback (and possibly the caller itself) can safely be
+ * deallocated at that point without creating dangling pointers / callbacks.
+ *
+ * The flipside of this contract is that a callee/registrar that has accepted a callback MUST
+ * install a CancelFn on the underlying Cancelable. When this CancelFn is called, the callee
+ * removes the Cancelable and/or the associated callback from its internal data structures; the
+ * callee MUST NOT access the Cancelable or Callback in any way after the CancelFn returns.
+ *
+ * Refer to the documentation of Callback and Cancelable below for details.
+ *
+ * While the concrete interaction patterns vary, the following are strong recommendations,
+ * especially for asynchronous operations that have a single outcome:
+ *
+ * - Callees should accept a pointer to a single Callback<T> as the last parameter to the function,
+ *   with a function signature that covers all success and failure cases. This is generally
+ *   preferable to accepting e.g. separate OnSuccess and OnFailure callbacks, which would entail
+ *   additional bookkeeping and memory usage for both the caller and callee, and would create
+ *   separate cancellation signals. If necessary, an alternative would be to sub-class Callback<T>
+ *   to hold additional function pointer(s), e.g. `void *mCallFailure(void *, CHIP_ERROR)`.
+ *
+ * - If the callee has synchronously rejected the call outright (e.g. by returning a CHIP_ERROR)
+ *   the callback will not be called at all. If the caller cancels the callback prior to the
+ *   operation completing, the callback will not be called. Otherwise, the callback will be called
+ *   exactly once.
+ *
+ * - Callers must be prepared for their callback to be invoked synchronously from within the
+ *   function call initiating the operation. This avoids the callee having to dispatch the callback
+ *   invocation via a work queue in case of a cached or other immediate outcome.
+ *
+ * - CallFn types should always carry a `void * context` as the initial parameter, which the callee
+ *   populates from Callback.mContext when invoking the callback function (Callback.mCall).
  */
 
 #pragma once
@@ -30,15 +77,19 @@
 #include <lib/support/CodeUtils.h>
 
 namespace chip {
-
 namespace Callback {
 
 /**
- *  @class Cancelable
+ * Represents the "callee" side of a cancelable callback (see Callback below).
  *
- *    Private members of a Callback for use by subsystems that accept
- *     Callbacks for event registration/notification.
+ * The callee receives ownership of a Cancelable by calling Cancel() on a Callback provided by the
+ * caller; usually it is convenient to store the pointer to the Cancelable, and to only recover the
+ * Callback itself using Callback::FromCancelable when the time comes to invoke it.
  *
+ * The callee "registers" the callback/cancelable by setting mCancel to a CancelFn, and may then
+ * use the mNext/mPrev or mContextA/mContextB pointers to keep track of it internally as needed.
+ * (Note that the CancelFn receives only the Cancelable pointer itself, i.e. has to rely on those
+ * members to recover any context necessary to perform the cancellation and relinquish the callback.)
  */
 class Cancelable
 {
@@ -75,18 +126,27 @@ public:
 #endif // CHIP_CONFIG_CANCELABLE_HAS_INFO_STRING_FIELD
 
     /**
-     * @brief when non-null, indicates the Callback is registered with
-     *   a subsystem and that Cancelable members belong to
-     *   that subsystem
+     * When non-null, indicates that the Callback associated with this Cancelable is registered
+     * with a callee, and that the Cancelable members (mPrev, mNext, mContextA, mContextB, mInfo)
+     * belong to that callee.
+     *
+     * When this function is called (generally by Cancel()), the callee must relinquish the
+     * cancelable, and MUST NOT access the cancelable or associated callback in any way after
+     * the function returns. Note that the CancelFn does not need to clear mCancel or any other
+     * Cancelable members; this is handled automatically by Cancel().
+     *
+     * Cancellation also happens automatically during destruction.
      */
     CancelFn mCancel = nullptr;
 
     Cancelable() = default;
+    ~Cancelable() { Cancel(); }
 
     /**
-     * @brief run whatever function the callee/registrar has specified in order
-     *  to clean up any resource allocation associated with the registration,
-     *  and surrender ownership of the Cancelable's fields
+     * Runs the CancelFn (if any), and takes ownership of the Cancelable.
+     *
+     * Usually this method is called through the Callback sub-class, refer to
+     * Callback::Cancel() for more details.
      */
     Cancelable * Cancel()
     {
@@ -99,102 +159,92 @@ public:
         }
         return this;
     }
-    ~Cancelable() { Cancel(); }
 
     /**
-     * Invalidate the callee state. This is semantically a no-op in the sense that it
-     * clears state that by the contract of this class shouldn't be read after this point.
+     * Invalidate the callee state after ownership has been relinquished.
+     *
+     * This is semantically a no-op in the sense that it clears state that by the contract of this
+     * class shouldn't be read after that point anyway, but avoids dangling pointers.
+     *
+     * This is called automatically by Cancel() after the CancelFn has been invoked, but can also
+     * be called manually as part of removing the cancelable from a data structure.
      */
     void Invalidate() { mPrev = mNext = nullptr; }
 
-    Cancelable(const Cancelable &) = delete;
-    // A Cancelable links itself into intrusive cancelable lists via mNext/mPrev, so it must not be
-    // copy-assigned either: a shallow assignment would copy those list links and corrupt the lists
-    // (and silently shallow-copy any Callback subclass). Complete the rule-of-three; copy construction
-    // is already deleted above.
+    // Not copyable
+    Cancelable(const Cancelable &)             = delete;
     Cancelable & operator=(const Cancelable &) = delete;
 };
 
 typedef void (*CallFn)(void *);
 
 /**
- *  @class Callback
- *
- *    Base struct used for registration of items of interest, includes
- *     memory for list management and storing information about the registration's
- *     meaning.  Callback also defines cancellation.
- *    Callbacks can be registered with exactly one callee at a time. While
- *     registered (as indicated by a non-null mCancel function), all fields of
- *     the Callback save usercontext are "owned" by the callee, and should not
- *     be touched unless Cancel() has first been called.
- *    When a callee accepts a Callback for registration, step one is always Cancel(),
- *     in order to take ownership of Cancelable members next, prev, and info.
- *    This template class also defines a default notification function prototype.
- *
- *   One-shot semantics can be accomplished by calling Cancel() before calling mCall.
- *     Persistent registration semantics would skip that.
- *
- *   There is no provision for queueing data passed as arguments to a Callback's mCall
- *     function.  If such a thing is required, the normal pattern is to take an output
- *     parameter at Callback registration time.
- *
+ * A cancelable callback, refer to the introduction above for an overview.
  */
 template <class T = CallFn>
 class Callback : private Cancelable
 {
 public:
     /**
-     * pointer to owner context, normally passed to the run function
-     */
-    void * mContext;
-
-    /**
-     * where to call when the event of interest has occurred
-     */
-    T mCall;
-
-    /**
-     * Indication that the Callback is registered with a notifier
-     */
-    bool IsRegistered() { return (mCancel != nullptr); }
-
-    /**
-     * Cancel, i.e. de-register interest in the event,
-     * This is the only way to get access to the Cancelable, to enqueue,
-     *  store any per-registration state.
-     * There are 3 primary use cases for this API:
-     *   1. For the owner of the Callback, Cancel() means "where-ever this Callback
-     *       was put in a list or registered for an event, gimme back, remove interest".
-     *   2. To a new registrar, during a registration call, it means "hey cleanup any
-     *       current registrations, let me use the internal fields of Cancelable
-     *       to keep track of what the owner is interested in.
-     *   3. To any current registrar (i.e. when mCancel is non-null), Cancel() means:
-     *       "remove this Callback from any internal lists and free any resources
-     *        you've allocated to track the interest".
-     *
-     *  For example: a sockets library with an API like Socket::Readable(Callback<> *cb)
-     *    using an underlying persistent registration API with the OS (like epoll())
-     *    might store the file descriptor and interest mask in the scalar, put the
-     *    Callback in a list.  Cancel() would dequeue the callback and remove
-     *    the socket from the interest set
-     *
-     */
-    Cancelable * Cancel() { return Cancelable::Cancel(); }
-
-    /**
-     * public constructor
+     * Constructs a Callback with the provided function pointer and context parameter.
      */
     Callback(T call, void * context) : mContext(context), mCall(call) {}
 
     /**
-     * TODO: type-safety? It'd be nice if Cancelables that aren't Callbacks returned null
-     *    here.  https://github.com/project-chip/connectedhomeip/issues/1350
+     * Caller context, generally passed as the first argument to mCall.
+     */
+    void * mContext;
+
+    /**
+     * The function to call when the event of interest has occurred.
+     * Generally expected to be non-null.
+     */
+    T mCall;
+
+    /**
+     * Returns true if a callee/registrar has ownership of the Cancelable underlying this callback.
+     */
+    bool IsRegistered() { return (mCancel != nullptr); }
+
+    /**
+     * Cancel interest with any caller/registrar that this callback may be registered with,
+     * and take ownership of the underlying Cancelable (this method is the only way to get
+     * access to it).
+     *
+     * The "caller" and "callee" both make use of this API, but for different use cases:
+     * 1) When a caller starts an interaction with a callee, the callee calls Cancel() to gain
+     *    access to the Cancelable, and then registers its CancelFn on it in accordance with the
+     *    contract outlined in the introduction above.
+     * 2) At a later time, the caller may call Cancel() to notify the registered callee that it
+     *    is no longer interested in being called back, and to make that registered callee
+     *    relinquish the callback.
+     * Combining these use cases into the same function guarantees that if caller (accidentally?)
+     * passes a Callback that is already registered with some registrar A to a second registrar B,
+     * then the Cancel() call performed by B to take ownership also cancels interest with A.
+     *
+     * Note that ownership of the Callback itself (and the mCall and mContext members specifically)
+     * remains with the "caller" at all times; the "callee" only reads those members when invoking
+     * mCall.
+     */
+    Cancelable * Cancel() { return Cancelable::Cancel(); }
+
+    /**
+     * Allows a callee to recover the Callback associated with a Cancelable.
+     * This method is not type safe, the callee is responsible for recovering the Callback as the
+     * type that the Cancelable was obtained from.
      */
     static Callback * FromCancelable(Cancelable * ca) { return static_cast<Callback *>(ca); }
 };
 
 /**
- * @brief core of a simple doubly-linked list Callback keeper-tracker-of
+ * A doubly-linked list of Cancelables.
+ *
+ * By default the CancelFn used by this container is CallbackDeque::Dequeue, i.e. cancellation
+ * only removes a Cancelable from the list, but performs no other cleanup.
+ *
+ * Enqueue() optionally accepts a custom CancelFn, which must delegate to CallbackDeque::Dequeue.
+ * However because both Cancelable members (mPrev and mNext) are used to represent the list structure
+ * itself, such a custom CancelFn is unable to associate any additional context with each Cancelable.
  */
 class CallbackDeque : protected Cancelable
 {
@@ -210,6 +260,7 @@ public:
         // add to a doubly-linked list, set cancel function
         InsertBefore(ca, this, cancel);
     }
+
     /**
      * @brief appends
      */
@@ -288,14 +339,14 @@ public:
     }
 
     /**
-     * @brief dequeue but don't cancel, useful if
-     *     immediately putting on another list
+     * Removes a Cancelable from the CallbackDeque containing it.
+     * MUST NOT be called on a Cancelable that is not an element in a CallbackDeque.
      */
     static void Dequeue(Cancelable * ca)
     {
         _Dequeue(ca);
         ca->mCancel = nullptr;
-        ca->Invalidate();
+        ca->Invalidate(); // Cancel() already does, this but this function is also API
     }
 
     /**
