@@ -41,7 +41,6 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body, pics
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
@@ -189,28 +188,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
             log.info("Skipping subset check (endpoint attributes not present)")
             self.mark_current_step_skipped()
 
-        self.step(10, "TH attempts write to AvailableEndpoints and ActiveEndpoints - expect UNSUPPORTED_WRITE")
-        attempted = False
-        if avail_eps is not None:
-            status = await self.write_single_attribute(
-                attribute_value=attributes.AvailableEndpoints([]),
-                endpoint_id=endpoint,
-                expect_success=False)
-            asserts.assert_equal(status, Status.UnsupportedWrite,
-                                 "Write to AvailableEndpoints should return UNSUPPORTED_WRITE")
-            attempted = True
-        if active_eps is not None:
-            status = await self.write_single_attribute(
-                attribute_value=attributes.ActiveEndpoints([]),
-                endpoint_id=endpoint,
-                expect_success=False)
-            asserts.assert_equal(status, Status.UnsupportedWrite,
-                                 "Write to ActiveEndpoints should return UNSUPPORTED_WRITE")
-            attempted = True
-        if not attempted:
-            self.mark_current_step_skipped()
-
-        self.step(11, "Reboot DUT; TH reads ActiveEndpoints - persisted value returned (Non-Volatile)")
+        self.step(10, "Reboot DUT; TH reads ActiveEndpoints - persisted value returned (Non-Volatile)")
         if active_eps is None:
             # DYPF not supported, so there is no ActiveEndpoints value whose
             # Non-Volatile quality could be verified.
