@@ -23,6 +23,7 @@
 #import "MTRCluster.h"
 #import "MTRClusterStateCacheContainer_Internal.h"
 #import "MTRCluster_Internal.h"
+#import "MTRCommandWithRequiredResponse.h"
 #import "MTRDeviceDataValidation.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
@@ -1422,6 +1423,191 @@ exit:
     }
 }
 
+// An AttestationResponse is only interpretable alongside the attestation challenge of the session it
+// was requested over, which is not carried in the response itself.  Append it to the decoded data the
+// same way for both the single-command and the batched invoke paths.
+static NSDictionary<NSString *, id> * MTRResponseByAppendingAttestationChallenge(
+    NSDictionary<NSString *, id> * response, NSData * attestationChallenge)
+{
+    if (attestationChallenge == nil) {
+        return response;
+    }
+
+    NSArray<NSDictionary<NSString *, id> *> * value = response[MTRValueKey];
+    NSMutableArray<NSDictionary<NSString *, id> *> * newValue = [[NSMutableArray alloc] initWithCapacity:(value.count + 1)];
+    [newValue addObjectsFromArray:value];
+    [newValue addObject:@{
+        MTRContextTagKey : @(kAttestationChallengeTagValue),
+        MTRDataKey : @ {
+            MTRTypeKey : MTROctetStringValueType,
+            MTRValueKey : attestationChallenge,
+        },
+    }];
+    auto * newResponse = [NSMutableDictionary dictionaryWithCapacity:(response.count + 1)];
+    [newResponse addEntriesFromDictionary:response];
+    newResponse[MTRValueKey] = newValue;
+    return newResponse;
+}
+
+// Returns YES if the given cluster/command is an OperationalCredentials AttestationRequest, whose response
+// needs the session's attestation challenge appended to be interpretable.
+static BOOL MTRCommandNeedsAttestationChallenge(NSNumber * clusterID, NSNumber * commandID)
+{
+    return [clusterID isEqualToNumber:@(MTRClusterIDTypeOperationalCredentialsID)] &&
+        [commandID isEqualToNumber:@(MTRCommandIDTypeClusterOperationalCredentialsCommandAttestationRequestID)];
+}
+
+class NSObjectCommandBatchCallback final : public app::CommandSender::ExtendableCallback {
+public:
+    using OnResultsCallbackType = std::function<void(NSArray<MTRDeviceResponseValueDictionary> * results)>;
+    using OnErrorCallbackType = std::function<void(CHIP_ERROR aError)>;
+    using OnDoneCallbackType = std::function<void(app::CommandSender * commandSender)>;
+
+    NSObjectCommandBatchCallback(NSArray<MTRCommandPath *> * commandPaths, NSData * attestationChallenge,
+        OnResultsCallbackType aOnResults, OnErrorCallbackType aOnError)
+        : mCommandPaths(commandPaths)
+        , mResults([[NSMutableArray alloc] initWithCapacity:commandPaths.count])
+        , mAttestationChallenge(attestationChallenge)
+        , mOnResults(aOnResults)
+        , mOnError(aOnError)
+    {
+        for (NSUInteger i = 0; i < commandPaths.count; i++) {
+            [mResults addObject:[NSNull null]];
+        }
+    }
+
+    void SetOnDoneCallback(OnDoneCallbackType callback) { mOnDone = callback; }
+
+private:
+    // Resolves which of our commands a response belongs to.  Returns false (after logging) if the peer
+    // referenced a command we never sent.  A response without a commandRef is only expected from a peer
+    // that does not support batching, where responses arrive in request order.
+    bool ResolveIndex(Optional<uint16_t> commandRef, NSUInteger & index)
+    {
+        index = commandRef.HasValue() ? commandRef.Value() : mFallbackIndex++;
+        if (index >= mResults.count) {
+            MTR_LOG_ERROR("Batch invoke response references command index %llu but only %llu commands were sent; dropping it",
+                static_cast<unsigned long long>(index), static_cast<unsigned long long>(mResults.count));
+            return false;
+        }
+        return true;
+    }
+
+    // Validates that a response we got for the command at the given index matches what we asked for, the
+    // same way NSObjectCommandCallback does for the single-command path.  Returns false (after placing an
+    // error result) if it does not, so one bogus response does not get matched against another command's
+    // requiredResponse.
+    bool ValidateResponsePath(NSUInteger index, const app::ConcreteCommandPath & responsePath, bool isDataResponse)
+    {
+        MTRCommandPath * requested = mCommandPaths[index];
+        // A data response carries its own (response) command id, which we do not know up front, so only
+        // the cluster can be checked.  A status response must come back on the command we sent.
+        bool matches = responsePath.mClusterId == static_cast<chip::ClusterId>([requested.cluster unsignedLongValue])
+            && (isDataResponse || responsePath.mCommandId == static_cast<chip::CommandId>([requested.command unsignedLongValue]));
+        if (!matches) {
+            MTR_LOG_ERROR("Batch invoke got a response for cluster 0x%llx command 0x%llx but command %llu was %@; treating it as a "
+                          "schema mismatch",
+                static_cast<unsigned long long>(responsePath.mClusterId), static_cast<unsigned long long>(responsePath.mCommandId),
+                static_cast<unsigned long long>(index), requested);
+            mResults[index] = @ {
+                MTRCommandPathKey : requested,
+                MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_SCHEMA_MISMATCH],
+            };
+        }
+        return matches;
+    }
+
+    void OnResponse(app::CommandSender * apCommandSender, const app::CommandSender::ResponseData & aResponseData) override
+    {
+        // Resolve which command this response belongs to before trusting its path, so validation and the
+        // attestation-challenge fixup below look at the command we actually sent.
+        NSUInteger index;
+        if (!ResolveIndex(aResponseData.commandRef, index)) {
+            return;
+        }
+
+        bool isDataResponse = (aResponseData.data != nullptr);
+        if (!ValidateResponsePath(index, aResponseData.path, isDataResponse)) {
+            return;
+        }
+
+        auto * path = [[MTRCommandPath alloc] initWithPath:aResponseData.path];
+        if (isDataResponse) {
+            MTRDataValueDictionaryDecodableType response;
+            CHIP_ERROR err = app::DataModel::Decode(*aResponseData.data, response);
+            if (err != CHIP_NO_ERROR) {
+                mError = err;
+                return;
+            }
+            NSDictionary<NSString *, id> * decoded = response.GetDecodedObject();
+            if (decoded != nil) {
+                if (MTRCommandNeedsAttestationChallenge(mCommandPaths[index].cluster, mCommandPaths[index].command)) {
+                    decoded = MTRResponseByAppendingAttestationChallenge(decoded, mAttestationChallenge);
+                }
+                mResults[index] = @ { MTRCommandPathKey : path, MTRDataKey : decoded };
+            } else {
+                mResults[index] = @ { MTRCommandPathKey : path };
+            }
+        } else if (aResponseData.statusIB.IsFailure()) {
+            mResults[index] = @ {
+                MTRCommandPathKey : path,
+                MTRErrorKey : [MTRError errorForIMStatus:aResponseData.statusIB],
+            };
+        } else {
+            mResults[index] = @ { MTRCommandPathKey : path };
+        }
+    }
+
+    void OnNoResponse(app::CommandSender * apCommandSender, const app::CommandSender::NoResponseData & aNoResponseData) override
+    {
+        NSUInteger index;
+        if (!ResolveIndex(MakeOptional(aNoResponseData.commandRef), index)) {
+            return;
+        }
+        mResults[index] = @ {
+            MTRCommandPathKey : mCommandPaths[index],
+            MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_TIMEOUT],
+        };
+    }
+
+    void OnError(const app::CommandSender * apCommandSender, const app::CommandSender::ErrorData & aErrorData) override
+    {
+        if (mError == CHIP_NO_ERROR) {
+            mError = aErrorData.error;
+        } else {
+            MTR_LOG_ERROR("Batch invoke got another error (%s) after (%s); keeping the first",
+                chip::ErrorStr(aErrorData.error), chip::ErrorStr(mError));
+        }
+    }
+
+    void OnDone(app::CommandSender * apCommandSender) override
+    {
+        if (mError != CHIP_NO_ERROR) {
+            mOnError(mError);
+        } else {
+            for (NSUInteger i = 0; i < mResults.count; i++) {
+                if (mResults[i] == [NSNull null]) {
+                    mResults[i] = @ {
+                        MTRCommandPathKey : mCommandPaths[i],
+                        MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE],
+                    };
+                }
+            }
+            mOnResults(mResults);
+        }
+        mOnDone(apCommandSender);
+    }
+
+    NSArray<MTRCommandPath *> * mCommandPaths;
+    NSMutableArray * mResults;
+    NSData * mAttestationChallenge;
+    OnResultsCallbackType mOnResults;
+    OnErrorCallbackType mOnError;
+    OnDoneCallbackType mOnDone;
+    CHIP_ERROR mError = CHIP_NO_ERROR;
+    NSUInteger mFallbackIndex = 0;
+};
+
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
                           clusterID:(NSNumber *)clusterID
                           commandID:(NSNumber *)commandID
@@ -1482,8 +1668,7 @@ exit:
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, MTRDataValueDictionaryCallback successCb,
             MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
             NSData * attestationChallenge;
-            if ([clusterID isEqualToNumber:@(MTRClusterIDTypeOperationalCredentialsID)] &&
-                [commandID isEqualToNumber:@(MTRCommandIDTypeClusterOperationalCredentialsCommandAttestationRequestID)] && session->IsSecureSession()) {
+            if (MTRCommandNeedsAttestationChallenge(clusterID, commandID) && session->IsSecureSession()) {
                 // An AttestationResponse command needs to have an attestationChallenge
                 // to make sense of the results.  If we are doing an
                 // AttestationRequest, store the challenge now.
@@ -1495,24 +1680,7 @@ exit:
                                    const MTRDataValueDictionaryDecodableType & responseData) {
                 auto resultArray = [[NSMutableArray alloc] init];
                 if (responseData.GetDecodedObject()) {
-                    auto response = responseData.GetDecodedObject();
-                    if (attestationChallenge != nil) {
-                        // Add the attestationChallenge to our data.
-                        NSArray<NSDictionary<NSString *, id> *> * value = response[MTRValueKey];
-                        NSMutableArray<NSDictionary<NSString *, id> *> * newValue = [[NSMutableArray alloc] initWithCapacity:(value.count + 1)];
-                        [newValue addObjectsFromArray:value];
-                        [newValue addObject:@{
-                            MTRContextTagKey : @(kAttestationChallengeTagValue),
-                            MTRDataKey : @ {
-                                MTRTypeKey : MTROctetStringValueType,
-                                MTRValueKey : attestationChallenge,
-                            },
-                        }];
-                        auto * newResponse = [NSMutableDictionary dictionaryWithCapacity:(response.count + 1)];
-                        [newResponse addEntriesFromDictionary:response];
-                        newResponse[MTRValueKey] = newValue;
-                        response = newResponse;
-                    }
+                    auto response = MTRResponseByAppendingAttestationChallenge(responseData.GetDecodedObject(), attestationChallenge);
                     [resultArray addObject:@ {
                         MTRCommandPathKey : [[MTRCommandPath alloc] initWithPath:commandPath],
                         MTRDataKey : response,
@@ -1562,6 +1730,145 @@ exit:
             return CHIP_NO_ERROR;
         });
     std::move(*bridge).DispatchAction(self, CommandHasLargePayload(static_cast<ClusterId>(clusterID.unsignedLongLongValue), static_cast<CommandId>(commandID.unsignedLongLongValue)));
+}
+
+- (void)_invokeCommandBatch:(NSArray<MTRCommandWithRequiredResponse *> *)commands
+             timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+    serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                        logCall:(BOOL)logCall
+                          queue:(dispatch_queue_t)queue
+                     completion:(MTRDeviceResponseHandler)completion
+{
+    commands = [[NSArray alloc] initWithArray:commands copyItems:YES];
+
+    serverSideProcessingTimeout = [serverSideProcessingTimeout copy];
+    if (serverSideProcessingTimeout != nil) {
+        serverSideProcessingTimeout = MTRClampedNumber(serverSideProcessingTimeout, @(0), @(UINT16_MAX));
+    }
+
+    timeoutMs = [timeoutMs copy];
+    if (timeoutMs != nil) {
+        timeoutMs = MTRClampedNumber(timeoutMs, @(1), @(UINT16_MAX));
+    }
+
+    if (logCall) {
+        MTR_LOG("%@ invoke batch of %llu commands: %@", self, static_cast<unsigned long long>(commands.count), commands);
+    }
+
+    auto * bridge = new MTRDataValueDictionaryCallbackBridge(queue, completion,
+        ^(ExchangeManager & exchangeManager, const SessionHandle & session, MTRDataValueDictionaryCallback successCb,
+            MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
+            uint16_t remoteMaxPaths = session->GetRemoteSessionParameters().GetMaxPathsPerInvoke();
+            VerifyOrReturnError(commands.count >= 1, CHIP_ERROR_INVALID_ARGUMENT,
+                MTR_LOG_ERROR("Batch invoke requires at least one command"));
+            VerifyOrReturnError(commands.count <= remoteMaxPaths, CHIP_ERROR_INVALID_ARGUMENT,
+                MTR_LOG_ERROR("Batch invoke of %llu commands exceeds peer MaxPathsPerInvoke %u",
+                    static_cast<unsigned long long>(commands.count), remoteMaxPaths));
+
+            auto * commandPaths = [[NSMutableArray alloc] initWithCapacity:commands.count];
+            for (MTRCommandWithRequiredResponse * command in commands) {
+                [commandPaths addObject:command.path];
+            }
+
+            NSData * attestationChallenge;
+            if (session->IsSecureSession()) {
+                for (MTRCommandWithRequiredResponse * command in commands) {
+                    if (MTRCommandNeedsAttestationChallenge(command.path.cluster, command.path.command)) {
+                        // An AttestationResponse command needs to have an attestationChallenge to make
+                        // sense of the results.  If this batch contains an AttestationRequest, store the
+                        // challenge now.
+                        attestationChallenge = AsData(session->AsSecureSession()->GetCryptoContext().GetAttestationChallenge());
+                        break;
+                    }
+                }
+            }
+
+            auto onResultsCb = [successCb, bridge](NSArray<MTRDeviceResponseValueDictionary> * results) {
+                successCb(bridge, results);
+            };
+            auto onErrorCb = [failureCb, bridge](CHIP_ERROR aError) { failureCb(bridge, aError); };
+
+            auto decoder = chip::Platform::MakeUnique<NSObjectCommandBatchCallback>(
+                commandPaths, attestationChallenge, onResultsCb, onErrorCb);
+            VerifyOrReturnError(decoder != nullptr, CHIP_ERROR_NO_MEMORY);
+
+            auto rawDecoderPtr = decoder.get();
+            auto onDoneCb = [rawDecoderPtr](app::CommandSender * commandSender) {
+                chip::Platform::Delete(commandSender);
+                chip::Platform::Delete(rawDecoderPtr);
+            };
+            decoder->SetOnDoneCallback(onDoneCb);
+
+            bool isTimedRequest = (timeoutMs != nil);
+            auto commandSender = chip::Platform::MakeUnique<app::CommandSender>(decoder.get(), &exchangeManager, isTimedRequest);
+            VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+            app::CommandSender::ConfigParameters configParams;
+            configParams.SetRemoteMaxPathsPerInvoke(remoteMaxPaths);
+            ReturnErrorOnFailure(commandSender->SetCommandSenderConfig(configParams));
+
+            uint16_t commandRef = 0;
+            for (MTRCommandWithRequiredResponse * command in commands) {
+                app::CommandPathParams commandPath = { static_cast<chip::EndpointId>([command.path.endpoint unsignedShortValue]), 0,
+                    static_cast<chip::ClusterId>([command.path.cluster unsignedLongValue]),
+                    static_cast<chip::CommandId>([command.path.command unsignedLongValue]), (app::CommandPathFlags::kEndpointIdValid) };
+
+                app::CommandSender::AddRequestDataParameters addRequestDataParams(
+                    (timeoutMs == nil) ? NullOptional : Optional<uint16_t>([timeoutMs unsignedShortValue]));
+                addRequestDataParams.SetCommandRef(commandRef);
+                id commandFields = command.commandFields ?: @{MTRTypeKey : MTRStructureValueType,
+                    MTRValueKey : @[]};
+                ReturnErrorOnFailure(commandSender->AddRequestData(
+                    commandPath, MTRDataValueDictionaryDecodableType(commandFields), addRequestDataParams));
+                ++commandRef;
+            }
+
+            Optional<System::Clock::Timeout> invokeTimeout;
+            if (serverSideProcessingTimeout != nil) {
+                auto serverTimeoutInSeconds = System::Clock::Seconds16(serverSideProcessingTimeout.unsignedShortValue);
+                invokeTimeout.SetValue(session->ComputeRoundTripTimeout(serverTimeoutInSeconds, true /*isFirstMessageOnExchange*/));
+            }
+            ReturnErrorOnFailure(commandSender->SendCommandRequest(session, invokeTimeout));
+
+            decoder.release();
+            commandSender.release();
+            return CHIP_NO_ERROR;
+        });
+    BOOL needsLargePayload = NO;
+    for (MTRCommandWithRequiredResponse * command in commands) {
+        if (CommandHasLargePayload(static_cast<ClusterId>([command.path.cluster unsignedLongLongValue]),
+                static_cast<CommandId>([command.path.command unsignedLongLongValue]))) {
+            needsLargePayload = YES;
+            break;
+        }
+    }
+    std::move(*bridge).DispatchAction(self, needsLargePayload);
+}
+
+- (void)_getRemoteMaxPathsPerInvokeWithQueue:(dispatch_queue_t)queue
+                                  completion:(void (^)(uint16_t maxPathsPerInvoke, NSError * _Nullable error))completion
+{
+    auto responseHandler = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+        if (error != nil) {
+            completion(1, error);
+            return;
+        }
+        NSNumber * maxPaths = values.firstObject[MTRValueKey];
+        completion(maxPaths.unsignedShortValue, nil);
+    };
+
+    auto * bridge = new MTRDataValueDictionaryCallbackBridge(queue, responseHandler,
+        ^(ExchangeManager & exchangeManager, const SessionHandle & session, MTRDataValueDictionaryCallback successCb,
+            MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
+            uint16_t maxPaths = session->GetRemoteSessionParameters().GetMaxPathsPerInvoke();
+            NSDictionary<NSString *, id> * maxPathsValue = @{
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @(maxPaths),
+            };
+            successCb(bridge, @[ maxPathsValue ]);
+            return CHIP_NO_ERROR;
+        });
+    std::move(*bridge).DispatchAction(self);
 }
 
 - (void)_invokeKnownCommandWithEndpointID:(NSNumber *)endpointID
