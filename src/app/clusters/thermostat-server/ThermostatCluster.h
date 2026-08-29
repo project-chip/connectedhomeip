@@ -33,6 +33,36 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
+/**
+ * @brief Code-driven implementation of the Matter Thermostat Server Cluster.
+ *
+ * `ThermostatCluster` is a variadic class template that configures cluster features,
+ * internal state, and storage at compile time based on the delegate types passed to it.
+ *
+ * ### How the Template Works:
+ * - **Delegate-Driven Feature Selection**:
+ *   Supported features (Heating, Cooling, Presets, Hold, Suggestions, Occupancy) are enabled
+ *   if and only if a corresponding delegate interface (e.g. `ThermostatPresets::Delegate`) is
+ *   included in the `Delegates...` parameter pack. The order of delegates is not important, but
+ *   the delegate list must include `ThermostatDelegate`.
+ *
+ * ### Usage Example:
+ * @code
+ *   // Class Template Argument Deduction (CTAD) infers `Delegates...` automatically:
+ *   ThermostatCluster cluster(
+ *       endpointId,
+ *       features,
+ *       config,
+ *       thermostatDelegate,
+ *       heatingDelegate,
+ *       coolingDelegate,
+ *       presetsDelegate
+ *   );
+ * @endcode
+ *
+ * @tparam Delegates Parameter pack of delegate references implementing cluster feature interfaces.
+ *                   Must include `Thermostat::Delegate` and at least one setpoint delegate.
+ */
 template <typename... Delegates>
 class ThermostatCluster : public ThermostatClusterBase, public AtomicWriteSession::Delegate
 {
@@ -388,10 +418,16 @@ private:
     CHIP_NO_UNIQUE_ADDRESS std::conditional_t<kHasOccupancy, ThermostatOccupancy, std::monostate> mOccupancy;
 };
 
+/**
+ * Deduce the template parameters for ThermostatCluster from the arguments.
+ */
 template <typename... DelegateArgs>
 ThermostatCluster(EndpointId, BitFlags<Thermostat::Feature>, const ThermostatClusterBase::Config &, DelegateArgs &...)
     -> ThermostatCluster<std::decay_t<DelegateArgs>...>;
 
+/**
+ * An alias for a ThermostatCluster with all features enabled and all delegate types implemented.
+ */
 using FullFeaturedThermostatCluster =
     ThermostatCluster<Thermostat::Delegate, ThermostatHeatingSetpoints::Delegate, ThermostatCoolingSetpoints::Delegate,
                       ThermostatAutoSetpoints::Delegate, ThermostatHold::Delegate, ThermostatPresets::Delegate,

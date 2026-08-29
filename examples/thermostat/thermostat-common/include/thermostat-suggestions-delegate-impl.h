@@ -35,6 +35,10 @@ namespace Thermostat {
 
 static constexpr uint8_t kMaxNumberOfThermostatSuggestions = 5;
 
+/*
+ * A simple implementation of ThermostatSuggestions::Delegate.
+ * It reports and persists the state of the thermostat's suggestions attributes.
+ */
 class ThermostatSuggestionsDelegate : public ThermostatSuggestions::Delegate
 {
 public:

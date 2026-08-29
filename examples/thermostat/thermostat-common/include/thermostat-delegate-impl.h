@@ -32,6 +32,10 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
+/*
+ * A simple implementation of ThermostatDelegate.
+ * It reports and persists the basic state of the thermostat.
+ */
 class ThermostatDelegate : public Delegate
 {
 public:

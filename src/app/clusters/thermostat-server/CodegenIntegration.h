@@ -41,18 +41,38 @@ constexpr size_t kThermostatFixedClusterCount = Thermostat::StaticApplicationCon
 constexpr size_t kThermostatEndpointCount     = kThermostatFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 inline DefaultTimerDelegate gDefaultTimerDelegate;
+
+/**
+ * Base delegate for the Thermostat cluster.
+ * 
+ * It provides the default implementation of GetOptionalAttributes, which is used to
+ * determine which optional attributes should be enabled for the cluster.
+ */
 class BaseIntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 protected:
     OptionalAttributes GetOptionalAttributes(EndpointId endpointId, BitFlags<Thermostat::Feature> features);
 };
 
+/**
+ * A helper struct to store the cluster instances.
+ * 
+ * @tparam Size The maximum number of cluster instances.
+ * @tparam Cluster The type of the cluster.
+ */
 template <std::size_t Size, typename Cluster>
 struct ClusterStorage
 {
     inline static std::array<LazyRegisteredServerCluster<Cluster>, Size> mClusters = {};
 };
 
+/**
+ * Integration delegate for the Thermostat cluster.
+ * 
+ * @tparam Size The maximum number of cluster instances.
+ * @tparam Cluster The type of the cluster.
+ * @tparam ...Delegates The types of the delegates.
+ */
 template <std::size_t Size, typename Cluster, typename... Delegates>
 class IntegrationDelegate : public BaseIntegrationDelegate
 {
@@ -109,6 +129,9 @@ private:
     std::tuple<Delegates &...> mDelegates;
 };
 
+/**
+ * Initialize the Thermostat cluster on a given endpoint with the given delegates.
+ */
 template <typename ClusterT, typename... DelegateArgs>
 void ServerInit(EndpointId endpointId, DelegateArgs &... delegates)
 {
@@ -127,6 +150,9 @@ void ServerInit(EndpointId endpointId, DelegateArgs &... delegates)
         integrationDelegate);
 }
 
+/**
+ * A convenience overload that deduces the cluster type from the delegate arguments.
+ */
 template <typename... DelegateArgs>
 void ServerInit(EndpointId endpointId, DelegateArgs &... delegates)
 {
@@ -134,6 +160,9 @@ void ServerInit(EndpointId endpointId, DelegateArgs &... delegates)
                                                                                   std::forward<DelegateArgs &>(delegates)...);
 }
 
+/**
+ * Uninitialize the Thermostat cluster on a given endpoint with the given cluster type.
+ */
 template <typename ClusterT>
 void ServerShutdown(EndpointId endpointId, MatterClusterShutdownType clusterShutdownType)
 {
@@ -149,6 +178,9 @@ void ServerShutdown(EndpointId endpointId, MatterClusterShutdownType clusterShut
         integrationDelegate, clusterShutdownType);
 }
 
+/**
+ * A convenience overload that deduces the cluster type from the delegate arguments.
+ */
 template <typename ClusterT>
 ClusterT * FindClusterOnEndpoint(EndpointId endpointId)
 {

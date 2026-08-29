@@ -38,6 +38,10 @@ static constexpr uint8_t kMaxNumberOfPresetsOfEachType = 1;
 // kMaxNumberOfPresetsSupported < kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType
 static constexpr uint8_t kMaxNumberOfPresetsSupported = kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType - 1;
 
+/*
+ * A simple implementation of ThermostatPresets::Delegate.
+ * It reports and persists the state of the thermostat's attributes tracking setpoint presets.
+ */
 class ThermostatPresetsDelegate : public ThermostatPresets::Delegate
 {
 public:

@@ -30,6 +30,13 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
+/*
+ * A simple implementation of ThermostatCoolingSetpoints::Delegate,
+ * ThermostatHeatingSetpoints::Delegate, and ThermostatAutoSetpoints::Delegate.
+ * It reports and persists the state of the thermostat's setpoints attributes.
+ *
+ * It also demonstrates that a single class can implement multiple related thermostat delegates.
+ */
 class ThermostatSetpointsDelegate : public ThermostatCoolingSetpoints::Delegate,
                                     public ThermostatHeatingSetpoints::Delegate,
                                     public ThermostatAutoSetpoints::Delegate

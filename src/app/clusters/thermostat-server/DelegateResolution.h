@@ -31,6 +31,16 @@ namespace Clusters {
 namespace Thermostat {
 namespace detail {
 
+/**
+ * @brief Traverses a variadic argument pack to locate and return the first delegate deriving from TargetDelegate.
+ *
+ * Checks arguments in order using `std::is_base_of_v`. If none match, triggers a compile-time assertion.
+ *
+ * @tparam TargetDelegate The base delegate interface type to search for.
+ * @param first The first delegate argument in the pack.
+ * @param rest The remaining delegate arguments.
+ * @return Reference to the matching delegate object.
+ */
 template <typename TargetDelegate, typename First, typename... Rest>
 constexpr decltype(auto) FindDelegate(First && first, Rest &&... rest)
 {
@@ -49,6 +59,16 @@ constexpr decltype(auto) FindDelegate(First && first, Rest &&... rest)
     }
 }
 
+/**
+ * @brief Unpacks constructor arguments and matching delegate to instantiate FeatureType.
+ *
+ * Invoked by MakeFeature with an index sequence covering the leading non-delegate arguments.
+ * Extracts the required `FeatureType::Delegate` from the delegates tuple via `FindDelegate`.
+ *
+ * @tparam FeatureType The feature class to construct.
+ * @param args Tuple containing all forwarded arguments (constructor arguments followed by delegates tuple).
+ * @param delegates Tuple containing all available delegates.
+ */
 template <typename FeatureType, typename Args, typename... DelegateArgs, std::size_t... Index>
 constexpr auto ConstructFeature(Args && args, const std::tuple<DelegateArgs &...> & delegates, std::index_sequence<Index...>)
 {
@@ -59,6 +79,20 @@ constexpr auto ConstructFeature(Args && args, const std::tuple<DelegateArgs &...
         delegates);
 }
 
+/**
+ * @brief Conditionally constructs a feature handler object or std::monostate.
+ *
+ * Intended for use in cluster member initializer lists. Takes all constructor arguments for
+ * `FeatureType` followed by a trailing `std::tuple` of delegates (e.g. via `std::forward_as_tuple`).
+ *
+ * If `Enabled` is true, automatically forwards the constructor arguments and searches the
+ * delegates tuple for `FeatureType::Delegate` to instantiate `FeatureType`.
+ * If `Enabled` is false, returns `std::monostate` to avoid runtime memory or execution overhead.
+ *
+ * @tparam Enabled Whether the feature is enabled at compile time.
+ * @tparam FeatureType The feature class to instantiate if enabled.
+ * @param args Leading constructor arguments for FeatureType, followed by a trailing std::tuple of delegates.
+ */
 template <bool Enabled, typename FeatureType, typename... Args>
 static auto MakeFeature(Args &&... args)
 {
@@ -75,6 +109,13 @@ static auto MakeFeature(Args &&... args)
     }
 }
 
+/**
+ * @brief Conditionally constructs an AtomicWriteSession or std::monostate.
+ *
+ * If `Enabled` is true, returns an active `AtomicWriteSession`. If false, returns `std::monostate`.
+ *
+ * @tparam Enabled Whether atomic write support is required (e.g. when presets are enabled).
+ */
 template <bool Enabled>
 static auto MakeAtomicWriteSession(AtomicWriteSession::Delegate & delegate, TimerDelegate & timerDelegate,
                                    FabricTable * fabricTable)
@@ -89,6 +130,14 @@ static auto MakeAtomicWriteSession(AtomicWriteSession::Delegate & delegate, Time
     }
 }
 
+/**
+ * @brief Compile-time predicate checking whether any type in Args derives from Target.
+ *
+ * Used to evaluate feature flags (e.g. `kHasPresets`, `kHasHold`) from the delegate pack.
+ *
+ * @tparam Target The target delegate base class.
+ * @tparam Args Parameter pack of candidate delegate types.
+ */
 template <typename Target, typename... Args>
 inline constexpr bool kArgsHasDelegate = (std::is_base_of_v<Target, std::decay_t<Args>> || ...);
 
