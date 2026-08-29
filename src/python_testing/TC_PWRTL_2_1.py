@@ -67,8 +67,6 @@ class TC_PWRTL_2_1(MatterBaseTest):
         both endpoint list attributes, and Non-volatile persistence of
         ActiveEndpoints across reboot.
 
-        Step numbering matches the test plan one for one.
-
         Test Plan:
         https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/cluster/power_topology.adoc#tc-pwrtl-21
         """
