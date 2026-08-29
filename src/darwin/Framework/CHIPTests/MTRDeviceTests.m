@@ -2844,6 +2844,36 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     }];
 
     [self waitForExpectations:@[ attestationRequestedViaDevice ] timeout:kTimeoutInSeconds];
+
+    XCTestExpectation * attestationRequestedViaInvokeCommands = [self expectationWithDescription:@"Invoked AttestationRequest via invokeCommands:"];
+    __auto_type * attestationPath = [MTRCommandPath commandPathWithEndpointID:@(0)
+                                                                    clusterID:@(MTRClusterIDTypeOperationalCredentialsID)
+                                                                    commandID:@(MTRCommandIDTypeClusterOperationalCredentialsCommandAttestationRequestID)];
+    __auto_type * onPath = [MTRCommandPath commandPathWithEndpointID:@(1)
+                                                           clusterID:@(MTRClusterIDTypeOnOffID)
+                                                           commandID:@(MTRCommandIDTypeClusterOnOffCommandOnID)];
+    __auto_type * attestationGroup = @[
+        [[MTRCommandWithRequiredResponse alloc] initWithPath:attestationPath commandFields:requestFields requiredResponse:nil],
+        [[MTRCommandWithRequiredResponse alloc] initWithPath:onPath commandFields:nil requiredResponse:nil],
+    ];
+    [device invokeCommands:@[ attestationGroup ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
+                    XCTAssertEqual(values.count, attestationGroup.count);
+
+                    NSError * decodeError;
+                    __auto_type * response = [[MTROperationalCredentialsClusterAttestationResponseParams alloc] initWithResponseValue:values[0] error:&decodeError];
+                    XCTAssertNil(decodeError);
+                    XCTAssertNotNil(response);
+                    XCTAssertNotNil(response.attestationChallenge);
+
+                    [attestationRequestedViaInvokeCommands fulfill];
+                }];
+
+    [self waitForExpectations:@[ attestationRequestedViaInvokeCommands ] timeout:(2 * kTimeoutInSeconds)];
 }
 
 - (void)test028_TimeZoneAndDST
@@ -5999,6 +6029,322 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // 2 commands actually run, so use double the timeout.
     [self waitForExpectations:@[ updateFabricLabelExpectingWrongValueExpectation ] timeout:(2 * kTimeoutInSeconds)];
+}
+
+#pragma mark - Helpers shared by the invokeCommands: grouping tests
+
+static MTRDeviceDataValueDictionary MTRTestUnsignedFieldStructure(NSArray<NSNumber *> * values)
+{
+    NSMutableArray<NSDictionary<NSString *, id> *> * fields = [NSMutableArray arrayWithCapacity:values.count];
+    for (NSUInteger i = 0; i < values.count; i++) {
+        [fields addObject:@{
+            MTRContextTagKey : @(i),
+            MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : values[i] },
+        }];
+    }
+    return @ { MTRTypeKey : MTRStructureValueType, MTRValueKey : fields };
+}
+
+static MTRCommandWithRequiredResponse * MTRTestCommand(NSNumber * endpointID, NSNumber * clusterID, NSNumber * commandID,
+    MTRDeviceDataValueDictionary _Nullable commandFields)
+{
+    __auto_type * path = [MTRCommandPath commandPathWithEndpointID:endpointID clusterID:clusterID commandID:commandID];
+    return [[MTRCommandWithRequiredResponse alloc] initWithPath:path commandFields:commandFields requiredResponse:nil];
+}
+
+// all-clusters-app advertises MaxPathsPerInvoke == 5, so these six split 5 + 1; the endpoint 2 command is
+// first so the first chunk spans two endpoints.
+static NSArray<MTRCommandWithRequiredResponse *> * MTRTestLightingCommandBurst(void)
+{
+    return @[
+        MTRTestCommand(@(2), @(MTRClusterIDTypeOnOffID), @(MTRCommandIDTypeClusterOnOffCommandOnID), nil),
+        MTRTestCommand(@(1), @(MTRClusterIDTypeOnOffID), @(MTRCommandIDTypeClusterOnOffCommandOnID), nil),
+        MTRTestCommand(@(1), @(MTRClusterIDTypeLevelControlID), @(MTRCommandIDTypeClusterLevelControlCommandMoveToLevelID),
+            MTRTestUnsignedFieldStructure(@[ @(128), @(0), @(0), @(0) ])),
+        MTRTestCommand(@(1), @(MTRClusterIDTypeColorControlID), @(MTRCommandIDTypeClusterColorControlCommandMoveToColorID),
+            MTRTestUnsignedFieldStructure(@[ @(0x4000), @(0x4000), @(0), @(0), @(0) ])),
+        MTRTestCommand(@(1), @(MTRClusterIDTypeColorControlID),
+            @(MTRCommandIDTypeClusterColorControlCommandMoveToColorTemperatureID),
+            MTRTestUnsignedFieldStructure(@[ @(250), @(0), @(0), @(0) ])),
+        MTRTestCommand(@(1), @(MTRClusterIDTypeLevelControlID),
+            @(MTRCommandIDTypeClusterLevelControlCommandMoveToLevelWithOnOffID),
+            MTRTestUnsignedFieldStructure(@[ @(200), @(0), @(0), @(0) ])),
+    ];
+}
+
+static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithRequiredResponse *> * commands)
+{
+    NSMutableArray<MTRCommandPath *> * paths = [NSMutableArray arrayWithCapacity:commands.count];
+    for (MTRCommandWithRequiredResponse * command in commands) {
+        [paths addObject:command.path];
+    }
+    return paths;
+}
+
+- (void)test045b_MTRDeviceInvokeGroupExceedingMaxPathsPerInvoke
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * commandGroup = MTRTestLightingCommandBurst();
+    __auto_type * expectedPaths = MTRTestCommandPaths(commandGroup);
+
+    XCTestExpectation * chunkedInvokeDone = [self expectationWithDescription:@"Invoke of a group exceeding max paths per invoke done"];
+    [device invokeCommands:@[ commandGroup ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
+
+                    XCTAssertEqual(values.count, expectedPaths.count);
+                    for (NSUInteger i = 0; i < values.count; i++) {
+                        XCTAssertEqualObjects(values[i], @ { MTRCommandPathKey : expectedPaths[i] });
+                    }
+
+                    [chunkedInvokeDone fulfill];
+                }];
+
+    [self waitForExpectations:@[ chunkedInvokeDone ] timeout:(6 * kTimeoutInSeconds)];
+}
+
+- (void)test045c_MTRDeviceInvokeGroupWithRepeatedCommandPath
+{
+    // Packed into one message the server would reject all three; the repeat is non-adjacent on purpose.
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * onPath = [MTRCommandPath commandPathWithEndpointID:@(1)
+                                                           clusterID:@(MTRClusterIDTypeOnOffID)
+                                                           commandID:@(MTRCommandIDTypeClusterOnOffCommandOnID)];
+    __auto_type * togglePath = [MTRCommandPath commandPathWithEndpointID:@(1)
+                                                               clusterID:@(MTRClusterIDTypeOnOffID)
+                                                               commandID:@(MTRCommandIDTypeClusterOnOffCommandToggleID)];
+    __auto_type * repeatedGroup = @[
+        [[MTRCommandWithRequiredResponse alloc] initWithPath:onPath commandFields:nil requiredResponse:nil],
+        [[MTRCommandWithRequiredResponse alloc] initWithPath:togglePath commandFields:nil requiredResponse:nil],
+        [[MTRCommandWithRequiredResponse alloc] initWithPath:onPath commandFields:nil requiredResponse:nil],
+    ];
+
+    XCTestExpectation * repeatedInvokeDone = [self expectationWithDescription:@"Invoke of a group with a repeated command path done"];
+    [device invokeCommands:@[ repeatedGroup ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
+
+                    XCTAssertEqualObjects(values, (@[
+                        @ { MTRCommandPathKey : onPath },
+                        @ { MTRCommandPathKey : togglePath },
+                        @ { MTRCommandPathKey : onPath },
+                    ]));
+
+                    [repeatedInvokeDone fulfill];
+                }];
+
+    [self waitForExpectations:@[ repeatedInvokeDone ] timeout:(4 * kTimeoutInSeconds)];
+}
+
+- (void)test045d_MTRDeviceInvokeGroupFailureSpanningChunks
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    NSMutableArray<MTRCommandWithRequiredResponse *> * firstGroup = [MTRTestLightingCommandBurst() mutableCopy];
+    __auto_type * failing = firstGroup[2];
+    firstGroup[2] = [[MTRCommandWithRequiredResponse alloc] initWithPath:failing.path
+                                                           commandFields:failing.commandFields
+                                                        requiredResponse:@{
+                                                            @(0) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(0) }
+                                                        }];
+    __auto_type * secondGroup = @[ MTRTestCommand(@(1), @(MTRClusterIDTypeOnOffID), @(MTRCommandIDTypeClusterOnOffCommandOffID), nil) ];
+
+    __auto_type * expectedPaths = MTRTestCommandPaths(firstGroup);
+
+    XCTestExpectation * invokeDone = [self expectationWithDescription:@"Invoke of a chunked group containing a failure done"];
+    [device invokeCommands:@[ firstGroup, secondGroup ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
+
+                    XCTAssertEqual(values.count, expectedPaths.count);
+                    for (NSUInteger i = 0; i < values.count; i++) {
+                        XCTAssertEqualObjects(values[i], @ { MTRCommandPathKey : expectedPaths[i] });
+                    }
+
+                    [invokeDone fulfill];
+                }];
+
+    [self waitForExpectations:@[ invokeDone ] timeout:(7 * kTimeoutInSeconds)];
+}
+
+#ifdef DEBUG
+- (void)test045e_MTRDeviceInvokeGroupSendsOneMessagePerChunk
+{
+    // Counts messages actually sent; one-command-per-message would give three and six.
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * burst = MTRTestLightingCommandBurst();
+    __auto_type * singleChunkGroup = [burst subarrayWithRange:NSMakeRange(1, 3)];
+
+    [MTRBaseDevice unitTestResetInvokeRequestMessageCount];
+    XCTestExpectation * singleChunkDone = [self expectationWithDescription:@"Invoke of a group fitting in one message done"];
+    [device invokeCommands:@[ singleChunkGroup ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertEqual(values.count, singleChunkGroup.count);
+                    XCTAssertEqual([MTRBaseDevice unitTestInvokeRequestMessageCount], 1);
+                    [singleChunkDone fulfill];
+                }];
+    [self waitForExpectations:@[ singleChunkDone ] timeout:(4 * kTimeoutInSeconds)];
+
+    __auto_type * twoChunkGroup = burst;
+
+    [MTRBaseDevice unitTestResetInvokeRequestMessageCount];
+    XCTestExpectation * twoChunkDone = [self expectationWithDescription:@"Invoke of a group needing two messages done"];
+    [device invokeCommands:@[ twoChunkGroup ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertEqual(values.count, twoChunkGroup.count);
+                    XCTAssertEqual([MTRBaseDevice unitTestInvokeRequestMessageCount], 2);
+                    [twoChunkDone fulfill];
+                }];
+    [self waitForExpectations:@[ twoChunkDone ] timeout:(7 * kTimeoutInSeconds)];
+}
+
+- (void)test045g_MTRDeviceInvokeGroupAgainstPeerWithoutBatching
+{
+    // all-clusters-app advertises 5, so the path a peer advertising 1 takes — a message per command, with no
+    // CommandRef, and responses resolved by request order rather than by ref — is otherwise never exercised.
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * commandGroup = [MTRTestLightingCommandBurst() subarrayWithRange:NSMakeRange(1, 3)];
+    __auto_type * expectedPaths = MTRTestCommandPaths(commandGroup);
+
+    [MTRBaseDevice unitTestSetMaxPathsPerInvokeOverride:1];
+    [MTRBaseDevice unitTestResetInvokeRequestMessageCount];
+    XCTestExpectation * invokeDone = [self expectationWithDescription:@"Invoke against a peer without batching done"];
+    [device invokeCommands:@[ commandGroup ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
+
+                    // One message per command, and every response still landed on the right command.
+                    XCTAssertEqual([MTRBaseDevice unitTestInvokeRequestMessageCount], commandGroup.count);
+                    XCTAssertEqual(values.count, expectedPaths.count);
+                    for (NSUInteger i = 0; i < values.count; i++) {
+                        XCTAssertEqualObjects(values[i], @ { MTRCommandPathKey : expectedPaths[i] });
+                    }
+                    [invokeDone fulfill];
+                }];
+
+    [self waitForExpectations:@[ invokeDone ] timeout:(6 * kTimeoutInSeconds)];
+    [MTRBaseDevice unitTestSetMaxPathsPerInvokeOverride:0];
+}
+#endif // DEBUG
+
+- (void)test045f_MTRDeviceInvokeGroupSnapshotsCommandFields
+{
+    // Made unencodable right after the call: if the mutation leaked through to encoding time, this errors.
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    NSMutableDictionary<NSString *, id> * mutableFields =
+        [MTRTestUnsignedFieldStructure(@[ @(128), @(0), @(0), @(0) ]) mutableCopy];
+    __auto_type * movePath = [MTRCommandPath commandPathWithEndpointID:@(1)
+                                                             clusterID:@(MTRClusterIDTypeLevelControlID)
+                                                             commandID:@(MTRCommandIDTypeClusterLevelControlCommandMoveToLevelID)];
+    __auto_type * moveCommand = [[MTRCommandWithRequiredResponse alloc] initWithPath:movePath
+                                                                       commandFields:mutableFields
+                                                                    requiredResponse:nil];
+
+    XCTestExpectation * moveDone = [self expectationWithDescription:@"Invoke of a command with mutated fields done"];
+    [device invokeCommands:@[ @[ moveCommand ] ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
+                    XCTAssertEqualObjects(values, (@[ @ { MTRCommandPathKey : movePath } ]));
+                    [moveDone fulfill];
+                }];
+
+    mutableFields[MTRValueKey] = @"not a list of fields";
+
+    [self waitForExpectations:@[ moveDone ] timeout:(4 * kTimeoutInSeconds)];
+}
+
+- (void)test045h_MTRDeviceInvokeGroupWithUnencodableCommand
+{
+    // A command whose fields are not a structure-typed data-value cannot be encoded.  It must fail in its own
+    // position — the commands around it in its group still run, earlier groups are unaffected, and only the
+    // groups after it are skipped — rather than the whole invoke being refused up front.
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * onPath = [MTRCommandPath commandPathWithEndpointID:@(1)
+                                                           clusterID:@(MTRClusterIDTypeOnOffID)
+                                                           commandID:@(MTRCommandIDTypeClusterOnOffCommandOnID)];
+    __auto_type * togglePath = [MTRCommandPath commandPathWithEndpointID:@(1)
+                                                               clusterID:@(MTRClusterIDTypeOnOffID)
+                                                               commandID:@(MTRCommandIDTypeClusterOnOffCommandToggleID)];
+    __auto_type * offPath = [MTRCommandPath commandPathWithEndpointID:@(1)
+                                                            clusterID:@(MTRClusterIDTypeOnOffID)
+                                                            commandID:@(MTRCommandIDTypeClusterOnOffCommandOffID)];
+    __auto_type * badPath = [MTRCommandPath commandPathWithEndpointID:@(1)
+                                                            clusterID:@(MTRClusterIDTypeLevelControlID)
+                                                            commandID:@(MTRCommandIDTypeClusterLevelControlCommandMoveToLevelID)];
+
+    // An unsigned-typed data-value where a structure is required.
+    __auto_type * unencodable = [[MTRCommandWithRequiredResponse alloc]
+            initWithPath:badPath
+           commandFields:@{ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(1) }
+        requiredResponse:nil];
+
+    __auto_type * firstGroup = @[ MTRTestCommand(@(1), @(MTRClusterIDTypeOnOffID), @(MTRCommandIDTypeClusterOnOffCommandOnID), nil) ];
+    __auto_type * secondGroup = @[
+        MTRTestCommand(@(1), @(MTRClusterIDTypeOnOffID), @(MTRCommandIDTypeClusterOnOffCommandToggleID), nil),
+        unencodable,
+        MTRTestCommand(@(1), @(MTRClusterIDTypeColorControlID), @(MTRCommandIDTypeClusterColorControlCommandMoveToColorID),
+            MTRTestUnsignedFieldStructure(@[ @(0x4000), @(0x4000), @(0), @(0), @(0) ])),
+    ];
+    __auto_type * thirdGroup = @[ MTRTestCommand(@(1), @(MTRClusterIDTypeOnOffID), @(MTRCommandIDTypeClusterOnOffCommandOffID), nil) ];
+
+    XCTestExpectation * invokeDone = [self expectationWithDescription:@"Invoke of a group with an unencodable command done"];
+    [device invokeCommands:@[ firstGroup, secondGroup, thirdGroup ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
+
+                    XCTAssertEqual(values.count, 4);
+                    if (values.count == 4) {
+                        XCTAssertEqualObjects(values[0], @ { MTRCommandPathKey : onPath });
+                        XCTAssertEqualObjects(values[1], @ { MTRCommandPathKey : togglePath });
+                        XCTAssertEqualObjects(values[2][MTRCommandPathKey], badPath);
+                        NSError * badError = values[2][MTRErrorKey];
+                        XCTAssertNotNil(badError);
+                        XCTAssertEqualObjects(badError.domain, MTRErrorDomain);
+                        XCTAssertEqual(badError.code, MTRErrorCodeInvalidArgument);
+                        XCTAssertNil(values[3][MTRErrorKey]);
+                    }
+                    for (NSDictionary<NSString *, id> * value in values) {
+                        XCTAssertNotEqualObjects(value[MTRCommandPathKey], offPath);
+                    }
+                    [invokeDone fulfill];
+                }];
+
+    [self waitForExpectations:@[ invokeDone ] timeout:(6 * kTimeoutInSeconds)];
 }
 
 - (void)test046_MTRCommandWithRequiredResponseEncoding

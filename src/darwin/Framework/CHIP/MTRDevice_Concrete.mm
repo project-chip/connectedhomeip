@@ -386,6 +386,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
  */
 @property (nonatomic, readonly) MTRDeviceMatterCPPObjectsHolder * matterCPPObjectsHolder;
 
+- (void)_invokeCommandsBatched:(NSArray<NSArray<MTRCommandWithRequiredResponse *> *> *)commands
+             maxPathsPerInvoke:(uint16_t)maxPathsPerInvoke
+                    baseDevice:(MTRBaseDevice *)baseDevice
+                         queue:(dispatch_queue_t)queue
+                    completion:(void (^)(NSArray<MTRDeviceResponseValueDictionary> * responses))completion;
+
 @end
 
 // Declaring selector so compiler won't complain about testing and calling it in _handleReportEnd
@@ -3986,79 +3992,220 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                  queue:(dispatch_queue_t)queue
             completion:(MTRDeviceResponseHandler)completion
 {
-    // We will generally do our work on self.queue, and just dispatch to the provided queue when
-    // calling the provided completion.
-    auto nextCompletion = ^(BOOL allSucceededSoFar, NSArray<MTRDeviceResponseValueDictionary> * responses) {
+    NSMutableArray<NSArray<MTRCommandWithRequiredResponse *> *> * commandsSnapshot =
+        [[NSMutableArray alloc] initWithCapacity:commands.count];
+    NSArray<MTRCommandWithRequiredResponse *> * firstGroupToInvoke;
+    NSDate * cutoffTime;
+    for (NSArray<MTRCommandWithRequiredResponse *> * commandGroup in commands) {
+        NSMutableArray<MTRCommandWithRequiredResponse *> * commandGroupSnapshot =
+            [[NSMutableArray alloc] initWithCapacity:commandGroup.count];
+        for (MTRCommandWithRequiredResponse * command in commandGroup) {
+            [commandGroupSnapshot addObject:[[MTRCommandWithRequiredResponse alloc] initWithPath:command.path
+                                                                                   commandFields:[command.commandFields copy]
+                                                                                requiredResponse:command.requiredResponse]];
+            if (cutoffTime == nil && MTRCommandNeedsTimedInvoke(command.path.cluster, command.path.command)) {
+                cutoffTime = [NSDate dateWithTimeIntervalSinceNow:(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS / 1000.0)];
+            }
+        }
+        if (firstGroupToInvoke == nil && commandGroupSnapshot.count > 0) {
+            firstGroupToInvoke = commandGroupSnapshot;
+        }
+        [commandsSnapshot addObject:commandGroupSnapshot];
+    }
+    commands = commandsSnapshot;
+
+    if (firstGroupToInvoke == nil) {
         dispatch_async(queue, ^{
-            completion(responses, nil);
+            completion(@[], nil);
         });
+        return;
+    }
+
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
+    uint64_t workItemID = workItem.uniqueID;
+    [workItem setDuplicateTypeID:MTRDeviceWorkItemDuplicateReadTypeID handler:^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
+        *isDuplicate = NO;
+        *stop = YES;
+    }];
+    [workItem setReadyHandler:^(MTRDevice_Concrete * self, NSInteger retryCount, MTRAsyncWorkCompletionBlock workCompletion) {
+        auto workDone = ^(NSArray<MTRDeviceResponseValueDictionary> * _Nullable responses) {
+            dispatch_async(queue, ^{
+                completion(responses, nil);
+            });
+            workCompletion(MTRAsyncWorkComplete);
+        };
+
+        if (cutoffTime != nil && [[NSDate now] compare:cutoffTime] == NSOrderedDescending) {
+            MTR_LOG("Invoke work item [%llu] waited past its timed invoke timeout; not sending", workItemID);
+            NSMutableArray<MTRDeviceResponseValueDictionary> * responses = [NSMutableArray array];
+            __auto_type * timeoutError = [MTRError errorForIMStatusCode:Status::Timeout];
+            for (MTRCommandWithRequiredResponse * command in firstGroupToInvoke) {
+                [responses addObject:@ {
+                    MTRCommandPathKey : command.path,
+                    MTRErrorKey : timeoutError,
+                }];
+            }
+            workDone(responses);
+            return;
+        }
+
+        MTRBaseDevice * baseDevice = [self newBaseDevice];
+        mtr_weakify(self);
+        [baseDevice _getRemoteMaxPathsPerInvokeWithQueue:self.queue
+                                              completion:^(uint16_t maxPathsPerInvoke, NSError * _Nullable error) {
+                                                  mtr_strongify(self);
+                                                  VerifyOrReturn(self, MTR_LOG_DEBUG("invokeCommands: called back with nil MTRDevice"));
+                                                  uint16_t pathsPerMessage = MAX(maxPathsPerInvoke, static_cast<uint16_t>(1));
+                                                  if (error != nil) {
+                                                      MTR_LOG_ERROR("Invoke work item [%llu] could not read peer MaxPathsPerInvoke (%@); sending one command per message", workItemID, error);
+                                                  } else {
+                                                      MTR_LOG("Invoke work item [%llu] running; peer MaxPathsPerInvoke=%u", workItemID, maxPathsPerInvoke);
+                                                  }
+                                                  [self _invokeCommandsBatched:commands
+                                                             maxPathsPerInvoke:pathsPerMessage
+                                                                    baseDevice:baseDevice
+                                                                         queue:self.queue
+                                                                    completion:workDone];
+                                              }];
+    }];
+    [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"invokeCommands (%llu groups)", static_cast<unsigned long long>(commands.count)];
+}
+
+// A command whose fields are not a structure-typed data-value cannot be encoded; the single-command path
+// rejected it locally rather than sending it, so it must not be packed in with commands that would encode.
+static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
+{
+    return command.commandFields == nil
+        || (MTRDataValueDictionaryIsWellFormed(command.commandFields)
+            && [MTRStructureValueType isEqual:command.commandFields[MTRTypeKey]]);
+}
+
+- (void)_invokeCommandsBatched:(NSArray<NSArray<MTRCommandWithRequiredResponse *> *> *)commands
+             maxPathsPerInvoke:(uint16_t)maxPathsPerInvoke
+                    baseDevice:(MTRBaseDevice *)baseDevice
+                         queue:(dispatch_queue_t)queue
+                    completion:(void (^)(NSArray<MTRDeviceResponseValueDictionary> * responses))completion
+{
+    auto nextCompletion = ^(BOOL allSucceededSoFar, NSArray<MTRDeviceResponseValueDictionary> * responses) {
+        completion(responses);
     };
 
-    // We want to invoke the command groups in order, stopping after failures as needed.  Build up a
-    // linked list of groups via chaining the completions, with calls out to the original
-    // completion instead of going to the next list item when we want to stop.
     for (NSArray<MTRCommandWithRequiredResponse *> * commandGroup in [commands reverseObjectEnumerator]) {
-        // We want to invoke all the commands in the group in order, propagating along the list of
-        // current responses.  Build up that linked list of command invokes via chaining the completions.
+        // One message may not carry a concrete command path twice (the server rejects the whole message) but
+        // a group may repeat one, so a repeat also cuts a message; otherwise it would depend on the boundary.
+        NSMutableArray<NSArray<MTRCommandWithRequiredResponse *> *> * chunks = [NSMutableArray array];
+        NSMutableArray<MTRCommandWithRequiredResponse *> * currentChunk = [NSMutableArray array];
+        NSMutableSet<MTRCommandPath *> * pathsInCurrentChunk = [NSMutableSet set];
+        for (MTRCommandWithRequiredResponse * command in commandGroup) {
+            BOOL canEncode = MTRInvokeCommandCanEncode(command);
+            if (currentChunk.count > 0
+                && (!canEncode || currentChunk.count == maxPathsPerInvoke
+                    || [pathsInCurrentChunk containsObject:command.path])) {
+                [chunks addObject:currentChunk];
+                currentChunk = [NSMutableArray array];
+                [pathsInCurrentChunk removeAllObjects];
+            }
+            [currentChunk addObject:command];
+            [pathsInCurrentChunk addObject:command.path];
+            if (!canEncode) {
+                [chunks addObject:currentChunk];
+                currentChunk = [NSMutableArray array];
+                [pathsInCurrentChunk removeAllObjects];
+            }
+        }
+        if (currentChunk.count > 0) {
+            [chunks addObject:currentChunk];
+        }
+
         mtr_weakify(self);
-        for (MTRCommandWithRequiredResponse * command in [commandGroup reverseObjectEnumerator]) {
-            auto commandInvokeBlock = ^(BOOL allSucceededSoFar, NSArray<MTRDeviceResponseValueDictionary> * previousResponses) {
+        for (NSArray<MTRCommandWithRequiredResponse *> * chunk in [chunks reverseObjectEnumerator]) {
+            auto chunkInvokeBlock = ^(BOOL allSucceededSoFar, NSArray<MTRDeviceResponseValueDictionary> * previousResponses) {
                 mtr_strongify(self);
-                VerifyOrReturn(self, MTR_LOG_DEBUG("invokeCommands commandInvokeBlock called back with nil MTRDevice"));
+                VerifyOrReturn(self, MTR_LOG_DEBUG("invokeCommands batch block called back with nil MTRDevice"));
 
-                [self invokeCommandWithEndpointID:command.path.endpoint
-                                        clusterID:command.path.cluster
-                                        commandID:command.path.command
-                                    commandFields:command.commandFields
-                                   expectedValues:nil
-                            expectedValueInterval:nil
-                                            queue:self.queue
-                                       completion:^(NSArray<NSDictionary<NSString *, id> *> * responses, NSError * error) {
-                                           mtr_strongify(self);
-                                           VerifyOrReturn(self, MTR_LOG_DEBUG("invokeCommands invokeCommandWithEndpointID completion called back with nil MTRDevice"));
-                                           if (error != nil) {
-                                               nextCompletion(NO, [previousResponses arrayByAddingObject:@ {
-                                                   MTRCommandPathKey : command.path,
-                                                   MTRErrorKey : error,
-                                               }]);
-                                               return;
-                                           }
+                if (!MTRInvokeCommandCanEncode(chunk.firstObject)) {
+                    // Chunked on its own above, so failing it here leaves the commands around it alone and
+                    // stops the following groups the same way any other failure does.
+                    MTR_LOG_ERROR("%@ invokeCommands: %@ has commandFields that are not a structure-typed "
+                                  "data-value; not invoking it",
+                        self, chunk.firstObject);
+                    nextCompletion(NO,
+                        [previousResponses arrayByAddingObject:@{
+                            MTRCommandPathKey : chunk.firstObject.path,
+                            MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT],
+                        }]);
+                    return;
+                }
 
-                                           if (responses.count != 1) {
-                                               // Very much unexpected for invoking a single command.
-                                               MTR_LOG_ERROR("%@ invokeCommands unexpectedly got multiple responses for %@", self, command.path);
-                                               nextCompletion(NO, [previousResponses arrayByAddingObject:@ {
-                                                   MTRCommandPathKey : command.path,
-                                                   MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTERNAL],
-                                               }]);
-                                               return;
-                                           }
+                // Each batch is its own timed interaction; the queue wait was charged before sending began.
+                NSNumber * timedInvokeTimeout = nil;
+                for (MTRCommandWithRequiredResponse * command in chunk) {
+                    if (MTRCommandNeedsTimedInvoke(command.path.cluster, command.path.command)) {
+                        timedInvokeTimeout = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
+                        break;
+                    }
+                }
 
-                                           BOOL nextAllSucceeded = allSucceededSoFar;
-                                           MTRDeviceResponseValueDictionary response = responses[0];
-                                           if (command.requiredResponse != nil && ![self _invokeResponse:response matchesRequiredResponse:command.requiredResponse]) {
-                                               nextAllSucceeded = NO;
-                                           }
+                [baseDevice _invokeCommandBatch:chunk
+                             timedInvokeTimeout:timedInvokeTimeout
+                    serverSideProcessingTimeout:nil
+                                        logCall:YES
+                                          queue:queue
+                                     completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable responses, NSError * _Nullable error) {
+                                         mtr_strongify(self);
+                                         VerifyOrReturn(self, MTR_LOG_DEBUG("invokeCommands batch completion called back with nil MTRDevice"));
 
-                                           nextCompletion(nextAllSucceeded, [previousResponses arrayByAddingObject:response]);
-                                       }];
+                                         if (error != nil) {
+                                             NSMutableArray<MTRDeviceResponseValueDictionary> * newResponses = [previousResponses mutableCopy];
+                                             for (MTRCommandWithRequiredResponse * command in chunk) {
+                                                 [newResponses addObject:@ {
+                                                     MTRCommandPathKey : command.path,
+                                                     MTRErrorKey : error,
+                                                 }];
+                                             }
+                                             nextCompletion(NO, newResponses);
+                                             return;
+                                         }
+
+                                         if (responses.count != chunk.count) {
+                                             MTR_LOG_ERROR("%@ invokeCommands batch got %llu responses for %llu commands", self,
+                                                 static_cast<unsigned long long>(responses.count), static_cast<unsigned long long>(chunk.count));
+                                             NSMutableArray<MTRDeviceResponseValueDictionary> * newResponses = [previousResponses mutableCopy];
+                                             for (MTRCommandWithRequiredResponse * command in chunk) {
+                                                 [newResponses addObject:@ {
+                                                     MTRCommandPathKey : command.path,
+                                                     MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTERNAL],
+                                                 }];
+                                             }
+                                             nextCompletion(NO, newResponses);
+                                             return;
+                                         }
+
+                                         BOOL nextAllSucceeded = allSucceededSoFar;
+                                         for (NSUInteger i = 0; i < chunk.count; i++) {
+                                             MTRCommandWithRequiredResponse * command = chunk[i];
+                                             MTRDeviceResponseValueDictionary response = responses[i];
+                                             if (response[MTRErrorKey] != nil) {
+                                                 nextAllSucceeded = NO;
+                                             } else if (command.requiredResponse != nil && ![self _invokeResponse:response matchesRequiredResponse:command.requiredResponse]) {
+                                                 nextAllSucceeded = NO;
+                                             }
+                                         }
+
+                                         nextCompletion(nextAllSucceeded, [previousResponses arrayByAddingObjectsFromArray:responses]);
+                                     }];
             };
 
-            nextCompletion = commandInvokeBlock;
+            nextCompletion = chunkInvokeBlock;
         }
 
         auto commandGroupInvokeBlock = ^(BOOL allSucceededSoFar, NSArray<MTRDeviceResponseValueDictionary> * previousResponses) {
             mtr_strongify(self);
-            VerifyOrReturn(self, MTR_LOG_DEBUG("invokeCommands commandGroupInvokeBlock called back with nil MTRDevice"));
+            VerifyOrReturn(self, MTR_LOG_DEBUG("invokeCommands batch group block called back with nil MTRDevice"));
 
             if (allSucceededSoFar == NO) {
-                // Don't start a new command group if something failed in the
-                // previous one.  Note that we might be running on self.queue here, so make sure we
-                // dispatch to the correct queue.
-                MTR_LOG_ERROR("%@ failed a preceding command, not invoking command group %@ or later ones", self, commandGroup);
-                dispatch_async(queue, ^{
-                    completion(previousResponses, nil);
-                });
+                MTR_LOG_ERROR("%@ failed a preceding command, not invoking further command groups", self);
+                completion(previousResponses);
                 return;
             }
 
@@ -4068,7 +4215,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         nextCompletion = commandGroupInvokeBlock;
     }
 
-    // Kick things off with a "everything succeeded so far and we have no responses yet".
     nextCompletion(YES, @[]);
 }
 
