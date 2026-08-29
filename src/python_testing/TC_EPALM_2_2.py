@@ -155,6 +155,7 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
                      "and MaxIntervalCeiling=30",
                   expectation="Subscription is established successfully; TH awaits subscription report of an initial "
                   "priming report carrying the current State value (in the no-fault baseline this is 0).")
+        original_mask: int | None = None
         sub = AttributeSubscriptionHandler(expected_cluster=cluster, expected_attribute=attributes.State)
         await sub.start(self.default_controller, self.dut_node_id, endpoint,
                         min_interval_sec=0, max_interval_sec=30)
@@ -267,6 +268,8 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
             if not accepts_modify:
                 self.mark_current_step_skipped()
             else:
+                original_mask = int(await self.read_single_attribute_check_success(
+                    endpoint=endpoint, cluster=cluster, attribute=attributes.Mask))
                 status = await self._command_status(
                     cluster.Commands.ModifyEnabledAlarms(mask=int(supported)), endpoint)
                 asserts.assert_equal(status, Status.Success,
@@ -280,8 +283,6 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
             if not accepts_modify or not int(supported):
                 self.mark_current_step_skipped()
             else:
-                original_mask = int(await self.read_single_attribute_check_success(
-                    endpoint=endpoint, cluster=cluster, attribute=attributes.Mask))
                 lowest_supported_bit = int(supported) & -int(supported)
                 reduced_mask = int(supported) & ~lowest_supported_bit
                 status = await self._command_status(
@@ -299,9 +300,6 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
                     dropped = int(sub.wait_next_report(timeout_sec=REPORT_TIMEOUT_SEC).value)
                     log.info('State after masking off 0x%08X: 0x%08X', lowest_supported_bit, dropped)
                     current_state = dropped
-                status = await self._command_status(
-                    cluster.Commands.ModifyEnabledAlarms(mask=original_mask), endpoint)
-                asserts.assert_equal(status, Status.Success, 'Restoring the original Mask must succeed')
 
             self.step(14, "TH sends the TestEventTrigger that clears all alarms",
                       expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
@@ -315,7 +313,15 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
             asserts.assert_equal(final_state, 0, 'State must be 0 after the clear-all trigger')
         finally:
             # Best effort: step 14 is the real assertion, but a failure anywhere above must not
-            # leave the DUT with alarms latched or the subscription registered.
+            # leave the DUT with alarms latched, its Mask altered, or the subscription registered.
+            if original_mask is not None:
+                try:
+                    restore = await self._command_status(
+                        cluster.Commands.ModifyEnabledAlarms(mask=original_mask), endpoint)
+                    if restore is not Status.Success:
+                        log.warning('Restoring Mask returned %s', restore)
+                except Exception:
+                    log.warning('Restoring Mask failed', exc_info=True)
             try:
                 await self.send_test_event_trigger_clear_all()
             except Exception:
