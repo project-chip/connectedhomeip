@@ -52,18 +52,19 @@ class ElectricalProtectionAlarmTestBaseHelper(MatterBaseTest):
         AlarmBitmap.kSelfTest: 0x00A3_0000_0000_0017,
     }
 
-    async def send_test_event_trigger_set_alarm(self, alarm: AlarmBitmap):
+    async def send_test_event_trigger_set_alarm(self, alarm: AlarmBitmap) -> None:
         """Raise a single alarm."""
         await self.send_test_event_triggers(eventTrigger=self._set_triggers[alarm])
 
-    async def send_test_event_trigger_clear_alarm(self, alarm: AlarmBitmap):
+    async def send_test_event_trigger_clear_alarm(self, alarm: AlarmBitmap) -> None:
         """Lower a single alarm, leaving the others untouched."""
         await self.send_test_event_triggers(eventTrigger=self._clear_triggers[alarm])
 
-    async def send_test_event_trigger_clear_all(self):
+    async def send_test_event_trigger_clear_all(self) -> None:
         """Lower every alarm."""
         await self.send_test_event_triggers(eventTrigger=self.test_event_clear_all)
 
     async def read_state(self, endpoint: int) -> int:
+        """Read the State attribute."""
         return int(await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.State))
