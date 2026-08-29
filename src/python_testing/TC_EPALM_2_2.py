@@ -53,7 +53,7 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.runner import default_matter_test_main
 from matter.tlv import uint
 
 log = logging.getLogger(__name__)
@@ -108,43 +108,6 @@ class TC_EPALM_2_2(MatterBaseTest):
     def pics_TC_EPALM_2_2(self) -> list[str]:
         return ["EPALM.S"]
 
-    def steps_TC_EPALM_2_2(self) -> list[TestStep]:
-        return [
-            TestStep(1, "Commission DUT to TH (already done)", is_commissioning=True),
-            TestStep(2, "TH reads TestEventTriggersEnabled from General Diagnostics on endpoint 0",
-                     "Value is 1 (True). If 0, the remaining steps cannot run."),
-            TestStep(3, "TH establishes a subscription to the State attribute with MinIntervalFloor=0 "
-                        "and MaxIntervalCeiling=30",
-                     "Subscription is established and an initial priming report carrying the current "
-                     "State value is received."),
-            TestStep(4, "TH sends the TestEventTrigger for ShortCircuitFault",
-                     "DUT returns SUCCESS and reports a State value with bit 0 set."),
-            TestStep(5, "TH sends the TestEventTrigger for OverLoadFault",
-                     "DUT returns SUCCESS and reports a State value with bit 1 set."),
-            TestStep(6, "TH sends the TestEventTrigger for OverVoltageFault",
-                     "DUT returns SUCCESS and reports a State value with bit 2 set."),
-            TestStep(7, "TH sends the TestEventTrigger for VoltageSurgeFault",
-                     "DUT returns SUCCESS and reports a State value with bit 3 set."),
-            TestStep(8, "TH sends the TestEventTrigger for ResidualCurrentFault",
-                     "DUT returns SUCCESS and reports a State value with bit 4 set."),
-            TestStep(9, "TH sends the TestEventTrigger for ArcFault",
-                     "DUT returns SUCCESS and reports a State value with bit 5 set."),
-            TestStep(10, "TH sends the TestEventTrigger for SelfTest",
-                     "DUT returns SUCCESS and reports a State value with bit 6 set."),
-            TestStep(11, "TH reads the State attribute and inspects the value",
-                     "Every bit set in State is also set in Supported."),
-            TestStep(12, "TH sends the Reset command (Alarm Base.Reset) to the DUT",
-                     "DUT replies UNSUPPORTED_COMMAND (0x81). EPALM disallows the inherited RESET "
-                     "feature, so the command is not callable."),
-            TestStep(13, "If the DUT does not accept ModifyEnabledAlarms, TH sends it anyway",
-                     "DUT replies UNSUPPORTED_COMMAND (0x81)."),
-            TestStep("13a", "If the DUT accepts ModifyEnabledAlarms, TH sends it",
-                     "DUT returns SUCCESS. The command is optional in Alarm Base, so a DUT that "
-                     "implements it accepts rather than rejects it."),
-            TestStep(14, "TH sends the TestEventTrigger that clears all alarms",
-                     "DUT returns SUCCESS and reports a State value of 0."),
-        ]
-
     async def _command_status(self, command: ClusterCommand, endpoint: int) -> Status:
         """Send a command and return the resulting status, treating no exception as Success."""
         try:
@@ -186,9 +149,10 @@ class TC_EPALM_2_2(MatterBaseTest):
         alarm_bits = cluster.Bitmaps.AlarmBitmap
         features = cluster.Bitmaps.Feature
 
-        self.step(1)
+        self.step(1, "Commission DUT to TH (already done)", is_commissioning=True)
 
-        self.step(2)
+        self.step(2, "TH reads TestEventTriggersEnabled from General Diagnostics on endpoint 0",
+                  expectation="Value is 1 (True). If 0, the remaining steps cannot run.")
         await self.check_test_event_triggers_enabled()
 
         feature_map = await self.read_single_attribute_check_success(
@@ -199,7 +163,10 @@ class TC_EPALM_2_2(MatterBaseTest):
             endpoint=endpoint, cluster=cluster, attribute=attributes.AcceptedCommandList)
         accepts_modify = MODIFY_ENABLED_ALARMS_COMMAND_ID in accepted_commands
 
-        self.step(3)
+        self.step(3, "TH establishes a subscription to the State attribute with MinIntervalFloor=0 "
+                     "and MaxIntervalCeiling=30",
+                  expectation="Subscription is established and the current State value is read as "
+                              "the baseline.")
         sub = AttributeSubscriptionHandler(expected_cluster=cluster, expected_attribute=attributes.State)
         await sub.start(self.default_controller, self.dut_node_id, endpoint,
                         min_interval_sec=0, max_interval_sec=30)
@@ -211,27 +178,65 @@ class TC_EPALM_2_2(MatterBaseTest):
             endpoint=endpoint, cluster=cluster, attribute=attributes.State)
         log.info('State at subscription time: 0x%08X', priming_state)
 
-        # Steps 4 to 10 are each gated on the feature that owns the alarm bit. Steps for
-        # unsupported features are skipped per the standard PICS-gated step rules.
-        fault_steps = [
-            (4, features.kShortCircuit, TRIGGER_SHORT_CIRCUIT_FAULT, alarm_bits.kShortCircuitFault, 'ShortCircuitFault'),
-            (5, features.kOverLoad, TRIGGER_OVER_LOAD_FAULT, alarm_bits.kOverLoadFault, 'OverLoadFault'),
-            (6, features.kOverVoltage, TRIGGER_OVER_VOLTAGE_FAULT, alarm_bits.kOverVoltageFault, 'OverVoltageFault'),
-            (7, features.kSurgeProtection, TRIGGER_VOLTAGE_SURGE_FAULT, alarm_bits.kVoltageSurgeFault, 'VoltageSurgeFault'),
-            (8, features.kResidualCurrent, TRIGGER_RESIDUAL_CURRENT_FAULT, alarm_bits.kResidualCurrentFault,
-             'ResidualCurrentFault'),
-            (9, features.kArcFault, TRIGGER_ARC_FAULT, alarm_bits.kArcFault, 'ArcFault'),
-            (10, features.kSelfTest, TRIGGER_SELF_TEST, alarm_bits.kSelfTest, 'SelfTest'),
-        ]
         current_state = int(priming_state)
-        for step_number, feature, trigger, bit, name in fault_steps:
-            self.step(step_number)
-            if not feature_map & feature:
-                self.mark_current_step_skipped()
-                continue
-            current_state = await self._trigger_and_expect_bit(sub, trigger, bit, name, endpoint, current_state)
+        self.step(4, "TH sends the TestEventTrigger for ShortCircuitFault",
+                  expectation="DUT returns SUCCESS and reports a State value with bit 0 set.")
+        if feature_map & features.kShortCircuit:
+            current_state = await self._trigger_and_expect_bit(
+                sub, TRIGGER_SHORT_CIRCUIT_FAULT, alarm_bits.kShortCircuitFault, "ShortCircuitFault", endpoint, current_state)
+        else:
+            self.mark_current_step_skipped()
 
-        self.step(11)
+        self.step(5, "TH sends the TestEventTrigger for OverLoadFault",
+                  expectation="DUT returns SUCCESS and reports a State value with bit 1 set.")
+        if feature_map & features.kOverLoad:
+            current_state = await self._trigger_and_expect_bit(
+                sub, TRIGGER_OVER_LOAD_FAULT, alarm_bits.kOverLoadFault, "OverLoadFault", endpoint, current_state)
+        else:
+            self.mark_current_step_skipped()
+
+        self.step(6, "TH sends the TestEventTrigger for OverVoltageFault",
+                  expectation="DUT returns SUCCESS and reports a State value with bit 2 set.")
+        if feature_map & features.kOverVoltage:
+            current_state = await self._trigger_and_expect_bit(
+                sub, TRIGGER_OVER_VOLTAGE_FAULT, alarm_bits.kOverVoltageFault, "OverVoltageFault", endpoint, current_state)
+        else:
+            self.mark_current_step_skipped()
+
+        self.step(7, "TH sends the TestEventTrigger for VoltageSurgeFault",
+                  expectation="DUT returns SUCCESS and reports a State value with bit 3 set.")
+        if feature_map & features.kSurgeProtection:
+            current_state = await self._trigger_and_expect_bit(
+                sub, TRIGGER_VOLTAGE_SURGE_FAULT, alarm_bits.kVoltageSurgeFault, "VoltageSurgeFault", endpoint, current_state)
+        else:
+            self.mark_current_step_skipped()
+
+        self.step(8, "TH sends the TestEventTrigger for ResidualCurrentFault",
+                  expectation="DUT returns SUCCESS and reports a State value with bit 4 set.")
+        if feature_map & features.kResidualCurrent:
+            current_state = await self._trigger_and_expect_bit(
+                sub, TRIGGER_RESIDUAL_CURRENT_FAULT, alarm_bits.kResidualCurrentFault, "ResidualCurrentFault", endpoint, current_state)
+        else:
+            self.mark_current_step_skipped()
+
+        self.step(9, "TH sends the TestEventTrigger for ArcFault",
+                  expectation="DUT returns SUCCESS and reports a State value with bit 5 set.")
+        if feature_map & features.kArcFault:
+            current_state = await self._trigger_and_expect_bit(
+                sub, TRIGGER_ARC_FAULT, alarm_bits.kArcFault, "ArcFault", endpoint, current_state)
+        else:
+            self.mark_current_step_skipped()
+
+        self.step(10, "TH sends the TestEventTrigger for SelfTest",
+                  expectation="DUT returns SUCCESS and reports a State value with bit 6 set.")
+        if feature_map & features.kSelfTest:
+            current_state = await self._trigger_and_expect_bit(
+                sub, TRIGGER_SELF_TEST, alarm_bits.kSelfTest, "SelfTest", endpoint, current_state)
+        else:
+            self.mark_current_step_skipped()
+
+        self.step(11, "TH reads the State attribute and inspects the value",
+                  expectation="Every bit set in State is also set in Supported.")
         state = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attributes.State)
         supported = await self.read_single_attribute_check_success(
@@ -240,12 +245,14 @@ class TC_EPALM_2_2(MatterBaseTest):
         asserts.assert_equal(int(state) & ~int(supported), 0,
                              'State must not set any bit that is absent from Supported')
 
-        self.step(12)
+        self.step(12, "TH sends the Reset command (Alarm Base.Reset) to the DUT",
+                  expectation="DUT replies UNSUPPORTED_COMMAND (0x81).")
         status = await self._command_status(FakeReset(alarms=0), endpoint)
         asserts.assert_equal(status, Status.UnsupportedCommand,
                              'Reset must return UNSUPPORTED_COMMAND: EPALM disallows the RESET feature')
 
-        self.step(13)
+        self.step(13, "If the DUT does not accept ModifyEnabledAlarms, TH sends it anyway",
+                  expectation="DUT replies UNSUPPORTED_COMMAND (0x81).")
         if accepts_modify:
             self.mark_current_step_skipped()
         else:
@@ -255,7 +262,8 @@ class TC_EPALM_2_2(MatterBaseTest):
                                  'ModifyEnabledAlarms must return UNSUPPORTED_COMMAND when the DUT '
                                  'does not accept it')
 
-        self.step("13a")
+        self.step("13a", "If the DUT accepts ModifyEnabledAlarms, TH sends it",
+                  expectation="DUT returns SUCCESS.")
         if not accepts_modify:
             self.mark_current_step_skipped()
         else:
@@ -265,7 +273,8 @@ class TC_EPALM_2_2(MatterBaseTest):
                                  'ModifyEnabledAlarms is optional in Alarm Base, so a DUT that '
                                  'accepts it must succeed rather than reject')
 
-        self.step(14)
+        self.step(14, "TH sends the TestEventTrigger that clears all alarms",
+                  expectation="DUT returns SUCCESS and reports a State value of 0.")
         await self.send_test_event_triggers(eventTrigger=TRIGGER_CLEAR_ALL)
         if int(state) == 0:
             # Nothing was raised, so clearing is a no-op and the cluster reports nothing.
