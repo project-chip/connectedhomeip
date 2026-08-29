@@ -15,7 +15,10 @@
 #    limitations under the License.
 #
 
+from mobly import asserts
+
 import matter.clusters as Clusters
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 
 cluster = Clusters.ElectricalProtectionAlarm
@@ -67,3 +70,14 @@ class ElectricalProtectionAlarmTestBaseHelper(MatterBaseTest):
     async def read_state(self, endpoint: int) -> int:
         return int(await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.State))
+
+    async def await_notify(self, sub: EventSubscriptionHandler, timeout_sec: float = 10.0):
+        """Return the next Notify event, failing the test if it could not be decoded.
+
+        wait_for_event_report returns a ValueDecodeFailure rather than raising when the payload
+        will not decode, so the attribute check is load-bearing and not dead code.
+        """
+        report = sub.wait_for_event_report(cluster.Events.Notify, timeout_sec=timeout_sec)
+        asserts.assert_true(hasattr(report, "active") and hasattr(report, "state"),
+                            f"Notify event did not decode into an event object: {report}")
+        return report
