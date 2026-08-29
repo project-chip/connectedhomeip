@@ -106,7 +106,7 @@ class ElectricalProtectionAlarmTestBaseHelper(MatterBaseTest):
             TestStep("1d", "TH reads TestEventTriggersEnabled from General Diagnostics on endpoint 0",
                      "Verify that TestEventTriggersEnabled has a value of 1 (True)."),
             TestStep("1e", f"TH sends the TestEventTrigger clearing {alarm_name}, returning the DUT "
-                           "to its no-fault baseline", success),
+                     "to its no-fault baseline", success),
             TestStep("2a", f"TH sends the TestEventTrigger setting {alarm_name}",
                      f"{success} {awaits} a Notify event with bit {alarm_bit} set in Active and set in State."),
             TestStep("2b", "TH reads the State attribute",
