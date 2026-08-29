@@ -28,9 +28,9 @@ namespace Clusters {
 namespace Thermostat {
 
 /*
-* A simple implementation of ThermostatOccupancy::Delegate.
-* It reports and persists the basic state of the thermostat's occupancy attributes.
-*/
+ * A simple implementation of ThermostatOccupancy::Delegate.
+ * It reports and persists the basic state of the thermostat's occupancy attributes.
+ */
 class ThermostatOccupancyDelegate : public ThermostatOccupancy::Delegate
 {
 public:

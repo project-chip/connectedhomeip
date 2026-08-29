@@ -30,15 +30,14 @@ namespace Clusters {
 namespace Thermostat {
 
 /*
-* A simple implementation of ThermostatHoldDelegate.
-* It reports and persists the basic state of the thermostat's setpoint hold attributes.
-*/
+ * A simple implementation of ThermostatHoldDelegate.
+ * It reports and persists the basic state of the thermostat's setpoint hold attributes.
+ */
 class ThermostatHoldDelegate : public ThermostatHold::Delegate
 {
 public:
     ThermostatHoldDelegate(EndpointId endpoint, AttributePersistenceProvider * provider = nullptr) :
-        mEndpointId(endpoint),
-        mProvider(provider)
+        mEndpointId(endpoint), mProvider(provider)
     {}
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;

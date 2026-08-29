@@ -44,7 +44,7 @@ inline DefaultTimerDelegate gDefaultTimerDelegate;
 
 /**
  * Base delegate for the Thermostat cluster.
- * 
+ *
  * It provides the default implementation of GetOptionalAttributes, which is used to
  * determine which optional attributes should be enabled for the cluster.
  */
@@ -56,7 +56,7 @@ protected:
 
 /**
  * A helper struct to store the cluster instances.
- * 
+ *
  * @tparam Size The maximum number of cluster instances.
  * @tparam Cluster The type of the cluster.
  */
@@ -68,7 +68,7 @@ struct ClusterStorage
 
 /**
  * Integration delegate for the Thermostat cluster.
- * 
+ *
  * @tparam Size The maximum number of cluster instances.
  * @tparam Cluster The type of the cluster.
  * @tparam ...Delegates The types of the delegates.
