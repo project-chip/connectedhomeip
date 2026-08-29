@@ -69,15 +69,9 @@ CHIP_ERROR ModeSelectCluster::Startup(ServerClusterContext & context)
     return CHIP_NO_ERROR;
 }
 
-void ModeSelectCluster::Shutdown(ClusterShutdownType shutdownType)
-{
-    mStartupLogicApplied = false;
-    DefaultServerCluster::Shutdown(shutdownType);
-}
-
 void ModeSelectCluster::ApplyStartupModeLogic()
 {
-    if (mContext == nullptr || mStartupLogicApplied)
+    if (mContext == nullptr)
     {
         return;
     }
@@ -138,8 +132,6 @@ void ModeSelectCluster::ApplyStartupModeLogic()
             ChipLogError(Zcl, "ModeSelect: OnMode %u not supported, ignoring.", mOnMode.Value());
         }
     }
-
-    mStartupLogicApplied = true;
 }
 
 void ModeSelectCluster::LoadPersistentAttributes(AttributePersistenceProvider & provider)

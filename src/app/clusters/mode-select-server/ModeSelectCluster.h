@@ -63,7 +63,6 @@ public:
 
     // ServerClusterInterface overrides
     CHIP_ERROR Startup(ServerClusterContext & context) override;
-    void Shutdown(ClusterShutdownType shutdownType) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
@@ -111,7 +110,6 @@ private:
     uint8_t mCurrentMode = 0;
     DataModel::Nullable<uint8_t> mStartUpMode{};
     DataModel::Nullable<uint8_t> mOnMode{};
-    bool mStartupLogicApplied = false;
 };
 
 namespace ModeSelect {
