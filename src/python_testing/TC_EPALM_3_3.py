@@ -42,25 +42,27 @@
 
 import logging
 
-from mobly import asserts
 from TC_EPALM_TestBase import ElectricalProtectionAlarmTestBaseHelper
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.runner import default_matter_test_main
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 cluster = Clusters.ElectricalProtectionAlarm
 ALARM = cluster.Bitmaps.AlarmBitmap.kOverVoltageFault
-ALARM_MASK = int(ALARM)
+ALARM_NAME = "OverVoltageFault"
+ALARM_BIT = 2
 
 
 class TC_EPALM_3_3(ElectricalProtectionAlarmTestBaseHelper):
 
     def pics_TC_EPALM_3_3(self) -> list[str]:
         return ["EPALM.S", "EPALM.S.F22", "EPALM.S.E00"]
+
+    def steps_TC_EPALM_3_3(self) -> list[TestStep]:
+        return self.alarm_notify_steps(ALARM_BIT, ALARM_NAME)
 
     @run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kOverVoltage))
     async def test_TC_EPALM_3_3(self):
@@ -70,82 +72,7 @@ class TC_EPALM_3_3(ElectricalProtectionAlarmTestBaseHelper):
         transitions for the OverVoltageFault alarm of the Electrical Protection Alarm
         Cluster server.
         """
-        endpoint = self.get_endpoint()
-
-        self.step("1a", "Commission DUT to TH (already done)", is_commissioning=True)
-
-        self.step("1b", "TH sets up a subscription to the Notify event")
-        sub = EventSubscriptionHandler(expected_cluster=cluster)
-        await sub.start(self.default_controller, self.dut_node_id, endpoint)
-
-        try:
-
-            self.step("1c", "TH reads the Supported attribute",
-                      expectation="Bit 2 of the response SHALL be 1.")
-            supported = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Supported)
-            asserts.assert_true(int(supported) & ALARM_MASK,
-                                "Supported must set bit 2 for OverVoltageFault")
-
-            self.step("1d", "TH reads TestEventTriggersEnabled from General Diagnostics on endpoint 0",
-                      expectation="Verify that TestEventTriggersEnabled has a value of 1 (True).")
-            await self.check_test_event_triggers_enabled()
-
-            self.step("1e", "TH sends the TestEventTrigger clearing OverVoltageFault, returning the DUT to its "
-                            "no-fault baseline",
-                      expectation="Verify DUT responds w/ status SUCCESS(0x00).")
-            state_before = await self.read_state(endpoint)
-            await self.send_test_event_trigger_clear_alarm(ALARM)
-            if state_before & ALARM_MASK:
-                # Already raised, so this trigger emits an inactive Notify. Consume it here rather than
-                # letting it arrive after the flush, where step 2a would read it instead of the
-                # set-transition it is waiting for.
-                report = await self.await_notify(sub)
-                asserts.assert_true(int(report.inactive) & ALARM_MASK,
-                                    "Baseline clear must report OverVoltageFault in Inactive")
-            asserts.assert_false(await self.read_state(endpoint) & ALARM_MASK,
-                                 "OverVoltageFault must be clear before the set trigger")
-            sub.flush_events()
-
-            self.step("2a", "TH sends the TestEventTrigger setting OverVoltageFault",
-                      expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a Notify "
-                      "event with bit 2 set in Active and set in State.")
-            await self.send_test_event_trigger_set_alarm(ALARM)
-            report = await self.await_notify(sub)
-            log.info("Notify on set: active=0x%02X inactive=0x%02X state=0x%02X",
-                     report.active, report.inactive, report.state)
-            asserts.assert_true(int(report.active) & ALARM_MASK,
-                                "Notify.Active must set bit 2 when OverVoltageFault is raised")
-            asserts.assert_true(int(report.state) & ALARM_MASK,
-                                "Notify.State must set bit 2 when OverVoltageFault is raised")
-
-            self.step("2b", "TH reads the State attribute", expectation="Bit 2 of the response SHALL be 1.")
-            asserts.assert_true(await self.read_state(endpoint) & ALARM_MASK,
-                                "State bit 2 must be 1 after the set trigger")
-
-            self.step("3a", "TH sends the TestEventTrigger clearing OverVoltageFault",
-                      expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a Notify "
-                      "event with bit 2 set in Inactive and clear in State.")
-            await self.send_test_event_trigger_clear_alarm(ALARM)
-            report = await self.await_notify(sub)
-            log.info("Notify on clear: active=0x%02X inactive=0x%02X state=0x%02X",
-                     report.active, report.inactive, report.state)
-            asserts.assert_true(int(report.inactive) & ALARM_MASK,
-                                "Notify.Inactive must set bit 2 when OverVoltageFault is cleared")
-            asserts.assert_false(int(report.state) & ALARM_MASK,
-                                 "Notify.State must clear bit 2 when OverVoltageFault is cleared")
-
-            self.step("3b", "TH reads the State attribute", expectation="Bit 2 of the response SHALL be 0.")
-            asserts.assert_false(await self.read_state(endpoint) & ALARM_MASK,
-                                 "State bit 2 must be 0 after the clear trigger")
-        finally:
-            # Leave the DUT in its no-fault baseline even if a step above failed. A second clear
-            # after step 3a is a no-op: no transition means no report.
-            try:
-                await self.send_test_event_trigger_clear_alarm(ALARM)
-            except Exception:  # noqa: BLE001 - never mask the original failure
-                log.exception("Could not clear OverVoltageFault during cleanup")
-            sub.cancel()
+        await self.run_alarm_notify_test(ALARM, ALARM_NAME, ALARM_BIT)
 
 
 if __name__ == "__main__":
