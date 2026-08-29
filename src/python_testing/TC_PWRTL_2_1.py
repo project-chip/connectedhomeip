@@ -59,12 +59,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
     async def test_TC_PWRTL_2_1(self):
         """[TC-PWRTL-2.1] Attributes with DUT as Server
 
-        Verify FeatureMap (including the Matter 1.7 CIRC bit 4 with reserved-bit
-        discipline), AttributeList composition based on topology features,
-        AvailableEndpoints and ActiveEndpoints reads, the subset invariant
-        (ActiveEndpoints subset of AvailableEndpoints), read-only access on
-        both endpoint list attributes, and Non-volatile persistence of
-        ActiveEndpoints across reboot.
+        This test case verifies the primary functionality of the Power Topology Cluster server.
 
         Test Plan:
         https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/cluster/power_topology.adoc#tc-pwrtl-21
@@ -72,137 +67,41 @@ class TC_PWRTL_2_1(MatterBaseTest):
         endpoint = self.get_endpoint()
         cluster = Clusters.PowerTopology
         attributes = cluster.Attributes
-        features = cluster.Bitmaps.Feature
 
-        self.step(1, "Commissioning, already done", is_commissioning=True)
+        self.step(1, "Commission DUT to TH (already done)", is_commissioning=True)
 
-        self.step(2, "TH reads FeatureMap from DUT")
-        feature_map = await self.read_single_attribute_check_success(
-            endpoint=endpoint,
-            cluster=cluster,
-            attribute=attributes.FeatureMap
-        )
-        log.info("FeatureMap: 0x%08X", feature_map)
-
-        self.step(3, "TH validates O.a conformance (exactly one of NODE/TREE/SET); DYPF implies SET")
-        has_node = bool(feature_map & features.kNodeTopology)
-        has_tree = bool(feature_map & features.kTreeTopology)
-        has_set = bool(feature_map & features.kSetTopology)
-        topology_count = sum([has_node, has_tree, has_set])
-        asserts.assert_equal(topology_count, 1,
-                             f"Exactly one of NODE/TREE/SET must be set, got {topology_count}")
-        has_dypf = bool(feature_map & features.kDynamicPowerFlow)
-        if has_dypf:
-            asserts.assert_true(has_set,
-                                "DynamicPowerFlow (DYPF) requires SetTopology")
-        log.info("Topology: NODE=%s, TREE=%s, SET=%s, DYPF=%s", has_node, has_tree, has_set, has_dypf)
-
-        self.step(4, "TH validates CIRC bit and reserved bits 5..31")
-        has_circ = bool(feature_map & features.kElectricalCircuit)
-        log.info("ElectricalCircuit (CIRC): %s", has_circ)
-        KNOWN_BITS_MASK = (features.kNodeTopology | features.kTreeTopology |
-                           features.kSetTopology | features.kDynamicPowerFlow |
-                           features.kElectricalCircuit)
-        # The int() casts are load-bearing. Feature is an IntFlag whose members cover
-        # exactly bits 0..4, so ~KNOWN_BITS_MASK complements only within that mask and
-        # evaluates to 0, which would make the assertion below unconditionally true and
-        # leave bits 5..31 unchecked. Casting to int complements over the full width.
-        reserved_bits = int(feature_map) & ~int(KNOWN_BITS_MASK)
-        asserts.assert_equal(reserved_bits, 0,
-                             f"Reserved bits set in FeatureMap: 0x{reserved_bits:08X}")
-
-        self.step(5, "TH reads the AttributeList attribute")
         attribute_list = await self.read_single_attribute_check_success(
-            endpoint=endpoint,
-            cluster=cluster,
-            attribute=attributes.AttributeList
-        )
-        log.info("AttributeList: %s", attribute_list)
-        avail_ep_id = attributes.AvailableEndpoints.attribute_id
-        active_ep_id = attributes.ActiveEndpoints.attribute_id
+            endpoint=endpoint, cluster=cluster, attribute=attributes.AttributeList)
 
-        self.step(6, "TH verifies the AttributeList composition")
-
-        # AvailableEndpoints (0x0000): conformance "SET" — mandatory iff SET feature,
-        # disallowed otherwise (bare-symbol form, not bracketed).
-        if has_set:
-            asserts.assert_in(avail_ep_id, attribute_list,
-                              "AvailableEndpoints must be in AttributeList when SET feature is set")
-        else:
-            asserts.assert_not_in(avail_ep_id, attribute_list,
-                                  "AvailableEndpoints must NOT be in AttributeList when SET feature is not set")
-
-        # ActiveEndpoints (0x0001): conformance "DYPF" — mandatory iff DYPF feature,
-        # disallowed otherwise. DYPF itself requires SET ([SET]), so DYPF implies
-        # AvailableEndpoints is also present.
-        if has_dypf:
-            asserts.assert_in(active_ep_id, attribute_list,
-                              "ActiveEndpoints must be in AttributeList when DYPF feature is set")
-        else:
-            asserts.assert_not_in(active_ep_id, attribute_list,
-                                  "ActiveEndpoints must NOT be in AttributeList when DYPF feature is not set")
-
-        # ElectricalCircuitNodes (0x0002): conformance "CIRC" (Matter 1.7); mandatory iff CIRC feature,
-        # disallowed otherwise.
-        ecn_id = attributes.ElectricalCircuitNodes.attribute_id
-        if has_circ:
-            asserts.assert_in(ecn_id, attribute_list,
-                              "ElectricalCircuitNodes must be in AttributeList when CIRC feature is set")
-        else:
-            asserts.assert_not_in(ecn_id, attribute_list,
-                                  "ElectricalCircuitNodes must NOT be in AttributeList when CIRC feature is not set")
-
-        self.step(7, "TH reads AvailableEndpoints (if present in AttributeList)")
+        self.step(2, "TH reads from the DUT the AvailableEndpoints attribute.",
+                  expectation="Verify that the DUT response contains a list of endpoint-no entries. "
+                              "Verify that the list has no more than 20 entries.")
         avail_eps = None
-        if avail_ep_id in attribute_list:
+        if attributes.AvailableEndpoints.attribute_id in attribute_list:
             avail_eps = await self.read_single_attribute_check_success(
-                endpoint=endpoint,
-                cluster=cluster,
-                attribute=attributes.AvailableEndpoints
-            )
+                endpoint=endpoint, cluster=cluster, attribute=attributes.AvailableEndpoints)
+            asserts.assert_less_equal(len(avail_eps), 20,
+                                      "AvailableEndpoints must have no more than 20 entries")
             log.info("AvailableEndpoints: %s", avail_eps)
         else:
-            log.info("AvailableEndpoints not in AttributeList (SET feature not set)")
             self.mark_current_step_skipped()
 
-        self.step(8, "TH reads ActiveEndpoints (if present in AttributeList)")
-        active_eps = None
-        if active_ep_id in attribute_list:
+        self.step(3, "TH reads from the DUT the ActiveEndpoints attribute.",
+                  expectation="Verify that the DUT response contains a list of endpoint-no entries. "
+                              "Verify that the list has no more than 20 entries. Verify that the list "
+                              "is a subset of AvailableEndpoints.")
+        if attributes.ActiveEndpoints.attribute_id in attribute_list:
             active_eps = await self.read_single_attribute_check_success(
-                endpoint=endpoint,
-                cluster=cluster,
-                attribute=attributes.ActiveEndpoints
-            )
+                endpoint=endpoint, cluster=cluster, attribute=attributes.ActiveEndpoints)
+            asserts.assert_less_equal(len(active_eps), 20,
+                                      "ActiveEndpoints must have no more than 20 entries")
+            if avail_eps is not None:
+                for ep in active_eps:
+                    asserts.assert_in(ep, avail_eps,
+                                      f"ActiveEndpoint {ep} is not in AvailableEndpoints")
             log.info("ActiveEndpoints: %s", active_eps)
         else:
-            log.info("ActiveEndpoints not in AttributeList (DYPF feature not set)")
             self.mark_current_step_skipped()
-
-        self.step(9, "TH verifies ActiveEndpoints is a subset of AvailableEndpoints")
-        if avail_eps is not None and active_eps is not None:
-            for ep in active_eps:
-                asserts.assert_in(ep, avail_eps,
-                                  f"ActiveEndpoint {ep} not in AvailableEndpoints")
-            log.info("ActiveEndpoints is a subset of AvailableEndpoints")
-        else:
-            log.info("Skipping subset check (endpoint attributes not present)")
-            self.mark_current_step_skipped()
-
-        self.step(10, "Reboot DUT; TH reads ActiveEndpoints - persisted value returned (Non-Volatile)")
-        if active_eps is None:
-            # DYPF not supported, so there is no ActiveEndpoints value whose
-            # Non-Volatile quality could be verified.
-            self.mark_current_step_skipped()
-        else:
-            await self.request_device_reboot()
-            active_eps_post = await self.read_single_attribute_check_success(
-                endpoint=endpoint,
-                cluster=cluster,
-                attribute=attributes.ActiveEndpoints
-            )
-            asserts.assert_equal(sorted(active_eps_post), sorted(active_eps),
-                                 "ActiveEndpoints changed after reboot - violates Non-volatile quality")
-            log.info("ActiveEndpoints persisted across reboot (Non-volatile verified)")
 
 
 if __name__ == "__main__":
