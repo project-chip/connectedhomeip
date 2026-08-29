@@ -307,8 +307,8 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
                       expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
                       "value of 0 (cleanup).")
             await self.send_test_event_trigger_clear_all()
-            if int(state) == 0:
-                # Nothing was raised, so clearing is a no-op and the cluster reports nothing.
+            if current_state == 0:
+                # Nothing is raised, so clearing is a no-op and the cluster reports nothing.
                 final_state = await self.read_state(endpoint)
             else:
                 final_state = int(sub.wait_next_report(timeout_sec=REPORT_TIMEOUT_SEC).value)
