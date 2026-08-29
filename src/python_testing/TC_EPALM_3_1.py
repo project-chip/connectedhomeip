@@ -127,7 +127,17 @@ class TC_EPALM_3_1(MatterBaseTest):
         await self.check_test_event_triggers_enabled()
 
         self.step("1e")
+        state_before = await self._read_state(endpoint)
         await self.send_test_event_triggers(eventTrigger=CLEAR_TRIGGER)
+        if state_before & ALARM_MASK:
+            # The alarm was already raised, so this trigger produces an inactive Notify. Consume it
+            # here rather than letting it arrive after the flush, where step 2a would read it
+            # instead of the set-transition it is waiting for.
+            report = await self._await_notify(sub)
+            asserts.assert_true(int(report.inactive) & ALARM_MASK,
+                                "Baseline clear must report ShortCircuitFault in Inactive")
+        asserts.assert_false(int(await self._read_state(endpoint)) & ALARM_MASK,
+                             "ShortCircuitFault must be clear before the set trigger")
         sub.flush_events()
 
         try:
