@@ -155,14 +155,29 @@ class TC_EPALM_2_2(MatterBaseTest):
         return Status.Success
 
     async def _trigger_and_expect_bit(self, sub: AttributeSubscriptionHandler, trigger: int,
-                                      bit: cluster.Bitmaps.AlarmBitmap, name: str) -> None:
-        """Fire a fault trigger and wait for a State report that carries the corresponding bit."""
+                                      bit: cluster.Bitmaps.AlarmBitmap, name: str,
+                                      endpoint: int, current_state: int) -> int:
+        """Fire a fault trigger and confirm the bit ends up set. Returns the new State.
+
+        The cluster reports only on an actual transition, so a DUT that already has this alarm
+        raised emits nothing and waiting for a report would hang. Read in that case instead.
+        """
         await self.send_test_event_triggers(eventTrigger=trigger)
-        report = sub.wait_next_report(timeout_sec=REPORT_TIMEOUT_SEC)
-        state = report.value
-        log.info('State after %s trigger: 0x%08X', name, state)
+        if current_state & int(bit):
+            state = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.State)
+            log.info('State after %s trigger: 0x%08X (already raised, no transition to report)', name, state)
+        else:
+            report = sub.wait_next_report(timeout_sec=REPORT_TIMEOUT_SEC)
+            state = report.value
+            log.info('State after %s trigger: 0x%08X', name, state)
         asserts.assert_true(int(state) & int(bit),
                             f'State must have the {name} bit set after its TestEventTrigger')
+        return int(state)
+
+    async def _read_state(self, endpoint: int) -> int:
+        return int(await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.State))
 
     @async_test_body
     async def test_TC_EPALM_2_2(self):
@@ -208,12 +223,13 @@ class TC_EPALM_2_2(MatterBaseTest):
             (9, features.kArcFault, TRIGGER_ARC_FAULT, alarm_bits.kArcFault, 'ArcFault'),
             (10, features.kSelfTest, TRIGGER_SELF_TEST, alarm_bits.kSelfTest, 'SelfTest'),
         ]
+        current_state = int(priming_state)
         for step_number, feature, trigger, bit, name in fault_steps:
             self.step(step_number)
             if not feature_map & feature:
                 self.mark_current_step_skipped()
                 continue
-            await self._trigger_and_expect_bit(sub, trigger, bit, name)
+            current_state = await self._trigger_and_expect_bit(sub, trigger, bit, name, endpoint, current_state)
 
         self.step(11)
         state = await self.read_single_attribute_check_success(
@@ -251,8 +267,12 @@ class TC_EPALM_2_2(MatterBaseTest):
 
         self.step(14)
         await self.send_test_event_triggers(eventTrigger=TRIGGER_CLEAR_ALL)
-        report = sub.wait_next_report(timeout_sec=REPORT_TIMEOUT_SEC)
-        asserts.assert_equal(int(report.value), 0, 'State must be 0 after the clear-all trigger')
+        if int(state) == 0:
+            # Nothing was raised, so clearing is a no-op and the cluster reports nothing.
+            final_state = await self._read_state(endpoint)
+        else:
+            final_state = int(sub.wait_next_report(timeout_sec=REPORT_TIMEOUT_SEC).value)
+        asserts.assert_equal(final_state, 0, 'State must be 0 after the clear-all trigger')
         sub.cancel()
 
 
