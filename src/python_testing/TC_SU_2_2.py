@@ -582,6 +582,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # The provider auto-switches to UpdateAvailable after one Busy response.
         # kDownloading before kDelayedOnQuery is an immediate fail.
         # ------------------------------------------------------------------------------------
+        kQuerying_s3 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
         kDelayedOnQuery_s3 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery
         kDownloading_s3 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
         kApplying_s3 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying
@@ -599,19 +600,31 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                     step_number_s3, t_delayed_on_query_s3)
 
         # ------------------------------------------------------------------------------------
-        # [STEP_3]: Phase B — 180s guard window; kDownloading/kApplying are forbidden.
+        # [STEP_3]: Phase B — 180s guard window; kQuerying/kDownloading/kApplying are forbidden.
         # After the window elapses, the provider has auto-switched to UpdateAvailable and the
         # DUT's next query will trigger a download.
+        #
+        # kQuerying is what the step actually verifies the absence of ("the DUT waits for at
+        # least the DelayedActionTime before issuing another QueryImage"), so it is checked
+        # directly rather than only through its consequence: relying on kDownloading alone would
+        # miss an early query whose response never led to a transfer, and would measure the
+        # interval to the download rather than to the query itself.
+        #
+        # Forbidding it here is safe because the window is anchored on kDelayedOnQuery, which
+        # the DUT only reaches after it has found this provider and received its response — any
+        # session-recovery re-query from the provider switch is already behind us. The provider
+        # also runs untouched for the whole window (it is killed only once kDownloading is
+        # confirmed), so no further session invalidation can occur inside it.
         # ------------------------------------------------------------------------------------
         tolerance_s3 = 5.0
         min_interval_s3 = SPEC_GUARD_S3_SEC
 
         logger.info(
-            '%s: Phase B — guarding %ss DelayedActionTime (tolerance %ss). kDownloading/kApplying forbidden. This will take ~3 minutes.', step_number_s3, min_interval_s3, tolerance_s3)
+            '%s: Phase B — guarding %ss DelayedActionTime (tolerance %ss). kQuerying/kDownloading/kApplying forbidden. This will take ~3 minutes.', step_number_s3, min_interval_s3, tolerance_s3)
 
         subscription_attr_state_busy_180s.await_duration_asserting_no_forbidden(
             duration_sec=min_interval_s3,
-            forbidden_values={kDownloading_s3, kApplying_s3},
+            forbidden_values={kQuerying_s3, kDownloading_s3, kApplying_s3},
             tolerance_sec=tolerance_s3,
         )
 
