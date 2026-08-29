@@ -45,6 +45,7 @@ import typing
 from dataclasses import dataclass
 
 from mobly import asserts
+from TC_EPALM_TestBase import ElectricalProtectionAlarmTestBaseHelper
 
 import matter.clusters as Clusters
 from matter import ChipUtility
@@ -52,25 +53,12 @@ from matter.clusters.ClusterObjects import ClusterCommand, ClusterObjectDescript
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 from matter.tlv import uint
 
 log = logging.getLogger(__name__)
 
 cluster = Clusters.ElectricalProtectionAlarm
-
-# TestEventTrigger codes implemented by ElectricalProtectionAlarmTestEventTriggerHandler.
-# The top two bytes carry the cluster id to namespace the trigger; the low byte selects the
-# alarm bit to set, or 0 to clear all alarms.
-TRIGGER_CLEAR_ALL = 0x00A3_0000_0000_0000
-TRIGGER_SHORT_CIRCUIT_FAULT = 0x00A3_0000_0000_0001
-TRIGGER_OVER_LOAD_FAULT = 0x00A3_0000_0000_0002
-TRIGGER_OVER_VOLTAGE_FAULT = 0x00A3_0000_0000_0003
-TRIGGER_VOLTAGE_SURGE_FAULT = 0x00A3_0000_0000_0004
-TRIGGER_RESIDUAL_CURRENT_FAULT = 0x00A3_0000_0000_0005
-TRIGGER_ARC_FAULT = 0x00A3_0000_0000_0006
-TRIGGER_SELF_TEST = 0x00A3_0000_0000_0007
 
 # Alarm Base command ids, inherited by EPALM.
 RESET_COMMAND_ID = 0x00
@@ -100,7 +88,7 @@ class FakeReset(ClusterCommand):
     alarms: uint = 0
 
 
-class TC_EPALM_2_2(MatterBaseTest):
+class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
 
     def desc_TC_EPALM_2_2(self) -> str:
         return "[TC-EPALM-2.2] Primary functionality (alarm state machine) with Server as DUT"
@@ -117,7 +105,7 @@ class TC_EPALM_2_2(MatterBaseTest):
             return e.status
         return Status.Success
 
-    async def _trigger_and_expect_bit(self, sub: AttributeSubscriptionHandler, trigger: int,
+    async def _trigger_and_expect_bit(self, sub: AttributeSubscriptionHandler,
                                       bit: cluster.Bitmaps.AlarmBitmap, name: str,
                                       endpoint: int, current_state: int) -> int:
         """Fire a fault trigger and confirm the bit ends up set. Returns the new State.
@@ -125,7 +113,7 @@ class TC_EPALM_2_2(MatterBaseTest):
         The cluster reports only on an actual transition, so a DUT that already has this alarm
         raised emits nothing and waiting for a report would hang. Read in that case instead.
         """
-        await self.send_test_event_triggers(eventTrigger=trigger)
+        await self.send_test_event_trigger_set_alarm(bit)
         if current_state & int(bit):
             state = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.State)
@@ -137,10 +125,6 @@ class TC_EPALM_2_2(MatterBaseTest):
         asserts.assert_true(int(state) & int(bit),
                             f'State must have the {name} bit set after its TestEventTrigger')
         return int(state)
-
-    async def _read_state(self, endpoint: int) -> int:
-        return int(await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.State))
 
     @async_test_body
     async def test_TC_EPALM_2_2(self):
@@ -183,7 +167,7 @@ class TC_EPALM_2_2(MatterBaseTest):
                   expectation="DUT returns SUCCESS and reports a State value with bit 0 set.")
         if feature_map & features.kShortCircuit:
             current_state = await self._trigger_and_expect_bit(
-                sub, TRIGGER_SHORT_CIRCUIT_FAULT, alarm_bits.kShortCircuitFault, "ShortCircuitFault", endpoint, current_state)
+                sub, alarm_bits.kShortCircuitFault, "ShortCircuitFault", endpoint, current_state)
         else:
             self.mark_current_step_skipped()
 
@@ -191,7 +175,7 @@ class TC_EPALM_2_2(MatterBaseTest):
                   expectation="DUT returns SUCCESS and reports a State value with bit 1 set.")
         if feature_map & features.kOverLoad:
             current_state = await self._trigger_and_expect_bit(
-                sub, TRIGGER_OVER_LOAD_FAULT, alarm_bits.kOverLoadFault, "OverLoadFault", endpoint, current_state)
+                sub, alarm_bits.kOverLoadFault, "OverLoadFault", endpoint, current_state)
         else:
             self.mark_current_step_skipped()
 
@@ -199,7 +183,7 @@ class TC_EPALM_2_2(MatterBaseTest):
                   expectation="DUT returns SUCCESS and reports a State value with bit 2 set.")
         if feature_map & features.kOverVoltage:
             current_state = await self._trigger_and_expect_bit(
-                sub, TRIGGER_OVER_VOLTAGE_FAULT, alarm_bits.kOverVoltageFault, "OverVoltageFault", endpoint, current_state)
+                sub, alarm_bits.kOverVoltageFault, "OverVoltageFault", endpoint, current_state)
         else:
             self.mark_current_step_skipped()
 
@@ -207,7 +191,7 @@ class TC_EPALM_2_2(MatterBaseTest):
                   expectation="DUT returns SUCCESS and reports a State value with bit 3 set.")
         if feature_map & features.kSurgeProtection:
             current_state = await self._trigger_and_expect_bit(
-                sub, TRIGGER_VOLTAGE_SURGE_FAULT, alarm_bits.kVoltageSurgeFault, "VoltageSurgeFault", endpoint, current_state)
+                sub, alarm_bits.kVoltageSurgeFault, "VoltageSurgeFault", endpoint, current_state)
         else:
             self.mark_current_step_skipped()
 
@@ -215,7 +199,7 @@ class TC_EPALM_2_2(MatterBaseTest):
                   expectation="DUT returns SUCCESS and reports a State value with bit 4 set.")
         if feature_map & features.kResidualCurrent:
             current_state = await self._trigger_and_expect_bit(
-                sub, TRIGGER_RESIDUAL_CURRENT_FAULT, alarm_bits.kResidualCurrentFault, "ResidualCurrentFault", endpoint, current_state)
+                sub, alarm_bits.kResidualCurrentFault, "ResidualCurrentFault", endpoint, current_state)
         else:
             self.mark_current_step_skipped()
 
@@ -223,7 +207,7 @@ class TC_EPALM_2_2(MatterBaseTest):
                   expectation="DUT returns SUCCESS and reports a State value with bit 5 set.")
         if feature_map & features.kArcFault:
             current_state = await self._trigger_and_expect_bit(
-                sub, TRIGGER_ARC_FAULT, alarm_bits.kArcFault, "ArcFault", endpoint, current_state)
+                sub, alarm_bits.kArcFault, "ArcFault", endpoint, current_state)
         else:
             self.mark_current_step_skipped()
 
@@ -231,7 +215,7 @@ class TC_EPALM_2_2(MatterBaseTest):
                   expectation="DUT returns SUCCESS and reports a State value with bit 6 set.")
         if feature_map & features.kSelfTest:
             current_state = await self._trigger_and_expect_bit(
-                sub, TRIGGER_SELF_TEST, alarm_bits.kSelfTest, "SelfTest", endpoint, current_state)
+                sub, alarm_bits.kSelfTest, "SelfTest", endpoint, current_state)
         else:
             self.mark_current_step_skipped()
 
@@ -275,10 +259,10 @@ class TC_EPALM_2_2(MatterBaseTest):
 
         self.step(14, "TH sends the TestEventTrigger that clears all alarms",
                   expectation="DUT returns SUCCESS and reports a State value of 0.")
-        await self.send_test_event_triggers(eventTrigger=TRIGGER_CLEAR_ALL)
+        await self.send_test_event_trigger_clear_all()
         if int(state) == 0:
             # Nothing was raised, so clearing is a no-op and the cluster reports nothing.
-            final_state = await self._read_state(endpoint)
+            final_state = await self.read_state(endpoint)
         else:
             final_state = int(sub.wait_next_report(timeout_sec=REPORT_TIMEOUT_SEC).value)
         asserts.assert_equal(final_state, 0, 'State must be 0 after the clear-all trigger')
