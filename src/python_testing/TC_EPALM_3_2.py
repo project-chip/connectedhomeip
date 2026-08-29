@@ -79,19 +79,19 @@ class TC_EPALM_3_2(ElectricalProtectionAlarmTestBaseHelper):
         await sub.start(self.default_controller, self.dut_node_id, endpoint)
 
         self.step("1c", "TH reads the Supported attribute",
-                  expectation="Bit 1 is set, so the DUT supports OverLoadFault.")
+                  expectation="Bit 1 of the response SHALL be 1.")
         supported = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Supported)
         asserts.assert_true(int(supported) & ALARM_MASK,
                             "Supported must set bit 1 for OverLoadFault")
 
         self.step("1d", "TH reads TestEventTriggersEnabled from General Diagnostics on endpoint 0",
-                  expectation="Value is 1 (True).")
+                  expectation="Verify that TestEventTriggersEnabled has a value of 1 (True).")
         await self.check_test_event_triggers_enabled()
 
         self.step("1e", "TH sends the TestEventTrigger clearing OverLoadFault, returning the DUT to its "
                         "no-fault baseline",
-                  expectation="DUT returns SUCCESS and OverLoadFault is clear.")
+                  expectation="Verify DUT responds w/ status SUCCESS(0x00).")
         state_before = await self.read_state(endpoint)
         await self.send_test_event_trigger_clear_alarm(ALARM)
         if state_before & ALARM_MASK:
@@ -107,8 +107,8 @@ class TC_EPALM_3_2(ElectricalProtectionAlarmTestBaseHelper):
 
         try:
             self.step("2a", "TH sends the TestEventTrigger setting OverLoadFault",
-                      expectation="DUT returns SUCCESS and reports a Notify event with bit 1 "
-                                  "set in Active and set in State.")
+                      expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a Notify "
+                  "event with bit 1 set in Active and set in State.")
             await self.send_test_event_trigger_set_alarm(ALARM)
             report = await self.await_notify(sub)
             log.info("Notify on set: active=0x%02X inactive=0x%02X state=0x%02X",
@@ -118,13 +118,13 @@ class TC_EPALM_3_2(ElectricalProtectionAlarmTestBaseHelper):
             asserts.assert_true(int(report.state) & ALARM_MASK,
                                 "Notify.State must set bit 1 when OverLoadFault is raised")
 
-            self.step("2b", "TH reads the State attribute", expectation="Bit 1 is 1.")
+            self.step("2b", "TH reads the State attribute", expectation="Bit 1 of the response SHALL be 1.")
             asserts.assert_true(await self.read_state(endpoint) & ALARM_MASK,
                                 "State bit 1 must be 1 after the set trigger")
 
             self.step("3a", "TH sends the TestEventTrigger clearing OverLoadFault",
-                      expectation="DUT returns SUCCESS and reports a Notify event with bit 1 "
-                                  "set in Inactive and clear in State.")
+                      expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a Notify "
+                  "event with bit 1 set in Inactive and clear in State.")
             await self.send_test_event_trigger_clear_alarm(ALARM)
             report = await self.await_notify(sub)
             log.info("Notify on clear: active=0x%02X inactive=0x%02X state=0x%02X",
@@ -134,7 +134,7 @@ class TC_EPALM_3_2(ElectricalProtectionAlarmTestBaseHelper):
             asserts.assert_false(int(report.state) & ALARM_MASK,
                                  "Notify.State must clear bit 1 when OverLoadFault is cleared")
 
-            self.step("3b", "TH reads the State attribute", expectation="Bit 1 is 0.")
+            self.step("3b", "TH reads the State attribute", expectation="Bit 1 of the response SHALL be 0.")
             asserts.assert_false(await self.read_state(endpoint) & ALARM_MASK,
                                  "State bit 1 must be 0 after the clear trigger")
         finally:
