@@ -90,9 +90,6 @@ class FakeReset(ClusterCommand):
 
 class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
 
-    def desc_TC_EPALM_2_2(self) -> str:
-        return "[TC-EPALM-2.2] Primary functionality (alarm state machine) with Server as DUT"
-
     def pics_TC_EPALM_2_2(self) -> list[str]:
         return ["EPALM.S"]
 
@@ -128,6 +125,16 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
 
     @async_test_body
     async def test_TC_EPALM_2_2(self):
+        """[TC-EPALM-2.2] Primary functionality (alarm state machine) with Server as DUT
+
+        This test case verifies the alarm state machine of the Electrical Protection Alarm
+        Cluster server: that inducing each supported fault condition via the General Diagnostics
+        TestEventTrigger sets the correct AlarmBitmap bit in State, that latched alarms remain set
+        after the fault condition clears (and only clear via the Alarm Base cluster's Reset
+        semantics where applicable), and that the inherited Alarm Base Reset command is rejected
+        because EPALM disallows the inherited RESET feature. ModifyEnabledAlarms is optional in
+        Alarm Base and is checked against whichever behavior the DUT declares.
+        """
         endpoint = self.get_endpoint()
         attributes = cluster.Attributes
         alarm_bits = cluster.Bitmaps.AlarmBitmap
