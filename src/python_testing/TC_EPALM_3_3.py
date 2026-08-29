@@ -108,7 +108,7 @@ class TC_EPALM_3_3(ElectricalProtectionAlarmTestBaseHelper):
         try:
             self.step("2a", "TH sends the TestEventTrigger setting OverVoltageFault",
                       expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a Notify "
-                  "event with bit 2 set in Active and set in State.")
+                      "event with bit 2 set in Active and set in State.")
             await self.send_test_event_trigger_set_alarm(ALARM)
             report = await self.await_notify(sub)
             log.info("Notify on set: active=0x%02X inactive=0x%02X state=0x%02X",
@@ -124,7 +124,7 @@ class TC_EPALM_3_3(ElectricalProtectionAlarmTestBaseHelper):
 
             self.step("3a", "TH sends the TestEventTrigger clearing OverVoltageFault",
                       expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a Notify "
-                  "event with bit 2 set in Inactive and clear in State.")
+                      "event with bit 2 set in Inactive and clear in State.")
             await self.send_test_event_trigger_clear_alarm(ALARM)
             report = await self.await_notify(sub)
             log.info("Notify on clear: active=0x%02X inactive=0x%02X state=0x%02X",
