@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 #include <AppMain.h>
+#include <electrical-alarm-stub.h>
 #include <electrical-distribution-stub.h>
 #include <electrical-protection-alarm-stub.h>
 #include <power-topology-stub.h>
@@ -66,10 +67,15 @@ void ApplicationInit()
 
     VerifyOrDie(SetTagList(kBreakerEndpointId, Span<const Descriptor::Structs::SemanticTagStruct::Type>(kBreakerTagList)) ==
                 CHIP_NO_ERROR);
+
+    // Electrical Alarm reports measurement-threshold alarms on the breaker. It is one of the
+    // choice-group members the breaker device type offers, and it makes OverCurrent mandatory.
+    VerifyOrDie(ElectricalAlarm::ElectricalAlarmInit(kBreakerEndpointId) == CHIP_NO_ERROR);
 }
 
 void ApplicationShutdown()
 {
+    ElectricalAlarm::ElectricalAlarmShutdown();
     ElectricalProtectionAlarm::ElectricalProtectionAlarmShutdown();
     PowerTopology::PowerTopologyShutdown();
     ElectricalDistribution::ElectricalDistributionShutdown();
