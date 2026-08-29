@@ -60,9 +60,8 @@ log = logging.getLogger(__name__)
 
 cluster = Clusters.ElectricalProtectionAlarm
 
-# Alarm Base command ids, inherited by EPALM.
+# Alarm Base Reset command id, inherited by EPALM.
 RESET_COMMAND_ID = 0x00
-MODIFY_ENABLED_ALARMS_COMMAND_ID = 0x01
 
 REPORT_TIMEOUT_SEC = 10.0
 
@@ -112,8 +111,7 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
         """
         await self.send_test_event_trigger_set_alarm(bit)
         if current_state & int(bit):
-            state = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.State)
+            state = await self.read_state(endpoint)
             log.info('State after %s trigger: 0x%08X (already raised, no transition to report)', name, state)
         else:
             report = sub.wait_next_report(timeout_sec=REPORT_TIMEOUT_SEC)
@@ -143,7 +141,7 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
         self.step(1, "Commission DUT to TH (already done)", is_commissioning=True)
 
         self.step(2, "TH reads TestEventTriggersEnabled from General Diagnostics on endpoint 0",
-                  expectation="Value is 1 (True). If 0, the remaining steps cannot run.")
+                  expectation="Value has to be 1 (True). If 0, skip the remaining steps and end the test case.")
         await self.check_test_event_triggers_enabled()
 
         feature_map = await self.read_single_attribute_check_success(
@@ -152,12 +150,12 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
 
         accepted_commands = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attributes.AcceptedCommandList)
-        accepts_modify = MODIFY_ENABLED_ALARMS_COMMAND_ID in accepted_commands
+        accepts_modify = cluster.Commands.ModifyEnabledAlarms.command_id in accepted_commands
 
         self.step(3, "TH establishes a subscription to the State attribute with MinIntervalFloor=0 "
                      "and MaxIntervalCeiling=30",
-                  expectation="Subscription is established and the current State value is read as "
-                              "the baseline.")
+                  expectation="Subscription is established successfully; TH awaits subscription report of an initial "
+                  "priming report carrying the current State value (in the no-fault baseline this is 0).")
         sub = AttributeSubscriptionHandler(expected_cluster=cluster, expected_attribute=attributes.State)
         await sub.start(self.default_controller, self.dut_node_id, endpoint,
                         min_interval_sec=0, max_interval_sec=30)
@@ -165,13 +163,13 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
         # ReadAttribute returns, so the priming report is delivered before the handler is
         # listening and never reaches its queue. Read the attribute for the baseline instead;
         # every later report in this test is change-driven and does reach the queue.
-        priming_state = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attributes.State)
+        priming_state = await self.read_state(endpoint)
         log.info('State at subscription time: 0x%08X', priming_state)
 
         current_state = int(priming_state)
         self.step(4, "TH sends the TestEventTrigger for ShortCircuitFault",
-                  expectation="DUT returns SUCCESS and reports a State value with bit 0 set.")
+                  expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
+                  "value with bit 0 (ShortCircuitFault) set.")
         if feature_map & features.kShortCircuit:
             current_state = await self._trigger_and_expect_bit(
                 sub, alarm_bits.kShortCircuitFault, "ShortCircuitFault", endpoint, current_state)
@@ -179,7 +177,8 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
             self.mark_current_step_skipped()
 
         self.step(5, "TH sends the TestEventTrigger for OverLoadFault",
-                  expectation="DUT returns SUCCESS and reports a State value with bit 1 set.")
+                  expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
+                  "value with bit 1 (OverLoadFault) set.")
         if feature_map & features.kOverLoad:
             current_state = await self._trigger_and_expect_bit(
                 sub, alarm_bits.kOverLoadFault, "OverLoadFault", endpoint, current_state)
@@ -187,7 +186,8 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
             self.mark_current_step_skipped()
 
         self.step(6, "TH sends the TestEventTrigger for OverVoltageFault",
-                  expectation="DUT returns SUCCESS and reports a State value with bit 2 set.")
+                  expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
+                  "value with bit 2 (OverVoltageFault) set.")
         if feature_map & features.kOverVoltage:
             current_state = await self._trigger_and_expect_bit(
                 sub, alarm_bits.kOverVoltageFault, "OverVoltageFault", endpoint, current_state)
@@ -195,7 +195,8 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
             self.mark_current_step_skipped()
 
         self.step(7, "TH sends the TestEventTrigger for VoltageSurgeFault",
-                  expectation="DUT returns SUCCESS and reports a State value with bit 3 set.")
+                  expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
+                  "value with bit 3 (VoltageSurgeFault) set.")
         if feature_map & features.kSurgeProtection:
             current_state = await self._trigger_and_expect_bit(
                 sub, alarm_bits.kVoltageSurgeFault, "VoltageSurgeFault", endpoint, current_state)
@@ -203,7 +204,8 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
             self.mark_current_step_skipped()
 
         self.step(8, "TH sends the TestEventTrigger for ResidualCurrentFault",
-                  expectation="DUT returns SUCCESS and reports a State value with bit 4 set.")
+                  expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
+                  "value with bit 4 (ResidualCurrentFault) set.")
         if feature_map & features.kResidualCurrent:
             current_state = await self._trigger_and_expect_bit(
                 sub, alarm_bits.kResidualCurrentFault, "ResidualCurrentFault", endpoint, current_state)
@@ -211,7 +213,8 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
             self.mark_current_step_skipped()
 
         self.step(9, "TH sends the TestEventTrigger for ArcFault",
-                  expectation="DUT returns SUCCESS and reports a State value with bit 5 set.")
+                  expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
+                  "value with bit 5 (ArcFault) set.")
         if feature_map & features.kArcFault:
             current_state = await self._trigger_and_expect_bit(
                 sub, alarm_bits.kArcFault, "ArcFault", endpoint, current_state)
@@ -219,7 +222,8 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
             self.mark_current_step_skipped()
 
         self.step(10, "TH sends the TestEventTrigger for SelfTest",
-                  expectation="DUT returns SUCCESS and reports a State value with bit 6 set.")
+                  expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
+                  "value with bit 6 (SelfTest) set.")
         if feature_map & features.kSelfTest:
             current_state = await self._trigger_and_expect_bit(
                 sub, alarm_bits.kSelfTest, "SelfTest", endpoint, current_state)
@@ -227,9 +231,10 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
             self.mark_current_step_skipped()
 
         self.step(11, "TH reads the State attribute and inspects the value",
-                  expectation="Every bit set in State is also set in Supported.")
-        state = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attributes.State)
+                  expectation="For every bit b that is set: the feature corresponding to bit b is supported by the DUT "
+                  "(per Supported). For every bit b that is NOT supported by the DUT: bit b MUST NOT be set "
+                  "(feature gating is correctly enforced).")
+        state = await self.read_state(endpoint)
         supported = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attributes.Supported)
         log.info('State: 0x%08X  Supported: 0x%08X', state, supported)
@@ -237,13 +242,15 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
                              'State must not set any bit that is absent from Supported')
 
         self.step(12, "TH sends the Reset command (Alarm Base.Reset) to the DUT",
-                  expectation="DUT replies UNSUPPORTED_COMMAND (0x81).")
+                  expectation="Verify that the DUT response contains UNSUPPORTED_COMMAND (0x81). Reason: EPALM "
+                  "disallows the inherited RESET feature, so the Reset command is not callable.")
         status = await self._command_status(FakeReset(alarms=0), endpoint)
         asserts.assert_equal(status, Status.UnsupportedCommand,
                              'Reset must return UNSUPPORTED_COMMAND: EPALM disallows the RESET feature')
 
         self.step(13, "If the DUT does not accept ModifyEnabledAlarms, TH sends it anyway",
-                  expectation="DUT replies UNSUPPORTED_COMMAND (0x81).")
+                  expectation="Verify that the DUT response contains UNSUPPORTED_COMMAND (0x81). If the DUT declares "
+                  "EPALM.S.C01.Rsp(ModifyEnabledAlarms), the step is skipped.")
         if accepts_modify:
             self.mark_current_step_skipped()
         else:
@@ -254,7 +261,9 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
                                  'does not accept it')
 
         self.step("13a", "If the DUT accepts ModifyEnabledAlarms, TH sends it",
-                  expectation="DUT returns SUCCESS.")
+                  expectation="Verify DUT responds w/ status SUCCESS(0x00). The command is optional in Alarm Base, so a "
+                  "DUT that implements it SHALL accept it rather than reject it. If the DUT does not "
+                  "declare EPALM.S.C01.Rsp(ModifyEnabledAlarms), the step is skipped.")
         if not accepts_modify:
             self.mark_current_step_skipped()
         else:
@@ -265,7 +274,8 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
                                  'accepts it must succeed rather than reject')
 
         self.step(14, "TH sends the TestEventTrigger that clears all alarms",
-                  expectation="DUT returns SUCCESS and reports a State value of 0.")
+                  expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
+                  "value of 0 (cleanup).")
         await self.send_test_event_trigger_clear_all()
         if int(state) == 0:
             # Nothing was raised, so clearing is a no-op and the cluster reports nothing.
