@@ -170,11 +170,11 @@ not_automated:
       reason: Helper methods for Push AV Integration TCs
     - name: TC_PWRTL_2_2.py
       reason:
-          Power Topology Cluster's ElectricalCircuit (CIRC, FeatureMap bit 4)
-          feature is not yet exposed by any example app, so the script cannot
-          exercise the writable ElectricalCircuitNodes attribute. Remove this
-          entry once an example app advertises the CIRC feature on Power
-          Topology at the endpoint the script's CI directive targets
+          This script's CI directive targets ${EVSE_APP}, which does not
+          advertise the Power Topology ElectricalCircuit (CIRC, FeatureMap bit
+          4) feature at the endpoint under test, so the script cannot exercise
+          the writable ElectricalCircuitNodes attribute. Remove this entry once
+          the run targets an app that advertises CIRC at that endpoint
     - name: TC_TLS_Utils.py
       reason: Helper methods for TC tests dependent on TLS clusters
     - name: TC_TLSCERT_Base.py

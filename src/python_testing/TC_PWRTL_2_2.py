@@ -57,6 +57,19 @@ cluster = Clusters.PowerTopology
 class TC_PWRTL_2_2(MatterBaseTest):
 
     @pics('PWRTL.S', 'PWRTL.S.F04')
+    def _assert_nodes_equal(self, actual, expected, what: str) -> None:
+        """Compare every field of every CircuitNodeStruct, not just the list length.
+
+        Checking length alone lets a wrong node, endpoint or label pass, and lets a
+        difference in any entry after the first go unnoticed.
+        """
+        asserts.assert_equal(len(actual), len(expected),
+                             f'{what}: list length must match')
+        for i, (got, want) in enumerate(zip(actual, expected)):
+            asserts.assert_equal(got.node, want.node, f'{what}[{i}].node must match')
+            asserts.assert_equal(got.endpoint, want.endpoint, f'{what}[{i}].endpoint must match')
+            asserts.assert_equal(got.label, want.label, f'{what}[{i}].label must match')
+
     @async_test_body
     async def test_TC_PWRTL_2_2(self):
         """[TC-PWRTL-2.2] ElectricalCircuitNodes (CIRC feature) with DUT as Server
@@ -101,7 +114,7 @@ class TC_PWRTL_2_2(MatterBaseTest):
         read_back = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr)
         asserts.assert_equal(len(read_back), 2, 'Read-back length must match the 2 entries written')
-        # TODO: deep-compare struct fields once helper is in place.
+        self._assert_nodes_equal(read_back, entries_2, 'read-back')
 
         self.step(4, "TH1 writes a list of exactly 50 entries (max)")
         entries_50 = [CircuitNodeStruct(node=0x000000000000B000 + i) for i in range(50)]
@@ -146,11 +159,7 @@ class TC_PWRTL_2_2(MatterBaseTest):
             endpoint=endpoint, cluster=cluster, attribute=attr)
         asserts.assert_equal(len(post_reboot), len(pre_reboot),
                              'ElectricalCircuitNodes list length must persist across reboot (Non-Volatile)')
-        # Deep-compare the Label field of the first entry as a representative
-        # check that struct contents (not just list length) survived the reboot.
-        if pre_reboot:
-            asserts.assert_equal(post_reboot[0].label, pre_reboot[0].label,
-                                 'ElectricalCircuitNodes[0].label must persist across reboot')
+        self._assert_nodes_equal(post_reboot, pre_reboot, 'post-reboot')
 
         self.step(11, "TH1 establishes subscription; subsequently writes - subscription report reflects update")
         # TODO: use self.default_controller.ReadAttribute with reportInterval
