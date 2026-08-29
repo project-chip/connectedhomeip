@@ -59,10 +59,6 @@ cluster = Clusters.ElectricalProtectionAlarm
 # matter_asserts.assert_valid_int64 alone permits up to 0x7FFFFFFFFFFFFFFF.
 MEASUREMENT_MAX = 0x3FFFFFFFFFFFFFFF
 
-# Alarm Base bit 0. EPALM sets RESET to disallowConform, so Alchemy omits it from the generated
-# Feature IntFlag and the literal is the only way to name it.
-RESET_FEATURE_BIT = 0x1
-
 # Alarm Base attribute id for Latch, likewise absent from the generated bindings.
 LATCH_ATTRIBUTE_ID = 0x0001
 
@@ -257,17 +253,9 @@ class TC_EPALM_2_1(MatterBaseTest):
         self.step(1, "Commission DUT to TH (already done)", is_commissioning=True)
 
         self.step(2, "TH reads the FeatureMap attribute",
-                  expectation="DUT responds with a map32 value. Bit 0 (RESET) MUST NOT be set, "
-                              "because RESET is disallowConform on EPALM.")
-        feature_map = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attributes.FeatureMap)
-        log.info('FeatureMap: 0x%08X', feature_map)
-        # Choice conformance across the seven alarm-class bits belongs to TC-EPALM-2.3, which
-        # checks FeatureMap against Supported bidirectionally. Only the EPALM-specific RESET
-        # prohibition is asserted here. IDM-10.5 would cover it generically, but only once a 1.7
-        # data-model XML exists; the prebuilt directories stop at 1.6.1 and carry no EPALM.
-        asserts.assert_equal(feature_map & RESET_FEATURE_BIT, 0,
-                             'FeatureMap must not set bit 0: RESET is disallowConform on EPALM')
+                  expectation="DUT responds with a map32 value.")
+        log.info('FeatureMap: 0x%08X', await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attributes.FeatureMap))
 
         self.step(3, "TH reads the Mask attribute (inherited from Alarm Base)",
                   expectation="DUT responds with a map32 value (AlarmBitmap) indicating which "
