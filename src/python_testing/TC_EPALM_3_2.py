@@ -130,34 +130,43 @@ class TC_EPALM_3_2(MatterBaseTest):
         await self.send_test_event_triggers(eventTrigger=CLEAR_TRIGGER)
         sub.flush_events()
 
-        self.step("2a")
-        await self.send_test_event_triggers(eventTrigger=SET_TRIGGER)
-        report = await self._await_notify(sub)
-        log.info("Notify on set: active=0x%02X inactive=0x%02X state=0x%02X",
-                 report.active, report.inactive, report.state)
-        asserts.assert_true(int(report.active) & ALARM_MASK,
-                            "Notify.Active must set bit 1 when OverLoadFault is raised")
-        asserts.assert_true(int(report.state) & ALARM_MASK,
-                            "Notify.State must set bit 1 when OverLoadFault is raised")
+        try:
+            self.step("2a")
+            await self.send_test_event_triggers(eventTrigger=SET_TRIGGER)
+            report = await self._await_notify(sub)
+            log.info("Notify on set: active=0x%02X inactive=0x%02X state=0x%02X",
+                     report.active, report.inactive, report.state)
+            asserts.assert_true(int(report.active) & ALARM_MASK,
+                                "Notify.Active must set bit 1 when OverLoadFault is raised")
+            asserts.assert_true(int(report.state) & ALARM_MASK,
+                                "Notify.State must set bit 1 when OverLoadFault is raised")
 
-        self.step("2b")
-        state = await self._read_state(endpoint)
-        asserts.assert_true(int(state) & ALARM_MASK, "State bit 1 must be 1 after the set trigger")
+            self.step("2b")
+            state = await self._read_state(endpoint)
+            asserts.assert_true(int(state) & ALARM_MASK, "State bit 1 must be 1 after the set trigger")
 
-        self.step("3a")
-        await self.send_test_event_triggers(eventTrigger=CLEAR_TRIGGER)
-        report = await self._await_notify(sub)
-        log.info("Notify on clear: active=0x%02X inactive=0x%02X state=0x%02X",
-                 report.active, report.inactive, report.state)
-        asserts.assert_true(int(report.inactive) & ALARM_MASK,
-                            "Notify.Inactive must set bit 1 when OverLoadFault is cleared")
-        asserts.assert_false(int(report.state) & ALARM_MASK,
-                             "Notify.State must clear bit 1 when OverLoadFault is cleared")
+            self.step("3a")
+            await self.send_test_event_triggers(eventTrigger=CLEAR_TRIGGER)
+            report = await self._await_notify(sub)
+            log.info("Notify on clear: active=0x%02X inactive=0x%02X state=0x%02X",
+                     report.active, report.inactive, report.state)
+            asserts.assert_true(int(report.inactive) & ALARM_MASK,
+                                "Notify.Inactive must set bit 1 when OverLoadFault is cleared")
+            asserts.assert_false(int(report.state) & ALARM_MASK,
+                                 "Notify.State must clear bit 1 when OverLoadFault is cleared")
 
-        self.step("3b")
-        state = await self._read_state(endpoint)
-        asserts.assert_false(int(state) & ALARM_MASK, "State bit 1 must be 0 after the clear trigger")
-        sub.cancel()
+            self.step("3b")
+            state = await self._read_state(endpoint)
+            asserts.assert_false(int(state) & ALARM_MASK, "State bit 1 must be 0 after the clear trigger")
+        finally:
+            # Return the DUT to its no-fault baseline even if a step above failed, so a
+            # failure here does not leave the alarm latched for the test cases that follow.
+            # A second clear after step 3a is a no-op: no transition means no report.
+            try:
+                await self.send_test_event_triggers(eventTrigger=CLEAR_TRIGGER)
+            except Exception:  # noqa: BLE001 - never mask the original failure
+                log.exception('Could not clear OverLoadFault during cleanup')
+            sub.cancel()
 
 
 if __name__ == "__main__":
