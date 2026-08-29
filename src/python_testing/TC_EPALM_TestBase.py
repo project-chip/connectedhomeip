@@ -72,7 +72,8 @@ class ElectricalProtectionAlarmTestBaseHelper(MatterBaseTest):
         return int(await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.State))
 
-    async def await_notify(self, sub: EventSubscriptionHandler, timeout_sec: float = 10.0):
+    async def await_notify(self, sub: EventSubscriptionHandler,
+                           timeout_sec: float = 10.0) -> cluster.Events.Notify:
         """Return the next Notify event, failing the test if it could not be decoded.
 
         wait_for_event_report returns a ValueDecodeFailure rather than raising when the payload

@@ -158,149 +158,157 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
         sub = AttributeSubscriptionHandler(expected_cluster=cluster, expected_attribute=attributes.State)
         await sub.start(self.default_controller, self.dut_node_id, endpoint,
                         min_interval_sec=0, max_interval_sec=30)
-        # AttributeSubscriptionHandler.start() registers its update callback only after
-        # ReadAttribute returns, so the priming report is delivered before the handler is
-        # listening and never reaches its queue. Read the attribute for the baseline instead;
-        # every later report in this test is change-driven and does reach the queue.
-        priming_state = await self.read_state(endpoint)
-        log.info('State at subscription time: 0x%08X', priming_state)
+        try:
+            # AttributeSubscriptionHandler.start() registers its update callback only after
+            # ReadAttribute returns, so the priming report is delivered before the handler is
+            # listening and never reaches its queue. Read the attribute for the baseline instead;
+            # every later report in this test is change-driven and does reach the queue.
+            priming_state = await self.read_state(endpoint)
+            log.info('State at subscription time: 0x%08X', priming_state)
 
-        current_state = int(priming_state)
-        self.step(4, "TH sends the TestEventTrigger for ShortCircuitFault",
-                  expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
-                  "value with bit 0 (ShortCircuitFault) set.")
-        if feature_map & features.kShortCircuit:
-            current_state = await self._trigger_and_expect_bit(
-                sub, alarm_bits.kShortCircuitFault, "ShortCircuitFault", endpoint, current_state)
-        else:
-            self.mark_current_step_skipped()
+            current_state = int(priming_state)
+            self.step(4, "TH sends the TestEventTrigger for ShortCircuitFault",
+                      expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
+                      "value with bit 0 (ShortCircuitFault) set.")
+            if feature_map & features.kShortCircuit:
+                current_state = await self._trigger_and_expect_bit(
+                    sub, alarm_bits.kShortCircuitFault, "ShortCircuitFault", endpoint, current_state)
+            else:
+                self.mark_current_step_skipped()
 
-        self.step(5, "TH sends the TestEventTrigger for OverLoadFault",
-                  expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
-                  "value with bit 1 (OverLoadFault) set.")
-        if feature_map & features.kOverLoad:
-            current_state = await self._trigger_and_expect_bit(
-                sub, alarm_bits.kOverLoadFault, "OverLoadFault", endpoint, current_state)
-        else:
-            self.mark_current_step_skipped()
+            self.step(5, "TH sends the TestEventTrigger for OverLoadFault",
+                      expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
+                      "value with bit 1 (OverLoadFault) set.")
+            if feature_map & features.kOverLoad:
+                current_state = await self._trigger_and_expect_bit(
+                    sub, alarm_bits.kOverLoadFault, "OverLoadFault", endpoint, current_state)
+            else:
+                self.mark_current_step_skipped()
 
-        self.step(6, "TH sends the TestEventTrigger for OverVoltageFault",
-                  expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
-                  "value with bit 2 (OverVoltageFault) set.")
-        if feature_map & features.kOverVoltage:
-            current_state = await self._trigger_and_expect_bit(
-                sub, alarm_bits.kOverVoltageFault, "OverVoltageFault", endpoint, current_state)
-        else:
-            self.mark_current_step_skipped()
+            self.step(6, "TH sends the TestEventTrigger for OverVoltageFault",
+                      expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
+                      "value with bit 2 (OverVoltageFault) set.")
+            if feature_map & features.kOverVoltage:
+                current_state = await self._trigger_and_expect_bit(
+                    sub, alarm_bits.kOverVoltageFault, "OverVoltageFault", endpoint, current_state)
+            else:
+                self.mark_current_step_skipped()
 
-        self.step(7, "TH sends the TestEventTrigger for VoltageSurgeFault",
-                  expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
-                  "value with bit 3 (VoltageSurgeFault) set.")
-        if feature_map & features.kSurgeProtection:
-            current_state = await self._trigger_and_expect_bit(
-                sub, alarm_bits.kVoltageSurgeFault, "VoltageSurgeFault", endpoint, current_state)
-        else:
-            self.mark_current_step_skipped()
+            self.step(7, "TH sends the TestEventTrigger for VoltageSurgeFault",
+                      expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
+                      "value with bit 3 (VoltageSurgeFault) set.")
+            if feature_map & features.kSurgeProtection:
+                current_state = await self._trigger_and_expect_bit(
+                    sub, alarm_bits.kVoltageSurgeFault, "VoltageSurgeFault", endpoint, current_state)
+            else:
+                self.mark_current_step_skipped()
 
-        self.step(8, "TH sends the TestEventTrigger for ResidualCurrentFault",
-                  expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
-                  "value with bit 4 (ResidualCurrentFault) set.")
-        if feature_map & features.kResidualCurrent:
-            current_state = await self._trigger_and_expect_bit(
-                sub, alarm_bits.kResidualCurrentFault, "ResidualCurrentFault", endpoint, current_state)
-        else:
-            self.mark_current_step_skipped()
+            self.step(8, "TH sends the TestEventTrigger for ResidualCurrentFault",
+                      expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
+                      "value with bit 4 (ResidualCurrentFault) set.")
+            if feature_map & features.kResidualCurrent:
+                current_state = await self._trigger_and_expect_bit(
+                    sub, alarm_bits.kResidualCurrentFault, "ResidualCurrentFault", endpoint, current_state)
+            else:
+                self.mark_current_step_skipped()
 
-        self.step(9, "TH sends the TestEventTrigger for ArcFault",
-                  expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
-                  "value with bit 5 (ArcFault) set.")
-        if feature_map & features.kArcFault:
-            current_state = await self._trigger_and_expect_bit(
-                sub, alarm_bits.kArcFault, "ArcFault", endpoint, current_state)
-        else:
-            self.mark_current_step_skipped()
+            self.step(9, "TH sends the TestEventTrigger for ArcFault",
+                      expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
+                      "value with bit 5 (ArcFault) set.")
+            if feature_map & features.kArcFault:
+                current_state = await self._trigger_and_expect_bit(
+                    sub, alarm_bits.kArcFault, "ArcFault", endpoint, current_state)
+            else:
+                self.mark_current_step_skipped()
 
-        self.step(10, "TH sends the TestEventTrigger for SelfTest",
-                  expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
-                  "value with bit 6 (SelfTest) set.")
-        if feature_map & features.kSelfTest:
-            current_state = await self._trigger_and_expect_bit(
-                sub, alarm_bits.kSelfTest, "SelfTest", endpoint, current_state)
-        else:
-            self.mark_current_step_skipped()
+            self.step(10, "TH sends the TestEventTrigger for SelfTest",
+                      expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
+                      "value with bit 6 (SelfTest) set.")
+            if feature_map & features.kSelfTest:
+                current_state = await self._trigger_and_expect_bit(
+                    sub, alarm_bits.kSelfTest, "SelfTest", endpoint, current_state)
+            else:
+                self.mark_current_step_skipped()
 
-        self.step(11, "TH reads the State attribute and inspects the value",
-                  expectation="For every bit b that is set: the feature corresponding to bit b is supported by the DUT "
-                  "(per Supported). For every bit b that is NOT supported by the DUT: bit b MUST NOT be set "
-                  "(feature gating is correctly enforced).")
-        state = await self.read_state(endpoint)
-        supported = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attributes.Supported)
-        log.info('State: 0x%08X  Supported: 0x%08X', state, supported)
-        asserts.assert_equal(int(state) & ~int(supported), 0,
-                             'State must not set any bit that is absent from Supported')
+            self.step(11, "TH reads the State attribute and inspects the value",
+                      expectation="For every bit b that is set: the feature corresponding to bit b is supported by the DUT "
+                      "(per Supported). For every bit b that is NOT supported by the DUT: bit b MUST NOT be set "
+                      "(feature gating is correctly enforced).")
+            state = await self.read_state(endpoint)
+            supported = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attributes.Supported)
+            log.info('State: 0x%08X  Supported: 0x%08X', state, supported)
+            asserts.assert_equal(int(state) & ~int(supported), 0,
+                                 'State must not set any bit that is absent from Supported')
 
-        self.step(12, "TH sends the Reset command (Alarm Base.Reset) to the DUT",
-                  expectation="Verify that the DUT response contains UNSUPPORTED_COMMAND (0x81). Reason: EPALM "
-                  "disallows the inherited RESET feature, so the Reset command is not callable.")
-        status = await self._command_status(FakeReset(alarms=0), endpoint)
-        asserts.assert_equal(status, Status.UnsupportedCommand,
-                             'Reset must return UNSUPPORTED_COMMAND: EPALM disallows the RESET feature')
-
-        self.step(13, "If the DUT does not accept ModifyEnabledAlarms, TH sends it anyway",
-                  expectation="Verify that the DUT response contains UNSUPPORTED_COMMAND (0x81). If the DUT declares "
-                  "EPALM.S.C01.Rsp(ModifyEnabledAlarms), the step is skipped.")
-        if accepts_modify:
-            self.mark_current_step_skipped()
-        else:
-            status = await self._command_status(
-                cluster.Commands.ModifyEnabledAlarms(mask=0), endpoint)
+            self.step(12, "TH sends the Reset command (Alarm Base.Reset) to the DUT",
+                      expectation="Verify that the DUT response contains UNSUPPORTED_COMMAND (0x81). Reason: EPALM "
+                      "disallows the inherited RESET feature, so the Reset command is not callable.")
+            status = await self._command_status(FakeReset(alarms=0), endpoint)
             asserts.assert_equal(status, Status.UnsupportedCommand,
-                                 'ModifyEnabledAlarms must return UNSUPPORTED_COMMAND when the DUT '
-                                 'does not accept it')
+                                 'Reset must return UNSUPPORTED_COMMAND: EPALM disallows the RESET feature')
 
-        self.step("13a", "If the DUT accepts ModifyEnabledAlarms, TH sends it",
-                  expectation="Verify DUT responds w/ status SUCCESS(0x00). The command is optional in Alarm Base, so a "
-                  "DUT that implements it SHALL accept it rather than reject it. If the DUT does not "
-                  "declare EPALM.S.C01.Rsp(ModifyEnabledAlarms), the step is skipped.")
-        if not accepts_modify:
-            self.mark_current_step_skipped()
-        else:
-            status = await self._command_status(
-                cluster.Commands.ModifyEnabledAlarms(mask=int(supported)), endpoint)
-            asserts.assert_equal(status, Status.Success,
-                                 'ModifyEnabledAlarms is optional in Alarm Base, so a DUT that '
-                                 'accepts it must succeed rather than reject')
+            self.step(13, "If the DUT does not accept ModifyEnabledAlarms, TH sends it anyway",
+                      expectation="Verify that the DUT response contains UNSUPPORTED_COMMAND (0x81). If the DUT declares "
+                      "EPALM.S.C01.Rsp(ModifyEnabledAlarms), the step is skipped.")
+            if accepts_modify:
+                self.mark_current_step_skipped()
+            else:
+                status = await self._command_status(
+                    cluster.Commands.ModifyEnabledAlarms(mask=0), endpoint)
+                asserts.assert_equal(status, Status.UnsupportedCommand,
+                                     'ModifyEnabledAlarms must return UNSUPPORTED_COMMAND when the DUT '
+                                     'does not accept it')
 
-        self.step("13b", "TH sends the ModifyEnabledAlarms command with a mask that clears at least one "
-                         "bit set in Supported, then TH reads from the DUT the Mask attribute.",
-                  expectation="Value has to be the mask TH sent, with the cleared bit no longer set. If the "
-                  "DUT does not declare EPALM.S.C01.Rsp(ModifyEnabledAlarms), the step is skipped.")
-        if not accepts_modify or not int(supported):
-            self.mark_current_step_skipped()
-        else:
-            lowest_supported_bit = int(supported) & -int(supported)
-            reduced_mask = int(supported) & ~lowest_supported_bit
-            status = await self._command_status(
-                cluster.Commands.ModifyEnabledAlarms(mask=reduced_mask), endpoint)
-            asserts.assert_equal(status, Status.Success,
-                                 'ModifyEnabledAlarms must succeed when the DUT accepts it')
-            mask = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attributes.Mask)
-            asserts.assert_equal(int(mask), reduced_mask,
-                                 'Mask must reflect the value sent to ModifyEnabledAlarms')
+            self.step("13a", "If the DUT accepts ModifyEnabledAlarms, TH sends it",
+                      expectation="Verify DUT responds w/ status SUCCESS(0x00). The command is optional in Alarm Base, so a "
+                      "DUT that implements it SHALL accept it rather than reject it. If the DUT does not "
+                      "declare EPALM.S.C01.Rsp(ModifyEnabledAlarms), the step is skipped.")
+            if not accepts_modify:
+                self.mark_current_step_skipped()
+            else:
+                status = await self._command_status(
+                    cluster.Commands.ModifyEnabledAlarms(mask=int(supported)), endpoint)
+                asserts.assert_equal(status, Status.Success,
+                                     'ModifyEnabledAlarms is optional in Alarm Base, so a DUT that '
+                                     'accepts it must succeed rather than reject')
 
-        self.step(14, "TH sends the TestEventTrigger that clears all alarms",
-                  expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
-                  "value of 0 (cleanup).")
-        await self.send_test_event_trigger_clear_all()
-        if int(state) == 0:
-            # Nothing was raised, so clearing is a no-op and the cluster reports nothing.
-            final_state = await self.read_state(endpoint)
-        else:
-            final_state = int(sub.wait_next_report(timeout_sec=REPORT_TIMEOUT_SEC).value)
-        asserts.assert_equal(final_state, 0, 'State must be 0 after the clear-all trigger')
-        sub.cancel()
+            self.step("13b", "TH sends the ModifyEnabledAlarms command with a mask that clears at least one "
+                             "bit set in Supported, then TH reads from the DUT the Mask attribute.",
+                      expectation="Value has to be the mask TH sent, with the cleared bit no longer set. If the "
+                      "DUT does not declare EPALM.S.C01.Rsp(ModifyEnabledAlarms), the step is skipped.")
+            if not accepts_modify or not int(supported):
+                self.mark_current_step_skipped()
+            else:
+                lowest_supported_bit = int(supported) & -int(supported)
+                reduced_mask = int(supported) & ~lowest_supported_bit
+                status = await self._command_status(
+                    cluster.Commands.ModifyEnabledAlarms(mask=reduced_mask), endpoint)
+                asserts.assert_equal(status, Status.Success,
+                                     'ModifyEnabledAlarms must succeed when the DUT accepts it')
+                mask = await self.read_single_attribute_check_success(
+                    endpoint=endpoint, cluster=cluster, attribute=attributes.Mask)
+                asserts.assert_equal(int(mask), reduced_mask,
+                                     'Mask must reflect the value sent to ModifyEnabledAlarms')
+
+            self.step(14, "TH sends the TestEventTrigger that clears all alarms",
+                      expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
+                      "value of 0 (cleanup).")
+            await self.send_test_event_trigger_clear_all()
+            if int(state) == 0:
+                # Nothing was raised, so clearing is a no-op and the cluster reports nothing.
+                final_state = await self.read_state(endpoint)
+            else:
+                final_state = int(sub.wait_next_report(timeout_sec=REPORT_TIMEOUT_SEC).value)
+            asserts.assert_equal(final_state, 0, 'State must be 0 after the clear-all trigger')
+        finally:
+            # Best effort: step 14 is the real assertion, but a failure anywhere above must not
+            # leave the DUT with alarms latched or the subscription registered.
+            try:
+                await self.send_test_event_trigger_clear_all()
+            except Exception:
+                log.warning('Cleanup clear-all failed', exc_info=True)
+            sub.cancel()
 
 
 if __name__ == "__main__":

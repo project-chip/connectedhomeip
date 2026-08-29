@@ -78,34 +78,35 @@ class TC_EPALM_3_7(ElectricalProtectionAlarmTestBaseHelper):
         sub = EventSubscriptionHandler(expected_cluster=cluster)
         await sub.start(self.default_controller, self.dut_node_id, endpoint)
 
-        self.step("1c", "TH reads the Supported attribute",
-                  expectation="Bit 6 of the response SHALL be 1.")
-        supported = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Supported)
-        asserts.assert_true(int(supported) & ALARM_MASK,
-                            "Supported must set bit 6 for SelfTest")
-
-        self.step("1d", "TH reads TestEventTriggersEnabled from General Diagnostics on endpoint 0",
-                  expectation="Verify that TestEventTriggersEnabled has a value of 1 (True).")
-        await self.check_test_event_triggers_enabled()
-
-        self.step("1e", "TH sends the TestEventTrigger clearing SelfTest, returning the DUT to its "
-                        "no-fault baseline",
-                  expectation="Verify DUT responds w/ status SUCCESS(0x00).")
-        state_before = await self.read_state(endpoint)
-        await self.send_test_event_trigger_clear_alarm(ALARM)
-        if state_before & ALARM_MASK:
-            # Already raised, so this trigger emits an inactive Notify. Consume it here rather than
-            # letting it arrive after the flush, where step 2a would read it instead of the
-            # set-transition it is waiting for.
-            report = await self.await_notify(sub)
-            asserts.assert_true(int(report.inactive) & ALARM_MASK,
-                                "Baseline clear must report SelfTest in Inactive")
-        asserts.assert_false(await self.read_state(endpoint) & ALARM_MASK,
-                             "SelfTest must be clear before the set trigger")
-        sub.flush_events()
-
         try:
+
+            self.step("1c", "TH reads the Supported attribute",
+                      expectation="Bit 6 of the response SHALL be 1.")
+            supported = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Supported)
+            asserts.assert_true(int(supported) & ALARM_MASK,
+                                "Supported must set bit 6 for SelfTest")
+
+            self.step("1d", "TH reads TestEventTriggersEnabled from General Diagnostics on endpoint 0",
+                      expectation="Verify that TestEventTriggersEnabled has a value of 1 (True).")
+            await self.check_test_event_triggers_enabled()
+
+            self.step("1e", "TH sends the TestEventTrigger clearing SelfTest, returning the DUT to its "
+                            "no-fault baseline",
+                      expectation="Verify DUT responds w/ status SUCCESS(0x00).")
+            state_before = await self.read_state(endpoint)
+            await self.send_test_event_trigger_clear_alarm(ALARM)
+            if state_before & ALARM_MASK:
+                # Already raised, so this trigger emits an inactive Notify. Consume it here rather than
+                # letting it arrive after the flush, where step 2a would read it instead of the
+                # set-transition it is waiting for.
+                report = await self.await_notify(sub)
+                asserts.assert_true(int(report.inactive) & ALARM_MASK,
+                                    "Baseline clear must report SelfTest in Inactive")
+            asserts.assert_false(await self.read_state(endpoint) & ALARM_MASK,
+                                 "SelfTest must be clear before the set trigger")
+            sub.flush_events()
+
             self.step("2a", "TH sends the TestEventTrigger setting SelfTest",
                       expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a Notify "
                       "event with bit 6 set in Active and set in State.")
