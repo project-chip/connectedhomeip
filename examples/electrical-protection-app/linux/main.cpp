@@ -21,6 +21,7 @@
 #include <power-topology-stub.h>
 
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;
@@ -30,6 +31,16 @@ using namespace chip::app::Clusters;
 namespace {
 
 constexpr EndpointId kEnclosureEndpointId = 1; // Electrical Distribution Enclosure (0x0517)
+constexpr EndpointId kBreakerEndpointId   = 2; // Electrical Circuit Breaker (0x0516)
+
+// The enclosure device type requires each breaker child endpoint to carry a semantic tag from the
+// Common Number namespace, so this one is breaker number one.
+constexpr uint8_t kCommonNumberNamespaceId = 0x07;
+constexpr uint8_t kNumberOneTag            = 0x01;
+
+const Descriptor::Structs::SemanticTagStruct::Type kBreakerTagList[] = {
+    { .namespaceID = kCommonNumberNamespaceId, .tag = kNumberOneTag },
+};
 
 } // namespace
 
@@ -43,8 +54,18 @@ void ApplicationInit()
     // registration: its generated Init callback is a no-op too.
     VerifyOrDie(ElectricalProtectionAlarm::ElectricalProtectionAlarmInit(kEnclosureEndpointId) == CHIP_NO_ERROR);
 
-    // Power Topology is mandatory on the enclosure device type.
-    VerifyOrDie(PowerTopology::PowerTopologyInit(kEnclosureEndpointId) == CHIP_NO_ERROR);
+    // Power Topology is mandatory on both device types, but with different features. The
+    // enclosure needs only a topology choice; the breaker device type additionally makes
+    // ElectricalCircuit mandatory, which brings the ElectricalCircuitNodes attribute.
+    VerifyOrDie(PowerTopology::PowerTopologyInit(
+                    kEnclosureEndpointId, BitMask<PowerTopology::Feature>(PowerTopology::Feature::kTreeTopology)) == CHIP_NO_ERROR);
+    VerifyOrDie(PowerTopology::PowerTopologyInit(kBreakerEndpointId,
+                                                 BitMask<PowerTopology::Feature>(PowerTopology::Feature::kTreeTopology,
+                                                                                 PowerTopology::Feature::kElectricalCircuit)) ==
+                CHIP_NO_ERROR);
+
+    VerifyOrDie(SetTagList(kBreakerEndpointId, Span<const Descriptor::Structs::SemanticTagStruct::Type>(kBreakerTagList)) ==
+                CHIP_NO_ERROR);
 }
 
 void ApplicationShutdown()
