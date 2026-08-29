@@ -280,6 +280,8 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
             if not accepts_modify or not int(supported):
                 self.mark_current_step_skipped()
             else:
+                original_mask = int(await self.read_single_attribute_check_success(
+                    endpoint=endpoint, cluster=cluster, attribute=attributes.Mask))
                 lowest_supported_bit = int(supported) & -int(supported)
                 reduced_mask = int(supported) & ~lowest_supported_bit
                 status = await self._command_status(
@@ -290,6 +292,16 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
                     endpoint=endpoint, cluster=cluster, attribute=attributes.Mask)
                 asserts.assert_equal(int(mask), reduced_mask,
                                      'Mask must reflect the value sent to ModifyEnabledAlarms')
+                # Alarm Base SetMask clears any active State bit the new mask no longer covers, which is a
+                # State transition and therefore a report. Drain it, or step 14 dequeues it instead of the
+                # report from the clear-all trigger.
+                if current_state & lowest_supported_bit:
+                    dropped = int(sub.wait_next_report(timeout_sec=REPORT_TIMEOUT_SEC).value)
+                    log.info('State after masking off 0x%08X: 0x%08X', lowest_supported_bit, dropped)
+                    current_state = dropped
+                status = await self._command_status(
+                    cluster.Commands.ModifyEnabledAlarms(mask=original_mask), endpoint)
+                asserts.assert_equal(status, Status.Success, 'Restoring the original Mask must succeed')
 
             self.step(14, "TH sends the TestEventTrigger that clears all alarms",
                       expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
