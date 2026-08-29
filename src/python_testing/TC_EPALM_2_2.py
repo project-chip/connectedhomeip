@@ -127,11 +127,10 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
 
         This test case verifies the alarm state machine of the Electrical Protection Alarm
         Cluster server: that inducing each supported fault condition via the General Diagnostics
-        TestEventTrigger sets the correct AlarmBitmap bit in State, that latched alarms remain set
-        after the fault condition clears (and only clear via the Alarm Base cluster's Reset
-        semantics where applicable), and that the inherited Alarm Base Reset command is rejected
-        because EPALM disallows the inherited RESET feature. ModifyEnabledAlarms is optional in
-        Alarm Base and is checked against whichever behavior the DUT declares.
+        TestEventTrigger sets the correct AlarmBitmap bit in State, and that the inherited Alarm
+        Base Reset command is rejected because EPALM disallows the inherited RESET feature.
+        ModifyEnabledAlarms is optional in Alarm Base and is checked against whichever behavior
+        the DUT declares.
         """
         endpoint = self.get_endpoint()
         attributes = cluster.Attributes
@@ -272,6 +271,24 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
             asserts.assert_equal(status, Status.Success,
                                  'ModifyEnabledAlarms is optional in Alarm Base, so a DUT that '
                                  'accepts it must succeed rather than reject')
+
+        self.step("13b", "TH sends the ModifyEnabledAlarms command with a mask that clears at least one "
+                         "bit set in Supported, then TH reads from the DUT the Mask attribute.",
+                  expectation="Value has to be the mask TH sent, with the cleared bit no longer set. If the "
+                  "DUT does not declare EPALM.S.C01.Rsp(ModifyEnabledAlarms), the step is skipped.")
+        if not accepts_modify or not int(supported):
+            self.mark_current_step_skipped()
+        else:
+            lowest_supported_bit = int(supported) & -int(supported)
+            reduced_mask = int(supported) & ~lowest_supported_bit
+            status = await self._command_status(
+                cluster.Commands.ModifyEnabledAlarms(mask=reduced_mask), endpoint)
+            asserts.assert_equal(status, Status.Success,
+                                 'ModifyEnabledAlarms must succeed when the DUT accepts it')
+            mask = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attributes.Mask)
+            asserts.assert_equal(int(mask), reduced_mask,
+                                 'Mask must reflect the value sent to ModifyEnabledAlarms')
 
         self.step(14, "TH sends the TestEventTrigger that clears all alarms",
                   expectation="Verify DUT responds w/ status SUCCESS(0x00). TH awaits subscription report of a State "
