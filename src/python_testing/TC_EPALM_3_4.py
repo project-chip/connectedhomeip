@@ -59,14 +59,17 @@ ALARM_MASK = int(ALARM)
 
 class TC_EPALM_3_4(ElectricalProtectionAlarmTestBaseHelper):
 
-    def desc_TC_EPALM_3_4(self) -> str:
-        return "[TC-EPALM-3.4] Notify event for VoltageSurgeFault with DUT as Server"
-
     def pics_TC_EPALM_3_4(self) -> list[str]:
         return ["EPALM.S", "EPALM.S.F23", "EPALM.S.E00"]
 
     @run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kSurgeProtection))
     async def test_TC_EPALM_3_4(self):
+        """[TC-EPALM-3.4] Notify event for VoltageSurgeFault with Server as DUT
+
+        This test case verifies Notify event reporting and the corresponding State
+        transitions for the VoltageSurgeFault alarm of the Electrical Protection Alarm
+        Cluster server.
+        """
         endpoint = self.get_endpoint()
 
         self.step("1a", "Commission DUT to TH (already done)", is_commissioning=True)

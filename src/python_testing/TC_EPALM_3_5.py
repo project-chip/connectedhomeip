@@ -59,14 +59,17 @@ ALARM_MASK = int(ALARM)
 
 class TC_EPALM_3_5(ElectricalProtectionAlarmTestBaseHelper):
 
-    def desc_TC_EPALM_3_5(self) -> str:
-        return "[TC-EPALM-3.5] Notify event for ResidualCurrentFault with DUT as Server"
-
     def pics_TC_EPALM_3_5(self) -> list[str]:
         return ["EPALM.S", "EPALM.S.F24", "EPALM.S.E00"]
 
     @run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kResidualCurrent))
     async def test_TC_EPALM_3_5(self):
+        """[TC-EPALM-3.5] Notify event for ResidualCurrentFault with Server as DUT
+
+        This test case verifies Notify event reporting and the corresponding State
+        transitions for the ResidualCurrentFault alarm of the Electrical Protection Alarm
+        Cluster server.
+        """
         endpoint = self.get_endpoint()
 
         self.step("1a", "Commission DUT to TH (already done)", is_commissioning=True)
