@@ -79,7 +79,8 @@ DOWNLOAD_STALL_TIMEOUT_SEC = 1800
 STEP_RESERVE_SEC = 60
 # How long UpdateState must stay kIdle before Step 2 considers the DUT quiescent (its
 # session-recovery re-query burst from the provider switch is over and its next-query timer
-# is armed), so the 120s guard starts from an unperturbed baseline. See _wait_until_idle_settled.
+# is armed). This time is consumed from the 120s guard rather than added to it, since the spec
+# measures the minimum from the last QueryImage. See _wait_until_idle_settled.
 STEP2_SETTLE_SEC = 20
 # Upper bound for observing Step 6's kQuerying→kIdle cycle via subscription reports. The
 # cycle completes within ~1s of the announce on any DUT (a same-version query is answered
@@ -194,7 +195,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             extra_args=["-q", "updateNotAvailable", "--persistQueryImageStatus"],
         )
 
-    def _wait_until_idle_settled(self, subscription, settle_sec, timeout_sec, step_name):
+    def _wait_until_idle_settled(self, subscription, settle_sec, timeout_sec, step_name) -> float:
         """Block until UpdateState has stayed kIdle for ``settle_sec`` with no intervening
         non-idle report — i.e. the DUT has finished any post-provider-switch session-recovery
         churn and is quiescent on its next-query timer.
@@ -204,6 +205,16 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         it re-CASEs and retries (a burst of kQuerying spread over ~10-15s). This absorbs that
         burst so the 120s guard that follows measures the DUT's real, unperturbed behaviour.
         Fails if the DUT never settles within ``timeout_sec``.
+
+        The caller must flush the report queue before triggering the DUT, so the priming report
+        of a freshly started subscription (which carries the pre-trigger kIdle) cannot be
+        mistaken for the DUT having completed a query.
+
+        Returns:
+            ``time.time()`` of the last transition into kIdle, i.e. when the DUT's final
+            QueryImage exchange completed. TC-SU-2.2 measures the 120s minimum "from the last
+            QueryImage command", so the caller must anchor its guard window on this timestamp
+            rather than on this method's return, which is ``settle_sec`` later.
         """
         kIdle = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
         q = subscription.attribute_queue
@@ -215,7 +226,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         while True:
             now = time.time()
             if current_state == kIdle and idle_since is not None and now - idle_since >= settle_sec:
-                return
+                return idle_since
             if now >= deadline:
                 asserts.fail(f"{step_name}: DUT did not settle to a stable kIdle within "
                              f"{timeout_sec:.0f}s after the provider switch.")
@@ -425,12 +436,12 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info('%s: Prerequisite #1.0 - Requestor (DUT), NodeID: %s, FabricId: %s',
                     step_number_s2, requestor_node_id, fabric_id)
 
+        # The restart replaces the provider process only. It invalidates the DUT's CASE session
+        # to the provider, which Phase A absorbs; the controller's own session to the DUT is
+        # unaffected and is deliberately left in place. Expiring it here would discard a working
+        # session and force the subscription below through a full mDNS re-discovery and CASE
+        # handshake for no benefit.
         self.restart_provider_not_available()
-
-        # The provider switch above may leave the controller holding a stale cached session to
-        # the requestor; expire it so the priming subscription re-CASEs cleanly. No-op on a DUT
-        # whose session is already healthy.
-        controller.ExpireSessions(requestor_node_id)
 
         subscription_attr_state_updatenotavailable = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
@@ -454,7 +465,12 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         # ------------------------------------------------------------------------------------
         # [STEP_2]: Step #2.0 - Controller sends AnnounceOTAProvider command.
+        #
+        # Flush first: the subscription started above delivered a priming report carrying the
+        # pre-announce kIdle. Left in the queue it would satisfy Phase A's settle without the
+        # DUT having queried at all, so a DUT that ignores the announce would pass the step.
         # ------------------------------------------------------------------------------------
+        subscription_attr_state_updatenotavailable.flush_reports()
         logger.info('%s: Step #2.0 - Controller sends AnnounceOTAProvider command', step_number_s2)
         await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
         logger.info('%s: Step #2.0 - sent cmd AnnounceOTAProvider.', step_number_s2)
@@ -463,11 +479,13 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # [STEP_2]: Phase A — let the DUT receive NotAvailable and settle to a stable kIdle,
         # absorbing any session-recovery re-query burst from the provider switch. After a
         # NotAvailable response the DUT arms its long next-query timer and goes quiet; once it
-        # has been kIdle for STEP2_SETTLE_SEC the recovery is over and the 120s guard can start
-        # from an unperturbed baseline.
+        # has been kIdle for STEP2_SETTLE_SEC the recovery is over.
+        #
+        # The returned timestamp is when the DUT last entered kIdle, i.e. when its last
+        # QueryImage exchange completed — the point the spec measures the 120s minimum from.
         # ------------------------------------------------------------------------------------
         logger.info('%s: Phase A — waiting for the DUT to receive NotAvailable and settle to kIdle.', step_number_s2)
-        self._wait_until_idle_settled(
+        t_last_query_s2 = self._wait_until_idle_settled(
             subscription=subscription_attr_state_updatenotavailable,
             settle_sec=STEP2_SETTLE_SEC,
             timeout_sec=self.remaining_test_budget_sec(
@@ -483,11 +501,22 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # the 120s spec minimum of the last (NotAvailable) query. The persistent provider is left
         # running (no restart), so any kQuerying here is a genuine early re-query and hard-fails;
         # kDownloading/kApplying also fail.
+        #
+        # The guard is measured from the last QueryImage, per TC-SU-2.2, so the time already
+        # spent settling counts towards the 120s instead of extending it: waiting the full
+        # SPEC_GUARD_S2_SEC here would demand ~120 + STEP2_SETTLE_SEC seconds of silence and
+        # fail a DUT that legitimately re-queries just after the spec minimum.
         # ------------------------------------------------------------------------------------
-        logger.info('%s: Phase B — verifying no re-query for %ss (tolerance %ss) after NotAvailable.',
-                    step_number_s2, SPEC_GUARD_S2_SEC, tolerance_s2)
+        guard_remaining_s2 = SPEC_GUARD_S2_SEC - (time.time() - t_last_query_s2)
+        asserts.assert_greater(
+            guard_remaining_s2, tolerance_s2,
+            f"{step_number_s2}: settling consumed the whole {SPEC_GUARD_S2_SEC}s guard window "
+            f"({guard_remaining_s2:.1f}s left); nothing meaningful is left to verify.")
+        logger.info('%s: Phase B — verifying no re-query for %.1fs (tolerance %ss); %ss minus %.1fs already settled.',
+                    step_number_s2, guard_remaining_s2, tolerance_s2, SPEC_GUARD_S2_SEC,
+                    SPEC_GUARD_S2_SEC - guard_remaining_s2)
         subscription_attr_state_updatenotavailable.await_duration_asserting_no_forbidden(
-            duration_sec=SPEC_GUARD_S2_SEC,
+            duration_sec=guard_remaining_s2,
             forbidden_values={kQuerying_s2, kDownloading_s2, kApplying_s2},
             tolerance_sec=tolerance_s2,
         )
