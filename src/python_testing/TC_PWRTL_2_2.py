@@ -45,7 +45,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
-from matter.testing.decorators import async_test_body, pics
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 
@@ -56,7 +56,6 @@ cluster = Clusters.PowerTopology
 
 class TC_PWRTL_2_2(MatterBaseTest):
 
-    @pics('PWRTL.S', 'PWRTL.S.F04')
     def _assert_nodes_equal(self, actual, expected, what: str) -> None:
         """Compare every field of every CircuitNodeStruct, not just the list length.
 
@@ -70,7 +69,7 @@ class TC_PWRTL_2_2(MatterBaseTest):
             asserts.assert_equal(got.endpoint, want.endpoint, f'{what}[{i}].endpoint must match')
             asserts.assert_equal(got.label, want.label, f'{what}[{i}].label must match')
 
-    @async_test_body
+    @run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kElectricalCircuit))
     async def test_TC_PWRTL_2_2(self):
         """[TC-PWRTL-2.2] ElectricalCircuitNodes (CIRC feature) with DUT as Server
 
