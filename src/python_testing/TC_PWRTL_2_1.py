@@ -60,9 +60,6 @@ class TC_PWRTL_2_1(MatterBaseTest):
         """[TC-PWRTL-2.1] Attributes with DUT as Server
 
         This test case verifies the primary functionality of the Power Topology Cluster server.
-
-        Test Plan:
-        https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/cluster/power_topology.adoc#tc-pwrtl-21
         """
         endpoint = self.get_endpoint()
         cluster = Clusters.PowerTopology
