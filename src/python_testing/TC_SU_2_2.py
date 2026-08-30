@@ -262,6 +262,59 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                 current_state = val
                 idle_since = None
 
+    async def _announce_until_provider_queried(self, controller, provider_node_id: int, requestor_node_id: int,
+                                               timeout_sec: float, step_name: str,
+                                               retry_interval_sec: float = 60.0) -> None:
+        """Announce the provider, repeating until the provider reports receiving a QueryImage.
+
+        One AnnounceOTAProvider does not guarantee the DUT queries this provider. The requestor
+        drops an announce that arrives while UpdateState is not kIdle, and a query it does send
+        can still die in a CASE session left over from the previous provider process — every step
+        replaces that process — costing a message-layer timeout before the DUT tries again.
+        Repeating the announce keeps the step moving in both cases instead of leaving it at the
+        mercy of the DUT's own retry policy: DefaultOTARequestorDriver grants a single automatic
+        retry per invalid session (kMaxInvalidSessionRetries) and the spec mandates none at all.
+
+        Waiting on the provider's own report of the query, rather than on a DUT state change, is
+        what makes the loop terminate for the right reason: it is the only signal that separates a
+        query this provider answered from one that never arrived.
+
+        The caller must arm the provider's matcher with PROVIDER_QUERY_RECEIVED_LOG right after
+        starting it and before calling this, so a receipt landing between the announce and the
+        wait cannot be missed.
+
+        Announces stop as soon as the provider reports the query, so this never perturbs a
+        timing guard that follows: any announce it sends is either dropped by a busy DUT or
+        answered by the query that ends the loop.
+        """
+        proc = self.current_provider_app_proc
+        t_start = time.time()
+        attempt = 0
+
+        while True:
+            remaining = timeout_sec - (time.time() - t_start)
+            if remaining <= 0:
+                asserts.fail(f"{step_name}: the provider received no QueryImage within {timeout_sec:.0f}s "
+                             f"of the first announce ({attempt} sent); the DUT never reached it.")
+            attempt += 1
+            try:
+                await self.announce_ota_provider(
+                    controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
+                logger.info('%s: AnnounceOTAProvider sent (attempt %d).', step_name, attempt)
+            except (TimeoutError, ChipDeviceCtrl.ChipStackError) as e:
+                # Expected while the DUT is recovering from an aborted transfer: its session to
+                # the controller can drop (e.g. under Wi-Fi power-save). Retry on the next pass.
+                logger.info('%s: AnnounceOTAProvider failed (DUT transiently unreachable): %s; will retry.',
+                            step_name, e)
+
+            if proc.wait_for_output(timeout=min(retry_interval_sec, remaining)):
+                logger.info('%s: provider received a QueryImage %.0fs after the first announce.',
+                            step_name, time.time() - t_start)
+                return
+
+            logger.info('%s: no QueryImage reached the provider in %.0fs (elapsed %.0fs / %.0fs); re-announcing.',
+                        step_name, retry_interval_sec, time.time() - t_start, timeout_sec)
+
     async def _wait_until_idle_before_announce(self, controller, requestor_node_id: int, subscription,
                                                timeout_sec: float, step_name: str) -> None:
         """Block until the DUT's UpdateState is kIdle, so the AnnounceOTAProvider that follows is
@@ -501,6 +554,11 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # handshake for no benefit.
         self.restart_provider_not_available()
 
+        # Arm the barrier before the announce below, so that a QueryImage reaching this provider
+        # cannot slip past unnoticed. restart_provider_not_available() leaves the match armed on
+        # start_provider()'s own "Server initialization complete" wait, so this must follow it.
+        self.current_provider_app_proc.arm_output_match(PROVIDER_QUERY_RECEIVED_LOG)
+
         subscription_attr_state_updatenotavailable = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
@@ -522,24 +580,38 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         tolerance_s2 = 5.0
 
         # ------------------------------------------------------------------------------------
-        # [STEP_2]: Step #2.0 - Controller sends AnnounceOTAProvider command.
+        # [STEP_2]: Step #2.0 - Controller sends AnnounceOTAProvider command, repeating until the
+        # provider confirms it received a QueryImage.
+        #
+        # Entering this step the DUT is still in kDelayedOnQuery from Step 1, so the first
+        # announce is dropped and the DUT reaches this provider on its own next-query timer.
+        # Waiting for the provider's confirmation rather than assuming the announce worked is what
+        # establishes the step's premise — that a NotAvailable response actually reached the DUT.
+        # Without it Phase A would settle on any kIdle, including one the DUT enters without
+        # contacting this provider at all (an invalid session it does not retry, or its Busy retry
+        # budget running out), and the guard would then measure silence that proves nothing.
         #
         # Flush first: any report the DUT emitted between the subscription starting and the
         # announce predates the trigger, and left in the queue could satisfy Phase A's settle
-        # without the DUT having queried at all. Entering this step the DUT is in
-        # kDelayedOnQuery from Step 1, so its move to kIdle here is a real transition and does
-        # produce the report Phase A waits on.
+        # without the DUT having queried at all.
         # ------------------------------------------------------------------------------------
         subscription_attr_state_updatenotavailable.flush_reports()
         logger.info('%s: Step #2.0 - Controller sends AnnounceOTAProvider command', step_number_s2)
-        await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
-        logger.info('%s: Step #2.0 - sent cmd AnnounceOTAProvider.', step_number_s2)
+        await self._announce_until_provider_queried(
+            controller=controller,
+            provider_node_id=provider_node_id,
+            requestor_node_id=requestor_node_id,
+            timeout_sec=self.remaining_test_budget_sec(
+                reserve_sec=SPEC_GUARD_S2_SEC + STEP3_DELAYED_ACTION_TIME_SEC + 4 * STEP_RESERVE_SEC),
+            step_name=step_number_s2,
+        )
 
         # ------------------------------------------------------------------------------------
-        # [STEP_2]: Phase A — let the DUT receive NotAvailable and settle to a stable kIdle,
-        # absorbing any session-recovery re-query burst from the provider switch. After a
-        # NotAvailable response the DUT arms its long next-query timer and goes quiet; once it
-        # has been kIdle for STEP2_SETTLE_SEC the recovery is over.
+        # [STEP_2]: Phase A — let the DUT settle to a stable kIdle, absorbing any session-recovery
+        # re-query burst from the provider switch. The query itself has already been confirmed
+        # above, so what remains is to find where the DUT came to rest: after a NotAvailable
+        # response it arms its long next-query timer and goes quiet, and once it has been kIdle
+        # for STEP2_SETTLE_SEC the recovery is over.
         #
         # The returned timestamp is when the DUT last entered kIdle, i.e. when its last
         # QueryImage exchange completed — the point the spec measures the 120s minimum from.
@@ -618,6 +690,10 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             extra_args=provider_extra_args_busy_180,
         )
 
+        # Arm the barrier before the announce below; start_provider() leaves the match armed on
+        # its own "Server initialization complete" wait, so this must follow it.
+        self.current_provider_app_proc.arm_output_match(PROVIDER_QUERY_RECEIVED_LOG)
+
         subscription_attr_state_busy_180s = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
@@ -633,9 +709,19 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             keepSubscriptions=False
         )
 
+        # Announce until this provider confirms it received the query. The provider process was
+        # just replaced, so the DUT's first query can die in the session it cached for Step 2's
+        # process; re-announcing keeps the step moving without relying on the DUT retrying by
+        # itself. Announces stop at the confirmation, well before the guard window below.
         logger.info('%s: Step #3.0 - Controller sends AnnounceOTAProvider command', step_number_s3)
-        await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
-        logger.info('%s: Step #3.0 - sent cmd AnnounceOTAProvider.', step_number_s3)
+        await self._announce_until_provider_queried(
+            controller=controller,
+            provider_node_id=provider_node_id,
+            requestor_node_id=requestor_node_id,
+            timeout_sec=self.remaining_test_budget_sec(
+                reserve_sec=STEP3_DELAYED_ACTION_TIME_SEC + 3 * STEP_RESERVE_SEC),
+            step_name=step_number_s3,
+        )
 
         # ------------------------------------------------------------------------------------
         # [STEP_3]: Phase A — wait for kDelayedOnQuery (DUT received Busy/180s).
@@ -937,6 +1023,10 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             extra_args=provider_extra_args_updateAvailable,
         )
 
+        # Arm the barrier before the announce below; start_provider() leaves the match armed on
+        # its own "Server initialization complete" wait, so this must follow it.
+        self.current_provider_app_proc.arm_output_match(PROVIDER_QUERY_RECEIVED_LOG)
+
         # ------------------------------------------------------------------------------------
         # [STEP_5]: Step #5.1 - Matcher for OTA records logs
         # Start AttributeSubscriptionHandler first to avoid missing any rapid OTA events (race condition)
@@ -960,9 +1050,11 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
         # [STEP_5]: Step #5.0 - Controller sends AnnounceOTAProvider command.
         #
-        # Confirm the DUT is idle before announcing, so the announce is not dropped (see
-        # _wait_until_idle_before_announce). Flush afterwards so the matcher below sees only
-        # post-announce reports.
+        # Two distinct things can keep this step's announce from producing a download, so both are
+        # handled: the DUT dropping the announce because it is not idle (see
+        # _wait_until_idle_before_announce), and the query it then sends dying in the CASE session
+        # cached for Step 4's provider process (see _announce_until_provider_queried). Flush
+        # between them so the matcher below sees only post-announce reports.
         # ------------------------------------------------------------------------------------
         await self._wait_until_idle_before_announce(
             controller=controller,
@@ -974,8 +1066,13 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         subscription_attr.flush_reports()
 
         logger.info('%s: Step #5.0 - Controller sends AnnounceOTAProvider command', step_number_s5)
-        await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
-        logger.info('%s: Step #5.0 - sent cmd AnnounceOTAProvider.', step_number_s5)
+        await self._announce_until_provider_queried(
+            controller=controller,
+            provider_node_id=provider_node_id,
+            requestor_node_id=requestor_node_id,
+            timeout_sec=self.remaining_test_budget_sec(reserve_sec=STEP_RESERVE_SEC),
+            step_name=step_number_s5,
+        )
 
         # ------------------------------------------------------------------------------------
         # [STEP_5]: Step #5.2 - Track OTA attributes: UpdateState and UpdateStateProgress
