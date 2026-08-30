@@ -346,7 +346,7 @@ public:
     {
         _Dequeue(ca);
         ca->mCancel = nullptr;
-        ca->Invalidate(); // Cancel() already does, this but this function is also API
+        ca->Invalidate(); // Cancel() already does this, but this function is also a public API
     }
 
     /**
