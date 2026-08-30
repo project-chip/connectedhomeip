@@ -10631,7 +10631,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command Step
  *
- * This command indirectly changes the speed-oriented attributes of the fan in steps rather than using the speed-oriented attributes, FanMode, PercentSetting, or SpeedSetting, directly.
+ * This command speeds up or slows down the fan, in steps, without a client having to know the fan speed.
  */
 - (void)stepWithParams:(MTRFanControlClusterStepParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
@@ -23190,7 +23190,9 @@ typedef NS_ENUM(uint8_t, MTRFanControlFanMode) {
     MTRFanControlFanModeLow MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x01,
     MTRFanControlFanModeMedium MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x02,
     MTRFanControlFanModeHigh MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x03,
+    MTRFanControlFanModeOn MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x04,
     MTRFanControlFanModeAuto MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x05,
+    MTRFanControlFanModeSmart MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x06,
 } MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 typedef NS_ENUM(uint8_t, MTRFanControlFanModeType) {
@@ -23198,7 +23200,9 @@ typedef NS_ENUM(uint8_t, MTRFanControlFanModeType) {
     MTRFanControlFanModeTypeLow MTR_DEPRECATED("Please use MTRFanControlFanModeLow", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0)) = 0x01,
     MTRFanControlFanModeTypeMedium MTR_DEPRECATED("Please use MTRFanControlFanModeMedium", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0)) = 0x02,
     MTRFanControlFanModeTypeHigh MTR_DEPRECATED("Please use MTRFanControlFanModeHigh", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0)) = 0x03,
+    MTRFanControlFanModeTypeOn MTR_DEPRECATED("Please use MTRFanControlFanModeOn", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0)) = 0x04,
     MTRFanControlFanModeTypeAuto MTR_DEPRECATED("Please use MTRFanControlFanModeAuto", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0)) = 0x05,
+    MTRFanControlFanModeTypeSmart MTR_DEPRECATED("Please use MTRFanControlFanModeSmart", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0)) = 0x06,
 } MTR_DEPRECATED("Please use MTRFanControlFanMode", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0));
 
 typedef NS_ENUM(uint8_t, MTRFanControlFanModeSequence) {

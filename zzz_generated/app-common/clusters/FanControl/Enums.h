@@ -47,12 +47,14 @@ enum class FanModeEnum : uint8_t
     kLow    = 0x01,
     kMedium = 0x02,
     kHigh   = 0x03,
+    kOn     = 0x04,
     kAuto   = 0x05,
+    kSmart  = 0x06,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 4,
+    kUnknownEnumValue = 7,
 };
 
 // Enum for FanModeSequenceEnum

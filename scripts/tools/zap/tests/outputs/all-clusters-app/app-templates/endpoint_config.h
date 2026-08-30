@@ -552,7 +552,7 @@
         { (uint16_t) 0x1, (uint16_t) 0x0, (uint16_t) 0x9 },          /* SystemMode */                                              \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Fan Control (server) */                                                                           \
-        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x5 },  /* FanMode */                                                         \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x6 },  /* FanMode */                                                         \
         { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x64 }, /* PercentSetting */                                                  \
         { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x64 }, /* SpeedSetting */                                                    \
         { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x7 },  /* RockSetting */                                                     \

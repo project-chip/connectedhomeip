@@ -1699,7 +1699,7 @@ cluster OperationalState = 96 {
 
 /** An interface for controlling a fan in a heating/cooling system. */
 cluster FanControl = 514 {
-  revision 7;
+  revision 5;
 
   enum AirflowDirectionEnum : enum8 {
     kForward = 0;
@@ -1711,7 +1711,9 @@ cluster FanControl = 514 {
     kLow = 1;
     kMedium = 2;
     kHigh = 3;
+    kOn = 4;
     kAuto = 5;
+    kSmart = 6;
   }
 
   enum FanModeSequenceEnum : enum8 {
@@ -1772,7 +1774,7 @@ cluster FanControl = 514 {
     optional boolean lowestOff = 2;
   }
 
-  /** This command indirectly changes the speed-oriented attributes of the fan in steps rather than using the speed-oriented attributes, FanMode, PercentSetting, or SpeedSetting, directly. */
+  /** This command speeds up or slows down the fan, in steps, without a client having to know the fan speed. */
   command Step(StepRequest): DefaultSuccess = 0;
 }
 

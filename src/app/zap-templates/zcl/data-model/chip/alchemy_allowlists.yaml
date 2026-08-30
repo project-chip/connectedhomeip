@@ -40,6 +40,7 @@ INCOMPLETE_METADATA_ALLOWLIST:
     - electrical-energy-measurement-cluster.xml
     - electrical-power-measurement-cluster.xml
     - energy-evse-mode-cluster.xml
+    - fan-control-cluster.xml
     - general-commissioning-cluster.xml
     - global-structs.xml
     - groupcast-cluster.xml
