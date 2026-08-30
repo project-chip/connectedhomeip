@@ -49,3 +49,21 @@ source_set("single-endpoint-device") {
     "${chip_root}/src/lib/support",
   ]
 }
+
+source_set("platform-identify-integration") {
+  sources = [
+    "PlatformIdentifyIntegration.cpp",
+    "PlatformIdentifyIntegration.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/clusters/identify-server",
+    "${chip_root}/src/lib/core:error",
+    "${chip_root}/src/lib/support",
+  ]
+
+  public_configs = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/device:includes",
+    "${chip_root}/src:includes",
+  ]
+}

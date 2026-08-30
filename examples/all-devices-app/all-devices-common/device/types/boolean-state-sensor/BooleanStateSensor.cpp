@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 
 using namespace chip::app::Clusters;
@@ -28,7 +29,7 @@ CHIP_ERROR BooleanStateSensor::Register(chip::EndpointId endpoint, CodeDrivenDat
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mBooleanStateCluster.Create(endpoint);

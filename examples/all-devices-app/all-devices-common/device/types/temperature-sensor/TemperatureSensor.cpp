@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/types/temperature-sensor/TemperatureSensor.h>
 #include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -37,7 +38,7 @@ CHIP_ERROR TemperatureSensor::Register(EndpointId endpoint, CodeDrivenDataModelP
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // Create the identify cluster.
-    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     // Create the temperature measurement cluster

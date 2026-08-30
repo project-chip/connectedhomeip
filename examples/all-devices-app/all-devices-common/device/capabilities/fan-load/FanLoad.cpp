@@ -15,6 +15,7 @@
  */
 
 #include <clusters/FanControl/Enums.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/capabilities/fan-load/FanLoad.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -42,7 +43,7 @@ CHIP_ERROR FanLoad::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvi
         RegisterDescriptor(endpoint, provider, EndpointComposition(composition.parentId, composition.pattern, mContext.tagList)));
 
     // Identify
-    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     // ScenesManagement

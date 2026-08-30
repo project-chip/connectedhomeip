@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/types/device-energy-management/EnergyManagement.h>
 #include <devices/Types.h>
 
@@ -33,7 +34,7 @@ CHIP_ERROR EnergyManagement::Register(EndpointId endpoint, CodeDrivenDataModelPr
     mProvider = &provider;
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     Clusters::DeviceEnergyManagementCluster::Config config(endpoint, BitMask<Feature>(), *this);

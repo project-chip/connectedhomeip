@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/types/aggregator/Aggregator.h>
 #include <devices/Types.h>
 #include <lib/support/CodeUtils.h>
@@ -34,11 +35,13 @@ public:
     void OnIdentifyStart(IdentifyCluster & cluster) override
     {
         ChipLogProgress(DeviceLayer, "Aggregator [Endpoint %d]: Identify START", cluster.GetPaths()[0].mEndpointId);
+        PlatformIdentifyIntegration::GetInstance().NotifyIdentifyStart(cluster);
     }
 
     void OnIdentifyStop(IdentifyCluster & cluster) override
     {
         ChipLogProgress(DeviceLayer, "Aggregator [Endpoint %d]: Identify STOP", cluster.GetPaths()[0].mEndpointId);
+        PlatformIdentifyIntegration::GetInstance().NotifyIdentifyStop(cluster);
     }
 
     void OnTriggerEffect(IdentifyCluster & cluster) override
@@ -83,6 +86,7 @@ public:
 
         ChipLogProgress(DeviceLayer, "Aggregator [Endpoint %d]: Trigger effect: %s", cluster.GetPaths()[0].mEndpointId,
                         msg.c_str());
+        PlatformIdentifyIntegration::GetInstance().NotifyTriggerEffect(cluster);
     }
 
     bool IsTriggerEffectEnabled() const override { return true; }
@@ -108,7 +112,9 @@ CHIP_ERROR Aggregator::Register(EndpointId endpoint, CodeDrivenDataModelProvider
     composition.pattern = DataModel::EndpointCompositionPattern::kFullFamily;
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate).WithDelegate(&GetIdentifyDelegate()));
+    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance()
+                                .MakeConfig(endpoint, mTimerDelegate)
+                                .WithDelegate(&GetIdentifyDelegate()));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));

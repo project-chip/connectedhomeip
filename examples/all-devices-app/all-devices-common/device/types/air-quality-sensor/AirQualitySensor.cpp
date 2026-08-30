@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/types/air-quality-sensor/AirQualitySensor.h>
 #include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -34,7 +35,7 @@ CHIP_ERROR AirQualitySensor::Register(chip::EndpointId endpoint, CodeDrivenDataM
 {
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mAirQualityCluster.Create(endpoint, mConfig.airQualityFeatures);

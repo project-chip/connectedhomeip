@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/capabilities/on-off-load/OnOffLoad.h>
 #include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -38,7 +39,9 @@ CHIP_ERROR OnOffLoad::Register(chip::EndpointId endpoint, CodeDrivenDataModelPro
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mContext.timerDelegate).WithDelegate(&mIdentifyDelegate));
+    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance()
+                                .MakeConfig(endpoint, mContext.timerDelegate)
+                                .WithDelegate(&mIdentifyDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mScenesTableProvider.SetEndpoint(endpoint);

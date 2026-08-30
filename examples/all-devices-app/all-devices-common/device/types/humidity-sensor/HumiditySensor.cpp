@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/types/humidity-sensor/HumiditySensor.h>
 #include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -35,7 +36,7 @@ CHIP_ERROR HumiditySensor::Register(EndpointId endpoint, CodeDrivenDataModelProv
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mRelativeHumidityMeasurementCluster.Create(endpoint, mHumidityConfig);

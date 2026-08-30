@@ -16,6 +16,7 @@
 
 #include "Cooktop.h"
 
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <devices/Types.h>
 
 namespace chip::app {
@@ -32,7 +33,9 @@ CHIP_ERROR CookSurfacePart::Register(EndpointId endpoint, CodeDrivenDataModelPro
 {
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mTimerDelegate).WithDelegate(&mIdentifyDelegate));
+    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance()
+                                .MakeConfig(endpoint, mTimerDelegate)
+                                .WithDelegate(&mIdentifyDelegate));
     mOnOffCluster.Create(endpoint, Clusters::OnOffCluster::Context{ .timerDelegate = mTimerDelegate });
     mOnOffCluster.Cluster().AddDelegate(&mOnOffDelegate);
 

@@ -16,6 +16,7 @@
  */
 
 #include "SmokeCoAlarm.h"
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -63,7 +64,7 @@ CHIP_ERROR SmokeCoAlarm::Register(chip::EndpointId endpoint, CodeDrivenDataModel
 {
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mSmokeCoAlarmCluster.Create(endpoint, mSmokeConfig);

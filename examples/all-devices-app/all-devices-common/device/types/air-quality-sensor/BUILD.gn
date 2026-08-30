@@ -21,6 +21,7 @@ source_set("air-quality-sensor") {
   ]
 
   public_deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/api:platform-identify-integration",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
     "${chip_root}/src/app/clusters/air-quality-server",
     "${chip_root}/src/app/clusters/concentration-measurement-server",

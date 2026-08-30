@@ -16,6 +16,7 @@
 
 #include "LoggingTemperatureControlledCabinetPart.h"
 
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <lib/support/CodeUtils.h>
 
 namespace chip::app {
@@ -138,16 +139,19 @@ void LoggingTemperatureControlledCabinetPart::HandleStopStateCallback(Clusters::
 void LoggingTemperatureControlledCabinetPart::OnIdentifyStart(Clusters::IdentifyCluster & cluster)
 {
     ChipLogProgress(DeviceLayer, "TempCabinet (%s): OnIdentifyStart", mName);
+    PlatformIdentifyIntegration::GetInstance().NotifyIdentifyStart(cluster);
 }
 
 void LoggingTemperatureControlledCabinetPart::OnIdentifyStop(Clusters::IdentifyCluster & cluster)
 {
     ChipLogProgress(DeviceLayer, "TempCabinet (%s): OnIdentifyStop", mName);
+    PlatformIdentifyIntegration::GetInstance().NotifyIdentifyStop(cluster);
 }
 
 void LoggingTemperatureControlledCabinetPart::OnTriggerEffect(Clusters::IdentifyCluster & cluster)
 {
     ChipLogProgress(DeviceLayer, "TempCabinet (%s): OnTriggerEffect", mName);
+    PlatformIdentifyIntegration::GetInstance().NotifyTriggerEffect(cluster);
 }
 
 } // namespace chip::app

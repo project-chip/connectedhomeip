@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/types/proximity-ranger/ProximityRanger.h>
 #include <devices/Types.h>
 #include <lib/support/CodeUtils.h>
@@ -64,7 +65,7 @@ CHIP_ERROR ProximityRanger::Register(chip::EndpointId endpoint, CodeDrivenDataMo
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mProximityRangingCluster.Create(

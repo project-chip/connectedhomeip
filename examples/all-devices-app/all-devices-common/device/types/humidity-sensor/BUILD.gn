@@ -22,6 +22,7 @@ source_set("humidity-sensor") {
   ]
 
   public_deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/api:platform-identify-integration",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
     "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/app/clusters/relative-humidity-measurement-server",

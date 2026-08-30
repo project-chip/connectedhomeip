@@ -21,6 +21,7 @@
 #include <app/clusters/bindings/binding-table.h>
 #include <clusters/Identify/Ids.h>
 #include <clusters/OnOff/Ids.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <devices/Types.h>
 #include <platform/PlatformManager.h>
 
@@ -46,7 +47,7 @@ CHIP_ERROR OnOffLightSwitch::Register(chip::EndpointId endpoint, CodeDrivenDataM
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mBindingCluster.Create(

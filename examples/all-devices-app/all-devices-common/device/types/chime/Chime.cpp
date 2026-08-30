@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/types/chime/Chime.h>
 #include <devices/Types.h>
 #include <lib/support/StringBuilder.h>
@@ -32,7 +33,7 @@ CHIP_ERROR Chime::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvide
 {
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mChimeCluster.Create(endpoint, *this);

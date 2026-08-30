@@ -24,6 +24,7 @@ source_set("dimmable-load") {
   ]
 
   public_deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/api:platform-identify-integration",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
     "${chip_root}/src/app/clusters/groups-server",
     "${chip_root}/src/app/clusters/identify-server",
@@ -45,6 +46,7 @@ source_set("logging") {
 
   public_deps = [
     ":dimmable-load",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/api:platform-identify-integration",
     "${chip_root}/src/app/clusters/groups-server",
     "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/app/clusters/level-control",

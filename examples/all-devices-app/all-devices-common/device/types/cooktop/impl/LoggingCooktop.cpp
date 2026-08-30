@@ -16,6 +16,8 @@
 
 #include "LoggingCooktop.h"
 
+#include <device/api/PlatformIdentifyIntegration.h>
+
 namespace chip::app {
 
 // LoggingCookSurfacePart
@@ -37,16 +39,19 @@ void LoggingCookSurfacePart::OnOffStartup(bool on)
 void LoggingCookSurfacePart::OnIdentifyStart(Clusters::IdentifyCluster & cluster)
 {
     ChipLogProgress(DeviceLayer, "CookSurface (%s): OnIdentifyStart", mName);
+    PlatformIdentifyIntegration::GetInstance().NotifyIdentifyStart(cluster);
 }
 
 void LoggingCookSurfacePart::OnIdentifyStop(Clusters::IdentifyCluster & cluster)
 {
     ChipLogProgress(DeviceLayer, "CookSurface (%s): OnIdentifyStop", mName);
+    PlatformIdentifyIntegration::GetInstance().NotifyIdentifyStop(cluster);
 }
 
 void LoggingCookSurfacePart::OnTriggerEffect(Clusters::IdentifyCluster & cluster)
 {
     ChipLogProgress(DeviceLayer, "CookSurface (%s): OnTriggerEffect", mName);
+    PlatformIdentifyIntegration::GetInstance().NotifyTriggerEffect(cluster);
 }
 
 namespace {
