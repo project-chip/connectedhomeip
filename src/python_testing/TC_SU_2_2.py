@@ -183,7 +183,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         Every provider (re)start gets its own file so logs are not interleaved across
         restarts. The name embeds a monotonic start counter (so files sort in start order)
-        and the current step index (for correlation), e.g. ``provider_logs/provider_03_step2.log``.
+        and the current step index (for correlation), e.g. ``provider_03_step2.log`` under
+        this run's PROVIDER_LOG_DIR.
         """
         self._provider_start_count += 1
         step_idx = getattr(self, "current_step_index", 0)
@@ -357,9 +358,16 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # Each provider (re)start writes to its own log file under this directory instead of
         # appending to a single shared log, so each step's provider activity can be inspected
         # in isolation. See _next_provider_log_path.
-        self.PROVIDER_LOG_DIR = "provider_logs"
+        #
+        # The directory lives in this run's own Mobly output directory, which keeps the provider
+        # logs with the rest of the run's artifacts and — because OTAProviderSubprocess opens its
+        # log file for append — stops a run from adding to files left behind by earlier runs.
+        # current_test_info.output_path is unique per test invocation (it ends in
+        # "<test name>-<begin time>") and is created on access.
+        self.PROVIDER_LOG_DIR = os.path.join(self.current_test_info.output_path, "provider_logs")
         self._provider_start_count = 0
         os.makedirs(self.PROVIDER_LOG_DIR, exist_ok=True)
+        logger.info("Provider logs for this run: %s", self.PROVIDER_LOG_DIR)
         self.KVS_PATH = "/tmp/chip_kvs_provider"
         self.provider_app_path = self.user_params.get('provider_app_path')
         self.ota_image = self.user_params.get('ota_image')
