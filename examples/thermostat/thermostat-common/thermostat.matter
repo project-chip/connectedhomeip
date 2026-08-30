@@ -3166,10 +3166,15 @@ endpoint 1 {
     callback attribute thermostatSuggestions;
     callback attribute currentThermostatSuggestion;
     callback attribute thermostatSuggestionNotFollowingReason;
+    callback attribute sensors;
+    callback attribute availableSensors;
+    callback attribute enabledSensors;
+    callback attribute numberOfSensorScheduleTransitions;
+    callback attribute sensorSchedule;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x7A3;
+    ram      attribute featureMap default = 0xFA3;
     callback attribute clusterRevision;
 
     handle command SetpointRaiseLower;
