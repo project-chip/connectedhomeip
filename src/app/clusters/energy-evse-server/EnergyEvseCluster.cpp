@@ -440,7 +440,7 @@ CHIP_ERROR EnergyEvseCluster::AcceptedCommands(const ConcreteClusterPath & path,
     {
         ReturnErrorOnFailure(builder.AppendElements({ EnableDischarging::kMetadataEntry }));
     }
-    if (mOptionalCmds.Has(OptionalCommands::kSupportsStartDiagnostics))
+    if (SupportsStartDiagnostics())
     {
         ReturnErrorOnFailure(builder.AppendElements({ StartDiagnostics::kMetadataEntry }));
     }
