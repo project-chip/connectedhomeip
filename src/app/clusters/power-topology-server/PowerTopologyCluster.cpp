@@ -220,6 +220,11 @@ DataModel::ActionReturnStatus PowerTopologyCluster::WriteElectricalCircuitNodes(
         size_t newCount = 0;
         ReturnErrorOnFailure(list.ComputeSize(&newCount));
 
+        // The spec constrains the attribute to "max 50" entries, so a longer list is a constraint
+        // violation regardless of how much room storage has. Capacity() is separate: it may be lowered
+        // by a constrained platform, and only running out of that room is resource exhaustion.
+        VerifyOrReturnValue(newCount <= kMaxCircuitNodes, Status::ConstraintError);
+
         const size_t otherFabricNodeCount = mCircuitNodeStorage->Count() - mCircuitNodeStorage->CountForFabric(fabricIndex);
         VerifyOrReturnValue(otherFabricNodeCount + newCount <= mCircuitNodeStorage->Capacity(), Status::ResourceExhausted);
 
@@ -250,6 +255,7 @@ DataModel::ActionReturnStatus PowerTopologyCluster::WriteElectricalCircuitNodes(
     {
         Structs::CircuitNodeStruct::DecodableType value;
         ReturnErrorOnFailure(decoder.Decode(value));
+        VerifyOrReturnValue(mCircuitNodeStorage->Count() < kMaxCircuitNodes, Status::ConstraintError);
         VerifyOrReturnValue(mCircuitNodeStorage->Count() < mCircuitNodeStorage->Capacity(), Status::ResourceExhausted);
 
         CircuitNodeStorage::Node node;

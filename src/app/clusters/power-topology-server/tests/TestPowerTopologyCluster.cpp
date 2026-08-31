@@ -873,7 +873,7 @@ TEST_F(TestPowerTopologyCluster, WriteElectricalCircuitNodesLabelTooLongTest)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// Writing more nodes than the list maximum is rejected with ResourceExhausted.
+// Filling the storage's capacity, without exceeding the spec maximum, is ResourceExhausted.
 TEST_F(TestPowerTopologyCluster, WriteElectricalCircuitNodesResourceExhaustedTest)
 {
     chip::Testing::TestServerClusterContext context;
@@ -893,16 +893,60 @@ TEST_F(TestPowerTopologyCluster, WriteElectricalCircuitNodesResourceExhaustedTes
 
     ClusterTester tester(cluster);
 
+    // One past this storage's capacity, but still within the spec maximum, so this exercises
+    // capacity rather than the "max 50" constraint.
     std::vector<Structs::CircuitNodeStruct::Type> tooMany;
-    for (size_t i = 0; i < PowerTopologyCluster::kMaxCircuitNodes + 1; i++)
+    for (size_t i = 0; i < circuitStorage9.Capacity() + 1; i++)
     {
         tooMany.push_back(MakeCircuitNode(static_cast<NodeId>(i + 1), NullOptional, NullOptional));
     }
+    ASSERT_LE(tooMany.size(), PowerTopologyCluster::kMaxCircuitNodes);
 
     EXPECT_EQ(tester.WriteAttribute(ElectricalCircuitNodes::Id,
                                     DataModel::List<Structs::CircuitNodeStruct::Type>(tooMany.data(), tooMany.size()),
                                     ListWritingPattern::ReplaceAll),
               IMStatus::ResourceExhausted);
+
+    // The rejected write must not have mutated state.
+    ElectricalCircuitNodes::TypeInfo::DecodableType nodes;
+    EXPECT_TRUE(tester.ReadAttribute(ElectricalCircuitNodes::Id, nodes).IsSuccess());
+    auto iter = nodes.begin();
+    EXPECT_FALSE(iter.Next());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// A list longer than the spec's "max 50" is a constraint violation, not resource exhaustion, and is
+// rejected on that basis even though this storage runs out of room long before 50.
+TEST_F(TestPowerTopologyCluster, WriteElectricalCircuitNodesOverSpecMaximumIsConstraintError)
+{
+    chip::Testing::TestServerClusterContext context;
+    chip::Testing::FabricTestFixture fabricHelper{ &context.StorageDelegate() };
+    BitMask<Feature> features(Feature::kElectricalCircuit);
+    FixedCircuitNodeStorage circuitStorage9;
+    MockPowerTopologyDelegate dummyDelegate;
+
+    PowerTopologyCluster cluster(PowerTopologyCluster::Config{
+        .endpointId         = kTestEndpointId,
+        .delegate           = dummyDelegate,
+        .features           = features,
+        .fabricTable        = &fabricHelper.GetFabricTable(),
+        .circuitNodeStorage = &circuitStorage9,
+    });
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+
+    std::vector<Structs::CircuitNodeStruct::Type> overSpecMax;
+    for (size_t i = 0; i < PowerTopologyCluster::kMaxCircuitNodes + 1; i++)
+    {
+        overSpecMax.push_back(MakeCircuitNode(static_cast<NodeId>(i + 1), NullOptional, NullOptional));
+    }
+
+    EXPECT_EQ(tester.WriteAttribute(ElectricalCircuitNodes::Id,
+                                    DataModel::List<Structs::CircuitNodeStruct::Type>(overSpecMax.data(), overSpecMax.size()),
+                                    ListWritingPattern::ReplaceAll),
+              IMStatus::ConstraintError);
 
     // The rejected write must not have mutated state.
     ElectricalCircuitNodes::TypeInfo::DecodableType nodes;
