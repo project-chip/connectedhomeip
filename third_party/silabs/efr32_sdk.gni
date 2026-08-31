@@ -540,7 +540,6 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform_core/platform/driver/i2c/inc",
         "${efr32_sdk_root}/platform_core/platform/driver/i2c/src",
         "${efr32_sdk_root}/platform_core/platform/driver/i2cspm/inc",
-        "${efr32_sdk_root}/platform_core/platform/peripheral/inc",
         "${efr32_sdk_root}/bluetooth_le_middleware/common/sensor_rht",
         "${efr32_sdk_root}/bluetooth_le_middleware/common/sensor_rht/config",
         "${efr32_sdk_root}/boards/hardware/driver/si70xx/inc",
