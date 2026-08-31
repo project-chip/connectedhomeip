@@ -1612,6 +1612,7 @@ static CHIP_ERROR GenerateNetworkIdentity(const Crypto::P256Keypair & keypair, M
     P256ECDSASignatureSpan signatureSpan(signature.ConstBytes());
     ReturnErrorOnFailure(EncodeCompactIdentityCert(writer, AnonymousTag(), publicKeySpan, signatureSpan));
 
+    ReturnErrorOnFailure(writer.Finalize());
     outCompactCert.reduce_size(writer.GetLengthWritten());
     return CHIP_NO_ERROR;
 }

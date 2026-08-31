@@ -36,7 +36,9 @@ tests:
     - label:
           "Step 1a: TH writes AutoRelockTime attribute value as 10 seconds on
           the DUT"
-      PICS: DRLK.S.M.AutoRelockTimeAttributeWritable && PICS_SDK_CI_ONLY
+      PICS:
+          DRLK.S.M.AutoRelockTimeAttributeWritable && DRLK.S.A0023 &&
+          PICS_SDK_CI_ONLY
       command: "writeAttribute"
       attribute: "AutoRelockTime"
       arguments:
@@ -45,7 +47,9 @@ tests:
     - label:
           "Step 1b: TH writes AutoRelockTime attribute value as 60 seconds on
           the DUT"
-      PICS: DRLK.S.M.AutoRelockTimeAttributeWritable && PICS_SKIP_SAMPLE_APP
+      PICS:
+          DRLK.S.M.AutoRelockTimeAttributeWritable && DRLK.S.A0023 &&
+          PICS_SKIP_SAMPLE_APP
       command: "writeAttribute"
       attribute: "AutoRelockTime"
       arguments:
@@ -54,7 +58,9 @@ tests:
     - label:
           "Step 1c: TH writes AutoRelockTime attribute value as 10 seconds on
           the DUT"
-      PICS: PICS_SDK_CI_ONLY && !DRLK.S.M.AutoRelockTimeAttributeWritable
+      PICS:
+          PICS_SDK_CI_ONLY && DRLK.S.A0023 &&
+          !DRLK.S.M.AutoRelockTimeAttributeWritable
       command: "writeAttribute"
       attribute: "AutoRelockTime"
       arguments:
@@ -65,7 +71,9 @@ tests:
     - label:
           "Step 1d: TH writes AutoRelockTime attribute value as 60 seconds on
           the DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && !DRLK.S.M.AutoRelockTimeAttributeWritable
+      PICS:
+          PICS_SKIP_SAMPLE_APP && DRLK.S.A0023 &&
+          !DRLK.S.M.AutoRelockTimeAttributeWritable
       command: "writeAttribute"
       attribute: "AutoRelockTime"
       arguments:

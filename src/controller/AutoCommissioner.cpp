@@ -76,6 +76,23 @@ CHIP_ERROR AutoCommissioner::VerifyICDRegistrationInfo(const CommissioningParame
     return CHIP_NO_ERROR;
 }
 
+namespace {
+// Copies the contents of a Span into our own buffer and updates the Span
+template <typename T, size_t N>
+CHIP_ERROR RelocateSpan(Span<const T> & inOutSpan, T (&buffer)[N], bool exactSize = false)
+{
+    static_assert(std::is_trivially_copyable_v<T>);
+    size_t actualSize = inOutSpan.size();
+    VerifyOrReturnError(exactSize ? actualSize == N : actualSize <= N, CHIP_ERROR_INVALID_ARGUMENT);
+    if (actualSize > 0) // data() can be nullptr if size() == 0, and memmove(buffer, nullptr, 0) would be UB
+    {
+        memmove(buffer, inOutSpan.data(), actualSize * sizeof(T));
+    }
+    inOutSpan = Span(buffer, actualSize);
+    return CHIP_NO_ERROR;
+}
+} // namespace
+
 CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParameters & params)
 {
     // Our logic below assumes that we can modify mParams without affecting params.
@@ -92,73 +109,60 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     if (params.GetThreadOperationalDataset().HasValue())
     {
         ByteSpan dataset = params.GetThreadOperationalDataset().Value();
-        if (dataset.size() > CommissioningParameters::kMaxThreadDatasetLen)
-        {
-            ChipLogError(Controller, "Thread operational data set is too large");
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        memmove(mThreadOperationalDataset, dataset.data(), dataset.size());
+        ReturnErrorOnFailure(RelocateSpan(dataset, mThreadOperationalDataset),
+                             ChipLogError(Controller, "Thread operational data set is too large"));
         ChipLogProgress(Controller, "Setting thread operational dataset from parameters");
-        mParams.SetThreadOperationalDataset(ByteSpan(mThreadOperationalDataset, dataset.size()));
+        mParams.SetThreadOperationalDataset(dataset);
     }
 
     if (params.GetWiFiCredentials().HasValue())
     {
-        WiFiCredentials creds = params.GetWiFiCredentials().Value();
-        if (creds.ssid.size() > CommissioningParameters::kMaxSsidLen ||
-            creds.credentials.size() > CommissioningParameters::kMaxCredentialsLen)
-        {
-            ChipLogError(Controller, "Wifi credentials are too large");
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        memmove(mSsid, creds.ssid.data(), creds.ssid.size());
-        memmove(mCredentials, creds.credentials.data(), creds.credentials.size());
+        WiFiCredentials creds = params.GetWiFiCredentials().Value(); // shallow struct copy
+        ReturnErrorOnFailure(RelocateSpan(creds.ssid, mSsid),        //
+                             ChipLogError(Controller, "WiFiCredentials.ssid is too large"));
+        ReturnErrorOnFailure(RelocateSpan(creds.credentials, mCredentials),
+                             ChipLogError(Controller, "WiFiCredentials.credentials is too large"));
         ChipLogProgress(Controller, "Setting wifi credentials from parameters");
-        mParams.SetWiFiCredentials(
-            WiFiCredentials(ByteSpan(mSsid, creds.ssid.size()), ByteSpan(mCredentials, creds.credentials.size())));
+        mParams.SetWiFiCredentials(creds);
     }
 
     if (params.GetCountryCode().HasValue())
     {
-        auto code = params.GetCountryCode().Value();
-        MutableCharSpan copiedCode(mCountryCode);
-        if (CopyCharSpanToMutableCharSpan(code, copiedCode) == CHIP_NO_ERROR)
-        {
-            mParams.SetCountryCode(copiedCode);
-        }
-        else
-        {
-            ChipLogError(Controller, "Country code is too large: %u", static_cast<unsigned>(code.size()));
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
+        CharSpan countryCode = params.GetCountryCode().Value();
+        ReturnErrorOnFailure(RelocateSpan(countryCode, mCountryCode), ChipLogError(Controller, "Country code is too large"));
+        mParams.SetCountryCode(countryCode);
     }
 
     // If the AttestationNonce is passed in, using that else using a random one..
     if (params.GetAttestationNonce().HasValue())
     {
+        ByteSpan attestationNonce = params.GetAttestationNonce().Value();
+        ReturnErrorOnFailure(RelocateSpan(attestationNonce, mAttestationNonce, /* exactSize = */ true),
+                             ChipLogError(Controller, "Attestation nonce length is invalid"));
         ChipLogProgress(Controller, "Setting attestation nonce from parameters");
-        VerifyOrReturnError(params.GetAttestationNonce().Value().size() == sizeof(mAttestationNonce), CHIP_ERROR_INVALID_ARGUMENT);
-        memmove(mAttestationNonce, params.GetAttestationNonce().Value().data(), params.GetAttestationNonce().Value().size());
+        mParams.SetAttestationNonce(attestationNonce);
     }
     else
     {
         ChipLogProgress(Controller, "Setting attestation nonce to random value");
         ReturnErrorOnFailure(Crypto::DRBG_get_bytes(mAttestationNonce, sizeof(mAttestationNonce)));
+        mParams.SetAttestationNonce(ByteSpan(mAttestationNonce));
     }
-    mParams.SetAttestationNonce(ByteSpan(mAttestationNonce, sizeof(mAttestationNonce)));
 
     if (params.GetCSRNonce().HasValue())
     {
+        ByteSpan csrNonce = params.GetCSRNonce().Value();
+        ReturnErrorOnFailure(RelocateSpan(csrNonce, mCSRNonce, /* exactSize = */ true),
+                             ChipLogError(Controller, "CSR nonce length is invalid"));
         ChipLogProgress(Controller, "Setting CSR nonce from parameters");
-        VerifyOrReturnError(params.GetCSRNonce().Value().size() == sizeof(mCSRNonce), CHIP_ERROR_INVALID_ARGUMENT);
-        memmove(mCSRNonce, params.GetCSRNonce().Value().data(), params.GetCSRNonce().Value().size());
+        mParams.SetCSRNonce(csrNonce);
     }
     else
     {
         ChipLogProgress(Controller, "Setting CSR nonce to random value");
         ReturnErrorOnFailure(Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce)));
+        mParams.SetCSRNonce(ByteSpan(mCSRNonce));
     }
-    mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
 
     if (params.GetDSTOffsets().HasValue())
     {
@@ -532,6 +536,13 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         return CommissioningStage::kFindOperationalForStayActive;
 #endif
     case CommissioningStage::kPrimaryOperationalNetworkFailed:
+        if (!mWroteNetworkConfig)
+        {
+            // We never got as far as writing a network configuration for the primary network,
+            // so there is nothing on the commissionee to remove. Note that TrySecondaryNetwork()
+            // has already been called by the time we get here, so this selects the secondary network.
+            return GetNextCommissioningStageNetworkSetup(currentStage, lastErr);
+        }
         if (mDeviceCommissioningInfo.network.wifi.endpoint == kRootEndpointId)
         {
             return CommissioningStage::kRemoveWiFiNetworkConfig;
@@ -762,6 +773,7 @@ void AutoCommissioner::CleanupCommissioning()
     mCommissioneeDeviceProxy = nullptr;
     mOperationalDeviceProxy  = OperationalDeviceProxy();
     mDeviceCommissioningInfo = ReadCommissioningInfo();
+    mWroteNetworkConfig      = false;
     mNeedsDST                = false;
     mNeedsNetworkSetup       = false;
     mNeedIcdRegistration     = false;
@@ -828,6 +840,9 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             // TODO: This doesn't actually work, because in order to provide credentials someone
             // had to SetWiFiCredentials() or SetThreadOperationalDataset() on our params, so
             // IsScanNeeded() will no longer test true for that network technology.
+            //
+            // TODO: A retry also has to remove the configuration we just wrote before writing
+            // another one, (unless it is for the same NetworkID).
             if (IsScanNeeded())
             {
                 if (completionStatus.err == CHIP_NO_ERROR)
@@ -997,6 +1012,14 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             break;
         case CommissioningStage::kICDRegistration:
             // Noting to do. DevicePairingDelegate will handle this.
+            break;
+        case CommissioningStage::kWiFiNetworkSetup:
+        case CommissioningStage::kThreadNetworkSetup:
+            mWroteNetworkConfig = true;
+            break;
+        case CommissioningStage::kRemoveWiFiNetworkConfig:
+        case CommissioningStage::kRemoveThreadNetworkConfig:
+            mWroteNetworkConfig = false;
             break;
         case CommissioningStage::kFindOperationalForStayActive:
         case CommissioningStage::kFindOperationalForCommissioningComplete:
