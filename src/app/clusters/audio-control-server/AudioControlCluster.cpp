@@ -41,8 +41,7 @@ namespace {
 // effectiveMax, which is already a uint16_t.
 uint16_t AddCappedAtMax(uint16_t volume, uint16_t stepSize, uint16_t effectiveMax)
 {
-    return static_cast<uint16_t>(
-        std::min<uint32_t>(static_cast<uint32_t>(volume) + static_cast<uint32_t>(stepSize), effectiveMax));
+    return static_cast<uint16_t>(std::min<uint32_t>(static_cast<uint32_t>(volume) + static_cast<uint32_t>(stepSize), effectiveMax));
 }
 
 } // namespace
@@ -281,8 +280,7 @@ void AudioControlCluster::StoreSetVolumeUnmutePolicy()
     VerifyOrReturn(mContext != nullptr);
     AttributePersistence attributePersistence(mContext->attributeStorage);
     LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
-        ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::SetVolumeUnmutePolicy::Id),
-        mSetVolumeUnmutePolicy));
+        ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::SetVolumeUnmutePolicy::Id), mSetVolumeUnmutePolicy));
 }
 
 void AudioControlCluster::StoreIncreaseVolumeUnmutePolicy()
