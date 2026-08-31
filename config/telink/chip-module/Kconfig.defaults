@@ -24,10 +24,6 @@ config CHIP_PROJECT_CONFIG
     string "Project configuration file for Matter"
     default "include/CHIPProjectConfig.h"
 
-config ZEPHYR_VERSION_3_3
-    bool "Using Zephyr version 3.3"
-    default n
-
 config LOG
     default y
 
@@ -59,9 +55,6 @@ config PTHREAD_IPC
     bool
     default n
 
-config POSIX_API
-    default y if ZEPHYR_VERSION_3_3
-
 config POSIX_MAX_FDS
     int
     default 16
@@ -85,13 +78,12 @@ config SYSTEM_WORKQUEUE_STACK_SIZE
     default 1024 if PM && !SOC_RISCV_TELINK_W91
 
 config HEAP_MEM_POOL_SIZE
-    default 256 if ZEPHYR_VERSION_3_3
     default 1796 if SOC_RISCV_TELINK_TL721X
     default 1280
 
 config COMMON_LIBC_MALLOC_ARENA_SIZE
-    default 19000 if SOC_RISCV_TELINK_TL321X && !ZEPHYR_VERSION_3_3
-    default 26584 if SOC_RISCV_TELINK_TL721X && !ZEPHYR_VERSION_3_3
+    default 19000 if SOC_RISCV_TELINK_TL321X
+    default 26584 if SOC_RISCV_TELINK_TL721X
     default 29448 if SOC_RISCV_TELINK_W91
     default 20716
 
@@ -202,13 +194,11 @@ config BT_DEVICE_NAME_GATT_WRITABLE
     default n
 
 config BT_HOST_CRYPTO
-    default y if ZEPHYR_VERSION_3_3
     default n
 
 if SOC_RISCV_TELINK_B9X || SOC_RISCV_TELINK_TLX
 
 config TL_BLE_CTRL_THREAD_STACK_SIZE
-    default 648 if ZEPHYR_VERSION_3_3
     default 1536 if SOC_RISCV_TELINK_TL721X
     default 712
 
@@ -368,7 +358,6 @@ config OPENTHREAD_THREAD_STACK_SIZE
     default 2400 if PM || SOC_RISCV_TELINK_TL321X
 
 config OPENTHREAD_RADIO_WORKQUEUE_STACK_SIZE
-    default 496 if PM && ZEPHYR_VERSION_3_3
     default 640
 
 config OPENTHREAD_SLAAC
@@ -410,10 +399,6 @@ config NET_PKT_TXTIME
 
 config NET_PKT_TIMESTAMP
     default y if OPENTHREAD_FTD
-
-config IEEE802154_2015
-    bool "support ssed device to add thread"
-    default y if OPENTHREAD_FTD && ZEPHYR_VERSION_3_3
 
 config NET_MAX_CONN
     default 1 if !WIFI
@@ -501,7 +486,6 @@ config MBEDTLS_PKCS5_C
 config MBEDTLS_KEY_EXCHANGE_ECDH_ECDSA_ENABLED
     default y
 
-if !ZEPHYR_VERSION_3_3
 config MBEDTLS_ENTROPY_POLL_ZEPHYR
     bool "Provide entropy data to Mbed TLS through entropy driver or random generator"
     default y
@@ -534,11 +518,6 @@ config TELINK_TLX_SHA_HW_SLOTS
 config NET_CONTEXT_RECV_PKTINFO
     bool
     default y
-
-endif # !ZEPHYR_VERSION_3_3
-
-config GETOPT_LONG
-    default y if ZEPHYR_VERSION_3_3
 
 # Disable not used shell modules
 
