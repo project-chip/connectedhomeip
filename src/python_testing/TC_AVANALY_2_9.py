@@ -41,7 +41,6 @@ from mobly import asserts
 from TC_AVANALYTestBase import AVANALYTestBase
 
 import matter.clusters as Clusters
-from matter.interaction_model import Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
