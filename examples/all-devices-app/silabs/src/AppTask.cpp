@@ -151,7 +151,6 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     static chip::app::DefaultTimerDelegate sTimerDelegate;
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate;
 
-
     chip::app::RootNode::Context rootNodeContext = {
         .commissioningWindowManager = chip::Server::GetInstance().GetCommissioningWindowManager(),
         .configurationManager       = chip::DeviceLayer::ConfigurationMgr(),
