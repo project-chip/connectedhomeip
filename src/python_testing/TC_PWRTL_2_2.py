@@ -151,8 +151,8 @@ class TC_PWRTL_2_2(MatterBaseTest):
         self.mark_current_step_skipped()
 
         self.step(10, "Reboot the DUT. After it comes back online, as TH1, TH reads ElectricalCircuitNodes",
-                   expectation="Verify DUT responds w/ status SUCCESS(0x00) with the value last written by TH1, "
-                   "confirming the Non-Volatile (N) quality persists the value across reboot.")
+                  expectation="Verify DUT responds w/ status SUCCESS(0x00) with the value last written by TH1, "
+                  "confirming the Non-Volatile (N) quality persists the value across reboot.")
         pre_reboot = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr)
         await self.request_device_reboot()
@@ -163,13 +163,13 @@ class TC_PWRTL_2_2(MatterBaseTest):
         self._assert_nodes_equal(post_reboot, pre_reboot, 'post-reboot')
 
         self.step(11, "As TH1, establish a subscription to ElectricalCircuitNodes on the test endpoint",
-                   expectation="Subscription is established successfully; TH awaits a subscription report carrying "
-                   "the initial priming value of the list.")
+                  expectation="Subscription is established successfully; TH awaits a subscription report carrying "
+                  "the initial priming value of the list.")
         # TODO: use self.default_controller.ReadAttribute with reportInterval to establish the subscription.
         self.mark_current_step_skipped()
 
         self.step(12, "As TH1, TH writes ElectricalCircuitNodes with a new valid list of 2 entries",
-                   expectation="Write returns SUCCESS; TH awaits a subscription report reflecting the updated list.")
+                  expectation="Write returns SUCCESS; TH awaits a subscription report reflecting the updated list.")
         # TODO: perform the write against the step 11 subscription and await the report.
         self.mark_current_step_skipped()
 
