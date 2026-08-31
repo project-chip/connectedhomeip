@@ -2112,7 +2112,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_electrical_energy_tariff = 1299, version 1;
+  device type ma_electrical_energy_tariff = 1299, version 2;
 
 
   server cluster Identify {
@@ -2193,7 +2193,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 63;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 0x0002;
 
     handle command GetTariffComponent;
     handle command GetDayEntry;

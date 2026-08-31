@@ -1994,7 +1994,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0002;
+    ram      attribute clusterRevision default = 0x0003;
   }
 
   server cluster MicrowaveOvenControl {

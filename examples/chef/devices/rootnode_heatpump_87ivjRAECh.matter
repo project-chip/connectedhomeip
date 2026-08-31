@@ -2840,9 +2840,9 @@ endpoint 0 {
 }
 endpoint 1 {
   device type ma_powersource = 17, version 1;
-  device type ma_electricalsensor = 1296, version 1;
+  device type ma_electricalsensor = 1296, version 2;
   device type device_energy_management = 1293, version 1;
-  device type ma_heatpump = 777, version 1;
+  device type ma_heatpump = 777, version 2;
 
   binding cluster Thermostat;
 
@@ -2917,7 +2917,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0005;
   }
 
   server cluster PowerTopology {
@@ -2925,7 +2925,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 0x0002;
   }
 
   server cluster DeviceEnergyManagementMode {
@@ -2935,7 +2935,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 0x0003;
 
     handle command ChangeToMode;
   }

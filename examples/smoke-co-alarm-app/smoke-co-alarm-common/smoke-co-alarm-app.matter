@@ -2615,7 +2615,7 @@ endpoint 0 {
 }
 endpoint 1 {
   device type ma_powersource = 17, version 1;
-  device type ma_smokecoalarm = 118, version 2;
+  device type ma_smokecoalarm = 118, version 3;
 
 
   server cluster Identify {
@@ -2634,7 +2634,7 @@ endpoint 1 {
   server cluster Groups {
     ram      attribute nameSupport;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command AddGroup;
     handle command ViewGroup;

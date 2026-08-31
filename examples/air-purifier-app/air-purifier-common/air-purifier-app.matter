@@ -3081,7 +3081,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_air_purifier = 45, version 3;
+  device type ma_air_purifier = 45, version 4;
 
 
   server cluster Identify {
@@ -3229,7 +3229,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster CarbonDioxideConcentrationMeasurement {
@@ -3248,7 +3248,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster NitrogenDioxideConcentrationMeasurement {
@@ -3267,7 +3267,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster OzoneConcentrationMeasurement {
@@ -3286,7 +3286,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster Pm25ConcentrationMeasurement {
@@ -3305,7 +3305,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster FormaldehydeConcentrationMeasurement {
@@ -3324,7 +3324,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster Pm1ConcentrationMeasurement {
@@ -3343,7 +3343,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster Pm10ConcentrationMeasurement {
@@ -3362,7 +3362,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster TotalVolatileOrganicCompoundsConcentrationMeasurement {
@@ -3381,7 +3381,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster RadonConcentrationMeasurement {
@@ -3400,7 +3400,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 }
 endpoint 3 {
@@ -3486,7 +3486,7 @@ endpoint 4 {
   }
 }
 endpoint 5 {
-  device type ma_thermostat = 769, version 7;
+  device type ma_thermostat = 769, version 8;
 
 
   server cluster Identify {

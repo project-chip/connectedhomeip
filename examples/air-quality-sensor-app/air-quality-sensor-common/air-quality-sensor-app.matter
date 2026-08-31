@@ -2884,7 +2884,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0005;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster CarbonDioxideConcentrationMeasurement {
@@ -2903,7 +2903,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0005;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster NitrogenDioxideConcentrationMeasurement {
@@ -2922,7 +2922,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0005;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster OzoneConcentrationMeasurement {
@@ -2941,7 +2941,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0005;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster Pm25ConcentrationMeasurement {
@@ -2960,7 +2960,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0005;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster FormaldehydeConcentrationMeasurement {
@@ -2979,7 +2979,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0005;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster Pm1ConcentrationMeasurement {
@@ -2998,7 +2998,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0005;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster Pm10ConcentrationMeasurement {
@@ -3017,7 +3017,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0005;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster TotalVolatileOrganicCompoundsConcentrationMeasurement {
@@ -3036,7 +3036,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0005;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster RadonConcentrationMeasurement {
@@ -3055,7 +3055,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0005;
+    ram      attribute clusterRevision default = 0x0006;
   }
 }
 

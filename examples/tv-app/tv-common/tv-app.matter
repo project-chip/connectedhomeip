@@ -4308,7 +4308,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_casting_videoplayer = 35, version 1;
+  device type ma_casting_videoplayer = 35, version 3;
 
 
   server cluster OnOff {
@@ -4343,7 +4343,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0004;
 
     handle command PresentMessagesRequest;
     handle command CancelMessagesRequest;
@@ -4399,7 +4399,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x001F;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 0x0003;
 
     handle command Play;
     handle command Pause;
@@ -4450,7 +4450,7 @@ endpoint 1 {
     ram      attribute movable default = 0;
     callback attribute presets;
     ram      attribute featureMap default = 0x00FF;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 0x0003;
 
     handle command LaunchContent;
     handle command LaunchURL;
@@ -4527,7 +4527,7 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type ma_speaker = 34, version 1;
+  device type ma_speaker = 34, version 2;
 
 
   server cluster OnOff {
@@ -4556,7 +4556,7 @@ endpoint 2 {
     ram      attribute defaultMoveRate;
     persist  attribute startUpCurrentLevel default = 255;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 0x0007;
+    ram      attribute clusterRevision default = 0x0008;
 
     handle command MoveToLevel;
     handle command Move;
@@ -4645,7 +4645,7 @@ endpoint 3 {
     callback attribute availableCommands;
     callback attribute contentInfo;
     ram      attribute featureMap default = 0x001F;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 0x0003;
 
     handle command Play;
     handle command Pause;
@@ -4680,7 +4680,7 @@ endpoint 3 {
     ram      attribute movable default = 0;
     callback attribute presets;
     ram      attribute featureMap default = 0x00FF;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 0x0003;
 
     handle command LaunchContent;
     handle command LaunchURL;
@@ -4719,7 +4719,7 @@ endpoint 3 {
   server cluster AccountLogin {
     callback attribute OAuthLoggedIn;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0003;
 
     handle command GetSetupPIN;
     handle command Login;

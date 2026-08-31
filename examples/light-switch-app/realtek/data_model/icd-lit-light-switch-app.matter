@@ -2755,7 +2755,7 @@ endpoint 1 {
   server cluster Groups {
     ram      attribute nameSupport;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command AddGroup;
     handle command ViewGroup;

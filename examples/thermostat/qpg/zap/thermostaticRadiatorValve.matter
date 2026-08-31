@@ -3028,7 +3028,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_thermostat = 769, version 7;
+  device type ma_thermostat = 769, version 8;
 
 
   server cluster Identify {
@@ -3044,7 +3044,7 @@ endpoint 1 {
   server cluster Groups {
     ram      attribute nameSupport;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command AddGroup;
     handle command ViewGroup;

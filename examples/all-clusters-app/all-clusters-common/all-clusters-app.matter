@@ -7270,7 +7270,7 @@ endpoint 0 {
   server cluster Groups {
     ram      attribute nameSupport;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command AddGroup;
     handle command ViewGroup;
@@ -7396,7 +7396,7 @@ endpoint 0 {
   server cluster PowerSourceConfiguration {
     callback attribute sources;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 0x0002;
   }
 
   server cluster PowerSource {
@@ -7795,7 +7795,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command AddGroup;
     handle command ViewGroup;
@@ -7841,7 +7841,7 @@ endpoint 1 {
     ram      attribute defaultMoveRate default = 50;
     persist  attribute startUpCurrentLevel default = 255;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 0x0007;
+    ram      attribute clusterRevision default = 0x0008;
 
     handle command MoveToLevel;
     handle command Move;
@@ -7961,7 +7961,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0002;
+    ram      attribute clusterRevision default = 0x0003;
 
     handle command ChangeToMode;
   }
@@ -7999,7 +7999,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0003;
+    ram      attribute clusterRevision default = 0x0004;
 
     handle command ChangeToMode;
   }
@@ -8011,7 +8011,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0003;
+    ram      attribute clusterRevision default = 0x0004;
 
     handle command ChangeToMode;
   }
@@ -8035,7 +8035,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command ChangeToMode;
   }
@@ -8047,7 +8047,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0005;
+    ram      attribute clusterRevision default = 0x0006;
 
     handle command ChangeToMode;
   }
@@ -8083,7 +8083,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0003;
+    ram      attribute clusterRevision default = 0x0004;
 
     handle command ChangeToMode;
   }
@@ -8152,7 +8152,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0002;
+    ram      attribute clusterRevision default = 0x0003;
   }
 
   server cluster OperationalState {
@@ -8368,7 +8368,7 @@ endpoint 1 {
     ram      attribute operationMode default = 0x00;
     ram      attribute controlMode default = 0x00;
     ram      attribute featureMap default = 0x1F;
-    ram      attribute clusterRevision default = 0x0005;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster Thermostat {
@@ -8522,7 +8522,7 @@ endpoint 1 {
     ram      attribute coupleColorTempToLevelMinMireds default = 0x009A;
     persist  attribute startUpColorTemperatureMireds default = 0x00FA;
     ram      attribute featureMap default = 0x1F;
-    ram      attribute clusterRevision default = 0x0009;
+    ram      attribute clusterRevision default = 0x000a;
 
     handle command MoveToHue;
     handle command MoveHue;
@@ -8653,7 +8653,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster CarbonDioxideConcentrationMeasurement {
@@ -8672,7 +8672,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster NitrogenDioxideConcentrationMeasurement {
@@ -8691,7 +8691,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster OzoneConcentrationMeasurement {
@@ -8710,7 +8710,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster Pm25ConcentrationMeasurement {
@@ -8729,7 +8729,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster FormaldehydeConcentrationMeasurement {
@@ -8748,7 +8748,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster Pm1ConcentrationMeasurement {
@@ -8767,7 +8767,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster Pm10ConcentrationMeasurement {
@@ -8786,7 +8786,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster TotalVolatileOrganicCompoundsConcentrationMeasurement {
@@ -8805,7 +8805,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster RadonConcentrationMeasurement {
@@ -8824,7 +8824,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster SoilMeasurement {
@@ -9017,7 +9017,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command AddGroup;
     handle command ViewGroup;

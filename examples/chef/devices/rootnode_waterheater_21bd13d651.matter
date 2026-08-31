@@ -2140,7 +2140,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_waterheater = 1295, version 1;
+  device type ma_waterheater = 1295, version 2;
 
 
   server cluster Identify {
@@ -2193,7 +2193,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 0x0002;
 
     handle command ChangeToMode;
   }

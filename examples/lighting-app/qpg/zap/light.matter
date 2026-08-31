@@ -3259,7 +3259,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command AddGroup;
     handle command ViewGroup;
@@ -3300,7 +3300,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 0x0007;
+    ram      attribute clusterRevision default = 0x0008;
 
     handle command MoveToLevel;
     handle command Move;
@@ -3387,7 +3387,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x1F;
-    ram      attribute clusterRevision default = 0x0009;
+    ram      attribute clusterRevision default = 0x000a;
 
     handle command MoveToHue;
     handle command MoveHue;

@@ -4339,7 +4339,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": null,
+              "defaultValue": "0x0003",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -4876,7 +4876,7 @@
         }
       ],
       "deviceVersions": [
-        7
+        8
       ],
       "deviceIdentifiers": [
         769
@@ -5127,7 +5127,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "4",
+              "defaultValue": "0x0005",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -5829,7 +5829,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x000b",
+              "defaultValue": "0x000c",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,

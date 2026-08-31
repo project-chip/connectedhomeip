@@ -2015,7 +2015,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_speaker = 34, version 1;
+  device type ma_speaker = 34, version 2;
 
   binding cluster Binding;
 
@@ -2054,7 +2054,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x1;
-    ram      attribute clusterRevision default = 0x0007;
+    ram      attribute clusterRevision default = 0x0008;
 
     handle command MoveToLevel;
     handle command Move;

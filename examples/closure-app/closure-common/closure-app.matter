@@ -2695,7 +2695,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_closure = 560, version 1;
+  device type ma_closure = 560, version 2;
 
 
   server cluster Identify {
@@ -2746,7 +2746,7 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type ma_closure_panel = 561, version 1;
+  device type ma_closure_panel = 561, version 2;
 
 
   server cluster Descriptor {
@@ -2786,7 +2786,7 @@ endpoint 2 {
   }
 }
 endpoint 3 {
-  device type ma_closure_panel = 561, version 1;
+  device type ma_closure_panel = 561, version 2;
 
 
   server cluster Descriptor {

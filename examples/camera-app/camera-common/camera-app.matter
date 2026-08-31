@@ -3441,7 +3441,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_camera = 322, version 1;
+  device type ma_camera = 322, version 2;
 
 
   server cluster Identify {
@@ -3457,7 +3457,7 @@ endpoint 1 {
   server cluster Groups {
     ram      attribute nameSupport;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command AddGroup;
     handle command ViewGroup;
@@ -3520,7 +3520,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 0x0003;
 
     handle command AllocatePushTransport;
     handle command DeallocatePushTransport;

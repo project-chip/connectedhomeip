@@ -1858,7 +1858,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_network_infrastructure_manager = 144, version 2;
+  device type ma_network_infrastructure_manager = 144, version 3;
 
 
   server cluster Descriptor {

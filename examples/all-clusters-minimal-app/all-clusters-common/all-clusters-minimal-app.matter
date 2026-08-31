@@ -6594,7 +6594,7 @@ endpoint 0 {
   server cluster Groups {
     ram      attribute nameSupport;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command AddGroup;
     handle command ViewGroup;
@@ -6935,7 +6935,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command AddGroup;
     handle command ViewGroup;
@@ -6972,7 +6972,7 @@ endpoint 1 {
     ram      attribute onLevel default = 0xFF;
     persist  attribute startUpCurrentLevel default = 255;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0007;
+    ram      attribute clusterRevision default = 0x0008;
 
     handle command MoveToLevel;
     handle command Move;
@@ -7135,7 +7135,7 @@ endpoint 1 {
     ram      attribute capacity;
     ram      attribute operationMode default = 0x00;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 0x0005;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster Thermostat {
@@ -7172,7 +7172,7 @@ endpoint 1 {
     ram      attribute enhancedColorMode default = 0x01;
     ram      attribute colorCapabilities default = 0x1F;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0009;
+    ram      attribute clusterRevision default = 0x000a;
   }
 
   server cluster BallastConfiguration {
@@ -7260,7 +7260,7 @@ endpoint 1 {
   server cluster MediaPlayback {
     ram      attribute currentState default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 0x0003;
 
     handle command Play;
     handle command Pause;
@@ -7294,7 +7294,7 @@ endpoint 1 {
 
   server cluster ContentLauncher {
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 0x0003;
   }
 
   server cluster AudioOutput {
@@ -7327,7 +7327,7 @@ endpoint 1 {
 
   server cluster AccountLogin {
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 0x0003;
 
     handle command GetSetupPIN;
     handle command Login;
@@ -7476,7 +7476,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command AddGroup;
     handle command ViewGroup;
