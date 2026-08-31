@@ -64,10 +64,10 @@ constexpr uint16_t GetCASEAuthTagVersion(CASEAuthTag aCAT)
 }
 
 /**
- * @brief Check if a CAT identifier is valid, including reserved identifiers
+ * @brief Check whether a CAT identifier value is allowed.
  *
- * Reserved CAT identifiers (0xFFFF Admin CAT, 0xFFFE Anchor CAT) are valid
- * when accompanied by a non-zero version. Other identifiers follow standard validation.
+ * Reserved CAT identifiers (0xFFFF Admin CAT, 0xFFFE Anchor CAT) are permitted identifier values.
+ * Version validity (non-zero) is validated separately via IsValidCASEAuthTag().
  *
  * @param identifier The CAT identifier to validate
  * @return true if the identifier is valid, false otherwise
