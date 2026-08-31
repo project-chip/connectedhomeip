@@ -21,6 +21,7 @@
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/smoke-co-alarm-server/SmokeCoAlarmCluster.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -35,7 +36,8 @@ class SmokeCoAlarm : public SingleEndpoint
 public:
     using ConcentrationCluster = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
 
-    SmokeCoAlarm(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmDelegate & smokeCoAlarmDelegate);
+    SmokeCoAlarm(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmDelegate & smokeCoAlarmDelegate,
+                 PlatformIdentifyIntegration & platformIdentify);
     ~SmokeCoAlarm() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -48,6 +50,7 @@ public:
 
 protected:
     TimerDelegate & mTimerDelegate;
+    PlatformIdentifyIntegration & mPlatformIdentify;
     Clusters::SmokeCoAlarmDelegate & mSmokeCoAlarmDelegate;
     ConcentrationCluster::Config mCoConfig;
     Clusters::SmokeCoAlarmCluster::Config mSmokeConfig;

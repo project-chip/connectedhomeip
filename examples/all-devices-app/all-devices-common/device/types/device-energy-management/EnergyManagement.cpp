@@ -14,7 +14,6 @@
  *    limitations under the License.
  */
 
-#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/types/device-energy-management/EnergyManagement.h>
 #include <devices/Types.h>
 
@@ -22,8 +21,9 @@ using namespace chip::app::Clusters::DeviceEnergyManagement;
 
 namespace chip::app {
 
-EnergyManagement::EnergyManagement(TimerDelegate & timerDelegate) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDeviceEnergyManagement, 1)), mTimerDelegate(timerDelegate)
+EnergyManagement::EnergyManagement(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDeviceEnergyManagement, 1)), mTimerDelegate(timerDelegate),
+    mPlatformIdentify(platformIdentify)
 {}
 
 CHIP_ERROR EnergyManagement::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
@@ -34,7 +34,7 @@ CHIP_ERROR EnergyManagement::Register(EndpointId endpoint, CodeDrivenDataModelPr
     mProvider = &provider;
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(mPlatformIdentify.MakeConfig(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     Clusters::DeviceEnergyManagementCluster::Config config(endpoint, BitMask<Feature>(), *this);

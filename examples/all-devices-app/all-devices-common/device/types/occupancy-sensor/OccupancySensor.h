@@ -18,6 +18,7 @@
 
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -29,7 +30,8 @@ class OccupancySensor : public SingleEndpoint
 public:
     using OccupancySensingConfig = Clusters::OccupancySensingCluster::Config;
 
-    OccupancySensor(OccupancySensingConfig config, TimerDelegate & timerDelegate);
+    OccupancySensor(OccupancySensingConfig config, TimerDelegate & timerDelegate,
+                    PlatformIdentifyIntegration & platformIdentify);
     ~OccupancySensor() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -44,6 +46,7 @@ public:
 protected:
     OccupancySensingConfig mConfig;
     TimerDelegate & mTimerDelegate;
+    PlatformIdentifyIntegration & mPlatformIdentify;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::OccupancySensingCluster> mOccupancySensingCluster;
 };

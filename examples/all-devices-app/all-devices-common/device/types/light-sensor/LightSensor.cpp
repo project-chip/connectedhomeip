@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/types/light-sensor/LightSensor.h>
 #include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -25,9 +24,11 @@ namespace chip {
 namespace app {
 
 LightSensor::LightSensor(TimerDelegate & timerDelegate, IlluminanceMeasurementCluster::StartupConfiguration lightConfig,
-                         IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributes) :
+                         IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributes,
+                         PlatformIdentifyIntegration & platformIdentify) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kLightSensor, 1)),
-    mTimerDelegate(timerDelegate), mLightConfig(lightConfig), mOptionalAttributes(optionalAttributes)
+    mTimerDelegate(timerDelegate), mPlatformIdentify(platformIdentify), mLightConfig(lightConfig),
+    mOptionalAttributes(optionalAttributes)
 {}
 
 CHIP_ERROR LightSensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
@@ -37,7 +38,7 @@ CHIP_ERROR LightSensor::Register(EndpointId endpoint, CodeDrivenDataModelProvide
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(mPlatformIdentify.MakeConfig(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mIlluminanceMeasurementCluster.Create(endpoint, mOptionalAttributes, mLightConfig);

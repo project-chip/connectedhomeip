@@ -20,6 +20,7 @@
 #include <app/clusters/on-off-server/OnOffCluster.h>
 #include <app/clusters/on-off-server/OnOffDelegate.h>
 #include <device/api/Interface.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/api/SingleEndpoint.h>
 #include <devices/Types.h>
 #include <lib/support/TimerDelegate.h>
@@ -32,7 +33,7 @@ public:
     using SingleEndpoint::Register;
 
     CookSurfacePart(TimerDelegate & timerDelegate, Clusters::OnOffDelegate & onOffDelegate,
-                    Clusters::IdentifyDelegate & identifyDelegate);
+                    Clusters::IdentifyDelegate & identifyDelegate, PlatformIdentifyIntegration & platformIdentify);
     ~CookSurfacePart() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition) override;
@@ -46,6 +47,7 @@ private:
     TimerDelegate & mTimerDelegate;
     Clusters::OnOffDelegate & mOnOffDelegate;
     Clusters::IdentifyDelegate & mIdentifyDelegate;
+    PlatformIdentifyIntegration & mPlatformIdentify;
 
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::OnOffCluster> mOnOffCluster;

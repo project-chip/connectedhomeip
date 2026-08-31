@@ -30,8 +30,8 @@ public:
         TemperatureControlledCabinetPart::Config cavityConfig;
     };
 
-    explicit LoggingOven(TimerDelegate & timerDelegate);
-    LoggingOven(TimerDelegate & timerDelegate, Config config);
+    LoggingOven(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify);
+    LoggingOven(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify, Config config);
     ~LoggingOven() override = default;
 
     LoggingTemperatureControlledCabinetPart & Cavity() { return mCavity; }

@@ -18,6 +18,7 @@
 
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/proximity-ranging-server/ProximityRangingCluster.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -41,7 +42,8 @@ public:
      * The cluster's feature map is derived from the technologies of the
      * supplied adapters, so the caller does not pass a feature mask in.
      */
-    ProximityRanger(TimerDelegate & timerDelegate, std::vector<Clusters::ProximityRanging::RangingAdapter *> adapters);
+    ProximityRanger(TimerDelegate & timerDelegate, std::vector<Clusters::ProximityRanging::RangingAdapter *> adapters,
+                    PlatformIdentifyIntegration & platformIdentify);
     ~ProximityRanger() override = default;
 
     // Non-copyable / non-movable: copying or moving this device would invalidate the
@@ -73,6 +75,7 @@ private:
     BitMask<Clusters::ProximityRanging::Feature> DeriveFeatures() const;
 
     TimerDelegate & mTimerDelegate;
+    PlatformIdentifyIntegration & mPlatformIdentify;
     const std::vector<Clusters::ProximityRanging::RangingAdapter *> mAdapters;
 
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;

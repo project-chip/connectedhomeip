@@ -37,7 +37,7 @@ class LoggingOnlySmokeCoAlarm : public Clusters::SmokeCoAlarmDelegate, public Sm
 public:
     static constexpr uint16_t kSelfTestTimeoutSec = 10;
 
-    explicit LoggingOnlySmokeCoAlarm(TimerDelegate & timerDelegate);
+    explicit LoggingOnlySmokeCoAlarm(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify);
     ~LoggingOnlySmokeCoAlarm() override;
 
     // SmokeCoAlarmDelegate

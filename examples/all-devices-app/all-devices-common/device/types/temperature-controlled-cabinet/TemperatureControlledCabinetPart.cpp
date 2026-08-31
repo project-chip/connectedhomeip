@@ -16,22 +16,22 @@
 
 #include "TemperatureControlledCabinetPart.h"
 
-#include <device/api/PlatformIdentifyIntegration.h>
 #include <devices/Types.h>
 
 namespace chip::app {
 
 TemperatureControlledCabinetPart::TemperatureControlledCabinetPart(
     TimerDelegate & timerDelegate, Clusters::OperationalState::OperationalStateCluster::Delegate & opStateDelegate,
-    Clusters::IdentifyDelegate & identifyDelegate) :
-    TemperatureControlledCabinetPart(timerDelegate, Config{}, opStateDelegate, identifyDelegate)
+    Clusters::IdentifyDelegate & identifyDelegate, PlatformIdentifyIntegration & platformIdentify) :
+    TemperatureControlledCabinetPart(timerDelegate, Config{}, opStateDelegate, identifyDelegate, platformIdentify)
 {}
 
 TemperatureControlledCabinetPart::TemperatureControlledCabinetPart(
     TimerDelegate & timerDelegate, Config config, Clusters::OperationalState::OperationalStateCluster::Delegate & opStateDelegate,
-    Clusters::IdentifyDelegate & identifyDelegate) :
+    Clusters::IdentifyDelegate & identifyDelegate, PlatformIdentifyIntegration & platformIdentify) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kTemperatureControlledCabinet, 1)),
-    mTimerDelegate(timerDelegate), mConfig(config), mIdentifyDelegate(identifyDelegate), mOperationalStateDelegate(opStateDelegate)
+    mTimerDelegate(timerDelegate), mConfig(config), mIdentifyDelegate(identifyDelegate), mPlatformIdentify(platformIdentify),
+    mOperationalStateDelegate(opStateDelegate)
 {}
 
 CHIP_ERROR TemperatureControlledCabinetPart::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -41,8 +41,7 @@ CHIP_ERROR TemperatureControlledCabinetPart::Register(EndpointId endpoint, CodeD
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(
-        PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate).WithDelegate(&mIdentifyDelegate));
+    mIdentifyCluster.Create(mPlatformIdentify.MakeConfig(endpoint, mTimerDelegate).WithDelegate(&mIdentifyDelegate));
     mTemperatureControlCluster.Create(
         endpoint, BitFlags<Clusters::TemperatureControl::Feature>(Clusters::TemperatureControl::Feature::kTemperatureNumber),
         Clusters::TemperatureControlCluster::StartupConfiguration{

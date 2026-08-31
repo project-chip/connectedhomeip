@@ -30,7 +30,7 @@ namespace app {
 class IncreasingFlowSensor : public FlowSensor, public TimerContext
 {
 public:
-    IncreasingFlowSensor(TimerDelegate & timerDelegate);
+    IncreasingFlowSensor(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify);
     ~IncreasingFlowSensor() override;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;

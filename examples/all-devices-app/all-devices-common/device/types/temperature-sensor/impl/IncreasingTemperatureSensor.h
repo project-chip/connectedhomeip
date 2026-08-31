@@ -30,7 +30,7 @@ namespace app {
 class IncreasingTemperatureSensor : public TemperatureSensor, public TimerContext
 {
 public:
-    IncreasingTemperatureSensor();
+    IncreasingTemperatureSensor(PlatformIdentifyIntegration & platformIdentify);
     ~IncreasingTemperatureSensor() override;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;

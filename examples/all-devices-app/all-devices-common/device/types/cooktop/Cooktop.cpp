@@ -16,7 +16,6 @@
 
 #include "Cooktop.h"
 
-#include <device/api/PlatformIdentifyIntegration.h>
 #include <devices/Types.h>
 
 namespace chip::app {
@@ -24,17 +23,18 @@ namespace chip::app {
 // CookSurfacePart
 
 CookSurfacePart::CookSurfacePart(TimerDelegate & timerDelegate, Clusters::OnOffDelegate & onOffDelegate,
-                                 Clusters::IdentifyDelegate & identifyDelegate) :
+                                 Clusters::IdentifyDelegate & identifyDelegate,
+                                 PlatformIdentifyIntegration & platformIdentify) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCookSurface, 1)),
-    mTimerDelegate(timerDelegate), mOnOffDelegate(onOffDelegate), mIdentifyDelegate(identifyDelegate)
+    mTimerDelegate(timerDelegate), mOnOffDelegate(onOffDelegate), mIdentifyDelegate(identifyDelegate),
+    mPlatformIdentify(platformIdentify)
 {}
 
 CHIP_ERROR CookSurfacePart::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(
-        PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate).WithDelegate(&mIdentifyDelegate));
+    mIdentifyCluster.Create(mPlatformIdentify.MakeConfig(endpoint, mTimerDelegate).WithDelegate(&mIdentifyDelegate));
     mOnOffCluster.Create(endpoint, Clusters::OnOffCluster::Context{ .timerDelegate = mTimerDelegate });
     mOnOffCluster.Cluster().AddDelegate(&mOnOffDelegate);
 

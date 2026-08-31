@@ -21,6 +21,7 @@
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/clusters/bindings/binding-table.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
 #include <platform/PlatformManager.h>
@@ -31,7 +32,8 @@ class OnOffLightSwitch : public SingleEndpoint
 {
 public:
     OnOffLightSwitch(TimerDelegate & timerDelegate, DeviceLayer::PlatformManager & platformManager,
-                     Clusters::Binding::Table & bindingTable, Clusters::Binding::Manager & bindingManager);
+                     Clusters::Binding::Table & bindingTable, Clusters::Binding::Manager & bindingManager,
+                     PlatformIdentifyIntegration & platformIdentify);
     ~OnOffLightSwitch() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -50,6 +52,7 @@ private:
     DeviceLayer::PlatformManager & mPlatformManager;
     Clusters::Binding::Table & mBindingTable;
     Clusters::Binding::Manager & mBindingManager;
+    PlatformIdentifyIntegration & mPlatformIdentify;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::BindingCluster> mBindingCluster;
 };

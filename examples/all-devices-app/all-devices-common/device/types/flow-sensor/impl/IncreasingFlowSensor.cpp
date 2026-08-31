@@ -41,7 +41,9 @@ const FlowMeasurementCluster::Config kDefaultFlowConfig = []() {
 
 } // namespace
 
-IncreasingFlowSensor::IncreasingFlowSensor(TimerDelegate & timerDelegate) : FlowSensor(timerDelegate, kDefaultFlowConfig) {}
+IncreasingFlowSensor::IncreasingFlowSensor(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify) :
+    FlowSensor(timerDelegate, platformIdentify, kDefaultFlowConfig)
+{}
 
 IncreasingFlowSensor::~IncreasingFlowSensor()
 {

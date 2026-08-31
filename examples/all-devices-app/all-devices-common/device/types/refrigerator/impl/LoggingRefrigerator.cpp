@@ -18,10 +18,13 @@
 
 namespace chip::app {
 
-LoggingRefrigerator::LoggingRefrigerator(TimerDelegate & timerDelegate) : LoggingRefrigerator(timerDelegate, Config{}) {}
+LoggingRefrigerator::LoggingRefrigerator(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify) :
+    LoggingRefrigerator(timerDelegate, platformIdentify, Config{})
+{}
 
-LoggingRefrigerator::LoggingRefrigerator(TimerDelegate & timerDelegate, Config config) :
-    mCabinet(timerDelegate, config.cabinetConfig, "Cabinet")
+LoggingRefrigerator::LoggingRefrigerator(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify,
+                                         Config config) :
+    mCabinet(timerDelegate, platformIdentify, config.cabinetConfig, "Cabinet")
 {}
 
 CHIP_ERROR LoggingRefrigerator::RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider)

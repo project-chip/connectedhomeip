@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/types/refrigerator/Refrigerator.h>
 #include <device/types/temperature-controlled-cabinet/impl/LoggingTemperatureControlledCabinetPart.h>
 
@@ -44,8 +45,8 @@ public:
         TemperatureControlledCabinetPart::Config cabinetConfig = DefaultCabinetConfig();
     };
 
-    explicit LoggingRefrigerator(TimerDelegate & timerDelegate);
-    LoggingRefrigerator(TimerDelegate & timerDelegate, Config config);
+    LoggingRefrigerator(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify);
+    LoggingRefrigerator(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify, Config config);
     ~LoggingRefrigerator() override = default;
 
     LoggingTemperatureControlledCabinetPart & Cabinet() { return mCabinet; }

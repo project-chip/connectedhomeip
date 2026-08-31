@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/types/air-quality-sensor/AirQualitySensor.h>
 #include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -25,9 +24,10 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-AirQualitySensor::AirQualitySensor(TimerDelegate & timerDelegate, const Config & config) :
+AirQualitySensor::AirQualitySensor(TimerDelegate & timerDelegate, const Config & config,
+                                   PlatformIdentifyIntegration & platformIdentify) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAirQualitySensor, 1)), mTimerDelegate(timerDelegate),
-    mConfig(config)
+    mPlatformIdentify(platformIdentify), mConfig(config)
 {}
 
 CHIP_ERROR AirQualitySensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -35,7 +35,7 @@ CHIP_ERROR AirQualitySensor::Register(chip::EndpointId endpoint, CodeDrivenDataM
 {
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(mPlatformIdentify.MakeConfig(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mAirQualityCluster.Create(endpoint, mConfig.airQualityFeatures);

@@ -19,6 +19,7 @@
 
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/illuminance-measurement-server/IlluminanceMeasurementCluster.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -31,7 +32,8 @@ class LightSensor : public SingleEndpoint
 {
 public:
     LightSensor(TimerDelegate & timerDelegate, Clusters::IlluminanceMeasurementCluster::StartupConfiguration lightConfig,
-                Clusters::IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributes = {});
+                Clusters::IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributes,
+                PlatformIdentifyIntegration & platformIdentify);
     ~LightSensor() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -45,6 +47,7 @@ public:
 
 protected:
     TimerDelegate & mTimerDelegate;
+    PlatformIdentifyIntegration & mPlatformIdentify;
     const Clusters::IlluminanceMeasurementCluster::StartupConfiguration mLightConfig;
     const Clusters::IlluminanceMeasurementCluster::OptionalAttributeSet mOptionalAttributes;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;

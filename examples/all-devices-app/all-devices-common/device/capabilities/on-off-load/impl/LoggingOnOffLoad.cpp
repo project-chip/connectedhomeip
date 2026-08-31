@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/capabilities/on-off-load/impl/LoggingOnOffLoad.h>
 #include <devices/Types.h>
 #include <lib/support/StringBuilder.h>
@@ -88,13 +87,13 @@ DataModel::ActionReturnStatus LoggingOnOffLoad::TriggerDyingLight(OnOff::DyingLi
 void LoggingOnOffLoad::OnIdentifyStart(Clusters::IdentifyCluster & cluster)
 {
     ChipLogProgress(DeviceLayer, "LoggingOnOffLoad: Identify START");
-    PlatformIdentifyIntegration::GetInstance().NotifyIdentifyStart(cluster);
+    GetContext().platformIdentify.NotifyIdentifyStart(cluster);
 }
 
 void LoggingOnOffLoad::OnIdentifyStop(Clusters::IdentifyCluster & cluster)
 {
     ChipLogProgress(DeviceLayer, "LoggingOnOffLoad: Identify STOP");
-    PlatformIdentifyIntegration::GetInstance().NotifyIdentifyStop(cluster);
+    GetContext().platformIdentify.NotifyIdentifyStop(cluster);
 }
 
 void LoggingOnOffLoad::OnTriggerEffect(Clusters::IdentifyCluster & cluster)

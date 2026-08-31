@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/types/generic-switch/GenericSwitch.h>
 #include <devices/Types.h>
 
@@ -22,8 +21,9 @@ using namespace chip::app::Clusters;
 
 namespace chip::app {
 
-GenericSwitch::GenericSwitch(TimerDelegate & timerDelegate) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kGenericSwitch, 1)), mTimerDelegate(timerDelegate)
+GenericSwitch::GenericSwitch(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kGenericSwitch, 1)), mTimerDelegate(timerDelegate),
+    mPlatformIdentify(platformIdentify)
 {}
 
 CHIP_ERROR GenericSwitch::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -34,7 +34,7 @@ CHIP_ERROR GenericSwitch::Register(chip::EndpointId endpoint, CodeDrivenDataMode
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(mPlatformIdentify.MakeConfig(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mSwitchCluster.Create(endpoint, BitFlags<Switch::Feature>(Switch::Feature::kLatchingSwitch),

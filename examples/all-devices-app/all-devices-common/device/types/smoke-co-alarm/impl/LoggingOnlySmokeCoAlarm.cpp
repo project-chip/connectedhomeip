@@ -36,7 +36,9 @@ namespace app {
 // The device is its own delegate: SmokeCoAlarm only stores the reference, so passing *this
 // (the not-yet-fully-constructed SmokeCoAlarmDelegate base) is safe as long as it is not used until
 // the cluster is registered.
-LoggingOnlySmokeCoAlarm::LoggingOnlySmokeCoAlarm(TimerDelegate & timerDelegate) : SmokeCoAlarm(timerDelegate, *this) {}
+LoggingOnlySmokeCoAlarm::LoggingOnlySmokeCoAlarm(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify) :
+    SmokeCoAlarm(timerDelegate, *this, platformIdentify)
+{}
 
 LoggingOnlySmokeCoAlarm::~LoggingOnlySmokeCoAlarm()
 {

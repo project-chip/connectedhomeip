@@ -20,6 +20,7 @@
 #include <app/clusters/operational-state-server/OperationalStateDelegate.h>
 #include <app/clusters/operational-state-server/OvenCavityOperationalStateCluster.h>
 #include <app/clusters/temperature-control-server/TemperatureControlCluster.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -40,10 +41,12 @@ public:
 
     TemperatureControlledCabinetPart(TimerDelegate & timerDelegate,
                                      Clusters::OperationalState::OperationalStateCluster::Delegate & opStateDelegate,
-                                     Clusters::IdentifyDelegate & identifyDelegate);
+                                     Clusters::IdentifyDelegate & identifyDelegate,
+                                     PlatformIdentifyIntegration & platformIdentify);
     TemperatureControlledCabinetPart(TimerDelegate & timerDelegate, Config config,
                                      Clusters::OperationalState::OperationalStateCluster::Delegate & opStateDelegate,
-                                     Clusters::IdentifyDelegate & identifyDelegate);
+                                     Clusters::IdentifyDelegate & identifyDelegate,
+                                     PlatformIdentifyIntegration & platformIdentify);
     ~TemperatureControlledCabinetPart() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition) override;
@@ -71,6 +74,7 @@ private:
     TimerDelegate & mTimerDelegate;
     const Config mConfig;
     Clusters::IdentifyDelegate & mIdentifyDelegate;
+    PlatformIdentifyIntegration & mPlatformIdentify;
 
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::TemperatureControlCluster> mTemperatureControlCluster;

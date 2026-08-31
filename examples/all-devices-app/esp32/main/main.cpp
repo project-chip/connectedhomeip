@@ -27,6 +27,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
 #include <device/types/root-node/WifiRootNode.h>
 #include <esp_heap_caps.h>
@@ -108,6 +109,7 @@ chip::app::CodeDrivenDataModelProvider * gDataModelProvider = nullptr;
 std::unique_ptr<DeviceInterface> gRootNode;
 std::unique_ptr<DeviceInterface> gConstructedDevice;
 DefaultTimerDelegate gTimerDelegate;
+chip::app::PlatformIdentifyIntegration gPlatformIdentify;
 
 void DeInitBLEIfCommissioned()
 {
@@ -313,6 +315,7 @@ void InitServer(intptr_t context)
         .bindingTable             = Clusters::Binding::Table::GetInstance(),
         .bindingManager           = Clusters::Binding::Manager::GetInstance(),
         .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,
+        .platformIdentify         = gPlatformIdentify,
     });
 
 #if ALL_DEVICES_ENABLE_DIMMABLE_LIGHT
@@ -322,6 +325,7 @@ void InitServer(intptr_t context)
             .groupDataProvider = gGroupDataProvider,
             .fabricTable       = Server::GetInstance().GetFabricTable(),
             .timerDelegate     = gTimerDelegate,
+            .platformIdentify  = gPlatformIdentify,
         });
     });
 #endif

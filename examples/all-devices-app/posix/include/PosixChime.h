@@ -27,7 +27,7 @@ namespace app {
 class PosixChime : public Chime
 {
 public:
-    PosixChime(TimerDelegate & timerDelegate, PosixAudioManager & audioManager);
+    PosixChime(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify, PosixAudioManager & audioManager);
     ~PosixChime() override = default;
 
     Protocols::InteractionModel::Status PlayChimeSound(uint8_t chimeID) override;

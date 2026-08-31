@@ -32,16 +32,18 @@ namespace {
 class AggregatorIdentifyDelegate : public IdentifyDelegate
 {
 public:
+    explicit AggregatorIdentifyDelegate(PlatformIdentifyIntegration & platformIdentify) : mPlatformIdentify(platformIdentify) {}
+
     void OnIdentifyStart(IdentifyCluster & cluster) override
     {
         ChipLogProgress(DeviceLayer, "Aggregator [Endpoint %d]: Identify START", cluster.GetPaths()[0].mEndpointId);
-        PlatformIdentifyIntegration::GetInstance().NotifyIdentifyStart(cluster);
+        mPlatformIdentify.NotifyIdentifyStart(cluster);
     }
 
     void OnIdentifyStop(IdentifyCluster & cluster) override
     {
         ChipLogProgress(DeviceLayer, "Aggregator [Endpoint %d]: Identify STOP", cluster.GetPaths()[0].mEndpointId);
-        PlatformIdentifyIntegration::GetInstance().NotifyIdentifyStop(cluster);
+        mPlatformIdentify.NotifyIdentifyStop(cluster);
     }
 
     void OnTriggerEffect(IdentifyCluster & cluster) override
@@ -86,22 +88,20 @@ public:
 
         ChipLogProgress(DeviceLayer, "Aggregator [Endpoint %d]: Trigger effect: %s", cluster.GetPaths()[0].mEndpointId,
                         msg.c_str());
-        PlatformIdentifyIntegration::GetInstance().NotifyTriggerEffect(cluster);
+        mPlatformIdentify.NotifyTriggerEffect(cluster);
     }
 
     bool IsTriggerEffectEnabled() const override { return true; }
-};
 
-AggregatorIdentifyDelegate & GetIdentifyDelegate()
-{
-    static AggregatorIdentifyDelegate gIdentifyDelegate;
-    return gIdentifyDelegate;
-}
+private:
+    PlatformIdentifyIntegration & mPlatformIdentify;
+};
 
 } // namespace
 
-Aggregator::Aggregator(TimerDelegate & timerDelegate) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAggregator, 1)), mTimerDelegate(timerDelegate)
+Aggregator::Aggregator(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAggregator, 1)), mTimerDelegate(timerDelegate),
+    mPlatformIdentify(platformIdentify)
 {}
 
 CHIP_ERROR Aggregator::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
@@ -112,8 +112,8 @@ CHIP_ERROR Aggregator::Register(EndpointId endpoint, CodeDrivenDataModelProvider
     composition.pattern = DataModel::EndpointCompositionPattern::kFullFamily;
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(
-        PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate).WithDelegate(&GetIdentifyDelegate()));
+    static AggregatorIdentifyDelegate sIdentifyDelegate(mPlatformIdentify);
+    mIdentifyCluster.Create(mPlatformIdentify.MakeConfig(endpoint, mTimerDelegate).WithDelegate(&sIdentifyDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));

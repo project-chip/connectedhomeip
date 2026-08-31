@@ -18,6 +18,7 @@
 
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/switch-server/SwitchCluster.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -27,7 +28,7 @@ namespace app {
 class GenericSwitch : public SingleEndpoint
 {
 public:
-    GenericSwitch(TimerDelegate & timerDelegate);
+    GenericSwitch(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify);
     ~GenericSwitch() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -41,6 +42,7 @@ public:
 
 private:
     TimerDelegate & mTimerDelegate;
+    PlatformIdentifyIntegration & mPlatformIdentify;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::SwitchCluster> mSwitchCluster;
 };

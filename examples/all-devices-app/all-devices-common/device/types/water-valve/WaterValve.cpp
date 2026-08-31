@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/types/water-valve/WaterValve.h>
 #include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -23,8 +22,9 @@ using namespace chip::app::Clusters;
 
 namespace chip::app {
 
-WaterValve::WaterValve(TimerDelegate & timerDelegate) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterValve, 1)), mTimerDelegate(timerDelegate)
+WaterValve::WaterValve(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterValve, 1)), mTimerDelegate(timerDelegate),
+    mPlatformIdentify(platformIdentify)
 {}
 
 CHIP_ERROR WaterValve::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
@@ -34,7 +34,7 @@ CHIP_ERROR WaterValve::Register(chip::EndpointId endpoint, CodeDrivenDataModelPr
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(mPlatformIdentify.MakeConfig(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     ValveConfigurationAndControlCluster::StartupConfiguration config{ DataModel::NullNullable,

@@ -41,8 +41,8 @@ const PressureMeasurementCluster::Config kDefaultPressureConfig = []() {
 
 } // namespace
 
-IncreasingPressureSensor::IncreasingPressureSensor(TimerDelegate & timerDelegate) :
-    PressureSensor(timerDelegate, kDefaultPressureConfig)
+IncreasingPressureSensor::IncreasingPressureSensor(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify) :
+    PressureSensor(timerDelegate, kDefaultPressureConfig, platformIdentify)
 {}
 
 IncreasingPressureSensor::~IncreasingPressureSensor()

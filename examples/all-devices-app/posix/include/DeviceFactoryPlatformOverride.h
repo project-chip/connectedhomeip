@@ -20,12 +20,13 @@
 #include <lib/support/TimerDelegate.h>
 
 #include <PosixAudioManager.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 
 namespace chip {
 namespace app {
 
 void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate,
-                                    PosixAudioManager & audioManager);
+                                    PosixAudioManager & audioManager, PlatformIdentifyIntegration & platformIdentify);
 
 } // namespace app
 } // namespace chip

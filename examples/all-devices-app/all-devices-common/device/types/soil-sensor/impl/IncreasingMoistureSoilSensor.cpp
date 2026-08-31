@@ -50,8 +50,8 @@ const TemperatureMeasurementCluster::StartupConfiguration kDefaultTemperatureCon
 
 } // namespace
 
-IncreasingMoistureSoilSensor::IncreasingMoistureSoilSensor() :
-    SoilSensor(mTimerDelegate, kDefaultSoilMoistureMeasurementLimits, kDefaultTemperatureConfig)
+IncreasingMoistureSoilSensor::IncreasingMoistureSoilSensor(PlatformIdentifyIntegration & platformIdentify) :
+    SoilSensor(mTimerDelegate, kDefaultSoilMoistureMeasurementLimits, kDefaultTemperatureConfig, platformIdentify)
 {}
 
 IncreasingMoistureSoilSensor::~IncreasingMoistureSoilSensor()

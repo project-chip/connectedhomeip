@@ -16,14 +16,13 @@
 
 #include "LoggingCooktop.h"
 
-#include <device/api/PlatformIdentifyIntegration.h>
-
 namespace chip::app {
 
 // LoggingCookSurfacePart
 
-LoggingCookSurfacePart::LoggingCookSurfacePart(TimerDelegate & timerDelegate, const char * name) :
-    CookSurfacePart(timerDelegate, *this, *this), mName(name)
+LoggingCookSurfacePart::LoggingCookSurfacePart(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify,
+                                               const char * name) :
+    CookSurfacePart(timerDelegate, *this, *this, platformIdentify), mPlatformIdentify(platformIdentify), mName(name)
 {}
 
 void LoggingCookSurfacePart::OnOnOffChanged(bool on)
@@ -39,19 +38,19 @@ void LoggingCookSurfacePart::OnOffStartup(bool on)
 void LoggingCookSurfacePart::OnIdentifyStart(Clusters::IdentifyCluster & cluster)
 {
     ChipLogProgress(DeviceLayer, "CookSurface (%s): OnIdentifyStart", mName);
-    PlatformIdentifyIntegration::GetInstance().NotifyIdentifyStart(cluster);
+    mPlatformIdentify.NotifyIdentifyStart(cluster);
 }
 
 void LoggingCookSurfacePart::OnIdentifyStop(Clusters::IdentifyCluster & cluster)
 {
     ChipLogProgress(DeviceLayer, "CookSurface (%s): OnIdentifyStop", mName);
-    PlatformIdentifyIntegration::GetInstance().NotifyIdentifyStop(cluster);
+    mPlatformIdentify.NotifyIdentifyStop(cluster);
 }
 
 void LoggingCookSurfacePart::OnTriggerEffect(Clusters::IdentifyCluster & cluster)
 {
     ChipLogProgress(DeviceLayer, "CookSurface (%s): OnTriggerEffect", mName);
-    PlatformIdentifyIntegration::GetInstance().NotifyTriggerEffect(cluster);
+    mPlatformIdentify.NotifyTriggerEffect(cluster);
 }
 
 namespace {
@@ -72,7 +71,8 @@ const Clusters::Globals::Structs::SemanticTagStruct::Type kSurface2Tag = {
 
 // LoggingCooktop
 
-LoggingCooktop::LoggingCooktop(TimerDelegate & timerDelegate) : mSurface1(timerDelegate, "Left"), mSurface2(timerDelegate, "Right")
+LoggingCooktop::LoggingCooktop(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify) :
+    mSurface1(timerDelegate, platformIdentify, "Left"), mSurface2(timerDelegate, platformIdentify, "Right")
 {}
 
 CHIP_ERROR LoggingCooktop::RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider)

@@ -24,7 +24,7 @@ namespace chip::app {
 class LoggingCookSurfacePart : public CookSurfacePart, public Clusters::OnOffDelegate, public Clusters::IdentifyDelegate
 {
 public:
-    LoggingCookSurfacePart(TimerDelegate & timerDelegate, const char * name);
+    LoggingCookSurfacePart(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify, const char * name);
     ~LoggingCookSurfacePart() override = default;
 
     // OnOffDelegate
@@ -38,13 +38,14 @@ public:
     bool IsTriggerEffectEnabled() const override { return true; }
 
 private:
+    PlatformIdentifyIntegration & mPlatformIdentify;
     const char * mName;
 };
 
 class LoggingCooktop : public Cooktop
 {
 public:
-    explicit LoggingCooktop(TimerDelegate & timerDelegate);
+    LoggingCooktop(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify);
     ~LoggingCooktop() override = default;
 
     LoggingCookSurfacePart & Surface1() { return mSurface1; }

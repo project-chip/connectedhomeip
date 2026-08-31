@@ -21,7 +21,6 @@
 #include <app/clusters/bindings/binding-table.h>
 #include <clusters/Identify/Ids.h>
 #include <clusters/OnOff/Ids.h>
-#include <device/api/PlatformIdentifyIntegration.h>
 #include <devices/Types.h>
 #include <platform/PlatformManager.h>
 
@@ -34,9 +33,11 @@ const ClusterId kClientClusters[] = { OnOff::Id, Identify::Id };
 } // namespace
 
 OnOffLightSwitch::OnOffLightSwitch(TimerDelegate & timerDelegate, DeviceLayer::PlatformManager & platformManager,
-                                   Clusters::Binding::Table & bindingTable, Clusters::Binding::Manager & bindingManager) :
+                                   Clusters::Binding::Table & bindingTable, Clusters::Binding::Manager & bindingManager,
+                                   PlatformIdentifyIntegration & platformIdentify) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLightSwitch, 1)),
-    mTimerDelegate(timerDelegate), mPlatformManager(platformManager), mBindingTable(bindingTable), mBindingManager(bindingManager)
+    mTimerDelegate(timerDelegate), mPlatformManager(platformManager), mBindingTable(bindingTable), mBindingManager(bindingManager),
+    mPlatformIdentify(platformIdentify)
 {}
 
 CHIP_ERROR OnOffLightSwitch::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -47,7 +48,7 @@ CHIP_ERROR OnOffLightSwitch::Register(chip::EndpointId endpoint, CodeDrivenDataM
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(mPlatformIdentify.MakeConfig(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mBindingCluster.Create(

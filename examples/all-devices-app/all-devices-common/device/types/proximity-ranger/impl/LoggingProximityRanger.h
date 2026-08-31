@@ -33,7 +33,8 @@ namespace app {
 class LoggingProximityRanger : public ProximityRanger
 {
 public:
-    LoggingProximityRanger(TimerDelegate & timerDelegate, PersistentStorageDelegate & storage);
+    LoggingProximityRanger(TimerDelegate & timerDelegate, PersistentStorageDelegate & storage,
+                           PlatformIdentifyIntegration & platformIdentify);
     ~LoggingProximityRanger() override = default;
 
     // Non-copyable / non-movable: would invalidate the adapter pointers that the base

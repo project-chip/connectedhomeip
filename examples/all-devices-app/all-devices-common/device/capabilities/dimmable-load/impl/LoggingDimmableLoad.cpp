@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/capabilities/dimmable-load/impl/LoggingDimmableLoad.h>
 #include <devices/Types.h>
 #include <lib/support/StringBuilder.h>
@@ -122,13 +121,13 @@ DataModel::ActionReturnStatus LoggingDimmableLoad::TriggerDyingLight(OnOff::Dyin
 void LoggingDimmableLoad::OnIdentifyStart(Clusters::IdentifyCluster & cluster)
 {
     ChipLogProgress(DeviceLayer, "LoggingDimmableLoad: Identify START");
-    PlatformIdentifyIntegration::GetInstance().NotifyIdentifyStart(cluster);
+    GetContext().platformIdentify.NotifyIdentifyStart(cluster);
 }
 
 void LoggingDimmableLoad::OnIdentifyStop(Clusters::IdentifyCluster & cluster)
 {
     ChipLogProgress(DeviceLayer, "LoggingDimmableLoad: Identify STOP");
-    PlatformIdentifyIntegration::GetInstance().NotifyIdentifyStop(cluster);
+    GetContext().platformIdentify.NotifyIdentifyStop(cluster);
 }
 
 void LoggingDimmableLoad::OnTriggerEffect(Clusters::IdentifyCluster & cluster)
@@ -170,7 +169,7 @@ void LoggingDimmableLoad::OnTriggerEffect(Clusters::IdentifyCluster & cluster)
         break;
     }
     ChipLogProgress(DeviceLayer, "LoggingDimmableLoad: TriggerEffect: %s", msg.c_str());
-    PlatformIdentifyIntegration::GetInstance().NotifyTriggerEffect(cluster);
+    GetContext().platformIdentify.NotifyTriggerEffect(cluster);
 }
 
 bool LoggingDimmableLoad::IsTriggerEffectEnabled() const

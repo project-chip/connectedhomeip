@@ -28,8 +28,10 @@ class LoggingTemperatureControlledCabinetPart : public TemperatureControlledCabi
                                                 public TimerContext
 {
 public:
-    LoggingTemperatureControlledCabinetPart(TimerDelegate & timerDelegate, const char * name);
-    LoggingTemperatureControlledCabinetPart(TimerDelegate & timerDelegate, Config config, const char * name);
+    LoggingTemperatureControlledCabinetPart(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify,
+                                            const char * name);
+    LoggingTemperatureControlledCabinetPart(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify,
+                                            Config config, const char * name);
     ~LoggingTemperatureControlledCabinetPart() override;
 
     void Unregister(CodeDrivenDataModelProvider & provider) override;
@@ -61,6 +63,7 @@ private:
 
     const char * mName;
     TimerDelegate & mTimerDelegate;
+    PlatformIdentifyIntegration & mPlatformIdentify;
     Clusters::OperationalState::OperationalStateEnum mOperationalState = Clusters::OperationalState::OperationalStateEnum::kStopped;
     DataModel::Nullable<uint32_t> mCountdownTime;
 };

@@ -18,6 +18,7 @@
 
 #include <app/clusters/ambient-context-sensing-server/AmbientContextSensingCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -29,7 +30,8 @@ public:
     using AmbientContextSensingConfig = Clusters::AmbientContextSensingCluster::Config;
 
     AmbientContextSensor(AmbientContextSensingConfig config, TimerDelegate & timerDelegate,
-                         Clusters::AmbientContextSensing::AmbientContextSensingDelegate & delegate);
+                         Clusters::AmbientContextSensing::AmbientContextSensingDelegate & delegate,
+                         PlatformIdentifyIntegration & platformIdentify);
     ~AmbientContextSensor() override = default;
 
     // DeviceInterface pure virtual lifecycle hooks
@@ -44,6 +46,7 @@ protected:
     AmbientContextSensingConfig mConfig;
     TimerDelegate & mTimerDelegate;
     Clusters::AmbientContextSensing::AmbientContextSensingDelegate & mDelegate;
+    PlatformIdentifyIntegration & mPlatformIdentify;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::AmbientContextSensingCluster> mAmbientContextSensingCluster;
 };

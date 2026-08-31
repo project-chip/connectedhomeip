@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/capabilities/dimmable-load/DimmableLoad.h>
 #include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -40,8 +39,7 @@ CHIP_ERROR DimmableLoad::Register(chip::EndpointId endpoint, CodeDrivenDataModel
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(
-        PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mContext.timerDelegate).WithDelegate(&mIdentifyDelegate));
+    mIdentifyCluster.Create(mContext.platformIdentify.MakeConfig(endpoint, mContext.timerDelegate).WithDelegate(&mIdentifyDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mScenesTableProvider.SetEndpoint(endpoint);

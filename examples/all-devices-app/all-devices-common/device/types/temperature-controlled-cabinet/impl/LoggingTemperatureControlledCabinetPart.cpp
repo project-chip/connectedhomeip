@@ -16,20 +16,22 @@
 
 #include "LoggingTemperatureControlledCabinetPart.h"
 
-#include <device/api/PlatformIdentifyIntegration.h>
 #include <lib/support/CodeUtils.h>
 
 namespace chip::app {
 
-LoggingTemperatureControlledCabinetPart::LoggingTemperatureControlledCabinetPart(TimerDelegate & timerDelegate, const char * name) :
-    LoggingTemperatureControlledCabinetPart(timerDelegate, Config{}, name)
+LoggingTemperatureControlledCabinetPart::LoggingTemperatureControlledCabinetPart(TimerDelegate & timerDelegate,
+                                                                                 PlatformIdentifyIntegration & platformIdentify,
+                                                                                 const char * name) :
+    LoggingTemperatureControlledCabinetPart(timerDelegate, platformIdentify, Config{}, name)
 {}
 
-LoggingTemperatureControlledCabinetPart::LoggingTemperatureControlledCabinetPart(TimerDelegate & timerDelegate, Config config,
-                                                                                 const char * name) :
+LoggingTemperatureControlledCabinetPart::LoggingTemperatureControlledCabinetPart(TimerDelegate & timerDelegate,
+                                                                                 PlatformIdentifyIntegration & platformIdentify,
+                                                                                 Config config, const char * name) :
     TemperatureControlledCabinetPart(timerDelegate, config, static_cast<Clusters::OperationalState::Delegate &>(*this),
-                                     static_cast<Clusters::IdentifyDelegate &>(*this)),
-    mName(name), mTimerDelegate(timerDelegate)
+                                     static_cast<Clusters::IdentifyDelegate &>(*this), platformIdentify),
+    mName(name), mTimerDelegate(timerDelegate), mPlatformIdentify(platformIdentify)
 {}
 
 LoggingTemperatureControlledCabinetPart::~LoggingTemperatureControlledCabinetPart()
@@ -139,19 +141,19 @@ void LoggingTemperatureControlledCabinetPart::HandleStopStateCallback(Clusters::
 void LoggingTemperatureControlledCabinetPart::OnIdentifyStart(Clusters::IdentifyCluster & cluster)
 {
     ChipLogProgress(DeviceLayer, "TempCabinet (%s): OnIdentifyStart", mName);
-    PlatformIdentifyIntegration::GetInstance().NotifyIdentifyStart(cluster);
+    mPlatformIdentify.NotifyIdentifyStart(cluster);
 }
 
 void LoggingTemperatureControlledCabinetPart::OnIdentifyStop(Clusters::IdentifyCluster & cluster)
 {
     ChipLogProgress(DeviceLayer, "TempCabinet (%s): OnIdentifyStop", mName);
-    PlatformIdentifyIntegration::GetInstance().NotifyIdentifyStop(cluster);
+    mPlatformIdentify.NotifyIdentifyStop(cluster);
 }
 
 void LoggingTemperatureControlledCabinetPart::OnTriggerEffect(Clusters::IdentifyCluster & cluster)
 {
     ChipLogProgress(DeviceLayer, "TempCabinet (%s): OnTriggerEffect", mName);
-    PlatformIdentifyIntegration::GetInstance().NotifyTriggerEffect(cluster);
+    mPlatformIdentify.NotifyTriggerEffect(cluster);
 }
 
 } // namespace chip::app

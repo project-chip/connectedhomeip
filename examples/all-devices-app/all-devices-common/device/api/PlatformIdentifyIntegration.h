@@ -28,20 +28,27 @@ namespace app {
  * Platform-provided defaults for code-driven `IdentifyCluster` instances
  * created by devices in the `all-devices-app` reference application.
  *
- * Platforms (e.g. `silabs/`, `esp32/`) may install a global identify
+ * An instance of this class is owned by the application entry point
+ * (typically the platform's `main` or `AppTask`) and is passed explicitly
+ * into the device factory / device constructors that require it. There
+ * is no global singleton: the owner constructs and configures the
+ * instance and then registers it with `DeviceFactory::Context` so that
+ * every device receives the same platform integration.
+ *
+ * Platforms (e.g. `silabs/`, `esp32/`) may install a platform identify
  * delegate at boot (typically driving a status LED) and advertise the
  * appropriate `Identify::IdentifyTypeEnum` (e.g. `kVisibleIndicator`).
  * Device types pick these up when they Create() their `IdentifyCluster`
  * via `MakeConfig(...)`, without every device constructor having to
- * accept a delegate.
+ * accept a delegate directly.
  *
  * Defaults (nullptr delegate, `kNone` type) preserve prior behavior for
  * platforms that do not install anything.
  *
- * Usage inside a device `Register()`:
+ * Usage inside a device `Register()` (with a reference stored as
+ * `mPlatformIdentify` on the device):
  * @code
- *   mIdentifyCluster.Create(
- *       PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate));
+ *   mIdentifyCluster.Create(mPlatformIdentify.MakeConfig(endpoint, mTimerDelegate));
  * @endcode
  *
  * Devices that own their own `IdentifyDelegate` (e.g. `LoggingOnOffLoad`)
@@ -53,7 +60,7 @@ namespace app {
 class PlatformIdentifyIntegration
 {
 public:
-    static PlatformIdentifyIntegration & GetInstance();
+    PlatformIdentifyIntegration() = default;
 
     void SetDelegate(Clusters::IdentifyDelegate * delegate) { mPlatformDelegate = delegate; }
     Clusters::IdentifyDelegate * GetDelegate() const { return mPlatformDelegate; }
@@ -77,8 +84,6 @@ public:
     void NotifyTriggerEffect(Clusters::IdentifyCluster & cluster);
 
 private:
-    PlatformIdentifyIntegration() = default;
-
     Clusters::IdentifyDelegate * mPlatformDelegate     = nullptr;
     Clusters::Identify::IdentifyTypeEnum mIdentifyType = Clusters::Identify::IdentifyTypeEnum::kNone;
 };

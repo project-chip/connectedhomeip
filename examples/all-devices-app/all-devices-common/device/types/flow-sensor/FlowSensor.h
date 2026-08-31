@@ -19,6 +19,7 @@
 
 #include <app/clusters/flow-measurement-server/FlowMeasurementCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -30,7 +31,8 @@ namespace app {
 class FlowSensor : public SingleEndpoint
 {
 public:
-    FlowSensor(TimerDelegate & timerDelegate, Clusters::FlowMeasurementCluster::Config flowConfig);
+    FlowSensor(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify,
+               Clusters::FlowMeasurementCluster::Config flowConfig);
     ~FlowSensor() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -44,6 +46,7 @@ public:
 
 protected:
     TimerDelegate & mTimerDelegate;
+    PlatformIdentifyIntegration & mPlatformIdentify;
     const Clusters::FlowMeasurementCluster::Config mFlowConfig;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::FlowMeasurementCluster> mFlowMeasurementCluster;

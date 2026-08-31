@@ -41,8 +41,8 @@ const RelativeHumidityMeasurementCluster::Config kDefaultHumidityConfig = []() {
 
 } // namespace
 
-IncreasingHumiditySensor::IncreasingHumiditySensor(TimerDelegate & timerDelegate) :
-    HumiditySensor(timerDelegate, kDefaultHumidityConfig)
+IncreasingHumiditySensor::IncreasingHumiditySensor(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify) :
+    HumiditySensor(timerDelegate, kDefaultHumidityConfig, platformIdentify)
 {}
 
 IncreasingHumiditySensor::~IncreasingHumiditySensor()

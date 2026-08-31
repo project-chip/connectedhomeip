@@ -43,6 +43,7 @@
 #include <app_options/AppOptions.h>
 #include <app_options/DeviceTypeParser.h>
 #include <device-factory/DeviceFactory.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/api/allocator/DynamicEndpointIdAllocator.h>
 #include <oob-accessors/OOBAccessor.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
@@ -81,6 +82,7 @@ AppMainLoopImplementation * gMainLoopImplementation = nullptr;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
 chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 DefaultTimerDelegate gTimerDelegate;
+chip::app::PlatformIdentifyIntegration gPlatformIdentify;
 chip::app::PosixAudioManager gAudioManager;
 
 // To hold SPAKE2+ verifier, discriminator, passcode
@@ -334,9 +336,10 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         .bindingTable             = Binding::Table::GetInstance(),
         .bindingManager           = Binding::Manager::GetInstance(),
         .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,
+        .platformIdentify         = gPlatformIdentify,
     });
 
-    RegisterDeviceFactoryOverrides(gTimerDelegate, initParams.persistentStorageDelegate, gAudioManager);
+    RegisterDeviceFactoryOverrides(gTimerDelegate, initParams.persistentStorageDelegate, gAudioManager, gPlatformIdentify);
 
 #if CHIP_CONFIG_ENABLE_GROUPCAST
     // TODO(#72056): Once groupcast is enabled by default, this should not be dependent on the app argument.

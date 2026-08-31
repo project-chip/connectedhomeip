@@ -45,6 +45,7 @@
 
 #include <app_config/enabled_devices.h>
 #include <device-factory/DeviceFactory.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
 #include <device/types/root-node/RootNode.h>
 
@@ -70,6 +71,7 @@ using namespace ::chip::DeviceLayer::Silabs;
 namespace {
 chip::app::DefaultAttributePersistenceProvider sAttributePersistenceProvider;
 chip::app::DefaultSafeAttributePersistenceProvider sSafeAttributePersistenceProvider;
+chip::app::PlatformIdentifyIntegration sPlatformIdentify;
 std::unique_ptr<chip::app::CodeDrivenDataModelProvider> sDataModelProvider;
 std::unique_ptr<chip::app::DeviceInterface> sRootNode;
 std::vector<std::unique_ptr<chip::app::DeviceInterface>> sConstructedDevices;
@@ -207,6 +209,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         .bindingTable             = chip::app::Clusters::Binding::Table::GetInstance(),
         .bindingManager           = chip::app::Clusters::Binding::Manager::GetInstance(),
         .testEventTriggerDelegate = sTestEventTriggerDelegate,
+        .platformIdentify         = sPlatformIdentify,
     });
 
     auto & deviceFactory = chip::app::DeviceFactory::GetInstance();

@@ -19,6 +19,7 @@
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/valve-configuration-and-control-server/ValveConfigurationAndControlCluster.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-delegate.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -27,7 +28,7 @@ namespace chip::app {
 class WaterValve : public SingleEndpoint, public Clusters::ValveConfigurationAndControl::Delegate
 {
 public:
-    WaterValve(TimerDelegate & timerDelegate);
+    WaterValve(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify);
     ~WaterValve() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -46,6 +47,7 @@ public:
 
 protected:
     TimerDelegate & mTimerDelegate;
+    PlatformIdentifyIntegration & mPlatformIdentify;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::ValveConfigurationAndControlCluster> mValveCluster;
 };

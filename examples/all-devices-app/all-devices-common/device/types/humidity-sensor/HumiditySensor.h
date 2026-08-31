@@ -19,6 +19,7 @@
 
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/relative-humidity-measurement-server/RelativeHumidityMeasurementCluster.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -30,7 +31,8 @@ namespace app {
 class HumiditySensor : public SingleEndpoint
 {
 public:
-    HumiditySensor(TimerDelegate & timerDelegate, Clusters::RelativeHumidityMeasurementCluster::Config humidityConfig);
+    HumiditySensor(TimerDelegate & timerDelegate, Clusters::RelativeHumidityMeasurementCluster::Config humidityConfig,
+                   PlatformIdentifyIntegration & platformIdentify);
     ~HumiditySensor() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -47,6 +49,7 @@ public:
 
 protected:
     TimerDelegate & mTimerDelegate;
+    PlatformIdentifyIntegration & mPlatformIdentify;
     const Clusters::RelativeHumidityMeasurementCluster::Config mHumidityConfig;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::RelativeHumidityMeasurementCluster> mRelativeHumidityMeasurementCluster;

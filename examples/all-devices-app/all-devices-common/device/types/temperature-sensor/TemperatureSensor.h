@@ -18,6 +18,7 @@
 
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/temperature-measurement-server/TemperatureMeasurementCluster.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -28,7 +29,8 @@ class TemperatureSensor : public SingleEndpoint
 {
 public:
     TemperatureSensor(TimerDelegate & timerDelegate, Clusters::TemperatureMeasurementCluster::StartupConfiguration tempConfig,
-                      Clusters::TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributes = {});
+                      Clusters::TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributes,
+                      PlatformIdentifyIntegration & platformIdentify);
     ~TemperatureSensor() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -42,6 +44,7 @@ public:
 
 protected:
     TimerDelegate & mTimerDelegate;
+    PlatformIdentifyIntegration & mPlatformIdentify;
     Clusters::TemperatureMeasurementCluster::StartupConfiguration mTempConfig;
     Clusters::TemperatureMeasurementCluster::OptionalAttributeSet mOptionalAttributes;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;

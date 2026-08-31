@@ -19,6 +19,7 @@
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/soil-measurement-server/SoilMeasurementCluster.h>
 #include <app/clusters/temperature-measurement-server/TemperatureMeasurementCluster.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -30,7 +31,8 @@ class SoilSensor : public SingleEndpoint
 public:
     SoilSensor(TimerDelegate & timerDelegate,
                Clusters::SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type moistureLimits,
-               Clusters::TemperatureMeasurementCluster::StartupConfiguration tempConfig);
+               Clusters::TemperatureMeasurementCluster::StartupConfiguration tempConfig,
+               PlatformIdentifyIntegration & platformIdentify);
     ~SoilSensor() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -45,6 +47,7 @@ public:
 
 protected:
     TimerDelegate & mTimerDelegate;
+    PlatformIdentifyIntegration & mPlatformIdentify;
     Clusters::SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type mMoistureLimits;
     Clusters::TemperatureMeasurementCluster::StartupConfiguration mTempConfig;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;

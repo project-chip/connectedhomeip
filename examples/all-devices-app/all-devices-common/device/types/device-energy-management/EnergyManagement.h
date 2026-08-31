@@ -19,6 +19,7 @@
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -27,7 +28,7 @@ namespace chip::app {
 class EnergyManagement : public SingleEndpoint, public Clusters::DeviceEnergyManagement::Delegate
 {
 public:
-    explicit EnergyManagement(TimerDelegate & timerDelegate);
+    explicit EnergyManagement(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify);
     ~EnergyManagement() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
@@ -68,6 +69,7 @@ public:
 
 private:
     TimerDelegate & mTimerDelegate;
+    PlatformIdentifyIntegration & mPlatformIdentify;
     CodeDrivenDataModelProvider * mProvider                  = nullptr;
     Clusters::DeviceEnergyManagement::ESAStateEnum mESAState = Clusters::DeviceEnergyManagement::ESAStateEnum::kOnline;
     DataModel::Nullable<Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type> mPowerAdjustmentCapability;

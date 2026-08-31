@@ -19,6 +19,7 @@
 
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/pressure-measurement-server/PressureMeasurementCluster.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -30,7 +31,8 @@ namespace app {
 class PressureSensor : public SingleEndpoint
 {
 public:
-    PressureSensor(TimerDelegate & timerDelegate, Clusters::PressureMeasurementCluster::Config pressureConfig);
+    PressureSensor(TimerDelegate & timerDelegate, Clusters::PressureMeasurementCluster::Config pressureConfig,
+                   PlatformIdentifyIntegration & platformIdentify);
     ~PressureSensor() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -44,6 +46,7 @@ public:
 
 protected:
     TimerDelegate & mTimerDelegate;
+    PlatformIdentifyIntegration & mPlatformIdentify;
     const Clusters::PressureMeasurementCluster::Config mPressureConfig;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::PressureMeasurementCluster> mPressureMeasurementCluster;

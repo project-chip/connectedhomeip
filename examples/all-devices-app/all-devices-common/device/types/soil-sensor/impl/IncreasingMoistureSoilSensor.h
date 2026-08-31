@@ -30,7 +30,7 @@ namespace app {
 class IncreasingMoistureSoilSensor : public SoilSensor, public TimerContext
 {
 public:
-    IncreasingMoistureSoilSensor();
+    IncreasingMoistureSoilSensor(PlatformIdentifyIntegration & platformIdentify);
     ~IncreasingMoistureSoilSensor() override;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;

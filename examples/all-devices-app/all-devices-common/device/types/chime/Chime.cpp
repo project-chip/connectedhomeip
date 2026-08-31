@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/types/chime/Chime.h>
 #include <devices/Types.h>
 #include <lib/support/StringBuilder.h>
@@ -25,15 +24,16 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-Chime::Chime(TimerDelegate & timerDelegate, Span<const Sound> sounds) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kChime, 1)), mTimerDelegate(timerDelegate), mSounds(sounds)
+Chime::Chime(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify, Span<const Sound> sounds) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kChime, 1)), mTimerDelegate(timerDelegate),
+    mPlatformIdentify(platformIdentify), mSounds(sounds)
 {}
 
 CHIP_ERROR Chime::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(mPlatformIdentify.MakeConfig(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mChimeCluster.Create(endpoint, *this);

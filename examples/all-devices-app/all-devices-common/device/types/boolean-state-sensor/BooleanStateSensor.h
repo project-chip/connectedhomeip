@@ -18,6 +18,7 @@
 
 #include <app/clusters/boolean-state-server/BooleanStateCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
 #include <memory>
@@ -36,8 +37,9 @@ public:
     /// class for the sensor types that share the same core functionality through the identify and
     /// boolean state clusters. The caller creating a BooleanStateSensor MUST ensure that the underlying
     /// data for the Span of deviceTypes remains valid for the entire lifetime of the BooleanStateSensor object instance.
-    BooleanStateSensor(TimerDelegate & timerDelegate, Span<const DataModel::DeviceTypeEntry> deviceType) :
-        SingleEndpoint(deviceType), mTimerDelegate(timerDelegate)
+    BooleanStateSensor(TimerDelegate & timerDelegate, Span<const DataModel::DeviceTypeEntry> deviceType,
+                       PlatformIdentifyIntegration & platformIdentify) :
+        SingleEndpoint(deviceType), mTimerDelegate(timerDelegate), mPlatformIdentify(platformIdentify)
     {}
     ~BooleanStateSensor() override = default;
 
@@ -51,6 +53,7 @@ public:
 
 private:
     TimerDelegate & mTimerDelegate;
+    PlatformIdentifyIntegration & mPlatformIdentify;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::BooleanStateCluster> mBooleanStateCluster;
 };

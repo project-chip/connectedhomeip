@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/types/pressure-sensor/PressureSensor.h>
 #include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -24,9 +23,10 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-PressureSensor::PressureSensor(TimerDelegate & timerDelegate, PressureMeasurementCluster::Config pressureConfig) :
+PressureSensor::PressureSensor(TimerDelegate & timerDelegate, PressureMeasurementCluster::Config pressureConfig,
+                               PlatformIdentifyIntegration & platformIdentify) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kPressureSensor, 1)), mTimerDelegate(timerDelegate),
-    mPressureConfig(pressureConfig)
+    mPlatformIdentify(platformIdentify), mPressureConfig(pressureConfig)
 {}
 
 CHIP_ERROR PressureSensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
@@ -36,7 +36,7 @@ CHIP_ERROR PressureSensor::Register(EndpointId endpoint, CodeDrivenDataModelProv
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(mPlatformIdentify.MakeConfig(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mPressureMeasurementCluster.Create(endpoint, mPressureConfig);

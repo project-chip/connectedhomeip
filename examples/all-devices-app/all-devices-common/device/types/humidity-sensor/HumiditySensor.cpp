@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/types/humidity-sensor/HumiditySensor.h>
 #include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -24,9 +23,10 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-HumiditySensor::HumiditySensor(TimerDelegate & timerDelegate, RelativeHumidityMeasurementCluster::Config humidityConfig) :
+HumiditySensor::HumiditySensor(TimerDelegate & timerDelegate, RelativeHumidityMeasurementCluster::Config humidityConfig,
+                               PlatformIdentifyIntegration & platformIdentify) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kHumiditySensor, 1)), mTimerDelegate(timerDelegate),
-    mHumidityConfig(humidityConfig)
+    mPlatformIdentify(platformIdentify), mHumidityConfig(humidityConfig)
 {}
 
 CHIP_ERROR HumiditySensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
@@ -36,7 +36,7 @@ CHIP_ERROR HumiditySensor::Register(EndpointId endpoint, CodeDrivenDataModelProv
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(mPlatformIdentify.MakeConfig(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mRelativeHumidityMeasurementCluster.Create(endpoint, mHumidityConfig);

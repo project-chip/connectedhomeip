@@ -19,6 +19,7 @@
 #include <app/clusters/chime-server/ChimeCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/Span.h>
 #include <lib/support/TimerDelegate.h>
@@ -36,7 +37,7 @@ public:
     };
 
     // Note: sounds array must outlive the Chime lifetime (i.e. often static or similar)
-    Chime(TimerDelegate & timerDelegate, Span<const Sound> sounds);
+    Chime(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify, Span<const Sound> sounds);
     ~Chime() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -52,6 +53,7 @@ public:
 
 protected:
     TimerDelegate & mTimerDelegate;
+    PlatformIdentifyIntegration & mPlatformIdentify;
     Span<const Sound> mSounds;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::ChimeCluster> mChimeCluster;

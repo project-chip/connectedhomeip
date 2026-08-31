@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/types/soil-sensor/SoilSensor.h>
 #include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -27,9 +26,10 @@ namespace chip {
 namespace app {
 
 SoilSensor::SoilSensor(TimerDelegate & timerDelegate, SoilMoistureMeasurementLimits::TypeInfo::Type moistureLimits,
-                       TemperatureMeasurementCluster::StartupConfiguration tempConfig) :
+                       TemperatureMeasurementCluster::StartupConfiguration tempConfig,
+                       PlatformIdentifyIntegration & platformIdentify) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSoilSensor, 1)),
-    mTimerDelegate(timerDelegate), mMoistureLimits(moistureLimits), mTempConfig(tempConfig)
+    mTimerDelegate(timerDelegate), mPlatformIdentify(platformIdentify), mMoistureLimits(moistureLimits), mTempConfig(tempConfig)
 {}
 
 CHIP_ERROR SoilSensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
@@ -40,7 +40,7 @@ CHIP_ERROR SoilSensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelPr
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // Create the identify cluster.
-    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(mPlatformIdentify.MakeConfig(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     // Create the temperature measurement cluster

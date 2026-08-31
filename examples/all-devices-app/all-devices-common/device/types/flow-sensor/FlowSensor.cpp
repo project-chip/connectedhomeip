@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/types/flow-sensor/FlowSensor.h>
 #include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -24,9 +23,10 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-FlowSensor::FlowSensor(TimerDelegate & timerDelegate, FlowMeasurementCluster::Config flowConfig) :
+FlowSensor::FlowSensor(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify,
+                       FlowMeasurementCluster::Config flowConfig) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kFlowSensor, 1)), mTimerDelegate(timerDelegate),
-    mFlowConfig(flowConfig)
+    mPlatformIdentify(platformIdentify), mFlowConfig(flowConfig)
 {}
 
 CHIP_ERROR FlowSensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
@@ -36,7 +36,7 @@ CHIP_ERROR FlowSensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(mPlatformIdentify.MakeConfig(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mFlowMeasurementCluster.Create(endpoint, mFlowConfig);

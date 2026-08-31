@@ -24,9 +24,10 @@ using namespace chip::app::Clusters;
 namespace chip::app {
 
 AmbientContextSensor::AmbientContextSensor(AmbientContextSensingConfig config, TimerDelegate & timerDelegate,
-                                           AmbientContextSensing::AmbientContextSensingDelegate & delegate) :
+                                           AmbientContextSensing::AmbientContextSensingDelegate & delegate,
+                                           PlatformIdentifyIntegration & platformIdentify) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAmbientContextSensor, 1)),
-    mConfig(config), mTimerDelegate(timerDelegate), mDelegate(delegate)
+    mConfig(config), mTimerDelegate(timerDelegate), mDelegate(delegate), mPlatformIdentify(platformIdentify)
 {}
 
 CHIP_ERROR AmbientContextSensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -35,7 +36,7 @@ CHIP_ERROR AmbientContextSensor::Register(chip::EndpointId endpoint, CodeDrivenD
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // Create the identify cluster.
-    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(mPlatformIdentify.MakeConfig(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     // Create the ambient context sensing cluster

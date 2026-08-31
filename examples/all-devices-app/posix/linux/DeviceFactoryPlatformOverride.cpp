@@ -25,7 +25,7 @@ namespace chip {
 namespace app {
 
 void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate,
-                                    PosixAudioManager & audioManager)
+                                    PosixAudioManager & audioManager, PlatformIdentifyIntegration & platformIdentify)
 {
     if constexpr (ALL_DEVICES_ENABLE_SPEAKER)
     {
@@ -36,8 +36,9 @@ void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentSto
 
     if constexpr (ALL_DEVICES_ENABLE_CHIME)
     {
-        DeviceFactory::GetInstance().RegisterCreator(
-            "chime", [&timerDelegate, &audioManager]() { return std::make_unique<PosixChime>(timerDelegate, audioManager); });
+        DeviceFactory::GetInstance().RegisterCreator("chime", [&timerDelegate, &platformIdentify, &audioManager]() {
+            return std::make_unique<PosixChime>(timerDelegate, platformIdentify, audioManager);
+        });
     }
 }
 

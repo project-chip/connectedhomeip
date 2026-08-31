@@ -25,8 +25,9 @@ namespace app {
 // taking their addresses here is well-defined. The base only stores the
 // pointer list — it does not dereference until Register() runs, by which
 // point all members are fully constructed.
-LoggingProximityRanger::LoggingProximityRanger(TimerDelegate & timerDelegate, PersistentStorageDelegate & storage) :
-    ProximityRanger(timerDelegate, { &mBleRangingAdapter, &mWiFiRangingAdapter, &mBltcsRangingAdapter }),
+LoggingProximityRanger::LoggingProximityRanger(TimerDelegate & timerDelegate, PersistentStorageDelegate & storage,
+                                               PlatformIdentifyIntegration & platformIdentify) :
+    ProximityRanger(timerDelegate, { &mBleRangingAdapter, &mWiFiRangingAdapter, &mBltcsRangingAdapter }, platformIdentify),
     mBleRangingAdapter(Clusters::ProximityRanging::RangingTechEnum::kBLEBeaconRSSIRanging, timerDelegate, &storage,
                        /*periodicRangingSupport=*/true),
     mWiFiRangingAdapter(Clusters::ProximityRanging::RangingTechEnum::kWiFiRoundTripTimeRanging, timerDelegate),

@@ -30,7 +30,7 @@ namespace app {
 class LoggingOccupancySensor : public OccupancySensor, public Clusters::OccupancySensingDelegate
 {
 public:
-    LoggingOccupancySensor(TimerDelegate & timerDelegate);
+    LoggingOccupancySensor(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify);
     ~LoggingOccupancySensor() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;

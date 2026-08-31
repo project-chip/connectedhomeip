@@ -24,6 +24,7 @@
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <app/clusters/scenes-server/ScenesManagementCluster.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -59,6 +60,7 @@ public:
         Credentials::GroupDataProvider & groupDataProvider;
         FabricTable & fabricTable;
         TimerDelegate & timerDelegate;
+        PlatformIdentifyIntegration & platformIdentify;
         bool includeOnOffCluster                                                = true;
         Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList = {};
     };

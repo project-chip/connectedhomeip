@@ -19,6 +19,7 @@
 
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -39,7 +40,7 @@ namespace app {
 class Aggregator : public SingleEndpoint
 {
 public:
-    Aggregator(TimerDelegate & timerDelegate);
+    Aggregator(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify);
     ~Aggregator() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -51,6 +52,7 @@ public:
 
 protected:
     TimerDelegate & mTimerDelegate;
+    PlatformIdentifyIntegration & mPlatformIdentify;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
 };
 

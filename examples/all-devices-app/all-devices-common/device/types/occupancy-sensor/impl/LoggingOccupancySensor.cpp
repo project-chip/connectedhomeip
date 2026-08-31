@@ -24,7 +24,7 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-LoggingOccupancySensor::LoggingOccupancySensor(TimerDelegate & timerDelegate) :
+LoggingOccupancySensor::LoggingOccupancySensor(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify) :
     OccupancySensor(
         // Initialize with kInvalidEndpointId. The actual endpoint ID will be set
         // when Register() is called by the application with a valid endpoint ID.
@@ -38,7 +38,7 @@ LoggingOccupancySensor::LoggingOccupancySensor(TimerDelegate & timerDelegate) :
                           },
                           timerDelegate)
             .WithDelegate(this),
-        timerDelegate)
+        timerDelegate, platformIdentify)
 {}
 
 CHIP_ERROR LoggingOccupancySensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,

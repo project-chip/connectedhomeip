@@ -18,10 +18,13 @@
 
 namespace chip::app {
 
-LoggingOven::LoggingOven(TimerDelegate & timerDelegate) : LoggingOven(timerDelegate, Config{}) {}
+LoggingOven::LoggingOven(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify) :
+    LoggingOven(timerDelegate, platformIdentify, Config{})
+{}
 
-LoggingOven::LoggingOven(TimerDelegate & timerDelegate, Config config) :
-    mCavity(timerDelegate, config.cavityConfig, "Cavity"), mSurface(timerDelegate, "Top Surface")
+LoggingOven::LoggingOven(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify, Config config) :
+    mCavity(timerDelegate, platformIdentify, config.cavityConfig, "Cavity"),
+    mSurface(timerDelegate, platformIdentify, "Top Surface")
 {}
 
 CHIP_ERROR LoggingOven::RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider)

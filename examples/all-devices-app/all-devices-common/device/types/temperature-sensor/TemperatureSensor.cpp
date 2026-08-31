@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/types/temperature-sensor/TemperatureSensor.h>
 #include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -25,9 +24,11 @@ namespace chip {
 namespace app {
 
 TemperatureSensor::TemperatureSensor(TimerDelegate & timerDelegate, TemperatureMeasurementCluster::StartupConfiguration tempConfig,
-                                     TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributes) :
+                                     TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributes,
+                                     PlatformIdentifyIntegration & platformIdentify) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kTemperatureSensor, 1)),
-    mTimerDelegate(timerDelegate), mTempConfig(tempConfig), mOptionalAttributes(optionalAttributes)
+    mTimerDelegate(timerDelegate), mPlatformIdentify(platformIdentify), mTempConfig(tempConfig),
+    mOptionalAttributes(optionalAttributes)
 {}
 
 CHIP_ERROR TemperatureSensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
@@ -38,7 +39,7 @@ CHIP_ERROR TemperatureSensor::Register(EndpointId endpoint, CodeDrivenDataModelP
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // Create the identify cluster.
-    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(mPlatformIdentify.MakeConfig(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     // Create the temperature measurement cluster

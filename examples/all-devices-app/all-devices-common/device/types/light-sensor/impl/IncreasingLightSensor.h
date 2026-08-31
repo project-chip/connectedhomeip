@@ -30,7 +30,7 @@ namespace app {
 class IncreasingLightSensor : public LightSensor, public TimerContext
 {
 public:
-    IncreasingLightSensor(TimerDelegate & timerDelegate);
+    IncreasingLightSensor(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify);
     ~IncreasingLightSensor() override;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;

@@ -19,13 +19,8 @@
 namespace chip {
 namespace app {
 
-PlatformIdentifyIntegration & PlatformIdentifyIntegration::GetInstance()
-{
-    static PlatformIdentifyIntegration sInstance;
-    return sInstance;
-}
-
-Clusters::IdentifyCluster::Config PlatformIdentifyIntegration::MakeConfig(EndpointId endpoint, TimerDelegate & timerDelegate) const
+Clusters::IdentifyCluster::Config PlatformIdentifyIntegration::MakeConfig(EndpointId endpoint,
+                                                                         TimerDelegate & timerDelegate) const
 {
     Clusters::IdentifyCluster::Config config(endpoint, timerDelegate);
     config.WithIdentifyType(mIdentifyType);

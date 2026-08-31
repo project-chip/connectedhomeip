@@ -21,6 +21,7 @@
 #include <app/clusters/concentration-measurement-server/ConcentrationMeasurementCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -38,7 +39,7 @@ public:
         ConcentrationCluster::Config co2Config;
     };
 
-    AirQualitySensor(TimerDelegate & timerDelegate, const Config & config);
+    AirQualitySensor(TimerDelegate & timerDelegate, const Config & config, PlatformIdentifyIntegration & platformIdentify);
     ~AirQualitySensor() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -50,6 +51,7 @@ public:
 
 protected:
     TimerDelegate & mTimerDelegate;
+    PlatformIdentifyIntegration & mPlatformIdentify;
     Config mConfig;
 
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
