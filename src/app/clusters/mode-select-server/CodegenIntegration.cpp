@@ -224,7 +224,10 @@ void MatterModeSelectPluginServerInitCallback()
 {
     ModeSelect::internal::RegisterOnManagerSetCallback(OnSupportedModesManagerSet);
 }
-void MatterModeSelectPluginServerShutdownCallback() {}
+void MatterModeSelectPluginServerShutdownCallback()
+{
+    ModeSelect::internal::RegisterOnManagerSetCallback(nullptr);
+}
 
 void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId) {}
 void MatterModeSelectClusterServerAttributeChangedCallback(const ConcreteAttributePath &) {}
