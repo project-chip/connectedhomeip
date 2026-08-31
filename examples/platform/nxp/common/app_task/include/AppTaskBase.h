@@ -209,6 +209,15 @@ private:
     static constexpr EndpointId kThreadBRMgmtEndpoint = 2;
     bool mTbrmClusterEnabled                          = false;
 #endif
+
+protected:
+#if CHIP_DEVICE_CONFIG_ENABLE_TBR
+    // Each platform provides the border agent base service name, which differs by OpenThread integration.
+    virtual chip::CharSpan GetBorderRouterName() = 0;
+
+    // Builds the full MeshCoP service instance name (base name + extended address hex) that OpenThread advertises.
+    chip::CharSpan BuildBorderRouterName(const char * baseName);
+#endif
 };
 
 /**

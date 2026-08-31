@@ -431,7 +431,7 @@ cluster Descriptor = 29 {
   readonly attribute cluster_id clientList[] = 2;
   readonly attribute endpoint_no partsList[] = 3;
   readonly attribute optional SemanticTagStruct tagList[] = 4;
-  provisional readonly attribute optional char_string<32> endpointUniqueID = 5;
+  readonly attribute optional char_string<32> endpointUniqueID = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -3285,7 +3285,7 @@ endpoint 0 {
 }
 endpoint 1 {
   device type ma_powersource = 17, version 1;
-  device type ma_doorlock = 10, version 3;
+  device type ma_doorlock = 10, version 4;
 
 
   server cluster Identify {

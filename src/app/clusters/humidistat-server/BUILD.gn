@@ -18,6 +18,7 @@ source_set("humidistat-server") {
   sources = [
     "HumidistatCluster.cpp",
     "HumidistatCluster.h",
+    "HumidistatTestEventTriggerHandler.h",
   ]
 
   public_deps = [

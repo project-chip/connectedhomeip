@@ -5416,3 +5416,519 @@
     return value;
 }
 @end
+
+// MediaFileManagement cluster attributes:
+
+@implementation MCMediaFileManagementClusterTotalStorageAttribute
+- (void)read:(void * _Nullable)context
+    completion:(void (^_Nonnull __strong)(void * _Nullable, id _Nullable __strong before, id _Nullable __strong after, NSError * _Nullable __strong error))completion
+{
+    MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::TotalStorage::TypeInfo> * mcAttribute = new MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::TotalStorage::TypeInfo>(self.cppAttribute,
+        [self](std::any cppValue, CHIP_ERROR * errPtr) {
+            return [self getObjCTypeFromCpp:cppValue errorCode:errPtr];
+        });
+    mcAttribute->read(context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
+        completion(context, before, after, err);
+        delete mcAttribute;
+    });
+}
+
+- (void)subscribe:(void * _Nullable)context
+       completion:(void (^_Nonnull __strong)(void * _Nullable, id _Nullable __strong before, id _Nullable __strong after, NSError * _Nullable __strong error))completion
+      minInterval:(NSNumber * _Nonnull)minInterval
+      maxInterval:(NSNumber * _Nonnull)maxInterval
+{
+    MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::TotalStorage::TypeInfo> * mcAttribute = new MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::TotalStorage::TypeInfo>(self.cppAttribute,
+        [self](std::any cppValue, CHIP_ERROR * errPtr) {
+            return [self getObjCTypeFromCpp:cppValue errorCode:errPtr];
+        });
+    mcAttribute->subscribe(
+        context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
+            completion(context, before, after, err);
+            delete mcAttribute;
+        }, minInterval, maxInterval);
+}
+
+- (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
+{
+    NSNumber * value = nil;
+    if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::TotalStorage::TypeInfo::DecodableType>)) {
+        std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::TotalStorage::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::TotalStorage::TypeInfo::DecodableType>>(cppValue);
+        chip::app::Clusters::MediaFileManagement::Attributes::TotalStorage::TypeInfo::DecodableType _cppValue = *sharedPtr;
+        *aError = CHIP_NO_ERROR;
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedLongLong:_cppValue];
+        return value;
+    }
+    *aError = CHIP_ERROR_INTERNAL;
+    return value;
+}
+@end
+
+@implementation MCMediaFileManagementClusterAvailableStorageAttribute
+- (void)read:(void * _Nullable)context
+    completion:(void (^_Nonnull __strong)(void * _Nullable, id _Nullable __strong before, id _Nullable __strong after, NSError * _Nullable __strong error))completion
+{
+    MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::AvailableStorage::TypeInfo> * mcAttribute = new MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::AvailableStorage::TypeInfo>(self.cppAttribute,
+        [self](std::any cppValue, CHIP_ERROR * errPtr) {
+            return [self getObjCTypeFromCpp:cppValue errorCode:errPtr];
+        });
+    mcAttribute->read(context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
+        completion(context, before, after, err);
+        delete mcAttribute;
+    });
+}
+
+- (void)subscribe:(void * _Nullable)context
+       completion:(void (^_Nonnull __strong)(void * _Nullable, id _Nullable __strong before, id _Nullable __strong after, NSError * _Nullable __strong error))completion
+      minInterval:(NSNumber * _Nonnull)minInterval
+      maxInterval:(NSNumber * _Nonnull)maxInterval
+{
+    MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::AvailableStorage::TypeInfo> * mcAttribute = new MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::AvailableStorage::TypeInfo>(self.cppAttribute,
+        [self](std::any cppValue, CHIP_ERROR * errPtr) {
+            return [self getObjCTypeFromCpp:cppValue errorCode:errPtr];
+        });
+    mcAttribute->subscribe(
+        context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
+            completion(context, before, after, err);
+            delete mcAttribute;
+        }, minInterval, maxInterval);
+}
+
+- (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
+{
+    NSNumber * value = nil;
+    if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::AvailableStorage::TypeInfo::DecodableType>)) {
+        std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::AvailableStorage::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::AvailableStorage::TypeInfo::DecodableType>>(cppValue);
+        chip::app::Clusters::MediaFileManagement::Attributes::AvailableStorage::TypeInfo::DecodableType _cppValue = *sharedPtr;
+        *aError = CHIP_NO_ERROR;
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedLongLong:_cppValue];
+        return value;
+    }
+    *aError = CHIP_ERROR_INTERNAL;
+    return value;
+}
+@end
+
+@implementation MCMediaFileManagementClusterAvailableFilesAttribute
+- (void)read:(void * _Nullable)context
+    completion:(void (^_Nonnull __strong)(void * _Nullable, id _Nullable __strong before, id _Nullable __strong after, NSError * _Nullable __strong error))completion
+{
+    MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::AvailableFiles::TypeInfo> * mcAttribute = new MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::AvailableFiles::TypeInfo>(self.cppAttribute,
+        [self](std::any cppValue, CHIP_ERROR * errPtr) {
+            return [self getObjCTypeFromCpp:cppValue errorCode:errPtr];
+        });
+    mcAttribute->read(context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
+        completion(context, before, after, err);
+        delete mcAttribute;
+    });
+}
+
+- (void)subscribe:(void * _Nullable)context
+       completion:(void (^_Nonnull __strong)(void * _Nullable, id _Nullable __strong before, id _Nullable __strong after, NSError * _Nullable __strong error))completion
+      minInterval:(NSNumber * _Nonnull)minInterval
+      maxInterval:(NSNumber * _Nonnull)maxInterval
+{
+    MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::AvailableFiles::TypeInfo> * mcAttribute = new MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::AvailableFiles::TypeInfo>(self.cppAttribute,
+        [self](std::any cppValue, CHIP_ERROR * errPtr) {
+            return [self getObjCTypeFromCpp:cppValue errorCode:errPtr];
+        });
+    mcAttribute->subscribe(
+        context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
+            completion(context, before, after, err);
+            delete mcAttribute;
+        }, minInterval, maxInterval);
+}
+
+- (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
+{
+    NSArray * value = nil;
+    if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::AvailableFiles::TypeInfo::DecodableType>)) {
+        std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::AvailableFiles::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::AvailableFiles::TypeInfo::DecodableType>>(cppValue);
+        chip::app::Clusters::MediaFileManagement::Attributes::AvailableFiles::TypeInfo::DecodableType _cppValue = *sharedPtr;
+        *aError = CHIP_NO_ERROR;
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = _cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MCMediaFileManagementClusterFileDescriptionStruct * newElement_0;
+                newElement_0 = [MCMediaFileManagementClusterFileDescriptionStruct new];
+                newElement_0.fileID = [NSNumber numberWithUnsignedLongLong:entry_0.fileID];
+                newElement_0.name = AsString(entry_0.name);
+                if (newElement_0.name == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+                newElement_0.size = [NSNumber numberWithUnsignedLongLong:entry_0.size];
+                newElement_0.mimeType = AsString(entry_0.mimeType);
+                if (newElement_0.mimeType == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+                newElement_0.imageUri = AsString(entry_0.imageUri);
+                if (newElement_0.imageUri == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    *aError = CHIP_ERROR_INTERNAL;
+    return value;
+}
+@end
+
+@implementation MCMediaFileManagementClusterSupportedMimeTypesAttribute
+- (void)read:(void * _Nullable)context
+    completion:(void (^_Nonnull __strong)(void * _Nullable, id _Nullable __strong before, id _Nullable __strong after, NSError * _Nullable __strong error))completion
+{
+    MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::SupportedMimeTypes::TypeInfo> * mcAttribute = new MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::SupportedMimeTypes::TypeInfo>(self.cppAttribute,
+        [self](std::any cppValue, CHIP_ERROR * errPtr) {
+            return [self getObjCTypeFromCpp:cppValue errorCode:errPtr];
+        });
+    mcAttribute->read(context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
+        completion(context, before, after, err);
+        delete mcAttribute;
+    });
+}
+
+- (void)subscribe:(void * _Nullable)context
+       completion:(void (^_Nonnull __strong)(void * _Nullable, id _Nullable __strong before, id _Nullable __strong after, NSError * _Nullable __strong error))completion
+      minInterval:(NSNumber * _Nonnull)minInterval
+      maxInterval:(NSNumber * _Nonnull)maxInterval
+{
+    MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::SupportedMimeTypes::TypeInfo> * mcAttribute = new MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::SupportedMimeTypes::TypeInfo>(self.cppAttribute,
+        [self](std::any cppValue, CHIP_ERROR * errPtr) {
+            return [self getObjCTypeFromCpp:cppValue errorCode:errPtr];
+        });
+    mcAttribute->subscribe(
+        context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
+            completion(context, before, after, err);
+            delete mcAttribute;
+        }, minInterval, maxInterval);
+}
+
+- (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
+{
+    NSArray * value = nil;
+    if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::SupportedMimeTypes::TypeInfo::DecodableType>)) {
+        std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::SupportedMimeTypes::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::SupportedMimeTypes::TypeInfo::DecodableType>>(cppValue);
+        chip::app::Clusters::MediaFileManagement::Attributes::SupportedMimeTypes::TypeInfo::DecodableType _cppValue = *sharedPtr;
+        *aError = CHIP_NO_ERROR;
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = _cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSString * newElement_0;
+                newElement_0 = AsString(entry_0);
+                if (newElement_0 == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    *aError = CHIP_ERROR_INTERNAL;
+    return value;
+}
+@end
+
+@implementation MCMediaFileManagementClusterGeneratedCommandListAttribute
+- (void)read:(void * _Nullable)context
+    completion:(void (^_Nonnull __strong)(void * _Nullable, id _Nullable __strong before, id _Nullable __strong after, NSError * _Nullable __strong error))completion
+{
+    MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::GeneratedCommandList::TypeInfo> * mcAttribute = new MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::GeneratedCommandList::TypeInfo>(self.cppAttribute,
+        [self](std::any cppValue, CHIP_ERROR * errPtr) {
+            return [self getObjCTypeFromCpp:cppValue errorCode:errPtr];
+        });
+    mcAttribute->read(context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
+        completion(context, before, after, err);
+        delete mcAttribute;
+    });
+}
+
+- (void)subscribe:(void * _Nullable)context
+       completion:(void (^_Nonnull __strong)(void * _Nullable, id _Nullable __strong before, id _Nullable __strong after, NSError * _Nullable __strong error))completion
+      minInterval:(NSNumber * _Nonnull)minInterval
+      maxInterval:(NSNumber * _Nonnull)maxInterval
+{
+    MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::GeneratedCommandList::TypeInfo> * mcAttribute = new MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::GeneratedCommandList::TypeInfo>(self.cppAttribute,
+        [self](std::any cppValue, CHIP_ERROR * errPtr) {
+            return [self getObjCTypeFromCpp:cppValue errorCode:errPtr];
+        });
+    mcAttribute->subscribe(
+        context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
+            completion(context, before, after, err);
+            delete mcAttribute;
+        }, minInterval, maxInterval);
+}
+
+- (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
+{
+    NSArray * value = nil;
+    if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::GeneratedCommandList::TypeInfo::DecodableType>)) {
+        std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::GeneratedCommandList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::GeneratedCommandList::TypeInfo::DecodableType>>(cppValue);
+        chip::app::Clusters::MediaFileManagement::Attributes::GeneratedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
+        *aError = CHIP_NO_ERROR;
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = _cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    *aError = CHIP_ERROR_INTERNAL;
+    return value;
+}
+@end
+
+@implementation MCMediaFileManagementClusterAcceptedCommandListAttribute
+- (void)read:(void * _Nullable)context
+    completion:(void (^_Nonnull __strong)(void * _Nullable, id _Nullable __strong before, id _Nullable __strong after, NSError * _Nullable __strong error))completion
+{
+    MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::AcceptedCommandList::TypeInfo> * mcAttribute = new MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::AcceptedCommandList::TypeInfo>(self.cppAttribute,
+        [self](std::any cppValue, CHIP_ERROR * errPtr) {
+            return [self getObjCTypeFromCpp:cppValue errorCode:errPtr];
+        });
+    mcAttribute->read(context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
+        completion(context, before, after, err);
+        delete mcAttribute;
+    });
+}
+
+- (void)subscribe:(void * _Nullable)context
+       completion:(void (^_Nonnull __strong)(void * _Nullable, id _Nullable __strong before, id _Nullable __strong after, NSError * _Nullable __strong error))completion
+      minInterval:(NSNumber * _Nonnull)minInterval
+      maxInterval:(NSNumber * _Nonnull)maxInterval
+{
+    MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::AcceptedCommandList::TypeInfo> * mcAttribute = new MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::AcceptedCommandList::TypeInfo>(self.cppAttribute,
+        [self](std::any cppValue, CHIP_ERROR * errPtr) {
+            return [self getObjCTypeFromCpp:cppValue errorCode:errPtr];
+        });
+    mcAttribute->subscribe(
+        context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
+            completion(context, before, after, err);
+            delete mcAttribute;
+        }, minInterval, maxInterval);
+}
+
+- (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
+{
+    NSArray * value = nil;
+    if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::AcceptedCommandList::TypeInfo::DecodableType>)) {
+        std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::AcceptedCommandList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::AcceptedCommandList::TypeInfo::DecodableType>>(cppValue);
+        chip::app::Clusters::MediaFileManagement::Attributes::AcceptedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
+        *aError = CHIP_NO_ERROR;
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = _cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    *aError = CHIP_ERROR_INTERNAL;
+    return value;
+}
+@end
+
+@implementation MCMediaFileManagementClusterAttributeListAttribute
+- (void)read:(void * _Nullable)context
+    completion:(void (^_Nonnull __strong)(void * _Nullable, id _Nullable __strong before, id _Nullable __strong after, NSError * _Nullable __strong error))completion
+{
+    MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::AttributeList::TypeInfo> * mcAttribute = new MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::AttributeList::TypeInfo>(self.cppAttribute,
+        [self](std::any cppValue, CHIP_ERROR * errPtr) {
+            return [self getObjCTypeFromCpp:cppValue errorCode:errPtr];
+        });
+    mcAttribute->read(context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
+        completion(context, before, after, err);
+        delete mcAttribute;
+    });
+}
+
+- (void)subscribe:(void * _Nullable)context
+       completion:(void (^_Nonnull __strong)(void * _Nullable, id _Nullable __strong before, id _Nullable __strong after, NSError * _Nullable __strong error))completion
+      minInterval:(NSNumber * _Nonnull)minInterval
+      maxInterval:(NSNumber * _Nonnull)maxInterval
+{
+    MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::AttributeList::TypeInfo> * mcAttribute = new MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::AttributeList::TypeInfo>(self.cppAttribute,
+        [self](std::any cppValue, CHIP_ERROR * errPtr) {
+            return [self getObjCTypeFromCpp:cppValue errorCode:errPtr];
+        });
+    mcAttribute->subscribe(
+        context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
+            completion(context, before, after, err);
+            delete mcAttribute;
+        }, minInterval, maxInterval);
+}
+
+- (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
+{
+    NSArray * value = nil;
+    if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::AttributeList::TypeInfo::DecodableType>)) {
+        std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::AttributeList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::AttributeList::TypeInfo::DecodableType>>(cppValue);
+        chip::app::Clusters::MediaFileManagement::Attributes::AttributeList::TypeInfo::DecodableType _cppValue = *sharedPtr;
+        *aError = CHIP_NO_ERROR;
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = _cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    *aError = CHIP_ERROR_INTERNAL;
+    return value;
+}
+@end
+
+@implementation MCMediaFileManagementClusterFeatureMapAttribute
+- (void)read:(void * _Nullable)context
+    completion:(void (^_Nonnull __strong)(void * _Nullable, id _Nullable __strong before, id _Nullable __strong after, NSError * _Nullable __strong error))completion
+{
+    MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::FeatureMap::TypeInfo> * mcAttribute = new MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::FeatureMap::TypeInfo>(self.cppAttribute,
+        [self](std::any cppValue, CHIP_ERROR * errPtr) {
+            return [self getObjCTypeFromCpp:cppValue errorCode:errPtr];
+        });
+    mcAttribute->read(context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
+        completion(context, before, after, err);
+        delete mcAttribute;
+    });
+}
+
+- (void)subscribe:(void * _Nullable)context
+       completion:(void (^_Nonnull __strong)(void * _Nullable, id _Nullable __strong before, id _Nullable __strong after, NSError * _Nullable __strong error))completion
+      minInterval:(NSNumber * _Nonnull)minInterval
+      maxInterval:(NSNumber * _Nonnull)maxInterval
+{
+    MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::FeatureMap::TypeInfo> * mcAttribute = new MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::FeatureMap::TypeInfo>(self.cppAttribute,
+        [self](std::any cppValue, CHIP_ERROR * errPtr) {
+            return [self getObjCTypeFromCpp:cppValue errorCode:errPtr];
+        });
+    mcAttribute->subscribe(
+        context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
+            completion(context, before, after, err);
+            delete mcAttribute;
+        }, minInterval, maxInterval);
+}
+
+- (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
+{
+    NSNumber * value = nil;
+    if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::FeatureMap::TypeInfo::DecodableType>)) {
+        std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::FeatureMap::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::FeatureMap::TypeInfo::DecodableType>>(cppValue);
+        chip::app::Clusters::MediaFileManagement::Attributes::FeatureMap::TypeInfo::DecodableType _cppValue = *sharedPtr;
+        *aError = CHIP_NO_ERROR;
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedInt:_cppValue];
+        return value;
+    }
+    *aError = CHIP_ERROR_INTERNAL;
+    return value;
+}
+@end
+
+@implementation MCMediaFileManagementClusterClusterRevisionAttribute
+- (void)read:(void * _Nullable)context
+    completion:(void (^_Nonnull __strong)(void * _Nullable, id _Nullable __strong before, id _Nullable __strong after, NSError * _Nullable __strong error))completion
+{
+    MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::ClusterRevision::TypeInfo> * mcAttribute = new MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::ClusterRevision::TypeInfo>(self.cppAttribute,
+        [self](std::any cppValue, CHIP_ERROR * errPtr) {
+            return [self getObjCTypeFromCpp:cppValue errorCode:errPtr];
+        });
+    mcAttribute->read(context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
+        completion(context, before, after, err);
+        delete mcAttribute;
+    });
+}
+
+- (void)subscribe:(void * _Nullable)context
+       completion:(void (^_Nonnull __strong)(void * _Nullable, id _Nullable __strong before, id _Nullable __strong after, NSError * _Nullable __strong error))completion
+      minInterval:(NSNumber * _Nonnull)minInterval
+      maxInterval:(NSNumber * _Nonnull)maxInterval
+{
+    MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::ClusterRevision::TypeInfo> * mcAttribute = new MCAttributeTemplate<chip::app::Clusters::MediaFileManagement::Attributes::ClusterRevision::TypeInfo>(self.cppAttribute,
+        [self](std::any cppValue, CHIP_ERROR * errPtr) {
+            return [self getObjCTypeFromCpp:cppValue errorCode:errPtr];
+        });
+    mcAttribute->subscribe(
+        context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
+            completion(context, before, after, err);
+            delete mcAttribute;
+        }, minInterval, maxInterval);
+}
+
+- (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
+{
+    NSNumber * value = nil;
+    if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::ClusterRevision::TypeInfo::DecodableType>)) {
+        std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::ClusterRevision::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::MediaFileManagement::Attributes::ClusterRevision::TypeInfo::DecodableType>>(cppValue);
+        chip::app::Clusters::MediaFileManagement::Attributes::ClusterRevision::TypeInfo::DecodableType _cppValue = *sharedPtr;
+        *aError = CHIP_NO_ERROR;
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedShort:_cppValue];
+        return value;
+    }
+    *aError = CHIP_ERROR_INTERNAL;
+    return value;
+}
+@end

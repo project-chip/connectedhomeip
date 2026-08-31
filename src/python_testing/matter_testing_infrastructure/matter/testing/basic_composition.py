@@ -142,6 +142,8 @@ def JsonToMatterTlv(json_filename: str) -> AttributeCache:
 
 
 class BasicCompositionTests(MatterBaseTest):
+    # Disabled because these tests can run over PASE
+    disable_wildcard_subscription = True
     # These attributes are initialized/provided by the inheriting test class (MatterBaseTest)
     # or its setup process. Providing type hints here for mypy.
     default_controller: ChipDeviceController
@@ -180,6 +182,10 @@ class BasicCompositionTests(MatterBaseTest):
             LOGGER.info("###########################################################")
 
         if self.test_from_file:
+            # File-mode runs have no DUT: skip the pre-test DUT-state capture used by
+            # teardown cleanup and the background wildcard subscription, both gated on
+            # requires_dut in setup_test.
+            self.requires_dut = False
             cache = JsonToMatterTlv(self.test_from_file)
             self.endpoints = cache.GetUpdatedAttributeCache()
             self.endpoints_tlv = cache.attributeTLVCache
