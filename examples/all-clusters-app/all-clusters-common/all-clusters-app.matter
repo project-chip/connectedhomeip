@@ -5698,7 +5698,7 @@ provisional cluster DynamicLighting = 773 {
 
 /** Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements. */
 cluster IlluminanceMeasurement = 1024 {
-  revision 3;
+  revision 5;
 
   enum LightSensorTypeEnum : enum8 {
     kPhotodiode = 0;
