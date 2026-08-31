@@ -20,6 +20,7 @@
 #include <app/CommandHandlerExchangeInterface.h>
 #include <app/CommandHandlerImpl.h>
 #include <app/StatusResponse.h>
+#include <app/reporting/ReportScheduler.h>
 #include <messaging/ExchangeHolder.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -50,8 +51,11 @@ public:
         virtual void OnDone(CommandResponseSender & apResponderObj) = 0;
     };
 
-    CommandResponseSender(Callback * apCallback, CommandHandlerImpl::Callback * apDispatchCallback) :
-        mpCallback(apCallback), mpCommandHandlerCallback(apDispatchCallback), mCommandHandler(this), mExchangeCtx(*this)
+    CommandResponseSender(Callback * apCallback, CommandHandlerImpl::Callback * apDispatchCallback,
+                          reporting::ReportScheduler * apReportScheduler = nullptr) :
+        mpCallback(apCallback),
+        mpCommandHandlerCallback(apDispatchCallback), mCommandHandler(this), mExchangeCtx(*this),
+        mpReportScheduler(apReportScheduler)
     {}
 
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
@@ -65,6 +69,8 @@ public:
                          TLV::TLVReader & apPayload) override;
 
     Protocols::InteractionModel::Status ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request) override;
+
+    void OnDelayReport(System::Clock::Timeout aDelay, Span<const EndpointId> targetedEndpoints) override;
 
     /**
      * Gets the inner exchange context object, without ownership.
@@ -194,7 +200,8 @@ private:
     Messaging::ExchangeHolder mExchangeCtx;
     State mState = State::ReadyForInvokeResponses;
 
-    bool mReportResponseDropped = false;
+    bool mReportResponseDropped                    = false;
+    reporting::ReportScheduler * mpReportScheduler = nullptr;
 };
 
 } // namespace app

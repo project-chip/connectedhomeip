@@ -1758,8 +1758,9 @@ class ChipDeviceControllerBase:
     async def TestOnlySendBatchCommands(self, nodeId: int, commands: list[ClusterCommand.InvokeRequestInfo],
                                         timedRequestTimeoutMs: int | None = None,
                                         interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
-                                        suppressResponse: bool | None = None, remoteMaxPathsPerInvoke: int | None = None,
-                                        suppressTimedRequestMessage: bool = False, commandRefsOverride: list[int] | None = None):
+                                        suppressResponse: bool = False, remoteMaxPathsPerInvoke: int | None = None,
+                                        suppressTimedRequestMessage: bool = False, commandRefsOverride: list[int] | None = None,
+                                        delayReportData: ClusterCommand.DelayReportData | None = None):
         '''
         Please see SendBatchCommands for description.
         TestOnly overridable arguments:
@@ -1782,7 +1783,7 @@ class ChipDeviceControllerBase:
             timedRequestTimeoutMs=timedRequestTimeoutMs,
             interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse,
             remoteMaxPathsPerInvoke=remoteMaxPathsPerInvoke, suppressTimedRequestMessage=suppressTimedRequestMessage,
-            commandRefsOverride=commandRefsOverride).raise_on_error()
+            commandRefsOverride=commandRefsOverride, delayReportData=delayReportData).raise_on_error()
 
         if suppressResponse:
             return None
@@ -1884,8 +1885,9 @@ class ChipDeviceControllerBase:
     async def SendCommand(self, nodeId: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None,
                           timedRequestTimeoutMs: int | None = None,
                           interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
-                          suppressResponse: bool | None = None,
-                          payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
+                          suppressResponse: bool = False,
+                          payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD,
+                          delayReportData: ClusterCommand.DelayReportData | None = None):
         '''
         Send a cluster-object encapsulated command to a node and get returned a future that can be awaited upon to receive
         the response. If a valid responseType is passed in, that will be used to de-serialize the object. If not,
@@ -1894,6 +1896,7 @@ class ChipDeviceControllerBase:
         timedWriteTimeoutMs: Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
         interactionTimeoutMs: Overall timeout for the interaction. Omit or set to 'None' to have the SDK automatically compute the
                               right timeout value based on transport characteristics as well as the responsiveness of the target.
+        delayReportData: Optional DelayReportData specifying min delay and jitter window for report suppression during invoke.
 
         Returns:
             command response or None. The type of the response is defined by the command.
@@ -1916,7 +1919,8 @@ class ChipDeviceControllerBase:
                     ClusterId=payload.cluster_id,
                     CommandId=payload.command_id,
                 ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs,
-                interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse, allowLargePayload=allow_large_payload)
+                interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse,
+                allowLargePayload=allow_large_payload, delayReportData=delayReportData)
             res.raise_on_error()
 
             if suppressResponse:
@@ -1929,8 +1933,9 @@ class ChipDeviceControllerBase:
     async def SendBatchCommands(self, nodeId: int, commands: list[ClusterCommand.InvokeRequestInfo],
                                 timedRequestTimeoutMs: int | None = None,
                                 interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
-                                suppressResponse: bool | None = None,
-                                payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
+                                suppressResponse: bool = False,
+                                payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD,
+                                delayReportData: ClusterCommand.DelayReportData | None = None):
         '''
         Send a batch of cluster-object encapsulated commands to a node and get returned a future that can be awaited upon to receive
         the responses. If a valid responseType is passed in, that will be used to de-serialize the object. If not,
@@ -1943,9 +1948,10 @@ class ChipDeviceControllerBase:
                               right timeout value based on transport characteristics as well as the responsiveness of the target.
         busyWaitMs: How long to wait in ms after sending command to device before performing any other operations.
         suppressResponse: Do not send a response to this action
+        delayReportData: Optional DelayReportData specifying min delay and jitter window for report suppression during invoke.
 
         Returns:
-            - List of command responses in the same order as what was given in `commands`. The type of the response is defined by the command.
+            - None if suppressResponse is True. Otherwise, a list of command responses in the same order as what was given in `commands`. The type of the response is defined by the command.
                       - A value of `None` indicates success.
                       - If only a single command fails, for example with `UNSUPPORTED_COMMAND`, the corresponding index associated with the command will,
                         contain `interaction_model.Status.UnsupportedCommand`.
@@ -1963,8 +1969,11 @@ class ChipDeviceControllerBase:
             res = await ClusterCommand.SendBatchCommands(
                 future, eventLoop, device.deviceProxy, commands,
                 timedRequestTimeoutMs=timedRequestTimeoutMs,
-                interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse)
+                interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse,
+                delayReportData=delayReportData)
             res.raise_on_error()
+            if suppressResponse:
+                return None
             return await future
 
         return await self._run_with_session_retry(nodeId, _batch_send_impl)
@@ -1996,7 +2005,8 @@ class ChipDeviceControllerBase:
                              ],
                              timedRequestTimeoutMs: int | None = None,
                              interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
-                             payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
+                             payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD,
+                             suppressResponse: bool = False):
         '''
         Write a list of attributes on a target node.
 
@@ -2005,12 +2015,13 @@ class ChipDeviceControllerBase:
         attributes: A list of tuples of type (endpoint, cluster-object):
         interactionTimeoutMs: Overall timeout for the interaction. Omit or set to 'None' to have the SDK automatically compute the
                               right timeout value based on transport characteristics as well as the responsiveness of the target.
+        suppressResponse: Do not send a response to this action
         E.g
             (1, Clusters.UnitTesting.Attributes.XYZAttribute('hello')) -- Write 'hello'
             to the XYZ attribute on the test cluster to endpoint 1
 
         Returns:
-            [AttributeStatus] (list - one for each path).
+            [AttributeStatus] or None (list - one for each path, or None when suppressResponse is True).
 
         Raises:
             InteractionModelError on error.
@@ -2022,7 +2033,8 @@ class ChipDeviceControllerBase:
                                           interactionTimeoutMs=interactionTimeoutMs,
                                           busyWaitMs=busyWaitMs,
                                           payloadCapability=payloadCapability,
-                                          forceLegacyListEncoding=False)
+                                          forceLegacyListEncoding=False,
+                                          suppressResponse=suppressResponse)
 
     async def _WriteAttribute(self, nodeId: int,
                               attributes: list[
@@ -2031,7 +2043,8 @@ class ChipDeviceControllerBase:
                               ],
                               timedRequestTimeoutMs: int | None = None,
                               interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
-                              payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD, forceLegacyListEncoding: bool = False):
+                              payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD, forceLegacyListEncoding: bool = False,
+                              suppressResponse: bool = False):
 
         self.CheckIsActive()
 
@@ -2043,7 +2056,10 @@ class ChipDeviceControllerBase:
             attrs = self._prepare_write_attribute_requests(attributes)
             ClusterAttribute.WriteAttributes(
                 future, eventLoop, device.deviceProxy, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs,
-                interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, forceLegacyListEncoding=forceLegacyListEncoding).raise_on_error()
+                interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, forceLegacyListEncoding=forceLegacyListEncoding,
+                suppressResponse=suppressResponse).raise_on_error()
+            if suppressResponse:
+                return None
             return await future
 
         return await self._run_with_session_retry(nodeId, _write_impl)

@@ -25,6 +25,7 @@ static_library("wire") {
     "QName.h",
     "QNameString.cpp",
     "QNameString.h",
+    "Query.h",
     "RecordWriter.cpp",
     "RecordWriter.h",
   ]

@@ -177,11 +177,11 @@ static_library("nxp_platform") {
     if (chip_mdns == "platform") {
       if (chip_enable_wifi) {
         sources += [
+          "../../../OpenThread/DnssdImplBr.cpp",
+          "../../../OpenThread/OpenThreadBrDnssdImpl.cpp",
+          "../../../OpenThread/OpenThreadBrDnssdImpl.h",
           "../../../OpenThread/OpenThreadDnssdImpl.cpp",
           "../../../OpenThread/OpenThreadDnssdImpl.h",
-          "../../common/DnssdImpl.cpp",
-          "../../common/DnssdImplBr.cpp",
-          "../../common/DnssdImplBr.h",
         ]
       } else {
         sources += [
