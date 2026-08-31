@@ -57,9 +57,15 @@ protected:
     DataModel::ActionReturnStatus TriggerDelayedAllOff(Clusters::OnOff::DelayedAllOffEffectVariantEnum effect) override;
     DataModel::ActionReturnStatus TriggerDyingLight(Clusters::OnOff::DyingLightEffectVariantEnum effect) override;
 
-    // ColorControlDelegate. Only the color temperature output is implemented: the device types
-    // built on this advertise no more than one color representation at a time that needs driving,
-    // so the cluster never asks for a conversion between representations.
+    // ColorControlDelegate. Both output channels the device types built on this driver advertise are
+    // logged; HueSaturation and EnhancedHue are left at their no-op defaults because neither device
+    // type advertises those features, so the cluster never feeds them.
+    //
+    // The XY <-> mireds conversions are also left at their defaults, as this driver has no physical
+    // output to calibrate them against. The Extended Color Light advertises XY and ColorTemperature
+    // together, so a mode switch or a read of the inactive mode's attribute reports the
+    // ColorControlColorState default rather than a value converted from the active color.
+    void OnColorXYChanged(uint16_t x, uint16_t y, bool transitionActive) override;
     void OnColorCTChanged(uint16_t mireds, bool transitionActive) override;
 
     // IdentifyDelegate. TriggerEffect is mandatory for both device types built on this driver

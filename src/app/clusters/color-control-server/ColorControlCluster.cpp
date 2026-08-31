@@ -2546,7 +2546,7 @@ void ColorControlCluster::CoupleColorTempToLevel(uint8_t currentLevel)
     // Instantaneous coupling move (transitionTime 0) reusing the fully validated CT move path
     // (mode switch, physical-range clamp, hardware fan-out via the delegate, scene invalidation).
     //
-    // passing ExecuteIfOff in noth the mask and the override pins that bit to 1 whatever the
+    // passing ExecuteIfOff in both the mask and the override pins that bit to 1 whatever the
     // Options attribute holds, and the ShouldExecuteIfOff gate at the top of MoveToColorTemp always passes.
 
     MoveToColorTemp(newColorTemp, 0, BitMask<OptionsBitmap>(OptionsBitmap::kExecuteIfOff),
