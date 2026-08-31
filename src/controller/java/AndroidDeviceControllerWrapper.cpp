@@ -33,6 +33,7 @@
 #include <data-model-providers/codegen/Instance.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Defer.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 #include <lib/support/PersistentStorageMacros.h>
@@ -1274,6 +1275,11 @@ void AndroidDeviceControllerWrapper::HandleCredentialsNeededCallback(intptr_t co
     auto * callbackContext = reinterpret_cast<CredentialsNeededCallbackContext *>(context);
     VerifyOrReturn(callbackContext != nullptr);
 
+    auto contextCleanup = ::MakeDefer([callbackContext]() {
+        callbackContext->listenerObject.Reset();
+        chip::Platform::Delete(callbackContext);
+    });
+
     const EndpointId endpoint       = callbackContext->endpoint;
     const bool isWiFi               = callbackContext->isWiFi;
     const jmethodID listenerMethod  = callbackContext->listenerMethod;
@@ -1283,14 +1289,12 @@ void AndroidDeviceControllerWrapper::HandleCredentialsNeededCallback(intptr_t co
     if (env == nullptr)
     {
         ChipLogError(Controller, "Could not get JNIEnv for current thread");
-        chip::Platform::Delete(callbackContext);
         return;
     }
 
     if (listenerGlobalObjectRef == nullptr || listenerMethod == nullptr)
     {
         ChipLogError(Controller, "No listener registered for %sCredentialsNeeded", isWiFi ? "WiFi" : "Thread");
-        chip::Platform::Delete(callbackContext);
         return;
     }
 
@@ -1300,8 +1304,6 @@ void AndroidDeviceControllerWrapper::HandleCredentialsNeededCallback(intptr_t co
         if (listenerObject == nullptr)
         {
             ChipLogError(Controller, "Failed to create local listener reference");
-            callbackContext->listenerObject.Reset();
-            chip::Platform::Delete(callbackContext);
             return;
         }
 
@@ -1316,9 +1318,6 @@ void AndroidDeviceControllerWrapper::HandleCredentialsNeededCallback(intptr_t co
 
         env->DeleteLocalRef(listenerObject);
     }
-
-    callbackContext->listenerObject.Reset();
-    chip::Platform::Delete(callbackContext);
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
