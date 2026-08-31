@@ -112,9 +112,8 @@ CHIP_ERROR Aggregator::Register(EndpointId endpoint, CodeDrivenDataModelProvider
     composition.pattern = DataModel::EndpointCompositionPattern::kFullFamily;
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance()
-                                .MakeConfig(endpoint, mTimerDelegate)
-                                .WithDelegate(&GetIdentifyDelegate()));
+    mIdentifyCluster.Create(
+        PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate).WithDelegate(&GetIdentifyDelegate()));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));

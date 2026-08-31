@@ -40,9 +40,8 @@ CHIP_ERROR DimmableLoad::Register(chip::EndpointId endpoint, CodeDrivenDataModel
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance()
-                                .MakeConfig(endpoint, mContext.timerDelegate)
-                                .WithDelegate(&mIdentifyDelegate));
+    mIdentifyCluster.Create(
+        PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mContext.timerDelegate).WithDelegate(&mIdentifyDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mScenesTableProvider.SetEndpoint(endpoint);

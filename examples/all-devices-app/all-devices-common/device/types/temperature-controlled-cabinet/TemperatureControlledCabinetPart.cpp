@@ -41,9 +41,8 @@ CHIP_ERROR TemperatureControlledCabinetPart::Register(EndpointId endpoint, CodeD
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance()
-                                .MakeConfig(endpoint, mTimerDelegate)
-                                .WithDelegate(&mIdentifyDelegate));
+    mIdentifyCluster.Create(
+        PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mTimerDelegate).WithDelegate(&mIdentifyDelegate));
     mTemperatureControlCluster.Create(
         endpoint, BitFlags<Clusters::TemperatureControl::Feature>(Clusters::TemperatureControl::Feature::kTemperatureNumber),
         Clusters::TemperatureControlCluster::StartupConfiguration{

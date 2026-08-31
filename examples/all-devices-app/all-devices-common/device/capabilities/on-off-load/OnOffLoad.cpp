@@ -39,9 +39,8 @@ CHIP_ERROR OnOffLoad::Register(chip::EndpointId endpoint, CodeDrivenDataModelPro
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(PlatformIdentifyIntegration::GetInstance()
-                                .MakeConfig(endpoint, mContext.timerDelegate)
-                                .WithDelegate(&mIdentifyDelegate));
+    mIdentifyCluster.Create(
+        PlatformIdentifyIntegration::GetInstance().MakeConfig(endpoint, mContext.timerDelegate).WithDelegate(&mIdentifyDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mScenesTableProvider.SetEndpoint(endpoint);
