@@ -233,32 +233,6 @@ jobs:
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
-            - name: Build example Telink (tl321x) Lighting App with OTA (LZMA), Factory Data
-              # Run test for master and all PRs
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tl3218x-light-ota-compress-lzma-factory-data' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tl3218x light-app-ota-compress-lzma-factory-data \
-                    out/telink-tl3218x-light-ota-compress-lzma-factory-data/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
-
-            - name: clean out build output (keep tools)
-              run: rm -rf ./out/telink*
-
-            - name: Build example Telink (tl321x_retention) Light Switch App with OTA, Factory Data
-              # Run test for master and all PRs
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tl3218x_retention-light-switch-ota' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tl3218x_retention light-switch-app-ota \
-                    out/telink-tl3218x_retention-light-switch-ota/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
-
-            - name: clean out build output (keep tools)
-              run: rm -rf ./out/telink*
-
             - name: Build example Telink (tl721x) Lighting App with OTA (LZMA), Shell, Factory Data
               # Run test for master and all PRs
               run: |
@@ -326,15 +300,15 @@ jobs:
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
-            - name: Build example Telink (tl321x) OTA Requestor App
+            - name: Build example Telink (tl721x) OTA Requestor App
               # Run test for master and s07641069 PRs
               if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tl3218x-ota-requestor' build"
+                    "./scripts/build/build_examples.py --target 'telink-tl7218x-ota-requestor' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tl3218x ota-requestor-app \
-                    out/telink-tl3218x-ota-requestor/zephyr/zephyr.elf \
+                    telink tl7218x ota-requestor-app \
+                    out/telink-tl7218x-ota-requestor/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
