@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -25,7 +27,7 @@ import matter.tlv.TlvWriter
 class ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct(
   val role: UByte,
   val peerWiFiDevIK: ByteArray,
-  val pmk: ByteArray,
+  val pmk: ByteArray
 ) {
   override fun toString(): String = buildString {
     append("ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct {\n")
@@ -50,15 +52,12 @@ class ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct(
     private const val TAG_PEER_WI_FI_DEV_IK = 1
     private const val TAG_PMK = 2
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct {
       tlvReader.enterStructure(tlvTag)
       val role = tlvReader.getUByte(ContextSpecificTag(TAG_ROLE))
       val peerWiFiDevIK = tlvReader.getByteArray(ContextSpecificTag(TAG_PEER_WI_FI_DEV_IK))
       val pmk = tlvReader.getByteArray(ContextSpecificTag(TAG_PMK))
-
+      
       tlvReader.exitContainer()
 
       return ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct(role, peerWiFiDevIK, pmk)

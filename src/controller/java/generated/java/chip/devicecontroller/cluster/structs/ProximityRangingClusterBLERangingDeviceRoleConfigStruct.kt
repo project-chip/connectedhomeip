@@ -17,19 +17,21 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ProximityRangingClusterBLERangingDeviceRoleConfigStruct(
-  val role: UInt,
-  val peerBLEDeviceID: ULong,
-  val BLERBCSecurityMode: UInt,
-  val sessionKey: Optional<ByteArray>,
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ProximityRangingClusterBLERangingDeviceRoleConfigStruct (
+    val role: UInt,
+    val peerBLEDeviceID: ULong,
+    val BLERBCSecurityMode: UInt,
+    val sessionKey: Optional<ByteArray>) {
+  override fun toString(): String  = buildString {
     append("ProximityRangingClusterBLERangingDeviceRoleConfigStruct {\n")
     append("\trole : $role\n")
     append("\tpeerBLEDeviceID : $peerBLEDeviceID\n")
@@ -45,9 +47,9 @@ class ProximityRangingClusterBLERangingDeviceRoleConfigStruct(
       put(ContextSpecificTag(TAG_PEER_BLE_DEVICE_ID), peerBLEDeviceID)
       put(ContextSpecificTag(TAG_BLERBC_SECURITY_MODE), BLERBCSecurityMode)
       if (sessionKey.isPresent) {
-        val optsessionKey = sessionKey.get()
-        put(ContextSpecificTag(TAG_SESSION_KEY), optsessionKey)
-      }
+      val optsessionKey = sessionKey.get()
+      put(ContextSpecificTag(TAG_SESSION_KEY), optsessionKey)
+    }
       endStructure()
     }
   }
@@ -58,29 +60,20 @@ class ProximityRangingClusterBLERangingDeviceRoleConfigStruct(
     private const val TAG_BLERBC_SECURITY_MODE = 2
     private const val TAG_SESSION_KEY = 3
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): ProximityRangingClusterBLERangingDeviceRoleConfigStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ProximityRangingClusterBLERangingDeviceRoleConfigStruct {
       tlvReader.enterStructure(tlvTag)
       val role = tlvReader.getUInt(ContextSpecificTag(TAG_ROLE))
       val peerBLEDeviceID = tlvReader.getULong(ContextSpecificTag(TAG_PEER_BLE_DEVICE_ID))
       val BLERBCSecurityMode = tlvReader.getUInt(ContextSpecificTag(TAG_BLERBC_SECURITY_MODE))
-      val sessionKey =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SESSION_KEY))) {
-          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_SESSION_KEY)))
-        } else {
-          Optional.empty()
-        }
-
+      val sessionKey = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SESSION_KEY))) {
+      Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_SESSION_KEY)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
-      return ProximityRangingClusterBLERangingDeviceRoleConfigStruct(
-        role,
-        peerBLEDeviceID,
-        BLERBCSecurityMode,
-        sessionKey,
-      )
+      return ProximityRangingClusterBLERangingDeviceRoleConfigStruct(role, peerBLEDeviceID, BLERBCSecurityMode, sessionKey)
     }
   }
 }

@@ -96,7 +96,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::ProximityRanging::Commands::StartRangingResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };

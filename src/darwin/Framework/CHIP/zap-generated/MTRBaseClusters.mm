@@ -94030,7 +94030,7 @@ public:
 
 @implementation MTRBaseClusterProximityRanging
 
-- (void)startRangingRequestWithParams:(MTRProximityRangingClusterStartRangingRequestParams *)params completion:(MTRStatusCompletion)completion
+- (void)startRangingRequestWithParams:(MTRProximityRangingClusterStartRangingRequestParams *)params completion:(void (^)(MTRProximityRangingClusterStartRangingResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
         params = [[MTRProximityRangingClusterStartRangingRequestParams
@@ -94038,7 +94038,7 @@ public:
     }
 
     auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        completion(error);
+        completion(response, error);
     };
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
@@ -94050,7 +94050,7 @@ public:
                                     commandPayload:params
                                 timedInvokeTimeout:timedInvokeTimeoutMs
                        serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:nil
+                                     responseClass:MTRProximityRangingClusterStartRangingResponseParams.class
                                              queue:self.callbackQueue
                                         completion:responseHandler];
 }

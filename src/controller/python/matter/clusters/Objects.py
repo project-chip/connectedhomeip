@@ -45324,7 +45324,7 @@ class ProximityRanging(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000433
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[typing.Optional[str]] = None
+            response_type: typing.ClassVar[str] = 'StartRangingResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:

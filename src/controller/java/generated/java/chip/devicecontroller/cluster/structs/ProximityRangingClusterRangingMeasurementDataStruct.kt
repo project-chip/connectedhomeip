@@ -17,26 +17,28 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ProximityRangingClusterRangingMeasurementDataStruct(
-  val wiFiDevIK: Optional<ByteArray>,
-  val BLEDeviceID: Optional<ULong>,
-  val BLTDevIK: Optional<ByteArray>,
-  val timeOfMeasurement: Optional<ULong>,
-  val timeOfMeasurementOffset: Optional<ULong>,
-  val distance: UInt?,
-  val errorMargin: Optional<UInt>,
-  val rdr: Optional<ProximityRangingClusterRDRStruct>,
-  val detectedAttackLevel: Optional<UInt>,
-  val rssi: Optional<Int>?,
-  val txPower: Optional<Int>?,
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ProximityRangingClusterRangingMeasurementDataStruct (
+    val wiFiDevIK: Optional<ByteArray>,
+    val BLEDeviceID: Optional<ULong>,
+    val BLTDevIK: Optional<ByteArray>,
+    val timeOfMeasurement: Optional<ULong>,
+    val timeOfMeasurementOffset: Optional<ULong>,
+    val distance: UInt?,
+    val errorMargin: Optional<UInt>,
+    val rdr: Optional<ProximityRangingClusterRDRStruct>,
+    val detectedAttackLevel: Optional<UInt>,
+    val rssi: Optional<Int>?,
+    val txPower: Optional<Int>?) {
+  override fun toString(): String  = buildString {
     append("ProximityRangingClusterRangingMeasurementDataStruct {\n")
     append("\twiFiDevIK : $wiFiDevIK\n")
     append("\tBLEDeviceID : $BLEDeviceID\n")
@@ -56,58 +58,58 @@ class ProximityRangingClusterRangingMeasurementDataStruct(
     tlvWriter.apply {
       startStructure(tlvTag)
       if (wiFiDevIK.isPresent) {
-        val optwiFiDevIK = wiFiDevIK.get()
-        put(ContextSpecificTag(TAG_WI_FI_DEV_IK), optwiFiDevIK)
-      }
+      val optwiFiDevIK = wiFiDevIK.get()
+      put(ContextSpecificTag(TAG_WI_FI_DEV_IK), optwiFiDevIK)
+    }
       if (BLEDeviceID.isPresent) {
-        val optBLEDeviceID = BLEDeviceID.get()
-        put(ContextSpecificTag(TAG_BLE_DEVICE_ID), optBLEDeviceID)
-      }
+      val optBLEDeviceID = BLEDeviceID.get()
+      put(ContextSpecificTag(TAG_BLE_DEVICE_ID), optBLEDeviceID)
+    }
       if (BLTDevIK.isPresent) {
-        val optBLTDevIK = BLTDevIK.get()
-        put(ContextSpecificTag(TAG_BLT_DEV_IK), optBLTDevIK)
-      }
+      val optBLTDevIK = BLTDevIK.get()
+      put(ContextSpecificTag(TAG_BLT_DEV_IK), optBLTDevIK)
+    }
       if (timeOfMeasurement.isPresent) {
-        val opttimeOfMeasurement = timeOfMeasurement.get()
-        put(ContextSpecificTag(TAG_TIME_OF_MEASUREMENT), opttimeOfMeasurement)
-      }
+      val opttimeOfMeasurement = timeOfMeasurement.get()
+      put(ContextSpecificTag(TAG_TIME_OF_MEASUREMENT), opttimeOfMeasurement)
+    }
       if (timeOfMeasurementOffset.isPresent) {
-        val opttimeOfMeasurementOffset = timeOfMeasurementOffset.get()
-        put(ContextSpecificTag(TAG_TIME_OF_MEASUREMENT_OFFSET), opttimeOfMeasurementOffset)
-      }
+      val opttimeOfMeasurementOffset = timeOfMeasurementOffset.get()
+      put(ContextSpecificTag(TAG_TIME_OF_MEASUREMENT_OFFSET), opttimeOfMeasurementOffset)
+    }
       if (distance != null) {
-        put(ContextSpecificTag(TAG_DISTANCE), distance)
-      } else {
-        putNull(ContextSpecificTag(TAG_DISTANCE))
-      }
+      put(ContextSpecificTag(TAG_DISTANCE), distance)
+    } else {
+      putNull(ContextSpecificTag(TAG_DISTANCE))
+    }
       if (errorMargin.isPresent) {
-        val opterrorMargin = errorMargin.get()
-        put(ContextSpecificTag(TAG_ERROR_MARGIN), opterrorMargin)
-      }
+      val opterrorMargin = errorMargin.get()
+      put(ContextSpecificTag(TAG_ERROR_MARGIN), opterrorMargin)
+    }
       if (rdr.isPresent) {
-        val optrdr = rdr.get()
-        optrdr.toTlv(ContextSpecificTag(TAG_RDR), this)
-      }
+      val optrdr = rdr.get()
+      optrdr.toTlv(ContextSpecificTag(TAG_RDR), this)
+    }
       if (detectedAttackLevel.isPresent) {
-        val optdetectedAttackLevel = detectedAttackLevel.get()
-        put(ContextSpecificTag(TAG_DETECTED_ATTACK_LEVEL), optdetectedAttackLevel)
-      }
+      val optdetectedAttackLevel = detectedAttackLevel.get()
+      put(ContextSpecificTag(TAG_DETECTED_ATTACK_LEVEL), optdetectedAttackLevel)
+    }
       if (rssi != null) {
-        if (rssi.isPresent) {
-          val optrssi = rssi.get()
-          put(ContextSpecificTag(TAG_RSSI), optrssi)
-        }
-      } else {
-        putNull(ContextSpecificTag(TAG_RSSI))
-      }
+      if (rssi.isPresent) {
+      val optrssi = rssi.get()
+      put(ContextSpecificTag(TAG_RSSI), optrssi)
+    }
+    } else {
+      putNull(ContextSpecificTag(TAG_RSSI))
+    }
       if (txPower != null) {
-        if (txPower.isPresent) {
-          val opttxPower = txPower.get()
-          put(ContextSpecificTag(TAG_TX_POWER), opttxPower)
-        }
-      } else {
-        putNull(ContextSpecificTag(TAG_TX_POWER))
-      }
+      if (txPower.isPresent) {
+      val opttxPower = txPower.get()
+      put(ContextSpecificTag(TAG_TX_POWER), opttxPower)
+    }
+    } else {
+      putNull(ContextSpecificTag(TAG_TX_POWER))
+    }
       endStructure()
     }
   }
@@ -125,106 +127,78 @@ class ProximityRangingClusterRangingMeasurementDataStruct(
     private const val TAG_RSSI = 9
     private const val TAG_TX_POWER = 10
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): ProximityRangingClusterRangingMeasurementDataStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ProximityRangingClusterRangingMeasurementDataStruct {
       tlvReader.enterStructure(tlvTag)
-      val wiFiDevIK =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_WI_FI_DEV_IK))) {
-          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_WI_FI_DEV_IK)))
-        } else {
-          Optional.empty()
-        }
-      val BLEDeviceID =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_BLE_DEVICE_ID))) {
-          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_BLE_DEVICE_ID)))
-        } else {
-          Optional.empty()
-        }
-      val BLTDevIK =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_BLT_DEV_IK))) {
-          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_BLT_DEV_IK)))
-        } else {
-          Optional.empty()
-        }
-      val timeOfMeasurement =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_TIME_OF_MEASUREMENT))) {
-          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_TIME_OF_MEASUREMENT)))
-        } else {
-          Optional.empty()
-        }
-      val timeOfMeasurementOffset =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_TIME_OF_MEASUREMENT_OFFSET))) {
-          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_TIME_OF_MEASUREMENT_OFFSET)))
-        } else {
-          Optional.empty()
-        }
-      val distance =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_DISTANCE))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_DISTANCE))
-          null
-        }
-      val errorMargin =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ERROR_MARGIN))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ERROR_MARGIN)))
-        } else {
-          Optional.empty()
-        }
-      val rdr =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_RDR))) {
-          Optional.of(
-            ProximityRangingClusterRDRStruct.fromTlv(ContextSpecificTag(TAG_RDR), tlvReader)
-          )
-        } else {
-          Optional.empty()
-        }
-      val detectedAttackLevel =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_DETECTED_ATTACK_LEVEL))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_DETECTED_ATTACK_LEVEL)))
-        } else {
-          Optional.empty()
-        }
-      val rssi =
-        if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(ContextSpecificTag(TAG_RSSI))) {
-            Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_RSSI)))
-          } else {
-            Optional.empty()
-          }
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_RSSI))
-          null
-        }
-      val txPower =
-        if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(ContextSpecificTag(TAG_TX_POWER))) {
-            Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_TX_POWER)))
-          } else {
-            Optional.empty()
-          }
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_TX_POWER))
-          null
-        }
-
+      val wiFiDevIK = if (tlvReader.isNextTag(ContextSpecificTag(TAG_WI_FI_DEV_IK))) {
+      Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_WI_FI_DEV_IK)))
+    } else {
+      Optional.empty()
+    }
+      val BLEDeviceID = if (tlvReader.isNextTag(ContextSpecificTag(TAG_BLE_DEVICE_ID))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_BLE_DEVICE_ID)))
+    } else {
+      Optional.empty()
+    }
+      val BLTDevIK = if (tlvReader.isNextTag(ContextSpecificTag(TAG_BLT_DEV_IK))) {
+      Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_BLT_DEV_IK)))
+    } else {
+      Optional.empty()
+    }
+      val timeOfMeasurement = if (tlvReader.isNextTag(ContextSpecificTag(TAG_TIME_OF_MEASUREMENT))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_TIME_OF_MEASUREMENT)))
+    } else {
+      Optional.empty()
+    }
+      val timeOfMeasurementOffset = if (tlvReader.isNextTag(ContextSpecificTag(TAG_TIME_OF_MEASUREMENT_OFFSET))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_TIME_OF_MEASUREMENT_OFFSET)))
+    } else {
+      Optional.empty()
+    }
+      val distance = if (!tlvReader.isNull()) {
+      tlvReader.getUInt(ContextSpecificTag(TAG_DISTANCE))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_DISTANCE))
+      null
+    }
+      val errorMargin = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ERROR_MARGIN))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ERROR_MARGIN)))
+    } else {
+      Optional.empty()
+    }
+      val rdr = if (tlvReader.isNextTag(ContextSpecificTag(TAG_RDR))) {
+      Optional.of(ProximityRangingClusterRDRStruct.fromTlv(ContextSpecificTag(TAG_RDR), tlvReader))
+    } else {
+      Optional.empty()
+    }
+      val detectedAttackLevel = if (tlvReader.isNextTag(ContextSpecificTag(TAG_DETECTED_ATTACK_LEVEL))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_DETECTED_ATTACK_LEVEL)))
+    } else {
+      Optional.empty()
+    }
+      val rssi = if (!tlvReader.isNull()) {
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_RSSI))) {
+      Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_RSSI)))
+    } else {
+      Optional.empty()
+    }
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_RSSI))
+      null
+    }
+      val txPower = if (!tlvReader.isNull()) {
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_TX_POWER))) {
+      Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_TX_POWER)))
+    } else {
+      Optional.empty()
+    }
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_TX_POWER))
+      null
+    }
+      
       tlvReader.exitContainer()
 
-      return ProximityRangingClusterRangingMeasurementDataStruct(
-        wiFiDevIK,
-        BLEDeviceID,
-        BLTDevIK,
-        timeOfMeasurement,
-        timeOfMeasurementOffset,
-        distance,
-        errorMargin,
-        rdr,
-        detectedAttackLevel,
-        rssi,
-        txPower,
-      )
+      return ProximityRangingClusterRangingMeasurementDataStruct(wiFiDevIK, BLEDeviceID, BLTDevIK, timeOfMeasurement, timeOfMeasurementOffset, distance, errorMargin, rdr, detectedAttackLevel, rssi, txPower)
     }
   }
 }

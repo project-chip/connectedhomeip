@@ -17,22 +17,24 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ProximityRangingClusterRangingCapabilitiesStruct(
-  val technology: UInt,
-  val frequencyBand: UInt,
-  val bandwidth: ULong,
-  val supportedRangingRoles: UInt,
-  val RDRCapability: UInt,
-  val periodicRangingSupport: Boolean,
-  val maxConcurrentSessions: Optional<UInt>,
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ProximityRangingClusterRangingCapabilitiesStruct (
+    val technology: UInt,
+    val frequencyBand: UInt,
+    val bandwidth: ULong,
+    val supportedRangingRoles: UInt,
+    val RDRCapability: UInt,
+    val periodicRangingSupport: Boolean,
+    val maxConcurrentSessions: Optional<UInt>) {
+  override fun toString(): String  = buildString {
     append("ProximityRangingClusterRangingCapabilitiesStruct {\n")
     append("\ttechnology : $technology\n")
     append("\tfrequencyBand : $frequencyBand\n")
@@ -54,9 +56,9 @@ class ProximityRangingClusterRangingCapabilitiesStruct(
       put(ContextSpecificTag(TAG_RDR_CAPABILITY), RDRCapability)
       put(ContextSpecificTag(TAG_PERIODIC_RANGING_SUPPORT), periodicRangingSupport)
       if (maxConcurrentSessions.isPresent) {
-        val optmaxConcurrentSessions = maxConcurrentSessions.get()
-        put(ContextSpecificTag(TAG_MAX_CONCURRENT_SESSIONS), optmaxConcurrentSessions)
-      }
+      val optmaxConcurrentSessions = maxConcurrentSessions.get()
+      put(ContextSpecificTag(TAG_MAX_CONCURRENT_SESSIONS), optmaxConcurrentSessions)
+    }
       endStructure()
     }
   }
@@ -70,36 +72,23 @@ class ProximityRangingClusterRangingCapabilitiesStruct(
     private const val TAG_PERIODIC_RANGING_SUPPORT = 5
     private const val TAG_MAX_CONCURRENT_SESSIONS = 6
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): ProximityRangingClusterRangingCapabilitiesStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ProximityRangingClusterRangingCapabilitiesStruct {
       tlvReader.enterStructure(tlvTag)
       val technology = tlvReader.getUInt(ContextSpecificTag(TAG_TECHNOLOGY))
       val frequencyBand = tlvReader.getUInt(ContextSpecificTag(TAG_FREQUENCY_BAND))
       val bandwidth = tlvReader.getULong(ContextSpecificTag(TAG_BANDWIDTH))
       val supportedRangingRoles = tlvReader.getUInt(ContextSpecificTag(TAG_SUPPORTED_RANGING_ROLES))
       val RDRCapability = tlvReader.getUInt(ContextSpecificTag(TAG_RDR_CAPABILITY))
-      val periodicRangingSupport =
-        tlvReader.getBoolean(ContextSpecificTag(TAG_PERIODIC_RANGING_SUPPORT))
-      val maxConcurrentSessions =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAX_CONCURRENT_SESSIONS))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MAX_CONCURRENT_SESSIONS)))
-        } else {
-          Optional.empty()
-        }
-
+      val periodicRangingSupport = tlvReader.getBoolean(ContextSpecificTag(TAG_PERIODIC_RANGING_SUPPORT))
+      val maxConcurrentSessions = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAX_CONCURRENT_SESSIONS))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MAX_CONCURRENT_SESSIONS)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
-      return ProximityRangingClusterRangingCapabilitiesStruct(
-        technology,
-        frequencyBand,
-        bandwidth,
-        supportedRangingRoles,
-        RDRCapability,
-        periodicRangingSupport,
-        maxConcurrentSessions,
-      )
+      return ProximityRangingClusterRangingCapabilitiesStruct(technology, frequencyBand, bandwidth, supportedRangingRoles, RDRCapability, periodicRangingSupport, maxConcurrentSessions)
     }
   }
 }

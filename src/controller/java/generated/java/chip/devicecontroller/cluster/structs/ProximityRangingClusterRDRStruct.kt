@@ -17,19 +17,22 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ProximityRangingClusterRDRStruct(
-  val azimuth: UInt,
-  val elevation: Int,
-  val azimuthAccuracy: UInt,
-  val elevationAccuracy: UInt,
-  val reference: UInt,
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ProximityRangingClusterRDRStruct (
+    val azimuth: UInt,
+    val elevation: Int,
+    val azimuthAccuracy: UInt,
+    val elevationAccuracy: UInt,
+    val reference: UInt) {
+  override fun toString(): String  = buildString {
     append("ProximityRangingClusterRDRStruct {\n")
     append("\tazimuth : $azimuth\n")
     append("\televation : $elevation\n")
@@ -58,23 +61,17 @@ class ProximityRangingClusterRDRStruct(
     private const val TAG_ELEVATION_ACCURACY = 3
     private const val TAG_REFERENCE = 4
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ProximityRangingClusterRDRStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ProximityRangingClusterRDRStruct {
       tlvReader.enterStructure(tlvTag)
       val azimuth = tlvReader.getUInt(ContextSpecificTag(TAG_AZIMUTH))
       val elevation = tlvReader.getInt(ContextSpecificTag(TAG_ELEVATION))
       val azimuthAccuracy = tlvReader.getUInt(ContextSpecificTag(TAG_AZIMUTH_ACCURACY))
       val elevationAccuracy = tlvReader.getUInt(ContextSpecificTag(TAG_ELEVATION_ACCURACY))
       val reference = tlvReader.getUInt(ContextSpecificTag(TAG_REFERENCE))
-
+      
       tlvReader.exitContainer()
 
-      return ProximityRangingClusterRDRStruct(
-        azimuth,
-        elevation,
-        azimuthAccuracy,
-        elevationAccuracy,
-        reference,
-      )
+      return ProximityRangingClusterRDRStruct(azimuth, elevation, azimuthAccuracy, elevationAccuracy, reference)
     }
   }
 }

@@ -55513,11 +55513,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void startRangingRequest(DefaultClusterCallback callback, Integer technology, Optional<ChipStructs.ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct> wiFiRangingDeviceRoleConfig, Optional<ChipStructs.ProximityRangingClusterBLERangingDeviceRoleConfigStruct> BLERangingDeviceRoleConfig, Optional<ChipStructs.ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct> BLTChannelSoundingDeviceRoleConfig, Optional<Integer> frequencyBand, Optional<Long> bandwidth, ChipStructs.ProximityRangingClusterRangingTriggerConditionStruct trigger, Optional<ChipStructs.ProximityRangingClusterReportingConditionStruct> reportingCondition) {
+    public void startRangingRequest(StartRangingResponseCallback callback, Integer technology, Optional<ChipStructs.ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct> wiFiRangingDeviceRoleConfig, Optional<ChipStructs.ProximityRangingClusterBLERangingDeviceRoleConfigStruct> BLERangingDeviceRoleConfig, Optional<ChipStructs.ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct> BLTChannelSoundingDeviceRoleConfig, Optional<Integer> frequencyBand, Optional<Long> bandwidth, ChipStructs.ProximityRangingClusterRangingTriggerConditionStruct trigger, Optional<ChipStructs.ProximityRangingClusterReportingConditionStruct> reportingCondition) {
       startRangingRequest(callback, technology, wiFiRangingDeviceRoleConfig, BLERangingDeviceRoleConfig, BLTChannelSoundingDeviceRoleConfig, frequencyBand, bandwidth, trigger, reportingCondition, 0);
     }
 
-    public void startRangingRequest(DefaultClusterCallback callback, Integer technology, Optional<ChipStructs.ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct> wiFiRangingDeviceRoleConfig, Optional<ChipStructs.ProximityRangingClusterBLERangingDeviceRoleConfigStruct> BLERangingDeviceRoleConfig, Optional<ChipStructs.ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct> BLTChannelSoundingDeviceRoleConfig, Optional<Integer> frequencyBand, Optional<Long> bandwidth, ChipStructs.ProximityRangingClusterRangingTriggerConditionStruct trigger, Optional<ChipStructs.ProximityRangingClusterReportingConditionStruct> reportingCondition, int timedInvokeTimeoutMs) {
+    public void startRangingRequest(StartRangingResponseCallback callback, Integer technology, Optional<ChipStructs.ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct> wiFiRangingDeviceRoleConfig, Optional<ChipStructs.ProximityRangingClusterBLERangingDeviceRoleConfigStruct> BLERangingDeviceRoleConfig, Optional<ChipStructs.ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct> BLTChannelSoundingDeviceRoleConfig, Optional<Integer> frequencyBand, Optional<Long> bandwidth, ChipStructs.ProximityRangingClusterRangingTriggerConditionStruct trigger, Optional<ChipStructs.ProximityRangingClusterReportingConditionStruct> reportingCondition, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -55557,7 +55557,17 @@ public class ChipClusters {
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
+          final long sessionIDFieldID = 0L;
+          Integer sessionID = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == sessionIDFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                sessionID = castingValue.value(Integer.class);
+              }
+            }
+          }
+          callback.onSuccess(sessionID);
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
@@ -55579,6 +55589,10 @@ public class ChipClusters {
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public interface StartRangingResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer sessionID);
     }
 
     public interface RangingCapabilitiesAttributeCallback extends BaseAttributeCallback {

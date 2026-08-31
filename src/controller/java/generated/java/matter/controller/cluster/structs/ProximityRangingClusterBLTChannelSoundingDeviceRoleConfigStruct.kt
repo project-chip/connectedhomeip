@@ -18,6 +18,7 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -28,7 +29,7 @@ class ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct(
   val peerBLTDevIK: ByteArray,
   val BLTCSMode: Optional<UByte>,
   val BLTCSSecurityLevel: UByte,
-  val ltk: ByteArray,
+  val ltk: ByteArray
 ) {
   override fun toString(): String = buildString {
     append("ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct {\n")
@@ -62,31 +63,21 @@ class ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct(
     private const val TAG_BLTCS_SECURITY_LEVEL = 3
     private const val TAG_LTK = 4
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct {
       tlvReader.enterStructure(tlvTag)
       val role = tlvReader.getUByte(ContextSpecificTag(TAG_ROLE))
       val peerBLTDevIK = tlvReader.getByteArray(ContextSpecificTag(TAG_PEER_BLT_DEV_IK))
-      val BLTCSMode =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_BLTCS_MODE))) {
-          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_BLTCS_MODE)))
-        } else {
-          Optional.empty()
-        }
+      val BLTCSMode = if (tlvReader.isNextTag(ContextSpecificTag(TAG_BLTCS_MODE))) {
+      Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_BLTCS_MODE)))
+    } else {
+      Optional.empty()
+    }
       val BLTCSSecurityLevel = tlvReader.getUByte(ContextSpecificTag(TAG_BLTCS_SECURITY_LEVEL))
       val ltk = tlvReader.getByteArray(ContextSpecificTag(TAG_LTK))
-
+      
       tlvReader.exitContainer()
 
-      return ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct(
-        role,
-        peerBLTDevIK,
-        BLTCSMode,
-        BLTCSSecurityLevel,
-        ltk,
-      )
+      return ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct(role, peerBLTDevIK, BLTCSMode, BLTCSSecurityLevel, ltk)
     }
   }
 }

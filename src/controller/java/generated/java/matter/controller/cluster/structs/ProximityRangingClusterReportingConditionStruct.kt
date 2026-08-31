@@ -18,6 +18,7 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -26,7 +27,7 @@ import matter.tlv.TlvWriter
 class ProximityRangingClusterReportingConditionStruct(
   val minDistanceCondition: Optional<UShort>,
   val maxDistanceCondition: Optional<UShort>,
-  val errorMarginCondition: Optional<UShort>,
+  val errorMarginCondition: Optional<UShort>
 ) {
   override fun toString(): String = buildString {
     append("ProximityRangingClusterReportingConditionStruct {\n")
@@ -60,37 +61,27 @@ class ProximityRangingClusterReportingConditionStruct(
     private const val TAG_MAX_DISTANCE_CONDITION = 1
     private const val TAG_ERROR_MARGIN_CONDITION = 2
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): ProximityRangingClusterReportingConditionStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ProximityRangingClusterReportingConditionStruct {
       tlvReader.enterStructure(tlvTag)
-      val minDistanceCondition =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MIN_DISTANCE_CONDITION))) {
-          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_MIN_DISTANCE_CONDITION)))
-        } else {
-          Optional.empty()
-        }
-      val maxDistanceCondition =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAX_DISTANCE_CONDITION))) {
-          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_MAX_DISTANCE_CONDITION)))
-        } else {
-          Optional.empty()
-        }
-      val errorMarginCondition =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ERROR_MARGIN_CONDITION))) {
-          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_ERROR_MARGIN_CONDITION)))
-        } else {
-          Optional.empty()
-        }
-
+      val minDistanceCondition = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MIN_DISTANCE_CONDITION))) {
+      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_MIN_DISTANCE_CONDITION)))
+    } else {
+      Optional.empty()
+    }
+      val maxDistanceCondition = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAX_DISTANCE_CONDITION))) {
+      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_MAX_DISTANCE_CONDITION)))
+    } else {
+      Optional.empty()
+    }
+      val errorMarginCondition = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ERROR_MARGIN_CONDITION))) {
+      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_ERROR_MARGIN_CONDITION)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
-      return ProximityRangingClusterReportingConditionStruct(
-        minDistanceCondition,
-        maxDistanceCondition,
-        errorMarginCondition,
-      )
+      return ProximityRangingClusterReportingConditionStruct(minDistanceCondition, maxDistanceCondition, errorMarginCondition)
     }
   }
 }

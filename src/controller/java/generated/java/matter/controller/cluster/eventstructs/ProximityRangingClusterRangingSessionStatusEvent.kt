@@ -16,13 +16,18 @@
  */
 package matter.controller.cluster.eventstructs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ProximityRangingClusterRangingSessionStatusEvent(val sessionID: UByte, val status: UByte) {
+class ProximityRangingClusterRangingSessionStatusEvent(
+  val sessionID: UByte,
+  val status: UByte
+) {
   override fun toString(): String = buildString {
     append("ProximityRangingClusterRangingSessionStatusEvent {\n")
     append("\tsessionID : $sessionID\n")
@@ -43,14 +48,11 @@ class ProximityRangingClusterRangingSessionStatusEvent(val sessionID: UByte, val
     private const val TAG_SESSION_ID = 0
     private const val TAG_STATUS = 1
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): ProximityRangingClusterRangingSessionStatusEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ProximityRangingClusterRangingSessionStatusEvent {
       tlvReader.enterStructure(tlvTag)
       val sessionID = tlvReader.getUByte(ContextSpecificTag(TAG_SESSION_ID))
       val status = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
-
+      
       tlvReader.exitContainer()
 
       return ProximityRangingClusterRangingSessionStatusEvent(sessionID, status)

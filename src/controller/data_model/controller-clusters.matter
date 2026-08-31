@@ -9599,7 +9599,7 @@ provisional cluster ProximityRanging = 1075 {
   }
 
   /** This command allows the Client to request the start of a ranging session. */
-  command StartRangingRequest(StartRangingRequestRequest): DefaultSuccess = 0;
+  command StartRangingRequest(StartRangingRequestRequest): StartRangingResponse = 0;
   /** This command allows the Client to request the termination of an active proximity ranging session. */
   command StopRangingRequest(StopRangingRequestRequest): DefaultSuccess = 2;
 }
