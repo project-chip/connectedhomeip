@@ -20,6 +20,7 @@
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
 #include <app/SafeAttributePersistenceProvider.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
@@ -297,6 +298,10 @@ void InitServer(intptr_t context)
         return;
     }
 
+    // Initialize the test event trigger delegate
+    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate;
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
+
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
         .groupDataProvider      = gGroupDataProvider,                     //
         .fabricTable            = Server::GetInstance().GetFabricTable(), //
@@ -307,6 +312,7 @@ void InitServer(intptr_t context)
         .failSafeContext        = Server::GetInstance().GetFailSafeContext(),
         .bindingTable           = Clusters::Binding::Table::GetInstance(),
         .bindingManager         = Clusters::Binding::Manager::GetInstance(),
+        .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,
     });
 
 #if ALL_DEVICES_ENABLE_DIMMABLE_LIGHT

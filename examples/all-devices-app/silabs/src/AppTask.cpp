@@ -35,6 +35,7 @@
 
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -192,6 +193,9 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     chip::app::ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
     ReturnErrorOnFailure(sRootNode->Register(rootAllocator, *sDataModelProvider));
 
+    // Initialize the test event trigger delegate
+    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate;
+
     chip::app::DeviceFactory::GetInstance().Init(chip::app::DeviceFactory::Context{
         .groupDataProvider      = *groupDataProvider,
         .fabricTable            = chip::Server::GetInstance().GetFabricTable(),
@@ -202,6 +206,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         .failSafeContext        = chip::Server::GetInstance().GetFailSafeContext(),
         .bindingTable           = chip::app::Clusters::Binding::Table::GetInstance(),
         .bindingManager         = chip::app::Clusters::Binding::Manager::GetInstance(),
+        .testEventTriggerDelegate = sTestEventTriggerDelegate,
     });
 
     std::string deviceType = chip::app::DeviceFactory::GetInstance().GetDefaultDevice();

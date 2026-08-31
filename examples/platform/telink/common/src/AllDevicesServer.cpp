@@ -23,6 +23,7 @@
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/GroupDataProviderImpl.h>
@@ -149,6 +150,9 @@ CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams 
         std::make_unique<CodeDrivenDataModelProvider>(*initParams.persistentStorageDelegate, gAttributePersistenceProvider);
     VerifyOrReturnError(gDataModelProvider != nullptr, CHIP_ERROR_NO_MEMORY);
 
+    static SimpleTestEventTriggerDelegate testEventTriggerDelegate;
+    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
+
     ReturnErrorOnFailure(CreateAndRegisterRootNode(initParams));
 
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
@@ -161,6 +165,7 @@ CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams 
         .failSafeContext        = Server::GetInstance().GetFailSafeContext(),
         .bindingTable           = Clusters::Binding::Table::GetInstance(),
         .bindingManager         = Clusters::Binding::Manager::GetInstance(),
+        .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,
     });
 
     VerifyOrReturnError(!gDeviceType.empty(), CHIP_ERROR_INVALID_ARGUMENT);
