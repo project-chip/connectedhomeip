@@ -913,34 +913,6 @@ Status DeviceEnergyManagementDelegate::PowerRangeAdjustRequest(const DataModel::
 }
 
 /**
- * @brief Handle a PowerRangeAdjustRequest failing
- *
- *  Cleans up the PowerRangeAdjust state when the active request needs to be cancelled.
- *  This is called when an explicit cancellation occurs or when the timer expires abnormally.
- *
- *  If the manufacturer was notified of an active PRA (indicated by mPowerRangeAdjustmentInProgress
- *  being true), cancel the adjustment on the manufacturer side before clearing local state.
- */
-void DeviceEnergyManagementDelegate::HandlePowerRangeAdjustRequestFailure()
-{
-    DeviceLayer::SystemLayer().CancelTimer(PowerRangeAdjustTimerExpiry, this);
-    TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kOnline);
-
-    // If a timer is in progress, the manufacturer was notified and the request was active.
-    // Cancel it before clearing local state.
-    if (mPowerRangeAdjustmentInProgress && mpDEMManufacturerDelegate != nullptr)
-    {
-        TEMPORARY_RETURN_IGNORED mpDEMManufacturerDelegate->HandleDeviceEnergyManagementCancelPowerRangeAdjustRequest(
-            CauseEnum::kCancelled);
-    }
-
-    mPowerRangeAdjustment.SetNull();
-    mPowerRangeAdjustmentInProgress = false;
-
-    MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, PowerRangeAdjustment::Id);
-}
-
-/**
  * @brief Timer for handling the PowerRangeAdjustRequest
  *
  * This static function calls the non-static HandlePowerRangeAdjustTimerExpiry method.
