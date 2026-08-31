@@ -58,6 +58,10 @@ config SYSTEM_WORKQUEUE_STACK_SIZE
     default 2560 if CHIP_WIFI
     default 2048 if CHIP_ICD_LIT_SUPPORT
 
+config NET_MGMT_EVENT_STACK_SIZE
+    default 2048 if CHIP_WIFI_PAF
+    default 1024
+
 if CHIP_WIFI
 
 config HEAP_MEM_POOL_SIZE

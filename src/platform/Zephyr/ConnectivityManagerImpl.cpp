@@ -114,6 +114,9 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     ReturnErrorOnFailure(InitWiFi());
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    ReturnErrorOnFailure(InitWiFiPAF());
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD || CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 #if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
@@ -147,6 +150,9 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_OnPlatformEvent(event);
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    OnWiFiPAFPlatformEvent(event);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 }
 
 } // namespace DeviceLayer
