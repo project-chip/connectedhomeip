@@ -52,14 +52,14 @@ public:
 
     void Dispatch()
     {
-        Cancelable ready;
+        CallbackDeque ready;
 
         DequeueAll(ready);
 
         // runs the ready list
-        while (ready.mNext != &ready)
+        while (!ready.IsEmpty())
         {
-            Callback<> * cb = Callback<>::FromCancelable(ready.mNext);
+            Callback<> * cb = Callback<>::FromCancelable(ready.First());
 
             // one-shot semantics
             cb->Cancel();
@@ -225,4 +225,54 @@ TEST_F(TestCHIPCallback, NotifierTest)
 
     cb.Cancel();
     cancelcb.Cancel();
+}
+
+// Verifies the mechanics of OperationalSessionSetup::NotifyRetryHandlers
+TEST_F(TestCHIPCallback, PersistentCallbacksThatDeallocateThemselves)
+{
+    CallbackDeque retryHandlers;
+
+    int stackCallbackCalled = 0;
+    Callback<> stackCallback{ [](void * context) { ++*static_cast<int *>(context); }, &stackCallbackCalled };
+    retryHandlers.Enqueue(stackCallback.Cancel());
+
+    int heapCallbackCalled = 0;
+    struct HeapCallback : public Callback<>
+    {
+        int * mCounter;
+        explicit HeapCallback(int * counter) : Callback(&run, this), mCounter(counter) {}
+        static void run(void * context)
+        {
+            HeapCallback * self = static_cast<HeapCallback *>(context);
+            ++*self->mCounter;
+            chip::Platform::Delete(self);
+        }
+    };
+    retryHandlers.Enqueue((chip::Platform::New<HeapCallback>(&heapCallbackCalled))->Cancel());
+
+    CallbackDeque retryHandlerListSnapshot;
+    retryHandlers.DequeueAll(retryHandlerListSnapshot);
+    while (!retryHandlerListSnapshot.IsEmpty())
+    {
+        auto * cb = Callback<>::FromCancelable(retryHandlerListSnapshot.First());
+
+        CallbackDeque currentCallbackHolder;
+        currentCallbackHolder.Enqueue(cb->Cancel());
+
+        cb->mCall(cb->mContext);
+
+        if (!currentCallbackHolder.IsEmpty()) // cb->IsRegistered() would be UAF for HeapCallback
+        {
+            // Callback has not been canceled as part of the call,
+            // so is still supposed to be registered with us.
+            retryHandlers.Enqueue(cb->Cancel());
+        }
+    }
+
+    EXPECT_TRUE(retryHandlerListSnapshot.IsEmpty());
+    EXPECT_EQ(stackCallbackCalled, 1);
+    EXPECT_EQ(heapCallbackCalled, 1);
+    EXPECT_FALSE(retryHandlers.IsEmpty()); // stack callback remains
+    stackCallback.Cancel();
+    EXPECT_TRUE(retryHandlers.IsEmpty());
 }
