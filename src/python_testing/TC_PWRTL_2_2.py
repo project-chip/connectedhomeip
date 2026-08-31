@@ -123,6 +123,11 @@ class TC_PWRTL_2_2(MatterBaseTest):
         entries_label_max = [CircuitNodeStruct(node=0x000000000000B001, label=label_128)]
         await self.write_single_attribute(
             attribute_value=attr(entries_label_max), endpoint_id=endpoint)
+        read_label_max = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr)
+        asserts.assert_equal(len(read_label_max), 1, 'Read-back must return the single entry written')
+        asserts.assert_equal(read_label_max[0].label, label_128,
+                             'Label must round-trip at the full 128 characters')
 
         self.step(7, "TH1 writes ElectricalCircuitNodes with a single entry whose Label is 129 characters, one over the "
                      "maximum",
