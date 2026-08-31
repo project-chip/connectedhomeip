@@ -295,6 +295,13 @@ endif # CHIP_FACTORY_DATA_NRFCONNECT_BACKEND
 config CHIP_FACTORY_RESET_ERASE_SETTINGS
 	default y if !CHIP_CRYPTO_PSA_DAC_PRIV_KEY_ITS || BUILD_WITH_TFM
 
+config CHIP_FACTORY_RESET_TIME_MEASUREMENT
+	bool "Measure time of factory reset"
+	help
+	  Enables measuring the time it takes to perform a factory reset. The time
+	  is measured from the moment the factory reset is scheduled until the
+	  device is shutdown. The measured time is printed in the log.
+
 config CHIP_CRYPTO_PSA_MIGRATE_DAC_PRIV_KEY
 	bool "Migrate DAC private key from factory data to a secure storage"
 	default y
