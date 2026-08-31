@@ -140,7 +140,8 @@ class TC_AVANALY_2_7(MatterBaseTest, AVANALYTestBase):
             asserts.assert_in((context_b.namespaceID, context_b.tag), new_tags_2,
                               "Context B not found in newIdentifiedContexts of event 2")
             if event2.currentIdentifiedContexts is not None:
-                current_tags_2 = [(tc.identifiedContext.namespaceID, tc.identifiedContext.tag) for tc in event2.currentIdentifiedContexts]
+                current_tags_2 = [(tc.identifiedContext.namespaceID, tc.identifiedContext.tag)
+                                  for tc in event2.currentIdentifiedContexts]
                 asserts.assert_in((context_a.namespaceID, context_a.tag), current_tags_2,
                                   "Context A not found in currentIdentifiedContexts of event 2")
         else:
@@ -162,7 +163,8 @@ class TC_AVANALY_2_7(MatterBaseTest, AVANALYTestBase):
             asserts.assert_in((context_a.namespaceID, context_a.tag), expired_tags_3,
                               "Context A not found in expiredContexts of event 3")
             if event3.currentIdentifiedContexts is not None:
-                current_tags_3 = [(tc.identifiedContext.namespaceID, tc.identifiedContext.tag) for tc in event3.currentIdentifiedContexts]
+                current_tags_3 = [(tc.identifiedContext.namespaceID, tc.identifiedContext.tag)
+                                  for tc in event3.currentIdentifiedContexts]
                 asserts.assert_in((context_b.namespaceID, context_b.tag), current_tags_3,
                                   "Context B not found in currentIdentifiedContexts of event 3")
         else:
