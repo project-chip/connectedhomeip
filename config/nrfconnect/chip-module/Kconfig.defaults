@@ -232,14 +232,7 @@ config BOOT_IMAGE_ACCESS_HOOKS
     default y if SOC_SERIES_NRF53
 
 config UPDATEABLE_IMAGE_NUMBER
-    default 3 if NRF_WIFI_PATCHES_EXT_FLASH_STORE
     default 2 if SOC_SERIES_NRF53
-
-config DFU_MULTI_IMAGE_MAX_IMAGE_COUNT
-    default 3 if NRF_WIFI_PATCHES_EXT_FLASH_STORE
-
-config NRF_WIFI_FW_PATCH_DFU
-    default y if NRF_WIFI_PATCHES_EXT_FLASH_STORE
 
 # ==============================================================================
 # OpenThread L2 configuration
