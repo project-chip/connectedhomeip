@@ -212,8 +212,8 @@ config CHIP_FACTORY_DATA_GENERATE_ONBOARDING_CODES
 	default y
 	help
 	  Enables generation of onboarding codes (manual pairing code and QR code)
-	  during the generation of a factory data set. You can provide the 
-	  onboarding codes a Matter controller to commission a device to a Matter 
+	  during the generation of a factory data set. You can provide the
+	  onboarding codes a Matter controller to commission a device to a Matter
 	  network.
 
 # Select source of the certificates
@@ -453,16 +453,16 @@ choice CHIP_WIFI_CRYPTO_BACKEND
 
 config CHIP_WIFI_CRYPTO_BACKEND_PSA
 	bool "Matter WiFi PSA crypto backend"
-    select PSA_WANT_ALG_ECDSA
-    select PSA_WANT_ALG_ECDH
-    select PSA_WANT_ECC_SECP_R1_256
-    select PSA_WANT_ALG_HKDF
-    select PSA_INTERNAL_TRUSTED_STORAGE
-    select MBEDTLS_PSA_CRYPTO_STORAGE_C if !BUILD_WITH_TFM
-    select TRUSTED_STORAGE if !BUILD_WITH_TFM
-    select HW_UNIQUE_KEY_WRITE_ON_CRYPTO_INIT if (SOC_NRF5340_CPUAPP || SOC_SERIES_NRF54L)
-    select MBEDTLS_PSA_CRYPTO_C
-    select PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_GENERATE
+	select PSA_WANT_ALG_ECDSA
+	select PSA_WANT_ALG_ECDH
+	select PSA_WANT_ECC_SECP_R1_256
+	select PSA_WANT_ALG_HKDF
+	select PSA_INTERNAL_TRUSTED_STORAGE
+	select MBEDTLS_PSA_CRYPTO_STORAGE_C if !BUILD_WITH_TFM
+	select TRUSTED_STORAGE if !BUILD_WITH_TFM
+	select HW_UNIQUE_KEY_WRITE_ON_CRYPTO_INIT if (SOC_NRF5340_CPUAPP || SOC_SERIES_NRF54L)
+	select MBEDTLS_PSA_CRYPTO_C
+	select PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_GENERATE
 	select PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_IMPORT
 	select PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_EXPORT
 	select PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_DERIVE
@@ -470,8 +470,7 @@ config CHIP_WIFI_CRYPTO_BACKEND_PSA
 config CHIP_WIFI_CRYPTO_BACKEND_MBEDTLS
 	bool "Matter WiFi mbedTLS crypto backend"
 	select MBEDTLS
-	imply NORDIC_SECURITY_BACKEND
-	imply MBEDTLS_PSA_CRYPTO_C
+	imply PSA_CRYPTO
 	imply MBEDTLS_PROMPTLESS
 
 endchoice
