@@ -127,7 +127,7 @@ class TestSpecParsingComposedDeviceTypes(DeviceConformanceTests):
         self.endpoints = {
             0: {
                 Clusters.BasicInformation: {
-                    Clusters.BasicInformation.Attributes.SpecificationVersion: 0x01060000
+                    Clusters.BasicInformation.Attributes.SpecificationVersion: 0x01070000
                 }
             },
             1: {

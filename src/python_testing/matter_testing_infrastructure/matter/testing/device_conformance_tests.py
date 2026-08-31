@@ -505,8 +505,8 @@ class DeviceConformanceTests(BasicCompositionTests):
         except KeyError:
             spec_version = 0
 
-        if spec_version < 0x01060000:
-            logger.info("Skipping flat model device type requirements check: this test is not enabled for versions below 1.6")
+        if spec_version < 0x01070000:
+            logger.info("Skipping flat model device type requirements check: this test is not enabled for versions below 1.7")
             return success, problems
 
         def record_error(location, problem):

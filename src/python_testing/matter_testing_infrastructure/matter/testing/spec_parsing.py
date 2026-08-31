@@ -345,8 +345,8 @@ class XmlComposedDeviceTypeRequirement:
     device_type_id: int
     device_type_name: str
     conformance: ConformanceCallable
-    min_instances: Optional[int] = None
-    max_instances: Optional[int] = None
+    min_instances: int | None = None
+    max_instances: int | None = None
     device_type_location: str = 'childEndpoint'
     cluster_requirements: dict[uint, XmlDeviceTypeClusterRequirements] = field(default_factory=dict)
 
