@@ -38,6 +38,7 @@ CHIP_ERROR ElectricalSensor::Register(chip::EndpointId endpoint, CodeDrivenDataM
         ElectricalEnergyMeasurementClusterT::Config config{
             .endpointId     = endpoint,
             .featureFlags   = mConfig.electricalEnergyMeasurementFeatureFlags,
+            .optionalAttributes = mConfig.electricalEnergyMeasurementOptionalAttributes,
             .accuracyStruct = mConfig.electricalEnergyMeasurementAccuracyStruct,
             .delegate       = mConfig.electricalEnergyDelegate,
             .timerDelegate  = mConfig.timerDelegate,

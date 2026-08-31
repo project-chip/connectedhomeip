@@ -129,13 +129,13 @@ private:
      */
 
     /* Current power reading (base + randomness) */
-    int64_t mPower_mW;
+    int64_t mPower_mW = 0;
 
     /* Current voltage reading (base + randomness) */
-    int64_t mVoltage_mV;
+    int64_t mVoltage_mV = 0;
 
     /* Current ActiveCurrent reading (base + randomness) */
-    int64_t mCurrent_mA;
+    int64_t mCurrent_mA = 0;
 
     /* Cumulative Energy Imported which is updated if mPower > 0 */
     int64_t mTotalEnergyImported = 0;
