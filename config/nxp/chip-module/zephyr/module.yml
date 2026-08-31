@@ -19,4 +19,14 @@ build:
     cmake: .
     kconfig: Kconfig
     depends:
+<<<<<<< HEAD:config/nxp/chip-module/zephyr/module.yml
         - openthread
+=======
+        - mbedtls
+        - cmsis_6
+
+package-managers:
+    pip:
+        requirement-files:
+            - ../../scripts/setup/requirements.zephyr.txt
+>>>>>>> 7b27eac ([silabs] More zephyr fixes (#73738)):config/silabs/zephyr/module.yml
