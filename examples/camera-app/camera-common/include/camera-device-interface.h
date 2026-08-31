@@ -398,7 +398,7 @@ public:
 
         // Remove a zone trigger
         virtual CameraError RemoveZoneTrigger(uint16_t zoneId) = 0;
-        
+
         // Verify Zone presence
         virtual bool HasZone(uint16_t zoneId) = 0;
 

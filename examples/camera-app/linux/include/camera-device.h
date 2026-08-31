@@ -342,7 +342,7 @@ public:
     CameraError UpdateZoneTrigger(const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) override;
 
     CameraError RemoveZoneTrigger(uint16_t zoneId) override;
-    
+
     bool HasZone(uint16_t zoneId) override;
 
     CameraError SetPan(int16_t aPan) override;

@@ -108,14 +108,14 @@ public:
     virtual Protocols::InteractionModel::Status RemoveTrigger(uint16_t zoneID) = 0;
 
     /**
-     * @brief verifies whether a zone with the provided zoneID is present on the server. 
-     * 
+     * @brief verifies whether a zone with the provided zoneID is present on the server.
+     *
      * @param[in] zoneID Indicates the ID of the zone to be checked against known zones
-     * 
-     * @return true if the zoneID is found. 
+     *
+     * @return true if the zoneID is found.
      */
     virtual bool HasZone(const uint16_t zoneId) = 0;
-    
+
     /**
      *   @brief Delegate callback for notifying change in an attribute.
      *

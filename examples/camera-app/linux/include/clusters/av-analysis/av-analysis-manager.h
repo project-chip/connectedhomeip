@@ -17,8 +17,8 @@
  */
 
 #pragma once
-#include <app/clusters/av-analysis-server/AvAnalysisCluster.h>
 #include "camera-device-interface.h"
+#include <app/clusters/av-analysis-server/AvAnalysisCluster.h>
 
 namespace chip {
 namespace app {

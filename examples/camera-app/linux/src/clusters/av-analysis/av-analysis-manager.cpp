@@ -74,8 +74,8 @@ CHIP_ERROR AvAnalysisManager::VerifyZoneIDsAreValid(const std::vector<uint16_t> 
     // - for each zoneID, it does not represent a privacy zone
     //
     bool zoneNotFound = false;
-    
-    for (const auto& zone : aZoneIDs)
+
+    for (const auto & zone : aZoneIDs)
     {
         if (!mCameraDevice->GetCameraHALInterface().HasZone(zone))
         {
@@ -83,8 +83,8 @@ CHIP_ERROR AvAnalysisManager::VerifyZoneIDsAreValid(const std::vector<uint16_t> 
             break;
         }
     }
-    
-    return (zoneNotFound? CHIP_ERROR_NOT_FOUND : CHIP_NO_ERROR);
+
+    return (zoneNotFound ? CHIP_ERROR_NOT_FOUND : CHIP_NO_ERROR);
 }
 
 bool AvAnalysisManager::CanAddContextTriggers()
@@ -104,5 +104,5 @@ CHIP_ERROR AvAnalysisManager::PersistentAttributesLoadedCallback()
  */
 void AvAnalysisManager::SetCameraDevice(CameraDeviceInterface * aCameraDevice)
 {
-    mCameraDevice = aCameraDevice;    
+    mCameraDevice = aCameraDevice;
 }

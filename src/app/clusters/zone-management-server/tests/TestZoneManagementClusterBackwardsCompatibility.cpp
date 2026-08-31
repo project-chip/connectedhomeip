@@ -66,7 +66,6 @@ public:
     CHIP_ERROR LoadZones(std::vector<ZoneInformationStorage> &) override { return CHIP_NO_ERROR; }
     CHIP_ERROR LoadTriggers(std::vector<ZoneTriggerControlStruct> &) override { return CHIP_NO_ERROR; }
     bool HasZone(const uint16_t zoneId) override { return true; }
-
 };
 
 class TestZoneManagementClusterBackwardsCompatibility : public ::testing::Test

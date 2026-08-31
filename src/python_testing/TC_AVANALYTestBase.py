@@ -19,6 +19,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 
+
 class AVANALYTestBase:
     SPEC_MAX_COUNT_SUPPORTEDAMBIENTCONTEXTS = 50
     SPEC_MAX_COUNT_ANALYSIS_STREAMS = 255
@@ -46,7 +47,7 @@ class AVANALYTestBase:
         value = await self.read_avanaly_attribute_expect_success(endpoint=endpoint, attribute=attribute)
         asserts.assert_equal(value, expected_value,
                              f"Unexpected '{attribute}' value - expected {expected_value}, was {value}")
-                             
+
     async def send_enable_context_triggers_command(self, endpoint, context_triggers, expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.AvAnalysis.Commands.EnableContextTriggers(
@@ -57,7 +58,7 @@ class AVANALYTestBase:
 
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned on enabling context triggers")
-            
+
     async def send_disable_context_triggers_command(self, endpoint, context_triggers, expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.AvAnalysis.Commands.DisableContextTriggers(
@@ -68,20 +69,20 @@ class AVANALYTestBase:
 
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned on disabling context triggers")
-            
+
     async def get_zoneids_from_zone_management(self, endpoint) -> [int]:
         zones = []
         zoneIDs = []
-        
-        # pull zone ids from Zone Management, if none, try to create 
+
+        # pull zone ids from Zone Management, if none, try to create
         clusterZM = Clusters.Objects.ZoneManagement
-        attributesZM = clusterZM.Attributes         
+        attributesZM = clusterZM.Attributes
         aFeatureMapZM = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=clusterZM, attribute=attributesZM.FeatureMap)
         twoDCartSupported = aFeatureMapZM & clusterZM.Bitmaps.Feature.kTwoDimensionalCartesianZone
         userDefinedSupported = aFeatureMapZM & clusterZM.Bitmaps.Feature.kUserDefined
-            
+
         zones = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=clusterZM, attribute=attributesZM.Zones)
-            
+
         if len(zones) >= 1:
             for zone in zones:
                 zoneIDs.append(zone.zoneID)
@@ -107,5 +108,5 @@ class AVANALYTestBase:
                 asserts.assert_is_not_none(
                     cmdResponse.zoneID, "CreateTwoDCartesianCmdResponse does not contain ZoneID")
                 zoneIDs.append(cmdResponse.zoneID)
-        
+
         return zoneIDs
