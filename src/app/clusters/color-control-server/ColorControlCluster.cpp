@@ -2014,7 +2014,7 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
     // Fixed descriptor readers: a descriptor exists only if the app supplied the table (mStaticConfig) AND
     // the specific optional is engaged; otherwise the attribute is genuinely absent → UnsupportedAttribute.
     // `field` selects one std::optional<ChromaticityPoint>, `proj` picks x / y / intensity off it.
-    auto point = [&](std::optional<ChromaticityPoint> StaticConfig::* field, auto proj) -> DataModel::ActionReturnStatus {
+    auto point = [&](std::optional<ChromaticityPoint> StaticConfig::*field, auto proj) -> DataModel::ActionReturnStatus {
         if (mStaticConfig == nullptr || !(mStaticConfig->*field).has_value())
         {
             return Status::UnsupportedAttribute;
