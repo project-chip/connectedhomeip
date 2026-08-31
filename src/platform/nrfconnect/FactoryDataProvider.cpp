@@ -126,7 +126,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::MoveDACPrivateKeyToSecureStora
 
 // If key should be migrated to KMU save the KMU key slot to keyId.
 #ifdef CONFIG_CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU
-    mDACPrivKeyId = static_cast<psa_key_id_t>(PSA_KEY_HANDLE_FROM_CRACEN_KMU_SLOT(
+    mDACPrivKeyId = static_cast<psa_key_id_t>(PSA_KEY_ID_FROM_CRACEN_KMU_SLOT(
 #ifdef CONFIG_CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU_ENCRYPTED
         CRACEN_KMU_KEY_USAGE_SCHEME_ENCRYPTED,
 #else
