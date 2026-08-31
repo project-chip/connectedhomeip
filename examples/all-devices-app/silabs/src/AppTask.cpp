@@ -233,8 +233,8 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         std::string_view remaining = kBuildTimeDevices;
         while (!remaining.empty())
         {
-            auto comma      = remaining.find(',');
-            auto tokenView  = remaining.substr(0, comma);
+            auto comma     = remaining.find(',');
+            auto tokenView = remaining.substr(0, comma);
             std::string tok(tokenView);
             ReturnErrorOnFailure(instantiateDevice(tok));
             if (comma == std::string_view::npos)
