@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -30,7 +29,7 @@ class ProximityRangingClusterRangingConstraintStruct(
   val enabled: Optional<Boolean>,
   val minRangingInterval: Optional<UInt>,
   val maxSessionDuration: Optional<UInt>,
-  val maxRangingInstances: Optional<UShort>
+  val maxRangingInstances: Optional<UShort>,
 ) {
   override fun toString(): String = buildString {
     append("ProximityRangingClusterRangingConstraintStruct {\n")
@@ -80,30 +79,41 @@ class ProximityRangingClusterRangingConstraintStruct(
       tlvReader.enterStructure(tlvTag)
       val technology = tlvReader.getUByte(ContextSpecificTag(TAG_TECHNOLOGY))
       val role = tlvReader.getUByte(ContextSpecificTag(TAG_ROLE))
-      val enabled = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENABLED))) {
-      Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_ENABLED)))
-    } else {
-      Optional.empty()
-    }
-      val minRangingInterval = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MIN_RANGING_INTERVAL))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MIN_RANGING_INTERVAL)))
-    } else {
-      Optional.empty()
-    }
-      val maxSessionDuration = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAX_SESSION_DURATION))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MAX_SESSION_DURATION)))
-    } else {
-      Optional.empty()
-    }
-      val maxRangingInstances = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAX_RANGING_INSTANCES))) {
-      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_MAX_RANGING_INSTANCES)))
-    } else {
-      Optional.empty()
-    }
-      
+      val enabled =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENABLED))) {
+          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_ENABLED)))
+        } else {
+          Optional.empty()
+        }
+      val minRangingInterval =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MIN_RANGING_INTERVAL))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MIN_RANGING_INTERVAL)))
+        } else {
+          Optional.empty()
+        }
+      val maxSessionDuration =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAX_SESSION_DURATION))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MAX_SESSION_DURATION)))
+        } else {
+          Optional.empty()
+        }
+      val maxRangingInstances =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAX_RANGING_INSTANCES))) {
+          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_MAX_RANGING_INSTANCES)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return ProximityRangingClusterRangingConstraintStruct(technology, role, enabled, minRangingInterval, maxSessionDuration, maxRangingInstances)
+      return ProximityRangingClusterRangingConstraintStruct(
+        technology,
+        role,
+        enabled,
+        minRangingInterval,
+        maxSessionDuration,
+        maxRangingInstances,
+      )
     }
   }
 }

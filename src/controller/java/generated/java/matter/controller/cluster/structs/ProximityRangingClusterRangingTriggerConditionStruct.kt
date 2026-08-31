@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -27,7 +26,7 @@ import matter.tlv.TlvWriter
 class ProximityRangingClusterRangingTriggerConditionStruct(
   val startTime: UInt,
   val endTime: UInt,
-  val rangingInstanceInterval: Optional<UInt>
+  val rangingInstanceInterval: Optional<UInt>,
 ) {
   override fun toString(): String = buildString {
     append("ProximityRangingClusterRangingTriggerConditionStruct {\n")
@@ -55,19 +54,27 @@ class ProximityRangingClusterRangingTriggerConditionStruct(
     private const val TAG_END_TIME = 1
     private const val TAG_RANGING_INSTANCE_INTERVAL = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ProximityRangingClusterRangingTriggerConditionStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): ProximityRangingClusterRangingTriggerConditionStruct {
       tlvReader.enterStructure(tlvTag)
       val startTime = tlvReader.getUInt(ContextSpecificTag(TAG_START_TIME))
       val endTime = tlvReader.getUInt(ContextSpecificTag(TAG_END_TIME))
-      val rangingInstanceInterval = if (tlvReader.isNextTag(ContextSpecificTag(TAG_RANGING_INSTANCE_INTERVAL))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_RANGING_INSTANCE_INTERVAL)))
-    } else {
-      Optional.empty()
-    }
-      
+      val rangingInstanceInterval =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_RANGING_INSTANCE_INTERVAL))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_RANGING_INSTANCE_INTERVAL)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return ProximityRangingClusterRangingTriggerConditionStruct(startTime, endTime, rangingInstanceInterval)
+      return ProximityRangingClusterRangingTriggerConditionStruct(
+        startTime,
+        endTime,
+        rangingInstanceInterval,
+      )
     }
   }
 }

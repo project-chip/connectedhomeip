@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -28,7 +27,7 @@ class ProximityRangingClusterBLERangingDeviceRoleConfigStruct(
   val role: UByte,
   val peerBLEDeviceID: ULong,
   val BLERBCSecurityMode: UByte,
-  val sessionKey: Optional<ByteArray>
+  val sessionKey: Optional<ByteArray>,
 ) {
   override fun toString(): String = buildString {
     append("ProximityRangingClusterBLERangingDeviceRoleConfigStruct {\n")
@@ -59,20 +58,29 @@ class ProximityRangingClusterBLERangingDeviceRoleConfigStruct(
     private const val TAG_BLERBC_SECURITY_MODE = 2
     private const val TAG_SESSION_KEY = 3
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ProximityRangingClusterBLERangingDeviceRoleConfigStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): ProximityRangingClusterBLERangingDeviceRoleConfigStruct {
       tlvReader.enterStructure(tlvTag)
       val role = tlvReader.getUByte(ContextSpecificTag(TAG_ROLE))
       val peerBLEDeviceID = tlvReader.getULong(ContextSpecificTag(TAG_PEER_BLE_DEVICE_ID))
       val BLERBCSecurityMode = tlvReader.getUByte(ContextSpecificTag(TAG_BLERBC_SECURITY_MODE))
-      val sessionKey = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SESSION_KEY))) {
-      Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_SESSION_KEY)))
-    } else {
-      Optional.empty()
-    }
-      
+      val sessionKey =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SESSION_KEY))) {
+          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_SESSION_KEY)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return ProximityRangingClusterBLERangingDeviceRoleConfigStruct(role, peerBLEDeviceID, BLERBCSecurityMode, sessionKey)
+      return ProximityRangingClusterBLERangingDeviceRoleConfigStruct(
+        role,
+        peerBLEDeviceID,
+        BLERBCSecurityMode,
+        sessionKey,
+      )
     }
   }
 }

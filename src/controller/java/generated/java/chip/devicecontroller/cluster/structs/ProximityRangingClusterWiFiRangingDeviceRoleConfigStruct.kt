@@ -17,20 +17,17 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct (
-    val role: UInt,
-    val peerWiFiDevIK: ByteArray,
-    val pmk: ByteArray) {
-  override fun toString(): String  = buildString {
+class ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct(
+  val role: UInt,
+  val peerWiFiDevIK: ByteArray,
+  val pmk: ByteArray,
+) {
+  override fun toString(): String = buildString {
     append("ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct {\n")
     append("\trole : $role\n")
     append("\tpeerWiFiDevIK : $peerWiFiDevIK\n")
@@ -53,12 +50,15 @@ class ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct (
     private const val TAG_PEER_WI_FI_DEV_IK = 1
     private const val TAG_PMK = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct {
       tlvReader.enterStructure(tlvTag)
       val role = tlvReader.getUInt(ContextSpecificTag(TAG_ROLE))
       val peerWiFiDevIK = tlvReader.getByteArray(ContextSpecificTag(TAG_PEER_WI_FI_DEV_IK))
       val pmk = tlvReader.getByteArray(ContextSpecificTag(TAG_PMK))
-      
+
       tlvReader.exitContainer()
 
       return ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct(role, peerWiFiDevIK, pmk)

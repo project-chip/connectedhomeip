@@ -17,19 +17,17 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ProximityRangingClusterRangingResultEvent (
-    val sessionID: UInt,
-    val rangingResultData: chip.devicecontroller.cluster.structs.ProximityRangingClusterRangingMeasurementDataStruct) {
-  override fun toString(): String  = buildString {
+class ProximityRangingClusterRangingResultEvent(
+  val sessionID: UInt,
+  val rangingResultData:
+    chip.devicecontroller.cluster.structs.ProximityRangingClusterRangingMeasurementDataStruct,
+) {
+  override fun toString(): String = buildString {
     append("ProximityRangingClusterRangingResultEvent {\n")
     append("\tsessionID : $sessionID\n")
     append("\trangingResultData : $rangingResultData\n")
@@ -49,11 +47,13 @@ class ProximityRangingClusterRangingResultEvent (
     private const val TAG_SESSION_ID = 0
     private const val TAG_RANGING_RESULT_DATA = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ProximityRangingClusterRangingResultEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ProximityRangingClusterRangingResultEvent {
       tlvReader.enterStructure(tlvTag)
       val sessionID = tlvReader.getUInt(ContextSpecificTag(TAG_SESSION_ID))
-      val rangingResultData = chip.devicecontroller.cluster.structs.ProximityRangingClusterRangingMeasurementDataStruct.fromTlv(ContextSpecificTag(TAG_RANGING_RESULT_DATA), tlvReader)
-      
+      val rangingResultData =
+        chip.devicecontroller.cluster.structs.ProximityRangingClusterRangingMeasurementDataStruct
+          .fromTlv(ContextSpecificTag(TAG_RANGING_RESULT_DATA), tlvReader)
+
       tlvReader.exitContainer()
 
       return ProximityRangingClusterRangingResultEvent(sessionID, rangingResultData)

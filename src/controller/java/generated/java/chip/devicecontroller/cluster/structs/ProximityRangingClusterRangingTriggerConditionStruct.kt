@@ -17,20 +17,18 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ProximityRangingClusterRangingTriggerConditionStruct (
-    val startTime: ULong,
-    val endTime: ULong,
-    val rangingInstanceInterval: Optional<ULong>) {
-  override fun toString(): String  = buildString {
+class ProximityRangingClusterRangingTriggerConditionStruct(
+  val startTime: ULong,
+  val endTime: ULong,
+  val rangingInstanceInterval: Optional<ULong>,
+) {
+  override fun toString(): String = buildString {
     append("ProximityRangingClusterRangingTriggerConditionStruct {\n")
     append("\tstartTime : $startTime\n")
     append("\tendTime : $endTime\n")
@@ -44,9 +42,9 @@ class ProximityRangingClusterRangingTriggerConditionStruct (
       put(ContextSpecificTag(TAG_START_TIME), startTime)
       put(ContextSpecificTag(TAG_END_TIME), endTime)
       if (rangingInstanceInterval.isPresent) {
-      val optrangingInstanceInterval = rangingInstanceInterval.get()
-      put(ContextSpecificTag(TAG_RANGING_INSTANCE_INTERVAL), optrangingInstanceInterval)
-    }
+        val optrangingInstanceInterval = rangingInstanceInterval.get()
+        put(ContextSpecificTag(TAG_RANGING_INSTANCE_INTERVAL), optrangingInstanceInterval)
+      }
       endStructure()
     }
   }
@@ -56,19 +54,27 @@ class ProximityRangingClusterRangingTriggerConditionStruct (
     private const val TAG_END_TIME = 1
     private const val TAG_RANGING_INSTANCE_INTERVAL = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ProximityRangingClusterRangingTriggerConditionStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): ProximityRangingClusterRangingTriggerConditionStruct {
       tlvReader.enterStructure(tlvTag)
       val startTime = tlvReader.getULong(ContextSpecificTag(TAG_START_TIME))
       val endTime = tlvReader.getULong(ContextSpecificTag(TAG_END_TIME))
-      val rangingInstanceInterval = if (tlvReader.isNextTag(ContextSpecificTag(TAG_RANGING_INSTANCE_INTERVAL))) {
-      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_RANGING_INSTANCE_INTERVAL)))
-    } else {
-      Optional.empty()
-    }
-      
+      val rangingInstanceInterval =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_RANGING_INSTANCE_INTERVAL))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_RANGING_INSTANCE_INTERVAL)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return ProximityRangingClusterRangingTriggerConditionStruct(startTime, endTime, rangingInstanceInterval)
+      return ProximityRangingClusterRangingTriggerConditionStruct(
+        startTime,
+        endTime,
+        rangingInstanceInterval,
+      )
     }
   }
 }

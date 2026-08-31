@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -29,7 +27,7 @@ class ProximityRangingClusterRDRStruct(
   val elevation: Short,
   val azimuthAccuracy: UByte,
   val elevationAccuracy: UByte,
-  val reference: UByte
+  val reference: UByte,
 ) {
   override fun toString(): String = buildString {
     append("ProximityRangingClusterRDRStruct {\n")
@@ -67,10 +65,16 @@ class ProximityRangingClusterRDRStruct(
       val azimuthAccuracy = tlvReader.getUByte(ContextSpecificTag(TAG_AZIMUTH_ACCURACY))
       val elevationAccuracy = tlvReader.getUByte(ContextSpecificTag(TAG_ELEVATION_ACCURACY))
       val reference = tlvReader.getUByte(ContextSpecificTag(TAG_REFERENCE))
-      
+
       tlvReader.exitContainer()
 
-      return ProximityRangingClusterRDRStruct(azimuth, elevation, azimuthAccuracy, elevationAccuracy, reference)
+      return ProximityRangingClusterRDRStruct(
+        azimuth,
+        elevation,
+        azimuthAccuracy,
+        elevationAccuracy,
+        reference,
+      )
     }
   }
 }

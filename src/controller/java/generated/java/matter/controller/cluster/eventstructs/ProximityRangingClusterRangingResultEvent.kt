@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.eventstructs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -26,7 +24,8 @@ import matter.tlv.TlvWriter
 
 class ProximityRangingClusterRangingResultEvent(
   val sessionID: UByte,
-  val rangingResultData: matter.controller.cluster.structs.ProximityRangingClusterRangingMeasurementDataStruct
+  val rangingResultData:
+    matter.controller.cluster.structs.ProximityRangingClusterRangingMeasurementDataStruct,
 ) {
   override fun toString(): String = buildString {
     append("ProximityRangingClusterRangingResultEvent {\n")
@@ -48,11 +47,13 @@ class ProximityRangingClusterRangingResultEvent(
     private const val TAG_SESSION_ID = 0
     private const val TAG_RANGING_RESULT_DATA = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ProximityRangingClusterRangingResultEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ProximityRangingClusterRangingResultEvent {
       tlvReader.enterStructure(tlvTag)
       val sessionID = tlvReader.getUByte(ContextSpecificTag(TAG_SESSION_ID))
-      val rangingResultData = matter.controller.cluster.structs.ProximityRangingClusterRangingMeasurementDataStruct.fromTlv(ContextSpecificTag(TAG_RANGING_RESULT_DATA), tlvReader)
-      
+      val rangingResultData =
+        matter.controller.cluster.structs.ProximityRangingClusterRangingMeasurementDataStruct
+          .fromTlv(ContextSpecificTag(TAG_RANGING_RESULT_DATA), tlvReader)
+
       tlvReader.exitContainer()
 
       return ProximityRangingClusterRangingResultEvent(sessionID, rangingResultData)
