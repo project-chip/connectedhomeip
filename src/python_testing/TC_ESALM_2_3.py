@@ -210,8 +210,8 @@ class TC_ESALM_2_3(MatterBaseTest):
                 await self.send_single_cmd(cmd=cmds.Reset(alarms=inactive_bit), endpoint=endpoint)
                 state_after = await self.read_single_attribute_check_success(
                     endpoint=endpoint, cluster=cluster, attribute=attrs.State)
-                asserts.assert_equal(state_after & inactive_bit, 0,
-                                     "Inactive alarm bit unexpectedly set in State after no-op Reset")
+                asserts.assert_equal(state_after, state,
+                                     "State must be unchanged after Reset with an inactive alarm bit")
             else:
                 self.mark_current_step_skipped()
         else:
