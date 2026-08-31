@@ -17,7 +17,10 @@
 from mobly import asserts
 
 import matter.clusters as Clusters
+<<<<<<< HEAD
 from matter.interaction_model import InteractionModelError, Status
+=======
+>>>>>>> master
 
 
 class AVANALYTestBase:
