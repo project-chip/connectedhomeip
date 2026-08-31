@@ -34,6 +34,19 @@ using namespace AudioControl::Attributes;
 using namespace AudioControl::Commands;
 using chip::Protocols::InteractionModel::Status;
 
+namespace {
+
+// Adds stepSize to volume, capped at effectiveMax. The intermediate sum is computed in uint32_t
+// to avoid overflow; the cast back to uint16_t is safe because std::min bounds the result to
+// effectiveMax, which is already a uint16_t.
+uint16_t AddCappedAtMax(uint16_t volume, uint16_t stepSize, uint16_t effectiveMax)
+{
+    return static_cast<uint16_t>(
+        std::min<uint32_t>(static_cast<uint32_t>(volume) + static_cast<uint32_t>(stepSize), effectiveMax));
+}
+
+} // namespace
+
 AudioControlCluster::AudioControlCluster(EndpointId endpointId, AudioControlDelegate & delegate, const Config & config) :
     DefaultServerCluster({ endpointId, AudioControl::Id }), mDelegate(delegate), mFeatures(config.mFeatures),
     mOptionalAttributeSet(config.mOptionalAttributeSet), mMinDeviceVolume(delegate.GetMinDeviceVolume()),
@@ -226,109 +239,109 @@ uint16_t AudioControlCluster::EffectiveMaxVolume() const
 void AudioControlCluster::StoreVolume()
 {
     VerifyOrReturn(mContext != nullptr);
-    LogErrorOnFailure(
-        mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::Volume::Id),
-                                              ByteSpan(reinterpret_cast<const uint8_t *>(&mVolume), sizeof(mVolume))));
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::Volume::Id), mVolume));
 }
 
 void AudioControlCluster::StoreSoftMuted()
 {
     VerifyOrReturn(mContext != nullptr);
-    LogErrorOnFailure(
-        mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::SoftMuted::Id),
-                                              ByteSpan(reinterpret_cast<const uint8_t *>(&mSoftMuted), sizeof(mSoftMuted))));
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::SoftMuted::Id), mSoftMuted));
 }
 
 void AudioControlCluster::StoreStartUpMuted()
 {
     VerifyOrReturn(mContext != nullptr);
-    NumericAttributeTraits<bool>::StorageType storageValue;
-    DataModel::NullableToStorage(mStartUpMuted, storageValue);
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-        ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::StartUpMuted::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))));
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::StartUpMuted::Id), mStartUpMuted));
 }
 
 void AudioControlCluster::StoreStartUpVolume()
 {
     VerifyOrReturn(mContext != nullptr);
-    NumericAttributeTraits<uint16_t>::StorageType storageValue;
-    DataModel::NullableToStorage(mStartUpVolume, storageValue);
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-        ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::StartUpVolume::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))));
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::StartUpVolume::Id), mStartUpVolume));
 }
 
 void AudioControlCluster::StoreDefaultStepSize()
 {
     VerifyOrReturn(mContext != nullptr);
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-        ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::DefaultStepSize::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&mDefaultStepSize), sizeof(mDefaultStepSize))));
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::DefaultStepSize::Id), mDefaultStepSize));
 }
 
 void AudioControlCluster::StoreSetVolumeUnmutePolicy()
 {
     VerifyOrReturn(mContext != nullptr);
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
         ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::SetVolumeUnmutePolicy::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&mSetVolumeUnmutePolicy), sizeof(mSetVolumeUnmutePolicy))));
+        mSetVolumeUnmutePolicy));
 }
 
 void AudioControlCluster::StoreIncreaseVolumeUnmutePolicy()
 {
     VerifyOrReturn(mContext != nullptr);
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
         ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::IncreaseVolumeUnmutePolicy::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&mIncreaseVolumeUnmutePolicy), sizeof(mIncreaseVolumeUnmutePolicy))));
+        mIncreaseVolumeUnmutePolicy));
 }
 
 void AudioControlCluster::StoreIncreaseVolumeUnmuteVolume()
 {
     VerifyOrReturn(mContext != nullptr);
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
         ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::IncreaseVolumeUnmuteVolume::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&mIncreaseVolumeUnmuteVolume), sizeof(mIncreaseVolumeUnmuteVolume))));
+        mIncreaseVolumeUnmuteVolume));
 }
 
 void AudioControlCluster::StoreDecreaseVolumeUnmutePolicy()
 {
     VerifyOrReturn(mContext != nullptr);
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
         ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::DecreaseVolumeUnmutePolicy::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&mDecreaseVolumeUnmutePolicy), sizeof(mDecreaseVolumeUnmutePolicy))));
+        mDecreaseVolumeUnmutePolicy));
 }
 
 void AudioControlCluster::StoreMaxUserVolume()
 {
     VerifyOrReturn(mContext != nullptr);
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-        ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::MaxUserVolume::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&mMaxUserVolume), sizeof(mMaxUserVolume))));
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::MaxUserVolume::Id), mMaxUserVolume));
 }
 
 void AudioControlCluster::StoreBass()
 {
     VerifyOrReturn(mContext != nullptr);
-    LogErrorOnFailure(
-        mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::Bass::Id),
-                                              ByteSpan(reinterpret_cast<const uint8_t *>(&mBass), sizeof(mBass))));
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::Bass::Id), mBass));
 }
 
 void AudioControlCluster::StoreMid()
 {
     VerifyOrReturn(mContext != nullptr);
-    LogErrorOnFailure(
-        mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::Mid::Id),
-                                              ByteSpan(reinterpret_cast<const uint8_t *>(&mMid), sizeof(mMid))));
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::Mid::Id), mMid));
 }
 
 void AudioControlCluster::StoreTreble()
 {
     VerifyOrReturn(mContext != nullptr);
-    LogErrorOnFailure(
-        mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::Treble::Id),
-                                              ByteSpan(reinterpret_cast<const uint8_t *>(&mTreble), sizeof(mTreble))));
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::Treble::Id), mTreble));
 }
 
 DataModel::ActionReturnStatus AudioControlCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -761,8 +774,7 @@ DataModel::ActionReturnStatus AudioControlCluster::HandleIncreaseVolume(chip::TL
             requestedVolume = mVolume;
             break;
         case UnmuteVolumeEnum::kVolumePlusStepSize:
-            requestedVolume = static_cast<uint16_t>(
-                std::min<uint32_t>(static_cast<uint32_t>(mVolume) + static_cast<uint32_t>(stepSize), effectiveMax));
+            requestedVolume = AddCappedAtMax(mVolume, stepSize, effectiveMax);
             break;
         default:
             return Status::ConstraintError;
@@ -771,8 +783,7 @@ DataModel::ActionReturnStatus AudioControlCluster::HandleIncreaseVolume(chip::TL
     else
     {
         // Step 2.b: Volume + StepSize, capped at EffectiveMax
-        requestedVolume = static_cast<uint16_t>(
-            std::min<uint32_t>(static_cast<uint32_t>(mVolume) + static_cast<uint32_t>(stepSize), effectiveMax));
+        requestedVolume = AddCappedAtMax(mVolume, stepSize, effectiveMax);
     }
 
     // Step 3: fast path — device is not muted
