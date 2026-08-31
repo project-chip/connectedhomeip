@@ -138,7 +138,7 @@ class TC_ESALM_2_1(MatterBaseTest):
         under_current = None
 
         self.step(7, "TH reads OverVoltageThreshold (if OVERVOLT supported)",
-                  "DUT returns int64. Store as OverVoltageThreshold.")
+                  expectation="DUT returns int64. Store as OverVoltageThreshold.")
         if has_overvolt:
             over_voltage = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.OverVoltageThreshold)
@@ -147,7 +147,7 @@ class TC_ESALM_2_1(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(8, "TH reads UnderVoltageThreshold (if UNDERVOLT supported)",
-                  "DUT returns int64. Store as UnderVoltageThreshold. If both supported: OverVoltage >= UnderVoltage + 1.")
+                  expectation="DUT returns int64. Store as UnderVoltageThreshold. If both supported: OverVoltage >= UnderVoltage + 1.")
         if has_undervolt:
             under_voltage = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.UnderVoltageThreshold)
@@ -159,7 +159,7 @@ class TC_ESALM_2_1(MatterBaseTest):
                                          "OverVoltageThreshold must be >= UnderVoltageThreshold + 1")
 
         self.step(9, "TH reads OverFrequencyThreshold (if OVERFREQ supported)",
-                  "DUT returns int64. Store as OverFrequencyThreshold.")
+                  expectation="DUT returns int64. Store as OverFrequencyThreshold.")
         if has_overfreq:
             over_frequency = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.OverFrequencyThreshold)
@@ -168,7 +168,7 @@ class TC_ESALM_2_1(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(10, "TH reads UnderFrequencyThreshold (if UNDERFREQ supported)",
-                  "DUT returns int64. Store as UnderFrequencyThreshold. If both supported: OverFreq >= UnderFreq + 1.")
+                  expectation="DUT returns int64. Store as UnderFrequencyThreshold. If both supported: OverFreq >= UnderFreq + 1.")
         if has_underfreq:
             under_frequency = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.UnderFrequencyThreshold)
@@ -180,7 +180,7 @@ class TC_ESALM_2_1(MatterBaseTest):
                                          "OverFrequencyThreshold must be >= UnderFrequencyThreshold + 1")
 
         self.step(11, "TH reads OverPowerThreshold (if OVERPOWER supported)",
-                  "DUT returns int64. Store as OverPowerThreshold.")
+                  expectation="DUT returns int64. Store as OverPowerThreshold.")
         if has_overpower:
             over_power = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.OverPowerThreshold)
@@ -189,7 +189,7 @@ class TC_ESALM_2_1(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(12, "TH reads UnderPowerThreshold (if UNDERPOWER supported)",
-                  "DUT returns int64. If both supported: OverPower >= UnderPower + 1.")
+                  expectation="DUT returns int64. If both supported: OverPower >= UnderPower + 1.")
         if has_underpower:
             under_power = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.UnderPowerThreshold)
@@ -201,7 +201,7 @@ class TC_ESALM_2_1(MatterBaseTest):
                                          "OverPowerThreshold must be >= UnderPowerThreshold + 1")
 
         self.step(13, "TH reads OverCurrentThreshold (if OVERCUR supported)",
-                  "DUT returns int64. Store as OverCurrentThreshold.")
+                  expectation="DUT returns int64. Store as OverCurrentThreshold.")
         if has_overcur:
             over_current = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.OverCurrentThreshold)
@@ -210,7 +210,7 @@ class TC_ESALM_2_1(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(14, "TH reads UnderCurrentThreshold (if UNDERCUR supported)",
-                  "DUT returns int64. If both supported: OverCurrent >= UnderCurrent + 1.")
+                  expectation="DUT returns int64. If both supported: OverCurrent >= UnderCurrent + 1.")
         if has_undercur:
             under_current = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.UnderCurrentThreshold)
@@ -222,7 +222,7 @@ class TC_ESALM_2_1(MatterBaseTest):
                                          "OverCurrentThreshold must be >= UnderCurrentThreshold + 1")
 
         self.step(15, "TH reads PowerImportThreshold (if POWERIMP supported)",
-                  "DUT returns int64 >= 0.")
+                  expectation="DUT returns int64 >= 0.")
         if has_powerimp:
             power_import = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.PowerImportThreshold)
@@ -232,7 +232,7 @@ class TC_ESALM_2_1(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(16, "TH reads PowerExportThreshold (if POWEREXP supported)",
-                  "DUT returns int64 <= 0.")
+                  expectation="DUT returns int64 <= 0.")
         if has_powerexp:
             power_export = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.PowerExportThreshold)

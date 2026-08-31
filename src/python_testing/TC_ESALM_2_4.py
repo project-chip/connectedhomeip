@@ -92,11 +92,11 @@ class TC_ESALM_2_4(MatterBaseTest):
 
         self.step(1, "Commission DUT to TH", is_commissioning=True)
 
-        self.step(2, "TH reads FeatureMap attribute", "DUT returns map32. Store as FM.")
+        self.step(2, "TH reads FeatureMap attribute", expectation="DUT returns map32. Store as FM.")
         feature_map = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.FeatureMap)
 
-        self.step(3, "TH reads Supported attribute", "DUT returns AlarmBitmap. Store as SUP.")
+        self.step(3, "TH reads Supported attribute", expectation="DUT returns AlarmBitmap. Store as SUP.")
         supported = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.Supported)
 
