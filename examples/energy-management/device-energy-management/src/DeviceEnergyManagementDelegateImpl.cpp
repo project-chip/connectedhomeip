@@ -872,6 +872,15 @@ Status DeviceEnergyManagementDelegate::PowerRangeAdjustRequest(const DataModel::
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Unable to start a PowerRangeAdjust timer: %" CHIP_ERROR_FORMAT, err.Format());
+        // Timer startup failed. If we cancelled an old timer, restore consistent state to avoid
+        // leaving a PowerRangeAdjustment active with no timer running to clear it.
+        if (mPowerRangeAdjustmentInProgress)
+        {
+            mPowerRangeAdjustmentInProgress = false;
+            mPowerRangeAdjustment.SetNull();
+            TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kOnline);
+            MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, PowerRangeAdjustment::Id);
+        }
         return Status::Failure;
     }
 
