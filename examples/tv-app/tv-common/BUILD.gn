@@ -49,6 +49,8 @@ source_set("tv-common-sources") {
     "clusters/application-basic/ApplicationBasicManager.h",
     "clusters/application-launcher/ApplicationLauncherManager.cpp",
     "clusters/application-launcher/ApplicationLauncherManager.h",
+    "clusters/audio-control/AudioControlManager.cpp",
+    "clusters/audio-control/AudioControlManager.h",
     "clusters/audio-output/AudioOutputManager.cpp",
     "clusters/audio-output/AudioOutputManager.h",
     "clusters/channel/ChannelManager.cpp",
