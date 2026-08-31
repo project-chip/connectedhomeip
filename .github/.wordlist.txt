@@ -990,6 +990,7 @@ minLength
 MinRtrAdvInterval
 minValue
 mkdir
+mixins
 mlan
 MLD
 mmevk
@@ -1222,6 +1223,7 @@ ProductLabel
 ProductName
 ProductURL
 programmatically
+proguard
 proto
 protobuf
 protos
@@ -1319,6 +1321,7 @@ RequestorCanConsent
 Requestors
 responder
 RestrictedEvent
+resync
 retargeting
 reusability
 reviwed
@@ -1472,6 +1475,7 @@ strcpy
 struct
 structs
 su
+subclasses
 Subclassing
 subcommand
 subcommands

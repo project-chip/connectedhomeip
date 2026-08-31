@@ -39,6 +39,7 @@ target_include_directories(app PRIVATE
 target_sources(app PRIVATE
                src/AppTask.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/soil-measurement-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/all-clusters-energy-mode-stubs.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/dishwasher-mode.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/laundry-washer-mode.cpp
@@ -79,4 +80,9 @@ chip_configure_data_model(app
 
 if(CONFIG_BOOTLOADER_MCUBOOT)
   target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
+endif()
+
+if(CONFIG_OPENTHREAD_SNTP_CLIENT)
+  target_sources(app PRIVATE
+                   ${TELINK_COMMON}/util/src/ThreadTimeSync.cpp)
 endif()

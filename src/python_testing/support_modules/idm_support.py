@@ -24,7 +24,7 @@ import inspect
 import logging
 import time
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 from mobly import asserts
 
@@ -39,6 +39,7 @@ from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.event_attribute_reporting import WildcardAttributeSubscriptionHandler
 from matter.testing.global_attribute_ids import GlobalAttributeIds, is_standard_attribute_id
+from matter.testing.matter_testing import compute_mrp_retransmission_timeout_sec
 from matter.testing.spec_parsing import ConstraintReference, Constraints
 from matter.tlv import uint
 
@@ -61,7 +62,7 @@ class WritableAttributeInfo:
     attribute: type[ClusterObjects.ClusterAttributeDescriptor]
     cluster_class: type[ClusterObjects.Cluster]
     datatype: str
-    constraints: Optional[Constraints]
+    constraints: Constraints | None
 
 
 @dataclass
@@ -225,6 +226,30 @@ class IDMBaseTest(BasicCompositionTests):
         dut_acl.append(ace)
         await self.write_dut_acl(ctrl=ctrl, acl=dut_acl)
 
+    async def verify_suppress_response_message_count(self, snapshot, action_name: str = "suppressResponse"):
+        """Verify that zero unexpected response packets arrived when suppressResponse=True for Matter 1.7+.
+
+        Reads BasicInformation.SpecificationVersion from the DUT (endpoint 0) to determine
+        the supported Matter release. For Release 1.7 or later (SpecificationVersion >= 0x01070000),
+        asserts that snapshot.totalImResponseCount == 0. For Release 1.6 or earlier, logs the count.
+        """
+        spec_ver = await self.read_single_attribute_check_success(
+            endpoint=self.ROOT_NODE_ENDPOINT_ID,
+            cluster=Clusters.BasicInformation,
+            attribute=Clusters.BasicInformation.Attributes.SpecificationVersion
+        )
+
+        if spec_ver >= 0x01070000:
+            asserts.assert_equal(
+                snapshot.totalImResponseCount, 0,
+                f"DUT supporting Matter specification version 0x{spec_ver:08X} (1.7+) improperly sent "
+                f"{snapshot.totalImResponseCount} response frame(s) when {action_name}=True!"
+            )
+        else:
+            log.info("DUT supporting Matter specification version 0x%08X (pre-1.7) sent %d response frame(s) "
+                     "when %s=True (allowed per pre-1.7 spec)",
+                     spec_ver, snapshot.totalImResponseCount, action_name)
+
     # ========================================================================
     # Attribute Path Utilities
     # ========================================================================
@@ -249,7 +274,7 @@ class IDMBaseTest(BasicCompositionTests):
 
     async def find_timed_write_attribute(
         self, endpoints_data: dict[int, Any]
-    ) -> tuple[Optional[int], Optional[type[ClusterObjects.ClusterAttributeDescriptor]]]:
+    ) -> tuple[int | None, type[ClusterObjects.ClusterAttributeDescriptor] | None]:
         """
         Find an attribute that requires timed write on the actual device
         Uses the wildcard read data that's already in endpoints_data
@@ -300,10 +325,9 @@ class IDMBaseTest(BasicCompositionTests):
         if isinstance(sub, Clusters.Attribute.SubscriptionTransaction):
             sub_attrs = sub.GetAttributes()
 
-        asserts.assert_true(ep in sub_attrs, "Must have read endpoint %s data" % ep)
-        asserts.assert_true(cluster in sub_attrs[ep], "Must have read %s cluster data" % cluster.__name__)
-        asserts.assert_true(attribute in sub_attrs[ep][cluster],
-                            "Must have read back attribute %s" % attribute.__name__)
+        asserts.assert_true(ep in sub_attrs, f"Must have read endpoint {ep} data")
+        asserts.assert_true(cluster in sub_attrs[ep], f"Must have read {cluster.__name__} cluster data")
+        asserts.assert_true(attribute in sub_attrs[ep][cluster], f"Must have read back attribute {attribute.__name__}")
 
     def verify_attribute_path(self, read_response: dict, path: AttributePath):
         """Verify read response for an attribute path.
@@ -408,7 +432,7 @@ class IDMBaseTest(BasicCompositionTests):
                 asserts.assert_equal(returned_attrs, attr_list,
                                      f"Mismatch for {cluster} at endpoint {endpoint}")
 
-    async def resolve_dynamic_constraint(self, cluster_class, endpoint_id: int, ref: ConstraintReference) -> Optional[int]:
+    async def resolve_dynamic_constraint(self, cluster_class, endpoint_id: int, ref: ConstraintReference) -> int | None:
         """Resolve a dynamic constraint reference by reading the attribute value."""
         ref_attr = getattr(cluster_class.Attributes, ref.attribute, None)
         if not ref_attr:
@@ -610,37 +634,56 @@ class IDMBaseTest(BasicCompositionTests):
                     f"Returned attributes don't match AttributeList for cluster {cluster.id} on endpoint {endpoint}")
         return read_request
 
-    async def read_endpoint_all_clusters(self, endpoint):
+    async def read_endpoint_all_clusters(self, endpoint: int) -> dict:
         """Read all attributes from all clusters on an endpoint.
 
         Args:
             endpoint: Endpoint to read from
 
         Returns:
-            Read response dictionary
+            The codegen-parsed attributes mapping from the read response, keyed by
+            endpoint, then cluster class, then attribute class.
         """
-        read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [endpoint])
-        asserts.assert_in(Clusters.Descriptor, read_request[endpoint].keys(), "Descriptor cluster not in output")
-        asserts.assert_in(Clusters.Descriptor.Attributes.ServerList,
-                          read_request[endpoint][Clusters.Descriptor], "ServerList not in output")
+        # Use Read (not ReadAttribute): ReadAttribute returns only the codegen-parsed dict,
+        # whereas Read returns a response object that also carries tlvAttributes.
+        read_request = await self.default_controller.Read(self.dut_node_id, [endpoint])
+
+        # Use tlvAttributes (raw cluster/attribute IDs) rather than the codegen-parsed
+        # .attributes dict. The parsed dict is keyed by generated Cluster classes, so any
+        # cluster the controller has no codegen class for (e.g. a manufacturer-specific
+        # cluster in the 0xVVVV_FC00-0xVVVV_FFFE range) is silently dropped, which would
+        # make the returned cluster set disagree with the DUT's ServerList.
+        tlv_attributes = read_request.tlvAttributes
+        server_list_id = Clusters.Descriptor.Attributes.ServerList.attribute_id
+        attribute_list_id = Clusters.Descriptor.Attributes.AttributeList.attribute_id
+
+        asserts.assert_in(endpoint, tlv_attributes, f"Endpoint {endpoint} not in output")
+        asserts.assert_in(Clusters.Descriptor.id, tlv_attributes[endpoint], "Descriptor cluster not in output")
+        asserts.assert_in(server_list_id, tlv_attributes[endpoint][Clusters.Descriptor.id], "ServerList not in output")
 
         # Verify that returned clusters match the ServerList
-        returned_cluster_ids = sorted([cluster.id for cluster in read_request[endpoint]])
-        server_list = sorted(read_request[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList])
+        returned_cluster_ids = sorted(tlv_attributes[endpoint].keys())
+        server_list = sorted(tlv_attributes[endpoint][Clusters.Descriptor.id][server_list_id])
         asserts.assert_equal(
             returned_cluster_ids,
             server_list,
             f"Returned cluster IDs {returned_cluster_ids} don't match ServerList {server_list} for endpoint {endpoint}")
 
-        for cluster in read_request[endpoint]:
-            attribute_ids = [a.attribute_id for a in read_request[endpoint][cluster]
-                             if a != Clusters.Attribute.DataVersion]
+        for cluster_id in tlv_attributes[endpoint]:
+            # Skip non-standard clusters: the controller has no codegen for them, so
+            # their AttributeList cannot be validated against a known attribute set here.
+            if global_attribute_ids.cluster_id_type(cluster_id) != global_attribute_ids.ClusterIdType.kStandard:
+                continue
+            asserts.assert_in(attribute_list_id, tlv_attributes[endpoint][cluster_id],
+                              f"AttributeList not in output for cluster {cluster_id}")
+            returned_attrs = sorted(tlv_attributes[endpoint][cluster_id].keys())
+            attr_list = sorted(tlv_attributes[endpoint][cluster_id][attribute_list_id])
             asserts.assert_equal(
-                sorted(attribute_ids),
-                sorted(read_request[endpoint][cluster][cluster.Attributes.AttributeList]),
-                f"Expected attribute list does not match for cluster {cluster}"
+                returned_attrs,
+                attr_list,
+                f"Expected attribute list does not match for cluster {cluster_id}"
             )
-        return read_request
+        return read_request.attributes
 
     async def read_unsupported_endpoint(self):
         """Find an unsupported endpoint and attempt to read from it.
@@ -776,7 +819,7 @@ class IDMBaseTest(BasicCompositionTests):
         self,
         endpoint_id: int,
         attr_class: type[ClusterObjects.ClusterAttributeDescriptor],
-    ) -> Optional[Status]:
+    ) -> Status | None:
         """
         Attempts to write `attr_class` on `endpoint_id` using a small set
         of dummy values. Returns the resulting Status, or None if no value
@@ -1167,18 +1210,7 @@ class IDMBaseTest(BasicCompositionTests):
 
     def get_mrp_retransmission_timeout_sec(self, dev_ctrl: ChipDeviceCtrl) -> float:
         """Compute worst-case MRP retransmission time (s) using negotiated intervals; fall back conservatively."""
-        session_params = dev_ctrl.GetRemoteSessionParameters(self.dut_node_id)
-        # Default local MRP intervals from ReliableMessageProtocolConfig.h for Linux controller builds:
-        # idle=500ms, active=300ms.
-        negotiated_idle_interval_ms = session_params.sessionIdleInterval if session_params else 500
-        negotiated_active_interval_ms = session_params.sessionActiveInterval if session_params else 300
-
-        # Defaults: 500ms idle (IP) / 2000ms (Thread) / 4000ms (fallback).
-        base_interval_ms = max(negotiated_idle_interval_ms, negotiated_active_interval_ms, 4000)
-
-        # interval * (1 + 1.6 + 1.6^2 + 1.6^3) * jitter (1.25) * margin (1.1) ms to s
-        backoff_sum = 1 + 1.6 + 2.56 + 4.096
-        return base_interval_ms * backoff_sum * 1.375 / 1000.0
+        return compute_mrp_retransmission_timeout_sec(dev_ctrl, self.dut_node_id)
 
     def get_writable_attributes_for_cluster(self, cluster_id: uint, cluster_data: dict) -> list[uint]:
         """Get list of writable attribute IDs for a cluster.
@@ -1211,6 +1243,16 @@ class IDMBaseTest(BasicCompositionTests):
                 continue
 
             if attribute_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]:
+                continue
+
+            # Skip attributes carrying the Changes Omitted (C) or Quieter Reporting (Q)
+            # spec quality. The server is not required to emit a subscription report for
+            # every change to these (C suppresses change reporting entirely; Q reports
+            # less often than the reporting interval), so writing to them and asserting a
+            # report arrives produces false failures in steps 8/10/11. _cq_excluded_attr_ids
+            # (built once in MatterBaseTest from the data-model XML quality flags, unioned
+            # with the transitional allowlist) is the canonical exclusion set.
+            if (cluster_id, attribute_id) in self._cq_excluded_attr_ids:
                 continue
 
             xml_attr = xml_cluster.attributes[attribute_id]

@@ -30,6 +30,7 @@
 #include <clusters/AmbientSensingUnion/EventIds.h>
 #include <clusters/ApplicationBasic/EventIds.h>
 #include <clusters/ApplicationLauncher/EventIds.h>
+#include <clusters/AudioControl/EventIds.h>
 #include <clusters/AudioOutput/EventIds.h>
 #include <clusters/AvAnalysis/EventIds.h>
 #include <clusters/BallastConfiguration/EventIds.h>
@@ -98,6 +99,7 @@
 #include <clusters/LevelControl/EventIds.h>
 #include <clusters/LocalizationConfiguration/EventIds.h>
 #include <clusters/LowPower/EventIds.h>
+#include <clusters/MediaFileManagement/EventIds.h>
 #include <clusters/MediaInput/EventIds.h>
 #include <clusters/MediaPlayback/EventIds.h>
 #include <clusters/Messages/EventIds.h>

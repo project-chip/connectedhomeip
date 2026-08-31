@@ -82,6 +82,18 @@ public:
      * @param newOptimal The new optimal value.
      */
     virtual void OnOptimalChanged(bool newOptimal) {}
+
+    /**
+     * Called after CondPumpEnabled attribute changes.
+     * @param newCondPumpEnabled The new condensate pump enabled value.
+     */
+    virtual void OnCondPumpEnabledChanged(bool newCondPumpEnabled) {}
+
+    /**
+     * Called after CondRunCount attribute changes.
+     * @param newCondRunCount The new condensate pump run count.
+     */
+    virtual void OnCondRunCountChanged(uint16_t newCondRunCount) {}
 };
 
 /**
@@ -99,18 +111,19 @@ public:
     using FullOptionalAttributeSet = chip::app::OptionalAttributeSet<
         Humidistat::Attributes::UserSetpoint::Id, Humidistat::Attributes::MinSetpoint::Id, Humidistat::Attributes::MaxSetpoint::Id,
         Humidistat::Attributes::Step::Id, Humidistat::Attributes::TargetSetpoint::Id, Humidistat::Attributes::MistType::Id,
-        Humidistat::Attributes::Continuous::Id, Humidistat::Attributes::Sleep::Id, Humidistat::Attributes::Optimal::Id>;
+        Humidistat::Attributes::Continuous::Id, Humidistat::Attributes::Sleep::Id, Humidistat::Attributes::Optimal::Id,
+        Humidistat::Attributes::CondPumpEnabled::Id, Humidistat::Attributes::CondRunCount::Id>;
 
     struct StartupConfiguration
     {
-        Humidistat::ModeEnum mode               = Humidistat::ModeEnum::kOff;
-        Humidistat::SystemStateEnum systemState = Humidistat::SystemStateEnum::kOff;
+        Humidistat::ModeEnum mode               = Humidistat::ModeEnum::kAuto;
+        Humidistat::SystemStateEnum systemState = Humidistat::SystemStateEnum::kIdle;
         chip::Percent userSetpoint              = 50;
         chip::Percent minSetpoint               = 0;
         chip::Percent maxSetpoint               = 100;
         chip::Percent step                      = 1;
         chip::Percent targetSetpoint            = 50;
-        chip::BitMask<Humidistat::MistTypeBitmap> mistType{ 0 };
+        DataModel::Nullable<chip::BitMask<Humidistat::MistTypeBitmap>> mistType{ chip::BitMask<Humidistat::MistTypeBitmap>{ 0 } };
         bool continuous = false;
         bool sleep      = false;
         bool optimal    = false;
@@ -138,6 +151,9 @@ public:
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
 
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                 AttributeValueDecoder & decoder) override;
+
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                chip::TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler) override;
@@ -151,10 +167,15 @@ public:
     chip::Percent GetMaxSetpoint() const { return mMaxSetpoint; }
     chip::Percent GetStep() const { return mStep; }
     chip::Percent GetTargetSetpoint() const { return mTargetSetpoint; }
-    chip::BitMask<Humidistat::MistTypeBitmap> GetMistType() const { return mMistType; }
+    chip::BitMask<Humidistat::MistTypeBitmap> GetMistType() const
+    {
+        return mMistType.ValueOr(chip::BitMask<Humidistat::MistTypeBitmap>{ 0 });
+    }
     bool GetContinuous() const { return mContinuous; }
     bool GetSleep() const { return mSleep; }
     bool GetOptimal() const { return mOptimal; }
+    bool GetCondPumpEnabled() const { return mCondPumpEnabled; }
+    uint16_t GetCondRunCount() const { return mCondRunCount; }
 
     /**
      * Set the delegate to receive callbacks for attribute state changes.
@@ -166,10 +187,18 @@ public:
     CHIP_ERROR SetSystemState(Humidistat::SystemStateEnum systemState);
     CHIP_ERROR SetUserSetpoint(chip::Percent userSetpoint);
     CHIP_ERROR SetTargetSetpoint(chip::Percent targetSetpoint);
-    CHIP_ERROR SetMistType(chip::BitMask<Humidistat::MistTypeBitmap> mistType);
+    CHIP_ERROR SetMistType(DataModel::Nullable<chip::BitMask<Humidistat::MistTypeBitmap>> mistType);
     CHIP_ERROR SetContinuous(bool continuous);
     CHIP_ERROR SetSleep(bool sleep);
     CHIP_ERROR SetOptimal(bool optimal);
+    CHIP_ERROR SetCondPumpEnabled(bool condPumpEnabled);
+    CHIP_ERROR SetCondRunCount(uint16_t condRunCount);
+    CHIP_ERROR ResetCondRunCount();
+    CHIP_ERROR IncrementCondRunCount();
+
+    void SetSetSettingsAllowContinuous(bool allow) { mAllowSetSettingsContinuous = allow; }
+    void SetSetSettingsAllowSleep(bool allow) { mAllowSetSettingsSleep = allow; }
+    void SetSetSettingsAllowOptimal(bool allow) { mAllowSetSettingsOptimal = allow; }
 
 private:
     const BitFlags<Humidistat::Feature> mFeatures;
@@ -183,18 +212,24 @@ private:
     const chip::Percent mMaxSetpoint;
     const chip::Percent mStep;
     chip::Percent mTargetSetpoint;
-    chip::BitMask<Humidistat::MistTypeBitmap> mMistType;
+    DataModel::Nullable<chip::BitMask<Humidistat::MistTypeBitmap>> mMistType;
     bool mContinuous;
     bool mSleep;
     bool mOptimal;
-    HumidistatDelegate * mDelegate = nullptr;
+    bool mCondPumpEnabled;
+    uint16_t mCondRunCount;
+    bool mAllowSetSettingsContinuous = true;
+    bool mAllowSetSettingsSleep      = true;
+    bool mAllowSetSettingsOptimal    = true;
+    HumidistatDelegate * mDelegate   = nullptr;
 
     bool IsModeSupported(Humidistat::ModeEnum mode) const;
     bool IsSystemStateSupported(Humidistat::SystemStateEnum systemState) const;
-    bool IsMistTypeConsistentWithMode(Humidistat::ModeEnum mode, chip::BitMask<Humidistat::MistTypeBitmap> mistType) const;
+    bool IsMistTypeConsistentWithMode(Humidistat::ModeEnum mode,
+                                      DataModel::Nullable<chip::BitMask<Humidistat::MistTypeBitmap>> mistType) const;
     bool ShouldTargetSetpointMatchUserSetpoint() const;
     void SyncTargetSetpointToUserSetpoint();
-    bool IsMistTypeSupportable(chip::BitMask<Humidistat::MistTypeBitmap> mistType) const;
+    bool IsMistTypeSupportable(DataModel::Nullable<chip::BitMask<Humidistat::MistTypeBitmap>> mistType) const;
     chip::Percent SnapToNearestStep(chip::Percent value) const;
     FullOptionalAttributeSet ComputeActiveOptionalAttributes() const;
     void LoadPersistentAttributes();

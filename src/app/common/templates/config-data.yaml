@@ -24,9 +24,8 @@ CommandHandlerInterfaceOnlyClusters:
     # This uses asUpperCamelCase versions of the cluster name.
     # keep-sorted start
     - Camera AV Settings User Level Management
-    - Commodity Price
     - Commodity Tariff
-    - Electrical Alarm
+    - Electrical Distribution
     - Electrical Energy Measurement
     - Joint Fabric Administrator
     - Network Commissioning
@@ -40,7 +39,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Refrigerator And Temperature Controlled Cabinet Mode
     - Sample MEI
     - Service Area
-    - Soil Measurement
+    - Thermostat
     - Thread Border Router Management
     - Thread Network Directory
     - Water Heater Management
@@ -58,7 +57,6 @@ ClustersWithInitFunctions:
     - On/Off
     - Pump Configuration and Control
     - Sample MEI
-    - Thermostat
     # keep-sorted end
 
 ClustersWithAttributeChangedFunctions:
@@ -66,8 +64,6 @@ ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic Information
     - Door Lock
     - Pump Configuration and Control
-    - Thermostat
-    - Window Covering
     # keep-sorted end
 
 ClustersWithShutdownFunctions:
@@ -78,18 +74,13 @@ ClustersWithShutdownFunctions:
     - Level Control
     - On/Off
     - Sample MEI
-    - Thermostat
     # keep-sorted end
 
 ClustersWithPreAttributeChangeFunctions:
     # keep-sorted start
     - Door Lock
-    - Energy Preference
-    - Laundry Dryer Controls
-    - Laundry Washer Controls
     - Mode Select
     - Pump Configuration and Control
-    - Thermostat
     - Thermostat User Interface Configuration
     # keep-sorted end
     # Code Driven clusters are clusters that implement the ServerClusterInterface.
@@ -114,15 +105,19 @@ CodeDrivenClusters:
     - Closure Dimension
     - Commissioner Control
     - Commissioning Proxy
+    - Commodity Price
     - Descriptor
     - Device Energy Management
     - Device Energy Management Mode
     - Diagnostic Logs
+    - Dishwasher Alarm
     - Dishwasher Mode
-    - Electrical Alarm
+    - Dynamic Lighting
     - Electrical Power Measurement
+    - Electrical Protection Alarm
     - Energy EVSE
     - Energy EVSE Mode
+    - Energy Preference
     - Ethernet Network Diagnostics
     - Fan Control
     - Fixed Label
@@ -137,8 +132,11 @@ CodeDrivenClusters:
     - ICD Management
     - Identify
     - Illuminance Measurement
+    - Laundry Dryer Controls
+    - Laundry Washer Controls
     - Laundry Washer Mode
     - Localization Configuration
+    - Media File Management
     - Microwave Oven Control
     - Microwave Oven Mode
     - Network Identity Management
@@ -156,16 +154,20 @@ CodeDrivenClusters:
     - RVC Clean Mode
     - RVC Operational State
     - RVC Run Mode
+    - Refrigerator Alarm
     - Refrigerator And Temperature Controlled Cabinet Mode
     - Relative Humidity Measurement
     - Scenes Management
+    - Service Area
     - Smoke CO Alarm
     - Software Diagnostics
+    - Soil Measurement
     - Switch
     - TLS Certificate Management
     - TLS Client Management
     - Temperature Control
     - Temperature Measurement
+    - Thermostat
     - Thread Border Router Management
     - Thread Network Diagnostics
     - Time Format Localization
@@ -176,4 +178,5 @@ CodeDrivenClusters:
     - Water Heater Mode
     - Wi-Fi Network Diagnostics
     - Wi-Fi Network Management
+    - Window Covering
     # keep-sorted end

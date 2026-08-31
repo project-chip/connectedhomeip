@@ -117,7 +117,7 @@ CHIP_ERROR BluezAdvertisement::Init(BluezAdapter1 * apAdapter, const char * aAdv
 
     mAdapter.reset(reinterpret_cast<BluezAdapter1 *>(g_object_ref(apAdapter)));
 
-    GAutoPtr<char> rootPath;
+    GCharPtr rootPath;
     g_object_get(G_OBJECT(mEndpoint.GetGattApplicationObjectManager()), "object-path", &rootPath.GetReceiver(), nullptr);
     g_snprintf(mAdvPath, sizeof(mAdvPath), "%s/advertising", rootPath.get());
     chip::Platform::CopyString(mAdvUUID, aAdvUUID);
@@ -180,7 +180,7 @@ CHIP_ERROR BluezAdvertisement::SetupServiceData(ServiceDataFlags aFlags)
 
     GVariant * serviceData = g_variant_builder_end(&serviceDataBuilder);
 
-    GAutoPtr<char> debugStr(g_variant_print(serviceData, TRUE));
+    GCharPtr debugStr(g_variant_print(serviceData, TRUE));
     ChipLogDetail(DeviceLayer, "SET service data to %s", StringOrNullMarker(debugStr.get()));
 
     bluez_leadvertisement1_set_service_data(mAdv.get(), serviceData);

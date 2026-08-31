@@ -97,14 +97,14 @@ classDiagram
         +SetEndpointId(EndpointId id)
     }
 
-    class OccupancySensorDevice {
+    class OccupancySensor {
         -mOccupancySensingCluster: OccupancySensingCluster
         -mBridgedDeviceBasicInformationCluster: BridgedDeviceBasicInformationCluster
         +Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId) CHIP_ERROR
     }
 
     DeviceInterface <|-- SingleEndpointDevice
-    SingleEndpointDevice <|-- OccupancySensorDevice
+    SingleEndpointDevice <|-- OccupancySensor
 ```
 
 -   **`DeviceInterface`**
@@ -116,7 +116,7 @@ classDiagram
     Encapsulates endpoint state, managing its assigned `EndpointId`, its parent
     endpoint relationship (for bridges or composite devices), and a list of
     `DeviceTypeDescriptor` structures.
--   **Concrete Devices** (e.g., `OccupancySensorDevice`): Inherit from
+-   **Concrete Devices** (e.g., `OccupancySensor`): Inherit from
     `SingleEndpointDevice`, own one or more concrete strongly-typed cluster
     instances (`LazyRegisteredServerCluster`), and bind them to the endpoint
     during registration.

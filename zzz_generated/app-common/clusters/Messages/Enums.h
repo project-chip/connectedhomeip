@@ -64,6 +64,9 @@ enum class Feature : uint32_t
     kConfirmationResponse = 0x2,
     kConfirmationReply    = 0x4,
     kProtectedMessages    = 0x8,
+    kSpokenMessages       = 0x10,
+    kAudioMessages        = 0x20,
+    kMultiModalMessages   = 0x40,
 };
 
 // Bitmap for MessageControlBitmap
@@ -74,6 +77,8 @@ enum class MessageControlBitmap : uint8_t
     kReplyMessage         = 0x4,
     kMessageConfirmed     = 0x8,
     kMessageProtected     = 0x10,
+    kSpokenMessage        = 0x20,
+    kAudioMessage         = 0x40,
 };
 } // namespace Messages
 } // namespace Clusters

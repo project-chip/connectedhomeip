@@ -38,7 +38,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v7.0.0
+              uses: actions/checkout@v7
               with:
                 submodules: true
             - name: Checkout submodules & Bootstrap
@@ -48,7 +48,7 @@ jobs:
 
             - name: Generate all
               run: ./scripts/run_in_build_env.sh scripts/tools/zap_regen_all.py
-            - uses: EndBug/add-and-commit@v10
+            - uses: EndBug/add-and-commit@v11
               with:
                 default_author: github_actions
                 message: Regenerating ZAP

@@ -41,29 +41,27 @@
 
 namespace chip::app::Clusters::ModeBase {
 
-// A pair of cluster ID and revision.
-struct ClusterRevisionEntry
+struct ClusterEntry
 {
     ClusterId id;
     uint32_t revision;
 };
 
-// The 10 clusters that share this attribute structure.
-static constexpr ClusterRevisionEntry kAliasedClusters[] = {
-    { DeviceEnergyManagementMode::Id, DeviceEnergyManagementMode::kRevision },
-    { DishwasherMode::Id, DishwasherMode::kRevision },
-    { EnergyEvseMode::Id, EnergyEvseMode::kRevision },
-    { LaundryWasherMode::Id, LaundryWasherMode::kRevision },
-    { MicrowaveOvenMode::Id, MicrowaveOvenMode::kRevision },
-    { OvenMode::Id, OvenMode::kRevision },
-    { RefrigeratorAndTemperatureControlledCabinetMode::Id, RefrigeratorAndTemperatureControlledCabinetMode::kRevision },
-    { RvcCleanMode::Id, RvcCleanMode::kRevision },
-    { RvcRunMode::Id, RvcRunMode::kRevision },
-    { WaterHeaterMode::Id, WaterHeaterMode::kRevision },
+// Aliased Mode Base clusters defined in the specification
+constexpr ClusterEntry kDeviceEnergyManagementMode = { DeviceEnergyManagementMode::Id, DeviceEnergyManagementMode::kRevision };
+constexpr ClusterEntry kDishwasherMode             = { DishwasherMode::Id, DishwasherMode::kRevision };
+constexpr ClusterEntry kEnergyEvseMode             = { EnergyEvseMode::Id, EnergyEvseMode::kRevision };
+constexpr ClusterEntry kLaundryWasherMode          = { LaundryWasherMode::Id, LaundryWasherMode::kRevision };
+constexpr ClusterEntry kMicrowaveOvenMode          = { MicrowaveOvenMode::Id, MicrowaveOvenMode::kRevision };
+constexpr ClusterEntry kOvenMode                   = { OvenMode::Id, OvenMode::kRevision };
+constexpr ClusterEntry kRefrigeratorAndTemperatureControlledCabinetMode = {
+    RefrigeratorAndTemperatureControlledCabinetMode::Id, RefrigeratorAndTemperatureControlledCabinetMode::kRevision
 };
+constexpr ClusterEntry kRvcCleanMode    = { RvcCleanMode::Id, RvcCleanMode::kRevision };
+constexpr ClusterEntry kRvcRunMode      = { RvcRunMode::Id, RvcRunMode::kRevision };
+constexpr ClusterEntry kWaterHeaterMode = { WaterHeaterMode::Id, WaterHeaterMode::kRevision };
 
 // All aliased clusters share features, mandatory attributes, and commands (except MicrowaveOvenMode).
-using Feature      = DeviceEnergyManagementMode::Feature;
 namespace Commands = DeviceEnergyManagementMode::Commands;
 
 namespace Attributes {
@@ -137,6 +135,12 @@ enum class StatusCode : uint8_t
     kUnsupportedMode = 0x1,
     kGenericFailure  = 0x2,
     kInvalidInMode   = 0x3,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kOnOff = 0x1,
 };
 
 } // namespace chip::app::Clusters::ModeBase

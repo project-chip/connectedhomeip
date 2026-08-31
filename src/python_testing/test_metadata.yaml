@@ -28,12 +28,16 @@ not_automated:
           Electrical Alarm server is integrated into a real example app.
     - name: TC_DD_3_23.py
       reason:
-          NFC-Thread hardware setup needed for running this test-case and CI
-          does not support it
+          NFC Reader needed for running this test-case and CI does not support
+          it
     - name: TC_DD_3_24.py
       reason:
-          NFC-Thread hardware setup needed for running this test-case and CI
-          does not support it
+          NFC Reader needed for running this test-case and CI does not support
+          it
+    - name: TC_IDM_10_7.py
+      reason:
+          NFC Reader needed for running this test-case and CI does not support
+          it
     - name: TC_SC_TC_2_1.py
       reason: Test requires Thread MeshCoP hardware or simulation.
     - name: TC_SC_TC_2_2.py
@@ -62,6 +66,8 @@ not_automated:
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_10.py
       reason: It has no CI execution block, is not executed in CI
+    - name: TC_CNET_4_11.py
+      reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_12.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_15.py
@@ -69,6 +75,8 @@ not_automated:
     - name: TC_CNET_4_16.py
       reason: Can not run thread CNET tests in CI
     - name: TC_CNET_4_22.py
+      reason: It has no CI execution block, is not executed in CI
+    - name: TC_CNET_4_23.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_DGGEN_3_2.py
       reason:
@@ -82,6 +90,8 @@ not_automated:
       reason: Shared code for TC_EEM and TC_EPM, not a standalone test
     - name: TC_EGCTestBase.py
       reason: Shared code for TC_EGC, not a standalone test
+    - name: TC_EPALM_TestBase.py
+      reason: Shared code for TC_EPALM, not a standalone test
     - name: TC_OpstateCommon.py
       reason: Shared code for TC_OPSTATE, not a standalone test
     - name: TC_pics_checker.py
@@ -195,17 +205,23 @@ not_automated:
       reason: Shared code for TC_TLSCERT, not a standalone test
     - name: TC_TLSCLIENT_Base.py
       reason: Shared code for TC_TLSCLIENT, not a standalone test
+    - name: TC_TSTAT_Utils.py
+      reason: Shared code for TSTAT TCs, not a standalone test.
     - name: TC_DD_1_5.py
       reason:
           No existing app corresponding to the test content (NFC-based
           onboarding data security requirements)
     - name: TC_GC_common.py
       reason: Shared code for TC_GC, not a standalone test.
+    - name: TC_S_common.py
+      reason: Shared helper code for TC_S, not a standalone test.
     # Items below MUST be fixed eventually.
     - name: TC_MCORE_FS_1_4.py
       reason:
           Very flaky in CI.
           https://github.com/project-chip/connectedhomeip/issues/71932
+    - name: TC_AVANALYTestBase.py
+      reason: Shared helper methods for AV Analysis tests, not a standalone test
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially

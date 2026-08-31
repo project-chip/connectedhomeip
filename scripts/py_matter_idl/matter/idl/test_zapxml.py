@@ -17,7 +17,6 @@ import io
 import sys
 import unittest
 from pathlib import Path
-from typing import Union
 
 try:
     from matter.idl.zapxml import ParseSource, ParseXmls
@@ -30,14 +29,13 @@ from matter.idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQu
                                          Idl, Struct, StructQuality, StructTag)
 
 
-def XmlToIdl(what: Union[str, list[str]]) -> Idl:
+def XmlToIdl(what: str | list[str]) -> Idl:
     if not isinstance(what, list):
         what = [what]
 
     sources = []
     for idx, txt in enumerate(what):
-        sources.append(ParseSource(source=io.StringIO(
-            txt), name=("Input %d" % (idx + 1))))
+        sources.append(ParseSource(source=io.StringIO(txt), name=(f"Input {idx + 1}")))
 
     return ParseXmls(sources, include_meta_data=False)
 
