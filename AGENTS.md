@@ -137,10 +137,10 @@ Alternatively, you can activate the environment in your shell:
     -   Compile and run can be separated (e.g. if running under some memory
         debugger or needing to set other options):
 
-      ```bash
-      scripts/run_in_build_env.sh "ninja -C out/linux-x64-tests-clang src/app/clusters/occupancy-sensor-server/tests:TestOccupancySensingCluster"`
-      ./out/linux-x64-tests-clang/tests/TestOccupancySensingCluster
-      ```
+    ```bash
+    scripts/run_in_build_env.sh "ninja -C out/linux-x64-tests-clang src/app/clusters/occupancy-sensor-server/tests:TestOccupancySensingCluster"`
+    ./out/linux-x64-tests-clang/tests/TestOccupancySensingCluster
+    ```
 
 ### Building Common Apps
 
