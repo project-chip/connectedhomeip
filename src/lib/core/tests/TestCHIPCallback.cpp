@@ -29,6 +29,10 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 
+#include <cstddef>
+#include <type_traits>
+#include <utility>
+
 using namespace chip::Callback;
 
 /**
@@ -63,7 +67,7 @@ public:
 
             // one-shot semantics
             cb->Cancel();
-            cb->mCall(cb->mContext);
+            cb->Invoke();
         }
     }
 };
@@ -174,9 +178,7 @@ public:
         for (Cancelable * ca = mNext; ca != this; ca = ca->mNext)
         {
             // persistent registration semantics, with data
-
-            Callback<NotifyFn> * cb = Callback<NotifyFn>::FromCancelable(ca);
-            cb->mCall(cb->mContext, v);
+            Callback<NotifyFn>::FromCancelable(ca)->Invoke(v);
         }
     }
 
@@ -275,4 +277,225 @@ TEST_F(TestCHIPCallback, PersistentCallbacksThatDeallocateThemselves)
     EXPECT_FALSE(retryHandlers.IsEmpty()); // stack callback remains
     stackCallback.Cancel();
     EXPECT_TRUE(retryHandlers.IsEmpty());
+}
+
+/*
+ * Owned / OwnedOrNull tokens
+ */
+
+// The properties the Owned tokens exist to enforce, none of which are observable at runtime.
+static_assert(!std::is_copy_constructible_v<Callback<>::Owned>, "Owned is move-only");
+static_assert(std::is_move_constructible_v<Callback<>::Owned>, "Owned is move-only");
+static_assert(!std::is_copy_constructible_v<Callback<>::OwnedOrNull>, "OwnedOrNull is move-only");
+static_assert(std::is_move_constructible_v<Callback<>::OwnedOrNull>, "OwnedOrNull is move-only");
+
+// Owned implicitly accepts a Callback by reference or by pointer, but rejects a literal nullptr.
+static_assert(std::is_convertible_v<Callback<> &, Callback<>::Owned>, "Owned accepts a reference");
+static_assert(std::is_convertible_v<Callback<> *, Callback<>::Owned>, "Owned accepts a pointer");
+static_assert(!std::is_constructible_v<Callback<>::Owned, std::nullptr_t>, "Owned rejects nullptr");
+
+// OwnedOrNull additionally accepts a literal nullptr, as well as an Owned.
+static_assert(std::is_convertible_v<std::nullptr_t, Callback<>::OwnedOrNull>, "OwnedOrNull accepts nullptr");
+static_assert(std::is_convertible_v<Callback<>::Owned, Callback<>::OwnedOrNull>, "Owned converts to OwnedOrNull");
+
+// A signature-agnostic callee's "no callback" case does not go through a typed token either, since
+// a caller with nothing to pass has no signature to name.
+static_assert(std::is_convertible_v<std::nullptr_t, Cancelable::OwnedOrNull>, "Cancelable::OwnedOrNull accepts nullptr");
+static_assert(!std::is_constructible_v<Cancelable::Owned, std::nullptr_t>, "Cancelable::Owned rejects nullptr");
+
+// Callbacks with a different signature are not interchangeable.
+static_assert(!std::is_constructible_v<Callback<>::Owned, Callback<Notifier::NotifyFn> &>, "signatures must match");
+static_assert(!std::is_constructible_v<Callback<Notifier::NotifyFn>::Owned, Callback<> &>, "signatures must match");
+
+// A callee may take a signature-agnostic Cancelable::Owned, or widen to a Cancelable::OwnedOrNull ...
+static_assert(std::is_convertible_v<Callback<>::Owned, Cancelable::Owned>, "Owned converts to Cancelable::Owned");
+static_assert(std::is_convertible_v<Cancelable::Owned, Cancelable::OwnedOrNull>, "Owned widens to OwnedOrNull");
+static_assert(std::is_convertible_v<Callback<>::Owned, Cancelable::OwnedOrNull>, "Owned widens to OwnedOrNull");
+// ... but only by value: Owned::Take() hides rather than overrides OwnedOrNull::Take(), so binding
+// an Owned to an OwnedOrNull reference would sidestep its non-null check.
+static_assert(!std::is_convertible_v<Callback<>::Owned &, Cancelable::OwnedOrNull &>, "Owned must not slice");
+static_assert(!std::is_convertible_v<Cancelable::Owned &, Cancelable::OwnedOrNull &>, "Owned must not slice");
+
+/**
+ * A registrar in the shape CHIPCallback.h recommends for new APIs: it accepts callbacks by value
+ * as Owned / OwnedOrNull tokens rather than as plain pointers.
+ */
+class Acceptor : private CallbackDeque
+{
+public:
+    void Accept(Callback<>::Owned cb) { Enqueue(cb.Take()); }
+
+    // Returns whether a callback was actually provided.
+    bool AcceptOptional(Callback<>::OwnedOrNull cb)
+    {
+        VerifyOrReturnValue(cb.HasValue(), false);
+        Enqueue(cb.Take());
+        return true;
+    }
+
+    // Models a signature-agnostic callee, e.g. a shared layer underneath several typed APIs.
+    // Returns whether a callback was actually provided.
+    bool AcceptAgnostic(Cancelable::OwnedOrNull cb)
+    {
+        VerifyOrReturnValue(cb.HasValue(), false);
+        Enqueue(cb.Take());
+        return true;
+    }
+
+    // Models a callee that rejects the call outright, dropping the token without taking it.
+    static CHIP_ERROR Reject(Callback<>::Owned) { return CHIP_ERROR_INCORRECT_STATE; }
+
+    void InvokeAll()
+    {
+        CallbackDeque ready;
+        DequeueAll(ready);
+        while (!ready.IsEmpty())
+        {
+            Callback<> * cb = Callback<>::FromCancelable(ready.First());
+            cb->Cancel();
+            cb->Invoke();
+        }
+    }
+
+    using CallbackDeque::IsEmpty;
+};
+
+TEST_F(TestCHIPCallback, OwnedTakesOwnershipAtTheCallBoundary)
+{
+    int n = 0;
+    Callback<> cb(reinterpret_cast<CallFn>(increment), &n);
+    Acceptor first, second;
+
+    first.Accept(cb);
+    EXPECT_TRUE(cb.IsRegistered());
+    EXPECT_FALSE(first.IsEmpty());
+
+    // Handing the same callback to a second callee withdraws it from the first.
+    second.Accept(cb);
+    EXPECT_TRUE(first.IsEmpty());
+    EXPECT_FALSE(second.IsEmpty());
+
+    first.InvokeAll();
+    EXPECT_EQ(n, 0);
+    second.InvokeAll();
+    EXPECT_EQ(n, 1);
+    EXPECT_FALSE(cb.IsRegistered());
+}
+
+TEST_F(TestCHIPCallback, OwnedAcceptsAPointer)
+{
+    int n = 0;
+    Callback<> cb(reinterpret_cast<CallFn>(increment), &n);
+    Acceptor acceptor;
+
+    acceptor.Accept(&cb);
+    EXPECT_TRUE(cb.IsRegistered());
+    acceptor.InvokeAll();
+    EXPECT_EQ(n, 1);
+}
+
+TEST_F(TestCHIPCallback, OwnedIsMovable)
+{
+    int n = 0;
+    Callback<> cb(reinterpret_cast<CallFn>(increment), &n);
+    Acceptor acceptor;
+
+    Callback<>::Owned owned(cb);
+    EXPECT_FALSE(cb.IsRegistered()); // the token holds the cancelable now, nobody is registered
+
+    acceptor.Accept(std::move(owned));
+    EXPECT_TRUE(cb.IsRegistered());
+    acceptor.InvokeAll();
+    EXPECT_EQ(n, 1);
+}
+
+// A callee that rejects the call outright still cancels the callback at the boundary: dropping the
+// token leaves the callback registered with nobody, and no invocation ever happens.
+TEST_F(TestCHIPCallback, DroppingAnOwnedTokenLeavesTheCallbackUnregistered)
+{
+    int n = 0;
+    Callback<> cb(reinterpret_cast<CallFn>(increment), &n);
+    Acceptor acceptor;
+
+    acceptor.Accept(cb);
+    EXPECT_TRUE(cb.IsRegistered());
+
+    EXPECT_EQ(Acceptor::Reject(cb), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_FALSE(cb.IsRegistered());
+    EXPECT_TRUE(acceptor.IsEmpty());
+
+    acceptor.InvokeAll();
+    EXPECT_EQ(n, 0);
+}
+
+TEST_F(TestCHIPCallback, OwnedOrNullAcceptsAMissingCallback)
+{
+    int n = 0;
+    Callback<> cb(reinterpret_cast<CallFn>(increment), &n);
+    Acceptor acceptor;
+
+    EXPECT_FALSE(acceptor.AcceptOptional(nullptr));
+    EXPECT_TRUE(acceptor.IsEmpty());
+
+    Callback<> * missing = nullptr;
+    EXPECT_FALSE(acceptor.AcceptOptional(missing));
+    EXPECT_TRUE(acceptor.IsEmpty());
+
+    EXPECT_TRUE(acceptor.AcceptOptional(cb));
+    EXPECT_TRUE(cb.IsRegistered());
+    acceptor.InvokeAll();
+    EXPECT_EQ(n, 1);
+}
+
+// An Owned converts to an OwnedOrNull, so a callee holding a mandatory callback can forward it to
+// an API that treats it as optional.
+TEST_F(TestCHIPCallback, OwnedOrNullAcceptsAnOwned)
+{
+    int n = 0;
+    Callback<> cb(reinterpret_cast<CallFn>(increment), &n);
+    Acceptor acceptor;
+
+    EXPECT_TRUE(acceptor.AcceptOptional(Callback<>::Owned(cb)));
+    EXPECT_TRUE(cb.IsRegistered());
+    acceptor.InvokeAll();
+    EXPECT_EQ(n, 1);
+}
+
+// A typed Owned widens all the way to a signature-agnostic Cancelable::OwnedOrNull, so a shared
+// layer underneath several typed APIs can accept one without being templated over the signature.
+TEST_F(TestCHIPCallback, SignatureAgnosticOwnedOrNull)
+{
+    int n = 0;
+    Callback<> cb(reinterpret_cast<CallFn>(increment), &n);
+    Acceptor acceptor;
+
+    EXPECT_FALSE(acceptor.AcceptAgnostic(Callback<>::OwnedOrNull(nullptr)));
+    EXPECT_TRUE(acceptor.IsEmpty());
+
+    // A caller with no callback to pass need not name a signature just to say so.
+    EXPECT_FALSE(acceptor.AcceptAgnostic(nullptr));
+    EXPECT_TRUE(acceptor.IsEmpty());
+
+    EXPECT_TRUE(acceptor.AcceptAgnostic(Callback<>::Owned(cb)));
+    EXPECT_TRUE(cb.IsRegistered());
+    acceptor.InvokeAll();
+    EXPECT_EQ(n, 1);
+}
+
+// HasValue() answers what Take() would hand over, so that a callee rejecting a missing callback can
+// check it as a precondition rather than having to take first and test the pointer.
+TEST_F(TestCHIPCallback, OwnedOrNullHasValue)
+{
+    int n = 0;
+    Callback<> cb(reinterpret_cast<CallFn>(increment), &n);
+
+    EXPECT_TRUE(Callback<>::OwnedOrNull(cb).HasValue());
+    EXPECT_FALSE(Callback<>::OwnedOrNull(nullptr).HasValue());
+    EXPECT_FALSE(Cancelable::OwnedOrNull(nullptr).HasValue());
+    EXPECT_TRUE(Cancelable::OwnedOrNull(Callback<>::Owned(cb)).HasValue());
+
+    // Reports false once the token has been spent, which is why a callee gets to consume it once.
+    Callback<>::OwnedOrNull token(cb);
+    EXPECT_NE(token.Take(), nullptr);
+    EXPECT_FALSE(token.HasValue());
 }
