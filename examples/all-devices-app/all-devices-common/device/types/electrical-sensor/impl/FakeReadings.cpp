@@ -24,11 +24,6 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::ElectricalPowerMeasurement;
-using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
-using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Structs;
-using namespace chip::app::Clusters::PowerSource;
-using namespace chip::app::Clusters::PowerSource::Attributes;
 
 CHIP_ERROR FakeReadings::HandleEventTrigger(uint64_t eventTrigger)
 {
@@ -38,7 +33,7 @@ CHIP_ERROR FakeReadings::HandleEventTrigger(uint64_t eventTrigger)
     {
     case EnergyReportingTrigger::kFakeReadingsStop:
         ChipLogProgress(Support, "[EnergyReporting-Test-Event] => Stop Fake load");
-        StopFakeReadings()
+        StopFakeReadings();
         break;
     case EnergyReportingTrigger::kFakeReadingsLoadStart_1kW_2s:
         ChipLogProgress(Support, "[EnergyReporting-Test-Event] => Start Fake load 1kW @2s Import");
@@ -105,9 +100,12 @@ void FakeReadings::FakeReadingsUpdate()
     // Update readings
 
     // base + randomness
-    mPower_mW = mBasePower_mW + mPowerRandomness_mW == 0 ? 0 : (GetRandI64() % (2 * static_cast<int64_t>(mPowerRandomness_mW))) - mPowerRandomness_mW;
 
-    mVoltage_mV = mBaseVoltage_mV + mVoltageRandomness_mV == 0 ? 0 : (GetRandI64() % (2 * static_cast<int64_t>(mVoltageRandomness_mV))) - mVoltageRandomness_mV;
+    // for faking and testing purposes, insead of true random values, we will incrementally change the value in the specified range
+    // from base - randomness to base + randomness in mDeterministicOffsetStepCount steps, then repeat
+    mPower_mW = mBasePower_mW + (mPowerRandomness_mW == 0 ? 0 : (static_cast<int64_t>(mDeterministicOffsetStep * (2 * mPowerRandomness_mW) / (mDeterministicOffsetStepCount - 1)) - mPowerRandomness_mW));
+
+    mVoltage_mV = mBaseVoltage_mV + (mVoltageRandomness_mV == 0 ? 0 : (static_cast<int64_t>(mDeterministicOffsetStep * (2 * mVoltageRandomness_mV) / (mDeterministicOffsetStepCount - 1)) - mVoltageRandomness_mV));
 
     /* Note: whilst we could compute a current from the power and voltage,
      * there will always be some random error from the sensor
@@ -116,8 +114,11 @@ void FakeReadings::FakeReadingsUpdate()
      * This is meant more as an example to show how to use the APIs, not
      * to be a real representation of laws of physics.
      */
+    mCurrent_mA = mBaseCurrent_mA + (mCurrentRandomness_mA == 0 ? 0 : (static_cast<int64_t>(mDeterministicOffsetStep * (2 * mCurrentRandomness_mA) / (mDeterministicOffsetStepCount - 1)) - mCurrentRandomness_mA));
 
-    mCurrent_mA = mBaseCurrent_mA + mCurrentRandomness_mA == 0 ? 0 : (GetRandI64() % (2 * static_cast<int64_t>(mCurrentRandomness_mA))) - mCurrentRandomness_mA;
+     // mDeterministicOffsetStep increment from 0 to mDeterministicOffsetStepCount exclusive then reset to 0
+    mDeterministicOffsetStep++;
+    mDeterministicOffsetStep %= mDeterministicOffsetStepCount;
 
     // update the energy meter - we'll assume that the power has been constant during the previous interval
     if (mPower_mW > 0)
@@ -135,6 +136,9 @@ void FakeReadings::FakeReadingsUpdate()
         mTotalEnergyExported += mPeriodicEnergyExported;
     }
 
+    ChipLogProgress(Support, "FakeReadingsUpdate: BasePower=%ld mW, Power=%ld mW, BaseVoltage=%ld mV, Voltage=%ld mV, BaseCurrent=%ld mA, Current=%ld mA, PeriodicEnergyImported=%ld Wh, PeriodicEnergyExported=%ld Wh, TotalEnergyImported=%ld Wh, TotalEnergyExported=%ld Wh",
+                 mBasePower_mW, mPower_mW, mBaseVoltage_mV, mVoltage_mV, mBaseCurrent_mA, mCurrent_mA, mPeriodicEnergyImported, mPeriodicEnergyExported, mTotalEnergyImported,
+                 mTotalEnergyExported);
     if (mEEMCluster)
     {
         mEEMCluster->GenerateSnapshots();

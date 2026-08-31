@@ -6,12 +6,12 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 
 namespace {
-    const static detail::Structs::MeasurementAccuracyRangeStruct::Type kAccuracyRange{
+    const static Clusters::detail::Structs::MeasurementAccuracyRangeStruct::Type kAccuracyRange{
         .rangeMin = 0, .rangeMax = 10, .percentMax = MakeOptional(uint8_t{ 100 })
     };
 
-    const static detail::Structs::MeasurementAccuracyStruct::Type kAccuracy{
-        .measurementType  = detail::MeasurementTypeEnum::kElectricalEnergy,
+    const static Clusters::detail::Structs::MeasurementAccuracyStruct::Type kAccuracy{
+        .measurementType  = Clusters::detail::MeasurementTypeEnum::kElectricalEnergy,
         .measured         = false,
         .minMeasuredValue = 0,
         .maxMeasuredValue = 10,

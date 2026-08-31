@@ -28,6 +28,7 @@ namespace chip::app {
 
 class ElectricalSensor : public SingleEndpoint
 {
+protected:
     using ElectricalEnergyMeasurementClusterT = Clusters::ElectricalEnergyMeasurement::ElectricalEnergyMeasurementCluster;
     using ElectricalPowerMeasurementClusterT  = Clusters::ElectricalPowerMeasurement::ElectricalPowerMeasurementCluster;
     using PowerTopologyClusterT               = Clusters::PowerTopology::PowerTopologyCluster;
