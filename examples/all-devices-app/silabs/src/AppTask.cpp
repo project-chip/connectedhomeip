@@ -29,6 +29,8 @@
 #include <cstring>
 #include <memory>
 #include <string>
+#include <string_view>
+#include <vector>
 
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
@@ -38,9 +40,9 @@
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/DiagnosticDataProvider.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
+#include <app_config/enabled_devices.h>
 #include <device-factory/DeviceFactory.h>
 #include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
 #include <device/types/root-node/RootNode.h>
@@ -69,7 +71,7 @@ chip::app::DefaultAttributePersistenceProvider sAttributePersistenceProvider;
 chip::app::DefaultSafeAttributePersistenceProvider sSafeAttributePersistenceProvider;
 std::unique_ptr<chip::app::CodeDrivenDataModelProvider> sDataModelProvider;
 std::unique_ptr<chip::app::DeviceInterface> sRootNode;
-std::unique_ptr<chip::app::DeviceInterface> sConstructedDevice;
+std::vector<std::unique_ptr<chip::app::DeviceInterface>> sConstructedDevices;
 
 #if CHIP_ENABLE_OPENTHREAD
 chip::DeviceLayer::NetworkCommissioning::GenericThreadDriver sThreadDriver;
@@ -204,7 +206,52 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         .bindingManager         = chip::app::Clusters::Binding::Manager::GetInstance(),
     });
 
-    std::string deviceType = chip::app::DeviceFactory::GetInstance().GetDefaultDevice();
+    auto & deviceFactory = chip::app::DeviceFactory::GetInstance();
+
+    ConsecutiveEndpointIdAllocator allocator(kDeviceEndpointId);
+
+    auto instantiateDevice = [&](const std::string & type) -> CHIP_ERROR {
+        if (!deviceFactory.IsValidDevice(type))
+        {
+            ChipLogError(AppServer, "Invalid device type: %s", type.c_str());
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        auto device = deviceFactory.Create(type);
+        VerifyOrReturnError(device != nullptr, CHIP_ERROR_NO_MEMORY);
+        ReturnErrorOnFailure(device->Register(allocator, *sDataModelProvider));
+        ChipLogProgress(AppServer, "Registered device type '%s'", type.c_str());
+        sConstructedDevices.push_back(std::move(device));
+        return CHIP_NO_ERROR;
+    };
+
+    // Build-time device list (see all_devices_default_devices in enabled_devices.gni).
+    // When the list is non-empty, it fully drives the device topology and the
+    // KVS override / factory default is ignored — matching the "no shell needed"
+    // build configuration.
+    constexpr std::string_view kBuildTimeDevices{ ALL_DEVICES_DEFAULT_DEVICES };
+
+    if (!kBuildTimeDevices.empty())
+    {
+        sConstructedDevices.reserve(ALL_DEVICES_DEFAULT_DEVICES_COUNT);
+        std::string_view remaining = kBuildTimeDevices;
+        while (!remaining.empty())
+        {
+            auto comma     = remaining.find(',');
+            auto tokenView = remaining.substr(0, comma);
+            std::string tok(tokenView);
+            ReturnErrorOnFailure(instantiateDevice(tok));
+            if (comma == std::string_view::npos)
+            {
+                break;
+            }
+            remaining.remove_prefix(comma + 1);
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    // No build-time selection: fall back to the KVS-stored device type (set via
+    // the `devtype` shell command) or the factory default.
+    std::string deviceType = deviceFactory.GetDefaultDevice();
 
     char storedDeviceType[64] = {};
     uint16_t storedLen        = sizeof(storedDeviceType);
@@ -214,20 +261,13 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         deviceType = std::string(storedDeviceType, strnlen(storedDeviceType, storedLen));
     }
 
-    auto & deviceFactory = chip::app::DeviceFactory::GetInstance();
     if (!deviceFactory.IsValidDevice(deviceType))
     {
         ChipLogError(AppServer, "Invalid device type: %s, falling back to default", deviceType.c_str());
         deviceType = deviceFactory.GetDefaultDevice();
     }
 
-    sConstructedDevice = deviceFactory.Create(deviceType);
-    VerifyOrReturnError(sConstructedDevice != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    ConsecutiveEndpointIdAllocator allocator(kDeviceEndpointId);
-    ReturnErrorOnFailure(sConstructedDevice->Register(allocator, *sDataModelProvider));
-
-    return CHIP_NO_ERROR;
+    return instantiateDevice(deviceType);
 }
 
 chip::app::CodeDrivenDataModelProvider * AppTask::GetDataModelProvider()
