@@ -19,7 +19,6 @@
 
 #include <AllDevicesAppNamedPipeCommandHandler.h>
 #include <AppCommandDelegate.h>
-#include <device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.h>
 #include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationLogic.h>
 #include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationTopology.h>
 #include <device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.h>
@@ -34,9 +33,9 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::all_devices::rvc_simulation;
 
-// Reset is composed entirely from RoboticVacuumCleaner's public accessors and the shared
+// Reset is composed entirely from SimulatedRoboticVacuumCleaner's public accessors and the shared
 // simulation helpers, so it needs no dedicated API on the device type itself.
-void HandleReset(RoboticVacuumCleaner & rvcDevice)
+void HandleReset(SimulatedRoboticVacuumCleaner & rvcDevice)
 {
     rvcDevice.RunMode().UpdateCurrentMode(Topology::kRunModeIdle);
     LogErrorOnFailure(rvcDevice.OperationalState().SetOperationalState(

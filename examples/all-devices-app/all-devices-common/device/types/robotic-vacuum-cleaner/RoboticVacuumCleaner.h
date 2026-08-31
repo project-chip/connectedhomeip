@@ -20,9 +20,6 @@
 #include <app/clusters/mode-base-server/AppDelegate.h>
 #include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
-#include <app/clusters/service-area-server/ServiceAreaCluster.h>
-#include <app/clusters/service-area-server/service-area-delegate.h>
-#include <app/clusters/service-area-server/service-area-storage-delegate.h>
 #include <device/api/SingleEndpoint.h>
 #include <platform/DiagnosticDataProvider.h>
 
@@ -30,23 +27,22 @@
 
 namespace chip::app {
 
-// Generic RVC device: owns the mandatory clusters and wires them to whatever delegate
-// implementation is supplied. All device-specific simulation behavior lives in the delegate
-// implementation (see impl/SimulatedRoboticVacuumCleaner.h), not here.
+// Generic RVC device: owns only the clusters the Robotic Vacuum Cleaner device type mandates
+// (RVC Operational State, RVC Run Mode) and wires them to whatever delegate implementation is
+// supplied. RVC Clean Mode and Service Area are optional per the device type definition, so this
+// base class does not assume their presence or configuration; subclasses that want them override
+// RegisterOptionalClusters()/UnregisterOptionalClusters() to add and configure their own (see
+// impl/SimulatedRoboticVacuumCleaner.h for an example).
 class RoboticVacuumCleaner : public SingleEndpoint
 {
 public:
     struct Config
     {
         Clusters::OperationalState::OperationalStateCluster::Delegate & operationalStateDelegate;
-        Clusters::ServiceArea::StorageDelegate & serviceAreaStorageDelegate;
-        Clusters::ServiceArea::Delegate & serviceAreaDelegate;
         Clusters::ModeBase::AppDelegate & runModeDelegate;
-        Clusters::ModeBase::AppDelegate & cleanModeDelegate;
-        // Mode values to report on startup, using the numbering of the concrete run/clean mode
-        // option lists supplied via runModeDelegate/cleanModeDelegate.
+        // Mode value to report on startup, using the numbering of the concrete run mode option
+        // list supplied via runModeDelegate.
         uint8_t runModeStartupValue;
-        uint8_t cleanModeStartupValue;
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
     };
 
@@ -57,26 +53,29 @@ public:
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     Clusters::RvcOperationalState::RvcOperationalStateCluster & OperationalState() { return mOperationalStateCluster.Cluster(); }
-    Clusters::ServiceArea::ServiceAreaCluster & GetServiceAreaCluster() { return mServiceAreaCluster.Cluster(); }
     Clusters::ModeBaseCluster & RunMode() { return mRunModeCluster.Cluster(); }
-    Clusters::ModeBaseCluster & CleanMode() { return mCleanModeCluster.Cluster(); }
+
+protected:
+    DeviceLayer::DiagnosticDataProvider & GetDiagnosticDataProvider() { return mDiagnosticDataProvider; }
+
+    // Hook for subclasses to register device-specific optional clusters (RVC Clean Mode, Service
+    // Area, ...) after the mandatory clusters above have been registered. Default: none added.
+    virtual CHIP_ERROR RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    // Counterpart to RegisterOptionalClusters(): a subclass that overrides one must override the
+    // other, to tear down whatever optional clusters it added.
+    virtual void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) {}
 
 private:
     Clusters::OperationalState::OperationalStateCluster::Delegate & mOperationalStateDelegate;
     LazyRegisteredServerCluster<Clusters::RvcOperationalState::RvcOperationalStateCluster> mOperationalStateCluster;
 
-    Clusters::ServiceArea::StorageDelegate & mServiceAreaStorageDelegate;
-    Clusters::ServiceArea::Delegate & mServiceAreaDelegate;
-    LazyRegisteredServerCluster<Clusters::ServiceArea::ServiceAreaCluster> mServiceAreaCluster;
-
     Clusters::ModeBase::AppDelegate & mRunModeDelegate;
     LazyRegisteredServerCluster<Clusters::ModeBaseCluster> mRunModeCluster;
-
-    Clusters::ModeBase::AppDelegate & mCleanModeDelegate;
-    LazyRegisteredServerCluster<Clusters::ModeBaseCluster> mCleanModeCluster;
-
     uint8_t mRunModeStartupValue;
-    uint8_t mCleanModeStartupValue;
 
     DeviceLayer::DiagnosticDataProvider & mDiagnosticDataProvider;
 };

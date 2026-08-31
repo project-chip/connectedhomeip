@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app/clusters/service-area-server/ServiceAreaCluster.h>
 #include <clusters/RvcOperationalState/Enums.h>
 #include <device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.h>
 #include <device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaStorageDelegate.h>
@@ -86,6 +87,9 @@ public:
 
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
+    Clusters::ServiceArea::ServiceAreaCluster & GetServiceAreaCluster() { return mServiceAreaCluster.Cluster(); }
+    Clusters::ModeBaseCluster & CleanMode() { return mCleanModeCluster.Cluster(); }
+
     // -- TimerContext --
     void TimerFired() override;
 
@@ -124,6 +128,13 @@ public:
     void HandleAreaComplete();
     void HandleClearError();
     void HandleErrorEvent(const std::string & error);
+
+protected:
+    // -- RoboticVacuumCleaner optional clusters --
+    // Adds RVC Clean Mode and Service Area, both optional per the device type definition, with
+    // this simulation's specific feature/attribute configuration.
+    CHIP_ERROR RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider) override;
+    void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) override;
 
 private:
     // ModeBase::AppDelegate can only be implemented once per class, but RunMode and CleanMode each
@@ -186,8 +197,10 @@ private:
 
     TimerDelegate & mTimerDelegate;
     Clusters::ServiceArea::LoggingServiceAreaStorageDelegate mServiceAreaStorageDelegate;
+    LazyRegisteredServerCluster<Clusters::ServiceArea::ServiceAreaCluster> mServiceAreaCluster;
     RunModeAppDelegate mRunModeAppDelegate{ *this };
     CleanModeAppDelegate mCleanModeAppDelegate{ *this };
+    LazyRegisteredServerCluster<Clusters::ModeBaseCluster> mCleanModeCluster;
 
     uint8_t mStateBeforePause            = 0;
     PhysicalDockState mPhysicalDockState = PhysicalDockState::kOffDock;

@@ -93,14 +93,10 @@ bool IsOperating(RvcOperationalState::RvcOperationalStateCluster & cluster)
 
 SimulatedRoboticVacuumCleaner::SimulatedRoboticVacuumCleaner(const Context & context) :
     RoboticVacuumCleaner(RoboticVacuumCleaner::Config{
-        .operationalStateDelegate   = *this,
-        .serviceAreaStorageDelegate = mServiceAreaStorageDelegate,
-        .serviceAreaDelegate        = *this,
-        .runModeDelegate            = mRunModeAppDelegate,
-        .cleanModeDelegate          = mCleanModeAppDelegate,
-        .runModeStartupValue        = kRunModeIdle,
-        .cleanModeStartupValue      = kCleanModeQuick,
-        .diagnosticDataProvider     = context.diagnosticDataProvider,
+        .operationalStateDelegate = *this,
+        .runModeDelegate          = mRunModeAppDelegate,
+        .runModeStartupValue      = kRunModeIdle,
+        .diagnosticDataProvider   = context.diagnosticDataProvider,
     }),
     mTimerDelegate(context.timerDelegate)
 {}
@@ -114,6 +110,48 @@ void SimulatedRoboticVacuumCleaner::Unregister(CodeDrivenDataModelProvider & pro
 {
     CancelTimer();
     RoboticVacuumCleaner::Unregister(provider);
+}
+
+CHIP_ERROR SimulatedRoboticVacuumCleaner::RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
+{
+    ServiceAreaCluster::OptionalAttributeSet serviceAreaOptionalAttributes;
+    serviceAreaOptionalAttributes.Set<Attributes::SupportedMaps::Id>();
+    serviceAreaOptionalAttributes.Set<Attributes::CurrentArea::Id>();
+    serviceAreaOptionalAttributes.Set<Attributes::EstimatedEndTime::Id>();
+    serviceAreaOptionalAttributes.Set<Attributes::Progress::Id>();
+
+    mServiceAreaCluster.Create(endpoint, mServiceAreaStorageDelegate, *this,
+                               BitMask<Feature>(Feature::kMaps, Feature::kProgressReporting), serviceAreaOptionalAttributes);
+    ReturnErrorOnFailure(provider.AddCluster(mServiceAreaCluster.Registration()));
+
+    mCleanModeCluster.Create(endpoint, Clusters::ModeBase::kRvcCleanMode,
+                             Clusters::ModeBaseCluster::Config{
+                                 .feature                = BitMask<Clusters::ModeBase::Feature>(),
+                                 .optionalAttributeSet   = {},
+                                 .appDelegate            = mCleanModeAppDelegate,
+                                 .onOffValueForStartUp   = false,
+                                 .diagnosticDataProvider = GetDiagnosticDataProvider(),
+                             });
+    ReturnErrorOnFailure(provider.AddCluster(mCleanModeCluster.Registration()));
+
+    ReturnErrorOnFailure(Init());
+
+    mCleanModeCluster.Cluster().UpdateCurrentMode(kCleanModeQuick);
+    return CHIP_NO_ERROR;
+}
+
+void SimulatedRoboticVacuumCleaner::UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider)
+{
+    if (mCleanModeCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mCleanModeCluster.Cluster()));
+        mCleanModeCluster.Destroy();
+    }
+    if (mServiceAreaCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mServiceAreaCluster.Cluster()));
+        mServiceAreaCluster.Destroy();
+    }
 }
 
 void SimulatedRoboticVacuumCleaner::CancelTimer()
