@@ -305,7 +305,7 @@ if CHIP_CRYPTO_PSA_MIGRATE_DAC_PRIV_KEY
 
 choice CHIP_CRYPTO_PSA_DAC_PRIV_KEY_MIGRATION_DEST
 	prompt "Destination for DAC private key migration"
-	default CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU if CRACEN_LIB_KMU
+	default CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU if CRACEN_KMU
 	default CHIP_CRYPTO_PSA_DAC_PRIV_KEY_ITS
 
 config CHIP_CRYPTO_PSA_DAC_PRIV_KEY_ITS
@@ -318,7 +318,7 @@ config CHIP_CRYPTO_PSA_DAC_PRIV_KEY_ITS
 
 config CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU
 	bool "Migrate DAC private key from factory data to CRACEN KMU"
-	depends on CRACEN_LIB_KMU
+	depends on CRACEN_KMU
 	help
 	  Move DAC private key from the factory data set to the CRACEN Key Management Unit (KMU) secure
 	  storage and remove it. After the first boot of the device the DAC private key will be
@@ -345,7 +345,7 @@ endif # CHIP_CRYPTO_PSA_MIGRATE_DAC_PRIV_KEY
 
 config CHIP_STORE_KEYS_IN_KMU
 	bool "Use KMU to store crypto keys"
-	depends on CRACEN_LIB_KMU
+	depends on CRACEN_KMU
 	select EXPERIMENTAL
 	help
 	  Stores cryptographic materials like keys in the KMU if available on the device.
