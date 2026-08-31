@@ -22,6 +22,12 @@
 
 namespace chip::app::Clusters::ServiceArea {
 
+// Minimal, non-persistent StorageDelegate: supported/selected areas, supported maps, and progress
+// elements are all held in-memory for the lifetime of the process and are lost on restart. It
+// starts empty; it does not pre-populate any hardcoded areas or maps on construction. A
+// ServiceAreaCluster is constructed with a reference to an instance of this class and drives it
+// entirely through the Get*/Add*Raw/Modify*Raw/Remove*Raw calls below; callers that want default
+// content (e.g. SimulatedRoboticVacuumCleaner::Init()) populate it explicitly after construction.
 class LoggingServiceAreaStorageDelegate : public StorageDelegate
 {
 public:
