@@ -18,7 +18,6 @@
 
 import logging
 from collections.abc import Callable
-from typing import Optional
 
 import matter.clusters as Clusters
 from matter.testing.basic_composition import BasicCompositionTests
