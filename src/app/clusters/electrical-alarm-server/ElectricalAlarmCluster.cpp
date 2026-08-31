@@ -513,9 +513,8 @@ Status ElectricalAlarmCluster::HandleSetThresholds(const Commands::SetElectrical
     //
     // For voltage/frequency/power/current pairs: over must be strictly > under (over >= under + 1).
     // For import/export: (0, 0) is the valid quiescent state; otherwise over must be > under.
-    auto checkPair = [&](const Optional<int64_t> & over, const Optional<int64_t> & under,
-                         int64_t storedOver, bool overFeatureEnabled,
-                         int64_t storedUnder, bool underFeatureEnabled) -> Status {
+    auto checkPair = [&](const Optional<int64_t> & over, const Optional<int64_t> & under, int64_t storedOver,
+                         bool overFeatureEnabled, int64_t storedUnder, bool underFeatureEnabled) -> Status {
         if (!over.HasValue() && !under.HasValue())
         {
             return Status::Success;
@@ -532,27 +531,27 @@ Status ElectricalAlarmCluster::HandleSetThresholds(const Commands::SetElectrical
     };
 
     Status s;
-    if ((s = checkPair(data.overVoltageThreshold, data.underVoltageThreshold,
-                       *mOverVoltageThreshold, mFeatureFlags.Has(Feature::kOverVoltage),
-                       *mUnderVoltageThreshold, mFeatureFlags.Has(Feature::kUnderVoltage))) != Status::Success)
+    if ((s = checkPair(data.overVoltageThreshold, data.underVoltageThreshold, *mOverVoltageThreshold,
+                       mFeatureFlags.Has(Feature::kOverVoltage), *mUnderVoltageThreshold,
+                       mFeatureFlags.Has(Feature::kUnderVoltage))) != Status::Success)
     {
         return s;
     }
-    if ((s = checkPair(data.overFrequencyThreshold, data.underFrequencyThreshold,
-                       *mOverFrequencyThreshold, mFeatureFlags.Has(Feature::kOverFrequency),
-                       *mUnderFrequencyThreshold, mFeatureFlags.Has(Feature::kUnderFrequency))) != Status::Success)
+    if ((s = checkPair(data.overFrequencyThreshold, data.underFrequencyThreshold, *mOverFrequencyThreshold,
+                       mFeatureFlags.Has(Feature::kOverFrequency), *mUnderFrequencyThreshold,
+                       mFeatureFlags.Has(Feature::kUnderFrequency))) != Status::Success)
     {
         return s;
     }
-    if ((s = checkPair(data.overPowerThreshold, data.underPowerThreshold,
-                       *mOverPowerThreshold, mFeatureFlags.Has(Feature::kOverPower),
-                       *mUnderPowerThreshold, mFeatureFlags.Has(Feature::kUnderPower))) != Status::Success)
+    if ((s = checkPair(data.overPowerThreshold, data.underPowerThreshold, *mOverPowerThreshold,
+                       mFeatureFlags.Has(Feature::kOverPower), *mUnderPowerThreshold, mFeatureFlags.Has(Feature::kUnderPower))) !=
+        Status::Success)
     {
         return s;
     }
-    if ((s = checkPair(data.overCurrentThreshold, data.underCurrentThreshold,
-                       *mOverCurrentThreshold, mFeatureFlags.Has(Feature::kOverCurrent),
-                       *mUnderCurrentThreshold, mFeatureFlags.Has(Feature::kUnderCurrent))) != Status::Success)
+    if ((s = checkPair(data.overCurrentThreshold, data.underCurrentThreshold, *mOverCurrentThreshold,
+                       mFeatureFlags.Has(Feature::kOverCurrent), *mUnderCurrentThreshold,
+                       mFeatureFlags.Has(Feature::kUnderCurrent))) != Status::Success)
     {
         return s;
     }
