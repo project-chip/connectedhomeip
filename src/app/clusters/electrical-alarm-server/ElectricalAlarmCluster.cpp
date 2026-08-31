@@ -497,6 +497,23 @@ Status ElectricalAlarmCluster::HandleSetThresholds(const Commands::SetElectrical
         return Status::UnsupportedCommand;
     }
 
+    // Validate that every supplied field targets a feature that is present. Do this before any
+    // constraint check or state mutation so the command is either fully accepted or fully rejected —
+    // applying some fields and then failing on a later one would leave state partially mutated.
+    if ((data.overVoltageThreshold.HasValue() && !mFeatureFlags.Has(Feature::kOverVoltage)) ||
+        (data.underVoltageThreshold.HasValue() && !mFeatureFlags.Has(Feature::kUnderVoltage)) ||
+        (data.overFrequencyThreshold.HasValue() && !mFeatureFlags.Has(Feature::kOverFrequency)) ||
+        (data.underFrequencyThreshold.HasValue() && !mFeatureFlags.Has(Feature::kUnderFrequency)) ||
+        (data.overPowerThreshold.HasValue() && !mFeatureFlags.Has(Feature::kOverPower)) ||
+        (data.underPowerThreshold.HasValue() && !mFeatureFlags.Has(Feature::kUnderPower)) ||
+        (data.overCurrentThreshold.HasValue() && !mFeatureFlags.Has(Feature::kOverCurrent)) ||
+        (data.underCurrentThreshold.HasValue() && !mFeatureFlags.Has(Feature::kUnderCurrent)) ||
+        (data.powerImportThreshold.HasValue() && !mFeatureFlags.Has(Feature::kPowerImport)) ||
+        (data.powerExportThreshold.HasValue() && !mFeatureFlags.Has(Feature::kPowerExport)))
+    {
+        return Status::InvalidCommand;
+    }
+
     // Validate absolute per-field constraints before cross-pair ordering.
     // PowerImportThreshold min 0, PowerExportThreshold max 0 (from spec and XML).
     if (data.powerImportThreshold.HasValue() && data.powerImportThreshold.Value() < 0)
@@ -572,66 +589,47 @@ Status ElectricalAlarmCluster::HandleSetThresholds(const Commands::SetElectrical
         return Status::Failure;
     }
 
-    // Persist each present field via the setter so SetAttributeValue fires for subscriptions.
-    // If a field is present in the command but the corresponding alarm-class feature is absent,
-    // the setter returns UnsupportedAttribute — treat that as InvalidCommand so the caller
-    // knows the field was not accepted rather than silently dropping it.
-    auto applyThreshold = [](Status result) -> Status {
-        if (result == Status::UnsupportedAttribute)
-        {
-            return Status::InvalidCommand;
-        }
-        return result;
-    };
+    // Commit: all fields have been validated; apply each present field. Feature presence was
+    // already checked above so each setter returns Success.
     if (data.overVoltageThreshold.HasValue())
     {
-        VerifyOrReturnValue(applyThreshold(SetOverVoltageThreshold(data.overVoltageThreshold.Value())) == Status::Success,
-                            Status::InvalidCommand);
+        SetOverVoltageThreshold(data.overVoltageThreshold.Value());
     }
     if (data.underVoltageThreshold.HasValue())
     {
-        VerifyOrReturnValue(applyThreshold(SetUnderVoltageThreshold(data.underVoltageThreshold.Value())) == Status::Success,
-                            Status::InvalidCommand);
+        SetUnderVoltageThreshold(data.underVoltageThreshold.Value());
     }
     if (data.overFrequencyThreshold.HasValue())
     {
-        VerifyOrReturnValue(applyThreshold(SetOverFrequencyThreshold(data.overFrequencyThreshold.Value())) == Status::Success,
-                            Status::InvalidCommand);
+        SetOverFrequencyThreshold(data.overFrequencyThreshold.Value());
     }
     if (data.underFrequencyThreshold.HasValue())
     {
-        VerifyOrReturnValue(applyThreshold(SetUnderFrequencyThreshold(data.underFrequencyThreshold.Value())) == Status::Success,
-                            Status::InvalidCommand);
+        SetUnderFrequencyThreshold(data.underFrequencyThreshold.Value());
     }
     if (data.overPowerThreshold.HasValue())
     {
-        VerifyOrReturnValue(applyThreshold(SetOverPowerThreshold(data.overPowerThreshold.Value())) == Status::Success,
-                            Status::InvalidCommand);
+        SetOverPowerThreshold(data.overPowerThreshold.Value());
     }
     if (data.underPowerThreshold.HasValue())
     {
-        VerifyOrReturnValue(applyThreshold(SetUnderPowerThreshold(data.underPowerThreshold.Value())) == Status::Success,
-                            Status::InvalidCommand);
+        SetUnderPowerThreshold(data.underPowerThreshold.Value());
     }
     if (data.overCurrentThreshold.HasValue())
     {
-        VerifyOrReturnValue(applyThreshold(SetOverCurrentThreshold(data.overCurrentThreshold.Value())) == Status::Success,
-                            Status::InvalidCommand);
+        SetOverCurrentThreshold(data.overCurrentThreshold.Value());
     }
     if (data.underCurrentThreshold.HasValue())
     {
-        VerifyOrReturnValue(applyThreshold(SetUnderCurrentThreshold(data.underCurrentThreshold.Value())) == Status::Success,
-                            Status::InvalidCommand);
+        SetUnderCurrentThreshold(data.underCurrentThreshold.Value());
     }
     if (data.powerImportThreshold.HasValue())
     {
-        VerifyOrReturnValue(applyThreshold(SetPowerImportThreshold(data.powerImportThreshold.Value())) == Status::Success,
-                            Status::InvalidCommand);
+        SetPowerImportThreshold(data.powerImportThreshold.Value());
     }
     if (data.powerExportThreshold.HasValue())
     {
-        VerifyOrReturnValue(applyThreshold(SetPowerExportThreshold(data.powerExportThreshold.Value())) == Status::Success,
-                            Status::InvalidCommand);
+        SetPowerExportThreshold(data.powerExportThreshold.Value());
     }
 
     return Status::Success;
