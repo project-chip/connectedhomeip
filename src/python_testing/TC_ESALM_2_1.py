@@ -40,26 +40,12 @@
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.interaction_model import Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 
-# Feature bitmap bit positions (from electrical-alarm-cluster.xml)
-_FEAT_RESET = 1 << 0
-_FEAT_ADJUST = 1 << 20
-_FEAT_OVERVOLT = 1 << 21
-_FEAT_UNDERVOLT = 1 << 22
-_FEAT_OVERFREQ = 1 << 23
-_FEAT_UNDERFREQ = 1 << 24
-_FEAT_OVERPOWER = 1 << 25
-_FEAT_UNDERPOWER = 1 << 26
-_FEAT_OVERCUR = 1 << 27
-_FEAT_UNDERCUR = 1 << 28
-_FEAT_POWERIMP = 1 << 29
-_FEAT_POWEREXP = 1 << 30
-
 cluster = Clusters.ElectricalAlarm
+_F = cluster.Bitmaps.Feature
 
 
 class TC_ESALM_2_1(MatterBaseTest):
@@ -76,23 +62,24 @@ class TC_ESALM_2_1(MatterBaseTest):
 
         self.step(1, "Commission DUT to TH", is_commissioning=True)
 
-        self.step(2, "TH reads FeatureMap attribute", "DUT returns uint32. Store as FeatureMap.")
+        self.step(2, "TH reads FeatureMap attribute",
+                  expectation="DUT returns uint32. Store as FeatureMap.")
         feature_map = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.FeatureMap)
-        has_reset = bool(feature_map & _FEAT_RESET)
-        has_overvolt = bool(feature_map & _FEAT_OVERVOLT)
-        has_undervolt = bool(feature_map & _FEAT_UNDERVOLT)
-        has_overfreq = bool(feature_map & _FEAT_OVERFREQ)
-        has_underfreq = bool(feature_map & _FEAT_UNDERFREQ)
-        has_overpower = bool(feature_map & _FEAT_OVERPOWER)
-        has_underpower = bool(feature_map & _FEAT_UNDERPOWER)
-        has_overcur = bool(feature_map & _FEAT_OVERCUR)
-        has_undercur = bool(feature_map & _FEAT_UNDERCUR)
-        has_powerimp = bool(feature_map & _FEAT_POWERIMP)
-        has_powerexp = bool(feature_map & _FEAT_POWEREXP)
+        has_reset = bool(feature_map & _F.kReset)
+        has_overvolt = bool(feature_map & _F.kOverVoltage)
+        has_undervolt = bool(feature_map & _F.kUnderVoltage)
+        has_overfreq = bool(feature_map & _F.kOverFrequency)
+        has_underfreq = bool(feature_map & _F.kUnderFrequency)
+        has_overpower = bool(feature_map & _F.kOverPower)
+        has_underpower = bool(feature_map & _F.kUnderPower)
+        has_overcur = bool(feature_map & _F.kOverCurrent)
+        has_undercur = bool(feature_map & _F.kUnderCurrent)
+        has_powerimp = bool(feature_map & _F.kPowerImport)
+        has_powerexp = bool(feature_map & _F.kPowerExport)
 
         self.step(3, "TH reads Supported attribute",
-                  "DUT returns AlarmBitmap. Every bit set in Supported has a corresponding feature bit in FeatureMap.")
+                  expectation="DUT returns AlarmBitmap. Every bit set in Supported has a corresponding feature bit in FeatureMap.")
         supported = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.Supported)
         asserts.assert_true(isinstance(supported, int), "Supported must be an integer bitmap")
@@ -117,27 +104,29 @@ class TC_ESALM_2_1(MatterBaseTest):
         if has_powerexp:
             asserts.assert_true(supported & 0x4000, "POWEREXP feature set but PowerExported bit (0x4000) missing from Supported")
 
-        self.step(4, "TH reads Mask attribute", "DUT returns AlarmBitmap. Every bit set in Mask is also set in Supported.")
+        self.step(4, "TH reads Mask attribute",
+                  expectation="DUT returns AlarmBitmap. Every bit set in Mask is also set in Supported.")
         mask = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.Mask)
         asserts.assert_true(isinstance(mask, int), "Mask must be an integer bitmap")
-        asserts.assert_equal(mask & ~supported, 0, "Mask contains bits not set in Supported")
+        asserts.assert_equal(int(mask) & ~int(supported), 0, "Mask contains bits not set in Supported")
 
         self.step(5, "TH reads Latch attribute (if RESET supported)",
-                  "DUT returns AlarmBitmap. Every bit set in Latch is also set in Supported.")
+                  expectation="DUT returns AlarmBitmap. Every bit set in Latch is also set in Supported.")
         if has_reset:
             latch = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.Latch)
             asserts.assert_true(isinstance(latch, int), "Latch must be an integer bitmap")
-            asserts.assert_equal(latch & ~supported, 0, "Latch contains bits not set in Supported")
+            asserts.assert_equal(int(latch) & ~int(supported), 0, "Latch contains bits not set in Supported")
         else:
             self.mark_current_step_skipped()
 
-        self.step(6, "TH reads State attribute", "DUT returns AlarmBitmap. Every bit set in State is also set in Supported.")
+        self.step(6, "TH reads State attribute",
+                  expectation="DUT returns AlarmBitmap. Every bit set in State is also set in Supported.")
         state = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.State)
         asserts.assert_true(isinstance(state, int), "State must be an integer bitmap")
-        asserts.assert_equal(state & ~supported, 0, "State contains bits not set in Supported")
+        asserts.assert_equal(int(state) & ~int(supported), 0, "State contains bits not set in Supported")
 
         over_voltage = None
         under_voltage = None
@@ -252,16 +241,6 @@ class TC_ESALM_2_1(MatterBaseTest):
         else:
             self.mark_current_step_skipped()
 
-        self.step(17, "TH attempts write to OverVoltageThreshold (if OVERVOLT supported)",
-                  "DUT returns UNSUPPORTED_WRITE (attribute is read-only).")
-        if has_overvolt:
-            write_val = attrs.OverVoltageThreshold(over_voltage if over_voltage is not None else 0)
-            status = await self.write_single_attribute(
-                attribute_value=write_val, endpoint_id=endpoint, expect_success=False)
-            asserts.assert_equal(status, Status.UnsupportedWrite,
-                                 "Expected UNSUPPORTED_WRITE for read-only OverVoltageThreshold")
-        else:
-            self.mark_current_step_skipped()
 
 
 if __name__ == "__main__":

@@ -44,23 +44,12 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 
-_FEAT_ADJUST = 1 << 20
-_FEAT_OVERVOLT = 1 << 21
-_FEAT_UNDERVOLT = 1 << 22
-_FEAT_OVERFREQ = 1 << 23
-_FEAT_UNDERFREQ = 1 << 24
-_FEAT_OVERPOWER = 1 << 25
-_FEAT_UNDERPOWER = 1 << 26
-_FEAT_OVERCUR = 1 << 27
-_FEAT_UNDERCUR = 1 << 28
-_FEAT_POWERIMP = 1 << 29
-_FEAT_POWEREXP = 1 << 30
-
 cluster = Clusters.ElectricalAlarm
+_F = cluster.Bitmaps.Feature
 
 
 class TC_ESALM_2_2(MatterBaseTest):
@@ -78,7 +67,7 @@ class TC_ESALM_2_2(MatterBaseTest):
             asserts.assert_equal(e.status, expected_status,
                                  f"Expected {expected_status}, got {e.status}")
 
-    @run_if_endpoint_matches(has_cluster(cluster))
+    @run_if_endpoint_matches(has_feature(cluster, _F.kAdjustableThresholds))
     async def test_TC_ESALM_2_2(self):
         """[TC-ESALM-2.2] SetElectricalAlarmThresholds Command with Server as DUT
 
@@ -95,16 +84,16 @@ class TC_ESALM_2_2(MatterBaseTest):
                   "SUCCESS for each read.")
         feature_map = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.FeatureMap)
-        has_overvolt = bool(feature_map & _FEAT_OVERVOLT)
-        has_undervolt = bool(feature_map & _FEAT_UNDERVOLT)
-        has_overfreq = bool(feature_map & _FEAT_OVERFREQ)
-        has_underfreq = bool(feature_map & _FEAT_UNDERFREQ)
-        has_overpower = bool(feature_map & _FEAT_OVERPOWER)
-        has_underpower = bool(feature_map & _FEAT_UNDERPOWER)
-        has_overcur = bool(feature_map & _FEAT_OVERCUR)
-        has_undercur = bool(feature_map & _FEAT_UNDERCUR)
-        has_powerimp = bool(feature_map & _FEAT_POWERIMP)
-        has_powerexp = bool(feature_map & _FEAT_POWEREXP)
+        has_overvolt = bool(feature_map & _F.kOverVoltage)
+        has_undervolt = bool(feature_map & _F.kUnderVoltage)
+        has_overfreq = bool(feature_map & _F.kOverFrequency)
+        has_underfreq = bool(feature_map & _F.kUnderFrequency)
+        has_overpower = bool(feature_map & _F.kOverPower)
+        has_underpower = bool(feature_map & _F.kUnderPower)
+        has_overcur = bool(feature_map & _F.kOverCurrent)
+        has_undercur = bool(feature_map & _F.kUnderCurrent)
+        has_powerimp = bool(feature_map & _F.kPowerImport)
+        has_powerexp = bool(feature_map & _F.kPowerExport)
 
         orig_over_voltage = None
         orig_under_voltage = None

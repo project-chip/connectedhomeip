@@ -70,18 +70,28 @@ class TC_ESALM_3_1(MatterBaseTest):
         self.step(1, "Commission DUT to TH", is_commissioning=True)
 
         self.step(2, "TH reads TestEventTriggersEnabled from General Diagnostics",
-                  "Value is 1 (True). If 0, skip remaining steps.")
+                  expectation="Value is 1 (True). If 0, skip remaining steps.")
         gen_diag = Clusters.GeneralDiagnostics
         triggers_enabled = await self.read_single_attribute_check_success(
             endpoint=0, cluster=gen_diag, attribute=gen_diag.Attributes.TestEventTriggersEnabled)
         if not triggers_enabled:
-            for step_num in [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]:
-                self.step(step_num)
-                self.mark_current_step_skipped()
+            self.mark_all_remaining_steps_skipped(3)
             return
 
+        # PIXITs are required for this test to run — fail explicitly if absent rather than silently
+        # skipping all remaining steps (which would report a pass without testing anything).
+        trigger_active = self.user_params.get("PIXIT.ESALM.TEST_EVENT_TRIGGER_ACTIVE", None)
+        trigger_clear = self.user_params.get("PIXIT.ESALM.TEST_EVENT_TRIGGER_CLEAR", None)
+        # triggered_bit must match the alarm the trigger actually raises — derive from PIXIT
+        triggered_bit_raw = self.user_params.get("PIXIT.ESALM.TRIGGERED_BIT", None)
+        asserts.assert_is_not_none(trigger_active,
+                                   "PIXIT.ESALM.TEST_EVENT_TRIGGER_ACTIVE is required but was not supplied")
+        asserts.assert_is_not_none(triggered_bit_raw,
+                                   "PIXIT.ESALM.TRIGGERED_BIT is required but was not supplied")
+        triggered_bit = int(triggered_bit_raw, 0) if isinstance(triggered_bit_raw, str) else int(triggered_bit_raw)
+
         self.step(3, "TH reads Supported, Mask, Latch, and State",
-                  "SUCCESS. At least one alarm bit is set in Supported and enabled in Mask.")
+                  expectation="SUCCESS. At least one alarm bit is set in Supported and enabled in Mask.")
         supported = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.Supported)
         mask = await self.read_single_attribute_check_success(
@@ -94,22 +104,23 @@ class TC_ESALM_3_1(MatterBaseTest):
             latch = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.Latch)
 
-        triggered_bit = None
-        for bit in range(64):
-            candidate = 1 << bit
-            if (supported & candidate) and (mask & candidate):
-                triggered_bit = candidate
-                break
-        asserts.assert_is_not_none(triggered_bit,
-                                   "No alarm bit is both supported and enabled in Mask — cannot proceed")
+        asserts.assert_true(int(supported) & triggered_bit,
+                            f"TRIGGERED_BIT (0x{triggered_bit:x}) is not set in Supported — cannot test this alarm")
+        asserts.assert_true(int(mask) & triggered_bit,
+                            f"TRIGGERED_BIT (0x{triggered_bit:x}) is not enabled in Mask — test would be suppressed")
 
-        is_latched = bool(latch & triggered_bit)
+        is_latched = bool(int(latch) & triggered_bit)
 
-        trigger_active = self.user_params.get("PIXIT.ESALM.TEST_EVENT_TRIGGER_ACTIVE", None)
-        trigger_clear = self.user_params.get("PIXIT.ESALM.TEST_EVENT_TRIGGER_CLEAR", None)
+        # Verify the alarm is not already active before triggering — if it is, the trigger causes
+        # no state transition and the subscription report never arrives.
+        current_state = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attrs.State)
+        asserts.assert_false(int(current_state) & triggered_bit,
+                             f"TRIGGERED_BIT (0x{triggered_bit:x}) is already active before test starts — "
+                             "send the all-clear trigger first, or choose a different alarm bit")
 
         self.step(4, "TH establishes subscription to State with MinIntervalFloor=0, MaxIntervalCeiling=30",
-                  "Subscription established; initial priming report received.")
+                  expectation="Subscription established; initial priming report received.")
         state_sub = AttributeSubscriptionHandler(cluster, attrs.State)
         await state_sub.start(self.default_controller, self.dut_node_id,
                               endpoint=endpoint, min_interval_sec=0,
@@ -119,15 +130,8 @@ class TC_ESALM_3_1(MatterBaseTest):
                               endpoint=endpoint, min_interval_sec=0,
                               max_interval_sec=30)
 
-        self.step(5, "TH sends TestEventTrigger to simulate an alarm condition for a supported and enabled alarm bit (TRIGGERED_BIT)",
-                  "SUCCESS. Subscription report received with TRIGGERED_BIT set in State.")
-        if trigger_active is None:
-            self.mark_current_step_skipped()
-            for step_num in [6, 7, 8, 9, 10, 11, 12, 13]:
-                self.step(step_num)
-                self.mark_current_step_skipped()
-            return
-
+        self.step(5, "TH sends TestEventTrigger to simulate an alarm condition for TRIGGERED_BIT",
+                  expectation="SUCCESS. Subscription report received with TRIGGERED_BIT set in State.")
         state_sub.reset()
         event_sub.reset()
         trigger_active_val = int(trigger_active, 0) if isinstance(trigger_active, str) else int(trigger_active)
