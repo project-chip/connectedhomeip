@@ -112,12 +112,6 @@ private:
     DataModel::Nullable<uint8_t> mOnMode{};
 };
 
-namespace ModeSelect {
-/// Returns the cluster instance registered on the given endpoint, or nullptr if not found.
-/// Only valid when code-driven cluster integration is active (all-clusters apps).
-ModeSelectCluster * FindClusterOnEndpoint(EndpointId endpointId);
-} // namespace ModeSelect
-
 } // namespace Clusters
 } // namespace app
 } // namespace chip

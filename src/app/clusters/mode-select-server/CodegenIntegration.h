@@ -17,5 +17,18 @@
 
 #pragma once
 
-// ModeSelectCluster.h contains all public declarations including FindClusterOnEndpoint.
 #include <app/clusters/mode-select-server/ModeSelectCluster.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ModeSelect {
+
+/// Returns the cluster instance registered on the given endpoint, or nullptr if not found.
+/// Only valid when code-driven cluster integration is active (all-clusters apps).
+ModeSelectCluster * FindClusterOnEndpoint(EndpointId endpointId);
+
+} // namespace ModeSelect
+} // namespace Clusters
+} // namespace app
+} // namespace chip

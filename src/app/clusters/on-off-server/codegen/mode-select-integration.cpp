@@ -17,7 +17,7 @@
 
 #ifdef MATTER_DM_PLUGIN_MODE_SELECT
 
-#include <app/clusters/mode-select-server/ModeSelectCluster.h> // nogncheck
+#include <app/clusters/mode-select-server/CodegenIntegration.h> // nogncheck
 
 namespace chip::app::Clusters::OnOff::Internal::ModeSelect {
 
