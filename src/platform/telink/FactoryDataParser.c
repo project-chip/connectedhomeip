@@ -45,7 +45,6 @@ bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData 
     memset(factoryData, 0, sizeof(*factoryData));
     ZCBOR_STATE_D(states, MAX_FACTORY_DATA_NESTING_LEVEL, buffer, bufferSize, 1, 0);
 
-
     bool res = zcbor_map_start_decode(states);
     struct zcbor_string currentString;
 
