@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <app/clusters/electrical-alarm-server/electrical-alarm-delegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/ElectricalAlarm/AttributeIds.h>
@@ -115,29 +117,22 @@ private:
     BitMask<AlarmBitmap> mSupported;
     BitMask<AlarmBitmap> mLatch;
 
-    // Threshold attribute state (valid only when the corresponding feature is present)
-    int64_t mOverVoltageThreshold    = 0;
-    int64_t mUnderVoltageThreshold   = 0;
-    int64_t mOverFrequencyThreshold  = 0;
-    int64_t mUnderFrequencyThreshold = 0;
-    int64_t mOverPowerThreshold      = 0;
-    int64_t mUnderPowerThreshold     = 0;
-    int64_t mOverCurrentThreshold    = 0;
-    int64_t mUnderCurrentThreshold   = 0;
-    int64_t mPowerImportThreshold    = 0;
-    int64_t mPowerExportThreshold    = 0;
+    // Threshold attribute state — seeded to spec Fallback values so the boot state is always
+    // valid (e.g. OVT > UVT when both features are present). std::optional is used per SDK
+    // convention; values are always present after construction.
+    static constexpr int64_t kOverThresholdDefault  = 4611686018427387904LL;  // 2^62
+    static constexpr int64_t kUnderThresholdDefault = -4611686018427387904LL; // -(2^62)
 
-    // Tracks whether each threshold has been explicitly set (0 is a valid threshold value).
-    bool mOverVoltageThresholdSet    = false;
-    bool mUnderVoltageThresholdSet   = false;
-    bool mOverFrequencyThresholdSet  = false;
-    bool mUnderFrequencyThresholdSet = false;
-    bool mOverPowerThresholdSet      = false;
-    bool mUnderPowerThresholdSet     = false;
-    bool mOverCurrentThresholdSet    = false;
-    bool mUnderCurrentThresholdSet   = false;
-    bool mPowerImportThresholdSet    = false;
-    bool mPowerExportThresholdSet    = false;
+    std::optional<int64_t> mOverVoltageThreshold    = kOverThresholdDefault;
+    std::optional<int64_t> mUnderVoltageThreshold   = 0;
+    std::optional<int64_t> mOverFrequencyThreshold  = 1000000;
+    std::optional<int64_t> mUnderFrequencyThreshold = 0;
+    std::optional<int64_t> mOverPowerThreshold      = kOverThresholdDefault;
+    std::optional<int64_t> mUnderPowerThreshold     = kUnderThresholdDefault;
+    std::optional<int64_t> mOverCurrentThreshold    = kOverThresholdDefault;
+    std::optional<int64_t> mUnderCurrentThreshold   = kUnderThresholdDefault;
+    std::optional<int64_t> mPowerImportThreshold    = kOverThresholdDefault;
+    std::optional<int64_t> mPowerExportThreshold    = kUnderThresholdDefault;
 };
 
 } // namespace ElectricalAlarm

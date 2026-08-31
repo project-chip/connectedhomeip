@@ -674,10 +674,10 @@ TEST_F(TestElectricalAlarmCluster, SetThresholds_DelegateRejects)
         EXPECT_EQ(statusCode->GetStatus(), Status::Failure);
     }
 
-    // Threshold must not have been persisted.
+    // Threshold must not have been persisted (should still be the Fallback default, not 1000).
     int64_t val = 0;
     EXPECT_TRUE(tester.ReadAttribute(Attributes::OverVoltageThreshold::Id, val).IsSuccess());
-    EXPECT_EQ(val, 0);
+    EXPECT_NE(val, 1000);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

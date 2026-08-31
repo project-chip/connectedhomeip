@@ -18,6 +18,7 @@
 #include <app/clusters/electrical-alarm-server/CodegenIntegration.h>
 
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/CodegenProcessingConfig.h>
 
 namespace chip {
 namespace app {
