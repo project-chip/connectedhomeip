@@ -308,7 +308,8 @@
             "Currency",
             "CurrentPrice",
             "PriceForecast",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Commodity Tariff": [
             "TariffInfo",

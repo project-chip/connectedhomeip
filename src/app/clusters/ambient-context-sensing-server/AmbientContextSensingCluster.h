@@ -98,6 +98,8 @@ public:
     CHIP_ERROR SetAmbientContextTypeSupported(const Span<AmbientContextSensing::SemanticTagType> & ACTypeList);
     CHIP_ERROR AddDetection(const AmbientContextSensing::AmbientContextSensingType & sensedEvent);
     DataModel::ActionReturnStatus SetObjectCountConfig(const AmbientContextSensing::ObjectCountConfigType & objectCountConfig);
+    // The returned countingObject.label references cluster-owned storage: it is valid only until
+    // the next SetObjectCountConfig call and must not be stored by the caller.
     AmbientContextSensing::ObjectCountConfigType GetObjectCountConfig() { return mObjectCountConfig; }
     CHIP_ERROR SetObjectCount(uint16_t objectCount);
     uint16_t GetObjectCount() { return mObjectCount; }
@@ -108,6 +110,7 @@ public:
     void SetHoldTimeLimits(const AmbientContextSensing::Structs::HoldTimeLimitsStruct::Type & holdTimeLimits);
     AmbientContextSensing::Structs::HoldTimeLimitsStruct::Type GetHoldTimeLimits() { return mHoldTimeLimits; }
     CHIP_ERROR SetPredictedActivity(const Span<AmbientContextSensing::PredictedActivityType> & predictedActivity);
+    CHIP_ERROR SetSensorFusionSupported(const Span<AmbientContextSensing::SemanticTagType> & sensorFusionSupportedList);
     void TimerFired() override;
 
 private:
@@ -128,6 +131,9 @@ private:
     System::Clock::Timestamp FindEarliestEndTimestamp();
     CHIP_ERROR CheckPredictedActivity(const Span<AmbientContextSensing::PredictedActivityType> & predictedActivityList);
     CHIP_ERROR ReadPredictedActivity(AttributeValueEncoder & encoder);
+    bool IsSupportedType(const AmbientContextSensing::SemanticTagType & sensedType);
+    CHIP_ERROR CheckSensorFusionSupported(const Span<AmbientContextSensing::SemanticTagType> & sensorFusionSupportedList);
+    CHIP_ERROR ReadSensorFusionSupported(AttributeValueEncoder & encoder);
 
     const BitMask<AmbientContextSensing::Feature> mFeatureMap;
     const OptionalAttributeSet mOptionalAttributeSet;
@@ -142,6 +148,7 @@ private:
     uint8_t mAmbientContextTypeListSize = 0;
 
     Span<AmbientContextSensing::PredictActivity> mPredictedActivityList;
+    Span<AmbientContextSensing::SemanticTagType> mSensorFusionSupportedList;
 
     uint8_t mSimultaneousDetectionLimit = AmbientContextSensing::kDefaultSimultaneousDetectionLimit;
     bool mObjectCountThresholdReached   = false;
@@ -152,6 +159,10 @@ private:
             },
             .objectCountThreshold = AmbientContextSensing::kDefaultCountThreshold,
         };
+    // Backing store for mObjectCountConfig.countingObject.label. The decoded CharSpan points into
+    // the write request payload, which is released when the write transaction completes.
+    char mObjectCountConfigLabel[AmbientContextSensing::kMaxSemanticTagLabelLength] = {};
+
     uint16_t mObjectCount = 0;
     System::Clock::Timestamp mObjectCountStartTime;
     uint64_t mObjectCountStartEpoch;
