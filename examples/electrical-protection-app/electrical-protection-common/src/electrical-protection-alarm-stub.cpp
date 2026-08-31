@@ -95,35 +95,44 @@ bool HandleElectricalProtectionAlarmTestEventTrigger(uint64_t eventTrigger)
     VerifyOrReturnValue(gInstance != nullptr, false);
     auto & cluster = gInstance->Cluster();
 
-    BitMask<AlarmBitmap> bit;
+    auto activate = [&cluster](AlarmBitmap alarm) { return cluster.ActivateAlarms(BitMask<AlarmBitmap>(alarm)) == CHIP_NO_ERROR; };
+    auto deactivate = [&cluster](AlarmBitmap alarm) {
+        return cluster.DeactivateAlarms(BitMask<AlarmBitmap>(alarm)) == CHIP_NO_ERROR;
+    };
+
     switch (static_cast<ElectricalProtectionAlarmTrigger>(eventTrigger))
     {
     case ElectricalProtectionAlarmTrigger::kClearAll:
         return cluster.ClearAllAlarms() == CHIP_NO_ERROR;
     case ElectricalProtectionAlarmTrigger::kSetShortCircuitFault:
-        bit.Set(AlarmBitmap::kShortCircuitFault);
-        break;
+        return activate(AlarmBitmap::kShortCircuitFault);
     case ElectricalProtectionAlarmTrigger::kSetOverLoadFault:
-        bit.Set(AlarmBitmap::kOverLoadFault);
-        break;
+        return activate(AlarmBitmap::kOverLoadFault);
     case ElectricalProtectionAlarmTrigger::kSetOverVoltageFault:
-        bit.Set(AlarmBitmap::kOverVoltageFault);
-        break;
+        return activate(AlarmBitmap::kOverVoltageFault);
     case ElectricalProtectionAlarmTrigger::kSetVoltageSurgeFault:
-        bit.Set(AlarmBitmap::kVoltageSurgeFault);
-        break;
+        return activate(AlarmBitmap::kVoltageSurgeFault);
     case ElectricalProtectionAlarmTrigger::kSetResidualCurrentFault:
-        bit.Set(AlarmBitmap::kResidualCurrentFault);
-        break;
+        return activate(AlarmBitmap::kResidualCurrentFault);
     case ElectricalProtectionAlarmTrigger::kSetArcFault:
-        bit.Set(AlarmBitmap::kArcFault);
-        break;
+        return activate(AlarmBitmap::kArcFault);
     case ElectricalProtectionAlarmTrigger::kSetSelfTest:
-        bit.Set(AlarmBitmap::kSelfTest);
-        break;
+        return activate(AlarmBitmap::kSelfTest);
+    case ElectricalProtectionAlarmTrigger::kClearShortCircuitFault:
+        return deactivate(AlarmBitmap::kShortCircuitFault);
+    case ElectricalProtectionAlarmTrigger::kClearOverLoadFault:
+        return deactivate(AlarmBitmap::kOverLoadFault);
+    case ElectricalProtectionAlarmTrigger::kClearOverVoltageFault:
+        return deactivate(AlarmBitmap::kOverVoltageFault);
+    case ElectricalProtectionAlarmTrigger::kClearVoltageSurgeFault:
+        return deactivate(AlarmBitmap::kVoltageSurgeFault);
+    case ElectricalProtectionAlarmTrigger::kClearResidualCurrentFault:
+        return deactivate(AlarmBitmap::kResidualCurrentFault);
+    case ElectricalProtectionAlarmTrigger::kClearArcFault:
+        return deactivate(AlarmBitmap::kArcFault);
+    case ElectricalProtectionAlarmTrigger::kClearSelfTest:
+        return deactivate(AlarmBitmap::kSelfTest);
     default:
         return false;
     }
-
-    return cluster.ActivateAlarms(bit) == CHIP_NO_ERROR;
 }
