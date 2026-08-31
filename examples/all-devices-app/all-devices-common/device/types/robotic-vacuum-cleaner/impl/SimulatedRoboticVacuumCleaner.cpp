@@ -372,7 +372,7 @@ void SimulatedRoboticVacuumCleaner::HandleGoHomeCommandCallback(OperationalState
 CHIP_ERROR SimulatedRoboticVacuumCleaner::Init()
 {
     SetMapTopology();
-    GetServiceAreaCluster().SetCurrentArea(DefaultCurrentAreaId());
+    GetServiceAreaCluster().SetCurrentArea(kAreaIdC);
     return CHIP_NO_ERROR;
 }
 

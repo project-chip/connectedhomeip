@@ -27,11 +27,6 @@ namespace app {
 namespace all_devices {
 namespace rvc_simulation {
 
-inline uint32_t DefaultCurrentAreaId()
-{
-    return Topology::kAreaIdC;
-}
-
 /**
  * Populates SupportedMaps and SupportedAreas with the default topology used by
  * all-devices-app robotic vacuum certification tests.

@@ -48,7 +48,7 @@ void HandleReset(SimulatedRoboticVacuumCleaner & rvcDevice)
     rvcDevice.GetServiceAreaCluster().SetEstimatedEndTime(DataModel::NullNullable);
 
     ApplyDefaultMapTopology(rvcDevice.GetServiceAreaCluster());
-    rvcDevice.GetServiceAreaCluster().SetCurrentArea(DefaultCurrentAreaId());
+    rvcDevice.GetServiceAreaCluster().SetCurrentArea(Topology::kAreaIdC);
 }
 
 class RvcNamedPipeCommandHandler : public AllDevicesAppNamedPipeCommandHandler
