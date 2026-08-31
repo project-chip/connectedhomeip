@@ -149,6 +149,8 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     VerifyOrReturnError(deviceInfoProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     static chip::app::DefaultTimerDelegate sTimerDelegate;
+    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate;
+
 
     chip::app::RootNode::Context rootNodeContext = {
         .commissioningWindowManager = chip::Server::GetInstance().GetCommissioningWindowManager(),
@@ -165,7 +167,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         .dnssdServer                = chip::app::DnssdServer::Instance(),
         .deviceLoadStatusProvider   = *chip::app::InteractionModelEngine::GetInstance(),
         .diagnosticDataProvider     = chip::DeviceLayer::GetDiagnosticDataProvider(),
-        .testEventTriggerDelegate   = nullptr,
+        .testEventTriggerDelegate   = &sTestEventTriggerDelegate,
         .dacProvider                = *chip::Credentials::GetDeviceAttestationCredentialsProvider(),
         .eventManagement            = chip::app::EventManagement::GetInstance(),
         .timerDelegate              = sTimerDelegate,
@@ -192,9 +194,6 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
 
     chip::app::ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
     ReturnErrorOnFailure(sRootNode->Register(rootAllocator, *sDataModelProvider));
-
-    // Initialize the test event trigger delegate
-    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate;
 
     chip::app::DeviceFactory::GetInstance().Init(chip::app::DeviceFactory::Context{
         .groupDataProvider        = *groupDataProvider,
