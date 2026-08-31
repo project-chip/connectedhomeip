@@ -120,9 +120,12 @@ DataModel::ActionReturnStatus LoggingLightDriver::TriggerDyingLight(OnOff::Dying
 
 // ColorControlDelegate
 
-void LoggingLightDriver::OnColorCTChanged(uint16_t mireds)
+void LoggingLightDriver::OnColorCTChanged(uint16_t mireds, bool transitionActive)
 {
-    ChipLogProgress(DeviceLayer, "LoggingLightDriver::OnColorCTChanged() -> %u mireds", mireds);
+    // This driver only logs, so it has no hardware ramp to abort or resynchronize: both intermediate
+    // frames and settled endpoints are reported the same way, with the flag recorded for visibility.
+    ChipLogProgress(DeviceLayer, "LoggingLightDriver::OnColorCTChanged() -> %u mireds (transitionActive=%s)", mireds,
+                    transitionActive ? "true" : "false");
 }
 
 void LoggingLightDriver::OnIdentifyStart(Clusters::IdentifyCluster & cluster)

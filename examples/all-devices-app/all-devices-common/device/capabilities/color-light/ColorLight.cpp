@@ -136,7 +136,7 @@ CHIP_ERROR ColorLight::Register(EndpointId endpoint, CodeDrivenDataModelProvider
                           });
     ReturnErrorOnFailure(provider.AddCluster(mGroupsCluster.Registration()));
 
-    Clusters::ColorControlCluster::Config colorConfig(mColorDelegate);
+    Clusters::ColorControlCluster::Config colorConfig(mColorDelegate, mContext.timerDelegate);
     colorConfig.onOff = &mOnOffCluster.Cluster();
     // The ColorValue variant defaults to XY; the leaf picks the mode matching its feature map.
     colorConfig.mColorValue = mConformance.initialColor;

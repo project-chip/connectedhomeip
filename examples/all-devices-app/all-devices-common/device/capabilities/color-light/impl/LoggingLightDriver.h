@@ -60,7 +60,7 @@ protected:
     // ColorControlDelegate. Only the color temperature output is implemented: the device types
     // built on this advertise no more than one color representation at a time that needs driving,
     // so the cluster never asks for a conversion between representations.
-    void OnColorCTChanged(uint16_t mireds) override;
+    void OnColorCTChanged(uint16_t mireds, bool transitionActive) override;
 
     // IdentifyDelegate. TriggerEffect is mandatory for both device types built on this driver
     // (Color Temperature Light 0x010C and Extended Color Light 0x010D), so it is always enabled.
