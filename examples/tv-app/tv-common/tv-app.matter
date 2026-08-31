@@ -4609,8 +4609,8 @@ endpoint 2 {
 
   server cluster OnOff {
     ram      attribute onOff default = 0x00;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0007;
+    callback attribute featureMap default = 0;
+    callback attribute clusterRevision default = 0x0007;
 
     handle command Off;
     handle command On;
@@ -4618,22 +4618,19 @@ endpoint 2 {
   }
 
   server cluster LevelControl {
-    persist  attribute currentLevel default = 0x00;
-    ram      attribute remainingTime default = 0x0000;
+    callback attribute currentLevel default = 0x00;
+    callback attribute remainingTime default = 0x0000;
     ram      attribute minLevel default = 0x00;
     ram      attribute maxLevel default = 0xFF;
-    ram      attribute currentFrequency default = 0x0000;
-    ram      attribute minFrequency default = 0x0000;
-    ram      attribute maxFrequency default = 0x0000;
-    ram      attribute options default = 0x00;
+    callback attribute options default = 0x00;
     ram      attribute onOffTransitionTime default = 0x0000;
     ram      attribute onLevel default = 0xFE;
     ram      attribute onTransitionTime;
     ram      attribute offTransitionTime;
     ram      attribute defaultMoveRate;
-    persist  attribute startUpCurrentLevel default = 255;
-    ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 0x0007;
+    callback attribute startUpCurrentLevel default = 255;
+    callback attribute featureMap default = 1;
+    callback attribute clusterRevision default = 0x0007;
 
     handle command MoveToLevel;
     handle command Move;

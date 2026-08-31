@@ -23,6 +23,7 @@
 #include "media-file-management/MediaFileManagementBdxProvider.h"
 #include "media-file-management/MediaFileManagementBdxRequestor.h"
 #include "media-file-management/MediaFileManagementManager.h"
+#include "speaker/SpeakerOnOffLevelControl.h"
 
 #include <access/AccessControl.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -84,6 +85,13 @@ std::optional<MediaFileManagement::MediaFileManagementBdxCoordinator> gMediaFile
 void ApplicationInit()
 {
     ChipLogProgress(Zcl, "TV Linux App: ApplicationInit()");
+
+    // Register the code-driven On/Off and Level Control clusters for the Speaker endpoint
+    // (MA-speaker, endpoint 2 only -- MA-videoplayer's On/Off keeps using the legacy Ember
+    // plugin). Must run after Server::Init() so this registration's Startup() calls are the
+    // final word over the legacy On/Off and Level Control Ember plugins' own init callbacks,
+    // which still fire once for endpoint 2 during Server::Init() itself.
+    Speaker::InitOnOffLevelControl();
 
     // Register the code-driven Media File Management cluster on endpoint 1.
     gMediaFileManagementManager.emplace();
@@ -198,6 +206,8 @@ void ApplicationShutdown()
     {
         gMediaFileManagementServer->Shutdown();
     }
+
+    Speaker::ShutdownOnOffLevelControl();
 }
 
 int main(int argc, char * argv[])

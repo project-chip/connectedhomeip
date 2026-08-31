@@ -77,6 +77,8 @@ source_set("tv-common-sources") {
     "clusters/media-playback/MediaPlaybackManager.h",
     "clusters/messages/MessagesManager.cpp",
     "clusters/messages/MessagesManager.h",
+    "clusters/speaker/SpeakerOnOffLevelControl.cpp",
+    "clusters/speaker/SpeakerOnOffLevelControl.h",
     "clusters/target-navigator/TargetNavigatorManager.cpp",
     "clusters/target-navigator/TargetNavigatorManager.h",
     "clusters/wake-on-lan/WakeOnLanManager.cpp",
