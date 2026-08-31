@@ -197,15 +197,15 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate;
 
     chip::app::DeviceFactory::GetInstance().Init(chip::app::DeviceFactory::Context{
-        .groupDataProvider      = *groupDataProvider,
-        .fabricTable            = chip::Server::GetInstance().GetFabricTable(),
-        .timerDelegate          = sTimerDelegate,
-        .storageDelegate        = storage,
-        .diagnosticDataProvider = chip::DeviceLayer::GetDiagnosticDataProvider(),
-        .platformManager        = chip::DeviceLayer::PlatformMgr(),
-        .failSafeContext        = chip::Server::GetInstance().GetFailSafeContext(),
-        .bindingTable           = chip::app::Clusters::Binding::Table::GetInstance(),
-        .bindingManager         = chip::app::Clusters::Binding::Manager::GetInstance(),
+        .groupDataProvider        = *groupDataProvider,
+        .fabricTable              = chip::Server::GetInstance().GetFabricTable(),
+        .timerDelegate            = sTimerDelegate,
+        .storageDelegate          = storage,
+        .diagnosticDataProvider   = chip::DeviceLayer::GetDiagnosticDataProvider(),
+        .platformManager          = chip::DeviceLayer::PlatformMgr(),
+        .failSafeContext          = chip::Server::GetInstance().GetFailSafeContext(),
+        .bindingTable             = chip::app::Clusters::Binding::Table::GetInstance(),
+        .bindingManager           = chip::app::Clusters::Binding::Manager::GetInstance(),
         .testEventTriggerDelegate = sTestEventTriggerDelegate,
     });
 

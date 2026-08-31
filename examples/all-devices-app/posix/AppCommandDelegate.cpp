@@ -627,8 +627,9 @@ public:
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
         auto * cluster =
-            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::ElectricalEnergyMeasurement::ElectricalEnergyMeasurementCluster>(
-                endpointId);
+            delegate->GetClusterImplementationRegistry()
+                .GetClusterByEndpoint<chip::app::Clusters::ElectricalEnergyMeasurement::ElectricalEnergyMeasurementCluster>(
+                    endpointId);
         if (!cluster)
         {
             ChipLogError(AppServer, "ElectricalEnergyMeasurementCluster not found on endpoint %d", endpointId);
