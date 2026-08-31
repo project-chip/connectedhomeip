@@ -138,6 +138,7 @@
         "TEMPERATURE_CONTROL_CLUSTER": [],
         "TEMPERATURE_MEASUREMENT_CLUSTER": [],
         "THERMOSTAT_CLUSTER": [],
+        "THERMOSTAT_MODE_CLUSTER": [],
         "THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER": [],
         "THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER": [],
         "THREAD_NETWORK_DIAGNOSTICS_CLUSTER": [],
@@ -360,6 +361,7 @@
         "TEMPERATURE_CONTROL_CLUSTER": ["temperature-control-server"],
         "TEMPERATURE_MEASUREMENT_CLUSTER": ["temperature-measurement-server"],
         "THERMOSTAT_CLUSTER": ["thermostat-server"],
+        "THERMOSTAT_MODE_CLUSTER": ["thermostat-mode-server"],
         "THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER": [
             "thermostat-user-interface-configuration-server"
         ],

@@ -7554,6 +7554,109 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readThermostatModeInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readThermostatModeSupportedModesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThermostatModeSupportedModesAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThermostatModeCluster) cluster).readSupportedModesAttribute(
+              (ChipClusters.ThermostatModeCluster.SupportedModesAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedThermostatModeClusterSupportedModesAttributeCallback(),
+          readThermostatModeSupportedModesCommandParams
+        );
+        result.put("readSupportedModesAttribute", readThermostatModeSupportedModesAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThermostatModeCurrentModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThermostatModeCurrentModeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThermostatModeCluster) cluster).readCurrentModeAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readThermostatModeCurrentModeCommandParams
+        );
+        result.put("readCurrentModeAttribute", readThermostatModeCurrentModeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThermostatModeStartUpModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThermostatModeStartUpModeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThermostatModeCluster) cluster).readStartUpModeAttribute(
+              (ChipClusters.ThermostatModeCluster.StartUpModeAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedThermostatModeClusterStartUpModeAttributeCallback(),
+          readThermostatModeStartUpModeCommandParams
+        );
+        result.put("readStartUpModeAttribute", readThermostatModeStartUpModeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThermostatModeCoreModeTagsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThermostatModeCoreModeTagsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThermostatModeCluster) cluster).readCoreModeTagsAttribute(
+              (ChipClusters.ThermostatModeCluster.CoreModeTagsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedThermostatModeClusterCoreModeTagsAttributeCallback(),
+          readThermostatModeCoreModeTagsCommandParams
+        );
+        result.put("readCoreModeTagsAttribute", readThermostatModeCoreModeTagsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThermostatModeGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThermostatModeGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThermostatModeCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.ThermostatModeCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedThermostatModeClusterGeneratedCommandListAttributeCallback(),
+          readThermostatModeGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readThermostatModeGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThermostatModeAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThermostatModeAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThermostatModeCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.ThermostatModeCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedThermostatModeClusterAcceptedCommandListAttributeCallback(),
+          readThermostatModeAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readThermostatModeAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThermostatModeAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThermostatModeAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThermostatModeCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.ThermostatModeCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedThermostatModeClusterAttributeListAttributeCallback(),
+          readThermostatModeAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readThermostatModeAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThermostatModeFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThermostatModeFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThermostatModeCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readThermostatModeFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readThermostatModeFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThermostatModeClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThermostatModeClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThermostatModeCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readThermostatModeClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readThermostatModeClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readGroupcastInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readGroupcastMembershipCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readGroupcastMembershipAttributeInteractionInfo = new InteractionInfo(
@@ -23079,6 +23182,7 @@ public class ClusterReadMapping {
             put("operationalState", readOperationalStateInteractionInfo());
             put("rvcOperationalState", readRvcOperationalStateInteractionInfo());
             put("scenesManagement", readScenesManagementInteractionInfo());
+            put("thermostatMode", readThermostatModeInteractionInfo());
             put("groupcast", readGroupcastInteractionInfo());
             put("hepaFilterMonitoring", readHepaFilterMonitoringInteractionInfo());
             put("activatedCarbonFilterMonitoring", readActivatedCarbonFilterMonitoringInteractionInfo());

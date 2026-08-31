@@ -139,6 +139,7 @@
         "test-cluster.xml",
         "test-hidden-manufacturer-specific-cluster.xml",
         "thermostat-cluster.xml",
+        "thermostat-mode-cluster.xml",
         "thermostat-user-interface-configuration-cluster.xml",
         "thread-border-router-management-cluster.xml",
         "thread-network-diagnostics-cluster.xml",
