@@ -37,29 +37,25 @@ CHIP_ERROR FakeReadings::HandleEventTrigger(uint64_t eventTrigger)
         break;
     case EnergyReportingTrigger::kFakeReadingsLoadStart_1kW_2s:
         ChipLogProgress(Support, "[EnergyReporting-Test-Event] => Start Fake load 1kW @2s Import");
-        StartFakeReadings({
-            .power_mW              = 1'000'000,  // Fake load 1000 W
-            .powerRandomness_mW    = 20'000,     // randomness 20W
-            .voltage_mV            = 230'000,    // Fake Voltage 230V
-            .voltageRandomness_mV  = 1'000,      // randomness 1V
-            .current_mA            = 4'348,      // Fake Current (at 1kW@230V = 4.3478 Amps)
-            .currentRandomness_mA  = 500,        // randomness 500mA
-            .interval_s            = 2,          // 2s updates
-            .reset                 = true
-        });
+        StartFakeReadings({ .power_mW             = 1'000'000, // Fake load 1000 W
+                            .powerRandomness_mW   = 20'000,    // randomness 20W
+                            .voltage_mV           = 230'000,   // Fake Voltage 230V
+                            .voltageRandomness_mV = 1'000,     // randomness 1V
+                            .current_mA           = 4'348,     // Fake Current (at 1kW@230V = 4.3478 Amps)
+                            .currentRandomness_mA = 500,       // randomness 500mA
+                            .interval_s           = 2,         // 2s updates
+                            .reset                = true });
         break;
     case EnergyReportingTrigger::kFakeReadingsGenStart_3kW_5s:
         ChipLogProgress(Support, "[EnergyReporting-Test-Event] => Start Fake generator 3kW @5s Export");
-        StartFakeReadings({
-            .power_mW              = -3'000'000, // Fake Generator -3000 W
-            .powerRandomness_mW    = 20'000,     // randomness 20W
-            .voltage_mV            = 230'000,    // Fake Voltage 230V
-            .voltageRandomness_mV  = 1'000,      // randomness 1V
-            .current_mA            = -13'043,    // Fake Current (at -3kW@230V = -13.0434 Amps)
-            .currentRandomness_mA  = 500,        // randomness 500mA
-            .interval_s            = 5,          // 5s updates
-            .reset                 = true
-        });
+        StartFakeReadings({ .power_mW             = -3'000'000, // Fake Generator -3000 W
+                            .powerRandomness_mW   = 20'000,     // randomness 20W
+                            .voltage_mV           = 230'000,    // Fake Voltage 230V
+                            .voltageRandomness_mV = 1'000,      // randomness 1V
+                            .current_mA           = -13'043,    // Fake Current (at -3kW@230V = -13.0434 Amps)
+                            .currentRandomness_mA = 500,        // randomness 500mA
+                            .interval_s           = 5,          // 5s updates
+                            .reset                = true });
         break;
 
     default:
@@ -103,9 +99,17 @@ void FakeReadings::FakeReadingsUpdate()
 
     // for faking and testing purposes, insead of true random values, we will incrementally change the value in the specified range
     // from base - randomness to base + randomness in mDeterministicOffsetStepCount steps, then repeat
-    mPower_mW = mBasePower_mW + (mPowerRandomness_mW == 0 ? 0 : (static_cast<int64_t>(mDeterministicOffsetStep * (2 * mPowerRandomness_mW) / (mDeterministicOffsetStepCount - 1)) - mPowerRandomness_mW));
+    mPower_mW = mBasePower_mW +
+        (mPowerRandomness_mW == 0
+             ? 0
+             : (static_cast<int64_t>(mDeterministicOffsetStep * (2 * mPowerRandomness_mW) / (mDeterministicOffsetStepCount - 1)) -
+                mPowerRandomness_mW));
 
-    mVoltage_mV = mBaseVoltage_mV + (mVoltageRandomness_mV == 0 ? 0 : (static_cast<int64_t>(mDeterministicOffsetStep * (2 * mVoltageRandomness_mV) / (mDeterministicOffsetStepCount - 1)) - mVoltageRandomness_mV));
+    mVoltage_mV = mBaseVoltage_mV +
+        (mVoltageRandomness_mV == 0
+             ? 0
+             : (static_cast<int64_t>(mDeterministicOffsetStep * (2 * mVoltageRandomness_mV) / (mDeterministicOffsetStepCount - 1)) -
+                mVoltageRandomness_mV));
 
     /* Note: whilst we could compute a current from the power and voltage,
      * there will always be some random error from the sensor
@@ -114,9 +118,13 @@ void FakeReadings::FakeReadingsUpdate()
      * This is meant more as an example to show how to use the APIs, not
      * to be a real representation of laws of physics.
      */
-    mCurrent_mA = mBaseCurrent_mA + (mCurrentRandomness_mA == 0 ? 0 : (static_cast<int64_t>(mDeterministicOffsetStep * (2 * mCurrentRandomness_mA) / (mDeterministicOffsetStepCount - 1)) - mCurrentRandomness_mA));
+    mCurrent_mA = mBaseCurrent_mA +
+        (mCurrentRandomness_mA == 0
+             ? 0
+             : (static_cast<int64_t>(mDeterministicOffsetStep * (2 * mCurrentRandomness_mA) / (mDeterministicOffsetStepCount - 1)) -
+                mCurrentRandomness_mA));
 
-     // mDeterministicOffsetStep increment from 0 to mDeterministicOffsetStepCount exclusive then reset to 0
+    // mDeterministicOffsetStep increment from 0 to mDeterministicOffsetStepCount exclusive then reset to 0
     mDeterministicOffsetStep++;
     mDeterministicOffsetStep %= mDeterministicOffsetStepCount;
 
@@ -136,9 +144,12 @@ void FakeReadings::FakeReadingsUpdate()
         mTotalEnergyExported += mPeriodicEnergyExported;
     }
 
-    ChipLogProgress(Support, "FakeReadingsUpdate: BasePower=%ld mW, Power=%ld mW, BaseVoltage=%ld mV, Voltage=%ld mV, BaseCurrent=%ld mA, Current=%ld mA, PeriodicEnergyImported=%ld Wh, PeriodicEnergyExported=%ld Wh, TotalEnergyImported=%ld Wh, TotalEnergyExported=%ld Wh",
-                 mBasePower_mW, mPower_mW, mBaseVoltage_mV, mVoltage_mV, mBaseCurrent_mA, mCurrent_mA, mPeriodicEnergyImported, mPeriodicEnergyExported, mTotalEnergyImported,
-                 mTotalEnergyExported);
+    ChipLogProgress(
+        Support,
+        "FakeReadingsUpdate: BasePower=%ld mW, Power=%ld mW, BaseVoltage=%ld mV, Voltage=%ld mV, BaseCurrent=%ld mA, Current=%ld "
+        "mA, PeriodicEnergyImported=%ld Wh, PeriodicEnergyExported=%ld Wh, TotalEnergyImported=%ld Wh, TotalEnergyExported=%ld Wh",
+        mBasePower_mW, mPower_mW, mBaseVoltage_mV, mVoltage_mV, mBaseCurrent_mA, mCurrent_mA, mPeriodicEnergyImported,
+        mPeriodicEnergyExported, mTotalEnergyImported, mTotalEnergyExported);
     if (mEEMCluster)
     {
         mEEMCluster->GenerateSnapshots();

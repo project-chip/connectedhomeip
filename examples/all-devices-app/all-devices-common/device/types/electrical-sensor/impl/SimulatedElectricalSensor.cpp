@@ -6,49 +6,48 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 
 namespace {
-    const static Clusters::detail::Structs::MeasurementAccuracyRangeStruct::Type kAccuracyRange{
-        .rangeMin = 0, .rangeMax = 10, .percentMax = MakeOptional(uint8_t{ 100 })
-    };
+const static Clusters::detail::Structs::MeasurementAccuracyRangeStruct::Type kAccuracyRange{
+    .rangeMin = 0, .rangeMax = 10, .percentMax = MakeOptional(uint8_t{ 100 })
+};
 
-    const static Clusters::detail::Structs::MeasurementAccuracyStruct::Type kAccuracy{
-        .measurementType  = Clusters::detail::MeasurementTypeEnum::kElectricalEnergy,
-        .measured         = false,
-        .minMeasuredValue = 0,
-        .maxMeasuredValue = 10,
-        .accuracyRanges   = Span(&kAccuracyRange, 1)
-    };
-}
+const static Clusters::detail::Structs::MeasurementAccuracyStruct::Type kAccuracy{
+    .measurementType  = Clusters::detail::MeasurementTypeEnum::kElectricalEnergy,
+    .measured         = false,
+    .minMeasuredValue = 0,
+    .maxMeasuredValue = 10,
+    .accuracyRanges   = Span(&kAccuracyRange, 1)
+};
+} // namespace
 
-SimulatedElectricalSensor::SimulatedElectricalSensor(TimerDelegate & timerDelegate, TestEventTriggerDelegate & testEventTriggerDelegate) :
-    ElectricalSensor({
-        .electricalEnergyDelegate = *this,
-        .electricalEnergyMeasurementFeatureFlags =  BitMask<ElectricalEnergyMeasurement::Feature>(
-            ElectricalEnergyMeasurement::Feature::kImportedEnergy, ElectricalEnergyMeasurement::Feature::kExportedEnergy,
-            ElectricalEnergyMeasurement::Feature::kCumulativeEnergy, ElectricalEnergyMeasurement::Feature::kPeriodicEnergy,
-            ElectricalEnergyMeasurement::Feature::kApparentEnergy, ElectricalEnergyMeasurement::Feature::kReactiveEnergy
-        ),
-        .electricalEnergyMeasurementOptionalAttributes = ElectricalEnergyMeasurementClusterT::OptionalAttributesSet(
-            ElectricalEnergyMeasurementClusterT::OptionalAttributesSet::All()),
-        .electricalEnergyMeasurementAccuracyStruct = kAccuracy,
+SimulatedElectricalSensor::SimulatedElectricalSensor(TimerDelegate & timerDelegate,
+                                                     TestEventTriggerDelegate & testEventTriggerDelegate) :
+    ElectricalSensor(
+        { .electricalEnergyDelegate                = *this,
+          .electricalEnergyMeasurementFeatureFlags = BitMask<ElectricalEnergyMeasurement::Feature>(
+              ElectricalEnergyMeasurement::Feature::kImportedEnergy, ElectricalEnergyMeasurement::Feature::kExportedEnergy,
+              ElectricalEnergyMeasurement::Feature::kCumulativeEnergy, ElectricalEnergyMeasurement::Feature::kPeriodicEnergy,
+              ElectricalEnergyMeasurement::Feature::kApparentEnergy, ElectricalEnergyMeasurement::Feature::kReactiveEnergy),
+          .electricalEnergyMeasurementOptionalAttributes = ElectricalEnergyMeasurementClusterT::OptionalAttributesSet(
+              ElectricalEnergyMeasurementClusterT::OptionalAttributesSet::All()),
+          .electricalEnergyMeasurementAccuracyStruct = kAccuracy,
 
-        .electricalPowerDelegate = *this,
-        .electricalPowerMeasurementFeatureFlags = BitMask<ElectricalPowerMeasurement::Feature>(
-            ElectricalPowerMeasurement::Feature::kAlternatingCurrent, ElectricalPowerMeasurement::Feature::kPolyphasePower,
-            ElectricalPowerMeasurement::Feature::kDirectCurrent, ElectricalPowerMeasurement::Feature::kHarmonics,
-            ElectricalPowerMeasurement::Feature::kPowerQuality
-        ),
-        .electricalPowerMeasurementOptionalAttributes = ElectricalPowerMeasurementClusterT::OptionalAttributesSet(
-            ElectricalPowerMeasurementClusterT::OptionalAttributesSet::All()),
+          .electricalPowerDelegate                = *this,
+          .electricalPowerMeasurementFeatureFlags = BitMask<ElectricalPowerMeasurement::Feature>(
+              ElectricalPowerMeasurement::Feature::kAlternatingCurrent, ElectricalPowerMeasurement::Feature::kPolyphasePower,
+              ElectricalPowerMeasurement::Feature::kDirectCurrent, ElectricalPowerMeasurement::Feature::kHarmonics,
+              ElectricalPowerMeasurement::Feature::kPowerQuality),
+          .electricalPowerMeasurementOptionalAttributes = ElectricalPowerMeasurementClusterT::OptionalAttributesSet(
+              ElectricalPowerMeasurementClusterT::OptionalAttributesSet::All()),
 
-        .powerTopologyDelegate = *this,
-        .powerTopologyFeatures = BitMask<PowerTopology::Feature>(PowerTopology::Feature::kNodeTopology, PowerTopology::Feature::kElectricalCircuit),
+          .powerTopologyDelegate = *this,
+          .powerTopologyFeatures =
+              BitMask<PowerTopology::Feature>(PowerTopology::Feature::kNodeTopology, PowerTopology::Feature::kElectricalCircuit),
 
-        .timerDelegate = timerDelegate
-    }), mFakeReadings(timerDelegate), mTestEventTriggerDelegate(testEventTriggerDelegate)
-{};
+          .timerDelegate = timerDelegate }),
+    mFakeReadings(timerDelegate), mTestEventTriggerDelegate(testEventTriggerDelegate){};
 
 CHIP_ERROR SimulatedElectricalSensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                             EndpointComposition composition)
+                                               EndpointComposition composition)
 {
     ReturnErrorOnFailure(ElectricalSensor::Register(endpoint, provider, composition));
     mFakeReadings.SetEEMCluster(&ElectricalEnergyMeasurementCluster());
@@ -63,11 +62,11 @@ void SimulatedElectricalSensor::Unregister(CodeDrivenDataModelProvider & provide
     ElectricalSensor::Unregister(provider);
 }
 
-CHIP_ERROR SimulatedElectricalSensor::GetAccuracyByIndex(
-    uint8_t index, ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::Type & val)
+CHIP_ERROR SimulatedElectricalSensor::GetAccuracyByIndex(uint8_t index,
+                                                         ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::Type & val)
 {
     static ElectricalPowerMeasurement::Structs::MeasurementAccuracyRangeStruct::Type accuracyRange = { .rangeMin = 0,
-                                                                                                                 .rangeMax = 10 };
+                                                                                                       .rangeMax = 10 };
     val = { .measurementType  = ElectricalPowerMeasurement::MeasurementTypeEnum::kActivePower,
             .measured         = false,
             .minMeasuredValue = 0,

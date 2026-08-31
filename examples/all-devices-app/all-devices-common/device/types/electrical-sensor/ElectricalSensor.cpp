@@ -24,8 +24,7 @@ using namespace chip::app::Clusters;
 namespace chip::app {
 
 ElectricalSensor::ElectricalSensor(const Config & config) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kElectricalSensor, 1)),
-    mConfig(config)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kElectricalSensor, 1)), mConfig(config)
 {}
 
 CHIP_ERROR ElectricalSensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -37,8 +36,8 @@ CHIP_ERROR ElectricalSensor::Register(chip::EndpointId endpoint, CodeDrivenDataM
 
     {
         ElectricalEnergyMeasurementClusterT::Config config{
-            .endpointId   = endpoint,
-            .featureFlags = mConfig.electricalEnergyMeasurementFeatureFlags,
+            .endpointId     = endpoint,
+            .featureFlags   = mConfig.electricalEnergyMeasurementFeatureFlags,
             .accuracyStruct = mConfig.electricalEnergyMeasurementAccuracyStruct,
             .delegate       = mConfig.electricalEnergyDelegate,
             .timerDelegate  = mConfig.timerDelegate,
@@ -52,9 +51,9 @@ CHIP_ERROR ElectricalSensor::Register(chip::EndpointId endpoint, CodeDrivenDataM
 
     {
         ElectricalPowerMeasurementClusterT::Config config{
-            .endpointId = endpoint,
-            .delegate   = mConfig.electricalPowerDelegate,
-            .features   = mConfig.electricalPowerMeasurementFeatureFlags,
+            .endpointId         = endpoint,
+            .delegate           = mConfig.electricalPowerDelegate,
+            .features           = mConfig.electricalPowerMeasurementFeatureFlags,
             .optionalAttributes = mConfig.electricalPowerMeasurementOptionalAttributes,
         };
         mElectricalPowerMeasurementCluster.Create(config);
@@ -64,11 +63,9 @@ CHIP_ERROR ElectricalSensor::Register(chip::EndpointId endpoint, CodeDrivenDataM
     // PowerTopology Cluster
 
     {
-        PowerTopologyClusterT::Config config{
-            .endpointId = endpoint,
-            .delegate   = mConfig.powerTopologyDelegate,
-            .features   = mConfig.powerTopologyFeatures
-        };
+        PowerTopologyClusterT::Config config{ .endpointId = endpoint,
+                                              .delegate   = mConfig.powerTopologyDelegate,
+                                              .features   = mConfig.powerTopologyFeatures };
         mPowerTopologyCluster.Create(config);
         ReturnErrorOnFailure(provider.AddCluster(mPowerTopologyCluster.Registration()));
     }

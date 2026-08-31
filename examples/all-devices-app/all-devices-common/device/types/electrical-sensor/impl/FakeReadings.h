@@ -157,7 +157,7 @@ private:
 
     // For faking and testing purposes, insead of random values, we will incrementally change the value in a range
     uint32_t mDeterministicOffsetStep = 0;
-    // Because of some hardcoded values in the test plan for TC_EEC_2_2, we need this number to be less then 20 to ensure the tests will definitly pass.
-    // 9 is chosen to have some nice values when the code actually runs.
+    // Because of some hardcoded values in the test plan for TC_EEC_2_2, we need this number to be less then 20 to ensure the tests
+    // will definitly pass. 9 is chosen to have some nice values when the code actually runs.
     constexpr static uint32_t mDeterministicOffsetStepCount = 9;
 };

@@ -317,16 +317,16 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
-        .groupDataProvider         = gGroupDataProvider,                     //
-        .fabricTable               = Server::GetInstance().GetFabricTable(), //
-        .timerDelegate             = gTimerDelegate,                         //
-        .storageDelegate           = *initParams.persistentStorageDelegate,  //
-        .diagnosticDataProvider    = DeviceLayer::GetDiagnosticDataProvider(),
-        .platformManager           = DeviceLayer::PlatformMgr(),
-        .failSafeContext           = Server::GetInstance().GetFailSafeContext(),
-        .bindingTable              = Binding::Table::GetInstance(),
-        .bindingManager            = Binding::Manager::GetInstance(),
-        .testEventTriggerDelegate  = *initParams.testEventTriggerDelegate,
+        .groupDataProvider        = gGroupDataProvider,                     //
+        .fabricTable              = Server::GetInstance().GetFabricTable(), //
+        .timerDelegate            = gTimerDelegate,                         //
+        .storageDelegate          = *initParams.persistentStorageDelegate,  //
+        .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),
+        .platformManager          = DeviceLayer::PlatformMgr(),
+        .failSafeContext          = Server::GetInstance().GetFailSafeContext(),
+        .bindingTable             = Binding::Table::GetInstance(),
+        .bindingManager           = Binding::Manager::GetInstance(),
+        .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,
     });
 
     RegisterDeviceFactoryOverrides(gTimerDelegate, initParams.persistentStorageDelegate, gAudioManager);

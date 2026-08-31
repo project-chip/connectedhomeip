@@ -18,8 +18,8 @@
 
 #include "FakeReadings.h"
 
-#include <device/types/electrical-sensor/ElectricalSensor.h>
 #include <app/TestEventTriggerDelegate.h>
+#include <device/types/electrical-sensor/ElectricalSensor.h>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip::app {
@@ -28,12 +28,11 @@ namespace chip::app {
  * Simulated electrical sensor that supports test event triggers
  */
 class SimulatedElectricalSensor : public ElectricalSensor,
-                                public Clusters::ElectricalEnergyMeasurement::Delegate,
-                                public Clusters::ElectricalPowerMeasurement::Delegate,
-                                public Clusters::PowerTopology::Delegate
+                                  public Clusters::ElectricalEnergyMeasurement::Delegate,
+                                  public Clusters::ElectricalPowerMeasurement::Delegate,
+                                  public Clusters::PowerTopology::Delegate
 {
 public:
-
     explicit SimulatedElectricalSensor(TimerDelegate & timerDelegate, TestEventTriggerDelegate & testEventTriggerDelegate);
     ~SimulatedElectricalSensor() override = default;
 
@@ -113,8 +112,14 @@ public:
 
     // Clusters::PowerTopology::Delegate implementation
 
-    CHIP_ERROR GetAvailableEndpointAtIndex(size_t index, EndpointId & endpointId) override { return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED; }
-    CHIP_ERROR GetActiveEndpointAtIndex(size_t index, EndpointId & endpointId) override { return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED; }
+    CHIP_ERROR GetAvailableEndpointAtIndex(size_t index, EndpointId & endpointId) override
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+    CHIP_ERROR GetActiveEndpointAtIndex(size_t index, EndpointId & endpointId) override
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
 
 private:
     FakeReadings mFakeReadings;
