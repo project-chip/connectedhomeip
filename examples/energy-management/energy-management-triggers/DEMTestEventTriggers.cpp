@@ -298,7 +298,7 @@ void SetTestEventTrigger_PowerRangeAdjustment()
         sSavedAbsMinPowerMw         = GetDEMDelegate()->GetAbsMinPower();
         sSavedAbsMaxPowerMw         = GetDEMDelegate()->GetAbsMaxPower();
         sSavedAbsMinMaxPowerIsValid = true;
-        ChipLogDetail(Support, "Saved AbsMinPower=% " PRId64 " mW, AbsMaxPower=% " PRId64 " mW", sSavedAbsMinPowerMw,
+        ChipLogDetail(Support, "Saved AbsMinPower=%" PRId64 " mW, AbsMaxPower=%" PRId64 " mW", sSavedAbsMinPowerMw,
                       sSavedAbsMaxPowerMw);
     }
 
@@ -324,7 +324,7 @@ void SetTestEventTrigger_PowerRangeAdjustment()
         return;
     }
 
-    ChipLogDetail(Support, "Set AbsMinPower=% " PRId64 " mW, AbsMaxPower=% " PRId64 " mW", TEST_ABS_MIN_POWER_MW,
+    ChipLogDetail(Support, "Set AbsMinPower=%" PRId64 " mW, AbsMaxPower=%" PRId64 " mW", TEST_ABS_MIN_POWER_MW,
                   TEST_ABS_MAX_POWER_MW);
 }
 
@@ -356,7 +356,7 @@ void SetTestEventTrigger_PowerRangeAdjustmentClear()
         return;
     }
 
-    ChipLogDetail(Support, "Restored AbsMinPower=% " PRId64 " mW, AbsMaxPower=% " PRId64 " mW", sSavedAbsMinPowerMw,
+    ChipLogDetail(Support, "Restored AbsMinPower=%" PRId64 " mW, AbsMaxPower=%" PRId64 " mW", sSavedAbsMinPowerMw,
                   sSavedAbsMaxPowerMw);
 
     // Invalidate the snapshot after restoration so the next activation will capture fresh original values
