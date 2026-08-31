@@ -154,6 +154,7 @@ void FakeReadings::FakeReadingsUpdate()
                     static_cast<long long>(mBaseCurrent_mA), static_cast<long long>(mCurrent_mA),
                     static_cast<long long>(mPeriodicEnergyImported), static_cast<long long>(mPeriodicEnergyExported),
                     static_cast<long long>(mTotalEnergyImported), static_cast<long long>(mTotalEnergyExported));
+
     if (mEEMCluster)
     {
         mEEMCluster->GenerateSnapshots();

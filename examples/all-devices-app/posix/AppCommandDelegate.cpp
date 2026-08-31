@@ -21,6 +21,7 @@
 #include <app/clusters/ambient-context-sensing-server/CodegenIntegration.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/clusters/boolean-state-server/BooleanStateCluster.h>
+#include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementCluster.h>
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
 #include <platform/PlatformManager.h>
@@ -607,6 +608,36 @@ public:
     }
 };
 
+/**
+ * Named pipe handler for generating a electrical energy measurement snapshots on the ElectricalEnergyMeasurement cluster
+ *
+ * Usage example:
+ *   echo '{"Name":"GenerateElectricalEnergyMeasurementSnapshots","EndpointId":1}'> /tmp/acs_fifo
+ *
+ * JSON Arguments:
+ *   - "Name": Must be "GenerateElectricalEnergyMeasurementSnapshots"
+ *   - "EndpointId": ID of endpoint
+ *
+ * @param jsonValue - JSON payload from named pipe
+ */
+class GenerateElectricalEnergyMeasurementSnapshotsCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "GenerateElectricalEnergyMeasurementSnapshots"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::ElectricalEnergyMeasurement::ElectricalEnergyMeasurementCluster>(
+                endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "ElectricalEnergyMeasurementCluster not found on endpoint %d", endpointId);
+            return;
+        }
+        cluster->GenerateSnapshots();
+    }
+};
+
 } // namespace
 
 void AllDevicesAppCommandDelegate::OnEventCommandReceived(const char * json)
@@ -686,4 +717,5 @@ void AllDevicesAppCommandDelegate::RegisterCommandHandlers()
     RegisterCommandHandler(std::make_unique<SetObjCountCommandHandler>());
     RegisterCommandHandler(std::make_unique<SetBooleanStateCommandHandler>());
     RegisterCommandHandler(std::make_unique<SetOnOffCommandHandler>());
+    RegisterCommandHandler(std::make_unique<GenerateElectricalEnergyMeasurementSnapshotsCommandHandler>());
 }
