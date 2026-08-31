@@ -41,8 +41,7 @@ public:
     };
 
     explicit ElectricalAlarmCluster(const Config & config) :
-        DefaultServerCluster({ config.endpointId, ElectricalAlarm::Id }), mDelegate(config.delegate),
-        mFeatureFlags(config.features)
+        DefaultServerCluster({ config.endpointId, ElectricalAlarm::Id }), mDelegate(config.delegate), mFeatureFlags(config.features)
     {}
 
     void SetDelegate(Delegate * delegate) { mDelegate = delegate; }
@@ -50,14 +49,12 @@ public:
     // DefaultServerCluster overrides
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                               AttributeValueEncoder & encoder) override;
-    CHIP_ERROR Attributes(const ConcreteClusterPath & path,
-                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+                                                AttributeValueEncoder & encoder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               TLV::TLVReader & input_arguments,
-                                                               CommandHandler * handler) override;
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
     // Alarm Base attribute setters — callable by the application
     // A change in Supported narrows Latch, then Mask, then State.

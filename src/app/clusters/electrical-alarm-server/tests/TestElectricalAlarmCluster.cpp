@@ -76,9 +76,9 @@ TEST_F(TestElectricalAlarmCluster, ResetFeatureAddsLatch)
     auto cluster = MakeCluster(delegate, BitMask<Feature>(Feature::kReset));
 
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-    EXPECT_TRUE(IsAttributesListEqualTo(
-        cluster, { Attributes::Mask::kMetadataEntry, Attributes::State::kMetadataEntry, Attributes::Supported::kMetadataEntry,
-                   Attributes::Latch::kMetadataEntry }));
+    EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                        { Attributes::Mask::kMetadataEntry, Attributes::State::kMetadataEntry,
+                                          Attributes::Supported::kMetadataEntry, Attributes::Latch::kMetadataEntry }));
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
@@ -89,9 +89,10 @@ TEST_F(TestElectricalAlarmCluster, OverVoltageFeatureAddsThreshold)
     auto cluster = MakeCluster(delegate, BitMask<Feature>(Feature::kOverVoltage));
 
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-    EXPECT_TRUE(IsAttributesListEqualTo(
-        cluster, { Attributes::Mask::kMetadataEntry, Attributes::State::kMetadataEntry, Attributes::Supported::kMetadataEntry,
-                   Attributes::OverVoltageThreshold::kMetadataEntry }));
+    EXPECT_TRUE(
+        IsAttributesListEqualTo(cluster,
+                                { Attributes::Mask::kMetadataEntry, Attributes::State::kMetadataEntry,
+                                  Attributes::Supported::kMetadataEntry, Attributes::OverVoltageThreshold::kMetadataEntry }));
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
@@ -106,13 +107,14 @@ TEST_F(TestElectricalAlarmCluster, AllFeaturesAttributeList)
 
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     EXPECT_TRUE(IsAttributesListEqualTo(
-        cluster, { Attributes::Mask::kMetadataEntry, Attributes::State::kMetadataEntry, Attributes::Supported::kMetadataEntry,
-                   Attributes::Latch::kMetadataEntry, Attributes::OverVoltageThreshold::kMetadataEntry,
-                   Attributes::UnderVoltageThreshold::kMetadataEntry, Attributes::OverFrequencyThreshold::kMetadataEntry,
-                   Attributes::UnderFrequencyThreshold::kMetadataEntry, Attributes::OverPowerThreshold::kMetadataEntry,
-                   Attributes::UnderPowerThreshold::kMetadataEntry, Attributes::OverCurrentThreshold::kMetadataEntry,
-                   Attributes::UnderCurrentThreshold::kMetadataEntry, Attributes::PowerImportThreshold::kMetadataEntry,
-                   Attributes::PowerExportThreshold::kMetadataEntry }));
+        cluster,
+        { Attributes::Mask::kMetadataEntry, Attributes::State::kMetadataEntry, Attributes::Supported::kMetadataEntry,
+          Attributes::Latch::kMetadataEntry, Attributes::OverVoltageThreshold::kMetadataEntry,
+          Attributes::UnderVoltageThreshold::kMetadataEntry, Attributes::OverFrequencyThreshold::kMetadataEntry,
+          Attributes::UnderFrequencyThreshold::kMetadataEntry, Attributes::OverPowerThreshold::kMetadataEntry,
+          Attributes::UnderPowerThreshold::kMetadataEntry, Attributes::OverCurrentThreshold::kMetadataEntry,
+          Attributes::UnderCurrentThreshold::kMetadataEntry, Attributes::PowerImportThreshold::kMetadataEntry,
+          Attributes::PowerExportThreshold::kMetadataEntry }));
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 

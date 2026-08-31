@@ -242,6 +242,5 @@ class TC_ESALM_2_1(MatterBaseTest):
             self.mark_current_step_skipped()
 
 
-
 if __name__ == "__main__":
     default_matter_test_main()
