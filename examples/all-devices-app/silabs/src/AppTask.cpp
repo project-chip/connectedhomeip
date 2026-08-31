@@ -170,6 +170,8 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         .dacProvider                = *chip::Credentials::GetDeviceAttestationCredentialsProvider(),
         .eventManagement            = chip::app::EventManagement::GetInstance(),
         .timerDelegate              = sTimerDelegate,
+        .minGuaranteedSubscriptionsPerFabric =
+            chip::app::InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(),
     };
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -211,7 +213,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     auto instantiateDevice = [&](const std::string & type) -> CHIP_ERROR {
         if (!deviceFactory.IsValidDevice(type))
         {
-            ChipLogError(AppServer, "Invalid device type: %s, skipping", type.c_str());
+            ChipLogError(AppServer, "Invalid device type: %s", type.c_str());
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         auto device = deviceFactory.Create(type);
@@ -230,6 +232,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
 
     if (!kBuildTimeDevices.empty())
     {
+        sConstructedDevices.reserve(ALL_DEVICES_DEFAULT_DEVICES_COUNT);
         std::string_view remaining = kBuildTimeDevices;
         while (!remaining.empty())
         {
