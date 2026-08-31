@@ -146,10 +146,18 @@ void FakeReadings::FakeReadingsUpdate()
 
     ChipLogProgress(
         Support,
-        "FakeReadingsUpdate: BasePower=%ld mW, Power=%ld mW, BaseVoltage=%ld mV, Voltage=%ld mV, BaseCurrent=%ld mA, Current=%ld "
-        "mA, PeriodicEnergyImported=%ld Wh, PeriodicEnergyExported=%ld Wh, TotalEnergyImported=%ld Wh, TotalEnergyExported=%ld Wh",
-        mBasePower_mW, mPower_mW, mBaseVoltage_mV, mVoltage_mV, mBaseCurrent_mA, mCurrent_mA, mPeriodicEnergyImported,
-        mPeriodicEnergyExported, mTotalEnergyImported, mTotalEnergyExported);
+        "FakeReadingsUpdate: BasePower=%lld mW, Power=%lld mW, BaseVoltage=%lld mV, Voltage=%lld mV, BaseCurrent=%lld mA, Current=%lld "
+        "mA, PeriodicEnergyImported=%lld Wh, PeriodicEnergyExported=%lld Wh, TotalEnergyImported=%lld Wh, TotalEnergyExported=%lld Wh",
+        static_cast<long long>(mBasePower_mW),
+        static_cast<long long>(mPower_mW),
+        static_cast<long long>(mBaseVoltage_mV),
+        static_cast<long long>(mVoltage_mV),
+        static_cast<long long>(mBaseCurrent_mA),
+        static_cast<long long>(mCurrent_mA),
+        static_cast<long long>(mPeriodicEnergyImported),
+        static_cast<long long>(mPeriodicEnergyExported),
+        static_cast<long long>(mTotalEnergyImported),
+        static_cast<long long>(mTotalEnergyExported));
     if (mEEMCluster)
     {
         mEEMCluster->GenerateSnapshots();
