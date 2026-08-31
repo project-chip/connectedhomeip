@@ -18,11 +18,6 @@
 
 #include "audio-control/AudioControlManager.h"
 
-#include <app/clusters/audio-control-server/CodegenIntegration.h>
-#include <lib/support/logging/CHIPLogging.h>
-
-using namespace chip;
-using namespace chip::app::Clusters;
 using chip::Protocols::InteractionModel::Status;
 
 Status AudioControlManager::HandleVolumeAndMuteChange(uint16_t newVolume, bool newSoftMuted)
@@ -30,25 +25,3 @@ Status AudioControlManager::HandleVolumeAndMuteChange(uint16_t newVolume, bool n
     // Trivial demo implementation: accept all volume/mute changes.
     return Status::Success;
 }
-
-namespace {
-
-// MA-speaker (tv-app.zap) is endpoint 2.
-constexpr EndpointId kSpeakerEndpointId = 2;
-
-// AudioControlCluster is code-driven (unlike this app's other clusters, which use the legacy
-// Ember plugin's emberAf<Cluster>ClusterInitCallback + SetDefaultDelegate in ZCLCallbacks.cpp):
-// its delegate must be registered before MatterAudioControlClusterInitCallback fires, not from
-// within it. The constructor of this static object runs at program startup, before main(), which
-// guarantees that ordering.
-struct AudioControlRegistration
-{
-    AudioControlManager delegate;
-    AudioControlRegistration()
-    {
-        ChipLogProgress(Zcl, "TV Linux App: AudioControl::SetDelegate");
-        AudioControl::SetDelegate(kSpeakerEndpointId, &delegate);
-    }
-} gAudioControlRegistration;
-
-} // namespace

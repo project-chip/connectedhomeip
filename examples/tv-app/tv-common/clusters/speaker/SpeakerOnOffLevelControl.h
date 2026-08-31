@@ -22,10 +22,15 @@
 // endpoint (MA-speaker, endpoint 2) only. MA-videoplayer's On/Off (endpoint 1) is
 // untouched and keeps using the legacy Ember plugin.
 //
-// This is phase 1 of the Speaker migration: it establishes the on/off <-> level
-// coupling that the legacy Ember plugins already provided (turning the speaker off
-// zeroes/restores level via the standard OnOffDelegate hook), but does not yet wire
-// AudioControl into the sync -- that is a later phase.
+// Also owns the SpeakerAudioCoordinator that keeps On/Off, Level Control and Audio
+// Control in sync on this endpoint (OnOff.OnOff mirrors the inverse of
+// AudioControl.SoftMuted; LevelControl.CurrentLevel and AudioControl.Volume track the
+// same audio level, scaled between their ranges). AudioControlCluster itself is not
+// constructed here -- it is code-driven via tv-app.zap's normal ZAP dispatch (Audio
+// Control is on the CodeDrivenClusters list) -- the .cpp file registers the coordinator
+// as its delegate at static-init time (before Server::Init(), the same requirement
+// AudioControl::SetDelegate always had) and retrieves the resulting instance in
+// InitOnOffLevelControl() to hand to SpeakerAudioCoordinator::SetClusters().
 
 namespace chip::app::Clusters::Speaker {
 

@@ -18,9 +18,14 @@
 
 #include "speaker/SpeakerOnOffLevelControl.h"
 
+#include "audio-control/AudioControlManager.h"
+
+#include <algorithm>
+
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/audio-control-server/CodegenIntegration.h>
+#include <app/clusters/audio-control-server/SpeakerAudioCoordinator.h>
 #include <app/clusters/level-control/LevelControlCluster.h>
-#include <app/clusters/level-control/LevelControlDelegate.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
@@ -41,12 +46,28 @@ constexpr EndpointId kSpeakerEndpointId = 2;
 
 DefaultTimerDelegate gTimerDelegate;
 
-// Level Control has no hardware/AudioControl hook wired up yet in this phase, so it gets
-// a no-op delegate (LevelControlDelegate's virtual methods all have empty default bodies).
-LevelControlDelegate gNoOpLevelControlDelegate;
+// The real hardware-facing delegate, wrapped by gCoordinator below so AudioControl's
+// commands, and OnOff/LevelControl changes that need to sync into AudioControl, all
+// funnel through one place before reaching it.
+AudioControlManager gAudioControlManager;
+SpeakerAudioCoordinator gCoordinator(gAudioControlManager);
 
 LazyRegisteredServerCluster<OnOffCluster> gOnOffCluster;
 LazyRegisteredServerCluster<LevelControlCluster> gLevelControlCluster;
+
+// AudioControlCluster is code-driven (ZAP-dispatched, not constructed by this file -- see
+// SpeakerOnOffLevelControl.h), so its delegate must be registered before
+// MatterAudioControlClusterInitCallback fires, i.e. before Server::Init(). The constructor of
+// this static object runs at program startup, before main(), which guarantees that ordering
+// (mirrors the pattern AudioControlManager.cpp used before the coordinator existed).
+struct AudioControlDelegateRegistration
+{
+    AudioControlDelegateRegistration()
+    {
+        ChipLogProgress(Zcl, "TV Linux App: AudioControl::SetDelegate (SpeakerAudioCoordinator)");
+        AudioControl::SetDelegate(kSpeakerEndpointId, &gCoordinator);
+    }
+} gAudioControlDelegateRegistration;
 
 } // namespace
 
@@ -79,6 +100,13 @@ void InitOnOffLevelControl()
     {
         maxLevel = 0xFF;
     }
+    // LevelControlCluster::IsValidLevel() unconditionally rejects any level above its own
+    // kMaxLevel constant (254, the spec-defined ceiling: 0xFF/255 is reserved), regardless of
+    // what MaxLevel is configured to. tv-app.zap's legacy-Ember-era default of 0xFF predates that
+    // check and was never actually reachable -- clamp it down so the configured MaxLevel is a
+    // value CurrentLevel can genuinely reach (matters once AudioControl.Volume at its maximum
+    // needs to scale up to MaxLevel; see SpeakerAudioCoordinator::ScaleVolumeToLevel).
+    maxLevel = std::min(maxLevel, LevelControlCluster::kMaxLevel);
     uint16_t onOffTransitionTime = 0;
     if (LevelControl::Attributes::OnOffTransitionTime::Get(kSpeakerEndpointId, &onOffTransitionTime) != Status::Success)
     {
@@ -102,7 +130,7 @@ void InitOnOffLevelControl()
     // feature, and StartUpCurrentLevel/RemainingTime are spec-scoped to the Lighting feature --
     // the code-driven cluster now correctly hides them for a non-Lighting instance, where the
     // legacy Ember plugin exposed them regardless of feature support.
-    LevelControlCluster::Config levelControlConfig(gTimerDelegate, gNoOpLevelControlDelegate);
+    LevelControlCluster::Config levelControlConfig(gTimerDelegate, gCoordinator);
     levelControlConfig.WithOnOff(gOnOffCluster.Cluster());
     levelControlConfig.WithMinLevel(minLevel);
     levelControlConfig.WithMaxLevel(maxLevel);
@@ -120,8 +148,27 @@ void InitOnOffLevelControl()
     gLevelControlCluster.Create(kSpeakerEndpointId, levelControlConfig);
     gLevelControlCluster.Cluster().SetOnLevel(onLevel);
 
-    // Level Control reacts to On/Off changes the same way the legacy Ember plugins coupled
-    // these two clusters (turning the speaker off moves/restores CurrentLevel).
+    // AudioControlCluster was already constructed (and started) by the normal ZAP dispatch
+    // during Server::Init(), using gCoordinator as its delegate -- see
+    // AudioControlDelegateRegistration above. It is a static, always-enabled part of
+    // MA-speaker's configuration, so its absence here would mean tv-app.zap changed underneath
+    // this file.
+    AudioControlCluster * audioControlCluster = AudioControl::FindClusterOnEndpoint(kSpeakerEndpointId);
+    VerifyOrDie(audioControlCluster != nullptr);
+
+    // Must happen before either cluster below is registered (started): LevelControlCluster's own
+    // Startup() synchronously calls gCoordinator.OnLevelChanged(), which needs both cluster
+    // pointers set. AudioControlCluster::Startup() already ran during Server::Init(), before
+    // SetClusters() -- safe, since none of the delegate calls AudioControlCluster's Startup()
+    // makes (OnStartup, the fixed hardware-limit getters) dereference these pointers.
+    gCoordinator.SetClusters(gLevelControlCluster.Cluster(), *audioControlCluster);
+
+    // Level Control reacts to On/Off changes the same way the legacy Ember plugins coupled these
+    // two clusters (turning the speaker off moves/restores CurrentLevel); the coordinator also
+    // reacts to On/Off changes, to keep AudioControl.SoftMuted in sync. Order matters: the
+    // coordinator must see the raw On/Off change before LevelControlCluster's own choreography
+    // runs, so it is added first.
+    gOnOffCluster.Cluster().AddDelegate(&gCoordinator);
     gOnOffCluster.Cluster().AddDelegate(&gLevelControlCluster.Cluster());
 
     SingleEndpointServerClusterRegistry & registry = CodegenDataModelProvider::Instance().Registry();
@@ -157,6 +204,7 @@ void ShutdownOnOffLevelControl()
     }
     if (gOnOffCluster.IsConstructed())
     {
+        gOnOffCluster.Cluster().RemoveDelegate(&gCoordinator);
         LogErrorOnFailure(registry.Unregister(&gOnOffCluster.Cluster()));
         gOnOffCluster.Destroy();
     }
