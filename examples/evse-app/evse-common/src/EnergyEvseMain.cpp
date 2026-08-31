@@ -214,7 +214,7 @@ CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
 {
     if (!gCommonClustersInitialized)
     {
-        chip::BitMask<DeviceEnergyManagement::Feature> featureMap = GetFeatureMapFromCmdLine();
+        chip::BitMask<DeviceEnergyManagement::Feature> featureMap = GetFeatureMap();
         ReturnErrorOnFailure(DeviceEnergyManagementInit(endpointId, gDEMDelegate, gDEMInstance, featureMap));
 
         // Initialize ElectricalSensorManager (owns both EPM and EEM)
@@ -252,7 +252,9 @@ CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
         };
 
         ElectricalSensorManager::PtConfig ptConfig{
-            .features = BitMask<PowerTopology::Feature, uint32_t>(PowerTopology::Feature::kNodeTopology),
+            .features    = BitMask<PowerTopology::Feature, uint32_t>(PowerTopology::Feature::kNodeTopology,
+                                                                  PowerTopology::Feature::kElectricalCircuit),
+            .fabricTable = &Server::GetInstance().GetFabricTable(),
         };
 
         ReturnErrorOnFailure(gESManager->Init(endpointId, epmConfig, eemConfig, ptConfig));

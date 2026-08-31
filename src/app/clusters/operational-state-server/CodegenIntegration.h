@@ -36,13 +36,149 @@ namespace OperationalState {
 // detail:: base classes guarantee that the cluster + registration storage is initialized
 // before Instance receives references to them (base classes initialize before members).
 namespace detail {
+
+using LegacyDelegate = chip::app::Clusters::OperationalState::Delegate;
+
+class InstanceDelegateWrapper : public OperationalStateCluster::Delegate
+{
+public:
+    InstanceDelegateWrapper(LegacyDelegate * aDelegate = nullptr) { SetDelegate(aDelegate); }
+    ~InstanceDelegateWrapper() override { SetDelegate(nullptr); }
+
+    void SetInstance(Instance * aInstance)
+    {
+        // Identical check with OperationalState::Delegate, forcing a 1:1
+        // between instance and delegate, so that every delegate knows exactly what instance it
+        // belongs to and every instance is managed by one delegate only. Doing this here
+        // since mDelegate may not yet be set (and that was the one doing the check before).
+        VerifyOrDie(mInstance == nullptr || aInstance == nullptr || mInstance == aInstance);
+
+        mInstance = aInstance;
+        if (mDelegate != nullptr)
+        {
+            mDelegate->SetInstance(aInstance);
+        }
+    }
+
+    void SetDelegate(LegacyDelegate * aDelegate)
+    {
+        // We expect a general invariant of mDelegate::instance == mInstance.
+        //
+        // At the same time though, delegates throughout try to ensure that delegates are not reset and always
+        // travel through a "SetInstance" from null to a value.
+        //
+        // Enforce that the delegates actually match: when we receive the delegate,
+        // either it has no instance yet (and we can set it to our underlying instance whatever it is)
+        // or it is already set to the required instance anyway.
+        //
+        // What we try to avoid is the case of:
+        //   - mDelegate instance is FOO
+        //   - mInstance is BAR
+        // then:
+        //   - we would do SetInstance(nullptr) + SetInstance(mInstance), effectively switching FOO to BAR
+        //     without erroring out.
+        VerifyOrDie((aDelegate == nullptr) || (aDelegate->GetInstance() == nullptr) || (aDelegate->GetInstance() == mInstance));
+
+        if (mDelegate != nullptr)
+        {
+            mDelegate->SetInstance(nullptr);
+        }
+        mDelegate = aDelegate;
+        if (mDelegate != nullptr)
+        {
+            mDelegate->SetInstance(mInstance);
+        }
+    }
+
+    LegacyDelegate * GetDelegate() const { return mDelegate; }
+
+    DataModel::Nullable<uint32_t> GetCountdownTime() override
+    {
+        if (mDelegate != nullptr)
+        {
+            return mDelegate->GetCountdownTime();
+        }
+        return DataModel::NullNullable;
+    }
+
+    CHIP_ERROR GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState) override
+    {
+        if (mDelegate != nullptr)
+        {
+            return mDelegate->GetOperationalStateAtIndex(index, operationalState);
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase) override
+    {
+        if (mDelegate != nullptr)
+        {
+            return mDelegate->GetOperationalPhaseAtIndex(index, operationalPhase);
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    void HandlePauseStateCallback(GenericOperationalError & err) override
+    {
+        if (mDelegate != nullptr)
+        {
+            mDelegate->HandlePauseStateCallback(err);
+        }
+    }
+
+    void HandleResumeStateCallback(GenericOperationalError & err) override
+    {
+        if (mDelegate != nullptr)
+        {
+            mDelegate->HandleResumeStateCallback(err);
+        }
+    }
+
+    void HandleStartStateCallback(GenericOperationalError & err) override
+    {
+        if (mDelegate != nullptr)
+        {
+            mDelegate->HandleStartStateCallback(err);
+        }
+    }
+
+    void HandleStopStateCallback(GenericOperationalError & err) override
+    {
+        if (mDelegate != nullptr)
+        {
+            mDelegate->HandleStopStateCallback(err);
+        }
+    }
+
+    void HandleGoHomeCommandCallback(GenericOperationalError & err) override
+    {
+        if (mDelegate != nullptr)
+        {
+            mDelegate->HandleGoHomeCommandCallback(err);
+        }
+        else
+        {
+            err.Set(to_underlying(ErrorStateEnum::kUnknownEnumValue));
+        }
+    }
+
+private:
+    Instance * mInstance       = nullptr;
+    LegacyDelegate * mDelegate = nullptr;
+};
+
 struct OperationalInstanceBase
 {
+    InstanceDelegateWrapper mDelegateWrapper;
     RegisteredServerCluster<OperationalStateCluster> mCluster;
-    OperationalInstanceBase(Delegate * aDelegate, EndpointId aEndpointId, const OperationalStateCluster::Config & config = {}) :
-        mCluster(aEndpointId, aDelegate, config)
+    OperationalInstanceBase(LegacyDelegate * aDelegate, EndpointId aEndpointId,
+                            const OperationalStateCluster::Config & config = {}) :
+        mDelegateWrapper(aDelegate),
+        mCluster(aEndpointId, mDelegateWrapper, config)
     {}
 };
+
 } // namespace detail
 
 /**
@@ -63,10 +199,13 @@ public:
      * Standalone constructor: creates and owns an OperationalStateCluster for the given endpoint.
      */
     Instance(Delegate * aDelegate, EndpointId aEndpointId, const OperationalStateCluster::Config & config = {});
-    ~Instance();
+    virtual ~Instance();
 
     CHIP_ERROR Init();
     void Shutdown();
+
+    void SetDelegate(Delegate * aDelegate);
+    Delegate * GetDelegate() const;
 
     // Forwarders to the underlying cluster. Defined out-of-line in CodegenIntegration.cpp so the
     // cluster methods are not inlined (and duplicated) into each shim — keeps the back-compat layer small.
@@ -90,7 +229,8 @@ protected:
      * Constructor for derived instances (Rvc, OvenCavity) that supply their own cluster storage.
      * The derived class must ensure the cluster and registration outlive this object.
      */
-    Instance(OperationalStateCluster & cluster, ServerClusterRegistration & registration, Delegate * aDelegate);
+    Instance(OperationalStateCluster & cluster, ServerClusterRegistration & registration,
+             detail::InstanceDelegateWrapper & delegateWrapper, Delegate * aDelegate);
 
     OperationalStateCluster & Cluster() { return mCluster; }
     const OperationalStateCluster & Cluster() const { return mCluster; }
@@ -98,13 +238,14 @@ protected:
     bool mRegistered = false;
 
 private:
-    Delegate * mDelegate;
-    // mOwnedStorage declared before mCluster so it is initialized first in the standalone constructor,
-    // allowing mCluster to be bound to the storage's cluster object. Held by Platform::UniquePtr so the
-    // storage lifetime is managed automatically (no manual delete) and the type is non-copyable.
+    // mOwnedStorage declared first so it is initialized first in the standalone constructor,
+    // allowing mCluster, mRegPtr, and mDelegateWrapperPtr to be bound to the storage's objects.
+    // Held by Platform::UniquePtr so the storage lifetime is managed automatically (no manual delete)
+    // and the type is non-copyable.
     Platform::UniquePtr<detail::OperationalInstanceBase> mOwnedStorage;
     OperationalStateCluster & mCluster;
     ServerClusterRegistration * mRegPtr;
+    detail::InstanceDelegateWrapper * mDelegateWrapperPtr;
 };
 
 } // namespace OperationalState
@@ -114,10 +255,12 @@ namespace RvcOperationalState {
 namespace detail {
 struct RvcInstanceBase
 {
+    OperationalState::detail::InstanceDelegateWrapper mDelegateWrapper;
     RegisteredServerCluster<RvcOperationalStateCluster> mCluster;
     RvcInstanceBase(Delegate * aDelegate, EndpointId aEndpointId,
                     const OperationalState::OperationalStateCluster::Config & config = {}) :
-        mCluster(aEndpointId, aDelegate, config)
+        mDelegateWrapper(aDelegate),
+        mCluster(aEndpointId, mDelegateWrapper, config)
     {}
 };
 } // namespace detail
@@ -128,7 +271,7 @@ public:
     Instance(Delegate * aDelegate, EndpointId aEndpointId, const OperationalState::OperationalStateCluster::Config & config = {}) :
         detail::RvcInstanceBase(aDelegate, aEndpointId, config),
         OperationalState::Instance(detail::RvcInstanceBase::mCluster.Cluster(), detail::RvcInstanceBase::mCluster.Registration(),
-                                   aDelegate)
+                                   detail::RvcInstanceBase::mDelegateWrapper, aDelegate)
     {}
 };
 
@@ -139,10 +282,12 @@ namespace OvenCavityOperationalState {
 namespace detail {
 struct OvenInstanceBase
 {
+    OperationalState::detail::InstanceDelegateWrapper mDelegateWrapper;
     RegisteredServerCluster<OvenCavityOperationalStateCluster> mCluster;
     OvenInstanceBase(OperationalState::Delegate * aDelegate, EndpointId aEndpointId,
                      const OperationalState::OperationalStateCluster::Config & config = {}) :
-        mCluster(aEndpointId, aDelegate, config)
+        mDelegateWrapper(aDelegate),
+        mCluster(aEndpointId, mDelegateWrapper, config)
     {}
 };
 } // namespace detail
@@ -154,7 +299,7 @@ public:
              const OperationalState::OperationalStateCluster::Config & config = {}) :
         detail::OvenInstanceBase(aDelegate, aEndpointId, config),
         OperationalState::Instance(detail::OvenInstanceBase::mCluster.Cluster(), detail::OvenInstanceBase::mCluster.Registration(),
-                                   aDelegate)
+                                   detail::OvenInstanceBase::mDelegateWrapper, aDelegate)
     {}
 };
 
