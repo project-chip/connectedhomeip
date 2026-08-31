@@ -62,7 +62,6 @@ constexpr ClusterEntry kRvcRunMode      = { RvcRunMode::Id, RvcRunMode::kRevisio
 constexpr ClusterEntry kWaterHeaterMode = { WaterHeaterMode::Id, WaterHeaterMode::kRevision };
 
 // All aliased clusters share features, mandatory attributes, and commands (except MicrowaveOvenMode).
-using Feature      = DeviceEnergyManagementMode::Feature;
 namespace Commands = DeviceEnergyManagementMode::Commands;
 
 namespace Attributes {
@@ -136,6 +135,12 @@ enum class StatusCode : uint8_t
     kUnsupportedMode = 0x1,
     kGenericFailure  = 0x2,
     kInvalidInMode   = 0x3,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kOnOff = 0x1,
 };
 
 } // namespace chip::app::Clusters::ModeBase
