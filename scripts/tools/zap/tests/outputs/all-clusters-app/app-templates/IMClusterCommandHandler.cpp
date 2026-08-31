@@ -26,6 +26,7 @@
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app/CommandHandler.h>
 #include <app/InteractionModelEngine.h>
+#include <app/MessageDef/StatusIB.h>
 #include <app/util/util.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/TypeTraits.h>
@@ -231,6 +232,10 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        if (TLVError.IsIMStatus())
+        {
+            return app::StatusIB(TLVError).mStatus;
+        }
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
@@ -281,6 +286,10 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        if (TLVError.IsIMStatus())
+        {
+            return app::StatusIB(TLVError).mStatus;
+        }
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
@@ -331,6 +340,10 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        if (TLVError.IsIMStatus())
+        {
+            return app::StatusIB(TLVError).mStatus;
+        }
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
@@ -435,6 +448,10 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        if (TLVError.IsIMStatus())
+        {
+            return app::StatusIB(TLVError).mStatus;
+        }
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
@@ -476,6 +493,10 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        if (TLVError.IsIMStatus())
+        {
+            return app::StatusIB(TLVError).mStatus;
+        }
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
@@ -517,6 +538,10 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        if (TLVError.IsIMStatus())
+        {
+            return app::StatusIB(TLVError).mStatus;
+        }
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
@@ -603,6 +628,10 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        if (TLVError.IsIMStatus())
+        {
+            return app::StatusIB(TLVError).mStatus;
+        }
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
@@ -671,6 +700,10 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        if (TLVError.IsIMStatus())
+        {
+            return app::StatusIB(TLVError).mStatus;
+        }
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
@@ -899,6 +932,10 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+        if (TLVError.IsIMStatus())
+        {
+            return app::StatusIB(TLVError).mStatus;
+        }
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 

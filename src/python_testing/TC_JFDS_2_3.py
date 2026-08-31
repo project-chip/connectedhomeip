@@ -148,7 +148,7 @@ class TC_JFDS_2_3(MatterBaseTest):
         # HandleCommissioningCompleteEvent has populated the Admin/Anchor CAT entries.
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork {self.jfadmin_fabric_a_node_id} {self.jfadmin_fabric_a_passcode} --anchor true",
-            expected_output=f"Anchor Administrator ({self.jfadmin_fabric_a_node_id}) commissioned with success",
+            expected_output=f"[JF] Anchor Administrator (nodeId={self.jfadmin_fabric_a_node_id}) commissioned with success",
             timeout=30)
 
         # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
@@ -418,7 +418,8 @@ class TC_JFDS_2_3(MatterBaseTest):
         asserts.assert_false(found_entry, "Entry with GroupID=0x000A should not exist in GroupList after removal")
 
         self.step("8")
-        # Try to add a group with Admin CAT (0xFFFF_0001) - should fail with CONSTRAINT_ERROR
+        # Admin CAT entries are datastore-managed and cannot be created through AddGroup;
+        # the command must reject the reserved Admin CAT (0xFFFF_0001) with CONSTRAINT_ERROR.
         step8_cmd = Clusters.JointFabricDatastore.Commands.AddGroup(
             groupID=0x000A,
             friendlyName="tc-jf-2.3",
