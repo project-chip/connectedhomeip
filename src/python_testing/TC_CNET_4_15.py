@@ -16,6 +16,27 @@
 #
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
+#
+# The app runs with --wifi so the Network Commissioning cluster on endpoint 0
+# reports the Wi-Fi feature. No radio is needed: this test only requires that an
+# unknown NetworkID is rejected with NetworkIDNotFound, which an empty Networks
+# list satisfies. ci-pics-values sets CNET.S.F00=0, so --PICS is not passed here.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_WIFI_APP}
+#     app-args: --wifi --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --endpoint 0
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+# === END CI TEST ARGUMENTS ===
 
 import logging
 

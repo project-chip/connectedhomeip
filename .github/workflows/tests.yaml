@@ -873,6 +873,17 @@ jobs:
                   && rm -rf out/linux-x64-all-clusters-no-groupcast-${BUILD_VARIANT}-clang-test
                   "
 
+            # BUILD_VARIANT is no-wifi, which compiles out LinuxWiFiDriver, so --wifi
+            # is a no-op on the default app. This variant keeps Wi-Fi and Thread drivers
+            # so the CNET Wi-Fi feature map can be exercised.
+            - name: Build linux-x64-all-clusters with Wi-Fi drivers
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-all-clusters-ipv6only-no-ble-asan-clang-test
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-all-clusters-ipv6only-no-ble-asan-clang-test
+                  "
+
             - name: Build linux-x64-all-devices
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
@@ -1145,6 +1156,7 @@ jobs:
                   echo "AIR_PURIFIER_APP: objdir-clone/linux-x64-air-purifier-${BUILD_VARIANT}-clang-test-unified/chip-air-purifier-app" >> /tmp/test_env.yaml
                   echo "ALL_CLUSTERS_APP: objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
                   echo "ALL_CLUSTERS_NO_GROUPCAST_APP: objdir-clone/linux-x64-all-clusters-no-groupcast-${BUILD_VARIANT}-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
+                  echo "ALL_CLUSTERS_WIFI_APP: objdir-clone/linux-x64-all-clusters-ipv6only-no-ble-asan-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
                   echo "ALL_DEVICES_APP: objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}-clang-test/all-devices-app" >> /tmp/test_env.yaml
                   echo "BRIDGE_APP: objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-clang-test-unified/chip-bridge-app" >> /tmp/test_env.yaml
                   echo "CAMERA_APP: objdir-clone/linux-x64-camera-${BUILD_VARIANT}/chip-camera-app" >> /tmp/test_env.yaml
