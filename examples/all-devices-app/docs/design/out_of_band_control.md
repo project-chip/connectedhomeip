@@ -70,8 +70,7 @@ flowchart LR
         `all-devices-common/device/types/<device-name>/`:
         -   Core logic and `OOBAccessors.h/.cpp` belong to the platform-neutral
             `:<device-name>` target.
-        -   `NamedPipes.h/.cpp` belongs to the POSIX-only `:<device-name>:posix`
-            sub-target.
+        -   `NamedPipes.h/.cpp` belongs to the POSIX-only `:posix` sub-target.
     -   **Platform Transport Infrastructure**: Dispatchers and base interfaces
         (e.g., POSIX Named Pipes) live in platform directories under
         `posix/named_pipe/`.
@@ -83,6 +82,9 @@ flowchart LR
 ```text
 examples/all-devices-app/
 ├── all-devices-common/
+│   ├── device-factory/
+│   │   ├── DeviceFactory.h
+│   │   └── BUILD.gn
 │   ├── device/
 │   │   └── types/
 │   │       └── <device-name>/
@@ -91,15 +93,20 @@ examples/all-devices-app/
 │   │           ├── NamedPipes.h/.cpp                   # Device Named Pipe registration (POSIX-only)
 │   │           └── BUILD.gn                            # GN targets: :<device-name>, :posix, :logging
 │   └── oob-accessors/
+│       ├── all_devices_config.gni                      # GN build configuration header generator
+│       ├── all_devices_config.cmake                    # CMake build configuration header generator
+│       ├── all_devices_config.h.in                     # CMake configuration template
+│       ├── BUILD.gn                                    # GN rules for oob-accessors
 │       ├── OOBAccessor.h                               # Base interface: HandleAction(action, tlvData)
 │       ├── OOBAccessorRegistry.h                       # Active alias (InMemory vs Noop)
-│       ├── InMemoryOOBAccessorRegistry.h/.cpp           # Intrusive list of registered OOBAccessors
+│       ├── InMemoryOOBAccessorRegistry.h/.cpp           # Container of registered OOBAccessors
 │       ├── NoopOOBAccessorRegistry.h                   # Zero-cost inline stub for disabled targets
 │       └── clusters/
-│           └── <Cluster>OobAccessor.h/.cpp             # Cluster accessors (e.g. OnOffOobAccessor, OccupancyOobAccessor)
+│           └── <Cluster>OOBAccessor.h/.cpp             # Cluster accessors (e.g. OnOffOOBAccessor, OccupancyOOBAccessor)
 └── posix/
     └── named_pipe/
-        ├── NamedPipeCommandTranslator.h                # Base interface: TranslateAndExecute(json)
+        ├── BUILD.gn                                    # GN rules for POSIX dispatcher & translators
+        ├── NamedPipeCommandTranslator.h                # Base interface: TranslateAndExecute(json, registry)
         ├── PosixNamedPipeDispatcher.h/.cpp             # POSIX pipe listener & JSON command router
         └── translators/
             └── <Command>Translator.h/.cpp              # Command translators (e.g. OnOffTranslator, OccupancyTranslator)
@@ -114,7 +121,7 @@ examples/all-devices-app/
 ```cpp
 namespace chip::app {
 
-class OOBAccessor : public chip::IntrusiveListNodeBase<chip::IntrusiveMode::AutoUnlink>
+class OOBAccessor
 {
 public:
     virtual ~OOBAccessor() = default;
@@ -126,6 +133,9 @@ public:
      * @return std::nullopt if action is not supported (registry continues dispatch).
      * @return CHIP_NO_ERROR if action was recognized and executed successfully.
      * @return Other CHIP_ERROR on execution failure (registry stops dispatch).
+     *
+     * @note Asynchronous Safety: The tlvData parameter is a non-owning temporary view valid
+     *       only during synchronous execution of this call.
      */
     virtual std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) = 0;
 };
@@ -153,14 +163,8 @@ public:
      */
     CHIP_ERROR HandleAction(CharSpan action, ByteSpan tlvData);
 
-    /**
-     * @brief Helper to attach all accessors declared by a device instance.
-     */
-    template <typename ConcreteDevice>
-    void AttachAccessors(ConcreteDevice & device)
-    {
-        RegisterOOBAccessors(device, *this);
-    }
+private:
+    std::vector<std::unique_ptr<OOBAccessor>> mAccessors;
 };
 
 } // namespace chip::app
@@ -171,6 +175,8 @@ public:
 ```cpp
 namespace chip::app {
 
+class OOBAccessorRegistry;
+
 class NamedPipeCommandTranslator
 {
 public:
@@ -179,8 +185,9 @@ public:
     /**
      * @brief Translates a JSON payload into TLV and executes the action via OOBAccessorRegistry.
      * @param json Parsed JSON payload from named pipe.
+     * @param registry Target registry to dispatch the translated action.
      */
-    virtual CHIP_ERROR TranslateAndExecute(const Json::Value & json) = 0;
+    virtual CHIP_ERROR TranslateAndExecute(const Json::Value & json, OOBAccessorRegistry & registry) = 0;
 };
 
 } // namespace chip::app
@@ -196,6 +203,28 @@ class PosixNamedPipeDispatcher
 public:
     explicit PosixNamedPipeDispatcher(OOBAccessorRegistry & oobRegistry) :
         mOobRegistry(oobRegistry) {}
+    ~PosixNamedPipeDispatcher();
+
+    /**
+     * @brief Starts listening on the named pipe FIFO.
+     * @param fifoPath Path to the named pipe file (e.g. "/tmp/chip_all_devices_fifo").
+     */
+    CHIP_ERROR Start(const char * fifoPath);
+
+    /**
+     * @brief Stops listening on the named pipe and cleans up the FIFO file.
+     */
+    CHIP_ERROR Stop();
+
+    /**
+     * @brief Checks if a translator is registered for the specified action name.
+     */
+    bool HasTranslator(const std::string & actionName) const;
+
+    /**
+     * @brief Registers a command translator instance under the specified action name.
+     */
+    CHIP_ERROR RegisterTranslator(const std::string & actionName, std::unique_ptr<NamedPipeCommandTranslator> translator);
 
     /**
      * @brief Registers a translator if not already present, deduping by TranslatorType::kName.
@@ -209,19 +238,13 @@ public:
         }
         return RegisterTranslator(
             TranslatorType::kName,
-            std::make_unique<TranslatorType>(mOobRegistry, std::forward<Args>(args)...)
+            std::make_unique<TranslatorType>(std::forward<Args>(args)...)
         );
     }
 
     /**
-     * @brief Helper to attach all named pipe translators required by a device instance.
+     * @brief Parses and dispatches a JSON command to the registered translator.
      */
-    template <typename ConcreteDevice>
-    void AttachDevice(ConcreteDevice & device)
-    {
-        RegisterNamedPipes(device, *this);
-    }
-
     CHIP_ERROR DispatchJson(const Json::Value & json);
 
 private:
@@ -241,12 +264,14 @@ private:
 ```mermaid
 sequenceDiagram
     participant Pipe as Named Pipe
+    participant Disp as Posix Named Pipe Dispatcher
     participant Trans as Command Translator
     participant Reg as OOB Accessor Registry
     participant Accessor as Cluster OOB Accessor
     participant Cluster as OnOff Cluster
 
-    Pipe->>Trans: {"action": "SetOnOff", "endpoint": 1, "value": true}
+    Pipe->>Disp: Raw JSON string: {"action": "SetOnOff", "endpoint": 1, "value": true}
+    Disp->>Trans: TranslateAndExecute(json, Reg)
     Trans->>Reg: HandleAction("SetOnOff", TLV[endpoint: 1, value: true])
     Reg->>Accessor: HandleAction("SetOnOff", TLV)
     Accessor->>Cluster: SetOnOff(true)
@@ -264,13 +289,13 @@ sequenceDiagram
 2.  **Dispatch**: `PosixNamedPipeDispatcher` reads pipe, parses JSON, and
     extracts `"action"`.
 3.  **Translation**: Dispatcher invokes
-    `OnOffTranslator::TranslateAndExecute(json)`:
+    `OnOffTranslator::TranslateAndExecute(json, mOobRegistry)`:
     -   Extracts `endpoint = 1` and `value = true`.
     -   Encodes flat TLV payload:
         -   Tag 1: `EndpointId` (`uint16_t`)
         -   Tag 2: `Value` (`bool`)
-    -   Calls `mOobRegistry.HandleAction("SetOnOff", tlvBuffer)`.
-4.  **Execution**: `OOBAccessorRegistry` routes to `OnOffOobAccessor` registered
+    -   Calls `registry.HandleAction("SetOnOff", tlvBuffer)`.
+4.  **Execution**: `OOBAccessorRegistry` routes to `OnOffOOBAccessor` registered
     for Endpoint 1:
     -   Decodes TLV fields.
     -   Calls `mCluster.SetOnOff(true)` on target cluster instance.
@@ -287,9 +312,13 @@ In `all-devices-common/device/types/<device-name>/OOBAccessors.h`:
 #pragma once
 #include <oob-accessors/OOBAccessorRegistry.h>
 
+namespace chip::app {
+
 class MyDevice;
 
 void RegisterOOBAccessors(MyDevice & device, OOBAccessorRegistry & registry);
+
+} // namespace chip::app
 ```
 
 In `all-devices-common/device/types/<device-name>/OOBAccessors.cpp`:
@@ -297,12 +326,21 @@ In `all-devices-common/device/types/<device-name>/OOBAccessors.cpp`:
 ```cpp
 #include "OOBAccessors.h"
 #include "MyDevice.h"
-#include <oob-accessors/clusters/OnOffOobAccessor.h>
+
+#if ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
+#include <oob-accessors/clusters/OnOffOOBAccessor.h>
+#endif
+
+namespace chip::app {
 
 void RegisterOOBAccessors(MyDevice & device, OOBAccessorRegistry & registry)
 {
-    registry.Register(std::make_unique<OnOffOobAccessor>(device.GetOnOffCluster(), device.GetEndpointId()));
+#if ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
+    registry.Register(std::make_unique<OnOffOOBAccessor>(device.GetOnOffCluster(), device.GetEndpointId()));
+#endif
 }
+
+} // namespace chip::app
 ```
 
 ### Step 2: Register Named Pipe Translators (POSIX-Only)
@@ -313,9 +351,13 @@ In `all-devices-common/device/types/<device-name>/NamedPipes.h`:
 #pragma once
 #include <posix/named_pipe/PosixNamedPipeDispatcher.h>
 
+namespace chip::app {
+
 class MyDevice;
 
 void RegisterNamedPipes(MyDevice & device, PosixNamedPipeDispatcher & dispatcher);
+
+} // namespace chip::app
 ```
 
 In `all-devices-common/device/types/<device-name>/NamedPipes.cpp`:
@@ -325,10 +367,14 @@ In `all-devices-common/device/types/<device-name>/NamedPipes.cpp`:
 #include "MyDevice.h"
 #include <posix/named_pipe/translators/OnOffTranslator.h>
 
+namespace chip::app {
+
 void RegisterNamedPipes(MyDevice & device, PosixNamedPipeDispatcher & dispatcher)
 {
     dispatcher.EnsureTranslatorRegistered<OnOffTranslator>();
 }
+
+} // namespace chip::app
 ```
 
 ### Step 3: Define Granular GN Sub-Targets
@@ -361,23 +407,28 @@ source_set("posix") {
 
   public_deps = [
     ":<device-name>",
-    "${chip_root}/examples/all-devices-app/posix/named_pipe:dispatcher",
+    "${chip_root}/examples/all-devices-app/posix/named_pipe",
   ]
 }
 ```
 
 ### Step 4: Factory & Application Attachment
 
-In `DeviceFactory.h` (common across all platforms):
+In `DeviceFactory.h` (concrete creator registrations):
 
 ```cpp
-mContext->oobRegistry.AttachAccessors(*device);
+RegisterCreator("on-off-light", [this]() {
+    VerifyOrDie(mContext.has_value());
+    auto device = std::make_unique<LoggingOnOffLight>(...);
+    RegisterOOBAccessors(*device, mOobRegistry);
+    return device;
+});
 ```
 
 In POSIX application initialization (`posix/main.cpp`):
 
 ```cpp
-mNamedPipeDispatcher.AttachDevice(*device);
+mNamedPipeDispatcher.Start(kDefaultFifoPath);
 ```
 
 ---
@@ -424,13 +475,17 @@ Header aliasing in `all-devices-common/oob-accessors/OOBAccessorRegistry.h`:
 #pragma once
 #include <app_config/all_devices_config.h>
 
+namespace chip::app {
+
 #if ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
 #include <oob-accessors/InMemoryOOBAccessorRegistry.h>
-using OOBAccessorRegistry = chip::app::InMemoryOOBAccessorRegistry;
+using OOBAccessorRegistry = InMemoryOOBAccessorRegistry;
 #else
 #include <oob-accessors/NoopOOBAccessorRegistry.h>
-using OOBAccessorRegistry = chip::app::NoopOOBAccessorRegistry;
+using OOBAccessorRegistry = NoopOOBAccessorRegistry;
 #endif
+
+} // namespace chip::app
 ```
 
 ---
@@ -452,12 +507,13 @@ using OOBAccessorRegistry = chip::app::NoopOOBAccessorRegistry;
         (aliasing header).
 -   [ ] Implement shared cluster accessors in
         `all-devices-common/oob-accessors/clusters/`:
-    -   [ ] `OnOffOobAccessor.h/.cpp`
-    -   [ ] `OccupancyOobAccessor.h/.cpp`
-    -   [ ] `BooleanStateOobAccessor.h/.cpp`
-    -   [ ] `AmbientContextOobAccessor.h/.cpp`
-    -   [ ] `BasicInformationOobAccessor.h/.cpp`
--   [ ] Update `all-devices-common/BUILD.gn` with new OOB source targets.
+    -   [ ] `OnOffOOBAccessor.h/.cpp`
+    -   [ ] `OccupancyOOBAccessor.h/.cpp`
+    -   [ ] `BooleanStateOOBAccessor.h/.cpp`
+    -   [ ] `AmbientContextOOBAccessor.h/.cpp`
+    -   [ ] `BasicInformationOOBAccessor.h/.cpp`
+-   [ ] Update `all-devices-common/oob-accessors/BUILD.gn` with new OOB source
+        targets.
 
 ### Phase 2: Device-Type OOB Accessor Registration
 
@@ -470,8 +526,10 @@ using OOBAccessorRegistry = chip::app::NoopOOBAccessorRegistry;
     -   [ ] `all-devices-common/device/types/light-sensor/`
     -   [ ] `all-devices-common/device/types/air-quality-sensor/`
     -   [ ] `all-devices-common/device/types/speaker/`
-    -   [ ] `all-devices-common/device/types/smart-plug/`
--   [ ] Hook `oobRegistry.AttachAccessors(*device)` into `DeviceFactory.h`.
+    -   [ ] `all-devices-common/device/types/on-off-plug-in-unit/`
+    -   [ ] `all-devices-common/device/types/dimmable-plug-in-unit/`
+-   [ ] Hook `RegisterOOBAccessors(*device, mOobRegistry)` into
+        `DeviceFactory.h`.
 
 ### Phase 3: POSIX Named Pipe Dispatcher & Translators
 
@@ -490,13 +548,15 @@ using OOBAccessorRegistry = chip::app::NoopOOBAccessorRegistry;
         `all-devices-common/device/types/<device-name>/` for each supported
         device.
 -   [ ] Add `source_set("posix")` to each device's `BUILD.gn`.
--   [ ] Wire `mNamedPipeDispatcher.AttachDevice(*device)` in `posix/main.cpp`.
+-   [ ] Wire `mNamedPipeDispatcher.Start(path)` in `posix/main.cpp`.
 
 ### Phase 5: Legacy Cleanup & Build Verification
 
 -   [ ] Remove legacy `AppCommandDelegate.h/.cpp`.
 -   [ ] Remove legacy `ClusterTypeMappings.h/.cpp`.
 -   [ ] Remove legacy `AllDevicesAppClusterImplementationRegistry.h`.
--   [ ] Update build files (`posix/BUILD.gn`, `all-devices-common/BUILD.gn`).
+-   [ ] Update build files (`posix/BUILD.gn`,
+        `all-devices-common/oob-accessors/BUILD.gn`,
+        `posix/named_pipe/BUILD.gn`).
 -   [ ] Build target `linux-x64-all-devices-clang` and verify with sample named
         pipe commands.
