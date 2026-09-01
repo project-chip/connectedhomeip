@@ -16,10 +16,6 @@
  *    limitations under the License.
  */
 
-#ifndef __ZEPHYR__
-#include "LEDWidget.h"
-#endif
-
 #include "AppConfig.h"
 #include "AppTask.h"
 #include "DishwasherManager.h"
@@ -27,18 +23,17 @@
 
 #ifndef __ZEPHYR__
 #include "AppEvent.h"
+#include "LEDWidget.h"
+
+namespace {
+    LEDWidget sDishwasherLED;
+} // namespace
 #endif
 
 #ifdef SL_CATALOG_SIMPLE_LED_LED1_PRESENT
 #define DW_STATE_LED 1
 #else
 #define DW_STATE_LED 0
-#endif
-
-#ifndef __ZEPHYR__
-namespace {
-LEDWidget sDishwasherLED;
-}
 #endif
 
 using namespace chip;

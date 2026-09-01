@@ -27,6 +27,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+// Prefer a forward declaration over including the full header when only a
+// pointer/reference is needed (reduces coupling and compile-time dependencies).
+// The complete type is included in the .cpp where methods are called.
 namespace ElectricalPowerMeasurement {
 class ElectricalPowerMeasurementDelegate;
 } // namespace ElectricalPowerMeasurement

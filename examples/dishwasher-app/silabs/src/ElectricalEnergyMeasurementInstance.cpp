@@ -101,7 +101,7 @@ CHIP_ERROR ElectricalEnergyMeasurementInstance::Init()
     sCumulativeImported.startTimestamp.SetValue(currentTimestamp);
     sCumulativeImported.startSystime.SetValue(System::SystemClock().GetMonotonicTimestamp().count());
 
-    // Start Matter SystemLayer timer (CMSIS-free; works on FreeRTOS and Zephyr)
+    // Start Matter SystemLayer timer (CMSIS-free, works on FreeRTOS and Zephyr)
     StartTimer(kTimerPeriodms);
 
     return ElectricalEnergyMeasurementAttrAccess::Init();
@@ -132,7 +132,7 @@ void ElectricalEnergyMeasurementInstance::CancelTimer()
 
 void ElectricalEnergyMeasurementInstance::TimerEventHandler(System::Layer * systemLayer, void * appState)
 {
-    auto * self = static_cast<ElectricalEnergyMeasurementInstance *>(appState);
+    ElectricalEnergyMeasurementInstance * self = static_cast<ElectricalEnergyMeasurementInstance *>(appState);
     VerifyOrReturn(self != nullptr && self->mTimerActive);
 
     // Get different EPM Active Power values according to operational mode change

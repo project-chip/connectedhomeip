@@ -111,15 +111,13 @@ const ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::Type kMea
 
 std::unique_ptr<ElectricalSensorManager> gESManager;
 
-// Fake power table indexed by OperationalStateEnum (Stopped/Running/Paused/Error)
-struct FakePowerReading
+// EPM attribute values indexed by OperationalStateEnum (Stopped/Running/Paused/Error)
+static const struct
 {
-    int64_t voltage_mV;
-    int64_t activeCurrent_mA;
-    int64_t activePower_mW;
-};
-
-constexpr FakePowerReading kOpStatePowerReadings[] = {
+    int64_t Voltage;       // mV
+    int64_t ActiveCurrent; // mA
+    int64_t ActivePower;   // mW
+} kAttributes[4] = {
     { 120'000, 0, 0 },             // kStopped
     { 120'000, 15'000, 1800'000 }, // kRunning
     { 120'000, 125, 17'000 },      // kPaused
@@ -249,10 +247,7 @@ ElectricalSensorManager * GetESManager()
 
 void UpdateEpmAttributesForOperationalState(OperationalStateEnum state)
 {
-    if (gESManager == nullptr)
-    {
-        return;
-    }
+    VerifyOrReturn(gESManager != nullptr);
 
     size_t index = 0;
     switch (state)
@@ -272,17 +267,15 @@ void UpdateEpmAttributesForOperationalState(OperationalStateEnum state)
         break;
     }
 
-    const FakePowerReading & reading = kOpStatePowerReadings[index];
-    RETURN_SAFELY_IGNORED gESManager->SendPowerReading(reading.activePower_mW, reading.voltage_mV, reading.activeCurrent_mA);
+    chip::ChipError err = gESManager->SendPowerReading(kAttributes[index].ActivePower, kAttributes[index].Voltage,
+                                                       kAttributes[index].ActiveCurrent);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(AppServer, "ERR: updating EPM attributes for operational state %" CHIP_ERROR_FORMAT, err.Format()));
 }
 
 void UpdateOperationalStateLed(OperationalStateEnum state)
 {
 #ifdef HAS_LED1
-    if (!gpio_is_ready_dt(&sLed1))
-    {
-        return;
-    }
+    VerifyOrReturn(gpio_is_ready_dt(&sLed1));
 
     StopLed1Blink();
     sLed1State = false;
@@ -336,11 +329,8 @@ void AppTask::ActionInitiated(OperationalStateEnum action)
     CHIP_ERROR err = OperationalState::GetInstance()->SetOperationalState(to_underlying(action));
     PlatformMgr().UnlockChipStack();
 
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "ERR: updating Operational state %" CHIP_ERROR_FORMAT, err.Format());
-        return;
-    }
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogError(DeviceLayer, "ERR: updating Operational state %" CHIP_ERROR_FORMAT, err.Format()));
 
     GetDishwasherManager()->UpdateOperationState(action);
     UpdateEpmAttributesForOperationalState(action);
@@ -411,18 +401,12 @@ void AppTask::PostInitMatterStack()
 void AppTask::PostInitMatterServerInstance()
 {
     CHIP_ERROR err = DeviceEnergyManager::Instance().Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "DeviceEnergyManager.Init failed: %" CHIP_ERROR_FORMAT, err.Format());
-        return;
-    }
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogError(DeviceLayer, "DeviceEnergyManager.Init failed: %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = InitElectricalSensorManager();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "ElectricalSensorManager.Init failed: %" CHIP_ERROR_FORMAT, err.Format());
-        return;
-    }
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogError(DeviceLayer, "ElectricalSensorManager.Init failed: %" CHIP_ERROR_FORMAT, err.Format()));
 
     GetDishwasherManager()->SetCallbacks(ActionInitiated, ActionCompleted);
 
