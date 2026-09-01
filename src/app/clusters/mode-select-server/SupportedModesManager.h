@@ -86,6 +86,12 @@ const SupportedModesManager * getSupportedModesManager();
 
 void setSupportedModesManager(SupportedModesManager * aSupportedModesManager);
 
+namespace internal {
+// Registers a callback invoked when setSupportedModesManager() is called.
+// For use by CodegenIntegration only.
+void RegisterOnManagerSetCallback(void (*cb)(SupportedModesManager * manager));
+} // namespace internal
+
 } // namespace ModeSelect
 } // namespace Clusters
 } // namespace app
