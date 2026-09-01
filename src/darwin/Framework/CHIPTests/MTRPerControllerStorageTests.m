@@ -3057,6 +3057,84 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     // Generous, but far short of an indefinite hang: pre-fix this times out, post-fix it is near-instant.
     [self waitForExpectations:@[ readExpectation ] timeout:30];
 }
+
+// Complement to the reuse test above: when no active CASE session exists, a Thread
+// getSessionForNode must NOT take the reuse shortcut. It falls through to the connectivity-monitor
+// throttle path, which (with the monitor allowed to fire) re-establishes a session and completes.
+- (void)testGetSessionForThreadDeviceReestablishesViaConnectivityMonitorWhenNoActiveSession
+{
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type queue = dispatch_get_main_queue();
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
+
+    NSNumber * fabricID = @(456);
+    NSNumber * nodeID = @(123);
+
+    NSError * error;
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    NSNumber * deviceID = @(17);
+    certificateIssuer.nextNodeID = deviceID;
+    [self commissionWithController:controller newNodeID:deviceID];
+
+    __weak __auto_type weakSelf = self;
+    [self addTeardownBlock:^{
+        __auto_type self = weakSelf;
+        if (self == nil) {
+            return;
+        }
+        __auto_type * resetBaseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+        ResetCommissioneeWithNodeID(resetBaseDevice, queue, self, kTimeoutInSeconds, deviceID);
+        [controller shutdown];
+        XCTAssertFalse([controller isRunning]);
+    }];
+
+    // Establish a subscription so the device is Thread-classified and reachable.
+    __auto_type * subscriptionExpectation = [self expectationWithDescription:@"Subscription established"];
+    subscriptionExpectation.assertForOverFulfill = NO;
+    __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+    };
+    [device setDelegate:delegate queue:queue];
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    // Leave the monitor free to fire (opposite of the reuse test) and drop the active CASE session,
+    // so getSessionForNode cannot reuse and must go through the connectivity-monitor throttle path.
+    controller.unitTestSuppressGetSessionConnectivityMonitorFire = NO;
+    __auto_type * invalidateDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+    [invalidateDevice invalidateCASESession];
+
+    // The read must still complete: the monitor signals connectivity, the work item is enqueued, and
+    // a session is (re)established -- proving the throttle path is intact for the no-session case.
+    __auto_type * readExpectation = [self expectationWithDescription:@"BaseDevice read completes"];
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+    __auto_type * onOffCluster = [[MTRBaseClusterOnOff alloc] initWithDevice:baseDevice endpointID:@(1) queue:queue];
+    [onOffCluster readAttributeOnOffWithCompletion:^(NSNumber * value, NSError * _Nullable readError) {
+        XCTAssertNil(readError);
+        [readExpectation fulfill];
+    }];
+    [self waitForExpectations:@[ readExpectation ] timeout:60];
+}
 #endif // DEBUG
 
 - (void)testSubscriptionPool
