@@ -210,7 +210,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
                                                             ,
                                                         Transport::NfcListenParameters(nullptr)
 #endif
-                                                            ));
+                                                            ,
+                                                        Transport::ProxyListenParameters(stateParams.systemLayer)));
 
     // TODO(#16231): All the new'ed state above/below in this method is never properly released or null-checked!
     stateParams.sessionMgr                = chip::Platform::New<SessionManager>();
