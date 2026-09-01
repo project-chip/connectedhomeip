@@ -32,6 +32,12 @@ namespace Thermostat {
 using namespace chip::app::Clusters::Thermostat::Attributes;
 using namespace chip::Protocols::InteractionModel;
 
+DefaultTimerDelegate & GetDefaultTimerDelegate()
+{
+    static DefaultTimerDelegate sDefaultTimerDelegate;
+    return sDefaultTimerDelegate;
+}
+
 OptionalAttributes BaseIntegrationDelegate::GetOptionalAttributes(EndpointId endpointId, BitFlags<Thermostat::Feature> features)
 {
     OptionalAttributes optionalAttributes;

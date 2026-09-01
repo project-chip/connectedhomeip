@@ -40,7 +40,7 @@ namespace chip::app::Clusters::Thermostat {
 constexpr size_t kThermostatFixedClusterCount = Thermostat::StaticApplicationConfig::kFixedClusterConfig.size();
 constexpr size_t kThermostatEndpointCount     = kThermostatFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-inline DefaultTimerDelegate gDefaultTimerDelegate;
+DefaultTimerDelegate & GetDefaultTimerDelegate();
 
 /**
  * Base delegate for the Thermostat cluster.
@@ -85,7 +85,7 @@ public:
         const BitFlags<Thermostat::Feature> features(featureMap);
         const OptionalAttributes optionalAttributes = GetOptionalAttributes(endpointId, features);
 
-        ThermostatClusterBase::Config config(optionalAttributes, gDefaultTimerDelegate);
+        ThermostatClusterBase::Config config(optionalAttributes, GetDefaultTimerDelegate());
 
         ChipLogProgress(Zcl, "Creating thermostat cluster for endpoint %d", endpointId);
         if constexpr (sizeof...(Delegates) > 0)
