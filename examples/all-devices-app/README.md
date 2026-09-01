@@ -10,12 +10,12 @@ and clusters without requiring recompilation for each configuration.
 
 The Code-Driven paradigm offers several advantages:
 
-- **Unit Testable**: Allows clusters to be unit tested easily.
-- **Dynamic Data Model**: Allows applications to change their data model
-  dynamically at runtime without requiring recompilation.
-- **Composite Devices**: Supports multi-endpoint devices and bridges.
-- **Maintainability**: Decouples cluster implementations from application
-  configuration.
+-   **Unit Testable**: Allows clusters to be unit tested easily.
+-   **Dynamic Data Model**: Allows applications to change their data model
+    dynamically at runtime without requiring recompilation.
+-   **Composite Devices**: Supports multi-endpoint devices and bridges.
+-   **Maintainability**: Decouples cluster implementations from application
+    configuration.
 
 The application simulates various device types.
 
@@ -23,36 +23,38 @@ The application simulates various device types.
 
 The [`docs/`](docs/) directory contains documentation for this application:
 
-- **[Architecture & Design Patterns](docs/architecture.md)**: Describes the
-  Code-Driven Data Model, component hierarchies (`DeviceFactory`,
-  `SingleEndpointDevice`), and platform separation.
-- **[Starting Up & CLI Reference](docs/starting_up.md)**: Describes application
-  initialization, endpoint composition flags (`--device`), and network settings.
-- **[Testing & Simulation Guide](docs/testing.md)**: Instructions for
-  `chip-tool` commissioning and executing automated Python regression suites
-  (`src/python_testing/`).
-- **[How to Add a New Simulated Device](docs/adding_new_device.md)**:
-  Instructions for implementing Matter devices, binding code-driven clusters,
-  and updating build configurations.
-- **[Custom Product Baseline Guide](docs/custom_product_baseline.md)**: Guide on
-  transitioning from this simulator baseline to a custom product application.
+-   **[Architecture & Design Patterns](docs/architecture.md)**: Describes the
+    Code-Driven Data Model, component hierarchies (`DeviceFactory`,
+    `SingleEndpointDevice`), and platform separation.
+-   **[Starting Up & CLI Reference](docs/starting_up.md)**: Describes
+    application initialization, endpoint composition flags (`--device`), and
+    network settings.
+-   **[Testing & Simulation Guide](docs/testing.md)**: Instructions for
+    `chip-tool` commissioning and executing automated Python regression suites
+    (`src/python_testing/`).
+-   **[How to Add a New Simulated Device](docs/adding_new_device.md)**:
+    Instructions for implementing Matter devices, binding code-driven clusters,
+    and updating build configurations.
+-   **[Custom Product Baseline Guide](docs/custom_product_baseline.md)**: Guide
+    on transitioning from this simulator baseline to a custom product
+    application.
 
 ## Architecture and File Structure
 
 The `all-devices-app` separates platform-agnostic code from platform-specific
 implementations:
 
-- **`all-devices-common/`**: Contains platform-agnostic code, including:
-    - Core cluster logic and device interfaces.
-    - Base device implementations.
-    - The **`DeviceFactory`** (in
-      `all-devices-common/device-factory/DeviceFactory.h`), which enables
-      runtime registration and creation of supported device types.
-- **`esp32/`, `posix/`**: Contain platform-specific implementations (with
-  `posix/` containing `linux/` and `darwin/` subdirectories), entry points, and
-  build configurations.
-    - For example, `posix/linux/DeviceFactoryPlatformOverride.cpp` registers
-      platform-specific overrides for devices at build-time.
+-   **`all-devices-common/`**: Contains platform-agnostic code, including:
+    -   Core cluster logic and device interfaces.
+    -   Base device implementations.
+    -   The **`DeviceFactory`** (in
+        `all-devices-common/device-factory/DeviceFactory.h`), which enables
+        runtime registration and creation of supported device types.
+-   **`esp32/`, `posix/`**: Contain platform-specific implementations (with
+    `posix/` containing `linux/` and `darwin/` subdirectories), entry points,
+    and build configurations.
+    -   For example, `posix/linux/DeviceFactoryPlatformOverride.cpp` registers
+        platform-specific overrides for devices at build-time.
 
 This separation ensures core logic remains reusable across operating systems and
 hardware platforms while allowing platform-specific driver integration.
@@ -62,50 +64,50 @@ hardware platforms while allowing platform-specific driver integration.
 The application supports the following device types (specified via the
 `--device` flag). Currently supported device types include:
 
-- `aggregator`
-- `air-purifier`
-- `air-quality-sensor`
-- `bridged-node`
-- `chime`
-- `contact-sensor`
-- `cooktop`
-- `device-energy-management`
-- `dimmable-light`
-- `dimmable-plug-in-unit`
-- `dishwasher`
-- `electrical-sensor`
-- `extractor-hood`
-- `fan`
-- `fan-no-onoff`
-- `flow-sensor`
-- `generic-switch`
-- `humidity-sensor`
-- `laundry-dryer`
-- `laundry-washer`
-- `light-sensor`
-- `microwave-oven`
-- `mounted-dimmable-load-control`
-- `mounted-on-off-control`
-- `network-infrastructure-manager`
-- `occupancy-sensor`
-- `on-off-light`
-- `on-off-light-switch`
-- `on-off-plug-in-unit`
-- `oven`
-- `power-source`
-- `pressure-sensor`
-- `proximity-ranger`
-- `rain-sensor`
-- `refrigerator`
-- `robotic-vacuum-cleaner`
-- `smoke-co-alarm`
-- `soil-sensor`
-- `speaker`
-- `temperature-sensor`
-- `water-freeze-detector`
-- `water-leak-detector`
-- `water-valve`
-- `window-covering`
+-   `aggregator`
+-   `air-purifier`
+-   `air-quality-sensor`
+-   `bridged-node`
+-   `chime`
+-   `contact-sensor`
+-   `cooktop`
+-   `device-energy-management`
+-   `dimmable-light`
+-   `dimmable-plug-in-unit`
+-   `dishwasher`
+-   `electrical-sensor`
+-   `extractor-hood`
+-   `fan`
+-   `fan-no-onoff`
+-   `flow-sensor`
+-   `generic-switch`
+-   `humidity-sensor`
+-   `laundry-dryer`
+-   `laundry-washer`
+-   `light-sensor`
+-   `microwave-oven`
+-   `mounted-dimmable-load-control`
+-   `mounted-on-off-control`
+-   `network-infrastructure-manager`
+-   `occupancy-sensor`
+-   `on-off-light`
+-   `on-off-light-switch`
+-   `on-off-plug-in-unit`
+-   `oven`
+-   `power-source`
+-   `pressure-sensor`
+-   `proximity-ranger`
+-   `rain-sensor`
+-   `refrigerator`
+-   `robotic-vacuum-cleaner`
+-   `smoke-co-alarm`
+-   `soil-sensor`
+-   `speaker`
+-   `temperature-sensor`
+-   `water-freeze-detector`
+-   `water-leak-detector`
+-   `water-valve`
+-   `window-covering`
 
 You can run the application with `--help` to see the list of valid device types.
 
@@ -173,7 +175,7 @@ child, which gets extremely verbose:
 Using the `,bridged` modifier automatically handles the intermediate
 `bridged-node` injection:
 
-- **Explicit Bridged Device:**
+-   **Explicit Bridged Device:**
 
     ```bash
     ./out/linux-x64-all-devices-boringssl/all-devices-app --device aggregator:1 --device "chime:2,parent=1,bridged"
@@ -195,21 +197,21 @@ Using the `,bridged` modifier automatically handles the intermediate
 You can use the wildcard `*` to automatically instantiate all supported leaf
 device types. When an endpoint is specified, it represents the starting number.
 
-- **Standard Wildcard:** Start all devices from endpoint 1 sequentially.
+-   **Standard Wildcard:** Start all devices from endpoint 1 sequentially.
 
     ```bash
     ./out/linux-x64-all-devices-boringssl/all-devices-app --device "*:1"
     ```
 
-- **Parented Wildcard:** Start all devices from endpoint 2 sequentially and make
-  them all children of parent endpoint 1 (e.g., an aggregator).
+-   **Parented Wildcard:** Start all devices from endpoint 2 sequentially and
+    make them all children of parent endpoint 1 (e.g., an aggregator).
 
     ```bash
     ./out/linux-x64-all-devices-boringssl/all-devices-app --device aggregator:1 --device "*:2,parent=1"
     ```
 
-- **Compound Bridged Wildcard:** Automatically wraps every leaf device generated
-  by the wildcard in a dedicated `bridged-node` parent endpoint.
+-   **Compound Bridged Wildcard:** Automatically wraps every leaf device
+    generated by the wildcard in a dedicated `bridged-node` parent endpoint.
 
     ```bash
     ./out/linux-x64-all-devices-boringssl/all-devices-app --device aggregator:1 --device "*:2,parent=1,bridged"

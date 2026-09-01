@@ -8,6 +8,7 @@
 To update or validate this list manually, follow these steps:
 
 1. **Verify Implemented Device Types**:
+
     - Inspect
       `examples/all-devices-app/all-devices-common/device-factory/DeviceFactory.h`.
     - Look at the `DeviceFactory` constructor. Every
@@ -18,6 +19,7 @@ To update or validate this list manually, follow these steps:
       `examples/all-devices-app/all-devices-common/device/types/root-node/`.
 
 2. **Verify Server Clusters per Device Type**:
+
     - Locate the device type definition in the Matter Specification (e.g. under
       `device_library/` in the spec repository, or locally generated markdown
       files).
