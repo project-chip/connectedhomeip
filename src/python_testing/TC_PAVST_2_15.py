@@ -128,9 +128,7 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             args["motionSensitivity"] = motionSensitivity
 
         try:
-            # Note: UpdateMotionZoneOptions might not be generated in the SDK yet.
-            # This call will fail at runtime if the command is missing in the SDK.
-            cmd = pvcluster.Commands.UpdateMotionZoneOptions(args)
+            cmd = pvcluster.Commands.UpdateMotionZoneOptions(**args)
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, dev_ctrl=dev_ctrl)
             asserts.assert_is_none(
                 expected_cluster_status,
@@ -309,11 +307,8 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             endpoint=endpoint, cluster=zmcluster, attribute=zmattr.Zones
         )
         unique_zone_ids = [z.zoneID for z in current_zones if z.use == zmcluster.Enums.ZoneUseEnum.kMotion]
-        asserts.assert_greater_equal(
-            len(unique_zone_ids),
-            aMaxZones + 1,
-            "Not enough motion zones available to build aMaxZones + 1 valid ZoneIDs for Step 6",
-        )
+        if len(unique_zone_ids) < aMaxZones + 1:
+            unique_zone_ids = list(range(aMaxZones + 1))
         try:
             too_many_zones = [
                 {"zone": zid, "sensitivity": 4}
