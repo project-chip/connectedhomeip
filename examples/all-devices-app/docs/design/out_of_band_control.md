@@ -116,6 +116,28 @@ examples/all-devices-app/
 
 ## 3. Interfaces & Core Types
 
+### `CreatedDevice` Struct
+
+```cpp
+namespace chip::app {
+
+struct CreatedDevice
+{
+    std::unique_ptr<DeviceInterface> device;
+
+    /**
+     * @brief Optional callback to execute actions after endpoint registration.
+     *
+     * This callback MUST be invoked after `device->Register(...)` completes so that
+     * any actions requiring a valid allocated EndpointId (such as registering OOB
+     * cluster accessors) have access to `device->GetEndpointId()`.
+     */
+    std::function<void(OOBAccessorRegistry & registry)> postRegistrationCallback;
+};
+
+} // namespace chip::app
+```
+
 ### `OOBAccessor` Interface
 
 ```cpp
@@ -440,22 +462,49 @@ source_set("posix") {
 }
 ```
 
-### Step 4: Application Lifecycle & Registration
+### Step 4: Factory Creation & Application Lifecycle
+
+In `DeviceFactory.h` (creator registration):
+
+```cpp
+RegisterCreator("on-off-light", [this](const std::string & label) -> CreatedDevice {
+    VerifyOrDie(mContext.has_value());
+    auto device = std::make_unique<LoggingOnOffLight>(mContext->timerDelegate);
+    auto * rawDevice = device.get();
+
+    return CreatedDevice{
+        .device = std::move(device),
+        .postRegistrationCallback = [rawDevice](OOBAccessorRegistry & registry) {
+            RegisterOOBAccessors(*rawDevice, registry);
+        },
+    };
+});
+```
 
 In application initialization (`posix/main.cpp` and embedded setup):
 
 ```cpp
-// 1. Device creation via factory
-auto device = DeviceFactory::GetInstance().Create(deviceTypeName);
+for (const auto & entry : AppOptions::GetDeviceTypeEntries())
+{
+    // 1. Create device + post-registration callback via factory
+    auto created = DeviceFactory::GetInstance().Create(entry.type, entry.label);
+    VerifyOrReturnError(created.device != nullptr, CHIP_ERROR_NO_MEMORY);
 
-// 2. Register endpoint with data model provider (allocates valid endpoint ID)
-ReturnErrorOnFailure(device->Register(endpointIdAllocator, dataModelProvider));
+    // 2. Register endpoint with data model provider (allocates valid endpoint ID)
+    ReturnErrorOnFailure(
+        created.device->Register(endpointIdAllocator, mDataModelProvider, EndpointComposition::WithParent(entry.parentId)));
 
-// 3. Register OOB accessors once endpoint ID is assigned
-RegisterOOBAccessors(*device, oobRegistry);
+    // 3. Invoke post-registration callback once EndpointId is assigned
+    if (created.postRegistrationCallback)
+    {
+        created.postRegistrationCallback(mOobRegistry);
+    }
+
+    mConstructedDevices.push_back(std::move(created.device));
+}
 
 // 4. Start named pipe listener in POSIX main
-namedPipeDispatcher.Start(kDefaultFifoPath);
+mNamedPipeDispatcher.Start(kDefaultFifoPath);
 ```
 
 ---
@@ -559,7 +608,7 @@ using OOBAccessorRegistry = NoopOOBAccessorRegistry;
     -   [ ] `all-devices-common/device/types/speaker/`
     -   [ ] `all-devices-common/device/types/on-off-plug-in-unit/`
     -   [ ] `all-devices-common/device/types/dimmable-plug-in-unit/`
--   [ ] Hook `RegisterOOBAccessors(*device, oobRegistry)` after endpoint
+-   [ ] Hook `created.postRegistrationCallback(mOobRegistry)` after endpoint
         registration in `main.cpp`.
 
 ### Phase 3: POSIX Named Pipe Dispatcher & Translators
