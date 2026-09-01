@@ -634,6 +634,7 @@ def BuildNxpTarget():
     target.AppendModifier(name="log-none", log_level=NxpLogLevel.NONE).ExceptIfRe("-log-(progress|error|all)")
     target.AppendModifier(name="mtd", enable_mtd=True).OnlyIfRe("thread").OnlyIfRe("mcxw72")
     target.AppendModifier(name="no-ble", disable_ble=True)
+    target.AppendModifier(name="build-only-no-blobs", build_only_no_blobs=True).OnlyIfRe('zephyr')
     target.AppendModifier(name="se05x", se05x_enable=True).OnlyIfRe('cmake').OnlyIfRe('rw61x')
     target.AppendModifier(name="iw610", iw610_transceiver=True).OnlyIfRe('rt1060').OnlyIfRe('evkc').OnlyIfRe('cmake')
 
