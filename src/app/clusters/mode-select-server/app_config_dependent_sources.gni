@@ -16,4 +16,5 @@ app_config_dependent_sources = [
   "CodegenIntegration.h",
   "SupportedModesManager.cpp",
   "SupportedModesManager.h",
+  "supported-modes-manager.h",
 ]

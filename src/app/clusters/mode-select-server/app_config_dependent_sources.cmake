@@ -20,4 +20,5 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/CodegenIntegration.h"
     "${CLUSTER_DIR}/SupportedModesManager.cpp"
     "${CLUSTER_DIR}/SupportedModesManager.h"
+    "${CLUSTER_DIR}/supported-modes-manager.h"
 )

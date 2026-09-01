@@ -18,7 +18,6 @@ static_library("mode-select-server") {
   sources = [
     "ModeSelectCluster.cpp",
     "ModeSelectCluster.h",
-    "supported-modes-manager.h",
   ]
 
   public_deps = [
