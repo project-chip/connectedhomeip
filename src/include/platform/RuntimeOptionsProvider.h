@@ -27,9 +27,12 @@ public:
     static RuntimeOptionsProvider & Instance();
     void SetSimulateNoInternalTime(bool simulateNoInternalTime) { mSimulateNoInternalTime = simulateNoInternalTime; }
     bool GetSimulateNoInternalTime() { return mSimulateNoInternalTime; }
+    void SetPqcDeviceAttestationFeatureEnabled(bool enabled) { mPqcDeviceAttestationFeatureEnabled = enabled; }
+    bool GetPqcDeviceAttestationFeatureEnabled() const { return mPqcDeviceAttestationFeatureEnabled; }
 
 private:
-    bool mSimulateNoInternalTime = false;
+    bool mSimulateNoInternalTime             = false;
+    bool mPqcDeviceAttestationFeatureEnabled = false;
 };
 } // namespace app
 } // namespace chip

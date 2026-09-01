@@ -1002,9 +1002,13 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
         initParams.advertiseCommissionableIfNoFabrics = false;
     }
 
+    ResolveDeviceAttestationCredentialsProvider();
+
     // Set DAC provider before server init because Operational Credentials may snapshot
     // the provider during cluster construction.
     SetDeviceAttestationCredentialsProvider(LinuxDeviceOptions::GetInstance().dacProvider);
+    chip::app::RuntimeOptionsProvider::Instance().SetPqcDeviceAttestationFeatureEnabled(
+        LinuxDeviceOptions::GetInstance().dacProviderPqcReady);
 
     // Init ZCL Data Model and CHIP App Server
     CHIP_ERROR err = Server::GetInstance().Init(initParams);
