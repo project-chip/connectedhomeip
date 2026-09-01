@@ -130,7 +130,7 @@ class TC_HSTAT_2_5(HSTATBase):
             self.step(6)
             # TH writes to the DUT the MistType attribute with only the MistCold bit set
             # Verify DUT responds w/ status SUCCESS(0x00)
-            await self.write_single_attribute(attribute_value=self.attributes.MistType(self.MistTypeBitmap.kMistCold), expect_success=True)
+            await self.write_single_attribute(attribute_value=self.attributes.MistType(self.MistTypeBitmap.kMistCold), endpoint_id=self.endpoint, expect_success=True)
 
             self.step(7)
             # TH reads from the DUT the MistType attribute.
@@ -150,7 +150,7 @@ class TC_HSTAT_2_5(HSTATBase):
             self.step(9)
             # TH writes to the DUT the MistType attribute with only the MistWarm bit of the MistType field set
             # Verify that an attribute report was received for MistType and that the value received has only the MistWarm bit set.
-            await self.write_single_attribute(attribute_value=self.attributes.MistType(self.MistTypeBitmap.kMistWarm), expect_success=True)
+            await self.write_single_attribute(attribute_value=self.attributes.MistType(self.MistTypeBitmap.kMistWarm), endpoint_id=self.endpoint, expect_success=True)
             mistTypeReportValue = mistTypeSubscription.wait_for_attribute_report().value
             asserts.assert_equal(mistTypeReportValue, self.MistTypeBitmap.kMistWarm, "MistType report is not MistWarm as expected")
         else:
