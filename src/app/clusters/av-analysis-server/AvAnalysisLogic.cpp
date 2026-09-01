@@ -578,31 +578,19 @@ void AvAnalysisServerLogic::LoadPersistentAttributes()
 }
 
 /**
- * Handler for the EnableContextTriggers command. This invokes specific methods for local vs. remote as the logic
- * associated with each is different
+ * Handler for the EnableContextTriggers command.
  */
 std::optional<DataModel::ActionReturnStatus>
 AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                                    const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData)
 {
-    // Are we locally or remotely processing, handle appropriately
-    //
-    if (HasFeature(AvAnalysis::Feature::kLocalContextDetection))
-    {
-        return HandleLocalEnableContextTriggers(handler, commandPath, commandData);
-    }
-
-    return HandleRemoteEnableContextTriggers(handler, commandPath, commandData);
-}
-
-/**
- * Handler for EnableContextTriggers when the local detect feature is set.
- */
-std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalEnableContextTriggers(
-    CommandHandler & handler, const ConcreteCommandPath & commandPath,
-    const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData)
-{
     ChipLogProgress(Zcl, "AvAnalysis[ep=%d]: Enabling Context Triggers command handler entry.", mEndpointId);
+
+    // RemoteContextDetection requires an established analysis stream:
+    if (HasFeature(AvAnalysis::Feature::kRemoteContextDetection))
+    {
+        VerifyOrReturnError(mStreamTable.Count() > 0, Status::InvalidInState);
+    }
 
     // Verify spec constraints, provided list is 50 entries or less if not null
     //
@@ -760,16 +748,6 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalE
     MarkDirty(AvAnalysis::Attributes::ActiveAmbientContextTriggers::Id);
     LogErrorOnFailure(StoreActiveAmbientContextTriggers());
 
-    return Status::Success;
-}
-
-/**
- * Placeholder method for when the functionality for remote context detection is implemented
- */
-std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleRemoteEnableContextTriggers(
-    CommandHandler & handler, const ConcreteCommandPath & commandPath,
-    const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData)
-{
     return Status::Success;
 }
 

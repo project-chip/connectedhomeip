@@ -186,16 +186,6 @@ private:
      */
     void MarkDirty(AttributeId aAttributeId);
 
-    /**
-     * Command sub-handlers
-     */
-    std::optional<DataModel::ActionReturnStatus>
-    HandleLocalEnableContextTriggers(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                     const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData);
-    std::optional<DataModel::ActionReturnStatus>
-    HandleRemoteEnableContextTriggers(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                      const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData);
-
     /*
      * Command and event handler helper methods
      */

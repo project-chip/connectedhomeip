@@ -124,6 +124,39 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
 
     void TearDown() override { mServer.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
+    // Encodes a one-entry ContextTriggers list into aTlvBuffer and returns it as the nullable
+    // decodable list the command payload carries.
+    DataModel::Nullable<DataModel::DecodableList<Structs::ContextTriggerStruct::DecodableType>>
+    EncodeContextTriggers(const Descriptor::Structs::SemanticTagStruct::Type & aContext,
+                          const DataModel::Nullable<std::vector<uint16_t>> & aZones, uint8_t * aTlvBuffer, size_t aTlvBufferSize)
+    {
+        Structs::ContextTriggerStruct::Type trigger;
+        trigger.context = aContext;
+        if (aZones.IsNull())
+        {
+            trigger.zoneIDs = MakeOptional(DataModel::NullNullable);
+        }
+        else
+        {
+            trigger.zoneIDs = MakeOptional(
+                DataModel::MakeNullable(DataModel::List<const uint16_t>(aZones.Value().data(), aZones.Value().size())));
+        }
+
+        TLV::TLVWriter writer;
+        writer.Init(aTlvBuffer, static_cast<uint32_t>(aTlvBufferSize));
+        TLV::TLVType arrayType;
+        EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
+        EXPECT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), trigger), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
+
+        TLV::TLVReader reader;
+        reader.Init(aTlvBuffer, writer.GetLengthWritten());
+        EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+        DataModel::DecodableList<Structs::ContextTriggerStruct::DecodableType> decodedList;
+        EXPECT_EQ(decodedList.Decode(reader), CHIP_NO_ERROR);
+        return DataModel::MakeNullable(decodedList);
+    }
+
     // Sends EstablishAnalysisStream for the given camera node and completes the camera allocation
     // with the given status/stream id; returns the mock handler carrying response or status.
     void EstablishStream(Testing::MockCommandHandler & commandHandler, NodeId aCameraNodeId, Status aCameraStatus,
@@ -171,6 +204,101 @@ TEST_F(TestRemoteAvAnalysisCluster, TestCommands)
                                               }));
 }
 
+TEST_F(TestRemoteAvAnalysisCluster, EnableContextTriggersRequiresAnEstablishedStream)
+{
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
+    Commands::EnableContextTriggers::DecodableType commandData;
+    commandData.contextTriggers.SetNull();
+
+    // RemoteContextDetection and no established analysis stream, the command returns INVALID_IN_STATE
+    auto response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, path, commandData);
+    ASSERT_TRUE(response.has_value());
+    ASSERT_EQ(response.value().GetStatusCode().GetStatus(), Status::InvalidInState);
+
+    // No context triggers were enabled by the rejected command
+    Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType active;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, active), CHIP_NO_ERROR);
+    size_t count = 0;
+    ASSERT_EQ(active.ComputeSize(&count), CHIP_NO_ERROR);
+    ASSERT_EQ(count, 0u);
+
+    // Once a stream is established the same command enables all the context triggers
+    Testing::MockCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, 0x1234, Status::Success, 7);
+
+    response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, path, commandData);
+    ASSERT_TRUE(response.has_value());
+    ASSERT_TRUE(response.value().IsSuccess());
+
+    // Null ContextTriggers means the whole supported set is enabled
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, active), CHIP_NO_ERROR);
+    ASSERT_EQ(active.ComputeSize(&count), CHIP_NO_ERROR);
+    ASSERT_EQ(count, testAmbientContexts.size());
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, EnableContextTriggersEnablesASpecificContext)
+{
+    Testing::MockCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, 0x1234, Status::Success, 7);
+
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
+    Commands::EnableContextTriggers::DecodableType commandData;
+    uint8_t tlvBuffer[128];
+    const std::vector<uint16_t> zoneIDs = { 1, 2 };
+    commandData.contextTriggers =
+        EncodeContextTriggers(testAmbientContexts.front(), DataModel::MakeNullable(zoneIDs), tlvBuffer, sizeof(tlvBuffer));
+
+    auto response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, path, commandData);
+    ASSERT_TRUE(response.has_value());
+    ASSERT_TRUE(response.value().IsSuccess());
+
+    // Exactly the requested context is enabled, carrying its zone list
+    Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType active;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, active), CHIP_NO_ERROR);
+    auto iter = active.begin();
+    ASSERT_TRUE(iter.Next());
+    ASSERT_EQ(iter.GetValue().context.namespaceID, testAmbientContexts.front().namespaceID);
+    ASSERT_EQ(iter.GetValue().context.tag, testAmbientContexts.front().tag);
+    ASSERT_TRUE(iter.GetValue().zoneIDs.HasValue());
+    ASSERT_FALSE(iter.GetValue().zoneIDs.Value().IsNull());
+    std::vector<uint16_t> readZones;
+    auto zoneIter = iter.GetValue().zoneIDs.Value().Value().begin();
+    while (zoneIter.Next())
+    {
+        readZones.push_back(zoneIter.GetValue());
+    }
+    ASSERT_EQ(readZones, zoneIDs);
+    ASSERT_FALSE(iter.Next());
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, EnableContextTriggersRejectsAnUnsupportedContext)
+{
+    Testing::MockCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, 0x1234, Status::Success, 7);
+
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
+    Commands::EnableContextTriggers::DecodableType commandData;
+
+    // A context outside SupportedAmbientContexts (Sound.Snoring is not in the test set)
+    Descriptor::Structs::SemanticTagStruct::Type unsupportedContext = { std::nullopt, static_cast<uint8_t>(0x4A),
+                                                                        static_cast<uint8_t>(0x02), NullOptional };
+    uint8_t tlvBuffer[128];
+    commandData.contextTriggers = EncodeContextTriggers(unsupportedContext, DataModel::NullNullable, tlvBuffer, sizeof(tlvBuffer));
+
+    auto response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, path, commandData);
+    ASSERT_TRUE(response.has_value());
+    ASSERT_EQ(response.value().GetStatusCode().GetStatus(), Status::ConstraintError);
+}
+
 TEST_F(TestRemoteAvAnalysisCluster, ReadAllAttributesWithClusterTesterTest)
 {
     Attributes::SupportedAmbientContexts::TypeInfo::DecodableType aSupportedAmbientContexts;
@@ -216,26 +344,6 @@ TEST_F(TestRemoteAvAnalysisCluster, ReadAllAttributesWithClusterTesterTest)
     bool trackingEnabled = false;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::TrackingEnabled::Id, trackingEnabled), CHIP_NO_ERROR);
     ASSERT_FALSE(trackingEnabled);
-}
-
-TEST_F(TestRemoteAvAnalysisCluster, ExecuteEnableContextTriggersCommandTest)
-{
-    Testing::MockCommandHandler commandHandler;
-    commandHandler.SetFabricIndex(1);
-    ConcreteCommandPath kCommandPath{ 1, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
-    Commands::EnableContextTriggers::DecodableType commandData;
-
-    auto response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, kCommandPath, commandData);
-
-    if (response.has_value())
-    {
-        ASSERT_TRUE(response.value().IsSuccess());
-    }
-    else
-    {
-        // Fail the test case
-        FAIL();
-    }
 }
 
 TEST_F(TestRemoteAvAnalysisCluster, ExecuteDisableContextTriggersCommandTest)
