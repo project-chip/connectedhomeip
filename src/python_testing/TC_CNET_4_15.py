@@ -20,7 +20,7 @@
 # The app runs with --wifi so the Network Commissioning cluster on endpoint 0
 # reports the Wi-Fi feature. No radio is needed: this test only requires that an
 # unknown NetworkID is rejected with NetworkIDNotFound, which an empty Networks
-# list satisfies. ci-pics-values sets CNET.S.F00=0, so --PICS is not passed here.
+# list satisfies. Note: --PICS is intentionally omitted; when omitted, the runner uses an empty PICS map (all keys default to False).
 #
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
