@@ -2548,6 +2548,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentFabricIndex";
             break;
 
+        case MTRAttributeIDTypeClusterOperationalCredentialsAttributePQCDeviceAttestationProfileID:
+            result = @"PQCDeviceAttestationProfile";
+            break;
+
         case MTRAttributeIDTypeClusterOperationalCredentialsAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -2876,6 +2880,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentMode";
             break;
 
+        case MTRAttributeIDTypeClusterOvenModeAttributeCoreModeTagsID:
+            result = @"CoreModeTags";
+            break;
+
         case MTRAttributeIDTypeClusterOvenModeAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -3052,6 +3060,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentMode";
             break;
 
+        case MTRAttributeIDTypeClusterLaundryWasherModeAttributeCoreModeTagsID:
+            result = @"CoreModeTags";
+            break;
+
         case MTRAttributeIDTypeClusterLaundryWasherModeAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -3090,6 +3102,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeCurrentModeID:
             result = @"CurrentMode";
+            break;
+
+        case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeCoreModeTagsID:
+            result = @"CoreModeTags";
             break;
 
         case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeGeneratedCommandListID:
@@ -3180,6 +3196,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentMode";
             break;
 
+        case MTRAttributeIDTypeClusterRVCRunModeAttributeCoreModeTagsID:
+            result = @"CoreModeTags";
+            break;
+
         case MTRAttributeIDTypeClusterRVCRunModeAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -3218,6 +3238,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterRVCCleanModeAttributeCurrentModeID:
             result = @"CurrentMode";
+            break;
+
+        case MTRAttributeIDTypeClusterRVCCleanModeAttributeCoreModeTagsID:
+            result = @"CoreModeTags";
             break;
 
         case MTRAttributeIDTypeClusterRVCCleanModeAttributeGeneratedCommandListID:
@@ -3358,6 +3382,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterDishwasherModeAttributeCurrentModeID:
             result = @"CurrentMode";
+            break;
+
+        case MTRAttributeIDTypeClusterDishwasherModeAttributeCoreModeTagsID:
+            result = @"CoreModeTags";
             break;
 
         case MTRAttributeIDTypeClusterDishwasherModeAttributeGeneratedCommandListID:
@@ -3570,6 +3598,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeCurrentModeID:
             result = @"CurrentMode";
+            break;
+
+        case MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeCoreModeTagsID:
+            result = @"CoreModeTags";
             break;
 
         case MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeGeneratedCommandListID:
@@ -4796,6 +4828,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentMode";
             break;
 
+        case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeCoreModeTagsID:
+            result = @"CoreModeTags";
+            break;
+
         case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -4836,6 +4872,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentMode";
             break;
 
+        case MTRAttributeIDTypeClusterWaterHeaterModeAttributeCoreModeTagsID:
+            result = @"CoreModeTags";
+            break;
+
         case MTRAttributeIDTypeClusterWaterHeaterModeAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -4874,6 +4914,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeCurrentModeID:
             result = @"CurrentMode";
+            break;
+
+        case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeCoreModeTagsID:
+            result = @"CoreModeTags";
             break;
 
         case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeGeneratedCommandListID:
@@ -6066,6 +6110,34 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterThermostatAttributeThermostatSuggestionNotFollowingReasonID:
             result = @"ThermostatSuggestionNotFollowingReason";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeCriticalFreezeProtectionID:
+            result = @"CriticalFreezeProtection";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeCriticalOverheatProtectionID:
+            result = @"CriticalOverheatProtection";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeSensorsID:
+            result = @"Sensors";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeAvailableSensorHandlesID:
+            result = @"AvailableSensorHandles";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeEnabledSensorHandlesID:
+            result = @"EnabledSensorHandles";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeNumberOfSensorScheduleTransitionsID:
+            result = @"NumberOfSensorScheduleTransitions";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeSensorScheduleID:
+            result = @"SensorSchedule";
             break;
 
         case MTRAttributeIDTypeClusterThermostatAttributeGeneratedCommandListID:
@@ -9568,10 +9640,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentConnections";
             break;
 
-        case MTRAttributeIDTypeClusterPushAVStreamTransportAttributeMaxZonesID:
-            result = @"MaxZones";
-            break;
-
         case MTRAttributeIDTypeClusterPushAVStreamTransportAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -11391,6 +11459,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"ChangeToMode";
             break;
 
+        case MTRCommandIDTypeClusterOvenModeCommandChangeToModeByCoreTagID:
+            result = @"ChangeToModeByCoreTag";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
             break;
@@ -11439,6 +11511,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"ChangeToMode";
             break;
 
+        case MTRCommandIDTypeClusterLaundryWasherModeCommandChangeToModeByCoreTagID:
+            result = @"ChangeToModeByCoreTag";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
             break;
@@ -11451,6 +11527,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeCommandChangeToModeID:
             result = @"ChangeToMode";
+            break;
+
+        case MTRCommandIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeCommandChangeToModeByCoreTagID:
+            result = @"ChangeToModeByCoreTag";
             break;
 
         default:
@@ -11477,6 +11557,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"ChangeToMode";
             break;
 
+        case MTRCommandIDTypeClusterRVCRunModeCommandChangeToModeByCoreTagID:
+            result = @"ChangeToModeByCoreTag";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
             break;
@@ -11489,6 +11573,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterRVCCleanModeCommandChangeToModeID:
             result = @"ChangeToMode";
+            break;
+
+        case MTRCommandIDTypeClusterRVCCleanModeCommandChangeToModeByCoreTagID:
+            result = @"ChangeToModeByCoreTag";
             break;
 
         default:
@@ -11527,6 +11615,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterDishwasherModeCommandChangeToModeID:
             result = @"ChangeToMode";
+            break;
+
+        case MTRCommandIDTypeClusterDishwasherModeCommandChangeToModeByCoreTagID:
+            result = @"ChangeToModeByCoreTag";
             break;
 
         default:
@@ -11993,6 +12085,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"ChangeToMode";
             break;
 
+        case MTRCommandIDTypeClusterEnergyEVSEModeCommandChangeToModeByCoreTagID:
+            result = @"ChangeToModeByCoreTag";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
             break;
@@ -12007,6 +12103,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"ChangeToMode";
             break;
 
+        case MTRCommandIDTypeClusterWaterHeaterModeCommandChangeToModeByCoreTagID:
+            result = @"ChangeToModeByCoreTag";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
             break;
@@ -12019,6 +12119,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterDeviceEnergyManagementModeCommandChangeToModeID:
             result = @"ChangeToMode";
+            break;
+
+        case MTRCommandIDTypeClusterDeviceEnergyManagementModeCommandChangeToModeByCoreTagID:
+            result = @"ChangeToModeByCoreTag";
             break;
 
         default:
@@ -13469,10 +13573,6 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterPushAVStreamTransportCommandFindTransportID:
             result = @"FindTransport";
-            break;
-
-        case MTRCommandIDTypeClusterPushAVStreamTransportCommandUpdateMotionZoneOptionsID:
-            result = @"UpdateMotionZoneOptions";
             break;
 
         default:

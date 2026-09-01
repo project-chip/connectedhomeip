@@ -5937,6 +5937,24 @@ static id _Nullable DecodeEventPayloadForZoneManagementCluster(EventId aEventId,
             memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.reason)];
             value.reason = memberValue;
         } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.nodeID.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.nodeID.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.nodeID = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.endpointID.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedShort:cppValue.endpointID.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.endpointID = memberValue;
+        } while (0);
 
         return value;
     }
@@ -5958,6 +5976,24 @@ static id _Nullable DecodeEventPayloadForZoneManagementCluster(EventId aEventId,
             NSNumber * _Nonnull memberValue;
             memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.reason)];
             value.reason = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.nodeID.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.nodeID.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.nodeID = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.endpointID.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedShort:cppValue.endpointID.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.endpointID = memberValue;
         } while (0);
 
         return value;

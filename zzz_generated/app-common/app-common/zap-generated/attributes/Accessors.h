@@ -2786,6 +2786,18 @@ namespace SetpointHoldExpiryTimestamp {
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // epoch_s
 } // namespace SetpointHoldExpiryTimestamp
 
+namespace CriticalFreezeProtection {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value); // boolean
+} // namespace CriticalFreezeProtection
+
+namespace CriticalOverheatProtection {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value); // boolean
+} // namespace CriticalOverheatProtection
+
+namespace NumberOfSensorScheduleTransitions {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value); // int8u
+} // namespace NumberOfSensorScheduleTransitions
+
 namespace FeatureMap {
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // bitmap32
 } // namespace FeatureMap
@@ -4747,10 +4759,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 
 namespace PushAvStreamTransport {
 namespace Attributes {
-
-namespace MaxZones {
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
-} // namespace MaxZones
 
 namespace FeatureMap {
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // bitmap32

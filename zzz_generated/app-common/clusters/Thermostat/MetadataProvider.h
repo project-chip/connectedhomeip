@@ -151,6 +151,20 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Thermostat::
             return CurrentThermostatSuggestion::kMetadataEntry;
         case ThermostatSuggestionNotFollowingReason::Id:
             return ThermostatSuggestionNotFollowingReason::kMetadataEntry;
+        case CriticalFreezeProtection::Id:
+            return CriticalFreezeProtection::kMetadataEntry;
+        case CriticalOverheatProtection::Id:
+            return CriticalOverheatProtection::kMetadataEntry;
+        case Sensors::Id:
+            return Sensors::kMetadataEntry;
+        case AvailableSensorHandles::Id:
+            return AvailableSensorHandles::kMetadataEntry;
+        case EnabledSensorHandles::Id:
+            return EnabledSensorHandles::kMetadataEntry;
+        case NumberOfSensorScheduleTransitions::Id:
+            return NumberOfSensorScheduleTransitions::kMetadataEntry;
+        case SensorSchedule::Id:
+            return SensorSchedule::kMetadataEntry;
         default:
             return std::nullopt;
         }

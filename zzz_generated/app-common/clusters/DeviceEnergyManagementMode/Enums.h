@@ -55,7 +55,8 @@ enum class ModeTag : uint16_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kOnOff = 0x1,
+    kOnOff     = 0x1,
+    kCoreModes = 0x2,
 };
 } // namespace DeviceEnergyManagementMode
 } // namespace Clusters

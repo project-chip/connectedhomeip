@@ -8754,6 +8754,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
 
         _certificateType = @(0);
+
+        _cryptoProfile = nil;
+
+        _segmentID = nil;
+
+        _maxSegmentSize = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -8765,6 +8771,9 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     auto other = [[MTROperationalCredentialsClusterCertificateChainRequestParams alloc] init];
 
     other.certificateType = self.certificateType;
+    other.cryptoProfile = self.cryptoProfile;
+    other.segmentID = self.segmentID;
+    other.maxSegmentSize = self.maxSegmentSize;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -8773,7 +8782,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: certificateType:%@; >", NSStringFromClass([self class]), _certificateType];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: certificateType:%@; cryptoProfile:%@; segmentID:%@; maxSegmentSize:%@; >", NSStringFromClass([self class]), _certificateType, _cryptoProfile, _segmentID, _maxSegmentSize];
     return descriptionString;
 }
 
@@ -8787,6 +8796,24 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     ListFreer listFreer;
     {
         encodableStruct.certificateType = static_cast<std::remove_reference_t<decltype(encodableStruct.certificateType)>>(self.certificateType.unsignedCharValue);
+    }
+    {
+        if (self.cryptoProfile != nil) {
+            auto & definedValue_0 = encodableStruct.cryptoProfile.Emplace();
+            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.cryptoProfile.unsignedCharValue);
+        }
+    }
+    {
+        if (self.segmentID != nil) {
+            auto & definedValue_0 = encodableStruct.segmentID.Emplace();
+            definedValue_0 = self.segmentID.unsignedShortValue;
+        }
+    }
+    {
+        if (self.maxSegmentSize != nil) {
+            auto & definedValue_0 = encodableStruct.maxSegmentSize.Emplace();
+            definedValue_0 = self.maxSegmentSize.unsignedShortValue;
+        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -8833,6 +8860,10 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
 
         _certificate = [NSData data];
+
+        _totalDocumentSize = nil;
+
+        _nextSegmentID = nil;
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -8843,6 +8874,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     auto other = [[MTROperationalCredentialsClusterCertificateChainResponseParams alloc] init];
 
     other.certificate = self.certificate;
+    other.totalDocumentSize = self.totalDocumentSize;
+    other.nextSegmentID = self.nextSegmentID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -8850,7 +8883,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: certificate:%@; >", NSStringFromClass([self class]), [_certificate base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: certificate:%@; totalDocumentSize:%@; nextSegmentID:%@; >", NSStringFromClass([self class]), [_certificate base64EncodedStringWithOptions:0], _totalDocumentSize, _nextSegmentID];
     return descriptionString;
 }
 
@@ -8912,6 +8945,20 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     {
         self.certificate = AsData(decodableStruct.certificate);
+    }
+    {
+        if (decodableStruct.totalDocumentSize.HasValue()) {
+            self.totalDocumentSize = [NSNumber numberWithUnsignedShort:decodableStruct.totalDocumentSize.Value()];
+        } else {
+            self.totalDocumentSize = nil;
+        }
+    }
+    {
+        if (decodableStruct.nextSegmentID.HasValue()) {
+            self.nextSegmentID = [NSNumber numberWithUnsignedShort:decodableStruct.nextSegmentID.Value()];
+        } else {
+            self.nextSegmentID = nil;
+        }
     }
     return CHIP_NO_ERROR;
 }
@@ -11409,6 +11456,85 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @end
 
+@implementation MTROvenModeClusterChangeToModeByCoreTagParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newModeTag = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTROvenModeClusterChangeToModeByCoreTagParams alloc] init];
+
+    other.newModeTag = self.newModeTag;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newModeTag:%@; >", NSStringFromClass([self class]), _newModeTag];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTROvenModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::OvenMode::Commands::ChangeToModeByCoreTag::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.newModeTag = self.newModeTag.unsignedShortValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTRModeSelectClusterChangeToModeParams
 - (instancetype)init
 {
@@ -11670,6 +11796,85 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @end
 
+@implementation MTRLaundryWasherModeClusterChangeToModeByCoreTagParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newModeTag = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRLaundryWasherModeClusterChangeToModeByCoreTagParams alloc] init];
+
+    other.newModeTag = self.newModeTag;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newModeTag:%@; >", NSStringFromClass([self class]), _newModeTag];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRLaundryWasherModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeByCoreTag::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.newModeTag = self.newModeTag.unsignedShortValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeParams
 - (instancetype)init
 {
@@ -11850,6 +12055,85 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     return CHIP_NO_ERROR;
 }
 
+@end
+
+@implementation MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeByCoreTagParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newModeTag = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeByCoreTagParams alloc] init];
+
+    other.newModeTag = self.newModeTag;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newModeTag:%@; >", NSStringFromClass([self class]), _newModeTag];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeByCoreTag::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.newModeTag = self.newModeTag.unsignedShortValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
 @end
 
 @implementation MTRRVCRunModeClusterChangeToModeParams
@@ -12034,6 +12318,85 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @end
 
+@implementation MTRRVCRunModeClusterChangeToModeByCoreTagParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newModeTag = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRRVCRunModeClusterChangeToModeByCoreTagParams alloc] init];
+
+    other.newModeTag = self.newModeTag;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newModeTag:%@; >", NSStringFromClass([self class]), _newModeTag];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRRVCRunModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::RvcRunMode::Commands::ChangeToModeByCoreTag::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.newModeTag = self.newModeTag.unsignedShortValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTRRVCCleanModeClusterChangeToModeParams
 - (instancetype)init
 {
@@ -12214,6 +12577,85 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     return CHIP_NO_ERROR;
 }
 
+@end
+
+@implementation MTRRVCCleanModeClusterChangeToModeByCoreTagParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newModeTag = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRRVCCleanModeClusterChangeToModeByCoreTagParams alloc] init];
+
+    other.newModeTag = self.newModeTag;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newModeTag:%@; >", NSStringFromClass([self class]), _newModeTag];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRRVCCleanModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::RvcCleanMode::Commands::ChangeToModeByCoreTag::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.newModeTag = self.newModeTag.unsignedShortValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
 @end
 
 @implementation MTRTemperatureControlClusterSetTemperatureParams
@@ -12487,6 +12929,85 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     return CHIP_NO_ERROR;
 }
 
+@end
+
+@implementation MTRDishwasherModeClusterChangeToModeByCoreTagParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newModeTag = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRDishwasherModeClusterChangeToModeByCoreTagParams alloc] init];
+
+    other.newModeTag = self.newModeTag;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newModeTag:%@; >", NSStringFromClass([self class]), _newModeTag];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDishwasherModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::DishwasherMode::Commands::ChangeToModeByCoreTag::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.newModeTag = self.newModeTag.unsignedShortValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
 @end
 
 @implementation MTRSmokeCOAlarmClusterSelfTestRequestParams
@@ -19196,6 +19717,85 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @end
 
+@implementation MTREnergyEVSEModeClusterChangeToModeByCoreTagParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newModeTag = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTREnergyEVSEModeClusterChangeToModeByCoreTagParams alloc] init];
+
+    other.newModeTag = self.newModeTag;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newModeTag:%@; >", NSStringFromClass([self class]), _newModeTag];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTREnergyEVSEModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::EnergyEvseMode::Commands::ChangeToModeByCoreTag::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.newModeTag = self.newModeTag.unsignedShortValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTRWaterHeaterModeClusterChangeToModeParams
 - (instancetype)init
 {
@@ -19378,6 +19978,85 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @end
 
+@implementation MTRWaterHeaterModeClusterChangeToModeByCoreTagParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newModeTag = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRWaterHeaterModeClusterChangeToModeByCoreTagParams alloc] init];
+
+    other.newModeTag = self.newModeTag;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newModeTag:%@; >", NSStringFromClass([self class]), _newModeTag];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRWaterHeaterModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::WaterHeaterMode::Commands::ChangeToModeByCoreTag::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.newModeTag = self.newModeTag.unsignedShortValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTRDeviceEnergyManagementModeClusterChangeToModeParams
 - (instancetype)init
 {
@@ -19558,6 +20237,85 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     return CHIP_NO_ERROR;
 }
 
+@end
+
+@implementation MTRDeviceEnergyManagementModeClusterChangeToModeByCoreTagParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newModeTag = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRDeviceEnergyManagementModeClusterChangeToModeByCoreTagParams alloc] init];
+
+    other.newModeTag = self.newModeTag;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newModeTag:%@; >", NSStringFromClass([self class]), _newModeTag];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDeviceEnergyManagementModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::DeviceEnergyManagementMode::Commands::ChangeToModeByCoreTag::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.newModeTag = self.newModeTag.unsignedShortValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
 @end
 
 @implementation MTRElectricalAlarmClusterResetParams
@@ -39086,6 +39844,10 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
 
         _zone = [MTRZoneManagementClusterTwoDCartesianZoneStruct new];
+
+        _nodeID = nil;
+
+        _endpointID = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -39097,6 +39859,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     auto other = [[MTRZoneManagementClusterCreateTwoDCartesianZoneParams alloc] init];
 
     other.zone = self.zone;
+    other.nodeID = self.nodeID;
+    other.endpointID = self.endpointID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -39105,7 +39869,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; >", NSStringFromClass([self class]), _zone];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; nodeID:%@; endpointID:%@; >", NSStringFromClass([self class]), _zone, _nodeID, _endpointID];
     return descriptionString;
 }
 
@@ -39147,6 +39911,28 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         if (self.zone.color != nil) {
             auto & definedValue_1 = encodableStruct.zone.color.Emplace();
             definedValue_1 = AsCharSpan(self.zone.color);
+        }
+    }
+    {
+        if (self.nodeID != nil) {
+            auto & definedValue_0 = encodableStruct.nodeID.Emplace();
+            if (self.nodeID == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = self.nodeID.unsignedLongLongValue;
+            }
+        }
+    }
+    {
+        if (self.endpointID != nil) {
+            auto & definedValue_0 = encodableStruct.endpointID.Emplace();
+            if (self.endpointID == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = self.endpointID.unsignedShortValue;
+            }
         }
     }
 
@@ -39285,6 +40071,10 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _zoneID = @(0);
 
         _zone = [MTRZoneManagementClusterTwoDCartesianZoneStruct new];
+
+        _nodeID = nil;
+
+        _endpointID = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -39297,6 +40087,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.zoneID = self.zoneID;
     other.zone = self.zone;
+    other.nodeID = self.nodeID;
+    other.endpointID = self.endpointID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -39305,7 +40097,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneID:%@; zone:%@; >", NSStringFromClass([self class]), _zoneID, _zone];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneID:%@; zone:%@; nodeID:%@; endpointID:%@; >", NSStringFromClass([self class]), _zoneID, _zone, _nodeID, _endpointID];
     return descriptionString;
 }
 
@@ -39350,6 +40142,28 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         if (self.zone.color != nil) {
             auto & definedValue_1 = encodableStruct.zone.color.Emplace();
             definedValue_1 = AsCharSpan(self.zone.color);
+        }
+    }
+    {
+        if (self.nodeID != nil) {
+            auto & definedValue_0 = encodableStruct.nodeID.Emplace();
+            if (self.nodeID == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = self.nodeID.unsignedLongLongValue;
+            }
+        }
+    }
+    {
+        if (self.endpointID != nil) {
+            auto & definedValue_0 = encodableStruct.endpointID.Emplace();
+            if (self.endpointID == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = self.endpointID.unsignedShortValue;
+            }
         }
     }
 
@@ -44563,144 +45377,6 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     return CHIP_NO_ERROR;
 }
 
-@end
-
-@implementation MTRPushAVStreamTransportClusterUpdateMotionZoneOptionsParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _connectionID = @(0);
-
-        _motionZones = nil;
-
-        _motionSensitivity = nil;
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRPushAVStreamTransportClusterUpdateMotionZoneOptionsParams alloc] init];
-
-    other.connectionID = self.connectionID;
-    other.motionZones = self.motionZones;
-    other.motionSensitivity = self.motionSensitivity;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; motionZones:%@; motionSensitivity:%@; >", NSStringFromClass([self class]), _connectionID, _motionZones, _motionSensitivity];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRPushAVStreamTransportClusterUpdateMotionZoneOptionsParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::PushAvStreamTransport::Commands::UpdateMotionZoneOptions::Type encodableStruct;
-    ListFreer listFreer;
-    {
-        encodableStruct.connectionID = self.connectionID.unsignedShortValue;
-    }
-    {
-        if (self.motionZones != nil) {
-            auto & definedValue_0 = encodableStruct.motionZones.Emplace();
-            if (self.motionZones == nil) {
-                definedValue_0.SetNull();
-            } else {
-                auto & nonNullValue_1 = definedValue_0.SetNonNull();
-                {
-                    using ListType_2 = std::remove_reference_t<decltype(nonNullValue_1)>;
-                    using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
-                    if (self.motionZones.count != 0) {
-                        auto * listHolder_2 = new ListHolder<ListMemberType_2>(self.motionZones.count);
-                        if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        listFreer.add(listHolder_2);
-                        for (size_t i_2 = 0; i_2 < self.motionZones.count; ++i_2) {
-                            auto element_2 = MTR_SAFE_CAST(self.motionZones[i_2], MTRPushAVStreamTransportClusterTransportZoneOptionsStruct);
-                            if (!element_2) {
-                                // Wrong kind of value.
-                                MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.motionZones[i_2], NSStringFromClass(MTRPushAVStreamTransportClusterTransportZoneOptionsStruct.class));
-                                return CHIP_ERROR_INVALID_ARGUMENT;
-                            }
-                            if (element_2.zone == nil) {
-                                listHolder_2->mList[i_2].zone.SetNull();
-                            } else {
-                                auto & nonNullValue_4 = listHolder_2->mList[i_2].zone.SetNonNull();
-                                nonNullValue_4 = element_2.zone.unsignedShortValue;
-                            }
-                            if (element_2.sensitivity != nil) {
-                                auto & definedValue_4 = listHolder_2->mList[i_2].sensitivity.Emplace();
-                                definedValue_4 = element_2.sensitivity.unsignedCharValue;
-                            }
-                        }
-                        nonNullValue_1 = ListType_2(listHolder_2->mList, self.motionZones.count);
-                    } else {
-                        nonNullValue_1 = ListType_2();
-                    }
-                }
-            }
-        }
-    }
-    {
-        if (self.motionSensitivity != nil) {
-            auto & definedValue_0 = encodableStruct.motionSensitivity.Emplace();
-            if (self.motionSensitivity == nil) {
-                definedValue_0.SetNull();
-            } else {
-                auto & nonNullValue_1 = definedValue_0.SetNonNull();
-                nonNullValue_1 = self.motionSensitivity.unsignedCharValue;
-            }
-        }
-    }
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
 @end
 
 @implementation MTRChimeClusterPlayChimeSoundParams
@@ -53229,14 +53905,11 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 auto & nonNullValue_3 = definedValue_1.myBitmap.SetNonNull();
                 nonNullValue_3 = static_cast<std::remove_reference_t<decltype(nonNullValue_3)>>(self.arg1.d.myBitmap.unsignedIntValue);
             }
-            if (self.arg1.d.myEnum != nil) {
-                auto & definedValue_3 = definedValue_1.myEnum.Emplace();
-                if (self.arg1.d.myEnum == nil) {
-                    definedValue_3.SetNull();
-                } else {
-                    auto & nonNullValue_4 = definedValue_3.SetNonNull();
-                    nonNullValue_4 = static_cast<std::remove_reference_t<decltype(nonNullValue_4)>>(self.arg1.d.myEnum.unsignedCharValue);
-                }
+            if (self.arg1.d.myEnum == nil) {
+                definedValue_1.myEnum.SetNull();
+            } else {
+                auto & nonNullValue_3 = definedValue_1.myEnum.SetNonNull();
+                nonNullValue_3 = static_cast<std::remove_reference_t<decltype(nonNullValue_3)>>(self.arg1.d.myEnum.unsignedCharValue);
             }
         }
     }
@@ -54808,14 +55481,10 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         } else {
             self.field1.myBitmap = [NSNumber numberWithUnsignedInt:decodableStruct.field1.myBitmap.Value().Raw()];
         }
-        if (decodableStruct.field1.myEnum.HasValue()) {
-            if (decodableStruct.field1.myEnum.Value().IsNull()) {
-                self.field1.myEnum = nil;
-            } else {
-                self.field1.myEnum = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.field1.myEnum.Value().Value())];
-            }
-        } else {
+        if (decodableStruct.field1.myEnum.IsNull()) {
             self.field1.myEnum = nil;
+        } else {
+            self.field1.myEnum = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.field1.myEnum.Value())];
         }
     }
     {
@@ -55999,14 +56668,11 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             auto & nonNullValue_1 = encodableStruct.field1.myBitmap.SetNonNull();
             nonNullValue_1 = static_cast<std::remove_reference_t<decltype(nonNullValue_1)>>(self.field1.myBitmap.unsignedIntValue);
         }
-        if (self.field1.myEnum != nil) {
-            auto & definedValue_1 = encodableStruct.field1.myEnum.Emplace();
-            if (self.field1.myEnum == nil) {
-                definedValue_1.SetNull();
-            } else {
-                auto & nonNullValue_2 = definedValue_1.SetNonNull();
-                nonNullValue_2 = static_cast<std::remove_reference_t<decltype(nonNullValue_2)>>(self.field1.myEnum.unsignedCharValue);
-            }
+        if (self.field1.myEnum == nil) {
+            encodableStruct.field1.myEnum.SetNull();
+        } else {
+            auto & nonNullValue_1 = encodableStruct.field1.myEnum.SetNonNull();
+            nonNullValue_1 = static_cast<std::remove_reference_t<decltype(nonNullValue_1)>>(self.field1.myEnum.unsignedCharValue);
         }
     }
     {

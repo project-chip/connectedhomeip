@@ -103,6 +103,12 @@ enum AtomicRequestTypeEnum : enum8 {
   kRollbackWrite = 2;
 }
 
+enum CertificationTypeEnum : enum8 {
+  kDeviceAttestationPKI = 0;
+  kOperationalPKI = 1;
+  kVIDSignerPKI = 2;
+}
+
 enum LandmarkTag : enum8 {
   kAirConditioner = 0;
   kAirPurifier = 1;
@@ -183,6 +189,11 @@ enum MeasurementTypeEnum : enum16 {
   kReactiveEnergy = 15;
   kApparentEnergy = 16;
   kSoilMoisture = 17;
+}
+
+enum MediumType : enum8 {
+  kAir = 0;
+  kWater = 1;
 }
 
 enum PositionTag : enum8 {
@@ -341,7 +352,7 @@ struct SemanticTagStruct {
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
-  optional nullable TestGlobalEnum myEnum = 2;
+  nullable TestGlobalEnum myEnum = 2;
 }
 
 struct ViewportStruct {
@@ -577,7 +588,7 @@ cluster AccessControl = 31 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 cluster BasicInformation = 40 {
-  revision 6;
+  revision 7;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -665,7 +676,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional int32u specificationVersion = 21;
   readonly attribute optional int16u maxPathsPerInvoke = 22;
   provisional attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
-  provisional readonly attribute optional int32u configurationVersion = 24;
+  readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -677,7 +688,7 @@ cluster BasicInformation = 40 {
 
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
 cluster PowerSource = 47 {
-  revision 3;
+  revision 4;
 
   enum BatApprovedChemistryEnum : enum16 {
     kUnspecified = 0;
@@ -1449,7 +1460,13 @@ cluster AdministratorCommissioning = 60 {
 
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 cluster OperationalCredentials = 62 {
-  revision 2;
+  revision 3;
+
+  enum AttestationCryptoProfileEnum : enum8 {
+    kEcdsaMatterLegacy = 0;
+    kMlDsa44 = 1;
+    kMlDsa65 = 2;
+  }
 
   enum CertificateChainTypeEnum : enum8 {
     kDACCertificate = 1;
@@ -1469,6 +1486,16 @@ cluster OperationalCredentials = 62 {
     kInvalidFabricIndex = 11;
   }
 
+  bitmap AttestationCryptoProfileBitmap : bitmap16 {
+    kSupportsEcdsaMatterLegacy = 0x1;
+    kSupportsMlDsa44 = 0x2;
+    kSupportsMlDsa65 = 0x4;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPQCDeviceAttestation = 0x1;
+  }
+
   fabric_scoped struct FabricDescriptorStruct {
     octet_string<65> rootPublicKey = 1;
     vendor_id vendorID = 2;
@@ -1486,12 +1513,20 @@ cluster OperationalCredentials = 62 {
     fabric_idx fabricIndex = 254;
   }
 
+  struct PQCDeviceAttestationProfileStruct {
+    AttestationCryptoProfileBitmap PAASupportedProfiles = 0;
+    AttestationCryptoProfileBitmap PAISupportedProfiles = 1;
+    AttestationCryptoProfileBitmap DACSupportedProfiles = 2;
+    AttestationCryptoProfileBitmap CDSupportedProfiles = 3;
+  }
+
   readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
   readonly attribute FabricDescriptorStruct fabrics[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute octet_string trustedRootCertificates[] = 4;
   readonly attribute int8u currentFabricIndex = 5;
+  provisional readonly attribute optional PQCDeviceAttestationProfileStruct PQCDeviceAttestationProfile = 6;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1509,10 +1544,15 @@ cluster OperationalCredentials = 62 {
 
   request struct CertificateChainRequestRequest {
     CertificateChainTypeEnum certificateType = 0;
+    optional AttestationCryptoProfileEnum cryptoProfile = 1;
+    optional int16u segmentID = 2;
+    optional int16u maxSegmentSize = 3;
   }
 
   response struct CertificateChainResponse = 3 {
-    long_octet_string<600> certificate = 0;
+    octet_string certificate = 0;
+    optional int16u totalDocumentSize = 1;
+    optional int16u nextSegmentID = 2;
   }
 
   request struct CSRRequestRequest {
@@ -2164,8 +2204,8 @@ cluster PowerTopology = 156 {
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
-provisional cluster DeviceEnergyManagementMode = 159 {
-  revision 2;
+cluster DeviceEnergyManagementMode = 159 {
+  revision 3;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -2186,6 +2226,7 @@ provisional cluster DeviceEnergyManagementMode = 159 {
 
   bitmap Feature : bitmap32 {
     kOnOff = 0x1;
+    kCoreModes = 0x2;
   }
 
   shared struct ModeTagStruct {
@@ -2201,6 +2242,7 @@ provisional cluster DeviceEnergyManagementMode = 159 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
+  provisional readonly attribute optional enum16 coreModeTags[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2216,13 +2258,19 @@ provisional cluster DeviceEnergyManagementMode = 159 {
     optional char_string<64> statusText = 1;
   }
 
+  request struct ChangeToModeByCoreTagRequest {
+    enum16 newModeTag = 0;
+  }
+
   /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+  /** This command is used to change the mode of the device to one of the modes with a tag list that includes the given mode tag value. */
+  command ChangeToModeByCoreTag(ChangeToModeByCoreTagRequest): ChangeToModeResponse = 2;
 }
 
 /** An interface for configuring and controlling the functionality of a thermostat. */
 cluster Thermostat = 513 {
-  revision 11;
+  revision 12;
 
   enum ACCapacityFormatEnum : enum8 {
     kBTUh = 0;
@@ -2342,6 +2390,7 @@ cluster Thermostat = 513 {
     kPresets = 0x100;
     kEvents = 0x200;
     kThermostatSuggestions = 0x400;
+    kThermostatSensors = 0x800;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -2453,6 +2502,21 @@ cluster Thermostat = 513 {
     SystemModeEnum systemMode = 0;
     int8u numberOfSchedules = 1;
     ScheduleTypeFeaturesBitmap scheduleTypeFeatures = 2;
+  }
+
+  struct SensorScheduleTransitionStruct {
+    ScheduleDayOfWeekBitmap dayOfWeek = 0;
+    int16u transitionTime = 1;
+    octet_string enabledSensorHandles[] = 2;
+  }
+
+  struct ThermostatSensorStruct {
+    char_string<64> name = 0;
+    octet_string<16> sensorHandle = 1;
+    cluster_id cluster = 2;
+    optional endpoint_no endpoint = 3;
+    optional node_id node = 4;
+    optional fabric_idx fabricIndex = 5;
   }
 
   struct ThermostatSuggestionStruct {
@@ -2569,10 +2633,17 @@ cluster Thermostat = 513 {
   attribute access(write: manage) optional PresetStruct presets[] = 80;
   attribute access(write: manage) optional ScheduleStruct schedules[] = 81;
   readonly attribute optional nullable epoch_s setpointHoldExpiryTimestamp = 82;
-  provisional readonly attribute optional int8u maxThermostatSuggestions = 83;
-  provisional readonly attribute optional ThermostatSuggestionStruct thermostatSuggestions[] = 84;
-  provisional readonly attribute optional nullable ThermostatSuggestionStruct currentThermostatSuggestion = 85;
-  provisional readonly attribute optional nullable ThermostatSuggestionNotFollowingReasonBitmap thermostatSuggestionNotFollowingReason = 86;
+  readonly attribute optional int8u maxThermostatSuggestions = 83;
+  readonly attribute optional ThermostatSuggestionStruct thermostatSuggestions[] = 84;
+  readonly attribute optional nullable ThermostatSuggestionStruct currentThermostatSuggestion = 85;
+  readonly attribute optional nullable ThermostatSuggestionNotFollowingReasonBitmap thermostatSuggestionNotFollowingReason = 86;
+  provisional readonly attribute optional boolean criticalFreezeProtection = 87;
+  provisional readonly attribute optional boolean criticalOverheatProtection = 88;
+  provisional readonly attribute optional ThermostatSensorStruct sensors[] = 89;
+  provisional attribute access(write: manage) optional octet_string availableSensorHandles[] = 90;
+  provisional attribute access(write: manage) optional octet_string enabledSensorHandles[] = 91;
+  provisional readonly attribute optional int8u numberOfSensorScheduleTransitions = 92;
+  provisional attribute access(write: manage) optional SensorScheduleTransitionStruct sensorSchedule[] = 93;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2641,7 +2712,7 @@ cluster Thermostat = 513 {
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
   /** This command is used to update the thermostat weekly setpoint schedule from a management system. */
   command access(invoke: manage) SetWeeklySchedule(SetWeeklyScheduleRequest): DefaultSuccess = 1;
-  /** The Current Weekly Schedule Command is sent from the server in response to the Get Weekly Schedule Command. */
+  /** This command will return the weekly schedule for the values provided. */
   command GetWeeklySchedule(GetWeeklyScheduleRequest): GetWeeklyScheduleResponse = 2;
   /** This command is used to clear the weekly schedule. */
   command access(invoke: manage) ClearWeeklySchedule(): DefaultSuccess = 3;
@@ -2659,7 +2730,7 @@ cluster Thermostat = 513 {
 
 /** Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements. */
 cluster TemperatureMeasurement = 1026 {
-  revision 4;
+  revision 6;
 
   readonly attribute nullable temperature measuredValue = 0;
   readonly attribute nullable temperature minMeasuredValue = 1;

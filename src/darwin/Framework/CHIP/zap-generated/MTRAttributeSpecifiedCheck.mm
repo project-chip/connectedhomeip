@@ -1586,6 +1586,9 @@ static BOOL AttributeIsSpecifiedInOperationalCredentialsCluster(AttributeId aAtt
     case Attributes::CurrentFabricIndex::Id: {
         return YES;
     }
+    case Attributes::PQCDeviceAttestationProfile::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -1839,6 +1842,9 @@ static BOOL AttributeIsSpecifiedInOvenModeCluster(AttributeId aAttributeId)
     case Attributes::CurrentMode::Id: {
         return YES;
     }
+    case Attributes::CoreModeTags::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -1975,6 +1981,9 @@ static BOOL AttributeIsSpecifiedInLaundryWasherModeCluster(AttributeId aAttribut
     case Attributes::CurrentMode::Id: {
         return YES;
     }
+    case Attributes::CoreModeTags::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -2004,6 +2013,9 @@ static BOOL AttributeIsSpecifiedInRefrigeratorAndTemperatureControlledCabinetMod
         return YES;
     }
     case Attributes::CurrentMode::Id: {
+        return YES;
+    }
+    case Attributes::CoreModeTags::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -2074,6 +2086,9 @@ static BOOL AttributeIsSpecifiedInRVCRunModeCluster(AttributeId aAttributeId)
     case Attributes::CurrentMode::Id: {
         return YES;
     }
+    case Attributes::CoreModeTags::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -2103,6 +2118,9 @@ static BOOL AttributeIsSpecifiedInRVCCleanModeCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::CurrentMode::Id: {
+        return YES;
+    }
+    case Attributes::CoreModeTags::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -2211,6 +2229,9 @@ static BOOL AttributeIsSpecifiedInDishwasherModeCluster(AttributeId aAttributeId
         return YES;
     }
     case Attributes::CurrentMode::Id: {
+        return YES;
+    }
+    case Attributes::CoreModeTags::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -2374,6 +2395,9 @@ static BOOL AttributeIsSpecifiedInMicrowaveOvenModeCluster(AttributeId aAttribut
         return YES;
     }
     case Attributes::CurrentMode::Id: {
+        return YES;
+    }
+    case Attributes::CoreModeTags::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -3314,6 +3338,9 @@ static BOOL AttributeIsSpecifiedInEnergyEVSEModeCluster(AttributeId aAttributeId
     case Attributes::CurrentMode::Id: {
         return YES;
     }
+    case Attributes::CoreModeTags::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -3345,6 +3372,9 @@ static BOOL AttributeIsSpecifiedInWaterHeaterModeCluster(AttributeId aAttributeI
     case Attributes::CurrentMode::Id: {
         return YES;
     }
+    case Attributes::CoreModeTags::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -3374,6 +3404,9 @@ static BOOL AttributeIsSpecifiedInDeviceEnergyManagementModeCluster(AttributeId 
         return YES;
     }
     case Attributes::CurrentMode::Id: {
+        return YES;
+    }
+    case Attributes::CoreModeTags::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -4279,6 +4312,27 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::ThermostatSuggestionNotFollowingReason::Id: {
+        return YES;
+    }
+    case Attributes::CriticalFreezeProtection::Id: {
+        return YES;
+    }
+    case Attributes::CriticalOverheatProtection::Id: {
+        return YES;
+    }
+    case Attributes::Sensors::Id: {
+        return YES;
+    }
+    case Attributes::AvailableSensorHandles::Id: {
+        return YES;
+    }
+    case Attributes::EnabledSensorHandles::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfSensorScheduleTransitions::Id: {
+        return YES;
+    }
+    case Attributes::SensorSchedule::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -6958,9 +7012,6 @@ static BOOL AttributeIsSpecifiedInPushAVStreamTransportCluster(AttributeId aAttr
         return YES;
     }
     case Attributes::CurrentConnections::Id: {
-        return YES;
-    }
-    case Attributes::MaxZones::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
