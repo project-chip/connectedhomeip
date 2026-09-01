@@ -18,7 +18,7 @@
 #include <inttypes.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::WindowCovering;
 
 namespace chip {
 namespace app {
