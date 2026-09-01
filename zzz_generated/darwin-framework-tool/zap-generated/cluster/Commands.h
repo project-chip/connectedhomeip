@@ -40356,6 +40356,7 @@ public:
 | * CommissionedFabrics                                               | 0x0003 |
 | * TrustedRootCertificates                                           | 0x0004 |
 | * CurrentFabricIndex                                                | 0x0005 |
+| * PQCDeviceAttestationProfile                                       | 0x0006 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -40427,6 +40428,15 @@ public:
         : ClusterCommand("certificate-chain-request")
     {
         AddArgument("CertificateType", 0, UINT8_MAX, &mRequest.certificateType);
+#if MTR_ENABLE_PROVISIONAL
+        AddArgument("CryptoProfile", 0, UINT8_MAX, &mRequest.cryptoProfile);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+        AddArgument("SegmentID", 0, UINT16_MAX, &mRequest.segmentID);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+        AddArgument("MaxSegmentSize", 0, UINT16_MAX, &mRequest.maxSegmentSize);
+#endif // MTR_ENABLE_PROVISIONAL
         ClusterCommand::AddArguments();
     }
 
@@ -40442,6 +40452,27 @@ public:
         __auto_type * params = [[MTROperationalCredentialsClusterCertificateChainRequestParams alloc] init];
         params.timedInvokeTimeoutMs = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.certificateType = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.certificateType)];
+#if MTR_ENABLE_PROVISIONAL
+        if (mRequest.cryptoProfile.HasValue()) {
+            params.cryptoProfile = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.cryptoProfile.Value())];
+        } else {
+            params.cryptoProfile = nil;
+        }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+        if (mRequest.segmentID.HasValue()) {
+            params.segmentID = [NSNumber numberWithUnsignedShort:mRequest.segmentID.Value()];
+        } else {
+            params.segmentID = nil;
+        }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+        if (mRequest.maxSegmentSize.HasValue()) {
+            params.maxSegmentSize = [NSNumber numberWithUnsignedShort:mRequest.maxSegmentSize.Value()];
+        } else {
+            params.maxSegmentSize = nil;
+        }
+#endif // MTR_ENABLE_PROVISIONAL
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -41449,6 +41480,92 @@ public:
         return CHIP_NO_ERROR;
     }
 };
+
+#if MTR_ENABLE_PROVISIONAL
+
+/*
+ * Attribute PQCDeviceAttestationProfile
+ */
+class ReadOperationalCredentialsPQCDeviceAttestationProfile : public ReadAttribute {
+public:
+    ReadOperationalCredentialsPQCDeviceAttestationProfile()
+        : ReadAttribute("pqcdevice-attestation-profile")
+    {
+    }
+
+    ~ReadOperationalCredentialsPQCDeviceAttestationProfile()
+    {
+    }
+
+    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
+        constexpr chip::AttributeId attributeId = chip::app::Clusters::OperationalCredentials::Attributes::PQCDeviceAttestationProfile::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReadAttribute (0x%08" PRIX32 ") on endpoint %u", endpointId, clusterId, attributeId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        __auto_type * cluster = [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        [cluster readAttributePQCDeviceAttestationProfileWithCompletion:^(MTROperationalCredentialsClusterPQCDeviceAttestationProfileStruct * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"OperationalCredentials.PQCDeviceAttestationProfile response %@", [value description]);
+            if (error == nil) {
+                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
+            } else {
+                LogNSError("OperationalCredentials PQCDeviceAttestationProfile read Error", error);
+                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+            }
+            SetCommandExitStatus(error);
+        }];
+        return CHIP_NO_ERROR;
+    }
+};
+
+class SubscribeAttributeOperationalCredentialsPQCDeviceAttestationProfile : public SubscribeAttribute {
+public:
+    SubscribeAttributeOperationalCredentialsPQCDeviceAttestationProfile()
+        : SubscribeAttribute("pqcdevice-attestation-profile")
+    {
+    }
+
+    ~SubscribeAttributeOperationalCredentialsPQCDeviceAttestationProfile()
+    {
+    }
+
+    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
+        constexpr chip::CommandId attributeId = chip::app::Clusters::OperationalCredentials::Attributes::PQCDeviceAttestationProfile::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReportAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        __auto_type * cluster = [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(mMinInterval) maxInterval:@(mMaxInterval)];
+        if (mKeepSubscriptions.HasValue()) {
+            params.replaceExistingSubscriptions = !mKeepSubscriptions.Value();
+        }
+        if (mFabricFiltered.HasValue()) {
+            params.filterByFabric = mFabricFiltered.Value();
+        }
+        if (mAutoResubscribe.HasValue()) {
+            params.resubscribeAutomatically = mAutoResubscribe.Value();
+        }
+        [cluster subscribeAttributePQCDeviceAttestationProfileWithParams:params
+            subscriptionEstablished:^() { mSubscriptionEstablished = YES; }
+            reportHandler:^(MTROperationalCredentialsClusterPQCDeviceAttestationProfileStruct * _Nullable value, NSError * _Nullable error) {
+                NSLog(@"OperationalCredentials.PQCDeviceAttestationProfile response %@", [value description]);
+                if (error == nil) {
+                    TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
+                } else {
+                    TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+                }
+                SetCommandExitStatus(error);
+            }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+#endif // MTR_ENABLE_PROVISIONAL
 
 /*
  * Attribute GeneratedCommandList
@@ -217757,6 +217874,10 @@ void registerClusterOperationalCredentials(Commands & commands)
         make_unique<SubscribeAttributeOperationalCredentialsTrustedRootCertificates>(), //
         make_unique<ReadOperationalCredentialsCurrentFabricIndex>(), //
         make_unique<SubscribeAttributeOperationalCredentialsCurrentFabricIndex>(), //
+#if MTR_ENABLE_PROVISIONAL
+        make_unique<ReadOperationalCredentialsPQCDeviceAttestationProfile>(), //
+        make_unique<SubscribeAttributeOperationalCredentialsPQCDeviceAttestationProfile>(), //
+#endif // MTR_ENABLE_PROVISIONAL
         make_unique<ReadOperationalCredentialsGeneratedCommandList>(), //
         make_unique<SubscribeAttributeOperationalCredentialsGeneratedCommandList>(), //
         make_unique<ReadOperationalCredentialsAcceptedCommandList>(), //

@@ -12857,6 +12857,8 @@ class OperationalCredentials(Cluster):
                 ClusterObjectFieldDescriptor(Label="commissionedFabrics", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="trustedRootCertificates", Tag=0x00000004, Type=typing.List[bytes]),
                 ClusterObjectFieldDescriptor(Label="currentFabricIndex", Tag=0x00000005, Type=uint),
+                ClusterObjectFieldDescriptor(Label="PQCDeviceAttestationProfile", Tag=0x00000006,
+                                             Type=typing.Optional[OperationalCredentials.Structs.PQCDeviceAttestationProfileStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -12870,6 +12872,7 @@ class OperationalCredentials(Cluster):
     commissionedFabrics: uint = 0
     trustedRootCertificates: typing.List[bytes] = field(default_factory=lambda: [])
     currentFabricIndex: uint = 0
+    PQCDeviceAttestationProfile: typing.Optional[OperationalCredentials.Structs.PQCDeviceAttestationProfileStruct] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -12885,6 +12888,12 @@ class OperationalCredentials(Cluster):
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 0
+
+        class AttestationCryptoProfileEnum(MatterIntEnum):
+            kEcdsaMatterLegacy = 0x00
+            kMlDsa44 = 0x01
+            kMlDsa65 = 0x02
+            kUnknownEnumValue = 3
 
         class NodeOperationalCertStatusEnum(MatterIntEnum):
             kOk = 0x00
@@ -12944,6 +12953,21 @@ class OperationalCredentials(Cluster):
             vvsc: 'typing.Optional[bytes]' = None
             fabricIndex: 'uint' = 0
 
+        @dataclass
+        class PQCDeviceAttestationProfileStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="PAASupportedProfiles", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="PAISupportedProfiles", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="DACSupportedProfiles", Tag=2, Type=uint),
+                    ])
+
+            PAASupportedProfiles: 'uint' = 0
+            PAISupportedProfiles: 'uint' = 0
+            DACSupportedProfiles: 'uint' = 0
+
     class Commands:
         @dataclass
         class AttestationRequest(ClusterCommand):
@@ -12988,12 +13012,19 @@ class OperationalCredentials(Cluster):
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="certificateType", Tag=0, Type=OperationalCredentials.Enums.CertificateChainTypeEnum),
-                    ])
+                    return ClusterObjectDescriptor(
+                        Fields=[
+                            ClusterObjectFieldDescriptor(Label="certificateType", Tag=0, Type=OperationalCredentials.Enums.CertificateChainTypeEnum),
+                            ClusterObjectFieldDescriptor(Label="cryptoProfile", Tag=1,
+                                                         Type=typing.Optional[OperationalCredentials.Enums.AttestationCryptoProfileEnum]),
+                            ClusterObjectFieldDescriptor(Label="segmentID", Tag=2, Type=typing.Optional[uint]),
+                            ClusterObjectFieldDescriptor(Label="maxSegmentSize", Tag=3, Type=typing.Optional[uint]),
+                        ])
 
             certificateType: OperationalCredentials.Enums.CertificateChainTypeEnum = 0
+            cryptoProfile: typing.Optional[OperationalCredentials.Enums.AttestationCryptoProfileEnum] = None
+            segmentID: typing.Optional[uint] = None
+            maxSegmentSize: typing.Optional[uint] = None
 
         @dataclass
         class CertificateChainResponse(ClusterCommand):
@@ -13004,12 +13035,16 @@ class OperationalCredentials(Cluster):
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="certificate", Tag=0, Type=bytes),
-                    ])
+                    return ClusterObjectDescriptor(
+                        Fields=[
+                            ClusterObjectFieldDescriptor(Label="certificate", Tag=0, Type=bytes),
+                            ClusterObjectFieldDescriptor(Label="totalDocumentSize", Tag=1, Type=typing.Optional[uint]),
+                            ClusterObjectFieldDescriptor(Label="nextSegmentID", Tag=2, Type=typing.Optional[uint]),
+                        ])
 
             certificate: bytes = b""
+            totalDocumentSize: typing.Optional[uint] = None
+            nextSegmentID: typing.Optional[uint] = None
 
         @dataclass
         class CSRRequest(ClusterCommand):
@@ -13327,6 +13362,22 @@ class OperationalCredentials(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.List[uint])
 
             value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class PQCDeviceAttestationProfile(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000003E
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000006
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[OperationalCredentials.Structs.PQCDeviceAttestationProfileStruct])
+
+            value: typing.Optional[OperationalCredentials.Structs.PQCDeviceAttestationProfileStruct] = None
 
         @dataclass
         class AcceptedCommandList(ClusterAttributeDescriptor):
@@ -64052,4 +64103,3 @@ class SampleMei(Cluster):
 
             count: uint = 0
             fabricIndex: uint = 0
-

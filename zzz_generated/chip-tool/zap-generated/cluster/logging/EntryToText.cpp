@@ -1400,6 +1400,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "TrustedRootCertificates";
         case chip::app::Clusters::OperationalCredentials::Attributes::CurrentFabricIndex::Id:
             return "CurrentFabricIndex";
+        case chip::app::Clusters::OperationalCredentials::Attributes::PQCDeviceAttestationProfile::Id:
+            return "PQCDeviceAttestationProfile";
         case chip::app::Clusters::OperationalCredentials::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::OperationalCredentials::Attributes::AcceptedCommandList::Id:

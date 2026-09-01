@@ -2798,11 +2798,18 @@ cluster AdministratorCommissioning = 60 {
 
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 cluster OperationalCredentials = 62 {
-  revision 2;
+  revision 3;
+
+  enum AttestationCryptoProfileEnum : enum8 {
+    kEcdsaMatterLegacy = 0;
+    kMlDsa44 = 1;
+    kMlDsa65 = 2;
+  }
 
   enum CertificateChainTypeEnum : enum8 {
     kDACCertificate = 1;
     kPAICertificate = 2;
+    kCertificationDeclaration = 3;
   }
 
   enum NodeOperationalCertStatusEnum : enum8 {
@@ -2816,6 +2823,16 @@ cluster OperationalCredentials = 62 {
     kFabricConflict = 9;
     kLabelConflict = 10;
     kInvalidFabricIndex = 11;
+  }
+
+  bitmap AttestationCryptoProfileBitmap : bitmap16 {
+    kSupportsEcdsaMatterLegacy = 0x1;
+    kSupportsMlDsa44 = 0x2;
+    kSupportsMlDsa65 = 0x4;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPQCDeviceAttestation = 0x1;
   }
 
   fabric_scoped struct FabricDescriptorStruct {
@@ -2835,12 +2852,20 @@ cluster OperationalCredentials = 62 {
     fabric_idx fabricIndex = 254;
   }
 
+  struct PQCDeviceAttestationProfileStruct {
+    AttestationCryptoProfileBitmap PAASupportedProfiles = 0;
+    AttestationCryptoProfileBitmap PAISupportedProfiles = 1;
+    AttestationCryptoProfileBitmap DACSupportedProfiles = 2;
+    AttestationCryptoProfileBitmap CDSupportedProfiles = 3;
+  }
+
   readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
   readonly attribute FabricDescriptorStruct fabrics[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute octet_string trustedRootCertificates[] = 4;
   readonly attribute int8u currentFabricIndex = 5;
+  provisional readonly attribute optional PQCDeviceAttestationProfileStruct PQCDeviceAttestationProfile = 6;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2858,10 +2883,15 @@ cluster OperationalCredentials = 62 {
 
   request struct CertificateChainRequestRequest {
     CertificateChainTypeEnum certificateType = 0;
+    optional AttestationCryptoProfileEnum cryptoProfile = 1;
+    optional int16u segmentID = 2;
+    optional int16u maxSegmentSize = 3;
   }
 
   response struct CertificateChainResponse = 3 {
-    long_octet_string<600> certificate = 0;
+    octet_string certificate = 0;
+    optional int16u totalDocumentSize = 1;
+    optional int16u nextSegmentID = 2;
   }
 
   request struct CSRRequestRequest {

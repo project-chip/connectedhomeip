@@ -2398,6 +2398,40 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::OperationalCredentials::Structs::PQCDeviceAttestationProfileStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("PAASupportedProfiles", indent + 1, value.PAASupportedProfiles);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PAASupportedProfiles'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("PAISupportedProfiles", indent + 1, value.PAISupportedProfiles);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PAISupportedProfiles'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("DACSupportedProfiles", indent + 1, value.DACSupportedProfiles);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DACSupportedProfiles'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType & value)
@@ -14192,6 +14226,8 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("certificate", indent + 1, value.certificate));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("totalDocumentSize", indent + 1, value.totalDocumentSize));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("nextSegmentID", indent + 1, value.nextSegmentID));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -17528,6 +17564,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentFabricIndex", 1, value);
+        }
+        case OperationalCredentials::Attributes::PQCDeviceAttestationProfile::Id: {
+            chip::app::Clusters::OperationalCredentials::Structs::PQCDeviceAttestationProfileStruct::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PQCDeviceAttestationProfile", 1, value);
         }
         case OperationalCredentials::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
