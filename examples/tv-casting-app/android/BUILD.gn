@@ -133,6 +133,7 @@ android_library("java") {
     "App/app/src/main/jni/com/matter/casting/support/EndpointFilter.java",
     "App/app/src/main/jni/com/matter/casting/support/IdentificationDeclarationOptions.java",
     "App/app/src/main/jni/com/matter/casting/support/MatterCallback.java",
+    "App/app/src/main/jni/com/matter/casting/support/MatterCleaner.java",
     "App/app/src/main/jni/com/matter/casting/support/MatterError.java",
     "App/app/src/main/jni/com/matter/casting/support/TargetAppInfo.java",
   ]

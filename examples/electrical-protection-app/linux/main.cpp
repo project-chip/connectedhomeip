@@ -17,6 +17,7 @@
  */
 #include <AppMain.h>
 #include <electrical-distribution-stub.h>
+#include <electrical-protection-alarm-stub.h>
 
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <lib/support/CodeUtils.h>
@@ -36,10 +37,15 @@ void ApplicationInit()
     // Electrical Distribution describes the enclosure's physical characteristics. Its generated
     // Init callback is a no-op, so the app owns the instance and registers it imperatively.
     VerifyOrDie(ElectricalDistribution::ElectricalDistributionInit(kEnclosureEndpointId) == CHIP_NO_ERROR);
+
+    // Electrical Protection Alarm reports the enclosure's safety faults. Same imperative
+    // registration: its generated Init callback is a no-op too.
+    VerifyOrDie(ElectricalProtectionAlarm::ElectricalProtectionAlarmInit(kEnclosureEndpointId) == CHIP_NO_ERROR);
 }
 
 void ApplicationShutdown()
 {
+    ElectricalProtectionAlarm::ElectricalProtectionAlarmShutdown();
     ElectricalDistribution::ElectricalDistributionShutdown();
 }
 
