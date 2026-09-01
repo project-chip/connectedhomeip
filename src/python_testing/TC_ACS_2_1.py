@@ -354,13 +354,13 @@ class TC_ACS_2_1(MatterBaseTest):
 
                 if self.ObjectCountingSupported and predictedActivity:
                     self.step("13b", "If DUT supports PredictedActivity feature, then TH reads the PredictedActivity attribute. Verify that DUT response contains StartTimestamp epoch-s data less than equal to EndTimestamp-1 and EndTimestamp epoch-s data greater than equal to StartTimestamp-1 and Verify that DUT response contains Confidence field that is a percentage data between 0 and 100. If DUT supports HumanActivity or ObjectIdentification or SoundIdentification, then TH reads a list of SemanticTagStruct data that includes namespace ID and tag ID from IdentifiedObject or IdentifiedHumanActivity or IdentifiedSound namespaces.")
-                    
+
                     for predictedActivity in predictedActivityList:
                         # CrowdDetected
                         asserts.assert_true(predictedActivity.crowdDetected in [True, False],
                                             "Expected True or False Boolean value.")
                         log.info("Rx'd CrowdDetected: %s", {predictedActivity.crowdDetected})
-    
+
                         # CrowdCount
                         if "CrowdCount" in predictedActivity:
                             # log.info(f"Rx'd CrowdCount: {predictedActivity.crowdCount}")
