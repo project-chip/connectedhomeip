@@ -29,6 +29,11 @@ log = logging.getLogger(__name__)
 
 class TC_AUDIOCONTROL_2_6(MatterBaseTest, AUDIOCONTROLTestBase):
 
+    # This test reboots the DUT three times (steps 5, 10, 16). Disable the background
+    # wildcard subscription so reads after each reboot are not cross-checked against a
+    # now-stale subscription cache.
+    disable_wildcard_subscription = True
+    
     def desc_TC_AUDIOCONTROL_2_6(self) -> str:
         return "[TC-AUDIOCONTROL-2.6] Startup behavior with DUT as Server"
 
