@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include "ThermostatClusterBase.h"
+
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
@@ -30,8 +32,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace Thermostat {
-
-class ThermostatClusterBase;
 
 class ThermostatHold
 {

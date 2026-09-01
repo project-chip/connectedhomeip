@@ -19,6 +19,7 @@
 #include "Setpoints.h"
 #include "Temperature.h"
 #include "ThermostatClusterAttributes.h"
+#include "ThermostatClusterBase.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeValueEncoder.h>
@@ -32,8 +33,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace Thermostat {
-
-class ThermostatClusterBase;
 
 class ThermostatSetpointsBase
 {

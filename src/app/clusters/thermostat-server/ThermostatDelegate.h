@@ -18,12 +18,12 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <credentials/FabricTable.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 #include "Temperature.h"
 
 namespace chip {
-class FabricTable;
 
 namespace app {
 namespace Clusters {

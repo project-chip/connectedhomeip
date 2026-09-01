@@ -24,9 +24,9 @@
 
 #include <app/clusters/thermostat-server/ThermostatCluster.h>
 #include <app/clusters/thermostat-server/ThermostatDelegate.h>
+#include <credentials/FabricTable.h>
 
 namespace chip {
-class FabricTable;
 
 namespace app {
 namespace Clusters {

@@ -17,6 +17,7 @@
 #pragma once
 
 #include "Temperature.h"
+#include "ThermostatClusterBase.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeValueEncoder.h>
@@ -32,7 +33,6 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-class ThermostatClusterBase;
 
 class ThermostatOccupancy
 {

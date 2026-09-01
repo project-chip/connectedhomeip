@@ -16,8 +16,10 @@
 
 #pragma once
 
+#include "ThermostatClusterBase.h"
 #include "ThermostatClusterPresets.h"
 #include "ThermostatSuggestionStructWithOwnedMembers.h"
+
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
@@ -31,8 +33,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace Thermostat {
-
-class ThermostatClusterBase;
 
 class ThermostatSuggestions
 {

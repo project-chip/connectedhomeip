@@ -19,6 +19,7 @@
 #include "PresetStructWithOwnedMembers.h"
 #include "Setpoints.h"
 #include "ThermostatClusterAtomic.h"
+#include "ThermostatClusterBase.h"
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
@@ -33,8 +34,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace Thermostat {
-
-class ThermostatClusterBase;
 
 class ThermostatPresets
 {
