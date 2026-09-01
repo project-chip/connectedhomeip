@@ -872,14 +872,16 @@ Status DeviceEnergyManagementDelegate::PowerRangeAdjustRequest(const DataModel::
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Unable to start a PowerRangeAdjust timer: %" CHIP_ERROR_FORMAT, err.Format());
-        // Timer startup failed. If we cancelled an old timer, restore consistent state to avoid
-        // leaving a PowerRangeAdjustment active with no timer running to clear it.
+        // Timer startup failed. If we cancelled an old timer, undo the replacement attempt by cancelling the old PRA.
+        // If manufacturer cancellation fails, state is retained for explicit cancellation attempt.
         if (mPowerRangeAdjustmentInProgress)
         {
-            mPowerRangeAdjustmentInProgress = false;
-            mPowerRangeAdjustment.SetNull();
-            TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kOnline);
-            MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, PowerRangeAdjustment::Id);
+            CHIP_ERROR cancelErr = CancelPowerRangeAdjustRequestAndGenerateEvent(DeviceEnergyManagement::CauseEnum::kCancelled);
+            if (cancelErr != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "Failed to cancel old PowerRangeAdjustment after timer startup failure: %" CHIP_ERROR_FORMAT,
+                             cancelErr.Format());
+            }
         }
         return Status::Failure;
     }
