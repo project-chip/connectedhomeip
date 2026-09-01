@@ -479,8 +479,29 @@ TEST_F(TestDeviceEnergyManagementCluster, TestPowerRangeAdjustRequest)
     EXPECT_FALSE(tester.Invoke(Commands::PowerRangeAdjustRequest::Id, command).IsSuccess());
     EXPECT_EQ(mockDelegate.GetESAState(), ESAStateEnum::kOnline);
 
+    // Duration == 0 - rejected
+    command.cause    = AdjustmentCauseEnum::kLocalOptimization;
+    command.duration = 0;
+    EXPECT_FALSE(tester.Invoke(Commands::PowerRangeAdjustRequest::Id, command).IsSuccess());
+    EXPECT_EQ(mockDelegate.GetESAState(), ESAStateEnum::kOnline);
+
+    // Duration > 86400 - rejected
+    command.duration = 86401;
+    EXPECT_FALSE(tester.Invoke(Commands::PowerRangeAdjustRequest::Id, command).IsSuccess());
+    EXPECT_EQ(mockDelegate.GetESAState(), ESAStateEnum::kOnline);
+
+    // Both MinPower and MaxPower null - rejected
+    command.minPower.SetNull();
+    command.maxPower.SetNull();
+    EXPECT_FALSE(tester.Invoke(Commands::PowerRangeAdjustRequest::Id, command).IsSuccess());
+    EXPECT_EQ(mockDelegate.GetESAState(), ESAStateEnum::kOnline);
+
     // OptOut rejects LocalOptimization - rejected, state remains Online
-    command.cause = AdjustmentCauseEnum::kLocalOptimization;
+    command.minPower = 500;
+    command.maxPower = 1500;
+    command.duration = 60;
+    command.cause    = AdjustmentCauseEnum::kLocalOptimization;
+
     mockDelegate.SetOptOutState(OptOutStateEnum::kLocalOptOut);
     EXPECT_FALSE(tester.Invoke(Commands::PowerRangeAdjustRequest::Id, command).IsSuccess());
     EXPECT_EQ(mockDelegate.GetESAState(), ESAStateEnum::kOnline);
