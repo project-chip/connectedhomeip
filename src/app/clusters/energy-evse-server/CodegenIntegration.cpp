@@ -27,7 +27,7 @@ namespace Clusters {
 namespace EnergyEvse {
 
 Instance::Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature, OptionalAttributes aOptionalAttrs,
-                   OptionalCommands aOptionalCmds) :
+                   EnergyEvseCluster::OptionalCommandSet aOptionalCmds) :
     mCluster(EnergyEvseCluster::Config(aEndpointId, aDelegate, aFeature, aOptionalAttrs, aOptionalCmds))
 {}
 
@@ -64,9 +64,9 @@ bool Instance::SupportsOptAttr(OptionalAttributes aOptionalAttrs) const
     return mCluster.Cluster().OptionalAttrs().Has(aOptionalAttrs);
 }
 
-bool Instance::SupportsOptCmd(OptionalCommands aOptionalCmds) const
+bool Instance::SupportsStartDiagnostics() const
 {
-    return mCluster.Cluster().OptionalCmds().Has(aOptionalCmds);
+    return mCluster.Cluster().SupportsStartDiagnostics();
 }
 
 StateEnum Instance::GetState() const
