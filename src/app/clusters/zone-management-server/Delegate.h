@@ -111,8 +111,8 @@ public:
      * @brief verifies whether a zone with the provided zoneID is present on the server, and not a Privacy Zone. 
      * 
      * @param[in] zoneID Indicates the ID of the zone to be checked against known zones
-     * 
-     * @return true if the zoneID is found. 
+     *
+     * @return true if the zoneID is found.
      */
     virtual bool IsValidAnalysisZone(const uint16_t zoneId) = 0;
     
