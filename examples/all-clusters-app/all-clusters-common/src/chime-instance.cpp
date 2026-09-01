@@ -32,8 +32,8 @@ using ChimeSoundStructType = Structs::ChimeSoundStruct::Type;
 ChimeCommandDelegate ChimeCommandDelegate::instance;
 
 ChimeSoundStructType ChimeCommandDelegate::supportedChimes[] = {
-    { .chimeID = 5, .name = chip::CharSpan("Chime 5"_span) },
-    { .chimeID = 10, .name = chip::CharSpan("Chime 10"_span) },
+    { .chimeID = 5, .name = "Chime 5"_span },
+    { .chimeID = 10, .name = "Chime 10"_span },
 };
 
 CHIP_ERROR ChimeCommandDelegate::GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, MutableCharSpan & name)
