@@ -83,8 +83,8 @@ class AVANALYTestBase:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned on disabling context triggers")
 
     async def get_zoneids_from_zone_management(self, endpoint) -> list[int]:
-        """Returns a list of ZoneIDs that are available from the ZoneManagament cluster on the target endpoint. If none are 
-        present it will attempt to create one. 
+        """Returns a list of ZoneIDs that are available from the ZoneManagament cluster on the target endpoint. If none are
+        present it will attempt to create one.
 
         Returns:
             list[int]:  the list of ZoneIDs that are found.  Will be empty if there are none.
