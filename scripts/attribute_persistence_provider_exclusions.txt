@@ -54,7 +54,6 @@ src/app/clusters/camera-av-stream-management-server/tests/TestCameraAVStreamMana
 src/app/clusters/thread-network-directory-server/CodegenIntegration.cpp
 src/app/clusters/thread-network-directory-server/MigrateThreadNetworkDirectoryServerStorage.cpp
 src/app/clusters/thread-network-directory-server/MigrateThreadNetworkDirectoryServerStorage.h
-src/app/clusters/thread-network-directory-server/ThreadNetworkDirectoryCluster.cpp
 src/app/clusters/thread-network-directory-server/tests/TestThreadNetworkDirectoryCluster.cpp
 
 # Cluster server implementations that currently use SafeAttributePersistenceProvider

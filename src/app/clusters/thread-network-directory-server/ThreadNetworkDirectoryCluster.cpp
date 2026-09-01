@@ -125,7 +125,6 @@ CHIP_ERROR ThreadNetworkDirectoryCluster::ReadExtendedPanId(const ConcreteDataAt
     }
 
     VerifyOrReturnError(value.size() == ExtendedPanId::size(), CHIP_ERROR_INTERNAL);
-    outExPanId.emplace(ExtendedPanId(value));
     return CHIP_NO_ERROR;
 }
 
