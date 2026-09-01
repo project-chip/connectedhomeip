@@ -36,10 +36,6 @@
 #include <lib/support/TimerDelegate.h>
 #include <platform/DiagnosticDataProvider.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-#include <clusters/OtaSoftwareUpdateProvider/ClusterId.h>
-#endif // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-
 namespace chip {
 namespace app {
 

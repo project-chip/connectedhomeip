@@ -25,6 +25,10 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#include <clusters/OtaSoftwareUpdateProvider/ClusterId.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
