@@ -199,8 +199,27 @@ class TC_PAVST_2_14(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         transport_configs = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.CurrentConnections)
         asserts.assert_equal(len(transport_configs), 1, "TransportConfigurations must be 1")
-        asserts.assert_equal(transport_configs[0].connectionID, aConnectionID, "ConnectionID mismatch in CurrentConnections")
-        saved_transport_config = transport_configs[0]
+        entry = transport_configs[0]
+        asserts.assert_equal(entry.connectionID, aConnectionID, "ConnectionID mismatch in CurrentConnections")
+        opts = entry.transportOptions
+        asserts.assert_is_not_none(opts, "TransportOptions must not be None")
+        asserts.assert_equal(opts.streamUsage, streamUsage, "streamUsage mismatch")
+        asserts.assert_equal(opts.videoStreamID, video_stream_id, "videoStreamID mismatch")
+        asserts.assert_equal(opts.audioStreamID, audio_stream_id, "audioStreamID mismatch")
+        asserts.assert_equal(opts.TLSEndpointID, self.tlsEndpointId, "TLSEndpointID mismatch")
+        asserts.assert_equal(opts.url, f"https://{host_ip}:1234/streams/{uploadStreamId}/", "URL mismatch")
+        asserts.assert_equal(opts.triggerOptions.triggerType, pvcluster.Enums.TransportTriggerTypeEnum.kContinuous, "triggerType mismatch")
+        asserts.assert_equal(opts.ingestMethod, pvcluster.Enums.IngestMethodsEnum.kCMAFIngest, "ingestMethod mismatch")
+        asserts.assert_equal(opts.containerOptions.containerType, pvcluster.Enums.ContainerFormatEnum.kCmaf, "containerType mismatch")
+        cmafOpts = opts.containerOptions.CMAFContainerOptions
+        asserts.assert_is_not_none(cmafOpts, "CMAFContainerOptions must not be None")
+        asserts.assert_equal(cmafOpts.CMAFInterface, pvcluster.Enums.CMAFInterfaceEnum.kInterface1, "CMAFInterface mismatch")
+        asserts.assert_equal(cmafOpts.chunkDuration, 4, "chunkDuration mismatch")
+        asserts.assert_equal(cmafOpts.segmentDuration, 4000, "segmentDuration mismatch")
+        asserts.assert_equal(cmafOpts.sessionGroup, 3, "sessionGroup mismatch")
+        asserts.assert_equal(cmafOpts.trackName, "media", "trackName mismatch")
+        asserts.assert_equal(opts.expiryTime, 3600, "expiryTime mismatch")
+        saved_transport_config = entry
 
         # Step 6: Reboot DUT
         self.step(6)
