@@ -38,6 +38,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+import secrets
 
 from mobly import asserts
 
@@ -46,7 +47,8 @@ from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.network_identity import (encode_network_administrator_secret, generate_network_client_identity,
+from matter.testing.network_identity import (NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH, derive_ecdsa_network_identity,
+                                             encode_network_administrator_secret, generate_network_client_identity,
                                              matter_epoch_now, network_identity_identifier)
 from matter.testing.runner import TestStep, default_matter_test_main
 
@@ -79,8 +81,8 @@ class TC_NETIM_1_1(MatterBaseTest):
                         "CreatedTimestamp is epoch-s, Current is a bool, RemainingClients is null when Current is true "
                         "else a uint16."),
             TestStep(7, "TH verifies activeList contains the expected active network identity configured during setup.",
-                        "activeList contains an entry with the expected CreatedTimestamp, Type ECDSA, a 20-byte "
-                        "Identifier and Current true."),
+                        "activeList contains an entry with the expected CreatedTimestamp, Type ECDSA, Current true, and "
+                        "the Identifier that TH independently derives from the imported NASS raw secret."),
             TestStep(8, "TH reads the Clients attribute and stores as clientsList.", "DUT responds with a list."),
             TestStep(9, "TH validates the length of clientsList.", "clientsList is a list with length 1."),
             TestStep(10, "TH validates each element in clientsList.",
@@ -106,11 +108,15 @@ class TC_NETIM_1_1(MatterBaseTest):
 
         self.step(1)
         # Test Setup: configure one known active network identity and one known client.
-        # The active identity's CreatedTimestamp is taken verbatim from the imported NASS, so it
-        # is predictable. The client's ClientIdentifier is the 20-byte key identifier derived from
-        # the client identity we generate, so it is predictable too.
+        # The active identity's CreatedTimestamp is taken verbatim from the imported NASS, and its
+        # Identifier is the identifier of the ECDSA identity the DUT must derive from the NASS raw
+        # secret (HKDF + rejection sampling per "Network Identity Derivation for ECDSA"); we derive
+        # the same identity here to confirm the DUT's crypto rather than just its shape.
         expected_created_timestamp = matter_epoch_now()
-        nass = encode_network_administrator_secret(created=expected_created_timestamp)
+        raw_secret = secrets.token_bytes(NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH)
+        nass = encode_network_administrator_secret(created=expected_created_timestamp, raw_secret=raw_secret)
+        _, expected_network_identity = derive_ecdsa_network_identity(raw_secret)
+        expected_network_identifier = network_identity_identifier(expected_network_identity)
         await self.send_single_cmd(
             cmd=cluster.Commands.ImportAdminSecret(networkAdministratorSharedSecret=nass),
             endpoint=endpoint, timedRequestTimeoutMs=_TIMED_REQUEST_TIMEOUT_MS)
@@ -168,7 +174,10 @@ class TC_NETIM_1_1(MatterBaseTest):
         expected_identity = matching[0]
         asserts.assert_equal(expected_identity.type, cluster.Enums.IdentityTypeEnum.kEcdsa,
                              "The imported network identity should be of type ECDSA.")
-        asserts.assert_equal(len(expected_identity.identifier), 20, "The imported network identity Identifier must be 20 bytes.")
+        asserts.assert_equal(
+            expected_identity.identifier, expected_network_identifier,
+            "The active network identity Identifier does not match the identity derived from the imported NASS; the DUT "
+            "did not perform the expected HKDF/ECDSA Network Identity derivation.")
 
         self.step(8)
         clients_list = await self.read_single_attribute_check_success(

@@ -46,6 +46,7 @@ import time
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.asymmetric.utils import decode_dss_signature
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 
 # Length of the raw key material in a Network Administrator Shared Secret.
 NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH = 32
@@ -56,6 +57,14 @@ NETWORK_IDENTITY_IDENTIFIER_LENGTH = 20
 COMPACT_IDENTITY_LENGTH = 137
 # Unix time of the Matter/CHIP epoch (2000-01-01T00:00:00 UTC).
 MATTER_EPOCH_OFFSET_SECONDS = 946684800
+
+# Order of the NIST P-256 (secp256r1) curve.
+_P256_ORDER = 0xFFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551
+# Length of a P-256 field element / private key, in bytes.
+_P256_FIELD_ELEMENT_LENGTH = 32
+# HKDF info string and round count for "Network Identity Derivation for ECDSA".
+_NETWORK_IDENTITY_HKDF_INFO = b"NASS-ECDSA-secp256r1"
+_NETWORK_IDENTITY_DERIVATION_MAX_ROUNDS = 8
 
 # TLV tags of the compact-pdc-identity structure (Matter cert TLV tags).
 _TLV_TAG_EC_PUBLIC_KEY = 0x09
@@ -158,6 +167,18 @@ def _raw_public_key(private_key: ec.EllipticCurvePrivateKey) -> bytes:
         format=serialization.PublicFormat.UncompressedPoint)
 
 
+def _compact_identity_from_private_key(private_key: ec.EllipticCurvePrivateKey, *, deterministic: bool) -> bytes:
+    """Self-signs a Network Identity for the given keypair and returns the compact
+    identity. ``deterministic`` selects RFC 6979 signing, matching
+    ``DeriveChipNetworkIdentity`` (vs ``NewChipNetworkIdentity`` for random)."""
+    public_key = _raw_public_key(private_key)
+    tbs = _encode_network_identity_tbs(public_key)
+    der_signature = private_key.sign(tbs, ec.ECDSA(hashes.SHA256(), deterministic_signing=deterministic))
+    r, s = decode_dss_signature(der_signature)
+    raw_signature = r.to_bytes(32, "big") + s.to_bytes(32, "big")
+    return _encode_compact_identity(public_key, raw_signature)
+
+
 def generate_network_client_identity() -> tuple[ec.EllipticCurvePrivateKey, bytes]:
     """Generates a fresh Network (Client) Identity.
 
@@ -165,14 +186,48 @@ def generate_network_client_identity() -> tuple[ec.EllipticCurvePrivateKey, byte
     the 137-byte compact-pdc-identity accepted by the AddClient command.
     """
     private_key = ec.generate_private_key(ec.SECP256R1())
-    public_key = _raw_public_key(private_key)
+    return private_key, _compact_identity_from_private_key(private_key, deterministic=False)
 
-    tbs = _encode_network_identity_tbs(public_key)
-    der_signature = private_key.sign(tbs, ec.ECDSA(hashes.SHA256()))
-    r, s = decode_dss_signature(der_signature)
-    raw_signature = r.to_bytes(32, "big") + s.to_bytes(32, "big")
 
-    return private_key, _encode_compact_identity(public_key, raw_signature)
+def derive_ecdsa_network_identity_private_key(raw_secret: bytes) -> ec.EllipticCurvePrivateKey:
+    """Derives the ECDSA Network Identity private key from a NASS raw secret.
+
+    Implements "Network Identity Derivation for ECDSA" from the Matter
+    specification, mirroring ``RawKeyNetworkIdentityKeystore::DeriveECDSANetworkIdentity``:
+    HKDF-SHA256 expands the raw secret (empty salt, info "NASS-ECDSA-secp256r1")
+    into candidate 32-byte blocks; each block ``x`` yields the candidate private
+    key ``d = x + 1`` and is rejected (retrying the next block) when ``d`` is not
+    below the curve order.
+    """
+    if len(raw_secret) != NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH:
+        raise ValueError(f"raw secret must be {NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH} bytes, got {len(raw_secret)}")
+
+    key_material = HKDF(
+        algorithm=hashes.SHA256(),
+        length=_P256_FIELD_ELEMENT_LENGTH * _NETWORK_IDENTITY_DERIVATION_MAX_ROUNDS,
+        salt=None,  # RFC 5869 treats an absent salt as HashLen zero bytes, matching the SDK.
+        info=_NETWORK_IDENTITY_HKDF_INFO).derive(raw_secret)
+
+    for round_index in range(_NETWORK_IDENTITY_DERIVATION_MAX_ROUNDS):
+        block = key_material[round_index * _P256_FIELD_ELEMENT_LENGTH:(round_index + 1) * _P256_FIELD_ELEMENT_LENGTH]
+        candidate = int.from_bytes(block, "big") + 1
+        if candidate < _P256_ORDER:
+            return ec.derive_private_key(candidate, ec.SECP256R1())
+
+    raise ValueError("ECDSA Network Identity derivation failed after the maximum number of rounds")
+
+
+def derive_ecdsa_network_identity(raw_secret: bytes) -> tuple[ec.EllipticCurvePrivateKey, bytes]:
+    """Derives the ECDSA Network Identity for a NASS raw secret.
+
+    Returns a tuple of (private_key, compact_identity). The compact_identity is
+    byte-for-byte identical to what the DUT activates after ImportAdminSecret, so
+    its 20-byte identifier (see :func:`network_identity_identifier`) can be
+    compared against the ActiveNetworkIdentities attribute to confirm the DUT
+    performed the correct HKDF and key-derivation crypto.
+    """
+    private_key = derive_ecdsa_network_identity_private_key(raw_secret)
+    return private_key, _compact_identity_from_private_key(private_key, deterministic=True)
 
 
 def compact_identity_public_key(compact_identity: bytes) -> bytes:

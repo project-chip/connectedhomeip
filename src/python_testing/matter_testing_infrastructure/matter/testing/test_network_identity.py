@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
+import base64
 import unittest
 
 from cryptography.exceptions import InvalidSignature
@@ -58,6 +59,25 @@ _PDCID01_KEY_ID = bytes([
 # The tbs_certificate portion of the DER above (bytes 4..247), i.e. the exact
 # input EncodeNetworkIdentityTBSCert produces and signs.
 _PDCID01_TBS = _PDCID01_DER[4:4 + 244]
+
+# NASS spec vector from src/app/clusters/network-identity-management-server/tests/NASS_test_vectors.h
+# (kNASSTestVector1_*), also used by the C++ DeriveNASSSpecVector test. The raw secret is chosen so
+# the first derivation candidate is out of range and the second is accepted.
+_NASS_VECTOR_PEM = "FSQBACYCgHXoMDADIAAA+TEST+VECTOR+AoPhgYAAAAAUxWnjRzQJQUERWcGGA=="
+_NASS_VECTOR_COMPACT_IDENTITY = bytes([
+    0x15, 0x30, 0x09, 0x41, 0x04, 0xbc, 0x41, 0x0b, 0xc2, 0x97, 0x40, 0xfc, 0x44, 0xdc, 0x5b, 0xc5, 0x46, 0xe4, 0x95, 0x30,
+    0x97, 0x66, 0xed, 0x00, 0xf7, 0x44, 0xb2, 0x6e, 0x1b, 0x06, 0x48, 0x32, 0x3c, 0x45, 0x10, 0x74, 0xc0, 0xd2, 0xcf, 0x1a,
+    0x6e, 0xb0, 0x4e, 0x4c, 0xe8, 0xce, 0xa6, 0x7d, 0x1e, 0x01, 0xe8, 0xbb, 0xb0, 0xf2, 0x95, 0xdc, 0xca, 0x1c, 0x2c, 0x84,
+    0x74, 0xb5, 0xe3, 0x3a, 0x40, 0x12, 0x7f, 0x1b, 0x0a, 0x30, 0x0b, 0x40, 0xba, 0x5d, 0x50, 0x0e, 0x92, 0x9f, 0x36, 0x4c,
+    0x06, 0xb9, 0xe2, 0x2d, 0xc7, 0xaf, 0xf3, 0x5d, 0x78, 0x05, 0xd2, 0xfe, 0xc5, 0x15, 0xbc, 0x0f, 0xa5, 0xa6, 0x99, 0x50,
+    0xb7, 0xbc, 0x55, 0x51, 0x00, 0x5d, 0x66, 0xa2, 0xda, 0xc6, 0x2f, 0x7c, 0x84, 0xe4, 0x56, 0x17, 0x20, 0x29, 0xe7, 0xba,
+    0x32, 0xab, 0x94, 0x6e, 0xde, 0x7f, 0x64, 0x5f, 0x60, 0x02, 0x0d, 0x4f, 0x54, 0xef, 0xbb, 0x6b, 0x18,
+])
+_NASS_VECTOR_KEY_IDENTIFIER = bytes([
+    0xef, 0xa8, 0xce, 0x87, 0x39, 0xf9, 0xcf, 0xfd, 0x6d, 0xfb, 0xd2, 0x08, 0xa4, 0x06, 0xf7, 0x7b, 0x9b, 0x5b, 0xa8, 0xce,
+])
+# Raw secret extracted from the NASS TLV above (context tag 3, a 32-byte octet string).
+_NASS_VECTOR_RAW_SECRET = base64.b64decode(_NASS_VECTOR_PEM)[-1 - 32:-1]
 
 
 class TestNetworkIdentityTbsEncoding(unittest.TestCase):
@@ -115,6 +135,26 @@ class TestGeneratedClientIdentity(unittest.TestCase):
         tampered[-1] ^= 0xFF
         with self.assertRaises(InvalidSignature):
             loaded.verify(encode_dss_signature(r, s), bytes(tampered), ec.ECDSA(hashes.SHA256()))
+
+
+class TestEcdsaNetworkIdentityDerivation(unittest.TestCase):
+    """Validates the NASS -> ECDSA Network Identity derivation against the C++ spec vector."""
+
+    def test_compact_identity_matches_vector(self):
+        _, compact = ni.derive_ecdsa_network_identity(_NASS_VECTOR_RAW_SECRET)
+        self.assertEqual(compact, _NASS_VECTOR_COMPACT_IDENTITY)
+
+    def test_identifier_matches_vector(self):
+        _, compact = ni.derive_ecdsa_network_identity(_NASS_VECTOR_RAW_SECRET)
+        self.assertEqual(ni.network_identity_identifier(compact), _NASS_VECTOR_KEY_IDENTIFIER)
+
+    def test_derivation_is_deterministic(self):
+        self.assertEqual(ni.derive_ecdsa_network_identity(_NASS_VECTOR_RAW_SECRET)[1],
+                         ni.derive_ecdsa_network_identity(_NASS_VECTOR_RAW_SECRET)[1])
+
+    def test_rejects_bad_secret_length(self):
+        with self.assertRaises(ValueError):
+            ni.derive_ecdsa_network_identity(b"\x00" * 16)
 
 
 class TestNetworkAdministratorSecret(unittest.TestCase):
