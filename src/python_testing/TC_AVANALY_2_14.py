@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2025 Project CHIP Authors
+#    Copyright (c) 2026 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -82,16 +82,15 @@ class TC_AVANALY_2_14(MatterBaseTest, AVANALYTestBase):
 
         await self.read_avanaly_features(endpoint)
         zone_cluster = Clusters.Objects.ZoneManagement
-        has_remote_zones = False
-        try:
-            zone_feature_map = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=zone_cluster, attribute=zone_cluster.Attributes.FeatureMap
-            )
-            # Feature bit 4 = RemoteZones
-            has_remote_zones = (zone_feature_map & (1 << 4)) != 0
-        except Exception as e:
-            log.info("ZoneManagement cluster query exception: %s", e)
-            has_remote_zones = False
+        has_remote_zones = self.check_pics("ZONEMGMT.S.F04")
+        if hasattr(zone_cluster.Bitmaps.Feature, "kRemoteZones"):
+            try:
+                zone_feature_map = await self.read_single_attribute_check_success(
+                    endpoint=endpoint, cluster=zone_cluster, attribute=zone_cluster.Attributes.FeatureMap
+                )
+                has_remote_zones = (zone_feature_map & zone_cluster.Bitmaps.Feature.kRemoteZones) != 0
+            except Exception as e:
+                log.info("ZoneManagement cluster query exception: %s", e)
 
         if not has_remote_zones:
             log.info("RemoteZones feature not supported on ZoneManagement, skipping TC-AVANALY-2.14")

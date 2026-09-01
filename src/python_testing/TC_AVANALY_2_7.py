@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2025 Project CHIP Authors
+#    Copyright (c) 2026 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,6 +41,7 @@ from mobly import asserts
 from TC_AVANALYTestBase import AVANALYTestBase
 
 import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
@@ -91,8 +92,8 @@ class TC_AVANALY_2_7(MatterBaseTest, AVANALYTestBase):
 
         if self.has_feature_perzonedetect:
             triggers = [
-                cluster.Structs.ContextTriggerStruct(context=context_a, zoneIDs=None),
-                cluster.Structs.ContextTriggerStruct(context=context_b, zoneIDs=None)
+                cluster.Structs.ContextTriggerStruct(context=context_a, zoneIDs=NullValue),
+                cluster.Structs.ContextTriggerStruct(context=context_b, zoneIDs=NullValue)
             ]
         else:
             triggers = [
@@ -171,7 +172,7 @@ class TC_AVANALY_2_7(MatterBaseTest, AVANALYTestBase):
             log.info("CI mode: skipping blocking event wait in Step 8")
 
         # Cleanup: disable all context triggers
-        await self.send_disable_context_triggers_cmd(endpoint, context_triggers=None)
+        await self.send_disable_context_triggers_cmd(endpoint, context_triggers=NullValue)
 
 
 if __name__ == "__main__":

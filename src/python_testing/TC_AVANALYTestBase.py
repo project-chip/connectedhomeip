@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2025 Project CHIP Authors
+#    Copyright (c) 2026 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +17,7 @@
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
 
 
 class AVANALYTestBase:
@@ -57,13 +58,17 @@ class AVANALYTestBase:
         self.has_feature_perzonedetect = (feature_map & cluster.Bitmaps.Feature.kPerZoneContextDetection) != 0
         return feature_map
 
-    async def send_enable_context_triggers_cmd(self, endpoint, context_triggers=None):
+    async def send_enable_context_triggers_cmd(self, endpoint, context_triggers=NullValue):
         """Send EnableContextTriggers command to the AvAnalysis cluster."""
+        if context_triggers is None:
+            context_triggers = NullValue
         cmd = Clusters.Objects.AvAnalysis.Commands.EnableContextTriggers(contextTriggers=context_triggers)
         return await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
 
-    async def send_disable_context_triggers_cmd(self, endpoint, context_triggers=None):
+    async def send_disable_context_triggers_cmd(self, endpoint, context_triggers=NullValue):
         """Send DisableContextTriggers command to the AvAnalysis cluster."""
+        if context_triggers is None:
+            context_triggers = NullValue
         cmd = Clusters.Objects.AvAnalysis.Commands.DisableContextTriggers(contextTriggers=context_triggers)
         return await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
 
