@@ -214,7 +214,6 @@ limitations (e.g., requested frequency band unsupported by hardware).
 Client                    Cluster                   Driver                Adapter
   │                         │                         │                     │
   ├─ StartRangingRequest ──►│                         │                     │
-  │                         ├─ Validate request ─────►│                     │
   │                         ├─ HandleStartRanging ───►│                     │
   │                         │                         ├─ FindAdapter(tech)  │
   │                         │                         ├─ allocate session   │
