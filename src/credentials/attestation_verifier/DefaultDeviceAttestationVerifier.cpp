@@ -311,6 +311,39 @@ AttestationVerificationResult MapError(CertificateChainValidationResult certific
     }
 }
 
+bool SupportsAttestationVerificationProfile(DeviceAttestationCertProfile profile)
+{
+    switch (profile)
+    {
+    case DeviceAttestationCertProfile::kEcdsaMatterLegacy:
+        return true;
+    case DeviceAttestationCertProfile::kMlDsa44:
+        return Crypto::IsMlDsa44Supported();
+    case DeviceAttestationCertProfile::kMlDsa65:
+        return Crypto::IsMlDsa65Supported();
+    }
+
+    return false;
+}
+
+constexpr size_t GetPaaCertificateAllocationSize(DeviceAttestationCertProfile profile)
+{
+    switch (profile)
+    {
+    case DeviceAttestationCertProfile::kMlDsa44:
+    case DeviceAttestationCertProfile::kMlDsa65:
+        return kMaxDERCertLengthMlDsa65;
+    case DeviceAttestationCertProfile::kEcdsaMatterLegacy:
+        return kMaxDERCertLength;
+    }
+
+    return kMaxDERCertLength;
+}
+
+static_assert(GetPaaCertificateAllocationSize(DeviceAttestationCertProfile::kEcdsaMatterLegacy) == kMaxDERCertLength);
+static_assert(GetPaaCertificateAllocationSize(DeviceAttestationCertProfile::kMlDsa44) == kMaxDERCertLengthMlDsa65);
+static_assert(GetPaaCertificateAllocationSize(DeviceAttestationCertProfile::kMlDsa65) == kMaxDERCertLengthMlDsa65);
+
 // CertificateType class doesn't work since it doesn't encode PAA.
 enum class AttestationChainElement : uint8_t
 {
@@ -450,6 +483,14 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
     VerifyOrExit(info.attestationElementsBuffer.size() <= kMaxResponseLength,
                  attestationError = AttestationVerificationResult::kInvalidArgument);
 
+    if (!SupportsAttestationVerificationProfile(info.attestationProfile))
+    {
+        ChipLogError(NotSpecified, "PQC device attestation verification is not implemented for requested profile %u",
+                     to_underlying(info.attestationProfile));
+        attestationError = AttestationVerificationResult::kNotImplemented;
+        ExitNow();
+    }
+
     // Ensure PAI is present
     VerifyOrExit(!info.paiDerBuffer.empty(), attestationError = AttestationVerificationResult::kPaiMissing);
 
@@ -509,8 +550,8 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
     {
         uint8_t paiAkidBuf[Crypto::kAuthorityKeyIdentifierLength];
         MutableByteSpan paiAkid(paiAkidBuf);
-        constexpr size_t paaCertAllocatedLen = kMaxDERCertLength;
-        CHIP_ERROR err                       = CHIP_NO_ERROR;
+        const size_t paaCertAllocatedLen = GetPaaCertificateAllocationSize(info.attestationProfile);
+        CHIP_ERROR err                   = CHIP_NO_ERROR;
 
         VerifyOrExit(ExtractAKIDFromX509Cert(info.paiDerBuffer, paiAkid) == CHIP_NO_ERROR,
                      attestationError = AttestationVerificationResult::kPaiFormatInvalid);

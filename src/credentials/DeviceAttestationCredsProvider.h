@@ -16,11 +16,42 @@
  */
 #pragma once
 
+#include <cstddef>
+#include <cstdint>
+
 #include <lib/core/CHIPError.h>
+#include <lib/support/BitMask.h>
 #include <lib/support/Span.h>
 
 namespace chip {
 namespace Credentials {
+
+enum class DeviceAttestationCertProfile : uint8_t
+{
+    kEcdsaMatterLegacy = 0,
+    kMlDsa44           = 1,
+    kMlDsa65           = 2,
+};
+
+enum class DeviceAttestationCertProfileBitmap : uint8_t
+{
+    kSupportsEcdsaMatterLegacy = 0x1,
+    kSupportsMlDsa44           = 0x2,
+    kSupportsMlDsa65           = 0x4,
+};
+
+enum class DeviceAttestationDocumentType : uint8_t
+{
+    kDACCertificate,
+    kPAICertificate,
+};
+
+struct DeviceAttestationProfileSupport
+{
+    BitMask<DeviceAttestationCertProfileBitmap> paaSupportedProfiles;
+    BitMask<DeviceAttestationCertProfileBitmap> paiSupportedProfiles;
+    BitMask<DeviceAttestationCertProfileBitmap> dacSupportedProfiles;
+};
 
 class DeviceAttestationCredentialsProvider
 {
@@ -68,6 +99,14 @@ public:
     virtual CHIP_ERROR GetDeviceAttestationCert(MutableByteSpan & out_dac_buffer) = 0;
 
     /**
+     * @brief Get the Device Attestation Certificate in DER format for a given attestation profile.
+     *
+     * The default implementation serves the legacy Matter profile through
+     * GetDeviceAttestationCert() and reports unsupported profiles as not implemented.
+     */
+    virtual CHIP_ERROR GetDeviceAttestationCertForProfile(DeviceAttestationCertProfile profile, MutableByteSpan & out_dac_buffer);
+
+    /**
      * @brief Get the PAI Certificate in DER format. Updates `out_pai_buffer`'s
      *        size on success to match the data size. If no PAI certificate
      *        is available, sets `out_pai_buffer` to empty.
@@ -78,6 +117,35 @@ public:
      *          access fails.
      */
     virtual CHIP_ERROR GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer) = 0;
+
+    /**
+     * @brief Get the PAI Certificate in DER format for a given attestation profile.
+     *
+     * The default implementation serves the legacy Matter profile through
+     * GetProductAttestationIntermediateCert() and reports unsupported profiles as not implemented.
+     */
+    virtual CHIP_ERROR GetProductAttestationIntermediateCertForProfile(DeviceAttestationCertProfile profile,
+                                                                       MutableByteSpan & out_pai_buffer);
+
+    /**
+     * @brief Report which device attestation profiles are supported by this provider.
+     *
+     * The default implementation reports legacy Matter support for every attestation chain element.
+     */
+    virtual DeviceAttestationProfileSupport GetDeviceAttestationProfileSupport() const;
+
+    /**
+     * @brief Read one segment of a device attestation document for a given profile.
+     *
+     * On success, the implementation updates `out_document_buffer` to the bytes read starting at `offset` and sets
+     * `out_document_size` to the size of the complete document. Implementations backed by persistent storage should read only
+     * the requested segment into `out_document_buffer`.
+     *
+     * The default implementation supports legacy Matter documents at offset zero through the existing document getters.
+     */
+    virtual CHIP_ERROR GetDeviceAttestationDocumentSegment(DeviceAttestationDocumentType documentType,
+                                                           DeviceAttestationCertProfile profile, size_t offset,
+                                                           MutableByteSpan & out_document_buffer, size_t & out_document_size);
 
     /**
      * @brief Signs a message using the device attestation private key
