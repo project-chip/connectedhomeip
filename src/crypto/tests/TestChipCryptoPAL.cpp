@@ -127,8 +127,8 @@ std::string StringJoin(const std::vector<std::string> & elements, const std::str
 std::vector<uint8_t> DerCertificateFromPem(const char * pem)
 {
     std::vector<uint8_t> der;
-    BIO * bio  = BIO_new_mem_buf(pem, -1);
-    X509 * x509 = nullptr;
+    BIO * bio                = BIO_new_mem_buf(pem, -1);
+    X509 * x509              = nullptr;
     unsigned char * derBytes = nullptr;
 
     if (bio == nullptr)
@@ -2930,9 +2930,8 @@ TEST_F(TestChipCryptoPAL, TestX509_MlDsaAttestationChainValidation)
     ASSERT_FALSE(dacDer.empty());
 
     CertificateChainValidationResult chainValidationResult = CertificateChainValidationResult::kInternalFrameworkError;
-    const CHIP_ERROR err =
-        ValidateCertificateChain(paaDer.data(), paaDer.size(), paiDer.data(), paiDer.size(), dacDer.data(), dacDer.size(),
-                                 chainValidationResult);
+    const CHIP_ERROR err = ValidateCertificateChain(paaDer.data(), paaDer.size(), paiDer.data(), paiDer.size(), dacDer.data(),
+                                                    dacDer.size(), chainValidationResult);
 
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(chainValidationResult, CertificateChainValidationResult::kSuccess);
