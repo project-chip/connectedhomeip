@@ -153,6 +153,9 @@ be used to specify the the effect. It is able to be in following effects:
 | Blinks (950 ms on/50 ms off)    | Finish ( `Clusters::Identify::EffectIdentifierEnum::kFinishEffect`)          |
 | LED off                         | Stop (`Clusters::Identify::EffectIdentifierEnum::kStopEffect`)               |
 
+For multi-endpoint Identify configuration, see the
+[Multi-Endpoint Identify Guide](MULTI_ENDPOINT_IDENTIFY.md).
+
 ### CHIP tool commands
 
 1. Build
@@ -310,3 +313,10 @@ Semiconductor's kit you own:
     ```
     $ west build -b <build_target> -- -DOVERLAY_CONFIG=rpc.overlay
     ```
+
+```{toctree}
+:hidden:
+:maxdepth: 1
+
+MULTI_ENDPOINT_IDENTIFY
+```
