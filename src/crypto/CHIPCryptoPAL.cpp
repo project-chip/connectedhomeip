@@ -39,6 +39,10 @@
 #include <stdint.h>
 #include <string.h>
 
+#if CHIP_CRYPTO_OPENSSL && !CHIP_CRYPTO_BORINGSSL
+#include <openssl/evp.h>
+#endif
+
 using chip::ByteSpan;
 using chip::MutableByteSpan;
 using chip::Encoding::BufferWriter;
@@ -48,6 +52,25 @@ using namespace chip::ASN1;
 
 namespace chip {
 namespace Crypto {
+
+bool IsMlDsa44Supported()
+{
+#if CHIP_CRYPTO_OPENSSL && !CHIP_CRYPTO_BORINGSSL && defined(EVP_PKEY_ML_DSA_44)
+    return true;
+#else
+    return false;
+#endif
+}
+
+bool IsMlDsa65Supported()
+{
+#if CHIP_CRYPTO_OPENSSL && !CHIP_CRYPTO_BORINGSSL && defined(EVP_PKEY_ML_DSA_65)
+    return true;
+#else
+    return false;
+#endif
+}
+
 namespace {
 
 constexpr uint8_t kIntegerTag         = 0x02u;
