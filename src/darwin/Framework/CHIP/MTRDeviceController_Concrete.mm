@@ -1765,14 +1765,12 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     // In the case that this device is known to use thread, queue this with subscription attempts as well, to
     // help with throttling Thread traffic.
     if ([self definitelyUsesThreadForDevice:nodeID]) {
-        // If we already have a live operational CASE session to this node, reuse it directly.
-        // Reusing an existing session generates no new session-establishment Thread traffic.
+        // Reuse an existing CASE session directly; it generates no new Thread traffic.
         __block BOOL haveExistingCASESession = NO;
-        dispatch_sync(_chipWorkQueue, ^{
-            VerifyOrReturn([self checkIsRunning]);
+        [self syncRunOnWorkQueue:^{
             auto scopedNodeID = self->_cppCommissioner->GetPeerScopedId(nodeID);
             haveExistingCASESession = self->_cppCommissioner->SessionMgr()->FindSecureSessionForNode(scopedNodeID).HasValue();
-        });
+        } error:nil];
         if (haveExistingCASESession) {
             [self directlyGetSessionForNode:nodeID parameters:parameters completion:completion];
             return;
