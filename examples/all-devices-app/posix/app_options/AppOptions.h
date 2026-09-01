@@ -44,8 +44,9 @@ public:
         std::optional<uint32_t> interfaceId;
         std::string kvsPath;
         std::optional<std::string> dacProvider;
-        bool enableWiFi        = false;
-        uint32_t bleController = 0;
+        uint8_t testEventTriggerEnableKey[16] = { 0 };
+        bool enableWiFi                       = false;
+        uint32_t bleController                = 0;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         std::string wifipafExtCmds;
 #endif

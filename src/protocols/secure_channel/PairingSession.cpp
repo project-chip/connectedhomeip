@@ -118,11 +118,13 @@ void PairingSession::DiscardExchange()
     }
 }
 
-CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpLocalConfig,
+CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const SessionParameters & sessionParams,
                                                    TLV::TLVWriter & tlvWriter)
 {
     TLV::TLVType mrpParamsContainer;
     ReturnErrorOnFailure(tlvWriter.StartContainer(tag, TLV::kTLVType_Structure, mrpParamsContainer));
+
+    const ReliableMessageProtocolConfig & mrpLocalConfig = sessionParams.GetMRPConfig();
     ReturnErrorOnFailure(
         tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kSessionIdleInterval), mrpLocalConfig.mIdleRetransTimeout.count()));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kSessionActiveInterval),
@@ -141,6 +143,16 @@ CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const ReliableM
 
     uint16_t maxPathsPerInvoke = CHIP_CONFIG_MAX_PATHS_PER_INVOKE;
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kMaxPathsPerInvoke), maxPathsPerInvoke));
+
+    uint16_t supportedTransports = sessionParams.GetSupportedTransports();
+    if (supportedTransports != 0)
+    {
+        ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kSupportedTransports), supportedTransports));
+
+        uint32_t maxTCPPayloadSize = sessionParams.GetMaxTCPPayloadSize();
+        ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kMaxTCPPayloadSize), maxTCPPayloadSize));
+    }
+
     return tlvWriter.EndContainer(mrpParamsContainer);
 }
 
@@ -229,6 +241,26 @@ CHIP_ERROR PairingSession::DecodeSessionParametersIfPresent(TLV::Tag expectedTag
         uint16_t maxPathsPerInvoke;
         ReturnErrorOnFailure(tlvReader.Get(maxPathsPerInvoke));
         outSessionParameters.SetMaxPathsPerInvoke(maxPathsPerInvoke);
+
+        // The next element is optional. If it's not present, return CHIP_NO_ERROR.
+        SuccessOrExit(err = tlvReader.Next());
+    }
+
+    if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kSupportedTransports)
+    {
+        uint16_t supportedTransports;
+        ReturnErrorOnFailure(tlvReader.Get(supportedTransports));
+        outSessionParameters.SetSupportedTransports(supportedTransports);
+
+        // The next element is optional. If it's not present, return CHIP_NO_ERROR.
+        SuccessOrExit(err = tlvReader.Next());
+    }
+
+    if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kMaxTCPPayloadSize)
+    {
+        uint32_t maxTCPPayloadSize;
+        ReturnErrorOnFailure(tlvReader.Get(maxTCPPayloadSize));
+        outSessionParameters.SetMaxTCPPayloadSize(maxTCPPayloadSize);
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
         SuccessOrExit(err = tlvReader.Next());

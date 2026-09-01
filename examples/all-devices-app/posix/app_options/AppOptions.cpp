@@ -58,8 +58,9 @@ constexpr uint16_t kOptionGroupcast     = 0xffda;
 constexpr uint16_t kOptionAppPipe       = 0xffdb;
 constexpr uint16_t kOptionTraceTo       = 0xffdc;
 constexpr uint16_t kOptionDacProvider   = 0xffdd;
+constexpr uint16_t kOptionEnableKey     = 0xffde;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-constexpr uint16_t kOptionWiFiPAF = 0xffde;
+constexpr uint16_t kOptionWiFiPAF = 0xffdf;
 #endif
 
 DeviceTypeParser AppOptions::sParser;
@@ -180,6 +181,18 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         mConfig.dacProvider = value;
         ChipLogProgress(AppServer, "DAC provider file set to %s", value);
         return true;
+    case kOptionEnableKey: {
+        constexpr size_t kEnableKeyLength = sizeof(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey);
+
+        if (Encoding::HexToBytes(value, strlen(value), mConfig.testEventTriggerEnableKey, kEnableKeyLength) != kEnableKeyLength)
+        {
+
+            ChipLogError(Support, "%s: ERROR: invalid value specified for %s\n", program, name);
+            return false;
+        }
+        ChipLogProgress(AppServer, "TestEventTrigger enable key configured");
+        return true;
+    }
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     case kOptionWiFiPAF:
         mConfig.wifipafExtCmds = value ? value : "";
@@ -213,6 +226,7 @@ OptionSet * AppOptions::GetOptions()
         { "app-pipe", kArgumentRequired, kOptionAppPipe },
         { "trace-to", kArgumentRequired, kOptionTraceTo },
         { "dac_provider", kArgumentRequired, kOptionDacProvider },
+        { "enable-key", kArgumentRequired, kOptionEnableKey },
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         { "wifipaf", kArgumentRequired, kOptionWiFiPAF },
 #endif
@@ -280,6 +294,9 @@ OptionSet * AppOptions::GetOptions()
 
         result += "  --dac_provider <path>\n";
         result += "       Path to JSON file containing device attestation credentials\n\n";
+
+        result += "  --enable-key <key>\n";
+        result += "       A 16-byte, hex-encoded key, used to validate TestEventTrigger command of General Diagnostics cluster\n\n";
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         result += "  --wifipaf freq_list=<freq_1>,<freq_2>...\n";
