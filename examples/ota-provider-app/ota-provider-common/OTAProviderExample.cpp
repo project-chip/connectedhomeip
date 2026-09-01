@@ -502,11 +502,10 @@ void OTAProviderExample::HandleQueryImage(app::CommandHandler * commandObj, cons
 
 void OTAProviderExample::ApplyQueryImageStatusAfterResponse()
 {
-    if (!mPersistQueryImageStatus)
-    {
-        mQueryImageStatus          = OTAQueryStatus::kUpdateAvailable;
-        mDelayedQueryActionTimeSec = 0;
-    }
+    VerifyOrReturn(!mPersistQueryImageStatus);
+
+    mQueryImageStatus          = OTAQueryStatus::kUpdateAvailable;
+    mDelayedQueryActionTimeSec = 0;
 }
 
 void OTAProviderExample::HandleApplyUpdateRequest(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
