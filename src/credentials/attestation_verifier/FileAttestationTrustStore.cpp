@@ -17,6 +17,8 @@
 #include "FileAttestationTrustStore.h"
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <algorithm>
+#include <array>
 #include <cstdio>
 #include <cstring>
 #include <string>
@@ -29,6 +31,89 @@ namespace chip {
 namespace Credentials {
 
 namespace {
+
+enum class CertificateFamily
+{
+    kP256,
+    kMlDsa44,
+    kMlDsa65,
+    kUnknown,
+};
+
+constexpr size_t kCertTypeProbeLength = 512;
+
+// Keep unknown algorithms permissive to avoid skipping future cert profiles.
+constexpr size_t kMaxUnknownDerCertLength = kMaxDERCertLengthMlDsa65;
+
+// DER-encoded OIDs for certificate signature algorithms.
+constexpr uint8_t kOidEcdsaWithSha256[] = { 0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x04, 0x03, 0x02 };
+constexpr uint8_t kOidMlDsa44[]         = { 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x03, 0x11 };
+constexpr uint8_t kOidMlDsa65[]         = { 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x03, 0x12 };
+
+bool ContainsSequence(const uint8_t * haystack, size_t haystackLen, const uint8_t * needle, size_t needleLen)
+{
+    if (haystack == nullptr || needle == nullptr || needleLen == 0 || haystackLen < needleLen)
+    {
+        return false;
+    }
+
+    const uint8_t * begin = haystack;
+    const uint8_t * end   = haystack + haystackLen;
+    return std::search(begin, end, needle, needle + needleLen) != end;
+}
+
+CertificateFamily DetermineCertificateFamilyFromPrefix(const uint8_t * prefix, size_t prefixLen)
+{
+    if (ContainsSequence(prefix, prefixLen, kOidMlDsa44, sizeof(kOidMlDsa44)))
+    {
+        return CertificateFamily::kMlDsa44;
+    }
+
+    if (ContainsSequence(prefix, prefixLen, kOidMlDsa65, sizeof(kOidMlDsa65)))
+    {
+        return CertificateFamily::kMlDsa65;
+    }
+
+    if (ContainsSequence(prefix, prefixLen, kOidEcdsaWithSha256, sizeof(kOidEcdsaWithSha256)))
+    {
+        return CertificateFamily::kP256;
+    }
+
+    return CertificateFamily::kUnknown;
+}
+
+CertificateFamily DetermineCertificateFamilyFromFile(const std::string & filename)
+{
+    std::array<uint8_t, kCertTypeProbeLength> prefix = { 0 };
+
+    FILE * file = fopen(filename.c_str(), "rb");
+    if (file == nullptr)
+    {
+        return CertificateFamily::kUnknown;
+    }
+
+    const size_t bytesRead = fread(prefix.data(), sizeof(uint8_t), prefix.size(), file);
+    fclose(file);
+
+    return DetermineCertificateFamilyFromPrefix(prefix.data(), bytesRead);
+}
+
+size_t MaxDerCertLengthForFamily(CertificateFamily family)
+{
+    switch (family)
+    {
+    case CertificateFamily::kP256:
+        return kMaxDERCertLength;
+    case CertificateFamily::kMlDsa44:
+        return kMaxDERCertLengthMlDsa44;
+    case CertificateFamily::kMlDsa65:
+        return kMaxDERCertLengthMlDsa65;
+    case CertificateFamily::kUnknown:
+    default:
+        return kMaxUnknownDerCertLength;
+    }
+}
+
 const char * GetFilenameExtension(const char * filename)
 {
     const char * dot = strrchr(filename, '.');
@@ -73,10 +158,13 @@ std::vector<std::vector<uint8_t>> LoadAllX509DerCerts(const char * trustStorePat
             const char * fileExtension = GetFilenameExtension(entry->d_name);
             if (strncmp(fileExtension, "der", strlen("der")) == 0)
             {
-                std::vector<uint8_t> certificate(kMaxDERCertLength + 1);
                 std::string filename(trustStorePath);
 
                 filename += std::string("/") + std::string(entry->d_name);
+
+                const CertificateFamily certificateFamily = DetermineCertificateFamilyFromFile(filename);
+                const size_t maxDerCertLengthForFile      = MaxDerCertLengthForFamily(certificateFamily);
+                std::vector<uint8_t> certificate(maxDerCertLengthForFile + 1);
 
                 FILE * file = fopen(filename.c_str(), "rb");
                 if (file == nullptr)
@@ -86,7 +174,7 @@ std::vector<std::vector<uint8_t>> LoadAllX509DerCerts(const char * trustStorePat
                 }
 
                 size_t certificateLength = fread(certificate.data(), sizeof(uint8_t), certificate.size(), file);
-                if ((certificateLength > 0) && (certificateLength <= kMaxDERCertLength))
+                if ((certificateLength > 0) && (certificateLength <= maxDerCertLengthForFile))
                 {
                     certificate.resize(certificateLength);
                     ByteSpan certSpan{ certificate.data(), certificate.size() };
