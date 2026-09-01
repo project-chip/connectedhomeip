@@ -56,13 +56,17 @@ log = logging.getLogger(__name__)
 
 class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
     def desc_TC_PAVST_2_15(self) -> str:
+        """Test case description."""
         return "[TC-PAVST-2.15] Validate UpdateMotionZoneOptions command with Server as DUT - PROVISIONAL"
 
-    def pics_TC_PAVST_2_15(self):
+    def pics_TC_PAVST_2_15(self) -> list[str]:
+        """Required PICS for this test case."""
         return ["PAVST.S", "PAVST.S.F00", "ZONEMGMT.S"]
 
     @async_test_body
-    async def setup_class(self):
+    async def setup_class(self) -> None:
+        """Set up test class resources including mock push AV server."""
+        self.tlsEndpointId: int | None = None
         th_server_app = self.user_params.get("th_server_app_path", None)
         self.server = PushAvServerProcess(server_path=th_server_app)
         self.server.start(
@@ -71,17 +75,22 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         )
         super().setup_class()
 
-    def teardown_class(self):
+    def teardown_class(self) -> None:
+        """Tear down test class resources."""
         if self.server is not None:
             self.server.terminate()
         super().teardown_class()
 
     @async_test_body
-    async def teardown_test(self):
-        await self.postcondition_remove_tls_endpoint(self.tlsEndpointId)
+    async def teardown_test(self) -> None:
+        """Clean up per-test resources."""
+        tls_endpoint_id = getattr(self, "tlsEndpointId", None)
+        if tls_endpoint_id is not None:
+            await self.postcondition_remove_tls_endpoint(tls_endpoint_id)
         super().teardown_test()
 
     def steps_TC_PAVST_2_15(self) -> list[TestStep]:
+        """Test steps definition."""
         return [
             TestStep("precondition", "Commissioning and Zone Setup", is_commissioning=True),
             TestStep(1, "TH1 allocates a PushAV transport with TriggerType = Motion.",
@@ -107,7 +116,8 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             TestStep(15, "If PERZONESENS is True, TH1 sends command with MotionSensitivity.", "DUT responds with INVALID_COMMAND."),
         ]
 
-    async def send_update_motion_zone_options(self, endpoint, connectionID, motionZones=None, motionSensitivity=None, expected_status=Status.Success, expected_cluster_status=None, devCtrl=None):
+    async def send_update_motion_zone_options(self, endpoint: int, connectionID: int, motionZones=None, motionSensitivity=None, expected_status: Status = Status.Success, expected_cluster_status=None, devCtrl=None) -> Status | int:
+        """Helper to send UpdateMotionZoneOptions and validate response."""
         pvcluster = Clusters.PushAvStreamTransport
         dev_ctrl = devCtrl if devCtrl is not None else self.default_controller
 
@@ -122,6 +132,10 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             # This call will fail at runtime if the command is missing in the SDK.
             cmd = pvcluster.Commands.UpdateMotionZoneOptions(args)
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, dev_ctrl=dev_ctrl)
+            asserts.assert_is_none(
+                expected_cluster_status,
+                f"Expected cluster status {expected_cluster_status} but command succeeded",
+            )
             asserts.assert_equal(expected_status, Status.Success, "Expected failure but succeeded")
             return Status.Success
         except InteractionModelError as e:
@@ -130,13 +144,14 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                 return e.clusterStatus
             asserts.assert_equal(e.status, expected_status, "Status mismatch")
             return e.status
-        except AttributeError as e:
+        except AttributeError:
             # Fallback/Log error if the command is indeed missing in the generated SDK
-            log.error("UpdateMotionZoneOptions command not found in SDK: %s", e)
-            raise e
+            log.error("UpdateMotionZoneOptions command not found in SDK")
+            raise
 
-    @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport) and has_cluster(Clusters.ZoneManagement))
-    async def test_TC_PAVST_2_15(self):
+    @run_if_endpoint_matches(lambda wildcard, endpoint: has_cluster(Clusters.PushAvStreamTransport)(wildcard, endpoint) and has_cluster(Clusters.ZoneManagement)(wildcard, endpoint))
+    async def test_TC_PAVST_2_15(self) -> None:
+        """Run TC-PAVST-2.15 test."""
         endpoint = self.get_endpoint()
         self.endpoint = endpoint
         self.node_id = self.dut_node_id
@@ -191,10 +206,11 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             cmdResponse = await self.send_single_cmd(endpoint=endpoint, cmd=zmcluster.Commands.CreateTwoDCartesianZone(zone=zoneToCreate))
             aZoneID2 = cmdResponse.zoneID
         else:
+            motion_zones = [z for z in aZones if z.use == zmcluster.Enums.ZoneUseEnum.kMotion]
             asserts.assert_greater_equal(
-                len(aZones), 2, "Test requires at least 2 pre-existing zones if UserDefined is not supported")
-            aZoneID1 = aZones[0].zoneID
-            aZoneID2 = aZones[1].zoneID
+                len(motion_zones), 2, "Test requires at least 2 pre-existing motion zones if UserDefined is not supported")
+            aZoneID1 = motion_zones[0].zoneID
+            aZoneID2 = motion_zones[1].zoneID
 
         # Clean up existing transports
         status = await self.check_and_delete_all_push_av_transports(endpoint, pvattr)
@@ -261,40 +277,53 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
         # Step 6: Too many zones (aMaxZones + 1)
         self.step(6)
+        valid_zone_ids = [aZoneID1, aZoneID2]
+        temp_zone_ids = []
         if twoDCartSupported and userDefinedSupported:
-            temp_zones = []
-            for i in range(aMaxZones + 1):
+            for i in range(len(valid_zone_ids), aMaxZones):
                 zoneVertices = [
                     zmcluster.Structs.TwoDCartesianVertexStruct(x=10, y=10),
                     zmcluster.Structs.TwoDCartesianVertexStruct(x=20, y=10),
                     zmcluster.Structs.TwoDCartesianVertexStruct(x=20, y=20),
-                    zmcluster.Structs.TwoDCartesianVertexStruct(x=10, y=20)
+                    zmcluster.Structs.TwoDCartesianVertexStruct(x=10, y=20),
                 ]
                 zoneToCreate = zmcluster.Structs.TwoDCartesianZoneStruct(
-                    name=f"TempZone{i}", use=zmcluster.Enums.ZoneUseEnum.kMotion, vertices=zoneVertices,
-                    color="#00FFFF")
+                    name=f"TempZone{i}",
+                    use=zmcluster.Enums.ZoneUseEnum.kMotion,
+                    vertices=zoneVertices,
+                    color="#00FFFF",
+                )
                 try:
-                    cmdResponse = await self.send_single_cmd(endpoint=endpoint, cmd=zmcluster.Commands.CreateTwoDCartesianZone(zone=zoneToCreate))
-                    temp_zones.append({"zone": cmdResponse.zoneID, "sensitivity": 4})
+                    cmdResponse = await self.send_single_cmd(
+                        endpoint=endpoint,
+                        cmd=zmcluster.Commands.CreateTwoDCartesianZone(zone=zoneToCreate),
+                    )
+                    temp_zone_ids.append(cmdResponse.zoneID)
+                    valid_zone_ids.append(cmdResponse.zoneID)
                 except InteractionModelError as e:
-                    # If we hit max zones during creation, that's also a constraint, but we want to test the command constraint.
-                    # If we can't create them, we can't run this step properly.
-                    log.warning("Failed to create temp zone for limit test: %s", e)
+                    log.warning("Could not create additional temp zone: %s", e)
+                    break
 
-            if len(temp_zones) > aMaxZones:
-                await self.send_update_motion_zone_options(
-                    endpoint, aConnectionID, motionZones=temp_zones, expected_status=Status.DynamicConstraintError)
-                # Clean up temp zones
-                for tz in temp_zones:
+        try:
+            too_many_zones = [
+                {"zone": valid_zone_ids[i % len(valid_zone_ids)], "sensitivity": 4}
+                for i in range(aMaxZones + 1)
+            ]
+            await self.send_update_motion_zone_options(
+                endpoint,
+                aConnectionID,
+                motionZones=too_many_zones,
+                expected_status=Status.DynamicConstraintError,
+            )
+        finally:
+            for zid in temp_zone_ids:
+                try:
                     await self.send_single_cmd(
                         endpoint=endpoint,
-                        cmd=zmcluster.Commands.DeleteZone(zoneID=tz["zone"]))
-            else:
-                log.warning("Could not create enough zones to test MaxZones constraint. Skipping Step 6.")
-                self.skip_step(6)
-        else:
-            log.warning("UserDefined zones not supported, cannot create enough zones to test MaxZones constraint. Skipping Step 6.")
-            self.skip_step(6)
+                        cmd=zmcluster.Commands.DeleteZone(zoneID=zid),
+                    )
+                except Exception as e:
+                    log.warning("Failed to delete temp zone %s: %s", zid, e)
 
         # Step 7: Invalid ZoneID
         self.step(7)
@@ -315,11 +344,6 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
         # Step 9: Verify empty via FindTransport
         self.step(9)
-        # FindTransport response structure:
-        # status = await self.send_single_cmd(cmd=pvcluster.Commands.FindTransport(connectionID=aConnectionID), ...)
-        # We can use the helper from base class: psvt_find_transport
-        # But it asserts expected_connectionID.
-        # We want to check the content of the response.
         cmd = pvcluster.Commands.FindTransport(connectionID=aConnectionID)
         response = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
         asserts.assert_equal(len(response.transportConfigurations), 1, "Expected 1 transport config")
