@@ -15,6 +15,30 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${CAMERA_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --camera-test-videosrc --camera-test-audiosrc
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --string-arg th_server_app_path:${PUSH_AV_SERVER}
+#       --string-arg host_ip:localhost
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
+#       --timeout 300
+#     factory-reset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
+
 import logging
 
 from mobly import asserts
@@ -81,7 +105,7 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
     async def send_update_motion_zone_options(self, endpoint, connectionID, motionZones=None, motionSensitivity=None, expected_status=Status.Success, expected_cluster_status=None, devCtrl=None):
         pvcluster = Clusters.PushAvStreamTransport
         dev_ctrl = devCtrl if devCtrl is not None else self.default_controller
-        
+
         args = {"connectionID": connectionID}
         if motionZones is not None:
             args["motionZones"] = motionZones
@@ -228,17 +252,6 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
         # Step 6: Too many zones (aMaxZones + 1)
         self.step(6)
-        too_many_zones = []
-        for i in range(aMaxZones + 1):
-            # We need valid ZoneIDs. Since we might not have enough, we might have to reuse or use fake ones.
-            # But the step says "valid Zone IDs". If we can't create them, this is hard.
-            # If user-defined is supported, we could create them.
-            # For now, we will try to use sequential IDs, but they might not be "valid" if they don't exist.
-            # The test plan says "valid Zone IDs".
-            # If we can't create them, we might have to skip or assume we can create them.
-            # Let's try to create them if supported, otherwise we might fail this step if we don't have enough.
-            pass
-        
         if twoDCartSupported and userDefinedSupported:
             temp_zones = []
             for i in range(aMaxZones + 1):
@@ -258,7 +271,7 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                     # If we hit max zones during creation, that's also a constraint, but we want to test the command constraint.
                     # If we can't create them, we can't run this step properly.
                     log.warning("Failed to create temp zone for limit test: %s", e)
-            
+
             if len(temp_zones) > aMaxZones:
                 await self.send_update_motion_zone_options(
                     endpoint, aConnectionID, motionZones=temp_zones, expected_status=Status.DynamicConstraintError)
@@ -276,11 +289,11 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
         # Step 7: Invalid ZoneID
         self.step(7)
-        invalid_zone_id = 9999 # Hopefully invalid
+        invalid_zone_id = 9999  # Hopefully invalid
         # Check if it is indeed not in aZones
         while any(z.zoneID == invalid_zone_id for z in aZones):
             invalid_zone_id += 1
-        
+
         invalid_zones = [{"zone": invalid_zone_id, "sensitivity": 4}]
         await self.send_update_motion_zone_options(
             endpoint, aConnectionID, motionZones=invalid_zones,
