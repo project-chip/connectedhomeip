@@ -48,11 +48,8 @@ static CHIP_ERROR OpenCommissioningWindowHandler(int argc, char ** argv)
         streamer_printf(streamer_get(), "Opening commissioning window failed due to %" CHIP_ERROR_FORMAT "\r\n", err.Format());
         return err;
     }
-    else
-    {
-        streamer_printf(streamer_get(), "Opened commissioning window \r\n");
-    }
 
+    streamer_printf(streamer_get(), "Opened commissioning window \r\n");
     return CHIP_NO_ERROR;
 }
 

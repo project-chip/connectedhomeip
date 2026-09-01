@@ -33,7 +33,8 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/ThreadStackManager.h>
 
-#if CHIP_TARGET_STYLE_EMBEDDED
+#if CHIP_TARGET_STYLE_EMBEDDED &&                                                                                      \
+    (CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI || (defined(CONFIG_OPENTHREAD_SHELL) && CONFIG_OPENTHREAD_SHELL))
 #include <lib/support/StringBuilder.h>
 #include <openthread/cli.h>
 #include <openthread/instance.h>
@@ -50,7 +51,8 @@ static constexpr uint16_t sTxLength = SHELL_OTCLI_TX_BUFFER_SIZE;
 #endif // !CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI)
 #endif
 static constexpr uint16_t kMaxLineLength = 384;
-#else
+
+#elif CHIP_TARGET_STYLE_UNIX
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -77,7 +79,8 @@ CHIP_ERROR cmd_otcli_help(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
-#if CHIP_TARGET_STYLE_EMBEDDED
+#if CHIP_TARGET_STYLE_EMBEDDED &&                                                                                      \
+    (CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI || (defined(CONFIG_OPENTHREAD_SHELL) && CONFIG_OPENTHREAD_SHELL))
 
 CHIP_ERROR cmd_otcli_dispatch(int argc, char ** argv)
 {
@@ -104,6 +107,27 @@ CHIP_ERROR cmd_otcli_dispatch(int argc, char ** argv)
 
     return CHIP_NO_ERROR;
 }
+
+static const shell_command_t cmds_otcli_root = { &cmd_otcli_dispatch, "otcli", "Dispatch OpenThread CLI command" };
+
+#if OPENTHREAD_API_VERSION >= 85
+#if !CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+static int OnOtCliOutput(void * aContext, const char * aFormat, va_list aArguments)
+{
+    int rval = vsnprintf(sTxBuffer, sTxLength, aFormat, aArguments);
+    VerifyOrExit(rval >= 0 && rval < sTxLength, rval = CHIP_ERROR_BUFFER_TOO_SMALL.AsInteger());
+    return streamer_write(streamer_get(), (const char *) sTxBuffer, rval);
+exit:
+    return rval;
+}
+#endif // !CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+#else
+
+static int OnOtCliOutput(const char * aBuf, uint16_t aBufLength, void * aContext)
+{
+    return streamer_write(streamer_get(), aBuf, aBufLength);
+}
+#endif
 
 #elif CHIP_TARGET_STYLE_UNIX
 
@@ -146,37 +170,17 @@ CHIP_ERROR cmd_otcli_dispatch(int argc, char ** argv)
     }
 }
 
-#endif // CHIP_TARGET_STYLE_UNIX
-
 static const shell_command_t cmds_otcli_root = { &cmd_otcli_dispatch, "otcli", "Dispatch OpenThread CLI command" };
 
-#if CHIP_TARGET_STYLE_EMBEDDED
-#if OPENTHREAD_API_VERSION >= 85
-#if !CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
-static int OnOtCliOutput(void * aContext, const char * aFormat, va_list aArguments)
-{
-    int rval = vsnprintf(sTxBuffer, sTxLength, aFormat, aArguments);
-    VerifyOrExit(rval >= 0 && rval < sTxLength, rval = CHIP_ERROR_BUFFER_TOO_SMALL.AsInteger());
-    return streamer_write(streamer_get(), (const char *) sTxBuffer, rval);
-exit:
-    return rval;
-}
-#endif // !CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
-#else
-
-static int OnOtCliOutput(const char * aBuf, uint16_t aBufLength, void * aContext)
-{
-    return streamer_write(streamer_get(), aBuf, aBufLength);
-}
-#endif
-#endif
+#endif // CHIP_TARGET_STYLE_EMBEDDED/UNIX
 
 #endif // CHIP_ENABLE_OPENTHREAD
 
 void cmd_otcli_init()
 {
 #if CHIP_ENABLE_OPENTHREAD
-#if CHIP_TARGET_STYLE_EMBEDDED
+#if CHIP_TARGET_STYLE_EMBEDDED &&                                                                                      \
+    (CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI || (defined(CONFIG_OPENTHREAD_SHELL) && CONFIG_OPENTHREAD_SHELL))
 #if !CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
 #if OPENTHREAD_API_VERSION >= 85
     otCliInit(otInstanceInitSingle(), &OnOtCliOutput, NULL);
@@ -184,9 +188,13 @@ void cmd_otcli_init()
     otCliConsoleInit(otInstanceInitSingle(), &OnOtCliOutput, NULL);
 #endif // OPENTHREAD_API_VERSION >= 85
 #endif // !CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
-#endif // CHIP_TARGET_STYLE_EMBEDDED
 
     // Register the root otcli command with the top-level shell.
     Engine::Root().RegisterCommands(&cmds_otcli_root, 1);
+
+#elif CHIP_TARGET_STYLE_UNIX
+    // Register the root otcli command with the top-level shell.
+    Engine::Root().RegisterCommands(&cmds_otcli_root, 1);
+#endif
 #endif // CHIP_ENABLE_OPENTHREAD
 }

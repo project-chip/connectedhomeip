@@ -42,10 +42,6 @@ bool sIsInitialized = false;
 atomic_t sRestart   = ATOMIC_INIT(0);
 uint8_t sBtId       = 0;
 
-#if KERNEL_VERSION_MAJOR >= 4
-bool sWasDisconnection = false;
-#endif // KERNEL_VERSION_MAJOR >= 4
-
 // Cast an intrusive list node to the containing request object
 const BLEAdvertisingArbiter::Request & ToRequest(const sys_snode_t * node)
 {
