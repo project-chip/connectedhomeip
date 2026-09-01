@@ -46,7 +46,7 @@ namespace {
 // TODO: change once there is a clear public interface for the OnOff cluster data dependencies (#27508)
 IntrusiveList<Instance> gModeBaseInstances;
 
-// The 10 clusters that share this attribute structure.
+// The 11 clusters that share this attribute structure.
 constexpr ClusterEntry kAliasedClusters[] = {
     kDeviceEnergyManagementMode,                      //
     kDishwasherMode,                                  //
@@ -57,6 +57,7 @@ constexpr ClusterEntry kAliasedClusters[] = {
     kRefrigeratorAndTemperatureControlledCabinetMode, //
     kRvcCleanMode,                                    //
     kRvcRunMode,                                      //
+    kThermostatMode,                                  //
     kWaterHeaterMode,                                 //
 };
 
@@ -108,9 +109,23 @@ CHIP_ERROR Instance::Init()
     }
     VerifyOrReturnError(aliasedClusterEntry.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    // Although StartUpMode attribute is optional, spec says that none of the aliased clusters supports it.
-    VerifyOrReturnError(!emberAfContainsAttribute(mClusterPath.mEndpointId, mClusterPath.mClusterId, StartUpMode::Id),
-                        CHIP_ERROR_INCORRECT_STATE);
+    switch (mClusterPath.mClusterId)
+    {
+        case ThermostatMode::Id:
+            if (emberAfContainsAttribute(mClusterPath.mEndpointId, mClusterPath.mClusterId, StartUpMode::Id))
+            {
+                mOptionalAttributeSet.Set<StartUpMode::Id>();
+            }
+            break;
+        default:
+            // Although StartUpMode attribute is optional, spec says that none of the other
+            // aliased clusters supports it.
+            VerifyOrReturnError(!emberAfContainsAttribute(mClusterPath.mEndpointId, mClusterPath.mClusterId, StartUpMode::Id),
+                                CHIP_ERROR_INCORRECT_STATE);
+            // The only cluster that currently uses the core mode tags feature is Thermostat Mode.
+            VerifyOrReturnError(!HasFeature(ModeBase::Feature::kCoreModes),  CHIP_ERROR_INCORRECT_STATE);
+            break;
+    }
 
     bool onOffValueForStartUp = false;
 
@@ -204,6 +219,12 @@ CHIP_ERROR Instance::GetModeValueByModeTag(uint16_t modeTag, uint8_t & value)
 {
     VerifyOrDie(mCluster.IsConstructed());
     return mCluster.Cluster().GetModeValueByModeTag(modeTag, value);
+}
+
+bool Instance::IsSupportedCoreModeTag(uint16_t coreModeTag)
+{
+    VerifyOrDie(mCluster.IsConstructed());
+    return mCluster.Cluster().IsSupportedCoreModeTag(coreModeTag);
 }
 
 void Instance::RegisterThisInstance()

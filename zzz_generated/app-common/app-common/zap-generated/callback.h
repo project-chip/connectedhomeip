@@ -7808,18 +7808,6 @@ bool emberAfLevelControlClusterMoveToClosestFrequencyCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::LevelControl::Commands::MoveToClosestFrequency::DecodableType & commandData);
 /**
- * @brief Thermostat Mode Cluster ChangeToMode Command callback (from client)
- */
-bool emberAfThermostatModeClusterChangeToModeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ThermostatMode::Commands::ChangeToMode::DecodableType & commandData);
-/**
- * @brief Thermostat Mode Cluster ChangeToModeByCoreTag Command callback (from client)
- */
-bool emberAfThermostatModeClusterChangeToModeByCoreTagCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ThermostatMode::Commands::ChangeToModeByCoreTag::DecodableType & commandData);
-/**
  * @brief Water Tank Level Monitoring Cluster ResetCondition Command callback (from client)
  */
 bool emberAfWaterTankLevelMonitoringClusterResetConditionCallback(

@@ -26,6 +26,7 @@
 
 #include "thermostat-delegate-impl.h"
 #include "thermostat-hold-delegate-impl.h"
+#include "thermostat-mode-delegate-impl.h"
 #include "thermostat-presets-delegate-impl.h"
 #include "thermostat-setpoints-delegate-impl.h"
 #include "thermostat-suggestions-delegate-impl.h"
@@ -93,10 +94,16 @@ void ApplicationInit()
 
     Clusters::Thermostat::ServerInit<ThermostatClusterType>(gThermostatEndpoint, gThermostatDelegate, gSetpointsDelegate,
                                                             gHoldDelegate, gPresetsDelegate, gSuggestionsDelegate);
+    CHIP_ERROR err = Clusters::ThermostatMode::Init(gThermostatEndpoint);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to initialize ThermostatMode: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
 void ApplicationShutdown()
 {
+    Clusters::ThermostatMode::Shutdown();
     chip::app::Clusters::Thermostat::ServerShutdown<ThermostatClusterType>(gThermostatEndpoint,
                                                                            MatterClusterShutdownType::kClusterShutdown);
 }

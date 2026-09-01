@@ -97,8 +97,24 @@ public:
         mLastHandledNewMode = newMode;
     }
 
-    bool mRejectNextChange      = false;
-    uint8_t mLastHandledNewMode = 0xFF;
+    CHIP_ERROR GetCoreModeTagByIndex(uint8_t tagIndex, uint16_t & tag) override
+    {
+        static constexpr uint16_t kCoreTags[] = { to_underlying(ModeTag::kAuto), to_underlying(ModeTag::kLowEnergy) };
+        VerifyOrReturnError(tagIndex < MATTER_ARRAY_SIZE(kCoreTags), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
+        tag = kCoreTags[tagIndex];
+        return CHIP_NO_ERROR;
+    }
+
+    void HandleChangeToModeByCoreTag(uint16_t newModeTag, uint8_t & newMode,
+                                    Commands::ChangeToModeResponse::Type & response) override
+    {
+        mLastHandledCoreModeTag = newModeTag;
+        AppDelegate::HandleChangeToModeByCoreTag(newModeTag, newMode, response);
+    }
+
+    bool mRejectNextChange          = false;
+    uint8_t mLastHandledNewMode     = 0xFF;
+    uint16_t mLastHandledCoreModeTag = 0xFFFF;
 };
 
 struct TestModeBaseCluster : public ::testing::Test
@@ -112,6 +128,7 @@ struct TestModeBaseCluster : public ::testing::Test
         optionalAttributeSet               = {};
         appDelegate.mRejectNextChange      = false;
         appDelegate.mLastHandledNewMode    = 0xFF;
+        appDelegate.mLastHandledCoreModeTag = 0xFFFF;
         diagnosticDataProvider.mBootReason = GeneralDiagnostics::BootReasonEnum::kUnspecified;
         testContext.StorageDelegate().ClearStorage();
     }
@@ -460,6 +477,264 @@ TEST_F(TestModeBaseCluster, ReportSupportedModesChangeNotifiesAttribute)
     tester.GetDirtyList().clear();
     cluster.ReportSupportedModesChange();
     EXPECT_TRUE(tester.IsAttributeDirty(SupportedModes::Id));
+}
+
+TEST_F(TestModeBaseCluster, AttributeListWithCoreModesFeature)
+{
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig(BitMask<Feature>(Feature::kCoreModes)));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                        {
+                                            SupportedModes::kMetadataEntry,
+                                            CurrentMode::kMetadataEntry,
+                                            CoreModeTags::kMetadataEntry,
+                                        }));
+}
+
+TEST_F(TestModeBaseCluster, AcceptedCommandsWithCoreModesFeature)
+{
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig(BitMask<Feature>(Feature::kCoreModes)));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                              {
+                                                  Commands::ChangeToMode::kMetadataEntry,
+                                                  Commands::ChangeToModeByCoreTag::kMetadataEntry,
+                                              }));
+}
+
+TEST_F(TestModeBaseCluster, ReadCoreModeTagsAttribute)
+{
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig(BitMask<Feature>(Feature::kCoreModes)));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    uint32_t featureMap = 0;
+    ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    EXPECT_EQ(featureMap, to_underlying(Feature::kCoreModes));
+
+    Attributes::CoreModeTags::TypeInfo::DecodableType coreModeTags;
+    ASSERT_EQ(tester.ReadAttribute(CoreModeTags::Id, coreModeTags), CHIP_NO_ERROR);
+    auto it = coreModeTags.begin();
+    ASSERT_TRUE(it.Next());
+    EXPECT_EQ(it.GetValue(), to_underlying(ModeTag::kAuto));
+    ASSERT_TRUE(it.Next());
+    EXPECT_EQ(it.GetValue(), to_underlying(ModeTag::kLowEnergy));
+    EXPECT_FALSE(it.Next());
+}
+
+TEST_F(TestModeBaseCluster, IsSupportedCoreModeTag)
+{
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig(BitMask<Feature>(Feature::kCoreModes)));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(cluster.IsSupportedCoreModeTag(to_underlying(ModeTag::kAuto)));
+    EXPECT_TRUE(cluster.IsSupportedCoreModeTag(to_underlying(ModeTag::kLowEnergy)));
+    EXPECT_FALSE(cluster.IsSupportedCoreModeTag(to_underlying(ModeTag::kQuiet)));
+    EXPECT_FALSE(cluster.IsSupportedCoreModeTag(0xFFFF));
+}
+
+TEST_F(TestModeBaseCluster, ModeHasTag)
+{
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig());
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(cluster.ModeHasTag(0, to_underlying(ModeTag::kAuto)));
+    EXPECT_FALSE(cluster.ModeHasTag(0, to_underlying(ModeTag::kLowEnergy)));
+    EXPECT_TRUE(cluster.ModeHasTag(1, to_underlying(ModeTag::kLowEnergy)));
+    EXPECT_FALSE(cluster.ModeHasTag(1, to_underlying(ModeTag::kAuto)));
+    EXPECT_FALSE(cluster.ModeHasTag(99, to_underlying(ModeTag::kAuto)));
+}
+
+TEST_F(TestModeBaseCluster, ChangeToModeByCoreTagUnsupportedTag)
+{
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig(BitMask<Feature>(Feature::kCoreModes)));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    Commands::ChangeToModeByCoreTag::Type request;
+    request.newModeTag = to_underlying(ModeTag::kQuiet);
+    auto result        = tester.Invoke(request);
+    ASSERT_TRUE(result.status.has_value() && result.status->IsSuccess());
+    ASSERT_TRUE(result.response.has_value() && result.response->status == to_underlying(StatusCode::kUnsupportedMode));
+    EXPECT_EQ(cluster.GetCurrentMode(), 0u);
+}
+
+TEST_F(TestModeBaseCluster, ChangeToModeByCoreTagSuccessUpdatesCurrentMode)
+{
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig(BitMask<Feature>(Feature::kCoreModes)));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    Commands::ChangeToModeByCoreTag::Type request;
+    request.newModeTag = to_underlying(ModeTag::kLowEnergy);
+    auto result        = tester.Invoke(request);
+    ASSERT_TRUE(result.status.has_value() && result.status->IsSuccess());
+    ASSERT_TRUE(result.response.has_value() && result.response->status == to_underlying(StatusCode::kSuccess));
+    EXPECT_EQ(cluster.GetCurrentMode(), 1u);
+    EXPECT_EQ(appDelegate.mLastHandledCoreModeTag, to_underlying(ModeTag::kLowEnergy));
+    EXPECT_EQ(appDelegate.mLastHandledNewMode, 1u);
+    EXPECT_TRUE(tester.IsAttributeDirty(CurrentMode::Id));
+}
+
+TEST_F(TestModeBaseCluster, ChangeToModeByCoreTagSameModeReturnsSuccessWithoutUpdating)
+{
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig(BitMask<Feature>(Feature::kCoreModes)));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    Commands::ChangeToModeByCoreTag::Type request;
+    request.newModeTag = to_underlying(ModeTag::kAuto);
+    auto result        = tester.Invoke(request);
+    ASSERT_TRUE(result.status.has_value() && result.status->IsSuccess());
+    ASSERT_TRUE(result.response.has_value() && result.response->status == to_underlying(StatusCode::kSuccess));
+    EXPECT_EQ(cluster.GetCurrentMode(), 0u);
+}
+
+TEST_F(TestModeBaseCluster, ChangeToModeByCoreTagDelegateFailureLeavesCurrentModeUnchanged)
+{
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig(BitMask<Feature>(Feature::kCoreModes)));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    appDelegate.mRejectNextChange = true;
+
+    Commands::ChangeToModeByCoreTag::Type request;
+    request.newModeTag = to_underlying(ModeTag::kLowEnergy);
+    auto result        = tester.Invoke(request);
+    ASSERT_TRUE(result.status.has_value() && result.status->IsSuccess());
+    ASSERT_TRUE(result.response.has_value() && result.response->status == to_underlying(StatusCode::kGenericFailure));
+    EXPECT_EQ(cluster.GetCurrentMode(), 0u);
+}
+
+TEST_F(TestModeBaseCluster, ChangeToModeByCoreTagMultiModeSelection)
+{
+    class TestMultiModeAppDelegate : public ModeBase::AppDelegate
+    {
+    public:
+        CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
+
+        CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan & label) override
+        {
+            static constexpr CharSpan kLabels[] = { "Normal"_span, "Eco"_span, "EcoMax"_span };
+            VerifyOrReturnError(modeIndex < MATTER_ARRAY_SIZE(kLabels), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
+            return CopyCharSpanToMutableCharSpan(kLabels[modeIndex], label);
+        }
+
+        CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) override
+        {
+            static constexpr uint8_t kValues[] = { 0, 1, 2 };
+            VerifyOrReturnError(modeIndex < MATTER_ARRAY_SIZE(kValues), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
+            value = kValues[modeIndex];
+            return CHIP_NO_ERROR;
+        }
+
+        CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<ModeTagStructType> & modeTags) override
+        {
+            if (modeIndex == 0)
+            {
+                VerifyOrReturnError(modeTags.size() >= 1, CHIP_ERROR_INVALID_ARGUMENT);
+                modeTags[0].value = to_underlying(ModeTag::kAuto);
+                modeTags.reduce_size(1);
+                return CHIP_NO_ERROR;
+            }
+            if (modeIndex == 1)
+            {
+                VerifyOrReturnError(modeTags.size() >= 1, CHIP_ERROR_INVALID_ARGUMENT);
+                modeTags[0].value = to_underlying(ModeTag::kLowEnergy);
+                modeTags.reduce_size(1);
+                return CHIP_NO_ERROR;
+            }
+            if (modeIndex == 2)
+            {
+                VerifyOrReturnError(modeTags.size() >= 2, CHIP_ERROR_INVALID_ARGUMENT);
+                modeTags[0].value = to_underlying(ModeTag::kLowEnergy);
+                modeTags[1].value = to_underlying(ModeTag::kMax);
+                modeTags.reduce_size(2);
+                return CHIP_NO_ERROR;
+            }
+            return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+        }
+
+        CHIP_ERROR GetCoreModeTagByIndex(uint8_t tagIndex, uint16_t & tag) override
+        {
+            static constexpr uint16_t kCoreTags[] = { to_underlying(ModeTag::kAuto), to_underlying(ModeTag::kLowEnergy) };
+            VerifyOrReturnError(tagIndex < MATTER_ARRAY_SIZE(kCoreTags), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
+            tag = kCoreTags[tagIndex];
+            return CHIP_NO_ERROR;
+        }
+
+        void HandleChangeToMode(uint8_t newMode, Commands::ChangeToModeResponse::Type & response) override
+        {
+            response.status = to_underlying(StatusCode::kSuccess);
+        }
+
+        void HandleChangeToModeByCoreTag(uint16_t newModeTag, uint8_t & newMode,
+                                        Commands::ChangeToModeResponse::Type & response) override
+        {
+            if (newModeTag == to_underlying(ModeTag::kLowEnergy))
+            {
+                newMode = 2; // Choose EcoMax (mode 2) over default Eco (mode 1)
+            }
+            HandleChangeToMode(newMode, response);
+        }
+    };
+
+    TestMultiModeAppDelegate multiAppDelegate;
+    ModeBaseCluster::Config config{
+        .feature                = BitMask<Feature>(Feature::kCoreModes),
+        .optionalAttributeSet   = {},
+        .appDelegate            = multiAppDelegate,
+        .onOffValueForStartUp   = false,
+        .diagnosticDataProvider = diagnosticDataProvider,
+    };
+
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, config);
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_EQ(cluster.GetCurrentMode(), 0u);
+
+    // Invoke ChangeToModeByCoreTag for LowEnergy, delegate selects mode 2
+    Commands::ChangeToModeByCoreTag::Type request;
+    request.newModeTag = to_underlying(ModeTag::kLowEnergy);
+    auto result        = tester.Invoke(request);
+    ASSERT_TRUE(result.status.has_value() && result.status->IsSuccess());
+    ASSERT_TRUE(result.response.has_value() && result.response->status == to_underlying(StatusCode::kSuccess));
+    EXPECT_EQ(cluster.GetCurrentMode(), 2u);
+
+    // Invoke ChangeToModeByCoreTag for LowEnergy again while in mode 2, no change
+    result = tester.Invoke(request);
+    ASSERT_TRUE(result.status.has_value() && result.status->IsSuccess());
+    ASSERT_TRUE(result.response.has_value() && result.response->status == to_underlying(StatusCode::kSuccess));
+    EXPECT_EQ(cluster.GetCurrentMode(), 2u);
+}
+
+TEST_F(TestModeBaseCluster, ThermostatModeClusterIntegration)
+{
+    ModeBaseCluster cluster(kRootEndpointId, kThermostatMode, MakeConfig(BitMask<Feature>(Feature::kCoreModes)));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    uint32_t revision = 0;
+    ASSERT_EQ(tester.ReadAttribute(ClusterRevision::Id, revision), CHIP_NO_ERROR);
+    EXPECT_EQ(revision, ThermostatMode::kRevision);
+
+    uint32_t featureMap = 0;
+    ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    EXPECT_EQ(featureMap, to_underlying(Feature::kCoreModes));
+
+    Commands::ChangeToModeByCoreTag::Type request;
+    request.newModeTag = to_underlying(ModeTag::kLowEnergy);
+    auto result        = tester.Invoke(request);
+    ASSERT_TRUE(result.status.has_value() && result.status->IsSuccess());
+    ASSERT_TRUE(result.response.has_value() && result.response->status == to_underlying(StatusCode::kSuccess));
+    EXPECT_EQ(cluster.GetCurrentMode(), 1u);
 }
 
 } // namespace

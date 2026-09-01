@@ -2244,6 +2244,71 @@ cluster UserLabel = 65 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster is derived from the Mode Base cluster, defining additional mode tags and namespaced enumerated values for thermostat devices. */
+cluster ThermostatMode = 99 {
+  revision 1;
+
+  enum ModeTag : enum16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
+    kOff = 16384;
+    kCool = 16385;
+    kHeat = 16386;
+    kEmergencyHeat = 16387;
+  }
+
+  bitmap Feature : bitmap32 {
+    kCoreModes = 0x2;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute optional nullable int8u startUpMode = 2;
+  provisional readonly attribute optional enum16 coreModeTags[] = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    int8u newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 1 {
+    enum8 status = 0;
+    optional char_string<64> statusText = 1;
+  }
+
+  request struct ChangeToModeByCoreTagRequest {
+    enum16 newModeTag = 0;
+  }
+
+  /** This command is used to change device modes. */
+  command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+  /** This command is used to change the mode of the device to one of the modes with a tag list that includes the given mode tag value. */
+  command ChangeToModeByCoreTag(ChangeToModeByCoreTagRequest): ChangeToModeResponse = 2;
+}
+
 /** An interface for configuring and controlling the functionality of a thermostat. */
 cluster Thermostat = 513 {
   revision 11;
@@ -3109,6 +3174,21 @@ endpoint 1 {
     callback attribute partsList;
     callback attribute featureMap;
     callback attribute clusterRevision;
+  }
+
+  server cluster ThermostatMode {
+    callback attribute supportedModes;
+    callback attribute currentMode;
+    ram      attribute startUpMode;
+    callback attribute coreModeTags;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap default = 2;
+    ram      attribute clusterRevision default = 1;
+
+    handle command ChangeToMode;
+    handle command ChangeToModeByCoreTag;
   }
 
   server cluster Thermostat {
