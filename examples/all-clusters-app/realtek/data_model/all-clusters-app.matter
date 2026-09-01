@@ -5458,6 +5458,10 @@ cluster DeviceEnergyManagementMode = 159 {
     kGridOptimization = 16387;
   }
 
+  bitmap Feature : bitmap32 {
+    kCoreModes = 0x2;
+  }
+
   shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
@@ -10014,3 +10018,5 @@ endpoint 4 {
     callback attribute clusterRevision;
   }
 }
+
+

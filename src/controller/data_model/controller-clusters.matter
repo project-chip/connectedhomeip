@@ -5905,7 +5905,7 @@ cluster WaterHeaterMode = 158 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster DeviceEnergyManagementMode = 159 {
-  revision 2;
+  revision 3;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -5922,6 +5922,10 @@ cluster DeviceEnergyManagementMode = 159 {
     kDeviceOptimization = 16385;
     kLocalOptimization = 16386;
     kGridOptimization = 16387;
+  }
+
+  bitmap Feature : bitmap32 {
+    kCoreModes = 0x2;
   }
 
   shared struct ModeTagStruct {
@@ -13937,3 +13941,4 @@ internal cluster TestHiddenManufacturerSpecific = 4294048801 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
+
