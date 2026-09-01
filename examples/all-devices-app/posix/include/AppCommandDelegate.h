@@ -28,19 +28,12 @@
 
 #include "AllDevicesAppNamedPipeCommandHandler.h"
 
-namespace chip::app {
-class SimulatedRoboticVacuumCleaner;
-} // namespace chip::app
-
 class AllDevicesAppCommandDelegate : public NamedPipeCommandDelegate
 {
 public:
     void OnEventCommandReceived(const char * json) override;
 
     AllDevicesAppClusterImplementationRegistry & GetClusterImplementationRegistry() { return mRegistry; }
-
-    void RegisterRvcDevice(chip::EndpointId endpoint, chip::app::SimulatedRoboticVacuumCleaner * device);
-    chip::app::SimulatedRoboticVacuumCleaner * GetRvcDeviceByEndpoint(chip::EndpointId endpoint);
 
     void RegisterCommandHandler(std::unique_ptr<AllDevicesAppNamedPipeCommandHandler> handler);
     void RegisterCommandHandlers();
@@ -55,10 +48,6 @@ private:
     // when executing commands.
     //
     AllDevicesAppClusterImplementationRegistry mRegistry;
-
-    // RVC named-pipe commands coordinate several clusters at once (like rvc-app's RvcDevice),
-    // so pipe handlers resolve the SimulatedRoboticVacuumCleaner device object by endpoint.
-    std::map<chip::EndpointId, chip::app::SimulatedRoboticVacuumCleaner *> mRvcDevices;
 
     std::map<std::string, std::unique_ptr<AllDevicesAppNamedPipeCommandHandler>> mCommandHandlers;
 };

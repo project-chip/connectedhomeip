@@ -302,7 +302,6 @@ void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipe
                 &rvcDevice->RunMode());
             gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry().RegisterClusterInstance<RvcCleanModeType>(
                 &rvcDevice->CleanMode());
-            gAllDevicesAppCommandDelegate.RegisterRvcDevice(rvcDevice->GetEndpointId(), rvcDevice);
         }
     }
 

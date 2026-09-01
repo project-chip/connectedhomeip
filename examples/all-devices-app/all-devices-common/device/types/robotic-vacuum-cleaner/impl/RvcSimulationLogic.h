@@ -17,10 +17,15 @@
 
 #pragma once
 
+#include <app/clusters/mode-base-server/ModeBaseCluster.h>
+#include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
+#include <app/clusters/service-area-server/ServiceAreaCluster.h>
 #include <app/clusters/service-area-server/service-area-cluster-objects.h>
 #include <app/data-model/Nullable.h>
 #include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationTopology.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+#include <lib/support/TypeTraits.h>
 
 namespace chip {
 namespace app {
@@ -70,6 +75,26 @@ void ApplyDefaultMapTopology(ServiceAreaClusterLike & cluster)
     cluster.AddSupportedArea(areaB);
     cluster.AddSupportedArea(areaC);
     cluster.AddSupportedArea(areaD);
+}
+
+inline void ResetRvcSimulation(Clusters::ModeBaseCluster & runMode,
+                               Clusters::RvcOperationalState::RvcOperationalStateCluster & operationalState,
+                               Clusters::ModeBaseCluster & cleanMode, Clusters::ServiceArea::ServiceAreaCluster & serviceArea)
+{
+    using namespace Clusters;
+    using DataModel::NullNullable;
+
+    runMode.UpdateCurrentMode(Topology::kRunModeIdle);
+    LogErrorOnFailure(operationalState.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped)));
+    cleanMode.UpdateCurrentMode(Topology::kCleanModeQuick);
+
+    serviceArea.ClearSelectedAreas();
+    serviceArea.ClearProgress();
+    serviceArea.SetCurrentArea(NullNullable);
+    serviceArea.SetEstimatedEndTime(NullNullable);
+
+    ApplyDefaultMapTopology(serviceArea);
+    serviceArea.SetCurrentArea(Topology::kAreaIdC);
 }
 
 } // namespace rvc_simulation

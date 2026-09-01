@@ -20,6 +20,7 @@
 #include <app/clusters/service-area-server/ServiceAreaCluster.h>
 #include <clusters/RvcOperationalState/Enums.h>
 #include <device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.h>
+#include <device/types/robotic-vacuum-cleaner/impl/RvcNamedPipeSimulation.h>
 #include <device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaStorageDelegate.h>
 #include <lib/support/TimerDelegate.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -73,6 +74,7 @@ enum class PhysicalDockState : uint8_t
 class SimulatedRoboticVacuumCleaner : public RoboticVacuumCleaner,
                                       public Clusters::OperationalState::OperationalStateCluster::Delegate,
                                       public Clusters::ServiceArea::Delegate,
+                                      public RvcNamedPipeSimulation,
                                       public TimerContext
 {
 public:
@@ -119,15 +121,15 @@ public:
     // Named-pipe simulation entry points ported from examples/rvc-app/rvc-common/src/rvc-device.cpp.
     // These remain available so tests can drive transitions manually; the timer above drives the
     // same transitions automatically after the simulated duration elapses.
-    void HandleCharged();
-    void HandleCharging();
-    void HandleDocked();
-    void HandleChargerFound();
-    void HandleLowCharge();
-    void HandleActivityComplete();
-    void HandleAreaComplete();
-    void HandleClearError();
-    void HandleErrorEvent(const std::string & error);
+    void HandleCharged() override;
+    void HandleCharging() override;
+    void HandleDocked() override;
+    void HandleChargerFound() override;
+    void HandleLowCharge() override;
+    void HandleActivityComplete() override;
+    void HandleAreaComplete() override;
+    void HandleClearError() override;
+    void HandleErrorEvent(const std::string & error) override;
 
 protected:
     // -- RoboticVacuumCleaner optional clusters --

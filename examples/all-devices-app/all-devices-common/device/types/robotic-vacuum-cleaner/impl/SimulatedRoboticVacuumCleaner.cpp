@@ -17,6 +17,7 @@
 
 #include <clusters/RvcCleanMode/Enums.h>
 #include <clusters/RvcRunMode/Enums.h>
+#include <device/types/robotic-vacuum-cleaner/impl/RvcNamedPipeSimulation.h>
 #include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationLogic.h>
 #include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationTopology.h>
 #include <device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.h>
@@ -137,11 +138,13 @@ CHIP_ERROR SimulatedRoboticVacuumCleaner::RegisterOptionalClusters(EndpointId en
     ReturnErrorOnFailure(Init());
 
     mCleanModeCluster.Cluster().UpdateCurrentMode(kCleanModeQuick);
+    RegisterRvcNamedPipeSimulation(GetEndpointId(), this);
     return CHIP_NO_ERROR;
 }
 
 void SimulatedRoboticVacuumCleaner::UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider)
 {
+    UnregisterRvcNamedPipeSimulation(GetEndpointId());
     if (mCleanModeCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mCleanModeCluster.Cluster()));

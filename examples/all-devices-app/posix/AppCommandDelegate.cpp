@@ -16,11 +16,13 @@
  */
 
 #include "include/AppCommandDelegate.h"
+#include "include/ClusterRegistryTypes.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
+#include <app/clusters/service-area-server/ServiceAreaCluster.h>
+#include <device/types/robotic-vacuum-cleaner/impl/RvcNamedPipeSimulation.h>
 #include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationLogic.h>
-#include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationTopology.h>
-#include <device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
 #include <app/clusters/ambient-context-sensing-server/CodegenIntegration.h>
@@ -37,30 +39,31 @@ using namespace chip::app::Clusters;
 
 namespace {
 
-SimulatedRoboticVacuumCleaner * GetRvcDevice(AllDevicesAppCommandDelegate * delegate, EndpointId endpointId)
+template <typename RegistryType>
+auto * GetClusterByEndpoint(AllDevicesAppCommandDelegate * delegate, EndpointId endpointId, const char * clusterLabel)
 {
-    auto * rvcDevice = delegate->GetRvcDeviceByEndpoint(endpointId);
-    if (rvcDevice == nullptr)
+    auto * cluster = delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<RegistryType>(endpointId);
+    if (cluster == nullptr)
     {
-        ChipLogError(AppServer, "RoboticVacuumCleaner not found on endpoint %d", endpointId);
+        ChipLogError(AppServer, "%s not found on endpoint %d", clusterLabel, endpointId);
     }
-    return rvcDevice;
+    return cluster;
 }
 
-void HandleRvcReset(SimulatedRoboticVacuumCleaner & rvcDevice)
+RvcNamedPipeSimulation * GetRvcSimulation(AllDevicesAppCommandDelegate * delegate, EndpointId endpointId)
 {
-    rvcDevice.RunMode().UpdateCurrentMode(Topology::kRunModeIdle);
-    LogErrorOnFailure(rvcDevice.OperationalState().SetOperationalState(
-        to_underlying(OperationalState::OperationalStateEnum::kStopped)));
-    rvcDevice.CleanMode().UpdateCurrentMode(Topology::kCleanModeQuick);
-
-    rvcDevice.GetServiceAreaCluster().ClearSelectedAreas();
-    rvcDevice.GetServiceAreaCluster().ClearProgress();
-    rvcDevice.GetServiceAreaCluster().SetCurrentArea(DataModel::NullNullable);
-    rvcDevice.GetServiceAreaCluster().SetEstimatedEndTime(DataModel::NullNullable);
-
-    ApplyDefaultMapTopology(rvcDevice.GetServiceAreaCluster());
-    rvcDevice.GetServiceAreaCluster().SetCurrentArea(Topology::kAreaIdC);
+    auto * operationalState =
+        GetClusterByEndpoint<Clusters::RvcOperationalState::RvcOperationalStateCluster>(delegate, endpointId, "RvcOperationalState");
+    if (operationalState == nullptr)
+    {
+        return nullptr;
+    }
+    auto * simulation = GetRvcNamedPipeSimulation(endpointId);
+    if (simulation == nullptr)
+    {
+        ChipLogError(AppServer, "RvcNamedPipeSimulation not found on endpoint %d", endpointId);
+    }
+    return simulation;
 }
 
 struct CommandContext
@@ -553,12 +556,17 @@ public:
     const char * GetName() const override { return "Reset"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * rvcDevice = GetRvcDevice(delegate, endpointId);
-        if (rvcDevice == nullptr)
+        auto * runMode = GetClusterByEndpoint<RvcRunModeType>(delegate, endpointId, "RvcRunMode");
+        auto * operationalState =
+            GetClusterByEndpoint<Clusters::RvcOperationalState::RvcOperationalStateCluster>(delegate, endpointId, "RvcOperationalState");
+        auto * cleanMode = GetClusterByEndpoint<RvcCleanModeType>(delegate, endpointId, "RvcCleanMode");
+        auto * serviceArea =
+            GetClusterByEndpoint<Clusters::ServiceArea::ServiceAreaCluster>(delegate, endpointId, "ServiceArea");
+        if (runMode == nullptr || operationalState == nullptr || cleanMode == nullptr || serviceArea == nullptr)
         {
             return;
         }
-        HandleRvcReset(*rvcDevice);
+        ResetRvcSimulation(*runMode, *operationalState, *cleanMode, *serviceArea);
     }
 };
 
@@ -568,12 +576,12 @@ public:
     const char * GetName() const override { return "Charged"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * rvcDevice = GetRvcDevice(delegate, endpointId);
-        if (rvcDevice == nullptr)
+        auto * simulation = GetRvcSimulation(delegate, endpointId);
+        if (simulation == nullptr)
         {
             return;
         }
-        rvcDevice->HandleCharged();
+        simulation->HandleCharged();
     }
 };
 
@@ -583,12 +591,12 @@ public:
     const char * GetName() const override { return "Charging"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * rvcDevice = GetRvcDevice(delegate, endpointId);
-        if (rvcDevice == nullptr)
+        auto * simulation = GetRvcSimulation(delegate, endpointId);
+        if (simulation == nullptr)
         {
             return;
         }
-        rvcDevice->HandleCharging();
+        simulation->HandleCharging();
     }
 };
 
@@ -598,12 +606,12 @@ public:
     const char * GetName() const override { return "Docked"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * rvcDevice = GetRvcDevice(delegate, endpointId);
-        if (rvcDevice == nullptr)
+        auto * simulation = GetRvcSimulation(delegate, endpointId);
+        if (simulation == nullptr)
         {
             return;
         }
-        rvcDevice->HandleDocked();
+        simulation->HandleDocked();
     }
 };
 
@@ -613,12 +621,12 @@ public:
     const char * GetName() const override { return "ChargerFound"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * rvcDevice = GetRvcDevice(delegate, endpointId);
-        if (rvcDevice == nullptr)
+        auto * simulation = GetRvcSimulation(delegate, endpointId);
+        if (simulation == nullptr)
         {
             return;
         }
-        rvcDevice->HandleChargerFound();
+        simulation->HandleChargerFound();
     }
 };
 
@@ -628,12 +636,12 @@ public:
     const char * GetName() const override { return "LowCharge"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * rvcDevice = GetRvcDevice(delegate, endpointId);
-        if (rvcDevice == nullptr)
+        auto * simulation = GetRvcSimulation(delegate, endpointId);
+        if (simulation == nullptr)
         {
             return;
         }
-        rvcDevice->HandleLowCharge();
+        simulation->HandleLowCharge();
     }
 };
 
@@ -643,12 +651,12 @@ public:
     const char * GetName() const override { return "ActivityComplete"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * rvcDevice = GetRvcDevice(delegate, endpointId);
-        if (rvcDevice == nullptr)
+        auto * simulation = GetRvcSimulation(delegate, endpointId);
+        if (simulation == nullptr)
         {
             return;
         }
-        rvcDevice->HandleActivityComplete();
+        simulation->HandleActivityComplete();
     }
 };
 
@@ -658,12 +666,12 @@ public:
     const char * GetName() const override { return "AreaComplete"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * rvcDevice = GetRvcDevice(delegate, endpointId);
-        if (rvcDevice == nullptr)
+        auto * simulation = GetRvcSimulation(delegate, endpointId);
+        if (simulation == nullptr)
         {
             return;
         }
-        rvcDevice->HandleAreaComplete();
+        simulation->HandleAreaComplete();
     }
 };
 
@@ -673,12 +681,12 @@ public:
     const char * GetName() const override { return "ClearError"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * rvcDevice = GetRvcDevice(delegate, endpointId);
-        if (rvcDevice == nullptr)
+        auto * simulation = GetRvcSimulation(delegate, endpointId);
+        if (simulation == nullptr)
         {
             return;
         }
-        rvcDevice->HandleClearError();
+        simulation->HandleClearError();
     }
 };
 
@@ -688,12 +696,13 @@ public:
     const char * GetName() const override { return "EmptyingDustBin"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * rvcDevice = GetRvcDevice(delegate, endpointId);
-        if (rvcDevice == nullptr)
+        auto * operationalState =
+            GetClusterByEndpoint<Clusters::RvcOperationalState::RvcOperationalStateCluster>(delegate, endpointId, "RvcOperationalState");
+        if (operationalState == nullptr)
         {
             return;
         }
-        LogErrorOnFailure(rvcDevice->OperationalState().SetOperationalState(
+        LogErrorOnFailure(operationalState->SetOperationalState(
             to_underlying(RvcOperationalState::OperationalStateEnum::kEmptyingDustBin)));
     }
 };
@@ -704,12 +713,13 @@ public:
     const char * GetName() const override { return "CleaningMop"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * rvcDevice = GetRvcDevice(delegate, endpointId);
-        if (rvcDevice == nullptr)
+        auto * operationalState =
+            GetClusterByEndpoint<Clusters::RvcOperationalState::RvcOperationalStateCluster>(delegate, endpointId, "RvcOperationalState");
+        if (operationalState == nullptr)
         {
             return;
         }
-        LogErrorOnFailure(rvcDevice->OperationalState().SetOperationalState(
+        LogErrorOnFailure(operationalState->SetOperationalState(
             to_underlying(RvcOperationalState::OperationalStateEnum::kCleaningMop)));
     }
 };
@@ -720,12 +730,13 @@ public:
     const char * GetName() const override { return "FillingWaterTank"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * rvcDevice = GetRvcDevice(delegate, endpointId);
-        if (rvcDevice == nullptr)
+        auto * operationalState =
+            GetClusterByEndpoint<Clusters::RvcOperationalState::RvcOperationalStateCluster>(delegate, endpointId, "RvcOperationalState");
+        if (operationalState == nullptr)
         {
             return;
         }
-        LogErrorOnFailure(rvcDevice->OperationalState().SetOperationalState(
+        LogErrorOnFailure(operationalState->SetOperationalState(
             to_underlying(RvcOperationalState::OperationalStateEnum::kFillingWaterTank)));
     }
 };
@@ -736,12 +747,13 @@ public:
     const char * GetName() const override { return "UpdatingMaps"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * rvcDevice = GetRvcDevice(delegate, endpointId);
-        if (rvcDevice == nullptr)
+        auto * operationalState =
+            GetClusterByEndpoint<Clusters::RvcOperationalState::RvcOperationalStateCluster>(delegate, endpointId, "RvcOperationalState");
+        if (operationalState == nullptr)
         {
             return;
         }
-        LogErrorOnFailure(rvcDevice->OperationalState().SetOperationalState(
+        LogErrorOnFailure(operationalState->SetOperationalState(
             to_underlying(RvcOperationalState::OperationalStateEnum::kUpdatingMaps)));
     }
 };
@@ -752,14 +764,14 @@ public:
     const char * GetName() const override { return "ErrorEvent"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * rvcDevice = GetRvcDevice(delegate, endpointId);
-        if (rvcDevice == nullptr)
+        auto * simulation = GetRvcSimulation(delegate, endpointId);
+        if (simulation == nullptr)
         {
             return;
         }
         if (json.isMember("Error") && json["Error"].isString())
         {
-            rvcDevice->HandleErrorEvent(json["Error"].asString());
+            simulation->HandleErrorEvent(json["Error"].asString());
         }
     }
 };
@@ -770,8 +782,9 @@ public:
     const char * GetName() const override { return "AddMap"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * rvcDevice = GetRvcDevice(delegate, endpointId);
-        if (rvcDevice == nullptr)
+        auto * serviceArea =
+            GetClusterByEndpoint<Clusters::ServiceArea::ServiceAreaCluster>(delegate, endpointId, "ServiceArea");
+        if (serviceArea == nullptr)
         {
             return;
         }
@@ -779,7 +792,7 @@ public:
         {
             const uint32_t mapId = json["MapId"].asUInt();
             std::string mapName  = json["MapName"].asString();
-            if (!rvcDevice->GetServiceAreaCluster().AddSupportedMap(mapId, CharSpan(mapName.data(), mapName.size())))
+            if (!serviceArea->AddSupportedMap(mapId, CharSpan(mapName.data(), mapName.size())))
             {
                 ChipLogError(AppServer, "AddMap: failed to add map %u", static_cast<unsigned>(mapId));
             }
@@ -793,15 +806,16 @@ public:
     const char * GetName() const override { return "RemoveMap"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * rvcDevice = GetRvcDevice(delegate, endpointId);
-        if (rvcDevice == nullptr)
+        auto * serviceArea =
+            GetClusterByEndpoint<Clusters::ServiceArea::ServiceAreaCluster>(delegate, endpointId, "ServiceArea");
+        if (serviceArea == nullptr)
         {
             return;
         }
         if (json.isMember("MapId") && json["MapId"].isUInt())
         {
             const uint32_t mapId = json["MapId"].asUInt();
-            if (!rvcDevice->GetServiceAreaCluster().RemoveSupportedMap(mapId))
+            if (!serviceArea->RemoveSupportedMap(mapId))
             {
                 ChipLogError(AppServer, "RemoveMap: failed to remove map %u", static_cast<unsigned>(mapId));
             }
@@ -815,8 +829,9 @@ public:
     const char * GetName() const override { return "AddArea"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * rvcDevice = GetRvcDevice(delegate, endpointId);
-        if (rvcDevice == nullptr)
+        auto * serviceArea =
+            GetClusterByEndpoint<Clusters::ServiceArea::ServiceAreaCluster>(delegate, endpointId, "ServiceArea");
+        if (serviceArea == nullptr)
         {
             return;
         }
@@ -846,7 +861,7 @@ public:
             area.SetLocationInfo(CharSpan(locationName.data(), locationName.size()), DataModel::NullNullable,
                                  DataModel::NullNullable);
         }
-        if (!rvcDevice->GetServiceAreaCluster().AddSupportedArea(area))
+        if (!serviceArea->AddSupportedArea(area))
         {
             ChipLogError(AppServer, "AddArea: failed to add area %u", static_cast<unsigned>(areaId));
         }
@@ -859,15 +874,16 @@ public:
     const char * GetName() const override { return "RemoveArea"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * rvcDevice = GetRvcDevice(delegate, endpointId);
-        if (rvcDevice == nullptr)
+        auto * serviceArea =
+            GetClusterByEndpoint<Clusters::ServiceArea::ServiceAreaCluster>(delegate, endpointId, "ServiceArea");
+        if (serviceArea == nullptr)
         {
             return;
         }
         if (json.isMember("AreaId") && json["AreaId"].isUInt())
         {
             const uint32_t areaId = json["AreaId"].asUInt();
-            if (!rvcDevice->GetServiceAreaCluster().RemoveSupportedArea(areaId))
+            if (!serviceArea->RemoveSupportedArea(areaId))
             {
                 ChipLogError(AppServer, "RemoveArea: failed to remove area %u", static_cast<unsigned>(areaId));
             }
@@ -971,15 +987,4 @@ void AllDevicesAppCommandDelegate::RegisterCommandHandlers()
     RegisterCommandHandler(std::make_unique<RvcRemoveMapCommandHandler>());
     RegisterCommandHandler(std::make_unique<RvcAddAreaCommandHandler>());
     RegisterCommandHandler(std::make_unique<RvcRemoveAreaCommandHandler>());
-}
-
-void AllDevicesAppCommandDelegate::RegisterRvcDevice(chip::EndpointId endpoint, chip::app::SimulatedRoboticVacuumCleaner * device)
-{
-    mRvcDevices[endpoint] = device;
-}
-
-chip::app::SimulatedRoboticVacuumCleaner * AllDevicesAppCommandDelegate::GetRvcDeviceByEndpoint(chip::EndpointId endpoint)
-{
-    auto it = mRvcDevices.find(endpoint);
-    return (it != mRvcDevices.end()) ? it->second : nullptr;
 }

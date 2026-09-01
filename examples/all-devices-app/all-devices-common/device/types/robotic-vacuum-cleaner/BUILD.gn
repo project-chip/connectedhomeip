@@ -21,6 +21,8 @@ source_set("robotic-vacuum-cleaner") {
     "RoboticVacuumCleaner.h",
     "impl/LoggingServiceAreaStorageDelegate.cpp",
     "impl/LoggingServiceAreaStorageDelegate.h",
+    "impl/RvcNamedPipeSimulation.cpp",
+    "impl/RvcNamedPipeSimulation.h",
     "impl/RvcSimulationLogic.h",
     "impl/RvcSimulationTopology.h",
     "impl/SimulatedRoboticVacuumCleaner.cpp",
