@@ -33,10 +33,10 @@
 #ifdef CONFIG_CHIP_CRYPTO_PSA
 #include <lib/support/ScopedMemoryBuffer.h>
 #include <psa/crypto.h>
+#ifdef CONFIG_CHIP_CRYPTO_PSA_MIGRATE_DAC_PRIV_KEY
 #include <zephyr/drivers/flash.h>
-
-static const struct device * const kFlashDev = DEVICE_DT_GET_OR_NULL(DT_CHOSEN(zephyr_flash_controller));
-#endif
+#endif // CONFIG_CHIP_CRYPTO_PSA_MIGRATE_DAC_PRIV_KEY
+#endif // CONFIG_CHIP_CRYPTO_PSA
 
 namespace chip {
 namespace {
@@ -180,7 +180,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::MoveDACPrivateKeyToSecureStora
         // Check once again if the saved key has attributes set before removing it from the factory data set.
         VerifyOrReturnError(psa_get_key_attributes(mDACPrivKeyId, &attributes) == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
-        const struct device * flashDev = kFlashDev;
+        const struct device * flashDev = mFlashFactoryData.GetFlashDevice();
         VerifyOrReturnError(flashDev != nullptr && device_is_ready(flashDev), CHIP_ERROR_INTERNAL);
 
         // Get the actual block size.

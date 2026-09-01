@@ -116,6 +116,8 @@ struct InternalFlashFactoryData
 #else
     CHIP_ERROR ProtectFactoryDataPartitionAgainstWrite() { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #endif
+
+    const struct device * GetFlashDevice() const { return DEVICE_DT_GET_OR_NULL(DT_CHOSEN(zephyr_flash_controller)); }
 };
 
 #if defined(USE_PARTITION_MANAGER) && USE_PARTITION_MANAGER == 1 && (defined(CONFIG_SPI_NOR) || defined(CONFIG_NORDIC_QSPI_NOR))
@@ -137,6 +139,8 @@ struct ExternalFlashFactoryData
     }
 
     CHIP_ERROR ProtectFactoryDataPartitionAgainstWrite() { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    const struct device * GetFlashDevice() const { return mFlashDevice; }
 
     const struct device * mFlashDevice = DEVICE_DT_GET(DT_CHOSEN(nordic_pm_ext_flash));
     uint8_t mFactoryDataBuffer[FACTORY_DATA_SIZE];

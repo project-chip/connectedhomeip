@@ -769,6 +769,7 @@ TEST_F(TestCommissioningWindowManager, TestShellOpenCommissioningWindow)
 
     EXPECT_EQ(RunDeviceShellSubcommand("opencommissioningwindow"), CHIP_NO_ERROR);
     EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
+    commissionMgr.CloseCommissioningWindow();
 }
 
 TEST_F(TestCommissioningWindowManager, TestShellOpenCommissioningWindowAlreadyOpen)
@@ -779,6 +780,7 @@ TEST_F(TestCommissioningWindowManager, TestShellOpenCommissioningWindowAlreadyOp
 
     EXPECT_EQ(RunDeviceShellSubcommand("opencommissioningwindow"), CHIP_NO_ERROR);
     EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
+    commissionMgr.CloseCommissioningWindow();
 }
 
 TEST_F(TestCommissioningWindowManager, TestShellOpenCommissioningWindowFailsWhenFailSafeArmed)
@@ -793,6 +795,7 @@ TEST_F(TestCommissioningWindowManager, TestShellOpenCommissioningWindowFailsWhen
     EXPECT_FALSE(commissionMgr.IsCommissioningWindowOpen());
 
     failSafeContext.DisarmFailSafe();
+    commissionMgr.CloseCommissioningWindow();
 }
 
 TEST_F(TestCommissioningWindowManager, TestShellCloseCommissioningWindow)
@@ -803,6 +806,7 @@ TEST_F(TestCommissioningWindowManager, TestShellCloseCommissioningWindow)
 
     EXPECT_EQ(RunDeviceShellSubcommand("closecommissioningwindow"), CHIP_NO_ERROR);
     EXPECT_FALSE(commissionMgr.IsCommissioningWindowOpen());
+    commissionMgr.CloseCommissioningWindow();
 }
 
 TEST_F(TestCommissioningWindowManager, TestShellCloseCommissioningWindowNotOpen)
@@ -812,6 +816,7 @@ TEST_F(TestCommissioningWindowManager, TestShellCloseCommissioningWindowNotOpen)
 
     EXPECT_EQ(RunDeviceShellSubcommand("closecommissioningwindow"), CHIP_NO_ERROR);
     EXPECT_FALSE(commissionMgr.IsCommissioningWindowOpen());
+    commissionMgr.CloseCommissioningWindow();
 }
 
 } // namespace

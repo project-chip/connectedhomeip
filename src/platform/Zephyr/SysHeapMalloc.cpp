@@ -18,6 +18,7 @@
 #include "SysHeapMalloc.h"
 
 #include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemError.h>
 
 extern "C" {
@@ -87,7 +88,7 @@ void * Malloc(size_t size)
     void * const mem = lockGuard.Locked() ? sys_heap_aligned_alloc(&sHeap, kMallocAlignment, size) : nullptr;
 
 #ifdef CONFIG_CHIP_MALLOC_SYS_HEAP_DEBUG
-    ChipLogProgress(DeviceLayer, "Malloc(%u) = %p, caller: %p", size, mem, __builtin_return_address(0));
+    ChipLogProgress(DeviceLayer, "Malloc(%zu) = %p, caller: %p", size, mem, __builtin_return_address(0));
 #endif
 
     return mem;
@@ -119,7 +120,7 @@ void * Realloc(void * mem, size_t size)
     void * const new_mem = lockGuard.Locked() ? sys_heap_aligned_realloc(&sHeap, mem, kMallocAlignment, size) : nullptr;
 
 #ifdef CONFIG_CHIP_MALLOC_SYS_HEAP_DEBUG
-    ChipLogProgress(DeviceLayer, "Realloc(%p, %u) = %p, caller: %p", mem, size, new_mem, __builtin_return_address(0));
+    ChipLogProgress(DeviceLayer, "Realloc(%p, %zu) = %p, caller: %p", mem, size, new_mem, __builtin_return_address(0));
 #endif
 
     return new_mem;

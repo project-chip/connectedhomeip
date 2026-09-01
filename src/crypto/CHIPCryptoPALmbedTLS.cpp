@@ -20,29 +20,26 @@
  *      mbedTLS based implementation of CHIP crypto primitives
  */
 
-// In mbedTLS v4.0, ECP and bignum function declarations moved to private headers.
-// These are only needed for the mbedTLS-based SPAKE2+ fallback. Platforms with a
-// PSA SPAKE2+ driver don't need these private headers.
-#if !defined(CHIP_CRYPTO_SPAKE2P_PSA) || !CHIP_CRYPTO_SPAKE2P_PSA
+#include "CHIPCryptoPALmbedTLS.h"
+#include "CHIPCryptoPAL.h"
+
+#include <type_traits>
+
 #include <mbedtls/version.h>
+// In mbedTLS v4.0, ECP and bignum function declarations moved to private headers.
 #if (MBEDTLS_VERSION_NUMBER >= 0x04000000)
 #define MBEDTLS_DECLARE_PRIVATE_IDENTIFIERS
 #include <mbedtls/private/bignum.h>
 #include <mbedtls/private/ecp.h>
-#endif // (MBEDTLS_VERSION_NUMBER >= 0x04000000)
-#endif // !CHIP_CRYPTO_SPAKE2P_PSA
-
-#include "CHIPCryptoPAL.h"
-#include "CHIPCryptoPALmbedTLS.h"
-
-#include <type_traits>
-
+#else
 #include <mbedtls/bignum.h>
+#include <mbedtls/ecp.h>
+#endif // (MBEDTLS_VERSION_NUMBER >= 0x04000000)
+
 #include <mbedtls/ccm.h>
 #include <mbedtls/ctr_drbg.h>
 #include <mbedtls/ecdh.h>
 #include <mbedtls/ecdsa.h>
-#include <mbedtls/ecp.h>
 #include <mbedtls/entropy.h>
 #include <mbedtls/error.h>
 #include <mbedtls/hkdf.h>
@@ -50,7 +47,6 @@
 #include <mbedtls/pkcs5.h>
 #include <mbedtls/sha1.h>
 #include <mbedtls/sha256.h>
-#include <mbedtls/version.h>
 #include <mbedtls/x509_csr.h>
 
 #include <lib/core/CHIPSafeCasts.h>
