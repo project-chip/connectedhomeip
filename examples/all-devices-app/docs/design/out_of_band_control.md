@@ -194,7 +194,7 @@ namespace chip::app {
 class PosixNamedPipeDispatcher
 {
 public:
-    explicit PosixNamedPipeDispatcher(InMemoryOOBAccessorRegistry & oobRegistry) :
+    explicit PosixNamedPipeDispatcher(OOBAccessorRegistry & oobRegistry) :
         mOobRegistry(oobRegistry) {}
 
     /**
@@ -225,7 +225,7 @@ public:
     CHIP_ERROR DispatchJson(const Json::Value & json);
 
 private:
-    InMemoryOOBAccessorRegistry & mOobRegistry;
+    OOBAccessorRegistry & mOobRegistry;
     std::unordered_map<std::string, std::unique_ptr<NamedPipeCommandTranslator>> mTranslators;
 };
 
@@ -413,10 +413,10 @@ both GN and CMake:
     `configure_file` with `all_devices_config.h.in` to emit
     `${CMAKE_CURRENT_BINARY_DIR}/app_config/all_devices_config.h`.
 
-| Build Target / Flag                      | `ALL_DEVICES_APP_ENABLE_NAMED_PIPES` | `ALL_DEVICES_APP_ENABLE_PWRPC`   | `ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS` |
-| :--------------------------------------- | :----------------------------------- | :------------------------------- | :------------------------------------- |
-| POSIX Linux (`all-devices-app`)          | 1                                    | 0 (or 1 if `chip_enable_pw_rpc`) | 1                                      |
-| Embedded Targets (ESP32, SiLabs, Telink) | 0                                    | 0                                | 0                                      |
+| Build Target / Flag                      | `ALL_DEVICES_APP_ENABLE_NAMED_PIPES` | `PW_RPC_ENABLED` (via `chip_enable_pw_rpc`) | `ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS` |
+| :--------------------------------------- | :----------------------------------- | :------------------------------------------ | :------------------------------------- |
+| POSIX Linux (`all-devices-app`)          | 1                                    | 0 (or 1 if `chip_enable_pw_rpc`)            | 1                                      |
+| Embedded Targets (ESP32, SiLabs, Telink) | 0                                    | 0                                           | 0                                      |
 
 Header aliasing in `all-devices-common/oob-accessors/OOBAccessorRegistry.h`:
 
