@@ -79,7 +79,6 @@ ClustersWithShutdownFunctions:
 ClustersWithPreAttributeChangeFunctions:
     # keep-sorted start
     - Door Lock
-    - Mode Select
     - Pump Configuration and Control
     - Thermostat User Interface Configuration
     # keep-sorted end
@@ -139,6 +138,7 @@ CodeDrivenClusters:
     - Media File Management
     - Microwave Oven Control
     - Microwave Oven Mode
+    - Mode Select
     - Network Identity Management
     - OTA Software Update Provider
     - OTA Software Update Requestor
