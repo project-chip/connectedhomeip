@@ -46,7 +46,6 @@ from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess, SupportedIngestInt
 from TC_PAVSTTestBase import PAVSTTestBase
 
 import matter.clusters as Clusters
-from matter.clusters.Types import NullValue, Nullable
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest, TestStep
@@ -85,18 +84,24 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
     def steps_TC_PAVST_2_15(self) -> list[TestStep]:
         return [
             TestStep("precondition", "Commissioning and Zone Setup", is_commissioning=True),
-            TestStep(1, "TH1 allocates a PushAV transport with TriggerType = Motion.", "Verify successful allocation. Store ConnectionID as aConnectionID."),
+            TestStep(1, "TH1 allocates a PushAV transport with TriggerType = Motion.",
+                     "Verify successful allocation. Store ConnectionID as aConnectionID."),
             TestStep(2, "TH1 Reads MaxZones attribute from Zone Management cluster", "Store value as aMaxZones."),
             TestStep(3, "TH1 sends the UpdateMotionZoneOptions command with ConnectionID != aConnectionID.", "DUT responds with NOT_FOUND."),
-            TestStep(4, "TH2 sends the UpdateMotionZoneOptions command with ConnectionID = aConnectionID.", "DUT responds with NOT_FOUND (cross-fabric)."),
-            TestStep(5, "TH1 sends the UpdateMotionZoneOptions command with ConnectionID = aConnectionID and duplicate zones.", "DUT responds with ALREADY_EXISTS."),
-            TestStep(6, "TH1 sends the UpdateMotionZoneOptions command with aMaxZones + 1 valid Zone IDs.", "DUT responds with DYNAMIC_CONSTRAINT_ERROR."),
+            TestStep(4, "TH2 sends the UpdateMotionZoneOptions command with ConnectionID = aConnectionID.",
+                     "DUT responds with NOT_FOUND (cross-fabric)."),
+            TestStep(5, "TH1 sends the UpdateMotionZoneOptions command with ConnectionID = aConnectionID and duplicate zones.",
+                     "DUT responds with ALREADY_EXISTS."),
+            TestStep(6, "TH1 sends the UpdateMotionZoneOptions command with aMaxZones + 1 valid Zone IDs.",
+                     "DUT responds with DYNAMIC_CONSTRAINT_ERROR."),
             TestStep(7, "TH1 sends the UpdateMotionZoneOptions command with invalid ZoneID.", "DUT responds with InvalidZone."),
             TestStep(8, "TH1 sends the UpdateMotionZoneOptions command with empty list [].", "DUT responds with SUCCESS."),
             TestStep(9, "TH1 sends FindTransport command for aConnectionID.", "Verify MotionZones is empty."),
-            TestStep(10, "TH1 sends the UpdateMotionZoneOptions command with MotionZones = [aZoneID1, aZoneID2].", "DUT responds with SUCCESS."),
+            TestStep(
+                10, "TH1 sends the UpdateMotionZoneOptions command with MotionZones = [aZoneID1, aZoneID2].", "DUT responds with SUCCESS."),
             TestStep(11, "TH1 sends FindTransport command for aConnectionID.", "Verify MotionZones matches updated zones."),
-            TestStep(12, "If PERZONESENS is False, TH1 sends command with invalid MotionSensitivity (11).", "DUT responds with CONSTRAINT_ERROR."),
+            TestStep(12, "If PERZONESENS is False, TH1 sends command with invalid MotionSensitivity (11).",
+                     "DUT responds with CONSTRAINT_ERROR."),
             TestStep(13, "If PERZONESENS is False, TH1 sends command with valid MotionSensitivity (5).", "DUT responds with SUCCESS."),
             TestStep(14, "If PERZONESENS is False, TH1 sends FindTransport.", "Verify MotionSensitivity is 5."),
             TestStep(15, "If PERZONESENS is True, TH1 sends command with MotionSensitivity.", "DUT responds with INVALID_COMMAND."),
@@ -123,9 +128,8 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             if expected_cluster_status is not None:
                 asserts.assert_equal(e.clusterStatus, expected_cluster_status, "Cluster status mismatch")
                 return e.clusterStatus
-            else:
-                asserts.assert_equal(e.status, expected_status, "Status mismatch")
-                return e.status
+            asserts.assert_equal(e.status, expected_status, "Status mismatch")
+            return e.status
         except AttributeError as e:
             # Fallback/Log error if the command is indeed missing in the generated SDK
             log.error("UpdateMotionZoneOptions command not found in SDK: %s", e)
@@ -187,7 +191,8 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             cmdResponse = await self.send_single_cmd(endpoint=endpoint, cmd=zmcluster.Commands.CreateTwoDCartesianZone(zone=zoneToCreate))
             aZoneID2 = cmdResponse.zoneID
         else:
-            asserts.assert_greater_equal(len(aZones), 2, "Test requires at least 2 pre-existing zones if UserDefined is not supported")
+            asserts.assert_greater_equal(
+                len(aZones), 2, "Test requires at least 2 pre-existing zones if UserDefined is not supported")
             aZoneID1 = aZones[0].zoneID
             aZoneID2 = aZones[1].zoneID
 
