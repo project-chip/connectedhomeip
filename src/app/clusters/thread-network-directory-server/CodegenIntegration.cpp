@@ -36,8 +36,8 @@ CHIP_ERROR CodegenThreadNetworkDirectoryCluster::Startup(ServerClusterContext & 
 
     if (srcProvider != nullptr)
     {
-        LogErrorOnFailure(ThreadNetworkDirectory::MigrateThreadNetworkDirectoryServerStorage(mPath.mEndpointId, mPath.mClusterId,
-                                                                                             *srcProvider, dstProvider));
+        LogErrorOnFailure(
+            ThreadNetworkDirectory::MigrateThreadNetworkDirectoryServerStorage(mPath.mEndpointId, *srcProvider, dstProvider));
     }
 
     return ThreadNetworkDirectoryCluster::Startup(context);

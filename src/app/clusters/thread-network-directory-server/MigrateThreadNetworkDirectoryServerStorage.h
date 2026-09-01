@@ -22,8 +22,7 @@
 
 namespace chip::app::Clusters::ThreadNetworkDirectory {
 
-CHIP_ERROR MigrateThreadNetworkDirectoryServerStorage(EndpointId endpointId, ClusterId clusterId,
-                                                      SafeAttributePersistenceProvider & safeProvider,
+CHIP_ERROR MigrateThreadNetworkDirectoryServerStorage(EndpointId endpointId, SafeAttributePersistenceProvider & safeProvider,
                                                       AttributePersistenceProvider & dstProvider);
 
 } // namespace chip::app::Clusters::ThreadNetworkDirectory

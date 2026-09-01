@@ -523,9 +523,8 @@ TEST_F(TestThreadNetworkDirectoryCluster, MigrationTest_PreferredExtendedPanIdMi
     const ConcreteAttributePath path(kTestEndpointId, Id, Attributes::PreferredExtendedPanID::Id);
     ASSERT_EQ(safePersistence.SafeWriteValue(path, ByteSpan(kExPanId1Bytes)), CHIP_NO_ERROR);
 
-    ASSERT_EQ(
-        MigrateThreadNetworkDirectoryServerStorage(kTestEndpointId, Id, safePersistence, context.AttributePersistenceProvider()),
-        CHIP_NO_ERROR);
+    ASSERT_EQ(MigrateThreadNetworkDirectoryServerStorage(kTestEndpointId, safePersistence, context.AttributePersistenceProvider()),
+              CHIP_NO_ERROR);
 
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);

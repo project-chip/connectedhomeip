@@ -23,8 +23,7 @@
 
 namespace chip::app::Clusters::ThreadNetworkDirectory {
 
-CHIP_ERROR MigrateThreadNetworkDirectoryServerStorage(EndpointId endpointId, ClusterId clusterId,
-                                                      SafeAttributePersistenceProvider & safeProvider,
+CHIP_ERROR MigrateThreadNetworkDirectoryServerStorage(EndpointId endpointId, SafeAttributePersistenceProvider & safeProvider,
                                                       AttributePersistenceProvider & dstProvider)
 {
     static constexpr AttrMigrationData attributesToUpdate[] = {
@@ -35,7 +34,7 @@ CHIP_ERROR MigrateThreadNetworkDirectoryServerStorage(EndpointId endpointId, Clu
     static_assert(kBufferSize > 0, "All migration attributes have zero valueSize");
     uint8_t attributeBuffer[kBufferSize] = {};
     MutableByteSpan buffer(attributeBuffer);
-    return MigrateFromSafeToAttributePersistenceProvider(safeProvider, dstProvider, { endpointId, clusterId },
+    return MigrateFromSafeToAttributePersistenceProvider(safeProvider, dstProvider, { endpointId, ThreadNetworkDirectory::Id },
                                                          Span(attributesToUpdate), buffer);
 }
 
