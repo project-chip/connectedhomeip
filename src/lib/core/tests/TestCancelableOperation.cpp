@@ -19,6 +19,7 @@
 
 #include <lib/core/CancelableOperation.h>
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <memory>
 #include <optional>

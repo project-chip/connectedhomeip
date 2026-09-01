@@ -163,7 +163,7 @@ protected:
      *
      * A subclass that overrides this MUST call the inherited implementation.
      */
-    virtual void OnFinished(bool cancelled) {}
+    virtual void OnFinished(bool /* cancelled */) {}
 
 private:
     Cancelable * mCancelable = nullptr;
