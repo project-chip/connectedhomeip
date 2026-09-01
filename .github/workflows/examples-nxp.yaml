@@ -31,6 +31,7 @@ concurrency:
 
 env:
     CHIP_LOG_TIMESTAMPS: false
+    NXP_ZEPHYR_REVISION: b9df9f46ae4618a97c138b2c3cc11685264f967c
 
 jobs:
     FreeRTOS:
@@ -148,7 +149,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp-zephyr:203
+            image: ghcr.io/project-chip/chip-build-nxp-zephyr:211
             volumes:
                 - "/:/runner-root-volume"
 
@@ -172,6 +173,17 @@ jobs:
                       pigweed:
                         - 'src/pw_backends/**'
                         - 'third_party/pigweed/**'
+            - name: Setup Zephyr Workspace
+              if:
+                  github.event_name == 'push' ||
+                  steps.changed_paths.outputs.nxp == 'true' ||
+                  steps.changed_paths.outputs.pigweed == 'true'
+              run: |
+                  rm -rf /opt/nxp-zephyr/zephyrproject
+                  west init /opt/nxp-zephyr/zephyrproject -m https://github.com/zephyrproject-rtos/zephyr.git --mr ${{ env.NXP_ZEPHYR_REVISION }}
+                  cd /opt/nxp-zephyr/zephyrproject
+                  west update -o=--depth=1 -n
+                  west zephyr-export
             - name: Build NXP Zephyr all-clusters example
               if:
                   github.event_name == 'push' || steps.changed_paths.outputs.nxp
