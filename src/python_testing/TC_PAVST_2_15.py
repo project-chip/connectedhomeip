@@ -60,7 +60,7 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         return "[TC-PAVST-2.15] Validate UpdateMotionZoneOptions command with Server as DUT - PROVISIONAL"
 
     def pics_TC_PAVST_2_15(self):
-        return ["PAVST.S", "AVSM.S", "ZONEMGMT.S"]
+        return ["PAVST.S", "PAVST.S.F00", "ZONEMGMT.S"]
 
     @async_test_body
     async def setup_class(self):
@@ -148,12 +148,16 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             server=self.server, host_ip=host_ip)
         uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf)
 
+        # Read FeatureMap of PushAvStreamTransport
+        pvFeatureMap = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=pvcluster, attribute=pvattr.FeatureMap)
+        self.perZoneSenseSupported = (pvFeatureMap & pvcluster.Bitmaps.Feature.kPerZoneSensitivity) != 0
+
         # Read FeatureMap of ZoneManagement
         zmFeatureMap = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=zmcluster, attribute=zmattr.FeatureMap)
         twoDCartSupported = zmFeatureMap & zmcluster.Bitmaps.Feature.kTwoDimensionalCartesianZone
         userDefinedSupported = zmFeatureMap & zmcluster.Bitmaps.Feature.kUserDefined
-        self.perZoneSenseSupported = zmFeatureMap & zmcluster.Bitmaps.Feature.kPerZoneSensitivity
 
         # Read existing zones
         aZones = await self.read_single_attribute_check_success(
