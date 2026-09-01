@@ -361,7 +361,7 @@ class TC_AUDIOCONTROL_2_2(MatterBaseTest, AUDIOCONTROLTestBase):
         new_start_up_muted = None
         if supports_start_up_muted:
             # StartUpMuted is nullable, so the three distinct values are null, TRUE and FALSE.
-            new_start_up_muted = False if start_up_muted_old is not False else True
+            new_start_up_muted = start_up_muted_old is False
             await self.write_audiocontrol_attribute_expect_success(
                 endpoint, attributes.StartUpMuted, new_start_up_muted)
         else:

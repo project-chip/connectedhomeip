@@ -142,6 +142,7 @@ class AUDIOCONTROLTestBase:
             if candidate != current:
                 return candidate
         asserts.fail(f"Could not find an alternative value for {enum_type.__name__}")
+        return None
 
     @staticmethod
     def pick_different_in_range(current, low: int, high: int):
