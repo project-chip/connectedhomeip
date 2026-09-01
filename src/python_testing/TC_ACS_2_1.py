@@ -333,7 +333,7 @@ class TC_ACS_2_1(MatterBaseTest):
 
                         if predictedActivity.ambientContextType:
                             # AmbientContextType
-                            asserts.assert_less_equal(len(predictedActivity.ambientContextType),
+                            asserts.assert_less_equal(len(predictedActivity.ambientContextType), 100,
                                                       "AmbientContextType should be less than 100.")
 
                             for acts in predictedActivity.ambientContextType:
