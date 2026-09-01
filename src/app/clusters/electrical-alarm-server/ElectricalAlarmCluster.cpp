@@ -561,8 +561,8 @@ Status ElectricalAlarmCluster::HandleSetThresholds(const Commands::SetElectrical
         return s;
     }
     if ((s = checkPair(data.overPowerThreshold, data.underPowerThreshold, mOverPowerThreshold.value(),
-                       mFeatureFlags.Has(Feature::kOverPower), mUnderPowerThreshold.value(), mFeatureFlags.Has(Feature::kUnderPower))) !=
-        Status::Success)
+                       mFeatureFlags.Has(Feature::kOverPower), mUnderPowerThreshold.value(),
+                       mFeatureFlags.Has(Feature::kUnderPower))) != Status::Success)
     {
         return s;
     }
