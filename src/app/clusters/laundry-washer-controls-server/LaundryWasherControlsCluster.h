@@ -31,7 +31,6 @@ class LaundryWasherControlsCluster : public DefaultServerCluster
     constexpr static uint8_t kMaxSupportedRinsesLength = 4;
 
 public:
-
     struct Config
     {
         Config(BitFlags<LaundryWasherControls::Feature> features, LaundryWasherControls::Delegate & delegate) :
