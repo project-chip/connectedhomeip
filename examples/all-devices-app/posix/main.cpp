@@ -53,6 +53,7 @@
 #include <system/SystemLayer.h>
 
 #include <AppCommandDelegate.h>
+#include <ClusterRegistryTypes.h>
 #include <BleInit.h>
 #include <TermHandling.h>
 #if PW_RPC_ENABLED
@@ -297,10 +298,10 @@ void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipe
                     &rvcDevice->OperationalState());
             gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
                 .RegisterClusterInstance<chip::app::Clusters::ServiceArea::ServiceAreaCluster>(&rvcDevice->GetServiceAreaCluster());
-            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
-                .RegisterClusterInstance<chip::app::Clusters::ModeBaseCluster>(&rvcDevice->RunMode());
-            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
-                .RegisterClusterInstance<chip::app::Clusters::ModeBaseCluster>(&rvcDevice->CleanMode());
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry().RegisterClusterInstance<RvcRunModeType>(
+                &rvcDevice->RunMode());
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry().RegisterClusterInstance<RvcCleanModeType>(
+                &rvcDevice->CleanMode());
             gAllDevicesAppCommandDelegate.RegisterRvcDevice(rvcDevice->GetEndpointId(), rvcDevice);
         }
     }

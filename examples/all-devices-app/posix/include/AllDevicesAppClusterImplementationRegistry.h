@@ -19,8 +19,8 @@
 
 #include <app/util/basic-types.h>
 #include <map>
-#include <optional>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 namespace chip {
@@ -31,6 +31,22 @@ class ServerClusterInterface;
 
 template <typename ClusterType>
 const char * GetClusterTypeName();
+
+// Maps a registry lookup type to the concrete cluster implementation type.
+// When RegistryType is a cluster class (e.g. OnOffCluster), it is used directly.
+// When RegistryType is a tag struct with a ClusterType member (e.g. RvcRunModeType),
+// the tag disambiguates multiple instances that share the same implementation type.
+template <typename RegistryType, typename = void>
+struct ClusterRegistryTraits
+{
+    using ClusterType = RegistryType;
+};
+
+template <typename RegistryType>
+struct ClusterRegistryTraits<RegistryType, std::void_t<typename RegistryType::ClusterType>>
+{
+    using ClusterType = typename RegistryType::ClusterType;
+};
 
 /**
  * This class is responsible for holding pointers to all cluster instances
@@ -62,6 +78,10 @@ const char * GetClusterTypeName();
  *   {
  *       cluster->SetOnOff(true);
  *   }
+ *
+ *   // When several instances share the same implementation type, use a registry tag type:
+ *   registry.RegisterClusterInstance<RvcRunModeType>(&rvcDevice->RunMode());
+ *   auto * runMode = registry.GetClusterByEndpoint<RvcRunModeType>(endpointId);
  * @endcode
  */
 class AllDevicesAppClusterImplementationRegistry
@@ -69,27 +89,23 @@ class AllDevicesAppClusterImplementationRegistry
 public:
     AllDevicesAppClusterImplementationRegistry() = default;
 
-    template <typename ClusterType>
-    void RegisterClusterInstance(ClusterType * instance)
+    template <typename RegistryType>
+    void RegisterClusterInstance(typename ClusterRegistryTraits<RegistryType>::ClusterType * instance)
     {
-        const char * name = GetClusterTypeName<ClusterType>();
+        const char * name = GetClusterTypeName<RegistryType>();
         mClusters[name].push_back(instance);
     }
 
-    // If several instances of the same ClusterType are registered on the same endpoint (e.g. two
-    // ModeBaseCluster instances backing RVC Run Mode and RVC Clean Mode), pass clusterId to select
-    // the one you want.
-    template <typename ClusterType>
-    ClusterType * GetClusterByEndpoint(chip::EndpointId endpoint, std::optional<chip::ClusterId> clusterId = std::nullopt)
+    template <typename RegistryType>
+    typename ClusterRegistryTraits<RegistryType>::ClusterType * GetClusterByEndpoint(chip::EndpointId endpoint)
     {
-        const char * name = GetClusterTypeName<ClusterType>();
-        auto * cluster    = GetClusterInterfaceByEndpointAndType(name, endpoint, clusterId);
-        return static_cast<ClusterType *>(cluster);
+        const char * name = GetClusterTypeName<RegistryType>();
+        auto * cluster      = GetClusterInterfaceByEndpointAndType(name, endpoint);
+        return static_cast<typename ClusterRegistryTraits<RegistryType>::ClusterType *>(cluster);
     }
 
 private:
-    chip::app::ServerClusterInterface * GetClusterInterfaceByEndpointAndType(const char * typeName, chip::EndpointId endpoint,
-                                                                             std::optional<chip::ClusterId> clusterId);
+    chip::app::ServerClusterInterface * GetClusterInterfaceByEndpointAndType(const char * typeName, chip::EndpointId endpoint);
 
     std::map<std::string, std::vector<chip::app::ServerClusterInterface *>> mClusters;
 };
