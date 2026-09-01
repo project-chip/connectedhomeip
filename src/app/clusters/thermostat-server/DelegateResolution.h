@@ -118,7 +118,7 @@ static auto MakeFeature(Args &&... args)
  */
 template <bool Enabled>
 static auto MakeAtomicWriteSession(AtomicWriteSession::Delegate & delegate, TimerDelegate & timerDelegate,
-                                   FabricTable * fabricTable)
+                                   FabricTable & fabricTable)
 {
     if constexpr (Enabled)
     {

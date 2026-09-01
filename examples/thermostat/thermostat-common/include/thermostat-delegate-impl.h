@@ -45,7 +45,7 @@ public:
         mProvider(provider), mFabricTable(fabricTable)
     {}
 
-    FabricTable * GetFabricTable() const override;
+    FabricTable & GetFabricTable() const override;
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 

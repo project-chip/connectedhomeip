@@ -37,9 +37,9 @@ using namespace chip::app::Clusters::Thermostat::Structs;
 using namespace Protocols::InteractionModel;
 using namespace System::Clock;
 
-FabricTable * ThermostatDelegate::GetFabricTable() const
+FabricTable & ThermostatDelegate::GetFabricTable() const
 {
-    return mFabricTable != nullptr ? mFabricTable : &Server::GetInstance().GetFabricTable();
+    return mFabricTable != nullptr ? *mFabricTable : Server::GetInstance().GetFabricTable();
 }
 
 CHIP_ERROR ThermostatDelegate::Startup(ServerClusterContext & context)

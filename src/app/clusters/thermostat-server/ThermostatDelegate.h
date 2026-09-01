@@ -39,7 +39,7 @@ public:
     Delegate()          = default;
     virtual ~Delegate() = default;
 
-    virtual FabricTable * GetFabricTable() const;
+    virtual FabricTable & GetFabricTable() const = 0;
 
     virtual CHIP_ERROR Startup(ServerClusterContext & context);
     virtual void Shutdown(ClusterShutdownType type);
