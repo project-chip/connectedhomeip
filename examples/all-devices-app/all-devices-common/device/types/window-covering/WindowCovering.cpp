@@ -25,8 +25,8 @@ WindowCovering::WindowCovering(Clusters::WindowCovering::WindowCoveringDelegate 
                                Clusters::IdentifyDelegate & identifyDelegate, const Context & context,
                                Clusters::WindowCovering::OptionalAttributeSet optionalAttributes) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWindowCovering, 1)),
-    mTimerDelegate(context.timerDelegate), mOptionalAttributes(optionalAttributes),
-    mWindowCoveringDelegate(delegate), mIdentifyDelegate(identifyDelegate), mContext(context)
+    mTimerDelegate(context.timerDelegate), mOptionalAttributes(optionalAttributes), mWindowCoveringDelegate(delegate),
+    mIdentifyDelegate(identifyDelegate), mContext(context)
 {}
 
 CHIP_ERROR WindowCovering::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
