@@ -38,19 +38,6 @@ namespace chip {
 
 static constexpr int kInvokeTimeout = 2000;
 
-static inline std::string debug_blob_msg(blob_attr * attr)
-{
-    std::string s{};
-    char * json = blobmsg_format_json(attr, true);
-    if (json)
-    {
-        s = std::string(json);
-        free(json);
-    }
-
-    return s;
-}
-
 bool WiFiManagerUbus::GetUciBlob(const char * config, const char * type, blob_attr ** blob)
 {
     BlobMsgBuf buf;
@@ -89,6 +76,7 @@ void WiFiManagerUbus::InvokeUciGetWifiIfaces(void)
     if (!GetUciBlob("matter", "struct", &matter_config))
     {
         ChipLogError(AppServer, "Unable to fetch matter config, not setting default interface");
+        mDesiredRadio.clear();
     }
     else
     {
@@ -112,7 +100,6 @@ void WiFiManagerUbus::Init()
         [](UbusWatch & /*watch*/, void * appState) { static_cast<WiFiManagerUbus *>(appState)->InvokeUciGetWifiIfaces(); });
     mUci.SetNotificationCallback([](UbusWatch & /*watch*/, void * appState, ubus_request_data * /*req*/, const char * notification,
                                     blob_attr * msg) { static_cast<WiFiManagerUbus *>(appState)->InvokeUciGetWifiIfaces(); });
-
     mService.SetResolvedCallback(
         [](UbusWatch & /*watch*/, void * /*appState*/) { ChipLogDetail(AppServer, "WiFiManagerUbus: service object resolved"); });
 
@@ -151,6 +138,9 @@ void WiFiManagerUbus::Init()
             static_cast<WiFiManagerUbus *>(appState)->InvokeUciGetWifiIfaces();
         });
 
+    mUci.SetLostCallback(nullptr);
+    mService.SetLostCallback(nullptr);
+
     mUbusManager.Register(mUci);
     mUbusManager.Register(mService);
     ChipLogProgress(AppServer, "WiFiManagerUbus: init done");
@@ -165,8 +155,6 @@ void WiFiManagerUbus::OnPreferencesUpdate(blob_attr * msg)
     blob_attr * i      = nullptr;
     int rem            = 0;
     int r              = 0;
-
-    ChipLogProgress(AppServer, "preferences = %s", debug_blob_msg(msg).c_str());
 
     blobmsg_for_each_attr(cur, msg, rem)
     {
@@ -213,8 +201,6 @@ void WiFiManagerUbus::OnWirelessNetworksUpdate(blob_attr * msg)
     blob_attr * backup = nullptr;
     int rem            = 0;
     int r              = 0;
-
-    // ChipLogProgress(AppServer, "radios = %s", debug_blob_msg(msg).c_str());
 
     if (!mDesiredRadio.empty())
     {
@@ -266,10 +252,21 @@ void WiFiManagerUbus::OnWirelessNetworksUpdate(blob_attr * msg)
     }
     if (radio == nullptr && backup != nullptr)
     {
-        ChipLogError(AppServer, "Specified radio %s does not exist, falling back on first valid radio", mDesiredRadio.c_str());
+        ChipLogError(AppServer, "Specified radio %s does not exist or is not usable, falling back on first valid radio",
+                     mDesiredRadio.c_str());
         radio = backup;
     }
-    VerifyOrReturn(radio != nullptr, ChipLogError(AppServer, "No valid radio found!"));
+    if (radio == nullptr)
+    {
+        ChipLogError(AppServer, "No valid radio found!");
+        // We need to make sure not to advertise stale credentials
+        CHIP_ERROR err = mServer.ClearNetworkCredentials();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "ClearNetworkCredentials failed: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        return;
+    }
     char * ssid = nullptr;
     char * key  = nullptr;
 

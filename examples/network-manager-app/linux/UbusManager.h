@@ -95,7 +95,9 @@ public:
     using NotificationCallback = void (*)(UbusWatch & watch, void * appState, ubus_request_data * req, const char * notification,
                                           blob_attr * msg);
 
-    UbusWatch(const char * name, void * appState = nullptr) : ubus_subscriber{}, mAppState(appState), mName(name) {}
+    UbusWatch(const char * name, void * appState = nullptr) :
+        ubus_subscriber{}, mAppState(appState), mName(name), mResolvedCb(nullptr), mLostCb(nullptr), mNotificationCb(nullptr)
+    {}
 
     const char * Name() { return mName; }
     UbusWatch & SetName(const char * name)

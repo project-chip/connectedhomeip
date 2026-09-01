@@ -108,10 +108,17 @@ static void ApplicationEarlyInit()
 #endif
 }
 
+static inline ByteSpan ByteSpanFromCharSpan(const CharSpan & span)
+{
+    return ByteSpan(Uint8::from_const_char(span.data()), span.size());
+}
+
 void ApplicationInit()
 {
-    TEMPORARY_RETURN_IGNORED gWiFiNetworkManagementServer->SetNetworkCredentials(ByteSpan::fromCharSpan("MatterAP"_span),
-                                                                                 ByteSpan::fromCharSpan("Setec Astronomy"_span));
+#if !MATTER_ENABLE_UBUS
+    TEMPORARY_RETURN_IGNORED gWiFiNetworkManagementServer->SetNetworkCredentials(ByteSpanFromCharSpan("MatterAP"_span),
+                                                                                 ByteSpanFromCharSpan("Setec Astronomy"_span));
+#endif
 }
 
 void ApplicationShutdown()

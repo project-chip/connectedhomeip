@@ -27,7 +27,6 @@
 
 extern "C" {
 #include <libubox/blobmsg.h>
-#include <libubox/blobmsg_json.h>
 }
 
 namespace chip {
