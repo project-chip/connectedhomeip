@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
+#include "DishwasherManager.h"
 #include "AppConfig.h"
 #include "AppTask.h"
-#include "DishwasherManager.h"
 #include "operational-state-delegate-impl.h"
 
 #ifndef __ZEPHYR__
@@ -26,7 +26,7 @@
 #include "LEDWidget.h"
 
 namespace {
-    LEDWidget sDishwasherLED;
+LEDWidget sDishwasherLED;
 } // namespace
 #endif
 

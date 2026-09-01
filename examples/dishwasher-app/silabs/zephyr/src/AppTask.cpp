@@ -267,9 +267,10 @@ void UpdateEpmAttributesForOperationalState(OperationalStateEnum state)
         break;
     }
 
-    chip::ChipError err = gESManager->SendPowerReading(kAttributes[index].ActivePower, kAttributes[index].Voltage,
-                                                       kAttributes[index].ActiveCurrent);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(AppServer, "ERR: updating EPM attributes for operational state %" CHIP_ERROR_FORMAT, err.Format()));
+    chip::ChipError err =
+        gESManager->SendPowerReading(kAttributes[index].ActivePower, kAttributes[index].Voltage, kAttributes[index].ActiveCurrent);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "ERR: updating EPM attributes for operational state %" CHIP_ERROR_FORMAT, err.Format()));
 }
 
 void UpdateOperationalStateLed(OperationalStateEnum state)
