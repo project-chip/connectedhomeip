@@ -252,7 +252,9 @@ CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
         };
 
         ElectricalSensorManager::PtConfig ptConfig{
-            .features = BitMask<PowerTopology::Feature, uint32_t>(PowerTopology::Feature::kNodeTopology),
+            .features    = BitMask<PowerTopology::Feature, uint32_t>(PowerTopology::Feature::kNodeTopology,
+                                                                  PowerTopology::Feature::kElectricalCircuit),
+            .fabricTable = &Server::GetInstance().GetFabricTable(),
         };
 
         ReturnErrorOnFailure(gESManager->Init(endpointId, epmConfig, eemConfig, ptConfig));

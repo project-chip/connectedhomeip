@@ -46,9 +46,9 @@ using PredictedActivityDecodable         = AmbientContextSensing::Structs::Predi
 namespace {
 
 constexpr EndpointId kTestEndpointId = 1;
-constexpr BitFlags<Feature> kFeaturesAllForACSTest{ Feature::kHumanActivity, Feature::kObjectCounting,
+constexpr BitFlags<Feature> kFeaturesAllForACSTest{ Feature::kHumanActivity,        Feature::kObjectCounting,
                                                     Feature::kObjectIdentification, Feature::kSoundIdentification,
-                                                    Feature::kPredictedActivity };
+                                                    Feature::kPredictedActivity,    Feature::kSensorFusion };
 static SemanticTagType g_kACTSupportedArray[] = {
     {
         .namespaceID = kNamespaceIdentifiedHumanActivity,
@@ -120,6 +120,8 @@ public:
     CHIP_ERROR SetPredictedActivity(const Span<PredictedActivityType> & predictedActivityList) override;
     PredictActivity * GetPredictedActivityBuf() override { return mPredictActivityBuf; };
 
+    SemanticTagType * GetSensorFusionSupportedBuf(size_t size) override;
+
     AmbientContextSensed * AllocDetection() override;
     CHIP_ERROR DelDetection(AmbientContextSensed * pitem) override;
 
@@ -130,16 +132,19 @@ public:
     TestACSDelegate(TestACSDelegate &&)                  = delete;
     TestACSDelegate & operator=(TestACSDelegate &&)      = delete;
 
-    static constexpr uint8_t kMaxACTypeSupportedForTest   = 10;
-    static constexpr uint8_t kMaxPredictedActivityForTest = 3;
+    static constexpr uint8_t kMaxACTypeSupportedForTest       = 10;
+    static constexpr uint8_t kMaxPredictedActivityForTest     = 3;
+    static constexpr uint8_t kMaxSensorFusionSupportedForTest = 20;
 
 private:
     SemanticTagType mAmbientContextTypeSupportedBuf[kMaxACTypeSupportedForTest];
     PredictActivity mPredictActivityBuf[kMaxPredictedActivityForTest];
+    SemanticTagType mSensorFusionSupportedBuf[kMaxSensorFusionSupportedForTest];
+
     std::unique_ptr<AmbientContextSensed> mAmbientContextTypeList[kMaxSimultaneousDetectionLimit];
 };
 
-TestACSDelegate::TestACSDelegate() : mAmbientContextTypeSupportedBuf{}, mPredictActivityBuf{} {}
+TestACSDelegate::TestACSDelegate() : mAmbientContextTypeSupportedBuf{}, mPredictActivityBuf{}, mSensorFusionSupportedBuf{} {}
 
 SemanticTagType * TestACSDelegate::GetAmbientContextTypeSupportedBuf(size_t size)
 {
@@ -180,6 +185,12 @@ CHIP_ERROR TestACSDelegate::SetPredictedActivity(const Span<PredictedActivityTyp
     }
 
     return CHIP_NO_ERROR;
+}
+
+SemanticTagType * TestACSDelegate::GetSensorFusionSupportedBuf(size_t size)
+{
+    VerifyOrReturnError(size <= kMaxSensorFusionSupportedForTest, nullptr);
+    return mSensorFusionSupportedBuf;
 }
 
 AmbientContextSensed * TestACSDelegate::AllocDetection()
@@ -252,6 +263,7 @@ TEST_F(TestAmbientContextSensingCluster, TestAttributes)
     EXPECT_TRUE(featureMap.Has(Feature::kObjectIdentification));
     EXPECT_TRUE(featureMap.Has(Feature::kSoundIdentification));
     EXPECT_TRUE(featureMap.Has(Feature::kPredictedActivity));
+    EXPECT_TRUE(featureMap.Has(Feature::kSensorFusion));
 
     // Read the attributes
     bool eventDetected;
@@ -275,6 +287,7 @@ TEST_F(TestAmbientContextSensingCluster, TestAttributes)
                                                      Attributes::HoldTime::kMetadataEntry,
                                                      Attributes::HoldTimeLimits::kMetadataEntry,
                                                      Attributes::PredictedActivity::kMetadataEntry,
+                                                     Attributes::SensorFusionSupported::kMetadataEntry,
                                                  }));
     { // Read AmbientContextTypeSupported attribute, whose type is: list[SemanticTagStruct]
 
@@ -313,7 +326,7 @@ TEST_F(TestAmbientContextSensingCluster, TestAmbientContextTypeSupported)
 {
     chip::Testing::TestServerClusterContext context;
     constexpr BitFlags<Feature> kFeatures(Feature::kHumanActivity, Feature::kObjectCounting, Feature::kObjectIdentification,
-                                          Feature::kPredictedActivity);
+                                          Feature::kPredictedActivity, Feature::kSensorFusion);
     SemanticTagType kACTSupported_all[] = {
         {
             .namespaceID = kNamespaceIdentifiedHumanActivity,
@@ -904,8 +917,6 @@ TEST_F(TestAmbientContextSensingCluster, TestPredictActivity)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-<<<<<<< HEAD
-=======
 // The ObjectCountConfig label decodes into a CharSpan that aliases the write request's
 // PacketBuffer, so the cluster must copy it into storage it owns before retaining it.
 TEST_F(TestAmbientContextSensingCluster, TestObjectCountConfigLabelOutlivesRequestBuffer)
@@ -1139,5 +1150,4 @@ TEST_F(TestAmbientContextSensingCluster, TestSensorFusionSupported)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
->>>>>>> 53ebb0c ([AmbientContextSensing] Fix ObjectCountConfig label shallow copy and spec conformance (#73663))
 } // namespace
