@@ -49,6 +49,12 @@ class AVANALYTestBase:
                              f"Unexpected '{attribute}' value - expected {expected_value}, was {value}")
 
     async def send_enable_context_triggers_command(self, endpoint, context_triggers, expected_status: Status = Status.Success):
+        """Generate an EnableContextTriggers command executed on the cluster instance on the provided endpoint
+
+        Args:
+            context_triggers: The value of the ContextTriggers field that is sent
+            expected_status:  The status response to be matched, defaults to Success if a value is not provided.
+        """
         try:
             await self.send_single_cmd(cmd=Clusters.AvAnalysis.Commands.EnableContextTriggers(
                 contextTriggers=context_triggers),
@@ -60,6 +66,12 @@ class AVANALYTestBase:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned on enabling context triggers")
 
     async def send_disable_context_triggers_command(self, endpoint, context_triggers, expected_status: Status = Status.Success):
+        """Generate a DisableContextTriggers command executed on the cluster instance on the provided endpoint
+
+        Args:
+            context_triggers: The value of the ContextTriggers field that is sent
+            expected_status:  The status response to be matched, defaults to Success if a value is not provided.
+        """
         try:
             await self.send_single_cmd(cmd=Clusters.AvAnalysis.Commands.DisableContextTriggers(
                 contextTriggers=context_triggers),
@@ -70,7 +82,13 @@ class AVANALYTestBase:
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned on disabling context triggers")
 
-    async def get_zoneids_from_zone_management(self, endpoint) -> [int]:
+    async def get_zoneids_from_zone_management(self, endpoint) -> list[int]:
+        """Returns a list of ZoneIDs that are available from the ZoneManagament cluster on the target endpoint. If none are 
+        present it will attempt to create one. 
+
+        Returns:
+            list[int]:  the list of ZoneIDs that are found.  Will be empty if there are none.
+        """
         zones = []
         zoneIDs = []
 
