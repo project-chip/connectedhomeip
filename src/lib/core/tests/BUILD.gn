@@ -18,6 +18,8 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
 import("${chip_root}/build/chip/fuzz_test.gni")
 
+# Regression test for GroupedCallbackList (sensitive to ICF folding).
+# Kept local to avoid repo-wide symbolication/debuggability impacts.
 config("icf_config") {
   if (is_clang && (current_os == "linux" || current_os == "android")) {
     ldflags = [ "-Wl,--icf=all" ]
