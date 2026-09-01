@@ -1848,9 +1848,9 @@ CameraError CameraDevice::RemoveZoneTrigger(const uint16_t zoneId)
     return CameraError::SUCCESS;
 }
 
-bool CameraDevice::HasZone(const uint16_t zoneId)
+bool CameraDevice::IsValidAnalysisZone(const uint16_t zoneId)
 {
-    return mZoneManager.HasZone(zoneId);
+    return mZoneManager.IsValidAnalysisZone(zoneId);
 }
 
 void CameraDevice::HandleSimulatedZoneTriggeredEvent(const std::vector<uint16_t> & zoneIds)

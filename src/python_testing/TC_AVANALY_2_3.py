@@ -62,7 +62,7 @@ class TC_AVANALY_2_3(MatterBaseTest, AVANALYTestBase):
             TestStep(2, "TH reads the SupportedAmbientContexts attribute, save as `supported_ambient_contexts`."),
             TestStep(3, "If the DUT has feature PerZoneDetect, TH reads the Zones attribute from the ZoneManagement cluster.",
                         "If there are no zones defined, TH creates one. Save the ZoneIDs as 'zoneIDs'."),
-            TestStep(4, "TH sends an EnableContextTriggers command with `ContextTriggers` containing a context NOT in `supported_ambient_contexts`. Verify DynamicConstraing error."),
+            TestStep(4, "TH sends an EnableContextTriggers command with `ContextTriggers` containing a context NOT in `supported_ambient_contexts`. Verify ConstraintError."),
             TestStep(5, "If `zoneIDs` is not empty, TH sends an EnableContextTriggers command with `ContextTriggers` containing a `ZoneID` NOT in `existing_zones` Verify NotFound error."),
             TestStep(6, "TH sends an EnableContextTriggers command with `ContextTriggers` containing a valid subset of `supported_contexts` and valid `ZoneIDs` (or null if no 'zoneIDs'). Verify Success."),
             TestStep(7, "TH reads the ActiveAmbientContextTriggers attribute. Verify it contains the contexts provided in step 6."),
@@ -130,11 +130,11 @@ class TC_AVANALY_2_3(MatterBaseTest, AVANALYTestBase):
         valid_context_triggers = []
         
         # Set ZoneIDs to None if no feature, Null if feature and no zone IDs, or the first zoneID if we have those
-        valid_context_zoneID = None
+        valid_context_zoneIDs = None
         if self.has_feature_perzonedetect:
-            valid_context_zoneID = zoneIDs[0] if len(zoneIDs) >= 1 else NullValue
+            valid_context_zoneIDs = [zoneIDs[0]] if len(zoneIDs) >= 1 else NullValue
 
-        context_trigger = structs.ContextTriggerStruct(context = supported_ambient_contexts_dut[0], zoneIDs = [valid_context_zoneID])
+        context_trigger = structs.ContextTriggerStruct(context = supported_ambient_contexts_dut[0], zoneIDs = valid_context_zoneIDs)
         valid_context_triggers.append(context_trigger)
             
         await self.send_enable_context_triggers_command(endpoint, valid_context_triggers)

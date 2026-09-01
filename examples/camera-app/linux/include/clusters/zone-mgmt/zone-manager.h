@@ -56,7 +56,7 @@ public:
 
     Protocols::InteractionModel::Status RemoveTrigger(uint16_t zoneID) override;
     
-    bool HasZone(uint16_t zoneId) override;
+    bool IsValidAnalysisZone(uint16_t zoneId) override;
 
     void OnAttributeChanged(AttributeId attributeId) override;
 

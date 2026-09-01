@@ -139,7 +139,7 @@ public:
         return CHIP_NO_ERROR;
     }
     
-    bool HasZone(const uint16_t zoneId) override { return true; }
+    bool IsValidAnalysisZone(const uint16_t zoneId) override { return true; }
 
 
     std::vector<ZoneInformationStorage> mPersistedZones;

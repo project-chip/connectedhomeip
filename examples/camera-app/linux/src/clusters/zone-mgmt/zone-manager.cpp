@@ -116,14 +116,18 @@ Protocols::InteractionModel::Status ZoneManager::RemoveTrigger(uint16_t zoneID)
     }
 }
 
-bool ZoneManager::HasZone(uint16_t zoneId)
+bool ZoneManager::IsValidAnalysisZone(uint16_t zoneId)
 {
     // Find an iterator to the item with the matching ID
     auto it = std::find_if(mTwoDCartZones.begin(), mTwoDCartZones.end(),
                            [zoneId](const TwoDCartZone & zone) { return zone.zoneId == zoneId; });
 
-    // If an item with the zoneID was found
-    return (it != mTwoDCartZones.end());
+    // If an item with the zoneID was found, ensure it is not a privacy zone
+    if (it != mTwoDCartZones.end())
+    {
+        return (it->zone.use != ZoneUseEnum::kPrivacy);
+    }
+    return false;
 }
 
 CHIP_ERROR ZoneManager::LoadZones(std::vector<ZoneInformationStorage> & aZones)

@@ -343,7 +343,7 @@ public:
 
     CameraError RemoveZoneTrigger(uint16_t zoneId) override;
     
-    bool HasZone(uint16_t zoneId) override;
+    bool IsValidAnalysisZone(uint16_t zoneId) override;
 
     CameraError SetPan(int16_t aPan) override;
     CameraError SetTilt(int16_t aTilt) override;

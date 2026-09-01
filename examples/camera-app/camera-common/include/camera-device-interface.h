@@ -400,7 +400,7 @@ public:
         virtual CameraError RemoveZoneTrigger(uint16_t zoneId) = 0;
         
         // Verify Zone presence
-        virtual bool HasZone(uint16_t zoneId) = 0;
+        virtual bool IsValidAnalysisZone(uint16_t zoneId) = 0;
 
         class ZoneEventCallback
         {
