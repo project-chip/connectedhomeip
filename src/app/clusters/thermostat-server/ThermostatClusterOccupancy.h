@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include "Temperature.h"
 #include "ThermostatClusterBase.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
