@@ -54,6 +54,11 @@ static constexpr uint16_t kX509NoWellDefinedExpirationDateYear = 9999;
 static constexpr uint32_t kMaxCHIPCertLength = 400;
 static constexpr uint32_t kMaxDERCertLength  = 600;
 
+// Per specifications (6.1.3 PQC Phase 1 certifate sizes can be greater than 600 bytes)
+// Section 3.12 specifies the limit for ML-DSA-44 and ML-DSA-65 certificates.
+static constexpr uint32_t kMaxDERCertLengthMlDsa44 = 4732;
+static constexpr uint32_t kMaxDERCertLengthMlDsa65 = 6144;
+
 // As per spec section 11.24 (Wi-Fi Authentication with Per-Device Credentials)
 inline constexpr uint32_t kMaxCHIPCompactNetworkIdentityLength = 137;
 
