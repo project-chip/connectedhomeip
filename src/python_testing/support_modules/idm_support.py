@@ -668,7 +668,7 @@ class IDMBaseTest(BasicCompositionTests):
         if 'string' in datatype or 'octstr' in datatype:
             def make(length: int) -> str | bytes:
                 if 'octstr' in datatype:
-                    return b'\x00' * length
+                    return b'x' * length
                 return 'x' * length
 
             if constraints.max_length is not None:
