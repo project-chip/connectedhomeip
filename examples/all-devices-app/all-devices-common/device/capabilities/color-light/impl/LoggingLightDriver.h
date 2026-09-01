@@ -18,6 +18,7 @@
 #pragma once
 
 #include <device/capabilities/color-light/ColorLight.h>
+#include <device/capabilities/color-light/impl/PlanckianColorConverter.h>
 
 namespace chip {
 namespace app {
@@ -34,7 +35,7 @@ class LoggingLightDriver : public ColorLight,
                            public Clusters::OnOffDelegate,
                            public Clusters::LevelControlDelegate,
                            public Clusters::OnOffEffectDelegate,
-                           public Clusters::ColorControlDelegate,
+                           public PlanckianColorConverter,
                            public Clusters::IdentifyDelegate
 {
 public:
@@ -61,10 +62,9 @@ protected:
     // logged; HueSaturation and EnhancedHue are left at their no-op defaults because neither device
     // type advertises those features, so the cluster never feeds them.
     //
-    // The XY <-> mireds conversions are also left at their defaults, as this driver has no physical
-    // output to calibrate them against. The Extended Color Light advertises XY and ColorTemperature
-    // together, so a mode switch or a read of the inactive mode's attribute reports the
-    // ColorControlColorState default rather than a value converted from the active color.
+    // The XY <-> mireds conversions the Extended Color Light does need come from
+    // PlanckianColorConverter, so a mode switch or a read of the inactive mode's attribute reports a
+    // value derived from the active color rather than a constant.
     void OnColorXYChanged(uint16_t x, uint16_t y, bool transitionActive) override;
     void OnColorCTChanged(uint16_t mireds, bool transitionActive) override;
 

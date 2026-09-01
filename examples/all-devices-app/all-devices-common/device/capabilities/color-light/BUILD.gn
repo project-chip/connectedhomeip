@@ -39,6 +39,20 @@ source_set("color-light") {
   ]
 }
 
+source_set("planckian-color-converter") {
+  sources = [
+    "impl/PlanckianColorConverter.cpp",
+    "impl/PlanckianColorConverter.h",
+  ]
+
+  public_deps = [ "${chip_root}/src/app/clusters/color-control-server" ]
+
+  public_configs = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/device:includes",
+    "${chip_root}/src:includes",
+  ]
+}
+
 source_set("logging") {
   sources = [
     "impl/LoggingLightDriver.cpp",
@@ -47,6 +61,7 @@ source_set("logging") {
 
   public_deps = [
     ":color-light",
+    ":planckian-color-converter",
     "${chip_root}/src/app/clusters/color-control-server",
     "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/app/clusters/level-control",
