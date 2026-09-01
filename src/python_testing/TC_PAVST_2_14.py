@@ -208,9 +208,11 @@ class TC_PAVST_2_14(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         asserts.assert_equal(opts.audioStreamID, audio_stream_id, "audioStreamID mismatch")
         asserts.assert_equal(opts.TLSEndpointID, self.tlsEndpointId, "TLSEndpointID mismatch")
         asserts.assert_equal(opts.url, f"https://{host_ip}:1234/streams/{uploadStreamId}/", "URL mismatch")
-        asserts.assert_equal(opts.triggerOptions.triggerType, pvcluster.Enums.TransportTriggerTypeEnum.kContinuous, "triggerType mismatch")
+        asserts.assert_equal(opts.triggerOptions.triggerType,
+                             pvcluster.Enums.TransportTriggerTypeEnum.kContinuous, "triggerType mismatch")
         asserts.assert_equal(opts.ingestMethod, pvcluster.Enums.IngestMethodsEnum.kCMAFIngest, "ingestMethod mismatch")
-        asserts.assert_equal(opts.containerOptions.containerType, pvcluster.Enums.ContainerFormatEnum.kCmaf, "containerType mismatch")
+        asserts.assert_equal(opts.containerOptions.containerType,
+                             pvcluster.Enums.ContainerFormatEnum.kCmaf, "containerType mismatch")
         cmafOpts = opts.containerOptions.CMAFContainerOptions
         asserts.assert_is_not_none(cmafOpts, "CMAFContainerOptions must not be None")
         asserts.assert_equal(cmafOpts.CMAFInterface, pvcluster.Enums.CMAFInterfaceEnum.kInterface1, "CMAFInterface mismatch")
