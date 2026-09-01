@@ -178,7 +178,7 @@ DataModel::ActionReturnStatus ValveConfigurationAndControlCluster::WriteImpl(con
         ReturnErrorOnFailure(decoder.Decode(defaultOpenLevel));
         // DefaultOpenLevel is constrained to 1 to 100; Percent decodes as a plain uint8 and enforces neither bound.
         VerifyOrReturnError(defaultOpenLevel >= kMinLevelValuePercent && defaultOpenLevel <= kMaxLevelValuePercent,
-                            CHIP_IM_GLOBAL_STATUS(ConstraintError));
+                            Status::ConstraintError);
         VerifyOrReturnValue(defaultOpenLevel != mDefaultOpenLevel, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
         // TODO(#40708): Currently the `DecodeAndStoreNativeEndianValue` function doesn't allow performing specific checks
         // on provided values; update this logic once a fix for
