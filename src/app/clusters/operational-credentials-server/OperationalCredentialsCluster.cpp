@@ -30,6 +30,7 @@
 #include <credentials/CertificationDeclaration.h>
 #include <credentials/DeviceAttestationConstructor.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <tracing/macros.h>
 
 using namespace chip;
@@ -41,9 +42,30 @@ using namespace chip::Protocols::InteractionModel;
 using namespace chip::Transport;
 namespace {
 
-constexpr auto kDACCertificate                = CertificateChainTypeEnum::kDACCertificate;
-constexpr auto kPAICertificate                = CertificateChainTypeEnum::kPAICertificate;
-constexpr auto kNocResponseMaxDebugTextLength = 128;
+constexpr auto kDACCertificate                       = CertificateChainTypeEnum::kDACCertificate;
+constexpr auto kPAICertificate                       = CertificateChainTypeEnum::kPAICertificate;
+constexpr auto kLegacyAttestationProfile             = AttestationCryptoProfileEnum::kEcdsaMatterLegacy;
+constexpr uint16_t kDefaultCertificateSegmentSize    = 600;
+constexpr size_t kMaxPqcCertificateChainDocumentSize = 10240;
+constexpr auto kNocResponseMaxDebugTextLength        = 128;
+
+bool ProviderHasRequiredPqcCredentials(const Credentials::DeviceAttestationCredentialsProvider & provider)
+{
+    using Credentials::DeviceAttestationCertProfileBitmap;
+
+    constexpr uint8_t kLegacyProfile = static_cast<uint8_t>(DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy);
+    constexpr uint8_t kPqcProfiles   = static_cast<uint8_t>(DeviceAttestationCertProfileBitmap::kSupportsMlDsa44) |
+        static_cast<uint8_t>(DeviceAttestationCertProfileBitmap::kSupportsMlDsa65);
+
+    const auto profileSupport = provider.GetDeviceAttestationProfileSupport();
+    const bool hasLegacyChain = (profileSupport.paaSupportedProfiles.Raw() & kLegacyProfile) != 0 &&
+        (profileSupport.paiSupportedProfiles.Raw() & kLegacyProfile) != 0 &&
+        (profileSupport.dacSupportedProfiles.Raw() & kLegacyProfile) != 0;
+    const bool hasPqcIssuer = (profileSupport.paaSupportedProfiles.Raw() & kPqcProfiles) != 0 ||
+        (profileSupport.paiSupportedProfiles.Raw() & kPqcProfiles) != 0;
+
+    return hasLegacyChain && hasPqcIssuer;
+}
 
 // Get the attestation challenge for the current session in progress. Only valid when called
 // synchronously from inside a CommandHandler. If not called in CASE/PASE session context,
@@ -59,6 +81,69 @@ ByteSpan GetAttestationChallengeFromCurrentSession(app::CommandHandler * command
 
     ByteSpan attestationChallenge = sessionHandle->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
     return attestationChallenge;
+}
+
+BitMask<AttestationCryptoProfileBitmap>
+ToOperationalCredentialsProfileBitmap(BitMask<Credentials::DeviceAttestationCertProfileBitmap> profileBitmap)
+{
+    return BitMask<AttestationCryptoProfileBitmap>(profileBitmap.Raw());
+}
+
+Structs::PQCDeviceAttestationProfileStruct::Type
+ToOperationalCredentialsProfileSupport(const Credentials::DeviceAttestationProfileSupport & profileSupport)
+{
+    Structs::PQCDeviceAttestationProfileStruct::Type profile;
+    profile.PAASupportedProfiles = ToOperationalCredentialsProfileBitmap(profileSupport.paaSupportedProfiles);
+    profile.PAISupportedProfiles = ToOperationalCredentialsProfileBitmap(profileSupport.paiSupportedProfiles);
+    profile.DACSupportedProfiles = ToOperationalCredentialsProfileBitmap(profileSupport.dacSupportedProfiles);
+    return profile;
+}
+
+static_assert(to_underlying(AttestationCryptoProfileEnum::kEcdsaMatterLegacy) ==
+                  to_underlying(Credentials::DeviceAttestationCertProfile::kEcdsaMatterLegacy),
+              "Attestation profile enums must stay numerically aligned");
+static_assert(to_underlying(AttestationCryptoProfileEnum::kMlDsa44) ==
+                  to_underlying(Credentials::DeviceAttestationCertProfile::kMlDsa44),
+              "Attestation profile enums must stay numerically aligned");
+static_assert(to_underlying(AttestationCryptoProfileEnum::kMlDsa65) ==
+                  to_underlying(Credentials::DeviceAttestationCertProfile::kMlDsa65),
+              "Attestation profile enums must stay numerically aligned");
+
+CHIP_ERROR ToDeviceAttestationProfile(AttestationCryptoProfileEnum profile, Credentials::DeviceAttestationCertProfile & outProfile)
+{
+    if (profile == AttestationCryptoProfileEnum::kUnknownEnumValue)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    outProfile = static_cast<Credentials::DeviceAttestationCertProfile>(to_underlying(profile));
+    return CHIP_NO_ERROR;
+}
+
+BitMask<Credentials::DeviceAttestationCertProfileBitmap>
+ToDeviceAttestationProfileBitmap(Credentials::DeviceAttestationCertProfile profile)
+{
+    return BitMask<Credentials::DeviceAttestationCertProfileBitmap>(static_cast<uint8_t>(1u << to_underlying(profile)));
+}
+
+CHIP_ERROR BuildSegmentedCertificateResponse(const ByteSpan & segment, size_t documentSize, size_t offset, uint16_t segmentId,
+                                             Commands::CertificateChainResponse::Type & response)
+{
+    VerifyOrReturnError(documentSize != 0 && documentSize <= kMaxPqcCertificateChainDocumentSize, CHIP_ERROR_MESSAGE_TOO_LONG);
+    VerifyOrReturnError(offset < documentSize, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(CanCastTo<uint16_t>(documentSize), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(segment.size() == std::min(documentSize - offset, static_cast<size_t>(kDefaultCertificateSegmentSize)),
+                        CHIP_ERROR_INVALID_ARGUMENT);
+
+    response.certificate = segment;
+    response.totalDocumentSize.SetValue(static_cast<uint16_t>(documentSize));
+
+    if (offset + segment.size() < documentSize)
+    {
+        response.nextSegmentID.SetValue(static_cast<uint16_t>(segmentId + 1));
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 const FabricInfo * RetrieveCurrentFabric(CommandHandler * aCommandHandler, FabricTable & fabricTable)
@@ -909,30 +994,65 @@ std::optional<DataModel::ActionReturnStatus> HandleSignVIDVerificationRequest(Co
 
 std::optional<DataModel::ActionReturnStatus>
 HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                              TLV::TLVReader & input_arguments, Credentials::DeviceAttestationCredentialsProvider & dacProvider)
+                              TLV::TLVReader & input_arguments, Credentials::DeviceAttestationCredentialsProvider & dacProvider,
+                              BitFlags<OperationalCredentials::Feature> featureMap)
 {
     MATTER_TRACE_SCOPE("CertificateChainRequest", "OperationalCredentials");
     Commands::CertificateChainRequest::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments));
 
-    auto & certificateType = commandData.certificateType;
+    const auto certificateType = commandData.certificateType;
+    const bool pqcDaEnabled    = featureMap.Has(OperationalCredentials::Feature::kPQCDeviceAttestation);
+    const bool profileRequest  = pqcDaEnabled && commandData.cryptoProfile.HasValue();
+    const auto cryptoProfile   = commandData.cryptoProfile.ValueOr(kLegacyAttestationProfile);
+    const uint16_t segmentId   = profileRequest ? commandData.segmentID.ValueOr(0) : 0;
+    const uint16_t requestedSegmentSize =
+        profileRequest ? commandData.maxSegmentSize.ValueOr(kDefaultCertificateSegmentSize) : kDefaultCertificateSegmentSize;
+    const auto profileSupport = dacProvider.GetDeviceAttestationProfileSupport();
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    uint8_t derBuf[Credentials::kMaxDERCertLength];
-    MutableByteSpan derBufSpan(derBuf);
+    CHIP_ERROR err                                             = CHIP_NO_ERROR;
+    Credentials::DeviceAttestationCertProfile requestedProfile = Credentials::DeviceAttestationCertProfile::kEcdsaMatterLegacy;
+    Credentials::DeviceAttestationDocumentType documentType;
+    uint8_t documentBuffer[kDefaultCertificateSegmentSize];
+    MutableByteSpan documentSpan(documentBuffer);
+    size_t documentSize = 0;
+    size_t offset       = 0;
 
     Commands::CertificateChainResponse::Type response;
+
+    if (pqcDaEnabled && !profileRequest && (commandData.segmentID.HasValue() || commandData.maxSegmentSize.HasValue()))
+    {
+        return Status::InvalidCommand;
+    }
+
+    if (profileRequest)
+    {
+        VerifyOrReturnValue(ToDeviceAttestationProfile(cryptoProfile, requestedProfile) == CHIP_NO_ERROR, Status::InvalidCommand);
+        VerifyOrReturnValue(requestedSegmentSize >= kDefaultCertificateSegmentSize, Status::InvalidCommand);
+        offset = static_cast<size_t>(segmentId) * kDefaultCertificateSegmentSize;
+    }
 
     if (certificateType == kDACCertificate)
     {
         ChipLogProgress(Zcl, "OpCreds: Certificate Chain request received for DAC");
-        SuccessOrExit(err = dacProvider.GetDeviceAttestationCert(derBufSpan));
+        VerifyOrReturnValue(!profileRequest ||
+                                profileSupport.dacSupportedProfiles.HasAll(ToDeviceAttestationProfileBitmap(requestedProfile)),
+                            Status::InvalidCommand);
+        documentType = Credentials::DeviceAttestationDocumentType::kDACCertificate;
+        SuccessOrExit(err = profileRequest ? dacProvider.GetDeviceAttestationDocumentSegment(documentType, requestedProfile, offset,
+                                                                                             documentSpan, documentSize)
+                                           : dacProvider.GetDeviceAttestationCert(documentSpan));
     }
     else if (certificateType == kPAICertificate)
     {
         ChipLogProgress(Zcl, "OpCreds: Certificate Chain request received for PAI");
-        SuccessOrExit(err = dacProvider.GetProductAttestationIntermediateCert(derBufSpan));
+        VerifyOrReturnValue(!profileRequest ||
+                                profileSupport.paiSupportedProfiles.HasAll(ToDeviceAttestationProfileBitmap(requestedProfile)),
+                            Status::InvalidCommand);
+        documentType = Credentials::DeviceAttestationDocumentType::kPAICertificate;
+        SuccessOrExit(err = profileRequest ? dacProvider.GetDeviceAttestationDocumentSegment(documentType, requestedProfile, offset,
+                                                                                             documentSpan, documentSize)
+                                           : dacProvider.GetProductAttestationIntermediateCert(documentSpan));
     }
     else
     {
@@ -940,7 +1060,17 @@ HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommand
         return Status::InvalidCommand;
     }
 
-    response.certificate = derBufSpan;
+    if (!profileRequest)
+    {
+        response.certificate = documentSpan;
+    }
+    else
+    {
+        VerifyOrReturnValue(BuildSegmentedCertificateResponse(documentSpan, documentSize, offset, segmentId, response) ==
+                                CHIP_NO_ERROR,
+                            Status::InvalidCommand);
+    }
+
     commandObj->AddResponse(commandPath, response);
     return std::nullopt;
 
@@ -1109,6 +1239,14 @@ void OperationalCredentialsCluster::FailSafeCleanup(const DeviceLayer::ChipDevic
     }
 }
 
+OperationalCredentialsCluster::OperationalCredentialsCluster(EndpointId endpoint, const Context context) :
+    DefaultServerCluster({ endpoint, OperationalCredentials::Id }), mOpCredsContext(context)
+{
+    VerifyOrDieWithMsg(!HasFeature(OperationalCredentials::Feature::kPQCDeviceAttestation) ||
+                           ProviderHasRequiredPqcCredentials(mOpCredsContext.dacProvider),
+                       AppServer, "PQC Device Attestation requires a legacy chain and PQC PAA or PAI credentials");
+}
+
 CHIP_ERROR OperationalCredentialsCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
@@ -1128,8 +1266,12 @@ CHIP_ERROR OperationalCredentialsCluster::Attributes(const ConcreteClusterPath &
 {
     AttributeListBuilder listBuilder(builder);
 
-    return listBuilder.Append(Span(OperationalCredentials::Attributes::kMandatoryMetadata),
-                              Span<const AttributeListBuilder::OptionalAttributeEntry>());
+    const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
+        { HasFeature(OperationalCredentials::Feature::kPQCDeviceAttestation),
+          OperationalCredentials::Attributes::PQCDeviceAttestationProfile::kMetadataEntry },
+    };
+
+    return listBuilder.Append(Span(OperationalCredentials::Attributes::kMandatoryMetadata), Span(optionalAttributes));
 }
 
 DataModel::ActionReturnStatus OperationalCredentialsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -1140,7 +1282,7 @@ DataModel::ActionReturnStatus OperationalCredentialsCluster::ReadAttribute(const
     case OperationalCredentials::Attributes::ClusterRevision::Id:
         return encoder.Encode(OperationalCredentials::kRevision);
     case OperationalCredentials::Attributes::FeatureMap::Id:
-        return encoder.Encode(static_cast<uint32_t>(0));
+        return encoder.Encode(mOpCredsContext.featureMap.Raw());
     case OperationalCredentials::Attributes::NOCs::Id:
         return ReadNOCs(encoder, mOpCredsContext.fabricTable);
     case OperationalCredentials::Attributes::Fabrics::Id:
@@ -1153,6 +1295,11 @@ DataModel::ActionReturnStatus OperationalCredentialsCluster::ReadAttribute(const
         return ReadRootCertificates(encoder, mOpCredsContext.fabricTable);
     case OperationalCredentials::Attributes::CurrentFabricIndex::Id:
         return encoder.Encode(static_cast<uint8_t>(encoder.AccessingFabricIndex()));
+    case OperationalCredentials::Attributes::PQCDeviceAttestationProfile::Id:
+        VerifyOrReturnError(HasFeature(OperationalCredentials::Feature::kPQCDeviceAttestation),
+                            Protocols::InteractionModel::Status::UnsupportedAttribute);
+        return encoder.Encode(
+            ToOperationalCredentialsProfileSupport(mOpCredsContext.dacProvider.GetDeviceAttestationProfileSupport()));
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
@@ -1194,7 +1341,8 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
     case OperationalCredentials::Commands::AttestationRequest::Id:
         return HandleAttestationRequest(handler, request.path, input_arguments, mOpCredsContext.dacProvider);
     case OperationalCredentials::Commands::CertificateChainRequest::Id:
-        return HandleCertificateChainRequest(handler, request.path, input_arguments, mOpCredsContext.dacProvider);
+        return HandleCertificateChainRequest(handler, request.path, input_arguments, mOpCredsContext.dacProvider,
+                                             mOpCredsContext.featureMap);
     case OperationalCredentials::Commands::CSRRequest::Id:
         return HandleCSRRequest(handler, request.path, input_arguments, mOpCredsContext.fabricTable,
                                 mOpCredsContext.failSafeContext, mOpCredsContext.dacProvider, mCsrVendorReserved);

@@ -53,6 +53,7 @@ struct LinuxDeviceOptions
     chip::Optional<std::vector<uint8_t>> spake2pVerifier;
     chip::Optional<std::vector<uint8_t>> spake2pSalt;
     chip::Optional<std::string> dacProviderFile;
+    bool dacProviderPqcReady = false;
     uint32_t spake2pIterations = 0; // When not provided (0), will default elsewhere
     uint32_t mBleDevice        = 0;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -131,3 +132,4 @@ struct LinuxDeviceOptions
 };
 
 CHIP_ERROR ParseArguments(int argc, char * const argv[], chip::ArgParser::OptionSet * customOptions = nullptr);
+void ResolveDeviceAttestationCredentialsProvider();
