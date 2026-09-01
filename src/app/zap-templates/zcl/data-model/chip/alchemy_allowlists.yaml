@@ -43,8 +43,6 @@ INCOMPLETE_METADATA_ALLOWLIST:
     - fan-control-cluster.xml
     - general-commissioning-cluster.xml
     - global-structs.xml
-    - joint-fabric-administrator-cluster.xml
-    - joint-fabric-datastore-cluster.xml
     - laundry-dryer-controls-cluster.xml
     - localization-configuration-cluster.xml
     - media-input-cluster.xml
