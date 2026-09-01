@@ -127,6 +127,9 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_METERING_TRIGGER
 #include <app/clusters/commodity-metering-server/CommodityMeteringTestEventTriggerHandler.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_IDENTITY_MANAGEMENT_TRIGGER
+#include <app/clusters/network-identity-management-server/NetworkIdentityManagementTestEventTriggerHandler.h>
+#endif
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDManager.h> // nogncheck
 #endif
@@ -976,6 +979,10 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_METERING_TRIGGER
     static CommodityMeteringTestEventTriggerHandler CommodityMeteringTestEventTriggerHandler;
     SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&CommodityMeteringTestEventTriggerHandler));
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_IDENTITY_MANAGEMENT_TRIGGER
+    static NetworkIdentityManagementTestEventTriggerHandler sNetworkIdentityManagementTestEventTriggerHandler;
+    SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sNetworkIdentityManagementTestEventTriggerHandler));
 #endif
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&Server::GetInstance().GetICDManager()));
