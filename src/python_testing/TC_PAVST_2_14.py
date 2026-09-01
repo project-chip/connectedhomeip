@@ -46,7 +46,7 @@ from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess, SupportedIngestInt
 from TC_PAVSTTestBase import PAVSTTestBase
 
 import matter.clusters as Clusters
-from matter.interaction_model import InteractionModelError, Status
+from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.runner import default_matter_test_main
@@ -98,7 +98,8 @@ class TC_PAVST_2_14(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             TestStep(7, "TH waits for the DUT to come back online.", "DUT is online."),
             TestStep(8, "TH Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT",
                      "Verify the number of PushAV Connections is 1 and the entry still matches the allocated transport with aConnectionID."),
-            TestStep(9, "TH sends the DeallocatePushTransport command with ConnectionID = aConnectionID.", "DUT responds with SUCCESS status code."),
+            TestStep(9, "TH sends the DeallocatePushTransport command with ConnectionID = aConnectionID.",
+                     "DUT responds with SUCCESS status code."),
             TestStep(10, "TH Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT",
                      "Verify the number of PushAV Connections is 0."),
             TestStep(11, "TH reboots the DUT.", "DUT is rebooted."),
