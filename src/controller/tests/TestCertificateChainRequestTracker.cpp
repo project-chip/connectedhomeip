@@ -77,10 +77,10 @@ TEST(CertificateChainRequestTracker, RejectsOversizedDocument)
     CertificateChainRequestTracker tracker;
 
     const uint8_t firstSegment[] = { 0x42 };
-    EXPECT_EQ(tracker.HandleResponse(ByteSpan(firstSegment),
-                                     MakeOptional<uint16_t>(static_cast<uint16_t>(
-                                         CertificateChainRequestTracker::kMaxCertificateDocumentSize + 1)),
-                                     MakeOptional<uint16_t>(static_cast<uint16_t>(1))),
+    EXPECT_EQ(tracker.HandleResponse(
+                  ByteSpan(firstSegment),
+                  MakeOptional<uint16_t>(static_cast<uint16_t>(CertificateChainRequestTracker::kMaxCertificateDocumentSize + 1)),
+                  MakeOptional<uint16_t>(static_cast<uint16_t>(1))),
               CHIP_ERROR_MESSAGE_TOO_LONG);
 }
 

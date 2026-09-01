@@ -87,7 +87,8 @@ CHIP_ERROR CertificateChainRequestTracker::HandleSegmentedResponse(ByteSpan cert
 
     if (nextSegmentId.HasValue())
     {
-        // Make sure next segment id is the next expected segment id, which should be the current segment id + 1. If nextSegmentId is not provided, it means this is the last segment.
+        // Make sure next segment id is the next expected segment id, which should be the current segment id + 1. If nextSegmentId
+        // is not provided, it means this is the last segment.
         if (mNextSegmentId.HasValue())
         {
             VerifyOrReturnError(nextSegmentId.Value() == mNextSegmentId.Value() + 1, CHIP_ERROR_INVALID_ARGUMENT);

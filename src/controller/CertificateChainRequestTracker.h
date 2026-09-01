@@ -17,8 +17,8 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <credentials/CertificationDeclaration.h>
 #include <credentials/CHIPCert.h>
+#include <credentials/CertificationDeclaration.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedMemoryBuffer.h>

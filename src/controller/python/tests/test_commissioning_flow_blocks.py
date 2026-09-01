@@ -4,7 +4,6 @@ import unittest
 import matter.clusters as Clusters
 from matter.commissioning.commissioning_flow_blocks import CommissioningFlowBlocks
 
-
 _FEATURE_PQC_DEVICE_ATTESTATION = 0x1
 _PROFILE_ECDSA_MATTER_LEGACY = 0x1
 _PROFILE_ML_DSA_44 = 0x2
