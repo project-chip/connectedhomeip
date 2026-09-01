@@ -402,10 +402,6 @@ DataModel::ActionReturnStatus AudioControlCluster::WriteAttribute(const DataMode
     case MaxUserVolume::Id: {
         uint16_t value{};
         ReturnErrorOnFailure(decoder.Decode(value));
-        if (value == mMaxUserVolume)
-        {
-            return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
-        }
         return SetMaxUserVolume(value);
     }
     case DefaultStepSize::Id: {
@@ -414,65 +410,59 @@ DataModel::ActionReturnStatus AudioControlCluster::WriteAttribute(const DataMode
         const uint16_t effectiveMax = EffectiveMaxVolume();
         VerifyOrReturnError(value >= 1 && effectiveMax > mMinDeviceVolume && value <= effectiveMax - mMinDeviceVolume,
                             Status::ConstraintError);
-        if (!SetAttributeValue(mDefaultStepSize, value, DefaultStepSize::Id))
+        if (SetAttributeValue(mDefaultStepSize, value, DefaultStepSize::Id))
         {
-            return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+            StoreDefaultStepSize();
         }
-        StoreDefaultStepSize();
         return CHIP_NO_ERROR;
     }
     case SetVolumeUnmutePolicy::Id: {
         UnmutePolicyEnum value{};
         ReturnErrorOnFailure(decoder.Decode(value));
         VerifyOrReturnError(value < UnmutePolicyEnum::kUnknownEnumValue, Status::ConstraintError);
-        if (!SetAttributeValue(mSetVolumeUnmutePolicy, value, SetVolumeUnmutePolicy::Id))
+        if (SetAttributeValue(mSetVolumeUnmutePolicy, value, SetVolumeUnmutePolicy::Id))
         {
-            return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+            StoreSetVolumeUnmutePolicy();
         }
-        StoreSetVolumeUnmutePolicy();
         return CHIP_NO_ERROR;
     }
     case IncreaseVolumeUnmutePolicy::Id: {
         UnmutePolicyEnum value{};
         ReturnErrorOnFailure(decoder.Decode(value));
         VerifyOrReturnError(value < UnmutePolicyEnum::kUnknownEnumValue, Status::ConstraintError);
-        if (!SetAttributeValue(mIncreaseVolumeUnmutePolicy, value, IncreaseVolumeUnmutePolicy::Id))
+        if (SetAttributeValue(mIncreaseVolumeUnmutePolicy, value, IncreaseVolumeUnmutePolicy::Id))
         {
-            return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+            StoreIncreaseVolumeUnmutePolicy();
         }
-        StoreIncreaseVolumeUnmutePolicy();
         return CHIP_NO_ERROR;
     }
     case IncreaseVolumeUnmuteVolume::Id: {
         UnmuteVolumeEnum value{};
         ReturnErrorOnFailure(decoder.Decode(value));
         VerifyOrReturnError(value < UnmuteVolumeEnum::kUnknownEnumValue, Status::ConstraintError);
-        if (!SetAttributeValue(mIncreaseVolumeUnmuteVolume, value, IncreaseVolumeUnmuteVolume::Id))
+        if (SetAttributeValue(mIncreaseVolumeUnmuteVolume, value, IncreaseVolumeUnmuteVolume::Id))
         {
-            return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+            StoreIncreaseVolumeUnmuteVolume();
         }
-        StoreIncreaseVolumeUnmuteVolume();
         return CHIP_NO_ERROR;
     }
     case DecreaseVolumeUnmutePolicy::Id: {
         UnmutePolicyEnum value{};
         ReturnErrorOnFailure(decoder.Decode(value));
         VerifyOrReturnError(value < UnmutePolicyEnum::kUnknownEnumValue, Status::ConstraintError);
-        if (!SetAttributeValue(mDecreaseVolumeUnmutePolicy, value, DecreaseVolumeUnmutePolicy::Id))
+        if (SetAttributeValue(mDecreaseVolumeUnmutePolicy, value, DecreaseVolumeUnmutePolicy::Id))
         {
-            return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+            StoreDecreaseVolumeUnmutePolicy();
         }
-        StoreDecreaseVolumeUnmutePolicy();
         return CHIP_NO_ERROR;
     }
     case StartUpMuted::Id: {
         DataModel::Nullable<bool> value{};
         ReturnErrorOnFailure(decoder.Decode(value));
-        if (!SetAttributeValue(mStartUpMuted, value, StartUpMuted::Id))
+        if (SetAttributeValue(mStartUpMuted, value, StartUpMuted::Id))
         {
-            return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+            StoreStartUpMuted();
         }
-        StoreStartUpMuted();
         return CHIP_NO_ERROR;
     }
     case StartUpVolume::Id: {
@@ -483,59 +473,55 @@ DataModel::ActionReturnStatus AudioControlCluster::WriteAttribute(const DataMode
             const uint16_t effectiveMax = EffectiveMaxVolume();
             VerifyOrReturnError(value.Value() >= mMinDeviceVolume && value.Value() <= effectiveMax, Status::ConstraintError);
         }
-        if (!SetAttributeValue(mStartUpVolume, value, StartUpVolume::Id))
+        if (SetAttributeValue(mStartUpVolume, value, StartUpVolume::Id))
         {
-            return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+            StoreStartUpVolume();
         }
-        StoreStartUpVolume();
         return CHIP_NO_ERROR;
     }
     case Bass::Id: {
         int16_t value{};
         ReturnErrorOnFailure(decoder.Decode(value));
         VerifyOrReturnError(value >= mMinCorrection && value <= mMaxCorrection, Status::ConstraintError);
-        if (value == mBass)
-        {
-            return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
-        }
+        // Equality check gates the delegate call below, not just the reported status: a same-value
+        // write must not spuriously invoke HandleBassChanged.
+        if (value != mBass)
         {
             Status s = mDelegate.HandleBassChanged(value);
             VerifyOrReturnError(s == Status::Success, s);
+            SetAttributeValue(mBass, value, Bass::Id);
+            StoreBass();
         }
-        SetAttributeValue(mBass, value, Bass::Id);
-        StoreBass();
         return CHIP_NO_ERROR;
     }
     case Mid::Id: {
         int16_t value{};
         ReturnErrorOnFailure(decoder.Decode(value));
         VerifyOrReturnError(value >= mMinCorrection && value <= mMaxCorrection, Status::ConstraintError);
-        if (value == mMid)
-        {
-            return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
-        }
+        // Equality check gates the delegate call below, not just the reported status: a same-value
+        // write must not spuriously invoke HandleMidChanged.
+        if (value != mMid)
         {
             Status s = mDelegate.HandleMidChanged(value);
             VerifyOrReturnError(s == Status::Success, s);
+            SetAttributeValue(mMid, value, Mid::Id);
+            StoreMid();
         }
-        SetAttributeValue(mMid, value, Mid::Id);
-        StoreMid();
         return CHIP_NO_ERROR;
     }
     case Treble::Id: {
         int16_t value{};
         ReturnErrorOnFailure(decoder.Decode(value));
         VerifyOrReturnError(value >= mMinCorrection && value <= mMaxCorrection, Status::ConstraintError);
-        if (value == mTreble)
-        {
-            return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
-        }
+        // Equality check gates the delegate call below, not just the reported status: a same-value
+        // write must not spuriously invoke HandleTrebleChanged.
+        if (value != mTreble)
         {
             Status s = mDelegate.HandleTrebleChanged(value);
             VerifyOrReturnError(s == Status::Success, s);
+            SetAttributeValue(mTreble, value, Treble::Id);
+            StoreTreble();
         }
-        SetAttributeValue(mTreble, value, Treble::Id);
-        StoreTreble();
         return CHIP_NO_ERROR;
     }
     default:

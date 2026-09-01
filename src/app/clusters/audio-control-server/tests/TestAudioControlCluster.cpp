@@ -1249,13 +1249,12 @@ TEST_F(TestAudioControlCluster, WriteTrebleValidatesRange)
 
 // ---------- Write no-op behavior ----------
 //
-// For most writable attributes, writing the same value a second time must return
-// kWriteSuccessNoOp (spec requirement: no-ops must not trigger delegate callbacks
-// or KVS stores). StartUpMuted and StartUpVolume are intentional exceptions: they
-// always store to KVS so that an explicit null write establishes a persisted startup
-// directive even when the in-memory value is already null.
+// Writing the same value a second time must not re-persist to KVS, and for Bass/Mid/Treble
+// must not invoke the corresponding delegate callback either. Nothing here needs to be
+// distinguishable via the write's returned status (see PR discussion): every case below
+// returns plain CHIP_NO_ERROR whether or not the value actually changed.
 
-TEST_F(TestAudioControlCluster, WriteNoOpDefaultStepSize)
+TEST_F(TestAudioControlCluster, WriteSameValueDefaultStepSize)
 {
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithInitialDefaultStepSize(10));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
@@ -1263,13 +1262,16 @@ TEST_F(TestAudioControlCluster, WriteNoOpDefaultStepSize)
 
     uint16_t val = 20;
     ASSERT_EQ(tester.WriteAttribute(DefaultStepSize::Id, val), CHIP_NO_ERROR);
-    EXPECT_TRUE(tester.WriteAttribute(DefaultStepSize::Id, val).IsNoOpSuccess());
+    EXPECT_EQ(tester.WriteAttribute(DefaultStepSize::Id, val), CHIP_NO_ERROR);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestAudioControlCluster, WriteNoOpMaxUserVolume)
+TEST_F(TestAudioControlCluster, WriteSameValueMaxUserVolume)
 {
+    // MaxUserVolume goes through the shared app-facing SetMaxUserVolume() (CHIP_ERROR-typed), which
+    // has its own internal no-op check (via SetAttributeValue) -- nothing is re-persisted and the
+    // delegate is not spuriously invoked, even though WriteAttribute doesn't pre-check itself.
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<MaxUserVolume::Id>();
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
@@ -1279,12 +1281,13 @@ TEST_F(TestAudioControlCluster, WriteNoOpMaxUserVolume)
 
     uint16_t val = 60;
     ASSERT_EQ(tester.WriteAttribute(MaxUserVolume::Id, val), CHIP_NO_ERROR);
-    EXPECT_TRUE(tester.WriteAttribute(MaxUserVolume::Id, val).IsNoOpSuccess());
+    EXPECT_EQ(tester.WriteAttribute(MaxUserVolume::Id, val), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetMaxUserVolume(), val);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestAudioControlCluster, WriteNoOpSetVolumeUnmutePolicy)
+TEST_F(TestAudioControlCluster, WriteSameValueSetVolumeUnmutePolicy)
 {
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig());
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
@@ -1292,12 +1295,12 @@ TEST_F(TestAudioControlCluster, WriteNoOpSetVolumeUnmutePolicy)
 
     auto val = UnmutePolicyEnum::kDoNotUnmuteAndDoNotChangeVolume;
     ASSERT_EQ(tester.WriteAttribute(SetVolumeUnmutePolicy::Id, val), CHIP_NO_ERROR);
-    EXPECT_TRUE(tester.WriteAttribute(SetVolumeUnmutePolicy::Id, val).IsNoOpSuccess());
+    EXPECT_EQ(tester.WriteAttribute(SetVolumeUnmutePolicy::Id, val), CHIP_NO_ERROR);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestAudioControlCluster, WriteNoOpIncreaseVolumeUnmutePolicy)
+TEST_F(TestAudioControlCluster, WriteSameValueIncreaseVolumeUnmutePolicy)
 {
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig());
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
@@ -1305,12 +1308,12 @@ TEST_F(TestAudioControlCluster, WriteNoOpIncreaseVolumeUnmutePolicy)
 
     auto val = UnmutePolicyEnum::kDoNotUnmuteAndDoNotChangeVolume;
     ASSERT_EQ(tester.WriteAttribute(IncreaseVolumeUnmutePolicy::Id, val), CHIP_NO_ERROR);
-    EXPECT_TRUE(tester.WriteAttribute(IncreaseVolumeUnmutePolicy::Id, val).IsNoOpSuccess());
+    EXPECT_EQ(tester.WriteAttribute(IncreaseVolumeUnmutePolicy::Id, val), CHIP_NO_ERROR);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestAudioControlCluster, WriteNoOpIncreaseVolumeUnmuteVolume)
+TEST_F(TestAudioControlCluster, WriteSameValueIncreaseVolumeUnmuteVolume)
 {
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig());
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
@@ -1318,12 +1321,12 @@ TEST_F(TestAudioControlCluster, WriteNoOpIncreaseVolumeUnmuteVolume)
 
     auto val = UnmuteVolumeEnum::kMinDeviceVolume;
     ASSERT_EQ(tester.WriteAttribute(IncreaseVolumeUnmuteVolume::Id, val), CHIP_NO_ERROR);
-    EXPECT_TRUE(tester.WriteAttribute(IncreaseVolumeUnmuteVolume::Id, val).IsNoOpSuccess());
+    EXPECT_EQ(tester.WriteAttribute(IncreaseVolumeUnmuteVolume::Id, val), CHIP_NO_ERROR);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestAudioControlCluster, WriteNoOpDecreaseVolumeUnmutePolicy)
+TEST_F(TestAudioControlCluster, WriteSameValueDecreaseVolumeUnmutePolicy)
 {
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig());
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
@@ -1331,7 +1334,7 @@ TEST_F(TestAudioControlCluster, WriteNoOpDecreaseVolumeUnmutePolicy)
 
     auto val = UnmutePolicyEnum::kDoNotUnmuteAndDoNotChangeVolume;
     ASSERT_EQ(tester.WriteAttribute(DecreaseVolumeUnmutePolicy::Id, val), CHIP_NO_ERROR);
-    EXPECT_TRUE(tester.WriteAttribute(DecreaseVolumeUnmutePolicy::Id, val).IsNoOpSuccess());
+    EXPECT_EQ(tester.WriteAttribute(DecreaseVolumeUnmutePolicy::Id, val), CHIP_NO_ERROR);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -1346,8 +1349,8 @@ TEST_F(TestAudioControlCluster, WriteNoOpBassDoesNotCallDelegate)
     ASSERT_EQ(tester.WriteAttribute(Bass::Id, val), CHIP_NO_ERROR); // first write changes 0→3
 
     mMockDelegate.Reset();
-    EXPECT_TRUE(tester.WriteAttribute(Bass::Id, val).IsNoOpSuccess()); // same value: no-op
-    EXPECT_EQ(mMockDelegate.bassChangedCalls, 0);                      // delegate must not be called on no-op
+    EXPECT_EQ(tester.WriteAttribute(Bass::Id, val), CHIP_NO_ERROR); // same value: no-op
+    EXPECT_EQ(mMockDelegate.bassChangedCalls, 0);                   // delegate must not be called on no-op
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -1362,7 +1365,7 @@ TEST_F(TestAudioControlCluster, WriteNoOpMidDoesNotCallDelegate)
     ASSERT_EQ(tester.WriteAttribute(Mid::Id, val), CHIP_NO_ERROR);
 
     mMockDelegate.Reset();
-    EXPECT_TRUE(tester.WriteAttribute(Mid::Id, val).IsNoOpSuccess());
+    EXPECT_EQ(tester.WriteAttribute(Mid::Id, val), CHIP_NO_ERROR);
     EXPECT_EQ(mMockDelegate.midChangedCalls, 0);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -1378,13 +1381,13 @@ TEST_F(TestAudioControlCluster, WriteNoOpTrebleDoesNotCallDelegate)
     ASSERT_EQ(tester.WriteAttribute(Treble::Id, val), CHIP_NO_ERROR);
 
     mMockDelegate.Reset();
-    EXPECT_TRUE(tester.WriteAttribute(Treble::Id, val).IsNoOpSuccess());
+    EXPECT_EQ(tester.WriteAttribute(Treble::Id, val), CHIP_NO_ERROR);
     EXPECT_EQ(mMockDelegate.trebleChangedCalls, 0);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestAudioControlCluster, WriteNoOpStartUpMuted)
+TEST_F(TestAudioControlCluster, WriteSameValueStartUpMuted)
 {
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<StartUpMuted::Id>();
@@ -1395,17 +1398,17 @@ TEST_F(TestAudioControlCluster, WriteNoOpStartUpMuted)
     // null initial value: writing null is immediately a no-op
     DataModel::Nullable<bool> nullVal;
     nullVal.SetNull();
-    EXPECT_TRUE(tester.WriteAttribute(StartUpMuted::Id, nullVal).IsNoOpSuccess());
+    EXPECT_EQ(tester.WriteAttribute(StartUpMuted::Id, nullVal), CHIP_NO_ERROR);
 
     // write a non-null value, then the same value again
     bool val = true;
     ASSERT_EQ(tester.WriteAttribute(StartUpMuted::Id, DataModel::MakeNullable(val)), CHIP_NO_ERROR);
-    EXPECT_TRUE(tester.WriteAttribute(StartUpMuted::Id, DataModel::MakeNullable(val)).IsNoOpSuccess());
+    EXPECT_EQ(tester.WriteAttribute(StartUpMuted::Id, DataModel::MakeNullable(val)), CHIP_NO_ERROR);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestAudioControlCluster, WriteNoOpStartUpVolume)
+TEST_F(TestAudioControlCluster, WriteSameValueStartUpVolume)
 {
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<StartUpVolume::Id>();
@@ -1416,12 +1419,12 @@ TEST_F(TestAudioControlCluster, WriteNoOpStartUpVolume)
     // null initial value: writing null is immediately a no-op
     DataModel::Nullable<uint16_t> nullVal;
     nullVal.SetNull();
-    EXPECT_TRUE(tester.WriteAttribute(StartUpVolume::Id, nullVal).IsNoOpSuccess());
+    EXPECT_EQ(tester.WriteAttribute(StartUpVolume::Id, nullVal), CHIP_NO_ERROR);
 
     // write a non-null value, then the same value again
     uint16_t val = 50;
     ASSERT_EQ(tester.WriteAttribute(StartUpVolume::Id, DataModel::MakeNullable(val)), CHIP_NO_ERROR);
-    EXPECT_TRUE(tester.WriteAttribute(StartUpVolume::Id, DataModel::MakeNullable(val)).IsNoOpSuccess());
+    EXPECT_EQ(tester.WriteAttribute(StartUpVolume::Id, DataModel::MakeNullable(val)), CHIP_NO_ERROR);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
