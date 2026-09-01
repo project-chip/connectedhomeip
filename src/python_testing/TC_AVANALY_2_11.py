@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2025 Project CHIP Authors
+#    Copyright (c) 2026 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,6 +41,7 @@ from mobly import asserts
 from TC_AVANALYTestBase import AVANALYTestBase
 
 import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
@@ -85,7 +86,7 @@ class TC_AVANALY_2_11(MatterBaseTest, AVANALYTestBase):
         self.step(2)
         subset_context = supported_contexts[0]
         if self.has_feature_perzonedetect:
-            trigger = cluster.Structs.ContextTriggerStruct(context=subset_context, zoneIDs=None)
+            trigger = cluster.Structs.ContextTriggerStruct(context=subset_context, zoneIDs=NullValue)
         else:
             trigger = cluster.Structs.ContextTriggerStruct(context=subset_context)
 
@@ -116,7 +117,7 @@ class TC_AVANALY_2_11(MatterBaseTest, AVANALYTestBase):
 
         # Cleanup
         await self.write_single_attribute(attributes.TrackingEnabled(False), endpoint_id=endpoint)
-        await self.send_disable_context_triggers_cmd(endpoint, context_triggers=None)
+        await self.send_disable_context_triggers_cmd(endpoint, context_triggers=NullValue)
 
 
 if __name__ == "__main__":

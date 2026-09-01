@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2025 Project CHIP Authors
+#    Copyright (c) 2026 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,6 +41,7 @@ from mobly import asserts
 from TC_AVANALYTestBase import AVANALYTestBase
 
 import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
@@ -111,7 +112,7 @@ class TC_AVANALY_2_9(MatterBaseTest, AVANALYTestBase):
 
         # Enable TrackingEnabled and enable context triggers for all zones
         await self.write_single_attribute(attributes.TrackingEnabled(True), endpoint_id=endpoint)
-        await self.send_enable_context_triggers_cmd(endpoint, context_triggers=None)
+        await self.send_enable_context_triggers_cmd(endpoint, context_triggers=NullValue)
 
         # Set up event subscription handler
         event_callback = EventSubscriptionHandler(expected_cluster=cluster)
@@ -131,7 +132,8 @@ class TC_AVANALY_2_9(MatterBaseTest, AVANALYTestBase):
             asserts.assert_is_not_none(event1.newIdentifiedContexts, "newIdentifiedContexts must be present in event 1")
             tc1 = event1.newIdentifiedContexts[0]
             asserts.assert_equal(tc1.currentZone, zone_1_id, f"Expected currentZone {zone_1_id}, got {tc1.currentZone}")
-            asserts.assert_true(tc1.previousZone is None, f"Expected previousZone to be Null, got {tc1.previousZone}")
+            asserts.assert_true(tc1.previousZone is None or tc1.previousZone is NullValue,
+                                f"Expected previousZone to be Null, got {tc1.previousZone}")
         else:
             log.info("CI mode: skipping blocking event wait in Step 3")
 
@@ -156,7 +158,7 @@ class TC_AVANALY_2_9(MatterBaseTest, AVANALYTestBase):
 
         # Cleanup
         await self.write_single_attribute(attributes.TrackingEnabled(False), endpoint_id=endpoint)
-        await self.send_disable_context_triggers_cmd(endpoint, context_triggers=None)
+        await self.send_disable_context_triggers_cmd(endpoint, context_triggers=NullValue)
 
 
 if __name__ == "__main__":

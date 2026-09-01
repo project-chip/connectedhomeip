@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2025 Project CHIP Authors
+#    Copyright (c) 2026 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,6 +41,7 @@ from mobly import asserts
 from TC_AVANALYTestBase import AVANALYTestBase
 
 import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
@@ -99,7 +100,7 @@ class TC_AVANALY_2_4(MatterBaseTest, AVANALYTestBase):
         # TH sends EnableContextTriggers command before establishing analysis stream
         # Expect INVALID_IN_STATE because no stream is active
         try:
-            await self.send_enable_context_triggers_cmd(endpoint, context_triggers=None)
+            await self.send_enable_context_triggers_cmd(endpoint, context_triggers=NullValue)
             log.warning("EnableContextTriggers succeeded without stream (provisional / placeholder server behavior)")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.InvalidInState,
@@ -118,7 +119,7 @@ class TC_AVANALY_2_4(MatterBaseTest, AVANALYTestBase):
         self.step(5)
         valid_subset = [supported_contexts[0]]
         if self.has_feature_perzonedetect:
-            triggers = [cluster.Structs.ContextTriggerStruct(context=sc, zoneIDs=None) for sc in valid_subset]
+            triggers = [cluster.Structs.ContextTriggerStruct(context=sc, zoneIDs=NullValue) for sc in valid_subset]
         else:
             triggers = [cluster.Structs.ContextTriggerStruct(context=sc) for sc in valid_subset]
 
@@ -131,7 +132,7 @@ class TC_AVANALY_2_4(MatterBaseTest, AVANALYTestBase):
                           "Enabled context not found in ActiveAmbientContextTriggers")
 
         self.step(7)
-        await self.send_disable_context_triggers_cmd(endpoint, context_triggers=None)
+        await self.send_disable_context_triggers_cmd(endpoint, context_triggers=NullValue)
 
         self.step(8)
         active_triggers = await self.read_avanaly_attribute_expect_success(endpoint, attributes.ActiveAmbientContextTriggers)
