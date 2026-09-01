@@ -80,7 +80,7 @@ flowchart LR
 
 ## 2. Directory Layout
 
-```
+```text
 examples/all-devices-app/
 ├── all-devices-common/
 │   ├── device/
@@ -404,7 +404,7 @@ embedded builds:
     `${DEVICE_DIR}/OOBAccessors.cpp`. `NamedPipes.cpp` is excluded from CMake
     source lists.
 
-Configuration defines are generated into `<app_config/all_devices_config.h>` for
+Configuration defines are generated into `app_config/all_devices_config.h` for
 both GN and CMake:
 
 -   **GN Build** (`oob-accessors/all_devices_config.gni`): Uses
