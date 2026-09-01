@@ -155,7 +155,7 @@ protected:
      * Called with cancelled = true when the *caller* withdrew its Callback, in which case no
      * completion will be delivered and everything the operation holds can be released. Called with
      * cancelled = false from TakeCompletion(), i.e. just *before* the caller's callback runs, so
-     * that resources are cleaned up down before the callback can reuse or destroy the operation.
+     * that resources are cleaned up before the callback can reuse or destroy the operation.
      *
      * The distinction matters only for state the operation intends to hand to the caller: releasing
      * it here would pull it out from under the completion. Resources or underlying work like nested
