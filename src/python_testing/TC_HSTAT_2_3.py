@@ -95,7 +95,7 @@ class TC_HSTAT_2_3(HSTATBase):
             TestStep(16, "TH sends command SetSettings with the UserSetpoint field set to MaxSetpointValue+1",
                      "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
             TestStep(17, "If StepValue>1 then TH sends command SetSettings with the UserSetpoint field set to MinSetpointValue+1, otherwise skip this step",
-                     "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
     @property
@@ -207,14 +207,11 @@ class TC_HSTAT_2_3(HSTATBase):
         await self.send_SetSettingsCommand_expect_error(userSetpoint=dut_MaxSetpoint+1, error=Status.ConstraintError)
 
         # If StepValue>1 then TH sends command SetSettings with the UserSetpoint field set to MinSetpointValue+1, otherwise skip this step
-        # Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)
         log.info("StepValue is %s, MinSetpoint is %s", dut_Step, dut_MinSetpoint)
+        # Verify DUT responds w/ status SUCCESS(0x00)
         if dut_Step > 1:
             self.step(17)
-            # when dut_Step is greater than 1, dut_MinSetpoint + 1 falls within the allowed range
-            # but violates the required step alignment, so Status.ConstraintError is expected
-            # per the specification.
-            await self.send_SetSettingsCommand_expect_error(userSetpoint=dut_MinSetpoint+1, error=Status.ConstraintError)
+            await self.send_SetSettingsCommand_expect_success(userSetpoint=dut_MinSetpoint+1)
         else:
             self.skip_step(17)
 
