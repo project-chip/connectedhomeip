@@ -37,8 +37,8 @@
 #include <controller/AbstractDnssdDiscoveryController.h>
 #include <controller/AutoCommissioner.h>
 #include <controller/CHIPCluster.h>
-#include <controller/CertificateChainRequestTracker.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
+#include <controller/CertificateChainRequestTracker.h>
 #include <controller/CommissioneeDeviceProxy.h>
 #include <controller/CommissioningDelegate.h>
 #include <controller/DevicePairingDelegate.h>
@@ -947,11 +947,10 @@ private:
     /* This function sends a Device Attestation Certificate chain request to the device.
        The function does not hold a reference to the device object.
      */
-    CHIP_ERROR SendCertificateChainRequestCommand(DeviceProxy * device, Credentials::CertificateType certificateType,
-                                                  Optional<System::Clock::Timeout> timeout,
-                                                  Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum> cryptoProfile =
-                                                      NullOptional,
-                                                  Optional<uint16_t> segmentId = NullOptional);
+    CHIP_ERROR SendCertificateChainRequestCommand(
+        DeviceProxy * device, Credentials::CertificateType certificateType, Optional<System::Clock::Timeout> timeout,
+        Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum> cryptoProfile = NullOptional,
+        Optional<uint16_t> segmentId                                                                = NullOptional);
     /* This function sends an Attestation request to the device.
        The function does not hold a reference to the device object.
      */
@@ -1186,8 +1185,8 @@ private:
             cryptoProfile.ClearValue();
         }
 
-        bool hasActiveRequest = false;
-        uint32_t generation   = 0;
+        bool hasActiveRequest                        = false;
+        uint32_t generation                          = 0;
         Credentials::CertificateType certificateType = static_cast<Credentials::CertificateType>(0);
         Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum> cryptoProfile;
         CertificateChainRequestTracker requestTracker;

@@ -18,7 +18,6 @@
 import base64
 import logging
 from dataclasses import dataclass
-from typing import Optional
 
 from cryptography import x509
 from cryptography.hazmat.primitives import serialization
@@ -39,8 +38,8 @@ _MAX_CERTIFICATE_CHAIN_DOCUMENT_SIZE = 10240
 
 @dataclass(frozen=True)
 class _AttestationCertificateRequestProfiles:
-    pai: Optional[Clusters.OperationalCredentials.Enums.AttestationCryptoProfileEnum]
-    dac: Optional[Clusters.OperationalCredentials.Enums.AttestationCryptoProfileEnum]
+    pai: Clusters.OperationalCredentials.Enums.AttestationCryptoProfileEnum | None
+    dac: Clusters.OperationalCredentials.Enums.AttestationCryptoProfileEnum | None
 
 
 class CommissioningFlowBlocks:
@@ -51,7 +50,7 @@ class CommissioningFlowBlocks:
 
     def _select_attestation_certificate_request_profile(
         self, supported_profiles: int
-    ) -> Optional[Clusters.OperationalCredentials.Enums.AttestationCryptoProfileEnum]:
+    ) -> Clusters.OperationalCredentials.Enums.AttestationCryptoProfileEnum | None:
         if (supported_profiles & _ATTESTATION_PROFILE_SUPPORTS_ML_DSA_65) != 0:
             return Clusters.OperationalCredentials.Enums.AttestationCryptoProfileEnum.kMlDsa65
         if (supported_profiles & _ATTESTATION_PROFILE_SUPPORTS_ML_DSA_44) != 0:
