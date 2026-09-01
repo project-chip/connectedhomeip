@@ -61,7 +61,7 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
     def pics_TC_PAVST_2_15(self) -> list[str]:
         """Required PICS for this test case."""
-        return ["PAVST.S", "PAVST.S.F00", "ZONEMGMT.S"]
+        return ["PAVST.S", "PAVST.S.F00", "ZONEMGMT.S", "AVSM.S"]
 
     @async_test_body
     async def setup_class(self) -> None:
@@ -149,7 +149,7 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             log.error("UpdateMotionZoneOptions command not found in SDK")
             raise
 
-    @run_if_endpoint_matches(lambda wildcard, endpoint: has_cluster(Clusters.PushAvStreamTransport)(wildcard, endpoint) and has_cluster(Clusters.ZoneManagement)(wildcard, endpoint))
+    @run_if_endpoint_matches(lambda wildcard, endpoint: has_cluster(Clusters.PushAvStreamTransport)(wildcard, endpoint) and has_cluster(Clusters.ZoneManagement)(wildcard, endpoint) and has_cluster(Clusters.CameraAvStreamManagement)(wildcard, endpoint))
     async def test_TC_PAVST_2_15(self) -> None:
         """Run TC-PAVST-2.15 test."""
         endpoint = self.get_endpoint()
@@ -277,10 +277,10 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
         # Step 6: Too many zones (aMaxZones + 1)
         self.step(6)
-        valid_zone_ids = [aZoneID1, aZoneID2]
+        unique_zone_ids = [aZoneID1, aZoneID2]
         temp_zone_ids = []
         if twoDCartSupported and userDefinedSupported:
-            for i in range(len(valid_zone_ids), aMaxZones):
+            for i in range(len(unique_zone_ids), aMaxZones):
                 zoneVertices = [
                     zmcluster.Structs.TwoDCartesianVertexStruct(x=10, y=10),
                     zmcluster.Structs.TwoDCartesianVertexStruct(x=20, y=10),
@@ -299,15 +299,21 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                         cmd=zmcluster.Commands.CreateTwoDCartesianZone(zone=zoneToCreate),
                     )
                     temp_zone_ids.append(cmdResponse.zoneID)
-                    valid_zone_ids.append(cmdResponse.zoneID)
+                    unique_zone_ids.append(cmdResponse.zoneID)
                 except InteractionModelError as e:
                     log.warning("Could not create additional temp zone: %s", e)
                     break
 
+        # Generate unique zone IDs up to aMaxZones + 1 (with no duplicates to avoid ALREADY_EXISTS)
+        next_id = max(unique_zone_ids) + 1 if unique_zone_ids else 1
+        while len(unique_zone_ids) < aMaxZones + 1:
+            unique_zone_ids.append(next_id)
+            next_id += 1
+
         try:
             too_many_zones = [
-                {"zone": valid_zone_ids[i % len(valid_zone_ids)], "sensitivity": 4}
-                for i in range(aMaxZones + 1)
+                {"zone": zid, "sensitivity": 4}
+                for zid in unique_zone_ids[:aMaxZones + 1]
             ]
             await self.send_update_motion_zone_options(
                 endpoint,

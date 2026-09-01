@@ -117,7 +117,7 @@ class TC_PAVST_2_14(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                      "Verify the number of PushAV Connections is 0."),
         ]
 
-    @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport))
+    @run_if_endpoint_matches(lambda wildcard, endpoint: has_cluster(Clusters.PushAvStreamTransport)(wildcard, endpoint) and has_cluster(Clusters.CameraAvStreamManagement)(wildcard, endpoint))
     async def test_TC_PAVST_2_14(self) -> None:
         """Run TC-PAVST-2.14 test."""
         endpoint = self.get_endpoint()
@@ -174,20 +174,24 @@ class TC_PAVST_2_14(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                 "trackName": "media",
             },
         }
-        cmd = pvcluster.Commands.AllocatePushTransport(
-            streamUsage=streamUsage,
-            videoStreamID=video_stream_id,
-            audioStreamID=audio_stream_id,
-            TLSEndpointID=self.tlsEndpointId,
-            url=f"https://{host_ip}:1234/streams/{uploadStreamId}/",
-            triggerOptions={"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kContinuous},
-            ingestMethod=pvcluster.Enums.IngestMethodsEnum.kCMAFIngest,
-            containerOptions=containerOptions,
-            expiryTime=3600,
-        )
+        transportOptions = {
+            "streamUsage": streamUsage,
+            "videoStreamID": video_stream_id,
+            "audioStreamID": audio_stream_id,
+            "TLSEndpointID": self.tlsEndpointId,
+            "url": f"https://{host_ip}:1234/streams/{uploadStreamId}/",
+            "triggerOptions": {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kContinuous},
+            "ingestMethod": pvcluster.Enums.IngestMethodsEnum.kCMAFIngest,
+            "containerOptions": containerOptions,
+            "expiryTime": 3600,
+        }
+        cmd = pvcluster.Commands.AllocatePushTransport(transportOptions=transportOptions)
         alloc_response = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
-        asserts.assert_is_not_none(alloc_response.connectionID, "AllocatePushTransportResponse does not contain connectionID")
-        aConnectionID = alloc_response.connectionID
+        if hasattr(alloc_response, "transportConfiguration"):
+            aConnectionID = alloc_response.transportConfiguration.connectionID
+        else:
+            aConnectionID = alloc_response.connectionID
+        asserts.assert_is_not_none(aConnectionID, "AllocatePushTransportResponse does not contain connectionID")
         asserts.assert_true(aConnectionID != 0, "ConnectionID should not be 0")
 
         # Step 5: Verify Connection Active
