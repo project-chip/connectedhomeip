@@ -196,7 +196,7 @@ config NET_BUF_RX_COUNT
 config NET_BUF_TX_COUNT
 	default 16
 
-config NET_SOCKETS_POLL_MAX
+config ZVFS_POLL_MAX
 	default 6 if CHIP_WIFI
 
 # ==============================================================================
