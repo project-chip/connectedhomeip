@@ -141,8 +141,6 @@ public:
     
     bool IsValidAnalysisZone(const uint16_t zoneId) override { return true; }
 
-    bool HasZone(const uint16_t zoneId) override { return true; }
-
     std::vector<ZoneInformationStorage> mPersistedZones;
     std::vector<ZoneTriggerControlStruct> mPersistedTriggers;
     std::vector<AttributeId> mChangedAttributes;

@@ -108,11 +108,11 @@ public:
     virtual Protocols::InteractionModel::Status RemoveTrigger(uint16_t zoneID) = 0;
 
     /**
-     * @brief verifies whether a zone with the provided zoneID is present on the server, and not a Privacy Zone. 
+     * @brief verifies whether a zone with the provided zoneId is present on the server, and not a Privacy Zone. 
      * 
-     * @param[in] zoneID Indicates the ID of the zone to be checked against known zones
+     * @param[in] zoneId Indicates the Id of the zone to be checked against known zones
      *
-     * @return true if the zoneID is found.
+     * @return true if the zoneId is found, and the use is not privacy.
      */
     virtual bool IsValidAnalysisZone(const uint16_t zoneId) = 0;
     
