@@ -88,7 +88,13 @@ void * Malloc(size_t size)
     void * const mem = lockGuard.Locked() ? sys_heap_aligned_alloc(&sHeap, kMallocAlignment, size) : nullptr;
 
 #ifdef CONFIG_CHIP_MALLOC_SYS_HEAP_DEBUG
-    ChipLogProgress(DeviceLayer, "Malloc(%zu) = %p, caller: %p", size, mem, __builtin_return_address(0));
+    static bool sInMallocLog = false;
+    if (!sInMallocLog)
+    {
+        sInMallocLog = true;
+        ChipLogProgress(DeviceLayer, "Malloc(%zu) = %p, caller: %p", size, mem, __builtin_return_address(0));
+        sInMallocLog = false;
+    }
 #endif
 
     return mem;

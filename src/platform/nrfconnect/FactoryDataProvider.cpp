@@ -142,7 +142,10 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::MoveDACPrivateKeyToSecureStora
         psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
         // If there is the new DAC private key present in the factory data set and also there is
         // the existing one in ITS NVM storage, then skip saving it again.
-        if (psa_get_key_attributes(mDACPrivKeyId, &attributes) != PSA_SUCCESS)
+        const psa_status_t status = psa_get_key_attributes(mDACPrivKeyId, &attributes);
+        VerifyOrReturnError(status == PSA_SUCCESS || status == PSA_ERROR_DOES_NOT_EXIST || status == PSA_ERROR_INVALID_HANDLE,
+                            CHIP_ERROR_INTERNAL);
+        if (status != PSA_SUCCESS)
         {
             ChipLogProgress(DeviceLayer, "Found DAC Private Key in factory data set. Copying to secure storage...");
 
