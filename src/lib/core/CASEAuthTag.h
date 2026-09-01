@@ -63,6 +63,26 @@ constexpr uint16_t GetCASEAuthTagVersion(CASEAuthTag aCAT)
     return static_cast<uint16_t>(aCAT & kTagVersionMask);
 }
 
+/**
+ * @brief Check whether a CAT identifier value is allowed.
+ *
+ * Reserved CAT identifiers (0xFFFF Admin CAT, 0xFFFE Anchor CAT) are permitted identifier values.
+ * Version validity (non-zero) is validated separately via IsValidCASEAuthTag().
+ *
+ * @param identifier The CAT identifier to validate
+ * @return true if the identifier is valid, false otherwise
+ */
+constexpr bool IsValidCATIdentifier(uint16_t identifier)
+{
+    // Reserved identifiers are always valid (version check handled separately)
+    if (identifier == kAdminCATIdentifier || identifier == kAnchorCATIdentifier)
+    {
+        return true;
+    }
+    // Other identifiers: 0x0000 is invalid (undefined), 0xFFFE and 0xFFFF already handled above
+    return identifier != 0x0000;
+}
+
 constexpr CASEAuthTag GetAdminCATWithVersion(uint16_t version)
 {
     return ((static_cast<uint32_t>(kAdminCATIdentifier) << 16) | version);

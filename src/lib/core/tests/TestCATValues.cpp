@@ -196,3 +196,68 @@ TEST(TestCATValues, TestSubjectMatching)
     EXPECT_TRUE(e.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'0004ull)));
     EXPECT_TRUE(e.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'ffffull)));
 }
+
+TEST(TestCATValues, TestIsValidCATIdentifier)
+{
+    // Reserved identifiers should be valid
+    EXPECT_TRUE(IsValidCATIdentifier(kAdminCATIdentifier));  // 0xFFFF
+    EXPECT_TRUE(IsValidCATIdentifier(kAnchorCATIdentifier)); // 0xFFFE
+
+    // Regular identifiers should be valid
+    EXPECT_TRUE(IsValidCATIdentifier(0x0001));
+    EXPECT_TRUE(IsValidCATIdentifier(0x1111));
+    EXPECT_TRUE(IsValidCATIdentifier(0xFFFD));
+
+    // Undefined identifier (0x0000) should be invalid
+    EXPECT_FALSE(IsValidCATIdentifier(0x0000));
+}
+
+TEST(TestCATValues, TestReservedCATValues)
+{
+    // Test Admin CAT (0xFFFF) with version
+    CASEAuthTag adminCatV1 = GetAdminCATWithVersion(0x0001);
+    EXPECT_TRUE(IsValidCASEAuthTag(adminCatV1));
+    EXPECT_TRUE(IsValidCATIdentifier(GetCASEAuthTagIdentifier(adminCatV1)));
+    EXPECT_EQ(GetCASEAuthTagIdentifier(adminCatV1), kAdminCATIdentifier);
+    EXPECT_EQ(GetCASEAuthTagVersion(adminCatV1), 0x0001);
+
+    CASEAuthTag adminCatV2 = GetAdminCATWithVersion(0x0002);
+    EXPECT_TRUE(IsValidCASEAuthTag(adminCatV2));
+    EXPECT_TRUE(IsValidCATIdentifier(GetCASEAuthTagIdentifier(adminCatV2)));
+    EXPECT_EQ(GetCASEAuthTagIdentifier(adminCatV2), kAdminCATIdentifier);
+    EXPECT_EQ(GetCASEAuthTagVersion(adminCatV2), 0x0002);
+
+    // Test Anchor CAT (0xFFFE) with version
+    CASEAuthTag anchorCatV1 = GetAnchorCATWithVersion(0x0001);
+    EXPECT_TRUE(IsValidCASEAuthTag(anchorCatV1));
+    EXPECT_TRUE(IsValidCATIdentifier(GetCASEAuthTagIdentifier(anchorCatV1)));
+    EXPECT_EQ(GetCASEAuthTagIdentifier(anchorCatV1), kAnchorCATIdentifier);
+    EXPECT_EQ(GetCASEAuthTagVersion(anchorCatV1), 0x0001);
+
+    CASEAuthTag anchorCatV2 = GetAnchorCATWithVersion(0x0002);
+    EXPECT_TRUE(IsValidCASEAuthTag(anchorCatV2));
+    EXPECT_TRUE(IsValidCATIdentifier(GetCASEAuthTagIdentifier(anchorCatV2)));
+    EXPECT_EQ(GetCASEAuthTagIdentifier(anchorCatV2), kAnchorCATIdentifier);
+    EXPECT_EQ(GetCASEAuthTagVersion(anchorCatV2), 0x0002);
+
+    // Reserved CAT identifiers with version 0 should be invalid
+    CASEAuthTag adminCatV0 = GetAdminCATWithVersion(0x0000);
+    EXPECT_FALSE(IsValidCASEAuthTag(adminCatV0));
+
+    CASEAuthTag anchorCatV0 = GetAnchorCATWithVersion(0x0000);
+    EXPECT_FALSE(IsValidCASEAuthTag(anchorCatV0));
+
+    // Test that reserved CATs can be used in CATValues
+    auto catsWithAdmin = CATValues{ { adminCatV1 } };
+    EXPECT_TRUE(catsWithAdmin.AreValid());
+    EXPECT_TRUE(catsWithAdmin.ContainsIdentifier(kAdminCATIdentifier));
+
+    auto catsWithAnchor = CATValues{ { anchorCatV1 } };
+    EXPECT_TRUE(catsWithAnchor.AreValid());
+    EXPECT_TRUE(catsWithAnchor.ContainsIdentifier(kAnchorCATIdentifier));
+
+    auto catsWithBoth = CATValues{ { adminCatV1, anchorCatV1 } };
+    EXPECT_TRUE(catsWithBoth.AreValid());
+    EXPECT_TRUE(catsWithBoth.ContainsIdentifier(kAdminCATIdentifier));
+    EXPECT_TRUE(catsWithBoth.ContainsIdentifier(kAnchorCATIdentifier));
+}
