@@ -109,8 +109,10 @@ class TC_HSTAT_2_5(HSTATBase):
         # TH sends command SetSettings with the Mode field set to Humidifier
         # Verify DUT responds w/ status SUCCESS(0x00)
         await self.send_SetSettingsCommand_expect_success(mode=self.modeHumidifier)
+        dut_SystemState = await self.read_attribute_expect_success(attribute=self.attributes.SystemState)
+        log.info("State is: %s", dut_SystemState)
 
-        if self.warmFeatureSupported:
+        if self.warmFeatureSupported and dut_SystemState == self.modeHumidifier:
             self.step(4)
             # TH sends command SetSettings with only the MistWarm bit of the MistType field set
             # Verify DUT responds w/ status SUCCESS(0x00)
@@ -124,7 +126,7 @@ class TC_HSTAT_2_5(HSTATBase):
         else:
             self.mark_step_range_skipped(4, 5)
 
-        if self.coldFeatureSupported:
+        if self.coldFeatureSupported and dut_SystemState == self.modeHumidifier:
             self.step(6)
             # TH writes to the DUT the MistType attribute with only the MistCold bit set
             # Verify DUT responds w/ status SUCCESS(0x00)
@@ -138,7 +140,7 @@ class TC_HSTAT_2_5(HSTATBase):
         else:
             self.mark_step_range_skipped(6, 7)
 
-        if self.warmFeatureSupported and self.coldFeatureSupported:
+        if self.warmFeatureSupported and self.coldFeatureSupported and dut_SystemState == self.modeHumidifier:
             self.step(8)
             # Individually subscribe to the MistType attribute
             # This will receive updates when these attributes change value.
