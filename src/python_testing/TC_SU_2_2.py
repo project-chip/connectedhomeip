@@ -977,6 +977,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
             evt2 = raw.Data
             if evt2.previousState == kQuerying and evt2.newState == kIdle:
+                # timeout=0: a poll, not a wait. The DUT can't reach Idle before the provider
+                # has already logged receipt of this query, so the flag is already set here.
                 if not self.current_provider_app_proc.wait_for_output(timeout=0):
                     logger.info("%s: Discarding Querying→Idle — no QueryImage has reached the provider yet, "
                                 "so the query ended before it could be answered.", step_number_s4)
