@@ -26,7 +26,7 @@ namespace app {
 namespace {
 
 constexpr System::Clock::Milliseconds32 kTransitionInterval = System::Clock::Milliseconds32(500);
-constexpr Percent100ths kPositionStep                        = 500; // 5% step
+constexpr Percent100ths kPositionStep                       = 500; // 5% step
 
 } // namespace
 
@@ -138,7 +138,8 @@ CHIP_ERROR SimulatedWindowCovering::HandleStopMotion()
     auto currentTilt = cluster.GetCurrentPositionTiltPercent100ths();
     auto opStatus    = cluster.GetOperationalStatus();
 
-    ChipLogProgress(DeviceLayer, "WindowCovering: Halted. Frozen State -> Lift: %" PRIu16 ", Tilt: %" PRIu16 " | OpStatus raw=0x%02X",
+    ChipLogProgress(DeviceLayer,
+                    "WindowCovering: Halted. Frozen State -> Lift: %" PRIu16 ", Tilt: %" PRIu16 " | OpStatus raw=0x%02X",
                     currentLift.IsNull() ? static_cast<uint16_t>(0) : currentLift.Value(),
                     currentTilt.IsNull() ? static_cast<uint16_t>(0) : currentTilt.Value(), opStatus.Raw());
 
@@ -194,7 +195,8 @@ void SimulatedWindowCovering::TimerFired()
         cluster.SetCurrentPositionLiftPercent100ths(DataModel::Nullable<Percent100ths>(currentVal));
         auto opStatus = cluster.GetOperationalStatus();
         ChipLogProgress(DeviceLayer,
-                        "WindowCovering: Simulating Lift -> %" PRIu16 " / Target %" PRIu16 " | OpStatus raw=0x%02X (global=%u, lift=%u)",
+                        "WindowCovering: Simulating Lift -> %" PRIu16 " / Target %" PRIu16
+                        " | OpStatus raw=0x%02X (global=%u, lift=%u)",
                         currentVal, targetVal, opStatus.Raw(), opStatus.GetField(OperationalStatus::kGlobal),
                         opStatus.GetField(OperationalStatus::kLift));
 
@@ -225,7 +227,8 @@ void SimulatedWindowCovering::TimerFired()
         cluster.SetCurrentPositionTiltPercent100ths(DataModel::Nullable<Percent100ths>(currentVal));
         auto opStatus = cluster.GetOperationalStatus();
         ChipLogProgress(DeviceLayer,
-                        "WindowCovering: Simulating Tilt -> %" PRIu16 " / Target %" PRIu16 " | OpStatus raw=0x%02X (global=%u, tilt=%u)",
+                        "WindowCovering: Simulating Tilt -> %" PRIu16 " / Target %" PRIu16
+                        " | OpStatus raw=0x%02X (global=%u, tilt=%u)",
                         currentVal, targetVal, opStatus.Raw(), opStatus.GetField(OperationalStatus::kGlobal),
                         opStatus.GetField(OperationalStatus::kTilt));
 
