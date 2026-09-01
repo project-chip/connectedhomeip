@@ -118,21 +118,20 @@ private:
     BitMask<AlarmBitmap> mLatch;
 
     // Threshold attribute state — seeded to spec Fallback values so the boot state is always
-    // valid (e.g. OVT > UVT when both features are present). std::optional is used per SDK
-    // convention; values are always present after construction.
+    // valid (e.g. OVT > UVT when both features are present).
     static constexpr int64_t kOverThresholdDefault  = 4611686018427387904LL;  // 2^62
     static constexpr int64_t kUnderThresholdDefault = -4611686018427387904LL; // -(2^62)
 
-    std::optional<int64_t> mOverVoltageThreshold    = kOverThresholdDefault;
-    std::optional<int64_t> mUnderVoltageThreshold   = 0;
-    std::optional<int64_t> mOverFrequencyThreshold  = 1000000;
-    std::optional<int64_t> mUnderFrequencyThreshold = 0;
-    std::optional<int64_t> mOverPowerThreshold      = kOverThresholdDefault;
-    std::optional<int64_t> mUnderPowerThreshold     = kUnderThresholdDefault;
-    std::optional<int64_t> mOverCurrentThreshold    = kOverThresholdDefault;
-    std::optional<int64_t> mUnderCurrentThreshold   = kUnderThresholdDefault;
-    std::optional<int64_t> mPowerImportThreshold    = kOverThresholdDefault;
-    std::optional<int64_t> mPowerExportThreshold    = kUnderThresholdDefault;
+    int64_t mOverVoltageThreshold    = kOverThresholdDefault;
+    int64_t mUnderVoltageThreshold   = 0;
+    int64_t mOverFrequencyThreshold  = 1000000;
+    int64_t mUnderFrequencyThreshold = 0;
+    int64_t mOverPowerThreshold      = kOverThresholdDefault;
+    int64_t mUnderPowerThreshold     = kUnderThresholdDefault;
+    int64_t mOverCurrentThreshold    = kOverThresholdDefault;
+    int64_t mUnderCurrentThreshold   = kUnderThresholdDefault;
+    int64_t mPowerImportThreshold    = kOverThresholdDefault;
+    int64_t mPowerExportThreshold    = kUnderThresholdDefault;
 };
 
 } // namespace ElectricalAlarm
