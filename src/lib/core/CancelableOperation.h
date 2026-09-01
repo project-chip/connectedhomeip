@@ -158,20 +158,10 @@ protected:
      * that resources are cleaned up down before the callback can reuse or destroy the operation.
      *
      * The distinction matters only for state the operation intends to hand to the caller: releasing
-     * it here would pull it out from under the completion, so on that path leave it to the function
-     * doing the completing (see the note on payload lifetime in the class comment above).
-     * Registrations of underlying work -- nested Callbacks, timers, exchanges -- should be released
-     * unconditionally; doing so is idempotent, and leaving one live past a completion means it can
-     * fire into an idle or reused operation.
+     * it here would pull it out from under the completion. Resources or underlying work like nested
+     * Callbacks, timers, etc. should be released unconditionally.
      *
-     * A subclass that overrides this MUST call the inherited implementation, or the layers above it
-     * never hear that the operation finished. The implementation here does nothing -- there is no
-     * in-flight work at this level -- and exists to terminate that chain, so that a layer can call
-     * its base without having to know whether that base is the root of the hierarchy.
-     *
-     * A subclass with nothing in flight of its own need not override this at all, which is why it is
-     * not pure: only a layer that keeps state can know whether it has anything to release, so the
-     * obligation cannot usefully be enforced here.
+     * A subclass that overrides this MUST call the inherited implementation.
      */
     virtual void OnFinished(bool cancelled) {}
 
