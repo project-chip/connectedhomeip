@@ -27675,11 +27675,6 @@ class DeviceEnergyManagementMode(Cluster):
             # prone, and was removed. See
             # src/app/common/templates/config-data.yaml.
 
-    class Bitmaps:
-        class Feature(IntFlag):
-            kOnOff = 0x1
-            kCoreModes = 0x2
-
     class Structs:
         @dataclass
         class ModeTagStruct(ClusterObject):
@@ -64632,4 +64627,3 @@ class SampleMei(Cluster):
 
             count: uint = 0
             fabricIndex: uint = 0
-

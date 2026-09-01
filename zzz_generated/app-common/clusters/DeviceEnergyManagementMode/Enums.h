@@ -51,13 +51,6 @@ enum class ModeTag : uint16_t
     // prone, and was removed. See
     // src/app/common/templates/config-data.yaml.
 };
-
-// Bitmap for Feature
-enum class Feature : uint32_t
-{
-    kOnOff     = 0x1,
-    kCoreModes = 0x2,
-};
 } // namespace DeviceEnergyManagementMode
 } // namespace Clusters
 } // namespace app

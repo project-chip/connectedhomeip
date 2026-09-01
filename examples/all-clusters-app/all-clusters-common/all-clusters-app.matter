@@ -783,7 +783,7 @@ cluster Descriptor = 29 {
   readonly attribute cluster_id clientList[] = 2;
   readonly attribute endpoint_no partsList[] = 3;
   readonly attribute optional SemanticTagStruct tagList[] = 4;
-  provisional readonly attribute optional char_string<32> endpointUniqueID = 5;
+  readonly attribute optional char_string<32> endpointUniqueID = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -8201,7 +8201,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster DishwasherMode {
@@ -8260,14 +8260,14 @@ endpoint 1 {
   server cluster DishwasherAlarm {
     emits event Notify;
     ram      attribute mask default = 1;
-    ram      attribute latch default = 1;
+    ram      attribute latch default = 3;
     ram      attribute state default = 0;
-    ram      attribute supported default = 15;
+    ram      attribute supported default = 47;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command Reset;
     handle command ModifyEnabledAlarms;

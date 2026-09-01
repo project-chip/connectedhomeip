@@ -723,7 +723,7 @@ cluster Descriptor = 29 {
   readonly attribute cluster_id clientList[] = 2;
   readonly attribute endpoint_no partsList[] = 3;
   readonly attribute optional SemanticTagStruct tagList[] = 4;
-  provisional readonly attribute optional char_string<32> endpointUniqueID = 5;
+  readonly attribute optional char_string<32> endpointUniqueID = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -5905,7 +5905,7 @@ cluster WaterHeaterMode = 158 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster DeviceEnergyManagementMode = 159 {
-  revision 3;
+  revision 2;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -5922,11 +5922,6 @@ cluster DeviceEnergyManagementMode = 159 {
     kDeviceOptimization = 16385;
     kLocalOptimization = 16386;
     kGridOptimization = 16387;
-  }
-
-  bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
-    kCoreModes = 0x2;
   }
 
   shared struct ModeTagStruct {
@@ -12715,7 +12710,7 @@ cluster CommissionerControl = 1873 {
 
   response struct ReverseOpenCommissioningWindow = 2 {
     int16u commissioningTimeout = 0;
-    octet_string PAKEPasscodeVerifier = 1;
+    octet_string<97> PAKEPasscodeVerifier = 1;
     int16u discriminator = 2;
     int32u iterations = 3;
     octet_string<32> salt = 4;
@@ -13942,4 +13937,3 @@ internal cluster TestHiddenManufacturerSpecific = 4294048801 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
-

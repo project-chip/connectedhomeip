@@ -783,7 +783,7 @@ cluster Descriptor = 29 {
   readonly attribute cluster_id clientList[] = 2;
   readonly attribute endpoint_no partsList[] = 3;
   readonly attribute optional SemanticTagStruct tagList[] = 4;
-  provisional readonly attribute optional char_string<32> endpointUniqueID = 5;
+  readonly attribute optional char_string<32> endpointUniqueID = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -5458,11 +5458,6 @@ cluster DeviceEnergyManagementMode = 159 {
     kGridOptimization = 16387;
   }
 
-  bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
-    kCoreModes = 0x2;
-  }
-
   shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
@@ -8814,7 +8809,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster DishwasherMode {
@@ -8880,7 +8875,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command Reset;
     handle command ModifyEnabledAlarms;
@@ -10019,5 +10014,3 @@ endpoint 4 {
     callback attribute clusterRevision;
   }
 }
-
-
