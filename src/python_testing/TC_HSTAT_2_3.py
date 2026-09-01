@@ -175,7 +175,7 @@ class TC_HSTAT_2_3(HSTATBase):
         self.step(13)
         # TH writes to the DUT the UserSetpoint attribute with MinSetpointValue + StepValue.
         # Verify DUT responds w/ status SUCCESS(0x00)
-        await self.write_single_attribute(attribute_value=self.attributes.UserSetpoint(dut_MinSetpoint+dut_Step), expect_success=True)
+        await self.write_single_attribute(attribute_value=self.attributes.UserSetpoint(dut_MinSetpoint+dut_Step), endpoint_id=self.endpoint, expect_success=True)
         if dut_Setpoint != dut_MinSetpoint+dut_Step:
             reportsReceived.append(userSetpointSubscription.wait_for_attribute_report().value)
 
@@ -208,6 +208,7 @@ class TC_HSTAT_2_3(HSTATBase):
 
         # If StepValue>1 then TH sends command SetSettings with the UserSetpoint field set to MinSetpointValue+1, otherwise skip this step
         # Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)
+        log.info("StepValue is %s, MinSetpoint is %s", dut_Step, dut_MinSetpoint)
         if dut_Step > 1:
             self.step(17)
             # when dut_Step is greater than 1, dut_MinSetpoint + 1 falls within the allowed range

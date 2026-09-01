@@ -171,7 +171,7 @@ class TC_HSTAT_2_2(HSTATBase):
         # For each update, the DUT shall return a SUCCESS status code.
         *mostModes, lastMode = SupportedModes
         for mode in mostModes:
-            await self.write_single_attribute(attribute_value=self.attributes.Mode(mode), expect_success=True)
+            await self.write_single_attribute(attribute_value=self.attributes.Mode(mode), endpoint_id=self.endpoint, expect_success=True)
             if dut_CurrentMode != mode:
                 modeReportsReceived.append(modeSubscription.wait_for_attribute_report().value)
                 modeReportsExpected.append(mode)

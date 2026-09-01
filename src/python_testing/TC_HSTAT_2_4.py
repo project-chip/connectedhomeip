@@ -186,7 +186,7 @@ class TC_HSTAT_2_4(HSTATBase):
             self.step(8)
             # TH writes to the DUT the Continuous attribute with False.
             # Verify DUT responds w/ status SUCCESS(0x00) Confirm 2 attribute reports for Continuous with the first having a value of True and the second having a value of False.
-            await self.write_single_attribute(attribute_value=self.attributes.Continuous(False), expect_success=True)
+            await self.write_single_attribute(attribute_value=self.attributes.Continuous(False), endpoint_id=self.endpoint, expect_success=True)
             continuousReportsReceived.append(continuousSubscription.wait_for_attribute_report().value)
             asserts.assert_equal(len(continuousReportsReceived), 2, "Wrong number of reports received for Continuous")
             asserts.assert_equal(continuousReportsReceived[0], True, "First report for Continuous is not True")
@@ -210,7 +210,7 @@ class TC_HSTAT_2_4(HSTATBase):
             self.step(11)
             # TH writes to the DUT the Sleep attribute with False.
             # Verify DUT responds w/ status SUCCESS(0x00) Confirm 2 attribute reports for Sleep with the first having a value of True and the second having a value of False.
-            await self.write_single_attribute(attribute_value=self.attributes.Sleep(False), expect_success=True)
+            await self.write_single_attribute(attribute_value=self.attributes.Sleep(False), endpoint_id=self.endpoint, expect_success=True)
             sleepReportsReceived.append(sleepSubscription.wait_for_attribute_report().value)
             asserts.assert_equal(len(sleepReportsReceived), 2, "Wrong number of reports received for Sleep")
             asserts.assert_equal(sleepReportsReceived[0], True, "First report for Sleep is not True")
@@ -234,7 +234,7 @@ class TC_HSTAT_2_4(HSTATBase):
             self.step(14)
             # TH writes to the DUT the Optimal attribute with False.
             # Verify DUT responds w/ status SUCCESS(0x00) Confirm 2 attribute reports for Optimal with the first having a value of True and the second having a value of False.
-            await self.write_single_attribute(attribute_value=self.attributes.Optimal(False), expect_success=True)
+            await self.write_single_attribute(attribute_value=self.attributes.Optimal(False), endpoint_id=self.endpoint, expect_success=True)
             optimalReportsReceived.append(optimalSubscription.wait_for_attribute_report().value)
             asserts.assert_equal(len(optimalReportsReceived), 2, "Wrong number of reports received for Optimal")
             asserts.assert_equal(optimalReportsReceived[0], True, "First report for Optimal is not True")
