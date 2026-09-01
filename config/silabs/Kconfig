@@ -235,7 +235,7 @@ config BT_DEVICE_NAME_DYNAMIC
 	default y
 
 config BT_DEVICE_NAME_MAX
-	default 15
+	default 17
 
 config BT_MAX_CONN
 	default 1

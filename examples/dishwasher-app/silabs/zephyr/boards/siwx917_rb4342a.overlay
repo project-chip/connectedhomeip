@@ -33,30 +33,27 @@
 	pinctrl-names = "default";
 };
 
-
-
 &sram0 {
-    status = "okay";
-    reg = <0x00000400 DT_SIZE_K(319)>;
+	status = "okay";
+	reg = <0x00000400 DT_SIZE_K(319)>;
 };
 
 &flash0 {
-        partitions {
-                factory_partition: partition@1e3000 {
-                        reg = <0x003e5000 DT_SIZE_K(4)>;
-                };
+	partitions {
+		factory_partition: partition@3e0000 {
+			reg = <0x003e0000 DT_SIZE_K(4)>;
+		};
 
-                settings_partition: partition@1e4000 {
-                        reg = <0x003e6000 DT_SIZE_K(32)>;
-                };
-        };
+		settings_partition: partition@3e1000 {
+			reg = <0x003e1000 DT_SIZE_K(32)>;
+		};
+	};
 };
 
 &code_partition {
-       reg = <0x202000 DT_SIZE_K(1932)>;
+	reg = <0x00202000 DT_SIZE_K(1912)>;
 };
 
-
 &storage_partition {
-        reg = <0x00406200 DT_SIZE_K(68)>;
+	reg = <0x003e9000 DT_SIZE_K(92)>;
 };
