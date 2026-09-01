@@ -106,6 +106,16 @@ IDLE_BEFORE_ANNOUNCE_TIMEOUT_SEC = 120
 # over from a previous provider process, since both leave the DUT in the same
 # kQuerying→kIdle transition.
 PROVIDER_QUERY_RECEIVED_LOG = "OTA Provider received QueryImage"
+# Upper bound for establishing a subscription to the DUT. On a reachable DUT this takes well
+# under a second; the bound exists because AttributeSubscriptionHandler.start() goes through
+# ReadAttribute(), whose autoResubscribe parameter defaults to True, so a DUT that has dropped
+# off the network makes it retry establishment indefinitely and the step stalls for the rest of
+# the test budget. Every step subscribes only after the DUT has already answered the controller,
+# so a minute is generous for the establishment itself.
+SUBSCRIPTION_START_TIMEOUT_SEC = 60
+# Bound for the reachability probe that runs when a subscription fails to establish. Only needs
+# to answer "does the DUT still talk to this controller at all", so it is kept short.
+SUBSCRIPTION_PROBE_TIMEOUT_MS = 5000
 
 
 class TC_SU_2_2(SoftwareUpdateBaseTest):
@@ -262,6 +272,59 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             else:
                 current_state = val
                 idle_since = None
+
+    async def _start_subscription_bounded(self, subscription, step_name: str, **start_kwargs) -> None:
+        """Start ``subscription``, failing the step if it is not established in time.
+
+        Subscription establishment has no timeout of its own: ReadAttribute() defaults to
+        autoResubscribe=True, so a DUT that has dropped off the network is retried forever and
+        the step blocks until the whole test budget is gone — reported, if at all, as an opaque
+        overall timeout hours later.
+
+        On timeout the DUT is probed with a plain GetConnectedDevice before the step is failed,
+        because "no subscription" has two causes that call for opposite reactions: a DUT that has
+        left the network, versus a DUT that still answers while only the subscription fails (an
+        earlier subscription of this run retrying in the background competes for CASE sessions to
+        the same node, and cannot be cancelled once the DUT stops acknowledging). Reporting which
+        one it is keeps the failure from being read as a verdict on the DUT.
+        """
+        try:
+            await asyncio.wait_for(subscription.start(**start_kwargs), timeout=SUBSCRIPTION_START_TIMEOUT_SEC)
+            return
+        except TimeoutError:
+            logger.info('%s: no subscription after %ss; probing whether the DUT answers at all.',
+                        step_name, SUBSCRIPTION_START_TIMEOUT_SEC)
+
+        controller = start_kwargs.get('dev_ctrl', self.default_controller)
+        node_id = start_kwargs.get('node_id', self.dut_node_id)
+        probe_error = None
+        try:
+            # Bounded twice: GetConnectedDevice honours timeoutMs, and wait_for keeps a wedged
+            # probe from stalling the very failure it exists to explain.
+            await asyncio.wait_for(
+                controller.GetConnectedDevice(node_id, allowPASE=False, timeoutMs=SUBSCRIPTION_PROBE_TIMEOUT_MS),
+                timeout=SUBSCRIPTION_PROBE_TIMEOUT_MS / 1000 + 5)
+        except (TimeoutError, ChipDeviceCtrl.ChipStackError) as e:
+            probe_error = e
+
+        preamble = (f"{step_name}: could not establish a subscription to the DUT within "
+                    f"{SUBSCRIPTION_START_TIMEOUT_SEC}s")
+        no_verdict = ("No verdict: without a subscription this run observed nothing, so the DUT's OTA "
+                      "behaviour was neither proved nor disproved.")
+        if probe_error is None:
+            asserts.fail(
+                f"{preamble}, yet the DUT still answers the controller (GetConnectedDevice succeeded).\n"
+                f"{no_verdict} The DUT is not the suspect here — the controller's subscription machinery "
+                "is, most likely an earlier subscription of this run still retrying in the background.\n"
+                "ACTION: re-run the test. If this recurs at the same step, investigate the controller "
+                "side rather than the DUT.")
+        asserts.fail(
+            f"{preamble}, and the DUT does not answer the controller at all "
+            f"(GetConnectedDevice failed: {probe_error}).\n"
+            f"{no_verdict}\n"
+            "ACTION: check that the DUT is powered and on the network. A one-off drop-out is an "
+            "environment problem — re-run the test. A DUT that repeatedly stops answering at this "
+            "point is itself the defect and must not be retried away.")
 
     async def _announce_until_provider_queried(self, controller, provider_node_id: int, requestor_node_id: int,
                                                timeout_sec: float, step_name: str,
@@ -484,7 +547,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
 
-        await subscription_attr_state_busy.start(
+        await self._start_subscription_bounded(
+            subscription_attr_state_busy, step_number_s1,
             dev_ctrl=controller,
             node_id=requestor_node_id,
             endpoint=0,
@@ -572,7 +636,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
 
-        await subscription_attr_state_updatenotavailable.start(
+        await self._start_subscription_bounded(
+            subscription_attr_state_updatenotavailable, step_number_s2,
             dev_ctrl=controller,
             node_id=requestor_node_id,
             endpoint=0,
@@ -707,7 +772,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
 
-        await subscription_attr_state_busy_180s.start(
+        await self._start_subscription_bounded(
+            subscription_attr_state_busy_180s, step_number_s3,
             dev_ctrl=controller,
             node_id=requestor_node_id,
             endpoint=0,
@@ -854,7 +920,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             expected_event_id=Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition.event_id
         )
 
-        await subscription_state_invalid_uri.start(
+        await self._start_subscription_bounded(
+            subscription_state_invalid_uri, step_number_s4,
             dev_ctrl=controller,
             node_id=requestor_node_id,
             endpoint=0,
@@ -1047,7 +1114,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             expected_attribute=None  # receive all attributes
         )
 
-        await subscription_attr.start(
+        await self._start_subscription_bounded(
+            subscription_attr, step_number_s5,
             dev_ctrl=controller,
             node_id=requestor_node_id,
             endpoint=0,
@@ -1289,7 +1357,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
 
-        await subscription_s6.start(
+        await self._start_subscription_bounded(
+            subscription_s6, step_number_s6,
             dev_ctrl=controller,
             node_id=requestor_node_id,
             endpoint=0,
