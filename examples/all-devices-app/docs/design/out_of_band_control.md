@@ -46,7 +46,16 @@ flowchart LR
     simulated devices and clusters outside of the Matter protocol.
 -   **Generic Action Dispatch**: An `OOBAccessor` receives a semantic action
     name and a TLV data buffer. The application maintains a registry of
-    accessors and queries them in order until one handles the action.
+    accessors and queries them in order:
+    -   `CHIP_NO_ERROR`: The action was recognized and executed successfully.
+        Dispatch terminates.
+    -   `CHIP_ERROR_NOT_FOUND`: The action is not supported by this accessor.
+        Registry continues querying the next accessor.
+    -   Other `CHIP_ERROR`: The action was recognized by this accessor, but
+        execution failed. Dispatch terminates immediately and propagates the
+        error.
+    -   If no registered accessor handles the action, `HandleAction` returns
+        `CHIP_ERROR_NOT_FOUND`.
 -   **Transport Translation**: External protocols and transports (Named Pipe
     JSON, Pigweed RPC, Test Event Triggers) parse incoming requests, convert
     them into an action name and TLV payload, and forward them to
@@ -111,6 +120,9 @@ public:
      * @brief Executes an out-of-band action on a target endpoint.
      * @param action Semantic action string (e.g. "SetOnOff", "SetOccupancy").
      * @param tlvData Encoded TLV payload containing endpoint ID and action parameters.
+     * @return CHIP_NO_ERROR if action was recognized and executed successfully.
+     * @return CHIP_ERROR_NOT_FOUND if action is not supported (registry continues dispatch).
+     * @return Other CHIP_ERROR on execution failure (registry stops dispatch).
      */
     virtual CHIP_ERROR HandleAction(CharSpan action, ByteSpan tlvData) = 0;
 };
@@ -118,7 +130,7 @@ public:
 } // namespace chip::app::Clusters
 ```
 
-### `OOBAccessorRegistry` Interface
+### `InMemoryOOBAccessorRegistry` Class
 
 ```cpp
 namespace chip::app {
@@ -133,7 +145,8 @@ public:
     CHIP_ERROR Register(std::unique_ptr<chip::app::Clusters::OOBAccessor> accessor);
 
     /**
-     * @brief Dispatches an action to registered accessors.
+     * @brief Dispatches an action to registered accessors in order.
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_NOT_FOUND if unhandled, or specific error on execution failure.
      */
     CHIP_ERROR HandleAction(CharSpan action, ByteSpan tlvData);
 
