@@ -296,7 +296,6 @@ def _encodable_numeric_range(datatype: str, is_nullable: bool) -> tuple[int, int
             type_max -= 1
     return type_min, type_max
 
-
 # TLV tag of the FabricIndex field carried by every fabric-scoped struct.
 FABRIC_INDEX_TAG = 254
 
@@ -814,12 +813,18 @@ class IDMBaseTest(BasicCompositionTests):
         """
         datatype = attr_info.datatype.lower()
 
-        # String constraints
+        # String constraints. An octstr must be written as bytes; a str would either
+        # fail to encode or be encoded as a character string of the wrong type.
         if 'string' in datatype or 'octstr' in datatype:
+            def make(length: int) -> str | bytes:
+                if 'octstr' in datatype:
+                    return b'x' * length
+                return 'x' * length
+
             if constraints.max_length is not None:
-                return 'x' * (constraints.max_length + 1)
+                return make(constraints.max_length + 1)
             if constraints.min_length is not None and constraints.min_length > 0:
-                return 'x' * (constraints.min_length - 1)
+                return make(constraints.min_length - 1)
             return None
 
         # List constraints. Over-max_count violations are not generated: they would
@@ -945,11 +950,19 @@ class IDMBaseTest(BasicCompositionTests):
             attribute=attr_info.attribute
         )
 
+        # A non-timed write to a timed-write attribute is answered with
+        # NEEDS_TIMED_INTERACTION before the value is ever range-checked, which would
+        # report every such attribute as failing to return CONSTRAINT_ERROR.
+        timed_request_timeout_ms = None
+        if attr_info.attribute.must_use_timed_write:
+            timed_request_timeout_ms = 65535
+
         # Attempt to write violating value
         attr_obj = attr_info.attribute(test_value)
         write_result = await self.default_controller.WriteAttribute(
             nodeId=self.dut_node_id,
-            attributes=[(attr_info.endpoint_id, attr_obj)]
+            attributes=[(attr_info.endpoint_id, attr_obj)],
+            timedRequestTimeoutMs=timed_request_timeout_ms
         )
         result_status = write_result[0].Status
 
@@ -970,7 +983,8 @@ class IDMBaseTest(BasicCompositionTests):
         if stored_value != original_value:
             restore_result = await self.default_controller.WriteAttribute(
                 nodeId=self.dut_node_id,
-                attributes=[(attr_info.endpoint_id, attr_info.attribute(original_value))]
+                attributes=[(attr_info.endpoint_id, attr_info.attribute(original_value))],
+                timedRequestTimeoutMs=timed_request_timeout_ms
             )
             if restore_result[0].Status != Status.Success:
                 log.warning("Failed to restore %s to %s: %s", attribute_path, original_value,

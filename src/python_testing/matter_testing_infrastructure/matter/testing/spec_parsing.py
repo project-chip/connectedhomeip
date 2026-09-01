@@ -1250,6 +1250,7 @@ class ClusterParser:
                 continue
             fid = uint(int(xml_field.attrib['id'], 0))
             _, fabric_sensitive = self.parse_fabric_flags(xml_field.find('access'))
+
             fields[fid] = XmlDataTypeComponent(
                 value=fid,
                 name=xml_field.attrib['name'],
