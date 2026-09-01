@@ -16,9 +16,9 @@
  */
 #include "FileAttestationTrustStore.h"
 
-#include <crypto/CHIPCryptoPAL.h>
 #include <algorithm>
 #include <array>
+#include <crypto/CHIPCryptoPAL.h>
 #include <cstdio>
 #include <cstring>
 #include <string>
