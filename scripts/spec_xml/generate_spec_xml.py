@@ -84,7 +84,7 @@ CURRENT_IN_PROGRESS_DEFINES = [
     "thermostat-sensors",
     "tstatmode",
     "uwb-ranging",
-    "obsolete", # Needed for compatibility
+    "obsolete",  # Needed for compatibility
 ]
 
 
