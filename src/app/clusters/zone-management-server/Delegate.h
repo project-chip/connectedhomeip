@@ -108,8 +108,8 @@ public:
     virtual Protocols::InteractionModel::Status RemoveTrigger(uint16_t zoneID) = 0;
 
     /**
-     * @brief verifies whether a zone with the provided zoneId is present on the server, and not a Privacy Zone. 
-     * 
+     * @brief verifies whether a zone with the provided zoneId is present on the server, and not a Privacy Zone.
+     *
      * @param[in] zoneId Indicates the Id of the zone to be checked against known zones
      *
      * @return true if the zoneId is found, and the use is not privacy.
