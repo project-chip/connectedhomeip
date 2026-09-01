@@ -189,6 +189,13 @@
             "AccessControlEntriesPerFabric",
             "FeatureMap"
         ],
+        "Actions": [
+            "ActionList",
+            "EndpointLists",
+            { "name": "SetupURL", "keepDefault": true },
+            { "name": "FeatureMap", "keepDefault": true },
+            "ClusterRevision"
+        ],
         "Administrator Commissioning": [
             "ClusterRevision",
             "WindowStatus",
@@ -635,7 +642,14 @@
             "SupportedTemperatureLevels",
             "ClusterRevision"
         ],
-        "Dishwasher Alarm": ["ClusterRevision"],
+        "Dishwasher Alarm": [
+            { "name": "Mask", "keepDefault": true },
+            { "name": "Latch", "keepDefault": true },
+            { "name": "State", "keepDefault": true },
+            { "name": "Supported", "keepDefault": true },
+            { "name": "FeatureMap", "keepDefault": true },
+            "ClusterRevision"
+        ],
         "Dishwasher Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Control": [
@@ -653,7 +667,13 @@
         ],
         "Laundry Washer Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
-        "Refrigerator Alarm": ["ClusterRevision"],
+        "Refrigerator Alarm": [
+            { "name": "Mask", "keepDefault": true },
+            { "name": "State", "keepDefault": true },
+            { "name": "Supported", "keepDefault": true },
+            { "name": "FeatureMap", "keepDefault": true },
+            "ClusterRevision"
+        ],
         "Refrigerator And Temperature Controlled Cabinet Mode": [
             "SupportedModes",
             "CurrentMode",
@@ -1002,7 +1022,30 @@
             "FeatureMap"
         ],
         "Unit Localization": ["ClusterRevision", "TemperatureUnit"],
-        "Localization Configuration": ["ClusterRevision", "SupportedLocales"],
+        "Localization Configuration": [
+            { "name": "ActiveLocale", "keepDefault": true },
+            "SupportedLocales",
+            { "name": "FeatureMap", "keepDefault": true },
+            "ClusterRevision"
+        ],
+        "Smoke CO Alarm": [
+            "ExpressedState",
+            "SmokeState",
+            "COState",
+            "BatteryAlert",
+            "DeviceMuted",
+            { "name": "TestInProgress", "keepDefault": true },
+            "HardwareFaultAlert",
+            "EndOfServiceAlert",
+            { "name": "InterconnectSmokeAlarm", "keepDefault": true },
+            { "name": "InterconnectCOAlarm", "keepDefault": true },
+            { "name": "ContaminationState", "keepDefault": true },
+            { "name": "SmokeSensitivityLevel", "keepDefault": true },
+            { "name": "ExpiryDate", "keepDefault": true },
+            { "name": "Unmounted", "keepDefault": true },
+            { "name": "FeatureMap", "keepDefault": true },
+            "ClusterRevision"
+        ],
         "TLS Certificate Management": [
             "ClusterRevision",
             "MaxRootCertificates",

@@ -2351,7 +2351,7 @@ endpoint 0 {
   }
 
   server cluster LocalizationConfiguration {
-    ram      attribute activeLocale default = "en-US";
+    callback attribute activeLocale default = "en-US";
     callback attribute supportedLocales;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -2658,12 +2658,12 @@ endpoint 1 {
     emits event StateChanged;
     callback attribute actionList;
     callback attribute endpointLists;
-    ram      attribute setupURL default = "https://example.com";
+    callback attribute setupURL default = "https://example.com";
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap default = 0;
+    callback attribute clusterRevision;
 
     handle command InstantAction;
   }

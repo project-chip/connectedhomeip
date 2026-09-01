@@ -8966,8 +8966,8 @@ endpoint 0 {
     callback attribute actionList;
     callback attribute endpointLists;
     callback attribute setupURL;
-    ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute featureMap default = 0;
+    callback attribute clusterRevision;
   }
 
   server cluster BasicInformation {

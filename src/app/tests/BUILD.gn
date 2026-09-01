@@ -178,6 +178,7 @@ chip_test_suite("tests") {
     "TestDefaultSafeAttributePersistenceProvider.cpp",
     "TestDefaultTermsAndConditionsProvider.cpp",
     "TestDefaultThreadNetworkDirectoryStorage.cpp",
+    "TestDynamicAttributeMetadata.cpp",
     "TestEcosystemInformationCluster.cpp",
     "TestEventLoggingNoUTCTime.cpp",
     "TestEventOverflow.cpp",

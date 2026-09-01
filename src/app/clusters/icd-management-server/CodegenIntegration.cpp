@@ -66,14 +66,15 @@ public:
         }
 
         // Get UserActiveModeTriggerInstruction
-        char instructionBuffer[kUserActiveModeTriggerInstructionMaxLength];
-        MutableCharSpan instructionSpan(instructionBuffer);
-
-        if (Clusters::IcdManagement::Attributes::UserActiveModeTriggerInstruction::GetDefault(endpointId, instructionSpan) !=
-            Protocols::InteractionModel::Status::Success)
+        CharSpan instructionSpan;
+        if (optionalAttributeSet.IsSet(IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id))
         {
-            ChipLogError(Zcl, "Failed to get UserActiveModeTriggerInstruction, using default (empty string)");
-            instructionSpan = MutableCharSpan();
+            if (Clusters::IcdManagement::Attributes::UserActiveModeTriggerInstruction::GetDefault(endpointId, instructionSpan) !=
+                Protocols::InteractionModel::Status::Success)
+            {
+                ChipLogError(Zcl, "Failed to get UserActiveModeTriggerInstruction, using default (empty string)");
+                instructionSpan = CharSpan();
+            }
         }
 
         gServer.Create(endpointId, *Server::GetInstance().GetSessionKeystore(), Server::GetInstance().GetFabricTable(),

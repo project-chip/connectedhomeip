@@ -12,6 +12,7 @@
 #include <app/data-model/Nullable.h>
 #include <app/util/basic-types.h>
 #include <app/util/MarkAttributeDirty.h>
+#include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -26,12 +27,19 @@ namespace {{asUpperCamelCase parent.label}} {
 namespace Attributes {
 
 {{/first}}
+{{#unless isArray}}
+{{#if_is_struct type}}
 {{#unless (isStrEqual storagePolicy "attributeAccessInterface")}}
+#error Attribute "{{name}}" in cluster "{{../name}}" is struct-typed and must be added to the attributeAccessInterfaceAttributes object in src/app/zap-templates/zcl/zcl.json and src/app/zap-templates/zcl/zcl-with-test-extensions.json
+{{/unless}}
+{{else}}
 namespace {{asUpperCamelCase label}} {
-Protocols::InteractionModel::Status Get{{#if (isInConfigList parent.name "CodeDrivenClusters")}}Default{{/if}}(EndpointId endpoint, {{accessorGetterType this}} value); // {{type}}
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, {{#if (isString type)}}{{#if isNullable}}DataModel::Nullable<chip::{{#if (isOctetString type)}}Byte{{else}}Char{{/if}}Span> &{{else}}chip::{{#if (isOctetString type)}}Byte{{else}}Char{{/if}}Span &{{/if}}{{else}}{{accessorGetterType this}}{{/if}} value);
+{{#unless (isStrEqual storagePolicy "attributeAccessInterface")}}
 {{! NOTE: Adding an optional arg instead of an overload can break API
     consumers that are using the function type (e.g. in templates). }}
 {{#unless (isInConfigList parent.name "CodeDrivenClusters")}}
+Protocols::InteractionModel::Status Get(EndpointId endpoint, {{accessorGetterType this}} value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} value, MarkAttributeDirty markDirty);
 {{#if isNullable}}
@@ -41,8 +49,10 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, {{zapTypeToEncodabl
 Protocols::InteractionModel::Status Set(EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name isArgument=true forceNotOptional=true}} value, MarkAttributeDirty markDirty);
 {{/if}}
 {{/unless}}
+{{/unless}}
 } // namespace {{asUpperCamelCase label}}
 
+{{/if_is_struct}}
 {{/unless}}
 {{#last}}
 } // namespace Attributes
@@ -55,3 +65,4 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, {{zapTypeToEncodabl
 } // Clusters
 } // app
 } // chip
+

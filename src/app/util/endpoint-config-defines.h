@@ -21,9 +21,35 @@
  * endpoint configurations (e.g. for dynamic endpoints).
  */
 #define ZAP_TYPE(type) ZCL_##type##_ATTRIBUTE_TYPE
+#ifndef __cplusplus
+#error "Matter endpoint configuration headers require C++"
+#endif
+
+#include <cstdint>
+
+namespace chip {
+namespace app {
+
+/**
+ * Sentinel constant stored in EmberAfDefaultOrMinMaxAttributeValue::defaultValue
+ * when ZAP_EMPTY_DEFAULT() is used.
+ *
+ * This magic number serves as a marker indicating that no explicit default value
+ * was configured for the attribute, distinguishing "no default provided"
+ * (ZAP_EMPTY_DEFAULT()) from an explicit scalar default of zero (ZAP_SIMPLE_DEFAULT(0)).
+ *
+ * When an attribute has an empty default (HasEmptyDefault() is true),
+ * emberAfGetAttributeDefaultValue returns an empty ByteSpan, allowing nullable
+ * attributes to default to Null and non-nullable attributes to default to zero.
+ */
+inline constexpr uint32_t kZapEmptyDefaultMarker = 0xDEADBEEF;
+
+} // namespace app
+} // namespace chip
+
 #define ZAP_EMPTY_DEFAULT()                                                                                                        \
     {                                                                                                                              \
-        (uint32_t) 0                                                                                                               \
+        chip::app::kZapEmptyDefaultMarker                                                                                          \
     }
 #define ZAP_SIMPLE_DEFAULT(x)                                                                                                      \
     {                                                                                                                              \

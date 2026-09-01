@@ -20,6 +20,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <lib/support/CharSpanToStdString.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;
@@ -28,9 +29,6 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Actions;
 
 namespace {
-
-// Maximum SetupURL length per the Matter spec (Actions cluster, SetupURL attribute).
-constexpr size_t kMaxSetupURLLength = 512u;
 
 ActionsCluster::OptionalAttributesSet BuildOptionalAttributes(EndpointId endpointId)
 {
@@ -47,12 +45,10 @@ ActionsCluster::OptionalAttributesSet BuildOptionalAttributes(EndpointId endpoin
 std::string ReadSetupURL(EndpointId endpointId)
 {
     VerifyOrReturnValue(emberAfContainsAttribute(endpointId, Actions::Id, Attributes::SetupURL::Id), std::string());
-    // Use a stack buffer for the Ember read; the result is then copied into a std::string.
-    char buf[kMaxSetupURLLength];
-    MutableCharSpan urlSpan(buf);
+    CharSpan urlSpan;
     VerifyOrReturnValue(Attributes::SetupURL::GetDefault(endpointId, urlSpan) == Protocols::InteractionModel::Status::Success,
                         std::string());
-    return std::string(urlSpan.data(), urlSpan.size());
+    return CharSpanToStdString(urlSpan);
 }
 
 std::optional<CharSpan> SetupURLSpan(const std::string & url)
