@@ -48,9 +48,10 @@ MANDATORY_CONFORM = 'mandatoryConform'
 DEPRECATE_CONFORM = 'deprecateConform'
 DISALLOW_CONFORM = 'disallowConform'
 DESCRIBED_CONFORM = 'describedConform'
+OBSOLETE_CONFORM = 'obsoleteConform'
 TOP_LEVEL_CONFORMANCE_TAGS = {OTHERWISE_CONFORM, OPTIONAL_CONFORM,
                               PROVISIONAL_CONFORM, MANDATORY_CONFORM, DEPRECATE_CONFORM, DISALLOW_CONFORM,
-                              DESCRIBED_CONFORM}
+                              DESCRIBED_CONFORM, OBSOLETE_CONFORM}
 AND_TERM = 'andTerm'
 OR_TERM = 'orTerm'
 NOT_TERM = 'notTerm'
@@ -238,6 +239,14 @@ class described(Conformance):
         return 'Desc'
 
 
+class obsolete(Conformance):
+    def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
+        return ConformanceDecisionWithChoice(ConformanceDecision.DISALLOWED)
+
+    def __str__(self):
+        return 'Obs'
+
+
 class ValueConformance(Conformance):
     def __call__(self, conformance_assessment_data: ConformanceAssessmentData):
         # This should never be called
@@ -288,6 +297,7 @@ BASIC_CONFORMANCE: dict[str, Conformance] = {
     DEPRECATE_CONFORM: deprecated(),
     DISALLOW_CONFORM: disallowed(),
     DESCRIBED_CONFORM: described(),
+    OBSOLETE_CONFORM: obsolete(),
 }
 
 

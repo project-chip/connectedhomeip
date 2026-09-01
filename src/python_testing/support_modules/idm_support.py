@@ -37,6 +37,7 @@ from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
+from matter.testing.conformance import obsolete
 from matter.testing.event_attribute_reporting import WildcardAttributeSubscriptionHandler
 from matter.testing.global_attribute_ids import GlobalAttributeIds, is_standard_attribute_id
 from matter.testing.matter_testing import compute_mrp_retransmission_timeout_sec
@@ -1256,6 +1257,11 @@ class IDMBaseTest(BasicCompositionTests):
                 continue
 
             xml_attr = xml_cluster.attributes[attribute_id]
+
+            # Skip obsolete attributes (e.g. obsolete in spec)
+            if isinstance(xml_attr.conformance, obsolete):
+                continue
+
             write_access = xml_attr.write_access
 
             if write_access != Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue:
