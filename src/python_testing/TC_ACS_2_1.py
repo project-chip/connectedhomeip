@@ -352,6 +352,8 @@ class TC_ACS_2_1(MatterBaseTest):
                                 elif nsID == SOUND_IDENTIFICATION_NAMESPACE_ID:
                                     asserts.assert_less_equal(tagID, SOUND_IDENTIFICATION_MAXTAGNUMBER,
                                                               "Tag number doesn't exit in IdentifiedSound namesapce.")
+                                else:
+                                    asserts.assert_error("Namespace is not matching to the features.")
 
                 if self.ObjectCountingSupported and predictedActivity:
                     self.step("13b", "If DUT supports PredictedActivity feature, then TH reads the PredictedActivity attribute. Verify that DUT response contains StartTimestamp epoch-s data less than equal to EndTimestamp-1 and EndTimestamp epoch-s data greater than equal to StartTimestamp-1 and Verify that DUT response contains Confidence field that is a percentage data between 0 and 100. If DUT supports HumanActivity or ObjectIdentification or SoundIdentification, then TH reads a list of SemanticTagStruct data that includes namespace ID and tag ID from IdentifiedObject or IdentifiedHumanActivity or IdentifiedSound namespaces.")
