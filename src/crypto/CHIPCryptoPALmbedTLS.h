@@ -22,11 +22,9 @@
 #include <mbedtls/error.h>
 #include <mbedtls/version.h>
 
-#if (MBEDTLS_VERSION_NUMBER >= 0x04000000)
-#include <mbedtls/private/ecp.h>
-#else
+#if (MBEDTLS_VERSION_NUMBER < 0x04000000)
 #include <mbedtls/ecp.h>
-#endif
+#endif // (MBEDTLS_VERSION_NUMBER < 0x04000000)
 
 namespace chip {
 namespace Crypto {

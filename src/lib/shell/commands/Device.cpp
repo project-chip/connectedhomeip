@@ -58,13 +58,17 @@ static CHIP_ERROR OpenCommissioningWindowHandler(int argc, char ** argv)
 
 static CHIP_ERROR CloseCommissioningWindowHandler(int argc, char ** argv)
 {
-    if (!chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
+    auto & commissionMgr = chip::Server::GetInstance().GetCommissioningWindowManager();
+
+    commissionMgr.ExpireFailSafeIfHeldByOpenPASESession();
+
+    if (!commissionMgr.IsCommissioningWindowOpen())
     {
         streamer_printf(streamer_get(), "Commissioning window is not open \r\n");
         return CHIP_NO_ERROR;
     }
 
-    chip::Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+    commissionMgr.CloseCommissioningWindow();
 
     streamer_printf(streamer_get(), "Closed commissioning window \r\n");
 

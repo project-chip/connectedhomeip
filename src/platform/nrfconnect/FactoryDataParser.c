@@ -215,8 +215,11 @@ bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData 
         }
         else if (strncmp("dac_key", (const char *) currentString.value, currentString.len) == 0)
         {
-            res                              = res && zcbor_bstr_decode(states, (struct zcbor_string *) &factoryData->dac_priv_key);
-            factoryData->dacPrivateKeyOffset = (size_t) ((uint8_t *) factoryData->dac_priv_key.data - buffer);
+            res = res && zcbor_bstr_decode(states, (struct zcbor_string *) &factoryData->dac_priv_key);
+            if (res)
+            {
+                factoryData->dacPrivateKeyOffset = (size_t) ((uint8_t *) factoryData->dac_priv_key.data - buffer);
+            }
         }
         else if (strncmp("pai_cert", (const char *) currentString.value, currentString.len) == 0)
         {

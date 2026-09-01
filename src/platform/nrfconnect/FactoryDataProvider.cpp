@@ -85,6 +85,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::Init()
     }
 
 #ifdef CONFIG_CHIP_CRYPTO_PSA
+    // From security point of view, if this fails, the device may be compromised, so we should stop execution here.
     VerifyOrDie(MoveDACPrivateKeyToSecureStorage(factoryData, factoryDataSize) == CHIP_NO_ERROR);
 #endif
 
@@ -179,9 +180,12 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::MoveDACPrivateKeyToSecureStora
         // Check once again if the saved key has attributes set before removing it from the factory data set.
         VerifyOrReturnError(psa_get_key_attributes(mDACPrivKeyId, &attributes) == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
+        const struct device * flashDev = kFlashDev;
+        VerifyOrReturnError(flashDev != nullptr && device_is_ready(flashDev), CHIP_ERROR_INTERNAL);
+
         // Get the actual block size.
-        const flash_parameters * flashParameters = flash_get_parameters(kFlashDev);
-        VerifyOrReturnError(flashParameters, CHIP_ERROR_INTERNAL);
+        const flash_parameters * flashParameters = flash_get_parameters(flashDev);
+        VerifyOrReturnError(flashParameters != nullptr, CHIP_ERROR_INTERNAL);
 
         // To write zeros directly to the Flash memory without erasing whole page the start address must be aligned to the
         // write_block_size value (alignedDacPrivKeyOffset), then we need align the required buffer size to the write_block_size as
@@ -204,7 +208,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::MoveDACPrivateKeyToSecureStora
 
         // Write aligned buffer directly to the Flash without erasing.
         VerifyOrReturnError(0 ==
-                                flash_write(kFlashDev, kFactoryDataPartitionAddress + alignedDacPrivKeyOffset,
+                                flash_write(flashDev, kFactoryDataPartitionAddress + alignedDacPrivKeyOffset,
                                             removedPrivKeyBuffer.Get(), requiredFlashSpaceSize),
                             CHIP_ERROR_INTERNAL);
 
