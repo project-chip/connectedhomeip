@@ -32,8 +32,8 @@
 #endif // (MBEDTLS_VERSION_NUMBER >= 0x04000000)
 #endif // !CHIP_CRYPTO_SPAKE2P_PSA
 
-#include "CHIPCryptoPALmbedTLS.h"
 #include "CHIPCryptoPAL.h"
+#include "CHIPCryptoPALmbedTLS.h"
 
 #include <type_traits>
 
