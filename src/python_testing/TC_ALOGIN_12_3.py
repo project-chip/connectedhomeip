@@ -16,7 +16,7 @@
 
 import logging
 import re
-from urllib.parse import urlparse
+from urllib.parse import unquote_plus, urlparse
 
 from mobly import asserts
 
@@ -124,7 +124,10 @@ class TC_ALOGIN_12_3(MatterBaseTest):
             # The complete URI exists so a QR code can carry the code as well as the URI, so the
             # code must appear in it. Separators in the displayed code are not necessarily kept.
             normalized_code = re.sub(r"[ \-]", "", response.userCode).lower()
-            normalized_uri = re.sub(r"[ \-]", "", response.verificationURIComplete).lower()
+            # The code may be percent-encoded (or "+"-encoded) inside a query parameter, so
+            # decode before stripping separators.
+            decoded_uri = unquote_plus(response.verificationURIComplete)
+            normalized_uri = re.sub(r"[ \-]", "", decoded_uri).lower()
             asserts.assert_in(normalized_code, normalized_uri,
                               "VerificationURIComplete must encode the UserCode")
         else:
@@ -141,7 +144,8 @@ class TC_ALOGIN_12_3(MatterBaseTest):
                             "OAuthLoggedIn should be TRUE once the user has completed the OAuth login")
 
         self.step(5)
-        await self.send_single_cmd(cmd=cluster.Commands.Logout(), endpoint=endpoint)
+        await self.send_single_cmd(cmd=cluster.Commands.Logout(), endpoint=endpoint,
+                                   timedRequestTimeoutMs=_TIMED_REQUEST_TIMEOUT_MS)
 
         self.step(6)
         oauth_logged_in = await self._read_oauth_logged_in(endpoint)

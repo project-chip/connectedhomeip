@@ -119,15 +119,12 @@ class TC_AUDIOCONTROL_2_2(MatterBaseTest, AUDIOCONTROLTestBase):
         return steps
 
     async def _exercise_enum_attribute(self, endpoint, prefix: str, attribute, enum_type):
-        """Read/modify/verify/restore cycle shared by the four enum policy attributes."""
-        self.step(f"{prefix}a")
-        if not self.supports_attribute(attribute):
-            self.mark_current_step_skipped()
-            for suffix in ("b", "c", "d"):
-                self.step(f"{prefix}{suffix}")
-                self.mark_current_step_skipped()
-            return
+        """Read/modify/verify/restore cycle shared by the four enum policy attributes.
 
+        All four attributes are mandatory, so they are read directly rather than gated on
+        supports_attribute; a DUT that omits one fails here as it does in TC-AUDIOCONTROL-2.1.
+        """
+        self.step(f"{prefix}a")
         old_value = await self.read_audiocontrol_attribute_expect_success(endpoint, attribute)
 
         self.step(f"{prefix}b")
@@ -212,6 +209,12 @@ class TC_AUDIOCONTROL_2_2(MatterBaseTest, AUDIOCONTROLTestBase):
 
         # Step 3: MaxUserVolume, including its clipping effect on Volume and StartUpVolume
         supports_start_up_volume = self.supports_attribute(attributes.StartUpVolume)
+        # Step 3 writes StartUpVolume and may clip it, so capture the DUT's original value
+        # here; step 10d restores this rather than what step 3 left behind.
+        start_up_volume_original = None
+        if supports_start_up_volume:
+            start_up_volume_original = await self.read_audiocontrol_attribute_expect_success(
+                endpoint, attributes.StartUpVolume)
 
         self.step("3a")
         volume = None
@@ -412,7 +415,7 @@ class TC_AUDIOCONTROL_2_2(MatterBaseTest, AUDIOCONTROLTestBase):
         self.step("10d")
         if supports_start_up_volume:
             await self.write_audiocontrol_attribute_expect_success(
-                endpoint, attributes.StartUpVolume, start_up_volume_old)
+                endpoint, attributes.StartUpVolume, start_up_volume_original)
         else:
             self.mark_current_step_skipped()
 

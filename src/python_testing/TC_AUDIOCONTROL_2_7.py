@@ -172,11 +172,12 @@ class TC_AUDIOCONTROL_2_7(MatterBaseTest, AUDIOCONTROLTestBase):
         self.step("2b")
         max_device_volume = await self.read_audiocontrol_attribute_expect_success(endpoint, attributes.MaxDeviceVolume)
 
-        # The scene stores Volume=maxDeviceVolume, so the ceiling must actually be reachable.
+        # The scene stores the highest reachable volume. MaxUserVolume may sit below
+        # MaxDeviceVolume, in which case it is the real ceiling.
+        effective_max = max_device_volume
         if self.supports_attribute(attributes.MaxUserVolume):
             max_user_volume = await self.read_audiocontrol_attribute_expect_success(endpoint, attributes.MaxUserVolume)
-            asserts.assert_equal(max_user_volume, max_device_volume,
-                                 "MaxUserVolume must equal MaxDeviceVolume for the scene recall to reach the ceiling")
+            effective_max = min(max_user_volume, max_device_volume)
 
         beq_supported = self.supports_beq and all(
             self.supports_attribute(attr) for attr in (attributes.Bass, attributes.Mid, attributes.Treble,
@@ -238,7 +239,7 @@ class TC_AUDIOCONTROL_2_7(MatterBaseTest, AUDIOCONTROLTestBase):
             Clusters.ScenesManagement.Structs.AttributeValuePairStruct(
                 attributeID=attributes.SoftMuted.attribute_id, valueUnsigned8=1),
             Clusters.ScenesManagement.Structs.AttributeValuePairStruct(
-                attributeID=attributes.Volume.attribute_id, valueUnsigned16=max_device_volume),
+                attributeID=attributes.Volume.attribute_id, valueUnsigned16=effective_max),
         ]
         if beq_supported:
             attribute_values.extend(
@@ -264,7 +265,7 @@ class TC_AUDIOCONTROL_2_7(MatterBaseTest, AUDIOCONTROLTestBase):
         await self._verify_soft_muted_or_skip(endpoint, True)
 
         self.step("6c")
-        await self._verify_volume_or_skip(endpoint, max_device_volume)
+        await self._verify_volume_or_skip(endpoint, effective_max)
 
         for step_id, attribute in (("6d", attributes.Bass), ("6e", attributes.Mid), ("6f", attributes.Treble)):
             self.step(step_id)

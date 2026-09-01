@@ -21,6 +21,7 @@ the MessageQueued / MessagePresented / MessageComplete / MessageNotPresented eve
 """
 
 import logging
+import time
 
 from mobly import asserts
 
@@ -85,8 +86,12 @@ class MESSTestBase:
         Messages left over from an earlier step can still be in flight, so events for other
         MessageIDs are discarded rather than failing the wait.
         """
+        deadline = time.monotonic() + timeout_sec
         while True:
-            data = handler.wait_for_event_type_report(event, timeout_sec=timeout_sec)
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                asserts.fail(f"Timed out waiting for {event.__name__} with MessageID {message_id.hex()}")
+            data = handler.wait_for_event_type_report(event, timeout_sec=remaining)
             if data.messageID == message_id:
                 return data
             log.info("Ignoring %s for unrelated MessageID %s", event.__name__, data.messageID.hex())

@@ -135,9 +135,9 @@ class TC_MESS_3_2(MatterBaseTest, MESSTestBase):
         # time between receiving MessagePresented and MessageComplete stands in for the
         # presentation length.
         self.wait_for_message_event(event_handler, events.MessagePresented, MESSAGE_ID_2, timeout_sec=timeout_sec)
-        presented_at = time.time()
+        presented_at = time.monotonic()
         self.wait_for_message_event(event_handler, events.MessageComplete, MESSAGE_ID_2, timeout_sec=timeout_sec)
-        elapsed = time.time() - presented_at
+        elapsed = time.monotonic() - presented_at
         log.info("Long audio message completed %.1fs after it was presented", elapsed)
         asserts.assert_less_equal(
             elapsed, _TRUNCATION_LIMIT_SEC + _TRUNCATION_TOLERANCE_SEC,

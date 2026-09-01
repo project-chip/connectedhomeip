@@ -89,6 +89,9 @@ class TC_MEDIAPLAYBACK_6_12(MatterBaseTest, MEDIAPLAYBACKTestBase):
         asserts.assert_true(content_info is not NullValue,
                             f"ContentInfo must not be null while content is playing ({label})")
         matter_asserts.assert_valid_enum(content_info.contentType, f"ContentInfo.ContentType {label}", _MEDIA_TYPE)
+        # assert_valid_enum only checks the type, and kUnknownEnumValue is a member of it.
+        asserts.assert_not_equal(content_info.contentType, _MEDIA_TYPE.kUnknownEnumValue,
+                                 f"ContentInfo.ContentType {label} must be a known MediaTypeEnum value")
 
         # Any field that is present must respect its length constraint, whether or not it
         # is one of the fields expected for this MediaType.

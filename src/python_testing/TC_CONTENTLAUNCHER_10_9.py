@@ -83,10 +83,9 @@ class TC_CONTENTLAUNCHER_10_9(MatterBaseTest):
         """Ask the operator to confirm playback behaviour the TH cannot observe over the wire."""
         response = self.wait_for_user_input(
             prompt_msg=f"{description} Enter 'y' if this is what happened, or 'n' if it did not.\n",
-            prompt_msg_placeholder="y", default_value="y")
-        if response is None:
-            log.info("No response to the playback confirmation prompt; continuing")
-            return
+            prompt_msg_placeholder="n", default_value="n")
+        asserts.assert_is_not_none(
+            response, f"No response to the playback confirmation prompt; cannot confirm that the DUT did: {description}")
         asserts.assert_equal(response.lower(), "y", f"Operator reported that the DUT did not: {description}")
 
     @pixit("content_url", str, "A content URL the DUT can play")

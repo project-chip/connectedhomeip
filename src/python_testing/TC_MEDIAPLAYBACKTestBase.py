@@ -38,6 +38,11 @@ class MEDIAPLAYBACKTestBase:
 
     async def read_content_presets(self, endpoint):
         """Return the Content Launcher Presets list, or None when the feature is absent."""
+        server_list = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.ServerList)
+        if _CONTENT_LAUNCHER.id not in server_list:
+            log.info("Content Launcher cluster is not present on endpoint %d", endpoint)
+            return None
         attribute_list = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=_CONTENT_LAUNCHER, attribute=_CONTENT_LAUNCHER.Attributes.AttributeList)
         if _CONTENT_LAUNCHER.Attributes.Presets.attribute_id not in attribute_list:

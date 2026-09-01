@@ -26,12 +26,15 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
-# RFC 5646 language tag: a primary subtag of 2-3 alpha characters followed by optional
-# subtags of up to 8 alphanumeric characters, e.g. "en-US" or "fr-FR".
-_LANGUAGE_TAG_PATTERN = r"^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$"
+# RFC 5646 language tag: a primary subtag of 1-8 alpha characters followed by optional
+# subtags of up to 8 alphanumeric characters, e.g. "en-US", "fr-FR" or the private-use
+# form "x-test". This is a shape check, not full RFC 5646 registry validation.
+_LANGUAGE_TAG_PATTERN = r"^[A-Za-z]{1,8}(-[A-Za-z0-9]{1,8})*$"
 
-# MIME type: type/subtype using the RFC 2045 token character set, e.g. "audio/mpeg".
-_MIME_TYPE_PATTERN = r"^[A-Za-z0-9][A-Za-z0-9!#$&^_.+-]*/[A-Za-z0-9][A-Za-z0-9!#$&^_.+-]*$"
+# MIME type: type/subtype over the full RFC 2045 token character set (any CHAR except
+# SPACE, CTLs and tspecials), e.g. "audio/mpeg" or "audio/x-foo~bar".
+_MIME_TOKEN = r"[A-Za-z0-9!#$%&'*+^_`{|}~.-]+"
+_MIME_TYPE_PATTERN = rf"^{_MIME_TOKEN}/{_MIME_TOKEN}$"
 
 
 class TC_MESS_1_1(MatterBaseTest):
