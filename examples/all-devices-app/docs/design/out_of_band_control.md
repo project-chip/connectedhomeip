@@ -47,15 +47,15 @@ flowchart LR
 -   **Generic Action Dispatch**: An `OOBAccessor` receives a semantic action
     name and a TLV data buffer. The application maintains a registry of
     accessors and queries them in order:
+    -   `std::nullopt`: The action is not supported by this accessor. Registry
+        continues querying the next accessor.
     -   `CHIP_NO_ERROR`: The action was recognized and executed successfully.
         Dispatch terminates.
-    -   `CHIP_ERROR_NOT_FOUND`: The action is not supported by this accessor.
-        Registry continues querying the next accessor.
     -   Other `CHIP_ERROR`: The action was recognized by this accessor, but
         execution failed. Dispatch terminates immediately and propagates the
         error.
-    -   If no registered accessor handles the action, `HandleAction` returns
-        `CHIP_ERROR_NOT_FOUND`.
+    -   If no registered accessor handles the action (all return
+        `std::nullopt`), `HandleAction` returns `CHIP_ERROR_NOT_FOUND`.
 -   **Transport Translation**: External protocols and transports (Named Pipe
     JSON, Pigweed RPC, Test Event Triggers) parse incoming requests, convert
     them into an action name and TLV payload, and forward them to
@@ -112,9 +112,9 @@ examples/all-devices-app/
 ### `OOBAccessor` Interface
 
 ```cpp
-namespace chip::app::Clusters {
+namespace chip::app {
 
-class OOBAccessor
+class OOBAccessor : public chip::IntrusiveListNodeBase<chip::IntrusiveMode::AutoUnlink>
 {
 public:
     virtual ~OOBAccessor() = default;
@@ -123,14 +123,14 @@ public:
      * @brief Executes an out-of-band action on a target endpoint.
      * @param action Semantic action string (e.g. "SetOnOff", "SetOccupancy").
      * @param tlvData Encoded TLV payload containing endpoint ID and action parameters.
+     * @return std::nullopt if action is not supported (registry continues dispatch).
      * @return CHIP_NO_ERROR if action was recognized and executed successfully.
-     * @return CHIP_ERROR_NOT_FOUND if action is not supported (registry continues dispatch).
      * @return Other CHIP_ERROR on execution failure (registry stops dispatch).
      */
-    virtual CHIP_ERROR HandleAction(CharSpan action, ByteSpan tlvData) = 0;
+    virtual std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) = 0;
 };
 
-} // namespace chip::app::Clusters
+} // namespace chip::app
 ```
 
 ### `InMemoryOOBAccessorRegistry` Class
@@ -335,7 +335,7 @@ void RegisterNamedPipes(MyDevice & device, PosixNamedPipeDispatcher & dispatcher
 
 In `all-devices-common/device/types/<device-name>/BUILD.gn`:
 
-```gn
+```text
 import("//build_overrides/chip.gni")
 
 # Platform-neutral device target (used by all platforms)
@@ -389,7 +389,7 @@ embedded builds:
 
 -   **POSIX GN Target (`posix/BUILD.gn`)**: Pulls both the base device target
     and the `:posix` sub-target:
-    ```gn
+    ```text
     deps = [
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light",
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light:posix",
