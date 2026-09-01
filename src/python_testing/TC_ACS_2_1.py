@@ -40,6 +40,7 @@ import numpy as np
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
@@ -331,12 +332,12 @@ class TC_ACS_2_1(MatterBaseTest):
                     asserts.assert_less_equal(predictedActivity.confidence, 100,
                                               "Expected the percentage greater than 0 and less than equat to 100.")
 
-                    if self.HumanActivitySupported or self.ObjectIdentificationSupported or self.SoundIdentificationSupported:
+                    if predictedActivity.ambientContextType:
+                        # AmbientContextType
+                        asserts.assert_less_equal(len(predictedActivity.ambientContextType), 100,
+                                                  "AmbientContextType should be less than 100.")
 
-                        if predictedActivity.ambientContextType:
-                            # AmbientContextType
-                            asserts.assert_less_equal(len(predictedActivity.ambientContextType), 100,
-                                                      "AmbientContextType should be less than 100.")
+                        if self.HumanActivitySupported or self.ObjectIdentificationSupported or self.SoundIdentificationSupported:
 
                             for acts in predictedActivity.ambientContextType:
                                 nsID = acts.namespaceID
@@ -362,7 +363,7 @@ class TC_ACS_2_1(MatterBaseTest):
                         log.info("Rx'd CrowdDetected: %s", {predictedActivity.crowdDetected})
 
                         # CrowdCount
-                        if "CrowdCount" in predictedActivity:
+                        if predictedActivity.crowdCount != NullValue:
                             # log.info(f"Rx'd CrowdCount: {predictedActivity.crowdCount}")
                             asserts.assert_less_equal(1, predictedActivity.crowdCount,
                                                       "CrowdCount is expected to be between 1 and 254.")
