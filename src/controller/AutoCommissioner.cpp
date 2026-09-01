@@ -22,6 +22,7 @@
 #include <credentials/CHIPCert.h>
 #include <lib/support/SafeInt.h>
 
+#include <cinttypes>
 #include <cstring>
 #include <type_traits>
 
@@ -32,6 +33,49 @@ using namespace chip::app::Clusters;
 using namespace chip::Crypto;
 using chip::app::DataModel::MakeNullable;
 using chip::app::DataModel::NullNullable;
+
+namespace Internal {
+
+AttestationProfileBitmap GetControllerSupportedAttestationRequestProfiles()
+{
+    AttestationProfileBitmap profiles(OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy);
+
+    if (IsMlDsa44Supported())
+    {
+        profiles.Set(OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsMlDsa44);
+    }
+    if (IsMlDsa65Supported())
+    {
+        profiles.Set(OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsMlDsa65);
+    }
+
+    return profiles;
+}
+
+Optional<OperationalCredentials::AttestationCryptoProfileEnum>
+SelectControllerSupportedAttestationRequestProfile(AttestationProfileBitmap deviceProfiles)
+{
+    const AttestationProfileBitmap sharedProfiles(static_cast<AttestationProfileBitmap::IntegerType>(
+        deviceProfiles.Raw() & GetControllerSupportedAttestationRequestProfiles().Raw()));
+
+    // The parameterless CertificateChainRequest provides legacy compatibility independently of this profiled request.
+    if (sharedProfiles.Has(OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsMlDsa65))
+    {
+        return MakeOptional(OperationalCredentials::AttestationCryptoProfileEnum::kMlDsa65);
+    }
+    if (sharedProfiles.Has(OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsMlDsa44))
+    {
+        return MakeOptional(OperationalCredentials::AttestationCryptoProfileEnum::kMlDsa44);
+    }
+    if (sharedProfiles.Has(OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy))
+    {
+        return MakeOptional(OperationalCredentials::AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+    }
+
+    return NullOptional;
+}
+
+} // namespace Internal
 
 AutoCommissioner::AutoCommissioner()
 {
@@ -901,6 +945,30 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                 .SetRemoteProductId(mDeviceCommissioningInfo.basic.productId)
                 .SetDefaultRegulatoryLocation(mDeviceCommissioningInfo.general.currentRegulatoryLocation)
                 .SetLocationCapability(mDeviceCommissioningInfo.general.locationCapability);
+            mParams.ClearAttestationCertificateRequestProfiles();
+
+            if (mDeviceCommissioningInfo.supportsPqcDeviceAttestation)
+            {
+                auto paiRequestProfile = Internal::SelectControllerSupportedAttestationRequestProfile(
+                    mDeviceCommissioningInfo.paiSupportedAttestationProfiles);
+                auto dacRequestProfile = Internal::SelectControllerSupportedAttestationRequestProfile(
+                    mDeviceCommissioningInfo.dacSupportedAttestationProfiles);
+
+                if (paiRequestProfile.HasValue() && dacRequestProfile.HasValue())
+                {
+                    mParams.SetPAIAttestationCertificateRequestProfile(paiRequestProfile.Value())
+                        .SetDACAttestationCertificateRequestProfile(dacRequestProfile.Value());
+                }
+                else
+                {
+                    ChipLogError(Controller,
+                                 "Device advertised PQC device attestation, but the commissioner could not negotiate PAI and "
+                                 "DAC certificate request profiles (PAI bitmap: 0x%" PRIx32 ", DAC bitmap: 0x%" PRIx32
+                                 "). Falling back to Matter legacy device attestation.",
+                                 mDeviceCommissioningInfo.paiSupportedAttestationProfiles.Raw(),
+                                 mDeviceCommissioningInfo.dacSupportedAttestationProfiles.Raw());
+                }
+            }
             // Don't send DST unless the device says it needs it
             mNeedsDST = false;
 
