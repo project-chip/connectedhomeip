@@ -206,17 +206,15 @@ class TC_ACS_2_1(MatterBaseTest):
                     nsID = context.ambientContextSensed.namespaceID
                     tagID = context.ambientContextSensed.tag
 
-                    if self.HumanActivitySupported:
-                        asserts.assert_equal(nsID, HUMAN_ACTIVITY_NAMESPACE_ID, "Not Identified Human Activity Namespace ID")
-                        asserts.assert_less_equal(tagID, HUMAN_ACTIVITY_MAXTAGNUMBER, "Tag number doesn't exit.")
-
-                    if self.ObjectIdentificationSupported:
-                        asserts.assert_equal(nsID, OBJECT_IDENTIFICATION_NAMESPACE_ID, "Not Identified Object Namespace ID")
-                        asserts.assert_less_equal(tagID, OBJECT_IDENTIFICATION_MAXTAGNUMBER, "Tag number doesn't exit.")
-
-                    if self.SoundIdentificationSupported:
-                        asserts.assert_equal(nsID, SOUND_IDENTIFICATION_NAMESPACE_ID, "Not Identifid Sound Namespace ID")
-                        asserts.assert_less_equal(tagID, SOUND_IDENTIFICATION_MAXTAGNUMBER, "Tag number doesn't exit.")
+                    if nsID == HUMAN_ACTIVITY_NAMESPACE_ID:
+                        asserts.assert_less_equal(tagID, HUMAN_ACTIVITY_MAXTAGNUMBER,
+                                                  "Tag number doesn't exit in IdentifiedHumanActivity namesapce.")
+                    elif nsID == OBJECT_IDENTIFICATION_NAMESPACE_ID:
+                        asserts.assert_less_equal(tagID, OBJECT_IDENTIFICATION_MAXTAGNUMBER,
+                                                  "Tag number doesn't exit in IdentifiedObject namesapce.")
+                    elif nsID == SOUND_IDENTIFICATION_NAMESPACE_ID:
+                        asserts.assert_less_equal(tagID, SOUND_IDENTIFICATION_MAXTAGNUMBER,
+                                                  "Tag number doesn't exit in IdentifiedSound namesapce.")
 
                     # check if each AmbientContexType attribute is scoped within AmbientContextTypeSupported list
                     num_support = 0
