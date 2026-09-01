@@ -37,6 +37,7 @@
 
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -150,6 +151,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     VerifyOrReturnError(deviceInfoProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     static chip::app::DefaultTimerDelegate sTimerDelegate;
+    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate;
 
     chip::app::RootNode::Context rootNodeContext = {
         .commissioningWindowManager = chip::Server::GetInstance().GetCommissioningWindowManager(),
@@ -166,7 +168,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         .dnssdServer                = chip::app::DnssdServer::Instance(),
         .deviceLoadStatusProvider   = *chip::app::InteractionModelEngine::GetInstance(),
         .diagnosticDataProvider     = chip::DeviceLayer::GetDiagnosticDataProvider(),
-        .testEventTriggerDelegate   = nullptr,
+        .testEventTriggerDelegate   = &sTestEventTriggerDelegate,
         .dacProvider                = *chip::Credentials::GetDeviceAttestationCredentialsProvider(),
         .eventManagement            = chip::app::EventManagement::GetInstance(),
         .timerDelegate              = sTimerDelegate,
@@ -195,15 +197,16 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     ReturnErrorOnFailure(sRootNode->Register(rootAllocator, *sDataModelProvider));
 
     chip::app::DeviceFactory::GetInstance().Init(chip::app::DeviceFactory::Context{
-        .groupDataProvider      = *groupDataProvider,
-        .fabricTable            = chip::Server::GetInstance().GetFabricTable(),
-        .timerDelegate          = sTimerDelegate,
-        .storageDelegate        = storage,
-        .diagnosticDataProvider = chip::DeviceLayer::GetDiagnosticDataProvider(),
-        .platformManager        = chip::DeviceLayer::PlatformMgr(),
-        .failSafeContext        = chip::Server::GetInstance().GetFailSafeContext(),
-        .bindingTable           = chip::app::Clusters::Binding::Table::GetInstance(),
-        .bindingManager         = chip::app::Clusters::Binding::Manager::GetInstance(),
+        .groupDataProvider        = *groupDataProvider,
+        .fabricTable              = chip::Server::GetInstance().GetFabricTable(),
+        .timerDelegate            = sTimerDelegate,
+        .storageDelegate          = storage,
+        .diagnosticDataProvider   = chip::DeviceLayer::GetDiagnosticDataProvider(),
+        .platformManager          = chip::DeviceLayer::PlatformMgr(),
+        .failSafeContext          = chip::Server::GetInstance().GetFailSafeContext(),
+        .bindingTable             = chip::app::Clusters::Binding::Table::GetInstance(),
+        .bindingManager           = chip::app::Clusters::Binding::Manager::GetInstance(),
+        .testEventTriggerDelegate = sTestEventTriggerDelegate,
     });
 
     auto & deviceFactory = chip::app::DeviceFactory::GetInstance();
