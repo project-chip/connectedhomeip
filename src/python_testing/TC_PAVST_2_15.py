@@ -304,12 +304,16 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                     log.warning("Could not create additional temp zone: %s", e)
                     break
 
-        # Generate unique zone IDs up to aMaxZones + 1 (with no duplicates to avoid ALREADY_EXISTS)
-        next_id = max(unique_zone_ids) + 1 if unique_zone_ids else 1
-        while len(unique_zone_ids) < aMaxZones + 1:
-            unique_zone_ids.append(next_id)
-            next_id += 1
-
+        # Prefer ZoneIDs that are known to exist to avoid receiving InvalidZone instead of DynamicConstraintError.
+        current_zones = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=zmcluster, attribute=zmattr.Zones
+        )
+        unique_zone_ids = [z.zoneID for z in current_zones if z.use == zmcluster.Enums.ZoneUseEnum.kMotion]
+        asserts.assert_greater_equal(
+            len(unique_zone_ids),
+            aMaxZones + 1,
+            "Not enough motion zones available to build aMaxZones + 1 valid ZoneIDs for Step 6",
+        )
         try:
             too_many_zones = [
                 {"zone": zid, "sensitivity": 4}
@@ -334,10 +338,11 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         # Step 7: Invalid ZoneID
         self.step(7)
         invalid_zone_id = 9999  # Hopefully invalid
-        # Check if it is indeed not in aZones
-        while any(z.zoneID == invalid_zone_id for z in aZones):
+        current_zones = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=zmcluster, attribute=zmattr.Zones
+        )
+        while any(z.zoneID == invalid_zone_id for z in current_zones):
             invalid_zone_id += 1
-
         invalid_zones = [{"zone": invalid_zone_id, "sensitivity": 4}]
         await self.send_update_motion_zone_options(
             endpoint, aConnectionID, motionZones=invalid_zones,
