@@ -97,7 +97,13 @@ class TC_AUDIOCONTROL_2_7(MatterBaseTest, AUDIOCONTROLTestBase):
                      "command to DUT with the GroupID field set to 1."),
         ]
 
-    @run_if_endpoint_matches(has_cluster(Clusters.AudioControl))
+    @staticmethod
+    def should_run_TC_AUDIOCONTROL_2_7(wildcard, endpoint):
+        has_audiocontrol = has_cluster(Clusters.AudioControl)
+        has_scenes = has_cluster(Clusters.ScenesManagement)
+        return has_audiocontrol(wildcard, endpoint) and has_scenes(wildcard, endpoint)
+
+    @run_if_endpoint_matches(should_run_TC_AUDIOCONTROL_2_7)
     async def test_TC_AUDIOCONTROL_2_7(self):
         cluster = Clusters.AudioControl
         attributes = cluster.Attributes
