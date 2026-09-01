@@ -33,7 +33,7 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/ThreadStackManager.h>
 
-#if CHIP_TARGET_STYLE_EMBEDDED &&                                                                                      \
+#if CHIP_TARGET_STYLE_EMBEDDED &&                                                                                                  \
     (CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI || (defined(CONFIG_OPENTHREAD_SHELL) && CONFIG_OPENTHREAD_SHELL))
 #include <lib/support/StringBuilder.h>
 #include <openthread/cli.h>
@@ -79,7 +79,7 @@ CHIP_ERROR cmd_otcli_help(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
-#if CHIP_TARGET_STYLE_EMBEDDED &&                                                                                      \
+#if CHIP_TARGET_STYLE_EMBEDDED &&                                                                                                  \
     (CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI || (defined(CONFIG_OPENTHREAD_SHELL) && CONFIG_OPENTHREAD_SHELL))
 
 CHIP_ERROR cmd_otcli_dispatch(int argc, char ** argv)
@@ -179,7 +179,7 @@ static const shell_command_t cmds_otcli_root = { &cmd_otcli_dispatch, "otcli", "
 void cmd_otcli_init()
 {
 #if CHIP_ENABLE_OPENTHREAD
-#if CHIP_TARGET_STYLE_EMBEDDED &&                                                                                      \
+#if CHIP_TARGET_STYLE_EMBEDDED &&                                                                                                  \
     (CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI || (defined(CONFIG_OPENTHREAD_SHELL) && CONFIG_OPENTHREAD_SHELL))
 #if !CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
 #if OPENTHREAD_API_VERSION >= 85
