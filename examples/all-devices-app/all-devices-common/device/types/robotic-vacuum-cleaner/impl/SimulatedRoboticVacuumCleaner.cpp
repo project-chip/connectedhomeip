@@ -327,8 +327,14 @@ void SimulatedRoboticVacuumCleaner::HandleResumeStateCallback(OperationalState::
 void SimulatedRoboticVacuumCleaner::HandleStartStateCallback(OperationalState::GenericOperationalError & err)
 {
     ChipLogProgress(Zcl, "SimulatedRoboticVacuumCleaner: Start command received.");
-    LogErrorOnFailure(OperationalState().SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning)));
-    err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+    auto error = OperationalState().SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+    err.Set((error == CHIP_NO_ERROR) ? to_underlying(OperationalState::ErrorStateEnum::kNoError)
+                                     : to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
+    if (error == CHIP_NO_ERROR)
+    {
+        SetAttributesAtCleanStart();
+        StartActivityTimer();
+    }
 }
 
 void SimulatedRoboticVacuumCleaner::HandleStopStateCallback(OperationalState::GenericOperationalError & err)
