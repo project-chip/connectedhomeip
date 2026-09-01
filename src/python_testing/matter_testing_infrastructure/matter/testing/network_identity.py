@@ -189,6 +189,31 @@ def generate_network_client_identity() -> tuple[ec.EllipticCurvePrivateKey, byte
     return private_key, _compact_identity_from_private_key(private_key, deterministic=False)
 
 
+def regenerate_network_client_identity(private_key: ec.EllipticCurvePrivateKey) -> bytes:
+    """Re-signs an existing keypair to produce a colliding Network (Client) Identity.
+
+    The result shares the public key (and therefore the 20-byte identifier) of the
+    original identity but carries a fresh random signature, so its bytes differ. The
+    DUT must treat this as a collision (AlreadyExists), not as an idempotent re-add.
+    """
+    return _compact_identity_from_private_key(private_key, deterministic=False)
+
+
+def corrupt_network_client_identity(compact_identity: bytes) -> bytes:
+    """Returns a copy of a compact identity with an invalidated signature.
+
+    A single byte inside the ECDSA signature is flipped, leaving the TLV structure
+    and public key intact so the DUT reaches (and fails) signature verification,
+    which it reports as DynamicConstraintError.
+    """
+    corrupted = bytearray(compact_identity)
+    # The last byte is the TLV end-of-container marker; the byte before it is the
+    # final signature octet. Flipping it invalidates the signature without disturbing
+    # the container structure or the public key.
+    corrupted[-2] ^= 0xFF
+    return bytes(corrupted)
+
+
 def derive_ecdsa_network_identity_private_key(raw_secret: bytes) -> ec.EllipticCurvePrivateKey:
     """Derives the ECDSA Network Identity private key from a NASS raw secret.
 

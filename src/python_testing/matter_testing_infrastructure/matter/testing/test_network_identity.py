@@ -137,6 +137,40 @@ class TestGeneratedClientIdentity(unittest.TestCase):
             loaded.verify(encode_dss_signature(r, s), bytes(tampered), ec.ECDSA(hashes.SHA256()))
 
 
+def _verify_compact_self_signature(compact: bytes) -> None:
+    """Reconstructs the TBS from the embedded public key and verifies the signature,
+    mirroring the DUT's ValidateChipNetworkIdentity. Raises InvalidSignature on failure."""
+    public_key = ni.compact_identity_public_key(compact)
+    raw_signature = compact[4 + 65 + 3:4 + 65 + 3 + 64]
+    r = int.from_bytes(raw_signature[:32], "big")
+    s = int.from_bytes(raw_signature[32:], "big")
+    loaded = ec.EllipticCurvePublicKey.from_encoded_point(ec.SECP256R1(), public_key)
+    loaded.verify(encode_dss_signature(r, s), ni._encode_network_identity_tbs(public_key), ec.ECDSA(hashes.SHA256()))
+
+
+class TestCollidingAndInvalidIdentities(unittest.TestCase):
+    """Validates the helpers used to build collision and invalid-identity test inputs."""
+
+    def test_regenerated_identity_collides_but_differs(self):
+        private_key, original = ni.generate_network_client_identity()
+        colliding = ni.regenerate_network_client_identity(private_key)
+        # Same identifier (same public key) but different bytes, and still self-verifies.
+        self.assertEqual(ni.network_identity_identifier(colliding), ni.network_identity_identifier(original))
+        self.assertNotEqual(colliding, original)
+        _verify_compact_self_signature(colliding)
+
+    def test_corrupted_identity_keeps_structure_but_fails_verification(self):
+        _, original = ni.generate_network_client_identity()
+        corrupted = ni.corrupt_network_client_identity(original)
+        self.assertEqual(len(corrupted), len(original))
+        self.assertEqual(corrupted[0], 0x15)
+        self.assertEqual(corrupted[-1], 0x18)
+        # Public key (and thus identifier) is untouched, but the signature no longer verifies.
+        self.assertEqual(ni.compact_identity_public_key(corrupted), ni.compact_identity_public_key(original))
+        with self.assertRaises(InvalidSignature):
+            _verify_compact_self_signature(corrupted)
+
+
 class TestEcdsaNetworkIdentityDerivation(unittest.TestCase):
     """Validates the NASS -> ECDSA Network Identity derivation against the C++ spec vector."""
 
