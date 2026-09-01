@@ -52,7 +52,7 @@ logger.setLevel(logging.INFO)
 
 class TC_DGSW_2_3(MatterBaseTest):
 
-    async def read_dgsw_attribute_expect_success(self, endpoint, attribute):
+    async def _read_dgsw_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.SoftwareDiagnostics
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
@@ -94,7 +94,7 @@ class TC_DGSW_2_3(MatterBaseTest):
         # STEP 2: TH reads the ThreadMetrics attribute from DUT
         self.step(2)
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.ThreadMetrics):
-            thread_metrics_original = await self.read_dgsw_attribute_expect_success(
+            thread_metrics_original = await self._read_dgsw_attribute_expect_success(
                 endpoint=endpoint, attribute=attributes.ThreadMetrics)
             matter_asserts.assert_list(thread_metrics_original, "ThreadMetrics")
             logger.info("ThreadMetrics (original): %s", thread_metrics_original)
@@ -103,7 +103,7 @@ class TC_DGSW_2_3(MatterBaseTest):
         self.step(3)
         current_heap_used_original = None
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapUsed):
-            current_heap_used_original = await self.read_dgsw_attribute_expect_success(
+            current_heap_used_original = await self._read_dgsw_attribute_expect_success(
                 endpoint=endpoint, attribute=attributes.CurrentHeapUsed)
             matter_asserts.assert_valid_uint64(current_heap_used_original, "CurrentHeapUsed")
             logger.info("CurrentHeapUsed (original): %s", current_heap_used_original)
@@ -112,7 +112,7 @@ class TC_DGSW_2_3(MatterBaseTest):
         self.step(4)
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark) and \
                 await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapUsed):
-            high_watermark_original = await self.read_dgsw_attribute_expect_success(
+            high_watermark_original = await self._read_dgsw_attribute_expect_success(
                 endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
             matter_asserts.assert_valid_uint64(high_watermark_original, "CurrentHeapHighWatermark")
             logger.info("CurrentHeapHighWatermark (original): %s", high_watermark_original)
@@ -127,7 +127,7 @@ class TC_DGSW_2_3(MatterBaseTest):
         self.step("6a")
         current_heap_used = None
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapUsed):
-            current_heap_used = await self.read_dgsw_attribute_expect_success(
+            current_heap_used = await self._read_dgsw_attribute_expect_success(
                 endpoint=endpoint, attribute=attributes.CurrentHeapUsed)
             matter_asserts.assert_valid_uint64(current_heap_used, "CurrentHeapUsed")
             logger.info("CurrentHeapUsed (after ResetWatermarks): %s", current_heap_used)
@@ -136,7 +136,7 @@ class TC_DGSW_2_3(MatterBaseTest):
         self.step("6b")
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark) and \
                 await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapUsed):
-            high_watermark_current = await self.read_dgsw_attribute_expect_success(
+            high_watermark_current = await self._read_dgsw_attribute_expect_success(
                 endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
             matter_asserts.assert_valid_uint64(high_watermark_current, "CurrentHeapHighWatermark")
             logger.info("CurrentHeapHighWatermark (after ResetWatermarks): %s", high_watermark_current)
