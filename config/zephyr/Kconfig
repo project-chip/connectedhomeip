@@ -133,6 +133,13 @@ config CHIP_MALLOC_SYS_HEAP_WATERMARKS_SUPPORT
 	  Enables support for getting current heap high watermark and resetting 
 	  watermarks. 
 
+config CHIP_MALLOC_SYS_HEAP_DEBUG
+	bool "Log every allocated or freed memory block"
+	help
+	  Enables debug logs printed whenever a heap memory block is allocated or
+	  freed. The logs can be used to trace the source of memory leaks in the
+	  application.
+
 endif # CHIP_MALLOC_SYS_HEAP
 
 config CHIP_SYSTEM_USE_ZEPHYR_SOCKET_EXTENSIONS
