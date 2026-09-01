@@ -49,11 +49,11 @@ KeyFormat DetectKeyFormat(const uint8_t * key, uint32_t keyLen)
     static const uint8_t chipRawPrefix[]     = { 0x04 };
     static const char chipHexPrefix[]        = "04";
     static const char chipB64Prefix[]        = "B";
-    static const uint8_t derRawPrefix[]      = { 0x30, 0x77, 0x02, 0x01, 0x01, 0x04 };
-    static const char derHexPrefix[]         = "307702010104";
+    static const uint8_t derRawPrefix[]      = { 0x30 };
+    static const char derHexPrefix[]         = "30";
     static const char ecPEMMarker[]          = "-----BEGIN EC PRIVATE KEY-----";
     static const char pkcs8PEMMarker[]       = "-----BEGIN PRIVATE KEY-----";
-    static const char ecPUBPEMMarker[]       = "-----BEGIN PUBLIC KEY-----";
+    static const char pubPEMMarker[]         = "-----BEGIN PUBLIC KEY-----";
 
     VerifyOrReturnError(key != nullptr, kKeyFormat_Unknown);
 
@@ -93,7 +93,7 @@ KeyFormat DetectKeyFormat(const uint8_t * key, uint32_t keyLen)
     {
         return kKeyFormat_X509_PEM;
     }
-    if (ContainsPEMMarker(ecPUBPEMMarker, key, keyLen))
+    if (ContainsPEMMarker(pubPEMMarker, key, keyLen))
     {
         return kKeyFormat_X509_Pubkey_PEM;
     }
@@ -191,6 +191,7 @@ bool ReadKey(const char * fileNameOrStr, std::unique_ptr<EVP_PKEY, void (*)(EVP_
     bool res            = true;
     uint32_t keyDataLen = 0;
     KeyFormat keyFormat = kKeyFormat_Unknown;
+    int keyType         = EVP_PKEY_NONE;
     std::unique_ptr<uint8_t[]> keyData;
 
     // If fileNameOrStr is a file name
@@ -267,15 +268,10 @@ bool ReadKey(const char * fileNameOrStr, std::unique_ptr<EVP_PKEY, void (*)(EVP_
 
         if (keyFormat == kKeyFormat_X509_Pubkey_PEM)
         {
-            EC_KEY * ecKey = PEM_read_bio_EC_PUBKEY(keyBIO.get(), nullptr, nullptr, nullptr);
-            if (ecKey == nullptr)
+            key.reset(PEM_read_bio_PUBKEY(keyBIO.get(), nullptr, nullptr, nullptr));
+            if (key.get() == nullptr)
             {
-                ReportOpenSSLErrorAndExit("PEM_read_bio_EC_PUBKEY", res = false);
-            }
-
-            if (EVP_PKEY_set1_EC_KEY(key.get(), ecKey) != 1)
-            {
-                ReportOpenSSLErrorAndExit("EVP_PKEY_set1_EC_KEY", res = false);
+                ReportOpenSSLErrorAndExit("PEM_read_bio_PUBKEY", res = false);
             }
         }
         else if (keyFormat == kKeyFormat_X509_PEM)
@@ -296,11 +292,23 @@ bool ReadKey(const char * fileNameOrStr, std::unique_ptr<EVP_PKEY, void (*)(EVP_
         }
     }
 
-    // ML-DSA keys are not EC-based; skip the curve check for them.
-    if (!IsMLDSAKey(key.get()))
+    keyType = EVP_PKEY_id(key.get());
+    if (keyType != EVP_PKEY_EC && !IsMLDSAKey(key.get()))
     {
-        if ((EC_GROUP_get_curve_name(EC_KEY_get0_group(EVP_PKEY_get1_EC_KEY(key.get()))) != gNIDChipCurveP256) &&
-            !ignorErrorIfUnsupportedCurve)
+        fprintf(stderr, "Specified key uses an unsupported key type\n");
+        ExitNow(res = false);
+    }
+
+    // ML-DSA keys are not EC-based; skip the curve check for them.
+    if (keyType == EVP_PKEY_EC)
+    {
+        std::unique_ptr<EC_KEY, void (*)(EC_KEY *)> ecKey(EVP_PKEY_get1_EC_KEY(key.get()), &EC_KEY_free);
+        VerifyOrExit(ecKey.get() != nullptr, res = false);
+
+        const EC_GROUP * group = EC_KEY_get0_group(ecKey.get());
+        VerifyOrExit(group != nullptr, res = false);
+
+        if ((EC_GROUP_get_curve_name(group) != gNIDChipCurveP256) && !ignorErrorIfUnsupportedCurve)
         {
             fprintf(stderr, "Specified key uses unsupported Elliptic Curve\n");
             ExitNow(res = false);

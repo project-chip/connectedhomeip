@@ -32,6 +32,32 @@ from pathlib import Path
 CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 OPERATIONAL_CERTS = CHIP_ROOT / "credentials/test/operational-certificates"
 
+# A P-256 private key encoded as generic PKCS#8 DER. Unlike SEC1 DER, this does
+# not have the fixed P-256 prefix historically recognized by chip-cert.
+P256_PKCS8_DER = bytes.fromhex(
+    "308187020100301306072a8648ce3d020106082a8648ce3d030107046d306b0201010420"
+    "dba9924667a24265be1fe8427e8f23ac4e39d062d381c8ae43cb854813569418a1440342"
+    "0004eb11e2ad89309e8bd2a406f98db6414527a9741a565d395c718e97291265fed8c70d"
+    "c961a8899a7dc7a46d52722d9e43736ca51572a1afba5e0cd2ab1b9e1b4e"
+)
+
+P256_PUBLIC_KEY_PEM = b"""-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE6xHirYkwnovSpAb5jbZBRSepdBpW
+XTlccY6XKRJl/tjHDclhqImafcekbVJyLZ5Dc2ylFXKhr7peDNKrG54bTg==
+-----END PUBLIC KEY-----
+"""
+
+RSA_PUBLIC_KEY_PEM = b"""-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAompBTEp4SvLx4GS21AgB
+xBco0+zL1x8MARFquj02/BXF+e8kU0ZI8UT4i7lSZ96N2SqenkN3JW+0vOgUvTNF
+Q76F0cef9/c0Jr/6fjv7/yQaTJv8xW4DULjB3hL58Rb4WWBrKdB2NtDM/q+ZGO2n
+lu8g5SC4uzkPOIipprKZdIJUgGxjPv10dzLCGVPJm8ytDCLh2CKd1UsSYZ7nI+5r
+C9nP9j8gAC46bz09vvFDOnfrjegNpdItCgmQwCgPSOAtPHwwxPEIn9WMBs+KUcNV
+2pSUg77YKehq97VqmFPwLaGY4zUg416kAuiRCzhbhYdSrcxriv5obbNgP+nw4mJ3
+wQIDAQAB
+-----END PUBLIC KEY-----
+"""
+
 # The compact-pdc-identity test vector from src/credentials/tests/CHIPCert_test_vectors.cpp
 # (sTestCert_PDCID01_ChipCompact). All fields other than the public key and signature are
 # implied by the specification, so a conforming encoder must reproduce these exact bytes.
@@ -120,6 +146,44 @@ class ChipCertTest(unittest.TestCase):
                            "--out-format", "x509-pem", "--lifetime", "3650",
                            "--ignore-error", "--error-type", "no-error")
         return out
+
+
+class KeyConversionTest(ChipCertTest):
+    """Tests covering generic OpenSSL key encodings accepted by chip-cert."""
+
+    def convert_public_key(self, source, name):
+        """Convert a key to generic public-key PEM and return the output path."""
+        out = self.tmp_path / name
+        self.run_chip_cert("convert-key", "--x509-pubkey-pem", source, out)
+        return out
+
+    def test_reads_generic_private_key_der(self):
+        """Generic PKCS#8 DER private keys are detected and parsed."""
+        source = self.tmp_path / "key.der"
+        source.write_bytes(P256_PKCS8_DER)
+
+        converted = self.convert_public_key(source, "key-public.pem")
+
+        self.assertEqual(converted.read_bytes(), P256_PUBLIC_KEY_PEM)
+
+    def test_reads_generic_public_key_pem(self):
+        """Generic PUBLIC KEY PEM blocks are parsed through EVP APIs."""
+        source = self.tmp_path / "key-public.pem"
+        source.write_bytes(P256_PUBLIC_KEY_PEM)
+
+        converted = self.convert_public_key(source, "key-public-round-trip.pem")
+
+        self.assertEqual(converted.read_bytes(), P256_PUBLIC_KEY_PEM)
+
+    def test_rejects_unsupported_generic_public_key(self):
+        """Generic parsing does not permit key algorithms other than EC and ML-DSA."""
+        source = self.tmp_path / "rsa-public.pem"
+        source.write_bytes(RSA_PUBLIC_KEY_PEM)
+
+        result = self.run_chip_cert("convert-key", "--x509-pubkey-pem", source,
+                                    self.tmp_path / "converted.pem", expect_success=False)
+
+        self.assertIn("unsupported key type", result.stderr)
 
 
 class PDCIdentityTest(ChipCertTest):
