@@ -167,4 +167,3 @@ Detailed architecture specifications for application subsystems:
     Unified architecture for external control interfaces (Named Pipes, Pigweed
     RPC, test runners), separating transport translators from cluster execution
     backends (`OOBAccessor`).
-
