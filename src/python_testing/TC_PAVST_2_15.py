@@ -275,10 +275,9 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
         # Step 6: Too many zones (aMaxZones + 1)
         self.step(6)
-        unique_zone_ids = [aZoneID1, aZoneID2]
         temp_zone_ids = []
         if twoDCartSupported and userDefinedSupported:
-            for i in range(len(unique_zone_ids), aMaxZones):
+            for i in range(2, aMaxZones + 1):
                 zoneVertices = [
                     zmcluster.Structs.TwoDCartesianVertexStruct(x=10, y=10),
                     zmcluster.Structs.TwoDCartesianVertexStruct(x=20, y=10),
@@ -297,29 +296,33 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                         cmd=zmcluster.Commands.CreateTwoDCartesianZone(zone=zoneToCreate),
                     )
                     temp_zone_ids.append(cmdResponse.zoneID)
-                    unique_zone_ids.append(cmdResponse.zoneID)
                 except InteractionModelError as e:
                     log.warning("Could not create additional temp zone: %s", e)
                     break
 
-        # Prefer ZoneIDs that are known to exist to avoid receiving InvalidZone instead of DynamicConstraintError.
-        current_zones = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=zmcluster, attribute=zmattr.Zones
-        )
-        unique_zone_ids = [z.zoneID for z in current_zones if z.use == zmcluster.Enums.ZoneUseEnum.kMotion]
-        if len(unique_zone_ids) < aMaxZones + 1:
-            unique_zone_ids = list(range(aMaxZones + 1))
         try:
-            too_many_zones = [
-                {"zone": zid, "sensitivity": 4}
-                for zid in unique_zone_ids[:aMaxZones + 1]
-            ]
-            await self.send_update_motion_zone_options(
-                endpoint,
-                aConnectionID,
-                motionZones=too_many_zones,
-                expected_status=Status.DynamicConstraintError,
+            current_zones = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=zmcluster, attribute=zmattr.Zones
             )
+            valid_motion_zone_ids = [z.zoneID for z in current_zones if z.use == zmcluster.Enums.ZoneUseEnum.kMotion]
+            if len(valid_motion_zone_ids) >= aMaxZones + 1:
+                too_many_zones = [
+                    {"zone": zid, "sensitivity": 4}
+                    for zid in valid_motion_zone_ids[:aMaxZones + 1]
+                ]
+                await self.send_update_motion_zone_options(
+                    endpoint,
+                    aConnectionID,
+                    motionZones=too_many_zones,
+                    expected_status=Status.DynamicConstraintError,
+                )
+            else:
+                log.warning(
+                    "Not enough valid motion zones (%d) available to build aMaxZones + 1 (%d) valid ZoneIDs. Skipping Step 6.",
+                    len(valid_motion_zone_ids),
+                    aMaxZones + 1,
+                )
+                self.skip_step(6)
         finally:
             for zid in temp_zone_ids:
                 try:
