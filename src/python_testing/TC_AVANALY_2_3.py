@@ -135,7 +135,7 @@ class TC_AVANALY_2_3(MatterBaseTest, AVANALYTestBase):
         if self.has_feature_perzonedetect:
             valid_context_zoneIDs = [zoneIDs[0]] if len(zoneIDs) >= 1 else NullValue
 
-        context_trigger = structs.ContextTriggerStruct(context = supported_ambient_contexts_dut[0], zoneIDs = valid_context_zoneIDs)
+        context_trigger = structs.ContextTriggerStruct(context=supported_ambient_contexts_dut[0], zoneIDs=valid_context_zoneIDs)
         valid_context_triggers.append(context_trigger)
 
         await self.send_enable_context_triggers_command(endpoint, valid_context_triggers)

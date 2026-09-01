@@ -138,7 +138,7 @@ public:
         triggers = mPersistedTriggers;
         return CHIP_NO_ERROR;
     }
-    
+
     bool IsValidAnalysisZone(const uint16_t zoneId) override { return true; }
 
     std::vector<ZoneInformationStorage> mPersistedZones;

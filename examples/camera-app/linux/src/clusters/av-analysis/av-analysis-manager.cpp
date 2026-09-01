@@ -70,7 +70,7 @@ Protocols::InteractionModel::Status AvAnalysisManager::RemoveAnalysisStream()
 CHIP_ERROR AvAnalysisManager::VerifyZoneIDsAreValid(const std::vector<uint16_t> & aZoneIDs)
 {
     VerifyOrReturnError(mCameraDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    
+
     // Get our Zone Manager. Ensure that:
     // - each zone ID exists
     // - for each zoneID, it does not represent a privacy zone

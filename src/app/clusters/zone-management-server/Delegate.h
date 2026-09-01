@@ -115,7 +115,7 @@ public:
      * @return true if the zoneId is found, and the use is not privacy.
      */
     virtual bool IsValidAnalysisZone(const uint16_t zoneId) = 0;
-    
+
     /**
      *   @brief Delegate callback for notifying change in an attribute.
      *
