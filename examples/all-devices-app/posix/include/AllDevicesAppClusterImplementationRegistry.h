@@ -100,7 +100,7 @@ public:
     typename ClusterRegistryTraits<RegistryType>::ClusterType * GetClusterByEndpoint(chip::EndpointId endpoint)
     {
         const char * name = GetClusterTypeName<RegistryType>();
-        auto * cluster      = GetClusterInterfaceByEndpointAndType(name, endpoint);
+        auto * cluster    = GetClusterInterfaceByEndpointAndType(name, endpoint);
         return static_cast<typename ClusterRegistryTraits<RegistryType>::ClusterType *>(cluster);
     }
 

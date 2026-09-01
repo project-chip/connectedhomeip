@@ -19,18 +19,18 @@
 #include "include/ClusterRegistryTypes.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
-#include <app/clusters/service-area-server/ServiceAreaCluster.h>
-#include <device/types/robotic-vacuum-cleaner/impl/RvcNamedPipeSimulation.h>
-#include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationLogic.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/TypeTraits.h>
 #include <app/clusters/ambient-context-sensing-server/CodegenIntegration.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/clusters/boolean-state-server/BooleanStateCluster.h>
 #include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementCluster.h>
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
+#include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
+#include <app/clusters/service-area-server/ServiceAreaCluster.h>
+#include <device/types/robotic-vacuum-cleaner/impl/RvcNamedPipeSimulation.h>
+#include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationLogic.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/TypeTraits.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
@@ -53,8 +53,8 @@ auto * GetClusterByEndpoint(AllDevicesAppCommandDelegate * delegate, EndpointId 
 
 RvcNamedPipeSimulation * GetRvcSimulation(AllDevicesAppCommandDelegate * delegate, EndpointId endpointId)
 {
-    auto * operationalState =
-        GetClusterByEndpoint<Clusters::RvcOperationalState::RvcOperationalStateCluster>(delegate, endpointId, "RvcOperationalState");
+    auto * operationalState = GetClusterByEndpoint<Clusters::RvcOperationalState::RvcOperationalStateCluster>(
+        delegate, endpointId, "RvcOperationalState");
     if (operationalState == nullptr)
     {
         return nullptr;
@@ -649,12 +649,11 @@ public:
     const char * GetName() const override { return "Reset"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * runMode = GetClusterByEndpoint<RvcRunModeType>(delegate, endpointId, "RvcRunMode");
-        auto * operationalState =
-            GetClusterByEndpoint<Clusters::RvcOperationalState::RvcOperationalStateCluster>(delegate, endpointId, "RvcOperationalState");
-        auto * cleanMode = GetClusterByEndpoint<RvcCleanModeType>(delegate, endpointId, "RvcCleanMode");
-        auto * serviceArea =
-            GetClusterByEndpoint<Clusters::ServiceArea::ServiceAreaCluster>(delegate, endpointId, "ServiceArea");
+        auto * runMode          = GetClusterByEndpoint<RvcRunModeType>(delegate, endpointId, "RvcRunMode");
+        auto * operationalState = GetClusterByEndpoint<Clusters::RvcOperationalState::RvcOperationalStateCluster>(
+            delegate, endpointId, "RvcOperationalState");
+        auto * cleanMode   = GetClusterByEndpoint<RvcCleanModeType>(delegate, endpointId, "RvcCleanMode");
+        auto * serviceArea = GetClusterByEndpoint<Clusters::ServiceArea::ServiceAreaCluster>(delegate, endpointId, "ServiceArea");
         if (runMode == nullptr || operationalState == nullptr || cleanMode == nullptr || serviceArea == nullptr)
         {
             return;
@@ -789,14 +788,14 @@ public:
     const char * GetName() const override { return "EmptyingDustBin"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * operationalState =
-            GetClusterByEndpoint<Clusters::RvcOperationalState::RvcOperationalStateCluster>(delegate, endpointId, "RvcOperationalState");
+        auto * operationalState = GetClusterByEndpoint<Clusters::RvcOperationalState::RvcOperationalStateCluster>(
+            delegate, endpointId, "RvcOperationalState");
         if (operationalState == nullptr)
         {
             return;
         }
-        LogErrorOnFailure(operationalState->SetOperationalState(
-            to_underlying(RvcOperationalState::OperationalStateEnum::kEmptyingDustBin)));
+        LogErrorOnFailure(
+            operationalState->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kEmptyingDustBin)));
     }
 };
 
@@ -806,14 +805,14 @@ public:
     const char * GetName() const override { return "CleaningMop"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * operationalState =
-            GetClusterByEndpoint<Clusters::RvcOperationalState::RvcOperationalStateCluster>(delegate, endpointId, "RvcOperationalState");
+        auto * operationalState = GetClusterByEndpoint<Clusters::RvcOperationalState::RvcOperationalStateCluster>(
+            delegate, endpointId, "RvcOperationalState");
         if (operationalState == nullptr)
         {
             return;
         }
-        LogErrorOnFailure(operationalState->SetOperationalState(
-            to_underlying(RvcOperationalState::OperationalStateEnum::kCleaningMop)));
+        LogErrorOnFailure(
+            operationalState->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kCleaningMop)));
     }
 };
 
@@ -823,14 +822,14 @@ public:
     const char * GetName() const override { return "FillingWaterTank"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * operationalState =
-            GetClusterByEndpoint<Clusters::RvcOperationalState::RvcOperationalStateCluster>(delegate, endpointId, "RvcOperationalState");
+        auto * operationalState = GetClusterByEndpoint<Clusters::RvcOperationalState::RvcOperationalStateCluster>(
+            delegate, endpointId, "RvcOperationalState");
         if (operationalState == nullptr)
         {
             return;
         }
-        LogErrorOnFailure(operationalState->SetOperationalState(
-            to_underlying(RvcOperationalState::OperationalStateEnum::kFillingWaterTank)));
+        LogErrorOnFailure(
+            operationalState->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kFillingWaterTank)));
     }
 };
 
@@ -840,14 +839,14 @@ public:
     const char * GetName() const override { return "UpdatingMaps"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * operationalState =
-            GetClusterByEndpoint<Clusters::RvcOperationalState::RvcOperationalStateCluster>(delegate, endpointId, "RvcOperationalState");
+        auto * operationalState = GetClusterByEndpoint<Clusters::RvcOperationalState::RvcOperationalStateCluster>(
+            delegate, endpointId, "RvcOperationalState");
         if (operationalState == nullptr)
         {
             return;
         }
-        LogErrorOnFailure(operationalState->SetOperationalState(
-            to_underlying(RvcOperationalState::OperationalStateEnum::kUpdatingMaps)));
+        LogErrorOnFailure(
+            operationalState->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kUpdatingMaps)));
     }
 };
 
@@ -875,8 +874,7 @@ public:
     const char * GetName() const override { return "AddMap"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * serviceArea =
-            GetClusterByEndpoint<Clusters::ServiceArea::ServiceAreaCluster>(delegate, endpointId, "ServiceArea");
+        auto * serviceArea = GetClusterByEndpoint<Clusters::ServiceArea::ServiceAreaCluster>(delegate, endpointId, "ServiceArea");
         if (serviceArea == nullptr)
         {
             return;
@@ -899,8 +897,7 @@ public:
     const char * GetName() const override { return "RemoveMap"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * serviceArea =
-            GetClusterByEndpoint<Clusters::ServiceArea::ServiceAreaCluster>(delegate, endpointId, "ServiceArea");
+        auto * serviceArea = GetClusterByEndpoint<Clusters::ServiceArea::ServiceAreaCluster>(delegate, endpointId, "ServiceArea");
         if (serviceArea == nullptr)
         {
             return;
@@ -922,8 +919,7 @@ public:
     const char * GetName() const override { return "AddArea"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * serviceArea =
-            GetClusterByEndpoint<Clusters::ServiceArea::ServiceAreaCluster>(delegate, endpointId, "ServiceArea");
+        auto * serviceArea = GetClusterByEndpoint<Clusters::ServiceArea::ServiceAreaCluster>(delegate, endpointId, "ServiceArea");
         if (serviceArea == nullptr)
         {
             return;
@@ -967,8 +963,7 @@ public:
     const char * GetName() const override { return "RemoveArea"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * serviceArea =
-            GetClusterByEndpoint<Clusters::ServiceArea::ServiceAreaCluster>(delegate, endpointId, "ServiceArea");
+        auto * serviceArea = GetClusterByEndpoint<Clusters::ServiceArea::ServiceAreaCluster>(delegate, endpointId, "ServiceArea");
         if (serviceArea == nullptr)
         {
             return;

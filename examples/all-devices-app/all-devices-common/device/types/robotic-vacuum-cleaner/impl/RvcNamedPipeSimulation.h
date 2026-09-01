@@ -29,15 +29,15 @@ class RvcNamedPipeSimulation
 public:
     virtual ~RvcNamedPipeSimulation() = default;
 
-    virtual void HandleCharged()                                              = 0;
-    virtual void HandleCharging()                                             = 0;
-    virtual void HandleDocked()                                               = 0;
-    virtual void HandleChargerFound()                                           = 0;
-    virtual void HandleLowCharge()                                              = 0;
-    virtual void HandleActivityComplete()                                       = 0;
-    virtual void HandleAreaComplete()                                           = 0;
-    virtual void HandleClearError()                                             = 0;
-    virtual void HandleErrorEvent(const std::string & error)                    = 0;
+    virtual void HandleCharged()                             = 0;
+    virtual void HandleCharging()                            = 0;
+    virtual void HandleDocked()                              = 0;
+    virtual void HandleChargerFound()                        = 0;
+    virtual void HandleLowCharge()                           = 0;
+    virtual void HandleActivityComplete()                    = 0;
+    virtual void HandleAreaComplete()                        = 0;
+    virtual void HandleClearError()                          = 0;
+    virtual void HandleErrorEvent(const std::string & error) = 0;
 };
 
 void RegisterRvcNamedPipeSimulation(EndpointId endpoint, RvcNamedPipeSimulation * simulation);
