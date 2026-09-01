@@ -101,7 +101,7 @@ class TC_AVANALY_2_4(MatterBaseTest, AVANALYTestBase):
         # Expect INVALID_IN_STATE because no stream is active
         try:
             await self.send_enable_context_triggers_cmd(endpoint, context_triggers=NullValue)
-            log.warning("EnableContextTriggers succeeded without stream (provisional / placeholder server behavior)")
+            asserts.fail("EnableContextTriggers should fail with INVALID_IN_STATE when no stream is active")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.InvalidInState,
                                  f"Expected INVALID_IN_STATE status, received {e.status}")

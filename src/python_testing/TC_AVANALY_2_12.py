@@ -82,53 +82,50 @@ class TC_AVANALY_2_12(MatterBaseTest, AVANALYTestBase):
 
         self.step(2)
         zone_cluster = Clusters.Objects.ZoneManagement
-        zones_before = []
-        try:
-            zones_before = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=zone_cluster, attribute=zone_cluster.Attributes.Zones
-            )
-            log.info("Analysis Node zones before: %s", zones_before)
-        except Exception as e:
-            log.info("ZoneManagement on Analysis Node: %s", e)
+        zones_before = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=zone_cluster, attribute=zone_cluster.Attributes.Zones
+        )
+        log.info("Analysis Node zones before: %s", zones_before)
+        asserts.assert_is_not_none(zones_before, "Failed to read Zones from Zone Management cluster on Analysis Node")
 
         self.step(3)
         created_zone_id = None
+        zone_vertices = [
+            zone_cluster.Structs.TwoDCartesianVertexStruct(10, 10),
+            zone_cluster.Structs.TwoDCartesianVertexStruct(50, 10),
+            zone_cluster.Structs.TwoDCartesianVertexStruct(50, 50),
+            zone_cluster.Structs.TwoDCartesianVertexStruct(10, 50)
+        ]
+        zone_to_create = zone_cluster.Structs.TwoDCartesianZoneStruct(
+            name="AnalysisZone",
+            use=zone_cluster.Enums.ZoneUseEnum.kMotion,
+            vertices=zone_vertices,
+            color="#00FF00"
+        )
+        create_cmd = zone_cluster.Commands.CreateTwoDCartesianZone(zone=zone_to_create)
         try:
-            zone_vertices = [
-                zone_cluster.Structs.TwoDCartesianVertexStruct(10, 10),
-                zone_cluster.Structs.TwoDCartesianVertexStruct(50, 10),
-                zone_cluster.Structs.TwoDCartesianVertexStruct(50, 50),
-                zone_cluster.Structs.TwoDCartesianVertexStruct(10, 50)
-            ]
-            zone_to_create = zone_cluster.Structs.TwoDCartesianZoneStruct(
-                name="AnalysisZone",
-                use=zone_cluster.Enums.ZoneUseEnum.kMotion,
-                vertices=zone_vertices,
-                color="#00FF00"
-            )
-            create_cmd = zone_cluster.Commands.CreateTwoDCartesianZone(zone=zone_to_create)
             cmd_resp = await self.send_single_cmd(endpoint=endpoint, cmd=create_cmd)
+            asserts.assert_is_not_none(cmd_resp, "CreateTwoDCartesianZone response was None")
             created_zone_id = cmd_resp.zoneID
             log.info("Created zone ID on Analysis Node: %s", created_zone_id)
-        except Exception as e:
-            log.info("Zone creation on Analysis Node: %s", e)
+            asserts.assert_is_not_none(created_zone_id, "Expected valid zoneID in response")
 
-        self.step(4)
-        # Verify Analysis Node zone independence - camera zones are unmodified
-        try:
+            self.step(4)
+            # Verify Analysis Node zone independence - camera zones are unmodified
             zones_after = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=zone_cluster, attribute=zone_cluster.Attributes.Zones
             )
             log.info("Analysis Node zones after: %s", zones_after)
-        except Exception as e:
-            log.info("Reading zones after creation: %s", e)
-
-        # Cleanup created zone
-        if created_zone_id is not None:
-            try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=zone_cluster.Commands.RemoveZone(zoneID=created_zone_id))
-            except Exception as e:
-                log.info("Cleanup RemoveZone: %s", e)
+            asserts.assert_is_not_none(zones_after, "Failed to read Zones after creation")
+            created_zones = [z for z in zones_after if z.zoneID == created_zone_id]
+            asserts.assert_equal(len(created_zones), 1, f"Expected created zone {created_zone_id} in Analysis Node zones")
+        finally:
+            # Cleanup created zone
+            if created_zone_id is not None:
+                try:
+                    await self.send_single_cmd(endpoint=endpoint, cmd=zone_cluster.Commands.RemoveZone(zoneID=created_zone_id))
+                except Exception as e:
+                    log.info("Cleanup RemoveZone: %s", e)
 
 
 if __name__ == "__main__":
