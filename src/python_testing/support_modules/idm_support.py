@@ -296,6 +296,7 @@ def _encodable_numeric_range(datatype: str, is_nullable: bool) -> tuple[int, int
             type_max -= 1
     return type_min, type_max
 
+
 # TLV tag of the FabricIndex field carried by every fabric-scoped struct.
 FABRIC_INDEX_TAG = 254
 
