@@ -258,11 +258,15 @@ class TC_ACS_2_1(MatterBaseTest):
 
             self.step("9", "If DUT supports ObjectCount attribute, TH reads the ObjectCount attribute. Verity that DUT reads uint16 value.")
             # ObjectCount should be uint16 (optional)
-            objectCount = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCount)
-            if objectCount:
+            attribute_list = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.AttributeList)
+            if attr.ObjectCount.attribute_id in attribute_list:
+                objectCount = await self.read_single_attribute_check_success(
+                    endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCount)
                 asserts.assert_true((type(objectCount) is int), "ObjectCount value should be uint16 data.")
                 asserts.assert_less_equal(1, objectCount,
                                           "ObjectCount value should be greater than equal to 1.")
+
         else:
             log.info("Object Counting & Object Identification are not supported. Test steps skipped")
             self.skip_step("7")
@@ -319,7 +323,7 @@ class TC_ACS_2_1(MatterBaseTest):
                     asserts.assert_less_equal(startTime, endTime-1, "StartTimestamp must be less than EndTimestamp.")
 
                     # EndTimestamp should be epoch-s (uint32)
-                    asserts.assert_less_equal(endTime, startTime+1, "EndTimestamp must be greater than StartTimestamp.")
+                    asserts.assert_greater_equal(endTime, startTime+1, "EndTimestamp must be greater than StartTimestamp.")
 
                     # Confidence
                     asserts.assert_less_than(0, predictedActivity.confidence,
@@ -338,38 +342,34 @@ class TC_ACS_2_1(MatterBaseTest):
                                 nsID = acts.namespaceID
                                 tagID = acts.tag
 
-                                if self.HumanActivitySupported:
-                                    asserts.assert_equal(nsID, HUMAN_ACTIVITY_NAMESPACE_ID,
-                                                         "Not Identified Human Activity Namespace ID")
-                                    asserts.assert_less_equal(tagID, HUMAN_ACTIVITY_MAXTAGNUMBER, "Tag number doesn't exit.")
+                                if nsID == HUMAN_ACTIVITY_NAMESPACE_ID:
+                                    asserts.assert_less_equal(tagID, HUMAN_ACTIVITY_MAXTAGNUMBER,
+                                                              "Tag number doesn't exit in IdentifiedHumanActivity namesapce.")
+                                elif nsID == OBJECT_IDENTIFICATION_NAMESPACE_ID:
+                                    asserts.assert_less_equal(tagID, OBJECT_IDENTIFICATION_MAXTAGNUMBER,
+                                                              "Tag number doesn't exit in IdentifiedObject namesapce.")
+                                elif nsID == SOUND_IDENTIFICATION_NAMESPACE_ID:
+                                    asserts.assert_less_equal(tagID, SOUND_IDENTIFICATION_MAXTAGNUMBER,
+                                                              "Tag number doesn't exit in IdentifiedSound namesapce.")
 
-                                if self.ObjectIdentificationSupported:
-                                    asserts.assert_equal(nsID, OBJECT_IDENTIFICATION_NAMESPACE_ID,
-                                                         "Not Identified Object Namespace ID")
-                                    asserts.assert_less_equal(tagID, OBJECT_IDENTIFICATION_MAXTAGNUMBER, "Tag number doesn't exit.")
-
-                                if self.SoundIdentificationSupported:
-                                    asserts.assert_equal(nsID, SOUND_IDENTIFICATION_NAMESPACE_ID,
-                                                         "Not Identifid Sound Namespace ID")
-                                    asserts.assert_less_equal(tagID, SOUND_IDENTIFICATION_MAXTAGNUMBER, "Tag number doesn't exit.")
-
-                    if self.ObjectCountingSupported and predictedActivity:
-                        self.step("13b", "If DUT supports PredictedActivity feature, then TH reads the PredictedActivity attribute. Verify that DUT response contains StartTimestamp epoch-s data less than equal to EndTimestamp-1 and EndTimestamp epoch-s data greater than equal to StartTimestamp-1 and Verify that DUT response contains Confidence field that is a percentage data between 0 and 100. If DUT supports HumanActivity or ObjectIdentification or SoundIdentification, then TH reads a list of SemanticTagStruct data that includes namespace ID and tag ID from IdentifiedObject or IdentifiedHumanActivity or IdentifiedSound namespaces.")
-
+                if self.ObjectCountingSupported and predictedActivity:
+                    self.step("13b", "If DUT supports PredictedActivity feature, then TH reads the PredictedActivity attribute. Verify that DUT response contains StartTimestamp epoch-s data less than equal to EndTimestamp-1 and EndTimestamp epoch-s data greater than equal to StartTimestamp-1 and Verify that DUT response contains Confidence field that is a percentage data between 0 and 100. If DUT supports HumanActivity or ObjectIdentification or SoundIdentification, then TH reads a list of SemanticTagStruct data that includes namespace ID and tag ID from IdentifiedObject or IdentifiedHumanActivity or IdentifiedSound namespaces.")
+                    
+                    for predictedActivity in predictedActivityList:
                         # CrowdDetected
                         asserts.assert_true(predictedActivity.crowdDetected in [True, False],
                                             "Expected True or False Boolean value.")
                         log.info("Rx'd CrowdDetected: %s", {predictedActivity.crowdDetected})
-
+    
                         # CrowdCount
-                        if "crowdCount" in predictedActivity:
+                        if "CrowdCount" in predictedActivity:
                             # log.info(f"Rx'd CrowdCount: {predictedActivity.crowdCount}")
                             asserts.assert_less_equal(1, predictedActivity.crowdCount,
                                                       "CrowdCount is expected to be between 1 and 254.")
                             asserts.assert_less_equal(predictedActivity.crowdCount, 254,
                                                       "CrowdCount is expected to be between 1 and 254.")
-                    else:
-                        self.skip_step("13b")
+                else:
+                    self.skip_step("13b")
 
             else:
                 log.info("predictedActivity is empty")
