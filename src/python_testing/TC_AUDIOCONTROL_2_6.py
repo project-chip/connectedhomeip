@@ -33,7 +33,7 @@ class TC_AUDIOCONTROL_2_6(MatterBaseTest, AUDIOCONTROLTestBase):
     # wildcard subscription so reads after each reboot are not cross-checked against a
     # now-stale subscription cache.
     disable_wildcard_subscription = True
-    
+
     def desc_TC_AUDIOCONTROL_2_6(self) -> str:
         return "[TC-AUDIOCONTROL-2.6] Startup behavior with DUT as Server"
 

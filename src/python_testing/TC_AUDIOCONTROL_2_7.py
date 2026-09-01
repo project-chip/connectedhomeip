@@ -98,7 +98,9 @@ class TC_AUDIOCONTROL_2_7(MatterBaseTest, AUDIOCONTROLTestBase):
         ]
 
     @staticmethod
-    def should_run_TC_AUDIOCONTROL_2_7(wildcard, endpoint):
+    def should_run_TC_AUDIOCONTROL_2_7(
+            wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse, endpoint: int) -> bool:
+        """Return True only for endpoints that expose both AudioControl and Scenes Management."""
         has_audiocontrol = has_cluster(Clusters.AudioControl)
         has_scenes = has_cluster(Clusters.ScenesManagement)
         return has_audiocontrol(wildcard, endpoint) and has_scenes(wildcard, endpoint)
