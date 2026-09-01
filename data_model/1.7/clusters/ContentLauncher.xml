@@ -57,10 +57,11 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050A" name="Content Launcher Cluster" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050A" name="Content Launcher Cluster" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Add Seasons, Episode, Any and CurrentContext to search, Added Text/Audio tracks support with PlaybackPreferences field"/>
+    <revision revision="3" summary="Add ContentReplication, ContentQueueing, and Presets features"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x050A" name="Content Launcher"/>
@@ -81,6 +82,24 @@ Davis, CA 95616, USA
     </feature>
     <feature bit="4" code="AT" name="AudioTracks" summary="Device or app supports Audio Tracks">
       <optionalConform/>
+    </feature>
+    <feature bit="5" code="CR" name="ContentReplication" summary="Device supports replicating currently playing content to another device for playback continuation">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
+    </feature>
+    <feature bit="6" code="CQ" name="ContentQueueing" summary="Device supports content queueing and enhanced URL launching with content type, headers, offset, and next URL">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
+    </feature>
+    <feature bit="7" code="PS" name="Presets" summary="Device supports a list of presets that can be started without further details">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </feature>
   </features>
   <dataTypes>
@@ -145,6 +164,17 @@ Davis, CA 95616, USA
         <optionalConform/>
       </item>
     </enum>
+    <enum name="QueueTypeEnum">
+      <item value="0" name="Replace" summary="Interrupt currently playing content to play this content">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Next" summary="Insert this content at the front of the queue (will play next)">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Last" summary="Insert this content at the end of the queue">
+        <mandatoryConform/>
+      </item>
+    </enum>
     <enum name="StatusEnum">
       <item value="0" name="Success" summary="Command succeeded">
         <mandatoryConform/>
@@ -164,6 +194,54 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <feature name="AT"/>
         </mandatoryConform>
+      </item>
+      <item value="5" name="InvalidData" summary="Invalid data provided for replication">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="CR"/>
+          </mandatoryConform>
+        </otherwiseConform>
+      </item>
+      <item value="6" name="AccountMismatch" summary="Account mismatch during replication">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="CR"/>
+          </mandatoryConform>
+        </otherwiseConform>
+      </item>
+      <item value="7" name="ContentAppNotAvailable" summary="Content app not available for replication">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="CR"/>
+          </mandatoryConform>
+        </otherwiseConform>
+      </item>
+      <item value="8" name="ReplicationNotAllowed" summary="Replication not allowed">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="CR"/>
+          </mandatoryConform>
+        </otherwiseConform>
+      </item>
+      <item value="9" name="ReplicationNotSupported" summary="Replication not supported">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="CR"/>
+          </mandatoryConform>
+        </otherwiseConform>
+      </item>
+      <item value="10" name="PresetNotFound" summary="The requested preset is not in the Presets attribute">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="PS"/>
+          </mandatoryConform>
+        </otherwiseConform>
       </item>
     </enum>
     <bitmap name="SupportedProtocolsBitmap">
@@ -211,6 +289,34 @@ Davis, CA 95616, USA
         <optionalConform/>
       </field>
     </struct>
+    <struct name="ContentAppInfoStruct">
+      <field id="0" name="ContentAppVendorID" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="ContentAppProductID" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="Data" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="1024"/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="ContentPresetStruct">
+      <field id="0" name="PresetID" type="uint8">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="PresetName" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <lengthBetween>
+            <from value="1"/>
+            <to value="48"/>
+          </lengthBetween>
+        </constraint>
+      </field>
+    </struct>
     <struct name="ContentSearchStruct">
       <field id="0" name="ParameterList" type="list" default="0">
         <entry type="ParameterStruct"/>
@@ -226,6 +332,58 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="Metric" type="MetricTypeEnum">
         <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="LaunchURLInfoStruct">
+      <field id="0" name="URL" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="8192"/>
+        </constraint>
+      </field>
+      <field id="1" name="Data" type="string" default="null">
+        <quality nullable="true"/>
+        <optionalConform/>
+        <constraint>
+          <maxLength value="1024"/>
+        </constraint>
+      </field>
+      <field id="2" name="ContentType" type="string" default="null">
+        <quality nullable="true"/>
+        <optionalConform/>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
+      </field>
+      <field id="3" name="ContentHeaders" type="list" default="null">
+        <entry type="string">
+          <constraint>
+            <maxLength value="256"/>
+          </constraint>
+        </entry>
+        <quality nullable="true"/>
+        <optionalConform/>
+        <constraint>
+          <maxCount value="10"/>
+        </constraint>
+      </field>
+      <field id="4" name="OffsetMillisecs" type="uint32" default="null">
+        <quality nullable="true"/>
+        <optionalConform/>
+      </field>
+      <field id="5" name="QueueType" type="QueueTypeEnum" default="null">
+        <quality nullable="true"/>
+        <optionalConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="6" name="NextURL" type="string" default="null">
+        <quality nullable="true"/>
+        <optionalConform/>
+        <constraint>
+          <maxLength value="8192"/>
+        </constraint>
       </field>
     </struct>
     <struct name="ParameterStruct">
@@ -262,6 +420,16 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <feature name="AT"/>
         </mandatoryConform>
+      </field>
+    </struct>
+    <struct name="ReplicationInfoStruct">
+      <field id="0" name="LaunchURLInfo" type="LaunchURLInfoStruct" default="null">
+        <quality nullable="true"/>
+        <optionalConform choice="a" more="true" min="1"/>
+      </field>
+      <field id="1" name="ContentAppInfo" type="ContentAppInfoStruct" default="null">
+        <quality nullable="true"/>
+        <optionalConform choice="a" more="true" min="1"/>
       </field>
     </struct>
     <struct name="StyleInformationStruct">
@@ -326,6 +494,36 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="UP"/>
       </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0002" name="Movable" type="bool" default="false">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="CR"/>
+        </mandatoryConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute id="0x0003" name="Presets" type="list" default="empty">
+      <entry type="ContentPresetStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="PS"/>
+        </mandatoryConform>
+      </otherwiseConform>
+      <constraint>
+        <countBetween>
+          <from value="1"/>
+          <to value="255"/>
+        </countBetween>
+      </constraint>
     </attribute>
   </attributes>
   <commands>
@@ -348,6 +546,9 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="Data" type="string" default="MS">
         <optionalConform/>
+        <constraint>
+          <maxLength value="1024"/>
+        </constraint>
       </field>
       <field id="3" name="PlaybackPreferences" type="PlaybackPreferencesStruct" default="MS">
         <optionalConform/>
@@ -357,6 +558,24 @@ Davis, CA 95616, USA
         <constraint>
           <desc/>
         </constraint>
+      </field>
+      <field id="5" name="ContentAppVendorID" type="uint16" default="null">
+        <quality nullable="true"/>
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="CR"/>
+          </mandatoryConform>
+        </otherwiseConform>
+      </field>
+      <field id="6" name="ContentAppProductID" type="uint16" default="null">
+        <quality nullable="true"/>
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="CR"/>
+          </mandatoryConform>
+        </otherwiseConform>
       </field>
     </command>
     <command id="0x01" name="LaunchURL" direction="commandToServer" response="LauncherResponse">
@@ -382,6 +601,68 @@ Davis, CA 95616, USA
       <field id="3" name="PlaybackPreferences" type="PlaybackPreferencesStruct" default="MS">
         <optionalConform/>
       </field>
+      <field id="4" name="ContentType" type="string" default="null">
+        <quality nullable="true"/>
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="CQ"/>
+          </mandatoryConform>
+        </otherwiseConform>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
+      </field>
+      <field id="5" name="ContentHeaders" type="list" default="null">
+        <entry type="string">
+          <constraint>
+            <maxLength value="256"/>
+          </constraint>
+        </entry>
+        <quality nullable="true"/>
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="CQ"/>
+          </mandatoryConform>
+        </otherwiseConform>
+        <constraint>
+          <maxCount value="10"/>
+        </constraint>
+      </field>
+      <field id="6" name="OffsetMillisecs" type="uint32" default="null">
+        <quality nullable="true"/>
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="CQ"/>
+          </mandatoryConform>
+        </otherwiseConform>
+      </field>
+      <field id="7" name="QueueType" type="QueueTypeEnum" default="null">
+        <quality nullable="true"/>
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="CQ"/>
+          </mandatoryConform>
+        </otherwiseConform>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="8" name="NextURL" type="string" default="null">
+        <quality nullable="true"/>
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="CQ"/>
+          </mandatoryConform>
+        </otherwiseConform>
+        <constraint>
+          <maxLength value="8192"/>
+        </constraint>
+      </field>
     </command>
     <command id="0x02" name="LauncherResponse" direction="responseFromServer">
       <mandatoryConform>
@@ -397,5 +678,55 @@ Davis, CA 95616, USA
         <optionalConform/>
       </field>
     </command>
+    <command id="0x03" name="ContentReplicationRequest" direction="commandToServer" response="ContentReplicationResponse">
+      <access invokePrivilege="operate"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="CR"/>
+        </mandatoryConform>
+      </otherwiseConform>
+    </command>
+    <command id="0x04" name="ContentReplicationResponse" direction="responseFromServer">
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="CR"/>
+        </mandatoryConform>
+      </otherwiseConform>
+      <field id="0" name="Status" type="StatusEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="ReplicationInfo" type="ReplicationInfoStruct" default="null">
+        <quality nullable="true"/>
+        <optionalConform/>
+      </field>
+    </command>
+    <command id="0x05" name="PlayPreset" direction="commandToServer" response="N">
+      <access invokePrivilege="operate"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="PS"/>
+        </mandatoryConform>
+      </otherwiseConform>
+      <field id="0" name="PresetID" type="uint8">
+        <mandatoryConform/>
+      </field>
+    </command>
   </commands>
+  <events>
+    <event id="0x00" name="ContentReplication" priority="info">
+      <access readPrivilege="view"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="CR"/>
+        </mandatoryConform>
+      </otherwiseConform>
+      <field id="0" name="Status" type="StatusEnum">
+        <mandatoryConform/>
+      </field>
+    </event>
+  </events>
 </cluster>

@@ -136,6 +136,14 @@ Davis, CA 95616, USA
       <mandatoryConform/>
     </item>
   </enum>
+  <enum name="MediumType">
+    <item value="0" name="Air" summary="The medium is air">
+      <mandatoryConform/>
+    </item>
+    <item value="1" name="Water" summary="The medium is water">
+      <mandatoryConform/>
+    </item>
+  </enum>
   <enum name="PowerThresholdSourceEnum">
     <item value="0x00" name="Contract" summary="The power threshold comes from a signed contract">
       <mandatoryConform/>

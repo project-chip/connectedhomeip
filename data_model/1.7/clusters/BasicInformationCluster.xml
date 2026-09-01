@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0028" name="Basic Information Cluster" revision="6">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0028" name="Basic Information Cluster" revision="7">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Added ProductAppearance attribute"/>
@@ -65,6 +65,7 @@ Davis, CA 95616, USA
     <revision revision="4" summary="Updated conformance for UniqueID to mandatory"/>
     <revision revision="5" summary="Added ConfigurationVersion attribute as provisional"/>
     <revision revision="6" summary="Added extended information fields to CapabilityMinimaStruct and removed provisional status for ConfigurationVersion"/>
+    <revision revision="7" summary="Added DeviceLocation attribute"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0028" name="Basic Information"/>
@@ -436,6 +437,19 @@ Davis, CA 95616, USA
       <constraint>
         <min value="1"/>
       </constraint>
+    </attribute>
+    <attribute id="0x0017" name="DeviceLocation" type="LocationDescriptorStruct" default="MS">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
+      <quality nullable="true" persistence="nonVolatile"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform>
+          <greaterOrEqualTerm>
+            <revision value="current"/>
+            <revision value="7"/>
+          </greaterOrEqualTerm>
+        </optionalConform>
+      </otherwiseConform>
     </attribute>
     <attribute id="0x0018" name="ConfigurationVersion" type="uint32" default="1">
       <access read="true" readPrivilege="view"/>

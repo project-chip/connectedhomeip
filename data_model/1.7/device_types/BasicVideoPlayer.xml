@@ -57,14 +57,17 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0028" name="Basic Video Player" revision="2">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0028" name="Basic Video Player" revision="4">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Added Messages and Content Control clusters"/>
+    <revision revision="3" summary="Added Media File Management cluster"/>
+    <revision revision="4" summary="Added Content App Platform support (Application Launcher cluster)"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditions>
     <condition name="PhysicalInputs" summary="The device has physical inputs for media."/>
+    <condition name="ContentAppPlatform" summary="The device includes a Content App Platform. A Content App is usually an application built by a Content Provider. An Audio/Video Player with a Content App Platform is able to launch Content Apps and represent these apps as separate endpoints."/>
   </conditions>
   <clusters>
     <cluster id="0x0006" name="On/Off" side="server">
@@ -104,6 +107,16 @@ Davis, CA 95616, USA
     <cluster id="0x050B" name="Audio Output" side="server">
       <optionalConform/>
     </cluster>
+    <cluster id="0x050C" name="Application Launcher" side="server">
+      <mandatoryConform>
+        <condition name="ContentAppPlatform"/>
+      </mandatoryConform>
+      <features>
+        <feature code="AP">
+          <mandatoryConform/>
+        </feature>
+      </features>
+    </cluster>
     <cluster id="0x050F" name="Content Control" side="server">
       <otherwiseConform>
         <provisionalConform/>
@@ -114,6 +127,14 @@ Davis, CA 95616, USA
           </greaterOrEqualTerm>
         </optionalConform>
       </otherwiseConform>
+    </cluster>
+    <cluster id="0x0511" name="Media File Management" side="server">
+      <optionalConform>
+        <greaterOrEqualTerm>
+          <revision value="current"/>
+          <revision value="3"/>
+        </greaterOrEqualTerm>
+      </optionalConform>
     </cluster>
   </clusters>
 </deviceType>

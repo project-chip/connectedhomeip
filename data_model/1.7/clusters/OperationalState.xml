@@ -188,6 +188,9 @@ Davis, CA 95616, USA
     <attribute id="0x0004" name="OperationalState" type="OperationalStateEnum">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0005" name="OperationalError" type="ErrorStateStruct">
       <access read="true" readPrivilege="view"/>

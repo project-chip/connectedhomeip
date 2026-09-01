@@ -57,10 +57,11 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0090" name="Network Infrastructure Manager" revision="2">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0090" name="Network Infrastructure Manager" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
     <revision revision="2" summary="Added Thread Network Diagnostics requirement; extended &quot;Other Requirements&quot; section"/>
+    <revision revision="3" summary="Added optional Network Identity Management cluster. Added optional Commissioning Proxy Cluster."/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditionRequirements>
@@ -94,6 +95,17 @@ Davis, CA 95616, USA
     <cluster id="0x0035" name="Thread Network Diagnostics" side="server">
       <mandatoryConform/>
     </cluster>
+    <cluster id="0x0450" name="Network Identity Management" side="server">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform>
+          <greaterOrEqualTerm>
+            <revision value="current"/>
+            <revision value="3"/>
+          </greaterOrEqualTerm>
+        </optionalConform>
+      </otherwiseConform>
+    </cluster>
     <cluster id="0x0451" name="Wi-Fi Network Management" side="server">
       <mandatoryConform/>
     </cluster>
@@ -102,6 +114,12 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x0453" name="Thread Network Directory" side="server">
       <mandatoryConform/>
+    </cluster>
+    <cluster id="0x0455" name="Commissioning Proxy" side="server">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </cluster>
   </clusters>
 </deviceType>

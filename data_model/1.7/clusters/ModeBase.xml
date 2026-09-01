@@ -57,10 +57,11 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Mode Base Cluster" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Mode Base Cluster" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="ChangeToModeResponse command: StatusText must be provided for InvalidInMode status. Require at least one standard mode tag. Define reserved ranges for base/derived clusters."/>
+    <revision revision="3" summary="Added CoreModeTags attribute and ChangeToModeByCoreTag command."/>
   </revisionHistory>
   <clusterIds>
     <clusterId name="Mode Base"/>
@@ -69,6 +70,12 @@ Davis, CA 95616, USA
   <features>
     <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster">
       <optionalConform/>
+    </feature>
+    <feature bit="1" code="COREMODES" name="CoreModes" summary="One or more core modes are supported">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </feature>
   </features>
   <dataTypes>
@@ -144,6 +151,23 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
+    <attribute id="0x0004" name="CoreModeTags" type="list">
+      <entry type="enum16"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="COREMODES"/>
+        </mandatoryConform>
+      </otherwiseConform>
+      <constraint>
+        <countBetween>
+          <from value="1"/>
+          <to value="16"/>
+        </countBetween>
+      </constraint>
+    </attribute>
   </attributes>
   <commands>
     <command id="0x00" name="ChangeToMode" direction="commandToServer" response="ChangeToModeResponse">
@@ -177,6 +201,17 @@ Davis, CA 95616, USA
         <constraint>
           <maxLength value="64"/>
         </constraint>
+      </field>
+    </command>
+    <command id="0x02" name="ChangeToModeByCoreTag" direction="commandToServer" response="ChangeToModeResponse">
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="COREMODES"/>
+        </mandatoryConform>
+      </otherwiseConform>
+      <field id="0" name="NewModeTag" type="enum16">
+        <mandatoryConform/>
       </field>
     </command>
   </commands>

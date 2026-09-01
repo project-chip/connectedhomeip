@@ -532,13 +532,13 @@ Davis, CA 95616, USA
       <field id="0" name="VideoStreamID" type="VideoStreamID">
         <mandatoryConform/>
       </field>
-      <field id="1" name="DeltaX" type="int16" default="0">
+      <field id="1" name="DeltaX" type="int16">
         <optionalConform choice="d" more="true" min="1"/>
       </field>
-      <field id="2" name="DeltaY" type="int16" default="0">
+      <field id="2" name="DeltaY" type="int16">
         <optionalConform choice="d" more="true" min="1"/>
       </field>
-      <field id="3" name="ZoomDelta" type="int8" default="0">
+      <field id="3" name="ZoomDelta" type="int8">
         <optionalConform choice="d" more="true" min="1"/>
         <constraint>
           <between>

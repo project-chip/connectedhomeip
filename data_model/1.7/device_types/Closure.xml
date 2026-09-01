@@ -57,11 +57,36 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0230" name="Closure" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0230" name="Closure" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Added Groupcast condition requirement and AccessDevice condition"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
+  <conditions>
+    <condition name="AccessDevice" summary="The device grant access to a secured building or restricted area."/>
+  </conditions>
+  <conditionRequirements>
+    <deviceType id="0x0016" name="Root Node">
+      <conditionRequirement name="GroupcastListenerCond">
+        <otherwiseConform>
+          <mandatoryConform>
+            <andTerm>
+              <notTerm>
+                <condition name="AccessDevice"/>
+              </notTerm>
+              <condition name="Active"/>
+            </andTerm>
+          </mandatoryConform>
+          <optionalConform>
+            <notTerm>
+              <condition name="AccessDevice"/>
+            </notTerm>
+          </optionalConform>
+        </otherwiseConform>
+      </conditionRequirement>
+    </deviceType>
+  </conditionRequirements>
   <clusters>
     <cluster id="0x0003" name="Identify" side="server">
       <mandatoryConform/>
@@ -71,6 +96,16 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x0104" name="Closure Control" side="server">
       <mandatoryConform/>
+      <features>
+        <feature code="ACC">
+          <otherwiseConform>
+            <provisionalConform/>
+            <mandatoryConform>
+              <condition name="AccessDevice"/>
+            </mandatoryConform>
+          </otherwiseConform>
+        </feature>
+      </features>
     </cluster>
     <cluster id="0x0105" name="Closure Dimension" side="server">
       <disallowConform/>

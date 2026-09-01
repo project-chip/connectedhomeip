@@ -63,7 +63,7 @@ Davis, CA 95616, USA
     <revision revision="2" summary="New data model format and notation; integrate DM CCB 3501"/>
     <revision revision="3" summary="Added optional occupancy sensing"/>
     <revision revision="4" summary="Updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
-    <revision revision="5" summary="Added Groupcast condition requirement."/>
+    <revision revision="5" summary="Added Groupcast condition requirement"/>
   </revisionHistory>
   <classification superset="Color Temperature Light" class="simple" scope="endpoint"/>
   <conditionRequirements>
@@ -130,7 +130,12 @@ Davis, CA 95616, USA
       </attributes>
     </cluster>
     <cluster id="0x0062" name="Scenes Management" side="server">
-      <mandatoryConform/>
+      <mandatoryConform>
+        <greaterOrEqualTerm>
+          <revision value="current"/>
+          <revision value="4"/>
+        </greaterOrEqualTerm>
+      </mandatoryConform>
       <commands>
         <command id="0x0040" name="CopyScene">
           <mandatoryConform/>
@@ -163,7 +168,12 @@ Davis, CA 95616, USA
       </attributes>
     </cluster>
     <cluster id="0x0406" name="Occupancy Sensing" side="client">
-      <optionalConform/>
+      <optionalConform>
+        <greaterOrEqualTerm>
+          <revision value="current"/>
+          <revision value="3"/>
+        </greaterOrEqualTerm>
+      </optionalConform>
     </cluster>
   </clusters>
 </deviceType>

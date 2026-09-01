@@ -57,13 +57,15 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0513" name="Electrical Energy Tariff" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0513" name="Electrical Energy Tariff" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Added AuxiliarySwitch condition and conformance"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditions>
     <condition name="ActiveTariff" summary="The tariff represents the currently active tariff"/>
+    <condition name="AuxiliarySwitch" summary="The tariff contains information about controlling auxiliary switches"/>
   </conditions>
   <clusters>
     <cluster id="0x0095" name="Commodity Price" side="server">
@@ -75,7 +77,19 @@ Davis, CA 95616, USA
       <optionalConform/>
     </cluster>
     <cluster id="0x0700" name="Commodity Tariff" side="server">
-      <optionalConform choice="a" more="true" min="1"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <condition name="AuxiliarySwitch"/>
+        </mandatoryConform>
+        <optionalConform choice="a" more="true" min="1"/>
+      </otherwiseConform>
+      <features>
+        <feature code="AUXLD">
+          <mandatoryConform>
+            <condition name="AuxiliarySwitch"/>
+          </mandatoryConform>
+        </feature>
+      </features>
     </cluster>
   </clusters>
 </deviceType>

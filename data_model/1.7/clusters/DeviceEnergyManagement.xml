@@ -57,12 +57,13 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0098" name="Device Energy Management Cluster" revision="4">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0098" name="Device Energy Management Cluster" revision="5">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Updates after 0.7 Ballot review"/>
     <revision revision="3" summary="Updates to match cluster spec updates"/>
     <revision revision="4" summary="Updates to feature conformance. Corrected ForecastID type"/>
+    <revision revision="5" summary="Added AdjustPowerRangeRequest command"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0098" name="Device Energy Management"/>
@@ -70,14 +71,19 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="application" picsCode="DEM" scope="Endpoint"/>
   <features>
     <feature bit="0" code="PA" name="PowerAdjustment" summary="Allows an EMS to make a temporary power adjustment (within the limits offered by the ESA).">
-      <optionalConform/>
+      <optionalConform choice="a" max="1"/>
     </feature>
     <feature bit="1" code="PFR" name="PowerForecastReporting" summary="Allows an ESA to advertise its indicative future power consumption vs time.">
       <otherwiseConform>
-        <optionalConform choice="a">
-          <notTerm>
-            <feature name="PA"/>
-          </notTerm>
+        <optionalConform choice="b">
+          <andTerm>
+            <notTerm>
+              <feature name="PA"/>
+            </notTerm>
+            <notTerm>
+              <feature name="PRA"/>
+            </notTerm>
+          </andTerm>
         </optionalConform>
         <mandatoryConform>
           <orTerm>
@@ -91,10 +97,15 @@ Davis, CA 95616, USA
       </otherwiseConform>
     </feature>
     <feature bit="2" code="SFR" name="StateForecastReporting" summary="Allows an ESA to advertise its indicative future state vs time.">
-      <optionalConform choice="a">
-        <notTerm>
-          <feature name="PA"/>
-        </notTerm>
+      <optionalConform choice="b">
+        <andTerm>
+          <notTerm>
+            <feature name="PA"/>
+          </notTerm>
+          <notTerm>
+            <feature name="PRA"/>
+          </notTerm>
+        </andTerm>
       </optionalConform>
     </feature>
     <feature bit="3" code="STA" name="StartTimeAdjustment" summary="Allows an EMS to delay an ESA&apos;s planned operation.">
@@ -108,6 +119,12 @@ Davis, CA 95616, USA
     </feature>
     <feature bit="6" code="CON" name="ConstraintBasedAdjustment" summary="Allows an EMS to request constraints to an ESA&apos;s planned operation.">
       <optionalConform/>
+    </feature>
+    <feature bit="7" code="PRA" name="PowerRangeAdjustment" summary="Allows an EMS to make a temporary power range adjustment (within the limits offered by the ESA).">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform choice="a" max="1"/>
+      </otherwiseConform>
     </feature>
   </features>
   <dataTypes>
@@ -134,6 +151,12 @@ Davis, CA 95616, USA
       </item>
       <item value="4" name="Cancelled" summary="The adjustment was cancelled by a client">
         <mandatoryConform/>
+      </item>
+      <item value="5" name="Invalid" summary="The adjustment was no longer valid">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
       </item>
     </enum>
     <enum name="CostTypeEnum">
@@ -379,6 +402,27 @@ Davis, CA 95616, USA
         </constraint>
       </field>
     </struct>
+    <struct name="PowerRangeAdjustStruct">
+      <field id="0" name="MinPower" type="power-mW">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="MaxPower" type="power-mW">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <min>
+            <field name="MinPower"/>
+          </min>
+        </constraint>
+      </field>
+      <field id="2" name="Cause" type="PowerAdjustReasonEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="EndTime" type="epoch-s">
+        <mandatoryConform/>
+      </field>
+    </struct>
     <struct name="SlotAdjustmentStruct">
       <field id="0" name="SlotIndex" type="uint8">
         <mandatoryConform/>
@@ -545,6 +589,7 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <orTerm>
           <feature name="PA"/>
+          <feature name="PRA"/>
           <feature name="STA"/>
           <feature name="PAU"/>
           <feature name="FA"/>
@@ -554,6 +599,16 @@ Davis, CA 95616, USA
       <constraint>
         <desc/>
       </constraint>
+    </attribute>
+    <attribute id="0x0008" name="PowerRangeAdjustment" type="PowerRangeAdjustStruct">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="PRA"/>
+        </mandatoryConform>
+      </otherwiseConform>
     </attribute>
   </attributes>
   <commands>
@@ -668,6 +723,49 @@ Davis, CA 95616, USA
         </orTerm>
       </mandatoryConform>
     </command>
+    <command id="0x08" name="PowerRangeAdjustRequest" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="PRA"/>
+        </mandatoryConform>
+      </otherwiseConform>
+      <field id="0" name="MinPower" type="power-mW" default="0">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="MaxPower" type="power-mW" default="4611686018427387904">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <min>
+            <field name="MinPower"/>
+          </min>
+        </constraint>
+      </field>
+      <field id="2" name="Duration" type="elapsed-s">
+        <mandatoryConform/>
+        <constraint>
+          <max value="86400"/>
+        </constraint>
+      </field>
+      <field id="3" name="Cause" type="AdjustmentCauseEnum">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x09" name="CancelPowerRangeAdjustRequest" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="PRA"/>
+        </mandatoryConform>
+      </otherwiseConform>
+    </command>
   </commands>
   <events>
     <event id="0x00" name="PowerAdjustStart" priority="info">
@@ -703,6 +801,39 @@ Davis, CA 95616, USA
         <feature name="PAU"/>
       </mandatoryConform>
       <field id="0" name="Cause" type="CauseEnum">
+        <mandatoryConform/>
+      </field>
+    </event>
+    <event id="0x04" name="PowerRangeAdjustStart" priority="info">
+      <access readPrivilege="view"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="PRA"/>
+        </mandatoryConform>
+      </otherwiseConform>
+      <field id="0" name="Adjustment" type="PowerRangeAdjustStruct">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Duration" type="elapsed-s">
+        <mandatoryConform/>
+      </field>
+    </event>
+    <event id="0x05" name="PowerRangeAdjustEnd" priority="info">
+      <access readPrivilege="view"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="PRA"/>
+        </mandatoryConform>
+      </otherwiseConform>
+      <field id="0" name="Cause" type="CauseEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Duration" type="elapsed-s">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="EnergyUse" type="energy-mWh">
         <mandatoryConform/>
       </field>
     </event>

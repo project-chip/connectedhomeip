@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0008" name="Level Control Cluster" revision="7">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0008" name="Level Control Cluster" revision="8">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="Added Options attribute, state change table; ZLO 1.0; Base cluster (no change) CCB 2085 1775 2281 2147"/>
@@ -66,6 +66,7 @@ Davis, CA 95616, USA
     <revision revision="5" summary="New data model format and notation"/>
     <revision revision="6" summary="Added Q quality for CurrentLevel, CurrentFrequency and RemainingTime attributes, added clarifications for behavior related to Step value and adjusted constraint of DefaultMoveRate"/>
     <revision revision="7" summary="Simplify constraint, added F quality, changed the conformance to mandatory for MinLevel and MaxLevel, and removed P quality"/>
+    <revision revision="8" summary="Mark provisional Frequency feature and associated elements as obsolete"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0008" name="Level Control"/>
@@ -79,7 +80,7 @@ Davis, CA 95616, USA
       <optionalConform/>
     </feature>
     <feature bit="2" code="FQ" name="Frequency" summary="Supports frequency attributes and behavior.">
-      <provisionalConform/>
+      <obsoleteConform/>
     </feature>
   </features>
   <dataTypes>

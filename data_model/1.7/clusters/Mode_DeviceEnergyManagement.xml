@@ -57,10 +57,11 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x009F" name="Device Energy Management Mode Cluster" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x009F" name="Device Energy Management Mode Cluster" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Disallowed DEPONOFF feature and OnMode and StartUpMode attributes"/>
+    <revision revision="3" summary="Adopt latest version of base cluster"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x009F" name="Device Energy Management Mode"/>

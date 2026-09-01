@@ -57,9 +57,10 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0104" name="Closure Control Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0104" name="Closure Control Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Added Access feature and GroupedMoveTo command"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0104" name="Closure Control"/>
@@ -105,6 +106,12 @@ Davis, CA 95616, USA
     </feature>
     <feature bit="8" code="MO" name="ManuallyOperable" summary="Supports the manual operation feature">
       <optionalConform/>
+    </feature>
+    <feature bit="9" code="ACC" name="Access" summary="The closure can grant access to a secured building or restricted area">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </feature>
   </features>
   <dataTypes>
@@ -327,16 +334,13 @@ Davis, CA 95616, USA
     <command id="0x01" name="MoveTo" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" timed="true"/>
       <mandatoryConform/>
-      <field id="0" name="Position" type="TargetPositionEnum" default="desc">
+      <field id="0" name="Position" type="TargetPositionEnum">
         <optionalConform choice="a" more="true" min="1"/>
       </field>
-      <field id="1" name="Latch" type="bool" default="desc">
+      <field id="1" name="Latch" type="bool">
         <optionalConform choice="a" more="true" min="1"/>
       </field>
       <field id="2" name="Speed" type="ThreeLevelAutoEnum">
-        <default>
-          <enum default="Auto"/>
-        </default>
         <optionalConform choice="a" more="true" min="1"/>
       </field>
     </command>
@@ -345,6 +349,26 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="CL"/>
       </mandatoryConform>
+    </command>
+    <command id="0x03" name="GroupedMoveTo" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <notTerm>
+            <feature name="ACC"/>
+          </notTerm>
+        </mandatoryConform>
+      </otherwiseConform>
+      <field id="0" name="Position" type="TargetPositionEnum">
+        <optionalConform choice="a" more="true" min="1"/>
+      </field>
+      <field id="1" name="Latch" type="bool">
+        <optionalConform choice="a" more="true" min="1"/>
+      </field>
+      <field id="2" name="Speed" type="ThreeLevelAutoEnum">
+        <optionalConform choice="a" more="true" min="1"/>
+      </field>
     </command>
   </commands>
   <events>

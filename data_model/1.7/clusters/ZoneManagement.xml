@@ -57,9 +57,10 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0550" name="Zone Management Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0550" name="Zone Management Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial version of the Zone Management cluster"/>
+    <revision revision="2" summary="Add REMOTEZONES feature"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0550" name="Zone Management"/>
@@ -83,6 +84,14 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="USERDEFINED"/>
       </optionalConform>
+    </feature>
+    <feature bit="4" code="REMOTEZONES" name="RemoteZones" summary="Supports zones defined for other remote devices">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform>
+          <feature name="USERDEFINED"/>
+        </optionalConform>
+      </otherwiseConform>
     </feature>
   </features>
   <dataTypes>
@@ -184,6 +193,22 @@ Davis, CA 95616, USA
             </equalTerm>
           </andTerm>
         </mandatoryConform>
+      </field>
+      <field id="4" name="NodeID" type="node-id">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="REMOTEZONES"/>
+          </mandatoryConform>
+        </otherwiseConform>
+      </field>
+      <field id="5" name="EndpointID" type="endpoint-no">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="REMOTEZONES"/>
+          </mandatoryConform>
+        </otherwiseConform>
       </field>
     </struct>
     <struct name="ZoneTriggerControlStruct">
@@ -328,6 +353,24 @@ Davis, CA 95616, USA
       <field id="0" name="Zone" type="TwoDCartesianZoneStruct">
         <mandatoryConform/>
       </field>
+      <field id="1" name="NodeID" type="node-id">
+        <quality nullable="true"/>
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="REMOTEZONES"/>
+          </mandatoryConform>
+        </otherwiseConform>
+      </field>
+      <field id="2" name="EndpointID" type="endpoint-no">
+        <quality nullable="true"/>
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="REMOTEZONES"/>
+          </mandatoryConform>
+        </otherwiseConform>
+      </field>
     </command>
     <command id="0x01" name="CreateTwoDCartesianZoneResponse" direction="responseFromServer">
       <mandatoryConform>
@@ -353,6 +396,24 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="Zone" type="TwoDCartesianZoneStruct">
         <mandatoryConform/>
+      </field>
+      <field id="2" name="NodeID" type="node-id">
+        <quality nullable="true"/>
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="REMOTEZONES"/>
+          </mandatoryConform>
+        </otherwiseConform>
+      </field>
+      <field id="3" name="EndpointID" type="endpoint-no">
+        <quality nullable="true"/>
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="REMOTEZONES"/>
+          </mandatoryConform>
+        </otherwiseConform>
       </field>
     </command>
     <command id="0x03" name="RemoveZone" direction="commandToServer" response="Y">
@@ -389,6 +450,22 @@ Davis, CA 95616, USA
       <field id="1" name="Reason" type="ZoneEventTriggeredReasonEnum">
         <mandatoryConform/>
       </field>
+      <field id="2" name="NodeID" type="node-id">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="REMOTEZONES"/>
+          </mandatoryConform>
+        </otherwiseConform>
+      </field>
+      <field id="3" name="EndpointID" type="endpoint-no">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="REMOTEZONES"/>
+          </mandatoryConform>
+        </otherwiseConform>
+      </field>
     </event>
     <event id="0x01" name="ZoneStopped" priority="info">
       <access readPrivilege="view"/>
@@ -398,6 +475,22 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="Reason" type="ZoneEventStoppedReasonEnum">
         <mandatoryConform/>
+      </field>
+      <field id="2" name="NodeID" type="node-id">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="REMOTEZONES"/>
+          </mandatoryConform>
+        </otherwiseConform>
+      </field>
+      <field id="3" name="EndpointID" type="endpoint-no">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="REMOTEZONES"/>
+          </mandatoryConform>
+        </otherwiseConform>
       </field>
     </event>
   </events>

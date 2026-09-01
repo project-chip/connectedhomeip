@@ -135,7 +135,7 @@ Davis, CA 95616, USA
           <allowed value="2"/>
         </constraint>
       </field>
-      <field id="6" name="RequestorCanConsent" type="bool" default="false">
+      <field id="6" name="RequestorCanConsent" type="bool">
         <optionalConform/>
       </field>
       <field id="7" name="MetadataForProvider" type="octstr">

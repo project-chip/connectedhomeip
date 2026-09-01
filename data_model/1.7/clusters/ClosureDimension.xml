@@ -57,9 +57,10 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0105" name="Closure Dimension Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0105" name="Closure Dimension Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Added Access feature, GroupedSetTarget and GroupedStep commands"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0105" name="Closure Dimension"/>
@@ -101,6 +102,12 @@ Davis, CA 95616, USA
       <optionalConform choice="b">
         <feature name="PS"/>
       </optionalConform>
+    </feature>
+    <feature bit="8" code="ACC" name="Access" summary="The closure can grant access to a secured building or restricted area">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </feature>
   </features>
   <dataTypes>
@@ -421,16 +428,13 @@ Davis, CA 95616, USA
     <command id="0x00" name="SetTarget" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" timed="true"/>
       <mandatoryConform/>
-      <field id="0" name="Position" type="percent100ths" default="desc">
+      <field id="0" name="Position" type="percent100ths">
         <optionalConform choice="a" more="true" min="1"/>
       </field>
-      <field id="1" name="Latch" type="bool" default="desc">
+      <field id="1" name="Latch" type="bool">
         <optionalConform choice="a" more="true" min="1"/>
       </field>
       <field id="2" name="Speed" type="ThreeLevelAutoEnum">
-        <default>
-          <enum default="Auto"/>
-        </default>
         <optionalConform choice="a" more="true" min="1"/>
       </field>
     </command>
@@ -449,12 +453,58 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="2" name="Speed" type="ThreeLevelAutoEnum">
-        <default>
-          <enum default="Auto"/>
-        </default>
         <optionalConform>
           <feature name="SP"/>
         </optionalConform>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x02" name="GroupedSetTarget" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <notTerm>
+            <feature name="ACC"/>
+          </notTerm>
+        </mandatoryConform>
+      </otherwiseConform>
+      <field id="0" name="Position" type="percent100ths">
+        <optionalConform choice="a" more="true" min="1"/>
+      </field>
+      <field id="1" name="Latch" type="bool">
+        <optionalConform choice="a" more="true" min="1"/>
+      </field>
+      <field id="2" name="Speed" type="ThreeLevelAutoEnum">
+        <optionalConform choice="a" more="true" min="1"/>
+      </field>
+    </command>
+    <command id="0x03" name="GroupedStep" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <andTerm>
+            <feature name="PS"/>
+            <notTerm>
+              <feature name="ACC"/>
+            </notTerm>
+          </andTerm>
+        </mandatoryConform>
+      </otherwiseConform>
+      <field id="0" name="Direction" type="StepDirectionEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="NumberOfSteps" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="2" name="Speed" type="ThreeLevelAutoEnum">
+        <optionalConform/>
         <constraint>
           <desc/>
         </constraint>

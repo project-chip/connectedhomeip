@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0201" name="Thermostat Cluster" revision="11">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0201" name="Thermostat Cluster" revision="12">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added; fixed some defaults; CCB 1823, 1480"/>
     <revision revision="2" summary="CCB 1981 2186 2249 2250 2251; NFR Thermostat Setback"/>
@@ -70,6 +70,7 @@ Davis, CA 95616, USA
     <revision revision="9" summary="Removed AlarmMask attribute and AlarmCodeBitmap Type"/>
     <revision revision="10" summary="Removed Zigbee related elements and P quality, deprecated ThermostatProgrammingOperationMode and removed ProgrammingOperationModeBitmap. and deprecated Setback feature and related elements."/>
     <revision revision="11" summary="Added support for Thermostat suggestions. Added events."/>
+    <revision revision="12" summary="Mandate minimum value of 1 for TemperatureSetpointHoldDuration. Added Critical Protection attributes. Added support for scheduling sensors."/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0201" name="Thermostat"/>
@@ -95,8 +96,11 @@ Davis, CA 95616, USA
     <feature bit="2" code="OCC" name="Occupancy" summary="Supports Occupied and Unoccupied setpoints">
       <optionalConform/>
     </feature>
+    <feature bit="3" code="SCH" name="ScheduleConfiguration">
+      <obsoleteConform/>
+    </feature>
     <feature bit="4" code="SB" name="Setback">
-      <deprecateConform/>
+      <obsoleteConform/>
     </feature>
     <feature bit="5" code="AUTO" name="AutoMode" summary="Supports a System Mode of Auto">
       <optionalConform/>
@@ -120,6 +124,9 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="PRES"/>
       </optionalConform>
+    </feature>
+    <feature bit="11" code="SENSORS" name="ThermostatSensors" summary="Thermostat supports scheduling sensors">
+      <provisionalConform/>
     </feature>
   </features>
   <dataTypes>
@@ -389,6 +396,20 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </bitfield>
     </bitmap>
+    <bitmap name="HVACSystemTypeBitmap">
+      <bitfield name="CoolingStage" from="0x00" to="0x01" summary="Stage of cooling the HVAC system is using.">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="HeatingStage" from="0x02" to="0x03" summary="Stage of heating the HVAC system is using.">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="HeatingIsHeatPump" bit="4" summary="Is the heating type Heat Pump.">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="HeatingUsesFuel" bit="5" summary="Does the HVAC system use fuel.">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
     <bitmap name="OccupancyBitmap">
       <bitfield name="Occupied" bit="0" summary="Indicates the occupancy state">
         <mandatoryConform/>
@@ -399,6 +420,17 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </bitfield>
       <bitfield name="SupportsNames" bit="1" summary="Preset supports user-provided names">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="ProgrammingOperationModeBitmap">
+      <bitfield name="ScheduleActive" bit="0" summary="Schedule programming mode. This enables any programmed weekly schedule configurations.">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="AutoRecovery" bit="1" summary="Auto/recovery mode">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Economy" bit="2" summary="Economy/EnergyStar mode">
         <mandatoryConform/>
       </bitfield>
     </bitmap>
@@ -675,6 +707,61 @@ Davis, CA 95616, USA
         </constraint>
       </field>
     </struct>
+    <struct name="SensorScheduleTransitionStruct">
+      <field id="0" name="DayOfWeek" type="ScheduleDayOfWeekBitmap">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="TransitionTime" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <max value="1439"/>
+        </constraint>
+      </field>
+      <field id="2" name="EnabledSensorHandles" type="list">
+        <entry type="octstr">
+          <constraint>
+            <maxLength value="16"/>
+          </constraint>
+        </entry>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="32"/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="ThermostatSensorStruct">
+      <field id="0" name="Name" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="64"/>
+        </constraint>
+      </field>
+      <field id="1" name="SensorHandle" type="octstr">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="16"/>
+        </constraint>
+      </field>
+      <field id="2" name="Cluster" type="cluster-id">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="Endpoint" type="endpoint-no">
+        <optionalConform/>
+      </field>
+      <field id="4" name="Node" type="node-id">
+        <mandatoryConform>
+          <field name="Endpoint"/>
+        </mandatoryConform>
+      </field>
+      <field id="5" name="FabricIndex" type="fabric-idx">
+        <mandatoryConform>
+          <field name="Endpoint"/>
+        </mandatoryConform>
+      </field>
+    </struct>
     <struct name="ThermostatSuggestionStruct">
       <field id="0" name="UniqueID" type="uint8">
         <mandatoryConform/>
@@ -766,14 +853,29 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0007" name="PICoolingDemand">
-      <deprecateConform/>
+    <attribute id="0x0007" name="PICoolingDemand" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <obsoleteConform/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="100"/>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x0008" name="PIHeatingDemand">
-      <deprecateConform/>
+    <attribute id="0x0008" name="PIHeatingDemand" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <obsoleteConform/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="100"/>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x0009" name="HVACSystemTypeConfiguration">
-      <deprecateConform/>
+    <attribute id="0x0009" name="HVACSystemTypeConfiguration" type="HVACSystemTypeBitmap">
+      <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
+      <obsoleteConform/>
     </attribute>
     <attribute id="0x0010" name="LocalTemperatureCalibration" type="SignedTemperature" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
@@ -933,6 +1035,21 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
+    <attribute id="0x0020" name="StartOfWeek" type="StartOfWeekEnum">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <obsoleteConform/>
+    </attribute>
+    <attribute id="0x0021" name="NumberOfWeeklyTransitions" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <obsoleteConform/>
+    </attribute>
+    <attribute id="0x0022" name="NumberOfDailyTransitions" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <obsoleteConform/>
+    </attribute>
     <attribute id="0x0023" name="TemperatureSetpointHold" type="TemperatureSetpointHoldEnum" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
@@ -946,11 +1063,18 @@ Davis, CA 95616, USA
       <quality nullable="true" persistence="nonVolatile"/>
       <optionalConform/>
       <constraint>
-        <max value="1440"/>
+        <between>
+          <from value="1"/>
+          <to value="1440"/>
+        </between>
       </constraint>
     </attribute>
-    <attribute id="0x0025" name="ThermostatProgrammingOperationMode">
-      <deprecateConform/>
+    <attribute id="0x0025" name="ThermostatProgrammingOperationMode" type="ProgrammingOperationModeBitmap">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <obsoleteConform/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0029" name="ThermostatRunningState" type="RelayStateBitmap">
       <access read="true" readPrivilege="view"/>
@@ -975,23 +1099,81 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0034" name="OccupiedSetback">
-      <deprecateConform/>
+    <attribute id="0x0034" name="OccupiedSetback" type="UnsignedTemperature">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality nullable="true" persistence="nonVolatile"/>
+      <obsoleteConform/>
+      <constraint>
+        <between>
+          <from>
+            <attribute name="OccupiedSetbackMin"/>
+          </from>
+          <to>
+            <attribute name="OccupiedSetbackMax"/>
+          </to>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x0035" name="OccupiedSetbackMin">
-      <deprecateConform/>
+    <attribute id="0x0035" name="OccupiedSetbackMin" type="UnsignedTemperature">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="fixed"/>
+      <obsoleteConform/>
+      <constraint>
+        <max>
+          <attribute name="OccupiedSetbackMax"/>
+        </max>
+      </constraint>
     </attribute>
-    <attribute id="0x0036" name="OccupiedSetbackMax">
-      <deprecateConform/>
+    <attribute id="0x0036" name="OccupiedSetbackMax" type="UnsignedTemperature">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="fixed"/>
+      <obsoleteConform/>
+      <constraint>
+        <between>
+          <from>
+            <attribute name="OccupiedSetbackMin"/>
+          </from>
+          <to value="254"/>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x0037" name="UnoccupiedSetback">
-      <deprecateConform/>
+    <attribute id="0x0037" name="UnoccupiedSetback" type="UnsignedTemperature">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality nullable="true" persistence="nonVolatile"/>
+      <obsoleteConform/>
+      <constraint>
+        <between>
+          <from>
+            <attribute name="UnoccupiedSetbackMin"/>
+          </from>
+          <to>
+            <attribute name="UnoccupiedSetbackMax"/>
+          </to>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x0038" name="UnoccupiedSetbackMin">
-      <deprecateConform/>
+    <attribute id="0x0038" name="UnoccupiedSetbackMin" type="UnsignedTemperature">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="fixed"/>
+      <obsoleteConform/>
+      <constraint>
+        <max>
+          <attribute name="UnoccupiedSetbackMax"/>
+        </max>
+      </constraint>
     </attribute>
-    <attribute id="0x0039" name="UnoccupiedSetbackMax">
-      <deprecateConform/>
+    <attribute id="0x0039" name="UnoccupiedSetbackMax" type="UnsignedTemperature">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="fixed"/>
+      <obsoleteConform/>
+      <constraint>
+        <between>
+          <from>
+            <attribute name="UnoccupiedSetbackMin"/>
+          </from>
+          <to value="254"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x003A" name="EmergencyHeatDelta" type="UnsignedTemperature" default="255">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
@@ -1208,6 +1390,101 @@ Davis, CA 95616, USA
         <feature name="TSUGGEST"/>
       </mandatoryConform>
     </attribute>
+    <attribute id="0x0057" name="CriticalFreezeProtection" type="bool" default="false">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform>
+          <feature name="HEAT"/>
+        </optionalConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute id="0x0058" name="CriticalOverheatProtection" type="bool" default="false">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform>
+          <feature name="COOL"/>
+        </optionalConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute id="0x0059" name="Sensors" type="list">
+      <entry type="ThermostatSensorStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="SENSORS"/>
+        </mandatoryConform>
+      </otherwiseConform>
+      <constraint>
+        <maxCount value="32"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x005A" name="AvailableSensorHandles" type="list">
+      <entry type="octstr">
+        <constraint>
+          <maxLength value="16"/>
+        </constraint>
+      </entry>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="SENSORS"/>
+        </mandatoryConform>
+      </otherwiseConform>
+      <constraint>
+        <maxCount value="32"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x005B" name="EnabledSensorHandles" type="list">
+      <entry type="octstr">
+        <constraint>
+          <maxLength value="16"/>
+        </constraint>
+      </entry>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="SENSORS"/>
+        </mandatoryConform>
+      </otherwiseConform>
+      <constraint>
+        <maxCount value="32"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x005C" name="NumberOfSensorScheduleTransitions" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="SENSORS"/>
+        </mandatoryConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute id="0x005D" name="SensorSchedule" type="list">
+      <entry type="SensorScheduleTransitionStruct"/>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile" atomicWrite="true"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="SENSORS"/>
+        </mandatoryConform>
+      </otherwiseConform>
+      <constraint>
+        <maxCount>
+          <attribute name="NumberOfSensorScheduleTransitions"/>
+        </maxCount>
+      </constraint>
+    </attribute>
   </attributes>
   <commands>
     <command id="0x00" name="SetpointRaiseLower" direction="commandToServer" response="Y">
@@ -1223,6 +1500,73 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
+    <command id="0x00" name="GetWeeklyScheduleResponse" direction="responseFromServer">
+      <obsoleteConform/>
+      <field id="0" name="NumberOfTransitionsForSequence" type="uint8">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="DayOfWeekForSequence" type="ScheduleDayOfWeekBitmap">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="2" name="ModeForSequence" type="ScheduleModeBitmap">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="3" name="Transitions" type="list">
+        <entry type="WeeklyScheduleTransitionStruct"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="10"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x01" name="SetWeeklySchedule" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage"/>
+      <obsoleteConform/>
+      <field id="0" name="NumberOfTransitionsForSequence" type="uint8">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="DayOfWeekForSequence" type="ScheduleDayOfWeekBitmap">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="2" name="ModeForSequence" type="ScheduleModeBitmap">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="3" name="Transitions" type="list">
+        <entry type="WeeklyScheduleTransitionStruct"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="10"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x02" name="GetWeeklySchedule" direction="commandToServer" response="GetWeeklyScheduleResponse">
+      <access invokePrivilege="operate"/>
+      <obsoleteConform/>
+      <field id="0" name="DaysToReturn" type="ScheduleDayOfWeekBitmap">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="ModeToReturn" type="ScheduleModeBitmap">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
     <command id="0x02" name="AddThermostatSuggestionResponse" direction="responseFromServer">
       <mandatoryConform>
         <feature name="TSUGGEST"/>
@@ -1230,6 +1574,10 @@ Davis, CA 95616, USA
       <field id="0" name="UniqueID" type="uint8">
         <mandatoryConform/>
       </field>
+    </command>
+    <command id="0x03" name="ClearWeeklySchedule" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage"/>
+      <obsoleteConform/>
     </command>
     <command id="0x05" name="SetActiveScheduleRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>

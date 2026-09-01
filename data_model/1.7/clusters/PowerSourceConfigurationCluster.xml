@@ -57,9 +57,10 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002E" name="Power Source Configuration Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002E" name="Power Source Configuration Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Remove N quality from Sources attribute"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x002E" name="Power Source Configuration"/>
@@ -69,7 +70,6 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="Sources" type="list">
       <entry type="endpoint-no"/>
       <access read="true" readPrivilege="view"/>
-      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
       <constraint>
         <maxCount value="6"/>

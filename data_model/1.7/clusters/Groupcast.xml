@@ -96,6 +96,12 @@ Davis, CA 95616, USA
       <item value="5" name="SendFailure" summary="Issue with attempting to send a multicast IPv6 message">
         <mandatoryConform/>
       </item>
+      <item value="6" name="UnknownGroup" summary="The group targeted by the message is not joined">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
+      </item>
     </enum>
     <enum name="GroupcastTestingEnum">
       <item value="0" name="DisableTesting" summary="Disable all test event generation">
@@ -305,7 +311,7 @@ Davis, CA 95616, USA
       <field id="0" name="TestOperation" type="GroupcastTestingEnum">
         <mandatoryConform/>
       </field>
-      <field id="1" name="DurationSeconds" type="uint16" default="60">
+      <field id="1" name="DurationSeconds" type="uint16">
         <optionalConform/>
         <constraint>
           <between>
@@ -335,7 +341,7 @@ Davis, CA 95616, USA
       <field id="2" name="GroupID" type="group-id">
         <optionalConform/>
       </field>
-      <field id="3" name="EndpointID" type="endpoint-id">
+      <field id="3" name="EndpointID" type="endpoint-no">
         <optionalConform/>
       </field>
       <field id="4" name="ClusterID" type="cluster-id">

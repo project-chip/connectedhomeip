@@ -57,15 +57,35 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050E" name="Account Login Cluster" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050E" name="Account Login Cluster" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Add support for 8 character Passcode in GetSetupPIN and Login, Add Node to Login, Logout commands. Add LoggedOut event"/>
+    <revision revision="3" summary="Add support for OAuth 2.0 Device Authorization Grant flow. Add GetDeviceAuthURI commands. Add OAuthLoggedIn attribute"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x050E" name="Account Login"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="ALOGIN" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="OA" name="OAuth" summary="Support for account login via OAuth 2.0 Device Authorization Grant">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
+    </feature>
+  </features>
+  <attributes>
+    <attribute id="0x0000" name="OAuthLoggedIn" type="bool">
+      <access read="true" readPrivilege="view"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="OA"/>
+        </mandatoryConform>
+      </otherwiseConform>
+    </attribute>
+  </attributes>
   <commands>
     <command id="0x00" name="GetSetupPIN" direction="commandToServer" response="GetSetupPINResponse">
       <access invokePrivilege="admin" fabricScoped="true" timed="true"/>
@@ -117,6 +137,51 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="Node" type="node-id">
         <optionalConform/>
+      </field>
+    </command>
+    <command id="0x04" name="GetDeviceAuthURI" direction="commandToServer" response="GetDeviceAuthURIResponse">
+      <access invokePrivilege="admin" fabricScoped="true" timed="true"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="OA"/>
+        </mandatoryConform>
+      </otherwiseConform>
+    </command>
+    <command id="0x05" name="GetDeviceAuthURIResponse" direction="responseFromServer">
+      <access fabricScoped="true"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="OA"/>
+        </mandatoryConform>
+      </otherwiseConform>
+      <field id="0" name="UserCode" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="16"/>
+        </constraint>
+      </field>
+      <field id="1" name="VerificationURI" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
+      </field>
+      <field id="2" name="VerificationURIComplete" type="string" default="empty">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="512"/>
+        </constraint>
+      </field>
+      <field id="3" name="ExpiresIn" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="4" name="Interval" type="uint8" default="5">
+        <mandatoryConform/>
       </field>
     </command>
   </commands>

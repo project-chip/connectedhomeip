@@ -57,9 +57,10 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0510" name="Electrical Sensor" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0510" name="Electrical Sensor" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Added Electrical Alarm Cluster support"/>
   </revisionHistory>
   <classification class="utility" scope="endpoint"/>
   <clusters>
@@ -71,6 +72,12 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x009C" name="Power Topology" side="server">
       <mandatoryConform/>
+    </cluster>
+    <cluster id="0x00A1" name="Electrical Alarm" side="server">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </cluster>
   </clusters>
 </deviceType>

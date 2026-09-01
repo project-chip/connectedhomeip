@@ -65,7 +65,7 @@ Davis, CA 95616, USA
     <revision revision="4" summary="All Hubs changes with FeatureMap &amp; OperationalStatus attribute"/>
     <revision revision="5" summary="New data model format and notation. Created plus clarified PositionAware and AbsolutePosition features. General cleanup of functionality."/>
     <revision revision="6" summary="Marked AbsolutePosition feature and associated elements provisional."/>
-    <revision revision="7" summary="Removed ABS feature and all associated elements from the cluster."/>
+    <revision revision="7" summary="Removed AbsolutePosition feature and all associated elements from the cluster."/>
     <revision revision="8" summary="Removed P quality."/>
   </revisionHistory>
   <clusterIds>
@@ -83,6 +83,9 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="LF"/>
       </optionalConform>
+    </feature>
+    <feature bit="3" code="ABS" name="AbsolutePosition">
+      <obsoleteConform/>
     </feature>
     <feature bit="4" code="PA_TL" name="PositionAwareTilt" summary="Position aware tilt control is supported.">
       <optionalConform>
@@ -208,7 +211,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </bitfield>
       <bitfield name="OnlineReserved" bit="1" summary="">
-        <deprecateConform/>
+        <obsoleteConform/>
       </bitfield>
       <bitfield name="LiftMovementReversed" bit="2" summary="The lift movement is reversed.">
         <mandatoryConform>
@@ -311,6 +314,46 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <constraint>
         <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="PhysicalClosedLimitLift" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <obsoleteConform/>
+    </attribute>
+    <attribute id="0x0002" name="PhysicalClosedLimitTilt" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <obsoleteConform/>
+    </attribute>
+    <attribute id="0x0003" name="CurrentPositionLift" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="nonVolatile"/>
+      <obsoleteConform/>
+      <constraint>
+        <between>
+          <from>
+            <attribute name="InstalledOpenLimitLift"/>
+          </from>
+          <to>
+            <attribute name="InstalledClosedLimitLift"/>
+          </to>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0004" name="CurrentPositionTilt" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="nonVolatile"/>
+      <obsoleteConform/>
+      <constraint>
+        <between>
+          <from>
+            <attribute name="InstalledOpenLimitTilt"/>
+          </from>
+          <to>
+            <attribute name="InstalledClosedLimitTilt"/>
+          </to>
+        </between>
       </constraint>
     </attribute>
     <attribute id="0x0005" name="NumberOfActuationsLift" type="uint16" default="0">
@@ -416,6 +459,38 @@ Davis, CA 95616, USA
         <max value="10000"/>
       </constraint>
     </attribute>
+    <attribute id="0x0010" name="InstalledOpenLimitLift" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <obsoleteConform/>
+      <constraint>
+        <max value="65534"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0011" name="InstalledClosedLimitLift" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <obsoleteConform/>
+      <constraint>
+        <max value="65534"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0012" name="InstalledOpenLimitTilt" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <obsoleteConform/>
+      <constraint>
+        <max value="65534"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0013" name="InstalledClosedLimitTilt" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <obsoleteConform/>
+      <constraint>
+        <max value="65534"/>
+      </constraint>
+    </attribute>
     <attribute id="0x0017" name="Mode" type="ModeBitmap" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
@@ -445,6 +520,16 @@ Davis, CA 95616, USA
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>
+    <command id="0x04" name="GoToLiftValue" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <obsoleteConform/>
+      <field id="0" name="LiftValue" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
     <command id="0x05" name="GoToLiftPercentage" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <otherwiseConform>
@@ -459,6 +544,16 @@ Davis, CA 95616, USA
         </optionalConform>
       </otherwiseConform>
       <field id="0" name="LiftPercent100thsValue" type="percent100ths">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x07" name="GoToTiltValue" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <obsoleteConform/>
+      <field id="0" name="TiltValue" type="uint16">
         <mandatoryConform/>
         <constraint>
           <desc/>

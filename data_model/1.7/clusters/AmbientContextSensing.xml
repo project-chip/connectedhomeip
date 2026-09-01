@@ -57,9 +57,10 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0431" name="Ambient Context Sensing Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0431" name="Ambient Context Sensing Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Added SensorFusion feature"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0431" name="Ambient Context Sensing">
@@ -98,6 +99,12 @@ Davis, CA 95616, USA
         <optionalConform/>
       </otherwiseConform>
     </feature>
+    <feature bit="5" code="FUS" name="SensorFusion" summary="Supports sensor fusion">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
+    </feature>
   </features>
   <dataTypes>
     <struct name="AmbientContextTypeStruct">
@@ -109,6 +116,18 @@ Davis, CA 95616, USA
         </otherwiseConform>
         <constraint>
           <maxCount value="2"/>
+        </constraint>
+      </field>
+      <field id="1" name="DetectionConfidence" type="percent">
+        <quality nullable="true"/>
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="FUS"/>
+          </mandatoryConform>
+        </otherwiseConform>
+        <constraint>
+          <min value="1"/>
         </constraint>
       </field>
     </struct>
@@ -413,6 +432,19 @@ Davis, CA 95616, USA
       </otherwiseConform>
       <constraint>
         <maxCount value="20"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000C" name="SensorFusionSupported" type="list">
+      <entry type="SemanticTagStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="FUS"/>
+        </mandatoryConform>
+      </otherwiseConform>
+      <constraint>
+        <maxCount value="50"/>
       </constraint>
     </attribute>
   </attributes>

@@ -57,9 +57,10 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Resource Monitoring Clusters" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Resource Monitoring Clusters" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Added Medium attribute"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0071" name="HEPA Filter Monitoring" picsCode="HEPAFREMON"/>
@@ -172,6 +173,19 @@ Davis, CA 95616, USA
       <constraint>
         <maxCount value="5"/>
       </constraint>
+    </attribute>
+    <attribute id="0x0006" name="Medium" type="medium-type">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform>
+          <greaterOrEqualTerm>
+            <revision value="current"/>
+            <revision value="2"/>
+          </greaterOrEqualTerm>
+        </optionalConform>
+      </otherwiseConform>
     </attribute>
   </attributes>
   <commands>

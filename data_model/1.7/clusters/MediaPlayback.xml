@@ -57,10 +57,11 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0506" name="Media Playback Cluster" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0506" name="Media Playback Cluster" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Added Text/Audio tracks support, Audio-while-advancing (AA) feature, StateChanged event"/>
+    <revision revision="3" summary="Added the AvailableCommands and ContentInfo attributes"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0506" name="Media Playback"/>
@@ -140,6 +141,20 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
+    <enum name="MediaType">
+      <item value="0" name="Generic" summary="Generic content, described only by Title">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="TVShow" summary="TV content, described by Show, Season and Episode">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Music" summary="Music content, described by Provider, Artist, Album and Track">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Podcast" summary="Podcast content, described by Show and Episode">
+        <mandatoryConform/>
+      </item>
+    </enum>
     <enum name="PlaybackStateEnum">
       <item value="0" name="Playing" summary="Media is currently playing (includes FF and REW)">
         <mandatoryConform/>
@@ -178,6 +193,68 @@ Davis, CA 95616, USA
         </mandatoryConform>
       </item>
     </enum>
+    <struct name="ContentInfoStruct">
+      <field id="0" name="ContentType" type="MediaType">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Title" type="string">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
+      </field>
+      <field id="2" name="Show" type="string">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="64"/>
+        </constraint>
+      </field>
+      <field id="3" name="Season" type="string">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="64"/>
+        </constraint>
+      </field>
+      <field id="4" name="Episode" type="string">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="64"/>
+        </constraint>
+      </field>
+      <field id="5" name="Provider" type="string">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="64"/>
+        </constraint>
+      </field>
+      <field id="6" name="Artist" type="string">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="64"/>
+        </constraint>
+      </field>
+      <field id="7" name="Album" type="string">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="64"/>
+        </constraint>
+      </field>
+      <field id="8" name="Track" type="string">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="64"/>
+        </constraint>
+      </field>
+      <field id="9" name="ImageURL" type="string">
+        <otherwiseConform>
+          <provisionalConform/>
+          <optionalConform/>
+        </otherwiseConform>
+        <constraint>
+          <maxLength value="8192"/>
+        </constraint>
+      </field>
+    </struct>
     <struct name="PlaybackPositionStruct">
       <field id="0" name="UpdatedAt" type="epoch-us">
         <mandatoryConform/>
@@ -324,6 +401,28 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="TT"/>
       </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000B" name="AvailableCommands" type="list">
+      <entry type="uint32"/>
+      <access read="true" readPrivilege="view"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000C" name="ContentInfo" type="ContentInfoStruct" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
       <constraint>
         <desc/>
       </constraint>

@@ -103,7 +103,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
       <item value="2" name="ProxyView">
-        <deprecateConform/>
+        <obsoleteConform/>
       </item>
       <item value="3" name="Operate" summary="View privileges, and can perform the primary function of this Node (except Access Control Cluster)">
         <mandatoryConform/>

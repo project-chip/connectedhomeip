@@ -90,6 +90,9 @@ Davis, CA 95616, USA
         <optionalConform/>
       </otherwiseConform>
     </feature>
+    <feature bit="3" code="LOG" name="Logging">
+      <obsoleteConform/>
+    </feature>
     <feature bit="4" code="WDSCH" name="WeekDayAccessSchedules" summary="Lock supports week day user access schedules">
       <optionalConform/>
     </feature>
@@ -115,6 +118,9 @@ Davis, CA 95616, USA
           <feature name="ALIRO"/>
         </orTerm>
       </mandatoryConform>
+    </feature>
+    <feature bit="9" code="NOT" name="Notification">
+      <obsoleteConform/>
     </feature>
     <feature bit="10" code="YDSCH" name="YearDayAccessSchedules" summary="Lock supports year day user access schedules">
       <optionalConform/>
@@ -597,31 +603,6 @@ Davis, CA 95616, USA
         </mandatoryConform>
       </item>
     </enum>
-    <bitmap name="AlarmMaskBitmap">
-      <bitfield name="LockJammed" bit="0" summary="Locking Mechanism Jammed">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="LockFactoryReset" bit="1" summary="Lock Reset to Factory Defaults">
-        <optionalConform/>
-      </bitfield>
-      <bitfield name="LockRadioPowerCycled" bit="3" summary="RF Module Power Cycled">
-        <optionalConform/>
-      </bitfield>
-      <bitfield name="WrongCodeEntryLimit" bit="4" summary="Tamper Alarm - wrong code entry limit">
-        <mandatoryConform>
-          <orTerm>
-            <feature name="PIN"/>
-            <feature name="RID"/>
-          </orTerm>
-        </mandatoryConform>
-      </bitfield>
-      <bitfield name="FrontEscutcheonRemoved" bit="5" summary="Tamper Alarm - front escutcheon removed from main">
-        <optionalConform/>
-      </bitfield>
-      <bitfield name="DoorForcedOpen" bit="6" summary="Forced Door Open under Door Locked Condition">
-        <optionalConform/>
-      </bitfield>
-    </bitmap>
     <bitmap name="ConfigurationRegisterBitmap">
       <bitfield name="LocalProgramming" bit="0" summary="The state of local programming functionality">
         <mandatoryConform/>
@@ -962,10 +943,6 @@ Davis, CA 95616, USA
         </andTerm>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0034" name="SecurityLevel" default="0">
-      <access read="true" readPrivilege="view"/>
-      <deprecateConform/>
-    </attribute>
     <attribute id="0x0035" name="ExpiringUserTimeout" type="uint16" default="MS">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
       <optionalConform>
@@ -1094,10 +1071,6 @@ Davis, CA 95616, USA
           </andTerm>
         </optionalConform>
       </field>
-    </command>
-    <command id="0x02" name="Toggle" direction="commandToServer" response="Y">
-      <access invokePrivilege="operate" timed="true"/>
-      <disallowConform/>
     </command>
     <command id="0x03" name="UnlockWithTimeout" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" timed="true"/>

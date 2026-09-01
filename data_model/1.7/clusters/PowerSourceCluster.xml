@@ -57,11 +57,12 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002F" name="Power Source Cluster" revision="3">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002F" name="Power Source Cluster" revision="4">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Added EndpointList attribute that maps a power source to a list of endpoints"/>
     <revision revision="3" summary="Added Q quality (replacing C quality) on BatPercentRemaining, BatTimeRemaining and BatTimeToFullCharge"/>
+    <revision revision="4" summary="Remove N quality from Order attribute"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x002F" name="Power Source"/>
@@ -561,7 +562,6 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="Order" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0002" name="Description" type="string">

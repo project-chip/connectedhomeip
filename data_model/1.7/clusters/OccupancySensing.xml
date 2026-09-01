@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0406" name="Occupancy Sensing Cluster" revision="7">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0406" name="Occupancy Sensing Cluster" revision="8">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="Physical Contact Occupancy feature with mandatory OccupancySensorTypeBitmap"/>
@@ -66,6 +66,7 @@ Davis, CA 95616, USA
     <revision revision="5" summary="Rework to add modalities: radar-, ambient-sensing- and vision-based sensors; add sensitivity setting (via co-located BooleanStateConfiguration cluster on same endpoint); add new attribute for tuning the sensor&apos;s reporting; add event OccupancyChanged; add N quality for HoldTime and other timing attributes; describe how to accommodate legacy clients"/>
     <revision revision="6" summary="Removed P quality"/>
     <revision revision="7" summary="Added OccupancyEvent feature"/>
+    <revision revision="8" summary="Added Prediction feature"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0406" name="Occupancy Sensing"/>
@@ -95,6 +96,17 @@ Davis, CA 95616, USA
     </feature>
     <feature bit="7" code="VIS" name="Vision" summary="Supports sensing based on analyzing images">
       <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="8" code="PRED" name="Prediction" summary="Supports sensing based on prediction of occupancy">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform choice="a" more="true" min="1">
+          <greaterOrEqualTerm>
+            <revision value="current"/>
+            <revision value="8"/>
+          </greaterOrEqualTerm>
+        </optionalConform>
+      </otherwiseConform>
     </feature>
     <feature bit="9" code="OCCEVENT" name="OccupancyEvent" summary="Supports generating OccupancyChanged events">
       <optionalConform>
@@ -168,6 +180,31 @@ Davis, CA 95616, USA
         </constraint>
       </field>
     </struct>
+    <struct name="PredictedOccupancyStruct">
+      <field id="0" name="StartTimestamp" type="epoch-s">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="EndTimestamp" type="epoch-s">
+        <mandatoryConform/>
+        <constraint>
+          <min>
+            <compute>
+              <operation>add</operation>
+              <left>
+                <field name="StartTimestamp"/>
+              </left>
+              <right value="1"/>
+            </compute>
+          </min>
+        </constraint>
+      </field>
+      <field id="2" name="Occupancy" type="OccupancyBitmap">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="Confidence" type="percent">
+        <mandatoryConform/>
+      </field>
+    </struct>
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="Occupancy" type="OccupancyBitmap">
@@ -230,6 +267,16 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <attribute name="HoldTime"/>
       </mandatoryConform>
+    </attribute>
+    <attribute id="0x0005" name="PredictedOccupancy" type="list">
+      <entry type="PredictedOccupancyStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="PRED"/>
+        </mandatoryConform>
+      </otherwiseConform>
     </attribute>
     <attribute id="0x0010" name="PIROccupiedToUnoccupiedDelay" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
