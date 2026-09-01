@@ -90,61 +90,61 @@ DataModel::ActionReturnStatus ElectricalAlarmCluster::ReadAttribute(const DataMo
         {
             return Status::UnsupportedAttribute;
         }
-        return encoder.Encode(*mOverVoltageThreshold);
+        return encoder.Encode(mOverVoltageThreshold.value());
     case Attributes::UnderVoltageThreshold::Id:
         if (!mFeatureFlags.Has(Feature::kUnderVoltage))
         {
             return Status::UnsupportedAttribute;
         }
-        return encoder.Encode(*mUnderVoltageThreshold);
+        return encoder.Encode(mUnderVoltageThreshold.value());
     case Attributes::OverFrequencyThreshold::Id:
         if (!mFeatureFlags.Has(Feature::kOverFrequency))
         {
             return Status::UnsupportedAttribute;
         }
-        return encoder.Encode(*mOverFrequencyThreshold);
+        return encoder.Encode(mOverFrequencyThreshold.value());
     case Attributes::UnderFrequencyThreshold::Id:
         if (!mFeatureFlags.Has(Feature::kUnderFrequency))
         {
             return Status::UnsupportedAttribute;
         }
-        return encoder.Encode(*mUnderFrequencyThreshold);
+        return encoder.Encode(mUnderFrequencyThreshold.value());
     case Attributes::OverPowerThreshold::Id:
         if (!mFeatureFlags.Has(Feature::kOverPower))
         {
             return Status::UnsupportedAttribute;
         }
-        return encoder.Encode(*mOverPowerThreshold);
+        return encoder.Encode(mOverPowerThreshold.value());
     case Attributes::UnderPowerThreshold::Id:
         if (!mFeatureFlags.Has(Feature::kUnderPower))
         {
             return Status::UnsupportedAttribute;
         }
-        return encoder.Encode(*mUnderPowerThreshold);
+        return encoder.Encode(mUnderPowerThreshold.value());
     case Attributes::OverCurrentThreshold::Id:
         if (!mFeatureFlags.Has(Feature::kOverCurrent))
         {
             return Status::UnsupportedAttribute;
         }
-        return encoder.Encode(*mOverCurrentThreshold);
+        return encoder.Encode(mOverCurrentThreshold.value());
     case Attributes::UnderCurrentThreshold::Id:
         if (!mFeatureFlags.Has(Feature::kUnderCurrent))
         {
             return Status::UnsupportedAttribute;
         }
-        return encoder.Encode(*mUnderCurrentThreshold);
+        return encoder.Encode(mUnderCurrentThreshold.value());
     case Attributes::PowerImportThreshold::Id:
         if (!mFeatureFlags.Has(Feature::kPowerImport))
         {
             return Status::UnsupportedAttribute;
         }
-        return encoder.Encode(*mPowerImportThreshold);
+        return encoder.Encode(mPowerImportThreshold.value());
     case Attributes::PowerExportThreshold::Id:
         if (!mFeatureFlags.Has(Feature::kPowerExport))
         {
             return Status::UnsupportedAttribute;
         }
-        return encoder.Encode(*mPowerExportThreshold);
+        return encoder.Encode(mPowerExportThreshold.value());
     default:
         return Status::UnsupportedAttribute;
     }
@@ -548,26 +548,26 @@ Status ElectricalAlarmCluster::HandleSetThresholds(const Commands::SetElectrical
     };
 
     Status s;
-    if ((s = checkPair(data.overVoltageThreshold, data.underVoltageThreshold, *mOverVoltageThreshold,
-                       mFeatureFlags.Has(Feature::kOverVoltage), *mUnderVoltageThreshold,
+    if ((s = checkPair(data.overVoltageThreshold, data.underVoltageThreshold, mOverVoltageThreshold.value(),
+                       mFeatureFlags.Has(Feature::kOverVoltage), mUnderVoltageThreshold.value(),
                        mFeatureFlags.Has(Feature::kUnderVoltage))) != Status::Success)
     {
         return s;
     }
-    if ((s = checkPair(data.overFrequencyThreshold, data.underFrequencyThreshold, *mOverFrequencyThreshold,
-                       mFeatureFlags.Has(Feature::kOverFrequency), *mUnderFrequencyThreshold,
+    if ((s = checkPair(data.overFrequencyThreshold, data.underFrequencyThreshold, mOverFrequencyThreshold.value(),
+                       mFeatureFlags.Has(Feature::kOverFrequency), mUnderFrequencyThreshold.value(),
                        mFeatureFlags.Has(Feature::kUnderFrequency))) != Status::Success)
     {
         return s;
     }
-    if ((s = checkPair(data.overPowerThreshold, data.underPowerThreshold, *mOverPowerThreshold,
-                       mFeatureFlags.Has(Feature::kOverPower), *mUnderPowerThreshold, mFeatureFlags.Has(Feature::kUnderPower))) !=
+    if ((s = checkPair(data.overPowerThreshold, data.underPowerThreshold, mOverPowerThreshold.value(),
+                       mFeatureFlags.Has(Feature::kOverPower), mUnderPowerThreshold.value(), mFeatureFlags.Has(Feature::kUnderPower))) !=
         Status::Success)
     {
         return s;
     }
-    if ((s = checkPair(data.overCurrentThreshold, data.underCurrentThreshold, *mOverCurrentThreshold,
-                       mFeatureFlags.Has(Feature::kOverCurrent), *mUnderCurrentThreshold,
+    if ((s = checkPair(data.overCurrentThreshold, data.underCurrentThreshold, mOverCurrentThreshold.value(),
+                       mFeatureFlags.Has(Feature::kOverCurrent), mUnderCurrentThreshold.value(),
                        mFeatureFlags.Has(Feature::kUnderCurrent))) != Status::Success)
     {
         return s;
@@ -575,8 +575,8 @@ Status ElectricalAlarmCluster::HandleSetThresholds(const Commands::SetElectrical
     // PowerImport/Export: (0, 0) is valid quiescent state; otherwise import must be > export.
     if (data.powerImportThreshold.HasValue() || data.powerExportThreshold.HasValue())
     {
-        int64_t resolvedImport = data.powerImportThreshold.ValueOr(*mPowerImportThreshold);
-        int64_t resolvedExport = data.powerExportThreshold.ValueOr(*mPowerExportThreshold);
+        int64_t resolvedImport = data.powerImportThreshold.ValueOr(mPowerImportThreshold.value());
+        int64_t resolvedExport = data.powerExportThreshold.ValueOr(mPowerExportThreshold.value());
         if (!(resolvedImport == 0 && resolvedExport == 0) && resolvedImport <= resolvedExport)
         {
             return Status::ConstraintError;
