@@ -879,7 +879,8 @@ Status DeviceEnergyManagementDelegate::PowerRangeAdjustRequest(const DataModel::
             CHIP_ERROR cancelErr = CancelPowerRangeAdjustRequestAndGenerateEvent(DeviceEnergyManagement::CauseEnum::kCancelled);
             if (cancelErr != CHIP_NO_ERROR)
             {
-                ChipLogError(AppServer, "Failed to cancel old PowerRangeAdjustment after timer startup failure: %" CHIP_ERROR_FORMAT,
+                ChipLogError(AppServer,
+                             "Failed to cancel old PowerRangeAdjustment after timer startup failure: %" CHIP_ERROR_FORMAT,
                              cancelErr.Format());
             }
         }
