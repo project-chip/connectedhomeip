@@ -145,7 +145,7 @@ public:
      * @brief Registers an OOB accessor instance.
      * @param accessor The accessor instance to register.
      */
-    CHIP_ERROR Register(std::unique_ptr<chip::app::Clusters::OOBAccessor> accessor);
+    CHIP_ERROR Register(std::unique_ptr<OOBAccessor> accessor);
 
     /**
      * @brief Dispatches an action to registered accessors in order.
