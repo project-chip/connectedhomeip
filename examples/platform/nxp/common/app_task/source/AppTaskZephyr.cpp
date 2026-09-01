@@ -48,7 +48,7 @@
 
 #if CONFIG_CHIP_CRYPTO_PSA
 #include <crypto/PSAOperationalKeystore.h>
-#if CONFIG_SOC_FAMILY_NXP_RW
+#if CONFIG_SOC_FAMILY_NXP_RW && CONFIG_CHIP_CRYPTO_HW_ENGINE
 #include <platform/nxp/common/crypto/S50/S50KeyAllocator.h>
 #endif // CONFIG_SOC_FAMILY_NXP_RW
 #endif // CONFIG_CHIP_CRYPTO_PSA
@@ -95,7 +95,7 @@ chip::DeviceLayer::NetworkCommissioning::EthernetDriver * chip::NXP::App::AppTas
 
 void chip::NXP::App::AppTaskZephyr::PreInitMatterServerInstance()
 {
-#if CONFIG_CHIP_CRYPTO_PSA && CONFIG_SOC_FAMILY_NXP_RW
+#if CONFIG_CHIP_CRYPTO_PSA && CONFIG_SOC_FAMILY_NXP_RW && CONFIG_CHIP_CRYPTO_HW_ENGINE
     // Configure the PSA crypto subsystem to use the S50 secure element
     // for hardware-backed key storage.
     static chip::DeviceLayer::S50KeyAllocator s50KeyAllocator;
