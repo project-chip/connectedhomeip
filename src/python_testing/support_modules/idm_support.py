@@ -794,11 +794,17 @@ class IDMBaseTest(BasicCompositionTests):
             attribute=attr_info.attribute
         )
 
+        # A non-timed write to a timed-write attribute is answered with
+        # NEEDS_TIMED_INTERACTION before the value is ever range-checked, which would
+        # report every such attribute as failing to return CONSTRAINT_ERROR.
+        timed_request_timeout_ms = 65535 if attr_info.attribute.must_use_timed_write else None
+
         # Attempt to write violating value
         attr_obj = attr_info.attribute(test_value)
         write_result = await self.default_controller.WriteAttribute(
             nodeId=self.dut_node_id,
-            attributes=[(attr_info.endpoint_id, attr_obj)]
+            attributes=[(attr_info.endpoint_id, attr_obj)],
+            timedRequestTimeoutMs=timed_request_timeout_ms
         )
         result_status = write_result[0].Status
 
@@ -819,7 +825,8 @@ class IDMBaseTest(BasicCompositionTests):
         if stored_value != original_value:
             restore_result = await self.default_controller.WriteAttribute(
                 nodeId=self.dut_node_id,
-                attributes=[(attr_info.endpoint_id, attr_info.attribute(original_value))]
+                attributes=[(attr_info.endpoint_id, attr_info.attribute(original_value))],
+                timedRequestTimeoutMs=timed_request_timeout_ms
             )
             if restore_result[0].Status != Status.Success:
                 log.warning("Failed to restore %s to %s: %s", attribute_path, original_value,
