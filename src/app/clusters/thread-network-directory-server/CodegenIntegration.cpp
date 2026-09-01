@@ -16,8 +16,9 @@
  */
 
 #include <app/clusters/thread-network-directory-server/CodegenIntegration.h>
-#include <data-model-providers/codegen/ClusterIntegration.h>
+#include <app/clusters/thread-network-directory-server/MigrateThreadNetworkDirectoryServerStorage.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <lib/support/CodeUtils.h>
 
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -25,6 +26,22 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 namespace Clusters {
+
+CHIP_ERROR CodegenThreadNetworkDirectoryCluster::Startup(ServerClusterContext & context)
+{
+    // Migrate attributes for this cluster from SafeAttribute to AttributePersistence.
+    // This is done at Startup time when the persistence providers are guaranteed to be available.
+    SafeAttributePersistenceProvider * srcProvider = GetSafeAttributePersistenceProvider();
+    AttributePersistenceProvider & dstProvider     = context.attributeStorage;
+
+    if (srcProvider != nullptr)
+    {
+        LogErrorOnFailure(ThreadNetworkDirectory::MigrateThreadNetworkDirectoryServerStorage(mPath.mEndpointId, mPath.mClusterId,
+                                                                                             *srcProvider, dstProvider));
+    }
+
+    return ThreadNetworkDirectoryCluster::Startup(context);
+}
 
 CHIP_ERROR DefaultThreadNetworkDirectoryServer::Init()
 {

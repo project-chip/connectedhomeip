@@ -19,16 +19,24 @@
 
 #include <app/clusters/thread-network-directory-server/DefaultThreadNetworkDirectoryStorage.h>
 #include <app/clusters/thread-network-directory-server/ThreadNetworkDirectoryCluster.h>
-#include <app/clusters/thread-network-directory-server/ThreadNetworkDirectoryStorage.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/server/Server.h>
-#include <lib/core/CHIPError.h>
-
-#include <optional>
 
 namespace chip {
 namespace app {
 namespace Clusters {
+
+/**
+ * A ThreadNetworkDirectoryCluster subclass that performs storage migration during Startup.
+ * This ensures the persistence providers are available when migration runs.
+ */
+class CodegenThreadNetworkDirectoryCluster : public ThreadNetworkDirectoryCluster
+{
+public:
+    using ThreadNetworkDirectoryCluster::ThreadNetworkDirectoryCluster;
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+};
 
 /**
  * A ThreadNetworkDirectoryServer using DefaultThreadNetworkDirectoryStorage.
@@ -38,8 +46,7 @@ class DefaultThreadNetworkDirectoryServer
 public:
     DefaultThreadNetworkDirectoryServer(EndpointId endpoint,
                                         PersistentStorageDelegate & storage = Server::GetInstance().GetPersistentStorage()) :
-        mStorage(storage),
-        mCluster(endpoint, mStorage)
+        mStorage(storage), mCluster(endpoint, mStorage)
     {}
 
     ~DefaultThreadNetworkDirectoryServer();
@@ -48,7 +55,7 @@ public:
 
 private:
     DefaultThreadNetworkDirectoryStorage mStorage;
-    RegisteredServerCluster<ThreadNetworkDirectoryCluster> mCluster;
+    RegisteredServerCluster<CodegenThreadNetworkDirectoryCluster> mCluster;
 };
 
 } // namespace Clusters

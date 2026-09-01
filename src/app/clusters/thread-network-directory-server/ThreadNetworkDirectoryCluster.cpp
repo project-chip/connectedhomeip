@@ -18,9 +18,6 @@
 #include <app/clusters/thread-network-directory-server/ThreadNetworkDirectoryCluster.h>
 
 #include <app/MessageDef/StatusIB.h>
-#include <app/SafeAttributePersistenceProvider.h>
-#include <app/data-model/Nullable.h>
-#include <app/reporting/reporting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/ThreadNetworkDirectory/Metadata.h>
 #include <lib/support/CodeUtils.h>
@@ -112,7 +109,8 @@ CHIP_ERROR ThreadNetworkDirectoryCluster::ReadExtendedPanId(const ConcreteDataAt
                                                             std::optional<ExtendedPanId> & outExPanId)
 {
     MutableByteSpan value(outExPanId.emplace().bytes);
-    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->SafeReadValue(aPath, value);
+
+    CHIP_ERROR err = mContext->attributeStorage.ReadValue(aPath, value);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         outExPanId.reset(); // default to empty
@@ -127,6 +125,7 @@ CHIP_ERROR ThreadNetworkDirectoryCluster::ReadExtendedPanId(const ConcreteDataAt
     }
 
     VerifyOrReturnError(value.size() == ExtendedPanId::size(), CHIP_ERROR_INTERNAL);
+    outExPanId.emplace(ExtendedPanId(value));
     return CHIP_NO_ERROR;
 }
 
@@ -149,8 +148,7 @@ CHIP_ERROR ThreadNetworkDirectoryCluster::WritePreferredExtendedPanId(const Conc
     // Ensure the provided value is valid (correct size) and refers to PAN from the list.
     VerifyOrReturnError(value.empty() || (value.size() == ExtendedPanId::size() && mStorage.ContainsNetwork(ExtendedPanId(value))),
                         StatusIB(IMStatus::ConstraintError).ToChipError());
-
-    return GetSafeAttributePersistenceProvider()->SafeWriteValue(aPath, value);
+    return mContext->attributeStorage.WriteValue(aPath, value);
 }
 
 CHIP_ERROR ThreadNetworkDirectoryCluster::ReadThreadNetworks(const ConcreteDataAttributePath &, AttributeValueEncoder & aEncoder)
