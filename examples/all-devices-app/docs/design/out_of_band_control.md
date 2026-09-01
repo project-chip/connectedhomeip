@@ -26,8 +26,8 @@ flowchart LR
     end
 
     subgraph Backend["OOB Execution Backend"]
-        REG["OOBAccessorRegistry"]
-        OOB["OOBAccessors"]
+        REG["OOB Accessor Registry"]
+        OOB["OOB Accessors"]
     end
 
     subgraph Device["Device Data Model"]
@@ -58,7 +58,7 @@ flowchart LR
         that cluster reuses the same implementation.
     -   **Device-Specific Accessors**: Accessors tied to a specific device live
         directly alongside the device implementation in
-        `devices/types/<device-name>/`.
+        `all-devices-common/device/types/<device-name>/`.
     -   **Platform Transport Code**: Transport translators and listener
         dispatchers (e.g., POSIX Named Pipes) live in platform directories under
         `posix/named_pipe/`.
@@ -97,7 +97,7 @@ examples/all-devices-app/
 
 ## 3. Interfaces & Core Types
 
-### OOBAccessor Interface
+### `OOBAccessor` Interface
 
 ```cpp
 namespace chip::app::Clusters {
@@ -118,9 +118,11 @@ public:
 } // namespace chip::app::Clusters
 ```
 
-### OOBAccessorRegistry Interface
+### `OOBAccessorRegistry` Interface
 
 ```cpp
+namespace chip::app {
+
 class InMemoryOOBAccessorRegistry
 {
 public:
@@ -144,11 +146,15 @@ public:
         RegisterOOBAccessors(device, *this);
     }
 };
+
+} // namespace chip::app
 ```
 
-### NamedPipeCommandTranslator Interface
+### `NamedPipeCommandTranslator` Interface
 
 ```cpp
+namespace chip::app {
+
 class NamedPipeCommandTranslator
 {
 public:
@@ -160,11 +166,15 @@ public:
      */
     virtual CHIP_ERROR TranslateAndExecute(const Json::Value & json) = 0;
 };
+
+} // namespace chip::app
 ```
 
-### PosixNamedPipeDispatcher Interface
+### `PosixNamedPipeDispatcher` Interface
 
 ```cpp
+namespace chip::app {
+
 class PosixNamedPipeDispatcher
 {
 public:
@@ -202,6 +212,8 @@ private:
     InMemoryOOBAccessorRegistry & mOobRegistry;
     std::unordered_map<std::string, std::unique_ptr<NamedPipeCommandTranslator>> mTranslators;
 };
+
+} // namespace chip::app
 ```
 
 ---
@@ -213,10 +225,10 @@ private:
 ```mermaid
 sequenceDiagram
     participant Pipe as Named Pipe
-    participant Trans as OnOffTranslator
-    participant Reg as OOBAccessorRegistry
-    participant Accessor as OnOffOobAccessor
-    participant Cluster as OnOffCluster
+    participant Trans as Command Translator
+    participant Reg as OOB Accessor Registry
+    participant Accessor as Cluster OOB Accessor
+    participant Cluster as OnOff Cluster
 
     Pipe->>Trans: {"action": "SetOnOff", "endpoint": 1, "value": true}
     Trans->>Reg: HandleAction("SetOnOff", TLV[endpoint: 1, value: true])
@@ -224,8 +236,8 @@ sequenceDiagram
     Accessor->>Cluster: SetOnOff(true)
 ```
 
-1. **Ingress**: External process writes JSON string to named pipe (e.g.
-   `/tmp/chip_all_devices_fifo`):
+1.  **Ingress**: External process writes JSON string to named pipe (e.g.
+    `/tmp/chip_all_devices_fifo`):
     ```json
     {
         "action": "SetOnOff",
@@ -233,19 +245,19 @@ sequenceDiagram
         "value": true
     }
     ```
-2. **Dispatch**: `PosixNamedPipeDispatcher` reads pipe, parses JSON, and
-   extracts `"action"`.
-3. **Translation**: Dispatcher invokes
-   `OnOffTranslator::TranslateAndExecute(json)`:
-    - Extracts `endpoint = 1` and `value = true`.
-    - Encodes flat TLV payload:
-        - Tag 1: `EndpointId` (`uint16_t`)
-        - Tag 2: `Value` (`bool`)
-    - Calls `mOobRegistry.HandleAction("SetOnOff", tlvBuffer)`.
-4. **Execution**: `OOBAccessorRegistry` routes to `OnOffOobAccessor` registered
-   for Endpoint 1:
-    - Decodes TLV fields.
-    - Calls `mCluster.SetOnOff(true)` on target cluster instance.
+2.  **Dispatch**: `PosixNamedPipeDispatcher` reads pipe, parses JSON, and
+    extracts `"action"`.
+3.  **Translation**: Dispatcher invokes
+    `OnOffTranslator::TranslateAndExecute(json)`:
+    -   Extracts `endpoint = 1` and `value = true`.
+    -   Encodes flat TLV payload:
+        -   Tag 1: `EndpointId` (`uint16_t`)
+        -   Tag 2: `Value` (`bool`)
+    -   Calls `mOobRegistry.HandleAction("SetOnOff", tlvBuffer)`.
+4.  **Execution**: `OOBAccessorRegistry` routes to `OnOffOobAccessor` registered
+    for Endpoint 1:
+    -   Decodes TLV fields.
+    -   Calls `mCluster.SetOnOff(true)` on target cluster instance.
 
 ---
 
