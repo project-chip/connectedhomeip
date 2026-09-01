@@ -163,8 +163,29 @@ public:
      */
     CHIP_ERROR HandleAction(CharSpan action, ByteSpan tlvData);
 
+    /**
+     * @brief Clears all registered accessors during device teardown.
+     */
+    void Clear() { mAccessors.clear(); }
+
 private:
     std::vector<std::unique_ptr<OOBAccessor>> mAccessors;
+};
+
+} // namespace chip::app
+```
+
+### `NoopOOBAccessorRegistry` Class
+
+```cpp
+namespace chip::app {
+
+class NoopOOBAccessorRegistry
+{
+public:
+    CHIP_ERROR Register(std::unique_ptr<OOBAccessor> /* accessor */) { return CHIP_NO_ERROR; }
+    CHIP_ERROR HandleAction(CharSpan /* action */, ByteSpan /* tlvData */) { return CHIP_ERROR_NOT_FOUND; }
+    void Clear() {}
 };
 
 } // namespace chip::app
@@ -300,6 +321,13 @@ sequenceDiagram
     -   Decodes TLV fields.
     -   Calls `mCluster.SetOnOff(true)` on target cluster instance.
 
+> [!NOTE] > **Thread Safety & Stack Synchronization**: The POSIX named pipe
+> listener runs on a background worker thread. When a command is received,
+> `PosixNamedPipeDispatcher` synchronizes execution onto the Matter event loop
+> via `chip::DeviceLayer::PlatformMgr().ScheduleWork(...)` or acquires
+> `chip::DeviceLayer::PlatformMgr().LockChipStack()` before invoking
+> `HandleAction` on `OOBAccessorRegistry`.
+
 ---
 
 ## 5. Adding OOB Support for a Device
@@ -314,9 +342,9 @@ In `all-devices-common/device/types/<device-name>/OOBAccessors.h`:
 
 namespace chip::app {
 
-class MyDevice;
+class OnOffLight;
 
-void RegisterOOBAccessors(MyDevice & device, OOBAccessorRegistry & registry);
+void RegisterOOBAccessors(OnOffLight & device, OOBAccessorRegistry & registry);
 
 } // namespace chip::app
 ```
@@ -325,7 +353,7 @@ In `all-devices-common/device/types/<device-name>/OOBAccessors.cpp`:
 
 ```cpp
 #include "OOBAccessors.h"
-#include "MyDevice.h"
+#include "OnOffLight.h"
 
 #if ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
 #include <oob-accessors/clusters/OnOffOOBAccessor.h>
@@ -333,10 +361,10 @@ In `all-devices-common/device/types/<device-name>/OOBAccessors.cpp`:
 
 namespace chip::app {
 
-void RegisterOOBAccessors(MyDevice & device, OOBAccessorRegistry & registry)
+void RegisterOOBAccessors(OnOffLight & device, OOBAccessorRegistry & registry)
 {
 #if ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
-    registry.Register(std::make_unique<OnOffOOBAccessor>(device.GetOnOffCluster(), device.GetEndpointId()));
+    registry.Register(std::make_unique<OnOffOOBAccessor>(device.OnOffCluster(), device.GetEndpointId()));
 #endif
 }
 
@@ -353,9 +381,9 @@ In `all-devices-common/device/types/<device-name>/NamedPipes.h`:
 
 namespace chip::app {
 
-class MyDevice;
+class OnOffLight;
 
-void RegisterNamedPipes(MyDevice & device, PosixNamedPipeDispatcher & dispatcher);
+void RegisterNamedPipes(OnOffLight & device, PosixNamedPipeDispatcher & dispatcher);
 
 } // namespace chip::app
 ```
@@ -364,12 +392,12 @@ In `all-devices-common/device/types/<device-name>/NamedPipes.cpp`:
 
 ```cpp
 #include "NamedPipes.h"
-#include "MyDevice.h"
+#include "OnOffLight.h"
 #include <posix/named_pipe/translators/OnOffTranslator.h>
 
 namespace chip::app {
 
-void RegisterNamedPipes(MyDevice & device, PosixNamedPipeDispatcher & dispatcher)
+void RegisterNamedPipes(OnOffLight & device, PosixNamedPipeDispatcher & dispatcher)
 {
     dispatcher.EnsureTranslatorRegistered<OnOffTranslator>();
 }
@@ -412,23 +440,22 @@ source_set("posix") {
 }
 ```
 
-### Step 4: Factory & Application Attachment
+### Step 4: Application Lifecycle & Registration
 
-In `DeviceFactory.h` (concrete creator registrations):
-
-```cpp
-RegisterCreator("on-off-light", [this]() {
-    VerifyOrDie(mContext.has_value());
-    auto device = std::make_unique<LoggingOnOffLight>(...);
-    RegisterOOBAccessors(*device, mOobRegistry);
-    return device;
-});
-```
-
-In POSIX application initialization (`posix/main.cpp`):
+In application initialization (`posix/main.cpp` and embedded setup):
 
 ```cpp
-mNamedPipeDispatcher.Start(kDefaultFifoPath);
+// 1. Device creation via factory
+auto device = DeviceFactory::GetInstance().Create(deviceTypeName);
+
+// 2. Register endpoint with data model provider (allocates valid endpoint ID)
+ReturnErrorOnFailure(device->Register(endpointIdAllocator, dataModelProvider));
+
+// 3. Register OOB accessors once endpoint ID is assigned
+RegisterOOBAccessors(*device, oobRegistry);
+
+// 4. Start named pipe listener in POSIX main
+namedPipeDispatcher.Start(kDefaultFifoPath);
 ```
 
 ---
@@ -475,13 +502,17 @@ Header aliasing in `all-devices-common/oob-accessors/OOBAccessorRegistry.h`:
 #pragma once
 #include <app_config/all_devices_config.h>
 
+#if ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
+#include <oob-accessors/InMemoryOOBAccessorRegistry.h>
+#else
+#include <oob-accessors/NoopOOBAccessorRegistry.h>
+#endif
+
 namespace chip::app {
 
 #if ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
-#include <oob-accessors/InMemoryOOBAccessorRegistry.h>
 using OOBAccessorRegistry = InMemoryOOBAccessorRegistry;
 #else
-#include <oob-accessors/NoopOOBAccessorRegistry.h>
 using OOBAccessorRegistry = NoopOOBAccessorRegistry;
 #endif
 
@@ -528,8 +559,8 @@ using OOBAccessorRegistry = NoopOOBAccessorRegistry;
     -   [ ] `all-devices-common/device/types/speaker/`
     -   [ ] `all-devices-common/device/types/on-off-plug-in-unit/`
     -   [ ] `all-devices-common/device/types/dimmable-plug-in-unit/`
--   [ ] Hook `RegisterOOBAccessors(*device, mOobRegistry)` into
-        `DeviceFactory.h`.
+-   [ ] Hook `RegisterOOBAccessors(*device, oobRegistry)` after endpoint
+        registration in `main.cpp`.
 
 ### Phase 3: POSIX Named Pipe Dispatcher & Translators
 
