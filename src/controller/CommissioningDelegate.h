@@ -26,6 +26,7 @@
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/jcm/TrustVerification.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/BitMask.h>
 #include <lib/support/CharSpanToStdString.h>
 #include <lib/support/Span.h>
 #include <lib/support/Variant.h>
@@ -325,6 +326,19 @@ public:
     // This must be set before calling PerformCommissioningStep for the kAttestationVerification step.
     const Optional<ByteSpan> GetDAC() const { return mDAC; }
 
+    // Attestation profiles to use for the PAI and DAC CertificateChainRequest commands.
+    // When unset, legacy Matter behavior is used for the corresponding certificate.
+    const Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum>
+    GetPAIAttestationCertificateRequestProfile() const
+    {
+        return mPAIAttestationCertificateRequestProfile;
+    }
+    const Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum>
+    GetDACAttestationCertificateRequestProfile() const
+    {
+        return mDACAttestationCertificateRequestProfile;
+    }
+
     // Node ID when a matching fabric is found in the Node Operational Credentials cluster.
     // In the AutoCommissioner, this is set from kReadCommissioningInfo stage.
     const Optional<NodeId> GetRemoteNodeId() const { return mRemoteNodeId; }
@@ -514,6 +528,18 @@ public:
         mDAC = MakeOptional(dac);
         return *this;
     }
+    CommissioningParameters &
+    SetPAIAttestationCertificateRequestProfile(app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum profile)
+    {
+        mPAIAttestationCertificateRequestProfile.SetValue(profile);
+        return *this;
+    }
+    CommissioningParameters &
+    SetDACAttestationCertificateRequestProfile(app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum profile)
+    {
+        mDACAttestationCertificateRequestProfile.SetValue(profile);
+        return *this;
+    }
     CommissioningParameters & SetRemoteNodeId(NodeId id)
     {
         mRemoteNodeId = MakeOptional(id);
@@ -642,6 +668,11 @@ public:
         return *this;
     }
     void ClearICDStayActiveDurationMsec() { mICDStayActiveDurationMsec.ClearValue(); }
+    void ClearAttestationCertificateRequestProfiles()
+    {
+        mPAIAttestationCertificateRequestProfile.ClearValue();
+        mDACAttestationCertificateRequestProfile.ClearValue();
+    }
 
     Span<const app::AttributePathParams> GetExtraReadPaths() const { return mExtraReadPaths; }
 
@@ -673,6 +704,7 @@ public:
         mAttestationSignature.ClearValue();
         mPAI.ClearValue();
         mDAC.ClearValue();
+        ClearAttestationCertificateRequestProfiles();
         mTimeZone.ClearValue();
         mDSTOffsets.ClearValue();
         mDefaultNTP.ClearValue();
@@ -707,6 +739,8 @@ private:
     Optional<ByteSpan> mAttestationSignature;
     Optional<ByteSpan> mPAI;
     Optional<ByteSpan> mDAC;
+    Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum> mPAIAttestationCertificateRequestProfile;
+    Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum> mDACAttestationCertificateRequestProfile;
     Optional<NodeId> mRemoteNodeId;
     Optional<VendorId> mRemoteVendorId;
     Optional<uint16_t> mRemoteProductId;
@@ -847,6 +881,9 @@ struct ReadCommissioningInfo
     uint8_t maxDSTSize                = 1;
     NodeId remoteNodeId               = kUndefinedNodeId;
     bool supportsConcurrentConnection = true;
+    bool supportsPqcDeviceAttestation = false;
+    BitMask<app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap> paiSupportedAttestationProfiles;
+    BitMask<app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap> dacSupportedAttestationProfiles;
     ICDManagementClusterInfo icd;
 };
 

@@ -17,6 +17,8 @@
 
 import base64
 import logging
+from dataclasses import dataclass
+from typing import Optional
 
 from cryptography import x509
 from cryptography.hazmat.primitives import serialization
@@ -27,12 +29,125 @@ from .. import commissioning
 from ..credentials.cert import convert_chip_cert_to_x509_cert
 from ..crypto.fabric import generate_compressed_fabric_id
 
+_OPERATIONAL_CREDENTIALS_FEATURE_PQC_DEVICE_ATTESTATION = 0x1
+_ATTESTATION_PROFILE_SUPPORTS_ECDSA_MATTER_LEGACY = 0x1
+_ATTESTATION_PROFILE_SUPPORTS_ML_DSA_44 = 0x2
+_ATTESTATION_PROFILE_SUPPORTS_ML_DSA_65 = 0x4
+_CERTIFICATE_CHAIN_REQUEST_MAX_SEGMENT_SIZE = 900
+_MAX_CERTIFICATE_CHAIN_DOCUMENT_SIZE = 10240
+
+
+@dataclass(frozen=True)
+class _AttestationCertificateRequestProfiles:
+    pai: Optional[Clusters.OperationalCredentials.Enums.AttestationCryptoProfileEnum]
+    dac: Optional[Clusters.OperationalCredentials.Enums.AttestationCryptoProfileEnum]
+
 
 class CommissioningFlowBlocks:
     def __init__(self, devCtrl: ChipDeviceCtrl.ChipDeviceControllerBase, credential_provider: commissioning.CredentialProvider, logger: logging.Logger):
         self._devCtrl = devCtrl
         self._logger = logger
         self._credential_provider = credential_provider
+
+    def _select_attestation_certificate_request_profile(
+        self, supported_profiles: int
+    ) -> Optional[Clusters.OperationalCredentials.Enums.AttestationCryptoProfileEnum]:
+        if (supported_profiles & _ATTESTATION_PROFILE_SUPPORTS_ML_DSA_65) != 0:
+            return Clusters.OperationalCredentials.Enums.AttestationCryptoProfileEnum.kMlDsa65
+        if (supported_profiles & _ATTESTATION_PROFILE_SUPPORTS_ML_DSA_44) != 0:
+            return Clusters.OperationalCredentials.Enums.AttestationCryptoProfileEnum.kMlDsa44
+        if (supported_profiles & _ATTESTATION_PROFILE_SUPPORTS_ECDSA_MATTER_LEGACY) != 0:
+            return Clusters.OperationalCredentials.Enums.AttestationCryptoProfileEnum.kEcdsaMatterLegacy
+        return None
+
+    def _select_attestation_certificate_request_profiles(
+        self, opcreds: Clusters.OperationalCredentials
+    ) -> _AttestationCertificateRequestProfiles:
+        legacy_profiles = _AttestationCertificateRequestProfiles(pai=None, dac=None)
+
+        if (opcreds.featureMap & _OPERATIONAL_CREDENTIALS_FEATURE_PQC_DEVICE_ATTESTATION) == 0:
+            return legacy_profiles
+
+        profile_support = opcreds.PQCDeviceAttestationProfile
+        if profile_support is None:
+            self._logger.warning(
+                "Device advertised PQC device attestation support but did not provide PQCDeviceAttestationProfile; "
+                "falling back to Matter legacy device attestation")
+            return legacy_profiles
+
+        has_legacy_chain = all(
+            (profiles & _ATTESTATION_PROFILE_SUPPORTS_ECDSA_MATTER_LEGACY) != 0
+            for profiles in (
+                profile_support.PAASupportedProfiles,
+                profile_support.PAISupportedProfiles,
+                profile_support.DACSupportedProfiles,
+            ))
+        pqc_profiles = _ATTESTATION_PROFILE_SUPPORTS_ML_DSA_44 | _ATTESTATION_PROFILE_SUPPORTS_ML_DSA_65
+        has_pqc_issuer = ((profile_support.PAASupportedProfiles | profile_support.PAISupportedProfiles) & pqc_profiles) != 0
+
+        if not has_legacy_chain or not has_pqc_issuer:
+            self._logger.warning(
+                "Device advertised PQC device attestation without the required legacy chain and PQC issuer; "
+                "falling back to Matter legacy device attestation")
+            return legacy_profiles
+
+        pai_profile = self._select_attestation_certificate_request_profile(profile_support.PAISupportedProfiles)
+        dac_profile = self._select_attestation_certificate_request_profile(profile_support.DACSupportedProfiles)
+        if pai_profile is not None and dac_profile is not None:
+            return _AttestationCertificateRequestProfiles(pai=pai_profile, dac=dac_profile)
+
+        self._logger.warning(
+            "Device advertised PQC device attestation without usable PAI and DAC profiles; "
+            "falling back to Matter legacy device attestation")
+        return legacy_profiles
+
+    async def _request_certificate_chain(self, node_id: int, certificate_type, crypto_profile):
+        certificate_segments = []
+        next_segment_id = None
+        total_document_size = None
+
+        while True:
+            request = Clusters.OperationalCredentials.Commands.CertificateChainRequest(
+                certificateType=certificate_type,
+                cryptoProfile=crypto_profile,
+                segmentID=next_segment_id,
+                maxSegmentSize=_CERTIFICATE_CHAIN_REQUEST_MAX_SEGMENT_SIZE if crypto_profile is not None else None,
+            )
+            response = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, request)
+
+            certificate_segments.append(response.certificate)
+            assembled_size = sum(len(segment) for segment in certificate_segments)
+
+            if response.totalDocumentSize is None:
+                if response.nextSegmentID is not None:
+                    raise commissioning.CommissionFailure(
+                        "CertificateChainResponse included nextSegmentID without totalDocumentSize")
+                if assembled_size > _MAX_CERTIFICATE_CHAIN_DOCUMENT_SIZE:
+                    raise commissioning.CommissionFailure("CertificateChainResponse exceeded the maximum supported document size")
+                return b"".join(certificate_segments)
+
+            if total_document_size is None:
+                total_document_size = response.totalDocumentSize
+            elif total_document_size != response.totalDocumentSize:
+                raise commissioning.CommissionFailure("CertificateChainResponse changed totalDocumentSize across segments")
+
+            if total_document_size > _MAX_CERTIFICATE_CHAIN_DOCUMENT_SIZE:
+                raise commissioning.CommissionFailure("CertificateChainResponse advertised an unsupported total document size")
+            if assembled_size > total_document_size:
+                raise commissioning.CommissionFailure("CertificateChainResponse exceeded the advertised total document size")
+
+            if response.nextSegmentID is None:
+                if assembled_size != total_document_size:
+                    raise commissioning.CommissionFailure(
+                        "CertificateChainResponse ended before the advertised total document size was received")
+                return b"".join(certificate_segments)
+
+            next_segment_id = response.nextSegmentID
+
+    def _attestation_profile_name(self, crypto_profile) -> str:
+        if crypto_profile is None:
+            return "Matter legacy ECDSA/P256"
+        return crypto_profile.name
 
     async def arm_failsafe(self, node_id: int, duration_seconds: int = 180):
         response = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Commands.ArmFailSafe(
@@ -43,9 +158,18 @@ class CommissioningFlowBlocks:
 
     async def operational_credentials_commissioning(self, parameter: commissioning.Parameters, node_id: int):
         self._logger.info("Getting Remote Device Info")
-        device_info = (await self._devCtrl.ReadAttribute(node_id, [
+        attributes = await self._devCtrl.ReadAttribute(node_id, [
             (commissioning.ROOT_ENDPOINT_ID, Clusters.BasicInformation.Attributes.VendorID),
-            (commissioning.ROOT_ENDPOINT_ID, Clusters.BasicInformation.Attributes.ProductID)], returnClusterObject=True))[commissioning.ROOT_ENDPOINT_ID][Clusters.BasicInformation]
+            (commissioning.ROOT_ENDPOINT_ID, Clusters.BasicInformation.Attributes.ProductID),
+            (commissioning.ROOT_ENDPOINT_ID, Clusters.OperationalCredentials),
+        ], returnClusterObject=True)
+        device_info = attributes[commissioning.ROOT_ENDPOINT_ID][Clusters.BasicInformation]
+        operational_credentials = attributes[commissioning.ROOT_ENDPOINT_ID][Clusters.OperationalCredentials]
+        attestation_request_profiles = self._select_attestation_certificate_request_profiles(operational_credentials)
+        self._logger.info("Using PAI attestation certificate request profile: %s",
+                          self._attestation_profile_name(attestation_request_profiles.pai))
+        self._logger.info("Using DAC attestation certificate request profile: %s",
+                          self._attestation_profile_name(attestation_request_profiles.dac))
 
         self._logger.info("Getting AttestationNonce")
         attestation_nonce = await self._credential_provider.get_attestation_nonce()
@@ -64,17 +188,19 @@ class CommissioningFlowBlocks:
         self._logger.info("Getting CertificateChain - DAC")
         # Failures are exceptions
         try:
-            dac = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.OperationalCredentials.Commands.CertificateChainRequest(
-                certificateType=1
-            ))
+            dac = await self._request_certificate_chain(
+                node_id,
+                Clusters.OperationalCredentials.Enums.CertificateChainTypeEnum.kDACCertificate,
+                attestation_request_profiles.dac)
         except Exception as ex:
             raise commissioning.CommissionFailure(f"Failed to get DAC: {ex}")
 
         self._logger.info("Getting CertificateChain - PAI")
         try:
-            pai = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.OperationalCredentials.Commands.CertificateChainRequest(
-                certificateType=2
-            ))
+            pai = await self._request_certificate_chain(
+                node_id,
+                Clusters.OperationalCredentials.Enums.CertificateChainTypeEnum.kPAICertificate,
+                attestation_request_profiles.pai)
         except Exception as ex:
             raise commissioning.CommissionFailure(f"Failed to get PAI: {ex}")
 
