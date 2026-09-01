@@ -663,12 +663,18 @@ class IDMBaseTest(BasicCompositionTests):
         """
         datatype = attr_info.datatype.lower()
 
-        # String constraints
+        # String constraints. An octstr must be written as bytes; a str would either
+        # fail to encode or be encoded as a character string of the wrong type.
         if 'string' in datatype or 'octstr' in datatype:
+            def make(length: int) -> str | bytes:
+                if 'octstr' in datatype:
+                    return b'\x00' * length
+                return 'x' * length
+
             if constraints.max_length is not None:
-                return 'x' * (constraints.max_length + 1)
+                return make(constraints.max_length + 1)
             if constraints.min_length is not None and constraints.min_length > 0:
-                return 'x' * (constraints.min_length - 1)
+                return make(constraints.min_length - 1)
             return None
 
         # List constraints. Over-max_count violations are not generated: they would
@@ -797,7 +803,9 @@ class IDMBaseTest(BasicCompositionTests):
         # A non-timed write to a timed-write attribute is answered with
         # NEEDS_TIMED_INTERACTION before the value is ever range-checked, which would
         # report every such attribute as failing to return CONSTRAINT_ERROR.
-        timed_request_timeout_ms = 65535 if attr_info.attribute.must_use_timed_write else None
+        timed_request_timeout_ms = None
+        if attr_info.attribute.must_use_timed_write:
+            timed_request_timeout_ms = 65535
 
         # Attempt to write violating value
         attr_obj = attr_info.attribute(test_value)
