@@ -343,8 +343,10 @@ sequenceDiagram
     -   Decodes TLV fields.
     -   Calls `mCluster.SetOnOff(true)` on target cluster instance.
 
-> [!NOTE] > **Thread Safety & Stack Synchronization**: The POSIX named pipe
-> listener runs on a background worker thread. When a command is received,
+> [!NOTE]
+>
+> **Thread Safety & Stack Synchronization**: The POSIX named pipe listener runs
+> on a background worker thread. When a command is received,
 > `PosixNamedPipeDispatcher` synchronizes execution onto the Matter event loop
 > via `chip::DeviceLayer::PlatformMgr().ScheduleWork(...)` or acquires
 > `chip::DeviceLayer::PlatformMgr().LockChipStack()` before invoking
