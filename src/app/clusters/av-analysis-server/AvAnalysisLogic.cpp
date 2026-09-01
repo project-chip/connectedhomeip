@@ -606,9 +606,19 @@ AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, con
     //
     if (!commandData.contextTriggers.IsNull())
     {
-        // Loop over the provided context triggers
-        auto iter = commandData.contextTriggers.Value().begin();
+        // A trigger that survived validation, held until every trigger in the list has been
+        // validated: each validation failure ends processing with no other side-effects, so
+        // nothing may be applied until the whole list has passed.
+        struct ValidatedTrigger
+        {
+            Globals::Structs::SemanticTagStruct::Type context;
+            DataModel::Nullable<std::vector<uint16_t>> zoneIDs;
+        };
+        std::vector<ValidatedTrigger> validatedTriggers;
 
+        // First pass: validate every provided trigger, applying nothing
+        //
+        auto iter = commandData.contextTriggers.Value().begin();
         while (iter.Next())
         {
             Structs::ContextTriggerStruct::DecodableType contextTrigger = iter.GetValue();
@@ -626,8 +636,7 @@ AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, con
             // The trigger context is valid, now check the ZoneIDs, which can only be present of PERZONEDETECT is set, likewise,
             // if we have the feature, then ZoneIDs have to be present (note, they could be Null)
             //
-            bool hasZoneIDs        = contextTrigger.zoneIDs.HasValue();
-            bool hasNonNullZoneIDs = false;
+            bool hasZoneIDs = contextTrigger.zoneIDs.HasValue();
 
             if ((hasZoneIDs && !HasFeature(AvAnalysis::Feature::kPerZoneContextDetection)) ||
                 (!hasZoneIDs && HasFeature(AvAnalysis::Feature::kPerZoneContextDetection)))
@@ -635,10 +644,8 @@ AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, con
                 return Status::InvalidCommand;
             }
 
-            // Get the ZoneIDs, if present, into a format that can be used, that is convert the DecodableList to a List
-            //
-            std::vector<uint16_t> zoneIDs;
-            size_t size;
+            ValidatedTrigger validated;
+            validated.context = contextTrigger.context;
 
             if (hasZoneIDs)
             {
@@ -647,8 +654,11 @@ AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, con
                 //
                 if (!contextTrigger.zoneIDs.Value().IsNull())
                 {
+                    size_t size;
                     CHIP_ERROR err = contextTrigger.zoneIDs.Value().Value().ComputeSize(&size);
                     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
+
+                    std::vector<uint16_t> zoneIDs;
                     zoneIDs.reserve(size);
 
                     auto zone_iter = contextTrigger.zoneIDs.Value().Value().begin();
@@ -659,21 +669,36 @@ AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, con
                     }
                     err = mDelegate->VerifyZoneIDsAreValid(zoneIDs);
                     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::NotFound);
-                    hasNonNullZoneIDs = true;
+                    validated.zoneIDs.SetNonNull(std::move(zoneIDs));
                 }
             }
 
-            // Check with the delegate that additional contexts can be added
-            //
-            VerifyOrReturnError(mDelegate->CanAddContextTriggers(), Status::ResourceExhausted);
+            validatedTriggers.push_back(std::move(validated));
+        }
+
+        // Check with the delegate that additional contexts can be added
+        //
+        VerifyOrReturnError(mDelegate->CanAddContextTriggers(), Status::ResourceExhausted);
+
+        // Second pass: apply the validated triggers. Duplicate entries within the provided list are ignored
+        //
+        for (auto trigger = validatedTriggers.begin(); trigger != validatedTriggers.end(); ++trigger)
+        {
+            bool isDuplicate = std::any_of(validatedTriggers.begin(), trigger, [&trigger](const ValidatedTrigger & earlier) {
+                return earlier.context.namespaceID == trigger->context.namespaceID && earlier.context.tag == trigger->context.tag;
+            });
+            if (isDuplicate)
+            {
+                continue;
+            }
 
             // Update our active trigger set with this new context.
             // If the context exists, update the zone IDs, otherwise add a new entry
             //
             auto it2 = std::find_if(mActiveAmbientContextTriggers.begin(), mActiveAmbientContextTriggers.end(),
-                                    [&contextTrigger](AvAnalysis::AmbientContextStorage acs) {
-                                        return acs.GetContext().namespaceID == contextTrigger.context.namespaceID &&
-                                            acs.GetContext().tag == contextTrigger.context.tag;
+                                    [&trigger](AvAnalysis::AmbientContextStorage acs) {
+                                        return acs.GetContext().namespaceID == trigger->context.namespaceID &&
+                                            acs.GetContext().tag == trigger->context.tag;
                                     });
 
             // Does an entry with this context already exist?
@@ -683,19 +708,12 @@ AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, con
                 // No existing context, so just add this new one to the end
                 //
                 AvAnalysis::AmbientContextStorage newContextTrigger;
-                newContextTrigger.SetContext(contextTrigger.context);
+                newContextTrigger.SetContext(trigger->context);
 
                 // if we have Per Zone Sensitivity, then we have ZoneIDs (which could be null), add those, this is empty otherwise
                 if (HasFeature(AvAnalysis::Feature::kPerZoneContextDetection))
                 {
-                    if (!hasNonNullZoneIDs)
-                    {
-                        newContextTrigger.SetZoneIDs(chip::MakeOptional(DataModel::NullNullable));
-                    }
-                    else
-                    {
-                        newContextTrigger.SetZoneIDs(chip::MakeOptional(DataModel::MakeNullable(zoneIDs)));
-                    }
+                    newContextTrigger.SetZoneIDs(chip::MakeOptional(trigger->zoneIDs));
                 }
                 mActiveAmbientContextTriggers.push_back(newContextTrigger);
             }
@@ -705,14 +723,7 @@ AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, con
                 //
                 if (HasFeature(AvAnalysis::Feature::kPerZoneContextDetection))
                 {
-                    if (hasNonNullZoneIDs)
-                    {
-                        it2->SetZoneIDs(chip::MakeOptional(DataModel::MakeNullable(zoneIDs)));
-                    }
-                    else
-                    {
-                        it2->SetZoneIDs(chip::MakeOptional(DataModel::NullNullable));
-                    }
+                    it2->SetZoneIDs(chip::MakeOptional(trigger->zoneIDs));
                 }
             }
         }

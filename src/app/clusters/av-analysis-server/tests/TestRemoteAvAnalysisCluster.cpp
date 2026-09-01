@@ -124,29 +124,37 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
 
     void TearDown() override { mServer.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
-    // Encodes a one-entry ContextTriggers list into aTlvBuffer and returns it as the nullable
-    // decodable list the command payload carries.
-    DataModel::Nullable<DataModel::DecodableList<Structs::ContextTriggerStruct::DecodableType>>
-    EncodeContextTriggers(const Descriptor::Structs::SemanticTagStruct::Type & aContext,
-                          const DataModel::Nullable<std::vector<uint16_t>> & aZones, uint8_t * aTlvBuffer, size_t aTlvBufferSize)
+    // One entry of a ContextTriggers command list, in an encodable-friendly shape
+    struct TestTrigger
     {
-        Structs::ContextTriggerStruct::Type trigger;
-        trigger.context = aContext;
-        if (aZones.IsNull())
-        {
-            trigger.zoneIDs = MakeOptional(DataModel::NullNullable);
-        }
-        else
-        {
-            trigger.zoneIDs = MakeOptional(
-                DataModel::MakeNullable(DataModel::List<const uint16_t>(aZones.Value().data(), aZones.Value().size())));
-        }
+        Descriptor::Structs::SemanticTagStruct::Type context;
+        DataModel::Nullable<std::vector<uint16_t>> zones;
+    };
 
+    // Encodes a ContextTriggers list into aTlvBuffer and returns it as the nullable decodable
+    // list the command payload carries. aTlvBuffer must outlive the returned list.
+    DataModel::Nullable<DataModel::DecodableList<Structs::ContextTriggerStruct::DecodableType>>
+    EncodeContextTriggers(const std::vector<TestTrigger> & aTriggers, uint8_t * aTlvBuffer, size_t aTlvBufferSize)
+    {
         TLV::TLVWriter writer;
         writer.Init(aTlvBuffer, static_cast<uint32_t>(aTlvBufferSize));
         TLV::TLVType arrayType;
         EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
-        EXPECT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), trigger), CHIP_NO_ERROR);
+        for (const TestTrigger & spec : aTriggers)
+        {
+            Structs::ContextTriggerStruct::Type trigger;
+            trigger.context = spec.context;
+            if (spec.zones.IsNull())
+            {
+                trigger.zoneIDs = MakeOptional(DataModel::NullNullable);
+            }
+            else
+            {
+                trigger.zoneIDs = MakeOptional(
+                    DataModel::MakeNullable(DataModel::List<const uint16_t>(spec.zones.Value().data(), spec.zones.Value().size())));
+            }
+            EXPECT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), trigger), CHIP_NO_ERROR);
+        }
         EXPECT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
 
         TLV::TLVReader reader;
@@ -155,6 +163,13 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
         DataModel::DecodableList<Structs::ContextTriggerStruct::DecodableType> decodedList;
         EXPECT_EQ(decodedList.Decode(reader), CHIP_NO_ERROR);
         return DataModel::MakeNullable(decodedList);
+    }
+
+    DataModel::Nullable<DataModel::DecodableList<Structs::ContextTriggerStruct::DecodableType>>
+    EncodeContextTriggers(const Descriptor::Structs::SemanticTagStruct::Type & aContext,
+                          const DataModel::Nullable<std::vector<uint16_t>> & aZones, uint8_t * aTlvBuffer, size_t aTlvBufferSize)
+    {
+        return EncodeContextTriggers(std::vector<TestTrigger>{ { aContext, aZones } }, aTlvBuffer, aTlvBufferSize);
     }
 
     // Sends EstablishAnalysisStream for the given camera node and completes the camera allocation
@@ -297,6 +312,77 @@ TEST_F(TestRemoteAvAnalysisCluster, EnableContextTriggersRejectsAnUnsupportedCon
     auto response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, path, commandData);
     ASSERT_TRUE(response.has_value());
     ASSERT_EQ(response.value().GetStatusCode().GetStatus(), Status::ConstraintError);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, EnableContextTriggersAppliesNothingWhenAnyTriggerIsInvalid)
+{
+    Testing::MockCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, 0x1234, Status::Success, 7);
+
+    // A valid trigger followed by an unsupported one: every validation failure must end
+    // processing with no other side-effects, so the valid trigger must not be armed either.
+    Descriptor::Structs::SemanticTagStruct::Type unsupportedContext = { std::nullopt, static_cast<uint8_t>(0x4A),
+                                                                        static_cast<uint8_t>(0x02), NullOptional };
+    std::vector<TestTrigger> triggers                               = {
+        { testAmbientContexts.front(), DataModel::MakeNullable(std::vector<uint16_t>{ 1, 2 }) },
+        { unsupportedContext, DataModel::NullNullable },
+    };
+    uint8_t tlvBuffer[256];
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
+    Commands::EnableContextTriggers::DecodableType commandData;
+    commandData.contextTriggers = EncodeContextTriggers(triggers, tlvBuffer, sizeof(tlvBuffer));
+
+    auto response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, path, commandData);
+    ASSERT_TRUE(response.has_value());
+    ASSERT_EQ(response.value().GetStatusCode().GetStatus(), Status::ConstraintError);
+
+    Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType active;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, active), CHIP_NO_ERROR);
+    size_t count = 1;
+    ASSERT_EQ(active.ComputeSize(&count), CHIP_NO_ERROR);
+    ASSERT_EQ(count, 0u);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, EnableContextTriggersIgnoresDuplicateEntries)
+{
+    Testing::MockCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, 0x1234, Status::Success, 7);
+
+    // The same context twice with different zones: duplicates are ignored, the first wins
+    std::vector<TestTrigger> triggers = {
+        { testAmbientContexts.front(), DataModel::MakeNullable(std::vector<uint16_t>{ 1, 2 }) },
+        { testAmbientContexts.front(), DataModel::MakeNullable(std::vector<uint16_t>{ 3 }) },
+    };
+    uint8_t tlvBuffer[256];
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
+    Commands::EnableContextTriggers::DecodableType commandData;
+    commandData.contextTriggers = EncodeContextTriggers(triggers, tlvBuffer, sizeof(tlvBuffer));
+
+    auto response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, path, commandData);
+    ASSERT_TRUE(response.has_value());
+    ASSERT_TRUE(response.value().IsSuccess());
+
+    // Exactly one entry, carrying the first occurrence's zone list
+    Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType active;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, active), CHIP_NO_ERROR);
+    auto iter = active.begin();
+    ASSERT_TRUE(iter.Next());
+    ASSERT_TRUE(iter.GetValue().zoneIDs.HasValue());
+    ASSERT_FALSE(iter.GetValue().zoneIDs.Value().IsNull());
+    std::vector<uint16_t> readZones;
+    auto zoneIter = iter.GetValue().zoneIDs.Value().Value().begin();
+    while (zoneIter.Next())
+    {
+        readZones.push_back(zoneIter.GetValue());
+    }
+    ASSERT_EQ(readZones, (std::vector<uint16_t>{ 1, 2 }));
+    ASSERT_FALSE(iter.Next());
 }
 
 TEST_F(TestRemoteAvAnalysisCluster, ReadAllAttributesWithClusterTesterTest)
