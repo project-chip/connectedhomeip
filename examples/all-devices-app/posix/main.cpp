@@ -54,8 +54,8 @@
 #include <system/SystemLayer.h>
 
 #include <AppCommandDelegate.h>
-#include <ClusterRegistryTypes.h>
 #include <BleInit.h>
+#include <ClusterRegistryTypes.h>
 #include <TermHandling.h>
 #if PW_RPC_ENABLED
 #include <Rpc.h>
