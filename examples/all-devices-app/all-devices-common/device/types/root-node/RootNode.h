@@ -36,6 +36,10 @@
 #include <lib/support/TimerDelegate.h>
 #include <platform/DiagnosticDataProvider.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#include <clusters/OtaSoftwareUpdateProvider/ClusterId.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+
 namespace chip {
 namespace app {
 
@@ -69,7 +73,7 @@ public:
     };
 
     RootNode(const Context & context) :
-        SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRootNode, 1)), mContext(context)
+        SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(kDeviceTypes)), mContext(context)
     {}
     ~RootNode() override = default;
 
@@ -78,12 +82,22 @@ public:
 
     Clusters::BasicInformationCluster & BasicInformation() { return mBasicInformationCluster.Cluster(); }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+
 protected:
     Context mContext;
 
     LazyRegisteredServerCluster<Clusters::GeneralCommissioningCluster> mGeneralCommissioningCluster;
 
 private:
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    static constexpr DataModel::DeviceTypeEntry kDeviceTypes[] = { Device::Type::kRootNode, Device::Type::kOtaRequestor };
+#else
+    static constexpr DataModel::DeviceTypeEntry kDeviceTypes[] = { Device::Type::kRootNode };
+#endif // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+
     LazyRegisteredServerCluster<Clusters::BasicInformationCluster> mBasicInformationCluster;
     LazyRegisteredServerCluster<Clusters::AdministratorCommissioningWithBasicCommissioningWindowCluster>
         mAdministratorCommissioningCluster;

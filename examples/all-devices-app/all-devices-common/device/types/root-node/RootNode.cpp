@@ -32,6 +32,14 @@ using namespace chip::DeviceLayer;
 namespace chip {
 namespace app {
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+CHIP_ERROR RootNode::ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const
+{
+    static constexpr ClusterId kClientClusters[] = { OtaSoftwareUpdateProvider::Id };
+    return out.ReferenceExisting(Span<const ClusterId>(kClientClusters));
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+
 CHIP_ERROR RootNode::Register(EndpointId endpointId, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
     composition.pattern = DataModel::EndpointCompositionPattern::kFullFamily;

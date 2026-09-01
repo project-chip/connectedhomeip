@@ -38,6 +38,10 @@ source_set("root-node") {
     "${chip_root}/src/lib/support",
     "${chip_root}/zzz_generated/app-common/devices/",
   ]
+
+  if (chip_enable_ota_requestor) {
+    public_deps += [ "${chip_root}/zzz_generated/app-common/clusters/OtaSoftwareUpdateProvider:ids" ]
+  }
 }
 
 source_set("wifi") {
