@@ -56,13 +56,17 @@ log = logging.getLogger(__name__)
 
 class TC_PAVST_2_14(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
     def desc_TC_PAVST_2_14(self) -> str:
+        """Test case description."""
         return "[TC-PAVST-2.14] Validate persistence of CurrentConnections attribute - PROVISIONAL"
 
-    def pics_TC_PAVST_2_14(self):
+    def pics_TC_PAVST_2_14(self) -> list[str]:
+        """Required PICS for this test case."""
         return ["PAVST.S", "AVSM.S"]
 
     @async_test_body
-    async def setup_class(self):
+    async def setup_class(self) -> None:
+        """Set up test class resources including mock push AV server."""
+        self.tlsEndpointId: int | None = None
         th_server_app = self.user_params.get("th_server_app_path", None)
         self.server = PushAvServerProcess(server_path=th_server_app)
         self.server.start(
@@ -71,17 +75,22 @@ class TC_PAVST_2_14(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         )
         super().setup_class()
 
-    def teardown_class(self):
+    def teardown_class(self) -> None:
+        """Tear down test class resources."""
         if self.server is not None:
             self.server.terminate()
         super().teardown_class()
 
     @async_test_body
-    async def teardown_test(self):
-        await self.postcondition_remove_tls_endpoint(self.tlsEndpointId)
+    async def teardown_test(self) -> None:
+        """Clean up per-test resources."""
+        tls_endpoint_id = getattr(self, "tlsEndpointId", None)
+        if tls_endpoint_id is not None:
+            await self.postcondition_remove_tls_endpoint(tls_endpoint_id)
         super().teardown_test()
 
     def steps_TC_PAVST_2_14(self) -> list[TestStep]:
+        """Test steps definition."""
         return [
             TestStep("precondition", "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT",
@@ -109,7 +118,8 @@ class TC_PAVST_2_14(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         ]
 
     @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport))
-    async def test_TC_PAVST_2_14(self):
+    async def test_TC_PAVST_2_14(self) -> None:
+        """Run TC-PAVST-2.14 test."""
         endpoint = self.get_endpoint()
         self.endpoint = endpoint
         self.node_id = self.dut_node_id
@@ -147,19 +157,46 @@ class TC_PAVST_2_14(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
         # Step 4: Allocate push transport
         self.step(4)
-        status = await self.allocate_one_pushav_transport(
-            endpoint,
-            tlsEndPoint=self.tlsEndpointId,
-            url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
-        asserts.assert_equal(status, Status.Success, "Push AV Transport allocation failed")
+        video_stream_id = aAllocatedVideoStreams[0] if isinstance(aAllocatedVideoStreams, list) else aAllocatedVideoStreams
+        audio_stream_id = aAllocatedAudioStreams[0] if isinstance(aAllocatedAudioStreams, list) else aAllocatedAudioStreams
+        aStreamUsagePriorities = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.CameraAvStreamManagement, attribute=Clusters.CameraAvStreamManagement.Attributes.StreamUsagePriorities
+        )
+        streamUsage = aStreamUsagePriorities[0]
+
+        containerOptions = {
+            "containerType": pvcluster.Enums.ContainerFormatEnum.kCmaf,
+            "CMAFContainerOptions": {
+                "CMAFInterface": pvcluster.Enums.CMAFInterfaceEnum.kInterface1,
+                "chunkDuration": 4,
+                "segmentDuration": 4000,
+                "sessionGroup": 3,
+                "trackName": "media",
+            },
+        }
+        cmd = pvcluster.Commands.AllocatePushTransport(
+            streamUsage=streamUsage,
+            videoStreamID=video_stream_id,
+            audioStreamID=audio_stream_id,
+            TLSEndpointID=self.tlsEndpointId,
+            url=f"https://{host_ip}:1234/streams/{uploadStreamId}/",
+            triggerOptions={"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kContinuous},
+            ingestMethod=pvcluster.Enums.IngestMethodsEnum.kCMAFIngest,
+            containerOptions=containerOptions,
+            expiryTime=3600,
+        )
+        alloc_response = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+        asserts.assert_is_not_none(alloc_response.connectionID, "AllocatePushTransportResponse does not contain connectionID")
+        aConnectionID = alloc_response.connectionID
+        asserts.assert_true(aConnectionID != 0, "ConnectionID should not be 0")
 
         # Step 5: Verify Connection Active
         self.step(5)
         transport_configs = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.CurrentConnections)
         asserts.assert_equal(len(transport_configs), 1, "TransportConfigurations must be 1")
-        aConnectionID = transport_configs[0].connectionID
-        asserts.assert_true(aConnectionID != 0, "ConnectionID should not be 0")
+        asserts.assert_equal(transport_configs[0].connectionID, aConnectionID, "ConnectionID mismatch in CurrentConnections")
+        saved_transport_config = transport_configs[0]
 
         # Step 6: Reboot DUT
         self.step(6)
@@ -173,7 +210,7 @@ class TC_PAVST_2_14(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         transport_configs = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.CurrentConnections)
         asserts.assert_equal(len(transport_configs), 1, "TransportConfigurations must be 1 after reboot")
-        asserts.assert_equal(transport_configs[0].connectionID, aConnectionID, "ConnectionID mismatch after reboot")
+        asserts.assert_equal(transport_configs[0], saved_transport_config, "Persisted transport config mismatch after reboot")
 
         # Step 9: Deallocate
         self.step(9)
