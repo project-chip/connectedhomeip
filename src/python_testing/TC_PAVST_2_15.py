@@ -121,14 +121,18 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         pvcluster = Clusters.PushAvStreamTransport
         dev_ctrl = devCtrl if devCtrl is not None else self.default_controller
 
+        if not hasattr(pvcluster.Commands, "UpdateMotionZoneOptions"):
+            log.error("UpdateMotionZoneOptions command not found in SDK")
+            raise AttributeError("UpdateMotionZoneOptions command not found in SDK")
+
         args = {"connectionID": connectionID}
         if motionZones is not None:
             args["motionZones"] = motionZones
         if motionSensitivity is not None:
             args["motionSensitivity"] = motionSensitivity
 
+        cmd = pvcluster.Commands.UpdateMotionZoneOptions(**args)
         try:
-            cmd = pvcluster.Commands.UpdateMotionZoneOptions(**args)
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, dev_ctrl=dev_ctrl)
             asserts.assert_is_none(
                 expected_cluster_status,
@@ -142,10 +146,6 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                 return e.clusterStatus
             asserts.assert_equal(e.status, expected_status, "Status mismatch")
             return e.status
-        except AttributeError:
-            # Fallback/Log error if the command is indeed missing in the generated SDK
-            log.error("UpdateMotionZoneOptions command not found in SDK")
-            raise
 
     @run_if_endpoint_matches(lambda wildcard, endpoint: has_cluster(Clusters.PushAvStreamTransport)(wildcard, endpoint) and has_cluster(Clusters.ZoneManagement)(wildcard, endpoint) and has_cluster(Clusters.CameraAvStreamManagement)(wildcard, endpoint))
     async def test_TC_PAVST_2_15(self) -> None:
