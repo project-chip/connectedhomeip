@@ -46,8 +46,8 @@ The device type is expressed in **two independent places**:
 
 ### Runtime: `--device-type` (Linux)
 
-The Linux `tv-app` accepts a flag that rewrites endpoint 1's declared device
-type at boot, without a rebuild:
+The Linux `tv-app` accepts a flag that presents endpoint 1 as a different media
+device type at boot, without a rebuild:
 
 ```
 ./out/debug/chip-tv-app --device-type basic-video
@@ -59,18 +59,23 @@ type at boot, without a rebuild:
 Accepted values: `casting-video` (default), `basic-video`, `casting-audio`,
 `streaming-audio`.
 
-**What it changes:** only the Descriptor cluster `DeviceTypeList` on endpoint 1
-(via `emberAfSetDeviceTypeList`). This is enough to have the device *declare*
-itself as, and be tested as, any of the four types, because endpoint 1 already
-exposes the superset of clusters described above.
+**What it changes:**
+
+-   The **Descriptor cluster `DeviceTypeList`** on endpoint 1 (via
+    `emberAfSetDeviceTypeList`, applied in `ApplicationInit`). This is what a
+    commissioner reads to learn the device type.
+-   The **DNS-SD `_T<id>` advertising subtype** (via
+    `ConfigurationMgr().SetDeviceTypeId`, applied during argument parsing so it
+    is in place before the server starts advertising). Commissioners that filter
+    discovery by device-type subtype see the selected type. The override is not
+    persisted across reboots.
+
+Together these are enough to have the device *advertise as, declare itself as,*
+and be tested as any of the four types, because endpoint 1 already exposes the
+superset of clusters described above.
 
 **What it does NOT change (by design):**
 
--   The **DNS-SD `_T` advertising subtype** still reflects the compile-time
-    `CHIP_DEVICE_CONFIG_DEVICE_TYPE` (`0x0023`). Commissioners that filter
-    discovery by device-type subtype will still see the compiled value. Change
-    the compile constant (below) and rebuild if you need the advertisement to
-    match.
 -   The **commissioner vs. commissionable role**. The Linux `tv-app` is built as
     a combined server + commissioner (it runs the UDC/CommissionerDiscovery
     machinery and the `controller`/`app` shell commands). Selecting
@@ -80,30 +85,31 @@ exposes the superset of clusters described above.
 -   The **cluster set**. No clusters are added or removed; the endpoint keeps its
     superset.
 
-So the runtime flag is intended for exercising controllers, discovery, and
-Descriptor/`DeviceTypeList` behavior against each declared type — not for
-producing a byte-faithful build of a shipping product of that type.
+So the runtime flag is intended for exercising controllers, discovery, and the
+advertised/declared device type against each type — not for producing a
+byte-faithful build of a shipping product of that type (the cluster set and
+commissioner role are still those of the compiled Casting Video Player).
 
 ### Build time: a faithful variant
 
-For a variant that is faithful in all three respects (declared type, advertised
-type, cluster set, and role), change the data model and the compile constant and
-rebuild:
+For a variant that is also faithful in cluster set and role, change the data
+model (and, optionally, the compile-time default device type) and rebuild:
 
-1. Set `CHIP_DEVICE_CONFIG_DEVICE_TYPE` in
-   [tv-common/include/CHIPProjectAppConfig.h](tv-common/include/CHIPProjectAppConfig.h)
-   to the target device type ID so the DNS-SD advertisement matches.
-2. Edit endpoint 1's device type and trim the endpoint's clusters to the target
+1. Edit endpoint 1's device type and trim the endpoint's clusters to the target
    type's requirements in `tv-common/tv-app.zap` (open it with ZAP), then
    regenerate `tv-app.matter` and the generated code. Note that the two audio
    player types (`0x0020`, `0x0021`) are new spec additions and are not yet
    present in `src/app/zap-templates/zcl/data-model/chip/matter-devices.xml`, so
    ZAP's device-type dropdown will need those device types added there first.
-3. For a commissionable-only type (Basic Video Player, Streaming Audio Player),
+2. For a commissionable-only type (Basic Video Player, Streaming Audio Player),
    the commissioner-specific behavior would additionally need to be gated off
    (e.g. `CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE`).
+3. Optionally set `CHIP_DEVICE_CONFIG_DEVICE_TYPE` in
+   [tv-common/include/CHIPProjectAppConfig.h](tv-common/include/CHIPProjectAppConfig.h)
+   to the target device type ID, so the build advertises that type by default
+   without needing the `--device-type` flag.
 
 A cleaner long-term approach would be a build (`gn`) argument that selects among
 per-type ZAP/data-model files and the matching compile constant, mirroring how
 other examples ship multiple variants. That is not implemented today; the
-runtime flag above is the supported way to switch the declared type.
+runtime flag above is the supported way to switch the advertised/declared type.

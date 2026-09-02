@@ -34,6 +34,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/support/CHIPArgParser.hpp>
+#include <platform/ConfigurationManager.h>
 #include <protocols/Protocols.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
@@ -87,14 +88,19 @@ std::optional<MediaFileManagement::MediaFileManagementBdxCoordinator> gMediaFile
 //
 // tv-app is built as a Casting Video Player (0x0023) in tv-app.zap, but
 // endpoint 1 hosts a superset of clusters that also satisfies the mandatory set
-// of the other three media player device types. This flag rewrites endpoint 1's
-// Descriptor DeviceTypeList at boot so the app can be exercised as any of the
-// four without a rebuild. See examples/tv-app/README.md.
+// of the other three media player device types. This flag makes the app present
+// as any of the four without a rebuild by, at boot:
+//   - overriding the device type id used for DNS-SD "_T<id>" commissioning
+//     advertising (ConfigurationMgr().SetDeviceTypeId, applied during argument
+//     parsing so it is in place before the server starts advertising), and
+//   - rewriting endpoint 1's Descriptor DeviceTypeList (emberAfSetDeviceTypeList,
+//     applied in ApplicationInit once the endpoint table is populated).
+// See examples/tv-app/README.md.
 //
-// NOTE: this changes only the *declared* device type (Descriptor cluster). The
-// DNS-SD "_T<id>" commissioning subtype is derived from the compile-time
-// CHIP_DEVICE_CONFIG_DEVICE_TYPE and requires a rebuild (or the build-time
-// variant documented in the README) to change.
+// NOTE: this changes the advertised and declared device type only. The
+// commissioner role (Casting players are Commissioners) and the cluster set are
+// as compiled; the build-time variant documented in the README is the path to a
+// fully faithful data model.
 constexpr EndpointId kVideoPlayerEndpointId = 1;
 
 struct MediaDeviceTypeOption
@@ -134,6 +140,15 @@ bool TvAppOptionHandler(const char * program, chip::ArgParser::OptionSet * optio
         {
             gMediaDeviceTypeList[0]    = option.deviceType;
             gMediaDeviceTypeOverridden = true;
+            // Override the DNS-SD advertised device type now, before the server
+            // starts advertising. The Descriptor DeviceTypeList is updated later
+            // in ApplicationInit (the endpoint table does not exist yet here).
+            CHIP_ERROR err = ConfigurationMgr().SetDeviceTypeId(option.deviceType.deviceTypeId);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "%s: failed to override advertised device type: %" CHIP_ERROR_FORMAT, program,
+                             err.Format());
+            }
             ChipLogProgress(DeviceLayer, "TV Linux App: endpoint 1 device type selected: %s (0x%04X revision %u)", option.name,
                             static_cast<unsigned>(option.deviceType.deviceTypeId), option.deviceType.deviceTypeRevision);
             return true;
@@ -155,10 +170,10 @@ chip::ArgParser::OptionSet sTvAppOptions = {
     sTvAppOptionDefs,
     "TV APP OPTIONS",
     "  --device-type <casting-video|basic-video|casting-audio|streaming-audio>\n"
-    "       Declare endpoint 1 as the given media device type (Descriptor cluster\n"
-    "       DeviceTypeList). Defaults to casting-video, as built into tv-app.zap.\n"
-    "       Only the declared type changes; the DNS-SD _T advertising subtype still\n"
-    "       reflects the compile-time device type. See examples/tv-app/README.md.\n",
+    "       Present endpoint 1 as the given media device type: sets both the DNS-SD\n"
+    "       _T advertising subtype and the Descriptor cluster DeviceTypeList.\n"
+    "       Defaults to casting-video, as built into tv-app.zap. The commissioner\n"
+    "       role and cluster set are unchanged. See examples/tv-app/README.md.\n",
 };
 
 } // namespace
@@ -262,10 +277,8 @@ void ApplicationInit()
         }
         else
         {
-            ChipLogProgress(Zcl,
-                            "TV Linux App: endpoint 1 now declares device type 0x%04X. The DNS-SD _T subtype still advertises "
-                            "the compile-time device type %d; rebuild to change advertising.",
-                            static_cast<unsigned>(gMediaDeviceTypeList[0].deviceTypeId), CHIP_DEVICE_CONFIG_DEVICE_TYPE);
+            ChipLogProgress(Zcl, "TV Linux App: endpoint 1 now declares device type 0x%04X (DNS-SD _T subtype set to match).",
+                            static_cast<unsigned>(gMediaDeviceTypeList[0].deviceTypeId));
         }
     }
 }
