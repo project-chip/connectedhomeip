@@ -119,9 +119,11 @@ class TC_DGGEN_2_2(MatterBaseTest):
         # STEP 1: Commission DUT to TH (already done)
         self.step(1)
 
-        # Subscribe for GeneralDiagnostics events, used by steps 2 to 4
+        # Subscribe for GeneralDiagnostics events, used by steps 2 to 4. Inducing radio
+        # or network faults on a real DUT can drop the Matter link, so let the
+        # subscription re-establish itself.
         events_callback = EventSubscriptionHandler(expected_cluster=Clusters.GeneralDiagnostics)
-        await events_callback.start(self.default_controller, self.dut_node_id, endpoint)
+        await events_callback.start(self.default_controller, self.dut_node_id, endpoint, autoResubscribe=True)
 
         # STEP 2: DUT induces a hardware faults change, TH waits for the HardwareFaultChange event
         self.step(2)
@@ -161,8 +163,10 @@ class TC_DGGEN_2_2(MatterBaseTest):
             # proves this reboot emitted a new event.
             events_before = await self.default_controller.ReadEvent(
                 nodeId=self.dut_node_id, events=[(endpoint, events.BootReason, 0)])
+            # -1 sentinel: event numbers start at 0, so an empty pre-reboot result
+            # must not exclude a first-ever event numbered 0.
             last_event_number_before = max(
-                (e.Header.EventNumber for e in events_before), default=0)
+                (e.Header.EventNumber for e in events_before), default=-1)
 
             await self.request_device_reboot()
 
