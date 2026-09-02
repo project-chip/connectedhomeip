@@ -198,7 +198,8 @@ struct TransportTriggerOptionsStorage : public TransportTriggerOptionsStruct
     }
 
     void UpdateMotionZones(
-        const Optional<DataModel::Nullable<DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType>>> & newMotionZones)
+        const Optional<DataModel::Nullable<DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType>>> &
+            newMotionZones)
     {
         if (!newMotionZones.HasValue())
         {
@@ -558,7 +559,8 @@ struct TransportOptionsStorage : public TransportOptionsStruct
     }
 
     void UpdateMotionZones(
-        const Optional<DataModel::Nullable<DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType>>> & newMotionZones)
+        const Optional<DataModel::Nullable<DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType>>> &
+            newMotionZones)
     {
         mTriggerOptionsStorage.UpdateMotionZones(newMotionZones);
         triggerOptions = mTriggerOptionsStorage;

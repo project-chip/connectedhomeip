@@ -1586,8 +1586,7 @@ PushAvStreamTransportServerLogic::HandleFindTransport(CommandHandler & handler, 
     return std::nullopt;
 }
 
-std::optional<DataModel::ActionReturnStatus>
-PushAvStreamTransportServerLogic::HandleUpdateMotionZoneOptions(
+std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::HandleUpdateMotionZoneOptions(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const PushAvStreamTransport::Commands::UpdateMotionZoneOptions::DecodableType & commandData)
 {
@@ -1697,9 +1696,9 @@ PushAvStreamTransportServerLogic::HandleUpdateMotionZoneOptions(
             {
                 if (!mFeatures.Has(Feature::kPerZoneSensitivity))
                 {
-                    ChipLogError(Zcl,
-                                 "HandleUpdateMotionZoneOptions[ep=%d]: Zone sensitivity provided without PerZoneSensitivity feature",
-                                 mEndpointId);
+                    ChipLogError(
+                        Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Zone sensitivity provided without PerZoneSensitivity feature",
+                        mEndpointId);
                     handler.AddStatus(commandPath, Status::InvalidCommand);
                     return std::nullopt;
                 }
@@ -1707,8 +1706,7 @@ PushAvStreamTransportServerLogic::HandleUpdateMotionZoneOptions(
                 uint8_t sens = zoneOpt.sensitivity.Value();
                 if (sens < 1 || sens > 10)
                 {
-                    ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Zone sensitivity out of range: %u", mEndpointId,
-                                 sens);
+                    ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Zone sensitivity out of range: %u", mEndpointId, sens);
                     handler.AddStatus(commandPath, Status::ConstraintError);
                     return std::nullopt;
                 }

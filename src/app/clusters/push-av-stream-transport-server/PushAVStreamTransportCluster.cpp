@@ -42,7 +42,7 @@ namespace {
 using namespace chip::app::Clusters::PushAvStreamTransport::Commands;
 
 constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
-    AllocatePushTransport::kMetadataEntry,   DeallocatePushTransport::kMetadataEntry, ModifyPushTransport::kMetadataEntry,
+    AllocatePushTransport::kMetadataEntry,   DeallocatePushTransport::kMetadataEntry,  ModifyPushTransport::kMetadataEntry,
     SetTransportStatus::kMetadataEntry,      ManuallyTriggerTransport::kMetadataEntry, FindTransport::kMetadataEntry,
     UpdateMotionZoneOptions::kMetadataEntry,
 };
