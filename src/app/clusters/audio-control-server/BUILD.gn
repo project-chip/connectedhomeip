@@ -27,3 +27,19 @@ source_set("audio-control-server") {
     "${chip_root}/zzz_generated/app-common/clusters/AudioControl",
   ]
 }
+
+# Opt-in helper that keeps OnOff, LevelControl and AudioControl in sync on a Speaker endpoint.
+# Split out from the base target above so that applications using AudioControl without
+# LevelControl/OnOff (e.g. a device with no dimmable level) don't pull those clusters in.
+source_set("speaker-audio-coordinator") {
+  sources = [
+    "SpeakerAudioCoordinator.cpp",
+    "SpeakerAudioCoordinator.h",
+  ]
+
+  public_deps = [
+    ":audio-control-server",
+    "${chip_root}/src/app/clusters/level-control",
+    "${chip_root}/src/app/clusters/on-off-server",
+  ]
+}

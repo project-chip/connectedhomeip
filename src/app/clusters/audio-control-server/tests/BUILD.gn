@@ -18,11 +18,18 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libTestAudioControlCluster"
 
-  test_sources = [ "TestAudioControlCluster.cpp" ]
+  test_sources = [
+    "TestAudioControlCluster.cpp",
+    "TestSpeakerAudioCoordinator.cpp",
+  ]
 
   public_deps = [
     "${chip_root}/src/app/clusters/audio-control-server",
+    "${chip_root}/src/app/clusters/audio-control-server:speaker-audio-coordinator",
+    "${chip_root}/src/app/clusters/level-control",
+    "${chip_root}/src/app/clusters/on-off-server",
     "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:timer-delegate-mock",
   ]
 }

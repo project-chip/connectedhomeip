@@ -554,6 +554,12 @@ CHIP_ERROR LevelControlCluster::SetDefaultMoveRate(DataModel::Nullable<uint8_t> 
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR LevelControlCluster::ForceCurrentLevel(uint8_t level)
+{
+    mTransitionHandler.StopTransition();
+    return SetCurrentLevel(level, ReportingMode::kForceReport);
+}
+
 CHIP_ERROR LevelControlCluster::SetCurrentLevel(uint8_t level, ReportingMode reportingMode)
 {
     VerifyOrReturnError(IsValidLevel(level), CHIP_IM_GLOBAL_STATUS(ConstraintError));
@@ -635,6 +641,25 @@ CHIP_ERROR LevelControlCluster::SetOnOff(bool on)
     CHIP_ERROR err                   = mOnOffCluster->SetOnOff(on);
     mTemporarilyIgnoreOnOffCallbacks = false;
     return err;
+}
+
+CHIP_ERROR LevelControlCluster::ForceOnOff(bool on)
+{
+    VerifyOrReturnError(mFeatureMap.Has(Feature::kOnOff), CHIP_NO_ERROR);
+    VerifyOrReturnError(on != GetOnOff(), CHIP_NO_ERROR);
+
+    mTransitionHandler.StopTransition();
+
+    // Prevent potential callback loops
+    mTemporarilyIgnoreOnOffCallbacks = true;
+    CHIP_ERROR err                   = mOnOffCluster->SetOnOff(on);
+    mTemporarilyIgnoreOnOffCallbacks = false;
+    return err;
+}
+
+void LevelControlCluster::SetLevelBeforeTurnedOff(uint8_t level)
+{
+    mLevelBeforeTurnedOff.SetNonNull(level);
 }
 
 bool LevelControlCluster::GetOnOff()
