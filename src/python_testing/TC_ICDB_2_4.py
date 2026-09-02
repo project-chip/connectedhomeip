@@ -88,6 +88,10 @@ ONE_HOUR_S = 3600
 
 class TC_ICDB_2_4(MatterTestCommissioner, ICDBaseTest):
 
+    # ICD state machine transitions between subscribed and check-in states are validated
+    # explicitly; background wildcard subscription interferes with quiet-device assertions.
+    disable_wildcard_subscription = True
+
     # DUT can take more than one cycle to detect a dropped subscriber and resume check-ins, default_timeout
     # is raised to accommodate that (can be overridden by a --timeout on the command line)
     @property

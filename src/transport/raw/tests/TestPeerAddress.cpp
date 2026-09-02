@@ -99,6 +99,11 @@ TEST(TestPeerAddress, TestToString)
         udp.ToString(buff);
         EXPECT_STREQ(buff, "UDP:[::]:5840");
     }
+
+    {
+        PeerAddress::Proxy(42).ToString(buff);
+        EXPECT_STREQ(buff, "PROXY:42");
+    }
 }
 
 TEST(TestPeerAddress, TestEqualityOperator)
@@ -164,6 +169,24 @@ TEST(TestPeerAddress, TestEqualityOperator)
     EXPECT_FALSE(nfc1 == udp1);
     EXPECT_FALSE(nfc1 == tcp1);
     EXPECT_FALSE(udp1 == wifi1);
+
+    // 11. Proxy transport with same session id -> equal, different session id -> not equal
+    PeerAddress proxy1 = PeerAddress::Proxy(7);
+    PeerAddress proxy2 = PeerAddress::Proxy(7);
+    PeerAddress proxy3 = PeerAddress::Proxy(8);
+    EXPECT_EQ(proxy1.GetTransportType(), Type::kProxy);
+    EXPECT_EQ(proxy1.GetProxySessionId(), static_cast<uint16_t>(7));
+    EXPECT_TRUE(proxy1 == proxy2);
+    EXPECT_FALSE(proxy1 == proxy3);
+
+    // 12. Proxy is a distinct transport type: kProxy shares mId.mRemoteId and the same
+    //     operator== branch as kWiFiPAF, so only the type check separates them.  The last
+    //     comparison uses the same remote id as proxy1, so it fails if that check is lost.
+    EXPECT_FALSE(proxy1 == udp1);
+    EXPECT_FALSE(proxy1 == ble1);
+    EXPECT_FALSE(proxy1 == nfc1);
+    EXPECT_FALSE(proxy1 == wifi1);
+    EXPECT_FALSE(proxy1 == PeerAddress::WiFiPAF(7));
 }
 
 } // namespace

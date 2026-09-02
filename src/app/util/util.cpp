@@ -140,7 +140,6 @@ void MatterElectricalPowerMeasurementPluginServerInitCallback() {}
 void MatterServiceAreaPluginServerInitCallback() {}
 void MatterWaterHeaterManagementPluginServerInitCallback() {}
 void MatterWaterHeaterModePluginServerInitCallback() {}
-void MatterCommodityPricePluginServerInitCallback() {}
 void MatterCommodityTariffPluginServerInitCallback() {}
 void MatterElectricalGridConditionsPluginServerInitCallback() {}
 void MatterElectricalProtectionAlarmPluginServerInitCallback() {}

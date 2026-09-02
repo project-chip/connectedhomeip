@@ -536,6 +536,13 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         return CommissioningStage::kFindOperationalForStayActive;
 #endif
     case CommissioningStage::kPrimaryOperationalNetworkFailed:
+        if (!mWroteNetworkConfig)
+        {
+            // We never got as far as writing a network configuration for the primary network,
+            // so there is nothing on the commissionee to remove. Note that TrySecondaryNetwork()
+            // has already been called by the time we get here, so this selects the secondary network.
+            return GetNextCommissioningStageNetworkSetup(currentStage, lastErr);
+        }
         if (mDeviceCommissioningInfo.network.wifi.endpoint == kRootEndpointId)
         {
             return CommissioningStage::kRemoveWiFiNetworkConfig;
@@ -661,6 +668,16 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     mNeedsNetworkSetup = mNeedsNetworkSetup || (transportType == Transport::Type::kWiFiPAF);
 #endif
+    // For proxy transport, the commissioner tunnels commissioning packets to the
+    // end device via the Commissioning Proxy cluster.  The end device still needs
+    // WiFi/Thread credentials, so run network-setup stages when any credentials
+    // were provided.  Without credentials the stages are skipped rather than
+    // requested: kRequestWiFiCredentials leads to kNeedsNetworkCreds, which waits
+    // for DevicePairingDelegate::NetworkCredentialsReady(), and the proxy
+    // commissioning path has no delegate wired up to supply them.
+    mNeedsNetworkSetup = mNeedsNetworkSetup ||
+        (transportType == Transport::Type::kProxy &&
+         (mParams.GetWiFiCredentials().HasValue() || mParams.GetThreadOperationalDataset().HasValue()));
     CHIP_ERROR err               = CHIP_NO_ERROR;
     CommissioningStage nextStage = GetNextCommissioningStage(commissioner->GetCommissioningStage(), err);
 
@@ -766,6 +783,7 @@ void AutoCommissioner::CleanupCommissioning()
     mCommissioneeDeviceProxy = nullptr;
     mOperationalDeviceProxy  = OperationalDeviceProxy();
     mDeviceCommissioningInfo = ReadCommissioningInfo();
+    mWroteNetworkConfig      = false;
     mNeedsDST                = false;
     mNeedsNetworkSetup       = false;
     mNeedIcdRegistration     = false;
@@ -832,6 +850,9 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             // TODO: This doesn't actually work, because in order to provide credentials someone
             // had to SetWiFiCredentials() or SetThreadOperationalDataset() on our params, so
             // IsScanNeeded() will no longer test true for that network technology.
+            //
+            // TODO: A retry also has to remove the configuration we just wrote before writing
+            // another one, (unless it is for the same NetworkID).
             if (IsScanNeeded())
             {
                 if (completionStatus.err == CHIP_NO_ERROR)
@@ -1001,6 +1022,14 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             break;
         case CommissioningStage::kICDRegistration:
             // Noting to do. DevicePairingDelegate will handle this.
+            break;
+        case CommissioningStage::kWiFiNetworkSetup:
+        case CommissioningStage::kThreadNetworkSetup:
+            mWroteNetworkConfig = true;
+            break;
+        case CommissioningStage::kRemoveWiFiNetworkConfig:
+        case CommissioningStage::kRemoveThreadNetworkConfig:
+            mWroteNetworkConfig = false;
             break;
         case CommissioningStage::kFindOperationalForStayActive:
         case CommissioningStage::kFindOperationalForCommissioningComplete:

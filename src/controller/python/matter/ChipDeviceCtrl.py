@@ -1759,7 +1759,8 @@ class ChipDeviceControllerBase:
                                         timedRequestTimeoutMs: int | None = None,
                                         interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
                                         suppressResponse: bool = False, remoteMaxPathsPerInvoke: int | None = None,
-                                        suppressTimedRequestMessage: bool = False, commandRefsOverride: list[int] | None = None):
+                                        suppressTimedRequestMessage: bool = False, commandRefsOverride: list[int] | None = None,
+                                        delayReportData: ClusterCommand.DelayReportData | None = None):
         '''
         Please see SendBatchCommands for description.
         TestOnly overridable arguments:
@@ -1782,7 +1783,7 @@ class ChipDeviceControllerBase:
             timedRequestTimeoutMs=timedRequestTimeoutMs,
             interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse,
             remoteMaxPathsPerInvoke=remoteMaxPathsPerInvoke, suppressTimedRequestMessage=suppressTimedRequestMessage,
-            commandRefsOverride=commandRefsOverride).raise_on_error()
+            commandRefsOverride=commandRefsOverride, delayReportData=delayReportData).raise_on_error()
 
         if suppressResponse:
             return None
@@ -1885,7 +1886,8 @@ class ChipDeviceControllerBase:
                           timedRequestTimeoutMs: int | None = None,
                           interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
                           suppressResponse: bool = False,
-                          payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
+                          payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD,
+                          delayReportData: ClusterCommand.DelayReportData | None = None):
         '''
         Send a cluster-object encapsulated command to a node and get returned a future that can be awaited upon to receive
         the response. If a valid responseType is passed in, that will be used to de-serialize the object. If not,
@@ -1894,6 +1896,7 @@ class ChipDeviceControllerBase:
         timedWriteTimeoutMs: Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
         interactionTimeoutMs: Overall timeout for the interaction. Omit or set to 'None' to have the SDK automatically compute the
                               right timeout value based on transport characteristics as well as the responsiveness of the target.
+        delayReportData: Optional DelayReportData specifying min delay and jitter window for report suppression during invoke.
 
         Returns:
             command response or None. The type of the response is defined by the command.
@@ -1916,7 +1919,8 @@ class ChipDeviceControllerBase:
                     ClusterId=payload.cluster_id,
                     CommandId=payload.command_id,
                 ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs,
-                interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse, allowLargePayload=allow_large_payload)
+                interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse,
+                allowLargePayload=allow_large_payload, delayReportData=delayReportData)
             res.raise_on_error()
 
             if suppressResponse:
@@ -1930,7 +1934,8 @@ class ChipDeviceControllerBase:
                                 timedRequestTimeoutMs: int | None = None,
                                 interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
                                 suppressResponse: bool = False,
-                                payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
+                                payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD,
+                                delayReportData: ClusterCommand.DelayReportData | None = None):
         '''
         Send a batch of cluster-object encapsulated commands to a node and get returned a future that can be awaited upon to receive
         the responses. If a valid responseType is passed in, that will be used to de-serialize the object. If not,
@@ -1943,6 +1948,7 @@ class ChipDeviceControllerBase:
                               right timeout value based on transport characteristics as well as the responsiveness of the target.
         busyWaitMs: How long to wait in ms after sending command to device before performing any other operations.
         suppressResponse: Do not send a response to this action
+        delayReportData: Optional DelayReportData specifying min delay and jitter window for report suppression during invoke.
 
         Returns:
             - None if suppressResponse is True. Otherwise, a list of command responses in the same order as what was given in `commands`. The type of the response is defined by the command.
@@ -1963,7 +1969,8 @@ class ChipDeviceControllerBase:
             res = await ClusterCommand.SendBatchCommands(
                 future, eventLoop, device.deviceProxy, commands,
                 timedRequestTimeoutMs=timedRequestTimeoutMs,
-                interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse)
+                interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse,
+                delayReportData=delayReportData)
             res.raise_on_error()
             if suppressResponse:
                 return None

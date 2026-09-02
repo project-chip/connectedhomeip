@@ -114,7 +114,7 @@ class SmokeCoBaseTest(MatterTestCommissionedDevice):
     async def read_attribute_check_range(self, attribute, enum):
         """Reads an attribute from the SmokeCluster and validate against a range."""
         attr = await self.read_smokeco_attribute_expect_success(attribute=attribute)
-        is_valid = any(attr == item.value and str(item.name).lower() != "unknown" for item in enum)
+        is_valid = any(attr == item.value for item in enum if item is not enum.kUnknownEnumValue)
         asserts.assert_true(is_valid, f"Value {attr} is not in the range for the Enum {enum}")
 
     async def read_attribute_check_bool(self, attribute):

@@ -414,6 +414,38 @@ Incoming PAF messages are routed back to the cluster via a
 matches the peer against the active session map, and calls
 `host->Sessions().DispatchMessageResponse()`.
 
+## Driving the Proxy from a Commissioner
+
+Everything above is the proxy side. The commissioner side is `chip-tool`, which
+implements the tunnel as a pairing mode: `pairing proxy` establishes a CASE
+session to the proxy, sends `ProxyConnectRequest`, then carries every PASE and
+commissioning packet to the commissionee inside `ProxyMessageRequest` and
+`ProxyMessageResponse`.
+
+The proxy must already be commissioned onto the fabric, since the commissioner
+needs a CASE session before it can tunnel anything:
+
+```bash
+chip-tool pairing onnetwork <proxy-node-id> 20202021
+
+chip-tool commissioningproxy proxy-scan-request 0x0A <proxy-node-id> <endpoint> \
+    --WiFiBands 0x01 --allow-large-payload true --timeout 30
+
+chip-tool pairing proxy <node-id> <ssid> <password> <pin> <discriminator> \
+    <proxy-node-id> <proxy-connect-timeout> ble|wifipaf \
+    --proxy-endpoint <endpoint> [--proxy-wifi-band 2g4|5g]
+```
+
+`ProxyScanRequest` carries the large-message quality, so it needs
+`--allow-large-payload true`; the background-scan commands do not.
+`<proxy-connect-timeout>` is in seconds, with `0` meaning no timeout.
+
+Full argument documentation, worked examples, and the background-scan commands
+are in
+[the chip-tool README](../../../../examples/chip-tool/README.md#commission-a-device-through-a-commissioning-proxy)
+and
+[Working with the CHIP Tool](../../../../docs/development_controllers/chip-tool/chip_tool_guide.md#commissioning-through-a-commissioning-proxy).
+
 ## Cluster State
 
 The cluster tracks proxy state internally:
