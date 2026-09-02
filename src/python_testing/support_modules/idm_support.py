@@ -24,7 +24,7 @@ import inspect
 import logging
 import time
 from dataclasses import dataclass
-from typing import Any, get_args
+from typing import Any, get_args, get_origin
 
 from mobly import asserts
 
@@ -118,6 +118,11 @@ class CommandFieldInfo:
     field: XmlDataTypeComponent
     # All spec-parsed fields of the command, used to build valid sibling values.
     all_fields: dict[int, XmlDataTypeComponent]
+    # Values the spec's enum definition lists, keyed by field id, for every field of the
+    # command whose type is an enum. A field under test needs them to build a violating
+    # value and a sibling needs them to build a legal one, so all fields are carried
+    # rather than only the one under test. See spec_enum_values.
+    enum_values_by_field: dict[int, frozenset[int]]
 
     @property
     def path_str(self) -> str:
@@ -205,6 +210,22 @@ COMMAND_CONSTRAINT_DENIED_COMMANDS: frozenset[tuple[int, int]] = frozenset({
     # constraint would put a non-compliant DUT into groupcast testing state.
     # Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/71a64a58ee82ddaa1cebea93b9919f01cfaff280/src/service_device_management/Groupcast.adoc#762-durationseconds-field
     (Clusters.Groupcast.id, Clusters.Groupcast.Commands.GroupcastTesting.command_id),
+    # The commands below carry enum-typed fields and so became reachable once
+    # enum-typed fields were probed. Each mutates state that outlives the invoke on a
+    # DUT that fails to enforce the constraint and therefore executes the command.
+    # Setting the DUT's wall clock mid-run skews every later timestamp and can expire
+    # the session the harness is testing over.
+    (Clusters.TimeSynchronization.id, Clusters.TimeSynchronization.Commands.SetUTCTime.command_id),
+    # Writes group entries into the Joint Fabric datastore, which persists across the
+    # test and is not restored by the harness.
+    (Clusters.JointFabricDatastore.id, Clusters.JointFabricDatastore.Commands.AddGroup.command_id),
+    (Clusters.JointFabricDatastore.id, Clusters.JointFabricDatastore.Commands.UpdateGroup.command_id),
+    # Consumes one of a bounded number of client registration slots and changes how the
+    # ICD schedules its active periods, which alters the timing of later tests.
+    (Clusters.IcdManagement.id, Clusters.IcdManagement.Commands.RegisterClient.command_id),
+    # Joins a multicast group, changing which groupcast traffic the DUT accepts for the
+    # remainder of the session.
+    (Clusters.Groupcast.id, Clusters.Groupcast.Commands.JoinGroup.command_id),
 })
 
 # Type-intrinsic value ranges for numeric spec datatypes. Used to skip constraint
@@ -269,23 +290,62 @@ def spec_enum_values(xml_cluster: XmlCluster, datatype: str) -> frozenset[int]:
     return frozenset(int(component.value) for component in enum_definition.components.values())
 
 
-def enum_type_of(attribute: type[ClusterObjects.ClusterAttributeDescriptor]) -> type[MatterIntEnum] | None:
-    """The enum type an attribute encodes as, or None if the attribute is not enum-typed.
+def enum_in_type(generated_type: Any) -> type[MatterIntEnum] | None:
+    """The enum a generated Python type encodes as, or None if it does not encode one.
 
-    Read from the generated Python type, which unlike the spec type name is also what
-    the value must be encoded as. Nullable and optional attributes are generated as a
-    union, so the enum is picked out of the union's members.
+    Read from the generated type, which unlike the spec type name is also what the value
+    must be encoded as. Nullable and optional values are generated as a union, so the
+    enum is picked out of the union's members.
+
+    A list is generated as List[element], whose type argument reads exactly like a
+    union member, so a list of enums would otherwise be reported as an enum and be sent
+    a bare enum value in place of an array. Lists are rejected up front instead:
+    CameraAvStreamManagement.SetStreamPriorities.StreamPriorities is a list[StreamUsageEnum]
+    and reaches here on the command path.
     """
-    generated_type = attribute.attribute_type.Type
+    if get_origin(generated_type) is list:
+        return None
     for candidate in get_args(generated_type) or (generated_type,):
         if isinstance(candidate, type) and issubclass(candidate, MatterIntEnum):
             return candidate
     return None
 
 
-def undefined_enum_value(attribute: type[ClusterObjects.ClusterAttributeDescriptor],
-                         spec_values: frozenset[int]) -> MatterIntEnum | None:
-    """Return a value the attribute's enum does not define, or None if there is none to send.
+def enum_type_of(attribute: type[ClusterObjects.ClusterAttributeDescriptor]) -> type[MatterIntEnum] | None:
+    """The enum type an attribute encodes as, or None if the attribute is not enum-typed."""
+    return enum_in_type(attribute.attribute_type.Type)
+
+
+def _codegen_enum_values(enum_type: type[MatterIntEnum]) -> frozenset[int]:
+    """Values the generated Python enum defines.
+
+    kUnknownEnumValue is codegen's placeholder for "not a real member", and any
+    kUnknownPlaceholder* member was grafted on by undefined_enum_value. Neither is a
+    value the enum defines.
+    """
+    return frozenset(member.value for member in enum_type if not member.name.startswith('kUnknown'))
+
+
+def smallest_legal_enum_value(enum_type: type[MatterIntEnum], spec_values: frozenset[int]) -> MatterIntEnum | None:
+    """Return the smallest value the enum defines, or None if it defines none.
+
+    The inverse of undefined_enum_value, and used to fill a field that is not the one
+    under test: the generated dataclass defaults an enum field to 0, which is not a
+    legal value for every enum (ColorControl.StepModeEnum defines {1, 3}), so a payload
+    left at the default can carry a violation of its own.
+
+    Only values the spec and codegen agree on are considered legal, which is the
+    conservative direction here: a value defined by just one of the two could be
+    rejected by a DUT built against the other.
+    """
+    legal = spec_values & _codegen_enum_values(enum_type) if spec_values else _codegen_enum_values(enum_type)
+    if not legal:
+        return None
+    return enum_type(min(legal))
+
+
+def undefined_enum_value(enum_type: type[MatterIntEnum], spec_values: frozenset[int]) -> MatterIntEnum | None:
+    """Return a value the enum does not define, or None if there is none to send.
 
     An enum's legal values are a set, not a range: 30 of the enums in the 1.6.1 data
     model leave holes, and some reserve a sentinel at the top of the value space. So a
@@ -305,16 +365,7 @@ def undefined_enum_value(attribute: type[ClusterObjects.ClusterAttributeDescript
     an undefined value is one regardless of feature map or attribute values, so no
     conformance is evaluated here.
     """
-    enum_type = enum_type_of(attribute)
-    if enum_type is None:
-        return None
-
-    defined = set(spec_values)
-    # kUnknownEnumValue is codegen's placeholder for "not a real member", and any
-    # kUnknownPlaceholder* member was grafted on by an earlier call to this function.
-    # Neither is a value the enum defines.
-    defined.update(member.value for member in enum_type if not member.name.startswith('kUnknown'))
-
+    defined = spec_values | _codegen_enum_values(enum_type)
     value = next((v for v in range(_MAX_ENCODABLE_ENUM_VALUE + 1) if v not in defined), None)
     if value is None:
         return None
@@ -749,9 +800,9 @@ class IDMBaseTest(BasicCompositionTests):
         # branches and applies to enum-typed attributes that declare no constraint at all.
         # Its bound is a set of legal values rather than a range, so it cannot be folded
         # into the min/max handling below.
-        violating_enum_value = undefined_enum_value(attr_info.attribute, attr_info.enum_values)
-        if violating_enum_value is not None:
-            return violating_enum_value
+        enum_type = enum_type_of(attr_info.attribute)
+        if enum_type is not None:
+            return undefined_enum_value(enum_type, attr_info.enum_values)
 
         datatype = attr_info.datatype.lower()
 
@@ -987,6 +1038,10 @@ class IDMBaseTest(BasicCompositionTests):
         and the generated Python command classes, and returns one entry per
         constrained field. Clusters/commands on the constraint-fuzzing deny
         lists are excluded.
+
+        An enum-typed field counts as constrained even when it declares no
+        <constraint> element: an enum bounds its field through the values its
+        <dataTypes> definition lists, the same way it bounds an attribute.
         """
         infos: list[CommandFieldInfo] = []
         for endpoint_id, endpoint in self.endpoints_tlv.items():
@@ -1014,8 +1069,18 @@ class IDMBaseTest(BasicCompositionTests):
                     if xml_command is None or command_class is None:
                         continue
 
+                    # Resolved once per command: every field of the payload needs its
+                    # enum values, the one under test to be violated and the others to be
+                    # filled with something legal.
+                    enum_values_by_field = {
+                        field_id: spec_enum_values(xml_cluster, sibling.type_info or '')
+                        for field_id, sibling in xml_command.fields.items()
+                        if self._command_field_enum_type(command_class, field_id) is not None
+                    }
+
                     for field in xml_command.fields.values():
-                        if field.constraints is None or not field.constraints.has_constraints():
+                        has_constraints = field.constraints is not None and field.constraints.has_constraints()
+                        if not has_constraints and field.value not in enum_values_by_field:
                             continue
                         infos.append(CommandFieldInfo(
                             endpoint_id=endpoint_id,
@@ -1027,8 +1092,23 @@ class IDMBaseTest(BasicCompositionTests):
                             cluster_class=Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id],
                             field=field,
                             all_fields=xml_command.fields,
+                            enum_values_by_field=enum_values_by_field,
                         ))
         return infos
+
+    @staticmethod
+    def _command_field_enum_type(command_class: type[ClusterObjects.ClusterCommand],
+                                 field_id: int) -> type[MatterIntEnum] | None:
+        """The enum a command field encodes as, or None if it is not enum-typed.
+
+        Read from the generated command's field descriptor rather than from the spec type
+        name, for the same reason the attribute path reads attribute_type: it is the
+        encoding that has to carry the value.
+        """
+        for descriptor_field in command_class.descriptor.Fields:
+            if descriptor_field.Tag == field_id:
+                return enum_in_type(descriptor_field.Type)
+        return None
 
     @staticmethod
     def _command_field_label(command_class: type[ClusterObjects.ClusterCommand], field_id: int) -> str | None:
@@ -1053,7 +1133,14 @@ class IDMBaseTest(BasicCompositionTests):
             return None
 
     async def _resolved_command_field_constraints(self, info: CommandFieldInfo) -> Constraints:
-        """Return a copy of the field's constraints with dynamic references resolved against the DUT."""
+        """Return a copy of the field's constraints with dynamic references resolved against the DUT.
+
+        An enum-typed field reaches here with no <constraint> element of its own; the
+        empty set has no references to resolve and reads the same as one whose every
+        bound is unset.
+        """
+        if info.field.constraints is None:
+            return Constraints()
         constraints = copy.copy(info.field.constraints)
         if constraints.min_value_ref:
             constraints.min_value = await self.resolve_dynamic_constraint(
@@ -1069,16 +1156,28 @@ class IDMBaseTest(BasicCompositionTests):
                 info.cluster_class, info.endpoint_id, constraints.max_count_ref)
         return constraints
 
-    def generate_command_field_violations(self, field: XmlDataTypeComponent,
-                                          constraints: Constraints) -> list[tuple[str, Any]]:
+    def generate_command_field_violations(self, field: XmlDataTypeComponent, constraints: Constraints,
+                                          enum_type: type[MatterIntEnum] | None = None,
+                                          enum_values: frozenset[int] = frozenset()) -> list[tuple[str, Any]]:
         """Generate (description, value) pairs that each violate one bound of the field's constraints.
 
         Bounds that the field's own data type already enforces are skipped (e.g.
         under-min of an unsigned field with min 0, or over-max of a bound equal to
         the type's maximum), since such violations cannot be encoded on the wire.
+
+        An enum-typed field is bounded by the set of values its <dataTypes> definition
+        lists rather than by a <constraint> element, so it is violated from enum_type and
+        enum_values and yields a violation even with no constraints at all.
         """
         violations: list[tuple[str, Any]] = []
         datatype = (field.type_info or '').lower()
+
+        if enum_type is not None:
+            violating_value = undefined_enum_value(enum_type, enum_values)
+            if violating_value is not None:
+                violations.append((f"value {int(violating_value)} is not defined by {field.type_info}",
+                                   violating_value))
+            return violations
 
         if datatype in ('string', 'octstr'):
             def make(length: int) -> str | bytes:
@@ -1110,8 +1209,9 @@ class IDMBaseTest(BasicCompositionTests):
 
         type_range = _encodable_numeric_range(datatype, field.is_nullable)
         if type_range is None:
-            # Enum/bitmap/struct-typed fields and 'allowed' *value* constraints on
-            # numeric types are out of scope for automated violation generation.
+            # Bitmap- and struct-typed fields, and 'allowed' *value* constraints on
+            # numeric types, are out of scope for automated violation generation;
+            # enum-typed fields were handled above.
             return violations
         type_min, type_max = type_range
         if constraints.max_value is not None and constraints.max_value < type_max:
@@ -1122,16 +1222,26 @@ class IDMBaseTest(BasicCompositionTests):
                                constraints.min_value - 1))
         return violations
 
-    def _generate_valid_command_field_value(self, field: XmlDataTypeComponent) -> Any | None:
+    def _generate_valid_command_field_value(self, field: XmlDataTypeComponent,
+                                            enum_type: type[MatterIntEnum] | None = None,
+                                            enum_values: frozenset[int] = frozenset()) -> Any | None:
         """Generate an in-range value for a sibling field, or None if none can be generated.
 
         Only static constraints are considered; no value can be generated for fields
         whose bounds depend on unresolved attribute references, or whose types are out
-        of scope here (enum/bitmap/struct/list). A None return for an unconstrained
+        of scope here (bitmap/struct/list). A None return for an unconstrained
         field is harmless (its class default cannot violate anything), but for a
         constrained field it means the default may itself be out of range, so callers
         must not attribute a CONSTRAINT_ERROR to the field under test.
+
+        An enum-typed field is always given a value rather than left at its default: the
+        generated dataclass defaults an enum field to 0, which several enums do not
+        define (ColorControl.StepModeEnum defines {1, 3}), so the default can itself be
+        the violation the DUT reports.
         """
+        if enum_type is not None:
+            return smallest_legal_enum_value(enum_type, enum_values)
+
         constraints = field.constraints
         if constraints is None or not constraints.has_constraints():
             return None
@@ -1174,7 +1284,10 @@ class IDMBaseTest(BasicCompositionTests):
             return ConstraintProbeResult()
 
         constraints = await self._resolved_command_field_constraints(info)
-        violations = self.generate_command_field_violations(info.field, constraints)
+        violations = self.generate_command_field_violations(
+            info.field, constraints,
+            enum_type=self._command_field_enum_type(info.command_class, info.field.value),
+            enum_values=info.enum_values_by_field.get(info.field.value, frozenset()))
         if not violations:
             return ConstraintProbeResult()
 
@@ -1187,15 +1300,21 @@ class IDMBaseTest(BasicCompositionTests):
             sibling_label = self._command_field_label(info.command_class, field_id)
             if sibling_label is None:
                 continue
-            valid_value = self._generate_valid_command_field_value(sibling)
+            sibling_enum_type = self._command_field_enum_type(info.command_class, field_id)
+            valid_value = self._generate_valid_command_field_value(
+                sibling, enum_type=sibling_enum_type,
+                enum_values=info.enum_values_by_field.get(field_id, frozenset()))
             if valid_value is None:
-                # A required sibling that is itself constrained keeps its generated
-                # class default, which may violate the sibling's own bounds. The DUT
-                # would then return CONSTRAINT_ERROR for the sibling and the target
-                # field would be wrongly credited with enforcing its constraint, so
-                # skip the field rather than report an unobserved pass.
-                if sibling.constraints is not None and sibling.constraints.has_constraints():
-                    log.warning("Skipping %s: cannot generate a valid value for constrained "
+                # A required sibling that is itself bounded keeps its generated class
+                # default, which may violate the sibling's own bounds. The DUT would then
+                # return CONSTRAINT_ERROR for the sibling and the target field would be
+                # wrongly credited with enforcing its constraint, so skip the field rather
+                # than report an unobserved pass. An enum-typed sibling is bounded by its
+                # value set, so it counts here even with no <constraint> of its own.
+                sibling_is_bounded = sibling_enum_type is not None or (
+                    sibling.constraints is not None and sibling.constraints.has_constraints())
+                if sibling_is_bounded:
+                    log.warning("Skipping %s: cannot generate a valid value for bounded "
                                 "required field %s", info.path_str, sibling_label)
                     return ConstraintProbeResult()
                 continue
