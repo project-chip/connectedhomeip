@@ -739,6 +739,14 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
 
 
 def convert_args_to_matter_config(args: argparse.Namespace):
+    """Converts parsed command line arguments into a populated MatterTestConfig.
+
+    Args:
+        args: The namespace produced by the matter_test_args_parser parser.
+
+    Returns:
+        A MatterTestConfig carrying the test configuration the arguments describe.
+    """
     # Lazy import to avoid circular dependency
     from matter.testing.matter_test_config import MatterTestConfig
 
@@ -974,6 +982,12 @@ def root_index(s: str) -> int:
 
 
 def matter_test_args_parser() -> argparse.ArgumentParser:
+    """Builds the argument parser for standalone Matter Python tests.
+
+    Returns:
+        An ArgumentParser accepting the test execution, commissioning, and
+        test configuration argument groups.
+    """
     parser = argparse.ArgumentParser(description='Matter standalone Python test')
 
     basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")
