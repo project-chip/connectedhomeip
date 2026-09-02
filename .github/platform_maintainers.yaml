@@ -90,8 +90,13 @@ mediatek:
     - as23999
   paths:
     - "src/platform/mt793x/**"
+    - "src/lwip/mt793x/**"
+    - "examples/platform/mt793x/**"
     - "examples/lighting-app/genio/**"
+    - "config/genio/**"
     - "third_party/mt793x_sdk/**"
+    - "scripts/build/builders/genio.py"
+    - ".github/workflows/examples-genio.yaml"
 
 stm32:
   maintainers:
