@@ -40,7 +40,7 @@
 #define OPENTHREAD_CONFIG_PARENT_SEARCH_ENABLE 0
 
 // Timeout after 2 missed check-ins, or 4 mins if sleep interval is too short.
-#define OPENTHREAD_CONFIG_MLE_CHILD_TIMEOUT_DEFAULT                                                                \
+#define OPENTHREAD_CONFIG_MLE_CHILD_TIMEOUT_DEFAULT                                                                                \
     (((SL_TRANSPORT_IDLE_INTERVAL / 1000) < 120) ? 240 : (((SL_TRANSPORT_IDLE_INTERVAL / 1000) * 2) + 1))
 
 #if defined(SL_CSL_ENABLE) && SL_CSL_ENABLE || SL_CONFIG_OPENTHREAD_LIB
