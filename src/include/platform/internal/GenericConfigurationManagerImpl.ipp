@@ -60,6 +60,9 @@ namespace Internal {
 
 namespace {
 std::optional<System::Clock::Seconds32> gFirmwareBuildChipEpochTime;
+// Runtime override for the device type id (see SetDeviceTypeId). Not persisted;
+// falls back to CHIP_DEVICE_CONFIG_DEVICE_TYPE when unset.
+std::optional<uint32_t> gDeviceTypeId;
 }
 
 #if CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
@@ -347,7 +350,14 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::SetFirmwareBuildChipEpo
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetDeviceTypeId(uint32_t & deviceType)
 {
-    deviceType = static_cast<uint32_t>(CHIP_DEVICE_CONFIG_DEVICE_TYPE);
+    deviceType = gDeviceTypeId.value_or(static_cast<uint32_t>(CHIP_DEVICE_CONFIG_DEVICE_TYPE));
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::SetDeviceTypeId(uint32_t deviceType)
+{
+    gDeviceTypeId = deviceType;
     return CHIP_NO_ERROR;
 }
 

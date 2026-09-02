@@ -5,6 +5,10 @@ to build and run Matter TV Example on Raspberry Pi. This doc is tested on
 **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu for
 Raspberry Pi Desktop 20.10 (aarch64)**
 
+> To run the tv-app as a different media player device type (Basic Video Player,
+> Casting/Streaming Audio Player) via the `--device-type` flag, see
+> [Selecting the device type](../README.md#selecting-the-device-type).
+
 <hr>
 
 -   [Matter TV Example](#matter-tv-example)
