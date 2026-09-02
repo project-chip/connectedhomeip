@@ -40,12 +40,15 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+import random
 
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 
@@ -115,6 +118,9 @@ class TC_PWRTL_2_2(MatterBaseTest):
             attribute_value=attr(entries_51), endpoint_id=endpoint, expect_success=False)
         asserts.assert_equal(status, Status.ConstraintError,
                              'Write of 51-entry list (over max) must return CONSTRAINT_ERROR')
+        after_over_max = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr)
+        self._assert_nodes_equal(after_over_max, entries_50, 'after the rejected 51-entry write')
 
         self.step(6, "TH1 writes ElectricalCircuitNodes with a single entry whose Label is exactly 128 characters",
                   expectation="Verify DUT responds w/ status SUCCESS(0x00); a subsequent read returns the entry with "
@@ -139,44 +145,82 @@ class TC_PWRTL_2_2(MatterBaseTest):
             attribute_value=attr(entries_label_over), endpoint_id=endpoint, expect_success=False)
         asserts.assert_equal(status, Status.ConstraintError,
                              'Write with 129-char Label (over max) must return CONSTRAINT_ERROR')
+        after_over_label = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr)
+        self._assert_nodes_equal(after_over_label, entries_label_max,
+                                 'after the rejected 129-character Label write')
 
         self.step(8, "Open a commissioning window on DUT and commission DUT to the TH2 fabric. As TH2, TH reads "
                      "ElectricalCircuitNodes",
                   expectation="Verify DUT responds w/ status SUCCESS(0x00) with an empty list, or with only the TH2 "
                   "entries. The attribute is Fabric-Scoped (F), so the TH1 entries are not visible to TH2.")
-        # TODO: open commissioning window, commission TH2 to a second fabric,
-        # perform reads/writes as TH2, confirm per-fabric isolation.
-        # See TC_ACL_2_*.py for the fabric-add pattern.
-        self.mark_current_step_skipped()
+        th1 = self.default_controller
+        discriminator = random.randint(0, 4095)
+        params = await th1.OpenCommissioningWindow(
+            nodeId=self.dut_node_id, timeout=900, iteration=10000, discriminator=discriminator, option=1)
+        th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
+        th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=th1.fabricId + 1)
+        th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
+        await th2.CommissionOnNetwork(
+            nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
+        th2_view = await self.read_single_attribute_check_success(
+            dev_ctrl=th2, endpoint=endpoint, cluster=cluster, attribute=attr)
+        asserts.assert_equal(th2_view, [],
+                             'A Fabric-Scoped attribute must not expose the TH1 entries to TH2')
 
         self.step(9, "As TH2, TH writes ElectricalCircuitNodes with one CircuitNodeStruct entry, then as TH1 reads the "
                      "attribute",
                   expectation="The TH2 write returns SUCCESS. The TH1 read returns only the TH1 entries, with the TH2 "
                   "entry not visible, confirming per-fabric isolation.")
-        self.mark_current_step_skipped()
+        # write_single_attribute always writes as the default controller, so the TH2 write goes
+        # through the controller directly.
+        th2_entries = [CircuitNodeStruct(node=0x000000000000B0F2, label="th2-only")]
+        result = await th2.WriteAttribute(self.dut_node_id, [(endpoint, attr(th2_entries))])
+        asserts.assert_equal(result[0].Status, Status.Success, 'The TH2 write must succeed on its own fabric')
+        th1_view = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr)
+        self._assert_nodes_equal(th1_view, entries_label_max, 'TH1 view after the TH2 write')
 
         self.step(10, "Reboot the DUT. After it comes back online, as TH1, TH reads ElectricalCircuitNodes",
                   expectation="Verify DUT responds w/ status SUCCESS(0x00) with the value last written by TH1, "
                   "confirming the Non-Volatile (N) quality persists the value across reboot.")
         pre_reboot = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr)
+        self._assert_nodes_equal(pre_reboot, entries_label_max, 'pre-reboot')
         await self.request_device_reboot()
         post_reboot = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr)
-        asserts.assert_equal(len(post_reboot), len(pre_reboot),
-                             'ElectricalCircuitNodes list length must persist across reboot (Non-Volatile)')
-        self._assert_nodes_equal(post_reboot, pre_reboot, 'post-reboot')
+        self._assert_nodes_equal(post_reboot, entries_label_max,
+                                 'post-reboot (the Non-Volatile quality must persist the value)')
 
         self.step(11, "As TH1, establish a subscription to ElectricalCircuitNodes on the test endpoint",
                   expectation="Subscription is established successfully; TH awaits a subscription report carrying "
                   "the initial priming value of the list.")
-        # TODO: use self.default_controller.ReadAttribute with reportInterval to establish the subscription.
-        self.mark_current_step_skipped()
+        # fabric_filtered defaults to False on the handler, which would surface the TH2 entry
+        # written in step 9 alongside TH1's own. TH1's view is the one under test here.
+        sub_handler = AttributeSubscriptionHandler(cluster, attr)
+        subscription = await sub_handler.start(th1, self.dut_node_id, endpoint=endpoint, fabric_filtered=True,
+                                               min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
+        # start() awaits ReadAttribute, which returns only once the priming report has arrived, and
+        # installs the update callback after that. The priming value is therefore in the transaction
+        # cache and never reaches the handler's queue; only later updates do.
+        primed = subscription.GetAttributes()[endpoint][cluster][attr]
+        self._assert_nodes_equal(primed, entries_label_max, 'priming report')
 
         self.step(12, "As TH1, TH writes ElectricalCircuitNodes with a new valid list of 2 entries",
                   expectation="Write returns SUCCESS; TH awaits a subscription report reflecting the updated list.")
-        # TODO: perform the write against the step 11 subscription and await the report.
-        self.mark_current_step_skipped()
+        try:
+            entries_final = [
+                CircuitNodeStruct(node=0x000000000000B010),
+                CircuitNodeStruct(node=0x000000000000B011, endpoint=1, label="circuit-B"),
+            ]
+            await self.write_single_attribute(
+                attribute_value=attr(entries_final), endpoint_id=endpoint)
+            report = sub_handler.wait_for_attribute_report()
+            self._assert_nodes_equal(report.value, entries_final, 'subscription report after the write')
+        finally:
+            sub_handler.cancel()
 
 
 if __name__ == "__main__":
