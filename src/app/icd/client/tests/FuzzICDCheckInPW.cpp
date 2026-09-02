@@ -391,8 +391,7 @@ void ProcessSearchesAllStoredEntries(uint8_t entryCount, uint8_t targetEntry, ui
         // resolve to that entry rather than any other.
         ASSERT_EQ(err, CHIP_NO_ERROR);
         EXPECT_EQ(decodedCounter, encodedCounter);
-        EXPECT_EQ(matchedInfo.peer_node,
-                  ScopedNodeId(static_cast<NodeId>(0x1000 + target), static_cast<FabricIndex>(target + 1)));
+        EXPECT_EQ(matchedInfo.peer_node, ScopedNodeId(static_cast<NodeId>(0x1000 + target), static_cast<FabricIndex>(target + 1)));
     }
 
     if (err == CHIP_NO_ERROR)
