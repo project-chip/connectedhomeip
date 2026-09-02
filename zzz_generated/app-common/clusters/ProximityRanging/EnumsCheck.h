@@ -25,6 +25,18 @@
 namespace chip {
 namespace app {
 namespace Clusters {
+static auto __attribute__((unused)) EnsureKnownEnumValue(ProximityRanging::BLERBCSecurityModeEnum val)
+{
+    using EnumType = ProximityRanging::BLERBCSecurityModeEnum;
+    switch (val)
+    {
+    case EnumType::kBLEDeviceIDObfuscation:
+    case EnumType::kEncryptedAdvertisingData:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(ProximityRanging::BLTCSModeEnum val)
 {
     using EnumType = ProximityRanging::BLTCSModeEnum;
@@ -59,12 +71,24 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ProximityRanging::NADME
     {
     case EnumType::kAttackExtremelyUnlikely:
     case EnumType::kAttackVeryUnlikely:
-    case EnumType::kAttackUnlikely:
     case EnumType::kAttackIsPossible:
     case EnumType::kAttackIsLikely:
     case EnumType::kAttackVeryLikely:
     case EnumType::kAttackExtremelyLikely:
     case EnumType::kUnknown:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ProximityRanging::RDRCapabilityEnum val)
+{
+    using EnumType = ProximityRanging::RDRCapabilityEnum;
+    switch (val)
+    {
+    case EnumType::kNoRDR:
+    case EnumType::kAzimuthOnly:
+    case EnumType::kAzimuthElevation:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -98,26 +122,17 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ProximityRanging::Rangi
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ProximityRanging::RangingSecurityEnum val)
-{
-    using EnumType = ProximityRanging::RangingSecurityEnum;
-    switch (val)
-    {
-    case EnumType::kSecureRanging:
-    case EnumType::kOpenRanging:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
 static auto __attribute__((unused)) EnsureKnownEnumValue(ProximityRanging::RangingSessionStatusEnum val)
 {
     using EnumType = ProximityRanging::RangingSessionStatusEnum;
     switch (val)
     {
+    case EnumType::kSessionStarted:
     case EnumType::kSessionEndTimeReached:
+    case EnumType::kSessionStoppedByRequest:
     case EnumType::kPeerNotFound:
     case EnumType::kHardwareError:
+    case EnumType::kSessionFailed:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -137,12 +152,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ProximityRanging::Rangi
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ProximityRanging::ResultCodeEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ProximityRanging::StatusCodeEnum val)
 {
-    using EnumType = ProximityRanging::ResultCodeEnum;
+    using EnumType = ProximityRanging::StatusCodeEnum;
     switch (val)
     {
-    case EnumType::kAccepted:
     case EnumType::kRejectedInfeasibleRanging:
     case EnumType::kRejectedInfeasibleRangingTriggers:
     case EnumType::kBusySessionCapacityReached:

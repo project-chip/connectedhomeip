@@ -1000,61 +1000,16 @@ namespace ModeSelect {
 namespace Attributes {
 
 namespace Description {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableCharSpan & value); // char_string
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 } // namespace Description
 
 namespace StandardNamespace {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint16_t> & value); // enum16
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
-                                        MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value); // enum16
 } // namespace StandardNamespace
 
-namespace CurrentMode {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
-} // namespace CurrentMode
-
-namespace StartUpMode {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
-                                        MarkAttributeDirty markDirty);
-} // namespace StartUpMode
-
-namespace OnMode {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
-                                        MarkAttributeDirty markDirty);
-} // namespace OnMode
-
 namespace FeatureMap {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // bitmap32
 } // namespace FeatureMap
-
-namespace ClusterRevision {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-} // namespace ClusterRevision
 
 } // namespace Attributes
 } // namespace ModeSelect
@@ -4442,153 +4397,7 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 } // namespace MediaFileManagement
 
 namespace AudioControl {
-namespace Attributes {
-
-namespace SoftMuted {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
-} // namespace SoftMuted
-
-namespace PhysicallyMuted {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
-} // namespace PhysicallyMuted
-
-namespace Volume {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-} // namespace Volume
-
-namespace MinDeviceVolume {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-} // namespace MinDeviceVolume
-
-namespace MaxDeviceVolume {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-} // namespace MaxDeviceVolume
-
-namespace MaxDeviceVolumeDB {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-} // namespace MaxDeviceVolumeDB
-
-namespace MaxUserVolume {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-} // namespace MaxUserVolume
-
-namespace DefaultStepSize {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-} // namespace DefaultStepSize
-
-namespace SetVolumeUnmutePolicy {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::AudioControl::UnmutePolicyEnum * value); // UnmutePolicyEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::AudioControl::UnmutePolicyEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::AudioControl::UnmutePolicyEnum value,
-                                        MarkAttributeDirty markDirty);
-} // namespace SetVolumeUnmutePolicy
-
-namespace IncreaseVolumeUnmutePolicy {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::AudioControl::UnmutePolicyEnum * value); // UnmutePolicyEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::AudioControl::UnmutePolicyEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::AudioControl::UnmutePolicyEnum value,
-                                        MarkAttributeDirty markDirty);
-} // namespace IncreaseVolumeUnmutePolicy
-
-namespace IncreaseVolumeUnmuteVolume {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::AudioControl::UnmuteVolumeEnum * value); // UnmuteVolumeEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::AudioControl::UnmuteVolumeEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::AudioControl::UnmuteVolumeEnum value,
-                                        MarkAttributeDirty markDirty);
-} // namespace IncreaseVolumeUnmuteVolume
-
-namespace DecreaseVolumeUnmutePolicy {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::AudioControl::UnmutePolicyEnum * value); // UnmutePolicyEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::AudioControl::UnmutePolicyEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::AudioControl::UnmutePolicyEnum value,
-                                        MarkAttributeDirty markDirty);
-} // namespace DecreaseVolumeUnmutePolicy
-
-namespace StartUpMuted {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<bool> & value); // boolean
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<bool> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<bool> & value,
-                                        MarkAttributeDirty markDirty);
-} // namespace StartUpMuted
-
-namespace StartUpVolume {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint16_t> & value); // int16u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
-                                        MarkAttributeDirty markDirty);
-} // namespace StartUpVolume
-
-namespace Bass {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value); // int16s
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
-} // namespace Bass
-
-namespace Mid {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value); // int16s
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
-} // namespace Mid
-
-namespace Treble {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value); // int16s
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
-} // namespace Treble
-
-namespace MinCorrection {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value); // int16s
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
-} // namespace MinCorrection
-
-namespace MaxCorrection {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value); // int16s
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
-} // namespace MaxCorrection
-
-namespace FeatureMap {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-} // namespace ClusterRevision
-
-} // namespace Attributes
+namespace Attributes {} // namespace Attributes
 } // namespace AudioControl
 
 namespace ZoneManagement {

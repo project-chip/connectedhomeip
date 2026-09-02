@@ -62,6 +62,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/alarm-base-server/tests",
       "${chip_root}/src/app/clusters/ambient-context-sensing-server/tests",
       "${chip_root}/src/app/clusters/air-quality-server/tests",
+      "${chip_root}/src/app/clusters/audio-control-server/tests",
       "${chip_root}/src/app/clusters/av-analysis-server/tests",
       "${chip_root}/src/app/clusters/basic-information/tests",
       "${chip_root}/src/app/clusters/actions-server/tests",
@@ -112,6 +113,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/media-playback-server/tests",
       "${chip_root}/src/app/clusters/microwave-oven-control-server/tests",
       "${chip_root}/src/app/clusters/mode-base-server/tests",
+      "${chip_root}/src/app/clusters/mode-select-server/tests",
       "${chip_root}/src/app/clusters/network-commissioning/tests",
       "${chip_root}/src/app/clusters/network-identity-management-server/tests",
       "${chip_root}/src/app/clusters/occupancy-sensor-server/tests",
@@ -315,6 +317,9 @@ if (chip_build_tests) {
         chip_device_platform != "nxp" && current_os != "android") {
       tests += [ "${chip_root}/examples/evse-app/evse-common/tests" ]
     }
+
+    tests +=
+        [ "${chip_root}/examples/ota-provider-app/ota-provider-common/tests" ]
 
     # tv-app Media File Management delegate test. Excluded on embedded targets
     # where the example's filesystem-backed delegate has no /tmp to write to.
