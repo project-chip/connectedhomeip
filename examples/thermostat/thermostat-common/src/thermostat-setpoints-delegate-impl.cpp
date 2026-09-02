@@ -184,6 +184,7 @@ Protocols::InteractionModel::Status ThermostatSetpointsDelegate::GetMinCoolSetpo
 Protocols::InteractionModel::Status ThermostatSetpointsDelegate::SetMinCoolSetpointLimit(temperature minCoolSetpointLimit,
                                                                                          bool & changed)
 {
+    changed = false;
     if (mMinCoolSetpointLimit == minCoolSetpointLimit)
     {
         return Status::Success;
@@ -206,6 +207,7 @@ Protocols::InteractionModel::Status ThermostatSetpointsDelegate::GetMaxCoolSetpo
 Protocols::InteractionModel::Status ThermostatSetpointsDelegate::SetMaxCoolSetpointLimit(temperature maxCoolSetpointLimit,
                                                                                          bool & changed)
 {
+    changed = false;
     if (mMaxCoolSetpointLimit == maxCoolSetpointLimit)
     {
         return Status::Success;
@@ -229,6 +231,7 @@ ThermostatSetpointsDelegate::GetOccupiedCoolingSetpoint(temperature & occupiedCo
 Protocols::InteractionModel::Status ThermostatSetpointsDelegate::SetOccupiedCoolingSetpoint(temperature occupiedCoolingSetpoint,
                                                                                             bool & changed)
 {
+    changed = false;
     if (mOccupiedCoolingSetpoint == occupiedCoolingSetpoint)
     {
         return Status::Success;
@@ -252,6 +255,7 @@ ThermostatSetpointsDelegate::GetUnoccupiedCoolingSetpoint(temperature & unoccupi
 Protocols::InteractionModel::Status ThermostatSetpointsDelegate::SetUnoccupiedCoolingSetpoint(temperature unoccupiedCoolingSetpoint,
                                                                                               bool & changed)
 {
+    changed = false;
     if (mUnoccupiedCoolingSetpoint == unoccupiedCoolingSetpoint)
     {
         return Status::Success;
@@ -288,6 +292,7 @@ Protocols::InteractionModel::Status ThermostatSetpointsDelegate::GetMinHeatSetpo
 Protocols::InteractionModel::Status ThermostatSetpointsDelegate::SetMinHeatSetpointLimit(temperature minHeatSetpointLimit,
                                                                                          bool & changed)
 {
+    changed = false;
     if (mMinHeatSetpointLimit == minHeatSetpointLimit)
     {
         return Status::Success;
@@ -310,6 +315,7 @@ Protocols::InteractionModel::Status ThermostatSetpointsDelegate::GetMaxHeatSetpo
 Protocols::InteractionModel::Status ThermostatSetpointsDelegate::SetMaxHeatSetpointLimit(temperature maxHeatSetpointLimit,
                                                                                          bool & changed)
 {
+    changed = false;
     if (mMaxHeatSetpointLimit == maxHeatSetpointLimit)
     {
         return Status::Success;
@@ -333,6 +339,7 @@ ThermostatSetpointsDelegate::GetOccupiedHeatingSetpoint(temperature & occupiedHe
 Protocols::InteractionModel::Status ThermostatSetpointsDelegate::SetOccupiedHeatingSetpoint(temperature occupiedHeatingSetpoint,
                                                                                             bool & changed)
 {
+    changed = false;
     if (mOccupiedHeatingSetpoint == occupiedHeatingSetpoint)
     {
         return Status::Success;
@@ -356,6 +363,7 @@ ThermostatSetpointsDelegate::GetUnoccupiedHeatingSetpoint(temperature & unoccupi
 Protocols::InteractionModel::Status ThermostatSetpointsDelegate::SetUnoccupiedHeatingSetpoint(temperature unoccupiedHeatingSetpoint,
                                                                                               bool & changed)
 {
+    changed = false;
     if (mUnoccupiedHeatingSetpoint == unoccupiedHeatingSetpoint)
     {
         return Status::Success;

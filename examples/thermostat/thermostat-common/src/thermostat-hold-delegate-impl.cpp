@@ -50,6 +50,7 @@ TemperatureSetpointHoldEnum ThermostatHoldDelegate::GetTemperatureSetpointHold()
 Protocols::InteractionModel::Status ThermostatHoldDelegate::SetTemperatureSetpointHold(TemperatureSetpointHoldEnum hold,
                                                                                        bool & changed)
 {
+    changed = false;
     if (mTemperatureSetpointHold == hold)
     {
         return Status::Success;
@@ -75,6 +76,7 @@ DataModel::Nullable<uint16_t> ThermostatHoldDelegate::GetTemperatureSetpointHold
 Protocols::InteractionModel::Status
 ThermostatHoldDelegate::SetTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> duration, bool & changed)
 {
+    changed = false;
     if (mTemperatureSetpointHoldDuration == duration)
     {
         return Status::Success;
@@ -101,6 +103,7 @@ DataModel::Nullable<uint32_t> ThermostatHoldDelegate::GetSetpointHoldExpiryTimes
 Protocols::InteractionModel::Status ThermostatHoldDelegate::SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> timestamp,
                                                                                            bool & changed)
 {
+    changed = false;
     if (mSetpointHoldExpiryTimestamp == timestamp)
     {
         return Status::Success;

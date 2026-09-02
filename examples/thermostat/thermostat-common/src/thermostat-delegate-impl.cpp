@@ -70,6 +70,7 @@ SystemModeEnum ThermostatDelegate::GetSystemMode() const
 
 Protocols::InteractionModel::Status ThermostatDelegate::SetSystemMode(SystemModeEnum systemMode, bool & changed)
 {
+    changed = false;
     if (mSystemMode == systemMode)
     {
         return Status::Success;
@@ -96,6 +97,7 @@ Protocols::InteractionModel::Status ThermostatDelegate::GetRunningMode(Thermosta
 
 Protocols::InteractionModel::Status ThermostatDelegate::SetRunningMode(ThermostatRunningModeEnum runningMode, bool & changed)
 {
+    changed = false;
     if (mRunningMode == runningMode)
     {
         return Status::Success;
@@ -113,6 +115,7 @@ Protocols::InteractionModel::Status ThermostatDelegate::GetRunningState(BitMask<
 
 Protocols::InteractionModel::Status ThermostatDelegate::SetRunningState(BitMask<RelayStateBitmap> runningState, bool & changed)
 {
+    changed = false;
     if (mRunningState == runningState)
     {
         return Status::Success;
@@ -130,6 +133,7 @@ ControlSequenceOfOperationEnum ThermostatDelegate::GetControlSequenceOfOperation
 Protocols::InteractionModel::Status ThermostatDelegate::SetControlSequenceOfOperation(ControlSequenceOfOperationEnum seq,
                                                                                       bool & changed)
 {
+    changed = false;
     if (mControlSequenceOfOperation == seq)
     {
         return Status::Success;
@@ -155,6 +159,7 @@ DataModel::Nullable<temperature> ThermostatDelegate::GetLocalTemperature() const
 
 Protocols::InteractionModel::Status ThermostatDelegate::SetLocalTemperature(DataModel::Nullable<temperature> temp, bool & changed)
 {
+    changed = false;
     if (mLocalTemperature == temp)
     {
         return Status::Success;
@@ -177,6 +182,7 @@ int8_t ThermostatDelegate::GetLocalTemperatureCalibration() const
 
 Protocols::InteractionModel::Status ThermostatDelegate::SetLocalTemperatureCalibration(int8_t temp, bool & changed)
 {
+    changed = false;
     if (mLocalTemperatureCalibration == temp)
     {
         return Status::Success;
@@ -203,6 +209,7 @@ Protocols::InteractionModel::Status ThermostatDelegate::GetRemoteSensing(BitMask
 
 Protocols::InteractionModel::Status ThermostatDelegate::SetRemoteSensing(BitMask<RemoteSensingBitmap> sensing, bool & changed)
 {
+    changed = false;
     if (mRemoteSensing == sensing)
     {
         return Status::Success;
