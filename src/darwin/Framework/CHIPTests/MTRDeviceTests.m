@@ -6399,6 +6399,174 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertGreaterThan(values.count, 100);
 }
 
+- (void)test051_QuieterReportingAttributeReadsGoToTheDevice
+{
+    // Q-quality attributes are deliberately not reported on change, so a live subscription is
+    // precisely when the cached value goes stale and a read has to reach the device.  The counter and
+    // the report are separate assertions: a read-through can be coalesced into a duplicate, or fail.
+
+    __auto_type * endpointID = @(1);
+    __auto_type * clusterID = @(MTRClusterIDTypeOperationalStateID);
+    __auto_type * countdownID = @(MTRAttributeIDTypeClusterOperationalStateAttributeCountdownTimeID);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:sController];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+    // Otherwise a wire read returning the already-cached value is filtered and proves nothing.
+    delegate.forceAttributeReportsIfMatchingCache = YES;
+
+    dispatch_queue_t delegateQueue = dispatch_queue_create("qread.test", DISPATCH_QUEUE_SERIAL);
+
+    XCTestExpectation * primed = [self expectationWithDescription:@"subscription primed"];
+    __block BOOL alreadyPrimed = NO;
+    delegate.onReportEnd = ^{
+        if (!alreadyPrimed) {
+            alreadyPrimed = YES;
+            [primed fulfill];
+        }
+    };
+
+    // __block: reassigned per phase below, so the handler must see the current one, not the initial nil.
+    __block XCTestExpectation * countdownReport = nil;
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * reports) {
+        for (NSDictionary<NSString *, id> * report in reports) {
+            MTRAttributePath * path = report[MTRAttributePathKey];
+            if ([path.endpoint isEqual:endpointID] && [path.cluster isEqual:clusterID] &&
+                [path.attribute isEqual:countdownID]) {
+                [countdownReport fulfill];
+            }
+        }
+    };
+
+    [device setDelegate:delegate queue:delegateQueue];
+    [self waitForExpectations:@[ primed ] timeout:60];
+
+    // Start a cycle so CountdownTime becomes non-null and advances.  Waits for the report Start itself
+    // produces, not just the command completion: a state change IS reportable for this attribute, and that
+    // report would otherwise land inside the inverted window below and fail it for the wrong reason.
+    countdownReport = [self expectationWithDescription:@"CountdownTime report caused by Start"];
+
+    XCTestExpectation * started = [self expectationWithDescription:@"Start command completed"];
+    [device invokeCommandWithEndpointID:endpointID
+                              clusterID:clusterID
+                              commandID:@(MTRCommandIDTypeClusterOperationalStateCommandStartID)
+                          commandFields:nil
+                         expectedValues:nil
+                  expectedValueInterval:nil
+                                  queue:delegateQueue
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
+                                 NSError * _Nullable error) {
+                                 XCTAssertNil(error);
+                                 [started fulfill];
+                             }];
+    [self waitForExpectations:@[ started, countdownReport ] timeout:10];
+
+    // Let the accessory tick without reporting.  Kept short: the example app's cycle is only
+    // kExampleCountDown seconds long and everything below has to happen inside it.
+    countdownReport = [self expectationWithDescription:@"no countdown report while merely ticking"];
+    countdownReport.inverted = YES;
+    [self waitForExpectations:@[ countdownReport ] timeout:5];
+
+    // Baseline the counter immediately before the read under test, so nothing above is counted.
+    (void) [device unitTestReadThroughsSinceLastCheck];
+
+    countdownReport = [self expectationWithDescription:@"report produced by the read-through"];
+
+    __auto_type * cachedValue = [device readAttributeWithEndpointID:endpointID
+                                                          clusterID:clusterID
+                                                        attributeID:countdownID
+                                                             params:nil];
+    XCTAssertNotNil(cachedValue, @"CountdownTime should be in the cache from the priming report");
+
+    XCTAssertEqual([device unitTestReadThroughsSinceLastCheck], 1UL,
+        @"Reading a Q-quality attribute while subscribed must go to the device");
+
+    [self waitForExpectations:@[ countdownReport ] timeout:10];
+
+    XCTestExpectation * stopped = [self expectationWithDescription:@"Stop command completed"];
+    [device invokeCommandWithEndpointID:endpointID
+                              clusterID:clusterID
+                              commandID:@(MTRCommandIDTypeClusterOperationalStateCommandStopID)
+                          commandFields:nil
+                         expectedValues:nil
+                  expectedValueInterval:nil
+                                  queue:delegateQueue
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
+                                 NSError * _Nullable error) {
+                                 [stopped fulfill];
+                             }];
+    [self waitForExpectations:@[ stopped ] timeout:10];
+
+    [device removeDelegate:delegate];
+}
+
+- (void)test051b_NonQuieterReportingAttributeReadsStillUseTheCache
+{
+    // The negative control for test051: an ordinary attribute is reported on every change, so its cached
+    // value is trustworthy while subscribed and a read must not reach the wire.  Asserting "no reports"
+    // alone would pass either way, since the unchanged-value filter hides a wire read's identical result.
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:sController];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+    // Without this the unchanged-value filter would hide a wire read's result.
+    delegate.forceAttributeReportsIfMatchingCache = YES;
+
+    XCTestExpectation * primed = [self expectationWithDescription:@"subscription primed"];
+    __block BOOL alreadyPrimed = NO;
+    delegate.onReportEnd = ^{
+        if (!alreadyPrimed) {
+            alreadyPrimed = YES;
+            [primed fulfill];
+        }
+    };
+
+    __auto_type * endpointID = @(1);
+    __auto_type * clusterID = @(MTRClusterIDTypeOnOffID);
+    __auto_type * onOffID = @(MTRAttributeIDTypeClusterOnOffAttributeOnOffID);
+
+    __block BOOL sawOnOffReport = NO;
+    __block BOOL countingReports = NO;
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * reports) {
+        if (!countingReports) {
+            return;
+        }
+        for (NSDictionary<NSString *, id> * report in reports) {
+            MTRAttributePath * path = report[MTRAttributePathKey];
+            if ([path.endpoint isEqual:endpointID] && [path.cluster isEqual:clusterID] &&
+                [path.attribute isEqual:onOffID]) {
+                sawOnOffReport = YES;
+            }
+        }
+    };
+
+    dispatch_queue_t delegateQueue = dispatch_queue_create("nonq.read.test", DISPATCH_QUEUE_SERIAL);
+    [device setDelegate:delegate queue:delegateQueue];
+    [self waitForExpectations:@[ primed ] timeout:60];
+
+    // Baseline: ignore anything the priming report produced.
+    (void) [device unitTestReadThroughsSinceLastCheck];
+    countingReports = YES;
+
+    for (int i = 0; i < 5; i++) {
+        __auto_type * value = [device readAttributeWithEndpointID:endpointID
+                                                        clusterID:clusterID
+                                                      attributeID:onOffID
+                                                           params:nil];
+        XCTAssertNotNil(value);
+    }
+
+    XCTAssertEqual([device unitTestReadThroughsSinceLastCheck], 0UL,
+        @"Reads of a normally-reported attribute must not go to the device while subscribed");
+
+    [NSThread sleepForTimeInterval:3.0];
+    XCTAssertFalse(sawOnOffReport,
+        @"A cache-served read must not produce an attribute report");
+
+    countingReports = NO;
+    [device removeDelegate:delegate];
+}
+
 @end
 
 @interface MTRDeviceEncoderTests : XCTestCase
