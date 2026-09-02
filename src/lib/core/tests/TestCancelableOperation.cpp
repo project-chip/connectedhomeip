@@ -771,6 +771,17 @@ protected:
     }
 };
 
+// TypedOperation must also be nameable unqualified from inside a subclass body, where the base
+// contributes the name of the implementation template it resolves to as an injected-class-name.
+// Compile-time only, so there is no test of its own below.
+class UnqualifiedTypedOperationSubclass : public TypedOperation<FallibleOperationBase, CHIP_ERROR>
+{
+public:
+    using Base = TypedOperation<FallibleOperationBase, CHIP_ERROR>;
+    using Base::Complete;
+    using Base::Start;
+};
+
 // The CHIP_ERROR from the layer's Start() reaches the caller through the typed Start().
 TEST(CancelableOperationTest, FallibleStartForwardsItsResult)
 {

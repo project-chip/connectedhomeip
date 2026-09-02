@@ -92,9 +92,9 @@ protected:
      * operation as the callee holding it.
      *
      * An intermediate subclass that needs parameters of its own simply declares them ahead of the
-     * completion; TypedOperation reads them off this declaration and forwards to it from its
-     * type-safe Start() that takes a typed Callback<Args...>::Owned instead of an untyped
-     * Cancelable::Owned. Note that Start() must not be overloaded.
+     * completion. A TypedOperation sub-class forwards them from its type-safe Start() that takes a
+     * Callback<T>::Owned instead of the type-erased Cancelable::Owned. Note that Start() must not
+     * be overloaded for an operation class to be usable with TypedOperation.
      */
     void Start(Cancelable::Owned onCompletion)
     {
@@ -173,7 +173,7 @@ namespace detail {
 
 // Re-publishes OperationBase's protected Start(), so that a pointer to it can be formed:
 // [class.protected] does not allow naming a protected member via OperationBase itself, and
-// TypedOperation cannot name it via its own scope either, since its Start() hides the base one.
+// TypedOperationImpl cannot name it via its own scope either, since its Start() hides the base one.
 template <typename OperationBase>
 struct StartProbe : OperationBase
 {
@@ -198,7 +198,7 @@ struct MemberFunctionSignature<R (C::*)(A...)>
     using Parameters = ParameterList<A...>;
 };
 
-// The signature of OperationBase::Start(), i.e. what TypedOperation::Start() has to forward.
+// The signature of OperationBase::Start(), i.e. what TypedOperationImpl::Start() has to forward.
 template <typename OperationBase>
 using StartSignature = MemberFunctionSignature<decltype(&StartProbe<OperationBase>::Start)>;
 
@@ -235,11 +235,13 @@ using StartParameters = typename DropCompletionParameter<ParameterList<>, typena
 
 // Helper template implementing the TypedOperation alias below. It is necessary because a parameter
 // pack can only be introduced by a template parameter list: there is no way to expand
-// StartParameters<OperationBase> in place.
+// StartParameters<OperationBase> in place. It carries a distinct name so that a class deriving from
+// the alias can still name TypedOperation unqualified: the base contributes its own name as an
+// injected-class-name, which would otherwise hide the alias throughout any derived class body.
 template <typename OperationBase, typename Parameters, typename... CompletionArgs>
-class TypedOperation;
+class TypedOperationImpl;
 template <typename OperationBase, typename... StartArgs, typename... CompletionArgs>
-class TypedOperation<OperationBase, ParameterList<StartArgs...>, CompletionArgs...> : public OperationBase
+class TypedOperationImpl<OperationBase, ParameterList<StartArgs...>, CompletionArgs...> : public OperationBase
 {
     static_assert(std::is_base_of_v<CancelableOperationBase, OperationBase>);
 
@@ -304,7 +306,7 @@ protected:
  * former is a trailing pack here and the latter is read off OperationBase::Start() itself.
  */
 template <typename OperationBase, typename... CompletionArgs>
-using TypedOperation = detail::TypedOperation<OperationBase, detail::StartParameters<OperationBase>, CompletionArgs...>;
+using TypedOperation = detail::TypedOperationImpl<OperationBase, detail::StartParameters<OperationBase>, CompletionArgs...>;
 
 /**
  * Convenience type for a type-safe cancelable operation. Subclasses of this class should be
