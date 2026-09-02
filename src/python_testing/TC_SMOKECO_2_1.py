@@ -143,7 +143,7 @@ class TC_SMOKECO_2_1(SmokeCoBaseTest):
 
         self.step(13)
         if await self.feature_guard(endpoint=self.get_endpoint(), cluster=Clusters.SmokeCoAlarm, feature_int=Clusters.SmokeCoAlarm.Bitmaps.Feature.kSmokeAlarm):
-            await self.read_attribute_check_range(self.smokeco_cluster.Attributes.SmokeSensitivityLevel, enum=self.smokeco_enums.AlarmStateEnum)
+            await self.read_attribute_check_range(self.smokeco_cluster.Attributes.SmokeSensitivityLevel, enum=self.smokeco_enums.SensitivityEnum)
         else:
             self.skip_step(13)
 
