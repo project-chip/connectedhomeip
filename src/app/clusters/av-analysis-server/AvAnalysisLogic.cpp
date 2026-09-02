@@ -81,6 +81,8 @@ CHIP_ERROR AvAnalysisServerLogic::Startup(AttributePersistenceProvider & aAttrib
 
         VerifyOrReturnError(mCameraClient != nullptr, CHIP_ERROR_INCORRECT_STATE,
                             ChipLogError(Zcl, "AvAnalysis: a camera client is required with Remote Detection"));
+        VerifyOrReturnError(mWebRTCClient != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                            ChipLogError(Zcl, "AvAnalysis: a WebRTC client is required with Remote Detection"));
         if (mStreamTable.Capacity() == 0)
         {
             ReturnErrorOnFailure(mStreamTable.Init(mMaxAnalysisStreamCount));

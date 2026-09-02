@@ -114,10 +114,55 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
         int mCancelCount = 0;
     };
 
+    // Records WebRTC session interactions started by the command handlers; tests complete them by
+    // invoking the recorded Callback, simulating the camera's side of the signaling.
+    class FakeWebRTCClient : public AvAnalysisWebRTCClient
+    {
+    public:
+        int mSessionRequests = 0;
+        int mEndRequests     = 0;
+        ScopedNodeId mLastCamera;
+        EndpointId mLastEndpoint  = kInvalidEndpointId;
+        uint16_t mLastVideoStream = 0;
+        uint16_t mLastSessionId   = 0;
+        Callback * mLastCallback  = nullptr;
+
+        CHIP_ERROR RequestSession(const ScopedNodeId & aCameraNode, EndpointId aWebRTCEndpoint, uint16_t aVideoStreamId,
+                                  Callback & aCallback) override
+        {
+            mSessionRequests++;
+            mLastCamera      = aCameraNode;
+            mLastEndpoint    = aWebRTCEndpoint;
+            mLastVideoStream = aVideoStreamId;
+            mLastCallback    = &aCallback;
+            return CHIP_NO_ERROR;
+        }
+
+        CHIP_ERROR EndSession(const ScopedNodeId & aCameraNode, EndpointId aWebRTCEndpoint, uint16_t aWebRTCSessionId,
+                              Callback & aCallback) override
+        {
+            mEndRequests++;
+            mLastCamera    = aCameraNode;
+            mLastEndpoint  = aWebRTCEndpoint;
+            mLastSessionId = aWebRTCSessionId;
+            mLastCallback  = &aCallback;
+            return CHIP_NO_ERROR;
+        }
+
+        void Cancel() override
+        {
+            mCancelCount++;
+            mLastCallback = nullptr;
+        }
+
+        int mCancelCount = 0;
+    };
+
     void SetUp() override
     {
         mServer.SetDelegate(&mMockDelegate);
         mServer.SetCameraClient(&mFakeCameraClient);
+        mServer.SetWebRTCClient(&mFakeWebRTCClient);
         EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
         EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
     }
@@ -189,6 +234,7 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
 
     MockAvAnalysisDelegate mMockDelegate;
     FakeCameraClient mFakeCameraClient;
+    FakeWebRTCClient mFakeWebRTCClient;
     AvAnalysisCluster mServer;
     ClusterTester mClusterTester;
 };
