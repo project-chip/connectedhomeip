@@ -68,6 +68,10 @@ class TC_DGGEN_2_2(MatterBaseTest):
             matter_asserts.assert_list(fault_list, f"{event_name} {field_name}", max_length=max_faults)
             for fault in fault_list:
                 matter_asserts.assert_valid_enum(fault, f"{event_name} {field_name} entry", enum_type)
+                # Raw values outside the defined enum values decode to the kUnknownEnumValue
+                # sentinel, which is an instance of the enum type and passes the check above.
+                asserts.assert_not_equal(fault, enum_type.kUnknownEnumValue,
+                                         f"{event_name} {field_name} entry is not a defined {enum_type.__name__} value.")
             asserts.assert_equal(len(fault_list), len(set(fault_list)),
                                  f"{event_name} {field_name} contains duplicate faults, it must represent a set.")
         asserts.assert_not_equal(set(event_data.current), set(event_data.previous),
@@ -168,6 +172,10 @@ class TC_DGGEN_2_2(MatterBaseTest):
             asserts.assert_true(new_events, "No new BootReason event emitted after the reboot.")
             latest_event = max(new_events, key=lambda e: e.Header.EventNumber)
             matter_asserts.assert_valid_enum(latest_event.Data.bootReason, "BootReason", enums.BootReasonEnum)
+            # Raw values outside the defined enum values decode to the kUnknownEnumValue
+            # sentinel, which is an instance of the enum type and passes the check above.
+            asserts.assert_not_equal(latest_event.Data.bootReason, enums.BootReasonEnum.kUnknownEnumValue,
+                                     "BootReason is not a defined BootReasonEnum value.")
             logger.info("BootReason (after reboot): %s", latest_event.Data.bootReason)
 
 
