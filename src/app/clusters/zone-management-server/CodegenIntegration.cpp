@@ -17,6 +17,7 @@
  */
 
 #include <app/clusters/zone-management-server/CodegenIntegration.h>
+#include <app/clusters/zone-management-server/MigrateZoneManagementServerStorage.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/CodeUtils.h>
 
@@ -25,10 +26,25 @@ namespace app {
 namespace Clusters {
 namespace ZoneManagement {
 
+CHIP_ERROR CodegenZoneManagementCluster::Startup(ServerClusterContext & context)
+{
+    // Migrate attributes for this cluster from SafeAttribute to AttributePersistence.
+    // This is done at Startup time when the persistence providers are guaranteed to be available.
+    SafeAttributePersistenceProvider * srcProvider = GetSafeAttributePersistenceProvider();
+    AttributePersistenceProvider & dstProvider     = context.attributeStorage;
+
+    if (srcProvider != nullptr)
+    {
+        LogErrorOnFailure(ZoneManagement::MigrateZoneManagementServerStorage(mPath.mEndpointId, *srcProvider, dstProvider));
+    }
+
+    return ZoneManagementCluster::Startup(context);
+}
+
 ZoneMgmtServer::ZoneMgmtServer(Delegate & delegate, EndpointId endpointId, BitFlags<Feature> features, uint8_t maxUserDefinedZones,
                                uint8_t maxZones, uint8_t sensitivityMax, const TwoDCartesianVertexStruct & twoDCartesianMax) :
-    mEndpointId(endpointId),
-    mDelegate(delegate), mFeatures(features), mConfig({ maxUserDefinedZones, maxZones, sensitivityMax, twoDCartesianMax })
+    mEndpointId(endpointId), mDelegate(delegate), mFeatures(features),
+    mConfig({ maxUserDefinedZones, maxZones, sensitivityMax, twoDCartesianMax })
 {}
 
 ZoneMgmtServer::~ZoneMgmtServer()

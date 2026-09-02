@@ -55,6 +55,10 @@ src/app/clusters/thread-network-directory-server/CodegenIntegration.cpp
 src/app/clusters/thread-network-directory-server/MigrateThreadNetworkDirectoryServerStorage.cpp
 src/app/clusters/thread-network-directory-server/MigrateThreadNetworkDirectoryServerStorage.h
 src/app/clusters/thread-network-directory-server/tests/TestThreadNetworkDirectoryCluster.cpp
+# ZoneManagement migration
+src/app/clusters/zone-management-server/CodegenIntegration.cpp
+src/app/clusters/zone-management-server/MigrateZoneManagementServerStorage.cpp
+src/app/clusters/zone-management-server/MigrateZoneManagementServerStorage.h
 
 # Cluster server implementations that currently use SafeAttributePersistenceProvider
 src/app/clusters/mode-base-server/mode-base-server.cpp
