@@ -1504,8 +1504,6 @@ cluster GroupKeyManagement = 63 {
   fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
 }
 
-<<<<<<< HEAD
-=======
 /** The User Label Cluster provides a feature to tag an endpoint with zero or more labels. */
 cluster UserLabel = 65 {
   revision 1;
@@ -1552,7 +1550,6 @@ cluster PowerTopology = 156 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
->>>>>>> aed3a54 ([examples] Add an Electrical Circuit Breaker endpoint to electrical-protection-app (#73815))
 /** This cluster provides an interface for a device which distributes electrical power to other devices, providing information about the capacity of the device as well as whether it has been damaged or has reached the end of its service life. */
 provisional cluster ElectricalDistribution = 162 {
   revision 1;
