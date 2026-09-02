@@ -16201,7 +16201,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command Mute
  *
- * This command SHALL set the value of the SoftMuted attribute to TRUE.
+ * This command allows the audio output of the device to be muted.
  */
 - (void)muteWithParams:(MTRAudioControlClusterMuteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)muteWithCompletion:(MTRStatusCompletion)completion
@@ -16209,7 +16209,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command Unmute
  *
- * This command SHALL set the value of the SoftMuted attribute to FALSE.
+ * This command allows the audio output of the device to be unmuted.
  */
 - (void)unmuteWithParams:(MTRAudioControlClusterUnmuteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)unmuteWithCompletion:(MTRStatusCompletion)completion
@@ -16217,7 +16217,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command ToggleMuted
  *
- * This command SHALL toggle the state of the SoftMuted attribute.
+ * This command allows the audio output of the device to be muted if it is unmuted, or unmuted if it is muted.
  */
 - (void)toggleMutedWithParams:(MTRAudioControlClusterToggleMutedParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)toggleMutedWithCompletion:(MTRStatusCompletion)completion
