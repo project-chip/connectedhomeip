@@ -186,6 +186,48 @@ class KeyConversionTest(ChipCertTest):
         self.assertIn("unsupported key type", result.stderr)
 
 
+class AttestationKeyTypeTest(ChipCertTest):
+    """Tests covering certificate-type restrictions on attestation keys."""
+
+    def skip_if_mldsa_unavailable(self, result):
+        """Skip when chip-cert was built without the OpenSSL ML-DSA definitions."""
+        if "requires chip-cert to be built against OpenSSL 3.5 or later" in result.stderr:
+            self.skipTest("chip-cert was built without ML-DSA support")
+
+    def test_dac_rejects_generated_mldsa_key(self):
+        """A DAC cannot select ML-DSA when generating its key."""
+        result = self.run_chip_cert(
+            "gen-att-cert", "--type", "d", "--subject-cn", "Test DAC",
+            "--subject-vid", "FFF1", "--subject-pid", "8000",
+            "--ca-cert", "unused-ca.pem", "--ca-key", "unused-ca-key.pem",
+            "--out", self.tmp_path / "dac.pem", "--out-key", self.tmp_path / "dac-key.pem",
+            "--key-type", "ml-dsa-44", "--lifetime", "3650", expect_success=False)
+        self.skip_if_mldsa_unavailable(result)
+
+        self.assertIn("DAC certificates require a P-256 key", result.stderr)
+
+    def test_dac_rejects_imported_mldsa_key(self):
+        """A DAC cannot import an ML-DSA key generated for another certificate type."""
+        key = self.tmp_path / "mldsa-key.pem"
+        command = [
+            str(self.chip_cert),
+            "gen-att-cert", "--type", "a", "--subject-cn", "Test PAA",
+            "--out", self.tmp_path / "paa.pem", "--out-key", key,
+            "--key-type", "ml-dsa-44", "--lifetime", "3650",
+        ]
+        result = subprocess.run(command, capture_output=True, text=True)
+        self.skip_if_mldsa_unavailable(result)
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+        result = self.run_chip_cert(
+            "gen-att-cert", "--type", "d", "--subject-cn", "Test DAC",
+            "--subject-vid", "FFF1", "--subject-pid", "8000", "--key", key,
+            "--ca-cert", "unused-ca.pem", "--ca-key", "unused-ca-key.pem",
+            "--out", self.tmp_path / "dac.pem", "--lifetime", "3650", expect_success=False)
+
+        self.assertIn("DAC certificates require a P-256 key", result.stderr)
+
+
 class PDCIdentityTest(ChipCertTest):
     """Tests covering PDC (Network / Client) Identity certificates."""
 

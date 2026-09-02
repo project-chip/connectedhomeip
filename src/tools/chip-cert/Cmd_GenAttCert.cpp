@@ -630,6 +630,12 @@ bool Cmd_GenAttCert(int argc, char * argv[])
         }
     }
 
+    if (gAttCertType == kAttCertType_DAC && IsMLDSAKey(newKey.get()))
+    {
+        fprintf(stderr, "DAC certificates require a P-256 key\n");
+        ExitNow(res = false);
+    }
+
     if (gCRLIssuerCertFileName != nullptr || gCDPURI != nullptr)
     {
         int result;
