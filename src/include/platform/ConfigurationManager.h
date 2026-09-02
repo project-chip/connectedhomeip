@@ -152,8 +152,8 @@ public:
 
     virtual void LogDeviceConfig() = 0;
 
-    virtual bool IsCommissionableDeviceTypeEnabled()                              = 0;
-    virtual CHIP_ERROR GetDeviceTypeId(uint32_t & deviceType)                     = 0;
+    virtual bool IsCommissionableDeviceTypeEnabled()          = 0;
+    virtual CHIP_ERROR GetDeviceTypeId(uint32_t & deviceType) = 0;
     // Override the device type id returned by GetDeviceTypeId() (and therefore
     // advertised in the DNS-SD "_T<id>" commissioning subtype) for this session.
     // The override is not persisted across reboots. Not all platforms implement

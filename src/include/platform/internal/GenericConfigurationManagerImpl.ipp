@@ -63,7 +63,7 @@ std::optional<System::Clock::Seconds32> gFirmwareBuildChipEpochTime;
 // Runtime override for the device type id (see SetDeviceTypeId). Not persisted;
 // falls back to CHIP_DEVICE_CONFIG_DEVICE_TYPE when unset.
 std::optional<uint32_t> gDeviceTypeId;
-}
+} // namespace
 
 #if CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
 
