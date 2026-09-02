@@ -847,7 +847,7 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePowerRangeAdj
     // Check that Duration > 0 && <= 86400 (24 hours)
     if ((commandData.duration == 0) || (commandData.duration > kDayInSeconds))
     {
-        ChipLogError(Zcl, "DEM: Duration must be >0 and <= %u for PowerRangeAdjustRequest", kDayInSeconds);
+        ChipLogError(Zcl, "DEM: Duration must be >0 and <= 86400 for PowerRangeAdjustRequest");
         return Status::ConstraintError;
     }
 
