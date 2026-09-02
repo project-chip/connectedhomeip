@@ -79,7 +79,7 @@ class TC_ACS_3_1(MatterBaseTest):
                      "If 1 is read, skip this test case. Otherwise proceed the following."),
             TestStep("3", "TH establishes a wildcard subscription to all attributes on Ambient Context Sensing Cluster on the endpoint under test with minIntervalFloor set to 0, MaxIntervalCeiling set to 30 and KeepSubscriptions set to false.."),
             TestStep("4", "TH writes DUT HoldTime attribute.",
-                     "VVerify that its value is ranged between HoldTimeLimits.HoldTimeMin and HoldTimeLimits.HoldTimeMax."),
+                     "Verify that its value is ranged between HoldTimeLimits.HoldTimeMin and HoldTimeLimits.HoldTimeMax."),
             TestStep("5a", "This step is for DUT capable of supporting only 2 simultaneous detection. Otherwise, skip to 6a.",
                      "An operator actuates DUT to generate the first ambient sensing event, and then removes its sensing stimulus.",
                      "And within HoldTime duration, an operator actuates DUT to generate the second ambient sensing event, and then removes its sensing stimulus."),
@@ -102,7 +102,7 @@ class TC_ACS_3_1(MatterBaseTest):
 
     def setup_test(self):
         super().setup_test()
-        self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', True)
+        self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', False)
 
     # Sends and out-of-band command to the all-clusters-app
     def write_to_app_pipe(self, command):
@@ -201,7 +201,7 @@ class TC_ACS_3_1(MatterBaseTest):
             pixit1_nsid = self.user_params.get("PIXIT.ACS.Event1_NSID", "0x4B")
             pixit1_tagid = self.user_params.get("PIXIT.ACS.Event1_TAGID", "0x03")
             log.info("pixit1_nsid: %s", pixit1_nsid)
-            log.info("pixit1_nsid: %s", pixit1_tagid)
+            log.info("pixit1_tagid: %s", pixit1_tagid)
             # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
             list_dec = ast.literal_eval(pixit1_nsid)
             namespaceID1 = list_dec
@@ -228,7 +228,7 @@ class TC_ACS_3_1(MatterBaseTest):
             pixit2_nsid = self.user_params.get("PIXIT.ACS.Event2_NSID", "0x49")
             pixit2_tagid = self.user_params.get("PIXIT.ACS.Event2_TAGID", "0x03")
             log.info("pixit1_nsid: %s", pixit2_nsid)
-            log.info("pixit1_nsid: %s", pixit2_tagid)
+            log.info("pixit1_tagid: %s", pixit2_tagid)
             # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
             list_dec = ast.literal_eval(pixit2_nsid)
             namespaceID2 = list_dec
@@ -254,9 +254,8 @@ class TC_ACS_3_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType)
             # log.info(f"Rx'd AmbientContextType: {ambientContextType}")
 
-            # Simultaneous Detection <= 2
-            asserts.assert_less_equal(len(ambientContextType), 2, "AmbientContextType list needs to be the size of up to 2.")
-            asserts.assert_less_than(0, len(ambientContextType), "AmbientContextType list needs to be the size of greater than 0.")
+            # Simultaneous Detection = 2
+            asserts.assert_equal(len(ambientContextType), 2, "AmbientContextType list must hold both detections from step 5a.")
 
             # check the subscription of AmbientContextType attribute
             subscription_expected = attrib_listener.attribute_reports[cluster.Attributes.AmbientContextType][-1].value
@@ -306,7 +305,7 @@ class TC_ACS_3_1(MatterBaseTest):
                 audioContextDetected = subscription_bool_expected1[0].value
                 asserts.assert_true(audioContextDetected, "Failed to get audioContextDetected being True.")
 
-            attrib_listener.reset()
+            #attrib_listener.reset()
 
             self.step("5c", "An operator waits until the HoldTime duration expires since the step 5a execution. Check if AmbientContextDetectEnded is received for the second ambient sensing event.")
             # timer ends
@@ -389,7 +388,7 @@ class TC_ACS_3_1(MatterBaseTest):
             pixit3_nsid = self.user_params.get("PIXIT.ACS.Event3_NSID", "0x4A")
             pixit3_tagid = self.user_params.get("PIXIT.ACS.Event3_TAGID", "0x03")
             log.info("pixit3_nsid: %s", pixit3_nsid)
-            log.info("pixit3_nsid: %s", pixit3_tagid)
+            log.info("pixit3_tagid: %s", pixit3_tagid)
             # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
             list_dec = ast.literal_eval(pixit3_nsid)
             namespaceID3 = list_dec
@@ -414,9 +413,8 @@ class TC_ACS_3_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType)
             # log.info(f"Rx'd AmbientContextType: {ambientContextType}")
 
-            # Simultaneous Detection <= 3
-            asserts.assert_less_equal(len(ambientContextType), 3, "AmbientContextType list needs to be the size of 3.")
-            asserts.assert_less(0, len(ambientContextType), "AmbientContextType list size needs to be greater than 0.")
+            # Simultaneous Detection = 3
+            asserts.assert_equal(len(ambientContextType), 3, "AmbientContextType list needs to be the size of 3.")
 
             # check the subscription of AmbientContextType attribute
             subscription_expected = attrib_listener.attribute_reports[cluster.Attributes.AmbientContextType][-1].value
@@ -475,7 +473,7 @@ class TC_ACS_3_1(MatterBaseTest):
                 audioContextDetected = subscription_bool_expected1[0].value
                 asserts.assert_true(audioContextDetected, "Failed to get audioContextDetected being True.")
 
-            # AmbientContextType attribute subscription check for the early boolean attribute
+            # AmbientContextType attribute subscription check for the earliest boolean attribute
             if (namespaceid_test2 == HUMAN_ACTIVITY_NAMESPACE_ID) & self.HumanActivitySupported:
                 subscription_bool_expected2 = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
                 humanActivityDetected = subscription_bool_expected2[0].value
@@ -489,7 +487,7 @@ class TC_ACS_3_1(MatterBaseTest):
                 audioContextDetected = subscription_bool_expected2[0].value
                 asserts.assert_true(audioContextDetected, "Failed to get audioContextDetected being True.")
 
-            attrib_listener.reset()
+            #attrib_listener.reset()
 
             self.step("6c", "An operator waits until the HoldTime duration expires since the step 6a execution. Check if AmbientContextDetectEnded is received for the last ambient sensing event.")
 
@@ -497,7 +495,7 @@ class TC_ACS_3_1(MatterBaseTest):
             end_time = time.perf_counter()
             elapsed_time = end_time - start_time
             if elapsed_time > holdTime_input:
-                log.info("Two events weren't completed within HoldTime input.")
+                log.info("Three events weren't completed within HoldTime input.")
             else:
                 log.info("Waiting for the HoldTime input to expire.")
                 await asyncio.sleep(holdTime_input - elapsed_time + 1)
