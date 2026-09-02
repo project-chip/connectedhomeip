@@ -118,7 +118,7 @@ class TC_DD_3_26(MatterTestCommissioner):
             commissionee = await self.default_controller.FindOrEstablishPASESession(
                 setupCode=nfc_tag_data, nodeId=self.dut_node_id
             )
-        except ChipStackError as e:
+        except ChipStackError as e: # chipstack-ok
             asserts.fail(f"PASE session establishment over NFC failed: {e}")
         asserts.assert_is_not_none(commissionee, "Failed to find or establish PASE session over NFC")
 
@@ -151,7 +151,7 @@ class TC_DD_3_26(MatterTestCommissioner):
                 try:
                     await self.default_controller.ReadAttribute(nodeId=self.dut_node_id, attributes=[(0, breadcrumb_attr)])
                     log.info("Read Request succeeded at t=%.2fs (iteration %d/%d)", elapsed, iteration, rearm_iterations)
-                except ChipStackError as e:
+                except ChipStackError as e: # chipstack-ok
                     asserts.fail(
                         f"Read Request unexpectedly failed at t={elapsed:.2f}s during re-arm iteration "
                         f"{iteration}/{rearm_iterations}, well before the {expiry_length_seconds}s Fail-Safe "
@@ -176,7 +176,7 @@ class TC_DD_3_26(MatterTestCommissioner):
             try:
                 await self.default_controller.ReadAttribute(nodeId=self.dut_node_id, attributes=[(0, breadcrumb_attr)])
                 log.info("Read Request succeeded at t=%.2fs", elapsed)
-            except ChipStackError as e:
+            except ChipStackError as e: # chipstack-ok
                 failure_seen = True
                 failure_err = e
                 elapsed_at_failure = time.monotonic() - fail_safe_armed_at
