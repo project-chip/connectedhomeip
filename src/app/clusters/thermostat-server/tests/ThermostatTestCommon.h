@@ -557,6 +557,196 @@ public:
     DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> mNotFollowingReason = DataModel::NullNullable;
 };
 
+class MockSensorsDelegate : public ThermostatSensors::Delegate
+{
+public:
+    CHIP_ERROR GetSensorAtIndex(size_t index, ThermostatSensorStructWithOwnedMembers & sensor) override
+    {
+        if (index < mSensors.size())
+        {
+            sensor = *mSensors[index];
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+
+    CHIP_ERROR GetAvailableSensorAtIndex(size_t index, ByteSpan & sensorHandle) override
+    {
+        if (index < mAvailableSensors.size())
+        {
+            sensorHandle = ByteSpan(mAvailableSensors[index].data(), mAvailableSensors[index].size());
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+
+    bool SetAvailableSensors(Span<const ByteSpan> availableSensors) override
+    {
+        bool changed = (mAvailableSensors.size() != availableSensors.size());
+        if (!changed)
+        {
+            for (size_t i = 0; i < availableSensors.size(); i++)
+            {
+                ByteSpan current(mAvailableSensors[i].data(), mAvailableSensors[i].size());
+                if (!current.data_equal(availableSensors[i]))
+                {
+                    changed = true;
+                    break;
+                }
+            }
+        }
+        std::vector<std::vector<uint8_t>> newAvailable;
+        for (const auto & handle : availableSensors)
+        {
+            newAvailable.emplace_back(handle.data(), handle.data() + handle.size());
+        }
+        mAvailableSensors = std::move(newAvailable);
+        return changed;
+    }
+
+    CHIP_ERROR GetEnabledSensorAtIndex(size_t index, ByteSpan & sensorHandle) override
+    {
+        if (index < mEnabledSensors.size())
+        {
+            sensorHandle = ByteSpan(mEnabledSensors[index].data(), mEnabledSensors[index].size());
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+
+    bool SetEnabledSensors(Span<const ByteSpan> enabledSensors) override
+    {
+        bool changed = (mEnabledSensors.size() != enabledSensors.size());
+        if (!changed)
+        {
+            for (size_t i = 0; i < enabledSensors.size(); i++)
+            {
+                ByteSpan current(mEnabledSensors[i].data(), mEnabledSensors[i].size());
+                if (!current.data_equal(enabledSensors[i]))
+                {
+                    changed = true;
+                    break;
+                }
+            }
+        }
+        std::vector<std::vector<uint8_t>> newEnabled;
+        for (const auto & handle : enabledSensors)
+        {
+            newEnabled.emplace_back(handle.data(), handle.data() + handle.size());
+        }
+        mEnabledSensors = std::move(newEnabled);
+        return changed;
+    }
+
+    uint8_t GetNumberOfSensorScheduleTransitions() override { return mNumberOfSensorScheduleTransitions; }
+
+    CHIP_ERROR GetSensorScheduleTransitionAtIndex(size_t index,
+                                                  SensorScheduleTransitionStructWithOwnedMembers & transition) override
+    {
+        if (index < mTransitions.size())
+        {
+            transition = *mTransitions[index];
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+
+    CHIP_ERROR GetPendingSensorScheduleTransitionAtIndex(size_t index,
+                                                         SensorScheduleTransitionStructWithOwnedMembers & transition) override
+    {
+        if (index < mPendingTransitions.size())
+        {
+            transition = *mPendingTransitions[index];
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+
+    void InitializePendingSensorScheduleTransitions() override
+    {
+        mPendingTransitions.clear();
+        for (const auto & trans : mTransitions)
+        {
+            auto copy = std::make_unique<SensorScheduleTransitionStructWithOwnedMembers>();
+            *copy     = *trans;
+            mPendingTransitions.push_back(std::move(copy));
+        }
+    }
+
+    void ClearPendingSensorScheduleTransitions() override { mPendingTransitions.clear(); }
+
+    CHIP_ERROR AppendToPendingSensorScheduleTransitions(
+        const SensorScheduleTransitionStructWithOwnedMembers & transition) override
+    {
+        if (mFailAppend)
+        {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+        auto item = std::make_unique<SensorScheduleTransitionStructWithOwnedMembers>();
+        *item     = transition;
+        mPendingTransitions.push_back(std::move(item));
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR CommitPendingSensorScheduleTransitions() override
+    {
+        ReturnErrorOnFailure(mCommitError);
+        mTransitions.clear();
+        for (auto & trans : mPendingTransitions)
+        {
+            mTransitions.push_back(std::move(trans));
+        }
+        mPendingTransitions.clear();
+        return CHIP_NO_ERROR;
+    }
+
+    std::optional<System::Clock::Milliseconds16> GetMaxAtomicWriteTimeout(chip::AttributeId attributeId) override
+    {
+        if (attributeId == Attributes::SensorSchedule::Id)
+        {
+            return mMaxAtomicWriteTimeout;
+        }
+        return std::nullopt;
+    }
+
+    void AddSensor(const ThermostatSensorStructWithOwnedMembers & sensor)
+    {
+        auto item = std::make_unique<ThermostatSensorStructWithOwnedMembers>();
+        *item     = sensor;
+        mSensors.push_back(std::move(item));
+    }
+
+    void AddTransition(const SensorScheduleTransitionStructWithOwnedMembers & transition)
+    {
+        auto item = std::make_unique<SensorScheduleTransitionStructWithOwnedMembers>();
+        *item     = transition;
+        mTransitions.push_back(std::move(item));
+    }
+
+    void Reset()
+    {
+        mSensors.clear();
+        mAvailableSensors.clear();
+        mEnabledSensors.clear();
+        mTransitions.clear();
+        mPendingTransitions.clear();
+        mNumberOfSensorScheduleTransitions = 10;
+        mFailAppend                        = false;
+        mCommitError                       = CHIP_NO_ERROR;
+        mMaxAtomicWriteTimeout             = System::Clock::Milliseconds16(10000);
+    }
+
+    std::vector<std::unique_ptr<ThermostatSensorStructWithOwnedMembers>> mSensors;
+    std::vector<std::vector<uint8_t>> mAvailableSensors;
+    std::vector<std::vector<uint8_t>> mEnabledSensors;
+    uint8_t mNumberOfSensorScheduleTransitions = 10;
+    std::vector<std::unique_ptr<SensorScheduleTransitionStructWithOwnedMembers>> mTransitions;
+    std::vector<std::unique_ptr<SensorScheduleTransitionStructWithOwnedMembers>> mPendingTransitions;
+    bool mFailAppend                                                    = false;
+    CHIP_ERROR mCommitError                                             = CHIP_NO_ERROR;
+    std::optional<System::Clock::Milliseconds16> mMaxAtomicWriteTimeout = System::Clock::Milliseconds16(10000);
+};
+
 inline bool HasAttribute(ServerClusterInterface & cluster, AttributeId attrId)
 {
     ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> builder;
@@ -587,6 +777,7 @@ struct ThermostatTestFixture : public ::testing::Test
     MockOccupancyDelegate mOccupancyDelegate;
     MockPresetsDelegate mPresetsDelegate;
     MockSuggestionsDelegate mSuggestionsDelegate;
+    MockSensorsDelegate mSensorsDelegate;
 
     void SetUp() override
     {
@@ -597,6 +788,7 @@ struct ThermostatTestFixture : public ::testing::Test
 
     void TearDown() override
     {
+        mSensorsDelegate.Reset();
         FabricIndex fabricIndex = kTestFabricIndex;
         EXPECT_EQ(mFabricHelper.TearDownTestFabric(fabricIndex), CHIP_NO_ERROR);
     }
