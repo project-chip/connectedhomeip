@@ -258,8 +258,9 @@ class TC_ACS_3_3(MatterBaseTest):
         await event_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
 
         # Wait user to input capabilities
-        self.wait_for_user_input(
-            prompt_msg="Type any letter and press ENTER after DUT is clear of any detection state.")
+        if not self.is_ci:
+            self.wait_for_user_input(
+                prompt_msg="Type any letter and press ENTER after DUT is clear of any detection state.")
 
         # Human Activity Feature Supported =======================================================================
         if (namespaceID1 == HUMAN_ACTIVITY_NAMESPACE_ID) & self.HumanActivitySupported:
@@ -329,11 +330,11 @@ class TC_ACS_3_3(MatterBaseTest):
             # check AmbientContextDetectEnded event
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdtime_dut))
-            if event.eventStartTimePos:
-                asserts.assert_true((event.eventStartTimePos - event_start_time) < 1000, "Not matching EventStartTimePos")
+            if event.eventStartTimePos != NullValue:
+                asserts.assert_true(abs(event.eventStartTimePos - event_start_time) < 1000, "Not matching EventStartTimePos")
                 log.info("event time from AmbientContextDetectEnded field data: %s", {event.eventStartTimePos})
             else:
-                asserts.assert_true((event.eventStartTimeSys - event_start_time) < 1000, "Not matching EventStartTimeSys")
+                asserts.assert_true(abs(event.eventStartTimeSys - event_start_time) < 1000, "Not matching EventStartTimeSys")
                 log.info("event time from AmbientContextDetectEnded field data: %s", {event.eventStartTimeSys})
 
         else:
@@ -382,7 +383,7 @@ class TC_ACS_3_3(MatterBaseTest):
             # check the subscription of AmbientContextType attribute
             subscription_expected = attrib_listener.attribute_reports[cluster.Attributes.AmbientContextType][0].value
             asserts.assert_true(subscription_expected[0].ambientContextSensed[0].namespaceID == namespaceID2,
-                                f"Unexpected namespaceID, {subscription_expected[0].ambientContextSensed[0].namespaceID}, exp {namespaceID1}")
+                                f"Unexpected namespaceID, {subscription_expected[0].ambientContextSensed[0].namespaceID}, exp {namespaceID2}")
             asserts.assert_true(subscription_expected[0].ambientContextSensed[0].tag == tag2,
                                 f"Unexpected tag, {subscription_expected[0].ambientContextSensed[0].tag}, exp {tag2}")
             log.info("Received attribute report for AmbientContextType.")
@@ -416,11 +417,11 @@ class TC_ACS_3_3(MatterBaseTest):
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdtime_dut))
             # asserts.assert_true((event.eventStartTime//1000) == event_start_time, "Not matching EventStartTime")
-            if event.eventStartTimePos:
-                asserts.assert_true((event.eventStartTimePos - event_start_time) < 1000, "Not matching EventStartTimePos")
+            if event.eventStartTimePos != NullValue:
+                asserts.assert_true(abs(event.eventStartTimePos - event_start_time) < 1000, "Not matching EventStartTimePos")
                 # log.info(f"event time from AmbientContextDetectEnded field data: {event.eventStartTimePos}")
             else:
-                asserts.assert_true((event.eventStartTimeSys - event_start_time) < 1000, "Not matching EventStartTimeSys")
+                asserts.assert_true(abs(event.eventStartTimeSys - event_start_time) < 1000, "Not matching EventStartTimeSys")
                 # log.info(f"event time from AmbientContextDetectEnded field data: {event.eventStartTimeSys}")
         else:
             log.info("ObjectIdentification Feature not supported. Test steps skipped")
@@ -504,11 +505,11 @@ class TC_ACS_3_3(MatterBaseTest):
             self.step("5f", "TH receives AmbientContextDetectEnded event and reads EventStartTimePos or EventStartTimeSys event field. Verify that the EventStartTimePos or EventStartTimeSys field contains the event start time stored from the step 5d.")
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdtime_dut))
-            if event.eventStartTimePos:
-                asserts.assert_true((event.eventStartTimePos - event_start_time) < 1000, "Not matching EventStartTimePos")
+            if event.eventStartTimePos != NullValue:
+                asserts.assert_true(abs(event.eventStartTimePos - event_start_time) < 1000, "Not matching EventStartTimePos")
                 # log.info(f"event time from AmbientContextDetectEnded field data: {event.eventStartTimePos}")
             else:
-                asserts.assert_true((event.eventStartTimeSys - event_start_time) < 1000, "Not matching EventStartTimeSys")
+                asserts.assert_true(abs(event.eventStartTimeSys - event_start_time) < 1000, "Not matching EventStartTimeSys")
                 # log.info(f"event time from AmbientContextDetectEnded field data: {event.eventStartTimeSys}")
         else:
             log.info("SoundIdentification Feature not supported. Test steps skipped")
@@ -565,7 +566,7 @@ class TC_ACS_3_3(MatterBaseTest):
                     f'{{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":{namespaceID2}, "TagId":{tag2}}}]}}')
                 await asyncio.sleep(1)
                 self.write_to_app_pipe(
-                    '{"Name":"SetObjCount","EndpointId":1,"ObjectCount":2}')
+                    '{"Name":"SetObjCount","EndpointId":{endpoint},"ObjectCount":2}')
                 await asyncio.sleep(1)
             else:
                 self.wait_for_user_input(
@@ -582,10 +583,10 @@ class TC_ACS_3_3(MatterBaseTest):
             log.info("Received attribute report for ObjectCountThresholdReached = True.")
 
             # check if ObjectCount optional attribute is supported
-            if attr.ObjectCount in attribute_list:
-                subscription_expected = attrib_listener.attribute_reports[cluster.Attributes.ObjectCountThresholdReached]
+            if attr.ObjectCount.attribute_id in attribute_list:
+                subscription_expected = attrib_listener.attribute_reports[cluster.Attributes.ObjectCount]
                 objectCount = subscription_expected[0].value
-                asserts.assert_true(objectCount > 1, "Failed to get ObjectCount value correct.")
+                asserts.assert_true(objectCount > 1, "Failed to have ObjectCount value greater than 1")
                 log.info("Received attribute report for ObjectCountReached.")
 
             self.step("6f", "TH receives AmbientContextDetectStarted event. Verify that the AmbientContextDetected field contains the namespace ID and tag ID of the step 6d, and if DUT supports ObjectCount, ObjectCount event field is greater than equal to 2. Store the event time generated by this AmbientContextDetectStarted event.")
@@ -615,11 +616,11 @@ class TC_ACS_3_3(MatterBaseTest):
             self.step("6h", "TH receives AmbientContextDetectEnded event and reads EventStartTimePos or EventStartTimeSys field. Verify that the EventStartTimePos or EventStartTimeSys field contains the event time stored from the step 6f.")
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdtime_dut))
-            if event.eventStartTimePos:
-                asserts.assert_true((event.eventStartTimePos - event_start_time) < 1000, "Not matching EventStartTimePos")
+            if event.eventStartTimePos != NullValue:
+                asserts.assert_true(abs(event.eventStartTimePos - event_start_time) < 1000, "Not matching EventStartTimePos")
                 log.info("event time from AmbientContextDetectEnded field data: %s", {event.eventStartTimePos})
             else:
-                asserts.assert_true((event.eventStartTimeSys - event_start_time) < 1000, "Not matching EventStartTimeSys")
+                asserts.assert_true(abs(event.eventStartTimeSys - event_start_time) < 1000, "Not matching EventStartTimeSys")
                 log.info("event time from AmbientContextDetectEnded field data: %s", {event.eventStartTimeSys})
 
         else:
