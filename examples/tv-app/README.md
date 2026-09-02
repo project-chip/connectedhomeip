@@ -49,7 +49,7 @@ The device type is expressed in **two independent places**:
 The Linux `tv-app` accepts a flag that presents endpoint 1 as a different media
 device type at boot, without a rebuild:
 
-```
+```sh
 ./out/debug/chip-tv-app --device-type basic-video
 ./out/debug/chip-tv-app --device-type casting-audio
 ./out/debug/chip-tv-app --device-type streaming-audio

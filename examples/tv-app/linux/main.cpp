@@ -33,6 +33,7 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
+#include <devices/Types.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <platform/ConfigurationManager.h>
 #include <protocols/Protocols.h>
@@ -109,13 +110,17 @@ struct MediaDeviceTypeOption
     EmberAfDeviceType deviceType; // { deviceTypeId, deviceTypeRevision }
 };
 
-// Revisions match the current Device Library (video players, revision 2) and the
-// streaming-casting-speakers spec additions (audio players, revision 1).
+// EmberAfDeviceType is DataModel::DeviceTypeEntry, so the generated
+// devices/Types.h entries can be used directly for the ids/revisions that exist
+// there (they track the data model automatically). The two audio player types
+// are recent spec additions that are not yet emitted into devices/Types.h (they
+// are absent from matter-devices.xml), so they are spelled out (revision 1)
+// until they are generated.
 constexpr MediaDeviceTypeOption kMediaDeviceTypes[] = {
-    { "casting-video", { 0x0023, 2 } },   // Casting Video Player (tv-app.zap default)
-    { "basic-video", { 0x0028, 2 } },     // Basic Video Player
-    { "casting-audio", { 0x0021, 1 } },   // Casting Audio Player
-    { "streaming-audio", { 0x0020, 1 } }, // Streaming Audio Player
+    { "casting-video", app::Device::Type::kCastingVideoPlayer }, // 0x0023 (tv-app.zap default)
+    { "basic-video", app::Device::Type::kBasicVideoPlayer },     // 0x0028
+    { "casting-audio", { 0x0021, 1 } },                          // Casting Audio Player
+    { "streaming-audio", { 0x0020, 1 } },                        // Streaming Audio Player
 };
 
 // Backing storage for the runtime override; emberAfSetDeviceTypeList stores the
