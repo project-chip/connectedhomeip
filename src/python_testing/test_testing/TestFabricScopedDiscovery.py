@@ -99,7 +99,7 @@ class TestFabricScopedDiscovery(CertificationUnitTestNoDevice):
             idm_support.struct_is_fabric_scoped(Clusters.AccessControl.Structs.AccessControlTargetStruct),
             "AccessControlTargetStruct carries no FabricIndex field")
         asserts.assert_false(idm_support.struct_is_fabric_scoped(None),
-                            "A missing struct type is not fabric scoped")
+                             "A missing struct type is not fabric scoped")
 
     def test_fabric_sensitive_field_labels(self):
         # The spec marks Privilege/AuthMode/Subjects/Targets/AuxiliaryType of
