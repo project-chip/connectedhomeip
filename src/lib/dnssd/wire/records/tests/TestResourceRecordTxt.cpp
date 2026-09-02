@@ -24,7 +24,7 @@ namespace {
 
 using namespace chip;
 using namespace chip::Encoding;
-using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 
 TEST(TestResourceRecordTxt, TestTxt)
 {
