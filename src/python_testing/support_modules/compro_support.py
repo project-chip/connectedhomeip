@@ -1202,12 +1202,14 @@ class COMPROBaseTest(MatterBaseTest):
         elif ed_transport == "wifipaf":
             bit = int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF)
         elif ed_transport == "both":
-            # Ambiguous by construction: a dual-transport ED is for the scan
-            # tests, which pass an explicit bitmap rather than asking for one
-            # transport. A caller reaching here has to say which it wants.
-            raise ValueError(
-                "ed_transport=both does not select a single transport; pass the transport bit "
-                "explicitly instead of calling pick_proxy_transport().")
+            # The ED really is commissionable on either, so choosing one is not a
+            # guess. Prefer WiFi-PAF where the DUT supports it: it is the longer
+            # and more failure-prone path of the two, so it yields more signal.
+            kWiFiPAF = int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF)
+            kBle = int(cp.Bitmaps.CapabilitiesBitmap.kBle)
+            bit = kWiFiPAF if (valid_transports & kWiFiPAF) else kBle
+            logger.info("ed_transport=both: using transport 0x%02x (valid_transports=0x%02x)",
+                        bit, valid_transports)
         else:
             raise ValueError(f"Unknown ed_transport '{ed_transport}'; expected 'ble', 'wifipaf' or 'both'.")
         asserts.assert_true(

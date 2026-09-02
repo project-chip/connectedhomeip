@@ -33,6 +33,13 @@ from .namespace import IsolatedNetworkNamespace, NetworkLink
 
 log = logging.getLogger(__name__)
 
+# Discovery must not be reported before the call that asked for it has returned:
+# a subscriber sets up its result handling after NANSubscribe replies, and a
+# signal that arrives first is simply dropped. Real NAN discovery takes at least
+# a beacon interval, so a short delay is both realistic and what keeps the
+# ordering deterministic.
+DISCOVERY_DELAY_S = 0.1
+
 if TYPE_CHECKING:
     DbusAnyT: TypeAlias = (bool | int | float | str | bytes | list["DbusAnyT"] | tuple["DbusAnyT", ...] | dict[str, "DbusAnyT"]
                            | "DictVariantT")
@@ -83,6 +90,7 @@ class NANSimulator:
         active subscriber keeps receiving unsolicited publish frames, which is how a
         background scan notices a device that appears while the scan is running.
         """
+        await asyncio.sleep(DISCOVERY_DELAY_S)
         with self._lock:
             subscribers_copy = dict(self.subscribers)
             interfaces_copy = dict(self.interfaces)
@@ -105,7 +113,7 @@ class NANSimulator:
             log.debug("NANSimulator: Subscriber started - iface=%s, sub_id=%d",
                       iface_name, subscribe_id)
 
-        # Process discoveries after a delay
+        await asyncio.sleep(DISCOVERY_DELAY_S)
         await self._process_discoveries(iface_name, subscribe_id, args)
 
     def on_subscribe_cancelled(self, subscribe_id: int):
@@ -240,6 +248,13 @@ class WpaSupplicantMock(TerminableThread):
             for interface in self.mock.interfaces:
                 if interface.interface_name_in_sim in name.lower():  # Case-insensitive match
                     return interface.path
+            # Returning some other application's interface makes a misplaced
+            # application look like a NAN problem instead of a configuration one,
+            # so say so rather than only handing back the last interface.
+            log.warning("No mock interface matches '%s'; registered names are %s. "
+                        "Falling back to '%s' -- is the application in the right network namespace?",
+                        name, [i.interface_name_in_sim for i in self.mock.interfaces],
+                        self.mock.interfaces[-1].interface_name_in_sim)
             return self.mock.interfaces[-1].path
 
     class WpaInterface(sdbus.DbusInterfaceCommonAsync,
@@ -269,6 +284,11 @@ class WpaSupplicantMock(TerminableThread):
             self.link: NetworkLink | None = None
             # Unique bus name of the application currently using this interface.
             self.owner: str | None = None
+            # Whether this interface brought its link up by associating. Links the
+            # harness brought up itself -- an on-network proxy's, say -- are not
+            # ours to take down: doing so cuts the only path its controller has to
+            # it, and it never associated in the first place.
+            self.associated = False
 
         async def _note_caller(self) -> None:
             """Reset the association when a different application takes over.
@@ -322,6 +342,7 @@ class WpaSupplicantMock(TerminableThread):
                 await self.State.set_async("associated")
                 if self.link is not None:
                     self.link.up()
+                    self.associated = True
                 await self.State.set_async("completed")
 
             await self.Scan({})
@@ -354,8 +375,9 @@ class WpaSupplicantMock(TerminableThread):
             provisioned still be reached over IP, which is exactly the path a
             commissioning test needs closed.
             """
-            if self.link is not None and self.link.up_flag:
+            if self.link is not None and self.associated:
                 self.link.down()
+                self.associated = False
             await self.State.set_async("disconnected")
 
         @sdbus.dbus_method_async()

@@ -84,10 +84,12 @@ DEFAULT_CP_ENDPOINT = 5
 PAF_FREQ_LIST = "2437"
 
 # bluezoo exposes two adapters; the end device advertises on the first and the
-# proxy scans and connects as central on the second.
+# proxy scans and connects as central on the second. The controller gets none: a
+# test harness has no reason to reach the end device over BLE, and giving it an
+# adapter makes the multi-transport SetUpCodePairer race onto BLE while
+# commissioning the proxy, leaving the proxy holding a connection nobody closes.
 BLE_CONTROLLER_ED = 0
 BLE_CONTROLLER_PROXY = 1
-BLE_CONTROLLER_TOOL = 2
 
 # all-devices-app has no --passcode option, so the proxy always comes up on the
 # built-in test passcode and the test script has to be given the same value.
@@ -97,6 +99,27 @@ PROXY_PASSCODE = 20202021
 # marker the CI test-argument blocks use as their app-ready-pattern.
 APP_READY_PATTERN = "APP STATUS: Starting event loop"
 APP_READY_TIMEOUT_S = 30
+
+
+class MockRecordsOnly(logging.Filter):
+    """Let the mock servers log below the level everything else logs at.
+
+    Raising the whole run to debug to see the mock's NAN and link events changes
+    the timing enough to hide races, so the handler is opened up and everything
+    that is not a mock record is held to the run's own level.
+    """
+
+    MOCK_LOGGER = "matter.testing.linux"
+
+    def __init__(self, run_level: int, mock_level: int) -> None:
+        super().__init__()
+        self.run_level = run_level
+        self.mock_level = mock_level
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        if record.levelno >= self.run_level:
+            return True
+        return record.name.startswith(self.MOCK_LOGGER) and record.levelno >= self.mock_level
 
 
 class ProxyAppSubprocess(Subprocess):
@@ -228,13 +251,27 @@ def ed_app_args(transport: str) -> str:
 @click.option('--ns-index', default=0, show_default=True, help='Index of the Linux network namespaces.')
 @click.option('--log-level', default='info', show_default=True,
               type=click.Choice(['debug', 'info', 'warn', 'error'], case_sensitive=False))
+@click.option('--mock-log-level', default=None,
+              type=click.Choice(['debug', 'info', 'warn', 'error'], case_sensitive=False),
+              help='Log level for the BLE and Wi-Fi mock servers alone, independent of --log-level.')
 @click.option('--internal-inside-unshare', hidden=True, is_flag=True, default=False,
               help='Internal flag for running inside an unshared environment.')
 def main(proxy_app: str, proxy_args: str, ed_app: str | None, script: str, script_args: str, transport: str,
          endpoint: int, discriminator: int, passcode: int, ed_discriminator: int, ed_passcode: int,
-         proxy_ble: bool, ns_index: int, log_level: str, internal_inside_unshare: bool) -> None:
+         proxy_ble: bool, ns_index: int, log_level: str, mock_log_level: str | None,
+         internal_inside_unshare: bool) -> None:
 
     LogConfig(log_level, log_level, log_level, True).set_fmt()
+
+    if mock_log_level:
+        run_level = logging.getLevelNamesMapping()[log_level.upper()]
+        mock_level = logging.getLevelNamesMapping()[mock_log_level.upper()]
+        root = logging.getLogger()
+        root.setLevel(min(run_level, mock_level))
+        logging.getLogger(MockRecordsOnly.MOCK_LOGGER).setLevel(mock_level)
+        for handler in root.handlers:
+            handler.setLevel(min(run_level, mock_level))
+            handler.addFilter(MockRecordsOnly(run_level, mock_level))
 
     if passcode != PROXY_PASSCODE:
         raise click.BadOptionUsage(
@@ -302,11 +339,6 @@ def test_script_args(script: str, ed_app: str | None, script_args: str, transpor
         "--passcode", str(passcode),
         "--endpoint", str(endpoint),
         "--storage-path", os.path.join(storage_dir, "admin_storage.json"),
-        # An adapter of its own: the multi-transport SetUpCodePairer races onto
-        # BLE while commissioning the proxy, and sharing an adapter with the end
-        # device leaves the proxy holding a peripheral connection that its
-        # switch to central mode then waits on forever.
-        "--ble-controller", str(BLE_CONTROLLER_TOOL),
     ]
 
     if ed_app is not None:

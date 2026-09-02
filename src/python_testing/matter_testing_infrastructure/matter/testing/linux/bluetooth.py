@@ -26,11 +26,8 @@ log = logging.getLogger(__name__)
 class BluetoothMock(TerminablePopen[str]):
     """Run a BlueZ mock server in a subprocess."""
 
-    # The MAC addresses of the virtual Bluetooth adapters. Three, so that a
-    # topology with an intermediary -- controller, commissioning proxy and end
-    # device -- can give each actor its own adapter. Sharing one between two
-    # CHIP processes leaves half-open connections behind.
-    ADAPTERS = ["00:00:00:11:11:11", "00:00:00:22:22:22", "00:00:00:33:33:33"]
+    # The MAC addresses of the virtual Bluetooth adapters.
+    ADAPTERS = ["00:00:00:11:11:11", "00:00:00:22:22:22"]
 
     def _forward_stderr(self, process: subprocess.Popen[str], event: threading.Event) -> None:
         assert process.stderr is not None, "stderr should have been set to subprocess.PIPE"

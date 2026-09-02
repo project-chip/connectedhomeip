@@ -165,6 +165,7 @@ class TC_COMPRO_2_7(COMPROBaseTest):
             extra_args=self._param_for_index(n, 'extra_args', ''),
             ed_transport=self._transport_for_index(n),
             serial_port=self._param_for_index(n, 'serial_port'),
+            launch_wrapper=self._param_for_index(n, 'launch_wrapper'),
         ))
 
     def _discriminator_for_index(self, n: int) -> int:
