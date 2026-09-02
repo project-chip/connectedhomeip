@@ -31,15 +31,19 @@ constexpr Percent100ths kPositionStep                       = 500; // 5% step
 } // namespace
 
 SimulatedWindowCovering::SimulatedWindowCovering(const Context & context) :
-    WindowCovering(*this, *this, context, []() {
-        Clusters::WindowCovering::OptionalAttributeSet optionals;
-        optionals.Set<Clusters::WindowCovering::Attributes::NumberOfActuationsLift::Id>()
-            .Set<Clusters::WindowCovering::Attributes::NumberOfActuationsTilt::Id>()
-            .Set<Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::Id>()
-            .Set<Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::Id>()
-            .Set<Clusters::WindowCovering::Attributes::SafetyStatus::Id>();
-        return optionals;
-    }())
+    WindowCovering(*this, *this, context,
+                   BitFlags<Clusters::WindowCovering::Feature>(
+                       Clusters::WindowCovering::Feature::kLift, Clusters::WindowCovering::Feature::kPositionAwareLift,
+                       Clusters::WindowCovering::Feature::kTilt, Clusters::WindowCovering::Feature::kPositionAwareTilt),
+                   []() {
+                       Clusters::WindowCovering::OptionalAttributeSet optionals;
+                       optionals.Set<Clusters::WindowCovering::Attributes::NumberOfActuationsLift::Id>()
+                           .Set<Clusters::WindowCovering::Attributes::NumberOfActuationsTilt::Id>()
+                           .Set<Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::Id>()
+                           .Set<Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::Id>()
+                           .Set<Clusters::WindowCovering::Attributes::SafetyStatus::Id>();
+                       return optionals;
+                   }())
 {}
 
 SimulatedWindowCovering::~SimulatedWindowCovering()
@@ -114,6 +118,7 @@ CHIP_ERROR SimulatedWindowCovering::HandleMovement(Clusters::WindowCovering::Win
 
     if (mMovingLift || mMovingTilt)
     {
+        mTimerDelegate.CancelTimer(this);
         ReturnErrorOnFailure(mTimerDelegate.StartTimer(this, kTransitionInterval));
     }
 
@@ -176,24 +181,34 @@ void SimulatedWindowCovering::TimerFired()
 
     if (mMovingLift)
     {
-        auto targetVal  = cluster.GetTargetPositionLiftPercent100ths().Value();
-        auto currentVal = cluster.GetCurrentPositionLiftPercent100ths().Value();
+        Percent100ths currentVal = cluster.GetCurrentPositionLiftPercent100ths().ValueOr(0);
+        Percent100ths targetVal  = cluster.GetTargetPositionLiftPercent100ths().ValueOr(currentVal);
 
         if (currentVal < targetVal)
         {
-            currentVal = static_cast<Percent100ths>(currentVal + kPositionStep);
-            if (currentVal > targetVal)
+            if (targetVal - currentVal > kPositionStep)
+            {
+                currentVal = static_cast<Percent100ths>(currentVal + kPositionStep);
+            }
+            else
+            {
                 currentVal = targetVal;
+            }
         }
         else if (currentVal > targetVal)
         {
-            currentVal = static_cast<Percent100ths>(currentVal - kPositionStep);
-            if (currentVal < targetVal)
+            if (currentVal - targetVal > kPositionStep)
+            {
+                currentVal = static_cast<Percent100ths>(currentVal - kPositionStep);
+            }
+            else
+            {
                 currentVal = targetVal;
+            }
         }
 
         cluster.SetCurrentPositionLiftPercent100ths(DataModel::Nullable<Percent100ths>(currentVal));
-        [[maybe_unused]] auto opStatus = cluster.GetOperationalStatus();
+        BitMask<OperationalStatus> opStatus = cluster.GetOperationalStatus();
         ChipLogProgress(DeviceLayer,
                         "WindowCovering: Simulating Lift -> %" PRIu16 " / Target %" PRIu16
                         " | OpStatus raw=0x%02X (global=%u, lift=%u)",
@@ -208,24 +223,34 @@ void SimulatedWindowCovering::TimerFired()
 
     if (mMovingTilt)
     {
-        auto targetVal  = cluster.GetTargetPositionTiltPercent100ths().Value();
-        auto currentVal = cluster.GetCurrentPositionTiltPercent100ths().Value();
+        Percent100ths currentVal = cluster.GetCurrentPositionTiltPercent100ths().ValueOr(0);
+        Percent100ths targetVal  = cluster.GetTargetPositionTiltPercent100ths().ValueOr(currentVal);
 
         if (currentVal < targetVal)
         {
-            currentVal = static_cast<Percent100ths>(currentVal + kPositionStep);
-            if (currentVal > targetVal)
+            if (targetVal - currentVal > kPositionStep)
+            {
+                currentVal = static_cast<Percent100ths>(currentVal + kPositionStep);
+            }
+            else
+            {
                 currentVal = targetVal;
+            }
         }
         else if (currentVal > targetVal)
         {
-            currentVal = static_cast<Percent100ths>(currentVal - kPositionStep);
-            if (currentVal < targetVal)
+            if (currentVal - targetVal > kPositionStep)
+            {
+                currentVal = static_cast<Percent100ths>(currentVal - kPositionStep);
+            }
+            else
+            {
                 currentVal = targetVal;
+            }
         }
 
         cluster.SetCurrentPositionTiltPercent100ths(DataModel::Nullable<Percent100ths>(currentVal));
-        [[maybe_unused]] auto opStatus = cluster.GetOperationalStatus();
+        BitMask<OperationalStatus> opStatus = cluster.GetOperationalStatus();
         ChipLogProgress(DeviceLayer,
                         "WindowCovering: Simulating Tilt -> %" PRIu16 " / Target %" PRIu16
                         " | OpStatus raw=0x%02X (global=%u, tilt=%u)",
@@ -241,6 +266,28 @@ void SimulatedWindowCovering::TimerFired()
     if (mMovingLift || mMovingTilt)
     {
         LogErrorOnFailure(mTimerDelegate.StartTimer(this, kTransitionInterval));
+    }
+}
+
+CHIP_ERROR SimulatedWindowCovering::RegisterOptionalClusters(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider)
+{
+    // Groups is optional (Active, O) per the Window Covering device type, but we implement it
+    // here since it lets the device respond to groupcast commands like other simulated devices.
+    mGroupsCluster.Create(endpoint,
+                          Clusters::GroupsCluster::Context{
+                              .groupDataProvider   = mContext.groupDataProvider,
+                              .scenesIntegration   = nullptr, // Window Covering does not implement Scenes
+                              .identifyIntegration = &IdentifyCluster(),
+                          });
+    return provider.AddCluster(mGroupsCluster.Registration());
+}
+
+void SimulatedWindowCovering::UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider)
+{
+    if (mGroupsCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mGroupsCluster.Cluster()));
+        mGroupsCluster.Destroy();
     }
 }
 
