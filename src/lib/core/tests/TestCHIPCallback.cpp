@@ -345,6 +345,30 @@ public:
     // Models a callee that rejects the call outright, dropping the token without taking it.
     static CHIP_ERROR Reject(Callback<>::Owned) { return CHIP_ERROR_INCORRECT_STATE; }
 
+    // Models a callee that completes the operation synchronously, without ever registering the
+    // callback with itself.
+    static void AcceptAndComplete(Callback<>::Owned cb) { cb.Invoke(); }
+
+    // As above, but for an optional callback: Invoke() requires one, so HasValue() is a precondition.
+    // Returns whether a callback was actually provided.
+    static bool AcceptOptionalAndComplete(Callback<>::OwnedOrNull cb)
+    {
+        VerifyOrReturnValue(cb.HasValue(), false);
+        cb.Invoke();
+        return true;
+    }
+
+    // Models synchronous completion of an operation whose callback signature carries an outcome.
+    static void CompleteWith(Callback<Notifier::NotifyFn>::Owned cb, int result) { cb.Invoke(result); }
+
+    // Returns whether a callback was actually provided.
+    static bool CompleteOptionalWith(Callback<Notifier::NotifyFn>::OwnedOrNull cb, int result)
+    {
+        VerifyOrReturnValue(cb.HasValue(), false);
+        cb.Invoke(result);
+        return true;
+    }
+
     void InvokeAll()
     {
         CallbackDeque ready;
@@ -428,6 +452,24 @@ TEST_F(TestCHIPCallback, DroppingAnOwnedTokenLeavesTheCallbackUnregistered)
     EXPECT_EQ(n, 0);
 }
 
+// A callee completing synchronously never registers the callback, so it invokes it straight off the
+// token: there is no window in which the caller could cancel, and nothing to unregister.
+TEST_F(TestCHIPCallback, OwnedInvokesTheCallbackDirectly)
+{
+    int n = 0;
+    Callback<> cb(reinterpret_cast<CallFn>(increment), &n);
+    Acceptor acceptor;
+
+    // Whoever held the callback still gives it up at the boundary, as for any other call.
+    acceptor.Accept(cb);
+    EXPECT_TRUE(cb.IsRegistered());
+
+    Acceptor::AcceptAndComplete(cb);
+    EXPECT_EQ(n, 1);
+    EXPECT_FALSE(cb.IsRegistered());
+    EXPECT_TRUE(acceptor.IsEmpty());
+}
+
 TEST_F(TestCHIPCallback, OwnedOrNullAcceptsAMissingCallback)
 {
     int n = 0;
@@ -459,6 +501,45 @@ TEST_F(TestCHIPCallback, OwnedOrNullAcceptsAnOwned)
     EXPECT_TRUE(cb.IsRegistered());
     acceptor.InvokeAll();
     EXPECT_EQ(n, 1);
+}
+
+// The optional-callback counterpart of OwnedInvokesTheCallbackDirectly. Invoke() requires a
+// callback, so a callee that may not have been given one checks HasValue() first.
+TEST_F(TestCHIPCallback, OwnedOrNullInvokesTheCallbackDirectly)
+{
+    int n = 0;
+    Callback<> cb(reinterpret_cast<CallFn>(increment), &n);
+    Acceptor acceptor;
+
+    EXPECT_FALSE(Acceptor::AcceptOptionalAndComplete(nullptr));
+    EXPECT_EQ(n, 0);
+
+    acceptor.Accept(cb);
+    EXPECT_TRUE(cb.IsRegistered());
+
+    EXPECT_TRUE(Acceptor::AcceptOptionalAndComplete(cb));
+    EXPECT_EQ(n, 1);
+    EXPECT_FALSE(cb.IsRegistered());
+    EXPECT_TRUE(acceptor.IsEmpty());
+}
+
+// Invoke() forwards its arguments to the callback, so a callee completing synchronously reports an
+// outcome exactly as it would have from an asynchronous completion.
+TEST_F(TestCHIPCallback, InvokeForwardsArgumentsToTheCallback)
+{
+    int n = 0;
+    Callback<Notifier::NotifyFn> cb(reinterpret_cast<Notifier::NotifyFn>(increment_by), &n);
+
+    Acceptor::CompleteWith(cb, 3);
+    EXPECT_EQ(n, 3);
+    EXPECT_FALSE(cb.IsRegistered());
+
+    EXPECT_TRUE(Acceptor::CompleteOptionalWith(cb, 4));
+    EXPECT_EQ(n, 7);
+    EXPECT_FALSE(cb.IsRegistered());
+
+    EXPECT_FALSE(Acceptor::CompleteOptionalWith(nullptr, 5));
+    EXPECT_EQ(n, 7);
 }
 
 // A typed Owned widens all the way to a signature-agnostic Cancelable::OwnedOrNull, so a shared
@@ -494,7 +575,9 @@ TEST_F(TestCHIPCallback, OwnedOrNullHasValue)
     EXPECT_FALSE(Cancelable::OwnedOrNull(nullptr).HasValue());
     EXPECT_TRUE(Cancelable::OwnedOrNull(Callback<>::Owned(cb)).HasValue());
 
-    // Reports false once the token has been spent, which is why a callee gets to consume it once.
+    // Reports false once the token has been consumed. This stays true of HasValue() even though
+    // Take() does not promise a value for a consumed token, so that a callee holding one it may
+    // already have passed on can still ask.
     Callback<>::OwnedOrNull token(cb);
     EXPECT_NE(token.Take(), nullptr);
     EXPECT_FALSE(token.HasValue());
