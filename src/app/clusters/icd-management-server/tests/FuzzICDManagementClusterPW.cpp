@@ -155,6 +155,7 @@ Fixture & GetFixture()
             if (gFixture != nullptr)
             {
                 gFixture->cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+                gFixture->fabricFixture.TearDownTestFabric(gFixture->fabricIndex);
                 delete gFixture;
                 gFixture = nullptr;
             }

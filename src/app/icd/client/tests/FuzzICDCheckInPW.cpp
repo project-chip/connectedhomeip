@@ -234,6 +234,14 @@ void ParseRejectsArbitraryPayload(const std::vector<uint8_t> & payload)
     CHIP_ERROR err = CheckinMessage::ParseCheckinMessagePayload(aesHandle, hmacHandle, ByteSpan(payload.data(), payload.size()),
                                                                 counter, appData);
 
+    // A payload too short to hold nonce + counter + MIC, or one whose application
+    // data cannot fit the work buffer alongside the counter, can never be accepted.
+    if (payload.size() < CheckinMessage::kMinPayloadSize ||
+        payload.size() > CheckinMessage::kMinPayloadSize + kMaxParseAppDataSize)
+    {
+        EXPECT_NE(err, CHIP_NO_ERROR);
+    }
+
     if (err == CHIP_NO_ERROR)
     {
         // A success implies the payload was well formed: appData must have been
@@ -291,6 +299,13 @@ void ParseHandlesMutatedValidPayload(uint32_t encodedCounter, const std::vector<
     CHIP_ERROR err = CheckinMessage::ParseCheckinMessagePayload(aesHandle, hmacHandle, ByteSpan(payload.data(), payload.size()),
                                                                 decodedCounter, appData);
 
+    // Any byte actually changed invalidates the MIC, so the parse must fail. A
+    // mutated payload that still authenticates would itself be a finding.
+    if (mutated)
+    {
+        EXPECT_NE(err, CHIP_NO_ERROR);
+    }
+
     if (err == CHIP_NO_ERROR)
     {
         // An untouched payload must round-trip exactly.
@@ -346,6 +361,8 @@ void ProcessSearchesAllStoredEntries(uint8_t entryCount, uint8_t targetEntry, ui
     }
 
     std::vector<uint8_t> payload = BuildPayload(target, encodedCounter, appDataIn);
+    const bool mutated           = !payload.empty() && mutationIndex < payload.size() &&
+        payload[mutationIndex] != mutationValue;
     if (!payload.empty() && mutationIndex < payload.size())
     {
         payload[mutationIndex] = mutationValue;
@@ -355,10 +372,15 @@ void ProcessSearchesAllStoredEntries(uint8_t entryCount, uint8_t targetEntry, ui
     CounterType decodedCounter = 0;
     CHIP_ERROR err = storage.ProcessCheckInPayload(ByteSpan(payload.data(), payload.size()), matchedInfo, decodedCounter);
 
+    // A changed byte breaks the MIC, and application data larger than the
+    // kAppDataLength work buffer leaves alongside the counter cannot be accepted.
+    if (mutated || appDataIn.size() > DefaultICDClientStorage::kAppDataLength - sizeof(CounterType))
+    {
+        EXPECT_NE(err, CHIP_NO_ERROR);
+    }
+
     if (err == CHIP_NO_ERROR)
     {
-        // Only a payload whose application data fits the kAppDataLength work
-        // buffer alongside the counter can be accepted here at all.
         EXPECT_LE(appDataIn.size(), DefaultICDClientStorage::kAppDataLength - sizeof(CounterType));
     }
 
