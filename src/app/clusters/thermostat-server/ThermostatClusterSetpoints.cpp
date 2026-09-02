@@ -91,6 +91,7 @@ std::optional<DataModel::ActionReturnStatus> ThermostatAutoSetpoints::ReadAttrib
         temperature deadband;
         auto status = LoadDeadband(deadband);
         VerifyOrReturnValue(status == Status::Success, status);
+        // The deadband is exposed as a SignedTemperature, which is an int8_t in tenths of a degree
         return encoder.Encode(static_cast<int8_t>(deadband / 10));
     }
     default:

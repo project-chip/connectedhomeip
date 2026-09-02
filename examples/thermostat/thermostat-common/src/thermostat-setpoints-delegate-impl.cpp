@@ -140,6 +140,7 @@ Protocols::InteractionModel::Status ThermostatSetpointsDelegate::GetMinDeadband(
     VerifyOrReturnError(provider != nullptr, Status::Failure);
     AttributePersistence persistence(*provider);
 
+    // The deadband is stored as a SignedTemperature, which is an int8_t in tenths of a degree
     int8_t deadBand = static_cast<int8_t>(kDefaultDeadBand / 10);
     MinSetpointDeadBand::GetDefault(mEndpointId, &deadBand);
     persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, MinSetpointDeadBand::Id }, deadBand, deadBand);
