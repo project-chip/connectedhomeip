@@ -154,6 +154,10 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             return {"zone": zone_id, "sensitivity": sensitivity}
         return {"zone": zone_id}
 
+    @staticmethod
+    def _is_motion_zone(z, zmcluster) -> bool:
+        return bool(z.twoDCartesianZone and z.twoDCartesianZone.use == zmcluster.Enums.ZoneUseEnum.kMotion)
+
     @run_if_endpoint_matches(lambda wildcard, endpoint: has_cluster(Clusters.PushAvStreamTransport)(wildcard, endpoint) and has_cluster(Clusters.ZoneManagement)(wildcard, endpoint) and has_cluster(Clusters.CameraAvStreamManagement)(wildcard, endpoint))
     async def test_TC_PAVST_2_15(self) -> None:
         """Run TC-PAVST-2.15 test."""
@@ -187,7 +191,7 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         aZones = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=zmcluster, attribute=zmattr.Zones)
 
-        motion_zones = [z for z in aZones if z.use == zmcluster.Enums.ZoneUseEnum.kMotion]
+        motion_zones = [z for z in aZones if self._is_motion_zone(z, zmcluster)]
         if len(motion_zones) >= 2:
             aZoneID1 = motion_zones[0].zoneID
             aZoneID2 = motion_zones[1].zoneID
@@ -346,7 +350,7 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             current_zones = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=zmcluster, attribute=zmattr.Zones
             )
-            valid_motion_zone_ids = [z.zoneID for z in current_zones if z.use == zmcluster.Enums.ZoneUseEnum.kMotion]
+            valid_motion_zone_ids = [z.zoneID for z in current_zones if self._is_motion_zone(z, zmcluster)]
             if len(valid_motion_zone_ids) >= aMaxZones + 1:
                 too_many_zones = [
                     self._make_motion_zone(zid)
@@ -364,13 +368,13 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                     len(valid_motion_zone_ids),
                     aMaxZones + 1,
                 )
-                self.skip_step(6)
+                self.mark_current_step_skipped()
         finally:
             for zid in temp_zone_ids:
                 try:
                     await self.send_single_cmd(
                         endpoint=endpoint,
-                        cmd=zmcluster.Commands.DeleteZone(zoneID=zid),
+                        cmd=zmcluster.Commands.RemoveZone(zoneID=zid),
                     )
                 except Exception as e:
                     log.warning("Failed to delete temp zone %s: %s", zid, e)
