@@ -25,8 +25,8 @@ namespace app {
 
 PressureSensor::PressureSensor(TimerDelegate & timerDelegate, PressureMeasurementCluster::Config pressureConfig,
                                PlatformIdentifyIntegration & platformIdentify) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kPressureSensor, 1)), mTimerDelegate(timerDelegate),
-    mPlatformIdentify(platformIdentify), mPressureConfig(pressureConfig)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kPressureSensor, 1)),
+    mTimerDelegate(timerDelegate), mPlatformIdentify(platformIdentify), mPressureConfig(pressureConfig)
 {}
 
 CHIP_ERROR PressureSensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)

@@ -48,8 +48,7 @@ BitMask<ProximityRanging::Feature> ProximityRanger::DeriveFeatures() const
     return features;
 }
 
-ProximityRanger::ProximityRanger(TimerDelegate & timerDelegate,
-                                 std::vector<Clusters::ProximityRanging::RangingAdapter *> adapters,
+ProximityRanger::ProximityRanger(TimerDelegate & timerDelegate, std::vector<Clusters::ProximityRanging::RangingAdapter *> adapters,
                                  PlatformIdentifyIntegration & platformIdentify) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kProximityRanger, 1)),
     mTimerDelegate(timerDelegate), mPlatformIdentify(platformIdentify), mAdapters(std::move(adapters))

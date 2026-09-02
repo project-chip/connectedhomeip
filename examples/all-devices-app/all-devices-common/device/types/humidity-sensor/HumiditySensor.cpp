@@ -25,8 +25,8 @@ namespace app {
 
 HumiditySensor::HumiditySensor(TimerDelegate & timerDelegate, RelativeHumidityMeasurementCluster::Config humidityConfig,
                                PlatformIdentifyIntegration & platformIdentify) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kHumiditySensor, 1)), mTimerDelegate(timerDelegate),
-    mPlatformIdentify(platformIdentify), mHumidityConfig(humidityConfig)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kHumiditySensor, 1)),
+    mTimerDelegate(timerDelegate), mPlatformIdentify(platformIdentify), mHumidityConfig(humidityConfig)
 {}
 
 CHIP_ERROR HumiditySensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)

@@ -25,8 +25,8 @@ namespace app {
 
 FlowSensor::FlowSensor(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify,
                        FlowMeasurementCluster::Config flowConfig) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kFlowSensor, 1)), mTimerDelegate(timerDelegate),
-    mPlatformIdentify(platformIdentify), mFlowConfig(flowConfig)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kFlowSensor, 1)),
+    mTimerDelegate(timerDelegate), mPlatformIdentify(platformIdentify), mFlowConfig(flowConfig)
 {}
 
 CHIP_ERROR FlowSensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)

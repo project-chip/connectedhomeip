@@ -38,8 +38,10 @@ Span<const Chime::Sound> MapSounds(PosixAudioManager & audioManager)
 }
 } // namespace
 
-PosixChime::PosixChime(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify, PosixAudioManager & audioManager) :
-    Chime(timerDelegate, platformIdentify, MapSounds(audioManager)), mAudioManager(audioManager)
+PosixChime::PosixChime(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify,
+                       PosixAudioManager & audioManager) :
+    Chime(timerDelegate, platformIdentify, MapSounds(audioManager)),
+    mAudioManager(audioManager)
 {
     CHIP_ERROR err = mAudioManager.Init();
     if (err != CHIP_NO_ERROR)

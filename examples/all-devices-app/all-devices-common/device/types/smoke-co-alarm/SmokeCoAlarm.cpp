@@ -55,9 +55,9 @@ SmokeCoAlarmCluster::Config DefaultSmokeConfig()
 
 SmokeCoAlarm::SmokeCoAlarm(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmDelegate & smokeCoAlarmDelegate,
                            PlatformIdentifyIntegration & platformIdentify) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)), mTimerDelegate(timerDelegate),
-    mPlatformIdentify(platformIdentify), mSmokeCoAlarmDelegate(smokeCoAlarmDelegate), mCoConfig(DefaultCoConfig()),
-    mSmokeConfig(DefaultSmokeConfig())
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)),
+    mTimerDelegate(timerDelegate), mPlatformIdentify(platformIdentify), mSmokeCoAlarmDelegate(smokeCoAlarmDelegate),
+    mCoConfig(DefaultCoConfig()), mSmokeConfig(DefaultSmokeConfig())
 {}
 
 CHIP_ERROR SmokeCoAlarm::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,

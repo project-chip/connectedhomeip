@@ -30,8 +30,7 @@ class OccupancySensor : public SingleEndpoint
 public:
     using OccupancySensingConfig = Clusters::OccupancySensingCluster::Config;
 
-    OccupancySensor(OccupancySensingConfig config, TimerDelegate & timerDelegate,
-                    PlatformIdentifyIntegration & platformIdentify);
+    OccupancySensor(OccupancySensingConfig config, TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify);
     ~OccupancySensor() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,

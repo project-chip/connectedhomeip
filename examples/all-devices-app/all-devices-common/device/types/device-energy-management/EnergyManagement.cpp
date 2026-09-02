@@ -22,8 +22,8 @@ using namespace chip::app::Clusters::DeviceEnergyManagement;
 namespace chip::app {
 
 EnergyManagement::EnergyManagement(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDeviceEnergyManagement, 1)), mTimerDelegate(timerDelegate),
-    mPlatformIdentify(platformIdentify)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDeviceEnergyManagement, 1)),
+    mTimerDelegate(timerDelegate), mPlatformIdentify(platformIdentify)
 {}
 
 CHIP_ERROR EnergyManagement::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)

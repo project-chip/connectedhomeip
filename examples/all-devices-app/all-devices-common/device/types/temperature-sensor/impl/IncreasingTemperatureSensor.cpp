@@ -37,15 +37,16 @@ const TemperatureMeasurementCluster::StartupConfiguration kDefaultTemperatureCon
 } // namespace
 
 IncreasingTemperatureSensor::IncreasingTemperatureSensor(PlatformIdentifyIntegration & platformIdentify) :
-    TemperatureSensor(mTimerDelegate, kDefaultTemperatureConfig,
-                      []() {
-                          TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributes;
-                          // Enable optional Tolerance attribute to support YAML certification tests
-                          // (Test_TC_TMP_2_1.yaml) executed against this simulated device.
-                          optionalAttributes.Set<TemperatureMeasurement::Attributes::Tolerance::Id>();
-                          return optionalAttributes;
-                      }(),
-                      platformIdentify)
+    TemperatureSensor(
+        mTimerDelegate, kDefaultTemperatureConfig,
+        []() {
+            TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributes;
+            // Enable optional Tolerance attribute to support YAML certification tests
+            // (Test_TC_TMP_2_1.yaml) executed against this simulated device.
+            optionalAttributes.Set<TemperatureMeasurement::Attributes::Tolerance::Id>();
+            return optionalAttributes;
+        }(),
+        platformIdentify)
 {}
 
 IncreasingTemperatureSensor::~IncreasingTemperatureSensor()

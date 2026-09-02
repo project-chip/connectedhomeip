@@ -23,8 +23,7 @@ namespace chip::app {
 // CookSurfacePart
 
 CookSurfacePart::CookSurfacePart(TimerDelegate & timerDelegate, Clusters::OnOffDelegate & onOffDelegate,
-                                 Clusters::IdentifyDelegate & identifyDelegate,
-                                 PlatformIdentifyIntegration & platformIdentify) :
+                                 Clusters::IdentifyDelegate & identifyDelegate, PlatformIdentifyIntegration & platformIdentify) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCookSurface, 1)),
     mTimerDelegate(timerDelegate), mOnOffDelegate(onOffDelegate), mIdentifyDelegate(identifyDelegate),
     mPlatformIdentify(platformIdentify)

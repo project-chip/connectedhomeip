@@ -232,7 +232,7 @@ private:
             RegisterCreator("ambient-context-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return std::make_unique<Clusters::AmbientContextSensing::LoggingAmbientContextSensor>(mContext->timerDelegate,
-                                                                                                     mContext->platformIdentify);
+                                                                                                      mContext->platformIdentify);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_BRIDGED_NODE)
@@ -532,9 +532,9 @@ private:
         {
             RegisterCreator("rain-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<BooleanStateSensor>(
-                    mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRainSensor, 1),
-                    mContext->platformIdentify);
+                return std::make_unique<BooleanStateSensor>(mContext->timerDelegate,
+                                                            Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRainSensor, 1),
+                                                            mContext->platformIdentify);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_FREEZE_DETECTOR)

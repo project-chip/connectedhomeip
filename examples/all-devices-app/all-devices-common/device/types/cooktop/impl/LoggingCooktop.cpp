@@ -22,7 +22,8 @@ namespace chip::app {
 
 LoggingCookSurfacePart::LoggingCookSurfacePart(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify,
                                                const char * name) :
-    CookSurfacePart(timerDelegate, *this, *this, platformIdentify), mPlatformIdentify(platformIdentify), mName(name)
+    CookSurfacePart(timerDelegate, *this, *this, platformIdentify),
+    mPlatformIdentify(platformIdentify), mName(name)
 {}
 
 void LoggingCookSurfacePart::OnOnOffChanged(bool on)

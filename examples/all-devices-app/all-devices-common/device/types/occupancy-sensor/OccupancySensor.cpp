@@ -25,8 +25,8 @@ namespace app {
 
 OccupancySensor::OccupancySensor(OccupancySensingConfig config, TimerDelegate & timerDelegate,
                                  PlatformIdentifyIntegration & platformIdentify) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOccupancySensor, 1)), mConfig(config),
-    mTimerDelegate(timerDelegate), mPlatformIdentify(platformIdentify)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOccupancySensor, 1)),
+    mConfig(config), mTimerDelegate(timerDelegate), mPlatformIdentify(platformIdentify)
 {}
 
 CHIP_ERROR OccupancySensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,

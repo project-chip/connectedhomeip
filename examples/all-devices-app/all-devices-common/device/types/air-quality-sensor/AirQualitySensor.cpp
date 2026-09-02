@@ -26,8 +26,8 @@ namespace app {
 
 AirQualitySensor::AirQualitySensor(TimerDelegate & timerDelegate, const Config & config,
                                    PlatformIdentifyIntegration & platformIdentify) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAirQualitySensor, 1)), mTimerDelegate(timerDelegate),
-    mPlatformIdentify(platformIdentify), mConfig(config)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAirQualitySensor, 1)),
+    mTimerDelegate(timerDelegate), mPlatformIdentify(platformIdentify), mConfig(config)
 {}
 
 CHIP_ERROR AirQualitySensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,

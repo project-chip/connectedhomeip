@@ -42,17 +42,18 @@ const IlluminanceMeasurementCluster::StartupConfiguration kDefaultLightConfig = 
 } // namespace
 
 IncreasingLightSensor::IncreasingLightSensor(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify) :
-    LightSensor(timerDelegate, kDefaultLightConfig,
-                []() {
-                    IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributes;
-                    // Enable optional Tolerance and LightSensorType attributes.
-                    // These optional attributes are enabled to support the Illuminance Measurement
-                    // YAML certification tests (Test_TC_ILL_2_1.yaml) executed against this simulated device.
-                    optionalAttributes.Set<IlluminanceMeasurement::Attributes::Tolerance::Id>();
-                    optionalAttributes.Set<IlluminanceMeasurement::Attributes::LightSensorType::Id>();
-                    return optionalAttributes;
-                }(),
-                platformIdentify)
+    LightSensor(
+        timerDelegate, kDefaultLightConfig,
+        []() {
+            IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributes;
+            // Enable optional Tolerance and LightSensorType attributes.
+            // These optional attributes are enabled to support the Illuminance Measurement
+            // YAML certification tests (Test_TC_ILL_2_1.yaml) executed against this simulated device.
+            optionalAttributes.Set<IlluminanceMeasurement::Attributes::Tolerance::Id>();
+            optionalAttributes.Set<IlluminanceMeasurement::Attributes::LightSensorType::Id>();
+            return optionalAttributes;
+        }(),
+        platformIdentify)
 {}
 
 IncreasingLightSensor::~IncreasingLightSensor()

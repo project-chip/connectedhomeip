@@ -39,7 +39,8 @@ public:
     /// data for the Span of deviceTypes remains valid for the entire lifetime of the BooleanStateSensor object instance.
     BooleanStateSensor(TimerDelegate & timerDelegate, Span<const DataModel::DeviceTypeEntry> deviceType,
                        PlatformIdentifyIntegration & platformIdentify) :
-        SingleEndpoint(deviceType), mTimerDelegate(timerDelegate), mPlatformIdentify(platformIdentify)
+        SingleEndpoint(deviceType),
+        mTimerDelegate(timerDelegate), mPlatformIdentify(platformIdentify)
     {}
     ~BooleanStateSensor() override = default;
 
