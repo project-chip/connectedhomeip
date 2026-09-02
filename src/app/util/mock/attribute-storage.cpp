@@ -62,9 +62,9 @@ using namespace Clusters::Globals::Attributes;
 
 namespace {
 
-unsigned metadataStructureGeneration = 0;
-DataVersion dataVersion              = 0;
-const MockNodeConfig * mockConfig    = nullptr;
+unsigned metadataStructureGeneration                        = 0;
+DataVersion dataVersion                                     = 0;
+const MockNodeConfig * mockConfig                           = nullptr;
 const Access::SubjectDescriptor * gCurrentSubjectDescriptor = nullptr;
 
 const MockNodeConfig & DefaultMockNodeConfig()

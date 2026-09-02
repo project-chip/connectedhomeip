@@ -124,15 +124,14 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const Data
 
     // At this point, we have to use ember directly to read the data.
     EmberAfAttributeSearchRecord record;
-    record.endpoint                            = request.path.mEndpointId;
-    record.clusterId                           = request.path.mClusterId;
-    record.attributeId                         = request.path.mAttributeId;
+    record.endpoint    = request.path.mEndpointId;
+    record.clusterId   = request.path.mClusterId;
+    record.attributeId = request.path.mAttributeId;
 
     // Preserve the SubjectDescriptor while reading through the legacy Ember
     // attribute storage path so external attribute read callbacks can identify
     // the controller associated with the current read.
-    const Access::SubjectDescriptor * previousSubjectDescriptor =
-    GetCurrentSubjectDescriptor();
+    const Access::SubjectDescriptor * previousSubjectDescriptor = GetCurrentSubjectDescriptor();
     SetCurrentSubjectDescriptor(&request.subjectDescriptor);
 
     Protocols::InteractionModel::Status status = emAfReadOrWriteAttribute(
