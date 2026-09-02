@@ -957,10 +957,10 @@ TEST_F(ThermostatTestFixture, TestSensorScheduleTransitionValidationErrors)
 
     // 4. EnabledSensors containing unavailable sensor -> ConstraintError
     Structs::SensorScheduleTransitionStruct::Type invalidSensorTrans;
-    invalidSensorTrans.dayOfWeek        = ScheduleDayOfWeekBitmap::kMonday;
-    invalidSensorTrans.transitionTime   = 480;
-    ByteSpan unavailHandles[]           = { kHandle1 }; // kHandle1 not in available
-    invalidSensorTrans.enabledSensors   = DataModel::List<const ByteSpan>(unavailHandles, 1);
+    invalidSensorTrans.dayOfWeek      = ScheduleDayOfWeekBitmap::kMonday;
+    invalidSensorTrans.transitionTime = 480;
+    ByteSpan unavailHandles[]         = { kHandle1 }; // kHandle1 not in available
+    invalidSensorTrans.enabledSensors = DataModel::List<const ByteSpan>(unavailHandles, 1);
     EXPECT_EQ(
         AppendItemWithSubject(cluster, SensorSchedule::Id, tester.GetCommandHandler().GetSubjectDescriptor(), invalidSensorTrans),
         Status::ConstraintError);
