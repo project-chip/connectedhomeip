@@ -55331,6 +55331,11 @@ public class ChipClusters {
 
     public void readUnionContributorListAttribute(
         UnionContributorListAttributeCallback callback) {
+      readUnionContributorListAttributeWithFabricFilter(callback, true);
+    }
+
+    public void readUnionContributorListAttributeWithFabricFilter(
+        UnionContributorListAttributeCallback callback, boolean isFabricFiltered) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNION_CONTRIBUTOR_LIST_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
@@ -55339,7 +55344,7 @@ public class ChipClusters {
             List<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, UNION_CONTRIBUTOR_LIST_ATTRIBUTE_ID, true);
+        }, UNION_CONTRIBUTOR_LIST_ATTRIBUTE_ID, isFabricFiltered);
     }
 
     public void subscribeUnionContributorListAttribute(

@@ -5189,6 +5189,7 @@ static id _Nullable DecodeEventPayloadForAmbientSensingUnionCluster(EventId aEve
                         }
                     }
                     newElement_0.contributorStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.contributorStatus)];
+                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
@@ -5242,6 +5243,7 @@ static id _Nullable DecodeEventPayloadForAmbientSensingUnionCluster(EventId aEve
                         }
                     }
                     newElement_0.contributorStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.contributorStatus)];
+                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
@@ -5274,9 +5276,29 @@ static id _Nullable DecodeEventPayloadForAmbientSensingUnionCluster(EventId aEve
                     auto & entry_0 = iter_0.GetValue();
                     MTRAmbientSensingUnionClusterContributorStatusChangeStruct * newElement_0;
                     newElement_0 = [MTRAmbientSensingUnionClusterContributorStatusChangeStruct new];
-                    newElement_0.contributorIndex = [NSNumber numberWithUnsignedChar:entry_0.contributorIndex];
+                    if (entry_0.contributorNodeID.IsNull()) {
+                        newElement_0.contributorNodeID = nil;
+                    } else {
+                        newElement_0.contributorNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.contributorNodeID.Value()];
+                    }
+                    if (entry_0.contributorEndpointID.IsNull()) {
+                        newElement_0.contributorEndpointID = nil;
+                    } else {
+                        newElement_0.contributorEndpointID = [NSNumber numberWithUnsignedShort:entry_0.contributorEndpointID.Value()];
+                    }
+                    if (entry_0.contributorName.IsNull()) {
+                        newElement_0.contributorName = nil;
+                    } else {
+                        newElement_0.contributorName = AsString(entry_0.contributorName.Value());
+                        if (newElement_0.contributorName == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            *aError = err;
+                            return nil;
+                        }
+                    }
                     newElement_0.previousContributorStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.previousContributorStatus)];
                     newElement_0.currentContributorStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.currentContributorStatus)];
+                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();

@@ -5477,10 +5477,26 @@ CHIP_ERROR DataModelLogger::LogValue(
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("ContributorIndex", indent + 1, value.contributorIndex);
+        CHIP_ERROR err = LogValue("ContributorNodeID", indent + 1, value.contributorNodeID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ContributorIndex'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ContributorNodeID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ContributorEndpointID", indent + 1, value.contributorEndpointID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ContributorEndpointID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ContributorName", indent + 1, value.contributorName);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ContributorName'");
             return err;
         }
     }
@@ -5497,6 +5513,14 @@ CHIP_ERROR DataModelLogger::LogValue(
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CurrentContributorStatus'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
             return err;
         }
     }
@@ -5539,6 +5563,14 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ContributorStatus'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
             return err;
         }
     }

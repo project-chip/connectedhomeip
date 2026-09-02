@@ -41758,6 +41758,13 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                     newElement_0_contributorStatusClassName.c_str(), newElement_0_contributorStatusCtorSignature.c_str(),
                     jninewElement_0_contributorStatus, newElement_0_contributorStatus);
+                jobject newElement_0_fabricIndex;
+                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+                jint jninewElement_0_fabricIndex                  = static_cast<jint>(entry_0.fabricIndex);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_fabricIndexClassName.c_str(), newElement_0_fabricIndexCtorSignature.c_str(),
+                    jninewElement_0_fabricIndex, newElement_0_fabricIndex);
 
                 {
                     jclass unionContributorStructStructClass_1;
@@ -41773,7 +41780,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     jmethodID unionContributorStructStructCtor_1;
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, unionContributorStructStructClass_1, "<init>",
-                        "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/Integer;)V",
+                        "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;)V",
                         &unionContributorStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || unionContributorStructStructCtor_1 == nullptr)
                     {
@@ -41782,9 +41789,10 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         return nullptr;
                     }
 
-                    newElement_0 = env->NewObject(unionContributorStructStructClass_1, unionContributorStructStructCtor_1,
-                                                  newElement_0_contributorNodeID, newElement_0_contributorEndpointID,
-                                                  newElement_0_contributorName, newElement_0_contributorStatus);
+                    newElement_0 =
+                        env->NewObject(unionContributorStructStructClass_1, unionContributorStructStructCtor_1,
+                                       newElement_0_contributorNodeID, newElement_0_contributorEndpointID,
+                                       newElement_0_contributorName, newElement_0_contributorStatus, newElement_0_fabricIndex);
                 }
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }

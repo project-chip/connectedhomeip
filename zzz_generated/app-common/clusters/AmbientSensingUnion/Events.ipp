@@ -35,7 +35,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kAddedContributor), addedContributor));
+    ReturnErrorOnFailure(
+        DataModel::EncodeForRead(aWriter, TLV::ContextTag(Fields::kAddedContributor), GetFabricIndex(), addedContributor));
     return aWriter.EndContainer(outer);
 }
 
@@ -66,7 +67,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kRemovedContributor), removedContributor));
+    ReturnErrorOnFailure(
+        DataModel::EncodeForRead(aWriter, TLV::ContextTag(Fields::kRemovedContributor), GetFabricIndex(), removedContributor));
     return aWriter.EndContainer(outer);
 }
 
@@ -97,7 +99,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kContributorStatusChange), contributorStatusChange));
+    ReturnErrorOnFailure(DataModel::EncodeForRead(aWriter, TLV::ContextTag(Fields::kContributorStatusChange), GetFabricIndex(),
+                                                  contributorStatusChange));
     return aWriter.EndContainer(outer);
 }
 

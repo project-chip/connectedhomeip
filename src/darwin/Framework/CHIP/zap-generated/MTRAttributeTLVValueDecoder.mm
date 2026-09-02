@@ -17927,6 +17927,7 @@ static id _Nullable DecodeAttributeValueForAmbientSensingUnionCluster(AttributeI
                     }
                 }
                 newElement_0.contributorStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.contributorStatus)];
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
