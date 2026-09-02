@@ -23,11 +23,15 @@ namespace app {
 
 WindowCovering::WindowCovering(Clusters::WindowCovering::WindowCoveringDelegate & delegate,
                                Clusters::IdentifyDelegate & identifyDelegate, const Context & context,
+                               BitFlags<Clusters::WindowCovering::Feature> features,
                                Clusters::WindowCovering::OptionalAttributeSet optionalAttributes) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWindowCovering, 1)),
-    mTimerDelegate(context.timerDelegate), mOptionalAttributes(optionalAttributes), mWindowCoveringDelegate(delegate),
-    mIdentifyDelegate(identifyDelegate), mContext(context)
-{}
+    mTimerDelegate(context.timerDelegate), mOptionalAttributes(optionalAttributes), mContext(context), mFeatures(features),
+    mWindowCoveringDelegate(delegate), mIdentifyDelegate(identifyDelegate)
+{
+    // Sanity check: the Window Covering device type specification mandates that either Lift or Tilt, or both, be enabled.
+    VerifyOrDie(mFeatures.Has(Clusters::WindowCovering::Feature::kLift) || mFeatures.Has(Clusters::WindowCovering::Feature::kTilt));
+}
 
 CHIP_ERROR WindowCovering::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                     EndpointComposition composition)
@@ -45,24 +49,13 @@ CHIP_ERROR WindowCovering::Register(chip::EndpointId endpoint, CodeDrivenDataMod
     mWindowCoveringDelegate.SetEndpoint(endpoint);
 
     Clusters::WindowCovering::WindowCoveringCluster::Config config(mWindowCoveringDelegate);
-    config
-        .WithFeatures(BitFlags<Clusters::WindowCovering::Feature>(
-            Clusters::WindowCovering::Feature::kLift, Clusters::WindowCovering::Feature::kPositionAwareLift,
-            Clusters::WindowCovering::Feature::kTilt, Clusters::WindowCovering::Feature::kPositionAwareTilt))
-        .WithOptionalAttributes(mOptionalAttributes);
+    config.WithFeatures(mFeatures).WithOptionalAttributes(mOptionalAttributes);
     mWindowCoveringCluster.Create(endpoint, config);
 
     ReturnErrorOnFailure(provider.AddCluster(mWindowCoveringCluster.Registration()));
 
-    // Groups is optional (Active, O) per the Window Covering device type, but we implement it
-    // here since it lets the device respond to groupcast commands like other simulated devices.
-    mGroupsCluster.Create(endpoint,
-                          Clusters::GroupsCluster::Context{
-                              .groupDataProvider   = mContext.groupDataProvider,
-                              .scenesIntegration   = nullptr, // Window Covering does not implement Scenes
-                              .identifyIntegration = &mIdentifyCluster.Cluster(),
-                          });
-    ReturnErrorOnFailure(provider.AddCluster(mGroupsCluster.Registration()));
+    // Call hook to register optional clusters (like Groups on the simulated subclass)
+    ReturnErrorOnFailure(RegisterOptionalClusters(endpoint, provider));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
@@ -72,11 +65,9 @@ CHIP_ERROR WindowCovering::Register(chip::EndpointId endpoint, CodeDrivenDataMod
 void WindowCovering::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
-    if (mGroupsCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mGroupsCluster.Cluster()));
-        mGroupsCluster.Destroy();
-    }
+
+    UnregisterOptionalClusters(provider);
+
     if (mWindowCoveringCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mWindowCoveringCluster.Cluster()));

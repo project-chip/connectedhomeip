@@ -16,13 +16,17 @@
  */
 #pragma once
 
-#include <app/clusters/groups-server/GroupsCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/window-covering-server/WindowCoveringCluster.h>
 #include <device/api/SingleEndpoint.h>
+#include <lib/support/BitFlags.h>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip {
+namespace Credentials {
+class GroupDataProvider;
+} // namespace Credentials
+
 namespace app {
 
 class WindowCovering : public SingleEndpoint
@@ -35,7 +39,8 @@ public:
     };
 
     WindowCovering(Clusters::WindowCovering::WindowCoveringDelegate & delegate, Clusters::IdentifyDelegate & identifyDelegate,
-                   const Context & context, Clusters::WindowCovering::OptionalAttributeSet optionalAttributes = {});
+                   const Context & context, BitFlags<Clusters::WindowCovering::Feature> features,
+                   Clusters::WindowCovering::OptionalAttributeSet optionalAttributes = {});
     ~WindowCovering() override = default;
 
     // DeviceInterface pure virtual lifecycle hooks
@@ -46,20 +51,26 @@ public:
     // Public cluster getters for programmatic control
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
     Clusters::WindowCovering::WindowCoveringCluster & WindowCoveringCluster() { return mWindowCoveringCluster.Cluster(); }
-    Clusters::GroupsCluster & GroupsCluster() { return mGroupsCluster.Cluster(); }
 
 protected:
+    virtual CHIP_ERROR RegisterOptionalClusters(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    virtual void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) {}
+
     TimerDelegate & mTimerDelegate;
     const Clusters::WindowCovering::OptionalAttributeSet mOptionalAttributes;
+    const Context mContext;
+    const BitFlags<Clusters::WindowCovering::Feature> mFeatures;
 
 private:
     Clusters::WindowCovering::WindowCoveringDelegate & mWindowCoveringDelegate;
     Clusters::IdentifyDelegate & mIdentifyDelegate;
-    const Context mContext;
 
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::WindowCovering::WindowCoveringCluster> mWindowCoveringCluster;
-    LazyRegisteredServerCluster<Clusters::GroupsCluster> mGroupsCluster;
 };
 
 } // namespace app
