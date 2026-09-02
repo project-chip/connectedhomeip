@@ -13846,7 +13846,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command StopRangingRequest
  *
- * Upon receipt of a StopRangingRequest command that contains a SessionID that matches an active ranging session, the Server SHALL terminate the corresponding ranging session.
+ * This command allows the Client to request the termination of an active proximity ranging session.
  */
 - (void)stopRangingRequestWithParams:(MTRProximityRangingClusterStopRangingRequestParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 
@@ -13891,6 +13891,12 @@ MTR_PROVISIONALLY_AVAILABLE
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeSessionIDListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeRangingConstraintsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeRangingConstraintsWithParams:(MTRSubscribeParams *)params
+                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                         reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeRangingConstraintsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
@@ -23878,6 +23884,11 @@ typedef NS_ENUM(uint8_t, MTRAmbientSensingUnionUnionHealth) {
     MTRAmbientSensingUnionUnionHealthNonFunctional MTR_PROVISIONALLY_AVAILABLE = 0x02,
 } MTR_PROVISIONALLY_AVAILABLE;
 
+typedef NS_ENUM(uint8_t, MTRProximityRangingBLERBCSecurityMode) {
+    MTRProximityRangingBLERBCSecurityModeBLEDeviceIDObfuscation MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRProximityRangingBLERBCSecurityModeEncryptedAdvertisingData MTR_PROVISIONALLY_AVAILABLE = 0x01,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRProximityRangingBLTCSMode) {
     MTRProximityRangingBLTCSModePBROnly MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRProximityRangingBLTCSModeRTTOnly MTR_PROVISIONALLY_AVAILABLE = 0x01,
@@ -23894,12 +23905,17 @@ typedef NS_ENUM(uint8_t, MTRProximityRangingBLTCSSecurityLevel) {
 typedef NS_ENUM(uint16_t, MTRProximityRangingNADM) {
     MTRProximityRangingNADMAttackExtremelyUnlikely MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRProximityRangingNADMAttackVeryUnlikely MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRProximityRangingNADMAttackUnlikely MTR_PROVISIONALLY_AVAILABLE = 0x02,
     MTRProximityRangingNADMAttackIsPossible MTR_PROVISIONALLY_AVAILABLE = 0x03,
     MTRProximityRangingNADMAttackIsLikely MTR_PROVISIONALLY_AVAILABLE = 0x04,
     MTRProximityRangingNADMAttackVeryLikely MTR_PROVISIONALLY_AVAILABLE = 0x05,
     MTRProximityRangingNADMAttackExtremelyLikely MTR_PROVISIONALLY_AVAILABLE = 0x06,
     MTRProximityRangingNADMUnknown MTR_PROVISIONALLY_AVAILABLE = 0xFF,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRProximityRangingRDRCapability) {
+    MTRProximityRangingRDRCapabilityNoRDR MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRProximityRangingRDRCapabilityAzimuthOnly MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRProximityRangingRDRCapabilityAzimuthElevation MTR_PROVISIONALLY_AVAILABLE = 0x02,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRProximityRangingRDRReference) {
@@ -23916,15 +23932,13 @@ typedef NS_ENUM(uint8_t, MTRProximityRangingRangingRole) {
     MTRProximityRangingRangingRoleBLTReflectorRole MTR_PROVISIONALLY_AVAILABLE = 0x05,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRProximityRangingRangingSecurity) {
-    MTRProximityRangingRangingSecuritySecureRanging MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRProximityRangingRangingSecurityOpenRanging MTR_PROVISIONALLY_AVAILABLE = 0x01,
-} MTR_PROVISIONALLY_AVAILABLE;
-
 typedef NS_ENUM(uint8_t, MTRProximityRangingRangingSessionStatus) {
-    MTRProximityRangingRangingSessionStatusSessionEndTimeReached MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRProximityRangingRangingSessionStatusPeerNotFound MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRProximityRangingRangingSessionStatusHardwareError MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRProximityRangingRangingSessionStatusSessionStarted MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRProximityRangingRangingSessionStatusSessionEndTimeReached MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRProximityRangingRangingSessionStatusSessionStoppedByRequest MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRProximityRangingRangingSessionStatusPeerNotFound MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRProximityRangingRangingSessionStatusHardwareError MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRProximityRangingRangingSessionStatusSessionFailed MTR_PROVISIONALLY_AVAILABLE = 0x05,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRProximityRangingRangingTech) {
@@ -23934,12 +23948,11 @@ typedef NS_ENUM(uint8_t, MTRProximityRangingRangingTech) {
     MTRProximityRangingRangingTechBLEBeaconRSSIRanging MTR_PROVISIONALLY_AVAILABLE = 0x03,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRProximityRangingResultCode) {
-    MTRProximityRangingResultCodeAccepted MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRProximityRangingResultCodeRejectedInfeasibleRanging MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRProximityRangingResultCodeRejectedInfeasibleRangingTriggers MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRProximityRangingResultCodeBusySessionCapacityReached MTR_PROVISIONALLY_AVAILABLE = 0x03,
-    MTRProximityRangingResultCodeBusyTryAgainLater MTR_PROVISIONALLY_AVAILABLE = 0x04,
+typedef NS_ENUM(uint8_t, MTRProximityRangingStatusCode) {
+    MTRProximityRangingStatusCodeRejectedInfeasibleRanging MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRProximityRangingStatusCodeRejectedInfeasibleRangingTriggers MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRProximityRangingStatusCodeBusySessionCapacityReached MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRProximityRangingStatusCodeBusyTryAgainLater MTR_PROVISIONALLY_AVAILABLE = 0x05,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRProximityRangingFeature) {
@@ -23970,6 +23983,11 @@ typedef NS_OPTIONS(uint32_t, MTRProximityRangingRangingBandwidthBitmap) {
     MTRProximityRangingRangingBandwidthBitmap80MHz MTR_PROVISIONALLY_AVAILABLE = 0x80,
     MTRProximityRangingRangingBandwidthBitmap160MHz MTR_PROVISIONALLY_AVAILABLE = 0x100,
     MTRProximityRangingRangingBandwidthBitmap320MHz MTR_PROVISIONALLY_AVAILABLE = 0x200,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_OPTIONS(uint8_t, MTRProximityRangingRangingRoleSupportBitmap) {
+    MTRProximityRangingRangingRoleSupportBitmapInitiatorSupport MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRProximityRangingRangingRoleSupportBitmapResponderSupport MTR_PROVISIONALLY_AVAILABLE = 0x2,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRSmokeConcentrationMeasurementLevelValue) {

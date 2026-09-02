@@ -4256,6 +4256,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "BLTCSModeCapability";
         case chip::app::Clusters::ProximityRanging::Attributes::SessionIDList::Id:
             return "SessionIDList";
+        case chip::app::Clusters::ProximityRanging::Attributes::RangingConstraints::Id:
+            return "RangingConstraints";
         case chip::app::Clusters::ProximityRanging::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ProximityRanging::Attributes::AcceptedCommandList::Id:
