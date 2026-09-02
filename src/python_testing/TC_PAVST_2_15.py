@@ -23,6 +23,7 @@
 #   run1:
 #     app: ${CAMERA_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --camera-test-videosrc --camera-test-audiosrc
+#     app-ready-pattern: "APP STATUS: Starting event loop"
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --string-arg th_server_app_path:${PUSH_AV_SERVER}
@@ -147,6 +148,12 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             asserts.assert_equal(e.status, expected_status, "Status mismatch")
             return e.status
 
+    def _make_motion_zone(self, zone_id: int, sensitivity: int = 4) -> dict:
+        """Helper to create a motion zone option dict with or without sensitivity based on feature support."""
+        if getattr(self, "perZoneSenseSupported", False):
+            return {"zone": zone_id, "sensitivity": sensitivity}
+        return {"zone": zone_id}
+
     @run_if_endpoint_matches(lambda wildcard, endpoint: has_cluster(Clusters.PushAvStreamTransport)(wildcard, endpoint) and has_cluster(Clusters.ZoneManagement)(wildcard, endpoint) and has_cluster(Clusters.CameraAvStreamManagement)(wildcard, endpoint))
     async def test_TC_PAVST_2_15(self) -> None:
         """Run TC-PAVST-2.15 test."""
@@ -180,31 +187,39 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         aZones = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=zmcluster, attribute=zmattr.Zones)
 
-        aZoneID1 = None
-        aZoneID2 = None
+        motion_zones = [z for z in aZones if z.use == zmcluster.Enums.ZoneUseEnum.kMotion]
+        if len(motion_zones) >= 2:
+            aZoneID1 = motion_zones[0].zoneID
+            aZoneID2 = motion_zones[1].zoneID
+        elif twoDCartSupported and userDefinedSupported:
+            needed_zones = []
+            if len(motion_zones) == 1:
+                aZoneID1 = motion_zones[0].zoneID
+                needed_zones = [(2, "Zone2", 30)]
+            else:
+                needed_zones = [(1, "Zone1", 10), (2, "Zone2", 30)]
 
-        if twoDCartSupported and userDefinedSupported:
-            # Create Zone 1
-            zoneVertices = [
-                zmcluster.Structs.TwoDCartesianVertexStruct(x=10, y=10),
-                zmcluster.Structs.TwoDCartesianVertexStruct(x=20, y=10),
-                zmcluster.Structs.TwoDCartesianVertexStruct(x=20, y=20),
-                zmcluster.Structs.TwoDCartesianVertexStruct(x=10, y=20)
-            ]
-            zoneToCreate = zmcluster.Structs.TwoDCartesianZoneStruct(
-                name="Zone1", use=zmcluster.Enums.ZoneUseEnum.kMotion, vertices=zoneVertices,
-                color="#00FFFF")
-            cmdResponse = await self.send_single_cmd(endpoint=endpoint, cmd=zmcluster.Commands.CreateTwoDCartesianZone(zone=zoneToCreate))
-            aZoneID1 = cmdResponse.zoneID
+            created_ids = []
+            for num, name, offset in needed_zones:
+                zoneVertices = [
+                    zmcluster.Structs.TwoDCartesianVertexStruct(x=offset, y=10),
+                    zmcluster.Structs.TwoDCartesianVertexStruct(x=offset + 10, y=10),
+                    zmcluster.Structs.TwoDCartesianVertexStruct(x=offset + 10, y=20),
+                    zmcluster.Structs.TwoDCartesianVertexStruct(x=offset, y=20),
+                ]
+                zoneToCreate = zmcluster.Structs.TwoDCartesianZoneStruct(
+                    name=name, use=zmcluster.Enums.ZoneUseEnum.kMotion, vertices=zoneVertices,
+                    color="#00FFFF" if num == 1 else "#FF00FF",
+                )
+                cmdResponse = await self.send_single_cmd(endpoint=endpoint, cmd=zmcluster.Commands.CreateTwoDCartesianZone(zone=zoneToCreate))
+                created_ids.append(cmdResponse.zoneID)
 
-            # Create Zone 2
-            zoneToCreate = zmcluster.Structs.TwoDCartesianZoneStruct(
-                name="Zone2", use=zmcluster.Enums.ZoneUseEnum.kMotion, vertices=zoneVertices,
-                color="#FF00FF")
-            cmdResponse = await self.send_single_cmd(endpoint=endpoint, cmd=zmcluster.Commands.CreateTwoDCartesianZone(zone=zoneToCreate))
-            aZoneID2 = cmdResponse.zoneID
+            if len(motion_zones) == 1:
+                aZoneID2 = created_ids[0]
+            else:
+                aZoneID1 = created_ids[0]
+                aZoneID2 = created_ids[1]
         else:
-            motion_zones = [z for z in aZones if z.use == zmcluster.Enums.ZoneUseEnum.kMotion]
             asserts.assert_greater_equal(
                 len(motion_zones), 2, "Test requires at least 2 pre-existing motion zones if UserDefined is not supported")
             aZoneID1 = motion_zones[0].zoneID
@@ -217,29 +232,55 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         # Step 1: Allocate transport with Motion trigger
         self.step(1)
         # Allocate streams first
-        await self.allocate_one_video_stream()
-        await self.allocate_one_audio_stream()
+        aAllocatedVideoStreams = await self.allocate_one_video_stream()
+        video_stream_id = aAllocatedVideoStreams[0] if isinstance(aAllocatedVideoStreams, list) else aAllocatedVideoStreams
+        aAllocatedAudioStreams = await self.allocate_one_audio_stream()
+        audio_stream_id = aAllocatedAudioStreams[0] if isinstance(aAllocatedAudioStreams, list) else aAllocatedAudioStreams
+
+        aStreamUsagePriorities = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.CameraAvStreamManagement, attribute=Clusters.CameraAvStreamManagement.Attributes.StreamUsagePriorities
+        )
+        streamUsage = aStreamUsagePriorities[0]
+
+        containerOptions = {
+            "containerType": pvcluster.Enums.ContainerFormatEnum.kCmaf,
+            "CMAFContainerOptions": {
+                "CMAFInterface": pvcluster.Enums.CMAFInterfaceEnum.kInterface1,
+                "chunkDuration": 4,
+                "segmentDuration": 4000,
+                "sessionGroup": 3,
+                "trackName": "media",
+            },
+        }
 
         # Allocate transport with Motion trigger
         # We need valid MotionZones to allocate with Motion trigger
-        initZoneList = [{"zone": aZoneID1, "sensitivity": 4}]
+        initZoneList = [self._make_motion_zone(aZoneID1)]
         triggerOptions = {
             "triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
             "motionZones": initZoneList,
-            "motionTimeControl": {"initialDuration": 5, "augmentationDuration": 2, "maxDuration": 10, "blindDuration": 1}
+            "motionTimeControl": {"initialDuration": 5, "augmentationDuration": 2, "maxDuration": 10, "blindDuration": 1},
+            "maxPreRollLen": 4000,
         }
-        status = await self.allocate_one_pushav_transport(
-            endpoint,
-            trigger_Options=triggerOptions,
-            tlsEndPoint=self.tlsEndpointId,
-            url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
-        asserts.assert_equal(status, Status.Success, "Push AV Transport allocation failed")
-
-        # Get connection ID
-        transport_configs = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=pvcluster, attribute=pvattr.CurrentConnections)
-        asserts.assert_equal(len(transport_configs), 1, "TransportConfigurations must be 1")
-        aConnectionID = transport_configs[0].connectionID
+        transportOptions = {
+            "streamUsage": streamUsage,
+            "videoStreamID": video_stream_id,
+            "audioStreamID": audio_stream_id,
+            "TLSEndpointID": self.tlsEndpointId,
+            "url": f"https://{host_ip}:1234/streams/{uploadStreamId}/",
+            "triggerOptions": triggerOptions,
+            "ingestMethod": pvcluster.Enums.IngestMethodsEnum.kCMAFIngest,
+            "containerOptions": containerOptions,
+            "expiryTime": 3600,
+        }
+        cmd = pvcluster.Commands.AllocatePushTransport(transportOptions=transportOptions)
+        alloc_response = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+        if hasattr(alloc_response, "transportConfiguration"):
+            aConnectionID = alloc_response.transportConfiguration.connectionID
+        else:
+            aConnectionID = alloc_response.connectionID
+        asserts.assert_is_not_none(aConnectionID, "AllocatePushTransportResponse does not contain connectionID")
+        asserts.assert_true(aConnectionID != 0, "ConnectionID should not be 0")
 
         # Step 2: Read MaxZones
         self.step(2)
@@ -267,8 +308,8 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         # Step 5: Duplicate zones
         self.step(5)
         duplicate_zones = [
-            {"zone": aZoneID1, "sensitivity": 4},
-            {"zone": aZoneID1, "sensitivity": 4}
+            self._make_motion_zone(aZoneID1),
+            self._make_motion_zone(aZoneID1),
         ]
         await self.send_update_motion_zone_options(
             endpoint, aConnectionID, motionZones=duplicate_zones, expected_status=Status.AlreadyExists)
@@ -278,11 +319,12 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         temp_zone_ids = []
         if twoDCartSupported and userDefinedSupported:
             for i in range(2, aMaxZones + 1):
+                offset = (i + 4) * 10
                 zoneVertices = [
-                    zmcluster.Structs.TwoDCartesianVertexStruct(x=10, y=10),
-                    zmcluster.Structs.TwoDCartesianVertexStruct(x=20, y=10),
-                    zmcluster.Structs.TwoDCartesianVertexStruct(x=20, y=20),
-                    zmcluster.Structs.TwoDCartesianVertexStruct(x=10, y=20),
+                    zmcluster.Structs.TwoDCartesianVertexStruct(x=offset, y=10),
+                    zmcluster.Structs.TwoDCartesianVertexStruct(x=offset + 10, y=10),
+                    zmcluster.Structs.TwoDCartesianVertexStruct(x=offset + 10, y=20),
+                    zmcluster.Structs.TwoDCartesianVertexStruct(x=offset, y=20),
                 ]
                 zoneToCreate = zmcluster.Structs.TwoDCartesianZoneStruct(
                     name=f"TempZone{i}",
@@ -307,7 +349,7 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             valid_motion_zone_ids = [z.zoneID for z in current_zones if z.use == zmcluster.Enums.ZoneUseEnum.kMotion]
             if len(valid_motion_zone_ids) >= aMaxZones + 1:
                 too_many_zones = [
-                    {"zone": zid, "sensitivity": 4}
+                    self._make_motion_zone(zid)
                     for zid in valid_motion_zone_ids[:aMaxZones + 1]
                 ]
                 await self.send_update_motion_zone_options(
@@ -341,7 +383,7 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         )
         while any(z.zoneID == invalid_zone_id for z in current_zones):
             invalid_zone_id += 1
-        invalid_zones = [{"zone": invalid_zone_id, "sensitivity": 4}]
+        invalid_zones = [self._make_motion_zone(invalid_zone_id)]
         await self.send_update_motion_zone_options(
             endpoint, aConnectionID, motionZones=invalid_zones,
             expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidZone)
@@ -363,8 +405,8 @@ class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         # Step 10: Update with valid zones
         self.step(10)
         valid_zones = [
-            {"zone": aZoneID1, "sensitivity": 4},
-            {"zone": aZoneID2, "sensitivity": 4}
+            self._make_motion_zone(aZoneID1),
+            self._make_motion_zone(aZoneID2),
         ]
         await self.send_update_motion_zone_options(
             endpoint, aConnectionID, motionZones=valid_zones, expected_status=Status.Success)
