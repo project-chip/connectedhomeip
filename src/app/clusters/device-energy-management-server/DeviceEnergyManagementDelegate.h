@@ -43,7 +43,7 @@ public:
      *        before calling PowerAdjustRequest.
      *
      * @param power Milli-Watts the ESA SHALL use during the adjustment period.
-     * @param duration The duration that the ESA SHALL maintain the requested power for.
+     * @param duration The duration in seconds that the ESA SHALL maintain the requested power for.
      * @return  Success if the adjustment is accepted; otherwise the command SHALL be rejected with appropriate error.
      */
     virtual Protocols::InteractionModel::Status PowerAdjustRequest(const int64_t power, const uint32_t duration,
@@ -86,7 +86,7 @@ public:
      *   During this state the ESA SHALL not consume or produce significant power (other than required to keep its
      *   basic control system operational).
      *
-     * @param duration Duration that the ESA SHALL be paused for.
+     * @param duration Duration in seconds that the ESA SHALL be paused for.
      * @return  Success if the ESA is paused, otherwise returns other IM_Status.
      */
     virtual Protocols::InteractionModel::Status PauseRequest(const uint32_t duration, AdjustmentCauseEnum cause) = 0;
@@ -161,7 +161,7 @@ public:
      *
      * @param minPower  Minimum power in milli-Watts the ESA can operate within (nullable).
      * @param maxPower  Maximum power in milli-Watts the ESA can operate within (nullable).
-     * @param duration  The duration that the ESA SHALL maintain the requested power range for.
+     * @param duration  The duration in seconds that the ESA SHALL maintain the requested power range for.
      * @param cause     Who (Grid/local) is triggering this change.
      * @return  Success if the adjustment is accepted; otherwise the command SHALL be rejected with appropriate error.
      */
