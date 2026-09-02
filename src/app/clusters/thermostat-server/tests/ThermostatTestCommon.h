@@ -71,8 +71,8 @@ public:
     }
 
     ControlSequenceOfOperationEnum GetControlSequenceOfOperation() const override { return mControlSequenceOfOperation; }
-    Protocols::InteractionModel::Status
-    SetControlSequenceOfOperation(ControlSequenceOfOperationEnum controlSequenceOfOperation, bool & changed) override
+    Protocols::InteractionModel::Status SetControlSequenceOfOperation(ControlSequenceOfOperationEnum controlSequenceOfOperation,
+                                                                      bool & changed) override
     {
         changed                     = (mControlSequenceOfOperation != controlSequenceOfOperation);
         mControlSequenceOfOperation = controlSequenceOfOperation;
@@ -123,26 +123,26 @@ public:
         return mSetRemoteSensingStatus;
     }
 
-    FabricTable * mFabricTable                                                = nullptr;
-    DataModel::Nullable<temperature> mLocalTemperature                        = 2000;
-    DataModel::Nullable<temperature> mOutdoorTemperature                      = 1500;
-    SystemModeEnum mSystemMode                                                = SystemModeEnum::kOff;
-    ControlSequenceOfOperationEnum mControlSequenceOfOperation                = ControlSequenceOfOperationEnum::kCoolingAndHeating;
-    ThermostatRunningModeEnum mRunningMode                                    = ThermostatRunningModeEnum::kOff;
-    BitMask<RelayStateBitmap> mRunningState                                   = 0;
-    int8_t mCalibration                                                       = 0;
-    BitMask<RemoteSensingBitmap> mRemoteSensing                               = 0;
-    Protocols::InteractionModel::Status mSetLocalTemperatureStatus            = Protocols::InteractionModel::Status::Success;
-    Protocols::InteractionModel::Status mGetOutdoorTemperatureStatus          = Protocols::InteractionModel::Status::Success;
-    Protocols::InteractionModel::Status mSetSystemModeStatus                  = Protocols::InteractionModel::Status::Success;
-    Protocols::InteractionModel::Status mSetControlSequenceOfOperationStatus  = Protocols::InteractionModel::Status::Success;
-    Protocols::InteractionModel::Status mGetRunningModeStatus                 = Protocols::InteractionModel::Status::Success;
-    Protocols::InteractionModel::Status mSetRunningModeStatus                 = Protocols::InteractionModel::Status::Success;
-    Protocols::InteractionModel::Status mGetRunningStateStatus                = Protocols::InteractionModel::Status::Success;
-    Protocols::InteractionModel::Status mSetRunningStateStatus                = Protocols::InteractionModel::Status::Success;
-    Protocols::InteractionModel::Status mSetCalibrationStatus                 = Protocols::InteractionModel::Status::Success;
-    Protocols::InteractionModel::Status mGetRemoteSensingStatus               = Protocols::InteractionModel::Status::Success;
-    Protocols::InteractionModel::Status mSetRemoteSensingStatus               = Protocols::InteractionModel::Status::Success;
+    FabricTable * mFabricTable                                               = nullptr;
+    DataModel::Nullable<temperature> mLocalTemperature                       = 2000;
+    DataModel::Nullable<temperature> mOutdoorTemperature                     = 1500;
+    SystemModeEnum mSystemMode                                               = SystemModeEnum::kOff;
+    ControlSequenceOfOperationEnum mControlSequenceOfOperation               = ControlSequenceOfOperationEnum::kCoolingAndHeating;
+    ThermostatRunningModeEnum mRunningMode                                   = ThermostatRunningModeEnum::kOff;
+    BitMask<RelayStateBitmap> mRunningState                                  = 0;
+    int8_t mCalibration                                                      = 0;
+    BitMask<RemoteSensingBitmap> mRemoteSensing                              = 0;
+    Protocols::InteractionModel::Status mSetLocalTemperatureStatus           = Protocols::InteractionModel::Status::Success;
+    Protocols::InteractionModel::Status mGetOutdoorTemperatureStatus         = Protocols::InteractionModel::Status::Success;
+    Protocols::InteractionModel::Status mSetSystemModeStatus                 = Protocols::InteractionModel::Status::Success;
+    Protocols::InteractionModel::Status mSetControlSequenceOfOperationStatus = Protocols::InteractionModel::Status::Success;
+    Protocols::InteractionModel::Status mGetRunningModeStatus                = Protocols::InteractionModel::Status::Success;
+    Protocols::InteractionModel::Status mSetRunningModeStatus                = Protocols::InteractionModel::Status::Success;
+    Protocols::InteractionModel::Status mGetRunningStateStatus               = Protocols::InteractionModel::Status::Success;
+    Protocols::InteractionModel::Status mSetRunningStateStatus               = Protocols::InteractionModel::Status::Success;
+    Protocols::InteractionModel::Status mSetCalibrationStatus                = Protocols::InteractionModel::Status::Success;
+    Protocols::InteractionModel::Status mGetRemoteSensingStatus              = Protocols::InteractionModel::Status::Success;
+    Protocols::InteractionModel::Status mSetRemoteSensingStatus              = Protocols::InteractionModel::Status::Success;
 };
 
 class MockHeatingDelegate : public ThermostatHeatingSetpoints::Delegate
@@ -207,12 +207,12 @@ public:
         return mSetMaxHeatStatus;
     }
 
-    temperature mOccupiedHeatingSetpoint                        = 2000;
-    temperature mUnoccupiedHeatingSetpoint                      = 1600;
-    temperature mAbsMinHeat                                     = 700;
-    temperature mAbsMaxHeat                                     = 3000;
-    temperature mMinHeat                                        = 700;
-    temperature mMaxHeat                                        = 3000;
+    temperature mOccupiedHeatingSetpoint                            = 2000;
+    temperature mUnoccupiedHeatingSetpoint                          = 1600;
+    temperature mAbsMinHeat                                         = 700;
+    temperature mAbsMaxHeat                                         = 3000;
+    temperature mMinHeat                                            = 700;
+    temperature mMaxHeat                                            = 3000;
     Protocols::InteractionModel::Status mGetOccupiedHeatingStatus   = Protocols::InteractionModel::Status::Success;
     Protocols::InteractionModel::Status mSetOccupiedHeatingStatus   = Protocols::InteractionModel::Status::Success;
     Protocols::InteractionModel::Status mGetUnoccupiedHeatingStatus = Protocols::InteractionModel::Status::Success;
@@ -287,12 +287,12 @@ public:
         return mSetUnoccupiedCoolingStatus;
     }
 
-    temperature mOccupiedCoolingSetpoint                        = 2600;
-    temperature mUnoccupiedCoolingSetpoint                      = 2800;
-    temperature mAbsMinCool                                     = 1600;
-    temperature mAbsMaxCool                                     = 3200;
-    temperature mMinCool                                        = 1600;
-    temperature mMaxCool                                        = 3200;
+    temperature mOccupiedCoolingSetpoint                            = 2600;
+    temperature mUnoccupiedCoolingSetpoint                          = 2800;
+    temperature mAbsMinCool                                         = 1600;
+    temperature mAbsMaxCool                                         = 3200;
+    temperature mMinCool                                            = 1600;
+    temperature mMaxCool                                            = 3200;
     Protocols::InteractionModel::Status mGetOccupiedCoolingStatus   = Protocols::InteractionModel::Status::Success;
     Protocols::InteractionModel::Status mSetOccupiedCoolingStatus   = Protocols::InteractionModel::Status::Success;
     Protocols::InteractionModel::Status mGetAbsMinCoolStatus        = Protocols::InteractionModel::Status::Success;
@@ -314,7 +314,7 @@ public:
         return mGetMinDeadbandStatus;
     }
 
-    temperature mDeadband                                      = kDefaultDeadBand;
+    temperature mDeadband                                     = kDefaultDeadBand;
     Protocols::InteractionModel::Status mGetMinDeadbandStatus = Protocols::InteractionModel::Status::Success;
 };
 
@@ -347,9 +347,9 @@ public:
         return mSetExpiryStatus;
     }
 
-    TemperatureSetpointHoldEnum mHold                        = TemperatureSetpointHoldEnum::kSetpointHoldOff;
-    DataModel::Nullable<uint16_t> mDuration                  = 60;
-    DataModel::Nullable<uint32_t> mExpiryTimestamp           = 0;
+    TemperatureSetpointHoldEnum mHold                      = TemperatureSetpointHoldEnum::kSetpointHoldOff;
+    DataModel::Nullable<uint16_t> mDuration                = 60;
+    DataModel::Nullable<uint32_t> mExpiryTimestamp         = 0;
     Protocols::InteractionModel::Status mSetHoldStatus     = Protocols::InteractionModel::Status::Success;
     Protocols::InteractionModel::Status mSetDurationStatus = Protocols::InteractionModel::Status::Success;
     Protocols::InteractionModel::Status mSetExpiryStatus   = Protocols::InteractionModel::Status::Success;
@@ -366,7 +366,7 @@ public:
         return mSetOccupancyStatus;
     }
 
-    BitMask<OccupancyBitmap> mOccupancy                        = OccupancyBitmap::kOccupied;
+    BitMask<OccupancyBitmap> mOccupancy                     = OccupancyBitmap::kOccupied;
     Protocols::InteractionModel::Status mSetOccupancyStatus = Protocols::InteractionModel::Status::Success;
 };
 
@@ -434,8 +434,7 @@ public:
                 return CHIP_ERROR_BUFFER_TOO_SMALL;
             }
             memcpy(mActivePresetHandleBuffer, activePresetHandle.Value().data(), activePresetHandle.Value().size());
-            mActivePresetHandle =
-                DataModel::MakeNullable(ByteSpan(mActivePresetHandleBuffer, activePresetHandle.Value().size()));
+            mActivePresetHandle = DataModel::MakeNullable(ByteSpan(mActivePresetHandleBuffer, activePresetHandle.Value().size()));
         }
         return mSetActivePresetHandleError;
     }
@@ -467,15 +466,15 @@ public:
         return std::nullopt;
     }
 
-    size_t mMaxPresets                                                        = 10;
+    size_t mMaxPresets = 10;
     std::vector<Structs::PresetTypeStruct::Type> mPresetTypes;
     std::vector<PresetStructWithOwnedMembers> mPresets;
     std::vector<PresetStructWithOwnedMembers> mPendingPresets;
-    uint8_t mActivePresetHandleBuffer[kPresetHandleSize]                     = { 0 };
-    DataModel::Nullable<ByteSpan> mActivePresetHandle                         = DataModel::NullNullable;
-    CHIP_ERROR mSetActivePresetHandleError                                    = CHIP_NO_ERROR;
-    CHIP_ERROR mCommitPendingPresetsError                                     = CHIP_NO_ERROR;
-    std::optional<System::Clock::Milliseconds16> mMaxAtomicWriteTimeout      = System::Clock::Milliseconds16(10000);
+    uint8_t mActivePresetHandleBuffer[kPresetHandleSize]                = { 0 };
+    DataModel::Nullable<ByteSpan> mActivePresetHandle                   = DataModel::NullNullable;
+    CHIP_ERROR mSetActivePresetHandleError                              = CHIP_NO_ERROR;
+    CHIP_ERROR mCommitPendingPresetsError                               = CHIP_NO_ERROR;
+    std::optional<System::Clock::Milliseconds16> mMaxAtomicWriteTimeout = System::Clock::Milliseconds16(10000);
 };
 
 class MockSuggestionsDelegate : public ThermostatSuggestions::Delegate
@@ -548,13 +547,13 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    uint8_t mMaxSuggestions                                                              = 5;
-    uint8_t mNextUniqueID                                                                = 1;
-    bool mFailGetUniqueID                                                                = false;
-    bool mFailAppend                                                                     = false;
-    bool mReEvaluateCalled                                                               = false;
+    uint8_t mMaxSuggestions = 5;
+    uint8_t mNextUniqueID   = 1;
+    bool mFailGetUniqueID   = false;
+    bool mFailAppend        = false;
+    bool mReEvaluateCalled  = false;
     std::vector<ThermostatSuggestionStructWithOwnedMembers> mSuggestions;
-    DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> mCurrentSuggestion   = DataModel::NullNullable;
+    DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> mCurrentSuggestion    = DataModel::NullNullable;
     DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> mNotFollowingReason = DataModel::NullNullable;
 };
 

@@ -184,9 +184,9 @@ TEST_F(ThermostatTestFixture, TestSuggestionsAttributesAndAddRemoveCommands)
 
     // 1. Trying to add suggestion without synced clock -> InvalidInState
     Commands::AddThermostatSuggestion::Type addCmd;
-    addCmd.presetHandle         = ByteSpan(handle);
-    addCmd.expirationInMinutes  = 60;
-    addCmd.effectiveTime        = DataModel::NullNullable;
+    addCmd.presetHandle        = ByteSpan(handle);
+    addCmd.expirationInMinutes = 60;
+    addCmd.effectiveTime       = DataModel::NullNullable;
 
     auto result = tester.Invoke(addCmd);
     EXPECT_TRUE(result.status.has_value());
@@ -210,7 +210,7 @@ TEST_F(ThermostatTestFixture, TestSuggestionsAttributesAndAddRemoveCommands)
     EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::ConstraintError);
 
     // 4. Non-existent preset handle -> NotFound
-    uint8_t unknownHandle[4] = { 9, 9, 9, 9 };
+    uint8_t unknownHandle[4]   = { 9, 9, 9, 9 };
     addCmd.presetHandle        = ByteSpan(unknownHandle);
     addCmd.expirationInMinutes = 60;
     result                     = tester.Invoke(addCmd);

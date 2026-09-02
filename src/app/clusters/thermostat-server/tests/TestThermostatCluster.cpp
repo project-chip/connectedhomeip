@@ -78,7 +78,7 @@ TEST_F(ThermostatTestFixture, TestOptionalAttributesInAttributeList)
 {
     mOptionalAttributes.LocalTemperatureCalibration = true;
     mOptionalAttributes.OutdoorTemperature          = true;
-    mOptionalAttributes.RemoteSensing              = true;
+    mOptionalAttributes.RemoteSensing               = true;
     mOptionalAttributes.ThermostatRunningMode       = true;
     mOptionalAttributes.ThermostatRunningState      = true;
 

@@ -59,8 +59,7 @@ TEST(TestPresetStructWithOwnedMembers, TestBasicOperations)
     // Exceed max name size
     char largeName[kPresetNameSize + 1];
     memset(largeName, 'A', sizeof(largeName));
-    EXPECT_EQ(preset.SetName(MakeOptional(DataModel::MakeNullable(CharSpan(largeName, sizeof(largeName))))),
-              CHIP_ERROR_NO_MEMORY);
+    EXPECT_EQ(preset.SetName(MakeOptional(DataModel::MakeNullable(CharSpan(largeName, sizeof(largeName))))), CHIP_ERROR_NO_MEMORY);
 
     // Setpoints
     preset.SetHeatingSetpoint(MakeOptional<int16_t>(static_cast<int16_t>(2000)));
@@ -103,8 +102,8 @@ TEST_F(ThermostatTestFixture, TestPresetsAttributesReading)
 
     // Populate preset types
     Structs::PresetTypeStruct::Type ptype;
-    ptype.presetScenario       = PresetScenarioEnum::kOccupied;
-    ptype.numberOfPresets      = 2;
+    ptype.presetScenario  = PresetScenarioEnum::kOccupied;
+    ptype.numberOfPresets = 2;
     ptype.presetTypeFeatures.Set(PresetTypeFeaturesBitmap::kSupportsNames);
     mPresetsDelegate.mPresetTypes.push_back(ptype);
 
@@ -146,8 +145,8 @@ TEST_F(ThermostatTestFixture, TestAtomicWriteSessionFullLifecycle)
     BitFlags<Feature> features(Feature::kHeating, Feature::kCooling, Feature::kPresets);
 
     Structs::PresetTypeStruct::Type ptype;
-    ptype.presetScenario       = PresetScenarioEnum::kOccupied;
-    ptype.numberOfPresets      = 5;
+    ptype.presetScenario  = PresetScenarioEnum::kOccupied;
+    ptype.numberOfPresets = 5;
     ptype.presetTypeFeatures.Set(PresetTypeFeaturesBitmap::kSupportsNames);
     mPresetsDelegate.mPresetTypes.push_back(ptype);
 
@@ -173,10 +172,10 @@ TEST_F(ThermostatTestFixture, TestAtomicWriteSessionFullLifecycle)
 
     // 2. BeginAtomicWrite
     Commands::AtomicRequest::Type beginReq;
-    beginReq.requestType = AtomicRequestTypeEnum::kBeginWrite;
+    beginReq.requestType        = AtomicRequestTypeEnum::kBeginWrite;
     chip::AttributeId attrIds[] = { Presets::Id };
-    beginReq.attributeRequests = DataModel::List<const chip::AttributeId>(attrIds, 1);
-    beginReq.timeout           = MakeOptional<uint16_t>(static_cast<uint16_t>(5000)); // 5 seconds
+    beginReq.attributeRequests  = DataModel::List<const chip::AttributeId>(attrIds, 1);
+    beginReq.timeout            = MakeOptional<uint16_t>(static_cast<uint16_t>(5000)); // 5 seconds
 
     auto result = tester.Invoke(beginReq);
     EXPECT_TRUE(result.status.has_value());
@@ -227,8 +226,8 @@ TEST_F(ThermostatTestFixture, TestAtomicWriteRollback)
     BitFlags<Feature> features(Feature::kHeating, Feature::kCooling, Feature::kPresets);
 
     Structs::PresetTypeStruct::Type ptype;
-    ptype.presetScenario       = PresetScenarioEnum::kOccupied;
-    ptype.numberOfPresets      = 5;
+    ptype.presetScenario  = PresetScenarioEnum::kOccupied;
+    ptype.numberOfPresets = 5;
     ptype.presetTypeFeatures.Set(PresetTypeFeaturesBitmap::kSupportsNames);
     mPresetsDelegate.mPresetTypes.push_back(ptype);
 

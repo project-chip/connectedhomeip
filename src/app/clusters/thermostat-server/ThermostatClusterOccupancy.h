@@ -32,7 +32,6 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-
 class ThermostatOccupancy
 {
 public:
