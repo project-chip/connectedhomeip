@@ -611,13 +611,20 @@ CHIP_ERROR BluezEndpoint::ConnectDeviceImpl(BluezDevice1 & aDevice)
         }
 
         ChipLogError(DeviceLayer, "FAIL: ConnectDevice: %s (%d)", error->message, error->code);
+
+        // Cease the connection on every failure, not just before a retry. BlueZ may have
+        // established the link before reporting failure -- in particular when the attempt is
+        // cancelled because another transport won the discovery race -- and such a link stays
+        // up until it is explicitly released, leaving the peer holding a connection it will
+        // wait on indefinitely.
+        bluez_device1_call_disconnect_sync(&aDevice, nullptr, nullptr);
+
         if (!g_error_matches(error.get(), G_IO_ERROR, G_IO_ERROR_DBUS_ERROR))
         {
             break;
         }
 
         ChipLogProgress(DeviceLayer, "ConnectDevice retry: %u out of %u", i + 1, kMaxConnectRetries);
-        bluez_device1_call_disconnect_sync(&aDevice, nullptr, nullptr);
     }
 
     BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_INTERNAL);

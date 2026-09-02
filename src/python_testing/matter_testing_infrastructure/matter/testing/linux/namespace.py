@@ -173,7 +173,12 @@ class NetworkLink(NetworkResource):
         if ns:  # Only needed when running in netns, otherwise can be an unintended side-effect
             up_cmds.append(NetworkCmd("ip link set dev lo up", ns_wrapper=True))
 
-        up_cmds.extend(NetworkCmd(f"ip addr add {addr} dev {name}", ns_wrapper=True) for addr in self.ipv4_addrs)
+        # "replace" rather than "add": bringing a link up has to be idempotent, because
+        # a link can be brought up once per association and a test may associate more
+        # than once -- for example one commissioning per transport under test. A second
+        # "add" fails, and the failure surfaces inside the mock's association task where
+        # nothing awaits it, stalling the state machine before it reports "completed".
+        up_cmds.extend(NetworkCmd(f"ip addr replace {addr} dev {name}", ns_wrapper=True) for addr in self.ipv4_addrs)
 
         if self.ipv6_addrs:
             up_cmds.append(NetworkCmd(f"ip -6 addr flush {name}", ns_wrapper=True))
@@ -355,6 +360,18 @@ class IsolatedNetworkNamespace(TerminableResource):
                 obj.teardown()
             except Exception:
                 log.exception("Encountered an error during teardown of network resource '%s'", obj)
+
+    def link_for_name(self, name: str) -> NetworkLink | None:
+        """The link whose device name begins with ``name``.
+
+        Mock servers are configured with the base link names, while the devices
+        themselves carry the namespace index as a suffix, so an exact match will
+        not do. Returns None when no link matches.
+        """
+        for link in (self.app_link, self.tool_link, self.mgmt_link, self.proxy_link):
+            if link is not None and link.name.startswith(name):
+                return link
+        return None
 
     def netns_for_subprocess_kind(self, kind: SubprocessKind) -> NetworkNamespace:
         match kind:

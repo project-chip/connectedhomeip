@@ -249,6 +249,7 @@ class TC_COMPRO_2_4(COMPROBaseTest):
             extra_args=extra_args,
             ed_transport=ed_transport,
             serial_port=params.get('ed_serial_port'),
+            launch_wrapper=params.get('ed_launch_wrapper'),
         ))
 
     @async_test_body

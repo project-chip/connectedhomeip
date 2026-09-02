@@ -87,6 +87,7 @@ PAF_FREQ_LIST = "2437"
 # proxy scans and connects as central on the second.
 BLE_CONTROLLER_ED = 0
 BLE_CONTROLLER_PROXY = 1
+BLE_CONTROLLER_TOOL = 2
 
 # all-devices-app has no --passcode option, so the proxy always comes up on the
 # built-in test passcode and the test script has to be given the same value.
@@ -143,7 +144,7 @@ def wpa_interface_names(transport: str) -> list[str]:
     return names
 
 
-def proxy_app_args(transport: str, endpoint: int) -> list[str]:
+def proxy_app_args(transport: str, endpoint: int, proxy_ble: bool) -> list[str]:
     """Arguments for the proxy application.
 
     BLE is given to the proxy whichever transport is under test. The proxy
@@ -152,8 +153,11 @@ def proxy_app_args(transport: str, endpoint: int) -> list[str]:
     straight back as ProxyBackGroundScanStartRequest.transport -- so a proxy
     built with BLE but denied an adapter fails the scan outright.
     """
-    args = ["--device", f"commissioning-proxy:{endpoint}",
-            "--ble-controller", str(BLE_CONTROLLER_PROXY)]
+    args = ["--device", f"commissioning-proxy:{endpoint}"]
+    # --ble-controller is compiled out of a proxy built without BLE, and passing
+    # an option the application does not know is fatal to it.
+    if proxy_ble:
+        args += ["--ble-controller", str(BLE_CONTROLLER_PROXY)]
     if transport == Transport.WIFIPAF:
         args += ["--wifi", "--wifipaf", f"freq_list={PAF_FREQ_LIST}"]
     return args
@@ -210,6 +214,9 @@ def ed_app_args(transport: str) -> str:
                    'the test script which passcode to use and must match the built-in default.')
 @click.option('--ed-discriminator', default=3841, show_default=True, help='Discriminator of the end device.')
 @click.option('--ed-passcode', default=20202021, show_default=True, help='Passcode of the end device.')
+@click.option('--proxy-ble/--no-proxy-ble', default=True, show_default=True,
+              help='Whether the proxy application was built with BLE. Clear it for a PAF-only build, '
+                   'which does not accept --ble-controller.')
 @click.option('--ns-index', default=0, show_default=True, help='Index of the Linux network namespaces.')
 @click.option('--log-level', default='info', show_default=True,
               type=click.Choice(['debug', 'info', 'warn', 'error'], case_sensitive=False))
@@ -217,7 +224,7 @@ def ed_app_args(transport: str) -> str:
               help='Internal flag for running inside an unshared environment.')
 def main(proxy_app: str, proxy_args: str, ed_app: str | None, script: str, script_args: str, transport: str,
          endpoint: int, discriminator: int, passcode: int, ed_discriminator: int, ed_passcode: int,
-         ns_index: int, log_level: str, internal_inside_unshare: bool) -> None:
+         proxy_ble: bool, ns_index: int, log_level: str, internal_inside_unshare: bool) -> None:
 
     LogConfig(log_level, log_level, log_level, True).set_fmt()
 
@@ -232,12 +239,12 @@ def main(proxy_app: str, proxy_args: str, ed_app: str | None, script: str, scrip
         chiptest.linux.ensure_private_state()
 
     sys.exit(run(proxy_app, proxy_args, ed_app, script, script_args, transport, endpoint,
-                 discriminator, passcode, ed_discriminator, ed_passcode, ns_index))
+                 discriminator, passcode, ed_discriminator, ed_passcode, proxy_ble, ns_index))
 
 
 def run(proxy_app: str, proxy_args: str, ed_app: str | None, script: str, script_args: str, transport: str,
         endpoint: int, discriminator: int, passcode: int, ed_discriminator: int, ed_passcode: int,
-        ns_index: int) -> int:
+        proxy_ble: bool, ns_index: int) -> int:
     with contextlib.ExitStack() as stack:
         net_ns = stack.enter_context(chiptest.linux.IsolatedNetworkNamespace(
             index=ns_index,
@@ -259,7 +266,7 @@ def run(proxy_app: str, proxy_args: str, ed_app: str | None, script: str, script
             proxy_app,
             kvs_path=os.path.join(storage_dir, "kvs-proxy"),
             discriminator=discriminator,
-            extra_args=proxy_app_args(transport, endpoint) + shlex.split(proxy_args),
+            extra_args=proxy_app_args(transport, endpoint, proxy_ble) + shlex.split(proxy_args),
             wrapper=net_ns.proxy_ns.netns_cmd_wrapper)
         proxy.start(expected_output=APP_READY_PATTERN, timeout=APP_READY_TIMEOUT_S)
         stack.callback(proxy.terminate)
@@ -287,6 +294,11 @@ def test_script_args(script: str, ed_app: str | None, script_args: str, transpor
         "--passcode", str(passcode),
         "--endpoint", str(endpoint),
         "--storage-path", os.path.join(storage_dir, "admin_storage.json"),
+        # An adapter of its own: the multi-transport SetUpCodePairer races onto
+        # BLE while commissioning the proxy, and sharing an adapter with the end
+        # device leaves the proxy holding a peripheral connection that its
+        # switch to central mode then waits on forever.
+        "--ble-controller", str(BLE_CONTROLLER_TOOL),
     ]
 
     if ed_app is not None:
@@ -296,6 +308,17 @@ def test_script_args(script: str, ed_app: str | None, script_args: str, transpor
             f"ed_transport:{transport}",
             f"ed_extra_args:{ed_app_args(transport)}",
             f"ed_launch_wrapper:{shlex.join(net_ns.app_ns.netns_cmd_wrapper)}",
+            # Credentials of the mock access point, needed by the tests that
+            # provision the end device onto the operational network through the
+            # proxy. The mock ignores the password, but the test still has to
+            # send one for the ED to complete its association.
+            f"wifi_ssid:{MOCK_AP_SSID}",
+            f"wifi_password:{MOCK_AP_PASSWORD}",
+            # Multi-transport tests build one end device per transport under
+            # test and need each one's arguments, not just the transport this
+            # run was launched for.
+            f"wifipaf_ed_extra_args:{ed_app_args(Transport.WIFIPAF)}",
+            f"ble_ed_extra_args:{ed_app_args(Transport.BLE)}",
             "--int-arg",
             f"ed_discriminator:{ed_discriminator}",
             f"ed_passcode:{ed_passcode}",

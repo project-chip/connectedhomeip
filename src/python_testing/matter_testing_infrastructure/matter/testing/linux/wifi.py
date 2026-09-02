@@ -29,7 +29,7 @@ import sdbus
 
 from matter.testing.concurrency.context import TerminableThread
 
-from .namespace import IsolatedNetworkNamespace
+from .namespace import IsolatedNetworkNamespace, NetworkLink
 
 log = logging.getLogger(__name__)
 
@@ -243,13 +243,42 @@ class WpaSupplicantMock(TerminableThread):
             self.current_network = "/"
             self.nan_sessions: dict[int, dict] = {}
             self.interface_name_in_sim: str = ""
+            # The link this interface represents. Association brings it up and
+            # leaving the network takes it down, so that a device is reachable
+            # over IP only while it is actually associated.
+            self.link: NetworkLink | None = None
+            # Unique bus name of the application currently using this interface.
+            self.owner: str | None = None
+
+        async def _note_caller(self) -> None:
+            """Reset the association when a different application takes over.
+
+            A restarted application is a new client on the bus, and the interface
+            it inherits must look like a radio that has just come up: an
+            application that has forgotten its credentials must not still be
+            reachable over IP from the previous association. The alternative --
+            waiting for the old owner to say goodbye -- does not work, because a
+            process that is killed says nothing.
+            """
+            try:
+                sender = sdbus.get_current_message().sender
+            except Exception:  # Not called from a D-Bus message context.
+                return
+            if sender is None or sender == self.owner:
+                return
+            if self.owner is not None:
+                log.debug("Interface[%d] owner changed from %s to %s; dropping stale association",
+                          self.index, self.owner, sender)
+                await self._leave_network()
+            self.owner = sender
 
         @sdbus.dbus_method_async("s")
         async def AutoScan(self, arg: str) -> None:
-            pass
+            await self._note_caller()
 
         @sdbus.dbus_method_async("a{sv}")
         async def Scan(self, args: DictVariantT) -> None:
+            await self._note_caller()
             log.debug("Scanning started")
 
             async def scan():
@@ -271,7 +300,8 @@ class WpaSupplicantMock(TerminableThread):
                 # Mock AP association process.
                 await self.State.set_async("associating")
                 await self.State.set_async("associated")
-                self.mock.networking.app_link.up()
+                if self.link is not None:
+                    self.link.up()
                 await self.State.set_async("completed")
 
             await self.Scan({})
@@ -281,15 +311,32 @@ class WpaSupplicantMock(TerminableThread):
 
         @sdbus.dbus_method_async("o")
         async def RemoveNetwork(self, path: str) -> None:
+            log.debug("Interface[%d] RemoveNetwork: path=%s", self.index, path)
             await self.CurrentNetwork.set_async("/")
+            await self._leave_network()
 
         @sdbus.dbus_method_async()
         async def RemoveAllNetworks(self) -> None:
+            log.debug("Interface[%d] RemoveAllNetworks", self.index)
             await self.CurrentNetwork.set_async("/")
+            await self._leave_network()
 
         @sdbus.dbus_method_async()
         async def Disconnect(self) -> None:
-            pass
+            log.debug("Interface[%d] Disconnect", self.index)
+            await self._leave_network()
+
+        async def _leave_network(self) -> None:
+            """Drop the association: report disconnected and take the link down.
+
+            Real wpa_supplicant loses the interface's addresses when it leaves a
+            network. Keeping them would let a device that believes it is not
+            provisioned still be reached over IP, which is exactly the path a
+            commissioning test needs closed.
+            """
+            if self.link is not None and self.link.up_flag:
+                self.link.down()
+            await self.State.set_async("disconnected")
 
         @sdbus.dbus_method_async()
         async def SaveConfig(self) -> None:
@@ -557,6 +604,9 @@ class WpaSupplicantMock(TerminableThread):
         for interface_idx, name in enumerate(interfaces_names):
             self.interfaces.append(
                 interface := WpaSupplicantMock.WpaInterface(self, interface_idx))
+            interface.link = ns.link_for_name(name)
+            if interface.link is None:
+                raise ValueError(f"No network link matches interface name '{name}'")
             # Assign interfaces to given names
             self.nan_simulator.register_interface(name, interface)
 
