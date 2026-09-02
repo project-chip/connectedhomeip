@@ -861,15 +861,22 @@ void TestReadInteraction::TestReadHandlerSetMaxReportingInterval()
         readHandler.GetReportingIntervals(minInterval, maxInterval);
         EXPECT_EQ(kMaxIntervalCeiling, maxInterval);
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        // TC2: MaxInterval == MinIntervalFloor
+        EXPECT_EQ(readHandler.SetMaxReportingInterval(kMinInterval), CHIP_ERROR_INVALID_ARGUMENT);
+#else
         // TC2: MaxInterval == MinIntervalFloor
         EXPECT_EQ(readHandler.SetMaxReportingInterval(kMinInterval), CHIP_NO_ERROR);
-
         readHandler.GetReportingIntervals(minInterval, maxInterval);
         EXPECT_EQ(kMinInterval, maxInterval);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        // TC3: Minterval < MaxInterval < max(GetPublisherSelectedIntervalLimit(), mSubscriberRequestedMaxInterval)
+        EXPECT_EQ(readHandler.SetMaxReportingInterval(kMinInterval + 1), CHIP_ERROR_INVALID_ARGUMENT);
+#else
         // TC3: Minterval < MaxInterval < max(GetPublisherSelectedIntervalLimit(), mSubscriberRequestedMaxInterval)
         EXPECT_EQ(readHandler.SetMaxReportingInterval(kMaxIntervalCeiling), CHIP_NO_ERROR);
-
         readHandler.GetReportingIntervals(minInterval, maxInterval);
         EXPECT_EQ(kMaxIntervalCeiling, maxInterval);
 
@@ -878,6 +885,7 @@ void TestReadInteraction::TestReadHandlerSetMaxReportingInterval()
 
         readHandler.GetReportingIntervals(minInterval, maxInterval);
         EXPECT_EQ(readHandler.GetSubscriberRequestedMaxInterval(), maxInterval);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
         // TC4: MaxInterval == GetPublisherSelectedIntervalLimit()
         EXPECT_EQ(readHandler.SetMaxReportingInterval(readHandler.GetPublisherSelectedIntervalLimit()), CHIP_NO_ERROR);
