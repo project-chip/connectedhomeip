@@ -85,8 +85,9 @@ using namespace fuzztest;
 
 constexpr FabricIndex kFabricIndex = 1;
 constexpr NodeId kNodeId           = 0x1234;
-constexpr uint8_t kKeyMaterial[]   = { 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-                                       0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f };
+constexpr uint8_t kKeyMaterial[]   = {
+    0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
+};
 
 // OnMessageReceived is protected on CheckInHandler (it is an ExchangeDelegate
 // override). Same wrapper the unit test uses.
@@ -192,9 +193,9 @@ void CheckInStateMachineAbsorbsAnyCounter(uint32_t encodedCounter, uint32_t stor
 {
     Fixture & f = GetFixture();
 
-    ICDClientInfo info               = f.seededClient;
-    info.start_icd_counter           = storedStartCounter;
-    info.offset                      = storedOffset;
+    ICDClientInfo info     = f.seededClient;
+    info.start_icd_counter = storedStartCounter;
+    info.offset            = storedOffset;
     ASSERT_EQ(f.storage.StoreEntry(info), CHIP_NO_ERROR);
 
     std::vector<uint8_t> payload = BuildValidPayload(f.seededClient, encodedCounter, appData);

@@ -50,11 +50,11 @@
 #include <pw_fuzzer/fuzztest.h>
 #include <pw_unit_test/framework.h>
 
+#include <access/AccessControl.h>
+#include <access/examples/ExampleAccessControlDelegate.h>
 #include <app/clusters/icd-management-server/ICDManagementCluster.h>
 #include <app/icd/server/ICDConfigurationData.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
-#include <access/AccessControl.h>
-#include <access/examples/ExampleAccessControlDelegate.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/FabricTestFixture.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -108,8 +108,7 @@ struct Fixture
 #endif
 
     Fixture() :
-        cluster(kEndpoint, keystore, fabricFixture.GetFabricTable(), ICDConfigurationData::GetInstance(),
-                OptionalAttributeSet(0),
+        cluster(kEndpoint, keystore, fabricFixture.GetFabricTable(), ICDConfigurationData::GetInstance(), OptionalAttributeSet(0),
                 ICDManagementCluster::OptionalCommandSet().Set<IcdManagement::Commands::StayActiveRequest::Id>(),
                 BitMask<IcdManagement::UserActiveModeTriggerBitmap>(0), CharSpan())
     {}
@@ -164,14 +163,17 @@ std::vector<std::vector<uint8_t>> KeySeeds()
 {
     return {
         {},
-        std::vector<uint8_t>(1, 0xAA),  std::vector<uint8_t>(15, 0xAA), std::vector<uint8_t>(16, 0xAA),
-        std::vector<uint8_t>(17, 0xAA), std::vector<uint8_t>(32, 0xAA), std::vector<uint8_t>(64, 0xAA),
+        std::vector<uint8_t>(1, 0xAA),
+        std::vector<uint8_t>(15, 0xAA),
+        std::vector<uint8_t>(16, 0xAA),
+        std::vector<uint8_t>(17, 0xAA),
+        std::vector<uint8_t>(32, 0xAA),
+        std::vector<uint8_t>(64, 0xAA),
     };
 }
 
 void RegisterClientDoesNotCrash(uint64_t checkInNodeID, uint64_t monitoredSubject, const std::vector<uint8_t> & key,
-                               uint8_t clientTypeRaw, const std::vector<uint8_t> & verificationKey,
-                               bool sendVerificationKey)
+                                uint8_t clientTypeRaw, const std::vector<uint8_t> & verificationKey, bool sendVerificationKey)
 {
     Fixture & fx = GetFixture();
 
@@ -216,8 +218,8 @@ FUZZ_TEST(ICDManagementClusterPW, RegisterClientDoesNotCrash)
                  // Only 0 and 1 are valid ClientTypeEnum values; anything else is
                  // rejected by the first guard in the handler. Left unconstrained,
                  // ~254/256 inputs return before the entry is ever looked up.
-                 ElementOf<uint8_t>({ 0, 1, 2, 3, 0xFF }),
-                 Arbitrary<std::vector<uint8_t>>().WithSeeds(KeySeeds()).WithMaxSize(128), Arbitrary<bool>());
+                 ElementOf<uint8_t>({ 0, 1, 2, 3, 0xFF }), Arbitrary<std::vector<uint8_t>>().WithSeeds(KeySeeds()).WithMaxSize(128),
+                 Arbitrary<bool>());
 
 FUZZ_TEST(ICDManagementClusterPW, UnregisterClientDoesNotCrash)
     .WithDomains(Arbitrary<uint64_t>(), Arbitrary<std::vector<uint8_t>>().WithSeeds(KeySeeds()).WithMaxSize(128),
