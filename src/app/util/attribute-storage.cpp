@@ -16,6 +16,7 @@
  */
 #include <app/util/attribute-storage.h>
 
+#include <access/SubjectDescriptor.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
@@ -86,6 +87,12 @@ static bool emberAfEndpointIsEnabled(EndpointId endpoint);
 static void emberAfIncreaseDataVersion(const chip::app::ConcreteClusterPath & aConcreteClusterPath);
 
 namespace {
+
+/// Stores the SubjectDescriptor for the current attribute read request.
+/// Set before calling emAfReadOrWriteAttribute, cleared after the call returns.
+/// Used by GetSubjectDescriptor() to allow external attribute callbacks to
+/// identify which controller is making the request.
+const Access::SubjectDescriptor * gCurrentSubjectDescriptor = nullptr;
 
 uint16_t emberEndpointCount = 0;
 
@@ -1543,6 +1550,16 @@ EndpointComposition GetCompositionForEndpointIndex(uint16_t endpointIndex)
         return EndpointComposition::kFullFamily;
     }
     return EndpointComposition::kTree;
+}
+
+const Access::SubjectDescriptor * GetSubjectDescriptor()
+{
+    return gCurrentSubjectDescriptor;
+}
+
+void SetSubjectDescriptor(const Access::SubjectDescriptor * aSubjectDescriptor)
+{
+    gCurrentSubjectDescriptor = aSubjectDescriptor;
 }
 
 } // namespace app

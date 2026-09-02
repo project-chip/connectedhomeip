@@ -24,6 +24,12 @@
 #include <app/util/endpoint-config-defines.h>
 #include <lib/support/CodeUtils.h>
 
+namespace chip {
+namespace Access {
+struct SubjectDescriptor;
+} // namespace Access
+} // namespace chip
+
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-objects.h>
 
@@ -441,6 +447,26 @@ enum class EndpointComposition : uint8_t
  * @brief Returns the composition for a given endpoint index
  */
 EndpointComposition GetCompositionForEndpointIndex(uint16_t index);
+
+/**
+ * @brief Get the SubjectDescriptor for the current attribute read request.
+ *
+ * This function can be called from within emberAfExternalAttributeReadCallback
+ * to determine which controller (subject) is accessing the attribute. 
+ *
+ * @return Pointer to the SubjectDescriptor, or nullptr if no subject descriptor
+ *         is available.
+ */
+const Access::SubjectDescriptor * GetSubjectDescriptor();
+
+/**
+ * @brief Set the SubjectDescriptor for the current attribute read request.
+ *
+ * This is an internal API used by the data model provider to set the current
+ * subject descriptor before calling into ember attribute read functions.
+ * Application code should use GetSubjectDescriptor() instead.
+ */
+void SetSubjectDescriptor(const Access::SubjectDescriptor * aSubjectDescriptor);
 
 } // namespace app
 } // namespace chip

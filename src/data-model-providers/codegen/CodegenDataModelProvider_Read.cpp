@@ -127,9 +127,14 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const Data
     record.endpoint                            = request.path.mEndpointId;
     record.clusterId                           = request.path.mClusterId;
     record.attributeId                         = request.path.mAttributeId;
+
+    // Set the current subject descriptor so that external attribute read callbacks
+    // (emberAfExternalAttributeReadCallback) can identify which controller is making the request.
+    SetSubjectDescriptor(&request.subjectDescriptor);
     Protocols::InteractionModel::Status status = emAfReadOrWriteAttribute(
         &record, &attributeMetadata, gEmberAttributeIOBufferSpan.data(), static_cast<uint16_t>(gEmberAttributeIOBufferSpan.size()),
         /* write = */ false);
+    SetSubjectDescriptor(nullptr);
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
