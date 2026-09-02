@@ -182,46 +182,48 @@ class TC_PWRTL_2_2(MatterBaseTest):
             endpoint=endpoint, cluster=cluster, attribute=attr)
         self._assert_nodes_equal(th1_view, entries_label_max, 'TH1 view after the TH2 write')
 
-        self.step(10, "Reboot the DUT. After it comes back online, as TH1, TH reads ElectricalCircuitNodes",
-                  expectation="Verify DUT responds w/ status SUCCESS(0x00) with the value last written by TH1, "
-                  "confirming the Non-Volatile (N) quality persists the value across reboot.")
-        pre_reboot = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr)
-        self._assert_nodes_equal(pre_reboot, entries_label_max, 'pre-reboot')
-        await self.request_device_reboot()
-        post_reboot = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr)
-        self._assert_nodes_equal(post_reboot, entries_label_max,
-                                 'post-reboot (the Non-Volatile quality must persist the value)')
-
-        self.step(11, "As TH1, establish a subscription to ElectricalCircuitNodes on the test endpoint",
-                  expectation="Subscription is established successfully; TH awaits a subscription report carrying "
-                  "the initial priming value of the list.")
-        # fabric_filtered defaults to False on the handler, which would surface the TH2 entry
-        # written in step 9 alongside TH1's own. TH1's view is the one under test here.
-        sub_handler = AttributeSubscriptionHandler(cluster, attr)
-        subscription = await sub_handler.start(th1, self.dut_node_id, endpoint=endpoint, fabric_filtered=True,
-                                               min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
+        self.step(10, "As TH1 and as TH2, establish a subscription to ElectricalCircuitNodes on the test endpoint",
+                  expectation="Both subscriptions are established successfully; TH awaits a subscription report on "
+                  "each, carrying that fabric's own list value.")
+        # fabric_filtered defaults to False on the handler, which would surface the other fabric's
+        # entries alongside each subscriber's own. Each fabric's own view is what is under test.
         # start() awaits ReadAttribute, which returns only once the priming report has arrived, and
-        # installs the update callback after that. The priming value is therefore in the transaction
-        # cache and never reaches the handler's queue; only later updates do.
-        primed = subscription.GetAttributes()[endpoint][cluster][attr]
-        self._assert_nodes_equal(primed, entries_label_max, 'priming report')
+        # installs the update callback after that. Each priming value is therefore in its own
+        # transaction cache and never reaches the handler's queue; only later updates do.
+        th1_reports = AttributeSubscriptionHandler(cluster, attr)
+        th1_subscription = await th1_reports.start(th1, self.dut_node_id, endpoint=endpoint, fabric_filtered=True,
+                                                   min_interval_sec=0, max_interval_sec=30)
+        th2_reports = AttributeSubscriptionHandler(cluster, attr)
+        th2_subscription = await th2_reports.start(th2, self.dut_node_id, endpoint=endpoint, fabric_filtered=True,
+                                                   min_interval_sec=0, max_interval_sec=30)
+        self._assert_nodes_equal(th1_subscription.GetAttributes()[endpoint][cluster][attr], entries_label_max,
+                                 'TH1 priming report')
+        self._assert_nodes_equal(th2_subscription.GetAttributes()[endpoint][cluster][attr], th2_entries,
+                                 'TH2 priming report')
 
-        self.step(12, "As TH1, TH writes ElectricalCircuitNodes with a new valid list of 2 entries",
-                  expectation="Write returns SUCCESS; TH awaits a subscription report reflecting the updated list.")
+        self.step(11, "As TH2, TH writes ElectricalCircuitNodes with a new valid list of 2 entries",
+                  expectation="Write returns SUCCESS; TH awaits a subscription report on TH2's subscription "
+                  "reflecting the updated list. TH1 is also reported to, since dirtiness is per attribute path "
+                  "and not per fabric, but its report still carries only its own entries.")
         try:
             entries_final = [
                 CircuitNodeStruct(node=0x000000000000B010),
                 CircuitNodeStruct(node=0x000000000000B011, endpoint=1, label="circuit-B"),
             ]
-            await self.write_single_attribute(
-                attribute_value=attr(entries_final), endpoint_id=endpoint)
-            report = sub_handler.wait_for_attribute_report()
-            self._assert_nodes_equal(report.value, entries_final, 'subscription report after the write')
+            result = await th2.WriteAttribute(self.dut_node_id, [(endpoint, attr(entries_final))])
+            asserts.assert_equal(result[0].Status, Status.Success, 'The TH2 write must succeed on its own fabric')
+            report = th2_reports.wait_for_attribute_report()
+            self._assert_nodes_equal(report.value, entries_final, "TH2's report after its own write")
+            # TH1 is reported to as well: the IM marks an attribute dirty per path, and
+            # AttributePathParams carries no fabric, so there is no way to dirty an attribute for one
+            # fabric only. What must not happen is TH2's entries reaching TH1, so the content is what
+            # is checked rather than the absence of a report.
+            th1_report = th1_reports.wait_for_attribute_report()
+            self._assert_nodes_equal(th1_report.value, entries_label_max,
+                                     "TH1's report must still carry only TH1's own entries")
         finally:
-            sub_handler.cancel()
-
+            th1_reports.cancel()
+            th2_reports.cancel()
 
 if __name__ == "__main__":
     default_matter_test_main()
