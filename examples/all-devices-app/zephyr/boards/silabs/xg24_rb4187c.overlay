@@ -1,0 +1,70 @@
+/*
+ *	Copyright (c) 2026 Project CHIP Authors
+ *	All rights reserved.
+ *
+ *	Licensed under the Apache License, Version 2.0 (the "License");
+ *	you may not use this file except in compliance with the License.
+ *	You may obtain a copy of the License at
+ *
+ *	    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *	Unless required by applicable law or agreed to in writing, software
+ *	distributed under the License is distributed on an "AS IS" BASIS
+ *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *	See the License for the specific language governing permissions and
+ *	limitations under the License.
+ */
+
+/*
+ * Internal flash (1536 KiB): boot (48) + slot0 (1024) + unused (416) + storage (48).
+ * External flash (1024 KiB): slot1 (1024)
+ * slot1 must match for MCUboot in overwrite-only mode
+ */
+/delete-node/ &slot0_partition;
+/delete-node/ &slot1_partition;
+/delete-node/ &storage_partition;
+
+&flash0 {
+	partitions {
+		slot0_partition: partition@c000 {
+			compatible = "zephyr,mapped-partition";
+			reg = <0x0000c000 DT_SIZE_K(1024)>;
+			label = "image-0";
+		};
+
+		unused_partition: partition@10c000 {
+			compatible = "zephyr,mapped-partition";
+			reg = <0x0010c000 DT_SIZE_K(416)>;
+			label = "unused";
+		};
+
+		storage_partition: partition@174000 {
+			compatible = "zephyr,mapped-partition";
+			reg = <0x00174000 DT_SIZE_K(48)>;
+			label = "storage";
+		};
+	};
+};
+
+&mx25r80 {
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		slot1_partition: partition@0 {
+			reg = <0x00000000 DT_SIZE_K(1024)>;
+			label = "image-1";
+		};
+	};
+};
+
+&dma0 {
+	status = "okay";
+};
+
+&usart0 {
+	dmas = <&dma0 DMA_REQSEL_USART0TXBL>,
+		   <&dma0 DMA_REQSEL_USART0RXDATAV>;
+	dma-names = "tx", "rx";
+};
