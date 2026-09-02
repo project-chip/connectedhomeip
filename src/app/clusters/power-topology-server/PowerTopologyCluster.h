@@ -94,9 +94,9 @@ private:
     bool DecodeCircuitNode(const Structs::CircuitNodeStruct::DecodableType & decoded, FabricIndex fabricIndex,
                            CircuitNodeStorage::Node & out) const;
 
-    // Copies the accessing fabric's entries aside for the duration of a list write. Returns false if
-    // the copy could not be taken, in which case a failed write cannot be rolled back.
-    bool SnapshotNodesForFabric(FabricIndex fabricIndex);
+    // Copies the accessing fabric's entries aside for the duration of a list write. On error the
+    // copy was not taken and a failed write cannot be rolled back.
+    CHIP_ERROR SnapshotNodesForFabric(FabricIndex fabricIndex);
     void ReleaseNodeSnapshot();
 
     // FabricTable::Delegate: purge a removed fabric's ElectricalCircuitNodes entries (fabric-scoped data).
