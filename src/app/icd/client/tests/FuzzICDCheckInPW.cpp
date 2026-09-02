@@ -304,6 +304,13 @@ void ParseHandlesMutatedValidPayload(uint32_t encodedCounter, const std::vector<
     {
         EXPECT_NE(err, CHIP_NO_ERROR);
     }
+    else
+    {
+        // Conversely an untouched payload was generated under the same key the
+        // parser is given, so rejecting it is a defect. Without this a parser
+        // that always fails would satisfy every other assertion here.
+        ASSERT_EQ(err, CHIP_NO_ERROR);
+    }
 
     if (err == CHIP_NO_ERROR)
     {
@@ -375,6 +382,17 @@ void ProcessSearchesAllStoredEntries(uint8_t entryCount, uint8_t targetEntry, ui
     if (mutated || appDataIn.size() > DefaultICDClientStorage::kAppDataLength - sizeof(CounterType))
     {
         EXPECT_NE(err, CHIP_NO_ERROR);
+    }
+
+    else if (!payload.empty())
+    {
+        // An untouched payload whose application data fits the work buffer is
+        // valid for exactly one stored entry, so it must be found -- and must
+        // resolve to that entry rather than any other.
+        ASSERT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(decodedCounter, encodedCounter);
+        EXPECT_EQ(matchedInfo.peer_node,
+                  ScopedNodeId(static_cast<NodeId>(0x1000 + target), static_cast<FabricIndex>(target + 1)));
     }
 
     if (err == CHIP_NO_ERROR)
