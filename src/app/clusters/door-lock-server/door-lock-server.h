@@ -529,10 +529,14 @@ private:
     /**
      * Implements the UserType::kExpiringUser access rule (spec 5.2.6.18.8) for a resolved user found by
      * HandleRemoteLockOperation. Returns true if access should be granted. On first use, records the
-     * timestamp and grants access. On a later use, grants access if still within ExpiringUserTimeout
-     * minutes of that first use; once it has elapsed, denies access and persists UserStatus =
-     * OccupiedDisabled via modifyUser() so the disabled state itself survives a reboot even though the
-     * in-flight countdown does not.
+     * timestamp and grants access (evicting the oldest tracked entry if the table is full, rather than
+     * leaving this user untracked and so never disabled at all). On a later use, grants access if still
+     * within ExpiringUserTimeout minutes of that first use; once it has elapsed, or if the attribute can't
+     * be read to tell, denies access. On expiry it also persists UserStatus = OccupiedDisabled via
+     * modifyUser() so the disabled state itself survives a reboot even though the in-flight countdown does
+     * not -- the tracking entry is only cleared once that persist actually succeeds, so a failure there
+     * keeps denying (and retrying the persist) on every subsequent attempt instead of reverting to "first
+     * use" and granting again.
      */
     bool checkExpiringUserAccess(chip::EndpointId endpointId, EmberAfDoorLockEndpointContext * endpointContext, uint16_t userIndex,
                                  chip::FabricIndex creatorFabricIndex, chip::System::Clock::Timestamp currentTime);
@@ -808,7 +812,7 @@ struct EmberAfPluginDoorLockCredentialInfo
 #if DOOR_LOCK_USE_LOCAL_BUFFER
     chip::MutableByteSpan credentialData; /**< Credential data bytes. */
 #else
-    chip::ByteSpan credentialData;                  /**< Credential data bytes. */
+    chip::ByteSpan credentialData; /**< Credential data bytes. */
 #endif
     DlAssetSource creationSource;
     chip::FabricIndex createdBy; /**< Index of the fabric that created the user. */

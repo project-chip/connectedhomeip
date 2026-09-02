@@ -3361,6 +3361,7 @@ endpoint 1 {
     ram      attribute wrongCodeEntryLimit default = 3;
     ram      attribute userCodeTemporaryDisableTime default = 10;
     ram      attribute requirePINforRemoteOperation default = 0;
+    ram      attribute expiringUserTimeout default = 0;
     callback attribute aliroReaderVerificationKey;
     callback attribute aliroReaderGroupIdentifier;
     callback attribute aliroReaderGroupSubIdentifier;

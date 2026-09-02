@@ -359,6 +359,7 @@ bool DoorLockServer::checkExpiringUserAccess(chip::EndpointId endpointId, EmberA
 {
     ExpiringUserFirstUseEntry * entry    = nullptr;
     ExpiringUserFirstUseEntry * freeSlot = nullptr;
+    ExpiringUserFirstUseEntry * oldest   = nullptr;
     for (auto & candidate : endpointContext->expiringUserFirstUse)
     {
         if (candidate.valid && candidate.userIndex == userIndex)
@@ -366,32 +367,42 @@ bool DoorLockServer::checkExpiringUserAccess(chip::EndpointId endpointId, EmberA
             entry = &candidate;
             break;
         }
-        if (!candidate.valid && freeSlot == nullptr)
+        if (!candidate.valid)
         {
-            freeSlot = &candidate;
+            if (freeSlot == nullptr)
+            {
+                freeSlot = &candidate;
+            }
+        }
+        else if (oldest == nullptr || candidate.firstUseTimestamp < oldest->firstUseTimestamp)
+        {
+            oldest = &candidate;
         }
     }
 
     if (nullptr == entry)
     {
         // First use: spec 5.2.6.18.8 -- the user has the ability to open the lock for ExpiringUserTimeout
-        // minutes *after the first use*, so this access itself is always granted.
-        if (nullptr != freeSlot)
+        // minutes *after the first use*, so this access itself is always granted. If the table is full,
+        // evict the oldest tracked entry (closest to its own expiry anyway) rather than leaving this user
+        // untracked -- an untracked ExpiringUser would never be disabled at all.
+        ExpiringUserFirstUseEntry * slot = (nullptr != freeSlot) ? freeSlot : oldest;
+        if (nullptr == slot)
         {
-            freeSlot->valid             = true;
-            freeSlot->userIndex         = userIndex;
-            freeSlot->firstUseTimestamp = currentTime;
+            // kDoorLockMaxTrackedExpiringUsers is 0, which never happens in practice; deny rather than
+            // grant untracked access if it somehow did.
+            return false;
         }
-        else
+        if (slot == oldest)
         {
-            // Tracking table exhausted (kDoorLockMaxTrackedExpiringUsers concurrent countdowns already in
-            // flight) -- access still granted per spec, but this user's expiry can't be timed, so it never
-            // gets disabled until some other pending entry frees up and this user is used again.
-            ChipLogError(Zcl,
-                         "[checkExpiringUserAccess] No free slot to track first use, ExpiringUserTimeout will "
-                         "not be enforced for this user until a slot frees up [endpointId=%d,userIndex=%d]",
-                         endpointId, userIndex);
+            ChipLogProgress(Zcl,
+                            "[checkExpiringUserAccess] Tracking table full, evicting oldest entry for "
+                            "userIndex=%d to track userIndex=%d [endpointId=%d]",
+                            oldest->userIndex, userIndex, endpointId);
         }
+        slot->valid             = true;
+        slot->userIndex         = userIndex;
+        slot->firstUseTimestamp = currentTime;
         return true;
     }
 
@@ -401,8 +412,9 @@ bool DoorLockServer::checkExpiringUserAccess(chip::EndpointId endpointId, EmberA
     {
         ChipLogError(Zcl, "[checkExpiringUserAccess] Unable to read ExpiringUserTimeout attribute [status=%d]",
                      to_underlying(status));
-        // Can't evaluate expiry without the attribute; fail open rather than lock the user out on our own error.
-        return true;
+        // Can't evaluate expiry without the attribute; fail closed, consistent with how other attribute
+        // read failures are handled elsewhere in HandleRemoteLockOperation.
+        return false;
     }
 
     auto expiresAt =
@@ -419,11 +431,23 @@ bool DoorLockServer::checkExpiringUserAccess(chip::EndpointId endpointId, EmberA
 
     // Persist the disabled status through the same path any other UserStatus change already uses, so it
     // survives a reboot even though the in-flight countdown itself does not (see the "Known limitation"
-    // note on HandleRemoteLockOperation).
-    modifyUser(endpointId, creatorFabricIndex, chip::kUndefinedNodeId, userIndex, NullNullable, NullNullable,
-               MakeNullable(UserStatusEnum::kOccupiedDisabled), NullNullable, NullNullable);
-
-    entry->valid = false;
+    // note on HandleRemoteLockOperation). The entry is only cleared once that actually succeeds -- if it
+    // fails, access must keep being denied on every subsequent attempt (this entry staying valid and
+    // already past expiresAt guarantees that), and the next attempt will retry the persist rather than
+    // silently reverting to "first use" and granting access again.
+    auto modifyStatus = modifyUser(endpointId, creatorFabricIndex, chip::kUndefinedNodeId, userIndex, NullNullable, NullNullable,
+                                   MakeNullable(UserStatusEnum::kOccupiedDisabled), NullNullable, NullNullable);
+    if (Status::Success != modifyStatus)
+    {
+        ChipLogError(Zcl,
+                     "[checkExpiringUserAccess] Failed to persist OccupiedDisabled, will retry on next access "
+                     "[endpointId=%d,userIndex=%d,status=%d]",
+                     endpointId, userIndex, to_underlying(modifyStatus));
+    }
+    else
+    {
+        entry->valid = false;
+    }
 
     return false;
 }
