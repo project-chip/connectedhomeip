@@ -566,7 +566,7 @@ class TC_ACS_3_3(MatterBaseTest):
                     f'{{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":{namespaceID2}, "TagId":{tag2}}}]}}')
                 await asyncio.sleep(1)
                 self.write_to_app_pipe(
-                    '{"Name":"SetObjCount","EndpointId":{endpoint},"ObjectCount":2}')
+                    f'{{"Name":"SetObjCount","EndpointId":{endpoint},"ObjectCount":2}}')
                 await asyncio.sleep(1)
             else:
                 self.wait_for_user_input(
@@ -617,10 +617,10 @@ class TC_ACS_3_3(MatterBaseTest):
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdtime_dut))
             if event.eventStartTimePos != NullValue:
-                asserts.assert_true(abs(event.eventStartTimePos - event_start_time) < 1000, "Not matching EventStartTimePos")
+                asserts.assert_true((event.eventStartTimePos - event_start_time) < 1000, "Not matching EventStartTimePos")
                 log.info("event time from AmbientContextDetectEnded field data: %s", {event.eventStartTimePos})
             else:
-                asserts.assert_true(abs(event.eventStartTimeSys - event_start_time) < 1000, "Not matching EventStartTimeSys")
+                asserts.assert_true((event.eventStartTimeSys - event_start_time) < 1000, "Not matching EventStartTimeSys")
                 log.info("event time from AmbientContextDetectEnded field data: %s", {event.eventStartTimeSys})
 
         else:
