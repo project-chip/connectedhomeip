@@ -64,7 +64,11 @@
 #include <app/icd/client/DefaultICDClientStorage.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
+#include <crypto/CryptoBuildConfig.h>
 #include <crypto/DefaultSessionKeystore.h>
+#if CHIP_CRYPTO_PSA
+#include <psa/crypto.h>
+#endif
 #include <lib/core/ScopedNodeId.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -124,6 +128,11 @@ struct Fixture
     Fixture()
     {
         VerifyOrDie(Platform::MemoryInit() == CHIP_NO_ERROR);
+#if CHIP_CRYPTO_PSA
+        // Fuzz binaries use gmock_main and so miss the unit-test main's PSA
+        // initialization; the backend must be initialized before any crypto runs.
+        VerifyOrDie(psa_crypto_init() == PSA_SUCCESS);
+#endif
         // The check-in path logs per message; at fuzzing rates that dominates
         // both runtime and output volume.
         Logging::SetLogFilter(Logging::kLogCategory_None);

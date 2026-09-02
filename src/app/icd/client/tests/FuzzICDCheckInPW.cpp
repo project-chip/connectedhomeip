@@ -67,7 +67,11 @@
 
 #include <app/icd/client/DefaultICDClientStorage.h>
 #include <app/icd/client/ICDClientInfo.h>
+#include <crypto/CryptoBuildConfig.h>
 #include <crypto/DefaultSessionKeystore.h>
+#if CHIP_CRYPTO_PSA
+#include <psa/crypto.h>
+#endif
 #include <lib/core/CHIPError.h>
 #include <lib/core/ScopedNodeId.h>
 #include <lib/support/CHIPMem.h>
@@ -96,6 +100,11 @@ void EnsureInitialized()
 {
     static const bool sInitialized = [] {
         VerifyOrDie(Platform::MemoryInit() == CHIP_NO_ERROR);
+#if CHIP_CRYPTO_PSA
+        // Fuzz binaries use gmock_main and so miss the unit-test main's PSA
+        // initialization; the backend must be initialized before any crypto runs.
+        VerifyOrDie(psa_crypto_init() == PSA_SUCCESS);
+#endif
         // The storage layer logs a line per stored entry, which at fuzzing rates dominates
         // both runtime and output volume.
         Logging::SetLogFilter(Logging::kLogCategory_None);

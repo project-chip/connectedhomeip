@@ -61,7 +61,11 @@
 #include <clusters/IcdManagement/Commands.h>
 #include <clusters/IcdManagement/Enums.h>
 #include <clusters/IcdManagement/Metadata.h>
+#include <crypto/CryptoBuildConfig.h>
 #include <crypto/DefaultSessionKeystore.h>
+#if CHIP_CRYPTO_PSA
+#include <psa/crypto.h>
+#endif
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
@@ -121,6 +125,11 @@ Fixture & GetFixture()
     static std::once_flag once;
     std::call_once(once, [] {
         VerifyOrDie(Platform::MemoryInit() == CHIP_NO_ERROR);
+#if CHIP_CRYPTO_PSA
+        // Fuzz binaries use gmock_main and so miss the unit-test main's PSA
+        // initialization; the backend must be initialized before any crypto runs.
+        VerifyOrDie(psa_crypto_init() == PSA_SUCCESS);
+#endif
         // The cluster logs per command; at fuzzing rates that dominates runtime
         // and output volume both.
         Logging::SetLogFilter(Logging::kLogCategory_None);
