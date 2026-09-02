@@ -236,8 +236,7 @@ void ParseRejectsArbitraryPayload(const std::vector<uint8_t> & payload)
 
     // A payload too short to hold nonce + counter + MIC, or one whose application
     // data cannot fit the work buffer alongside the counter, can never be accepted.
-    if (payload.size() < CheckinMessage::kMinPayloadSize ||
-        payload.size() > CheckinMessage::kMinPayloadSize + kMaxParseAppDataSize)
+    if (payload.size() < CheckinMessage::kMinPayloadSize || payload.size() > CheckinMessage::kMinPayloadSize + kMaxParseAppDataSize)
     {
         EXPECT_NE(err, CHIP_NO_ERROR);
     }
@@ -361,8 +360,7 @@ void ProcessSearchesAllStoredEntries(uint8_t entryCount, uint8_t targetEntry, ui
     }
 
     std::vector<uint8_t> payload = BuildPayload(target, encodedCounter, appDataIn);
-    const bool mutated           = !payload.empty() && mutationIndex < payload.size() &&
-        payload[mutationIndex] != mutationValue;
+    const bool mutated           = !payload.empty() && mutationIndex < payload.size() && payload[mutationIndex] != mutationValue;
     if (!payload.empty() && mutationIndex < payload.size())
     {
         payload[mutationIndex] = mutationValue;
