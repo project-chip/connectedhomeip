@@ -830,6 +830,8 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePowerRangeAdj
 {
     using namespace Commands;
 
+    static constexpr uint32_t kDayInSeconds = 86400;
+
     PowerRangeAdjustRequest::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
 
@@ -843,9 +845,9 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePowerRangeAdj
     }
 
     // Check that Duration > 0 && <= 86400 (24 hours)
-    if ((commandData.duration == 0) || (commandData.duration > 86400))
+    if ((commandData.duration == 0) || (commandData.duration > kDayInSeconds))
     {
-        ChipLogError(Zcl, "DEM: Duration must be >0 and <= 86400 for PowerRangeAdjustRequest");
+        ChipLogError(Zcl, "DEM: Duration must be >0 and <= %u for PowerRangeAdjustRequest", kDayInSeconds);
         return Status::ConstraintError;
     }
 
