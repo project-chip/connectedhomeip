@@ -43,8 +43,8 @@ CHIP_ERROR CodegenZoneManagementCluster::Startup(ServerClusterContext & context)
 
 ZoneMgmtServer::ZoneMgmtServer(Delegate & delegate, EndpointId endpointId, BitFlags<Feature> features, uint8_t maxUserDefinedZones,
                                uint8_t maxZones, uint8_t sensitivityMax, const TwoDCartesianVertexStruct & twoDCartesianMax) :
-    mEndpointId(endpointId), mDelegate(delegate), mFeatures(features),
-    mConfig({ maxUserDefinedZones, maxZones, sensitivityMax, twoDCartesianMax })
+    mEndpointId(endpointId),
+    mDelegate(delegate), mFeatures(features), mConfig({ maxUserDefinedZones, maxZones, sensitivityMax, twoDCartesianMax })
 {}
 
 ZoneMgmtServer::~ZoneMgmtServer()
