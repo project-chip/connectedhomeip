@@ -712,7 +712,7 @@ cluster Descriptor = 29 {
   readonly attribute cluster_id clientList[] = 2;
   readonly attribute endpoint_no partsList[] = 3;
   readonly attribute optional SemanticTagStruct tagList[] = 4;
-  provisional readonly attribute optional char_string<32> endpointUniqueID = 5;
+  readonly attribute optional char_string<32> endpointUniqueID = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -5785,7 +5785,7 @@ cluster WaterHeaterMode = 158 {
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
-provisional cluster DeviceEnergyManagementMode = 159 {
+cluster DeviceEnergyManagementMode = 159 {
   revision 2;
 
   enum ModeTag : enum16 {
@@ -5803,10 +5803,6 @@ provisional cluster DeviceEnergyManagementMode = 159 {
     kDeviceOptimization = 16385;
     kLocalOptimization = 16386;
     kGridOptimization = 16387;
-  }
-
-  bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
   }
 
   shared struct ModeTagStruct {
@@ -9379,6 +9375,11 @@ provisional cluster AmbientSensingUnion = 1074 {
 provisional cluster ProximityRanging = 1075 {
   revision 1;
 
+  enum BLERBCSecurityModeEnum : enum8 {
+    kBLEDeviceIDObfuscation = 0;
+    kEncryptedAdvertisingData = 1;
+  }
+
   enum BLTCSModeEnum : enum8 {
     kPBROnly = 0;
     kRTTOnly = 1;
@@ -9395,12 +9396,17 @@ provisional cluster ProximityRanging = 1075 {
   enum NADMEnum : enum16 {
     kAttackExtremelyUnlikely = 0;
     kAttackVeryUnlikely = 1;
-    kAttackUnlikely = 2;
     kAttackIsPossible = 3;
     kAttackIsLikely = 4;
     kAttackVeryLikely = 5;
     kAttackExtremelyLikely = 6;
     kUnknown = 255;
+  }
+
+  enum RDRCapabilityEnum : enum8 {
+    kNoRDR = 0;
+    kAzimuthOnly = 1;
+    kAzimuthElevation = 2;
   }
 
   enum RDRReferenceEnum : enum8 {
@@ -9417,15 +9423,13 @@ provisional cluster ProximityRanging = 1075 {
     kBLTReflectorRole = 5;
   }
 
-  enum RangingSecurityEnum : enum8 {
-    kSecureRanging = 0;
-    kOpenRanging = 1;
-  }
-
   enum RangingSessionStatusEnum : enum8 {
-    kSessionEndTimeReached = 0;
-    kPeerNotFound = 1;
-    kHardwareError = 2;
+    kSessionStarted = 0;
+    kSessionEndTimeReached = 1;
+    kSessionStoppedByRequest = 2;
+    kPeerNotFound = 3;
+    kHardwareError = 4;
+    kSessionFailed = 5;
   }
 
   enum RangingTechEnum : enum8 {
@@ -9435,12 +9439,11 @@ provisional cluster ProximityRanging = 1075 {
     kBLEBeaconRSSIRanging = 3;
   }
 
-  enum ResultCodeEnum : enum8 {
-    kAccepted = 0;
-    kRejectedInfeasibleRanging = 1;
-    kRejectedInfeasibleRangingTriggers = 2;
-    kBusySessionCapacityReached = 3;
-    kBusyTryAgainLater = 4;
+  enum StatusCodeEnum : enum8 {
+    kRejectedInfeasibleRanging = 2;
+    kRejectedInfeasibleRangingTriggers = 3;
+    kBusySessionCapacityReached = 4;
+    kBusyTryAgainLater = 5;
   }
 
   bitmap Feature : bitmap32 {
@@ -9473,6 +9476,11 @@ provisional cluster ProximityRanging = 1075 {
     k320MHz = 0x200;
   }
 
+  bitmap RangingRoleSupportBitmap : bitmap8 {
+    kInitiatorSupport = 0x1;
+    kResponderSupport = 0x2;
+  }
+
   struct RDRStruct {
     int16u azimuth = 0;
     int16s elevation = 1;
@@ -9484,7 +9492,7 @@ provisional cluster ProximityRanging = 1075 {
   struct RangingMeasurementDataStruct {
     optional octet_string<16> wiFiDevIK = 0;
     optional int64u BLEDeviceID = 1;
-    optional octet_string BLTDevIK = 2;
+    optional octet_string<16> BLTDevIK = 2;
     optional epoch_s timeOfMeasurement = 3;
     optional elapsed_s timeOfMeasurementOffset = 4;
     nullable int16u distance = 5;
@@ -9498,20 +9506,35 @@ provisional cluster ProximityRanging = 1075 {
   struct BLERangingDeviceRoleConfigStruct {
     RangingRoleEnum role = 0;
     int64u peerBLEDeviceID = 1;
+    BLERBCSecurityModeEnum BLERBCSecurityMode = 2;
+    optional octet_string<16> sessionKey = 3;
   }
 
   struct BLTChannelSoundingDeviceRoleConfigStruct {
     RangingRoleEnum role = 0;
     octet_string<16> peerBLTDevIK = 1;
     optional BLTCSModeEnum BLTCSMode = 2;
-    optional BLTCSSecurityLevelEnum BLTCSSecurityLevel = 3;
-    optional octet_string<16> ltk = 4;
+    BLTCSSecurityLevelEnum BLTCSSecurityLevel = 3;
+    octet_string<16> ltk = 4;
   }
 
   struct RangingCapabilitiesStruct {
     RangingTechEnum technology = 0;
     RadioBandBitmap frequencyBand = 1;
-    boolean periodicRangingSupport = 2;
+    RangingBandwidthBitmap bandwidth = 2;
+    RangingRoleSupportBitmap supportedRangingRoles = 3;
+    RDRCapabilityEnum RDRCapability = 4;
+    boolean periodicRangingSupport = 5;
+    optional int8u maxConcurrentSessions = 6;
+  }
+
+  struct RangingConstraintStruct {
+    RangingTechEnum technology = 0;
+    RangingRoleEnum role = 1;
+    optional boolean enabled = 3;
+    optional elapsed_s minRangingInterval = 4;
+    optional elapsed_s maxSessionDuration = 5;
+    optional int16u maxRangingInstances = 6;
   }
 
   struct RangingTriggerConditionStruct {
@@ -9529,7 +9552,7 @@ provisional cluster ProximityRanging = 1075 {
   struct WiFiRangingDeviceRoleConfigStruct {
     RangingRoleEnum role = 0;
     octet_string<16> peerWiFiDevIK = 1;
-    optional octet_string<32> pmk = 2;
+    octet_string<32> pmk = 2;
   }
 
   info event RangingResult = 0 {
@@ -9548,7 +9571,8 @@ provisional cluster ProximityRanging = 1075 {
   readonly attribute optional octet_string<16> BLTDevIK = 3;
   readonly attribute optional BLTCSSecurityLevelEnum BLTCSSecurityLevel = 4;
   readonly attribute optional BLTCSModeEnum BLTCSModeCapability = 5;
-  readonly attribute nullable int8u sessionIDList[] = 6;
+  readonly attribute int8u sessionIDList[] = 6;
+  readonly attribute optional RangingConstraintStruct rangingConstraints[] = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -9562,14 +9586,12 @@ provisional cluster ProximityRanging = 1075 {
     optional BLTChannelSoundingDeviceRoleConfigStruct BLTChannelSoundingDeviceRoleConfig = 3;
     optional RadioBandBitmap frequencyBand = 4;
     optional RangingBandwidthBitmap bandwidth = 5;
-    RangingSecurityEnum securityMode = 6;
-    RangingTriggerConditionStruct trigger = 7;
-    optional ReportingConditionStruct reportingCondition = 8;
+    RangingTriggerConditionStruct trigger = 6;
+    optional ReportingConditionStruct reportingCondition = 7;
   }
 
   response struct StartRangingResponse = 1 {
-    ResultCodeEnum resultCode = 0;
-    nullable int8u sessionID = 1;
+    int8u sessionID = 0;
   }
 
   request struct StopRangingRequestRequest {
@@ -9578,7 +9600,7 @@ provisional cluster ProximityRanging = 1075 {
 
   /** This command allows the Client to request the start of a ranging session. */
   command StartRangingRequest(StartRangingRequestRequest): StartRangingResponse = 0;
-  /** Upon receipt of a StopRangingRequest command that contains a SessionID that matches an active ranging session, the Server SHALL terminate the corresponding ranging session. */
+  /** This command allows the Client to request the termination of an active proximity ranging session. */
   command StopRangingRequest(StopRangingRequestRequest): DefaultSuccess = 2;
 }
 
@@ -11309,11 +11331,11 @@ provisional cluster AudioControl = 1298 {
     optional UnmutePolicyEnum unmutePolicy = 1;
   }
 
-  /** This command SHALL set the value of the SoftMuted attribute to TRUE. */
+  /** This command allows the audio output of the device to be muted. */
   command Mute(): DefaultSuccess = 0;
-  /** This command SHALL set the value of the SoftMuted attribute to FALSE. */
+  /** This command allows the audio output of the device to be unmuted. */
   command Unmute(): DefaultSuccess = 1;
-  /** This command SHALL toggle the state of the SoftMuted attribute. */
+  /** This command allows the audio output of the device to be muted if it is unmuted, or unmuted if it is muted. */
   command ToggleMuted(): DefaultSuccess = 2;
   /** Sets the volume to a specified level. */
   command SetVolume(SetVolumeRequest): DefaultSuccess = 3;
@@ -11963,7 +11985,7 @@ cluster WebRTCTransportRequestor = 1364 {
 
 /** This cluster implements the upload of Audio and Video streams from the Push AV Stream Transport Cluster using suitable push-based transports. */
 cluster PushAvStreamTransport = 1365 {
-  revision 3;
+  revision 5;
 
   enum CMAFInterfaceEnum : enum8 {
     kInterface1 = 0;
@@ -12104,6 +12126,7 @@ cluster PushAvStreamTransport = 1365 {
 
   readonly attribute SupportedFormatStruct supportedFormats[] = 0;
   readonly attribute TransportConfigurationStruct currentConnections[] = 1;
+  provisional readonly attribute optional nullable int8u maxZones = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -12147,6 +12170,12 @@ cluster PushAvStreamTransport = 1365 {
     TransportConfigurationStruct transportConfigurations[] = 0;
   }
 
+  request struct UpdateMotionZoneOptionsRequest {
+    int16u connectionID = 0;
+    optional nullable TransportZoneOptionsStruct motionZones[] = 1;
+    optional nullable int8u motionSensitivity = 2;
+  }
+
   /** This command SHALL allocate a transport and return a PushTransportConnectionID. */
   fabric command access(invoke: manage) AllocatePushTransport(AllocatePushTransportRequest): AllocatePushTransportResponse = 0;
   /** This command SHALL be generated to request the Node deallocates the specified transport. */
@@ -12159,6 +12188,8 @@ cluster PushAvStreamTransport = 1365 {
   fabric command ManuallyTriggerTransport(ManuallyTriggerTransportRequest): DefaultSuccess = 5;
   /** This command SHALL return the Transport Configuration for the specified push transport or all allocated transports for the fabric if null. */
   fabric command FindTransport(FindTransportRequest): FindTransportResponse = 6;
+  /** This command is used to selectively modify the motion zones and sensitivity values of the trigger options for a specified push transport. */
+  fabric command UpdateMotionZoneOptions(UpdateMotionZoneOptionsRequest): DefaultSuccess = 8;
 }
 
 /** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */
@@ -12554,7 +12585,7 @@ cluster CommissionerControl = 1873 {
 
   response struct ReverseOpenCommissioningWindow = 2 {
     int16u commissioningTimeout = 0;
-    octet_string PAKEPasscodeVerifier = 1;
+    octet_string<97> PAKEPasscodeVerifier = 1;
     int16u discriminator = 2;
     int32u iterations = 3;
     octet_string<32> salt = 4;

@@ -17445,11 +17445,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer resultCode, @Nullable Integer sessionID) {
+    public void onSuccess(Integer sessionID) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
-      CommandResponseInfo resultCodeResponseValue = new CommandResponseInfo("resultCode", "Integer");
-      responseValues.put(resultCodeResponseValue, resultCode);
       CommandResponseInfo sessionIDResponseValue = new CommandResponseInfo("sessionID", "Integer");
       responseValues.put(sessionIDResponseValue, sessionID);
       callback.onSuccess(responseValues);
@@ -17489,9 +17487,30 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(@Nullable List<Integer> valueList) {
+    public void onSuccess(List<Integer> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedProximityRangingClusterRangingConstraintsAttributeCallback implements ChipClusters.ProximityRangingCluster.RangingConstraintsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.ProximityRangingClusterRangingConstraintStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ProximityRangingClusterRangingConstraintStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -21440,6 +21459,27 @@ public class ClusterInfoMapping {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct>");
       responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedPushAvStreamTransportClusterMaxZonesAttributeCallback implements ChipClusters.PushAvStreamTransportCluster.MaxZonesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
       callback.onSuccess(responseValues);
     }
 
@@ -31669,9 +31709,6 @@ public class ClusterInfoMapping {
     CommandParameterInfo proximityRangingstartRangingRequestbandwidthCommandParameterInfo = new CommandParameterInfo("bandwidth", Optional.class, Long.class);
     proximityRangingstartRangingRequestCommandParams.put("bandwidth",proximityRangingstartRangingRequestbandwidthCommandParameterInfo);
 
-    CommandParameterInfo proximityRangingstartRangingRequestsecurityModeCommandParameterInfo = new CommandParameterInfo("securityMode", Integer.class, Integer.class);
-    proximityRangingstartRangingRequestCommandParams.put("securityMode",proximityRangingstartRangingRequestsecurityModeCommandParameterInfo);
-
 
     InteractionInfo proximityRangingstartRangingRequestInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
@@ -31694,9 +31731,6 @@ public class ClusterInfoMapping {
 
            , (Optional<Long>)
              commandArguments.get("bandwidth")
-
-           , (Integer)
-             commandArguments.get("securityMode")
 
            , (ChipStructs.ProximityRangingClusterRangingTriggerConditionStruct)
              commandArguments.get("trigger")
@@ -34555,6 +34589,31 @@ public class ClusterInfoMapping {
         pushAvStreamTransportfindTransportCommandParams
       );
     pushAvStreamTransportClusterInteractionInfoMap.put("findTransport", pushAvStreamTransportfindTransportInteractionInfo);
+
+    Map<String, CommandParameterInfo> pushAvStreamTransportupdateMotionZoneOptionsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo pushAvStreamTransportupdateMotionZoneOptionsconnectionIDCommandParameterInfo = new CommandParameterInfo("connectionID", Integer.class, Integer.class);
+    pushAvStreamTransportupdateMotionZoneOptionsCommandParams.put("connectionID",pushAvStreamTransportupdateMotionZoneOptionsconnectionIDCommandParameterInfo);
+
+
+    CommandParameterInfo pushAvStreamTransportupdateMotionZoneOptionsmotionSensitivityCommandParameterInfo = new CommandParameterInfo("motionSensitivity", Optional.class, Integer.class);
+    pushAvStreamTransportupdateMotionZoneOptionsCommandParams.put("motionSensitivity",pushAvStreamTransportupdateMotionZoneOptionsmotionSensitivityCommandParameterInfo);
+    InteractionInfo pushAvStreamTransportupdateMotionZoneOptionsInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.PushAvStreamTransportCluster) cluster)
+        .updateMotionZoneOptions((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("connectionID")
+        , (Optional<ArrayList<ChipStructs.PushAvStreamTransportClusterTransportZoneOptionsStruct>>)
+        commandArguments.get("motionZones")
+        , (Optional<Integer>)
+        commandArguments.get("motionSensitivity")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        pushAvStreamTransportupdateMotionZoneOptionsCommandParams
+    );
+    pushAvStreamTransportClusterInteractionInfoMap.put("updateMotionZoneOptions", pushAvStreamTransportupdateMotionZoneOptionsInteractionInfo);
 
     commandMap.put("pushAvStreamTransport", pushAvStreamTransportClusterInteractionInfoMap);
 
