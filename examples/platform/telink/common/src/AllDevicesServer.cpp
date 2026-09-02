@@ -106,7 +106,6 @@ RootNode::Context MakeRootNodeContext(CommonCaseDeviceServerInitParams & initPar
         .eventManagement                     = EventManagement::GetInstance(),
         .timerDelegate                       = gTimerDelegate,
         .minGuaranteedSubscriptionsPerFabric = InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(),
-        .platformIdentify                    = gPlatformIdentify,
     };
 }
 
@@ -169,6 +168,7 @@ CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams 
         .bindingTable             = Clusters::Binding::Table::GetInstance(),
         .bindingManager           = Clusters::Binding::Manager::GetInstance(),
         .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,
+        .platformIdentify         = gPlatformIdentify,
     });
 
     VerifyOrReturnError(!gDeviceType.empty(), CHIP_ERROR_INVALID_ARGUMENT);
