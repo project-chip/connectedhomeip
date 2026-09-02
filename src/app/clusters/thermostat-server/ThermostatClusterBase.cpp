@@ -205,7 +205,7 @@ Status ThermostatClusterBase::SetLocalTemperatureCalibration(int8_t localTempera
 
 ThermostatRunningModeEnum ThermostatClusterBase::GetRunningMode() const
 {
-    ThermostatRunningModeEnum runningMode;
+    ThermostatRunningModeEnum runningMode = ThermostatRunningModeEnum::kUnknownEnumValue;
     if (auto status = mDelegate.GetRunningMode(runningMode); status != Status::Success)
     {
         ChipLogError(Zcl, "Failed to get running mode");
@@ -253,7 +253,7 @@ Status ThermostatClusterBase::SetRunningMode(ThermostatRunningModeEnum runningMo
 
 BitMask<RelayStateBitmap> ThermostatClusterBase::GetRunningState() const
 {
-    BitMask<RelayStateBitmap> runningState;
+    BitMask<RelayStateBitmap> runningState = 0;
     if (auto status = mDelegate.GetRunningState(runningState); status != Status::Success)
     {
         ChipLogError(Zcl, "Failed to get running state");
