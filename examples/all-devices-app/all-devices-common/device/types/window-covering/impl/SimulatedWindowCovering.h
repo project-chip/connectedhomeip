@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <app/clusters/groups-server/GroupsCluster.h>
 #include <device/types/window-covering/WindowCovering.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DefaultTimerDelegate.h>
@@ -50,9 +51,16 @@ public:
     // TimerContext
     void TimerFired() override;
 
-private:
+    protected:
+    // Overridden protected optional cluster registration hooks to preserve encapsulation
+    CHIP_ERROR RegisterOptionalClusters(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider) override;
+    void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) override;
+
+    private:
     bool mMovingLift = false;
     bool mMovingTilt = false;
+
+    LazyRegisteredServerCluster<Clusters::GroupsCluster> mGroupsCluster;
 };
 
 } // namespace app
