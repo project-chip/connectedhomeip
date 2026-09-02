@@ -26,8 +26,10 @@
 #include <credentials/CertificationDeclaration.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <transport/raw/MessageHeader.h>
 
 #include <algorithm>
+#include <limits>
 
 namespace {
 
@@ -41,6 +43,9 @@ using namespace chip::app::Clusters::OperationalCredentials;
 using chip::app::DataModel::AcceptedCommandEntry;
 using chip::app::DataModel::AttributeEntry;
 using chip::Testing::ClusterTester;
+
+// Mirrors the segment size the cluster serves and the floor the spec puts on MaxSegmentSize.
+constexpr uint16_t kDefaultCertificateSegmentSize = 600;
 
 class TestDACProvider : public Credentials::DeviceAttestationCredentialsProvider
 {
@@ -397,6 +402,9 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
     ASSERT_TRUE(unsupportedPqcProfileResult.status.has_value());
     EXPECT_EQ(unsupportedPqcProfileResult.GetStatusCode().value().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
 
+    // A SegmentID whose offset lands past the end of the document is a client error, not an
+    // internal failure, so it has to surface as INVALID_COMMAND rather than the provider's
+    // CHIP_ERROR_INVALID_ARGUMENT.
     Commands::CertificateChainRequest::Type outOfRangeSegment;
     outOfRangeSegment.certificateType = CertificateChainTypeEnum::kDACCertificate;
     outOfRangeSegment.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kMlDsa44);
@@ -404,7 +412,51 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
 
     auto outOfRangeSegmentResult = tester.Invoke(outOfRangeSegment);
     ASSERT_TRUE(outOfRangeSegmentResult.status.has_value());
-    EXPECT_EQ(outOfRangeSegmentResult.status->GetUnderlyingError(), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(outOfRangeSegmentResult.GetStatusCode().value().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+
+    Commands::CertificateChainRequest::Type undersizedSegmentSize;
+    undersizedSegmentSize.certificateType = CertificateChainTypeEnum::kDACCertificate;
+    undersizedSegmentSize.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kMlDsa44);
+    undersizedSegmentSize.maxSegmentSize.SetValue(kDefaultCertificateSegmentSize - 1);
+
+    auto undersizedSegmentSizeResult = tester.Invoke(undersizedSegmentSize);
+    ASSERT_TRUE(undersizedSegmentSizeResult.status.has_value());
+    EXPECT_EQ(undersizedSegmentSizeResult.GetStatusCode().value().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+
+    // A MaxSegmentSize larger than the application payload a Matter message can carry can never be
+    // honored, so it is rejected instead of being silently served at the default segment size.
+    Commands::CertificateChainRequest::Type oversizedSegmentSize;
+    oversizedSegmentSize.certificateType = CertificateChainTypeEnum::kDACCertificate;
+    oversizedSegmentSize.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kMlDsa44);
+    oversizedSegmentSize.maxSegmentSize.SetValue(std::numeric_limits<uint16_t>::max());
+
+    auto oversizedSegmentSizeResult = tester.Invoke(oversizedSegmentSize);
+    ASSERT_TRUE(oversizedSegmentSizeResult.status.has_value());
+    EXPECT_EQ(oversizedSegmentSizeResult.GetStatusCode().value().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+}
+
+TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeAcceptsSegmentSizeRange)
+{
+    OperationalCredentialsCluster cluster(kRootEndpointId, MakeContext(BitFlags<Feature>(Feature::kPQCDeviceAttestation)));
+    ClusterTester tester(cluster);
+
+    // Both ends of the permitted MaxSegmentSize range are served, and the response is capped at the
+    // default segment size regardless of how much the client is willing to receive.
+    for (uint16_t maxSegmentSize : { kDefaultCertificateSegmentSize, static_cast<uint16_t>(kMaxAppMessageLen) })
+    {
+        Commands::CertificateChainRequest::Type request;
+        request.certificateType = CertificateChainTypeEnum::kDACCertificate;
+        request.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kMlDsa44);
+        request.maxSegmentSize.SetValue(maxSegmentSize);
+
+        auto result = tester.Invoke(request);
+        ASSERT_TRUE(result.IsSuccess()) << "MaxSegmentSize " << maxSegmentSize << " was rejected";
+        ASSERT_TRUE(result.response.has_value());
+        EXPECT_EQ(result.response->certificate.size(), 96u);
+        ASSERT_TRUE(result.response->totalDocumentSize.HasValue());
+        EXPECT_EQ(result.response->totalDocumentSize.Value(), 96u);
+        EXPECT_FALSE(result.response->nextSegmentID.HasValue());
+    }
 }
 
 TEST_F(TestOperationalCredentials, TestSetCSRVendorReserved)

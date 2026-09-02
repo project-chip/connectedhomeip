@@ -32,6 +32,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <tracing/macros.h>
+#include <transport/raw/MessageHeader.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -48,6 +49,12 @@ constexpr auto kLegacyAttestationProfile             = AttestationCryptoProfileE
 constexpr uint16_t kDefaultCertificateSegmentSize    = 600;
 constexpr size_t kMaxPqcCertificateChainDocumentSize = 10240;
 constexpr auto kNocResponseMaxDebugTextLength        = 128;
+
+// Largest MaxSegmentSize a client may ask for. A segment has to travel back inside a single
+// message, so anything beyond the application payload a Matter message can carry is unusable.
+constexpr size_t kMaxCertificateSegmentSize = kMaxAppMessageLen;
+static_assert(kMaxCertificateSegmentSize >= kDefaultCertificateSegmentSize,
+              "A Matter message must be able to carry a default-sized certificate segment");
 
 bool ProviderHasRequiredPqcCredentials(const Credentials::DeviceAttestationCredentialsProvider & provider)
 {
@@ -1028,7 +1035,9 @@ HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommand
     if (profileRequest)
     {
         VerifyOrReturnValue(ToDeviceAttestationProfile(cryptoProfile, requestedProfile) == CHIP_NO_ERROR, Status::InvalidCommand);
-        VerifyOrReturnValue(requestedSegmentSize >= kDefaultCertificateSegmentSize, Status::InvalidCommand);
+        VerifyOrReturnValue(requestedSegmentSize >= kDefaultCertificateSegmentSize &&
+                                requestedSegmentSize <= kMaxCertificateSegmentSize,
+                            Status::InvalidCommand);
         offset = static_cast<size_t>(segmentId) * kDefaultCertificateSegmentSize;
     }
 
@@ -1076,6 +1085,10 @@ HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommand
 
 exit:
     ChipLogError(Zcl, "OpCreds: Failed CertificateChainRequest: %" CHIP_ERROR_FORMAT, err.Format());
+    // The document type handed to the provider is derived from an already validated CertificateType,
+    // so on a segmented read the only provider input left under client control is the offset. An
+    // invalid argument therefore means SegmentID pointed past the end of the document.
+    VerifyOrReturnValue(!profileRequest || err != CHIP_ERROR_INVALID_ARGUMENT, Status::InvalidCommand);
     return err;
 }
 
