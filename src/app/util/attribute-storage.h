@@ -452,7 +452,7 @@ EndpointComposition GetCompositionForEndpointIndex(uint16_t index);
  * @brief Get the SubjectDescriptor for the current attribute read request.
  *
  * This function can be called from within emberAfExternalAttributeReadCallback
- * to determine which controller (subject) is accessing the attribute. 
+ * to determine which controller (subject) is accessing the attribute.
  *
  * @return Pointer to the SubjectDescriptor, or nullptr if no subject descriptor
  *         is available.
