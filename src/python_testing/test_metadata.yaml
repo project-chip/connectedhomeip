@@ -3,12 +3,16 @@
 not_automated:
     - name: TC_DD_3_23.py
       reason:
-          NFC-Thread hardware setup needed for running this test-case and CI
-          does not support it
+          NFC Reader needed for running this test-case and CI does not support
+          it
     - name: TC_DD_3_24.py
       reason:
-          NFC-Thread hardware setup needed for running this test-case and CI
-          does not support it
+          NFC Reader needed for running this test-case and CI does not support
+          it
+    - name: TC_IDM_10_7.py
+      reason:
+          NFC Reader needed for running this test-case and CI does not support
+          it
     - name: TC_SC_TC_2_1.py
       reason: Test requires Thread MeshCoP hardware or simulation.
     - name: TC_SC_TC_2_2.py
@@ -61,6 +65,8 @@ not_automated:
       reason: Shared code for TC_EEM and TC_EPM, not a standalone test
     - name: TC_EGCTestBase.py
       reason: Shared code for TC_EGC, not a standalone test
+    - name: TC_EPALM_TestBase.py
+      reason: Shared code for TC_EPALM, not a standalone test
     - name: TC_OpstateCommon.py
       reason: Shared code for TC_OPSTATE, not a standalone test
     - name: TC_pics_checker.py
@@ -195,6 +201,8 @@ not_automated:
       reason:
           Very flaky in CI.
           https://github.com/project-chip/connectedhomeip/issues/71932
+    - name: TC_AVANALYTestBase.py
+      reason: Shared helper methods for AV Analysis tests, not a standalone test
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially

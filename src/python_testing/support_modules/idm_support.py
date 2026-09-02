@@ -49,6 +49,33 @@ from matter.tlv import uint
 log = logging.getLogger(__name__)
 
 
+# BasicInformation.SpecificationVersion value for Matter 1.7, encoded as 0xMMNNPP00.
+# Matter 1.7 is the first release that requires a DUT to reject every constraint
+# violation; earlier releases are held to the weaker bar described in
+# IDMBaseTest.enforces_constraints_strictly.
+SPEC_VERSION_1_7 = 0x01070000
+
+
+@dataclass
+class ConstraintProbeResult:
+    """Tallies how the DUT answered each violating value probed for one field or attribute.
+
+    A result with `probed == 0` means nothing could be exercised: no violation could
+    be synthesized, or the preconditions for an unambiguous answer were not met.
+    """
+    # Answered with CONSTRAINT_ERROR: the constraint is enforced.
+    rejected: int = 0
+    # Took the violating value: the constraint is not enforced.
+    accepted: int = 0
+    # Rejected with some other status, so enforcement is neither proven nor disproven.
+    other_error: int = 0
+
+    @property
+    def probed(self) -> int:
+        """Number of violating values the DUT actually answered."""
+        return self.rejected + self.accepted + self.other_error
+
+
 @dataclass
 class WritableAttributeInfo:
     """Describes a single writable attribute discovered on the DUT.
@@ -737,8 +764,71 @@ class IDMBaseTest(BasicCompositionTests):
         probes = self.generate_constraint_probes(attr_info, constraints, ProbeMode.VIOLATE)
         return probes[0].value if probes else None
 
-    async def check_attribute_constraint(self, attr_info: WritableAttributeInfo, constraints: Constraints) -> bool:
-        """Test a single attribute's constraint. Returns True if test passed, False otherwise."""
+    # ========================================================================
+    # Constraint Enforcement Policy
+    # ========================================================================
+
+    def dut_spec_version(self) -> int:
+        """Return BasicInformation.SpecificationVersion, or 0 if the DUT does not expose it.
+
+        Taken from the wildcard composition already read during setup rather than
+        with a fresh read. The attribute was added in Matter 1.3, so devices older
+        than that omit it; 0 sorts below every real version and therefore places
+        them on the pre-1.7 path.
+        """
+        root_node = self.endpoints_tlv.get(self.ROOT_NODE_ENDPOINT_ID, {})
+        basic_information = root_node.get(Clusters.BasicInformation.id, {})
+        return basic_information.get(Clusters.BasicInformation.Attributes.SpecificationVersion.attribute_id, 0)
+
+    def enforces_constraints_strictly(self) -> bool:
+        """Whether the DUT must reject every constraint violation it is sent.
+
+        Matter 1.7 onward requires constraint violations to be rejected on every
+        command field and writable attribute, so a DUT that accepts one fails.
+        Earlier releases were only ever verified by hand against a manually chosen
+        command or attribute, so holding them to the full automated sweep would fail
+        devices that were certified as conformant. Those are held to the weaker bar
+        instead: accepted violations are reported as warnings, and the DUT need only
+        demonstrate CONSTRAINT_ERROR enforcement at least once.
+        """
+        return self.dut_spec_version() >= SPEC_VERSION_1_7
+
+    def enforce_constraint_policy(self, subject: str, accepted_paths: list[str], rejected_count: int,
+                                  probed_count: int) -> None:
+        """Fail or pass one step according to the DUT's era. See enforces_constraints_strictly.
+
+        Args:
+            subject: What was probed, for the failure message (e.g. "Command field").
+            accepted_paths: Paths whose violating values the DUT accepted.
+            rejected_count: Violating values the DUT answered with CONSTRAINT_ERROR.
+            probed_count: Violating values the DUT answered at all. Zero means nothing
+                could be exercised, so no conclusion is drawn either way.
+        """
+        if self.enforces_constraints_strictly():
+            if accepted_paths:
+                asserts.fail(f"{subject} constraints not enforced: {', '.join(accepted_paths)}")
+            return
+
+        if accepted_paths:
+            log.warning("DUT predates Matter 1.7 (SpecificationVersion 0x%08X); accepted violating values for "
+                        "%d path(s) reported as warnings: %s", self.dut_spec_version(), len(accepted_paths),
+                        ', '.join(accepted_paths))
+        if probed_count > 0:
+            asserts.assert_greater(
+                rejected_count, 0,
+                f"DUT never returned CONSTRAINT_ERROR for any of the {probed_count} violating "
+                f"value(s) sent, so it has not demonstrated constraint enforcement at all")
+
+    async def check_attribute_constraint(self, attr_info: WritableAttributeInfo,
+                                         constraints: Constraints) -> ConstraintProbeResult:
+        """Write one out-of-bounds value to an attribute and classify the DUT's answer.
+
+        Records a warning for every violation the DUT did not answer with
+        CONSTRAINT_ERROR so the report enumerates them in both eras, and restores the
+        attribute's original value if the DUT stored the violating one. Deciding
+        whether an accepted violation fails the test is left to the caller, which
+        applies enforces_constraints_strictly.
+        """
         # Resolve dynamic constraints if present
         if constraints.min_value_ref or constraints.max_value_ref or constraints.min_count_ref or constraints.max_count_ref:
             cluster_class = attr_info.cluster_class
@@ -766,7 +856,7 @@ class IDMBaseTest(BasicCompositionTests):
         # Generate constraint violation
         test_value = self.generate_constraint_violation(attr_info, constraints)
         if test_value is None:
-            return None  # Unsupported constraint type
+            return ConstraintProbeResult()  # Unsupported constraint type
 
         # Read original value
         original_value = await self.read_single_attribute_check_success(
@@ -775,30 +865,143 @@ class IDMBaseTest(BasicCompositionTests):
             attribute=attr_info.attribute
         )
 
+        # A non-timed write to a timed-write attribute is answered with
+        # NEEDS_TIMED_INTERACTION before the value is ever range-checked, which would
+        # report every such attribute as failing to return CONSTRAINT_ERROR.
+        timed_request_timeout_ms = None
+        if attr_info.attribute.must_use_timed_write:
+            timed_request_timeout_ms = 65535
+
         # Attempt to write violating value
         attr_obj = attr_info.attribute(test_value)
         write_result = await self.default_controller.WriteAttribute(
             nodeId=self.dut_node_id,
-            attributes=[(attr_info.endpoint_id, attr_obj)]
+            attributes=[(attr_info.endpoint_id, attr_obj)],
+            timedRequestTimeoutMs=timed_request_timeout_ms
         )
         result_status = write_result[0].Status
 
-        if result_status == Status.ConstraintError:
-            # Verify value wasn't set to the violating value
-            new_value = await self.read_single_attribute_check_success(
-                endpoint=attr_info.endpoint_id,
-                cluster=attr_info.cluster_class,
-                attribute=attr_info.attribute
+        attribute_path = f"{attr_info.cluster_name}.{attr_info.attribute_name}"
+        location = AttributePathLocation(endpoint_id=attr_info.endpoint_id, cluster_id=attr_info.cluster_id,
+                                         attribute_id=attr_info.attribute_id)
+
+        # Read back to distinguish a DUT that stored the out-of-bounds value (and is now
+        # holding an illegal one) from one that ignored or clamped the write. Restore the
+        # original value whenever it changed so later probes see the device as we found it;
+        # an accepted violation no longer ends the test, so an illegal value left in place
+        # would corrupt every subsequent check.
+        stored_value = await self.read_single_attribute_check_success(
+            endpoint=attr_info.endpoint_id,
+            cluster=attr_info.cluster_class,
+            attribute=attr_info.attribute
+        )
+        if stored_value != original_value:
+            restore_result = await self.default_controller.WriteAttribute(
+                nodeId=self.dut_node_id,
+                attributes=[(attr_info.endpoint_id, attr_info.attribute(original_value))],
+                timedRequestTimeoutMs=timed_request_timeout_ms
             )
+            if restore_result[0].Status != Status.Success:
+                log.warning("Failed to restore %s to %s: %s", attribute_path, original_value,
+                            restore_result[0].Status)
 
-            if new_value == test_value:
-                log.error("FAIL: %s.%s was set to invalid value %s despite CONSTRAINT_ERROR", attr_info.cluster_name,
-                          attr_info.attribute_name, test_value)
-                return False
+        if result_status == Status.ConstraintError:
+            if stored_value != test_value:
+                log.info("PASS: %s constraint properly enforced (original=%s, rejected=%s)", attribute_path,
+                         original_value, test_value)
+                return ConstraintProbeResult(rejected=1)
 
-            log.info("PASS: %s.%s constraint properly enforced (original=%s, rejected=%s)", attr_info.cluster_name,
-                     attr_info.attribute_name, original_value, test_value)
-            return True
+            # The DUT reported the write as rejected but stored the violating value anyway,
+            # so the constraint was not enforced regardless of the status it returned.
+            self.record_warning(
+                test_name=self.current_test_info.name,
+                location=location,
+                problem=(f"{attribute_path} was set to out-of-bounds value {test_value} "
+                         f"despite returning CONSTRAINT_ERROR"))
+            return ConstraintProbeResult(accepted=1)
+
+        # Status is an IntEnum, which formats as a bare number under Python 3.11; log the
+        # name alongside it so the result reads as SUCCESS rather than as "got 0".
+        status_name = getattr(result_status, 'name', result_status)
+
+        if result_status != Status.Success:
+            # Rejected, but not with CONSTRAINT_ERROR. The write never took effect, so the
+            # attribute's constraint is neither proven nor disproven by this probe.
+            self.record_warning(
+                test_name=self.current_test_info.name,
+                location=location,
+                problem=(f"{attribute_path} rejected out-of-bounds value {test_value} with "
+                         f"{status_name} instead of CONSTRAINT_ERROR"))
+            return ConstraintProbeResult(other_error=1)
+
+        log.warning("%s got %s (%s) instead of CONSTRAINT_ERROR for value %s; attribute now reads %s",
+                    attribute_path, status_name, int(result_status), test_value, stored_value)
+        self.record_warning(
+            test_name=self.current_test_info.name,
+            location=location,
+            problem=f"{attribute_path} accepted out-of-bounds value {test_value}")
+        return ConstraintProbeResult(accepted=1)
+
+    # Command Constraint Testing (TC-IDM-9.1 step 1)
+
+    def discover_constrained_command_fields(self) -> list[CommandFieldInfo]:
+        """Discover all accepted-command fields with spec constraints on the DUT.
+
+        Walks the wildcard-read composition (endpoints_tlv), intersects each
+        cluster's AcceptedCommandList with the spec-parsed command definitions
+        and the generated Python command classes, and returns one entry per
+        constrained field. Clusters/commands on the constraint-fuzzing deny
+        lists are excluded.
+        """
+        infos: list[CommandFieldInfo] = []
+        for endpoint_id, endpoint in self.endpoints_tlv.items():
+            for cluster_id, cluster_data in endpoint.items():
+                if not is_standard_cluster_id(cluster_id):
+                    continue
+                if cluster_id not in self.xml_clusters or cluster_id not in Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS:
+                    continue
+                if cluster_id in COMMAND_CONSTRAINT_DENIED_CLUSTERS:
+                    log.info("Skipping cluster 0x%04X on EP%s: deny-listed for command constraint fuzzing",
+                             cluster_id, endpoint_id)
+                    continue
+
+                xml_cluster = self.xml_clusters[cluster_id]
+                accepted_command_ids = cluster_data.get(GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID, [])
+                for command_id in accepted_command_ids:
+                    if not is_standard_command_id(command_id):
+                        continue
+                    if (cluster_id, command_id) in COMMAND_CONSTRAINT_DENIED_COMMANDS:
+                        log.info("Skipping command 0x%04X:0x%02X on EP%s: deny-listed for command constraint fuzzing",
+                                 cluster_id, command_id, endpoint_id)
+                        continue
+                    xml_command = xml_cluster.accepted_commands.get(command_id)
+                    command_class = Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id].get(command_id)
+                    if xml_command is None or command_class is None:
+                        continue
+
+                    for field in xml_command.fields.values():
+                        if field.constraints is None or not field.constraints.has_constraints():
+                            continue
+                        infos.append(CommandFieldInfo(
+                            endpoint_id=endpoint_id,
+                            cluster_id=cluster_id,
+                            cluster_name=xml_cluster.name,
+                            command_id=command_id,
+                            command_name=xml_command.name,
+                            command_class=command_class,
+                            cluster_class=Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id],
+                            field=field,
+                            all_fields=xml_command.fields,
+                        ))
+        return infos
+
+    @staticmethod
+    def _command_field_label(command_class: type[ClusterObjects.ClusterCommand], field_id: int) -> str | None:
+        """Map a spec field ID to the generated Python dataclass attribute name via the descriptor tags."""
+        for descriptor_field in command_class.descriptor.Fields:
+            if descriptor_field.Tag == field_id:
+                return descriptor_field.Label
+        return None
 
         # The DUT did not reject the write. Read back to distinguish a DUT that stored the
         # out-of-bounds value (and is now holding an illegal one) from one that accepted
@@ -1179,37 +1382,56 @@ class IDMBaseTest(BasicCompositionTests):
                     f"Returned attributes don't match AttributeList for cluster {cluster.id} on endpoint {endpoint}")
         return read_request
 
-    async def read_endpoint_all_clusters(self, endpoint):
+    async def read_endpoint_all_clusters(self, endpoint: int) -> dict:
         """Read all attributes from all clusters on an endpoint.
 
         Args:
             endpoint: Endpoint to read from
 
         Returns:
-            Read response dictionary
+            The codegen-parsed attributes mapping from the read response, keyed by
+            endpoint, then cluster class, then attribute class.
         """
-        read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [endpoint])
-        asserts.assert_in(Clusters.Descriptor, read_request[endpoint].keys(), "Descriptor cluster not in output")
-        asserts.assert_in(Clusters.Descriptor.Attributes.ServerList,
-                          read_request[endpoint][Clusters.Descriptor], "ServerList not in output")
+        # Use Read (not ReadAttribute): ReadAttribute returns only the codegen-parsed dict,
+        # whereas Read returns a response object that also carries tlvAttributes.
+        read_request = await self.default_controller.Read(self.dut_node_id, [endpoint])
+
+        # Use tlvAttributes (raw cluster/attribute IDs) rather than the codegen-parsed
+        # .attributes dict. The parsed dict is keyed by generated Cluster classes, so any
+        # cluster the controller has no codegen class for (e.g. a manufacturer-specific
+        # cluster in the 0xVVVV_FC00-0xVVVV_FFFE range) is silently dropped, which would
+        # make the returned cluster set disagree with the DUT's ServerList.
+        tlv_attributes = read_request.tlvAttributes
+        server_list_id = Clusters.Descriptor.Attributes.ServerList.attribute_id
+        attribute_list_id = Clusters.Descriptor.Attributes.AttributeList.attribute_id
+
+        asserts.assert_in(endpoint, tlv_attributes, f"Endpoint {endpoint} not in output")
+        asserts.assert_in(Clusters.Descriptor.id, tlv_attributes[endpoint], "Descriptor cluster not in output")
+        asserts.assert_in(server_list_id, tlv_attributes[endpoint][Clusters.Descriptor.id], "ServerList not in output")
 
         # Verify that returned clusters match the ServerList
-        returned_cluster_ids = sorted([cluster.id for cluster in read_request[endpoint]])
-        server_list = sorted(read_request[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList])
+        returned_cluster_ids = sorted(tlv_attributes[endpoint].keys())
+        server_list = sorted(tlv_attributes[endpoint][Clusters.Descriptor.id][server_list_id])
         asserts.assert_equal(
             returned_cluster_ids,
             server_list,
             f"Returned cluster IDs {returned_cluster_ids} don't match ServerList {server_list} for endpoint {endpoint}")
 
-        for cluster in read_request[endpoint]:
-            attribute_ids = [a.attribute_id for a in read_request[endpoint][cluster]
-                             if a != Clusters.Attribute.DataVersion]
+        for cluster_id in tlv_attributes[endpoint]:
+            # Skip non-standard clusters: the controller has no codegen for them, so
+            # their AttributeList cannot be validated against a known attribute set here.
+            if global_attribute_ids.cluster_id_type(cluster_id) != global_attribute_ids.ClusterIdType.kStandard:
+                continue
+            asserts.assert_in(attribute_list_id, tlv_attributes[endpoint][cluster_id],
+                              f"AttributeList not in output for cluster {cluster_id}")
+            returned_attrs = sorted(tlv_attributes[endpoint][cluster_id].keys())
+            attr_list = sorted(tlv_attributes[endpoint][cluster_id][attribute_list_id])
             asserts.assert_equal(
-                sorted(attribute_ids),
-                sorted(read_request[endpoint][cluster][cluster.Attributes.AttributeList]),
-                f"Expected attribute list does not match for cluster {cluster}"
+                returned_attrs,
+                attr_list,
+                f"Expected attribute list does not match for cluster {cluster_id}"
             )
-        return read_request
+        return read_request.attributes
 
     async def read_unsupported_endpoint(self):
         """Find an unsupported endpoint and attempt to read from it.

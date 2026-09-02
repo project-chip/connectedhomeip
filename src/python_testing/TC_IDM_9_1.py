@@ -60,9 +60,9 @@ class TC_IDM_9_1(IDMBaseTest):
         return [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "For each accepted command of every standard server cluster on every endpoint of the DUT, identify the command fields with spec-defined constraints (min/max value, min/max length, exact length, count), excluding commands that are unsafe to invoke automatically (commissioning, credentials, networking, OTA and access-control flows). For every such field, send Invoke Request messages to the DUT from the TH with that field set to a value violating each testable constraint bound and all other fields set to in-range values. Skip bounds that the field's own data type already enforces.",
-                     "Verify on the TH that the DUT rejects every violating Invoke Request with a CONSTRAINT_ERROR Status Code, and that at least one constraint violation was exercised."),
+                     "Verify on the TH that a DUT reporting SpecificationVersion 1.7 or later rejects every violating Invoke Request with a CONSTRAINT_ERROR Status Code. A DUT reporting an earlier version, or not reporting SpecificationVersion at all, need only reject at least one. In both cases verify that at least one constraint violation was exercised."),
             TestStep(2, "Read every attribute that is writable with bounds from all the clusters from all the endpoints. For every writable attribute read, set the data field  to an out of bounds value in the Write Request message to the DUT from the TH.",
-                     "Verify on the TH that the DUT sends a Status Response Action with a CONSTRAINT_ERROR Status Code."),
+                     "Verify on the TH that a DUT reporting SpecificationVersion 1.7 or later sends a Status Response Action with a CONSTRAINT_ERROR Status Code for every such write. A DUT reporting an earlier version, or not reporting SpecificationVersion at all, need only do so for at least one."),
         ]
 
     @async_test_body
@@ -77,9 +77,14 @@ class TC_IDM_9_1(IDMBaseTest):
         command_field_infos = self.discover_constrained_command_fields()
         log.info("Found %s constrained command fields on DUT", len(command_field_infos))
 
+        log.info("DUT SpecificationVersion 0x%08X: %s constraint enforcement required on every path",
+                 self.dut_spec_version(), "strict" if self.enforces_constraints_strictly() else "no")
+
         commands_tested_count = 0
         commands_skipped_count = 0
-        failed_command_fields = []
+        commands_probed_count = 0
+        commands_rejected_count = 0
+        accepted_command_fields = []
 
         for info in command_field_infos:
             try:
@@ -88,21 +93,23 @@ class TC_IDM_9_1(IDMBaseTest):
                 log.warning("Transport error testing %s: %s", info.path_str, e)
                 commands_skipped_count += 1
                 continue
-            if result is None:
+            if result.probed == 0:
                 commands_skipped_count += 1
-            else:
-                commands_tested_count += 1
-                if not result:
-                    failed_command_fields.append(info.path_str)
+                continue
+            commands_tested_count += 1
+            commands_probed_count += result.probed
+            commands_rejected_count += result.rejected
+            if result.accepted:
+                accepted_command_fields.append(info.path_str)
 
         log.info("Step 1 complete: Tested %s command fields, skipped %s",
                  commands_tested_count, commands_skipped_count)
 
-        if failed_command_fields:
-            asserts.fail(f"Command field constraints not enforced: {', '.join(failed_command_fields)}")
         if command_field_infos:
             asserts.assert_greater(commands_tested_count, 0,
                                    "DUT exposes constrained command fields but no constraint violation could be exercised")
+        self.enforce_constraint_policy(subject="Command field", accepted_paths=accepted_command_fields,
+                                       rejected_count=commands_rejected_count, probed_count=commands_probed_count)
 
         # Step 2: Test all writable attributes with constraints
         self.step(2)
@@ -141,7 +148,9 @@ class TC_IDM_9_1(IDMBaseTest):
         # Test attributes with constraints
         tested_count = 0
         skipped_count = 0
-        failed_attributes = []
+        probed_count = 0
+        rejected_count = 0
+        accepted_attributes = []
 
         for attr_info in writable_attributes:
             constraints = attr_info.constraints
@@ -152,23 +161,24 @@ class TC_IDM_9_1(IDMBaseTest):
 
             try:
                 result = await self.check_attribute_constraint(attr_info, constraints)
-                if result is None:
-                    skipped_count += 1
-                elif result is False:
-                    failed_attributes.append(f"{attr_info.cluster_name}.{attr_info.attribute_name}")
-                    tested_count += 1
-                else:
-                    tested_count += 1
             except Exception as e:
                 log.warning("Exception testing %s.%s: %s", attr_info.cluster_name, attr_info.attribute_name, e)
                 skipped_count += 1
+                continue
+
+            if result.probed == 0:
+                skipped_count += 1
+                continue
+            tested_count += 1
+            probed_count += result.probed
+            rejected_count += result.rejected
+            if result.accepted:
+                accepted_attributes.append(f"{attr_info.cluster_name}.{attr_info.attribute_name}")
 
         log.info("Step 2 complete: Tested %s attributes, skipped %s", tested_count, skipped_count)
 
-        if failed_attributes:
-            failed_list = ', '.join(failed_attributes)
-            log.error("Failed attributes constraints not enforced: %s", failed_list)
-            asserts.fail(f"Failed attributes constraints not enforced: {failed_list}")
+        self.enforce_constraint_policy(subject="Writable attribute", accepted_paths=accepted_attributes,
+                                       rejected_count=rejected_count, probed_count=probed_count)
 
 
 if __name__ == "__main__":

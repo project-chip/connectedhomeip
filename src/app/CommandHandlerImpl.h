@@ -437,6 +437,12 @@ private:
      */
     Protocols::InteractionModel::Status ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement);
 
+    Protocols::InteractionModel::Status ValidateCommandCanBeDispatched(const ConcreteCommandPath & aConcretePath);
+    Protocols::InteractionModel::Status ValidateUnicastCommand(CommandDataIB::Parser & aCommandElement,
+                                                               ConcreteCommandPath & aOutPath);
+    CHIP_ERROR PopulateTargetedEndpoints(InvokeRequests::Parser aInvokeRequests, Span<EndpointId> & aTargetedEndpoints);
+    CHIP_ERROR PopulateGroupTargetedEndpoints(InvokeRequests::Parser aInvokeRequests, Span<EndpointId> & aTargetedEndpoints);
+
     CHIP_ERROR TryAddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus);
 
     CHIP_ERROR AddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus);
@@ -474,7 +480,8 @@ private:
 
     void InvalidateHandles();
 
-    void TriggerDelayReport(const InvokeRequestMessage::DelayReportData & aDelayReportData);
+    void TriggerDelayReport(const InvokeRequestMessage::DelayReportData & aDelayReportData,
+                            Span<const EndpointId> aTargetedEndpoints);
 
     bool TestOnlyIsInIdleState() const { return mState == State::Idle; }
 
@@ -522,11 +529,6 @@ private:
     // incoming invoke.  After this point, our session could go away at any
     // time.
     bool mGoneAsync = false;
-
-    static constexpr size_t kMaxTargetedEndpoints = CHIP_CONFIG_MAX_PATHS_PER_INVOKE;
-    uint16_t mNumTargetedEndpoints                = 0;
-    EndpointId mTargetedEndpoints[kMaxTargetedEndpoints];
-    void RecordTargetedEndpoint(EndpointId endpointId);
 };
 } // namespace app
 } // namespace chip
