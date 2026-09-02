@@ -172,6 +172,11 @@ std::vector<uint8_t> BuildPayload(uint8_t index, uint32_t counter, const std::ve
 // gates instead of having to find a 33-byte shape on its own.
 std::vector<std::vector<uint8_t>> PayloadSeeds()
 {
+    // Called while the FUZZ_TEST domains are registered, which happens before
+    // any property body runs -- so this, not the property, is the first thing
+    // to construct a keystore and must do the initialization itself.
+    EnsureInitialized();
+
     std::vector<std::vector<uint8_t>> seeds;
 
     for (uint8_t index = 0; index < 2; index++)
