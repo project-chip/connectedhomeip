@@ -357,8 +357,8 @@ bool DoorLockServer::checkExpiringUserAccess(chip::EndpointId endpointId, EmberA
                                              uint16_t userIndex, chip::FabricIndex creatorFabricIndex,
                                              chip::System::Clock::Timestamp currentTime)
 {
-    ExpiringUserFirstUseEntry * entry       = nullptr;
-    ExpiringUserFirstUseEntry * freeSlot     = nullptr;
+    ExpiringUserFirstUseEntry * entry    = nullptr;
+    ExpiringUserFirstUseEntry * freeSlot = nullptr;
     for (auto & candidate : endpointContext->expiringUserFirstUse)
     {
         if (candidate.valid && candidate.userIndex == userIndex)
@@ -378,8 +378,8 @@ bool DoorLockServer::checkExpiringUserAccess(chip::EndpointId endpointId, EmberA
         // minutes *after the first use*, so this access itself is always granted.
         if (nullptr != freeSlot)
         {
-            freeSlot->valid            = true;
-            freeSlot->userIndex        = userIndex;
+            freeSlot->valid             = true;
+            freeSlot->userIndex         = userIndex;
             freeSlot->firstUseTimestamp = currentTime;
         }
         else
@@ -396,7 +396,7 @@ bool DoorLockServer::checkExpiringUserAccess(chip::EndpointId endpointId, EmberA
     }
 
     uint16_t expiringUserTimeoutMinutes = 0;
-    auto status = Attributes::ExpiringUserTimeout::Get(endpointId, &expiringUserTimeoutMinutes);
+    auto status                         = Attributes::ExpiringUserTimeout::Get(endpointId, &expiringUserTimeoutMinutes);
     if (Status::Success != status)
     {
         ChipLogError(Zcl, "[checkExpiringUserAccess] Unable to read ExpiringUserTimeout attribute [status=%d]",
@@ -405,7 +405,8 @@ bool DoorLockServer::checkExpiringUserAccess(chip::EndpointId endpointId, EmberA
         return true;
     }
 
-    auto expiresAt = entry->firstUseTimestamp + chip::System::Clock::Seconds32(static_cast<uint32_t>(expiringUserTimeoutMinutes) * 60);
+    auto expiresAt =
+        entry->firstUseTimestamp + chip::System::Clock::Seconds32(static_cast<uint32_t>(expiringUserTimeoutMinutes) * 60);
     if (currentTime < expiresAt)
     {
         // Still within the window granted by the first use. Per spec this times from the *first* use, so
@@ -413,15 +414,14 @@ bool DoorLockServer::checkExpiringUserAccess(chip::EndpointId endpointId, EmberA
         return true;
     }
 
-    ChipLogProgress(Zcl,
-                    "ExpiringUserTimeout elapsed, disabling user [endpointId=%d,userIndex=%d,timeoutMinutes=%d]",
-                    endpointId, userIndex, expiringUserTimeoutMinutes);
+    ChipLogProgress(Zcl, "ExpiringUserTimeout elapsed, disabling user [endpointId=%d,userIndex=%d,timeoutMinutes=%d]", endpointId,
+                    userIndex, expiringUserTimeoutMinutes);
 
     // Persist the disabled status through the same path any other UserStatus change already uses, so it
     // survives a reboot even though the in-flight countdown itself does not (see the "Known limitation"
     // note on HandleRemoteLockOperation).
     modifyUser(endpointId, creatorFabricIndex, chip::kUndefinedNodeId, userIndex, NullNullable, NullNullable,
-              MakeNullable(UserStatusEnum::kOccupiedDisabled), NullNullable, NullNullable);
+               MakeNullable(UserStatusEnum::kOccupiedDisabled), NullNullable, NullNullable);
 
     entry->valid = false;
 

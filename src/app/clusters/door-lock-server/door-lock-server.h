@@ -100,7 +100,7 @@ static constexpr size_t kDoorLockMaxTrackedExpiringUsers = 16;
  */
 struct ExpiringUserFirstUseEntry
 {
-    bool valid = false;
+    bool valid         = false;
     uint16_t userIndex = 0;
     chip::System::Clock::Timestamp firstUseTimestamp;
 };
@@ -534,9 +534,8 @@ private:
      * OccupiedDisabled via modifyUser() so the disabled state itself survives a reboot even though the
      * in-flight countdown does not.
      */
-    bool checkExpiringUserAccess(chip::EndpointId endpointId, EmberAfDoorLockEndpointContext * endpointContext,
-                                 uint16_t userIndex, chip::FabricIndex creatorFabricIndex,
-                                 chip::System::Clock::Timestamp currentTime);
+    bool checkExpiringUserAccess(chip::EndpointId endpointId, EmberAfDoorLockEndpointContext * endpointContext, uint16_t userIndex,
+                                 chip::FabricIndex creatorFabricIndex, chip::System::Clock::Timestamp currentTime);
 
     /** Clears any pending ExpiringUser first-use tracking for a user slot that is being freed or reused. */
     void clearExpiringUserTracking(EmberAfDoorLockEndpointContext * endpointContext, uint16_t userIndex);
