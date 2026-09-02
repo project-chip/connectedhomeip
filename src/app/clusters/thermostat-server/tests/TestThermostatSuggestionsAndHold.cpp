@@ -97,7 +97,7 @@ TEST_F(ThermostatTestFixture, TestHoldAttributesReadWrite)
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Read TemperatureSetpointHold
-    TemperatureSetpointHoldEnum hold;
+    TemperatureSetpointHoldEnum hold = TemperatureSetpointHoldEnum::kSetpointHoldOff;
     EXPECT_EQ(tester.ReadAttribute(TemperatureSetpointHold::Id, hold), Status::Success);
     EXPECT_EQ(hold, TemperatureSetpointHoldEnum::kSetpointHoldOff);
 
@@ -111,7 +111,7 @@ TEST_F(ThermostatTestFixture, TestHoldAttributesReadWrite)
               Status::InvalidValue);
 
     // Read & Write TemperatureSetpointHoldDuration
-    DataModel::Nullable<uint16_t> duration;
+    DataModel::Nullable<uint16_t> duration = 0;
     EXPECT_EQ(tester.ReadAttribute(TemperatureSetpointHoldDuration::Id, duration), Status::Success);
     ASSERT_FALSE(duration.IsNull());
     EXPECT_EQ(duration.Value(), 60);
@@ -124,7 +124,7 @@ TEST_F(ThermostatTestFixture, TestHoldAttributesReadWrite)
               Status::InvalidValue);
 
     // Read & Write SetpointHoldExpiryTimestamp
-    DataModel::Nullable<uint32_t> timestamp;
+    DataModel::Nullable<uint32_t> timestamp = 0;
     EXPECT_EQ(tester.ReadAttribute(SetpointHoldExpiryTimestamp::Id, timestamp), Status::Success);
     EXPECT_EQ(timestamp.Value(), 0u);
 
@@ -144,7 +144,7 @@ TEST_F(ThermostatTestFixture, TestOccupancyFeatureAndEvents)
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Read Occupancy
-    BitMask<OccupancyBitmap> occ;
+    BitMask<OccupancyBitmap> occ = {};
     EXPECT_EQ(tester.ReadAttribute(Occupancy::Id, occ), Status::Success);
     EXPECT_TRUE(occ.Has(OccupancyBitmap::kOccupied));
     EXPECT_TRUE(cluster.IsOccupied());
@@ -189,9 +189,7 @@ TEST_F(ThermostatTestFixture, TestSuggestionsAttributesAndAddRemoveCommands)
     addCmd.effectiveTime       = DataModel::NullNullable;
 
     auto result = tester.Invoke(addCmd);
-    EXPECT_TRUE(result.status.has_value());
-    ASSERT_TRUE(result.GetStatusCode().has_value());
-    EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::InvalidInState);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::InvalidInState));
 
     // 2. Set synced mock clock
     EXPECT_EQ(mockClock.SetClock_RealTime(Microseconds64(kValidRealTimeMicroseconds)), CHIP_NO_ERROR);
@@ -199,33 +197,30 @@ TEST_F(ThermostatTestFixture, TestSuggestionsAttributesAndAddRemoveCommands)
     // 3. Expiration out of bounds (< 30 or > 1440) -> ConstraintError
     addCmd.expirationInMinutes = 10;
     result                     = tester.Invoke(addCmd);
-    EXPECT_TRUE(result.status.has_value());
-    ASSERT_TRUE(result.GetStatusCode().has_value());
-    EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::ConstraintError);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
 
     addCmd.expirationInMinutes = 2000;
     result                     = tester.Invoke(addCmd);
-    EXPECT_TRUE(result.status.has_value());
-    ASSERT_TRUE(result.GetStatusCode().has_value());
-    EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::ConstraintError);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
 
     // 4. Non-existent preset handle -> NotFound
     uint8_t unknownHandle[4]   = { 9, 9, 9, 9 };
     addCmd.presetHandle        = ByteSpan(unknownHandle);
     addCmd.expirationInMinutes = 60;
     result                     = tester.Invoke(addCmd);
-    EXPECT_TRUE(result.status.has_value());
-    ASSERT_TRUE(result.GetStatusCode().has_value());
-    EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::NotFound);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::NotFound));
 
     // 5. Valid suggestion add -> Success
     addCmd.presetHandle = ByteSpan(handle);
     result              = tester.Invoke(addCmd);
-    EXPECT_TRUE(result.status.has_value());
-    EXPECT_EQ(result.status->GetUnderlyingError(), CHIP_NO_ERROR);
+    EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    uint8_t uniqueID = result.response->uniqueID;
-    EXPECT_GT(uniqueID, 0);
+    uint8_t uniqueID = 0;
+    if (result.response.has_value())
+    {
+        uniqueID = result.response.value().uniqueID;
+        EXPECT_GT(uniqueID, 0);
+    }
 
     EXPECT_EQ(mSuggestionsDelegate.mSuggestions.size(), 1u);
     EXPECT_TRUE(mSuggestionsDelegate.mReEvaluateCalled);
@@ -235,16 +230,13 @@ TEST_F(ThermostatTestFixture, TestSuggestionsAttributesAndAddRemoveCommands)
     Commands::RemoveThermostatSuggestion::Type removeCmd;
     removeCmd.uniqueID = uniqueID;
     auto removeResult  = tester.Invoke(removeCmd);
-    EXPECT_TRUE(removeResult.status.has_value());
-    EXPECT_EQ(removeResult.status->GetUnderlyingError(), CHIP_NO_ERROR);
+    EXPECT_TRUE(removeResult.IsSuccess());
     EXPECT_EQ(mSuggestionsDelegate.mSuggestions.size(), 0u);
 
     // 7. Remove non-existent suggestion -> NotFound
     removeCmd.uniqueID = 0xFE;
     removeResult       = tester.Invoke(removeCmd);
-    EXPECT_TRUE(removeResult.status.has_value());
-    ASSERT_TRUE(removeResult.GetStatusCode().has_value());
-    EXPECT_EQ(removeResult.GetStatusCode()->GetStatus(), Status::NotFound);
+    EXPECT_EQ(removeResult.GetStatusCode(), ClusterStatusCode(Status::NotFound));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

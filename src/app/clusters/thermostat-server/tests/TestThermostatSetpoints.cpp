@@ -218,7 +218,10 @@ TEST_F(ThermostatTestFixture, TestOccupiedHeatingAndCoolingSetpointsAttributes)
     // Verify SetpointChangeEvent
     auto event = tester.GetNextGeneratedEvent();
     ASSERT_TRUE(event.has_value());
-    EXPECT_EQ(event->eventOptions.mPath.mEventId, Events::SetpointChange::Id);
+    if (event.has_value())
+    {
+        EXPECT_EQ(event.value().eventOptions.mPath.mEventId, Events::SetpointChange::Id);
+    }
 
     // Write OccupiedCoolingSetpoint
     EXPECT_EQ(tester.WriteAttribute(OccupiedCoolingSetpoint::Id, static_cast<temperature>(2500)), Status::Success);
@@ -331,8 +334,7 @@ TEST_F(ThermostatTestFixture, TestSetpointRaiseLowerCommand)
     req.amount = 10;
 
     auto result = tester.Invoke(req);
-    EXPECT_TRUE(result.status.has_value());
-    EXPECT_EQ(result.status->GetUnderlyingError(), CHIP_NO_ERROR);
+    EXPECT_TRUE(result.IsSuccess());
     EXPECT_EQ(mHeatingDelegate.mOccupiedHeatingSetpoint, 2100);
     EXPECT_EQ(mCoolingDelegate.mOccupiedCoolingSetpoint, 2600);
 
@@ -340,24 +342,21 @@ TEST_F(ThermostatTestFixture, TestSetpointRaiseLowerCommand)
     req.mode   = SetpointRaiseLowerModeEnum::kHeat;
     req.amount = -20;
     result     = tester.Invoke(req);
-    EXPECT_TRUE(result.status.has_value());
-    EXPECT_EQ(result.status->GetUnderlyingError(), CHIP_NO_ERROR);
+    EXPECT_TRUE(result.IsSuccess());
     EXPECT_EQ(mHeatingDelegate.mOccupiedHeatingSetpoint, 1900);
 
     // Raise Cool by +1.5 C (amount = 15)
     req.mode   = SetpointRaiseLowerModeEnum::kCool;
     req.amount = 15;
     result     = tester.Invoke(req);
-    EXPECT_TRUE(result.status.has_value());
-    EXPECT_EQ(result.status->GetUnderlyingError(), CHIP_NO_ERROR);
+    EXPECT_TRUE(result.IsSuccess());
     EXPECT_EQ(mCoolingDelegate.mOccupiedCoolingSetpoint, 2750);
 
     // Raise Both by +1.0 C (amount = 10)
     req.mode   = SetpointRaiseLowerModeEnum::kBoth;
     req.amount = 10;
     result     = tester.Invoke(req);
-    EXPECT_TRUE(result.status.has_value());
-    EXPECT_EQ(result.status->GetUnderlyingError(), CHIP_NO_ERROR);
+    EXPECT_TRUE(result.IsSuccess());
     EXPECT_EQ(mHeatingDelegate.mOccupiedHeatingSetpoint, 2000);
     EXPECT_EQ(mCoolingDelegate.mOccupiedCoolingSetpoint, 2850);
 
@@ -365,9 +364,7 @@ TEST_F(ThermostatTestFixture, TestSetpointRaiseLowerCommand)
     req.mode   = static_cast<SetpointRaiseLowerModeEnum>(0x99);
     req.amount = 10;
     result     = tester.Invoke(req);
-    EXPECT_TRUE(result.status.has_value());
-    ASSERT_TRUE(result.GetStatusCode().has_value());
-    EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::InvalidCommand);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::InvalidCommand));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -391,8 +388,7 @@ TEST_F(ThermostatTestFixture, TestSetpointRaiseLowerUnoccupied)
     req.amount = 20;
 
     auto result = tester.Invoke(req);
-    EXPECT_TRUE(result.status.has_value());
-    EXPECT_EQ(result.status->GetUnderlyingError(), CHIP_NO_ERROR);
+    EXPECT_TRUE(result.IsSuccess());
     EXPECT_EQ(mHeatingDelegate.mUnoccupiedHeatingSetpoint, 1800);
     // Occupied setpoint unchanged
     EXPECT_EQ(mHeatingDelegate.mOccupiedHeatingSetpoint, 2000);

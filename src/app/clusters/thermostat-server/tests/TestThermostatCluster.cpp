@@ -120,8 +120,11 @@ TEST_F(ThermostatTestFixture, TestLocalTemperatureNormalAndEvents)
     // Verify event was generated
     auto event = tester.GetNextGeneratedEvent();
     ASSERT_TRUE(event.has_value());
-    EXPECT_EQ(event->eventOptions.mPath.mClusterId, Thermostat::Id);
-    EXPECT_EQ(event->eventOptions.mPath.mEventId, Events::LocalTemperatureChange::Id);
+    if (event.has_value())
+    {
+        EXPECT_EQ(event.value().eventOptions.mPath.mClusterId, Thermostat::Id);
+        EXPECT_EQ(event.value().eventOptions.mPath.mEventId, Events::LocalTemperatureChange::Id);
+    }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -144,7 +147,7 @@ TEST_F(ThermostatTestFixture, TestLocalTemperatureNotExposedFeature)
 
     // Reading RemoteSensing clears kLocalTemperature bit when LTNE is supported
     mThermostatDelegate.mRemoteSensing.Set(RemoteSensingBitmap::kLocalTemperature);
-    BitMask<RemoteSensingBitmap> remoteSensing;
+    BitMask<RemoteSensingBitmap> remoteSensing{};
     EXPECT_EQ(tester.ReadAttribute(RemoteSensing::Id, remoteSensing), Status::Success);
     EXPECT_FALSE(remoteSensing.Has(RemoteSensingBitmap::kLocalTemperature));
 
@@ -171,7 +174,7 @@ TEST_F(ThermostatTestFixture, TestSystemModeValidationAndEvents)
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Read default system mode
-    SystemModeEnum mode;
+    SystemModeEnum mode = SystemModeEnum::kOff;
     EXPECT_EQ(tester.ReadAttribute(SystemMode::Id, mode), Status::Success);
     EXPECT_EQ(mode, SystemModeEnum::kOff);
 
@@ -183,7 +186,10 @@ TEST_F(ThermostatTestFixture, TestSystemModeValidationAndEvents)
     // Verify SystemModeChange event
     auto event = tester.GetNextGeneratedEvent();
     ASSERT_TRUE(event.has_value());
-    EXPECT_EQ(event->eventOptions.mPath.mEventId, Events::SystemModeChange::Id);
+    if (event.has_value())
+    {
+        EXPECT_EQ(event.value().eventOptions.mPath.mEventId, Events::SystemModeChange::Id);
+    }
 
     // Write Cool - supported because kCooling feature is set
     EXPECT_EQ(tester.WriteAttribute(SystemMode::Id, SystemModeEnum::kCool), Status::Success);
@@ -283,7 +289,7 @@ TEST_F(ThermostatTestFixture, TestControlSequenceOfOperation)
     SetupTesterSubject(tester);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    ControlSequenceOfOperationEnum cso;
+    ControlSequenceOfOperationEnum cso = ControlSequenceOfOperationEnum::kCoolingAndHeating;
     EXPECT_EQ(tester.ReadAttribute(ControlSequenceOfOperation::Id, cso), Status::Success);
     EXPECT_EQ(cso, ControlSequenceOfOperationEnum::kCoolingAndHeating);
 
@@ -308,7 +314,7 @@ TEST_F(ThermostatTestFixture, TestThermostatRunningModeAndRunningState)
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Read RunningMode
-    ThermostatRunningModeEnum rmode;
+    ThermostatRunningModeEnum rmode = ThermostatRunningModeEnum::kOff;
     EXPECT_EQ(tester.ReadAttribute(ThermostatRunningMode::Id, rmode), Status::Success);
     EXPECT_EQ(rmode, ThermostatRunningModeEnum::kOff);
 
@@ -319,19 +325,25 @@ TEST_F(ThermostatTestFixture, TestThermostatRunningModeAndRunningState)
 
     auto event = tester.GetNextGeneratedEvent();
     ASSERT_TRUE(event.has_value());
-    EXPECT_EQ(event->eventOptions.mPath.mEventId, Events::RunningModeChange::Id);
+    if (event.has_value())
+    {
+        EXPECT_EQ(event.value().eventOptions.mPath.mEventId, Events::RunningModeChange::Id);
+    }
 
     EXPECT_EQ(cluster.SetRunningMode(ThermostatRunningModeEnum::kCool), Status::Success);
     EXPECT_EQ(mThermostatDelegate.mRunningMode, ThermostatRunningModeEnum::kCool);
     event = tester.GetNextGeneratedEvent();
     ASSERT_TRUE(event.has_value());
-    EXPECT_EQ(event->eventOptions.mPath.mEventId, Events::RunningModeChange::Id);
+    if (event.has_value())
+    {
+        EXPECT_EQ(event.value().eventOptions.mPath.mEventId, Events::RunningModeChange::Id);
+    }
 
     // Invalid enum
     EXPECT_EQ(cluster.SetRunningMode(static_cast<ThermostatRunningModeEnum>(0xFF)), Status::ConstraintError);
 
     // Read RunningState
-    BitMask<RelayStateBitmap> rstate;
+    BitMask<RelayStateBitmap> rstate{};
     EXPECT_EQ(tester.ReadAttribute(ThermostatRunningState::Id, rstate), Status::Success);
     EXPECT_EQ(rstate.Raw(), 0u);
 
@@ -343,7 +355,10 @@ TEST_F(ThermostatTestFixture, TestThermostatRunningModeAndRunningState)
 
     auto stateEvent = tester.GetNextGeneratedEvent();
     ASSERT_TRUE(stateEvent.has_value());
-    EXPECT_EQ(stateEvent->eventOptions.mPath.mEventId, Events::RunningStateChange::Id);
+    if (stateEvent.has_value())
+    {
+        EXPECT_EQ(stateEvent.value().eventOptions.mPath.mEventId, Events::RunningStateChange::Id);
+    }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

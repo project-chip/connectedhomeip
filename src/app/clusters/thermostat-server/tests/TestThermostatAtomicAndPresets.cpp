@@ -132,7 +132,7 @@ TEST_F(ThermostatTestFixture, TestPresetsAttributesReading)
     EXPECT_EQ(numPresets, 10);
 
     // Read ActivePresetHandle
-    DataModel::Nullable<ByteSpan> activeHandle;
+    DataModel::Nullable<ByteSpan> activeHandle = {};
     EXPECT_EQ(tester.ReadAttribute(ActivePresetHandle::Id, activeHandle), Status::Success);
     ASSERT_FALSE(activeHandle.IsNull());
     EXPECT_TRUE(activeHandle.Value().data_equal(ByteSpan(handle)));
@@ -178,10 +178,12 @@ TEST_F(ThermostatTestFixture, TestAtomicWriteSessionFullLifecycle)
     beginReq.timeout            = MakeOptional<uint16_t>(static_cast<uint16_t>(5000)); // 5 seconds
 
     auto result = tester.Invoke(beginReq);
-    EXPECT_TRUE(result.status.has_value());
-    EXPECT_EQ(result.status->GetUnderlyingError(), CHIP_NO_ERROR);
+    EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->statusCode, to_underlying(Status::Success));
+    if (result.response.has_value())
+    {
+        EXPECT_EQ(result.response.value().statusCode, to_underlying(Status::Success));
+    }
 
     // 3. During atomic write session: writing non-atomic attribute returns InvalidInState
     EXPECT_EQ(tester.WriteAttribute(SystemMode::Id, SystemModeEnum::kHeat), Status::InvalidInState);
@@ -208,10 +210,12 @@ TEST_F(ThermostatTestFixture, TestAtomicWriteSessionFullLifecycle)
     commitReq.attributeRequests = DataModel::List<const chip::AttributeId>(attrIds, 1);
 
     result = tester.Invoke(commitReq);
-    EXPECT_TRUE(result.status.has_value());
-    EXPECT_EQ(result.status->GetUnderlyingError(), CHIP_NO_ERROR);
+    EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->statusCode, to_underlying(Status::Success));
+    if (result.response.has_value())
+    {
+        EXPECT_EQ(result.response.value().statusCode, to_underlying(Status::Success));
+    }
 
     // Presets should be committed
     ASSERT_EQ(mPresetsDelegate.mPresets.size(), 1u);
@@ -245,14 +249,22 @@ TEST_F(ThermostatTestFixture, TestAtomicWriteRollback)
     req.timeout                 = MakeOptional<uint16_t>(static_cast<uint16_t>(5000));
 
     auto result = tester.Invoke(req);
-    EXPECT_TRUE(result.status.has_value());
-    EXPECT_EQ(result.response->statusCode, to_underlying(Status::Success));
+    EXPECT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    if (result.response.has_value())
+    {
+        EXPECT_EQ(result.response.value().statusCode, to_underlying(Status::Success));
+    }
 
     // RollbackAtomicWrite
     req.requestType = AtomicRequestTypeEnum::kRollbackWrite;
     result          = tester.Invoke(req);
-    EXPECT_TRUE(result.status.has_value());
-    EXPECT_EQ(result.response->statusCode, to_underlying(Status::Success));
+    EXPECT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    if (result.response.has_value())
+    {
+        EXPECT_EQ(result.response.value().statusCode, to_underlying(Status::Success));
+    }
 
     // Verify session closed by checking writing a non-atomic attribute succeeds again
     EXPECT_EQ(tester.WriteAttribute(SystemMode::Id, SystemModeEnum::kHeat), Status::Success);
@@ -283,8 +295,12 @@ TEST_F(ThermostatTestFixture, TestAtomicWriteTimerExpiration)
     req.timeout                 = MakeOptional<uint16_t>(static_cast<uint16_t>(2000));
 
     auto result = tester.Invoke(req);
-    EXPECT_TRUE(result.status.has_value());
-    EXPECT_EQ(result.response->statusCode, to_underlying(Status::Success));
+    EXPECT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    if (result.response.has_value())
+    {
+        EXPECT_EQ(result.response.value().statusCode, to_underlying(Status::Success));
+    }
 
     // While timer is active, writing non-atomic attribute is blocked
     EXPECT_EQ(tester.WriteAttribute(SystemMode::Id, SystemModeEnum::kHeat), Status::InvalidInState);
@@ -319,28 +335,27 @@ TEST_F(ThermostatTestFixture, TestSetActivePresetRequestCommand)
     cmd.presetHandle = DataModel::MakeNullable(ByteSpan(handle));
 
     auto result = tester.Invoke(cmd);
-    EXPECT_TRUE(result.status.has_value());
-    EXPECT_EQ(result.status->GetUnderlyingError(), CHIP_NO_ERROR);
+    EXPECT_TRUE(result.IsSuccess());
     EXPECT_TRUE(tester.IsAttributeDirty(ActivePresetHandle::Id));
 
     // Verify ActivePresetChange event
     auto event = tester.GetNextGeneratedEvent();
     ASSERT_TRUE(event.has_value());
-    EXPECT_EQ(event->eventOptions.mPath.mEventId, Events::ActivePresetChange::Id);
+    if (event.has_value())
+    {
+        EXPECT_EQ(event.value().eventOptions.mPath.mEventId, Events::ActivePresetChange::Id);
+    }
 
     // Invoke with non-existent handle -> InvalidCommand
     uint8_t unknownHandle[4] = { 0xFF, 0xFF, 0xFF, 0xFF };
     cmd.presetHandle         = DataModel::MakeNullable(ByteSpan(unknownHandle));
     result                   = tester.Invoke(cmd);
-    EXPECT_TRUE(result.status.has_value());
-    ASSERT_TRUE(result.GetStatusCode().has_value());
-    EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::InvalidCommand);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::InvalidCommand));
 
     // Invoke with null handle -> clears active preset
     cmd.presetHandle = DataModel::NullNullable;
     result           = tester.Invoke(cmd);
-    EXPECT_TRUE(result.status.has_value());
-    EXPECT_EQ(result.status->GetUnderlyingError(), CHIP_NO_ERROR);
+    EXPECT_TRUE(result.IsSuccess());
     EXPECT_TRUE(mPresetsDelegate.mActivePresetHandle.IsNull());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
