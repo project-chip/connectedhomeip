@@ -494,7 +494,20 @@ void OTAProviderExample::HandleQueryImage(app::CommandHandler * commandObj, cons
     // Guarantees that either a response or an error status is sent
     SendQueryImageResponse(commandObj, commandPath, commandData);
 
-    // After the first response is sent, default to these values for subsequent queries
+    // After the response is sent, update the status used for future responses based on
+    // internal policies (separated out into its own method for easier unit testing).
+    ApplyQueryImageStatusAfterResponse();
+}
+
+// By default, a CLI-configured status such as kBusy or kNotAvailable is meant to model a
+// one-shot condition: it is served once, and later queries fall back to kUpdateAvailable so
+// the test suite isn't stuck re-issuing the same CLI arguments to get the provider unstuck.
+// --persistQueryImageStatus opts out of that reset for tests that need the configured status
+// (and its DelayedActionTime) to be served on every query.
+void OTAProviderExample::ApplyQueryImageStatusAfterResponse()
+{
+    VerifyOrReturn(!mPersistQueryImageStatus);
+
     mQueryImageStatus          = OTAQueryStatus::kUpdateAvailable;
     mDelayedQueryActionTimeSec = 0;
 }
