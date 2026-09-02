@@ -29,8 +29,8 @@ namespace Clusters {
 
 void SpeakerAudioCoordinator::SetClusters(LevelControlCluster & levelControlCluster, AudioControlCluster & audioControlCluster)
 {
-    mLevelControlCluster  = &levelControlCluster;
-    mAudioControlCluster  = &audioControlCluster;
+    mLevelControlCluster = &levelControlCluster;
+    mAudioControlCluster = &audioControlCluster;
 }
 
 void SpeakerAudioCoordinator::OnOffStartup(bool on)
@@ -53,7 +53,7 @@ void SpeakerAudioCoordinator::OnOnOffChanged(bool on)
         // OnOffDelegate::OnOnOffChanged has no veto path -- OnOff is already committed by the
         // time this fires, so a hardware rejection here can only be logged, not rolled back.
         ChipLogError(AppServer, "SpeakerAudioCoordinator: hardware rejected OnOff-driven mute sync (status %d)",
-                    static_cast<int>(status));
+                     static_cast<int>(status));
     }
 }
 
@@ -96,7 +96,7 @@ void SpeakerAudioCoordinator::OnLevelChanged(uint8_t value)
         // LevelControlDelegate::OnLevelChanged has no veto path -- CurrentLevel is already
         // committed by the time this fires, so a hardware rejection here can only be logged.
         ChipLogError(AppServer, "SpeakerAudioCoordinator: hardware rejected LevelControl-driven volume sync (status %d)",
-                    static_cast<int>(status));
+                     static_cast<int>(status));
     }
 }
 

@@ -131,10 +131,11 @@ struct SpeakerAudioCoordinatorTest : public ::testing::Test
     OnOffCluster::Context onOffContext{ mockTimer, {}, OnOffCluster::Defaults{ true } };
     OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
 
-    LevelControlCluster levelControlCluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, coordinator)
-                                                                  .WithOnOff(onOffCluster)
-                                                                  .WithLighting(DataModel::NullNullable)
-                                                                  .WithInitialCurrentLevel(254) };
+    LevelControlCluster levelControlCluster{ kTestEndpointId,
+                                             LevelControlCluster::Config(mockTimer, coordinator)
+                                                 .WithOnOff(onOffCluster)
+                                                 .WithLighting(DataModel::NullNullable)
+                                                 .WithInitialCurrentLevel(254) };
 
     AudioControlCluster audioControlCluster{ kTestEndpointId, coordinator,
                                              AudioControlCluster::Config().WithInitialVolume(100).WithInitialSoftMuted(false) };
@@ -207,11 +208,11 @@ TEST(SpeakerAudioCoordinatorStartupOrderingTest, StartupReconcilesLevelControlsE
 
     // Level 1 (MinLevel) would scale to Volume 1 (MinDeviceVolume) -- deliberately disagreeing
     // with AudioControl's own Volume=100 below.
-    LevelControlCluster levelControlCluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, coordinator)
-                                                                  .WithLighting(DataModel::NullNullable)
-                                                                  .WithInitialCurrentLevel(1) };
-    AudioControlCluster audioControlCluster{ kTestEndpointId, coordinator,
-                                             AudioControlCluster::Config().WithInitialVolume(100) };
+    LevelControlCluster levelControlCluster{
+        kTestEndpointId,
+        LevelControlCluster::Config(mockTimer, coordinator).WithLighting(DataModel::NullNullable).WithInitialCurrentLevel(1)
+    };
+    AudioControlCluster audioControlCluster{ kTestEndpointId, coordinator, AudioControlCluster::Config().WithInitialVolume(100) };
     Testing::ClusterTester tester{ audioControlCluster };
 
     coordinator.SetClusters(levelControlCluster, audioControlCluster);
@@ -374,10 +375,11 @@ struct SpeakerAudioCoordinatorMaxUserVolumeTest : public ::testing::Test
     OnOffCluster::Context onOffContext{ mockTimer, {}, OnOffCluster::Defaults{ true } };
     OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
 
-    LevelControlCluster levelControlCluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, coordinator)
-                                                                  .WithOnOff(onOffCluster)
-                                                                  .WithLighting(DataModel::NullNullable)
-                                                                  .WithInitialCurrentLevel(254) };
+    LevelControlCluster levelControlCluster{ kTestEndpointId,
+                                             LevelControlCluster::Config(mockTimer, coordinator)
+                                                 .WithOnOff(onOffCluster)
+                                                 .WithLighting(DataModel::NullNullable)
+                                                 .WithInitialCurrentLevel(254) };
 
     AudioControlCluster audioControlCluster{
         kTestEndpointId, coordinator,
@@ -448,7 +450,8 @@ TEST_F(SpeakerAudioCoordinatorTest, HardwareSetVolumeScalesLevelWithoutNotifying
     // Matter-driven SetVolume command does, so a subscriber sees the same report either way.
     EXPECT_TRUE(tester.IsAttributeDirty(AudioControl::Attributes::Volume::Id));
     auto & dirtyList = tester.GetDirtyList();
-    EXPECT_TRUE(IsPathDirty(dirtyList, ConcreteAttributePath(kTestEndpointId, LevelControl::Id, LevelControl::Attributes::CurrentLevel::Id)));
+    EXPECT_TRUE(IsPathDirty(dirtyList,
+                            ConcreteAttributePath(kTestEndpointId, LevelControl::Id, LevelControl::Attributes::CurrentLevel::Id)));
 }
 
 TEST_F(SpeakerAudioCoordinatorTest, HardwareSetVolumeRejectsOutOfRangeAndLeavesLevelControlUntouched)
@@ -495,9 +498,10 @@ struct SpeakerAudioCoordinatorPhysicallyMutedTest : public ::testing::Test
     MockHardwareDelegate hardwareDelegate;
     SpeakerAudioCoordinator coordinator{ hardwareDelegate };
 
-    LevelControlCluster levelControlCluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, coordinator)
-                                                                  .WithLighting(DataModel::NullNullable)
-                                                                  .WithInitialCurrentLevel(254) };
+    LevelControlCluster levelControlCluster{
+        kTestEndpointId,
+        LevelControlCluster::Config(mockTimer, coordinator).WithLighting(DataModel::NullNullable).WithInitialCurrentLevel(254)
+    };
 
     AudioControlCluster audioControlCluster{
         kTestEndpointId, coordinator,
@@ -549,9 +553,10 @@ struct SpeakerAudioCoordinatorOnOffSyncTest : public ::testing::Test
     OnOffCluster::Context onOffContext{ mockTimer, {}, OnOffCluster::Defaults{ true } };
     OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
 
-    LevelControlCluster levelControlCluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, coordinator)
-                                                                  .WithLighting(DataModel::NullNullable)
-                                                                  .WithInitialCurrentLevel(254) };
+    LevelControlCluster levelControlCluster{
+        kTestEndpointId,
+        LevelControlCluster::Config(mockTimer, coordinator).WithLighting(DataModel::NullNullable).WithInitialCurrentLevel(254)
+    };
 
     AudioControlCluster audioControlCluster{ kTestEndpointId, coordinator,
                                              AudioControlCluster::Config().WithInitialVolume(100).WithInitialSoftMuted(false) };
@@ -610,15 +615,14 @@ struct SpeakerAudioCoordinatorBEQTest : public ::testing::Test
     // BEQ has no OnOff/LevelControl counterpart, so AudioControlCluster is the only cluster
     // SpeakerAudioCoordinator needs here; LevelControl/OnOff are left unset (SetClusters() is
     // only required before a Volume/SoftMuted-affecting command runs).
-    AudioControlCluster audioControlCluster{
-        kTestEndpointId, coordinator,
-        AudioControlCluster::Config()
-            .WithFeatures(BitFlags<AudioControl::Feature>(AudioControl::Feature::kBasicEqualizer))
-            .WithOptionalAttributes(AudioControlCluster::OptionalAttributeSet()
-                                        .Set<AudioControl::Attributes::Bass::Id>()
-                                        .Set<AudioControl::Attributes::Mid::Id>()
-                                        .Set<AudioControl::Attributes::Treble::Id>())
-    };
+    AudioControlCluster audioControlCluster{ kTestEndpointId, coordinator,
+                                             AudioControlCluster::Config()
+                                                 .WithFeatures(
+                                                     BitFlags<AudioControl::Feature>(AudioControl::Feature::kBasicEqualizer))
+                                                 .WithOptionalAttributes(AudioControlCluster::OptionalAttributeSet()
+                                                                             .Set<AudioControl::Attributes::Bass::Id>()
+                                                                             .Set<AudioControl::Attributes::Mid::Id>()
+                                                                             .Set<AudioControl::Attributes::Treble::Id>()) };
 
     ClusterTester tester{ audioControlCluster };
 
@@ -665,15 +669,14 @@ struct SpeakerAudioCoordinatorFixedLimitsTest : public ::testing::Test
     FixedLimitsHardwareDelegate hardwareDelegate;
     SpeakerAudioCoordinator coordinator{ hardwareDelegate };
 
-    AudioControlCluster audioControlCluster{
-        kTestEndpointId, coordinator,
-        AudioControlCluster::Config()
-            .WithFeatures(BitFlags<AudioControl::Feature>(AudioControl::Feature::kBasicEqualizer))
-            .WithOptionalAttributes(AudioControlCluster::OptionalAttributeSet()
-                                        .Set<AudioControl::Attributes::MaxDeviceVolumeDB::Id>()
-                                        .Set<AudioControl::Attributes::Bass::Id>())
-            .WithInitialVolume(10)
-    };
+    AudioControlCluster audioControlCluster{ kTestEndpointId, coordinator,
+                                             AudioControlCluster::Config()
+                                                 .WithFeatures(
+                                                     BitFlags<AudioControl::Feature>(AudioControl::Feature::kBasicEqualizer))
+                                                 .WithOptionalAttributes(AudioControlCluster::OptionalAttributeSet()
+                                                                             .Set<AudioControl::Attributes::MaxDeviceVolumeDB::Id>()
+                                                                             .Set<AudioControl::Attributes::Bass::Id>())
+                                                 .WithInitialVolume(10) };
 
     ClusterTester tester{ audioControlCluster };
 

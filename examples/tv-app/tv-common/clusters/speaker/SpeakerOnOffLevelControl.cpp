@@ -106,7 +106,7 @@ void InitOnOffLevelControl()
     // check and was never actually reachable -- clamp it down so the configured MaxLevel is a
     // value CurrentLevel can genuinely reach (matters once AudioControl.Volume at its maximum
     // needs to scale up to MaxLevel; see SpeakerAudioCoordinator::ScaleVolumeToLevel).
-    maxLevel = std::min(maxLevel, LevelControlCluster::kMaxLevel);
+    maxLevel                     = std::min(maxLevel, LevelControlCluster::kMaxLevel);
     uint16_t onOffTransitionTime = 0;
     if (LevelControl::Attributes::OnOffTransitionTime::Get(kSpeakerEndpointId, &onOffTransitionTime) != Status::Success)
     {
