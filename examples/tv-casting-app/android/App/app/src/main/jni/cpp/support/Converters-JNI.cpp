@@ -182,7 +182,7 @@ jobject convertCastingPlayerFromCppToJava(matter::casting::memory::Strong<core::
             char addrCString[chip::Inet::IPAddress::kMaxStringLength];
             ipAddresses[i].ToString(addrCString, chip::Inet::IPAddress::kMaxStringLength);
             jstring jIPAddressStr = nullptr;
-            CHIP_ERROR err        = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan(addrCString, strlen(addrCString)),
+            CHIP_ERROR err        = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(addrCString),
                                                                                  reinterpret_cast<jobject &>(jIPAddressStr));
             if (err != CHIP_NO_ERROR)
             {
@@ -206,14 +206,14 @@ jobject convertCastingPlayerFromCppToJava(matter::casting::memory::Strong<core::
     jstring jDeviceName          = nullptr;
     jstring jInstanceName        = nullptr;
 
-    CHIP_ERROR idErr   = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan(player->GetId(), strlen(player->GetId())),
-                                                                      reinterpret_cast<jobject &>(jId));
-    CHIP_ERROR hostErr = JniReferences::GetInstance().CharToStringUTF(
-        chip::CharSpan(player->GetHostName(), strlen(player->GetHostName())), reinterpret_cast<jobject &>(jHostName));
-    CHIP_ERROR deviceErr = JniReferences::GetInstance().CharToStringUTF(
-        chip::CharSpan(player->GetDeviceName(), strlen(player->GetDeviceName())), reinterpret_cast<jobject &>(jDeviceName));
-    CHIP_ERROR instanceErr = JniReferences::GetInstance().CharToStringUTF(
-        chip::CharSpan(player->GetInstanceName(), strlen(player->GetInstanceName())), reinterpret_cast<jobject &>(jInstanceName));
+    CHIP_ERROR idErr       = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(player->GetId()),
+                                                                          reinterpret_cast<jobject &>(jId));
+    CHIP_ERROR hostErr     = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(player->GetHostName()),
+                                                                          reinterpret_cast<jobject &>(jHostName));
+    CHIP_ERROR deviceErr   = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(player->GetDeviceName()),
+                                                                          reinterpret_cast<jobject &>(jDeviceName));
+    CHIP_ERROR instanceErr = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(player->GetInstanceName()),
+                                                                          reinterpret_cast<jobject &>(jInstanceName));
 
     if (idErr != CHIP_NO_ERROR || hostErr != CHIP_NO_ERROR || deviceErr != CHIP_NO_ERROR || instanceErr != CHIP_NO_ERROR)
     {
@@ -231,13 +231,32 @@ jobject convertCastingPlayerFromCppToJava(matter::casting::memory::Strong<core::
         env->ExceptionClear();
         return jMatterCastingPlayer;
     }
-    // Set the value of the _cppCastingPlayer field in the Java object to the C++ CastingPlayer pointer.
-    jfieldID longFieldId = env->GetFieldID(matterCastingPlayerJavaClass, "_cppCastingPlayer", "J");
-    env->SetLongField(jMatterCastingPlayer, longFieldId, reinterpret_cast<jlong>(player.get()));
+
+    jmethodID setNativeCastingPlayerId = env->GetMethodID(matterCastingPlayerJavaClass, "setNativeCastingPlayer", "(J)V");
+    VerifyOrReturnValue(
+        setNativeCastingPlayerId != nullptr, nullptr,
+        ChipLogError(AppServer, "convertCastingPlayerFromCppToJava() could not get setNativeCastingPlayer method ID"));
+
+    // Store a heap-allocated handle containing a weak_ptr so the Java long field never
+    // holds a dangling raw pointer if the C++ CastingPlayer is destroyed.
+    // Note: Each call allocates a new CastingPlayerHandle. During discovery, repeated callbacks
+    // for the same player create short-lived wrappers collected by GC after stopDiscovery().
+    // A CastingPlayer* -> Java GlobalRef cache would avoid this but requires explicit
+    // eviction on player removal; not warranted at home-network scale.
+    auto handle = std::unique_ptr<CastingPlayerHandle>(new CastingPlayerHandle{ player });
+    env->CallVoidMethod(jMatterCastingPlayer, setNativeCastingPlayerId, reinterpret_cast<jlong>(handle.get()));
+    if (env->ExceptionCheck())
+    {
+        ChipLogError(AppServer, "convertCastingPlayerFromCppToJava() setNativeCastingPlayer threw");
+        env->ExceptionClear();
+        return jMatterCastingPlayer; // unique_ptr destructor frees the handle
+    }
+    handle.release();
+
     return jMatterCastingPlayer;
 }
 
-core::CastingPlayer * convertCastingPlayerFromJavaToCpp(jobject jCastingPlayerObject)
+matter::casting::memory::Strong<core::CastingPlayer> convertCastingPlayerFromJavaToCpp(jobject jCastingPlayerObject)
 {
     ChipLogProgress(AppServer, "convertCastingPlayerFromJavaToCpp() called");
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -254,8 +273,13 @@ core::CastingPlayer * convertCastingPlayerFromJavaToCpp(jobject jCastingPlayerOb
     jfieldID _cppCastingPlayerFieldId = env->GetFieldID(castingPlayerClass, "_cppCastingPlayer", "J");
     VerifyOrReturnValue(_cppCastingPlayerFieldId != nullptr, nullptr,
                         ChipLogError(AppServer, "convertCastingPlayerFromJavaToCpp _cppCastingPlayerFieldId == nullptr"));
-    jlong _cppCastingPlayerValue = env->GetLongField(jCastingPlayerObject, _cppCastingPlayerFieldId);
-    return reinterpret_cast<core::CastingPlayer *>(_cppCastingPlayerValue);
+    auto * handle = reinterpret_cast<CastingPlayerHandle *>(env->GetLongField(jCastingPlayerObject, _cppCastingPlayerFieldId));
+    VerifyOrReturnValue(handle != nullptr, nullptr,
+                        ChipLogError(AppServer, "convertCastingPlayerFromJavaToCpp() handle == nullptr"));
+    auto player = handle->player.lock();
+    VerifyOrReturnValue(player != nullptr, nullptr,
+                        ChipLogError(AppServer, "convertCastingPlayerFromJavaToCpp() CastingPlayer no longer exists"));
+    return player;
 }
 
 jobject convertClusterFromCppToJava(matter::casting::memory::Strong<core::BaseCluster> cluster, const char * className)

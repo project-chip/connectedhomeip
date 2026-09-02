@@ -36,6 +36,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, supportedFormats);
     case Attributes::CurrentConnections::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, currentConnections);
+    case Attributes::MaxZones::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, maxZones);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

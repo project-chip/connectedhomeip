@@ -86,7 +86,6 @@
         "joint-fabric-datastore-cluster.xml",
         "joint-fabric-administrator-cluster.xml",
         "keypad-input-cluster.xml",
-        "laundry-washer-controls-cluster.xml",
         "laundry-washer-mode-cluster.xml",
         "laundry-dryer-controls-cluster.xml",
         "level-control-cluster.xml",
@@ -285,7 +284,8 @@
             "Currency",
             "CurrentPrice",
             "PriceForecast",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Commodity Tariff": [
             "TariffInfo",
@@ -434,6 +434,11 @@
             "MeasuredValue"
         ],
         "Joint Fabric Datastore": ["Status"],
+        "Laundry Dryer Controls": [
+            "ClusterRevision",
+            "SelectedDrynessLevel",
+            "FeatureMap"
+        ],
         "Laundry Washer Controls": [
             "ClusterRevision",
             "SpinSpeeds",
@@ -629,8 +634,16 @@
             "SupportedTemperatureLevels",
             "ClusterRevision"
         ],
+        "Dishwasher Alarm": ["ClusterRevision"],
         "Dishwasher Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "Mode Select": [
+            "ClusterRevision",
+            "SupportedModes",
+            "CurrentMode",
+            "StartUpMode",
+            "OnMode"
+        ],
         "Microwave Oven Control": [
             "CookTime",
             "MaxCookTime",
@@ -646,6 +659,7 @@
         ],
         "Laundry Washer Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "Refrigerator Alarm": ["ClusterRevision"],
         "Refrigerator And Temperature Controlled Cabinet Mode": [
             "SupportedModes",
             "CurrentMode",
@@ -886,6 +900,11 @@
             "PowerFactor",
             "NeutralCurrent",
             "FeatureMap"
+        ],
+        "Energy Preference": [
+            "ClusterRevision",
+            "CurrentEnergyBalance",
+            "CurrentLowPowerModeSensitivity"
         ],
         "Power Topology": ["FeatureMap"],
         "Power Source": [
