@@ -150,10 +150,8 @@ class TC_PWRTL_2_2(MatterBaseTest):
         self._assert_nodes_equal(after_over_label, entries_label_max,
                                  'after the rejected 129-character Label write')
 
-        self.step(8, "Open a commissioning window on DUT and commission DUT to the TH2 fabric. As TH2, TH reads "
-                     "ElectricalCircuitNodes",
-                  expectation="Verify DUT responds w/ status SUCCESS(0x00) with an empty list, or with only the TH2 "
-                  "entries. The attribute is Fabric-Scoped (F), so the TH1 entries are not visible to TH2.")
+        self.step(8, "TH1 puts DUT into commissioning mode, TH2 commissions DUT",
+                  expectation="DUT is commissioned on the TH2 fabric.")
         th1 = self.default_controller
         discriminator = random.randint(0, 4095)
         params = await th1.OpenCommissioningWindow(
@@ -164,13 +162,17 @@ class TC_PWRTL_2_2(MatterBaseTest):
         await th2.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
+
+        self.step(9, "As TH2, TH reads ElectricalCircuitNodes",
+                  expectation="Verify DUT responds w/ status SUCCESS(0x00) with an empty list, or with only the TH2 "
+                  "entries. The attribute is Fabric-Scoped (F), so the TH1 entries are not visible to TH2.")
         th2_view = await self.read_single_attribute_check_success(
             dev_ctrl=th2, endpoint=endpoint, cluster=cluster, attribute=attr)
         asserts.assert_equal(th2_view, [],
                              'A Fabric-Scoped attribute must not expose the TH1 entries to TH2')
 
-        self.step(9, "As TH2, TH writes ElectricalCircuitNodes with one CircuitNodeStruct entry, then as TH1 reads the "
-                     "attribute",
+        self.step(10, "As TH2, TH writes ElectricalCircuitNodes with one CircuitNodeStruct entry, then as TH1 reads "
+                      "the attribute",
                   expectation="The TH2 write returns SUCCESS. The TH1 read returns only the TH1 entries, with the TH2 "
                   "entry not visible, confirming per-fabric isolation.")
         # write_single_attribute always writes as the default controller, so the TH2 write goes
@@ -182,7 +184,7 @@ class TC_PWRTL_2_2(MatterBaseTest):
             endpoint=endpoint, cluster=cluster, attribute=attr)
         self._assert_nodes_equal(th1_view, entries_label_max, 'TH1 view after the TH2 write')
 
-        self.step(10, "As TH1 and as TH2, establish a subscription to ElectricalCircuitNodes on the test endpoint",
+        self.step(11, "As TH1 and as TH2, establish a subscription to ElectricalCircuitNodes on the test endpoint",
                   expectation="Both subscriptions are established successfully; TH awaits a subscription report on "
                   "each, carrying that fabric's own list value.")
         # fabric_filtered defaults to False on the handler, which would surface the other fabric's
@@ -201,7 +203,7 @@ class TC_PWRTL_2_2(MatterBaseTest):
         self._assert_nodes_equal(th2_subscription.GetAttributes()[endpoint][cluster][attr], th2_entries,
                                  'TH2 priming report')
 
-        self.step(11, "As TH2, TH writes ElectricalCircuitNodes with a new valid list of 2 entries",
+        self.step(12, "As TH2, TH writes ElectricalCircuitNodes with a new valid list of 2 entries",
                   expectation="Write returns SUCCESS; TH awaits a subscription report on TH2's subscription "
                   "reflecting the updated list. TH1 is also reported to, since dirtiness is per attribute path "
                   "and not per fabric, but its report still carries only its own entries.")
@@ -224,7 +226,6 @@ class TC_PWRTL_2_2(MatterBaseTest):
         finally:
             th1_reports.cancel()
             th2_reports.cancel()
-
 
 if __name__ == "__main__":
     default_matter_test_main()
