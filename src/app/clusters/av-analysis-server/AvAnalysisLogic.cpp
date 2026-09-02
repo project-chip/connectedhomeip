@@ -78,6 +78,9 @@ CHIP_ERROR AvAnalysisServerLogic::Startup(AttributePersistenceProvider & aAttrib
     {
         VerifyOrReturnError(mMaxAnalysisStreamCount > 0, CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(Zcl, "AvAnalysis: MaxAnalysisStreamCount must be non-zero with Remote Detection"));
+
+        VerifyOrReturnError(mCameraClient != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                            ChipLogError(Zcl, "AvAnalysis: a camera client is required with Remote Detection"));
         if (mStreamTable.Capacity() == 0)
         {
             ReturnErrorOnFailure(mStreamTable.Init(mMaxAnalysisStreamCount));

@@ -25,6 +25,7 @@
 #include <app/clusters/av-analysis-server/AvAnalysisCameraInteraction.h>
 #include <app/clusters/av-analysis-server/AvAnalysisStorage.h>
 #include <app/clusters/av-analysis-server/AvAnalysisStreamTable.h>
+#include <app/clusters/av-analysis-server/AvAnalysisWebRTCClient.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/persistence/AttributePersistenceProvider.h>
@@ -80,6 +81,12 @@ public:
      * streams on the camera (not used with LocalContextDetection).
      */
     void SetCameraClient(AvAnalysisCameraClient * aCameraClient) { mCameraClient = aCameraClient; }
+
+    /**
+     * Sets the WebRTC client used by a RemoteContextDetection instance to initiate/end the WebRTC
+     * sessions carrying analysis streams (not used with LocalContextDetection).
+     */
+    void SetWebRTCClient(AvAnalysisWebRTCClient * aWebRTCClient) { mWebRTCClient = aWebRTCClient; }
 
     void OnVideoStreamAllocated(Protocols::InteractionModel::Status aStatus, uint16_t aVideoStreamId) override;
     void OnVideoStreamDeallocated(Protocols::InteractionModel::Status aStatus, uint16_t aVideoStreamId) override;
@@ -165,6 +172,7 @@ public:
 private:
     AvAnalysisDelegate * mDelegate                               = nullptr;
     AvAnalysisCameraClient * mCameraClient                       = nullptr;
+    AvAnalysisWebRTCClient * mWebRTCClient                       = nullptr;
     AttributePersistenceProvider * mAttributePersistenceProvider = nullptr;
     uint16_t mNextAnalysisSessionID                              = 0;
     std::vector<AvAnalysis::ActiveAmbientContextSession> mActiveSessions;
