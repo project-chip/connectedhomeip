@@ -510,7 +510,8 @@
             "CommissionedFabrics",
             "CurrentFabricIndex",
             "FeatureMap",
-            "ClusterRevision"
+            "ClusterRevision",
+            "PQCDeviceAttestationProfile"
         ],
         "OTA Software Update Requestor": [
             "UpdatePossible",
