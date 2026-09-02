@@ -15,12 +15,12 @@ feature set and differ by whether they also do content launching and whether
 they act as a **commissioner** (the "casting" role) versus a plain
 **commissionable node** (the "basic"/"streaming" role):
 
-| Device type            | ID       | Rev | Role               | Minimum feature set                                     |
-| ---------------------- | -------- | --- | ------------------ | ------------------------------------------------------- |
-| Basic Video Player     | `0x0028` | 2   | Commissionable     | Media playback + keypad (On/Off, Media Playback, Keypad Input) |
-| Casting Video Player   | `0x0023` | 2   | Commissioner       | Basic Video Player + content launch (Content Launcher)  |
-| Streaming Audio Player | `0x0020` | 1   | Commissionable     | Media playback + content launch (Media Playback, Content Launcher) |
-| Casting Audio Player   | `0x0021` | 1   | Commissioner       | Streaming Audio Player + commissioning                  |
+| Device type            | ID       | Rev | Role           | Minimum feature set                                                |
+| ---------------------- | -------- | --- | -------------- | ------------------------------------------------------------------ |
+| Basic Video Player     | `0x0028` | 2   | Commissionable | Media playback + keypad (On/Off, Media Playback, Keypad Input)     |
+| Casting Video Player   | `0x0023` | 2   | Commissioner   | Basic Video Player + content launch (Content Launcher)             |
+| Streaming Audio Player | `0x0020` | 1   | Commissionable | Media playback + content launch (Media Playback, Content Launcher) |
+| Casting Audio Player   | `0x0021` | 1   | Commissioner   | Streaming Audio Player + commissioning                             |
 
 The authoritative cluster requirements are in the spec Device Library
 (`device_types/{BasicVideoPlayer,CastingVideoPlayer,StreamingAudioPlayer,CastingAudioPlayer}`)
@@ -35,8 +35,8 @@ satisfies the mandatory cluster set of all four types.
 The device type is expressed in **two independent places**:
 
 1. The **declared** device type — endpoint 1's `deviceType` in
-   [tv-common/tv-app.matter](tv-common/tv-app.matter) / `tv-app.zap`, surfaced at
-   runtime through the Descriptor cluster `DeviceTypeList`. This is what a
+   [tv-common/tv-app.matter](tv-common/tv-app.matter) / `tv-app.zap`, surfaced
+   at runtime through the Descriptor cluster `DeviceTypeList`. This is what a
    controller reads to learn what the device is, and what certification checks.
 2. The **advertised** device type — the compile-time
    `CHIP_DEVICE_CONFIG_DEVICE_TYPE` in
@@ -70,7 +70,7 @@ Accepted values: `casting-video` (default), `basic-video`, `casting-audio`,
     discovery by device-type subtype see the selected type. The override is not
     persisted across reboots.
 
-Together these are enough to have the device *advertise as, declare itself as,*
+Together these are enough to have the device _advertise as, declare itself as,_
 and be tested as any of the four types, because endpoint 1 already exposes the
 superset of clusters described above.
 
@@ -82,8 +82,8 @@ superset of clusters described above.
     `basic-video` or `streaming-audio` declares the commissionable-only type but
     does not disable the commissioner stack; the app still behaves as a
     commissioner.
--   The **cluster set**. No clusters are added or removed; the endpoint keeps its
-    superset.
+-   The **cluster set**. No clusters are added or removed; the endpoint keeps
+    its superset.
 
 So the runtime flag is intended for exercising controllers, discovery, and the
 advertised/declared device type against each type — not for producing a
