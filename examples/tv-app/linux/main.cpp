@@ -31,13 +31,16 @@
 #include <app/app-platform/ContentAppPlatform.h>
 #include <app/clusters/media-file-management-server/CodegenIntegration.h>
 #include <app/server/Server.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
+#include <lib/support/CHIPArgParser.hpp>
 #include <protocols/Protocols.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #include <controller/CHIPDeviceController.h> // nogncheck
 #endif                                       // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
+#include <cstring>
 #include <optional>
 
 #if defined(ENABLE_CHIP_SHELL)
@@ -78,6 +81,85 @@ std::optional<MediaFileManagement::MediaFileManagementServer> gMediaFileManageme
 std::optional<MediaFileManagement::MediaFileManagementBdxProvider> gMediaFileManagementBdxProvider;
 std::optional<MediaFileManagement::MediaFileManagementBdxRequestor> gMediaFileManagementBdxRequestor;
 std::optional<MediaFileManagement::MediaFileManagementBdxCoordinator> gMediaFileManagementBdxCoordinator;
+
+// ---------------------------------------------------------------------------
+// --device-type flag: choose which media device type endpoint 1 presents as.
+//
+// tv-app is built as a Casting Video Player (0x0023) in tv-app.zap, but
+// endpoint 1 hosts a superset of clusters that also satisfies the mandatory set
+// of the other three media player device types. This flag rewrites endpoint 1's
+// Descriptor DeviceTypeList at boot so the app can be exercised as any of the
+// four without a rebuild. See examples/tv-app/README.md.
+//
+// NOTE: this changes only the *declared* device type (Descriptor cluster). The
+// DNS-SD "_T<id>" commissioning subtype is derived from the compile-time
+// CHIP_DEVICE_CONFIG_DEVICE_TYPE and requires a rebuild (or the build-time
+// variant documented in the README) to change.
+constexpr EndpointId kVideoPlayerEndpointId = 1;
+
+struct MediaDeviceTypeOption
+{
+    const char * name;
+    EmberAfDeviceType deviceType; // { deviceTypeId, deviceTypeRevision }
+};
+
+// Revisions match the current Device Library (video players, revision 2) and the
+// streaming-casting-speakers spec additions (audio players, revision 1).
+constexpr MediaDeviceTypeOption kMediaDeviceTypes[] = {
+    { "casting-video", { 0x0023, 2 } },   // Casting Video Player (tv-app.zap default)
+    { "basic-video", { 0x0028, 2 } },     // Basic Video Player
+    { "casting-audio", { 0x0021, 1 } },   // Casting Audio Player
+    { "streaming-audio", { 0x0020, 1 } }, // Streaming Audio Player
+};
+
+// Backing storage for the runtime override; emberAfSetDeviceTypeList stores the
+// span (not a copy), so this must outlive the endpoint - hence file scope.
+EmberAfDeviceType gMediaDeviceTypeList[1];
+bool gMediaDeviceTypeOverridden = false;
+
+constexpr uint16_t kOptionDeviceType = 0xffe0;
+
+bool TvAppOptionHandler(const char * program, chip::ArgParser::OptionSet * options, int identifier, const char * name,
+                        const char * value)
+{
+    if (identifier != kOptionDeviceType)
+    {
+        ChipLogError(DeviceLayer, "%s: INTERNAL ERROR: Unhandled option: %s", program, name);
+        return false;
+    }
+
+    for (const MediaDeviceTypeOption & option : kMediaDeviceTypes)
+    {
+        if (strcmp(value, option.name) == 0)
+        {
+            gMediaDeviceTypeList[0]    = option.deviceType;
+            gMediaDeviceTypeOverridden = true;
+            ChipLogProgress(DeviceLayer, "TV Linux App: endpoint 1 device type selected: %s (0x%04X revision %u)", option.name,
+                            static_cast<unsigned>(option.deviceType.deviceTypeId), option.deviceType.deviceTypeRevision);
+            return true;
+        }
+    }
+
+    ChipLogError(DeviceLayer, "%s: unknown --device-type '%s' (expected casting-video|basic-video|casting-audio|streaming-audio)",
+                 program, value);
+    return false;
+}
+
+chip::ArgParser::OptionDef sTvAppOptionDefs[] = {
+    { "device-type", chip::ArgParser::kArgumentRequired, kOptionDeviceType },
+    { nullptr },
+};
+
+chip::ArgParser::OptionSet sTvAppOptions = {
+    TvAppOptionHandler,
+    sTvAppOptionDefs,
+    "TV APP OPTIONS",
+    "  --device-type <casting-video|basic-video|casting-audio|streaming-audio>\n"
+    "       Declare endpoint 1 as the given media device type (Descriptor cluster\n"
+    "       DeviceTypeList). Defaults to casting-video, as built into tv-app.zap.\n"
+    "       Only the declared type changes; the DNS-SD _T advertising subtype still\n"
+    "       reflects the compile-time device type. See examples/tv-app/README.md.\n",
+};
 
 } // namespace
 
@@ -168,6 +250,24 @@ void ApplicationInit()
     constexpr uint16_t kApp5ProductId = 1;
     factory->InstallContentApp(kApp5VendorId, kApp5ProductId);
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
+    // Apply the --device-type override (if any) to endpoint 1's declared device
+    // type. Done here, after the server has populated the endpoint table.
+    if (gMediaDeviceTypeOverridden)
+    {
+        CHIP_ERROR err2 = emberAfSetDeviceTypeList(kVideoPlayerEndpointId, Span<const EmberAfDeviceType>(gMediaDeviceTypeList, 1));
+        if (err2 != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "TV Linux App: failed to set endpoint 1 device type: %" CHIP_ERROR_FORMAT, err2.Format());
+        }
+        else
+        {
+            ChipLogProgress(Zcl,
+                            "TV Linux App: endpoint 1 now declares device type 0x%04X. The DNS-SD _T subtype still advertises "
+                            "the compile-time device type %d; rebuild to change advertising.",
+                            static_cast<unsigned>(gMediaDeviceTypeList[0].deviceTypeId), CHIP_DEVICE_CONFIG_DEVICE_TYPE);
+        }
+    }
 }
 
 void ApplicationShutdown()
@@ -203,7 +303,7 @@ void ApplicationShutdown()
 int main(int argc, char * argv[])
 {
 
-    VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+    VerifyOrDie(ChipLinuxAppInit(argc, argv, &sTvAppOptions) == 0);
 
     TEMPORARY_RETURN_IGNORED AppTvInit();
 
