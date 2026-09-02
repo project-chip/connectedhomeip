@@ -65,6 +65,7 @@ namespace {
 unsigned metadataStructureGeneration = 0;
 DataVersion dataVersion              = 0;
 const MockNodeConfig * mockConfig    = nullptr;
+const Access::SubjectDescriptor * gCurrentSubjectDescriptor = nullptr;
 
 const MockNodeConfig & DefaultMockNodeConfig()
 {
@@ -262,6 +263,16 @@ CHIP_ERROR emberAfGetEndpointUniqueIdForEndPoint(EndpointId endpoint, MutableCha
 
 namespace chip {
 namespace app {
+
+const Access::SubjectDescriptor * GetCurrentSubjectDescriptor()
+{
+    return gCurrentSubjectDescriptor;
+}
+
+void SetCurrentSubjectDescriptor(const Access::SubjectDescriptor * subjectDescriptor)
+{
+    gCurrentSubjectDescriptor = subjectDescriptor;
+}
 
 EndpointComposition GetCompositionForEndpointIndex(uint16_t endpointIndex)
 {

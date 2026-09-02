@@ -24,6 +24,12 @@
 #include <app/util/endpoint-config-defines.h>
 #include <lib/support/CodeUtils.h>
 
+namespace chip {
+namespace Access {
+struct SubjectDescriptor;
+} // namespace Access
+} // namespace chip
+
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-objects.h>
 
@@ -441,6 +447,32 @@ enum class EndpointComposition : uint8_t
  * @brief Returns the composition for a given endpoint index
  */
 EndpointComposition GetCompositionForEndpointIndex(uint16_t index);
+
+/**
+ * @brief Gets the SubjectDescriptor associated with the current attribute read.
+ *
+ * This can be used by external attribute read callbacks to identify the
+ * subject associated with the current read request.
+ *
+ * The returned pointer is only valid for the duration of the current
+ * synchronous attribute read and must not be retained after the callback
+ * returns.
+ *
+ * @return A pointer to the current SubjectDescriptor, or nullptr if no
+ *         attribute read is currently being processed.
+ */
+const Access::SubjectDescriptor * GetCurrentSubjectDescriptor();
+
+/**
+ * @brief Sets the SubjectDescriptor associated with the current attribute read.
+ *
+ * This is an internal API used by the data model provider while processing
+ * an attribute read.
+ *
+ * @param[in] subjectDescriptor The SubjectDescriptor associated with the
+ *                              current attribute read.
+ */
+void SetCurrentSubjectDescriptor(const Access::SubjectDescriptor * subjectDescriptor);
 
 } // namespace app
 } // namespace chip
