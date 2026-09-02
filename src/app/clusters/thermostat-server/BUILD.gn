@@ -57,7 +57,7 @@ source_set("thermostat-server") {
     "ThermostatDelegate.cpp",
     "ThermostatDelegate.h",
     "ThermostatSuggestionStructWithOwnedMembers.cpp",
-    "ThermostatSuggestionStructWithOwnedMembers.h"
+    "ThermostatSuggestionStructWithOwnedMembers.h",
   ]
 
   public_deps = [
