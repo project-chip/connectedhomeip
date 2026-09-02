@@ -21,6 +21,7 @@ chip_test_suite("tests") {
   test_sources = [
     "TestThermostatAtomicAndPresets.cpp",
     "TestThermostatCluster.cpp",
+    "TestThermostatSensors.cpp",
     "TestThermostatSetpoints.cpp",
     "TestThermostatSuggestionsAndHold.cpp",
   ]
