@@ -65,6 +65,23 @@ LockGuard::~LockGuard()
     }
 }
 
+#ifdef CONFIG_CHIP_MALLOC_SYS_HEAP_DEBUG
+// Suppress recursive heap debug logs on the same thread when logging allocates.
+class HeapDebugLogGuard
+{
+public:
+    HeapDebugLogGuard() : mLogging(!sInHeapLog) { if (mLogging) { sInHeapLog = true; } }
+    ~HeapDebugLogGuard() { if (mLogging) { sInHeapLog = false; } }
+    explicit operator bool() const { return mLogging; }
+
+private:
+    static thread_local bool sInHeapLog;
+    const bool mLogging;
+};
+
+thread_local bool HeapDebugLogGuard::sInHeapLog = false;
+#endif // CONFIG_CHIP_MALLOC_SYS_HEAP_DEBUG
+
 int InitSysHeapMalloc()
 {
     sys_heap_init(&sHeap, sHeapMemory, sizeof(sHeapMemory));
@@ -83,17 +100,16 @@ namespace Malloc {
 
 void * Malloc(size_t size)
 {
-    LockGuard lockGuard;
-
-    void * const mem = lockGuard.Locked() ? sys_heap_aligned_alloc(&sHeap, kMallocAlignment, size) : nullptr;
+    void * mem;
+    {
+        LockGuard lockGuard;
+        mem = lockGuard.Locked() ? sys_heap_aligned_alloc(&sHeap, kMallocAlignment, size) : nullptr;
+    }
 
 #ifdef CONFIG_CHIP_MALLOC_SYS_HEAP_DEBUG
-    static bool sInMallocLog = false;
-    if (!sInMallocLog)
+    if (HeapDebugLogGuard guard; guard)
     {
-        sInMallocLog = true;
         ChipLogProgress(DeviceLayer, "Malloc(%zu) = %p, caller: %p", size, mem, __builtin_return_address(0));
-        sInMallocLog = false;
     }
 #endif
 
@@ -121,12 +137,17 @@ void * Calloc(size_t num, size_t size)
 
 void * Realloc(void * mem, size_t size)
 {
-    LockGuard lockGuard;
-
-    void * const new_mem = lockGuard.Locked() ? sys_heap_aligned_realloc(&sHeap, mem, kMallocAlignment, size) : nullptr;
+    void * new_mem;
+    {
+        LockGuard lockGuard;
+        new_mem = lockGuard.Locked() ? sys_heap_aligned_realloc(&sHeap, mem, kMallocAlignment, size) : nullptr;
+    }
 
 #ifdef CONFIG_CHIP_MALLOC_SYS_HEAP_DEBUG
-    ChipLogProgress(DeviceLayer, "Realloc(%p, %zu) = %p, caller: %p", mem, size, new_mem, __builtin_return_address(0));
+    if (HeapDebugLogGuard guard; guard)
+    {
+        ChipLogProgress(DeviceLayer, "Realloc(%p, %zu) = %p, caller: %p", mem, size, new_mem, __builtin_return_address(0));
+    }
 #endif
 
     return new_mem;
@@ -134,13 +155,17 @@ void * Realloc(void * mem, size_t size)
 
 void Free(void * mem)
 {
-    LockGuard lockGuard;
-
-    VerifyOrReturn(lockGuard.Locked());
-    sys_heap_free(&sHeap, mem);
+    {
+        LockGuard lockGuard;
+        VerifyOrReturn(lockGuard.Locked());
+        sys_heap_free(&sHeap, mem);
+    }
 
 #ifdef CONFIG_CHIP_MALLOC_SYS_HEAP_DEBUG
-    ChipLogProgress(DeviceLayer, "Free(%p), caller: %p", mem, __builtin_return_address(0));
+    if (HeapDebugLogGuard guard; guard)
+    {
+        ChipLogProgress(DeviceLayer, "Free(%p), caller: %p", mem, __builtin_return_address(0));
+    }
 #endif
 }
 
