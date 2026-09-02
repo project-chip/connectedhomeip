@@ -65,17 +65,23 @@ jobs:
             - name: Setup Build
               # all_features bundles ICD, ARL and rotating-device-id (with clang/asan/boringssl) into one matrix row
               run: |
+                  GN_ARGS=""
+                  BUILD_TARGET=""
                   case $BUILD_TYPE in
                      "main") GN_ARGS='chip_build_all_platform_tests=true';;
                      "mbedtls") GN_ARGS='chip_crypto="mbedtls" chip_build_all_platform_tests=true';;
                      "all_features") GN_ARGS='is_clang=true is_asan=true chip_crypto="boringssl" chip_enable_rotating_device_id=true chip_enable_icd_server=true chip_enable_icd_lit=true chip_enable_access_restrictions=true chip_build_all_platform_tests=true';;
-                     "release") GN_ARGS='is_clang=true is_debug=false enable_icf=true chip_crypto="boringssl" chip_enable_rotating_device_id=true chip_enable_icd_server=true chip_enable_icd_lit=true chip_enable_access_restrictions=true chip_build_all_platform_tests=true';;
+                     "release")
+                         GN_ARGS='is_clang=true is_debug=false enable_icf=true chip_crypto="boringssl" chip_enable_rotating_device_id=true chip_enable_icd_server=true chip_enable_icd_lit=true chip_enable_access_restrictions=true chip_build_all_platform_tests=true'
+                         BUILD_TARGET="check"
+                         ;;
                      *) ;;
                   esac
 
+                  echo "BUILD_TARGET=$BUILD_TARGET" >> "$GITHUB_ENV"
                   scripts/build/gn_gen.sh --args="$GN_ARGS"
             - name: Run Build
-              run: scripts/run_in_build_env.sh "ninja -C out/$BUILD_TYPE"
+              run: scripts/run_in_build_env.sh "ninja -C out/$BUILD_TYPE $BUILD_TARGET"
             - name: Run Tests
               run: scripts/tests/gn_tests.sh
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
