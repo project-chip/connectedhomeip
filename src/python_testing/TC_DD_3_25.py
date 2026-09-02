@@ -116,7 +116,7 @@ class TC_DD_3_25(MatterTestCommissioner):
             commissionee = await self.default_controller.FindOrEstablishPASESession(
                 setupCode=nfc_tag_data, nodeId=self.dut_node_id
             )
-        except ChipStackError as e: # chipstack-ok
+        except ChipStackError as e:  # chipstack-ok
             asserts.fail(f"PASE session establishment over NFC failed: {e}")
         asserts.assert_is_not_none(commissionee, "Failed to find or establish PASE session over NFC")
 
@@ -132,7 +132,7 @@ class TC_DD_3_25(MatterTestCommissioner):
         )
         fail_safe_armed_at = time.monotonic()
 
-        # Step 4: Poll a Read Request until the Fail-Safe expires and the DUT tears down the PASE session, 
+        # Step 4: Poll a Read Request until the Fail-Safe expires and the DUT tears down the PASE session,
         # at which point the Read Request is expected to fail with a TIMEOUT error.
         self.step(4)
 
@@ -151,7 +151,7 @@ class TC_DD_3_25(MatterTestCommissioner):
             try:
                 await self.default_controller.ReadAttribute(nodeId=self.dut_node_id, attributes=[(0, breadcrumb_attr)])
                 log.info("Read Request succeeded at t=%.2fs", elapsed)
-            except ChipStackError as e: # chipstack-ok
+            except ChipStackError as e:  # chipstack-ok
                 failure_seen = True
                 failure_err = e
                 elapsed_at_failure = time.monotonic() - fail_safe_armed_at
