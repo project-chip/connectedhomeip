@@ -2661,6 +2661,49 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::OperationalCredentials
     ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
+CHIP_ERROR ComplexArgumentParser::Setup(
+    const char * label, chip::app::Clusters::OperationalCredentials::Structs::PQCDeviceAttestationProfileStruct::Type & request,
+    Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PQCDeviceAttestationProfileStruct.PAASupportedProfiles",
+                                                                  "PAASupportedProfiles", value.isMember("PAASupportedProfiles")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PQCDeviceAttestationProfileStruct.PAISupportedProfiles",
+                                                                  "PAISupportedProfiles", value.isMember("PAISupportedProfiles")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PQCDeviceAttestationProfileStruct.DACSupportedProfiles",
+                                                                  "DACSupportedProfiles", value.isMember("DACSupportedProfiles")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "PAASupportedProfiles");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.PAASupportedProfiles, value["PAASupportedProfiles"]));
+    valueCopy.removeMember("PAASupportedProfiles");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "PAISupportedProfiles");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.PAISupportedProfiles, value["PAISupportedProfiles"]));
+    valueCopy.removeMember("PAISupportedProfiles");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "DACSupportedProfiles");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.DACSupportedProfiles, value["DACSupportedProfiles"]));
+    valueCopy.removeMember("DACSupportedProfiles");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(
+    chip::app::Clusters::OperationalCredentials::Structs::PQCDeviceAttestationProfileStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.PAASupportedProfiles);
+    ComplexArgumentParser::Finalize(request.PAISupportedProfiles);
+    ComplexArgumentParser::Finalize(request.DACSupportedProfiles);
+}
+
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::Type & request,
                                         Json::Value & value)
