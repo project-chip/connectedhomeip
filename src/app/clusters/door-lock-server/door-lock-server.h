@@ -86,11 +86,31 @@ static constexpr size_t DOOR_LOCK_USER_NAME_BUFFER_SIZE =
 struct EmberAfPluginDoorLockCredentialInfo;
 struct EmberAfPluginDoorLockUserInfo;
 
+/**
+ * Bounds the number of ExpiringUser records this server can track a pending first-use timestamp for at
+ * once, per endpoint. Not a limit on NumberOfTotalUsersSupported -- most users are not UserType::kExpiringUser,
+ * so this only needs to cover those with a countdown actually in flight.
+ */
+static constexpr size_t kDoorLockMaxTrackedExpiringUsers = 16;
+
+/**
+ * Tracks when a UserType::kExpiringUser record was first successfully used, so HandleRemoteLockOperation
+ * can tell whether ExpiringUserTimeout has since elapsed. RAM-only, like the wrongCodeEntryAttempts/
+ * lockoutEndTimestamp state below it -- see the "Known limitation" note on HandleRemoteLockOperation.
+ */
+struct ExpiringUserFirstUseEntry
+{
+    bool valid = false;
+    uint16_t userIndex = 0;
+    chip::System::Clock::Timestamp firstUseTimestamp;
+};
+
 struct EmberAfDoorLockEndpointContext
 {
     chip::System::Clock::Timestamp lockoutEndTimestamp;
     int wrongCodeEntryAttempts;
     chip::app::Clusters::DoorLock::Delegate * delegate = nullptr;
+    ExpiringUserFirstUseEntry expiringUserFirstUse[kDoorLockMaxTrackedExpiringUsers];
 };
 
 /**
@@ -505,6 +525,21 @@ private:
     EmberAfDoorLockEndpointContext * getContext(chip::EndpointId endpointId);
 
     bool engageLockout(chip::EndpointId endpointId);
+
+    /**
+     * Implements the UserType::kExpiringUser access rule (spec 5.2.6.18.8) for a resolved user found by
+     * HandleRemoteLockOperation. Returns true if access should be granted. On first use, records the
+     * timestamp and grants access. On a later use, grants access if still within ExpiringUserTimeout
+     * minutes of that first use; once it has elapsed, denies access and persists UserStatus =
+     * OccupiedDisabled via modifyUser() so the disabled state itself survives a reboot even though the
+     * in-flight countdown does not.
+     */
+    bool checkExpiringUserAccess(chip::EndpointId endpointId, EmberAfDoorLockEndpointContext * endpointContext,
+                                 uint16_t userIndex, chip::FabricIndex creatorFabricIndex,
+                                 chip::System::Clock::Timestamp currentTime);
+
+    /** Clears any pending ExpiringUser first-use tracking for a user slot that is being freed or reused. */
+    void clearExpiringUserTracking(EmberAfDoorLockEndpointContext * endpointContext, uint16_t userIndex);
 
     static void sendClusterResponse(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                     chip::Protocols::InteractionModel::ClusterStatusCode status);

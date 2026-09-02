@@ -341,6 +341,93 @@ bool DoorLockServer::engageLockout(chip::EndpointId endpointId)
     return true;
 }
 
+void DoorLockServer::clearExpiringUserTracking(EmberAfDoorLockEndpointContext * endpointContext, uint16_t userIndex)
+{
+    for (auto & entry : endpointContext->expiringUserFirstUse)
+    {
+        if (entry.valid && entry.userIndex == userIndex)
+        {
+            entry.valid = false;
+            break;
+        }
+    }
+}
+
+bool DoorLockServer::checkExpiringUserAccess(chip::EndpointId endpointId, EmberAfDoorLockEndpointContext * endpointContext,
+                                             uint16_t userIndex, chip::FabricIndex creatorFabricIndex,
+                                             chip::System::Clock::Timestamp currentTime)
+{
+    ExpiringUserFirstUseEntry * entry       = nullptr;
+    ExpiringUserFirstUseEntry * freeSlot     = nullptr;
+    for (auto & candidate : endpointContext->expiringUserFirstUse)
+    {
+        if (candidate.valid && candidate.userIndex == userIndex)
+        {
+            entry = &candidate;
+            break;
+        }
+        if (!candidate.valid && freeSlot == nullptr)
+        {
+            freeSlot = &candidate;
+        }
+    }
+
+    if (nullptr == entry)
+    {
+        // First use: spec 5.2.6.18.8 -- the user has the ability to open the lock for ExpiringUserTimeout
+        // minutes *after the first use*, so this access itself is always granted.
+        if (nullptr != freeSlot)
+        {
+            freeSlot->valid            = true;
+            freeSlot->userIndex        = userIndex;
+            freeSlot->firstUseTimestamp = currentTime;
+        }
+        else
+        {
+            // Tracking table exhausted (kDoorLockMaxTrackedExpiringUsers concurrent countdowns already in
+            // flight) -- access still granted per spec, but this user's expiry can't be timed, so it never
+            // gets disabled until some other pending entry frees up and this user is used again.
+            ChipLogError(Zcl,
+                         "[checkExpiringUserAccess] No free slot to track first use, ExpiringUserTimeout will "
+                         "not be enforced for this user until a slot frees up [endpointId=%d,userIndex=%d]",
+                         endpointId, userIndex);
+        }
+        return true;
+    }
+
+    uint16_t expiringUserTimeoutMinutes = 0;
+    auto status = Attributes::ExpiringUserTimeout::Get(endpointId, &expiringUserTimeoutMinutes);
+    if (Status::Success != status)
+    {
+        ChipLogError(Zcl, "[checkExpiringUserAccess] Unable to read ExpiringUserTimeout attribute [status=%d]",
+                     to_underlying(status));
+        // Can't evaluate expiry without the attribute; fail open rather than lock the user out on our own error.
+        return true;
+    }
+
+    auto expiresAt = entry->firstUseTimestamp + chip::System::Clock::Seconds32(static_cast<uint32_t>(expiringUserTimeoutMinutes) * 60);
+    if (currentTime < expiresAt)
+    {
+        // Still within the window granted by the first use. Per spec this times from the *first* use, so
+        // the timestamp is not re-armed here.
+        return true;
+    }
+
+    ChipLogProgress(Zcl,
+                    "ExpiringUserTimeout elapsed, disabling user [endpointId=%d,userIndex=%d,timeoutMinutes=%d]",
+                    endpointId, userIndex, expiringUserTimeoutMinutes);
+
+    // Persist the disabled status through the same path any other UserStatus change already uses, so it
+    // survives a reboot even though the in-flight countdown itself does not (see the "Known limitation"
+    // note on HandleRemoteLockOperation).
+    modifyUser(endpointId, creatorFabricIndex, chip::kUndefinedNodeId, userIndex, NullNullable, NullNullable,
+              MakeNullable(UserStatusEnum::kOccupiedDisabled), NullNullable, NullNullable);
+
+    entry->valid = false;
+
+    return false;
+}
+
 bool DoorLockServer::GetAutoRelockTime(chip::EndpointId endpointId, uint32_t & autoRelockTime)
 {
     return GetAttribute(endpointId, Attributes::AutoRelockTime::Id, Attributes::AutoRelockTime::Get, autoRelockTime);
@@ -2017,6 +2104,15 @@ ClusterStatusCode DoorLockServer::createUser(chip::EndpointId endpointId, chip::
                     endpointId, creatorFabricIdx, userIndex, NullTerminated(newUserName).c_str(), newUserUniqueId,
                     to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule),
                     static_cast<unsigned int>(newTotalCredentials));
+
+    // This slot held Available (cleared) before this call, so no live ExpiringUser countdown should exist
+    // for it -- but a slot can be re-Added without an intervening ClearUser in some flows, so clear
+    // defensively rather than assume.
+    if (auto * endpointContext = getContext(endpointId))
+    {
+        clearExpiringUserTracking(endpointContext, userIndex);
+    }
+
     sendRemoteLockUserChange(endpointId, LockDataTypeEnum::kUserIndex, DataOperationTypeEnum::kAdd, sourceNodeId, creatorFabricIdx,
                              userIndex, userIndex);
 
@@ -2144,6 +2240,13 @@ Status DoorLockServer::clearUser(chip::EndpointId endpointId, chip::FabricIndex 
                                       nullptr, 0))
     {
         return Status::Failure;
+    }
+
+    // The slot may be reused by a different user later; don't let a stale first-use timestamp from this
+    // user leak onto whoever ends up at this index next.
+    if (auto * endpointContext = getContext(endpointId))
+    {
+        clearExpiringUserTracking(endpointContext, userIndex);
     }
 
     if (sendUserChangeEvent)
@@ -3690,6 +3793,19 @@ bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * comma
                             "Unable to perform remote lock operation: user is disabled [endpoint=%d, lock_op=%d, userIndex=%d]",
                             endpoint, to_underlying(opType), userIdx);
         });
+
+        // appclusters 5.2.6.18.8: an ExpiringUser may open the lock for ExpiringUserTimeout minutes after
+        // the first use of their credential, after which they SHALL be treated as OccupiedDisabled.
+        if (UserTypeEnum::kExpiringUser == user.userType)
+        {
+            VerifyOrExit(checkExpiringUserAccess(endpoint, endpointContext, userIdx, user.createdBy, currentTime), {
+                reason = OperationErrorEnum::kDisabledUserDenied;
+                ChipLogProgress(Zcl,
+                                "Unable to perform remote lock operation: ExpiringUser timeout elapsed "
+                                "[endpoint=%d, lock_op=%d, userIndex=%d]",
+                                endpoint, to_underlying(opType), userIdx);
+            });
+        }
     }
     else
     {
