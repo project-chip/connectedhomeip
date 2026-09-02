@@ -48,8 +48,8 @@ public:
     using TestOperationBase::Complete;
     using TestOperationBase::Start;
 
-    size_t mCancelledCount = 0;
-    size_t mFinishedCount  = 0;
+    int mCancelledCount = 0;
+    int mFinishedCount  = 0;
 
     // The `cancelled` argument of, and what IsPending() returned during, the most recent
     // OnFinished() call.
@@ -75,14 +75,14 @@ class TestCaller
 public:
     TestOperationBase::Completion mCallback{ OnCompletion, this };
 
-    size_t mCompletionCount = 0;
-    CHIP_ERROR mStatus      = CHIP_NO_ERROR;
-    int mValue              = 0;
+    int mCompletionCount = 0;
+    CHIP_ERROR mStatus   = CHIP_NO_ERROR;
+    int mValue           = 0;
 
     // Observed from within the completion handler.
     std::optional<bool> mPendingDuringCompletion;
     std::optional<bool> mRegisteredDuringCompletion;
-    std::optional<size_t> mFinishedCountDuringCompletion;
+    std::optional<int> mFinishedCountDuringCompletion;
 
     // The operation the callback was handed to, and an optional action to run reentrantly from
     // within the completion handler (cleared before it runs, so it only fires once).
@@ -133,16 +133,16 @@ TEST(CancelableOperationTest, StartAndComplete)
     operation.Start(caller.mCallback);
     EXPECT_TRUE(operation.IsPending());
     EXPECT_TRUE(caller.mCallback.IsRegistered());
-    EXPECT_EQ(caller.mCompletionCount, 0u);
+    EXPECT_EQ(caller.mCompletionCount, 0);
 
     CHIP_ERROR status = CHIP_ERROR_BUSY;
     int value         = 42;
     operation.Complete(status, value);
 
-    EXPECT_EQ(caller.mCompletionCount, 1u);
+    EXPECT_EQ(caller.mCompletionCount, 1);
     EXPECT_EQ(caller.mStatus, CHIP_ERROR_BUSY);
     EXPECT_EQ(caller.mValue, 42);
-    EXPECT_EQ(operation.mCancelledCount, 0u);
+    EXPECT_EQ(operation.mCancelledCount, 0);
     EXPECT_FALSE(operation.IsPending());
     EXPECT_FALSE(caller.mCallback.IsRegistered());
 }
@@ -175,12 +175,12 @@ TEST(CancelableOperationTest, RestartedFromWithinCompletion)
     operation.Complete(CHIP_NO_ERROR, 1);
 
     // The reentrant Start() left a second operation in flight.
-    EXPECT_EQ(caller.mCompletionCount, 1u);
+    EXPECT_EQ(caller.mCompletionCount, 1);
     EXPECT_TRUE(operation.IsPending());
     EXPECT_TRUE(caller.mCallback.IsRegistered());
 
     operation.Complete(CHIP_NO_ERROR, 2);
-    EXPECT_EQ(caller.mCompletionCount, 2u);
+    EXPECT_EQ(caller.mCompletionCount, 2);
     EXPECT_EQ(caller.mValue, 2);
     EXPECT_FALSE(operation.IsPending());
     EXPECT_FALSE(caller.mCallback.IsRegistered());
@@ -202,7 +202,7 @@ TEST(CancelableOperationTest, DestroyedFromWithinCompletion)
     operation.Start(caller.mCallback);
     operation.Complete(CHIP_NO_ERROR, 5);
 
-    EXPECT_EQ(caller.mCompletionCount, 1u);
+    EXPECT_EQ(caller.mCompletionCount, 1);
     EXPECT_EQ(caller.mValue, 5);
     EXPECT_EQ(caller.mOwnedOperation, nullptr);
     EXPECT_FALSE(caller.mCallback.IsRegistered());
@@ -217,8 +217,8 @@ TEST(CancelableOperationTest, CallerCancels)
     operation.Start(caller.mCallback);
     caller.mCallback.Cancel();
 
-    EXPECT_EQ(operation.mCancelledCount, 1u);
-    EXPECT_EQ(caller.mCompletionCount, 0u);
+    EXPECT_EQ(operation.mCancelledCount, 1);
+    EXPECT_EQ(caller.mCompletionCount, 0);
     EXPECT_FALSE(operation.IsPending());
     EXPECT_FALSE(caller.mCallback.IsRegistered());
 
@@ -241,8 +241,8 @@ TEST(CancelableOperationTest, CancellingAfterCompletionIsANoOp)
     operation.Complete(CHIP_NO_ERROR, 0);
     caller.mCallback.Cancel();
 
-    EXPECT_EQ(operation.mCancelledCount, 0u);
-    EXPECT_EQ(caller.mCompletionCount, 1u);
+    EXPECT_EQ(operation.mCancelledCount, 0);
+    EXPECT_EQ(caller.mCompletionCount, 1);
 }
 
 TEST(CancelableOperationTest, DestroyingTheCallbackCancels)
@@ -255,7 +255,7 @@ TEST(CancelableOperationTest, DestroyingTheCallbackCancels)
         EXPECT_TRUE(operation.IsPending());
     }
 
-    EXPECT_EQ(operation.mCancelledCount, 1u);
+    EXPECT_EQ(operation.mCancelledCount, 1);
     EXPECT_FALSE(operation.IsPending());
 }
 
@@ -291,7 +291,7 @@ TEST(CancelableOperationTest, DestroyedFromWithinOnFinished)
     caller.mCallback.Cancel();
     EXPECT_TRUE(destroyed);
     EXPECT_FALSE(caller.mCallback.IsRegistered());
-    EXPECT_EQ(caller.mCompletionCount, 0u);
+    EXPECT_EQ(caller.mCompletionCount, 0);
 }
 
 // Callback::Cancel() cancels interest with any previous callee, so handing an already-registered
@@ -305,15 +305,15 @@ TEST(CancelableOperationTest, StartingASecondOperationCancelsTheFirst)
     first.Start(caller.mCallback);
     second.Start(caller.mCallback);
 
-    EXPECT_EQ(first.mCancelledCount, 1u);
+    EXPECT_EQ(first.mCancelledCount, 1);
     EXPECT_FALSE(first.IsPending());
-    EXPECT_EQ(second.mCancelledCount, 0u);
+    EXPECT_EQ(second.mCancelledCount, 0);
     EXPECT_TRUE(second.IsPending());
     EXPECT_TRUE(caller.mCallback.IsRegistered());
 
     caller.mOperation = &second;
     second.Complete(CHIP_NO_ERROR, 7);
-    EXPECT_EQ(caller.mCompletionCount, 1u);
+    EXPECT_EQ(caller.mCompletionCount, 1);
     EXPECT_EQ(caller.mValue, 7);
 }
 
@@ -329,15 +329,15 @@ TEST(CancelableOperationTest, RestartingWithTheSameCallbackCancelsTheInFlightOpe
     operation.Start(caller.mCallback);
     operation.Start(caller.mCallback);
 
-    EXPECT_EQ(operation.mCancelledCount, 1u);
-    EXPECT_EQ(caller.mCompletionCount, 0u);
+    EXPECT_EQ(operation.mCancelledCount, 1);
+    EXPECT_EQ(caller.mCompletionCount, 0);
     EXPECT_TRUE(operation.IsPending());
     EXPECT_TRUE(caller.mCallback.IsRegistered());
 
     operation.Complete(CHIP_NO_ERROR, 9);
-    EXPECT_EQ(caller.mCompletionCount, 1u);
+    EXPECT_EQ(caller.mCompletionCount, 1);
     EXPECT_EQ(caller.mValue, 9);
-    EXPECT_EQ(operation.mCancelledCount, 1u);
+    EXPECT_EQ(operation.mCancelledCount, 1);
 }
 
 // A callee that rejects the call outright drops the Owned token instead of starting. The callback
@@ -353,8 +353,8 @@ TEST(CancelableOperationTest, RejectingWithoutStarting)
     operation.Start(caller.mCallback);
     EXPECT_EQ(reject(caller.mCallback), CHIP_ERROR_INCORRECT_STATE);
 
-    EXPECT_EQ(operation.mCancelledCount, 1u);
-    EXPECT_EQ(caller.mCompletionCount, 0u);
+    EXPECT_EQ(operation.mCancelledCount, 1);
+    EXPECT_EQ(caller.mCompletionCount, 0);
     EXPECT_FALSE(operation.IsPending());
     EXPECT_FALSE(caller.mCallback.IsRegistered());
 }
@@ -372,10 +372,10 @@ TEST(CancelableOperationTest, SequentialOperationsReuseTheSameInstance)
     operation.Start(caller.mCallback);
     operation.Complete(CHIP_ERROR_TIMEOUT, 3);
 
-    EXPECT_EQ(caller.mCompletionCount, 2u);
+    EXPECT_EQ(caller.mCompletionCount, 2);
     EXPECT_EQ(caller.mStatus, CHIP_ERROR_TIMEOUT);
     EXPECT_EQ(caller.mValue, 3);
-    EXPECT_EQ(operation.mCancelledCount, 1u);
+    EXPECT_EQ(operation.mCancelledCount, 1);
     EXPECT_FALSE(operation.IsPending());
     EXPECT_FALSE(caller.mCallback.IsRegistered());
 }
@@ -437,7 +437,7 @@ TEST(CancelableOperationTest, TypedCompletionOverACustomOperationBase)
 {
     struct Recorder
     {
-        size_t count      = 0;
+        int count         = 0;
         CHIP_ERROR status = CHIP_NO_ERROR;
 
         static void OnCompletion(void * context, CHIP_ERROR status)
@@ -460,7 +460,7 @@ TEST(CancelableOperationTest, TypedCompletionOverACustomOperationBase)
     EXPECT_EQ(*operation.mWork, 1);
 
     operation.Complete(CHIP_ERROR_CANCELLED);
-    EXPECT_EQ(recorder.count, 1u);
+    EXPECT_EQ(recorder.count, 1);
     EXPECT_EQ(recorder.status, CHIP_ERROR_CANCELLED);
     EXPECT_FALSE(operation.mWorkReleased);
     EXPECT_FALSE(operation.IsPending());
@@ -470,7 +470,7 @@ TEST(CancelableOperationTest, TypedCompletionOverACustomOperationBase)
     callback.Cancel();
     EXPECT_TRUE(operation.mWorkReleased);
     EXPECT_EQ(operation.mWork, nullptr); // the layer released what it was started with
-    EXPECT_EQ(recorder.count, 1u);
+    EXPECT_EQ(recorder.count, 1);
 }
 
 /**
@@ -510,7 +510,7 @@ private:
 class PayloadRecorder
 {
 public:
-    size_t mCount      = 0;
+    int mCount         = 0;
     CHIP_ERROR mStatus = CHIP_ERROR_INTERNAL;
     Payload mPayload;
 
@@ -557,7 +557,7 @@ TEST(CancelableOperationTest, MoveOnlyCompletionArgumentPassedByValue)
     EXPECT_TRUE(operation.IsPending());
 
     operation.Finish();
-    EXPECT_EQ(recorder.mCount, 1u);
+    EXPECT_EQ(recorder.mCount, 1);
     EXPECT_EQ(recorder.mStatus, CHIP_NO_ERROR);
     ASSERT_NE(recorder.mPayload, nullptr);
     EXPECT_EQ(*recorder.mPayload, 11);
@@ -575,7 +575,7 @@ TEST(CancelableOperationTest, MoveOnlyCompletionArgumentPassedByRvalueReference)
 
     operation.Begin(callback, std::make_unique<int>(22));
     operation.Finish();
-    EXPECT_EQ(recorder.mCount, 1u);
+    EXPECT_EQ(recorder.mCount, 1);
     ASSERT_NE(recorder.mPayload, nullptr);
     EXPECT_EQ(*recorder.mPayload, 22);
     EXPECT_FALSE(operation.IsPending());
@@ -599,13 +599,13 @@ TEST(CancelableOperationTest, RvalueReferencePayloadConsumedBeforeReuse)
     operation.Begin(callback, std::make_unique<int>(22));
     operation.Finish();
 
-    EXPECT_EQ(recorder.mCount, 1u);
+    EXPECT_EQ(recorder.mCount, 1);
     ASSERT_NE(recorder.mPayload, nullptr);
     EXPECT_EQ(*recorder.mPayload, 22);
     EXPECT_TRUE(operation.IsPending());
 
     operation.Finish();
-    EXPECT_EQ(recorder.mCount, 2u);
+    EXPECT_EQ(recorder.mCount, 2);
     ASSERT_NE(recorder.mPayload, nullptr);
     EXPECT_EQ(*recorder.mPayload, 44);
     EXPECT_FALSE(operation.IsPending());
@@ -624,7 +624,7 @@ TEST(CancelableOperationTest, MoveOnlyPayloadIsReleasedOnCancellation)
     operation.Begin(callback, std::make_unique<int>(33));
     callback.Cancel();
 
-    EXPECT_EQ(recorder.mCount, 0u);
+    EXPECT_EQ(recorder.mCount, 0);
     EXPECT_EQ(recorder.mPayload, nullptr);
     EXPECT_FALSE(operation.IsPending());
 }
@@ -639,16 +639,16 @@ TEST(CancelableOperationTest, FinishedBeforeCompletionCallbackRuns)
     caller.mOperation = &operation;
 
     operation.Start(caller.mCallback);
-    EXPECT_EQ(operation.mFinishedCount, 0u);
+    EXPECT_EQ(operation.mFinishedCount, 0);
 
     operation.Complete(CHIP_NO_ERROR, 3);
 
-    EXPECT_EQ(operation.mFinishedCount, 1u);
-    EXPECT_EQ(operation.mCancelledCount, 0u);
+    EXPECT_EQ(operation.mFinishedCount, 1);
+    EXPECT_EQ(operation.mCancelledCount, 0);
     EXPECT_EQ(operation.mLastFinishedCancelled, std::optional(false));
 
     // Already finished by the time the callback observed it, and no longer pending either.
-    EXPECT_EQ(caller.mFinishedCountDuringCompletion, std::optional<size_t>(1u));
+    EXPECT_EQ(caller.mFinishedCountDuringCompletion, std::optional<int>(1));
     ASSERT_TRUE(operation.mPendingDuringFinished.has_value());
     EXPECT_FALSE(*operation.mPendingDuringFinished);
 }
@@ -662,16 +662,16 @@ TEST(CancelableOperationTest, FinishedExactlyOncePerOperation)
 
     operation.Start(caller.mCallback);
     operation.Complete(CHIP_NO_ERROR, 1);
-    EXPECT_EQ(operation.mFinishedCount, 1u);
+    EXPECT_EQ(operation.mFinishedCount, 1);
 
     operation.Start(caller.mCallback);
     caller.mCallback.Cancel();
-    EXPECT_EQ(operation.mFinishedCount, 2u);
-    EXPECT_EQ(operation.mCancelledCount, 1u);
+    EXPECT_EQ(operation.mFinishedCount, 2);
+    EXPECT_EQ(operation.mCancelledCount, 1);
 
     // Cancelling again after the operation has already finished is a no-op.
     caller.mCallback.Cancel();
-    EXPECT_EQ(operation.mFinishedCount, 2u);
+    EXPECT_EQ(operation.mFinishedCount, 2);
 }
 
 // A restart from within the completion is a fresh operation, so it gets its own OnFinished().
@@ -684,12 +684,12 @@ TEST(CancelableOperationTest, FinishedAgainForAnOperationRestartedFromTheComplet
 
     operation.Start(caller.mCallback);
     operation.Complete(CHIP_NO_ERROR, 1);
-    EXPECT_EQ(operation.mFinishedCount, 1u);
+    EXPECT_EQ(operation.mFinishedCount, 1);
     EXPECT_TRUE(operation.IsPending());
 
     operation.Complete(CHIP_NO_ERROR, 2);
-    EXPECT_EQ(operation.mFinishedCount, 2u);
-    EXPECT_EQ(operation.mCancelledCount, 0u);
+    EXPECT_EQ(operation.mFinishedCount, 2);
+    EXPECT_EQ(operation.mCancelledCount, 0);
 }
 
 // An operation may free itself from the completion path of the hook as well, which is what lets a
@@ -727,7 +727,7 @@ TEST(CancelableOperationTest, DestroyedFromWithinOnFinishedWhileCompleting)
     // still delivered even though the operation is already gone.
     operation->Complete(CHIP_ERROR_TIMEOUT, 8);
     EXPECT_TRUE(destroyed);
-    EXPECT_EQ(caller.mCompletionCount, 1u);
+    EXPECT_EQ(caller.mCompletionCount, 1);
     EXPECT_EQ(caller.mStatus, CHIP_ERROR_TIMEOUT);
     EXPECT_EQ(caller.mValue, 8);
     EXPECT_FALSE(caller.mCallback.IsRegistered());
@@ -761,7 +761,7 @@ public:
     using FallibleLeafBase::Complete;
     using FallibleLeafBase::Start;
 
-    size_t mFinishedCount = 0;
+    int mFinishedCount = 0;
 
 protected:
     void OnFinished(bool cancelled) override
@@ -787,7 +787,7 @@ TEST(CancelableOperationTest, FallibleStartForwardsItsResult)
 {
     struct Recorder
     {
-        size_t count = 0;
+        int count = 0;
         static void OnCompletion(void * context, CHIP_ERROR) { static_cast<Recorder *>(context)->count++; }
     } recorder;
 
@@ -799,8 +799,8 @@ TEST(CancelableOperationTest, FallibleStartForwardsItsResult)
     EXPECT_EQ(operation.Start(false, callback), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_FALSE(operation.IsPending());
     EXPECT_FALSE(callback.IsRegistered());
-    EXPECT_EQ(operation.mFinishedCount, 0u);
-    EXPECT_EQ(recorder.count, 0u);
+    EXPECT_EQ(operation.mFinishedCount, 0);
+    EXPECT_EQ(recorder.count, 0);
 
     // Accepted: the usual contract applies from here on.
     EXPECT_EQ(operation.Start(true, callback), CHIP_NO_ERROR);
@@ -808,8 +808,8 @@ TEST(CancelableOperationTest, FallibleStartForwardsItsResult)
     EXPECT_TRUE(callback.IsRegistered());
 
     operation.Complete(CHIP_NO_ERROR);
-    EXPECT_EQ(recorder.count, 1u);
-    EXPECT_EQ(operation.mFinishedCount, 1u);
+    EXPECT_EQ(recorder.count, 1);
+    EXPECT_EQ(operation.mFinishedCount, 1);
     EXPECT_FALSE(operation.IsPending());
 }
 
@@ -825,9 +825,9 @@ TEST(CancelableOperationTest, FallibleStartRejectionCancelsAPendingOperation)
 
     EXPECT_EQ(second.Start(false, callback), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_FALSE(first.IsPending());
-    EXPECT_EQ(first.mFinishedCount, 1u);
+    EXPECT_EQ(first.mFinishedCount, 1);
     EXPECT_FALSE(second.IsPending());
-    EXPECT_EQ(second.mFinishedCount, 0u);
+    EXPECT_EQ(second.mFinishedCount, 0);
     EXPECT_FALSE(callback.IsRegistered());
 }
 
