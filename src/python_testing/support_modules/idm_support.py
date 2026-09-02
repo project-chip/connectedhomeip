@@ -1119,26 +1119,29 @@ class IDMBaseTest(BasicCompositionTests):
                 return constraints.max_value
         return None
 
-    async def check_command_constraint(self, info: CommandFieldInfo) -> bool | None:
-        """Test a single command field's constraints by sending violating payloads.
+    async def check_command_constraint(self, info: CommandFieldInfo) -> ConstraintProbeResult:
+        """Invoke a command with violating values for one field and classify each answer.
 
-        Sends one Invoke per violated bound, with all sibling fields set to
-        in-range values, and expects CONSTRAINT_ERROR for each. Returns True if
-        every generated violation was properly rejected, False if any was not,
-        and None if the field could not be tested: no violation could be generated
-        for it, or a constrained required sibling could not be given a valid value
-        (which would make a CONSTRAINT_ERROR ambiguous).
+        Sends one Invoke per violated bound, with all sibling fields set to in-range
+        values so a CONSTRAINT_ERROR can only be attributed to the field under test.
+        Records a warning for every violation the DUT did not answer with
+        CONSTRAINT_ERROR so the report enumerates them in both eras; deciding whether
+        an accepted violation fails the test is left to the caller, which applies
+        enforces_constraints_strictly. A result with `probed == 0` means the field
+        could not be tested: no violation could be generated for it, or a constrained
+        required sibling could not be given a valid value (which would make a
+        CONSTRAINT_ERROR ambiguous).
         """
         target_label = self._command_field_label(info.command_class, info.field.value)
         if target_label is None:
             log.warning("Skipping %s: field id %s not present in generated command class",
                         info.path_str, info.field.value)
-            return None
+            return ConstraintProbeResult()
 
         constraints = await self._resolved_command_field_constraints(info)
         violations = self.generate_command_field_violations(info.field, constraints)
         if not violations:
-            return None
+            return ConstraintProbeResult()
 
         # Build valid values for the other fields so a CONSTRAINT_ERROR can only be
         # attributed to the field under test. Optional siblings are left unset.
@@ -1159,12 +1162,14 @@ class IDMBaseTest(BasicCompositionTests):
                 if sibling.constraints is not None and sibling.constraints.has_constraints():
                     log.warning("Skipping %s: cannot generate a valid value for constrained "
                                 "required field %s", info.path_str, sibling_label)
-                    return None
+                    return ConstraintProbeResult()
                 continue
             base_kwargs[sibling_label] = valid_value
 
         timed_request_timeout_ms = 65535 if info.command_class.must_use_timed_invoke else None
-        all_enforced = True
+        location = CommandPathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
+                                       command_id=info.command_id)
+        result = ConstraintProbeResult()
         for description, bad_value in violations:
             command = info.command_class(**base_kwargs, **{target_label: bad_value})
             try:
@@ -1174,17 +1179,17 @@ class IDMBaseTest(BasicCompositionTests):
             except InteractionModelError as e:
                 if e.status == Status.ConstraintError:
                     log.info("PASS: %s properly rejected %s", info.path_str, description)
-                elif e.status == Status.Success:
-                    log.error("FAIL: %s returned %s instead of CONSTRAINT_ERROR for %s",
-                              info.path_str, e.status, description)
-                    all_enforced = False
-                else:
-                    self.record_warning(
-                        test_name=self.current_test_info.name,
-                        location=CommandPathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
-                                                     command_id=info.command_id),
-                        problem=(f"{info.path_str} accepted violating payload ({description})"))
+                    result.rejected += 1
+                    continue
 
+                # Rejected, but not with CONSTRAINT_ERROR. The command never ran, so the
+                # field's constraint is neither proven nor disproven by this payload.
+                result.other_error += 1
+                self.record_warning(
+                    test_name=self.current_test_info.name,
+                    location=location,
+                    problem=(f"{info.path_str} rejected violating payload ({description}) with "
+                             f"{getattr(e.status, 'name', e.status)} instead of CONSTRAINT_ERROR"))
                 continue
 
             # Some commands convey their result in a Status field of their response
@@ -1195,17 +1200,19 @@ class IDMBaseTest(BasicCompositionTests):
             if embedded_status == Status.ConstraintError:
                 log.info("PASS: %s properly rejected %s (via response command status)",
                          info.path_str, description)
-            elif embedded_status == Status.Success:
-                log.error("FAIL: %s returned %s instead of CONSTRAINT_ERROR for %s",
-                          info.path_str, embedded_status, description)
-                all_enforced = False
-            else:
-                self.record_warning(
-                    test_name=self.current_test_info.name,
-                    location=CommandPathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
-                                                 command_id=info.command_id),
-                    problem=(f"{info.path_str} accepted violating payload ({description})"))
-        return all_enforced
+                result.rejected += 1
+                continue
+
+            # No IM error and no CONSTRAINT_ERROR in the response payload means the DUT
+            # executed the command. Commands that return no response command at all land
+            # here with a None response, which is the ordinary Invoke success case.
+            result.accepted += 1
+            log.warning("%s accepted violating payload (%s)", info.path_str, description)
+            self.record_warning(
+                test_name=self.current_test_info.name,
+                location=location,
+                problem=f"{info.path_str} accepted violating payload ({description})")
+        return result
 
     def checkable_attributes(self, cluster_id, cluster, xml_cluster) -> list[uint]:
         """Get list of attributes that exist on the DUT and have spec/codegen data available."""
