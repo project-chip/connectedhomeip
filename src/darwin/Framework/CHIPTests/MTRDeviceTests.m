@@ -6493,6 +6493,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                   queue:delegateQueue
                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
                                  NSError * _Nullable error) {
+                                 XCTAssertNil(error);
                                  [stopped fulfill];
                              }];
     [self waitForExpectations:@[ stopped ] timeout:10];
@@ -6546,7 +6547,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Baseline: ignore anything the priming report produced.
     (void) [device unitTestReadThroughsSinceLastCheck];
-    countingReports = YES;
+    // Both flags are touched on delegateQueue, so hand them across it rather than racing: an unseen
+    // write here would make the report assertion below pass for the wrong reason.
+    dispatch_sync(delegateQueue, ^{
+        countingReports = YES;
+    });
 
     for (int i = 0; i < 5; i++) {
         __auto_type * value = [device readAttributeWithEndpointID:endpointID
@@ -6560,7 +6565,12 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         @"Reads of a normally-reported attribute must not go to the device while subscribed");
 
     [NSThread sleepForTimeInterval:3.0];
-    XCTAssertFalse(sawOnOffReport,
+    // Draining delegateQueue also orders the flag's last write before this read.
+    __block BOOL sawReport = NO;
+    dispatch_sync(delegateQueue, ^{
+        sawReport = sawOnOffReport;
+    });
+    XCTAssertFalse(sawReport,
         @"A cache-served read must not produce an attribute report");
 
     countingReports = NO;
