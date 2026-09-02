@@ -498,10 +498,10 @@ TEST_F(ThermostatTestFixture, TestWriteAvailableSensorsCascadeUpdateToEnabledSen
 
     // Verify EnabledSensors was automatically filtered to remove sensor 1
     ASSERT_EQ(mSensorsDelegate.mEnabledSensors.size(), 2u);
-    EXPECT_TRUE(ByteSpan(mSensorsDelegate.mEnabledSensors[0].data(), mSensorsDelegate.mEnabledSensors[0].size())
-                    .data_equal(kHandle0));
-    EXPECT_TRUE(ByteSpan(mSensorsDelegate.mEnabledSensors[1].data(), mSensorsDelegate.mEnabledSensors[1].size())
-                    .data_equal(kHandle2));
+    EXPECT_TRUE(
+        ByteSpan(mSensorsDelegate.mEnabledSensors[0].data(), mSensorsDelegate.mEnabledSensors[0].size()).data_equal(kHandle0));
+    EXPECT_TRUE(
+        ByteSpan(mSensorsDelegate.mEnabledSensors[1].data(), mSensorsDelegate.mEnabledSensors[1].size()).data_equal(kHandle2));
 
     // Both attributes should be marked dirty
     EXPECT_TRUE(tester.IsAttributeDirty(AvailableSensors::Id));
@@ -933,27 +933,27 @@ TEST_F(ThermostatTestFixture, TestSensorScheduleTransitionValidationErrors)
     invalidAwayTrans.transitionTime = 480;
     ByteSpan handles[]              = { kHandle0 };
     invalidAwayTrans.enabledSensors = DataModel::List<const ByteSpan>(handles, 1);
-    EXPECT_EQ(AppendItemWithSubject(cluster, SensorSchedule::Id, tester.GetCommandHandler().GetSubjectDescriptor(),
-                                    invalidAwayTrans),
-              Status::ConstraintError);
+    EXPECT_EQ(
+        AppendItemWithSubject(cluster, SensorSchedule::Id, tester.GetCommandHandler().GetSubjectDescriptor(), invalidAwayTrans),
+        Status::ConstraintError);
 
     // 2. DayOfWeek zero -> ConstraintError
     Structs::SensorScheduleTransitionStruct::Type invalidZeroDaysTrans;
     invalidZeroDaysTrans.dayOfWeek.ClearAll();
     invalidZeroDaysTrans.transitionTime = 480;
     invalidZeroDaysTrans.enabledSensors = DataModel::List<const ByteSpan>(handles, 1);
-    EXPECT_EQ(AppendItemWithSubject(cluster, SensorSchedule::Id, tester.GetCommandHandler().GetSubjectDescriptor(),
-                                    invalidZeroDaysTrans),
-              Status::ConstraintError);
+    EXPECT_EQ(
+        AppendItemWithSubject(cluster, SensorSchedule::Id, tester.GetCommandHandler().GetSubjectDescriptor(), invalidZeroDaysTrans),
+        Status::ConstraintError);
 
     // 3. TransitionTime > 1439 -> ConstraintError
     Structs::SensorScheduleTransitionStruct::Type invalidTimeTrans;
     invalidTimeTrans.dayOfWeek      = ScheduleDayOfWeekBitmap::kMonday;
     invalidTimeTrans.transitionTime = 1440;
     invalidTimeTrans.enabledSensors = DataModel::List<const ByteSpan>(handles, 1);
-    EXPECT_EQ(AppendItemWithSubject(cluster, SensorSchedule::Id, tester.GetCommandHandler().GetSubjectDescriptor(),
-                                    invalidTimeTrans),
-              Status::ConstraintError);
+    EXPECT_EQ(
+        AppendItemWithSubject(cluster, SensorSchedule::Id, tester.GetCommandHandler().GetSubjectDescriptor(), invalidTimeTrans),
+        Status::ConstraintError);
 
     // 4. EnabledSensors containing unavailable sensor -> ConstraintError
     Structs::SensorScheduleTransitionStruct::Type invalidSensorTrans;
@@ -961,9 +961,9 @@ TEST_F(ThermostatTestFixture, TestSensorScheduleTransitionValidationErrors)
     invalidSensorTrans.transitionTime   = 480;
     ByteSpan unavailHandles[]           = { kHandle1 }; // kHandle1 not in available
     invalidSensorTrans.enabledSensors   = DataModel::List<const ByteSpan>(unavailHandles, 1);
-    EXPECT_EQ(AppendItemWithSubject(cluster, SensorSchedule::Id, tester.GetCommandHandler().GetSubjectDescriptor(),
-                                    invalidSensorTrans),
-              Status::ConstraintError);
+    EXPECT_EQ(
+        AppendItemWithSubject(cluster, SensorSchedule::Id, tester.GetCommandHandler().GetSubjectDescriptor(), invalidSensorTrans),
+        Status::ConstraintError);
 
     // 5. EnabledSensors containing duplicate sensor -> ConstraintError
     Structs::SensorScheduleTransitionStruct::Type duplicateSensorTrans;
@@ -971,35 +971,32 @@ TEST_F(ThermostatTestFixture, TestSensorScheduleTransitionValidationErrors)
     duplicateSensorTrans.transitionTime = 480;
     ByteSpan dupHandles[]               = { kHandle0, kHandle0 };
     duplicateSensorTrans.enabledSensors = DataModel::List<const ByteSpan>(dupHandles, 2);
-    EXPECT_EQ(AppendItemWithSubject(cluster, SensorSchedule::Id, tester.GetCommandHandler().GetSubjectDescriptor(),
-                                    duplicateSensorTrans),
-              Status::ConstraintError);
+    EXPECT_EQ(
+        AppendItemWithSubject(cluster, SensorSchedule::Id, tester.GetCommandHandler().GetSubjectDescriptor(), duplicateSensorTrans),
+        Status::ConstraintError);
 
     // 6. ResourceExhausted when exceeding NumberOfSensorScheduleTransitions (limit is 2)
     Structs::SensorScheduleTransitionStruct::Type validTrans1;
     validTrans1.dayOfWeek      = ScheduleDayOfWeekBitmap::kMonday;
     validTrans1.transitionTime = 300;
     validTrans1.enabledSensors = DataModel::List<const ByteSpan>(handles, 1);
-    EXPECT_EQ(
-        AppendItemWithSubject(cluster, SensorSchedule::Id, tester.GetCommandHandler().GetSubjectDescriptor(), validTrans1),
-        Status::Success);
+    EXPECT_EQ(AppendItemWithSubject(cluster, SensorSchedule::Id, tester.GetCommandHandler().GetSubjectDescriptor(), validTrans1),
+              Status::Success);
 
     Structs::SensorScheduleTransitionStruct::Type validTrans2;
     validTrans2.dayOfWeek      = ScheduleDayOfWeekBitmap::kMonday;
     validTrans2.transitionTime = 600;
     validTrans2.enabledSensors = DataModel::List<const ByteSpan>(handles, 1);
-    EXPECT_EQ(
-        AppendItemWithSubject(cluster, SensorSchedule::Id, tester.GetCommandHandler().GetSubjectDescriptor(), validTrans2),
-        Status::Success);
+    EXPECT_EQ(AppendItemWithSubject(cluster, SensorSchedule::Id, tester.GetCommandHandler().GetSubjectDescriptor(), validTrans2),
+              Status::Success);
 
     // 3rd transition exceeds max of 2 -> ResourceExhausted
     Structs::SensorScheduleTransitionStruct::Type validTrans3;
     validTrans3.dayOfWeek      = ScheduleDayOfWeekBitmap::kMonday;
     validTrans3.transitionTime = 900;
     validTrans3.enabledSensors = DataModel::List<const ByteSpan>(handles, 1);
-    EXPECT_EQ(
-        AppendItemWithSubject(cluster, SensorSchedule::Id, tester.GetCommandHandler().GetSubjectDescriptor(), validTrans3),
-        Status::ResourceExhausted);
+    EXPECT_EQ(AppendItemWithSubject(cluster, SensorSchedule::Id, tester.GetCommandHandler().GetSubjectDescriptor(), validTrans3),
+              Status::ResourceExhausted);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

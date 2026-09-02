@@ -675,8 +675,7 @@ public:
 
     void ClearPendingSensorScheduleTransitions() override { mPendingTransitions.clear(); }
 
-    CHIP_ERROR AppendToPendingSensorScheduleTransitions(
-        const SensorScheduleTransitionStructWithOwnedMembers & transition) override
+    CHIP_ERROR AppendToPendingSensorScheduleTransitions(const SensorScheduleTransitionStructWithOwnedMembers & transition) override
     {
         if (mFailAppend)
         {
