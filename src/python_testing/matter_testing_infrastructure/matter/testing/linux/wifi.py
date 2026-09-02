@@ -74,7 +74,29 @@ class NANSimulator:
     def on_publish_cancelled(self, publish_id: int):
         """Called when a publish session is cancelled."""
         if self.publishers.pop(publish_id, None):
-            log.debug("NANSimulator: Publisher cancelled: id=%d", id)
+            log.debug("NANSimulator: Publisher cancelled: id=%d", publish_id)
+
+    async def announce_publisher(self, pub_iface_name: str, pub_id: int, pub_args: dict):
+        """Tell subscribers already running about a publisher that just started.
+
+        A subscriber does not have to be started after the publisher to see it: an
+        active subscriber keeps receiving unsolicited publish frames, which is how a
+        background scan notices a device that appears while the scan is running.
+        """
+        with self._lock:
+            subscribers_copy = dict(self.subscribers)
+            interfaces_copy = dict(self.interfaces)
+
+        pub_iface = interfaces_copy.get(pub_iface_name)
+        if not pub_iface:
+            return
+
+        for sub_id, (sub_iface_name, sub_args) in subscribers_copy.items():
+            sub_iface = interfaces_copy.get(sub_iface_name)
+            if sub_iface is None:
+                continue
+            self._match(sub_iface, sub_id, sub_args, sub_iface_name,
+                        pub_iface, pub_id, pub_args, pub_iface_name)
 
     async def on_subscribe_started(self, iface_name: str, subscribe_id: int, args: dict):
         """Called when an interface starts subscribing. Triggers discovery after delay."""
@@ -101,55 +123,53 @@ class NANSimulator:
         if not sub_iface:
             return
 
-        sub_srv_name = sub_args.get("srv_name", "")
-        # A discovery-only subscriber is scanning, not setting up a session, so it
-        # must not reply to the publisher. wpa_supplicant suppresses the automatic
-        # passive-subscriber Follow-up for these, because those replies interfere
-        # with a scan that is only meant to observe.
-        discovery_only = bool(sub_args.get("discovery_only", False))
-
         for pub_id, (pub_iface_name, pub_args) in publishers_copy.items():
-            # Don't match same interface
-            if sub_iface_name == pub_iface_name:
-                continue
-
             pub_iface = interfaces_copy.get(pub_iface_name)
-            if not pub_iface:
+            if pub_iface is None:
                 continue
+            self._match(sub_iface, sub_id, sub_args, sub_iface_name,
+                        pub_iface, pub_id, pub_args, pub_iface_name)
 
-            # Check service name match
-            pub_srv_name = pub_args.get("srv_name", "")
-            if sub_srv_name and pub_srv_name and sub_srv_name != pub_srv_name:
-                continue
+    def _match(self, sub_iface, sub_id: int, sub_args: dict, sub_iface_name: str,
+               pub_iface, pub_id: int, pub_args: dict, pub_iface_name: str) -> None:
+        """Report one publisher to one subscriber, if the two match."""
+        # Don't match same interface
+        if sub_iface_name == pub_iface_name:
+            return
 
-            log.debug("NANSimulator: Discovery match - sub=%s (id=%d) <-> pub=%s (id=%d)",
-                      sub_iface_name, sub_id, pub_iface_name, pub_id)
+        # Check service name match
+        sub_srv_name = sub_args.get("srv_name", "")
+        pub_srv_name = pub_args.get("srv_name", "")
+        if sub_srv_name and pub_srv_name and sub_srv_name != pub_srv_name:
+            return
 
-            # Emit NANDiscoveryResult to subscriber
-            discovery_args = {
-                "subscribe_id": ("u", sub_id),
-                "publish_id": ("u", pub_id),
-                "peer_addr": ("s", pub_iface.mock_mac),
-                "srv_proto_type": ("u", pub_args.get("srv_proto_type", 3)),
-                "ssi": ("ay", pub_args.get("ssi", b"")),
-            }
-            sub_iface.NANDiscoveryResult.emit(discovery_args)
+        log.debug("NANSimulator: Discovery match - sub=%s (id=%d) <-> pub=%s (id=%d)",
+                  sub_iface_name, sub_id, pub_iface_name, pub_id)
 
-            if discovery_only:
-                log.debug("Interface[%d] Suppressing NANReplied: subscriber %d is discovery-only",
-                          pub_iface.index, sub_id)
-                continue
+        # Emit NANDiscoveryResult to subscriber
+        sub_iface.NANDiscoveryResult.emit({
+            "subscribe_id": ("u", sub_id),
+            "publish_id": ("u", pub_id),
+            "peer_addr": ("s", pub_iface.mock_mac),
+            "srv_proto_type": ("u", pub_args.get("srv_proto_type", 3)),
+            "ssi": ("ay", pub_args.get("ssi", b"")),
+        })
 
-            # Emit NANReplied to publisher
-            replied_args = {
-                "publish_id": ("u", pub_id),
-                "subscribe_id": ("u", sub_id),
-                "peer_addr": ("s", sub_iface.mock_mac),
-                "srv_proto_type": ("u", sub_args.get("srv_proto_type", 3)),
-                "ssi": ("ay", sub_args.get("ssi", b"")),
-            }
-            log.debug("Interface[%d] Emitting NANReplied: %s", pub_iface.index, replied_args)
-            pub_iface.NANReplied.emit(replied_args)
+        if bool(sub_args.get("discovery_only", False)):
+            log.debug("Interface[%d] Suppressing NANReplied: subscriber %d is discovery-only",
+                      pub_iface.index, sub_id)
+            return
+
+        # Emit NANReplied to publisher
+        replied_args = {
+            "publish_id": ("u", pub_id),
+            "subscribe_id": ("u", sub_id),
+            "peer_addr": ("s", sub_iface.mock_mac),
+            "srv_proto_type": ("u", sub_args.get("srv_proto_type", 3)),
+            "ssi": ("ay", sub_args.get("ssi", b"")),
+        }
+        log.debug("Interface[%d] Emitting NANReplied: %s", pub_iface.index, replied_args)
+        pub_iface.NANReplied.emit(replied_args)
 
     async def on_transmit(self, sender_iface: WpaSupplicantMock.WpaInterface, handle: int,
                           req_instance_id: int, peer_addr: str, ssi: bytes):
@@ -382,6 +402,9 @@ class WpaSupplicantMock(TerminableThread):
             if self.mock.nan_simulator and self.interface_name_in_sim:
                 self.mock.nan_simulator.on_publish_started(
                     self.interface_name_in_sim, publish_id, args_dict)
+                asyncio.create_task(
+                    self.mock.nan_simulator.announce_publisher(
+                        self.interface_name_in_sim, publish_id, args_dict))
 
             return publish_id
 

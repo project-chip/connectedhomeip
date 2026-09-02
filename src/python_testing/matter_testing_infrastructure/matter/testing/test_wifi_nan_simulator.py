@@ -95,6 +95,27 @@ class TestNANSimulator(unittest.TestCase):
         self.discover(discovery_only=False)
         self.assertEqual(len(self.publisher.NANReplied.emissions), 1)
 
+    def test_subscriber_already_running_sees_a_later_publisher(self):
+        """A running scan must notice a device that appears while it is scanning.
+
+        A background scan subscribes once and keeps running, so a device that
+        starts publishing afterwards has to reach it -- otherwise the scan only
+        ever reports devices that were already there when it began.
+        """
+        async def scenario():
+            await self.simulator.on_subscribe_started(
+                "wlx-cp", 1, {"srv_name": self.SERVICE, "srv_proto_type": 3, "discovery_only": True})
+            self.assertEqual(len(self.subscriber.NANDiscoveryResult.emissions), 0,
+                             "nothing to discover before the publisher starts")
+            args = {"srv_name": self.SERVICE, "srv_proto_type": 3}
+            self.simulator.on_publish_started("wlx-app", 1, args)
+            await self.simulator.announce_publisher("wlx-app", 1, args)
+
+        asyncio.run(scenario())
+        self.assertEqual(len(self.subscriber.NANDiscoveryResult.emissions), 1)
+        # The subscriber is discovery-only, so the publisher must not be replied to.
+        self.assertEqual(len(self.publisher.NANReplied.emissions), 0)
+
     def test_data_is_routed_to_the_peer_holding_the_address(self):
         asyncio.run(self.simulator.on_transmit(
             sender_iface=self.subscriber, handle=1, req_instance_id=2,
