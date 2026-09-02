@@ -29,6 +29,7 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device-factory/DeviceFactory.h>
+#include <device/api/PlatformIdentifyIntegration.h>
 #include <device/api/Interface.h>
 #include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
 #include <device/api/allocator/EndpointIdAllocator.h>
@@ -72,6 +73,7 @@ DefaultAttributePersistenceProvider gAttributePersistenceProvider;
 DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
 DefaultTimerDelegate gTimerDelegate;
+PlatformIdentifyIntegration gPlatformIdentify;
 
 std::unique_ptr<CodeDrivenDataModelProvider> gDataModelProvider;
 std::unique_ptr<DeviceInterface> gRootNodeDevice;
@@ -104,6 +106,7 @@ RootNode::Context MakeRootNodeContext(CommonCaseDeviceServerInitParams & initPar
         .eventManagement                     = EventManagement::GetInstance(),
         .timerDelegate                       = gTimerDelegate,
         .minGuaranteedSubscriptionsPerFabric = InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(),
+        .platformIdentify                    = gPlatformIdentify,
     };
 }
 

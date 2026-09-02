@@ -27,81 +27,65 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-namespace {
-
-class AggregatorIdentifyDelegate : public IdentifyDelegate
+void Aggregator::AggregatorIdentifyDelegate::OnIdentifyStart(Clusters::IdentifyCluster & cluster)
 {
-public:
-    explicit AggregatorIdentifyDelegate(PlatformIdentifyIntegration & platformIdentify) : mPlatformIdentify(platformIdentify) {}
+    ChipLogProgress(DeviceLayer, "Aggregator [Endpoint %d]: Identify START", cluster.GetPaths()[0].mEndpointId);
+    mPlatformIdentify.NotifyIdentifyStart(cluster);
+}
 
-    void OnIdentifyStart(IdentifyCluster & cluster) override
+void Aggregator::AggregatorIdentifyDelegate::OnIdentifyStop(Clusters::IdentifyCluster & cluster)
+{
+    ChipLogProgress(DeviceLayer, "Aggregator [Endpoint %d]: Identify STOP", cluster.GetPaths()[0].mEndpointId);
+    mPlatformIdentify.NotifyIdentifyStop(cluster);
+}
+
+void Aggregator::AggregatorIdentifyDelegate::OnTriggerEffect(Clusters::IdentifyCluster & cluster)
+{
+    StringBuilder<48> msg;
+
+    switch (cluster.GetEffectIdentifier())
     {
-        ChipLogProgress(DeviceLayer, "Aggregator [Endpoint %d]: Identify START", cluster.GetPaths()[0].mEndpointId);
-        mPlatformIdentify.NotifyIdentifyStart(cluster);
+    case Identify::EffectIdentifierEnum::kBlink:
+        msg.Add("BlinkEffect");
+        break;
+    case Identify::EffectIdentifierEnum::kBreathe:
+        msg.Add("BreatheEffect");
+        break;
+    case Identify::EffectIdentifierEnum::kOkay:
+        msg.Add("OkayEffect");
+        break;
+    case Identify::EffectIdentifierEnum::kChannelChange:
+        msg.Add("ChannelChangeEffect");
+        break;
+    case Identify::EffectIdentifierEnum::kFinishEffect:
+        msg.Add("FinishEffect");
+        break;
+    case Identify::EffectIdentifierEnum::kStopEffect:
+        msg.Add("StopEffect");
+        break;
+    default:
+        msg.AddFormat("UnknownEffect(%d)", static_cast<int>(cluster.GetEffectIdentifier()));
+        break;
+    }
+    msg.Add(" / ");
+
+    switch (cluster.GetEffectVariant())
+    {
+    case Identify::EffectVariantEnum::kDefault:
+        msg.Add("DefaultVariant");
+        break;
+    default:
+        msg.AddFormat("UnknownVariant(%d)", static_cast<int>(cluster.GetEffectVariant()));
+        break;
     }
 
-    void OnIdentifyStop(IdentifyCluster & cluster) override
-    {
-        ChipLogProgress(DeviceLayer, "Aggregator [Endpoint %d]: Identify STOP", cluster.GetPaths()[0].mEndpointId);
-        mPlatformIdentify.NotifyIdentifyStop(cluster);
-    }
-
-    void OnTriggerEffect(IdentifyCluster & cluster) override
-    {
-        StringBuilder<48> msg;
-
-        switch (cluster.GetEffectIdentifier())
-        {
-        case Identify::EffectIdentifierEnum::kBlink:
-            msg.Add("BlinkEffect");
-            break;
-        case Identify::EffectIdentifierEnum::kBreathe:
-            msg.Add("BreatheEffect");
-            break;
-        case Identify::EffectIdentifierEnum::kOkay:
-            msg.Add("OkayEffect");
-            break;
-        case Identify::EffectIdentifierEnum::kChannelChange:
-            msg.Add("ChannelChangeEffect");
-            break;
-        case Identify::EffectIdentifierEnum::kFinishEffect:
-            msg.Add("FinishEffect");
-            break;
-        case Identify::EffectIdentifierEnum::kStopEffect:
-            msg.Add("StopEffect");
-            break;
-        default:
-            msg.AddFormat("UnknownEffect(%d)", static_cast<int>(cluster.GetEffectIdentifier()));
-            break;
-        }
-        msg.Add(" / ");
-
-        switch (cluster.GetEffectVariant())
-        {
-        case Identify::EffectVariantEnum::kDefault:
-            msg.Add("DefaultVariant");
-            break;
-        default:
-            msg.AddFormat("UnknownVariant(%d)", static_cast<int>(cluster.GetEffectVariant()));
-            break;
-        }
-
-        ChipLogProgress(DeviceLayer, "Aggregator [Endpoint %d]: Trigger effect: %s", cluster.GetPaths()[0].mEndpointId,
-                        msg.c_str());
-        mPlatformIdentify.NotifyTriggerEffect(cluster);
-    }
-
-    bool IsTriggerEffectEnabled() const override { return true; }
-
-private:
-    PlatformIdentifyIntegration & mPlatformIdentify;
-};
-
-} // namespace
+    ChipLogProgress(DeviceLayer, "Aggregator [Endpoint %d]: Trigger effect: %s", cluster.GetPaths()[0].mEndpointId, msg.c_str());
+    mPlatformIdentify.NotifyTriggerEffect(cluster);
+}
 
 Aggregator::Aggregator(TimerDelegate & timerDelegate, PlatformIdentifyIntegration & platformIdentify) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAggregator, 1)), mTimerDelegate(timerDelegate),
-    mPlatformIdentify(platformIdentify)
+    mPlatformIdentify(platformIdentify), mIdentifyDelegate(platformIdentify)
 {}
 
 CHIP_ERROR Aggregator::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
@@ -112,8 +96,7 @@ CHIP_ERROR Aggregator::Register(EndpointId endpoint, CodeDrivenDataModelProvider
     composition.pattern = DataModel::EndpointCompositionPattern::kFullFamily;
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    static AggregatorIdentifyDelegate sIdentifyDelegate(mPlatformIdentify);
-    mIdentifyCluster.Create(mPlatformIdentify.MakeConfig(endpoint, mTimerDelegate).WithDelegate(&sIdentifyDelegate));
+    mIdentifyCluster.Create(mPlatformIdentify.MakeConfig(endpoint, mTimerDelegate).WithDelegate(&mIdentifyDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));

@@ -51,8 +51,23 @@ public:
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
 
 protected:
+    class AggregatorIdentifyDelegate : public Clusters::IdentifyDelegate
+    {
+    public:
+        explicit AggregatorIdentifyDelegate(PlatformIdentifyIntegration & platformIdentify) : mPlatformIdentify(platformIdentify) {}
+
+        void OnIdentifyStart(Clusters::IdentifyCluster & cluster) override;
+        void OnIdentifyStop(Clusters::IdentifyCluster & cluster) override;
+        void OnTriggerEffect(Clusters::IdentifyCluster & cluster) override;
+        bool IsTriggerEffectEnabled() const override { return true; }
+
+    private:
+        PlatformIdentifyIntegration & mPlatformIdentify;
+    };
+
     TimerDelegate & mTimerDelegate;
     PlatformIdentifyIntegration & mPlatformIdentify;
+    AggregatorIdentifyDelegate mIdentifyDelegate;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
 };
 

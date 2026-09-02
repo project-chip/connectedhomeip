@@ -16,7 +16,6 @@
  */
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/TimerDelegate.h>
@@ -79,9 +78,9 @@ public:
 
     /// Forward cluster-level identify events to the installed platform
     /// delegate. Safe to call when no platform delegate is installed (no-op).
-    void NotifyIdentifyStart(Clusters::IdentifyCluster & cluster);
-    void NotifyIdentifyStop(Clusters::IdentifyCluster & cluster);
-    void NotifyTriggerEffect(Clusters::IdentifyCluster & cluster);
+    void NotifyIdentifyStart(Clusters::IdentifyCluster & cluster) const;
+    void NotifyIdentifyStop(Clusters::IdentifyCluster & cluster) const;
+    void NotifyTriggerEffect(Clusters::IdentifyCluster & cluster) const;
 
 private:
     Clusters::IdentifyDelegate * mPlatformDelegate     = nullptr;

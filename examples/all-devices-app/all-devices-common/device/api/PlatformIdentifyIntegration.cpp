@@ -31,7 +31,7 @@ Clusters::IdentifyCluster::Config PlatformIdentifyIntegration::MakeConfig(Endpoi
     return config;
 }
 
-void PlatformIdentifyIntegration::NotifyIdentifyStart(Clusters::IdentifyCluster & cluster)
+void PlatformIdentifyIntegration::NotifyIdentifyStart(Clusters::IdentifyCluster & cluster) const
 {
     if (mPlatformDelegate != nullptr)
     {
@@ -39,7 +39,7 @@ void PlatformIdentifyIntegration::NotifyIdentifyStart(Clusters::IdentifyCluster 
     }
 }
 
-void PlatformIdentifyIntegration::NotifyIdentifyStop(Clusters::IdentifyCluster & cluster)
+void PlatformIdentifyIntegration::NotifyIdentifyStop(Clusters::IdentifyCluster & cluster) const
 {
     if (mPlatformDelegate != nullptr)
     {
@@ -47,9 +47,9 @@ void PlatformIdentifyIntegration::NotifyIdentifyStop(Clusters::IdentifyCluster &
     }
 }
 
-void PlatformIdentifyIntegration::NotifyTriggerEffect(Clusters::IdentifyCluster & cluster)
+void PlatformIdentifyIntegration::NotifyTriggerEffect(Clusters::IdentifyCluster & cluster) const
 {
-    if (mPlatformDelegate != nullptr)
+    if (mPlatformDelegate != nullptr && mPlatformDelegate->IsTriggerEffectEnabled())
     {
         mPlatformDelegate->OnTriggerEffect(cluster);
     }
