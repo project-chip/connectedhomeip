@@ -25,12 +25,13 @@
 
 <<<<<<< HEAD:examples/platform/stm32/STM32WBA65I-DK1/Inc/stm32_hal.h
 #endif /*__STM32HAL_H__*/
-    =======
+    == == ==
+    =
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitMask.h>
 
-    namespace chip::app::Clusters::PowerTopology
+        namespace chip::app::Clusters::PowerTopology
 {
 
     /// Create and register the Power Topology cluster on `endpointId` with `features`.
