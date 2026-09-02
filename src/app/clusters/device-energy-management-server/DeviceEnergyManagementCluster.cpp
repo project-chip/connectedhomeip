@@ -856,7 +856,7 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePowerRangeAdj
         return Status::ConstraintError;
     }
 
-    // Check that the MinPower > AbsMinPower and MaxPower < AbsMaxPower
+    // Check that the MinPower >= AbsMinPower and MaxPower <= AbsMaxPower
     if (!commandData.minPower.IsNull() &&
         (commandData.minPower.Value() < mDelegate.GetAbsMinPower() || commandData.minPower.Value() > mDelegate.GetAbsMaxPower()))
     {
