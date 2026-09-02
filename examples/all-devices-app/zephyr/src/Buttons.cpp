@@ -56,11 +56,11 @@ void InitButtonGpio(const struct gpio_dt_spec & sw, struct gpio_callback & callb
 {
     VerifyOrReturn(gpio_is_ready_dt(&sw), ChipLogError(DeviceLayer, "Button GPIO not ready"));
     VerifyOrReturn(gpio_pin_configure_dt(&sw, GPIO_INPUT) == 0, ChipLogError(DeviceLayer, "Button GPIO configure failed"));
-    VerifyOrReturn(gpio_pin_interrupt_configure_dt(&sw, GPIO_INT_EDGE_BOTH) == 0, ChipLogError(DeviceLayer, "Button GPIO interrupt configure failed"));
+    VerifyOrReturn(gpio_pin_interrupt_configure_dt(&sw, GPIO_INT_EDGE_BOTH) == 0,
+                   ChipLogError(DeviceLayer, "Button GPIO interrupt configure failed"));
 
     gpio_init_callback(&callback, handler, BIT(sw.pin));
     VerifyOrReturn(gpio_add_callback(sw.port, &callback) == 0, ChipLogError(DeviceLayer, "Button GPIO add callback failed"));
-
 }
 #endif // ALL_DEVICES_HAS_FACTORY_RESET_SW
 
