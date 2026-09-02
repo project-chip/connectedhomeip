@@ -134,9 +134,9 @@ CHIP_ERROR SimulatedWindowCovering::HandleStopMotion()
     cluster.SetTargetPositionLiftPercent100ths(cluster.GetCurrentPositionLiftPercent100ths());
     cluster.SetTargetPositionTiltPercent100ths(cluster.GetCurrentPositionTiltPercent100ths());
 
-    auto currentLift = cluster.GetCurrentPositionLiftPercent100ths();
-    auto currentTilt = cluster.GetCurrentPositionTiltPercent100ths();
-    auto opStatus    = cluster.GetOperationalStatus();
+    [[maybe_unused]] auto currentLift = cluster.GetCurrentPositionLiftPercent100ths();
+    [[maybe_unused]] auto currentTilt = cluster.GetCurrentPositionTiltPercent100ths();
+    [[maybe_unused]] auto opStatus    = cluster.GetOperationalStatus();
 
     ChipLogProgress(DeviceLayer,
                     "WindowCovering: Halted. Frozen State -> Lift: %" PRIu16 ", Tilt: %" PRIu16 " | OpStatus raw=0x%02X",
@@ -193,7 +193,7 @@ void SimulatedWindowCovering::TimerFired()
         }
 
         cluster.SetCurrentPositionLiftPercent100ths(DataModel::Nullable<Percent100ths>(currentVal));
-        auto opStatus = cluster.GetOperationalStatus();
+        [[maybe_unused]] auto opStatus = cluster.GetOperationalStatus();
         ChipLogProgress(DeviceLayer,
                         "WindowCovering: Simulating Lift -> %" PRIu16 " / Target %" PRIu16
                         " | OpStatus raw=0x%02X (global=%u, lift=%u)",
@@ -225,7 +225,7 @@ void SimulatedWindowCovering::TimerFired()
         }
 
         cluster.SetCurrentPositionTiltPercent100ths(DataModel::Nullable<Percent100ths>(currentVal));
-        auto opStatus = cluster.GetOperationalStatus();
+        [[maybe_unused]] auto opStatus = cluster.GetOperationalStatus();
         ChipLogProgress(DeviceLayer,
                         "WindowCovering: Simulating Tilt -> %" PRIu16 " / Target %" PRIu16
                         " | OpStatus raw=0x%02X (global=%u, tilt=%u)",
