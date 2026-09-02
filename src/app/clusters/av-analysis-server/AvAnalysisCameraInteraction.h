@@ -28,9 +28,9 @@ namespace Clusters {
 namespace AvAnalysis {
 
 /**
- * A camera-bound command (EstablishAnalysisStream, RemoveAnalysisStream) cannot be answered until
- * the camera responds, so its CommandHandler is parked here and the interaction advances through
- * this state machine
+ * A camera-bound command (EstablishAnalysisStream, RemoveAnalysisStream, ActivateAnalysisStream,
+ * DeactivateAnalysisStream) cannot be answered until the camera responds, so its CommandHandler is
+ * parked here and the interaction advances through this state machine
  * Exactly one interaction exists at a time; a command arriving while InFlight() is answered Busy.
  */
 class CameraInteraction
@@ -41,6 +41,8 @@ public:
         kIdle,         // No camera interaction in flight
         kEstablishing, // VideoStreamAllocate awaiting the camera's answer
         kRemoving,     // VideoStreamDeallocate awaiting the camera's answer
+        kActivating,   // WebRTC session initiation awaiting the offer exchange's outcome
+        kDeactivating, // WebRTC EndSession awaiting the camera's answer
     };
 
     State GetState() const { return mState; }

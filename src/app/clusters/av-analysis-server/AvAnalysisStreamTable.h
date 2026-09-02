@@ -41,13 +41,16 @@ namespace AvAnalysis {
  */
 struct AnalysisStreamEntry
 {
+    // The AnalysisStreamStruct fields, encoded into the AnalysisStreams attribute
     uint16_t analysisStreamID = 0;
     DataModel::Nullable<EndpointId> webRTCEndpointID;
     DataModel::Nullable<EndpointId> pushAVEndpointID;
     AnalysisStreamStateEnum state = AnalysisStreamStateEnum::kPendingInitiation;
 
+    // Internal associations the server keeps for the stream, never encoded
     ScopedNodeId cameraNode;
     uint16_t videoStreamID = 0;
+    DataModel::Nullable<uint16_t> webRTCSessionID;
 
     Structs::AnalysisStreamStruct::Type ToEncodableStruct() const
     {
