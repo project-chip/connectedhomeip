@@ -122,15 +122,29 @@ struct TypeInfo
 namespace SessionIDList {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<chip::app::DataModel::List<const uint8_t>>;
-    using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<uint8_t>>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<uint8_t>> &;
+    using Type             = chip::app::DataModel::List<const uint8_t>;
+    using DecodableType    = chip::app::DataModel::DecodableList<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ProximityRanging::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SessionIDList::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SessionIDList
+namespace RangingConstraints {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::ProximityRanging::Structs::RangingConstraintStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::ProximityRanging::Structs::RangingConstraintStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ProximityRanging::Structs::RangingConstraintStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ProximityRanging::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RangingConstraints::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace RangingConstraints
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -179,6 +193,7 @@ struct TypeInfo
         Attributes::BLTCSModeCapability::TypeInfo::DecodableType BLTCSModeCapability =
             static_cast<chip::app::Clusters::ProximityRanging::BLTCSModeEnum>(0);
         Attributes::SessionIDList::TypeInfo::DecodableType sessionIDList;
+        Attributes::RangingConstraints::TypeInfo::DecodableType rangingConstraints;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
