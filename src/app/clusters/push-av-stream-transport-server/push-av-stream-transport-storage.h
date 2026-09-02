@@ -182,6 +182,47 @@ struct TransportTriggerOptionsStorage : public TransportTriggerOptionsStruct
         *this = triggerOptions;
     }
 
+    void UpdateMotionSensitivity(const Optional<DataModel::Nullable<uint8_t>> & newSensitivity)
+    {
+        if (newSensitivity.HasValue())
+        {
+            if (newSensitivity.Value().IsNull())
+            {
+                motionSensitivity.SetValue(DataModel::NullNullable);
+            }
+            else
+            {
+                motionSensitivity.SetValue(DataModel::MakeNullable(newSensitivity.Value().Value()));
+            }
+        }
+    }
+
+    void UpdateMotionZones(
+        const Optional<DataModel::Nullable<DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType>>> & newMotionZones)
+    {
+        if (!newMotionZones.HasValue())
+        {
+            return;
+        }
+
+        mTransportZoneOptions.clear();
+
+        if (newMotionZones.Value().IsNull())
+        {
+            motionZones.SetValue(DataModel::NullNullable);
+        }
+        else
+        {
+            auto iter = newMotionZones.Value().Value().begin();
+            while (iter.Next())
+            {
+                mTransportZoneOptions.push_back(iter.GetValue());
+            }
+            motionZones.SetValue(DataModel::MakeNullable(
+                DataModel::List<const TransportZoneOptionsStruct>(mTransportZoneOptions.data(), mTransportZoneOptions.size())));
+        }
+    }
+
 private:
     std::vector<TransportZoneOptionsStruct> mTransportZoneOptions;
 };
@@ -508,6 +549,19 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         {
             audioStreams.ClearValue();
         }
+    }
+
+    void UpdateMotionSensitivity(const Optional<DataModel::Nullable<uint8_t>> & newSensitivity)
+    {
+        mTriggerOptionsStorage.UpdateMotionSensitivity(newSensitivity);
+        triggerOptions = mTriggerOptionsStorage;
+    }
+
+    void UpdateMotionZones(
+        const Optional<DataModel::Nullable<DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType>>> & newMotionZones)
+    {
+        mTriggerOptionsStorage.UpdateMotionZones(newMotionZones);
+        triggerOptions = mTriggerOptionsStorage;
     }
 
 private:

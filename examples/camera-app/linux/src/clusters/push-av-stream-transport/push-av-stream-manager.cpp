@@ -554,7 +554,7 @@ bool PushAvStreamTransportManager::ValidateMotionZoneListSize(size_t zoneListSiz
         return false;
     }
     auto maxZones = mCameraDevice->GetZoneManagementDelegate().GetZoneMgmtServer()->GetMaxZones();
-    if (zoneListSize >= maxZones)
+    if (zoneListSize > maxZones)
     {
         return false;
     }

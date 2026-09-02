@@ -1586,6 +1586,221 @@ PushAvStreamTransportServerLogic::HandleFindTransport(CommandHandler & handler, 
     return std::nullopt;
 }
 
+std::optional<DataModel::ActionReturnStatus>
+PushAvStreamTransportServerLogic::HandleUpdateMotionZoneOptions(
+    CommandHandler & handler, const ConcreteCommandPath & commandPath,
+    const PushAvStreamTransport::Commands::UpdateMotionZoneOptions::DecodableType & commandData)
+{
+    if (IsNullDelegateWithLogging(commandPath.mEndpointId))
+    {
+        handler.AddStatus(commandPath, Status::UnsupportedCommand);
+        return std::nullopt;
+    }
+
+    uint16_t connectionID   = commandData.connectionID;
+    FabricIndex fabricIndex = handler.GetAccessingFabricIndex();
+
+    TransportConfigurationStorage * transportConfiguration = FindStreamTransportConnectionWithinFabric(connectionID, fabricIndex);
+    if (transportConfiguration == nullptr)
+    {
+        ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: ConnectionID (%u) Not Found for fabric %u", mEndpointId,
+                     connectionID, fabricIndex);
+        handler.AddStatus(commandPath, Status::NotFound);
+        return std::nullopt;
+    }
+
+    if (mDelegate->GetTransportBusyStatus(connectionID) == PushAvStreamTransportStatusEnum::kBusy)
+    {
+        ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Connection is Busy", mEndpointId);
+        handler.AddStatus(commandPath, Status::Busy);
+        return std::nullopt;
+    }
+
+    auto transportOptionsPtr = transportConfiguration->GetTransportOptionsPtr();
+    if (transportOptionsPtr == nullptr)
+    {
+        ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Transport options missing for connection %u", mEndpointId,
+                     connectionID);
+        handler.AddStatus(commandPath, Status::NotFound);
+        return std::nullopt;
+    }
+
+    if (transportOptionsPtr->triggerOptions.triggerType != TransportTriggerTypeEnum::kMotion)
+    {
+        ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Transport trigger type is not Motion", mEndpointId);
+        handler.AddStatus(commandPath, Status::InvalidCommand);
+        return std::nullopt;
+    }
+
+    // Validate MotionSensitivity
+    if (commandData.motionSensitivity.HasValue())
+    {
+        if (mFeatures.Has(Feature::kPerZoneSensitivity))
+        {
+            ChipLogError(Zcl,
+                         "HandleUpdateMotionZoneOptions[ep=%d]: MotionSensitivity cannot be set when PerZoneSensitivity is enabled",
+                         mEndpointId);
+            handler.AddStatus(commandPath, Status::InvalidCommand);
+            return std::nullopt;
+        }
+
+        if (!commandData.motionSensitivity.Value().IsNull())
+        {
+            uint8_t sensitivity = commandData.motionSensitivity.Value().Value();
+            if (sensitivity < 1 || sensitivity > 10)
+            {
+                ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: MotionSensitivity out of range: %u", mEndpointId,
+                             sensitivity);
+                handler.AddStatus(commandPath, Status::ConstraintError);
+                return std::nullopt;
+            }
+        }
+    }
+
+    // Validate MotionZones
+    if (commandData.motionZones.HasValue() && !commandData.motionZones.Value().IsNull())
+    {
+        std::set<uint16_t> zoneIDsFound;
+        bool nullFound      = false;
+        size_t zoneListSize = 0;
+
+        auto iterDup = commandData.motionZones.Value().Value().begin();
+        while (iterDup.Next())
+        {
+            zoneListSize++;
+            auto & zoneOpt = iterDup.GetValue();
+
+            if (!zoneOpt.zone.IsNull())
+            {
+                uint16_t zoneID = zoneOpt.zone.Value();
+                if (zoneIDsFound.count(zoneID) != 0)
+                {
+                    ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Duplicate Zone ID (=%u) in Motion Zones", mEndpointId,
+                                 zoneID);
+                    handler.AddStatus(commandPath, Status::AlreadyExists);
+                    return std::nullopt;
+                }
+                zoneIDsFound.emplace(zoneID);
+            }
+            else
+            {
+                if (nullFound)
+                {
+                    ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Duplicate Null Zone ID in Motion Zones", mEndpointId);
+                    handler.AddStatus(commandPath, Status::AlreadyExists);
+                    return std::nullopt;
+                }
+                nullFound = true;
+            }
+
+            if (zoneOpt.sensitivity.HasValue())
+            {
+                if (!mFeatures.Has(Feature::kPerZoneSensitivity))
+                {
+                    ChipLogError(Zcl,
+                                 "HandleUpdateMotionZoneOptions[ep=%d]: Zone sensitivity provided without PerZoneSensitivity feature",
+                                 mEndpointId);
+                    handler.AddStatus(commandPath, Status::InvalidCommand);
+                    return std::nullopt;
+                }
+
+                uint8_t sens = zoneOpt.sensitivity.Value();
+                if (sens < 1 || sens > 10)
+                {
+                    ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Zone sensitivity out of range: %u", mEndpointId,
+                                 sens);
+                    handler.AddStatus(commandPath, Status::ConstraintError);
+                    return std::nullopt;
+                }
+            }
+        }
+
+        if (iterDup.GetStatus() != CHIP_NO_ERROR)
+        {
+            handler.AddStatus(commandPath, Status::InvalidCommand);
+            return std::nullopt;
+        }
+
+        bool isValidZoneSize = mDelegate->ValidateMotionZoneListSize(zoneListSize);
+        if (!isValidZoneSize)
+        {
+            ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Invalid Motion Zone Size (%u)", mEndpointId,
+                         static_cast<unsigned>(zoneListSize));
+            handler.AddStatus(commandPath, Status::DynamicConstraintError);
+            return std::nullopt;
+        }
+
+        auto iterZones = commandData.motionZones.Value().Value().begin();
+        while (iterZones.Next())
+        {
+            auto & zoneOpt = iterZones.GetValue();
+            if (!zoneOpt.zone.IsNull())
+            {
+                Status zoneIdStatus = mDelegate->ValidateZoneId(zoneOpt.zone.Value());
+                if (zoneIdStatus != Status::Success)
+                {
+                    auto status = to_underlying(StatusCodeEnum::kInvalidZone);
+                    ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Invalid ZoneId (%u)", mEndpointId,
+                                 zoneOpt.zone.Value());
+                    TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
+                    return std::nullopt;
+                }
+            }
+        }
+
+        if (iterZones.GetStatus() != CHIP_NO_ERROR)
+        {
+            handler.AddStatus(commandPath, Status::InvalidCommand);
+            return std::nullopt;
+        }
+    }
+
+    std::shared_ptr<TransportOptionsStorage> updatedTransportOptionsPtr{ new (std::nothrow)
+                                                                             TransportOptionsStorage(*transportOptionsPtr) };
+    if (updatedTransportOptionsPtr == nullptr)
+    {
+        ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Memory Allocation failed for transportOptions", mEndpointId);
+        handler.AddStatus(commandPath, Status::ResourceExhausted);
+        return std::nullopt;
+    }
+
+    if (commandData.motionSensitivity.HasValue())
+    {
+        updatedTransportOptionsPtr->UpdateMotionSensitivity(commandData.motionSensitivity);
+    }
+
+    if (commandData.motionZones.HasValue())
+    {
+        updatedTransportOptionsPtr->UpdateMotionZones(commandData.motionZones);
+    }
+
+    Status status = mDelegate->UpdateMotionZoneOptions(connectionID, *updatedTransportOptionsPtr);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Delegate UpdateMotionZoneOptions failed: %u", mEndpointId,
+                     to_underlying(status));
+        handler.AddStatus(commandPath, status);
+        return std::nullopt;
+    }
+
+    transportConfiguration->SetTransportOptionsPtr(updatedTransportOptionsPtr);
+
+    CHIP_ERROR err = StoreCurrentConnections();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl,
+                     "HandleUpdateMotionZoneOptions[ep=%d]: Failed to store modified connection, reverting: %" CHIP_ERROR_FORMAT,
+                     mEndpointId, err.Format());
+        transportConfiguration->SetTransportOptionsPtr(transportOptionsPtr);
+        handler.AddStatus(commandPath, Status::Failure);
+        return std::nullopt;
+    }
+
+    mDelegate->OnAttributeChanged(PushAvStreamTransport::Attributes::CurrentConnections::Id);
+    handler.AddStatus(commandPath, Status::Success);
+    return std::nullopt;
+}
+
 Status PushAvStreamTransportServerLogic::CheckPrivacyModes(StreamUsageEnum streamUsage)
 {
     bool hardPrivacyModeActive = false;

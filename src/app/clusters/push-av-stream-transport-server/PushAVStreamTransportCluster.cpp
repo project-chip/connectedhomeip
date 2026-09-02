@@ -42,8 +42,9 @@ namespace {
 using namespace chip::app::Clusters::PushAvStreamTransport::Commands;
 
 constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
-    AllocatePushTransport::kMetadataEntry, DeallocatePushTransport::kMetadataEntry,  ModifyPushTransport::kMetadataEntry,
-    SetTransportStatus::kMetadataEntry,    ManuallyTriggerTransport::kMetadataEntry, FindTransport::kMetadataEntry,
+    AllocatePushTransport::kMetadataEntry,   DeallocatePushTransport::kMetadataEntry, ModifyPushTransport::kMetadataEntry,
+    SetTransportStatus::kMetadataEntry,      ManuallyTriggerTransport::kMetadataEntry, FindTransport::kMetadataEntry,
+    UpdateMotionZoneOptions::kMetadataEntry,
 };
 
 constexpr CommandId kGeneratedCommands[] = {
@@ -172,6 +173,11 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServer::Invoke
         FindTransport::DecodableType data;
         ReturnErrorOnFailure(data.Decode(input_arguments, fabricIndex));
         return mLogic.HandleFindTransport(*handler, request.path, data);
+    }
+    case UpdateMotionZoneOptions::Id: {
+        UpdateMotionZoneOptions::DecodableType data;
+        ReturnErrorOnFailure(data.Decode(input_arguments, fabricIndex));
+        return mLogic.HandleUpdateMotionZoneOptions(*handler, request.path, data);
     }
     }
 
