@@ -219,12 +219,14 @@ chip-tool-x86-64 thermostat read max-thermostat-suggestions <nodeID> 1 | grep TO
 
 `AddThermostatSuggestion` can fail with (non-exhaustive):
 
--   `INVALID_IN_STATE` if Matter time isn't synchronized yet (or the suggestions delegate isn't available)
+-   `INVALID_IN_STATE` if Matter time isn't synchronized yet (or the suggestions
+    delegate isn't available)
 -   `NOT_FOUND` if `PresetHandle` isn't in the `Presets` attribute
 -   `RESOURCE_EXHAUSTED` if `ThermostatSuggestions` is already at
     `MaxThermostatSuggestions` entries
 -   `INVALID_COMMAND` if `EffectiveTime` is more than 24 hours in the future
--   `CONSTRAINT_ERROR` if `PresetHandle` is longer than 16 bytes or `ExpirationInMinutes` is outside `[30, 1440]`
+-   `CONSTRAINT_ERROR` if `PresetHandle` is longer than 16 bytes or
+    `ExpirationInMinutes` is outside `[30, 1440]`
 -   `FAILURE` for unexpected internal errors appending to the suggestions list
 
 Add a suggestion for `PresetHandle` `01`, effective now (`EffectiveTime: null`),
