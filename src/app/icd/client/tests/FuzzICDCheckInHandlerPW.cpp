@@ -140,9 +140,9 @@ struct Fixture
         HarnessContext::SetUpTestSuite();
         context.SetUp();
 
+        // AppContext::SetUp() has already initialized the engine (and the access
+        // control), so take the instance rather than initializing it again.
         InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
-        VerifyOrDie(engine->Init(&context.GetExchangeManager(), &context.GetFabricTable(),
-                                 app::reporting::GetDefaultReportScheduler()) == CHIP_NO_ERROR);
 
         VerifyOrDie(storage.Init(&clientInfoStore, &keystore) == CHIP_NO_ERROR);
         VerifyOrDie(delegate.Init(&storage, engine) == CHIP_NO_ERROR);
@@ -166,7 +166,7 @@ struct Fixture
     {
         handler.Shutdown();
         storage.Shutdown();
-        InteractionModelEngine::GetInstance()->Shutdown();
+        // AppContext::TearDown() shuts the engine down, so do not do it here too.
         context.TearDown();
         HarnessContext::TearDownTestSuite();
     }
