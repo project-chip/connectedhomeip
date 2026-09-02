@@ -96,6 +96,7 @@ target_sources(app
 if(CONFIG_CHIP_FACTORY_DATA)
     target_sources(app PRIVATE
                     ${CHIP_ROOT}/examples/platform/silabs/provision/ProvisionStorageZephyr.cpp
+                    ${CHIP_ROOT}/examples/platform/silabs/provision/ProvisionStorageCommon.cpp
                     ${CHIP_ROOT}/examples/platform/silabs/provision/ProvisionStorageCustom.cpp
     )
     target_include_directories(app PRIVATE
