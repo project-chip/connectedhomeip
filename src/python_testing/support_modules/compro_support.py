@@ -311,6 +311,7 @@ import contextlib
 import json
 import logging
 import os
+import shlex
 import sys
 from collections.abc import Awaitable, Callable
 from typing import Any
@@ -320,6 +321,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 import matter.discovery as discovery
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing.apps import AppServerSubprocess
 from matter.testing.matter_testing import MatterBaseTest
 
 logger = logging.getLogger(__name__)
@@ -417,6 +419,12 @@ ED_SERIAL_CLI = os.environ.get(
 )
 
 
+class EDAppSubprocess(AppServerSubprocess):
+    """The ED application, tagged so its output is distinguishable from the proxy's."""
+
+    PREFIX = b"[ED]"
+
+
 class EDFixture:
     """Controls a Matter end device for use as the commissionable ED.
 
@@ -443,6 +451,7 @@ class EDFixture:
         ed_transport: str = "wifipaf",
         serial_port: str | None = None,
         serial_baud: int = 115200,
+        launch_wrapper: str | None = None,
     ):
         self._app_path = app_path
         self._discriminator = discriminator
@@ -451,10 +460,13 @@ class EDFixture:
         self._ed_transport = ed_transport
         self._serial_port = serial_port
         self._serial_baud = serial_baud
+        # Command prefixing the ED in local mode, e.g. the netns_cmd_wrapper of a
+        # Linux network namespace. Empty for a plain subprocess on this host.
+        self._launch_wrapper = shlex.split(launch_wrapper) if launch_wrapper else []
         # "remote" == not an in-process subprocess: driven over the serial console.
         self._remote = bool(serial_port)
         self._remote_desc = f"serial:{serial_port}" if serial_port else "local"
-        self._process: asyncio.subprocess.Process | None = None
+        self._process: EDAppSubprocess | None = None
         self._remote_pid: int | None = None
         self._validate_extra_args_for_transport()
 
@@ -508,41 +520,45 @@ class EDFixture:
     # Local subprocess implementation
     # ------------------------------------------------------------------
 
+    # Logged by every Linux example app once it is up and commissionable. The
+    # same marker the CI test-argument blocks use as their app-ready-pattern.
+    APP_READY_PATTERN = "APP STATUS: Starting event loop"
+    APP_READY_TIMEOUT_S = 30
+
     async def _start_local(self):
         if self._process is not None:
             logger.info("ED fixture already running locally – skipping start")
             return
         logger.info("Starting ED fixture locally: %s", self._app_path)
+
+        # Remove the KVS so the ED is commissionable again on every start.
         kvs = f"/tmp/ed_kvs_{self._discriminator}.json"
         if os.path.exists(kvs):
             os.remove(kvs)
-        cmd = [
+
+        self._process = EDAppSubprocess(
             self._app_path,
-            "--discriminator", str(self._discriminator),
-            "--passcode", str(self._passcode),
-            "--KVS", kvs,
-        ]
-        if self._extra_args:
-            cmd.extend(self._extra_args.split())
-        self._process = await asyncio.create_subprocess_exec(
-            *cmd,
-            stdout=asyncio.subprocess.DEVNULL,
-            stderr=asyncio.subprocess.DEVNULL,
+            storage_dir="/tmp",
+            kvs_path=kvs,
+            discriminator=self._discriminator,
+            passcode=self._passcode,
+            extra_args=shlex.split(self._extra_args) if self._extra_args else [],
+            wrapper=self._launch_wrapper,
         )
-        await asyncio.sleep(3)
+        # Wait for the readiness line rather than a fixed delay: startup time
+        # differs by an order of magnitude between real hardware and a mocked
+        # transport, and a delay that is generous on one is short on the other.
+        await asyncio.to_thread(self._process.start,
+                                expected_output=self.APP_READY_PATTERN,
+                                timeout=self.APP_READY_TIMEOUT_S)
         logger.info("ED fixture started locally (PID=%d, discriminator=%d)",
-                    self._process.pid, self._discriminator)
+                    self._process.p.pid, self._discriminator)
 
     async def _stop_local(self):
         if self._process is None:
             return
-        logger.info("Stopping local ED fixture (PID=%d)", self._process.pid)
-        self._process.terminate()
-        try:
-            await asyncio.wait_for(self._process.wait(), timeout=5.0)
-        except TimeoutError:
-            self._process.kill()
-            await self._process.wait()
+        logger.info("Stopping local ED fixture (PID=%d)", self._process.p.pid)
+        await asyncio.to_thread(self._process.terminate)
         self._process = None
         await asyncio.sleep(1)
         logger.info("Local ED fixture stopped")
@@ -782,6 +798,9 @@ class COMPROBaseTest(MatterBaseTest):
                                Otherwise the ED runs as a local subprocess.
           ed_extra_args      — extra CLI args forwarded to the ED app
                                (e.g. "--wifi --wifipaf freq_list=2437")
+          ed_launch_wrapper  — command prefixing the ED in local mode, e.g.
+                               "ip netns exec ns-wlx-app-0" to place it in a
+                               Linux network namespace
           ed_transport       — 'wifipaf' (default) or 'ble'.  Selects which
                                proxy transport tests should use, and triggers
                                validation of ed_extra_args.
@@ -797,6 +816,7 @@ class COMPROBaseTest(MatterBaseTest):
             extra_args=params.get('ed_extra_args', ''),
             ed_transport=params.get('ed_transport', 'wifipaf'),
             serial_port=params.get('ed_serial_port'),
+            launch_wrapper=params.get('ed_launch_wrapper'),
         ))
 
     def track_ed(self, ed: EDFixture) -> EDFixture:

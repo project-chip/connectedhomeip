@@ -261,12 +261,15 @@ class IsolatedNetworkNamespace(TerminableResource):
     """
 
     def __init__(self, index: int = 0, mgmt_link_name: str = 'eth-mgmt', tool_link_name: str = 'eth-tool', app_link_name: str = 'eth-app',
-                 mgmt_link_up: bool = True, tool_link_up: bool = True, app_link_up: bool = True, add_ula: bool = True):
+                 mgmt_link_up: bool = True, tool_link_up: bool = True, app_link_up: bool = True, add_ula: bool = True,
+                 proxy_link_name: str | None = None, proxy_link_up: bool = True):
         """Initialize isolated network namespaces.
 
         - mgmt -- management network for the RPC server.
         - tool -- tool network for chip-tool.
         - app -- network for tested application(s).
+        - proxy -- network for an intermediary application (e.g. a commissioning proxy),
+          created only when ``proxy_link_name`` is given.
         """
         super().__init__()
         self.index = index
@@ -295,44 +298,59 @@ class IsolatedNetworkNamespace(TerminableResource):
                                      ipv4_addrs=["10.10.10.5/24"], ipv6_addrs=mgmt_ipv6, ns=self.mgmt_ns)
         self._mgmt_link_up = mgmt_link_up
 
+        # An optional fourth namespace, used when a test needs a second application
+        # alongside the one under test. Not created unless a name is given, so the
+        # topology seen by existing tests is unchanged.
+        self.proxy_ns: NetworkNamespace | None = None
+        self.proxy_link: NetworkLink | None = None
+        self._proxy_link_up = proxy_link_up
+        if proxy_link_name is not None:
+            self.proxy_ns = NetworkNamespace(f"ns-{proxy_link_name}-{index}")
+            proxy_ipv6 = ["fe80::6/64"]
+            if add_ula:
+                proxy_ipv6.append("fd00:0:1:1::6/64")
+            self.proxy_link = NetworkLink(f"{proxy_link_name}-{index}",
+                                         ipv4_addrs=["10.10.10.6/24"], ipv6_addrs=proxy_ipv6, ns=self.proxy_ns)
+
         self.bridge = NetworkBridge(f"br-{index}")
         self.bridge.attach_link(self.app_link)
         self.bridge.attach_link(self.tool_link)
         self.bridge.attach_link(self.mgmt_link)
+        if self.proxy_link is not None:
+            self.bridge.attach_link(self.proxy_link)
 
     def resource_start(self) -> None:
         """Bring up selected links in parallel to reduce wait time."""
-        with concurrent.futures.ThreadPoolExecutor(max_workers=3, thread_name_prefix="NetnsSetup") as executor:
-            list(executor.map(lambda x: x(), (
-                self.app_ns.setup,
-                self.tool_ns.setup,
-                self.mgmt_ns.setup,
-            )))
+        namespaces = [self.app_ns, self.tool_ns, self.mgmt_ns]
+        links = [(self.app_link, self._app_link_up),
+                 (self.tool_link, self._tool_link_up),
+                 (self.mgmt_link, self._mgmt_link_up)]
 
-            list(executor.map(lambda x: x(), (
-                self.app_link.setup,
-                self.tool_link.setup,
-                self.mgmt_link.setup,
-            )))
+        if self.proxy_ns is not None and self.proxy_link is not None:
+            namespaces.append(self.proxy_ns)
+            links.append((self.proxy_link, self._proxy_link_up))
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=len(namespaces), thread_name_prefix="NetnsSetup") as executor:
+            list(executor.map(lambda x: x(), (ns.setup for ns in namespaces)))
+
+            list(executor.map(lambda x: x(), (link.setup for link, _ in links)))
 
             self.bridge.setup()
 
-            list(executor.map(lambda x: x(), (
-                link.up for link, should_up in (
-                    (self.app_link, self._app_link_up),
-                    (self.tool_link, self._tool_link_up),
-                    (self.mgmt_link, self._mgmt_link_up)
-                ) if should_up)))
+            list(executor.map(lambda x: x(), (link.up for link, should_up in links if should_up)))
 
             self.bridge.up()
 
     def resource_terminate(self):
         """Execute all teardown, gracefully omitting errors."""
-        for obj in (
-            self.bridge,
-            self.app_link, self.tool_link, self.mgmt_link,
-            self.app_ns, self.tool_ns, self.mgmt_ns
-        ):
+        resources: list[NetworkResource] = [self.bridge, self.app_link, self.tool_link, self.mgmt_link]
+        if self.proxy_link is not None:
+            resources.append(self.proxy_link)
+        resources += [self.app_ns, self.tool_ns, self.mgmt_ns]
+        if self.proxy_ns is not None:
+            resources.append(self.proxy_ns)
+
+        for obj in resources:
             try:
                 obj.teardown()
             except Exception:
