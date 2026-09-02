@@ -166,8 +166,13 @@ public:
      * @param aSessionId the server will manage all session Ids
      * @param aZoneList  the list of Zones that are relevant for the session, Null is used when this information is not available,
      * or all zones
+     * @param aSourceNodeId           With RemoteContextDetection: the camera node the analyzed stream comes from;
+     * every event of the session reports it. Not used with LocalContextDetection.
+     * @param aSourceStartTimestampUs With RemoteContextDetection: the start timestamp (epoch-us) of the analyzed stream,
+     * reported by the session's PerceivedContext events.
      */
-    CHIP_ERROR AnalysisSessionStart(uint16_t & aSessionId, DataModel::Nullable<std::vector<uint16_t>> aZoneList);
+    CHIP_ERROR AnalysisSessionStart(uint16_t & aSessionId, DataModel::Nullable<std::vector<uint16_t>> aZoneList,
+                                    NodeId aSourceNodeId = kUndefinedNodeId, uint64_t aSourceStartTimestampUs = 0);
 
     /**
      * Invoked by the delegate to furnish details of the event that triggered the session. The server will generate a

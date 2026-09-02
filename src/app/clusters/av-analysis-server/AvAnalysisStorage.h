@@ -135,6 +135,11 @@ struct ActiveAmbientContextSession
 {
 private:
     uint16_t mSessionId = 0;
+    // With RemoteContextDetection: the camera the analyzed stream comes from and that stream's
+    // start timestamp. Recorded once at session start so every event of the session reports the
+    // same source, as the event definitions require.
+    NodeId mSourceNodeId             = kUndefinedNodeId;
+    uint64_t mSourceStartTimestampUs = 0;
     std::vector<Structs::TrackedContext::Type> mTrackedContexts;
 
 public:
@@ -143,6 +148,14 @@ public:
 
     void SetSessionId(uint16_t aSessionId) { mSessionId = aSessionId; }
     uint16_t GetSessionId() const { return mSessionId; }
+
+    void SetSource(NodeId aSourceNodeId, uint64_t aSourceStartTimestampUs)
+    {
+        mSourceNodeId           = aSourceNodeId;
+        mSourceStartTimestampUs = aSourceStartTimestampUs;
+    }
+    NodeId GetSourceNodeId() const { return mSourceNodeId; }
+    uint64_t GetSourceStartTimestampUs() const { return mSourceStartTimestampUs; }
 
     void AddTrackedContext(const std::vector<Structs::TrackedContext::Type> & aTrackedContext)
     {

@@ -1014,9 +1014,17 @@ bool AvAnalysisServerLogic::ZoneIDListContains(const DataModel::DecodableList<ui
 
 CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionStart(uint16_t & aSessionId,
                                                        const DataModel::Nullable<std::vector<uint16_t>> & aZoneList,
-                                                       ServerClusterContext * aContext)
+                                                       ServerClusterContext * aContext, NodeId aSourceNodeId,
+                                                       uint64_t aSourceStartTimestampUs)
 {
     VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    // With RemoteContextDetection every event of the session names the camera the analyzed
+    // stream comes from, so a session cannot start without one
+    if (HasFeature(Feature::kRemoteContextDetection))
+    {
+        VerifyOrReturnError(aSourceNodeId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
+    }
 
     // Validate the information received - are the zoneIDs known (if provided)
     if (!aZoneList.IsNull())
@@ -1030,12 +1038,17 @@ CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionStart(uint16_t & aSessionId,
     // Capture our new active session information
     AvAnalysis::ActiveAmbientContextSession newSession;
     newSession.SetSessionId(aSessionId);
+    newSession.SetSource(aSourceNodeId, aSourceStartTimestampUs);
     mActiveSessions.push_back(newSession);
 
     // Create the Initial Event
     Events::AnalysisSessionStart::Type startEvent;
 
     startEvent.sessionID = aSessionId;
+    if (HasFeature(Feature::kRemoteContextDetection))
+    {
+        startEvent.sourceNodeId = MakeOptional(aSourceNodeId);
+    }
 
     // The zones could be null, meaning that no zone information is available
     if (aZoneList.IsNull())
@@ -1085,6 +1098,11 @@ CHIP_ERROR AvAnalysisServerLogic::InitialTriggeringContextDetected(
     perceivedEvent.sessionID             = aSessionId;
     perceivedEvent.newIdentifiedContexts = chip::MakeOptional(
         DataModel::List<const Structs::TrackedContext::Type>(aTriggeringContext.data(), aTriggeringContext.size()));
+    if (HasFeature(Feature::kRemoteContextDetection))
+    {
+        perceivedEvent.sourceNodeId         = MakeOptional(session_it->GetSourceNodeId());
+        perceivedEvent.sourceStartTimestamp = MakeOptional(session_it->GetSourceStartTimestampUs());
+    }
 
     VerifyOrReturnError(aContext->interactionContext.eventsGenerator.GenerateEvent(perceivedEvent, mEndpointId).has_value(),
                         CHIP_ERROR_INTERNAL, ChipLogError(Zcl, "Unable to generate PerceivedContext event"));
@@ -1123,6 +1141,11 @@ CHIP_ERROR AvAnalysisServerLogic::NewContextDetected(uint16_t aSessionId,
         chip::MakeOptional(DataModel::List<const Structs::TrackedContext::Type>(aNewContext.data(), aNewContext.size()));
     perceivedEvent.currentIdentifiedContexts = chip::MakeOptional(
         DataModel::List<const Structs::TrackedContext::Type>(it->GetTrackedContexts().data(), it->GetTrackedContexts().size()));
+    if (HasFeature(Feature::kRemoteContextDetection))
+    {
+        perceivedEvent.sourceNodeId         = MakeOptional(it->GetSourceNodeId());
+        perceivedEvent.sourceStartTimestamp = MakeOptional(it->GetSourceStartTimestampUs());
+    }
 
     VerifyOrReturnError(aContext->interactionContext.eventsGenerator.GenerateEvent(perceivedEvent, mEndpointId).has_value(),
                         CHIP_ERROR_INTERNAL, ChipLogError(Zcl, "Unable to generate PerceivedContext event"));
@@ -1179,6 +1202,11 @@ AvAnalysisServerLogic::ContextNoLongerDetected(uint16_t aSessionId,
         DataModel::List<const Structs::TrackedContext::Type>(it->GetTrackedContexts().data(), it->GetTrackedContexts().size()));
     perceivedEvent.expiredContexts =
         chip::MakeOptional(DataModel::List<const Structs::TrackedContext::Type>(aOldContext.data(), aOldContext.size()));
+    if (HasFeature(Feature::kRemoteContextDetection))
+    {
+        perceivedEvent.sourceNodeId         = MakeOptional(it->GetSourceNodeId());
+        perceivedEvent.sourceStartTimestamp = MakeOptional(it->GetSourceStartTimestampUs());
+    }
 
     VerifyOrReturnError(aContext->interactionContext.eventsGenerator.GenerateEvent(perceivedEvent, mEndpointId).has_value(),
                         CHIP_ERROR_INTERNAL, ChipLogError(Zcl, "Unable to generate PerceivedContext event"));
@@ -1204,6 +1232,12 @@ CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionEnd(uint16_t aSessionId, Server
     // Now create the End Session Event
     Events::AnalysisSessionEnd::Type endSessionEvent;
     endSessionEvent.sessionID = aSessionId;
+    // The source matches the associated AnalysisSessionStart by construction: it was recorded on
+    // the session when it started
+    if (HasFeature(Feature::kRemoteContextDetection))
+    {
+        endSessionEvent.sourceNodeId = MakeOptional(it->GetSourceNodeId());
+    }
 
     VerifyOrReturnError(aContext->interactionContext.eventsGenerator.GenerateEvent(endSessionEvent, mEndpointId).has_value(),
                         CHIP_ERROR_INTERNAL, ChipLogError(Zcl, "Unable to generate EndSession event"));

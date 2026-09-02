@@ -385,6 +385,73 @@ TEST_F(TestRemoteAvAnalysisCluster, EnableContextTriggersIgnoresDuplicateEntries
     ASSERT_FALSE(iter.Next());
 }
 
+TEST_F(TestRemoteAvAnalysisCluster, AnalysisSessionRequiresASourceCameraOnARemoteNode)
+{
+    // Every event of a remote session names the camera the analyzed stream comes from, so a
+    // session cannot start without one
+    uint16_t sessionId = 0;
+    ASSERT_EQ(
+        mServer.GetLogic().AnalysisSessionStart(sessionId, DataModel::NullNullable, &mClusterTester.GetServerClusterContext()),
+        CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, EventsCarryTheSourceCameraOfTheSession)
+{
+    constexpr NodeId kSourceCamera        = 0xCA11;
+    constexpr uint64_t kStreamStartUs     = 123456789;
+    ServerClusterContext & clusterContext = mClusterTester.GetServerClusterContext();
+
+    // Arm all triggers (requires an established stream first)
+    Testing::MockCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, kSourceCamera, Status::Success, 7);
+    Testing::MockCommandHandler enableHandler;
+    enableHandler.SetFabricIndex(1);
+    ConcreteCommandPath enablePath{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
+    Commands::EnableContextTriggers::DecodableType enableData;
+    enableData.contextTriggers.SetNull();
+    auto enableResponse = mServer.GetLogic().HandleEnableContextTriggers(enableHandler, enablePath, enableData);
+    ASSERT_TRUE(enableResponse.has_value() && enableResponse.value().IsSuccess());
+
+    // Session start: the event names the source camera
+    uint16_t sessionId = 0;
+    ASSERT_EQ(
+        mServer.GetLogic().AnalysisSessionStart(sessionId, DataModel::NullNullable, &clusterContext, kSourceCamera, kStreamStartUs),
+        CHIP_NO_ERROR);
+    auto startEvent = mClusterTester.GetNextGeneratedEvent();
+    ASSERT_TRUE(startEvent.has_value());
+    Events::AnalysisSessionStart::DecodableType startData;
+    ASSERT_EQ(startEvent->GetEventData(startData), CHIP_NO_ERROR);
+    ASSERT_TRUE(startData.sourceNodeId.HasValue());
+    ASSERT_EQ(startData.sourceNodeId.Value(), kSourceCamera);
+
+    // PerceivedContext: same camera, plus the stream's start timestamp
+    const std::vector<Structs::TrackedContext::Type> trackedContext = {
+        { .identifiedContextID = 0,
+          .identifiedContext   = { .namespaceID = static_cast<uint8_t>(0x49), .tag = static_cast<uint8_t>(0x0B) },
+          .startTime           = 0,
+          .endTime             = DataModel::NullNullable }
+    };
+    ASSERT_EQ(mServer.GetLogic().InitialTriggeringContextDetected(sessionId, trackedContext, &clusterContext), CHIP_NO_ERROR);
+    auto perceivedEvent = mClusterTester.GetNextGeneratedEvent();
+    ASSERT_TRUE(perceivedEvent.has_value());
+    Events::PerceivedContext::DecodableType perceivedData;
+    ASSERT_EQ(perceivedEvent->GetEventData(perceivedData), CHIP_NO_ERROR);
+    ASSERT_TRUE(perceivedData.sourceNodeId.HasValue());
+    ASSERT_EQ(perceivedData.sourceNodeId.Value(), kSourceCamera);
+    ASSERT_TRUE(perceivedData.sourceStartTimestamp.HasValue());
+    ASSERT_EQ(perceivedData.sourceStartTimestamp.Value(), kStreamStartUs);
+
+    // Session end: the source matches the associated AnalysisSessionStart
+    ASSERT_EQ(mServer.GetLogic().AnalysisSessionEnd(sessionId, &clusterContext), CHIP_NO_ERROR);
+    auto endEvent = mClusterTester.GetNextGeneratedEvent();
+    ASSERT_TRUE(endEvent.has_value());
+    Events::AnalysisSessionEnd::DecodableType endData;
+    ASSERT_EQ(endEvent->GetEventData(endData), CHIP_NO_ERROR);
+    ASSERT_TRUE(endData.sourceNodeId.HasValue());
+    ASSERT_EQ(endData.sourceNodeId.Value(), kSourceCamera);
+}
+
 TEST_F(TestRemoteAvAnalysisCluster, ReadAllAttributesWithClusterTesterTest)
 {
     Attributes::SupportedAmbientContexts::TypeInfo::DecodableType aSupportedAmbientContexts;

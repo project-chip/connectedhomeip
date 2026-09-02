@@ -856,6 +856,8 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEventGenerationSequence)
     Events::AnalysisSessionStart::DecodableType startData;
     ASSERT_EQ(analysisStartEvent->GetEventData(startData), CHIP_NO_ERROR);
     ASSERT_EQ(startData.sessionID, mSessionId);
+    // The source fields are REMCONDETECT-only; a local node's events must not carry them
+    ASSERT_FALSE(startData.sourceNodeId.HasValue());
     if (!startData.triggeredZones.IsNull())
     {
         FAIL() << "Expected Zones to be Null";
@@ -882,6 +884,8 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEventGenerationSequence)
     Events::PerceivedContext::DecodableType perceivedContextData;
     ASSERT_EQ(perceivedContextEvent->GetEventData(perceivedContextData), CHIP_NO_ERROR);
     ASSERT_EQ(perceivedContextData.sessionID, mSessionId);
+    ASSERT_FALSE(perceivedContextData.sourceNodeId.HasValue());
+    ASSERT_FALSE(perceivedContextData.sourceStartTimestamp.HasValue());
 
     // Verify that the event contains only a new identified context, and that it has one value.
     ASSERT_TRUE(perceivedContextData.newIdentifiedContexts.HasValue());
@@ -1037,6 +1041,7 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEventGenerationSequence)
     Events::AnalysisSessionEnd::DecodableType endSessionData;
     ASSERT_EQ(endSessionEvent->GetEventData(endSessionData), CHIP_NO_ERROR);
     ASSERT_EQ(endSessionData.sessionID, mSessionId);
+    ASSERT_FALSE(endSessionData.sourceNodeId.HasValue());
 
     // 6. Verify that the session is no longer available, a new context should fail with the no longer valid session id
     ASSERT_EQ(

@@ -154,9 +154,10 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisCluster::InvokeCommand(co
 }
 
 // Context detection
-CHIP_ERROR AvAnalysisCluster::AnalysisSessionStart(uint16_t & aSessionId, DataModel::Nullable<std::vector<uint16_t>> aZoneList)
+CHIP_ERROR AvAnalysisCluster::AnalysisSessionStart(uint16_t & aSessionId, DataModel::Nullable<std::vector<uint16_t>> aZoneList,
+                                                   NodeId aSourceNodeId, uint64_t aSourceStartTimestampUs)
 {
-    return mLogic.AnalysisSessionStart(aSessionId, aZoneList, mContext);
+    return mLogic.AnalysisSessionStart(aSessionId, aZoneList, mContext, aSourceNodeId, aSourceStartTimestampUs);
 }
 
 CHIP_ERROR

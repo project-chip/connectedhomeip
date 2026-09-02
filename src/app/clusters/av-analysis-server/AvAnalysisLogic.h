@@ -146,7 +146,8 @@ public:
 
     // Active context tracking and events
     CHIP_ERROR AnalysisSessionStart(uint16_t & aSessionId, const DataModel::Nullable<std::vector<uint16_t>> & aZoneList,
-                                    ServerClusterContext * aContext);
+                                    ServerClusterContext * aContext, NodeId aSourceNodeId = kUndefinedNodeId,
+                                    uint64_t aSourceStartTimestampUs = 0);
 
     CHIP_ERROR InitialTriggeringContextDetected(uint16_t aSessionId,
                                                 const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aTriggeringContext,
