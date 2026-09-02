@@ -1342,6 +1342,11 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             extra_args=provider_extra_args_updateAvailable,
         )
 
+        # Arm the barrier before the announce below, so that a QueryImage reaching this provider
+        # cannot slip past unnoticed. start_provider() leaves the match armed on its own "Server
+        # initialization complete" wait, so this must follow it.
+        self.current_provider_app_proc.arm_output_match(PROVIDER_QUERY_RECEIVED_LOG)
+
         # ------------------------------------------------------------------------------------
         # [STEP_6]: Step #6.1 - Subscribe to UpdateState attribute.
         # Attribute subscription is used instead of event subscription because:
@@ -1388,11 +1393,24 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         subscription_s6.flush_reports()
 
         # ------------------------------------------------------------------------------------
-        # [STEP_6]: Step #6.0 - Controller sends AnnounceOTAProvider command
+        # [STEP_6]: Step #6.0 - Controller sends AnnounceOTAProvider command, repeating until the
+        # provider confirms it received a QueryImage.
+        #
+        # The provider process was just replaced by start_provider() above, so the DUT's first
+        # query can die in a CASE session it cached for Step 5's process, producing the same
+        # kQuerying→kIdle cycle Phase A/B below wait for without this provider ever having
+        # answered it. Gating on the provider's own receipt log — not just the DUT's state
+        # transitions — is what makes the cycle observed below prove the same-version rejection
+        # actually happened against this provider.
         # ------------------------------------------------------------------------------------
         logger.info('%s: Step #6.0 - Controller sends AnnounceOTAProvider command', step_number_s6)
-        await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
-        logger.info('%s: Step #6.0 - sent cmd AnnounceOTAProvider.', step_number_s6)
+        await self._announce_until_provider_queried(
+            controller=controller,
+            provider_node_id=provider_node_id,
+            requestor_node_id=requestor_node_id,
+            timeout_sec=self.remaining_test_budget_sec(reserve_sec=STEP_RESERVE_SEC),
+            step_name=step_number_s6,
+        )
 
         # ------------------------------------------------------------------------------------
         # [STEP_6]: Step #6.1 - The DUT (on V2) must query the provider (which offers the same
