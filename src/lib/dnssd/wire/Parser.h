@@ -114,12 +114,18 @@ public:
     virtual void OnResource(ResourceType type, const ResourceData & data) = 0;
 };
 
-/// Parses a mMDNS packet.
+/// Parses a DNS packet.
 ///
-/// Calls appropriate delegate callbacks while parsing
+/// Calls appropriate delegate callbacks while parsing.
 ///
 /// returns true if packet was successfully parsed, false otherwise
-bool ParsePacket(const BytesRange & packetData, ParserDelegate * delegate);
+bool ParseDnsPacket(const BytesRange & packetData, ParserDelegate * delegate);
+
+/// Parses an mDNS packet, validating the header according to RFC 6762.
+/// (OPCODE and RCODE must be zero).
+/// It then parses using ParseDnsPacket().
+/// returns true if packet was successfully parsed, false otherwise
+bool ParseMdnsPacket(const BytesRange & packetData, ParserDelegate * delegate);
 
 } // namespace Dnssd
 } // namespace chip

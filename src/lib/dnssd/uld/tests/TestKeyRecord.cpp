@@ -35,12 +35,9 @@ TEST(TestKeyRecord, WritesFlagsProtocolAlgorithmAndRawKey)
 {
     uint8_t headerBuffer[HeaderRef::kSizeBytes];
     uint8_t dataBuffer[256];
-    uint8_t rawKey[kP256RawPublicKeySize];
 
-    for (size_t i = 0; i < sizeof(rawKey); i++)
-    {
-        rawKey[i] = static_cast<uint8_t>(i);
-    }
+    Crypto::P256Keypair keypair;
+    ASSERT_EQ(keypair.Initialize(Crypto::ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
 
     HeaderRef header(headerBuffer);
     header.Clear();
@@ -48,7 +45,7 @@ TEST(TestKeyRecord, WritesFlagsProtocolAlgorithmAndRawKey)
     BufferWriter output(dataBuffer, sizeof(dataBuffer));
     RecordWriter writer(&output);
 
-    KeyResourceRecord record(kNames, ByteSpan(rawKey));
+    KeyResourceRecord record(kNames, keypair.Pubkey());
     record.SetTtl(120);
 
     EXPECT_TRUE(record.Append(header, ResourceType::kAuthority, writer));
@@ -70,14 +67,15 @@ TEST(TestKeyRecord, WritesFlagsProtocolAlgorithmAndRawKey)
     EXPECT_EQ(rdata[1], 0x00);
     EXPECT_EQ(rdata[2], KeyResourceRecord::kKeyProtocolDnssec);
     EXPECT_EQ(rdata[3], kKeyAlgorithmEcdsaP256);
-    EXPECT_EQ(memcmp(rdata + 4, rawKey, sizeof(rawKey)), 0);
+    EXPECT_EQ(memcmp(rdata + 4, keypair.Pubkey().ConstBytes() + 1, kP256RawPublicKeySize), 0);
 }
 
-TEST(TestKeyRecord, RejectsWrongKeyLength)
+TEST(TestKeyRecord, RejectsNonUncompressedKey)
 {
     uint8_t headerBuffer[HeaderRef::kSizeBytes];
     uint8_t dataBuffer[128];
-    uint8_t shortKey[16] = {};
+    Crypto::P256PublicKey publicKey;
+    memset(publicKey.Bytes(), 0, publicKey.Length());
 
     HeaderRef header(headerBuffer);
     header.Clear();
@@ -85,34 +83,52 @@ TEST(TestKeyRecord, RejectsWrongKeyLength)
     BufferWriter output(dataBuffer, sizeof(dataBuffer));
     RecordWriter writer(&output);
 
-    KeyResourceRecord record(kNames, ByteSpan(shortKey));
+    KeyResourceRecord record(kNames, publicKey);
     EXPECT_FALSE(record.Append(header, ResourceType::kAuthority, writer));
     EXPECT_EQ(header.GetAuthorityCount(), 0);
 }
 
-TEST(TestKeyRecord, ExtractRawP256PublicKeyStripsPrefix)
+TEST(TestKeyRecord, ParseReconstructsUncompressedPublicKey)
 {
-    uint8_t point[kP256RawPublicKeySize + 1];
-    uint8_t raw[kP256RawPublicKeySize];
-
-    point[0] = 0x04;
-    for (size_t i = 0; i < kP256RawPublicKeySize; i++)
+    uint8_t rdata[4 + kP256RawPublicKeySize] = {};
+    rdata[2]                                 = KeyResourceRecord::kKeyProtocolDnssec;
+    rdata[3]                                 = kKeyAlgorithmEcdsaP256;
+    for (size_t i = 0; i < kP256RawPublicKeySize; ++i)
     {
-        point[i + 1] = static_cast<uint8_t>(0xA0 + i);
+        rdata[4 + i] = static_cast<uint8_t>(i + 1);
     }
 
-    MutableByteSpan out(raw);
-    EXPECT_EQ(KeyResourceRecord::ExtractRawP256PublicKey(ByteSpan(point), out), CHIP_NO_ERROR);
-    EXPECT_EQ(out.size(), kP256RawPublicKeySize);
-    EXPECT_EQ(memcmp(raw, point + 1, kP256RawPublicKeySize), 0);
+    Crypto::P256PublicKey publicKey;
+    EXPECT_EQ(KeyResourceRecord::Parse(ByteSpan(rdata), publicKey), CHIP_NO_ERROR);
+    EXPECT_EQ(publicKey.ConstBytes()[0], 0x04);
+    EXPECT_EQ(memcmp(publicKey.ConstBytes() + 1, rdata + 4, kP256RawPublicKeySize), 0);
+}
 
-    point[0] = 0x02; // compressed — reject
-    out      = MutableByteSpan(raw);
-    EXPECT_EQ(KeyResourceRecord::ExtractRawP256PublicKey(ByteSpan(point), out), CHIP_ERROR_INVALID_ARGUMENT);
+TEST(TestKeyRecord, ParseRejectsInvalidRdata)
+{
+    uint8_t rdata[4 + kP256RawPublicKeySize] = {};
+    rdata[2]                                 = KeyResourceRecord::kKeyProtocolDnssec;
+    rdata[3]                                 = kKeyAlgorithmEcdsaP256;
+    rdata[4]                                 = 1;
 
-    point[0] = 0x04;
-    out      = MutableByteSpan(raw, kP256RawPublicKeySize - 1);
-    EXPECT_EQ(KeyResourceRecord::ExtractRawP256PublicKey(ByteSpan(point), out), CHIP_ERROR_BUFFER_TOO_SMALL);
+    Crypto::P256PublicKey publicKey;
+
+    rdata[0] = 1;
+    EXPECT_EQ(KeyResourceRecord::Parse(ByteSpan(rdata), publicKey), CHIP_ERROR_INVALID_ARGUMENT);
+
+    rdata[0] = 0;
+    rdata[2] = 2;
+    EXPECT_EQ(KeyResourceRecord::Parse(ByteSpan(rdata), publicKey), CHIP_ERROR_INVALID_ARGUMENT);
+
+    rdata[2] = KeyResourceRecord::kKeyProtocolDnssec;
+    rdata[3] = 14;
+    EXPECT_EQ(KeyResourceRecord::Parse(ByteSpan(rdata), publicKey), CHIP_ERROR_INVALID_ARGUMENT);
+
+    rdata[3] = kKeyAlgorithmEcdsaP256;
+    rdata[4] = 0;
+    EXPECT_EQ(KeyResourceRecord::Parse(ByteSpan(rdata), publicKey), CHIP_ERROR_INVALID_ARGUMENT);
+
+    EXPECT_EQ(KeyResourceRecord::Parse(ByteSpan(rdata, sizeof(rdata) - 1), publicKey), CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 } // namespace

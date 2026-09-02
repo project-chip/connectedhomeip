@@ -136,20 +136,12 @@ bool ResourceData::Parse(const BytesRange & validData, const uint8_t ** start)
     return true;
 }
 
-bool ParsePacket(const BytesRange & packetData, ParserDelegate * delegate)
+bool ParseDnsPacket(const BytesRange & packetData, ParserDelegate * delegate)
 {
-    if (packetData.Size() < static_cast<ptrdiff_t>(HeaderRef::kSizeBytes))
-    {
-        return false;
-    }
+    VerifyOrReturnValue(packetData.Size() >= static_cast<ptrdiff_t>(HeaderRef::kSizeBytes), false);
 
     // header is used as const, so cast is safe
     ConstHeaderRef header(packetData.Start());
-
-    if (!header.GetFlags().IsValidMdns())
-    {
-        return false;
-    }
 
     // Reject packets with unreasonable record counts to prevent CPU exhaustion.
     // An mDNS packet is at most ~9000 bytes; the smallest record is ~12 bytes,
@@ -213,6 +205,16 @@ bool ParsePacket(const BytesRange & packetData, ParserDelegate * delegate)
     }
 
     return true;
+}
+
+bool ParseMdnsPacket(const BytesRange & packetData, ParserDelegate * delegate)
+{
+    VerifyOrReturnValue(packetData.Size() >= static_cast<ptrdiff_t>(HeaderRef::kSizeBytes), false);
+
+    ConstHeaderRef header(packetData.Start());
+    VerifyOrReturnValue(header.GetFlags().IsValidMdns(), false);
+
+    return ParseDnsPacket(packetData, delegate);
 }
 
 } // namespace Dnssd

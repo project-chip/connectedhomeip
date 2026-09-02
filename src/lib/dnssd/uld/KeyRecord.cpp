@@ -16,6 +16,11 @@
  */
 
 #include <lib/dnssd/uld/KeyRecord.h>
+
+#include <algorithm>
+#include <cstring>
+
+#include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
 
 namespace chip {
@@ -24,26 +29,33 @@ namespace Uld {
 
 bool KeyResourceRecord::WriteData(RecordWriter & out) const
 {
-    if (mPublicKey.size() != kP256RawPublicKeySize)
-    {
-        return false;
-    }
+    static_assert(Crypto::kP256_PublicKey_Length == kP256RawPublicKeySize + 1);
+    VerifyOrReturnValue(mPublicKey.IsUncompressed(), false);
 
     out.Put16(kKeyFlags).Put8(kKeyProtocolDnssec).Put8(kKeyAlgorithmEcdsaP256);
-    out.Writer().Put(mPublicKey.data(), mPublicKey.size());
+    out.Writer().Put(mPublicKey.ConstBytes() + 1, kP256RawPublicKeySize);
     return out.Fit();
 }
 
-CHIP_ERROR KeyResourceRecord::ExtractRawP256PublicKey(ByteSpan uncompressedPoint, MutableByteSpan outRawKey)
+CHIP_ERROR KeyResourceRecord::Parse(ByteSpan rdata, Crypto::P256PublicKey & publicKey)
 {
-    constexpr uint8_t kUncompressedPointPrefix = 0x04;
-    constexpr size_t kUncompressedPointSize    = kP256RawPublicKeySize + 1;
+    static_assert(Crypto::kP256_PublicKey_Length == kP256RawPublicKeySize + 1);
+    // KEY RDATA prefix: flags (u16) | protocol (u8) | algorithm (u8).
+    constexpr size_t kKeyMetadataSize = sizeof(uint16_t) + sizeof(uint8_t) + sizeof(uint8_t);
 
-    VerifyOrReturnError(uncompressedPoint.size() == kUncompressedPointSize, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(uncompressedPoint[0] == kUncompressedPointPrefix, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(outRawKey.size() >= kP256RawPublicKeySize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(rdata.size() == kKeyMetadataSize + kP256RawPublicKeySize, CHIP_ERROR_INVALID_ARGUMENT);
 
-    return CopySpanToMutableSpan(uncompressedPoint.SubSpan(1), outRawKey);
+    const uint8_t * cursor = rdata.data();
+    // Verify the validity of the Key metadata.
+    VerifyOrReturnError(Encoding::BigEndian::Read16(cursor) == kKeyFlags, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(*cursor++ == kKeyProtocolDnssec, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(*cursor++ == kKeyAlgorithmEcdsaP256, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(std::any_of(cursor, rdata.end(), [](uint8_t value) { return value != 0; }), CHIP_ERROR_INVALID_ARGUMENT);
+
+    constexpr uint8_t kUncompressedPointMarker = 0x04;
+    publicKey.Bytes()[0]                       = kUncompressedPointMarker;
+    memcpy(publicKey.Bytes() + 1, cursor, kP256RawPublicKeySize);
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Uld

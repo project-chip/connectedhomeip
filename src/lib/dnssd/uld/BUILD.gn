@@ -23,11 +23,15 @@ source_set("uld") {
     "OptRecord.h",
     "Sig0Record.h",
     "UpdateBuilder.h",
+    "UpdateResponse.cpp",
+    "UpdateResponse.h",
   ]
 
   public_deps = [
+    "${chip_root}/src/crypto",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/dnssd/wire",
+    "${chip_root}/src/lib/dnssd/wire:reader",
     "${chip_root}/src/lib/dnssd/wire/records",
     "${chip_root}/src/lib/support",
   ]
