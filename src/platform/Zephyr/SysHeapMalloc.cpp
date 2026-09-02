@@ -70,8 +70,20 @@ LockGuard::~LockGuard()
 class HeapDebugLogGuard
 {
 public:
-    HeapDebugLogGuard() : mLogging(!sInHeapLog) { if (mLogging) { sInHeapLog = true; } }
-    ~HeapDebugLogGuard() { if (mLogging) { sInHeapLog = false; } }
+    HeapDebugLogGuard() : mLogging(!sInHeapLog)
+    {
+        if (mLogging)
+        {
+            sInHeapLog = true;
+        }
+    }
+    ~HeapDebugLogGuard()
+    {
+        if (mLogging)
+        {
+            sInHeapLog = false;
+        }
+    }
     explicit operator bool() const { return mLogging; }
 
 private:
