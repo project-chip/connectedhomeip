@@ -227,5 +227,6 @@ class TC_PWRTL_2_2(MatterBaseTest):
             th1_reports.cancel()
             th2_reports.cancel()
 
+
 if __name__ == "__main__":
     default_matter_test_main()
