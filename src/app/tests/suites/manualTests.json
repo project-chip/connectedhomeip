@@ -80,7 +80,7 @@
     "EnergyEVSEMode": [],
     "FanControl": [],
     "GeneralCommissioning": [],
-    "GeneralDiagnostics": ["Test_TC_DGGEN_2_2"],
+    "GeneralDiagnostics": [],
     "Identify": ["Test_TC_I_3_2"],
     "IcdManagement": [],
     "IlluminanceMeasurement": [],
