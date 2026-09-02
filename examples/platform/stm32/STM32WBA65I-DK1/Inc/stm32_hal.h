@@ -25,20 +25,21 @@
 
 <<<<<<< HEAD:examples/platform/stm32/STM32WBA65I-DK1/Inc/stm32_hal.h
 #endif /*__STM32HAL_H__*/
-=======
+    =======
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitMask.h>
 
-namespace chip::app::Clusters::PowerTopology {
+    namespace chip::app::Clusters::PowerTopology
+{
 
-/// Create and register the Power Topology cluster on `endpointId` with `features`.
-/// The app instantiates this cluster on more than one endpoint, and the two carry different
-/// feature sets, so the caller chooses. Call from ApplicationInit().
-CHIP_ERROR PowerTopologyInit(EndpointId endpointId, BitMask<Feature> features);
+    /// Create and register the Power Topology cluster on `endpointId` with `features`.
+    /// The app instantiates this cluster on more than one endpoint, and the two carry different
+    /// feature sets, so the caller chooses. Call from ApplicationInit().
+    CHIP_ERROR PowerTopologyInit(EndpointId endpointId, BitMask<Feature> features);
 
-/// Unregister and destroy every instance. Call from ApplicationShutdown().
-void PowerTopologyShutdown();
+    /// Unregister and destroy every instance. Call from ApplicationShutdown().
+    void PowerTopologyShutdown();
 
 } // namespace chip::app::Clusters::PowerTopology
 >>>>>>> aed3a54 ([examples] Add an Electrical Circuit Breaker endpoint to electrical-protection-app (#73815)):examples/electrical-protection-app/electrical-protection-common/include/power-topology-stub.h
