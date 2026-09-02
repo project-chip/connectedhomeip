@@ -162,6 +162,8 @@ if(CONFIG_CHIP)
     )
     
     set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS chip)
+    
+    target_link_libraries(chip INTERFACE $<TARGET_FILE:kernel>)
 
     if (CONFIG_CHIP_MALLOC_SYS_HEAP_OVERRIDE)
         target_link_options(chip INTERFACE

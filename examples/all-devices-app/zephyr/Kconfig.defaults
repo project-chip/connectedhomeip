@@ -1,0 +1,151 @@
+#
+# Copyright (c) 2026 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+if CHIP
+
+choice STD_CPP
+	default STD_CPP17
+endchoice
+
+config CHIP_ENABLE_PAIRING_AUTOSTART
+	default y
+
+config CHIP_OTA_REQUESTOR
+	default n
+	imply STREAM_FLASH
+	imply STREAM_FLASH_ERASE
+	imply IMG_MANAGER
+
+config STREAM_FLASH
+	default n
+
+config STREAM_FLASH_ERASE
+	default n
+
+config IMG_MANAGER
+	default n
+
+config BOOTLOADER_MCUBOOT
+	default y
+
+config BT
+	default y
+
+config BT_PERIPHERAL
+	default y
+
+config BT_DEVICE_NAME
+	default "MatterAllDev"
+
+config BT_HOST_CRYPTO
+	default y
+
+config MBEDTLS_ENTROPY_C
+	default y
+
+config MBEDTLS_PSA_DRIVER_GET_ENTROPY
+	default y
+
+config NET_L2_OPENTHREAD
+	default y
+
+config LOG
+	default y
+
+choice LOG_MODE
+	default LOG_MODE_DEFERRED
+endchoice
+
+config SYSTEM_WORKQUEUE_STACK_SIZE
+	default 4096
+
+config THREAD_LOCAL_STORAGE
+	default y
+
+config MAIN_STACK_SIZE
+	default 12288
+
+choice POSIX_AEP_CHOICE
+	default POSIX_AEP_CHOICE_NONE
+endchoice
+
+config MBEDTLS
+	default y
+
+choice CHIP_CRYPTO
+	default CHIP_CRYPTO_PSA
+endchoice
+
+config MBEDTLS_HEAP_SIZE
+	default 16384
+
+config SHELL
+	default y
+
+config CHIP_LIB_SHELL
+	default y
+
+
+if SHELL
+
+config SHELL_STACK_SIZE
+    default 2616 if CHIP_WIFI
+
+config SHELL_MINIMAL
+    default y if !CHIP_MEMORY_PROFILING
+
+config KERNEL_SHELL
+    default n if !CHIP_MEMORY_PROFILING
+
+config SHELL_WILDCARD
+	default n
+
+config SENSOR_SHELL
+    default n
+
+config DEVICE_SHELL
+    default n
+
+config DATE_SHELL
+    default n
+
+config DEVMEM_SHELL
+    default n
+
+config MCUBOOT_SHELL
+    default n
+
+config CLOCK_CONTROL_NRF_SHELL
+    default n
+
+config FLASH_SHELL
+    default n
+
+config HWINFO_SHELL
+    default n
+
+config OPENTHREAD_SHELL
+    default n if !CHIP_MEMORY_PROFILING
+
+config SHELL_CMD_BUFF_SIZE
+    default 512 if CHIP_MEMORY_PROFILING
+
+endif # SHELL
+
+config SHELL_WILDCARD
+	default n
+
+endif # CHIP
