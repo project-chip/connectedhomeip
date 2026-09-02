@@ -27,6 +27,7 @@
 #include <credentials/FabricTable.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 
 #include <cstddef>
 
@@ -80,12 +81,23 @@ public:
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
+    /// Brackets a list write so a failed one can be undone. A client writes a list as ReplaceAll
+    /// followed by one AppendItem per entry, and each of those arrives as its own WriteAttribute
+    /// call; without this the entries already applied when a later one is rejected would stay.
+    void ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType,
+                                        FabricIndex accessingFabric) override;
+
 private:
     // ElectricalCircuitNodes (CIRC): fabric-scoped, writable, non-volatile list.
     DataModel::ActionReturnStatus WriteElectricalCircuitNodes(const DataModel::WriteAttributeRequest & request,
                                                               AttributeValueDecoder & decoder);
     bool DecodeCircuitNode(const Structs::CircuitNodeStruct::DecodableType & decoded, FabricIndex fabricIndex,
                            CircuitNodeStorage::Node & out) const;
+
+    // Copies the accessing fabric's entries aside for the duration of a list write. Returns false if
+    // the copy could not be taken, in which case a failed write cannot be rolled back.
+    bool SnapshotNodesForFabric(FabricIndex fabricIndex);
+    void ReleaseNodeSnapshot();
 
     // FabricTable::Delegate: purge a removed fabric's ElectricalCircuitNodes entries (fabric-scoped data).
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
@@ -95,8 +107,16 @@ private:
     FabricTable * mFabricTable;
 
     // Not owned. Non-null whenever the CIRC feature is enabled (checked at Startup). The cluster
-    // performs no allocation of its own for ElectricalCircuitNodes.
+    // holds no ElectricalCircuitNodes entries of its own; it allocates only for the duration of a
+    // single write, to stage the incoming list and to hold the rollback snapshot below.
     CircuitNodeStorage * mCircuitNodeStorage;
+
+    // The accessing fabric's entries as they were when the current list write began, restored if
+    // that write fails. Empty outside a list write. mNodeSnapshotValid distinguishes "the fabric
+    // had no entries" from "the snapshot could not be taken", since only the former may be restored.
+    Platform::ScopedMemoryBuffer<CircuitNodeStorage::Node> mNodeSnapshot;
+    size_t mNodeSnapshotCount = 0;
+    bool mNodeSnapshotValid   = false;
 };
 
 } // namespace chip::app::Clusters::PowerTopology

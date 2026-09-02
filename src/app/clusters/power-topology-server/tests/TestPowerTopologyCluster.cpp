@@ -957,6 +957,112 @@ TEST_F(TestPowerTopologyCluster, WriteElectricalCircuitNodesOverSpecMaximumIsCon
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// A client writes a list as ReplaceAll([]) followed by one AppendItem per entry, and each block
+// arrives as its own WriteAttribute call. The ReplaceAll has therefore already cleared the fabric's
+// slice by the time a later entry is rejected, so without the failure notification the write would
+// leave the attribute empty rather than unchanged. WriteHandler brackets the sequence; the tester
+// does not, so this drives the notifications the way WriteHandler would.
+TEST_F(TestPowerTopologyCluster, FailedChunkedListWriteRollsBackToThePreviousNodes)
+{
+    chip::Testing::TestServerClusterContext context;
+    chip::Testing::FabricTestFixture fabricHelper{ &context.StorageDelegate() };
+    BitMask<Feature> features(Feature::kElectricalCircuit);
+    FixedCircuitNodeStorage circuitStorage10;
+    MockPowerTopologyDelegate dummyDelegate;
+
+    PowerTopologyCluster cluster(PowerTopologyCluster::Config{
+        .endpointId         = kTestEndpointId,
+        .delegate           = dummyDelegate,
+        .features           = features,
+        .fabricTable        = &fabricHelper.GetFabricTable(),
+        .circuitNodeStorage = &circuitStorage10,
+    });
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    const ConcreteAttributePath listPath(kTestEndpointId, PowerTopology::Id, ElectricalCircuitNodes::Id);
+
+    // Seed a value that the failed write must not destroy.
+    Structs::CircuitNodeStruct::Type seeded[] = {
+        MakeCircuitNode(0xA1A1, MakeOptional<EndpointId>(static_cast<EndpointId>(3)),
+                        MakeOptional(CharSpan::fromCharString("keep-me"))),
+    };
+    EXPECT_EQ(tester.WriteAttribute(ElectricalCircuitNodes::Id, DataModel::List<Structs::CircuitNodeStruct::Type>(seeded),
+                                    ListWritingPattern::ReplaceAll),
+              IMStatus::Success);
+
+    std::string tooLong(PowerTopologyCluster::kMaxNodeLabelLength + 1, 'x');
+    Structs::CircuitNodeStruct::Type rejected[] = {
+        MakeCircuitNode(0xB2B2, NullOptional, MakeOptional(CharSpan(tooLong.data(), tooLong.size()))),
+    };
+
+    cluster.ListAttributeWriteNotification(listPath, DataModel::ListWriteOperation::kListWriteBegin, kTestFabricIndex);
+    EXPECT_EQ(tester.WriteAttribute(ElectricalCircuitNodes::Id, DataModel::List<Structs::CircuitNodeStruct::Type>(rejected),
+                                    ListWritingPattern::ClearAllThenAppendItems),
+              IMStatus::ConstraintError);
+    cluster.ListAttributeWriteNotification(listPath, DataModel::ListWriteOperation::kListWriteFailure, kTestFabricIndex);
+
+    ElectricalCircuitNodes::TypeInfo::DecodableType nodes;
+    EXPECT_TRUE(tester.ReadAttribute(ElectricalCircuitNodes::Id, nodes).IsSuccess());
+    auto iter = nodes.begin();
+    ASSERT_TRUE(iter.Next());
+    EXPECT_EQ(iter.GetValue().node, static_cast<NodeId>(0xA1A1));
+    ASSERT_TRUE(iter.GetValue().endpoint.HasValue());
+    EXPECT_EQ(iter.GetValue().endpoint.Value(), static_cast<EndpointId>(3));
+    ASSERT_TRUE(iter.GetValue().label.HasValue());
+    EXPECT_TRUE(iter.GetValue().label.Value().data_equal(CharSpan::fromCharString("keep-me")));
+    EXPECT_FALSE(iter.Next());
+    EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// A chunked write that succeeds must keep what it wrote: the snapshot taken at the start of the
+// sequence is dropped, not restored, when the success notification arrives.
+TEST_F(TestPowerTopologyCluster, SuccessfulChunkedListWriteKeepsTheNewNodes)
+{
+    chip::Testing::TestServerClusterContext context;
+    chip::Testing::FabricTestFixture fabricHelper{ &context.StorageDelegate() };
+    BitMask<Feature> features(Feature::kElectricalCircuit);
+    FixedCircuitNodeStorage circuitStorage11;
+    MockPowerTopologyDelegate dummyDelegate;
+
+    PowerTopologyCluster cluster(PowerTopologyCluster::Config{
+        .endpointId         = kTestEndpointId,
+        .delegate           = dummyDelegate,
+        .features           = features,
+        .fabricTable        = &fabricHelper.GetFabricTable(),
+        .circuitNodeStorage = &circuitStorage11,
+    });
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    const ConcreteAttributePath listPath(kTestEndpointId, PowerTopology::Id, ElectricalCircuitNodes::Id);
+
+    Structs::CircuitNodeStruct::Type seeded[] = { MakeCircuitNode(0xA1A1, NullOptional, NullOptional) };
+    EXPECT_EQ(tester.WriteAttribute(ElectricalCircuitNodes::Id, DataModel::List<Structs::CircuitNodeStruct::Type>(seeded),
+                                    ListWritingPattern::ReplaceAll),
+              IMStatus::Success);
+
+    Structs::CircuitNodeStruct::Type replacement[] = { MakeCircuitNode(0xC3C3, NullOptional, NullOptional) };
+
+    cluster.ListAttributeWriteNotification(listPath, DataModel::ListWriteOperation::kListWriteBegin, kTestFabricIndex);
+    EXPECT_EQ(tester.WriteAttribute(ElectricalCircuitNodes::Id, DataModel::List<Structs::CircuitNodeStruct::Type>(replacement),
+                                    ListWritingPattern::ClearAllThenAppendItems),
+              IMStatus::Success);
+    cluster.ListAttributeWriteNotification(listPath, DataModel::ListWriteOperation::kListWriteSuccess, kTestFabricIndex);
+
+    ElectricalCircuitNodes::TypeInfo::DecodableType nodes;
+    EXPECT_TRUE(tester.ReadAttribute(ElectricalCircuitNodes::Id, nodes).IsSuccess());
+    auto iter = nodes.begin();
+    ASSERT_TRUE(iter.Next());
+    EXPECT_EQ(iter.GetValue().node, static_cast<NodeId>(0xC3C3));
+    EXPECT_FALSE(iter.Next());
+    EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 // DefaultCircuitNodeStorage owns the persistence that used to live in the cluster, so it needs its
 // own round-trip coverage: the cluster-level tests above deliberately use a non-persisting storage.
 TEST_F(TestPowerTopologyCluster, DefaultCircuitNodeStoragePersistsAcrossInstances)
