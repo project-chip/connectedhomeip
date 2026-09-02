@@ -158,7 +158,7 @@ class TC_ACS_3_2(MatterBaseTest):
         pixit1_nsid = self.user_params.get("PIXIT.ACS.Event1_NSID", "0x4B")
         pixit1_tagid = self.user_params.get("PIXIT.ACS.Event1_TAGID", "0x03")
         log.info("pixit1_nsid: %s", pixit1_nsid)
-        log.info("pixit1_nsid: %s", pixit1_tagid)
+        log.info("pixit1_tagid: %s", pixit1_tagid)
         list_dec = ast.literal_eval(pixit1_nsid)  # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
         namespaceID1 = list_dec
         list_dec = ast.literal_eval(pixit1_tagid)  # same as the above
@@ -262,7 +262,7 @@ class TC_ACS_3_2(MatterBaseTest):
         # asserts.assert_equal(tagID_1_read, tag1, "Tag ID must match.")
 
         # check the subscription of AmbientContextType attribute
-        subscription_expected = attrib_listener.attribute_reports[cluster.Attributes.AmbientContextType][0].value
+        subscription_expected = attrib_listener.attribute_reports[cluster.Attributes.AmbientContextType][-1].value
         asserts.assert_true(subscription_expected[0].ambientContextSensed[0].namespaceID == namespaceID1,
                             f"Unexpected namespaceID, {subscription_expected[0].ambientContextSensed[0].namespaceID}, exp {namespaceID1}")
         asserts.assert_true(subscription_expected[0].ambientContextSensed[0].tag == tag1,
@@ -275,7 +275,7 @@ class TC_ACS_3_2(MatterBaseTest):
         end_time = time.perf_counter()
         elapsed_time = end_time - start_time
         if elapsed_time > holdTime_input:
-            log.info("Two events weren't completed within HoldTime input.")
+            log.info("HoldTime already elapsed since the step 4 trigger; no additional wait needed.")
         else:
             log.info("Waiting for the HoldTime input to expire.")
             await asyncio.sleep(holdTime_input - elapsed_time + 1)
@@ -286,17 +286,17 @@ class TC_ACS_3_2(MatterBaseTest):
         asserts.assert_true(len(subscription_expected) == 0, "AmbientContext attribute is not empty.")
 
         # check boolean attributes
-        if humanActivityDetected & self.HumanActivitySupported:
+        if namespaceID1 == HUMAN_ACTIVITY_NAMESPACE_ID and self.HumanActivitySupported:
             # subscription check
             subscription_expected1 = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
             humanActivityDetected = subscription_expected1[0].value
             asserts.assert_true(humanActivityDetected is False, "Failed to get HumanActivityDetected being False.")
-        elif objectIdentified & self.ObjectIdentificationSupported:
+        elif namespaceID1 == OBJECT_IDENTIFICATION_NAMESPACE_ID and self.ObjectIdentificationSupported:
             # subscription check
             subscription_expected2 = attrib_listener.attribute_reports[cluster.Attributes.ObjectIdentified]
             objectIdentified = subscription_expected2[0].value
             asserts.assert_true(objectIdentified is False, "Failed to get ObjectIdentified being False.")
-        elif audioContextDetected & self.SoundIdentificationSupported:
+        elif namespaceID1 == SOUND_IDENTIFICATION_NAMESPACE_ID and self.SoundIdentificationSupported:
             # subscription check
             subscription_expected3 = attrib_listener.attribute_reports[cluster.Attributes.AudioContextDetected]
             audioContextDetected = subscription_expected3[0].value
