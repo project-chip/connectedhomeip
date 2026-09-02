@@ -116,10 +116,16 @@ class ProxyAppSubprocess(Subprocess):
 
 
 class Transport(enum.StrEnum):
-    """Transport the proxy uses to reach the end device."""
+    """Transport the proxy uses to reach the end device.
+
+    BOTH makes the end device commissionable over BLE and Wi-Fi PAF at the same
+    time, which the scan tests need in order to see one device reported once per
+    transport.
+    """
 
     WIFIPAF = "wifipaf"
     BLE = "ble"
+    BOTH = "both"
 
 
 def proxy_link_name(transport: str) -> str:
@@ -129,7 +135,7 @@ def proxy_link_name(transport: str) -> str:
     it is Wi-Fi or Ethernet, so the proxy only gets a `wlx` link when it actually
     needs a NAN interface of its own.
     """
-    return "wlx-cp" if transport == Transport.WIFIPAF else "eth-cp"
+    return "eth-cp" if transport == Transport.BLE else "wlx-cp"
 
 
 def wpa_interface_names(transport: str) -> list[str]:
@@ -139,7 +145,7 @@ def wpa_interface_names(transport: str) -> list[str]:
     commissioning. The proxy needs one only for Wi-Fi PAF.
     """
     names = ["wlx-app"]
-    if transport == Transport.WIFIPAF:
+    if transport != Transport.BLE:
         names.append("wlx-cp")
     return names
 
@@ -158,7 +164,7 @@ def proxy_app_args(transport: str, endpoint: int, proxy_ble: bool) -> list[str]:
     # an option the application does not know is fatal to it.
     if proxy_ble:
         args += ["--ble-controller", str(BLE_CONTROLLER_PROXY)]
-    if transport == Transport.WIFIPAF:
+    if transport != Transport.BLE:
         args += ["--wifi", "--wifipaf", f"freq_list={PAF_FREQ_LIST}"]
     return args
 
@@ -191,7 +197,9 @@ def ed_app_args(transport: str) -> str:
     """
     if transport == Transport.WIFIPAF:
         return f"--wifi --wifipaf freq_list={PAF_FREQ_LIST}"
-    return f"--wifi --ble-controller {BLE_CONTROLLER_ED}"
+    if transport == Transport.BLE:
+        return f"--wifi --ble-controller {BLE_CONTROLLER_ED}"
+    return f"--wifi --wifipaf freq_list={PAF_FREQ_LIST} --ble-controller {BLE_CONTROLLER_ED}"
 
 
 @click.command()

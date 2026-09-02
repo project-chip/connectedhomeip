@@ -491,9 +491,24 @@ class EDFixture:
             if "--wifipaf" not in args:
                 raise ValueError(
                     "ed_transport=wifipaf requires '--wifipaf' in ed_extra_args.")
+        elif self._ed_transport == "both":
+            # Commissionable over BLE and WiFi-PAF at the same time, which the
+            # scan tests need in order to see one device reported once per
+            # transport (TC-COMPRO-2.2 step 13, TC-COMPRO-2.3 step 17).
+            if "--wifipaf" not in args:
+                raise ValueError(
+                    "ed_transport=both requires '--wifipaf' in ed_extra_args.")
+            if "--ble-controller" not in args:
+                raise ValueError(
+                    "ed_transport=both requires '--ble-controller' in ed_extra_args so the ED "
+                    "advertises over BLE as well.")
+            if "--wifi" not in args:
+                raise ValueError(
+                    "ed_transport=both requires '--wifi' in ed_extra_args so the ED "
+                    "can complete AddOrUpdateWifiNetwork after either channel is up.")
         else:
             raise ValueError(
-                f"Unknown ed_transport '{self._ed_transport}'; expected 'ble' or 'wifipaf'.")
+                f"Unknown ed_transport '{self._ed_transport}'; expected 'ble', 'wifipaf' or 'both'.")
 
     async def start(self) -> None:
         """Start the ED app so it is commissionable."""
@@ -520,8 +535,18 @@ class EDFixture:
     # Local subprocess implementation
     # ------------------------------------------------------------------
 
-    # Logged by every Linux example app once it is up and commissionable. The
-    # same marker the CI test-argument blocks use as their app-ready-pattern.
+    # The ED is only usable by the proxy once it is actually reachable over the
+    # transport under test, which is later than its event loop starting: BLE
+    # advertising and the NAN publish both come up afterwards. Returning from
+    # start() too early lets a proxy scan run before the ED is discoverable and
+    # find nothing.
+    APP_READY_PATTERNS: dict[str, str | list[str]] = {
+        "ble": "BLE advertisement started successfully",
+        "wifipaf": "WiFi-PAF: publish_id:",
+        "both": ["BLE advertisement started successfully", "WiFi-PAF: publish_id:"],
+    }
+    # Logged by every Linux example app once its event loop is running. Only a
+    # fallback: it says nothing about either transport being up.
     APP_READY_PATTERN = "APP STATUS: Starting event loop"
     APP_READY_TIMEOUT_S = 30
 
@@ -548,8 +573,9 @@ class EDFixture:
         # Wait for the readiness line rather than a fixed delay: startup time
         # differs by an order of magnitude between real hardware and a mocked
         # transport, and a delay that is generous on one is short on the other.
+        ready_pattern = self.APP_READY_PATTERNS.get(self._ed_transport, self.APP_READY_PATTERN)
         await asyncio.to_thread(self._process.start,
-                                expected_output=self.APP_READY_PATTERN,
+                                expected_output=ready_pattern,
                                 timeout=self.APP_READY_TIMEOUT_S)
         logger.info("ED fixture started locally (PID=%d, discriminator=%d)",
                     self._process.p.pid, self._discriminator)
@@ -1175,8 +1201,15 @@ class COMPROBaseTest(MatterBaseTest):
             bit = int(cp.Bitmaps.CapabilitiesBitmap.kBle)
         elif ed_transport == "wifipaf":
             bit = int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF)
+        elif ed_transport == "both":
+            # Ambiguous by construction: a dual-transport ED is for the scan
+            # tests, which pass an explicit bitmap rather than asking for one
+            # transport. A caller reaching here has to say which it wants.
+            raise ValueError(
+                "ed_transport=both does not select a single transport; pass the transport bit "
+                "explicitly instead of calling pick_proxy_transport().")
         else:
-            raise ValueError(f"Unknown ed_transport '{ed_transport}'; expected 'ble' or 'wifipaf'.")
+            raise ValueError(f"Unknown ed_transport '{ed_transport}'; expected 'ble', 'wifipaf' or 'both'.")
         asserts.assert_true(
             bool(valid_transports & bit),
             f"ed_transport={ed_transport} but the DUT does not advertise that transport "

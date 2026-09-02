@@ -1,7 +1,7 @@
 # src/python_testing/matter_testing_infrastructure/matter/typings/matter/testing/tasks.py
 
 import threading
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from re import Pattern
 from typing import Any, BinaryIO
 
@@ -28,18 +28,18 @@ class Subprocess(threading.Thread):
                  f_stdout: BinaryIO = ...,
                  f_stderr: BinaryIO = ...) -> None: ...
 
-    def _set_output_match(self, pattern: str | Pattern[bytes]) -> None: ...
+    def _set_output_match(self, pattern: str | Pattern[bytes] | Sequence[str | Pattern[bytes]]) -> None: ...
 
     def _check_output(self, line: bytes, is_stderr: bool) -> bytes: ...
 
     def run(self) -> None: ...
 
     def start(self,
-              expected_output: str | Pattern[bytes] | None = ...,
+              expected_output: str | Pattern[bytes] | Sequence[str | Pattern[bytes]] | None = ...,
               timeout: float | None = ...) -> None: ...
 
     def send(self, message: str, end: str = ...,
-             expected_output: str | Pattern[bytes] | None = ...,
+             expected_output: str | Pattern[bytes] | Sequence[str | Pattern[bytes]] | None = ...,
              timeout: float | None = ...) -> None: ...
 
     def terminate(self) -> None: ...
