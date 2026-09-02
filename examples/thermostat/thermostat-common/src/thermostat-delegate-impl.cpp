@@ -57,6 +57,9 @@ CHIP_ERROR ThermostatDelegate::Startup(ServerClusterContext & context)
         mRemoteSensing = BitMask<RemoteSensingBitmap>(remoteSensing);
     }
 
+    persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, LocalTemperatureCalibration::Id },
+                                      mLocalTemperatureCalibration, mLocalTemperatureCalibration);
+
     return CHIP_NO_ERROR;
 }
 
@@ -177,6 +180,15 @@ Protocols::InteractionModel::Status ThermostatDelegate::SetLocalTemperatureCalib
     if (mLocalTemperatureCalibration == temp)
     {
         return Status::Success;
+    }
+    AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
+    VerifyOrReturnError(provider != nullptr, Status::InvalidInState);
+    AttributePersistence persistence(*provider);
+    CHIP_ERROR result = persistence.StoreNativeEndianValue({ mEndpointId, Thermostat::Id, LocalTemperatureCalibration::Id }, temp);
+    if (result != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to store LocalTemperatureCalibration attribute");
+        return Status::Failure;
     }
     mLocalTemperatureCalibration = temp;
     changed                      = true;
