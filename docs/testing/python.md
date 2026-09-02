@@ -496,6 +496,10 @@ See
 -   `--discriminator`, `--passcode`, `--qr-code`, `--manual-code`
 -   `--tests` to select tests
 -   `--PICS`
+-   `--pics-override`
+    -   Set individual PICS items on top of the `--PICS` file, or in its
+        absence, using the PICS file line format, ex `--pics-override
+        DGGEN.S.E00=0`. May be repeated.
 -   `--int-arg`, `--bool-arg`, `--float-arg`, `--string-arg`, `--json-arg`,
     `--hex-arg`
     -   Specify as key:value ex --bool-arg pixit_name:False
@@ -505,6 +509,8 @@ See
 
 -   PICS
     -   use --PICS on the command line to specify the PICS file
+    -   use --pics-override to set individual PICS items over the PICS file values,
+        or in absence of the file
     -   use check_pics to gate steps in a file
 -   have_whatever = check_pics(“PICS.S.WHATEVER”)
 -   PIXITs

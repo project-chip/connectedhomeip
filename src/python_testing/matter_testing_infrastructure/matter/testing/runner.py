@@ -43,7 +43,7 @@ from matter.clusters import Attribute
 # Add imports for argument parsing dependencies
 from matter.testing.defaults import TestingDefaults
 # Add imports for argument parsing dependencies
-from matter.testing.pics import read_pics_from_file
+from matter.testing.pics import apply_pics_overrides, read_pics_from_file
 
 try:
     from matter_yamltests.hooks import TestRunnerHooks
@@ -799,6 +799,22 @@ def convert_args_to_matter_config(args: argparse.Namespace):
         config.pics = {}
     else:
         config.pics = read_pics_from_file(args.PICS, endpoint=args.endpoint)
+    if args.pics_override:
+        try:
+            # Overrides existing PICS items; returns empty if all specified items are present.
+            # If PICS items are absent, adds them and returns them.
+            added = apply_pics_overrides(config.pics, list(chain.from_iterable(args.pics_override)))
+        except ValueError as e:
+            LOGGER.error("Invalid --pics-override entry: %s", e)
+            sys.exit(1)
+        if args.PICS and added:
+            # With a PICS file present, an added key is either a new item missing from
+            # the file, or a typo of a file item, silently leaving the intended item
+            # unchanged: warn.
+            LOGGER.warning("--pics-override items not present in the PICS file %s: %s. "
+                           "Each is either a new item, or a typo of an item in the file "
+                           "(in which case the intended item was NOT changed).",
+                           args.PICS, ", ".join(added))
     config.tests = list(chain.from_iterable(args.tests or []))
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
@@ -999,6 +1015,9 @@ def matter_test_args_parser() -> argparse.ArgumentParser:
                              help="Run the script in debug mode. This is needed to capture attribute dump at end of test modules if there are problems found during testing.")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
+    basic_group.add_argument("--pics-override", nargs='+', action='append', type=str, metavar="PICS=0|1",
+                             help="Set individual PICS items on top of the --PICS file, or in its absence, "
+                                  "using the PICS file line format (e.g. DGGEN.S.E00=0). May be repeated.")
 
     basic_group.add_argument("--use-legacy-test-event-triggers", action="store_true", default=False,
                              help="Send test event triggers with endpoint 0 for older devices")
