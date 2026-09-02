@@ -57,7 +57,8 @@ enum class Type : uint8_t
     kWiFiPAF,
     kNfc,
     kThreadMeshcop,
-    kLast = kThreadMeshcop, // This is not an actual transport type, it just refers to the last transport type
+    kProxy,         // Virtual transport: packets tunnelled through ProxyMessageRequest/Response IM commands
+    kLast = kProxy, // This is not an actual transport type, it just refers to the last transport type
 };
 
 /**
@@ -194,6 +195,9 @@ public:
 #endif
                 snprintf(buf, bufSize, "ThreadMeshcop:[%s]:%d", ip_addr, mPort);
             break;
+        case Type::kProxy:
+            snprintf(buf, bufSize, "PROXY:%u", static_cast<unsigned>(mId.mRemoteId));
+            break;
         default:
             snprintf(buf, bufSize, "ERROR");
             break;
@@ -243,6 +247,10 @@ public:
     }
 
     static constexpr PeerAddress WiFiPAF(NodeId remoteId) { return PeerAddress(Type::kWiFiPAF, remoteId); }
+
+    static constexpr PeerAddress Proxy(uint16_t sessionId) { return PeerAddress(Type::kProxy, static_cast<NodeId>(sessionId)); }
+
+    uint16_t GetProxySessionId() const { return static_cast<uint16_t>(mId.mRemoteId); }
 
     static PeerAddress BuildMatterPerGroupMulticastAddress(chip::FabricId fabric, chip::GroupId group)
     {

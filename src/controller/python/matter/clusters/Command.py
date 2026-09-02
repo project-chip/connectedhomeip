@@ -27,6 +27,7 @@ from ..interaction_model import InteractionModelError, PyInvokeRequestData
 from ..interaction_model import Status as InteractionModelStatus
 from ..interaction_model import TestOnlyPyBatchCommandsOverrides, TestOnlyPyOnDoneInfo
 from ..native import GetLibraryHandle, NativeLibraryHandleMethodArguments, PyChipError
+from ..tlv import UINT16_MAX, uint
 from . import Objects as GeneratedObjects
 from .ClusterObjects import Cluster, ClusterCommand
 
@@ -58,6 +59,18 @@ class Status:
 class TestOnlyBatchCommandResponse:
     Responses: object
     ResponseMessageCount: int
+
+
+@dataclass
+class DelayReportData:
+    delayMinMs: uint = 0
+    delayJitterWindowMs: uint = 0
+
+    def __post_init__(self):
+        if not (0 <= self.delayMinMs <= UINT16_MAX):
+            raise ValueError(f"delayMinMs must be a uint16 (0 to {UINT16_MAX}), got {self.delayMinMs}")
+        if not (0 <= self.delayJitterWindowMs <= UINT16_MAX):
+            raise ValueError(f"delayJitterWindowMs must be a uint16 (0 to {UINT16_MAX}), got {self.delayJitterWindowMs}")
 
 
 def FindCommandClusterObject(isClientSideCommand: bool, path: CommandPath):
@@ -273,7 +286,8 @@ def TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(future: Future, eventLo
 async def SendCommand(future: Future, eventLoop, responseType: type[ClusterCommand] | None,
                       device, commandPath: CommandPath, payload: ClusterCommand, timedRequestTimeoutMs: None | int = None,
                       interactionTimeoutMs: None | int = None, busyWaitMs: None | int = None, suppressResponse: bool = False,
-                      allowLargePayload: bool = False) -> PyChipError:
+                      allowLargePayload: bool = False,
+                      delayReportData: DelayReportData | None = None) -> PyChipError:
     ''' Send a cluster-object encapsulated command to a device and does the following:
             - On receipt of a successful data response, returns the cluster-object equivalent through the provided future.
             - None (on a successful response containing no data)
@@ -304,7 +318,9 @@ async def SendCommand(future: Future, eventLoop, responseType: type[ClusterComma
             ctypes.c_uint32(0 if interactionTimeoutMs is None else interactionTimeoutMs),
             ctypes.c_uint16(0 if busyWaitMs is None else busyWaitMs),
             ctypes.c_bool(False if suppressResponse is None else suppressResponse),
-            ctypes.c_bool(False if allowLargePayload is None else allowLargePayload)
+            ctypes.c_bool(False if allowLargePayload is None else allowLargePayload),
+            c_uint16(0 if delayReportData is None else delayReportData.delayMinMs),
+            c_uint16(0 if delayReportData is None else delayReportData.delayJitterWindowMs)
         ))
 
 
@@ -337,7 +353,8 @@ def _BuildPyInvokeRequestData(commands: list[InvokeRequestInfo], timedRequestTim
 
 async def SendBatchCommands(future: Future, eventLoop, device, commands: list[InvokeRequestInfo],
                             timedRequestTimeoutMs: int | None = None, interactionTimeoutMs: int | None = None,
-                            busyWaitMs: int | None = None, suppressResponse: bool | None = None) -> PyChipError:
+                            busyWaitMs: int | None = None, suppressResponse: bool | None = None,
+                            delayReportData: DelayReportData | None = None) -> PyChipError:
     ''' Initiates an InvokeInteraction with the batch commands provided.
 
     Arguments:
@@ -377,14 +394,17 @@ async def SendBatchCommands(future: Future, eventLoop, device, commands: list[In
             c_uint32(0 if interactionTimeoutMs is None else interactionTimeoutMs),
             c_uint16(0 if busyWaitMs is None else busyWaitMs),
             c_bool(False if suppressResponse is None else suppressResponse),
-            pyBatchCommandsData, c_size_t(len(pyBatchCommandsData)))
+            pyBatchCommandsData, c_size_t(len(pyBatchCommandsData)),
+            c_uint16(0 if delayReportData is None else delayReportData.delayMinMs),
+            c_uint16(0 if delayReportData is None else delayReportData.delayJitterWindowMs))
     )
 
 
 def TestOnlySendBatchCommands(future: Future, eventLoop, device, commands: list[InvokeRequestInfo],
                               timedRequestTimeoutMs: int | None = None, interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
                               suppressResponse: bool | None = None, remoteMaxPathsPerInvoke: int | None = None,
-                              suppressTimedRequestMessage: bool = False, commandRefsOverride: list[int] | None = None) -> PyChipError:
+                              suppressTimedRequestMessage: bool = False, commandRefsOverride: list[int] | None = None,
+                              delayReportData: DelayReportData | None = None) -> PyChipError:
     ''' ONLY TO BE USED FOR TEST: Send batch commands using various overrides.
     '''
     if suppressTimedRequestMessage and timedRequestTimeoutMs is not None:
@@ -420,7 +440,9 @@ def TestOnlySendBatchCommands(future: Future, eventLoop, device, commands: list[
             c_uint16(0 if busyWaitMs is None else busyWaitMs),
             c_bool(False if suppressResponse is None else suppressResponse),
             testOnlyOverrides,
-            pyBatchCommandsData, c_size_t(len(pyBatchCommandsData)))
+            pyBatchCommandsData, c_size_t(len(pyBatchCommandsData)),
+            c_uint16(0 if delayReportData is None else delayReportData.delayMinMs),
+            c_uint16(0 if delayReportData is None else delayReportData.delayJitterWindowMs))
     )
 
 
@@ -449,11 +471,11 @@ def Init():
         setter = NativeLibraryHandleMethodArguments(handle)
 
         setter.Set('pychip_CommandSender_SendCommand',
-                   PyChipError, [py_object, c_void_p, c_uint16, c_uint16, c_uint32, c_uint32, c_char_p, c_size_t, c_uint32, c_uint16, c_bool, c_bool])
+                   PyChipError, [py_object, c_void_p, c_uint16, c_uint16, c_uint32, c_uint32, c_char_p, c_size_t, c_uint32, c_uint16, c_bool, c_bool, c_uint16, c_uint16])
         setter.Set('pychip_CommandSender_SendBatchCommands',
-                   PyChipError, [py_object, c_void_p, c_uint16, c_uint32, c_uint16, c_bool, POINTER(PyInvokeRequestData), c_size_t])
+                   PyChipError, [py_object, c_void_p, c_uint16, c_uint32, c_uint16, c_bool, POINTER(PyInvokeRequestData), c_size_t, c_uint16, c_uint16])
         setter.Set('pychip_CommandSender_TestOnlySendBatchCommands',
-                   PyChipError, [py_object, c_void_p, c_uint16, c_uint32, c_uint16, c_bool, TestOnlyPyBatchCommandsOverrides, POINTER(PyInvokeRequestData), c_size_t])
+                   PyChipError, [py_object, c_void_p, c_uint16, c_uint32, c_uint16, c_bool, TestOnlyPyBatchCommandsOverrides, POINTER(PyInvokeRequestData), c_size_t, c_uint16, c_uint16])
         setter.Set('pychip_CommandSender_TestOnlySendCommandTimedRequestNoTimedInvoke',
                    PyChipError, [py_object, c_void_p, c_uint16, c_uint32, c_uint32, c_char_p, c_size_t, c_uint32, c_uint16, c_bool])
         setter.Set('pychip_CommandSender_SendGroupCommand',
