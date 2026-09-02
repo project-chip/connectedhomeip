@@ -39,7 +39,7 @@
 import logging
 
 from mobly import asserts
-from support_modules.idm_support import IDMBaseTest, WritableAttributeInfo
+from support_modules.idm_support import IDMBaseTest, WritableAttributeInfo, spec_enum_values
 
 import matter.clusters as Clusters
 from matter.exceptions import ChipStackError
@@ -61,7 +61,7 @@ class TC_IDM_9_1(IDMBaseTest):
             TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "For each accepted command of every standard server cluster on every endpoint of the DUT, identify the command fields with spec-defined constraints (min/max value, min/max length, exact length, count), excluding commands that are unsafe to invoke automatically (commissioning, credentials, networking, OTA and access-control flows). For every such field, send Invoke Request messages to the DUT from the TH with that field set to a value violating each testable constraint bound and all other fields set to in-range values. Skip bounds that the field's own data type already enforces.",
                      "Verify on the TH that a DUT reporting SpecificationVersion 1.7 or later rejects every violating Invoke Request with a CONSTRAINT_ERROR Status Code. A DUT reporting an earlier version, or not reporting SpecificationVersion at all, need only reject at least one. In both cases verify that at least one constraint violation was exercised."),
-            TestStep(2, "Read every attribute that is writable with bounds from all the clusters from all the endpoints. For every writable attribute read, set the data field  to an out of bounds value in the Write Request message to the DUT from the TH.",
+            TestStep(2, "Read every attribute that is writable with bounds from all the clusters from all the endpoints, taking the bounds of an enum-typed attribute from the values its enum defines rather than from a constraint on the attribute. For every writable attribute read, set the data field to an out of bounds value in the Write Request message to the DUT from the TH.",
                      "Verify on the TH that a DUT reporting SpecificationVersion 1.7 or later sends a Status Response Action with a CONSTRAINT_ERROR Status Code for every such write. A DUT reporting an earlier version, or not reporting SpecificationVersion at all, need only do so for at least one."),
         ]
 
@@ -141,6 +141,7 @@ class TC_IDM_9_1(IDMBaseTest):
                             cluster_class=cluster_class,
                             datatype=xml_attr.datatype,
                             constraints=xml_attr.constraints,
+                            enum_values=spec_enum_values(xml_cluster, xml_attr.datatype),
                         ))
 
         log.info("Found %s writable attributes on DUT", len(writable_attributes))
@@ -153,14 +154,13 @@ class TC_IDM_9_1(IDMBaseTest):
         accepted_attributes = []
 
         for attr_info in writable_attributes:
-            constraints = attr_info.constraints
-
-            if not constraints or not constraints.has_constraints():
-                skipped_count += 1
-                continue
-
+            # Whether an attribute has anything violable is decided by
+            # check_attribute_constraint, which covers enum-typed attributes whose legal
+            # values come from their enum definition rather than from a <constraint>
+            # element. It reports probed == 0, without contacting the DUT, when no
+            # violating value could be built.
             try:
-                result = await self.check_attribute_constraint(attr_info, constraints)
+                result = await self.check_attribute_constraint(attr_info, attr_info.constraints)
             except Exception as e:
                 log.warning("Exception testing %s.%s: %s", attr_info.cluster_name, attr_info.attribute_name, e)
                 skipped_count += 1

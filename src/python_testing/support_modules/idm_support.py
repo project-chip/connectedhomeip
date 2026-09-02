@@ -32,6 +32,7 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters import ClusterObjects as ClusterObjects
 from matter.clusters.Attribute import AttributePath, TypedAttributePath, ValueDecodeFailure
+from matter.clusters.enum import MatterIntEnum
 from matter.clusters.Types import Nullable, NullValue
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
@@ -42,7 +43,7 @@ from matter.testing.global_attribute_ids import (GlobalAttributeIds, is_standard
                                                  is_standard_command_id)
 from matter.testing.matter_testing import compute_mrp_retransmission_timeout_sec
 from matter.testing.problem_notices import AttributePathLocation, CommandPathLocation
-from matter.testing.spec_parsing import ConstraintReference, Constraints, XmlDataTypeComponent
+from matter.testing.spec_parsing import ConstraintReference, Constraints, XmlCluster, XmlDataTypeComponent
 from matter.tlv import uint
 
 log = logging.getLogger(__name__)
@@ -92,6 +93,10 @@ class WritableAttributeInfo:
     cluster_class: type[ClusterObjects.Cluster]
     datatype: str
     constraints: Constraints | None
+    # Values the spec's enum definition lists for an enum-typed attribute. An enum
+    # bounds its attribute without a <constraint> element, so these are carried
+    # separately from constraints. See spec_enum_values.
+    enum_values: frozenset[int] = frozenset()
 
 
 @dataclass
@@ -241,6 +246,84 @@ def _encodable_numeric_range(datatype: str, is_nullable: bool) -> tuple[int, int
         else:
             type_max -= 1
     return type_min, type_max
+
+
+# Largest value certainly encodable in any enum's underlying type: enum8 is the
+# narrowest, and a nullable enum8 reserves 0xFF for null. A violating value above this
+# could not be carried by an enum8 attribute, so none is generated past it.
+_MAX_ENCODABLE_ENUM_VALUE = 0xFE
+
+
+def spec_enum_values(xml_cluster: XmlCluster, datatype: str) -> frozenset[int]:
+    """Values the spec's enum definition lists for a datatype, or empty if it is not a cluster enum.
+
+    An enum-typed attribute carries its legal values in the cluster's <dataTypes>
+    enum definition rather than in a <constraint> element on the attribute, so they
+    have to be looked up by type name. Enums defined in the global data types are not
+    parsed into XmlCluster and come back empty here; the generated Python enum is then
+    the only source of legal values, which undefined_enum_value also consults.
+    """
+    enum_definition = xml_cluster.enums.get(datatype)
+    if enum_definition is None:
+        return frozenset()
+    return frozenset(int(component.value) for component in enum_definition.components.values())
+
+
+def enum_type_of(attribute: type[ClusterObjects.ClusterAttributeDescriptor]) -> type[MatterIntEnum] | None:
+    """The enum type an attribute encodes as, or None if the attribute is not enum-typed.
+
+    Read from the generated Python type, which unlike the spec type name is also what
+    the value must be encoded as. Nullable and optional attributes are generated as a
+    union, so the enum is picked out of the union's members.
+    """
+    generated_type = attribute.attribute_type.Type
+    for candidate in get_args(generated_type) or (generated_type,):
+        if isinstance(candidate, type) and issubclass(candidate, MatterIntEnum):
+            return candidate
+    return None
+
+
+def undefined_enum_value(attribute: type[ClusterObjects.ClusterAttributeDescriptor],
+                         spec_values: frozenset[int]) -> MatterIntEnum | None:
+    """Return a value the attribute's enum does not define, or None if there is none to send.
+
+    An enum's legal values are a set, not a range: 30 of the enums in the 1.6.1 data
+    model leave holes, and some reserve a sentinel at the top of the value space. So a
+    violation is any value missing from the set, which may sit inside the span of
+    defined values or below the smallest of them, and is not "one past the largest".
+    Thermostat.SystemMode defines {0, 1, 3..9} and is violated by 2; ACLouverPosition
+    starts at 1 and is violated by 0; HourFormat defines {0, 1, 255} and is violated by
+    2, where one past the largest would not even fit an enum8.
+
+    The smallest missing value is chosen so that it stays within the width of the
+    narrowest enum type. Values defined by either the spec XML or the generated Python
+    enum are excluded, since the two can disagree when the DUT reports a Matter release
+    older than the one this SDK generates for, and a value defined by either one is a
+    value the DUT may legitimately accept.
+
+    Enum items whose conformance excludes them on this DUT would be violations too, but
+    an undefined value is one regardless of feature map or attribute values, so no
+    conformance is evaluated here.
+    """
+    enum_type = enum_type_of(attribute)
+    if enum_type is None:
+        return None
+
+    defined = set(spec_values)
+    # kUnknownEnumValue is codegen's placeholder for "not a real member", and any
+    # kUnknownPlaceholder* member was grafted on by an earlier call to this function.
+    # Neither is a value the enum defines.
+    defined.update(member.value for member in enum_type if not member.name.startswith('kUnknown'))
+
+    value = next((v for v in range(_MAX_ENCODABLE_ENUM_VALUE + 1) if v not in defined), None)
+    if value is None:
+        return None
+
+    # The generated enum maps any value it does not recognize to kUnknownEnumValue on
+    # construction, so an undefined value has to be grafted onto the enum first or the
+    # write would silently carry kUnknownEnumValue instead of the value under test.
+    return enum_type.extend_enum_if_value_doesnt_exist(value)
+
 
 # ============================================================================
 # Module-Level Utility Functions
@@ -653,7 +736,7 @@ class IDMBaseTest(BasicCompositionTests):
         return Nullable in get_args(attribute.attribute_type.Type)
 
     def generate_constraint_violation(self, attr_info: WritableAttributeInfo, constraints: Constraints):
-        """Generate a test value that violates the given constraints, or None if none can be.
+        """Generate a test value that violates the attribute's spec-defined bounds, or None.
 
         Bounds that the attribute's own data type already enforces are skipped (e.g.
         under-min of an unsigned attribute with min 0, or over-max of a bound equal to the
@@ -661,6 +744,15 @@ class IDMBaseTest(BasicCompositionTests):
         value would be in range and a compliant DUT accepting it would be reported as a
         failure to enforce the constraint.
         """
+        # An enum bounds its attribute through its own <dataTypes> definition rather than
+        # through a <constraint> element, so this is checked ahead of the constraint-driven
+        # branches and applies to enum-typed attributes that declare no constraint at all.
+        # Its bound is a set of legal values rather than a range, so it cannot be folded
+        # into the min/max handling below.
+        violating_enum_value = undefined_enum_value(attr_info.attribute, attr_info.enum_values)
+        if violating_enum_value is not None:
+            return violating_enum_value
+
         datatype = attr_info.datatype.lower()
 
         # String constraints. An octstr must be written as bytes; a str would either
@@ -688,8 +780,8 @@ class IDMBaseTest(BasicCompositionTests):
         # Numeric-like constraints (int, uint, percent, elapsed-s, temperature, etc.)
         type_range = _encodable_numeric_range(datatype, self._is_nullable_attribute(attr_info.attribute))
         if type_range is None:
-            # Enum/bitmap/struct-typed attributes are out of scope for automated
-            # violation generation.
+            # Bitmap- and struct-typed attributes are out of scope for automated
+            # violation generation; enum-typed ones were handled above.
             return None
         type_min, type_max = type_range
         if constraints.max_value is not None and constraints.max_value < type_max:
@@ -755,7 +847,7 @@ class IDMBaseTest(BasicCompositionTests):
                 f"value(s) sent, so it has not demonstrated constraint enforcement at all")
 
     async def check_attribute_constraint(self, attr_info: WritableAttributeInfo,
-                                         constraints: Constraints) -> ConstraintProbeResult:
+                                         constraints: Constraints | None) -> ConstraintProbeResult:
         """Write one out-of-bounds value to an attribute and classify the DUT's answer.
 
         Records a warning for every violation the DUT did not answer with
@@ -763,7 +855,15 @@ class IDMBaseTest(BasicCompositionTests):
         attribute's original value if the DUT stored the violating one. Deciding
         whether an accepted violation fails the test is left to the caller, which
         applies enforces_constraints_strictly.
+
+        An attribute with no <constraint> element still reaches here: an enum-typed one
+        is bounded by its enum definition instead. Attributes for which no violating
+        value can be built return a result with probed == 0 without touching the DUT.
         """
+        # An attribute that declares no constraint carries no bounds to resolve, and the
+        # empty set reads the same as one whose every bound is unset.
+        constraints = constraints if constraints is not None else Constraints()
+
         # Resolve dynamic constraints if present
         if constraints.min_value_ref or constraints.max_value_ref or constraints.min_count_ref or constraints.max_count_ref:
             cluster_class = attr_info.cluster_class
