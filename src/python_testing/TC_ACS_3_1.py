@@ -305,7 +305,7 @@ class TC_ACS_3_1(MatterBaseTest):
                 audioContextDetected = subscription_bool_expected1[0].value
                 asserts.assert_true(audioContextDetected, "Failed to get audioContextDetected being True.")
 
-            #attrib_listener.reset()
+            # attrib_listener.reset()
 
             self.step("5c", "An operator waits until the HoldTime duration expires since the step 5a execution. Check if AmbientContextDetectEnded is received for the second ambient sensing event.")
             # timer ends
@@ -487,7 +487,7 @@ class TC_ACS_3_1(MatterBaseTest):
                 audioContextDetected = subscription_bool_expected2[0].value
                 asserts.assert_true(audioContextDetected, "Failed to get audioContextDetected being True.")
 
-            #attrib_listener.reset()
+            # attrib_listener.reset()
 
             self.step("6c", "An operator waits until the HoldTime duration expires since the step 6a execution. Check if AmbientContextDetectEnded is received for the last ambient sensing event.")
 
