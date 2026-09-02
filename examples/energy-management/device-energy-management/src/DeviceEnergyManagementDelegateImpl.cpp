@@ -131,18 +131,18 @@ Status DeviceEnergyManagementDelegate::PowerAdjustRequest(const int64_t powerMw,
         }
     }
 
-    TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kPowerAdjustActive);
+    LogErrorOnFailure(SetESAState(ESAStateEnum::kPowerAdjustActive));
 
     // mPowerAdjustCapabilityStruct is guaranteed to have a value as validated in Instance::HandlePowerAdjustRequest.
     // If it did not have a value, this method would not have been called.
     switch (cause)
     {
     case AdjustmentCauseEnum::kLocalOptimization:
-        TEMPORARY_RETURN_IGNORED SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kLocalOptimizationAdjustment);
+        LogErrorOnFailure(SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kLocalOptimizationAdjustment));
         break;
 
     case AdjustmentCauseEnum::kGridOptimization:
-        TEMPORARY_RETURN_IGNORED SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kGridOptimizationAdjustment);
+        LogErrorOnFailure(SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kGridOptimizationAdjustment));
         break;
 
     default:
@@ -189,11 +189,11 @@ void DeviceEnergyManagementDelegate::HandlePowerAdjustRequestFailure()
 {
     DeviceLayer::SystemLayer().CancelTimer(PowerAdjustTimerExpiry, this);
 
-    TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kOnline);
+    LogErrorOnFailure(SetESAState(ESAStateEnum::kOnline));
 
     mPowerAdjustmentInProgress = false;
 
-    TEMPORARY_RETURN_IGNORED SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kNoAdjustment);
+    LogErrorOnFailure(SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kNoAdjustment));
 
     // TODO
     // Should we inform the mpDEMManufacturerDelegate that PowerAdjustRequest has failed?
@@ -226,17 +226,17 @@ void DeviceEnergyManagementDelegate::HandlePowerAdjustTimerExpiry()
     // The PowerAdjustment is no longer in progress
     mPowerAdjustmentInProgress = false;
 
-    TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kOnline);
+    LogErrorOnFailure(SetESAState(ESAStateEnum::kOnline));
 
-    TEMPORARY_RETURN_IGNORED SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kNoAdjustment);
+    LogErrorOnFailure(SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kNoAdjustment));
 
     // Generate a PowerAdjustEnd event
-    TEMPORARY_RETURN_IGNORED GeneratePowerAdjustEndEvent(CauseEnum::kNormalCompletion);
+    LogErrorOnFailure(GeneratePowerAdjustEndEvent(CauseEnum::kNormalCompletion));
 
     // Update the forecast with new expected end time
     if (mpDEMManufacturerDelegate != nullptr)
     {
-        TEMPORARY_RETURN_IGNORED mpDEMManufacturerDelegate->HandleDeviceEnergyManagementPowerAdjustCompletion();
+        LogErrorOnFailure(mpDEMManufacturerDelegate->HandleDeviceEnergyManagementPowerAdjustCompletion());
     }
 }
 
@@ -279,10 +279,10 @@ CHIP_ERROR DeviceEnergyManagementDelegate::CancelPowerAdjustRequestAndGenerateEv
 {
     DeviceLayer::SystemLayer().CancelTimer(PowerAdjustTimerExpiry, this);
 
-    TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kOnline);
+    LogErrorOnFailure(SetESAState(ESAStateEnum::kOnline));
 
     mPowerAdjustmentInProgress = false;
-    TEMPORARY_RETURN_IGNORED SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kNoAdjustment);
+    LogErrorOnFailure(SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kNoAdjustment));
 
     CHIP_ERROR err = GeneratePowerAdjustEndEvent(cause);
 
@@ -472,7 +472,7 @@ Status DeviceEnergyManagementDelegate::PauseRequest(const uint32_t durationS, Ad
         }
     }
 
-    TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kPaused);
+    LogErrorOnFailure(SetESAState(ESAStateEnum::kPaused));
 
     // Update the forecaseUpdateReason based on the AdjustmentCause
     if (cause == AdjustmentCauseEnum::kLocalOptimization)
@@ -500,7 +500,7 @@ void DeviceEnergyManagementDelegate::HandlePauseRequestFailure()
 {
     DeviceLayer::SystemLayer().CancelTimer(PowerAdjustTimerExpiry, this);
 
-    TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kOnline);
+    LogErrorOnFailure(SetESAState(ESAStateEnum::kOnline));
 
     mPauseRequestInProgress = false;
 
@@ -533,15 +533,15 @@ void DeviceEnergyManagementDelegate::HandlePauseRequestTimerExpiry()
     // The PauseRequestment is no longer in progress
     mPauseRequestInProgress = false;
 
-    TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kOnline);
+    LogErrorOnFailure(SetESAState(ESAStateEnum::kOnline));
 
     // Generate a Resumed event
-    TEMPORARY_RETURN_IGNORED GenerateResumedEvent(CauseEnum::kNormalCompletion);
+    LogErrorOnFailure(GenerateResumedEvent(CauseEnum::kNormalCompletion));
 
     // It is expected the mpDEMManufacturerDelegate will update the forecast with new expected end time
     if (mpDEMManufacturerDelegate != nullptr)
     {
-        TEMPORARY_RETURN_IGNORED mpDEMManufacturerDelegate->HandleDeviceEnergyManagementPauseCompletion();
+        LogErrorOnFailure(mpDEMManufacturerDelegate->HandleDeviceEnergyManagementPauseCompletion());
     }
 }
 
@@ -559,7 +559,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::CancelPauseRequestAndGenerateEvent(Ca
 {
     mPauseRequestInProgress = false;
 
-    TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kOnline);
+    LogErrorOnFailure(SetESAState(ESAStateEnum::kOnline));
 
     DeviceLayer::SystemLayer().CancelTimer(PauseRequestTimerExpiry, this);
 
@@ -892,7 +892,7 @@ Status DeviceEnergyManagementDelegate::PowerRangeAdjustRequest(const DataModel::
     mPowerRangeAdjustmentStartTimeUtc = newStartTimeUtc;
 
     // Update ESAState to indicate active power range adjustment
-    TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kPowerAdjustActive);
+    LogErrorOnFailure(SetESAState(ESAStateEnum::kPowerAdjustActive));
 
     // Build the PowerRangeAdjustment attribute
     Structs::PowerRangeAdjustStruct::Type powerRangeAdjustment;
@@ -952,10 +952,10 @@ void DeviceEnergyManagementDelegate::HandlePowerRangeAdjustTimerExpiry()
     mPowerRangeAdjustmentInProgress = false;
 
     // Update the ESA state back to online
-    TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kOnline);
+    LogErrorOnFailure(SetESAState(ESAStateEnum::kOnline));
 
     // Generate a PowerRangeAdjustEnd event
-    TEMPORARY_RETURN_IGNORED GeneratePowerRangeAdjustEndEvent(CauseEnum::kNormalCompletion);
+    LogErrorOnFailure(GeneratePowerRangeAdjustEndEvent(CauseEnum::kNormalCompletion));
 
     // Clear the PowerRangeAdjustment attribute
     mPowerRangeAdjustment.SetNull();
@@ -965,7 +965,7 @@ void DeviceEnergyManagementDelegate::HandlePowerRangeAdjustTimerExpiry()
     // Notify the appliance that the power range adjustment is complete
     if (mpDEMManufacturerDelegate != nullptr)
     {
-        TEMPORARY_RETURN_IGNORED mpDEMManufacturerDelegate->HandleDeviceEnergyManagementPowerRangeAdjustCompletion();
+        LogErrorOnFailure(mpDEMManufacturerDelegate->HandleDeviceEnergyManagementPowerRangeAdjustCompletion());
     }
 }
 
@@ -1042,7 +1042,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::CancelPowerRangeAdjustRequestAndGener
     // Only proceed with clearing local state if manufacturer cancellation succeeded
     DeviceLayer::SystemLayer().CancelTimer(PowerRangeAdjustTimerExpiry, this);
 
-    TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kOnline);
+    LogErrorOnFailure(SetESAState(ESAStateEnum::kOnline));
 
     mPowerRangeAdjustmentInProgress = false;
 
