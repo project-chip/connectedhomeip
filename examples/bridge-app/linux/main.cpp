@@ -485,44 +485,6 @@ Protocols::InteractionModel::Status HandleWriteOnOffAttribute(DeviceOnOff * dev,
     return Protocols::InteractionModel::Status::Success;
 }
 
-Protocols::InteractionModel::Status HandleReadTempMeasurementAttribute(DeviceTempSensor * dev, chip::AttributeId attributeId,
-                                                                       uint8_t * buffer, uint16_t maxReadLength)
-{
-    using namespace TemperatureMeasurement::Attributes;
-
-    if ((attributeId == MeasuredValue::Id) && (maxReadLength == 2))
-    {
-        int16_t measuredValue = dev->GetMeasuredValue();
-        memcpy(buffer, &measuredValue, sizeof(measuredValue));
-    }
-    else if ((attributeId == MinMeasuredValue::Id) && (maxReadLength == 2))
-    {
-        int16_t minValue = dev->mMin;
-        memcpy(buffer, &minValue, sizeof(minValue));
-    }
-    else if ((attributeId == MaxMeasuredValue::Id) && (maxReadLength == 2))
-    {
-        int16_t maxValue = dev->mMax;
-        memcpy(buffer, &maxValue, sizeof(maxValue));
-    }
-    else if ((attributeId == FeatureMap::Id) && (maxReadLength == 4))
-    {
-        uint32_t featureMap = ZCL_TEMPERATURE_SENSOR_FEATURE_MAP;
-        memcpy(buffer, &featureMap, sizeof(featureMap));
-    }
-    else if ((attributeId == ClusterRevision::Id) && (maxReadLength == 2))
-    {
-        uint16_t clusterRevision = ZCL_TEMPERATURE_SENSOR_CLUSTER_REVISION;
-        memcpy(buffer, &clusterRevision, sizeof(clusterRevision));
-    }
-    else
-    {
-        return Protocols::InteractionModel::Status::Failure;
-    }
-
-    return Protocols::InteractionModel::Status::Success;
-}
-
 Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                                          const EmberAfAttributeMetadata * attributeMetadata,
                                                                          uint8_t * buffer, uint16_t maxReadLength)
@@ -539,15 +501,58 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
         {
             ret = HandleReadOnOffAttribute(static_cast<DeviceOnOff *>(dev), attributeMetadata->attributeId, buffer, maxReadLength);
         }
-        else if (clusterId == TemperatureMeasurement::Id)
-        {
-            ret = HandleReadTempMeasurementAttribute(static_cast<DeviceTempSensor *>(dev), attributeMetadata->attributeId, buffer,
-                                                     maxReadLength);
-        }
     }
 
     return ret;
 }
+
+class TempMeasurementAttrAccess : public AttributeAccessInterface
+{
+public:
+    TempMeasurementAttrAccess(EndpointId endpointId, DeviceTempSensor * device) :
+        AttributeAccessInterface(chip::MakeOptional(endpointId), TemperatureMeasurement::Id),
+        mDevice(device)
+    {}
+
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override
+    {
+        if (aPath.mClusterId != TemperatureMeasurement::Id)
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        switch (aPath.mAttributeId)
+        {
+            case TemperatureMeasurement::Attributes::MeasuredValue::Id:
+                return aEncoder.Encode(mDevice->GetMeasuredValue());
+
+            case TemperatureMeasurement::Attributes::MinMeasuredValue::Id:
+                return aEncoder.Encode(mDevice->mMin);
+
+            case TemperatureMeasurement::Attributes::MaxMeasuredValue::Id:
+                return aEncoder.Encode(mDevice->mMax);
+
+            case TemperatureMeasurement::Attributes::FeatureMap::Id:
+                return aEncoder.Encode(static_cast<uint32_t>(ZCL_TEMPERATURE_SENSOR_FEATURE_MAP));
+
+            case TemperatureMeasurement::Attributes::ClusterRevision::Id:
+                return aEncoder.Encode(static_cast<uint16_t>(ZCL_TEMPERATURE_SENSOR_CLUSTER_REVISION));
+
+            default:
+                break;
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+private:
+    DeviceTempSensor * mDevice;
+};
+
+std::unique_ptr<TempMeasurementAttrAccess> gTempMeasurement1;
+std::unique_ptr<TempMeasurementAttrAccess> gTempMeasurement2;
+std::unique_ptr<TempMeasurementAttrAccess> gComposedTempMeasurement1;
+std::unique_ptr<TempMeasurementAttrAccess> gComposedTempMeasurement2;
 
 class BridgedPowerSourceAttrAccess : public AttributeAccessInterface
 {
@@ -979,6 +984,16 @@ void ApplicationInit()
         TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
     }
 
+    gTempMeasurement1 = std::make_unique<TempMeasurementAttrAccess>(TempSensor1.GetEndpointId(), &TempSensor1);
+    gTempMeasurement2 = std::make_unique<TempMeasurementAttrAccess>(TempSensor2.GetEndpointId(), &TempSensor2);
+
+    gComposedTempMeasurement1 = std::make_unique<TempMeasurementAttrAccess>(ComposedTempSensor1.GetEndpointId(), &ComposedTempSensor1);
+    gComposedTempMeasurement2 = std::make_unique<TempMeasurementAttrAccess>(ComposedTempSensor2.GetEndpointId(), &ComposedTempSensor2);
+
+    AttributeAccessInterfaceRegistry::Instance().Register(gTempMeasurement1.get());
+    AttributeAccessInterfaceRegistry::Instance().Register(gTempMeasurement2.get());
+    AttributeAccessInterfaceRegistry::Instance().Register(gComposedTempMeasurement1.get());
+    AttributeAccessInterfaceRegistry::Instance().Register(gComposedTempMeasurement2.get());
     AttributeAccessInterfaceRegistry::Instance().Register(&gPowerAttrAccess);
 }
 
