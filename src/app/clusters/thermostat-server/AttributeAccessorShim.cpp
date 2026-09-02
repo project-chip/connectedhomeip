@@ -26,6 +26,10 @@ namespace Clusters {
 namespace Thermostat {
 namespace Attributes {
 
+// TODO: This shim layer is just for backwards compat with various example apps that were calling
+// Ember methods directly. The shim layer should be removed after the example apps are updated to
+// call the generated cluster API directly, or are migrated to all-devices.
+
 namespace ControlSequenceOfOperation {
 
 Protocols::InteractionModel::Status

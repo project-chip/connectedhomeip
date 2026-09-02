@@ -19,6 +19,7 @@
 
 #include "ThermostatClusterBase.h"
 #include <app/EventLogging.h>
+#include <app/server-cluster/ServerClusterContext.h>
 
 #include <limits>
 
@@ -37,11 +38,17 @@ void ThermostatClusterBase::GenerateSystemModeChangeEvent(Optional<SystemModeEnu
         return;
     }
     Events::SystemModeChange::Type event;
-    EventNumber eventNumber;
 
     event.previousSystemMode = previousSystemMode;
     event.currentSystemMode  = currentSystemMode;
 
+    if (mContext != nullptr)
+    {
+        mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+        return;
+    }
+
+    EventNumber eventNumber;
     CHIP_ERROR err = LogEvent(event, mPath.mEndpointId, eventNumber);
     if (CHIP_NO_ERROR != err)
     {
@@ -56,10 +63,16 @@ void ThermostatClusterBase::GenerateLocalTemperatureChangeEvent(DataModel::Nulla
         return;
     }
     Events::LocalTemperatureChange::Type event;
-    EventNumber eventNumber;
 
     event.currentLocalTemperature = currentLocalTemperature;
 
+    if (mContext != nullptr)
+    {
+        mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+        return;
+    }
+
+    EventNumber eventNumber;
     CHIP_ERROR err = LogEvent(event, mPath.mEndpointId, eventNumber);
     if (CHIP_NO_ERROR != err)
     {
@@ -75,11 +88,17 @@ void ThermostatClusterBase::GenerateOccupancyChangeEvent(Optional<BitMask<Occupa
         return;
     }
     Events::OccupancyChange::Type event;
-    EventNumber eventNumber;
 
     event.previousOccupancy = previousOccupancy;
     event.currentOccupancy  = currentOccupancy;
 
+    if (mContext != nullptr)
+    {
+        mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+        return;
+    }
+
+    EventNumber eventNumber;
     CHIP_ERROR err = LogEvent(event, mPath.mEndpointId, eventNumber);
     if (CHIP_NO_ERROR != err)
     {
@@ -95,13 +114,19 @@ void ThermostatClusterBase::GenerateSetpointChangeEvent(SystemModeEnum systemMod
         return;
     }
     Events::SetpointChange::Type event;
-    EventNumber eventNumber;
 
     event.systemMode       = systemMode;
     event.occupancy        = MakeOptional(occupancy);
     event.previousSetpoint = previousSetpoint;
     event.currentSetpoint  = currentSetpoint;
 
+    if (mContext != nullptr)
+    {
+        mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+        return;
+    }
+
+    EventNumber eventNumber;
     CHIP_ERROR err = LogEvent(event, mPath.mEndpointId, eventNumber);
     if (CHIP_NO_ERROR != err)
     {
@@ -117,11 +142,17 @@ void ThermostatClusterBase::GenerateRunningStateChangeEvent(Optional<BitMask<Rel
         return;
     }
     Events::RunningStateChange::Type event;
-    EventNumber eventNumber;
 
     event.previousRunningState = previousRunningState;
     event.currentRunningState  = currentRunningState;
 
+    if (mContext != nullptr)
+    {
+        mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+        return;
+    }
+
+    EventNumber eventNumber;
     CHIP_ERROR err = LogEvent(event, mPath.mEndpointId, eventNumber);
     if (CHIP_NO_ERROR != err)
     {
@@ -137,11 +168,17 @@ void ThermostatClusterBase::GenerateRunningModeChangeEvent(Optional<ThermostatRu
         return;
     }
     Events::RunningModeChange::Type event;
-    EventNumber eventNumber;
 
     event.previousRunningMode = previousRunningMode;
     event.currentRunningMode  = currentRunningMode;
 
+    if (mContext != nullptr)
+    {
+        mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+        return;
+    }
+
+    EventNumber eventNumber;
     CHIP_ERROR err = LogEvent(event, mPath.mEndpointId, eventNumber);
     if (CHIP_NO_ERROR != err)
     {
@@ -157,11 +194,17 @@ void ThermostatClusterBase::GenerateActiveScheduleChangeEvent(Optional<DataModel
         return;
     }
     Events::ActiveScheduleChange::Type event;
-    EventNumber eventNumber;
 
     event.previousScheduleHandle = previousScheduleHandle;
     event.currentScheduleHandle  = currentScheduleHandle;
 
+    if (mContext != nullptr)
+    {
+        mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+        return;
+    }
+
+    EventNumber eventNumber;
     CHIP_ERROR err = LogEvent(event, mPath.mEndpointId, eventNumber);
     if (CHIP_NO_ERROR != err)
     {
@@ -177,11 +220,17 @@ void ThermostatClusterBase::GenerateActivePresetChangeEvent(Optional<DataModel::
         return;
     }
     Events::ActivePresetChange::Type event;
-    EventNumber eventNumber;
 
     event.previousPresetHandle = previousPresetHandle;
     event.currentPresetHandle  = currentPresetHandle;
 
+    if (mContext != nullptr)
+    {
+        mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+        return;
+    }
+
+    EventNumber eventNumber;
     CHIP_ERROR err = LogEvent(event, mPath.mEndpointId, eventNumber);
     if (CHIP_NO_ERROR != err)
     {

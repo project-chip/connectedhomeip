@@ -131,9 +131,9 @@ public:
     }
 
     template <bool Cond = kHasOccupancy, typename std::enable_if_t<Cond, int> = 0>
-    Protocols::InteractionModel::Status SetOccupied(BitMask<OccupancyBitmap> occupied)
+    Protocols::InteractionModel::Status SetOccupancy(BitMask<OccupancyBitmap> occupied)
     {
-        return mOccupancy.SetOccupied(occupied);
+        return mOccupancy.SetOccupancy(occupied);
     }
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,

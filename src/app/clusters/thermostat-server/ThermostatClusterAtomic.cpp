@@ -42,18 +42,27 @@ namespace {
  */
 ScopedNodeId GetSourceScopedNodeId(CommandHandler * commandObj)
 {
-    ScopedNodeId sourceNodeId = ScopedNodeId();
-    auto sessionHandle        = commandObj->GetExchangeContext()->GetSessionHandle();
+    if (commandObj == nullptr)
+    {
+        return ScopedNodeId();
+    }
 
-    if (sessionHandle->IsSecureSession())
+    if (auto * ec = commandObj->GetExchangeContext())
     {
-        sourceNodeId = sessionHandle->AsSecureSession()->GetPeer();
+        auto sessionHandle = ec->GetSessionHandle();
+        if (sessionHandle->IsSecureSession())
+        {
+            return sessionHandle->AsSecureSession()->GetPeer();
+        }
+        if (sessionHandle->IsGroupSession())
+        {
+            return sessionHandle->AsIncomingGroupSession()->GetPeer();
+        }
+        return ScopedNodeId();
     }
-    else if (sessionHandle->IsGroupSession())
-    {
-        sourceNodeId = sessionHandle->AsIncomingGroupSession()->GetPeer();
-    }
-    return sourceNodeId;
+
+    auto subjectDescriptor = commandObj->GetSubjectDescriptor();
+    return ScopedNodeId(subjectDescriptor.subject, subjectDescriptor.fabricIndex);
 }
 
 /**
