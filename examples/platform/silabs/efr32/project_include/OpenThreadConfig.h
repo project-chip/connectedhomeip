@@ -45,6 +45,12 @@
 // Timeout after 2 missed checkin or 4 mins if sleep interval is too short.
 #define OPENTHREAD_CONFIG_MLE_CHILD_TIMEOUT_DEFAULT ((SL_MLE_TIMEOUT_s < 120) ? 240 : ((SL_MLE_TIMEOUT_s * 2) + 1))
 
+// Keep child-supervision check aligned with LIT idle so it cannot
+// wake the device mid-idle before the EM4 / slow-poll window.
+#ifndef OPENTHREAD_CONFIG_CHILD_SUPERVISION_CHECK_TIMEOUT
+#define OPENTHREAD_CONFIG_CHILD_SUPERVISION_CHECK_TIMEOUT SL_IDLE_MODE_DURATION_S
+#endif
+
 #if defined(SL_CSL_ENABLE) && SL_CSL_ENABLE || SL_CONFIG_OPENTHREAD_LIB
 
 #define OPENTHREAD_CONFIG_MAC_CSL_RECEIVER_ENABLE 1
