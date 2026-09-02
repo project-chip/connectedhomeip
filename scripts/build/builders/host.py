@@ -585,6 +585,13 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('is_libfuzzer=true')
         elif fuzzing_type == HostFuzzingType.PW_FUZZTEST:
             self.extra_gn_options.append('pw_enable_fuzz_test_targets=true')
+            # The ICD Management cluster command handlers are compiled only when
+            # the ICD server is enabled, and RegisterClient/UnregisterClient
+            # additionally require the Check-In Protocol, which chip_enable_icd_lit
+            # turns on. Without these the corresponding fuzz target is configured
+            # out and never built.
+            self.extra_gn_options.append('chip_enable_icd_server=true')
+            self.extra_gn_options.append('chip_enable_icd_lit=true')
             if pw_fuzz_libfuzzer_compat:
                 self.extra_gn_options.append('chip_pw_fuzz_libfuzzer_compat=true')
             if use_ubsan:

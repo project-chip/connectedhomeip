@@ -14,6 +14,8 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+
+import("${chip_root}/src/app/icd/icd.gni")
 import("//build_overrides/mbedtls.gni")
 import("//build_overrides/pigweed.gni")
 
@@ -73,6 +75,8 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     group("pw_fuzz_tests") {
       deps = [
         "${chip_root}/src/app/clusters/tls-certificate-management-server/tests:fuzz-tls-certificate-management-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
+        "${chip_root}/src/app/icd/client/tests:fuzz-icd-check-in-handler-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
+        "${chip_root}/src/app/icd/client/tests:fuzz-icd-check-in-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
         "${chip_root}/src/ble/tests:fuzz-ble-endpoint-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
         "${chip_root}/src/ble/tests:fuzz-ble-layer-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
         "${chip_root}/src/ble/tests:fuzz-btp-engine-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
@@ -96,6 +100,12 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "${chip_root}/src/wifipaf/tests:fuzz-wifipaf-endpoint-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
         "${chip_root}/src/wifipaf/tests:fuzz-wifipaf-tp-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
       ]
+
+      # The ICD Management command handlers are only compiled when the ICD
+      # server is enabled, so the target follows the same condition.
+      if (chip_enable_icd_server) {
+        deps += [ "${chip_root}/src/app/clusters/icd-management-server/tests:fuzz-icd-management-cluster-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)" ]
+      }
 
       # These two exercise ActiveResolveAttempts and IncrementalResolve, which
       # //src/lib/dnssd only compiles for chip_mdns == "minimal".
