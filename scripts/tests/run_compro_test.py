@@ -64,6 +64,7 @@ import chiptest.linux
 import click
 from chiptest.log_config import LogConfig
 
+from matter.testing.metadata import extract_runs_args
 from matter.testing.tasks import Subprocess
 
 log = logging.getLogger(__name__)
@@ -149,6 +150,26 @@ def proxy_app_args(transport: str, endpoint: int) -> list[str]:
     else:
         args += ["--ble-controller", str(BLE_CONTROLLER_PROXY)]
     return args
+
+
+def declared_commissioning_args(script: str) -> list[str]:
+    """The commissioning-method arguments the test itself declares.
+
+    Whether the framework commissions the proxy before the test body, or the test
+    does it mid-run, is a property of the test: 2.6 opens its own PASE and calls
+    commission_dut_in_test(), so it asks for --in-test-commissioning-method and
+    would fail if CommissionDeviceTest had already consumed the commissioning
+    window. Read it from the test's CI arguments block rather than assuming, so a
+    test that changes its mind does not need this script changed too.
+    """
+    for run in extract_runs_args(script).values():
+        args = shlex.split(run.get("script-args", ""))
+        for flag in ("--in-test-commissioning-method", "--commissioning-method"):
+            if flag in args:
+                return [flag, args[args.index(flag) + 1]]
+
+    log.warning("%s declares no commissioning method; defaulting to --commissioning-method on-network", script)
+    return ["--commissioning-method", "on-network"]
 
 
 def ed_app_args(transport: str) -> str:
@@ -237,14 +258,14 @@ def run(proxy_app: str, proxy_args: str, ed_app: str | None, script: str, script
         stack.callback(proxy.terminate)
 
         cmd = net_ns.tool_ns.wrap_cmd([sys.executable, script])
-        cmd += test_script_args(ed_app, script_args, transport, endpoint, discriminator, passcode,
+        cmd += test_script_args(script, ed_app, script_args, transport, endpoint, discriminator, passcode,
                                ed_discriminator, ed_passcode, storage_dir, net_ns)
 
         log.info("Running %s", shlex.join(cmd))
         return subprocess.run(cmd, check=False, cwd=DEFAULT_CHIP_ROOT).returncode
 
 
-def test_script_args(ed_app: str | None, script_args: str, transport: str, endpoint: int,
+def test_script_args(script: str, ed_app: str | None, script_args: str, transport: str, endpoint: int,
                      discriminator: int, passcode: int, ed_discriminator: int, ed_passcode: int,
                      storage_dir: str, net_ns) -> list[str]:
     """Build the test script command line.
@@ -254,7 +275,7 @@ def test_script_args(ed_app: str | None, script_args: str, transport: str, endpo
     added here.
     """
     args = [
-        "--commissioning-method", "on-network",
+        *declared_commissioning_args(script),
         "--discriminator", str(discriminator),
         "--passcode", str(passcode),
         "--endpoint", str(endpoint),
