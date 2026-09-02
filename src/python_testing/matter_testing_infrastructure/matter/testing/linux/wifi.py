@@ -102,6 +102,11 @@ class NANSimulator:
             return
 
         sub_srv_name = sub_args.get("srv_name", "")
+        # A discovery-only subscriber is scanning, not setting up a session, so it
+        # must not reply to the publisher. wpa_supplicant suppresses the automatic
+        # passive-subscriber Follow-up for these, because those replies interfere
+        # with a scan that is only meant to observe.
+        discovery_only = bool(sub_args.get("discovery_only", False))
 
         for pub_id, (pub_iface_name, pub_args) in publishers_copy.items():
             # Don't match same interface
@@ -129,6 +134,11 @@ class NANSimulator:
                 "ssi": ("ay", pub_args.get("ssi", b"")),
             }
             sub_iface.NANDiscoveryResult.emit(discovery_args)
+
+            if discovery_only:
+                log.debug("Interface[%d] Suppressing NANReplied: subscriber %d is discovery-only",
+                          pub_iface.index, sub_id)
+                continue
 
             # Emit NANReplied to publisher
             replied_args = {

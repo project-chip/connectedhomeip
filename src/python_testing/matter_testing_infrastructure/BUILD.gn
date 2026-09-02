@@ -90,6 +90,7 @@ pw_python_package("matter-testing-module") {
   ]
   tests = [
     "matter/testing/test_metadata.py",
+    "matter/testing/test_wifi_nan_simulator.py",
     "matter/testing/test_pixit.py",
     "matter/testing/test_tasks.py",
     "matter/testing/test_matter_asserts.py",

@@ -144,11 +144,18 @@ def wpa_interface_names(transport: str) -> list[str]:
 
 
 def proxy_app_args(transport: str, endpoint: int) -> list[str]:
-    args = ["--device", f"commissioning-proxy:{endpoint}"]
+    """Arguments for the proxy application.
+
+    BLE is given to the proxy whichever transport is under test. The proxy
+    advertises every transport it was built with, and the tests scan on that
+    whole bitmap -- TC_COMPRO_2_8 step 10 passes the Transport attribute
+    straight back as ProxyBackGroundScanStartRequest.transport -- so a proxy
+    built with BLE but denied an adapter fails the scan outright.
+    """
+    args = ["--device", f"commissioning-proxy:{endpoint}",
+            "--ble-controller", str(BLE_CONTROLLER_PROXY)]
     if transport == Transport.WIFIPAF:
         args += ["--wifi", "--wifipaf", f"freq_list={PAF_FREQ_LIST}"]
-    else:
-        args += ["--ble-controller", str(BLE_CONTROLLER_PROXY)]
     return args
 
 
@@ -241,8 +248,8 @@ def run(proxy_app: str, proxy_args: str, ed_app: str | None, script: str, script
             proxy_link_name=proxy_link_name(transport)))
 
         stack.enter_context(chiptest.linux.DBusTestSystemBus())
-        if transport == Transport.BLE:
-            stack.enter_context(chiptest.linux.BluetoothMock())
+        # Started for both transports: see proxy_app_args().
+        stack.enter_context(chiptest.linux.BluetoothMock())
         stack.enter_context(chiptest.linux.WpaSupplicantMock(
             wpa_interface_names(transport), MOCK_AP_SSID, MOCK_AP_PASSWORD, net_ns))
 
