@@ -18,6 +18,8 @@ source_set("thread-network-directory-server") {
   sources = [
     "DefaultThreadNetworkDirectoryStorage.cpp",
     "DefaultThreadNetworkDirectoryStorage.h",
+    "MigrateThreadNetworkDirectoryServerStorage.cpp",
+    "MigrateThreadNetworkDirectoryServerStorage.h",
     "ThreadNetworkDirectoryCluster.cpp",
     "ThreadNetworkDirectoryCluster.h",
     "ThreadNetworkDirectoryStorage.h",

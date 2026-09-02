@@ -19,6 +19,8 @@ source_set("boolean-state-configuration-server") {
     "BooleanStateConfigurationCluster.cpp",
     "BooleanStateConfigurationCluster.h",
     "boolean-state-configuration-delegate.h",
+    "MigrateBooleanStateConfigurationStorage.cpp",
+    "MigrateBooleanStateConfigurationStorage.h",
   ]
 
   public_deps = [

@@ -19,6 +19,8 @@ source_set("chime-server") {
   sources = [
     "ChimeCluster.cpp",
     "ChimeCluster.h",
+    "MigrateChimeServerStorage.cpp",
+    "MigrateChimeServerStorage.h",
   ]
 
   public_deps = [
