@@ -1039,7 +1039,13 @@ public:
             return;
         }
 
-        cluster->UpdateCurrentMode(newMode);
+        Protocols::InteractionModel::Status status = cluster->UpdateCurrentMode(newMode);
+        if (status != Protocols::InteractionModel::Status::Success)
+        {
+            ChipLogError(AppServer, "Failed to set mode %u on endpoint %d: status %u", newMode, endpointId,
+                         static_cast<unsigned>(to_underlying(status)));
+            return;
+        }
         ChipLogProgress(AppServer, "SetModeSelectCurrentMode to %d on endpoint %d", newMode, endpointId);
     }
 };
