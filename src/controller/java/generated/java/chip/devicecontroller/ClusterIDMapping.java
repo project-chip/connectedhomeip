@@ -16158,6 +16158,7 @@ public class ClusterIDMapping {
             BLTCSSecurityLevel(4L),
             BLTCSModeCapability(5L),
             SessionIDList(6L),
+            RangingConstraints(7L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -16224,7 +16225,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum StartRangingRequestCommandField {Technology(0),WiFiRangingDeviceRoleConfig(1),BLERangingDeviceRoleConfig(2),BLTChannelSoundingDeviceRoleConfig(3),FrequencyBand(4),Bandwidth(5),SecurityMode(6),Trigger(7),ReportingCondition(8),;
+        }public enum StartRangingRequestCommandField {Technology(0),WiFiRangingDeviceRoleConfig(1),BLERangingDeviceRoleConfig(2),BLTChannelSoundingDeviceRoleConfig(3),FrequencyBand(4),Bandwidth(5),Trigger(6),ReportingCondition(7),;
                     private final int id;
                     StartRangingRequestCommandField(int id) {
                         this.id = id;
