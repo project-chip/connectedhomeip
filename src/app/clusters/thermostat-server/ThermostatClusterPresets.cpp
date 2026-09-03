@@ -118,40 +118,46 @@ bool MatchingPendingPresetExists(Delegate * delegate, const PresetStructWithOwne
 
 /**
  * @brief Finds and returns an entry in the Presets attribute list that matches
- *        a preset, if such an entry exists. The presetToMatch must have a preset handle.
+ *        the given preset handle, if such an entry exists.
  *
  * @param[in] delegate The delegate to use.
- * @param[in] presetToMatch The preset to match with.
- * @param[out] matchingPreset The preset in the Presets attribute list that has the same PresetHandle as the presetToMatch.
+ * @param[in] presetHandle The preset handle to match against entries in the Presets attribute list.
+ * @param[out] matchingPreset The preset in the Presets attribute list that has the same PresetHandle as @p presetHandle.
+ *                            Only valid if @p found is set to true.
+ * @param[out] found Set to true if a matching preset was found; set to false if no matching preset exists.
  *
- * @return true if a matching entry was found in the  presets attribute list, false otherwise.
+ * @return CHIP_NO_ERROR if the lookup completed (regardless of whether a matching preset was found);
+ *         otherwise an appropriate error code.
  */
-bool GetMatchingPresetInPresets(Delegate * delegate, const DataModel::Nullable<ByteSpan> & presetHandle,
-                                PresetStructWithOwnedMembers & matchingPreset)
+CHIP_ERROR GetMatchingPresetInPresets(Delegate * delegate, const ByteSpan & presetHandle,
+                                      PresetStructWithOwnedMembers & matchingPreset, bool & found)
 {
-    VerifyOrReturnValue(delegate != nullptr, false);
+    found = false;
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     for (uint8_t i = 0; true; i++)
     {
         CHIP_ERROR err = delegate->GetPresetAtIndex(i, matchingPreset);
 
-        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED || err == CHIP_ERROR_NOT_FOUND)
         {
             break;
         }
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "GetMatchingPresetInPresets: GetPresetAtIndex failed with error %" CHIP_ERROR_FORMAT, err.Format());
-            return false;
+            return err;
         }
 
-        // Note: presets coming from our delegate always have a handle.
-        if (presetHandle.Value().data_equal(matchingPreset.GetPresetHandle().Value()))
+        // Treat presets with a null handle as non-matching.
+        DataModel::Nullable<ByteSpan> matchingPresetHandle = matchingPreset.GetPresetHandle();
+        if (!matchingPresetHandle.IsNull() && presetHandle.data_equal(matchingPresetHandle.Value()))
         {
-            return true;
+            found = true;
+            return CHIP_NO_ERROR;
         }
     }
-    return false;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -257,18 +263,59 @@ Status ThermostatCluster::SetActivePreset(DataModel::Nullable<ByteSpan> presetHa
         return Status::InvalidInState;
     }
 
-    // If the preset handle passed in the command is not present in the Presets attribute, return INVALID_COMMAND.
-    if (!presetHandle.IsNull() && !IsPresetHandlePresentInPresets(mDelegate, presetHandle.Value()))
+    PresetStructWithOwnedMembers matchingPreset;
+    bool found = false;
+
+    if (!presetHandle.IsNull())
     {
-        return Status::InvalidCommand;
+        CHIP_ERROR lookupErr = GetMatchingPresetInPresets(mDelegate, presetHandle.Value(), matchingPreset, found);
+        if (lookupErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "SetActivePreset: failed to look up preset with error %" CHIP_ERROR_FORMAT, lookupErr.Format());
+            return StatusIB(lookupErr).mStatus;
+        }
+        // If the preset handle passed in the command is not present in the Presets attribute, return INVALID_COMMAND.
+        if (!found)
+        {
+            return Status::InvalidCommand;
+        }
     }
 
+    // Switch the active handle before applying the preset's setpoints: SetActivePresetHandle is the more likely of
+    // the two to fail (e.g. a persistent-storage write error), and doing it first means such a failure leaves no
+    // setpoint change behind. The preset's setpoints were already validated when the preset was added/committed, so
+    // ChangeRange/SaveSetpoints failing afterwards is not expected in practice.
     CHIP_ERROR err = mDelegate->SetActivePresetHandle(presetHandle);
 
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Failed to set ActivePresetHandle with error %" CHIP_ERROR_FORMAT, err.Format());
         return StatusIB(err).mStatus;
+    }
+
+    if (found)
+    {
+        // Apply the preset's setpoints to the occupied setpoint range now that it's active.
+        Optional<int16_t> coolingSetpoint = matchingPreset.GetCoolingSetpoint();
+        Optional<int16_t> heatingSetpoint = matchingPreset.GetHeatingSetpoint();
+        if (coolingSetpoint.HasValue() || heatingSetpoint.HasValue())
+        {
+            Setpoints setpoints = mSetpoints;
+            SetpointAttributes changedAttributes;
+            DataModel::ActionReturnStatus status = setpoints.ChangeRange(setpoints.occupiedRange, heatingSetpoint, coolingSetpoint,
+                                                                         Setpoints::ClampMode::kClamp, changedAttributes);
+            if (status.IsSuccess())
+            {
+                status = SaveSetpoints(setpoints, changedAttributes);
+            }
+            if (!status.IsSuccess())
+            {
+                ChipLogError(Zcl, "SetActivePreset: failed to apply preset setpoints with status 0x%02x",
+                             to_underlying(status.GetStatusCode().GetStatus()));
+                return status.GetStatusCode().GetStatus();
+            }
+            mSetpoints = setpoints;
+        }
     }
 
     NotifyAttributeChanged(ActivePresetHandle::Id);
@@ -304,7 +351,13 @@ CHIP_ERROR ThermostatCluster::AppendPendingPreset(const PresetStruct::Type & new
         // Per spec we need to check that:
         // (a) There is an existing non-pending preset with this handle.
         PresetStructWithOwnedMembers matchingPreset;
-        if (!GetMatchingPresetInPresets(mDelegate, preset.GetPresetHandle().Value(), matchingPreset))
+        bool found           = false;
+        CHIP_ERROR lookupErr = GetMatchingPresetInPresets(mDelegate, preset.GetPresetHandle().Value(), matchingPreset, found);
+        if (lookupErr != CHIP_NO_ERROR)
+        {
+            return CHIP_IM_GLOBAL_STATUS(InvalidInState);
+        }
+        if (!found)
         {
             return CHIP_IM_GLOBAL_STATUS(NotFound);
         }
