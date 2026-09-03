@@ -141,6 +141,10 @@ class FabricScopedAttributeInfo:
     # Generated dataclass field labels the spec marks fabric sensitive. Empty when the
     # struct has no fabric-sensitive fields, or when the spec XML has no entry for it.
     fabric_sensitive_labels: frozenset[str]
+    # The spec marks the attribute itself fabric sensitive, rather than naming individual
+    # fields of its entry struct. Every field of a cross-fabric entry must then read back
+    # as a default, so the check covers the whole struct instead of a labelled subset.
+    whole_entry_sensitive: bool
     # Write access per the spec XML, independent of whether a sweep may write it.
     writable: bool
     # Listed in FABRIC_WRITE_DENIED_ATTRIBUTES. Kept apart from `writable` so a report
@@ -154,6 +158,21 @@ class FabricScopedAttributeInfo:
     @property
     def path_str(self) -> str:
         return f"EP{self.endpoint_id} {self.cluster_name}.{self.attribute_name}"
+
+    @property
+    def masked_field_labels(self) -> frozenset[str]:
+        """Fields of a cross-fabric entry that must read back as null or as their default.
+
+        An attribute the spec marks fabric sensitive masks its entries whole, so every
+        field but FabricIndex is covered. Otherwise only the fields the entry struct
+        itself marks are, which for many fabric-scoped attributes is none of them.
+        """
+        if not self.whole_entry_sensitive:
+            return self.fabric_sensitive_labels
+        descriptor = getattr(self.struct_class, 'descriptor', None)
+        if descriptor is None:
+            return self.fabric_sensitive_labels
+        return frozenset(f.Label for f in descriptor.Fields if f.Tag != FABRIC_INDEX_TAG)
 
 
 @dataclass
@@ -1400,6 +1419,7 @@ class IDMBaseTest(BasicCompositionTests):
                         cluster_class=cluster_class,
                         struct_class=struct_class,
                         fabric_sensitive_labels=fabric_sensitive_field_labels(struct_class, xml_struct),
+                        whole_entry_sensitive=bool(xml_attribute is not None and xml_attribute.fabric_sensitive),
                         writable=writable,
                         write_denied=(cluster_id, attribute_id) in FABRIC_WRITE_DENIED_ATTRIBUTES,
                         from_codegen=from_codegen,
@@ -1496,7 +1516,8 @@ class IDMBaseTest(BasicCompositionTests):
         accepted. Returns the number of cross-fabric entries checked, which lets the
         caller distinguish "verified" from "nothing to verify".
         """
-        if not info.fabric_sensitive_labels or not isinstance(entries, list):
+        labels = info.masked_field_labels
+        if not labels or not isinstance(entries, list):
             return 0
 
         default_entry = info.struct_class()
@@ -1505,7 +1526,7 @@ class IDMBaseTest(BasicCompositionTests):
             if getattr(entry, 'fabricIndex', own_fabric_index) == own_fabric_index:
                 continue
             checked += 1
-            for label in sorted(info.fabric_sensitive_labels):
+            for label in sorted(labels):
                 value = getattr(entry, label)
                 if isinstance(value, Nullable):
                     continue

@@ -232,6 +232,11 @@ class XmlAttribute:
     # F quality on the attribute's <access> element: the attribute is a list whose
     # entries each belong to a single fabric. Reads honour the request's fabric filter.
     fabric_scoped: bool = False
+    # S quality on the attribute's <access> element. Where a struct field carries this
+    # quality only that field is sensitive, but here the whole entry is: an entry
+    # belonging to another fabric carries no readable data, rather than a subset of
+    # fields that read back as defaults.
+    fabric_sensitive: bool = False
 
     def access_string(self):
         read_marker = "R" if self.read_access is not ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue else ""
@@ -1182,7 +1187,7 @@ class ClusterParser:
                 write_optional = self.parse_write_optional(element, access_xml)
             # Parse constraints for this attribute
             constraints = self.parse_attribute_constraints(element)
-            fabric_scoped, _ = self.parse_fabric_flags(access_xml)
+            fabric_scoped, fabric_sensitive = self.parse_fabric_flags(access_xml)
             attributes[code] = XmlAttribute(name=element.attrib['name'], datatype=datatype,
                                             conformance=conformance,
                                             read_access=get_access_privilege_or_unknown(read_access),
@@ -1193,7 +1198,8 @@ class ClusterParser:
                                             scene=self._is_scene_attribute(element),
                                             atomic_write=self._is_atomic_write_attribute(element),
                                             constraints=constraints,
-                                            fabric_scoped=fabric_scoped)
+                                            fabric_scoped=fabric_scoped,
+                                            fabric_sensitive=fabric_sensitive)
         # Add in the global attributes for the base class
         for aid in GlobalAttributeIds:
             # TODO: Add data type here. Right now it's unused. We should parse this from the spec.

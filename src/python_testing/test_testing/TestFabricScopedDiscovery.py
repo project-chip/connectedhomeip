@@ -67,6 +67,7 @@ ACL_ID = Clusters.AccessControl.Attributes.Acl.attribute_id
 EXTENSION_ID = Clusters.AccessControl.Attributes.Extension.attribute_id
 SUBJECTS_PER_ENTRY_ID = Clusters.AccessControl.Attributes.SubjectsPerAccessControlEntry.attribute_id
 BINDING_ID = Clusters.Binding.Attributes.Binding.attribute_id
+PROVISIONED_ENDPOINTS_ID = Clusters.TlsClientManagement.Attributes.ProvisionedEndpoints.attribute_id
 
 
 class TestFabricScopedDiscovery(CertificationUnitTestNoDevice):
@@ -263,6 +264,43 @@ class TestFabricScopedDiscovery(CertificationUnitTestNoDevice):
         except signals.TestFailure:
             return
         asserts.fail("Cross-fabric fabric-sensitive data must fail the masking assertion")
+
+    def test_attribute_level_fabric_sensitivity_masks_the_whole_entry(self):
+        # ProvisionedEndpoints carries the S quality on the attribute itself rather than
+        # on any field of TLSEndpointStruct, so every field but FabricIndex is masked.
+        dut = make_dut({0: {Clusters.TlsClientManagement.id: attribute_list(PROVISIONED_ENDPOINTS_ID)}})
+        info = self.find(dut.discover_fabric_scoped_attributes(),
+                         Clusters.TlsClientManagement.id, PROVISIONED_ENDPOINTS_ID)
+
+        asserts.assert_true(info.whole_entry_sensitive,
+                            "ProvisionedEndpoints is marked fabric sensitive on the attribute")
+        asserts.assert_equal(info.fabric_sensitive_labels, frozenset(),
+                             "TLSEndpointStruct marks no individual field fabric sensitive")
+        asserts.assert_equal(
+            info.masked_field_labels,
+            frozenset({"endpointID", "hostname", "port", "caid", "ccdid", "referenceCount"}),
+            "Every field but FabricIndex must be masked when the attribute itself is sensitive")
+
+    def test_field_level_sensitivity_masks_only_the_marked_fields(self):
+        dut = make_dut({0: {Clusters.AccessControl.id: attribute_list(ACL_ID)}})
+        info = self.find(dut.discover_fabric_scoped_attributes(), Clusters.AccessControl.id, ACL_ID)
+        asserts.assert_false(info.whole_entry_sensitive,
+                             "The ACL attribute itself is fabric scoped, not fabric sensitive")
+        asserts.assert_equal(info.masked_field_labels, info.fabric_sensitive_labels,
+                             "Only the fields the struct marks should be masked")
+
+    def test_masking_fails_on_a_leaked_whole_sensitive_entry(self):
+        dut = make_dut({0: {Clusters.TlsClientManagement.id: attribute_list(PROVISIONED_ENDPOINTS_ID)}})
+        info = self.find(dut.discover_fabric_scoped_attributes(),
+                         Clusters.TlsClientManagement.id, PROVISIONED_ENDPOINTS_ID)
+        # Hostname is not fabric sensitive on its own, so this leak is only caught once
+        # the attribute's own S quality is honoured.
+        leaked = [Clusters.TlsClientManagement.Structs.TLSEndpointStruct(hostname=b'example.com', fabricIndex=2)]
+        try:
+            dut.assert_other_fabric_entries_masked(info, leaked, own_fabric_index=1)
+        except signals.TestFailure:
+            return
+        asserts.fail("A cross-fabric entry of a fabric-sensitive attribute must fail the masking assertion")
 
     def test_masking_reports_nothing_checked_for_own_fabric_only(self):
         # A fabric-filtered read returns only own-fabric entries, so there is nothing to

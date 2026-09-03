@@ -231,12 +231,26 @@ class TC_IDM_8_1(IDMBaseTest):
         # Each entry pairs the attribute with why the write half of the check was not
         # exercised on it. Being deny-listed and being read-only are separate reasons.
         not_written: list[tuple[FabricScopedAttributeInfo, str]] = []
+        # Attributes whose unfiltered read asserted nothing about cross-fabric masking,
+        # with the reason. Reported so a read that checked nothing is not mistaken for a
+        # read that checked something and found it correct.
+        masking_not_asserted: list[tuple[FabricScopedAttributeInfo, str]] = []
         for info in attribute_infos:
+            cross_fabric_entries = 0
             for dev_ctrl, own_index, reader_name in ((self.th1, f1, "TH1"), (self.th2, f2, "TH2")):
                 filtered = await self.read_fabric_scoped_attribute(info, dev_ctrl, fabric_filtered=True)
                 self.assert_filtered_read_is_own_fabric_only(info, filtered, own_index, reader_name)
                 unfiltered = await self.read_fabric_scoped_attribute(info, dev_ctrl, fabric_filtered=False)
-                self.assert_other_fabric_entries_masked(info, unfiltered, own_fabric_index=own_index)
+                cross_fabric_entries += self.assert_other_fabric_entries_masked(info, unfiltered,
+                                                                                own_fabric_index=own_index)
+
+            if not info.masked_field_labels:
+                masking_not_asserted.append((info, "the spec marks neither the attribute nor any field of its entry "
+                                                   "struct fabric sensitive, so an entry belonging to another fabric "
+                                                   "carries nothing that has to be masked"))
+            elif cross_fabric_entries == 0:
+                masking_not_asserted.append((info, "neither unfiltered read returned an entry belonging to the other "
+                                                   "fabric, so there was nothing to check the masking rules against"))
 
             if (info.cluster_id, info.attribute_id) in FABRIC_REPORT_DENIED_ATTRIBUTES:
                 not_written.append((info, "the cluster does not report the change, so the subscription half of the "
@@ -275,9 +289,12 @@ class TC_IDM_8_1(IDMBaseTest):
                                     f"after writing one")
                 # TH2 must see that TH1's fabric gained an entry, with its fabric-sensitive
                 # fields masked: the entry's presence is not itself fabric-sensitive data.
-                asserts.assert_true(any(getattr(e, 'fabricIndex', None) == f1 for e in report_th2.value),
-                                    f"{info.path_str}: TH2's report contained no entry for fabric {f1} after "
-                                    f"TH1 wrote one")
+                # Not required where the whole entry is sensitive, because the DUT may
+                # then legitimately omit it from TH2's report rather than mask its fields.
+                if not info.whole_entry_sensitive:
+                    asserts.assert_true(any(getattr(e, 'fabricIndex', None) == f1 for e in report_th2.value),
+                                        f"{info.path_str}: TH2's report contained no entry for fabric {f1} after "
+                                        f"TH1 wrote one")
                 self.assert_other_fabric_entries_masked(info, report_th1.value, own_fabric_index=f1)
                 self.assert_other_fabric_entries_masked(info, report_th2.value, own_fabric_index=f2)
                 modified += 1
@@ -286,14 +303,21 @@ class TC_IDM_8_1(IDMBaseTest):
                 handler_th2.cancel()
                 await self.write_fabric_scoped_attribute(info, self.th1, original)
 
-        log.info("Step 4: %d fabric-scoped attribute(s) discovered, %d modified and verified, %d verified by read only",
-                 len(attribute_infos), modified, len(not_written))
+        log.info("Step 4: %d fabric-scoped attribute(s) discovered, %d modified and verified, %d read only, "
+                 "%d without a cross-fabric masking assertion",
+                 len(attribute_infos), modified, len(not_written), len(masking_not_asserted))
         for info, reason in not_written:
             self.record_note(test_name=self.current_test_info.name,
                              location=AttributePathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
                                                             attribute_id=info.attribute_id),
-                             problem=f"Step 4: {info.path_str} was not written because {reason}; its fabric "
-                             "filtering was verified by read only")
+                             problem=f"Step 4: {info.path_str} was not written because {reason}; only its read "
+                             "path was exercised")
+        for info, reason in masking_not_asserted:
+            self.record_note(test_name=self.current_test_info.name,
+                             location=AttributePathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
+                                                            attribute_id=info.attribute_id),
+                             problem=f"Step 4: no cross-fabric masking was asserted for {info.path_str} because "
+                             f"{reason}; its fabric-filtered read was still verified")
 
         self.step(5, "For every fabric-sensitive event discovered on the DUT that can be triggered, TH1 and TH2 activate a subscription to the event, not fabric filtered, and the event is triggered on the fabric TH1 is on.",
                   expectation="The DUT reports the event to TH1 and does not report it to TH2.")
