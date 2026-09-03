@@ -40192,6 +40192,11 @@ public class ChipClusters {
     private static final long THERMOSTAT_SUGGESTIONS_ATTRIBUTE_ID = 84L;
     private static final long CURRENT_THERMOSTAT_SUGGESTION_ATTRIBUTE_ID = 85L;
     private static final long THERMOSTAT_SUGGESTION_NOT_FOLLOWING_REASON_ATTRIBUTE_ID = 86L;
+    private static final long SENSORS_ATTRIBUTE_ID = 89L;
+    private static final long AVAILABLE_SENSORS_ATTRIBUTE_ID = 90L;
+    private static final long ENABLED_SENSORS_ATTRIBUTE_ID = 91L;
+    private static final long NUMBER_OF_SENSOR_SCHEDULE_TRANSITIONS_ATTRIBUTE_ID = 92L;
+    private static final long SENSOR_SCHEDULE_ATTRIBUTE_ID = 93L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -40583,6 +40588,22 @@ public class ChipClusters {
 
     public interface ThermostatSuggestionNotFollowingReasonAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Integer value);
+    }
+
+    public interface SensorsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.ThermostatClusterThermostatSensorStruct> value);
+    }
+
+    public interface AvailableSensorsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<byte[]> value);
+    }
+
+    public interface EnabledSensorsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<byte[]> value);
+    }
+
+    public interface SensorScheduleAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.ThermostatClusterSensorScheduleTransitionStruct> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -42520,6 +42541,163 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, THERMOSTAT_SUGGESTION_NOT_FOLLOWING_REASON_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readSensorsAttribute(
+        SensorsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SENSORS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.ThermostatClusterThermostatSensorStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SENSORS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeSensorsAttribute(
+        SensorsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SENSORS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.ThermostatClusterThermostatSensorStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SENSORS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAvailableSensorsAttribute(
+        AvailableSensorsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AVAILABLE_SENSORS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<byte[]> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, AVAILABLE_SENSORS_ATTRIBUTE_ID, true);
+    }
+
+    public void writeAvailableSensorsAttribute(DefaultClusterCallback callback, ArrayList<byte[]> value) {
+      writeAvailableSensorsAttribute(callback, value, 0);
+    }
+
+    public void writeAvailableSensorsAttribute(DefaultClusterCallback callback, ArrayList<byte[]> value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = ArrayType.generateArrayType(value, (elementvalue) -> new ByteArrayType(elementvalue));
+      writeAttribute(new WriteAttributesCallbackImpl(callback), AVAILABLE_SENSORS_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeAvailableSensorsAttribute(
+        AvailableSensorsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AVAILABLE_SENSORS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<byte[]> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, AVAILABLE_SENSORS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readEnabledSensorsAttribute(
+        EnabledSensorsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ENABLED_SENSORS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<byte[]> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ENABLED_SENSORS_ATTRIBUTE_ID, true);
+    }
+
+    public void writeEnabledSensorsAttribute(DefaultClusterCallback callback, ArrayList<byte[]> value) {
+      writeEnabledSensorsAttribute(callback, value, 0);
+    }
+
+    public void writeEnabledSensorsAttribute(DefaultClusterCallback callback, ArrayList<byte[]> value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = ArrayType.generateArrayType(value, (elementvalue) -> new ByteArrayType(elementvalue));
+      writeAttribute(new WriteAttributesCallbackImpl(callback), ENABLED_SENSORS_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeEnabledSensorsAttribute(
+        EnabledSensorsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ENABLED_SENSORS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<byte[]> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ENABLED_SENSORS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readNumberOfSensorScheduleTransitionsAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_SENSOR_SCHEDULE_TRANSITIONS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, NUMBER_OF_SENSOR_SCHEDULE_TRANSITIONS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeNumberOfSensorScheduleTransitionsAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_SENSOR_SCHEDULE_TRANSITIONS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, NUMBER_OF_SENSOR_SCHEDULE_TRANSITIONS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readSensorScheduleAttribute(
+        SensorScheduleAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SENSOR_SCHEDULE_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.ThermostatClusterSensorScheduleTransitionStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SENSOR_SCHEDULE_ATTRIBUTE_ID, true);
+    }
+
+    public void writeSensorScheduleAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.ThermostatClusterSensorScheduleTransitionStruct> value) {
+      writeSensorScheduleAttribute(callback, value, 0);
+    }
+
+    public void writeSensorScheduleAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.ThermostatClusterSensorScheduleTransitionStruct> value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = ArrayType.generateArrayType(value, (elementvalue) -> elementvalue.encodeTlv());
+      writeAttribute(new WriteAttributesCallbackImpl(callback), SENSOR_SCHEDULE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeSensorScheduleAttribute(
+        SensorScheduleAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SENSOR_SCHEDULE_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.ThermostatClusterSensorScheduleTransitionStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SENSOR_SCHEDULE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
