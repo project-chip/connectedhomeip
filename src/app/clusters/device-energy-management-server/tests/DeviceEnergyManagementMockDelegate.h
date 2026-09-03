@@ -87,6 +87,18 @@ public:
      */
     Protocols::InteractionModel::Status CancelRequest() override;
 
+    /**
+     * @brief Handle PowerRangeAdjustRequest command
+     */
+    Protocols::InteractionModel::Status PowerRangeAdjustRequest(const DataModel::Nullable<int64_t> minPower,
+                                                                const DataModel::Nullable<int64_t> maxPower,
+                                                                const uint32_t duration, AdjustmentCauseEnum cause) override;
+
+    /**
+     * @brief Handle CancelPowerRangeAdjustRequest command
+     */
+    Protocols::InteractionModel::Status CancelPowerRangeAdjustRequest() override;
+
     ESATypeEnum GetESAType() override;
     bool GetESACanGenerate() override;
     ESAStateEnum GetESAState() override;
@@ -98,12 +110,18 @@ public:
 
     const DataModel::Nullable<Structs::ForecastStruct::Type> & GetForecast() override;
 
+    const DataModel::Nullable<Structs::PowerRangeAdjustStruct::Type> & GetPowerRangeAdjustment() override;
+
     CHIP_ERROR SetESAState(ESAStateEnum) override;
 
     // Test helpers to set internal state
     void SetForecast(const DataModel::Nullable<Structs::ForecastStruct::Type> & forecast) { mForecast = forecast; }
     DataModel::Nullable<Structs::ForecastStruct::Type> & GetForecastMutable() { return mForecast; }
     void SetOptOutState(OptOutStateEnum state) { mOptOutState = state; }
+    void SetPowerRangeAdjustment(const DataModel::Nullable<Structs::PowerRangeAdjustStruct::Type> & powerRangeAdjustment)
+    {
+        mPowerRangeAdjustment = powerRangeAdjustment;
+    }
 
 private:
     ESAStateEnum mESAState       = ESAStateEnum::kOnline;
@@ -114,6 +132,7 @@ private:
     OptOutStateEnum mOptOutState = OptOutStateEnum::kNoOptOut;
     DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> mPowerAdjustmentCapability;
     DataModel::Nullable<Structs::ForecastStruct::Type> mForecast;
+    DataModel::Nullable<Structs::PowerRangeAdjustStruct::Type> mPowerRangeAdjustment;
 };
 
 } // namespace DeviceEnergyManagement
