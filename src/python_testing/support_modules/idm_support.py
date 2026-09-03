@@ -1723,7 +1723,7 @@ class IDMBaseTest(BasicCompositionTests):
                 continue
             self.record_note(test_name=self.current_test_info.name, location=record.location,
                              problem=f"{step_name}: {record.check} was not exercised for {record.path}: "
-                                     f"{record.reason}")
+                             f"{record.reason}")
 
         # Cleared so the next step reports its own coverage under its own name.
         self.fabric_check_records = []
