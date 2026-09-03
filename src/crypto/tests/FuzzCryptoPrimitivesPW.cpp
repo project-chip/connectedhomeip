@@ -45,7 +45,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <crypto/CHIPCryptoPAL.h>
-#include <crypto/RawKeySessionKeystore.h>
+#include <crypto/DefaultSessionKeystore.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 
@@ -72,6 +72,12 @@ void EnsureInitialized()
 {
     static const bool sInitialized = [] {
         VerifyOrDie(Platform::MemoryInit() == CHIP_NO_ERROR);
+#if CHIP_CRYPTO_PSA
+        // The PSA backend rejects every key operation until the driver is
+        // initialized, which would otherwise turn each property below into a
+        // vacuous pass.
+        VerifyOrDie(psa_crypto_init() == PSA_SUCCESS);
+#endif
         return true;
     }();
     (void) sInitialized;
@@ -160,7 +166,7 @@ auto AnyTagLen()
     return ElementOf<size_t>({ 4, 6, 8, 10, 12, 14, 16 });
 }
 
-bool MakeKey(const KeyArray & raw, RawKeySessionKeystore & keystore, Aes128KeyHandle & out)
+bool MakeKey(const KeyArray & raw, DefaultSessionKeystore & keystore, Aes128KeyHandle & out)
 {
     Symmetric128BitsKeyByteArray material;
     memcpy(material, raw.data(), raw.size());
@@ -175,7 +181,7 @@ void AesCcmDecryptNoCrash(const KeyArray & key, const Bytes & nonce, const Bytes
 {
     EnsureInitialized();
 
-    RawKeySessionKeystore keystore;
+    DefaultSessionKeystore keystore;
     Aes128KeyHandle handle;
     if (!MakeKey(key, keystore, handle))
     {
@@ -203,7 +209,7 @@ void AesCcmRoundtrip(const KeyArray & key, const Bytes & nonce, const Bytes & aa
 {
     EnsureInitialized();
 
-    RawKeySessionKeystore keystore;
+    DefaultSessionKeystore keystore;
     Aes128KeyHandle handle;
     if (!MakeKey(key, keystore, handle))
     {
@@ -255,7 +261,7 @@ void AesCtrCryptNoCrash(const KeyArray & key, const Bytes & nonce, const Bytes &
 {
     EnsureInitialized();
 
-    RawKeySessionKeystore keystore;
+    DefaultSessionKeystore keystore;
     Aes128KeyHandle handle;
     if (!MakeKey(key, keystore, handle))
     {
@@ -274,7 +280,7 @@ void AesCtrRoundtrip(const KeyArray & key, const Bytes & nonce, const Bytes & pl
 {
     EnsureInitialized();
 
-    RawKeySessionKeystore keystore;
+    DefaultSessionKeystore keystore;
     Aes128KeyHandle handle;
     if (!MakeKey(key, keystore, handle))
     {
