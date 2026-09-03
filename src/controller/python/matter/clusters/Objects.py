@@ -36520,7 +36520,7 @@ class Humidistat(Cluster):
                 ClusterObjectFieldDescriptor(Label="maxSetpoint", Tag=0x00000005, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="step", Tag=0x00000006, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="targetSetpoint", Tag=0x00000007, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="mistType", Tag=0x00000008, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="mistType", Tag=0x00000008, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="continuous", Tag=0x00000009, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="sleep", Tag=0x0000000A, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="optimal", Tag=0x0000000B, Type=typing.Optional[bool]),
@@ -36541,7 +36541,7 @@ class Humidistat(Cluster):
     maxSetpoint: typing.Optional[uint] = None
     step: typing.Optional[uint] = None
     targetSetpoint: typing.Optional[uint] = None
-    mistType: typing.Union[None, Nullable, uint] = None
+    mistType: typing.Optional[uint] = None
     continuous: typing.Optional[bool] = None
     sleep: typing.Optional[bool] = None
     optimal: typing.Optional[bool] = None
@@ -36761,9 +36761,9 @@ class Humidistat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: typing.Union[None, Nullable, uint] = None
+            value: typing.Optional[uint] = None
 
         @dataclass
         class Continuous(ClusterAttributeDescriptor):

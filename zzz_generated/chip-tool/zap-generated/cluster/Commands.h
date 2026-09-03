@@ -29838,7 +29838,7 @@ void registerClusterHumidistat(Commands & commands, CredentialIssuerCommands * c
                                                    credsIssuerConfig), //
         make_unique<WriteAttribute<chip::Percent>>(Id, "target-setpoint", 0, UINT8_MAX, Attributes::TargetSetpoint::Id,
                                                    WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap>>>>(
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap>>>(
             Id, "mist-type", 0, UINT8_MAX, Attributes::MistType::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "continuous", 0, 1, Attributes::Continuous::Id, WriteCommandType::kWrite,
                                           credsIssuerConfig),                                                                     //

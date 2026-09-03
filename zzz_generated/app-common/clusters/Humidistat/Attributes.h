@@ -142,9 +142,9 @@ struct TypeInfo
 namespace MistType {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap>>;
-    using DecodableType    = chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap>>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap>> &;
+    using Type             = chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Humidistat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MistType::Id; }
@@ -259,7 +259,8 @@ struct TypeInfo
         Attributes::MaxSetpoint::TypeInfo::DecodableType maxSetpoint       = static_cast<chip::Percent>(0);
         Attributes::Step::TypeInfo::DecodableType step                     = static_cast<chip::Percent>(0);
         Attributes::TargetSetpoint::TypeInfo::DecodableType targetSetpoint = static_cast<chip::Percent>(0);
-        Attributes::MistType::TypeInfo::DecodableType mistType;
+        Attributes::MistType::TypeInfo::DecodableType mistType =
+            static_cast<chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap>>(0);
         Attributes::Continuous::TypeInfo::DecodableType continuous           = static_cast<bool>(0);
         Attributes::Sleep::TypeInfo::DecodableType sleep                     = static_cast<bool>(0);
         Attributes::Optimal::TypeInfo::DecodableType optimal                 = static_cast<bool>(0);
