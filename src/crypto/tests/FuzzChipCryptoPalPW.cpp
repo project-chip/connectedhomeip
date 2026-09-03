@@ -41,6 +41,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <string>
 #include <vector>
 
 #include <pw_fuzzer/fuzztest.h>
@@ -49,7 +50,13 @@
 #include <credentials/attestation_verifier/TestPAAStore.h>
 #include <credentials/tests/CHIPAttCert_test_vectors.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+
+#if CHIP_CRYPTO_PSA
+#include <psa/crypto.h>
+#endif
 
 namespace {
 
@@ -60,10 +67,28 @@ using namespace fuzztest;
 
 using Bytes = std::vector<uint8_t>;
 
+// The mbedTLS and PSA certificate backends import keys through PSA, which
+// rejects every operation until the driver is initialized -- without this the
+// CSR case would pass without verifying anything.
+void EnsureInitialized()
+{
+    static const bool sInitialized = [] {
+        VerifyOrDie(Platform::MemoryInit() == CHIP_NO_ERROR);
+#if CHIP_CRYPTO_PSA
+        VerifyOrDie(psa_crypto_init() == PSA_SUCCESS);
+#endif
+        return true;
+    }();
+    (void) sInitialized;
+}
+
 Bytes ToBytes(const ByteSpan & span)
 {
     return Bytes(span.begin(), span.end());
 }
+
+// Matches the DER cap used by the other certificate harnesses.
+constexpr size_t kMaxDerCertLen = 8192;
 
 std::vector<Bytes> ToSeeds(const std::vector<ByteSpan> & spans)
 {
@@ -81,34 +106,38 @@ std::vector<Bytes> ToSeeds(const std::vector<ByteSpan> & spans)
 // edge case the test corpus provides.
 auto AnyDacCert()
 {
-    return Arbitrary<Bytes>().WithSeeds(ToSeeds({
-        sTestCert_DAC_FFF1_8000_0000_Cert,
-        sTestCert_DAC_FFF1_8000_0004_Cert,
-        sTestCert_DAC_FFF2_8001_0008_Cert,
-        sTestCert_DAC_FFF2_8002_0017_Cert,
-        sTestCert_DAC_FFF2_8003_0018_FB_Cert,
-        sTestCert_DAC_FFF2_8004_001C_FB_Cert,
-        sTestCert_DAC_FFF2_8004_0020_ValInPast_Cert,
-        sTestCert_DAC_FFF2_8004_0021_ValInFuture_Cert,
-        sTestCert_DAC_FFF2_8004_0030_Val1SecBefore_Cert,
-        sTestCert_DAC_FFF2_8006_0034_ValInFuture_Cert,
-    }));
+    return Arbitrary<Bytes>()
+        .WithMaxSize(kMaxDerCertLen)
+        .WithSeeds(ToSeeds({
+            sTestCert_DAC_FFF1_8000_0000_Cert,
+            sTestCert_DAC_FFF1_8000_0004_Cert,
+            sTestCert_DAC_FFF2_8001_0008_Cert,
+            sTestCert_DAC_FFF2_8002_0017_Cert,
+            sTestCert_DAC_FFF2_8003_0018_FB_Cert,
+            sTestCert_DAC_FFF2_8004_001C_FB_Cert,
+            sTestCert_DAC_FFF2_8004_0020_ValInPast_Cert,
+            sTestCert_DAC_FFF2_8004_0021_ValInFuture_Cert,
+            sTestCert_DAC_FFF2_8004_0030_Val1SecBefore_Cert,
+            sTestCert_DAC_FFF2_8006_0034_ValInFuture_Cert,
+        }));
 }
 
 // Product attestation intermediates, leading with the FFF1 chain issuer.
 auto AnyPaiCert()
 {
-    return Arbitrary<Bytes>().WithSeeds(ToSeeds({
-        sTestCert_PAI_FFF1_8000_Cert,
-        sTestCert_PAI_FFF2_8001_Cert,
-        sTestCert_PAI_FFF2_8001_Resigned_Cert,
-        sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_Cert,
-        sTestCert_PAI_FFF2_8001_ResignedSubjectDiff_Cert,
-        sTestCert_PAI_FFF2_8004_FB_Cert,
-        sTestCert_PAI_FFF2_8005_ValInPast_Cert,
-        sTestCert_PAI_FFF2_8006_ValInFuture_Cert,
-        sTestCert_PAI_FFF2_NoPID_Cert,
-    }));
+    return Arbitrary<Bytes>()
+        .WithMaxSize(kMaxDerCertLen)
+        .WithSeeds(ToSeeds({
+            sTestCert_PAI_FFF1_8000_Cert,
+            sTestCert_PAI_FFF2_8001_Cert,
+            sTestCert_PAI_FFF2_8001_Resigned_Cert,
+            sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_Cert,
+            sTestCert_PAI_FFF2_8001_ResignedSubjectDiff_Cert,
+            sTestCert_PAI_FFF2_8004_FB_Cert,
+            sTestCert_PAI_FFF2_8005_ValInPast_Cert,
+            sTestCert_PAI_FFF2_8006_ValInFuture_Cert,
+            sTestCert_PAI_FFF2_NoPID_Cert,
+        }));
 }
 
 // Certificates that actually carry a CRL distribution point, in every shape the
@@ -116,29 +145,33 @@ auto AnyPaiCert()
 // over-long URI, a wrong URI prefix, and one/two CRL issuers.
 auto AnyCdpCert()
 {
-    return Arbitrary<Bytes>().WithSeeds(ToSeeds({
-        sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_Cert,
-        sTestCert_DAC_FFF1_8000_0000_CDP_Cert,
-        sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_Cert,
-        sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_Cert,
-        sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_Cert,
-        sTestCert_DAC_FFF1_8000_0000_CDP_Long_Cert,
-        sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_Cert,
-        sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_Cert,
-        sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_Cert,
-        sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_Cert,
-        sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Cert,
-        sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_Cert,
-        sTestCert_DAC_FFF1_8000_0000_2CDPs_Cert,
-        sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_Cert,
-        sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_Cert,
-    }));
+    return Arbitrary<Bytes>()
+        .WithMaxSize(kMaxDerCertLen)
+        .WithSeeds(ToSeeds({
+            sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_Cert,
+            sTestCert_DAC_FFF1_8000_0000_CDP_Cert,
+            sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_Cert,
+            sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_Cert,
+            sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_Cert,
+            sTestCert_DAC_FFF1_8000_0000_CDP_Long_Cert,
+            sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_Cert,
+            sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_Cert,
+            sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_Cert,
+            sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_Cert,
+            sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Cert,
+            sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_Cert,
+            sTestCert_DAC_FFF1_8000_0000_2CDPs_Cert,
+            sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_Cert,
+            sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_Cert,
+        }));
 }
 
 // IsCertificateValidAtCurrentTime reads the wall clock, so its result is not
 // reproducible across runs; only the absence of a crash is checked here.
 void IssuanceTimeComparison(const Bytes & candidate, const Bytes & issuer)
 {
+    EnsureInitialized();
+
     const ByteSpan candidateSpan(candidate.data(), candidate.size());
 
     RETURN_SAFELY_IGNORED IsCertificateValidAtIssuance(candidateSpan, ByteSpan(issuer.data(), issuer.size()));
@@ -149,6 +182,8 @@ FUZZ_TEST(ChipCryptoPal, IssuanceTimeComparison).WithDomains(AnyDacCert(), AnyPa
 
 void SerialNumberExtraction(const Bytes & cert)
 {
+    EnsureInitialized();
+
     uint8_t serialNumberBuf[kMaxCertificateSerialNumberLength] = { 0 };
     MutableByteSpan serialNumber(serialNumberBuf);
     RETURN_SAFELY_IGNORED ExtractSerialNumberFromX509Cert(ByteSpan(cert.data(), cert.size()), serialNumber);
@@ -158,6 +193,8 @@ FUZZ_TEST(ChipCryptoPal, SerialNumberExtraction).WithDomains(AnyDacCert());
 
 void KeyIdentifierExtraction(const Bytes & cert)
 {
+    EnsureInitialized();
+
     const ByteSpan certSpan(cert.data(), cert.size());
 
     uint8_t skidBuf[kSubjectKeyIdentifierLength];
@@ -173,6 +210,8 @@ FUZZ_TEST(ChipCryptoPal, KeyIdentifierExtraction).WithDomains(AnyDacCert());
 
 void CrlDistributionPointUriExtraction(const Bytes & cert)
 {
+    EnsureInitialized();
+
     char cdpBuf[kMaxCRLDistributionPointURLLength] = { '\0' };
     MutableCharSpan cdpUrl(cdpBuf);
     RETURN_SAFELY_IGNORED ExtractCRLDistributionPointURIFromX509Cert(ByteSpan(cert.data(), cert.size()), cdpUrl);
@@ -182,6 +221,8 @@ FUZZ_TEST(ChipCryptoPal, CrlDistributionPointUriExtraction).WithDomains(AnyCdpCe
 
 void CrlIssuerExtraction(const Bytes & cert)
 {
+    EnsureInitialized();
+
     uint8_t crlIssuerBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
     MutableByteSpan crlIssuer(crlIssuerBuf);
     RETURN_SAFELY_IGNORED ExtractCDPExtensionCRLIssuerFromX509Cert(ByteSpan(cert.data(), cert.size()), crlIssuer);
@@ -191,6 +232,8 @@ FUZZ_TEST(ChipCryptoPal, CrlIssuerExtraction).WithDomains(AnyCdpCert());
 
 void VidPidExtractionFromCert(const Bytes & cert)
 {
+    EnsureInitialized();
+
     AttestationCertVidPid vidPid;
     RETURN_SAFELY_IGNORED ExtractVIDPIDFromX509Cert(ByteSpan(cert.data(), cert.size()), vidPid);
 }
@@ -207,6 +250,8 @@ auto AnyDNAttrType()
 // seeded from certificates.
 void VidPidExtractionFromAttributeString(DNAttrType attrType, const std::string & attrString)
 {
+    EnsureInitialized();
+
     AttestationCertVidPid vidPid;
     AttestationCertVidPid vidPidFromCN;
 
@@ -221,6 +266,8 @@ FUZZ_TEST(ChipCryptoPal, VidPidExtractionFromAttributeString)
 
 void SubjectAndIssuerExtraction(const Bytes & cert)
 {
+    EnsureInitialized();
+
     const ByteSpan certSpan(cert.data(), cert.size());
 
     uint8_t subjectBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
@@ -246,6 +293,8 @@ const ByteSpan kResignedCandidates[] = {
 
 void ResignedCertificateLookup(const Bytes & cert, size_t candidateCount)
 {
+    EnsureInitialized();
+
     ByteSpan replacement;
     RETURN_SAFELY_IGNORED ReplaceCertIfResignedCertFound(ByteSpan(cert.data(), cert.size()), kResignedCandidates, candidateCount,
                                                          replacement);
@@ -254,15 +303,8 @@ void ResignedCertificateLookup(const Bytes & cert, size_t candidateCount)
 FUZZ_TEST(ChipCryptoPal, ResignedCertificateLookup)
     .WithDomains(AnyPaiCert(), InRange<size_t>(0, MATTER_ARRAY_SIZE(kResignedCandidates)));
 
-// A CSR whose signature verifies against this public key, used as the lead seed
-// so that mutations start from a structurally valid request.
-const uint8_t kGoodCsrSubjectPublicKey[] = {
-    0x04, 0xa3, 0xbe, 0xa1, 0xf5, 0x42, 0x01, 0x07, 0x3c, 0x4b, 0x75, 0x85, 0xd8, 0xe2, 0x98, 0xac, 0x2f,
-    0xf6, 0x98, 0xdb, 0xd9, 0x5b, 0xe0, 0x7e, 0xc1, 0x04, 0xd5, 0x73, 0xc5, 0xb0, 0x90, 0x77, 0x27, 0x00,
-    0x1e, 0x22, 0xc7, 0x89, 0x5e, 0x4d, 0x75, 0x07, 0x89, 0x82, 0x0f, 0x49, 0xb6, 0x59, 0xd5, 0xc5, 0x15,
-    0x7d, 0x93, 0xe6, 0x80, 0x5c, 0x70, 0x89, 0x0a, 0x43, 0x10, 0x3d, 0xeb, 0x3d, 0x4a,
-};
-
+// A well-formed CSR, used as the lead seed so that mutations start from a
+// structurally valid request.
 const uint8_t kGoodCsr[] = {
     0x30, 0x81, 0xca, 0x30, 0x70, 0x02, 0x01, 0x00, 0x30, 0x0e, 0x31, 0x0c, 0x30, 0x0a, 0x06, 0x03, 0x55, 0x04, 0x0a, 0x0c, 0x03,
     0x43, 0x53, 0x52, 0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x02, 0x01, 0x06, 0x08, 0x2a, 0x86, 0x48,
@@ -278,8 +320,11 @@ const uint8_t kGoodCsr[] = {
 
 void CertificateSigningRequestVerification(const Bytes & csr)
 {
-    P256PublicKey expectedPublicKey(kGoodCsrSubjectPublicKey);
-    RETURN_SAFELY_IGNORED VerifyCertificateSigningRequest(csr.data(), csr.size(), expectedPublicKey);
+    EnsureInitialized();
+
+    // The key is an output: on success it is filled in from the CSR.
+    P256PublicKey csrPublicKey;
+    RETURN_SAFELY_IGNORED VerifyCertificateSigningRequest(csr.data(), csr.size(), csrPublicKey);
 }
 
 FUZZ_TEST(ChipCryptoPal, CertificateSigningRequestVerification)

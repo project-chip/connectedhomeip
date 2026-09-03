@@ -49,6 +49,10 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 
+#if CHIP_CRYPTO_PSA
+#include <psa/crypto.h>
+#endif
+
 #include "AES_CCM_128_test_vectors.h"
 #include "DerSigConversion_test_vectors.h"
 #include "HKDF_SHA256_test_vectors.h"
