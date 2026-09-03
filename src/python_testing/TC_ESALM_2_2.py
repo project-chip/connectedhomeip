@@ -72,8 +72,8 @@ class TC_ESALM_2_2(MatterBaseTest):
         """[TC-ESALM-2.2] SetElectricalAlarmThresholds Command with Server as DUT
 
         Verify that the SetElectricalAlarmThresholds command correctly sets threshold
-        attributes, enforces cross-field constraints, and that written values persist
-        across a device reboot (Non-Volatile).
+        attributes and enforces cross-field constraints. The threshold attributes carry
+        no Non-Volatile quality in the spec, so persistence across reboot is not tested.
         """
         endpoint = self.get_endpoint()
         attrs = cluster.Attributes
@@ -293,52 +293,7 @@ class TC_ESALM_2_2(MatterBaseTest):
         else:
             self.mark_current_step_skipped()
 
-        self.step(16, "TH reboots DUT and re-commissions; reads all threshold attributes written in steps 3-14",
-                  expectation="Each attribute returns the value written before reboot (Non-Volatile).")
-        await self.request_device_reboot()
-
-        if has_overvolt:
-            readback = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.OverVoltageThreshold)
-            asserts.assert_equal(readback, new_over_voltage, "OverVoltageThreshold not persisted across reboot")
-        if has_undervolt:
-            readback = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.UnderVoltageThreshold)
-            asserts.assert_equal(readback, new_under_voltage, "UnderVoltageThreshold not persisted across reboot")
-        if has_overfreq:
-            readback = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.OverFrequencyThreshold)
-            asserts.assert_equal(readback, new_over_freq, "OverFrequencyThreshold not persisted across reboot")
-        if has_underfreq:
-            readback = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.UnderFrequencyThreshold)
-            asserts.assert_equal(readback, new_under_freq, "UnderFrequencyThreshold not persisted across reboot")
-        if has_overpower:
-            readback = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.OverPowerThreshold)
-            asserts.assert_equal(readback, new_over_power, "OverPowerThreshold not persisted across reboot")
-        if has_underpower:
-            readback = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.UnderPowerThreshold)
-            asserts.assert_equal(readback, new_under_power, "UnderPowerThreshold not persisted across reboot")
-        if has_overcur:
-            readback = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.OverCurrentThreshold)
-            asserts.assert_equal(readback, new_over_current, "OverCurrentThreshold not persisted across reboot")
-        if has_undercur:
-            readback = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.UnderCurrentThreshold)
-            asserts.assert_equal(readback, new_under_current, "UnderCurrentThreshold not persisted across reboot")
-        if has_powerimp:
-            readback = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.PowerImportThreshold)
-            asserts.assert_equal(readback, new_power_import, "PowerImportThreshold not persisted across reboot")
-        if has_powerexp:
-            readback = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.PowerExportThreshold)
-            asserts.assert_equal(readback, new_power_export, "PowerExportThreshold not persisted across reboot")
-
-        self.step(17, "TH sends SetElectricalAlarmThresholds to restore all attributes to original values",
+        self.step(16, "TH sends SetElectricalAlarmThresholds to restore all attributes to original values",
                   expectation="SUCCESS for each restore.")
         restore_kwargs = {}
         if has_overvolt:
