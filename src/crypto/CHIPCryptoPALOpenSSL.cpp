@@ -23,6 +23,7 @@
 #include "CHIPCryptoPALOpenSSL.h"
 #include "CHIPCryptoPAL.h"
 
+#include <optional>
 #include <type_traits>
 
 #if CHIP_CRYPTO_BORINGSSL
@@ -138,25 +139,55 @@ static int _compareDaysAndSeconds(const int days, const int seconds)
     return 0;
 }
 
-bool IsSupportedAttestationSignatureAlgorithm(int signatureNid)
+bool IsMlDsa44Supported()
+{
+#if !CHIP_CRYPTO_BORINGSSL && defined(EVP_PKEY_ML_DSA_44)
+    return true;
+#else
+    return false;
+#endif
+}
+
+bool IsMlDsa65Supported()
+{
+#if !CHIP_CRYPTO_BORINGSSL && defined(EVP_PKEY_ML_DSA_65)
+    return true;
+#else
+    return false;
+#endif
+}
+
+// Relative security strength of the algorithms allowed in an attestation chain. A certificate
+// may not carry a key stronger than the algorithm that signed it, so these values are ordered
+// and compared; they are not persisted or exchanged anywhere.
+enum class AttestationAlgorithmStrength : uint8_t
+{
+    kEcdsaP256 = 1,
+    kMlDsa44   = 2,
+    kMlDsa65   = 3,
+};
+
+// Returns the strength of a certificate's signature algorithm, i.e. of the issuer's key, or
+// std::nullopt when the algorithm is not one this backend accepts for attestation.
+std::optional<AttestationAlgorithmStrength> AttestationSignatureAlgorithmStrength(int signatureNid)
 {
     if (signatureNid == NID_ecdsa_with_SHA256)
     {
-        return true;
+        return AttestationAlgorithmStrength::kEcdsaP256;
     }
 #if !CHIP_CRYPTO_BORINGSSL && defined(NID_ML_DSA_44)
-    if (signatureNid == NID_ML_DSA_44)
+    if (signatureNid == NID_ML_DSA_44 && IsMlDsa44Supported())
     {
-        return IsMlDsa44Supported();
+        return AttestationAlgorithmStrength::kMlDsa44;
     }
 #endif
 #if !CHIP_CRYPTO_BORINGSSL && defined(NID_ML_DSA_65)
-    if (signatureNid == NID_ML_DSA_65)
+    if (signatureNid == NID_ML_DSA_65 && IsMlDsa65Supported())
     {
-        return IsMlDsa65Supported();
+        return AttestationAlgorithmStrength::kMlDsa65;
     }
 #endif
-    return false;
+    return std::nullopt;
 }
 
 bool IsP256AttestationPublicKey(EVP_PKEY * pkey)
@@ -164,6 +195,9 @@ bool IsP256AttestationPublicKey(EVP_PKEY * pkey)
     VerifyOrReturnError(pkey != nullptr, false);
     VerifyOrReturnError(EVP_PKEY_base_id(pkey) == EVP_PKEY_EC, false);
     VerifyOrReturnError(EVP_PKEY_bits(pkey) == 256, false);
+
+    // The key must encode as an uncompressed point, the only form a P256PublicKey holds.
+    VerifyOrReturnError(i2d_PublicKey(pkey, nullptr) == static_cast<int>(kP256_PublicKey_Length), false);
 
     EC_KEY * ecKey = EVP_PKEY_get1_EC_KEY(pkey);
     VerifyOrReturnError(ecKey != nullptr, false);
@@ -173,27 +207,29 @@ bool IsP256AttestationPublicKey(EVP_PKEY * pkey)
     return isP256;
 }
 
-bool IsSupportedMlDsaAttestationPublicKey(EVP_PKEY * pkey)
+// Returns the strength of a certificate's subject public key, or std::nullopt when the key is
+// not one this backend accepts for attestation.
+std::optional<AttestationAlgorithmStrength> AttestationPublicKeyStrength([[maybe_unused]] EVP_PKEY * pkey)
 {
-#if !CHIP_CRYPTO_BORINGSSL && (defined(EVP_PKEY_ML_DSA_44) || defined(EVP_PKEY_ML_DSA_65))
-    VerifyOrReturnError(pkey != nullptr, false);
-#if defined(EVP_PKEY_ML_DSA_44)
+    VerifyOrReturnError(pkey != nullptr, std::nullopt);
+
+    if (IsP256AttestationPublicKey(pkey))
+    {
+        return AttestationAlgorithmStrength::kEcdsaP256;
+    }
+#if !CHIP_CRYPTO_BORINGSSL && defined(EVP_PKEY_ML_DSA_44)
     if (IsMlDsa44Supported() && (EVP_PKEY_is_a(pkey, "ML-DSA-44") == 1 || EVP_PKEY_is_a(pkey, "MLDSA44") == 1))
     {
-        return true;
+        return AttestationAlgorithmStrength::kMlDsa44;
     }
 #endif
-#if defined(EVP_PKEY_ML_DSA_65)
+#if !CHIP_CRYPTO_BORINGSSL && defined(EVP_PKEY_ML_DSA_65)
     if (IsMlDsa65Supported() && (EVP_PKEY_is_a(pkey, "ML-DSA-65") == 1 || EVP_PKEY_is_a(pkey, "MLDSA65") == 1))
     {
-        return true;
+        return AttestationAlgorithmStrength::kMlDsa65;
     }
 #endif
-    return false;
-#else
-    (void) pkey;
-    return false;
-#endif
+    return std::nullopt;
 }
 
 CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, const uint8_t * aad, size_t aad_length,
@@ -1292,6 +1328,8 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
     bool extKeyUsagePresent = false;
     bool extSKIDPresent     = false;
     bool extAKIDPresent     = false;
+    std::optional<AttestationAlgorithmStrength> signatureStrength;
+    std::optional<AttestationAlgorithmStrength> keyStrength;
 
     VerifyOrReturnError(!cert.empty() && CanCastTo<long>(cert.size()), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -1300,7 +1338,8 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
 
     VerifyOrExit(X509_get_version(x509Cert) == 2, err = CHIP_ERROR_INTERNAL);
     VerifyOrExit(X509_get_serialNumber(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(IsSupportedAttestationSignatureAlgorithm(X509_get_signature_nid(x509Cert)), err = CHIP_ERROR_INTERNAL);
+    signatureStrength = AttestationSignatureAlgorithmStrength(X509_get_signature_nid(x509Cert));
+    VerifyOrExit(signatureStrength.has_value(), err = CHIP_ERROR_INTERNAL);
     VerifyOrExit(X509_get_issuer_name(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
     VerifyOrExit(X509_getm_notBefore(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
     VerifyOrExit(X509_getm_notAfter(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
@@ -1309,14 +1348,25 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
     publicKey = X509_get0_pubkey(x509Cert);
     VerifyOrExit(publicKey != nullptr, err = CHIP_ERROR_INTERNAL);
 
+    keyStrength = AttestationPublicKeyStrength(publicKey);
+    VerifyOrExit(keyStrength.has_value(), err = CHIP_ERROR_INTERNAL);
+
+    // A DAC always carries a P-256 key; only a PAA or PAI may be ML-DSA.
     if (certType == AttestationCertType::kDAC)
     {
-        VerifyOrExit(IsP256AttestationPublicKey(publicKey), err = CHIP_ERROR_INTERNAL);
+        VerifyOrExit(*keyStrength == AttestationAlgorithmStrength::kEcdsaP256, err = CHIP_ERROR_INTERNAL);
+    }
+
+    if (certType == AttestationCertType::kPAA)
+    {
+        // A self-signed PAA must use its subject key algorithm for its signature.
+        VerifyOrExit(*keyStrength == *signatureStrength, err = CHIP_ERROR_INTERNAL);
     }
     else
     {
-        VerifyOrExit(IsP256AttestationPublicKey(publicKey) || IsSupportedMlDsaAttestationPublicKey(publicKey),
-                     err = CHIP_ERROR_INTERNAL);
+        // A certificate must not be stronger than the one that signed it: an issuer whose own key
+        // can be broken offers no protection to a stronger key below it.
+        VerifyOrExit(*keyStrength <= *signatureStrength, err = CHIP_ERROR_INTERNAL);
     }
 
     for (int i = 0; i < X509_get_ext_count(x509Cert); i++)

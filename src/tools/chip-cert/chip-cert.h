@@ -85,9 +85,36 @@ inline bool IsMLDSAKey(const EVP_PKEY * key)
 #endif
 }
 
+// Relative security strength of the algorithms allowed in an attestation chain. The values are
+// ordered so they can be compared: a certificate must not carry a key stronger than the key
+// that signs it, since a weaker issuer cannot protect a stronger key below it.
+enum class KeyStrength : uint8_t
+{
+    kEcdsaP256 = 1,
+    kMlDsa44   = 2,
+    kMlDsa65   = 3,
+};
+
+inline KeyStrength GetKeyStrength(const EVP_PKEY * key)
+{
+#if CHIP_CERT_ML_DSA_AVAILABLE
+    if (EVP_PKEY_is_a(key, "ML-DSA-65"))
+    {
+        return KeyStrength::kMlDsa65;
+    }
+    if (EVP_PKEY_is_a(key, "ML-DSA-44"))
+    {
+        return KeyStrength::kMlDsa44;
+    }
+#else
+    (void) key;
+#endif
+    return KeyStrength::kEcdsaP256;
+}
+
 // ML-DSA signed attestation certificates exceed the 600-byte limit that applies
-// to ECDSA-only chains. ML-DSA-65 certificates are ~5.5 KB DER encoded.
-inline constexpr uint32_t kMaxPQCDERCertLength = 6144;
+// to ECDSA-only chains. ML-DSA-65 is the largest algorithm supported here.
+inline constexpr uint32_t kMaxPQCDERCertLength = chip::Credentials::kMaxDERCertLengthMlDsa65;
 
 #ifndef CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES
 #define CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES CHIP_CONFIG_TEST
@@ -241,9 +268,7 @@ public:
     }
     uint8_t GetSignatureAlgorithmTLVEnum()
     {
-        // 0xFF is an unassigned SigAlgo enum, used to inject an unsupported signature
-        // algorithm. ECDSA-with-SHA1 has no CHIP TLV enum of its own.
-        return (mEnabled && mFlags.Has(CertErrorFlags::kSigAlgo)) ? 0xFF : GetOIDEnum(chip::ASN1::kOID_SigAlgo_ECDSAWithSHA256);
+        return (mEnabled && mFlags.Has(CertErrorFlags::kSigAlgo)) ? 0x02 : GetOIDEnum(chip::ASN1::kOID_SigAlgo_ECDSAWithSHA256);
     }
     bool IsSubjectVIDMismatch() { return (mEnabled && mFlags.Has(CertErrorFlags::kSubjectVIDMismatch)); }
     bool IsSubjectPIDMismatch() { return (mEnabled && mFlags.Has(CertErrorFlags::kSubjectPIDMismatch)); }

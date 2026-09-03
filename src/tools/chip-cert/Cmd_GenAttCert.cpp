@@ -324,12 +324,12 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         gCRLIssuerCertFileName = arg;
         break;
     case 'A':
-        gKeyTypeName = arg;
         if (strcmp(arg, "p256") != 0 && strcmp(arg, "ml-dsa-44") != 0 && strcmp(arg, "ml-dsa-65") != 0)
         {
             PrintArgError("%s: Invalid value specified for key type: %s\n", progName, arg);
             return false;
         }
+        gKeyTypeName = arg;
         break;
 #if CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES
     case 'I':
@@ -616,9 +616,13 @@ bool Cmd_GenAttCert(int argc, char * argv[])
         {
             const char * opensslAlgo = nullptr;
             if (strcmp(gKeyTypeName, "ml-dsa-44") == 0)
+            {
                 opensslAlgo = "ML-DSA-44";
+            }
             else if (strcmp(gKeyTypeName, "ml-dsa-65") == 0)
+            {
                 opensslAlgo = "ML-DSA-65";
+            }
 
             res = GenerateKeyPair_MLDSA(newKey, opensslAlgo);
             VerifyTrueOrExit(res);
@@ -630,7 +634,7 @@ bool Cmd_GenAttCert(int argc, char * argv[])
         }
     }
 
-    if (gAttCertType == kAttCertType_DAC && IsMLDSAKey(newKey.get()))
+    if (gAttCertType == kAttCertType_DAC && IsMLDSAKey(newKey.get()) && !gCertConfig.IsErrorTestCaseEnabled())
     {
         fprintf(stderr, "DAC certificates require a P-256 key\n");
         ExitNow(res = false);
@@ -724,6 +728,14 @@ bool Cmd_GenAttCert(int argc, char * argv[])
 
         res = ReadKey(gCAKeyFileNameOrStr, caKey, gCertConfig.IsErrorTestCaseEnabled());
         VerifyTrueOrExit(res);
+
+        // Attestation validation rejects a certificate whose key is stronger than the algorithm
+        // that signed it, so refuse to issue one unless invalid certificates were asked for.
+        if (!gCertConfig.IsErrorTestCaseEnabled() && GetKeyStrength(newKey.get()) > GetKeyStrength(caKey.get()))
+        {
+            fprintf(stderr, "The new key algorithm is stronger than the CA key signing it\n");
+            ExitNow(res = false);
+        }
 
         res = MakeAttCert(gAttCertType, gSubjectCN, gSubjectVID, gSubjectPID, gEncodeVIDandPIDasCN, caCert.get(), caKey.get(),
                           gValidFrom, gValidDays, newCert.get(), newKey.get(), gCertConfig, cdpExtension.get());

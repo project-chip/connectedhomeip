@@ -186,46 +186,162 @@ class KeyConversionTest(ChipCertTest):
         self.assertIn("unsupported key type", result.stderr)
 
 
-class AttestationKeyTypeTest(ChipCertTest):
-    """Tests covering certificate-type restrictions on attestation keys."""
+class MlDsaTest(ChipCertTest):
+    """Base class for tests that need chip-cert built with ML-DSA support."""
 
-    def skip_if_mldsa_unavailable(self, result):
-        """Skip when chip-cert was built without the OpenSSL ML-DSA definitions."""
+    def gen_att_cert(self, *args, expect_success=True):
+        """Run gen-att-cert, skipping the test when the build has no ML-DSA support."""
+        command = [str(self.chip_cert), "gen-att-cert", *map(str, args)]
+        result = subprocess.run(command, capture_output=True, text=True)
         if "requires chip-cert to be built against OpenSSL 3.5 or later" in result.stderr:
             self.skipTest("chip-cert was built without ML-DSA support")
+        if expect_success:
+            self.assertEqual(result.returncode, 0, f"{' '.join(command)} failed:\n{result.stderr}")
+        else:
+            self.assertNotEqual(result.returncode, 0, f"{' '.join(command)} unexpectedly succeeded")
+        return result
+
+    def generate_ca_key(self, key_type=None, name="paa"):
+        """Generate a self-signed PAA, returning its (certificate, key) paths.
+
+        A key_type of None leaves gen-att-cert on its P-256 default.
+        """
+        cert = self.tmp_path / f"{name}.pem"
+        key = self.tmp_path / f"{name}-key.pem"
+        key_options = ("--key-type", key_type) if key_type else ()
+        self.gen_att_cert("--type", "a", "--subject-cn", "Test PAA", *key_options,
+                          "--lifetime", "3650", "--out", cert, "--out-key", key)
+        return cert, key
+
+
+class AttestationKeyTypeTest(MlDsaTest):
+    """Tests covering certificate-type restrictions on attestation keys."""
 
     def test_dac_rejects_generated_mldsa_key(self):
         """A DAC cannot select ML-DSA when generating its key."""
-        result = self.run_chip_cert(
-            "gen-att-cert", "--type", "d", "--subject-cn", "Test DAC",
+        result = self.gen_att_cert(
+            "--type", "d", "--subject-cn", "Test DAC",
             "--subject-vid", "FFF1", "--subject-pid", "8000",
             "--ca-cert", "unused-ca.pem", "--ca-key", "unused-ca-key.pem",
             "--out", self.tmp_path / "dac.pem", "--out-key", self.tmp_path / "dac-key.pem",
             "--key-type", "ml-dsa-44", "--lifetime", "3650", expect_success=False)
-        self.skip_if_mldsa_unavailable(result)
 
         self.assertIn("DAC certificates require a P-256 key", result.stderr)
 
     def test_dac_rejects_imported_mldsa_key(self):
         """A DAC cannot import an ML-DSA key generated for another certificate type."""
-        key = self.tmp_path / "mldsa-key.pem"
-        command = [
-            str(self.chip_cert),
-            "gen-att-cert", "--type", "a", "--subject-cn", "Test PAA",
-            "--out", self.tmp_path / "paa.pem", "--out-key", key,
-            "--key-type", "ml-dsa-44", "--lifetime", "3650",
-        ]
-        result = subprocess.run(command, capture_output=True, text=True)
-        self.skip_if_mldsa_unavailable(result)
-        self.assertEqual(result.returncode, 0, result.stderr)
+        _, key = self.generate_ca_key("ml-dsa-44")
 
-        result = self.run_chip_cert(
-            "gen-att-cert", "--type", "d", "--subject-cn", "Test DAC",
+        result = self.gen_att_cert(
+            "--type", "d", "--subject-cn", "Test DAC",
             "--subject-vid", "FFF1", "--subject-pid", "8000", "--key", key,
             "--ca-cert", "unused-ca.pem", "--ca-key", "unused-ca-key.pem",
             "--out", self.tmp_path / "dac.pem", "--lifetime", "3650", expect_success=False)
 
         self.assertIn("DAC certificates require a P-256 key", result.stderr)
+
+
+class MlDsaAttestationChainTest(MlDsaTest):
+    """Tests covering ML-DSA attestation certificate generation and key serialization."""
+
+    # The PAA/PAI algorithm combinations the specification lists as valid for PQC Phase 1.
+    # A PAI either repeats its PAA's algorithm or falls back to a weaker one, and the DAC
+    # is always ECDSA P-256. A PAI key type of None leaves gen-att-cert on its P-256 default.
+    VALID_CHAINS = (
+        ("ml-dsa-65", "ml-dsa-65"),
+        ("ml-dsa-65", "ml-dsa-44"),
+        ("ml-dsa-65", None),
+        ("ml-dsa-44", "ml-dsa-44"),
+        ("ml-dsa-44", None),
+    )
+
+    def generate_chain(self, paa_key_type, pai_key_type):
+        """Generate a PAA and PAI of the given algorithms, plus the P-256 DAC under them.
+
+        Output names carry the algorithms, since chip-cert refuses to overwrite a file.
+        """
+        prefix = f"{paa_key_type}-{pai_key_type or 'p256'}"
+        paa, paa_key = self.generate_ca_key(paa_key_type, name=f"{prefix}-paa")
+        pai = self.tmp_path / f"{prefix}-pai.pem"
+        pai_key = self.tmp_path / f"{prefix}-pai-key.pem"
+        dac = self.tmp_path / f"{prefix}-dac.pem"
+
+        pai_key_options = ("--key-type", pai_key_type) if pai_key_type else ()
+        self.gen_att_cert("--type", "i", "--subject-cn", "Test PAI", "--subject-vid", "FFF1",
+                          *pai_key_options, "--ca-cert", paa, "--ca-key", paa_key,
+                          "--lifetime", "3650", "--out", pai, "--out-key", pai_key)
+        self.gen_att_cert("--type", "d", "--subject-cn", "Test DAC", "--subject-vid", "FFF1",
+                          "--subject-pid", "8000", "--ca-cert", pai, "--ca-key", pai_key,
+                          "--lifetime", "3650", "--out", dac,
+                          "--out-key", self.tmp_path / f"{prefix}-dac-key.pem")
+        return paa, pai, dac
+
+    def convert_key(self, source, name, out_format):
+        """Convert a key with convert-key, returning the output path."""
+        out = self.tmp_path / name
+        self.run_chip_cert("convert-key", source, out, out_format)
+        return out
+
+    # A PAI must not be stronger than the PAA that signs it; neither combination is in the
+    # specification's table, and attestation validation rejects the resulting PAI.
+    STRONGER_THAN_ISSUER_CHAINS = (
+        ("ml-dsa-44", "ml-dsa-65"),
+        (None, "ml-dsa-65"),
+        (None, "ml-dsa-44"),
+    )
+
+    def test_validates_every_specified_chain(self):
+        """Each PAA/PAI algorithm combination the specification permits must validate."""
+        for paa_key_type, pai_key_type in self.VALID_CHAINS:
+            with self.subTest(paa=paa_key_type, pai=pai_key_type or "p256"):
+                paa, pai, dac = self.generate_chain(paa_key_type, pai_key_type)
+
+                self.run_chip_cert("validate-att-cert", "--dac", dac, "--pai", pai, "--paa", paa)
+
+    def test_refuses_pai_stronger_than_its_paa(self):
+        """gen-att-cert must not issue a PAI whose key is stronger than the signing PAA's."""
+        for paa_key_type, pai_key_type in self.STRONGER_THAN_ISSUER_CHAINS:
+            with self.subTest(paa=paa_key_type or "p256", pai=pai_key_type):
+                paa, paa_key = self.generate_ca_key(paa_key_type, name=f"{paa_key_type}-{pai_key_type}-paa")
+
+                result = self.gen_att_cert(
+                    "--type", "i", "--subject-cn", "Test PAI", "--subject-vid", "FFF1",
+                    "--key-type", pai_key_type, "--ca-cert", paa, "--ca-key", paa_key,
+                    "--lifetime", "3650", "--out", self.tmp_path / f"{pai_key_type}-pai.pem",
+                    "--out-key", self.tmp_path / f"{pai_key_type}-pai-key.pem", expect_success=False)
+
+                self.assertIn("stronger than the CA key", result.stderr)
+
+    def test_round_trips_mldsa_private_key(self):
+        """An ML-DSA private key survives conversion through the DER and hex formats."""
+        _, key = self.generate_ca_key("ml-dsa-44")
+
+        der = self.convert_key(key, "key.der", "--x509-der")
+        hex_key = self.convert_key(key, "key.hex", "--x509-hex")
+
+        self.assertEqual(self.convert_key(der, "from-der.pem", "--x509-pem").read_bytes(),
+                         key.read_bytes())
+        self.assertEqual(self.convert_key(hex_key, "from-hex.pem", "--x509-pem").read_bytes(),
+                         key.read_bytes())
+
+    def test_round_trips_mldsa_public_key(self):
+        """An ML-DSA public key written as generic PEM can be read back."""
+        _, key = self.generate_ca_key("ml-dsa-44")
+
+        public = self.convert_key(key, "key-public.pem", "--x509-pubkey-pem")
+
+        self.assertEqual(self.convert_key(public, "public-round-trip.pem", "--x509-pubkey-pem").read_bytes(),
+                         public.read_bytes())
+
+    def test_rejects_private_key_output_for_mldsa_public_key(self):
+        """An ML-DSA public key cannot be converted to a private-key format."""
+        _, key = self.generate_ca_key("ml-dsa-44")
+        public = self.convert_key(key, "key-public.pem", "--x509-pubkey-pem")
+
+        result = self.run_chip_cert("convert-key", public, self.tmp_path / "private.pem",
+                                    "--x509-pem", expect_success=False)
+
+        self.assertIn("doesn't include private key", result.stderr)
 
 
 class PDCIdentityTest(ChipCertTest):

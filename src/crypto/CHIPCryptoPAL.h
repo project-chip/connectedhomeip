@@ -1768,10 +1768,10 @@ enum class AttestationCertType
     kDAC = 2,
 };
 
-/** Returns whether the active crypto backend supports ML-DSA-44 attestation operations. */
+/** Returns whether this crypto backend implements ML-DSA-44 attestation operations. */
 bool IsMlDsa44Supported();
 
-/** Returns whether the active crypto backend supports ML-DSA-65 attestation operations. */
+/** Returns whether this crypto backend implements ML-DSA-65 attestation operations. */
 bool IsMlDsa65Supported();
 
 CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, AttestationCertType certType);

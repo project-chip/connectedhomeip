@@ -123,7 +123,9 @@ std::string StringJoin(const std::vector<std::string> & elements, const std::str
     return outStr;
 }
 
-#if CHIP_CRYPTO_OPENSSL && !CHIP_CRYPTO_BORINGSSL && defined(EVP_PKEY_ML_DSA_44)
+#if CHIP_CRYPTO_OPENSSL && !CHIP_CRYPTO_BORINGSSL && defined(EVP_PKEY_ML_DSA_44) && defined(EVP_PKEY_ML_DSA_65)
+#include "MlDsaAttestationChain_test_vectors.h"
+
 std::vector<uint8_t> DerCertificateFromPem(const char * pem)
 {
     std::vector<uint8_t> der;
@@ -159,250 +161,30 @@ std::vector<uint8_t> DerCertificateFromPem(const char * pem)
     return der;
 }
 
-constexpr uint8_t kMlDsaSignedDacPublicKey[] = {
-    0x04, 0x19, 0x0f, 0x01, 0x0d, 0x19, 0x06, 0x9f, 0x05, 0x5e, 0x55, 0x3f, 0x73, 0x9a, 0x10, 0x8e, 0x37,
-    0xd0, 0x7c, 0x1f, 0x56, 0x0a, 0xec, 0x25, 0xc7, 0xec, 0x3f, 0x43, 0xd0, 0xa2, 0x19, 0x91, 0x10, 0x3c,
-    0xe0, 0xd8, 0x9b, 0xd0, 0x74, 0x65, 0x8e, 0x0f, 0x01, 0x9a, 0x15, 0x7b, 0xe1, 0x62, 0x8d, 0xf2, 0x3e,
-    0x9f, 0xa8, 0xe4, 0xce, 0xbb, 0x1d, 0x5f, 0x21, 0x4c, 0x7c, 0xe0, 0x49, 0xa9, 0x7e,
+// One row of the specification's table of valid PQC Phase 1 algorithm combinations.
+struct MlDsaAttestationChain
+{
+    const char * description;
+    const char * paaPem;
+    const char * paiPem;
+    const char * dacPem;
+    ByteSpan dacPublicKey;
 };
 
-constexpr char kMlDsa44PaaPem[] = R"(-----BEGIN CERTIFICATE-----
-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
-AAAAAAAAAAAAAA0aJzs=
------END CERTIFICATE-----
-)";
+const MlDsaAttestationChain kMlDsaAttestationChains[] = {
+    { "ML-DSA-65 PAA, ML-DSA-65 PAI", kMlDsa65PaaPem, kMlDsa65PaiPem, kMlDsa65PaiDacPem, ByteSpan(kMlDsa65PaiDacPublicKey) },
+    { "ML-DSA-65 PAA, ML-DSA-44 PAI", kMlDsa65PaaPem, kMlDsa44PaiUnderMlDsa65PaaPem, kMlDsa44PaiUnderMlDsa65PaaDacPem,
+      ByteSpan(kMlDsa44PaiUnderMlDsa65PaaDacPublicKey) },
+    { "ML-DSA-65 PAA, P-256 PAI", kMlDsa65PaaPem, kP256PaiUnderMlDsa65PaaPem, kP256PaiUnderMlDsa65PaaDacPem,
+      ByteSpan(kP256PaiUnderMlDsa65PaaDacPublicKey) },
+    { "ML-DSA-44 PAA, ML-DSA-44 PAI", kMlDsa44PaaPem, kMlDsa44PaiPem, kMlDsa44PaiDacPem, ByteSpan(kMlDsa44PaiDacPublicKey) },
+    { "ML-DSA-44 PAA, P-256 PAI", kMlDsa44PaaPem, kP256PaiUnderMlDsa44PaaPem, kP256PaiUnderMlDsa44PaaDacPem,
+      ByteSpan(kP256PaiUnderMlDsa44PaaDacPublicKey) },
+};
 
-constexpr char kMlDsa44PaiPem[] = R"(-----BEGIN CERTIFICATE-----
-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
-2vUAAAAAAAAAABAdNUg=
------END CERTIFICATE-----
-)";
+// The specification lists five valid PAA/PAI/DAC algorithm combinations for PQC Phase 1.
+static_assert(MATTER_ARRAY_SIZE(kMlDsaAttestationChains) == 5, "One chain per specified combination is expected");
 
-constexpr char kMlDsa44DacPem[] = R"(-----BEGIN CERTIFICATE-----
-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
-AAAAAAAAAAAAChsnNw==
------END CERTIFICATE-----
-)";
 #endif
 
 // Helper class to verify that all mbedTLS heap objects are released at the end of a test.
@@ -2896,49 +2678,124 @@ TEST_F(TestChipCryptoPAL, TestX509_CertChainValidation)
     }
 }
 
-#if CHIP_CRYPTO_OPENSSL && !CHIP_CRYPTO_BORINGSSL && defined(EVP_PKEY_ML_DSA_44)
+#if CHIP_CRYPTO_OPENSSL && !CHIP_CRYPTO_BORINGSSL && defined(EVP_PKEY_ML_DSA_44) && defined(EVP_PKEY_ML_DSA_65)
+// Every algorithm combination the specification lists as valid must be accepted; see
+// MlDsaAttestationChain_test_vectors.h for the table these chains come from.
 TEST_F(TestChipCryptoPAL, TestX509_MlDsaAttestationCertificateFormat)
 {
     HeapChecker heapChecker;
 
-    const std::vector<uint8_t> paaDer = DerCertificateFromPem(kMlDsa44PaaPem);
-    const std::vector<uint8_t> paiDer = DerCertificateFromPem(kMlDsa44PaiPem);
-    const std::vector<uint8_t> dacDer = DerCertificateFromPem(kMlDsa44DacPem);
+    for (const MlDsaAttestationChain & chain : kMlDsaAttestationChains)
+    {
+        SCOPED_TRACE(chain.description);
 
+        const std::vector<uint8_t> paaDer = DerCertificateFromPem(chain.paaPem);
+        const std::vector<uint8_t> paiDer = DerCertificateFromPem(chain.paiPem);
+        const std::vector<uint8_t> dacDer = DerCertificateFromPem(chain.dacPem);
+
+        ASSERT_FALSE(paaDer.empty());
+        ASSERT_FALSE(paiDer.empty());
+        ASSERT_FALSE(dacDer.empty());
+
+        EXPECT_EQ(VerifyAttestationCertificateFormat(ByteSpan(paaDer.data(), paaDer.size()), Crypto::AttestationCertType::kPAA),
+                  CHIP_NO_ERROR);
+        EXPECT_EQ(VerifyAttestationCertificateFormat(ByteSpan(paiDer.data(), paiDer.size()), Crypto::AttestationCertType::kPAI),
+                  CHIP_NO_ERROR);
+        EXPECT_EQ(VerifyAttestationCertificateFormat(ByteSpan(dacDer.data(), dacDer.size()), Crypto::AttestationCertType::kDAC),
+                  CHIP_NO_ERROR);
+    }
+}
+
+TEST_F(TestChipCryptoPAL, TestX509_StrongerThanIssuerRejected)
+{
+    HeapChecker heapChecker;
+
+    // A certificate must not carry a key stronger than the algorithm that signed it. Both of
+    // these are well-formed PAIs in every other respect, so only the strength rule rejects them.
+    const char * const strongerThanIssuer[] = { kMlDsa65PaiUnderMlDsa44PaaPem, kMlDsa65PaiUnderP256PaaPem };
+
+    for (const char * pem : strongerThanIssuer)
+    {
+        const std::vector<uint8_t> paiDer = DerCertificateFromPem(pem);
+        ASSERT_FALSE(paiDer.empty());
+
+        EXPECT_EQ(VerifyAttestationCertificateFormat(ByteSpan(paiDer.data(), paiDer.size()), Crypto::AttestationCertType::kPAI),
+                  CHIP_ERROR_INTERNAL);
+    }
+}
+
+TEST_F(TestChipCryptoPAL, TestX509_PaaKeyAndSignatureAlgorithmsMustMatch)
+{
+    HeapChecker heapChecker;
+
+    std::vector<uint8_t> paaDer = DerCertificateFromPem(kMlDsa44PaaPem);
     ASSERT_FALSE(paaDer.empty());
-    ASSERT_FALSE(paiDer.empty());
-    ASSERT_FALSE(dacDer.empty());
+
+    // Change the two signature AlgorithmIdentifiers from ML-DSA-44 to ML-DSA-65 while leaving
+    // the subject public-key AlgorithmIdentifier as ML-DSA-44. Each OID is DER encoded as
+    // 2.16.840.1.101.3.4.3.17; the three occurrences are TBS signature, subject key, and outer
+    // signature, in that order.
+    constexpr uint8_t kMlDsa44OidDer[] = { 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x03, 0x11 };
+    std::vector<size_t> oidOffsets;
+    for (size_t offset = 0; offset + sizeof(kMlDsa44OidDer) <= paaDer.size(); ++offset)
+    {
+        if (memcmp(paaDer.data() + offset, kMlDsa44OidDer, sizeof(kMlDsa44OidDer)) == 0)
+        {
+            oidOffsets.push_back(offset);
+        }
+    }
+    ASSERT_EQ(oidOffsets.size(), 3u);
+
+    constexpr uint8_t kMlDsa65OidLastByte                   = 0x12;
+    paaDer[oidOffsets.front() + sizeof(kMlDsa44OidDer) - 1] = kMlDsa65OidLastByte;
+    paaDer[oidOffsets.back() + sizeof(kMlDsa44OidDer) - 1]  = kMlDsa65OidLastByte;
 
     EXPECT_EQ(VerifyAttestationCertificateFormat(ByteSpan(paaDer.data(), paaDer.size()), Crypto::AttestationCertType::kPAA),
-              CHIP_NO_ERROR);
-    EXPECT_EQ(VerifyAttestationCertificateFormat(ByteSpan(paiDer.data(), paiDer.size()), Crypto::AttestationCertType::kPAI),
-              CHIP_NO_ERROR);
+              CHIP_ERROR_INTERNAL);
+}
+
+TEST_F(TestChipCryptoPAL, TestX509_MlDsaKeyedDacRejected)
+{
+    HeapChecker heapChecker;
+
+    // Every valid combination gives the DAC a P-256 key, so an otherwise conforming DAC
+    // that carries an ML-DSA key must fail the format check. This certificate differs from
+    // the accepted row 4 DAC only in its subject key algorithm: same issuer, same signature
+    // algorithm, same extensions.
+    const std::vector<uint8_t> dacDer = DerCertificateFromPem(kMlDsa44KeyedDacPem);
+    ASSERT_FALSE(dacDer.empty());
+
     EXPECT_EQ(VerifyAttestationCertificateFormat(ByteSpan(dacDer.data(), dacDer.size()), Crypto::AttestationCertType::kDAC),
-              CHIP_NO_ERROR);
+              CHIP_ERROR_INTERNAL);
 }
 
 TEST_F(TestChipCryptoPAL, TestX509_MlDsaAttestationChainValidation)
 {
     HeapChecker heapChecker;
 
-    const std::vector<uint8_t> paaDer = DerCertificateFromPem(kMlDsa44PaaPem);
-    const std::vector<uint8_t> paiDer = DerCertificateFromPem(kMlDsa44PaiPem);
-    const std::vector<uint8_t> dacDer = DerCertificateFromPem(kMlDsa44DacPem);
+    for (const MlDsaAttestationChain & chain : kMlDsaAttestationChains)
+    {
+        SCOPED_TRACE(chain.description);
 
-    ASSERT_FALSE(paaDer.empty());
-    ASSERT_FALSE(paiDer.empty());
-    ASSERT_FALSE(dacDer.empty());
+        const std::vector<uint8_t> paaDer = DerCertificateFromPem(chain.paaPem);
+        const std::vector<uint8_t> paiDer = DerCertificateFromPem(chain.paiPem);
+        const std::vector<uint8_t> dacDer = DerCertificateFromPem(chain.dacPem);
 
-    CertificateChainValidationResult chainValidationResult = CertificateChainValidationResult::kInternalFrameworkError;
-    const CHIP_ERROR err = ValidateCertificateChain(paaDer.data(), paaDer.size(), paiDer.data(), paiDer.size(), dacDer.data(),
-                                                    dacDer.size(), chainValidationResult);
+        ASSERT_FALSE(paaDer.empty());
+        ASSERT_FALSE(paiDer.empty());
+        ASSERT_FALSE(dacDer.empty());
 
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-    EXPECT_EQ(chainValidationResult, CertificateChainValidationResult::kSuccess);
+        CertificateChainValidationResult chainValidationResult = CertificateChainValidationResult::kInternalFrameworkError;
+        const CHIP_ERROR err = ValidateCertificateChain(paaDer.data(), paaDer.size(), paiDer.data(), paiDer.size(), dacDer.data(),
+                                                        dacDer.size(), chainValidationResult);
 
-    P256PublicKey publicKey;
-    EXPECT_EQ(ExtractPubkeyFromX509Cert(ByteSpan(dacDer.data(), dacDer.size()), publicKey), CHIP_NO_ERROR);
-    EXPECT_EQ(memcmp(publicKey.ConstBytes(), kMlDsaSignedDacPublicKey, sizeof(kMlDsaSignedDacPublicKey)), 0);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(chainValidationResult, CertificateChainValidationResult::kSuccess);
+
+        P256PublicKey publicKey;
+        EXPECT_EQ(ExtractPubkeyFromX509Cert(ByteSpan(dacDer.data(), dacDer.size()), publicKey), CHIP_NO_ERROR);
+        EXPECT_TRUE(chain.dacPublicKey.data_equal(ByteSpan(publicKey.ConstBytes(), publicKey.Length())));
+    }
 }
 #endif
 
