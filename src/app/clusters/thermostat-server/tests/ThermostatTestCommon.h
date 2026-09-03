@@ -612,6 +612,7 @@ public:
 
     CHIP_ERROR SetActiveScheduleHandle(const DataModel::Nullable<ByteSpan> & activeScheduleHandle) override
     {
+        ReturnErrorOnFailure(mSetActiveScheduleHandleError);
         if (activeScheduleHandle.IsNull())
         {
             mActiveScheduleHandle.SetNull();
@@ -626,7 +627,7 @@ public:
             mActiveScheduleHandle =
                 DataModel::MakeNullable(ByteSpan(mActiveScheduleHandleBuffer, activeScheduleHandle.Value().size()));
         }
-        return mSetActiveScheduleHandleError;
+        return CHIP_NO_ERROR;
     }
 
     void InitializePendingSchedules() override { mPendingSchedules = mSchedules; }
