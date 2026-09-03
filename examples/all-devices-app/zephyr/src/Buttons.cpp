@@ -36,7 +36,7 @@ int64_t sFactoryResetSwPressedAtMs = 0;
 
 void OnFactoryResetSwPressed(const struct device *, struct gpio_callback *, gpio_port_pins_t)
 {
-    if (gpio_pin_get_dt(&sFactoryResetSw))
+    if (gpio_pin_get_dt(&sFactoryResetSw) > 0)
     {
         sFactoryResetSwPressedAtMs = k_uptime_get();
         ChipLogProgress(DeviceLayer, "Factory reset button pressed, hold for %dms to reset.", kFactoryResetHoldMs);

@@ -138,7 +138,7 @@ CHIP_ERROR AppTask::InitRootNode()
         .deviceControlServer        = DeviceControlServer::DeviceControlSvr(),
         .fabricTable                = Server::GetInstance().GetFabricTable(),
         .accessControl              = Server::GetInstance().GetAccessControl(),
-        .persistentStorage          = Server::GetInstance().GetPersistentStorage(),
+        .persistentStorage          = *mInitParams.persistentStorageDelegate,
         .failSafeContext            = Server::GetInstance().GetFailSafeContext(),
         .deviceInstanceInfoProvider = *deviceInstanceInfoProvider,
         .platformManager            = PlatformMgr(),
@@ -186,6 +186,7 @@ CHIP_ERROR AppTask::InitRootNode()
         .failSafeContext        = Server::GetInstance().GetFailSafeContext(),
         .bindingTable           = Clusters::Binding::Table::GetInstance(),
         .bindingManager         = Clusters::Binding::Manager::GetInstance(),
+        .testEventTriggerDelegate = *mInitParams.testEventTriggerDelegate,
     });
 
     return CHIP_NO_ERROR;
@@ -215,7 +216,7 @@ CHIP_ERROR AppTask::RegisterAppDevices()
 
     for (const std::string & deviceType : DeviceFactory::GetInstance().SupportedDeviceTypes())
     {
-        VerifyOrReturnError(mDeviceCount <= ALL_DEVICES_ENABLED_DEVICE_COUNT, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(mDeviceCount < ALL_DEVICES_ENABLED_DEVICE_COUNT, CHIP_ERROR_NO_MEMORY);
 
         std::unique_ptr<DeviceInterface> device = DeviceFactory::GetInstance().Create(deviceType);
         VerifyOrReturnError(device != nullptr, CHIP_ERROR_NO_MEMORY);

@@ -49,7 +49,7 @@ namespace chip::app::AllDevices {
  * Generic Zephyr Matter application task.
  *
  * `Run()` is not virtual and fixes the order of initialization. Each step is
- * a virtual method with a working default that could be overriden.
+ * a virtual method with a working default that could be overridden.
  */
 class AppTask
 {
@@ -66,7 +66,7 @@ protected:
     // SetDeviceAttestationCredentialsProvider and SetDeviceInstanceInfoProvider
     virtual CHIP_ERROR InitCredentials();
 
-    // Dispatches to InitThreadNetworking() / InitWifiNetworking(); both are
+    // Dispatches to InitThreadNetworking() / InitWifiNetworking(); both are virtual methods.
     virtual CHIP_ERROR InitNetwork();
 
     virtual CHIP_ERROR InitThreadNetworking();
