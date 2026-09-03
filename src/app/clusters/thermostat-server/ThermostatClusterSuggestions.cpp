@@ -177,7 +177,7 @@ ThermostatSuggestions::AddThermostatSuggestion(CommandHandler * commandObj, cons
         return Status::InvalidInState;
     }
 
-    // If the preset hande doesn't exist in the Presets attribute, return NOT_FOUND.
+    // If the preset handle doesn't exist in the Presets attribute, return NOT_FOUND.
     if (!mPresets.IsPresetHandlePresentInPresets(commandData.presetHandle))
     {
         return Status::NotFound;
