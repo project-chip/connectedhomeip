@@ -189,6 +189,10 @@ private:
     DataModel::Nullable<uint16_t> mTemperatureSetpointHoldDuration = DataModel::Nullable<uint16_t>(0);
     DataModel::Nullable<uint32_t> mSetpointHoldExpiryTimestamp     = DataModel::Nullable<uint32_t>(0);
 
+    SetpointChangeSourceEnum mSetpointChangeSource = SetpointChangeSourceEnum::kManual;
+    DataModel::Nullable<int16_t> mSetpointChangeAmount;
+    uint32_t mSetpointChangeSourceTimestamp = 0;
+
     DataModel::ActionReturnStatus WriteNonAtomicAttribute(const DataModel::WriteAttributeRequest & request,
                                                           AttributeValueDecoder & decoder);
 
@@ -199,6 +203,8 @@ private:
     Protocols::InteractionModel::Status LoadSetpoints(Setpoints & setpoints, AttributePersistence & persistence);
     Protocols::InteractionModel::Status SaveSetpoint(Setpoint & oldSetpoint, Setpoint & newSetpoint);
     DataModel::ActionReturnStatus SaveSetpoints(Setpoints & setpoints, SetpointAttributes changedAttributes);
+
+    void UpdateSetpointChangeAttributes(temperature oldTemp, temperature newTemp);
 
     /**
      * @brief Set the Active Preset to a given preset handle, or null
