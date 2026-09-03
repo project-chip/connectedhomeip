@@ -28,6 +28,7 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from typing import Optional, Tuple
 
 CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 OPERATIONAL_CERTS = CHIP_ROOT / "credentials/test/operational-certificates"
@@ -189,7 +190,7 @@ class KeyConversionTest(ChipCertTest):
 class MlDsaTest(ChipCertTest):
     """Base class for tests that need chip-cert built with ML-DSA support."""
 
-    def gen_att_cert(self, *args, expect_success=True):
+    def gen_att_cert(self, *args: object, expect_success: bool = True) -> subprocess.CompletedProcess[str]:
         """Run gen-att-cert, skipping the test when the build has no ML-DSA support."""
         command = [str(self.chip_cert), "gen-att-cert", *map(str, args)]
         result = subprocess.run(command, capture_output=True, text=True)
@@ -201,7 +202,7 @@ class MlDsaTest(ChipCertTest):
             self.assertNotEqual(result.returncode, 0, f"{' '.join(command)} unexpectedly succeeded")
         return result
 
-    def generate_ca_key(self, key_type=None, name="paa"):
+    def generate_ca_key(self, key_type: Optional[str] = None, name: str = "paa") -> Tuple[Path, Path]:
         """Generate a self-signed PAA, returning its (certificate, key) paths.
 
         A key_type of None leaves gen-att-cert on its P-256 default.
@@ -255,7 +256,7 @@ class MlDsaAttestationChainTest(MlDsaTest):
         ("ml-dsa-44", None),
     )
 
-    def generate_chain(self, paa_key_type, pai_key_type):
+    def generate_chain(self, paa_key_type: Optional[str], pai_key_type: Optional[str]) -> Tuple[Path, Path, Path]:
         """Generate a PAA and PAI of the given algorithms, plus the P-256 DAC under them.
 
         Output names carry the algorithms, since chip-cert refuses to overwrite a file.
@@ -276,7 +277,7 @@ class MlDsaAttestationChainTest(MlDsaTest):
                           "--out-key", self.tmp_path / f"{prefix}-dac-key.pem")
         return paa, pai, dac
 
-    def convert_key(self, source, name, out_format):
+    def convert_key(self, source: Path | str, name: str, out_format: str) -> Path:
         """Convert a key with convert-key, returning the output path."""
         out = self.tmp_path / name
         self.run_chip_cert("convert-key", source, out, out_format)
