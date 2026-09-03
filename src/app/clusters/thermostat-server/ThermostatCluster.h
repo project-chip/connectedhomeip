@@ -229,6 +229,18 @@ private:
                                const Commands::RemoveThermostatSuggestion::DecodableType & commandData);
 
     void ReEvaluateCurrentSuggestion();
+
+    /**
+     * @brief Removes every entry in the ThermostatSuggestions attribute list whose PresetHandle no longer matches a
+     *        preset in the Presets attribute list, and notifies if any entry was removed.
+     *
+     * Per spec § 4.3.11.50, this cascade must run after a Presets atomic write commits a preset removal. If a
+     * removed entry was the CurrentThermostatSuggestion, RemoveFromThermostatSuggestionsList() is responsible for
+     * setting CurrentThermostatSuggestion to null, per its API contract.
+     *
+     * @return CHIP_NO_ERROR if successful, an error code if not.
+     */
+    CHIP_ERROR RemoveThermostatSuggestionsForRemovedPresets();
 };
 
 } // namespace Thermostat
