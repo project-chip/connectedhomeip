@@ -224,7 +224,7 @@ void HumidistatCluster::LoadPersistentAttributes()
 
     if (mFeatures.Has(Feature::kHumidifier))
     {
-        uint8_t rawMistType = mMistType.Raw();
+        uint8_t rawMistType              = mMistType.Raw();
         const uint8_t defaultRawMistType = rawMistType;
         if (!attrPersistence.LoadNativeEndianValue<uint8_t>(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, MistType::Id),
                                                             rawMistType, defaultRawMistType))
@@ -438,8 +438,7 @@ CHIP_ERROR HumidistatCluster::SetMode(Humidistat::ModeEnum mode)
 {
     VerifyOrReturnError(IsModeSupported(mode), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
-    const bool shouldClearMistType =
-        mFeatures.Has(Feature::kHumidifier) && (mode != ModeEnum::kHumidifier) && mMistType.HasAny();
+    const bool shouldClearMistType = mFeatures.Has(Feature::kHumidifier) && (mode != ModeEnum::kHumidifier) && mMistType.HasAny();
 
     if (SetAttributeValue(mMode, mode, Mode::Id))
     {
