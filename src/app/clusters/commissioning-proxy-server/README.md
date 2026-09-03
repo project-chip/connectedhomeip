@@ -415,6 +415,7 @@ matches the peer against the active session map, and calls
 `host->Sessions().DispatchMessageResponse()`.
 
 <<<<<<< HEAD
+
 ## Driving the Proxy from a Commissioner
 
 Everything above is the proxy side. The commissioner side is `chip-tool`, which
@@ -448,7 +449,10 @@ and
 [Working with the CHIP Tool](../../../../docs/development_controllers/chip-tool/chip_tool_guide.md#commissioning-through-a-commissioning-proxy).
 
 =======
->>>>>>> f9dd287 (Commissioning Proxy PR2: Add CP Cluster Server and Unit Tests  (#72625))
+
+> > > > > > > f9dd287 (Commissioning Proxy PR2: Add CP Cluster Server and Unit
+> > > > > > > Tests (#72625))
+
 ## Cluster State
 
 The cluster tracks proxy state internally:
