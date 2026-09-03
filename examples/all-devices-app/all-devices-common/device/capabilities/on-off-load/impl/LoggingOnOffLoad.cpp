@@ -30,7 +30,7 @@ LoggingOnOffLoad::LoggingOnOffLoad(Span<const DataModel::DeviceTypeEntry> device
                                    Clusters::OnOffDelegate * customOnOff, Clusters::OnOffEffectDelegate * customEffect,
                                    Clusters::IdentifyDelegate * customIdentify) :
     OnOffLoad(deviceTypes, customOnOff ? *customOnOff : static_cast<Clusters::OnOffDelegate &>(*this),
-              customEffect ? *customEffect : static_cast<Clusters::OnOffEffectDelegate &>(*this), context.identifyDelegate, context)
+              customEffect ? *customEffect : static_cast<Clusters::OnOffEffectDelegate &>(*this), customIdentify ? *customIdentify : context.identifyDelegate, context)
 {}
 
 // OnOffDelegate

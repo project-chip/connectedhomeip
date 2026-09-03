@@ -113,6 +113,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/dimmable-load/impl/LoggingDimmableLoad.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/fan-load/FanLoad.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/fan-load/impl/LoggingFanLoad.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/identify/LoggingIdentifyDelegate.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/on-off-load/OnOffLoad.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/on-off-load/impl/LoggingOnOffLoad.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/operational-state/impl/LoggingOperationalStateDelegate.cpp"
