@@ -1884,6 +1884,7 @@ DataModel::ActionReturnStatus ColorControlCluster::WriteAttribute(const DataMode
         ReturnErrorOnFailure(decoder.Decode(value));
         // null = "keep previous value on startup"; a concrete value must be a legal mired (<= 0xFEFF).
         VerifyOrReturnError(value.IsNull() || value.Value() <= kMaxColorTemperatureMireds, Status::ConstraintError);
+        ApplyModeSwitch(EnhancedColorModeEnum::kColorTemperatureMireds);
         mCT.startUpColorTemperatureMireds = value;
         // NVM attribute: the Nullable overload of StoreNativeEndianValue writes the same native-endian
         // storage format (null → sentinel) that Startup()'s Nullable load reads back.

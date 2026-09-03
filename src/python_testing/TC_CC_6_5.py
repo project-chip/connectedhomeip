@@ -33,8 +33,23 @@
 #     factory-reset: true
 #     quiet: true
 #   run2:
-#     app: ${LIGHTING_APP_NO_UNIQUE_ID}
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device color-temperature-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-ready-pattern: "Server initialization complete"
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#   run3:
+#     app: ${ALL_DEVICES_APP}
 #     app-args: --device extended-color-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-ready-pattern: "Server initialization complete"
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
