@@ -93,11 +93,11 @@ silabs_executable("all_devices_app") {
   }
 
   sources = [
+    "${examples_common_plat_dir}/codeDrivenImp/SilabsIdentifyDelegate.cpp",
+    "${examples_common_plat_dir}/codeDrivenImp/SilabsIdentifyDelegate.h",
     "include/AppKeys.h",
     "include/AppTask.h",
     "src/AppTask.cpp",
-    "${examples_common_plat_dir}/codeDrivenImp/SilabsIdentifyDelegate.cpp",
-    "${examples_common_plat_dir}/codeDrivenImp/SilabsIdentifyDelegate.h",
   ]
 
   if (chip_build_libshell) {
