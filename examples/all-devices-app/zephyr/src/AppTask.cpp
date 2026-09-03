@@ -230,7 +230,7 @@ CHIP_ERROR AppTask::RegisterAppDevices()
 
 CHIP_ERROR AppTask::InitBoardControls()
 {
-    Button::Init();
+    ReturnErrorOnFailure(Button::Init());
     return CHIP_NO_ERROR;
 }
 

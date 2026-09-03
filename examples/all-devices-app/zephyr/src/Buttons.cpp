@@ -52,25 +52,32 @@ void OnFactoryResetSwPressed(const struct device *, struct gpio_callback *, gpio
     }
 }
 
-void InitButtonGpio(const struct gpio_dt_spec & sw, struct gpio_callback & callback, gpio_callback_handler_t handler)
+CHIP_ERROR InitButtonGpio(const struct gpio_dt_spec & sw, struct gpio_callback & callback, gpio_callback_handler_t handler)
 {
-    VerifyOrReturn(gpio_is_ready_dt(&sw), ChipLogError(DeviceLayer, "Button GPIO not ready"));
-    VerifyOrReturn(gpio_pin_configure_dt(&sw, GPIO_INPUT) == 0, ChipLogError(DeviceLayer, "Button GPIO configure failed"));
-    VerifyOrReturn(gpio_pin_interrupt_configure_dt(&sw, GPIO_INT_EDGE_BOTH) == 0,
-                   ChipLogError(DeviceLayer, "Button GPIO interrupt configure failed"));
+    VerifyOrReturnError(gpio_is_ready_dt(&sw), CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "Button GPIO not ready"));
+    VerifyOrReturnError(gpio_pin_configure_dt(&sw, GPIO_INPUT) == 0, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "Button GPIO configure failed"));
+    VerifyOrReturnError(gpio_pin_interrupt_configure_dt(&sw, GPIO_INT_EDGE_BOTH) == 0, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "Button GPIO interrupt configure failed"));
 
     gpio_init_callback(&callback, handler, BIT(sw.pin));
-    VerifyOrReturn(gpio_add_callback(sw.port, &callback) == 0, ChipLogError(DeviceLayer, "Button GPIO add callback failed"));
+    VerifyOrReturnError(gpio_add_callback(sw.port, &callback) == 0, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "Button GPIO add callback failed"));
+
+    return CHIP_NO_ERROR;
 }
 #endif // ALL_DEVICES_HAS_FACTORY_RESET_SW
 
 } // namespace
 
-void Init()
+CHIP_ERROR Init()
 {
 #if ALL_DEVICES_HAS_FACTORY_RESET_SW
-    InitButtonGpio(sFactoryResetSw, sFactoryResetSwCallback, OnFactoryResetSwPressed);
+    ReturnErrorOnFailure(InitButtonGpio(sFactoryResetSw, sFactoryResetSwCallback, OnFactoryResetSwPressed));
 #endif // ALL_DEVICES_HAS_FACTORY_RESET_SW
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip::app::AllDevices::Button

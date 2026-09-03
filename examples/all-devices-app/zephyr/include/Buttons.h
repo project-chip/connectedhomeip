@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <lib/core/CHIPError.h>
 #include <zephyr/devicetree.h>
 
 #if DT_NODE_EXISTS(DT_ALIAS(sw0))
@@ -33,6 +34,6 @@
 namespace chip::app::AllDevices::Button {
 
 /// Configures the factory-reset button when it exists.
-void Init();
+CHIP_ERROR Init();
 
 } // namespace chip::app::AllDevices::Button
