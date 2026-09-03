@@ -1128,17 +1128,19 @@ MwdJi6uhAiBFkP7hxkMwPUH+uD4FUS+QpKD7syx5NJpfgxDyguSJdA==
 -----END CERTIFICATE-----
 )";
 
-// A DAC-shaped certificate carrying an ML-DSA-44 key, signed by the row 4 PAI. No valid
-// combination gives a DAC anything but a P-256 key, so the DAC format check must reject it.
-// Its signature algorithm and extensions are those of a conforming DAC, leaving the subject
-// key as the only reason to fail. Crafted with OpenSSL, since chip-cert refuses to issue it:
-//
-//   openssl genpkey -algorithm ML-DSA-44 -out dacml-key.pem
-//   openssl req -new -key dacml-key.pem -subj "/CN=Test DAC ML-DSA-44 key" -out dacml.csr
-//   openssl x509 -req -in dacml.csr -CA pai44_u44.pem -CAkey pai44_u44-key.pem -days 3650 \
-//       -extfile dac.cnf -extensions dac_ext -out dacml.pem
-//   # dac.cnf: basicConstraints = critical,CA:FALSE / keyUsage = critical,digitalSignature
-//   #          subjectKeyIdentifier = hash / authorityKeyIdentifier = keyid:always
+/*
+ * A DAC-shaped certificate carrying an ML-DSA-44 key, signed by the row 4 PAI. No valid
+ * combination gives a DAC anything but a P-256 key, so the DAC format check must reject it.
+ * Its signature algorithm and extensions are those of a conforming DAC, leaving the subject
+ * key as the only reason to fail. Crafted with OpenSSL, since chip-cert refuses to issue it:
+ *
+ *   openssl genpkey -algorithm ML-DSA-44 -out dacml-key.pem
+ *   openssl req -new -key dacml-key.pem -subj "/CN=Test DAC ML-DSA-44 key" -out dacml.csr
+ *   openssl x509 -req -in dacml.csr -CA pai44_u44.pem -CAkey pai44_u44-key.pem -days 3650 \
+ *       -extfile dac.cnf -extensions dac_ext -out dacml.pem
+ *   # dac.cnf: basicConstraints = critical,CA:FALSE / keyUsage = critical,digitalSignature
+ *   #          subjectKeyIdentifier = hash / authorityKeyIdentifier = keyid:always
+ */
 constexpr char kMlDsa44KeyedDacPem[] = R"(-----BEGIN CERTIFICATE-----
 MIIPwjCCBjigAwIBAgIUW0UgdRZVmVhmEWwiukhtejMXYgwwCwYJYIZIAWUDBAMR
 MDMxGzAZBgNVBAMMElRlc3QgUEFJIE1MLURTQS00NDEUMBIGCisGAQQBgqJ8AgEM
