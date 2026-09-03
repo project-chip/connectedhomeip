@@ -51,12 +51,12 @@ public:
     // TimerContext
     void TimerFired() override;
 
-    protected:
+protected:
     // Overridden protected optional cluster registration hooks to preserve encapsulation
     CHIP_ERROR RegisterOptionalClusters(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider) override;
     void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) override;
 
-    private:
+private:
     bool mMovingLift = false;
     bool mMovingTilt = false;
 
