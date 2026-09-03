@@ -81,11 +81,20 @@ class TC_IDM_8_1(IDMBaseTest):
         return 900
 
     def teardown_test(self):
-        """Clear the Extension entries the event triggers left on both fabrics.
+        """Undo what the test left on either fabric.
 
         The framework's cleanup restores only Acl, and a failing step skips any
         in-test cleanup, so this runs here rather than at the end of the test body.
+        Two kinds of leftovers: the entries step 4 created through a cluster's own
+        command set, and the Extension entries the event triggers wrote.
         """
+        try:
+            self.event_loop.run_until_complete(self.run_fabric_entry_cleanups())
+        except Exception as e:
+            # Swallowed for the same reason as the Extension cleanup below: the
+            # test's own failure, if any, stays the reported one.
+            log.warning("Could not remove the entries created during step 4: %s", e)
+
         extension_info = getattr(self, 'extension_info', None)
         if extension_info is None or not extension_info.writable:
             return
@@ -161,6 +170,12 @@ class TC_IDM_8_1(IDMBaseTest):
                   expectation="The number of entries returned to TH1 and TH2 is the same, and the fabric-sensitive fields of the entries belonging to the other fabric are null or contain default values.")
         acl_th1_unfiltered = await self.read_fabric_scoped_attribute(acl_info, self.th1, fabric_filtered=False)
         acl_th2_unfiltered = await self.read_fabric_scoped_attribute(acl_info, self.th2, fabric_filtered=False)
+        # Deliberately scoped to the ACL rather than generalised over every
+        # fabric-scoped attribute in step 4. The ACL entry struct names individual
+        # fabric-sensitive fields, so a cross-fabric entry is still reported, with
+        # those fields omitted. An attribute the spec marks fabric sensitive as a
+        # whole is reported fabric filtered whatever the request asked for, so the
+        # two controllers legitimately see different numbers of entries there.
         asserts.assert_equal(len(acl_th1_unfiltered), len(acl_th2_unfiltered),
                              "TH1 and TH2 must see the same number of ACL entries when not fabric filtered")
 
@@ -236,17 +251,53 @@ class TC_IDM_8_1(IDMBaseTest):
         # gave nothing to check against. Both vary with the DUT and are worth reading.
         no_payload_known: list[FabricScopedAttributeInfo] = []
         nothing_to_mask_against: list[FabricScopedAttributeInfo] = []
+        # Attributes whose entries had to be created through their cluster's command
+        # set before anything could be asserted about them, and those where that was
+        # attempted and the DUT declined.
+        populated: list[FabricScopedAttributeInfo] = []
+        populate_failed: list[FabricScopedAttributeInfo] = []
+        # Fabric-sensitive attributes the DUT was shown to withhold from the other
+        # fabric entirely, which is what the spec requires of them.
+        withheld: list[FabricScopedAttributeInfo] = []
         for info in attribute_infos:
+            # An attribute owned by its cluster's command set has no entry on either
+            # fabric until one is created, and every masking assertion below passes
+            # trivially on an empty list. Where a safe command sequence is known,
+            # give both fabrics an entry first so the checks have something to work
+            # against; the entries are removed again in teardown.
+            populator = self.fabric_entry_populator(info)
+            entries_created = False
+            if populator is not None:
+                populated_th1 = await populator(info, self.th1)
+                populated_th2 = await populator(info, self.th2)
+                entries_created = populated_th1 and populated_th2
+                if entries_created:
+                    populated.append(info)
+                else:
+                    populate_failed.append(info)
+
             # Counted across the reads and the subscription reports alike: a write on
             # TH1's fabric gives TH2's report a cross-fabric entry that the reads, taken
             # before the write, may not have had.
             cross_fabric_entries = 0
+            # Set where the DUT was shown to withhold the other fabric's entries from
+            # an unfiltered read, which for a fabric-sensitive attribute is the check
+            # that matters and leaves nothing left to mask.
+            withholding_verified = False
             for dev_ctrl, own_index, reader_name in ((self.th1, f1, "TH1"), (self.th2, f2, "TH2")):
                 filtered = await self.read_fabric_scoped_attribute(info, dev_ctrl, fabric_filtered=True)
                 self.assert_filtered_read_is_own_fabric_only(info, filtered, own_index, reader_name)
                 unfiltered = await self.read_fabric_scoped_attribute(info, dev_ctrl, fabric_filtered=False)
                 cross_fabric_entries += self.assert_other_fabric_entries_masked(info, unfiltered,
                                                                                 own_fabric_index=own_index)
+                # An attribute the spec marks fabric sensitive is reported fabric
+                # filtered whatever the request asked for, so the other fabric's
+                # entries must be absent rather than present with fields omitted.
+                # Only checked once both fabrics are known to hold an entry: on an
+                # empty list the absence would prove nothing.
+                if info.whole_entry_sensitive and entries_created:
+                    self.assert_other_fabrics_withheld(info, unfiltered, own_index, reader_name)
+                    withholding_verified = True
 
             skip_reason = self.fabric_write_skip_reason(info)
             if skip_reason is not None:
@@ -293,15 +344,23 @@ class TC_IDM_8_1(IDMBaseTest):
                     handler_th2.cancel()
                     await self.write_fabric_scoped_attribute(info, self.th1, original)
 
-            if not info.masked_field_labels:
+            if withholding_verified:
+                withheld.append(info)
+            elif not info.masked_field_labels:
                 no_masking_rules.append(info)
             elif cross_fabric_entries == 0:
                 nothing_to_mask_against.append(info)
 
         log.info("Step 4: %d fabric-scoped attribute(s) discovered, %d written and verified, %d not written, "
-                 "%d with cross-fabric masking asserted",
+                 "%d with cross-fabric masking asserted, %d given entries through their cluster's commands",
                  len(attribute_infos), modified, len(skipped_by_metadata) + len(no_payload_known),
-                 len(attribute_infos) - len(no_masking_rules) - len(nothing_to_mask_against))
+                 len(attribute_infos) - len(no_masking_rules) - len(nothing_to_mask_against), len(populated))
+        for info in populated:
+            log.info("  Step 4: %s was given an entry on each fabric through its cluster's command set, so its "
+                     "cross-fabric behaviour could be checked", info.path_str)
+        for info in withheld:
+            log.info("  Step 4: %s is fabric sensitive and the DUT withheld the other fabric's entry from an "
+                     "unfiltered read, as the spec requires", info.path_str)
         for info, reason in skipped_by_metadata:
             log.info("  Step 4: %s was not written because %s; only its read path was exercised",
                      info.path_str, reason)
@@ -317,6 +376,13 @@ class TC_IDM_8_1(IDMBaseTest):
                              problem=f"Step 4: {info.path_str} was not written because no value is known that this "
                              "cluster would accept without cluster-specific state setup; only its read path was "
                              "exercised")
+        for info in populate_failed:
+            self.record_note(test_name=self.current_test_info.name,
+                             location=AttributePathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
+                                                            attribute_id=info.attribute_id),
+                             problem=f"Step 4: {info.path_str} is owned by its cluster's command set and the DUT "
+                             "would not accept the commands that create an entry, so no entry belonging to the "
+                             "other fabric existed and its cross-fabric masking was not asserted")
         for info in nothing_to_mask_against:
             self.record_note(test_name=self.current_test_info.name,
                              location=AttributePathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,

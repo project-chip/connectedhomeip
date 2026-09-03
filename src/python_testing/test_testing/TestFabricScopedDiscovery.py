@@ -23,6 +23,7 @@ the test actually covers. These tests exercise both without a DUT, using a
 synthetic composition and the real spec XML.
 """
 
+import asyncio
 import sys
 from pathlib import Path
 
@@ -68,6 +69,8 @@ EXTENSION_ID = Clusters.AccessControl.Attributes.Extension.attribute_id
 SUBJECTS_PER_ENTRY_ID = Clusters.AccessControl.Attributes.SubjectsPerAccessControlEntry.attribute_id
 BINDING_ID = Clusters.Binding.Attributes.Binding.attribute_id
 PROVISIONED_ENDPOINTS_ID = Clusters.TlsClientManagement.Attributes.ProvisionedEndpoints.attribute_id
+PROVISIONED_ROOT_CERTIFICATES_ID = Clusters.TlsCertificateManagement.Attributes.ProvisionedRootCertificates.attribute_id
+GROUP_TABLE_ID = Clusters.GroupKeyManagement.Attributes.GroupTable.attribute_id
 
 
 class TestFabricScopedDiscovery(CertificationUnitTestNoDevice):
@@ -332,6 +335,93 @@ class TestFabricScopedDiscovery(CertificationUnitTestNoDevice):
         own_only = [Clusters.AccessControl.Structs.AccessControlExtensionStruct(data=b'\x17\x18', fabricIndex=1)]
         asserts.assert_equal(dut.assert_other_fabric_entries_masked(info, own_only, own_fabric_index=1), 0,
                              "No cross-fabric entries means nothing was checked")
+
+    def test_populator_is_registered_for_command_owned_attributes(self):
+        # The attributes that most need one: read-only, so the sweep can never write
+        # them, and fabric sensitive as a whole, so a cross-fabric entry must be
+        # withheld entirely. Without a populator neither fabric has an entry and the
+        # masking assertions have nothing to check.
+        dut = make_dut({
+            0: {Clusters.TlsClientManagement.id: attribute_list(PROVISIONED_ENDPOINTS_ID),
+                Clusters.TlsCertificateManagement.id: attribute_list(PROVISIONED_ROOT_CERTIFICATES_ID),
+                Clusters.GroupKeyManagement.id: attribute_list(GROUP_TABLE_ID)},
+        })
+        infos = dut.discover_fabric_scoped_attributes()
+        for cluster_id, attribute_id in ((Clusters.TlsClientManagement.id, PROVISIONED_ENDPOINTS_ID),
+                                         (Clusters.TlsCertificateManagement.id, PROVISIONED_ROOT_CERTIFICATES_ID),
+                                         (Clusters.GroupKeyManagement.id, GROUP_TABLE_ID)):
+            info = self.find(infos, cluster_id, attribute_id)
+            asserts.assert_is_not_none(dut.fabric_entry_populator(info),
+                                       f"{info.path_str} is command owned and needs a populator")
+            asserts.assert_is_not_none(dut.fabric_write_skip_reason(info),
+                                       f"{info.path_str} must not be written by the sweep")
+
+    def test_no_populator_for_attributes_the_sweep_can_write(self):
+        # Extension is writable, so the sweep creates its own entry and a populator
+        # would be redundant work with a second way to leave state behind.
+        dut = make_dut({0: {Clusters.AccessControl.id: attribute_list(EXTENSION_ID)}})
+        info = self.find(dut.discover_fabric_scoped_attributes(), Clusters.AccessControl.id, EXTENSION_ID)
+        asserts.assert_is_none(dut.fabric_entry_populator(info),
+                               "A writable attribute is populated by the sweep's own write")
+
+    def test_withholding_assertion_fails_on_a_returned_cross_fabric_entry(self):
+        # The check that a fabric-sensitive attribute withholds another fabric's
+        # entries rather than masking their fields. Exercised here against a
+        # synthetic response because the clusters carrying that quality on a real
+        # DUT need a live session or a provisioned certificate before they hold
+        # anything, so a passing device run does not prove the assertion works.
+        dut = make_dut({0: {Clusters.TlsClientManagement.id: attribute_list(PROVISIONED_ENDPOINTS_ID)}})
+        info = self.find(dut.discover_fabric_scoped_attributes(),
+                         Clusters.TlsClientManagement.id, PROVISIONED_ENDPOINTS_ID)
+        returned = [Clusters.TlsClientManagement.Structs.TLSEndpointStruct(hostname=b'example.com', fabricIndex=2)]
+        try:
+            dut.assert_other_fabrics_withheld(info, returned, own_fabric_index=1, reader_name="TH1")
+        except signals.TestFailure:
+            return
+        asserts.fail("An entry belonging to another fabric must fail the withholding assertion")
+
+    def test_withholding_assertion_passes_when_the_entry_is_absent(self):
+        dut = make_dut({0: {Clusters.TlsClientManagement.id: attribute_list(PROVISIONED_ENDPOINTS_ID)}})
+        info = self.find(dut.discover_fabric_scoped_attributes(),
+                         Clusters.TlsClientManagement.id, PROVISIONED_ENDPOINTS_ID)
+        own_only = [Clusters.TlsClientManagement.Structs.TLSEndpointStruct(hostname=b'example.com', fabricIndex=1)]
+        dut.assert_other_fabrics_withheld(info, own_only, own_fabric_index=1, reader_name="TH1")
+
+    def test_cleanups_run_in_reverse_order(self):
+        # A TLS endpoint names the root certificate it trusts, so it has to be removed
+        # before that certificate is. Reverse order is what makes the dependent entry
+        # go first.
+        dut = make_dut({})
+        removed = []
+
+        async def undo(name):
+            removed.append(name)
+
+        dut.record_fabric_entry_cleanup("root certificate", lambda: undo("root certificate"))
+        dut.record_fabric_entry_cleanup("endpoint", lambda: undo("endpoint"))
+        asyncio.run(dut.run_fabric_entry_cleanups())
+
+        asserts.assert_equal(removed, ["endpoint", "root certificate"],
+                             "Cleanups must run most recent first")
+        asserts.assert_equal(dut.fabric_entry_cleanups, [], "The cleanup list is emptied once drained")
+
+    def test_a_failing_cleanup_does_not_stop_the_others(self):
+        # One cluster refusing to remove an entry must not leave the rest behind, and
+        # must not replace the test's own result with a teardown error.
+        dut = make_dut({})
+        removed = []
+
+        async def fails():
+            raise RuntimeError("DUT refused")
+
+        async def succeeds():
+            removed.append("second")
+
+        dut.record_fabric_entry_cleanup("second", succeeds)
+        dut.record_fabric_entry_cleanup("first", fails)
+        asyncio.run(dut.run_fabric_entry_cleanups())
+
+        asserts.assert_equal(removed, ["second"], "A failing cleanup must not skip the remaining ones")
 
 
 if __name__ == "__main__":

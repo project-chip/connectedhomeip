@@ -328,6 +328,19 @@ D_OK_EMPTY = bytes.fromhex('1718')
 # cluster; clusters that omit it fall back to the codegen event list.
 EVENT_LIST_ID = 0xFFFA
 
+# Values used to give a fabric an entry in an attribute owned by its cluster's command
+# set, so the cross-fabric masking assertions have something to check. Chosen to be
+# inert: a TLS endpoint that is never connected to, and a group and key set whose ids
+# no other test state refers to.
+POPULATE_TLS_HOSTNAME = b"idm81.example.com"
+POPULATE_TLS_PORT = 443
+POPULATE_GROUP_ID = 0x8101
+POPULATE_GROUP_KEY_SET_ID = 0x8102
+# Epoch keys are a fixed 16 octets. The first octet is varied per key below so the
+# three keys of the set differ, which the cluster requires.
+POPULATE_EPOCH_KEY = b"\x81" * 16
+POPULATE_EPOCH_START_TIME = 2220000
+
 # Fabric-scoped attributes that must never be written by a device-wide fabric sweep.
 # Writing these either removes the controller's own access, rewrites credentials, or
 # fights the cluster's command-driven state machine.
@@ -1537,6 +1550,26 @@ class IDMBaseTest(BasicCompositionTests):
                     f"default value")
         return checked
 
+    def assert_other_fabrics_withheld(self, info: FabricScopedAttributeInfo, entries: list | Nullable,
+                                      own_fabric_index: int, reader_name: str) -> None:
+        """Assert an unfiltered read of a fabric-sensitive attribute still hides other fabrics.
+
+        Where the spec marks the attribute itself fabric sensitive, rather than
+        naming fields of its entry struct, the list is reported fabric filtered
+        whatever the request asked for: an entry belonging to another fabric is
+        withheld outright rather than returned with its fields omitted. Only
+        meaningful once the other fabric is known to have an entry, so callers
+        gate this on a successful populate; otherwise an empty list would pass
+        without proving anything.
+        """
+        if not isinstance(entries, list):
+            return
+        foreign = [e for e in entries if getattr(e, 'fabricIndex', own_fabric_index) != own_fabric_index]
+        asserts.assert_equal(foreign, [],
+                             f"{info.path_str}: the spec marks this attribute fabric sensitive, so "
+                             f"{reader_name}'s unfiltered read must not return the {len(foreign)} entry/entries "
+                             f"belonging to another fabric")
+
     def assert_filtered_read_is_own_fabric_only(self, info: FabricScopedAttributeInfo, entries: list | Nullable,
                                                 own_fabric_index: int, reader_name: str) -> None:
         """Assert a fabric-filtered read returned no entries belonging to another fabric."""
@@ -1615,6 +1648,189 @@ class IDMBaseTest(BasicCompositionTests):
         if not info.writable:
             return "the spec makes it read-only"
         return None
+
+    # ========================================================================
+    # Populating the Other Fabric's Entries (TC-IDM-8.1)
+    # ========================================================================
+
+    def fabric_entry_populator(self, info: FabricScopedAttributeInfo):
+        """Return a populator for this attribute, or None when no sequence is known.
+
+        The cross-fabric masking assertions only prove anything when the other
+        fabric actually has an entry, and most fabric-scoped attributes cannot be
+        written: they are owned by their cluster's command set. Where a safe
+        command sequence is known it is registered here, so the sweep can give
+        each fabric an entry of its own. Everything absent from this table is
+        reported as not exercised rather than counted as verified.
+        """
+        populators = {
+            (Clusters.TlsCertificateManagement.id,
+             Clusters.TlsCertificateManagement.Attributes.ProvisionedRootCertificates.attribute_id):
+                self.populate_tls_root_certificate,
+            (Clusters.TlsClientManagement.id,
+             Clusters.TlsClientManagement.Attributes.ProvisionedEndpoints.attribute_id):
+                self.populate_tls_endpoint,
+            (Clusters.GroupKeyManagement.id,
+             Clusters.GroupKeyManagement.Attributes.GroupTable.attribute_id):
+                self.populate_group_table,
+        }
+        return populators.get((info.cluster_id, info.attribute_id))
+
+    def record_fabric_entry_cleanup(self, description: str, undo) -> None:
+        """Remember how to remove an entry a populator added.
+
+        A command-owned entry cannot be restored by writing the attribute back, so
+        the usual read-then-rewrite approach does not apply. Cleanups are drained
+        in reverse order by run_fabric_entry_cleanups, which matters where one
+        entry references another.
+        """
+        if not hasattr(self, 'fabric_entry_cleanups'):
+            self.fabric_entry_cleanups = []
+        self.fabric_entry_cleanups.append((description, undo))
+
+    async def run_fabric_entry_cleanups(self) -> None:
+        """Remove every entry the populators added, most recent first.
+
+        Failures are logged and skipped so one cluster refusing to clean up cannot
+        hide the test's own result or prevent the remaining entries being removed.
+        """
+        for description, undo in reversed(getattr(self, 'fabric_entry_cleanups', [])):
+            try:
+                await undo()
+            except Exception as e:
+                log.warning("Could not remove %s: %s", description, e)
+        self.fabric_entry_cleanups = []
+
+    def tls_command_helper(self, endpoint_id: int, dev_ctrl: ChipDeviceCtrl):
+        """Build the shared TLS command helper bound to one controller's fabric.
+
+        Imported here rather than at module scope: TC_TLS_Utils sits beside the
+        test modules rather than in support_modules and pulls in the cryptography
+        package, which only the two TLS populators need.
+        """
+        from TC_TLS_Utils import TLSUtils
+        return TLSUtils(self, endpoint=endpoint_id, dev_ctrl=dev_ctrl, node_id=self.dut_node_id)
+
+    async def provision_tls_root_certificate(self, endpoint_id: int, dev_ctrl: ChipDeviceCtrl) -> int | None:
+        """Provision a self-signed root certificate on the controller's own fabric.
+
+        Returns the CAID the DUT assigned, or None when it would not accept one.
+        The certificate is generated locally and is never used for a connection;
+        it exists so that the other fabric has an entry whose masking can be
+        checked.
+        """
+        tls = self.tls_command_helper(endpoint_id, dev_ctrl)
+        try:
+            response = await tls.send_provision_root_command(certificate=tls.gen_cert())
+        except Exception as e:
+            # Broad by intent: the shared helper turns a rejected command into a
+            # mobly TestFailure rather than an InteractionModelError, and a DUT
+            # that will not take another certificate is a coverage gap rather
+            # than a failure of the fabric checks.
+            log.info("Could not provision a TLS root certificate on node %d's fabric: %s", dev_ctrl.nodeId, e)
+            return None
+
+        caid = response.caid
+        self.record_fabric_entry_cleanup(
+            f"TLS root certificate {caid} on node {dev_ctrl.nodeId}'s fabric",
+            lambda: tls.send_remove_root_command(caid=caid))
+        return caid
+
+    async def populate_tls_root_certificate(self, info: FabricScopedAttributeInfo,
+                                            dev_ctrl: ChipDeviceCtrl) -> bool:
+        """Give ProvisionedRootCertificates an entry on the controller's fabric."""
+        caid = await self.provision_tls_root_certificate(info.endpoint_id, dev_ctrl)
+        return caid is not None
+
+    async def populate_tls_endpoint(self, info: FabricScopedAttributeInfo, dev_ctrl: ChipDeviceCtrl) -> bool:
+        """Give ProvisionedEndpoints an entry on the controller's fabric.
+
+        An endpoint names the root certificate it trusts, so one is provisioned
+        first. The hostname and port are never connected to.
+        """
+        caid = await self.provision_tls_root_certificate(info.endpoint_id, dev_ctrl)
+        if caid is None:
+            return False
+
+        tls = self.tls_command_helper(info.endpoint_id, dev_ctrl)
+        try:
+            response = await tls.send_provision_tls_endpoint_command(
+                hostname=POPULATE_TLS_HOSTNAME, port=POPULATE_TLS_PORT, caid=caid)
+        except Exception as e:
+            log.info("Could not provision a TLS endpoint on node %d's fabric: %s", dev_ctrl.nodeId, e)
+            return False
+
+        provisioned_id = response.endpointID
+        self.record_fabric_entry_cleanup(
+            f"TLS endpoint {provisioned_id} on node {dev_ctrl.nodeId}'s fabric",
+            lambda: tls.send_remove_tls_endpoint_command(endpoint_id=provisioned_id))
+        return True
+
+    def endpoint_with_cluster(self, cluster_id: int) -> int | None:
+        """Lowest endpoint on the DUT carrying the given server cluster, or None."""
+        for endpoint_id in sorted(self.endpoints_tlv):
+            if cluster_id in self.endpoints_tlv[endpoint_id]:
+                return endpoint_id
+        return None
+
+    async def populate_group_table(self, info: FabricScopedAttributeInfo, dev_ctrl: ChipDeviceCtrl) -> bool:
+        """Add a group on the controller's fabric, which is what GroupTable lists.
+
+        AddGroup is refused unless the accessing fabric already holds a key set
+        bound to the group id, so the key set and the GroupKeyMap entry are
+        written first. GroupKeyMap is on the sweep's write deny list because a
+        replacing write would desynchronize the group tables; the write here
+        appends to what the fabric already has and is undone in cleanup.
+        """
+        groups_endpoint = self.endpoint_with_cluster(Clusters.Groups.id)
+        if groups_endpoint is None:
+            log.info("Cannot populate %s: the DUT exposes no Groups cluster", info.path_str)
+            return False
+
+        group_key_map = Clusters.GroupKeyManagement.Attributes.GroupKeyMap
+        try:
+            original_map = await self.read_single_attribute_check_success(
+                dev_ctrl=dev_ctrl, endpoint=self.ROOT_NODE_ENDPOINT_ID,
+                cluster=Clusters.GroupKeyManagement, attribute=group_key_map, fabric_filtered=True)
+
+            await dev_ctrl.SendCommand(
+                self.dut_node_id, self.ROOT_NODE_ENDPOINT_ID,
+                Clusters.GroupKeyManagement.Commands.KeySetWrite(
+                    groupKeySet=Clusters.GroupKeyManagement.Structs.GroupKeySetStruct(
+                        groupKeySetID=POPULATE_GROUP_KEY_SET_ID,
+                        groupKeySecurityPolicy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
+                        epochKey0=POPULATE_EPOCH_KEY,
+                        epochStartTime0=POPULATE_EPOCH_START_TIME,
+                        epochKey1=b"\x01" + POPULATE_EPOCH_KEY[1:],
+                        epochStartTime1=POPULATE_EPOCH_START_TIME + 1,
+                        epochKey2=b"\x02" + POPULATE_EPOCH_KEY[1:],
+                        epochStartTime2=POPULATE_EPOCH_START_TIME + 2)))
+
+            updated_map = copy.deepcopy(original_map)
+            updated_map.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
+                groupId=POPULATE_GROUP_ID, groupKeySetID=POPULATE_GROUP_KEY_SET_ID))
+            write_result = await dev_ctrl.WriteAttribute(
+                self.dut_node_id, [(self.ROOT_NODE_ENDPOINT_ID, group_key_map(updated_map))])
+            failures = [str(getattr(r.Status, 'name', r.Status)) for r in write_result if r.Status != Status.Success]
+            asserts.assert_equal(failures, [], f"GroupKeyMap write returned {', '.join(failures)}")
+
+            await dev_ctrl.SendCommand(self.dut_node_id, groups_endpoint,
+                                       Clusters.Groups.Commands.AddGroup(groupID=POPULATE_GROUP_ID, groupName=""))
+        except Exception as e:
+            log.info("Could not add a group on node %d's fabric: %s", dev_ctrl.nodeId, e)
+            return False
+
+        async def undo() -> None:
+            await dev_ctrl.SendCommand(self.dut_node_id, groups_endpoint,
+                                       Clusters.Groups.Commands.RemoveGroup(groupID=POPULATE_GROUP_ID))
+            await dev_ctrl.WriteAttribute(self.dut_node_id,
+                                          [(self.ROOT_NODE_ENDPOINT_ID, group_key_map(original_map))])
+            await dev_ctrl.SendCommand(
+                self.dut_node_id, self.ROOT_NODE_ENDPOINT_ID,
+                Clusters.GroupKeyManagement.Commands.KeySetRemove(groupKeySetID=POPULATE_GROUP_KEY_SET_ID))
+
+        self.record_fabric_entry_cleanup(f"group {POPULATE_GROUP_ID} on node {dev_ctrl.nodeId}'s fabric", undo)
+        return True
 
     async def trigger_fabric_sensitive_event(self, info: FabricSensitiveEventInfo,
                                              dev_ctrl: ChipDeviceCtrl) -> bool:
