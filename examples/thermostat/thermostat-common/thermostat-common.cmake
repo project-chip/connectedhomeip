@@ -41,6 +41,7 @@ macro(chip_add_thermostat_common target)
             ${CHIP_THERMOSTAT_COMMON_BASE_DIR}/src/thermostat-hold-delegate-impl.cpp
             ${CHIP_THERMOSTAT_COMMON_BASE_DIR}/src/thermostat-occupancy-delegate-impl.cpp
             ${CHIP_THERMOSTAT_COMMON_BASE_DIR}/src/thermostat-presets-delegate-impl.cpp
+            ${CHIP_THERMOSTAT_COMMON_BASE_DIR}/src/thermostat-schedules-delegate-impl.cpp
             ${CHIP_THERMOSTAT_COMMON_BASE_DIR}/src/thermostat-setpoints-delegate-impl.cpp
             ${CHIP_THERMOSTAT_COMMON_BASE_DIR}/src/thermostat-suggestions-delegate-impl.cpp
     )

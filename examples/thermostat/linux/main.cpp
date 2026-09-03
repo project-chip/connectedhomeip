@@ -27,6 +27,7 @@
 #include "thermostat-delegate-impl.h"
 #include "thermostat-hold-delegate-impl.h"
 #include "thermostat-presets-delegate-impl.h"
+#include "thermostat-schedules-delegate-impl.h"
 #include "thermostat-setpoints-delegate-impl.h"
 #include "thermostat-suggestions-delegate-impl.h"
 
@@ -81,18 +82,20 @@ static Clusters::Thermostat::ThermostatSetpointsDelegate gSetpointsDelegate(gThe
 static Clusters::Thermostat::ThermostatHoldDelegate gHoldDelegate(gThermostatEndpoint);
 static Clusters::Thermostat::ThermostatPresetsDelegate gPresetsDelegate(gThermostatEndpoint);
 static Clusters::Thermostat::ThermostatSuggestionsDelegate gSuggestionsDelegate(gThermostatEndpoint, gPresetsDelegate);
+static Clusters::Thermostat::ThermostatSchedulesDelegate gSchedulesDelegate(gThermostatEndpoint);
 
 using ThermostatClusterType = Clusters::Thermostat::ThermostatCluster<
     Clusters::Thermostat::ThermostatDelegate, Clusters::Thermostat::ThermostatSetpointsDelegate,
     Clusters::Thermostat::ThermostatHoldDelegate, Clusters::Thermostat::ThermostatPresetsDelegate,
-    Clusters::Thermostat::ThermostatSuggestionsDelegate>;
+    Clusters::Thermostat::ThermostatSuggestionsDelegate, Clusters::Thermostat::ThermostatSchedulesDelegate>;
 
 void ApplicationInit()
 {
     ChipLogProgress(Zcl, "Thermostat application init");
 
     Clusters::Thermostat::ServerInit<ThermostatClusterType>(gThermostatEndpoint, gThermostatDelegate, gSetpointsDelegate,
-                                                            gHoldDelegate, gPresetsDelegate, gSuggestionsDelegate);
+                                                            gHoldDelegate, gPresetsDelegate, gSuggestionsDelegate,
+                                                            gSchedulesDelegate);
 }
 
 void ApplicationShutdown()
