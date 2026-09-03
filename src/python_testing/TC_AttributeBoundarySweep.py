@@ -254,36 +254,50 @@ class AttributeBoundarySweep(IDMBaseTest):
         if attr_info.attribute.must_use_timed_write:
             timed_request_timeout_ms = 65535
 
-        write_result = await self.default_controller.WriteAttribute(
-            nodeId=self.dut_node_id, attributes=[(attr_info.endpoint_id, attr_info.attribute(probe.value))],
-            timedRequestTimeoutMs=timed_request_timeout_ms)
-        status = write_result[0].Status
-
-        if status != Status.Success:
-            outcome = ProbeOutcome.REJECTED if status == Status.ConstraintError else ProbeOutcome.OTHER_STATUS
-            # Status is an IntEnum and formats as a bare number, so log the name too.
-            return result(outcome, status_name=getattr(status, 'name', str(status)),
-                          detail=f'{probe.description}, value {probe.value!r}')
-
-        # The DUT took the write, so it may already hold probe.value no matter how the
-        # read-back below turns out. Classify inside the try and restore in the finally: a
-        # read that raises (read failure, decode error, failed check) would otherwise leave
-        # the attribute holding a value the sweep wrote, with nothing recorded as dirty.
+        # The probe write and everything that follows it go inside the try so that the
+        # finally always gets a chance to put the original value back. A write can reach the
+        # DUT and still raise here (a response that never arrives, a timeout after the DUT
+        # applied it), and the read-back can raise on its own; either way the attribute may
+        # be holding a value the sweep wrote, which must not be left behind unrecorded.
         detail = f'{probe.description}, value {probe.value!r}'
         outcome = ProbeOutcome.ERROR
+        status_name = ''
+        stage = 'write'
+        # Armed until the attribute is known to be unchanged: nothing has been confirmed
+        # about the DUT's state yet.
         needs_restore = True
         restore_failed = False
         stored_repr = None
         try:
-            stored = await self.read_single_attribute_check_success(
-                endpoint=attr_info.endpoint_id, cluster=attr_info.cluster_class, attribute=attr_info.attribute)
-            stored_repr = repr(stored)
-            needs_restore = stored != original
-            outcome = ProbeOutcome.ACCEPTED if stored == probe.value else ProbeOutcome.IGNORED
-            if outcome is ProbeOutcome.IGNORED:
-                detail += f', attribute reads {stored!r}'
+            write_result = await self.default_controller.WriteAttribute(
+                nodeId=self.dut_node_id, attributes=[(attr_info.endpoint_id, attr_info.attribute(probe.value))],
+                timedRequestTimeoutMs=timed_request_timeout_ms)
+            status = write_result[0].Status
+            # Status is an IntEnum and formats as a bare number, so keep the name.
+            status_name = getattr(status, 'name', str(status))
+
+            if status != Status.Success:
+                # The DUT answered with a failure status, so it did not take the value.
+                needs_restore = False
+                if status == Status.ConstraintError:
+                    outcome = ProbeOutcome.REJECTED
+                else:
+                    outcome = ProbeOutcome.OTHER_STATUS
+            else:
+                stage = 'read-back after a successful write'
+                stored = await self.read_single_attribute_check_success(
+                    endpoint=attr_info.endpoint_id, cluster=attr_info.cluster_class, attribute=attr_info.attribute)
+                stored_repr = repr(stored)
+                needs_restore = stored != original
+                if stored == probe.value:
+                    outcome = ProbeOutcome.ACCEPTED
+                else:
+                    outcome = ProbeOutcome.IGNORED
+                    detail += f', attribute reads {stored!r}'
         except Exception as e:
-            detail += f'; read-back after a successful write failed: {e}'
+            # The status of a write that raised says nothing about what the DUT did with it.
+            status_name = ''
+            detail += f'; {stage} failed: {e}'
         finally:
             if needs_restore:
                 try:
@@ -298,11 +312,6 @@ class AttributeBoundarySweep(IDMBaseTest):
                 if restore_failed:
                     log.error("Could not restore %s.%s on EP%s to %r: %s", attr_info.cluster_name,
                               attr_info.attribute_name, attr_info.endpoint_id, original, restore_status)
-
-        status_name = Status.Success.name
-        if outcome is ProbeOutcome.ERROR:
-            # The write status says nothing about why the probe failed; only the read did.
-            status_name = ''
 
         return result(outcome, status_name=status_name, detail=detail, restore_failed=restore_failed,
                       stored_repr=stored_repr)
