@@ -366,6 +366,12 @@ POPULATE_GROUP_KEY_SET_ID = 0x8102
 # three keys of the set differ, which the cluster requires.
 POPULATE_EPOCH_KEY = b"\x81" * 16
 POPULATE_EPOCH_START_TIME = 2220000
+# A message id is a fixed 16 octets. The first eight mark the entry as this test's and
+# the last eight carry the presenting controller's node id: Messages is one list on the
+# node rather than one per fabric, so two fabrics presenting the same id would be
+# indistinguishable from a single duplicate presentation.
+POPULATE_MESSAGE_ID_PREFIX = b"\x81\x08\x01\x00\x00\x00\x00\x00"
+POPULATE_MESSAGE_TEXT = "TC-IDM-8.1 fabric isolation probe"
 
 # Fabric-scoped attributes that must never be written by a device-wide fabric sweep.
 # Writing these either removes the controller's own access, rewrites credentials, or
@@ -1752,6 +1758,9 @@ class IDMBaseTest(BasicCompositionTests):
             (Clusters.GroupKeyManagement.id,
              Clusters.GroupKeyManagement.Attributes.GroupTable.attribute_id):
             self.populate_group_table,
+            (Clusters.Messages.id,
+             Clusters.Messages.Attributes.Messages.attribute_id):
+            self.populate_messages,
         }
         return populators.get((info.cluster_id, info.attribute_id))
 
@@ -1909,6 +1918,84 @@ class IDMBaseTest(BasicCompositionTests):
                 Clusters.GroupKeyManagement.Commands.KeySetRemove(groupKeySetID=POPULATE_GROUP_KEY_SET_ID))
 
         self.record_fabric_entry_cleanup(f"group {POPULATE_GROUP_ID} on node {dev_ctrl.nodeId}'s fabric", undo)
+        return True
+
+    def populate_message_id(self, dev_ctrl: ChipDeviceCtrl) -> bytes:
+        """The 16-octet message id this test presents on one controller's fabric."""
+        return POPULATE_MESSAGE_ID_PREFIX + dev_ctrl.nodeId.to_bytes(8, 'big')
+
+    async def populate_messages(self, info: FabricScopedAttributeInfo, dev_ctrl: ChipDeviceCtrl) -> bool:
+        """Queue a message on the controller's own fabric, which is what Messages lists.
+
+        PresentMessagesRequest is fabric scoped and needs only Operate privilege, so
+        each fabric can give itself an entry. StartTime and Duration are left null,
+        which presents the message immediately and until it is cancelled; cleanup
+        cancels it by the id used here.
+
+        MessageStruct carries no FabricIndex in the generated code, so the entry
+        cannot be attributed to a fabric by field. A marker is registered so the
+        isolation check can recognise it by its message id instead.
+        """
+        message_id = self.populate_message_id(dev_ctrl)
+        try:
+            await dev_ctrl.SendCommand(
+                self.dut_node_id, info.endpoint_id,
+                Clusters.Messages.Commands.PresentMessagesRequest(
+                    messageID=message_id,
+                    priority=Clusters.Messages.Enums.MessagePriorityEnum.kLow,
+                    messageControl=0,
+                    startTime=NullValue,
+                    duration=NullValue,
+                    messageText=POPULATE_MESSAGE_TEXT))
+        except Exception as e:
+            # Broad by intent, matching the other populators: a DUT that will not
+            # queue a message is a coverage gap rather than a fabric-check failure.
+            log.info("Could not queue a message on node %d's fabric: %s", dev_ctrl.nodeId, e)
+            return False
+
+        async def undo() -> None:
+            await dev_ctrl.SendCommand(
+                self.dut_node_id, info.endpoint_id,
+                Clusters.Messages.Commands.CancelMessagesRequest(messageIDs=[message_id]))
+
+        self.record_fabric_entry_cleanup(f"message {message_id.hex()} on node {dev_ctrl.nodeId}'s fabric", undo)
+        self.record_fabric_entry_marker(info, dev_ctrl,
+                                        lambda entry: getattr(entry, 'messageID', None) == message_id)
+        return True
+
+    def record_fabric_entry_marker(self, info: FabricScopedAttributeInfo, dev_ctrl: ChipDeviceCtrl, matches) -> None:
+        """Remember how to recognise the entry a populator created on one fabric.
+
+        The cross-fabric assertions attribute an entry to a fabric by its FabricIndex
+        field, and a struct the spec marks fabric scoped but codegen does not carries
+        no such field. Where the populator knows exactly which entry it created it
+        registers a predicate here, so isolation can be checked by the entry's own
+        identity rather than by a field the generated struct may be missing.
+        """
+        if not hasattr(self, 'fabric_entry_markers'):
+            self.fabric_entry_markers = {}
+        self.fabric_entry_markers[(info.path_str, dev_ctrl.nodeId)] = matches
+
+    def assert_populated_entry_not_leaked(self, info: FabricScopedAttributeInfo, entries: list | Nullable,
+                                          other_ctrl: ChipDeviceCtrl, reader_name: str) -> bool:
+        """Assert a fabric-filtered read does not return the entry another fabric created.
+
+        A fabric-filtered read returns only the accessing fabric's entries, so the
+        entry a populator created on the other fabric must be absent. Unlike the
+        FabricIndex-based assertions this holds even when the generated struct has no
+        FabricIndex, which is the case that would otherwise pass unnoticed: with no
+        such field every entry reads as the accessing fabric's own.
+
+        Returns True when the check could be made, i.e. the other fabric registered a
+        marker, so the caller can tell a verified check from one with nothing to check.
+        """
+        matches = getattr(self, 'fabric_entry_markers', {}).get((info.path_str, other_ctrl.nodeId))
+        if matches is None or not isinstance(entries, list):
+            return False
+        leaked = [entry for entry in entries if matches(entry)]
+        asserts.assert_equal(leaked, [],
+                             f"{info.path_str}: {reader_name}'s fabric-filtered read returned the entry created "
+                             f"on the other fabric, so the DUT is not isolating this attribute by fabric")
         return True
 
     async def trigger_fabric_sensitive_event(self, info: FabricSensitiveEventInfo,

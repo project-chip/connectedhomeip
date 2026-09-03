@@ -260,14 +260,27 @@ class TC_IDM_8_1(IDMBaseTest):
                 if not entries_created:
                     populate_failure_reason = ("the DUT would not accept the commands that create an entry, so "
                                                "neither fabric held one")
+                elif not info.from_codegen:
+                    # Reported instead of the default reason below, which would claim no
+                    # populate sequence is known when one has just run.
+                    populate_failure_reason = ("both fabrics were given an entry but the generated struct carries "
+                                               "no FabricIndex, so no entry can be attributed to another fabric")
 
             # Counted across the reads and the subscription reports alike: a write on
             # TH1's fabric gives TH2's report a cross-fabric entry that the reads, taken
             # before the write, may not have had.
             cross_fabric_entries = 0
-            for dev_ctrl, own_index, reader_name in ((self.th1, f1, "TH1"), (self.th2, f2, "TH2")):
+            isolation_checked = False
+            for dev_ctrl, own_index, reader_name, other_ctrl in ((self.th1, f1, "TH1", self.th2),
+                                                                 (self.th2, f2, "TH2", self.th1)):
                 filtered = await self.read_fabric_scoped_attribute(info, dev_ctrl, fabric_filtered=True)
                 self.assert_filtered_read_is_own_fabric_only(info, filtered, own_index, reader_name)
+                # Identifies the other fabric's entry by what the populator created rather
+                # than by FabricIndex, so a struct missing that field is still checked. With
+                # no FabricIndex the assertion above sees every entry as the reader's own.
+                if entries_created:
+                    if self.assert_populated_entry_not_leaked(info, filtered, other_ctrl, reader_name):
+                        isolation_checked = True
                 unfiltered = await self.read_fabric_scoped_attribute(info, dev_ctrl, fabric_filtered=False)
                 cross_fabric_entries += self.assert_other_fabric_entries_masked(info, unfiltered,
                                                                                 own_fabric_index=own_index)
@@ -280,6 +293,22 @@ class TC_IDM_8_1(IDMBaseTest):
                     self.assert_other_fabrics_withheld(info, unfiltered, own_index, reader_name)
 
             self.record_fabric_check(info.path_str, "fabric-filtered read", FabricCheckOutcome.VERIFIED, location)
+
+            # Only worth reporting for a struct codegen does not see as fabric scoped.
+            # Where the entries carry a FabricIndex the fabric-filtered read assertion
+            # above already attributes each one, so this would restate that result.
+            if info.from_codegen:
+                self.record_fabric_check(info.path_str, "cross-fabric isolation", FabricCheckOutcome.NOT_APPLICABLE,
+                                         location,
+                                         "the generated entries carry a FabricIndex, so the fabric-filtered read "
+                                         "check already attributes every entry to a fabric")
+            elif isolation_checked:
+                self.record_fabric_check(info.path_str, "cross-fabric isolation", FabricCheckOutcome.VERIFIED, location)
+            else:
+                self.record_fabric_check(info.path_str, "cross-fabric isolation", FabricCheckOutcome.NOT_EXERCISED,
+                                         location,
+                                         "the generated struct carries no FabricIndex and no populator created an "
+                                         "entry that could be recognised without one")
 
             if info.whole_entry_sensitive:
                 if entries_created:
