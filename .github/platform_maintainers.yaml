@@ -113,6 +113,18 @@ tizen:
     - "examples/**/tizen/**"
     - "config/tizen/**"
 
+bouffalolab:
+   maintainers:
+     - wy-hh
+     - shchen-Lab
+     - stoneM2017
+   paths:
+     - "src/platform/bouffalolab/**"
+     - "examples/platform/bouffalolab/**"
+     - "examples/**/bouffalolab/**"
+     - "config/bouffalolab/**"
+     - "third_party/bouffalolab/**"
+
 # --- Proposals / Opt-In Templates ---
 
 # nrfconnect:
@@ -144,15 +156,6 @@ tizen:
 #     - "examples/platform/beken/**"
 #     - "examples/**/beken/**"
 #     - "config/beken/**"
-# 
-# bouffalolab:
-#   maintainers:
-#     - wy-hh
-#   paths:
-#     - "src/platform/bouffalolab/**"
-#     - "examples/platform/bouffalolab/**"
-#     - "examples/**/bouffalolab/**"
-#     - "config/bouffalolab/**"
 # 
 # qpg:
 #   maintainers:

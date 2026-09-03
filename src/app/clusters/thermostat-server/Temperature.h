@@ -17,9 +17,7 @@
 
 #pragma once
 
-#include <app/ConcreteAttributePath.h>
-#include <app/util/attribute-storage.h>
-#include <protocols/interaction_model/Constants.h>
+#include <cstdint>
 
 namespace chip {
 namespace app {
@@ -35,6 +33,11 @@ constexpr temperature kDefaultAbsMaxCoolSetpointLimit = 3200; // 32C (90 F) is t
 constexpr temperature kDefaultDeadBand        = 200; // 2.0C is the default; this changed from 2.5C in revision 8 of this cluster
 constexpr temperature kDefaultHeatingSetpoint = 2000;
 constexpr temperature kDefaultCoolingSetpoint = 2600;
+constexpr int8_t kDefaultLocalTemperatureCalibration = 0;
+
+constexpr int8_t kMinDeadBand                             = 0;   // 0.0C
+constexpr int8_t kMaxDeadBand                             = 127; // 12.7C
+constexpr uint16_t kMaxTemperatureSetpointHoldDurationMin = 1440;
 
 } // namespace Thermostat
 } // namespace Clusters

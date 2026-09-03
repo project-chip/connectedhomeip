@@ -91,6 +91,122 @@ or equivalently:
 chip-tool pairing ble-wifi 17 hex:787980 hex:736563726574 20202021 3840
 ```
 
+#### Commission a device through a Commissioning Proxy
+
+When the commissioner has no radio the commissionee can be reached on, a
+Commissioning Proxy (CP) can tunnel for it. A CP is a Matter device that
+implements the Commissioning Proxy cluster. It opens a transport (e.g. BLE,
+Wi-Fi PAF) connection to the commissionee on the commissioner's behalf. The PASE
+handshake and the commissioning flow are tunneled using `ProxyMessageRequest`
+and `ProxyMessageResponse`.
+
+The CP is an ordinary Matter node, it must already be commissioned onto the
+fabric before it can tunnel anything as it requires a CASE session for the
+tunnel. `examples/all-devices-app` provides a CP, run this with
+`--device commissioning-proxy:<endpoint_id>`:
+
+```
+./out/linux-x64-all-devices-boringssl/all-devices-app --device commissioning-proxy:5 \
+    --wifi --wifipaf freq_list=2437
+```
+
+```
+chip-tool pairing onnetwork ${PROXY_NODE_ID} 20202021
+```
+
+##### Asking the CP to scan
+
+The CP can scan on the commissioner's behalf, to discover commissionable
+devices. `Transport` is the `CapabilitiesBitmap`: BLE is `0x02`, Wi-Fi PAF is
+`0x08`, and `0x0A` asks for both in one scan. `--WiFiBands` is the
+`WiFiBandBitmap`: 2.4 GHz is `0x01`, 5 GHz is `0x04`.
+
+```
+chip-tool commissioningproxy proxy-scan-request 0x0A ${PROXY_NODE_ID} 5 \
+    --WiFiBands 0x01 --allow-large-payload true --timeout 30
+```
+
+`proxy-scan-request` carries the large-message quality, so it needs
+`--allow-large-payload true` to put the invoke on a TCP session. Without it the
+session is UDP/MRP and the round-trip budget expires before `ScanMaxTime`, which
+chip-tool reports as a bare `Timeout` rather than as a rejected request.
+
+Size `--timeout` — chip-tool's own wait is 20 s by default — from the proxy's
+`ScanMaxTime` attribute:
+
+```
+chip-tool commissioningproxy read scan-max-time ${PROXY_NODE_ID} 5
+```
+
+A background scan allows the CP to scan continuously and cache what it finds, so
+the results can be read or subscribed to at any time. `Timeout` is how long the
+scan runs, in seconds:
+
+```
+chip-tool commissioningproxy proxy-back-ground-scan-start-request 0x0A 60 ${PROXY_NODE_ID} 5 \
+    --WiFiBands 0x01
+chip-tool commissioningproxy read num-cached-results ${PROXY_NODE_ID} 5
+chip-tool commissioningproxy read cached-results ${PROXY_NODE_ID} 5
+chip-tool commissioningproxy subscribe cached-results 1 30 ${PROXY_NODE_ID} 5
+chip-tool commissioningproxy proxy-back-ground-scan-stop-request 0x0A ${PROXY_NODE_ID} 5 \
+    --WiFiBands 0x01
+```
+
+Stopping every transport the scan was started on erases the fabric's scan
+record, so a repeated identical stop is answered `NOT_FOUND` rather than
+`SUCCESS`. Neither background-scan command carries the large-message quality, so
+neither needs `--allow-large-payload`.
+
+##### Commissioning through the CP
+
+```
+chip-tool pairing proxy ${NODE_ID_TO_ASSIGN} ${SSID} ${PASSWORD} ${SETUP_PIN_CODE} \
+    ${DISCRIMINATOR} ${PROXY_NODE_ID} ${PROXY_CONNECT_TIMEOUT} ${PROXY_TRANSPORT} \
+    [--proxy-endpoint ${PROXY_ENDPOINT}] [--proxy-wifi-band 2g4|5g]
+```
+
+where:
+
+-   \${NODE_ID_TO_ASSIGN}, \${SSID}, \${PASSWORD} and \${SETUP_PIN_CODE} are as
+    for `pairing ble-wifi` above. \${SSID} and \${PASSWORD} are the required
+    credentials to configure the network to join, not the link the proxy tunnels
+    over.
+-   \${DISCRIMINATOR} is the discriminator of the commissionee, as reported by a
+    scan above.
+-   \${PROXY_NODE_ID} is the node id of the already-commissioned proxy.
+-   \${PROXY_CONNECT_TIMEOUT} is how many seconds the proxy may spend
+    establishing the transport connection to the commissionee. `0` means no
+    timeout, so the proxy keeps trying until it is cancelled.
+-   \${PROXY_TRANSPORT} is `ble` or `wifipaf` — the transport the proxy should
+    use to reach the commissionee.
+-   `--proxy-endpoint` is the endpoint on the proxy that hosts the Commissioning
+    Proxy cluster. Defaults to `1`; `all-devices-app` above puts it on `5`.
+-   `--proxy-wifi-band` is an optional band hint, `2g4` or `5g`, and is only
+    accepted when \${PROXY_TRANSPORT} is `wifipaf`.
+
+For example, commissioning node `0x11` onto Wi-Fi network `xyz` through a proxy
+commissioned as node `0x12`, over BLE:
+
+```
+chip-tool pairing proxy 0x11 xyz secret 20202021 3840 0x12 0 ble --proxy-endpoint 5
+```
+
+or over Wi-Fi PAF, hinting the 2.4 GHz band:
+
+```
+chip-tool pairing proxy 0x11 xyz secret 20202021 3840 0x12 0 wifipaf \
+    --proxy-endpoint 5 --proxy-wifi-band 2g4
+```
+
+chip-tool disconnects the proxy session using `ProxyDisconnectRequest` when the
+flow finishes, whether it succeeded or failed.
+
+For the CP side — implementing a transport driver, or running the example CP —
+see
+[the Commissioning Proxy cluster README](../../src/app/clusters/commissioning-proxy-server/README.md)
+and
+[Getting Started: Wi-Fi PAF for the Commissioning Proxy](../all-devices-app/all-devices-common/device/types/commissioning-proxy/README.md).
+
 #### Pair a device over IP
 
 The command below will discover devices and try to pair with the first one it

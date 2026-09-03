@@ -55496,6 +55496,7 @@ public class ChipClusters {
     private static final long BLTCS_SECURITY_LEVEL_ATTRIBUTE_ID = 4L;
     private static final long BLTCS_MODE_CAPABILITY_ATTRIBUTE_ID = 5L;
     private static final long SESSION_ID_LIST_ATTRIBUTE_ID = 6L;
+    private static final long RANGING_CONSTRAINTS_ATTRIBUTE_ID = 7L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -55512,11 +55513,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void startRangingRequest(StartRangingResponseCallback callback, Integer technology, Optional<ChipStructs.ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct> wiFiRangingDeviceRoleConfig, Optional<ChipStructs.ProximityRangingClusterBLERangingDeviceRoleConfigStruct> BLERangingDeviceRoleConfig, Optional<ChipStructs.ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct> BLTChannelSoundingDeviceRoleConfig, Optional<Integer> frequencyBand, Optional<Long> bandwidth, Integer securityMode, ChipStructs.ProximityRangingClusterRangingTriggerConditionStruct trigger, Optional<ChipStructs.ProximityRangingClusterReportingConditionStruct> reportingCondition) {
-      startRangingRequest(callback, technology, wiFiRangingDeviceRoleConfig, BLERangingDeviceRoleConfig, BLTChannelSoundingDeviceRoleConfig, frequencyBand, bandwidth, securityMode, trigger, reportingCondition, 0);
+    public void startRangingRequest(StartRangingResponseCallback callback, Integer technology, Optional<ChipStructs.ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct> wiFiRangingDeviceRoleConfig, Optional<ChipStructs.ProximityRangingClusterBLERangingDeviceRoleConfigStruct> BLERangingDeviceRoleConfig, Optional<ChipStructs.ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct> BLTChannelSoundingDeviceRoleConfig, Optional<Integer> frequencyBand, Optional<Long> bandwidth, ChipStructs.ProximityRangingClusterRangingTriggerConditionStruct trigger, Optional<ChipStructs.ProximityRangingClusterReportingConditionStruct> reportingCondition) {
+      startRangingRequest(callback, technology, wiFiRangingDeviceRoleConfig, BLERangingDeviceRoleConfig, BLTChannelSoundingDeviceRoleConfig, frequencyBand, bandwidth, trigger, reportingCondition, 0);
     }
 
-    public void startRangingRequest(StartRangingResponseCallback callback, Integer technology, Optional<ChipStructs.ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct> wiFiRangingDeviceRoleConfig, Optional<ChipStructs.ProximityRangingClusterBLERangingDeviceRoleConfigStruct> BLERangingDeviceRoleConfig, Optional<ChipStructs.ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct> BLTChannelSoundingDeviceRoleConfig, Optional<Integer> frequencyBand, Optional<Long> bandwidth, Integer securityMode, ChipStructs.ProximityRangingClusterRangingTriggerConditionStruct trigger, Optional<ChipStructs.ProximityRangingClusterReportingConditionStruct> reportingCondition, int timedInvokeTimeoutMs) {
+    public void startRangingRequest(StartRangingResponseCallback callback, Integer technology, Optional<ChipStructs.ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct> wiFiRangingDeviceRoleConfig, Optional<ChipStructs.ProximityRangingClusterBLERangingDeviceRoleConfigStruct> BLERangingDeviceRoleConfig, Optional<ChipStructs.ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct> BLTChannelSoundingDeviceRoleConfig, Optional<Integer> frequencyBand, Optional<Long> bandwidth, ChipStructs.ProximityRangingClusterRangingTriggerConditionStruct trigger, Optional<ChipStructs.ProximityRangingClusterReportingConditionStruct> reportingCondition, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -55544,15 +55545,11 @@ public class ChipClusters {
       BaseTLVType bandwidthtlvValue = bandwidth.<BaseTLVType>map((nonOptionalbandwidth) -> new UIntType(nonOptionalbandwidth)).orElse(new EmptyType());
       elements.add(new StructElement(bandwidthFieldID, bandwidthtlvValue));
 
-      final long securityModeFieldID = 6L;
-      BaseTLVType securityModetlvValue = new UIntType(securityMode);
-      elements.add(new StructElement(securityModeFieldID, securityModetlvValue));
-
-      final long triggerFieldID = 7L;
+      final long triggerFieldID = 6L;
       BaseTLVType triggertlvValue = trigger.encodeTlv();
       elements.add(new StructElement(triggerFieldID, triggertlvValue));
 
-      final long reportingConditionFieldID = 8L;
+      final long reportingConditionFieldID = 7L;
       BaseTLVType reportingConditiontlvValue = reportingCondition.<BaseTLVType>map((nonOptionalreportingCondition) -> nonOptionalreportingCondition.encodeTlv()).orElse(new EmptyType());
       elements.add(new StructElement(reportingConditionFieldID, reportingConditiontlvValue));
 
@@ -55560,24 +55557,17 @@ public class ChipClusters {
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
-          final long resultCodeFieldID = 0L;
-          Integer resultCode = null;
-          final long sessionIDFieldID = 1L;
-          @Nullable Integer sessionID = null;
+          final long sessionIDFieldID = 0L;
+          Integer sessionID = null;
           for (StructElement element: invokeStructValue.value()) {
-            if (element.contextTagNum() == resultCodeFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-                UIntType castingValue = element.value(UIntType.class);
-                resultCode = castingValue.value(Integer.class);
-              }
-            } else if (element.contextTagNum() == sessionIDFieldID) {
+            if (element.contextTagNum() == sessionIDFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
                 UIntType castingValue = element.value(UIntType.class);
                 sessionID = castingValue.value(Integer.class);
               }
             }
           }
-          callback.onSuccess(resultCode, sessionID);
+          callback.onSuccess(sessionID);
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
@@ -55602,7 +55592,7 @@ public class ChipClusters {
     }
 
     public interface StartRangingResponseCallback extends BaseClusterCallback {
-      void onSuccess(Integer resultCode, @Nullable Integer sessionID);
+      void onSuccess(Integer sessionID);
     }
 
     public interface RangingCapabilitiesAttributeCallback extends BaseAttributeCallback {
@@ -55610,7 +55600,11 @@ public class ChipClusters {
     }
 
     public interface SessionIDListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable List<Integer> value);
+      void onSuccess(List<Integer> value);
+    }
+
+    public interface RangingConstraintsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.ProximityRangingClusterRangingConstraintStruct> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -55788,7 +55782,7 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, SESSION_ID_LIST_ATTRIBUTE_ID, true);
@@ -55801,10 +55795,36 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, SESSION_ID_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readRangingConstraintsAttribute(
+        RangingConstraintsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RANGING_CONSTRAINTS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.ProximityRangingClusterRangingConstraintStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, RANGING_CONSTRAINTS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeRangingConstraintsAttribute(
+        RangingConstraintsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RANGING_CONSTRAINTS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.ProximityRangingClusterRangingConstraintStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, RANGING_CONSTRAINTS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -68972,6 +68992,7 @@ public class ChipClusters {
 
     private static final long SUPPORTED_FORMATS_ATTRIBUTE_ID = 0L;
     private static final long CURRENT_CONNECTIONS_ATTRIBUTE_ID = 1L;
+    private static final long MAX_ZONES_ATTRIBUTE_ID = 2L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -69148,6 +69169,34 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
+    public void updateMotionZoneOptions(DefaultClusterCallback callback, Integer connectionID, @Nullable Optional<ArrayList<ChipStructs.PushAvStreamTransportClusterTransportZoneOptionsStruct>> motionZones, @Nullable Optional<Integer> motionSensitivity) {
+      updateMotionZoneOptions(callback, connectionID, motionZones, motionSensitivity, 0);
+    }
+
+    public void updateMotionZoneOptions(DefaultClusterCallback callback, Integer connectionID, @Nullable Optional<ArrayList<ChipStructs.PushAvStreamTransportClusterTransportZoneOptionsStruct>> motionZones, @Nullable Optional<Integer> motionSensitivity, int timedInvokeTimeoutMs) {
+      final long commandId = 8L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long connectionIDFieldID = 0L;
+      BaseTLVType connectionIDtlvValue = new UIntType(connectionID);
+      elements.add(new StructElement(connectionIDFieldID, connectionIDtlvValue));
+
+      final long motionZonesFieldID = 1L;
+      BaseTLVType motionZonestlvValue = motionZones != null ? motionZones.<BaseTLVType>map((nonOptionalmotionZones) -> ArrayType.generateArrayType(nonOptionalmotionZones, (elementnonOptionalmotionZones) -> elementnonOptionalmotionZones.encodeTlv())).orElse(new EmptyType()) : new NullType();
+      elements.add(new StructElement(motionZonesFieldID, motionZonestlvValue));
+
+      final long motionSensitivityFieldID = 2L;
+      BaseTLVType motionSensitivitytlvValue = motionSensitivity != null ? motionSensitivity.<BaseTLVType>map((nonOptionalmotionSensitivity) -> new UIntType(nonOptionalmotionSensitivity)).orElse(new EmptyType()) : new NullType();
+      elements.add(new StructElement(motionSensitivityFieldID, motionSensitivitytlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
     public interface AllocatePushTransportResponseCallback extends BaseClusterCallback {
       void onSuccess(ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct transportConfiguration);
     }
@@ -69162,6 +69211,10 @@ public class ChipClusters {
 
     public interface CurrentConnectionsAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct> value);
+    }
+
+    public interface MaxZonesAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable Integer value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -69231,6 +69284,32 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, CURRENT_CONNECTIONS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readMaxZonesAttribute(
+        MaxZonesAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_ZONES_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MAX_ZONES_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeMaxZonesAttribute(
+        MaxZonesAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_ZONES_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MAX_ZONES_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

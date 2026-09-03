@@ -132,6 +132,11 @@ public:
 
     Optional<SessionHandle> GetPASESession() const { return mPASESession.Get(); }
 
+    void SetLocalSessionParameters(const SessionParameters & sessionParams)
+    {
+        mPairingSession.SetLocalSessionParameters(sessionParams);
+    }
+
     /**
      * Expire the fail-safe if there is an active PASE session, since this indicates that the fail-safe is for the commissioning
      * happening over the PASE session, and not for some unrelated non-commissioning activity.

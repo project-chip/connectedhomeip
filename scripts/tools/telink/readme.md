@@ -184,12 +184,12 @@ You can try one of these factory partition FW on developing stage.
 3. Then flash the `factory_data.bin` generated from the generator tool at
    specific address:
 
-    > Note: The offset for Matter
-    > [v1.0-branch](https://github.com/telink-semi/zephyr/blob/telink_matter_v1.0-branch/boards/riscv/tlsr9518adk80d/tlsr9518adk80d.dts)
-    > is `0xF4000` and for
-    > [master branch](https://github.com/telink-semi/zephyr/blob/telink_matter/boards/riscv/tlsr9518adk80d/tlsr9518adk80d.dts)
-    > is `0x107000`. You can check the `factory_partition` reg at
-    > `tlsr9518adk80d.dts` for details.
+    > Note: The factory data partition offset depends on the flash size. For
+    > [2 MB flash](../../../src/platform/telink/tlsr9518adk80d_2m_flash.overlay)
+    > it is `0xff000` and for
+    > [4 MB flash](../../../src/platform/telink/tlsr9518adk80d_4m_flash.overlay)
+    > it is `0x205000`. You can check the `factory_partition` reg in the
+    > corresponding flash overlay for details.
 
     For example, the `factory_data_bin` with serial number
     `aabbccddeeff11223344556677889900`. Here is the expected output in logging:

@@ -18,19 +18,19 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <headers/AttestationKey.h>
 #include <headers/ProvisionStorage.h>
-#include <lib/support/Base64.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/CHIPDeviceConfig.h>
-#include <platform/CHIPDeviceError.h>
 #include <platform/Zephyr/CHIPDevicePlatformConfig.h>
 #include <platform/Zephyr/ZephyrConfig.h>
 #include <psa/crypto.h>
 #include <zephyr/settings/settings.h>
 
+#if SL_PROVISION_GENERATOR
+#include <settings/settings_nvs.h>
+#endif
+
 #include <cinttypes>
-#include <cstdlib>
 #include <cstring>
 
 namespace chip {
@@ -63,14 +63,6 @@ constexpr psa_key_id_t kDacPsaKeyId = 2;
 static constexpr ZephyrConfig::Key kProvisionRequestKey = CONFIG_KEY(NAMESPACE_SL_FACTORY "provision-req");
 static constexpr ZephyrConfig::Key kProvisionVersionKey = CONFIG_KEY(NAMESPACE_SL_FACTORY "provision-ver");
 
-constexpr size_t kDateStringLength = 8; // YYYYMMDD
-
-#if SL_PROVISION_GENERATOR == 0
-[[maybe_unused]] constexpr size_t kSpake2pSaltB64LengthMax = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length);
-[[maybe_unused]] constexpr size_t kSpake2pVerifierB64LengthMax =
-    BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length);
-#endif // SL_PROVISION_GENERATOR == 0
-
 CHIP_ERROR ReadConfigBin(ZephyrConfig::Key key, MutableByteSpan & buffer)
 {
     size_t dataLen = 0;
@@ -87,17 +79,24 @@ bool DacPsaKeyExists()
     return status == PSA_SUCCESS;
 }
 
+bool sInitialized = false;
+
 } // namespace
 
 CHIP_ERROR Storage::Initialize(uint32_t flash_addr, uint32_t flash_size)
 {
-    // Zephyr settings owns its own flash placement.
+#if SL_PROVISION_GENERATOR
+    // flash_addr is the offset to the start of the storage area, and flash_size is the total size of the storage area.
+    VerifyOrReturnError(settings_nvs_set_runtime_geometry(static_cast<off_t>(flash_addr), flash_size) == 0,
+                        CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    ReturnErrorOnFailure(ZephyrConfig::Init());
+#else
     (void) flash_addr;
     (void) flash_size;
     ReturnErrorOnFailure(ZephyrConfig::Init());
-#if SL_PROVISION_GENERATOR == 0
     VerifyOrDo(DacPsaKeyExists(), ChipLogError(DeviceLayer, "DAC PSA key id %u missing", kDacPsaKeyId));
-#endif // SL_PROVISION_GENERATOR == 0
+#endif // SL_PROVISION_GENERATOR
+    sInitialized = true;
     return CHIP_NO_ERROR;
 }
 
@@ -448,11 +447,18 @@ CHIP_ERROR Storage::GetSetupPayload(uint8_t * value, size_t max, size_t & size)
 
 CHIP_ERROR Storage::SetProvisionRequest(bool value)
 {
-    return ZephyrConfig::WriteConfigValue(kProvisionRequestKey, static_cast<uint32_t>(value ? 1 : 0));
+    return sInitialized ? ZephyrConfig::WriteConfigValue(kProvisionRequestKey, static_cast<uint32_t>(value ? 1 : 0))
+                        : CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Storage::GetProvisionRequest(bool & value)
 {
+    if (!sInitialized)
+    {
+        // Generator firmware hasn't initialized the NVS yet, so assume provisioning is required.
+        value = true;
+        return CHIP_NO_ERROR;
+    }
     uint32_t stored = 0;
     ReturnErrorOnFailure(ZephyrConfig::ReadConfigValue(kProvisionRequestKey, stored));
     value = stored != 0;
@@ -491,7 +497,7 @@ CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 }
 
 // ProvisionStorage functions for Zephyr settings backend, provided by provision libraries for other ProvisionStorage backends.
-#if SL_PROVISION_GENERATOR == 0
+#if !SL_PROVISION_GENERATOR
 
 CHIP_ERROR Storage::Set(uint16_t id, const uint8_t * value)
 {
@@ -566,110 +572,7 @@ CHIP_ERROR Storage::Set(uint16_t id, const uint8_t * value, size_t size)
     return CHIP_ERROR_UNKNOWN_RESOURCE_ID;
 }
 
-CHIP_ERROR Storage::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
-{
-    constexpr uint8_t kLegacyDateLength        = 10; // YYYY-MM-DD
-    char date[kManufacturingDateLengthMax + 1] = { 0 };
-    char temp[kManufacturingDateLengthMax + 1] = { 0 };
-    size_t date_len                            = 0;
-    char * parse_end                           = nullptr;
-    CHIP_ERROR err                             = CHIP_NO_ERROR;
-
-    ReturnErrorOnFailure(GetManufacturingDate((uint8_t *) date, sizeof(date), date_len));
-    // Convert legacy date format to new date format
-    if ((kLegacyDateLength == date_len) && ('-' == date[4]) && ('-' == date[7]))
-    {
-        date_len = kDateStringLength;
-        snprintf(temp, sizeof(temp), "%.4s%.2s%.2s", date, date + 5, date + 8);
-        memcpy(date, temp, date_len);
-        ReturnErrorOnFailure(SetManufacturingDate(date, date_len));
-    }
-    VerifyOrExit(date_len >= kDateStringLength, err = CHIP_ERROR_INVALID_ARGUMENT);
-    // Year
-    memcpy(temp, date, 4); // yyyy
-    temp[4] = 0;
-    year    = static_cast<uint16_t>(strtoul(temp, &parse_end, 10));
-    VerifyOrExit(parse_end == (temp + 4), err = CHIP_ERROR_INVALID_ARGUMENT);
-    // Month
-    memcpy(temp, &date[4], 2); // mm
-    temp[2] = 0;
-    month   = static_cast<uint8_t>(strtoul(temp, &parse_end, 10));
-    VerifyOrExit(parse_end == (temp + 2), err = CHIP_ERROR_INVALID_ARGUMENT);
-    // Day
-    memcpy(temp, &date[6], 2); // dd
-    temp[2] = 0;
-    day     = static_cast<uint8_t>(strtoul(temp, &parse_end, 10));
-    VerifyOrExit(parse_end == (temp + 2), err = CHIP_ERROR_INVALID_ARGUMENT);
-
-exit:
-    if (err != CHIP_NO_ERROR && err != CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-    {
-        printf("Invalid manufacturing date: %s", date);
-    }
-    return err;
-}
-
-CHIP_ERROR Storage::GetManufacturingDateSuffix(MutableCharSpan & suffixBuffer)
-{
-    char date[kManufacturingDateLengthMax + 1] = { 0 };
-    size_t dateLen                             = 0;
-
-    ReturnErrorOnFailure(GetManufacturingDate(reinterpret_cast<uint8_t *>(date), sizeof(date), dateLen));
-    if (dateLen <= kDateStringLength)
-    {
-        suffixBuffer.reduce_size(0);
-        return CHIP_NO_ERROR;
-    }
-
-    const size_t suffixLen = dateLen - kDateStringLength;
-    VerifyOrReturnError(suffixLen <= suffixBuffer.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(suffixBuffer.data(), date + kDateStringLength, suffixLen);
-    suffixBuffer.reduce_size(suffixLen);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR Storage::GetRotatingDeviceIdUniqueId(MutableByteSpan & value)
-{
-    size_t size = 0;
-
-    ReturnErrorOnFailure(GetPersistentUniqueId(value.data(), value.size(), size));
-    value.reduce_size(size);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR Storage::GetSpake2pSalt(MutableByteSpan & value)
-{
-    char saltB64[kSpake2pSaltB64LengthMax + 1] = { 0 };
-    size_t sizeB64                             = 0;
-
-    ReturnErrorOnFailure(GetSpake2pSalt(saltB64, sizeof(saltB64), sizeB64));
-
-    uint8_t salt[chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length] = { 0 };
-    const size_t saltLen                                       = chip::Base64Decode32(saltB64, sizeB64, salt);
-    VerifyOrReturnError(saltLen != UINT32_MAX, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(saltLen <= value.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    memcpy(value.data(), salt, saltLen);
-    value.reduce_size(saltLen);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR Storage::GetSpake2pVerifier(MutableByteSpan & outValue, size_t & outSize)
-{
-    VerifyOrReturnError(outValue.size() >= chip::Crypto::kSpake2p_VerifierSerialized_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    char verifierB64[kSpake2pVerifierB64LengthMax + 1] = { 0 };
-    size_t sizeB64                                     = 0;
-
-    ReturnErrorOnFailure(GetSpake2pVerifier(verifierB64, sizeof(verifierB64), sizeB64));
-
-    outSize = chip::Base64Decode32(verifierB64, sizeB64, outValue.data());
-    VerifyOrReturnError(outSize != UINT32_MAX, CHIP_ERROR_INVALID_ARGUMENT);
-    outValue.reduce_size(outSize);
-    return CHIP_NO_ERROR;
-}
-
-#endif // SL_PROVISION_GENERATOR == 0
+#endif // !SL_PROVISION_GENERATOR
 
 } // namespace Provision
 } // namespace Silabs

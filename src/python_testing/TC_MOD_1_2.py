@@ -41,6 +41,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
+from matter.testing import matter_asserts
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
@@ -158,9 +159,11 @@ class TC_MOD_1_2(MatterBaseTest):
         if await self.attribute_guard(endpoint=self.endpoint, attribute=self.cluster.Attributes.StartUpMode):
             startup_mode = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=self.cluster, attribute=self.cluster.Attributes.StartUpMode)
             self._log_attribute("StartupMode", startup_mode)
-            asserts.assert_true(isinstance(startup_mode, int), "Startupmode is not int")
-            asserts.assert_in(startup_mode, supported_modes_values,
-                              f"Startupmode {startup_mode} is not in {supported_modes_values}")
+            asserts.assert_true(matter_asserts.is_valid_uint_value(startup_mode, 8) or startup_mode is NullValue,
+                                "StartupMode is not uint8 or NullValue")
+            if startup_mode is not NullValue:
+                asserts.assert_in(startup_mode, supported_modes_values,
+                                  f"StartupMode {startup_mode} is not in {supported_modes_values}")
 
         # Verify the string  is str and larger that 1 char.
         self.step(6)

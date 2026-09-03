@@ -20,6 +20,7 @@
 #include <app/clusters/ambient-context-sensing-server/AmbientContextSensingCluster.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/clusters/boolean-state-server/BooleanStateCluster.h>
+#include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementCluster.h>
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
 
@@ -53,6 +54,12 @@ template <>
 const char * GetClusterTypeName<chip::app::Clusters::BasicInformationCluster>()
 {
     return "chip::app::Clusters::BasicInformationCluster";
+}
+
+template <>
+const char * GetClusterTypeName<chip::app::Clusters::ElectricalEnergyMeasurement::ElectricalEnergyMeasurementCluster>()
+{
+    return "chip::app::Clusters::ElectricalEnergyMeasurement::ElectricalEnergyMeasurementCluster";
 }
 
 chip::app::ServerClusterInterface *

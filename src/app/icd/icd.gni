@@ -28,6 +28,9 @@ declare_args() {
 
   # Set to true if device supports dynamic switching from SIT to LIT operating modes (DSLS)
   chip_enable_icd_dsls = false
+
+  # Enable the ICD server to defer ActiveMode and Check-In when Thread network is not attached
+  chip_enable_icd_defer_activemode_thread_attach = true
 }
 
 # Set the defaults for CIP and UAT features to be consistent with the LIT value.

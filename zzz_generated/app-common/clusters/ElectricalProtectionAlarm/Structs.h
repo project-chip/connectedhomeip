@@ -194,7 +194,7 @@ enum class Fields : uint8_t
     kMaxVoltageProtection           = 4,
     kMaxTemporaryVoltage            = 5,
     kNominalDischargeCurrent        = 6,
-    kMaximumDishargeCurrent         = 7,
+    kMaximumDischargeCurrent        = 7,
     kRatedShortCircuitCurrent       = 8,
     kRatedShortTimeWithstandCurrent = 9,
     kEnergyAbsorptionCapability     = 10,
@@ -211,7 +211,7 @@ public:
     Optional<int64_t> maxVoltageProtection;
     Optional<int64_t> maxTemporaryVoltage;
     Optional<int64_t> nominalDischargeCurrent;
-    Optional<int64_t> maximumDishargeCurrent;
+    Optional<int64_t> maximumDischargeCurrent;
     Optional<int64_t> ratedShortCircuitCurrent;
     Optional<int64_t> ratedShortTimeWithstandCurrent;
     Optional<uint64_t> energyAbsorptionCapability;

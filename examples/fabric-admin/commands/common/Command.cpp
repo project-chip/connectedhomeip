@@ -370,7 +370,7 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::CharString: {
         isValidArgument = HandleNullableOptional<chip::CharSpan>(arg, argValue, [&](auto * value) {
-            *value = chip::Span<const char>(argValue, strlen(argValue));
+            *value = chip::CharSpan::fromCharString(argValue);
             return true;
         });
         break;

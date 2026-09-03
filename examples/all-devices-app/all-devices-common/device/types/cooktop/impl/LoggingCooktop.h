@@ -47,9 +47,16 @@ public:
     explicit LoggingCooktop(TimerDelegate & timerDelegate);
     ~LoggingCooktop() override = default;
 
+    LoggingCookSurfacePart & Surface1() { return mSurface1; }
+    LoggingCookSurfacePart & Surface2() { return mSurface2; }
+
+protected:
+    CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider) override;
+    void UnregisterParts(CodeDrivenDataModelProvider & provider) override;
+
 private:
-    LoggingCookSurfacePart mLoggingSurface1;
-    LoggingCookSurfacePart mLoggingSurface2;
+    LoggingCookSurfacePart mSurface1;
+    LoggingCookSurfacePart mSurface2;
 };
 
 } // namespace chip::app

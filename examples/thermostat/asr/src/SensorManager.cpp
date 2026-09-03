@@ -21,6 +21,8 @@
 #include "AppTask.h"
 #include "lega_rtos_api.h"
 
+#include <app/clusters/thermostat-server/AttributeAccessorShim.h>
+
 using namespace chip;
 using namespace ::chip::DeviceLayer;
 

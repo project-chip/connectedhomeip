@@ -3131,18 +3131,26 @@ CHIP_ERROR DeviceCommissioner::ICDRegistrationInfoReady()
 void DeviceCommissioner::OnNetworkConfigResponse(void * context,
                                                  const NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data)
 {
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     CommissioningDelegate::CommissioningReport report;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogProgress(Controller, "Received NetworkConfig response, networkingStatus=%u", to_underlying(data.networkingStatus));
-    if (data.networkingStatus != NetworkCommissioning::NetworkCommissioningStatusEnum::kSuccess)
+
+    // A removal is only asking for the configuration to be gone, so accept a kNetworkIDNotFound as success.
+    if ((commissioner->mCommissioningStage == CommissioningStage::kRemoveWiFiNetworkConfig ||
+         commissioner->mCommissioningStage == CommissioningStage::kRemoveThreadNetworkConfig) &&
+        data.networkingStatus == NetworkCommissioning::NetworkCommissioningStatusEnum::kNetworkIDNotFound)
+    {
+        ChipLogDetail(Controller, "Treating NetworkIDNotFound as success for network removal");
+    }
+    else if (data.networkingStatus != NetworkCommissioning::NetworkCommissioningStatusEnum::kSuccess)
     {
         err = CHIP_ERROR_INTERNAL;
         // Preserve debugText alongside the status enum so callers can distinguish
         // ambiguous statuses (e.g. kAuthFailure: "wrong password" vs "regulatory restriction").
         report.Set<NetworkCommissioningStatusInfo>(data.networkingStatus, data.debugText.ValueOr(CharSpan{}));
     }
-    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(err, report);
 }
 
@@ -3935,6 +3943,12 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         break;
     }
     case CommissioningStage::kRemoveWiFiNetworkConfig: {
+        if (!params.GetWiFiCredentials().HasValue())
+        {
+            ChipLogError(Controller, "No Wi-Fi credentials configured at commissioner!");
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
         NetworkCommissioning::Commands::RemoveNetwork::Type request;
         request.networkID = params.GetWiFiCredentials().Value().ssid;
         request.breadcrumb.Emplace(breadcrumb);

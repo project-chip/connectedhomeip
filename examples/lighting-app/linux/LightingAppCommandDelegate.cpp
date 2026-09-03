@@ -214,7 +214,7 @@ void LightingAppCommandHandler::OnSoftwareFaultEventHandler(uint32_t eventId)
     char timeChar[50];
     if (std::strftime(timeChar, sizeof(timeChar), "%c", std::localtime(&result)))
     {
-        softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(timeChar), strlen(timeChar)));
+        softwareFault.faultRecording.SetValue(ByteSpan::fromCharString(timeChar));
     }
 
     Clusters::SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(softwareFault);

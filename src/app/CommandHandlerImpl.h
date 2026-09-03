@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <optional>
+
 #include <app/CommandHandler.h>
 
 #include <app/CommandHandlerExchangeInterface.h>
@@ -28,6 +30,7 @@
 #include <lib/core/TLVDebug.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/Scoped.h>
+#include <lib/support/Span.h>
 #include <messaging/ExchangeHolder.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
@@ -76,6 +79,8 @@ public:
          */
         virtual void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                                      TLV::TLVReader & apPayload) = 0;
+
+        virtual void OnDelayReport(System::Clock::Timeout aDelay, Span<const EndpointId> targetedEndpoints) {}
     };
 
     struct InvokeResponseParameters
@@ -432,6 +437,12 @@ private:
      */
     Protocols::InteractionModel::Status ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement);
 
+    Protocols::InteractionModel::Status ValidateCommandCanBeDispatched(const ConcreteCommandPath & aConcretePath);
+    Protocols::InteractionModel::Status ValidateUnicastCommand(CommandDataIB::Parser & aCommandElement,
+                                                               ConcreteCommandPath & aOutPath);
+    CHIP_ERROR PopulateTargetedEndpoints(InvokeRequests::Parser aInvokeRequests, Span<EndpointId> & aTargetedEndpoints);
+    CHIP_ERROR PopulateGroupTargetedEndpoints(InvokeRequests::Parser aInvokeRequests, Span<EndpointId> & aTargetedEndpoints);
+
     CHIP_ERROR TryAddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus);
 
     CHIP_ERROR AddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus);
@@ -468,6 +479,9 @@ private:
     void RemoveFromHandleList(Handle * handle);
 
     void InvalidateHandles();
+
+    void TriggerDelayReport(const InvokeRequestMessage::DelayReportData & aDelayReportData,
+                            Span<const EndpointId> aTargetedEndpoints);
 
     bool TestOnlyIsInIdleState() const { return mState == State::Idle; }
 

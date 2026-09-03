@@ -26,6 +26,7 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/TimerDelegate.h>
+#include <protocols/interaction_model/StatusCode.h>
 #include <system/SystemClock.h>
 
 #include <array>
@@ -171,7 +172,7 @@ public:
 
     RangingTechEnum GetTechnology() const override { return mTechnology; }
     Structs::RangingCapabilitiesStruct::Type GetCapabilities() const override;
-    ResultCodeEnum PrepareSession(uint8_t sessionId, const StartSessionParams & params) override;
+    Protocols::InteractionModel::ClusterStatusCode PrepareSession(uint8_t sessionId, const StartSessionParams & params) override;
     CHIP_ERROR StartSession(uint8_t sessionId) override;
     CHIP_ERROR StopSession(uint8_t sessionId) override;
     void StopAllSessions() override;

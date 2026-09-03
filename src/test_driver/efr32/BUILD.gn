@@ -80,6 +80,7 @@ source_set("efr32_test_main") {
     "${chip_root}/examples/common/pigweed/RpcService.cpp",
     "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
     "${examples_common_plat_dir}/PigweedLogger.cpp",
+    "${examples_common_plat_dir}/provision/ProvisionStorageCommon.cpp",
     "${examples_common_plat_dir}/provision/ProvisionStorageCustom.cpp",
     "${examples_common_plat_dir}/provision/ProvisionStorageDefault.cpp",
     "${examples_common_plat_dir}/syscalls_stubs.cpp",

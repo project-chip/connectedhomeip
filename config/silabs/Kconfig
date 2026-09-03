@@ -45,26 +45,6 @@ config MCUBOOT_SIGNATURE_KEY_FILE
 	default "bootloader/mcuboot/root-ec-p256.pem"
 	depends on BOOTLOADER_MCUBOOT
 
-config CHIP_LOG_VERIFY_OR_DIE
-	bool "Log source code location on VerifyOrDie failure"
-	default y
-	help
-	  Enables the feature to log the file name and line number where the Matter
-	  stack calls the VerifyOrDie macro with the condition evaluating to false.
-
-config CHIP_LOG_FILE_NAME
-	bool "Log file name instead of entire file path"
-	default y
-	help
-	  Enables using a file name instead of an entire file path whenever the
-	  source code location needs to be logged. This is achieved by overriding
-	  the __FILE__ macro with __FILE_NAME__.
-	  This reduces the code size in debug configurations that enable verbose
-	  assertion macros.
-
-config CHIP_MALLOC_SYS_HEAP
-	default n if !ARCH_POSIX
-
 config CHIP_TASK_STACK_SIZE
 	int "The Matter thread stack size"
 	default 10240
@@ -75,10 +55,11 @@ config CHIP_FACTORY_DATA
 	bool "Use provisioned factory data from Zephyr settings"
 	default n
 	help
-		Enables Provision::Storage (ProvisionStorageZephyr) that reads provisioned
-		credentials and commissionable data from Zephyr settings stored in the
-		storage partition. Factory data is expected to be provisioned into NVS
-		separately using Silicon Labs generator firmware.
+	  Enables Provision::Storage (ProvisionStorageZephyr) that reads
+	  provisioned credentials and commissionable data from Zephyr settings
+	  stored in the storage partition. Factory data is expected to be
+	  provisioned into NVS separately using Silicon Labs generator
+	  firmware.
 
 config CHIP_FACTORY_DATA_ROTATING_DEVICE_UID_MAX_LEN
 	int "Maximum length of rotating device ID unique ID in bytes"
@@ -103,72 +84,10 @@ config CHIP_OPENTHREAD_JOINER_ENABLED
 	  If disabled, it allows to optimize memory usage even if Thread Joiner
 	  support is enabled.
 
-config CHIP_MIGRATE_OPERATIONAL_KEYS_TO_ITS
-	bool "Operational keys migration feature"
-	depends on CHIP_CRYPTO_IMPL_PSA
-	help
-	  Enables migration of the operational keys stored in the persistent storage
-	  to the PSA ITS secure storage. Enable this feature while updating the
-	  firmware of in-field devices that run Mbed TLS cryptography backend to the
-	  firmware based on PSA Crypto API.
-
-config CHIP_FACTORY_RESET_ON_KEY_MIGRATION_FAILURE
-	bool "Perform factory reset if the operational key migration failed"
-	default y
-	depends on CHIP_MIGRATE_OPERATIONAL_KEYS_TO_ITS
-	help
-	  Perform factory reset of the device if the operational key for Fabric has
-	  not been migrated properly to PSA ITS storage.
-
 config CHIP_PERSISTENT_SUBSCRIPTIONS
 	default n
 	# selecting experimental for this feature since there is an issue with multiple controllers.
 	select EXPERIMENTAL
-
-config CHIP_MAX_FABRICS
-	int "Maximum number of Matter fabrics"
-	default 5
-	help
-	  The maximum number of Matter fabrics that device can be joined to.
-
-config CHIP_MAX_ACTIVE_CASE_CLIENTS
-	int "Maximum number of outgoing CASE sessions"
-	default CHIP_MAX_FABRICS if CHIP_PERSISTENT_SUBSCRIPTIONS
-	default 2
-	help
-	  The maximum number of outgoing CASE sessions that can be simultaneously
-	  handled by the end device.
-
-config CHIP_MAX_ACTIVE_DEVICES
-	int "Maximum number of simultaneous connections over CASE"
-	default CHIP_MAX_FABRICS if CHIP_PERSISTENT_SUBSCRIPTIONS
-	default 4
-	help
-	  The maximum number of devices to which the Server implementers will be
-	  able to concurrently connect over CASE and interact with.
-
-config CHIP_SUBSCRIPTION_RESUMPTION_MIN_RETRY_INTERVAL
-	int "Minimum subscription resumption interval in seconds"
-	default 20
-	depends on CHIP_PERSISTENT_SUBSCRIPTIONS
-	help
-	  The minimum interval in seconds before resuming a subscription that timed
-	  out.
-
-config CHIP_SUBSCRIPTION_RESUMPTION_RETRY_MULTIPLIER
-	int "The multiplier for subscription resumption retry in seconds"
-	default 40
-	depends on CHIP_PERSISTENT_SUBSCRIPTIONS
-	help
-	  The multiplier per subscription resumption retry attempt that is
-	  multiplied by the index of Fibonacci sequence and added to
-	  CHIP_SUBSCRIPTION_RESUMPTION_MIN_RETRY_INTERVAL to obtain final wait time
-	  for next retry.
-
-config CHIP_ENABLE_BDX_LOG_TRANSFER
-	bool "Enable BDX transfer for diagnostic logs"
-	help
-	  Enables the BDX protocol for diagnostics log transfer purposes.
 
 # See config/common/cmake/Kconfig for full definition
 config CHIP_WIFI
@@ -208,55 +127,6 @@ config CHIP_MEMORY_PROFILING
 	help
 	  Enables features for tracking memory usage in Matter.
 
-choice CHIP_LAST_FABRIC_REMOVED_ACTION
-	prompt "An action to perform after removing the last fabric"
-	default CHIP_LAST_FABRIC_REMOVED_ERASE_AND_REBOOT
-
-config CHIP_LAST_FABRIC_REMOVED_NONE
-	bool "After removing the last fabric do not perform any action"
-	help
-	  After removing the last fabric the device will not perform factory reset
-	  or reboot. The current state will be left as it is and the BLE advertising
-	  will not start automatically.
-
-config CHIP_LAST_FABRIC_REMOVED_ERASE_AND_REBOOT
-	bool "After removing the last fabric erase NVS and reboot"
-	help
-	  After removing the last fabric the device will perform the factory reset
-	  and then reboot. The current RAM state will be removed and the new
-	  commissioning to the new fabric will use the initial fabric index. This
-	  option is the most safe.
-
-config CHIP_LAST_FABRIC_REMOVED_ERASE_AND_PAIRING_START
-	bool "After removing the last fabric erase NVS and start Bluetooth LE advertising"
-	help
-	  After removing the last fabric the device will perform the factory reset
-	  without rebooting and start the Bluetooth LE advertisement automatically.
-	  The current RAM state will be saved and the new commissioning to the next
-	  fabric will use the next possible fabric index. This option should not be
-	  used for devices that normally do not advertise Bluetooth LE on boot to
-	  keep their original behavior.
-
-config CHIP_LAST_FABRIC_REMOVED_ERASE_ONLY
-	bool "After removing the last fabric erase NVS only"
-	help
-	  After removing the last fabric the device will perform the factory reset
-	  only without rebooting. The current RAM state will be saved and the new
-	  commissioning to the next fabric will use the next possible fabric
-	  index.
-
-endchoice
-
-config CHIP_LAST_FABRIC_REMOVED_ACTION_DELAY
-	int "After removing the last fabric wait defined time [in milliseconds] to perform an action"
-	depends on !CHIP_LAST_FABRIC_REMOVED_NONE
-	default 1000
-	help
-	  After removing the last fabric the device will wait for the defined time
-	  and then perform an action chosen by the CHIP_LAST_FABRIC_REMOVED_ACTION
-	  option. This schedule will allow for avoiding race conditions before the
-	  device removes non-volatile data.
-
 # ==============================================================================
 # System configuration
 # ==============================================================================
@@ -287,11 +157,6 @@ config INIT_STACKS
 config SYSTEM_WORKQUEUE_STACK_SIZE
 	default 2560 if CHIP_WIFI
 	default 2048 if CHIP_ICD_LIT_SUPPORT
-
-config HEAP_MEM_POOL_IGNORE_MIN
-	default y if CHIP_WIFI
-
-#We use sys_heap based allocators, so make sure we don't reserve unused libc heap anyway
 
 config NVS_LOOKUP_CACHE_SIZE
 	default 512 if NVS
@@ -331,7 +196,7 @@ config NET_BUF_RX_COUNT
 config NET_BUF_TX_COUNT
 	default 16
 
-config NET_SOCKETS_POLL_MAX
+config ZVFS_POLL_MAX
 	default 6 if CHIP_WIFI
 
 # ==============================================================================

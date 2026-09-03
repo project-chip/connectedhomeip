@@ -135,6 +135,7 @@ class HostApp(Enum):
     KOTLIN_MATTER_CONTROLLER = auto()
     CONTACT_SENSOR = auto()
     DISHWASHER = auto()
+    ELECTRICAL_PROTECTION = auto()
     MICROWAVE_OVEN = auto()
     REFRIGERATOR = auto()
     RVC = auto()
@@ -234,6 +235,8 @@ class HostApp(Enum):
             return 'dishwasher-app/linux'
         if self == HostApp.MICROWAVE_OVEN:
             return 'microwave-oven-app/linux'
+        if self == HostApp.ELECTRICAL_PROTECTION:
+            return 'electrical-protection-app/linux'
         if self == HostApp.REFRIGERATOR:
             return 'refrigerator-app/linux'
         if self == HostApp.RVC:
@@ -368,6 +371,9 @@ class HostApp(Enum):
         elif self == HostApp.MICROWAVE_OVEN:
             yield 'chip-microwave-oven-app'
             yield 'chip-microwave-oven-app.map'
+        elif self == HostApp.ELECTRICAL_PROTECTION:
+            yield 'chip-electrical-protection-app'
+            yield 'chip-electrical-protection-app.map'
         elif self == HostApp.REFRIGERATOR:
             yield 'refrigerator-app'
             yield 'refrigerator-app.map'

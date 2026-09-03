@@ -18,4 +18,6 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
     "${CLUSTER_DIR}/CodegenIntegration.h"
+    "${CLUSTER_DIR}/MigrateThreadNetworkDirectoryServerStorage.cpp"
+    "${CLUSTER_DIR}/MigrateThreadNetworkDirectoryServerStorage.h"
 )

@@ -98,7 +98,7 @@ DeriveSessionKeysTestVector deriveSessionKeysTestVectors[] = {
 
 ByteSpan ToSpan(const char * str)
 {
-    return ByteSpan(reinterpret_cast<const uint8_t *>(str), strlen(str));
+    return ByteSpan::fromCharString(str);
 }
 
 struct TestSessionKeystore : public ::testing::Test

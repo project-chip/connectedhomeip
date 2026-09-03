@@ -32,7 +32,7 @@ class EnergyEvseManager : public Instance
 {
 public:
     EnergyEvseManager(EndpointId aEndpointId, EnergyEvseDelegate & aDelegate, Feature aFeature, OptionalAttributes aOptionalAttrs,
-                      OptionalCommands aOptionalCmds) :
+                      EnergyEvseCluster::OptionalCommandSet aOptionalCmds) :
         EnergyEvse::Instance(aEndpointId, aDelegate, aFeature, aOptionalAttrs, aOptionalCmds)
     {
         mDelegate = &aDelegate;

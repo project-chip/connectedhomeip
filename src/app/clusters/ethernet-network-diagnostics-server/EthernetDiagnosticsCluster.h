@@ -44,7 +44,7 @@ public:
         EthernetNetworkDiagnostics::Attributes::CarrierDetect::Id, EthernetNetworkDiagnostics::Attributes::FullDuplex::Id,
         EthernetNetworkDiagnostics::Attributes::PHYRate::Id, EthernetNetworkDiagnostics::Attributes::TimeSinceReset::Id>;
 
-    EthernetDiagnosticsServerCluster(DeviceLayer::DiagnosticDataProvider & provider,
+    EthernetDiagnosticsServerCluster(EndpointId endpointId, DeviceLayer::DiagnosticDataProvider & provider,
                                      const BitFlags<EthernetNetworkDiagnostics::Feature> mEnabledFeatures,
                                      OptionalAttributeSet optionalAttributeSet);
 

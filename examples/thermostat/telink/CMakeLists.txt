@@ -23,6 +23,7 @@ get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 include(${TELINK_COMMON}/common.cmake)
 include(${CHIP_ROOT}/config/telink/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../thermostat-common/thermostat-common.cmake)
 
 project(chip-telink-thermostat-example)
 

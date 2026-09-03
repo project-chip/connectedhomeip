@@ -327,6 +327,9 @@ void TestPASESession::SecurePairingHandshakeTestCommon(SessionManager & sessionM
     EXPECT_EQ(delegateCommissioner.mNumPairingErrors, 0u);
     EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 1u);
 
+    EXPECT_EQ(pairingAccessory.GetRemoteSessionParameters().GetSupportedTransports(), 0u);
+    EXPECT_EQ(pairingCommissioner.GetRemoteSessionParameters().GetSupportedTransports(), 0u);
+
     if (mrpCommissionerConfig.HasValue())
     {
         EXPECT_EQ(pairingAccessory.GetRemoteMRPConfig().mIdleRetransTimeout, mrpCommissionerConfig.Value().mIdleRetransTimeout);
@@ -429,6 +432,75 @@ TEST_F(TestPASESession, SecurePairingHandshakeWithPacketLossTest)
                                      Optional<ReliableMessageProtocolConfig>::Missing(), delegateCommissioner);
     EXPECT_EQ(loopback.mDroppedMessageCount, 2u);
     EXPECT_EQ(loopback.mNumMessagesToDrop, 0u);
+}
+
+TEST_F(TestPASESession, SecurePairingHandshakeTCPParamsTest)
+{
+    TemporarySessionManager sessionManager(*this);
+
+    TestSecurePairingDelegate delegateCommissioner;
+    PASESession pairingCommissioner;
+
+    TestSecurePairingDelegate delegateAccessory;
+    PASESession pairingAccessory;
+
+    SessionParameters commissionerSessionParams;
+    commissionerSessionParams.SetSupportedTransports(static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient));
+    commissionerSessionParams.SetMaxTCPPayloadSize(40000);
+    pairingCommissioner.SetLocalSessionParameters(commissionerSessionParams);
+
+    SessionParameters accessorySessionParams;
+    accessorySessionParams.SetSupportedTransports(static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpServer));
+    accessorySessionParams.SetMaxTCPPayloadSize(50000);
+    pairingAccessory.SetLocalSessionParameters(accessorySessionParams);
+
+    auto & loopback = GetLoopback();
+    loopback.Reset();
+    loopback.mSentMessageCount = 0;
+
+    ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
+
+    ReliableMessageMgr * rm     = GetExchangeManager().GetReliableMessageMgr();
+    ReliableMessageContext * rc = contextCommissioner->GetReliableMessageContext();
+    ASSERT_NE(rm, nullptr);
+    ASSERT_NE(rc, nullptr);
+
+    contextCommissioner->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
+        64_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        64_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+    }));
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest,
+                                                                            &pairingAccessory),
+              CHIP_NO_ERROR);
+
+    EXPECT_EQ(pairingAccessory.WaitForPairing(sessionManager, sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount,
+                                              ByteSpan(sTestSpake2p01_Salt), Optional<ReliableMessageProtocolConfig>::Missing(),
+                                              &delegateAccessory),
+              CHIP_NO_ERROR);
+    DrainAndServiceIO();
+
+    EXPECT_EQ(pairingCommissioner.Pair(sessionManager, sTestSpake2p01_PinCode, Optional<ReliableMessageProtocolConfig>::Missing(),
+                                       contextCommissioner, &delegateCommissioner),
+              CHIP_NO_ERROR);
+    DrainAndServiceIO();
+
+    EXPECT_EQ(delegateAccessory.mNumPairingErrors, 0u);
+    EXPECT_EQ(delegateAccessory.mNumPairingComplete, 1u);
+    EXPECT_EQ(delegateCommissioner.mNumPairingErrors, 0u);
+    EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 1u);
+
+    EXPECT_EQ(pairingAccessory.GetRemoteSessionParameters().GetSupportedTransports(),
+              commissionerSessionParams.GetSupportedTransports());
+    EXPECT_EQ(pairingAccessory.GetRemoteSessionParameters().GetMaxTCPPayloadSize(),
+              commissionerSessionParams.GetMaxTCPPayloadSize());
+    EXPECT_EQ(pairingAccessory.GetRemoteMRPConfig(), GetDefaultMRPConfig());
+
+    EXPECT_EQ(pairingCommissioner.GetRemoteSessionParameters().GetSupportedTransports(),
+              accessorySessionParams.GetSupportedTransports());
+    EXPECT_EQ(pairingCommissioner.GetRemoteSessionParameters().GetMaxTCPPayloadSize(),
+              accessorySessionParams.GetMaxTCPPayloadSize());
+    EXPECT_EQ(pairingCommissioner.GetRemoteMRPConfig(), GetDefaultMRPConfig());
 }
 
 TEST_F(TestPASESession, SecurePairingFailedHandshake)

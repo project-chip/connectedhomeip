@@ -46,6 +46,7 @@ OptionDef gCmdOptionDefs[] =
 {
     { "cert",           kArgumentRequired,  'c' },
     { "trusted-cert",   kArgumentRequired,  't' },
+    { "pdc-identity",   kNoArgument,        'p' },
     { }
 };
 
@@ -59,6 +60,11 @@ const char * const gCmdOptionHelp =
     "\n"
     "       File or string containing a trusted CHIP certificate to be used during\n"
     "       validation. Usually, it is trust anchor root certificate (RCAC).\n"
+    "\n"
+    "  -p, --pdc-identity\n"
+    "\n"
+    "       Validate the certificate as a PDC Identity. No other certificates are\n"
+    "       involved, so the --cert and --trusted-cert options must not be used.\n"
     "\n"
     ;
 
@@ -74,7 +80,7 @@ HelpOptions gHelpOptions(
     CMD_NAME,
     "Usage: " CMD_NAME " [ <options...> ] <file/str>\n",
     CHIP_VERSION_STRING "\n" COPYRIGHT_STRING,
-    "Validate a chain of CHIP certificates.\n"
+    "Validate a chain of CHIP certificates, or a single Wi-Fi PDC Identity.\n"
     "\n"
     "ARGUMENTS\n"
     "\n"
@@ -103,6 +109,7 @@ const char * gTargetCertFileName         = nullptr;
 const char * gCACertFileNames[kMaxCerts] = { nullptr };
 bool gCACertIsTrusted[kMaxCerts]         = { false };
 size_t gNumCertFileNames                 = 0;
+bool gValidatePDCIdentity                = false;
 
 bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg)
 {
@@ -117,6 +124,9 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         }
         gCACertFileNames[gNumCertFileNames]   = arg;
         gCACertIsTrusted[gNumCertFileNames++] = (id == 't');
+        break;
+    case 'p':
+        gValidatePDCIdentity = true;
         break;
     default:
         PrintArgError("%s: Unhandled option: %s\n", progName, name);
@@ -140,8 +150,32 @@ bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[])
         return false;
     }
 
+    if (gValidatePDCIdentity && gNumCertFileNames > 0)
+    {
+        PrintArgError("%s: The --cert and --trusted-cert options cannot be used with --pdc-identity.\n", progName);
+        return false;
+    }
+
     gTargetCertFileName = argv[0];
 
+    return true;
+}
+
+bool ValidatePDCIdentity(const char * fileNameOrStr)
+{
+    std::unique_ptr<X509, void (*)(X509 *)> cert(nullptr, &X509_free);
+    VerifyOrReturnValue(ReadCert(fileNameOrStr, cert), false);
+
+    uint8_t chipCertBuf[kMaxCHIPCertLength];
+    MutableByteSpan chipCert(chipCertBuf);
+    VerifyOrReturnValue(X509ToChipCert(cert.get(), chipCert), false);
+
+    CHIP_ERROR err = ValidateChipNetworkIdentity(chipCert);
+    if (err != CHIP_NO_ERROR)
+    {
+        fprintf(stderr, "Failed PDC Identity validation: %s\n", chip::ErrorStr(err));
+        return false;
+    }
     return true;
 }
 
@@ -168,6 +202,11 @@ bool Cmd_ValidateCert(int argc, char * argv[])
 
     res = ParseArgs(CMD_NAME, argc, argv, gCmdOptionSets, HandleNonOptionArgs);
     VerifyTrueOrExit(res);
+
+    if (gValidatePDCIdentity)
+    {
+        ExitNow(res = ValidatePDCIdentity(gTargetCertFileName));
+    }
 
     err = certSet.Init(kMaxCerts);
     if (err != CHIP_NO_ERROR)

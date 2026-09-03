@@ -25,7 +25,6 @@
 #include <app/clusters/wifi-network-management-server/wifi-network-management-server.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
-#include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 
@@ -41,11 +40,6 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-
-ByteSpan ByteSpanFromCharSpan(CharSpan span)
-{
-    return ByteSpan(Uint8::from_const_char(span.data()), span.size());
-}
 
 #if MATTER_ENABLE_UBUS
 ubus::UbusManager gUbusManager{};
@@ -109,8 +103,8 @@ static void ApplicationEarlyInit()
 
 void ApplicationInit()
 {
-    TEMPORARY_RETURN_IGNORED gWiFiNetworkManagementServer->SetNetworkCredentials(ByteSpanFromCharSpan("MatterAP"_span),
-                                                                                 ByteSpanFromCharSpan("Setec Astronomy"_span));
+    TEMPORARY_RETURN_IGNORED gWiFiNetworkManagementServer->SetNetworkCredentials(ByteSpan::fromCharSpan("MatterAP"_span),
+                                                                                 ByteSpan::fromCharSpan("Setec Astronomy"_span));
 }
 
 void ApplicationShutdown()

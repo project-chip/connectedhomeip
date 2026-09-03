@@ -43,5 +43,7 @@ enum class StatusCode : uint16_t
 
 StatusCode GetBdxStatusCodeFromChipError(CHIP_ERROR error);
 
+CHIP_ERROR GetChipErrorFromBdxStatusCode(StatusCode statusCode);
+
 } // namespace bdx
 } // namespace chip

@@ -367,6 +367,13 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
                 break;
             }
 
+            // The association has failed, so release the PAF channel and send anything queued.
+            // Keep this inside the mAssociationStarted check: _ConnectWiFiNetworkAsync() blocks
+            // PAF and then calls disconnect() before associating, which also lands in this
+            // 'disconnected' branch.  Unblocking PAF for that deliberate disconnect would let
+            // frames out mid-association.
+            OnAssociationFailed();
+
             TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
                 [this, reason]() { OnConnectResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), reason); });
             if (delegate != nullptr)
@@ -393,6 +400,10 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
     }
     else if (g_strcmp0(state, "completed") == 0)
     {
+        // The link is up, but NAN typically needs a few hundred milliseconds more before it can
+        // carry frames, hold the channel until it is seen working or the bounding timer expires.
+        OnAssociationCompleted();
+
         if (mAssociationStarted)
         {
             TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
@@ -547,6 +558,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceRemoved(WpaSupplicant1 * proxy, con
         ChipLogProgress(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "WiFi interface removed: %s", StringOrNullMarker(path));
         mWpaSupplicant.interfacePath.reset();
         mWpaSupplicant.iface.reset();
+        OnInterfaceRemoved();
     }
 }
 
@@ -863,18 +875,14 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
         }
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    mPafChannelAvailable = false;
-#endif
+    OnAssociationStarting();
 
     if (!wpa_supplicant_1_interface_call_add_network_sync(mWpaSupplicant.iface.get(), args,
                                                           &mWpaSupplicant.networkPath.GetReceiver(), nullptr, &err.GetReceiver()))
     {
         ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to add network: %s", err->message);
         mWpaSupplicant.networkPath.reset();
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-        mPafChannelAvailable = true;
-#endif
+        OnAssociationFailed();
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -890,6 +898,7 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
                                                              &err.GetReceiver()))
     {
         ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to select network: %s", err->message);
+        OnAssociationFailed();
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -909,6 +918,11 @@ ConnectivityManagerImpl::ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credent
 
     VerifyOrReturnError(ssid.size() <= kMaxWiFiSSIDLength, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(credentials.size() <= kMaxWiFiKeyLength, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // On a device that shares one radio between Wi-Fi PAF and the station link,
+    // association leaves the radio unable to carry PAF frames for several
+    // seconds. Flush any pending PAFTP acknowledgement now before association.
+    OnAssociationRequested();
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INCORRECT_STATE);
@@ -965,6 +979,8 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectWiFiNetworkWithPDCAsync(
     NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback)
 {
     VerifyOrReturnError(ssid.size() <= kMaxWiFiSSIDLength, CHIP_ERROR_INVALID_ARGUMENT);
+
+    OnAssociationRequested();
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INCORRECT_STATE);
@@ -1576,9 +1592,8 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
                      err.Format());
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    mPafChannelAvailable = true;
-#endif
+    // No Wi-Fi PAF action here: a completed scan says nothing about whether the radio can carry
+    // PAF frames -- during an association the scan is only the first phase.
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_StartWiFiManagement()

@@ -363,7 +363,7 @@ ClusterConfig ClusterConfigWithProgress()
 AreaStructureWrapper MakeNamedArea(uint32_t areaId, const char * name)
 {
     AreaStructureWrapper area;
-    CharSpan nameSpan(name, strlen(name));
+    CharSpan nameSpan = CharSpan::fromCharString(name);
     area.SetAreaId(areaId)
         .SetMapId(DataModel::NullNullable)
         .SetLocationInfo(nameSpan, DataModel::NullNullable, DataModel::NullNullable);
@@ -391,7 +391,7 @@ AreaStructureWrapper MakeFloorArea(uint32_t areaId, int16_t floor)
 AreaStructureWrapper MakeMappedArea(uint32_t areaId, uint32_t mapId, const char * name)
 {
     AreaStructureWrapper area;
-    CharSpan nameSpan(name, strlen(name));
+    CharSpan nameSpan = CharSpan::fromCharString(name);
     area.SetAreaId(areaId)
         .SetMapId(DataModel::MakeNullable(mapId))
         .SetLocationInfo(nameSpan, DataModel::NullNullable, DataModel::NullNullable);

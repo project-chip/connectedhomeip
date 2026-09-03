@@ -16,6 +16,9 @@ import("//build_overrides/chip.gni")
 
 source_set("power-topology-server") {
   sources = [
+    "DefaultPowerTopologyCircuitNodeStorage.cpp",
+    "DefaultPowerTopologyCircuitNodeStorage.h",
+    "PowerTopologyCircuitNodeStorage.h",
     "PowerTopologyCluster.cpp",
     "PowerTopologyCluster.h",
     "PowerTopologyDelegate.h",

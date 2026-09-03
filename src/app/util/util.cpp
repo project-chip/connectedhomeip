@@ -134,14 +134,15 @@ void MatterMicrowaveOvenModePluginServerInitCallback() {}
 void MatterDeviceEnergyManagementModePluginServerInitCallback() {}
 void MatterEnergyEvseModePluginServerInitCallback() {}
 void MatterPowerTopologyPluginServerInitCallback() {}
+void MatterElectricalDistributionPluginServerInitCallback() {}
 void MatterElectricalEnergyMeasurementPluginServerInitCallback() {}
 void MatterElectricalPowerMeasurementPluginServerInitCallback() {}
 void MatterServiceAreaPluginServerInitCallback() {}
 void MatterWaterHeaterManagementPluginServerInitCallback() {}
 void MatterWaterHeaterModePluginServerInitCallback() {}
-void MatterCommodityPricePluginServerInitCallback() {}
 void MatterCommodityTariffPluginServerInitCallback() {}
 void MatterElectricalGridConditionsPluginServerInitCallback() {}
+void MatterElectricalProtectionAlarmPluginServerInitCallback() {}
 void MatterSoilMeasurementPluginServerInitCallback() {}
 void MatterLocalizationConfigurationPluginServerInitCallback() {}
 void MatterIcdManagementPluginServerInitCallback() {}

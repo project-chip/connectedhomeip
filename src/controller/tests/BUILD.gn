@@ -54,6 +54,7 @@ chip_test_suite("tests") {
     test_sources += [
       "TestAutoCommissioner.cpp",
       "TestICDManagementResponses.cpp",
+      "TestNetworkConfigResponses.cpp",
       "TestParseICDInfo.cpp",
     ]
   }

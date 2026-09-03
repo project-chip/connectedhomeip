@@ -23,6 +23,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitMask.h>
 #include <lib/support/Span.h>
+#include <protocols/interaction_model/StatusCode.h>
 #include <system/SystemClock.h>
 
 #include <cstdint>
@@ -97,9 +98,10 @@ struct StartSessionParams
  *   1. PrepareSession(sessionId, params) — synchronous. The adapter validates
  *      that the radio can satisfy the request (peer compatibility, security
  *      mode, resource availability, ...) and stages whatever per-session
- *      bookkeeping it needs. Returns a ResultCodeEnum: kAccepted commits the
- *      adapter to the session; any other value rejects the request before the
- *      cluster surfaces a session ID to the client. If the adapter accepted
+ *      bookkeeping it needs. Returns a ClusterStatusCode: a success status
+ *      commits the adapter to the session; a cluster-specific failure (one of
+ *      the Proximity Ranging StatusCodeEnum values) rejects the request before
+ *      the cluster surfaces a session ID to the client. If the adapter accepted
  *      and stashed resources, those resources MUST be released on a subsequent
  *      StopSession call (see "Stop semantics" below).
  *
@@ -137,9 +139,9 @@ struct StartSessionParams
  *
  * Adapters MUST NOT deliver OnRangingSessionStopped synchronously from inside
  * PrepareSession; if the start is already known to have failed at preparation
- * time, return a non-Accepted ResultCodeEnum from PrepareSession instead.
- * Termination callbacks are valid only after PrepareSession has returned
- * kAccepted.
+ * time, return a cluster-specific failure ClusterStatusCode from PrepareSession
+ * instead. Termination callbacks are valid only after PrepareSession has
+ * returned a success status.
  *
  * Async events:
  *   - OnMeasurementData: emitted exactly once per accepted StartSession
@@ -185,15 +187,16 @@ public:
     virtual Structs::RangingCapabilitiesStruct::Type GetCapabilities() const = 0;
 
     /**
-     * Validate and stage a ranging session. Returns kAccepted to commit the
-     * adapter to the session; any other value rejects it. The driver only
-     * surfaces a session ID to the client when this returns kAccepted.
+     * Validate and stage a ranging session. Returns a success ClusterStatusCode
+     * to commit the adapter to the session; a cluster-specific failure (a
+     * Proximity Ranging StatusCodeEnum value) rejects it. The driver only
+     * surfaces a session ID to the client when this returns a success status.
      *
-     * After kAccepted, the adapter MUST emit OnRangingSessionStopped exactly
-     * once for this session — either in response to a future StopSession
-     * call, or asynchronously on hardware-driven termination.
+     * After a success status, the adapter MUST emit OnRangingSessionStopped
+     * exactly once for this session — either in response to a future
+     * StopSession call, or asynchronously on hardware-driven termination.
      */
-    virtual ResultCodeEnum PrepareSession(uint8_t sessionId, const StartSessionParams & params) = 0;
+    virtual Protocols::InteractionModel::ClusterStatusCode PrepareSession(uint8_t sessionId, const StartSessionParams & params) = 0;
 
     /**
      * Trigger one ranging instance for a previously prepared session. The

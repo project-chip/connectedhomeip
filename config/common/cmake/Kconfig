@@ -200,6 +200,7 @@ config CHIP_DEVICE_TYPE
 
 config CHIP_DEVICE_DISCRIMINATOR
 	hex "Device pairing discriminator"
+	range 0x0 0xFFF
 	default 0xF00
 	help
 	  Provides a 12-bit identifier that is used to discover the device during

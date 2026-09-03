@@ -55,6 +55,28 @@
 // These are configuration options that are unique to Linux platforms.
 // These can be overridden by the application as needed.
 
+/**
+ * CHIP_DEVICE_CONFIG_WIFIPAF_NAN_RECOVERY_TIMEOUT_MS
+ *
+ * Only relevant when CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF is enabled.
+ *
+ * On a device that shares one radio between Wi-Fi PAF and the station link, NAN does not
+ * resume the instant wpa_supplicant reports the station link connected.  A PAF frame sent
+ * in that window is accepted by the supplicant and then silently dropped, and PAFTP has no
+ * retransmission to recover it.
+ *
+ * After the link comes up the PAF transport is therefore held until the NAN layer is seen
+ * carrying traffic again, or until this timeout expires, whichever happens first.  It is an
+ * upper bound on how long to wait for that evidence. Real world measurements show NAN
+ * activity within 0.01-1.05s.
+ *
+ * The default is roughly twice the slowest recovery observed.  Tune it to suit the radio; a
+ * value of 0 releases the transport after the link comes up.
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_NAN_RECOVERY_TIMEOUT_MS
+#define CHIP_DEVICE_CONFIG_WIFIPAF_NAN_RECOVERY_TIMEOUT_MS 1500
+#endif // CHIP_DEVICE_CONFIG_WIFIPAF_NAN_RECOVERY_TIMEOUT_MS
+
 // ========== Platform-specific Configuration Overrides =========
 
 #ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE

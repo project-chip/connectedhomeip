@@ -850,7 +850,10 @@ struct LwIPEvent;
  * Individual systems may override this size based on their requirements.
  * Data transfers over MRP should not be using this size for allocating
  * buffers as they are restricted by the IPv6 MTU.
+ *
+ * This is set to 64000 bytes (spec-defined MAX_TCP_MESSAGE_SIZE) plus 4 bytes
+ * for the TCP framing message length prefix (kTCPFramingHeaderSize).
  */
 #ifndef CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES
-#define CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES (64000)
+#define CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES (64000 + 4)
 #endif

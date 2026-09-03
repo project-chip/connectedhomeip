@@ -20,7 +20,7 @@ import inspect
 import ipaddress
 import re
 
-from mdns_discovery.mdns_discovery import MdnsServiceType
+from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mobly import asserts
 from mobly.signals import TestFailure
 
@@ -1403,3 +1403,46 @@ def assert_valid_ipv6_addresses(addresses: list[str]) -> None:
 
     if invalid:
         asserts.fail(f"Invalid IPv6 addresses: {invalid}")
+
+
+@not_none_args
+async def assert_txt_record_present(instance_name: str, service_type: MdnsServiceType) -> None:
+    """
+    Verifies that the TXT record for the given instance name and service type
+    is present and contains at least one key/value pair.
+
+    Only call this when the DUT is required to advertise TXT keys (e.g. commissionable,
+    or operational when the DUT is an ICD or claims TCP support); otherwise the
+    record may be legitimately absent.
+
+    Args:
+        instance_name (str): The instance name of the DUT.
+        service_type (MdnsServiceType): The service type identifying the service to query.
+
+    Raises:
+        TestFailure: If the TXT record cannot be retrieved from the DUT, or if
+            it contains no key/value pairs.
+    """
+    instance_qname = f"{instance_name}.{service_type.value}"
+    try:
+        txt_record = await MdnsDiscovery().get_txt_record(
+            service_name=instance_qname,
+            service_type=service_type.value,
+        )
+    except Exception as e:
+        asserts.fail(
+            f"{service_type.name.lower().title()} TXT record expected but not found for instance name '{instance_name}' "
+            f"of type '{service_type}': {e}"
+        )
+
+    asserts.assert_is_not_none(
+        txt_record,
+        f"{service_type.name.lower().title()} TXT record expected but not found for instance name '{instance_name}' "
+        f"of type '{service_type}'"
+    )
+
+    asserts.assert_greater(
+        len(txt_record.txt), 0,
+        f"{service_type.name.lower().title()} TXT record found but contains no key/value pairs for instance name "
+        f"'{instance_name}' of type '{service_type}'"
+    )

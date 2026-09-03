@@ -273,7 +273,7 @@ struct __attribute__((packed)) PyReadAttributeParams
 PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT,
                                                size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT,
                                                chip::python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength,
-                                               bool forceLegacyListEncoding);
+                                               bool forceLegacyListEncoding, bool suppressResponse);
 PyChipError pychip_WriteClient_TestOnlyWriteAttributesWithMismatchedTimedRequestField(
     void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT, bool timedRequestFieldValue,
     size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT, chip::python::PyWriteAttributeData * writeAttributesData,
@@ -404,7 +404,7 @@ void pychip_ReadClient_InitCallbacks(OnReadAttributeDataCallback onReadAttribute
 PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT,
                                                size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT,
                                                python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength,
-                                               bool forceLegacyListEncoding)
+                                               bool forceLegacyListEncoding, bool suppressResponse)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -417,7 +417,7 @@ PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * 
     std::unique_ptr<WriteClientCallback> callback = std::make_unique<WriteClientCallback>(appContext);
     std::unique_ptr<WriteClient> client           = std::make_unique<WriteClient>(
         app::InteractionModelEngine::GetInstance()->GetExchangeManager(), callback->GetChunkedCallback(),
-        timedWriteTimeoutMs != 0 ? Optional<uint16_t>(timedWriteTimeoutMs) : Optional<uint16_t>::Missing());
+        timedWriteTimeoutMs != 0 ? Optional<uint16_t>(timedWriteTimeoutMs) : Optional<uint16_t>::Missing(), suppressResponse);
 
     VerifyOrExit(device != nullptr && device->GetSecureSession().HasValue(), err = CHIP_ERROR_MISSING_SECURE_SESSION);
 

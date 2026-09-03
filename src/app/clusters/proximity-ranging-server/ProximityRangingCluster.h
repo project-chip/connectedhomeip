@@ -28,6 +28,7 @@
 #include <lib/support/BitMask.h>
 #include <lib/support/Span.h>
 #include <lib/support/TimerDelegate.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #include <optional>
 
@@ -126,7 +127,10 @@ private:
 
     // Spec preflight: reject before touching the driver if the requested technology
     // is not in FeatureMap or its matching DeviceRoleConfig field is missing/inconsistent.
-    ResultCodeEnum ValidateStartRangingRequest(const Commands::StartRangingRequest::DecodableType & request) const;
+    // Returns a success ClusterStatusCode when the request passes preflight, or a
+    // cluster-specific failure (a StatusCodeEnum value) identifying the rejection.
+    Protocols::InteractionModel::ClusterStatusCode
+    ValidateStartRangingRequest(const Commands::StartRangingRequest::DecodableType & request) const;
 
     // Members
     ProximityRangingDriver mDriver;

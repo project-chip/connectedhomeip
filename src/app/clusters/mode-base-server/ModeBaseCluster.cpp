@@ -43,10 +43,10 @@ constexpr uint8_t kMaxNumOfModeTags = 8;
 
 } // namespace
 
-ModeBaseCluster::ModeBaseCluster(EndpointId endpointId, ClusterId aClusterId, const Config & config) :
-    DefaultServerCluster({ endpointId, aClusterId }), mFeature(config.feature), mOptionalAttributeSet(config.optionalAttributeSet),
+ModeBaseCluster::ModeBaseCluster(EndpointId endpointId, ModeBase::ClusterEntry cluster, const Config & config) :
+    DefaultServerCluster({ endpointId, cluster.id }), mFeature(config.feature), mOptionalAttributeSet(config.optionalAttributeSet),
     mAppDelegate(config.appDelegate), mOnOffValueForStartUp(config.onOffValueForStartUp),
-    mDiagnosticDataProvider(config.diagnosticDataProvider), mClusterRevision(config.clusterRevision)
+    mDiagnosticDataProvider(config.diagnosticDataProvider), mClusterRevision(cluster.revision)
 {}
 
 CHIP_ERROR ModeBaseCluster::Startup(ServerClusterContext & context)

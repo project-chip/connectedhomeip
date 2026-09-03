@@ -52,7 +52,7 @@ template <typename... T>
 class GroupedCallbackList : protected Cancelable
 {
 public:
-    GroupedCallbackList() = default;
+    GroupedCallbackList() { mNext = mPrev = this; }
     ~GroupedCallbackList() { Clear(); }
 
     GroupedCallbackList(GroupedCallbackList const &)             = delete;
@@ -216,9 +216,9 @@ inline void LinkGroup(Cancelable * prev, Cancelable * cancelable)
 // Does NOT touch the state of adjacent nodes.
 inline Cancelable * ClearCancelable(Cancelable * cancelable)
 {
-    auto * next       = cancelable->mNext;
-    cancelable->mPrev = cancelable->mNext = cancelable;
-    cancelable->mCancel                   = nullptr;
+    auto * next         = cancelable->mNext;
+    cancelable->mCancel = nullptr;
+    cancelable->Invalidate();
     return next;
 }
 

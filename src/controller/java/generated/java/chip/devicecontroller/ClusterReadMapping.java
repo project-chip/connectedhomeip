@@ -17143,6 +17143,17 @@ public class ClusterReadMapping {
           readProximityRangingSessionIDListCommandParams
         );
         result.put("readSessionIDListAttribute", readProximityRangingSessionIDListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readProximityRangingRangingConstraintsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readProximityRangingRangingConstraintsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ProximityRangingCluster) cluster).readRangingConstraintsAttribute(
+              (ChipClusters.ProximityRangingCluster.RangingConstraintsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedProximityRangingClusterRangingConstraintsAttributeCallback(),
+          readProximityRangingRangingConstraintsCommandParams
+        );
+        result.put("readRangingConstraintsAttribute", readProximityRangingRangingConstraintsAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readProximityRangingGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readProximityRangingGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -20489,6 +20500,17 @@ public class ClusterReadMapping {
           readPushAvStreamTransportCurrentConnectionsCommandParams
         );
         result.put("readCurrentConnectionsAttribute", readPushAvStreamTransportCurrentConnectionsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readPushAvStreamTransportMaxZonesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readPushAvStreamTransportMaxZonesAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.PushAvStreamTransportCluster) cluster).readMaxZonesAttribute(
+              (ChipClusters.PushAvStreamTransportCluster.MaxZonesAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedPushAvStreamTransportClusterMaxZonesAttributeCallback(),
+          readPushAvStreamTransportMaxZonesCommandParams
+        );
+        result.put("readMaxZonesAttribute", readPushAvStreamTransportMaxZonesAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readPushAvStreamTransportGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readPushAvStreamTransportGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

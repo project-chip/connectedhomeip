@@ -23,9 +23,9 @@
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/opstate_2_5_fifo
+#     app-ready-pattern: "APP STATUS: Starting event loop"
 #     script-args: >
 #       --endpoint 1
-#       --int-arg PIXIT.WAITTIME.REBOOT:5
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
@@ -48,6 +48,10 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_OPSTATE_2_5(MatterBaseTest, TC_OPSTATE_BASE):
+    # This test reboots the DUT (step 15). Disable the background wildcard subscription
+    # so reads after the reboot are not cross-checked against a now-stale subscription cache.
+    disable_wildcard_subscription = True
+
     def __init__(self, *args):
         super().__init__(*args)
 

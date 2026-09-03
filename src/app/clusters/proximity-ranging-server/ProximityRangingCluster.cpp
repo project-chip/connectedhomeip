@@ -31,7 +31,8 @@ namespace app {
 namespace Clusters {
 namespace ProximityRanging {
 
-using Status = Protocols::InteractionModel::Status;
+using Status            = Protocols::InteractionModel::Status;
+using ClusterStatusCode = Protocols::InteractionModel::ClusterStatusCode;
 
 namespace {
 static constexpr uint8_t kInvalidSessionId = 0;
@@ -182,26 +183,22 @@ ProximityRangingCluster::HandleStartRangingRequest(const DataModel::InvokeReques
     Commands::StartRangingRequest::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(reader));
 
-    Commands::StartRangingResponse::Type response;
-    response.resultCode = ValidateStartRangingRequest(commandData);
-    response.sessionID.SetNull();
-    if (response.resultCode == ResultCodeEnum::kAccepted)
-    {
-        uint8_t sessionId = GenerateSessionId();
-        if (sessionId == kInvalidSessionId)
-        {
-            response.resultCode = ResultCodeEnum::kBusySessionCapacityReached;
-        }
-        else
-        {
-            response.resultCode = mDriver.HandleStartRanging(sessionId, commandData);
-            if (response.resultCode == ResultCodeEnum::kAccepted)
-            {
-                response.sessionID.SetNonNull(sessionId);
-            }
-        }
-    }
+    // StartRangingResponse is sent only when request is successful; any rejection is returned
+    // as the command's status code (cluster-specific StatusCodeEnum value) and included in the
+    // DefaultFailureResponse
+    ClusterStatusCode validation = ValidateStartRangingRequest(commandData);
+    VerifyOrReturnValue(validation.IsSuccess(), DataModel::ActionReturnStatus(validation));
 
+    uint8_t sessionId = GenerateSessionId();
+    VerifyOrReturnValue(
+        sessionId != kInvalidSessionId,
+        DataModel::ActionReturnStatus(ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kBusySessionCapacityReached)));
+
+    ClusterStatusCode startStatus = mDriver.HandleStartRanging(sessionId, commandData);
+    VerifyOrReturnValue(startStatus.IsSuccess(), DataModel::ActionReturnStatus(startStatus));
+
+    Commands::StartRangingResponse::Type response;
+    response.sessionID = sessionId;
     handler->AddResponse(request.path, response);
     return std::nullopt;
 }
@@ -241,9 +238,14 @@ void ProximityRangingCluster::OnSessionStopped(uint8_t sessionId, RangingSession
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
-ResultCodeEnum
+ClusterStatusCode
 ProximityRangingCluster::ValidateStartRangingRequest(const Commands::StartRangingRequest::DecodableType & request) const
 {
+    const ClusterStatusCode kInfeasibleRanging =
+        ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kRejectedInfeasibleRanging);
+    const ClusterStatusCode kInfeasibleTriggers =
+        ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kRejectedInfeasibleRangingTriggers);
+
     const bool hasWiFi = request.wiFiRangingDeviceRoleConfig.HasValue();
     const bool hasBle  = request.BLERangingDeviceRoleConfig.HasValue();
     const bool hasBlt  = request.BLTChannelSoundingDeviceRoleConfig.HasValue();
@@ -253,12 +255,12 @@ ProximityRangingCluster::ValidateStartRangingRequest(const Commands::StartRangin
     case RangingTechEnum::kBluetoothChannelSounding: {
         if (!mFeatureMap.Has(Feature::kBluetoothChannelSounding) || !hasBlt || hasWiFi || hasBle)
         {
-            return ResultCodeEnum::kRejectedInfeasibleRanging;
+            return kInfeasibleRanging;
         }
         auto role = request.BLTChannelSoundingDeviceRoleConfig.Value().role;
         if (role != RangingRoleEnum::kBLTInitiatorRole && role != RangingRoleEnum::kBLTReflectorRole)
         {
-            return ResultCodeEnum::kRejectedInfeasibleRanging;
+            return kInfeasibleRanging;
         }
         break;
     }
@@ -266,38 +268,38 @@ ProximityRangingCluster::ValidateStartRangingRequest(const Commands::StartRangin
     case RangingTechEnum::kWiFiNextGenerationRanging: {
         if (!mFeatureMap.Has(Feature::kWiFiUsdProximityDetection) || !hasWiFi || hasBle || hasBlt)
         {
-            return ResultCodeEnum::kRejectedInfeasibleRanging;
+            return kInfeasibleRanging;
         }
         auto role = request.wiFiRangingDeviceRoleConfig.Value().role;
         if (role != RangingRoleEnum::kWiFiSubscriberRole && role != RangingRoleEnum::kWiFiPublisherRole)
         {
-            return ResultCodeEnum::kRejectedInfeasibleRanging;
+            return kInfeasibleRanging;
         }
         break;
     }
     case RangingTechEnum::kBLEBeaconRSSIRanging: {
         if (!mFeatureMap.Has(Feature::kBleBeaconRssi) || !hasBle || hasWiFi || hasBlt)
         {
-            return ResultCodeEnum::kRejectedInfeasibleRanging;
+            return kInfeasibleRanging;
         }
         auto role = request.BLERangingDeviceRoleConfig.Value().role;
         if (role != RangingRoleEnum::kBLEScanningRole && role != RangingRoleEnum::kBLEBeaconRole)
         {
-            return ResultCodeEnum::kRejectedInfeasibleRanging;
+            return kInfeasibleRanging;
         }
         break;
     }
     default:
-        return ResultCodeEnum::kRejectedInfeasibleRanging;
+        return kInfeasibleRanging;
     }
 
     if (request.trigger.endTime <= request.trigger.startTime)
     {
-        return ResultCodeEnum::kRejectedInfeasibleRangingTriggers;
+        return kInfeasibleTriggers;
     }
     if (request.trigger.rangingInstanceInterval.HasValue() && request.trigger.rangingInstanceInterval.Value() == 0)
     {
-        return ResultCodeEnum::kRejectedInfeasibleRangingTriggers;
+        return kInfeasibleTriggers;
     }
 
     if (request.reportingCondition.HasValue())
@@ -305,20 +307,20 @@ ProximityRangingCluster::ValidateStartRangingRequest(const Commands::StartRangin
         const auto & rc = request.reportingCondition.Value();
         if (rc.minDistanceCondition.HasValue() && rc.minDistanceCondition.Value() == 0)
         {
-            return ResultCodeEnum::kRejectedInfeasibleRanging;
+            return kInfeasibleRanging;
         }
         if (rc.maxDistanceCondition.HasValue() && rc.maxDistanceCondition.Value() == 0)
         {
-            return ResultCodeEnum::kRejectedInfeasibleRanging;
+            return kInfeasibleRanging;
         }
         if (rc.minDistanceCondition.HasValue() && rc.maxDistanceCondition.HasValue() &&
             rc.minDistanceCondition.Value() > rc.maxDistanceCondition.Value())
         {
-            return ResultCodeEnum::kRejectedInfeasibleRanging;
+            return kInfeasibleRanging;
         }
     }
 
-    return ResultCodeEnum::kAccepted;
+    return ClusterStatusCode(Status::Success);
 }
 
 uint8_t ProximityRangingCluster::GenerateSessionId()

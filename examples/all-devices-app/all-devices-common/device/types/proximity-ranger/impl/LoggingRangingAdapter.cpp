@@ -318,8 +318,8 @@ LoggingRangingAdapter::~LoggingRangingAdapter()
 // the cluster server has accepted a StartRangingRequest command. The adapter
 // must:
 //   - Determine whether the request is compatible with what the radio can do
-//     and synchronously return kRejectedInfeasibleRanging (or an
-//     adapter-specific ResultCodeEnum) when it is not. Capability checks
+//     and synchronously return a cluster-specific failure ClusterStatusCode
+//     (e.g. StatusCodeEnum::kRejectedInfeasibleRanging) when it is not. Capability checks
 //     belong to the adapter, not the cluster, because only the adapter knows
 //     the radio's true capabilities.
 //   - Stage all per-session bookkeeping needed for the eventual StartSession
@@ -338,10 +338,11 @@ LoggingRangingAdapter::~LoggingRangingAdapter()
 // REAL ADAPTER: most of this function would translate `params` into the
 // radio driver's session-staging API (allocate a session handle, configure
 // the scan filter / publisher / CS engine without yet starting it, ...).
-// Asynchronous validation that requires talking to the radio MAY return
-// kAccepted here and reject in StartSession or via OnRangingSessionStopped,
+// Asynchronous validation that requires talking to the radio MAY return a
+// success status here and reject in StartSession or via OnRangingSessionStopped,
 // but doing the work synchronously is preferred where the radio supports it.
-ResultCodeEnum LoggingRangingAdapter::PrepareSession(uint8_t sessionId, const StartSessionParams & params)
+Protocols::InteractionModel::ClusterStatusCode LoggingRangingAdapter::PrepareSession(uint8_t sessionId,
+                                                                                     const StartSessionParams & params)
 {
     ChipLogProgress(AppServer, "[LoggingRangingAdapter:%s] PrepareSession id=%u tech=%s", LogTag(), sessionId,
                     TechName(params.technology));
@@ -351,7 +352,7 @@ ResultCodeEnum LoggingRangingAdapter::PrepareSession(uint8_t sessionId, const St
         [[maybe_unused]] const auto & cfg = *params.wifiRoleConfig;
         ChipLogProgress(AppServer, "[LoggingRangingAdapter:%s]   WiFiRoleConfig role=%s peerWiFiDevIK.size=%u pmk=%s", LogTag(),
                         RoleName(cfg.role), static_cast<unsigned>(cfg.peerWiFiDevIK.size()),
-                        cfg.pmk.HasValue() ? "present" : "absent");
+                        !cfg.pmk.empty() ? "present" : "absent");
     }
     if (params.bleRoleConfig.has_value())
     {
@@ -366,8 +367,9 @@ ResultCodeEnum LoggingRangingAdapter::PrepareSession(uint8_t sessionId, const St
                         "[LoggingRangingAdapter:%s]   BLTRoleConfig role=%s peerBLTDevIK.size=%u "
                         "BLTCSMode=%s BLTCSSecurityLevel=%s ltk=%s",
                         LogTag(), RoleName(cfg.role), static_cast<unsigned>(cfg.peerBLTDevIK.size()),
-                        cfg.BLTCSMode.HasValue() ? "present" : "absent", cfg.BLTCSSecurityLevel.HasValue() ? "present" : "absent",
-                        cfg.ltk.HasValue() ? "present" : "absent");
+                        cfg.BLTCSMode.HasValue() ? "present" : "absent",
+                        cfg.BLTCSSecurityLevel != BLTCSSecurityLevelEnum::kBLTCSSecurityLevelUnknown ? "present" : "absent",
+                        !cfg.ltk.empty() ? "present" : "absent");
     }
 
     // REAL ADAPTER: a hardware adapter should reject here on conditions its
@@ -432,7 +434,7 @@ ResultCodeEnum LoggingRangingAdapter::PrepareSession(uint8_t sessionId, const St
     }
 
     mSessions.push_back(std::move(session));
-    return ResultCodeEnum::kAccepted;
+    return Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::Success);
 }
 
 // StartSession triggers a single ranging instance. The driver invokes this

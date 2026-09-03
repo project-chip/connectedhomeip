@@ -66,7 +66,7 @@ TEST_F(TestEnergyEvseCluster, TestFeatures)
         // ChargingPreferences feature is mandatory
         BitMask<Feature> minimumFeatures(Feature::kChargingPreferences);
         BitMask<OptionalAttributes> optionalAttributes;
-        BitMask<OptionalCommands> optionalCommands;
+        EnergyEvseCluster::OptionalCommandSet optionalCommands;
 
         EnergyEvseCluster cluster(
             EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, minimumFeatures, optionalAttributes, optionalCommands));
@@ -116,7 +116,7 @@ TEST_F(TestEnergyEvseCluster, TestFeatures)
     {
         BitMask<Feature> allFeatures(Feature::kChargingPreferences, Feature::kV2x, Feature::kSoCReporting, Feature::kPlugAndCharge);
         BitMask<OptionalAttributes> optionalAttributes;
-        BitMask<OptionalCommands> optionalCommands;
+        EnergyEvseCluster::OptionalCommandSet optionalCommands;
 
         EnergyEvseCluster cluster(
             EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, allFeatures, optionalAttributes, optionalCommands));
@@ -178,7 +178,8 @@ TEST_F(TestEnergyEvseCluster, TestFeatures)
         BitMask<OptionalAttributes> optionalAttributes(OptionalAttributes::kSupportsUserMaximumChargingCurrent,
                                                        OptionalAttributes::kSupportsRandomizationWindow,
                                                        OptionalAttributes::kSupportsApproximateEvEfficiency);
-        BitMask<OptionalCommands> optionalCommands(OptionalCommands::kSupportsStartDiagnostics);
+        EnergyEvseCluster::OptionalCommandSet optionalCommands =
+            EnergyEvseCluster::OptionalCommandSet().Set<Commands::StartDiagnostics::Id>();
 
         EnergyEvseCluster cluster(
             EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, allFeatures, optionalAttributes, optionalCommands));
@@ -250,7 +251,7 @@ TEST_F(TestEnergyEvseCluster, TestStartupFailsWithMismatchedEndpointId)
     MockEvseDelegate mockDelegate;
     BitMask<Feature> noFeatures;
     BitMask<OptionalAttributes> optionalAttributes;
-    BitMask<OptionalCommands> optionalCommands;
+    EnergyEvseCluster::OptionalCommandSet optionalCommands;
 
     constexpr EndpointId kClusterEndpointId  = 1;
     constexpr EndpointId kDelegateEndpointId = 2;
@@ -273,7 +274,7 @@ TEST_F(TestEnergyEvseCluster, TestStartupSucceedsWithMatchingEndpointId)
     MockEvseDelegate mockDelegate;
     BitMask<Feature> noFeatures;
     BitMask<OptionalAttributes> optionalAttributes;
-    BitMask<OptionalCommands> optionalCommands;
+    EnergyEvseCluster::OptionalCommandSet optionalCommands;
     constexpr EndpointId kEndpointId = 1;
 
     // Create cluster with endpoint ID
@@ -301,7 +302,7 @@ TEST_F(TestEnergyEvseCluster, TestAttributesMinimalConfig)
     MockEvseDelegate mockDelegate;
     BitMask<Feature> noFeatures;
     BitMask<OptionalAttributes> optionalAttributes;
-    BitMask<OptionalCommands> optionalCommands;
+    EnergyEvseCluster::OptionalCommandSet optionalCommands;
 
     EnergyEvseCluster cluster(
         EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, noFeatures, optionalAttributes, optionalCommands));
@@ -378,7 +379,7 @@ TEST_F(TestEnergyEvseCluster, TestAttributesFullConfig)
     BitMask<OptionalAttributes> optionalAttributes(OptionalAttributes::kSupportsUserMaximumChargingCurrent,
                                                    OptionalAttributes::kSupportsRandomizationWindow,
                                                    OptionalAttributes::kSupportsApproximateEvEfficiency);
-    BitMask<OptionalCommands> optionalCommands;
+    EnergyEvseCluster::OptionalCommandSet optionalCommands;
 
     EnergyEvseCluster cluster(
         EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, allFeatures, optionalAttributes, optionalCommands));
@@ -499,7 +500,7 @@ TEST_F(TestEnergyEvseCluster, TestWriteAttributes)
     BitMask<OptionalAttributes> optionalAttributes(OptionalAttributes::kSupportsUserMaximumChargingCurrent,
                                                    OptionalAttributes::kSupportsRandomizationWindow,
                                                    OptionalAttributes::kSupportsApproximateEvEfficiency);
-    BitMask<OptionalCommands> optionalCommands;
+    EnergyEvseCluster::OptionalCommandSet optionalCommands;
 
     EnergyEvseCluster cluster(
         EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, allFeatures, optionalAttributes, optionalCommands));
@@ -559,7 +560,7 @@ TEST_F(TestEnergyEvseCluster, TestWriteAttributesNotifiesChange)
     BitMask<OptionalAttributes> optionalAttributes(OptionalAttributes::kSupportsUserMaximumChargingCurrent,
                                                    OptionalAttributes::kSupportsRandomizationWindow,
                                                    OptionalAttributes::kSupportsApproximateEvEfficiency);
-    BitMask<OptionalCommands> optionalCommands;
+    EnergyEvseCluster::OptionalCommandSet optionalCommands;
 
     EnergyEvseCluster cluster(
         EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, allFeatures, optionalAttributes, optionalCommands));
@@ -607,7 +608,7 @@ TEST_F(TestEnergyEvseCluster, TestWriteReadOnlyAttributesFails)
     BitMask<OptionalAttributes> optionalAttributes(OptionalAttributes::kSupportsUserMaximumChargingCurrent,
                                                    OptionalAttributes::kSupportsRandomizationWindow,
                                                    OptionalAttributes::kSupportsApproximateEvEfficiency);
-    BitMask<OptionalCommands> optionalCommands;
+    EnergyEvseCluster::OptionalCommandSet optionalCommands;
 
     EnergyEvseCluster cluster(
         EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, allFeatures, optionalAttributes, optionalCommands));
@@ -672,7 +673,7 @@ TEST_F(TestEnergyEvseCluster, TestProgrammaticSetAttributes)
     BitMask<OptionalAttributes> optionalAttributes(OptionalAttributes::kSupportsUserMaximumChargingCurrent,
                                                    OptionalAttributes::kSupportsRandomizationWindow,
                                                    OptionalAttributes::kSupportsApproximateEvEfficiency);
-    BitMask<OptionalCommands> optionalCommands;
+    EnergyEvseCluster::OptionalCommandSet optionalCommands;
 
     EnergyEvseCluster cluster(
         EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, allFeatures, optionalAttributes, optionalCommands));
@@ -775,7 +776,7 @@ TEST_F(TestEnergyEvseCluster, TestProgrammaticSetNoOpWhenSameValue)
     MockEvseDelegate mockDelegate;
     BitMask<Feature> allFeatures(Feature::kChargingPreferences, Feature::kV2x, Feature::kSoCReporting, Feature::kPlugAndCharge);
     BitMask<OptionalAttributes> optionalAttributes;
-    BitMask<OptionalCommands> optionalCommands;
+    EnergyEvseCluster::OptionalCommandSet optionalCommands;
 
     EnergyEvseCluster cluster(
         EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, allFeatures, optionalAttributes, optionalCommands));
@@ -844,7 +845,7 @@ TEST_F(TestEnergyEvseCluster, TestDisable)
     MockEvseDelegate mockDelegate;
     BitMask<Feature> noFeatures;
     BitMask<OptionalAttributes> optionalAttributes;
-    BitMask<OptionalCommands> optionalCommands;
+    EnergyEvseCluster::OptionalCommandSet optionalCommands;
 
     EnergyEvseCluster cluster(
         EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, noFeatures, optionalAttributes, optionalCommands));
@@ -872,7 +873,7 @@ TEST_F(TestEnergyEvseCluster, TestEnableCharging)
     MockEvseDelegate mockDelegate;
     BitMask<Feature> noFeatures;
     BitMask<OptionalAttributes> optionalAttributes;
-    BitMask<OptionalCommands> optionalCommands;
+    EnergyEvseCluster::OptionalCommandSet optionalCommands;
 
     EnergyEvseCluster cluster(
         EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, noFeatures, optionalAttributes, optionalCommands));
@@ -973,7 +974,7 @@ TEST_F(TestEnergyEvseCluster, TestEnableDischarging)
     MockEvseDelegate mockDelegate;
     BitMask<Feature> features(Feature::kV2x); // V2x feature enables discharging
     BitMask<OptionalAttributes> optionalAttributes;
-    BitMask<OptionalCommands> optionalCommands;
+    EnergyEvseCluster::OptionalCommandSet optionalCommands;
 
     EnergyEvseCluster cluster(
         EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, features, optionalAttributes, optionalCommands));
@@ -1059,7 +1060,8 @@ TEST_F(TestEnergyEvseCluster, TestStartDiagnostics)
     BitMask<OptionalAttributes> optionalAttributes;
     // Test with command supported
     {
-        BitMask<OptionalCommands> optionalCommands(OptionalCommands::kSupportsStartDiagnostics);
+        EnergyEvseCluster::OptionalCommandSet optionalCommands =
+            EnergyEvseCluster::OptionalCommandSet().Set<Commands::StartDiagnostics::Id>();
         EnergyEvseCluster cluster(
             EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, noFeatures, optionalAttributes, optionalCommands));
         mockDelegate.SetCluster(cluster);
@@ -1082,7 +1084,7 @@ TEST_F(TestEnergyEvseCluster, TestStartDiagnostics)
     }
     // Test with command not supported
     {
-        BitMask<OptionalCommands> optionalCommands;
+        EnergyEvseCluster::OptionalCommandSet optionalCommands;
         EnergyEvseCluster cluster(
             EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, noFeatures, optionalAttributes, optionalCommands));
         mockDelegate.SetCluster(cluster);
@@ -1111,7 +1113,7 @@ TEST_F(TestEnergyEvseCluster, TestTargetsCommands)
     // SoCReporting feature requires TargetSoC to be present
     BitMask<Feature> features(Feature::kChargingPreferences, Feature::kSoCReporting);
     BitMask<OptionalAttributes> optionalAttributes;
-    BitMask<OptionalCommands> optionalCommands;
+    EnergyEvseCluster::OptionalCommandSet optionalCommands;
 
     EnergyEvseCluster cluster(
         EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, features, optionalAttributes, optionalCommands));
