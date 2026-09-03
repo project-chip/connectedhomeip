@@ -208,7 +208,7 @@ void SimulatedWindowCovering::TimerFired()
         }
 
         cluster.SetCurrentPositionLiftPercent100ths(DataModel::Nullable<Percent100ths>(currentVal));
-        BitMask<OperationalStatus> opStatus = cluster.GetOperationalStatus();
+        [[maybe_unused]] BitMask<OperationalStatus> opStatus = cluster.GetOperationalStatus();
         ChipLogProgress(DeviceLayer,
                         "WindowCovering: Simulating Lift -> %" PRIu16 " / Target %" PRIu16
                         " | OpStatus raw=0x%02X (global=%u, lift=%u)",
@@ -250,7 +250,7 @@ void SimulatedWindowCovering::TimerFired()
         }
 
         cluster.SetCurrentPositionTiltPercent100ths(DataModel::Nullable<Percent100ths>(currentVal));
-        BitMask<OperationalStatus> opStatus = cluster.GetOperationalStatus();
+        [[maybe_unused]] BitMask<OperationalStatus> opStatus = cluster.GetOperationalStatus();
         ChipLogProgress(DeviceLayer,
                         "WindowCovering: Simulating Tilt -> %" PRIu16 " / Target %" PRIu16
                         " | OpStatus raw=0x%02X (global=%u, tilt=%u)",
