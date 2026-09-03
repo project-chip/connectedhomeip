@@ -991,11 +991,11 @@ void ApplicationInit()
     gComposedTempMeasurement2 =
         std::make_unique<TempMeasurementAttrAccess>(ComposedTempSensor2.GetEndpointId(), &ComposedTempSensor2);
 
-    AttributeAccessInterfaceRegistry::Instance().Register(gTempMeasurement1.get());
-    AttributeAccessInterfaceRegistry::Instance().Register(gTempMeasurement2.get());
-    AttributeAccessInterfaceRegistry::Instance().Register(gComposedTempMeasurement1.get());
-    AttributeAccessInterfaceRegistry::Instance().Register(gComposedTempMeasurement2.get());
-    AttributeAccessInterfaceRegistry::Instance().Register(&gPowerAttrAccess);
+    VerifyOrDie(AttributeAccessInterfaceRegistry::Instance().Register(gTempMeasurement1.get()));
+    VerifyOrDie(AttributeAccessInterfaceRegistry::Instance().Register(gTempMeasurement2.get()));
+    VerifyOrDie(AttributeAccessInterfaceRegistry::Instance().Register(gComposedTempMeasurement1.get()));
+    VerifyOrDie(AttributeAccessInterfaceRegistry::Instance().Register(gComposedTempMeasurement2.get()));
+    VerifyOrDie(AttributeAccessInterfaceRegistry::Instance().Register(&gPowerAttrAccess));
 }
 
 void ApplicationShutdown() {}
