@@ -257,8 +257,7 @@ class CASEHandshakeMetrics:
 
     @property
     def total_case_handshake_duration_ms(self) -> float | None:
-        """Everything observed, from the first mark to the last: discovery start through to
-        the StatusReport closing Sigma3.
+        """Everything observed, from the first mark to the last.
 
         Wider than the three phases summed, because it also covers the gap between
         discovery finishing and Sigma1 going out, and this node's own Sigma2 verification
@@ -267,9 +266,19 @@ class CASEHandshakeMetrics:
         Falls back to starting at Sigma1 when no discovery ran, so it always reports
         whatever was actually measured. Runs a few milliseconds short of the wall clock
         around GetConnectedDevice, which additionally covers session setup before the
-        lookup and session activation after the handshake."""
+        lookup and session activation after the handshake.
+
+        None when the peer never answered, since there is then nothing to measure to."""
         start = self.discovery_started_timestamp_us if self.discovery_started_timestamp_us is not None else self.sigma1_sent_timestamp_us
-        return self._duration_between_ms(start, self.status_report_received_timestamp_us)
+        # The last mark, whichever way the handshake went: the StatusReport closing Sigma3 on a
+        # full one, Sigma2_Resume on a resumed one, or wherever a rejected one stopped. Sigma1 is
+        # left out on purpose, so a handshake that got no reply at all measures nothing rather
+        # than reporting zero. Timestamps are monotonic, so the largest is the latest.
+        marks_after_sigma1 = [timestamp for timestamp in (
+            self.sigma2_received_timestamp_us, self.sigma3_sent_timestamp_us,
+            self.sigma2_resume_received_timestamp_us, self.status_report_received_timestamp_us)
+            if timestamp is not None]
+        return self._duration_between_ms(start, max(marks_after_sigma1) if marks_after_sigma1 else None)
 
     @property
     def used_session_resumption(self) -> bool:
@@ -322,12 +331,16 @@ class CASEHandshakeMetrics:
         """True when something went wrong during the exchange.
 
         Covers all three observable failures: this node rejected the peer, the peer
-        rejected this node, or the handshake started and never finished. A resumed
-        handshake is a legitimate outcome and does not count."""
-        if self.used_session_resumption:
-            return False
+        rejected this node, or the handshake started and never finished. A resumption that
+        went through is a legitimate outcome and does not count, but one this node turned
+        down does."""
+        # Asked before resumption, not after. Sigma2_Resume is observed before its MIC has been
+        # checked, so a resumption that failed validation carries the resumption flag too; taking
+        # the flag as proof of a good outcome would report that failure as a success.
         if self.this_node_rejected_peer:
             return True
+        if self.used_session_resumption:
+            return False
         if not self.all_messages_exchanged:
             return True
         # Completed, so the remaining question is whether the peer accepted Sigma3. Anything
@@ -356,7 +369,28 @@ def _GetNotificationLibraryHandle() -> ctypes.CDLL:
                     ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_uint32)])
         setter.Set('pychip_case_handshake_metrics_get_abandoned_count', PyChipError,
                    [ctypes.POINTER(ctypes.c_uint32)])
+        setter.Set('pychip_case_handshake_metrics_get_record_size', PyChipError,
+                   [ctypes.POINTER(ctypes.c_uint32)])
+        _CheckRecordLayoutMatchesNative(handle)
     return handle
+
+
+def _CheckRecordLayoutMatchesNative(handle: ctypes.CDLL) -> None:
+    """Prove the mirror below still describes the C struct, before anything is read through it.
+
+    PyCASEHandshakeMetricsRecord is a hand-written copy of a struct that lives in another file and
+    another language. Nothing makes them change together, and a mismatch does not fail loudly: the
+    fields simply come back holding parts of their neighbours. Comparing the two sizes catches a
+    field added, removed, resized or reordered, which is every way the two have to drift.
+    """
+    native_size = ctypes.c_uint32(0)
+    handle.pychip_case_handshake_metrics_get_record_size(ctypes.byref(native_size)).raise_on_error()
+    mirror_size = ctypes.sizeof(PyCASEHandshakeMetricsRecord)
+    if native_size.value != mirror_size:
+        raise RuntimeError(
+            f"CASE handshake metrics record layout has drifted: the C struct is {native_size.value} bytes "
+            f"but the ctypes mirror in {__name__} is {mirror_size}. Bring PyCASEHandshakeMetricsRecord "
+            "back into line with PychipCASEHandshakeMetricsRecord in CASEHandshakeMetrics.h.")
 
 
 def StartCASEHandshakeNotifications(notification_queue_depth: int = NOTIFICATION_QUEUE_DEPTH_NATIVE_DEFAULT) -> None:
@@ -460,6 +494,10 @@ class _RegisteredListener:
         self.dropped = 0
         self.worker: threading.Thread | None = None
         self.active = True
+        # Whether this listener already has a place in the shared scheduler queue. Guarded by the
+        # registry lock, so scheduling it a second time while it is still waiting is impossible.
+        # Only meaningful for shared listeners; one with its own thread is never scheduled.
+        self.scheduled = False
 
     def release_worker(self) -> None:
         """Wake this listener's worker so it can exit, even when its queue is full.
@@ -601,6 +639,12 @@ class _ListenerRegistry:
         with self._lock:
             if not self._running:
                 return
+            # The caller decided to stop because it removed the last listener, but it had to let
+            # the lock go to get here, and a registration can land in that gap. Stopping then
+            # would leave that listener registered and never called, with nothing to switch
+            # delivery back on, so the emptiness is confirmed here rather than taken on trust.
+            if self._listeners:
+                return
             self._running = False
             delivery_thread, shared_worker = self._delivery_thread, self._shared_worker
             self._delivery_thread = self._shared_worker = None
@@ -629,6 +673,13 @@ class _ListenerRegistry:
             metrics = _WaitForCompletedCASEHandshake(_DELIVERY_WAIT_MS)
             if metrics is None:
                 continue
+            # One immutable metrics object, handed to every listener by reference. Queueing never
+            # blocks, so a slow listener cannot hold up the others or the next handshake.
+            #
+            # Done under the lock, which the handover needs anyway: it is what lets a shared
+            # listener be given a place in the scheduler queue only when it does not already hold
+            # one. Cheap either way, since no listener runs here.
+            to_schedule = []
             with self._lock:
                 # Asked again, and in the same breath as reading the listeners. The lock is let
                 # go across the wait above, so a stop and a fresh start can both land while this
@@ -636,16 +687,25 @@ class _ListenerRegistry:
                 # record to the next run's listeners, which registered after it was captured.
                 if not self._running or self._run_counter != run:
                     return
-                targets = [r for r in self._listeners.values() if r.active]
-            # One immutable metrics object, shared by reference. Offering never blocks, so a
-            # slow listener cannot hold up the others or the next handshake.
-            for registered in targets:
-                registered.enqueue_notification(metrics)
-                if registered.shared:
-                    shared_delivery_queue.put(registered)
+                for registered in self._listeners.values():
+                    if not registered.active:
+                        continue
+                    registered.enqueue_notification(metrics)
+                    if registered.shared and not registered.scheduled:
+                        registered.scheduled = True
+                        to_schedule.append(registered)
+            for registered in to_schedule:
+                shared_delivery_queue.put(registered)
 
     def _deliver_on_shared_thread(self, shared_delivery_queue: queue.Queue) -> None:
-        """Runs the cheap listeners in turn on one thread."""
+        """Runs the cheap listeners in turn on one thread.
+
+        One notification per turn, then the listener goes to the back of the queue if it still has
+        any waiting. That keeps the listeners taking turns however far one of them falls behind,
+        and it keeps this queue to at most one entry per shared listener: without that, an entry
+        per notification would pile up unboundedly behind a listener that had stopped draining,
+        including entries for notifications its own bounded queue had already dropped.
+        """
         while True:
             registered = shared_delivery_queue.get()
             if registered is None:
@@ -653,9 +713,17 @@ class _ListenerRegistry:
             try:
                 metrics = registered.pending_notifications.get_nowait()
             except queue.Empty:
-                continue
+                metrics = None
             if metrics is not None and registered.active:
                 registered.invoke_listener(metrics)
+            # Giving up the place and testing for more work happen together under the lock the
+            # dispatcher also takes, so a notification arriving now either sees the place still
+            # held, and is picked up by the test below, or takes a fresh place for itself.
+            with self._lock:
+                if registered.pending_notifications.empty():
+                    registered.scheduled = False
+                else:
+                    shared_delivery_queue.put(registered)
 
     def _deliver_on_dedicated_thread(self, registered: _RegisteredListener) -> None:
         """Runs one slow listener on a thread of its own, isolated from the rest."""
