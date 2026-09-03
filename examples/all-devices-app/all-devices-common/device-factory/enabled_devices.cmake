@@ -119,7 +119,6 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/fan-load/impl/LoggingFanLoad.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/on-off-load/OnOffLoad.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/on-off-load/impl/LoggingOnOffLoad.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/operational-state/impl/LoggingOperationalStateDelegate.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/api/allocator/DynamicEndpointIdAllocator.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/api/Interface.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/api/SingleEndpoint.cpp"

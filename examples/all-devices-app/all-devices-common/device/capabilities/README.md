@@ -18,8 +18,6 @@ For example:
     and Groups cluster behaviors.
 -   **`fan-load`** (`FanLoad`): Encapsulates shared fan control logic.
 -   **`on-off-load`** (`OnOffLoad`): Encapsulates basic on/off cluster behavior.
--   **`operational-state`**: Implements reusable logging delegates for
-    operational state clusters.
 
 ## Design Rules
 
