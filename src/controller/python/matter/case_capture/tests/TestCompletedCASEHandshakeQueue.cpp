@@ -84,7 +84,8 @@ TEST_F(TestCompletedCASEHandshakeQueue, RecordsComeBackInTheOrderPublished)
     mQueue.Publish(RecordFor(2));
     mQueue.Publish(RecordFor(3));
 
-    for (uint16_t expected : { 1, 2, 3 })
+    constexpr uint16_t kPublishedOrder[] = { 1, 2, 3 };
+    for (uint16_t expected : kPublishedOrder)
     {
         PychipCASEHandshakeMetricsRecord out{};
         uint32_t dropped = 0;
