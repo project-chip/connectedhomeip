@@ -81,6 +81,30 @@ static ProxyScanForwarder * sProxyScanForwarder = nullptr;
 // cache the background-scan registry has just cleared.
 static uint32_t sProxyScanGeneration = 0;
 
+// A device is re-reported on every RSSI change, so one device in range costs a report per
+// advertisement. Only the background scan needs the repeats, to reset a cached result's
+// timer; a device's first report is never suppressed.
+//
+// The bound is the 1 second minimum CacheTimeout. A repeat waits for the first
+// advertisement after the interval, so a device advertising just under it refreshes at
+// twice the interval - which has to stay inside that second.
+constexpr System::Clock::Timeout kProxyScanCoalesceInterval = System::Clock::Milliseconds32(400);
+
+// One slot per device the proxy can hold a result for.
+constexpr size_t kProxyScanCoalesceSlots = CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS;
+
+// Ordered and sized to pack: a 32-bit stamp first leaves no padding, and 3 x uint16 plus
+// the flag fill the rest. Milliseconds64 would cost 13 bytes of padding out of 24.
+struct ProxyScanReportRecord
+{
+    System::Clock::Milliseconds32 lastReported;
+    uint16_t discriminator;
+    uint16_t vendorId;
+    uint16_t productId;
+    bool inUse;
+};
+static_assert(sizeof(ProxyScanReportRecord) == 12, "ProxyScanReportRecord has grown padding");
+
 // Work item carried from the GLib scan thread onto the Matter event loop.
 struct ProxyScanWorkCtx
 {
@@ -129,6 +153,10 @@ public:
             ChipLogDetail(DeviceLayer, "ProxyScanForwarder: malformed BD_ADDR '%s', skipping", addrStr);
             return;
         }
+
+        // Drop a repeat before it costs an allocation and a work item.
+        VerifyOrReturn(ShouldForward(info));
+
         // Schedule the callback onto the Matter event loop so the consumer can
         // safely touch SystemLayer timers and the data model.  Dispatching via
         // ScheduleWork avoids acquiring the CHIP stack lock from this GLib
@@ -159,11 +187,61 @@ public:
     void OnScanComplete() override {}
     void OnScanError(CHIP_ERROR) override {}
 
+    ~ProxyScanForwarder() override
+    {
+        // One line per scan, rather than one per report.
+        ChipLogDetail(DeviceLayer, "ProxyScanForwarder: scan %u forwarded %u report(s), coalesced %u", mGeneration, mForwarded,
+                      mCoalesced);
+    }
+
 private:
+    /// False when this device was already forwarded inside kProxyScanCoalesceInterval.
+    /// Called only from OnDeviceScanned, so the records need no locking.
+    bool ShouldForward(const chip::Ble::ChipBLEDeviceIdentificationInfo & info)
+    {
+        const auto now = std::chrono::duration_cast<System::Clock::Milliseconds32>(System::SystemClock().GetMonotonicTimestamp());
+        const uint16_t discriminator = info.GetDeviceDiscriminator();
+        const uint16_t vendorId      = info.GetVendorId();
+        const uint16_t productId     = info.GetProductId();
+
+        ProxyScanReportRecord * freeSlot = nullptr;
+        for (auto & record : mReported)
+        {
+            if (record.inUse && record.discriminator == discriminator && record.vendorId == vendorId &&
+                record.productId == productId)
+            {
+                if (now - record.lastReported < kProxyScanCoalesceInterval)
+                {
+                    mCoalesced++;
+                    return false;
+                }
+                record.lastReported = now;
+                mForwarded++;
+                return true;
+            }
+            if (freeSlot == nullptr && !record.inUse)
+            {
+                freeSlot = &record;
+            }
+        }
+
+        // No slot left: forward unrecorded, so only the coalescing is lost.
+        if (freeSlot != nullptr)
+        {
+            *freeSlot = ProxyScanReportRecord{ now, discriminator, vendorId, productId, true };
+        }
+        mForwarded++;
+        return true;
+    }
+
     BLEManagerImpl::BleScanResultCallback mCb;
     void * mCtx;
     // Immutable once constructed, so the GLib thread can read it unsynchronised.
     const uint32_t mGeneration;
+
+    ProxyScanReportRecord mReported[kProxyScanCoalesceSlots] = {};
+    uint32_t mForwarded                                      = 0;
+    uint32_t mCoalesced                                      = 0;
 };
 
 /// Tear down the current forwarder and invalidate every result it has queued.
