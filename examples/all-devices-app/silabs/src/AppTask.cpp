@@ -21,16 +21,18 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "AppKeys.h"
+#include "SilabsIdentifyDelegate.h"
 
 #ifdef ENABLE_CHIP_SHELL
 #include <DeviceShellCommands.h>
 #endif
 
+#include <array>
+#include <cstddef>
 #include <cstring>
 #include <memory>
 #include <string>
 #include <string_view>
-#include <vector>
 
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
@@ -72,7 +74,18 @@ chip::app::DefaultAttributePersistenceProvider sAttributePersistenceProvider;
 chip::app::DefaultSafeAttributePersistenceProvider sSafeAttributePersistenceProvider;
 std::unique_ptr<chip::app::CodeDrivenDataModelProvider> sDataModelProvider;
 std::unique_ptr<chip::app::DeviceInterface> sRootNode;
-std::vector<std::unique_ptr<chip::app::DeviceInterface>> sConstructedDevices;
+
+// Fixed-capacity storage for constructed devices. The maximum number of
+// devices this build can ever instantiate is known at compile time:
+//   - The build-time device list path is bounded by ALL_DEVICES_DEFAULT_DEVICES_COUNT.
+//   - The KVS/fallback path instantiates exactly one device.
+// Using a std::array (rather than std::vector) avoids heap allocation for the
+// container itself and enforces the bound at compile time, which is important
+// on RAM-constrained embedded platforms.
+constexpr std::size_t kMaxConstructedDevices =
+    (ALL_DEVICES_DEFAULT_DEVICES_COUNT > 0) ? ALL_DEVICES_DEFAULT_DEVICES_COUNT : 1;
+std::array<std::unique_ptr<chip::app::DeviceInterface>, kMaxConstructedDevices> sConstructedDevices;
+std::size_t sConstructedDeviceCount = 0;
 
 #if CHIP_ENABLE_OPENTHREAD
 chip::DeviceLayer::NetworkCommissioning::GenericThreadDriver sThreadDriver;
@@ -152,6 +165,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
 
     static chip::app::DefaultTimerDelegate sTimerDelegate;
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate;
+    static chip::app::SilabsIdentifyLedDelegate sIdentifyDelegate;
 
     chip::app::RootNode::Context rootNodeContext = {
         .commissioningWindowManager = chip::Server::GetInstance().GetCommissioningWindowManager(),
@@ -207,6 +221,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         .bindingTable             = chip::app::Clusters::Binding::Table::GetInstance(),
         .bindingManager           = chip::app::Clusters::Binding::Manager::GetInstance(),
         .testEventTriggerDelegate = sTestEventTriggerDelegate,
+        .identifyDelegate         = sIdentifyDelegate,
     });
 
     auto & deviceFactory = chip::app::DeviceFactory::GetInstance();
@@ -219,11 +234,12 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
             ChipLogError(AppServer, "Invalid device type: %s", type.c_str());
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
+        VerifyOrReturnError(sConstructedDeviceCount < sConstructedDevices.size(), CHIP_ERROR_NO_MEMORY);
         auto device = deviceFactory.Create(type);
         VerifyOrReturnError(device != nullptr, CHIP_ERROR_NO_MEMORY);
         ReturnErrorOnFailure(device->Register(allocator, *sDataModelProvider));
         ChipLogProgress(AppServer, "Registered device type '%s'", type.c_str());
-        sConstructedDevices.push_back(std::move(device));
+        sConstructedDevices[sConstructedDeviceCount++] = std::move(device);
         return CHIP_NO_ERROR;
     };
 
@@ -235,7 +251,6 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
 
     if (!kBuildTimeDevices.empty())
     {
-        sConstructedDevices.reserve(ALL_DEVICES_DEFAULT_DEVICES_COUNT);
         std::string_view remaining = kBuildTimeDevices;
         while (!remaining.empty())
         {

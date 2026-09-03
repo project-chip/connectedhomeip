@@ -28,7 +28,7 @@ namespace app {
 
 LoggingDimmableLoad::LoggingDimmableLoad(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
                                          const Config & config) :
-    DimmableLoad(deviceTypes, context, Delegates{ .onOff = *this, .levelControl = *this, .effect = *this, .identify = *this },
+    DimmableLoad(deviceTypes, context, Delegates{ .onOff = *this, .levelControl = *this, .effect = *this, .identify = context.identifyDelegate },
                  config)
 {}
 
@@ -114,64 +114,6 @@ DataModel::ActionReturnStatus LoggingDimmableLoad::TriggerDyingLight(OnOff::Dyin
         break;
     }
     return Status::Success;
-}
-
-// IdentifyDelegate
-
-void LoggingDimmableLoad::OnIdentifyStart(Clusters::IdentifyCluster & cluster)
-{
-    ChipLogProgress(DeviceLayer, "LoggingDimmableLoad: Identify START");
-}
-
-void LoggingDimmableLoad::OnIdentifyStop(Clusters::IdentifyCluster & cluster)
-{
-    ChipLogProgress(DeviceLayer, "LoggingDimmableLoad: Identify STOP");
-}
-
-void LoggingDimmableLoad::OnTriggerEffect(Clusters::IdentifyCluster & cluster)
-{
-    StringBuilder<64> msg;
-
-    switch (cluster.GetEffectIdentifier())
-    {
-    case Identify::EffectIdentifierEnum::kBlink:
-        msg.Add("BlinkEffect");
-        break;
-    case Identify::EffectIdentifierEnum::kBreathe:
-        msg.Add("BreatheEffect");
-        break;
-    case Identify::EffectIdentifierEnum::kOkay:
-        msg.Add("OkayEffect");
-        break;
-    case Identify::EffectIdentifierEnum::kChannelChange:
-        msg.Add("ChannelChangeEffect");
-        break;
-    case Identify::EffectIdentifierEnum::kFinishEffect:
-        msg.Add("FinishEffect");
-        break;
-    case Identify::EffectIdentifierEnum::kStopEffect:
-        msg.Add("StopEffect");
-        break;
-    default:
-        msg.AddFormat("UnknownEffect(%d)", static_cast<int>(cluster.GetEffectIdentifier()));
-        break;
-    }
-    msg.Add(" / ");
-    switch (cluster.GetEffectVariant())
-    {
-    case Identify::EffectVariantEnum::kDefault:
-        msg.Add("DefaultVariant");
-        break;
-    default:
-        msg.AddFormat("UnknownVariant(%d)", static_cast<int>(cluster.GetEffectVariant()));
-        break;
-    }
-    ChipLogProgress(DeviceLayer, "LoggingDimmableLoad: TriggerEffect: %s", msg.c_str());
-}
-
-bool LoggingDimmableLoad::IsTriggerEffectEnabled() const
-{
-    return true;
 }
 
 } // namespace app

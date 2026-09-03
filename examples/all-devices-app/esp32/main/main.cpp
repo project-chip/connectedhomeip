@@ -41,6 +41,7 @@
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 #include <platform/PlatformManager.h>
 #include <setup_payload/OnboardingCodesUtil.h>
+#include <device/capabilities/identify/LoggingIdentifyDelegate.h>
 
 #include <app_config/enabled_devices.h>
 
@@ -104,6 +105,7 @@ DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 chip::app::DefaultAttributePersistenceProvider gAttributePersistenceProvider;
 chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
+LoggingIdentifyDelegate gIdentifyDelegate;
 chip::app::CodeDrivenDataModelProvider * gDataModelProvider = nullptr;
 std::unique_ptr<DeviceInterface> gRootNode;
 std::unique_ptr<DeviceInterface> gConstructedDevice;
@@ -313,6 +315,7 @@ void InitServer(intptr_t context)
         .bindingTable             = Clusters::Binding::Table::GetInstance(),
         .bindingManager           = Clusters::Binding::Manager::GetInstance(),
         .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,
+        .identifyDelegate         = gIdentifyDelegate,
     });
 
 #if ALL_DEVICES_ENABLE_DIMMABLE_LIGHT

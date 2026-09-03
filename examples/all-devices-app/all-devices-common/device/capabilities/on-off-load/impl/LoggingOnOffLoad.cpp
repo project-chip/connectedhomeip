@@ -31,7 +31,7 @@ LoggingOnOffLoad::LoggingOnOffLoad(Span<const DataModel::DeviceTypeEntry> device
                                    Clusters::IdentifyDelegate * customIdentify) :
     OnOffLoad(deviceTypes, customOnOff ? *customOnOff : static_cast<Clusters::OnOffDelegate &>(*this),
               customEffect ? *customEffect : static_cast<Clusters::OnOffEffectDelegate &>(*this),
-              customIdentify ? *customIdentify : static_cast<Clusters::IdentifyDelegate &>(*this), context)
+              context.identifyDelegate, context)
 {}
 
 // OnOffDelegate
@@ -80,64 +80,6 @@ DataModel::ActionReturnStatus LoggingOnOffLoad::TriggerDyingLight(OnOff::DyingLi
         break;
     }
     return Status::Success;
-}
-
-// IdentifyDelegate
-
-void LoggingOnOffLoad::OnIdentifyStart(Clusters::IdentifyCluster & cluster)
-{
-    ChipLogProgress(DeviceLayer, "LoggingOnOffLoad: Identify START");
-}
-
-void LoggingOnOffLoad::OnIdentifyStop(Clusters::IdentifyCluster & cluster)
-{
-    ChipLogProgress(DeviceLayer, "LoggingOnOffLoad: Identify STOP");
-}
-
-void LoggingOnOffLoad::OnTriggerEffect(Clusters::IdentifyCluster & cluster)
-{
-    StringBuilder<64> msg;
-
-    switch (cluster.GetEffectIdentifier())
-    {
-    case Identify::EffectIdentifierEnum::kBlink:
-        msg.Add("BlinkEffect");
-        break;
-    case Identify::EffectIdentifierEnum::kBreathe:
-        msg.Add("BreatheEffect");
-        break;
-    case Identify::EffectIdentifierEnum::kOkay:
-        msg.Add("OkayEffect");
-        break;
-    case Identify::EffectIdentifierEnum::kChannelChange:
-        msg.Add("ChannelChangeEffect");
-        break;
-    case Identify::EffectIdentifierEnum::kFinishEffect:
-        msg.Add("FinishEffect");
-        break;
-    case Identify::EffectIdentifierEnum::kStopEffect:
-        msg.Add("StopEffect");
-        break;
-    default:
-        msg.AddFormat("UnknownEffect(%d)", static_cast<int>(cluster.GetEffectIdentifier()));
-        break;
-    }
-    msg.Add(" / ");
-    switch (cluster.GetEffectVariant())
-    {
-    case Identify::EffectVariantEnum::kDefault:
-        msg.Add("DefaultVariant");
-        break;
-    default:
-        msg.AddFormat("UnknownVariant(%d)", static_cast<int>(cluster.GetEffectVariant()));
-        break;
-    }
-    ChipLogProgress(DeviceLayer, "LoggingOnOffLoad: TriggerEffect: %s", msg.c_str());
-}
-
-bool LoggingOnOffLoad::IsTriggerEffectEnabled() const
-{
-    return true;
 }
 
 } // namespace app
