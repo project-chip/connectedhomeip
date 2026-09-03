@@ -26,6 +26,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Camera AV Settings User Level Management
     - Commodity Price
     - Commodity Tariff
+    - Electrical Alarm
     - Electrical Distribution
     - Electrical Energy Measurement
     - Joint Fabric Administrator
@@ -117,6 +118,7 @@ CodeDrivenClusters:
     - Diagnostic Logs
     - Dishwasher Mode
     - Dynamic Lighting
+    - Electrical Alarm
     - Electrical Power Measurement
     - Electrical Protection Alarm
     - Energy EVSE
