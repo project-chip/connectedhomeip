@@ -112,6 +112,8 @@ CHIP_ERROR AppTask::InitPersistence()
     ReturnErrorOnFailure(mInitParams.InitializeStaticResourcesBeforeServerInit());
 
     ReturnErrorOnFailure(mAttributePersistenceProvider.Init(mInitParams.persistentStorageDelegate));
+    ReturnErrorOnFailure(mSafeAttributePersistenceProvider.Init(mInitParams.persistentStorageDelegate));
+    SetSafeAttributePersistenceProvider(&mSafeAttributePersistenceProvider);
 
     mInitParams.groupDataProvider = &mGroupDataProvider;
     mGroupDataProvider.SetStorageDelegate(mInitParams.persistentStorageDelegate);
@@ -186,7 +188,6 @@ CHIP_ERROR AppTask::InitRootNode()
         .failSafeContext        = Server::GetInstance().GetFailSafeContext(),
         .bindingTable           = Clusters::Binding::Table::GetInstance(),
         .bindingManager         = Clusters::Binding::Manager::GetInstance(),
-        .testEventTriggerDelegate = *mInitParams.testEventTriggerDelegate,
     });
 
     return CHIP_NO_ERROR;
