@@ -15,26 +15,28 @@
  *    limitations under the License.
  */
 
-// Attestation certificate chains for every PAA/PAI/DAC algorithm combination the
-// specification lists as valid for PQC Phase 1. A PAI may repeat its PAA's algorithm
-// or fall back to a weaker one, and the DAC is always ECDSA P-256:
-//
-//   Row  PAA          PAI          DAC
-//    1   ML-DSA-65    ML-DSA-65    P-256
-//    2   ML-DSA-65    ML-DSA-44    P-256
-//    3   ML-DSA-65    P-256        P-256
-//    4   ML-DSA-44    ML-DSA-44    P-256
-//    5   ML-DSA-44    P-256        P-256
-//
-// Generated with chip-cert built against OpenSSL 3.6:
-//
-//   chip-cert gen-att-cert --type a --subject-cn "Test PAA ML-DSA-65" --subject-vid FFF1 \
-//       --key-type ml-dsa-65 --valid-from "2026-06-30 01:50:58" --lifetime 3650 \
-//       --out-key paa65-key.pem --out paa65.pem
-//   chip-cert gen-att-cert --type i --subject-cn "Test PAI ..." --subject-vid FFF1 \
-//       [--key-type ml-dsa-44|ml-dsa-65] --ca-cert <paa>.pem --ca-key <paa>-key.pem ...
-//   chip-cert gen-att-cert --type d --subject-cn "Test DAC" --subject-vid FFF1 \
-//       --subject-pid 8000 --ca-cert <pai>.pem --ca-key <pai>-key.pem ...
+/*
+ * Attestation certificate chains for every PAA/PAI/DAC algorithm combination the
+ * specification lists as valid for PQC Phase 1. A PAI may repeat its PAA's algorithm
+ * or fall back to a weaker one, and the DAC is always ECDSA P-256:
+ *
+ *   Row  PAA          PAI          DAC
+ *    1   ML-DSA-65    ML-DSA-65    P-256
+ *    2   ML-DSA-65    ML-DSA-44    P-256
+ *    3   ML-DSA-65    P-256        P-256
+ *    4   ML-DSA-44    ML-DSA-44    P-256
+ *    5   ML-DSA-44    P-256        P-256
+ *
+ * Generated with chip-cert built against OpenSSL 3.6:
+ *
+ *   chip-cert gen-att-cert --type a --subject-cn "Test PAA ML-DSA-65" --subject-vid FFF1 \
+ *       --key-type ml-dsa-65 --valid-from "2026-06-30 01:50:58" --lifetime 3650 \
+ *       --out-key paa65-key.pem --out paa65.pem
+ *   chip-cert gen-att-cert --type i --subject-cn "Test PAI ..." --subject-vid FFF1 \
+ *       [--key-type ml-dsa-44|ml-dsa-65] --ca-cert <paa>.pem --ca-key <paa>-key.pem ...
+ *   chip-cert gen-att-cert --type d --subject-cn "Test DAC" --subject-vid FFF1 \
+ *       --subject-pid 8000 --ca-cert <pai>.pem --ca-key <pai>-key.pem ...
+ */
 
 #pragma once
 
