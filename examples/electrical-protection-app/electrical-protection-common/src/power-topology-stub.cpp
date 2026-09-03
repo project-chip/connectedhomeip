@@ -18,8 +18,11 @@
 
 #include <power-topology-stub.h>
 
+#include <app/server/Server.h>
 #include <lib/support/CodeUtils.h>
 
+#include <algorithm>
+#include <array>
 #include <memory>
 
 using namespace chip;
@@ -28,8 +31,10 @@ using namespace chip::app::Clusters;
 
 namespace {
 
-// TREE gates none of this cluster's attributes, so neither accessor is reachable.
-class EnclosureTopologyDelegate : public PowerTopology::Delegate
+// Neither accessor is reachable: AvailableEndpoints is gated on SET and ActiveEndpoints on DYPF,
+// and this app enables neither on either endpoint. The delegate holds no state, so both
+// instances share one.
+class StubTopologyDelegate : public PowerTopology::Delegate
 {
 public:
     CHIP_ERROR GetAvailableEndpointAtIndex(size_t index, EndpointId & endpointId) override
@@ -43,24 +48,31 @@ public:
     }
 };
 
-EnclosureTopologyDelegate gDelegate;
-std::unique_ptr<PowerTopology::Instance> gInstance;
+StubTopologyDelegate gDelegate;
+
+// One per endpoint carrying the cluster: the enclosure and the breaker.
+constexpr size_t kMaxInstances = 2;
+std::array<std::unique_ptr<PowerTopology::Instance>, kMaxInstances> gInstances;
 
 } // namespace
 
 namespace chip::app::Clusters::PowerTopology {
 
-CHIP_ERROR PowerTopologyInit(EndpointId endpointId)
+CHIP_ERROR PowerTopologyInit(EndpointId endpointId, BitMask<Feature> features)
 {
-    VerifyOrReturnError(gInstance == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    auto slot = std::find_if(gInstances.begin(), gInstances.end(), [](const auto & i) { return i == nullptr; });
+    VerifyOrReturnError(slot != gInstances.end(), CHIP_ERROR_NO_MEMORY);
 
-    gInstance = std::make_unique<Instance>(endpointId, gDelegate, BitMask<Feature>(Feature::kTreeTopology));
-    VerifyOrReturnError(gInstance != nullptr, CHIP_ERROR_NO_MEMORY);
+    // ElectricalCircuitNodes is fabric-scoped, so the cluster needs the fabric table to serve it.
+    // The constructor defaults this to nullptr, and Startup() then fails with INCORRECT_STATE
+    // whenever CIRC is set, so pass it unconditionally.
+    *slot = std::make_unique<Instance>(endpointId, gDelegate, features, &Server::GetInstance().GetFabricTable());
+    VerifyOrReturnError(*slot != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    CHIP_ERROR err = gInstance->Init();
+    CHIP_ERROR err = (*slot)->Init();
     if (err != CHIP_NO_ERROR)
     {
-        gInstance.reset();
+        slot->reset();
     }
     return err;
 }
@@ -68,7 +80,10 @@ CHIP_ERROR PowerTopologyInit(EndpointId endpointId)
 void PowerTopologyShutdown()
 {
     // ~Instance() unregisters.
-    gInstance.reset();
+    for (auto & instance : gInstances)
+    {
+        instance.reset();
+    }
 }
 
 } // namespace chip::app::Clusters::PowerTopology
