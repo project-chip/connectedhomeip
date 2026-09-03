@@ -19,8 +19,8 @@
 #include <cstddef>
 #include <cstdint>
 
-namespace mdns {
-namespace Minimal {
+namespace chip {
+namespace Dnssd {
 
 // Assigned by IANA: https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-4
 enum class QType : uint16_t
@@ -71,5 +71,5 @@ enum class ResourceType
     kAdditional,
 };
 
-} // namespace Minimal
-} // namespace mdns
+} // namespace Dnssd
+} // namespace chip

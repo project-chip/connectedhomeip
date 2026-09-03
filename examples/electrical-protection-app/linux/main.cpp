@@ -18,6 +18,7 @@
 #include <AppMain.h>
 #include <electrical-distribution-stub.h>
 #include <electrical-protection-alarm-stub.h>
+#include <power-topology-stub.h>
 
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/attribute-storage.h>
@@ -70,6 +71,7 @@ void ApplicationInit()
 void ApplicationShutdown()
 {
     ElectricalProtectionAlarm::ElectricalProtectionAlarmShutdown();
+    PowerTopology::PowerTopologyShutdown();
     ElectricalDistribution::ElectricalDistributionShutdown();
 }
 

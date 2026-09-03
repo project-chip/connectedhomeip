@@ -48,6 +48,7 @@
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
+#include <atomic>
 #include <platform/Linux/NetworkCommissioningDriver.h>
 #include <platform/NetworkCommissioning.h>
 #include <vector>
@@ -58,6 +59,18 @@
 
 namespace chip {
 namespace DeviceLayer {
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+// Records when the radio can carry Wi-Fi PAF frames
+enum class PafChannelState : uint8_t
+{
+    kAvailable,   // The radio is free and PAF frames may be sent
+    kConnecting,  // Station connect in progress (scan, authenticate, associate, key handshake),
+                  // during which the radio cannot carry PAF frames
+    kAwaitingNan, // STA link up but NAN not yet ready
+    kNoInterface, // No wpa_supplicant interface to send on
+};
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 
 /**
  * Concrete implementation of the ConnectivityManager singleton object for Linux platforms.
@@ -223,9 +236,33 @@ private:
     uint16_t mApFreq;
     CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
     CHIP_ERROR _WiFiPAFCancelPublish(uint32_t PublishId);
-    bool _WiFiPAFResourceAvailable() { return mPafChannelAvailable; };
     // The resource checking is needed right before sending data packets that they are initialized and connected.
-    bool mPafChannelAvailable = true;
+    bool _WiFiPAFResourceAvailable() { return mPafChannelState.load() == PafChannelState::kAvailable; };
+    // Written from both the glib D-Bus thread and the CHIP thread.
+    std::atomic<PafChannelState> mPafChannelState{ PafChannelState::kAvailable };
+    // Association hooks, called from the wpa_supplicant state machine.  Defined in
+    // ConnectivityManagerImpl_WiFiPafWpaSupplicant.cpp; no-ops below when PAF is disabled so the
+    // call sites need no #if.
+    void OnAssociationRequested();
+    void OnAssociationStarting();
+    void OnAssociationFailed();
+    void OnAssociationCompleted();
+    void OnInterfaceRemoved();
+    // Evidence from the NAN layer that the radio is carrying PAF traffic again.
+    void PafChannelNoteNanActivity();
+    void ArmNanRecoveryTimer();
+    static void HandleNanRecoveryTimeout(chip::System::Layer * layer, void * context);
+    // True if this call released the wait, false if there was none to release.
+    bool TryReleaseNanRecoveryWait();
+    // Identifies the NAN recovery wait a timer was armed for, so it releases only its own.
+    std::atomic<uint32_t> mNanRecoveryId{ 0 };
+    std::atomic<uint32_t> mArmedNanRecoveryId{ 0 };
+#else
+    void OnAssociationRequested() {}
+    void OnAssociationStarting() {}
+    void OnAssociationFailed() {}
+    void OnAssociationCompleted() {}
+    void OnInterfaceRemoved() {}
 #endif
 
     CHIP_ERROR _GetBssInfo(const char * bssPath, NetworkCommissioning::WiFiScanResponse & result);
