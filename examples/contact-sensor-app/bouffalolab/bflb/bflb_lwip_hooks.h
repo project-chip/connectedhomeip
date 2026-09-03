@@ -20,6 +20,8 @@
 #include "lwip/arch.h"
 #include "lwip/err.h"
 #include "lwip/ip_addr.h"
+#include "lwip/netif.h"
+#include "lwip/pbuf.h"
 
 #include "lwiphooks.h"
 
@@ -28,5 +30,11 @@ extern struct netif * lwip_hook_ip6_route(const ip6_addr_t * src, const ip6_addr
 
 extern const ip6_addr_t * lwip_hook_nd6_get_gw(struct netif * netif, const ip6_addr_t * dest);
 #define LWIP_HOOK_ND6_GET_GW lwip_hook_nd6_get_gw
+
+extern int app_dtim_ip4_input(struct pbuf * pbuf, struct netif * input_netif);
+#define LWIP_HOOK_IP4_INPUT app_dtim_ip4_input
+
+extern int app_dtim_ip6_input(struct pbuf * pbuf, struct netif * input_netif);
+#define LWIP_HOOK_IP6_INPUT app_dtim_ip6_input
 
 #endif /* _LWIP_DEFAULT_HOOKS_H_ */

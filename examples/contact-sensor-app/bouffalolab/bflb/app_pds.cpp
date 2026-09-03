@@ -37,6 +37,14 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
+#include <lwip/ip4_addr.h>
+#include <lwip/netif.h>
+#include <lwip/pbuf.h>
+#include <lwip/prot/ip4.h>
+#include <lwip/prot/ip6.h>
+
+#include "app_pds.h"
+
 extern "C" {
 #if defined(BL616CL)
 #include <bl616cl_glb.h>
@@ -72,8 +80,115 @@ static uint64_t s_sleep_enter_rtc       = 0;
 #endif
 static struct bflb_device_s * s_sha_dev = NULL;
 
+namespace {
+
+constexpr uint8_t kActiveDtim              = 1;
+constexpr uint8_t kIdleDtim                = 10;
+constexpr uint32_t kDtimActivityDurationMs = 3000;
+constexpr uint32_t kDtimActivityNotification = 1U;
+
+StaticTask_t sDtimActivityTaskStorage;
+StackType_t sDtimActivityTaskStack[configMINIMAL_STACK_SIZE];
+TaskHandle_t sDtimActivityTaskHandle = nullptr;
+uint8_t sCurrentDtim                 = 0;
+
+void SetDtim(uint8_t dtim)
+{
+    if (sCurrentDtim == dtim)
+    {
+        return;
+    }
+
+    set_dtim_config(dtim);
+    bl_lp_fw_bcn_loss_cfg_dtim_default(dtim);
+    sCurrentDtim = dtim;
+    ChipLogDetail(NotSpecified, "[LP] DTIM switched to %u", dtim);
+}
+
+void DtimActivityTask(void * arg)
+{
+    (void) arg;
+
+    for (;;)
+    {
+        uint32_t notificationValue       = 0;
+        BaseType_t notificationReceived  =
+            xTaskNotifyWait(0, kDtimActivityNotification, &notificationValue, pdMS_TO_TICKS(kDtimActivityDurationMs));
+
+        if (notificationReceived == pdTRUE && (notificationValue & kDtimActivityNotification) != 0)
+        {
+            SetDtim(kActiveDtim);
+        }
+        else
+        {
+            SetDtim(kIdleDtim);
+        }
+    }
+}
+
+} // namespace
+
 static void app_lp_config_gpio(void);
 static void app_lp_config_wakup_gpio(void);
+
+void app_dtim_activity_notify(void)
+{
+    if (sDtimActivityTaskHandle == nullptr)
+    {
+        return;
+    }
+
+    BaseType_t notifyResult;
+    if (xPortIsInsideInterrupt())
+    {
+        BaseType_t higherPriorityTaskWoken = pdFALSE;
+        notifyResult = xTaskNotifyFromISR(sDtimActivityTaskHandle, kDtimActivityNotification, eSetBits,
+                                          &higherPriorityTaskWoken);
+        portYIELD_FROM_ISR(higherPriorityTaskWoken);
+    }
+    else
+    {
+        notifyResult = xTaskNotify(sDtimActivityTaskHandle, kDtimActivityNotification, eSetBits);
+    }
+
+    if (notifyResult != pdPASS)
+    {
+        ChipLogError(NotSpecified, "[LP] Failed to notify DTIM activity task");
+    }
+}
+
+extern "C" int app_dtim_ip4_input(struct pbuf * pbuf, struct netif * input_netif)
+{
+    if (pbuf != nullptr && input_netif != nullptr && pbuf->len >= IP_HLEN)
+    {
+        const auto * header = static_cast<const ip_hdr *>(pbuf->payload);
+        ip4_addr_t destination;
+        memcpy(&destination.addr, &header->dest.addr, sizeof(destination.addr));
+
+        if (!ip4_addr_ismulticast(&destination) && !ip4_addr_isbroadcast(&destination, input_netif))
+        {
+            app_dtim_activity_notify();
+        }
+    }
+
+    return 0;
+}
+
+extern "C" int app_dtim_ip6_input(struct pbuf * pbuf, struct netif * input_netif)
+{
+    (void) input_netif;
+    if (pbuf != nullptr && pbuf->len >= IP6_HLEN)
+    {
+        const auto * header            = static_cast<const ip6_hdr *>(pbuf->payload);
+        const auto * destinationOctets = reinterpret_cast<const uint8_t *>(&header->dest);
+        if (destinationOctets[0] != 0xff)
+        {
+            app_dtim_activity_notify();
+        }
+    }
+
+    return 0;
+}
 
 /* -------------------------------------------------------------------------- */
 /* GPIO interrupt handlers                                                    */
@@ -299,6 +414,15 @@ static void app_lp_config_wakup_gpio(void)
 void app_pds_init(void (*pinHandler)(int, bool))
 {
     s_pin_handler = pinHandler;
+
+    sDtimActivityTaskHandle = xTaskCreateStatic(DtimActivityTask, "DtimActivity", configMINIMAL_STACK_SIZE, nullptr,
+                                                configMAX_PRIORITIES - 2, sDtimActivityTaskStack,
+                                                &sDtimActivityTaskStorage);
+    if (sDtimActivityTaskHandle == nullptr)
+    {
+        ChipLogError(NotSpecified, "[LP] Failed to create DTIM activity task");
+    }
+    app_dtim_activity_notify();
 
     app_clock_init();
 

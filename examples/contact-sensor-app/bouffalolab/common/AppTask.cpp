@@ -49,6 +49,10 @@ extern "C" {
 #include "AppTask.h"
 #include "mboard.h"
 
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
+#include "../bflb/app_pds.h"
+#endif
+
 using namespace ::chip;
 using namespace ::chip::app;
 using namespace ::chip::Credentials;
@@ -174,6 +178,9 @@ void AppTask::AppTaskMain(void * pvParameter)
             {
                 stateValueAttrValue = 1;
 
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
+                app_dtim_activity_notify();
+#endif
                 auto booleanState = app::Clusters::BooleanState::FindClusterOnEndpoint(1);
                 if (booleanState != nullptr)
                 {
@@ -185,6 +192,9 @@ void AppTask::AppTaskMain(void * pvParameter)
             {
                 stateValueAttrValue = 0;
 
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
+                app_dtim_activity_notify();
+#endif
                 auto booleanState = app::Clusters::BooleanState::FindClusterOnEndpoint(1);
                 if (booleanState != nullptr)
                 {
