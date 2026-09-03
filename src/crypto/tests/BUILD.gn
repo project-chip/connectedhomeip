@@ -16,6 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${chip_root}/build/chip/fuzz_test.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 
 chip_test_suite("tests") {
@@ -72,4 +73,28 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/platform",
   ]
+}
+
+if (pw_enable_fuzz_test_targets) {
+  chip_pw_fuzz_target("fuzz-crypto-primitives-pw") {
+    test_source = [
+      "AES_CCM_128_test_vectors.h",
+      "DerSigConversion_test_vectors.h",
+      "FuzzCryptoPrimitivesPW.cpp",
+      "HKDF_SHA256_test_vectors.h",
+    ]
+    public_deps = [
+      "${chip_root}/src/crypto",
+      "${chip_root}/src/platform/logging:default",
+    ]
+  }
+
+  chip_pw_fuzz_target("fuzz-chip-crypto-pal-pw") {
+    test_source = [ "FuzzChipCryptoPalPW.cpp" ]
+    public_deps = [
+      "${chip_root}/src/credentials/tests:cert_test_vectors",
+      "${chip_root}/src/crypto",
+      "${chip_root}/src/platform/logging:default",
+    ]
+  }
 }

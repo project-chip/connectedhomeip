@@ -2907,11 +2907,6 @@ cluster OperationalCredentials = 62 {
 cluster GroupKeyManagement = 63 {
   revision 4;
 
-  enum GroupKeyMulticastPolicyEnum : enum8 {
-    kPerGroupID = 0;
-    kAllNodes = 1;
-  }
-
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
     kCacheAndSync = 1;
@@ -4354,7 +4349,7 @@ cluster ValveConfigurationAndControl = 129 {
 }
 
 /** This cluster provides an interface to specify preferences for how devices should consume energy. */
-provisional cluster EnergyPreference = 155 {
+cluster EnergyPreference = 155 {
   revision 1;
 
   enum EnergyPriorityEnum : enum8 {
@@ -5724,7 +5719,7 @@ provisional cluster DynamicLighting = 773 {
 
 /** Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements. */
 cluster IlluminanceMeasurement = 1024 {
-  revision 3;
+  revision 5;
 
   enum LightSensorTypeEnum : enum8 {
     kPhotodiode = 0;
@@ -5784,7 +5779,7 @@ cluster PressureMeasurement = 1027 {
 
 /** Attributes and commands for configuring the measurement of flow, and reporting flow measurements. */
 cluster FlowMeasurement = 1028 {
-  revision 3;
+  revision 5;
 
   readonly attribute nullable int16u measuredValue = 0;
   readonly attribute nullable int16u minMeasuredValue = 1;
