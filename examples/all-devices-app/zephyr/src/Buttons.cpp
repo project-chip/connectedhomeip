@@ -55,7 +55,7 @@ void OnFactoryResetSwPressed(const struct device *, struct gpio_callback *, gpio
     if (pin < 0)
     {
         ChipLogError(DeviceLayer, "Factory reset button read failed: %d", pin);
-        sFactoryResetSwPressedAtMs = 0;
+        sFactoryResetSwPressedAtMs = -1;
         return;
     }
 
@@ -65,15 +65,15 @@ void OnFactoryResetSwPressed(const struct device *, struct gpio_callback *, gpio
         sFactoryResetSwPressedAtMs = k_uptime_get();
         k_work_submit(&sFactoryResetPressedWork);
     }
-    else if (sFactoryResetSwPressedAtMs != 0 && (k_uptime_get() - sFactoryResetSwPressedAtMs) >= kFactoryResetHoldMs)
+    else if (sFactoryResetSwPressedAtMs >= 0 && (k_uptime_get() - sFactoryResetSwPressedAtMs) >= kFactoryResetHoldMs)
     {
         // Button released and was held long enough.
-        sFactoryResetSwPressedAtMs = 0;
+        sFactoryResetSwPressedAtMs = -1;
         k_work_submit(&sFactoryResetWork);
     }
     else
     {
-        sFactoryResetSwPressedAtMs = 0;
+        sFactoryResetSwPressedAtMs = -1;
     }
 }
 
