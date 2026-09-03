@@ -69,8 +69,8 @@ west build ... -- \
 
 ## Factory Reset
 
-Press and hold button 0 for 5 seconds to factory reset the device. Button 0
-is the `sw0` devicetree button, defined by the board devicetree or an overlay.
+Press and hold button 0 for 5 seconds to factory reset the device. Button 0 is
+the `sw0` devicetree button, defined by the board devicetree or an overlay.
 
 ## Custom AppTask
 
