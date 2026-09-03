@@ -88,6 +88,14 @@ public:
     /**
      * Stop a scan started by StartScan and release the scanner. A no-op when no scan is
      * running, so teardown paths can call it unconditionally.
+     *
+     * Once this returns, nothing discovered by the stopped scan may be reported —
+     * including a result the platform has already queued but not yet delivered. A
+     * platform that discovers on one thread and reports on the Matter event loop has to
+     * invalidate what is in flight, not merely stop discovering: the next StartScan can
+     * be a different scan with different results, and a leaked result would be counted
+     * as one of its own. The Linux implementation stamps each queued result with a scan
+     * generation and drops any whose stamp is no longer current.
      */
     virtual void StopScan() = 0;
 };
