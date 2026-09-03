@@ -135,8 +135,7 @@ CHIP_ERROR ThermostatSchedulesDelegate::GetActiveScheduleHandle(DataModel::Nulla
 {
     if (!mActiveScheduleHandleIsNull)
     {
-        VerifyOrReturnError(!activeScheduleHandle.IsNull() &&
-                                activeScheduleHandle.Value().size() >= mActiveScheduleHandleDataSize,
+        VerifyOrReturnError(!activeScheduleHandle.IsNull() && activeScheduleHandle.Value().size() >= mActiveScheduleHandleDataSize,
                             CHIP_ERROR_BUFFER_TOO_SMALL);
         ReturnErrorOnFailure(CopySpanToMutableSpan(ByteSpan(mActiveScheduleHandleData, mActiveScheduleHandleDataSize),
                                                    activeScheduleHandle.Value()));
