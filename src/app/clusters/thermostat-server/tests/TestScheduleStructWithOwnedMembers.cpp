@@ -72,7 +72,7 @@ TEST(TestScheduleStructWithOwnedMembers, ConstructFromTypeCopiesAllFields)
 
     ScheduleStructWithOwnedMembers schedule(source);
 
-    EXPECT_FALSE(schedule.GetScheduleHandle().IsNull());
+    ASSERT_FALSE(schedule.GetScheduleHandle().IsNull());
     EXPECT_TRUE(schedule.GetScheduleHandle().Value().data_equal(ByteSpan(kHandleData)));
     EXPECT_EQ(schedule.GetSystemMode(), SystemModeEnum::kHeat);
     ASSERT_TRUE(schedule.GetName().HasValue());
@@ -97,6 +97,7 @@ TEST(TestScheduleStructWithOwnedMembers, CopyAssignmentDeepCopiesBuffers)
         copy = original;
     }
 
+    ASSERT_FALSE(copy.GetScheduleHandle().IsNull());
     EXPECT_TRUE(copy.GetScheduleHandle().Value().data_equal(ByteSpan(kHandleData)));
     ASSERT_TRUE(copy.GetName().HasValue());
     EXPECT_TRUE(copy.GetName().Value().data_equal(kNameData));
@@ -114,6 +115,7 @@ TEST(TestScheduleStructWithOwnedMembers, SelfAssignmentIsNoOp)
     const ScheduleStructWithOwnedMembers & alias = schedule;
     schedule                                     = alias;
 
+    ASSERT_FALSE(schedule.GetScheduleHandle().IsNull());
     EXPECT_TRUE(schedule.GetScheduleHandle().Value().data_equal(ByteSpan(kHandleData)));
     ASSERT_EQ(schedule.GetTransitions().size(), 1u);
 }

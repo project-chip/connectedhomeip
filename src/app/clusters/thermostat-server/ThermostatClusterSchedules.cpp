@@ -91,11 +91,15 @@ bool ScheduleHandlesExistAndMatch(const ScheduleStructWithOwnedMembers & schedul
  *
  * @param[in] delegate The delegate to use.
  * @param[in] scheduleToMatch The schedule to match with.
+ * @param[out] found true if a matching entry was found in the pending schedules list, false otherwise.
  *
- * @return true if a matching entry was found in the pending schedules list, false otherwise.
+ * @return CHIP_NO_ERROR if the pending schedules list was searched successfully (whether or not a match was found), or the
+ *         CHIP_ERROR returned by the delegate if the search could not be completed.
  */
-bool MatchingPendingScheduleExists(ThermostatSchedules::Delegate & delegate, const ScheduleStructWithOwnedMembers & scheduleToMatch)
+CHIP_ERROR MatchingPendingScheduleExists(ThermostatSchedules::Delegate & delegate, const ScheduleStructWithOwnedMembers & scheduleToMatch,
+                                         bool & found)
 {
+    found = false;
     for (uint8_t i = 0; true; i++)
     {
         ScheduleStructWithOwnedMembers schedule;
@@ -103,21 +107,21 @@ bool MatchingPendingScheduleExists(ThermostatSchedules::Delegate & delegate, con
 
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
-            break;
+            return CHIP_NO_ERROR;
         }
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "MatchingPendingScheduleExists: GetPendingScheduleAtIndex failed with error %" CHIP_ERROR_FORMAT,
                          err.Format());
-            return false;
+            return err;
         }
 
         if (ScheduleHandlesExistAndMatch(schedule, scheduleToMatch))
         {
-            return true;
+            found = true;
+            return CHIP_NO_ERROR;
         }
     }
-    return false;
 }
 
 /**
@@ -752,7 +756,14 @@ Status ThermostatSchedules::PrecommitSchedules()
             return Status::InvalidInState;
         }
 
-        bool found = MatchingPendingScheduleExists(mDelegate, schedule);
+        bool found = false;
+        err        = MatchingPendingScheduleExists(mDelegate, schedule, found);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "PrecommitSchedules: MatchingPendingScheduleExists failed with error %" CHIP_ERROR_FORMAT,
+                         err.Format());
+            return Status::InvalidInState;
+        }
 
         // If a built in schedule in the Schedules attribute list is removed and not found in the pending schedules list,
         // return CONSTRAINT_ERROR.
