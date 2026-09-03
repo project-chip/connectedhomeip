@@ -992,11 +992,19 @@ void ApplicationInit()
     gComposedTempMeasurement2 =
         std::make_unique<TempMeasurementAttrAccess>(ComposedTempSensor2.GetEndpointId(), &ComposedTempSensor2);
 
-    VerifyOrDie(AttributeAccessInterfaceRegistry::Instance().Register(gTempMeasurement1.get()));
-    VerifyOrDie(AttributeAccessInterfaceRegistry::Instance().Register(gTempMeasurement2.get()));
-    VerifyOrDie(AttributeAccessInterfaceRegistry::Instance().Register(gComposedTempMeasurement1.get()));
-    VerifyOrDie(AttributeAccessInterfaceRegistry::Instance().Register(gComposedTempMeasurement2.get()));
-    VerifyOrDie(AttributeAccessInterfaceRegistry::Instance().Register(&gPowerAttrAccess));
+    VerifyOrDo(AttributeAccessInterfaceRegistry::Instance().Register(gTempMeasurement1.get()),
+               ChipLogError(NotSpecified, "Failed to register gTempMeasurement1"));
+
+    VerifyOrDo(AttributeAccessInterfaceRegistry::Instance().Register(gTempMeasurement2.get()),
+               ChipLogError(NotSpecified, "Failed to register gTempMeasurement2"));
+
+    VerifyOrDo(AttributeAccessInterfaceRegistry::Instance().Register(gComposedTempMeasurement1.get()),
+               ChipLogError(NotSpecified, "Failed to register gComposedTempMeasurement1"));
+
+    VerifyOrDo(AttributeAccessInterfaceRegistry::Instance().Register(gComposedTempMeasurement2.get()),
+               ChipLogError(NotSpecified, "Failed to register gComposedTempMeasurement2"));
+
+    AttributeAccessInterfaceRegistry::Instance().Register(&gPowerAttrAccess);
 }
 
 void ApplicationShutdown() {}
