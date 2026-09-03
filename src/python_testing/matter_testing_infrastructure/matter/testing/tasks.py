@@ -111,7 +111,7 @@ class Subprocess(threading.Thread):
         with self.output_match_lock:
             self.output_match = [re.compile(re.escape(p.encode())) if isinstance(p, str) else p for p in patterns]
 
-    def arm_output_match(self, pattern: str | re.Pattern) -> None:
+    def arm_output_match(self, pattern: str | re.Pattern | Sequence[str | re.Pattern]) -> None:
         """Watch the output for a pattern, discarding any match seen so far.
 
         Arm before triggering whatever makes the subprocess print the line, so that a
