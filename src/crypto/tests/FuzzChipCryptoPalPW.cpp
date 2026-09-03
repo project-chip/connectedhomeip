@@ -135,12 +135,26 @@ auto AnyCdpCert()
     }));
 }
 
+// IsCertificateValidAtCurrentTime reads the wall clock, so its result is not
+// reproducible across runs; only the absence of a crash is checked here.
 void IssuanceTimeComparison(const Bytes & candidate, const Bytes & issuer)
 {
-    (void) IsCertificateValidAtIssuance(ByteSpan(candidate.data(), candidate.size()), ByteSpan(issuer.data(), issuer.size()));
+    const ByteSpan candidateSpan(candidate.data(), candidate.size());
+
+    RETURN_SAFELY_IGNORED IsCertificateValidAtIssuance(candidateSpan, ByteSpan(issuer.data(), issuer.size()));
+    RETURN_SAFELY_IGNORED IsCertificateValidAtCurrentTime(candidateSpan);
 }
 
 FUZZ_TEST(ChipCryptoPal, IssuanceTimeComparison).WithDomains(AnyDacCert(), AnyPaiCert());
+
+void SerialNumberExtraction(const Bytes & cert)
+{
+    uint8_t serialNumberBuf[kMaxCertificateSerialNumberLength] = { 0 };
+    MutableByteSpan serialNumber(serialNumberBuf);
+    RETURN_SAFELY_IGNORED ExtractSerialNumberFromX509Cert(ByteSpan(cert.data(), cert.size()), serialNumber);
+}
+
+FUZZ_TEST(ChipCryptoPal, SerialNumberExtraction).WithDomains(AnyDacCert());
 
 void KeyIdentifierExtraction(const Bytes & cert)
 {
@@ -148,11 +162,11 @@ void KeyIdentifierExtraction(const Bytes & cert)
 
     uint8_t skidBuf[kSubjectKeyIdentifierLength];
     MutableByteSpan skid(skidBuf);
-    (void) ExtractSKIDFromX509Cert(certSpan, skid);
+    RETURN_SAFELY_IGNORED ExtractSKIDFromX509Cert(certSpan, skid);
 
     uint8_t akidBuf[kAuthorityKeyIdentifierLength];
     MutableByteSpan akid(akidBuf);
-    (void) ExtractAKIDFromX509Cert(certSpan, akid);
+    RETURN_SAFELY_IGNORED ExtractAKIDFromX509Cert(certSpan, akid);
 }
 
 FUZZ_TEST(ChipCryptoPal, KeyIdentifierExtraction).WithDomains(AnyDacCert());
@@ -161,7 +175,7 @@ void CrlDistributionPointUriExtraction(const Bytes & cert)
 {
     char cdpBuf[kMaxCRLDistributionPointURLLength] = { '\0' };
     MutableCharSpan cdpUrl(cdpBuf);
-    (void) ExtractCRLDistributionPointURIFromX509Cert(ByteSpan(cert.data(), cert.size()), cdpUrl);
+    RETURN_SAFELY_IGNORED ExtractCRLDistributionPointURIFromX509Cert(ByteSpan(cert.data(), cert.size()), cdpUrl);
 }
 
 FUZZ_TEST(ChipCryptoPal, CrlDistributionPointUriExtraction).WithDomains(AnyCdpCert());
@@ -170,7 +184,7 @@ void CrlIssuerExtraction(const Bytes & cert)
 {
     uint8_t crlIssuerBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
     MutableByteSpan crlIssuer(crlIssuerBuf);
-    (void) ExtractCDPExtensionCRLIssuerFromX509Cert(ByteSpan(cert.data(), cert.size()), crlIssuer);
+    RETURN_SAFELY_IGNORED ExtractCDPExtensionCRLIssuerFromX509Cert(ByteSpan(cert.data(), cert.size()), crlIssuer);
 }
 
 FUZZ_TEST(ChipCryptoPal, CrlIssuerExtraction).WithDomains(AnyCdpCert());
@@ -178,7 +192,7 @@ FUZZ_TEST(ChipCryptoPal, CrlIssuerExtraction).WithDomains(AnyCdpCert());
 void VidPidExtractionFromCert(const Bytes & cert)
 {
     AttestationCertVidPid vidPid;
-    (void) ExtractVIDPIDFromX509Cert(ByteSpan(cert.data(), cert.size()), vidPid);
+    RETURN_SAFELY_IGNORED ExtractVIDPIDFromX509Cert(ByteSpan(cert.data(), cert.size()), vidPid);
 }
 
 FUZZ_TEST(ChipCryptoPal, VidPidExtractionFromCert).WithDomains(AnyDacCert());
@@ -197,7 +211,7 @@ void VidPidExtractionFromAttributeString(DNAttrType attrType, const std::string 
     AttestationCertVidPid vidPidFromCN;
 
     const ByteSpan attrSpan(reinterpret_cast<const uint8_t *>(attrString.data()), attrString.size());
-    (void) ExtractVIDPIDFromAttributeString(attrType, attrSpan, vidPid, vidPidFromCN);
+    RETURN_SAFELY_IGNORED ExtractVIDPIDFromAttributeString(attrType, attrSpan, vidPid, vidPidFromCN);
 }
 
 FUZZ_TEST(ChipCryptoPal, VidPidExtractionFromAttributeString)
@@ -211,11 +225,11 @@ void SubjectAndIssuerExtraction(const Bytes & cert)
 
     uint8_t subjectBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
     MutableByteSpan subject(subjectBuf);
-    (void) ExtractSubjectFromX509Cert(certSpan, subject);
+    RETURN_SAFELY_IGNORED ExtractSubjectFromX509Cert(certSpan, subject);
 
     uint8_t issuerBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
     MutableByteSpan issuer(issuerBuf);
-    (void) ExtractIssuerFromX509Cert(certSpan, issuer);
+    RETURN_SAFELY_IGNORED ExtractIssuerFromX509Cert(certSpan, issuer);
 }
 
 FUZZ_TEST(ChipCryptoPal, SubjectAndIssuerExtraction).WithDomains(AnyDacCert());
@@ -233,7 +247,8 @@ const ByteSpan kResignedCandidates[] = {
 void ResignedCertificateLookup(const Bytes & cert, size_t candidateCount)
 {
     ByteSpan replacement;
-    (void) ReplaceCertIfResignedCertFound(ByteSpan(cert.data(), cert.size()), kResignedCandidates, candidateCount, replacement);
+    RETURN_SAFELY_IGNORED ReplaceCertIfResignedCertFound(ByteSpan(cert.data(), cert.size()), kResignedCandidates, candidateCount,
+                                                         replacement);
 }
 
 FUZZ_TEST(ChipCryptoPal, ResignedCertificateLookup)
@@ -264,7 +279,7 @@ const uint8_t kGoodCsr[] = {
 void CertificateSigningRequestVerification(const Bytes & csr)
 {
     P256PublicKey expectedPublicKey(kGoodCsrSubjectPublicKey);
-    (void) VerifyCertificateSigningRequest(csr.data(), csr.size(), expectedPublicKey);
+    RETURN_SAFELY_IGNORED VerifyCertificateSigningRequest(csr.data(), csr.size(), expectedPublicKey);
 }
 
 FUZZ_TEST(ChipCryptoPal, CertificateSigningRequestVerification)
