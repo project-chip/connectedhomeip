@@ -201,6 +201,6 @@ To update or validate this list manually, follow these steps:
 | 155       | WebRTC Transport Requestor                                 | 1364 (0x0554) | Yes                | No                  |                                       |
 | 156       | Wi-Fi Network Diagnostics                                  | 54 (0x0036)   | Yes                | Yes                 |                                       |
 | 157       | Wi-Fi Network Management                                   | 1105 (0x0451) | Yes                | Yes                 |                                       |
-| 158       | Window Covering                                            | 258 (0x0102)  | No                 | No                  |                                       |
+| 158       | Window Covering                                            | 258 (0x0102)  | Yes                | Yes                 |                                       |
 | 159       | Zone Management                                            | 1360 (0x0550) | Yes                | No                  |                                       |
-| **Total** | **159**                                                    |               | **101**            | **54**              |                                       |
+| **Total** | **159**                                                    |               | **101**            | **55**              |                                       |
