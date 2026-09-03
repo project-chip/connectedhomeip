@@ -55,6 +55,7 @@ public:
         kFailedAuth     = 0x03,
         kNoAvailableKey = 0x04,
         kSendFailure    = 0x05,
+        kUnknownGroup   = 0x06,
     };
 
     static constexpr size_t kIPv6AddressLength = 16; // IPv6 address is 16 bytes

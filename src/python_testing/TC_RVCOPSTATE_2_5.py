@@ -33,6 +33,22 @@
 #       --int-arg runmode_cleanmode:1
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device robotic-vacuum-cleaner --trace-to json:${TRACE_APP}.json --app-pipe /tmp/rvcopstate_2_5_fifo
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
+#       --app-pipe /tmp/rvcopstate_2_5_fifo
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --int-arg runmode_cleanmode:1
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -193,7 +209,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
                 step_name_idle_mode = "Manually put the device in a RVC Run Mode cluster mode with the Idle mode tag and in a device state that allows changing to {PIXIT_RUNMODE_CLEANMODE}"
                 self.wait_for_user_input(prompt_msg=f"{step_name_idle_mode}, and press Enter when ready.")
             else:
-                self.write_to_app_pipe({"Name": "Reset"})
+                self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
             # TH reads the SupportedModes attribute of the RVC Run Mode cluster
             self.step("3")
             supported_run_modes_dut = await self.read_supported_mode(endpoint=self.endpoint)
@@ -256,7 +272,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
                 confirm_docking_complete = "Manually confirm DUT has returned to the dock and completed docking-related activities"
                 self.wait_for_user_input(prompt_msg=f"{confirm_docking_complete}, and press Enter when ready.")
             else:
-                self.write_to_app_pipe({"Name": "Docked"})
+                self.write_to_app_pipe({"Name": "Docked", "EndpointId": self.endpoint})
 
             current_mode_match = AttributeMatcher.from_callable(
                 "CurrentMode is IDLE",

@@ -31,6 +31,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/TestEventTriggerDelegate.h>
+#include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/server/Dnssd.h>
@@ -54,6 +55,7 @@
 
 #include <AppCommandDelegate.h>
 #include <BleInit.h>
+#include <ClusterRegistryTypes.h>
 #include <TermHandling.h>
 #if PW_RPC_ENABLED
 #include <Rpc.h>
@@ -64,6 +66,7 @@
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/types/occupancy-sensor/OccupancySensor.h>
 #include <device/types/on-off-light/impl/LoggingOnOffLight.h>
+#include <device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -288,6 +291,26 @@ void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipe
                 .RegisterClusterInstance<chip::app::Clusters::AmbientContextSensingCluster>(
                     &ambientContextSensorDevice->AmbientContextSensingCluster());
         }
+        else if (config.type == "robotic-vacuum-cleaner")
+        {
+            auto * rvcDevice = static_cast<SimulatedRoboticVacuumCleaner *>(device);
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
+                .RegisterClusterInstance<chip::app::Clusters::RvcOperationalState::RvcOperationalStateCluster>(
+                    &rvcDevice->OperationalState());
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
+                .RegisterClusterInstance<chip::app::Clusters::ServiceArea::ServiceAreaCluster>(&rvcDevice->GetServiceAreaCluster());
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry().RegisterClusterInstance<RvcRunModeType>(
+                &rvcDevice->RunMode());
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry().RegisterClusterInstance<RvcCleanModeType>(
+                &rvcDevice->CleanMode());
+        }
+        else if (config.type == "electrical-sensor")
+        {
+            auto * electricalSensorDevice = static_cast<ElectricalSensor *>(device);
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
+                .RegisterClusterInstance<chip::app::Clusters::ElectricalEnergyMeasurement::ElectricalEnergyMeasurementCluster>(
+                    &electricalSensorDevice->ElectricalEnergyMeasurementCluster());
+        }
     }
 
     gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
@@ -310,16 +333,22 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     static chip::CommonCaseDeviceServerInitParams initParams;
     SuccessOrDie(initParams.InitializeStaticResourcesBeforeServerInit());
 
+    // Initialize the test event trigger delegate, and add a handler
+    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate;
+    SuccessOrDie(sTestEventTriggerDelegate.Init(ByteSpan(AppOptions::GetConfig().testEventTriggerEnableKey)));
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
+
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
-        .groupDataProvider      = gGroupDataProvider,                     //
-        .fabricTable            = Server::GetInstance().GetFabricTable(), //
-        .timerDelegate          = gTimerDelegate,                         //
-        .storageDelegate        = *initParams.persistentStorageDelegate,  //
-        .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
-        .platformManager        = DeviceLayer::PlatformMgr(),
-        .failSafeContext        = Server::GetInstance().GetFailSafeContext(),
-        .bindingTable           = Binding::Table::GetInstance(),
-        .bindingManager         = Binding::Manager::GetInstance(),
+        .groupDataProvider        = gGroupDataProvider,                     //
+        .fabricTable              = Server::GetInstance().GetFabricTable(), //
+        .timerDelegate            = gTimerDelegate,                         //
+        .storageDelegate          = *initParams.persistentStorageDelegate,  //
+        .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),
+        .platformManager          = DeviceLayer::PlatformMgr(),
+        .failSafeContext          = Server::GetInstance().GetFailSafeContext(),
+        .bindingTable             = Binding::Table::GetInstance(),
+        .bindingManager           = Binding::Manager::GetInstance(),
+        .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,
     });
 
     RegisterDeviceFactoryOverrides(gTimerDelegate, initParams.persistentStorageDelegate, gAudioManager);
