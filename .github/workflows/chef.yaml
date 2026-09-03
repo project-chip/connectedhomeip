@@ -137,7 +137,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nrf-platform:211
+            image: ghcr.io/project-chip/chip-build-nrf-platform:210
             volumes:
                 - "/:/runner-root-volume"
             options: --user root
