@@ -85,6 +85,7 @@ void WiFiManagerUbus::InvokeUciGetWifiIfaces(void)
     if (!GetUciBlob("wireless", "wifi-iface", &wireless_config))
     {
         ChipLogError(AppServer, "Unable to fetch wireless config, can't configure matter!");
+        ClearCredentials();
     }
     else
     {
@@ -191,6 +192,15 @@ void WiFiManagerUbus::OnPreferencesUpdate(blob_attr * msg)
     }
 }
 
+void WiFiManagerUbus::ClearCredentials(void)
+{
+    CHIP_ERROR err = mServer.ClearNetworkCredentials();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "ClearNetworkCredentials failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+
 void WiFiManagerUbus::OnWirelessNetworksUpdate(blob_attr * msg)
 {
     // Response: { "values": { "<section>": { ".type": "wifi-device"|"wifi-iface", "ssid": "...", "key": "...", ... } } }
@@ -227,17 +237,12 @@ void WiFiManagerUbus::OnWirelessNetworksUpdate(blob_attr * msg)
         {
             if (blobmsg_type(i) == BLOBMSG_TYPE_STRING)
             {
-                ChipWifiDebug("  [string] %s = %s", blobmsg_name(i), blobmsg_get_string(i));
                 if ((strcmp(blobmsg_name(i), "mode") == 0 && strcmp(blobmsg_get_string(i), "ap") != 0) ||
                     (strcmp(blobmsg_name(i), "disabled") == 0 && strcmp(blobmsg_get_string(i), "1") == 0))
                 {
                     ChipLogProgress(AppServer, "Radio was invalid, SKIPPING");
                     radio_is_invalid = true;
                 }
-            }
-            else
-            {
-                ChipWifiDebug("  [type=%d] %s", blobmsg_type(i), blobmsg_name(i));
             }
         }
         if (!radio_is_invalid && (mDesiredRadio.empty() || mDesiredRadio == blobmsg_name(cur)))
@@ -260,11 +265,7 @@ void WiFiManagerUbus::OnWirelessNetworksUpdate(blob_attr * msg)
     {
         ChipLogError(AppServer, "No valid radio found!");
         // We need to make sure not to advertise stale credentials
-        CHIP_ERROR err = mServer.ClearNetworkCredentials();
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(AppServer, "ClearNetworkCredentials failed: %" CHIP_ERROR_FORMAT, err.Format());
-        }
+        ClearCredentials();
         return;
     }
     char * ssid = nullptr;
@@ -281,8 +282,12 @@ void WiFiManagerUbus::OnWirelessNetworksUpdate(blob_attr * msg)
             key = blobmsg_get_string(cur);
         }
     }
-    VerifyOrReturn(ssid != nullptr, ChipLogError(AppServer, "Radio %s does not have a set SSID!", blobmsg_name(radio)));
-    VerifyOrReturn(key != nullptr, ChipLogError(AppServer, "Radio %s does not have a set key!", blobmsg_name(radio)));
+    if (ssid == nullptr || key == nullptr)
+    {
+        ChipLogError(AppServer, "Radio %s has invalid configuration (SSID and/or key)!", blobmsg_name(radio));
+        ClearCredentials();
+        return;
+    }
 
     ChipLogProgress(AppServer, "Chosen radio '%s' has SSID '%s'", blobmsg_name(radio), ssid);
 

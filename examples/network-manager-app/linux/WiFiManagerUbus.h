@@ -37,6 +37,7 @@ private:
     void OnWirelessNetworksUpdate(blob_attr * msg);
     void OnPreferencesUpdate(blob_attr * msg);
     bool GetUciBlob(const char * config, const char * type, blob_attr ** blob);
+    void ClearCredentials(void);
 
     ubus::UbusManager & mUbusManager;
     app::Clusters::WiFiNetworkManagementServer & mServer;
