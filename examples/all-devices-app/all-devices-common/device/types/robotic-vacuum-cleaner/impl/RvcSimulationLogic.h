@@ -25,7 +25,6 @@
 #include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationTopology.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
-#include <lib/support/TypeTraits.h>
 
 namespace chip {
 namespace app {
@@ -36,8 +35,7 @@ namespace rvc_simulation {
  * Populates SupportedMaps and SupportedAreas with the default topology used by
  * all-devices-app robotic vacuum certification tests.
  */
-template <typename ServiceAreaClusterLike>
-void ApplyDefaultMapTopology(ServiceAreaClusterLike & cluster)
+inline void ApplyDefaultMapTopology(Clusters::ServiceArea::ServiceAreaCluster & cluster)
 {
     using namespace Clusters;
     using namespace Clusters::ServiceArea;

@@ -96,7 +96,6 @@ SimulatedRoboticVacuumCleaner::SimulatedRoboticVacuumCleaner(const Context & con
     RoboticVacuumCleaner(RoboticVacuumCleaner::Config{
         .operationalStateDelegate = *this,
         .runModeDelegate          = mRunModeAppDelegate,
-        .runModeStartupValue      = kRunModeIdle,
         .diagnosticDataProvider   = context.diagnosticDataProvider,
     }),
     mTimerDelegate(context.timerDelegate)

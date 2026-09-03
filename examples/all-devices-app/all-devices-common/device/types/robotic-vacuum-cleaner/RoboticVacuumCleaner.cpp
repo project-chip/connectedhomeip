@@ -24,7 +24,7 @@ namespace chip::app {
 RoboticVacuumCleaner::RoboticVacuumCleaner(const Config & config) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRoboticVacuumCleaner, 1)),
     mOperationalStateDelegate(config.operationalStateDelegate), mRunModeDelegate(config.runModeDelegate),
-    mRunModeStartupValue(config.runModeStartupValue), mDiagnosticDataProvider(config.diagnosticDataProvider)
+    mDiagnosticDataProvider(config.diagnosticDataProvider)
 {}
 
 CHIP_ERROR RoboticVacuumCleaner::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -48,11 +48,6 @@ CHIP_ERROR RoboticVacuumCleaner::Register(EndpointId endpoint, CodeDrivenDataMod
     ReturnErrorOnFailure(provider.AddCluster(mRunModeCluster.Registration()));
 
     ReturnErrorOnFailure(RegisterOptionalClusters(endpoint, provider));
-
-    mRunModeCluster.Cluster().UpdateCurrentMode(mRunModeStartupValue);
-    LogErrorOnFailure(mOperationalStateCluster.Cluster().SetOperationalState(
-        to_underlying(Clusters::OperationalState::OperationalStateEnum::kStopped)));
-    LogErrorOnFailure(mOperationalStateCluster.Cluster().SetCurrentPhase(0));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 

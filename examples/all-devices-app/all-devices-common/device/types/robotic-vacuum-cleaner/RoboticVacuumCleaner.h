@@ -40,9 +40,6 @@ public:
     {
         Clusters::OperationalState::OperationalStateCluster::Delegate & operationalStateDelegate;
         Clusters::ModeBase::AppDelegate & runModeDelegate;
-        // Mode value to report on startup, using the numbering of the concrete run mode option
-        // list supplied via runModeDelegate.
-        uint8_t runModeStartupValue;
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
     };
 
@@ -75,7 +72,6 @@ private:
 
     Clusters::ModeBase::AppDelegate & mRunModeDelegate;
     LazyRegisteredServerCluster<Clusters::ModeBaseCluster> mRunModeCluster;
-    uint8_t mRunModeStartupValue;
 
     DeviceLayer::DiagnosticDataProvider & mDiagnosticDataProvider;
 };

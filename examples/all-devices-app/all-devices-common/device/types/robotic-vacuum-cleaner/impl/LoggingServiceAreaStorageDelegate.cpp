@@ -79,6 +79,13 @@ bool LoggingServiceAreaStorageDelegate::ModifySupportedAreaRaw(uint32_t listInde
 {
     // The server instance (caller) is responsible for ensuring that there are no duplicate area IDs, list size not exceeded,
     // etc.
+    if (listIndex >= mSupportedAreas.size())
+    {
+        ChipLogError(Zcl, "ModifySupportedAreaRaw - listIndex %u out of range (size %u)", static_cast<unsigned>(listIndex),
+                     static_cast<unsigned>(mSupportedAreas.size()));
+        return false;
+    }
+
     if (modifiedArea.areaID != mSupportedAreas[listIndex].areaID)
     {
         ChipLogError(Zcl, "ModifySupportedAreaRaw - areaID's do not match, new areaID %u, existing areaID %u",
@@ -174,6 +181,13 @@ bool LoggingServiceAreaStorageDelegate::ModifySupportedMapRaw(uint32_t listIndex
 {
     // The server instance (caller) is responsible for ensuring that there are no duplicate map IDs, list size not exceeded,
     // etc.
+    if (listIndex >= mSupportedMaps.size())
+    {
+        ChipLogError(Zcl, "ModifySupportedMapRaw - listIndex %u out of range (size %u)", static_cast<unsigned>(listIndex),
+                     static_cast<unsigned>(mSupportedMaps.size()));
+        return false;
+    }
+
     if (modifiedMap.mapID != mSupportedMaps[listIndex].mapID)
     {
         ChipLogError(Zcl, "ModifySupportedMapRaw - mapID's do not match, new mapID %u, existing mapID %u",
@@ -331,6 +345,13 @@ bool LoggingServiceAreaStorageDelegate::AddProgressElementRaw(const Structs::Pro
 bool LoggingServiceAreaStorageDelegate::ModifyProgressElementRaw(uint32_t listIndex,
                                                                  const Structs::ProgressStruct::Type & modifiedProgressElement)
 {
+    if (listIndex >= mProgressList.size())
+    {
+        ChipLogError(Zcl, "ModifyProgressElementRaw - listIndex %u out of range (size %u)", static_cast<unsigned>(listIndex),
+                     static_cast<unsigned>(mProgressList.size()));
+        return false;
+    }
+
     if (modifiedProgressElement.areaID != mProgressList[listIndex].areaID)
     {
         ChipLogError(Zcl, "ModifyProgressElementRaw - areaID's do not match, new areaID %u, existing areaID %u",
