@@ -1599,6 +1599,23 @@ class IDMBaseTest(BasicCompositionTests):
                 providerNodeID=dev_ctrl.nodeId, endpoint=self.ROOT_NODE_ENDPOINT_ID)]
         return None
 
+    def fabric_write_skip_reason(self, info: FabricScopedAttributeInfo) -> str | None:
+        """Why a device-wide fabric sweep must not write this attribute, or None if it may.
+
+        Covers only the reasons the attribute's own metadata gives. Whether a value is
+        known that the cluster would accept is a separate question, answered by
+        fabric_scoped_write_payload.
+        """
+        if (info.cluster_id, info.attribute_id) in FABRIC_REPORT_DENIED_ATTRIBUTES:
+            return ("the cluster does not report the change, so the subscription half of the check cannot be "
+                    "exercised")
+        if info.write_denied:
+            return ("writing it in a device-wide sweep would break the test session, so it is deliberately "
+                    "excluded")
+        if not info.writable:
+            return "the spec makes it read-only"
+        return None
+
     async def trigger_fabric_sensitive_event(self, info: FabricSensitiveEventInfo,
                                              dev_ctrl: ChipDeviceCtrl) -> bool:
         """Generate the given fabric-sensitive event on the controller's own fabric.

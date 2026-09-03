@@ -265,6 +265,28 @@ class TestFabricScopedDiscovery(CertificationUnitTestNoDevice):
             return
         asserts.fail("Cross-fabric fabric-sensitive data must fail the masking assertion")
 
+    def test_write_skip_reason_distinguishes_why_a_sweep_must_not_write(self):
+        dut = make_dut({
+            0: {Clusters.AccessControl.id: attribute_list(ACL_ID, EXTENSION_ID),
+                Clusters.TlsClientManagement.id: attribute_list(PROVISIONED_ENDPOINTS_ID)},
+            1: {Clusters.Binding.id: attribute_list(BINDING_ID)},
+        })
+        infos = dut.discover_fabric_scoped_attributes()
+
+        acl = dut.fabric_write_skip_reason(self.find(infos, Clusters.AccessControl.id, ACL_ID))
+        asserts.assert_in("break the test session", acl, "The ACL is deny-listed, not read-only")
+
+        read_only = dut.fabric_write_skip_reason(
+            self.find(infos, Clusters.TlsClientManagement.id, PROVISIONED_ENDPOINTS_ID))
+        asserts.assert_equal(read_only, "the spec makes it read-only", "ProvisionedEndpoints is read-only")
+
+        binding = dut.fabric_write_skip_reason(self.find(infos, Clusters.Binding.id, BINDING_ID))
+        asserts.assert_in("does not report the change", binding,
+                          "Binding is writable but reports no change, so the subscription half cannot run")
+
+        asserts.assert_is_none(dut.fabric_write_skip_reason(self.find(infos, Clusters.AccessControl.id, EXTENSION_ID)),
+                               "Extension is the attribute the sweep is expected to write")
+
     def test_attribute_level_fabric_sensitivity_masks_the_whole_entry(self):
         # ProvisionedEndpoints carries the S quality on the attribute itself rather than
         # on any field of TLSEndpointStruct, so every field but FabricIndex is masked.
