@@ -145,7 +145,7 @@ class TC_ESALM_3_1(MatterBaseTest):
             timeout_sec=30)
 
         self.step(6, "TH waits up to 30 seconds for Notify event",
-                  "Notify event received. Active has TRIGGERED_BIT set. Inactive does not. State has TRIGGERED_BIT set. Mask equals current Mask attribute.")
+                  expectation="Notify event received. Active has TRIGGERED_BIT set. Inactive does not. State has TRIGGERED_BIT set. Mask equals current Mask attribute.")
         notify_event = event_sub.wait_for_event_report(cluster.Events.Notify, timeout_sec=30)
         asserts.assert_true(notify_event.active & triggered_bit,
                             "Notify event: TRIGGERED_BIT not set in Active field")
@@ -159,13 +159,13 @@ class TC_ESALM_3_1(MatterBaseTest):
                              "Notify event Mask field does not match current Mask attribute")
 
         self.step(7, "TH reads State",
-                  "DUT returns AlarmBitmap with TRIGGERED_BIT set.")
+                  expectation="DUT returns AlarmBitmap with TRIGGERED_BIT set.")
         state_val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.State)
         asserts.assert_true(state_val & triggered_bit, "State does not have TRIGGERED_BIT set")
 
         self.step(8, "TH sends TestEventTrigger to clear the alarm condition for TRIGGERED_BIT",
-                  "SUCCESS.")
+                  expectation="SUCCESS.")
         state_sub.reset()
         event_sub.reset()
         if trigger_clear is not None:
@@ -176,7 +176,7 @@ class TC_ESALM_3_1(MatterBaseTest):
 
         if not is_latched:
             self.step(9, "If non-latched: TH awaits subscription report with TRIGGERED_BIT cleared in State",
-                      "Report received with TRIGGERED_BIT = 0.")
+                      expectation="Report received with TRIGGERED_BIT = 0.")
             if trigger_clear is not None:
                 def state_cleared_triggered_bit(report):
                     return not bool(report.value & triggered_bit)
@@ -187,7 +187,7 @@ class TC_ESALM_3_1(MatterBaseTest):
                 self.mark_current_step_skipped()
 
             self.step(10, "If non-latched: TH waits up to 30 seconds for Notify event",
-                      "Notify event received. Inactive has TRIGGERED_BIT set. Active does not. State does not have TRIGGERED_BIT set.")
+                      expectation="Notify event received. Inactive has TRIGGERED_BIT set. Active does not. State does not have TRIGGERED_BIT set.")
             if trigger_clear is not None:
                 clear_event = event_sub.wait_for_event_report(cluster.Events.Notify, timeout_sec=30)
                 asserts.assert_true(clear_event.inactive & triggered_bit,
@@ -200,30 +200,30 @@ class TC_ESALM_3_1(MatterBaseTest):
                 self.mark_current_step_skipped()
 
             self.step(11, "If latched: TH reads State",
-                      "TRIGGERED_BIT remains set (latched alarm persists until Reset).")
+                      expectation="TRIGGERED_BIT remains set (latched alarm persists until Reset).")
             self.mark_current_step_skipped()
 
             self.step(12, "If latched and Reset supported: TH sends Reset with TRIGGERED_BIT",
-                      "SUCCESS. Subscription report received with TRIGGERED_BIT cleared.")
+                      expectation="SUCCESS. Subscription report received with TRIGGERED_BIT cleared.")
             self.mark_current_step_skipped()
         else:
             self.step(9, "If non-latched: TH awaits subscription report with TRIGGERED_BIT cleared in State",
-                      "Report received with TRIGGERED_BIT = 0.")
+                      expectation="Report received with TRIGGERED_BIT = 0.")
             self.mark_current_step_skipped()
 
             self.step(10, "If non-latched: TH waits up to 30 seconds for Notify event",
-                      "Notify event received. Inactive has TRIGGERED_BIT set. Active does not. State does not have TRIGGERED_BIT set.")
+                      expectation="Notify event received. Inactive has TRIGGERED_BIT set. Active does not. State does not have TRIGGERED_BIT set.")
             self.mark_current_step_skipped()
 
             self.step(11, "If latched: TH reads State",
-                      "TRIGGERED_BIT remains set (latched alarm persists until Reset).")
+                      expectation="TRIGGERED_BIT remains set (latched alarm persists until Reset).")
             state_val = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.State)
             asserts.assert_true(state_val & triggered_bit,
                                 "Latched alarm: TRIGGERED_BIT should still be set in State after condition clears")
 
             self.step(12, "If latched and Reset supported: TH sends Reset with TRIGGERED_BIT",
-                      "SUCCESS. Subscription report received with TRIGGERED_BIT cleared.")
+                      expectation="SUCCESS. Subscription report received with TRIGGERED_BIT cleared.")
             accepted_cmds = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.AcceptedCommandList)
             if 0x00 in accepted_cmds:  # Reset command code = 0x00
@@ -239,7 +239,7 @@ class TC_ESALM_3_1(MatterBaseTest):
                 self.mark_current_step_skipped()
 
         self.step(13, "TH sends TestEventTrigger for all-alarms-cleared (0x00A1_0000_0000_0000)",
-                  "SUCCESS. Subscription report received with State = 0 (cleanup).")
+                  expectation="SUCCESS. Subscription report received with State = 0 (cleanup).")
         state_sub.reset()
         await self.send_test_event_triggers(eventTrigger=_TRIGGER_ALL_CLEAR)
 

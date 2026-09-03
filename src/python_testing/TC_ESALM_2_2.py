@@ -81,7 +81,7 @@ class TC_ESALM_2_2(MatterBaseTest):
         self.step(1, "Commission DUT to TH", is_commissioning=True)
 
         self.step(2, "TH reads FeatureMap; reads all supported threshold attributes and stores originals",
-                  "SUCCESS for each read.")
+                  expectation="SUCCESS for each read.")
         feature_map = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.FeatureMap)
         has_overvolt = bool(feature_map & _F.kOverVoltage)
@@ -141,7 +141,7 @@ class TC_ESALM_2_2(MatterBaseTest):
         new_under_voltage = None
 
         self.step(3, "TH sends SetElectricalAlarmThresholds with OverVoltageThreshold = ORIG + 1000; reads back",
-                  "SUCCESS. Read-back equals ORIG + 1000.")
+                  expectation="SUCCESS. Read-back equals ORIG + 1000.")
         if has_overvolt:
             base_val = orig_over_voltage if isinstance(orig_over_voltage, int) else 230000
             new_over_voltage = base_val + 1000
@@ -153,7 +153,7 @@ class TC_ESALM_2_2(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(4, "TH sends SetElectricalAlarmThresholds with UnderVoltageThreshold = ORIG - 1000; reads back",
-                  "SUCCESS. Read-back equals ORIG - 1000.")
+                  expectation="SUCCESS. Read-back equals ORIG - 1000.")
         if has_undervolt:
             base_val = orig_under_voltage if isinstance(orig_under_voltage, int) else 110000
             new_under_voltage = base_val - 1000
@@ -165,7 +165,7 @@ class TC_ESALM_2_2(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(5, "TH sends SetElectricalAlarmThresholds with OverVoltageThreshold = current UnderVoltageThreshold (constraint violation)",
-                  "DUT returns CONSTRAINT_ERROR. OverVoltageThreshold unchanged from step 3.")
+                  expectation="DUT returns CONSTRAINT_ERROR. OverVoltageThreshold unchanged from step 3.")
         if has_overvolt and has_undervolt:
             current_under = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.UnderVoltageThreshold)
@@ -178,7 +178,7 @@ class TC_ESALM_2_2(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(6, "TH sends SetElectricalAlarmThresholds with OverFrequencyThreshold = ORIG + 1000; reads back",
-                  "SUCCESS. Read-back equals ORIG + 1000.")
+                  expectation="SUCCESS. Read-back equals ORIG + 1000.")
         if has_overfreq:
             base_val = orig_over_frequency if isinstance(orig_over_frequency, int) else 50000
             new_over_freq = base_val + 1000
@@ -190,7 +190,7 @@ class TC_ESALM_2_2(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(7, "TH sends SetElectricalAlarmThresholds with UnderFrequencyThreshold = ORIG - 1000; reads back",
-                  "SUCCESS. Read-back equals ORIG - 1000.")
+                  expectation="SUCCESS. Read-back equals ORIG - 1000.")
         if has_underfreq:
             base_val = orig_under_frequency if isinstance(orig_under_frequency, int) else 50000
             new_under_freq = base_val - 1000
@@ -202,7 +202,7 @@ class TC_ESALM_2_2(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(8, "TH sends SetElectricalAlarmThresholds with OverPowerThreshold = ORIG + 1000; reads back",
-                  "SUCCESS. Read-back equals ORIG + 1000.")
+                  expectation="SUCCESS. Read-back equals ORIG + 1000.")
         if has_overpower:
             base_val = orig_over_power if isinstance(orig_over_power, int) else 10000
             new_over_power = base_val + 1000
@@ -214,7 +214,7 @@ class TC_ESALM_2_2(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(9, "TH sends SetElectricalAlarmThresholds with UnderPowerThreshold = ORIG - 1000; reads back",
-                  "SUCCESS. Read-back equals ORIG - 1000.")
+                  expectation="SUCCESS. Read-back equals ORIG - 1000.")
         if has_underpower:
             base_val = orig_under_power if isinstance(orig_under_power, int) else 1000
             new_under_power = base_val - 1000
@@ -226,7 +226,7 @@ class TC_ESALM_2_2(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(10, "TH sends SetElectricalAlarmThresholds with OverCurrentThreshold = ORIG + 1000; reads back",
-                  "SUCCESS. Read-back equals ORIG + 1000.")
+                  expectation="SUCCESS. Read-back equals ORIG + 1000.")
         if has_overcur:
             base_val = orig_over_current if isinstance(orig_over_current, int) else 16000
             new_over_current = base_val + 1000
@@ -238,7 +238,7 @@ class TC_ESALM_2_2(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(11, "TH sends SetElectricalAlarmThresholds with UnderCurrentThreshold = ORIG - 1000; reads back",
-                  "SUCCESS. Read-back equals ORIG - 1000.")
+                  expectation="SUCCESS. Read-back equals ORIG - 1000.")
         if has_undercur:
             base_val = orig_under_current if isinstance(orig_under_current, int) else 1000
             new_under_current = base_val - 1000
@@ -251,7 +251,7 @@ class TC_ESALM_2_2(MatterBaseTest):
 
         new_power_import = None
         self.step(12, "TH sends SetElectricalAlarmThresholds with PowerImportThreshold = 1000; reads back",
-                  "SUCCESS. Read-back equals 1000.")
+                  expectation="SUCCESS. Read-back equals 1000.")
         if has_powerimp:
             new_power_import = 1000
             await self._send_set_thresholds(endpoint, powerImportThreshold=new_power_import)
@@ -262,7 +262,7 @@ class TC_ESALM_2_2(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(13, "TH sends SetElectricalAlarmThresholds with PowerImportThreshold = -1 (violates min 0)",
-                  "DUT returns CONSTRAINT_ERROR. PowerImportThreshold unchanged from step 12.")
+                  expectation="DUT returns CONSTRAINT_ERROR. PowerImportThreshold unchanged from step 12.")
         if has_powerimp:
             await self._send_set_thresholds_expect_error(endpoint, Status.ConstraintError, powerImportThreshold=-1)
             readback = await self.read_single_attribute_check_success(
@@ -273,7 +273,7 @@ class TC_ESALM_2_2(MatterBaseTest):
 
         new_power_export = None
         self.step(14, "TH sends SetElectricalAlarmThresholds with PowerExportThreshold = -1000; reads back",
-                  "SUCCESS. Read-back equals -1000.")
+                  expectation="SUCCESS. Read-back equals -1000.")
         if has_powerexp:
             new_power_export = -1000
             await self._send_set_thresholds(endpoint, powerExportThreshold=new_power_export)
@@ -284,7 +284,7 @@ class TC_ESALM_2_2(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(15, "TH sends SetElectricalAlarmThresholds with PowerExportThreshold = 1 (violates max 0)",
-                  "DUT returns CONSTRAINT_ERROR. PowerExportThreshold unchanged from step 14.")
+                  expectation="DUT returns CONSTRAINT_ERROR. PowerExportThreshold unchanged from step 14.")
         if has_powerexp:
             await self._send_set_thresholds_expect_error(endpoint, Status.ConstraintError, powerExportThreshold=1)
             readback = await self.read_single_attribute_check_success(
@@ -294,7 +294,7 @@ class TC_ESALM_2_2(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(16, "TH reboots DUT and re-commissions; reads all threshold attributes written in steps 3-14",
-                  "Each attribute returns the value written before reboot (Non-Volatile).")
+                  expectation="Each attribute returns the value written before reboot (Non-Volatile).")
         await self.request_device_reboot()
 
         if has_overvolt:
@@ -339,7 +339,7 @@ class TC_ESALM_2_2(MatterBaseTest):
             asserts.assert_equal(readback, new_power_export, "PowerExportThreshold not persisted across reboot")
 
         self.step(17, "TH sends SetElectricalAlarmThresholds to restore all attributes to original values",
-                  "SUCCESS for each restore.")
+                  expectation="SUCCESS for each restore.")
         restore_kwargs = {}
         if has_overvolt:
             restore_kwargs['overVoltageThreshold'] = orig_over_voltage
