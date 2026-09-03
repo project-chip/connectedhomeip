@@ -177,15 +177,15 @@ CHIP_ERROR AppTask::InitRootNode()
     ReturnErrorOnFailure(mRootNode->Register(rootAllocator, *mDataModelProvider));
 
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
-        .groupDataProvider      = mGroupDataProvider,
-        .fabricTable            = Server::GetInstance().GetFabricTable(),
-        .timerDelegate          = mTimerDelegate,
-        .storageDelegate        = *mInitParams.persistentStorageDelegate,
-        .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
-        .platformManager        = DeviceLayer::PlatformMgr(),
-        .failSafeContext        = Server::GetInstance().GetFailSafeContext(),
-        .bindingTable           = Clusters::Binding::Table::GetInstance(),
-        .bindingManager         = Clusters::Binding::Manager::GetInstance(),
+        .groupDataProvider        = mGroupDataProvider,
+        .fabricTable              = Server::GetInstance().GetFabricTable(),
+        .timerDelegate            = mTimerDelegate,
+        .storageDelegate          = *mInitParams.persistentStorageDelegate,
+        .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),
+        .platformManager          = DeviceLayer::PlatformMgr(),
+        .failSafeContext          = Server::GetInstance().GetFailSafeContext(),
+        .bindingTable             = Clusters::Binding::Table::GetInstance(),
+        .bindingManager           = Clusters::Binding::Manager::GetInstance(),
         .testEventTriggerDelegate = *mInitParams.testEventTriggerDelegate,
     });
 
