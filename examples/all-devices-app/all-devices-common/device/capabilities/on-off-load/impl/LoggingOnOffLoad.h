@@ -40,9 +40,7 @@ namespace app {
  * It is intended as a base class for logging leaf simulator devices like
  * LoggingOnOffLight, OnOffPlugInUnit, and MountedOnOffControl.
  */
-class LoggingOnOffLoad : public OnOffLoad,
-                         public Clusters::OnOffDelegate,
-                         public Clusters::OnOffEffectDelegate
+class LoggingOnOffLoad : public OnOffLoad, public Clusters::OnOffDelegate, public Clusters::OnOffEffectDelegate
 {
 public:
     LoggingOnOffLoad(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,

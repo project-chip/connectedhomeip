@@ -28,6 +28,7 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
 #include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
+#include <device/capabilities/identify/LoggingIdentifyDelegate.h>
 #include <device/types/root-node/WifiRootNode.h>
 #include <esp_heap_caps.h>
 #include <esp_log.h>
@@ -41,7 +42,6 @@
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 #include <platform/PlatformManager.h>
 #include <setup_payload/OnboardingCodesUtil.h>
-#include <device/capabilities/identify/LoggingIdentifyDelegate.h>
 
 #include <app_config/enabled_devices.h>
 

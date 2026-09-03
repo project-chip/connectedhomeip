@@ -62,10 +62,10 @@
 #include <pigweed/rpc_services/AccessInterceptorRegistry.h>
 #endif // PW_RPC_ENABLED
 #include <device/api/SingleEndpoint.h>
+#include <device/capabilities/identify/LoggingIdentifyDelegate.h>
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/types/occupancy-sensor/OccupancySensor.h>
 #include <device/types/on-off-light/impl/LoggingOnOffLight.h>
-#include <device/capabilities/identify/LoggingIdentifyDelegate.h>
 
 using namespace chip;
 using namespace chip::app;

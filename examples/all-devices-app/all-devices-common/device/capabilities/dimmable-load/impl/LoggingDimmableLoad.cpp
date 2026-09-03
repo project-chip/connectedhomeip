@@ -28,8 +28,8 @@ namespace app {
 
 LoggingDimmableLoad::LoggingDimmableLoad(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
                                          const Config & config) :
-    DimmableLoad(deviceTypes, context, Delegates{ .onOff = *this, .levelControl = *this, .effect = *this, .identify = context.identifyDelegate },
-                 config)
+    DimmableLoad(deviceTypes, context,
+                 Delegates{ .onOff = *this, .levelControl = *this, .effect = *this, .identify = context.identifyDelegate }, config)
 {}
 
 // OnOffDelegate

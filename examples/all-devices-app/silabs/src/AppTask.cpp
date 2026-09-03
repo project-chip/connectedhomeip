@@ -82,8 +82,7 @@ std::unique_ptr<chip::app::DeviceInterface> sRootNode;
 // Using a std::array (rather than std::vector) avoids heap allocation for the
 // container itself and enforces the bound at compile time, which is important
 // on RAM-constrained embedded platforms.
-constexpr std::size_t kMaxConstructedDevices =
-    (ALL_DEVICES_DEFAULT_DEVICES_COUNT > 0) ? ALL_DEVICES_DEFAULT_DEVICES_COUNT : 1;
+constexpr std::size_t kMaxConstructedDevices = (ALL_DEVICES_DEFAULT_DEVICES_COUNT > 0) ? ALL_DEVICES_DEFAULT_DEVICES_COUNT : 1;
 std::array<std::unique_ptr<chip::app::DeviceInterface>, kMaxConstructedDevices> sConstructedDevices;
 std::size_t sConstructedDeviceCount = 0;
 
