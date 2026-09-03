@@ -126,7 +126,7 @@ product baseline patterns before modifying or generating code.
 ## Common Commands
 
 Most commands require an activated environment. The user may or may not have
-already done that before running an agent harness; if $PW_PROJECT_ROOT is set
+already done that before running an agent harness; if `$PW_PROJECT_ROOT` is set
 the environment is probably active.
 
 ### Environment Activation
