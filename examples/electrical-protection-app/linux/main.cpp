@@ -52,8 +52,6 @@ void ApplicationInit()
     // Electrical Protection Alarm reports the enclosure's safety faults. Same imperative
     // registration: its generated Init callback is a no-op too.
     VerifyOrDie(ElectricalProtectionAlarm::ElectricalProtectionAlarmInit(kEnclosureEndpointId) == CHIP_NO_ERROR);
-<<<<<<< HEAD
-=======
 
     // Power Topology is mandatory on both device types, but with different features. The
     // enclosure needs only a topology choice; the breaker device type additionally makes
@@ -67,7 +65,6 @@ void ApplicationInit()
 
     VerifyOrDie(SetTagList(kBreakerEndpointId, Span<const Descriptor::Structs::SemanticTagStruct::Type>(kBreakerTagList)) ==
                 CHIP_NO_ERROR);
->>>>>>> aed3a54 ([examples] Add an Electrical Circuit Breaker endpoint to electrical-protection-app (#73815))
 }
 
 void ApplicationShutdown()
