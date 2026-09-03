@@ -1489,11 +1489,6 @@ cluster OperationalCredentials = 62 {
 cluster GroupKeyManagement = 63 {
   revision 4;
 
-  enum GroupKeyMulticastPolicyEnum : enum8 {
-    kPerGroupID = 0;
-    kAllNodes = 1;
-  }
-
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
     kCacheAndSync = 1;
@@ -1640,7 +1635,7 @@ provisional cluster CommodityPrice = 149 {
 }
 
 /** The Electrical Grid Conditions Cluster provides the mechanism for communicating electricity grid carbon intensity to devices within the premises in units of Grams of CO2e per kWh. */
-provisional cluster ElectricalGridConditions = 160 {
+cluster ElectricalGridConditions = 160 {
   revision 1;
 
   enum ThreeLevelEnum : enum8 {
