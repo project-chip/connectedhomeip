@@ -34,11 +34,11 @@ constexpr uint16_t kFactoryResetHoldMs = 5000;
 #if ALL_DEVICES_HAS_FACTORY_RESET_SW
 const struct gpio_dt_spec sFactoryResetSw = GPIO_DT_SPEC_GET(ALL_DEVICES_FACTORY_RESET_SW_NODE, gpios);
 struct gpio_callback sFactoryResetSwCallback;
-int64_t sFactoryResetSwPressedAtMs = 0;
+int64_t sFactoryResetSwPressedAtMs = -1;
 
 void FactoryResetPressedHandler(struct k_work *)
 {
-    ChipLogProgress(DeviceLayer, "Factory reset button pressed, hold for %dms to reset.", kFactoryResetHoldMs);
+    ChipLogProgress(DeviceLayer, "Factory reset button pressed; release after holding for %dms to reset.", kFactoryResetHoldMs);
 }
 K_WORK_DEFINE(sFactoryResetPressedWork, FactoryResetPressedHandler);
 
