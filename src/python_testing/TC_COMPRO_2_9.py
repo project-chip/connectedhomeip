@@ -63,9 +63,8 @@ stated in the cluster specification.
 Because this test no longer needs a PASE session, it commissions the DUT the
 ordinary way (``--commissioning-method``) rather than PASE-first
 (``--in-test-commissioning-method``), and it does not read or write any cluster
-attribute over PASE.  It uses no End Device: none of the ``ed_*`` arguments apply,
-and ``--paa-trust-store-path`` is unnecessary — there is no tunnelled
-commissioning to attest.
+attribute over PASE.  It uses no End Device, so none of the ``ed_*`` arguments
+apply.
 
 Test plan reference: TC-COMPRO-2.9 (PROVISIONAL)
 
@@ -76,6 +75,7 @@ Example:
         --discriminator 1234 \\
         --passcode 20202021 \\
         --storage-path /tmp/compro_admin_storage.json \\
+        --paa-trust-store-path ~/matter_tests/paa-trust-store \\
         --endpoint 5
     ```
 """

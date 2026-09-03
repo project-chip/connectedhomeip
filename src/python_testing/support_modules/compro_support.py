@@ -110,9 +110,9 @@ the CommissioningProxy cluster on endpoint 5, so pass ``--endpoint 5``
       --string-arg 'ed_extra_args:--wifi --wifipaf freq_list=2437' \\
       --int-arg ed_discriminator:3840 ed_passcode:20202021
 
-``--paa-trust-store-path`` must point at the PAA certificates for the ED's DAC, or
-tunnelled commissioning fails attestation.  See each test's own docstring for its
-full argument list.
+``--paa-trust-store-path`` must point at the PAA certificates for the DUT's DAC,
+and for 2.4 the ED's too, or commissioning fails attestation.  See each test's
+own docstring for its full argument list.
 
 The ``--PICS`` line shown in each file's CI-arguments block is a *repo-relative*
 path (``src/app/tests/suites/certification/ci-pics-values``) that only resolves

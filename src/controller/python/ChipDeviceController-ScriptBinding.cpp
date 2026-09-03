@@ -128,9 +128,11 @@ public:
               uint16_t discriminator, uint32_t setupPinCode)
     {
         // The entry point rejects a call while a flow is in flight, so this only ever runs
-        // between flows and cannot destroy a sender that is mid-callback higher up the
-        // stack.  Deactivating first covers a previous flow that ended abnormally, and
-        // leaves the transport in the inactive state Activate() requires.
+        // between flows, never on a sender that is mid-callback.  A sender left outstanding
+        // by the previous flow is destroyed here without its OnDone, which is safe:
+        // ~ExchangeHolder clears the delegate and aborts the exchange.
+        // Deactivating first covers a previous flow that ended abnormally, and leaves the
+        // transport in the inactive state Activate() requires.
         DeactivateProxyTransport();
         mProxyCmdSenders.clear();
 
