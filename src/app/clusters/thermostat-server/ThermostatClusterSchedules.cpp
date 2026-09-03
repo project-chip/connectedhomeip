@@ -96,8 +96,8 @@ bool ScheduleHandlesExistAndMatch(const ScheduleStructWithOwnedMembers & schedul
  * @return CHIP_NO_ERROR if the pending schedules list was searched successfully (whether or not a match was found), or the
  *         CHIP_ERROR returned by the delegate if the search could not be completed.
  */
-CHIP_ERROR MatchingPendingScheduleExists(ThermostatSchedules::Delegate & delegate, const ScheduleStructWithOwnedMembers & scheduleToMatch,
-                                         bool & found)
+CHIP_ERROR MatchingPendingScheduleExists(ThermostatSchedules::Delegate & delegate,
+                                         const ScheduleStructWithOwnedMembers & scheduleToMatch, bool & found)
 {
     found = false;
     for (uint8_t i = 0; true; i++)
