@@ -53,8 +53,7 @@ from support_modules import zap_fabric_metadata  # noqa: E402
 from matter.testing.global_attribute_ids import is_standard_cluster_id  # noqa: E402
 from matter.testing.matter_testing import CertificationUnitTestNoDevice  # noqa: E402
 from matter.testing.runner import default_matter_test_main  # noqa: E402
-from matter.testing.spec_parsing import (PrebuiltDataModelDirectory, build_xml_clusters,  # noqa: E402
-                                         build_xml_global_data_types)
+from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_global_data_types  # noqa: E402
 
 # Parsed once: each of these walks a whole data model directory.
 SPEC_CLUSTERS, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_6_1)
