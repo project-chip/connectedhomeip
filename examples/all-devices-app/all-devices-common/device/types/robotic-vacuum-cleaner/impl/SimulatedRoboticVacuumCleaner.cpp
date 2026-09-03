@@ -268,6 +268,13 @@ void SimulatedRoboticVacuumCleaner::UpdateServiceAreaProgressOnExit()
     }
 }
 
+void SimulatedRoboticVacuumCleaner::ExitActiveCleaningServiceArea()
+{
+    GetServiceAreaCluster().SetCurrentArea(DataModel::NullNullable);
+    GetServiceAreaCluster().SetEstimatedEndTime(DataModel::NullNullable);
+    UpdateServiceAreaProgressOnExit();
+}
+
 void SimulatedRoboticVacuumCleaner::HandlePauseStateCallback(OperationalState::GenericOperationalError & err)
 {
     ChipLogProgress(Zcl, "SimulatedRoboticVacuumCleaner: Pause command received.");
@@ -363,6 +370,14 @@ void SimulatedRoboticVacuumCleaner::HandleGoHomeCommandCallback(OperationalState
 
         CancelTimer();
         RunMode().UpdateCurrentMode(kRunModeIdle);
+
+        const uint8_t currentState = OperationalState().GetCurrentOperationalState();
+        if (currentState == to_underlying(OperationalState::OperationalStateEnum::kRunning) ||
+            (currentState == to_underlying(OperationalState::OperationalStateEnum::kPaused) &&
+             mStateBeforePause == to_underlying(OperationalState::OperationalStateEnum::kRunning)))
+        {
+            ExitActiveCleaningServiceArea();
+        }
 
         auto error =
             OperationalState().SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
@@ -833,9 +848,7 @@ void SimulatedRoboticVacuumCleaner::HandleActivityComplete()
     LogErrorOnFailure(
         OperationalState().SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger)));
 
-    GetServiceAreaCluster().SetCurrentArea(DataModel::NullNullable);
-    GetServiceAreaCluster().SetEstimatedEndTime(DataModel::NullNullable);
-    UpdateServiceAreaProgressOnExit();
+    ExitActiveCleaningServiceArea();
 }
 
 void SimulatedRoboticVacuumCleaner::HandleAreaComplete()
@@ -859,6 +872,14 @@ void SimulatedRoboticVacuumCleaner::HandleClearError()
 
     RunMode().UpdateCurrentMode(kRunModeIdle);
     SetDeviceToIdleState();
+}
+
+void SimulatedRoboticVacuumCleaner::HandleReset()
+{
+    CancelTimer();
+    ClearDockChargingTracking();
+    mStateBeforePause = 0;
+    ResetRvcSimulation(RunMode(), OperationalState(), CleanMode(), GetServiceAreaCluster());
 }
 
 void SimulatedRoboticVacuumCleaner::HandleErrorEvent(const std::string & error)

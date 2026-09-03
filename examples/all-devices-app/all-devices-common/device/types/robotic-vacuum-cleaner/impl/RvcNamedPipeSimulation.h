@@ -37,6 +37,7 @@ public:
     virtual void HandleActivityComplete()                    = 0;
     virtual void HandleAreaComplete()                        = 0;
     virtual void HandleClearError()                          = 0;
+    virtual void HandleReset()                               = 0;
     virtual void HandleErrorEvent(const std::string & error) = 0;
 };
 

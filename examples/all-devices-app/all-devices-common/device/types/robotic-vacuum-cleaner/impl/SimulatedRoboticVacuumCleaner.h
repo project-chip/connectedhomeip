@@ -129,6 +129,7 @@ public:
     void HandleActivityComplete() override;
     void HandleAreaComplete() override;
     void HandleClearError() override;
+    void HandleReset() override;
     void HandleErrorEvent(const std::string & error) override;
 
 protected:
@@ -183,6 +184,7 @@ private:
 
     void SetDeviceToIdleState();
     void UpdateServiceAreaProgressOnExit();
+    void ExitActiveCleaningServiceArea();
     void SetMapTopology();
     void SetAttributesAtCleanStart();
     void GoToNextArea(Clusters::ServiceArea::OperationalStatusEnum currentAreaOpState, bool & finished);

@@ -28,14 +28,12 @@
 #include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
 #include <app/clusters/service-area-server/ServiceAreaCluster.h>
 #include <device/types/robotic-vacuum-cleaner/impl/RvcNamedPipeSimulation.h>
-#include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationLogic.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::all_devices::rvc_simulation;
 using namespace chip::app::Clusters;
 
 namespace {
@@ -649,16 +647,12 @@ public:
     const char * GetName() const override { return "Reset"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * runMode          = GetClusterByEndpoint<RvcRunModeType>(delegate, endpointId, "RvcRunMode");
-        auto * operationalState = GetClusterByEndpoint<Clusters::RvcOperationalState::RvcOperationalStateCluster>(
-            delegate, endpointId, "RvcOperationalState");
-        auto * cleanMode   = GetClusterByEndpoint<RvcCleanModeType>(delegate, endpointId, "RvcCleanMode");
-        auto * serviceArea = GetClusterByEndpoint<Clusters::ServiceArea::ServiceAreaCluster>(delegate, endpointId, "ServiceArea");
-        if (runMode == nullptr || operationalState == nullptr || cleanMode == nullptr || serviceArea == nullptr)
+        auto * simulation = GetRvcSimulation(delegate, endpointId);
+        if (simulation == nullptr)
         {
             return;
         }
-        ResetRvcSimulation(*runMode, *operationalState, *cleanMode, *serviceArea);
+        simulation->HandleReset();
     }
 };
 
