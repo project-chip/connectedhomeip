@@ -110,19 +110,23 @@ void DtimActivityTask(void * arg)
 {
     (void) arg;
 
+    bool dtimActive = true;
     for (;;)
     {
-        uint32_t notificationValue       = 0;
-        BaseType_t notificationReceived  =
-            xTaskNotifyWait(0, kDtimActivityNotification, &notificationValue, pdMS_TO_TICKS(kDtimActivityDurationMs));
+        uint32_t notificationValue = 0;
+        const TickType_t waitTime  = dtimActive ? pdMS_TO_TICKS(kDtimActivityDurationMs) : portMAX_DELAY;
+        BaseType_t notificationReceived =
+            xTaskNotifyWait(0, kDtimActivityNotification, &notificationValue, waitTime);
 
         if (notificationReceived == pdTRUE && (notificationValue & kDtimActivityNotification) != 0)
         {
             SetDtim(kActiveDtim);
+            dtimActive = true;
         }
         else
         {
             SetDtim(kIdleDtim);
+            dtimActive = false;
         }
     }
 }
