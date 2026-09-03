@@ -15,7 +15,6 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-import("//build_overrides/mbedtls.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
 import("${chip_root}/build/chip/fuzz_test.gni")
 import("${chip_root}/src/crypto/crypto.gni")
@@ -88,10 +87,6 @@ if (pw_enable_fuzz_test_targets) {
       "${chip_root}/src/crypto",
       "${chip_root}/src/platform/logging:default",
     ]
-
-    if (chip_crypto == "psa") {
-      public_deps += [ "${mbedtls_root}:mbedtls" ]
-    }
   }
 
   chip_pw_fuzz_target("fuzz-chip-crypto-pal-pw") {

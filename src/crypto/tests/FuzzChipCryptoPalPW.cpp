@@ -328,6 +328,6 @@ void CertificateSigningRequestVerification(const Bytes & csr)
 }
 
 FUZZ_TEST(ChipCryptoPal, CertificateSigningRequestVerification)
-    .WithDomains(Arbitrary<Bytes>().WithSeeds({ Bytes(kGoodCsr, kGoodCsr + sizeof(kGoodCsr)) }));
+    .WithDomains(Arbitrary<Bytes>().WithMaxSize(kMaxDerCertLen).WithSeeds({ Bytes(kGoodCsr, kGoodCsr + sizeof(kGoodCsr)) }));
 
 } // namespace
