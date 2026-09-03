@@ -167,7 +167,6 @@ class NANSimulator:
         with self._lock:
             if (sub_id, pub_id) in self.announced:
                 return
-            self.announced.add((sub_id, pub_id))
 
         log.debug("NANSimulator: Discovery match - sub=%s (id=%d) <-> pub=%s (id=%d)",
                   sub_iface_name, sub_id, pub_iface_name, pub_id)
@@ -180,6 +179,11 @@ class NANSimulator:
             "srv_proto_type": ("u", pub_args.get("srv_proto_type", 3)),
             "ssi": ("ay", pub_args.get("ssi", b"")),
         })
+
+        # Recorded only now: a pair marked reported before the emit would be
+        # suppressed for good if the emit raised.
+        with self._lock:
+            self.announced.add((sub_id, pub_id))
 
         if bool(sub_args.get("discovery_only", False)):
             log.debug("Interface[%d] Suppressing NANReplied: subscriber %d is discovery-only",
@@ -255,6 +259,11 @@ class WpaSupplicantMock(TerminableThread):
 
         dbus_error_name = "fi.w1.wpa_supplicant1.InterfaceUnknown"
 
+    class InterfaceCreationUnsupportedError(sdbus.DbusFailedError):
+        """Raised when asked to create an interface the mock does not have."""
+
+        dbus_error_name = "fi.w1.wpa_supplicant1.InterfaceCreationFailed"
+
     class Wpa(sdbus.DbusInterfaceCommonAsync,
               interface_name="fi.w1.wpa_supplicant1"):
         path = "/fi/w1/wpa_supplicant1"
@@ -268,7 +277,18 @@ class WpaSupplicantMock(TerminableThread):
             ifname = ""
             if "Ifname" in args:
                 ifname = str(args["Ifname"][1])
-            return await self.GetInterface(ifname)
+            for interface in self.mock.interfaces:
+                if interface.interface_name_in_sim in ifname.lower():
+                    return interface.path
+            # The platform falls back to CreateInterface once GetInterface has
+            # failed. The mock cannot honour it: its interfaces are created up
+            # front, each bound to a network link, so there is nothing to bind a
+            # new one to. Say that rather than repeating InterfaceUnknown.
+            registered = [i.interface_name_in_sim for i in self.mock.interfaces]
+            log.error("Cannot create mock interface '%s'; the mock serves %s only. "
+                      "Is the application in the right network namespace?", ifname, registered)
+            raise WpaSupplicantMock.InterfaceCreationUnsupportedError(
+                f"The mock cannot create '{ifname}'; it serves {registered}")
 
         @sdbus.dbus_method_async("s", "o")
         async def GetInterface(self, name: str) -> str:
@@ -318,6 +338,14 @@ class WpaSupplicantMock(TerminableThread):
             # it, and it never associated in the first place.
             self.associated = False
 
+        @staticmethod
+        def _current_sender() -> str | None:
+            """Unique bus name of the application making this call, if any."""
+            try:
+                return sdbus.get_current_message().sender
+            except Exception:  # Not called from a D-Bus message context.
+                return None
+
         async def _note_caller(self) -> None:
             """Reset the association when a different application takes over.
 
@@ -328,17 +356,42 @@ class WpaSupplicantMock(TerminableThread):
             waiting for the old owner to say goodbye -- does not work, because a
             process that is killed says nothing.
             """
-            try:
-                sender = sdbus.get_current_message().sender
-            except Exception:  # Not called from a D-Bus message context.
-                return
+            sender = self._current_sender()
             if sender is None or sender == self.owner:
                 return
             if self.owner is not None:
                 log.debug("Interface[%d] owner changed from %s to %s; dropping stale association",
                           self.index, self.owner, sender)
                 await self._leave_network()
+            self._cancel_nan_sessions(sender)
             self.owner = sender
+
+        def _cancel_nan_sessions(self, current_owner: str) -> None:
+            """Forget the NAN sessions of applications that have gone away.
+
+            A killed application cancels nothing, so its publish and subscribe
+            registrations would otherwise keep being matched: the restarted
+            application publishes under a new id and the same device is then
+            reported once per stale id in a single scan.
+
+            Only sessions belonging to another application are dropped. The
+            interface is not evidence of ownership: an application publishes
+            before it ever scans, so by the time a change of owner is noticed
+            the new owner's own sessions are already recorded here.
+            """
+            simulator = self.mock.nan_simulator
+            stale = [session_id for session_id, session in self.nan_sessions.items()
+                     if session.get("owner") not in (None, current_owner)]
+            for session_id in stale:
+                session = self.nan_sessions.pop(session_id)
+                log.debug("Interface[%d] cancelling %s session %d left by %s",
+                          self.index, session["type"], session_id, session.get("owner"))
+                if simulator is None:
+                    continue
+                if session["type"] == "publish":
+                    simulator.on_publish_cancelled(session_id)
+                else:
+                    simulator.on_subscribe_cancelled(session_id)
 
         @sdbus.dbus_method_async("s")
         async def AutoScan(self, arg: str) -> None:
@@ -406,7 +459,12 @@ class WpaSupplicantMock(TerminableThread):
             if self.link is not None and self.associated:
                 self.link.down()
                 self.associated = False
-            await self.State.set_async("disconnected")
+            # Disconnect() runs before every SelectNetwork, and sdbus emits
+            # PropertiesChanged whether or not the value changed, so reporting
+            # unconditionally would have the platform record a disconnection
+            # that never happened.
+            if self.state != "disconnected":
+                await self.State.set_async("disconnected")
 
         @sdbus.dbus_method_async()
         async def SaveConfig(self) -> None:
@@ -442,7 +500,10 @@ class WpaSupplicantMock(TerminableThread):
                 "type": "publish",
                 "id": publish_id,
                 "args": args_dict,
-                "active": True
+                "active": True,
+                # Which application owns this session, so a restart can drop the
+                # sessions of the instance that went away and only those.
+                "owner": self._current_sender(),
             }
             self.nan_sessions[publish_id] = session_info
 
@@ -495,7 +556,10 @@ class WpaSupplicantMock(TerminableThread):
                 "type": "subscribe",
                 "id": subscribe_id,
                 "args": args_dict,
-                "active": True
+                "active": True,
+                # Which application owns this session, so a restart can drop the
+                # sessions of the instance that went away and only those.
+                "owner": self._current_sender(),
             }
             self.nan_sessions[subscribe_id] = session_info
 
