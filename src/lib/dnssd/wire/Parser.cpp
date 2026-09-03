@@ -16,9 +16,9 @@
  */
 
 #include "Parser.h"
-
 #include "Query.h"
 
+#include <lib/support/CodeUtils.h>
 #include <stdio.h>
 
 namespace chip {
@@ -144,8 +144,7 @@ bool ParseDnsPacket(const BytesRange & packetData, ParserDelegate * delegate)
     ConstHeaderRef header(packetData.Start());
 
     // Reject packets with unreasonable record counts to prevent CPU exhaustion.
-    // An mDNS packet is at most ~9000 bytes; the smallest record is ~12 bytes,
-    // so 256 is a generous upper bound for any single section.
+    // for DNS/mDNS packets, 256 records is a generous upper bound for any single section.
     static constexpr uint16_t kMaxRecordCount = 256;
 
     if (header.GetQueryCount() > kMaxRecordCount || header.GetAnswerCount() > kMaxRecordCount ||

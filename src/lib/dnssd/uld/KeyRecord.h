@@ -58,7 +58,7 @@ protected:
     bool WriteData(RecordWriter & out) const override;
 
 private:
-    const Crypto::P256PublicKey & mPublicKey;
+    Crypto::P256PublicKey mPublicKey;
 };
 
 } // namespace Uld
