@@ -25,6 +25,7 @@ synthetic composition and the real spec XML.
 
 import asyncio
 import sys
+import types
 from pathlib import Path
 
 # The module under test lives in src/python_testing, one level above this directory.
@@ -39,6 +40,7 @@ import matter.clusters as Clusters  # noqa: E402
 from matter.clusters.Types import NullValue  # noqa: E402
 from matter.testing.global_attribute_ids import GlobalAttributeIds  # noqa: E402
 from matter.testing.matter_testing import CertificationUnitTestNoDevice  # noqa: E402
+from matter.testing.problem_notices import AttributePathLocation  # noqa: E402
 from matter.testing.runner import default_matter_test_main  # noqa: E402
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters  # noqa: E402
 
@@ -386,6 +388,44 @@ class TestFabricScopedDiscovery(CertificationUnitTestNoDevice):
                          Clusters.TlsClientManagement.id, PROVISIONED_ENDPOINTS_ID)
         own_only = [Clusters.TlsClientManagement.Structs.TLSEndpointStruct(hostname=b'example.com', fabricIndex=1)]
         dut.assert_other_fabrics_withheld(info, own_only, own_fabric_index=1, reader_name="TH1")
+
+    def make_coverage_dut(self) -> idm_support.IDMBaseTest:
+        """A DUT stub carrying just what the coverage recorder writes through."""
+        dut = make_dut({})
+        dut.problems = []
+        dut.current_test_info = types.SimpleNamespace(name="test_TC_IDM_8_1")
+        return dut
+
+    def test_coverage_notes_only_the_unexercised_checks(self):
+        # A check that did not apply is a property of the data model and reads the
+        # same on every DUT carrying the cluster, so noting each one would bury the
+        # unexercised checks, which are the ones that vary and need reading.
+        dut = self.make_coverage_dut()
+        location = AttributePathLocation(endpoint_id=0, cluster_id=Clusters.AccessControl.id, attribute_id=ACL_ID)
+        dut.record_fabric_check("EP0 Access Control.Acl", "cross-fabric masking",
+                                idm_support.FabricCheckOutcome.VERIFIED, location)
+        dut.record_fabric_check("EP0 Binding.Binding", "cross-fabric masking",
+                                idm_support.FabricCheckOutcome.NOT_APPLICABLE, location, "no field is sensitive")
+        dut.record_fabric_check("EP0 Groupcast.Membership", "cross-fabric masking",
+                                idm_support.FabricCheckOutcome.NOT_EXERCISED, location, "no entry was created")
+        dut.report_fabric_coverage("Step 4")
+
+        asserts.assert_equal(len(dut.problems), 1, "Only the unexercised check should be recorded as a note")
+        asserts.assert_in("Groupcast.Membership", dut.problems[0].problem)
+        asserts.assert_in("no entry was created", dut.problems[0].problem,
+                          "The note must say why the check could not run")
+
+    def test_coverage_records_are_cleared_between_steps(self):
+        # Each step reports under its own name, so anything left behind would be
+        # attributed to the wrong step and counted twice.
+        dut = self.make_coverage_dut()
+        location = AttributePathLocation(endpoint_id=0, cluster_id=Clusters.AccessControl.id, attribute_id=ACL_ID)
+        dut.record_fabric_check("EP0 Access Control.Acl", "cross-fabric masking",
+                                idm_support.FabricCheckOutcome.NOT_EXERCISED, location, "nothing to check against")
+        dut.report_fabric_coverage("Step 4")
+        dut.report_fabric_coverage("Step 5")
+
+        asserts.assert_equal(len(dut.problems), 1, "A drained record must not be reported again by the next step")
 
     def test_cleanups_run_in_reverse_order(self):
         # A TLS endpoint names the root certificate it trusts, so it has to be removed

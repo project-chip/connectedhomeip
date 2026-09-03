@@ -26,6 +26,7 @@ import time
 import types
 import typing
 from dataclasses import dataclass
+from enum import StrEnum
 from typing import Any, get_args
 
 from mobly import asserts
@@ -75,6 +76,31 @@ class ConstraintProbeResult:
     def probed(self) -> int:
         """Number of violating values the DUT actually answered."""
         return self.rejected + self.accepted + self.other_error
+
+
+class FabricCheckOutcome(StrEnum):
+    """How much one fabric check on one path actually established.
+
+    The distinction that matters is between the last two. A check that did not
+    apply says the DUT is compliant by construction; a check that was not
+    exercised says nothing at all, and a run full of those looks identical to a
+    clean one unless it is reported.
+    """
+    VERIFIED = 'verified'
+    NOT_APPLICABLE = 'not applicable'
+    NOT_EXERCISED = 'not exercised'
+
+
+@dataclass(frozen=True)
+class FabricCheckRecord:
+    """One check against one path, and what came of it."""
+    path: str
+    check: str
+    outcome: FabricCheckOutcome
+    # AttributePathLocation or EventPathLocation, for the problem notice.
+    location: Any
+    # Why, for anything that is not VERIFIED.
+    reason: str = ''
 
 
 @dataclass
@@ -1648,6 +1674,59 @@ class IDMBaseTest(BasicCompositionTests):
         if not info.writable:
             return "the spec makes it read-only"
         return None
+
+    # ========================================================================
+    # Fabric Check Coverage Accounting (TC-IDM-8.1)
+    # ========================================================================
+
+    def record_fabric_check(self, path: str, check: str, outcome: FabricCheckOutcome,
+                            location: Any, reason: str = '') -> None:
+        """Record what one check established about one path."""
+        if not hasattr(self, 'fabric_check_records'):
+            self.fabric_check_records = []
+        self.fabric_check_records.append(FabricCheckRecord(path=path, check=check, outcome=outcome,
+                                                           location=location, reason=reason))
+
+    def report_fabric_coverage(self, step_name: str) -> None:
+        """Log what the run verified, and record a note for everything it did not.
+
+        A fabric sweep passes on whatever the DUT happens to expose, so the same
+        result covers wildly different amounts of ground from one device to the
+        next. Logging the tally per check, and naming every path a check could
+        not be exercised against, is what lets a reader tell a thorough run from
+        an empty one without re-deriving it from the absence of failures.
+        """
+        records = getattr(self, 'fabric_check_records', [])
+        if not records:
+            return
+
+        verified = [r for r in records if r.outcome is FabricCheckOutcome.VERIFIED]
+        log.info("%s coverage: %d of %d check(s) verified across %d path(s)",
+                 step_name, len(verified), len(records), len({r.path for r in records}))
+
+        for check in sorted({r.check for r in records}):
+            for_check = [r for r in records if r.check == check]
+            tally = {outcome: len([r for r in for_check if r.outcome is outcome]) for outcome in FabricCheckOutcome}
+            log.info("  %-26s %d verified, %d not applicable, %d not exercised", check,
+                     tally[FabricCheckOutcome.VERIFIED], tally[FabricCheckOutcome.NOT_APPLICABLE],
+                     tally[FabricCheckOutcome.NOT_EXERCISED])
+            for record in for_check:
+                if record.outcome is FabricCheckOutcome.VERIFIED:
+                    continue
+                log.info("    %-11s %s: %s", record.outcome, record.path, record.reason)
+
+        # Only the unexercised checks become notices. A check that did not apply
+        # is a property of the data model rather than of this DUT, so recording
+        # one per path would bury the findings that do vary between devices.
+        for record in records:
+            if record.outcome is not FabricCheckOutcome.NOT_EXERCISED:
+                continue
+            self.record_note(test_name=self.current_test_info.name, location=record.location,
+                             problem=f"{step_name}: {record.check} was not exercised for {record.path}: "
+                                     f"{record.reason}")
+
+        # Cleared so the next step reports its own coverage under its own name.
+        self.fabric_check_records = []
 
     # ========================================================================
     # Populating the Other Fabric's Entries (TC-IDM-8.1)

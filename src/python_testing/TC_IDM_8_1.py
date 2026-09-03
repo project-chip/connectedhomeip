@@ -40,7 +40,7 @@ import logging
 import random
 
 from mobly import asserts
-from support_modules.idm_support import FabricScopedAttributeInfo, FabricSensitiveEventInfo, IDMBaseTest
+from support_modules.idm_support import FabricCheckOutcome, FabricSensitiveEventInfo, IDMBaseTest
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
@@ -242,24 +242,9 @@ class TC_IDM_8_1(IDMBaseTest):
         self.step(4, "For every fabric-scoped attribute discovered on the DUT, TH1 and TH2 read it both fabric filtered and unfiltered, then activate a subscription to it and TH1 modifies it wherever it is writable.",
                   expectation="A fabric-filtered read returns only the reader's own entries, the DUT reports the modified value to both TH1 and TH2, and no response contains fabric-sensitive data belonging to the other fabric.")
         modified = 0
-        # What the attribute's own metadata rules out is summarised in the log: the reason
-        # is the same on every DUT carrying the cluster, so a note each would bury the
-        # findings below that do depend on this DUT.
-        skipped_by_metadata: list[tuple[FabricScopedAttributeInfo, str]] = []
-        no_masking_rules: list[FabricScopedAttributeInfo] = []
-        # Recorded as notes: a harness gap, and an attribute whose masking rules this DUT
-        # gave nothing to check against. Both vary with the DUT and are worth reading.
-        no_payload_known: list[FabricScopedAttributeInfo] = []
-        nothing_to_mask_against: list[FabricScopedAttributeInfo] = []
-        # Attributes whose entries had to be created through their cluster's command
-        # set before anything could be asserted about them, and those where that was
-        # attempted and the DUT declined.
-        populated: list[FabricScopedAttributeInfo] = []
-        populate_failed: list[FabricScopedAttributeInfo] = []
-        # Fabric-sensitive attributes the DUT was shown to withhold from the other
-        # fabric entirely, which is what the spec requires of them.
-        withheld: list[FabricScopedAttributeInfo] = []
         for info in attribute_infos:
+            location = AttributePathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
+                                             attribute_id=info.attribute_id)
             # An attribute owned by its cluster's command set has no entry on either
             # fabric until one is created, and every masking assertion below passes
             # trivially on an empty list. Where a safe command sequence is known,
@@ -267,23 +252,19 @@ class TC_IDM_8_1(IDMBaseTest):
             # against; the entries are removed again in teardown.
             populator = self.fabric_entry_populator(info)
             entries_created = False
+            populate_failure_reason = "no command sequence is known that creates an entry on a given fabric"
             if populator is not None:
                 populated_th1 = await populator(info, self.th1)
                 populated_th2 = await populator(info, self.th2)
                 entries_created = populated_th1 and populated_th2
-                if entries_created:
-                    populated.append(info)
-                else:
-                    populate_failed.append(info)
+                if not entries_created:
+                    populate_failure_reason = ("the DUT would not accept the commands that create an entry, so "
+                                               "neither fabric held one")
 
             # Counted across the reads and the subscription reports alike: a write on
             # TH1's fabric gives TH2's report a cross-fabric entry that the reads, taken
             # before the write, may not have had.
             cross_fabric_entries = 0
-            # Set where the DUT was shown to withhold the other fabric's entries from
-            # an unfiltered read, which for a fabric-sensitive attribute is the check
-            # that matters and leaves nothing left to mask.
-            withholding_verified = False
             for dev_ctrl, own_index, reader_name in ((self.th1, f1, "TH1"), (self.th2, f2, "TH2")):
                 filtered = await self.read_fabric_scoped_attribute(info, dev_ctrl, fabric_filtered=True)
                 self.assert_filtered_read_is_own_fabric_only(info, filtered, own_index, reader_name)
@@ -297,16 +278,29 @@ class TC_IDM_8_1(IDMBaseTest):
                 # empty list the absence would prove nothing.
                 if info.whole_entry_sensitive and entries_created:
                     self.assert_other_fabrics_withheld(info, unfiltered, own_index, reader_name)
-                    withholding_verified = True
+
+            self.record_fabric_check(info.path_str, "fabric-filtered read", FabricCheckOutcome.VERIFIED, location)
+
+            if info.whole_entry_sensitive:
+                if entries_created:
+                    self.record_fabric_check(info.path_str, "cross-fabric withholding",
+                                             FabricCheckOutcome.VERIFIED, location)
+                else:
+                    self.record_fabric_check(info.path_str, "cross-fabric withholding",
+                                             FabricCheckOutcome.NOT_EXERCISED, location, populate_failure_reason)
 
             skip_reason = self.fabric_write_skip_reason(info)
             if skip_reason is not None:
                 payload = None
-                skipped_by_metadata.append((info, skip_reason))
+                self.record_fabric_check(info.path_str, "write and report", FabricCheckOutcome.NOT_APPLICABLE,
+                                         location, skip_reason)
             else:
                 payload = self.fabric_scoped_write_payload(info, self.th1)
                 if payload is None:
-                    no_payload_known.append(info)
+                    self.record_fabric_check(info.path_str, "write and report", FabricCheckOutcome.NOT_EXERCISED,
+                                             location,
+                                             "no value is known that this cluster would accept without "
+                                             "cluster-specific state setup")
 
             if payload is not None:
                 original = await self.read_fabric_scoped_attribute(info, self.th1, fabric_filtered=True)
@@ -339,57 +333,38 @@ class TC_IDM_8_1(IDMBaseTest):
                     cross_fabric_entries += self.assert_other_fabric_entries_masked(info, report_th2.value,
                                                                                     own_fabric_index=f2)
                     modified += 1
+                    self.record_fabric_check(info.path_str, "write and report",
+                                             FabricCheckOutcome.VERIFIED, location)
                 finally:
                     handler_th1.cancel()
                     handler_th2.cancel()
                     await self.write_fabric_scoped_attribute(info, self.th1, original)
 
-            if withholding_verified:
-                withheld.append(info)
+            # Keyed on the attribute's own quality rather than on whether the
+            # withholding check ran: masking never applies to an attribute whose
+            # entries must be withheld outright, so recording it as unexercised
+            # would report the same gap twice under two names.
+            if info.whole_entry_sensitive:
+                self.record_fabric_check(info.path_str, "cross-fabric masking", FabricCheckOutcome.NOT_APPLICABLE,
+                                         location,
+                                         "the spec marks the whole attribute fabric sensitive, so its entries are "
+                                         "withheld from the other fabric rather than masked")
             elif not info.masked_field_labels:
-                no_masking_rules.append(info)
-            elif cross_fabric_entries == 0:
-                nothing_to_mask_against.append(info)
+                self.record_fabric_check(info.path_str, "cross-fabric masking", FabricCheckOutcome.NOT_APPLICABLE,
+                                         location,
+                                         "the spec marks neither the attribute nor any field of its entry struct "
+                                         "fabric sensitive, so no entry carries data to mask")
+            elif cross_fabric_entries > 0:
+                self.record_fabric_check(info.path_str, "cross-fabric masking", FabricCheckOutcome.VERIFIED, location)
+            else:
+                self.record_fabric_check(info.path_str, "cross-fabric masking", FabricCheckOutcome.NOT_EXERCISED,
+                                         location,
+                                         f"no entry belonging to the other fabric appeared in any read or report "
+                                         f"and {populate_failure_reason}")
 
-        log.info("Step 4: %d fabric-scoped attribute(s) discovered, %d written and verified, %d not written, "
-                 "%d with cross-fabric masking asserted, %d given entries through their cluster's commands",
-                 len(attribute_infos), modified, len(skipped_by_metadata) + len(no_payload_known),
-                 len(attribute_infos) - len(no_masking_rules) - len(nothing_to_mask_against), len(populated))
-        for info in populated:
-            log.info("  Step 4: %s was given an entry on each fabric through its cluster's command set, so its "
-                     "cross-fabric behaviour could be checked", info.path_str)
-        for info in withheld:
-            log.info("  Step 4: %s is fabric sensitive and the DUT withheld the other fabric's entry from an "
-                     "unfiltered read, as the spec requires", info.path_str)
-        for info, reason in skipped_by_metadata:
-            log.info("  Step 4: %s was not written because %s; only its read path was exercised",
-                     info.path_str, reason)
-        for info in no_masking_rules:
-            log.info("  Step 4: no cross-fabric masking was asserted for %s because the spec marks neither the "
-                     "attribute nor any field of its entry struct fabric sensitive; its fabric-filtered read was "
-                     "still verified", info.path_str)
-
-        for info in no_payload_known:
-            self.record_note(test_name=self.current_test_info.name,
-                             location=AttributePathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
-                                                            attribute_id=info.attribute_id),
-                             problem=f"Step 4: {info.path_str} was not written because no value is known that this "
-                             "cluster would accept without cluster-specific state setup; only its read path was "
-                             "exercised")
-        for info in populate_failed:
-            self.record_note(test_name=self.current_test_info.name,
-                             location=AttributePathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
-                                                            attribute_id=info.attribute_id),
-                             problem=f"Step 4: {info.path_str} is owned by its cluster's command set and the DUT "
-                             "would not accept the commands that create an entry, so no entry belonging to the "
-                             "other fabric existed and its cross-fabric masking was not asserted")
-        for info in nothing_to_mask_against:
-            self.record_note(test_name=self.current_test_info.name,
-                             location=AttributePathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
-                                                            attribute_id=info.attribute_id),
-                             problem=f"Step 4: {info.path_str} has fabric-sensitive data but no entry belonging to "
-                             "the other fabric appeared in any read or report, so its cross-fabric masking was not "
-                             "asserted; its fabric-filtered read was still verified")
+        log.info("Step 4: %d fabric-scoped attribute(s) discovered, %d written and verified",
+                 len(attribute_infos), modified)
+        self.report_fabric_coverage("Step 4")
 
         self.step(5, "For every fabric-sensitive event discovered on the DUT that can be triggered, TH1 and TH2 activate a subscription to the event, not fabric filtered, and the event is triggered on the fabric TH1 is on.",
                   expectation="The DUT reports the event to TH1 and does not report it to TH2.")
@@ -399,8 +374,9 @@ class TC_IDM_8_1(IDMBaseTest):
         # src/app/EventManagement.cpp), so a filtered request would let a DUT that only
         # suppresses cross-fabric events when asked to filter pass the step.
         triggered: list[FabricSensitiveEventInfo] = []
-        untriggerable: list[FabricSensitiveEventInfo] = []
         for event_info in event_infos:
+            event_location = EventPathLocation(endpoint_id=event_info.endpoint_id,
+                                               cluster_id=event_info.cluster_id, event_id=event_info.event_id)
             cluster_class = Clusters.ClusterObjects.ALL_CLUSTERS[event_info.cluster_id]
             handler_th1 = EventSubscriptionHandler(expected_cluster=cluster_class)
             handler_th2 = EventSubscriptionHandler(expected_cluster=cluster_class)
@@ -410,26 +386,25 @@ class TC_IDM_8_1(IDMBaseTest):
                 handler_th1.flush_events()
                 handler_th2.flush_events()
                 if not await self.trigger_fabric_sensitive_event(event_info, self.th1):
-                    untriggerable.append(event_info)
+                    self.record_fabric_check(event_info.path_str, "event fabric filtering",
+                                             FabricCheckOutcome.NOT_EXERCISED, event_location,
+                                             "no generic trigger is known for this event, so it never occurred on "
+                                             "either fabric")
                     continue
                 handler_th1.wait_for_event_type_report(event_info.event, timeout_sec=REPORT_TIMEOUT_SEC)
                 await asyncio.sleep(NO_REPORT_SETTLE_SEC)
                 self.assert_no_events_for_fabric(handler_th2, f1,
                                                  f"{event_info.path_str}: TH2's subscription")
                 triggered.append(event_info)
+                self.record_fabric_check(event_info.path_str, "event fabric filtering",
+                                         FabricCheckOutcome.VERIFIED, event_location)
             finally:
                 handler_th1.cancel()
                 handler_th2.cancel()
 
-        log.info("Step 5: %d fabric-sensitive event(s) discovered, %d triggered and verified, %d without a "
-                 "generic trigger", len(event_infos), len(triggered), len(untriggerable))
-        for event_info in untriggerable:
-            self.record_note(test_name=self.current_test_info.name,
-                             location=EventPathLocation(endpoint_id=event_info.endpoint_id,
-                                                        cluster_id=event_info.cluster_id,
-                                                        event_id=event_info.event_id),
-                             problem=f"Step 5: no generic trigger for {event_info.path_str}; fabric filtering of "
-                             "this event was not exercised")
+        log.info("Step 5: %d fabric-sensitive event(s) discovered, %d triggered and verified",
+                 len(event_infos), len(triggered))
+        self.report_fabric_coverage("Step 5")
         asserts.assert_greater(len(triggered), 0, "No fabric-sensitive event could be triggered on the DUT")
 
         self.step(6, "TH2 triggers a fabric-sensitive event on its own fabric. TH1 then sends a Subscribe Request Message with EventRequests set to that event path and fabric filtered set to false.",
