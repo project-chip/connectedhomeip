@@ -715,6 +715,11 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::ProximityRanging::Structs::RangingCapabilitiesStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ProximityRanging::Structs::RangingConstraintStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ProximityRanging::Structs::RangingConstraintStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::ProximityRanging::Structs::RangingTriggerConditionStruct::Type & request,
                         Json::Value & value);
