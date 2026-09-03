@@ -111,6 +111,24 @@ class Subprocess(threading.Thread):
         with self.output_match_lock:
             self.output_match = [re.compile(re.escape(p.encode())) if isinstance(p, str) else p for p in patterns]
 
+    def arm_output_match(self, pattern: str | re.Pattern) -> None:
+        """Watch the output for a pattern, discarding any match seen so far.
+
+        Arm before triggering whatever makes the subprocess print the line, so that a
+        later wait_for_output() cannot miss a line arriving in between. Note that start()
+        and send() leave their own expected_output match set, so arming must follow them.
+        """
+        self.set_output_match(pattern)
+        self.event.clear()
+
+    def wait_for_output(self, timeout: float) -> bool:
+        """Wait for the armed pattern to appear in the output.
+
+        Returns True once the pattern has been seen, False if it has not appeared within
+        timeout seconds. A timeout of 0 polls the current state without blocking.
+        """
+        return self.event.wait(timeout)
+
     def _check_output(self, line: bytes, is_stderr: bool) -> bytes:
         with self.output_match_lock:
             if self.output_match:
@@ -177,8 +195,7 @@ class Subprocess(threading.Thread):
         """Start a subprocess and optionally wait for a specific output."""
 
         if expected_output is not None:
-            self.set_output_match(expected_output)
-            self.event.clear()
+            self.arm_output_match(expected_output)
 
         super().start()
         # Wait for the thread to start, so the self.p attribute is available.
@@ -198,8 +215,7 @@ class Subprocess(threading.Thread):
         """Send a message to a process and optionally wait for a response."""
 
         if expected_output is not None:
-            self.set_output_match(expected_output)
-            self.event.clear()
+            self.arm_output_match(expected_output)
 
         if self.p is None:
             raise RuntimeError(f'Process "{self.program}" has not been started yet')

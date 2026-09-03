@@ -542,7 +542,7 @@ class ChipDeviceControllerBase:
                 err = self._dmLib.pychip_GetCompletionError()
 
             if self._commissioning_context.future is None:
-                LOGGER.exception("HandleCommissioningComplete called unexpectedly")
+                LOGGER.error("HandleCommissioningComplete called unexpectedly")
                 return
 
             if err.is_success:
@@ -565,7 +565,7 @@ class ChipDeviceControllerBase:
                 LOGGER.warning("Failed to open commissioning window: %s", str(err))
 
             if self._open_window_context.future is None:
-                LOGGER.exception("HandleOpenWindowComplete called unexpectedly")
+                LOGGER.error("HandleOpenWindowComplete called unexpectedly")
                 return
 
             if err.is_success:
@@ -581,7 +581,7 @@ class ChipDeviceControllerBase:
                 LOGGER.warning("Failed to unpair device: %s", str(err))
 
             if self._unpair_device_context.future is None:
-                LOGGER.exception("HandleUnpairDeviceComplete called unexpectedly")
+                LOGGER.error("HandleUnpairDeviceComplete called unexpectedly")
                 return
 
             if err.is_success:
@@ -604,7 +604,7 @@ class ChipDeviceControllerBase:
                 return
 
             if self._pase_establishment_context.future is None:
-                LOGGER.exception("HandlePASEEstablishmentComplete called unexpectedly")
+                LOGGER.error("HandlePASEEstablishmentComplete called unexpectedly")
                 return
 
             if err.is_success:
@@ -3612,7 +3612,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
             rcac_data = bytearray(rcac_buffer[:actual_rcac_size.value])
             rcac_bytes = bytes(rcac_data)
         else:
-            LOGGER.exception("RCAC returned from C++ did not contain any data")
+            LOGGER.error("RCAC returned from C++ did not contain any data")
             return None
         return rcac_bytes
 
@@ -3654,7 +3654,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
             None
         '''
         if self._issue_node_chain_context.future is None:
-            LOGGER.exception("NOCChainCallback while not expecting a callback")
+            LOGGER.error("NOCChainCallback while not expecting a callback")
             return
         self._issue_node_chain_context.future.set_result(nocChain)
         return
