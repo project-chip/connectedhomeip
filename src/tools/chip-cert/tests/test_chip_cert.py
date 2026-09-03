@@ -28,7 +28,6 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
-from typing import Optional, Tuple
 
 CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 OPERATIONAL_CERTS = CHIP_ROOT / "credentials/test/operational-certificates"
@@ -202,7 +201,7 @@ class MlDsaTest(ChipCertTest):
             self.assertNotEqual(result.returncode, 0, f"{' '.join(command)} unexpectedly succeeded")
         return result
 
-    def generate_ca_key(self, key_type: Optional[str] = None, name: str = "paa") -> Tuple[Path, Path]:
+    def generate_ca_key(self, key_type: str | None = None, name: str = "paa") -> tuple[Path, Path]:
         """Generate a self-signed PAA, returning its (certificate, key) paths.
 
         A key_type of None leaves gen-att-cert on its P-256 default.
@@ -256,7 +255,7 @@ class MlDsaAttestationChainTest(MlDsaTest):
         ("ml-dsa-44", None),
     )
 
-    def generate_chain(self, paa_key_type: Optional[str], pai_key_type: Optional[str]) -> Tuple[Path, Path, Path]:
+    def generate_chain(self, paa_key_type: str | None, pai_key_type: str | None) -> tuple[Path, Path, Path]:
         """Generate a PAA and PAI of the given algorithms, plus the P-256 DAC under them.
 
         Output names carry the algorithms, since chip-cert refuses to overwrite a file.
