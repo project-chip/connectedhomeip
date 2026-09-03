@@ -22,7 +22,7 @@
 #include <deque>
 #include <mutex>
 
-#include <controller/python/matter/case_capture/CASEHandshakeMetrics.h>
+#include <controller/python/matter/case_capture/CASEHandshakeMetricsRecord.h>
 
 namespace chip {
 namespace python {

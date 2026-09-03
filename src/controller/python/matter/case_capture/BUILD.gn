@@ -1,0 +1,38 @@
+# Copyright (c) 2026 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+# What a CASE handshake is and where completed ones are held, with no dependency on the Python
+# layer above. Separated out so it can be unit tested on its own: the rest of this directory is
+# the ctypes-facing API, which needs the interpreter and the CHIP event loop.
+source_set("case_handshake_metrics") {
+  sources = [
+    "CASEHandshakeMetricsBackend.h",
+    "CASEHandshakeMetricsRecord.h",
+    "CompletedCASEHandshakeQueue.cpp",
+    "CompletedCASEHandshakeQueue.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/lib/address_resolve",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/protocols/secure_channel",
+    "${chip_root}/src/system",
+    "${chip_root}/src/tracing",
+    "${chip_root}/src/transport",
+  ]
+}

@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <controller/python/matter/case_capture/CASEHandshakeMetrics.h>
+#include <controller/python/matter/case_capture/CASEHandshakeMetricsRecord.h>
 #include <controller/python/matter/case_capture/CompletedCASEHandshakeQueue.h>
 #include <lib/address_resolve/TracingStructs.h>
 #include <lib/core/CHIPEncoding.h>

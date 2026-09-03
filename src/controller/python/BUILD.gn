@@ -93,9 +93,6 @@ shared_library("ChipDeviceCtrl") {
       "matter/case_capture/CASEHandshakeMetrics.cpp",
       "matter/case_capture/CASEHandshakeMetrics.h",
       "matter/case_capture/CASEHandshakeMetricsBackend.cpp",
-      "matter/case_capture/CASEHandshakeMetricsBackend.h",
-      "matter/case_capture/CompletedCASEHandshakeQueue.cpp",
-      "matter/case_capture/CompletedCASEHandshakeQueue.h",
       "matter/clusters/attribute.cpp",
       "matter/clusters/command.cpp",
       "matter/commissioning/PlaceholderOperationalCredentialsIssuer.h",
@@ -165,6 +162,7 @@ shared_library("ChipDeviceCtrl") {
   }
 
   public_deps = [
+    "matter/case_capture:case_handshake_metrics",
     "${chip_root}/src/app",
     "${chip_root}/src/app/icd/client:handler",
     "${chip_root}/src/app/server",
