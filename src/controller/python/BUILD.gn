@@ -162,7 +162,6 @@ shared_library("ChipDeviceCtrl") {
   }
 
   public_deps = [
-    "matter/case_capture:case_handshake_metrics",
     "${chip_root}/src/app",
     "${chip_root}/src/app/icd/client:handler",
     "${chip_root}/src/app/server",
@@ -178,6 +177,7 @@ shared_library("ChipDeviceCtrl") {
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
+    "matter/case_capture:case_handshake_metrics",
   ]
 
   if (chip_support_webrtc_python_bindings) {
