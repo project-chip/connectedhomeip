@@ -27,5 +27,9 @@ std::optional<System::Clock::Milliseconds16> GetUserDefaultBDXThrottleIntervalFo
 
 std::optional<uint8_t> GetUserDefaultBDXThreadFramesPerBlock();
 
+// Returns an override for the BDX transfer timeout, if one is configured. This is a debug/testing
+// hook (the OTA spec mandates a timeout of at least 5 minutes for production use).
+std::optional<System::Clock::Seconds16> GetUserDefaultBDXTransferTimeout();
+
 } // namespace Platform
 } // namespace chip

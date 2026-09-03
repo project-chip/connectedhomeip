@@ -41,6 +41,10 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 #include <thermostat-delegate-impl.h>
+#include <thermostat-hold-delegate-impl.h>
+#include <thermostat-presets-delegate-impl.h>
+#include <thermostat-setpoints-delegate-impl.h>
+#include <thermostat-suggestions-delegate-impl.h>
 
 #include "matter_ble.h"
 #include <os_mem.h>
@@ -84,6 +88,14 @@ uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] =
                                                                                    0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
+constexpr EndpointId gThermostatEndpoint(1);
+static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatHoldDelegate gHoldDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatPresetsDelegate gPresetsDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatSetpointsDelegate gSetpointsDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatSuggestionsDelegate gSuggestionsDelegate(gThermostatEndpoint, gPresetsDelegate);
+
 } // namespace
 
 AppTask AppTask::sAppTask;
@@ -289,12 +301,8 @@ void AppTask::InitServer(intptr_t arg)
         return;
     }
 
-    auto status = chip::app::Clusters::Thermostat::SetDefaultDelegate(
-        Thermostat_ENDPOINT_ID, &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
-    if (status != chip::Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogError(NotSpecified, "SetDefaultDelegate failed: 0x%02x", chip::to_underlying(status));
-    }
+    Clusters::Thermostat::ServerInit(gThermostatEndpoint, gThermostatDelegate, gSetpointsDelegate, gHoldDelegate, gPresetsDelegate,
+                                     gSuggestionsDelegate);
 
     static RealtekObserver sRealtekObserver;
     err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sRealtekObserver);

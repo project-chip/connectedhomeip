@@ -22,13 +22,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemError.h>
 #include <zephyr/bluetooth/conn.h>
-
-#if defined(CONFIG_ZEPHYR_VERSION_3_3)
-#include <version.h>
-#else
 #include <zephyr/random/random.h>
 #include <zephyr/version.h>
-#endif
 
 namespace chip {
 namespace DeviceLayer {

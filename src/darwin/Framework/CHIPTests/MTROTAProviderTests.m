@@ -793,7 +793,11 @@ static BOOL sStackInitRan = NO;
             sOTAProviderDelegate.transferEndHandler = nil;
             XCTAssertEqualObjects(nodeID, @(kDeviceId1));
             XCTAssertIdentical(controller, sController);
-            XCTAssertNotNil(error); // we cancelled the transfer, so there should be an error
+            // We cancelled the transfer with a specific error, so the transfer-end callback should
+            // report that actual error rather than a generic one.
+            XCTAssertNotNil(error);
+            XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+            XCTAssertEqual(error.code, MTRErrorCodeCancelled);
         };
 
         XCTAssertEqualObjects(nodeID, @(kDeviceId1));
@@ -820,8 +824,9 @@ static BOOL sStackInitRan = NO;
                                       softwareVersionString:kUpdatedSoftwareVersionString_5
                                                  completion:innerCompletion];
 
-            // Cancel the transfer with device1
-            [sOTAProviderDelegate respondErrorWithCompletion:outerCompletion];
+            // Cancel the transfer with device1, using a specific error so we can verify it is the
+            // error reported to the transfer-end callback (rather than a generic error).
+            [sOTAProviderDelegate respondErrorWithCode:MTRErrorCodeCancelled completion:outerCompletion];
         };
 
         announceResponseExpectation2 = [self announceProviderToDevice:device2];
@@ -846,6 +851,92 @@ static BOOL sStackInitRan = NO;
                  enforceOrder:YES];
 
     [self waitForExpectations:@[ announceResponseExpectation1, announceResponseExpectation2 ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test003b_ReceiveQueryImageRequestThenTimeOutBDXTransfer
+{
+    // In this test we do the following:
+    //
+    // 1) Shorten the BDX transfer timeout via a user default so the exchange response timeout
+    //    fires quickly instead of after the 5 minute production default.
+    // 2) Advertise ourselves to the device and, when it queries, claim to have an image.
+    // 3) When the device tries to start a BDX transfer, terminate the requestor app so it stops
+    //    responding, then accept the transfer.
+    // 4) Since the peer is gone, the messages we send never get a response, so our exchange
+    //    response timeout fires and the transfer-end callback must report MTRErrorCodeTimeout.
+    NSString * const bdxTimeoutDefaultsKey = @"BDXTransferTimeoutInSeconds";
+    const NSInteger bdxTimeoutInSeconds = 3;
+    [[NSUserDefaults standardUserDefaults] setInteger:bdxTimeoutInSeconds forKey:bdxTimeoutDefaultsKey];
+    // Ensure the override is always cleared, even if an assertion below fails, so it can't leak
+    // into later tests.
+    [self addTeardownBlock:^() {
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:bdxTimeoutDefaultsKey];
+    }];
+
+    __auto_type * downloadFilePath =
+        [NSString stringWithFormat:@"/tmp/chip-ota-requestor-downloaded-image%u", [MTROTAProviderTests nextUniqueIndex]];
+    MTRTestCaseServerApp * requestorApp = [self startCommissionedAppWithName:@"ota-requestor"
+                                                                   arguments:@[ @"--otaDownloadPath", downloadFilePath, @"--autoApplyImage" ]
+                                                                  controller:sController
+                                                                     payload:kOnboardingPayload1
+                                                                      nodeID:@(kDeviceId1)];
+    XCTAssertNotNil(requestorApp);
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:sController];
+
+    XCTestExpectation * queryExpectation = [self expectationWithDescription:@"handleQueryImageForNodeID called"];
+    XCTestExpectation * transferBeginExpectation = [self expectationWithDescription:@"handleBDXTransferSessionBeginForNodeID called"];
+    XCTestExpectation * transferEndExpectation = [self expectationWithDescription:@"handleBDXTransferSessionEndForNodeID called"];
+
+    NSString * fakeImageURI = @"No such image, really";
+
+    sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
+        MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
+        sOTAProviderDelegate.queryImageHandler = nil;
+        XCTAssertEqualObjects(nodeID, @(kDeviceId1));
+        XCTAssertIdentical(controller, sController);
+        [sOTAProviderDelegate respondAvailableWithDelay:@(0)
+                                                    uri:fakeImageURI
+                                            updateToken:[sOTAProviderDelegate generateUpdateToken]
+                                        softwareVersion:kUpdatedSoftwareVersion_5
+                                  softwareVersionString:kUpdatedSoftwareVersionString_5
+                                             completion:completion];
+        [queryExpectation fulfill];
+    };
+
+    sOTAProviderDelegate.transferBeginHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSString * fileDesignator,
+        NSNumber * offset, MTRStatusCompletion completion) {
+        sOTAProviderDelegate.transferBeginHandler = nil;
+        XCTAssertEqualObjects(nodeID, @(kDeviceId1));
+        XCTAssertIdentical(controller, sController);
+
+        // Now that we've begun a transfer, we expect to be told when it ends.
+        sOTAProviderDelegate.transferEndHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, MTRMetrics * metrics, NSError * _Nullable error) {
+            sOTAProviderDelegate.transferEndHandler = nil;
+            XCTAssertEqualObjects(nodeID, @(kDeviceId1));
+            XCTAssertIdentical(controller, sController);
+            // The peer stopped responding, so the transfer must end with a timeout error reported
+            // to the transfer-end callback (rather than a generic error).
+            XCTAssertNotNil(error);
+            XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+            XCTAssertEqual(error.code, MTRErrorCodeTimeout);
+            [transferEndExpectation fulfill];
+        };
+
+        // Terminate the requestor so it stops responding, then accept the transfer.  Since the peer
+        // is gone, the messages we send will never get a response and our (shortened) exchange
+        // response timeout will fire.
+        [requestorApp terminate];
+        [sOTAProviderDelegate respondSuccess:completion];
+        [transferBeginExpectation fulfill];
+    };
+
+    XCTestExpectation * announceResponseExpectation = [self announceProviderToDevice:device];
+
+    // Wait long enough for commissioning/announce plus the shortened BDX timeout to fire.
+    [self waitForExpectations:@[ queryExpectation, transferBeginExpectation, transferEndExpectation ]
+                      timeout:(kTimeoutInSeconds + bdxTimeoutInSeconds + 30)
+                 enforceOrder:YES];
+    [self waitForExpectations:@[ announceResponseExpectation ] timeout:kTimeoutInSeconds];
 }
 
 - (void)test004_DoBDXTransferDenyUpdateRequest
