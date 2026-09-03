@@ -19,10 +19,12 @@
 #include "Buttons.h"
 
 #include <app/server/Server.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/kernel.h>
+#include <zephyr/sys/atomic.h>
 
 namespace chip::app::AllDevices::Button {
 namespace {
@@ -34,17 +36,31 @@ const struct gpio_dt_spec sFactoryResetSw = GPIO_DT_SPEC_GET(ALL_DEVICES_FACTORY
 struct gpio_callback sFactoryResetSwCallback;
 int64_t sFactoryResetSwPressedAtMs = 0;
 
+void FactoryResetPressedHandler(struct k_work *)
+{
+    ChipLogProgress(DeviceLayer, "Factory reset button pressed, hold for %dms to reset.", kFactoryResetHoldMs);
+}
+K_WORK_DEFINE(sFactoryResetPressedtWork, FactoryResetPressedHandler);
+
+void FactoryResetWorkHandler(struct k_work *)
+{
+    ChipLogProgress(DeviceLayer, "Factory reset button held; resetting");
+    Server::GetInstance().ScheduleFactoryReset();
+}
+K_WORK_DEFINE(sFactoryResetWork, FactoryResetWorkHandler);
+
 void OnFactoryResetSwPressed(const struct device *, struct gpio_callback *, gpio_port_pins_t)
 {
     if (gpio_pin_get_dt(&sFactoryResetSw) > 0)
     {
+        // Button pressed, tell user to keep holding.
         sFactoryResetSwPressedAtMs = k_uptime_get();
-        ChipLogProgress(DeviceLayer, "Factory reset button pressed, hold for %dms to reset.", kFactoryResetHoldMs);
+        k_work_submit(&sFactoryResetPressedtWork);
     }
     else if (sFactoryResetSwPressedAtMs != 0 && (k_uptime_get() - sFactoryResetSwPressedAtMs) >= kFactoryResetHoldMs)
     {
-        ChipLogProgress(DeviceLayer, "Factory reset button held; resetting");
-        Server::GetInstance().ScheduleFactoryReset();
+        // Button released and was held long enough.
+        k_work_submit(&sFactoryResetWork);
     }
     else
     {

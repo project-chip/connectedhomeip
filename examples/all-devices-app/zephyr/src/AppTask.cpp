@@ -22,6 +22,7 @@
 
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <app/server/Dnssd.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -124,12 +125,19 @@ CHIP_ERROR AppTask::InitPersistence()
     return CHIP_NO_ERROR;
 }
 
+TestEventTriggerDelegate & AppTask::GetTestEventTriggerDelegate()
+{
+    return mDefaultTestEventTriggerDelegate;
+}
+
 CHIP_ERROR AppTask::InitRootNode()
 {
     mDataModelProvider =
         std::make_unique<CodeDrivenDataModelProvider>(*mInitParams.persistentStorageDelegate, mAttributePersistenceProvider);
     VerifyOrReturnError(mDataModelProvider != nullptr, CHIP_ERROR_NO_MEMORY);
     mInitParams.dataModelProvider = mDataModelProvider.get();
+
+    mInitParams.testEventTriggerDelegate = &GetTestEventTriggerDelegate();
 
     DeviceInstanceInfoProvider * deviceInstanceInfoProvider = GetDeviceInstanceInfoProvider();
     VerifyOrReturnError(deviceInstanceInfoProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -179,15 +187,16 @@ CHIP_ERROR AppTask::InitRootNode()
     ReturnErrorOnFailure(mRootNode->Register(rootAllocator, *mDataModelProvider));
 
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
-        .groupDataProvider      = mGroupDataProvider,
-        .fabricTable            = Server::GetInstance().GetFabricTable(),
-        .timerDelegate          = mTimerDelegate,
-        .storageDelegate        = *mInitParams.persistentStorageDelegate,
-        .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
-        .platformManager        = DeviceLayer::PlatformMgr(),
-        .failSafeContext        = Server::GetInstance().GetFailSafeContext(),
-        .bindingTable           = Clusters::Binding::Table::GetInstance(),
-        .bindingManager         = Clusters::Binding::Manager::GetInstance(),
+        .groupDataProvider        = mGroupDataProvider,
+        .fabricTable              = Server::GetInstance().GetFabricTable(),
+        .timerDelegate            = mTimerDelegate,
+        .storageDelegate          = *mInitParams.persistentStorageDelegate,
+        .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),
+        .platformManager          = DeviceLayer::PlatformMgr(),
+        .failSafeContext          = Server::GetInstance().GetFailSafeContext(),
+        .bindingTable             = Clusters::Binding::Table::GetInstance(),
+        .bindingManager           = Clusters::Binding::Manager::GetInstance(),
+        .testEventTriggerDelegate = *mInitParams.testEventTriggerDelegate,
     });
 
     return CHIP_NO_ERROR;
@@ -231,7 +240,7 @@ CHIP_ERROR AppTask::RegisterAppDevices()
 
 CHIP_ERROR AppTask::InitBoardControls()
 {
-    Button::Init();
+    ReturnErrorOnFailure(Button::Init());
     return CHIP_NO_ERROR;
 }
 

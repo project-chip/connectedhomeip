@@ -78,6 +78,8 @@ protected:
     /// Storage/group data provider setup.
     virtual CHIP_ERROR InitPersistence();
 
+    virtual TestEventTriggerDelegate & GetTestEventTriggerDelegate();
+
     virtual CHIP_ERROR InitRootNode();
 
     /// OTA Requestor cluster on the root endpoint, if enabled.
@@ -97,6 +99,7 @@ protected:
 
     chip::CommonCaseDeviceServerInitParams mInitParams;
     Credentials::GroupDataProviderImpl mGroupDataProvider;
+    SimpleTestEventTriggerDelegate mDefaultTestEventTriggerDelegate;
     DefaultTimerDelegate mTimerDelegate;
     DefaultAttributePersistenceProvider mAttributePersistenceProvider;
     DefaultSafeAttributePersistenceProvider mSafeAttributePersistenceProvider;
