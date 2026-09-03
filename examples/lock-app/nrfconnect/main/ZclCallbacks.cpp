@@ -27,6 +27,8 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 
+#include <zephyr/logging/log.h>
+
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
 using namespace ::chip::app::Clusters::DoorLock;
