@@ -559,7 +559,8 @@ CHIP_ERROR HumidistatCluster::SetMistType(DataModel::Nullable<chip::BitMask<Humi
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kHumidifier), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     VerifyOrReturnError(IsMistTypeConsistentWithMode(mMode, mistType), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    VerifyOrReturnError(IsMistTypeSupportable(mistType), CHIP_IM_GLOBAL_STATUS(InvalidInState));
+    // Spec: bits not indicated by the feature map SHALL result in CONSTRAINT_ERROR.
+    VerifyOrReturnError(IsMistTypeSupportable(mistType), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     if (mistType.IsNull())
     {
@@ -900,8 +901,8 @@ DataModel::ActionReturnStatus HumidistatCluster::HandleSetSettings(chip::TLV::TL
     {
         VerifyOrReturnError(IsMistTypeConsistentWithMode(effectiveMode, commandData.mistType.Value()),
                             CHIP_IM_GLOBAL_STATUS(ConstraintError));
-        // Spec: unsupported bits SHALL result in INVALID_IN_STATE.
-        VerifyOrReturnError(IsMistTypeSupportable(commandData.mistType.Value()), CHIP_IM_GLOBAL_STATUS(InvalidInState));
+        // Spec: bits not indicated by the feature map SHALL result in CONSTRAINT_ERROR.
+        VerifyOrReturnError(IsMistTypeSupportable(commandData.mistType.Value()), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
 
     if (commandData.userSetpoint.HasValue() && mFeatures.Has(Feature::kSensor))

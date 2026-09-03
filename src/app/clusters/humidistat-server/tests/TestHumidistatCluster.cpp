@@ -593,13 +593,13 @@ TEST_F(TestHumidistatCluster, SetSettingsMistTypeValidation)
 
     tester.GetDirtyList().clear();
 
-    // Setting WarmMist should fail with InvalidInState (feature not supported)
+    // Setting WarmMist should fail with ConstraintError (feature not supported)
     {
         Commands::SetSettings::Type request;
         request.mistType.SetValue(chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistWarm));
         auto result = tester.Invoke(request);
         EXPECT_FALSE(result.IsSuccess());
-        EXPECT_EQ(result.GetStatusCode(), std::make_optional(CSC(Status::InvalidInState)));
+        EXPECT_EQ(result.GetStatusCode(), std::make_optional(CSC(Status::ConstraintError)));
         // MistType unchanged
         EXPECT_EQ(cluster.GetMistType().Raw(), chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold).Raw());
     }
