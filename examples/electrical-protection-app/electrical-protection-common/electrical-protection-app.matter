@@ -364,6 +364,77 @@ fabric_scoped struct WebRTCSessionStruct {
   fabric_idx fabricIndex = 254;
 }
 
+/** Attributes and commands for switching devices between 'On' and 'Off' states. */
+cluster OnOff = 6 {
+  revision 6;
+
+  enum DelayedAllOffEffectVariantEnum : enum8 {
+    kDelayedOffFastFade = 0;
+    kNoFade = 1;
+    kDelayedOffSlowFade = 2;
+  }
+
+  enum DyingLightEffectVariantEnum : enum8 {
+    kDyingLightFadeOff = 0;
+  }
+
+  enum EffectIdentifierEnum : enum8 {
+    kDelayedAllOff = 0;
+    kDyingLight = 1;
+  }
+
+  enum StartUpOnOffEnum : enum8 {
+    kOff = 0;
+    kOn = 1;
+    kToggle = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kLighting = 0x1;
+    kDeadFrontBehavior = 0x2;
+    kOffOnly = 0x4;
+  }
+
+  bitmap OnOffControlBitmap : bitmap8 {
+    kAcceptOnlyWhenOn = 0x1;
+  }
+
+  readonly attribute boolean onOff = 0;
+  readonly attribute optional boolean globalSceneControl = 16384;
+  attribute optional int16u onTime = 16385;
+  attribute optional int16u offWaitTime = 16386;
+  attribute access(write: manage) optional nullable StartUpOnOffEnum startUpOnOff = 16387;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct OffWithEffectRequest {
+    EffectIdentifierEnum effectIdentifier = 0;
+    enum8 effectVariant = 1;
+  }
+
+  request struct OnWithTimedOffRequest {
+    OnOffControlBitmap onOffControl = 0;
+    int16u onTime = 1;
+    int16u offWaitTime = 2;
+  }
+
+  /** On receipt of this command, a device SHALL enter its ‘Off’ state. This state is device dependent, but it is recommended that it is used for power off or similar functions. On receipt of the Off command, the OnTime attribute SHALL be set to 0. */
+  command Off(): DefaultSuccess = 0;
+  /** On receipt of this command, a device SHALL enter its ‘On’ state. This state is device dependent, but it is recommended that it is used for power on or similar functions. On receipt of the On command, if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0. */
+  command On(): DefaultSuccess = 1;
+  /** On receipt of this command, if a device is in its ‘Off’ state it SHALL enter its ‘On’ state. Otherwise, if it is in its ‘On’ state it SHALL enter its ‘Off’ state. On receipt of the Toggle command, if the value of the OnOff attribute is equal to FALSE and if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0. If the value of the OnOff attribute is equal to TRUE, the OnTime attribute SHALL be set to 0. */
+  command Toggle(): DefaultSuccess = 2;
+  /** The OffWithEffect command allows devices to be turned off using enhanced ways of fading. */
+  command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
+  /** This command allows the recall of the settings when the device was turned off. */
+  command OnWithRecallGlobalScene(): DefaultSuccess = 65;
+  /** This command allows devices to be turned on for a specific duration with a guarded off duration so that SHOULD the device be subsequently turned off, further OnWithTimedOff commands, received during this time, are prevented from turning the devices back on. */
+  command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
+}
+
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 cluster Descriptor = 29 {
   revision 3;
@@ -382,7 +453,7 @@ cluster Descriptor = 29 {
   readonly attribute cluster_id clientList[] = 2;
   readonly attribute endpoint_no partsList[] = 3;
   readonly attribute optional SemanticTagStruct tagList[] = 4;
-  provisional readonly attribute optional char_string<32> endpointUniqueID = 5;
+  readonly attribute optional char_string<32> endpointUniqueID = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1348,11 +1419,6 @@ cluster OperationalCredentials = 62 {
 cluster GroupKeyManagement = 63 {
   revision 4;
 
-  enum GroupKeyMulticastPolicyEnum : enum8 {
-    kPerGroupID = 0;
-    kAllNodes = 1;
-  }
-
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
     kCacheAndSync = 1;
@@ -1433,6 +1499,52 @@ cluster GroupKeyManagement = 63 {
   fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
 }
 
+/** The User Label Cluster provides a feature to tag an endpoint with zero or more labels. */
+cluster UserLabel = 65 {
+  revision 1;
+
+  shared struct LabelStruct {
+    char_string<16> label = 0;
+    char_string<16> value = 1;
+  }
+
+  attribute access(write: manage) LabelStruct labelList[] = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** The Power Topology Cluster provides a mechanism for expressing how power is flowing between endpoints. */
+cluster PowerTopology = 156 {
+  revision 2;
+
+  bitmap Feature : bitmap32 {
+    kNodeTopology = 0x1;
+    kTreeTopology = 0x2;
+    kSetTopology = 0x4;
+    kDynamicPowerFlow = 0x8;
+    kElectricalCircuit = 0x10;
+  }
+
+  fabric_scoped struct CircuitNodeStruct {
+    node_id node = 1;
+    optional endpoint_no endpoint = 2;
+    optional char_string<128> label = 3;
+    fabric_idx fabricIndex = 254;
+  }
+
+  readonly attribute optional endpoint_no availableEndpoints[] = 0;
+  readonly attribute optional endpoint_no activeEndpoints[] = 1;
+  provisional attribute optional CircuitNodeStruct electricalCircuitNodes[] = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** This cluster provides an interface for a device which distributes electrical power to other devices, providing information about the capacity of the device as well as whether it has been damaged or has reached the end of its service life. */
 provisional cluster ElectricalDistribution = 162 {
   revision 1;
@@ -1454,6 +1566,176 @@ provisional cluster ElectricalDistribution = 162 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+}
+
+/** This cluster is a derived cluster of the Alarm Base cluster and provides the alarm definition related to the Electrical Protection device type. */
+provisional cluster ElectricalProtectionAlarm = 163 {
+  revision 1;
+
+  enum CurrentTripCurveEnum : enum8 {
+    kTypeZ = 0;
+    kTypeB = 1;
+    kTypeC = 2;
+    kTypeK = 3;
+    kTypeD = 4;
+  }
+
+  enum CurrentWaveformEnum : enum8 {
+    kAC = 0 [spec_name = "AC"];
+    kA = 1;
+    kF = 2;
+    kB = 3;
+  }
+
+  enum GroundFaultClassEnum : enum8 {
+    kClassA = 0;
+    kClassB = 1;
+    kClassC = 2;
+    kClassD = 3;
+    kClassE = 4;
+  }
+
+  bitmap AlarmBitmap : bitmap32 {
+    kShortCircuitFault = 0x1;
+    kOverLoadFault = 0x2;
+    kOverVoltageFault = 0x4;
+    kVoltageSurgeFault = 0x8;
+    kResidualCurrentFault = 0x10;
+    kArcFault = 0x20;
+    kSelfTest = 0x40;
+  }
+
+  bitmap ArcCauseBitmap : bitmap8 {
+    kSeries = 0x1;
+    kParallelToNeutral = 0x2;
+    kParallelToGround = 0x4;
+  }
+
+  bitmap CurrentTripMechanismBitmap : bitmap8 {
+    kThermal = 0x1;
+    kMagnetic = 0x2;
+    kElectronic = 0x4;
+  }
+
+  bitmap Feature : bitmap32 {
+    kShortCircuit = 0x100000;
+    kOverLoad = 0x200000;
+    kOverVoltage = 0x400000;
+    kSurgeProtection = 0x800000;
+    kResidualCurrent = 0x1000000;
+    kArcFault = 0x2000000;
+    kSelfTest = 0x4000000;
+  }
+
+  bitmap SurgeProtectionClassBitmap : bitmap16 {
+    kClassI = 0x1;
+    kClassII = 0x2;
+    kClassIII = 0x4;
+  }
+
+  bitmap SurgeProtectionTypeBitmap : bitmap16 {
+    kType1 = 0x1;
+    kType2 = 0x2;
+    kType3 = 0x4;
+  }
+
+  bitmap TrippingCharacteristicsBitmap : bitmap16 {
+    kShortDelay = 0x1;
+    kSelective = 0x2;
+    kSuperImmune = 0x4;
+  }
+
+  bitmap VoltageTripMechanismBitmap : bitmap8 {
+    kMOV = 0x1 [spec_name = "MOV"];
+    kSAD = 0x2 [spec_name = "SAD"];
+    kGDT = 0x4 [spec_name = "GDT"];
+  }
+
+  struct ArcFaultRatingsStruct {
+    optional amperage_ma seriesArcCurrentSensitivity = 0;
+    optional amperage_ma parallelArcCurrentSensitivity = 1;
+    optional ArcCauseBitmap supportedArcCauses = 2;
+  }
+
+  struct OverLoadRatingsStruct {
+    optional amperage_ma tripCurrent = 0;
+    optional CurrentTripCurveEnum tripCurve = 1;
+    optional CurrentTripMechanismBitmap tripMechanism = 2;
+    optional amperage_ma ultimateMaxCurrent = 3;
+    optional amperage_ma serviceMaxCurrent = 4;
+  }
+
+  struct OverVoltageRatingsStruct {
+    optional VoltageTripMechanismBitmap tripMechanism = 0;
+    optional voltage_mv tripVoltage = 1;
+    optional voltage_mv maxContinuousOperatingVoltage = 2;
+    optional int64u responseTime = 3;
+  }
+
+  struct ResidualCurrentFaultRatingsStruct {
+    optional amperage_ma currentSensitivity = 0;
+    optional CurrentTripMechanismBitmap tripMechanism = 1;
+    optional boolean voltageDependent = 2;
+    optional GroundFaultClassEnum groundFaultClass = 3;
+    optional CurrentWaveformEnum waveform = 4;
+    optional TrippingCharacteristicsBitmap trippingCharacteristic = 5;
+    optional amperage_ma ultimateMaxCurrent = 6;
+    optional amperage_ma serviceMaxCurrent = 7;
+  }
+
+  struct ShortCircuitRatingsStruct {
+    optional amperage_ma tripCurrent = 0;
+    optional CurrentTripMechanismBitmap tripMechanism = 1;
+    optional CurrentTripCurveEnum tripCurve = 2;
+    optional amperage_ma ultimateMaxCurrent = 3;
+    optional amperage_ma serviceMaxCurrent = 4;
+    optional amperage_ma maxCurrent = 5;
+  }
+
+  struct SurgeProtectionRatingsStruct {
+    optional VoltageTripMechanismBitmap tripMechanism = 0;
+    optional SurgeProtectionClassBitmap protectionClass = 1;
+    optional SurgeProtectionTypeBitmap protectionType = 2;
+    optional voltage_mv maxContinuousOperatingVoltage = 3;
+    optional voltage_mv maxVoltageProtection = 4;
+    optional voltage_mv maxTemporaryVoltage = 5;
+    optional amperage_ma nominalDischargeCurrent = 6;
+    optional amperage_ma maximumDischargeCurrent = 7;
+    optional amperage_ma ratedShortCircuitCurrent = 8;
+    optional amperage_ma ratedShortTimeWithstandCurrent = 9;
+    optional int64u energyAbsorptionCapability = 10;
+    optional int64u responseTime = 11;
+  }
+
+  provisional info event Notify = 0 {
+    AlarmBitmap active = 0;
+    AlarmBitmap inactive = 1;
+    AlarmBitmap state = 2;
+    AlarmBitmap mask = 3;
+  }
+
+  provisional readonly attribute AlarmBitmap mask = 0;
+  provisional readonly attribute AlarmBitmap state = 2;
+  provisional readonly attribute AlarmBitmap supported = 3;
+  provisional readonly attribute optional nullable ArcCauseBitmap arcCause = 128;
+  provisional readonly attribute optional nullable OverLoadRatingsStruct overLoadRating = 129;
+  provisional readonly attribute optional nullable OverVoltageRatingsStruct overVoltageRating = 130;
+  provisional readonly attribute optional nullable SurgeProtectionRatingsStruct surgeProtectionRating = 131;
+  provisional readonly attribute optional nullable ShortCircuitRatingsStruct shortCircuitRating = 132;
+  provisional readonly attribute optional nullable ResidualCurrentFaultRatingsStruct residualCurrentRating = 133;
+  provisional readonly attribute optional nullable ArcFaultRatingsStruct arcFaultRating = 134;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ModifyEnabledAlarmsRequest {
+    AlarmBitmap mask = 0;
+  }
+
+  /** This command allows a client to request that an alarm be enabled or suppressed at the server. */
+  command ModifyEnabledAlarms(ModifyEnabledAlarmsRequest): DefaultSuccess = 1;
 }
 
 endpoint 0 {
@@ -1683,6 +1965,14 @@ endpoint 1 {
     callback attribute clusterRevision;
   }
 
+  server cluster PowerTopology {
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 2;
+  }
+
   server cluster ElectricalDistribution {
     callback attribute maxContinuousCurrent;
     callback attribute maxVoltage;
@@ -1694,6 +1984,66 @@ endpoint 1 {
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
+  }
+
+  server cluster ElectricalProtectionAlarm {
+    emits event Notify;
+    callback attribute mask;
+    callback attribute state;
+    callback attribute supported;
+    callback attribute arcCause;
+    callback attribute overLoadRating;
+    callback attribute overVoltageRating;
+    callback attribute surgeProtectionRating;
+    callback attribute shortCircuitRating;
+    callback attribute residualCurrentRating;
+    callback attribute arcFaultRating;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+  }
+}
+endpoint 2 {
+  device type ma_electrical_circuit_breaker = 1302, version 1;
+
+
+  server cluster OnOff {
+    persist  attribute onOff default = 0x00;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0x04;
+    ram      attribute clusterRevision default = 6;
+
+    handle command Off;
+  }
+
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+  }
+
+  server cluster UserLabel {
+    callback attribute labelList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+  }
+
+  server cluster PowerTopology {
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 2;
   }
 }
 

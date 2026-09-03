@@ -59,8 +59,10 @@ if (chip_build_tests) {
       "${chip_root}/src/app/cluster-building-blocks/tests",
       "${chip_root}/src/app/clusters/access-control-server/tests",
       "${chip_root}/src/app/clusters/administrator-commissioning-server/tests",
+      "${chip_root}/src/app/clusters/alarm-base-server/tests",
       "${chip_root}/src/app/clusters/ambient-context-sensing-server/tests",
       "${chip_root}/src/app/clusters/air-quality-server/tests",
+      "${chip_root}/src/app/clusters/audio-control-server/tests",
       "${chip_root}/src/app/clusters/av-analysis-server/tests",
       "${chip_root}/src/app/clusters/basic-information/tests",
       "${chip_root}/src/app/clusters/actions-server/tests",
@@ -73,8 +75,11 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/chime-server/tests",
       "${chip_root}/src/app/clusters/closure-control-server/tests",
       "${chip_root}/src/app/clusters/closure-dimension-server/tests",
+      "${chip_root}/src/app/clusters/color-control-server/tests",
       "${chip_root}/src/app/clusters/commissioner-control-server/tests",
+      "${chip_root}/src/app/clusters/commissioning-proxy-server/tests",
       "${chip_root}/src/app/clusters/commodity-tariff-server/tests",
+      "${chip_root}/src/app/clusters/commodity-price-server/tests",
       "${chip_root}/src/app/clusters/concentration-measurement-server/tests",
       "${chip_root}/src/app/clusters/content-launch-server/tests",
       "${chip_root}/src/app/clusters/descriptor/tests",
@@ -107,6 +112,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/media-playback-server/tests",
       "${chip_root}/src/app/clusters/microwave-oven-control-server/tests",
       "${chip_root}/src/app/clusters/mode-base-server/tests",
+      "${chip_root}/src/app/clusters/mode-select-server/tests",
       "${chip_root}/src/app/clusters/network-commissioning/tests",
       "${chip_root}/src/app/clusters/network-identity-management-server/tests",
       "${chip_root}/src/app/clusters/occupancy-sensor-server/tests",
@@ -125,10 +131,12 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/flow-measurement-server/tests",
       "${chip_root}/src/app/clusters/pressure-measurement-server/tests",
       "${chip_root}/src/app/clusters/software-diagnostics-server/tests",
+      "${chip_root}/src/app/clusters/electrical-protection-alarm-server/tests",
       "${chip_root}/src/app/clusters/soil-measurement-server/tests",
       "${chip_root}/src/app/clusters/switch-server/tests",
       "${chip_root}/src/app/clusters/temperature-control-server/tests",
       "${chip_root}/src/app/clusters/temperature-measurement-server/tests",
+      "${chip_root}/src/app/clusters/thermostat-server/tests",
       "${chip_root}/src/app/clusters/thread-border-router-management-server/tests",
       "${chip_root}/src/app/clusters/thread-network-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/thread-network-directory-server/tests",
@@ -165,6 +173,7 @@ if (chip_build_tests) {
       "${chip_root}/src/lib/dnssd/minimal_mdns/responders/tests",
       "${chip_root}/src/lib/dnssd/minimal_mdns/tests",
       "${chip_root}/src/lib/dnssd/tests",
+      "${chip_root}/src/lib/dnssd/uld/tests",
       "${chip_root}/src/lib/format/tests",
       "${chip_root}/src/lib/support/verhoeff/tests",
       "${chip_root}/src/messaging/tests",
@@ -187,8 +196,9 @@ if (chip_build_tests) {
       ]
     }
 
-    # Backwards compatibility uses ember mocks, so they cannot run in a "unified"
-    # test build. Restrict them to specific platforms only
+    # These suites link ember mocks (codegen data-model provider), so they cannot
+    # run in a "unified" single-binary test build. Restrict them to specific
+    # platforms only.
     if (chip_device_platform == "darwin" || chip_device_platform == "linux") {
       tests += [
         # keep-sorted: start
@@ -307,6 +317,9 @@ if (chip_build_tests) {
         chip_device_platform != "nxp" && current_os != "android") {
       tests += [ "${chip_root}/examples/evse-app/evse-common/tests" ]
     }
+
+    tests +=
+        [ "${chip_root}/examples/ota-provider-app/ota-provider-common/tests" ]
 
     # tv-app Media File Management delegate test. Excluded on embedded targets
     # where the example's filesystem-backed delegate has no /tmp to write to.

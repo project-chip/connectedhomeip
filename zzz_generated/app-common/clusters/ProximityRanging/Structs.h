@@ -110,15 +110,19 @@ using DecodableType = Type;
 namespace BLERangingDeviceRoleConfigStruct {
 enum class Fields : uint8_t
 {
-    kRole            = 0,
-    kPeerBLEDeviceID = 1,
+    kRole               = 0,
+    kPeerBLEDeviceID    = 1,
+    kBLERBCSecurityMode = 2,
+    kSessionKey         = 3,
 };
 
 struct Type
 {
 public:
-    RangingRoleEnum role     = static_cast<RangingRoleEnum>(0);
-    uint64_t peerBLEDeviceID = static_cast<uint64_t>(0);
+    RangingRoleEnum role                      = static_cast<RangingRoleEnum>(0);
+    uint64_t peerBLEDeviceID                  = static_cast<uint64_t>(0);
+    BLERBCSecurityModeEnum BLERBCSecurityMode = static_cast<BLERBCSecurityModeEnum>(0);
+    Optional<chip::ByteSpan> sessionKey;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -146,8 +150,8 @@ public:
     RangingRoleEnum role = static_cast<RangingRoleEnum>(0);
     chip::ByteSpan peerBLTDevIK;
     Optional<BLTCSModeEnum> BLTCSMode;
-    Optional<BLTCSSecurityLevelEnum> BLTCSSecurityLevel;
-    Optional<chip::ByteSpan> ltk;
+    BLTCSSecurityLevelEnum BLTCSSecurityLevel = static_cast<BLTCSSecurityLevelEnum>(0);
+    chip::ByteSpan ltk;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -164,15 +168,23 @@ enum class Fields : uint8_t
 {
     kTechnology             = 0,
     kFrequencyBand          = 1,
-    kPeriodicRangingSupport = 2,
+    kBandwidth              = 2,
+    kSupportedRangingRoles  = 3,
+    kRDRCapability          = 4,
+    kPeriodicRangingSupport = 5,
+    kMaxConcurrentSessions  = 6,
 };
 
 struct Type
 {
 public:
-    RangingTechEnum technology                   = static_cast<RangingTechEnum>(0);
-    chip::BitMask<RadioBandBitmap> frequencyBand = static_cast<chip::BitMask<RadioBandBitmap>>(0);
-    bool periodicRangingSupport                  = static_cast<bool>(0);
+    RangingTechEnum technology                                    = static_cast<RangingTechEnum>(0);
+    chip::BitMask<RadioBandBitmap> frequencyBand                  = static_cast<chip::BitMask<RadioBandBitmap>>(0);
+    chip::BitMask<RangingBandwidthBitmap> bandwidth               = static_cast<chip::BitMask<RangingBandwidthBitmap>>(0);
+    chip::BitMask<RangingRoleSupportBitmap> supportedRangingRoles = static_cast<chip::BitMask<RangingRoleSupportBitmap>>(0);
+    RDRCapabilityEnum RDRCapability                               = static_cast<RDRCapabilityEnum>(0);
+    bool periodicRangingSupport                                   = static_cast<bool>(0);
+    Optional<uint8_t> maxConcurrentSessions;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -184,6 +196,37 @@ public:
 using DecodableType = Type;
 
 } // namespace RangingCapabilitiesStruct
+namespace RangingConstraintStruct {
+enum class Fields : uint8_t
+{
+    kTechnology          = 0,
+    kRole                = 1,
+    kEnabled             = 3,
+    kMinRangingInterval  = 4,
+    kMaxSessionDuration  = 5,
+    kMaxRangingInstances = 6,
+};
+
+struct Type
+{
+public:
+    RangingTechEnum technology = static_cast<RangingTechEnum>(0);
+    RangingRoleEnum role       = static_cast<RangingRoleEnum>(0);
+    Optional<bool> enabled;
+    Optional<uint32_t> minRangingInterval;
+    Optional<uint32_t> maxSessionDuration;
+    Optional<uint16_t> maxRangingInstances;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace RangingConstraintStruct
 namespace RangingTriggerConditionStruct {
 enum class Fields : uint8_t
 {
@@ -247,7 +290,7 @@ struct Type
 public:
     RangingRoleEnum role = static_cast<RangingRoleEnum>(0);
     chip::ByteSpan peerWiFiDevIK;
-    Optional<chip::ByteSpan> pmk;
+    chip::ByteSpan pmk;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

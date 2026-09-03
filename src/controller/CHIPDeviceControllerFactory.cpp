@@ -69,6 +69,7 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
     mCertificateValidityPolicy = params.certificateValidityPolicy;
     mSessionResumptionStorage  = params.sessionResumptionStorage;
     mEnableServerInteractions  = params.enableServerInteractions;
+    mEnableTCPServer           = params.enableTCPServer;
     mPreventDnssdPortOverwrite = params.preventDnssdPortOverwrite;
     mDataModelProvider         = params.dataModelProvider;
 
@@ -97,6 +98,7 @@ CHIP_ERROR DeviceControllerFactory::ReinitSystemStateIfNecessary()
     params.interfaceId               = mInterfaceId;
     params.fabricIndependentStorage  = mFabricIndependentStorage;
     params.enableServerInteractions  = mEnableServerInteractions;
+    params.enableTCPServer           = mEnableTCPServer;
     params.preventDnssdPortOverwrite = mPreventDnssdPortOverwrite;
     params.groupDataProvider         = mSystemState->GetGroupDataProvider();
     params.sessionKeystore           = mSystemState->GetSessionKeystore();
@@ -138,7 +140,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     auto tcpListenParams = Transport::TcpListenParameters(stateParams.tcpEndPointManager)
                                .SetAddressType(IPAddressType::kIPv6)
                                .SetListenPort(params.listenPort)
-                               .SetServerListenEnabled(false); // Initialize as a TCP Client
+                               .SetServerListenEnabled(params.enableTCPServer);
 #endif
 
     if (params.dataModelProvider == nullptr)
@@ -199,7 +201,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
                                                         Transport::TcpListenParameters(stateParams.tcpEndPointManager)
                                                             .SetAddressType(Inet::IPAddressType::kIPv4)
                                                             .SetListenPort(params.listenPort)
-                                                            .SetServerListenEnabled(false)
+                                                            .SetServerListenEnabled(params.enableTCPServer)
 #endif
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
@@ -210,7 +212,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
                                                             ,
                                                         Transport::NfcListenParameters(nullptr)
 #endif
-                                                            ));
+                                                            ,
+                                                        Transport::ProxyListenParameters(stateParams.systemLayer)));
 
     // TODO(#16231): All the new'ed state above/below in this method is never properly released or null-checked!
     stateParams.sessionMgr                = chip::Platform::New<SessionManager>();
@@ -281,6 +284,20 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     ReturnErrorOnFailure(Dnssd::Resolver::Instance().Init(stateParams.udpEndPointManager));
 
+    SessionParameters localSessionParams;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    {
+        uint16_t supportedTransports = static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient);
+        if (params.enableTCPServer)
+        {
+            supportedTransports |= static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpServer);
+        }
+        localSessionParams.SetSupportedTransports(supportedTransports);
+        localSessionParams.SetMaxTCPPayloadSize(CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES -
+                                                SessionParameters::kTCPFramingHeaderSize);
+    }
+#endif
+
     if (params.enableServerInteractions)
     {
         stateParams.caseServer = chip::Platform::New<CASEServer>();
@@ -289,6 +306,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         ReturnErrorOnFailure(stateParams.caseServer->ListenForSessionEstablishment(
             stateParams.exchangeMgr, stateParams.sessionMgr, stateParams.fabricTable, sessionResumptionStorage,
             stateParams.certificateValidityPolicy, stateParams.groupDataProvider));
+        stateParams.caseServer->SetLocalSessionParameters(localSessionParams);
 
         if (!params.preventDnssdPortOverwrite)
         {
@@ -338,6 +356,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         // the then-current value.
         .mrpLocalConfig            = NullOptional,
         .minimumLITBackoffInterval = params.minimumLITBackoffInterval,
+        .localSessionParams        = localSessionParams,
     };
 
     CASESessionManagerConfig sessionManagerConfig = {

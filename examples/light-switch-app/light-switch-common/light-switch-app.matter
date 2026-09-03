@@ -750,7 +750,7 @@ cluster Descriptor = 29 {
   readonly attribute cluster_id clientList[] = 2;
   readonly attribute endpoint_no partsList[] = 3;
   readonly attribute optional SemanticTagStruct tagList[] = 4;
-  provisional readonly attribute optional char_string<32> endpointUniqueID = 5;
+  readonly attribute optional char_string<32> endpointUniqueID = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2354,11 +2354,6 @@ cluster OperationalCredentials = 62 {
 cluster GroupKeyManagement = 63 {
   revision 4;
 
-  enum GroupKeyMulticastPolicyEnum : enum8 {
-    kPerGroupID = 0;
-    kAllNodes = 1;
-  }
-
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
     kCacheAndSync = 1;
@@ -2708,7 +2703,7 @@ provisional cluster ScenesManagement = 98 {
 }
 
 /** The Groupcast cluster manages the content of the node-wide multicast Group membership that is part of the underlying interaction layer. */
-provisional cluster Groupcast = 101 {
+cluster Groupcast = 101 {
   revision 1;
 
   enum GroupcastTestResultEnum : enum8 {
@@ -2718,6 +2713,7 @@ provisional cluster Groupcast = 101 {
     kFailedAuth = 3;
     kNoAvailableKey = 4;
     kSendFailure = 5;
+    kUnknownGroup = 6;
   }
 
   enum GroupcastTestingEnum : enum8 {
@@ -2746,7 +2742,7 @@ provisional cluster Groupcast = 101 {
     fabric_idx fabricIndex = 254;
   }
 
-  provisional fabric_sensitive info event access(read: administer) GroupcastTesting = 0 {
+  fabric_sensitive info event access(read: administer) GroupcastTesting = 0 {
     optional octet_string sourceIpAddress = 0;
     optional octet_string destinationIpAddress = 1;
     optional group_id groupID = 2;
@@ -2758,11 +2754,11 @@ provisional cluster Groupcast = 101 {
     fabric_idx fabricIndex = 254;
   }
 
-  provisional readonly attribute MembershipStruct membership[] = 0;
-  provisional readonly attribute int16u maxMembershipCount = 1;
-  provisional readonly attribute int16u maxMcastAddrCount = 2;
-  provisional readonly attribute int16u usedMcastAddrCount = 3;
-  provisional readonly attribute fabric_idx fabricUnderTest = 4;
+  readonly attribute MembershipStruct membership[] = 0;
+  readonly attribute int16u maxMembershipCount = 1;
+  readonly attribute int16u maxMcastAddrCount = 2;
+  readonly attribute int16u usedMcastAddrCount = 3;
+  readonly attribute fabric_idx fabricUnderTest = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
