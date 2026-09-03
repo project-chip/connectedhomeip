@@ -1197,6 +1197,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestCreateNewController.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDefaultWarnings.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestFabricScopedDiscovery.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestFabricMetadataConsistency.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestIdChecks.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestMatterTestingSupport.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestPixitSupport.py'
