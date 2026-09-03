@@ -95,8 +95,8 @@ KNOWN_FABRIC_METADATA_GAPS = frozenset({
     # Confirmed against spec master: MessageStruct is "Access Modifier: Fabric
     # Scoped" with every field marked S, and each event's field table carries
     # "Access Modifier: Fabric Sensitive".
-    # TODO: remove once the Messages cluster is fixed; tracked in the issue
-    # raised from the TC-IDM-8.1 fabric sweep.
+    # TODO: remove once the Messages cluster is fixed; tracked in
+    # https://github.com/project-chip/connectedhomeip/issues/73948
     'Messages/MessageStruct: spec fabricScoped, ZAP not',
     'Messages/MessageStruct: fabric-sensitive fields differ, spec [0, 1, 2, 3, 4, 5, 6] ZAP [7, 8]',
     'Messages/MessageQueued: spec fabricSensitive, ZAP not',
@@ -110,7 +110,7 @@ KNOWN_FABRIC_METADATA_GAPS = frozenset({
     # requires the list to be reported fabric filtered whatever the request
     # asked for, and the SDK implements that quality nowhere generically.
     # TODO: remove once the WebRTC clusters filter CurrentSessions; tracked in
-    # the issue raised from the TC-IDM-8.1 fabric sweep.
+    # https://github.com/project-chip/connectedhomeip/issues/73946
     'WebRTC Transport Provider/CurrentSessions: attribute is fabric sensitive but '
     'WebRTCSessionStruct masks no field and the cluster does not hand-filter',
     'WebRTC Transport Requestor/CurrentSessions: attribute is fabric sensitive but '
