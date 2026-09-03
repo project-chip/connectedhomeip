@@ -1,0 +1,1 @@
+{"reportName":"Nightly CI Tests","testRuns":[],"statistic":{"failed":1,"broken":0,"skipped":0,"passed":4,"unknown":0,"total":5},"time":{"start":1788396411000,"stop":1788397318583,"duration":907583,"minDuration":3206,"maxDuration":862583,"sumDuration":2001326}}
