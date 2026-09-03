@@ -161,6 +161,8 @@ CHIP_ERROR AppTask::InitRootNode()
         .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(),
         .eventManagement            = EventManagement::GetInstance(),
         .timerDelegate              = mTimerDelegate,
+        .minGuaranteedSubscriptionsPerFabric =
+            InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(),
     };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -205,6 +207,8 @@ CHIP_ERROR AppTask::InitRootNode()
 CHIP_ERROR AppTask::RegisterOTACluster()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    VerifyOrReturnError(mDataModelProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     // Must be registered before Server::Init() starts the provider.
     mOTARequestorCluster.Create(kRootEndpointId, mOTARequestorCore, mOTARequestorAttributes,
                                 Server::GetInstance().GetFabricTable());
