@@ -273,6 +273,11 @@ class TC_IDM_8_1(IDMBaseTest):
                 asserts.assert_true(any(getattr(e, 'fabricIndex', None) == f1 for e in report_th1.value),
                                     f"{info.path_str}: TH1's report contained no entry for its own fabric "
                                     f"after writing one")
+                # TH2 must see that TH1's fabric gained an entry, with its fabric-sensitive
+                # fields masked: the entry's presence is not itself fabric-sensitive data.
+                asserts.assert_true(any(getattr(e, 'fabricIndex', None) == f1 for e in report_th2.value),
+                                    f"{info.path_str}: TH2's report contained no entry for fabric {f1} after "
+                                    f"TH1 wrote one")
                 self.assert_other_fabric_entries_masked(info, report_th1.value, own_fabric_index=f1)
                 self.assert_other_fabric_entries_masked(info, report_th2.value, own_fabric_index=f2)
                 modified += 1
@@ -290,16 +295,21 @@ class TC_IDM_8_1(IDMBaseTest):
                              problem=f"Step 4: {info.path_str} was not written because {reason}; its fabric "
                              "filtering was verified by read only")
 
-        self.step(5, "For every fabric-sensitive event discovered on the DUT that can be triggered, TH1 and TH2 activate a fabric-filtered subscription to the event and the event is triggered on the fabric TH1 is on.",
+        self.step(5, "For every fabric-sensitive event discovered on the DUT that can be triggered, TH1 and TH2 activate a subscription to the event, not fabric filtered, and the event is triggered on the fabric TH1 is on.",
                   expectation="The DUT reports the event to TH1 and does not report it to TH2.")
+        # Subscriptions here and in steps 6 and 7 are deliberately not fabric filtered.
+        # An event whose associated fabric does not match the accessing fabric is dropped
+        # before the fabric filtering flag is consulted (IncludeEventInReport in
+        # src/app/EventManagement.cpp), so a filtered request would let a DUT that only
+        # suppresses cross-fabric events when asked to filter pass the step.
         triggered: list[FabricSensitiveEventInfo] = []
         untriggerable: list[FabricSensitiveEventInfo] = []
         for event_info in event_infos:
             cluster_class = Clusters.ClusterObjects.ALL_CLUSTERS[event_info.cluster_id]
             handler_th1 = EventSubscriptionHandler(expected_cluster=cluster_class)
             handler_th2 = EventSubscriptionHandler(expected_cluster=cluster_class)
-            await handler_th1.start(self.th1, self.dut_node_id, event_info.endpoint_id, fabric_filtered=True)
-            await handler_th2.start(self.th2, self.dut_node_id, event_info.endpoint_id, fabric_filtered=True)
+            await handler_th1.start(self.th1, self.dut_node_id, event_info.endpoint_id, fabric_filtered=False)
+            await handler_th2.start(self.th2, self.dut_node_id, event_info.endpoint_id, fabric_filtered=False)
             try:
                 handler_th1.flush_events()
                 handler_th2.flush_events()
@@ -309,7 +319,7 @@ class TC_IDM_8_1(IDMBaseTest):
                 handler_th1.wait_for_event_type_report(event_info.event, timeout_sec=REPORT_TIMEOUT_SEC)
                 await asyncio.sleep(NO_REPORT_SETTLE_SEC)
                 self.assert_no_events_for_fabric(handler_th2, f1,
-                                                 f"{event_info.path_str}: TH2's fabric-filtered subscription")
+                                                 f"{event_info.path_str}: TH2's subscription")
                 triggered.append(event_info)
             finally:
                 handler_th1.cancel()
@@ -326,8 +336,8 @@ class TC_IDM_8_1(IDMBaseTest):
                              "this event was not exercised")
         asserts.assert_greater(len(triggered), 0, "No fabric-sensitive event could be triggered on the DUT")
 
-        self.step(6, "TH2 triggers a fabric-sensitive event on its own fabric. TH1 then sends a Subscribe Request Message with EventRequests set to that event path and fabric filtered set to true.",
-                  expectation="The DUT sends a Report Data Message with no entry for the event associated with the fabric TH2 is on.")
+        self.step(6, "TH2 triggers a fabric-sensitive event on its own fabric. TH1 then sends a Subscribe Request Message with EventRequests set to that event path and fabric filtered set to false.",
+                  expectation="The DUT sends a Report Data Message with no entry for the event associated with the fabric TH2 is on, and the report carries at least one event.")
         # Steps 6 and 7 need an event that exists on TH2's fabric, so they reuse the
         # events step 5 was able to trigger, this time triggered by TH2.
         for event_info in triggered:
@@ -339,30 +349,37 @@ class TC_IDM_8_1(IDMBaseTest):
             handler_th1 = EventSubscriptionHandler(
                 expected_cluster=Clusters.ClusterObjects.ALL_CLUSTERS[event_info.cluster_id])
             subscription = await handler_th1.start(self.th1, self.dut_node_id, event_info.endpoint_id,
-                                                   fabric_filtered=True)
+                                                   fabric_filtered=False)
             try:
                 # start() returns once the subscription is established, so the priming
                 # report is already in the subscription's event list.
                 primed = self.assert_no_subscription_events_for_fabric(
-                    subscription, f2, f"{event_info.path_str}: TH1's fabric-filtered subscription")
+                    subscription, f2, f"{event_info.path_str}: TH1's subscription")
                 asserts.assert_greater(primed, 0,
                                        f"{event_info.path_str}: TH1's priming report carried no event at all, so "
                                        f"the absence of fabric {f2}'s event proves nothing")
             finally:
                 handler_th1.cancel()
 
-        self.step(7, "TH1 sends a Read Request Message with EventRequests set to the same event path and fabric filtered set to true.",
-                  expectation="The DUT sends a Report Data Message with no entry for the event associated with the fabric TH2 is on.")
+        self.step(7, "TH2 triggers the same fabric-sensitive event on its own fabric. TH1 then sends a Read Request Message with EventRequests set to that event path and fabric filtered set to false.",
+                  expectation="The DUT sends a Report Data Message with no entry for the event associated with the fabric TH2 is on, and the response carries at least one event for TH1's own fabric.")
         for event_info in triggered:
             await self.trigger_fabric_sensitive_event(event_info, self.th2)
+            # As in step 6, trigger on TH1's fabric as well so an event log that has
+            # rolled over cannot make the assertion below pass on an empty response.
+            await self.trigger_fabric_sensitive_event(event_info, self.th1)
             events = await self.th1.ReadEvent(
                 self.dut_node_id,
-                events=[(event_info.endpoint_id, Clusters.ClusterObjects.ALL_CLUSTERS[event_info.cluster_id])],
-                fabricFiltered=True)
+                events=[(event_info.endpoint_id, event_info.event)],
+                fabricFiltered=False)
             leaked = [e for e in events if getattr(e.Data, 'fabricIndex', None) == f2]
             asserts.assert_equal(leaked, [],
-                                 f"{event_info.path_str}: TH1's fabric-filtered read returned "
+                                 f"{event_info.path_str}: TH1's read returned "
                                  f"{len(leaked)} event(s) for TH2's fabric")
+            own = [e for e in events if getattr(e.Data, 'fabricIndex', None) == f1]
+            asserts.assert_greater(len(own), 0,
+                                   f"{event_info.path_str}: TH1's read returned no event for its own fabric, so "
+                                   f"the absence of fabric {f2}'s event proves nothing")
 
 
 if __name__ == "__main__":
