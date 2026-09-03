@@ -27,7 +27,9 @@ config CHIP_OTA_REQUESTOR
 	default n
 	imply STREAM_FLASH
 	imply STREAM_FLASH_ERASE
-	imply IMG_MANAGER
+
+config IMG_MANAGER
+	default y
 
 config STREAM_FLASH
 	default n

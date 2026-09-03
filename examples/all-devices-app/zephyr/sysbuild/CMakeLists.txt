@@ -35,6 +35,14 @@ else()
     unset(mcuboot_EXTRA_DTC_OVERLAY_FILE CACHE)
 endif()
 
+all_devices_find_board_file(${APP_DIR}/boards ${_board_name}.conf _board_conf EXCLUDE_FLAT)
+if(_board_conf)
+    set(zephyr_EXTRA_CONF_FILE ${_board_conf}
+        CACHE INTERNAL "App board Kconfig fragment")
+else()
+    unset(zephyr_EXTRA_CONF_FILE CACHE)
+endif()
+
 all_devices_find_board_file(${APP_DIR}/boards ${_board_name}_mcuboot.conf _board_mcuboot_conf)
 set(_mcuboot_extra_conf ${APP_DIR}/sysbuild/mcuboot.conf)
 if(_board_mcuboot_conf)

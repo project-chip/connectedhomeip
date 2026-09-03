@@ -41,8 +41,8 @@ endforeach()
 
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/zephyr/chip-module)
 
-# Zephyr auto-discovers boards in  boards/
-# This allows discovery in boards/vendor/
+# Zephyr auto-discovers files directly under boards/. This also discovers
+# board files in the registered vendor subdirectories.
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/board_files.cmake)
 if(DEFINED BOARD)
     all_devices_board_name(${BOARD} ALL_DEVICES_BOARD_NAME)
@@ -61,16 +61,6 @@ if(DEFINED BOARD)
         list(APPEND EXTRA_CONF_FILE ${ALL_DEVICES_NESTED_BOARD_CONF})
     endif()
 
-    # Zephyr also auto-discovers socs/${SOC}.conf, but only directly in socs/.
-    # Allow grouping those under a vendor subfolder too (e.g. socs/vendor/).
-    all_devices_find_soc_for_board(${ALL_DEVICES_BOARD_NAME} ALL_DEVICES_SOC_NAME)
-    if(ALL_DEVICES_SOC_NAME)
-        all_devices_find_board_file(${CMAKE_CURRENT_SOURCE_DIR}/socs ${ALL_DEVICES_SOC_NAME}.conf
-                                     ALL_DEVICES_NESTED_SOC_CONF EXCLUDE_FLAT)
-        if(ALL_DEVICES_NESTED_SOC_CONF)
-            list(APPEND EXTRA_CONF_FILE ${ALL_DEVICES_NESTED_SOC_CONF})
-        endif()
-    endif()
 endif()
 
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
