@@ -22,8 +22,8 @@
 #include <lib/dnssd/wire/QName.h>
 #include <lib/dnssd/wire/RecordWriter.h>
 
-namespace mdns {
-namespace Minimal {
+namespace chip {
+namespace Dnssd {
 
 class QueryData
 {
@@ -121,5 +121,5 @@ public:
 /// returns true if packet was successfully parsed, false otherwise
 bool ParsePacket(const BytesRange & packetData, ParserDelegate * delegate);
 
-} // namespace Minimal
-} // namespace mdns
+} // namespace Dnssd
+} // namespace chip
