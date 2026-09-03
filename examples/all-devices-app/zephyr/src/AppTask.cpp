@@ -49,7 +49,7 @@ using namespace chip::DeviceLayer;
 namespace chip::app::AllDevices {
 namespace {
 
-constexpr EndpointId kRootEndpointId   = 0;
+constexpr EndpointId kRootEndpointId        = 0;
 constexpr EndpointId kFirstDeviceEndpointId = 1;
 
 } // namespace
@@ -256,8 +256,8 @@ CHIP_ERROR AppTask::InitOTARequestor()
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     SetRequestorInstance(&mOTARequestorCore);
     mOTARequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
-    ReturnErrorOnFailure(mOTARequestorCore.Init(Server::GetInstance(), mOTARequestorStorage, mOTARequestorDriver,
-                                                mOTADownloader, mOTARequestorAttributes, mOTARequestorCluster.Cluster()));
+    ReturnErrorOnFailure(mOTARequestorCore.Init(Server::GetInstance(), mOTARequestorStorage, mOTARequestorDriver, mOTADownloader,
+                                                mOTARequestorAttributes, mOTARequestorCluster.Cluster()));
 
     auto & imageProcessor = OTAImageProcessorImpl::GetDefaultInstance();
     mOTARequestorDriver.Init(&mOTARequestorCore, &imageProcessor);
