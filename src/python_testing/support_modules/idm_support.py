@@ -755,7 +755,7 @@ class IDMBaseTest(BasicCompositionTests):
 
         return probes
 
-    def generate_constraint_violation(self, attr_info: WritableAttributeInfo, constraints: Constraints):
+    def generate_constraint_violation(self, attr_info: WritableAttributeInfo, constraints: Constraints) -> Any | None:
         """Generate a single test value that violates the given constraints, or None.
 
         Thin wrapper over generate_constraint_probes(): the first violating probe is the

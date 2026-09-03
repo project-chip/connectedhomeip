@@ -34,9 +34,8 @@ value immediately. Attributes whose value could not be restored are called out
 separately in the report: the device is left dirty and should be factory reset before
 running anything else against it.
 
-Example:
-    python3 src/python_testing/AttributeBoundarySweep.py --commissioning-method on-network \\
-        --discriminator 1234 --passcode 20202021 --storage-path admin_storage.json
+Example with the chip-all-clusters-app:
+    ./scripts/tests/run_python_test.py --factory-reset --app out/linux-x64-all-clusters/chip-all-clusters-app --app-args "--discriminator 1234 --KVS kvs1" --script src/python_testing/TC_AttributeBoundarySweep.py --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values"
 """
 
 import logging
@@ -96,6 +95,10 @@ class ProbeResult:
     # True when the probe changed the attribute and the original value could not be put
     # back; the DUT is left holding a value the sweep wrote.
     restore_failed: bool = False
+    # repr() of the value the attribute read back after the probe write, or None when that
+    # read did not complete. The DUT can clamp a write, so this is not necessarily the
+    # probe value; it is what the device is left holding when restore_failed is set.
+    stored_repr: str | None = None
 
     @property
     def path_str(self) -> str:
@@ -137,7 +140,7 @@ class AttributeBoundarySweep(IDMBaseTest):
         ]
 
     @async_test_body
-    async def test_AttributeBoundarySweep(self):
+    async def test_AttributeBoundarySweep(self) -> None:
         self.step(0)
         await self.setup_class_helper(allow_pase=False)
         self.build_spec_xmls()
@@ -244,8 +247,16 @@ class AttributeBoundarySweep(IDMBaseTest):
         if original == probe.value:
             return result(ProbeOutcome.ALREADY_AT_BOUND, detail=f'attribute already reads {original}')
 
+        # A non-timed write to a timed-write attribute is answered with
+        # NEEDS_TIMED_INTERACTION before the boundary value is ever range-checked, which
+        # would record the attribute as OTHER_STATUS without testing or restoring it.
+        timed_request_timeout_ms = None
+        if attr_info.attribute.must_use_timed_write:
+            timed_request_timeout_ms = 65535
+
         write_result = await self.default_controller.WriteAttribute(
-            nodeId=self.dut_node_id, attributes=[(attr_info.endpoint_id, attr_info.attribute(probe.value))])
+            nodeId=self.dut_node_id, attributes=[(attr_info.endpoint_id, attr_info.attribute(probe.value))],
+            timedRequestTimeoutMs=timed_request_timeout_ms)
         status = write_result[0].Status
 
         if status != Status.Success:
@@ -254,24 +265,47 @@ class AttributeBoundarySweep(IDMBaseTest):
             return result(outcome, status_name=getattr(status, 'name', str(status)),
                           detail=f'{probe.description}, value {probe.value!r}')
 
-        stored = await self.read_single_attribute_check_success(
-            endpoint=attr_info.endpoint_id, cluster=attr_info.cluster_class, attribute=attr_info.attribute)
-        outcome = ProbeOutcome.ACCEPTED if stored == probe.value else ProbeOutcome.IGNORED
+        # The DUT took the write, so it may already hold probe.value no matter how the
+        # read-back below turns out. Classify inside the try and restore in the finally: a
+        # read that raises (read failure, decode error, failed check) would otherwise leave
+        # the attribute holding a value the sweep wrote, with nothing recorded as dirty.
         detail = f'{probe.description}, value {probe.value!r}'
-        if outcome is ProbeOutcome.IGNORED:
-            detail += f', attribute reads {stored!r}'
-
+        outcome = ProbeOutcome.ERROR
+        needs_restore = True
         restore_failed = False
-        if stored != original:
-            restore_result = await self.default_controller.WriteAttribute(
-                nodeId=self.dut_node_id, attributes=[(attr_info.endpoint_id, attr_info.attribute(original))])
-            if restore_result[0].Status != Status.Success:
-                restore_failed = True
-                log.error("Could not restore %s.%s on EP%s to %r: %s", attr_info.cluster_name,
-                          attr_info.attribute_name, attr_info.endpoint_id, original,
-                          getattr(restore_result[0].Status, 'name', restore_result[0].Status))
+        stored_repr = None
+        try:
+            stored = await self.read_single_attribute_check_success(
+                endpoint=attr_info.endpoint_id, cluster=attr_info.cluster_class, attribute=attr_info.attribute)
+            stored_repr = repr(stored)
+            needs_restore = stored != original
+            outcome = ProbeOutcome.ACCEPTED if stored == probe.value else ProbeOutcome.IGNORED
+            if outcome is ProbeOutcome.IGNORED:
+                detail += f', attribute reads {stored!r}'
+        except Exception as e:
+            detail += f'; read-back after a successful write failed: {e}'
+        finally:
+            if needs_restore:
+                try:
+                    restore_result = await self.default_controller.WriteAttribute(
+                        nodeId=self.dut_node_id, attributes=[(attr_info.endpoint_id, attr_info.attribute(original))],
+                        timedRequestTimeoutMs=timed_request_timeout_ms)
+                    restore_status = getattr(restore_result[0].Status, 'name', restore_result[0].Status)
+                    restore_failed = restore_result[0].Status != Status.Success
+                except Exception as e:
+                    restore_status = e
+                    restore_failed = True
+                if restore_failed:
+                    log.error("Could not restore %s.%s on EP%s to %r: %s", attr_info.cluster_name,
+                              attr_info.attribute_name, attr_info.endpoint_id, original, restore_status)
 
-        return result(outcome, status_name=Status.Success.name, detail=detail, restore_failed=restore_failed)
+        status_name = Status.Success.name
+        if outcome is ProbeOutcome.ERROR:
+            # The write status says nothing about why the probe failed; only the read did.
+            status_name = ''
+
+        return result(outcome, status_name=status_name, detail=detail, restore_failed=restore_failed,
+                      stored_repr=stored_repr)
 
     @staticmethod
     def _tally(results: list[ProbeResult]) -> SweepTally:
@@ -312,8 +346,11 @@ class AttributeBoundarySweep(IDMBaseTest):
         if tally.dirty:
             log.error("--- DUT left dirty: original value could not be restored ---")
             for probe_result in tally.dirty:
-                log.error("  %s now holds %r; factory reset before the next run", probe_result.path_str,
-                          probe_result.probe.value)
+                if probe_result.stored_repr is not None:
+                    current = f'now holds {probe_result.stored_repr}'
+                else:
+                    current = 'holds an unknown value: the read after the write did not complete'
+                log.error("  %s %s; factory reset before the next run", probe_result.path_str, current)
 
 
 if __name__ == "__main__":
