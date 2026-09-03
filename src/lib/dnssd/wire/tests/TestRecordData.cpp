@@ -27,7 +27,7 @@
 namespace {
 
 using namespace chip;
-using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 
 TEST(TestRecordData, SrvRecordSimpleParsing)
 {
