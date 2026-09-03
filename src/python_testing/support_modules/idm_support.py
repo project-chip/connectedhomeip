@@ -1666,13 +1666,13 @@ class IDMBaseTest(BasicCompositionTests):
         populators = {
             (Clusters.TlsCertificateManagement.id,
              Clusters.TlsCertificateManagement.Attributes.ProvisionedRootCertificates.attribute_id):
-                self.populate_tls_root_certificate,
+            self.populate_tls_root_certificate,
             (Clusters.TlsClientManagement.id,
              Clusters.TlsClientManagement.Attributes.ProvisionedEndpoints.attribute_id):
-                self.populate_tls_endpoint,
+            self.populate_tls_endpoint,
             (Clusters.GroupKeyManagement.id,
              Clusters.GroupKeyManagement.Attributes.GroupTable.attribute_id):
-                self.populate_group_table,
+            self.populate_group_table,
         }
         return populators.get((info.cluster_id, info.attribute_id))
 
