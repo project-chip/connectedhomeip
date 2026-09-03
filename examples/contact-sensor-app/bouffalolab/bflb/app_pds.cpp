@@ -37,8 +37,8 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
-#include <lwip/ip4_addr.h>
 #include <lwip/inet_chksum.h>
+#include <lwip/ip4_addr.h>
 #include <lwip/netif.h>
 #include <lwip/pbuf.h>
 #include <lwip/prot/ip4.h>
@@ -83,9 +83,9 @@ static struct bflb_device_s * s_sha_dev = NULL;
 
 namespace {
 
-constexpr uint8_t kActiveDtim              = 1;
-constexpr uint8_t kIdleDtim                = 10;
-constexpr uint32_t kDtimActivityDurationMs = 3000;
+constexpr uint8_t kActiveDtim                = 1;
+constexpr uint8_t kIdleDtim                  = 10;
+constexpr uint32_t kDtimActivityDurationMs   = 3000;
 constexpr uint32_t kDtimActivityNotification = 1U;
 
 StaticTask_t sDtimActivityTaskStorage;
@@ -113,10 +113,9 @@ void DtimActivityTask(void * arg)
     bool dtimActive = true;
     for (;;)
     {
-        uint32_t notificationValue = 0;
-        const TickType_t waitTime  = dtimActive ? pdMS_TO_TICKS(kDtimActivityDurationMs) : portMAX_DELAY;
-        BaseType_t notificationReceived =
-            xTaskNotifyWait(0, kDtimActivityNotification, &notificationValue, waitTime);
+        uint32_t notificationValue      = 0;
+        const TickType_t waitTime       = dtimActive ? pdMS_TO_TICKS(kDtimActivityDurationMs) : portMAX_DELAY;
+        BaseType_t notificationReceived = xTaskNotifyWait(0, kDtimActivityNotification, &notificationValue, waitTime);
 
         if (notificationReceived == pdTRUE && (notificationValue & kDtimActivityNotification) != 0)
         {
@@ -147,8 +146,7 @@ void app_dtim_activity_notify(void)
     if (xPortIsInsideInterrupt())
     {
         BaseType_t higherPriorityTaskWoken = pdFALSE;
-        notifyResult = xTaskNotifyFromISR(sDtimActivityTaskHandle, kDtimActivityNotification, eSetBits,
-                                          &higherPriorityTaskWoken);
+        notifyResult = xTaskNotifyFromISR(sDtimActivityTaskHandle, kDtimActivityNotification, eSetBits, &higherPriorityTaskWoken);
         portYIELD_FROM_ISR(higherPriorityTaskWoken);
     }
     else
@@ -170,15 +168,13 @@ bool IsLocalIPv4Destination(const ip4_addr_t * destination, const struct netif *
 
 extern "C" int app_dtim_ip4_input(struct pbuf * pbuf, struct netif * input_netif)
 {
-    if (pbuf != nullptr && input_netif != nullptr && pbuf->payload != nullptr && pbuf->len >= IP_HLEN &&
-        pbuf->tot_len >= IP_HLEN)
+    if (pbuf != nullptr && input_netif != nullptr && pbuf->payload != nullptr && pbuf->len >= IP_HLEN && pbuf->tot_len >= IP_HLEN)
     {
-        const auto * header = static_cast<const ip_hdr *>(pbuf->payload);
+        const auto * header         = static_cast<const ip_hdr *>(pbuf->payload);
         const uint16_t headerLength = IPH_HL_BYTES(header);
         const uint16_t packetLength = lwip_ntohs(IPH_LEN(header));
 
-        if (headerLength >= IP_HLEN && headerLength <= pbuf->len && packetLength >= headerLength &&
-            packetLength <= pbuf->tot_len)
+        if (headerLength >= IP_HLEN && headerLength <= pbuf->len && packetLength >= headerLength && packetLength <= pbuf->tot_len)
         {
 #if CHECKSUM_CHECK_IP
             IF__NETIF_CHECKSUM_ENABLED(input_netif, NETIF_CHECKSUM_CHECK_IP)
@@ -204,8 +200,7 @@ extern "C" int app_dtim_ip4_input(struct pbuf * pbuf, struct netif * input_netif
 
 extern "C" int app_dtim_ip6_input(struct pbuf * pbuf, struct netif * input_netif)
 {
-    if (pbuf != nullptr && input_netif != nullptr && pbuf->payload != nullptr && pbuf->len >= IP6_HLEN &&
-        pbuf->tot_len >= IP6_HLEN)
+    if (pbuf != nullptr && input_netif != nullptr && pbuf->payload != nullptr && pbuf->len >= IP6_HLEN && pbuf->tot_len >= IP6_HLEN)
     {
         const auto * header          = static_cast<const ip6_hdr *>(pbuf->payload);
         const uint16_t payloadLength = lwip_ntohs(IP6H_PLEN(header));
@@ -455,8 +450,7 @@ void app_pds_init(void (*pinHandler)(int, bool))
     s_pin_handler = pinHandler;
 
     sDtimActivityTaskHandle = xTaskCreateStatic(DtimActivityTask, "DtimActivity", configMINIMAL_STACK_SIZE, nullptr,
-                                                configMAX_PRIORITIES - 2, sDtimActivityTaskStack,
-                                                &sDtimActivityTaskStorage);
+                                                configMAX_PRIORITIES - 2, sDtimActivityTaskStack, &sDtimActivityTaskStorage);
     if (sDtimActivityTaskHandle == nullptr)
     {
         ChipLogError(DeviceLayer, "[LP] Failed to create DTIM activity task");
