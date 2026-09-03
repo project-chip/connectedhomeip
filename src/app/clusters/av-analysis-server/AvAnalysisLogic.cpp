@@ -1132,10 +1132,22 @@ void AvAnalysisServerLogic::OnSessionActive(uint16_t aWebRTCSessionId)
     SetStreamState(*entry, AnalysisStreamStateEnum::kWebRTCActive);
 }
 
-// TODO: post-initiation failures
 void AvAnalysisServerLogic::OnSessionFailed(uint16_t aWebRTCSessionId)
 {
+    AnalysisStreamEntry * entry = FindByWebRTCSession(aWebRTCSessionId);
+    VerifyOrReturn(entry != nullptr,
+                   ChipLogError(Zcl, "AvAnalysis[ep=%d]: unknown session %u failed", mEndpointId, aWebRTCSessionId));
+
+    // If the flow fails at any point post-initiation
+    VerifyOrReturn(entry->state == AnalysisStreamStateEnum::kWebRTCInitiated ||
+                       entry->state == AnalysisStreamStateEnum::kWebRTCActive,
+                   ChipLogError(Zcl, "AvAnalysis[ep=%d]: session %u failed in an unexpected state", mEndpointId, aWebRTCSessionId));
+
     ChipLogError(Zcl, "AvAnalysis[ep=%d]: session %u failed", mEndpointId, aWebRTCSessionId);
+
+    // The session is gone; the endpoint stays populated until a deactivation or re-activation
+    entry->webRTCSessionID.SetNull();
+    SetStreamState(*entry, AnalysisStreamStateEnum::kFailure);
 }
 
 void AvAnalysisServerLogic::OnSessionEnded(Status aStatus, uint16_t aWebRTCSessionId)
