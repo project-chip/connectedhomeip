@@ -171,7 +171,7 @@ class TC_IDM_8_1(IDMBaseTest):
         asserts.assert_greater(masked_for_th2, 0, "TH2's unfiltered ACL read contained no entry from TH1's fabric")
 
         self.step(2, "TH1 and TH2 each send a fabric-filtered Read Request Message to read the ACL attribute. TH1 then writes an entry in the fabric scoped list associated with its own fabric, and both controllers read the attribute again, fabric filtered.",
-                    expectation="The data read by TH2 after the write is the same as the data it read before the write, and the data read by TH1 reflects its modification.")
+                  expectation="The data read by TH2 after the write is the same as the data it read before the write, and the data read by TH1 reflects its modification.")
         acl_th1_before = await self.read_fabric_scoped_attribute(acl_info, self.th1, fabric_filtered=True)
         acl_th2_before = await self.read_fabric_scoped_attribute(acl_info, self.th2, fabric_filtered=True)
 
@@ -195,7 +195,7 @@ class TC_IDM_8_1(IDMBaseTest):
         await self.write_dut_acl(ctrl=self.th1, acl=acl_th1_before)
 
         self.step(3, "TH1 and TH2 each read the Fabrics attribute of the Operational Credentials cluster with fabric filtered set to false. TH1 invokes UpdateFabricLabel to update the label of its own fabric, and both controllers read Fabrics again.",
-                    expectation="The label of the fabric TH1 is on is updated, and the label of the fabric TH2 is on is not modified.")
+                  expectation="The label of the fabric TH1 is on is updated, and the label of the fabric TH2 is on is not modified.")
         fabrics_attribute = Clusters.OperationalCredentials.Attributes.Fabrics
         fabrics_th1_before = await self.read_single_attribute_check_success(
             dev_ctrl=self.th1, endpoint=0, cluster=Clusters.OperationalCredentials, attribute=fabrics_attribute,
@@ -226,7 +226,7 @@ class TC_IDM_8_1(IDMBaseTest):
                              "TH2 must observe the label TH1 set on its own fabric")
 
         self.step(4, "For every fabric-scoped attribute discovered on the DUT, TH1 and TH2 read it both fabric filtered and unfiltered, then activate a subscription to it and TH1 modifies it wherever it is writable.",
-                    expectation="A fabric-filtered read returns only the reader's own entries, the DUT reports the modified value to both TH1 and TH2, and no response contains fabric-sensitive data belonging to the other fabric.")
+                  expectation="A fabric-filtered read returns only the reader's own entries, the DUT reports the modified value to both TH1 and TH2, and no response contains fabric-sensitive data belonging to the other fabric.")
         modified = 0
         # Each entry pairs the attribute with why the write half of the check was not
         # exercised on it. Being deny-listed and being read-only are separate reasons.
@@ -288,10 +288,10 @@ class TC_IDM_8_1(IDMBaseTest):
                              location=AttributePathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
                                                             attribute_id=info.attribute_id),
                              problem=f"Step 4: {info.path_str} was not written because {reason}; its fabric "
-                                     "filtering was verified by read only")
+                             "filtering was verified by read only")
 
         self.step(5, "For every fabric-sensitive event discovered on the DUT that can be triggered, TH1 and TH2 activate a fabric-filtered subscription to the event and the event is triggered on the fabric TH1 is on.",
-                    expectation="The DUT reports the event to TH1 and does not report it to TH2.")
+                  expectation="The DUT reports the event to TH1 and does not report it to TH2.")
         triggered: list[FabricSensitiveEventInfo] = []
         untriggerable: list[FabricSensitiveEventInfo] = []
         for event_info in event_infos:
@@ -323,11 +323,11 @@ class TC_IDM_8_1(IDMBaseTest):
                                                         cluster_id=event_info.cluster_id,
                                                         event_id=event_info.event_id),
                              problem=f"Step 5: no generic trigger for {event_info.path_str}; fabric filtering of "
-                                     "this event was not exercised")
+                             "this event was not exercised")
         asserts.assert_greater(len(triggered), 0, "No fabric-sensitive event could be triggered on the DUT")
 
         self.step(6, "TH2 triggers a fabric-sensitive event on its own fabric. TH1 then sends a Subscribe Request Message with EventRequests set to that event path and fabric filtered set to true.",
-                    expectation="The DUT sends a Report Data Message with no entry for the event associated with the fabric TH2 is on.")
+                  expectation="The DUT sends a Report Data Message with no entry for the event associated with the fabric TH2 is on.")
         # Steps 6 and 7 need an event that exists on TH2's fabric, so they reuse the
         # events step 5 was able to trigger, this time triggered by TH2.
         for event_info in triggered:
@@ -352,7 +352,7 @@ class TC_IDM_8_1(IDMBaseTest):
                 handler_th1.cancel()
 
         self.step(7, "TH1 sends a Read Request Message with EventRequests set to the same event path and fabric filtered set to true.",
-                    expectation="The DUT sends a Report Data Message with no entry for the event associated with the fabric TH2 is on.")
+                  expectation="The DUT sends a Report Data Message with no entry for the event associated with the fabric TH2 is on.")
         for event_info in triggered:
             await self.trigger_fabric_sensitive_event(event_info, self.th2)
             events = await self.th1.ReadEvent(
