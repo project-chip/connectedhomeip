@@ -208,6 +208,7 @@ private:
     /*
      * Command and event handler helper methods
      */
+    AvAnalysis::AnalysisStreamEntry * FindByWebRTCSession(uint16_t aWebRTCSessionId);
     bool ZoneIDListContains(const DataModel::DecodableList<uint16_t> list, uint16_t value);
     bool IsContextPartOfActiveContextTriggers(const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aContext);
 

@@ -995,16 +995,41 @@ AvAnalysisServerLogic::HandleActivateAnalysisStream(CommandHandler & handler, co
     return std::nullopt;
 }
 
-/**
- * TODO: implement WebRTC session deactivation. No stream can be in an active state yet,
- * so INVALID_IN_STATE is sent as response.
- */
 std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleDeactivateAnalysisStream(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const AvAnalysis::Commands::DeactivateAnalysisStream::DecodableType & commandData)
 {
-    VerifyOrReturnValue(mStreamTable.Find(commandData.analysisStreamID) != nullptr, Status::NotFound);
-    return Status::InvalidInState;
+    AnalysisStreamEntry * entry = mStreamTable.Find(commandData.analysisStreamID);
+    VerifyOrReturnValue(entry != nullptr, Status::NotFound);
+
+    // Only an active stream can be deactivated
+    VerifyOrReturnValue(entry->state == AnalysisStreamStateEnum::kWebRTCActive, Status::InvalidInState);
+
+    VerifyOrReturnValue(mWebRTCClient != nullptr, Status::Failure,
+                        ChipLogError(Zcl, "AvAnalysis[ep=%d]: no WebRTC client configured", mEndpointId));
+
+    // An active stream always carries its session association
+    VerifyOrReturnValue(!entry->webRTCSessionID.IsNull() && !entry->webRTCEndpointID.IsNull(), Status::Failure,
+                        ChipLogError(Zcl, "AvAnalysis[ep=%d]: active stream lacks its session association", mEndpointId));
+
+    // One camera-bound command at a time; the response of this one depends on the camera's answer
+    VerifyOrReturnValue(!mCameraInteraction.InFlight(), Status::Busy);
+
+    mCameraInteraction.Begin(AvAnalysis::CameraInteraction::State::kDeactivating, handler, commandPath, entry->cameraNode,
+                             entry->analysisStreamID);
+    CHIP_ERROR err =
+        mWebRTCClient->EndSession(entry->cameraNode, entry->webRTCEndpointID.Value(), entry->webRTCSessionID.Value(), *this);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "AvAnalysis[ep=%d]: failed to end session: %" CHIP_ERROR_FORMAT, mEndpointId, err.Format());
+        mCameraInteraction.Abort();
+        return (err == CHIP_ERROR_BUSY) ? Status::Busy : Status::Failure;
+    }
+
+    SetStreamState(*entry, AnalysisStreamStateEnum::kWebRTCPendingDeactivation);
+
+    // Response is produced in OnSessionEnded once the camera answers
+    return std::nullopt;
 }
 
 std::optional<DataModel::ActionReturnStatus>
@@ -1096,12 +1121,18 @@ void AvAnalysisServerLogic::OnSessionInitiated(Status aStatus, uint16_t aWebRTCS
     handler->AddStatus(commandPath, Status::Success);
 }
 
-// TODO: the post-initiation transitions (WebRTCActive / Failure / deactivation)
 void AvAnalysisServerLogic::OnSessionActive(uint16_t aWebRTCSessionId)
 {
-    ChipLogProgress(Zcl, "AvAnalysis[ep=%d]: session %u active", mEndpointId, aWebRTCSessionId);
+    AnalysisStreamEntry * entry = FindByWebRTCSession(aWebRTCSessionId);
+    VerifyOrReturn(entry != nullptr,
+                   ChipLogError(Zcl, "AvAnalysis[ep=%d]: unknown session %u active", mEndpointId, aWebRTCSessionId));
+    VerifyOrReturn(entry->state == AnalysisStreamStateEnum::kWebRTCInitiated,
+                   ChipLogError(Zcl, "AvAnalysis[ep=%d]: session %u active in an unexpected state", mEndpointId, aWebRTCSessionId));
+
+    SetStreamState(*entry, AnalysisStreamStateEnum::kWebRTCActive);
 }
 
+// TODO: post-initiation failures
 void AvAnalysisServerLogic::OnSessionFailed(uint16_t aWebRTCSessionId)
 {
     ChipLogError(Zcl, "AvAnalysis[ep=%d]: session %u failed", mEndpointId, aWebRTCSessionId);
@@ -1109,7 +1140,50 @@ void AvAnalysisServerLogic::OnSessionFailed(uint16_t aWebRTCSessionId)
 
 void AvAnalysisServerLogic::OnSessionEnded(Status aStatus, uint16_t aWebRTCSessionId)
 {
-    ChipLogProgress(Zcl, "AvAnalysis[ep=%d]: session %u ended", mEndpointId, aWebRTCSessionId);
+    VerifyOrReturn(mCameraInteraction.GetState() == AvAnalysis::CameraInteraction::State::kDeactivating,
+                   ChipLogError(Zcl, "AvAnalysis[ep=%d]: unexpected session end completion", mEndpointId));
+
+    uint16_t analysisStreamId = mCameraInteraction.AnalysisStreamId();
+    ConcreteCommandPath commandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
+
+    auto handleRef = mCameraInteraction.Complete(commandPath);
+    auto * handler = handleRef.Get();
+
+    AnalysisStreamEntry * entry = mStreamTable.Find(analysisStreamId);
+    if (entry == nullptr)
+    {
+        ChipLogError(Zcl, "AvAnalysis[ep=%d]: stream %u removed while deactivating", mEndpointId, analysisStreamId);
+        VerifyOrReturn(handler != nullptr);
+        handler->AddStatus(commandPath, Status::NotFound);
+        return;
+    }
+
+    if (aStatus == Status::Success)
+    {
+        // The session is over: back to an activatable stream with no session associations
+        entry->webRTCEndpointID.SetNull();
+        entry->webRTCSessionID.SetNull();
+        SetStreamState(*entry, AnalysisStreamStateEnum::kPendingInitiation);
+    }
+    else
+    {
+        SetStreamState(*entry, AnalysisStreamStateEnum::kFailure);
+    }
+
+    VerifyOrReturn(handler != nullptr);
+    handler->AddStatus(commandPath, aStatus);
+}
+
+AnalysisStreamEntry * AvAnalysisServerLogic::FindByWebRTCSession(uint16_t aWebRTCSessionId)
+{
+    for (auto & entry : mStreamTable)
+    {
+        if (!entry.webRTCSessionID.IsNull() && entry.webRTCSessionID.Value() == aWebRTCSessionId)
+        {
+            return &entry;
+        }
+    }
+    return nullptr;
 }
 
 CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionStart(uint16_t & aSessionId,
