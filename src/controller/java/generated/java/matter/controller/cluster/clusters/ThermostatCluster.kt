@@ -300,6 +300,48 @@ class ThermostatCluster(private val controller: MatterController, private val en
       ThermostatSuggestionNotFollowingReasonAttributeSubscriptionState()
   }
 
+  class SensorsAttribute(val value: List<ThermostatClusterThermostatSensorStruct>?)
+
+  sealed class SensorsAttributeSubscriptionState {
+    data class Success(val value: List<ThermostatClusterThermostatSensorStruct>?) :
+      SensorsAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : SensorsAttributeSubscriptionState()
+
+    object SubscriptionEstablished : SensorsAttributeSubscriptionState()
+  }
+
+  class AvailableSensorsAttribute(val value: List<ByteArray>?)
+
+  sealed class AvailableSensorsAttributeSubscriptionState {
+    data class Success(val value: List<ByteArray>?) : AvailableSensorsAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : AvailableSensorsAttributeSubscriptionState()
+
+    object SubscriptionEstablished : AvailableSensorsAttributeSubscriptionState()
+  }
+
+  class EnabledSensorsAttribute(val value: List<ByteArray>?)
+
+  sealed class EnabledSensorsAttributeSubscriptionState {
+    data class Success(val value: List<ByteArray>?) : EnabledSensorsAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : EnabledSensorsAttributeSubscriptionState()
+
+    object SubscriptionEstablished : EnabledSensorsAttributeSubscriptionState()
+  }
+
+  class SensorScheduleAttribute(val value: List<ThermostatClusterSensorScheduleTransitionStruct>?)
+
+  sealed class SensorScheduleAttributeSubscriptionState {
+    data class Success(val value: List<ThermostatClusterSensorScheduleTransitionStruct>?) :
+      SensorScheduleAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : SensorScheduleAttributeSubscriptionState()
+
+    object SubscriptionEstablished : SensorScheduleAttributeSubscriptionState()
+  }
+
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
@@ -8087,6 +8129,662 @@ class ThermostatCluster(private val controller: MatterController, private val en
           emit(
             ThermostatSuggestionNotFollowingReasonAttributeSubscriptionState.SubscriptionEstablished
           )
+        }
+      }
+    }
+  }
+
+  suspend fun readSensorsAttribute(): SensorsAttribute {
+    val ATTRIBUTE_ID: UInt = 89u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Sensors attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<ThermostatClusterThermostatSensorStruct>? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        buildList<ThermostatClusterThermostatSensorStruct> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(ThermostatClusterThermostatSensorStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
+      } else {
+        null
+      }
+
+    return SensorsAttribute(decodedValue)
+  }
+
+  suspend fun subscribeSensorsAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<SensorsAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 89u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            SensorsAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Sensors attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<ThermostatClusterThermostatSensorStruct>? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              buildList<ThermostatClusterThermostatSensorStruct> {
+                tlvReader.enterArray(AnonymousTag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(ThermostatClusterThermostatSensorStruct.fromTlv(AnonymousTag, tlvReader))
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(SensorsAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(SensorsAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readAvailableSensorsAttribute(): AvailableSensorsAttribute {
+    val ATTRIBUTE_ID: UInt = 90u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Availablesensors attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<ByteArray>? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        buildList<ByteArray> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getByteArray(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+      } else {
+        null
+      }
+
+    return AvailableSensorsAttribute(decodedValue)
+  }
+
+  suspend fun writeAvailableSensorsAttribute(
+    value: List<ByteArray>,
+    timedWriteTimeout: Duration? = null,
+  ) {
+    val ATTRIBUTE_ID: UInt = 90u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startArray(AnonymousTag)
+    for (item in value.iterator()) {
+      tlvWriter.put(AnonymousTag, item)
+    }
+    tlvWriter.endArray()
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
+              tlvPayload = tlvWriter.getEncoded(),
+            )
+          ),
+        timedRequest = timedWriteTimeout,
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.FINE, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeAvailableSensorsAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<AvailableSensorsAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 90u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            AvailableSensorsAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Availablesensors attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<ByteArray>? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              buildList<ByteArray> {
+                tlvReader.enterArray(AnonymousTag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(tlvReader.getByteArray(AnonymousTag))
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(AvailableSensorsAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(AvailableSensorsAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readEnabledSensorsAttribute(): EnabledSensorsAttribute {
+    val ATTRIBUTE_ID: UInt = 91u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Enabledsensors attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<ByteArray>? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        buildList<ByteArray> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getByteArray(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+      } else {
+        null
+      }
+
+    return EnabledSensorsAttribute(decodedValue)
+  }
+
+  suspend fun writeEnabledSensorsAttribute(
+    value: List<ByteArray>,
+    timedWriteTimeout: Duration? = null,
+  ) {
+    val ATTRIBUTE_ID: UInt = 91u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startArray(AnonymousTag)
+    for (item in value.iterator()) {
+      tlvWriter.put(AnonymousTag, item)
+    }
+    tlvWriter.endArray()
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
+              tlvPayload = tlvWriter.getEncoded(),
+            )
+          ),
+        timedRequest = timedWriteTimeout,
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.FINE, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeEnabledSensorsAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<EnabledSensorsAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 91u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            EnabledSensorsAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Enabledsensors attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<ByteArray>? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              buildList<ByteArray> {
+                tlvReader.enterArray(AnonymousTag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(tlvReader.getByteArray(AnonymousTag))
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(EnabledSensorsAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(EnabledSensorsAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readNumberOfSensorScheduleTransitionsAttribute(): UByte? {
+    val ATTRIBUTE_ID: UInt = 92u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) {
+      "Numberofsensorscheduletransitions attribute not found in response"
+    }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
+  }
+
+  suspend fun subscribeNumberOfSensorScheduleTransitionsAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<UByteSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 92u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UByteSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Numberofsensorscheduletransitions attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UByte? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getUByte(AnonymousTag)
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UByteSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readSensorScheduleAttribute(): SensorScheduleAttribute {
+    val ATTRIBUTE_ID: UInt = 93u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Sensorschedule attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<ThermostatClusterSensorScheduleTransitionStruct>? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        buildList<ThermostatClusterSensorScheduleTransitionStruct> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(ThermostatClusterSensorScheduleTransitionStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
+      } else {
+        null
+      }
+
+    return SensorScheduleAttribute(decodedValue)
+  }
+
+  suspend fun writeSensorScheduleAttribute(
+    value: List<ThermostatClusterSensorScheduleTransitionStruct>,
+    timedWriteTimeout: Duration? = null,
+  ) {
+    val ATTRIBUTE_ID: UInt = 93u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startArray(AnonymousTag)
+    for (item in value.iterator()) {
+      item.toTlv(AnonymousTag, tlvWriter)
+    }
+    tlvWriter.endArray()
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
+              tlvPayload = tlvWriter.getEncoded(),
+            )
+          ),
+        timedRequest = timedWriteTimeout,
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.FINE, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeSensorScheduleAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<SensorScheduleAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 93u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            SensorScheduleAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Sensorschedule attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<ThermostatClusterSensorScheduleTransitionStruct>? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              buildList<ThermostatClusterSensorScheduleTransitionStruct> {
+                tlvReader.enterArray(AnonymousTag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(
+                    ThermostatClusterSensorScheduleTransitionStruct.fromTlv(AnonymousTag, tlvReader)
+                  )
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(SensorScheduleAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(SensorScheduleAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

@@ -23,11 +23,14 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/List.h>
 #include <app/persistence/AttributePersistence.h>
+#include <credentials/FabricTable.h>
 #include <lib/core/ScopedNodeId.h>
 #include <lib/support/ScopedMemoryBuffer.h>
+#include <lib/support/TimerDelegate.h>
 #include <protocols/interaction_model/Constants.h>
 #include <system/SystemClock.h>
 
@@ -45,7 +48,9 @@ namespace Thermostat {
  * Tracks active atomic write operations associated with a particular subject descriptor,
  * locking out other writers until the write is committed, rolled back, or times out
  ******************************************************************************/
-class AtomicWriteSession
+
+using AtomicAttributes = Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type>;
+class AtomicWriteSession : public TimerContext, public FabricTable::Delegate
 {
 public:
     class Delegate
@@ -70,6 +75,14 @@ public:
         Open,
     };
 
+    AtomicWriteSession(Delegate & delegate, TimerDelegate & timerDelegate, FabricTable * fabricTable) :
+        mDelegate(delegate), mTimerDelegate(timerDelegate), mFabricTable(fabricTable)
+    {}
+
+    void Startup();
+
+    void Shutdown();
+
     /**
      * @brief Sets the atomic write state for the given originatorNodeId
      *
@@ -79,9 +92,7 @@ public:
      * @return true if it was able to update the atomic write state
      * @return false if it was unable to update the atomic write state
      */
-    bool
-    SetAtomicWrite(ScopedNodeId originatorNodeId, State state,
-                   Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
+    bool SetAtomicWrite(ScopedNodeId originatorNodeId, State state, AtomicAttributes & attributeStatuses);
 
     /**
      * @brief Processes a request to begin an atomic write operation
@@ -127,7 +138,16 @@ public:
      * @return true if the endpoint has an open atomic write
      * @return false if the endpoint does not have an open atomic write
      */
-    bool InAtomicWrite(Optional<AttributeId> attributeId = NullOptional);
+    bool InAtomicWrite(std::optional<AttributeId> attributeId = std::nullopt);
+
+    /**
+     * @brief Checks if the thermostat cluster has an atomic write open, filtered by fabric index
+     *
+     * @param fabricIndex The fabric index to filter on
+     * @return true if the endpoint has an open atomic write
+     * @return false if the endpoint does not have an open atomic write
+     */
+    bool InAtomicWrite(FabricIndex fabricIndex);
 
     /**
      * @brief Checks if a thermostat cluster has an atomic write open for a given subject descriptor, optionally filtered by an
@@ -138,7 +158,7 @@ public:
      * @return true if the thermostat cluster has an open atomic write
      * @return false if the thermostat cluster does not have an open atomic write
      */
-    bool InAtomicWrite(const Access::SubjectDescriptor & subjectDescriptor, Optional<AttributeId> attributeId = NullOptional);
+    bool InAtomicWrite(const Access::SubjectDescriptor & subjectDescriptor, std::optional<AttributeId> attributeId = std::nullopt);
 
     /**
      * @brief Checks if a thermostat cluster has an atomic write open for a given command invocation, optionally filtered by an
@@ -149,7 +169,7 @@ public:
      * @return true if the thermostat cluster has an open atomic write
      * @return false if the thermostat cluster does not have an open atomic write
      */
-    bool InAtomicWrite(CommandHandler * commandObj, Optional<AttributeId> attributeId = NullOptional);
+    bool InAtomicWrite(CommandHandler * commandObj, std::optional<AttributeId> attributeId = std::nullopt);
 
     /**
      * @brief Checks if a thermostat cluster has an atomic write open for a given command invocation and a list of attributes
@@ -159,29 +179,39 @@ public:
      * @return true if the thermostat cluster has an open atomic write
      * @return false if the thermostat cluster does not have an open atomic write
      */
-    bool
-    InAtomicWrite(CommandHandler * commandObj,
-                  Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
+    bool InAtomicWrite(CommandHandler * commandObj, AtomicAttributes & attributeStatuses);
 
-    void OnAtomicWriteTimeout();
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler,
+                                                               bool & handled);
 
-    void SetDelegate(Delegate * delegate) { mDelegate = delegate; }
+    void TimerFired() override;
+
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
 private:
     State mState = State::Closed;
     Platform::ScopedMemoryBufferWithSize<AttributeId> mAttributeIds;
     ScopedNodeId mNodeId;
 
-    Delegate * mDelegate = nullptr;
+    Delegate & mDelegate;
+    TimerDelegate & mTimerDelegate;
+    FabricTable * mFabricTable = nullptr;
+
+    Protocols::InteractionModel::Status
+    ExecuteAtomicAction(AtomicAttributes & attributeStatuses,
+                        Protocols::InteractionModel::Status (Delegate::*action)(chip::AttributeId),
+                        std::optional<Protocols::InteractionModel::Status> statusOverride = std::nullopt);
+
+    void Rollback();
 
     /// @brief Builds the list of attribute statuses to return from an AtomicRequest invocation
     /// @param attributeRequests The list of requested attributes
     /// @param attributeStatusCount The number of attribute statuses in attributeStatuses
     /// @param attributeStatuses The status of each requested attribute, plus additional attributes if needed
     /// @return Status::Success if the request is valid, an error status if it is not
-    Protocols::InteractionModel::Status BuildAttributeStatuses(
-        const DataModel::DecodableList<chip::AttributeId> attributeRequests,
-        Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
+    Protocols::InteractionModel::Status BuildAttributeStatuses(const DataModel::DecodableList<chip::AttributeId> attributeRequests,
+                                                               AtomicAttributes & attributeStatuses);
 };
 
 } // namespace Thermostat
