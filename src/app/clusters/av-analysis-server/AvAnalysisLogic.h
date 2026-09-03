@@ -46,7 +46,7 @@ class AvAnalysisDelegate;
 // Callback type for notifying attribute changes
 using MarkDirtyCallback = std::function<void(AttributeId)>;
 
-class AvAnalysisServerLogic : public AvAnalysisCameraClient::Callback
+class AvAnalysisServerLogic : public AvAnalysisCameraClient::Callback, public AvAnalysisWebRTCClient::Callback
 {
 public:
     /**
@@ -90,6 +90,11 @@ public:
 
     void OnVideoStreamAllocated(Protocols::InteractionModel::Status aStatus, uint16_t aVideoStreamId) override;
     void OnVideoStreamDeallocated(Protocols::InteractionModel::Status aStatus, uint16_t aVideoStreamId) override;
+
+    void OnSessionInitiated(Protocols::InteractionModel::Status aStatus, uint16_t aWebRTCSessionId) override;
+    void OnSessionActive(uint16_t aWebRTCSessionId) override;
+    void OnSessionFailed(uint16_t aWebRTCSessionId) override;
+    void OnSessionEnded(Protocols::InteractionModel::Status aStatus, uint16_t aWebRTCSessionId) override;
 
     EndpointId mEndpointId = kInvalidEndpointId;
 
@@ -194,6 +199,11 @@ private:
      * Helper function for attribute handlers to mark the attribute as dirty
      */
     void MarkDirty(AttributeId aAttributeId);
+
+    /**
+     * Abandons the in-flight camera interaction, if any, on whichever client carries it.
+     */
+    void CancelCameraInteraction();
 
     /*
      * Command and event handler helper methods

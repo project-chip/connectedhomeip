@@ -49,10 +49,7 @@ AvAnalysisServerLogic::AvAnalysisServerLogic(
 
 AvAnalysisServerLogic::~AvAnalysisServerLogic()
 {
-    if (mCameraClient != nullptr && mCameraInteraction.InFlight())
-    {
-        mCameraClient->Cancel();
-    }
+    CancelCameraInteraction();
 }
 
 CHIP_ERROR AvAnalysisServerLogic::Startup(AttributePersistenceProvider & aAttributePersistenceProvider)
@@ -95,12 +92,23 @@ CHIP_ERROR AvAnalysisServerLogic::Startup(AttributePersistenceProvider & aAttrib
     return CHIP_NO_ERROR;
 }
 
-void AvAnalysisServerLogic::Shutdown()
+void AvAnalysisServerLogic::CancelCameraInteraction()
 {
-    if (mCameraClient != nullptr && mCameraInteraction.InFlight())
+    VerifyOrReturn(mCameraInteraction.InFlight());
+
+    if (mCameraClient != nullptr)
     {
         mCameraClient->Cancel();
     }
+    if (mWebRTCClient != nullptr)
+    {
+        mWebRTCClient->Cancel();
+    }
+}
+
+void AvAnalysisServerLogic::Shutdown()
+{
+    CancelCameraInteraction();
 
     // A command still waiting on a camera interaction can no longer be completed.
     ConcreteCommandPath commandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
@@ -943,15 +951,48 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleEstabl
 }
 
 /**
- * TODO: implement WebRTC session activation (stream state machine beyond PendingInitiation).
- * Streams cannot be activated yet, so INVALID_IN_STATE is sent as response.
+ * Handler for the ActivateAnalysisStream command, it initiates a WebRTC session for the
+ * stream through the WebRTC client. The PushAV transport path
+ * is not supported by this implementation and will answer INVALID_COMMAND.
  */
 std::optional<DataModel::ActionReturnStatus>
 AvAnalysisServerLogic::HandleActivateAnalysisStream(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                                     const AvAnalysis::Commands::ActivateAnalysisStream::DecodableType & commandData)
 {
-    VerifyOrReturnValue(mStreamTable.Find(commandData.analysisStreamID) != nullptr, Status::NotFound);
-    return Status::InvalidInState;
+    AnalysisStreamEntry * entry = mStreamTable.Find(commandData.analysisStreamID);
+    VerifyOrReturnValue(entry != nullptr, Status::NotFound);
+
+    // A stream that is already active is answered SUCCESS with no side-effects
+    VerifyOrReturnValue(entry->state == AnalysisStreamStateEnum::kPendingInitiation ||
+                            entry->state == AnalysisStreamStateEnum::kFailure,
+                        Status::Success);
+
+    // Exactly one of the endpoint fields selects the transport
+    VerifyOrReturnValue(commandData.webRTCEndpointID.HasValue() != commandData.pushAVEndpointID.HasValue(), Status::InvalidCommand);
+
+    // The PushAV transport path is not supported by this implementation
+    VerifyOrReturnValue(!commandData.pushAVEndpointID.HasValue(), Status::InvalidCommand,
+                        ChipLogError(Zcl, "AvAnalysis[ep=%d]: PushAV activation is not supported", mEndpointId));
+
+    VerifyOrReturnValue(mWebRTCClient != nullptr, Status::Failure,
+                        ChipLogError(Zcl, "AvAnalysis[ep=%d]: no WebRTC client configured", mEndpointId));
+
+    // One camera-bound command at a time; the response of this one depends on the offer exchange
+    VerifyOrReturnValue(!mCameraInteraction.InFlight(), Status::Busy);
+
+    const EndpointId webrtcEndpoint = commandData.webRTCEndpointID.Value();
+    mCameraInteraction.Begin(AvAnalysis::CameraInteraction::State::kActivating, handler, commandPath, entry->cameraNode,
+                             entry->analysisStreamID, webrtcEndpoint);
+    CHIP_ERROR err = mWebRTCClient->RequestSession(entry->cameraNode, webrtcEndpoint, entry->videoStreamID, *this);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "AvAnalysis[ep=%d]: failed to start session initiation: %" CHIP_ERROR_FORMAT, mEndpointId, err.Format());
+        mCameraInteraction.Abort();
+        return (err == CHIP_ERROR_BUSY) ? Status::Busy : Status::Failure;
+    }
+
+    // Response is produced in OnSessionInitiated once the offer exchange concludes
+    return std::nullopt;
 }
 
 /**
@@ -1015,6 +1056,60 @@ bool AvAnalysisServerLogic::ZoneIDListContains(const DataModel::DecodableList<ui
         }
     }
     return false;
+}
+
+void AvAnalysisServerLogic::OnSessionInitiated(Status aStatus, uint16_t aWebRTCSessionId)
+{
+    VerifyOrReturn(mCameraInteraction.GetState() == AvAnalysis::CameraInteraction::State::kActivating,
+                   ChipLogError(Zcl, "AvAnalysis[ep=%d]: unexpected session initiation completion", mEndpointId));
+
+    uint16_t analysisStreamId       = mCameraInteraction.AnalysisStreamId();
+    const EndpointId webrtcEndpoint = mCameraInteraction.WebRTCEndpoint();
+    ConcreteCommandPath commandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
+
+    auto handleRef = mCameraInteraction.Complete(commandPath);
+    auto * handler = handleRef.Get();
+
+    // A failed initiation is propagated as the command status, no side-effects.
+    if (aStatus != Status::Success)
+    {
+        VerifyOrReturn(handler != nullptr);
+        handler->AddStatus(commandPath, aStatus);
+        return;
+    }
+
+    AnalysisStreamEntry * entry = mStreamTable.Find(analysisStreamId);
+    if (entry == nullptr)
+    {
+        // Cannot happen while the single-flight rule holds (a Remove would have answered Busy)
+        ChipLogError(Zcl, "AvAnalysis[ep=%d]: stream %u removed while activating", mEndpointId, analysisStreamId);
+        VerifyOrReturn(handler != nullptr);
+        handler->AddStatus(commandPath, Status::NotFound);
+        return;
+    }
+
+    entry->webRTCEndpointID = DataModel::MakeNullable(webrtcEndpoint);
+    entry->webRTCSessionID  = DataModel::MakeNullable(aWebRTCSessionId);
+    SetStreamState(*entry, AnalysisStreamStateEnum::kWebRTCInitiated);
+
+    VerifyOrReturn(handler != nullptr);
+    handler->AddStatus(commandPath, Status::Success);
+}
+
+// TODO: the post-initiation transitions (WebRTCActive / Failure / deactivation)
+void AvAnalysisServerLogic::OnSessionActive(uint16_t aWebRTCSessionId)
+{
+    ChipLogProgress(Zcl, "AvAnalysis[ep=%d]: session %u active", mEndpointId, aWebRTCSessionId);
+}
+
+void AvAnalysisServerLogic::OnSessionFailed(uint16_t aWebRTCSessionId)
+{
+    ChipLogError(Zcl, "AvAnalysis[ep=%d]: session %u failed", mEndpointId, aWebRTCSessionId);
+}
+
+void AvAnalysisServerLogic::OnSessionEnded(Status aStatus, uint16_t aWebRTCSessionId)
+{
+    ChipLogProgress(Zcl, "AvAnalysis[ep=%d]: session %u ended", mEndpointId, aWebRTCSessionId);
 }
 
 CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionStart(uint16_t & aSessionId,
