@@ -270,8 +270,8 @@ FUZZ_TEST(ICDManagementClusterPW, RegisterClientDoesNotCrash)
 FUZZ_TEST(ICDManagementClusterPW, UnregisterClientDoesNotCrash)
     // Same node-ID set as RegisterClient, so unregistration finds an entry
     // rather than returning NotFound on almost every input.
-    .WithDomains(ElementOf<uint64_t>({ 0x1234, 0x1235, 0x1236 }), Arbitrary<std::vector<uint8_t>>().WithSeeds(KeySeeds()).WithMaxSize(128),
-                 Arbitrary<bool>());
+    .WithDomains(ElementOf<uint64_t>({ 0x1234, 0x1235, 0x1236 }),
+                 Arbitrary<std::vector<uint8_t>>().WithSeeds(KeySeeds()).WithMaxSize(128), Arbitrary<bool>());
 
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
