@@ -304,7 +304,7 @@ TEST_F(TestHumidistatCluster, ReadAttributes)
 
     chip::BitMask<MistTypeBitmap> mistType;
     ASSERT_EQ(tester.ReadAttribute(MistType::Id, mistType), CHIP_NO_ERROR);
-    ASSERT_EQ(mistType.Raw(), config.mistType.ValueOr(chip::BitMask<MistTypeBitmap>{ 0 }).Raw());
+    ASSERT_EQ(mistType.Raw(), config.mistType.Raw());
 
     bool continuous = false;
     ASSERT_EQ(tester.ReadAttribute(Continuous::Id, continuous), CHIP_NO_ERROR);
@@ -648,7 +648,7 @@ TEST_F(TestHumidistatCluster, SetSettingsEmptyCommand)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestHumidistatCluster, WriteNullableMistType)
+TEST_F(TestHumidistatCluster, WriteEmptyMistTypeFailsInHumidifierMode)
 {
     const BitFlags<Feature> features{ Feature::kHumidifier, Feature::kColdMist };
     HumidistatCluster cluster(kTestEndpointId, features, {});
@@ -658,12 +658,13 @@ TEST_F(TestHumidistatCluster, WriteNullableMistType)
     ASSERT_EQ(cluster.SetMode(ModeEnum::kHumidifier), CHIP_NO_ERROR);
     ASSERT_EQ(cluster.SetMistType(chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold)), CHIP_NO_ERROR);
 
-    DataModel::Nullable<chip::BitMask<MistTypeBitmap>> nullMistType = DataModel::NullNullable;
-    EXPECT_EQ(tester.WriteAttribute(MistType::Id, nullMistType), CHIP_NO_ERROR);
+    // MistType can no longer be null; an empty value while Mode is Humidifier is inconsistent and rejected.
+    chip::BitMask<MistTypeBitmap> emptyMistType;
+    EXPECT_EQ(tester.WriteAttribute(MistType::Id, emptyMistType), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
-    DataModel::Nullable<chip::BitMask<MistTypeBitmap>> readMistType;
+    chip::BitMask<MistTypeBitmap> readMistType;
     ASSERT_EQ(tester.ReadAttribute(MistType::Id, readMistType), CHIP_NO_ERROR);
-    EXPECT_TRUE(readMistType.IsNull());
+    EXPECT_EQ(readMistType.Raw(), chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold).Raw());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
