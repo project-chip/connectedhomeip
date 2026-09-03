@@ -60,8 +60,8 @@ source_set("logging") {
   ]
 
   public_deps = [
-    ":color-light",
     ":color-converter",
+    ":color-light",
     "${chip_root}/src/app/clusters/color-control-server",
     "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/app/clusters/level-control",
