@@ -18,6 +18,7 @@
 
 #include <AppMain.h>
 #include <cstdint>
+#include <memory>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
