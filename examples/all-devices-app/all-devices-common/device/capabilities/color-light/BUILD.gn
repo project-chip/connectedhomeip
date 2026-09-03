@@ -39,10 +39,10 @@ source_set("color-light") {
   ]
 }
 
-source_set("planckian-color-converter") {
+source_set("color-converter") {
   sources = [
-    "impl/PlanckianColorConverter.cpp",
-    "impl/PlanckianColorConverter.h",
+    "impl/ColorConverter.cpp",
+    "impl/ColorConverter.h",
   ]
 
   public_deps = [ "${chip_root}/src/app/clusters/color-control-server" ]
@@ -61,7 +61,7 @@ source_set("logging") {
 
   public_deps = [
     ":color-light",
-    ":planckian-color-converter",
+    ":color-converter",
     "${chip_root}/src/app/clusters/color-control-server",
     "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/app/clusters/level-control",

@@ -18,7 +18,7 @@
 #pragma once
 
 #include <device/capabilities/color-light/ColorLight.h>
-#include <device/capabilities/color-light/impl/PlanckianColorConverter.h>
+#include <device/capabilities/color-light/impl/ColorConverter.h>
 
 namespace chip {
 namespace app {
@@ -35,7 +35,7 @@ class LoggingLightDriver : public ColorLight,
                            public Clusters::OnOffDelegate,
                            public Clusters::LevelControlDelegate,
                            public Clusters::OnOffEffectDelegate,
-                           public PlanckianColorConverter,
+                           public ColorConverter,
                            public Clusters::IdentifyDelegate
 {
 public:
@@ -63,10 +63,13 @@ protected:
     // type advertises those features, so the cluster never feeds them.
     //
     // The XY <-> mireds conversions the Extended Color Light does need come from
-    // PlanckianColorConverter, so a mode switch or a read of the inactive mode's attribute reports a
+    // ColorConverter, so a mode switch or a read of the inactive mode's attribute reports a
     // value derived from the active color rather than a constant.
     void OnColorXYChanged(uint16_t x, uint16_t y, bool transitionActive) override;
     void OnColorCTChanged(uint16_t mireds, bool transitionActive) override;
+    void OnColorHSChanged(uint8_t hue, uint8_t sat, bool transitionActive) override;
+    void OnEnhancedHueChanged(uint16_t enhancedHue, bool transitionActive) override;
+    void OnColorLoopStarted(uint16_t startEnhancedHue, uint16_t loopTimeSec, bool directionUp) override;
 
     // IdentifyDelegate. TriggerEffect is mandatory for both device types built on this driver
     // (Color Temperature Light 0x010C and Extended Color Light 0x010D), so it is always enabled.

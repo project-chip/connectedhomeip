@@ -135,6 +135,24 @@ void LoggingLightDriver::OnColorCTChanged(uint16_t mireds, bool transitionActive
                     transitionActive ? "true" : "false");
 }
 
+void LoggingLightDriver::OnColorHSChanged(uint8_t hue, uint8_t sat, bool transitionActive)
+{
+    ChipLogProgress(DeviceLayer, "LoggingLightDriver::OnColorHSChanged() -> Hue=%u Saturation=%u (transitionActive=%s)", hue, sat,
+                    transitionActive ? "true" : "false");
+}
+
+void LoggingLightDriver::OnEnhancedHueChanged(uint16_t enhancedHue, bool transitionActive)
+{
+    ChipLogProgress(DeviceLayer, "LoggingLightDriver::OnEnhancedHueChanged() -> EnhancedHue=%u (transitionActive=%s)", enhancedHue,
+                    transitionActive ? "true" : "false");
+}
+
+void LoggingLightDriver::OnColorLoopStarted(uint16_t startEnhancedHue, uint16_t loopTimeSec, bool directionUp)
+{
+    ChipLogProgress(DeviceLayer, "LoggingLightDriver::OnColorLoopStarted() -> startEnhancedHue=%u loopTimeSec=%u (direction=%s)",
+                    startEnhancedHue, loopTimeSec, directionUp ? "Up" : "Down");
+}
+
 void LoggingLightDriver::OnIdentifyStart(Clusters::IdentifyCluster & cluster)
 {
     ChipLogProgress(DeviceLayer, "LoggingLightDriver: Identify START");

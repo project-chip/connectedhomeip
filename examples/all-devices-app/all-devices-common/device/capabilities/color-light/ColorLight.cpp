@@ -23,9 +23,9 @@ namespace app {
 
 ColorLight::ColorLight(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context, const Delegates & delegates,
                        const Conformance & conformance) :
-    SingleEndpoint(deviceTypes),
-    mContext(context), mConformance(conformance), mOnOffDelegate(delegates.onOff), mLevelControlDelegate(delegates.levelControl),
-    mEffectDelegate(delegates.effect), mColorDelegate(delegates.color), mIdentifyDelegate(delegates.identify)
+    SingleEndpoint(deviceTypes), mContext(context), mConformance(conformance), mOnOffDelegate(delegates.onOff),
+    mLevelControlDelegate(delegates.levelControl), mEffectDelegate(delegates.effect), mColorDelegate(delegates.color),
+    mIdentifyDelegate(delegates.identify)
 {}
 
 Clusters::OnOffLightingCluster & ColorLight::GetOnOffCluster()
@@ -141,6 +141,20 @@ CHIP_ERROR ColorLight::Register(EndpointId endpoint, CodeDrivenDataModelProvider
     // The ColorValue variant defaults to XY; the leaf picks the mode matching its feature map.
     colorConfig.mColorValue = mConformance.initialColor;
     colorConfig.mFeatures   = mConformance.colorFeatures;
+
+    // The span a 2700K-6500K lamp can actually produce. CTConfig's own defaults are the widest values
+    // the attributes ALLOW (1 .. 0xFEFF), which is the entire legal mired domain rather than any real
+    // luminaire — leaving them makes every rate-based command sweep ~65000 mireds, so a MoveColorTemperature
+    // at the maximum rate of 65535 mireds/s still runs for a full second instead of the few milliseconds a
+    // client would expect. ColorConverter's Kelvin window is kept to the same 2700K-6500K span, because a
+    // read of ColorTemperatureMireds while XY owns the output is answered by converting, and the cluster
+    // encodes that result without clamping it to the range advertised here.
+    //
+    // coupleColorTempToLevelMinMireds is constrained to this range too, so it tracks the minimum rather
+    // than keeping the struct default (which is only valid while the minimum is also at its default).
+    colorConfig.ctConfig.colorTempPhysicalMinMireds      = 153; // 6500K
+    colorConfig.ctConfig.colorTempPhysicalMaxMireds      = 370; // 2700K
+    colorConfig.ctConfig.coupleColorTempToLevelMinMireds = 153;
     mColorControlCluster.Create(endpoint, colorConfig);
     ReturnErrorOnFailure(provider.AddCluster(mColorControlCluster.Registration()));
 

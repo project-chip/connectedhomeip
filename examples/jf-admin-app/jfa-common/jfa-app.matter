@@ -2203,7 +2203,7 @@ cluster UserLabel = 65 {
 
 /** Attributes and commands for controlling the color properties of a color-capable light. */
 cluster ColorControl = 768 {
-  revision 9;
+  revision 10;
 
   enum ColorLoopActionEnum : enum8 {
     kDeactivate = 0;

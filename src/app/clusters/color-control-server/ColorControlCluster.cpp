@@ -56,21 +56,31 @@ constexpr uint16_t RemainingTenthsFromMs(uint32_t durationMs)
     return static_cast<uint16_t>(std::min<uint32_t>(durationMs / 100, kMaxRemainingTenths));
 }
 
-// Remaining time on one axis, in 1/10 s, from its wall-clock anchor. durationMs == kIndefiniteHueMoveMs
-// is the MoveHue rate move, which has no end, so RemainingTime is kMaxInt16uValue until a Stop clears the
-// axis (§3.2.7.4). durationMs == 0 is an immediate (transitionTime 0) move → 0 remaining.
-inline uint16_t RemainingTenths(uint64_t startTimeMs, uint32_t durationMs, uint64_t now)
+// Time left on one axis from its wall-clock anchor. durationMs == kIndefiniteHueMoveMs is the MoveHue
+// rate move, which has no end and so never arrives — UINT32_MAX keeps it from ever shortening the tick
+// below. durationMs == 0 is an immediate (transitionTime 0) move → 0 remaining.
+//
+// This is the resolution the TIMER needs, as opposed to the one the attribute reports: the tick has to
+// land ON the endpoint, and 1/10 s cannot express "96 ms left". A period is re-armed only once the
+// previous tick has finished its work, so a transition whose end falls between two periods is applied on
+// the boundary AFTER it — late by up to a full period, plus the drift every earlier tick accumulated.
+// Arming this instead re-anchors to the clock each time, so that drift cannot build up.
+inline uint32_t RemainingMs(uint64_t startTimeMs, uint32_t durationMs, uint64_t now)
 {
     if (durationMs == kIndefiniteHueMoveMs)
     {
-        return kMaxInt16uValue;
+        return UINT32_MAX;
     }
     const uint64_t endMs = startTimeMs + durationMs;
-    if (now >= endMs)
-    {
-        return 0;
-    }
-    return RemainingTenthsFromMs(static_cast<uint32_t>(endMs - now));
+    return (now >= endMs) ? 0 : static_cast<uint32_t>(endMs - now);
+}
+
+// The same quantity in the units RemainingTime reports, saturating at kMaxInt16uValue for the endless
+// MoveHue rate move (§3.2.7.4).
+inline uint16_t RemainingTenths(uint64_t startTimeMs, uint32_t durationMs, uint64_t now)
+{
+    const uint32_t remainingMs = RemainingMs(startTimeMs, durationMs, now);
+    return (remainingMs == UINT32_MAX) ? kMaxInt16uValue : RemainingTenthsFromMs(remainingMs);
 }
 static constexpr uint8_t kMinCurrentLevel = 0x01;
 static constexpr uint8_t kMaxCurrentLevel = 0xFE;
@@ -588,14 +598,15 @@ void ColorControlCluster::Shutdown(ClusterShutdownType type)
 }
 
 // Arm the one-shot tick. Guarded against double-arming so a command issued mid-transition doesn't stack
-// a second timer; OnTick re-arms itself while any axis (or the loop) is still moving.
-CHIP_ERROR ColorControlCluster::ArmTick()
+// a second timer; OnTick re-arms itself while any axis (or the loop) is still moving, shortening
+// intervalMs when the next endpoint falls inside the period.
+CHIP_ERROR ColorControlCluster::ArmTick(uint32_t intervalMs)
 {
     if (mTimerDelegate.IsTimerActive(this))
     {
         return CHIP_NO_ERROR;
     }
-    return mTimerDelegate.StartTimer(this, System::Clock::Milliseconds32(kTickMs));
+    return mTimerDelegate.StartTimer(this, System::Clock::Milliseconds32(intervalMs));
 }
 
 bool ColorControlCluster::LoopIsDriving() const
@@ -636,6 +647,9 @@ void ColorControlCluster::OnTick()
     const uint64_t now = NowMs();
     bool driverActive  = false;
     uint16_t remaining = 0; // 1/10 s, slowest still-active axis; 0 once everything has settled
+    // Interval for the re-arm at the end. Aggregated the opposite way to `remaining`: that reports when
+    // the LAST axis finishes, this has to wake for the FIRST one that does.
+    uint32_t nextTickMs = kTickMs;
 
     // Remember whether a driver was running: if it settles this tick we persist the final color once.
     const bool hadTransition = !std::holds_alternative<std::monostate>(mTransition);
@@ -654,8 +668,10 @@ void ColorControlCluster::OnTick()
         driverActive = TickXY(*xytx, now);
         if (driverActive) // X and Y share one start; RemainingTime is the slower axis
         {
-            remaining = std::max(RemainingTenths(xytx->startTimeMs, xytx->durationXMs, now),
+            remaining  = std::max(RemainingTenths(xytx->startTimeMs, xytx->durationXMs, now),
                                  RemainingTenths(xytx->startTimeMs, xytx->durationYMs, now));
+            nextTickMs = std::min({ nextTickMs, RemainingMs(xytx->startTimeMs, xytx->durationXMs, now),
+                                    RemainingMs(xytx->startTimeMs, xytx->durationYMs, now) });
         }
     }
     else if (auto * cttx = std::get_if<CTTransition>(&mTransition))
@@ -663,7 +679,8 @@ void ColorControlCluster::OnTick()
         driverActive = TickCT(*cttx, now);
         if (driverActive)
         {
-            remaining = RemainingTenths(cttx->startTimeMs, cttx->durationMs, now);
+            remaining  = RemainingTenths(cttx->startTimeMs, cttx->durationMs, now);
+            nextTickMs = std::min(nextTickMs, RemainingMs(cttx->startTimeMs, cttx->durationMs, now));
         }
     }
     else if (auto * hsx = std::get_if<HueSatTransition>(&mTransition))
@@ -682,11 +699,13 @@ void ColorControlCluster::OnTick()
         // RemainingTime follows the slower axis: a finished axis contributed nothing.
         if (hsx->hue)
         {
-            remaining = std::max(remaining, RemainingTenths(hsx->hue->startTimeMs, hsx->hue->durationMs, now));
+            remaining  = std::max(remaining, RemainingTenths(hsx->hue->startTimeMs, hsx->hue->durationMs, now));
+            nextTickMs = std::min(nextTickMs, RemainingMs(hsx->hue->startTimeMs, hsx->hue->durationMs, now));
         }
         if (hsx->sat)
         {
-            remaining = std::max(remaining, RemainingTenths(hsx->sat->startTimeMs, hsx->sat->durationMs, now));
+            remaining  = std::max(remaining, RemainingTenths(hsx->sat->startTimeMs, hsx->sat->durationMs, now));
+            nextTickMs = std::min(nextTickMs, RemainingMs(hsx->sat->startTimeMs, hsx->sat->durationMs, now));
         }
         driverActive = hsx->hue.has_value() || hsx->sat.has_value();
     }
@@ -721,7 +740,7 @@ void ColorControlCluster::OnTick()
     // Re-arm only while something is still moving → zero CPU at steady state.
     if (driverActive || loopActive)
     {
-        LogErrorOnFailure(ArmTick());
+        LogErrorOnFailure(ArmTick(nextTickMs));
     }
 }
 
