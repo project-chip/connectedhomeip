@@ -77,9 +77,9 @@ struct ThermostatSchedulesTestFixture : public ThermostatTestFixture
     {
         ThermostatTestFixture::SetUp();
 
-        mSchedulesDelegate.mMaxSchedules                  = kTestMaxSchedules;
-        mSchedulesDelegate.mMaxScheduleTransitions         = kTestMaxTransitions;
-        mSchedulesDelegate.mMaxScheduleTransitionsPerDay   = DataModel::MakeNullable(kTestMaxPerDay);
+        mSchedulesDelegate.mMaxSchedules                 = kTestMaxSchedules;
+        mSchedulesDelegate.mMaxScheduleTransitions       = kTestMaxTransitions;
+        mSchedulesDelegate.mMaxScheduleTransitionsPerDay = DataModel::MakeNullable(kTestMaxPerDay);
         mSchedulesDelegate.mScheduleTypes.push_back({
             .systemMode           = SystemModeEnum::kHeat,
             .numberOfSchedules    = kTestMaxSchedules,
@@ -93,8 +93,7 @@ struct ThermostatSchedulesTestFixture : public ThermostatTestFixture
 
 TEST_F(ThermostatSchedulesTestFixture, SchedulesAttributePresentWhenFeatureEnabled)
 {
-    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate,
-                              mSchedulesDelegate);
+    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
     ClusterTester tester(cluster);
     SetupTesterSubject(tester);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -109,8 +108,7 @@ TEST_F(ThermostatSchedulesTestFixture, SchedulesAttributePresentWhenFeatureEnabl
 
 TEST_F(ThermostatSchedulesTestFixture, ReadNumberOfSchedulesAndTransitions)
 {
-    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate,
-                              mSchedulesDelegate);
+    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
     ClusterTester tester(cluster);
     SetupTesterSubject(tester);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -133,8 +131,7 @@ TEST_F(ThermostatSchedulesTestFixture, ReadNumberOfSchedulesAndTransitions)
 
 TEST_F(ThermostatSchedulesTestFixture, ActiveScheduleHandleDefaultsToNull)
 {
-    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate,
-                              mSchedulesDelegate);
+    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
     ClusterTester tester(cluster);
     SetupTesterSubject(tester);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -148,8 +145,7 @@ TEST_F(ThermostatSchedulesTestFixture, ActiveScheduleHandleDefaultsToNull)
 
 TEST_F(ThermostatSchedulesTestFixture, SetActiveScheduleRequestWithUnknownHandleIsInvalidCommand)
 {
-    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate,
-                              mSchedulesDelegate);
+    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
     ClusterTester tester(cluster);
     SetupTesterSubject(tester);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -168,8 +164,8 @@ TEST_F(ThermostatSchedulesTestFixture, SetActiveScheduleRequestSucceedsAndGenera
 {
     mSchedulesDelegate.SeedBuiltInSchedule(0x01);
 
-    ThermostatCluster cluster(kTestEndpointId, BitFlags<Feature>(Feature::kHeating, Feature::kMatterScheduleConfiguration,
-                                                                 Feature::kEvents),
+    ThermostatCluster cluster(kTestEndpointId,
+                              BitFlags<Feature>(Feature::kHeating, Feature::kMatterScheduleConfiguration, Feature::kEvents),
                               MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
     ClusterTester tester(cluster);
     SetupTesterSubject(tester);
@@ -195,8 +191,7 @@ TEST_F(ThermostatSchedulesTestFixture, SetActiveScheduleRequestSucceedsAndGenera
 
 TEST_F(ThermostatSchedulesTestFixture, WriteToSchedulesOutsideAtomicWriteIsRejected)
 {
-    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate,
-                              mSchedulesDelegate);
+    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
     ClusterTester tester(cluster);
     SetupTesterSubject(tester);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -204,7 +199,7 @@ TEST_F(ThermostatSchedulesTestFixture, WriteToSchedulesOutsideAtomicWriteIsRejec
     ScheduleStruct::Type list[] = { MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
                                                  DataModel::List<const ScheduleTransitionStruct::Type>()) };
     EXPECT_EQ(tester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list), ListWritingPattern::ReplaceAll),
-             Status::InvalidInState);
+              Status::InvalidInState);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -213,8 +208,7 @@ TEST_F(ThermostatSchedulesTestFixture, BeginWriteSeedsPendingSchedulesFromExisti
 {
     mSchedulesDelegate.SeedBuiltInSchedule(0x01);
 
-    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate,
-                              mSchedulesDelegate);
+    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
     ClusterTester tester(cluster);
     SetupTesterSubject(tester);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -236,8 +230,7 @@ TEST_F(ThermostatSchedulesTestFixture, PrecommitFailsWhenBuiltInScheduleIsRemove
 {
     mSchedulesDelegate.SeedBuiltInSchedule(0x01);
 
-    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate,
-                              mSchedulesDelegate);
+    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
     ClusterTester tester(cluster);
     SetupTesterSubject(tester);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -255,8 +248,7 @@ TEST_F(ThermostatSchedulesTestFixture, PrecommitSucceedsWhenBuiltInScheduleIsPre
 {
     mSchedulesDelegate.SeedBuiltInSchedule(0x01);
 
-    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate,
-                              mSchedulesDelegate);
+    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
     ClusterTester tester(cluster);
     SetupTesterSubject(tester);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -271,8 +263,7 @@ TEST_F(ThermostatSchedulesTestFixture, PrecommitSucceedsWhenBuiltInScheduleIsPre
 
 TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleSucceedsAndAddsToPendingList)
 {
-    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate,
-                              mSchedulesDelegate);
+    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
     ClusterTester tester(cluster);
     SetupTesterSubject(tester);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -294,8 +285,7 @@ TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleSucceedsAndAddsToPen
 
 TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsOversizedHandle)
 {
-    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate,
-                              mSchedulesDelegate);
+    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
     ClusterTester tester(cluster);
     SetupTesterSubject(tester);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -314,8 +304,7 @@ TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsOversizedHand
 
 TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsOversizedName)
 {
-    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate,
-                              mSchedulesDelegate);
+    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
     ClusterTester tester(cluster);
     SetupTesterSubject(tester);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -336,8 +325,7 @@ TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsOversizedName
 
 TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsWhenTotalTransitionsExceedMaximum)
 {
-    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate,
-                              mSchedulesDelegate);
+    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
     ClusterTester tester(cluster);
     SetupTesterSubject(tester);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -364,8 +352,7 @@ TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsWhenTotalTran
 
 TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsWhenPerDayTransitionLimitExceeded)
 {
-    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate,
-                              mSchedulesDelegate);
+    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
     ClusterTester tester(cluster);
     SetupTesterSubject(tester);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -389,8 +376,7 @@ TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsWhenPerDayTra
 
 TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsUnknownScheduleHandle)
 {
-    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate,
-                              mSchedulesDelegate);
+    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
     ClusterTester tester(cluster);
     SetupTesterSubject(tester);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -412,8 +398,7 @@ TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsBuiltInMismat
 {
     mSchedulesDelegate.SeedBuiltInSchedule(0x01);
 
-    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate,
-                              mSchedulesDelegate);
+    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
     ClusterTester tester(cluster);
     SetupTesterSubject(tester);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -435,8 +420,7 @@ TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsDuplicatePend
 {
     mSchedulesDelegate.SeedBuiltInSchedule(0x01);
 
-    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate,
-                              mSchedulesDelegate);
+    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
     ClusterTester tester(cluster);
     SetupTesterSubject(tester);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -459,8 +443,7 @@ TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsDuplicatePend
 
 TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsWhenScheduleCountExceedsMaximum)
 {
-    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate,
-                              mSchedulesDelegate);
+    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
     ClusterTester tester(cluster);
     SetupTesterSubject(tester);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -480,8 +463,7 @@ TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsWhenScheduleC
 
 TEST_F(ThermostatSchedulesTestFixture, FullAtomicWriteRoundTripAppendsAndCommitsNewSchedule)
 {
-    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate,
-                              mSchedulesDelegate);
+    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
     ClusterTester tester(cluster);
     SetupTesterSubject(tester);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -490,9 +472,8 @@ TEST_F(ThermostatSchedulesTestFixture, FullAtomicWriteRoundTripAppendsAndCommits
 
     ScheduleStruct::Type list[] = { MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
                                                  DataModel::List<const ScheduleTransitionStruct::Type>()) };
-    ASSERT_TRUE(
-        tester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list), ListWritingPattern::ReplaceAll)
-            .IsSuccess());
+    ASSERT_TRUE(tester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list), ListWritingPattern::ReplaceAll)
+                    .IsSuccess());
 
     auto commitResult = tester.Invoke(MakeAtomicRequest(AtomicRequestTypeEnum::kCommitWrite));
     EXPECT_TRUE(commitResult.IsSuccess());
@@ -508,8 +489,7 @@ TEST_F(ThermostatSchedulesTestFixture, RollbackWriteClearsPendingScheduleList)
 {
     mSchedulesDelegate.SeedBuiltInSchedule(0x01);
 
-    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate,
-                              mSchedulesDelegate);
+    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
     ClusterTester tester(cluster);
     SetupTesterSubject(tester);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);

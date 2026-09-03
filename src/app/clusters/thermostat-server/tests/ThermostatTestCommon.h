@@ -675,8 +675,8 @@ public:
         mSchedules.push_back(schedule);
     }
 
-    size_t mMaxSchedules                                     = 10;
-    uint8_t mMaxScheduleTransitions                          = 10;
+    size_t mMaxSchedules                                       = 10;
+    uint8_t mMaxScheduleTransitions                            = 10;
     DataModel::Nullable<uint8_t> mMaxScheduleTransitionsPerDay = DataModel::NullNullable;
     std::vector<Structs::ScheduleTypeStruct::Type> mScheduleTypes;
     std::vector<ScheduleStructWithOwnedMembers> mSchedules;

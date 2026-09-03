@@ -199,7 +199,7 @@ CHIP_ERROR MaximumScheduleTypeCount(ThermostatSchedules::Delegate & delegate, Sy
  * found.
  */
 uint8_t CountSchedulesInPendingListWithScheduleHandle(ThermostatSchedules::Delegate & delegate,
-                                                       const ByteSpan & scheduleHandleToMatch)
+                                                      const ByteSpan & scheduleHandleToMatch)
 {
     uint8_t count = 0;
     for (uint8_t i = 0; true; i++)
