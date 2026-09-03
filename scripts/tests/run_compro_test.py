@@ -52,6 +52,7 @@ Example:
 
 import contextlib
 import enum
+import glob
 import logging
 import os
 import shlex
@@ -84,12 +85,15 @@ DEFAULT_CP_ENDPOINT = 5
 PAF_FREQ_LIST = "2437"
 
 # bluezoo exposes two adapters; the end device advertises on the first and the
-# proxy scans and connects as central on the second. The controller gets none: a
-# test harness has no reason to reach the end device over BLE, and giving it an
-# adapter makes the multi-transport SetUpCodePairer race onto BLE while
-# commissioning the proxy, leaving the proxy holding a connection nobody closes.
+# proxy scans and connects as central on the second.
 BLE_CONTROLLER_ED = 0
 BLE_CONTROLLER_PROXY = 1
+
+# The controller is pointed at an adapter that does not exist, which is how the
+# hardware rig runs it: Bluetooth is disabled there, and SetUpCodePairer logs the
+# resulting discovery failure and carries on over IP. Omitting the option instead
+# would default the controller to adapter 0 and have it share the end device's.
+BLE_CONTROLLER_TOOL_ABSENT = 9
 
 # all-devices-app has no --passcode option, so the proxy always comes up on the
 # built-in test passcode and the test script has to be given the same value.
@@ -305,6 +309,18 @@ def run(proxy_app: str, proxy_args: str, ed_app: str | None, script: str, script
         stack.enter_context(chiptest.linux.WpaSupplicantMock(
             wpa_interface_names(transport), MOCK_AP_SSID, MOCK_AP_PASSWORD, net_ns))
 
+        # Both applications open these fixed paths whatever --KVS says, so they
+        # carry state from one run to the next and between the two applications.
+        # Upstream's YAML worker avoids this by bind-mounting a private /tmp; here
+        # it is enough to start from nothing.
+        for stale in ("/tmp/chip_factory.ini", "/tmp/chip_config.ini",
+                      "/tmp/chip_counters.ini", "/tmp/chip_kvs"):
+            with contextlib.suppress(OSError):
+                os.unlink(stale)
+        for stale in glob.glob("/tmp/ed_kvs_*.json"):
+            with contextlib.suppress(OSError):
+                os.unlink(stale)
+
         storage_dir = stack.enter_context(tempfile.TemporaryDirectory(prefix="compro-"))
 
         proxy = ProxyAppSubprocess(
@@ -339,6 +355,7 @@ def test_script_args(script: str, ed_app: str | None, script_args: str, transpor
         "--passcode", str(passcode),
         "--endpoint", str(endpoint),
         "--storage-path", os.path.join(storage_dir, "admin_storage.json"),
+        "--ble-controller", str(BLE_CONTROLLER_TOOL_ABSENT),
     ]
 
     if ed_app is not None:
