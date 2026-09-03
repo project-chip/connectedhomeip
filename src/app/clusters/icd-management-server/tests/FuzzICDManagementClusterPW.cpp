@@ -28,11 +28,13 @@
  *      symmetric key storage, so the domain deliberately straddles the expected
  *      16-byte length in both directions.
  *
- *      RegisterClient's behaviour also forks on whether the invoking subject has
- *      administrator privileges: an admin may overwrite an existing entry
- *      outright, while a non-admin must present a matching verificationKey. Both
- *      are driven, since the non-admin arm is the one that compares
- *      caller-supplied bytes against stored key material.
+ *      RegisterClient and UnregisterClient fork on whether the invoking subject
+ *      has administrator privileges: an admin may act on an existing entry
+ *      outright, while a non-admin must present a matching verificationKey. The
+ *      access-control delegate here grants nothing, so CheckAdmin resolves every
+ *      subject to non-admin and it is the verificationKey comparison against
+ *      stored key material that gets driven. Reaching the administrator arm would
+ *      need access-control entries granting that privilege.
  *
  *      Each property runs against a table that persists across inputs, so entries
  *      left by earlier iterations are what later ones find, update, and evict --
@@ -202,7 +204,14 @@ void RegisterClientDoesNotCrash(uint64_t checkInNodeID, uint64_t monitoredSubjec
     }
 
     auto result = tester.Invoke(Commands::RegisterClient::Id, request);
-    (void) result;
+    // ClusterTester returns no status when it could not encode the request --
+    // which a large fuzzer-chosen key can cause -- so that case is not a handler
+    // defect. When the command did reach the handler it must not come back
+    // without having produced a response or a status.
+    if (result.status.has_value())
+    {
+        EXPECT_NE(result.status.value(), app::DataModel::ActionReturnStatus(CHIP_ERROR_INCORRECT_STATE));
+    }
 }
 
 void UnregisterClientDoesNotCrash(uint64_t checkInNodeID, const std::vector<uint8_t> & verificationKey, bool sendVerificationKey)
@@ -212,6 +221,20 @@ void UnregisterClientDoesNotCrash(uint64_t checkInNodeID, const std::vector<uint
     ClusterTester tester(fx.cluster, &fx.fabricFixture);
     tester.SetFabricIndex(fx.fabricIndex);
 
+    // Each property runs as its own process, so nothing has registered a client
+    // yet and every unregistration would return NotFound. Register first, with a
+    // key the fuzzer also controls, so the lookup succeeds and the key
+    // verification and removal paths are reachable.
+    {
+        Commands::RegisterClient::Type seed;
+        seed.checkInNodeID    = checkInNodeID;
+        seed.monitoredSubject = checkInNodeID;
+        seed.key              = ByteSpan(verificationKey.data(), verificationKey.size());
+        seed.clientType       = ClientTypeEnum::kPermanent;
+        auto seedResult       = tester.Invoke(Commands::RegisterClient::Id, seed);
+        (void) seedResult;
+    }
+
     Commands::UnregisterClient::Type request;
     request.checkInNodeID = checkInNodeID;
     if (sendVerificationKey)
@@ -220,11 +243,23 @@ void UnregisterClientDoesNotCrash(uint64_t checkInNodeID, const std::vector<uint
     }
 
     auto result = tester.Invoke(Commands::UnregisterClient::Id, request);
-    (void) result;
+    // ClusterTester returns no status when it could not encode the request --
+    // which a large fuzzer-chosen key can cause -- so that case is not a handler
+    // defect. When the command did reach the handler it must not come back
+    // without having produced a response or a status.
+    if (result.status.has_value())
+    {
+        EXPECT_NE(result.status.value(), app::DataModel::ActionReturnStatus(CHIP_ERROR_INCORRECT_STATE));
+    }
 }
 
 FUZZ_TEST(ICDManagementClusterPW, RegisterClientDoesNotCrash)
-    .WithDomains(Arbitrary<uint64_t>(), Arbitrary<uint64_t>(),
+    // The monitoring table holds CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC (2)
+    // entries per fabric, so unconstrained 64-bit node IDs fill it within two
+    // inputs and every later one returns ResourceExhausted without registering.
+    // A small set makes registrations collide, which is what reaches the
+    // existing-entry path and its verificationKey comparison.
+    .WithDomains(ElementOf<uint64_t>({ 0x1234, 0x1235, 0x1236 }), Arbitrary<uint64_t>(),
                  Arbitrary<std::vector<uint8_t>>().WithSeeds(KeySeeds()).WithMaxSize(128),
                  // Only 0 and 1 are valid ClientTypeEnum values; anything else is
                  // rejected by the first guard in the handler. Left unconstrained,
@@ -233,7 +268,9 @@ FUZZ_TEST(ICDManagementClusterPW, RegisterClientDoesNotCrash)
                  Arbitrary<bool>());
 
 FUZZ_TEST(ICDManagementClusterPW, UnregisterClientDoesNotCrash)
-    .WithDomains(Arbitrary<uint64_t>(), Arbitrary<std::vector<uint8_t>>().WithSeeds(KeySeeds()).WithMaxSize(128),
+    // Same node-ID set as RegisterClient, so unregistration finds an entry
+    // rather than returning NotFound on almost every input.
+    .WithDomains(ElementOf<uint64_t>({ 0x1234, 0x1235, 0x1236 }), Arbitrary<std::vector<uint8_t>>().WithSeeds(KeySeeds()).WithMaxSize(128),
                  Arbitrary<bool>());
 
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
@@ -249,7 +286,14 @@ void StayActiveRequestDoesNotCrash(uint32_t stayActiveDuration)
     request.stayActiveDuration = stayActiveDuration;
 
     auto result = tester.Invoke(Commands::StayActiveRequest::Id, request);
-    (void) result;
+    // ClusterTester returns no status when it could not encode the request --
+    // which a large fuzzer-chosen key can cause -- so that case is not a handler
+    // defect. When the command did reach the handler it must not come back
+    // without having produced a response or a status.
+    if (result.status.has_value())
+    {
+        EXPECT_NE(result.status.value(), app::DataModel::ActionReturnStatus(CHIP_ERROR_INCORRECT_STATE));
+    }
 }
 
 FUZZ_TEST(ICDManagementClusterPW, StayActiveRequestDoesNotCrash)

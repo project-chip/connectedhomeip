@@ -53,6 +53,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <utility>
 #include <vector>
 
 #include <pw_fuzzer/fuzztest.h>

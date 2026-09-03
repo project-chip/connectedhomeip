@@ -60,6 +60,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <utility>
 #include <vector>
 
 #include <pw_fuzzer/fuzztest.h>
@@ -397,6 +398,14 @@ void ProcessSearchesAllStoredEntries(uint8_t entryCount, uint8_t targetEntry, ui
     if (err == CHIP_NO_ERROR)
     {
         EXPECT_LE(appDataIn.size(), DefaultICDClientStorage::kAppDataLength - sizeof(CounterType));
+    }
+
+    // SetKey imports two key handles per entry and Shutdown does not release
+    // them, so under a keystore with finite slots they would accumulate for the
+    // life of the run.
+    for (uint8_t index = 0; index < entries; index++)
+    {
+        EXPECT_EQ(storage.DeleteAllEntries(static_cast<FabricIndex>(index + 1)), CHIP_NO_ERROR);
     }
 
     storage.Shutdown();
