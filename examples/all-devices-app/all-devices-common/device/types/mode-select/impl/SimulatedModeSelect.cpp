@@ -29,17 +29,15 @@ const Structs::ModeOptionStruct::Type SimulatedModeSelect::kSupportedModes[] = {
 };
 
 SimulatedModeSelect::SimulatedModeSelect(DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider) :
-    ModeSelect(ModeSelect::Config{
-        *this,
-        {
-            BitMask<Feature>(Feature::kOnOff),
-            Clusters::ModeSelectCluster::OptionalAttributeSet(),
-            "Mode Select Simulated Device"_span,
-            DataModel::NullNullable,
-            false,
-            diagnosticDataProvider,
-        }
-    })
+    ModeSelect(ModeSelect::Config{ *this,
+                                   {
+                                       BitMask<Feature>(Feature::kOnOff),
+                                       Clusters::ModeSelectCluster::OptionalAttributeSet(),
+                                       "Mode Select Simulated Device"_span,
+                                       DataModel::NullNullable,
+                                       false,
+                                       diagnosticDataProvider,
+                                   } })
 {}
 
 Span<const Structs::ModeOptionStruct::Type> SimulatedModeSelect::GetSupportedModes() const
