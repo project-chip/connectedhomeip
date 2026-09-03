@@ -90,6 +90,10 @@ Bytes ToBytes(const ByteSpan & span)
 // Matches the DER cap used by the other certificate harnesses.
 constexpr size_t kMaxDerCertLen = 8192;
 
+// Distinguished-name attributes are bounded by kMaxCertificateDistinguishedNameLength;
+// allow twice that so over-long values are still exercised.
+constexpr size_t kMaxAttributeStringLen = 2 * kMaxCertificateDistinguishedNameLength;
+
 std::vector<Bytes> ToSeeds(const std::vector<ByteSpan> & spans)
 {
     std::vector<Bytes> seeds;
@@ -261,8 +265,10 @@ void VidPidExtractionFromAttributeString(DNAttrType attrType, const std::string 
 
 FUZZ_TEST(ChipCryptoPal, VidPidExtractionFromAttributeString)
     .WithDomains(AnyDNAttrType(),
-                 Arbitrary<std::string>().WithSeeds({ "Mvid:FFF1", "Mpid:8000", "Mvid:FFF1 Mpid:8000", "Matter Test DAC 0000",
-                                                      "Mvid:", "Mvid:FFFF Mpid:FFFF" }));
+                 Arbitrary<std::string>()
+                     .WithMaxSize(kMaxAttributeStringLen)
+                     .WithSeeds({ "Mvid:FFF1", "Mpid:8000", "Mvid:FFF1 Mpid:8000", "Matter Test DAC 0000",
+                                  "Mvid:", "Mvid:FFFF Mpid:FFFF" }));
 
 void SubjectAndIssuerExtraction(const Bytes & cert)
 {
