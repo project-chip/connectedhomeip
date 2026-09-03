@@ -54,8 +54,7 @@ void OnFactoryResetSwPressed(const struct device *, struct gpio_callback *, gpio
 
 CHIP_ERROR InitButtonGpio(const struct gpio_dt_spec & sw, struct gpio_callback & callback, gpio_callback_handler_t handler)
 {
-    VerifyOrReturnError(gpio_is_ready_dt(&sw), CHIP_ERROR_INTERNAL,
-                        ChipLogError(DeviceLayer, "Button GPIO not ready"));
+    VerifyOrReturnError(gpio_is_ready_dt(&sw), CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "Button GPIO not ready"));
     VerifyOrReturnError(gpio_pin_configure_dt(&sw, GPIO_INPUT) == 0, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "Button GPIO configure failed"));
     VerifyOrReturnError(gpio_pin_interrupt_configure_dt(&sw, GPIO_INT_EDGE_BOTH) == 0, CHIP_ERROR_INTERNAL,
