@@ -83,6 +83,7 @@ void AsyncTransferFacilitator::ProcessOutputEvents()
             // message!) but eventually they will time out.
             if (err != CHIP_NO_ERROR)
             {
+                mTransferEndError = err;
                 DestroySelf();
                 return;
             }
@@ -149,6 +150,7 @@ CHIP_ERROR AsyncTransferFacilitator::OnMessageReceived(Messaging::ExchangeContex
 
         // This should notify the transfer object to abort transfer so it can send a status report across the exchange
         // when we call ProcessOutputEvents below.
+        mTransferEndError = err;
         TEMPORARY_RETURN_IGNORED mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(err));
     }
     else if (!payloadHeader.HasMessageType(MessageType::BlockAckEOF))
@@ -164,6 +166,7 @@ CHIP_ERROR AsyncTransferFacilitator::OnMessageReceived(Messaging::ExchangeContex
 void AsyncTransferFacilitator::OnResponseTimeout(Messaging::ExchangeContext * ec)
 {
     ChipLogDetail(BDX, "OnResponseTimeout, ec: " ChipLogFormatExchange, ChipLogValueExchange(ec));
+    mTransferEndError = CHIP_ERROR_TIMEOUT;
     DestroySelf();
 }
 
@@ -178,6 +181,13 @@ CHIP_ERROR AsyncResponder::Init(System::Layer * layer, Messaging::ExchangeContex
 
 void AsyncResponder::NotifyEventHandled(const TransferSession::OutputEventType eventType, CHIP_ERROR status)
 {
+    // Record the error (if any) that is ending the transfer, so subclasses that report a terminal
+    // error (e.g. from their destructor) can surface the real cause instead of a generic error.
+    if (status != CHIP_NO_ERROR)
+    {
+        mTransferEndError = status;
+    }
+
     // If this is the end of the transfer (whether a clean end, or some sort of error condition), ensure
     // that we destroy ourselves after unwinding the processing loop in the ProcessOutputEvents API.
     // We can ignore the status for these output events because none of them are supposed to result in
