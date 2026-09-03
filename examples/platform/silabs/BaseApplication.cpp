@@ -168,10 +168,12 @@ SilabsLCD slLCD;
 
 #ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
 Clusters::Identify::EffectIdentifierEnum sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
-
 ObjectPool<Identify, MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT> IdentifyPool;
-
 #endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
+
+int sCodeDrivenIdentifyActiveCount                                  = 0;
+Clusters::Identify::EffectIdentifierEnum sCodeDrivenIdentifyEffect  = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
+Clusters::Identify::EffectVariantEnum sCodeDrivenIdentifyVariant    = Clusters::Identify::EffectVariantEnum::kDefault;
 
 } // namespace
 
@@ -401,8 +403,10 @@ bool BaseApplication::ActivateStatusLedPatterns()
 {
     bool isPatternSet = false;
 #if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)))
-#ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
+    // Local copy to prevent race condition
+    Clusters::Identify::EffectIdentifierEnum activeEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
     bool isIdentifyActive = false;
+#ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
     for (const auto & obj : IdentifyPool)
     {
         if (obj->mActive)
@@ -411,6 +415,19 @@ bool BaseApplication::ActivateStatusLedPatterns()
             break;
         }
     }
+    activeEffect = sIdentifyEffect;
+#endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
+
+    if (sCodeDrivenIdentifyActiveCount > 0)
+    {
+        isIdentifyActive = true;
+    }
+    if (activeEffect == Clusters::Identify::EffectIdentifierEnum::kStopEffect &&
+        sCodeDrivenIdentifyEffect != Clusters::Identify::EffectIdentifierEnum::kStopEffect)
+    {
+        activeEffect = sCodeDrivenIdentifyEffect;
+    }
+
     if (isIdentifyActive)
     {
         // Identify in progress
@@ -418,25 +435,25 @@ bool BaseApplication::ActivateStatusLedPatterns()
         sStatusLED.Blink(250, 250);
         isPatternSet = true;
     }
-    else if (sIdentifyEffect != Clusters::Identify::EffectIdentifierEnum::kStopEffect)
+    else if (activeEffect != Clusters::Identify::EffectIdentifierEnum::kStopEffect)
     {
         // Identify trigger effect received. Do some on/off patterns on the status led
-        if (sIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kBlink)
+        if (activeEffect == Clusters::Identify::EffectIdentifierEnum::kBlink)
         {
             // Fast blink
             sStatusLED.Blink(50, 50);
         }
-        else if (sIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kBreathe)
+        else if (activeEffect == Clusters::Identify::EffectIdentifierEnum::kBreathe)
         {
             // Slow blink
             sStatusLED.Blink(1000, 1000);
         }
-        else if (sIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kOkay)
+        else if (activeEffect == Clusters::Identify::EffectIdentifierEnum::kOkay)
         {
             // Pulse effect
             sStatusLED.Blink(300, 700);
         }
-        else if (sIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kChannelChange)
+        else if (activeEffect == Clusters::Identify::EffectIdentifierEnum::kChannelChange)
         {
             // Alternate between Short and Long pulses effect
             static uint64_t mLastChangeTimeMS = 0;
@@ -454,7 +471,7 @@ bool BaseApplication::ActivateStatusLedPatterns()
         }
         isPatternSet = true;
     }
-#endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
+
 
 #if !(CHIP_CONFIG_ENABLE_ICD_SERVER)
     // Identify Patterns have priority over Status patterns
@@ -719,7 +736,6 @@ void BaseApplication::OnIdentifyStop(Identify * identify)
 
 void BaseApplication::OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState)
 {
-    ChipLogDetail(Zcl, "Trigger Identify Complete");
     sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -762,7 +778,6 @@ void BaseApplication::OnTriggerIdentifyEffect(Identify * identify)
         break;
     default:
         sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
-        ChipLogDetail(Zcl, "No identifier effect");
     }
 }
 
@@ -772,6 +787,81 @@ void emberAfIdentifyClusterInitCallback(chip::EndpointId endpoint)
                               Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, BaseApplication::OnTriggerIdentifyEffect);
 }
 #endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
+
+
+namespace {
+void CodeDrivenTriggerEffectCompleted(chip::System::Layer *, void *)
+{
+    ChipLogDetail(Zcl, "Trigger Identify Complete (code-driven)");
+    sCodeDrivenIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    BaseApplication::StopStatusLEDTimer();
+#endif
+}
+} // namespace
+
+void BaseApplication::NotifyCodeDrivenIdentifyStart()
+{
+    ++sCodeDrivenIdentifyActiveCount;
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    StartStatusLEDTimer();
+#endif
+}
+
+void BaseApplication::NotifyCodeDrivenIdentifyStop()
+{
+    if (sCodeDrivenIdentifyActiveCount > 0)
+    {
+        --sCodeDrivenIdentifyActiveCount;
+    }
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    if (sCodeDrivenIdentifyActiveCount == 0)
+    {
+        StopStatusLEDTimer();
+    }
+#endif
+}
+
+void BaseApplication::NotifyCodeDrivenTriggerEffect(Clusters::Identify::EffectIdentifierEnum effect,
+                                                    Clusters::Identify::EffectVariantEnum variant)
+{
+    sCodeDrivenIdentifyEffect  = effect;
+    sCodeDrivenIdentifyVariant = variant;
+
+    if (variant != Clusters::Identify::EffectVariantEnum::kDefault)
+    {
+        ChipLogDetail(AppServer, "Identify Effect Variant unsupported. Using default");
+    }
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    StartStatusLEDTimer();
+#endif
+
+    switch (effect)
+    {
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
+    case Clusters::Identify::EffectIdentifierEnum::kOkay:
+        (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(5), CodeDrivenTriggerEffectCompleted,
+                                                           nullptr);
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
+    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
+        (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(10), CodeDrivenTriggerEffectCompleted,
+                                                           nullptr);
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kFinishEffect:
+        (void) chip::DeviceLayer::SystemLayer().CancelTimer(CodeDrivenTriggerEffectCompleted, nullptr);
+        (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), CodeDrivenTriggerEffectCompleted,
+                                                           nullptr);
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kStopEffect:
+        (void) chip::DeviceLayer::SystemLayer().CancelTimer(CodeDrivenTriggerEffectCompleted, nullptr);
+        break;
+    default:
+        sCodeDrivenIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
+        ChipLogDetail(Zcl, "No identifier effect");
+    }
+}
 
 void BaseApplication::LightTimerEventHandler(void * timerCbArg)
 {
