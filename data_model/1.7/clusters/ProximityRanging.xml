@@ -1,0 +1,808 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2026). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0433" name="Proximity Ranging Cluster" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0433" name="Proximity Ranging">
+      <provisionalConform/>
+    </clusterId>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="PROXR" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="WFUSDPD" name="Wi-Fi USD Proximity Detection" summary="Supports proximity ranging based on Wi-Fi">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="1" code="BLTCS" name="Bluetooth Channel Sounding" summary="Supports proximity ranging based on Bluetooth Channel Sounding">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="2" code="BLERBC" name="BLE Beacon RSSI" summary="Supports proximity ranging based on BLE Beacon RSSI">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="3" code="UWBRNG" name="UWB Ranging" summary="Supports proximity ranging based on UWB ranging">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform choice="a" more="true" min="1"/>
+      </otherwiseConform>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="BLERBCSecurityModeEnum">
+      <item value="0" name="BLEDeviceIDObfuscation" summary="BLE Device ID is obfuscated using HMAC-SHA256 keyed with SessionKey">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="EncryptedAdvertisingData" summary="Encrypted Advertising Data (EAD) as defined in Bluetooth® Core Specification 5.4">
+        <otherwiseConform>
+          <provisionalConform/>
+          <optionalConform/>
+        </otherwiseConform>
+      </item>
+    </enum>
+    <enum name="BLTCSModeEnum">
+      <item value="0" name="PBROnly" summary="Use Phase‑Based Ranging (PBR) only.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="RTTOnly" summary="Use Round‑Trip‑Time (RTT) only.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Both" summary="Device supports both PBR and RTT, and may combine or select between them.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="BLTCSSecurityLevelEnum">
+      <item value="0" name="BLTCSSecurityLevelUnknown" summary="The supported BLTCS security level is unknown">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="BLTCSSecurityLevelOne" summary="The Device supports the lower BLTCS Security Level One">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="BLTCSSecurityLevelTwo" summary="The Device supports the intermediate BLTCS Security Level Two">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="BLTCSSecurityLevelThree" summary="The Device supports the higher BLTCS Security Level Three">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="NADMEnum">
+      <item value="0" name="AttackExtremelyUnlikely" summary="An attack is extremely unlikely">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="AttackVeryUnlikely" summary="An attack is very unlikely">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="AttackIsPossible" summary="An attack is possible">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="AttackIsLikely" summary="An attack is likely">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="AttackVeryLikely" summary="An attack is very likely">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="AttackExtremelyLikely" summary="An attack is extremely likely">
+        <mandatoryConform/>
+      </item>
+      <item value="255" name="Unknown" summary="The likelihood of an attack is unknown">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="RDRCapabilityEnum">
+      <item value="0" name="NoRDR" summary="Device does not support relative direction reporting">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="AzimuthOnly" summary="Device supports azimuth reporting only">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="AzimuthElevation" summary="Device supports both azimuth and elevation reporting">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="RDRReferenceEnum">
+      <item value="0" name="DeviceCoordinates" summary="Device-relative coordinates">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="EarthCoordinates" summary="Earth-fixed coordinates">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="RangingRoleEnum">
+      <item value="0" name="WiFiSubscriberRole" summary="The initiating Wi-Fi (subscriber) endpoint">
+        <mandatoryConform>
+          <feature name="WFUSDPD"/>
+        </mandatoryConform>
+      </item>
+      <item value="1" name="WiFiPublisherRole" summary="The responding Wi-Fi (publisher) endpoint">
+        <mandatoryConform>
+          <feature name="WFUSDPD"/>
+        </mandatoryConform>
+      </item>
+      <item value="2" name="BLEScanningRole" summary="The initiating BLE (scanning) endpoint">
+        <mandatoryConform>
+          <feature name="BLERBC"/>
+        </mandatoryConform>
+      </item>
+      <item value="3" name="BLEBeaconRole" summary="The responding BLE (beacon sender) endpoint">
+        <mandatoryConform>
+          <feature name="BLERBC"/>
+        </mandatoryConform>
+      </item>
+      <item value="4" name="BLTInitiatorRole" summary="The initiating BLT (initiator) endpoint">
+        <mandatoryConform>
+          <feature name="BLTCS"/>
+        </mandatoryConform>
+      </item>
+      <item value="5" name="BLTReflectorRole" summary="The responding BLT (reflector) endpoint">
+        <mandatoryConform>
+          <feature name="BLTCS"/>
+        </mandatoryConform>
+      </item>
+    </enum>
+    <enum name="RangingSessionStatusEnum">
+      <item value="0" name="SessionStarted" summary="Indicates the ranging session has successfully started">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="SessionEndTimeReached" summary="Indicates the ranging session&apos;s EndTime has been reached">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="SessionStoppedByRequest" summary="Indicates the ranging session was terminated by StopRangingRequest">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="PeerNotFound" summary="Indicates no ranging peer found to establish a ranging session">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="HardwareError" summary="Indicates hardware issue during ranging session">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="SessionFailed" summary="Indicates the ranging session terminated due to a non-hardware issue">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="RangingTechEnum">
+      <item value="0" name="BluetoothChannelSounding" summary="Based on Bluetooth 6.0">
+        <mandatoryConform>
+          <feature name="BLTCS"/>
+        </mandatoryConform>
+      </item>
+      <item value="1" name="WiFiRoundTripTimeRanging" summary="Based on IEEE 802.11mc">
+        <optionalConform choice="c" more="true" min="1">
+          <feature name="WFUSDPD"/>
+        </optionalConform>
+      </item>
+      <item value="2" name="WiFiNextGenerationRanging" summary="Based on IEEE 802.11az/bk">
+        <optionalConform choice="c" more="true" min="1">
+          <feature name="WFUSDPD"/>
+        </optionalConform>
+      </item>
+      <item value="3" name="BLEBeaconRSSIRanging" summary="Based on Bluetooth 4.2 (amended) or later">
+        <mandatoryConform>
+          <feature name="BLERBC"/>
+        </mandatoryConform>
+      </item>
+    </enum>
+    <enum name="StatusCodeEnum">
+      <item value="0x02" name="RejectedInfeasibleRanging" summary="Rejected due to infeasible RF ranging">
+        <mandatoryConform/>
+      </item>
+      <item value="0x03" name="RejectedInfeasibleRangingTriggers" summary="Rejected due to infeasible ranging triggers">
+        <mandatoryConform/>
+      </item>
+      <item value="0x04" name="BusySessionCapacityReached" summary="Rejected due to session capacity reached">
+        <mandatoryConform/>
+      </item>
+      <item value="0x05" name="BusyTryAgainLater" summary="Rejected due to Device being busy">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <bitmap name="RadioBandBitmap">
+      <bitfield name="2G4" bit="0" summary="2.4GHz - 2.401GHz to 2.495GHz (IEEE 802.11b/g/n/ax/be/bn and BLE)">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="3G65" bit="1" summary="3.65GHz - 3.655GHz to 3.695GHz (IEEE 802.11y)">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="5G" bit="2" summary="5GHz - 5.150GHz to 5.895GHz (IEEE 802.11a/n/ac/ax/be/bn)">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="6G" bit="3" summary="6GHz - 5.925GHz to 7.250GHz (IEEE 802.11ax/be/bn, Wi-Fi 6E)">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="60G" bit="4" summary="60GHz - 57.24GHz to 70.20GHz (IEEE 802.11ad/ay)">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="S1G" bit="5" summary="Sub-1GHz - 755MHz to 931MHz (IEEE 802.11ah)">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="45G" bit="6" summary="45GHz - 42.3GHz to 49GHz (IEEE 802.11aj)">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="RangingBandwidthBitmap">
+      <bitfield name="1MHz" bit="0" summary="1 MHz bandwidth">
+        <mandatoryConform>
+          <orTerm>
+            <feature name="WFUSDPD"/>
+            <feature name="BLTCS"/>
+            <feature name="BLERBC"/>
+          </orTerm>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="2MHz" bit="1" summary="2 MHz bandwidth">
+        <mandatoryConform>
+          <orTerm>
+            <feature name="WFUSDPD"/>
+            <feature name="BLTCS"/>
+            <feature name="BLERBC"/>
+          </orTerm>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="4MHz" bit="2" summary="4 MHz bandwidth">
+        <mandatoryConform>
+          <feature name="WFUSDPD"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="8MHz" bit="3" summary="8 MHz bandwidth">
+        <mandatoryConform>
+          <feature name="WFUSDPD"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="16MHz" bit="4" summary="16 MHz bandwidth">
+        <mandatoryConform>
+          <feature name="WFUSDPD"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="20MHz" bit="5" summary="20 MHz bandwidth">
+        <mandatoryConform>
+          <feature name="WFUSDPD"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="40MHz" bit="6" summary="40 MHz bandwidth">
+        <mandatoryConform>
+          <feature name="WFUSDPD"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="80MHz" bit="7" summary="80 MHz bandwidth">
+        <mandatoryConform>
+          <feature name="WFUSDPD"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="160MHz" bit="8" summary="160 MHz bandwidth">
+        <mandatoryConform>
+          <feature name="WFUSDPD"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="320MHz" bit="9" summary="320 MHz bandwidth">
+        <mandatoryConform>
+          <feature name="WFUSDPD"/>
+        </mandatoryConform>
+      </bitfield>
+    </bitmap>
+    <bitmap name="RangingRoleSupportBitmap">
+      <bitfield name="InitiatorSupport" bit="0" summary="Device supports acting as a ranging initiator">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="ResponderSupport" bit="1" summary="Device supports acting as a ranging responder">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <struct name="BLERangingDeviceRoleConfigStruct">
+      <field id="0" name="Role" type="RangingRoleEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="PeerBLEDeviceID" type="uint64">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="BLERBCSecurityMode" type="BLERBCSecurityModeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="SessionKey" type="octstr">
+        <describedConform/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="BLTChannelSoundingDeviceRoleConfigStruct">
+      <field id="0" name="Role" type="RangingRoleEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="PeerBLTDevIK" type="octstr">
+        <mandatoryConform/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
+      </field>
+      <field id="2" name="BLTCSMode" type="BLTCSModeEnum">
+        <optionalConform/>
+      </field>
+      <field id="3" name="BLTCSSecurityLevel" type="BLTCSSecurityLevelEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="LTK" type="octstr">
+        <mandatoryConform/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="RDRStruct">
+      <field id="0" name="Azimuth" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="2047"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="1" name="Elevation" type="int16">
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="-512"/>
+            <to value="511"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="2" name="AzimuthAccuracy" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="127"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="3" name="ElevationAccuracy" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="127"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="4" name="Reference" type="RDRReferenceEnum">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="RangingCapabilitiesStruct">
+      <field id="0" name="Technology" type="RangingTechEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="FrequencyBand" type="RadioBandBitmap">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="2" name="Bandwidth" type="RangingBandwidthBitmap">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="3" name="SupportedRangingRoles" type="RangingRoleSupportBitmap">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="4" name="RDRCapability" type="RDRCapabilityEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="5" name="PeriodicRangingSupport" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="6" name="MaxConcurrentSessions" type="uint8">
+        <optionalConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="RangingConstraintStruct">
+      <field id="0" name="Technology" type="RangingTechEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Role" type="RangingRoleEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="BLTCSMode" type="BLTCSModeEnum">
+        <optionalConform>
+          <equalTerm>
+            <field name="Technology"/>
+            <enum name="RangingTechEnum" value="BluetoothChannelSounding"/>
+          </equalTerm>
+        </optionalConform>
+      </field>
+      <field id="3" name="Enabled" type="bool" default="true">
+        <optionalConform/>
+      </field>
+      <field id="4" name="MinRangingInterval" type="elapsed-s">
+        <optionalConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="5" name="MaxSessionDuration" type="elapsed-s">
+        <optionalConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="6" name="MaxRangingInstances" type="uint16">
+        <optionalConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="RangingMeasurementDataStruct">
+      <field id="0" name="WiFiDevIK" type="octstr">
+        <mandatoryConform>
+          <feature name="WFUSDPD"/>
+        </mandatoryConform>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
+      </field>
+      <field id="1" name="BLEDeviceID" type="uint64">
+        <mandatoryConform>
+          <feature name="BLERBC"/>
+        </mandatoryConform>
+      </field>
+      <field id="2" name="BLTDevIK" type="octstr">
+        <mandatoryConform>
+          <feature name="BLTCS"/>
+        </mandatoryConform>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
+      </field>
+      <field id="3" name="TimeOfMeasurement" type="epoch-s">
+        <optionalConform choice="d"/>
+      </field>
+      <field id="4" name="TimeOfMeasurementOffset" type="elapsed-s">
+        <optionalConform choice="d"/>
+      </field>
+      <field id="5" name="Distance" type="uint16">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="6" name="ErrorMargin" type="uint16">
+        <optionalConform/>
+      </field>
+      <field id="7" name="RDR" type="RDRStruct">
+        <optionalConform/>
+      </field>
+      <field id="8" name="DetectedAttackLevel" type="NADMEnum" default="255">
+        <optionalConform/>
+      </field>
+      <field id="9" name="RSSI" type="int8">
+        <quality nullable="true"/>
+        <otherwiseConform>
+          <mandatoryConform>
+            <feature name="BLERBC"/>
+          </mandatoryConform>
+          <optionalConform/>
+        </otherwiseConform>
+        <constraint>
+          <between>
+            <from value="-127"/>
+            <to value="27"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="10" name="TxPower" type="int8">
+        <quality nullable="true"/>
+        <otherwiseConform>
+          <mandatoryConform>
+            <feature name="BLERBC"/>
+          </mandatoryConform>
+          <optionalConform/>
+        </otherwiseConform>
+        <constraint>
+          <between>
+            <from value="-20"/>
+            <to value="27"/>
+          </between>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="RangingTriggerConditionStruct">
+      <field id="0" name="StartTime" type="elapsed-s">
+        <mandatoryConform/>
+        <constraint>
+          <max value="2678399"/>
+        </constraint>
+      </field>
+      <field id="1" name="EndTime" type="elapsed-s">
+        <mandatoryConform/>
+        <constraint>
+          <min>
+            <compute>
+              <operation>add</operation>
+              <left>
+                <field name="StartTime"/>
+              </left>
+              <right value="1"/>
+            </compute>
+          </min>
+        </constraint>
+        <constraint>
+          <max value="2678400"/>
+        </constraint>
+      </field>
+      <field id="2" name="RangingInstanceInterval" type="elapsed-s">
+        <optionalConform/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="2678400"/>
+          </between>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="ReportingConditionStruct">
+      <field id="0" name="MinDistanceCondition" type="uint16">
+        <optionalConform choice="b" more="true" min="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="1" name="MaxDistanceCondition" type="uint16">
+        <optionalConform choice="b" more="true" min="1"/>
+        <constraint>
+          <min>
+            <maxOf>
+              <value>1</value>
+              <field name="MinDistanceCondition"/>
+            </maxOf>
+          </min>
+        </constraint>
+      </field>
+      <field id="2" name="ErrorMarginCondition" type="uint16">
+        <optionalConform choice="b" more="true" min="1"/>
+      </field>
+    </struct>
+    <struct name="WiFiRangingDeviceRoleConfigStruct">
+      <field id="0" name="Role" type="RangingRoleEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="PeerWiFiDevIK" type="octstr">
+        <mandatoryConform/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
+      </field>
+      <field id="2" name="PMK" type="octstr">
+        <mandatoryConform/>
+        <constraint>
+          <allowed value="32"/>
+        </constraint>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="RangingCapabilities" type="list">
+      <entry type="RangingCapabilitiesStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <countBetween>
+          <from value="1"/>
+          <to value="16"/>
+        </countBetween>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="WiFiDevIK" type="octstr">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="WFUSDPD"/>
+      </mandatoryConform>
+      <constraint>
+        <allowed value="16"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0002" name="BLEDeviceID" type="uint64">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="BLERBC"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0003" name="BLTDevIK" type="octstr">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="BLTCS"/>
+      </mandatoryConform>
+      <constraint>
+        <allowed value="16"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0004" name="BLTCSSecurityLevel" type="BLTCSSecurityLevelEnum">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="BLTCS"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0005" name="BLTCSModeCapability" type="BLTCSModeEnum">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="BLTCS"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0006" name="SessionIDList" type="list">
+      <entry type="uint8"/>
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+      <constraint>
+        <maxCount value="255"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0007" name="RangingConstraints" type="list">
+      <entry type="RangingConstraintStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality quieterReporting="true"/>
+      <optionalConform/>
+      <constraint>
+        <countBetween>
+          <from value="0"/>
+          <to value="32"/>
+        </countBetween>
+      </constraint>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="StartRangingRequest" direction="commandToServer">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="Technology" type="RangingTechEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="WiFiRangingDeviceRoleConfig" type="WiFiRangingDeviceRoleConfigStruct">
+        <mandatoryConform>
+          <orTerm>
+            <equalTerm>
+              <field name="Technology"/>
+              <enum name="RangingTechEnum" value="WiFiRoundTripTimeRanging"/>
+            </equalTerm>
+            <equalTerm>
+              <field name="Technology"/>
+              <enum name="RangingTechEnum" value="WiFiNextGenerationRanging"/>
+            </equalTerm>
+          </orTerm>
+        </mandatoryConform>
+      </field>
+      <field id="2" name="BLERangingDeviceRoleConfig" type="BLERangingDeviceRoleConfigStruct">
+        <mandatoryConform>
+          <equalTerm>
+            <field name="Technology"/>
+            <enum name="RangingTechEnum" value="BLEBeaconRSSIRanging"/>
+          </equalTerm>
+        </mandatoryConform>
+      </field>
+      <field id="3" name="BLTChannelSoundingDeviceRoleConfig" type="BLTChannelSoundingDeviceRoleConfigStruct">
+        <mandatoryConform>
+          <equalTerm>
+            <field name="Technology"/>
+            <enum name="RangingTechEnum" value="BluetoothChannelSounding"/>
+          </equalTerm>
+        </mandatoryConform>
+      </field>
+      <field id="4" name="FrequencyBand" type="RadioBandBitmap">
+        <optionalConform/>
+      </field>
+      <field id="5" name="Bandwidth" type="RangingBandwidthBitmap">
+        <optionalConform/>
+      </field>
+      <field id="6" name="Trigger" type="RangingTriggerConditionStruct">
+        <mandatoryConform/>
+      </field>
+      <field id="7" name="ReportingCondition" type="ReportingConditionStruct">
+        <optionalConform/>
+      </field>
+    </command>
+    <command id="0x01" name="StartRangingResponse" direction="responseFromServer">
+      <mandatoryConform/>
+      <field id="0" name="SessionID" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x02" name="StopRangingRequest" direction="commandToServer" response="N">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="SessionID" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+    </command>
+  </commands>
+  <events>
+    <event id="0x00" name="RangingResult" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+      <field id="0" name="SessionID" type="uint8">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="RangingResultData" type="RangingMeasurementDataStruct">
+        <mandatoryConform/>
+      </field>
+    </event>
+    <event id="0x01" name="RangingSessionStatus" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+      <field id="0" name="SessionID" type="uint8">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Status" type="RangingSessionStatusEnum">
+        <mandatoryConform/>
+      </field>
+    </event>
+  </events>
+</cluster>

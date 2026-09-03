@@ -79,6 +79,7 @@ ClustersWithShutdownFunctions:
 ClustersWithPreAttributeChangeFunctions:
     # keep-sorted start
     - Door Lock
+    - Level Control
     - Pump Configuration and Control
     - Thermostat User Interface Configuration
     # keep-sorted end

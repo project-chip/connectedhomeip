@@ -103,6 +103,12 @@ enum AtomicRequestTypeEnum : enum8 {
   kRollbackWrite = 2;
 }
 
+enum CertificationTypeEnum : enum8 {
+  kDeviceAttestationPKI = 0;
+  kOperationalPKI = 1;
+  kVIDSignerPKI = 2;
+}
+
 enum LandmarkTag : enum8 {
   kAirConditioner = 0;
   kAirPurifier = 1;
@@ -183,6 +189,11 @@ enum MeasurementTypeEnum : enum16 {
   kReactiveEnergy = 15;
   kApparentEnergy = 16;
   kSoilMoisture = 17;
+}
+
+enum MediumType : enum8 {
+  kAir = 0;
+  kWater = 1;
 }
 
 enum PositionTag : enum8 {
@@ -341,7 +352,7 @@ struct SemanticTagStruct {
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
-  optional nullable TestGlobalEnum myEnum = 2;
+  nullable TestGlobalEnum myEnum = 2;
 }
 
 struct ViewportStruct {
@@ -415,7 +426,7 @@ cluster Identify = 3 {
 
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
 cluster OnOff = 6 {
-  revision 6;
+  revision 7;
 
   enum DelayedAllOffEffectVariantEnum : enum8 {
     kDelayedOffFastFade = 0;
@@ -470,11 +481,11 @@ cluster OnOff = 6 {
     int16u offWaitTime = 2;
   }
 
-  /** On receipt of this command, a device SHALL enter its ‘Off’ state. This state is device dependent, but it is recommended that it is used for power off or similar functions. On receipt of the Off command, the OnTime attribute SHALL be set to 0. */
+  /** This command allows devices to be turned off. */
   command Off(): DefaultSuccess = 0;
-  /** On receipt of this command, a device SHALL enter its ‘On’ state. This state is device dependent, but it is recommended that it is used for power on or similar functions. On receipt of the On command, if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0. */
+  /** This command allows devices to be turned on. */
   command On(): DefaultSuccess = 1;
-  /** On receipt of this command, if a device is in its ‘Off’ state it SHALL enter its ‘On’ state. Otherwise, if it is in its ‘On’ state it SHALL enter its ‘Off’ state. On receipt of the Toggle command, if the value of the OnOff attribute is equal to FALSE and if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0. If the value of the OnOff attribute is equal to TRUE, the OnTime attribute SHALL be set to 0. */
+  /** This command allows devices to be toggled. */
   command Toggle(): DefaultSuccess = 2;
   /** The OffWithEffect command allows devices to be turned off using enhanced ways of fading. */
   command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
@@ -648,7 +659,7 @@ cluster AccessControl = 31 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 cluster BasicInformation = 40 {
-  revision 6;
+  revision 7;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -736,7 +747,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional int32u specificationVersion = 21;
   readonly attribute optional int16u maxPathsPerInvoke = 22;
   provisional attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
-  provisional readonly attribute optional int32u configurationVersion = 24;
+  readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1450,7 +1461,13 @@ cluster AdministratorCommissioning = 60 {
 
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 cluster OperationalCredentials = 62 {
-  revision 2;
+  revision 3;
+
+  enum AttestationCryptoProfileEnum : enum8 {
+    kEcdsaMatterLegacy = 0;
+    kMlDsa44 = 1;
+    kMlDsa65 = 2;
+  }
 
   enum CertificateChainTypeEnum : enum8 {
     kDACCertificate = 1;
@@ -1470,6 +1487,16 @@ cluster OperationalCredentials = 62 {
     kInvalidFabricIndex = 11;
   }
 
+  bitmap AttestationCryptoProfileBitmap : bitmap16 {
+    kSupportsEcdsaMatterLegacy = 0x1;
+    kSupportsMlDsa44 = 0x2;
+    kSupportsMlDsa65 = 0x4;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPQCDeviceAttestation = 0x1;
+  }
+
   fabric_scoped struct FabricDescriptorStruct {
     octet_string<65> rootPublicKey = 1;
     vendor_id vendorID = 2;
@@ -1487,12 +1514,20 @@ cluster OperationalCredentials = 62 {
     fabric_idx fabricIndex = 254;
   }
 
+  struct PQCDeviceAttestationProfileStruct {
+    AttestationCryptoProfileBitmap PAASupportedProfiles = 0;
+    AttestationCryptoProfileBitmap PAISupportedProfiles = 1;
+    AttestationCryptoProfileBitmap DACSupportedProfiles = 2;
+    AttestationCryptoProfileBitmap CDSupportedProfiles = 3;
+  }
+
   readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
   readonly attribute FabricDescriptorStruct fabrics[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute octet_string trustedRootCertificates[] = 4;
   readonly attribute int8u currentFabricIndex = 5;
+  provisional readonly attribute optional PQCDeviceAttestationProfileStruct PQCDeviceAttestationProfile = 6;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1510,10 +1545,15 @@ cluster OperationalCredentials = 62 {
 
   request struct CertificateChainRequestRequest {
     CertificateChainTypeEnum certificateType = 0;
+    optional AttestationCryptoProfileEnum cryptoProfile = 1;
+    optional int16u segmentID = 2;
+    optional int16u maxSegmentSize = 3;
   }
 
   response struct CertificateChainResponse = 3 {
-    long_octet_string<600> certificate = 0;
+    octet_string certificate = 0;
+    optional int16u totalDocumentSize = 1;
+    optional int16u nextSegmentID = 2;
   }
 
   request struct CSRRequestRequest {
@@ -1787,7 +1827,7 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
 
 /** An interface for controlling a fan in a heating/cooling system. */
 cluster FanControl = 514 {
-  revision 5;
+  revision 7;
 
   enum AirflowDirectionEnum : enum8 {
     kForward = 0;
@@ -1862,7 +1902,7 @@ cluster FanControl = 514 {
     optional boolean lowestOff = 2;
   }
 
-  /** This command speeds up or slows down the fan, in steps, without a client having to know the fan speed. */
+  /** This command indirectly changes the speed-oriented attributes of the fan in steps rather than using the speed-oriented attributes, FanMode, PercentSetting, or SpeedSetting, directly. */
   command Step(StepRequest): DefaultSuccess = 0;
 }
 
@@ -2052,7 +2092,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_air_purifier = 45, version 3;
+  device type ma_air_purifier = 45, version 4;
 
 
   server cluster Identify {

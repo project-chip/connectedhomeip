@@ -103,6 +103,12 @@ enum AtomicRequestTypeEnum : enum8 {
   kRollbackWrite = 2;
 }
 
+enum CertificationTypeEnum : enum8 {
+  kDeviceAttestationPKI = 0;
+  kOperationalPKI = 1;
+  kVIDSignerPKI = 2;
+}
+
 enum LandmarkTag : enum8 {
   kAirConditioner = 0;
   kAirPurifier = 1;
@@ -183,6 +189,11 @@ enum MeasurementTypeEnum : enum16 {
   kReactiveEnergy = 15;
   kApparentEnergy = 16;
   kSoilMoisture = 17;
+}
+
+enum MediumType : enum8 {
+  kAir = 0;
+  kWater = 1;
 }
 
 enum PositionTag : enum8 {
@@ -341,7 +352,7 @@ struct SemanticTagStruct {
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
-  optional nullable TestGlobalEnum myEnum = 2;
+  nullable TestGlobalEnum myEnum = 2;
 }
 
 struct ViewportStruct {
@@ -415,7 +426,7 @@ cluster Identify = 3 {
 
 /** Attributes and commands for group configuration and manipulation. */
 cluster Groups = 4 {
-  revision 4;
+  revision 5;
 
   bitmap Feature : bitmap32 {
     kGroupNames = 0x1;
@@ -491,7 +502,7 @@ cluster Groups = 4 {
 
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
 cluster OnOff = 6 {
-  revision 6;
+  revision 7;
 
   enum DelayedAllOffEffectVariantEnum : enum8 {
     kDelayedOffFastFade = 0;
@@ -546,11 +557,11 @@ cluster OnOff = 6 {
     int16u offWaitTime = 2;
   }
 
-  /** On receipt of this command, a device SHALL enter its ‘Off’ state. This state is device dependent, but it is recommended that it is used for power off or similar functions. On receipt of the Off command, the OnTime attribute SHALL be set to 0. */
+  /** This command allows devices to be turned off. */
   command Off(): DefaultSuccess = 0;
-  /** On receipt of this command, a device SHALL enter its ‘On’ state. This state is device dependent, but it is recommended that it is used for power on or similar functions. On receipt of the On command, if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0. */
+  /** This command allows devices to be turned on. */
   command On(): DefaultSuccess = 1;
-  /** On receipt of this command, if a device is in its ‘Off’ state it SHALL enter its ‘On’ state. Otherwise, if it is in its ‘On’ state it SHALL enter its ‘Off’ state. On receipt of the Toggle command, if the value of the OnOff attribute is equal to FALSE and if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0. If the value of the OnOff attribute is equal to TRUE, the OnTime attribute SHALL be set to 0. */
+  /** This command allows devices to be toggled. */
   command Toggle(): DefaultSuccess = 2;
   /** The OffWithEffect command allows devices to be turned off using enhanced ways of fading. */
   command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
@@ -562,7 +573,7 @@ cluster OnOff = 6 {
 
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
 cluster OnOff = 6 {
-  revision 6;
+  revision 7;
 
   enum DelayedAllOffEffectVariantEnum : enum8 {
     kDelayedOffFastFade = 0;
@@ -617,11 +628,11 @@ cluster OnOff = 6 {
     int16u offWaitTime = 2;
   }
 
-  /** On receipt of this command, a device SHALL enter its ‘Off’ state. This state is device dependent, but it is recommended that it is used for power off or similar functions. On receipt of the Off command, the OnTime attribute SHALL be set to 0. */
+  /** This command allows devices to be turned off. */
   command Off(): DefaultSuccess = 0;
-  /** On receipt of this command, a device SHALL enter its ‘On’ state. This state is device dependent, but it is recommended that it is used for power on or similar functions. On receipt of the On command, if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0. */
+  /** This command allows devices to be turned on. */
   command On(): DefaultSuccess = 1;
-  /** On receipt of this command, if a device is in its ‘Off’ state it SHALL enter its ‘On’ state. Otherwise, if it is in its ‘On’ state it SHALL enter its ‘Off’ state. On receipt of the Toggle command, if the value of the OnOff attribute is equal to FALSE and if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0. If the value of the OnOff attribute is equal to TRUE, the OnTime attribute SHALL be set to 0. */
+  /** This command allows devices to be toggled. */
   command Toggle(): DefaultSuccess = 2;
   /** The OffWithEffect command allows devices to be turned off using enhanced ways of fading. */
   command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
@@ -633,7 +644,7 @@ cluster OnOff = 6 {
 
 /** Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.' */
 cluster LevelControl = 8 {
-  revision 6;
+  revision 8;
 
   enum MoveModeEnum : enum8 {
     kUp = 0;
@@ -1114,7 +1125,7 @@ cluster Actions = 37 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 cluster BasicInformation = 40 {
-  revision 6;
+  revision 7;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -1202,7 +1213,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional int32u specificationVersion = 21;
   readonly attribute optional int16u maxPathsPerInvoke = 22;
   provisional attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
-  provisional readonly attribute optional int32u configurationVersion = 24;
+  readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1451,7 +1462,7 @@ cluster UnitLocalization = 45 {
 
 /** This cluster is used to describe the configuration and capabilities of a Device's power system. */
 cluster PowerSourceConfiguration = 46 {
-  revision 1;
+  revision 2;
 
   readonly attribute endpoint_no sources[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -1463,7 +1474,7 @@ cluster PowerSourceConfiguration = 46 {
 
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
 cluster PowerSource = 47 {
-  revision 3;
+  revision 4;
 
   enum BatApprovedChemistryEnum : enum16 {
     kUnspecified = 0;
@@ -2757,7 +2768,13 @@ cluster AdministratorCommissioning = 60 {
 
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 cluster OperationalCredentials = 62 {
-  revision 2;
+  revision 3;
+
+  enum AttestationCryptoProfileEnum : enum8 {
+    kEcdsaMatterLegacy = 0;
+    kMlDsa44 = 1;
+    kMlDsa65 = 2;
+  }
 
   enum CertificateChainTypeEnum : enum8 {
     kDACCertificate = 1;
@@ -2777,6 +2794,16 @@ cluster OperationalCredentials = 62 {
     kInvalidFabricIndex = 11;
   }
 
+  bitmap AttestationCryptoProfileBitmap : bitmap16 {
+    kSupportsEcdsaMatterLegacy = 0x1;
+    kSupportsMlDsa44 = 0x2;
+    kSupportsMlDsa65 = 0x4;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPQCDeviceAttestation = 0x1;
+  }
+
   fabric_scoped struct FabricDescriptorStruct {
     octet_string<65> rootPublicKey = 1;
     vendor_id vendorID = 2;
@@ -2794,12 +2821,20 @@ cluster OperationalCredentials = 62 {
     fabric_idx fabricIndex = 254;
   }
 
+  struct PQCDeviceAttestationProfileStruct {
+    AttestationCryptoProfileBitmap PAASupportedProfiles = 0;
+    AttestationCryptoProfileBitmap PAISupportedProfiles = 1;
+    AttestationCryptoProfileBitmap DACSupportedProfiles = 2;
+    AttestationCryptoProfileBitmap CDSupportedProfiles = 3;
+  }
+
   readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
   readonly attribute FabricDescriptorStruct fabrics[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute octet_string trustedRootCertificates[] = 4;
   readonly attribute int8u currentFabricIndex = 5;
+  provisional readonly attribute optional PQCDeviceAttestationProfileStruct PQCDeviceAttestationProfile = 6;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2817,10 +2852,15 @@ cluster OperationalCredentials = 62 {
 
   request struct CertificateChainRequestRequest {
     CertificateChainTypeEnum certificateType = 0;
+    optional AttestationCryptoProfileEnum cryptoProfile = 1;
+    optional int16u segmentID = 2;
+    optional int16u maxSegmentSize = 3;
   }
 
   response struct CertificateChainResponse = 3 {
-    long_octet_string<600> certificate = 0;
+    octet_string certificate = 0;
+    optional int16u totalDocumentSize = 1;
+    optional int16u nextSegmentID = 2;
   }
 
   request struct CSRRequestRequest {
@@ -3110,7 +3150,7 @@ cluster OvenCavityOperationalState = 72 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster OvenMode = 73 {
-  revision 2;
+  revision 3;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3138,6 +3178,10 @@ cluster OvenMode = 73 {
     kFrozenFood = 16396;
   }
 
+  bitmap Feature : bitmap32 {
+    kCoreModes = 0x2;
+  }
+
   shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
@@ -3151,6 +3195,7 @@ cluster OvenMode = 73 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
+  provisional readonly attribute optional enum16 coreModeTags[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -3166,8 +3211,14 @@ cluster OvenMode = 73 {
     optional char_string<64> statusText = 1;
   }
 
+  request struct ChangeToModeByCoreTagRequest {
+    enum16 newModeTag = 0;
+  }
+
   /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+  /** This command is used to change the mode of the device to one of the modes with a tag list that includes the given mode tag value. */
+  command ChangeToModeByCoreTag(ChangeToModeByCoreTagRequest): ChangeToModeResponse = 2;
 }
 
 /** This cluster provides a way to access options associated with the operation of
@@ -3232,7 +3283,7 @@ cluster ModeSelect = 80 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster LaundryWasherMode = 81 {
-  revision 3;
+  revision 4;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3251,6 +3302,10 @@ cluster LaundryWasherMode = 81 {
     kWhites = 16387;
   }
 
+  bitmap Feature : bitmap32 {
+    kCoreModes = 0x2;
+  }
+
   shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
@@ -3264,6 +3319,7 @@ cluster LaundryWasherMode = 81 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
+  provisional readonly attribute optional enum16 coreModeTags[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -3279,13 +3335,19 @@ cluster LaundryWasherMode = 81 {
     optional char_string<64> statusText = 1;
   }
 
+  request struct ChangeToModeByCoreTagRequest {
+    enum16 newModeTag = 0;
+  }
+
   /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+  /** This command is used to change the mode of the device to one of the modes with a tag list that includes the given mode tag value. */
+  command ChangeToModeByCoreTag(ChangeToModeByCoreTagRequest): ChangeToModeResponse = 2;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
-  revision 3;
+  revision 4;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3302,6 +3364,10 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
     kRapidFreeze = 16385;
   }
 
+  bitmap Feature : bitmap32 {
+    kCoreModes = 0x2;
+  }
+
   shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
@@ -3315,6 +3381,7 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
+  provisional readonly attribute optional enum16 coreModeTags[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -3330,8 +3397,14 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
     optional char_string<64> statusText = 1;
   }
 
+  request struct ChangeToModeByCoreTagRequest {
+    enum16 newModeTag = 0;
+  }
+
   /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+  /** This command is used to change the mode of the device to one of the modes with a tag list that includes the given mode tag value. */
+  command ChangeToModeByCoreTag(ChangeToModeByCoreTagRequest): ChangeToModeResponse = 2;
 }
 
 /** This cluster supports remotely monitoring and controlling the different types of functionality available to a washing device, such as a washing machine. */
@@ -3363,7 +3436,7 @@ cluster LaundryWasherControls = 83 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcRunMode = 84 {
-  revision 4;
+  revision 5;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3393,6 +3466,7 @@ cluster RvcRunMode = 84 {
   }
 
   bitmap Feature : bitmap32 {
+    kCoreModes = 0x2;
     kDirectModeChange = 0x100000;
   }
 
@@ -3409,6 +3483,7 @@ cluster RvcRunMode = 84 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
+  provisional readonly attribute optional enum16 coreModeTags[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -3424,13 +3499,19 @@ cluster RvcRunMode = 84 {
     optional char_string<64> statusText = 1;
   }
 
+  request struct ChangeToModeByCoreTagRequest {
+    enum16 newModeTag = 0;
+  }
+
   /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+  /** This command is used to change the mode of the device to one of the modes with a tag list that includes the given mode tag value. */
+  command ChangeToModeByCoreTag(ChangeToModeByCoreTagRequest): ChangeToModeResponse = 2;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcCleanMode = 85 {
-  revision 5;
+  revision 6;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3454,6 +3535,7 @@ cluster RvcCleanMode = 85 {
   }
 
   bitmap Feature : bitmap32 {
+    kCoreModes = 0x2;
     kDirectModeChange = 0x100000;
   }
 
@@ -3470,6 +3552,7 @@ cluster RvcCleanMode = 85 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
+  provisional readonly attribute optional enum16 coreModeTags[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -3485,8 +3568,14 @@ cluster RvcCleanMode = 85 {
     optional char_string<64> statusText = 1;
   }
 
+  request struct ChangeToModeByCoreTagRequest {
+    enum16 newModeTag = 0;
+  }
+
   /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+  /** This command is used to change the mode of the device to one of the modes with a tag list that includes the given mode tag value. */
+  command ChangeToModeByCoreTag(ChangeToModeByCoreTagRequest): ChangeToModeResponse = 2;
 }
 
 /** Attributes and commands for configuring the temperature control, and reporting temperature. */
@@ -3547,7 +3636,7 @@ cluster RefrigeratorAlarm = 87 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster DishwasherMode = 89 {
-  revision 3;
+  revision 4;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3565,6 +3654,10 @@ cluster DishwasherMode = 89 {
     kLight = 16386;
   }
 
+  bitmap Feature : bitmap32 {
+    kCoreModes = 0x2;
+  }
+
   shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
@@ -3578,6 +3671,7 @@ cluster DishwasherMode = 89 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
+  provisional readonly attribute optional enum16 coreModeTags[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -3593,8 +3687,14 @@ cluster DishwasherMode = 89 {
     optional char_string<64> statusText = 1;
   }
 
+  request struct ChangeToModeByCoreTagRequest {
+    enum16 newModeTag = 0;
+  }
+
   /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+  /** This command is used to change the mode of the device to one of the modes with a tag list that includes the given mode tag value. */
+  command ChangeToModeByCoreTag(ChangeToModeByCoreTagRequest): ChangeToModeResponse = 2;
 }
 
 /** This cluster provides an interface to air quality classification using distinct levels with human-readable labels. */
@@ -3789,7 +3889,7 @@ cluster DishwasherAlarm = 93 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster MicrowaveOvenMode = 94 {
-  revision 2;
+  revision 3;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3806,6 +3906,10 @@ cluster MicrowaveOvenMode = 94 {
     kDefrost = 16385;
   }
 
+  bitmap Feature : bitmap32 {
+    kCoreModes = 0x2;
+  }
+
   shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
@@ -3819,6 +3923,7 @@ cluster MicrowaveOvenMode = 94 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
+  provisional readonly attribute optional enum16 coreModeTags[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -3977,8 +4082,8 @@ cluster RvcOperationalState = 97 {
 }
 
 /** Attributes and commands for scene configuration and manipulation. */
-provisional cluster ScenesManagement = 98 {
-  revision 1;
+cluster ScenesManagement = 98 {
+  revision 2;
 
   bitmap CopyModeBitmap : bitmap8 {
     kCopyAllScenes = 0x1;
@@ -4112,17 +4217,17 @@ provisional cluster ScenesManagement = 98 {
     int8u sceneIdentifierFrom = 2;
   }
 
-  /** Add a scene to the scene table. Extension field sets are input as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeID": VALUE, "Value*": VALUE}]}'. */
+  /** This command is used to add a new scene. */
   fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
-  /** Retrieves the requested scene entry from its Scene table. */
+  /** This command returns the details for the requested scene. */
   fabric command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
-  /** Removes the requested scene entry, corresponding to the value of the GroupID field, from its Scene Table */
+  /** This command removes the specified scene. */
   fabric command access(invoke: manage) RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
-  /** Remove all scenes, corresponding to the value of the GroupID field, from its Scene Table */
+  /** This command removes all scenes for the specified GroupID. */
   fabric command access(invoke: manage) RemoveAllScenes(RemoveAllScenesRequest): RemoveAllScenesResponse = 3;
-  /** Adds the scene entry into its Scene Table along with all extension field sets corresponding to the current state of other clusters on the same endpoint */
+  /** This command will create a new entry for the requested scene. */
   fabric command access(invoke: manage) StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
-  /** Set the attributes and corresponding state for each other cluster implemented on the endpoint accordingly to the resquested scene entry in the Scene Table */
+  /** This command will cause the specified scene to be recalled. */
   fabric command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
   /** This command can be used to get the used scene identifiers within a certain group, for the endpoint that implements this cluster. */
   fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
@@ -4290,7 +4395,7 @@ cluster BooleanStateConfiguration = 128 {
 
 /** This cluster is used to configure a valve. */
 cluster ValveConfigurationAndControl = 129 {
-  revision 1;
+  revision 2;
 
   enum StatusCodeEnum : enum8 {
     kFailureDueToFault = 2;
@@ -4540,7 +4645,7 @@ cluster WindowCovering = 258 {
 
 /** An interface for configuring and controlling pumps. */
 cluster PumpConfigurationAndControl = 512 {
-  revision 4;
+  revision 6;
 
   enum ControlModeEnum : enum8 {
     kConstantSpeed = 0;
@@ -4663,7 +4768,7 @@ cluster PumpConfigurationAndControl = 512 {
 
 /** An interface for configuring and controlling the functionality of a thermostat. */
 cluster Thermostat = 513 {
-  revision 11;
+  revision 12;
 
   enum ACCapacityFormatEnum : enum8 {
     kBTUh = 0;
@@ -4783,6 +4888,7 @@ cluster Thermostat = 513 {
     kPresets = 0x100;
     kEvents = 0x200;
     kThermostatSuggestions = 0x400;
+    kThermostatSensors = 0x800;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -4894,6 +5000,21 @@ cluster Thermostat = 513 {
     SystemModeEnum systemMode = 0;
     int8u numberOfSchedules = 1;
     ScheduleTypeFeaturesBitmap scheduleTypeFeatures = 2;
+  }
+
+  struct SensorScheduleTransitionStruct {
+    ScheduleDayOfWeekBitmap dayOfWeek = 0;
+    int16u transitionTime = 1;
+    octet_string enabledSensorHandles[] = 2;
+  }
+
+  struct ThermostatSensorStruct {
+    char_string<64> name = 0;
+    octet_string<16> sensorHandle = 1;
+    cluster_id cluster = 2;
+    optional endpoint_no endpoint = 3;
+    optional node_id node = 4;
+    optional fabric_idx fabricIndex = 5;
   }
 
   struct ThermostatSuggestionStruct {
@@ -5010,10 +5131,17 @@ cluster Thermostat = 513 {
   attribute access(write: manage) optional PresetStruct presets[] = 80;
   attribute access(write: manage) optional ScheduleStruct schedules[] = 81;
   readonly attribute optional nullable epoch_s setpointHoldExpiryTimestamp = 82;
-  provisional readonly attribute optional int8u maxThermostatSuggestions = 83;
-  provisional readonly attribute optional ThermostatSuggestionStruct thermostatSuggestions[] = 84;
-  provisional readonly attribute optional nullable ThermostatSuggestionStruct currentThermostatSuggestion = 85;
-  provisional readonly attribute optional nullable ThermostatSuggestionNotFollowingReasonBitmap thermostatSuggestionNotFollowingReason = 86;
+  readonly attribute optional int8u maxThermostatSuggestions = 83;
+  readonly attribute optional ThermostatSuggestionStruct thermostatSuggestions[] = 84;
+  readonly attribute optional nullable ThermostatSuggestionStruct currentThermostatSuggestion = 85;
+  readonly attribute optional nullable ThermostatSuggestionNotFollowingReasonBitmap thermostatSuggestionNotFollowingReason = 86;
+  provisional readonly attribute optional boolean criticalFreezeProtection = 87;
+  provisional readonly attribute optional boolean criticalOverheatProtection = 88;
+  provisional readonly attribute optional ThermostatSensorStruct sensors[] = 89;
+  provisional attribute access(write: manage) optional octet_string availableSensorHandles[] = 90;
+  provisional attribute access(write: manage) optional octet_string enabledSensorHandles[] = 91;
+  provisional readonly attribute optional int8u numberOfSensorScheduleTransitions = 92;
+  provisional attribute access(write: manage) optional SensorScheduleTransitionStruct sensorSchedule[] = 93;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -5082,7 +5210,7 @@ cluster Thermostat = 513 {
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
   /** This command is used to update the thermostat weekly setpoint schedule from a management system. */
   command access(invoke: manage) SetWeeklySchedule(SetWeeklyScheduleRequest): DefaultSuccess = 1;
-  /** The Current Weekly Schedule Command is sent from the server in response to the Get Weekly Schedule Command. */
+  /** This command will return the weekly schedule for the values provided. */
   command GetWeeklySchedule(GetWeeklyScheduleRequest): GetWeeklyScheduleResponse = 2;
   /** This command is used to clear the weekly schedule. */
   command access(invoke: manage) ClearWeeklySchedule(): DefaultSuccess = 3;
@@ -5100,7 +5228,7 @@ cluster Thermostat = 513 {
 
 /** An interface for controlling a fan in a heating/cooling system. */
 cluster FanControl = 514 {
-  revision 5;
+  revision 7;
 
   enum AirflowDirectionEnum : enum8 {
     kForward = 0;
@@ -5175,7 +5303,7 @@ cluster FanControl = 514 {
     optional boolean lowestOff = 2;
   }
 
-  /** This command speeds up or slows down the fan, in steps, without a client having to know the fan speed. */
+  /** This command indirectly changes the speed-oriented attributes of the fan in steps rather than using the speed-oriented attributes, FanMode, PercentSetting, or SpeedSetting, directly. */
   command Step(StepRequest): DefaultSuccess = 0;
 }
 
@@ -5283,7 +5411,7 @@ provisional cluster Humidistat = 517 {
 
 /** Attributes and commands for controlling the color properties of a color-capable light. */
 cluster ColorControl = 768 {
-  revision 9;
+  revision 10;
 
   enum ColorLoopActionEnum : enum8 {
     kDeactivate = 0;
@@ -5588,7 +5716,7 @@ cluster ColorControl = 768 {
   command MoveColor(MoveColorRequest): DefaultSuccess = 8;
   /** This command will change the color of the device using a step and transition. */
   command StepColor(StepColorRequest): DefaultSuccess = 9;
-  /** This command will move the device to the requested color temperate using a transition. */
+  /** This command will move the device to the requested color temperature using a transition. */
   command MoveToColorTemperature(MoveToColorTemperatureRequest): DefaultSuccess = 10;
   /** This command allows the light to be moved in a smooth continuous transition from their current hue to a target hue. */
   command EnhancedMoveToHue(EnhancedMoveToHueRequest): DefaultSuccess = 64;
@@ -5703,7 +5831,7 @@ provisional cluster DynamicLighting = 773 {
 
 /** Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements. */
 cluster IlluminanceMeasurement = 1024 {
-  revision 3;
+  revision 5;
 
   enum LightSensorTypeEnum : enum8 {
     kPhotodiode = 0;
@@ -5724,7 +5852,7 @@ cluster IlluminanceMeasurement = 1024 {
 
 /** Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements. */
 cluster TemperatureMeasurement = 1026 {
-  revision 4;
+  revision 6;
 
   readonly attribute nullable temperature measuredValue = 0;
   readonly attribute nullable temperature minMeasuredValue = 1;
@@ -5739,7 +5867,7 @@ cluster TemperatureMeasurement = 1026 {
 
 /** Attributes and commands for configuring the measurement of pressure, and reporting pressure measurements. */
 cluster PressureMeasurement = 1027 {
-  revision 3;
+  revision 5;
 
   bitmap Feature : bitmap32 {
     kExtended = 0x1;
@@ -5763,7 +5891,7 @@ cluster PressureMeasurement = 1027 {
 
 /** Attributes and commands for configuring the measurement of flow, and reporting flow measurements. */
 cluster FlowMeasurement = 1028 {
-  revision 3;
+  revision 5;
 
   readonly attribute nullable int16u measuredValue = 0;
   readonly attribute nullable int16u minMeasuredValue = 1;
@@ -5793,7 +5921,7 @@ cluster RelativeHumidityMeasurement = 1029 {
 
 /** The server cluster provides an interface to occupancy sensing functionality based on one or more sensing modalities, including configuration and provision of notifications of occupancy status. */
 cluster OccupancySensing = 1030 {
-  revision 7;
+  revision 8;
 
   enum OccupancySensorTypeEnum : enum8 {
     kPIR = 0 [spec_name = "PIR"];
@@ -7347,7 +7475,7 @@ endpoint 0 {
   server cluster Groups {
     ram      attribute nameSupport;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command AddGroup;
     handle command ViewGroup;
@@ -7473,7 +7601,7 @@ endpoint 0 {
   server cluster PowerSourceConfiguration {
     callback attribute sources;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 0x0002;
   }
 
   server cluster PowerSource {
@@ -7872,7 +8000,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command AddGroup;
     handle command ViewGroup;
@@ -7918,7 +8046,7 @@ endpoint 1 {
     ram      attribute defaultMoveRate default = 50;
     persist  attribute startUpCurrentLevel default = 255;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 0x0007;
+    ram      attribute clusterRevision default = 0x0008;
 
     handle command MoveToLevel;
     handle command Move;
@@ -8038,7 +8166,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0002;
+    ram      attribute clusterRevision default = 0x0003;
 
     handle command ChangeToMode;
   }
@@ -8076,7 +8204,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0003;
+    ram      attribute clusterRevision default = 0x0004;
 
     handle command ChangeToMode;
   }
@@ -8088,7 +8216,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0003;
+    ram      attribute clusterRevision default = 0x0004;
 
     handle command ChangeToMode;
   }
@@ -8112,7 +8240,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command ChangeToMode;
   }
@@ -8124,7 +8252,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0005;
+    ram      attribute clusterRevision default = 0x0006;
 
     handle command ChangeToMode;
   }
@@ -8160,7 +8288,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0003;
+    ram      attribute clusterRevision default = 0x0004;
 
     handle command ChangeToMode;
   }
@@ -8229,7 +8357,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0002;
+    ram      attribute clusterRevision default = 0x0003;
   }
 
   server cluster OperationalState {
@@ -8445,7 +8573,7 @@ endpoint 1 {
     ram      attribute operationMode default = 0x00;
     ram      attribute controlMode default = 0x00;
     ram      attribute featureMap default = 0x1F;
-    ram      attribute clusterRevision default = 0x0005;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster Thermostat {
@@ -8599,7 +8727,7 @@ endpoint 1 {
     ram      attribute coupleColorTempToLevelMinMireds default = 0x009A;
     persist  attribute startUpColorTemperatureMireds default = 0x00FA;
     ram      attribute featureMap default = 0x1F;
-    ram      attribute clusterRevision default = 0x0009;
+    ram      attribute clusterRevision default = 0x000a;
 
     handle command MoveToHue;
     handle command MoveHue;
@@ -8730,7 +8858,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster CarbonDioxideConcentrationMeasurement {
@@ -8749,7 +8877,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster NitrogenDioxideConcentrationMeasurement {
@@ -8768,7 +8896,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster OzoneConcentrationMeasurement {
@@ -8787,7 +8915,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster Pm25ConcentrationMeasurement {
@@ -8806,7 +8934,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster FormaldehydeConcentrationMeasurement {
@@ -8825,7 +8953,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster Pm1ConcentrationMeasurement {
@@ -8844,7 +8972,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster Pm10ConcentrationMeasurement {
@@ -8863,7 +8991,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster TotalVolatileOrganicCompoundsConcentrationMeasurement {
@@ -8882,7 +9010,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster RadonConcentrationMeasurement {
@@ -8901,7 +9029,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster SoilMeasurement {
@@ -9128,7 +9256,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command AddGroup;
     handle command ViewGroup;

@@ -760,6 +760,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTROvenModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRModeSelectClusterChangeToModeParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -779,6 +785,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRLaundryWasherModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -789,6 +801,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
@@ -805,6 +823,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRRVCRunModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRRVCCleanModeClusterChangeToModeParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -815,6 +839,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::RvcCleanMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::RvcCleanMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRRVCCleanModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
@@ -834,6 +864,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::DishwasherMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::DishwasherMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRDishwasherModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
@@ -1271,6 +1307,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTREnergyEVSEModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRWaterHeaterModeClusterChangeToModeParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -1284,6 +1326,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRWaterHeaterModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRDeviceEnergyManagementModeClusterChangeToModeParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -1294,6 +1342,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::DeviceEnergyManagementMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::DeviceEnergyManagementMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRDeviceEnergyManagementModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
@@ -2802,12 +2856,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::PushAvStreamTransport::Commands::FindTransportResponse::DecodableType &)decodableStruct;
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::PushAvStreamTransport::Commands::FindTransportResponse::DecodableType &)decodableStruct;
-
-@end
-
-@interface MTRPushAVStreamTransportClusterUpdateMotionZoneOptionsParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 

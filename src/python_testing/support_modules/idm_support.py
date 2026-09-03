@@ -37,6 +37,7 @@ from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
+from matter.testing.conformance import is_disallowed
 from matter.testing.event_attribute_reporting import WildcardAttributeSubscriptionHandler
 from matter.testing.global_attribute_ids import (GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id,
                                                  is_standard_command_id)
@@ -1859,9 +1860,14 @@ class IDMBaseTest(BasicCompositionTests):
                 continue
 
             xml_attr = xml_cluster.attributes[attribute_id]
+
+            # Skip obsolete/disallowed attributes (e.g. obsolete in spec)
+            if is_disallowed(xml_attr.conformance):
+                continue
+
             write_access = xml_attr.write_access
 
-            if write_access != Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue:
+            if write_access is not None and write_access != Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue:
                 writable_attrs.append(attribute_id)
 
         return writable_attrs
@@ -1949,6 +1955,9 @@ class IDMBaseTest(BasicCompositionTests):
                         # ignored per spec (backwards compatibility).
                         # Spec Link: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/Thermostat.adoc#1119-minsetpointdeadband-attribute
                         Clusters.Thermostat.Attributes.MinSetpointDeadBand,
+                        # UserSetpoint may snap to nearest step (e.g. step=5). Adding 1 to cached_val
+                        # might snap back to the original value, resulting in no value change and no report.
+                        Clusters.Humidistat.Attributes.UserSetpoint,
                     ]
                     if attribute in ATTRIBUTES_WITH_WRITE_CONSTRAINTS:
                         log.debug("%s: Skipping %s - known to have write constraints", test_step, attribute.__name__)

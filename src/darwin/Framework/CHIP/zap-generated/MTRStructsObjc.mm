@@ -3248,6 +3248,42 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTROperationalCredentialsClusterPQCDeviceAttestationProfileStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _paaSupportedProfiles = @(0);
+
+        _paiSupportedProfiles = @(0);
+
+        _dacSupportedProfiles = @(0);
+
+        _cdSupportedProfiles = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTROperationalCredentialsClusterPQCDeviceAttestationProfileStruct alloc] init];
+
+    other.paaSupportedProfiles = self.paaSupportedProfiles;
+    other.paiSupportedProfiles = self.paiSupportedProfiles;
+    other.dacSupportedProfiles = self.dacSupportedProfiles;
+    other.cdSupportedProfiles = self.cdSupportedProfiles;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: paaSupportedProfiles:%@; paiSupportedProfiles:%@; dacSupportedProfiles:%@; cdSupportedProfiles:%@; >", NSStringFromClass([self class]), _paaSupportedProfiles, _paiSupportedProfiles, _dacSupportedProfiles, _cdSupportedProfiles];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRGroupKeyManagementClusterGroupInfoMapStruct
 - (instancetype)init
 {
@@ -8649,6 +8685,81 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRThermostatClusterSensorScheduleTransitionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _dayOfWeek = @(0);
+
+        _transitionTime = @(0);
+
+        _enabledSensorHandles = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterSensorScheduleTransitionStruct alloc] init];
+
+    other.dayOfWeek = self.dayOfWeek;
+    other.transitionTime = self.transitionTime;
+    other.enabledSensorHandles = self.enabledSensorHandles;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: dayOfWeek:%@; transitionTime:%@; enabledSensorHandles:%@; >", NSStringFromClass([self class]), _dayOfWeek, _transitionTime, _enabledSensorHandles];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterThermostatSensorStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _name = @"";
+
+        _sensorHandle = [NSData data];
+
+        _cluster = @(0);
+
+        _endpoint = nil;
+
+        _node = nil;
+
+        _fabricIndex = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterThermostatSensorStruct alloc] init];
+
+    other.name = self.name;
+    other.sensorHandle = self.sensorHandle;
+    other.cluster = self.cluster;
+    other.endpoint = self.endpoint;
+    other.node = self.node;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: name:%@; sensorHandle:%@; cluster:%@; endpoint:%@; node:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _name, [_sensorHandle base64EncodedStringWithOptions:0], _cluster, _endpoint, _node, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRThermostatClusterThermostatSuggestionStruct
 - (instancetype)init
 {
@@ -11784,6 +11895,10 @@ NS_ASSUME_NONNULL_BEGIN
         _zoneSource = @(0);
 
         _twoDCartesianZone = nil;
+
+        _nodeID = nil;
+
+        _endpointID = nil;
     }
     return self;
 }
@@ -11796,13 +11911,15 @@ NS_ASSUME_NONNULL_BEGIN
     other.zoneType = self.zoneType;
     other.zoneSource = self.zoneSource;
     other.twoDCartesianZone = self.twoDCartesianZone;
+    other.nodeID = self.nodeID;
+    other.endpointID = self.endpointID;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneID:%@; zoneType:%@; zoneSource:%@; twoDCartesianZone:%@; >", NSStringFromClass([self class]), _zoneID, _zoneType, _zoneSource, _twoDCartesianZone];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneID:%@; zoneType:%@; zoneSource:%@; twoDCartesianZone:%@; nodeID:%@; endpointID:%@; >", NSStringFromClass([self class]), _zoneID, _zoneType, _zoneSource, _twoDCartesianZone, _nodeID, _endpointID];
     return descriptionString;
 }
 
@@ -11858,6 +11975,10 @@ NS_ASSUME_NONNULL_BEGIN
         _zone = @(0);
 
         _reason = @(0);
+
+        _nodeID = nil;
+
+        _endpointID = nil;
     }
     return self;
 }
@@ -11868,13 +11989,15 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.zone = self.zone;
     other.reason = self.reason;
+    other.nodeID = self.nodeID;
+    other.endpointID = self.endpointID;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; reason:%@; >", NSStringFromClass([self class]), _zone, _reason];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; reason:%@; nodeID:%@; endpointID:%@; >", NSStringFromClass([self class]), _zone, _reason, _nodeID, _endpointID];
     return descriptionString;
 }
 
@@ -11888,6 +12011,10 @@ NS_ASSUME_NONNULL_BEGIN
         _zone = @(0);
 
         _reason = @(0);
+
+        _nodeID = nil;
+
+        _endpointID = nil;
     }
     return self;
 }
@@ -11898,13 +12025,15 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.zone = self.zone;
     other.reason = self.reason;
+    other.nodeID = self.nodeID;
+    other.endpointID = self.endpointID;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; reason:%@; >", NSStringFromClass([self class]), _zone, _reason];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; reason:%@; nodeID:%@; endpointID:%@; >", NSStringFromClass([self class]), _zone, _reason, _nodeID, _endpointID];
     return descriptionString;
 }
 
