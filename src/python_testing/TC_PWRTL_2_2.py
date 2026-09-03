@@ -164,8 +164,9 @@ class TC_PWRTL_2_2(MatterBaseTest):
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
 
         self.step(9, "As TH2, TH reads ElectricalCircuitNodes",
-                  expectation="Verify DUT responds w/ status SUCCESS(0x00) with an empty list, or with only the TH2 "
-                  "entries. The attribute is Fabric-Scoped (F), so the TH1 entries are not visible to TH2.")
+                  expectation="Verify DUT responds w/ status SUCCESS(0x00) with an empty list. TH2 has written "
+                  "nothing at this point, and the attribute is Fabric-Scoped (F), so the TH1 entries are not "
+                  "visible to TH2.")
         th2_view = await self.read_single_attribute_check_success(
             dev_ctrl=th2, endpoint=endpoint, cluster=cluster, attribute=attr)
         asserts.assert_equal(th2_view, [],
