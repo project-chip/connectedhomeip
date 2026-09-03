@@ -63,7 +63,7 @@ public:
     virtual Protocols::InteractionModel::Status GetRunningState(BitMask<RelayStateBitmap> & runningState) const         = 0;
     virtual Protocols::InteractionModel::Status SetRunningState(BitMask<RelayStateBitmap> runningState, bool & changed) = 0;
 
-    virtual int8_t GetLocalTemperatureCalibration() const { return 0; };
+    virtual int8_t GetLocalTemperatureCalibration() const { return 0; }
     virtual Protocols::InteractionModel::Status SetLocalTemperatureCalibration(int8_t localTemperatureCalibration, bool & changed)
     {
         changed = false;
