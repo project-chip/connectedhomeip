@@ -669,7 +669,7 @@ void ColorControlCluster::OnTick()
         if (driverActive) // X and Y share one start; RemainingTime is the slower axis
         {
             remaining  = std::max(RemainingTenths(xytx->startTimeMs, xytx->durationXMs, now),
-                                 RemainingTenths(xytx->startTimeMs, xytx->durationYMs, now));
+                                  RemainingTenths(xytx->startTimeMs, xytx->durationYMs, now));
             nextTickMs = std::min({ nextTickMs, RemainingMs(xytx->startTimeMs, xytx->durationXMs, now),
                                     RemainingMs(xytx->startTimeMs, xytx->durationYMs, now) });
         }
