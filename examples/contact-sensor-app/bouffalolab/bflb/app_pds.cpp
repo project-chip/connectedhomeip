@@ -38,6 +38,7 @@
 #include <task.h>
 
 #include <lwip/ip4_addr.h>
+#include <lwip/inet_chksum.h>
 #include <lwip/netif.h>
 #include <lwip/pbuf.h>
 #include <lwip/prot/ip4.h>
@@ -102,7 +103,7 @@ void SetDtim(uint8_t dtim)
     set_dtim_config(dtim);
     bl_lp_fw_bcn_loss_cfg_dtim_default(dtim);
     sCurrentDtim = dtim;
-    ChipLogDetail(NotSpecified, "[LP] DTIM switched to %u", dtim);
+    ChipLogDetail(DeviceLayer, "[LP] DTIM switched to %u", dtim);
 }
 
 void DtimActivityTask(void * arg)
@@ -153,21 +154,44 @@ void app_dtim_activity_notify(void)
 
     if (notifyResult != pdPASS)
     {
-        ChipLogError(NotSpecified, "[LP] Failed to notify DTIM activity task");
+        ChipLogError(DeviceLayer, "[LP] Failed to notify DTIM activity task");
     }
+}
+
+bool IsLocalIPv4Destination(const ip4_addr_t * destination, const struct netif * input_netif)
+{
+    return netif_is_up(input_netif) && !ip4_addr_isany(netif_ip4_addr(input_netif)) &&
+        ip4_addr_cmp(destination, netif_ip4_addr(input_netif));
 }
 
 extern "C" int app_dtim_ip4_input(struct pbuf * pbuf, struct netif * input_netif)
 {
-    if (pbuf != nullptr && input_netif != nullptr && pbuf->len >= IP_HLEN)
+    if (pbuf != nullptr && input_netif != nullptr && pbuf->payload != nullptr && pbuf->len >= IP_HLEN &&
+        pbuf->tot_len >= IP_HLEN)
     {
         const auto * header = static_cast<const ip_hdr *>(pbuf->payload);
-        ip4_addr_t destination;
-        memcpy(&destination.addr, &header->dest.addr, sizeof(destination.addr));
+        const uint16_t headerLength = IPH_HL_BYTES(header);
+        const uint16_t packetLength = lwip_ntohs(IPH_LEN(header));
 
-        if (!ip4_addr_ismulticast(&destination) && !ip4_addr_isbroadcast(&destination, input_netif))
+        if (headerLength >= IP_HLEN && headerLength <= pbuf->len && packetLength >= headerLength &&
+            packetLength <= pbuf->tot_len)
         {
-            app_dtim_activity_notify();
+#if CHECKSUM_CHECK_IP
+            IF__NETIF_CHECKSUM_ENABLED(input_netif, NETIF_CHECKSUM_CHECK_IP)
+            {
+                if (inet_chksum(header, headerLength) != 0)
+                {
+                    return 0;
+                }
+            }
+#endif
+
+            ip4_addr_t destination;
+            memcpy(&destination.addr, &header->dest.addr, sizeof(destination.addr));
+            if (IsLocalIPv4Destination(&destination, input_netif))
+            {
+                app_dtim_activity_notify();
+            }
         }
     }
 
@@ -176,12 +200,23 @@ extern "C" int app_dtim_ip4_input(struct pbuf * pbuf, struct netif * input_netif
 
 extern "C" int app_dtim_ip6_input(struct pbuf * pbuf, struct netif * input_netif)
 {
-    (void) input_netif;
-    if (pbuf != nullptr && pbuf->len >= IP6_HLEN)
+    if (pbuf != nullptr && input_netif != nullptr && pbuf->payload != nullptr && pbuf->len >= IP6_HLEN &&
+        pbuf->tot_len >= IP6_HLEN)
     {
-        const auto * header            = static_cast<const ip6_hdr *>(pbuf->payload);
-        const auto * destinationOctets = reinterpret_cast<const uint8_t *>(&header->dest);
-        if (destinationOctets[0] != 0xff)
+        const auto * header          = static_cast<const ip6_hdr *>(pbuf->payload);
+        const uint16_t payloadLength = lwip_ntohs(IP6H_PLEN(header));
+        if (payloadLength > pbuf->tot_len - IP6_HLEN)
+        {
+            return 0;
+        }
+
+        ip6_addr_t destination;
+        ip6_addr_t source;
+        ip6_addr_copy_from_packed(destination, header->dest);
+        ip6_addr_copy_from_packed(source, header->src);
+        if (!ip6_addr_isipv4mappedipv6(&source) && !ip6_addr_ismulticast(&source) && !ip6_addr_isany(&source) &&
+            !ip6_addr_ismulticast(&destination) && netif_is_up(input_netif) &&
+            netif_get_ip6_addr_match(input_netif, &destination) >= 0)
         {
             app_dtim_activity_notify();
         }
@@ -420,7 +455,7 @@ void app_pds_init(void (*pinHandler)(int, bool))
                                                 &sDtimActivityTaskStorage);
     if (sDtimActivityTaskHandle == nullptr)
     {
-        ChipLogError(NotSpecified, "[LP] Failed to create DTIM activity task");
+        ChipLogError(DeviceLayer, "[LP] Failed to create DTIM activity task");
     }
     app_dtim_activity_notify();
 
