@@ -61,6 +61,11 @@ class NANSimulator:
         self.interfaces: dict[str, WpaSupplicantMock.WpaInterface] = {}
         self.publishers: dict[int, tuple[str, Any]] = {}
         self.subscribers: dict[int, tuple[str, Any]] = {}
+        # (subscribe_id, publish_id) pairs already reported. A subscriber
+        # starting and a publisher starting both trigger matching, so without
+        # this a pair that appears at both moments is reported twice and the
+        # same device turns up twice in one scan.
+        self.announced: set[tuple[int, int]] = set()
         self._lock = threading.Lock()
 
     def register_interface(self, name: str, interface: WpaSupplicantMock.WpaInterface):
@@ -81,6 +86,7 @@ class NANSimulator:
     def on_publish_cancelled(self, publish_id: int):
         """Called when a publish session is cancelled."""
         if self.publishers.pop(publish_id, None):
+            self.announced = {pair for pair in self.announced if pair[1] != publish_id}
             log.debug("NANSimulator: Publisher cancelled: id=%d", publish_id)
 
     async def announce_publisher(self, pub_iface_name: str, pub_id: int, pub_args: dict):
@@ -92,6 +98,9 @@ class NANSimulator:
         """
         await asyncio.sleep(DISCOVERY_DELAY_S)
         with self._lock:
+            if pub_id not in self.publishers:
+                log.debug("NANSimulator: Publisher %d cancelled before it was announced", pub_id)
+                return
             subscribers_copy = dict(self.subscribers)
             interfaces_copy = dict(self.interfaces)
 
@@ -119,11 +128,15 @@ class NANSimulator:
     def on_subscribe_cancelled(self, subscribe_id: int):
         """Called when a subscribe session is cancelled."""
         if self.subscribers.pop(subscribe_id, None):
+            self.announced = {pair for pair in self.announced if pair[0] != subscribe_id}
             log.debug("NANSimulator: Subscriber cancelled - sub_id=%d", subscribe_id)
 
     async def _process_discoveries(self, sub_iface_name: str, sub_id: int, sub_args: dict):
         """Match subscriber with publishers and emit discovery signals."""
         with self._lock:
+            if sub_id not in self.subscribers:
+                log.debug("NANSimulator: Subscriber %d cancelled before discovery ran", sub_id)
+                return
             publishers_copy = dict(self.publishers)
             interfaces_copy = dict(self.interfaces)
 
@@ -150,6 +163,11 @@ class NANSimulator:
         pub_srv_name = pub_args.get("srv_name", "")
         if sub_srv_name and pub_srv_name and sub_srv_name != pub_srv_name:
             return
+
+        with self._lock:
+            if (sub_id, pub_id) in self.announced:
+                return
+            self.announced.add((sub_id, pub_id))
 
         log.debug("NANSimulator: Discovery match - sub=%s (id=%d) <-> pub=%s (id=%d)",
                   sub_iface_name, sub_id, pub_iface_name, pub_id)
@@ -228,6 +246,15 @@ class WpaSupplicantMock(TerminableThread):
     and `resource_terminate()`.
     """
 
+    class InterfaceUnknownError(sdbus.DbusFailedError):
+        """Raised for an interface name the mock was not asked to provide.
+
+        The error wpa_supplicant itself returns from GetInterface, so the
+        application reacts as it would on a real system.
+        """
+
+        dbus_error_name = "fi.w1.wpa_supplicant1.InterfaceUnknown"
+
     class Wpa(sdbus.DbusInterfaceCommonAsync,
               interface_name="fi.w1.wpa_supplicant1"):
         path = "/fi/w1/wpa_supplicant1"
@@ -248,14 +275,15 @@ class WpaSupplicantMock(TerminableThread):
             for interface in self.mock.interfaces:
                 if interface.interface_name_in_sim in name.lower():  # Case-insensitive match
                     return interface.path
-            # Returning some other application's interface makes a misplaced
-            # application look like a NAN problem instead of a configuration one,
-            # so say so rather than only handing back the last interface.
-            log.warning("No mock interface matches '%s'; registered names are %s. "
-                        "Falling back to '%s' -- is the application in the right network namespace?",
-                        name, [i.interface_name_in_sim for i in self.mock.interfaces],
-                        self.mock.interfaces[-1].interface_name_in_sim)
-            return self.mock.interfaces[-1].path
+            # Handing back some other application's interface makes a
+            # misplaced application look like a NAN problem instead of the
+            # configuration one it is, and two applications sharing one
+            # interface then take each other's link down.
+            registered = [i.interface_name_in_sim for i in self.mock.interfaces]
+            log.error("No mock interface matches '%s'; registered names are %s. "
+                      "Is the application in the right network namespace?", name, registered)
+            raise WpaSupplicantMock.InterfaceUnknownError(
+                f"No mock interface matches '{name}'; registered names are {registered}")
 
     class WpaInterface(sdbus.DbusInterfaceCommonAsync,
                        interface_name="fi.w1.wpa_supplicant1.Interface"):

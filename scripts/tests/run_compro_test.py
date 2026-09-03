@@ -196,6 +196,54 @@ def proxy_app_args(transport: str, endpoint: int, proxy_ble: bool) -> list[str]:
     return args
 
 
+def proxy_build_transports(proxy_app: str) -> set[str]:
+    """Transports the proxy application was *built* with.
+
+    The Transport attribute is derived from the build, not from which adapters
+    or interfaces exist, and the tests scan on that whole bitmap. Asking a
+    both-transport build to run a single-transport leg therefore exercises a
+    transport the run never set up. The application only offers the options for
+    the transports it was built with, so its own help output answers this.
+    """
+    help_text = subprocess.run([proxy_app, "--help"], capture_output=True, text=True).stdout
+    transports = set()
+    if "--ble-controller" in help_text:
+        transports.add(Transport.BLE)
+    if "--wifipaf" in help_text:
+        transports.add(Transport.WIFIPAF)
+    return transports
+
+
+def check_transport_matches_build(proxy_app: str, transport: str, proxy_ble: bool) -> bool:
+    """Compare the requested transport against the proxy build; return proxy_ble.
+
+    Raises when the build cannot serve the requested transport at all, and warns
+    when it serves more, because the extra transport reaches the tests through
+    the Transport attribute whatever this run configured.
+    """
+    built = proxy_build_transports(proxy_app)
+    if not built:
+        log.warning("Could not read the transports %s was built with; trusting --proxy-transport",
+                    proxy_app)
+        return proxy_ble
+
+    wanted = set(Transport) - {Transport.BOTH} if transport == Transport.BOTH else {transport}
+    if missing := wanted - built:
+        raise click.BadOptionUsage(
+            "proxy-transport",
+            f"{proxy_app} was built without {', '.join(sorted(missing))}; "
+            f"it supports {', '.join(sorted(built))}. Use a matching build.")
+    if extra := built - wanted:
+        log.warning("%s was built with %s, which this run does not configure. The Transport "
+                    "attribute still advertises it and the scan tests use that bitmap "
+                    "(TC_COMPRO_2_8 step 10), so use a %s-only build to test that leg alone.",
+                    proxy_app, ", ".join(sorted(extra)), transport)
+
+    # --ble-controller exists only in a build with BLE, and passing an option the
+    # application does not know is fatal to it.
+    return Transport.BLE in built and proxy_ble
+
+
 def declared_commissioning_args(script: str) -> list[str]:
     """The commissioning-method arguments the test itself declares.
 
@@ -281,6 +329,8 @@ def main(proxy_app: str, proxy_args: str, ed_app: str | None, script: str, scrip
         raise click.BadOptionUsage(
             "passcode", f"The proxy application has no --passcode option, so its passcode is always "
                         f"{PROXY_PASSCODE} and --passcode cannot change it.")
+
+    proxy_ble = check_transport_matches_build(proxy_app, transport, proxy_ble)
 
     if not internal_inside_unshare:
         chiptest.linux.ensure_namespace_availability()

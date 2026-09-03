@@ -95,6 +95,9 @@ class Subprocess(threading.Thread):
         self.f_stdout = f_stdout
         self.f_stderr = f_stderr
         self.output_match: list[re.Pattern] = []
+        # stdout and stderr are forwarded by separate threads sharing one
+        # callback, so the patterns still outstanding are guarded.
+        self.output_match_lock = threading.Lock()
         self.returncode: int | None = None
         self.p: subprocess.Popen | None = None
 
@@ -104,14 +107,16 @@ class Subprocess(threading.Thread):
         A sequence waits for every pattern in it, in any order, which is what a
         process that becomes ready in more than one respect needs.
         """
-        patterns = pattern if isinstance(pattern, (list, tuple)) else [pattern]
-        self.output_match = [re.compile(re.escape(p.encode())) if isinstance(p, str) else p for p in patterns]
+        patterns = [pattern] if isinstance(pattern, (str, re.Pattern)) else list(pattern)
+        with self.output_match_lock:
+            self.output_match = [re.compile(re.escape(p.encode())) if isinstance(p, str) else p for p in patterns]
 
     def _check_output(self, line: bytes, is_stderr: bool) -> bytes:
-        if self.output_match:
-            self.output_match = [p for p in self.output_match if not p.search(line)]
-            if not self.output_match:
-                self.event.set()
+        with self.output_match_lock:
+            if self.output_match:
+                self.output_match = [p for p in self.output_match if not p.search(line)]
+                if not self.output_match:
+                    self.event.set()
         if self.output_cb is not None:
             line = self.output_cb(line, is_stderr)
         return line

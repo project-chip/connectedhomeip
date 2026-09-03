@@ -98,6 +98,10 @@ class BluetoothMock(TerminablePopen[str]):
         self._advertising = dict.fromkeys(range(len(self.ADAPTERS)), 0)
         self._loop = asyncio.new_event_loop()
         self._loop_thread: threading.Thread | None = None
+        # Watcher tasks are kept referenced: a task nothing holds can be
+        # garbage collected mid-run, and a watcher that stops silently takes
+        # re-discovery with it.
+        self._watchers: list[asyncio.Task] = []
         super().__init__(lambda: subprocess.Popen(["bluezoo", "--auto-enable"] + adapters, stderr=subprocess.PIPE, text=True))
 
     def _device_path(self, adapter_index: int, peer_index: int) -> str:
@@ -136,10 +140,24 @@ class BluetoothMock(TerminablePopen[str]):
             if not was_advertising and instances[1]:
                 await self._forget_peer(adapter_index)
 
+    def _watcher_done(self, task: asyncio.Task) -> None:
+        if task.cancelled():
+            return
+        if (error := task.exception()) is not None:
+            log.error("Advertising watcher stopped; devices will not be re-discovered", exc_info=error)
+
     async def _start_watching(self) -> None:
         self._bus = sdbus.sd_bus_open_system()
         for adapter_index in range(len(self.ADAPTERS)):
-            asyncio.ensure_future(self._watch_advertising(adapter_index))
+            watcher = asyncio.ensure_future(self._watch_advertising(adapter_index))
+            watcher.add_done_callback(self._watcher_done)
+            self._watchers.append(watcher)
+
+    async def _stop_watching(self) -> None:
+        for watcher in self._watchers:
+            watcher.cancel()
+        await asyncio.gather(*self._watchers, return_exceptions=True)
+        self._watchers.clear()
 
     def resource_start(self) -> subprocess.Popen[str]:
         process = super().resource_start()
@@ -160,15 +178,22 @@ class BluetoothMock(TerminablePopen[str]):
 
     def resource_terminate(self) -> None:
         if self._loop_thread is not None:
+            # Nothing here may raise: teardown runs while a test is already
+            # failing, and an exception raised now replaces the reason it failed.
+            try:
+                asyncio.run_coroutine_threadsafe(
+                    self._stop_watching(), self._loop).result(self.RESOURCE_TIMEOUT_TERMINATE_S)
+            except Exception:
+                log.exception("Failed to stop the advertising watchers")
             self._loop.call_soon_threadsafe(self._loop.stop)
             self._loop_thread.join(self.RESOURCE_TIMEOUT_TERMINATE_S)
+            if self._loop_thread.is_alive():
+                log.warning("BluetoothMock event loop did not stop within %s seconds; leaving it open",
+                            self.RESOURCE_TIMEOUT_TERMINATE_S)
             self._loop_thread = None
 
         super().resource_terminate()
 
-        if not self._loop.is_closed():
-            try:
-                self._loop.close()
-            except Exception:
-                log.exception("Failed to close BluetoothMock event loop")
-                raise
+        # Closing a loop that is still running raises.
+        if not self._loop.is_running() and not self._loop.is_closed():
+            self._loop.close()
