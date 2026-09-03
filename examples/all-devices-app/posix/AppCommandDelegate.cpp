@@ -1025,7 +1025,14 @@ public:
             return;
         }
 
-        uint8_t newMode = static_cast<uint8_t>(json["NewMode"].asUInt());
+        unsigned int newModeVal = json["NewMode"].asUInt();
+        if (newModeVal > UINT8_MAX)
+        {
+            ChipLogError(AppServer, "Invalid mode value (out of range): %u", newModeVal);
+            return;
+        }
+
+        uint8_t newMode = static_cast<uint8_t>(newModeVal);
         if (!cluster->IsSupportedMode(newMode))
         {
             ChipLogError(AppServer, "Invalid mode: %u", newMode);
