@@ -1119,6 +1119,81 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportOptionsStorage_DecodableTy
     }
 }
 
+TEST_F(TestPushAVStreamTransportStorage, TestUpdateMotionZonesAndSensitivity)
+{
+    TransportTriggerOptionsStorage triggerStorage;
+
+    // Test UpdateMotionSensitivity
+    triggerStorage.UpdateMotionSensitivity(MakeOptional(DataModel::MakeNullable(static_cast<uint8_t>(6))));
+    EXPECT_TRUE(triggerStorage.motionSensitivity.HasValue());
+    EXPECT_FALSE(triggerStorage.motionSensitivity.Value().IsNull());
+    EXPECT_EQ(triggerStorage.motionSensitivity.Value().Value(), 6);
+
+    // Update to Null
+    triggerStorage.UpdateMotionSensitivity(MakeOptional(DataModel::Nullable<uint8_t>()));
+    EXPECT_TRUE(triggerStorage.motionSensitivity.HasValue());
+    EXPECT_TRUE(triggerStorage.motionSensitivity.Value().IsNull());
+
+    // Update with empty optional (no-op)
+    triggerStorage.UpdateMotionSensitivity(Optional<DataModel::Nullable<uint8_t>>());
+    EXPECT_TRUE(triggerStorage.motionSensitivity.HasValue());
+    EXPECT_TRUE(triggerStorage.motionSensitivity.Value().IsNull());
+
+    // Test UpdateMotionZones with empty list
+    DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> emptyList;
+    triggerStorage.UpdateMotionZones(MakeOptional(DataModel::MakeNullable(emptyList)));
+    EXPECT_TRUE(triggerStorage.motionZones.HasValue());
+    EXPECT_FALSE(triggerStorage.motionZones.Value().IsNull());
+    EXPECT_EQ(triggerStorage.motionZones.Value().Value().size(), (size_t) 0);
+
+    // Test UpdateMotionZones with non-empty list
+    uint8_t tlvBuf[256];
+    Structs::TransportZoneOptionsStruct::Type z1;
+    z1.zone.SetNonNull(10);
+    z1.sensitivity.SetValue(3);
+
+    TLV::TLVWriter writer;
+    writer.Init(tlvBuf, sizeof(tlvBuf));
+    TLV::TLVWriter arrayWriter;
+    EXPECT_EQ(writer.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayWriter), CHIP_NO_ERROR);
+    EXPECT_EQ(DataModel::Encode(arrayWriter, TLV::AnonymousTag(), z1), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.CloseContainer(arrayWriter), CHIP_NO_ERROR);
+
+    TLV::TLVReader reader;
+    reader.Init(tlvBuf, static_cast<uint32_t>(writer.GetLengthWritten()));
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+
+    DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> decodedList;
+    EXPECT_EQ(decodedList.Decode(reader), CHIP_NO_ERROR);
+
+    triggerStorage.UpdateMotionZones(MakeOptional(DataModel::MakeNullable(decodedList)));
+    EXPECT_TRUE(triggerStorage.motionZones.HasValue());
+    EXPECT_FALSE(triggerStorage.motionZones.Value().IsNull());
+    EXPECT_EQ(triggerStorage.motionZones.Value().Value().size(), (size_t) 1);
+    EXPECT_EQ(triggerStorage.motionZones.Value().Value()[0].zone.Value(), 10);
+    EXPECT_EQ(triggerStorage.motionZones.Value().Value()[0].sensitivity.Value(), 3);
+
+    // Test UpdateMotionZones with null
+    DataModel::Nullable<DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType>> nullZones;
+    triggerStorage.UpdateMotionZones(MakeOptional(nullZones));
+    EXPECT_TRUE(triggerStorage.motionZones.HasValue());
+    EXPECT_TRUE(triggerStorage.motionZones.Value().IsNull());
+
+    // Test TransportOptionsStorage wrapper
+    TransportOptionsStorage optionsStorage;
+    optionsStorage.UpdateMotionZones(MakeOptional(DataModel::MakeNullable(decodedList)));
+    optionsStorage.UpdateMotionSensitivity(MakeOptional(DataModel::MakeNullable(static_cast<uint8_t>(9))));
+
+    EXPECT_TRUE(optionsStorage.triggerOptions.motionZones.HasValue());
+    EXPECT_FALSE(optionsStorage.triggerOptions.motionZones.Value().IsNull());
+    EXPECT_EQ(optionsStorage.triggerOptions.motionZones.Value().Value().size(), (size_t) 1);
+    EXPECT_EQ(optionsStorage.triggerOptions.motionZones.Value().Value()[0].zone.Value(), 10);
+
+    EXPECT_TRUE(optionsStorage.triggerOptions.motionSensitivity.HasValue());
+    EXPECT_FALSE(optionsStorage.triggerOptions.motionSensitivity.Value().IsNull());
+    EXPECT_EQ(optionsStorage.triggerOptions.motionSensitivity.Value().Value(), 9);
+}
+
 } // namespace PushAvStreamTransport
 } // namespace Clusters
 } // namespace app

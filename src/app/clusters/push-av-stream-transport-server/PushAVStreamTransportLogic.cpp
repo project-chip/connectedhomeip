@@ -1794,7 +1794,7 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
         return std::nullopt;
     }
 
-    mDelegate->OnAttributeChanged(PushAvStreamTransport::Attributes::CurrentConnections::Id);
+    mCluster->ReportAttributeChange(PushAvStreamTransport::Attributes::CurrentConnections::Id);
     handler.AddStatus(commandPath, Status::Success);
     return std::nullopt;
 }
