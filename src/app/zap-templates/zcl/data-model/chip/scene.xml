@@ -79,7 +79,7 @@ Git: 1.4-1773-g2b8c413df
     <define>SCENES_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="2"/>
+    <globalAttribute side="either" code="0xFFFD" value="1"/>
     <features>
       <feature bit="0" code="SN" name="SceneNames" summary="The ability to store a name for a scene.">
         <optionalConform/>

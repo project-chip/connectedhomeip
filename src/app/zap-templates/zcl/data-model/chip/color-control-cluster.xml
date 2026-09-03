@@ -111,7 +111,7 @@ Alchemy: v1.6.10
     <define>COLOR_CONTROL_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="10"/>
+    <globalAttribute side="either" code="0xFFFD" value="9"/>
     <features>
       <feature bit="0" code="HS" name="Hue And Saturation" summary="Supports color specification via hue/saturation.">
         <otherwiseConform>
