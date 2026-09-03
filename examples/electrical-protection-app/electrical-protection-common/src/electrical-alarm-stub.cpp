@@ -31,7 +31,7 @@ namespace {
 
 // The app performs no real measurement, so every request is approved and nothing is written to
 // hardware. SetElectricalAlarmThresholdsCallback is left to the base implementation, which also
-// approves, and is unreachable here anyway because this instance does not enable ADJUST.
+// approves.
 class BreakerAlarmDelegate : public ElectricalAlarm::Delegate
 {
 public:
@@ -46,14 +46,11 @@ std::unique_ptr<ElectricalAlarm::Instance> gInstance;
 
 namespace chip::app::Clusters::ElectricalAlarm {
 
-CHIP_ERROR ElectricalAlarmInit(EndpointId endpointId)
+CHIP_ERROR ElectricalAlarmInit(EndpointId endpointId, BitMask<Feature> features)
 {
     VerifyOrReturnError(gInstance == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    // OverCurrent is the only alarm class the breaker endpoint claims. The device type makes it
-    // mandatory once this cluster is present, and one alarm class is enough to satisfy the
-    // cluster's own at-least-one feature choice.
-    gInstance = std::make_unique<Instance>(endpointId, &gDelegate, BitMask<Feature>(Feature::kOverCurrent));
+    gInstance = std::make_unique<Instance>(endpointId, &gDelegate, features);
     VerifyOrReturnError(gInstance != nullptr, CHIP_ERROR_NO_MEMORY);
 
     CHIP_ERROR err = gInstance->Init();

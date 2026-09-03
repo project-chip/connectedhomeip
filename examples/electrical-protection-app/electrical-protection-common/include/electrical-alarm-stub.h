@@ -20,15 +20,19 @@
 
 #include <app/clusters/electrical-alarm-server/CodegenIntegration.h>
 
+#include <clusters/ElectricalAlarm/Enums.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/BitMask.h>
 
 namespace chip::app::Clusters::ElectricalAlarm {
 
-/// Create and register the Electrical Alarm cluster on `endpointId` with the OverCurrent feature,
-/// which the Electrical Circuit Breaker device type makes mandatory wherever this cluster appears.
+/// Create and register the Electrical Alarm cluster on `endpointId` with `features`. The caller
+/// chooses them, as the Power Topology stub next door does, so the app states what the endpoint
+/// offers rather than burying it here. At least one alarm class is required; the Electrical Circuit
+/// Breaker device type makes OverCurrent mandatory wherever this cluster appears.
 /// Call from ApplicationInit().
-CHIP_ERROR ElectricalAlarmInit(EndpointId endpointId);
+CHIP_ERROR ElectricalAlarmInit(EndpointId endpointId, BitMask<Feature> features);
 
 /// Unregister and destroy the cluster. Call from ApplicationShutdown().
 void ElectricalAlarmShutdown();

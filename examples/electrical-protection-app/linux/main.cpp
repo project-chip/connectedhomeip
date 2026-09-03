@@ -70,7 +70,12 @@ void ApplicationInit()
 
     // Electrical Alarm reports measurement-threshold alarms on the breaker. It is one of the
     // choice-group members the breaker device type offers, and it makes OverCurrent mandatory.
-    VerifyOrDie(ElectricalAlarm::ElectricalAlarmInit(kBreakerEndpointId) == CHIP_NO_ERROR);
+    // AdjustableThresholds is offered too, so the thresholds behind that alarm can be set at
+    // runtime; without it SetElectricalAlarmThresholds is absent and TC-ESALM-2.2 has no DUT.
+    VerifyOrDie(ElectricalAlarm::ElectricalAlarmInit(
+                    kBreakerEndpointId,
+                    BitMask<ElectricalAlarm::Feature>(ElectricalAlarm::Feature::kOverCurrent,
+                                                      ElectricalAlarm::Feature::kAdjustableThresholds)) == CHIP_NO_ERROR);
 }
 
 void ApplicationShutdown()
