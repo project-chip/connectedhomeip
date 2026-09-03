@@ -315,7 +315,7 @@ class IsolatedNetworkNamespace(TerminableResource):
             if add_ula:
                 proxy_ipv6.append("fd00:0:1:1::6/64")
             self.proxy_link = NetworkLink(f"{proxy_link_name}-{index}",
-                                         ipv4_addrs=["10.10.10.6/24"], ipv6_addrs=proxy_ipv6, ns=self.proxy_ns)
+                                          ipv4_addrs=["10.10.10.6/24"], ipv6_addrs=proxy_ipv6, ns=self.proxy_ns)
 
         self.bridge = NetworkBridge(f"br-{index}")
         self.bridge.attach_link(self.app_link)

@@ -328,7 +328,7 @@ def main(proxy_app: str, proxy_args: str, ed_app: str | None, script: str, scrip
     if passcode != PROXY_PASSCODE:
         raise click.BadOptionUsage(
             "passcode", f"The proxy application has no --passcode option, so its passcode is always "
-                        f"{PROXY_PASSCODE} and --passcode cannot change it.")
+            f"{PROXY_PASSCODE} and --passcode cannot change it.")
 
     proxy_ble = check_transport_matches_build(proxy_app, transport, proxy_ble)
 
@@ -384,7 +384,7 @@ def run(proxy_app: str, proxy_args: str, ed_app: str | None, script: str, script
 
         cmd = net_ns.tool_ns.wrap_cmd([sys.executable, script])
         cmd += test_script_args(script, ed_app, script_args, transport, endpoint, discriminator, passcode,
-                               ed_discriminator, ed_passcode, storage_dir, net_ns)
+                                ed_discriminator, ed_passcode, storage_dir, net_ns)
 
         log.info("Running %s", shlex.join(cmd))
         return subprocess.run(cmd, check=False, cwd=DEFAULT_CHIP_ROOT).returncode
