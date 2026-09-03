@@ -87,8 +87,6 @@ public:
         if (features.Has(Feature::kHumidifier))
         {
             VerifyOrDie(MistType::GetDefault(endpointId, config.mistType) == Status::Success);
-            VerifyOrDie((config.mode == ModeEnum::kHumidifier) ? (!config.mistType.IsNull() && config.mistType.Value().HasAny())
-                                                               : (config.mistType.IsNull() || !config.mistType.Value().HasAny()));
         }
 
         if (features.Has(Feature::kContinuous))

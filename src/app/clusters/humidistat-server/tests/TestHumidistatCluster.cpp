@@ -564,7 +564,7 @@ TEST_F(TestHumidistatCluster, SetSettingsMultipleFields)
 
         EXPECT_FALSE(tester.IsAttributeDirty(Mode::Id));
         EXPECT_TRUE(tester.IsAttributeDirty(UserSetpoint::Id));
-        EXPECT_FALSE(tester.IsAttributeDirty(MistType::Id));
+        EXPECT_TRUE(tester.IsAttributeDirty(MistType::Id));
         EXPECT_TRUE(tester.IsAttributeDirty(Continuous::Id));
         EXPECT_TRUE(tester.IsAttributeDirty(Sleep::Id));
         EXPECT_TRUE(tester.IsAttributeDirty(Optimal::Id));
@@ -593,31 +593,30 @@ TEST_F(TestHumidistatCluster, SetSettingsMistTypeValidation)
 
     tester.GetDirtyList().clear();
 
-    // Setting WarmMist should fail with InvalidInState (feature not supported)
+    // Setting WarmMist should fail with ConstraintError (feature not supported)
     {
         Commands::SetSettings::Type request;
         request.mistType.SetValue(chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistWarm));
         auto result = tester.Invoke(request);
         EXPECT_FALSE(result.IsSuccess());
-        EXPECT_EQ(result.GetStatusCode(), std::make_optional(CSC(Status::InvalidInState)));
+        EXPECT_EQ(result.GetStatusCode(), std::make_optional(CSC(Status::ConstraintError)));
         // MistType unchanged
         EXPECT_EQ(cluster.GetMistType().Raw(), chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold).Raw());
     }
 
-    // Setting an empty MistType while mode is Humidifier should fail.
+    // Setting an empty MistType while mode is Humidifier is allowed (no Mode/MistType relationship in the spec).
     {
         Commands::SetSettings::Type request;
         request.mistType.SetValue(chip::BitMask<MistTypeBitmap>());
         auto result = tester.Invoke(request);
-        EXPECT_FALSE(result.IsSuccess());
-        EXPECT_EQ(result.GetStatusCode(), std::make_optional(CSC(Status::ConstraintError)));
-        EXPECT_EQ(cluster.GetMistType().Raw(), chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold).Raw());
+        EXPECT_TRUE(result.IsSuccess());
+        EXPECT_EQ(cluster.GetMistType().Raw(), 0u);
     }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestHumidistatCluster, SetMistTypeRequiresAtLeastOneBitInHumidifierMode)
+TEST_F(TestHumidistatCluster, SetMistTypeAllowsEmptyValueInHumidifierMode)
 {
     const BitFlags<Feature> features{ Feature::kHumidifier, Feature::kColdMist };
     HumidistatCluster cluster(kTestEndpointId, features, {});
@@ -625,9 +624,12 @@ TEST_F(TestHumidistatCluster, SetMistTypeRequiresAtLeastOneBitInHumidifierMode)
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     ASSERT_EQ(cluster.SetMode(ModeEnum::kHumidifier), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.SetMistType(chip::BitMask<MistTypeBitmap>()), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    EXPECT_EQ(cluster.GetMistType().Raw(), chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold).Raw());
-    EXPECT_FALSE(tester.IsAttributeDirty(MistType::Id));
+    ASSERT_EQ(cluster.SetMistType(chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold)), CHIP_NO_ERROR);
+    tester.GetDirtyList().clear();
+
+    EXPECT_EQ(cluster.SetMistType(chip::BitMask<MistTypeBitmap>()), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetMistType().Raw(), 0u);
+    EXPECT_TRUE(tester.IsAttributeDirty(MistType::Id));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -818,9 +820,9 @@ TEST_F(TestHumidistatCluster, TestPersistence)
     }
 }
 
-TEST_F(TestHumidistatCluster, SetModeClearsMistType)
+TEST_F(TestHumidistatCluster, SetModeDoesNotAffectMistType)
 {
-    // Spec: "If the value of Mode is not set to Humidifier, all bits of MistType SHALL be set to zero."
+    // Spec no longer relates MistType to Mode; changing Mode away from Humidifier SHALL NOT clear MistType.
     const BitFlags<Feature> features{ Feature::kHumidifier, Feature::kDehumidifier, Feature::kColdMist, Feature::kSensor };
     HumidistatCluster cluster(kTestEndpointId, features, {});
     ClusterTester tester(cluster);
@@ -833,10 +835,10 @@ TEST_F(TestHumidistatCluster, SetModeClearsMistType)
 
     tester.GetDirtyList().clear();
 
-    // Change mode away from Humidifier — MistType must be cleared.
+    // Change mode away from Humidifier — MistType SHALL remain unchanged.
     ASSERT_EQ(cluster.SetMode(ModeEnum::kDehumidifier), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.GetMistType().Raw(), 0u);
-    EXPECT_TRUE(tester.IsAttributeDirty(MistType::Id));
+    EXPECT_EQ(cluster.GetMistType().Raw(), chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold).Raw());
+    EXPECT_FALSE(tester.IsAttributeDirty(MistType::Id));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
