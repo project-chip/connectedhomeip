@@ -48,7 +48,7 @@ using namespace chip::DeviceLayer;
 namespace chip::app::AllDevices {
 namespace {
 
-constexpr EndpointId kRootEndpointId        = 0;
+constexpr EndpointId kRootEndpointId   = 0;
 constexpr EndpointId kFirstDeviceEndpointId = 1;
 
 } // namespace
@@ -177,15 +177,15 @@ CHIP_ERROR AppTask::InitRootNode()
     ReturnErrorOnFailure(mRootNode->Register(rootAllocator, *mDataModelProvider));
 
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
-        .groupDataProvider        = mGroupDataProvider,
-        .fabricTable              = Server::GetInstance().GetFabricTable(),
-        .timerDelegate            = mTimerDelegate,
-        .storageDelegate          = *mInitParams.persistentStorageDelegate,
-        .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),
-        .platformManager          = DeviceLayer::PlatformMgr(),
-        .failSafeContext          = Server::GetInstance().GetFailSafeContext(),
-        .bindingTable             = Clusters::Binding::Table::GetInstance(),
-        .bindingManager           = Clusters::Binding::Manager::GetInstance(),
+        .groupDataProvider      = mGroupDataProvider,
+        .fabricTable            = Server::GetInstance().GetFabricTable(),
+        .timerDelegate          = mTimerDelegate,
+        .storageDelegate        = *mInitParams.persistentStorageDelegate,
+        .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
+        .platformManager        = DeviceLayer::PlatformMgr(),
+        .failSafeContext        = Server::GetInstance().GetFailSafeContext(),
+        .bindingTable           = Clusters::Binding::Table::GetInstance(),
+        .bindingManager         = Clusters::Binding::Manager::GetInstance(),
         .testEventTriggerDelegate = *mInitParams.testEventTriggerDelegate,
     });
 
@@ -230,7 +230,7 @@ CHIP_ERROR AppTask::RegisterAppDevices()
 
 CHIP_ERROR AppTask::InitBoardControls()
 {
-    ReturnErrorOnFailure(Button::Init());
+    Button::Init();
     return CHIP_NO_ERROR;
 }
 
@@ -246,8 +246,8 @@ CHIP_ERROR AppTask::InitOTARequestor()
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     SetRequestorInstance(&mOTARequestorCore);
     mOTARequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
-    ReturnErrorOnFailure(mOTARequestorCore.Init(Server::GetInstance(), mOTARequestorStorage, mOTARequestorDriver, mOTADownloader,
-                                                mOTARequestorAttributes, mOTARequestorCluster.Cluster()));
+    ReturnErrorOnFailure(mOTARequestorCore.Init(Server::GetInstance(), mOTARequestorStorage, mOTARequestorDriver,
+                                                mOTADownloader, mOTARequestorAttributes, mOTARequestorCluster.Cluster()));
 
     auto & imageProcessor = OTAImageProcessorImpl::GetDefaultInstance();
     mOTARequestorDriver.Init(&mOTARequestorCore, &imageProcessor);

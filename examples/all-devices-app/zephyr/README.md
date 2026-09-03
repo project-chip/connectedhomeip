@@ -6,30 +6,31 @@ device types are selected at build time. The default device is an on/off light.
 
 ## Setup
 
-This setup section will be improved. For now, follow the generic Zephyr setup:
+Follow the generic Zephyr setup:
 
 https://docs.zephyrproject.org/latest/develop/getting_started/index.html
 
 Then return to the Matter repository and run the Matter bootstrap:
 
 ```sh
-cd ~/src/connectedhomeip
+cd $HOME/src/connectedhomeip
 . ./scripts/bootstrap.sh
 ```
 
 Make sure the Zephyr virtual environment is first in `PATH`:
 
 ```sh
-export PATH="~/zephyrproject/.venv/bin:$PATH"
+export PATH="$HOME/zephyrproject/.venv/bin:$PATH"
 ```
 
 ## Build
 
-Within the `~/zephyrproject/` directory, build the app with West and sysbuild:
+Within the `$HOME/zephyrproject/` directory, build the app with West and
+sysbuild:
 
 ```sh
 west build -p always -b xg26_rb4118a --sysbuild \
-	~/src/connectedhomeip/examples/all-devices-app/zephyr \
+	$HOME/src/connectedhomeip/examples/all-devices-app/zephyr \
 	-d build/all-devices-zephyr-xg26 -- -DUSE_CCACHE=0
 ```
 
@@ -70,7 +71,7 @@ west build ... -- \
 ## Factory Reset
 
 Press and hold button 0 for 5 seconds to factory reset the device. Button 0 is
-the `sw0` devicetree button, defined by the board devicetree or an overlay.
+defined as `sw0` in a board overlay.
 
 ## Custom AppTask
 
