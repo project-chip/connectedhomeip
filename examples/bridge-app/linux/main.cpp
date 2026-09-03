@@ -548,10 +548,10 @@ private:
     DeviceTempSensor * mDevice;
 };
 
-std::unique_ptr<TempMeasurementAttrAccess> gTempMeasurement1;
-std::unique_ptr<TempMeasurementAttrAccess> gTempMeasurement2;
-std::unique_ptr<TempMeasurementAttrAccess> gComposedTempMeasurement1;
-std::unique_ptr<TempMeasurementAttrAccess> gComposedTempMeasurement2;
+static std::unique_ptr<TempMeasurementAttrAccess> gTempMeasurement1;
+static std::unique_ptr<TempMeasurementAttrAccess> gTempMeasurement2;
+static std::unique_ptr<TempMeasurementAttrAccess> gComposedTempMeasurement1;
+static std::unique_ptr<TempMeasurementAttrAccess> gComposedTempMeasurement2;
 
 class BridgedPowerSourceAttrAccess : public AttributeAccessInterface
 {
