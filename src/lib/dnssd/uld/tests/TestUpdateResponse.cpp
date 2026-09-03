@@ -97,11 +97,13 @@ TEST(TestUpdateResponse, ParsesExtendedResponseCodeAndKey)
     ASSERT_EQ(response.Parse(ByteSpan(packet)), CHIP_NO_ERROR);
     EXPECT_EQ(response.GetMessageId(), 0x1234);
     EXPECT_EQ(response.GetResponseCode(), 0x2B);
-    ASSERT_TRUE(response.GetKey().has_value());
-
-    const Crypto::P256PublicKey & publicKey = response.GetKey().value();
-    EXPECT_EQ(publicKey.ConstBytes()[0], 0x04);
-    EXPECT_EQ(memcmp(publicKey.ConstBytes() + 1, packet.data() + kKeyBytesOffset, kP256RawPublicKeySize), 0);
+    const std::optional<Crypto::P256PublicKey> & key = response.GetKey();
+    ASSERT_TRUE(key.has_value());
+    if (key.has_value())
+    {
+        EXPECT_EQ(key->ConstBytes()[0], 0x04);
+        EXPECT_EQ(memcmp(key->ConstBytes() + 1, packet.data() + kKeyBytesOffset, kP256RawPublicKeySize), 0);
+    }
 }
 
 TEST(TestUpdateResponse, RejectsUnsupportedKeyMetadata)

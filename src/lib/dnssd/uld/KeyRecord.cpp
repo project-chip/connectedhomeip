@@ -32,8 +32,12 @@ bool KeyResourceRecord::WriteData(RecordWriter & out) const
     static_assert(Crypto::kP256_PublicKey_Length == kP256RawPublicKeySize + 1);
     VerifyOrReturnValue(mPublicKey.IsUncompressed(), false);
 
+    const uint8_t * rawBegin = mPublicKey.ConstBytes() + 1;
+    const uint8_t * rawEnd   = rawBegin + kP256RawPublicKeySize;
+    VerifyOrReturnValue(std::any_of(rawBegin, rawEnd, [](uint8_t value) { return value != 0; }), false);
+
     out.Put16(kKeyFlags).Put8(kKeyProtocolDnssec).Put8(kKeyAlgorithmEcdsaP256);
-    out.Writer().Put(mPublicKey.ConstBytes() + 1, kP256RawPublicKeySize);
+    out.Writer().Put(rawBegin, kP256RawPublicKeySize);
     return out.Fit();
 }
 

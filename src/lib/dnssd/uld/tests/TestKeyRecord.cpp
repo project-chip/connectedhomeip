@@ -88,6 +88,25 @@ TEST(TestKeyRecord, RejectsNonUncompressedKey)
     EXPECT_EQ(header.GetAuthorityCount(), 0);
 }
 
+TEST(TestKeyRecord, RejectsAllZeroRawPublicKey)
+{
+    uint8_t headerBuffer[HeaderRef::kSizeBytes];
+    uint8_t dataBuffer[128];
+    Crypto::P256PublicKey publicKey;
+    memset(publicKey.Bytes(), 0, publicKey.Length());
+    publicKey.Bytes()[0] = 0x04;
+
+    HeaderRef header(headerBuffer);
+    header.Clear();
+
+    BufferWriter output(dataBuffer, sizeof(dataBuffer));
+    RecordWriter writer(&output);
+
+    KeyResourceRecord record(kNames, publicKey);
+    EXPECT_FALSE(record.Append(header, ResourceType::kAuthority, writer));
+    EXPECT_EQ(header.GetAuthorityCount(), 0);
+}
+
 TEST(TestKeyRecord, ParseReconstructsUncompressedPublicKey)
 {
     uint8_t rdata[4 + kP256RawPublicKeySize] = {};
