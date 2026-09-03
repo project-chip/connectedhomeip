@@ -20,6 +20,7 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
 from matter.clusters.Attribute import ValueDecodeFailure
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.timeoperations import utc_time_in_matter_epoch
@@ -260,7 +261,6 @@ class DEMTestBase:
             expected_max_power: Expected maxPower value. Pass None to expect NullValue, or an int for the expected value.
             expected_duration: Expected duration value in seconds.
         """
-        from matter.clusters.Types import NullValue
 
         asserts.assert_false(isinstance(event_data, ValueDecodeFailure),
                              "Event data should be properly decoded, not a decode failure")
