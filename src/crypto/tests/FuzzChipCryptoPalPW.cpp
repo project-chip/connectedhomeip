@@ -47,7 +47,6 @@
 #include <pw_fuzzer/fuzztest.h>
 #include <pw_unit_test/framework.h>
 
-#include <credentials/attestation_verifier/TestPAAStore.h>
 #include <credentials/tests/CHIPAttCert_test_vectors.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CHIPMem.h>

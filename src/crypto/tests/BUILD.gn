@@ -92,7 +92,6 @@ if (pw_enable_fuzz_test_targets) {
   chip_pw_fuzz_target("fuzz-chip-crypto-pal-pw") {
     test_source = [ "FuzzChipCryptoPalPW.cpp" ]
     public_deps = [
-      "${chip_root}/src/credentials:test_paa_store",
       "${chip_root}/src/credentials/tests:cert_test_vectors",
       "${chip_root}/src/crypto",
       "${chip_root}/src/platform/logging:default",
