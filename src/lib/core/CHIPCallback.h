@@ -45,6 +45,13 @@
  *
  * Refer to the documentation of Callback and Cancelable below for details.
  *
+ * Note that Callback<T>, Cancelable, and related classes are not thread-safe; they must only be
+ * used by a caller and callee that share a serial context. This is inherent to the design rather
+ * than a missing lock: neither the promise that no invocation follows Cancel() nor an accessor
+ * like IsRegistered() mean anything if the callee can concurrently be part-way through a
+ * completion. Generally the serial context will be the Matter event loop, or another thread
+ * holding the Matter stack lock.
+ *
  * While the concrete interaction patterns vary, the following are strong recommendations,
  * especially for asynchronous operations that have a single outcome:
  *
