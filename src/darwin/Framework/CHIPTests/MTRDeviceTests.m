@@ -6245,22 +6245,16 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // We relaunch the app multiple times, to try to trigger time
     // synchronization loss detection. These are the different cases:
     //
-    //   1) Relaunch with a bad clock, this should just trigger an update,
-    //      because it's the first time that we detect a bad time.
-    //   2) Relaunch with a bad clock again, this should not trigger an update,
-    //      because we avoid doing it too soon after a previous update (see
-    //      MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_CADENCE).
-    //   3) Set the cadence to zero and relaunch with a bad clock again. This
-    //      should trigger an update, because with cadence being zero we won't
-    //      block an update.
-    //   4) Relaunch with a slightly bad clock (and cadence still set to zero).
-    //      This should not trigger an update, because the time is not out of
-    //      sync enough.
+    //   1) Relaunch with a bad clock, this should trigger an update.
+    //   2) Relaunch with a bad clock again, this should trigger an update too:
+    //      a device with no battery-backed RTC loses its clock on every power
+    //      cycle, and the budget gives us room to repair several in a row.
+    //   3) Same again, still within the budget, so still an update.
+    //   4) Relaunch with a slightly bad clock. This should not trigger an
+    //      update, because the time is not out of sync enough.
+    //
+    // test049a covers exhausting the budget, without relaunching the app.
     for (int i = 0; i < 4; ++i) {
-        if (i == 2) {
-            delegate.forceTimeSynchronizationLossDetectionCadenceToZero = YES;
-        }
-
         __weak __auto_type weakDelegate = delegate;
 
         XCTestExpectation * subscriptionDroppedExpectation = [self expectationWithDescription:@"Subscription has dropped"];
@@ -6285,7 +6279,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 XCTAssertNil(error);
                 [correctedTime fulfill];
             };
-            if (i == 1 || i == 3) {
+            if (i == 3) {
                 correctedTime.inverted = YES;
             }
             [resubscriptionReachableExpectation fulfill];
@@ -6313,6 +6307,101 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     }
 }
 
+// Tests that we only repair a device's clock BUDGET times per window, so a device that
+// cannot keep its clock does not have us updating it forever.
+- (void)test049a_TimeSynchronizationRepairIsRateLimited
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    XCTAssertNotNil(controller);
+
+    // The mock clock is required, not just convenient: without it the app has to set the
+    // real system clock, which it cannot do, so every SetUTCTime fails with
+    // TimeNotAccepted. Starting at the Matter epoch also means the app's own priming report
+    // shows a lost clock, which costs no budget because no update is scheduled yet.
+    MTRTestCaseServerApp * app = [self startCommissionedAppWithName:@"all-clusters"
+                                                          arguments:@[ @"--use_mock_clock", @"0" ]
+                                                         controller:controller
+                                                            payload:kOnboardingPayload2
+                                                             nodeID:@(kDeviceId2)];
+    XCTAssertNotNil(app);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    // Repairs are scheduled rather than performed inline, so without this every iteration
+    // would wait out MTR_DEVICE_TIME_UPDATE_SHORT_WAIT_TIME_SEC.
+    delegate.forceTimeUpdateShortDelayToZero = YES;
+
+    // Let the update that subscription establishment schedules finish first. It costs no
+    // budget (nothing is spent unless a long-delay update was already pending), and it
+    // leaves exactly that long-delay update pending, which is what a repair needs.
+    XCTestExpectation * baselineTimeSet = [self expectationWithDescription:@"Baseline SetUTCTime"];
+    __weak __auto_type weakDelegateForBaseline = delegate;
+    delegate.onUTCTimeSet = ^(NSError * error) {
+        __strong __auto_type strongDelegate = weakDelegateForBaseline;
+        strongDelegate.onUTCTimeSet = nil;
+        XCTAssertNil(error);
+        [baselineTimeSet fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ baselineTimeSet ] timeout:60];
+
+    // UTCTime = null means the device has no time, which is a time synchronization loss.
+    NSArray * nullTimeSyncReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0)
+                                                                  clusterID:@(MTRClusterIDTypeTimeSynchronizationID)
+                                                                attributeID:@(MTRAttributeIDTypeClusterTimeSynchronizationAttributeUTCTimeID)],
+        MTRDataKey : @ {
+            MTRTypeKey : MTRNullValueType,
+        }
+    } ];
+
+    // Injecting the report is enough to hit the repair path; no need to restart the app
+    // with a bad clock the way test049 does.
+    __weak __auto_type weakDelegate = delegate;
+    __auto_type injectLoss = ^(BOOL expectRepair, NSString * label) {
+        XCTestExpectation * repaired = [self expectationWithDescription:[NSString stringWithFormat:@"SetUTCTime for %@", label]];
+        repaired.inverted = !expectRepair;
+        XCTestExpectation * reportEnded = [self expectationWithDescription:[NSString stringWithFormat:@"Report end for %@", label]];
+        // Clear the handlers as they fire, so a later report cannot reach an expectation
+        // an earlier iteration is done with.
+        delegate.onUTCTimeSet = ^(NSError * error) {
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onUTCTimeSet = nil;
+            XCTAssertNil(error);
+            [repaired fulfill];
+        };
+        delegate.onReportEnd = ^{
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onReportEnd = nil;
+            [reportEnded fulfill];
+        };
+
+        [device unitTestInjectAttributeReport:nullTimeSyncReport fromSubscription:YES];
+        [self waitForExpectations:@[ reportEnded ] timeout:kTimeoutInSeconds];
+        // Short timeout for the inverted ones, so a passing test does not sit there
+        // proving a negative.
+        [self waitForExpectations:@[ repaired ] timeout:expectRepair ? 60 : 5];
+    };
+
+    // The whole loop runs well inside the window, so losses past the budget must not be
+    // repaired.
+    const int budget = 5; // MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_BUDGET
+    for (int i = 0; i < budget; ++i) {
+        injectLoss(YES, [NSString stringWithFormat:@"loss %d", i]);
+    }
+    injectLoss(NO, @"loss past budget");
+    injectLoss(NO, @"another loss past budget");
+
+    // Forcing the window to zero stands in for waiting it out; test049c covers it sliding
+    // entry by entry.
+    delegate.timeSynchronizationLossDetectionCadenceOverride = @(0);
+    injectLoss(YES, @"loss after window");
+}
+
 // Tests that time synchronization loss is detected even when the cached CurrentTime
 // value has not changed (i.e. when the device power-cycles repeatedly and always
 // reports null, matching what we already have in cache from the previous cycle).
@@ -6323,7 +6412,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
     __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
     delegate.skipSetupSubscription = YES;
-    delegate.forceTimeSynchronizationLossDetectionCadenceToZero = YES;
+    delegate.timeSynchronizationLossDetectionCadenceOverride = @(0);
 
     [device setDelegate:delegate queue:queue];
 
@@ -6377,6 +6466,61 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [device unitTestInjectAttributeReport:nullTimeSyncReport fromSubscription:NO];
     [self waitForExpectations:@[ nonSubscriptionReportEnd ] timeout:kTimeoutInSeconds];
     [self waitForExpectations:@[ noLossFromRead ] timeout:2];
+}
+
+// Tests that the window slides: budget frees up as individual repairs age out, rather
+// than the whole window being discarded at once.
+- (void)test049c_TimeSynchronizationRepairBudgetWindowSlides
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    // We never subscribe, so the node does not have to exist, and tearDown removes this
+    // device so we start with the whole budget unspent.
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:sController];
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+
+    [device setDelegate:delegate queue:queue];
+
+    const int budget = 5; // MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_BUDGET
+    const int olderGroupCount = 3;
+
+    // Spend part of the budget, then leave a gap before spending the rest, so the two
+    // groups have ages we can tell apart below.
+    for (int i = 0; i < olderGroupCount; ++i) {
+        XCTAssertTrue([device unitTestShouldDetectTimeSynchronizationLoss]);
+        [device unitTestNoteTimeSynchronizationRepairScheduled];
+    }
+    NSDate * olderGroupEnd = [NSDate now];
+
+    // The newer group ages past the window chosen below after gap/2, so keep the gap
+    // comfortably longer than the work that follows.
+    [NSThread sleepForTimeInterval:3];
+
+    NSDate * newerGroupStart = [NSDate now];
+    for (int i = olderGroupCount; i < budget; ++i) {
+        XCTAssertTrue([device unitTestShouldDetectTimeSynchronizationLoss]);
+        [device unitTestNoteTimeSynchronizationRepairScheduled];
+    }
+
+    // Budget is spent.
+    XCTAssertFalse([device unitTestShouldDetectTimeSynchronizationLoss]);
+
+    // Age out only the older group. Its entries are all at least (now - olderGroupEnd)
+    // old and the newer group's are at most (now - newerGroupStart), so any window
+    // between those two ages expires exactly the older group.
+    NSTimeInterval youngestOlderGroupAge = -[olderGroupEnd timeIntervalSinceNow];
+    NSTimeInterval oldestNewerGroupAge = -[newerGroupStart timeIntervalSinceNow];
+    XCTAssertGreaterThan(youngestOlderGroupAge, oldestNewerGroupAge);
+    delegate.timeSynchronizationLossDetectionCadenceOverride = @((youngestOlderGroupAge + oldestNewerGroupAge) / 2);
+
+    // Exactly olderGroupCount slots came back. Expiring the window all at once would give
+    // us the whole budget, and dropping one entry per check would give us fewer.
+    for (int i = 0; i < olderGroupCount; ++i) {
+        XCTAssertTrue([device unitTestShouldDetectTimeSynchronizationLoss]);
+        [device unitTestNoteTimeSynchronizationRepairScheduled];
+    }
+    XCTAssertFalse([device unitTestShouldDetectTimeSynchronizationLoss]);
 }
 
 - (void)test050_readAttributePaths_withWildCardPath
