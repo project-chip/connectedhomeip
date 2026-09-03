@@ -18,6 +18,7 @@
 
 #include <pw_unit_test/framework.h>
 
+#include <type_traits>
 #include <vector>
 
 #include <controller/python/matter/case_capture/CASEHandshakeMetricsBackend.h>
@@ -73,6 +74,27 @@ public:
 private:
     uint8_t mBytes[8] = {};
 };
+
+// Some interface, whatever an interface handle happens to be on this platform: an index on POSIX,
+// a pointer to a netif on LwIP. Only whether an interface is stated matters to these tests, never
+// which one it names, and the value is never dereferenced. Two overloads rather than `if
+// constexpr`, because in a plain function both branches would still have to compile everywhere.
+template <typename PlatformType, std::enable_if_t<std::is_pointer<PlatformType>::value, int> = 0>
+PlatformType SomeInterfaceHandle()
+{
+    return reinterpret_cast<PlatformType>(sizeof(void *));
+}
+
+template <typename PlatformType, std::enable_if_t<!std::is_pointer<PlatformType>::value, int> = 0>
+PlatformType SomeInterfaceHandle()
+{
+    return static_cast<PlatformType>(1);
+}
+
+chip::Inet::InterfaceId SomeInterface()
+{
+    return chip::Inet::InterfaceId(SomeInterfaceHandle<chip::Inet::InterfaceId::PlatformType>());
+}
 
 PeerAddress AddressWithInterface(const char * literal, uint16_t port, chip::Inet::InterfaceId interface)
 {
@@ -301,7 +323,7 @@ TEST_F(TestCASEHandshakeMetricsBackend, DiscoveryMatchesWhenOnlyOneSideNamesTheI
     // while an inbound packet always carries the interface it arrived on. Comparing the two whole
     // addresses would never match for a peer reached through a router.
     const PeerAddress resolved = AddressWithInterface("fd11::7", 5540, chip::Inet::InterfaceId::Null());
-    const PeerAddress observed = AddressWithInterface("fd11::7", 5540, chip::Inet::InterfaceId(3));
+    const PeerAddress observed = AddressWithInterface("fd11::7", 5540, SomeInterface());
     const StatusReportBody success(kGeneralCodeSuccess, kProtocolCodeSuccess);
 
     ResolveNode(kPeerNodeId, resolved);
