@@ -171,9 +171,9 @@ Clusters::Identify::EffectIdentifierEnum sIdentifyEffect = Clusters::Identify::E
 ObjectPool<Identify, MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT> IdentifyPool;
 #endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
 
-int sCodeDrivenIdentifyActiveCount                                  = 0;
-Clusters::Identify::EffectIdentifierEnum sCodeDrivenIdentifyEffect  = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
-Clusters::Identify::EffectVariantEnum sCodeDrivenIdentifyVariant    = Clusters::Identify::EffectVariantEnum::kDefault;
+int sCodeDrivenIdentifyActiveCount                                 = 0;
+Clusters::Identify::EffectIdentifierEnum sCodeDrivenIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
+Clusters::Identify::EffectVariantEnum sCodeDrivenIdentifyVariant   = Clusters::Identify::EffectVariantEnum::kDefault;
 
 } // namespace
 
@@ -405,7 +405,7 @@ bool BaseApplication::ActivateStatusLedPatterns()
 #if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)))
     // Local copy to prevent race condition
     Clusters::Identify::EffectIdentifierEnum activeEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
-    bool isIdentifyActive = false;
+    bool isIdentifyActive                                 = false;
 #ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
     for (const auto & obj : IdentifyPool)
     {
@@ -471,7 +471,6 @@ bool BaseApplication::ActivateStatusLedPatterns()
         }
         isPatternSet = true;
     }
-
 
 #if !(CHIP_CONFIG_ENABLE_ICD_SERVER)
     // Identify Patterns have priority over Status patterns
@@ -787,7 +786,6 @@ void emberAfIdentifyClusterInitCallback(chip::EndpointId endpoint)
                               Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, BaseApplication::OnTriggerIdentifyEffect);
 }
 #endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
-
 
 namespace {
 void CodeDrivenTriggerEffectCompleted(chip::System::Layer *, void *)
