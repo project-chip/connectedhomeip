@@ -37,9 +37,6 @@ config STREAM_FLASH
 config STREAM_FLASH_ERASE
 	default n
 
-config IMG_MANAGER
-	default n
-
 config BOOTLOADER_MCUBOOT
 	default y
 
