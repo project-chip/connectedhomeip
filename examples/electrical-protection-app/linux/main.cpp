@@ -68,14 +68,11 @@ void ApplicationInit()
     VerifyOrDie(SetTagList(kBreakerEndpointId, Span<const Descriptor::Structs::SemanticTagStruct::Type>(kBreakerTagList)) ==
                 CHIP_NO_ERROR);
 
-    // Electrical Alarm reports measurement-threshold alarms on the breaker. It is one of the
-    // choice-group members the breaker device type offers, and it makes OverCurrent mandatory.
-    // AdjustableThresholds is offered too, so the thresholds behind that alarm can be set at
-    // runtime; without it SetElectricalAlarmThresholds is absent and TC-ESALM-2.2 has no DUT.
-    VerifyOrDie(ElectricalAlarm::ElectricalAlarmInit(
-                    kBreakerEndpointId,
-                    BitMask<ElectricalAlarm::Feature>(ElectricalAlarm::Feature::kOverCurrent,
-                                                      ElectricalAlarm::Feature::kAdjustableThresholds)) == CHIP_NO_ERROR);
+    // Electrical Alarm reports measurement-threshold alarms on the breaker. The device type makes
+    // OverCurrent mandatory and leaves the rest optional; this app offers every feature so that a
+    // test script gating on any one of them has a DUT. Each alarm-class feature exposes its own
+    // threshold attribute, and ADJUST exposes SetElectricalAlarmThresholds over all of them.
+    VerifyOrDie(ElectricalAlarm::ElectricalAlarmInit(kBreakerEndpointId, ElectricalAlarm::kAllFeatures) == CHIP_NO_ERROR);
 }
 
 void ApplicationShutdown()

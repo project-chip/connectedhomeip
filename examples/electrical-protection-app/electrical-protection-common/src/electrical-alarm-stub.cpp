@@ -18,6 +18,7 @@
 
 #include <electrical-alarm-stub.h>
 
+#include <app/clusters/electrical-alarm-server/ElectricalAlarmTestEventTriggerHandler.h>
 #include <lib/support/CodeUtils.h>
 
 #include <memory>
@@ -60,14 +61,34 @@ CHIP_ERROR ElectricalAlarmInit(EndpointId endpointId, BitMask<Feature> features)
         return err;
     }
 
-    // Supported defaults to empty; declare the one alarm this endpoint can raise so Mask and State
-    // have something to narrow against.
-    Protocols::InteractionModel::Status status =
-        gInstance->Cluster().SetSupportedValue(BitMask<AlarmBitmap>(AlarmBitmap::kOverCurrent));
+    // Supported defaults to empty; declare every alarm so Mask and State have the widest set to
+    // narrow against, and so a test script exercising any one alarm bit has a DUT.
+    Protocols::InteractionModel::Status status = gInstance->Cluster().SetSupportedValue(kAllAlarms);
     if (status != Protocols::InteractionModel::Status::Success)
     {
         gInstance.reset();
         return CHIP_ERROR_INTERNAL;
+    }
+
+    // Mask defaults to empty, which suppresses every alarm and makes State undrivable. Enable them
+    // all so a test can activate any alarm it asks for.
+    status = gInstance->Cluster().SetMaskValue(kAllAlarms);
+    if (status != Protocols::InteractionModel::Status::Success)
+    {
+        gInstance.reset();
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    // Latch every alarm when RST is offered, so an activated alarm stays active until Reset clears
+    // it. Without this the Reset command has nothing to act on.
+    if (features.Has(Feature::kReset))
+    {
+        status = gInstance->Cluster().SetLatchValue(kAllAlarms);
+        if (status != Protocols::InteractionModel::Status::Success)
+        {
+            gInstance.reset();
+            return CHIP_ERROR_INTERNAL;
+        }
     }
     return CHIP_NO_ERROR;
 }
@@ -79,3 +100,47 @@ void ElectricalAlarmShutdown()
 }
 
 } // namespace chip::app::Clusters::ElectricalAlarm
+
+bool HandleElectricalAlarmTestEventTrigger(uint64_t eventTrigger)
+{
+    VerifyOrReturnValue(gInstance != nullptr, false);
+    auto & cluster = gInstance->Cluster();
+
+    // Activating is additive: OR the requested bit into the current State so a test can raise
+    // several alarms in sequence.
+    auto activate = [&cluster](AlarmBitmap alarm) {
+        BitMask<AlarmBitmap> next = cluster.GetState();
+        next.Set(alarm);
+        return cluster.SetStateValue(next) == Protocols::InteractionModel::Status::Success;
+    };
+
+    switch (static_cast<ElectricalAlarmTrigger>(eventTrigger))
+    {
+    case ElectricalAlarmTrigger::kClearAll:
+        // Models the measured condition going away, not an operator acknowledging it: latched
+        // alarms deliberately stay active here and clear only via the Reset command.
+        return cluster.SetStateValue(BitMask<AlarmBitmap>()) == Protocols::InteractionModel::Status::Success;
+    case ElectricalAlarmTrigger::kSetOverVoltage:
+        return activate(AlarmBitmap::kOverVoltage);
+    case ElectricalAlarmTrigger::kSetUnderVoltage:
+        return activate(AlarmBitmap::kUnderVoltage);
+    case ElectricalAlarmTrigger::kSetOverFrequency:
+        return activate(AlarmBitmap::kOverFrequency);
+    case ElectricalAlarmTrigger::kSetUnderFrequency:
+        return activate(AlarmBitmap::kUnderFrequency);
+    case ElectricalAlarmTrigger::kSetOverPower:
+        return activate(AlarmBitmap::kOverPower);
+    case ElectricalAlarmTrigger::kSetUnderPower:
+        return activate(AlarmBitmap::kUnderPower);
+    case ElectricalAlarmTrigger::kSetOverCurrent:
+        return activate(AlarmBitmap::kOverCurrent);
+    case ElectricalAlarmTrigger::kSetUnderCurrent:
+        return activate(AlarmBitmap::kUnderCurrent);
+    case ElectricalAlarmTrigger::kSetPowerImport:
+        return activate(AlarmBitmap::kPowerImported);
+    case ElectricalAlarmTrigger::kSetPowerExport:
+        return activate(AlarmBitmap::kPowerExported);
+    default:
+        return false;
+    }
+}
