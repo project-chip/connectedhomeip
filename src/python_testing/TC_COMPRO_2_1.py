@@ -42,8 +42,7 @@ cluster are present and within spec-defined constraints.
 
 This test reads and writes only the proxy's own cluster attributes; it does not
 use an End Device.  None of the ``ed_*`` arguments (or the standalone-serial
-setup) apply, and ``--paa-trust-store-path`` is unnecessary — there is no
-tunnelled commissioning to attest.
+setup) apply.
 
 Test plan reference: TC-COMPRO-2.1 (PROVISIONAL)
 
