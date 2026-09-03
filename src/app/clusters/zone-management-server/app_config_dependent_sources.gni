@@ -14,5 +14,7 @@
 app_config_dependent_sources = [
   "CodegenIntegration.cpp",
   "CodegenIntegration.h",
+  "MigrateZoneManagementServerStorage.cpp",
+  "MigrateZoneManagementServerStorage.h",
   "zone-management-server.h",
 ]
