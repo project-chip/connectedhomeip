@@ -510,8 +510,7 @@ class TempMeasurementAttrAccess : public AttributeAccessInterface
 {
 public:
     TempMeasurementAttrAccess(EndpointId endpointId, DeviceTempSensor * device) :
-        AttributeAccessInterface(chip::MakeOptional(endpointId), TemperatureMeasurement::Id),
-        mDevice(device)
+        AttributeAccessInterface(chip::MakeOptional(endpointId), TemperatureMeasurement::Id), mDevice(device)
     {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override
@@ -523,23 +522,23 @@ public:
 
         switch (aPath.mAttributeId)
         {
-            case TemperatureMeasurement::Attributes::MeasuredValue::Id:
-                return aEncoder.Encode(mDevice->GetMeasuredValue());
+        case TemperatureMeasurement::Attributes::MeasuredValue::Id:
+            return aEncoder.Encode(mDevice->GetMeasuredValue());
 
-            case TemperatureMeasurement::Attributes::MinMeasuredValue::Id:
-                return aEncoder.Encode(mDevice->mMin);
+        case TemperatureMeasurement::Attributes::MinMeasuredValue::Id:
+            return aEncoder.Encode(mDevice->mMin);
 
-            case TemperatureMeasurement::Attributes::MaxMeasuredValue::Id:
-                return aEncoder.Encode(mDevice->mMax);
+        case TemperatureMeasurement::Attributes::MaxMeasuredValue::Id:
+            return aEncoder.Encode(mDevice->mMax);
 
-            case TemperatureMeasurement::Attributes::FeatureMap::Id:
-                return aEncoder.Encode(static_cast<uint32_t>(ZCL_TEMPERATURE_SENSOR_FEATURE_MAP));
+        case TemperatureMeasurement::Attributes::FeatureMap::Id:
+            return aEncoder.Encode(static_cast<uint32_t>(ZCL_TEMPERATURE_SENSOR_FEATURE_MAP));
 
-            case TemperatureMeasurement::Attributes::ClusterRevision::Id:
-                return aEncoder.Encode(static_cast<uint16_t>(ZCL_TEMPERATURE_SENSOR_CLUSTER_REVISION));
+        case TemperatureMeasurement::Attributes::ClusterRevision::Id:
+            return aEncoder.Encode(static_cast<uint16_t>(ZCL_TEMPERATURE_SENSOR_CLUSTER_REVISION));
 
-            default:
-                break;
+        default:
+            break;
         }
 
         return CHIP_NO_ERROR;
@@ -987,8 +986,10 @@ void ApplicationInit()
     gTempMeasurement1 = std::make_unique<TempMeasurementAttrAccess>(TempSensor1.GetEndpointId(), &TempSensor1);
     gTempMeasurement2 = std::make_unique<TempMeasurementAttrAccess>(TempSensor2.GetEndpointId(), &TempSensor2);
 
-    gComposedTempMeasurement1 = std::make_unique<TempMeasurementAttrAccess>(ComposedTempSensor1.GetEndpointId(), &ComposedTempSensor1);
-    gComposedTempMeasurement2 = std::make_unique<TempMeasurementAttrAccess>(ComposedTempSensor2.GetEndpointId(), &ComposedTempSensor2);
+    gComposedTempMeasurement1 =
+        std::make_unique<TempMeasurementAttrAccess>(ComposedTempSensor1.GetEndpointId(), &ComposedTempSensor1);
+    gComposedTempMeasurement2 =
+        std::make_unique<TempMeasurementAttrAccess>(ComposedTempSensor2.GetEndpointId(), &ComposedTempSensor2);
 
     AttributeAccessInterfaceRegistry::Instance().Register(gTempMeasurement1.get());
     AttributeAccessInterfaceRegistry::Instance().Register(gTempMeasurement2.get());
