@@ -24,7 +24,6 @@ CommandHandlerInterfaceOnlyClusters:
     # This uses asUpperCamelCase versions of the cluster name.
     # keep-sorted start
     - Camera AV Settings User Level Management
-    - Commodity Price
     - Commodity Tariff
     - Electrical Distribution
     - Electrical Energy Measurement
@@ -80,7 +79,6 @@ ClustersWithShutdownFunctions:
 ClustersWithPreAttributeChangeFunctions:
     # keep-sorted start
     - Door Lock
-    - Mode Select
     - Pump Configuration and Control
     - Thermostat User Interface Configuration
     # keep-sorted end
@@ -95,6 +93,7 @@ CodeDrivenClusters:
     - Administrator Commissioning
     - Air Quality
     - Ambient Context Sensing
+    - Audio Control
     - Basic Information
     - Binding
     - Boolean State
@@ -106,10 +105,12 @@ CodeDrivenClusters:
     - Closure Dimension
     - Commissioner Control
     - Commissioning Proxy
+    - Commodity Price
     - Descriptor
     - Device Energy Management
     - Device Energy Management Mode
     - Diagnostic Logs
+    - Dishwasher Alarm
     - Dishwasher Mode
     - Dynamic Lighting
     - Electrical Power Measurement
@@ -138,6 +139,7 @@ CodeDrivenClusters:
     - Media File Management
     - Microwave Oven Control
     - Microwave Oven Mode
+    - Mode Select
     - Network Identity Management
     - OTA Software Update Provider
     - OTA Software Update Requestor
@@ -153,6 +155,7 @@ CodeDrivenClusters:
     - RVC Clean Mode
     - RVC Operational State
     - RVC Run Mode
+    - Refrigerator Alarm
     - Refrigerator And Temperature Controlled Cabinet Mode
     - Relative Humidity Measurement
     - Scenes Management

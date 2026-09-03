@@ -7759,24 +7759,6 @@ bool emberAfLevelControlClusterMoveToClosestFrequencyCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::LevelControl::Commands::MoveToClosestFrequency::DecodableType & commandData);
 /**
- * @brief Mode Select Cluster ChangeToMode Command callback (from client)
- */
-bool emberAfModeSelectClusterChangeToModeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ModeSelect::Commands::ChangeToMode::DecodableType & commandData);
-/**
- * @brief Dishwasher Alarm Cluster Reset Command callback (from client)
- */
-bool emberAfDishwasherAlarmClusterResetCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::DishwasherAlarm::Commands::Reset::DecodableType & commandData);
-/**
- * @brief Dishwasher Alarm Cluster ModifyEnabledAlarms Command callback (from client)
- */
-bool emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::DishwasherAlarm::Commands::ModifyEnabledAlarms::DecodableType & commandData);
-/**
  * @brief Water Tank Level Monitoring Cluster ResetCondition Command callback (from client)
  */
 bool emberAfWaterTankLevelMonitoringClusterResetConditionCallback(
@@ -8393,42 +8375,6 @@ bool emberAfContentControlClusterRemoveBlockContentTimeWindowCallback(
 bool emberAfContentAppObserverClusterContentAppMessageCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessage::DecodableType & commandData);
-/**
- * @brief Audio Control Cluster Mute Command callback (from client)
- */
-bool emberAfAudioControlClusterMuteCallback(chip::app::CommandHandler * commandObj,
-                                            const chip::app::ConcreteCommandPath & commandPath,
-                                            const chip::app::Clusters::AudioControl::Commands::Mute::DecodableType & commandData);
-/**
- * @brief Audio Control Cluster Unmute Command callback (from client)
- */
-bool emberAfAudioControlClusterUnmuteCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::AudioControl::Commands::Unmute::DecodableType & commandData);
-/**
- * @brief Audio Control Cluster ToggleMuted Command callback (from client)
- */
-bool emberAfAudioControlClusterToggleMutedCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::AudioControl::Commands::ToggleMuted::DecodableType & commandData);
-/**
- * @brief Audio Control Cluster SetVolume Command callback (from client)
- */
-bool emberAfAudioControlClusterSetVolumeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::AudioControl::Commands::SetVolume::DecodableType & commandData);
-/**
- * @brief Audio Control Cluster IncreaseVolume Command callback (from client)
- */
-bool emberAfAudioControlClusterIncreaseVolumeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::AudioControl::Commands::IncreaseVolume::DecodableType & commandData);
-/**
- * @brief Audio Control Cluster DecreaseVolume Command callback (from client)
- */
-bool emberAfAudioControlClusterDecreaseVolumeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::AudioControl::Commands::DecreaseVolume::DecodableType & commandData);
 /**
  * @brief AV Analysis Cluster EnableContextTriggers Command callback (from client)
  */
