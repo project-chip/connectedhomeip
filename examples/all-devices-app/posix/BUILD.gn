@@ -60,6 +60,7 @@ executable("all-devices-app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/laundry-washer",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/light-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/microwave-oven",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mode-select",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-dimmable-load-control",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-on-off-control",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/network-infrastructure-manager",

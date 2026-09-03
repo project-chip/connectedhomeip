@@ -131,7 +131,7 @@ To update or validate this list manually, follow these steps:
 | 85        | Meter Identification                                       | 2822 (0x0B06) | No                 | No                  |                                       |
 | 86        | Microwave Oven Control                                     | 95 (0x005F)   | Yes                | No                  |                                       |
 | 87        | Microwave Oven Mode                                        | 94 (0x005E)   | Yes                | No                  | Instance of Mode Base                 |
-| 88        | Mode Select                                                | 80 (0x0050)   | No                 | No                  |                                       |
+| 88        | Mode Select                                                | 80 (0x0050)   | Yes                | Yes                 |                                       |
 | 89        | Network Commissioning                                      | 49 (0x0031)   | Yes                | Yes                 |                                       |
 | 90        | Network Identity Management                                | 1104 (0x0450) | Yes                | No                  |                                       |
 | 91        | Nitrogen Dioxide Concentration Measurement                 | 1043 (0x0413) | Yes                | Yes                 | Instance of Concentration Measurement |
