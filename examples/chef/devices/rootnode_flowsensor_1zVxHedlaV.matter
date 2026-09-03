@@ -1625,11 +1625,6 @@ cluster OperationalCredentials = 62 {
 cluster GroupKeyManagement = 63 {
   revision 4;
 
-  enum GroupKeyMulticastPolicyEnum : enum8 {
-    kPerGroupID = 0;
-    kAllNodes = 1;
-  }
-
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
     kCacheAndSync = 1;
@@ -1712,7 +1707,7 @@ cluster GroupKeyManagement = 63 {
 
 /** Attributes and commands for configuring the measurement of flow, and reporting flow measurements. */
 cluster FlowMeasurement = 1028 {
-  revision 3;
+  revision 5;
 
   readonly attribute nullable int16u measuredValue = 0;
   readonly attribute nullable int16u minMeasuredValue = 1;
