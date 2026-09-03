@@ -145,7 +145,4 @@ config SHELL_CMD_BUFF_SIZE
 
 endif # SHELL
 
-config SHELL_WILDCARD
-	default n
-
 endif # CHIP

@@ -31,7 +31,7 @@ if(_board_overlay)
     set(mcuboot_EXTRA_DTC_OVERLAY_FILE ${_board_overlay}
         CACHE INTERNAL "App board overlay for MCUboot partitions")
 else()
-    unset(app_DTC_OVERLAY_FILE CACHE)
+    unset(zephyr_DTC_OVERLAY_FILE CACHE)
     unset(mcuboot_EXTRA_DTC_OVERLAY_FILE CACHE)
 endif()
 
