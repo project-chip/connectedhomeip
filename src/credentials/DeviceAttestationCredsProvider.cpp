@@ -16,10 +16,15 @@
  */
 #include "DeviceAttestationCredsProvider.h"
 
+#include <lib/support/CodeUtils.h>
+
 namespace chip {
 namespace Credentials {
 
 namespace {
+
+constexpr auto kLegacyDeviceAttestationProfiles =
+    BitMask<DeviceAttestationCertProfileBitmap>(DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy);
 
 // Version to have a default placeholder so the getter never
 // returns `nullptr` by default.
@@ -69,6 +74,65 @@ DeviceAttestationCredentialsProvider * gDacProvider = &gDefaultDACProvider;
 DeviceAttestationCredentialsProvider * GetDeviceAttestationCredentialsProvider()
 {
     return gDacProvider;
+}
+
+CHIP_ERROR DeviceAttestationCredentialsProvider::GetDeviceAttestationCertForProfile(DeviceAttestationCertProfile profile,
+                                                                                    MutableByteSpan & out_dac_buffer)
+{
+    if (profile != DeviceAttestationCertProfile::kEcdsaMatterLegacy)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    return GetDeviceAttestationCert(out_dac_buffer);
+}
+
+CHIP_ERROR
+DeviceAttestationCredentialsProvider::GetProductAttestationIntermediateCertForProfile(DeviceAttestationCertProfile profile,
+                                                                                      MutableByteSpan & out_pai_buffer)
+{
+    if (profile != DeviceAttestationCertProfile::kEcdsaMatterLegacy)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    return GetProductAttestationIntermediateCert(out_pai_buffer);
+}
+
+DeviceAttestationProfileSupport DeviceAttestationCredentialsProvider::GetDeviceAttestationProfileSupport() const
+{
+    return {
+        .paaSupportedProfiles = kLegacyDeviceAttestationProfiles,
+        .paiSupportedProfiles = kLegacyDeviceAttestationProfiles,
+        .dacSupportedProfiles = kLegacyDeviceAttestationProfiles,
+    };
+}
+
+CHIP_ERROR DeviceAttestationCredentialsProvider::GetDeviceAttestationDocumentSegment(DeviceAttestationDocumentType documentType,
+                                                                                     DeviceAttestationCertProfile profile,
+                                                                                     size_t offset,
+                                                                                     MutableByteSpan & out_document_buffer,
+                                                                                     size_t & out_document_size)
+{
+    VerifyOrReturnError(profile == DeviceAttestationCertProfile::kEcdsaMatterLegacy, CHIP_ERROR_NOT_IMPLEMENTED);
+    VerifyOrReturnError(offset == 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+    CHIP_ERROR err;
+    switch (documentType)
+    {
+    case DeviceAttestationDocumentType::kDACCertificate:
+        err = GetDeviceAttestationCert(out_document_buffer);
+        break;
+    case DeviceAttestationDocumentType::kPAICertificate:
+        err = GetProductAttestationIntermediateCert(out_document_buffer);
+        break;
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    ReturnErrorOnFailure(err);
+    out_document_size = out_document_buffer.size();
+    return CHIP_NO_ERROR;
 }
 
 void SetDeviceAttestationCredentialsProvider(DeviceAttestationCredentialsProvider * provider)

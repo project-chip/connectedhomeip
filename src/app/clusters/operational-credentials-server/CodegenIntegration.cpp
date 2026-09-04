@@ -25,6 +25,7 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <credentials/GroupDataProvider.h>
+#include <platform/RuntimeOptionsProvider.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -44,17 +45,25 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
+        auto & dacProvider = *Credentials::GetDeviceAttestationCredentialsProvider();
+        BitFlags<OperationalCredentials::Feature> configuredFeatureMap(featureMap);
+        if (RuntimeOptionsProvider::Instance().GetPqcDeviceAttestationFeatureEnabled())
+        {
+            configuredFeatureMap.Set(OperationalCredentials::Feature::kPQCDeviceAttestation);
+        }
+
         OperationalCredentialsCluster::Context context = {
             .fabricTable                = Server::GetInstance().GetFabricTable(),
             .failSafeContext            = Server::GetInstance().GetFailSafeContext(),
             .sessionManager             = Server::GetInstance().GetSecureSessionManager(),
             .dnssdServer                = app::DnssdServer::Instance(),
             .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
-            .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(),
+            .dacProvider                = dacProvider,
             .groupDataProvider          = *Credentials::GetGroupDataProvider(),
             .accessControl              = Server::GetInstance().GetAccessControl(),
             .platformManager            = DeviceLayer::PlatformMgr(),
             .eventManagement            = EventManagement::GetInstance(),
+            .featureMap                 = configuredFeatureMap,
         };
         gServer.Create(endpointId, context);
         return gServer.Registration();
@@ -80,7 +89,7 @@ void MatterOperationalCredentialsClusterInitCallback(EndpointId endpointId)
             .clusterId                 = OperationalCredentials::Id,
             .fixedClusterInstanceCount = OperationalCredentials::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1,
-            .fetchFeatureMap           = false,
+            .fetchFeatureMap           = true,
             .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
