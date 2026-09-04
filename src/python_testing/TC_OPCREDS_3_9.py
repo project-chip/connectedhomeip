@@ -23,15 +23,11 @@
 #   ./chip-all-clusters-app --dac_provider <pqc_dac_provider.json> --dac_provider_pqc_ready
 #
 # where the JSON carries the dac_cert_ml_dsa_44/65 and pai_cert_ml_dsa_44/65 keys
-# read by TestHarnessDACProvider.
-#
-# Steps 7 and 8 assert the INVALID_COMMAND outcome the test plan requires. The SDK server in
-# src/app/clusters/operational-credentials-server does not produce it today: an out-of-range
-# SegmentID surfaces CHIP_ERROR_INVALID_ARGUMENT from the provider, which the data model maps to
-# FAILURE, and an oversized MaxSegmentSize is accepted because the only bound the handler checks is
-# the 600-byte lower one. Both steps are expected to fail until the server is updated.
+# read by TestHarnessDACProvider. The PQC DAC certificates retain P-256 subject keys for the
+# legacy Device Attestation signature and are signed by the corresponding ML-DSA PAI.
 
 import logging
+from dataclasses import dataclass
 
 from mobly import asserts
 
@@ -57,13 +53,25 @@ kOversizedMaxSegmentSize = 0xFFFF
 # CertificateType values outside CertificateChainTypeEnum (test step 9).
 kInvalidCertificateType = 0x03
 
-# X.509 AlgorithmIdentifier OIDs for each attestation crypto profile. Per
-# draft-ietf-lamps-dilithium-certificates an ML-DSA certificate carries the same OID in its
-# signatureAlgorithm and in its subjectPublicKeyInfo algorithm.
+# X.509 AlgorithmIdentifier OIDs for each attestation crypto profile. ML-DSA uses its
+# profile-specific OID in either field when that field uses ML-DSA.
 kOidEcPublicKey = "1.2.840.10045.2.1"
 kOidEcdsaWithSha256 = "1.2.840.10045.4.3.2"
 kOidMlDsa44 = "2.16.840.1.101.3.4.3.17"
 kOidMlDsa65 = "2.16.840.1.101.3.4.3.18"
+
+AttestationCryptoProfile = Clusters.OperationalCredentials.Enums.AttestationCryptoProfileEnum
+
+
+@dataclass(frozen=True)
+class CertificateAlgorithms:
+    """Attestation profiles used by an X.509 certificate's key and signature."""
+
+    subject_key_profile: AttestationCryptoProfile
+    signature_profile: AttestationCryptoProfile
+    subject_public_key_algorithm_oid: str
+    signature_algorithm_oid: str
+
 
 # DER tags used while walking a certificate.
 kDerTagInteger = 0x02
@@ -180,6 +188,44 @@ def parse_certificate_algorithm_oids(der: bytes) -> tuple[str, str]:
     return signature_algorithm_oid, subject_public_key_algorithm_oid
 
 
+def _certificate_algorithms_for_oids(signature_algorithm_oid: str,
+                                     subject_public_key_algorithm_oid: str) -> CertificateAlgorithms:
+    """Map the signature and subject-key OIDs to their attestation profiles."""
+    signature_profiles = {
+        kOidEcdsaWithSha256: AttestationCryptoProfile.kEcdsaMatterLegacy,
+        kOidMlDsa44: AttestationCryptoProfile.kMlDsa44,
+        kOidMlDsa65: AttestationCryptoProfile.kMlDsa65,
+    }
+    public_key_profiles = {
+        kOidEcPublicKey: AttestationCryptoProfile.kEcdsaMatterLegacy,
+        kOidMlDsa44: AttestationCryptoProfile.kMlDsa44,
+        kOidMlDsa65: AttestationCryptoProfile.kMlDsa65,
+    }
+
+    asserts.assert_true(signature_algorithm_oid in signature_profiles,
+                        f"Certificate uses unsupported signatureAlgorithm OID {signature_algorithm_oid}")
+    asserts.assert_true(subject_public_key_algorithm_oid in public_key_profiles,
+                        "Certificate uses unsupported subjectPublicKeyInfo algorithm OID "
+                        f"{subject_public_key_algorithm_oid}")
+    return CertificateAlgorithms(
+        subject_key_profile=public_key_profiles[subject_public_key_algorithm_oid],
+        signature_profile=signature_profiles[signature_algorithm_oid],
+        subject_public_key_algorithm_oid=subject_public_key_algorithm_oid,
+        signature_algorithm_oid=signature_algorithm_oid,
+    )
+
+
+def parse_certificate_algorithms(der: bytes) -> CertificateAlgorithms:
+    """Parse the attestation profiles used for a certificate's key and signature."""
+    signature_algorithm_oid, subject_public_key_algorithm_oid = parse_certificate_algorithm_oids(der)
+    return _certificate_algorithms_for_oids(signature_algorithm_oid, subject_public_key_algorithm_oid)
+
+
+def _profile_mask(profile: AttestationCryptoProfile) -> int:
+    """Return the AttestationCryptoProfileBitmap mask for an enum profile."""
+    return 1 << int(profile)
+
+
 class TC_OPCREDS_3_9(MatterBaseTest):
     """PQC Device Attestation CertificateChainRequest behavior [DUT-Server]."""
 
@@ -198,31 +244,30 @@ class TC_OPCREDS_3_9(MatterBaseTest):
                      "TH obtains the advertised profile bitmap set for PAA, PAI and DAC. PAA is stored as "
                      "PAAProfileSupported, PAI is stored as PAIProfileSupported and DAC is stored as "
                      "DACProfileSupported."),
-            TestStep(3, "TH sends CertificateChainRequest for PAICertificate and CryptoProfile set to "
-                        "PAIProfileSupported. TH sets MaxSegmentSize to a value that requires more than one "
-                        "response segment.",
+            TestStep(3, "TH selects the strongest profile advertised for the self-signed PAA and sends "
+                        "CertificateChainRequest for PAICertificate using that profile. TH sets MaxSegmentSize "
+                        "to a value that requires more than one response segment.",
                      "DUT returns TotalDocumentSize and NextSegmentID as required for segmented retrieval."),
             TestStep(4, "TH continues to request the remaining segments for PAI using the returned NextSegmentID "
                         "values until completion.",
                      "Segment numbering is monotonic from zero; TotalDocumentSize is stable across all segments; "
                      "NextSegmentID is present until the final segment and absent on the final segment; the "
                      "reassembled PAI payload exactly matches the declared TotalDocumentSize; the reassembled PAI "
-                     "payload parses successfully; the subjectPublicKeyInfo algorithm matches the negotiated "
-                     "profile; the PAI signature field matches the OID for the algorithm signaled by "
-                     "PAAProfileSupported."),
-            TestStep(5, "TH selects the expected profile and sends CertificateChainRequest for DACCertificate with "
-                        "CryptoProfile set to DACProfileSupported.",
-                     "If PAIProfileSupported is EcdsaMatterLegacy, DUT returns the certificate in a single response "
-                     "and omits NextSegmentID. Otherwise DUT returns TotalDocumentSize and NextSegmentID as "
-                     "required for segmented retrieval."),
+                     "payload parses successfully; its subjectPublicKeyInfo and signature algorithms are advertised "
+                     "by PAIProfileSupported; and the PAI signature matches the selected PAA profile."),
+            TestStep(5, "TH sends CertificateChainRequest for DACCertificate using the profile of the PAI public "
+                        "key that signs the DAC.",
+                     "If the PAI public-key profile is EcdsaMatterLegacy, DUT returns the certificate in a single "
+                     "response and omits NextSegmentID. Otherwise DUT returns TotalDocumentSize and NextSegmentID "
+                     "as required for segmented retrieval."),
             TestStep(6, "TH continues to request the remaining segments for DAC using the returned NextSegmentID "
                         "values until completion.",
                      "Segment numbering is monotonic from zero; TotalDocumentSize is stable across all segments; "
                      "NextSegmentID is present until the final segment and absent on the final segment; the "
                      "reassembled DAC payload exactly matches the declared TotalDocumentSize; the reassembled DAC "
-                     "payload parses successfully; the subjectPublicKeyInfo algorithm matches the negotiated "
-                     "profile; the DAC signature field matches the OID for the algorithm signaled by "
-                     "PAIProfileSupported."),
+                     "payload parses successfully; its subjectPublicKeyInfo and signature algorithms are advertised "
+                     "by DACProfileSupported; the DAC signature matches the PAI public-key profile; and the DAC "
+                     "public key uses EcdsaMatterLegacy for the Device Attestation signature."),
             TestStep(7, "TH sends a CertificateChainRequest with a SegmentID that points beyond the available data.",
                      "DUT rejects the request with INVALID_COMMAND."),
             TestStep(8, "TH sends a CertificateChainRequest with a MaxSegmentSize value that cannot fit within the "
@@ -232,19 +277,20 @@ class TC_OPCREDS_3_9(MatterBaseTest):
                      "DUT rejects the request with INVALID_COMMAND."),
         ]
 
-    def _negotiated_profile(self, supported_profiles: int, chain_element: str):
+    def _select_strongest_profile(self, supported_profiles: int,
+                                  chain_element: str) -> AttestationCryptoProfile:
         """Pick the highest-security attestation profile the DUT advertises for one chain element.
 
         Pre-condition 2 of the test plan requires the TH to always negotiate for the highest
         security profile the DUT supports.
         """
-        bitmap = Clusters.OperationalCredentials.Enums.AttestationCryptoProfileEnum
-
         # AttestationCryptoProfileBitmap: bit 0 EcdsaMatterLegacy, bit 1 MlDsa44, bit 2 MlDsa65.
         # Clusters.OperationalCredentials.Bitmaps is not generated, so the masks are spelled out.
-        for mask, profile in ((0x04, bitmap.kMlDsa65), (0x02, bitmap.kMlDsa44), (0x01, bitmap.kEcdsaMatterLegacy)):
+        for mask, profile in ((0x04, AttestationCryptoProfile.kMlDsa65),
+                              (0x02, AttestationCryptoProfile.kMlDsa44),
+                              (0x01, AttestationCryptoProfile.kEcdsaMatterLegacy)):
             if supported_profiles & mask:
-                logger.info("Negotiated %s profile %s from bitmap 0x%04X", chain_element, profile.name, supported_profiles)
+                logger.info("Selected %s profile %s from bitmap 0x%04X", chain_element, profile.name, supported_profiles)
                 return profile
 
         asserts.fail(f"{chain_element}SupportedProfiles (0x{supported_profiles:04X}) advertises no known profile")
@@ -307,41 +353,42 @@ class TC_OPCREDS_3_9(MatterBaseTest):
                              f"Reassembled {document_name} does not match the declared TotalDocumentSize")
         return bytes(document), expected_segment_id
 
-    def _verify_certificate_algorithms(self, der: bytes, document_name: str, subject_profile, issuer_profile) -> None:
-        """Check that a reassembled certificate parses and carries the negotiated algorithm OIDs.
+    def _assert_profile_advertised(self, supported_profiles: int, profile: AttestationCryptoProfile,
+                                   document_name: str, algorithm_field: str) -> None:
+        asserts.assert_true(supported_profiles & _profile_mask(profile),
+                            f"{document_name} {algorithm_field} uses {profile.name}, but "
+                            f"{document_name}SupportedProfiles (0x{supported_profiles:04X}) does not advertise it")
 
-        `subject_profile` is the profile negotiated for this document (it governs the
-        subjectPublicKeyInfo algorithm) and `issuer_profile` is the profile of the certificate that
-        signed it (it governs the signatureAlgorithm).
-        """
-        bitmap = Clusters.OperationalCredentials.Enums.AttestationCryptoProfileEnum
-        expected_public_key_oids = {
-            bitmap.kEcdsaMatterLegacy: kOidEcPublicKey,
-            bitmap.kMlDsa44: kOidMlDsa44,
-            bitmap.kMlDsa65: kOidMlDsa65,
-        }
-        expected_signature_oids = {
-            bitmap.kEcdsaMatterLegacy: kOidEcdsaWithSha256,
-            bitmap.kMlDsa44: kOidMlDsa44,
-            bitmap.kMlDsa65: kOidMlDsa65,
-        }
-
-        signature_algorithm_oid, subject_public_key_algorithm_oid = parse_certificate_algorithm_oids(der)
+    def _verify_certificate_algorithms(
+            self, der: bytes, document_name: str, supported_profiles: int,
+            expected_signature_profile: AttestationCryptoProfile,
+            expected_subject_key_profile: AttestationCryptoProfile | None = None) -> CertificateAlgorithms:
+        """Validate a certificate's algorithms against its bitmap and issuer relationship."""
+        algorithms = parse_certificate_algorithms(der)
         logger.info("Reassembled %s: signatureAlgorithm %s, subjectPublicKeyInfo algorithm %s",
-                    document_name, signature_algorithm_oid, subject_public_key_algorithm_oid)
+                    document_name, algorithms.signature_algorithm_oid,
+                    algorithms.subject_public_key_algorithm_oid)
 
-        asserts.assert_equal(subject_public_key_algorithm_oid, expected_public_key_oids[subject_profile],
-                             f"{document_name} subjectPublicKeyInfo algorithm does not match the negotiated "
-                             f"{subject_profile.name} profile")
-        asserts.assert_equal(signature_algorithm_oid, expected_signature_oids[issuer_profile],
-                             f"{document_name} signature field does not match the OID for the algorithm signaled by "
-                             f"the issuer {issuer_profile.name} profile")
+        # A profile bitmap is the union of the algorithms that may appear on the certificate; the
+        # subject key and the issuer-generated signature therefore contribute independently.
+        self._assert_profile_advertised(supported_profiles, algorithms.subject_key_profile,
+                                        document_name, "subjectPublicKeyInfo")
+        self._assert_profile_advertised(supported_profiles, algorithms.signature_profile,
+                                        document_name, "signatureAlgorithm")
+        asserts.assert_equal(algorithms.signature_profile, expected_signature_profile,
+                             f"{document_name} signature profile must match its issuer's public-key profile "
+                             f"{expected_signature_profile.name}")
+        if expected_subject_key_profile is not None:
+            asserts.assert_equal(algorithms.subject_key_profile, expected_subject_key_profile,
+                                 f"{document_name} subjectPublicKeyInfo must use "
+                                 f"{expected_subject_key_profile.name}")
+
+        return algorithms
 
     @async_test_body
     async def test_TC_OPCREDS_3_9(self):
         opcreds = Clusters.OperationalCredentials
         certificate_type = opcreds.Enums.CertificateChainTypeEnum
-        crypto_profile = opcreds.Enums.AttestationCryptoProfileEnum
         # Operational Credentials only ever lives on the root endpoint.
         self.root_endpoint = 0
 
@@ -358,15 +405,19 @@ class TC_OPCREDS_3_9(MatterBaseTest):
             cluster=opcreds, attribute=opcreds.Attributes.PQCDeviceAttestationProfile, endpoint=self.root_endpoint)
         asserts.assert_is_not_none(attestation_profile,
                                    "DUT signals PQCDA but does not expose PQCDeviceAttestationProfile")
-        paa_profile_supported = self._negotiated_profile(attestation_profile.PAASupportedProfiles, "PAA")
-        pai_profile_supported = self._negotiated_profile(attestation_profile.PAISupportedProfiles, "PAI")
-        dac_profile_supported = self._negotiated_profile(attestation_profile.DACSupportedProfiles, "DAC")
+        selected_paa_profile = self._select_strongest_profile(attestation_profile.PAASupportedProfiles, "PAA")
+
+        # The PAA is self-signed, so its strongest advertised profile unambiguously identifies both
+        # its public key and signature. The corresponding PAI must advertise that profile because
+        # its certificate is signed by this PAA.
+        self._assert_profile_advertised(attestation_profile.PAISupportedProfiles, selected_paa_profile,
+                                        "PAI", "signatureAlgorithm")
 
         self.step(3)
         # kCertificateSegmentSize is the smallest MaxSegmentSize the spec allows, so it is the value
         # that forces the largest number of response segments.
         pai_first_segment = await self._send_certificate_chain_request(
-            certificate_type.kPAICertificate, pai_profile_supported, 0, kCertificateSegmentSize)
+            certificate_type.kPAICertificate, selected_paa_profile, 0, kCertificateSegmentSize)
         asserts.assert_is_not_none(pai_first_segment.totalDocumentSize,
                                    "DUT omitted TotalDocumentSize from a profile-selected CertificateChainResponse")
         asserts.assert_greater(pai_first_segment.totalDocumentSize, 0, "DUT reported an empty PAI document")
@@ -379,17 +430,25 @@ class TC_OPCREDS_3_9(MatterBaseTest):
 
         self.step(4)
         pai_der, pai_segment_count = await self._retrieve_remaining_segments(
-            certificate_type.kPAICertificate, pai_profile_supported, pai_first_segment, "PAI")
-        # The PAI is issued by the PAA, so its signature carries the PAA's algorithm.
-        self._verify_certificate_algorithms(pai_der, "PAI", pai_profile_supported, paa_profile_supported)
+            certificate_type.kPAICertificate, selected_paa_profile, pai_first_segment, "PAI")
+        pai_algorithms = self._verify_certificate_algorithms(
+            pai_der, "PAI", attestation_profile.PAISupportedProfiles, selected_paa_profile)
+
+        # The PAI public key signs the DAC. This derived profile, rather than the strongest bit in
+        # DACSupportedProfiles, selects the matching DAC certificate document.
+        selected_dac_profile = pai_algorithms.subject_key_profile
+        logger.info("Selected DAC request profile %s from the PAI subjectPublicKeyInfo",
+                    selected_dac_profile.name)
+        self._assert_profile_advertised(attestation_profile.DACSupportedProfiles, selected_dac_profile,
+                                        "DAC", "signatureAlgorithm")
 
         self.step(5)
         dac_first_segment = await self._send_certificate_chain_request(
-            certificate_type.kDACCertificate, dac_profile_supported, 0, kCertificateSegmentSize)
+            certificate_type.kDACCertificate, selected_dac_profile, 0, kCertificateSegmentSize)
         asserts.assert_is_not_none(dac_first_segment.totalDocumentSize,
                                    "DUT omitted TotalDocumentSize from a profile-selected CertificateChainResponse")
         asserts.assert_greater(dac_first_segment.totalDocumentSize, 0, "DUT reported an empty DAC document")
-        if pai_profile_supported == crypto_profile.kEcdsaMatterLegacy:
+        if selected_dac_profile == AttestationCryptoProfile.kEcdsaMatterLegacy:
             asserts.assert_is_none(dac_first_segment.nextSegmentID,
                                    "A legacy PAI profile requires the DAC to be returned in a single response")
         elif dac_first_segment.totalDocumentSize > kCertificateSegmentSize:
@@ -401,16 +460,19 @@ class TC_OPCREDS_3_9(MatterBaseTest):
 
         self.step(6)
         dac_der, dac_segment_count = await self._retrieve_remaining_segments(
-            certificate_type.kDACCertificate, dac_profile_supported, dac_first_segment, "DAC")
-        # The DAC is issued by the PAI, so its signature carries the PAI's algorithm.
-        self._verify_certificate_algorithms(dac_der, "DAC", dac_profile_supported, pai_profile_supported)
+            certificate_type.kDACCertificate, selected_dac_profile, dac_first_segment, "DAC")
+        # The DAC is issued by the selected PAI, while its P-256 subject key verifies the legacy DA
+        # signature that remains in use during PQC Phase 1.
+        self._verify_certificate_algorithms(
+            dac_der, "DAC", attestation_profile.DACSupportedProfiles, selected_dac_profile,
+            AttestationCryptoProfile.kEcdsaMatterLegacy)
 
         self.step(7)
         # Valid SegmentIDs run from 0 to pai_segment_count - 1, so pai_segment_count is the first
         # one whose offset lands at or past the end of the PAI document.
         await self._expect_invalid_command(
             opcreds.Commands.CertificateChainRequest(certificateType=certificate_type.kPAICertificate,
-                                                     cryptoProfile=pai_profile_supported,
+                                                     cryptoProfile=selected_paa_profile,
                                                      segmentID=pai_segment_count,
                                                      maxSegmentSize=kCertificateSegmentSize),
             f"a SegmentID ({pai_segment_count}) past the end of a {pai_segment_count}-segment PAI document")
@@ -418,7 +480,7 @@ class TC_OPCREDS_3_9(MatterBaseTest):
         self.step(8)
         await self._expect_invalid_command(
             opcreds.Commands.CertificateChainRequest(certificateType=certificate_type.kPAICertificate,
-                                                     cryptoProfile=pai_profile_supported,
+                                                     cryptoProfile=selected_paa_profile,
                                                      segmentID=0,
                                                      maxSegmentSize=kOversizedMaxSegmentSize),
             f"a MaxSegmentSize ({kOversizedMaxSegmentSize}) that cannot fit in a single message on this transport")
@@ -426,7 +488,7 @@ class TC_OPCREDS_3_9(MatterBaseTest):
         self.step(9)
         await self._expect_invalid_command(
             opcreds.Commands.CertificateChainRequest(certificateType=kInvalidCertificateType,
-                                                     cryptoProfile=dac_profile_supported,
+                                                     cryptoProfile=selected_dac_profile,
                                                      segmentID=0,
                                                      maxSegmentSize=kCertificateSegmentSize),
             f"an invalid CertificateType ({kInvalidCertificateType})")
