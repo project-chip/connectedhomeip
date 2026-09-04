@@ -178,7 +178,7 @@
     ],
     "SoftwareDiagnostics": ["Test_TC_DGSW_2_3"],
     "EthernetNetworkDiagnostics": [],
-    "WiFiNetworkDiagnostics": ["Test_TC_DGWIFI_2_2"],
+    "WiFiNetworkDiagnostics": [],
     "WindowCovering": [],
     "FlowMeasurement": ["Test_TC_FLW_2_2"],
     "GroupKeyManagement": ["Test_TC_GRPKEY_5_4"],
