@@ -61,7 +61,7 @@ void PacketParserFuzz(const std::vector<std::uint8_t> & bytes)
     BytesRange packet(bytes.data(), bytes.data() + bytes.size());
     FuzzDelegate delegate(packet);
 
-    chip::Dnssd::ParsePacket(packet, &delegate);
+    chip::Dnssd::ParseMdnsPacket(packet, &delegate);
 }
 
 FUZZ_TEST(MinimalmDNS, PacketParserFuzz).WithDomains(Arbitrary<std::vector<uint8_t>>());
