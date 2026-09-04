@@ -297,9 +297,8 @@ class TC_COMPRO_2_3(COMPROBaseTest):
         logger.info("After 40 s (no ED): NumCachedResults=%d", num_cached)
         asserts.assert_equal(num_cached, 0,
                              "NumCachedResults must be 0 when no ED is commissionable")
-        asserts.assert_true(
-            (cached_results is NullValue) or (cached_results == []),
-            "CachedResults must be null when no ED is commissionable")
+        asserts.assert_equal(cached_results, NullValue,
+                             "CachedResults must be null when no ED is commissionable")
 
         # Step 8 — make ED commissionable
         self.step(8)
@@ -375,9 +374,8 @@ class TC_COMPRO_2_3(COMPROBaseTest):
         num_cached = await self.read_cp_attribute(cp.Attributes.NumCachedResults)
         cached_results = await self.read_cp_attribute(cp.Attributes.CachedResults)
         asserts.assert_equal(num_cached, 0, "NumCachedResults must be 0 after cache timeout")
-        asserts.assert_true(
-            (cached_results is NullValue) or (cached_results == []),
-            "CachedResults must be null after cache timeout")
+        asserts.assert_equal(cached_results, NullValue,
+                             "CachedResults must be null after cache timeout")
 
         # Step 13 — make ED commissionable again to verify continuous background scan
         self.step(13)
@@ -406,9 +404,8 @@ class TC_COMPRO_2_3(COMPROBaseTest):
         cached_results = await self.read_cp_attribute(cp.Attributes.CachedResults)
         asserts.assert_equal(num_cached, 0,
                              "NumCachedResults must be 0 immediately after stop")
-        asserts.assert_true(
-            (cached_results is NullValue) or (cached_results == []),
-            "CachedResults must be null immediately after stop")
+        asserts.assert_equal(cached_results, NullValue,
+                             "CachedResults must be null immediately after stop")
 
         # Step 17 — a ProxyBackGroundScanStopRequest for a supported transport that
         # is NOT part of an active background scan SHALL return SUCCESS.  Step 15
@@ -525,9 +522,8 @@ class TC_COMPRO_2_3(COMPROBaseTest):
         asserts.assert_equal(num_cached, 0,
                              "NumCachedResults must be 0 after Timeout expired "
                              "(background scan auto-stopped)")
-        asserts.assert_true(
-            (cached_results is NullValue) or (cached_results == []),
-            "CachedResults must be null after Timeout expired")
+        asserts.assert_equal(cached_results, NullValue,
+                             "CachedResults must be null after Timeout expired")
 
         # Cleanup
         await self.ensure_ed_not_commissionable(ed)

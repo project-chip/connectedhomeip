@@ -325,14 +325,21 @@ class TC_COMPRO_2_2(COMPROBaseTest):
                 return e  # Return so gather captures it; validate below
 
         concurrent_results = await asyncio.gather(_scan_tolerant(), _scan_tolerant())
+        busy_count = 0
         for i, r in enumerate(concurrent_results):
             if isinstance(r, InteractionModelError):
                 asserts.assert_equal(r.status, Status.Busy,
                                      f"Concurrent scan {i + 1} returned unexpected status {r.status}")
-                logger.info("Concurrent scan %d returned BUSY (acceptable)", i + 1)
+                busy_count += 1
+                logger.info("Concurrent scan %d returned BUSY", i + 1)
             else:
                 logger.info("Concurrent scan %d returned SUCCESS (NumberOfResults=%d)",
                             i + 1, r.numberOfResults)
+        # BUSY is permitted for at most one of the two requests: the DUT must either
+        # complete both scans or serve one and reject the other.
+        asserts.assert_less_equal(busy_count, 1,
+                                  "At most one concurrent ProxyScanRequest may return BUSY; "
+                                  "the DUT must respond SUCCESS to at least one")
 
         # Step 12 — MaxCachedResults (BGS feature only).
         if has_bgs:

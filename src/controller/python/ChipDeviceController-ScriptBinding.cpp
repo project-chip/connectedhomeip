@@ -298,6 +298,9 @@ private:
         {
             mDevCtrl->RegisterPairingDelegate(mPairingDelegate);
         }
+        // The flow is over; a late CommandSender callback must not reach through a
+        // controller the Python layer may already have torn down.  Init() sets it again.
+        mDevCtrl  = nullptr;
         mInFlight = false;
     }
 
