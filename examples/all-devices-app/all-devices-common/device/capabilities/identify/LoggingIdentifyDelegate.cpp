@@ -17,8 +17,8 @@
 
 #include "LoggingIdentifyDelegate.h"
 
- #include <lib/support/StringBuilder.h>
- #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/StringBuilder.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace app {
