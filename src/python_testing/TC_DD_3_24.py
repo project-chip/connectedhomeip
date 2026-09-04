@@ -154,12 +154,18 @@ class TC_DD_3_24(MatterTestCommissioner):
 
         self.step(6)    # Perform DNS-SD Discovery and check that the “_IC” subtype is no more present.
 
-        # Wait a bit that mDNS service gets updated and propagated
-        await asyncio.sleep(1)
+        txt_ic_still_present = True
+        for attempt in range(20):
+            txt_ic_still_present = await self.check_operational_service_has_txt_ic()
+            if not txt_ic_still_present:
+                break
+
+            log.info('Attempt %d/20: TXT key "IC" still present, retrying in 1 second', attempt + 1)
+            await asyncio.sleep(1)
 
         asserts.assert_false(
-            await self.check_operational_service_has_txt_ic(),
-            'TXT key "IC" is still present!'
+            txt_ic_still_present,
+            'TXT key "IC" is still present after 20 attempts!'
         )
 
     def get_dut_instance_name(self, log_result: bool = False) -> str:
