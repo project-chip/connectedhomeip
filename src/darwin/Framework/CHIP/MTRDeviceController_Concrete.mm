@@ -1867,6 +1867,14 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 - (void)asyncGetCommissionerOnMatterQueue:(void (^)(chip::Controller::DeviceCommissioner *))block
                              errorHandler:(nullable MTRDeviceErrorHandler)errorHandler
 {
+    // Depth-1 dispatch contract: this method enqueues exactly ONE dispatch_async
+    // hop onto _chipWorkQueue. Callers that hold dispatch_source handlers on the
+    // Matter queue (e.g. MTROperationalCredentialsDelegate's external NOC issuer
+    // watchdog) rely on this depth=1 to size their teardown fences — the
+    // delegate destructor issues two dispatch_sync barriers: one to drain the
+    // handler itself, one to drain this single inner block. If this method is
+    // ever changed to enqueue >1 levels of async, those teardown fences must
+    // grow correspondingly.
     {
         NSError * error;
         if (![self checkIsRunning:&error]) {
