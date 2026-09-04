@@ -134,14 +134,10 @@ class TC_HSTAT_2_2(HSTATBase):
         # TH reads from the DUT the MistType attribute.
         # Verify that the DUT response contains a value between 1 and 3 inclusive.
         if self.humidifierFeatureSupported:
+            self.step(5)
             dut_MistType = await self.read_attribute_expect_success(attribute=self.attributes.MistType)
-            if isinstance(dut_MistType, Nullable) and dut_MistType == NullValue:
-                log.info("MistType is NULL - SDK changes are incomplete, so skipping this step")
-                self.skip_step(5)
-            else:
-                self.step(5)
-                asserts.assert_greater_equal(dut_MistType, 1, "MistType is less than 1")
-                asserts.assert_less_equal(dut_MistType, 3, "MistType is greater than 3")
+            asserts.assert_greater_equal(dut_MistType, 1, "MistType is less than 1")
+            asserts.assert_less_equal(dut_MistType, 3, "MistType is greater than 3")
         else:
             self.skip_step(5)
 

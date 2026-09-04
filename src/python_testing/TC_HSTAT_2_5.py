@@ -177,16 +177,12 @@ class TC_HSTAT_2_5(HSTATBase):
         # Verify DUT responds w/ status SUCCESS(0x00)
         await self.send_onoff_off_cmd_expect_success()
 
+        self.step(13)
         # TH reads from the DUT the MistType attribute.
         # Verify that the DUT response contains a value between 1 and 3 inclusive.
         dut_MistType = await self.read_attribute_expect_success(attribute=self.attributes.MistType)
-        if isinstance(dut_MistType, Nullable) and dut_MistType == NullValue:
-            log.info("MistType is NULL - SDK changes are incomplete, so skipping this step")
-            self.skip_step(13)
-        else:
-            self.step(13)
-            asserts.assert_greater_equal(dut_MistType, 1, "MistType is less than 1")
-            asserts.assert_less_equal(dut_MistType, 3, "MistType is greater than 3")
+        asserts.assert_greater_equal(dut_MistType, 1, "MistType is less than 1")
+        asserts.assert_less_equal(dut_MistType, 3, "MistType is greater than 3")
 
 
 if __name__ == '__main__':
