@@ -538,6 +538,10 @@ private:
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<LoggingOven>(mContext->timerDelegate);
             });
+            RegisterCreator("oven-2", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<LoggingOven>(mContext->timerDelegate, LoggingOven::Config{ .cavityCount = 2 });
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_REFRIGERATOR)
         {

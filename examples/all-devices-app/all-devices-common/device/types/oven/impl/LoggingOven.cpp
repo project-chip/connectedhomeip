@@ -16,17 +16,35 @@
 
 #include "LoggingOven.h"
 
+#include <lib/support/CodeUtils.h>
+
 namespace chip::app {
 
 LoggingOven::LoggingOven(TimerDelegate & timerDelegate) : LoggingOven(timerDelegate, Config{}) {}
 
-LoggingOven::LoggingOven(TimerDelegate & timerDelegate, Config config) :
-    mCavity(timerDelegate, config.cavityConfig, "Cavity"), mSurface(timerDelegate, "Top Surface")
-{}
+LoggingOven::LoggingOven(TimerDelegate & timerDelegate, Config config) : mSurface(timerDelegate, "Top Surface")
+{
+    // The MA-oven device type requires at least one cavity endpoint.
+    VerifyOrDie(config.cavityCount >= 1);
+
+    // Reserve up front: the parts capture the name pointers at construction, so the
+    // name strings must not move afterwards.
+    mCavityNames.reserve(config.cavityCount);
+    mCavities.reserve(config.cavityCount);
+    for (uint8_t i = 0; i < config.cavityCount; i++)
+    {
+        mCavityNames.push_back("Cavity " + std::to_string(i + 1));
+        mCavities.push_back(std::make_unique<LoggingTemperatureControlledCabinetPart>(timerDelegate, config.cavityConfig,
+                                                                                      mCavityNames.back().c_str()));
+    }
+}
 
 CHIP_ERROR LoggingOven::RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider)
 {
-    ReturnErrorOnFailure(mCavity.Register(allocator, provider, EndpointComposition::WithParent(GetEndpointId())));
+    for (auto & cavity : mCavities)
+    {
+        ReturnErrorOnFailure(cavity->Register(allocator, provider, EndpointComposition::WithParent(GetEndpointId())));
+    }
     ReturnErrorOnFailure(mSurface.Register(allocator, provider, EndpointComposition::WithParent(GetEndpointId())));
     return CHIP_NO_ERROR;
 }
@@ -34,7 +52,10 @@ CHIP_ERROR LoggingOven::RegisterParts(EndpointIdAllocator & allocator, CodeDrive
 void LoggingOven::UnregisterParts(CodeDrivenDataModelProvider & provider)
 {
     mSurface.Unregister(provider);
-    mCavity.Unregister(provider);
+    for (auto it = mCavities.rbegin(); it != mCavities.rend(); ++it)
+    {
+        (*it)->Unregister(provider);
+    }
 }
 
 } // namespace chip::app
