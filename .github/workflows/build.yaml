@@ -247,6 +247,11 @@ jobs:
                   BUILD_TYPE=gcc_release scripts/tests/gn_tests.sh
             - name: Clean output
               run: rm -rf ./out
+            - name: Build ASAN libcxx
+              # Builds libc++/libc++abi/libunwind with -fsanitize-address-field-padding=1
+              # so intra-object writes that overflow class members are detected. Idempotent;
+              # first-time build takes ~3-5 min. Covers all subsequent ASAN steps in this job.
+              run: ./scripts/run_in_build_env.sh "scripts/build/build_asan_libcxx.sh"
             - name: Build and run AddressSanitizer (ASAN) unit tests (Pull Requests only)
               if: github.event_name == 'pull_request'
               run: |
@@ -261,6 +266,10 @@ jobs:
               env:
                   LSAN_OPTIONS: detect_leaks=1
               run: |
+                  # Direct gn_gen.sh callers don't go through host.py, so the ASAN libcxx
+                  # path is read from this env var by BUILD.gn's getenv("SYSROOT_ASAN_LIBCXX").
+                  # Use bash $HOME expansion to match where build_asan_libcxx.sh installed it.
+                  export SYSROOT_ASAN_LIBCXX="$HOME/.cache/matter/asan_libcxx"
                   for BUILD_TYPE in asan tsan ubsan; do
                       case $BUILD_TYPE in
                           "asan") GN_ARGS='is_clang=true is_asan=true';;
@@ -276,6 +285,7 @@ jobs:
             - name: Generate tests with sanitizers (for tidy)
               if: github.event.pull_request.number != null
               run: |
+                  export SYSROOT_ASAN_LIBCXX="$HOME/.cache/matter/asan_libcxx"
                   rm -rf ./out/sanitizers
                   BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="is_clang=true is_asan=true" --add-export-compile-commands=*
             - name: Ensure codegen is done for sanitize
