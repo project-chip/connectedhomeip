@@ -237,11 +237,13 @@ static bool IsValidContributorStatus(UnionContributorStatusEnum status)
 }
 
 CHIP_ERROR AmbientSensingUnionCluster::AddMatterContributor(NodeId nodeId, EndpointId endpointId,
-                                                            AmbientSensingUnion::UnionContributorStatusEnum status)
+                                                            AmbientSensingUnion::UnionContributorStatusEnum status,
+                                                            const CharSpan & name)
 {
     VerifyOrReturnError(nodeId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(endpointId != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsValidContributorStatus(status), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(name.size() <= kMaxContributorNameLength, CHIP_ERROR_INVALID_ARGUMENT);
     // Check for duplicate
     if (FindMatterContributor(nodeId, endpointId) != nullptr)
     {
@@ -261,6 +263,10 @@ CHIP_ERROR AmbientSensingUnionCluster::AddMatterContributor(NodeId nodeId, Endpo
     entry->endpointId = endpointId;
     entry->status     = status;
     entry->active     = true;
+    if (!name.empty())
+    {
+        entry->SetName(name);
+    }
     mContributorCount++;
 
     NotifyAttributeChanged(UnionContributorList::Id);

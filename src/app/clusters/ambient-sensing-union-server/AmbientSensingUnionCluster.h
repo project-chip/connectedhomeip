@@ -87,7 +87,15 @@ public:
             {
                 dest.contributorNodeID.SetNonNull(nodeId);
                 dest.contributorEndpointID.SetNonNull(endpointId);
-                dest.contributorName.SetNull();
+                // ContributorName MAY be NULL or MAY contain a valid string for Matter contributors.
+                if (nameLength > 0)
+                {
+                    dest.contributorName.SetNonNull(GetName());
+                }
+                else
+                {
+                    dest.contributorName.SetNull();
+                }
             }
             else
             {
@@ -152,7 +160,8 @@ public:
 
     CHIP_ERROR AddMatterContributor(NodeId nodeId, EndpointId endpointId,
                                     AmbientSensingUnion::UnionContributorStatusEnum status =
-                                        AmbientSensingUnion::UnionContributorStatusEnum::kUnionContributorOnline);
+                                        AmbientSensingUnion::UnionContributorStatusEnum::kUnionContributorOnline,
+                                    const CharSpan & name = CharSpan());
     CHIP_ERROR RemoveMatterContributor(NodeId nodeId, EndpointId endpointId);
     CHIP_ERROR UpdateMatterContributorStatus(NodeId nodeId, EndpointId endpointId,
                                              AmbientSensingUnion::UnionContributorStatusEnum status);
