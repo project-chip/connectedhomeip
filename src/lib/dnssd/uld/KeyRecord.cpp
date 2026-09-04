@@ -49,11 +49,14 @@ CHIP_ERROR KeyResourceRecord::Parse(ByteSpan rdata, Crypto::P256PublicKey & publ
 
     VerifyOrReturnError(rdata.size() == kKeyMetadataSize + kP256RawPublicKeySize, CHIP_ERROR_INVALID_ARGUMENT);
 
-    const uint8_t * cursor = rdata.data();
-    // Verify the validity of the Key metadata.
-    VerifyOrReturnError(Encoding::BigEndian::Read16(cursor) == kKeyFlags, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(*cursor++ == kKeyProtocolDnssec, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(*cursor++ == kKeyAlgorithmEcdsaP256, CHIP_ERROR_INVALID_ARGUMENT);
+    const uint8_t * cursor  = rdata.data();
+    const uint16_t flags    = Encoding::BigEndian::Read16(cursor);
+    const uint8_t protocol  = *cursor++;
+    const uint8_t algorithm = *cursor++;
+
+    VerifyOrReturnError(flags == kKeyFlags, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(protocol == kKeyProtocolDnssec, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(algorithm == kKeyAlgorithmEcdsaP256, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(std::any_of(cursor, rdata.end(), [](uint8_t value) { return value != 0; }), CHIP_ERROR_INVALID_ARGUMENT);
 
     constexpr uint8_t kUncompressedPointMarker = 0x04;

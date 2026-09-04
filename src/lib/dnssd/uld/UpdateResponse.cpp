@@ -35,7 +35,18 @@ CHIP_ERROR UpdateResponse::Parse(ByteSpan packet)
     VerifyOrReturnError(packet.size() >= HeaderRef::kSizeBytes, CHIP_ERROR_INVALID_ARGUMENT);
 
     const BytesRange packetData = BytesRange::BufferWithSize(packet.data(), packet.size());
-    VerifyOrReturnError(ParseDnsPacket(packetData, this), CHIP_ERROR_INVALID_ARGUMENT);
+    if (!ParseDnsPacket(packetData, this))
+    {
+        mParseError = CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (mParseError != CHIP_NO_ERROR)
+    {
+        mMessageId    = 0;
+        mResponseCode = 0;
+        mKey.reset();
+    }
+
     return mParseError;
 }
 
@@ -77,17 +88,12 @@ void UpdateResponse::OnResource(ResourceType type, const ResourceData & data)
         return;
     }
 
-    if (data.GetType() == QType::KEY)
+    // RFC 9665 section 3.3.5: an SRP requester must not validate the RRs a registrar copies
+    // into a response, so a KEY that does not parse is ignored rather than failing the parse.
+    if ((data.GetType() == QType::KEY) && !mKey.has_value())
     {
-        if ((type == ResourceType::kAnswer) || mKey.has_value())
-        {
-            mParseError = CHIP_ERROR_INVALID_ARGUMENT;
-            return;
-        }
-
         Crypto::P256PublicKey publicKey;
-        mParseError = KeyResourceRecord::Parse(data.GetData().AsByteSpan(), publicKey);
-        if (mParseError == CHIP_NO_ERROR)
+        if (KeyResourceRecord::Parse(data.GetData().AsByteSpan(), publicKey) == CHIP_NO_ERROR)
         {
             mKey = publicKey;
         }

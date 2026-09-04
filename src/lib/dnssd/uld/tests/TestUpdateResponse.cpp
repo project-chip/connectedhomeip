@@ -34,7 +34,10 @@ constexpr size_t kKeyFlagsOffset     = 34;
 constexpr size_t kKeyProtocolOffset  = 36;
 constexpr size_t kKeyAlgorithmOffset = 37;
 constexpr size_t kKeyBytesOffset     = 38;
+constexpr size_t kKeyRdlengthOffset  = kKeyFlagsOffset - 1;
+constexpr size_t kOptRecordOffset    = kKeyBytesOffset + kP256RawPublicKeySize;
 constexpr size_t kPacketSize         = 113;
+constexpr size_t kKeyRecordSize      = kOptRecordOffset - HeaderRef::kSizeBytes;
 
 std::array<uint8_t, kPacketSize> MakeUpdateResponse()
 {
@@ -106,33 +109,75 @@ TEST(TestUpdateResponse, ParsesExtendedResponseCodeAndKey)
     }
 }
 
-TEST(TestUpdateResponse, RejectsUnsupportedKeyMetadata)
+TEST(TestUpdateResponse, IgnoresUnsupportedKeyMetadata)
 {
     auto packet = MakeUpdateResponse();
     UpdateResponse response;
 
     packet[kKeyFlagsOffset] = 1;
-    EXPECT_EQ(response.Parse(ByteSpan(packet)), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(response.Parse(ByteSpan(packet)), CHIP_NO_ERROR);
+    EXPECT_FALSE(response.GetKey().has_value());
 
     packet                     = MakeUpdateResponse();
     packet[kKeyProtocolOffset] = 2;
-    EXPECT_EQ(response.Parse(ByteSpan(packet)), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(response.Parse(ByteSpan(packet)), CHIP_NO_ERROR);
+    EXPECT_FALSE(response.GetKey().has_value());
 
     packet                      = MakeUpdateResponse();
     packet[kKeyAlgorithmOffset] = 14;
-    EXPECT_EQ(response.Parse(ByteSpan(packet)), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(response.Parse(ByteSpan(packet)), CHIP_NO_ERROR);
+    EXPECT_FALSE(response.GetKey().has_value());
 }
 
-TEST(TestUpdateResponse, RejectsEmptyOrTruncatedKey)
+TEST(TestUpdateResponse, IgnoresInvalidKeyData)
 {
     auto packet = MakeUpdateResponse();
     UpdateResponse response;
 
     memset(packet.data() + kKeyBytesOffset, 0, kP256RawPublicKeySize);
-    EXPECT_EQ(response.Parse(ByteSpan(packet)), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(response.Parse(ByteSpan(packet)), CHIP_NO_ERROR);
+    EXPECT_FALSE(response.GetKey().has_value());
 
+    // Remove one byte from the KEY RDATA and move the complete OPT record after it.
     packet = MakeUpdateResponse();
+    std::array<uint8_t, kPacketSize - 1> shortKeyPacket;
+    memcpy(shortKeyPacket.data(), packet.data(), kOptRecordOffset - 1);
+    memcpy(shortKeyPacket.data() + kOptRecordOffset - 1, packet.data() + kOptRecordOffset, kPacketSize - kOptRecordOffset);
+    shortKeyPacket[kKeyRdlengthOffset] = static_cast<uint8_t>(4 + kP256RawPublicKeySize - 1);
+
+    EXPECT_EQ(response.Parse(ByteSpan(shortKeyPacket)), CHIP_NO_ERROR);
+    EXPECT_EQ(response.GetResponseCode(), 0x2B);
+    EXPECT_FALSE(response.GetKey().has_value());
+}
+
+TEST(TestUpdateResponse, AcceptsRepeatedKey)
+{
+    const auto packet = MakeUpdateResponse();
+    std::array<uint8_t, kPacketSize + kKeyRecordSize> packetWithRepeatedKey;
+
+    memcpy(packetWithRepeatedKey.data(), packet.data(), kOptRecordOffset);
+    memcpy(packetWithRepeatedKey.data() + kOptRecordOffset, packet.data() + HeaderRef::kSizeBytes, kKeyRecordSize);
+    memcpy(packetWithRepeatedKey.data() + kOptRecordOffset + kKeyRecordSize, packet.data() + kOptRecordOffset,
+           kPacketSize - kOptRecordOffset);
+    packetWithRepeatedKey[9] = 2; // two authority records
+
+    UpdateResponse response;
+    EXPECT_EQ(response.Parse(ByteSpan(packetWithRepeatedKey)), CHIP_NO_ERROR);
+    EXPECT_TRUE(response.GetKey().has_value());
+}
+
+TEST(TestUpdateResponse, RejectsTruncatedPacketAndClearsResults)
+{
+    const auto packet = MakeUpdateResponse();
+    UpdateResponse response;
+
+    ASSERT_EQ(response.Parse(ByteSpan(packet)), CHIP_NO_ERROR);
+    ASSERT_TRUE(response.GetKey().has_value());
+
     EXPECT_EQ(response.Parse(ByteSpan(packet.data(), packet.size() - 1)), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(response.GetMessageId(), 0);
+    EXPECT_EQ(response.GetResponseCode(), 0);
+    EXPECT_FALSE(response.GetKey().has_value());
 }
 
 TEST(TestUpdateResponse, ParsesHeaderOnlyResponse)

@@ -127,5 +127,11 @@ bool ParseDnsPacket(const BytesRange & packetData, ParserDelegate * delegate);
 /// returns true if packet was successfully parsed, false otherwise
 bool ParseMdnsPacket(const BytesRange & packetData, ParserDelegate * delegate);
 
+/// Backwards-compatible name for the original mDNS-only parser entry point.
+inline bool ParsePacket(const BytesRange & packetData, ParserDelegate * delegate)
+{
+    return ParseMdnsPacket(packetData, delegate);
+}
+
 } // namespace Dnssd
 } // namespace chip

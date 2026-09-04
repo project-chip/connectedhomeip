@@ -38,12 +38,15 @@ public:
      * Parses a complete DNS UPDATE response.
      *
      * @return CHIP_NO_ERROR on success or CHIP_ERROR_INVALID_ARGUMENT if the
-     *         packet or a recognized ULD record is malformed.
+     *         DNS packet, UPDATE response header, or OPT record is malformed.
      */
     CHIP_ERROR Parse(ByteSpan packet);
 
     uint16_t GetMessageId() const { return mMessageId; }
     uint16_t GetResponseCode() const { return mResponseCode; }
+
+    // Returns the first KEY with decodable RDATA. Per RFC 9665 section 3.3.5,
+    // invalid KEY records in a response are ignored rather than failing Parse().
     const std::optional<Crypto::P256PublicKey> & GetKey() const { return mKey; }
 
 private:

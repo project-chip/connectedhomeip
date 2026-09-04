@@ -35,4 +35,6 @@ source_set("uld") {
     "${chip_root}/src/lib/dnssd/wire/records",
     "${chip_root}/src/lib/support",
   ]
+
+  cflags = [ "-Wconversion" ]
 }

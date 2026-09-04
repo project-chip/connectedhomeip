@@ -50,7 +50,9 @@ public:
 
     /**
      * Parses KEY RDATA (RFC 2535 / RFC 6605) and reconstructs an uncompressed
-     * P-256 public key.
+     * P-256 public key. Only the RDATA length, metadata, and nonzero key
+     * material are checked; the X||Y coordinates are not validated as a point
+     * on the curve.
      */
     static CHIP_ERROR Parse(ByteSpan rdata, Crypto::P256PublicKey & publicKey);
 
