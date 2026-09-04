@@ -26,10 +26,16 @@
 #import <lib/support/TypeTraits.h>
 
 #import <objc/runtime.h>
+#import <string.h>
 
 NSString * const MTRErrorDomain = @"MTRErrorDomain";
 
 NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
+
+NSErrorUserInfoKey const MTRAttestationVerificationResultKey = @"attestationVerificationResult";
+NSErrorUserInfoKey const MTRDeviceBasicInformationVendorIDKey = @"deviceBasicInformationVendorID";
+NSErrorUserInfoKey const MTRDeviceBasicInformationProductIDKey = @"deviceBasicInformationProductID";
+NSErrorUserInfoKey const MTRUnderlyingErrorCodeKey = @"errorCode";
 
 // Class for holding on to a CHIP_ERROR that we can use as the value
 // in a dictionary.
@@ -42,6 +48,19 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
 - (instancetype)initWithError:(CHIP_ERROR)error;
 @end
 
+// Returns the MTRErrorHolder associated with @p error if one was attached when the
+// NSError was bridged from a CHIP_ERROR. Returns nil for NSErrors not produced by the
+// MTRError bridge (or NSErrors that have lost the association, e.g. after NSCoding).
+static MTRErrorHolder * _Nullable MTRErrorHolderFor(NSError * error)
+{
+    void * key = (__bridge void *) [MTRErrorHolder class];
+    id holder = objc_getAssociatedObject(error, key);
+    if (![holder isKindOfClass:[MTRErrorHolder class]]) {
+        return nil;
+    }
+    return (MTRErrorHolder *) holder;
+}
+
 @implementation MTRError
 
 + (NSError *)errorWithCode:(MTRErrorCode)code
@@ -51,10 +70,17 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
 
 + (NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode
 {
-    return [MTRError errorForCHIPErrorCode:errorCode logContext:nil];
+    return [MTRError errorForCHIPErrorCode:errorCode logContext:nil additionalUserInfo:nil];
 }
 
 + (NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode logContext:(id)contextToLog
+{
+    return [MTRError errorForCHIPErrorCode:errorCode logContext:contextToLog additionalUserInfo:nil];
+}
+
++ (NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode
+                        logContext:(id)contextToLog
+                additionalUserInfo:(NSDictionary<NSErrorUserInfoKey, id> *)additionalUserInfo
 {
     if (errorCode == CHIP_NO_ERROR) {
         return nil;
@@ -64,12 +90,46 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
 
     if (errorCode.IsIMStatus()) {
         chip::app::StatusIB status(errorCode);
-        return [MTRError errorForIMStatus:status];
+        NSError * imError = [MTRError errorForIMStatus:status];
+        if (imError != nil) {
+            // Merge additionalUserInfo into the IM-domain NSError if any was supplied so callers
+            // passing structured userInfo (e.g. attestation keys) don't have it silently dropped
+            // on the IMStatus path.
+            //
+            // Merge order: start from additionalUserInfo, then overlay imError.userInfo on top so
+            // framework-reserved keys win on the IM path. In particular, errorToCHIPErrorCode:
+            // re-encodes StatusIB.mClusterStatus from userInfo[@"clusterStatus"]; allowing a
+            // caller to overwrite it would silently corrupt the round-trip integer. See
+            // MTRError_Internal.h for the reserved-key contract.
+            //
+            // Always overlay MTRUnderlyingErrorCodeKey with the bridge's authoritative integer
+            // so the framework-wins contract is symmetric with the non-IM path: callers cannot
+            // poison the underlying-error integer via additionalUserInfo on either path.
+            if (additionalUserInfo != nil) {
+                NSMutableDictionary<NSErrorUserInfoKey, id> * mergedUserInfo =
+                    [NSMutableDictionary dictionaryWithDictionary:additionalUserInfo];
+                [mergedUserInfo addEntriesFromDictionary:(imError.userInfo ?: @{})];
+                mergedUserInfo[MTRUnderlyingErrorCodeKey] = @(errorCode.AsInteger());
+                imError = [NSError errorWithDomain:imError.domain code:imError.code userInfo:mergedUserInfo];
+            }
+            // Attach an MTRErrorHolder with the original CHIP_ERROR so the NSError (Matter)
+            // category accessors (mtr_underlyingMatterErrorSourceFile / Line) work on bridged
+            // IM-status errors too. errorForIMStatus: itself doesn't attach one because it can
+            // be invoked without an underlying CHIP_ERROR (StatusIB-only path).
+            //
+            // The holder on IM-status errors is consumed ONLY by the NSError(Matter) category
+            // accessors (mtr_underlyingMatterErrorSourceFile/Line). errorToCHIPErrorCode: short-
+            // circuits on MTRInteractionErrorDomain via StatusIB re-encoding before consulting
+            // any holder, so this holder does NOT participate in the integer round-trip.
+            void * key = (__bridge void *) [MTRErrorHolder class];
+            objc_setAssociatedObject(imError, key, [[MTRErrorHolder alloc] initWithError:errorCode],
+                OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
+        return imError;
     }
 
     MTRErrorCode code;
     NSString * description;
-    NSDictionary * additionalUserInfo;
     switch (errorCode.AsInteger()) {
     case CHIP_ERROR_INVALID_STRING_LENGTH.AsInteger():
         code = MTRErrorCodeInvalidStringLength;
@@ -141,15 +201,23 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
     default:
         code = MTRErrorCodeGeneralError;
         description = [NSString stringWithFormat:NSLocalizedString(@"General error: %u", nil), errorCode.AsInteger()];
-        additionalUserInfo = @{ @"errorCode" : @(errorCode.AsInteger()) };
     }
 
-    NSDictionary * userInfo = @{ NSLocalizedDescriptionKey : description };
+    NSMutableDictionary<NSErrorUserInfoKey, id> * userInfo = [NSMutableDictionary dictionary];
+    // Merge caller-supplied keys FIRST so that framework-reserved keys (set below) win on
+    // collision. This mirrors the IM-status path's contract: NSLocalizedDescriptionKey and
+    // MTRUnderlyingErrorCodeKey are owned by the bridge and cannot be overridden by callers.
     if (additionalUserInfo) {
-        NSMutableDictionary * combined = [userInfo mutableCopy];
-        [combined addEntriesFromDictionary:additionalUserInfo];
-        userInfo = combined;
+        [userInfo addEntriesFromDictionary:additionalUserInfo];
     }
+    userInfo[NSLocalizedDescriptionKey] = description;
+    // MTRUnderlyingErrorCodeKey resolves to @"errorCode", which is the documented userInfo key for
+    // MTRErrorCodeGeneralError. Populate it on every bridged error so callers can read the
+    // underlying CHIP_ERROR integer regardless of which MTRErrorCode the bridge mapped to.
+    // This is the authoritative bridged value; it must not be overridable by additionalUserInfo
+    // because errorToCHIPErrorCode: relies on it for the round trip when the MTRErrorHolder
+    // associated object is absent (post-XPC, post-NSCoding, etc.).
+    userInfo[MTRUnderlyingErrorCodeKey] = @(errorCode.AsInteger());
 
     auto * error = [NSError errorWithDomain:MTRErrorDomain code:code userInfo:userInfo];
     void * key = (__bridge void *) [MTRErrorHolder class];
@@ -160,6 +228,12 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
 + (NSError *)errorForCHIPIntegerCode:(uint32_t)errorCode
 {
     return [MTRError errorForCHIPErrorCode:chip::ChipError(errorCode)];
+}
+
++ (NSError *)errorForCHIPIntegerCode:(uint32_t)errorCode
+                  additionalUserInfo:(NSDictionary<NSErrorUserInfoKey, id> *)additionalUserInfo
+{
+    return [MTRError errorForCHIPErrorCode:chip::ChipError(errorCode) logContext:nil additionalUserInfo:additionalUserInfo];
 }
 
 + (NSError *)errorForIMStatus:(const chip::app::StatusIB &)status
@@ -327,12 +401,8 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
         return CHIP_ERROR_INTERNAL;
     }
 
-    {
-        void * key = (__bridge void *) [MTRErrorHolder class];
-        id underlyingError = objc_getAssociatedObject(error, key);
-        if (underlyingError != nil && [underlyingError isKindOfClass:[MTRErrorHolder class]]) {
-            return ((MTRErrorHolder *) underlyingError).error;
-        }
+    if (MTRErrorHolder * holder = MTRErrorHolderFor(error)) {
+        return holder.error;
     }
 
     chip::ChipError::StorageType code;
@@ -386,7 +456,7 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
         code = CHIP_ERROR_NOT_FOUND.AsInteger();
         break;
     case MTRErrorCodeGeneralError: {
-        id userInfoErrorCode = error.userInfo[@"errorCode"];
+        id userInfoErrorCode = error.userInfo[MTRUnderlyingErrorCodeKey];
         if ([userInfoErrorCode isKindOfClass:NSNumber.class]) {
             code = static_cast<decltype(code)>([userInfoErrorCode unsignedLongValue]);
             break;
@@ -418,6 +488,40 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
 
     _error = error;
     return self;
+}
+
+@end
+
+@implementation NSError (Matter)
+
+- (nullable NSString *)mtr_underlyingMatterErrorSourceFile
+{
+#if CHIP_CONFIG_ERROR_SOURCE
+    MTRErrorHolder * holder = MTRErrorHolderFor(self);
+    if (holder == nil) {
+        return nil;
+    }
+    // Strip the path. Take the LAST forward- or back-slash so paths with mixed separators
+    // (Windows build hosts can produce e.g. "C:\src\foo/bar\baz.cpp") still resolve to the
+    // basename instead of leaking an intermediate directory. Shared helper in MTRError_Test.h
+    // so unit tests exercise the exact same logic.
+    return MTRErrorBasenameForPath(holder.error.GetFile());
+#else
+    return nil;
+#endif
+}
+
+- (NSUInteger)mtr_underlyingMatterErrorSourceLine
+{
+#if CHIP_CONFIG_ERROR_SOURCE
+    MTRErrorHolder * holder = MTRErrorHolderFor(self);
+    if (holder == nil) {
+        return 0;
+    }
+    return holder.error.GetLine();
+#else
+    return 0;
+#endif
 }
 
 @end
