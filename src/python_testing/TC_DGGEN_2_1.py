@@ -156,7 +156,13 @@ class TC_DGGEN_2_1(MatterBaseTest):
                     asserts.assert_is_instance(value, bool, f"NetworkInterface.{field_name} is not a bool or null")
             matter_asserts.assert_is_octstr(interface.hardwareAddress, "NetworkInterface.HardwareAddress")
             matter_asserts.assert_list(interface.IPv4Addresses, "NetworkInterface.IPv4Addresses")
+            for addr in interface.IPv4Addresses:
+                matter_asserts.assert_is_octstr(addr, "NetworkInterface.IPv4Addresses entry")
+                asserts.assert_equal(len(addr), 4, "NetworkInterface.IPv4Addresses entry is not 4 bytes.")
             matter_asserts.assert_list(interface.IPv6Addresses, "NetworkInterface.IPv6Addresses")
+            for addr in interface.IPv6Addresses:
+                matter_asserts.assert_is_octstr(addr, "NetworkInterface.IPv6Addresses entry")
+                asserts.assert_equal(len(addr), 16, "NetworkInterface.IPv6Addresses entry is not 16 bytes.")
             matter_asserts.assert_valid_enum(interface.type, "NetworkInterface.Type", enums.InterfaceTypeEnum)
             asserts.assert_not_equal(interface.type, enums.InterfaceTypeEnum.kUnknownEnumValue,
                                      "NetworkInterface.Type is not a defined InterfaceType value.")
