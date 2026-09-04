@@ -70,7 +70,7 @@ flowchart LR
         `all-devices-common/device/types/<device-name>/`:
         -   Core logic and `OOBAccessors.h/.cpp` belong to the platform-neutral
             `:<device-name>` target.
-        -   `NamedPipes.h/.cpp` belong to the target's `:<device-name>:posix`
+        -   `NamedPipeTranslators.h/.cpp` belong to the target's `:<device-name>:posix`
             source set.
     -   **Platform Transport Infrastructure**: Dispatchers, hooks, and base interfaces
         (e.g., POSIX Named Pipes and JSON translators) live under
@@ -275,16 +275,12 @@ public:
     virtual ~NamedPipeCommandTranslator() = default;
 
     /**
-     * @brief Returns the set of action names supported by this translator.
-     */
-    virtual Span<const CharSpan> GetActionNames() const = 0;
-
-    /**
      * @brief Translates a JSON payload into TLV and executes the action via OOBAccessorRegistry.
+     * @param endpointId Target endpoint ID.
      * @param json Parsed JSON payload from named pipe.
      * @param registry Target registry to dispatch the translated action.
      */
-    virtual CHIP_ERROR TranslateAndExecute(const Json::Value & json, OOBAccessorRegistry & registry) = 0;
+    virtual CHIP_ERROR TranslateAndExecute(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry) = 0;
 };
 
 } // namespace chip::app
@@ -309,13 +305,12 @@ public:
 
     bool HasTranslator(CharSpan actionName) const;
     CHIP_ERROR RegisterTranslator(CharSpan actionName, std::shared_ptr<NamedPipeCommandTranslator> translator);
-    CHIP_ERROR RegisterTranslator(Span<const CharSpan> actionNames, std::shared_ptr<NamedPipeCommandTranslator> translator);
 
     /**
      * @brief Registers a translator if not already present, deduping by TranslatorType::GetActionNames().
      */
-    template <typename TranslatorType, typename... Args>
-    CHIP_ERROR EnsureTranslatorRegistered(Args &&... args)
+    template <typename TranslatorType>
+    CHIP_ERROR EnsureTranslatorRegistered()
     {
         for (const auto & action : TranslatorType::GetActionNames())
         {
@@ -324,8 +319,12 @@ public:
                 return CHIP_NO_ERROR;
             }
         }
-        auto translator = std::make_shared<TranslatorType>(std::forward<Args>(args)...);
-        return RegisterTranslator(translator->GetActionNames(), std::move(translator));
+        auto translator = std::make_shared<TranslatorType>();
+        for (const auto & action : TranslatorType::GetActionNames())
+        {
+            ReturnErrorOnFailure(RegisterTranslator(action, translator));
+        }
+        return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR DispatchJson(const Json::Value & json);
@@ -353,9 +352,9 @@ sequenceDiagram
     participant Accessor as Cluster OOB Accessor
     participant Cluster as OnOff Cluster
 
-    Pipe->>Disp: Raw JSON string: {"action": "SetOnOff", "endpoint": 1, "value": true}
-    Disp->>Trans: TranslateAndExecute(json, Reg)
-    Trans->>Reg: HandleAction("SetOnOff", TLV[endpoint: 1, value: true])
+    Pipe->>Disp: Raw JSON string: {"Name": "SetOnOff", "EndpointId": 1, "OnOff": true}
+    Disp->>Trans: TranslateAndExecute(endpointId, json, Reg)
+    Trans->>Reg: HandleAction("SetOnOff", TLV[endpoint: 1, OnOff: true])
     Reg->>Accessor: HandleAction("SetOnOff", TLV)
     Accessor->>Cluster: SetOnOff(true)
 ```
@@ -364,19 +363,19 @@ sequenceDiagram
     `/tmp/chip_all_devices_fifo`):
     ```json
     {
-        "action": "SetOnOff",
-        "endpoint": 1,
-        "value": true
+        "Name": "SetOnOff",
+        "EndpointId": 1,
+        "OnOff": true
     }
     ```
 2.  **Dispatch**: `PosixNamedPipeDispatcher` reads pipe, parses JSON, and
-    extracts `"action"`.
+    extracts `"Name"` and `"EndpointId"`.
 3.  **Translation**: Dispatcher invokes
-    `OnOffTranslator::TranslateAndExecute(json, mOobRegistry)`:
-    -   Extracts `endpoint = 1` and `value = true`.
+    `OnOffTranslator::TranslateAndExecute(endpointId, json, mOobRegistry)`:
+    -   Extracts `OnOff = true`.
     -   Encodes flat TLV payload:
         -   Tag 1: `EndpointId` (`uint16_t`)
-        -   Tag 2: `Value` (`bool`)
+        -   Tag 2: `OnOff` (`bool`)
     -   Calls `registry.HandleAction("SetOnOff", tlvBuffer)`.
 4.  **Execution**: `OOBAccessorRegistry` routes to `OnOffOOBAccessor` registered
     for Endpoint 1:
@@ -510,7 +509,11 @@ In `DeviceFactory.h` (creator registration):
 ```cpp
 RegisterCreator("on-off-light", [this](const std::string & label) -> CreatedDevice {
     VerifyOrDie(mContext.has_value());
-    auto device = std::make_unique<LoggingOnOffLight>(mContext->timerDelegate);
+    auto device = std::make_unique<LoggingOnOffLight>(LoggingOnOffLight::Context{
+        .groupDataProvider = mContext->groupDataProvider,
+        .fabricTable       = mContext->fabricTable,
+        .timerDelegate     = mContext->timerDelegate,
+    });
     auto * rawDevice = device.get();
 
     return CreatedDevice{

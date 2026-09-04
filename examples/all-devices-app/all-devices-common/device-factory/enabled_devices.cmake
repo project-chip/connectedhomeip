@@ -251,6 +251,8 @@ if(NOT CMAKE_BUILD_EARLY_EXPANSION)
     )
 endif()
 
+include("${ALL_DEVICES_COMMON_DIR}/oob-accessors/all_devices_config.cmake")
+
 # ---------------------------------------------------------------------------
 # Source files for clusters that are not included in the default SDK build
 # but are required by enabled devices (e.g. Binding cluster for client switches).

@@ -76,7 +76,7 @@ CHIP_ERROR PosixNamedPipeDispatcher::DispatchJson(const Json::Value & json)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    auto endpointId = NamedPipeCommandTranslator::GetEndpointId(json);
+    auto endpointId = NamedPipeCommandTranslator::ExtractUInt<EndpointId>(json, "EndpointId");
     if (!endpointId.has_value())
     {
         ChipLogError(AppServer, "PosixNamedPipeDispatcher: Missing or invalid EndpointId");

@@ -18,31 +18,31 @@ the appropriate accessor based on the target Endpoint ID.
 ```mermaid
 classDiagram
     class OOBAccessorRegistry {
-        -mAccessors: IntrusiveList~OOBAccessor~
-        +Register(accessor: OOBAccessor&) void
+        +Register(accessor: unique_ptr~OOBAccessor~) CHIP_ERROR
         +HandleAction(actionName: CharSpan, tlvBuffer: ByteSpan) CHIP_ERROR
     }
     class OOBAccessor {
         <<Interface>>
-        +HandleAction(actionName: CharSpan, tlvBuffer: ByteSpan) std::optional~CHIP_ERROR~*
+        +HandleAction(actionName: CharSpan, tlvBuffer: ByteSpan) optional~CHIP_ERROR~*
+        +GetActionNames() Span~const CharSpan~*
     }
-    class BooleanStateSensorAccessor {
-        +HandleAction(actionName: CharSpan, tlvBuffer: ByteSpan) std::optional~CHIP_ERROR~
+    class BooleanStateOOBAccessor {
+        +HandleAction(actionName: CharSpan, tlvBuffer: ByteSpan) optional~CHIP_ERROR~
+        +GetActionNames() Span~const CharSpan~
     }
     class BooleanStateSensor {
     }
 
-    class PigweedAttributeAccessor {
-        <<Pigweed Interceptor>>
-        +Write(path: ConcreteDataAttributePath, reader: TLVReader)
+    class PosixNamedPipeDispatcher {
+        +DispatchJson(json: Json::Value) CHIP_ERROR
     }
     class ShellCommandHandler {
         +HandleCommand(args)
     }
 
     OOBAccessorRegistry "1" *-- "many" OOBAccessor
-    BooleanStateSensorAccessor --|> OOBAccessor
-    BooleanStateSensorAccessor "1" --> "1" BooleanStateSensor : references
-    PigweedAttributeAccessor --> OOBAccessorRegistry : uses
+    BooleanStateOOBAccessor --|> OOBAccessor
+    BooleanStateOOBAccessor "1" --> "1" BooleanStateSensor : references
+    PosixNamedPipeDispatcher --> OOBAccessorRegistry : uses
     ShellCommandHandler --> OOBAccessorRegistry : uses
 ```

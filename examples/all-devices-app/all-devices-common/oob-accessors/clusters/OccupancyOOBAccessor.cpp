@@ -138,7 +138,11 @@ std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleSetHoldTime(ByteSpan tlvDa
     }
 
     auto status = mCluster.SetHoldTime(holdTime);
-    return status.IsSuccess() ? CHIP_NO_ERROR : CHIP_ERROR_INVALID_ARGUMENT;
+    if (!status.IsSuccess())
+    {
+        return status.GetUnderlyingError();
+    }
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip::app

@@ -55,7 +55,7 @@ Instantiate device classes (such as `LoggingDimmableLight`) directly.
 
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
-#include <device/types/dimmable-light/LoggingDimmableLight.h>
+#include <device/types/dimmable-light/impl/LoggingDimmableLight.h>
 #include <lib/core/CHIPError.h>
 #include <platform/DefaultTimerDelegate.h>
 

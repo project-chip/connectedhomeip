@@ -20,7 +20,6 @@
 #include <app/FailSafeContext.h>
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/clusters/bindings/binding-table.h>
-#include <app_config/all_devices_config.h>
 #include <app_config/enabled_devices.h>
 #include <device/types/aggregator/Aggregator.h>
 #include <device/types/air-purifier/impl/LoggingAirPurifier.h>
@@ -91,7 +90,7 @@ namespace chip::app {
  * - When no hooks are needed (e.g. resource-constrained embedded targets), use @ref SimpleDeviceFactory
  *   (`DeviceFactory<>`). In this mode, `MakeOnDeviceRegisteredCallback` compiles to a no-op returning `nullptr`.
  * - When one or more hooks are supplied (e.g. `DeviceFactory<OOBAccessorHook, NamedPipeHook>`), each hook's
- *   static `Register(*device)` method is invoked in order via C++17 fold expressions once the device is created.
+ *   static `OnDeviceRegistered(*device)` method is invoked in order via C++17 fold expressions once the device is created.
  *
  * ### Lifecycle & Data Flow
  *
@@ -176,6 +175,15 @@ public:
     };
 
     template <typename TDevice>
+    static void ExecuteHooks(TDevice & device)
+    {
+        if constexpr (sizeof...(Hooks) > 0)
+        {
+            (Hooks::OnDeviceRegistered(device), ...);
+        }
+    }
+
+    template <typename TDevice>
     static std::function<void()> MakeOnDeviceRegisteredCallback(TDevice * device)
     {
         if constexpr (sizeof...(Hooks) == 0)
@@ -185,7 +193,10 @@ public:
         else
         {
             return [device]() {
-                (Hooks::OnDeviceRegistered(*device), ...);
+                if (device != nullptr)
+                {
+                    ExecuteHooks(*device);
+                }
             };
         }
     }

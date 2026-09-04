@@ -190,8 +190,7 @@ public:
         DynamicEndpointIdAllocator endpointIdAllocator(GetReservedEndpointIds());
         endpointIdAllocator.ForceNext(kRootEndpointId);
         ReturnErrorOnFailure(mRootNode.RootDevice().Register(endpointIdAllocator, mDataModelProvider));
-        OOBAccessorHook::OnDeviceRegistered(mRootNode.GetRootNode());
-        NamedPipeHook::OnDeviceRegistered(mRootNode.GetRootNode());
+        PosixDeviceFactory::ExecuteHooks(mRootNode.GetRootNode());
 
         for (const auto & entry : AppOptions::GetDeviceTypeEntries())
         {

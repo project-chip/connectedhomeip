@@ -50,10 +50,16 @@ graph TD
 Contains simulated device behaviors and capability management. This layer
 compiles independently of the operating system or hardware drivers. It includes:
 
--   **`devices/`**: Concrete implementations of simulated Matter devices (e.g.,
+-   **`device/types/`**: Concrete implementations of simulated Matter devices (e.g.,
     `OccupancySensor`, `DimmableLight`, `Speaker`).
--   **`device-factory/`**: Registry (`DeviceFactory`) responsible for mapping
+-   **`device/api/`**: Base contracts and abstractions (`DeviceInterface`, `SingleEndpoint`,
+    `DynamicEndpointIdAllocator`).
+-   **`device/capabilities/`**: Reusable device loads and capabilities (e.g., `OnOffLoad`,
+    `DimmableLoad`, `FanLoad`).
+-   **`device-factory/`**: Registry (`DeviceFactory<Hooks...>`) responsible for mapping
     CLI device names to creation factories.
+-   **`oob-accessors/`**: Out-of-Band cluster manipulation layer (`OOBAccessor`,
+    `OOBAccessorRegistry`).
 -   **`providers/`**: SDK-level data providers (such as
     `AllDevicesExampleDeviceInfoProviderImpl`) that supply node lifecycle
     information, storage interfaces, and descriptor details.
@@ -75,49 +81,48 @@ These directories contain hardware-specific or OS-specific drivers, entrypoint
 ### The Device Interface
 
 All devices in the application implement `DeviceInterface` and its core base
-class, `SingleEndpointDevice`.
+class, `SingleEndpoint`.
 
 ```mermaid
 classDiagram
     class DeviceInterface {
         <<interface>>
-        +Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)* CHIP_ERROR
+        +Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider, EndpointComposition composition)* CHIP_ERROR
         +Unregister(CodeDrivenDataModelProvider & provider)*
         +GetEndpointId() EndpointId
-        +GetParentEndpointId() EndpointId
     }
 
-    class SingleEndpointDevice {
+    class SingleEndpoint {
         <<abstract>>
-        -mEndpointId: EndpointId
-        -mParentEndpointId: EndpointId
-        -mDeviceTypeList: Span<DeviceTypeDescriptor>
-        +Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId) CHIP_ERROR
+        #mEndpointId: EndpointId
+        #mDeviceTypes: Span~const DeviceTypeEntry~
+        +Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider, EndpointComposition composition) CHIP_ERROR
+        +Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)* CHIP_ERROR
         +Unregister(CodeDrivenDataModelProvider & provider)
-        +SetEndpointId(EndpointId id)
+        +GetEndpointId() EndpointId
     }
 
     class OccupancySensor {
-        -mOccupancySensingCluster: OccupancySensingCluster
-        -mBridgedDeviceBasicInformationCluster: BridgedDeviceBasicInformationCluster
-        +Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId) CHIP_ERROR
+        -mOccupancySensingCluster: LazyRegisteredServerCluster~OccupancySensingCluster~
+        -mIdentifyCluster: LazyRegisteredServerCluster~IdentifyCluster~
+        +Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition) CHIP_ERROR
     }
 
-    DeviceInterface <|-- SingleEndpointDevice
-    SingleEndpointDevice <|-- OccupancySensor
+    DeviceInterface <|-- SingleEndpoint
+    SingleEndpoint <|-- OccupancySensor
 ```
 
 -   **`DeviceInterface`**
-    (`all-devices-common/devices/interface/DeviceInterface.h`): Defines the pure
+    (`all-devices-common/device/api/Interface.h`): Defines the pure
     virtual lifecycle contracts (`Register`, `Unregister`, etc.) required for
     registering a block of data model elements into the active server.
--   **`SingleEndpointDevice`**
-    (`all-devices-common/devices/interface/SingleEndpointDevice.h`):
+-   **`SingleEndpoint`**
+    (`all-devices-common/device/api/SingleEndpoint.h`):
     Encapsulates endpoint state, managing its assigned `EndpointId`, its parent
     endpoint relationship (for bridges or composite devices), and a list of
-    `DeviceTypeDescriptor` structures.
+    `DeviceTypeEntry` structures.
 -   **Concrete Devices** (e.g., `OccupancySensor`): Inherit from
-    `SingleEndpointDevice`, own one or more concrete strongly-typed cluster
+    `SingleEndpoint`, own one or more concrete strongly-typed cluster
     instances (`LazyRegisteredServerCluster`), and bind them to the endpoint
     during registration.
 

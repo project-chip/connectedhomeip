@@ -42,20 +42,6 @@ public:
      */
     virtual CHIP_ERROR TranslateAndExecute(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry) = 0;
 
-    static std::optional<EndpointId> GetEndpointId(const Json::Value & json)
-    {
-        if (!json.isMember("EndpointId") || !json["EndpointId"].isUInt())
-        {
-            return std::nullopt;
-        }
-        unsigned int val = json["EndpointId"].asUInt();
-        if (val > 0xFFFF)
-        {
-            return std::nullopt;
-        }
-        return static_cast<EndpointId>(val);
-    }
-
     static std::optional<bool> ExtractBool(const Json::Value & json, const char * key)
     {
         if (!json.isMember(key))
