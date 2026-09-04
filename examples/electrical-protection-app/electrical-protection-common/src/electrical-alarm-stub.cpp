@@ -106,40 +106,68 @@ bool HandleElectricalAlarmTestEventTrigger(uint64_t eventTrigger)
     VerifyOrReturnValue(gInstance != nullptr, false);
     auto & cluster = gInstance->Cluster();
 
-    // Activating is additive: OR the requested bit into the current State so a test can raise
-    // several alarms in sequence.
+    // Setting is additive: OR the bit into the current State, per the test plan note that simulate
+    // triggers do not disturb other active alarms.
     auto activate = [&cluster](AlarmBitmap alarm) {
         BitMask<AlarmBitmap> next = cluster.GetState();
         next.Set(alarm);
         return cluster.SetStateValue(next) == Protocols::InteractionModel::Status::Success;
     };
 
+    // Clearing one alarm models its measured condition going away. SetStateValue preserves bits
+    // that are latched and active, so a latched alarm survives this and clears only via Reset.
+    auto deactivate = [&cluster](AlarmBitmap alarm) {
+        BitMask<AlarmBitmap> next = cluster.GetState();
+        next.Clear(alarm);
+        return cluster.SetStateValue(next) == Protocols::InteractionModel::Status::Success;
+    };
+
     switch (static_cast<ElectricalAlarmTrigger>(eventTrigger))
     {
+    // Test cleanup: drop every alarm including latched ones, so State returns to zero.
     case ElectricalAlarmTrigger::kClearAll:
-        // Models the measured condition going away, not an operator acknowledging it: latched
-        // alarms deliberately stay active here and clear only via the Reset command.
-        return cluster.SetStateValue(BitMask<AlarmBitmap>()) == Protocols::InteractionModel::Status::Success;
+        return cluster.SetStateValue(BitMask<AlarmBitmap>(), /* ignoreLatchState = */ true) ==
+            Protocols::InteractionModel::Status::Success;
     case ElectricalAlarmTrigger::kSetOverVoltage:
         return activate(AlarmBitmap::kOverVoltage);
+    case ElectricalAlarmTrigger::kClearOverVoltage:
+        return deactivate(AlarmBitmap::kOverVoltage);
     case ElectricalAlarmTrigger::kSetUnderVoltage:
         return activate(AlarmBitmap::kUnderVoltage);
+    case ElectricalAlarmTrigger::kClearUnderVoltage:
+        return deactivate(AlarmBitmap::kUnderVoltage);
     case ElectricalAlarmTrigger::kSetOverFrequency:
         return activate(AlarmBitmap::kOverFrequency);
+    case ElectricalAlarmTrigger::kClearOverFrequency:
+        return deactivate(AlarmBitmap::kOverFrequency);
     case ElectricalAlarmTrigger::kSetUnderFrequency:
         return activate(AlarmBitmap::kUnderFrequency);
+    case ElectricalAlarmTrigger::kClearUnderFrequency:
+        return deactivate(AlarmBitmap::kUnderFrequency);
     case ElectricalAlarmTrigger::kSetOverPower:
         return activate(AlarmBitmap::kOverPower);
+    case ElectricalAlarmTrigger::kClearOverPower:
+        return deactivate(AlarmBitmap::kOverPower);
     case ElectricalAlarmTrigger::kSetUnderPower:
         return activate(AlarmBitmap::kUnderPower);
+    case ElectricalAlarmTrigger::kClearUnderPower:
+        return deactivate(AlarmBitmap::kUnderPower);
     case ElectricalAlarmTrigger::kSetOverCurrent:
         return activate(AlarmBitmap::kOverCurrent);
+    case ElectricalAlarmTrigger::kClearOverCurrent:
+        return deactivate(AlarmBitmap::kOverCurrent);
     case ElectricalAlarmTrigger::kSetUnderCurrent:
         return activate(AlarmBitmap::kUnderCurrent);
+    case ElectricalAlarmTrigger::kClearUnderCurrent:
+        return deactivate(AlarmBitmap::kUnderCurrent);
     case ElectricalAlarmTrigger::kSetPowerImport:
         return activate(AlarmBitmap::kPowerImported);
+    case ElectricalAlarmTrigger::kClearPowerImport:
+        return deactivate(AlarmBitmap::kPowerImported);
     case ElectricalAlarmTrigger::kSetPowerExport:
         return activate(AlarmBitmap::kPowerExported);
+    case ElectricalAlarmTrigger::kClearPowerExport:
+        return deactivate(AlarmBitmap::kPowerExported);
     default:
         return false;
     }
