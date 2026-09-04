@@ -70,7 +70,8 @@ public:
 
         Config(BitMask<CommissioningProxy::Feature> aFeatures,
                BitMask<CommissioningProxy::WiFiBandBitmap> aSupportedWiFiBands = {}) :
-            featureFlags(aFeatures), supportedWiFiBands(aSupportedWiFiBands)
+            featureFlags(aFeatures),
+            supportedWiFiBands(aSupportedWiFiBands)
         {}
     };
 
@@ -88,8 +89,8 @@ public:
     // OnFabricRemoved must be driven directly.
     CommissioningProxyCluster(EndpointId endpointId, const Config & config, TimerDelegate & timerDelegate,
                               FabricTable * fabricTable = nullptr) :
-        DefaultServerCluster({ endpointId, CommissioningProxy::Id }), mFeatureFlags(config.featureFlags),
-        mSupportedWiFiBands(config.supportedWiFiBands), mEnabledOptionalAttributes([&]() {
+        DefaultServerCluster({ endpointId, CommissioningProxy::Id }),
+        mFeatureFlags(config.featureFlags), mSupportedWiFiBands(config.supportedWiFiBands), mEnabledOptionalAttributes([&]() {
             OptionalAttributesSet attrs;
             attrs.Set<CommissioningProxy::Attributes::MaxCachedResults::Id>(
                 config.featureFlags.Has(CommissioningProxy::Feature::kBackgroundScan));
