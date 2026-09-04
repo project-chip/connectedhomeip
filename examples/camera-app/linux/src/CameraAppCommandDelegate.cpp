@@ -79,6 +79,12 @@ void CameraAppCommandHandler::HandleCommand(intptr_t context)
         bool value = self->mJsonValue["Value"].asBool();
         self->OnSetHardPrivacyModeOnHandler(value);
     }
+    else if (name == "AmbientContextTriggered")
+    {
+        uint16_t namespaceValue = self->mJsonValue["NamespaceId"].asUInt();
+        uint16_t tagValue = self->mJsonValue["TagId"].asUInt(); 
+        self->OnAmbientContextTriggeredHandler(namespaceValue, tagValue);
+    }
     else
     {
         ChipLogError(NotSpecified, "Unhandled command: Should never happen");
@@ -101,6 +107,11 @@ void CameraAppCommandHandler::OnZoneTriggeredHandler(const std::vector<uint16_t>
 void CameraAppCommandHandler::OnSetHardPrivacyModeOnHandler(bool value)
 {
     TEMPORARY_RETURN_IGNORED mCameraDevice->GetCameraAVStreamMgmtController().SetHardPrivacyModeOn(value);
+}
+
+void CameraAppCommandHandler::OnAmbientContextTriggeredHandler(uint8_t namespaceId, uint8_t tagId)
+{
+    mCameraDevice->HandleSimulatedAmbientContextTriggeredEvent(namespaceId, tagId);
 }
 
 void CameraAppCommandDelegate::SetCameraDevice(Camera::CameraDevice * aCameraDevice)

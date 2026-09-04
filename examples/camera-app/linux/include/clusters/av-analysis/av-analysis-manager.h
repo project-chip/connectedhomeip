@@ -58,7 +58,7 @@ public:
     virtual Protocols::InteractionModel::Status RemoveAnalysisStream() override;
 
     /**
-     * Delegate command assists
+     * Delegate command helpers
      */
 
     virtual CHIP_ERROR VerifyZoneIDsAreValid(const std::vector<uint16_t> & aZoneIDs) override;
@@ -68,6 +68,11 @@ public:
     void ActiveAmbientContextTriggersUpdated() override;
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
+    
+    /**
+     * Context event detection handling
+     */
+    void OnAmbientContextTriggeredEvent(uint8_t namespaceId, uint8_t tagId, bool& triggeredContextEnabled);
 
 private:
 };

@@ -83,3 +83,12 @@ CHIP_ERROR AvAnalysisManager::PersistentAttributesLoadedCallback()
 {
     return CHIP_NO_ERROR;
 }
+
+/**
+ * Context event handling
+ */
+void AvAnalysisManager::OnAmbientContextTriggeredEvent(uint8_t namespaceId, uint8_t tagId, bool& triggeredContextEnabled)
+{
+    // Event generation logic goes here
+    triggeredContextEnabled = true;
+}

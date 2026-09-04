@@ -46,6 +46,7 @@ using namespace chip::app::Clusters::CameraAvStreamManagement;
 using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
 using namespace chip::app::Clusters::ZoneManagement;
+using namespace chip::app::Clusters::AvAnalysis;
 
 using namespace Camera;
 
@@ -1864,6 +1865,19 @@ void CameraDevice::HandleSimulatedZoneStoppedEvent(uint16_t zoneId)
     mZoneManager.OnZoneStoppedEvent(zoneId, ZoneEventStoppedReasonEnum::kActionStopped);
     // Note: PushAVTransportManager doesn't need zone stopped event currently
 }
+
+void CameraDevice::HandleSimulatedAmbientContextTriggeredEvent(uint8_t namespaceId, uint8_t tagId)
+{
+    bool triggeredContextEnabled;
+    mAVAnalysisManager.OnAmbientContextTriggeredEvent(namespaceId, tagId, triggeredContextEnabled);
+    
+    // We only want to trigger PushAV if the triggering context has been enabled
+    if (triggeredContextEnabled)
+    {
+        mPushAVTransportManager.HandleAmbientContextTrigger(namespaceId, tagId);
+    }
+}
+
 
 void CameraDevice::InitializeVideoStreams()
 {

@@ -355,6 +355,8 @@ public:
     void HandleSimulatedZoneTriggeredEvent(const std::vector<uint16_t> & zoneIds);
 
     void HandleSimulatedZoneStoppedEvent(uint16_t zoneId);
+    
+    void HandleSimulatedAmbientContextTriggeredEvent(uint8_t namespaceId, uint8_t tagId);
 
     uint8_t GetMaxAnalysisStreams() override { return mMaxAnalysisStreams; }
     std::vector<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> GetSupportedAmbientContexts() override;
