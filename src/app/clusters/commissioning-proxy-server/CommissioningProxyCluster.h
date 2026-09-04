@@ -70,8 +70,7 @@ public:
 
         Config(BitMask<CommissioningProxy::Feature> aFeatures,
                BitMask<CommissioningProxy::WiFiBandBitmap> aSupportedWiFiBands = {}) :
-            featureFlags(aFeatures),
-            supportedWiFiBands(aSupportedWiFiBands)
+            featureFlags(aFeatures), supportedWiFiBands(aSupportedWiFiBands)
         {}
     };
 
@@ -89,8 +88,8 @@ public:
     // OnFabricRemoved must be driven directly.
     CommissioningProxyCluster(EndpointId endpointId, const Config & config, TimerDelegate & timerDelegate,
                               FabricTable * fabricTable = nullptr) :
-        DefaultServerCluster({ endpointId, CommissioningProxy::Id }),
-        mFeatureFlags(config.featureFlags), mSupportedWiFiBands(config.supportedWiFiBands), mEnabledOptionalAttributes([&]() {
+        DefaultServerCluster({ endpointId, CommissioningProxy::Id }), mFeatureFlags(config.featureFlags),
+        mSupportedWiFiBands(config.supportedWiFiBands), mEnabledOptionalAttributes([&]() {
             OptionalAttributesSet attrs;
             attrs.Set<CommissioningProxy::Attributes::MaxCachedResults::Id>(
                 config.featureFlags.Has(CommissioningProxy::Feature::kBackgroundScan));
@@ -172,6 +171,16 @@ public:
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
     CHIP_ERROR SetCPState(State state);
     CommissioningProxyCluster::State GetCPState();
+
+    /**
+     * @brief Report the proxy disconnected once no session remains, anywhere.
+     *
+     * For a transport whose peer closed the connection: the ProxyDisconnectRequest path
+     * sets the state itself. A transport must not decide this from its own sessions --
+     * with more than one transport configured, the last session on one of them is not the
+     * last session on the proxy.
+     */
+    void SetDisconnectedIfLastSession();
 
     /**
      * @brief Current ScanMaxTime / CacheTimeout attribute values.

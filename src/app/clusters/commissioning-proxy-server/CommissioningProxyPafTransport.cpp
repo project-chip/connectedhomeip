@@ -38,8 +38,7 @@ using Protocols::InteractionModel::Status;
 
 CommissioningProxyPafTransport::CommissioningProxyPafTransport(CommissioningProxyPafAdapter & adapter,
                                                                TimerDelegate & timerDelegate, FabricTable * fabricTable) :
-    mAdapter(adapter),
-    mTimerDelegate(timerDelegate), mBgScan(mBgScanHardware, timerDelegate), mFabricTable(fabricTable)
+    mAdapter(adapter), mTimerDelegate(timerDelegate), mBgScan(mBgScanHardware, timerDelegate), mFabricTable(fabricTable)
 {}
 
 CommissioningProxyPafTransport::~CommissioningProxyPafTransport()
@@ -212,18 +211,6 @@ CHIP_ERROR CommissioningProxyPafTransport::ProxyPafDelegate::WiFiPAFCloseSession
         if (mOwner.mHost != nullptr)
         {
             mOwner.mHost->Sessions().DispatchMessageFailure(sid, Status::Failure);
-            // Only the last session leaving makes the proxy disconnected: the slot is
-            // already freed above, so AnySessionOpen() reflects what remains. The
-            // ProxyDisconnectRequest path is not handled here - the cluster sets the state
-            // itself once it has torn the session down.
-            if (!mOwner.AnySessionOpen())
-            {
-                CHIP_ERROR stateErr = mOwner.mHost->SetCPState(CommissioningProxyCluster::kState_CPDisconnected);
-                if (stateErr != CHIP_NO_ERROR)
-                {
-                    ChipLogError(AppServer, "WiFiPAFCloseSession: SetCPState failed: %" CHIP_ERROR_FORMAT, stateErr.Format());
-                }
-            }
         }
 
         WiFiPAF::WiFiPAFLayer & layer = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
@@ -239,6 +226,9 @@ CHIP_ERROR CommissioningProxyPafTransport::ProxyPafDelegate::WiFiPAFCloseSession
         if (mOwner.mHost != nullptr)
         {
             mOwner.mHost->Sessions().RemoveSession(sid);
+
+            // The cluster owns this decision: it can see the sessions of every transport.
+            mOwner.mHost->SetDisconnectedIfLastSession();
         }
 
         // This path does not run through the cluster's OnAllSessionsClosed(), so resume a
