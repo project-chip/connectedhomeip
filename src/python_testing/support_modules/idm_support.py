@@ -1765,7 +1765,7 @@ class IDMBaseTest(BasicCompositionTests):
         return populators.get((info.cluster_id, info.attribute_id))
 
     def record_fabric_entry_cleanup(self, description: str, undo) -> None:
-        """Remember how to remove an entry a populator added.
+        """Remember how to undo something the test changed on a fabric.
 
         A command-owned entry cannot be restored by writing the attribute back, so
         the usual read-then-rewrite approach does not apply. Cleanups are drained
@@ -1777,7 +1777,7 @@ class IDMBaseTest(BasicCompositionTests):
         self.fabric_entry_cleanups.append((description, undo))
 
     async def run_fabric_entry_cleanups(self) -> None:
-        """Remove every entry the populators added, most recent first.
+        """Undo every recorded change, most recent first.
 
         Failures are logged and skipped so one cluster refusing to clean up cannot
         hide the test's own result or prevent the remaining entries being removed.
@@ -1786,7 +1786,7 @@ class IDMBaseTest(BasicCompositionTests):
             try:
                 await undo()
             except Exception as e:
-                log.warning("Could not remove %s: %s", description, e)
+                log.warning("Could not clean up %s: %s", description, e)
         self.fabric_entry_cleanups = []
 
     def tls_command_helper(self, endpoint_id: int, dev_ctrl: ChipDeviceCtrl):

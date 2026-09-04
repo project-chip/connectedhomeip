@@ -85,15 +85,17 @@ class TC_IDM_8_1(IDMBaseTest):
 
         The framework's cleanup restores only Acl, and a failing step skips any
         in-test cleanup, so this runs here rather than at the end of the test body.
-        Two kinds of leftovers: the entries step 4 created through a cluster's own
-        command set, and the Extension entries the event triggers wrote.
+        Three kinds of leftovers: the label step 3 wrote on TH1's fabric, which
+        outlives the test because only the extra fabrics are removed; the entries
+        step 4 created through a cluster's own command set; and the Extension
+        entries the event triggers wrote.
         """
         try:
             self.event_loop.run_until_complete(self.run_fabric_entry_cleanups())
         except Exception as e:
             # Swallowed for the same reason as the Extension cleanup below: the
             # test's own failure, if any, stays the reported one.
-            log.warning("Could not remove the entries created during step 4: %s", e)
+            log.warning("Could not undo the changes recorded during the test: %s", e)
 
         extension_info = getattr(self, 'extension_info', None)
         if extension_info is None or not extension_info.writable:
@@ -217,11 +219,20 @@ class TC_IDM_8_1(IDMBaseTest):
         fabrics_th2_before = await self.read_single_attribute_check_success(
             dev_ctrl=self.th2, endpoint=0, cluster=Clusters.OperationalCredentials, attribute=fabrics_attribute,
             fabric_filtered=False)
+        label_f1_before = fabric_label(fabrics_th1_before, f1, "TH1's Fabrics read before UpdateFabricLabel")
         label_f2_before = fabric_label(fabrics_th2_before, f2, "TH2's Fabrics read before UpdateFabricLabel")
 
         await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0,
                                    payload=Clusters.OperationalCredentials.Commands.UpdateFabricLabel(
                                        label=FABRIC_LABEL_TH1))
+        # The DUT commits the label to storage, and TH1's fabric outlives the test:
+        # the framework's cleanup removes only the extra fabrics, so nothing else puts
+        # the label the DUT arrived with back.
+        self.record_fabric_entry_cleanup(
+            f"the fabric label TH1 replaced with {FABRIC_LABEL_TH1!r}",
+            lambda: self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0,
+                                         payload=Clusters.OperationalCredentials.Commands.UpdateFabricLabel(
+                                             label=label_f1_before)))
 
         fabrics_th1_after = await self.read_single_attribute_check_success(
             dev_ctrl=self.th1, endpoint=0, cluster=Clusters.OperationalCredentials, attribute=fabrics_attribute,
