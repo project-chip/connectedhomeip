@@ -1,0 +1,257 @@
+/*
+ *    Copyright (c) 2026 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+#include <pw_unit_test/framework.h>
+
+#include <app/clusters/av-analysis-server/DefaultAvAnalysisWebRTCClient.h>
+#include <app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h>
+#include <clusters/Descriptor/Attributes.h>
+#include <clusters/Descriptor/Ids.h>
+#include <clusters/WebRTCTransportProvider/Ids.h>
+#include <lib/core/TLV.h>
+
+namespace {
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace Protocols::InteractionModel;
+
+constexpr EndpointId kProviderEndpoint = 2;
+const ScopedNodeId kCameraNode(0x1234, 1);
+constexpr uint8_t kMaxSessions = 4;
+
+// Intercepts the network boundary: records session requests instead of establishing CASE sessions.
+// The camera's behavior is simulated by invoking the public callback methods.
+class InterceptingWebRTCClient : public DefaultAvAnalysisWebRTCClient
+{
+public:
+    using DefaultAvAnalysisWebRTCClient::CurrentRequest;
+    using DefaultAvAnalysisWebRTCClient::HandleServerListReport;
+
+    // Drives the request into the provider-check phase, as OnDeviceConnected would after CASE
+    void EnterProviderCheck() { CurrentRequest().Advance(Request::Phase::kCheckingProvider); }
+
+    int mConnectRequests = 0;
+    ScopedNodeId mLastPeer;
+
+protected:
+    void EstablishSession(const ScopedNodeId & aCameraNode) override
+    {
+        mConnectRequests++;
+        mLastPeer = aCameraNode;
+    }
+};
+
+class RecordingCallback : public AvAnalysisWebRTCClient::Callback
+{
+public:
+    int mInitiatedCount   = 0;
+    int mActiveCount      = 0;
+    int mFailedCount      = 0;
+    int mEndedCount       = 0;
+    Status mLastStatus    = Status::Success;
+    uint16_t mLastSession = 0;
+
+    void OnSessionInitiated(Status aStatus, uint16_t aWebRTCSessionId) override
+    {
+        mInitiatedCount++;
+        mLastStatus  = aStatus;
+        mLastSession = aWebRTCSessionId;
+    }
+    void OnSessionActive(uint16_t aWebRTCSessionId) override
+    {
+        mActiveCount++;
+        mLastSession = aWebRTCSessionId;
+    }
+    void OnSessionFailed(uint16_t aWebRTCSessionId) override
+    {
+        mFailedCount++;
+        mLastSession = aWebRTCSessionId;
+    }
+    void OnSessionEnded(Status aStatus, uint16_t aWebRTCSessionId) override
+    {
+        mEndedCount++;
+        mLastStatus  = aStatus;
+        mLastSession = aWebRTCSessionId;
+    }
+};
+
+// Hands back a canned SDP synchronously; records the session lifecycle notifications
+class FakePeerDelegate : public AvAnalysisWebRTCPeerDelegate
+{
+public:
+    int mOffersRequested   = 0;
+    int mSessionsAssigned  = 0;
+    int mSessionsClosed    = 0;
+    uint16_t mLastAssigned = 0;
+    uint16_t mLastClosed   = 0;
+
+    CHIP_ERROR CreateOffer(OfferCallback & aCallback) override
+    {
+        mOffersRequested++;
+        mLastOfferCallback = &aCallback;
+        return CHIP_NO_ERROR;
+    }
+    void OnSessionAssigned(uint16_t aWebRTCSessionId) override
+    {
+        mSessionsAssigned++;
+        mLastAssigned = aWebRTCSessionId;
+    }
+    void OnSessionClosed(uint16_t aWebRTCSessionId) override
+    {
+        mSessionsClosed++;
+        mLastClosed = aWebRTCSessionId;
+    }
+
+    OfferCallback * mLastOfferCallback = nullptr;
+};
+
+// The requestor cluster the client records sessions into
+{
+public:
+    CHIP_ERROR HandleOffer(const WebRTCTransportRequestor::WebRTCSessionStruct &, const OfferArgs &) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR HandleAnswer(const WebRTCTransportRequestor::WebRTCSessionStruct &, const std::string &) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR HandleICECandidates(const WebRTCTransportRequestor::WebRTCSessionStruct &,
+                                   const std::vector<WebRTCTransportRequestor::ICECandidateStruct> &) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR HandleEnd(const WebRTCTransportRequestor::WebRTCSessionStruct &,
+                         WebRTCTransportRequestor::WebRTCEndReasonEnum) override
+    {
+        return CHIP_NO_ERROR;
+    }
+};
+
+// Feeds a crafted ServerList report for the provider endpoint into the client
+void FeedServerList(InterceptingWebRTCClient & aClient, EndpointId aEndpoint, Span<const ClusterId> aClusters)
+{
+    uint8_t buffer[64];
+    TLV::TLVWriter writer;
+    writer.Init(buffer, sizeof(buffer));
+    TLV::TLVType outer;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outer), CHIP_NO_ERROR);
+    for (ClusterId cluster : aClusters)
+    {
+        ASSERT_EQ(writer.Put(TLV::AnonymousTag(), cluster), CHIP_NO_ERROR);
+    }
+    ASSERT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
+
+    TLV::TLVReader reader;
+    reader.Init(buffer, writer.GetLengthWritten());
+    ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+    aClient.HandleServerListReport(ConcreteDataAttributePath(aEndpoint, Descriptor::Id, Descriptor::Attributes::ServerList::Id),
+                                   reader);
+}
+
+struct TestDefaultAvAnalysisWebRTCClient : public ::testing::Test
+{
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+
+    void SetUp() override
+    {
+        ASSERT_EQ(mClient.Init(&mCASESessionManager, &mPeerDelegate, &mRequestorCluster, kMaxSessions), CHIP_NO_ERROR);
+    }
+
+    // Never used for real sessions: InterceptingWebRTCClient overrides EstablishSession.
+    CASESessionManager mCASESessionManager;
+    InterceptingWebRTCClient mClient;
+    RecordingCallback mCallback;
+    FakePeerDelegate mPeerDelegate;
+    StubRequestorDelegate mRequestorDelegate;
+    WebRTCTransportRequestor::WebRTCTransportRequestorCluster mRequestorCluster{ 1, mRequestorDelegate };
+};
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, InitArgumentValidation)
+{
+    DefaultAvAnalysisWebRTCClient client;
+    EXPECT_EQ(client.Init(nullptr, &mPeerDelegate, &mRequestorCluster, kMaxSessions), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(client.Init(&mCASESessionManager, nullptr, &mRequestorCluster, kMaxSessions), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(client.Init(&mCASESessionManager, &mPeerDelegate, nullptr, kMaxSessions), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(client.Init(&mCASESessionManager, &mPeerDelegate, &mRequestorCluster, 0), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(client.Init(&mCASESessionManager, &mPeerDelegate, &mRequestorCluster, kMaxSessions), CHIP_NO_ERROR);
+    EXPECT_EQ(client.Init(&mCASESessionManager, &mPeerDelegate, &mRequestorCluster, kMaxSessions), CHIP_ERROR_INCORRECT_STATE);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, RequestStartsSessionEstablishment)
+{
+    EXPECT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, 42, mCallback), CHIP_NO_ERROR);
+    EXPECT_EQ(mClient.mConnectRequests, 1);
+    EXPECT_EQ(mClient.mLastPeer, kCameraNode);
+    EXPECT_EQ(mCallback.mInitiatedCount, 0); // Nothing completed yet
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, SecondRequestWhilePendingIsBusy)
+{
+    EXPECT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, 42, mCallback), CHIP_NO_ERROR);
+    EXPECT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, 42, mCallback), CHIP_ERROR_BUSY);
+    EXPECT_EQ(mClient.mConnectRequests, 1);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, EndingAnUntrackedSessionIsRejected)
+{
+    EXPECT_EQ(mClient.EndSession(kCameraNode, kProviderEndpoint, 55, mCallback), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(mClient.mConnectRequests, 0);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, MissingProviderClusterIsNotFound)
+{
+    EXPECT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, 42, mCallback), CHIP_NO_ERROR);
+    mClient.EnterProviderCheck();
+
+    // The endpoint's ServerList lacks WebRTCTransportProvider
+    const ClusterId kOtherClusters[] = { Descriptor::Id, 0x0557 };
+    FeedServerList(mClient, kProviderEndpoint, Span<const ClusterId>(kOtherClusters));
+    mClient.OnDone(static_cast<ReadClient *>(nullptr));
+
+    EXPECT_EQ(mCallback.mInitiatedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::NotFound);
+
+    // Completed: the client accepts a new request again
+    EXPECT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, 42, mCallback), CHIP_NO_ERROR);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, ReportsForOtherPathsDoNotSatisfyTheProviderCheck)
+{
+    EXPECT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, 42, mCallback), CHIP_NO_ERROR);
+    mClient.EnterProviderCheck();
+
+    // The provider exists, but on a different endpoint than the command named
+    const ClusterId kProviderList[] = { WebRTCTransportProvider::Id };
+    FeedServerList(mClient, static_cast<EndpointId>(kProviderEndpoint + 1), Span<const ClusterId>(kProviderList));
+    mClient.OnDone(static_cast<ReadClient *>(nullptr));
+
+    EXPECT_EQ(mCallback.mInitiatedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::NotFound);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, CancelSilentlyAbandonsTheRequest)
+{
+    EXPECT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, 42, mCallback), CHIP_NO_ERROR);
+    mClient.Cancel();
+
+    EXPECT_EQ(mCallback.mInitiatedCount, 0);
+    EXPECT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, 42, mCallback), CHIP_NO_ERROR);
+}
+
+} // namespace

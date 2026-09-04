@@ -34,4 +34,6 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/AvAnalysisStreamTable.h"
     "${CLUSTER_DIR}/DefaultAvAnalysisCameraClient.cpp"
     "${CLUSTER_DIR}/DefaultAvAnalysisCameraClient.h"
+    "${CLUSTER_DIR}/DefaultAvAnalysisWebRTCClient.cpp"
+    "${CLUSTER_DIR}/DefaultAvAnalysisWebRTCClient.h"
 )

@@ -27,6 +27,8 @@ source_set("av-analysis-server") {
     "AvAnalysisStreamTable.h",
     "DefaultAvAnalysisCameraClient.cpp",
     "DefaultAvAnalysisCameraClient.h",
+    "DefaultAvAnalysisWebRTCClient.cpp",
+    "DefaultAvAnalysisWebRTCClient.h",
   ]
 
   deps = [
@@ -34,7 +36,10 @@ source_set("av-analysis-server") {
     "${chip_root}/src/lib/support",
   ]
 
-  public_deps = [ ":av-analysis-cluster" ]
+  public_deps = [
+    ":av-analysis-cluster",
+    "${chip_root}/src/app/clusters/webrtc-transport-requestor-server",
+  ]
 }
 
 source_set("av-analysis-cluster") {

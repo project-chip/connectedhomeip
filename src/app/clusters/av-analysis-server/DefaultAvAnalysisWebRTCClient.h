@@ -1,0 +1,316 @@
+/*
+ *
+ *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#pragma once
+
+#include <app/BufferedReadCallback.h>
+#include <app/CASESessionManager.h>
+#include <app/CommandSender.h>
+#include <app/ReadClient.h>
+#include <app/clusters/av-analysis-server/AvAnalysisWebRTCClient.h>
+#include <app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/support/ScopedMemoryBuffer.h>
+#include <transport/SessionHolder.h>
+
+#include <string>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+/**
+ * The application side of the default WebRTC client: manages the peer connections whose signaling
+ * the client performs. The methods carry the camera-assigned
+ * WebRTC session id, under which the application keys its peer connections.
+ *
+ * All methods are invoked on the Matter thread.
+ */
+class AvAnalysisWebRTCPeerDelegate
+{
+public:
+    class OfferCallback
+    {
+    public:
+        virtual ~OfferCallback() = default;
+
+        /**
+         * Delivers the SDP offer produced for a new session, or the error that prevented it
+         * The SDP is copied before this call returns.
+         */
+        virtual void OnOfferReady(CHIP_ERROR aError, CharSpan aSdp) = 0;
+    };
+
+    virtual ~AvAnalysisWebRTCPeerDelegate() = default;
+
+    /**
+     * Creates the peer connection for a new session and produces its SDP offer, delivered through
+     * aCallback. At most one offer is outstanding at a
+     * time; its session id follows via OnSessionAssigned once the camera assigns one.
+     */
+    virtual CHIP_ERROR CreateOffer(OfferCallback & aCallback) = 0;
+
+    /**
+     * The offer most recently produced now has a camera-assigned session id: the application binds
+     * the peer connection it created to this id.
+     */
+    virtual void OnSessionAssigned(uint16_t aWebRTCSessionId) = 0;
+
+    /**
+     * The session is over (deactivated, failed, or cancelled): the application releases the peer
+     * connection bound to this id.
+     */
+    virtual void OnSessionClosed(uint16_t aWebRTCSessionId) = 0;
+};
+
+/**
+ * AvAnalysisWebRTCClient: reaches the camera over a CASE session obtained from the
+ * CASESessionManager and drives the WebRTCTransportProvider signaling with a CommandSender, with
+ * the SDP offers produced by the application through AvAnalysisWebRTCPeerDelegate.
+ *
+ * One signaling interaction is in flight at a time; a request made while another is pending fails
+ * with CHIP_ERROR_BUSY. Established sessions are tracked until they end, so their late outcomes
+ * (active, failed, camera-ended) reach the callback that initiated them.
+ */
+class DefaultAvAnalysisWebRTCClient : public AvAnalysisWebRTCClient,
+                                      public CommandSender::Callback,
+                                      public ReadClient::Callback,
+                                      public AvAnalysisWebRTCPeerDelegate::OfferCallback
+{
+public:
+    DefaultAvAnalysisWebRTCClient() :
+        mOnConnectedCallback(OnDeviceConnected, this), mOnConnectionFailureCallback(OnDeviceConnectionFailure, this)
+    {}
+
+    /**
+     * @param aCASESessionManager Used to reach the camera node; must outlive this instance.
+     * @param aPeerDelegate       Produces the SDP offers and manages the peer connections; must
+     *                            outlive this instance.
+     * @param aRequestorCluster   The node's WebRTCTransportRequestor server instance, registered by
+     *                            the application; the client records the sessions it initiates
+     *                            there (and removes them when they end) so the camera's inbound
+     *                            commands validate and CurrentSessions stays truthful. Must outlive
+     *                            this instance.
+     * @param aMaxSessions        Sessions tracked concurrently; an Analysis Node passes its
+     *                            MaxAnalysisStreamCount.
+     */
+    CHIP_ERROR Init(CASESessionManager * aCASESessionManager, AvAnalysisWebRTCPeerDelegate * aPeerDelegate,
+                    WebRTCTransportRequestor::WebRTCTransportRequestorCluster * aRequestorCluster, uint8_t aMaxSessions);
+
+    // AvAnalysisWebRTCClient
+    CHIP_ERROR RequestSession(const ScopedNodeId & aCameraNode, EndpointId aWebRTCEndpoint, uint16_t aVideoStreamId,
+                              AvAnalysisWebRTCClient::Callback & aCallback) override;
+    CHIP_ERROR EndSession(const ScopedNodeId & aCameraNode, EndpointId aWebRTCEndpoint, uint16_t aWebRTCSessionId,
+                          AvAnalysisWebRTCClient::Callback & aCallback) override;
+    void Cancel() override;
+
+    /**
+     * Inbound session signals, forwarded by the application when the camera's Answer or End
+     * arrives on its WebRTCTransportRequestor cluster, or its media layer observes a failure.
+     * A signal for a session this client does not track is ignored.
+     */
+    void NotifyAnswered(uint16_t aWebRTCSessionId);
+    void NotifyFailed(uint16_t aWebRTCSessionId);
+    void NotifyEnded(uint16_t aWebRTCSessionId);
+
+    // CommandSender::Callback
+    void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const StatusIB & aStatusIB,
+                    TLV::TLVReader * apData) override;
+    void OnError(const CommandSender * apCommandSender, CHIP_ERROR aError) override;
+    void OnDone(CommandSender * apCommandSender) override;
+
+    // ReadClient::Callback (provider-presence check)
+    void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
+    void OnError(CHIP_ERROR aError) override;
+    void OnDone(ReadClient * apReadClient) override;
+
+    // AvAnalysisWebRTCPeerDelegate::OfferCallback
+    void OnOfferReady(CHIP_ERROR aError, CharSpan aSdp) override;
+
+protected:
+    /**
+     * Starts CASE session establishment toward the camera; the connected/connection-failure
+     * callbacks continue the pending request. The default body is the expected behavior; virtual
+     * only so unit tests can intercept the network boundary.
+     */
+    virtual void EstablishSession(const ScopedNodeId & aCameraNode)
+    {
+        mCASESessionManager->FindOrEstablishSession(aCameraNode, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+    }
+
+    /**
+     * One signaling request, from the first CASE attempt to the command's answer. The phase says
+     * which step is outstanding and therefore which callback is legitimate; exactly one request
+     * exists at a time.
+     */
+    class Request
+    {
+    public:
+        enum class Phase : uint8_t
+        {
+            kIdle,             // No request in flight
+            kConnecting,       // Awaiting a CASE session with the camera
+            kCheckingProvider, // Reading the provided endpoint's ServerList for WebRTCTransportProvider
+            kCreatingOffer,    // Awaiting the application's SDP offer
+            kInvoking,         // Command sent, awaiting the camera's answer
+        };
+
+        enum class CommandType : uint8_t
+        {
+            kProvideOffer,
+            kEndSession,
+        };
+
+        Phase GetPhase() const { return mPhase; }
+        bool InPhase(Phase aPhase) const { return mPhase == aPhase; }
+        bool InFlight() const { return mPhase != Phase::kIdle; }
+        void Advance(Phase aPhase) { mPhase = aPhase; }
+
+        CommandType GetCommandType() const { return mCommandType; }
+        EndpointId WebRTCEndpoint() const { return mWebRTCEndpoint; }
+        uint16_t VideoStreamId() const { return mVideoStreamId; }
+        uint16_t WebRTCSessionId() const { return mWebRTCSessionId; }
+
+        /**
+         * Start a request in kConnecting; the callback is delivered exactly once, by TakeCallback().
+         */
+        void BeginProvideOffer(EndpointId aWebRTCEndpoint, uint16_t aVideoStreamId, AvAnalysisWebRTCClient::Callback & aCallback)
+        {
+            Begin(CommandType::kProvideOffer, aWebRTCEndpoint, aCallback);
+            mVideoStreamId = aVideoStreamId;
+        }
+
+        void BeginEndSession(EndpointId aWebRTCEndpoint, uint16_t aWebRTCSessionId, AvAnalysisWebRTCClient::Callback & aCallback)
+        {
+            Begin(CommandType::kEndSession, aWebRTCEndpoint, aCallback);
+            mWebRTCSessionId = aWebRTCSessionId;
+        }
+
+        /**
+         * Returns the callback owed the outcome, or nullptr when it was already delivered (or the
+         * request was cancelled). Delivering is therefore exactly-once by construction.
+         */
+        AvAnalysisWebRTCClient::Callback * TakeCallback()
+        {
+            auto * callback = mCallback;
+            mCallback       = nullptr;
+            return callback;
+        }
+
+        /**
+         * The callback owed the outcome, without consuming it (to register a session on success).
+         */
+        AvAnalysisWebRTCClient::Callback * PeekCallback() const { return mCallback; }
+
+        // Session held from kConnecting until the request ends
+        void HoldSession(const SessionHandle & aSession, Messaging::ExchangeManager & aExchangeMgr)
+        {
+            mSessionHolder.Grab(aSession);
+            mExchangeMgr = &aExchangeMgr;
+        }
+        bool HasSession() const { return mSessionHolder && mExchangeMgr != nullptr; }
+        // By value: SessionHolder::Get() builds a fresh Optional, so handing out a reference into it
+        // would dangle as soon as the caller's full expression ends.
+        Optional<SessionHandle> Session() const { return mSessionHolder.Get(); }
+        Messaging::ExchangeManager & ExchangeManager() const { return *mExchangeMgr; }
+
+        // The sender this request invoked with. A CommandSender callback that does not
+        // carry this pointer belongs to an interaction this request has already finished with.
+        void SetInvokedSender(CommandSender * aSender) { mInvokedSender = aSender; }
+        bool WasInvokedBy(const CommandSender * aSender) const { return mInvokedSender == aSender; }
+
+        void SetProviderFound(bool aFound) { mProviderFound = aFound; }
+        bool ProviderFound() const { return mProviderFound; }
+
+        void Reset() { *this = Request{}; }
+
+    private:
+        void Begin(CommandType aCommandType, EndpointId aWebRTCEndpoint, AvAnalysisWebRTCClient::Callback & aCallback)
+        {
+            Reset();
+            mPhase          = Phase::kConnecting;
+            mCommandType    = aCommandType;
+            mWebRTCEndpoint = aWebRTCEndpoint;
+            mCallback       = &aCallback;
+        }
+
+        Phase mPhase                                 = Phase::kIdle;
+        CommandType mCommandType                     = CommandType::kProvideOffer;
+        EndpointId mWebRTCEndpoint                   = kInvalidEndpointId;
+        uint16_t mVideoStreamId                      = 0;
+        uint16_t mWebRTCSessionId                    = 0;
+        AvAnalysisWebRTCClient::Callback * mCallback = nullptr;
+        SessionHolder mSessionHolder;
+        Messaging::ExchangeManager * mExchangeMgr = nullptr;
+        CommandSender * mInvokedSender            = nullptr;
+        bool mProviderFound                       = false;
+    };
+
+    /**
+     * The request in flight.
+     */
+    Request & CurrentRequest() { return mRequest; }
+
+    /**
+     * Provider-check report decoder, dispatched from OnAttributeData.
+     */
+    void HandleServerListReport(const ConcreteDataAttributePath & aPath, TLV::TLVReader & aData);
+
+private:
+    // Tracked session
+    struct TrackedSession
+    {
+        uint16_t webRTCSessionId                     = 0;
+        AvAnalysisWebRTCClient::Callback * mCallback = nullptr;
+        bool inUse                                   = false;
+    };
+
+    // Common preconditions of RequestSession/EndSession, checked before Request::Begin* runs
+    CHIP_ERROR CanStartRequest() const;
+    CHIP_ERROR SendProviderCheckRead();
+    void ResetReadClient();
+    void OnProviderCheckComplete();
+    void FinishRequest(Protocols::InteractionModel::Status aStatus, uint16_t aWebRTCSessionId);
+    TrackedSession * FindTrackedSession(uint16_t aWebRTCSessionId);
+
+    static void OnDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
+    static void OnDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
+
+    CASESessionManager * mCASESessionManager                                      = nullptr;
+    AvAnalysisWebRTCPeerDelegate * mPeerDelegate                                  = nullptr;
+    WebRTCTransportRequestor::WebRTCTransportRequestorCluster * mRequestorCluster = nullptr;
+    Platform::ScopedMemoryBuffer<TrackedSession> mSessions;
+    uint8_t mMaxSessions = 0;
+
+    Request mRequest;
+
+    std::string mOfferSdp;
+
+    // mReadCallback is declared before mReadClient on purpose: the ReadClient holds the callback by
+    // reference, and members are destroyed in reverse declaration order, so the callback outlives it.
+    Platform::UniquePtr<BufferedReadCallback> mReadCallback;
+    Platform::UniquePtr<ReadClient> mReadClient;
+    Platform::UniquePtr<CommandSender> mCommandSender;
+
+    chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;
+    chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectionFailureCallback;
+};
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip
