@@ -36,6 +36,7 @@ using chip::PacketHeader;
 using chip::PayloadHeader;
 using chip::PeerId;
 using chip::Protocols::SecureChannel::MsgType;
+using chip::python::CASEHandshakeDiscoveryOutcome;
 using chip::python::CASEHandshakeMetricsBackend;
 using chip::python::CASEHandshakeRecordedField;
 using chip::python::CompletedCASEHandshakes;
@@ -151,6 +152,16 @@ protected:
                                                  payload,
                                                  payload.size() };
         mBackend.LogMessageReceived(info);
+    }
+
+    // A lookup that starts and never produces an address, which is what a resolution that times
+    // out looks like to these hooks.
+    void StartLookupWithoutResolving(NodeId nodeId)
+    {
+        const PeerId peer = PeerId().SetCompressedFabricId(1).SetNodeId(nodeId);
+        chip::AddressResolve::NodeLookupRequest request(peer);
+        chip::Tracing::NodeLookupInfo lookup{ &request };
+        mBackend.LogNodeLookup(lookup);
     }
 
     void ResolveNode(NodeId nodeId, const PeerAddress & address)
@@ -424,6 +435,113 @@ TEST_F(TestCASEHandshakeMetricsBackend, ASecondSigma1ForTheSameExchangeDoesNotSt
         SendSigma(MsgType::CASE_Sigma1, static_cast<uint16_t>(0x6000 + i));
     }
     EXPECT_EQ(mBackend.AbandonedCASEHandshakeCount(), 0u) << "a slot was leaked by the second Sigma1";
+}
+
+TEST_F(TestCASEHandshakeMetricsBackend, DiscoveryOutcomeSaysRecordedWhenALookupWasAttributed)
+{
+    const PeerAddress peer = Address("fd11::9");
+    const StatusReportBody success(kGeneralCodeSuccess, kProtocolCodeSuccess);
+
+    ResolveNode(kPeerNodeId, peer);
+    SendSigma(MsgType::CASE_Sigma1);
+    ReceiveSigma(MsgType::CASE_Sigma2, peer);
+    SendSigma(MsgType::CASE_Sigma3);
+    ReceiveSigma(MsgType::StatusReport, peer, kExchange, kLocalNodeId, success.Span());
+
+    const auto records = Drain();
+    ASSERT_EQ(records.size(), 1u);
+    EXPECT_EQ(records[0].deviceDiscoveryOutcome, chip::to_underlying(CASEHandshakeDiscoveryOutcome::kRecorded));
+}
+
+TEST_F(TestCASEHandshakeMetricsBackend, DiscoveryOutcomeSaysNoLookupWhenTheAddressWasAlreadyKnown)
+{
+    // No lookup at all, which is what happens when the controller already has the address. The
+    // handshake is still timed; only the discovery duration is missing, and for a good reason.
+    const PeerAddress peer = Address("fd11::9");
+    const StatusReportBody success(kGeneralCodeSuccess, kProtocolCodeSuccess);
+
+    SendSigma(MsgType::CASE_Sigma1);
+    ReceiveSigma(MsgType::CASE_Sigma2, peer);
+    SendSigma(MsgType::CASE_Sigma3);
+    ReceiveSigma(MsgType::StatusReport, peer, kExchange, kLocalNodeId, success.Span());
+
+    const auto records = Drain();
+    ASSERT_EQ(records.size(), 1u);
+    EXPECT_FALSE(records[0].recordedFields.Has(CASEHandshakeRecordedField::kDeviceDiscovery));
+    EXPECT_EQ(records[0].deviceDiscoveryOutcome, chip::to_underlying(CASEHandshakeDiscoveryOutcome::kNoLookupObserved));
+}
+
+TEST_F(TestCASEHandshakeMetricsBackend, ALookupThatProducedNoAddressCountsAsNoLookupSeen)
+{
+    const PeerAddress peer = Address("fd11::9");
+    const StatusReportBody success(kGeneralCodeSuccess, kProtocolCodeSuccess);
+
+    // The lookup starts but never reports an address, so there is no endpoint to match it by and
+    // it is indistinguishable from no lookup having run.
+    StartLookupWithoutResolving(kPeerNodeId);
+    SendSigma(MsgType::CASE_Sigma1);
+    ReceiveSigma(MsgType::CASE_Sigma2, peer);
+    SendSigma(MsgType::CASE_Sigma3);
+    ReceiveSigma(MsgType::StatusReport, peer, kExchange, kLocalNodeId, success.Span());
+
+    const auto records = Drain();
+    ASSERT_EQ(records.size(), 1u);
+    EXPECT_FALSE(records[0].recordedFields.Has(CASEHandshakeRecordedField::kDeviceDiscovery));
+    EXPECT_EQ(records[0].deviceDiscoveryOutcome, chip::to_underlying(CASEHandshakeDiscoveryOutcome::kNoLookupObserved));
+}
+
+TEST_F(TestCASEHandshakeMetricsBackend, DiscoveryOutcomeSaysTheLookupHasNotResolvedYet)
+{
+    // A second lookup for a peer whose address is already known, with the handshake's reply
+    // arriving before that lookup finishes. The address still matches, so the peer can be named,
+    // but the lookup in progress has timed nothing yet and its start must not be reported as a
+    // duration.
+    const PeerAddress peer = Address("fd11::9");
+    const StatusReportBody success(kGeneralCodeSuccess, kProtocolCodeSuccess);
+
+    ResolveNode(kPeerNodeId, peer);
+    StartLookupWithoutResolving(kPeerNodeId);
+
+    SendSigma(MsgType::CASE_Sigma1);
+    ReceiveSigma(MsgType::CASE_Sigma2, peer);
+    SendSigma(MsgType::CASE_Sigma3);
+    ReceiveSigma(MsgType::StatusReport, peer, kExchange, kLocalNodeId, success.Span());
+
+    const auto records = Drain();
+    ASSERT_EQ(records.size(), 1u);
+    EXPECT_FALSE(records[0].recordedFields.Has(CASEHandshakeRecordedField::kDeviceDiscovery));
+    EXPECT_EQ(records[0].deviceDiscoveryOutcome, chip::to_underlying(CASEHandshakeDiscoveryOutcome::kLookupDidNotResolve));
+    EXPECT_EQ(records[0].peerNodeId, kPeerNodeId) << "the peer is still named from the address";
+}
+
+TEST_F(TestCASEHandshakeMetricsBackend, DiscoveryOutcomeSaysTheLookupWentToAnEarlierHandshake)
+{
+    // One lookup, two handshakes to the same address. The first takes the duration; the second has
+    // to say why it has none, rather than looking like a handshake that was never resolved.
+    const PeerAddress peer = Address("fd11::9");
+    const StatusReportBody success(kGeneralCodeSuccess, kProtocolCodeSuccess);
+
+    ResolveNode(kPeerNodeId, peer);
+
+    SendSigma(MsgType::CASE_Sigma1, kExchange);
+    ReceiveSigma(MsgType::CASE_Sigma2, peer, kExchange);
+    SendSigma(MsgType::CASE_Sigma3, kExchange);
+    ReceiveSigma(MsgType::StatusReport, peer, kExchange, kLocalNodeId, success.Span());
+    const auto first = Drain();
+    ASSERT_EQ(first.size(), 1u);
+    ASSERT_EQ(first[0].deviceDiscoveryOutcome, chip::to_underlying(CASEHandshakeDiscoveryOutcome::kRecorded));
+
+    constexpr uint16_t kSecondExchange = 0x4545;
+    SendSigma(MsgType::CASE_Sigma1, kSecondExchange);
+    ReceiveSigma(MsgType::CASE_Sigma2, peer, kSecondExchange);
+    SendSigma(MsgType::CASE_Sigma3, kSecondExchange);
+    ReceiveSigma(MsgType::StatusReport, peer, kSecondExchange, kLocalNodeId, success.Span());
+
+    const auto second = Drain();
+    ASSERT_EQ(second.size(), 1u);
+    EXPECT_FALSE(second[0].recordedFields.Has(CASEHandshakeRecordedField::kDeviceDiscovery));
+    EXPECT_EQ(second[0].deviceDiscoveryOutcome, chip::to_underlying(CASEHandshakeDiscoveryOutcome::kLookupAlreadyAttributed));
+    EXPECT_EQ(second[0].peerNodeId, kPeerNodeId) << "the peer is still named from the address";
 }
 
 TEST_F(TestCASEHandshakeMetricsBackend, ResetForgetsWhatWasInFlight)

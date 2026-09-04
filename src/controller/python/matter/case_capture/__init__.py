@@ -40,6 +40,7 @@ See the CASEHandshakeMetrics class for the phases reported."""
 
 import contextlib
 import ctypes
+import enum
 import logging
 import queue
 import threading
@@ -138,6 +139,34 @@ RECORDED_THIS_NODE_REJECTED_PEER = 0x80
 
 
 # Mirror of the C struct PychipCASEHandshakeMetricsRecord defined in CASECapture.h.
+class CASEHandshakeDiscoveryOutcome(enum.IntEnum):
+    """Why a handshake has no discovery duration, or that it has one.
+
+    Absence is not a fault on its own. A controller that already knows the peer's address runs
+    no lookup, so there is nothing to time; NO_LOOKUP_OBSERVED is the ordinary reason for that.
+    Values must match CASEHandshakeDiscoveryOutcome in CASEHandshakeMetricsRecord.h."""
+
+    # The peer never replied, so there was no address to match a lookup against.
+    NO_REPLY_FROM_PEER = 0
+    # A lookup was matched to this handshake and its duration is in the record.
+    RECORDED = 1
+    # No lookup for the peer's address was seen while capture was running.
+    NO_LOOKUP_OBSERVED = 2
+    # A lookup was seen for the address but it never resolved one.
+    LOOKUP_DID_NOT_RESOLVE = 3
+    # The matching lookup's duration had already been given to an earlier handshake.
+    LOOKUP_ALREADY_ATTRIBUTED = 4
+
+
+# Why there is no discovery duration, in words, for logging. Keyed by the enum above.
+_DISCOVERY_ABSENCE_REASONS = {
+    CASEHandshakeDiscoveryOutcome.NO_REPLY_FROM_PEER: "the peer never replied, so no address was known to match a lookup to",
+    CASEHandshakeDiscoveryOutcome.NO_LOOKUP_OBSERVED: "no lookup was seen for the peer's address, so it was most likely already known",
+    CASEHandshakeDiscoveryOutcome.LOOKUP_DID_NOT_RESOLVE: "a lookup was seen for the address but it never resolved one",
+    CASEHandshakeDiscoveryOutcome.LOOKUP_ALREADY_ATTRIBUTED: "the lookup's duration was already reported against an earlier handshake",
+}
+
+
 class PyCASEHandshakeMetricsRecord(ctypes.Structure):
     _fields_ = [
         ("sigma1SentTimestampUs", ctypes.c_uint64),
@@ -153,6 +182,7 @@ class PyCASEHandshakeMetricsRecord(ctypes.Structure):
         ("statusReportProtocolCode", ctypes.c_uint16),
         ("exchangeId", ctypes.c_uint16),
         ("recordedFields", ctypes.c_uint8),
+        ("deviceDiscoveryOutcome", ctypes.c_uint8),
         ("peerTransportAddress", ctypes.c_char * PEER_TRANSPORT_ADDRESS_MAX_LENGTH),
     ]
 
@@ -194,6 +224,9 @@ class CASEHandshakeMetrics:
     # Which peer the handshake is with. See peer_node_id and peer_transport_address below.
     peer_node_id: int
     peer_transport_address: str
+    # Whether a discovery duration was recorded and, when it was not, why. Absence is not a fault
+    # on its own; see device_discovery_absence_reason.
+    device_discovery_outcome: CASEHandshakeDiscoveryOutcome
 
     @staticmethod
     def _from_native_record(record: PyCASEHandshakeMetricsRecord) -> "CASEHandshakeMetrics":
@@ -215,6 +248,7 @@ class CASEHandshakeMetrics:
             local_ephemeral_node_id=record.localEphemeralNodeId,
             peer_node_id=record.peerNodeId,
             peer_transport_address=record.peerTransportAddress.decode("utf-8", errors="replace"),
+            device_discovery_outcome=CASEHandshakeDiscoveryOutcome(record.deviceDiscoveryOutcome),
         )
 
     @staticmethod
@@ -279,6 +313,18 @@ class CASEHandshakeMetrics:
             self.sigma2_resume_received_timestamp_us, self.status_report_received_timestamp_us)
             if timestamp is not None]
         return self._duration_between_ms(start, max(marks_after_sigma1) if marks_after_sigma1 else None)
+
+    @property
+    def device_discovery_absence_reason(self) -> str | None:
+        """Why device_discovery_duration_ms is None, or None when a duration was recorded.
+
+        Absence is often expected rather than a fault: a controller that already knows the peer's
+        address runs no lookup, so there is nothing to time. Branch on device_discovery_outcome
+        rather than on this text, which is meant for logs."""
+        if self.device_discovery_outcome == CASEHandshakeDiscoveryOutcome.RECORDED:
+            return None
+        return _DISCOVERY_ABSENCE_REASONS.get(
+            self.device_discovery_outcome, f"unrecognised outcome {int(self.device_discovery_outcome)}")
 
     @property
     def used_session_resumption(self) -> bool:

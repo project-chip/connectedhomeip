@@ -45,6 +45,26 @@ enum class CASEHandshakeRecordedField : uint8_t
 
 using CASEHandshakeRecordedFields = BitFlags<CASEHandshakeRecordedField>;
 
+// Why a handshake has no discovery duration, so that a caller can tell an expected absence from
+// one worth looking into. Absence on its own is not a fault: a controller that already knows the
+// peer's address runs no lookup, and there is then nothing to time.
+enum class CASEHandshakeDiscoveryOutcome : uint8_t
+{
+    // The peer never replied, so there was no address to match a lookup against. Records start
+    // here, and stay here when a handshake gets no answer at all.
+    kNoReplyFromPeer = 0,
+    // A lookup was matched to this handshake and its duration is in the record.
+    kRecorded = 1,
+    // No lookup for the peer's address was seen while capture was running, so most likely the
+    // address was already known and none ran.
+    kNoLookupObserved = 2,
+    // A lookup for the address was seen, but it never resolved one, so it timed nothing.
+    kLookupDidNotResolve = 3,
+    // The matching lookup's duration had already been given to an earlier handshake. Each lookup
+    // is only counted once, so the handshake that used it is the one that reports it.
+    kLookupAlreadyAttributed = 4,
+};
+
 // Handshakes that may be in progress at the same time. A record is scratch space held only
 // between Sigma1 and the handshake concluding, so this bounds concurrency rather than how many
 // handshakes may be run. If every slot is occupied the longest-running one is given up, so a
@@ -109,6 +129,9 @@ struct PychipCASEHandshakeMetricsRecord
     uint16_t exchangeId;
     // Which fields above have been filled in.
     chip::python::CASEHandshakeRecordedFields recordedFields;
+    // A chip::python::CASEHandshakeDiscoveryOutcome saying why there is no discovery duration, or
+    // that there is one. Fits in the padding the record already had, so it costs no space.
+    uint8_t deviceDiscoveryOutcome;
     // The peer's transport address, empty until the peer sends its first message. Always
     // available even when peerNodeId is not, so it is the reliable way to tell two DUTs
     // apart.

@@ -400,18 +400,31 @@ private:
                 closest = &pending;
             }
         }
-        VerifyOrReturn(closest != nullptr);
+        if (closest == nullptr)
+        {
+            record.deviceDiscoveryOutcome = chip::to_underlying(CASEHandshakeDiscoveryOutcome::kNoLookupObserved);
+            return;
+        }
 
         record.peerNodeId = closest->peer.GetNodeId();
+        if (!closest->done)
+        {
+            record.deviceDiscoveryOutcome = chip::to_underlying(CASEHandshakeDiscoveryOutcome::kLookupDidNotResolve);
+            return;
+        }
+        if (closest->used)
+        {
+            record.deviceDiscoveryOutcome = chip::to_underlying(CASEHandshakeDiscoveryOutcome::kLookupAlreadyAttributed);
+            return;
+        }
+
         // Claimed so a later handshake to the same peer waits for its own lookup rather
         // than reusing this span.
-        if (closest->done && !closest->used)
-        {
-            closest->used                        = true;
-            record.discoveryStartedTimestampUs   = closest->startUs;
-            record.discoveryCompletedTimestampUs = closest->doneUs;
-            record.recordedFields.Set(CASEHandshakeRecordedField::kDeviceDiscovery);
-        }
+        closest->used                        = true;
+        record.discoveryStartedTimestampUs   = closest->startUs;
+        record.discoveryCompletedTimestampUs = closest->doneUs;
+        record.recordedFields.Set(CASEHandshakeRecordedField::kDeviceDiscovery);
+        record.deviceDiscoveryOutcome = chip::to_underlying(CASEHandshakeDiscoveryOutcome::kRecorded);
     }
 
     // Returns the slot tracking this peer, allocating or evicting one as needed. Never null,
