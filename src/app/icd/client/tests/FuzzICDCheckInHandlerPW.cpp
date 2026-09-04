@@ -170,6 +170,11 @@ struct Fixture
         // AppContext::TearDown() shuts the engine down, so do not do it here too.
         context.TearDown();
         HarnessContext::TearDownTestSuite();
+        // MemoryInit/MemoryShutdown are reference counted. SetUpTestSuite above
+        // takes one reference and TearDownTestSuite releases it, so without this
+        // the reference taken in the constructor is never released and the
+        // allocator is never torn down.
+        Platform::MemoryShutdown();
     }
 };
 
