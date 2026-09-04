@@ -185,6 +185,7 @@ static NodeId ParseNodeId(const Json::Value & json)
  *
  * JSON Arguments:
  *   - "Status": 0 = Online, 1 = Offline
+ *   - "ContributorName": optional human-readable name for the Matter contributor
  */
 class AddAmbientSensingContributorCommandHandler : public AllDevicesAppNamedPipeCommandHandler
 {
@@ -223,7 +224,16 @@ public:
         EndpointId contributorEndpointId = static_cast<EndpointId>(json["ContributorEndpointId"].asUInt());
         auto status = static_cast<chip::app::Clusters::AmbientSensingUnion::UnionContributorStatusEnum>(json["Status"].asUInt());
 
-        CHIP_ERROR err = cluster->AddMatterContributor(nodeId, contributorEndpointId, status);
+        // ContributorName is optional for Matter contributors
+        std::string contributorName;
+        chip::CharSpan nameSpan;
+        if (json.isMember("ContributorName") && json["ContributorName"].isString())
+        {
+            contributorName = json["ContributorName"].asString();
+            nameSpan        = chip::CharSpan::fromCharString(contributorName.c_str());
+        }
+
+        CHIP_ERROR err = cluster->AddMatterContributor(nodeId, contributorEndpointId, status, nameSpan);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "AddMatterContributor failed on endpoint %d: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
