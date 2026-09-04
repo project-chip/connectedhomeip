@@ -38,10 +38,13 @@ from mobly import signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
 
+import matter.clusters as Clusters
 import matter.testing.global_stash as global_stash
+from matter import ChipDeviceCtrl
 from matter.clusters import Attribute
 # Add imports for argument parsing dependencies
 from matter.testing.defaults import TestingDefaults
+from matter.testing.global_attribute_ids import GlobalAttributeIds
 # Add imports for argument parsing dependencies
 from matter.testing.pics import read_pics_from_file
 
@@ -363,6 +366,124 @@ def get_test_info(test_class, matter_test_config) -> list[TestInfo]:
     return info
 
 
+async def read_global_wildcard_async(default_controller: ChipDeviceCtrl.ChipDeviceController, node_id: int) -> Attribute.AsyncReadTransaction.ReadResponse:
+    """Perform the global wildcard read (Descriptor cluster + AttributeList / FeatureMap /
+    AcceptedCommandList on every endpoint) with a 60-second timeout.
+
+    Reusable by both the runner (pre-populate path) and MatterBaseTest guards
+    (on-demand fallback when --skip-global-wildcard-population is set, when the test
+    class opts out of pre-populate, or when the DUT was simply not reachable at
+    runner time — e.g. NFC in-test commissioning or file-based BasicComposition).
+    Keeping the Read in a single function means the attribute set and timeout stay
+    in lockstep between the two entry points.
+    """
+    return await asyncio.wait_for(
+        default_controller.Read(
+            node_id,
+            [
+                Clusters.Descriptor,  # type: ignore[list-item]
+                Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
+                Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
+                Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
+            ],
+        ),
+        timeout=60,
+    )
+
+
+def read_global_wildcard(event_loop: asyncio.AbstractEventLoop, default_controller: ChipDeviceCtrl.ChipDeviceController, node_id: int) -> Attribute.AsyncReadTransaction.ReadResponse:
+    """Sync wrapper around :func:`read_global_wildcard_async` for callers outside an event loop."""
+    return event_loop.run_until_complete(
+        read_global_wildcard_async(default_controller, node_id)
+    )
+
+
+async def _prepopulate_wildcard_via_case(default_controller, node_id, test_config):
+    """Device is already on this fabric — read via CASE, no side effects.
+
+    Any downstream setup_class_helper will also reach the device via CASE.
+    """
+    try:
+        stored_global_wildcard = await read_global_wildcard_async(default_controller, node_id)
+        test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(
+            stored_global_wildcard)
+    except Exception:
+        LOGGER.warning("Could not pre-populate global wildcard via CASE", exc_info=True)
+
+
+async def _prepopulate_wildcard_via_pase(default_controller, node_id, matter_test_config, test_config):
+    """Device is not commissioned — attempt PASE if credentials are available.
+
+    The session is kept alive afterwards so that downstream consumers
+    (CommissionDeviceTest or BasicCompositionTests.setup_class_helper)
+    reuse it via FindOrEstablishPASESession instead of forcing the device
+    to reopen its commissioning window.
+    """
+    setup_code: str | None = None
+    if matter_test_config.manual_code:
+        setup_code = matter_test_config.manual_code[0]
+    elif matter_test_config.qr_code_content:
+        setup_code = matter_test_config.qr_code_content[0]
+    elif matter_test_config.setup_passcodes and matter_test_config.discriminators:
+        setup_code = default_controller.CreateManualCode(
+            matter_test_config.discriminators[0],
+            matter_test_config.setup_passcodes[0],
+        )
+
+    if setup_code is None:
+        LOGGER.warning(
+            "Device not commissioned and no setup code available — "
+            "skipping global wildcard pre-population"
+        )
+        return
+
+    try:
+        commissionee = await default_controller.FindOrEstablishPASESession(
+            setupCode=setup_code, nodeId=node_id
+        )
+        if commissionee is None:
+            LOGGER.error("FindOrEstablishPASESession returned None")
+            return
+
+        stored_global_wildcard = await read_global_wildcard_async(default_controller, node_id)
+        test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(
+            stored_global_wildcard)
+        LOGGER.info(
+            "Keeping PASE session alive for downstream reuse "
+            "(CommissionDeviceTest or setup_class_helper)"
+        )
+    except Exception:
+        LOGGER.warning(
+            "Could not pre-populate global wildcard before commissioning",
+            exc_info=True
+        )
+
+
+async def _prepopulate_global_wildcard(default_controller, node_id, matter_test_config, test_config):
+    """Route to CASE or PASE pre-population based on the device's commissioning status.
+
+    A failure to determine the commissioning status is treated as "not commissioned",
+    matching the previous sync behavior.
+    """
+    # Local import to avoid circular dependency.
+    from matter.testing.commissioning import is_commissioned
+
+    try:
+        already_commissioned = await is_commissioned(default_controller, node_id)
+    except Exception:
+        LOGGER.warning(
+            "Could not determine commissioning status for node %s, assuming not commissioned",
+            node_id
+        )
+        already_commissioned = False
+
+    if already_commissioned:
+        await _prepopulate_wildcard_via_case(default_controller, node_id, test_config)
+    else:
+        await _prepopulate_wildcard_via_pase(
+            default_controller, node_id, matter_test_config, test_config)
+
+
 def run_tests_no_exit(
         test_class,
         matter_test_config,
@@ -433,9 +554,6 @@ def run_tests_no_exit(
             matter_test_config)
         test_config.user_params["hooks"] = global_stash.stash_globally(hooks)
 
-        # Execute the test class with the config
-        ok = True
-
         test_config.user_params["certificate_authority_manager"] = global_stash.stash_globally(
             stack.certificate_authority_manager)
 
@@ -458,14 +576,36 @@ def run_tests_no_exit(
             if matter_test_config.commissioning_method is not None:
                 runner.add_test_class(test_config, CommissionDeviceTest, None)
 
+            node_id = matter_test_config.dut_node_ids[0]
+
+            # Decide whether to pre-populate the global wildcard from the runner.
+            #
+            # Three mutually exclusive branches, evaluated in order:
+            #
+            #  1. CLI escape hatch --skip-global-wildcard-population is set. Used for
+            #     ad-hoc runs and for flows where the DUT is not reachable at runner
+            #     time (e.g. NFC in-test commissioning, file-based BasicComposition):
+            #     the populate must happen later, once the test itself can drive it.
+            #
+            #  2. Default: pre-populate now via CASE or PASE depending on commissioning
+            #     status. Guards will find the value in the stash and never trigger
+            #     the on-demand read.
+            if getattr(matter_test_config, "skip_global_wildcard_population", False):
+                LOGGER.info(
+                    "--skip-global-wildcard-population set; skipping runner pre-populate. "
+                    "Guards will populate the global wildcard on-demand when first called."
+                )
+            else:
+                event_loop.run_until_complete(
+                    _prepopulate_global_wildcard(
+                        default_controller, node_id, matter_test_config, test_config)
+                )
+
             # Add the tests selected unless we have a commission-only request
             if not matter_test_config.commission_only and not matter_test_config.commission_only_re_open_window:
                 runner.add_test_class(test_config, test_class, tests)
 
             if hooks:
-                # Right now, we only support running a single test class at once,
-                # but it's relatively easy to expand that to make the test process faster
-                # TODO: support a list of tests
                 hooks.start(count=1)
                 # Mobly gives the test run time in seconds, lets be a bit more
                 # precise
@@ -827,6 +967,8 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     config.legacy = args.use_legacy_test_event_triggers
     config.no_wildcard_subscription = args.no_wildcard_subscription
 
+    config.skip_global_wildcard_population = args.skip_global_wildcard_population
+
     config.controller_node_id = args.controller_node_id
     config.trace_to = args.trace_to
 
@@ -1007,6 +1149,9 @@ def matter_test_args_parser() -> argparse.ArgumentParser:
                              help="Skip the background wildcard attribute subscription that is normally started "
                                   "before each test.  Prefer setting disable_wildcard_subscription = True on the "
                                   "test class (MatterBaseTest) for certification; this flag overrides for ad-hoc runs.")
+    basic_group.add_argument("--skip-global-wildcard-population", action="store_true", default=False,
+                             help="Skip the global wildcard population step in runner file. If you skip this step "
+                                  "you can populate the global wildcard on-demand")
 
     commission_group = parser.add_argument_group(title="Commissioning", description="Arguments to commission a node")
 
