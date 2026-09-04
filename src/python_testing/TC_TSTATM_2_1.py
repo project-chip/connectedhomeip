@@ -255,21 +255,21 @@ class TC_TSTATM_2_1(MatterBaseTest):
 
         # Step 13: TH sends a ChangeToMode command to the DUT with NewMode set to invalid_mode_th
         self.step(13)
-        if self.pics_guard(test_manual):
-            cmd = cluster.Commands.ChangeToMode(newMode=invalid_mode_th)
-            change_to_mode_response = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+        cmd = cluster.Commands.ChangeToMode(newMode=invalid_mode_th)
+        change_to_mode_response = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
 
-            asserts.assert_equal(change_to_mode_response.status, CommonCodes.UNSUPPORTED_MODE.value,
-                                 f"Attempt to change to invalid mode {invalid_mode_th} didn't fail as expected")
+        asserts.assert_equal(change_to_mode_response.status, CommonCodes.UNSUPPORTED_MODE.value,
+                             f"Attempt to change to invalid mode {invalid_mode_th} didn't fail as expected")
 
         # Step 14: TH reads from the DUT the CurrentMode attribute
         self.step(14)
-        if self.pics_guard(test_manual):
-            current_mode = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=current_mode_attribute
-            )
-            asserts.assert_equal(current_mode, self.mode_ok,
-                                 f"CurrentMode: {current_mode} doesn't match the argument of the successful ChangeToMode command: {self.mode_ok}")
+        current_mode = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=current_mode_attribute
+        )
+        is_valid_int_value(current_mode)
+        expected_current_mode = self.mode_ok if test_manual else old_current_mode_dut
+        asserts.assert_equal(current_mode, expected_current_mode,
+                             f"CurrentMode: {current_mode} doesn't match expected mode: {expected_current_mode}")
 
 
 if __name__ == "__main__":

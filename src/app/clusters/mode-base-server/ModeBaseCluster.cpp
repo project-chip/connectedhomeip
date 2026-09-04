@@ -455,14 +455,14 @@ ModeBaseCluster::HandleChangeToModeByCoreTag(CommandHandler & commandObj, const 
         return std::nullopt;
     }
 
-    if (newMode == GetCurrentMode())
-    {
-        ChipLogProgress(Zcl, "ModeBase: HandleChangeToModeByCoreTag resulted in no change to CurrentMode (%u)", newMode);
-    }
-    else if (!IsSupportedMode(newMode) || !ModeHasTag(newMode, newModeTag))
+    if (!IsSupportedMode(newMode) || !ModeHasTag(newMode, newModeTag))
     {
         ChipLogError(Zcl, "ModeBase: Mode %u is not supported or does not contain tag %u", newMode, newModeTag);
         response.status = to_underlying(StatusCode::kGenericFailure);
+    }
+    else if (newMode == GetCurrentMode())
+    {
+        ChipLogProgress(Zcl, "ModeBase: HandleChangeToModeByCoreTag resulted in no change to CurrentMode (%u)", newMode);
     }
     else
     {

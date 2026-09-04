@@ -109,12 +109,17 @@ public:
                                      Commands::ChangeToModeResponse::Type & response) override
     {
         mLastHandledCoreModeTag = newModeTag;
+        if (mOverrideNewMode.has_value())
+        {
+            newMode = mOverrideNewMode.value();
+        }
         AppDelegate::HandleChangeToModeByCoreTag(newModeTag, newMode, response);
     }
 
     bool mRejectNextChange           = false;
     uint8_t mLastHandledNewMode      = 0xFF;
     uint16_t mLastHandledCoreModeTag = 0xFFFF;
+    std::optional<uint8_t> mOverrideNewMode;
 };
 
 struct TestModeBaseCluster : public ::testing::Test
@@ -129,7 +134,8 @@ struct TestModeBaseCluster : public ::testing::Test
         appDelegate.mRejectNextChange       = false;
         appDelegate.mLastHandledNewMode     = 0xFF;
         appDelegate.mLastHandledCoreModeTag = 0xFFFF;
-        diagnosticDataProvider.mBootReason  = GeneralDiagnostics::BootReasonEnum::kUnspecified;
+        appDelegate.mOverrideNewMode.reset();
+        diagnosticDataProvider.mBootReason = GeneralDiagnostics::BootReasonEnum::kUnspecified;
         testContext.StorageDelegate().ClearStorage();
     }
 
@@ -603,6 +609,23 @@ TEST_F(TestModeBaseCluster, ChangeToModeByCoreTagDelegateFailureLeavesCurrentMod
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     appDelegate.mRejectNextChange = true;
+
+    Commands::ChangeToModeByCoreTag::Type request;
+    request.newModeTag = to_underlying(ModeTag::kLowEnergy);
+    auto result        = tester.Invoke(request);
+    ASSERT_TRUE(result.status.has_value() && result.status->IsSuccess());
+    ASSERT_TRUE(result.response.has_value() && result.response->status == to_underlying(StatusCode::kGenericFailure));
+    EXPECT_EQ(cluster.GetCurrentMode(), 0u);
+}
+
+TEST_F(TestModeBaseCluster, ChangeToModeByCoreTagDelegateSelectedCurrentModeWithoutTagFails)
+{
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig(BitMask<Feature>(Feature::kCoreModes)));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // Override delegate to select current mode (0), which does not have the kLowEnergy tag
+    appDelegate.mOverrideNewMode = 0;
 
     Commands::ChangeToModeByCoreTag::Type request;
     request.newModeTag = to_underlying(ModeTag::kLowEnergy);
