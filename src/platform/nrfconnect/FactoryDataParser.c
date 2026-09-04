@@ -55,7 +55,7 @@ static bool DecodeEntry(zcbor_state_t * states, void * buffer, size_t bufferSize
     struct zcbor_string tempString;
     int32_t tempInt = 0;
 
-    // Try to decode entry as string
+    // Try to decode entry as text string
     bool res = zcbor_tstr_decode(states, &tempString);
     if (res)
     {
@@ -78,6 +78,19 @@ static bool DecodeEntry(zcbor_state_t * states, void * buffer, size_t bufferSize
         }
         memcpy(buffer, &tempInt, sizeof(tempInt));
         *outlen = sizeof(tempInt);
+        return res;
+    }
+
+    // Try to decode entry as byte string
+    res = zcbor_bstr_decode(states, &tempString);
+    if (res)
+    {
+        if (bufferSize < tempString.len)
+        {
+            return false;
+        }
+        memcpy(buffer, tempString.value, tempString.len);
+        *outlen = tempString.len;
         return res;
     }
 
