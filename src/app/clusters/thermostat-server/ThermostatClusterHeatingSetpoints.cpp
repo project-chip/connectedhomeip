@@ -311,6 +311,7 @@ ThermostatHeatingSetpoints::WriteAttribute(const DataModel::WriteAttributeReques
     {
     case AbsMinHeatSetpointLimit::Id:
     case AbsMaxHeatSetpointLimit::Id:
+    case CriticalFreezeProtection::Id:
         return Status::UnsupportedWrite;
     default:
         break;

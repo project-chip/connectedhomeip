@@ -309,6 +309,7 @@ ThermostatCoolingSetpoints::WriteAttribute(const DataModel::WriteAttributeReques
     {
     case AbsMinCoolSetpointLimit::Id:
     case AbsMaxCoolSetpointLimit::Id:
+    case CriticalOverheatProtection::Id:
         return Status::UnsupportedWrite;
     default:
         break;
