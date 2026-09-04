@@ -82,7 +82,7 @@ CHIP_ERROR AmbientContextTranslator::TranslateSetAmbientContextSupport(EndpointI
 
     // Sizing: Each semantic tag structure is 8 bytes in TLV (2B struct wrapper + 3B TypeId + 3B TagId).
     // Sizing with 16 bytes per item provides 2x margin over the 8 bytes requirement.
-    TlvMessageBuffer message(json["AmbientContextType"].size() * 16);
+    TlvMessageBuffer message(static_cast<size_t>(json["AmbientContextType"].size()) * 16);
 
     TLV::TLVType outerType;
     ReturnErrorOnFailure(message.Writer().StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
@@ -101,7 +101,7 @@ CHIP_ERROR AmbientContextTranslator::TranslateAddAmbientContextDetect(EndpointId
     VerifyOrReturnError(json.isMember("AmbientContextType") && json["AmbientContextType"].isArray(), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Sizing: Each semantic tag structure is 8 bytes in TLV; 16 bytes per item provides 2x margin.
-    TlvMessageBuffer message(json["AmbientContextType"].size() * 16);
+    TlvMessageBuffer message(static_cast<size_t>(json["AmbientContextType"].size()) * 16);
 
     TLV::TLVType outerType;
     ReturnErrorOnFailure(message.Writer().StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
@@ -141,7 +141,7 @@ CHIP_ERROR AmbientContextTranslator::TranslateSetPredictedActivity(EndpointId en
     // Sizing: Fixed fields per activity item require ~28 bytes (timestamps, flags, confidence, struct envelope).
     // Each semantic tag structure requires 8 bytes (2B struct wrapper + 3B TypeId + 3B TagId).
     // Sizing with 64 bytes per item + 16 bytes per tag provides >2x margin.
-    TlvMessageBuffer message((predActArray.size() * 64) + (totalTags * 16));
+    TlvMessageBuffer message((static_cast<size_t>(predActArray.size()) * 64) + (totalTags * 16));
 
     TLV::TLVType outerType;
     ReturnErrorOnFailure(message.Writer().StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
@@ -196,7 +196,7 @@ CHIP_ERROR AmbientContextTranslator::TranslateSetSensorFusionSupported(EndpointI
     VerifyOrReturnError(json.isMember("AmbientContextType") && json["AmbientContextType"].isArray(), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Sizing: Each semantic tag structure is 8 bytes in TLV; 16 bytes per item provides 2x margin.
-    TlvMessageBuffer message(json["AmbientContextType"].size() * 16);
+    TlvMessageBuffer message(static_cast<size_t>(json["AmbientContextType"].size()) * 16);
 
     TLV::TLVType outerType;
     ReturnErrorOnFailure(message.Writer().StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
