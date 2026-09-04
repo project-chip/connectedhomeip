@@ -80,18 +80,19 @@ CHIP_ERROR AmbientContextTranslator::TranslateSetAmbientContextSupport(EndpointI
 {
     VerifyOrReturnError(json.isMember("AmbientContextType") && json["AmbientContextType"].isArray(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    uint8_t buffer[1024];
-    TLV::TLVWriter writer;
-    writer.Init(buffer, sizeof(buffer));
+    // Sizing: Each semantic tag structure is 8 bytes in TLV (2B struct wrapper + 3B TypeId + 3B TagId).
+    // Sizing with 16 bytes per item provides 2x margin over the 8 bytes requirement.
+    TlvMessageBuffer message(json["AmbientContextType"].size() * 16);
 
     TLV::TLVType outerType;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(1), endpointId));
-    ReturnErrorOnFailure(EncodeSemanticTagList(writer, TLV::ContextTag(2), json["AmbientContextType"]));
-    ReturnErrorOnFailure(writer.EndContainer(outerType));
-    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(message.Writer().StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+    ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(1), endpointId));
+    ReturnErrorOnFailure(EncodeSemanticTagList(message.Writer(), TLV::ContextTag(2), json["AmbientContextType"]));
+    ReturnErrorOnFailure(message.Writer().EndContainer(outerType));
 
-    return registry.HandleAction("SetAmbientContextSupport"_span, ByteSpan(buffer, writer.GetLengthWritten()));
+    ByteSpan payload;
+    ReturnErrorOnFailure(message.Finalize(payload));
+    return registry.HandleAction("SetAmbientContextSupport"_span, payload);
 }
 
 CHIP_ERROR AmbientContextTranslator::TranslateAddAmbientContextDetect(EndpointId endpointId, const Json::Value & json,
@@ -99,26 +100,26 @@ CHIP_ERROR AmbientContextTranslator::TranslateAddAmbientContextDetect(EndpointId
 {
     VerifyOrReturnError(json.isMember("AmbientContextType") && json["AmbientContextType"].isArray(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    uint8_t buffer[1024];
-    TLV::TLVWriter writer;
-    writer.Init(buffer, sizeof(buffer));
+    // Sizing: Each semantic tag structure is 8 bytes in TLV; 16 bytes per item provides 2x margin.
+    TlvMessageBuffer message(json["AmbientContextType"].size() * 16);
 
     TLV::TLVType outerType;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(1), endpointId));
-    ReturnErrorOnFailure(EncodeSemanticTagList(writer, TLV::ContextTag(2), json["AmbientContextType"]));
+    ReturnErrorOnFailure(message.Writer().StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+    ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(1), endpointId));
+    ReturnErrorOnFailure(EncodeSemanticTagList(message.Writer(), TLV::ContextTag(2), json["AmbientContextType"]));
 
     if (json.isMember("DetectionConfidence"))
     {
         auto confOpt = ExtractUInt<uint8_t>(json, "DetectionConfidence");
         VerifyOrReturnError(confOpt.has_value() && *confOpt <= 100, CHIP_ERROR_INVALID_ARGUMENT);
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(3), *confOpt));
+        ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(3), *confOpt));
     }
 
-    ReturnErrorOnFailure(writer.EndContainer(outerType));
-    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(message.Writer().EndContainer(outerType));
 
-    return registry.HandleAction("AddAmbientContextDetect"_span, ByteSpan(buffer, writer.GetLengthWritten()));
+    ByteSpan payload;
+    ReturnErrorOnFailure(message.Finalize(payload));
+    return registry.HandleAction("AddAmbientContextDetect"_span, payload);
 }
 
 CHIP_ERROR AmbientContextTranslator::TranslateSetPredictedActivity(EndpointId endpointId, const Json::Value & json,
@@ -127,16 +128,16 @@ CHIP_ERROR AmbientContextTranslator::TranslateSetPredictedActivity(EndpointId en
     VerifyOrReturnError(json.isMember("PredAct") && json["PredAct"].isArray(), CHIP_ERROR_INVALID_ARGUMENT);
     const Json::Value & predActArray = json["PredAct"];
 
-    uint8_t buffer[2048];
-    TLV::TLVWriter writer;
-    writer.Init(buffer, sizeof(buffer));
+    // Sizing: Each predicted activity item is ~60 bytes in TLV (timestamps, semantic tags, confidence, flags).
+    // Sizing with 128 bytes per item provides >2x margin over the ~60 bytes requirement.
+    TlvMessageBuffer message(predActArray.size() * 128);
 
     TLV::TLVType outerType;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(1), endpointId));
+    ReturnErrorOnFailure(message.Writer().StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+    ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(1), endpointId));
 
     TLV::TLVType arrayType;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(2), TLV::kTLVType_Array, arrayType));
+    ReturnErrorOnFailure(message.Writer().StartContainer(TLV::ContextTag(2), TLV::kTLVType_Array, arrayType));
     for (Json::ArrayIndex i = 0; i < predActArray.size(); i++)
     {
         const Json::Value & item = predActArray[i];
@@ -150,31 +151,32 @@ CHIP_ERROR AmbientContextTranslator::TranslateSetPredictedActivity(EndpointId en
                             CHIP_ERROR_INVALID_ARGUMENT);
 
         TLV::TLVType itemType;
-        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, itemType));
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(1), *startTStampOpt));
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(2), *endTStampOpt));
-        ReturnErrorOnFailure(EncodeSemanticTagList(writer, TLV::ContextTag(3), item["AmbientContextType"]));
+        ReturnErrorOnFailure(message.Writer().StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, itemType));
+        ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(1), *startTStampOpt));
+        ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(2), *endTStampOpt));
+        ReturnErrorOnFailure(EncodeSemanticTagList(message.Writer(), TLV::ContextTag(3), item["AmbientContextType"]));
 
         if (item.isMember("CrowdDetect"))
         {
             auto crowdDetectOpt = ExtractBool(item, "CrowdDetect");
             VerifyOrReturnError(crowdDetectOpt.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
-            ReturnErrorOnFailure(writer.Put(TLV::ContextTag(4), *crowdDetectOpt));
+            ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(4), *crowdDetectOpt));
         }
         if (item.isMember("CrowdCnt"))
         {
             auto crowdCntOpt = ExtractUInt<uint8_t>(item, "CrowdCnt");
             VerifyOrReturnError(crowdCntOpt.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
-            ReturnErrorOnFailure(writer.Put(TLV::ContextTag(5), *crowdCntOpt));
+            ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(5), *crowdCntOpt));
         }
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(6), *confOpt));
-        ReturnErrorOnFailure(writer.EndContainer(itemType));
+        ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(6), *confOpt));
+        ReturnErrorOnFailure(message.Writer().EndContainer(itemType));
     }
-    ReturnErrorOnFailure(writer.EndContainer(arrayType));
-    ReturnErrorOnFailure(writer.EndContainer(outerType));
-    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(message.Writer().EndContainer(arrayType));
+    ReturnErrorOnFailure(message.Writer().EndContainer(outerType));
 
-    return registry.HandleAction("SetPredictedActivity"_span, ByteSpan(buffer, writer.GetLengthWritten()));
+    ByteSpan payload;
+    ReturnErrorOnFailure(message.Finalize(payload));
+    return registry.HandleAction("SetPredictedActivity"_span, payload);
 }
 
 CHIP_ERROR AmbientContextTranslator::TranslateSetSensorFusionSupported(EndpointId endpointId, const Json::Value & json,
@@ -182,18 +184,18 @@ CHIP_ERROR AmbientContextTranslator::TranslateSetSensorFusionSupported(EndpointI
 {
     VerifyOrReturnError(json.isMember("AmbientContextType") && json["AmbientContextType"].isArray(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    uint8_t buffer[1024];
-    TLV::TLVWriter writer;
-    writer.Init(buffer, sizeof(buffer));
+    // Sizing: Each semantic tag structure is 8 bytes in TLV; 16 bytes per item provides 2x margin.
+    TlvMessageBuffer message(json["AmbientContextType"].size() * 16);
 
     TLV::TLVType outerType;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(1), endpointId));
-    ReturnErrorOnFailure(EncodeSemanticTagList(writer, TLV::ContextTag(2), json["AmbientContextType"]));
-    ReturnErrorOnFailure(writer.EndContainer(outerType));
-    ReturnErrorOnFailure(writer.Finalize());
+    ReturnErrorOnFailure(message.Writer().StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+    ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(1), endpointId));
+    ReturnErrorOnFailure(EncodeSemanticTagList(message.Writer(), TLV::ContextTag(2), json["AmbientContextType"]));
+    ReturnErrorOnFailure(message.Writer().EndContainer(outerType));
 
-    return registry.HandleAction("SetSensorFusionSupported"_span, ByteSpan(buffer, writer.GetLengthWritten()));
+    ByteSpan payload;
+    ReturnErrorOnFailure(message.Finalize(payload));
+    return registry.HandleAction("SetSensorFusionSupported"_span, payload);
 }
 
 CHIP_ERROR AmbientContextTranslator::TranslateSetObjectCount(EndpointId endpointId, const Json::Value & json,

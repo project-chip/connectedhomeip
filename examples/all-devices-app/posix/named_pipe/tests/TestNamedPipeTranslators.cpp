@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include <oob-accessors/InMemoryOOBAccessorRegistry.h>
+#include <oob-accessors/OOBAccessor.h>
 #include <posix/named_pipe/CommandTranslator.h>
 #include <posix/named_pipe/Dispatcher.h>
 #include <posix/named_pipe/translators/AmbientContextTranslator.h>
@@ -25,8 +27,6 @@
 #include <posix/named_pipe/translators/OccupancyTranslator.h>
 #include <posix/named_pipe/translators/OnOffTranslator.h>
 #include <posix/named_pipe/translators/RvcTranslator.h>
-#include <oob-accessors/InMemoryOOBAccessorRegistry.h>
-#include <oob-accessors/OOBAccessor.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
@@ -77,7 +77,7 @@ protected:
     void SetUp() override
     {
         mRegistry.Clear();
-        auto mock = std::make_unique<MockOOBAccessor>();
+        auto mock     = std::make_unique<MockOOBAccessor>();
         mMockAccessor = mock.get();
         EXPECT_EQ(mRegistry.Register(std::move(mock)), CHIP_NO_ERROR);
     }
@@ -246,12 +246,14 @@ TEST_F(TestNamedPipeTranslators, AmbientContextTranslator)
     EXPECT_EQ(mMockAccessor->mLastAction, "SetAmbientContextSupport");
 
     // AddAmbientContextDetect
-    Json::Value detJson = ParseJson(R"({"Name": "AddAmbientContextDetect", "AmbientContextType": [{"TypeId": 75, "TagId": 1}], "DetectionConfidence": 85})");
+    Json::Value detJson = ParseJson(
+        R"({"Name": "AddAmbientContextDetect", "AmbientContextType": [{"TypeId": 75, "TagId": 1}], "DetectionConfidence": 85})");
     EXPECT_EQ(translator.TranslateAndExecute(1, detJson, mRegistry), CHIP_NO_ERROR);
     EXPECT_EQ(mMockAccessor->mLastAction, "AddAmbientContextDetect");
 
     // SetSensorFusionSupported
-    Json::Value fusionJson = ParseJson(R"({"Name": "SetSensorFusionSupported", "AmbientContextType": [{"TypeId": 75, "TagId": 1}]})");
+    Json::Value fusionJson =
+        ParseJson(R"({"Name": "SetSensorFusionSupported", "AmbientContextType": [{"TypeId": 75, "TagId": 1}]})");
     EXPECT_EQ(translator.TranslateAndExecute(1, fusionJson, mRegistry), CHIP_NO_ERROR);
     EXPECT_EQ(mMockAccessor->mLastAction, "SetSensorFusionSupported");
 
@@ -354,4 +356,33 @@ TEST_F(TestNamedPipeTranslators, Dispatcher_DispatchJson)
     // Unknown action
     Json::Value unkAction = ParseJson(R"({"Name": "UnknownAction"})");
     EXPECT_EQ(dispatcher.DispatchJson(unkAction), CHIP_ERROR_NOT_FOUND);
+}
+
+TEST_F(TestNamedPipeTranslators, TlvMessageBuffer_LifecycleAndSizing)
+{
+    // Verify default sizing adds envelope overhead
+    TlvMessageBuffer buffer0;
+    EXPECT_GE(TlvMessageBuffer::kTlvEnvelopeOverhead, 64U);
+
+    // Verify writing and finalize
+    TlvMessageBuffer buffer(128);
+    TLV::TLVType outerType;
+    EXPECT_EQ(buffer.Writer().StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType), CHIP_NO_ERROR);
+    EXPECT_EQ(buffer.Writer().Put(TLV::ContextTag(1), static_cast<uint16_t>(5)), CHIP_NO_ERROR);
+    EXPECT_EQ(buffer.Writer().EndContainer(outerType), CHIP_NO_ERROR);
+
+    ByteSpan payload;
+    EXPECT_EQ(buffer.Finalize(payload), CHIP_NO_ERROR);
+    EXPECT_GT(payload.size(), 0U);
+}
+
+TEST_F(TestNamedPipeTranslators, CommandTranslator_DispatchStringAction_LargePayload)
+{
+    // Large string exceeding previous fixed stack buffers (1024 bytes)
+    std::string largeError(1024, 'E');
+    EXPECT_EQ(
+        CommandTranslator::DispatchStringAction(mRegistry, "ErrorEvent"_span, 1, CharSpan(largeError.data(), largeError.size())),
+        CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "ErrorEvent");
+    EXPECT_GT(mMockAccessor->mLastData.size(), 1024U);
 }

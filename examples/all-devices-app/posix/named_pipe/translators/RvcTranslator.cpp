@@ -48,19 +48,18 @@ CHIP_ERROR RvcTranslator::TranslateAndExecute(EndpointId endpointId, const Json:
         }
         std::string mapName = json["MapName"].asString();
 
-        uint8_t buffer[128];
-        TLV::TLVWriter writer;
-        writer.Init(buffer, sizeof(buffer));
+        TlvMessageBuffer message(mapName.size());
 
         TLV::TLVType outerType;
-        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(1), endpointId));
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(2), *mapId));
-        ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(3), CharSpan(mapName.data(), mapName.size())));
-        ReturnErrorOnFailure(writer.EndContainer(outerType));
-        ReturnErrorOnFailure(writer.Finalize());
+        ReturnErrorOnFailure(message.Writer().StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+        ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(1), endpointId));
+        ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(2), *mapId));
+        ReturnErrorOnFailure(message.Writer().PutString(TLV::ContextTag(3), CharSpan(mapName.data(), mapName.size())));
+        ReturnErrorOnFailure(message.Writer().EndContainer(outerType));
 
-        return registry.HandleAction("AddMap"_span, ByteSpan(buffer, writer.GetLengthWritten()));
+        ByteSpan payload;
+        ReturnErrorOnFailure(message.Finalize(payload));
+        return registry.HandleAction("AddMap"_span, payload);
     }
     if (action == "RemoveMap")
     {
@@ -97,26 +96,25 @@ CHIP_ERROR RvcTranslator::TranslateAndExecute(EndpointId endpointId, const Json:
             locName = json["LocationName"].asString();
         }
 
-        uint8_t buffer[128];
-        TLV::TLVWriter writer;
-        writer.Init(buffer, sizeof(buffer));
+        TlvMessageBuffer message(locName.has_value() ? locName->size() : 0);
 
         TLV::TLVType outerType;
-        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(1), endpointId));
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(2), *areaId));
+        ReturnErrorOnFailure(message.Writer().StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+        ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(1), endpointId));
+        ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(2), *areaId));
         if (mapId.has_value())
         {
-            ReturnErrorOnFailure(writer.Put(TLV::ContextTag(3), *mapId));
+            ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(3), *mapId));
         }
         if (locName.has_value())
         {
-            ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(4), CharSpan(locName->data(), locName->size())));
+            ReturnErrorOnFailure(message.Writer().PutString(TLV::ContextTag(4), CharSpan(locName->data(), locName->size())));
         }
-        ReturnErrorOnFailure(writer.EndContainer(outerType));
-        ReturnErrorOnFailure(writer.Finalize());
+        ReturnErrorOnFailure(message.Writer().EndContainer(outerType));
 
-        return registry.HandleAction("AddArea"_span, ByteSpan(buffer, writer.GetLengthWritten()));
+        ByteSpan payload;
+        ReturnErrorOnFailure(message.Finalize(payload));
+        return registry.HandleAction("AddArea"_span, payload);
     }
     if (action == "RemoveArea")
     {
