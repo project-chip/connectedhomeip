@@ -1631,8 +1631,8 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
 
     for (int i = 0; i < X509_get_ext_count(x509Cert); i++)
     {
-        X509_EXTENSION * ex = X509_get_ext(x509Cert, i);
-        ASN1_OBJECT * obj   = X509_EXTENSION_get_object(ex);
+        const X509_EXTENSION * ex = X509_get_ext(x509Cert, i);
+        const ASN1_OBJECT * obj   = X509_EXTENSION_get_object(ex);
         bool isCritical     = X509_EXTENSION_get_critical(ex) == 1;
 
         switch (OBJ_obj2nid(obj))
@@ -1680,12 +1680,12 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
             break;
         case NID_subject_key_identifier:
             VerifyOrExit(!isCritical && !extSKIDPresent, err = CHIP_ERROR_INTERNAL);
-            VerifyOrExit(X509_get0_subject_key_id(x509Cert)->length == kSubjectKeyIdentifierLength, err = CHIP_ERROR_INTERNAL);
+            VerifyOrExit(ASN1_STRING_length(X509_get0_subject_key_id(x509Cert)) == kSubjectKeyIdentifierLength, err = CHIP_ERROR_INTERNAL);
             extSKIDPresent = true;
             break;
         case NID_authority_key_identifier:
             VerifyOrExit(!isCritical && !extAKIDPresent, err = CHIP_ERROR_INTERNAL);
-            VerifyOrExit(X509_get0_authority_key_id(x509Cert)->length == kAuthorityKeyIdentifierLength, err = CHIP_ERROR_INTERNAL);
+            VerifyOrExit(ASN1_STRING_length(X509_get0_authority_key_id(x509Cert)) == kAuthorityKeyIdentifierLength, err = CHIP_ERROR_INTERNAL);
             extAKIDPresent = true;
             break;
         default:
@@ -1772,7 +1772,7 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     {
         X509_VERIFY_PARAM * param = X509_STORE_CTX_get0_param(verifyCtx);
         chip::ASN1::ASN1UniversalTime asn1Time;
-        char * asn1TimeStr = reinterpret_cast<char *>(X509_get_notBefore(x509LeafCertificate)->data);
+        const char * asn1TimeStr = reinterpret_cast<const char *>(ASN1_STRING_get0_data(X509_get_notBefore(x509LeafCertificate)));
         uint32_t unixEpoch;
 
         VerifyOrExit(param != nullptr, (result = CertificateChainValidationResult::kNoMemory, err = CHIP_ERROR_NO_MEMORY));
@@ -1945,13 +1945,13 @@ CHIP_ERROR ExtractKIDFromX509Cert(bool isSKID, const ByteSpan & certificate, Mut
 
     kidString = isSKID ? X509_get0_subject_key_id(x509certificate) : X509_get0_authority_key_id(x509certificate);
     VerifyOrExit(kidString != nullptr, err = CHIP_ERROR_NOT_FOUND);
-    VerifyOrExit(CanCastTo<size_t>(kidString->length), err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(kidString->length == kSubjectKeyIdentifierLength, err = CHIP_ERROR_WRONG_CERT_TYPE);
-    VerifyOrExit(static_cast<size_t>(kidString->length) <= kid.size(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrExit(CanCastTo<size_t>(ASN1_STRING_length(kidString)), err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(ASN1_STRING_length(kidString) == kSubjectKeyIdentifierLength, err = CHIP_ERROR_WRONG_CERT_TYPE);
+    VerifyOrExit(static_cast<size_t>(ASN1_STRING_length(kidString)) <= kid.size(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    memcpy(kid.data(), kidString->data, static_cast<size_t>(kidString->length));
+    memcpy(kid.data(), ASN1_STRING_get0_data(kidString), static_cast<size_t>(ASN1_STRING_length(kidString)));
 
-    kid.reduce_size(static_cast<size_t>(kidString->length));
+    kid.reduce_size(static_cast<size_t>(ASN1_STRING_length(kidString)));
 
 exit:
     X509_free(x509certificate);
@@ -2141,13 +2141,13 @@ CHIP_ERROR ExtractSerialNumberFromX509Cert(const ByteSpan & certificate, Mutable
 
     serialNumberASN1 = X509_get_serialNumber(x509certificate);
     VerifyOrExit(serialNumberASN1 != nullptr, err = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(serialNumberASN1->data != nullptr, err = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(CanCastTo<size_t>(serialNumberASN1->length), err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(ASN1_STRING_get0_data(serialNumberASN1) != nullptr, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(CanCastTo<size_t>(ASN1_STRING_length(serialNumberASN1)), err = CHIP_ERROR_INTERNAL);
 
-    serialNumberLen = static_cast<size_t>(serialNumberASN1->length);
+    serialNumberLen = static_cast<size_t>(ASN1_STRING_length(serialNumberASN1));
     VerifyOrExit(serialNumberLen <= serialNumber.size(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    memcpy(serialNumber.data(), serialNumberASN1->data, serialNumberLen);
+    memcpy(serialNumber.data(), ASN1_STRING_get0_data(serialNumberASN1), serialNumberLen);
     serialNumber.reduce_size(serialNumberLen);
 
 exit:
@@ -2164,7 +2164,7 @@ CHIP_ERROR ExtractRawDNFromX509Cert(bool extractSubject, const ByteSpan & certif
     X509 * x509certificate               = nullptr;
     auto * pCertificate                  = Uint8::to_const_uchar(certificate.data());
     const unsigned char ** ppCertificate = &pCertificate;
-    X509_NAME * distinguishedName        = nullptr;
+    const X509_NAME * distinguishedName        = nullptr;
     const uint8_t * pDistinguishedName   = nullptr;
     size_t distinguishedNameLen          = 0;
 
@@ -2213,7 +2213,7 @@ CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCe
     CHIP_ERROR err                     = CHIP_NO_ERROR;
     X509 * x509certificate             = nullptr;
     const unsigned char * pCertificate = certificate.data();
-    X509_NAME * subject                = nullptr;
+    const X509_NAME * subject          = nullptr;
     int x509EntryCountIdx              = 0;
     AttestationCertVidPid vidpidFromCN;
 
@@ -2227,9 +2227,9 @@ CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCe
 
     for (x509EntryCountIdx = 0; x509EntryCountIdx < X509_NAME_entry_count(subject); ++x509EntryCountIdx)
     {
-        X509_NAME_ENTRY * name_entry = X509_NAME_get_entry(subject, x509EntryCountIdx);
+        const X509_NAME_ENTRY * name_entry = X509_NAME_get_entry(subject, x509EntryCountIdx);
         VerifyOrExit(name_entry != nullptr, err = CHIP_ERROR_INTERNAL);
-        ASN1_OBJECT * object = X509_NAME_ENTRY_get_object(name_entry);
+        const ASN1_OBJECT * object = X509_NAME_ENTRY_get_object(name_entry);
         VerifyOrExit(object != nullptr, err = CHIP_ERROR_INTERNAL);
 
         DNAttrType attrType = DNAttrType::kUnspecified;
@@ -2248,9 +2248,9 @@ CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCe
 
         if (attrType != DNAttrType::kUnspecified)
         {
-            ASN1_STRING * data_entry = X509_NAME_ENTRY_get_data(name_entry);
+            const ASN1_STRING * data_entry = X509_NAME_ENTRY_get_data(name_entry);
             VerifyOrExit(data_entry != nullptr, err = CHIP_ERROR_INTERNAL);
-            unsigned char * str = ASN1_STRING_data(data_entry);
+            const unsigned char * str = ASN1_STRING_get0_data(data_entry);
             VerifyOrExit(str != nullptr, err = CHIP_ERROR_INTERNAL);
             int len = ASN1_STRING_length(data_entry);
             VerifyOrExit(CanCastTo<size_t>(len), err = CHIP_ERROR_INTERNAL);
@@ -2283,8 +2283,8 @@ CHIP_ERROR ReplaceCertIfResignedCertFound(const ByteSpan & referenceCertificate,
     X509 * x509ReferenceCertificate       = nullptr;
     X509 * x509CandidateCertificate       = nullptr;
     const uint8_t * pReferenceCertificate = referenceCertificate.data();
-    X509_NAME * referenceSubject          = nullptr;
-    X509_NAME * candidateSubject          = nullptr;
+    const X509_NAME * referenceSubject          = nullptr;
+    const X509_NAME * candidateSubject          = nullptr;
     uint8_t referenceSKIDBuf[kSubjectKeyIdentifierLength];
     uint8_t candidateSKIDBuf[kSubjectKeyIdentifierLength];
     MutableByteSpan referenceSKID(referenceSKIDBuf);
