@@ -93,7 +93,8 @@ class TC_ESALM_2_1(MatterBaseTest):
         if has_overfreq:
             asserts.assert_true(supported & _A.kOverFrequency, "OVERFREQ feature set but OverFrequency bit missing from Supported")
         if has_underfreq:
-            asserts.assert_true(supported & _A.kUnderFrequency, "UNDERFREQ feature set but UnderFrequency bit missing from Supported")
+            asserts.assert_true(supported & _A.kUnderFrequency,
+                                "UNDERFREQ feature set but UnderFrequency bit missing from Supported")
         if has_overpower:
             asserts.assert_true(supported & _A.kOverPower, "OVERPOWER feature set but OverPower bit missing from Supported")
         if has_underpower:
