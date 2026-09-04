@@ -24,6 +24,7 @@
 #include <app/ReadClient.h>
 #include <app/clusters/av-analysis-server/AvAnalysisWebRTCClient.h>
 #include <app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h>
+#include <clusters/WebRTCTransportProvider/Commands.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/ScopedMemoryBuffer.h>
 #include <transport/SessionHolder.h>
@@ -150,7 +151,8 @@ protected:
      */
     virtual void EstablishSession(const ScopedNodeId & aCameraNode)
     {
-        mCASESessionManager->FindOrEstablishSession(aCameraNode, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+        mCASESessionManager->FindOrEstablishSession(aCameraNode, &mOnConnectedCallback, &mOnConnectionFailureCallback,
+                                                    TransportPayloadCapability::kLargePayload);
     }
 
     /**
@@ -182,24 +184,42 @@ protected:
         void Advance(Phase aPhase) { mPhase = aPhase; }
 
         CommandType GetCommandType() const { return mCommandType; }
+        const ScopedNodeId & CameraNode() const { return mCameraNode; }
         EndpointId WebRTCEndpoint() const { return mWebRTCEndpoint; }
         uint16_t VideoStreamId() const { return mVideoStreamId; }
+        // The WebRTC session this request is about
         uint16_t WebRTCSessionId() const { return mWebRTCSessionId; }
 
         /**
          * Start a request in kConnecting; the callback is delivered exactly once, by TakeCallback().
          */
-        void BeginProvideOffer(EndpointId aWebRTCEndpoint, uint16_t aVideoStreamId, AvAnalysisWebRTCClient::Callback & aCallback)
+        void BeginProvideOffer(const ScopedNodeId & aCameraNode, EndpointId aWebRTCEndpoint, uint16_t aVideoStreamId,
+                               AvAnalysisWebRTCClient::Callback & aCallback)
         {
-            Begin(CommandType::kProvideOffer, aWebRTCEndpoint, aCallback);
+            Begin(CommandType::kProvideOffer, aCameraNode, aWebRTCEndpoint, aCallback);
             mVideoStreamId = aVideoStreamId;
         }
 
-        void BeginEndSession(EndpointId aWebRTCEndpoint, uint16_t aWebRTCSessionId, AvAnalysisWebRTCClient::Callback & aCallback)
+        void BeginEndSession(const ScopedNodeId & aCameraNode, EndpointId aWebRTCEndpoint, uint16_t aWebRTCSessionId,
+                             AvAnalysisWebRTCClient::Callback & aCallback)
         {
-            Begin(CommandType::kEndSession, aWebRTCEndpoint, aCallback);
+            Begin(CommandType::kEndSession, aCameraNode, aWebRTCEndpoint, aCallback);
             mWebRTCSessionId = aWebRTCSessionId;
         }
+
+        /**
+         * Records the decoded ProvideOfferResponse: the camera-assigned session id and the video
+         * stream the camera selected. HasOfferResponse() separates "command answered" from every
+         * way the exchange can end without one.
+         */
+        void SetOfferResponse(uint16_t aWebRTCSessionId, const DataModel::Nullable<uint16_t> & aVideoStreamId)
+        {
+            mWebRTCSessionId       = aWebRTCSessionId;
+            mResponseVideoStreamId = aVideoStreamId;
+            mHasOfferResponse      = true;
+        }
+        bool HasOfferResponse() const { return mHasOfferResponse; }
+        const DataModel::Nullable<uint16_t> & ResponseVideoStreamId() const { return mResponseVideoStreamId; }
 
         /**
          * Returns the callback owed the outcome, or nullptr when it was already delivered (or the
@@ -240,25 +260,35 @@ protected:
         void Reset() { *this = Request{}; }
 
     private:
-        void Begin(CommandType aCommandType, EndpointId aWebRTCEndpoint, AvAnalysisWebRTCClient::Callback & aCallback)
+        void Begin(CommandType aCommandType, const ScopedNodeId & aCameraNode, EndpointId aWebRTCEndpoint,
+                   AvAnalysisWebRTCClient::Callback & aCallback)
         {
             Reset();
             mPhase          = Phase::kConnecting;
             mCommandType    = aCommandType;
+            mCameraNode     = aCameraNode;
             mWebRTCEndpoint = aWebRTCEndpoint;
             mCallback       = &aCallback;
         }
 
+        // Request machinery
         Phase mPhase                                 = Phase::kIdle;
         CommandType mCommandType                     = CommandType::kProvideOffer;
-        EndpointId mWebRTCEndpoint                   = kInvalidEndpointId;
-        uint16_t mVideoStreamId                      = 0;
-        uint16_t mWebRTCSessionId                    = 0;
         AvAnalysisWebRTCClient::Callback * mCallback = nullptr;
+        CommandSender * mInvokedSender               = nullptr;
+        bool mProviderFound                          = false;
+        bool mHasOfferResponse                       = false;
+
+        // Sending the command
         SessionHolder mSessionHolder;
         Messaging::ExchangeManager * mExchangeMgr = nullptr;
-        CommandSender * mInvokedSender            = nullptr;
-        bool mProviderFound                       = false;
+        EndpointId mWebRTCEndpoint                = kInvalidEndpointId;
+        uint16_t mVideoStreamId                   = 0;
+
+        // The session record the requestor cluster gets on success
+        ScopedNodeId mCameraNode;
+        uint16_t mWebRTCSessionId = 0;
+        DataModel::Nullable<uint16_t> mResponseVideoStreamId;
     };
 
     /**
@@ -271,13 +301,30 @@ protected:
      */
     void HandleServerListReport(const ConcreteDataAttributePath & aPath, TLV::TLVReader & aData);
 
+    /**
+     * Fills a ProvideOffer request from the pending request and the buffered SDP, per the WebRTC
+     * Normal Flow: a null session id asks for a new session, StreamUsage is Analysis, and the
+     * originating endpoint is where our WebRTCTransportRequestor cluster is registered. The sdp
+     * span references mOfferSdp and is only valid while it is unchanged.
+     */
+    CHIP_ERROR BuildProvideOffer(WebRTCTransportProvider::Commands::ProvideOffer::Type & aRequest) const;
+
+    /**
+     * Sends the built ProvideOffer on the held session. The default body is the expected behavior;
+     * virtual only so unit tests can intercept the network boundary.
+     */
+    virtual CHIP_ERROR SendProvideOffer();
+
 private:
-    // Tracked session
+    // A session the camera assigned, tracked until it ends: routes its late signals to the
+    // callback that initiated it, and (for outbound sends about it) back to the camera.
     struct TrackedSession
     {
         uint16_t webRTCSessionId                     = 0;
         AvAnalysisWebRTCClient::Callback * mCallback = nullptr;
-        bool inUse                                   = false;
+        ScopedNodeId cameraNode;
+        EndpointId providerEndpoint = kInvalidEndpointId;
+        bool inUse                  = false;
     };
 
     // Common preconditions of RequestSession/EndSession, checked before Request::Begin* runs
@@ -285,6 +332,9 @@ private:
     CHIP_ERROR SendProviderCheckRead();
     void ResetReadClient();
     void OnProviderCheckComplete();
+    // Tracks the camera-assigned session, records it on the requestor cluster, and hands it to the
+    // peer delegate; the offer request's success completion.
+    CHIP_ERROR RegisterSession(uint16_t aWebRTCSessionId);
     void FinishRequest(Protocols::InteractionModel::Status aStatus, uint16_t aWebRTCSessionId);
     TrackedSession * FindTrackedSession(uint16_t aWebRTCSessionId);
 

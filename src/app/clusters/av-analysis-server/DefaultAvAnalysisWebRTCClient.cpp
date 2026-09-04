@@ -56,7 +56,7 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::RequestSession(const ScopedNodeId & aC
 {
     ReturnErrorOnFailure(CanStartRequest());
 
-    mRequest.BeginProvideOffer(aWebRTCEndpoint, aVideoStreamId, aCallback);
+    mRequest.BeginProvideOffer(aCameraNode, aWebRTCEndpoint, aVideoStreamId, aCallback);
 
     EstablishSession(aCameraNode);
     return CHIP_NO_ERROR;
@@ -69,7 +69,7 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::EndSession(const ScopedNodeId & aCamer
     VerifyOrReturnError(FindTrackedSession(aWebRTCSessionId) != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(CanStartRequest());
 
-    mRequest.BeginEndSession(aWebRTCEndpoint, aWebRTCSessionId, aCallback);
+    mRequest.BeginEndSession(aCameraNode, aWebRTCEndpoint, aWebRTCSessionId, aCallback);
 
     EstablishSession(aCameraNode);
     return CHIP_NO_ERROR;
@@ -89,6 +89,7 @@ void DefaultAvAnalysisWebRTCClient::Cancel()
 
     // Forget the request without delivering a completion
     mRequest.Reset();
+    mOfferSdp.clear();
 }
 
 CHIP_ERROR DefaultAvAnalysisWebRTCClient::CanStartRequest() const
@@ -121,7 +122,7 @@ void DefaultAvAnalysisWebRTCClient::OnDeviceConnected(void * context, Messaging:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "AvAnalysisWebRTCClient: provider check not started: %" CHIP_ERROR_FORMAT, err.Format());
-        self->FinishRequest(Status::Failure, 0);
+        self->FinishRequest(Status::Failure, self->mRequest.WebRTCSessionId());
     }
 }
 
@@ -220,28 +221,116 @@ void DefaultAvAnalysisWebRTCClient::OnProviderCheckComplete()
     {
         // no WebRTCTransportProvider on the endpoint the command named
         ChipLogError(Zcl, "AvAnalysisWebRTCClient: no WebRTCTransportProvider on endpoint %u", mRequest.WebRTCEndpoint());
-        FinishRequest(Status::NotFound, 0);
+        FinishRequest(Status::NotFound, mRequest.WebRTCSessionId());
         return;
     }
 
-    // TODO: request the SDP offer from the peer delegate and send ProvideOffer
-    ChipLogError(Zcl, "AvAnalysisWebRTCClient: offer sending is not implemented yet");
-    FinishRequest(Status::Failure, 0);
+    mRequest.Advance(Request::Phase::kCreatingOffer);
+    CHIP_ERROR err = mPeerDelegate->CreateOffer(*this);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "AvAnalysisWebRTCClient: no SDP offer forthcoming: %" CHIP_ERROR_FORMAT, err.Format());
+        FinishRequest(Status::Failure, mRequest.WebRTCSessionId());
+    }
 }
 
-// TODO: buffer the SDP and send ProvideOffer
 void DefaultAvAnalysisWebRTCClient::OnOfferReady(CHIP_ERROR aError, CharSpan aSdp)
 {
     VerifyOrReturn(mRequest.InPhase(Request::Phase::kCreatingOffer),
                    ChipLogError(Zcl, "AvAnalysisWebRTCClient: unexpected offer delivery"));
+
+    if (aError != CHIP_NO_ERROR || aSdp.empty())
+    {
+        ChipLogError(Zcl, "AvAnalysisWebRTCClient: the application produced no SDP offer: %" CHIP_ERROR_FORMAT, aError.Format());
+        FinishRequest(Status::Failure, mRequest.WebRTCSessionId());
+        return;
+    }
+
+    mOfferSdp.assign(aSdp.data(), aSdp.size());
+
+    CHIP_ERROR err = SendProvideOffer();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "AvAnalysisWebRTCClient: ProvideOffer not sent: %" CHIP_ERROR_FORMAT, err.Format());
+        FinishRequest(Status::Failure, mRequest.WebRTCSessionId());
+    }
 }
 
-// TODO: decode ProvideOfferResponse / propagate the EndSession status
+CHIP_ERROR DefaultAvAnalysisWebRTCClient::BuildProvideOffer(WebRTCTransportProvider::Commands::ProvideOffer::Type & aRequest) const
+{
+    // The requestor cluster's registered path is where the camera's answering commands must land
+    VerifyOrReturnError(!mRequestorCluster->GetPaths().empty(), CHIP_ERROR_INCORRECT_STATE);
+
+    aRequest.webRTCSessionID.SetNull(); // a new session, to be assigned by the camera
+    aRequest.sdp                   = CharSpan(mOfferSdp.data(), mOfferSdp.size());
+    aRequest.streamUsage           = Globals::StreamUsageEnum::kAnalysis;
+    aRequest.originatingEndpointID = mRequestorCluster->GetPaths().front().mEndpointId;
+    aRequest.videoStreamID         = MakeOptional(DataModel::MakeNullable(mRequest.VideoStreamId()));
+    // No audio for analysis; ICE servers and transport policy are the camera's defaults
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DefaultAvAnalysisWebRTCClient::SendProvideOffer()
+{
+    VerifyOrReturnError(mRequest.HasSession(), CHIP_ERROR_INCORRECT_STATE);
+
+    // A CommandSender may only be destroyed from its own OnDone, so it must not be replaced while a
+    // previous one's callbacks can still fire.
+    VerifyOrReturnError(!mCommandSender, CHIP_ERROR_INCORRECT_STATE);
+
+    auto session   = mRequest.Session();
+    mCommandSender = Platform::MakeUnique<CommandSender>(this, &mRequest.ExchangeManager(), /* aIsTimedRequest = */ false,
+                                                         /* aSuppressResponse = */ false, session.Value()->AllowsLargePayload());
+    VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    // Recorded before sending: a send can dispatch the interaction's completion synchronously, and
+    // that callback must already recognise this sender as ours.
+    mRequest.SetInvokedSender(mCommandSender.get());
+    mRequest.Advance(Request::Phase::kInvoking);
+
+    WebRTCTransportProvider::Commands::ProvideOffer::Type request;
+    CHIP_ERROR err = BuildProvideOffer(request);
+    if (err == CHIP_NO_ERROR)
+    {
+        CommandPathParams commandPath{ mRequest.WebRTCEndpoint(), WebRTCTransportProvider::Id,
+                                       WebRTCTransportProvider::Commands::ProvideOffer::Id, CommandPathFlags::kEndpointIdValid };
+        err = mCommandSender->AddRequestData(commandPath, request);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = mCommandSender->SendCommandRequest(session.Value());
+    }
+    if (err != CHIP_NO_ERROR)
+    {
+        // A send that never left means OnDone will never arrive, so the sender is ours to destroy
+        mRequest.SetInvokedSender(nullptr);
+        mCommandSender.reset();
+        return err;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+// TODO(EndSession): propagate the EndSession status response
 void DefaultAvAnalysisWebRTCClient::OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath,
                                                const StatusIB & aStatusIB, TLV::TLVReader * apData)
 {
     VerifyOrReturn(mRequest.WasInvokedBy(apCommandSender),
                    ChipLogError(Zcl, "AvAnalysisWebRTCClient: response for an interaction already finished with"));
+    VerifyOrReturn(mRequest.GetCommandType() == Request::CommandType::kProvideOffer);
+
+    VerifyOrReturn(aStatusIB.IsSuccess() && apData != nullptr,
+                   ChipLogError(Zcl, "AvAnalysisWebRTCClient: ProvideOffer response carried no data"));
+    VerifyOrReturn(aPath.mClusterId == WebRTCTransportProvider::Id &&
+                       aPath.mCommandId == WebRTCTransportProvider::Commands::ProvideOfferResponse::Id,
+                   ChipLogError(Zcl, "AvAnalysisWebRTCClient: unexpected response command"));
+
+    WebRTCTransportProvider::Commands::ProvideOfferResponse::DecodableType response;
+    VerifyOrReturn(DataModel::Decode(*apData, response) == CHIP_NO_ERROR,
+                   ChipLogError(Zcl, "AvAnalysisWebRTCClient: ProvideOfferResponse did not decode"));
+
+    mRequest.SetOfferResponse(response.webRTCSessionID,
+                              response.videoStreamID.HasValue() ? response.videoStreamID.Value() : DataModel::NullNullable);
 }
 
 void DefaultAvAnalysisWebRTCClient::OnError(const CommandSender * apCommandSender, CHIP_ERROR aError)
@@ -269,11 +358,64 @@ void DefaultAvAnalysisWebRTCClient::OnDone(CommandSender * apCommandSender)
         mCommandSender.reset();
     }
 
-    // The interaction is over: with no response or error seen
-    if (isOurs)
+    VerifyOrReturn(isOurs);
+
+    // The exchange ended without the offer being answered (OnError already finished the request,
+    // making this a no-op, or the exchange timed out with nothing delivered at all)
+    if (mRequest.GetCommandType() != Request::CommandType::kProvideOffer || !mRequest.HasOfferResponse())
     {
         FinishRequest(Status::Failure, mRequest.WebRTCSessionId());
+        return;
     }
+
+    const uint16_t webRTCSessionId = mRequest.WebRTCSessionId();
+    CHIP_ERROR err                 = RegisterSession(webRTCSessionId);
+    if (err != CHIP_NO_ERROR)
+    {
+        // The camera holds a session this node cannot track.
+        // TODO(EndSession): release the orphan with EndSession once sending it lands.
+        ChipLogError(Zcl, "AvAnalysisWebRTCClient: session %u not tracked: %" CHIP_ERROR_FORMAT, webRTCSessionId, err.Format());
+        FinishRequest(Status::ResourceExhausted, webRTCSessionId);
+        return;
+    }
+
+    FinishRequest(Status::Success, webRTCSessionId);
+}
+
+CHIP_ERROR DefaultAvAnalysisWebRTCClient::RegisterSession(uint16_t aWebRTCSessionId)
+{
+    TrackedSession * slot = nullptr;
+    for (uint8_t i = 0; i < mMaxSessions; i++)
+    {
+        if (!mSessions[i].inUse)
+        {
+            slot = &mSessions[i];
+            break;
+        }
+    }
+    VerifyOrReturnError(slot != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    // Tracked session
+    slot->inUse            = true;
+    slot->webRTCSessionId  = aWebRTCSessionId;
+    slot->mCallback        = mRequest.PeekCallback();
+    slot->cameraNode       = mRequest.CameraNode();
+    slot->providerEndpoint = mRequest.WebRTCEndpoint();
+
+    // The requestor cluster is the receiving end of this session
+    Globals::Structs::WebRTCSessionStruct::Type session;
+    session.id             = aWebRTCSessionId;
+    session.peerNodeID     = mRequest.CameraNode().GetNodeId();
+    session.fabricIndex    = mRequest.CameraNode().GetFabricIndex();
+    session.peerEndpointID = mRequest.WebRTCEndpoint();
+    session.streamUsage    = Globals::StreamUsageEnum::kAnalysis;
+    session.videoStreamID  = mRequest.ResponseVideoStreamId();
+    session.audioStreamID.SetNull();
+    mRequestorCluster->UpsertSession(session);
+
+    // The application binds the peer connection it created for this offer to the assigned id
+    mPeerDelegate->OnSessionAssigned(aWebRTCSessionId);
+    return CHIP_NO_ERROR;
 }
 
 // TODO: route the signal to the tracked session's callback
@@ -289,6 +431,7 @@ void DefaultAvAnalysisWebRTCClient::FinishRequest(Status aStatus, uint16_t aWebR
 
     const Request::CommandType completed = mRequest.GetCommandType();
     mRequest.Reset();
+    mOfferSdp.clear();
 
     if (completed == Request::CommandType::kProvideOffer)
     {
