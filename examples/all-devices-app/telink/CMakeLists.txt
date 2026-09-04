@@ -56,8 +56,6 @@ target_sources(app PRIVATE
 target_sources(app PRIVATE
                src/AppTask.cpp
                src/DeviceTypeShell.cpp
-               ${ALL_DEVICES_COMMON_DIR}/device/capabilities/identify/LoggingIdentifyDelegate.cpp
-               ${ALL_DEVICES_COMMON_DIR}/device/capabilities/identify/LoggingIdentifyDelegate.h
                ${TELINK_COMMON}/common/src/AllDevicesServer.cpp
                ${TELINK_COMMON}/common/src/mainCommon.cpp
                ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
