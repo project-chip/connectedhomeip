@@ -20,7 +20,25 @@ config("config") {
   include_dirs = [ "include" ]
 }
 
+source_set("thermostat-delegate-impl") {
+  sources = [
+    "src/thermostat-delegate-impl.cpp",
+    "src/thermostat-hold-delegate-impl.cpp",
+    "src/thermostat-occupancy-delegate-impl.cpp",
+    "src/thermostat-presets-delegate-impl.cpp",
+    "src/thermostat-setpoints-delegate-impl.cpp",
+    "src/thermostat-suggestions-delegate-impl.cpp",
+  ]
+  public_configs = [ ":config" ]
+  public_deps = [
+    "${chip_root}/src/app/clusters/thermostat-server",
+    "${chip_root}/src/lib",
+  ]
+}
+
 chip_data_model("thermostat-common") {
   zap_file = "thermostat.zap"
   is_server = true
+
+  public_deps = [ ":thermostat-delegate-impl" ]
 }

@@ -15,18 +15,27 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include "ThermostatClusterAttributes.h"
 
-#include "LoggingOperationalStateDelegate.h"
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace Thermostat {
 
-namespace chip::app::Clusters::OperationalState {
-
-class LoggingRvcOperationalStateDelegate : public LoggingOperationalStateDelegate
+CHIP_ERROR AppendOptionalAttributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder,
+                                    Span<const AttributeListBuilder::OptionalAttributeEntry> entries)
 {
-public:
-    LoggingRvcOperationalStateDelegate() = default;
+    for (const auto & entry : entries)
+    {
+        if (entry.enabled)
+        {
+            ReturnErrorOnFailure(builder.AppendElements({ entry.metadata }));
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 
-    void HandleGoHomeCommandCallback(GenericOperationalError & err) override;
-};
-
-} // namespace chip::app::Clusters::OperationalState
+} // namespace Thermostat
+} // namespace Clusters
+} // namespace app
+} // namespace chip

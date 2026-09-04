@@ -79,6 +79,10 @@ _available_devices = [
     "COLOR_TEMPERATURE_LIGHT",
   ],
   [
+    "commissioning-proxy",
+    "COMMISSIONING_PROXY",
+  ],
+  [
     "contact-sensor",
     "CONTACT_SENSOR",
   ],
