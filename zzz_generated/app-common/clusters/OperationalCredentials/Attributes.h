@@ -120,6 +120,19 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentFabricIndex
+namespace PQCDeviceAttestationProfile {
+struct TypeInfo
+{
+    using Type          = chip::app::Clusters::OperationalCredentials::Structs::PQCDeviceAttestationProfileStruct::Type;
+    using DecodableType = chip::app::Clusters::OperationalCredentials::Structs::PQCDeviceAttestationProfileStruct::DecodableType;
+    using DecodableArgType =
+        const chip::app::Clusters::OperationalCredentials::Structs::PQCDeviceAttestationProfileStruct::DecodableType &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PQCDeviceAttestationProfile::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PQCDeviceAttestationProfile
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -165,6 +178,7 @@ struct TypeInfo
         Attributes::CommissionedFabrics::TypeInfo::DecodableType commissionedFabrics = static_cast<uint8_t>(0);
         Attributes::TrustedRootCertificates::TypeInfo::DecodableType trustedRootCertificates;
         Attributes::CurrentFabricIndex::TypeInfo::DecodableType currentFabricIndex = static_cast<uint8_t>(0);
+        Attributes::PQCDeviceAttestationProfile::TypeInfo::DecodableType PQCDeviceAttestationProfile;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
