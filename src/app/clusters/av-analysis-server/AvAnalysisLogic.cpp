@@ -370,6 +370,8 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalE
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData)
 {
+    ChipLogProgress(Zcl, "AvAnalysis[ep=%d]: Enabling Context Triggers command handler entry.", mEndpointId);
+
     // Verify spec constraints, provided list is 50 entries or less if not null
     //
     if (!commandData.contextTriggers.IsNull())
@@ -402,7 +404,7 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalE
             VerifyOrReturnError(it != mSupportedAmbientContexts.end(), Status::ConstraintError);
 
             // The trigger context is valid, now check the ZoneIDs, which can only be present of PERZONEDETECT is set, likewise,
-            // if we have the feature, then ZoneIDs have to be present
+            // if we have the feature, then ZoneIDs have to be present (note, they could be Null)
             //
             bool hasZoneIDs        = contextTrigger.zoneIDs.HasValue();
             bool hasNonNullZoneIDs = false;
