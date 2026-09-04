@@ -42,18 +42,11 @@ CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIn
 
 CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
 {
-    bool includeSensitive = !aAccessingFabricIndex.HasValue() || (aAccessingFabricIndex.Value() == fabricIndex);
 
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
 
-    if (includeSensitive)
-    {
-        encoder.Encode(to_underlying(Fields::kContributorNodeID), contributorNodeID);
-    }
-    if (includeSensitive)
-    {
-        encoder.Encode(to_underlying(Fields::kContributorEndpointID), contributorEndpointID);
-    }
+    encoder.Encode(to_underlying(Fields::kContributorNodeID), contributorNodeID);
+    encoder.Encode(to_underlying(Fields::kContributorEndpointID), contributorEndpointID);
     encoder.Encode(to_underlying(Fields::kContributorName), contributorName);
     encoder.Encode(to_underlying(Fields::kPreviousContributorStatus), previousContributorStatus);
     encoder.Encode(to_underlying(Fields::kCurrentContributorStatus), currentContributorStatus);
@@ -119,18 +112,11 @@ CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIn
 
 CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
 {
-    bool includeSensitive = !aAccessingFabricIndex.HasValue() || (aAccessingFabricIndex.Value() == fabricIndex);
 
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
 
-    if (includeSensitive)
-    {
-        encoder.Encode(to_underlying(Fields::kContributorNodeID), contributorNodeID);
-    }
-    if (includeSensitive)
-    {
-        encoder.Encode(to_underlying(Fields::kContributorEndpointID), contributorEndpointID);
-    }
+    encoder.Encode(to_underlying(Fields::kContributorNodeID), contributorNodeID);
+    encoder.Encode(to_underlying(Fields::kContributorEndpointID), contributorEndpointID);
     encoder.Encode(to_underlying(Fields::kContributorName), contributorName);
     encoder.Encode(to_underlying(Fields::kContributorStatus), contributorStatus);
     if (aAccessingFabricIndex.HasValue())

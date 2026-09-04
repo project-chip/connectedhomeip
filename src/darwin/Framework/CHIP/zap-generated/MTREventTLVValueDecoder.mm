@@ -5201,6 +5201,11 @@ static id _Nullable DecodeEventPayloadForAmbientSensingUnionCluster(EventId aEve
             }
             value.addedContributor = memberValue;
         } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex];
+            value.fabricIndex = memberValue;
+        } while (0);
 
         return value;
     }
@@ -5254,6 +5259,11 @@ static id _Nullable DecodeEventPayloadForAmbientSensingUnionCluster(EventId aEve
                 memberValue = array_0;
             }
             value.removedContributor = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex];
+            value.fabricIndex = memberValue;
         } while (0);
 
         return value;
@@ -5309,6 +5319,11 @@ static id _Nullable DecodeEventPayloadForAmbientSensingUnionCluster(EventId aEve
                 memberValue = array_0;
             }
             value.contributorStatusChange = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex];
+            value.fabricIndex = memberValue;
         } while (0);
 
         return value;

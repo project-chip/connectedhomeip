@@ -9432,6 +9432,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _addedContributor = [NSArray array];
+
+        _fabricIndex = @(0);
     }
     return self;
 }
@@ -9441,13 +9443,14 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRAmbientSensingUnionClusterUnionContributorAddedEvent alloc] init];
 
     other.addedContributor = self.addedContributor;
+    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: addedContributor:%@; >", NSStringFromClass([self class]), _addedContributor];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: addedContributor:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _addedContributor, _fabricIndex];
     return descriptionString;
 }
 
@@ -9459,6 +9462,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _removedContributor = [NSArray array];
+
+        _fabricIndex = @(0);
     }
     return self;
 }
@@ -9468,13 +9473,14 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRAmbientSensingUnionClusterUnionContributorRemovedEvent alloc] init];
 
     other.removedContributor = self.removedContributor;
+    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: removedContributor:%@; >", NSStringFromClass([self class]), _removedContributor];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: removedContributor:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _removedContributor, _fabricIndex];
     return descriptionString;
 }
 
@@ -9486,6 +9492,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _contributorStatusChange = [NSArray array];
+
+        _fabricIndex = @(0);
     }
     return self;
 }
@@ -9495,13 +9503,14 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRAmbientSensingUnionClusterUnionContributorStatusChangedEvent alloc] init];
 
     other.contributorStatusChange = self.contributorStatusChange;
+    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contributorStatusChange:%@; >", NSStringFromClass([self class]), _contributorStatusChange];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contributorStatusChange:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _contributorStatusChange, _fabricIndex];
     return descriptionString;
 }
 
