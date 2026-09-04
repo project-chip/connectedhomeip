@@ -566,7 +566,7 @@ TEST_F(ThermostatSchedulesTestFixture, WriteToSchedulesFromDifferentNodeDuringAt
     ScheduleStruct::Type list[] = { MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
                                                  DataModel::List<const ScheduleTransitionStruct::Type>()) };
     EXPECT_EQ(tester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list), ListWritingPattern::ReplaceAll),
-             CHIP_IM_GLOBAL_STATUS(Busy));
+              CHIP_IM_GLOBAL_STATUS(Busy));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -584,8 +584,8 @@ TEST_F(ThermostatSchedulesTestFixture, AppendItemListOperationAppendsSingleSched
     // schedule with an AppendItem write, exercising the AppendItem list-operation path.
     ScheduleStruct::Type list[] = { MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
                                                  DataModel::List<const ScheduleTransitionStruct::Type>()) };
-    auto writeStatus = tester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list),
-                                             ListWritingPattern::ClearAllThenAppendItems);
+    auto writeStatus            = tester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list),
+                                                        ListWritingPattern::ClearAllThenAppendItems);
     EXPECT_TRUE(writeStatus.IsSuccess());
 
     ASSERT_EQ(mSchedulesDelegate.mPendingSchedules.size(), 1u);
@@ -626,10 +626,9 @@ TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsOversizedTran
     uint8_t oversizedHandle[kScheduleHandleSize + 1] = {};
     ScheduleTransitionStruct::Type transition        = MakeScheduleTransition(0, ScheduleDayOfWeekBitmap::kMonday);
     transition.presetHandle                          = MakeOptional(ByteSpan(oversizedHandle));
-    ScheduleTransitionStruct::Type transitions[]      = { transition };
-    ScheduleStruct::Type list[]                       = { MakeSchedule(
-        DataModel::NullNullable, DataModel::NullNullable, NullOptional,
-        DataModel::List<const ScheduleTransitionStruct::Type>(transitions)) };
+    ScheduleTransitionStruct::Type transitions[]     = { transition };
+    ScheduleStruct::Type list[] = { MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
+                                                 DataModel::List<const ScheduleTransitionStruct::Type>(transitions)) };
     auto writeStatus =
         tester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list), ListWritingPattern::ReplaceAll);
     EXPECT_EQ(writeStatus, CHIP_IM_GLOBAL_STATUS(ConstraintError));
