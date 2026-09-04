@@ -205,10 +205,15 @@ class TC_MEDIAFILEMANAGEMENT_3_1(MatterBaseTest, MEDIAFILEMANAGEMENTTestBase):
 
     @staticmethod
     def _find_unissued_response_id(issued: set) -> int:
-        for candidate in range(_UINT16_MAX, -1, -1):
-            if candidate not in issued:
-                return candidate
-        asserts.fail("Every uint16 ResponseID has been issued; cannot build an unissued ResponseID")
+        """Return a uint16 ResponseID that the DUT never issued.
+
+        A DUT shares a handful of files at a time, so the search settles immediately; the
+        assertion only guards the theoretical case of the whole uint16 space being in use.
+        """
+        candidate = next((value for value in range(_UINT16_MAX, -1, -1) if value not in issued), None)
+        asserts.assert_is_not_none(
+            candidate, "Every uint16 ResponseID has been issued; cannot fabricate an unissued ResponseID")
+        return candidate
 
 
 if __name__ == "__main__":
