@@ -19,9 +19,11 @@
 #pragma once
 
 #include "analysis-delegate.h"
+#include "webrtc-requestor-delegate.h"
 
 #include <app/clusters/av-analysis-server/AvAnalysisCluster.h>
 #include <app/clusters/av-analysis-server/DefaultAvAnalysisCameraClient.h>
+#include <app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -46,7 +48,10 @@ private:
 
     AnalysisDelegate mAnalysisDelegate;
     Clusters::DefaultAvAnalysisCameraClient mCameraClient;
+    WebRTCRequestorDelegate mRequestorDelegate;
     LazyRegisteredServerCluster<Clusters::AvAnalysisCluster> mAvAnalysisServer;
+    // The receiving end of the WebRTC sessions the AV Analysis cluster initiates
+    LazyRegisteredServerCluster<Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorCluster> mWebRTCRequestorServer;
 };
 
 } // namespace app
