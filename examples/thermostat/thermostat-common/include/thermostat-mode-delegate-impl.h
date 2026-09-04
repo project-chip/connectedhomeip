@@ -47,7 +47,7 @@ private:
     ModeTagStructType ModeTagsCool[1]          = { { .value = to_underlying(ModeTag::kCool) } };
     ModeTagStructType ModeTagsHeat[1]          = { { .value = to_underlying(ModeTag::kHeat) } };
     ModeTagStructType ModeTagsEmergencyHeat[2] = { { .value = to_underlying(ModeTag::kHeat) },
-                                                  { .value = to_underlying(ModeTag::kEmergencyHeat) } };
+                                                   { .value = to_underlying(ModeTag::kEmergencyHeat) } };
     ModeTagStructType ModeTagsAuto[1]          = { { .value = to_underlying(ModeTag::kAuto) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[5] = {
@@ -81,7 +81,7 @@ private:
     CHIP_ERROR Init() override;
     void HandleChangeToMode(uint8_t mode, ModeBase::Commands::ChangeToModeResponse::Type & response) override;
     void HandleChangeToModeByCoreTag(uint16_t newModeTag, uint8_t & newMode,
-                                    ModeBase::Commands::ChangeToModeResponse::Type & response) override;
+                                     ModeBase::Commands::ChangeToModeResponse::Type & response) override;
 
     CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan & label) override;
     CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) override;

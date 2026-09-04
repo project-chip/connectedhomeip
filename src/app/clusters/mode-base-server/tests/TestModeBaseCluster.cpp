@@ -106,14 +106,14 @@ public:
     }
 
     void HandleChangeToModeByCoreTag(uint16_t newModeTag, uint8_t & newMode,
-                                    Commands::ChangeToModeResponse::Type & response) override
+                                     Commands::ChangeToModeResponse::Type & response) override
     {
         mLastHandledCoreModeTag = newModeTag;
         AppDelegate::HandleChangeToModeByCoreTag(newModeTag, newMode, response);
     }
 
-    bool mRejectNextChange          = false;
-    uint8_t mLastHandledNewMode     = 0xFF;
+    bool mRejectNextChange           = false;
+    uint8_t mLastHandledNewMode      = 0xFF;
     uint16_t mLastHandledCoreModeTag = 0xFFFF;
 };
 
@@ -125,11 +125,11 @@ struct TestModeBaseCluster : public ::testing::Test
 
     void SetUp() override
     {
-        optionalAttributeSet               = {};
-        appDelegate.mRejectNextChange      = false;
-        appDelegate.mLastHandledNewMode    = 0xFF;
+        optionalAttributeSet                = {};
+        appDelegate.mRejectNextChange       = false;
+        appDelegate.mLastHandledNewMode     = 0xFF;
         appDelegate.mLastHandledCoreModeTag = 0xFFFF;
-        diagnosticDataProvider.mBootReason = GeneralDiagnostics::BootReasonEnum::kUnspecified;
+        diagnosticDataProvider.mBootReason  = GeneralDiagnostics::BootReasonEnum::kUnspecified;
         testContext.StorageDelegate().ClearStorage();
     }
 
@@ -675,7 +675,7 @@ TEST_F(TestModeBaseCluster, ChangeToModeByCoreTagMultiModeSelection)
         }
 
         void HandleChangeToModeByCoreTag(uint16_t newModeTag, uint8_t & newMode,
-                                        Commands::ChangeToModeResponse::Type & response) override
+                                         Commands::ChangeToModeResponse::Type & response) override
         {
             if (newModeTag == to_underlying(ModeTag::kLowEnergy))
             {

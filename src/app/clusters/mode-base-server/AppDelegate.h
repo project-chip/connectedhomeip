@@ -130,7 +130,7 @@ public:
      * @return Returns a void since any errors are to be reported in the response.status value.
      */
     virtual void HandleChangeToModeByCoreTag(uint16_t newModeTag, uint8_t & newMode,
-                                            ModeBase::Commands::ChangeToModeResponse::Type & response)
+                                             ModeBase::Commands::ChangeToModeResponse::Type & response)
     {
         HandleChangeToMode(newMode, response);
     }

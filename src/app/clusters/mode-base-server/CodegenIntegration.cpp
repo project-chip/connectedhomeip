@@ -111,20 +111,20 @@ CHIP_ERROR Instance::Init()
 
     switch (mClusterPath.mClusterId)
     {
-        case ThermostatMode::Id:
-            if (emberAfContainsAttribute(mClusterPath.mEndpointId, mClusterPath.mClusterId, StartUpMode::Id))
-            {
-                mOptionalAttributeSet.Set<StartUpMode::Id>();
-            }
-            break;
-        default:
-            // Although StartUpMode attribute is optional, spec says that none of the other
-            // aliased clusters supports it.
-            VerifyOrReturnError(!emberAfContainsAttribute(mClusterPath.mEndpointId, mClusterPath.mClusterId, StartUpMode::Id),
-                                CHIP_ERROR_INCORRECT_STATE);
-            // The only cluster that currently uses the core mode tags feature is Thermostat Mode.
-            VerifyOrReturnError(!HasFeature(ModeBase::Feature::kCoreModes),  CHIP_ERROR_INCORRECT_STATE);
-            break;
+    case ThermostatMode::Id:
+        if (emberAfContainsAttribute(mClusterPath.mEndpointId, mClusterPath.mClusterId, StartUpMode::Id))
+        {
+            mOptionalAttributeSet.Set<StartUpMode::Id>();
+        }
+        break;
+    default:
+        // Although StartUpMode attribute is optional, spec says that none of the other
+        // aliased clusters supports it.
+        VerifyOrReturnError(!emberAfContainsAttribute(mClusterPath.mEndpointId, mClusterPath.mClusterId, StartUpMode::Id),
+                            CHIP_ERROR_INCORRECT_STATE);
+        // The only cluster that currently uses the core mode tags feature is Thermostat Mode.
+        VerifyOrReturnError(!HasFeature(ModeBase::Feature::kCoreModes), CHIP_ERROR_INCORRECT_STATE);
+        break;
     }
 
     bool onOffValueForStartUp = false;

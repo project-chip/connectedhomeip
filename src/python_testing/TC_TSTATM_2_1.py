@@ -119,7 +119,8 @@ class TC_TSTATM_2_1(MatterBaseTest):
         can_manually_control = self.check_pics("TSTATM.S.M.CAN_MANUALLY_CONTROLLED")
 
         test_manual = can_manually_control and ('PIXIT.TSTATM.MODE_CHANGE_OK' in self.matter_test_config.global_test_params)
-        test_failure = can_test_mode_failure and can_manually_control and ('PIXIT.TSTATM.MODE_CHANGE_FAIL' in self.matter_test_config.global_test_params)
+        test_failure = can_test_mode_failure and can_manually_control and (
+            'PIXIT.TSTATM.MODE_CHANGE_FAIL' in self.matter_test_config.global_test_params)
 
         if test_manual:
             self.mode_ok = self.matter_test_config.global_test_params['PIXIT.TSTATM.MODE_CHANGE_OK']

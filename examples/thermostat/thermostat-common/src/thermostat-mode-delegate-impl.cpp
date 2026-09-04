@@ -52,7 +52,7 @@ void ThermostatModeDelegate::HandleChangeToMode(uint8_t mode, ModeBase::Commands
 }
 
 void ThermostatModeDelegate::HandleChangeToModeByCoreTag(uint16_t newModeTag, uint8_t & newMode,
-                                                        ModeBase::Commands::ChangeToModeResponse::Type & response)
+                                                         ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
     HandleChangeToMode(newMode, response);
 }
@@ -159,4 +159,3 @@ void MatterThermostatModeClusterShutdownCallback(chip::EndpointId endpointId, Ma
     }
     ThermostatMode::Shutdown();
 }
-
