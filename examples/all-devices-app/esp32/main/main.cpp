@@ -269,7 +269,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
     {
         gDeviceType = deviceFactory.GetDefaultDevice();
     }
-    auto created = deviceFactory.Create(gDeviceType);
+    auto created       = deviceFactory.Create(gDeviceType);
     gConstructedDevice = std::move(created.device);
 
     if (gConstructedDevice == nullptr)

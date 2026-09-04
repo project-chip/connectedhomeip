@@ -26,7 +26,8 @@ class BooleanStateOOBAccessor : public OOBAccessor
 {
 public:
     BooleanStateOOBAccessor(Clusters::BooleanStateCluster & cluster, EndpointId endpointId) :
-        mCluster(cluster), mEndpointId(endpointId) {}
+        mCluster(cluster), mEndpointId(endpointId)
+    {}
 
     std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) override;
 

@@ -76,7 +76,7 @@ CHIP_ERROR AmbientContextTranslator::TranslateAndExecute(EndpointId endpointId, 
 }
 
 CHIP_ERROR AmbientContextTranslator::TranslateSetAmbientContextSupport(EndpointId endpointId, const Json::Value & json,
-                                                                      OOBAccessorRegistry & registry) const
+                                                                       OOBAccessorRegistry & registry) const
 {
     VerifyOrReturnError(json.isMember("AmbientContextType") && json["AmbientContextType"].isArray(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -95,7 +95,7 @@ CHIP_ERROR AmbientContextTranslator::TranslateSetAmbientContextSupport(EndpointI
 }
 
 CHIP_ERROR AmbientContextTranslator::TranslateAddAmbientContextDetect(EndpointId endpointId, const Json::Value & json,
-                                                                     OOBAccessorRegistry & registry) const
+                                                                      OOBAccessorRegistry & registry) const
 {
     VerifyOrReturnError(json.isMember("AmbientContextType") && json["AmbientContextType"].isArray(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -178,7 +178,7 @@ CHIP_ERROR AmbientContextTranslator::TranslateSetPredictedActivity(EndpointId en
 }
 
 CHIP_ERROR AmbientContextTranslator::TranslateSetSensorFusionSupported(EndpointId endpointId, const Json::Value & json,
-                                                                     OOBAccessorRegistry & registry) const
+                                                                       OOBAccessorRegistry & registry) const
 {
     VerifyOrReturnError(json.isMember("AmbientContextType") && json["AmbientContextType"].isArray(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -197,7 +197,7 @@ CHIP_ERROR AmbientContextTranslator::TranslateSetSensorFusionSupported(EndpointI
 }
 
 CHIP_ERROR AmbientContextTranslator::TranslateSetObjectCount(EndpointId endpointId, const Json::Value & json,
-                                                           OOBAccessorRegistry & registry) const
+                                                             OOBAccessorRegistry & registry) const
 {
     auto objectCount = ExtractUInt<uint16_t>(json, "ObjectCount");
     VerifyOrReturnError(objectCount.has_value(), CHIP_ERROR_INVALID_ARGUMENT);

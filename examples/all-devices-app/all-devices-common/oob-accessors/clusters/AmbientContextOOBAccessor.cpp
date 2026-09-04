@@ -25,8 +25,7 @@ namespace chip::app {
 
 namespace {
 
-CHIP_ERROR DecodeSemanticTagList(TLV::TLVReader & reader,
-                                 std::vector<Clusters::Globals::Structs::SemanticTagStruct::Type> & tags)
+CHIP_ERROR DecodeSemanticTagList(TLV::TLVReader & reader, std::vector<Clusters::Globals::Structs::SemanticTagStruct::Type> & tags)
 {
     TLV::TLVType containerType;
     ReturnErrorOnFailure(reader.EnterContainer(containerType));
@@ -87,7 +86,7 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleAction(CharSpan actio
     return std::nullopt;
 }
 
-std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetAmbientContextSupport(ByteSpan tlvData)
+std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetAmbientContextSupport(ByteSpan tlvData) const
 {
     TLV::TLVReader reader;
     reader.Init(tlvData);
@@ -133,7 +132,7 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetAmbientContextSupp
     return mCluster.SetAmbientContextTypeSupported(tagSpan);
 }
 
-std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleAddAmbientContextDetect(ByteSpan tlvData)
+std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleAddAmbientContextDetect(ByteSpan tlvData) const
 {
     TLV::TLVReader reader;
     reader.Init(tlvData);
@@ -181,8 +180,7 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleAddAmbientContextDete
         return std::nullopt;
     }
 
-    auto tagList =
-        DataModel::List<const Clusters::Globals::Structs::SemanticTagStruct::Type>(tags.data(), tags.size());
+    auto tagList = DataModel::List<const Clusters::Globals::Structs::SemanticTagStruct::Type>(tags.data(), tags.size());
     Clusters::AmbientContextSensing::Structs::AmbientContextTypeStruct::Type acsType = { .ambientContextSensed = tagList };
     if (hasConfidence)
     {
@@ -192,7 +190,7 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleAddAmbientContextDete
     return mCluster.AddDetection(acsType);
 }
 
-std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetPredictedActivity(ByteSpan tlvData)
+std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetPredictedActivity(ByteSpan tlvData) const
 {
     TLV::TLVReader reader;
     reader.Init(tlvData);
@@ -302,7 +300,7 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetPredictedActivity(
     return mCluster.SetPredictedActivity(activitySpan);
 }
 
-std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetSensorFusionSupported(ByteSpan tlvData)
+std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetSensorFusionSupported(ByteSpan tlvData) const
 {
     TLV::TLVReader reader;
     reader.Init(tlvData);
@@ -348,7 +346,7 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetSensorFusionSuppor
     return mCluster.SetSensorFusionSupported(tagSpan);
 }
 
-std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetObjectCount(ByteSpan tlvData)
+std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetObjectCount(ByteSpan tlvData) const
 {
     TLV::TLVReader reader;
     reader.Init(tlvData);

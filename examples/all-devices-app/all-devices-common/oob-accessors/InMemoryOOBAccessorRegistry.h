@@ -34,9 +34,9 @@ public:
         return instance;
     }
 
-    InMemoryOOBAccessorRegistry()          = default;
-    ~InMemoryOOBAccessorRegistry()         = default;
-    InMemoryOOBAccessorRegistry(const InMemoryOOBAccessorRegistry &) = delete;
+    InMemoryOOBAccessorRegistry()                                                = default;
+    ~InMemoryOOBAccessorRegistry()                                               = default;
+    InMemoryOOBAccessorRegistry(const InMemoryOOBAccessorRegistry &)             = delete;
     InMemoryOOBAccessorRegistry & operator=(const InMemoryOOBAccessorRegistry &) = delete;
 
     /**

@@ -18,9 +18,8 @@
 
 namespace chip::app {
 
-CHIP_ERROR ElectricalEnergyMeasurementTranslator::TranslateAndExecute(EndpointId endpointId,
-                                                                               const Json::Value & json,
-                                                                               OOBAccessorRegistry & registry)
+CHIP_ERROR ElectricalEnergyMeasurementTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
+                                                                      OOBAccessorRegistry & registry)
 {
     return DispatchAction(registry, "GenerateElectricalEnergyMeasurementSnapshots"_span, endpointId);
 }

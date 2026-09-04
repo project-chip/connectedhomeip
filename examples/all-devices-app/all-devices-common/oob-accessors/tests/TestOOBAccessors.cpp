@@ -31,9 +31,9 @@
 #include <oob-accessors/clusters/ElectricalEnergyMeasurementOOBAccessor.h>
 #include <oob-accessors/clusters/OccupancyOOBAccessor.h>
 #include <oob-accessors/clusters/OnOffOOBAccessor.h>
-#include <platform/DefaultTimerDelegate.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
+#include <platform/DefaultTimerDelegate.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/PlatformManager.h>
 #include <pw_unit_test/framework.h>
@@ -46,14 +46,8 @@ namespace {
 class TestOOBAccessors : public ::testing::Test
 {
 protected:
-    void SetUp() override
-    {
-        EXPECT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
-    }
-    void TearDown() override
-    {
-        chip::DeviceLayer::PlatformMgr().Shutdown();
-    }
+    void SetUp() override { EXPECT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR); }
+    void TearDown() override { chip::DeviceLayer::PlatformMgr().Shutdown(); }
 
     DefaultTimerDelegate mTimerDelegate;
     Testing::TestServerClusterContext mClusterContext;
@@ -74,8 +68,7 @@ TEST_F(TestOOBAccessors, RegistryLifecycle)
     EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
-    EXPECT_EQ(registry.HandleAction("NonExistentAction"_span, ByteSpan(buffer, writer.GetLengthWritten())),
-              CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(registry.HandleAction("NonExistentAction"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_ERROR_NOT_FOUND);
 
     registry.Clear();
     EXPECT_EQ(registry.Size(), 0U);
@@ -126,7 +119,9 @@ TEST_F(TestOOBAccessors, OccupancyOOBAccessor)
 {
     InMemoryOOBAccessorRegistry registry;
     Clusters::OccupancySensingCluster::Config config(1);
-    Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type limits{ .holdTimeMin = 1, .holdTimeMax = 100, .holdTimeDefault = 30 };
+    Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type limits{ .holdTimeMin     = 1,
+                                                                            .holdTimeMax     = 100,
+                                                                            .holdTimeDefault = 30 };
     config.WithHoldTime(30, limits, mTimerDelegate);
     Clusters::OccupancySensingCluster cluster(config);
     EXPECT_EQ(cluster.Startup(mClusterContext.Get()), CHIP_NO_ERROR);
@@ -224,13 +219,9 @@ TEST_F(TestOOBAccessors, AmbientContextOOBAccessor)
     FakeAmbientContextDelegate delegate;
     Clusters::AmbientContextSensingCluster::Config config(mTimerDelegate);
     config.WithFeatures(BitFlags<Clusters::AmbientContextSensing::Feature>(
-        Clusters::AmbientContextSensing::Feature::kHumanActivity,
-        Clusters::AmbientContextSensing::Feature::kObjectIdentification,
-        Clusters::AmbientContextSensing::Feature::kSoundIdentification,
-        Clusters::AmbientContextSensing::Feature::kObjectCounting,
-        Clusters::AmbientContextSensing::Feature::kPredictedActivity,
-        Clusters::AmbientContextSensing::Feature::kSensorFusion
-    ));
+        Clusters::AmbientContextSensing::Feature::kHumanActivity, Clusters::AmbientContextSensing::Feature::kObjectIdentification,
+        Clusters::AmbientContextSensing::Feature::kSoundIdentification, Clusters::AmbientContextSensing::Feature::kObjectCounting,
+        Clusters::AmbientContextSensing::Feature::kPredictedActivity, Clusters::AmbientContextSensing::Feature::kSensorFusion));
     Clusters::AmbientContextSensingCluster cluster(1, config);
     cluster.SetDelegate(&delegate);
     EXPECT_EQ(cluster.Startup(mClusterContext.Get()), CHIP_NO_ERROR);
@@ -328,7 +319,10 @@ TEST_F(TestOOBAccessors, AmbientContextOOBAccessor)
 class FakeElectricalEnergyDelegate : public Clusters::ElectricalEnergyMeasurement::Delegate
 {
 public:
-    DataModel::Nullable<int64_t> GetCumulativeEnergyImported() override { return DataModel::MakeNullable(static_cast<int64_t>(100)); }
+    DataModel::Nullable<int64_t> GetCumulativeEnergyImported() override
+    {
+        return DataModel::MakeNullable(static_cast<int64_t>(100));
+    }
     DataModel::Nullable<int64_t> GetCumulativeEnergyExported() override { return DataModel::Nullable<int64_t>(); }
     DataModel::Nullable<int64_t> GetPeriodicEnergyImported() override { return DataModel::Nullable<int64_t>(); }
     DataModel::Nullable<int64_t> GetPeriodicEnergyExported() override { return DataModel::Nullable<int64_t>(); }
@@ -340,8 +334,9 @@ TEST_F(TestOOBAccessors, ElectricalEnergyMeasurementOOBAccessor)
     FakeElectricalEnergyDelegate energyDelegate;
     Clusters::ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::Type accuracy;
     Clusters::ElectricalEnergyMeasurement::ElectricalEnergyMeasurementCluster::Config config{
-        .endpointId         = 1,
-        .featureFlags       = BitFlags<Clusters::ElectricalEnergyMeasurement::Feature>(Clusters::ElectricalEnergyMeasurement::Feature::kCumulativeEnergy),
+        .endpointId   = 1,
+        .featureFlags = BitFlags<Clusters::ElectricalEnergyMeasurement::Feature>(
+            Clusters::ElectricalEnergyMeasurement::Feature::kCumulativeEnergy),
         .optionalAttributes = {},
         .accuracyStruct     = accuracy,
         .delegate           = energyDelegate,
@@ -362,7 +357,9 @@ TEST_F(TestOOBAccessors, ElectricalEnergyMeasurementOOBAccessor)
     EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
-    EXPECT_EQ(registry.HandleAction("GenerateElectricalEnergyMeasurementSnapshots"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+    EXPECT_EQ(
+        registry.HandleAction("GenerateElectricalEnergyMeasurementSnapshots"_span, ByteSpan(buffer, writer.GetLengthWritten())),
+        CHIP_NO_ERROR);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -371,15 +368,27 @@ class FakeDeviceInstanceInfoProvider : public DeviceLayer::DeviceInstanceInfoPro
 {
 public:
     CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR GetVendorId(uint16_t & vendorId) override { vendorId = 0xFFF1; return CHIP_NO_ERROR; }
+    CHIP_ERROR GetVendorId(uint16_t & vendorId) override
+    {
+        vendorId = 0xFFF1;
+        return CHIP_NO_ERROR;
+    }
     CHIP_ERROR GetProductName(char * buf, size_t bufSize) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR GetProductId(uint16_t & productId) override { productId = 0x8000; return CHIP_NO_ERROR; }
+    CHIP_ERROR GetProductId(uint16_t & productId) override
+    {
+        productId = 0x8000;
+        return CHIP_NO_ERROR;
+    }
     CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override { return CHIP_NO_ERROR; }
     CHIP_ERROR GetProductURL(char * buf, size_t bufSize) override { return CHIP_NO_ERROR; }
     CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override { return CHIP_NO_ERROR; }
     CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override { return CHIP_NO_ERROR; }
     CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override { hardwareVersion = 1; return CHIP_NO_ERROR; }
+    CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override
+    {
+        hardwareVersion = 1;
+        return CHIP_NO_ERROR;
+    }
     CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override { return CHIP_NO_ERROR; }
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override { return CHIP_NO_ERROR; }
 };
@@ -389,13 +398,9 @@ TEST_F(TestOOBAccessors, BasicInformationOOBAccessor)
     InMemoryOOBAccessorRegistry registry;
     FakeDeviceInstanceInfoProvider fakeDeviceInfo;
     EXPECT_EQ(DeviceLayer::ConfigurationMgr().StoreConfigurationVersion(1), CHIP_NO_ERROR);
-    Clusters::BasicInformationCluster cluster(
-        Clusters::BasicInformationOptionalAttributesSet{},
-        fakeDeviceInfo,
-        DeviceLayer::ConfigurationMgr(),
-        DeviceLayer::PlatformMgr(),
-        static_cast<uint16_t>(10)
-    );
+    Clusters::BasicInformationCluster cluster(Clusters::BasicInformationOptionalAttributesSet{}, fakeDeviceInfo,
+                                              DeviceLayer::ConfigurationMgr(), DeviceLayer::PlatformMgr(),
+                                              static_cast<uint16_t>(10));
     EXPECT_EQ(cluster.Startup(mClusterContext.Get()), CHIP_NO_ERROR);
 
     auto accessor = std::make_unique<BasicInformationOOBAccessor>(cluster, 0);
@@ -410,7 +415,8 @@ TEST_F(TestOOBAccessors, BasicInformationOOBAccessor)
     EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
-    EXPECT_EQ(registry.HandleAction("IncreaseConfigurationVersion"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+    EXPECT_EQ(registry.HandleAction("IncreaseConfigurationVersion"_span, ByteSpan(buffer, writer.GetLengthWritten())),
+              CHIP_NO_ERROR);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -438,4 +444,3 @@ TEST_F(TestOOBAccessors, NoopRegistryLifecycle)
 }
 
 } // namespace
-

@@ -25,8 +25,8 @@ namespace chip::app {
 class ElectricalEnergyMeasurementOOBAccessor : public OOBAccessor
 {
 public:
-    ElectricalEnergyMeasurementOOBAccessor(
-        Clusters::ElectricalEnergyMeasurement::ElectricalEnergyMeasurementCluster & cluster, EndpointId endpointId) :
+    ElectricalEnergyMeasurementOOBAccessor(Clusters::ElectricalEnergyMeasurement::ElectricalEnergyMeasurementCluster & cluster,
+                                           EndpointId endpointId) :
         mCluster(cluster),
         mEndpointId(endpointId)
     {}

@@ -65,15 +65,15 @@ flowchart LR
         (e.g., `OnOff`, `OccupancySensing`) live in
         `all-devices-common/oob-accessors/clusters/` so any device containing
         that cluster reuses the same implementation.
-    -   **Device-Specific Accessors & Translators**: Device implementations and their
-        associated OOB accessor and named pipe registrations live together in
-        `all-devices-common/device/types/<device-name>/`:
+    -   **Device-Specific Accessors & Translators**: Device implementations and
+        their associated OOB accessor and named pipe registrations live together
+        in `all-devices-common/device/types/<device-name>/`:
         -   Core logic and `OOBAccessors.h/.cpp` belong to the platform-neutral
             `:<device-name>` target.
-        -   `NamedPipeTranslators.h/.cpp` belong to the target's `:<device-name>:posix`
-            source set.
-    -   **Platform Transport Infrastructure**: Dispatchers, hooks, and base interfaces
-        (e.g., POSIX Named Pipes and JSON translators) live under
+        -   `NamedPipeTranslators.h/.cpp` belong to the target's
+            `:<device-name>:posix` source set.
+    -   **Platform Transport Infrastructure**: Dispatchers, hooks, and base
+        interfaces (e.g., POSIX Named Pipes and JSON translators) live under
         `posix/named_pipe/` and `all-devices-common/oob-accessors/`.
 
 ---
@@ -313,7 +313,20 @@ public:
     CHIP_ERROR EnsureTranslatorRegistered()
     {
         auto actionNames = TranslatorType::GetActionNames();
-        if (actionNames.empty() || HasTranslator(actionNames.front()))
+        if (actionNames.empty())
+        {
+            return CHIP_NO_ERROR;
+        }
+        bool anyMissing = false;
+        for (const auto & name : actionNames)
+        {
+            if (!HasTranslator(name))
+            {
+                anyMissing = true;
+                break;
+            }
+        }
+        if (!anyMissing)
         {
             return CHIP_NO_ERROR;
         }
@@ -417,18 +430,14 @@ In `all-devices-common/device/types/<device-name>/OOBAccessors.cpp`:
 ```cpp
 #include "OOBAccessors.h"
 #include <device/capabilities/on-off-load/OnOffLoad.h>
-
-#if ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
 #include <oob-accessors/clusters/OnOffOOBAccessor.h>
-#endif
 
 namespace chip::app {
 
 void RegisterOOBAccessors(OnOffLoad & device, OOBAccessorRegistry & registry)
 {
-#if ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
-    registry.Register(std::make_unique<OnOffOOBAccessor>(device.OnOffCluster(), device.GetEndpointId()));
-#endif
+    LogErrorOnFailure(registry.Register(
+        std::make_unique<OnOffOOBAccessor>(device.OnOffCluster(), device.GetEndpointId())));
 }
 
 } // namespace chip::app
@@ -440,13 +449,12 @@ In `all-devices-common/device/types/<device-name>/NamedPipeTranslators.h`:
 
 ```cpp
 #pragma once
+#include <device/capabilities/on-off-load/OnOffLoad.h>
 #include <posix/named_pipe/PosixNamedPipeDispatcher.h>
 
 namespace chip::app {
 
-class OnOffLight;
-
-void RegisterNamedPipeTranslators(OnOffLight & device, PosixNamedPipeDispatcher & dispatcher);
+void RegisterNamedPipeTranslators(OnOffLoad & device, PosixNamedPipeDispatcher & dispatcher);
 
 } // namespace chip::app
 ```
@@ -459,9 +467,9 @@ In `all-devices-common/device/types/<device-name>/NamedPipeTranslators.cpp`:
 
 namespace chip::app {
 
-void RegisterNamedPipeTranslators(OnOffLight & device, PosixNamedPipeDispatcher & dispatcher)
+void RegisterNamedPipeTranslators(OnOffLoad & device, PosixNamedPipeDispatcher & dispatcher)
 {
-    dispatcher.EnsureTranslatorRegistered<OnOffTranslator>();
+    LogErrorOnFailure(dispatcher.EnsureTranslatorRegistered<OnOffTranslator>());
 }
 
 } // namespace chip::app
@@ -598,4 +606,3 @@ using OOBAccessorRegistry = NoopOOBAccessorRegistry;
 
 } // namespace chip::app
 ```
-

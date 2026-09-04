@@ -26,13 +26,14 @@ class OccupancyOOBAccessor : public OOBAccessor
 {
 public:
     OccupancyOOBAccessor(Clusters::OccupancySensingCluster & cluster, EndpointId endpointId) :
-        mCluster(cluster), mEndpointId(endpointId) {}
+        mCluster(cluster), mEndpointId(endpointId)
+    {}
 
     std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) override;
 
 private:
-    std::optional<CHIP_ERROR> HandleSetOccupancy(ByteSpan tlvData);
-    std::optional<CHIP_ERROR> HandleSetHoldTime(ByteSpan tlvData);
+    std::optional<CHIP_ERROR> HandleSetOccupancy(ByteSpan tlvData) const;
+    std::optional<CHIP_ERROR> HandleSetHoldTime(ByteSpan tlvData) const;
 
     Clusters::OccupancySensingCluster & mCluster;
     EndpointId mEndpointId;

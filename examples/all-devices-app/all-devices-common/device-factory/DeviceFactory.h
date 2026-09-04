@@ -204,7 +204,7 @@ public:
     template <typename TDevice, typename... Args>
     static CreatedDevice MakeCreatedDevice(Args &&... args)
     {
-        auto dev = std::make_unique<TDevice>(std::forward<Args>(args)...);
+        auto dev   = std::make_unique<TDevice>(std::forward<Args>(args)...);
         auto * raw = dev.get();
         return CreatedDevice{
             .device             = std::move(dev),
@@ -250,7 +250,8 @@ public:
         RegisterCreator(deviceTypeArg, [c = std::move(creator)](const std::string &) { return c(); });
     }
 
-    void RegisterCreator(const std::string & deviceTypeArg, std::function<std::unique_ptr<DeviceInterface>(const std::string &)> && creator)
+    void RegisterCreator(const std::string & deviceTypeArg,
+                         std::function<std::unique_ptr<DeviceInterface>(const std::string &)> && creator)
     {
         RegisterCreator(deviceTypeArg, [c = std::move(creator)](const std::string & label) {
             return CreatedDevice{ .device = c(label), .onDeviceRegistered = nullptr };
@@ -276,8 +277,8 @@ public:
             return it->second(nodeLabel);
         }
         ChipLogError(
-            Support,
-            "INTERNAL ERROR: Invalid device type: %s. Run with the --help argument to view the list of valid device types.\n",
+            AppServer,
+            "INTERNAL ERROR: Invalid device type: %s. Run with the --help argument to view the list of valid device types.",
             deviceTypeArg.c_str());
         return CreatedDevice{ nullptr, nullptr };
     }
@@ -620,8 +621,8 @@ private:
         {
             RegisterCreator("rain-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeCreatedDevice<BooleanStateSensor>(
-                    mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRainSensor, 1));
+                return MakeCreatedDevice<BooleanStateSensor>(mContext->timerDelegate,
+                                                             Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRainSensor, 1));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_FREEZE_DETECTOR)

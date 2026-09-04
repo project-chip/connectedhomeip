@@ -26,16 +26,17 @@ class AmbientContextOOBAccessor : public OOBAccessor
 {
 public:
     AmbientContextOOBAccessor(Clusters::AmbientContextSensingCluster & cluster, EndpointId endpointId) :
-        mCluster(cluster), mEndpointId(endpointId) {}
+        mCluster(cluster), mEndpointId(endpointId)
+    {}
 
     std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) override;
 
 private:
-    std::optional<CHIP_ERROR> HandleSetAmbientContextSupport(ByteSpan tlvData);
-    std::optional<CHIP_ERROR> HandleAddAmbientContextDetect(ByteSpan tlvData);
-    std::optional<CHIP_ERROR> HandleSetPredictedActivity(ByteSpan tlvData);
-    std::optional<CHIP_ERROR> HandleSetSensorFusionSupported(ByteSpan tlvData);
-    std::optional<CHIP_ERROR> HandleSetObjectCount(ByteSpan tlvData);
+    std::optional<CHIP_ERROR> HandleSetAmbientContextSupport(ByteSpan tlvData) const;
+    std::optional<CHIP_ERROR> HandleAddAmbientContextDetect(ByteSpan tlvData) const;
+    std::optional<CHIP_ERROR> HandleSetPredictedActivity(ByteSpan tlvData) const;
+    std::optional<CHIP_ERROR> HandleSetSensorFusionSupported(ByteSpan tlvData) const;
+    std::optional<CHIP_ERROR> HandleSetObjectCount(ByteSpan tlvData) const;
 
     Clusters::AmbientContextSensingCluster & mCluster;
     EndpointId mEndpointId;

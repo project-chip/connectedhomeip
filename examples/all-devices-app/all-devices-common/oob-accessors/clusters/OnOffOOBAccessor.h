@@ -25,8 +25,7 @@ namespace chip::app {
 class OnOffOOBAccessor : public OOBAccessor
 {
 public:
-    OnOffOOBAccessor(Clusters::OnOffCluster & cluster, EndpointId endpointId) :
-        mCluster(cluster), mEndpointId(endpointId) {}
+    OnOffOOBAccessor(Clusters::OnOffCluster & cluster, EndpointId endpointId) : mCluster(cluster), mEndpointId(endpointId) {}
 
     std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) override;
 

@@ -91,9 +91,9 @@ and easy to test:
       by `DeviceFactory` or unit tests without requiring external wiring.
 
 5. **Spec-Pure Directory Layout & Extracted Capabilities**:
-    - Keep the root of the `device/types/` directory pure: it should contain _only_
-      real, spec-defined Matter Device Types (like `dimmable-light`, `fan`,
-      `air-purifier`).
+    - Keep the root of the `device/types/` directory pure: it should contain
+      _only_ real, spec-defined Matter Device Types (like `dimmable-light`,
+      `fan`, `air-purifier`).
     - **Avoid non-spec inheritance** (such as making a plug-in unit inherit from
       a light) just to reuse code.
     - If multiple device types share a common capability (like dimming or air
@@ -247,8 +247,8 @@ public:
 
 ### The GN Build (`BUILD.gn`)
 
-Create `all-devices-common/device/types/my-sensor/BUILD.gn` to define your standalone
-source set:
+Create `all-devices-common/device/types/my-sensor/BUILD.gn` to define your
+standalone source set:
 
 ```text
 # Copyright (c) 2026 Project CHIP Authors
@@ -299,6 +299,7 @@ your self-contained **logging mock** in
     ```
 
 2. **Register the Creator** inside the `DeviceFactory` constructor:
+
     ```cpp
     if constexpr (ALL_DEVICES_ENABLE_MY_SENSOR)
     {
@@ -308,13 +309,23 @@ your self-contained **logging mock** in
         });
     }
     ```
+
     _Note: We instantiate the Logging mock version in the factory so it runs
     completely out-of-the-box with self-contained console logging, keeping the
     platform main clean._
 
 3. **(Optional) Register Out-of-Band & Named Pipe Support**:
-   - For simulated sensor triggers or external control, implement `OOBAccessors.h/.cpp` (platform-neutral) and `NamedPipeTranslators.h/.cpp` (POSIX-only).
-   - See [Out-of-Band Control Architecture](design/out_of_band_control.md) for full details and examples.
+    - For simulated sensor triggers or external control, implement
+      `OOBAccessors.h/.cpp` (platform-neutral) and `NamedPipeTranslators.h/.cpp`
+      (POSIX-only).
+    - Include `<device/types/<name>/OOBAccessors.h>` in
+      `all-devices-common/oob-accessors/OOBAccessorHook.h` and
+      `<device/types/<name>/NamedPipeTranslators.h>` in
+      `posix/named_pipe/NamedPipeHook.h` so the SFINAE detection hooks
+      (`HasOOBAccessors`, `HasNamedPipeTranslators`) discover the registration
+      overloads at compile-time.
+    - See [Out-of-Band Control Architecture](design/out_of_band_control.md) for
+      full details and examples.
 
 ---
 

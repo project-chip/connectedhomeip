@@ -33,6 +33,7 @@ endif()
 if(ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS)
     list(APPEND ALL_DEVICES_DEVICE_SOURCES
         "${ALL_DEVICES_COMMON_DIR}/oob-accessors/InMemoryOOBAccessorRegistry.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/oob-accessors/OOBDataSerializer.cpp"
         "${ALL_DEVICES_COMMON_DIR}/oob-accessors/clusters/AmbientContextOOBAccessor.cpp"
         "${ALL_DEVICES_COMMON_DIR}/oob-accessors/clusters/BasicInformationOOBAccessor.cpp"
         "${ALL_DEVICES_COMMON_DIR}/oob-accessors/clusters/BooleanStateOOBAccessor.cpp"

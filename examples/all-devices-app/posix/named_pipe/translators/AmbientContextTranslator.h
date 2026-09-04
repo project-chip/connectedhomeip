@@ -29,11 +29,8 @@ public:
     static Span<const CharSpan> GetActionNames()
     {
         static constexpr CharSpan kNames[] = {
-            "SetAmbientContextSupport"_span,
-            "AddAmbientContextDetect"_span,
-            "SetPredictedActivity"_span,
-            "SetSensorFusionSupported"_span,
-            "SetObjectCount"_span,
+            "SetAmbientContextSupport"_span, "AddAmbientContextDetect"_span, "SetPredictedActivity"_span,
+            "SetSensorFusionSupported"_span, "SetObjectCount"_span,
         };
         return Span<const CharSpan>(kNames);
     }
@@ -42,11 +39,10 @@ public:
 
 private:
     CHIP_ERROR TranslateSetAmbientContextSupport(EndpointId endpointId, const Json::Value & json,
-                                                OOBAccessorRegistry & registry) const;
+                                                 OOBAccessorRegistry & registry) const;
     CHIP_ERROR TranslateAddAmbientContextDetect(EndpointId endpointId, const Json::Value & json,
-                                               OOBAccessorRegistry & registry) const;
-    CHIP_ERROR TranslateSetPredictedActivity(EndpointId endpointId, const Json::Value & json,
-                                             OOBAccessorRegistry & registry) const;
+                                                OOBAccessorRegistry & registry) const;
+    CHIP_ERROR TranslateSetPredictedActivity(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry) const;
     CHIP_ERROR TranslateSetSensorFusionSupported(EndpointId endpointId, const Json::Value & json,
                                                  OOBAccessorRegistry & registry) const;
     CHIP_ERROR TranslateSetObjectCount(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry) const;

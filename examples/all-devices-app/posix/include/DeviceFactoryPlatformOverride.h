@@ -35,14 +35,15 @@ void RegisterDeviceFactoryOverrides(Factory & factory, TimerDelegate & timerDele
     if constexpr (ALL_DEVICES_ENABLE_SPEAKER)
     {
         factory.RegisterCreator("speaker", [&timerDelegate, &audioManager]() {
-            return std::make_unique<PosixSpeaker>(PosixSpeaker::Context{ timerDelegate }, audioManager);
+            return Factory::template MakeCreatedDevice<PosixSpeaker>(PosixSpeaker::Context{ timerDelegate }, audioManager);
         });
     }
 
     if constexpr (ALL_DEVICES_ENABLE_CHIME)
     {
-        factory.RegisterCreator(
-            "chime", [&timerDelegate, &audioManager]() { return std::make_unique<PosixChime>(timerDelegate, audioManager); });
+        factory.RegisterCreator("chime", [&timerDelegate, &audioManager]() {
+            return Factory::template MakeCreatedDevice<PosixChime>(timerDelegate, audioManager);
+        });
     }
 }
 

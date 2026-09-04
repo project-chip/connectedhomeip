@@ -19,7 +19,7 @@
 namespace chip::app {
 
 CHIP_ERROR BooleanStateTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
-                                                                OOBAccessorRegistry & registry)
+                                                       OOBAccessorRegistry & registry)
 {
     auto newState = ExtractBool(json, "NewState");
     VerifyOrReturnError(newState.has_value(), CHIP_ERROR_INVALID_ARGUMENT);

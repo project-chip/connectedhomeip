@@ -22,8 +22,7 @@ namespace chip::app {
 
 void RegisterOOBAccessors(BooleanStateSensor & device, OOBAccessorRegistry & registry)
 {
-    LogErrorOnFailure(
-        registry.Register(std::make_unique<BooleanStateOOBAccessor>(device.BooleanState(), device.GetEndpointId())));
+    LogErrorOnFailure(registry.Register(std::make_unique<BooleanStateOOBAccessor>(device.BooleanState(), device.GetEndpointId())));
 }
 
 } // namespace chip::app

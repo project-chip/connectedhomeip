@@ -251,7 +251,6 @@ void SetupNamedPipe(const char * namedPipePath)
     }
 }
 
-
 void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 {
     gMainLoopImplementation = mainLoop;
@@ -355,7 +354,6 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     {
         SetupNamedPipe(namedPipePath.c_str());
     }
-
 
     initParams.dataModelProvider      = &devices.DataModelProvider();
     initParams.groupDataProvider      = &gGroupDataProvider;

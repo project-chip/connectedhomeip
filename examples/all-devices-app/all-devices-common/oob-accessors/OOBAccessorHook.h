@@ -41,8 +41,8 @@ struct HasOOBAccessors : std::false_type
 };
 
 template <typename T>
-struct HasOOBAccessors<T, std::void_t<decltype(RegisterOOBAccessors(std::declval<T &>(), std::declval<OOBAccessorRegistry &>()))>> :
-    std::true_type
+struct HasOOBAccessors<T, std::void_t<decltype(RegisterOOBAccessors(std::declval<T &>(), std::declval<OOBAccessorRegistry &>()))>>
+    : std::true_type
 {
 };
 

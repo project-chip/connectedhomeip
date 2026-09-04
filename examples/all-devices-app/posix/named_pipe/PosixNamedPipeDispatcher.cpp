@@ -60,8 +60,7 @@ bool PosixNamedPipeDispatcher::HasTranslator(CharSpan actionName) const
     return mTranslators.find(std::string(actionName.data(), actionName.size())) != mTranslators.end();
 }
 
-CHIP_ERROR PosixNamedPipeDispatcher::RegisterTranslator(CharSpan actionName,
-                                                        std::shared_ptr<NamedPipeCommandTranslator> translator)
+CHIP_ERROR PosixNamedPipeDispatcher::RegisterTranslator(CharSpan actionName, std::shared_ptr<NamedPipeCommandTranslator> translator)
 {
     VerifyOrReturnError(translator != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mTranslators[std::string(actionName.data(), actionName.size())] = std::move(translator);
@@ -137,6 +136,5 @@ void PosixNamedPipeDispatcher::DispatchCommand(intptr_t context)
         Platform::Delete(cmd);
     }
 }
-
 
 } // namespace chip::app

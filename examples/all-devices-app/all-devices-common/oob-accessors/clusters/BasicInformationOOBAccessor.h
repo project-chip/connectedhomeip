@@ -26,7 +26,8 @@ class BasicInformationOOBAccessor : public OOBAccessor
 {
 public:
     BasicInformationOOBAccessor(Clusters::BasicInformationCluster & cluster, EndpointId endpointId) :
-        mCluster(cluster), mEndpointId(endpointId) {}
+        mCluster(cluster), mEndpointId(endpointId)
+    {}
 
     std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) override;
 

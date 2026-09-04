@@ -34,7 +34,7 @@ std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleAction(CharSpan action, By
     return std::nullopt;
 }
 
-std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleSetOccupancy(ByteSpan tlvData)
+std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleSetOccupancy(ByteSpan tlvData) const
 {
     TLV::TLVReader reader;
     reader.Init(tlvData);
@@ -93,7 +93,7 @@ std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleSetOccupancy(ByteSpan tlvD
     return CHIP_NO_ERROR;
 }
 
-std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleSetHoldTime(ByteSpan tlvData)
+std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleSetHoldTime(ByteSpan tlvData) const
 {
     TLV::TLVReader reader;
     reader.Init(tlvData);
