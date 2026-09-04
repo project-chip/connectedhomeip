@@ -112,6 +112,7 @@ tests:
           saveAs: th2FabricIndex
 
     - label: "TH1 sends a RemoveAllGroups command to DUT."
+      PICS: "!GC.S"
       cluster: "Groups"
       command: "RemoveAllGroups"
 
@@ -135,6 +136,7 @@ tests:
                     }
 
     - label: "TH1 Map KeySets to GroupId."
+      PICS: "!GC.S"
       cluster: "Group Key Management"
       endpoint: 0
       command: "writeAttribute"
@@ -143,6 +145,7 @@ tests:
           value: [{ FabricIndex: 0, GroupId: G1, GroupKeySetID: 0x01a1 }]
 
     - label: "TH1 sends a AddGroup command to DUT for G1."
+      PICS: "!GC.S"
       cluster: "Groups"
       command: "AddGroup"
       arguments:
@@ -157,6 +160,20 @@ tests:
                 value: 0
               - name: "GroupID"
                 value: G1
+
+    - label: "TH1 sends a JoinGroup command to DUT for G1."
+      PICS: "GC.S"
+      endpoint: 0
+      cluster: "Groupcast"
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "Endpoints"
+                value: [endpoint]
+              - name: "KeySetID"
+                value: 0x01a1
 
     - label: "Preparation step : TH2 Add Group KeySet."
       identity: "beta"
@@ -188,6 +205,7 @@ tests:
           value: [{ FabricIndex: 0, GroupId: G1, GroupKeySetID: 0x01a2 }]
 
     - label: "TH2 sends a AddGroup command to DUT for G1."
+      PICS: "!GC.S"
       identity: "beta"
       cluster: "Groups"
       command: "AddGroup"
@@ -203,6 +221,21 @@ tests:
                 value: 0
               - name: "GroupID"
                 value: G1
+
+    - label: "TH2 sends a JoinGroup command to DUT for G1."
+      PICS: "GC.S"
+      endpoint: 0
+      identity: "beta"
+      cluster: "Groupcast"
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "Endpoints"
+                value: [endpoint]
+              - name: "KeySetID"
+                value: 0x01a2
 
     - label: "TH1 confirms its Scene table is empty and gets its capacity"
       command: "GetSceneMembership"

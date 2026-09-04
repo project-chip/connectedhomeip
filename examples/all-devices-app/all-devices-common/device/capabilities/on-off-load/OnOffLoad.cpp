@@ -61,12 +61,8 @@ CHIP_ERROR OnOffLoad::Register(chip::EndpointId endpoint, CodeDrivenDataModelPro
     mOnOffCluster.Cluster().AddDelegate(&mOnOffDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
 
-    mGroupsCluster.Create(endpoint,
-                          GroupsCluster::Context{
-                              .groupDataProvider   = mContext.groupDataProvider,
-                              .scenesIntegration   = &mScenesManagementCluster.Cluster(),
-                              .identifyIntegration = &mIdentifyCluster.Cluster(),
-                          });
+    mGroupsCluster.Create(endpoint, StubbedGroupsCluster::Context{ .groupDataProvider = mContext.groupDataProvider });
+
     ReturnErrorOnFailure(provider.AddCluster(mGroupsCluster.Registration()));
 
     // We have scenes enabled, so make sure handlers are registered so we can

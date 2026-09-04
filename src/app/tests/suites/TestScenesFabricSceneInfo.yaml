@@ -128,6 +128,7 @@ tests:
                     }
 
     - label: "Preparation step for using the Write Group Keys command."
+      PICS: "!GC.S"
       cluster: "Group Key Management"
       endpoint: 0
       command: "writeAttribute"
@@ -140,10 +141,12 @@ tests:
               ]
 
     - label: "TH sends a RemoveAllGroups command to DUT."
+      PICS: "!GC.S"
       cluster: "Groups"
       command: "RemoveAllGroups"
 
     - label: "TH sends a AddGroup command to DUT for G1."
+      PICS: "!GC.S"
       cluster: "Groups"
       command: "AddGroup"
       arguments:
@@ -159,7 +162,22 @@ tests:
               - name: "GroupID"
                 value: G1
 
+    - label: "TH sends a JoinGroup command to DUT for G1."
+      PICS: "GC.S"
+      endpoint: 0
+      cluster: "Groupcast"
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "Endpoints"
+                value: [endpoint]
+              - name: "KeySetID"
+                value: 0x01a1
+
     - label: "TH sends a AddGroup command to DUT for G2."
+      PICS: "!GC.S"
       cluster: "Groups"
       command: "AddGroup"
       arguments:
@@ -174,6 +192,20 @@ tests:
                 value: 0
               - name: "GroupID"
                 value: G2
+
+    - label: "TH sends a JoinGroup command to DUT for G2."
+      PICS: "GC.S"
+      endpoint: 0
+      cluster: "Groupcast"
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G2
+              - name: "Endpoints"
+                value: [endpoint]
+              - name: "KeySetID"
+                value: 0x01a1
 
     - label: "TH confirms the Fabric Capacity is Maximum"
       command: "GetSceneMembership"

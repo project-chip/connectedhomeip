@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <app/clusters/groups-server/GroupsCluster.h>
+#include <app/clusters/groups-server/StubbedGroupsCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/on-off-server/OnOffDelegate.h>
 #include <app/clusters/on-off-server/OnOffEffectDelegate.h>
@@ -72,7 +72,7 @@ public:
     Clusters::OnOffLightingCluster & OnOffCluster() { return mOnOffCluster.Cluster(); }
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
     Clusters::ScenesManagementCluster & ScenesManagementCluster() { return mScenesManagementCluster.Cluster(); }
-    Clusters::GroupsCluster & GroupsCluster() { return mGroupsCluster.Cluster(); }
+    Clusters::StubbedGroupsCluster & GroupsCluster() { return mGroupsCluster.Cluster(); }
 
 protected:
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -105,7 +105,7 @@ private:
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::OnOffLightingCluster> mOnOffCluster;
     LazyRegisteredServerCluster<Clusters::ScenesManagementCluster> mScenesManagementCluster;
-    LazyRegisteredServerCluster<Clusters::GroupsCluster> mGroupsCluster;
+    LazyRegisteredServerCluster<Clusters::StubbedGroupsCluster> mGroupsCluster;
 };
 
 } // namespace app

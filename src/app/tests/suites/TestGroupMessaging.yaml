@@ -45,7 +45,44 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "TH reads ClusterRevision from DUT (endpoint 1)"
+      endpoint: 1
+      cluster: "Groups"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          saveAs: GroupsClusterRevision
+
+    - label: "Check if Groups cluster revision is 5 (stubbed implementation)"
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: GroupsClusterRevision
+              - name: "Value2"
+                value: 5
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsStubbedRevision
+
+    - label: "Determine if test should run (legacy Groups cluster revision < 5)"
+      cluster: "EqualityCommands"
+      command: "BooleanEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: IsStubbedRevision
+              - name: "Value2"
+                value: false
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsLegacyGroupsRevision
+
     - label: "KeySet Write 1"
+      runIf: IsLegacyGroupsRevision
       cluster: "Group Key Management"
       command: "KeySetWrite"
       arguments:
@@ -65,6 +102,7 @@ tests:
                     }
 
     - label: "KeySet Write 2"
+      runIf: IsLegacyGroupsRevision
       cluster: "Group Key Management"
       command: "KeySetWrite"
       arguments:
@@ -82,6 +120,7 @@ tests:
                     }
 
     - label: "Write Group Keys"
+      runIf: IsLegacyGroupsRevision
       cluster: "Group Key Management"
       command: "writeAttribute"
       attribute: "GroupKeyMap"
@@ -93,6 +132,7 @@ tests:
               ]
 
     - label: "Add Group 1 (endpoint 1)"
+      runIf: IsLegacyGroupsRevision
       cluster: "Groups"
       command: "AddGroup"
       endpoint: 1
@@ -110,6 +150,7 @@ tests:
                 value: 0x0101
 
     - label: "Add Group 1 (endpoint 2)"
+      runIf: IsLegacyGroupsRevision
       cluster: "Groups"
       command: "AddGroup"
       endpoint: 2
@@ -127,6 +168,7 @@ tests:
                 value: 0x0101
 
     - label: "Add Group 2 (endpoint 0)"
+      runIf: IsLegacyGroupsRevision
       cluster: "Groups"
       command: "AddGroup"
       endpoint: 0
@@ -144,6 +186,7 @@ tests:
                 value: 0x0102
 
     - label: "Install ACLs"
+      runIf: IsLegacyGroupsRevision
       cluster: "Access Control"
       command: "writeAttribute"
       attribute: "ACL"
@@ -169,6 +212,7 @@ tests:
 
     # Test Pair 1 : Check initial value (ensure it's not the test value)
     - label: "Read initial Attribute value"
+      runIf: IsLegacyGroupsRevision
       command: "readAttribute"
       attribute: "NodeLabel"
       response:
@@ -176,6 +220,7 @@ tests:
 
     # Test Pair 2 : Sends a Group Write Attribute
     - label: "Group Write Attribute"
+      runIf: IsLegacyGroupsRevision
       command: "writeAttribute"
       attribute: "NodeLabel"
       groupId: 0x0102
@@ -185,6 +230,7 @@ tests:
     # Give the group write time to actually happen; unicast delivery can outrace
     # multicast if the unicast packet is sent immediately after the multicast one.
     - label: "Wait for write 1"
+      runIf: IsLegacyGroupsRevision
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -194,6 +240,7 @@ tests:
 
       # Test Pair 2 : Validates previous group write attribute with a unicast to read
     - label: "Read back Attribute"
+      runIf: IsLegacyGroupsRevision
       command: "readAttribute"
       attribute: "NodeLabel"
       response:
@@ -201,6 +248,7 @@ tests:
 
     # Test Pair 3 : Sends a Group Write Attribute
     - label: "Restore initial Attribute value"
+      runIf: IsLegacyGroupsRevision
       command: "writeAttribute"
       attribute: "NodeLabel"
       groupId: 0x0102
@@ -210,6 +258,7 @@ tests:
     # Give the group write time to actually happen; unicast delivery can outrace
     # multicast if the unicast packet is sent immediately after the multicast one.
     - label: "Wait for write 2"
+      runIf: IsLegacyGroupsRevision
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -219,6 +268,7 @@ tests:
 
     # Test Pair 3 : Validates previous group write attribute with a unicast to read
     - label: "Read back Attribute"
+      runIf: IsLegacyGroupsRevision
       command: "readAttribute"
       attribute: "NodeLabel"
       response:
@@ -226,6 +276,7 @@ tests:
 
     # Test Pair 4 : Sends a Group command
     - label: "Check on/off attribute value is false for endpoint 1"
+      runIf: IsLegacyGroupsRevision
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"
@@ -234,6 +285,7 @@ tests:
           value: 0
 
     - label: "Check on/off attribute value is false for endpoint 2"
+      runIf: IsLegacyGroupsRevision
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"
@@ -242,6 +294,7 @@ tests:
           value: 0
 
     - label: "Turn On the light to see attribute change"
+      runIf: IsLegacyGroupsRevision
       cluster: "On/Off"
       command: "On"
       groupId: groupIdVariable # 0x0101
@@ -249,6 +302,7 @@ tests:
     # Give the group invoke time to actually happen; unicast delivery can outrace
     # multicast if the unicast packet is sent immediately after the multicast one.
     - label: "Wait for command 3"
+      runIf: IsLegacyGroupsRevision
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -259,6 +313,7 @@ tests:
     # Test Pair 4 : Validates previous group command with a unicast to read
     - label:
           "Check on/off attribute value is true after on command for endpoint 1"
+      runIf: IsLegacyGroupsRevision
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"
@@ -268,6 +323,7 @@ tests:
 
     - label:
           "Check on/off attribute value is true after on command for endpoint 2"
+      runIf: IsLegacyGroupsRevision
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"
@@ -276,16 +332,19 @@ tests:
           value: 1
 
     - label: "Turn off the light to get ready for the next test for endpoint 1"
+      runIf: IsLegacyGroupsRevision
       cluster: "On/Off"
       command: "Off"
       endpoint: 1
 
     - label: "Turn off the light to get ready for the next test for endpoint 2"
+      runIf: IsLegacyGroupsRevision
       cluster: "On/Off"
       command: "Off"
       endpoint: 2
 
     - label: "Cleanup for next test remove Group 1 (endpoint 2)"
+      runIf: IsLegacyGroupsRevision
       cluster: "Groups"
       command: "RemoveGroup"
       endpoint: 2
@@ -301,6 +360,7 @@ tests:
                 value: 0x0101
 
     - label: "Cleanup ACLs"
+      runIf: IsLegacyGroupsRevision
       cluster: "Access Control"
       command: "writeAttribute"
       attribute: "ACL"
@@ -317,6 +377,7 @@ tests:
               ]
 
     - label: "Open Commissioning Window from alpha"
+      runIf: IsLegacyGroupsRevision
       cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
@@ -329,6 +390,7 @@ tests:
     # index is 3 but the device's will be 2, so we have different fabric
     # indices for the same fabric id.
     - label: "Commission from gamma"
+      runIf: IsLegacyGroupsRevision
       identity: "gamma"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -340,6 +402,7 @@ tests:
                 value: payload
 
     - label: "Wait for the commissioned device to be retrieved for gamma"
+      runIf: IsLegacyGroupsRevision
       identity: "gamma"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
@@ -349,6 +412,7 @@ tests:
                 value: nodeId2
 
     - label: "KeySet Write 1 for gamma"
+      runIf: IsLegacyGroupsRevision
       identity: "gamma"
       cluster: "Group Key Management"
       command: "KeySetWrite"
@@ -369,6 +433,7 @@ tests:
                     }
 
     - label: "KeySet Write 2 for gamma"
+      runIf: IsLegacyGroupsRevision
       identity: "gamma"
       cluster: "Group Key Management"
       command: "KeySetWrite"
@@ -387,6 +452,7 @@ tests:
                     }
 
     - label: "Write Group Keys for gamma"
+      runIf: IsLegacyGroupsRevision
       identity: "gamma"
       cluster: "Group Key Management"
       command: "writeAttribute"
@@ -399,6 +465,7 @@ tests:
               ]
 
     - label: "Add Group 1 (endpoint 1) for gamma"
+      runIf: IsLegacyGroupsRevision
       identity: "gamma"
       cluster: "Groups"
       command: "AddGroup"
@@ -417,6 +484,7 @@ tests:
                 value: 0x0101
 
     - label: "Add Group 2 (endpoint 0) for gamma"
+      runIf: IsLegacyGroupsRevision
       identity: "gamma"
       cluster: "Groups"
       command: "AddGroup"
@@ -435,6 +503,7 @@ tests:
                 value: 0x0102
 
     - label: "Install ACLs for gamma"
+      runIf: IsLegacyGroupsRevision
       identity: "gamma"
       cluster: "Access Control"
       command: "writeAttribute"
@@ -461,6 +530,7 @@ tests:
 
     # Test Pair 1 : Check initial value (ensure it's not the test value)
     - label: "Read initial Attribute value for gamma"
+      runIf: IsLegacyGroupsRevision
       identity: "gamma"
       command: "readAttribute"
       attribute: "NodeLabel"
@@ -469,6 +539,7 @@ tests:
 
     # Test Pair 2 : Sends a Group Write Attribute
     - label: "Group Write Attribute for gamma"
+      runIf: IsLegacyGroupsRevision
       identity: "gamma"
       command: "writeAttribute"
       attribute: "NodeLabel"
@@ -479,6 +550,7 @@ tests:
     # Give the group write time to actually happen; unicast delivery can outrace
     # multicast if the unicast packet is sent immediately after the multicast one.
     - label: "Wait for write 1 for gamma"
+      runIf: IsLegacyGroupsRevision
       identity: "gamma"
       cluster: "DelayCommands"
       command: "WaitForMs"
@@ -489,6 +561,7 @@ tests:
 
       # Test Pair 2 : Validates previous group write attribute with a unicast to read
     - label: "Read back Attribute for gamma"
+      runIf: IsLegacyGroupsRevision
       identity: "gamma"
       command: "readAttribute"
       attribute: "NodeLabel"
@@ -497,6 +570,7 @@ tests:
 
     # Test Pair 3 : Sends a Group Write Attribute
     - label: "Restore initial Attribute value for gamma"
+      runIf: IsLegacyGroupsRevision
       identity: "gamma"
       command: "writeAttribute"
       attribute: "NodeLabel"
@@ -507,6 +581,7 @@ tests:
     # Give the group write time to actually happen; unicast delivery can outrace
     # multicast if the unicast packet is sent immediately after the multicast one.
     - label: "Wait for write 2 for gamma"
+      runIf: IsLegacyGroupsRevision
       identity: "gamma"
       cluster: "DelayCommands"
       command: "WaitForMs"
@@ -517,6 +592,7 @@ tests:
 
     # Test Pair 3 : Validates previous group write attribute with a unicast to read
     - label: "Read back Attribute for gamma"
+      runIf: IsLegacyGroupsRevision
       identity: "gamma"
       command: "readAttribute"
       attribute: "NodeLabel"
@@ -525,6 +601,7 @@ tests:
 
     # Test Pair 4 : Sends a Group command
     - label: "Check on/off attribute value is false for endpoint 1 for gamma"
+      runIf: IsLegacyGroupsRevision
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"
@@ -533,6 +610,7 @@ tests:
           value: 0
 
     - label: "Turn On the light to see attribute change for gamma"
+      runIf: IsLegacyGroupsRevision
       identity: "gamma"
       cluster: "On/Off"
       command: "On"
@@ -541,6 +619,7 @@ tests:
     # Give the group invoke time to actually happen; unicast delivery can outrace
     # multicast if the unicast packet is sent immediately after the multicast one.
     - label: "Wait for command 3 for gamma"
+      runIf: IsLegacyGroupsRevision
       identity: "gamma"
       cluster: "DelayCommands"
       command: "WaitForMs"
@@ -553,6 +632,7 @@ tests:
     - label:
           "Check on/off attribute value is true after on command for endpoint 1
           for gamma"
+      runIf: IsLegacyGroupsRevision
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"
@@ -561,6 +641,7 @@ tests:
           value: 1
 
     - label: "Cleanup ACLs for gamma"
+      runIf: IsLegacyGroupsRevision
       identity: "gamma"
       cluster: "Access Control"
       command: "writeAttribute"

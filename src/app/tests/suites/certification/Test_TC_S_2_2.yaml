@@ -1522,6 +1522,7 @@ tests:
           "Step 13a: If Groupcast is enabled on RootNode, TH sends JoinGroup
           with G2, Scene endpoint, and KeySetID 0x01a1"
       PICS: GC.S
+      runIf: ContinueTest
       cluster: "Groupcast"
       endpoint: groupcastendpoint
       command: "JoinGroup"
