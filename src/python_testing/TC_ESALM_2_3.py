@@ -49,9 +49,12 @@ from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 
 cluster = Clusters.ElectricalAlarm
+_A = cluster.Bitmaps.AlarmBitmap
 
-# AlarmBitmap mask for all defined alarm bits (from electrical-alarm-cluster.xml)
-_ALL_DEFINED_ALARM_BITS = 0x7FFF
+# Mask of every defined AlarmBitmap bit, derived from the cluster enum rather than hardcoded.
+_ALL_DEFINED_ALARM_BITS = 0
+for _alarm_bit in _A:
+    _ALL_DEFINED_ALARM_BITS |= _alarm_bit
 
 
 class TC_ESALM_2_3(MatterBaseTest):
@@ -78,11 +81,8 @@ class TC_ESALM_2_3(MatterBaseTest):
         initial_mask = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.Mask)
 
-        CMD_RESET = 0x00
-        CMD_MODIFY = 0x01
-
-        has_modify = CMD_MODIFY in accepted_cmds
-        has_reset = CMD_RESET in accepted_cmds
+        has_modify = cmds.ModifyEnabledAlarms.command_id in accepted_cmds
+        has_reset = cmds.Reset.command_id in accepted_cmds
 
         attribute_list = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.AttributeList)
@@ -122,13 +122,14 @@ class TC_ESALM_2_3(MatterBaseTest):
                               "violation, so the command must be rejected. Mask read-back is unchanged.")
         if has_modify:
             invalid_bit = None
-            for bit in range(64):
-                candidate = 1 << bit
-                if candidate & _ALL_DEFINED_ALARM_BITS and not (supported & candidate):
-                    invalid_bit = candidate
+            for alarm_bit in _A:
+                if not (supported & alarm_bit):
+                    invalid_bit = alarm_bit
                     break
             if invalid_bit is None:
-                invalid_bit = 1 << 15  # bit 15 is not defined in AlarmBitmap
+                # Every defined alarm bit is supported; fall back to the first reserved bit
+                # above the defined range, which is likewise outside Supported.
+                invalid_bit = 1 << _ALL_DEFINED_ALARM_BITS.bit_length()
             try:
                 await self.send_single_cmd(
                     cmd=cmds.ModifyEnabledAlarms(mask=invalid_bit), endpoint=endpoint)
