@@ -18,6 +18,7 @@
 
 #include <oob-accessors/OOBAccessorRegistry.h>
 #include <type_traits>
+#include <utility>
 
 #include <device/types/ambient-context-sensor/OOBAccessors.h>
 #include <device/types/boolean-state-sensor/OOBAccessors.h>

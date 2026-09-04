@@ -91,7 +91,6 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/refrigerator/impl/LoggingRefrigerator.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaStorageDelegate.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/impl/RvcNamedPipeSimulation.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/impl/LoggingProximityRanger.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/impl/LoggingRangingAdapter.cpp"
@@ -122,6 +121,8 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/api/SingleEndpoint.cpp"
     # keep-sorted: end
 )
+
+include("${ALL_DEVICES_COMMON_DIR}/oob-accessors/all_devices_config.cmake")
 
 # ---------------------------------------------------------------------------
 # Source directories (unconditional — all device sources are always compiled;
@@ -252,8 +253,6 @@ if(NOT CMAKE_BUILD_EARLY_EXPANSION)
         "${CMAKE_CURRENT_BINARY_DIR}/app_config/enabled_devices.h"
     )
 endif()
-
-include("${ALL_DEVICES_COMMON_DIR}/oob-accessors/all_devices_config.cmake")
 
 # ---------------------------------------------------------------------------
 # Source files for clusters that are not included in the default SDK build

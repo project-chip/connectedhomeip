@@ -211,10 +211,7 @@ public:
     {
         auto dev   = std::make_unique<TDevice>(std::forward<Args>(args)...);
         auto * raw = dev.get();
-        return CreatedDevice{
-            .device             = std::move(dev),
-            .onDeviceRegistered = MakeOnDeviceRegisteredCallback(raw),
-        };
+        return CreatedDevice{ std::move(dev), MakeOnDeviceRegisteredCallback(raw) };
     }
 
     using DeviceCreator = std::function<CreatedDevice(const std::string & nodeLabel)>;

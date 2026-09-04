@@ -18,6 +18,7 @@
 
 #include <posix/named_pipe/Dispatcher.h>
 #include <type_traits>
+#include <utility>
 
 #include <device/types/ambient-context-sensor/NamedPipeTranslators.h>
 #include <device/types/boolean-state-sensor/NamedPipeTranslators.h>

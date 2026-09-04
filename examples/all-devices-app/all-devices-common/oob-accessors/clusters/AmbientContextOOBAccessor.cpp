@@ -189,6 +189,7 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleAddAmbientContextDete
     Clusters::AmbientContextSensing::Structs::AmbientContextTypeStruct::Type acsType = { .ambientContextSensed = tagList };
     if (hasConfidence)
     {
+        VerifyOrReturnError(confidence <= 100, CHIP_ERROR_INVALID_ARGUMENT);
         acsType.detectionConfidence.SetValue(static_cast<Percent>(confidence));
     }
 
@@ -267,6 +268,7 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetPredictedActivity(
                     case 6: {
                         uint8_t conf = 0;
                         ReturnErrorOnFailure(reader.Get(conf));
+                        VerifyOrReturnError(conf <= 100, CHIP_ERROR_INVALID_ARGUMENT);
                         item.confidence = static_cast<Percent>(conf);
                         break;
                     }
