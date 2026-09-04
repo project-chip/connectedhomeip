@@ -153,7 +153,8 @@ class TC_TSTATM_3_2(MatterBaseTest):
             )
             supported_modes_dut = [m.mode for m in supported_modes]
             different_modes = [m for m in supported_modes_dut if m != effective_startup_mode]
-            asserts.assert_greater_equal(len(different_modes), 1, "Must have at least one mode different from the effective startup mode")
+            asserts.assert_greater_equal(len(different_modes), 1,
+                                         "Must have at least one mode different from the effective startup mode")
             new_mode_th = different_modes[0]
             logger.info("Selected new_mode_th: %s", new_mode_th)
         else:
