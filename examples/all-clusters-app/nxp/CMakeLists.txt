@@ -107,6 +107,7 @@ target_sources(app
     ${ALL_CLUSTERS_COMMON_DIR}/src/rvc-operational-state-delegate-impl.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/tcc-mode.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/test-hidden-manufacturer-specific-stub.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/thermostat-mode-stub.cpp
 )
 
 if (CONFIG_CHIP_WIFI AND CONFIG_NET_L2_OPENTHREAD)
