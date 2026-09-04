@@ -1061,6 +1061,64 @@ TEST_F(TestAmbientSensingUnionCluster, TestConfigurationChaining)
 }
 
 // =============================================================================
+// Matter Contributor Name Tests (spec: ContributorName MAY be NULL or valid string)
+// =============================================================================
+
+TEST_F(TestAmbientSensingUnionCluster, TestMatterContributorWithNoNameEncodesNullName)
+{
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
+    EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
+
+    EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline),
+              CHIP_NO_ERROR);
+
+    const auto * contributors = cluster->GetContributors();
+    ASSERT_NE(contributors, nullptr);
+
+    AmbientSensingUnion::Structs::UnionContributorStruct::Type dest;
+    contributors[0].CopyTo(dest);
+
+    EXPECT_TRUE(dest.contributorName.IsNull());
+}
+
+TEST_F(TestAmbientSensingUnionCluster, TestMatterContributorWithNameEncodesNonNullName)
+{
+    constexpr char kContributorName[] = "PrimarySensor";
+
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
+    EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
+
+    EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline,
+                                            CharSpan::fromCharString(kContributorName)),
+              CHIP_NO_ERROR);
+
+    const auto * contributors = cluster->GetContributors();
+    ASSERT_NE(contributors, nullptr);
+
+    AmbientSensingUnion::Structs::UnionContributorStruct::Type dest;
+    contributors[0].CopyTo(dest);
+
+    EXPECT_FALSE(dest.contributorName.IsNull());
+    EXPECT_TRUE(dest.contributorName.Value().data_equal(CharSpan::fromCharString(kContributorName)));
+    EXPECT_FALSE(dest.contributorNodeID.IsNull());
+    EXPECT_EQ(dest.contributorNodeID.Value(), kTestNodeId1);
+}
+
+TEST_F(TestAmbientSensingUnionCluster, TestAddMatterContributorNameTooLong)
+{
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
+    EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
+
+    static const char tooLongName[] = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                                      "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; // 129 A's
+
+    EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline,
+                                            CharSpan::fromCharString(tooLongName)),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(cluster->GetContributorCount(), 0u);
+}
+
+// =============================================================================
 // Direct Contributor Array Access Test
 // =============================================================================
 
