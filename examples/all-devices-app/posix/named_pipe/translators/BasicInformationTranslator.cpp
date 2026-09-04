@@ -26,7 +26,7 @@ CHIP_ERROR BasicInformationTranslator::TranslateAndExecute(EndpointId endpointId
         std::string actionName = json["Name"].asString();
         if (actionName == "IncreaseConfigurationVersion" || actionName == "SimulateConfigurationVersionChange")
         {
-            return DispatchAction(registry, "IncreaseConfigurationVersion"_span, endpointId);
+            return DispatchAction(registry, CharSpan(actionName.data(), actionName.size()), endpointId);
         }
     }
     return CHIP_ERROR_NOT_FOUND;

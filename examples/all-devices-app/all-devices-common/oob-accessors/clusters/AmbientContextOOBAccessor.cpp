@@ -29,14 +29,16 @@ CHIP_ERROR DecodeSemanticTagList(TLV::TLVReader & reader, std::vector<Clusters::
 {
     TLV::TLVType containerType;
     ReturnErrorOnFailure(reader.EnterContainer(containerType));
-    while (reader.Next() == CHIP_NO_ERROR)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         TLV::TLVType tagStructType;
         ReturnErrorOnFailure(reader.EnterContainer(tagStructType));
         Clusters::Globals::Structs::SemanticTagStruct::Type tagStruct{};
-        bool hasNamespace = false;
-        bool hasTag       = false;
-        while (reader.Next() == CHIP_NO_ERROR)
+        bool hasNamespace   = false;
+        bool hasTag         = false;
+        CHIP_ERROR innerErr = CHIP_NO_ERROR;
+        while ((innerErr = reader.Next()) == CHIP_NO_ERROR)
         {
             TLV::Tag tag = reader.GetTag();
             if (!TLV::IsContextTag(tag))
@@ -57,10 +59,12 @@ CHIP_ERROR DecodeSemanticTagList(TLV::TLVReader & reader, std::vector<Clusters::
                 break;
             }
         }
+        VerifyOrReturnError(innerErr == CHIP_END_OF_TLV, innerErr);
         ReturnErrorOnFailure(reader.ExitContainer(tagStructType));
         VerifyOrReturnError(hasNamespace && hasTag, CHIP_ERROR_INVALID_ARGUMENT);
         tags.push_back(tagStruct);
     }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     return reader.ExitContainer(containerType);
 }
 
@@ -104,7 +108,8 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetAmbientContextSupp
     bool hasEndpointId    = false;
     std::vector<Clusters::Globals::Structs::SemanticTagStruct::Type> tags;
 
-    while (reader.Next() == CHIP_NO_ERROR)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         TLV::Tag tag = reader.GetTag();
         if (!TLV::IsContextTag(tag))
@@ -124,6 +129,7 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetAmbientContextSupp
             break;
         }
     }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
 
     VerifyOrReturnError(hasEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
@@ -152,7 +158,8 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleAddAmbientContextDete
     bool hasConfidence    = false;
     std::vector<Clusters::Globals::Structs::SemanticTagStruct::Type> tags;
 
-    while (reader.Next() == CHIP_NO_ERROR)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         TLV::Tag tag = reader.GetTag();
         if (!TLV::IsContextTag(tag))
@@ -176,6 +183,7 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleAddAmbientContextDete
             break;
         }
     }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
 
     VerifyOrReturnError(hasEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
@@ -211,7 +219,8 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetPredictedActivity(
     std::vector<Clusters::AmbientContextSensing::Structs::PredictedActivityStruct::Type> activities;
     std::vector<std::vector<Clusters::Globals::Structs::SemanticTagStruct::Type>> allTags;
 
-    while (reader.Next() == CHIP_NO_ERROR)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         TLV::Tag tag = reader.GetTag();
         if (!TLV::IsContextTag(tag))
@@ -227,7 +236,8 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetPredictedActivity(
         case 2: {
             TLV::TLVType arrayType;
             ReturnErrorOnFailure(reader.EnterContainer(arrayType));
-            while (reader.Next() == CHIP_NO_ERROR)
+            CHIP_ERROR arrayErr = CHIP_NO_ERROR;
+            while ((arrayErr = reader.Next()) == CHIP_NO_ERROR)
             {
                 TLV::TLVType structType;
                 ReturnErrorOnFailure(reader.EnterContainer(structType));
@@ -235,7 +245,8 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetPredictedActivity(
                 Clusters::AmbientContextSensing::Structs::PredictedActivityStruct::Type item{};
                 std::vector<Clusters::Globals::Structs::SemanticTagStruct::Type> itemTags;
 
-                while (reader.Next() == CHIP_NO_ERROR)
+                CHIP_ERROR itemErr = CHIP_NO_ERROR;
+                while ((itemErr = reader.Next()) == CHIP_NO_ERROR)
                 {
                     TLV::Tag itemTag = reader.GetTag();
                     if (!TLV::IsContextTag(itemTag))
@@ -276,11 +287,13 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetPredictedActivity(
                         break;
                     }
                 }
+                VerifyOrReturnError(itemErr == CHIP_END_OF_TLV, itemErr);
                 ReturnErrorOnFailure(reader.ExitContainer(structType));
 
                 allTags.push_back(std::move(itemTags));
                 activities.push_back(item);
             }
+            VerifyOrReturnError(arrayErr == CHIP_END_OF_TLV, arrayErr);
             ReturnErrorOnFailure(reader.ExitContainer(arrayType));
             break;
         }
@@ -288,6 +301,7 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetPredictedActivity(
             break;
         }
     }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
 
     VerifyOrReturnError(hasEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
@@ -320,7 +334,8 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetSensorFusionSuppor
     bool hasEndpointId    = false;
     std::vector<Clusters::Globals::Structs::SemanticTagStruct::Type> tags;
 
-    while (reader.Next() == CHIP_NO_ERROR)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         TLV::Tag tag = reader.GetTag();
         if (!TLV::IsContextTag(tag))
@@ -340,6 +355,7 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetSensorFusionSuppor
             break;
         }
     }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
 
     VerifyOrReturnError(hasEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
@@ -367,7 +383,8 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetObjectCount(ByteSp
     bool hasEndpointId    = false;
     bool hasObjectCount   = false;
 
-    while (reader.Next() == CHIP_NO_ERROR)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         TLV::Tag tag = reader.GetTag();
         if (!TLV::IsContextTag(tag))
@@ -388,6 +405,7 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetObjectCount(ByteSp
             break;
         }
     }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
 
     VerifyOrReturnError(hasEndpointId && hasObjectCount, CHIP_ERROR_INVALID_ARGUMENT);

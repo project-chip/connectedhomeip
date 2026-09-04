@@ -48,7 +48,8 @@ std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleSetOccupancy(ByteSpan tlvD
     bool hasEndpointId    = false;
     bool hasOccupancy     = false;
 
-    while (reader.Next() == CHIP_NO_ERROR)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         TLV::Tag tag = reader.GetTag();
         if (!TLV::IsContextTag(tag))
@@ -80,6 +81,7 @@ std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleSetOccupancy(ByteSpan tlvD
             break;
         }
     }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
 
     VerifyOrReturnError(hasEndpointId && hasOccupancy, CHIP_ERROR_INVALID_ARGUMENT);
@@ -107,7 +109,8 @@ std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleSetHoldTime(ByteSpan tlvDa
     bool hasEndpointId    = false;
     bool hasHoldTime      = false;
 
-    while (reader.Next() == CHIP_NO_ERROR)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         TLV::Tag tag = reader.GetTag();
         if (!TLV::IsContextTag(tag))
@@ -128,6 +131,7 @@ std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleSetHoldTime(ByteSpan tlvDa
             break;
         }
     }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
 
     VerifyOrReturnError(hasEndpointId && hasHoldTime, CHIP_ERROR_INVALID_ARGUMENT);

@@ -40,7 +40,8 @@ std::optional<CHIP_ERROR> BooleanStateOOBAccessor::HandleAction(CharSpan action,
     bool hasEndpointId    = false;
     bool hasNewState      = false;
 
-    while (reader.Next() == CHIP_NO_ERROR)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         TLV::Tag tag = reader.GetTag();
         if (!TLV::IsContextTag(tag))
@@ -61,6 +62,7 @@ std::optional<CHIP_ERROR> BooleanStateOOBAccessor::HandleAction(CharSpan action,
             break;
         }
     }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
 
     VerifyOrReturnError(hasEndpointId && hasNewState, CHIP_ERROR_INVALID_ARGUMENT);

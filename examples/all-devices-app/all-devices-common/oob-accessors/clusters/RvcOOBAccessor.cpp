@@ -67,7 +67,8 @@ std::optional<CHIP_ERROR> RvcOOBAccessor::HandleParameterlessAction(CharSpan act
     EndpointId endpointId = kInvalidEndpointId;
     bool hasEndpointId    = false;
 
-    while (reader.Next() == CHIP_NO_ERROR)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         TLV::Tag tag = reader.GetTag();
         if (TLV::IsContextTag(tag) && TLV::TagNumFromTag(tag) == 1)
@@ -76,6 +77,7 @@ std::optional<CHIP_ERROR> RvcOOBAccessor::HandleParameterlessAction(CharSpan act
             hasEndpointId = true;
         }
     }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
 
     VerifyOrReturnError(hasEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
@@ -154,7 +156,8 @@ std::optional<CHIP_ERROR> RvcOOBAccessor::HandleErrorEvent(ByteSpan tlvData) con
     bool hasEndpointId = false;
     bool hasError      = false;
 
-    while (reader.Next() == CHIP_NO_ERROR)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         TLV::Tag tag = reader.GetTag();
         if (!TLV::IsContextTag(tag))
@@ -175,6 +178,7 @@ std::optional<CHIP_ERROR> RvcOOBAccessor::HandleErrorEvent(ByteSpan tlvData) con
             break;
         }
     }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
 
     VerifyOrReturnError(hasEndpointId && hasError, CHIP_ERROR_INVALID_ARGUMENT);
@@ -203,7 +207,8 @@ std::optional<CHIP_ERROR> RvcOOBAccessor::HandleAddMap(ByteSpan tlvData) const
     bool hasMapId      = false;
     bool hasMapName    = false;
 
-    while (reader.Next() == CHIP_NO_ERROR)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         TLV::Tag tag = reader.GetTag();
         if (!TLV::IsContextTag(tag))
@@ -228,6 +233,7 @@ std::optional<CHIP_ERROR> RvcOOBAccessor::HandleAddMap(ByteSpan tlvData) const
             break;
         }
     }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
 
     VerifyOrReturnError(hasEndpointId && hasMapId && hasMapName, CHIP_ERROR_INVALID_ARGUMENT);
@@ -254,7 +260,8 @@ std::optional<CHIP_ERROR> RvcOOBAccessor::HandleRemoveMap(ByteSpan tlvData) cons
     bool hasEndpointId    = false;
     bool hasMapId         = false;
 
-    while (reader.Next() == CHIP_NO_ERROR)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         TLV::Tag tag = reader.GetTag();
         if (!TLV::IsContextTag(tag))
@@ -275,6 +282,7 @@ std::optional<CHIP_ERROR> RvcOOBAccessor::HandleRemoveMap(ByteSpan tlvData) cons
             break;
         }
     }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
 
     VerifyOrReturnError(hasEndpointId && hasMapId, CHIP_ERROR_INVALID_ARGUMENT);
@@ -303,7 +311,8 @@ std::optional<CHIP_ERROR> RvcOOBAccessor::HandleAddArea(ByteSpan tlvData) const
     bool hasEndpointId = false;
     bool hasAreaId     = false;
 
-    while (reader.Next() == CHIP_NO_ERROR)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         TLV::Tag tag = reader.GetTag();
         if (!TLV::IsContextTag(tag))
@@ -336,6 +345,7 @@ std::optional<CHIP_ERROR> RvcOOBAccessor::HandleAddArea(ByteSpan tlvData) const
             break;
         }
     }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
 
     VerifyOrReturnError(hasEndpointId && hasAreaId, CHIP_ERROR_INVALID_ARGUMENT);
@@ -362,7 +372,8 @@ std::optional<CHIP_ERROR> RvcOOBAccessor::HandleRemoveArea(ByteSpan tlvData) con
     bool hasEndpointId    = false;
     bool hasAreaId        = false;
 
-    while (reader.Next() == CHIP_NO_ERROR)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         TLV::Tag tag = reader.GetTag();
         if (!TLV::IsContextTag(tag))
@@ -383,6 +394,7 @@ std::optional<CHIP_ERROR> RvcOOBAccessor::HandleRemoveArea(ByteSpan tlvData) con
             break;
         }
     }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
 
     VerifyOrReturnError(hasEndpointId && hasAreaId, CHIP_ERROR_INVALID_ARGUMENT);

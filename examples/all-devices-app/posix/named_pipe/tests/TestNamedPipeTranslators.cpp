@@ -220,7 +220,7 @@ TEST_F(TestNamedPipeTranslators, BasicInformationTranslator)
     // SimulateConfigurationVersionChange alias
     Json::Value json2 = ParseJson(R"({"Name": "SimulateConfigurationVersionChange"})");
     EXPECT_EQ(translator.TranslateAndExecute(0, json2, mRegistry), CHIP_NO_ERROR);
-    EXPECT_EQ(mMockAccessor->mLastAction, "IncreaseConfigurationVersion");
+    EXPECT_EQ(mMockAccessor->mLastAction, "SimulateConfigurationVersionChange");
 
     // Unknown
     Json::Value unknown = ParseJson(R"({"Name": "Unknown"})");

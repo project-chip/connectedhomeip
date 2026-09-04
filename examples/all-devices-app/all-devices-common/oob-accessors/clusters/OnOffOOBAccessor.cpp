@@ -40,7 +40,8 @@ std::optional<CHIP_ERROR> OnOffOOBAccessor::HandleAction(CharSpan action, ByteSp
     bool hasEndpointId    = false;
     bool hasOnOff         = false;
 
-    while (reader.Next() == CHIP_NO_ERROR)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         TLV::Tag tag = reader.GetTag();
         if (!TLV::IsContextTag(tag))
@@ -61,6 +62,7 @@ std::optional<CHIP_ERROR> OnOffOOBAccessor::HandleAction(CharSpan action, ByteSp
             break;
         }
     }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
 
     VerifyOrReturnError(hasEndpointId && hasOnOff, CHIP_ERROR_INVALID_ARGUMENT);

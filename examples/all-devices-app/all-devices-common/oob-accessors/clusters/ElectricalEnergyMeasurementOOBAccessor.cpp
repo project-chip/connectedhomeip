@@ -38,7 +38,8 @@ std::optional<CHIP_ERROR> ElectricalEnergyMeasurementOOBAccessor::HandleAction(C
     EndpointId endpointId = kInvalidEndpointId;
     bool hasEndpointId    = false;
 
-    while (reader.Next() == CHIP_NO_ERROR)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         TLV::Tag tag = reader.GetTag();
         if (!TLV::IsContextTag(tag))
@@ -55,6 +56,7 @@ std::optional<CHIP_ERROR> ElectricalEnergyMeasurementOOBAccessor::HandleAction(C
             break;
         }
     }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
 
     VerifyOrReturnError(hasEndpointId, CHIP_ERROR_INVALID_ARGUMENT);

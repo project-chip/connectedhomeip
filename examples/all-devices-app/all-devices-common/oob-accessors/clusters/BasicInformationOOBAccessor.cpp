@@ -23,7 +23,7 @@ namespace chip::app {
 
 std::optional<CHIP_ERROR> BasicInformationOOBAccessor::HandleAction(CharSpan action, ByteSpan tlvData)
 {
-    if (!action.data_equal("IncreaseConfigurationVersion"_span))
+    if (!action.data_equal("IncreaseConfigurationVersion"_span) && !action.data_equal("SimulateConfigurationVersionChange"_span))
     {
         return std::nullopt;
     }
@@ -38,7 +38,8 @@ std::optional<CHIP_ERROR> BasicInformationOOBAccessor::HandleAction(CharSpan act
     EndpointId endpointId = kInvalidEndpointId;
     bool hasEndpointId    = false;
 
-    while (reader.Next() == CHIP_NO_ERROR)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         TLV::Tag tag = reader.GetTag();
         if (!TLV::IsContextTag(tag))
@@ -55,6 +56,7 @@ std::optional<CHIP_ERROR> BasicInformationOOBAccessor::HandleAction(CharSpan act
             break;
         }
     }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
 
     VerifyOrReturnError(hasEndpointId, CHIP_ERROR_INVALID_ARGUMENT);

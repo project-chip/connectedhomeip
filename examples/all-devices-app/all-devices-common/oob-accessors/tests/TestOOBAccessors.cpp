@@ -418,6 +418,8 @@ TEST_F(TestOOBAccessors, BasicInformationOOBAccessor)
 
     EXPECT_EQ(registry.HandleAction("IncreaseConfigurationVersion"_span, ByteSpan(buffer, writer.GetLengthWritten())),
               CHIP_NO_ERROR);
+    EXPECT_EQ(registry.HandleAction("SimulateConfigurationVersionChange"_span, ByteSpan(buffer, writer.GetLengthWritten())),
+              CHIP_NO_ERROR);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
