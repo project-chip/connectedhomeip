@@ -54,4 +54,3 @@ source_set("posix") {
     "${chip_root}/examples/all-devices-app/posix/named_pipe",
   ]
 }
-

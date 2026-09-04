@@ -50,4 +50,3 @@ source_set("named_pipe") {
 config("includes") {
   include_dirs = [ "${chip_root}/examples/all-devices-app" ]
 }
-

@@ -33,7 +33,9 @@ CHIP_ERROR DecodeSemanticTagList(TLV::TLVReader & reader, std::vector<Clusters::
     {
         TLV::TLVType tagStructType;
         ReturnErrorOnFailure(reader.EnterContainer(tagStructType));
-        Clusters::Globals::Structs::SemanticTagStruct::Type tagStruct;
+        Clusters::Globals::Structs::SemanticTagStruct::Type tagStruct{};
+        bool hasNamespace = false;
+        bool hasTag       = false;
         while (reader.Next() == CHIP_NO_ERROR)
         {
             TLV::Tag tag = reader.GetTag();
@@ -45,15 +47,18 @@ CHIP_ERROR DecodeSemanticTagList(TLV::TLVReader & reader, std::vector<Clusters::
             {
             case 1:
                 ReturnErrorOnFailure(reader.Get(tagStruct.namespaceID));
+                hasNamespace = true;
                 break;
             case 2:
                 ReturnErrorOnFailure(reader.Get(tagStruct.tag));
+                hasTag = true;
                 break;
             default:
                 break;
             }
         }
         ReturnErrorOnFailure(reader.ExitContainer(tagStructType));
+        VerifyOrReturnError(hasNamespace && hasTag, CHIP_ERROR_INVALID_ARGUMENT);
         tags.push_back(tagStruct);
     }
     return reader.ExitContainer(containerType);
@@ -226,7 +231,7 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetPredictedActivity(
                 TLV::TLVType structType;
                 ReturnErrorOnFailure(reader.EnterContainer(structType));
 
-                Clusters::AmbientContextSensing::Structs::PredictedActivityStruct::Type item;
+                Clusters::AmbientContextSensing::Structs::PredictedActivityStruct::Type item{};
                 std::vector<Clusters::Globals::Structs::SemanticTagStruct::Type> itemTags;
 
                 while (reader.Next() == CHIP_NO_ERROR)

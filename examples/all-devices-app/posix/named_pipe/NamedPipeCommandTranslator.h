@@ -53,7 +53,7 @@ public:
         {
             return json[key].asBool();
         }
-        if (json[key].isInt() || json[key].isUInt())
+        if (json[key].isInt64() || json[key].isUInt64())
         {
             return json[key].asInt64() != 0;
         }

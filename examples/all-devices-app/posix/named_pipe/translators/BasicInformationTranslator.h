@@ -28,7 +28,10 @@ class BasicInformationTranslator : public NamedPipeCommandTranslator
 public:
     static Span<const CharSpan> GetActionNames()
     {
-        static constexpr CharSpan kNames[] = { "IncreaseConfigurationVersion"_span };
+        static constexpr CharSpan kNames[] = {
+            "IncreaseConfigurationVersion"_span,
+            "SimulateConfigurationVersionChange"_span,
+        };
         return Span<const CharSpan>(kNames);
     }
 

@@ -75,11 +75,16 @@ CHIP_ERROR PosixNamedPipeDispatcher::DispatchJson(const Json::Value & json)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    auto endpointId = NamedPipeCommandTranslator::ExtractUInt<EndpointId>(json, "EndpointId");
-    if (!endpointId.has_value())
+    EndpointId targetEndpoint = kRootEndpointId;
+    if (json.isMember("EndpointId"))
     {
-        ChipLogError(AppServer, "PosixNamedPipeDispatcher: Missing or invalid EndpointId");
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        auto endpointId = NamedPipeCommandTranslator::ExtractUInt<EndpointId>(json, "EndpointId");
+        if (!endpointId.has_value())
+        {
+            ChipLogError(AppServer, "PosixNamedPipeDispatcher: Invalid EndpointId format");
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        targetEndpoint = *endpointId;
     }
 
     std::string actionName = json["Name"].asString();
@@ -90,11 +95,11 @@ CHIP_ERROR PosixNamedPipeDispatcher::DispatchJson(const Json::Value & json)
         return CHIP_ERROR_NOT_FOUND;
     }
 
-    CHIP_ERROR err = it->second->TranslateAndExecute(*endpointId, json, mOobRegistry);
+    CHIP_ERROR err = it->second->TranslateAndExecute(targetEndpoint, json, mOobRegistry);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "PosixNamedPipeDispatcher: Failed to execute action %s on endpoint %u: %" CHIP_ERROR_FORMAT,
-                     actionName.c_str(), *endpointId, err.Format());
+                     actionName.c_str(), targetEndpoint, err.Format());
     }
     return err;
 }

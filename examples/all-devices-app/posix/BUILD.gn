@@ -108,7 +108,6 @@ executable("all-devices-app") {
     "${chip_root}/third_party/miniaudio:miniaudio",
     "${chip_root}/zzz_generated/app-common/devices/",
   ]
-  defines = []
 
   if (chip_enable_transport_trace) {
     deps += [
