@@ -1619,10 +1619,12 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
                 ret[_id].read_access = override.read_access
             if override.write_access:
                 ret[_id].write_access = override.write_access
-            # Fabric scoping is never removed by a derived cluster, so OR the two:
-            # the base may declare it and the derived XML omit the <access> element.
+            # Fabric qualities are never removed by a derived cluster, so OR them:
+            # either side may declare one and the other omit the <access> element.
             if override.fabric_scoped:
                 ret[_id].fabric_scoped = True
+            if override.fabric_sensitive:
+                ret[_id].fabric_sensitive = True
 
         for attr_id, attribute in ret.items():
             if attribute.read_access == ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue and attribute.write_access == ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue:
