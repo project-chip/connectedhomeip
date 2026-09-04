@@ -142,7 +142,8 @@ class TC_TSTATM_3_2(MatterBaseTest):
         is_valid_int_value(old_current_mode_dut)
         logger.info("old_current_mode_dut: %s", old_current_mode_dut)
 
-        need_change_mode = (startup_mode_dut == old_current_mode_dut)
+        effective_startup_mode = new_start_up_mode_th if need_write_startup_mode else startup_mode_dut
+        need_change_mode = (effective_startup_mode == old_current_mode_dut)
 
         # Step 6: TH reads SupportedModes attribute (if needed)
         self.step(6)
@@ -151,8 +152,8 @@ class TC_TSTATM_3_2(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.SupportedModes
             )
             supported_modes_dut = [m.mode for m in supported_modes]
-            different_modes = [m for m in supported_modes_dut if m != startup_mode_dut]
-            asserts.assert_greater_equal(len(different_modes), 1, "Must have at least one mode different from startup_mode_dut")
+            different_modes = [m for m in supported_modes_dut if m != effective_startup_mode]
+            asserts.assert_greater_equal(len(different_modes), 1, "Must have at least one mode different from the effective startup mode")
             new_mode_th = different_modes[0]
             logger.info("Selected new_mode_th: %s", new_mode_th)
         else:
