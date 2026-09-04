@@ -49,11 +49,11 @@ KeyFormat DetectKeyFormat(const uint8_t * key, uint32_t keyLen)
     static const uint8_t chipRawPrefix[]     = { 0x04 };
     static const char chipHexPrefix[]        = "04";
     static const char chipB64Prefix[]        = "B";
-    static const uint8_t derRawPrefix[]      = { 0x30, 0x77, 0x02, 0x01, 0x01, 0x04 };
-    static const char derHexPrefix[]         = "307702010104";
+    static const uint8_t derRawPrefix[]      = { 0x30 };
+    static const char derHexPrefix[]         = "30";
     static const char ecPEMMarker[]          = "-----BEGIN EC PRIVATE KEY-----";
     static const char pkcs8PEMMarker[]       = "-----BEGIN PRIVATE KEY-----";
-    static const char ecPUBPEMMarker[]       = "-----BEGIN PUBLIC KEY-----";
+    static const char pubPEMMarker[]         = "-----BEGIN PUBLIC KEY-----";
 
     VerifyOrReturnError(key != nullptr, kKeyFormat_Unknown);
 
@@ -93,7 +93,7 @@ KeyFormat DetectKeyFormat(const uint8_t * key, uint32_t keyLen)
     {
         return kKeyFormat_X509_PEM;
     }
-    if (ContainsPEMMarker(ecPUBPEMMarker, key, keyLen))
+    if (ContainsPEMMarker(pubPEMMarker, key, keyLen))
     {
         return kKeyFormat_X509_Pubkey_PEM;
     }
@@ -118,19 +118,20 @@ bool SetPublicKey(const uint8_t * pubkey, uint32_t pubkeyLen, EVP_PKEY * key)
 
 bool ExtractPublicKey(EVP_PKEY * key, MutableByteSpan & pubKey)
 {
-    const EC_KEY * ecKey     = nullptr;
     const EC_GROUP * group   = nullptr;
     const EC_POINT * ecPoint = nullptr;
 
     VerifyOrReturnError(pubKey.size() >= kP256_PublicKey_Length, false);
 
-    ecKey = EVP_PKEY_get1_EC_KEY(key);
-    VerifyOrReturnError(ecKey != nullptr, false);
+    // Per the OpenSSL naming convention, the key returned by a "get1" function holds an extra reference
+    // that must be released independently of the EVP_PKEY it was obtained from.
+    std::unique_ptr<EC_KEY, void (*)(EC_KEY *)> ecKey(EVP_PKEY_get1_EC_KEY(key), &EC_KEY_free);
+    VerifyOrReturnError(ecKey.get() != nullptr, false);
 
-    group = EC_KEY_get0_group(ecKey);
+    group = EC_KEY_get0_group(ecKey.get());
     VerifyOrReturnError(group != nullptr, false);
 
-    ecPoint = EC_KEY_get0_public_key(ecKey);
+    ecPoint = EC_KEY_get0_public_key(ecKey.get());
     VerifyOrReturnError(ecPoint != nullptr, false);
 
     VerifyOrReturnError(EC_POINT_point2oct(group, ecPoint, POINT_CONVERSION_UNCOMPRESSED, Uint8::to_uchar(pubKey.data()),
@@ -156,7 +157,12 @@ bool DeserializeKeyPair(const uint8_t * keyPair, uint32_t keyPairLen, EVP_PKEY *
 
     VerifyOrReturnError(BN_bin2bn(keyPair + kP256_PublicKey_Length, kP256_PrivateKey_Length, privKeyBN.get()) != nullptr, false);
 
-    VerifyOrReturnError(EC_KEY_set_private_key(EVP_PKEY_get1_EC_KEY(key), privKeyBN.get()) == 1, false);
+    {
+        std::unique_ptr<EC_KEY, void (*)(EC_KEY *)> ecKey(EVP_PKEY_get1_EC_KEY(key), &EC_KEY_free);
+        VerifyOrReturnError(ecKey.get() != nullptr, false);
+
+        VerifyOrReturnError(EC_KEY_set_private_key(ecKey.get(), privKeyBN.get()) == 1, false);
+    }
 
     return true;
 }
@@ -165,16 +171,15 @@ bool DeserializeKeyPair(const uint8_t * keyPair, uint32_t keyPairLen, EVP_PKEY *
 
 bool SerializeKeyPair(EVP_PKEY * key, P256SerializedKeypair & serializedKeypair)
 {
-    const EC_KEY * ecKey     = nullptr;
     const BIGNUM * privKeyBN = nullptr;
     MutableByteSpan pubKey(serializedKeypair.Bytes(), kP256_PublicKey_Length);
 
     VerifyOrReturnError(ExtractPublicKey(key, pubKey), false);
 
-    ecKey = EVP_PKEY_get1_EC_KEY(key);
-    VerifyOrReturnError(ecKey != nullptr, false);
+    std::unique_ptr<EC_KEY, void (*)(EC_KEY *)> ecKey(EVP_PKEY_get1_EC_KEY(key), &EC_KEY_free);
+    VerifyOrReturnError(ecKey.get() != nullptr, false);
 
-    privKeyBN = EC_KEY_get0_private_key(ecKey);
+    privKeyBN = EC_KEY_get0_private_key(ecKey.get());
     VerifyOrReturnError(privKeyBN != nullptr, false);
 
     VerifyOrReturnError(BN_bn2binpad(privKeyBN, serializedKeypair.Bytes() + kP256_PublicKey_Length, kP256_PrivateKey_Length) ==
@@ -191,6 +196,7 @@ bool ReadKey(const char * fileNameOrStr, std::unique_ptr<EVP_PKEY, void (*)(EVP_
     bool res            = true;
     uint32_t keyDataLen = 0;
     KeyFormat keyFormat = kKeyFormat_Unknown;
+    int keyType         = EVP_PKEY_NONE;
     std::unique_ptr<uint8_t[]> keyData;
 
     // If fileNameOrStr is a file name
@@ -267,15 +273,10 @@ bool ReadKey(const char * fileNameOrStr, std::unique_ptr<EVP_PKEY, void (*)(EVP_
 
         if (keyFormat == kKeyFormat_X509_Pubkey_PEM)
         {
-            EC_KEY * ecKey = PEM_read_bio_EC_PUBKEY(keyBIO.get(), nullptr, nullptr, nullptr);
-            if (ecKey == nullptr)
+            key.reset(PEM_read_bio_PUBKEY(keyBIO.get(), nullptr, nullptr, nullptr));
+            if (key.get() == nullptr)
             {
-                ReportOpenSSLErrorAndExit("PEM_read_bio_EC_PUBKEY", res = false);
-            }
-
-            if (EVP_PKEY_set1_EC_KEY(key.get(), ecKey) != 1)
-            {
-                ReportOpenSSLErrorAndExit("EVP_PKEY_set1_EC_KEY", res = false);
+                ReportOpenSSLErrorAndExit("PEM_read_bio_PUBKEY", res = false);
             }
         }
         else if (keyFormat == kKeyFormat_X509_PEM)
@@ -296,11 +297,27 @@ bool ReadKey(const char * fileNameOrStr, std::unique_ptr<EVP_PKEY, void (*)(EVP_
         }
     }
 
-    if ((EC_GROUP_get_curve_name(EC_KEY_get0_group(EVP_PKEY_get1_EC_KEY(key.get()))) != gNIDChipCurveP256) &&
-        !ignorErrorIfUnsupportedCurve)
+    keyType = EVP_PKEY_id(key.get());
+    if (keyType != EVP_PKEY_EC && !IsMLDSAKey(key.get()))
     {
-        fprintf(stderr, "Specified key uses unsupported Elliptic Curve\n");
+        fprintf(stderr, "Specified key uses an unsupported key type\n");
         ExitNow(res = false);
+    }
+
+    // ML-DSA keys are not EC-based; skip the curve check for them.
+    if (keyType == EVP_PKEY_EC)
+    {
+        std::unique_ptr<EC_KEY, void (*)(EC_KEY *)> ecKey(EVP_PKEY_get1_EC_KEY(key.get()), &EC_KEY_free);
+        VerifyOrExit(ecKey.get() != nullptr, res = false);
+
+        const EC_GROUP * group = EC_KEY_get0_group(ecKey.get());
+        VerifyOrExit(group != nullptr, res = false);
+
+        if ((EC_GROUP_get_curve_name(group) != gNIDChipCurveP256) && !ignorErrorIfUnsupportedCurve)
+        {
+            fprintf(stderr, "Specified key uses unsupported Elliptic Curve\n");
+            ExitNow(res = false);
+        }
     }
 
 exit:
@@ -349,6 +366,42 @@ exit:
     return res;
 }
 
+bool GenerateKeyPair_MLDSA(std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> & key, const char * algorithm)
+{
+#if !CHIP_CERT_ML_DSA_AVAILABLE
+    (void) key;
+    fprintf(stderr, "ML-DSA key generation (%s) requires chip-cert to be built against OpenSSL 3.5 or later\n", algorithm);
+    return false;
+#else
+    bool res = true;
+
+    {
+        std::unique_ptr<EVP_PKEY_CTX, void (*)(EVP_PKEY_CTX *)> ctx(EVP_PKEY_CTX_new_from_name(nullptr, algorithm, nullptr),
+                                                                    &EVP_PKEY_CTX_free);
+        if (ctx.get() == nullptr)
+        {
+            ReportOpenSSLErrorAndExit("EVP_PKEY_CTX_new_from_name", res = false);
+        }
+
+        if (EVP_PKEY_keygen_init(ctx.get()) <= 0)
+        {
+            ReportOpenSSLErrorAndExit("EVP_PKEY_keygen_init", res = false);
+        }
+
+        EVP_PKEY * pkey = nullptr;
+        if (EVP_PKEY_keygen(ctx.get(), &pkey) <= 0)
+        {
+            ReportOpenSSLErrorAndExit("EVP_PKEY_keygen", res = false);
+        }
+
+        key.reset(pkey);
+    }
+
+exit:
+    return res;
+#endif // CHIP_CERT_ML_DSA_AVAILABLE
+}
+
 bool WriteKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
 {
     bool res              = true;
@@ -363,37 +416,90 @@ bool WriteKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
         VerifyOrExit(OpenFile(fileName, file, true), res = false);
     }
 
-    if (EVP_PKEY_type(EVP_PKEY_id(key)) != EVP_PKEY_EC)
     {
-        fprintf(stderr, "Unsupported private key type\n");
-        ExitNow(res = false);
+        int keyType = EVP_PKEY_id(key);
+        if (keyType != EVP_PKEY_EC && !IsMLDSAKey(key))
+        {
+            fprintf(stderr, "Unsupported private key type\n");
+            ExitNow(res = false);
+        }
     }
 
     switch (keyFmt)
     {
     case kKeyFormat_X509_PEM:
-        if (PEM_write_ECPrivateKey(file, EVP_PKEY_get1_EC_KEY(key), nullptr, nullptr, 0, nullptr, nullptr) == 0)
+        if (EVP_PKEY_id(key) == EVP_PKEY_EC)
         {
-            ReportOpenSSLErrorAndExit("PEM_write_ECPrivateKey", res = false);
+            std::unique_ptr<EC_KEY, void (*)(EC_KEY *)> ecKey(EVP_PKEY_get1_EC_KEY(key), &EC_KEY_free);
+            VerifyOrExit(ecKey.get() != nullptr, res = false);
+
+            if (PEM_write_ECPrivateKey(file, ecKey.get(), nullptr, nullptr, 0, nullptr, nullptr) == 0)
+            {
+                ReportOpenSSLErrorAndExit("PEM_write_ECPrivateKey", res = false);
+            }
+        }
+        else
+        {
+            if (PEM_write_PrivateKey(file, key, nullptr, nullptr, 0, nullptr, nullptr) == 0)
+            {
+                ReportOpenSSLErrorAndExit("PEM_write_PrivateKey", res = false);
+            }
         }
         break;
     case kKeyFormat_X509_Pubkey_PEM:
-        if (PEM_write_EC_PUBKEY(file, EVP_PKEY_get1_EC_KEY(key)) == 0)
+        if (EVP_PKEY_id(key) == EVP_PKEY_EC)
         {
-            ReportOpenSSLErrorAndExit("PEM_write_EC_PUBKEY", res = false);
+            std::unique_ptr<EC_KEY, void (*)(EC_KEY *)> ecKey(EVP_PKEY_get1_EC_KEY(key), &EC_KEY_free);
+            VerifyOrExit(ecKey.get() != nullptr, res = false);
+
+            if (PEM_write_EC_PUBKEY(file, ecKey.get()) == 0)
+            {
+                ReportOpenSSLErrorAndExit("PEM_write_EC_PUBKEY", res = false);
+            }
+        }
+        else
+        {
+            if (PEM_write_PUBKEY(file, key) == 0)
+            {
+                ReportOpenSSLErrorAndExit("PEM_write_PUBKEY", res = false);
+            }
         }
         break;
     case kKeyFormat_X509_DER:
-        if (i2d_ECPrivateKey_fp(file, EVP_PKEY_get1_EC_KEY(key)) == 0)
+        if (EVP_PKEY_id(key) == EVP_PKEY_EC)
         {
-            ReportOpenSSLErrorAndExit("i2d_PrivateKey_fp", res = false);
+            std::unique_ptr<EC_KEY, void (*)(EC_KEY *)> ecKey(EVP_PKEY_get1_EC_KEY(key), &EC_KEY_free);
+            VerifyOrExit(ecKey.get() != nullptr, res = false);
+
+            if (i2d_ECPrivateKey_fp(file, ecKey.get()) == 0)
+            {
+                ReportOpenSSLErrorAndExit("i2d_PrivateKey_fp", res = false);
+            }
+        }
+        else
+        {
+            if (i2d_PrivateKey_fp(file, key) == 0)
+            {
+                ReportOpenSSLErrorAndExit("i2d_PrivateKey_fp", res = false);
+            }
         }
         break;
     case kKeyFormat_X509_Hex: {
-        int derKeyLen = i2d_ECPrivateKey(EVP_PKEY_get1_EC_KEY(key), &derKey);
+        int derKeyLen;
+        if (EVP_PKEY_id(key) == EVP_PKEY_EC)
+        {
+            std::unique_ptr<EC_KEY, void (*)(EC_KEY *)> ecKey(EVP_PKEY_get1_EC_KEY(key), &EC_KEY_free);
+            VerifyOrExit(ecKey.get() != nullptr, res = false);
+
+            derKeyLen = i2d_ECPrivateKey(ecKey.get(), &derKey);
+        }
+        else
+        {
+            derKeyLen = i2d_PrivateKey(key, &derKey);
+        }
         if (derKeyLen < 0)
         {
-            ReportOpenSSLErrorAndExit("i2d_X509", res = false);
+            ReportOpenSSLErrorAndExit("i2d_PrivateKey", res = false);
         }
         VerifyOrExit(CanCastTo<size_t>(derKeyLen), res = false);
         VerifyOrExit(WriteDataIntoFile(fileName, derKey, static_cast<size_t>(derKeyLen), kDataFormat_Hex), res = false);
