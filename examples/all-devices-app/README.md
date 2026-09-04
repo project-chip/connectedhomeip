@@ -53,7 +53,7 @@ implementations:
 -   **`esp32/`, `posix/`**: Contain platform-specific implementations (with
     `posix/` containing `linux/` and `darwin/` subdirectories), entry points,
     and build configurations.
-    -   For example, `posix/linux/DeviceFactoryPlatformOverride.cpp` registers
+    -   For example, `posix/include/DeviceFactoryPlatformOverride.h` registers
         platform-specific overrides for devices at build-time.
 
 This separation ensures core logic remains reusable across operating systems and

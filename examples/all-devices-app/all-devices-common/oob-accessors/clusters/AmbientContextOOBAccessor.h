@@ -35,7 +35,7 @@ private:
     std::optional<CHIP_ERROR> HandleAddAmbientContextDetect(ByteSpan tlvData);
     std::optional<CHIP_ERROR> HandleSetPredictedActivity(ByteSpan tlvData);
     std::optional<CHIP_ERROR> HandleSetSensorFusionSupported(ByteSpan tlvData);
-    std::optional<CHIP_ERROR> HandleSetObjCount(ByteSpan tlvData);
+    std::optional<CHIP_ERROR> HandleSetObjectCount(ByteSpan tlvData);
 
     Clusters::AmbientContextSensingCluster & mCluster;
     EndpointId mEndpointId;

@@ -35,8 +35,8 @@ public:
     CHIP_ERROR TranslateAndExecute(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry) override;
 
 private:
-    CHIP_ERROR TranslateSetOccupancy(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry);
-    CHIP_ERROR TranslateSetHoldTime(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry);
+    CHIP_ERROR TranslateSetOccupancy(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry) const;
+    CHIP_ERROR TranslateSetHoldTime(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry) const;
 };
 
 } // namespace chip::app

@@ -190,7 +190,7 @@ public:
         DynamicEndpointIdAllocator endpointIdAllocator(GetReservedEndpointIds());
         endpointIdAllocator.ForceNext(kRootEndpointId);
         ReturnErrorOnFailure(mRootNode.RootDevice().Register(endpointIdAllocator, mDataModelProvider));
-        PosixDeviceFactory::ExecuteHooks(mRootNode.GetRootNode());
+        PosixDeviceFactory::ExecuteHooks(mRootNode.RootDevice());
 
         for (const auto & entry : AppOptions::GetDeviceTypeEntries())
         {

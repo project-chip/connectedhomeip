@@ -35,7 +35,7 @@ To update or validate this list manually, follow these steps:
       `rg "LazyRegisteredServerCluster<|RegisteredServerCluster<" examples/all-devices-app/`
     - Check where these are registered. They are typically added to the endpoint
       in the device implementation files under
-      `examples/all-devices-app/all-devices-common/devices/` (e.g.
+      `examples/all-devices-app/all-devices-common/device/types/` (e.g.
       `provider.AddCluster(...)`).
     - Mark as "Yes" only if they are actively instantiated and added to an
       endpoint.

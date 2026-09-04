@@ -18,6 +18,7 @@
 
 #include <limits>
 #include <optional>
+#include <type_traits>
 
 #include <json/json.h>
 #include <lib/core/CHIPError.h>
@@ -44,7 +45,7 @@ public:
 
     static std::optional<bool> ExtractBool(const Json::Value & json, const char * key)
     {
-        if (!json.isMember(key))
+        if (!json.isObject() || !json.isMember(key))
         {
             return std::nullopt;
         }
@@ -62,7 +63,8 @@ public:
     template <typename T>
     static std::optional<T> ExtractUInt(const Json::Value & json, const char * key)
     {
-        if (!json.isMember(key) || !json[key].isUInt())
+        static_assert(std::is_unsigned_v<T>, "ExtractUInt requires an unsigned integer type");
+        if (!json.isObject() || !json.isMember(key) || !json[key].isUInt64())
         {
             return std::nullopt;
         }

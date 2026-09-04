@@ -28,10 +28,13 @@ executable("all-devices-app") {
   defines = [ "ENABLE_TRACING=${matter_enable_tracing_support}" ]
 
   sources = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/OOBAccessorHook.h",
+    "${chip_root}/examples/all-devices-app/posix/named_pipe/NamedPipeHook.h",
     "PosixAudioManager.cpp",
     "PosixChime.cpp",
     "PosixSpeaker.cpp",
     "include/CHIPProjectAppConfig.h",
+    "include/DeviceFactoryPlatformOverride.h",
     "main.cpp",
   ]
 

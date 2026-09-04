@@ -80,9 +80,9 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleAction(CharSpan actio
     {
         return HandleSetSensorFusionSupported(tlvData);
     }
-    if (action.data_equal("SetObjCount"_span))
+    if (action.data_equal("SetObjectCount"_span))
     {
-        return HandleSetObjCount(tlvData);
+        return HandleSetObjectCount(tlvData);
     }
     return std::nullopt;
 }
@@ -348,7 +348,7 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetSensorFusionSuppor
     return mCluster.SetSensorFusionSupported(tagSpan);
 }
 
-std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetObjCount(ByteSpan tlvData)
+std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetObjectCount(ByteSpan tlvData)
 {
     TLV::TLVReader reader;
     reader.Init(tlvData);

@@ -65,7 +65,20 @@ public:
     CHIP_ERROR EnsureTranslatorRegistered()
     {
         auto actionNames = TranslatorType::GetActionNames();
-        if (actionNames.empty() || HasTranslator(actionNames.front()))
+        if (actionNames.empty())
+        {
+            return CHIP_NO_ERROR;
+        }
+        bool anyMissing = false;
+        for (const auto & name : actionNames)
+        {
+            if (!HasTranslator(name))
+            {
+                anyMissing = true;
+                break;
+            }
+        }
+        if (!anyMissing)
         {
             return CHIP_NO_ERROR;
         }

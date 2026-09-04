@@ -53,7 +53,7 @@ compiles independently of the operating system or hardware drivers. It includes:
 -   **`device/types/`**: Concrete implementations of simulated Matter devices (e.g.,
     `OccupancySensor`, `DimmableLight`, `Speaker`).
 -   **`device/api/`**: Base contracts and abstractions (`DeviceInterface`, `SingleEndpoint`,
-    `DynamicEndpointIdAllocator`).
+    `device/api/allocator/DynamicEndpointIdAllocator.h`).
 -   **`device/capabilities/`**: Reusable device loads and capabilities (e.g., `OnOffLoad`,
     `DimmableLoad`, `FanLoad`).
 -   **`device-factory/`**: Registry (`DeviceFactory<Hooks...>`) responsible for mapping
@@ -70,7 +70,7 @@ These directories contain hardware-specific or OS-specific drivers, entrypoint
 `main()` functions, and build configurations.
 
 -   **Platform Overrides**: Platforms can replace simulated behaviors with
-    hardware drivers. For example, `DeviceFactoryPlatformOverride.cpp` can
+    hardware drivers. For example, `DeviceFactoryPlatformOverride.h` can
     register an LED driver for the `on-off-light` device instead of the
     simulated device.
 
@@ -87,15 +87,14 @@ class, `SingleEndpoint`.
 classDiagram
     class DeviceInterface {
         <<interface>>
+        #mDeviceTypes: Span~const DeviceTypeEntry~
         +Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider, EndpointComposition composition)* CHIP_ERROR
         +Unregister(CodeDrivenDataModelProvider & provider)*
-        +GetEndpointId() EndpointId
     }
 
     class SingleEndpoint {
         <<abstract>>
         #mEndpointId: EndpointId
-        #mDeviceTypes: Span~const DeviceTypeEntry~
         +Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider, EndpointComposition composition) CHIP_ERROR
         +Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)* CHIP_ERROR
         +Unregister(CodeDrivenDataModelProvider & provider)

@@ -33,7 +33,7 @@ public:
             "AddAmbientContextDetect"_span,
             "SetPredictedActivity"_span,
             "SetSensorFusionSupported"_span,
-            "SetObjCount"_span,
+            "SetObjectCount"_span,
         };
         return Span<const CharSpan>(kNames);
     }
@@ -42,14 +42,14 @@ public:
 
 private:
     CHIP_ERROR TranslateSetAmbientContextSupport(EndpointId endpointId, const Json::Value & json,
-                                                OOBAccessorRegistry & registry);
+                                                OOBAccessorRegistry & registry) const;
     CHIP_ERROR TranslateAddAmbientContextDetect(EndpointId endpointId, const Json::Value & json,
-                                               OOBAccessorRegistry & registry);
+                                               OOBAccessorRegistry & registry) const;
     CHIP_ERROR TranslateSetPredictedActivity(EndpointId endpointId, const Json::Value & json,
-                                             OOBAccessorRegistry & registry);
+                                             OOBAccessorRegistry & registry) const;
     CHIP_ERROR TranslateSetSensorFusionSupported(EndpointId endpointId, const Json::Value & json,
-                                                 OOBAccessorRegistry & registry);
-    CHIP_ERROR TranslateSetObjCount(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry);
+                                                 OOBAccessorRegistry & registry) const;
+    CHIP_ERROR TranslateSetObjectCount(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry) const;
 };
 
 } // namespace chip::app

@@ -50,7 +50,7 @@ CHIP_ERROR EncodeSemanticTagList(TLV::TLVWriter & writer, TLV::Tag tag, const Js
 CHIP_ERROR AmbientContextTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
                                                          OOBAccessorRegistry & registry)
 {
-    const std::string & actionName = json["Name"].asString();
+    std::string actionName = json["Name"].asString();
     if (actionName == "SetAmbientContextSupport")
     {
         return TranslateSetAmbientContextSupport(endpointId, json, registry);
@@ -67,16 +67,16 @@ CHIP_ERROR AmbientContextTranslator::TranslateAndExecute(EndpointId endpointId, 
     {
         return TranslateSetSensorFusionSupported(endpointId, json, registry);
     }
-    if (actionName == "SetObjCount")
+    if (actionName == "SetObjectCount")
     {
-        return TranslateSetObjCount(endpointId, json, registry);
+        return TranslateSetObjectCount(endpointId, json, registry);
     }
 
     return CHIP_ERROR_NOT_FOUND;
 }
 
 CHIP_ERROR AmbientContextTranslator::TranslateSetAmbientContextSupport(EndpointId endpointId, const Json::Value & json,
-                                                                      OOBAccessorRegistry & registry)
+                                                                      OOBAccessorRegistry & registry) const
 {
     VerifyOrReturnError(json.isMember("AmbientContextType") && json["AmbientContextType"].isArray(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -95,7 +95,7 @@ CHIP_ERROR AmbientContextTranslator::TranslateSetAmbientContextSupport(EndpointI
 }
 
 CHIP_ERROR AmbientContextTranslator::TranslateAddAmbientContextDetect(EndpointId endpointId, const Json::Value & json,
-                                                                     OOBAccessorRegistry & registry)
+                                                                     OOBAccessorRegistry & registry) const
 {
     VerifyOrReturnError(json.isMember("AmbientContextType") && json["AmbientContextType"].isArray(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -108,9 +108,10 @@ CHIP_ERROR AmbientContextTranslator::TranslateAddAmbientContextDetect(EndpointId
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(1), endpointId));
     ReturnErrorOnFailure(EncodeSemanticTagList(writer, TLV::ContextTag(2), json["AmbientContextType"]));
 
-    auto confOpt = ExtractUInt<uint8_t>(json, "DetectionConfidence");
-    if (confOpt.has_value())
+    if (json.isMember("DetectionConfidence"))
     {
+        auto confOpt = ExtractUInt<uint8_t>(json, "DetectionConfidence");
+        VerifyOrReturnError(confOpt.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(3), *confOpt));
     }
 
@@ -121,7 +122,7 @@ CHIP_ERROR AmbientContextTranslator::TranslateAddAmbientContextDetect(EndpointId
 }
 
 CHIP_ERROR AmbientContextTranslator::TranslateSetPredictedActivity(EndpointId endpointId, const Json::Value & json,
-                                                                   OOBAccessorRegistry & registry)
+                                                                   OOBAccessorRegistry & registry) const
 {
     VerifyOrReturnError(json.isMember("PredAct") && json["PredAct"].isArray(), CHIP_ERROR_INVALID_ARGUMENT);
     const Json::Value & predActArray = json["PredAct"];
@@ -139,7 +140,8 @@ CHIP_ERROR AmbientContextTranslator::TranslateSetPredictedActivity(EndpointId en
     for (Json::ArrayIndex i = 0; i < predActArray.size(); i++)
     {
         const Json::Value & item = predActArray[i];
-        VerifyOrReturnError(item.isObject() && item.isMember("AmbientContextType"), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(item.isObject() && item.isMember("AmbientContextType") && item["AmbientContextType"].isArray(),
+                            CHIP_ERROR_INVALID_ARGUMENT);
 
         auto startTStampOpt = ExtractUInt<uint32_t>(item, "StartTStamp");
         auto endTStampOpt   = ExtractUInt<uint32_t>(item, "EndTStamp");
@@ -153,9 +155,11 @@ CHIP_ERROR AmbientContextTranslator::TranslateSetPredictedActivity(EndpointId en
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(2), *endTStampOpt));
         ReturnErrorOnFailure(EncodeSemanticTagList(writer, TLV::ContextTag(3), item["AmbientContextType"]));
 
-        if (item.isMember("CrowdDetect") && item["CrowdDetect"].isBool())
+        if (item.isMember("CrowdDetect"))
         {
-            ReturnErrorOnFailure(writer.Put(TLV::ContextTag(4), item["CrowdDetect"].asBool()));
+            auto crowdDetectOpt = ExtractBool(item, "CrowdDetect");
+            VerifyOrReturnError(crowdDetectOpt.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
+            ReturnErrorOnFailure(writer.Put(TLV::ContextTag(4), *crowdDetectOpt));
         }
         if (item.isMember("CrowdCnt"))
         {
@@ -174,7 +178,7 @@ CHIP_ERROR AmbientContextTranslator::TranslateSetPredictedActivity(EndpointId en
 }
 
 CHIP_ERROR AmbientContextTranslator::TranslateSetSensorFusionSupported(EndpointId endpointId, const Json::Value & json,
-                                                                       OOBAccessorRegistry & registry)
+                                                                     OOBAccessorRegistry & registry) const
 {
     VerifyOrReturnError(json.isMember("AmbientContextType") && json["AmbientContextType"].isArray(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -192,13 +196,13 @@ CHIP_ERROR AmbientContextTranslator::TranslateSetSensorFusionSupported(EndpointI
     return registry.HandleAction("SetSensorFusionSupported"_span, ByteSpan(buffer, writer.GetLengthWritten()));
 }
 
-CHIP_ERROR AmbientContextTranslator::TranslateSetObjCount(EndpointId endpointId, const Json::Value & json,
-                                                          OOBAccessorRegistry & registry)
+CHIP_ERROR AmbientContextTranslator::TranslateSetObjectCount(EndpointId endpointId, const Json::Value & json,
+                                                           OOBAccessorRegistry & registry) const
 {
     auto objectCount = ExtractUInt<uint16_t>(json, "ObjectCount");
     VerifyOrReturnError(objectCount.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    return DispatchAction(registry, "SetObjCount"_span, endpointId, *objectCount);
+    return DispatchAction(registry, "SetObjectCount"_span, endpointId, *objectCount);
 }
 
 } // namespace chip::app

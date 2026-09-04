@@ -24,25 +24,19 @@ classDiagram
     class OOBAccessor {
         <<Interface>>
         +HandleAction(actionName: CharSpan, tlvBuffer: ByteSpan) optional~CHIP_ERROR~*
-        +GetActionNames() Span~const CharSpan~*
     }
     class BooleanStateOOBAccessor {
         +HandleAction(actionName: CharSpan, tlvBuffer: ByteSpan) optional~CHIP_ERROR~
-        +GetActionNames() Span~const CharSpan~
     }
-    class BooleanStateSensor {
+    class BooleanStateCluster {
     }
 
     class PosixNamedPipeDispatcher {
         +DispatchJson(json: Json::Value) CHIP_ERROR
     }
-    class ShellCommandHandler {
-        +HandleCommand(args)
-    }
 
     OOBAccessorRegistry "1" *-- "many" OOBAccessor
     BooleanStateOOBAccessor --|> OOBAccessor
-    BooleanStateOOBAccessor "1" --> "1" BooleanStateSensor : references
+    BooleanStateOOBAccessor "1" --> "1" BooleanStateCluster : references
     PosixNamedPipeDispatcher --> OOBAccessorRegistry : uses
-    ShellCommandHandler --> OOBAccessorRegistry : uses
 ```

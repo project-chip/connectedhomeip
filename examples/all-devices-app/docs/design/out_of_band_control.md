@@ -307,22 +307,23 @@ public:
     CHIP_ERROR RegisterTranslator(CharSpan actionName, std::shared_ptr<NamedPipeCommandTranslator> translator);
 
     /**
-     * @brief Registers a translator if not already present, deduping by TranslatorType::GetActionNames().
+     * @brief Registers a translator if not already present, registering all action names exposed by TranslatorType.
      */
     template <typename TranslatorType>
     CHIP_ERROR EnsureTranslatorRegistered()
     {
-        for (const auto & action : TranslatorType::GetActionNames())
+        auto actionNames = TranslatorType::GetActionNames();
+        if (actionNames.empty() || HasTranslator(actionNames.front()))
         {
-            if (HasTranslator(action))
-            {
-                return CHIP_NO_ERROR;
-            }
+            return CHIP_NO_ERROR;
         }
         auto translator = std::make_shared<TranslatorType>();
-        for (const auto & action : TranslatorType::GetActionNames())
+        for (const auto & name : actionNames)
         {
-            ReturnErrorOnFailure(RegisterTranslator(action, translator));
+            if (!HasTranslator(name))
+            {
+                ReturnErrorOnFailure(RegisterTranslator(name, translator));
+            }
         }
         return CHIP_NO_ERROR;
     }
@@ -401,13 +402,12 @@ In `all-devices-common/device/types/<device-name>/OOBAccessors.h`:
 
 ```cpp
 #pragma once
+#include <device/capabilities/on-off-load/OnOffLoad.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
 
 namespace chip::app {
 
-class OnOffLight;
-
-void RegisterOOBAccessors(OnOffLight & device, OOBAccessorRegistry & registry);
+void RegisterOOBAccessors(OnOffLoad & device, OOBAccessorRegistry & registry);
 
 } // namespace chip::app
 ```
@@ -416,7 +416,7 @@ In `all-devices-common/device/types/<device-name>/OOBAccessors.cpp`:
 
 ```cpp
 #include "OOBAccessors.h"
-#include "OnOffLight.h"
+#include <device/capabilities/on-off-load/OnOffLoad.h>
 
 #if ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
 #include <oob-accessors/clusters/OnOffOOBAccessor.h>
@@ -424,7 +424,7 @@ In `all-devices-common/device/types/<device-name>/OOBAccessors.cpp`:
 
 namespace chip::app {
 
-void RegisterOOBAccessors(OnOffLight & device, OOBAccessorRegistry & registry)
+void RegisterOOBAccessors(OnOffLoad & device, OOBAccessorRegistry & registry)
 {
 #if ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
     registry.Register(std::make_unique<OnOffOOBAccessor>(device.OnOffCluster(), device.GetEndpointId()));
@@ -507,19 +507,13 @@ source_set("posix") {
 In `DeviceFactory.h` (creator registration):
 
 ```cpp
-RegisterCreator("on-off-light", [this](const std::string & label) -> CreatedDevice {
+RegisterCreator("on-off-light", [this]() {
     VerifyOrDie(mContext.has_value());
-    auto device = std::make_unique<LoggingOnOffLight>(LoggingOnOffLight::Context{
+    return MakeCreatedDevice<LoggingOnOffLight>(LoggingOnOffLight::Context{
         .groupDataProvider = mContext->groupDataProvider,
         .fabricTable       = mContext->fabricTable,
         .timerDelegate     = mContext->timerDelegate,
     });
-    auto * rawDevice = device.get();
-
-    return CreatedDevice{
-        .device = std::move(device),
-        .onDeviceRegistered = MakeOnDeviceRegisteredCallback(rawDevice),
-    };
 });
 ```
 
@@ -549,7 +543,7 @@ for (const auto & entry : AppOptions::GetDeviceTypeEntries())
 }
 
 // 4. Start named pipe listener in POSIX main
-mNamedPipeDispatcher.Start(kDefaultFifoPath);
+PosixNamedPipeDispatcher::Instance().Start(kDefaultFifoPath);
 ```
 
 ---

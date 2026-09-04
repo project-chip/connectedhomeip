@@ -70,7 +70,7 @@ CHIP_ERROR PosixNamedPipeDispatcher::RegisterTranslator(CharSpan actionName,
 
 CHIP_ERROR PosixNamedPipeDispatcher::DispatchJson(const Json::Value & json)
 {
-    if (!json.isMember("Name") || !json["Name"].isString())
+    if (!json.isObject() || !json.isMember("Name") || !json["Name"].isString())
     {
         ChipLogError(AppServer, "PosixNamedPipeDispatcher: Missing or invalid command Name");
         return CHIP_ERROR_INVALID_ARGUMENT;

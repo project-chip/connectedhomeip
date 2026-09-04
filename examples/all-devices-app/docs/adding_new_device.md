@@ -82,7 +82,7 @@ and easy to test:
 
     - For every base device class, implement a corresponding
       "logging-by-default" mock subclass in a dedicated `impl/` subfolder (e.g.,
-      `LoggingMySensorDevice`).
+      `LoggingMySensor`).
     - Use the **self-delegate pattern** where the mock subclass inherits from
       both the base device class and the delegate interfaces, implements the
       callbacks to log to the console, and passes `*this` to the base
@@ -302,14 +302,9 @@ your self-contained **logging mock** in
     ```cpp
     if constexpr (ALL_DEVICES_ENABLE_MY_SENSOR)
     {
-        RegisterCreator("my-sensor", [this](const std::string & label) -> CreatedDevice {
+        RegisterCreator("my-sensor", [this]() {
             VerifyOrDie(mContext.has_value());
-            auto device = std::make_unique<LoggingMySensor>(mContext->timerDelegate);
-            auto * rawDevice = device.get();
-            return CreatedDevice{
-                .device = std::move(device),
-                .onDeviceRegistered = MakeOnDeviceRegisteredCallback(rawDevice),
-            };
+            return MakeCreatedDevice<LoggingMySensor>(mContext->timerDelegate);
         });
     }
     ```
@@ -318,7 +313,7 @@ your self-contained **logging mock** in
     platform main clean._
 
 3. **(Optional) Register Out-of-Band & Named Pipe Support**:
-   - For simulated sensor triggers or external control, implement `OOBAccessors.h/.cpp` (platform-neutral) and `NamedPipes.h/.cpp` (POSIX-only).
+   - For simulated sensor triggers or external control, implement `OOBAccessors.h/.cpp` (platform-neutral) and `NamedPipeTranslators.h/.cpp` (POSIX-only).
    - See [Out-of-Band Control Architecture](design/out_of_band_control.md) for full details and examples.
 
 ---

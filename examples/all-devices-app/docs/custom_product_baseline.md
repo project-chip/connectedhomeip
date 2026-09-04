@@ -84,7 +84,7 @@ public:
 private:
     DefaultAttributePersistenceProvider mAttributePersistence;
     std::unique_ptr<CodeDrivenDataModelProvider> mDataModelProvider;
-    std::unique_ptr<DeviceInterface> mMainLightEndpoint;
+    std::unique_ptr<SingleEndpoint> mMainLightEndpoint;
     DeviceLayer::DefaultTimerDelegate mTimerDelegate;
 };
 

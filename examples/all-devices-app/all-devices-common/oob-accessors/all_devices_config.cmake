@@ -29,3 +29,26 @@ if(NOT CMAKE_BUILD_EARLY_EXPANSION)
         "${CMAKE_CURRENT_BINARY_DIR}/app_config/all_devices_config.h"
     )
 endif()
+
+if(ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS)
+    list(APPEND ALL_DEVICES_DEVICE_SOURCES
+        "${ALL_DEVICES_COMMON_DIR}/oob-accessors/InMemoryOOBAccessorRegistry.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/oob-accessors/clusters/AmbientContextOOBAccessor.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/oob-accessors/clusters/BasicInformationOOBAccessor.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/oob-accessors/clusters/BooleanStateOOBAccessor.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/oob-accessors/clusters/ElectricalEnergyMeasurementOOBAccessor.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/oob-accessors/clusters/OccupancyOOBAccessor.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/oob-accessors/clusters/OnOffOOBAccessor.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/device/types/ambient-context-sensor/OOBAccessors.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/device/types/boolean-state-sensor/OOBAccessors.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/device/types/dimmable-light/OOBAccessors.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/device/types/dimmable-plug-in-unit/OOBAccessors.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-sensor/OOBAccessors.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/device/types/mounted-dimmable-load-control/OOBAccessors.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/device/types/mounted-on-off-control/OOBAccessors.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/device/types/occupancy-sensor/OOBAccessors.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-light/OOBAccessors.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-plug-in-unit/OOBAccessors.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/device/types/root-node/OOBAccessors.cpp"
+    )
+endif()

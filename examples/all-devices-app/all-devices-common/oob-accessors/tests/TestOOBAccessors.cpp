@@ -24,6 +24,7 @@
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <lib/core/TLV.h>
 #include <oob-accessors/InMemoryOOBAccessorRegistry.h>
+#include <oob-accessors/NoopOOBAccessorRegistry.h>
 #include <oob-accessors/clusters/AmbientContextOOBAccessor.h>
 #include <oob-accessors/clusters/BasicInformationOOBAccessor.h>
 #include <oob-accessors/clusters/BooleanStateOOBAccessor.h>
@@ -311,7 +312,7 @@ TEST_F(TestOOBAccessors, AmbientContextOOBAccessor)
 
     EXPECT_EQ(registry.HandleAction("SetPredictedActivity"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
 
-    // 5. SetObjCount
+    // 5. SetObjectCount
     writer.Init(buffer);
     EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(1)), CHIP_NO_ERROR);
@@ -319,7 +320,7 @@ TEST_F(TestOOBAccessors, AmbientContextOOBAccessor)
     EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
-    EXPECT_EQ(registry.HandleAction("SetObjCount"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+    EXPECT_EQ(registry.HandleAction("SetObjectCount"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -411,6 +412,28 @@ TEST_F(TestOOBAccessors, BasicInformationOOBAccessor)
 
     EXPECT_EQ(registry.HandleAction("IncreaseConfigurationVersion"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
 
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestOOBAccessors, NoopRegistryLifecycle)
+{
+    NoopOOBAccessorRegistry noopRegistry;
+    Clusters::OnOffCluster cluster(1, { .timerDelegate = mTimerDelegate });
+    EXPECT_EQ(cluster.Startup(mClusterContext.Get()), CHIP_NO_ERROR);
+    EXPECT_EQ(noopRegistry.Register(std::make_unique<OnOffOOBAccessor>(cluster, 1)), CHIP_NO_ERROR);
+
+    uint8_t buffer[64];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+    TLV::TLVType outer;
+    EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(1)), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(2), true), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+    EXPECT_EQ(noopRegistry.HandleAction("SetOnOff"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_ERROR_NOT_FOUND);
+    noopRegistry.Clear();
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
