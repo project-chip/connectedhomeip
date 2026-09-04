@@ -1692,13 +1692,11 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
                 nullFound = true;
             }
 
-            if (zoneOpt.sensitivity.HasValue())
+            if (mFeatures.Has(Feature::kPerZoneSensitivity))
             {
-                if (!mFeatures.Has(Feature::kPerZoneSensitivity))
+                if (!zoneOpt.sensitivity.HasValue())
                 {
-                    ChipLogError(
-                        Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Zone sensitivity provided without PerZoneSensitivity feature",
-                        mEndpointId);
+                    ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Missing Zone Sensitivity", mEndpointId);
                     handler.AddStatus(commandPath, Status::InvalidCommand);
                     return std::nullopt;
                 }
@@ -1710,6 +1708,14 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
                     handler.AddStatus(commandPath, Status::ConstraintError);
                     return std::nullopt;
                 }
+            }
+            else if (zoneOpt.sensitivity.HasValue())
+            {
+                ChipLogError(Zcl,
+                             "HandleUpdateMotionZoneOptions[ep=%d]: Zone sensitivity provided without PerZoneSensitivity feature",
+                             mEndpointId);
+                handler.AddStatus(commandPath, Status::InvalidCommand);
+                return std::nullopt;
             }
         }
 
