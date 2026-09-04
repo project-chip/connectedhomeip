@@ -202,7 +202,10 @@ bool IsP256AttestationPublicKey(EVP_PKEY * pkey)
     EC_KEY * ecKey = EVP_PKEY_get1_EC_KEY(pkey);
     VerifyOrReturnError(ecKey != nullptr, false);
 
-    const bool isP256 = (EC_GROUP_get_curve_name(EC_KEY_get0_group(ecKey)) == NID_X9_62_prime256v1);
+    // Check if nullptr is returned, in case ecKey does not belong to a group
+    // There is a bigger issue that will need to be made. EC_KEY_free is being deprecated in OpenSSL 3.0 and will be removed in OpenSSL 4.0. The replacement is EVP_PKEY_free, but it is not a drop-in replacement for EC_KEY_free. The code will need to be refactored to use EVP_PKEY_free instead of EC_KEY_free.
+    const EC_GROUP * group = EC_KEY_get0_group(ecKey);
+    const bool isP256      = (group != nullptr && EC_GROUP_get_curve_name(group) == NID_X9_62_prime256v1);
     EC_KEY_free(ecKey);
     return isP256;
 }
