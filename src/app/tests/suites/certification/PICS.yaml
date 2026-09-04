@@ -10321,6 +10321,62 @@ PICS:
       id: EEVSEM.S.M.CAN_MANUALLY_CONTROLLED
 
     #
+    # Thermostat Mode Cluster
+    #
+
+    - label: "Does the device implement the TSTATM cluster as a server?"
+      id: TSTATM.S
+
+    # server / features
+    - label: "Does the device support the CoreModes feature?"
+      id: TSTATM.S.F01
+
+    # server / attributes
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: TSTATM.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: TSTATM.S.A0001
+
+    - label: "Does the device implement the StartUpMode attribute?"
+      id: TSTATM.S.A0002
+
+    - label: "Does the device implement the CoreModeTags attribute?"
+      id: TSTATM.S.A0004
+
+    # server / Commands received
+    - label: "Does the device implement receiving the ChangeToMode command?"
+      id: TSTATM.S.C00.Rsp
+
+    - label:
+          "Does the device implement receiving the ChangeToModeByCoreTag
+          command?"
+      id: TSTATM.S.C02.Rsp
+
+    # server / Commands generated
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: TSTATM.S.C01.Tx
+
+    # Manual controllable
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: TSTATM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label: "Can the mode change be manually controlled?"
+      id: TSTATM.S.M.CAN_MANUALLY_CONTROLLED
+
+    # PIXIT
+    - label:
+          "ID of mode the device will fail to transition to, given its current
+          state"
+      id: PIXIT.TSTATM.MODE_CHANGE_FAIL
+
+    - label:
+          "ID of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.TSTATM.MODE_CHANGE_OK
+
+    #
     # Power Topology Cluster
     #
     - label: "Does the device implement the Power Topology Cluster as a server?"

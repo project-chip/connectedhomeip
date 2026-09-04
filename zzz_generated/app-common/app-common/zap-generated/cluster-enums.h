@@ -156,6 +156,7 @@
 #include <clusters/TemperatureMeasurement/Enums.h>
 #include <clusters/TestHiddenManufacturerSpecific/Enums.h>
 #include <clusters/Thermostat/Enums.h>
+#include <clusters/ThermostatMode/Enums.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/Enums.h>
 #include <clusters/ThreadBorderRouterManagement/Enums.h>
 #include <clusters/ThreadNetworkDiagnostics/Enums.h>

@@ -154,6 +154,7 @@
 #include <clusters/TemperatureMeasurement/CommandIds.h>
 #include <clusters/TestHiddenManufacturerSpecific/CommandIds.h>
 #include <clusters/Thermostat/CommandIds.h>
+#include <clusters/ThermostatMode/CommandIds.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/CommandIds.h>
 #include <clusters/ThreadBorderRouterManagement/CommandIds.h>
 #include <clusters/ThreadNetworkDiagnostics/CommandIds.h>

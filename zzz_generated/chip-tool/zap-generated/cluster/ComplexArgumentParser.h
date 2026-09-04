@@ -364,6 +364,16 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ScenesManagemen
 
 static void Finalize(chip::app::Clusters::ScenesManagement::Structs::SceneInfoStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ThermostatMode::Structs::ModeTagStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ThermostatMode::Structs::ModeTagStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ThermostatMode::Structs::ModeOptionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ThermostatMode::Structs::ModeOptionStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Groupcast::Structs::MembershipStruct::Type & request,
                         Json::Value & value);
 

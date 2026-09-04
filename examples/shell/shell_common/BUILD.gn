@@ -89,6 +89,7 @@ static_library("shell_common") {
       "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
       "${chip_root}/examples/all-clusters-app/all-clusters-common/src/tcc-mode.cpp",
       "${chip_root}/examples/all-clusters-app/all-clusters-common/src/test-hidden-manufacturer-specific-stub.cpp",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/thermostat-mode-stub.cpp",
     ]
 
     include_dirs =

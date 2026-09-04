@@ -143,6 +143,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "RvcOperationalState";
     case chip::app::Clusters::ScenesManagement::Id:
         return "ScenesManagement";
+    case chip::app::Clusters::ThermostatMode::Id:
+        return "ThermostatMode";
     case chip::app::Clusters::Groupcast::Id:
         return "Groupcast";
     case chip::app::Clusters::HepaFilterMonitoring::Id:
@@ -2110,6 +2112,31 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::ScenesManagement::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::ScenesManagement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ThermostatMode::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ThermostatMode::Attributes::SupportedModes::Id:
+            return "SupportedModes";
+        case chip::app::Clusters::ThermostatMode::Attributes::CurrentMode::Id:
+            return "CurrentMode";
+        case chip::app::Clusters::ThermostatMode::Attributes::StartUpMode::Id:
+            return "StartUpMode";
+        case chip::app::Clusters::ThermostatMode::Attributes::CoreModeTags::Id:
+            return "CoreModeTags";
+        case chip::app::Clusters::ThermostatMode::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ThermostatMode::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ThermostatMode::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ThermostatMode::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ThermostatMode::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -6158,6 +6185,17 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::ThermostatMode::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ThermostatMode::Commands::ChangeToMode::Id:
+            return "ChangeToMode";
+        case chip::app::Clusters::ThermostatMode::Commands::ChangeToModeByCoreTag::Id:
+            return "ChangeToModeByCoreTag";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::Groupcast::Id: {
         switch (id)
         {
@@ -7479,6 +7517,15 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "GetSceneMembershipResponse";
         case chip::app::Clusters::ScenesManagement::Commands::CopySceneResponse::Id:
             return "CopySceneResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ThermostatMode::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ThermostatMode::Commands::ChangeToModeResponse::Id:
+            return "ChangeToModeResponse";
         default:
             return "Unknown";
         }

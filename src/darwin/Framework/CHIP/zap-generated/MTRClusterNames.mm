@@ -195,6 +195,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeScenesManagementID:
         result = @"ScenesManagement";
         break;
+    case MTRClusterIDTypeThermostatModeID:
+        result = @"ThermostatMode";
+        break;
     case MTRClusterIDTypeGroupcastID:
         result = @"Groupcast";
         break;
@@ -3818,6 +3821,54 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         default:
             // Not a known ScenesManagement attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeThermostatModeID:
+
+        switch (attributeID) {
+
+            // Cluster ThermostatMode attributes
+        case MTRAttributeIDTypeClusterThermostatModeAttributeSupportedModesID:
+            result = @"SupportedModes";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatModeAttributeCurrentModeID:
+            result = @"CurrentMode";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatModeAttributeStartUpModeID:
+            result = @"StartUpMode";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatModeAttributeCoreModeTagsID:
+            result = @"CoreModeTags";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatModeAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatModeAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatModeAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatModeAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatModeAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known ThermostatMode attribute.
             result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
             break;
         }
@@ -11703,6 +11754,24 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeThermostatModeID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterThermostatModeCommandChangeToModeID:
+            result = @"ChangeToMode";
+            break;
+
+        case MTRCommandIDTypeClusterThermostatModeCommandChangeToModeByCoreTagID:
+            result = @"ChangeToModeByCoreTag";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeGroupcastID:
 
         switch (commandID) {
@@ -14695,6 +14764,20 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeThermostatModeID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterThermostatModeCommandChangeToModeResponseID:
+            result = @"ChangeToModeResponse";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeGroupcastID:
 
         switch (commandID) {
@@ -16835,6 +16918,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         break;
 
     case MTRClusterIDTypeScenesManagementID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeThermostatModeID:
 
         switch (eventID) {
 

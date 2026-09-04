@@ -225,6 +225,12 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ScenesManagement::Structs::SceneInfoStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::ThermostatMode::Structs::ModeTagStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::ThermostatMode::Structs::ModeOptionStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Groupcast::Structs::MembershipStruct::DecodableType & value);
 
 static CHIP_ERROR
@@ -1251,6 +1257,8 @@ LogValue(const char * label, size_t indent,
          const chip::app::Clusters::ScenesManagement::Commands::GetSceneMembershipResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ScenesManagement::Commands::CopySceneResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::ThermostatMode::Commands::ChangeToModeResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Groupcast::Commands::LeaveGroupResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
