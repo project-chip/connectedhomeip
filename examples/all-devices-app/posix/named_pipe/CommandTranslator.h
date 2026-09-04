@@ -42,7 +42,7 @@ public:
      * @param registry Target registry to dispatch the translated action.
      */
     virtual CHIP_ERROR TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
-                                            OOBAccessorRegistry & registry) const = 0;
+                                           OOBAccessorRegistry & registry) const = 0;
 
     static std::optional<bool> ExtractBool(const Json::Value & json, const char * key)
     {

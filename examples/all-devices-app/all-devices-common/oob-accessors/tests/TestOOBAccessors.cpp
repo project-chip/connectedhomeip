@@ -452,7 +452,7 @@ public:
     }
     bool HandleAddArea(uint32_t areaId, std::optional<uint32_t> mapId, std::optional<CharSpan> locationName) override
     {
-        mLastAreaId = areaId;
+        mLastAreaId    = areaId;
         mLastAreaMapId = mapId;
         if (locationName.has_value())
         {
@@ -471,7 +471,7 @@ public:
     uint32_t mLastMapId = 0;
     std::string mLastMapName;
     uint32_t mLastRemovedMapId = 0;
-    uint32_t mLastAreaId = 0;
+    uint32_t mLastAreaId       = 0;
     std::optional<uint32_t> mLastAreaMapId;
     std::optional<std::string> mLastLocationName;
     uint32_t mLastRemovedAreaId = 0;

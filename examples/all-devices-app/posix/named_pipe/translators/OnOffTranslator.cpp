@@ -19,7 +19,7 @@
 namespace chip::app::NamedPipe {
 
 CHIP_ERROR OnOffTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
-                                               OOBAccessorRegistry & registry) const
+                                                OOBAccessorRegistry & registry) const
 {
     auto onOff = ExtractBool(json, "OnOff");
     VerifyOrReturnError(onOff.has_value(), CHIP_ERROR_INVALID_ARGUMENT);

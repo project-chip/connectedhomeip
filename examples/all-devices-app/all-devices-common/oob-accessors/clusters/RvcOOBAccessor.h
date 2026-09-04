@@ -53,9 +53,7 @@ public:
 class RvcOOBAccessor : public OOBAccessor
 {
 public:
-    RvcOOBAccessor(RvcSimulationDelegate & delegate, EndpointId endpointId) :
-        mDelegate(delegate), mEndpointId(endpointId)
-    {}
+    RvcOOBAccessor(RvcSimulationDelegate & delegate, EndpointId endpointId) : mDelegate(delegate), mEndpointId(endpointId) {}
 
     std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) override;
 

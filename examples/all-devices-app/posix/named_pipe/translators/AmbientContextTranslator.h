@@ -35,8 +35,7 @@ public:
         return Span<const CharSpan>(kNames);
     }
 
-    CHIP_ERROR TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
-                                   OOBAccessorRegistry & registry) const override;
+    CHIP_ERROR TranslateAndExecute(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry) const override;
 
 private:
     CHIP_ERROR TranslateSetAmbientContextSupport(EndpointId endpointId, const Json::Value & json,
