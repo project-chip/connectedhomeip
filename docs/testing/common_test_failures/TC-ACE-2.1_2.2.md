@@ -1,8 +1,15 @@
 ## TC-ACE-2.1,2.2
 
-These tests both test that the attributes on the device enforce proper permissions for reads and writes. Because privilege enforcement for SDK cluster attributes are normally handled in common SDK code, it is uncommon to see a true failure on clusters that are tested in the CI. However, failure here are possible for new clusters, where it's possible for the access to be set incorrectly.
+These tests both test that the attributes on the device enforce proper
+permissions for reads and writes. Because privilege enforcement for SDK cluster
+attributes are normally handled in common SDK code, it is uncommon to see a true
+failure on clusters that are tested in the CI. However, failure here are
+possible for new clusters, where it's possible for the access to be set
+incorrectly.
 
-Timeouts are also possible on this test. Because both tests test every access privilege for every attribute on the device, the time required to run the test depends on the number of attributes and the network conditions.
+Timeouts are also possible on this test. Because both tests test every access
+privilege for every attribute on the device, the time required to run the test
+depends on the number of attributes and the network conditions.
 
 <table>
   <tr>

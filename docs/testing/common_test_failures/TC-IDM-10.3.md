@@ -1,7 +1,8 @@
 ## TC-IDM-10.3
 
-This is a test for cluster revision conformance. It uses the spec data model XML files as the spec ground truth for cluster revisions, and checks all standard clusters on all endpoints.
-
+This is a test for cluster revision conformance. It uses the spec data model XML
+files as the spec ground truth for cluster revisions, and checks all standard
+clusters on all endpoints.
 
 <table>
   <tr>

@@ -1,7 +1,7 @@
 ## TC-DA-1.7
 
-This test verifies that the DUTs are correctly following all the requirements for the Device Attestation certificate chain.
-
+This test verifies that the DUTs are correctly following all the requirements
+for the Device Attestation certificate chain.
 
 <table>
   <tr>
@@ -42,4 +42,3 @@ Either this means the company has used a single DAC for all its products, or the
    </td>
   </tr>
 </table>
-

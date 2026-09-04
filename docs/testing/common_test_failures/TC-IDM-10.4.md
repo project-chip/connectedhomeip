@@ -1,16 +1,21 @@
-
 ## TC-IDM-10.4
 
-This test ensures that the submitted PICS for an endpoint exactly matches the reported element on the endpoint.
+This test ensures that the submitted PICS for an endpoint exactly matches the
+reported element on the endpoint.
 
-PICS XML files are set per endpoint, and need to include all of the clusters on the endpoint.
-
+PICS XML files are set per endpoint, and need to include all of the clusters on
+the endpoint.
 
 ### Tooling
 
-Here are some resources that can help with PICS setting, or for narrowing down errors on this test:
+Here are some resources that can help with PICS setting, or for narrowing down
+errors on this test:
 
-PICS generator - this tool will fill in the PICS for all the elements reported on the device. Note that this is not a complete PICS for the device, as there are numerous PICS related to things like manual test ability etc. that cannot be determined from the device. However, it is a good starting point to ease the PICS selection process and ensure an exact match for device elements.
+PICS generator - this tool will fill in the PICS for all the elements reported
+on the device. Note that this is not a complete PICS for the device, as there
+are numerous PICS related to things like manual test ability etc. that cannot be
+determined from the device. However, it is a good starting point to ease the
+PICS selection process and ensure an exact match for device elements.
 
 [https://github.com/project-chip/connectedhomeip/tree/master/src/tools/PICS-generator](https://github.com/project-chip/connectedhomeip/tree/master/src/tools/PICS-generator)
 
@@ -18,13 +23,14 @@ Device graph - visual representation of the device endpoints in graph form
 
 [https://github.com/project-chip/connectedhomeip/tree/master/src/tools/device-graph](https://github.com/project-chip/connectedhomeip/tree/master/src/tools/device-graph)
 
-Device minimal representation -  Shows the smallest set of optional elements that fully describe the device. Can be used to get a quick understanding of what is actually implemented. This is written as a python test, and it runs the device conformance test before outputting anything.
+Device minimal representation - Shows the smallest set of optional elements that
+fully describe the device. Can be used to get a quick understanding of what is
+actually implemented. This is written as a python test, and it runs the device
+conformance test before outputting anything.
 
 [https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/MinimalRepresentation.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/MinimalRepresentation.py)
 
-
 ### Problems
-
 
 <table>
   <tr>
@@ -71,4 +77,3 @@ Device minimal representation -  Shows the smallest set of optional elements tha
     </td>
    </tr>
 </table>
-

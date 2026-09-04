@@ -1,7 +1,8 @@
-
 ## TC-IDM-10.2
 
-This is a test of device conformance. It uses the spec data model XML files as the spec ground truth and checks for standard feature, attribute and command conformance for all standard clusters on all endpoints.
+This is a test of device conformance. It uses the spec data model XML files as
+the spec ground truth and checks for standard feature, attribute and command
+conformance for all standard clusters on all endpoints.
 
 <table>
   <tr>
