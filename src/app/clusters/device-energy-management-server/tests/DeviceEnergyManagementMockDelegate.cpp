@@ -16,6 +16,7 @@
 
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementCluster.h>
 #include <app/clusters/device-energy-management-server/tests/DeviceEnergyManagementMockDelegate.h>
+#include <system/SystemClock.h>
 
 namespace chip {
 namespace app {
@@ -171,6 +172,59 @@ Protocols::InteractionModel::Status DeviceEnergyManagementMockDelegate::CancelRe
     return Protocols::InteractionModel::Status::Success;
 }
 
+Protocols::InteractionModel::Status
+DeviceEnergyManagementMockDelegate::PowerRangeAdjustRequest(const DataModel::Nullable<int64_t> minPower,
+                                                            const DataModel::Nullable<int64_t> maxPower, const uint32_t duration,
+                                                            AdjustmentCauseEnum cause)
+{
+    // Create and set the PowerRangeAdjustment attribute
+    Structs::PowerRangeAdjustStruct::Type powerRangeAdjustment;
+    powerRangeAdjustment.minPower = minPower;
+    powerRangeAdjustment.maxPower = maxPower;
+
+    // Map cause to PowerAdjustReasonEnum
+    switch (cause)
+    {
+    case AdjustmentCauseEnum::kLocalOptimization:
+        powerRangeAdjustment.cause = PowerAdjustReasonEnum::kLocalOptimizationAdjustment;
+        break;
+    case AdjustmentCauseEnum::kGridOptimization:
+        powerRangeAdjustment.cause = PowerAdjustReasonEnum::kGridOptimizationAdjustment;
+        break;
+    default:
+        return Protocols::InteractionModel::Status::Failure;
+    }
+
+    // Set endTime as absolute epoch time (current time + duration in seconds)
+    uint32_t currentTimeS = 0;
+    if (chip::System::Clock::GetClock_MatterEpochS(currentTimeS) == CHIP_NO_ERROR)
+    {
+        powerRangeAdjustment.endTime = currentTimeS + duration;
+    }
+    else
+    {
+        // Fallback: use duration directly if clock is unavailable
+        powerRangeAdjustment.endTime = duration;
+    }
+    mPowerRangeAdjustment.SetNonNull(powerRangeAdjustment);
+
+    // Only update state after successful validation
+    mESAState = ESAStateEnum::kPowerAdjustActive;
+
+    return Protocols::InteractionModel::Status::Success;
+}
+
+Protocols::InteractionModel::Status DeviceEnergyManagementMockDelegate::CancelPowerRangeAdjustRequest()
+{
+    // Reset ESAState to Online
+    mESAState = ESAStateEnum::kOnline;
+
+    // Clear PowerRangeAdjustment attribute
+    mPowerRangeAdjustment.SetNull();
+
+    return Protocols::InteractionModel::Status::Success;
+}
+
 ESATypeEnum DeviceEnergyManagementMockDelegate::GetESAType()
 {
     return mESAType;
@@ -210,6 +264,11 @@ DeviceEnergyManagementMockDelegate::GetPowerAdjustmentCapability()
 const DataModel::Nullable<Structs::ForecastStruct::Type> & DeviceEnergyManagementMockDelegate::GetForecast()
 {
     return mForecast;
+}
+
+const DataModel::Nullable<Structs::PowerRangeAdjustStruct::Type> & DeviceEnergyManagementMockDelegate::GetPowerRangeAdjustment()
+{
+    return mPowerRangeAdjustment;
 }
 
 CHIP_ERROR DeviceEnergyManagementMockDelegate::SetESAState(ESAStateEnum state)
