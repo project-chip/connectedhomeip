@@ -19,11 +19,11 @@
 #include <string>
 #include <vector>
 
-#include <posix/named_pipe/NamedPipeCommandTranslator.h>
+#include <posix/named_pipe/CommandTranslator.h>
 
-namespace chip::app {
+namespace chip::app::NamedPipe {
 
-class OnOffTranslator : public NamedPipeCommandTranslator
+class OnOffTranslator : public CommandTranslator
 {
 public:
     static Span<const CharSpan> GetActionNames()
@@ -35,4 +35,4 @@ public:
     CHIP_ERROR TranslateAndExecute(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry) override;
 };
 
-} // namespace chip::app
+} // namespace chip::app::NamedPipe

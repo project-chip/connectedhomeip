@@ -16,12 +16,20 @@
 
 #include <posix/named_pipe/translators/BasicInformationTranslator.h>
 
-namespace chip::app {
+namespace chip::app::NamedPipe {
 
 CHIP_ERROR BasicInformationTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
                                                            OOBAccessorRegistry & registry)
 {
-    return DispatchAction(registry, "IncreaseConfigurationVersion"_span, endpointId);
+    if (json.isMember("Name") && json["Name"].isString())
+    {
+        std::string actionName = json["Name"].asString();
+        if (actionName == "IncreaseConfigurationVersion" || actionName == "SimulateConfigurationVersionChange")
+        {
+            return DispatchAction(registry, "IncreaseConfigurationVersion"_span, endpointId);
+        }
+    }
+    return CHIP_ERROR_NOT_FOUND;
 }
 
-} // namespace chip::app
+} // namespace chip::app::NamedPipe

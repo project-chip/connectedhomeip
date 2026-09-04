@@ -29,7 +29,7 @@ executable("all-devices-app") {
 
   sources = [
     "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/OOBAccessorHook.h",
-    "${chip_root}/examples/all-devices-app/posix/named_pipe/NamedPipeHook.h",
+    "${chip_root}/examples/all-devices-app/posix/named_pipe/Hook.h",
     "PosixAudioManager.cpp",
     "PosixChime.cpp",
     "PosixSpeaker.cpp",

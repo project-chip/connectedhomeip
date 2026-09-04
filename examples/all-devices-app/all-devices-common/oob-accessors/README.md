@@ -31,12 +31,12 @@ classDiagram
     class BooleanStateCluster {
     }
 
-    class PosixNamedPipeDispatcher {
+    class NamedPipeDispatcher["NamedPipe::Dispatcher"] {
         +DispatchJson(json: Json::Value) CHIP_ERROR
     }
 
     OOBAccessorRegistry "1" *-- "many" OOBAccessor
     BooleanStateOOBAccessor --|> OOBAccessor
     BooleanStateOOBAccessor "1" --> "1" BooleanStateCluster : references
-    PosixNamedPipeDispatcher --> OOBAccessorRegistry : uses
+    NamedPipeDispatcher --> OOBAccessorRegistry : uses
 ```

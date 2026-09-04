@@ -89,7 +89,7 @@ namespace chip::app {
  *
  * - When no hooks are needed (e.g. resource-constrained embedded targets), use @ref SimpleDeviceFactory
  *   (`DeviceFactory<>`). In this mode, `MakeOnDeviceRegisteredCallback` compiles to a no-op returning `nullptr`.
- * - When one or more hooks are supplied (e.g. `DeviceFactory<OOBAccessorHook, NamedPipeHook>`), each hook's
+ * - When one or more hooks are supplied (e.g. `DeviceFactory<OOBAccessorHook, NamedPipe::Hook>`), each hook's
  *   static `OnDeviceRegistered(*device)` method is invoked in order via C++17 fold expressions once the device is created.
  *
  * ### Lifecycle & Data Flow
@@ -97,7 +97,7 @@ namespace chip::app {
  * ```
  * +-------------------------------------------------------------------------+
  * | 1. Initialize Context (Main / Startup)                                  |
- * |    using AppFactory = DeviceFactory<OOBAccessorHook, NamedPipeHook>;    |
+ * |    using AppFactory = DeviceFactory<OOBAccessorHook, NamedPipe::Hook>;  |
  * |    AppFactory::GetInstance().Init(context);                             |
  * +-------------------------------------------------------------------------+
  *                                    |
@@ -106,7 +106,7 @@ namespace chip::app {
  * | 2. Instantiate Device                                                   |
  * |    auto created = AppFactory::GetInstance().Create(deviceTypeArg);      |
  * |    // created.device -> std::unique_ptr<DeviceInterface>                |
- * |    // created.onDeviceRegistered -> static hook fold invoker      |
+ * |    // created.onDeviceRegistered -> static hook fold invoker            |
  * +-------------------------------------------------------------------------+
  *                                    |
  *                                    v
@@ -118,9 +118,9 @@ namespace chip::app {
  *                                    v
  * +-------------------------------------------------------------------------+
  * | 4. Invoke Post-Registration Hooks                                       |
- * |    if (created.onDeviceRegistered) {                              |
- * |        created.onDeviceRegistered();                              |
- * |        // Calls (Hooks::OnDeviceRegistered(*concreteDevice), ...)                 |
+ * |    if (created.onDeviceRegistered) {                                    |
+ * |        created.onDeviceRegistered();                                    |
+ * |        // Calls (Hooks::OnDeviceRegistered(*concreteDevice), ...)       |
  * |    }                                                                    |
  * +-------------------------------------------------------------------------+
  * ```
@@ -137,7 +137,7 @@ namespace chip::app {
  *
  * POSIX (With OOB Accessors and Named Pipes):
  * @code
- * using PosixFactory = chip::app::DeviceFactory<OOBAccessorHook, NamedPipeHook>;
+ * using PosixFactory = chip::app::DeviceFactory<OOBAccessorHook, NamedPipe::Hook>;
  * PosixFactory::GetInstance().Init(context);
  * auto created = PosixFactory::GetInstance().Create("ambient-context-sensor");
  * created.device->Register(allocator, dataModelProvider);
@@ -171,6 +171,11 @@ public:
     struct CreatedDevice
     {
         std::unique_ptr<DeviceInterface> device;
+        /**
+         * @brief Executes registered static hooks for the concrete device.
+         * @warning Must be invoked while @ref device remains alive (immediately after
+         *          calling device->Register(...)).
+         */
         std::function<void()> onDeviceRegistered;
     };
 

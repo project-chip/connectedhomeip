@@ -19,11 +19,11 @@
 #include <string>
 #include <vector>
 
-#include <posix/named_pipe/NamedPipeCommandTranslator.h>
+#include <posix/named_pipe/CommandTranslator.h>
 
-namespace chip::app {
+namespace chip::app::NamedPipe {
 
-class OccupancyTranslator : public NamedPipeCommandTranslator
+class OccupancyTranslator : public CommandTranslator
 {
 public:
     static Span<const CharSpan> GetActionNames()
@@ -39,4 +39,4 @@ private:
     CHIP_ERROR TranslateSetHoldTime(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry) const;
 };
 
-} // namespace chip::app
+} // namespace chip::app::NamedPipe

@@ -17,10 +17,10 @@
 #pragma once
 
 #include <device/types/root-node/RootNode.h>
-#include <posix/named_pipe/PosixNamedPipeDispatcher.h>
+#include <posix/named_pipe/Dispatcher.h>
 
 namespace chip::app {
 
-void RegisterNamedPipeTranslators(RootNode & device, PosixNamedPipeDispatcher & dispatcher);
+void RegisterNamedPipeTranslators(RootNode & device, NamedPipe::Dispatcher & dispatcher);
 
 } // namespace chip::app

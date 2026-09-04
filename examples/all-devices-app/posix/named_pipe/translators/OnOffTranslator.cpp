@@ -16,7 +16,7 @@
 
 #include <posix/named_pipe/translators/OnOffTranslator.h>
 
-namespace chip::app {
+namespace chip::app::NamedPipe {
 
 CHIP_ERROR OnOffTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry)
 {
@@ -25,4 +25,4 @@ CHIP_ERROR OnOffTranslator::TranslateAndExecute(EndpointId endpointId, const Jso
     return DispatchAction(registry, "SetOnOff"_span, endpointId, *onOff);
 }
 
-} // namespace chip::app
+} // namespace chip::app::NamedPipe

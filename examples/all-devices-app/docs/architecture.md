@@ -157,7 +157,7 @@ sequenceDiagram
       no hooks, used by embedded targets (ESP32, SiLabs, Telink) to minimize
       binary footprint.
     - **`PosixDeviceFactory`**
-      (`DeviceFactory<OOBAccessorHook, NamedPipeHook>`): Specialized for POSIX,
+      (`DeviceFactory<OOBAccessorHook, NamedPipe::Hook>`): Specialized for POSIX,
       dynamically registering OOB cluster accessors and named pipe JSON
       translators only for instantiated devices.
 3. **Creation & Registration Lifecycle**:

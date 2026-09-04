@@ -16,7 +16,7 @@
 
 #include <posix/named_pipe/translators/OccupancyTranslator.h>
 
-namespace chip::app {
+namespace chip::app::NamedPipe {
 
 CHIP_ERROR OccupancyTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry)
 {
@@ -48,4 +48,4 @@ CHIP_ERROR OccupancyTranslator::TranslateSetHoldTime(EndpointId endpointId, cons
     return DispatchAction(registry, "SetHoldTime"_span, endpointId, *holdTime);
 }
 
-} // namespace chip::app
+} // namespace chip::app::NamedPipe

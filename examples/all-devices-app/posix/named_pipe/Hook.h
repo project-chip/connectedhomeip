@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <posix/named_pipe/PosixNamedPipeDispatcher.h>
+#include <posix/named_pipe/Dispatcher.h>
 #include <type_traits>
 
 #include <device/types/ambient-context-sensor/NamedPipeTranslators.h>
@@ -31,7 +31,7 @@
 #include <device/types/on-off-plug-in-unit/NamedPipeTranslators.h>
 #include <device/types/root-node/NamedPipeTranslators.h>
 
-namespace chip::app {
+namespace chip::app::NamedPipe {
 
 namespace detail {
 
@@ -42,14 +42,14 @@ struct HasNamedPipeTranslators : std::false_type
 
 template <typename T>
 struct HasNamedPipeTranslators<
-    T, std::void_t<decltype(RegisterNamedPipeTranslators(std::declval<T &>(), std::declval<PosixNamedPipeDispatcher &>()))>>
+    T, std::void_t<decltype(RegisterNamedPipeTranslators(std::declval<T &>(), std::declval<Dispatcher &>()))>>
     : std::true_type
 {
 };
 
 } // namespace detail
 
-class NamedPipeHook
+class Hook
 {
 public:
     template <typename TDevice>
@@ -57,9 +57,9 @@ public:
     {
         if constexpr (detail::HasNamedPipeTranslators<TDevice>::value)
         {
-            RegisterNamedPipeTranslators(device, PosixNamedPipeDispatcher::Instance());
+            RegisterNamedPipeTranslators(device, Dispatcher::Instance());
         }
     }
 };
 
-} // namespace chip::app
+} // namespace chip::app::NamedPipe

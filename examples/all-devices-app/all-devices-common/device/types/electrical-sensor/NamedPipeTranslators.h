@@ -17,10 +17,10 @@
 #pragma once
 
 #include <device/types/electrical-sensor/ElectricalSensor.h>
-#include <posix/named_pipe/PosixNamedPipeDispatcher.h>
+#include <posix/named_pipe/Dispatcher.h>
 
 namespace chip::app {
 
-void RegisterNamedPipeTranslators(ElectricalSensor & device, PosixNamedPipeDispatcher & dispatcher);
+void RegisterNamedPipeTranslators(ElectricalSensor & device, NamedPipe::Dispatcher & dispatcher);
 
 } // namespace chip::app

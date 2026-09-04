@@ -19,11 +19,11 @@
 #include <string>
 #include <vector>
 
-#include <posix/named_pipe/NamedPipeCommandTranslator.h>
+#include <posix/named_pipe/CommandTranslator.h>
 
-namespace chip::app {
+namespace chip::app::NamedPipe {
 
-class AmbientContextTranslator : public NamedPipeCommandTranslator
+class AmbientContextTranslator : public CommandTranslator
 {
 public:
     static Span<const CharSpan> GetActionNames()
@@ -48,4 +48,4 @@ private:
     CHIP_ERROR TranslateSetObjectCount(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry) const;
 };
 
-} // namespace chip::app
+} // namespace chip::app::NamedPipe

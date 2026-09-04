@@ -106,8 +106,8 @@ and easy to test:
 
 ### The Header (`MySensor.h`)
 
-Derive your class from `SingleEndpoint` (or `EndpointDevice` if managing
-sub-endpoints). Require all mandatory delegates as references in the constructor
+Derive your class from `SingleEndpoint` (or `DeviceInterface` if managing
+composite / multi-endpoint devices). Require all mandatory delegates as references in the constructor
 and declare public getters to expose the underlying clusters:
 
 ```cpp
@@ -321,7 +321,7 @@ your self-contained **logging mock** in
     - Include `<device/types/<name>/OOBAccessors.h>` in
       `all-devices-common/oob-accessors/OOBAccessorHook.h` and
       `<device/types/<name>/NamedPipeTranslators.h>` in
-      `posix/named_pipe/NamedPipeHook.h` so the SFINAE detection hooks
+      `posix/named_pipe/Hook.h` so the SFINAE detection hooks
       (`HasOOBAccessors`, `HasNamedPipeTranslators`) discover the registration
       overloads at compile-time.
     - See [Out-of-Band Control Architecture](design/out_of_band_control.md) for

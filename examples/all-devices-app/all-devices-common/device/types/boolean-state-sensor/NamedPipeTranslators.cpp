@@ -19,9 +19,9 @@
 
 namespace chip::app {
 
-void RegisterNamedPipeTranslators(BooleanStateSensor & device, PosixNamedPipeDispatcher & dispatcher)
+void RegisterNamedPipeTranslators(BooleanStateSensor & device, NamedPipe::Dispatcher & dispatcher)
 {
-    LogErrorOnFailure(dispatcher.EnsureTranslatorRegistered<BooleanStateTranslator>());
+    LogErrorOnFailure(dispatcher.EnsureTranslatorRegistered<NamedPipe::BooleanStateTranslator>());
 }
 
 } // namespace chip::app

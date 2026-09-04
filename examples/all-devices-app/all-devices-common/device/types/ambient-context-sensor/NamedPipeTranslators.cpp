@@ -19,9 +19,9 @@
 
 namespace chip::app {
 
-void RegisterNamedPipeTranslators(AmbientContextSensor & device, PosixNamedPipeDispatcher & dispatcher)
+void RegisterNamedPipeTranslators(AmbientContextSensor & device, NamedPipe::Dispatcher & dispatcher)
 {
-    LogErrorOnFailure(dispatcher.EnsureTranslatorRegistered<AmbientContextTranslator>());
+    LogErrorOnFailure(dispatcher.EnsureTranslatorRegistered<NamedPipe::AmbientContextTranslator>());
 }
 
 } // namespace chip::app

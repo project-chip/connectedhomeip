@@ -17,10 +17,10 @@
 #pragma once
 
 #include <device/types/ambient-context-sensor/AmbientContextSensor.h>
-#include <posix/named_pipe/PosixNamedPipeDispatcher.h>
+#include <posix/named_pipe/Dispatcher.h>
 
 namespace chip::app {
 
-void RegisterNamedPipeTranslators(AmbientContextSensor & device, PosixNamedPipeDispatcher & dispatcher);
+void RegisterNamedPipeTranslators(AmbientContextSensor & device, NamedPipe::Dispatcher & dispatcher);
 
 } // namespace chip::app

@@ -19,7 +19,7 @@
 #include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 
-namespace chip::app {
+namespace chip::app::NamedPipe {
 
 namespace {
 
@@ -32,8 +32,8 @@ CHIP_ERROR EncodeSemanticTagList(TLV::TLVWriter & writer, TLV::Tag tag, const Js
         const Json::Value & item = actArray[i];
         VerifyOrReturnError(item.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
-        auto typeIdOpt = NamedPipeCommandTranslator::ExtractUInt<uint8_t>(item, "TypeId");
-        auto tagIdOpt  = NamedPipeCommandTranslator::ExtractUInt<uint8_t>(item, "TagId");
+        auto typeIdOpt = CommandTranslator::ExtractUInt<uint8_t>(item, "TypeId");
+        auto tagIdOpt  = CommandTranslator::ExtractUInt<uint8_t>(item, "TagId");
         VerifyOrReturnError(typeIdOpt.has_value() && tagIdOpt.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
 
         TLV::TLVType structType;
@@ -111,7 +111,7 @@ CHIP_ERROR AmbientContextTranslator::TranslateAddAmbientContextDetect(EndpointId
     if (json.isMember("DetectionConfidence"))
     {
         auto confOpt = ExtractUInt<uint8_t>(json, "DetectionConfidence");
-        VerifyOrReturnError(confOpt.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(confOpt.has_value() && *confOpt <= 100, CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(3), *confOpt));
     }
 
@@ -205,4 +205,4 @@ CHIP_ERROR AmbientContextTranslator::TranslateSetObjectCount(EndpointId endpoint
     return DispatchAction(registry, "SetObjectCount"_span, endpointId, *objectCount);
 }
 
-} // namespace chip::app
+} // namespace chip::app::NamedPipe

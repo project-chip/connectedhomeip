@@ -17,10 +17,10 @@
 #pragma once
 
 #include <device/types/mounted-dimmable-load-control/MountedDimmableLoadControl.h>
-#include <posix/named_pipe/PosixNamedPipeDispatcher.h>
+#include <posix/named_pipe/Dispatcher.h>
 
 namespace chip::app {
 
-void RegisterNamedPipeTranslators(MountedDimmableLoadControl & device, PosixNamedPipeDispatcher & dispatcher);
+void RegisterNamedPipeTranslators(MountedDimmableLoadControl & device, NamedPipe::Dispatcher & dispatcher);
 
 } // namespace chip::app

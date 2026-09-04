@@ -108,9 +108,9 @@ examples/all-devices-app/
 └── posix/
     └── named_pipe/
         ├── BUILD.gn                                    # GN rules for POSIX dispatcher & translators
-        ├── NamedPipeCommandTranslator.h                # Base interface: TranslateAndExecute(endpointId, json, registry)
-        ├── NamedPipeHook.h                             # Static named pipe translator registration hook for DeviceFactory
-        ├── PosixNamedPipeDispatcher.h/.cpp             # POSIX pipe listener & JSON command router
+        ├── CommandTranslator.h                         # Base interface: TranslateAndExecute(endpointId, json, registry)
+        ├── Dispatcher.h/.cpp                           # POSIX pipe listener & JSON command router
+        ├── Hook.h                                      # Static named pipe translator registration hook for DeviceFactory
         └── translators/
             └── <Command>Translator.h/.cpp              # Command-specific JSON-to-TLV translators
 ```
@@ -241,12 +241,12 @@ public:
 } // namespace chip::app
 ```
 
-### `NamedPipeHook` Class
+### `NamedPipe::Hook` Class
 
 ```cpp
-namespace chip::app {
+namespace chip::app::NamedPipe {
 
-class NamedPipeHook
+class Hook
 {
 public:
     template <typename TDevice>
@@ -254,25 +254,25 @@ public:
     {
         if constexpr (detail::HasNamedPipeTranslators<TDevice>::value)
         {
-            RegisterNamedPipeTranslators(device, PosixNamedPipeDispatcher::Instance());
+            RegisterNamedPipeTranslators(device, Dispatcher::Instance());
         }
     }
 };
 
-} // namespace chip::app
+} // namespace chip::app::NamedPipe
 ```
 
-### `NamedPipeCommandTranslator` Interface
+### `NamedPipe::CommandTranslator` Interface
 
 ```cpp
-namespace chip::app {
+namespace chip::app::NamedPipe {
 
 class OOBAccessorRegistry;
 
-class NamedPipeCommandTranslator
+class CommandTranslator
 {
 public:
-    virtual ~NamedPipeCommandTranslator() = default;
+    virtual ~CommandTranslator() = default;
 
     /**
      * @brief Translates a JSON payload into TLV and executes the action via OOBAccessorRegistry.
@@ -283,28 +283,28 @@ public:
     virtual CHIP_ERROR TranslateAndExecute(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry) = 0;
 };
 
-} // namespace chip::app
+} // namespace chip::app::NamedPipe
 ```
 
-### `PosixNamedPipeDispatcher` Interface
+### `NamedPipe::Dispatcher` Interface
 
 ```cpp
-namespace chip::app {
+namespace chip::app::NamedPipe {
 
-class PosixNamedPipeDispatcher
+class Dispatcher
 {
 public:
-    static PosixNamedPipeDispatcher & Instance();
+    static Dispatcher & Instance();
 
-    explicit PosixNamedPipeDispatcher(OOBAccessorRegistry & oobRegistry) :
+    explicit Dispatcher(OOBAccessorRegistry & oobRegistry) :
         mOobRegistry(oobRegistry) {}
-    ~PosixNamedPipeDispatcher();
+    ~Dispatcher() override;
 
     CHIP_ERROR Start(const char * fifoPath);
     CHIP_ERROR Stop();
 
     bool HasTranslator(CharSpan actionName) const;
-    CHIP_ERROR RegisterTranslator(CharSpan actionName, std::shared_ptr<NamedPipeCommandTranslator> translator);
+    CHIP_ERROR RegisterTranslator(CharSpan actionName, std::shared_ptr<CommandTranslator> translator);
 
     /**
      * @brief Registers a translator if not already present, registering all action names exposed by TranslatorType.
@@ -345,10 +345,10 @@ public:
 
 private:
     OOBAccessorRegistry & mOobRegistry;
-    std::unordered_map<std::string, std::shared_ptr<NamedPipeCommandTranslator>> mTranslators;
+    std::unordered_map<std::string, std::shared_ptr<CommandTranslator>> mTranslators;
 };
 
-} // namespace chip::app
+} // namespace chip::app::NamedPipe
 ```
 
 ---
@@ -360,7 +360,7 @@ private:
 ```mermaid
 sequenceDiagram
     participant Pipe as Named Pipe
-    participant Disp as Posix Named Pipe Dispatcher
+    participant Disp as NamedPipe::Dispatcher
     participant Trans as Command Translator
     participant Reg as OOB Accessor Registry
     participant Accessor as Cluster OOB Accessor
@@ -382,10 +382,10 @@ sequenceDiagram
         "OnOff": true
     }
     ```
-2.  **Dispatch**: `PosixNamedPipeDispatcher` reads pipe, parses JSON, and
+2.  **Dispatch**: `NamedPipe::Dispatcher` reads pipe, parses JSON, and
     extracts `"Name"` and `"EndpointId"`.
 3.  **Translation**: Dispatcher invokes
-    `OnOffTranslator::TranslateAndExecute(endpointId, json, mOobRegistry)`:
+    `NamedPipe::OnOffTranslator::TranslateAndExecute(endpointId, json, mOobRegistry)`:
     -   Extracts `OnOff = true`.
     -   Encodes flat TLV payload:
         -   Tag 1: `EndpointId` (`uint16_t`)
@@ -400,7 +400,7 @@ sequenceDiagram
 >
 > **Thread Safety & Stack Synchronization**: The POSIX named pipe listener runs
 > on a background worker thread. When a command is received,
-> `PosixNamedPipeDispatcher` synchronizes execution onto the Matter event loop
+> `NamedPipe::Dispatcher` synchronizes execution onto the Matter event loop
 > via `chip::DeviceLayer::PlatformMgr().ScheduleWork(...)` or acquires
 > `chip::DeviceLayer::PlatformMgr().LockChipStack()` before invoking
 > `HandleAction` on `OOBAccessorRegistry`.
@@ -450,11 +450,11 @@ In `all-devices-common/device/types/<device-name>/NamedPipeTranslators.h`:
 ```cpp
 #pragma once
 #include <device/capabilities/on-off-load/OnOffLoad.h>
-#include <posix/named_pipe/PosixNamedPipeDispatcher.h>
+#include <posix/named_pipe/Dispatcher.h>
 
 namespace chip::app {
 
-void RegisterNamedPipeTranslators(OnOffLoad & device, PosixNamedPipeDispatcher & dispatcher);
+void RegisterNamedPipeTranslators(OnOffLoad & device, NamedPipe::Dispatcher & dispatcher);
 
 } // namespace chip::app
 ```
@@ -467,9 +467,9 @@ In `all-devices-common/device/types/<device-name>/NamedPipeTranslators.cpp`:
 
 namespace chip::app {
 
-void RegisterNamedPipeTranslators(OnOffLoad & device, PosixNamedPipeDispatcher & dispatcher)
+void RegisterNamedPipeTranslators(OnOffLoad & device, NamedPipe::Dispatcher & dispatcher)
 {
-    LogErrorOnFailure(dispatcher.EnsureTranslatorRegistered<OnOffTranslator>());
+    LogErrorOnFailure(dispatcher.EnsureTranslatorRegistered<NamedPipe::OnOffTranslator>());
 }
 
 } // namespace chip::app
@@ -529,7 +529,7 @@ In application initialization (`posix/main.cpp` and embedded setup):
 
 ```cpp
 // In posix/main.cpp:
-using PosixDeviceFactory = DeviceFactory<OOBAccessorHook, NamedPipeHook>;
+using PosixDeviceFactory = DeviceFactory<OOBAccessorHook, NamedPipe::Hook>;
 
 for (const auto & entry : AppOptions::GetDeviceTypeEntries())
 {
@@ -551,7 +551,7 @@ for (const auto & entry : AppOptions::GetDeviceTypeEntries())
 }
 
 // 4. Start named pipe listener in POSIX main
-PosixNamedPipeDispatcher::Instance().Start(kDefaultFifoPath);
+NamedPipe::Dispatcher::Instance().Start(kDefaultFifoPath);
 ```
 
 ---

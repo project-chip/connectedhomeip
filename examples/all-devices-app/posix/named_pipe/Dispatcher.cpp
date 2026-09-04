@@ -14,74 +14,74 @@
  *    limitations under the License.
  */
 
-#include <posix/named_pipe/PosixNamedPipeDispatcher.h>
+#include <posix/named_pipe/Dispatcher.h>
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
 
-namespace chip::app {
+namespace chip::app::NamedPipe {
 
 namespace {
 
 struct CommandContext
 {
     Json::Value json;
-    PosixNamedPipeDispatcher * dispatcher;
+    Dispatcher * dispatcher;
 };
 
 } // namespace
 
-PosixNamedPipeDispatcher & PosixNamedPipeDispatcher::Instance()
+Dispatcher & Dispatcher::Instance()
 {
-    static PosixNamedPipeDispatcher instance(OOBAccessorRegistry::Instance());
+    static Dispatcher instance(OOBAccessorRegistry::Instance());
     return instance;
 }
 
-PosixNamedPipeDispatcher::~PosixNamedPipeDispatcher()
+Dispatcher::~Dispatcher()
 {
     LogErrorOnFailure(Stop());
 }
 
-CHIP_ERROR PosixNamedPipeDispatcher::Start(const char * fifoPath)
+CHIP_ERROR Dispatcher::Start(const char * fifoPath)
 {
     VerifyOrReturnError(fifoPath != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     return mNamedPipeCommands.Start(fifoPath, this);
 }
 
-CHIP_ERROR PosixNamedPipeDispatcher::Stop()
+CHIP_ERROR Dispatcher::Stop()
 {
     return mNamedPipeCommands.Stop();
 }
 
-bool PosixNamedPipeDispatcher::HasTranslator(CharSpan actionName) const
+bool Dispatcher::HasTranslator(CharSpan actionName) const
 {
     return mTranslators.find(std::string(actionName.data(), actionName.size())) != mTranslators.end();
 }
 
-CHIP_ERROR PosixNamedPipeDispatcher::RegisterTranslator(CharSpan actionName, std::shared_ptr<NamedPipeCommandTranslator> translator)
+CHIP_ERROR Dispatcher::RegisterTranslator(CharSpan actionName, std::shared_ptr<CommandTranslator> translator)
 {
     VerifyOrReturnError(translator != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mTranslators[std::string(actionName.data(), actionName.size())] = std::move(translator);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PosixNamedPipeDispatcher::DispatchJson(const Json::Value & json)
+CHIP_ERROR Dispatcher::DispatchJson(const Json::Value & json)
 {
     if (!json.isObject() || !json.isMember("Name") || !json["Name"].isString())
     {
-        ChipLogError(AppServer, "PosixNamedPipeDispatcher: Missing or invalid command Name");
+        ChipLogError(AppServer, "NamedPipe::Dispatcher: Missing or invalid command Name");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     EndpointId targetEndpoint = kRootEndpointId;
     if (json.isMember("EndpointId"))
     {
-        auto endpointId = NamedPipeCommandTranslator::ExtractUInt<EndpointId>(json, "EndpointId");
+        auto endpointId = CommandTranslator::ExtractUInt<EndpointId>(json, "EndpointId");
         if (!endpointId.has_value())
         {
-            ChipLogError(AppServer, "PosixNamedPipeDispatcher: Invalid EndpointId format");
+            ChipLogError(AppServer, "NamedPipe::Dispatcher: Invalid EndpointId format");
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         targetEndpoint = *endpointId;
@@ -91,26 +91,26 @@ CHIP_ERROR PosixNamedPipeDispatcher::DispatchJson(const Json::Value & json)
     auto it                = mTranslators.find(actionName);
     if (it == mTranslators.end())
     {
-        ChipLogError(AppServer, "PosixNamedPipeDispatcher: Unhandled action: %s", actionName.c_str());
+        ChipLogError(AppServer, "NamedPipe::Dispatcher: Unhandled action: %s", actionName.c_str());
         return CHIP_ERROR_NOT_FOUND;
     }
 
     CHIP_ERROR err = it->second->TranslateAndExecute(targetEndpoint, json, mOobRegistry);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "PosixNamedPipeDispatcher: Failed to execute action %s on endpoint %u: %" CHIP_ERROR_FORMAT,
+        ChipLogError(AppServer, "NamedPipe::Dispatcher: Failed to execute action %s on endpoint %u: %" CHIP_ERROR_FORMAT,
                      actionName.c_str(), targetEndpoint, err.Format());
     }
     return err;
 }
 
-void PosixNamedPipeDispatcher::OnEventCommandReceived(const char * json)
+void Dispatcher::OnEventCommandReceived(const char * json)
 {
     Json::Reader reader;
     Json::Value value;
     if (!reader.parse(json, value))
     {
-        ChipLogError(AppServer, "PosixNamedPipeDispatcher: Failed to parse JSON command: %s",
+        ChipLogError(AppServer, "NamedPipe::Dispatcher: Failed to parse JSON command: %s",
                      reader.getFormattedErrorMessages().c_str());
         return;
     }
@@ -118,7 +118,7 @@ void PosixNamedPipeDispatcher::OnEventCommandReceived(const char * json)
     auto * context = Platform::New<CommandContext>();
     if (context == nullptr)
     {
-        ChipLogError(AppServer, "PosixNamedPipeDispatcher: Memory allocation failed for command context");
+        ChipLogError(AppServer, "NamedPipe::Dispatcher: Memory allocation failed for command context");
         return;
     }
     context->json       = std::move(value);
@@ -127,12 +127,12 @@ void PosixNamedPipeDispatcher::OnEventCommandReceived(const char * json)
     CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(DispatchCommand, reinterpret_cast<intptr_t>(context));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "PosixNamedPipeDispatcher: Failed to schedule work: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(AppServer, "NamedPipe::Dispatcher: Failed to schedule work: %" CHIP_ERROR_FORMAT, err.Format());
         Platform::Delete(context);
     }
 }
 
-void PosixNamedPipeDispatcher::DispatchCommand(intptr_t context)
+void Dispatcher::DispatchCommand(intptr_t context)
 {
     auto * cmd = reinterpret_cast<CommandContext *>(context);
     if (cmd != nullptr)
@@ -142,4 +142,4 @@ void PosixNamedPipeDispatcher::DispatchCommand(intptr_t context)
     }
 }
 
-} // namespace chip::app
+} // namespace chip::app::NamedPipe

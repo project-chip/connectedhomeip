@@ -16,7 +16,7 @@
 
 #include <posix/named_pipe/translators/BooleanStateTranslator.h>
 
-namespace chip::app {
+namespace chip::app::NamedPipe {
 
 CHIP_ERROR BooleanStateTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
                                                        OOBAccessorRegistry & registry)
@@ -34,4 +34,4 @@ CHIP_ERROR BooleanStateTranslator::TranslateAndExecute(EndpointId endpointId, co
     return DispatchAction(registry, "SetBooleanState"_span, endpointId, *newState);
 }
 
-} // namespace chip::app
+} // namespace chip::app::NamedPipe

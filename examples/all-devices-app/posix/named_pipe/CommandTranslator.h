@@ -28,12 +28,12 @@
 #include <lib/support/Span.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
 
-namespace chip::app {
+namespace chip::app::NamedPipe {
 
-class NamedPipeCommandTranslator
+class CommandTranslator
 {
 public:
-    virtual ~NamedPipeCommandTranslator() = default;
+    virtual ~CommandTranslator() = default;
 
     /**
      * @brief Translates a JSON payload into TLV and executes the action via OOBAccessorRegistry.
@@ -53,7 +53,11 @@ public:
         {
             return json[key].asBool();
         }
-        if (json[key].isInt64() || json[key].isUInt64())
+        if (json[key].isUInt64())
+        {
+            return json[key].asUInt64() != 0;
+        }
+        if (json[key].isInt64())
         {
             return json[key].asInt64() != 0;
         }
@@ -109,4 +113,4 @@ public:
     }
 };
 
-} // namespace chip::app
+} // namespace chip::app::NamedPipe

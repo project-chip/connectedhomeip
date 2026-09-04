@@ -51,8 +51,8 @@
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
-#include <posix/named_pipe/NamedPipeHook.h>
-#include <posix/named_pipe/PosixNamedPipeDispatcher.h>
+#include <posix/named_pipe/Dispatcher.h>
+#include <posix/named_pipe/Hook.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <system/SystemLayer.h>
 
@@ -71,7 +71,7 @@ using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters;
 using namespace chip::ArgParser;
 
-using PosixDeviceFactory = DeviceFactory<OOBAccessorHook, NamedPipeHook>;
+using PosixDeviceFactory = DeviceFactory<OOBAccessorHook, NamedPipe::Hook>;
 
 void ApplicationShutdown();
 
@@ -196,7 +196,7 @@ public:
         {
             auto created = PosixDeviceFactory::GetInstance().Create(entry.type, entry.label);
 
-            VerifyOrReturnError(created.device, CHIP_ERROR_NO_MEMORY);
+            VerifyOrReturnError(created.device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
             ChipLogProgress(AppServer, "Registering device %s on endpoint %u with parent 0x%04X", entry.type.c_str(),
                             entry.endpoint, entry.parentId);
             if (entry.endpoint != kInvalidEndpointId)
@@ -243,11 +243,11 @@ private:
 
 void SetupNamedPipe(const char * namedPipePath)
 {
-    CHIP_ERROR err = PosixNamedPipeDispatcher::Instance().Start(namedPipePath);
+    CHIP_ERROR err = NamedPipe::Dispatcher::Instance().Start(namedPipePath);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to start named pipe at %s: %" CHIP_ERROR_FORMAT, namedPipePath, err.Format());
-        LogErrorOnFailure(PosixNamedPipeDispatcher::Instance().Stop());
+        LogErrorOnFailure(NamedPipe::Dispatcher::Instance().Stop());
     }
 }
 
@@ -444,7 +444,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     }
     gMainLoopImplementation = nullptr;
 
-    LogErrorOnFailure(PosixNamedPipeDispatcher::Instance().Stop());
+    LogErrorOnFailure(NamedPipe::Dispatcher::Instance().Stop());
     devices.Shutdown();
 
     Server::GetInstance().Shutdown();

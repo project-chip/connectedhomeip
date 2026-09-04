@@ -16,7 +16,7 @@
 
 #include <posix/named_pipe/translators/ElectricalEnergyMeasurementTranslator.h>
 
-namespace chip::app {
+namespace chip::app::NamedPipe {
 
 CHIP_ERROR ElectricalEnergyMeasurementTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
                                                                       OOBAccessorRegistry & registry)
@@ -24,4 +24,4 @@ CHIP_ERROR ElectricalEnergyMeasurementTranslator::TranslateAndExecute(EndpointId
     return DispatchAction(registry, "GenerateElectricalEnergyMeasurementSnapshots"_span, endpointId);
 }
 
-} // namespace chip::app
+} // namespace chip::app::NamedPipe

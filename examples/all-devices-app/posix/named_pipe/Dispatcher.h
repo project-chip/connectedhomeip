@@ -25,17 +25,17 @@
 #include <json/json.h>
 #include <lib/core/CHIPError.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
-#include <posix/named_pipe/NamedPipeCommandTranslator.h>
+#include <posix/named_pipe/CommandTranslator.h>
 
-namespace chip::app {
+namespace chip::app::NamedPipe {
 
-class PosixNamedPipeDispatcher : public NamedPipeCommandDelegate
+class Dispatcher : public NamedPipeCommandDelegate
 {
 public:
-    static PosixNamedPipeDispatcher & Instance();
+    static Dispatcher & Instance();
 
-    explicit PosixNamedPipeDispatcher(OOBAccessorRegistry & oobRegistry) : mOobRegistry(oobRegistry) {}
-    ~PosixNamedPipeDispatcher() override;
+    explicit Dispatcher(OOBAccessorRegistry & oobRegistry) : mOobRegistry(oobRegistry) {}
+    ~Dispatcher() override;
 
     /**
      * @brief Starts listening on the named pipe FIFO.
@@ -56,7 +56,7 @@ public:
     /**
      * @brief Registers a command translator instance under the specified action name.
      */
-    CHIP_ERROR RegisterTranslator(CharSpan actionName, std::shared_ptr<NamedPipeCommandTranslator> translator);
+    CHIP_ERROR RegisterTranslator(CharSpan actionName, std::shared_ptr<CommandTranslator> translator);
 
     /**
      * @brief Registers a translator if not already present, registering all action names exposed by TranslatorType.
@@ -106,7 +106,7 @@ private:
 
     OOBAccessorRegistry & mOobRegistry;
     NamedPipeCommands mNamedPipeCommands;
-    std::unordered_map<std::string, std::shared_ptr<NamedPipeCommandTranslator>> mTranslators;
+    std::unordered_map<std::string, std::shared_ptr<CommandTranslator>> mTranslators;
 };
 
-} // namespace chip::app
+} // namespace chip::app::NamedPipe

@@ -17,10 +17,10 @@
 #pragma once
 
 #include <device/types/on-off-plug-in-unit/OnOffPlugInUnit.h>
-#include <posix/named_pipe/PosixNamedPipeDispatcher.h>
+#include <posix/named_pipe/Dispatcher.h>
 
 namespace chip::app {
 
-void RegisterNamedPipeTranslators(OnOffPlugInUnit & device, PosixNamedPipeDispatcher & dispatcher);
+void RegisterNamedPipeTranslators(OnOffPlugInUnit & device, NamedPipe::Dispatcher & dispatcher);
 
 } // namespace chip::app

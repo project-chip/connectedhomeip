@@ -18,9 +18,9 @@ import("//build_overrides/jsoncpp.gni")
 
 source_set("named_pipe") {
   sources = [
-    "NamedPipeCommandTranslator.h",
-    "PosixNamedPipeDispatcher.cpp",
-    "PosixNamedPipeDispatcher.h",
+    "CommandTranslator.h",
+    "Dispatcher.cpp",
+    "Dispatcher.h",
     "translators/AmbientContextTranslator.cpp",
     "translators/AmbientContextTranslator.h",
     "translators/BasicInformationTranslator.cpp",

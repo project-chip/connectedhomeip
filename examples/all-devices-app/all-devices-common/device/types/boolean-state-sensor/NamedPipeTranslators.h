@@ -17,10 +17,10 @@
 #pragma once
 
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
-#include <posix/named_pipe/PosixNamedPipeDispatcher.h>
+#include <posix/named_pipe/Dispatcher.h>
 
 namespace chip::app {
 
-void RegisterNamedPipeTranslators(BooleanStateSensor & device, PosixNamedPipeDispatcher & dispatcher);
+void RegisterNamedPipeTranslators(BooleanStateSensor & device, NamedPipe::Dispatcher & dispatcher);
 
 } // namespace chip::app
