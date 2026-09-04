@@ -109,7 +109,7 @@ CHIP_ERROR EnergyEvseInit(chip::EndpointId endpointId)
         BitMask<EnergyEvse::OptionalAttributes, uint32_t>(EnergyEvse::OptionalAttributes::kSupportsUserMaximumChargingCurrent,
                                                           EnergyEvse::OptionalAttributes::kSupportsRandomizationWindow,
                                                           EnergyEvse::OptionalAttributes::kSupportsApproximateEvEfficiency),
-        BitMask<EnergyEvse::OptionalCommands, uint32_t>(EnergyEvse::OptionalCommands::kSupportsStartDiagnostics));
+        EnergyEvseCluster::OptionalCommandSet().Set<EnergyEvse::Commands::StartDiagnostics::Id>());
 
     if (!gEvseInstance)
     {

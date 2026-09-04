@@ -41937,6 +41937,27 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                     newElement_0_frequencyBandClassName.c_str(), newElement_0_frequencyBandCtorSignature.c_str(),
                     jninewElement_0_frequencyBand, newElement_0_frequencyBand);
+                jobject newElement_0_bandwidth;
+                std::string newElement_0_bandwidthClassName     = "java/lang/Long";
+                std::string newElement_0_bandwidthCtorSignature = "(J)V";
+                jlong jninewElement_0_bandwidth                 = static_cast<jlong>(entry_0.bandwidth.Raw());
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    newElement_0_bandwidthClassName.c_str(), newElement_0_bandwidthCtorSignature.c_str(), jninewElement_0_bandwidth,
+                    newElement_0_bandwidth);
+                jobject newElement_0_supportedRangingRoles;
+                std::string newElement_0_supportedRangingRolesClassName     = "java/lang/Integer";
+                std::string newElement_0_supportedRangingRolesCtorSignature = "(I)V";
+                jint jninewElement_0_supportedRangingRoles = static_cast<jint>(entry_0.supportedRangingRoles.Raw());
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_supportedRangingRolesClassName.c_str(), newElement_0_supportedRangingRolesCtorSignature.c_str(),
+                    jninewElement_0_supportedRangingRoles, newElement_0_supportedRangingRoles);
+                jobject newElement_0_RDRCapability;
+                std::string newElement_0_RDRCapabilityClassName     = "java/lang/Integer";
+                std::string newElement_0_RDRCapabilityCtorSignature = "(I)V";
+                jint jninewElement_0_RDRCapability                  = static_cast<jint>(entry_0.RDRCapability);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_RDRCapabilityClassName.c_str(), newElement_0_RDRCapabilityCtorSignature.c_str(),
+                    jninewElement_0_RDRCapability, newElement_0_RDRCapability);
                 jobject newElement_0_periodicRangingSupport;
                 std::string newElement_0_periodicRangingSupportClassName     = "java/lang/Boolean";
                 std::string newElement_0_periodicRangingSupportCtorSignature = "(Z)V";
@@ -41944,6 +41965,26 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
                     newElement_0_periodicRangingSupportClassName.c_str(), newElement_0_periodicRangingSupportCtorSignature.c_str(),
                     jninewElement_0_periodicRangingSupport, newElement_0_periodicRangingSupport);
+                jobject newElement_0_maxConcurrentSessions;
+                if (!entry_0.maxConcurrentSessions.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr,
+                                                                                               newElement_0_maxConcurrentSessions);
+                }
+                else
+                {
+                    jobject newElement_0_maxConcurrentSessionsInsideOptional;
+                    std::string newElement_0_maxConcurrentSessionsInsideOptionalClassName     = "java/lang/Integer";
+                    std::string newElement_0_maxConcurrentSessionsInsideOptionalCtorSignature = "(I)V";
+                    jint jninewElement_0_maxConcurrentSessionsInsideOptional =
+                        static_cast<jint>(entry_0.maxConcurrentSessions.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        newElement_0_maxConcurrentSessionsInsideOptionalClassName.c_str(),
+                        newElement_0_maxConcurrentSessionsInsideOptionalCtorSignature.c_str(),
+                        jninewElement_0_maxConcurrentSessionsInsideOptional, newElement_0_maxConcurrentSessionsInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        newElement_0_maxConcurrentSessionsInsideOptional, newElement_0_maxConcurrentSessions);
+                }
 
                 {
                     jclass rangingCapabilitiesStructStructClass_1;
@@ -41959,7 +42000,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     jmethodID rangingCapabilitiesStructStructCtor_1;
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, rangingCapabilitiesStructStructClass_1, "<init>",
-                        "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Boolean;)V", &rangingCapabilitiesStructStructCtor_1);
+                        "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/"
+                        "Boolean;Ljava/util/Optional;)V",
+                        &rangingCapabilitiesStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || rangingCapabilitiesStructStructCtor_1 == nullptr)
                     {
                         ChipLogError(Zcl,
@@ -41967,9 +42010,10 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         return nullptr;
                     }
 
-                    newElement_0 =
-                        env->NewObject(rangingCapabilitiesStructStructClass_1, rangingCapabilitiesStructStructCtor_1,
-                                       newElement_0_technology, newElement_0_frequencyBand, newElement_0_periodicRangingSupport);
+                    newElement_0 = env->NewObject(rangingCapabilitiesStructStructClass_1, rangingCapabilitiesStructStructCtor_1,
+                                                  newElement_0_technology, newElement_0_frequencyBand, newElement_0_bandwidth,
+                                                  newElement_0_supportedRangingRoles, newElement_0_RDRCapability,
+                                                  newElement_0_periodicRangingSupport, newElement_0_maxConcurrentSessions);
                 }
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
@@ -42062,26 +42106,157 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            if (cppValue.IsNull())
-            {
-                value = nullptr;
-            }
-            else
-            {
-                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(value);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(value);
 
-                auto iter_value_1 = cppValue.Value().begin();
-                while (iter_value_1.Next())
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Integer";
+                std::string newElement_0CtorSignature = "(I)V";
+                jint jninewElement_0                  = static_cast<jint>(entry_0);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), jninewElement_0, newElement_0);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::RangingConstraints::Id: {
+            using TypeInfo = Attributes::RangingConstraints::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                jobject newElement_0_technology;
+                std::string newElement_0_technologyClassName     = "java/lang/Integer";
+                std::string newElement_0_technologyCtorSignature = "(I)V";
+                jint jninewElement_0_technology                  = static_cast<jint>(entry_0.technology);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_technologyClassName.c_str(), newElement_0_technologyCtorSignature.c_str(),
+                    jninewElement_0_technology, newElement_0_technology);
+                jobject newElement_0_role;
+                std::string newElement_0_roleClassName     = "java/lang/Integer";
+                std::string newElement_0_roleCtorSignature = "(I)V";
+                jint jninewElement_0_role                  = static_cast<jint>(entry_0.role);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_roleClassName.c_str(), newElement_0_roleCtorSignature.c_str(), jninewElement_0_role,
+                    newElement_0_role);
+                jobject newElement_0_enabled;
+                if (!entry_0.enabled.HasValue())
                 {
-                    auto & entry_1 = iter_value_1.GetValue();
-                    jobject newElement_1;
-                    std::string newElement_1ClassName     = "java/lang/Integer";
-                    std::string newElement_1CtorSignature = "(I)V";
-                    jint jninewElement_1                  = static_cast<jint>(entry_1);
-                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                        newElement_1ClassName.c_str(), newElement_1CtorSignature.c_str(), jninewElement_1, newElement_1);
-                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_1);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_enabled);
                 }
+                else
+                {
+                    jobject newElement_0_enabledInsideOptional;
+                    std::string newElement_0_enabledInsideOptionalClassName     = "java/lang/Boolean";
+                    std::string newElement_0_enabledInsideOptionalCtorSignature = "(Z)V";
+                    jboolean jninewElement_0_enabledInsideOptional              = static_cast<jboolean>(entry_0.enabled.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
+                        newElement_0_enabledInsideOptionalClassName.c_str(),
+                        newElement_0_enabledInsideOptionalCtorSignature.c_str(), jninewElement_0_enabledInsideOptional,
+                        newElement_0_enabledInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(newElement_0_enabledInsideOptional,
+                                                                                               newElement_0_enabled);
+                }
+                jobject newElement_0_minRangingInterval;
+                if (!entry_0.minRangingInterval.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr,
+                                                                                               newElement_0_minRangingInterval);
+                }
+                else
+                {
+                    jobject newElement_0_minRangingIntervalInsideOptional;
+                    std::string newElement_0_minRangingIntervalInsideOptionalClassName     = "java/lang/Long";
+                    std::string newElement_0_minRangingIntervalInsideOptionalCtorSignature = "(J)V";
+                    jlong jninewElement_0_minRangingIntervalInsideOptional = static_cast<jlong>(entry_0.minRangingInterval.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        newElement_0_minRangingIntervalInsideOptionalClassName.c_str(),
+                        newElement_0_minRangingIntervalInsideOptionalCtorSignature.c_str(),
+                        jninewElement_0_minRangingIntervalInsideOptional, newElement_0_minRangingIntervalInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        newElement_0_minRangingIntervalInsideOptional, newElement_0_minRangingInterval);
+                }
+                jobject newElement_0_maxSessionDuration;
+                if (!entry_0.maxSessionDuration.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr,
+                                                                                               newElement_0_maxSessionDuration);
+                }
+                else
+                {
+                    jobject newElement_0_maxSessionDurationInsideOptional;
+                    std::string newElement_0_maxSessionDurationInsideOptionalClassName     = "java/lang/Long";
+                    std::string newElement_0_maxSessionDurationInsideOptionalCtorSignature = "(J)V";
+                    jlong jninewElement_0_maxSessionDurationInsideOptional = static_cast<jlong>(entry_0.maxSessionDuration.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        newElement_0_maxSessionDurationInsideOptionalClassName.c_str(),
+                        newElement_0_maxSessionDurationInsideOptionalCtorSignature.c_str(),
+                        jninewElement_0_maxSessionDurationInsideOptional, newElement_0_maxSessionDurationInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        newElement_0_maxSessionDurationInsideOptional, newElement_0_maxSessionDuration);
+                }
+                jobject newElement_0_maxRangingInstances;
+                if (!entry_0.maxRangingInstances.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr,
+                                                                                               newElement_0_maxRangingInstances);
+                }
+                else
+                {
+                    jobject newElement_0_maxRangingInstancesInsideOptional;
+                    std::string newElement_0_maxRangingInstancesInsideOptionalClassName     = "java/lang/Integer";
+                    std::string newElement_0_maxRangingInstancesInsideOptionalCtorSignature = "(I)V";
+                    jint jninewElement_0_maxRangingInstancesInsideOptional = static_cast<jint>(entry_0.maxRangingInstances.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        newElement_0_maxRangingInstancesInsideOptionalClassName.c_str(),
+                        newElement_0_maxRangingInstancesInsideOptionalCtorSignature.c_str(),
+                        jninewElement_0_maxRangingInstancesInsideOptional, newElement_0_maxRangingInstancesInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        newElement_0_maxRangingInstancesInsideOptional, newElement_0_maxRangingInstances);
+                }
+
+                {
+                    jclass rangingConstraintStructStructClass_1;
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                        env, "chip/devicecontroller/ChipStructs$ProximityRangingClusterRangingConstraintStruct",
+                        rangingConstraintStructStructClass_1);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(Zcl, "Could not find class ChipStructs$ProximityRangingClusterRangingConstraintStruct");
+                        return nullptr;
+                    }
+
+                    jmethodID rangingConstraintStructStructCtor_1;
+                    err = chip::JniReferences::GetInstance().FindMethod(
+                        env, rangingConstraintStructStructClass_1, "<init>",
+                        "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/"
+                        "util/Optional;)V",
+                        &rangingConstraintStructStructCtor_1);
+                    if (err != CHIP_NO_ERROR || rangingConstraintStructStructCtor_1 == nullptr)
+                    {
+                        ChipLogError(Zcl, "Could not find ChipStructs$ProximityRangingClusterRangingConstraintStruct constructor");
+                        return nullptr;
+                    }
+
+                    newElement_0 = env->NewObject(rangingConstraintStructStructClass_1, rangingConstraintStructStructCtor_1,
+                                                  newElement_0_technology, newElement_0_role, newElement_0_enabled,
+                                                  newElement_0_minRangingInterval, newElement_0_maxSessionDuration,
+                                                  newElement_0_maxRangingInstances);
+                }
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }

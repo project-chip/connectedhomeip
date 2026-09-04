@@ -38,11 +38,19 @@ public:
     {}
     ~Instance() { Shutdown(); }
 
+    Instance(const Instance &)             = delete;
+    Instance(Instance &&)                  = delete;
+    Instance & operator=(const Instance &) = delete;
+    Instance & operator=(Instance &&)      = delete;
+
     CHIP_ERROR Init();
     void Shutdown();
 
+    ElectricalAlarmCluster & Cluster() { return mCluster.Cluster(); }
+
 private:
     RegisteredServerCluster<ElectricalAlarmCluster> mCluster;
+    bool mRegistered = false;
 };
 
 } // namespace ElectricalAlarm

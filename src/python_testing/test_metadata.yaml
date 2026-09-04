@@ -26,6 +26,42 @@ not_automated:
           Electrical Alarm (0x00A1) server is not yet implemented in any example
           app, so the script cannot exercise the DUT. Remove this entry once the
           Electrical Alarm server is integrated into a real example app.
+    - name: TC_COMPRO_2_1.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
+    - name: TC_COMPRO_2_2.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
+    - name: TC_COMPRO_2_3.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
+    - name: TC_COMPRO_2_4.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
+    - name: TC_COMPRO_2_5.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
+    - name: TC_COMPRO_2_6.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
+    - name: TC_COMPRO_2_7.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
+    - name: TC_COMPRO_2_8.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
+    - name: TC_COMPRO_2_9.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
     - name: TC_DD_3_23.py
       reason:
           NFC Reader needed for running this test-case and CI does not support
