@@ -33,6 +33,12 @@ struct CommandContext
 
 } // namespace
 
+PosixNamedPipeDispatcher & PosixNamedPipeDispatcher::Instance()
+{
+    static PosixNamedPipeDispatcher instance(OOBAccessorRegistry::Instance());
+    return instance;
+}
+
 PosixNamedPipeDispatcher::~PosixNamedPipeDispatcher()
 {
     LogErrorOnFailure(Stop());

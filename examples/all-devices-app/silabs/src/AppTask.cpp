@@ -196,7 +196,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     chip::app::ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
     ReturnErrorOnFailure(sRootNode->Register(rootAllocator, *sDataModelProvider));
 
-    chip::app::DeviceFactory::GetInstance().Init(chip::app::DeviceFactory::Context{
+    chip::app::SimpleDeviceFactory::GetInstance().Init(chip::app::SimpleDeviceFactory::Context{
         .groupDataProvider        = *groupDataProvider,
         .fabricTable              = chip::Server::GetInstance().GetFabricTable(),
         .timerDelegate            = sTimerDelegate,
@@ -209,7 +209,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         .testEventTriggerDelegate = sTestEventTriggerDelegate,
     });
 
-    auto & deviceFactory = chip::app::DeviceFactory::GetInstance();
+    auto & deviceFactory = chip::app::SimpleDeviceFactory::GetInstance();
 
     ConsecutiveEndpointIdAllocator allocator(kDeviceEndpointId);
 
@@ -219,11 +219,15 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
             ChipLogError(AppServer, "Invalid device type: %s", type.c_str());
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        auto device = deviceFactory.Create(type);
-        VerifyOrReturnError(device != nullptr, CHIP_ERROR_NO_MEMORY);
-        ReturnErrorOnFailure(device->Register(allocator, *sDataModelProvider));
+        auto created = deviceFactory.Create(type);
+        VerifyOrReturnError(created.device != nullptr, CHIP_ERROR_NO_MEMORY);
+        ReturnErrorOnFailure(created.device->Register(allocator, *sDataModelProvider));
+        if (created.onDeviceRegistered)
+        {
+            created.onDeviceRegistered();
+        }
         ChipLogProgress(AppServer, "Registered device type '%s'", type.c_str());
-        sConstructedDevices.push_back(std::move(device));
+        sConstructedDevices.push_back(std::move(created.device));
         return CHIP_NO_ERROR;
     };
 

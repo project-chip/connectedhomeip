@@ -123,15 +123,36 @@ classDiagram
 
 ### The Device Factory
 
-The `DeviceFactory` singleton acts as the central device creator.
+The `DeviceFactory<typename... Hooks>` template class acts as the central device creator and post-registration dispatcher:
 
-1. When a particular device type is enabled during the build, its static
-   self-registering factory macro executes at startup.
-2. The factory maintains an internal map of string keys (e.g.,
-   `"occupancy-sensor"`) to creation callbacks.
-3. During boot, the application parses command-line device types and calls
-   `DeviceFactory::CreateDevice(...)` to instantiate the specified runtime
-   devices.
+```mermaid
+sequenceDiagram
+    participant App as Application / main()
+    participant Factory as DeviceFactory<Hooks...>
+    participant Device as Concrete Device
+    participant Provider as CodeDrivenDataModelProvider
+    participant Hook as Registered Hooks
+
+    App->>Factory: Create(deviceType, label)
+    Factory->>Device: new ConcreteDevice(...)
+    Factory-->>App: CreatedDevice { device, onDeviceRegistered }
+
+    App->>Device: Register(endpointIdAllocator, Provider)
+    Device->>Provider: AddEndpoint / AddCluster (assigns EndpointId)
+    Device-->>App: CHIP_NO_ERROR
+
+    App->>Factory: onDeviceRegistered()
+    Factory->>Hook: (Hooks::OnDeviceRegistered(*device), ...)
+```
+
+1. **Factory Registration**: Enabled device types register creator lambdas in the `DeviceFactory` constructor.
+2. **Hook Specialization**: Platforms instantiate `DeviceFactory` with target-specific static hooks:
+   - **`SimpleDeviceFactory`** (`DeviceFactory<>`): Default specialization with no hooks, used by embedded targets (ESP32, SiLabs, Telink) to minimize binary footprint.
+   - **`PosixDeviceFactory`** (`DeviceFactory<OOBAccessorHook, NamedPipeHook>`): Specialized for POSIX, dynamically registering OOB cluster accessors and named pipe JSON translators only for instantiated devices.
+3. **Creation & Registration Lifecycle**:
+   - `factory.Create(type, label)` instantiates the device and returns a `CreatedDevice` struct containing the `std::unique_ptr<DeviceInterface>` and a `std::function<void()> onDeviceRegistered` callback.
+   - The application registers the endpoint with the `CodeDrivenDataModelProvider`, allocating its valid runtime `EndpointId`.
+   - The application invokes `created.onDeviceRegistered()`, which expands the variadic fold expression `(Hooks::OnDeviceRegistered(*rawDevice), ...)` statically for each configured hook.
 
 ---
 

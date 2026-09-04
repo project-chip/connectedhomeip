@@ -16,27 +16,11 @@
 
 #pragma once
 
-#include <memory>
-
-#include <lib/core/CHIPError.h>
-#include <lib/support/Span.h>
-#include <oob-accessors/OOBAccessor.h>
+#include <device/types/mounted-on-off-control/MountedOnOffControl.h>
+#include <posix/named_pipe/PosixNamedPipeDispatcher.h>
 
 namespace chip::app {
 
-class NoopOOBAccessorRegistry
-{
-public:
-    static NoopOOBAccessorRegistry & Instance()
-    {
-        static NoopOOBAccessorRegistry instance;
-        return instance;
-    }
-
-    CHIP_ERROR Register(std::unique_ptr<OOBAccessor> /* accessor */) { return CHIP_NO_ERROR; }
-    CHIP_ERROR HandleAction(CharSpan /* action */, ByteSpan /* tlvData */) { return CHIP_ERROR_NOT_FOUND; }
-    void Clear() {}
-    size_t Size() const { return 0; }
-};
+void RegisterNamedPipeTranslators(MountedOnOffControl & device, PosixNamedPipeDispatcher & dispatcher);
 
 } // namespace chip::app

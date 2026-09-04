@@ -65,14 +65,16 @@ flowchart LR
         (e.g., `OnOff`, `OccupancySensing`) live in
         `all-devices-common/oob-accessors/clusters/` so any device containing
         that cluster reuses the same implementation.
-    -   **Device-Specific Accessors**: Device implementations and their
-        associated OOB accessor registrations live together in
+    -   **Device-Specific Accessors & Translators**: Device implementations and their
+        associated OOB accessor and named pipe registrations live together in
         `all-devices-common/device/types/<device-name>/`:
         -   Core logic and `OOBAccessors.h/.cpp` belong to the platform-neutral
             `:<device-name>` target.
-    -   **Platform Transport Infrastructure**: Dispatchers and base interfaces
-        (e.g., POSIX Named Pipes and JSON translators) live in platform directories
-        under `posix/named_pipe/`.
+        -   `NamedPipes.h/.cpp` belong to the target's `:<device-name>:posix`
+            source set.
+    -   **Platform Transport Infrastructure**: Dispatchers, hooks, and base interfaces
+        (e.g., POSIX Named Pipes and JSON translators) live under
+        `posix/named_pipe/` and `all-devices-common/oob-accessors/`.
 
 ---
 
@@ -82,22 +84,24 @@ flowchart LR
 examples/all-devices-app/
 ├── all-devices-common/
 │   ├── device-factory/
-│   │   ├── DeviceFactory.h
+│   │   ├── DeviceFactory.h                             # Variadic DeviceFactory<Hooks...> & SimpleDeviceFactory
 │   │   └── BUILD.gn
 │   ├── device/
 │   │   └── types/
 │   │       └── <device-name>/
 │   │           ├── <DeviceName>.h/.cpp                 # Core device implementation (platform-neutral)
 │   │           ├── OOBAccessors.h/.cpp                 # Device OOB accessor registration (platform-neutral)
-│   │           └── BUILD.gn                            # GN targets: :<device-name>, :logging
+│   │           ├── NamedPipeTranslators.h/.cpp         # POSIX NamedPipe translator registration (POSIX-specific)
+│   │           └── BUILD.gn                            # GN targets: :<device-name>, :posix, :logging
 │   └── oob-accessors/
 │       ├── all_devices_config.gni                      # GN build configuration header generator
 │       ├── all_devices_config.cmake                    # CMake build configuration header generator
 │       ├── all_devices_config.h.in                     # CMake configuration template
 │       ├── BUILD.gn                                    # GN rules for oob-accessors
 │       ├── OOBAccessor.h                               # Base interface: HandleAction(action, tlvData)
+│       ├── OOBAccessorHook.h                           # Static OOB accessor registration hook for DeviceFactory
 │       ├── OOBAccessorRegistry.h                       # Active alias (InMemory vs Noop)
-│       ├── InMemoryOOBAccessorRegistry.h/.cpp           # Container of registered OOBAccessors
+│       ├── InMemoryOOBAccessorRegistry.h/.cpp          # Container of registered OOBAccessors
 │       ├── NoopOOBAccessorRegistry.h                   # Zero-cost inline stub for disabled targets
 │       └── clusters/
 │           └── <Cluster>OOBAccessor.h/.cpp             # Cluster accessors (e.g. OnOffOOBAccessor, OccupancyOOBAccessor)
@@ -105,6 +109,7 @@ examples/all-devices-app/
     └── named_pipe/
         ├── BUILD.gn                                    # GN rules for POSIX dispatcher & translators
         ├── NamedPipeCommandTranslator.h                # Base interface: TranslateAndExecute(endpointId, json, registry)
+        ├── NamedPipeHook.h                             # Static named pipe translator registration hook for DeviceFactory
         ├── PosixNamedPipeDispatcher.h/.cpp             # POSIX pipe listener & JSON command router
         └── translators/
             └── <Command>Translator.h/.cpp              # Command-specific JSON-to-TLV translators
@@ -128,9 +133,9 @@ struct CreatedDevice
      *
      * This callback MUST be invoked after `device->Register(...)` completes so that
      * any actions requiring a valid allocated EndpointId (such as registering OOB
-     * cluster accessors) have access to `device->GetEndpointId()`.
+     * cluster accessors or named pipe translators) have access to `device->GetEndpointId()`.
      */
-    std::function<void(OOBAccessorRegistry & registry)> postRegistrationCallback;
+    std::function<void()> onDeviceRegistered;
 };
 
 } // namespace chip::app
@@ -171,6 +176,8 @@ namespace chip::app {
 class InMemoryOOBAccessorRegistry
 {
 public:
+    static InMemoryOOBAccessorRegistry & Instance();
+
     /**
      * @brief Registers an OOB accessor instance.
      * @param accessor The accessor instance to register.
@@ -203,9 +210,53 @@ namespace chip::app {
 class NoopOOBAccessorRegistry
 {
 public:
+    static NoopOOBAccessorRegistry & Instance();
+
     CHIP_ERROR Register(std::unique_ptr<OOBAccessor> /* accessor */) { return CHIP_NO_ERROR; }
     CHIP_ERROR HandleAction(CharSpan /* action */, ByteSpan /* tlvData */) { return CHIP_ERROR_NOT_FOUND; }
     void Clear() {}
+};
+
+} // namespace chip::app
+```
+
+### `OOBAccessorHook` Class
+
+```cpp
+namespace chip::app {
+
+class OOBAccessorHook
+{
+public:
+    template <typename TDevice>
+    static void OnDeviceRegistered(TDevice & device)
+    {
+        if constexpr (detail::HasOOBAccessors<TDevice>::value)
+        {
+            RegisterOOBAccessors(device, OOBAccessorRegistry::Instance());
+        }
+    }
+};
+
+} // namespace chip::app
+```
+
+### `NamedPipeHook` Class
+
+```cpp
+namespace chip::app {
+
+class NamedPipeHook
+{
+public:
+    template <typename TDevice>
+    static void OnDeviceRegistered(TDevice & device)
+    {
+        if constexpr (detail::HasNamedPipeTranslators<TDevice>::value)
+        {
+            RegisterNamedPipeTranslators(device, PosixNamedPipeDispatcher::Instance());
+        }
+    }
 };
 
 } // namespace chip::app
@@ -222,6 +273,11 @@ class NamedPipeCommandTranslator
 {
 public:
     virtual ~NamedPipeCommandTranslator() = default;
+
+    /**
+     * @brief Returns the set of action names supported by this translator.
+     */
+    virtual Span<const CharSpan> GetActionNames() const = 0;
 
     /**
      * @brief Translates a JSON payload into TLV and executes the action via OOBAccessorRegistry.
@@ -242,55 +298,41 @@ namespace chip::app {
 class PosixNamedPipeDispatcher
 {
 public:
+    static PosixNamedPipeDispatcher & Instance();
+
     explicit PosixNamedPipeDispatcher(OOBAccessorRegistry & oobRegistry) :
         mOobRegistry(oobRegistry) {}
     ~PosixNamedPipeDispatcher();
 
-    /**
-     * @brief Starts listening on the named pipe FIFO.
-     * @param fifoPath Path to the named pipe file (e.g. "/tmp/chip_all_devices_fifo").
-     */
     CHIP_ERROR Start(const char * fifoPath);
-
-    /**
-     * @brief Stops listening on the named pipe and cleans up the FIFO file.
-     */
     CHIP_ERROR Stop();
 
-    /**
-     * @brief Checks if a translator is registered for the specified action name.
-     */
-    bool HasTranslator(const std::string & actionName) const;
+    bool HasTranslator(CharSpan actionName) const;
+    CHIP_ERROR RegisterTranslator(CharSpan actionName, std::shared_ptr<NamedPipeCommandTranslator> translator);
+    CHIP_ERROR RegisterTranslator(Span<const CharSpan> actionNames, std::shared_ptr<NamedPipeCommandTranslator> translator);
 
     /**
-     * @brief Registers a command translator instance under the specified action name.
-     */
-    CHIP_ERROR RegisterTranslator(const std::string & actionName, std::unique_ptr<NamedPipeCommandTranslator> translator);
-
-    /**
-     * @brief Registers a translator if not already present, deduping by TranslatorType::kName.
+     * @brief Registers a translator if not already present, deduping by TranslatorType::GetActionNames().
      */
     template <typename TranslatorType, typename... Args>
     CHIP_ERROR EnsureTranslatorRegistered(Args &&... args)
     {
-        if (HasTranslator(TranslatorType::kName))
+        for (const auto & action : TranslatorType::GetActionNames())
         {
-            return CHIP_NO_ERROR;
+            if (HasTranslator(action))
+            {
+                return CHIP_NO_ERROR;
+            }
         }
-        return RegisterTranslator(
-            TranslatorType::kName,
-            std::make_unique<TranslatorType>(std::forward<Args>(args)...)
-        );
+        auto translator = std::make_shared<TranslatorType>(std::forward<Args>(args)...);
+        return RegisterTranslator(translator->GetActionNames(), std::move(translator));
     }
 
-    /**
-     * @brief Parses and dispatches a JSON command to the registered translator.
-     */
     CHIP_ERROR DispatchJson(const Json::Value & json);
 
 private:
     OOBAccessorRegistry & mOobRegistry;
-    std::unordered_map<std::string, std::unique_ptr<NamedPipeCommandTranslator>> mTranslators;
+    std::unordered_map<std::string, std::shared_ptr<NamedPipeCommandTranslator>> mTranslators;
 };
 
 } // namespace chip::app
@@ -395,15 +437,35 @@ void RegisterOOBAccessors(OnOffLight & device, OOBAccessorRegistry & registry)
 
 ### Step 2: Register Named Pipe Translators (POSIX-Only)
 
-In `posix/main.cpp`:
+In `all-devices-common/device/types/<device-name>/NamedPipeTranslators.h`:
 
 ```cpp
-mNamedPipeDispatcher.EnsureTranslatorRegistered<OnOffTranslator>();
-mNamedPipeDispatcher.EnsureTranslatorRegistered<OccupancyTranslator>();
-mNamedPipeDispatcher.EnsureTranslatorRegistered<BooleanStateTranslator>();
-mNamedPipeDispatcher.EnsureTranslatorRegistered<AmbientContextTranslator>();
-mNamedPipeDispatcher.EnsureTranslatorRegistered<BasicInformationTranslator>();
-mNamedPipeDispatcher.EnsureTranslatorRegistered<ElectricalEnergyMeasurementTranslator>();
+#pragma once
+#include <posix/named_pipe/PosixNamedPipeDispatcher.h>
+
+namespace chip::app {
+
+class OnOffLight;
+
+void RegisterNamedPipeTranslators(OnOffLight & device, PosixNamedPipeDispatcher & dispatcher);
+
+} // namespace chip::app
+```
+
+In `all-devices-common/device/types/<device-name>/NamedPipeTranslators.cpp`:
+
+```cpp
+#include "NamedPipeTranslators.h"
+#include <posix/named_pipe/translators/OnOffTranslator.h>
+
+namespace chip::app {
+
+void RegisterNamedPipeTranslators(OnOffLight & device, PosixNamedPipeDispatcher & dispatcher)
+{
+    dispatcher.EnsureTranslatorRegistered<OnOffTranslator>();
+}
+
+} // namespace chip::app
 ```
 
 ### Step 3: Define Granular GN Sub-Targets
@@ -426,6 +488,19 @@ source_set("<device-name>") {
     "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
   ]
 }
+
+# POSIX target for named pipe translator registration
+source_set("posix") {
+  sources = [
+    "NamedPipeTranslators.cpp",
+    "NamedPipeTranslators.h",
+  ]
+
+  public_deps = [
+    ":<device-name>",
+    "${chip_root}/examples/all-devices-app/posix/named_pipe",
+  ]
+}
 ```
 
 ### Step 4: Factory Creation & Application Lifecycle
@@ -440,9 +515,7 @@ RegisterCreator("on-off-light", [this](const std::string & label) -> CreatedDevi
 
     return CreatedDevice{
         .device = std::move(device),
-        .postRegistrationCallback = PostRegistrationCallback([rawDevice](OOBAccessorRegistry & registry) {
-            RegisterOOBAccessors(*rawDevice, registry);
-        }),
+        .onDeviceRegistered = MakeOnDeviceRegisteredCallback(rawDevice),
     };
 });
 ```
@@ -450,10 +523,13 @@ RegisterCreator("on-off-light", [this](const std::string & label) -> CreatedDevi
 In application initialization (`posix/main.cpp` and embedded setup):
 
 ```cpp
+// In posix/main.cpp:
+using PosixDeviceFactory = DeviceFactory<OOBAccessorHook, NamedPipeHook>;
+
 for (const auto & entry : AppOptions::GetDeviceTypeEntries())
 {
     // 1. Create device + post-registration callback via factory
-    auto created = DeviceFactory::GetInstance().Create(entry.type, entry.label);
+    auto created = PosixDeviceFactory::GetInstance().Create(entry.type, entry.label);
     VerifyOrReturnError(created.device != nullptr, CHIP_ERROR_NO_MEMORY);
 
     // 2. Register endpoint with data model provider (allocates valid endpoint ID)
@@ -461,9 +537,9 @@ for (const auto & entry : AppOptions::GetDeviceTypeEntries())
         created.device->Register(endpointIdAllocator, mDataModelProvider, EndpointComposition::WithParent(entry.parentId)));
 
     // 3. Invoke post-registration callback once EndpointId is assigned
-    if (created.postRegistrationCallback)
+    if (created.onDeviceRegistered)
     {
-        created.postRegistrationCallback(mOobRegistry);
+        created.onDeviceRegistered();
     }
 
     mConstructedDevices.push_back(std::move(created.device));

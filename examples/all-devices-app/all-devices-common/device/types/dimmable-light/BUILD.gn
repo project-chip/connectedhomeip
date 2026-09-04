@@ -43,3 +43,15 @@ source_set("logging") {
   ]
 }
 
+source_set("posix") {
+  sources = [
+    "NamedPipeTranslators.cpp",
+    "NamedPipeTranslators.h",
+  ]
+
+  public_deps = [
+    ":dimmable-light",
+    "${chip_root}/examples/all-devices-app/posix/named_pipe",
+  ]
+}
+

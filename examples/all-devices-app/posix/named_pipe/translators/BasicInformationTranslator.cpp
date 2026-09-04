@@ -18,7 +18,8 @@
 
 namespace chip::app {
 
-CHIP_ERROR BasicInformationTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry)
+CHIP_ERROR BasicInformationTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
+                                                                    OOBAccessorRegistry & registry)
 {
     return DispatchAction(registry, "IncreaseConfigurationVersion"_span, endpointId);
 }

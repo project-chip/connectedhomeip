@@ -28,6 +28,12 @@ namespace chip::app {
 class InMemoryOOBAccessorRegistry
 {
 public:
+    static InMemoryOOBAccessorRegistry & Instance()
+    {
+        static InMemoryOOBAccessorRegistry instance;
+        return instance;
+    }
+
     InMemoryOOBAccessorRegistry()          = default;
     ~InMemoryOOBAccessorRegistry()         = default;
     InMemoryOOBAccessorRegistry(const InMemoryOOBAccessorRegistry &) = delete;

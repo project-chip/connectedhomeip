@@ -47,3 +47,15 @@ source_set("logging") {
   public_deps = [ ":electrical-sensor" ]
 }
 
+source_set("posix") {
+  sources = [
+    "NamedPipeTranslators.cpp",
+    "NamedPipeTranslators.h",
+  ]
+
+  public_deps = [
+    ":electrical-sensor",
+    "${chip_root}/examples/all-devices-app/posix/named_pipe",
+  ]
+}
+

@@ -14,29 +14,14 @@
  *    limitations under the License.
  */
 
-#pragma once
-
-#include <memory>
-
-#include <lib/core/CHIPError.h>
-#include <lib/support/Span.h>
-#include <oob-accessors/OOBAccessor.h>
+#include "NamedPipeTranslators.h"
+#include <posix/named_pipe/translators/AmbientContextTranslator.h>
 
 namespace chip::app {
 
-class NoopOOBAccessorRegistry
+void RegisterNamedPipeTranslators(AmbientContextSensor & device, PosixNamedPipeDispatcher & dispatcher)
 {
-public:
-    static NoopOOBAccessorRegistry & Instance()
-    {
-        static NoopOOBAccessorRegistry instance;
-        return instance;
-    }
-
-    CHIP_ERROR Register(std::unique_ptr<OOBAccessor> /* accessor */) { return CHIP_NO_ERROR; }
-    CHIP_ERROR HandleAction(CharSpan /* action */, ByteSpan /* tlvData */) { return CHIP_ERROR_NOT_FOUND; }
-    void Clear() {}
-    size_t Size() const { return 0; }
-};
+    LogErrorOnFailure(dispatcher.EnsureTranslatorRegistered<AmbientContextTranslator>());
+}
 
 } // namespace chip::app

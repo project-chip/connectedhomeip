@@ -262,14 +262,15 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         return nullptr;
     }
 
-    auto & deviceFactory = DeviceFactory::GetInstance();
+    auto & deviceFactory = SimpleDeviceFactory::GetInstance();
 
     // figure out the default
     if (gDeviceType.empty() || !deviceFactory.IsValidDevice(gDeviceType))
     {
         gDeviceType = deviceFactory.GetDefaultDevice();
     }
-    gConstructedDevice = deviceFactory.Create(gDeviceType);
+    auto created = deviceFactory.Create(gDeviceType);
+    gConstructedDevice = std::move(created.device);
 
     if (gConstructedDevice == nullptr)
     {
@@ -283,6 +284,10 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
     {
         ESP_LOGE(TAG, "Failed to register device: %" CHIP_ERROR_FORMAT, err.Format());
         return nullptr;
+    }
+    if (created.onDeviceRegistered)
+    {
+        created.onDeviceRegistered();
     }
 
     return &dataModelProvider;
@@ -302,7 +307,7 @@ void InitServer(intptr_t context)
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate;
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
-    DeviceFactory::GetInstance().Init(DeviceFactory::Context{
+    SimpleDeviceFactory::GetInstance().Init(SimpleDeviceFactory::Context{
         .groupDataProvider        = gGroupDataProvider,                     //
         .fabricTable              = Server::GetInstance().GetFabricTable(), //
         .timerDelegate            = gTimerDelegate,                         //
@@ -317,7 +322,7 @@ void InitServer(intptr_t context)
 
 #if ALL_DEVICES_ENABLE_DIMMABLE_LIGHT
     // Override dimmable-light with ESP32 hardware implementation that drives a real LED
-    DeviceFactory::GetInstance().RegisterCreator("dimmable-light", [&]() {
+    SimpleDeviceFactory::GetInstance().RegisterCreator("dimmable-light", [&]() {
         return std::make_unique<ESP32DimmableLight>(ESP32DimmableLight::Context{
             .groupDataProvider = gGroupDataProvider,
             .fabricTable       = Server::GetInstance().GetFabricTable(),

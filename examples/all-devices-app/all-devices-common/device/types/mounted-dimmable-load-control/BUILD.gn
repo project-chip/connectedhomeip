@@ -28,3 +28,15 @@ source_set("mounted-dimmable-load-control") {
   ]
 }
 
+source_set("posix") {
+  sources = [
+    "NamedPipeTranslators.cpp",
+    "NamedPipeTranslators.h",
+  ]
+
+  public_deps = [
+    ":mounted-dimmable-load-control",
+    "${chip_root}/examples/all-devices-app/posix/named_pipe",
+  ]
+}
+

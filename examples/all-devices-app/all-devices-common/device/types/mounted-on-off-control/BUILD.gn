@@ -30,3 +30,15 @@ source_set("mounted-on-off-control") {
   ]
 }
 
+source_set("posix") {
+  sources = [
+    "NamedPipeTranslators.cpp",
+    "NamedPipeTranslators.h",
+  ]
+
+  public_deps = [
+    ":mounted-on-off-control",
+    "${chip_root}/examples/all-devices-app/posix/named_pipe",
+  ]
+}
+

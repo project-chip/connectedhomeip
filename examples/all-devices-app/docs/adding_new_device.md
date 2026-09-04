@@ -302,15 +302,24 @@ your self-contained **logging mock** in
     ```cpp
     if constexpr (ALL_DEVICES_ENABLE_MY_SENSOR)
     {
-        RegisterCreator("my-sensor", [this]() {
+        RegisterCreator("my-sensor", [this](const std::string & label) -> CreatedDevice {
             VerifyOrDie(mContext.has_value());
-            return std::make_unique<LoggingMySensorDevice>(mContext->timerDelegate);
+            auto device = std::make_unique<LoggingMySensorDevice>(mContext->timerDelegate);
+            auto * rawDevice = device.get();
+            return CreatedDevice{
+                .device = std::move(device),
+                .onDeviceRegistered = MakeOnDeviceRegisteredCallback(rawDevice),
+            };
         });
     }
     ```
     _Note: We instantiate the Logging mock version in the factory so it runs
     completely out-of-the-box with self-contained console logging, keeping the
     platform main clean._
+
+3. **(Optional) Register Out-of-Band & Named Pipe Support**:
+   - For simulated sensor triggers or external control, implement `OOBAccessors.h/.cpp` (platform-neutral) and `NamedPipes.h/.cpp` (POSIX-only).
+   - See [Out-of-Band Control Architecture](design/out_of_band_control.md) for full details and examples.
 
 ---
 

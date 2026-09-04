@@ -26,9 +26,9 @@ source_set("linux") {
   sources = [
     "../include/AppRootNode.h",
     "../include/BleInit.h",
+    "../include/DeviceFactoryPlatformOverride.h",
     "../include/TermHandling.h",
     "BleInit.cpp",
-    "DeviceFactoryPlatformOverride.cpp",
     "TermHandling.cpp",
   ]
 

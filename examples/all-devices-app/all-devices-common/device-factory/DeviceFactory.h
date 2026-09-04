@@ -72,50 +72,122 @@
 
 #include <functional>
 #include <map>
-#include <oob-accessors/OOBAccessorRegistry.h>
-
-#if ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
-#include <device/types/ambient-context-sensor/OOBAccessors.h>
-#include <device/types/boolean-state-sensor/OOBAccessors.h>
-#include <device/types/dimmable-light/OOBAccessors.h>
-#include <device/types/dimmable-plug-in-unit/OOBAccessors.h>
-#include <device/types/electrical-sensor/OOBAccessors.h>
-#include <device/types/mounted-dimmable-load-control/OOBAccessors.h>
-#include <device/types/mounted-on-off-control/OOBAccessors.h>
-#include <device/types/occupancy-sensor/OOBAccessors.h>
-#include <device/types/on-off-light/OOBAccessors.h>
-#include <device/types/on-off-plug-in-unit/OOBAccessors.h>
-#endif
 
 namespace chip::app {
 
 /**
- * This is a factory class made to be used to create any valid device type as part of the
- * all-devices-app. This class is meant to abstract away some details of device specific code,
- * and to have more generic implementation code being used in main to create a device. The keys
- * in the device registry map are the command line arguments used to start the respective device.
- * Create devices by fetching the instance of this class and passing in the device type argument
- * i.e. DeviceFactory::GetInstance().Create(deviceTypeName)
+ * @brief Centralized factory registry for instantiating Matter devices in all-devices-app.
+ *
+ * This class abstracts away concrete device construction and wires device types (e.g., "on-off-light",
+ * "occupancy-sensor") from command-line arguments or configuration strings to concrete C++ implementations.
+ *
+ * ### Variadic Hook Architecture (`template <typename... Hooks>`)
+ *
+ * `DeviceFactory` supports zero or more compile-time static hooks. Hooks allow platforms and transports
+ * (e.g. Out-of-Band TLV accessors, POSIX named pipes, UI controllers, Pigweed RPC) to attach device-specific
+ * capabilities during post-registration without coupling core device implementations to platform code or
+ * introducing runtime overhead.
+ *
+ * - When no hooks are needed (e.g. resource-constrained embedded targets), use @ref SimpleDeviceFactory
+ *   (`DeviceFactory<>`). In this mode, `MakeOnDeviceRegisteredCallback` compiles to a no-op returning `nullptr`.
+ * - When one or more hooks are supplied (e.g. `DeviceFactory<OOBAccessorHook, NamedPipeHook>`), each hook's
+ *   static `Register(*device)` method is invoked in order via C++17 fold expressions once the device is created.
+ *
+ * ### Lifecycle & Data Flow
+ *
+ * ```
+ * +-------------------------------------------------------------------------+
+ * | 1. Initialize Context (Main / Startup)                                  |
+ * |    using AppFactory = DeviceFactory<OOBAccessorHook, NamedPipeHook>;    |
+ * |    AppFactory::GetInstance().Init(context);                             |
+ * +-------------------------------------------------------------------------+
+ *                                    |
+ *                                    v
+ * +-------------------------------------------------------------------------+
+ * | 2. Instantiate Device                                                   |
+ * |    auto created = AppFactory::GetInstance().Create(deviceTypeArg);      |
+ * |    // created.device -> std::unique_ptr<DeviceInterface>                |
+ * |    // created.onDeviceRegistered -> static hook fold invoker      |
+ * +-------------------------------------------------------------------------+
+ *                                    |
+ *                                    v
+ * +-------------------------------------------------------------------------+
+ * | 3. Register in Data Model                                               |
+ * |    created.device->Register(allocator, dataModelProvider);              |
+ * +-------------------------------------------------------------------------+
+ *                                    |
+ *                                    v
+ * +-------------------------------------------------------------------------+
+ * | 4. Invoke Post-Registration Hooks                                       |
+ * |    if (created.onDeviceRegistered) {                              |
+ * |        created.onDeviceRegistered();                              |
+ * |        // Calls (Hooks::OnDeviceRegistered(*concreteDevice), ...)                 |
+ * |    }                                                                    |
+ * +-------------------------------------------------------------------------+
+ * ```
+ *
+ * ### Example Usage
+ *
+ * Standard (Embedded / No-Hooks):
+ * @code
+ * using Factory = chip::app::SimpleDeviceFactory;
+ * Factory::GetInstance().Init(context);
+ * auto created = Factory::GetInstance().Create("on-off-light");
+ * created.device->Register(allocator, dataModelProvider);
+ * @endcode
+ *
+ * POSIX (With OOB Accessors and Named Pipes):
+ * @code
+ * using PosixFactory = chip::app::DeviceFactory<OOBAccessorHook, NamedPipeHook>;
+ * PosixFactory::GetInstance().Init(context);
+ * auto created = PosixFactory::GetInstance().Create("ambient-context-sensor");
+ * created.device->Register(allocator, dataModelProvider);
+ * if (created.onDeviceRegistered)
+ * {
+ *     created.onDeviceRegistered();
+ * }
+ * @endcode
+ *
+ * ### Implementing a Custom Hook
+ *
+ * A hook class must provide a static `OnDeviceRegistered` template function:
+ * @code
+ * struct CustomUIHook
+ * {
+ *     template <typename TDevice>
+ *     static void OnDeviceRegistered(TDevice & device)
+ *     {
+ *         if constexpr (detail::HasCustomUI<TDevice>::value)
+ *         {
+ *             RegisterDeviceUI(device);
+ *         }
+ *     }
+ * };
+ * @endcode
  */
+template <typename... Hooks>
 class DeviceFactory
 {
 public:
     struct CreatedDevice
     {
         std::unique_ptr<DeviceInterface> device;
-        std::function<void(OOBAccessorRegistry & registry)> postRegistrationCallback;
+        std::function<void()> onDeviceRegistered;
     };
 
     template <typename TDevice>
-    static std::function<void(OOBAccessorRegistry &)> PostRegistrationCallback(TDevice * device)
+    static std::function<void()> MakeOnDeviceRegisteredCallback(TDevice * device)
     {
-#if ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
-        return [device](OOBAccessorRegistry & registry) {
-            RegisterOOBAccessors(*device, registry);
-        };
-#else
-        return nullptr;
-#endif
+        if constexpr (sizeof...(Hooks) == 0)
+        {
+            return nullptr;
+        }
+        else
+        {
+            return [device]() {
+                (Hooks::OnDeviceRegistered(*device), ...);
+            };
+        }
     }
 
     using DeviceCreator = std::function<CreatedDevice(const std::string & nodeLabel)>;
@@ -159,14 +231,14 @@ public:
     void RegisterCreator(const std::string & deviceTypeArg, std::function<std::unique_ptr<DeviceInterface>(const std::string &)> && creator)
     {
         RegisterCreator(deviceTypeArg, [c = std::move(creator)](const std::string & label) {
-            return CreatedDevice{ .device = c(label), .postRegistrationCallback = nullptr };
+            return CreatedDevice{ .device = c(label), .onDeviceRegistered = nullptr };
         });
     }
 
     void RegisterCreator(const std::string & deviceTypeArg, std::function<std::unique_ptr<DeviceInterface>()> && creator)
     {
         RegisterCreator(deviceTypeArg, [c = std::move(creator)](const std::string &) {
-            return CreatedDevice{ .device = c(), .postRegistrationCallback = nullptr };
+            return CreatedDevice{ .device = c(), .onDeviceRegistered = nullptr };
         });
     }
 
@@ -256,7 +328,7 @@ private:
                 auto * raw = dev.get();
                 return CreatedDevice{
                     .device                   = std::move(dev),
-                    .postRegistrationCallback = PostRegistrationCallback(raw),
+                    .onDeviceRegistered = MakeOnDeviceRegisteredCallback(raw),
                 };
             });
         }
@@ -280,7 +352,7 @@ private:
                 auto * raw = dev.get();
                 return CreatedDevice{
                     .device                   = std::move(dev),
-                    .postRegistrationCallback = PostRegistrationCallback(raw),
+                    .onDeviceRegistered = MakeOnDeviceRegisteredCallback(raw),
                 };
             });
         }
@@ -293,7 +365,7 @@ private:
                 auto * raw = dev.get();
                 return CreatedDevice{
                     .device                   = std::move(dev),
-                    .postRegistrationCallback = PostRegistrationCallback(raw),
+                    .onDeviceRegistered = MakeOnDeviceRegisteredCallback(raw),
                 };
             });
         }
@@ -305,7 +377,7 @@ private:
                 auto * raw = dev.get();
                 return CreatedDevice{
                     .device                   = std::move(dev),
-                    .postRegistrationCallback = PostRegistrationCallback(raw),
+                    .onDeviceRegistered = MakeOnDeviceRegisteredCallback(raw),
                 };
             });
         }
@@ -348,7 +420,7 @@ private:
                 auto * raw = dev.get();
                 return CreatedDevice{
                     .device                   = std::move(dev),
-                    .postRegistrationCallback = PostRegistrationCallback(raw),
+                    .onDeviceRegistered = MakeOnDeviceRegisteredCallback(raw),
                 };
             });
         }
@@ -366,7 +438,7 @@ private:
                 auto * raw = dev.get();
                 return CreatedDevice{
                     .device                   = std::move(dev),
-                    .postRegistrationCallback = PostRegistrationCallback(raw),
+                    .onDeviceRegistered = MakeOnDeviceRegisteredCallback(raw),
                 };
             });
         }
@@ -394,7 +466,7 @@ private:
                 auto * raw = dev.get();
                 return CreatedDevice{
                     .device                   = std::move(dev),
-                    .postRegistrationCallback = PostRegistrationCallback(raw),
+                    .onDeviceRegistered = MakeOnDeviceRegisteredCallback(raw),
                 };
             });
         }
@@ -410,7 +482,7 @@ private:
                 auto * raw = dev.get();
                 return CreatedDevice{
                     .device                   = std::move(dev),
-                    .postRegistrationCallback = PostRegistrationCallback(raw),
+                    .onDeviceRegistered = MakeOnDeviceRegisteredCallback(raw),
                 };
             });
         }
@@ -434,7 +506,7 @@ private:
                 auto * raw = dev.get();
                 return CreatedDevice{
                     .device                   = std::move(dev),
-                    .postRegistrationCallback = PostRegistrationCallback(raw),
+                    .onDeviceRegistered = MakeOnDeviceRegisteredCallback(raw),
                 };
             });
         }
@@ -458,7 +530,7 @@ private:
                 auto * raw = dev.get();
                 return CreatedDevice{
                     .device                   = std::move(dev),
-                    .postRegistrationCallback = PostRegistrationCallback(raw),
+                    .onDeviceRegistered = MakeOnDeviceRegisteredCallback(raw),
                 };
             });
         }
@@ -499,7 +571,7 @@ private:
                 auto * raw = dev.get();
                 return CreatedDevice{
                     .device                   = std::move(dev),
-                    .postRegistrationCallback = PostRegistrationCallback(raw),
+                    .onDeviceRegistered = MakeOnDeviceRegisteredCallback(raw),
                 };
             });
         }
@@ -586,7 +658,7 @@ private:
                 auto * raw = dev.get();
                 return CreatedDevice{
                     .device                   = std::move(dev),
-                    .postRegistrationCallback = PostRegistrationCallback(raw),
+                    .onDeviceRegistered = MakeOnDeviceRegisteredCallback(raw),
                 };
             });
         }
@@ -599,7 +671,7 @@ private:
                 auto * raw = dev.get();
                 return CreatedDevice{
                     .device                   = std::move(dev),
-                    .postRegistrationCallback = PostRegistrationCallback(raw),
+                    .onDeviceRegistered = MakeOnDeviceRegisteredCallback(raw),
                 };
             });
         }
@@ -674,5 +746,7 @@ private:
         VerifyOrDie(!mRegistry.empty());
     }
 };
+
+using SimpleDeviceFactory = DeviceFactory<>;
 
 } // namespace chip::app

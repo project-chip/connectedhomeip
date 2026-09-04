@@ -32,6 +32,8 @@ namespace chip::app {
 class PosixNamedPipeDispatcher : public NamedPipeCommandDelegate
 {
 public:
+    static PosixNamedPipeDispatcher & Instance();
+
     explicit PosixNamedPipeDispatcher(OOBAccessorRegistry & oobRegistry) : mOobRegistry(oobRegistry) {}
     ~PosixNamedPipeDispatcher() override;
 

@@ -18,7 +18,8 @@
 
 namespace chip::app {
 
-CHIP_ERROR OccupancyTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry)
+CHIP_ERROR OccupancyTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
+                                                             OOBAccessorRegistry & registry)
 {
     const std::string & actionName = json["Name"].asString();
     if (actionName == "SetOccupancy")
@@ -33,7 +34,7 @@ CHIP_ERROR OccupancyTranslator::TranslateAndExecute(EndpointId endpointId, const
 }
 
 CHIP_ERROR OccupancyTranslator::TranslateSetOccupancy(EndpointId endpointId, const Json::Value & json,
-                                                     OOBAccessorRegistry & registry)
+                                                              OOBAccessorRegistry & registry)
 {
     auto occupancy = ExtractBool(json, "Occupancy");
     VerifyOrReturnError(occupancy.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -41,7 +42,7 @@ CHIP_ERROR OccupancyTranslator::TranslateSetOccupancy(EndpointId endpointId, con
 }
 
 CHIP_ERROR OccupancyTranslator::TranslateSetHoldTime(EndpointId endpointId, const Json::Value & json,
-                                                    OOBAccessorRegistry & registry)
+                                                             OOBAccessorRegistry & registry)
 {
     auto holdTime = ExtractUInt<uint16_t>(json, "HoldTime");
     VerifyOrReturnError(holdTime.has_value(), CHIP_ERROR_INVALID_ARGUMENT);

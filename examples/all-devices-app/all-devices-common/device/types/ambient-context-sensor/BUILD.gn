@@ -44,3 +44,15 @@ source_set("logging") {
   public_deps = [ ":ambient-context-sensor" ]
 }
 
+source_set("posix") {
+  sources = [
+    "NamedPipeTranslators.cpp",
+    "NamedPipeTranslators.h",
+  ]
+
+  public_deps = [
+    ":ambient-context-sensor",
+    "${chip_root}/examples/all-devices-app/posix/named_pipe",
+  ]
+}
+

@@ -43,16 +43,16 @@
 #include <app_options/AppOptions.h>
 #include <app_options/DeviceTypeParser.h>
 #include <device-factory/DeviceFactory.h>
+#include <device/api/SingleEndpoint.h>
 #include <device/api/allocator/DynamicEndpointIdAllocator.h>
-#if ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
-#include <device/types/root-node/OOBAccessors.h>
-#endif
-#include <oob-accessors/OOBAccessor.h>
+#include <oob-accessors/OOBAccessorHook.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
+#include <posix/named_pipe/NamedPipeHook.h>
+#include <posix/named_pipe/PosixNamedPipeDispatcher.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <system/SystemLayer.h>
 
@@ -63,14 +63,6 @@
 #include <oob-accessors/pigweed/PigweedAttributeAccessor.h>
 #include <pigweed/rpc_services/AccessInterceptorRegistry.h>
 #endif // PW_RPC_ENABLED
-#include <device/api/SingleEndpoint.h>
-#include <posix/named_pipe/PosixNamedPipeDispatcher.h>
-#include <posix/named_pipe/translators/AmbientContextTranslator.h>
-#include <posix/named_pipe/translators/BasicInformationTranslator.h>
-#include <posix/named_pipe/translators/BooleanStateTranslator.h>
-#include <posix/named_pipe/translators/ElectricalEnergyMeasurementTranslator.h>
-#include <posix/named_pipe/translators/OccupancyTranslator.h>
-#include <posix/named_pipe/translators/OnOffTranslator.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -78,6 +70,8 @@ using namespace chip::Platform;
 using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters;
 using namespace chip::ArgParser;
+
+using PosixDeviceFactory = DeviceFactory<OOBAccessorHook, NamedPipeHook>;
 
 void ApplicationShutdown();
 
@@ -91,8 +85,6 @@ chip::app::PosixAudioManager gAudioManager;
 
 // To hold SPAKE2+ verifier, discriminator, passcode
 LinuxCommissionableDataProvider gCommissionableDataProvider;
-
-std::unique_ptr<PosixNamedPipeDispatcher> gNamedPipeDispatcher;
 
 void StopSignalHandler(int /* signal */)
 {
@@ -198,13 +190,12 @@ public:
         DynamicEndpointIdAllocator endpointIdAllocator(GetReservedEndpointIds());
         endpointIdAllocator.ForceNext(kRootEndpointId);
         ReturnErrorOnFailure(mRootNode.RootDevice().Register(endpointIdAllocator, mDataModelProvider));
-#if ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
-        RegisterOOBAccessors(mRootNode.GetRootNode(), mOobRegistry);
-#endif
+        OOBAccessorHook::OnDeviceRegistered(mRootNode.GetRootNode());
+        NamedPipeHook::OnDeviceRegistered(mRootNode.GetRootNode());
 
         for (const auto & entry : AppOptions::GetDeviceTypeEntries())
         {
-            auto created = DeviceFactory::GetInstance().Create(entry.type, entry.label);
+            auto created = PosixDeviceFactory::GetInstance().Create(entry.type, entry.label);
 
             VerifyOrReturnError(created.device, CHIP_ERROR_NO_MEMORY);
             ChipLogProgress(AppServer, "Registering device %s on endpoint %u with parent 0x%04X", entry.type.c_str(),
@@ -215,9 +206,9 @@ public:
             }
             ReturnErrorOnFailure(
                 created.device->Register(endpointIdAllocator, mDataModelProvider, EndpointComposition::WithParent(entry.parentId)));
-            if (created.postRegistrationCallback)
+            if (created.onDeviceRegistered)
             {
-                created.postRegistrationCallback(mOobRegistry);
+                created.onDeviceRegistered();
             }
             mConstructedDevices.push_back(std::move(created.device));
         }
@@ -227,7 +218,7 @@ public:
 
     void Shutdown()
     {
-        mOobRegistry.Clear();
+        OOBAccessorRegistry::Instance().Clear();
         for (auto & device : mConstructedDevices)
         {
             device->Unregister(mDataModelProvider);
@@ -240,8 +231,6 @@ public:
 
     AppRootNode & RootNode() { return mRootNode; }
 
-    OOBAccessorRegistry & OobRegistry() { return mOobRegistry; }
-
     const std::vector<std::unique_ptr<DeviceInterface>> & GetConstructedDevices() const { return mConstructedDevices; }
 
 private:
@@ -251,25 +240,15 @@ private:
 
     AppRootNode mRootNode;
     std::vector<std::unique_ptr<DeviceInterface>> mConstructedDevices;
-    OOBAccessorRegistry mOobRegistry;
 };
 
-void SetupNamedPipe(OOBAccessorRegistry & oobRegistry, const char * namedPipePath)
+void SetupNamedPipe(const char * namedPipePath)
 {
-    gNamedPipeDispatcher = std::make_unique<PosixNamedPipeDispatcher>(oobRegistry);
-
-    LogErrorOnFailure(gNamedPipeDispatcher->EnsureTranslatorRegistered<OnOffTranslator>());
-    LogErrorOnFailure(gNamedPipeDispatcher->EnsureTranslatorRegistered<OccupancyTranslator>());
-    LogErrorOnFailure(gNamedPipeDispatcher->EnsureTranslatorRegistered<BooleanStateTranslator>());
-    LogErrorOnFailure(gNamedPipeDispatcher->EnsureTranslatorRegistered<AmbientContextTranslator>());
-    LogErrorOnFailure(gNamedPipeDispatcher->EnsureTranslatorRegistered<ElectricalEnergyMeasurementTranslator>());
-    LogErrorOnFailure(gNamedPipeDispatcher->EnsureTranslatorRegistered<BasicInformationTranslator>());
-
-    CHIP_ERROR err = gNamedPipeDispatcher->Start(namedPipePath);
+    CHIP_ERROR err = PosixNamedPipeDispatcher::Instance().Start(namedPipePath);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to start named pipe at %s: %" CHIP_ERROR_FORMAT, namedPipePath, err.Format());
-        LogErrorOnFailure(gNamedPipeDispatcher->Stop());
+        LogErrorOnFailure(PosixNamedPipeDispatcher::Instance().Stop());
     }
 }
 
@@ -286,7 +265,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     SuccessOrDie(sTestEventTriggerDelegate.Init(ByteSpan(AppOptions::GetConfig().testEventTriggerEnableKey)));
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
-    DeviceFactory::GetInstance().Init(DeviceFactory::Context{
+    PosixDeviceFactory::GetInstance().Init(PosixDeviceFactory::Context{
         .groupDataProvider        = gGroupDataProvider,                     //
         .fabricTable              = Server::GetInstance().GetFabricTable(), //
         .timerDelegate            = gTimerDelegate,                         //
@@ -299,7 +278,8 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,
     });
 
-    RegisterDeviceFactoryOverrides(gTimerDelegate, initParams.persistentStorageDelegate, gAudioManager);
+    RegisterDeviceFactoryOverrides(PosixDeviceFactory::GetInstance(), gTimerDelegate, initParams.persistentStorageDelegate,
+                                   gAudioManager);
 
 #if CHIP_CONFIG_ENABLE_GROUPCAST
     // TODO(#72056): Once groupcast is enabled by default, this should not be dependent on the app argument.
@@ -374,7 +354,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     const std::string & namedPipePath = AppOptions::GetConfig().appPipePath;
     if (!namedPipePath.empty())
     {
-        SetupNamedPipe(devices.OobRegistry(), namedPipePath.c_str());
+        SetupNamedPipe(namedPipePath.c_str());
     }
 
 
@@ -467,11 +447,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     }
     gMainLoopImplementation = nullptr;
 
-    if (gNamedPipeDispatcher)
-    {
-        LogErrorOnFailure(gNamedPipeDispatcher->Stop());
-        gNamedPipeDispatcher.reset();
-    }
+    LogErrorOnFailure(PosixNamedPipeDispatcher::Instance().Stop());
     devices.Shutdown();
 
     Server::GetInstance().Shutdown();

@@ -63,7 +63,7 @@ int cmd_devtype_set(const struct shell * shell, size_t argc, char ** argv)
     }
 
     const std::string deviceType(argv[1]);
-    auto & factory = chip::app::DeviceFactory::GetInstance();
+    auto & factory = chip::app::SimpleDeviceFactory::GetInstance();
 
     if (!factory.IsValidDevice(deviceType))
     {

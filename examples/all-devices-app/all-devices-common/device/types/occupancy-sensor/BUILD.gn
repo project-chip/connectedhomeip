@@ -44,3 +44,15 @@ source_set("logging") {
   public_deps = [ ":occupancy-sensor" ]
 }
 
+source_set("posix") {
+  sources = [
+    "NamedPipeTranslators.cpp",
+    "NamedPipeTranslators.h",
+  ]
+
+  public_deps = [
+    ":occupancy-sensor",
+    "${chip_root}/examples/all-devices-app/posix/named_pipe",
+  ]
+}
+
