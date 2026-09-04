@@ -34,13 +34,36 @@ struct LockUserInfo
     chip::FabricIndex lastModifiedBy;
 };
 
-struct LockCredentialInfo;
-struct WeekDaysScheduleInfo;
-struct YearDayScheduleInfo;
-struct HolidayScheduleInfo;
-
 static constexpr size_t DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE = 20;
 static constexpr size_t DOOR_LOCK_CREDENTIAL_INFO_MAX_TYPES     = 6; // 0: ProgrammingPIN ~ 5: Face
+
+struct LockCredentialInfo
+{
+    DlCredentialStatus status;
+    CredentialTypeEnum credentialType;
+    chip::FabricIndex createdBy;
+    chip::FabricIndex modifiedBy;
+    uint8_t credentialData[DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE];
+    size_t credentialDataSize;
+};
+
+struct WeekDaysScheduleInfo
+{
+    DlScheduleStatus status;
+    EmberAfPluginDoorLockWeekDaySchedule schedule;
+};
+
+struct YearDayScheduleInfo
+{
+    DlScheduleStatus status;
+    EmberAfPluginDoorLockYearDaySchedule schedule;
+};
+
+struct HolidayScheduleInfo
+{
+    DlScheduleStatus status;
+    EmberAfPluginDoorLockHolidaySchedule schedule;
+};
 
 class LockEndpoint
 {
@@ -131,32 +154,4 @@ private:
     std::vector<std::vector<WeekDaysScheduleInfo>> mWeekDaySchedules;
     std::vector<std::vector<YearDayScheduleInfo>> mYearDaySchedules;
     std::vector<HolidayScheduleInfo> mHolidaySchedules;
-};
-
-struct LockCredentialInfo
-{
-    DlCredentialStatus status;
-    CredentialTypeEnum credentialType;
-    chip::FabricIndex createdBy;
-    chip::FabricIndex modifiedBy;
-    uint8_t credentialData[DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE];
-    size_t credentialDataSize;
-};
-
-struct WeekDaysScheduleInfo
-{
-    DlScheduleStatus status;
-    EmberAfPluginDoorLockWeekDaySchedule schedule;
-};
-
-struct YearDayScheduleInfo
-{
-    DlScheduleStatus status;
-    EmberAfPluginDoorLockYearDaySchedule schedule;
-};
-
-struct HolidayScheduleInfo
-{
-    DlScheduleStatus status;
-    EmberAfPluginDoorLockHolidaySchedule schedule;
 };

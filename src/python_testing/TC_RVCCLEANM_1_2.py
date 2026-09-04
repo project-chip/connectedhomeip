@@ -34,6 +34,20 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device robotic-vacuum-cleaner --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -84,7 +98,7 @@ class TC_RVCCLEANM_1_2(MatterBaseTest):
             self.print_step(2, "Read SupportedModes attribute")
             supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
-            log.info("SupportedModes: %s" % (supported_modes))
+            log.info("SupportedModes: %s", supported_modes)
 
             # Verify that the list has at least 2 and at most 255 entries
             asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least 2 entries!")
@@ -147,7 +161,7 @@ class TC_RVCCLEANM_1_2(MatterBaseTest):
             self.print_step(3, "Read CurrentMode attribute")
             current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-            log.info("CurrentMode: %s" % (current_mode))
+            log.info("CurrentMode: %s", current_mode)
             asserts.assert_true(current_mode in self.supported_modes_dut, "CurrentMode is not a supported mode!")
 
 

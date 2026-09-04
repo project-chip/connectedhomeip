@@ -96,7 +96,6 @@ TEST(TestAttributePersistence, TestNativeRawValueViaDecoder)
     AttributePersistence persistence(ramProvider);
 
     const ConcreteAttributePath path(1, 2, 3);
-    const ConcreteAttributePath wrongPath(1, 2, 4);
     constexpr uint32_t kValueToStore = 0x12345678;
     constexpr uint32_t kOtherValue   = 0x99887766;
     uint32_t valueRead               = 0;

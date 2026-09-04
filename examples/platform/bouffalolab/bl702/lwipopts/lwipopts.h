@@ -277,7 +277,7 @@ a lot of data that needs to be copied, this should be set high. */
 #define LWIP_AUTOIP 1
 #define LWIP_IPV6_MLD 1
 #define LWIP_ND6_RDNSS_MAX_DNS_SERVERS 1
-#define LWIP_HOOK_FILENAME "bl_lwip_hooks.h"
+#define LWIP_HOOK_FILENAME "bflb_lwip_hooks.h"
 
 #define LWIP_NETIF_EXT_STATUS_CALLBACK 1
 

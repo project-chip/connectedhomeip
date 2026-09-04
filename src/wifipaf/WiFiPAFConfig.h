@@ -119,7 +119,7 @@ static_assert(
  *   request to wait for connection establishment.
  */
 #ifndef PAFTP_CONN_RSP_TIMEOUT_MS
-#define PAFTP_CONN_RSP_TIMEOUT_MS 5000
+#define PAFTP_CONN_RSP_TIMEOUT_MS 15000
 #endif // PAFTP_CONN_RSP_TIMEOUT_MS
 
 /**

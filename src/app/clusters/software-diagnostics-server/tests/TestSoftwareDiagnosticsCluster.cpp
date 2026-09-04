@@ -202,27 +202,27 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
 
         // Test all attributes
         // cluster revision
-        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision;
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision{};
         ASSERT_TRUE(tester.ReadAttribute(Attributes::ClusterRevision::Id, clusterRevision).IsSuccess());
         EXPECT_EQ(clusterRevision, SoftwareDiagnostics::kRevision);
 
         // feature map
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap{};
         ASSERT_TRUE(tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap).IsSuccess());
         EXPECT_EQ(featureMap, BitFlags<SoftwareDiagnostics::Feature>{ SoftwareDiagnostics::Feature::kWatermarks }.Raw());
 
         // heapfree
-        Attributes::CurrentHeapFree::TypeInfo::DecodableType heapFree;
+        Attributes::CurrentHeapFree::TypeInfo::DecodableType heapFree{};
         ASSERT_TRUE(tester.ReadAttribute(Attributes::CurrentHeapFree::Id, heapFree).IsSuccess());
         EXPECT_EQ(heapFree, 123u);
 
         // heapused
-        Attributes::CurrentHeapUsed::TypeInfo::DecodableType heapUsed;
+        Attributes::CurrentHeapUsed::TypeInfo::DecodableType heapUsed{};
         ASSERT_TRUE(tester.ReadAttribute(Attributes::CurrentHeapUsed::Id, heapUsed).IsSuccess());
         EXPECT_EQ(heapUsed, 234u);
 
         // highwatermark
-        Attributes::CurrentHeapHighWatermark::TypeInfo::DecodableType highWatermark;
+        Attributes::CurrentHeapHighWatermark::TypeInfo::DecodableType highWatermark{};
         ASSERT_TRUE(tester.ReadAttribute(Attributes::CurrentHeapHighWatermark::Id, highWatermark).IsSuccess());
         EXPECT_EQ(highWatermark, 456u);
 
@@ -267,7 +267,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, TestEventGeneration)
     Events::SoftwareFault::Type fault{
         .id             = 1234,
         .name           = Optional{ "test"_span },
-        .faultRecording = Optional{ ByteSpan(Uint8::from_const_char(faultData), strlen(faultData)) },
+        .faultRecording = Optional{ ByteSpan::fromCharString(faultData) },
     };
 
     SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(fault);

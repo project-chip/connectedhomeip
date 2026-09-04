@@ -21,8 +21,7 @@ from pathlib import Path
 
 from chiptest import AllChipToolYamlTests
 
-DEFAULT_CHIP_ROOT = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..'))
+DEFAULT_CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
 
 def _is_cert_test(path):
@@ -32,7 +31,7 @@ def _is_cert_test(path):
 def check_unit_testing():
     bad_tests = set()
     for test in AllChipToolYamlTests(use_short_run_name=False):
-        with open(test.run_name, "r") as f:
+        with open(test.run_name) as f:
             # Unit testing cluster is disallowed in cert tests, but permissible in general integration tests
             unit_test_lines = {}
             if _is_cert_test(test.run_name):

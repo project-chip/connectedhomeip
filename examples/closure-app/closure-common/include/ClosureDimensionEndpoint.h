@@ -20,7 +20,6 @@
 
 #include <app/clusters/closure-dimension-server/closure-dimension-cluster-objects.h>
 #include <app/clusters/closure-dimension-server/closure-dimension-delegate.h>
-#include <app/clusters/closure-dimension-server/closure-dimension-matter-context.h>
 #include <app/clusters/closure-dimension-server/closure-dimension-server.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -91,9 +90,7 @@ private:
 class ClosureDimensionEndpoint
 {
 public:
-    ClosureDimensionEndpoint(EndpointId endpoint) :
-        mEndpoint(endpoint), mContext(mEndpoint), mDelegate(mEndpoint), mInterface(mEndpoint, mDelegate, mContext)
-    {}
+    ClosureDimensionEndpoint(EndpointId endpoint) : mEndpoint(endpoint), mDelegate(mEndpoint), mInterface(mEndpoint, mDelegate) {}
 
     /**
      * @brief Initializes the ClosureDimensionEndpoint instance.
@@ -172,7 +169,6 @@ public:
 
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
-    MatterContext mContext;
     ClosureDimensionDelegate mDelegate;
     Interface mInterface;
 

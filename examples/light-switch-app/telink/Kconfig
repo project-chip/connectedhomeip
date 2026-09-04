@@ -15,7 +15,7 @@
 #
 mainmenu "Matter Telink Light Switch Example Application"
 
-config CONFIG_CHIP_ENABLE_GROUPCAST
+config CHIP_ENABLE_GROUPCAST
 	bool
 	default y
 

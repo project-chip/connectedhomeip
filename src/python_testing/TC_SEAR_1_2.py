@@ -36,6 +36,21 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device robotic-vacuum-cleaner --trace-to json:${TRACE_APP}.json --app-pipe /tmp/sear_1_2_fifo
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --endpoint 1
+#       --app-pipe /tmp/sear_1_2_fifo
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -72,7 +87,7 @@ class TC_SEAR_1_2(MatterBaseTest):
         self.print_step(step, "Read SupportedMaps attribute")
         supported_maps = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SupportedMaps)
-        log.info("SupportedMaps: %s" % supported_maps)
+        log.info("SupportedMaps: %s", supported_maps)
         asserts.assert_less_equal(len(supported_maps), 255,
                                   "SupportedMaps should have max 255 entries")
 
@@ -89,7 +104,7 @@ class TC_SEAR_1_2(MatterBaseTest):
         self.print_step(step, "Read SupportedAreas attribute")
         supported_areas = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SupportedAreas)
-        log.info("SupportedAreas: %s" % supported_areas)
+        log.info("SupportedAreas: %s", supported_areas)
         asserts.assert_less_equal(len(supported_areas), 255,
                                   "SupportedAreas should have max 255 entries")
         areaid_list = []
@@ -132,7 +147,7 @@ class TC_SEAR_1_2(MatterBaseTest):
         self.print_step(step, "Read SelectedAreas attribute")
         selected_areas = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SelectedAreas)
-        log.info(f"SelectedAreas {selected_areas}")
+        log.info("SelectedAreas %s", selected_areas)
 
         # TODO how to check if all entries are uint32?
 
@@ -151,7 +166,7 @@ class TC_SEAR_1_2(MatterBaseTest):
         self.print_step(step, "Read CurrentArea attribute")
         current_area = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.CurrentArea)
-        log.info(f"CurrentArea {current_area}")
+        log.info("CurrentArea %s", current_area)
 
         if current_area is not NullValue:
             asserts.assert_true(current_area in self.areaid_list,
@@ -166,7 +181,7 @@ class TC_SEAR_1_2(MatterBaseTest):
         self.print_step(step, "Read EstimatedEndTime attribute")
         estimated_end_time = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.EstimatedEndTime)
-        log.info(f"EstimatedEndTime {estimated_end_time}")
+        log.info("EstimatedEndTime %s", estimated_end_time)
 
         if self.current_area is NullValue:
             asserts.assert_true(estimated_end_time is NullValue,
@@ -181,7 +196,7 @@ class TC_SEAR_1_2(MatterBaseTest):
         self.print_step(step, "Read Progress attribute")
         progress = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.Progress)
-        log.info(f"Progress {progress}")
+        log.info("Progress %s", progress)
 
         asserts.assert_true(len(progress) <= len(self.areaid_list),
                             f"Progress(len {len(progress)}) should have at most {len(self.areaid_list)} entries")
@@ -220,7 +235,7 @@ class TC_SEAR_1_2(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe({"Name": "Reset"})
+            self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
 
         if self.check_pics("SEAR.S.F02"):
             await self.read_and_validate_supported_maps(step=2)
@@ -250,7 +265,7 @@ class TC_SEAR_1_2(MatterBaseTest):
             test_step = "Manually intervene to remove one or more entries in the SupportedMaps list"
             self.print_step("10", test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "RemoveMap", "MapId": 3})
+                self.write_to_app_pipe({"Name": "RemoveMap", "EndpointId": self.endpoint, "MapId": 3})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -285,7 +300,7 @@ class TC_SEAR_1_2(MatterBaseTest):
             test_step = "Manually intervene to add one or more entries to the SupportedMaps list"
             self.print_step("14", test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "AddMap", "MapId": 1, "MapName": "NewTestMap1"})
+                self.write_to_app_pipe({"Name": "AddMap", "EndpointId": self.endpoint, "MapId": 1, "MapName": "NewTestMap1"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -320,7 +335,7 @@ class TC_SEAR_1_2(MatterBaseTest):
             test_step = "Manually intervene to remove one or more entries from the SupportedAreas list"
             self.print_step("18", test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "RemoveArea", "AreaId": 10050})
+                self.write_to_app_pipe({"Name": "RemoveArea", "EndpointId": self.endpoint, "AreaId": 10050})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -348,13 +363,22 @@ class TC_SEAR_1_2(MatterBaseTest):
             if not self.is_ci:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
+            if self.check_pics("SEAR.S.F02"):
+                await self.read_and_validate_supported_maps(step=21)
+
             await self.read_and_validate_supported_areas(step=21)
             old_supported_areas = self.areaid_list
 
             test_step = "Manually intervene to add one or more entries to the SupportedAreas list"
             self.print_step("22", test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "AddArea", "AreaId": 42, "MapId": 1, "LocationName": "NewTestArea1"})
+                add_area_cmd = {"Name": "AddArea", "EndpointId": self.endpoint,
+                                "AreaId": 42, "LocationName": "NewTestArea1"}
+                if self.check_pics("SEAR.S.F02"):
+                    asserts.assert_true(len(self.mapid_list) > 0,
+                                        "SupportedMaps must not be empty when adding an area with a map")
+                    add_area_cmd["MapId"] = self.mapid_list[0]
+                self.write_to_app_pipe(add_area_cmd)
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 

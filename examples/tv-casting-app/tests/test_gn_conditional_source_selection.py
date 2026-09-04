@@ -1,21 +1,26 @@
 """
 Property Test — Property 5: GN conditional source selection
 
-**Validates: Requirements 3.3, 3.4, 3.5, 6.1, 6.2**
+**Validates: Requirements 4.1, 4.2, 5.1, 14.4**
 
 This test parses `src/controller/java/BUILD.gn` and verifies that the
-`if (matter_enable_tlv_decoder_cpp)` block contains conditional logic for
-both `chip_tlv_decoder_attribute_source_override` and
-`chip_tlv_decoder_event_source_override`, following the pattern:
+`android_chip_im_jni` source set contains conditional logic for both
+TLV decoder overrides using `chip_data_model_overrides_dir`, following
+the pattern:
 
-    if (override != "") { use override } else { use zap-generated }
+    if (chip_data_model_overrides_dir != "") { use override } else { use zap-generated }
 
-This ensures that non-empty overrides compile the slim file, while empty
-(default) overrides compile the full zap-generated decoder.
+This ensures that when the override directory is set, the slim files are
+compiled, and when it is empty (default), the full zap-generated decoders
+are compiled.
+
+After the consolidation, `matter_enable_tlv_decoder_cpp` has been removed
+and the TLV decoder block is unconditional.
 """
 
 import os
 import re
+from pathlib import Path
 
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
@@ -24,7 +29,7 @@ from hypothesis import strategies as st
 # Paths
 # ---------------------------------------------------------------------------
 
-REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+REPO_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 BUILD_GN = os.path.join(REPO_ROOT, "src", "controller", "java", "BUILD.gn")
 
 # ---------------------------------------------------------------------------
@@ -37,143 +42,66 @@ def _read_file(path: str) -> str:
         return f.read()
 
 
-def _extract_brace_block(text: str, start: int) -> str:
-    """
-    Given *text* and the index of an opening '{', return the content
-    between the braces (handling nested braces).
-    """
-    assert text[start] == "{", f"Expected '{{' at position {start}"
-    depth = 1
-    pos = start + 1
-    while pos < len(text) and depth > 0:
-        if text[pos] == "{":
-            depth += 1
-        elif text[pos] == "}":
-            depth -= 1
-        pos += 1
-    return text[start + 1: pos - 1]
-
-
-def _find_tlv_decoder_block(content: str) -> str:
-    """
-    Locate the `if (matter_enable_tlv_decoder_cpp)` block inside BUILD.gn
-    and return its body text.
-    """
-    pattern = r"if\s*\(\s*matter_enable_tlv_decoder_cpp\s*\)"
-    m = re.search(pattern, content)
-    assert m is not None, (
-        "Could not find `if (matter_enable_tlv_decoder_cpp)` in BUILD.gn"
-    )
-    brace_pos = content.index("{", m.end())
-    return _extract_brace_block(content, brace_pos)
-
-
-def _find_conditional_override(block: str, override_var: str, fallback_file: str):
-    """
-    Verify that *block* contains a conditional of the form:
-
-        if (<override_var> != "") {
-          sources += [ <override_var> ]
-        } else {
-          sources += [ "<fallback_file>" ]
-        }
-
-    Returns (if_body, else_body) strings for further inspection.
-    """
-    # Match the if-condition
-    pattern = rf'if\s*\(\s*{re.escape(override_var)}\s*!=\s*""\s*\)'
-    m = re.search(pattern, block)
-    assert m is not None, (
-        f"Could not find `if ({override_var} != \"\")` inside the "
-        f"matter_enable_tlv_decoder_cpp block"
-    )
-
-    # Extract the if-body
-    if_brace = block.index("{", m.end())
-    if_body = _extract_brace_block(block, if_brace)
-
-    # Find the else clause immediately after the if-block closing brace
-    after_if = if_brace + 1 + len(if_body) + 1  # skip past closing '}'
-    rest = block[after_if:]
-    else_match = re.match(r"\s*else\s*\{", rest)
-    assert else_match is not None, (
-        f"Could not find `else` clause after `if ({override_var} != \"\")` block"
-    )
-
-    else_brace = after_if + rest.index("{", else_match.start())
-    else_body = _extract_brace_block(block, else_brace)
-
-    return if_body, else_body
+# Override filenames paired with their zap-generated fallback filenames
+OVERRIDE_CONFIGS = [
+    ("CHIPAttributeTLVValueDecoder-override.cpp",
+     "zap-generated/CHIPAttributeTLVValueDecoder.cpp"),
+    ("CHIPEventTLVValueDecoder-override.cpp",
+     "zap-generated/CHIPEventTLVValueDecoder.cpp"),
+]
 
 
 # ---------------------------------------------------------------------------
 # Property-based tests
 # ---------------------------------------------------------------------------
 
-# Override arg names paired with their zap-generated fallback filenames
-OVERRIDE_CONFIGS = [
-    ("chip_tlv_decoder_attribute_source_override",
-     "zap-generated/CHIPAttributeTLVValueDecoder.cpp"),
-    ("chip_tlv_decoder_event_source_override",
-     "zap-generated/CHIPEventTLVValueDecoder.cpp"),
-]
-
 
 @given(
     override_config=st.sampled_from(OVERRIDE_CONFIGS),
-    dummy_path=st.text(
-        alphabet=st.characters(whitelist_categories=("L", "N", "P")),
-        min_size=1,
-        max_size=80,
-    ),
 )
 @settings(
     max_examples=100,
     suppress_health_check=[HealthCheck.function_scoped_fixture],
     deadline=None,
 )
-def test_gn_conditional_source_selection(override_config, dummy_path):
+def test_gn_conditional_source_selection(override_config):
     """
-    **Validates: Requirements 3.3, 3.4, 3.5, 6.1, 6.2**
+    **Validates: Requirements 4.1, 4.2, 14.4**
 
-    Property 5: For any non-empty value of the override arg, BUILD.gn SHALL
-    compile the override file instead of the zap-generated file. When the
-    override is empty (default), the zap-generated file SHALL be compiled.
+    Property 5: For any non-empty value of `chip_data_model_overrides_dir`,
+    BUILD.gn SHALL compile the override file instead of the zap-generated
+    file. When the override dir is empty (default), the zap-generated file
+    SHALL be compiled.
 
     This test:
-    1. Parses BUILD.gn and locates the matter_enable_tlv_decoder_cpp block
-    2. Verifies the conditional `if (override != "")` exists for each arg
-    3. Verifies the if-branch references the override variable
-    4. Verifies the else-branch references the zap-generated fallback
+    1. Parses BUILD.gn
+    2. Verifies the conditional `if (chip_data_model_overrides_dir != "")` exists
+    3. Verifies the override filename is referenced with the override dir
+    4. Verifies the fallback filename is present for the else branch
     """
-    override_var, fallback_file = override_config
+    override_filename, fallback_file = override_config
 
     content = _read_file(BUILD_GN)
-    block = _find_tlv_decoder_block(content)
 
-    # Verify the conditional pattern exists and extract bodies
-    if_body, else_body = _find_conditional_override(block, override_var, fallback_file)
-
-    # The if-body should reference the override variable (the dynamic path)
-    assert override_var in if_body, (
-        f"The if-branch for `{override_var} != \"\"` does not reference "
-        f"`{override_var}` — expected `sources += [ {override_var} ]`"
+    # Verify the conditional pattern exists
+    conditional_pattern = r'if\s*\(\s*chip_data_model_overrides_dir\s*!=\s*""\s*\)'
+    assert re.search(conditional_pattern, content), (
+        "Could not find `if (chip_data_model_overrides_dir != \"\")` in BUILD.gn"
     )
 
-    # The else-body should reference the zap-generated fallback file
-    assert fallback_file in else_body, (
-        f"The else-branch for `{override_var}` does not reference "
-        f"`{fallback_file}` — expected `sources += [ \"{fallback_file}\" ]`"
+    # The override filename should be referenced with chip_data_model_overrides_dir
+    dir_ref_pattern = (
+        r"chip_data_model_overrides_dir.*" + re.escape(override_filename)
+    )
+    assert re.search(dir_ref_pattern, content), (
+        f"BUILD.gn does not reference `{override_filename}` in combination "
+        f"with `chip_data_model_overrides_dir`"
     )
 
-    # The if-body should contain a sources += assignment
-    assert "sources +=" in if_body, (
-        f"The if-branch for `{override_var}` does not contain `sources +=`"
-    )
-
-    # The else-body should contain a sources += assignment
-    assert "sources +=" in else_body, (
-        f"The else-branch for `{override_var}` does not contain `sources +=`"
+    # The fallback file should be present
+    assert fallback_file in content, (
+        f"BUILD.gn does not reference the fallback file `{fallback_file}` — "
+        f"there should be an else branch for the default path"
     )
 
 
@@ -183,26 +111,25 @@ def test_gn_conditional_source_selection(override_config, dummy_path):
     suppress_health_check=[HealthCheck.function_scoped_fixture],
     deadline=None,
 )
-def test_tlv_decoder_block_preserves_unconditional_elements(dummy):
+def test_tlv_decoder_unconditional_elements(dummy):
     """
-    **Validates: Requirements 3.5, 6.1, 6.2**
+    **Validates: Requirements 4.1, 4.2**
 
-    Verify that the matter_enable_tlv_decoder_cpp block still contains the
+    Verify that the android_chip_im_jni source set contains the
     unconditional elements: the USE_JAVA_TLV_ENCODE_DECODE define and the
-    CHIPTLVValueDecoder-JNI.cpp source. These must not be gated behind the
-    override conditionals.
+    CHIPTLVValueDecoder-JNI.cpp source. These are no longer gated behind
+    `matter_enable_tlv_decoder_cpp` (which has been removed).
     """
     content = _read_file(BUILD_GN)
-    block = _find_tlv_decoder_block(content)
 
-    assert "USE_JAVA_TLV_ENCODE_DECODE" in block, (
-        "The matter_enable_tlv_decoder_cpp block is missing the "
-        "`USE_JAVA_TLV_ENCODE_DECODE` define"
+    assert "USE_JAVA_TLV_ENCODE_DECODE" in content, (
+        "BUILD.gn is missing the `USE_JAVA_TLV_ENCODE_DECODE` define "
+        "in the android_chip_im_jni source set"
     )
 
-    assert "CHIPTLVValueDecoder-JNI.cpp" in block, (
-        "The matter_enable_tlv_decoder_cpp block is missing "
-        "`CHIPTLVValueDecoder-JNI.cpp` as an unconditional source"
+    assert "CHIPTLVValueDecoder-JNI.cpp" in content, (
+        "BUILD.gn is missing `CHIPTLVValueDecoder-JNI.cpp` as a source "
+        "in the android_chip_im_jni source set"
     )
 
 
@@ -212,22 +139,22 @@ def test_tlv_decoder_block_preserves_unconditional_elements(dummy):
     suppress_health_check=[HealthCheck.function_scoped_fixture],
     deadline=None,
 )
-def test_both_override_conditionals_present(dummy):
+def test_matter_enable_tlv_decoder_cpp_removed(dummy):
     """
-    **Validates: Requirements 3.3, 3.4**
+    **Validates: Requirements 2.6, 14.2**
 
-    Verify that both override conditionals are present in the
-    matter_enable_tlv_decoder_cpp block — one for attributes, one for events.
+    Verify that `matter_enable_tlv_decoder_cpp` is no longer referenced
+    as a conditional in BUILD.gn. The flag has been removed and the TLV
+    decoder block is now unconditional.
     """
     content = _read_file(BUILD_GN)
-    block = _find_tlv_decoder_block(content)
 
-    for override_var, fallback_file in OVERRIDE_CONFIGS:
-        pattern = rf'if\s*\(\s*{re.escape(override_var)}\s*!=\s*""\s*\)'
-        assert re.search(pattern, block) is not None, (
-            f"Missing conditional for `{override_var}` in the "
-            f"matter_enable_tlv_decoder_cpp block"
-        )
+    pattern = r"if\s*\(\s*matter_enable_tlv_decoder_cpp\s*\)"
+    assert not re.search(pattern, content), (
+        "REGRESSION: `if (matter_enable_tlv_decoder_cpp)` is still present "
+        "in BUILD.gn — this conditional should have been removed as part of "
+        "the consolidation to chip_data_model_overrides_dir"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -238,12 +165,12 @@ if __name__ == "__main__":
 
     print("Running GN conditional source selection property tests...")
     tests = [
-        ("5a: GN conditional source selection",
+        ("5a: GN conditional source selection with overrides dir",
          test_gn_conditional_source_selection),
-        ("5b: Unconditional elements preserved",
-         test_tlv_decoder_block_preserves_unconditional_elements),
-        ("5c: Both override conditionals present",
-         test_both_override_conditionals_present),
+        ("5b: Unconditional TLV decoder elements preserved",
+         test_tlv_decoder_unconditional_elements),
+        ("5c: matter_enable_tlv_decoder_cpp removed from BUILD.gn",
+         test_matter_enable_tlv_decoder_cpp_removed),
     ]
     all_passed = True
     for name, test_fn in tests:

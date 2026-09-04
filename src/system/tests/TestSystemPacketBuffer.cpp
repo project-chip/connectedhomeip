@@ -1744,5 +1744,32 @@ TEST_F(TestSystemPacketBuffer, CheckPacketBufferWriter)
     EXPECT_EQ(memcmp(yayBuffer->Start(), kPayload, sizeof kPayload), 0);
 }
 
+TEST_F(TestSystemPacketBuffer, CheckPacketBufferWriterNullBuffer)
+{
+    static const char kPayload[] = "Hello, world!";
+
+    // A failed allocation reaches the writer as a null handle. Construction must leave the writer
+    // null instead of dereferencing it, so that callers can test IsNull() as documented, and writing
+    // to it must be inert. Fit() reports only whether the input fit, so it does not by itself
+    // distinguish a null writer from a usable one; Finalize() is null in both cases below.
+
+    // Sized constructor, written past its zero capacity, so Fit() is false.
+    PacketBufferWriter sized(PacketBufferHandle(), sizeof(kPayload));
+    EXPECT_TRUE(sized.IsNull());
+    EXPECT_EQ(sized.Size(), static_cast<size_t>(0));
+    sized.Put(kPayload);
+    EXPECT_FALSE(sized.Fit());
+    EXPECT_TRUE(sized.Finalize().IsNull());
+
+    // Unsized constructor, never written, so Fit() is true: it reflects capacity, not validity, and
+    // gives no warning here. A caller that skipped the IsNull() check still sees Finalize() yield null.
+    PacketBufferHandle empty;
+    PacketBufferWriter unsized(std::move(empty));
+    EXPECT_TRUE(unsized.IsNull());
+    EXPECT_EQ(unsized.Size(), static_cast<size_t>(0));
+    EXPECT_TRUE(unsized.Fit());
+    EXPECT_TRUE(unsized.Finalize().IsNull());
+}
+
 } // namespace System
 } // namespace chip

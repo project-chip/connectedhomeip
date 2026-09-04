@@ -247,8 +247,8 @@ public:
      */
     virtual inline void SetNativeParams(void * params) { (void) params; }
 
-    inline bool operator==(const UDPEndPointHandle & other) const { return other == *this; }
-    inline bool operator!=(const UDPEndPointHandle & other) const { return other != *this; }
+    inline bool operator==(const UDPEndPointHandle & other) const { return other.IsReferencing(this); }
+    inline bool operator!=(const UDPEndPointHandle & other) const { return !other.IsReferencing(this); }
 
 protected:
     friend class EndPointDeletor<UDPEndPoint>;

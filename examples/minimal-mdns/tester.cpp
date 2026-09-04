@@ -20,6 +20,7 @@
 #include <memory>
 
 #include <TracingCommandLineArgument.h>
+#include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/dnssd/MinimalMdnsServer.h>
@@ -27,11 +28,11 @@
 #include <lib/dnssd/minimal_mdns/AddressPolicy.h>
 #include <lib/dnssd/minimal_mdns/ResponseBuilder.h>
 #include <lib/dnssd/minimal_mdns/Server.h>
-#include <lib/dnssd/minimal_mdns/core/QName.h>
-#include <lib/dnssd/minimal_mdns/records/IP.h>
-#include <lib/dnssd/minimal_mdns/records/Ptr.h>
-#include <lib/dnssd/minimal_mdns/records/Srv.h>
-#include <lib/dnssd/minimal_mdns/records/Txt.h>
+#include <lib/dnssd/wire/QName.h>
+#include <lib/dnssd/wire/records/IP.h>
+#include <lib/dnssd/wire/records/Ptr.h>
+#include <lib/dnssd/wire/records/Srv.h>
+#include <lib/dnssd/wire/records/Txt.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -135,7 +136,7 @@ OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
 class ReportDelegate : public mdns::Minimal::ServerDelegate
 {
 public:
-    void OnQuery(const mdns::Minimal::BytesRange & data, const chip::Inet::IPPacketInfo * info) override
+    void OnQuery(const chip::Dnssd::BytesRange & data, const chip::Inet::IPPacketInfo * info) override
     {
         char addr[Inet::IPAddress::kMaxStringLength];
         info->SrcAddress.ToString(addr, sizeof(addr));
@@ -147,7 +148,7 @@ public:
         Report("QUERY: ", data);
     }
 
-    void OnResponse(const mdns::Minimal::BytesRange & data, const chip::Inet::IPPacketInfo * info) override
+    void OnResponse(const chip::Dnssd::BytesRange & data, const chip::Inet::IPPacketInfo * info) override
     {
         char addr[Inet::IPAddress::kMaxStringLength];
         info->SrcAddress.ToString(addr, sizeof(addr));
@@ -160,10 +161,10 @@ public:
     }
 
 private:
-    void Report(const char * prefix, const mdns::Minimal::BytesRange & data)
+    void Report(const char * prefix, const chip::Dnssd::BytesRange & data)
     {
         MdnsExample::PacketReporter reporter(prefix, data);
-        if (!mdns::Minimal::ParsePacket(data, &reporter))
+        if (!chip::Dnssd::ParsePacket(data, &reporter))
         {
             printf("INVALID PACKET!!!!!!\n");
         }
@@ -177,21 +178,21 @@ System::PacketBufferHandle BuildSrvTestPacket()
 
     mdns::Minimal::ResponseBuilder builder(std::move(packet));
 
-    constexpr uint16_t kSrvPort                          = 5540;
-    constexpr const char * kNodeName                     = "ABCD1234ABCD1234";
-    constexpr const char * kNodeFabricName               = "ABCD1234ABCD1234-0000000000000001";
-    constexpr mdns::Minimal::QNamePart kServiceName[]    = { Dnssd::kOperationalServiceName, Dnssd::kOperationalProtocol,
-                                                             Dnssd::kLocalDomain };
-    constexpr mdns::Minimal::QNamePart kServerFullName[] = { kNodeFabricName, Dnssd::kOperationalServiceName,
-                                                             Dnssd::kOperationalProtocol, Dnssd::kLocalDomain };
-    constexpr mdns::Minimal::QNamePart kServerName[]     = { kNodeName, Dnssd::kLocalDomain };
+    constexpr uint16_t kSrvPort                        = 5540;
+    constexpr const char * kNodeName                   = "ABCD1234ABCD1234";
+    constexpr const char * kNodeFabricName             = "ABCD1234ABCD1234-0000000000000001";
+    constexpr chip::Dnssd::QNamePart kServiceName[]    = { Dnssd::kOperationalServiceName, Dnssd::kOperationalProtocol,
+                                                           Dnssd::kLocalDomain };
+    constexpr chip::Dnssd::QNamePart kServerFullName[] = { kNodeFabricName, Dnssd::kOperationalServiceName,
+                                                           Dnssd::kOperationalProtocol, Dnssd::kLocalDomain };
+    constexpr chip::Dnssd::QNamePart kServerName[]     = { kNodeName, Dnssd::kLocalDomain };
 
-    mdns::Minimal::PtrResourceRecord ptrRecord(kServiceName, kServerFullName);
-    mdns::Minimal::SrvResourceRecord srvRecord(kServerFullName, kServerName, kSrvPort);
+    chip::Dnssd::PtrResourceRecord ptrRecord(kServiceName, kServerFullName);
+    chip::Dnssd::SrvResourceRecord srvRecord(kServerFullName, kServerName, kSrvPort);
     srvRecord.SetCacheFlush(true);
 
-    builder.AddRecord(mdns::Minimal::ResourceType::kAnswer, ptrRecord);
-    builder.AddRecord(mdns::Minimal::ResourceType::kAnswer, srvRecord);
+    builder.AddRecord(chip::Dnssd::ResourceType::kAnswer, ptrRecord);
+    builder.AddRecord(chip::Dnssd::ResourceType::kAnswer, srvRecord);
 
     if (!builder.Ok())
     {

@@ -350,7 +350,7 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPaused)
 
         self.step("18")
-        log.info(f"Sleeping for forecast.slots[0].minPauseDuration {forecast.slots[0].minPauseDuration}s")
+        log.info("Sleeping for forecast.slots[0].minPauseDuration %ss", forecast.slots[0].minPauseDuration)
         await asyncio.sleep(forecast.slots[0].minPauseDuration)
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.Resumed)
         asserts.assert_equal(event_data.cause, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kNormalCompletion)

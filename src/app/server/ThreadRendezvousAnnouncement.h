@@ -36,6 +36,12 @@ class TxtStringsBuilder
 public:
     TxtStringsBuilder() = default;
 
+    // mNextStart and the mTxtStrings entries point into this object's own mTxtBuffer, so a defaulted
+    // copy would leave them aliasing the source's buffer. The builder is used as a single local and is
+    // never copied; forbid copying so an accidental copy is a compile error rather than a dangling alias.
+    TxtStringsBuilder(const TxtStringsBuilder &)             = delete;
+    TxtStringsBuilder & operator=(const TxtStringsBuilder &) = delete;
+
     /**
      * @brief Fills the TXT record entries from the given advertising parameters.
      *

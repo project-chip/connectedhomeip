@@ -34,11 +34,15 @@
 
 /*
  * Enable trustm for HKDF SHA256
+ * Ensure that TRUSTM_HKDF_OID_KEY is provisioned before enabling this option
+ * refer to /docs/platforms/infineon/infineon_trustm_provisioning.md for more details.
  */
 #define ENABLE_TRUSTM_HKDF_SHA256 0
 
 /*
  * Enable trustm for HMAC SHA256
+ * Ensure that TRUSTM_HMAC_OID_KEY is provisioned before enabling this option
+ * refer to /docs/platforms/infineon/infineon_trustm_provisioning.md for more details.
  */
 #define ENABLE_TRUSTM_HMAC_SHA256 0
 
@@ -48,6 +52,8 @@
 #define ENABLE_TRUSTM_DEVICE_ATTESTATION 1
 
 /*
- * Enable trustm for NOC key-pair generation
+ * Enable trustm for Random Number Generation (DRBG)
+ * Disabled: TrustM is registered as an entropy source for the mbedtls CTR-DRBG
+ * via add_entropy_source() in PlatformManagerImpl::_InitChipStack().
  */
-#define ENABLE_TRUSTM_NOC_KEYGEN 0
+#define ENABLE_TRUSTM_RANDOM 1

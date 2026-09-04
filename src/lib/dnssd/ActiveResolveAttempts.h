@@ -23,7 +23,7 @@
 
 #include <lib/core/PeerId.h>
 #include <lib/dnssd/Resolver.h>
-#include <lib/dnssd/minimal_mdns/core/HeapQName.h>
+#include <lib/dnssd/wire/HeapQName.h>
 #include <lib/support/Variant.h>
 #include <system/SystemClock.h>
 
@@ -65,13 +65,13 @@ public:
 
         struct IpResolve
         {
-            HeapQName hostName;
-            IpResolve(HeapQName && host) : hostName(std::move(host)) {}
+            chip::Dnssd::HeapQName hostName;
+            IpResolve(chip::Dnssd::HeapQName && host) : hostName(std::move(host)) {}
         };
 
         ScheduledAttempt()
         {
-            static_assert(sizeof(Resolve) <= sizeof(Browse) || sizeof(Resolve) <= sizeof(HeapQName),
+            static_assert(sizeof(Resolve) <= sizeof(Browse) || sizeof(Resolve) <= sizeof(chip::Dnssd::HeapQName),
                           "Figure out where to put the Resolve counter so that Resolve is not making ScheduledAttempt bigger than "
                           "it has to be anyway to handle the other attempt types.");
         }
@@ -132,7 +132,7 @@ public:
             return false;
         }
 
-        bool MatchesIpResolve(SerializedQNameIterator hostName) const
+        bool MatchesIpResolve(chip::Dnssd::SerializedQNameIterator hostName) const
         {
             return resolveData.Is<IpResolve>() && (hostName == resolveData.Get<IpResolve>().hostName.Content());
         }
@@ -250,7 +250,7 @@ public:
 
     /// Mark a resolution as a success, removing it from the internal list
     void Complete(const chip::PeerId & peerId);
-    void CompleteIpResolution(SerializedQNameIterator targetHostName);
+    void CompleteIpResolution(chip::Dnssd::SerializedQNameIterator targetHostName);
 
     /// Mark all browse-type scheduled attemptes as a success, removing them
     /// from the internal list.
@@ -285,7 +285,7 @@ public:
 
     /// Check if any of the pending queries are for the given host name for
     /// IP resolution.
-    bool IsWaitingForIpResolutionFor(SerializedQNameIterator hostName) const;
+    bool IsWaitingForIpResolutionFor(chip::Dnssd::SerializedQNameIterator hostName) const;
 
     /// Determines if address resolution for the given peer ID is required
     ///

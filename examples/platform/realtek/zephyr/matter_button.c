@@ -36,13 +36,53 @@ static const struct gpio_dt_spec buttons[] = {
     DT_FOREACH_CHILD(BUTTONS_NODE, GPIO_SPEC_AND_COMMA)
 #endif
 };
-static uint8_t key_trigger_level[NUMBER_OF_BUTTONS];
+
+#define DEBOUNCE_MS DT_PROP_OR(DT_PATH(buttons), debounce_interval_ms, 30)
+
+struct button_state
+{
+    struct k_work_delayable work;
+    uint8_t index;
+};
+static struct button_state button_state[NUMBER_OF_BUTTONS];
 static struct gpio_callback button_cb_data;
 static button_handler_t button_handler_cb;
 
+static void button_work_handler(struct k_work * work)
+{
+    struct k_work_delayable * dwork = k_work_delayable_from_work(work);
+    struct button_state * state     = CONTAINER_OF(dwork, struct button_state, work);
+    uint8_t i                       = state->index;
+    int pressed;
+
+    pressed = gpio_pin_get_dt(&buttons[i]);
+
+    if (pressed > 0)
+    {
+        /* PRESSED */
+        gpio_pin_interrupt_configure_dt(&buttons[i], GPIO_INT_LEVEL_INACTIVE);
+        gpio_pin_interrupt_configure_dt(&buttons[i], GPIO_INT_MODE_ENABLE_ONLY);
+
+        if (button_handler_cb != NULL)
+        {
+            button_handler_cb(i, MATTER_BUTTON_STATE_PRESS);
+        }
+    }
+    else
+    {
+        /* RELEASED */
+        gpio_pin_interrupt_configure_dt(&buttons[i], GPIO_INT_LEVEL_ACTIVE);
+        gpio_pin_interrupt_configure_dt(&buttons[i], GPIO_INT_MODE_ENABLE_ONLY);
+
+        if (button_handler_cb != NULL)
+        {
+            button_handler_cb(i, MATTER_BUTTON_STATE_RELEASE);
+        }
+    }
+}
+
 void button_pressed(const struct device * dev, struct gpio_callback * cb, uint32_t pins)
 {
-    uint8_t state;
     uint8_t i;
 
     for (i = 0; i < ARRAY_SIZE(buttons); i++)
@@ -58,23 +98,8 @@ void button_pressed(const struct device * dev, struct gpio_callback * cb, uint32
         return;
     }
 
-    if (key_trigger_level[i] == GPIO_ACTIVE_HIGH)
-    {
-        gpio_pin_interrupt_configure_dt(&buttons[i], GPIO_INT_EDGE_TO_INACTIVE);
-        key_trigger_level[i] = GPIO_ACTIVE_LOW;
-        state                = MATTER_BUTTON_STATE_PRESS;
-    }
-    else
-    {
-        gpio_pin_interrupt_configure_dt(&buttons[i], GPIO_INT_EDGE_TO_ACTIVE);
-        key_trigger_level[i] = GPIO_ACTIVE_HIGH;
-        state                = MATTER_BUTTON_STATE_RELEASE;
-    }
-
-    if (button_handler_cb != NULL)
-    {
-        button_handler_cb(i, state);
-    }
+    gpio_pin_interrupt_configure_dt(&buttons[i], GPIO_INT_MODE_DISABLE_ONLY);
+    k_work_reschedule(&button_state[i].work, K_MSEC(DEBOUNCE_MS));
 }
 
 int matter_button_init(button_handler_t button_handler)
@@ -86,7 +111,8 @@ int matter_button_init(button_handler_t button_handler)
 
     for (size_t i = 0; i < ARRAY_SIZE(buttons); i++)
     {
-        key_trigger_level[i] = GPIO_ACTIVE_HIGH;
+        button_state[i].index = i;
+        k_work_init_delayable(&button_state[i].work, button_work_handler);
 
         if (!gpio_is_ready_dt(&buttons[i]))
         {
@@ -101,7 +127,7 @@ int matter_button_init(button_handler_t button_handler)
             return err;
         }
 
-        err = gpio_pin_interrupt_configure_dt(&buttons[i], GPIO_INT_EDGE_TO_ACTIVE);
+        err = gpio_pin_interrupt_configure_dt(&buttons[i], GPIO_INT_LEVEL_ACTIVE);
         if (err != 0)
         {
             LOG_ERR("Error %d: failed to configure interrupt on %s pin %d", err, buttons[i].port->name, buttons[i].pin);

@@ -12,10 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
-  "ClosureDimensionCluster.cpp",
-  "ClosureDimensionClusterMatterContext.cpp",
+  "CodegenIntegration.cpp",
+  "CodegenIntegration.h",
   "closure-dimension-cluster-objects.h",
   "closure-dimension-delegate.h",
-  "closure-dimension-matter-context.h",
   "closure-dimension-server.h",
 ]

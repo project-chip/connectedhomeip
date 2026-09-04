@@ -140,8 +140,8 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
 
         self.step(1)
 
-        logger.info(f"Step #1 - DUT NodeID (OTA Requestor): {requestor_node_id}")
-        logger.info(f"Step #1 - admin_fabric1 FabricID: {admin_fabric1.fabricId}")
+        logger.info("Step #1 - DUT NodeID (OTA Requestor): %s", requestor_node_id)
+        logger.info("Step #1 - admin_fabric1 FabricID: %s", admin_fabric1.fabricId)
 
         # Read current DefaultOTAProviders value on Fabric1 (via admin_fabric1)
         actual_otap_info = await self.read_single_attribute_check_success(
@@ -149,7 +149,7 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
             cluster=self.cluster_otar,
             attribute=self.cluster_otar.Attributes.DefaultOTAProviders,
         )
-        logger.info(f"Step #1 - DefaultOTAProviders read via admin_fabric1: {actual_otap_info}")
+        logger.info("Step #1 - DefaultOTAProviders read via admin_fabric1: %s", actual_otap_info)
 
         # Write DefaultOTAProviders on Fabric1: set provider1_fabric1 (TH2)
         await self.set_default_ota_providers_list(
@@ -168,15 +168,15 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
             cluster=self.cluster_otar,
             attribute=self.cluster_otar.Attributes.DefaultOTAProviders,
         )
-        logger.info(f"Step #2 - DefaultOTAProviders read via admin_fabric1: {actual_otap_info}")
+        logger.info("Step #2 - DefaultOTAProviders read via admin_fabric1: %s", actual_otap_info)
 
         asserts.assert_true(len(actual_otap_info) > 0, "DefaultOTAProviders list is empty on Fabric1")
 
         actual_provider_f1 = actual_otap_info[0]
-        logger.info(f"Step #2 - First provider entry (Fabric1): {actual_provider_f1}")
+        logger.info("Step #2 - First provider entry (Fabric1): %s", actual_provider_f1)
 
         fabric1_index = actual_provider_f1.fabricIndex
-        logger.info(f"Step #2 - Captured fabric1_index from DUT: {fabric1_index}")
+        logger.info("Step #2 - Captured fabric1_index from DUT: %s", fabric1_index)
 
         asserts.assert_equal(
             actual_provider_f1.providerNodeID,
@@ -199,13 +199,13 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
             nodeId=provider1_fabric2_node_id, useTestCommissioner=True
         )
 
-        logger.info(f"Step #3 - admin_fabric2 NodeID: {admin_fabric2.nodeId}")
-        logger.info(f"Step #3 - admin_fabric2 FabricID: {admin_fabric2.fabricId}")
+        logger.info("Step #3 - admin_fabric2 NodeID: %s", admin_fabric2.nodeId)
+        logger.info("Step #3 - admin_fabric2 FabricID: %s", admin_fabric2.fabricId)
 
         params = await self.open_commissioning_window(admin_fabric1, requestor_node_id)
         setup_pin_code = params.commissioningParameters.setupPinCode
         long_discriminator = params.randomDiscriminator
-        logger.info(f"Step #3 - Commissioning window opened: {vars(params)}")
+        logger.info("Step #3 - Commissioning window opened: %s", vars(params))
 
         logger.info("Step #3 - Commissioning DUT with admin_fabric2")
         resp = await admin_fabric2.CommissionOnNetwork(
@@ -214,7 +214,7 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=long_discriminator,
         )
-        logger.info(f"Step #3 - admin_fabric2 commissioning response: {resp}")
+        logger.info("Step #3 - admin_fabric2 commissioning response: %s", resp)
 
         # Write DefaultOTAProviders on Fabric2: set provider1_fabric2 (TH3)
         await self.set_default_ota_providers_list(
@@ -234,14 +234,14 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
             cluster=self.cluster_otar,
             attribute=self.cluster_otar.Attributes.DefaultOTAProviders,
         )
-        logger.info(f"Step #4 - DefaultOTAProviders read via admin_fabric2: {f2_otap_info}")
+        logger.info("Step #4 - DefaultOTAProviders read via admin_fabric2: %s", f2_otap_info)
 
         asserts.assert_true(len(f2_otap_info) > 0, "DefaultOTAProviders list is empty on Fabric2")
 
         actual_provider_f2 = f2_otap_info[0]
         fabric2_index = actual_provider_f2.fabricIndex
-        logger.info(f"Step #4 - First provider entry (Fabric2): {actual_provider_f2}")
-        logger.info(f"Step #4 - Captured fabric2_index from DUT: {fabric2_index}")
+        logger.info("Step #4 - First provider entry (Fabric2): %s", actual_provider_f2)
+        logger.info("Step #4 - Captured fabric2_index from DUT: %s", fabric2_index)
 
         asserts.assert_equal(
             actual_provider_f2.providerNodeID,
@@ -258,7 +258,7 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
             cluster=self.cluster_otar,
             attribute=self.cluster_otar.Attributes.DefaultOTAProviders,
         )
-        logger.info(f"Step #4 - DefaultOTAProviders read via admin_fabric1: {f1_otap_info}")
+        logger.info("Step #4 - DefaultOTAProviders read via admin_fabric1: %s", f1_otap_info)
 
         asserts.assert_true(len(f1_otap_info) > 0, "DefaultOTAProviders list is empty on Fabric1 after Fabric2 write")
 
@@ -290,7 +290,7 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
         )
 
         providers_list = [provider2_fabric1_for_write, provider1_fabric1_for_write]
-        logger.info(f"Step #5 - Providers list (Fabric1 write): {providers_list}")
+        logger.info("Step #5 - Providers list (Fabric1 write): %s", providers_list)
 
         attr = self.cluster_otar.Attributes.DefaultOTAProviders(value=providers_list)
 
@@ -299,13 +299,13 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
             cluster=self.cluster_otar,
             attribute=self.cluster_otar.Attributes.DefaultOTAProviders,
         )
-        logger.info(f"Step #5 - BEFORE Write - Fabric1 DefaultOTAProviders: {pre_write_val}")
+        logger.info("Step #5 - BEFORE Write - Fabric1 DefaultOTAProviders: %s", pre_write_val)
 
         resp = await admin_fabric1.WriteAttribute(
             nodeId=requestor_node_id,
             attributes=[(0, attr)],
         )
-        logger.info(f"Step #5 - Write DefaultOTAProviders response: {resp}")
+        logger.info("Step #5 - Write DefaultOTAProviders response: %s", resp)
 
         asserts.assert_equal(
             resp[0].Status,
@@ -319,7 +319,7 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
             cluster=self.cluster_otar,
             attribute=self.cluster_otar.Attributes.DefaultOTAProviders,
         )
-        logger.info(f"Step #5 - AFTER Write - Fabric1 DefaultOTAProviders: {post_write_val}")
+        logger.info("Step #5 - AFTER Write - Fabric1 DefaultOTAProviders: %s", post_write_val)
 
         asserts.assert_equal(
             len(post_write_val),
@@ -344,7 +344,7 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
             cluster=self.cluster_otar,
             attribute=self.cluster_otar.Attributes.DefaultOTAProviders,
         )
-        logger.info(f"Step #5 - Fabric2 DefaultOTAProviders read via admin_fabric2: {fabric2_val}")
+        logger.info("Step #5 - Fabric2 DefaultOTAProviders read via admin_fabric2: %s", fabric2_val)
 
         asserts.assert_equal(len(fabric2_val), 1, "Fabric2 should still have exactly one provider after failed write on Fabric1")
         asserts.assert_equal(
@@ -363,7 +363,7 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
         self.step(6)
 
         providers_list_empty = []
-        logger.info(f"Step #6 - Providers list empty (Fabric2 write): {providers_list_empty}")
+        logger.info("Step #6 - Providers list empty (Fabric2 write): %s", providers_list_empty)
 
         attr = self.cluster_otar.Attributes.DefaultOTAProviders(value=providers_list_empty)
 
@@ -371,7 +371,7 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
             nodeId=requestor_node_id,
             attributes=[(0, attr)],
         )
-        logger.info(f"Step #6 - Write DefaultOTAProviders response on Fabric2: {resp}")
+        logger.info("Step #6 - Write DefaultOTAProviders response on Fabric2: %s", resp)
 
         asserts.assert_equal(resp[0].Status, Status.Success, "Failed to write DefaultOTAProviders (empty list) on Fabric2")
         logger.info("Step #6 - Write operation succeeded with empty list on Fabric2")
@@ -382,7 +382,7 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
             cluster=self.cluster_otar,
             attribute=self.cluster_otar.Attributes.DefaultOTAProviders,
         )
-        logger.info(f"Step #6 - Fabric2 DefaultOTAProviders after clear: {f2_after_clear}")
+        logger.info("Step #6 - Fabric2 DefaultOTAProviders after clear: %s", f2_after_clear)
 
         asserts.assert_equal(len(f2_after_clear), 0, "DefaultOTAProviders on Fabric2 should be empty after clear")
         asserts.assert_equal(f2_after_clear, [], "DefaultOTAProviders on Fabric2 should be [] after clear")
@@ -393,7 +393,7 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
             cluster=self.cluster_otar,
             attribute=self.cluster_otar.Attributes.DefaultOTAProviders,
         )
-        logger.info(f"Step #6 - Fabric1 DefaultOTAProviders after Fabric2 clear: {f1_after_clear_f2}")
+        logger.info("Step #6 - Fabric1 DefaultOTAProviders after Fabric2 clear: %s", f1_after_clear_f2)
 
         asserts.assert_equal(len(f1_after_clear_f2), 1, "DefaultOTAProviders on Fabric1 should contain one provider")
         asserts.assert_equal(
@@ -416,7 +416,7 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
             cluster=self.cluster_otar,
             attribute=self.cluster_otar.Attributes.UpdatePossible,
         )
-        logger.info(f"Step #7 - UpdatePossible read via admin_fabric1: {update_possible}")
+        logger.info("Step #7 - UpdatePossible read via admin_fabric1: %s", update_possible)
 
         asserts.assert_true(update_possible, "Expected UpdatePossible to be True")
 
@@ -427,7 +427,7 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
             cluster=self.cluster_otar,
             attribute=self.cluster_otar.Attributes.UpdateState,
         )
-        logger.info(f"Step #8 - UpdateState read via admin_fabric1: {update_state}")
+        logger.info("Step #8 - UpdateState read via admin_fabric1: %s", update_state)
 
         valid_states = [
             self.cluster_otar.Enums.UpdateStateEnum.kUnknown,

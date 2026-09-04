@@ -20,7 +20,7 @@
 
 set -e
 
-if [[ -z "${MATTER_ROOT}" ]]; then
+if [[ -z "$MATTER_ROOT" ]]; then
     echo "Using default path for Matter root"
     CHIP_ROOT="$(dirname "$0")/../.."
 else
@@ -28,7 +28,7 @@ else
     CHIP_ROOT="$MATTER_ROOT"
 fi
 
-if [[ -z "${PW_ENVIRONMENT_ROOT}" ]]; then
+if [[ -z "$PW_ENVIRONMENT_ROOT" ]]; then
     echo "Using the bootstrapped pigweed ENV in Matter root"
     PW_PATH="$CHIP_ROOT/.environment/cipd/packages/pigweed"
 else
@@ -38,7 +38,6 @@ fi
 
 USE_WIFI=false
 USE_DOCKER=false
-USE_GIT_SHA_FOR_VERSION=true
 GN_PATH="$PW_PATH/gn"
 USE_BOOTLOADER=false
 DOTFILE=".gn"
@@ -64,11 +63,8 @@ if [ "$#" == "0" ]; then
     <silabs_board_name>
         Identifier of the board for which this app is built
         Currently Supported :
-            BRD4186A
-            BRD4187A
             BRD4186C
             BRD4187C
-            BRD2601B
             BRD2703A
             BRD2704A
             BRD4316A
@@ -108,8 +104,6 @@ if [ "$#" == "0" ]; then
             Use to build the example with pigweed RPC
         ota_periodic_query_timeout_sec
             Periodic query timeout variable for OTA in seconds
-        rs91x_wpa3_transition
-            Support for WPA3 transition mode on RS91x
         slc_gen_path
             Allow users to define a path where slc generates board files. (requires --slc_generate or --slc_reuse_files)
             (default: /third_party/silabs/slc_gen/<board>/)
@@ -185,7 +179,7 @@ else
                 shift
                 ;;
             --wifi)
-                if [ -z "$2" ]; then
+                if [ "$2" = "" ]; then
                     echo "--wifi requires SiWx917"
                     exit 1
                 fi
@@ -231,11 +225,6 @@ else
                 optArgs+="lwip_root=\""//third_party/connectedhomeip/third_party/lwip"\" "
                 shift
                 ;;
-            # Option not to be used until ot-efr32 github is updated
-            # --use_ot_github_sources)
-            #   optArgs+="openthread_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/openthread\" openthread_efr32_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/src/src\""
-            #    shift
-            #    ;;
             --release)
                 optArgs+="is_debug=false disable_lcd=true chip_build_libshell=false enable_openthread_cli=false use_external_flash=false chip_logging=false silabs_log_enabled=false sl_uart_log_output=false "
                 shift
@@ -273,18 +262,13 @@ else
                 shift
                 ;;
             --gn_path)
-                if [ -z "$2" ]; then
+                if [ "$2" = "" ]; then
                     echo "--gn_path requires a path to GN"
                     exit 1
                 else
                     GN_PATH="$2"
                 fi
                 shift
-                shift
-                ;;
-            *"sl_matter_version_str="*)
-                optArgs+="$1 "
-                USE_GIT_SHA_FOR_VERSION=false
                 shift
                 ;;
             *)
@@ -299,9 +283,13 @@ else
         esac
     done
 
-    if [ -z "$SILABS_BOARD" ]; then
+    if [ "$SILABS_BOARD" = "" ]; then
         echo "SILABS_BOARD not defined"
         exit 1
+    fi
+
+    if [[ "BRD2601B" == "$SILABS_BOARD" ]]; then
+        echo "BRD2601B is deprecated, please use the BRD2601D"
     fi
 
     # 917 exception. TODO find a more generic way
@@ -311,18 +299,15 @@ else
         USE_WIFI=true
     fi
 
-    if [ "$USE_GIT_SHA_FOR_VERSION" == true ]; then
-        {
-            ShortCommitSha=$(git describe --always --dirty --exclude '*')
-            branchName=$(git rev-parse --abbrev-ref HEAD)
-            optArgs+="sl_matter_version_str=\"v1.3-$branchName-$ShortCommitSha\" "
-        } &>/dev/null
-    fi
-
-    # Run install-packages once (creates .install-packages-done when done); skip when using Docker (SDK is in image)
-    if [ "$USE_DOCKER" != true ] && [ ! -f "$CHIP_ROOT/scripts/setup/silabs/.install-packages-done" ]; then
-
+    # After a completed local install (.install-packages-done), run the Silabs package install step to check for updates. Docker never runs it (SDK is in the image).
+    if [ -f "$CHIP_ROOT/scripts/setup/silabs/.install-packages-done" ]; then # INSTALL_EVERYTHING
+        INSTALL_EVERYTHING=true
+    else
         INSTALL_EVERYTHING=false
+    fi # INSTALL_EVERYTHING
+
+    # First-time local install: INSTALL_EVERYTHING is false until .install-packages-done (see above); respect opt-out. No prompt in Docker.
+    if [ "$USE_DOCKER" != true ] && [ "$INSTALL_EVERYTHING" != true ] && [ ! -f "$CHIP_ROOT/scripts/setup/silabs/.do-not-install-packages" ]; then # first-time install prompt
         cat <<'EOF'
         !!!!!!!!! FIRST TIME INSTALL !!!!!!!!!
         Do you agree to install SILICON LABS PACKAGES MANAGER?
@@ -332,30 +317,33 @@ else
 
         Most of the files will be located under ~/.silabs,
         some symbolic link will be created and it will replace simplicity_sdk submodule
+        This is required for the build to succeed.
 EOF
 
         while true; do
-            read -p "Do you want to proceed? (y/n): " yn
+            read -p "Do you want to proceed? [Y/n]: " yn
             case $yn in
-                [Yy]*)
+                "" | [Yy]*)
                     INSTALL_EVERYTHING=true
+                    python3 -m pip install -q -r "$CHIP_ROOT/integrations/docker/images/stage-2/chip-build-efr32/requirements.txt" >/dev/null 2>&1 || true
                     break
-                    ;; # Case for yes/Y
+                    ;; # Case for yes/Y (Enter accepts default)
                 [Nn]*)
-                    echo "You won't be asked again"
+                    echo "You won't be asked again, cannot proceed with build. Exiting..."
+                    touch "$CHIP_ROOT/scripts/setup/silabs/.do-not-install-packages"
+                    exit 1
                     break
                     ;;                                                  # Case for no/N
                 *) echo "Invalid response. Please answer yes or no." ;; # Case for invalid input
             esac
         done
+    fi # first-time install prompt
 
-        if [ "$INSTALL_EVERYTHING" == true ]; then
-            pip install -r "$CHIP_ROOT/integrations/docker/images/stage-2/chip-build-efr32/requirements.txt"
-            python3 "$CHIP_ROOT/scripts/setup/silabs/install-packages.py" || exit 1
-        else
-            touch "$CHIP_ROOT/scripts/setup/silabs/.install-packages-done"
-        fi
-    fi
+    # Local Silabs package install when agreed (INSTALL_EVERYTHING). Never under Docker.
+    if [ "$INSTALL_EVERYTHING" == true ] && [ "$USE_DOCKER" != true ]; then # run install-packages
+        python3 -m pip install -q -r "$CHIP_ROOT/integrations/docker/images/stage-2/chip-build-efr32/requirements.txt"
+        python3 "$CHIP_ROOT/scripts/setup/silabs/install-packages.py" || exit 1
+    fi # run install-packages
 
     # Zap generation requires activation
     source "$CHIP_ROOT/scripts/activate.sh"
@@ -407,12 +395,12 @@ EOF
         bootloaderPath=""
         commanderPath=""
         # find the matter root folder
-        if [ -z "$MATTER_ROOT" ]; then
+        if [ "$MATTER_ROOT" = "" ]; then
             MATTER_ROOT="$CHIP_ROOT"
         fi
 
         # set commander path
-        if [ -z "$COMMANDER_PATH" ]; then
+        if [ "$COMMANDER_PATH" = "" ]; then
             commanderPath="commander"
         else
             commanderPath="$COMMANDER_PATH"

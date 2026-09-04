@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <app/clusters/thread-network-diagnostics-server/DirectThreadNetworkDiagnosticsProvider.h>
 #include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsCluster.h>
 #include <app/static-cluster-config/ThreadNetworkDiagnostics.h>
 #include <app/util/endpoint-config-api.h>
@@ -38,6 +39,12 @@ constexpr size_t kThreadNetworkDiagnosticsMaxClusterCount =
 
 LazyRegisteredServerCluster<ThreadNetworkDiagnosticsCluster> gServers[kThreadNetworkDiagnosticsMaxClusterCount];
 
+DirectThreadNetworkDiagnosticsProvider & GetDirectProvider()
+{
+    static DirectThreadNetworkDiagnosticsProvider sDirectProvider;
+    return sDirectProvider;
+}
+
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
@@ -56,7 +63,8 @@ public:
 
         gServers[clusterInstanceIndex].Create(endpointId,
                                               rawFeatureMap == 0 ? ThreadNetworkDiagnosticsCluster::ClusterType::kMinimal
-                                                                 : ThreadNetworkDiagnosticsCluster::ClusterType::kFull);
+                                                                 : ThreadNetworkDiagnosticsCluster::ClusterType::kFull,
+                                              GetDirectProvider());
         return gServers[clusterInstanceIndex].Registration();
     }
 

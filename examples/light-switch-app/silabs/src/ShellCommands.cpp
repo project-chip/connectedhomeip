@@ -17,19 +17,63 @@
  *    limitations under the License.
  */
 #include <optional>
-#if defined(ENABLE_CHIP_SHELL)
 
-#include "BindingHandler.h"
+#include "AppTask.h"
 #include "ShellCommands.h"
 
 #include <app/clusters/bindings/BindingManager.h>
 #include <lib/shell/Engine.h>
 #include <lib/shell/commands/Help.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::LevelControl;
+
+namespace {
+void BindingWorkerFunction(intptr_t context)
+{
+    VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "BindingWorkerFunction - Invalid work data"));
+    auto * entry = reinterpret_cast<Binding::TableEntry *>(context);
+    RETURN_SAFELY_IGNORED AddBindingEntry(*entry);
+    Platform::Delete(entry);
+}
+
+CHIP_ERROR ScheduleSwitchWorker(BindingCommandData * data)
+{
+    CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(AppTask::SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to schedule switch worker");
+        Platform::Delete(data);
+    }
+    return err;
+}
+
+CHIP_ERROR ScheduleBindingCommand(ClusterId clusterId, CommandId commandId, bool isGroupCommand)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "BindingCommandData allocation failed"));
+    data->clusterId = clusterId;
+    data->commandId = commandId;
+    data->isGroup   = isGroupCommand;
+    return ScheduleSwitchWorker(data);
+}
+
+CHIP_ERROR ScheduleBindingWorker(Binding::TableEntry * entry)
+{
+    CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to schedule binding worker");
+        Platform::Delete(entry);
+    }
+    return err;
+}
+} // namespace
 
 namespace LightSwitchCommands {
 
@@ -90,32 +134,17 @@ CHIP_ERROR OnOffSwitchCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR OnSwitchCommandHandler(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::OnOff::Commands::On::Id;
-    data->clusterId           = Clusters::OnOff::Id;
-
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleBindingCommand(Clusters::OnOff::Id, Clusters::OnOff::Commands::On::Id, false);
 }
 
 CHIP_ERROR OffSwitchCommandHandler(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::OnOff::Commands::Off::Id;
-    data->clusterId           = Clusters::OnOff::Id;
-
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleBindingCommand(Clusters::OnOff::Id, Clusters::OnOff::Commands::Off::Id, false);
 }
 
 CHIP_ERROR ToggleSwitchCommandHandler(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::OnOff::Commands::Toggle::Id;
-    data->clusterId           = Clusters::OnOff::Id;
-
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleBindingCommand(Clusters::OnOff::Id, Clusters::OnOff::Commands::Toggle::Id, false);
 }
 
 /********************************************************
@@ -144,8 +173,8 @@ CHIP_ERROR BindingGroupBindCommandHandler(int argc, char ** argv)
 
     Binding::TableEntry * entry =
         Platform::New<Binding::TableEntry>(atoi(argv[0]), atoi(argv[1]), 1, std::make_optional<ClusterId>(6));
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
-    return CHIP_NO_ERROR;
+    VerifyOrReturnError(entry != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "Binding::TableEntry allocation failed"));
+    return ScheduleBindingWorker(entry);
 }
 
 CHIP_ERROR BindingUnicastBindCommandHandler(int argc, char ** argv)
@@ -154,8 +183,8 @@ CHIP_ERROR BindingUnicastBindCommandHandler(int argc, char ** argv)
 
     Binding::TableEntry * entry =
         Platform::New<Binding::TableEntry>(atoi(argv[0]), atoi(argv[1]), 1, atoi(argv[2]), std::make_optional<ClusterId>(6));
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
-    return CHIP_NO_ERROR;
+    VerifyOrReturnError(entry != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "Binding::TableEntry allocation failed"));
+    return ScheduleBindingWorker(entry);
 }
 
 /********************************************************
@@ -200,35 +229,17 @@ CHIP_ERROR GroupsOnOffSwitchCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR GroupOnSwitchCommandHandler(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::OnOff::Commands::On::Id;
-    data->clusterId           = Clusters::OnOff::Id;
-    data->isGroup             = true;
-
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleBindingCommand(Clusters::OnOff::Id, Clusters::OnOff::Commands::On::Id, true);
 }
 
 CHIP_ERROR GroupOffSwitchCommandHandler(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::OnOff::Commands::Off::Id;
-    data->clusterId           = Clusters::OnOff::Id;
-    data->isGroup             = true;
-
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleBindingCommand(Clusters::OnOff::Id, Clusters::OnOff::Commands::Off::Id, true);
 }
 
 CHIP_ERROR GroupToggleSwitchCommandHandler(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::OnOff::Commands::Toggle::Id;
-    data->clusterId           = Clusters::OnOff::Id;
-    data->isGroup             = true;
-
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleBindingCommand(Clusters::OnOff::Id, Clusters::OnOff::Commands::Toggle::Id, true);
 }
 
 /********************************************************
@@ -259,9 +270,10 @@ CHIP_ERROR MoveToLevelSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::LevelControl::Commands::MoveToLevel::Id;
-    data->clusterId           = Clusters::LevelControl::Id;
-    data->commandData         = BindingCommandData::MoveToLevel{};
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "BindingCommandData allocation failed"));
+    data->commandId   = Clusters::LevelControl::Commands::MoveToLevel::Id;
+    data->clusterId   = Clusters::LevelControl::Id;
+    data->commandData = BindingCommandData::MoveToLevel{};
     char * endPtr;
     if (auto * moveToLevel = std::get_if<BindingCommandData::MoveToLevel>(&data->commandData))
     {
@@ -270,8 +282,7 @@ CHIP_ERROR MoveToLevelSwitchCommandHandler(int argc, char ** argv)
         moveToLevel->optionsMask     = chip::BitMask<OptionsBitmap>(strtol(argv[2], &endPtr, 10));
         moveToLevel->optionsOverride = chip::BitMask<OptionsBitmap>(strtol(argv[3], &endPtr, 10));
     }
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR MoveSwitchCommandHandler(int argc, char ** argv)
@@ -282,9 +293,10 @@ CHIP_ERROR MoveSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::LevelControl::Commands::Move::Id;
-    data->clusterId           = Clusters::LevelControl::Id;
-    data->commandData         = BindingCommandData::Move{};
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "BindingCommandData allocation failed"));
+    data->commandId   = Clusters::LevelControl::Commands::Move::Id;
+    data->clusterId   = Clusters::LevelControl::Id;
+    data->commandData = BindingCommandData::Move{};
     char * endPtr;
     if (auto * move = std::get_if<BindingCommandData::Move>(&data->commandData))
     {
@@ -294,8 +306,7 @@ CHIP_ERROR MoveSwitchCommandHandler(int argc, char ** argv)
         move->optionsOverride = chip::BitMask<OptionsBitmap>(strtol(argv[3], &endPtr, 10));
     }
 
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR StepSwitchCommandHandler(int argc, char ** argv)
@@ -306,8 +317,9 @@ CHIP_ERROR StepSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::LevelControl::Commands::Step::Id;
-    data->clusterId           = Clusters::LevelControl::Id;
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "BindingCommandData allocation failed"));
+    data->commandId = Clusters::LevelControl::Commands::Step::Id;
+    data->clusterId = Clusters::LevelControl::Id;
     char * endPtr;
     data->commandData = BindingCommandData::Step{};
     if (auto * step = std::get_if<BindingCommandData::Step>(&data->commandData))
@@ -318,8 +330,7 @@ CHIP_ERROR StepSwitchCommandHandler(int argc, char ** argv)
         step->optionsMask     = chip::BitMask<OptionsBitmap>(strtol(argv[3], &endPtr, 10));
         step->optionsOverride = chip::BitMask<OptionsBitmap>(strtol(argv[4], &endPtr, 10));
     }
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR StopSwitchCommandHandler(int argc, char ** argv)
@@ -330,8 +341,9 @@ CHIP_ERROR StopSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::LevelControl::Commands::Stop::Id;
-    data->clusterId           = Clusters::LevelControl::Id;
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "BindingCommandData allocation failed"));
+    data->commandId = Clusters::LevelControl::Commands::Stop::Id;
+    data->clusterId = Clusters::LevelControl::Id;
     char * endPtr;
     data->commandData = BindingCommandData::Stop{};
     if (auto * stop = std::get_if<BindingCommandData::Stop>(&data->commandData))
@@ -340,8 +352,7 @@ CHIP_ERROR StopSwitchCommandHandler(int argc, char ** argv)
         stop->optionsOverride = chip::BitMask<OptionsBitmap>(strtol(argv[1], &endPtr, 10));
     }
 
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR MoveToLevelWithOnOffSwitchCommandHandler(int argc, char ** argv)
@@ -352,9 +363,10 @@ CHIP_ERROR MoveToLevelWithOnOffSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Id;
-    data->clusterId           = Clusters::LevelControl::Id;
-    data->commandData         = BindingCommandData::MoveToLevel{};
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "BindingCommandData allocation failed"));
+    data->commandId   = Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Id;
+    data->clusterId   = Clusters::LevelControl::Id;
+    data->commandData = BindingCommandData::MoveToLevel{};
     char * endPtr;
     if (auto * moveToLevel = std::get_if<BindingCommandData::MoveToLevel>(&data->commandData))
     {
@@ -364,8 +376,7 @@ CHIP_ERROR MoveToLevelWithOnOffSwitchCommandHandler(int argc, char ** argv)
         moveToLevel->optionsOverride = chip::BitMask<OptionsBitmap>(strtol(argv[3], &endPtr, 10));
     }
 
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR MoveWithOnOffSwitchCommandHandler(int argc, char ** argv)
@@ -376,9 +387,10 @@ CHIP_ERROR MoveWithOnOffSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::LevelControl::Commands::MoveWithOnOff::Id;
-    data->clusterId           = Clusters::LevelControl::Id;
-    data->commandData         = BindingCommandData::Move{};
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "BindingCommandData allocation failed"));
+    data->commandId   = Clusters::LevelControl::Commands::MoveWithOnOff::Id;
+    data->clusterId   = Clusters::LevelControl::Id;
+    data->commandData = BindingCommandData::Move{};
     char * endPtr;
     if (auto * move = std::get_if<BindingCommandData::Move>(&data->commandData))
     {
@@ -388,8 +400,7 @@ CHIP_ERROR MoveWithOnOffSwitchCommandHandler(int argc, char ** argv)
         move->optionsOverride = chip::BitMask<OptionsBitmap>(strtol(argv[3], &endPtr, 10));
     }
 
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR StepWithOnOffSwitchCommandHandler(int argc, char ** argv)
@@ -400,8 +411,9 @@ CHIP_ERROR StepWithOnOffSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::LevelControl::Commands::StepWithOnOff::Id;
-    data->clusterId           = Clusters::LevelControl::Id;
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "BindingCommandData allocation failed"));
+    data->commandId = Clusters::LevelControl::Commands::StepWithOnOff::Id;
+    data->clusterId = Clusters::LevelControl::Id;
     char * endPtr;
     data->commandData = BindingCommandData::Step{};
     if (auto * step = std::get_if<BindingCommandData::Step>(&data->commandData))
@@ -413,8 +425,7 @@ CHIP_ERROR StepWithOnOffSwitchCommandHandler(int argc, char ** argv)
         step->optionsOverride = chip::BitMask<OptionsBitmap>(strtol(argv[4], &endPtr, 10));
     }
 
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR StopWithOnOffSwitchCommandHandler(int argc, char ** argv)
@@ -425,8 +436,9 @@ CHIP_ERROR StopWithOnOffSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::LevelControl::Commands::StopWithOnOff::Id;
-    data->clusterId           = Clusters::LevelControl::Id;
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "BindingCommandData allocation failed"));
+    data->commandId = Clusters::LevelControl::Commands::StopWithOnOff::Id;
+    data->clusterId = Clusters::LevelControl::Id;
     char * endPtr;
     data->commandData = BindingCommandData::Stop{};
     if (auto * stop = std::get_if<BindingCommandData::Stop>(&data->commandData))
@@ -435,8 +447,7 @@ CHIP_ERROR StopWithOnOffSwitchCommandHandler(int argc, char ** argv)
         stop->optionsOverride = chip::BitMask<OptionsBitmap>(strtol(argv[1], &endPtr, 10));
     }
 
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 #if 0
@@ -463,152 +474,167 @@ CHIP_ERROR LevelControlRead(int argc, char ** argv)
 CHIP_ERROR LevelControlReadAttributeList(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::AttributeList::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR LevelControlReadCurrentLevel(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::CurrentLevel::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR LevelControlReadRemainingTime(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::RemainingTime::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR LevelControlReadMinLevel(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::MinLevel::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR LevelControlReadMaxLevel(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::MaxLevel::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR LevelControlReadCurrentFrequency(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::CurrentFrequency::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR LevelControlReadMinFrequency(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::MinFrequency::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR LevelControlReadMaxFrequency(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::MaxFrequency::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR LevelControlReadOptions(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::Options::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR LevelControlReadOnOffTransitionTime(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::OnOffTransitionTime::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR LevelControlReadOnLevel(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::OnLevel::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR LevelControlReadOnTransitionTime(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::OnTransitionTime::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR LevelControlReadOffTransitionTime(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::OffTransitionTime::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR LevelControlReadDefaultMoveRate(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::DefaultMoveRate::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR LevelControlReadStartUpCurrentLevel(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::StartUpCurrentLevel::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 #endif // commenting the read functions
@@ -641,9 +667,10 @@ CHIP_ERROR GroupsMoveToLevelSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::LevelControl::Commands::MoveToLevel::Id;
-    data->clusterId           = Clusters::LevelControl::Id;
-    data->commandData         = BindingCommandData::MoveToLevel{};
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "BindingCommandData allocation failed"));
+    data->commandId   = Clusters::LevelControl::Commands::MoveToLevel::Id;
+    data->clusterId   = Clusters::LevelControl::Id;
+    data->commandData = BindingCommandData::MoveToLevel{};
     char * endPtr;
     if (auto * moveToLevel = std::get_if<BindingCommandData::MoveToLevel>(&data->commandData))
     {
@@ -654,8 +681,7 @@ CHIP_ERROR GroupsMoveToLevelSwitchCommandHandler(int argc, char ** argv)
     }
     data->isGroup = true;
 
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR GroupsMoveSwitchCommandHandler(int argc, char ** argv)
@@ -666,9 +692,10 @@ CHIP_ERROR GroupsMoveSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::LevelControl::Commands::Move::Id;
-    data->clusterId           = Clusters::LevelControl::Id;
-    data->commandData         = BindingCommandData::Move{};
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "BindingCommandData allocation failed"));
+    data->commandId   = Clusters::LevelControl::Commands::Move::Id;
+    data->clusterId   = Clusters::LevelControl::Id;
+    data->commandData = BindingCommandData::Move{};
     char * endPtr;
     if (auto * move = std::get_if<BindingCommandData::Move>(&data->commandData))
     {
@@ -679,8 +706,7 @@ CHIP_ERROR GroupsMoveSwitchCommandHandler(int argc, char ** argv)
     }
     data->isGroup = true;
 
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR GroupsStepSwitchCommandHandler(int argc, char ** argv)
@@ -691,8 +717,9 @@ CHIP_ERROR GroupsStepSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::LevelControl::Commands::Step::Id;
-    data->clusterId           = Clusters::LevelControl::Id;
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "BindingCommandData allocation failed"));
+    data->commandId = Clusters::LevelControl::Commands::Step::Id;
+    data->clusterId = Clusters::LevelControl::Id;
     char * endPtr;
     data->commandData = BindingCommandData::Step{};
     if (auto * step = std::get_if<BindingCommandData::Step>(&data->commandData))
@@ -705,8 +732,7 @@ CHIP_ERROR GroupsStepSwitchCommandHandler(int argc, char ** argv)
     }
     data->isGroup = true;
 
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR GroupsStopSwitchCommandHandler(int argc, char ** argv)
@@ -717,8 +743,9 @@ CHIP_ERROR GroupsStopSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::LevelControl::Commands::Stop::Id;
-    data->clusterId           = Clusters::LevelControl::Id;
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "BindingCommandData allocation failed"));
+    data->commandId = Clusters::LevelControl::Commands::Stop::Id;
+    data->clusterId = Clusters::LevelControl::Id;
     char * endPtr;
     data->commandData = BindingCommandData::Stop{};
     if (auto * stop = std::get_if<BindingCommandData::Stop>(&data->commandData))
@@ -728,8 +755,7 @@ CHIP_ERROR GroupsStopSwitchCommandHandler(int argc, char ** argv)
     }
     data->isGroup = true;
 
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR GroupsMoveToLevelWithOnOffSwitchCommandHandler(int argc, char ** argv)
@@ -740,9 +766,10 @@ CHIP_ERROR GroupsMoveToLevelWithOnOffSwitchCommandHandler(int argc, char ** argv
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Id;
-    data->clusterId           = Clusters::LevelControl::Id;
-    data->commandData         = BindingCommandData::MoveToLevel{};
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "BindingCommandData allocation failed"));
+    data->commandId   = Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Id;
+    data->clusterId   = Clusters::LevelControl::Id;
+    data->commandData = BindingCommandData::MoveToLevel{};
     char * endPtr;
     if (auto * moveToLevel = std::get_if<BindingCommandData::MoveToLevel>(&data->commandData))
     {
@@ -753,8 +780,7 @@ CHIP_ERROR GroupsMoveToLevelWithOnOffSwitchCommandHandler(int argc, char ** argv
     }
     data->isGroup = true;
 
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR GroupsMoveWithOnOffSwitchCommandHandler(int argc, char ** argv)
@@ -765,9 +791,10 @@ CHIP_ERROR GroupsMoveWithOnOffSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::LevelControl::Commands::MoveWithOnOff::Id;
-    data->clusterId           = Clusters::LevelControl::Id;
-    data->commandData         = BindingCommandData::Move{};
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "BindingCommandData allocation failed"));
+    data->commandId   = Clusters::LevelControl::Commands::MoveWithOnOff::Id;
+    data->clusterId   = Clusters::LevelControl::Id;
+    data->commandData = BindingCommandData::Move{};
     char * endPtr;
     if (auto * move = std::get_if<BindingCommandData::Move>(&data->commandData))
     {
@@ -778,8 +805,7 @@ CHIP_ERROR GroupsMoveWithOnOffSwitchCommandHandler(int argc, char ** argv)
     }
     data->isGroup = true;
 
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR GroupsStepWithOnOffSwitchCommandHandler(int argc, char ** argv)
@@ -790,8 +816,9 @@ CHIP_ERROR GroupsStepWithOnOffSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::LevelControl::Commands::StepWithOnOff::Id;
-    data->clusterId           = Clusters::LevelControl::Id;
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "BindingCommandData allocation failed"));
+    data->commandId = Clusters::LevelControl::Commands::StepWithOnOff::Id;
+    data->clusterId = Clusters::LevelControl::Id;
     char * endPtr;
     data->commandData = BindingCommandData::Step{};
     if (auto * step = std::get_if<BindingCommandData::Step>(&data->commandData))
@@ -804,8 +831,7 @@ CHIP_ERROR GroupsStepWithOnOffSwitchCommandHandler(int argc, char ** argv)
     }
     data->isGroup = true;
 
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 CHIP_ERROR GroupsStopWithOnOffSwitchCommandHandler(int argc, char ** argv)
@@ -816,8 +842,9 @@ CHIP_ERROR GroupsStopWithOnOffSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::LevelControl::Commands::StopWithOnOff::Id;
-    data->clusterId           = Clusters::LevelControl::Id;
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "BindingCommandData allocation failed"));
+    data->commandId = Clusters::LevelControl::Commands::StopWithOnOff::Id;
+    data->clusterId = Clusters::LevelControl::Id;
     char * endPtr;
     data->commandData = BindingCommandData::Stop{};
     if (auto * stop = std::get_if<BindingCommandData::Stop>(&data->commandData))
@@ -827,8 +854,7 @@ CHIP_ERROR GroupsStopWithOnOffSwitchCommandHandler(int argc, char ** argv)
     }
     data->isGroup = true;
 
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchWorker(data);
 }
 
 /**
@@ -926,5 +952,3 @@ void RegisterSwitchCommands()
 }
 
 } // namespace LightSwitchCommands
-
-#endif // ENABLE_CHIP_SHELL

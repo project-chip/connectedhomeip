@@ -67,11 +67,11 @@ def find_executables(dirs):
       A list of paths to the first executable found in each directory.
     """
     executables = []
-    for dir in dirs:
-        if not os.path.isdir(dir):
+    for directory in dirs:
+        if not os.path.isdir(directory):
             continue
-        for filename in os.listdir(dir):
-            filepath = os.path.join(dir, filename)
+        for filename in os.listdir(directory):
+            filepath = os.path.join(directory, filename)
             if os.path.isfile(filepath) and os.access(filepath, os.X_OK):
                 executables.append(filepath)
                 break  # Move to the next directory
@@ -94,7 +94,7 @@ def parse_test_logs(test_log_paths):
     for test_log_path in test_log_paths:
         print(f"  Parsing {test_log_path}")
         try:
-            with open(test_log_path, "r") as f:
+            with open(test_log_path) as f:
                 output_lines = f.readlines()
         except FileNotFoundError:
             print(f"Result file not found {test_log_path}. Skipping...")
@@ -304,7 +304,7 @@ def csv_to_html_report(csv_file_paths, html_page_title, html_out_dir, sha):
     """
 
     for csv_file_path in csv_file_paths:
-        with open(csv_file_path, 'r') as csv_file:
+        with open(csv_file_path) as csv_file:
             reader = csv.reader(csv_file)
             table_title = next(reader)[0]
             headers = next(reader)

@@ -107,12 +107,12 @@ class TC_DGSW_2_1(MatterBaseTest):
                 stackSize = None
                 # The Id field is mandatory
                 matter_asserts.assert_valid_uint64(metric.id, "Id")
-                logger.info(f"Thread Metric ID: {metric.id}")
+                logger.info("Thread Metric ID: %s", metric.id)
 
                 # Validate the optional Name field
                 if metric.name is not None:
                     matter_asserts.assert_is_string(metric.name, "Name")
-                    logger.info(f"Thread Metric Name: {metric.name}")
+                    logger.info("Thread Metric Name: %s", metric.name)
 
                 # Validate the optional StackSize field
                 if metric.stackSize is not None:
@@ -121,7 +121,7 @@ class TC_DGSW_2_1(MatterBaseTest):
                     # Verify that StackSize is greater than 0.
                     asserts.assert_greater(stackSize, 0, "StackSize is not greater than 0.")
                 else:
-                    logger.warning(f"Thread Metric StackSize is None for ID: {metric.id}")
+                    logger.warning("Thread Metric StackSize is None for ID: %s", metric.id)
 
                 # Validate the optional StackFreeCurrent field
                 if metric.stackFreeCurrent is not None:
@@ -131,7 +131,7 @@ class TC_DGSW_2_1(MatterBaseTest):
                         asserts.assert_less(metric.stackFreeCurrent, stackSize,
                                             "StackFreeCurrent is not less than StackSize.")
                 else:
-                    logger.warning(f"Thread Metric StackFreeCurrent is None for ID: {metric.id}")
+                    logger.warning("Thread Metric StackFreeCurrent is None for ID: %s", metric.id)
 
                 # Validate the optional StackFreeMinimum field
                 if metric.stackFreeMinimum is not None:
@@ -141,14 +141,14 @@ class TC_DGSW_2_1(MatterBaseTest):
                         asserts.assert_less_equal(metric.stackFreeMinimum, metric.stackFreeCurrent,
                                                   "StackFreeMinimum is not less than or equal to StackFreeCurrent.")
                 else:
-                    logger.warning(f"Thread Metric StackFreeMinimum is None for ID: {metric.id}")
+                    logger.warning("Thread Metric StackFreeMinimum is None for ID: %s", metric.id)
 
         # STEP 3: TH reads from the DUT the CurrentHeapFree attribute
         self.step(3)
         attr_condition = await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapFree)
         if attr_condition:
             current_heap_free_attr = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapFree)
-            logger.info(f"CurrentHeapFree: {current_heap_free_attr}")
+            logger.info("CurrentHeapFree: %s", current_heap_free_attr)
             matter_asserts.assert_valid_uint64(current_heap_free_attr, "CurrentHeapFree")
             # Verify that CurrentHeapFree is greater than or equal to 0.
             asserts.assert_greater_equal(current_heap_free_attr, 0, "CurrentHeapFree is not greater than or equal to 0.")
@@ -160,7 +160,7 @@ class TC_DGSW_2_1(MatterBaseTest):
         attr_condition = await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapUsed)
         if attr_condition:
             current_heap_used_attr = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapUsed)
-            logger.info(f"CurrentHeapUsed: {current_heap_used_attr}")
+            logger.info("CurrentHeapUsed: %s", current_heap_used_attr)
             matter_asserts.assert_valid_uint64(current_heap_used_attr, "CurrentHeapUsed")
             # Verify that CurrentHeapUsed is greater than or equal to 0.
             asserts.assert_greater_equal(current_heap_used_attr, 0, "CurrentHeapUsed is not greater than or equal to 0.")
@@ -170,7 +170,7 @@ class TC_DGSW_2_1(MatterBaseTest):
         attr_condition = await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
         if attr_condition:
             current_heap_high_watermark_attr = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
-            logger.info(f"CurrentHeapHighWatermark: {current_heap_high_watermark_attr}")
+            logger.info("CurrentHeapHighWatermark: %s", current_heap_high_watermark_attr)
             matter_asserts.assert_valid_uint64(current_heap_high_watermark_attr, "CurrentHeapHighWatermark")
             # Verify that CurrentHeapHighWatermark is greater than or equal to CurrentHeapUsed.
             asserts.assert_greater_equal(current_heap_high_watermark_attr, current_heap_used_attr,

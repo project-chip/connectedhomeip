@@ -48,14 +48,14 @@ public:
         BitFlags<Feature> features(featureMap);
 
         uint8_t numberOfPositions{};
-        VerifyOrDie(NumberOfPositions::Get(endpointId, &numberOfPositions) == Status::Success);
+        VerifyOrDie(NumberOfPositions::GetDefault(endpointId, &numberOfPositions) == Status::Success);
 
         uint8_t multiPressMax{};
         // Enforce a valid configuration from ember
         if (features.Has(Feature::kMomentarySwitchMultiPress))
         {
             VerifyOrDie(optionalAttributeSet.IsSet(MultiPressMax::Id));
-            VerifyOrDie(MultiPressMax::Get(endpointId, &multiPressMax) == Status::Success);
+            VerifyOrDie(MultiPressMax::GetDefault(endpointId, &multiPressMax) == Status::Success);
         }
 
         gServers[clusterInstanceIndex].Create(endpointId, features,

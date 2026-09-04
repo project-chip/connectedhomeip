@@ -66,7 +66,7 @@ public:
     uint16_t connectionID                = static_cast<uint16_t>(0);
     TransportTriggerTypeEnum triggerType = static_cast<TransportTriggerTypeEnum>(0);
     Optional<TriggerActivationReasonEnum> activationReason;
-    ContainerFormatEnum containerType = static_cast<ContainerFormatEnum>(0);
+    Optional<ContainerFormatEnum> containerType;
     Optional<uint64_t> CMAFSessionNumber;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -82,7 +82,7 @@ public:
     uint16_t connectionID                = static_cast<uint16_t>(0);
     TransportTriggerTypeEnum triggerType = static_cast<TransportTriggerTypeEnum>(0);
     Optional<TriggerActivationReasonEnum> activationReason;
-    ContainerFormatEnum containerType = static_cast<ContainerFormatEnum>(0);
+    Optional<ContainerFormatEnum> containerType;
     Optional<uint64_t> CMAFSessionNumber;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -106,8 +106,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    uint16_t connectionID             = static_cast<uint16_t>(0);
-    ContainerFormatEnum containerType = static_cast<ContainerFormatEnum>(0);
+    uint16_t connectionID = static_cast<uint16_t>(0);
+    Optional<ContainerFormatEnum> containerType;
     Optional<uint64_t> CMAFSessionNumber;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -120,8 +120,8 @@ public:
     static constexpr EventId GetEventId() { return Events::PushTransportEnd::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
 
-    uint16_t connectionID             = static_cast<uint16_t>(0);
-    ContainerFormatEnum containerType = static_cast<ContainerFormatEnum>(0);
+    uint16_t connectionID = static_cast<uint16_t>(0);
+    Optional<ContainerFormatEnum> containerType;
     Optional<uint64_t> CMAFSessionNumber;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

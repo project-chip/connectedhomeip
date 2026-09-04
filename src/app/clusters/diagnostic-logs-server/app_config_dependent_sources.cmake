@@ -20,14 +20,3 @@ TARGET_SOURCES(
   "${CLUSTER_DIR}/CodegenIntegration.h"
   "${CLUSTER_DIR}/diagnostic-logs-server.h"
 )
-
-# These are the things that BUILD.gn dependencies would pull
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-  "${CLUSTER_DIR}/DiagnosticLogsCluster.cpp"
-  "${CLUSTER_DIR}/DiagnosticLogsCluster.h"
-  "${CLUSTER_DIR}/DiagnosticLogsProviderDelegate.h"
-  "${CLUSTER_DIR}/BDXDiagnosticLogsProvider.cpp"
-  "${CLUSTER_DIR}/BDXDiagnosticLogsProvider.h"
-)

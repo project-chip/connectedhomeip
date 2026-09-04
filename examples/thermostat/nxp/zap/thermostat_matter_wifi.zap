@@ -3283,7 +3283,7 @@
         }
       ],
       "deviceVersions": [
-        4
+        7
       ],
       "deviceIdentifiers": [
         769

@@ -320,6 +320,8 @@ public:
     uint16_t GetTransferBlockSize() const { return mTransferMaxBlockSize; }
     uint32_t GetNextBlockNum() const { return mNextBlockNum; }
     uint32_t GetNextQueryNum() const { return mNextQueryNum; }
+    uint32_t GetLastBlockNum() const { return mLastBlockNum; }
+    uint32_t GetLastQueryNum() const { return mLastQueryNum; }
     size_t GetNumBytesProcessed() const { return mNumBytesProcessed; }
     const uint8_t * GetFileDesignator(uint16_t & fileDesignatorLen) const
     {

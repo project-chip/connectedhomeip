@@ -16,6 +16,7 @@
 #include <errno.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
@@ -46,22 +47,24 @@ namespace Internal {
 
 namespace {
 
-static bool _HexToBytes(std::string octetString, uint8_t * dataBytes)
+static bool _HexToBytes(const std::string & octetString, chip::MutableByteSpan & outBuffer)
 {
-    chip::Platform::ScopedMemoryBuffer<uint8_t> buffer;
-    size_t argLen = octetString.length();
-    if (!buffer.Calloc(argLen))
+    if (octetString.empty() || outBuffer.empty())
     {
         return false;
     }
 
-    size_t octetCount = chip::Encoding::HexToBytes(octetString.c_str(), argLen, buffer.Get(), argLen);
-
-    if (octetCount == 0)
+    if (octetString.length() != outBuffer.size() * 2)
     {
         return false;
     }
-    memcpy(dataBytes, buffer.Get(), octetCount);
+
+    size_t decodedSize = chip::Encoding::HexToBytes(octetString.c_str(), octetString.length(), outBuffer.data(), outBuffer.size());
+
+    if (decodedSize != outBuffer.size())
+    {
+        return false;
+    }
 
     return true;
 }
@@ -69,7 +72,7 @@ static bool _HexToBytes(std::string octetString, uint8_t * dataBytes)
 /// Retrieve CHIP device identification info from the device advertising data
 bool WbsGetChipDeviceInfo(const pbnjson::JValue & aDevice, chip::Ble::ChipBLEDeviceIdentificationInfo & aDeviceInfo)
 {
-    VerifyOrReturnError(aDevice.hasKey("serviceData") == true, false);
+    VerifyOrReturnError(aDevice.hasKey("serviceData"), false);
     bool bChipDevice = false;
 
     if (aDevice.hasKey("serviceUuid") == true)
@@ -92,13 +95,18 @@ bool WbsGetChipDeviceInfo(const pbnjson::JValue & aDevice, chip::Ble::ChipBLEDev
         }
     }
 
-    VerifyOrReturnError(bChipDevice == true, false);
-    VerifyOrReturnError(_HexToBytes(aDevice["serviceData"].asString(), reinterpret_cast<uint8_t *>(&aDeviceInfo)) == true, false);
+    VerifyOrReturnError(bChipDevice, false);
+    chip::MutableByteSpan deviceInfoSpan(reinterpret_cast<uint8_t *>(&aDeviceInfo),
+                                         sizeof(chip::Ble::ChipBLEDeviceIdentificationInfo));
+    bool success = _HexToBytes(aDevice["serviceData"].asString(), deviceInfoSpan);
 
-    return bChipDevice;
+    if (!success)
+    {
+        return false;
+    }
+
+    return true;
 }
-
-} // namespace
 
 CHIP_ERROR WbsDeviceScanner::Init(WbsDeviceScannerDelegate * delegate)
 {
@@ -270,7 +278,14 @@ void WbsDeviceScanner::ReportDevice(const pbnjson::JValue & device)
         0,
     };
     uint8_t * payload = &aScanRecord[0];
-    ssize_t total_len = scanRecordDataJObj.arraySize();
+
+    // scanRecord comes from a remote device and may be larger than aScanRecord
+    // (e.g. BLE 5 extended advertising), so clamp it to the buffer before copying.
+    if (scanRecordDataJSize > static_cast<ssize_t>(sizeof(aScanRecord)))
+    {
+        scanRecordDataJSize = static_cast<ssize_t>(sizeof(aScanRecord));
+    }
+    ssize_t total_len = scanRecordDataJSize;
 
     for (ssize_t j = 0; j < scanRecordDataJSize; j++)
     {
@@ -278,19 +293,27 @@ void WbsDeviceScanner::ReportDevice(const pbnjson::JValue & device)
         if (chip::CanCastTo<uint8_t>(v))
             aScanRecord[j] = static_cast<uint8_t>(v);
     }
-    uint8_t adv_length   = 0;
-    uint8_t adv_type     = 0;
-    uint8_t sizeConsumed = 0;
-    bool finished        = false;
+    const uint8_t * const end = aScanRecord + total_len;
+    uint8_t adv_length        = 0;
+    uint8_t adv_type          = 0;
+    size_t sizeConsumed       = 0;
+    bool finished             = false;
 
     while (!finished)
     {
+        if (payload >= end)
+            break;
+
         adv_length = *payload;
         payload++;
-        sizeConsumed += 1 + adv_length;
+        sizeConsumed += 1u + adv_length;
 
         if (adv_length != 0)
         {
+            // The AD structure spans adv_length bytes from adv_type; don't read past the record.
+            if (payload + adv_length > end)
+                break;
+
             adv_type = *payload;
             payload++;
             adv_length--;
@@ -359,7 +382,7 @@ void WbsDeviceScanner::ReportDevice(const pbnjson::JValue & device)
             payload += adv_length;
         }
 
-        if (sizeConsumed >= total_len)
+        if (sizeConsumed >= static_cast<size_t>(total_len))
             finished = true;
     }
 

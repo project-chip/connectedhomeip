@@ -106,6 +106,9 @@ class TestImCustomDataModel : public CodegenDataModelProvider
 public:
     static TestImCustomDataModel & Instance();
 
+    // No-op: mock provider has no persistent storage delegate, so skip the real
+    // CodegenDataModelProvider::Startup() which requires one.
+    CHIP_ERROR Startup(DataModel::InteractionModelContext context) override { return CHIP_NO_ERROR; }
     CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; }
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,

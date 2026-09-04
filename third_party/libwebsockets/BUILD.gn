@@ -23,10 +23,12 @@ config("libwebsockets_config") {
 
 config("libwebsockets_config_disable_warnings") {
   cflags = [
-    "-Wno-shadow",
-    "-Wno-unreachable-code",
+    "-Wno-discarded-qualifiers",
     "-Wno-format-nonliteral",
     "-Wno-implicit-fallthrough",
+    "-Wno-incompatible-pointer-types-discards-qualifiers",
+    "-Wno-shadow",
+    "-Wno-unreachable-code",
   ]
 }
 

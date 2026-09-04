@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <access/AccessControl.h>
 #include <app/clusters/identify-server/IdentifyIntegrationDelegate.h>
 #include <app/clusters/scenes-server/ScenesIntegrationDelegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -58,7 +59,8 @@ private:
     scenes::ScenesIntegrationDelegate * mScenesIntegration;
     IdentifyIntegrationDelegate * mIdentifyIntegration;
 
-    Protocols::InteractionModel::Status AddGroup(GroupId groupID, CharSpan groupName, FabricIndex fabricIndex);
+    Protocols::InteractionModel::Status AddGroup(GroupId groupID, CharSpan groupName,
+                                                 const chip::Access::SubjectDescriptor & subjectDescriptor);
 };
 
 } // namespace chip::app::Clusters

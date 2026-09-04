@@ -71,7 +71,7 @@ public:
             WiFiPAFSession * pInInfo = reinterpret_cast<WiFiPAFSession *>(c);
             if ((elem->mWiFiPafLayer != nullptr) && (elem->mSessionInfo.id == pInInfo->id) &&
                 (elem->mSessionInfo.peer_id == pInInfo->peer_id) &&
-                !memcmp(elem->mSessionInfo.peer_addr, pInInfo->peer_addr, sizeof(uint8_t) * 6))
+                !memcmp(elem->mSessionInfo.peer_addr, pInInfo->peer_addr, kMACAddressLength))
             {
                 ChipLogProgress(WiFiPAF, "Find: Found WiFiPAFEndPoint[%zu]", i);
                 return elem;
@@ -79,7 +79,7 @@ public:
 #ifdef CHIP_WIFIPAF_LAYER_DEBUG_LOGGING_ENABLED
             {
                 const WiFiPAFSession * pElmInfo = &elem->mSessionInfo;
-                ChipLogError(WiFiPAF, "EndPoint[%lu]", i);
+                ChipLogError(WiFiPAF, "EndPoint[%zu]", i);
                 ChipLogError(WiFiPAF, "Role: [%d, %d]", pElmInfo->role, pInInfo->role);
                 ChipLogError(WiFiPAF, "id: [%u, %u]", pElmInfo->id, pInInfo->id);
                 ChipLogError(WiFiPAF, "peer_id: [%d, %d]", pElmInfo->peer_id, pInInfo->peer_id);
@@ -87,7 +87,7 @@ public:
                              pElmInfo->peer_addr[2], pElmInfo->peer_addr[3], pElmInfo->peer_addr[4], pElmInfo->peer_addr[5]);
                 ChipLogError(WiFiPAF, "InMac: [%02x:%02x:%02x:%02x:%02x:%02x]", pInInfo->peer_addr[0], pInInfo->peer_addr[1],
                              pInInfo->peer_addr[2], pInInfo->peer_addr[3], pInInfo->peer_addr[4], pInInfo->peer_addr[5]);
-                ChipLogError(WiFiPAF, "nodeId: [%lu, %lu]", pElmInfo->nodeId, pInInfo->nodeId);
+                ChipLogError(WiFiPAF, "nodeId: [%" PRIu64 ", %" PRIu64 "]", pElmInfo->nodeId, pInInfo->nodeId);
                 ChipLogError(WiFiPAF, "discriminator: [%d, %d]", pElmInfo->discriminator, pInInfo->discriminator);
             }
 #endif
@@ -240,26 +240,59 @@ CHIP_ERROR WiFiPAFLayer::Init(chip::System::Layer * systemLayer)
     return CHIP_NO_ERROR;
 }
 
-void WiFiPAFLayer::Shutdown(OnCancelDeviceHandle OnCancelDevice)
+void WiFiPAFLayer::Shutdown()
 {
-    ChipLogProgress(WiFiPAF, "WiFiPAF: Closing all WiFiPAF sessions to shutdown");
-    uint8_t i;
-    WiFiPAFSession * pPafSession;
-
-    for (i = 0; i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; i++)
+    for (uint8_t i = 0; i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; i++)
     {
-        pPafSession = &mPafInfoVect[i];
-        if (pPafSession->id == UINT32_MAX)
+        WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Get(i);
+        if ((endPoint == nullptr) || (endPoint->mWiFiPafLayer != this))
         {
-            // Unused session
             continue;
         }
-        ChipLogProgress(WiFiPAF, "WiFiPAF: Canceling id: %u", pPafSession->id);
-        OnCancelDevice(pPafSession->id, pPafSession->role);
-        WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Find(reinterpret_cast<WIFIPAF_CONNECTION_OBJECT>(pPafSession));
-        if (endPoint != nullptr)
+
+        ChipLogProgress(WiFiPAF, "WiFiPAF: Canceling id: %u", endPoint->mSessionInfo.id);
+        endPoint->DoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
+    }
+}
+
+void WiFiPAFLayer::FlushPendingAcks()
+{
+    for (uint8_t i = 0; i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; i++)
+    {
+        WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Get(i);
+        if ((endPoint == nullptr) || (endPoint->mWiFiPafLayer != this) || !endPoint->IsConnected(endPoint->mState))
         {
-            endPoint->DoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
+            continue;
+        }
+        if (!endPoint->mTimerStateFlags.Has(WiFiPAFEndPoint::TimerStateFlag::kSendAckTimerRunning))
+        {
+            continue;
+        }
+
+        ChipLogProgress(WiFiPAF, "WiFiPAF: flushing pending ack on session id: %u", endPoint->mSessionInfo.id);
+        CHIP_ERROR err = endPoint->DriveStandAloneAck();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(WiFiPAF, "WiFiPAF: failed to flush pending ack: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
+}
+
+void WiFiPAFLayer::DrivePendingSends()
+{
+    for (uint8_t i = 0; i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; i++)
+    {
+        WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Get(i);
+        if ((endPoint == nullptr) || (endPoint->mWiFiPafLayer != this) || !endPoint->IsConnected(endPoint->mState))
+        {
+            continue;
+        }
+
+        CHIP_ERROR err = endPoint->DriveSending();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(WiFiPAF, "WiFiPAF: failed to drive pending sends: %" CHIP_ERROR_FORMAT, err.Format());
+            endPoint->DoClose(kWiFiPAFCloseFlag_AbortTransmission, err);
         }
     }
 }
@@ -347,6 +380,10 @@ CHIP_ERROR WiFiPAFLayer::HandleTransportConnectionInitiated(WiFiPAF::WiFiPAFSess
     {
         err = newEndPoint->StartConnect();
     }
+    else
+    {
+        err = newEndPoint->StartReceiveConnectionTimer();
+    }
 
     return err;
 }
@@ -405,7 +442,6 @@ void WiFiPAFLayer::CleanPafInfo(WiFiPAFSession & SessionInfo)
     SessionInfo.peer_id       = kUndefinedWiFiPafSessionId;
     SessionInfo.nodeId        = kUndefinedNodeId;
     SessionInfo.discriminator = UINT16_MAX;
-    return;
 }
 
 CHIP_ERROR WiFiPAFLayer::AddPafSession(PafInfoAccess accType, WiFiPAFSession & SessionInfo)
@@ -508,8 +544,7 @@ WiFiPAFSession * WiFiPAFLayer::GetPAFInfo(PafInfoAccess accType, WiFiPAFSession 
         {
             if (pPafSession->id != kUndefinedWiFiPafSessionId)
                 return pPafSession;
-            else
-                continue;
+            continue;
         }
         switch (accType)
         {

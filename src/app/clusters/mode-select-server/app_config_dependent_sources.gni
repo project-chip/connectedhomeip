@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
-  "mode-select-server.cpp",
+  "CodegenIntegration.cpp",
+  "CodegenIntegration.h",
+  "SupportedModesManager.cpp",
+  "SupportedModesManager.h",
   "supported-modes-manager.h",
 ]

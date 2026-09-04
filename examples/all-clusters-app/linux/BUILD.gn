@@ -31,6 +31,8 @@ if (chip_enable_pw_rpc) {
 source_set("chip-all-clusters-common") {
   sources = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/all-clusters-energy-mode-stubs.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/audio-control-instance.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/boolcfg-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
@@ -56,11 +58,11 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/tcc-mode.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/test-hidden-manufacturer-specific-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/tls-certificate-management-instance.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/tls-client-management-instance.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/wifi-diagnostics-stub.cpp",
     "${chip_root}/examples/all-clusters-app/linux/diagnostic-logs-provider-delegate-impl.cpp",
-    "${chip_root}/examples/thermostat/thermostat-common/src/thermostat-delegate-impl.cpp",
     "AllClustersCommandDelegate.cpp",
     "AllClustersCommandDelegate.h",
     "AppOptions.cpp",
@@ -76,7 +78,9 @@ source_set("chip-all-clusters-common") {
   deps = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common",
     "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/examples/thermostat/thermostat-common:thermostat-delegate-impl",
     "${chip_root}/src/app:attribute-persistence",
+    "${chip_root}/src/app/clusters/audio-control-server",
     "${chip_root}/src/app/clusters/groupcast",
     "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/app/clusters/software-diagnostics-server:software-fault-listener",
@@ -161,7 +165,7 @@ if (is_libfuzzer) {
 
   if (chip_device_platform == "darwin") {
     action("codesign") {
-      script = "entitlements/codesign.py"
+      script = "${chip_root}/examples/common/darwin/entitlements/codesign.py"
       public_deps = [ ":chip-all-clusters-app" ]
 
       args = [

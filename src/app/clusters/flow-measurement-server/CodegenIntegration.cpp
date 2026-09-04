@@ -49,12 +49,12 @@ public:
         // defaults, so failure is tolerated.
         FlowMeasurementCluster::Config config;
 
-        if (MinMeasuredValue::Get(endpointId, config.minMeasuredValue) != Status::Success)
+        if (MinMeasuredValue::GetDefault(endpointId, config.minMeasuredValue) != Status::Success)
         {
             config.minMeasuredValue.SetNull();
         }
 
-        if (MaxMeasuredValue::Get(endpointId, config.maxMeasuredValue) != Status::Success)
+        if (MaxMeasuredValue::GetDefault(endpointId, config.maxMeasuredValue) != Status::Success)
         {
             config.maxMeasuredValue.SetNull();
         }
@@ -72,7 +72,7 @@ public:
         if (optionalAttributeSet.IsSet(Tolerance::Id))
         {
             uint16_t tolerance{};
-            VerifyOrDie(Tolerance::Get(endpointId, &tolerance) == Status::Success);
+            VerifyOrDie(Tolerance::GetDefault(endpointId, &tolerance) == Status::Success);
             config.WithTolerance(tolerance);
         }
 

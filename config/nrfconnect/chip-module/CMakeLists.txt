@@ -59,8 +59,6 @@ if (CHIP_CFLAGS)
     matter_add_flags("${CHIP_CFLAGS}")
 endif()
 
-matter_add_flags(-D_POSIX_C_SOURCE=200809)
-
 if (CONFIG_ARM)
     matter_add_cflags(--specs=nosys.specs)
 endif()
@@ -139,7 +137,7 @@ matter_add_gn_arg_string("zephyr_cc"                              ${CMAKE_C_COMP
 matter_add_gn_arg_string("zephyr_cxx"                             ${CMAKE_CXX_COMPILER})
 matter_add_gn_arg_string("chip_app_zap_dir"                       ${CHIP_APP_ZAP_DIR})
 matter_add_gn_arg_bool  ("chip_logging"                           CONFIG_LOG)
-matter_add_gn_arg_bool  ("chip_enable_thread"                     CONFIG_NET_L2_OPENTHREAD)
+matter_add_gn_arg_bool  ("chip_enable_thread"                     CONFIG_OPENTHREAD)
 matter_add_gn_arg_bool  ("chip_openthread_ftd"                    CONFIG_OPENTHREAD_FTD)
 matter_add_gn_arg_bool  ("chip_config_network_layer_ble"          CONFIG_BT)
 matter_add_gn_arg_bool  ("chip_inet_config_enable_ipv4"           CONFIG_CHIP_IPV4)
@@ -156,11 +154,12 @@ matter_add_gn_arg_bool  ("chip_malloc_sys_heap"                   CONFIG_CHIP_MA
 matter_add_gn_arg_bool  ("chip_enable_wifi"                       CONFIG_WIFI_NRF70)
 matter_add_gn_arg_bool  ("chip_system_config_provide_statistics"  CONFIG_CHIP_STATISTICS)
 matter_add_gn_arg_bool  ("chip_enable_icd_server"                 CONFIG_CHIP_ENABLE_ICD_SUPPORT)
-matter_add_gn_arg_bool  ("chip_enable_factory_data"               CONFIG_CHIP_FACTORY_DATA)
+matter_add_gn_arg_bool  ("chip_enable_factory_data"               CONFIG_CHIP_FACTORY_DATA_NRFCONNECT_BACKEND)
 matter_add_gn_arg_bool  ("chip_enable_read_client"                CONFIG_CHIP_ENABLE_READ_CLIENT)
 matter_add_gn_arg_bool  ("chip_mdns_minimal"                      CONFIG_WIFI_NRF70)
-matter_add_gn_arg_bool  ("chip_mdns_platform"                     CONFIG_NET_L2_OPENTHREAD)
-matter_add_gn_arg_bool  ("chip_config_enable_groupcast"                  CONFIG_CHIP_ENABLE_GROUPCAST)
+matter_add_gn_arg_bool  ("chip_config_enable_groupcast"           CONFIG_CHIP_ENABLE_GROUPCAST)
+matter_add_gn_arg_bool  ("chip_mdns_platform"                     CONFIG_OPENTHREAD)
+matter_add_gn_arg_bool  ("enable_im_pretty_print"                 CONFIG_CHIP_IM_PRETTY_PRINT)
 
 matter_add_gn_arg_bool  ("chip_system_config_use_sockets"                   NOT CONFIG_CHIP_USE_OPENTHREAD_ENDPOINT)
 matter_add_gn_arg_bool  ("chip_system_config_use_openthread_inet_endpoints" CONFIG_CHIP_USE_OPENTHREAD_ENDPOINT)
@@ -185,7 +184,7 @@ endif()
 
 if(CONFIG_WIFI_NRF70)
     matter_add_gn_arg_string("chip_mdns" "minimal")
-elseif (CONFIG_NET_L2_OPENTHREAD)
+elseif (CONFIG_OPENTHREAD)
     matter_add_gn_arg_string("chip_mdns" "platform")
 else()
     matter_add_gn_arg_string("chip_mdns" "none")
@@ -228,7 +227,7 @@ if (CONFIG_CHIP_PW_RPC)
 endif()
 
 # Inform users that they use not-optimized settings backend for the nRF54LX series.
-if(CONFIG_SOC_SERIES_NRF54LX AND CONFIG_SETTINGS_NVS)
+if(CONFIG_SOC_SERIES_NRF54L AND CONFIG_SETTINGS_NVS)
     message(WARNING "
     The nRF54L series is not optimized for the NVS settings backend due to RRAM specifications.
     Consider using the CONFIG_SETTINGS_ZMS Kconfig option, which is recommended for this type of non-volatile memory.")
@@ -259,8 +258,6 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/matter-data-model.c)
 target_sources(matter-data-model PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/matter-data-model.c)
 
 set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS chip)
-# Enable visibility of POSIX.1-2008 functions, such as strnlen
-target_compile_definitions(chip INTERFACE _POSIX_C_SOURCE=200809)
 # Make sure that kernel symbols that are only referenced by the Matter libraries are resolved.
 target_link_libraries(chip INTERFACE $<TARGET_FILE:kernel>)
 

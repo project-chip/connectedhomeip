@@ -82,9 +82,14 @@ def parse_paa_root_certs(cmdpipe, paa_list):
                 paa_list.append(copy.deepcopy(result))
 
 
-def write_cert(certificate, subject):
-    filename = 'dcld_mirror_' + \
-        re.sub('[^a-zA-Z0-9_-]', '', re.sub('[=, ]', '_', subject))
+def write_cert(certificate, subject, all_subjects):
+    # Include counter in filename to handle multiple certs with same subject
+    sanitized_subject = re.sub('[^a-zA-Z0-9_-]', '', re.sub('[=, ]', '_', subject))
+    if sanitized_subject not in all_subjects:
+        all_subjects[sanitized_subject] = 1
+    else:
+        all_subjects[sanitized_subject] += 1
+    filename = f'dcld_mirror_{sanitized_subject}_{all_subjects[sanitized_subject]}'
     with open(filename + '.pem', 'w+') as outfile:
         outfile.write(certificate)
     # convert pem file to der
@@ -95,7 +100,7 @@ def write_cert(certificate, subject):
             der_certificate = pem_certificate.public_bytes(
                 serialization.Encoding.DER)
             outfile.write(der_certificate)
-    except (IOError, ValueError) as e:
+    except (OSError, ValueError) as e:
         print(
             f"ERROR: Failed to convert {filename + '.pem'}: {str(e)}. Skipping...")
 
@@ -160,13 +165,14 @@ def fetch_cd_signing_certs(store_path):
 
     cd_signer_ids = requests.get(
         f"{rest_node_url}/dcl/pki/child-certificates/{MATTER_CERT_CA_SUBJECT}/{MATTER_CERT_CA_SUBJECT_KEY_ID}").json()['childCertificates']['certIds']
+    all_subjects = {}
     for signer in cd_signer_ids:
         subject = signer['subject']
         subject_key_id = signer['subjectKeyId']
         certificate, subject = get_cert_from_rest(rest_node_url, subject, subject_key_id)
 
         print(f"Downloaded CD signing cert with subject: {subject}")
-        write_cert(certificate, subject)
+        write_cert(certificate, subject, all_subjects)
 
     os.chdir(original_dir)
 
@@ -202,6 +208,7 @@ def fetch_paa_certs(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use
         parse_paa_root_certs.counter = 0
         parse_paa_root_certs(cmdpipe, paa_list)
 
+    all_subjects = {}
     for paa in paa_list:
         if paa['subject'] == MATTER_CERT_CA_SUBJECT and paa['subjectKeyId'] == MATTER_CERT_CA_SUBJECT_KEY_ID:
             # Don't include the CD signing cert as a PAA root.
@@ -220,7 +227,7 @@ def fetch_paa_certs(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use
         certificate = certificate.rstrip('\n')
 
         print(f"Downloaded PAA certificate with subject: {subject}")
-        write_cert(certificate, subject)
+        write_cert(certificate, subject, all_subjects)
 
     os.chdir(original_dir)
 

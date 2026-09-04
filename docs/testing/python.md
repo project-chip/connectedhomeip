@@ -99,6 +99,46 @@ file.
 The structured comments above the class definition are used to set up the CI for
 the tests. Please see [Running tests in CI](#running-tests-in-ci).
 
+### Declaring a test's device requirement
+
+`MatterBaseTest` is device-requirement neutral: on its own it does not say
+whether a test needs a commissioned device, an uncommissioned one, performs
+commissioning itself, or needs no device at all. Instead of deriving from
+`MatterBaseTest` directly, a test should derive from the marker base class that
+matches what it requires. These markers are currently **declarative only** —
+they add no runtime behavior and do not change method resolution order, setup,
+teardown, or test discovery. They give tooling (the Test Harness, CI selection,
+the structural check below) a single static signal for what each test needs.
+
+| Base class                       | The test...                                                                   |
+| -------------------------------- | ----------------------------------------------------------------------------- |
+| `MatterTestCommissionedDevice`   | requires a DUT already commissioned before it runs (the common case).         |
+| `MatterTestUncommissionedDevice` | requires an uncommissioned / commissionable DUT (not yet on a fabric).        |
+| `MatterTestCommissioner`         | commissions the DUT itself, or exercises commissioner-role flows (e.g. PASE). |
+| `CertificationUnitTestNoDevice`  | is a parser / validation / framework unit test that never talks to a DUT.     |
+| `BasicCompositionTests`          | intentionally supports either a commissioned **or** an uncommissioned device. |
+
+A test that commissions a _second_ fabric or a helper device while its own DUT
+is already commissioned is still `MatterTestCommissionedDevice`: classification
+follows the DUT's required starting state, not incidental commissioning actions.
+
+> **Wildcard subscription is a separate concern.** Whether the background
+> wildcard subscription runs is controlled by `requires_dut` /
+> `disable_wildcard_subscription` / `--no-wildcard-subscription` (see
+> [Wildcard subscription read verification](#wildcard-subscription-read-verification)).
+> For the three device-STATE markers (`MatterTestCommissionedDevice`,
+> `MatterTestUncommissionedDevice`, `MatterTestCommissioner`) this is
+> independent of classification — e.g. a `MatterTestCommissionedDevice` test may
+> still set `requires_dut = False` to skip the subscription. The one exception
+> is `CertificationUnitTestNoDevice`, which sets `requires_dut = False` on the
+> base: a test that never talks to a DUT can never use the subscription, so
+> no-device tests inherit that automatically and should not set it themselves.
+
+`TestDeviceRequirementMarkers.py` (under `test_testing/`) enforces the hierarchy
+invariants (the device-state markers are empty and subscription-independent,
+`CertificationUnitTestNoDevice` disables the subscription, markers are mutually
+exclusive) and checks that the reclassified tests declare the expected marker.
+
 ## Cluster Codegen
 
 -   [Objects.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/matter/clusters/Objects.py)
@@ -471,6 +511,10 @@ See
     -   use --int-arg, --bool-arg etc on the command line to specify PIXITs
     -   Warn users if they don’t set required values, add instructions in the
         comments
+    -   for a declarative alternative, declare required/optional PIXITs and
+        harness parameters up front with the `@pixit` / `@harness_params`
+        decorators — see
+        [Declarative PIXITs and harness parameters](./pics_and_pixit.md#declarative-pixits-and-harness-parameters)
 -   pixit_value = self.user_params.get("pixit_name", default)
 
 ## Support functionality
@@ -845,6 +889,7 @@ for that run, e.g.:
 #     app-args: <app_arguments>
 #     script-args: <script_arguments>
 #     factory-reset: <true|false>
+#     timeout: <float>   [optional]
 #     quiet: <true|false>
 # === END CI TEST ARGUMENTS ===
 ```
@@ -862,6 +907,13 @@ for that run, e.g.:
     before the test.
 
     -   Example: `true`
+
+-   `timeout`: Sets the timeout of the test script. When this timeout expires
+    the test run is considered failed. The value is in seconds.
+
+    -   Example: `700.6`
+    -   Default: Value of test script `--timeout` argument plus slack time,
+        otherwise `matter.testing.defaults.TestingDefaults.DEFAULT_TIMEOUT_S`
 
 -   `quiet`: Sets the verbosity level of the test run. When set to True, the
     test run will be quieter.
@@ -1008,3 +1060,114 @@ async def test_TC_OPCREDS_3_8(self):
     # Do test step logic if command is available, else this test is skipped
 
 ```
+
+## Wildcard subscription read verification
+
+This verification is enabled by default for tests that do not explicitly disable
+it.
+
+### Overview
+
+Certification tests can use a background **wildcard attribute subscription**
+(all endpoints, all clusters, all attributes) to cross-check routine attribute
+reads against values observed through the subscription path.
+
+The framework maintains a subscription-backed attribute cache and, when enabled,
+read helpers compare direct read responses against cached subscription values to
+help detect missing reports, stale values, or reporting inconsistencies.
+
+The comparison path is implemented in `matter_testing.py`
+(`verify_attribute_subscription_value`, `read_single_attribute_check_success`,
+and related helpers), while subscription client handling lives in
+`event_attribute_reporting.py`.
+
+### Architecture
+
+#### Secondary controller
+
+The wildcard subscription runs on a dedicated `ChipDeviceController` rather than
+`default_controller`.
+
+This avoids interference from test code that issues `ReadAttribute` calls with
+`keepSubscriptions=False` on the primary controller, which could otherwise tear
+down the background subscription.
+
+#### Subscription flags
+
+The wildcard subscribe uses:
+
+-   `keepSubscriptions=False`
+-   `autoResubscribe=False`
+
+`keepSubscriptions=False` avoids leaving stale server-side subscriptions behind
+if setup is retried.
+
+`autoResubscribe=False` avoids repeated client resubscribe attempts when tests
+temporarily overwrite ACLs in ways that remove the subscription controller's
+administer privilege, which can otherwise add noise and unnecessary DUT load.
+
+#### ACL handling
+
+Before the subscription starts, the framework snapshots the DUT ACL and appends
+an administer entry for the subscription controller.
+
+`teardown_test` restores the original ACL snapshot so each test starts from a
+known ACL state.
+
+Tests that replace the entire ACL during a step should include the subscription
+controller entry (see `get_subscription_acl_entry()` on `MatterBaseTest`) if
+subscription coverage needs to remain active through that step.
+
+### C/Q excluded attributes
+
+Attributes marked in the data model XML with:
+
+-   **Changes Omitted (C)**
+-   **Quieter Reporting (Q)**
+
+are excluded from wildcard subscription verification, since these attributes are
+not expected to behave like ordinary report-driven attributes.
+
+A small transitional allowlist (`_CQ_EXPECTED_BUT_NOT_YET_MARKED` in
+`matter_testing.py`) can treat additional attributes as C until XML/spec
+metadata catches up.
+
+Each temporary entry should cite a tracking issue and be removed once the data
+model is corrected and regenerated.
+
+### Disabling the wildcard subscription or verification
+
+**Disable the background subscription entirely** (no cache, no ACL append for
+the subscription controller):
+
+-   Per test class: `disable_wildcard_subscription = True`
+-   Per run / harness: `--no-wildcard-subscription`
+    (`matter_test_config.no_wildcard_subscription`)
+
+**Keep the subscription but skip comparing reads to the cache:**
+
+-   Per test class: `default_verify_wildcard_subscription = False`
+-   Single read: pass `verify_wildcard_subscription=False` to the read helper,
+    otherwise this defaults to True.
+
+### Known limitations
+
+This framework has exposed cases where some attributes are effectively polled on
+read in the SDK rather than updated through a reporting path.
+
+Such attributes may appear in the subscription priming read but later disagree
+with a direct read, producing mismatches that are not DUT subscription failures.
+
+The canonical example is Software Diagnostics heap counters.
+
+These issues are tracked separately as SDK/spec/XML alignment gaps rather than
+framework defects.
+
+Per-fabric attributes may also require special handling when comparing values
+across controllers operating on different fabrics (for example, fabric-scoped
+attributes such as CurrentFabricIndex can legitimately differ across fabrics and
+should not be treated as subscription failures).
+
+Direct reads may also occasionally overtake in-flight subscription reports
+during attribute transitions, which can create transient mismatches that are
+framework timing artifacts rather than missing DUT reports.

@@ -124,7 +124,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
 
     mParams.totalFileBytes = header.mPayloadSize;
     mHeaderParser.Clear();
-    ChipLogError(SoftwareUpdate, "Processed header successfully");
+    ChipLogDetail(SoftwareUpdate, "Processed header successfully");
 
     return CHIP_NO_ERROR;
 }
@@ -262,7 +262,16 @@ void OTAImageProcessorImpl::HandleStatus(CHIP_ERROR status)
     }
     else
     {
-        ChipLogError(SoftwareUpdate, "Image update canceled. Failed to process OTA block: %" CHIP_ERROR_FORMAT, status.Format());
+        if (status == CHIP_ERROR_OTA_PROCESSOR_START_IMAGE)
+        {
+            ChipLogError(SoftwareUpdate,
+                         "Image update canceled. Failed to process OTA block: CHIP_ERROR_OTA_PROCESSOR_START_IMAGE");
+        }
+        else
+        {
+            ChipLogError(SoftwareUpdate, "Image update canceled. Failed to process OTA block: %" CHIP_ERROR_FORMAT,
+                         status.Format());
+        }
         GetRequestorInstance()->CancelImageUpdate();
     }
 }
@@ -293,10 +302,41 @@ bool OTAImageProcessorImpl::IsFirstImageRun()
     return requestor->GetCurrentUpdateState() == OTARequestorInterface::OTAUpdateStateEnum::kApplying;
 }
 
+CHIP_ERROR OTAImageProcessorImpl::HandleImageStatus()
+{
+    OtaImgState_t otaResult = OTA_GetImgState();
+    switch (otaResult)
+    {
+    case OtaImgState_None:
+    case OtaImgState_Permanent:
+        ChipLogProgress(SoftwareUpdate, "Image state: Default state, current image made permanent");
+        break;
+    case OtaImgState_Acquiring:
+        ChipLogProgress(SoftwareUpdate, "Image state: Acquisition of new firmware is ongoing");
+        break;
+    case OtaImgState_CandidateRdy:
+        ChipLogProgress(SoftwareUpdate, "Image state: Candidate ready");
+        break;
+    case OtaImgState_RunCandidate:
+        ChipLogProgress(SoftwareUpdate, "Image state: Running candidate");
+        break;
+    case OtaImgState_Fail:
+        ChipLogError(SoftwareUpdate, "Image state: FAIL");
+        return CHIP_ERROR_INTERNAL;
+    default:
+        ChipLogError(SoftwareUpdate, "Image state: UNKNOWN");
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
 {
     uint32_t currentVersion;
     uint32_t targetVersion;
+
+    VerifyOrReturnError(HandleImageStatus() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     OTARequestorInterface * requestor = chip::GetRequestorInstance();
     VerifyOrReturnError(requestor != nullptr, CHIP_ERROR_INTERNAL);

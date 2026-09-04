@@ -28,7 +28,10 @@ from matter.tlv import uint
 
 
 class TestSpecParsingSelection(DeviceConformanceTests):
+    requires_dut = False
+
     def setup_class(self):
+        super().setup_class()
         # Overriding the DeviceConformanceTest setup_class so we don't go out to a real device
         pass
 
@@ -54,6 +57,8 @@ class TestSpecParsingSelection(DeviceConformanceTests):
                              "Incorrect directory selected for 1.5.1")
         asserts.assert_equal(dm_from_spec_version(0x01060000), PrebuiltDataModelDirectory.k1_6,
                              "Incorrect directory selected for 1.6")
+        asserts.assert_equal(dm_from_spec_version(0x01060100), PrebuiltDataModelDirectory.k1_6_1,
+                             "Incorrect directory selected for 1.6.1")
 
         # 1.2 doesn't include a specification revision field, so this should error
         with asserts.assert_raises(ConformanceException, "Expected assertion was not raised for spec version 1.2"):
@@ -72,6 +77,12 @@ class TestSpecParsingSelection(DeviceConformanceTests):
         with asserts.assert_raises(ConformanceException, "Data model incorrectly identified for 1.5.FF"):
             dm_from_spec_version(0x0105FF00)
 
+        # Any dot release above .1 should error for 1.6
+        with asserts.assert_raises(ConformanceException, "Data model incorrectly identified for 1.6.2"):
+            dm_from_spec_version(0x01060200)
+        with asserts.assert_raises(ConformanceException, "Data model incorrectly identified for 1.6.FF"):
+            dm_from_spec_version(0x0106FF00)
+
         # Any value with stuff in reserved should error
         with asserts.assert_raises(ConformanceException, "Error not returned for specification revision with non-zero reserved values"):
             dm_from_spec_version(0x01030001)
@@ -83,6 +94,8 @@ class TestSpecParsingSelection(DeviceConformanceTests):
             dm_from_spec_version(0x01050001)
         with asserts.assert_raises(ConformanceException, "Error not returned for specification revision with non-zero reserved values"):
             dm_from_spec_version(0x01060001)
+        with asserts.assert_raises(ConformanceException, "Error not returned for specification revision with non-zero reserved values"):
+            dm_from_spec_version(0x01060101)
 
     def _create_device(self, spec_version: uint, tc_enabled: bool):
         if spec_version is None:
@@ -102,11 +115,11 @@ class TestSpecParsingSelection(DeviceConformanceTests):
             spec_generated_commands = xml_clusters[cluster.id].generated_commands
             info = ConformanceAssessmentData(feature_map=feature_map, attribute_list=[], all_command_list=[], cluster_revision=1)
             # Build just the lists - basic composition checks the wildcard against the lists, conformance just uses lists
-            attributes = [id for id, a in spec_attributes.items() if a.conformance(
+            attributes = [_id for _id, a in spec_attributes.items() if a.conformance(
                 info).decision == ConformanceDecision.MANDATORY]
-            accepted_commands = [id for id, c in spec_accepted_commands.items() if c.conformance(
+            accepted_commands = [_id for _id, c in spec_accepted_commands.items() if c.conformance(
                 info).decision == ConformanceDecision.MANDATORY]
-            generated_commands = [id for id, c in spec_generated_commands.items() if c.conformance(
+            generated_commands = [_id for _id, c in spec_generated_commands.items() if c.conformance(
                 info).decision == ConformanceDecision.MANDATORY]
             attr = cluster.Attributes
 

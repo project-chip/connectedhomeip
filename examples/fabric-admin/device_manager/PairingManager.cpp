@@ -499,8 +499,9 @@ CommissioningParameters PairingManager::GetCommissioningParameters()
 
         if (!mICDSymmetricKey.HasValue())
         {
-            TEMPORARY_RETURN_IGNORED Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey,
-                                                            sizeof(mRandomGeneratedICDSymmetricKey));
+            VerifyOrDieWithMsg(Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey, sizeof(mRandomGeneratedICDSymmetricKey)) ==
+                                   CHIP_NO_ERROR,
+                               NotSpecified, "Failed to generate ICD symmetric key (DRBG failure)");
             mICDSymmetricKey.SetValue(ByteSpan(mRandomGeneratedICDSymmetricKey));
         }
         if (!mICDCheckInNodeId.HasValue())

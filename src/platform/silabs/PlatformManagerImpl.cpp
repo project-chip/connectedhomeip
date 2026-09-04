@@ -106,7 +106,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 #endif // !SLI_SI91X_MCU_INTERFACE
     /* Set RNG function for tinycrypt operations. */
     rngMutexHandle = osMutexNew(nullptr);
-    VerifyOrExit((&rngMutexHandle != nullptr), err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit((rngMutexHandle != nullptr), err = CHIP_ERROR_NO_MEMORY);
     uECC_set_rng(PlatformManagerImpl::uECC_RNG_Function);
 #endif // SL_MBEDTLS_USE_TINYCRYPT
 
@@ -199,32 +199,29 @@ void HandleWFXSystemEvent(sl_wfx_generic_message_t * eventData)
 
     switch (eventData->header.id)
     {
-// TODO: Work around until we unify the data structures behind a Matter level common structure
-#if WF200_WIFI
-    case SL_WFX_STARTUP_IND_ID:
-#endif
+
     case to_underlying(WifiInterface::WifiEvent::kStartUp):
-        memcpy(&event.Platform.WFXSystemEvent.data.startupEvent, eventData,
-               sizeof(event.Platform.WFXSystemEvent.data.startupEvent));
+        memcpy(&event.Platform.event.WFXSystemEvent.data.startupEvent, eventData,
+               sizeof(event.Platform.event.WFXSystemEvent.data.startupEvent));
         // TODO: This is a workaround until we unify the Matter Data structures
-        event.Platform.WFXSystemEvent.data.startupEvent.header.id = to_underlying(WifiInterface::WifiEvent::kStartUp);
+        event.Platform.event.WFXSystemEvent.data.startupEvent.header.id = to_underlying(WifiInterface::WifiEvent::kStartUp);
         break;
 
     case to_underlying(WifiInterface::WifiEvent::kConnect):
-        memcpy(&event.Platform.WFXSystemEvent.data.connectEvent, eventData,
-               sizeof(event.Platform.WFXSystemEvent.data.connectEvent));
+        memcpy(&event.Platform.event.WFXSystemEvent.data.connectEvent, eventData,
+               sizeof(event.Platform.event.WFXSystemEvent.data.connectEvent));
         break;
 
     case to_underlying(WifiInterface::WifiEvent::kDisconnect):
-        memcpy(&event.Platform.WFXSystemEvent.data.disconnectEvent, eventData,
-               sizeof(event.Platform.WFXSystemEvent.data.disconnectEvent));
+        memcpy(&event.Platform.event.WFXSystemEvent.data.disconnectEvent, eventData,
+               sizeof(event.Platform.event.WFXSystemEvent.data.disconnectEvent));
         break;
 
     case to_underlying(WifiInterface::WifiEvent::kGotIPv4):
     case to_underlying(WifiInterface::WifiEvent::kLostIP):
     case to_underlying(WifiInterface::WifiEvent::kGotIPv6):
-        memcpy(&event.Platform.WFXSystemEvent.data.genericMsgEvent, eventData,
-               sizeof(event.Platform.WFXSystemEvent.data.genericMsgEvent));
+        memcpy(&event.Platform.event.WFXSystemEvent.data.genericMsgEvent, eventData,
+               sizeof(event.Platform.event.WFXSystemEvent.data.genericMsgEvent));
         break;
 
     default:

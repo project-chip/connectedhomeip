@@ -219,17 +219,13 @@ TEST_F(TestPlatformMgr, TryLockChipStack)
     PlatformMgr().Shutdown();
 }
 
-static int sEventRecieved = 0;
-
 void DeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
     EXPECT_EQ(arg, 12345);
-    sEventRecieved++;
 }
 
 TEST_F(TestPlatformMgr, AddEventHandler)
 {
-    sEventRecieved = 0;
     EXPECT_EQ(PlatformMgr().AddEventHandler(DeviceEventHandler, 12345), CHIP_NO_ERROR);
 }
 

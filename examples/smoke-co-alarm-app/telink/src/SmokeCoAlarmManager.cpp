@@ -20,6 +20,7 @@
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
+using namespace ::chip::app::Clusters;
 using namespace ::chip::app::Clusters::SmokeCoAlarm;
 using namespace ::chip::DeviceLayer;
 
@@ -35,7 +36,15 @@ static std::array<ExpressedStateEnum, SmokeCoAlarmServer::kPriorityOrderLength> 
 
 CHIP_ERROR SmokeCoAlarmManager::Init()
 {
-    return CHIP_NO_ERROR;
+    SmokeCoAlarmCluster::Config config;
+    config.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
+    config.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
+    return SmokeCoAlarmServer::Instance().Init(1, config, this);
+}
+
+void SmokeCoAlarmManager::OnSelfTestRequested()
+{
+    StartSelfTesting();
 }
 
 void SmokeCoAlarmManager::StartSelfTesting()

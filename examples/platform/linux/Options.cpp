@@ -155,6 +155,7 @@ enum
     kDeviceOption_Camera_TestAudiosrc,
     kDeviceOption_Camera_AudioPlayback,
     kDeviceOption_Camera_VideoDevice,
+    kDeviceOption_Camera_Framerate,
 #endif
     kDeviceOption_VendorName,
     kDeviceOption_ProductName,
@@ -169,7 +170,12 @@ OptionDef sDeviceOptionDefs[] = {
     { "ble-controller", kArgumentRequired, kDeviceOption_BleDevice },
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
+    // On Linux the interface managed by wpa_supplicant can be selected via --wifi=<interface>.
+    { "wifi", kArgumentOptional, kDeviceOption_WiFi },
+#else
     { "wifi", kNoArgument, kDeviceOption_WiFi },
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
     { "wifi-supports-5g", kNoArgument, kDeviceOption_WiFiSupports5g },
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     { "wifipaf", kArgumentRequired, kDeviceOption_WiFi_PAF },
@@ -264,6 +270,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "camera-test-audiosrc", kNoArgument, kDeviceOption_Camera_TestAudiosrc },
     { "camera-audio-playback", kNoArgument, kDeviceOption_Camera_AudioPlayback },
     { "camera-video-device", kArgumentRequired, kDeviceOption_Camera_VideoDevice },
+    { "camera-framerate", kArgumentRequired, kDeviceOption_Camera_Framerate },
 #endif
     {}
 };
@@ -273,12 +280,15 @@ const char * sDeviceOptionHelp =
     "  --ble-controller <selector>\n"
     "       BLE controller selector, see example or platform docs for details\n"
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     "\n"
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
+    "  --wifi[=interface]\n"
+    "       Enable Wi-Fi management via wpa_supplicant, optionally specifying the interface name.\n"
+#else
     "  --wifi\n"
     "       Enable Wi-Fi management via wpa_supplicant.\n"
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
     "\n"
     "  --wifi-supports-5g\n"
     "       Indicate that local Wi-Fi hardware should report 5GHz support.\n"
@@ -491,6 +501,9 @@ const char * sDeviceOptionHelp =
     "  --camera-audio-playback\n"
     "       Enables audio playback gstreamer pipeline to play the audio received from remote peer.\n"
     "\n"
+    "  --camera-framerate <fps>\n"
+    "       Framerate for video streaming (default: 30).\n"
+    "\n"
 #endif
     "\n";
 
@@ -558,13 +571,21 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         }
         break;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     case kDeviceOption_WiFi:
         LinuxDeviceOptions::GetInstance().mWiFi = true;
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
+        if (aValue != nullptr && *aValue != 0)
+        {
+            LinuxDeviceOptions::GetInstance().mWiFiInterface.Emplace(aValue);
+        }
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
         break;
 
     case kDeviceOption_WiFiSupports5g:
         LinuxDeviceOptions::GetInstance().wifiSupports5g = true;
         break;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
@@ -997,6 +1018,17 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     }
     case kDeviceOption_Camera_VideoDevice: {
         LinuxDeviceOptions::GetInstance().cameraVideoDevice.SetValue(aValue);
+        break;
+    }
+    case kDeviceOption_Camera_Framerate: {
+        unsigned long value = strtoul(aValue, nullptr, 0);
+        if (value > UINT16_MAX)
+        {
+            PrintArgError("%s: Invalid camera framerate: %s\n", aProgram, aValue);
+            retval = false;
+            break;
+        }
+        LinuxDeviceOptions::GetInstance().cameraFramerate.SetValue(static_cast<uint16_t>(value));
         break;
     }
 #endif

@@ -648,6 +648,15 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
+ *
+ * Enable BLE advertising after commissioning completes.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
+#define CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING 0
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART
  *
  * Enable opening pairing window automatically after device power-up.
@@ -1226,6 +1235,15 @@ static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN <= CHIP_DEVICE
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART 1
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_THREAD_DISCOVERY_INTERVAL_MS
+ *
+ * The interval in milliseconds between two seeker attempts in Thread Rendezvous.
+ */
+#ifndef CHIP_DEVICE_CONFIG_THREAD_DISCOVERY_INTERVAL_MS
+#define CHIP_DEVICE_CONFIG_THREAD_DISCOVERY_INTERVAL_MS 0
 #endif
 
 // -------------------- Network Telemetry Configuration --------------------

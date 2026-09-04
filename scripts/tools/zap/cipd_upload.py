@@ -66,7 +66,7 @@ def main(log_level: str, version: str, no_temp_clean: bool):
 
             # Release downloaded, create a CIPD definition and upload it
             cipd_def_file = f"cipd_{platform}_{arch}.yaml"
-            with open(os.path.join(download_path, cipd_def_file), "wt") as f:
+            with open(os.path.join(download_path, cipd_def_file), 'w') as f:
                 f.write(f"package: experimental/matter/zap/{cipd_dir}\n")
                 f.write(f"description: ZAP release {version} of {platform}-{arch}\n")
                 f.write("install_mode: copy\n")

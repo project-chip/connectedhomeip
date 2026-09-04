@@ -54,23 +54,15 @@ config NORDIC_QSPI_NOR_STACK_WRITE_BUFFER_SIZE
 
 endif # CHIP_QSPI_NOR
 
-config CHIP_SPI_NOR
-	bool "Enable SPI NOR feature set"
-	imply SPI
-	imply SPI_NOR
-	imply MULTITHREADING
-	imply PM_OVERRIDE_EXTERNAL_DRIVER_CHECK
-	imply MCUMGR_GRP_IMG_ALLOW_ERASE_PENDING
-	help
-	  Enables SPI NOR flash with a set of options for configuring pages and
-	  buffer sizes.
-
-if CHIP_SPI_NOR
+if SPI_NOR
 
 config SPI_NOR_FLASH_LAYOUT_PAGE_SIZE
 	default 4096
 
-endif # CHIP_SPI_NOR
+config PM_OVERRIDE_EXTERNAL_DRIVER_CHECK
+	default y
+
+endif # SPI_NOR
 
 config CHIP_MEMORY_PROFILING
 	bool "Enable features for tracking memory usage"
@@ -111,6 +103,7 @@ config BT_BONDABLE
 	default n
 
 config BT_RX_STACK_SIZE
+	default 2560 if SOC_SERIES_NRF54L
 	default 1536
 
 config SYSTEM_WORKQUEUE_STACK_SIZE
@@ -121,7 +114,7 @@ config BT_DEVICE_APPEARANCE
 
 if !LOG
 
-config BT_FIXED_PASSKEY
+config BT_APP_PASSKEY
 	default y
 
 endif
@@ -135,7 +128,7 @@ config CHIP_NUS_MAX_COMMAND_LEN
 
 config CHIP_NUS_FIXED_PASSKEY
 	int "Define the default passkey for NUS"
-	depends on BT_FIXED_PASSKEY
+	depends on BT_APP_PASSKEY
 	default 123456
 	help
 	  Define the default password for pairing with the Bluetooth LE device.
@@ -151,8 +144,6 @@ endif
 
 config CHIP_DFU_OVER_BT_SMP
 	bool "Enable DFU over Bluetooth LE SMP feature set"
-	imply CHIP_QSPI_NOR if BOARD_NRF5340DK_NRF5340_CPUAPP || BOARD_NRF52840DK_NRF52840
-	imply CHIP_SPI_NOR if BOARD_NRF7002DK_NRF5340_CPUAPP || BOARD_NRF7002DK_NRF5340_CPUAPP_NRF7001 || BOARD_NRF54L15DK
 	imply BOOTLOADER_MCUBOOT
 	select MCUMGR
 	select MCUMGR_TRANSPORT_BT
@@ -207,7 +198,7 @@ config MCUMGR_TRANSPORT_NETBUF_SIZE
 config SYSTEM_WORKQUEUE_STACK_SIZE
 	default 2800
 
-if SOC_SERIES_NRF53X
+if SOC_SERIES_NRF53
 
 # Enable custom SMP request to erase settings partition.
 config MCUMGR_GRP_ZBASIC
@@ -216,7 +207,7 @@ config MCUMGR_GRP_ZBASIC
 config MCUMGR_GRP_ZBASIC_STORAGE_ERASE
 	default y
 
-endif # SOC_SERIES_NRF53X
+endif # SOC_SERIES_NRF53
 
 endif # CHIP_DFU_OVER_BT_SMP
 

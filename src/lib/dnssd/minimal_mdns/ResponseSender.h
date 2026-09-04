@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "Parser.h"
 #include "ResponseBuilder.h"
 #include "Server.h"
+#include <lib/dnssd/wire/Parser.h>
 
 #include <lib/dnssd/minimal_mdns/responders/QueryResponder.h>
 
@@ -71,18 +71,18 @@ class ResponseSendingState
 public:
     ResponseSendingState() {}
 
-    void Reset(uint16_t messageId, const QueryData & query, const chip::Inet::IPPacketInfo * packet)
+    void Reset(uint16_t messageId, const chip::Dnssd::QueryData & query, const chip::Inet::IPPacketInfo * packet)
     {
         mMessageId    = messageId;
         mQuery        = &query;
         mSource       = packet;
         mSendError    = CHIP_NO_ERROR;
-        mResourceType = ResourceType::kAnswer;
+        mResourceType = chip::Dnssd::ResourceType::kAnswer;
         mSentItems.ClearAll();
     }
 
-    void SetResourceType(ResourceType resourceType) { mResourceType = resourceType; }
-    ResourceType GetResourceType() const { return mResourceType; }
+    void SetResourceType(chip::Dnssd::ResourceType resourceType) { mResourceType = resourceType; }
+    chip::Dnssd::ResourceType GetResourceType() const { return mResourceType; }
 
     CHIP_ERROR SetError(CHIP_ERROR chipError)
     {
@@ -93,7 +93,7 @@ public:
 
     uint16_t GetMessageId() const { return mMessageId; }
 
-    const QueryData * GetQuery() const { return mQuery; }
+    const chip::Dnssd::QueryData * GetQuery() const { return mQuery; }
 
     /// Check if the reply should be sent as a unicast reply
     bool SendUnicast() const;
@@ -111,10 +111,10 @@ public:
     void MarkWasSent(ResponseItemsSent item) { mSentItems.Set(item); }
 
 private:
-    const QueryData * mQuery                 = nullptr;               // query being replied to
-    const chip::Inet::IPPacketInfo * mSource = nullptr;               // Where to send the reply (if unicast)
-    uint16_t mMessageId                      = 0;                     // message id for the reply
-    ResourceType mResourceType               = ResourceType::kAnswer; // what is being sent right now
+    const chip::Dnssd::QueryData * mQuery    = nullptr;                            // query being replied to
+    const chip::Inet::IPPacketInfo * mSource = nullptr;                            // Where to send the reply (if unicast)
+    uint16_t mMessageId                      = 0;                                  // message id for the reply
+    chip::Dnssd::ResourceType mResourceType  = chip::Dnssd::ResourceType::kAnswer; // what is being sent right now
     CHIP_ERROR mSendError                    = CHIP_NO_ERROR;
     chip::BitFlags<ResponseItemsSent> mSentItems;
 };
@@ -135,11 +135,11 @@ public:
     bool HasQueryResponders() const;
 
     /// Send back the response to a particular query
-    CHIP_ERROR Respond(uint16_t messageId, const QueryData & query, const chip::Inet::IPPacketInfo * querySource,
+    CHIP_ERROR Respond(uint16_t messageId, const chip::Dnssd::QueryData & query, const chip::Inet::IPPacketInfo * querySource,
                        const ResponseConfiguration & configuration);
 
     // Implementation of ResponderDelegate
-    void AddResponse(const ResourceRecord & record) override;
+    void AddResponse(const chip::Dnssd::ResourceRecord & record) override;
     bool ShouldSend(const Responder &) const override;
     void ResponsesAdded(const Responder &) override;
 

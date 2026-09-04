@@ -16,6 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${chip_root}/build/chip/fuzz_test.gni")
 
 chip_test_suite("tests") {
   output_name = "libWiFiPAFLayerTests"
@@ -33,4 +34,22 @@ chip_test_suite("tests") {
     "${chip_root}/src/platform",
     "${chip_root}/src/wifipaf",
   ]
+}
+
+if (pw_enable_fuzz_test_targets) {
+  chip_pw_fuzz_target("fuzz-wifipaf-endpoint-pw") {
+    test_source = [ "FuzzWiFiPAFEndPointPW.cpp" ]
+    public_deps = [
+      "${chip_root}/src/platform",
+      "${chip_root}/src/platform/logging:default",
+      "${chip_root}/src/wifipaf",
+    ]
+  }
+  chip_pw_fuzz_target("fuzz-wifipaf-tp-pw") {
+    test_source = [ "FuzzWiFiPAFTPPW.cpp" ]
+    public_deps = [
+      "${chip_root}/src/platform/logging:default",
+      "${chip_root}/src/wifipaf",
+    ]
+  }
 }

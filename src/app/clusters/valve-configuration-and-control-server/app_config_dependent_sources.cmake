@@ -19,13 +19,3 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
 )
-
-# These are the things that BUILD.gn dependencies would pull
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/ValveConfigurationAndControlCluster.cpp"
-    "${CLUSTER_DIR}/ValveConfigurationAndControlCluster.h"
-    "${CLUSTER_DIR}/valve-configuration-and-control-delegate.h"
-    "${CLUSTER_DIR}/TimeSyncTracker.h"
-)

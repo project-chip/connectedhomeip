@@ -27,7 +27,7 @@ include:
   file_list:
   - {path: app.h}
   - {path: reset_util.h}
-sdk: {id: simplicity_sdk, version: 2024.12.2}
+sdk: {id: silabs.simplicity_sdk, version: 2026.6.0}
 toolchain_settings: []
 
 component:
@@ -57,7 +57,8 @@ component:
 - {id: freertos_heap_3}
 - {id: iostream_rtt}
 - {id: toolchain_gcc}
-- {id: brd4002a}
+- id: brd4002b
+  condition: [hardware_board_rb]
 - {id: rail_util_pti}
 - {id: rail_lib_multiprotocol}
 - {id: rail_util_power_manager_init}
@@ -78,6 +79,14 @@ component:
 - {id: ot_psa_crypto}
 - {id: ot_platform_abstraction}
 - {id: sl_ot_custom_cli}
+- id: dmadrv
+  condition: [device_series_2]
+- id: dmadrv
+  condition: [device_series_3]
+- id: bootloader_interface
+  condition: [device_series_2]
+- id: bootloader_interface_s3
+  condition: [device_series_3]
 # Necessary componenets for ot coap cert lib
 # - {id: mbedtls_dtls} # Requried by COAP lib
 # - {id: mbedtls_tls_server} # Requried by COAP lib
@@ -104,12 +113,12 @@ configuration:
 - condition: [uartdrv_usart]
   name: UARTDRV_RESTRICT_ENERGY_MODE_TO_ALLOW_RECEPTION
   value: '1'
-- condition: [iostream_usart]
-  name: SL_IOSTREAM_USART_VCOM_RESTRICT_ENERGY_MODE_TO_ALLOW_RECEPTION
-  value: '1'
-- condition: [iostream_usart]
-  name: SL_IOSTREAM_USART_VCOM_RX_BUFFER_SIZE
-  value: '128'
+#- condition: [iostream_usart]
+#  name: SL_IOSTREAM_USART_VCOM_RESTRICT_ENERGY_MODE_TO_ALLOW_RECEPTION
+#  value: '1'
+#- condition: [iostream_usart]
+#  name: SL_IOSTREAM_USART_VCOM_RX_BUFFER_SIZE
+#  value: '128'
 - {name: SL_HEAP_SIZE, value: '0'}
 - {name: SL_STACK_SIZE, value: '4608'}
 - {name: SL_BOARD_ENABLE_VCOM, value: '0'}
@@ -119,7 +128,12 @@ configuration:
 - {name: SL_CLOCK_MANAGER_HFRCO_DPLL_EN, value: 1}
 - {name: SL_BT_RTOS_LINK_LAYER_TASK_STACK_SIZE, value: 1024}
 - {name: SL_BT_RTOS_HOST_STACK_TASK_STACK_SIZE, value: 2048}
-- {name: SL_BT_RTOS_EVENT_HANDLER_STACK_SIZE, value: 1536}
+- name: SL_BT_RTOS_EVENT_HANDLER_STACK_SIZE
+  value: "1536"
+  condition: [device_series_2]
+- name: SL_BT_RTOS_EVENT_HANDLER_STACK_SIZE
+  value: "2000"
+  condition: [device_series_3]
 - {name: SL_MBEDTLS_PSA_ASSUME_EXCLUSIVE_BUFFERS, value: 1}
 - {name: SL_OPENTHREAD_ENABLE_SERIAL_TASK, value: 0}
 - condition: [device_series_3]
@@ -128,6 +142,8 @@ configuration:
 
 requires:
 - condition: [device_series_2]
+  name: uartdrv_eusart
+- condition: [device_series_3]
   name: uartdrv_eusart
 - condition: [device_series_2]
   name: device_init_dpll

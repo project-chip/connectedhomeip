@@ -37,8 +37,7 @@
 
 import asyncio
 import contextlib
-import typing
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from mobly import asserts
 
@@ -54,10 +53,10 @@ from matter.tlv import uint
 
 
 class TC_TIMESYNC_2_10(MatterBaseTest):
-    async def send_set_time_zone_cmd(self, tz: typing.List[Clusters.Objects.TimeSynchronization.Structs.TimeZoneStruct]) -> Clusters.Objects.TimeSynchronization.Commands.SetTimeZoneResponse:
+    async def send_set_time_zone_cmd(self, tz: list[Clusters.Objects.TimeSynchronization.Structs.TimeZoneStruct]) -> Clusters.Objects.TimeSynchronization.Commands.SetTimeZoneResponse:
         return await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetTimeZone(timeZone=tz), endpoint=self.endpoint)
 
-    async def send_set_dst_cmd(self, dst: typing.List[Clusters.Objects.TimeSynchronization.Structs.DSTOffsetStruct]) -> None:
+    async def send_set_dst_cmd(self, dst: list[Clusters.Objects.TimeSynchronization.Structs.DSTOffsetStruct]) -> None:
         await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetDSTOffset(DSTOffset=dst))
 
     async def send_set_utc_cmd(self, utc: uint) -> None:
@@ -107,8 +106,8 @@ class TC_TIMESYNC_2_10(MatterBaseTest):
         cb.wait_for_event_report(event, 5)
 
         self.print_step(7, "Set DSTOffset to expire in 10 seconds")
-        th_utc = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc))
-        expiry = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=10))
+        th_utc = utc_time_in_matter_epoch(datetime.now(tz=UTC))
+        expiry = utc_time_in_matter_epoch(datetime.now(tz=UTC) + timedelta(seconds=10))
         dst = [dst_struct(offset=3600, validStarting=0, validUntil=expiry)]
         await self.send_set_dst_cmd(dst)
 

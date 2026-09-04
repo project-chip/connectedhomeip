@@ -87,6 +87,19 @@ bool Delegate::HasFeature(chip::EndpointId endpoint, Feature feature)
     return (featureMap & chip::to_underlying(feature));
 }
 
+CHIP_ERROR LogMessageNotPresentedEvent(chip::EndpointId endpoint, const ByteSpan & messageId, bool removedFromQueue)
+{
+    Events::MessageNotPresented::Type event{ .messageID = messageId, .removedFromQueue = removedFromQueue };
+
+    EventNumber eventNumber;
+    CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "LogMessageNotPresentedEvent: unable to send event: %s [endpointId=%d]", err.AsString(), endpoint);
+    }
+    return err;
+}
+
 } // namespace Messages
 } // namespace Clusters
 } // namespace app
@@ -107,6 +120,8 @@ public:
 private:
     CHIP_ERROR ReadMessages(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadActiveMessageIds(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadSupportedLanguageCodes(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadSupportedMimeTypes(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadFeatureFlagAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
 };
 
@@ -133,6 +148,20 @@ CHIP_ERROR MessagesAttrAccess::Read(const app::ConcreteReadAttributePath & aPath
         }
 
         return ReadActiveMessageIds(aEncoder, delegate);
+    case app::Clusters::Messages::Attributes::SupportedLanguageCodes::Id:
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return aEncoder.EncodeEmptyList();
+        }
+
+        return ReadSupportedLanguageCodes(aEncoder, delegate);
+    case app::Clusters::Messages::Attributes::SupportedMimeTypes::Id:
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return aEncoder.EncodeEmptyList();
+        }
+
+        return ReadSupportedMimeTypes(aEncoder, delegate);
     case app::Clusters::Messages::Attributes::FeatureMap::Id:
         if (isDelegateNull(delegate, endpoint))
         {
@@ -164,6 +193,16 @@ CHIP_ERROR MessagesAttrAccess::ReadActiveMessageIds(app::AttributeValueEncoder &
     return delegate->HandleGetActiveMessageIds(aEncoder);
 }
 
+CHIP_ERROR MessagesAttrAccess::ReadSupportedLanguageCodes(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
+{
+    return delegate->HandleGetSupportedLanguageCodes(aEncoder);
+}
+
+CHIP_ERROR MessagesAttrAccess::ReadSupportedMimeTypes(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
+{
+    return delegate->HandleGetSupportedMimeTypes(aEncoder);
+}
+
 } // anonymous namespace
 
 bool emberAfMessagesClusterPresentMessagesRequestCallback(
@@ -181,6 +220,8 @@ bool emberAfMessagesClusterPresentMessagesRequestCallback(
     auto & duration       = commandData.duration;
     auto & messageText    = commandData.messageText;
     auto & responses      = commandData.responses;
+    auto & languageCode   = commandData.languageCode;
+    auto & messageUri     = commandData.messageURI;
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, status = Status::NotFound);
@@ -192,6 +233,64 @@ bool emberAfMessagesClusterPresentMessagesRequestCallback(
     VerifyOrExit(messageText.size() <= kMessageTextLengthMax,
                  ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback invalid message text length");
                  status = Status::ConstraintError);
+
+    VerifyOrExit(!messageControl.Has(MessageControlBitmap::kSpokenMessage) ||
+                     delegate->HasFeature(endpoint, Feature::kSpokenMessages),
+                 ChipLogProgress(Zcl,
+                                 "emberAfMessagesClusterPresentMessagesRequestCallback SpokenMessage bit set but "
+                                 "SpokenMessages feature not supported");
+                 status = Status::InvalidCommand);
+
+    VerifyOrExit(!messageControl.Has(MessageControlBitmap::kAudioMessage) ||
+                     delegate->HasFeature(endpoint, Feature::kAudioMessages),
+                 ChipLogProgress(Zcl,
+                                 "emberAfMessagesClusterPresentMessagesRequestCallback AudioMessage bit set but "
+                                 "AudioMessages feature not supported");
+                 status = Status::InvalidCommand);
+
+    VerifyOrExit(
+        !(messageControl.Has(MessageControlBitmap::kSpokenMessage) && messageControl.Has(MessageControlBitmap::kAudioMessage)) ||
+            delegate->HasFeature(endpoint, Feature::kMultiModalMessages),
+        ChipLogProgress(Zcl,
+                        "emberAfMessagesClusterPresentMessagesRequestCallback SpokenMessage and AudioMessage "
+                        "bits both set but MultiModalMessages feature not supported");
+        status = Status::InvalidCommand);
+
+    VerifyOrExit(
+        !messageControl.Has(MessageControlBitmap::kSpokenMessage) || languageCode.HasValue(),
+        ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback SpokenMessage bit set but LanguageCode missing");
+        status = Status::ConstraintError);
+
+    VerifyOrExit(
+        !messageControl.Has(MessageControlBitmap::kAudioMessage) || messageUri.HasValue(),
+        ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback AudioMessage bit set but MessageURI missing");
+        status = Status::ConstraintError);
+
+    if (languageCode.HasValue())
+    {
+        VerifyOrExit(delegate->HasFeature(endpoint, Feature::kSpokenMessages),
+                     ChipLogProgress(Zcl,
+                                     "emberAfMessagesClusterPresentMessagesRequestCallback LanguageCode sent but "
+                                     "SpokenMessages feature not supported");
+                     status = Status::InvalidCommand);
+
+        VerifyOrExit(languageCode.Value().size() > 0 && languageCode.Value().size() <= kLanguageCodeLengthMax,
+                     ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback invalid LanguageCode length");
+                     status = Status::ConstraintError);
+    }
+
+    if (messageUri.HasValue())
+    {
+        VerifyOrExit(delegate->HasFeature(endpoint, Feature::kAudioMessages),
+                     ChipLogProgress(Zcl,
+                                     "emberAfMessagesClusterPresentMessagesRequestCallback MessageURI sent but "
+                                     "AudioMessages feature not supported");
+                     status = Status::InvalidCommand);
+
+        VerifyOrExit(messageUri.Value().size() > 0 && messageUri.Value().size() <= kMessageUriLengthMax,
+                     ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback invalid MessageURI length");
+                     status = Status::ConstraintError);
+    }
 
     if (responses.HasValue())
     {
@@ -234,7 +333,8 @@ bool emberAfMessagesClusterPresentMessagesRequestCallback(
                      status = Status::InvalidAction);
     }
 
-    err = delegate->HandlePresentMessagesRequest(messageId, priority, messageControl, startTime, duration, messageText, responses);
+    err = delegate->HandlePresentMessagesRequest(messageId, priority, messageControl, startTime, duration, messageText, responses,
+                                                 languageCode, messageUri);
 
 exit:
     if (err != CHIP_NO_ERROR)

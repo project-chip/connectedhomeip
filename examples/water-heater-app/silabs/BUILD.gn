@@ -110,11 +110,6 @@ if (wifi_soc) {
       "${examples_common_plat_dir}/freertos_config",
     ]
 
-    if (use_wf200) {
-      # TODO efr32_sdk should not need a header from this location
-      include_dirs += [ "${examples_plat_dir}/wf200" ]
-    }
-
     defines = []
     if (chip_enable_pw_rpc) {
       defines += [
@@ -138,7 +133,6 @@ silabs_executable("water-heater-app") {
 
   sources = [
     # Actual application code
-    "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
 
     # Water Heater Common files
@@ -177,8 +171,8 @@ silabs_executable("water-heater-app") {
     sources += [
       "${chip_root}/examples/common/pigweed/RpcService.cpp",
       "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
-      "${examples_common_plat_dir}/PigweedLogger.cpp",
-      "${examples_common_plat_dir}/Rpc.cpp",
+      "${examples_common_plat_dir}/pigweed_rpc/PigweedLogger.cpp",
+      "${examples_common_plat_dir}/pigweed_rpc/Rpc.cpp",
     ]
 
     deps += [
@@ -210,7 +204,11 @@ silabs_executable("water-heater-app") {
     ]
   }
 
-  ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+  if (is_clang) {
+    ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}-clang.ld"
+  } else {
+    ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+  }
 
   inputs = [ ldscript ]
 

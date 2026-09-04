@@ -61,7 +61,7 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Clarify KeySetWrite validation and behavior on invalid epoch key lengths"/>
-    <revision revision="3" summary="Refocus on pure key management; move group management to Groupcast cluster"/>
+    <revision revision="3" summary="Refocus on pure key management; introduce Groupcast feature associated with Groupcast cluster"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x003F" name="Group Key Management"/>
@@ -72,7 +72,10 @@ Davis, CA 95616, USA
       <provisionalConform/>
     </feature>
     <feature bit="1" code="GCAST" name="Groupcast" summary="The device supports groups using the Groupcast cluster.">
-      <mandatoryConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </feature>
   </features>
   <dataTypes>
@@ -172,10 +175,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
       <field id="8" name="GroupKeyMulticastPolicy" type="GroupKeyMulticastPolicyEnum">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
+        <deprecateConform/>
       </field>
       <access fabricScoped="true"/>
     </struct>
@@ -224,9 +224,12 @@ Davis, CA 95616, USA
       <entry type="GroupcastAdoptionStruct"/>
       <access read="true" write="true" readPrivilege="admin" writePrivilege="admin" fabricScoped="true"/>
       <quality persistence="nonVolatile"/>
-      <mandatoryConform>
-        <feature name="GCAST"/>
-      </mandatoryConform>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="GCAST"/>
+        </mandatoryConform>
+      </otherwiseConform>
       <constraint>
         <desc/>
       </constraint>

@@ -169,9 +169,7 @@ public:
     WiFiPAFLayer();
     static WiFiPAFLayer & GetWiFiPAFLayer();
     CHIP_ERROR Init(chip::System::Layer * systemLayer);
-
-    typedef void (*OnCancelDeviceHandle)(uint32_t id, WiFiPAF::WiFiPafRole role);
-    void Shutdown(OnCancelDeviceHandle OnCancelDevice);
+    void Shutdown();
     bool OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg);
     CHIP_ERROR OnWiFiPAFMsgRxComplete(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg);
     State GetWiFiPAFState() { return mAppState; };
@@ -185,6 +183,17 @@ public:
                                                   OnSubscribeCompleteFunct OnSubscribeDoneFunc = nullptr, void * appState = nullptr,
                                                   OnSubscribeErrorFunct OnSubscribeErrFunc = nullptr);
     void OnEndPointConnectComplete(WiFiPAFEndPoint * endPoint, CHIP_ERROR err);
+
+    /**
+     *  Send any pending stand-alone PAFTP acknowledgement on every connected
+     *  endpoint.
+     */
+    void FlushPendingAcks();
+
+    /**
+     * Give every connected endpoint a chance to send anything queued.
+     */
+    void DrivePendingSends();
 
     static WiFiPAFTransportProtocolVersion
     GetHighestSupportedProtocolVersion(const PAFTransportCapabilitiesRequestMessage & reqMsg);

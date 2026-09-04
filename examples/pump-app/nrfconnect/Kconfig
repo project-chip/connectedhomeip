@@ -16,7 +16,7 @@
 mainmenu "Matter nRF Connect Pump Application"
 
 # Sample configuration used for Thread networking
-if NET_L2_OPENTHREAD
+if OPENTHREAD
 
 choice OPENTHREAD_NORDIC_LIBRARY_CONFIGURATION
 	default OPENTHREAD_NORDIC_LIBRARY_MTD
@@ -26,7 +26,7 @@ choice OPENTHREAD_DEVICE_TYPE
 	default OPENTHREAD_MTD
 endchoice
 
-endif # NET_L2_OPENTHREAD
+endif # OPENTHREAD
 
 rsource "../../../config/nrfconnect/chip-module/Kconfig.features"
 rsource "../../../config/nrfconnect/chip-module/Kconfig.defaults"

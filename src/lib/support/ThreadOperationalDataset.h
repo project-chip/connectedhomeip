@@ -394,7 +394,7 @@ public:
     /**
      * This method clears all data stored in the dataset.
      */
-    void Clear() { mData = ByteSpan(mBuffer, 0); }
+    void Clear();
 
     /**
      * Returns a ByteSpan view of the current state of the dataset.

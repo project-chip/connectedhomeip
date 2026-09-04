@@ -26,7 +26,14 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace AccountLogin {} // namespace AccountLogin
+namespace AccountLogin {
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kOAuth = 0x1,
+};
+} // namespace AccountLogin
 } // namespace Clusters
 } // namespace app
 } // namespace chip

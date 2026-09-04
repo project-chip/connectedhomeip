@@ -28,7 +28,7 @@ namespace Attributes {
 {{/first}}
 {{#unless (isStrEqual storagePolicy "attributeAccessInterface")}}
 namespace {{asUpperCamelCase label}} {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, {{accessorGetterType this}} value); // {{type}}
+Protocols::InteractionModel::Status Get{{#if (isInConfigList parent.name "CodeDrivenClusters")}}Default{{/if}}(EndpointId endpoint, {{accessorGetterType this}} value); // {{type}}
 {{! NOTE: Adding an optional arg instead of an overload can break API
     consumers that are using the function type (e.g. in templates). }}
 {{#unless (isInConfigList parent.name "CodeDrivenClusters")}}

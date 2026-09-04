@@ -102,4 +102,35 @@ TEST_F(TestOperationalCredentials, TestCommands)
                                               }));
 }
 
+TEST_F(TestOperationalCredentials, TestSetCSRVendorReserved)
+{
+    OperationalCredentialsCluster::Context context = {
+        .fabricTable                = Server::GetInstance().GetFabricTable(),
+        .failSafeContext            = Server::GetInstance().GetFailSafeContext(),
+        .sessionManager             = Server::GetInstance().GetSecureSessionManager(),
+        .dnssdServer                = app::DnssdServer::Instance(),
+        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
+        .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(),
+        .groupDataProvider          = *Server::GetInstance().GetGroupDataProvider(),
+        .accessControl              = Access::GetAccessControl(),
+        .platformManager            = DeviceLayer::PlatformMgr(),
+        .eventManagement            = EventManagement::GetInstance(),
+    };
+    OperationalCredentialsCluster cluster(kRootEndpointId, context);
+
+    using Field = OperationalCredentialsCluster::CSRVendorReservedField;
+    const uint8_t payload[]{ 0xAA, 0xBB, 0xCC };
+
+    // Each of the three valid fields can be set, and a field can be cleared with an empty span.
+    EXPECT_EQ(cluster.SetCSRVendorReserved(Field::kVendorReserved1, ByteSpan(payload)), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetCSRVendorReserved(Field::kVendorReserved2, ByteSpan(payload)), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetCSRVendorReserved(Field::kVendorReserved3, ByteSpan(payload)), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetCSRVendorReserved(Field::kVendorReserved1, ByteSpan()), CHIP_NO_ERROR);
+
+    // An out-of-range field index is rejected.
+    EXPECT_EQ(cluster.SetCSRVendorReserved(static_cast<Field>(OperationalCredentialsCluster::kMaxCSRVendorReservedFields),
+                                           ByteSpan(payload)),
+              CHIP_ERROR_INVALID_ARGUMENT);
+}
+
 } // namespace

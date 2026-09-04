@@ -33,6 +33,22 @@
 #       --int-arg runmode_cleanmode:1
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device robotic-vacuum-cleaner --trace-to json:${TRACE_APP}.json --app-pipe /tmp/rvcopstate_2_5_fifo
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
+#       --app-pipe /tmp/rvcopstate_2_5_fifo
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --int-arg runmode_cleanmode:1
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -75,7 +91,7 @@ def verify_mode_tag_in_supported_modes(supported_modes, mode_value, expected_tag
     for entry in supported_modes:
         if entry.mode == mode_value:
             tag_values = [tag.value for tag in entry.modeTags]
-            log.info(f"Matched SupportedMode entry: {entry}, ModeTags: {tag_values}")
+            log.info("Matched SupportedMode entry: %s, ModeTags: %s", entry, tag_values)
             asserts.assert_in(expected_tag.value, tag_values,
                               f"Expected ModeTag '{expected_tag.name}' (0x{expected_tag.value:04x}) not found in ModeTags: {tag_values}")
             return
@@ -193,12 +209,12 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
                 step_name_idle_mode = "Manually put the device in a RVC Run Mode cluster mode with the Idle mode tag and in a device state that allows changing to {PIXIT_RUNMODE_CLEANMODE}"
                 self.wait_for_user_input(prompt_msg=f"{step_name_idle_mode}, and press Enter when ready.")
             else:
-                self.write_to_app_pipe({"Name": "Reset"})
+                self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
             # TH reads the SupportedModes attribute of the RVC Run Mode cluster
             self.step("3")
             supported_run_modes_dut = await self.read_supported_mode(endpoint=self.endpoint)
             # Logging the SupportedModes Attribute output responses from the DUT:
-            log.info("SupportedModes: %s" % (supported_run_modes_dut))
+            log.info("SupportedModes: %s", supported_run_modes_dut)
             # As per SPEC, the SupportedModes must have at least two entries
             asserts.assert_greater_equal(len(supported_run_modes_dut), 2, "SupportedModes must have at least two entries!")
 
@@ -240,7 +256,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
             self.step("7")
             cleaning_run_mode_dut = await self.read_current_mode_with_check(cleaning_mode, endpoint=self.endpoint)
             # Logging the CurrentMode Attribute output responses from the DUT:
-            log.info(f"CurrentMode: {cleaning_run_mode_dut}")
+            log.info("CurrentMode: %s", cleaning_run_mode_dut)
             verify_mode_tag_in_supported_modes(supported_run_modes_dut, cleaning_run_mode_dut,
                                                Clusters.RvcRunMode.Enums.ModeTag.kCleaning)
 
@@ -256,7 +272,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
                 confirm_docking_complete = "Manually confirm DUT has returned to the dock and completed docking-related activities"
                 self.wait_for_user_input(prompt_msg=f"{confirm_docking_complete}, and press Enter when ready.")
             else:
-                self.write_to_app_pipe({"Name": "Docked"})
+                self.write_to_app_pipe({"Name": "Docked", "EndpointId": self.endpoint})
 
             current_mode_match = AttributeMatcher.from_callable(
                 "CurrentMode is IDLE",
@@ -268,7 +284,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
             self.step("10")
             post_docking_run_mode_dut = await self.read_current_mode_with_check(expected_mode=idle_mode, endpoint=self.endpoint)
             # Logging the CurrentMode Attribute output responses from the DUT:
-            log.info(f"CurrentMode: {post_docking_run_mode_dut}")
+            log.info("CurrentMode: %s", post_docking_run_mode_dut)
             verify_mode_tag_in_supported_modes(supported_run_modes_dut, post_docking_run_mode_dut,
                                                Clusters.RvcRunMode.Enums.ModeTag.kIdle)
 

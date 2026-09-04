@@ -16,6 +16,16 @@ name:
     178.2.2. [TC-TCTL-2.2] Optional Temperature number attributes with DUT as
     Server
 
+CI:
+    - name: "Test against all-devices/refrigerator"
+      app: all-devices
+      args:
+          - --device
+          - refrigerator
+      test_args:
+          - --endpoint
+          - "2"
+
 PICS:
     - TCTL.S
     - TCTL.S.F00

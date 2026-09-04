@@ -44,15 +44,15 @@ class OvenModeDelegate : public ModeBase::Delegate
 {
 private:
     using ModeTagStructType                      = detail::Structs::ModeTagStruct::Type;
-    ModeTagStructType ModeTagsBake[1]            = { { .value = to_underlying(ModeTag::kBake) } };
-    ModeTagStructType ModeTagsConvection[1]      = { { .value = to_underlying(ModeTag::kConvection) } };
-    ModeTagStructType ModeTagsGrill[1]           = { { .value = to_underlying(ModeTag::kGrill) } };
-    ModeTagStructType ModeTagsRoast[1]           = { { .value = to_underlying(ModeTag::kRoast) } };
-    ModeTagStructType ModeTagsClean[1]           = { { .value = to_underlying(ModeTag::kClean) } };
-    ModeTagStructType ModeTagsConvectionBake[1]  = { { .value = to_underlying(ModeTag::kConvectionBake) } };
-    ModeTagStructType ModeTagsConvectionRoast[1] = { { .value = to_underlying(ModeTag::kConvectionRoast) } };
-    ModeTagStructType ModeTagsWarming[1]         = { { .value = to_underlying(ModeTag::kWarming) } };
-    ModeTagStructType ModeTagsProofing[1]        = { { .value = to_underlying(ModeTag::kProofing) } };
+    ModeTagStructType ModeTagsBake[1]            = { { .mfgCode = {}, .value = to_underlying(ModeTag::kBake) } };
+    ModeTagStructType ModeTagsConvection[1]      = { { .mfgCode = {}, .value = to_underlying(ModeTag::kConvection) } };
+    ModeTagStructType ModeTagsGrill[1]           = { { .mfgCode = {}, .value = to_underlying(ModeTag::kGrill) } };
+    ModeTagStructType ModeTagsRoast[1]           = { { .mfgCode = {}, .value = to_underlying(ModeTag::kRoast) } };
+    ModeTagStructType ModeTagsClean[1]           = { { .mfgCode = {}, .value = to_underlying(ModeTag::kClean) } };
+    ModeTagStructType ModeTagsConvectionBake[1]  = { { .mfgCode = {}, .value = to_underlying(ModeTag::kConvectionBake) } };
+    ModeTagStructType ModeTagsConvectionRoast[1] = { { .mfgCode = {}, .value = to_underlying(ModeTag::kConvectionRoast) } };
+    ModeTagStructType ModeTagsWarming[1]         = { { .mfgCode = {}, .value = to_underlying(ModeTag::kWarming) } };
+    ModeTagStructType ModeTagsProofing[1]        = { { .mfgCode = {}, .value = to_underlying(ModeTag::kProofing) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[9] = {
         detail::Structs::ModeOptionStruct::Type{

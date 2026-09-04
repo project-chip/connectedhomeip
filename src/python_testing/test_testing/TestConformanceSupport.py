@@ -16,7 +16,7 @@
 #
 
 import xml.etree.ElementTree as ElementTree
-from typing import Callable
+from collections.abc import Callable
 
 from mobly import asserts
 
@@ -24,7 +24,7 @@ from matter.testing.conformance import (EMPTY_CLUSTER_GLOBAL_ATTRIBUTES, Choice,
                                         ConformanceDecision, ConformanceException, ConformanceParseParameters, deprecated,
                                         disallowed, mandatory, optional, parse_basic_callable_from_xml, parse_callable_from_xml,
                                         provisional, zigbee)
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.runner import default_matter_test_main
 from matter.tlv import uint
 
@@ -35,7 +35,8 @@ def basic_test(xml: str, cls: Callable) -> None:
     asserts.assert_true(isinstance(xml_callable, cls), "Unexpected class parsed from basic conformance")
 
 
-class TestConformanceSupport(MatterBaseTest):
+class TestConformanceSupport(CertificationUnitTestNoDevice):
+
     def setup_class(self):
         super().setup_class()
         # a small feature map
@@ -101,6 +102,15 @@ class TestConformanceSupport(MatterBaseTest):
             info = ConformanceAssessmentData(feature_map=f, attribute_list=[], all_command_list=[], cluster_revision=1)
             asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.PROVISIONAL)
         asserts.assert_equal(str(xml_callable), 'P')
+
+    def test_conformance_described(self):
+        xml = '<describedConform />'
+        et = ElementTree.fromstring(xml)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for f in self.feature_maps:
+            info = ConformanceAssessmentData(feature_map=f, attribute_list=[], all_command_list=[], cluster_revision=1)
+            asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.OPTIONAL)
+        asserts.assert_equal(str(xml_callable), 'Desc')
 
     def test_conformance_zigbee(self):
         xml = '<condition name="Zigbee"/>'
@@ -662,8 +672,8 @@ class TestConformanceSupport(MatterBaseTest):
                     f'{xml_mid}'
                     f'</{term}>'
                     '</mandatoryConform>')
-        xml = create_xml(('<attribute name="attr1" />'
-                          '<literal value="1" />'))
+        xml = create_xml('<attribute name="attr1" />'
+                         '<literal value="1" />')
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         # TODO: switch this to check greater than once the update to the base is done (#33422)
@@ -671,9 +681,9 @@ class TestConformanceSupport(MatterBaseTest):
         asserts.assert_equal(str(xml_callable), f'attr1 {symbol} 1')
 
         # Ensure that we can only have greater terms with exactly 2 value
-        xml = create_xml(('<attribute name="attr1" />'
-                          '<attribute name="attr2" />'
-                          '<literal value="1" />'))
+        xml = create_xml('<attribute name="attr1" />'
+                         '<attribute name="attr2" />'
+                         '<literal value="1" />')
         et = ElementTree.fromstring(xml)
         try:
             xml_callable = parse_callable_from_xml(et, self.params)
@@ -681,7 +691,7 @@ class TestConformanceSupport(MatterBaseTest):
         except ConformanceException:
             pass
 
-        xml = create_xml(('<attribute name="attr1" />'))
+        xml = create_xml('<attribute name="attr1" />')
         et = ElementTree.fromstring(xml)
         try:
             xml_callable = parse_callable_from_xml(et, self.params)
@@ -690,8 +700,8 @@ class TestConformanceSupport(MatterBaseTest):
             pass
 
         # Only attributes and literals allowed because arithmetic operations require values
-        xml = create_xml(('<feature name="AB" />'
-                          '<literal value="1" />'))
+        xml = create_xml('<feature name="AB" />'
+                         '<literal value="1" />')
         et = ElementTree.fromstring(xml)
         try:
             xml_callable = parse_callable_from_xml(et, self.params)

@@ -154,8 +154,8 @@ void pychip_DeviceController_IterateDiscoveredCommissionableNodes(Controller::De
             Json::Value addresses;
             for (unsigned j = 0; j < dnsSdInfo->numIPs; ++j)
             {
-                char buf[Inet::IPAddress::kMaxStringLength];
-                dnsSdInfo->ipAddress[j].ToString(buf);
+                char buf[Inet::IPAddress::kMaxAddressWithInterfaceLength];
+                dnsSdInfo->ipAddress[j].ToString(buf, dnsSdInfo->interfaceId);
                 addresses[j] = buf;
             }
             jsonVal["addresses"] = addresses;

@@ -19,6 +19,7 @@
 #pragma once
 #include "camera-avstream-controller.h"
 #include "media-controller.h"
+#include <app/clusters/av-analysis-server/AvAnalysisCluster.h>
 #include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
 #include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
 #include <app/clusters/chime-server/chime-server.h>
@@ -146,6 +147,9 @@ public:
 
     // Getter for PushAVStreamTransport Delegate
     virtual chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVTransportDelegate() = 0;
+
+    // Getter for the AVAnalysis Delegate
+    virtual chip::app::Clusters::AvAnalysisDelegate & GetAVAnalysisDelegate() = 0;
 
     // Class defining the Camera HAL interface
     class CameraHALInterface
@@ -365,6 +369,11 @@ public:
         virtual int16_t GetTiltMin() = 0;
         virtual int16_t GetTiltMax() = 0;
         virtual uint8_t GetZoomMax() = 0;
+
+        // Get the maximum number of Analysis Streams supported by the camera.
+        virtual uint8_t GetMaxAnalysisStreams() = 0;
+
+        virtual std::vector<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> GetSupportedAmbientContexts() = 0;
 
         // Get the maximum number of zones supported by camera.
         virtual uint8_t GetMaxZones() = 0;

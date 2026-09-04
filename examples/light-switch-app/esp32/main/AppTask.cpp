@@ -129,10 +129,14 @@ void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
     if (aEvent->Type == AppEvent::kEventType_Button)
     {
         BindingCommandData * data = Platform::New<BindingCommandData>();
-        data->commandId           = chip::app::Clusters::OnOff::Commands::Toggle::Id;
-        data->clusterId           = chip::app::Clusters::OnOff::Id;
+        VerifyOrReturn(data != nullptr, ChipLogError(NotSpecified, "CHIP_ERROR_NO_MEMORY"));
+        data->commandId = app::Clusters::OnOff::Commands::Toggle::Id;
+        data->clusterId = app::Clusters::OnOff::Id;
 
-        DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+        if (DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)) != CHIP_NO_ERROR)
+        {
+            Platform::Delete(data);
+        }
     }
 }
 

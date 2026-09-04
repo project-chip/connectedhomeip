@@ -147,6 +147,14 @@ private:
 
     NetworkAttemptType mTryingNetworkType = NetworkAttemptType::kSingle;
 
+    // Whether the commissionee is holding a network configuration we wrote, which we would have to
+    // remove before we can put it on a different network. Only set once AddOrUpdateWiFiNetwork or
+    // AddOrUpdateThreadNetwork has actually succeeded: a failed one writes nothing.
+    // Not carried across commissioning attempts: a configuration written by an attempt that we go on
+    // to resume via the breadcrumb is not recorded here, so we will not remove it on our way to the
+    // secondary network, and it may survive if that attempt then succeeds.
+    bool mWroteNetworkConfig = false;
+
     bool mStopCommissioning = false;
 
     DeviceCommissioner * mCommissioner                               = nullptr;

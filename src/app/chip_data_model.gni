@@ -197,8 +197,13 @@ template("chip_data_model") {
       "${_app_root}/clusters/on-off-server/on-off-server.h",
       "${_app_root}/util/generic-callback-stubs.cpp",
       "${_app_root}/util/privilege-storage.cpp",
-      "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp",
     ]
+
+    if (chip_data_model_overrides_dir != "") {
+      sources += [ "${chip_data_model_overrides_dir}/Accessors-override.cpp" ]
+    } else {
+      sources += [ "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp" ]
+    }
 
     sources += codegen_data_model_SOURCES
 
@@ -213,7 +218,14 @@ template("chip_data_model") {
       ]
     }
 
-    if (defined(invoker.zap_file)) {
+    if (chip_data_model_overrides_dir != "") {
+      # Use the override .gni file to get the cluster server list instead
+      # of auto-discovering from the .zap file via zap_cluster_list.py.
+      # This allows applications to compile only the cluster server
+      # implementations they actually need.
+      import("${chip_data_model_overrides_dir}/cluster-servers-override.gni")
+      _cluster_sources = cluster_server_override_dirs
+    } else if (defined(invoker.zap_file)) {
       _zap_file = rebase_path(invoker.zap_file, root_build_dir)
       _script_args = [
         "--zap_file",

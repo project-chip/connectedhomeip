@@ -87,6 +87,13 @@ if (chip_build_tests) {
       test_sources += [ "TestInetEndPoint.cpp" ]
     }
 
+    # ESP32 (FreeRTOS+LwIP) regression test for the TCPEndPointImplLwIP
+    # PCB-race fix. Runs under the esp32-qemu-tests CI image.
+    if (chip_device_platform == "esp32") {
+      test_sources += [ "TestTCPEndPointLwIP.cpp" ]
+      public_deps += [ "${chip_root}/src/platform" ]
+    }
+
     cflags = [ "-Wconversion" ]
   }
 }

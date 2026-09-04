@@ -83,6 +83,19 @@ static constexpr size_t kMaxLargeApplicationPayloadAndMICSizeBytes =
 
 static constexpr size_t kMaxLargeAppMessageLen = kMaxLargeApplicationPayloadAndMICSizeBytes - kMaxTagLen;
 
+/**
+ * Legacy default maximum large application message length.
+ *
+ * This is the conservative default limit assumed for peers that support large messages (TCP)
+ * but do not advertise their MaxTCPPayloadSize during the handshake (legacy nodes).
+ *
+ * To ensure reliable operation across various platform and LwIP configurations
+ * using the default 64KB buffer size, this is set conservatively with a 256-byte
+ * reserve margin for network/transport headers, framing, and MIC:
+ *   64000 (Spec default MAX_TCP_MESSAGE_SIZE) - 256 (Conservative header & reserve margin) = 63744 bytes.
+ */
+static constexpr size_t kLegacyDefaultMaxLargeAppMessageLen = 64000 - 256;
+
 typedef int PacketHeaderFlags;
 
 namespace Header {
@@ -181,7 +194,7 @@ public:
     /**
      * Gets the message counter set in the header.
      *
-     * Message IDs are expecte to monotonically increase by one for each mesage
+     * Message IDs are expected to monotonically increase by one for each message
      * that has been sent.
      */
     uint32_t GetMessageCounter() const { return mMessageCounter; }

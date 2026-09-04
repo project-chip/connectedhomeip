@@ -143,7 +143,7 @@ class TC_ECOINFO_2_1(MatterBaseTest):
             self.dut_fsa_stdin.write(f"pairing onnetwork 2 {self.th_server_setup_params.passcode}\n")
         self.dut_fsa_stdin.flush()
         # Wait for the commissioning to complete.
-        await asyncio.sleep(5)
+        await asyncio.sleep(20)
 
     def _validate_device_directory(self, current_fabric_index, device_directory):
         for device in device_directory:

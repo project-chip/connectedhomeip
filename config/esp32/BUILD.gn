@@ -42,3 +42,8 @@ group("esp32") {
     ]
   }
 }
+
+# Placeholder for chip_openthread_target when OpenThread is provided by the
+# ESP-IDF component instead of built by Matter GN.
+group("openthread") {
+}

@@ -22,6 +22,9 @@
 
 #include <lib/support/CommonIterator.h>
 
+#include <algorithm>
+#include <cstring>
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -55,17 +58,10 @@ struct GenericOperationalState : public app::Clusters::detail::Structs::Operatio
         operationalStateID = state;
         if (label.HasValue())
         {
-            memset(mOperationalStateLabelBuffer, 0, sizeof(mOperationalStateLabelBuffer));
-            if (label.Value().size() > sizeof(mOperationalStateLabelBuffer))
-            {
-                memcpy(mOperationalStateLabelBuffer, label.Value().data(), sizeof(mOperationalStateLabelBuffer));
-                operationalStateLabel.SetValue(CharSpan(mOperationalStateLabelBuffer, sizeof(mOperationalStateLabelBuffer)));
-            }
-            else
-            {
-                memcpy(mOperationalStateLabelBuffer, label.Value().data(), label.Value().size());
-                operationalStateLabel.SetValue(CharSpan(mOperationalStateLabelBuffer, label.Value().size()));
-            }
+            // The resulting CharSpan length bounds all reads, so only the copied bytes matter (no memset needed).
+            size_t len = std::min(label.Value().size(), sizeof(mOperationalStateLabelBuffer));
+            memcpy(mOperationalStateLabelBuffer, label.Value().data(), len);
+            operationalStateLabel.SetValue(CharSpan(mOperationalStateLabelBuffer, len));
         }
         else
         {
@@ -101,17 +97,10 @@ struct GenericOperationalError : public app::Clusters::detail::Structs::ErrorSta
         errorStateID = state;
         if (label.HasValue())
         {
-            memset(mErrorStateLabelBuffer, 0, sizeof(mErrorStateLabelBuffer));
-            if (label.Value().size() > sizeof(mErrorStateLabelBuffer))
-            {
-                memcpy(mErrorStateLabelBuffer, label.Value().data(), sizeof(mErrorStateLabelBuffer));
-                errorStateLabel.SetValue(CharSpan(mErrorStateLabelBuffer, sizeof(mErrorStateLabelBuffer)));
-            }
-            else
-            {
-                memcpy(mErrorStateLabelBuffer, label.Value().data(), label.Value().size());
-                errorStateLabel.SetValue(CharSpan(mErrorStateLabelBuffer, label.Value().size()));
-            }
+            // The resulting CharSpan length bounds all reads, so only the copied bytes matter (no memset needed).
+            size_t len = std::min(label.Value().size(), sizeof(mErrorStateLabelBuffer));
+            memcpy(mErrorStateLabelBuffer, label.Value().data(), len);
+            errorStateLabel.SetValue(CharSpan(mErrorStateLabelBuffer, len));
         }
         else
         {
@@ -120,17 +109,9 @@ struct GenericOperationalError : public app::Clusters::detail::Structs::ErrorSta
 
         if (details.HasValue())
         {
-            memset(mErrorStateDetailsBuffer, 0, sizeof(mErrorStateDetailsBuffer));
-            if (details.Value().size() > sizeof(mErrorStateDetailsBuffer))
-            {
-                memcpy(mErrorStateDetailsBuffer, details.Value().data(), sizeof(mErrorStateDetailsBuffer));
-                errorStateDetails.SetValue(CharSpan(mErrorStateDetailsBuffer, sizeof(mErrorStateDetailsBuffer)));
-            }
-            else
-            {
-                memcpy(mErrorStateDetailsBuffer, details.Value().data(), details.Value().size());
-                errorStateDetails.SetValue(CharSpan(mErrorStateDetailsBuffer, details.Value().size()));
-            }
+            size_t len = std::min(details.Value().size(), sizeof(mErrorStateDetailsBuffer));
+            memcpy(mErrorStateDetailsBuffer, details.Value().data(), len);
+            errorStateDetails.SetValue(CharSpan(mErrorStateDetailsBuffer, len));
         }
         else
         {

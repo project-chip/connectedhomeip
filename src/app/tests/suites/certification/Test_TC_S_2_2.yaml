@@ -84,7 +84,6 @@ tests:
                         EpochStartTime1: 1110001,
                         EpochKey2: null,
                         EpochStartTime2: null,
-                        GroupKeyMulticastPolicy: 0,
                     }
 
     - label:
@@ -459,9 +458,9 @@ tests:
               [
                   {
                       SceneCount: 1,
-                      CurrentScene: 0x01,
-                      CurrentGroup: G1,
-                      SceneValid: true,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
+                      SceneValid: false,
                       RemainingCapacity: fabricCapacity - 1,
                   },
               ]

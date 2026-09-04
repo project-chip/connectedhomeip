@@ -18,7 +18,7 @@
 
 #include "access/AccessControl.h"
 #include "access/examples/ExampleAccessControlDelegate.h"
-#include "access/examples/GroupAuxiliaryAccessControlDelegate.h"
+#include "access/examples/GroupAuxiliaryAccessControlDelegateImpl.h"
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <credentials/GroupDataProviderImpl.h>
@@ -46,7 +46,7 @@ chip::TestPersistentStorageDelegate gTestStorage;
 chip::Crypto::DefaultSessionKeystore gSessionKeystore;
 chip::Credentials::GroupDataProviderImpl gGroupsProvider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
 
-chip::Access::Examples::GroupAuxiliaryAccessControlDelegate gGroupAuxiliaryAccessControlDelegate(&gGroupsProvider);
+chip::Access::Examples::GroupAuxiliaryAccessControlDelegateImpl gGroupAuxiliaryAccessControlDelegate;
 
 } // namespace
 
@@ -1312,7 +1312,9 @@ public: // protected
         ASSERT_EQ(gGroupsProvider.Init(), CHIP_NO_ERROR);
         chip::Credentials::SetGroupDataProvider(&gGroupsProvider);
 
-        // Register group auxilary access control delegate
+        // Register group auxilary access control delegate.
+        // The shared global delegate is not tied to a FabricTable.
+        SuccessOrDie(gGroupAuxiliaryAccessControlDelegate.Initialize(&gGroupsProvider, nullptr));
         SuccessOrDie(GetAccessControl().RegisterGroupAuxiliaryDelegate(&gGroupAuxiliaryAccessControlDelegate));
     }
     static void TearDownTestSuite()
@@ -2106,6 +2108,67 @@ TEST_F(TestAccessControl, TestFabricFilteredReadEntry)
     }
 }
 
+TEST_F(TestAccessControl, TestGroupAuxiliaryDelegateInit)
+{
+    Credentials::GroupDataProvider * provider = Credentials::GetGroupDataProvider();
+    ASSERT_NE(provider, nullptr);
+
+    Examples::GroupAuxiliaryAccessControlDelegateImpl delegate;
+    EXPECT_FALSE(delegate.IsInitialized());
+
+    // Null GroupDataProvider is rejected.
+    EXPECT_EQ(delegate.Initialize(nullptr, nullptr), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_FALSE(delegate.IsInitialized());
+
+    // First Initialize succeeds; IsInitialized flips to true.
+    EXPECT_EQ(delegate.Initialize(provider, nullptr), CHIP_NO_ERROR);
+    EXPECT_TRUE(delegate.IsInitialized());
+
+    // Double Initialize is rejected.
+    EXPECT_EQ(delegate.Initialize(provider, nullptr), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_TRUE(delegate.IsInitialized());
+
+    delegate.Shutdown();
+    EXPECT_FALSE(delegate.IsInitialized());
+}
+
+TEST_F(TestAccessControl, TestGroupAuxiliaryDelegateLifecycle)
+{
+    Credentials::GroupDataProvider * provider = Credentials::GetGroupDataProvider();
+    ASSERT_NE(provider, nullptr);
+
+    Examples::GroupAuxiliaryAccessControlDelegateImpl delegate;
+
+    // AuxiliaryEntries before Initialize returns CHIP_ERROR_INCORRECT_STATE.
+    {
+        EntryIterator iterator;
+        EXPECT_EQ(delegate.AuxiliaryEntries(iterator, nullptr), CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    // Shutdown on an uninitialized delegate is a safe no-op.
+    delegate.Shutdown();
+    EXPECT_FALSE(delegate.IsInitialized());
+
+    // Shutdown after Initialize resets state and re-Initialize succeeds.
+    EXPECT_EQ(delegate.Initialize(provider, nullptr), CHIP_NO_ERROR);
+    EXPECT_TRUE(delegate.IsInitialized());
+
+    delegate.Shutdown();
+    EXPECT_FALSE(delegate.IsInitialized());
+
+    // AuxiliaryEntries fails again after Shutdown.
+    {
+        EntryIterator iterator;
+        EXPECT_EQ(delegate.AuxiliaryEntries(iterator, nullptr), CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    // Re-Initialize after Shutdown works.
+    EXPECT_EQ(delegate.Initialize(provider, nullptr), CHIP_NO_ERROR);
+    EXPECT_TRUE(delegate.IsInitialized());
+
+    delegate.Shutdown();
+}
+
 TEST_F(TestAccessControl, TestGroupAuxiliaryDelegateRegistration)
 {
     // The delegate is already registered in SetUpTestSuite.
@@ -2229,7 +2292,8 @@ TEST_F(TestAccessControl, TestGroupAuxiliaryEntriesAllFabrics)
         // Unregister global delegate first
         GetAccessControl().UnregisterGroupAuxiliaryDelegate();
 
-        Examples::GroupAuxiliaryAccessControlDelegate manualDelegate(provider, nullptr);
+        Examples::GroupAuxiliaryAccessControlDelegateImpl manualDelegate;
+        EXPECT_EQ(manualDelegate.Initialize(provider, nullptr), CHIP_NO_ERROR);
         EXPECT_EQ(GetAccessControl().RegisterGroupAuxiliaryDelegate(&manualDelegate), CHIP_NO_ERROR);
 
         ValidateAuxiliaryEntries(accessControl, kUndefinedFabricIndex, expectedAll);
@@ -2263,7 +2327,8 @@ TEST_F(TestAccessControl, TestGroupAuxiliaryEntriesAllFabrics)
                   CHIP_NO_ERROR);
 
         // Create GroupAuxiliaryAccessControlDelegate with fabric table
-        Examples::GroupAuxiliaryAccessControlDelegate tableDelegate(provider, &fabricTable);
+        Examples::GroupAuxiliaryAccessControlDelegateImpl tableDelegate;
+        EXPECT_EQ(tableDelegate.Initialize(provider, &fabricTable), CHIP_NO_ERROR);
         EXPECT_EQ(GetAccessControl().RegisterGroupAuxiliaryDelegate(&tableDelegate), CHIP_NO_ERROR);
 
         // Validate entries

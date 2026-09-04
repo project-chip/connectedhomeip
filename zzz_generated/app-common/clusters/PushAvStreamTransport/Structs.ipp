@@ -233,8 +233,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kChunkDuration), chunkDuration);
     encoder.Encode(to_underlying(Fields::kSessionGroup), sessionGroup);
     encoder.Encode(to_underlying(Fields::kTrackName), trackName);
-    encoder.Encode(to_underlying(Fields::kCENCKey), CENCKey);
-    encoder.Encode(to_underlying(Fields::kCENCKeyID), CENCKeyID);
     encoder.Encode(to_underlying(Fields::kMetadataEnabled), metadataEnabled);
     return encoder.Finalize();
 }
@@ -268,14 +266,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kTrackName))
         {
             err = DataModel::Decode(reader, trackName);
-        }
-        else if (__context_tag == to_underlying(Fields::kCENCKey))
-        {
-            err = DataModel::Decode(reader, CENCKey);
-        }
-        else if (__context_tag == to_underlying(Fields::kCENCKeyID))
-        {
-            err = DataModel::Decode(reader, CENCKeyID);
         }
         else if (__context_tag == to_underlying(Fields::kMetadataEnabled))
         {

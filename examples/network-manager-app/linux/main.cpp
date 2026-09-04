@@ -16,10 +16,15 @@
  */
 
 #include <AppMain.h>
+#include <app/clusters/network-identity-management-server/AuthenticatorDriver.h>
+#include <app/clusters/network-identity-management-server/DefaultNetworkIdentityStorage.h>
+#include <app/clusters/network-identity-management-server/NetworkIdentityManagementCluster.h>
+#include <app/clusters/network-identity-management-server/RawKeyNetworkIdentityKeystore.h>
 #include <app/clusters/thread-border-router-management-server/thread-border-router-management-server.h>
 #include <app/clusters/thread-network-directory-server/thread-network-directory-server.h>
 #include <app/clusters/wifi-network-management-server/wifi-network-management-server.h>
-#include <lib/core/CHIPSafeCasts.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 
@@ -33,12 +38,8 @@
 #include <optional>
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
-
-ByteSpan ByteSpanFromCharSpan(CharSpan span)
-{
-    return ByteSpan(Uint8::from_const_char(span.data()), span.size());
-}
 
 #if MATTER_ENABLE_UBUS
 ubus::UbusManager gUbusManager{};
@@ -72,6 +73,27 @@ void emberAfThreadBorderRouterManagementClusterInitCallback(EndpointId endpoint)
         .Init();
 }
 
+// Null AuthenticatorDriver for standalone testing (no real authenticator).
+class NullAuthenticatorDriver : public NetworkIdentityManagement::AuthenticatorDriver
+{
+public:
+    void OnStartup(NetworkIdentityManagement::AuthenticatorDriverCallback &, ReadOnlyNetworkIdentityStorage &) override {}
+};
+
+std::optional<DefaultNetworkIdentityStorage> gNetworkIdentityStorage;
+Crypto::RawKeyNetworkIdentityKeystore gNetworkIdentityKeystore;
+NullAuthenticatorDriver gNullAuthenticatorDriver;
+LazyRegisteredServerCluster<NetworkIdentityManagementCluster> gNetworkIdentityManagementCluster;
+
+void emberAfNetworkIdentityManagementClusterInitCallback(EndpointId endpoint)
+{
+    VerifyOrDie(!gNetworkIdentityManagementCluster.IsConstructed());
+    gNetworkIdentityStorage.emplace(Server::GetInstance().GetPersistentStorage());
+    gNetworkIdentityManagementCluster.Create(endpoint, *gNetworkIdentityStorage, gNetworkIdentityKeystore,
+                                             gNullAuthenticatorDriver);
+    SuccessOrDie(CodegenDataModelProvider::Instance().Registry().Register(gNetworkIdentityManagementCluster.Registration()));
+}
+
 static void ApplicationEarlyInit()
 {
 #if MATTER_ENABLE_UBUS
@@ -81,8 +103,8 @@ static void ApplicationEarlyInit()
 
 void ApplicationInit()
 {
-    TEMPORARY_RETURN_IGNORED gWiFiNetworkManagementServer->SetNetworkCredentials(ByteSpanFromCharSpan("MatterAP"_span),
-                                                                                 ByteSpanFromCharSpan("Setec Astronomy"_span));
+    TEMPORARY_RETURN_IGNORED gWiFiNetworkManagementServer->SetNetworkCredentials(ByteSpan::fromCharSpan("MatterAP"_span),
+                                                                                 ByteSpan::fromCharSpan("Setec Astronomy"_span));
 }
 
 void ApplicationShutdown()

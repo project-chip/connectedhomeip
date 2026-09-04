@@ -374,6 +374,9 @@ protected:
     void TestReadAdminFabricsPopulatesCommissionerInfo();
     void TestReadAdminCertsPopulatesCommissionerRcac();
     void TestReadAdminNOCsPopulatesCommissionerCerts();
+    void TestPerformVendorIdVerificationCompletesOnceOnReadFailure();
+    void TestPerformVendorIdVerificationDoesNotUseFreedCommissioneeOnReadFailure();
+    void FailSafeAsyncReadUseAfterFree();
 };
 
 TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestNextStageFollowsExpectedOrder)
@@ -676,6 +679,162 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestValidateAdministratorIdsMatch)
     commissionee.mInfo.rootPublicKey.CopyFromSpan(ByteSpan(adminRootKey, Crypto::kP256_PublicKey_Length - 1));
     ASSERT_EQ(commissionee.mInfo.rootPublicKey.AllocatedSize(), Crypto::kP256_PublicKey_Length - 1);
     EXPECT_EQ(commissionee.ValidateAdministratorIdsMatch(kAdminFabricId, matchingKey), TrustVerificationError::kInternalError);
+}
+
+// Harness for PerformVendorIdVerification()'s FetchCommissionerInfo error path: it forces the commissioner read
+// to fail and counts how many times the verification completes. The error path must complete exactly once and
+// stop, not continue into VerifyVendorId(&mInfo). In production, continuing would be a use-after-free, since
+// OnVendorIdVerificationComplete() destroys *this (mOnCompletion -> CleanupAnnounceJFA ->
+// mActiveCommissionee.reset()); this test detects the defect by counting completions, without that teardown.
+class ReadFailureJCMCommissionee : public JCMCommissionee
+{
+public:
+    using JCMCommissionee::JCMCommissionee;
+
+    int completionCount = 0;
+
+protected:
+    // Drive StartTrustVerification() straight into kPerformingVendorIDVerification.
+    TrustVerificationStage GetNextTrustVerificationStage(const TrustVerificationStage & currentStage) override
+    {
+        return (currentStage == TrustVerificationStage::kPerformingVendorIDVerification)
+            ? TrustVerificationStage::kComplete
+            : TrustVerificationStage::kPerformingVendorIDVerification;
+    }
+
+    // Counts how many times the verification completes; the error path must complete once.
+    void OnVendorIdVerificationComplete(const CHIP_ERROR & err) override
+    {
+        ++completionCount;
+        JCMCommissionee::OnVendorIdVerificationComplete(err);
+    }
+
+    // Simulate a dispatched read whose response is an error: invoke onError but return
+    // CHIP_NO_ERROR (returning an error would make FetchCommissionerInfo complete on its own).
+    CHIP_ERROR
+    ReadAdminFabricsAttribute(std::function<void(const ConcreteAttributePath &, const FabricsAttr::DecodableType &)>,
+                              ReadErrorHandler onError) override
+    {
+        onError(nullptr, CHIP_ERROR_INTERNAL);
+        return CHIP_NO_ERROR;
+    }
+};
+
+// A failed commissioner read must complete the verification exactly once. If the error path
+// continued into VerifyVendorId (session released below), that call would complete a second
+// time and completionCount would exceed 1.
+TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestPerformVendorIdVerificationCompletesOnceOnReadFailure)
+{
+    FakeCommandHandler commandHandler;
+    CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx);
+
+    ReadFailureJCMCommissionee commissionee(handle, EndpointId{ 41 }, [](CHIP_ERROR) {});
+
+    // Release the session so that if the error path ever continues into VerifyVendorId, that
+    // call completes synchronously (its "session missing" path) and the extra completion is
+    // caught by the assertion below.
+    commissionee.mSessionHolder.Release();
+
+    commissionee.VerifyTrustAgainstCommissionerAdmin();
+
+    EXPECT_EQ(commissionee.completionCount, 1);
+}
+
+// Heap-allocates the commissionee and frees it from the completion callback (mirroring
+// production's mActiveCommissionee.reset()). If the read-failure path continues into
+// VerifyVendorId(&mInfo) after completing, it touches freed memory and ASan aborts. There is
+// nothing to assert; in non-ASan builds it is a no-op, so the counting test above is the guard.
+TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestPerformVendorIdVerificationDoesNotUseFreedCommissioneeOnReadFailure)
+{
+    FakeCommandHandler commandHandler;
+    CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx);
+
+    // The completion callback owns the teardown and, like production's onComplete, does nothing
+    // after the delete -- so the only post-free access that can occur is the buggy fall-through.
+    ReadFailureJCMCommissionee * commissionee = nullptr;
+    commissionee = new ReadFailureJCMCommissionee(handle, EndpointId{ 41 }, [&commissionee](CHIP_ERROR) { delete commissionee; });
+
+    // Release the session so a continued VerifyVendorId resolves synchronously (dereferencing the
+    // freed commissionee in the regression).
+    commissionee->mSessionHolder.Release();
+
+    commissionee->VerifyTrustAgainstCommissionerAdmin();
+}
+// Regression for the JCMCommissionee heap use-after-free when a FailSafe teardown destroys the
+// commissionee while a Controller::ReadAttribute is in flight.
+//
+// MECHANISM: JCMCommissionee issues attribute reads whose [this]-capturing callbacks are owned by a
+// heap TypedReadAttributeCallback that adopts the ReadClient and outlives the commissionee. On
+// FailSafe expiry, OnFailSafeTimerExpired -> CleanupAnnounceJFA -> mActiveCommissionee.reset()
+// destroys the commissionee; a late OnAttributeData/OnError then runs the read callback through the
+// freed `this`. This test stashes the read's error callback, deletes the commissionee (standing in
+// for the failsafe-driven reset()), then delivers the late response.
+//
+//   Without the fix: ASan heap-use-after-free in TrustVerificationStageFinished.
+//   With the fix:    the read callbacks are wrapped by VendorIdVerificationClient::GuardWithLiveness,
+//                    so once the commissionee is destroyed the late callback is a no-op (the trust
+//                    verification completion is never re-entered).
+class DeferredReadJCMCommissionee : public JCMCommissionee
+{
+public:
+    using JCMCommissionee::JCMCommissionee;
+
+    ReadErrorHandler pendingError;
+    bool hasPending = false;
+
+protected:
+    // Drive verification straight into the AdministratorFabricIndex read stage.
+    TrustVerificationStage GetNextTrustVerificationStage(const TrustVerificationStage & currentStage) override
+    {
+        return (currentStage == TrustVerificationStage::kReadingCommissionerAdminFabricIndex)
+            ? TrustVerificationStage::kComplete
+            : TrustVerificationStage::kReadingCommissionerAdminFabricIndex;
+    }
+
+    // Model an in-flight ReadClient: stash the [this]-capturing error callback and return success,
+    // so the stage reports kAsync and the commissionee stays alive awaiting the response.
+    CHIP_ERROR
+    ReadAdminFabricIndexAttribute(std::function<void(const ConcreteAttributePath &, const FabricIndexAttr::DecodableType &)>,
+                                  ReadErrorHandler onError) override
+    {
+        pendingError = std::move(onError);
+        hasPending   = true;
+        return CHIP_NO_ERROR;
+    }
+};
+
+TEST_F_FROM_FIXTURE(TestJCMCommissionee, FailSafeAsyncReadUseAfterFree)
+{
+    FakeCommandHandler commandHandler;
+    CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx);
+
+    // Sentinel that the trust-verification completion would flip if the late callback re-entered the
+    // (destroyed) state machine. The liveness guard must prevent that, so it stays false.
+    bool completionInvoked = false;
+    auto * commissionee =
+        new DeferredReadJCMCommissionee(handle, EndpointId{ 42 }, [&completionInvoked](CHIP_ERROR) { completionInvoked = true; });
+
+    // Launch verification -> issues the (deferred) AdministratorFabricIndex read; object stays alive.
+    commissionee->VerifyTrustAgainstCommissionerAdmin();
+    ASSERT_TRUE(commissionee->hasPending);
+    ASSERT_FALSE(completionInvoked);
+
+    // Copy the in-flight callback out, then simulate OnFailSafeTimerExpired ->
+    // mActiveCommissionee.reset() destroying the commissionee mid-read.
+    auto savedError = commissionee->pendingError;
+    delete commissionee;
+
+    // Late ReadClient response. Without the fix this fires this->TrustVerificationStageFinished on the
+    // freed object (ASan heap-use-after-free). With the liveness guard it is a no-op.
+    savedError(nullptr, CHIP_ERROR_TIMEOUT);
+
+    EXPECT_FALSE(completionInvoked);
 }
 
 } // namespace JointFabricAdministrator

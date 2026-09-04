@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,12 +21,14 @@
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <app/EventLogging.h>
+#include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementDelegate.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <data-model-providers/codegen/CodegenProcessingConfig.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/DefaultTimerDelegate.h>
 
 #include <lib/support/logging/CHIPLogging.h>
 #include <zap-generated/gen_config.h>
@@ -74,6 +76,20 @@ inline void UnregisterLegacyEEM(SingleLinkedListNode<ElectricalEnergyMeasurement
 
 // Default empty accuracy used at construction time; real values are set later via SetMeasurementAccuracy.
 const MeasurementAccuracyStruct::Type kDefaultAccuracy = {};
+
+// No-op delegate for legacy CodegenIntegration path (readings are pushed via snapshot methods)
+class NoOpEEMDelegate : public ElectricalEnergyMeasurement::Delegate
+{
+public:
+    DataModel::Nullable<int64_t> GetCumulativeEnergyImported() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetCumulativeEnergyExported() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetPeriodicEnergyImported() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetPeriodicEnergyExported() override { return DataModel::NullNullable; }
+};
+
+NoOpEEMDelegate gNoOpDelegate;
+DefaultTimerDelegate gDefaultTimerDelegate;
+
 } // namespace
 
 namespace chip {
@@ -84,22 +100,25 @@ namespace ElectricalEnergyMeasurement {
 ElectricalEnergyMeasurementAttrAccess::ElectricalEnergyMeasurementAttrAccess(BitMask<Feature> aFeature,
                                                                              BitMask<OptionalAttributes> aOptionalAttrs,
                                                                              EndpointId endpointId) :
+    ElectricalEnergyMeasurementAttrAccess(aFeature, aOptionalAttrs, endpointId, gNoOpDelegate, gDefaultTimerDelegate)
+{}
+
+ElectricalEnergyMeasurementAttrAccess::ElectricalEnergyMeasurementAttrAccess(BitMask<Feature> aFeature,
+                                                                             BitMask<OptionalAttributes> aOptionalAttrs,
+                                                                             EndpointId endpointId, Delegate & delegate,
+                                                                             TimerDelegate & timerDelegate) :
     mCluster(ElectricalEnergyMeasurementCluster::Config{
-        .endpointId         = endpointId,
-        .featureFlags       = aFeature,
-        .optionalAttributes = aOptionalAttrs,
-        .accuracyStruct     = kDefaultAccuracy,
+        .endpointId   = endpointId,
+        .featureFlags = aFeature,
+        .optionalAttributes =
+            ElectricalEnergyMeasurementCluster::OptionalAttributesSet().Set<Attributes::CumulativeEnergyReset::Id>(
+                aOptionalAttrs.Has(OptionalAttributes::kOptionalAttributeCumulativeEnergyReset)),
+        .accuracyStruct = kDefaultAccuracy,
+        .delegate       = delegate,
+        .timerDelegate  = timerDelegate,
     })
 {
     mClusterListNode.mValue = &mCluster.Cluster();
-}
-
-const ElectricalEnergyMeasurement::MeasurementData * MeasurementDataForEndpoint(EndpointId endpointId)
-{
-    ElectricalEnergyMeasurementCluster * cluster = FindElectricalEnergyMeasurementClusterOnEndpoint(endpointId);
-    VerifyOrReturnValue(cluster != nullptr, nullptr);
-
-    return cluster->GetMeasurementData();
 }
 
 CHIP_ERROR SetMeasurementAccuracy(EndpointId endpointId, const MeasurementAccuracyStruct::Type & accuracy)
@@ -109,15 +128,17 @@ CHIP_ERROR SetMeasurementAccuracy(EndpointId endpointId, const MeasurementAccura
     return cluster->SetMeasurementAccuracy(accuracy);
 }
 
-CHIP_ERROR SetCumulativeReset(EndpointId endpointId, const Optional<CumulativeEnergyResetStruct::Type> & cumulativeReset)
+CHIP_ERROR SetCumulativeReset(EndpointId endpointId,
+                              const DataModel::Nullable<Structs::CumulativeEnergyResetStruct::Type> & cumulativeReset)
 {
     ElectricalEnergyMeasurementCluster * cluster = FindElectricalEnergyMeasurementClusterOnEndpoint(endpointId);
     VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NOT_FOUND);
     return cluster->SetCumulativeEnergyReset(cumulativeReset);
 }
 
-bool NotifyCumulativeEnergyMeasured(EndpointId endpointId, const Optional<EnergyMeasurementStruct::Type> & energyImported,
-                                    const Optional<EnergyMeasurementStruct::Type> & energyExported)
+bool NotifyCumulativeEnergyMeasured(EndpointId endpointId,
+                                    const DataModel::Nullable<EnergyMeasurementStruct::Type> & energyImported,
+                                    const DataModel::Nullable<EnergyMeasurementStruct::Type> & energyExported)
 {
     ElectricalEnergyMeasurementCluster * cluster = FindElectricalEnergyMeasurementClusterOnEndpoint(endpointId);
 
@@ -128,8 +149,8 @@ bool NotifyCumulativeEnergyMeasured(EndpointId endpointId, const Optional<Energy
     return true;
 }
 
-bool NotifyPeriodicEnergyMeasured(EndpointId endpointId, const Optional<EnergyMeasurementStruct::Type> & energyImported,
-                                  const Optional<EnergyMeasurementStruct::Type> & energyExported)
+bool NotifyPeriodicEnergyMeasured(EndpointId endpointId, const DataModel::Nullable<EnergyMeasurementStruct::Type> & energyImported,
+                                  const DataModel::Nullable<EnergyMeasurementStruct::Type> & energyExported)
 {
     ElectricalEnergyMeasurementCluster * cluster = FindElectricalEnergyMeasurementClusterOnEndpoint(endpointId);
 

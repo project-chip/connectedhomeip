@@ -338,7 +338,7 @@ extern "C" void app_init(void)
 
     blog_init();
     bl_irq_init();
-#if CHIP_DEVICE_LAYER_TARGET_BL702L
+#ifdef CFG_PDS_ENABLE
     bl_rtc_init();
 #endif
     bl_sec_init();

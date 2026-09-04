@@ -530,6 +530,19 @@ void emAfCallInits()
     }
 }
 
+// Symmetric to emAfCallInits() — calls shutdown callbacks for all enabled endpoints.
+void emAfCallShutdowns(MatterClusterShutdownType shutdownType)
+{
+    uint16_t index;
+    for (index = 0; index < emberAfEndpointCount(); index++)
+    {
+        if (emberAfEndpointIndexIsEnabled(index))
+        {
+            shutdownEndpoint(&(emAfEndpoints[index]), shutdownType);
+        }
+    }
+}
+
 // Returns the pointer to metadata, or null if it is not found
 const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
 {

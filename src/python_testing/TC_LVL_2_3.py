@@ -204,7 +204,7 @@ class TC_LVL_2_3(MatterBaseTest):
 
         self.step(21)
         remaining_time = sub_handler.attribute_reports[lvl.Attributes.RemainingTime]
-        log.info(f'Reamining time reports: {remaining_time}')
+        log.info('Reamining time reports: %s', remaining_time)
         asserts.assert_less_equal(remaining_time[0].value, 100, "Unexpected first RemainingTime report")
         asserts.assert_almost_equal(remaining_time[0].value, 100, delta=10, msg="Unexpected first RemainingTime report")
 

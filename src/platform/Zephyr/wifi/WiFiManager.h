@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024, 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -229,6 +229,7 @@ private:
     static void PostConnectivityStatusChange(ConnectivityChange changeType);
     static void SendRouterSolicitation(System::Layer * layer, void * param);
     static void IPv6AddressChangeHandler(const void * data);
+    static void UpdateIpv6InternetConnectivityState();
 
     // Connection Recovery feature
     // This feature allows re-scanning and re-connecting the connection to the known network after
@@ -262,6 +263,7 @@ private:
     uint32_t mConnectionRecoveryTimeMs{ kConnectionRecoveryMinIntervalMs };
     bool mApplicationDisconnectRequested{ false };
     uint16_t mLastDisconnectedReason;
+    bool mHasGlobalIPv6Address{ false };
 
     static const Map<wifi_iface_state, StationStatus, 10> sStatusMap;
 };

@@ -114,6 +114,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, statusLightEnabled);
     case Attributes::StatusLightBrightness::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, statusLightBrightness);
+    case Attributes::ImageRotationDiscreteAngles::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, imageRotationDiscreteAngles);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

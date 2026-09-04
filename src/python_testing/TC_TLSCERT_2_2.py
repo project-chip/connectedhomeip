@@ -26,7 +26,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --endpoint 1
+#       --endpoint 0
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -45,6 +45,8 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_TLSCERT_2_2(TC_TLSCERT_Base):
+    disable_wildcard_subscription = True
+
     def pics_TC_TLSCERT_2_2(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
         # In this case - there is no feature flags needed to run this test case

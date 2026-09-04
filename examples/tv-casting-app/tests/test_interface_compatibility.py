@@ -4,9 +4,9 @@ Property Test — Property 3: Interface compatibility (attribute & event decoder
 **Validates: Requirements 1.3, 2.3**
 
 This test parses both the slim attribute decoder
-(`casting-CHIPAttributeTLVValueDecoder.cpp`) and the full zap-generated
+(`CHIPAttributeTLVValueDecoder-override.cpp`) and the full zap-generated
 decoder (`zap-generated/CHIPAttributeTLVValueDecoder.cpp`), as well as
-the slim event decoder (`casting-CHIPEventTLVValueDecoder.cpp`) and the
+the slim event decoder (`CHIPEventTLVValueDecoder-override.cpp`) and the
 full zap-generated event decoder (`zap-generated/CHIPEventTLVValueDecoder.cpp`),
 and verifies:
 
@@ -19,6 +19,7 @@ Property 3: Interface compatibility
 
 import os
 import re
+from pathlib import Path
 
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
@@ -27,14 +28,14 @@ from hypothesis import strategies as st
 # Paths
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
-REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+REPO_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
 SLIM_ATTR_DECODER = os.path.join(
     REPO_ROOT,
     "examples",
     "tv-casting-app",
     "tv-casting-common",
-    "casting-CHIPAttributeTLVValueDecoder.cpp",
+    "CHIPAttributeTLVValueDecoder-override.cpp",
 )
 
 FULL_ATTR_DECODER = os.path.join(
@@ -51,7 +52,7 @@ SLIM_EVENT_DECODER = os.path.join(
     "examples",
     "tv-casting-app",
     "tv-casting-common",
-    "casting-CHIPEventTLVValueDecoder.cpp",
+    "CHIPEventTLVValueDecoder-override.cpp",
 )
 
 FULL_EVENT_DECODER = os.path.join(

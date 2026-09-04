@@ -170,7 +170,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MaxConcurrentEncoders
             )
-            log.info(f"Rx'd MaxConcurrentEncoders: {value}")
+            log.info("Rx'd MaxConcurrentEncoders: %s", value)
             asserts.assert_is_not_none(value, "MaxConcurrentEncoders is None")
             matter_asserts.assert_valid_uint8(value, "MaxConcurrentEncoders")
 
@@ -179,7 +179,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MaxEncodedPixelRate
             )
-            log.info(f"Rx'd MaxEncodedPixelRate: {value}")
+            log.info("Rx'd MaxEncodedPixelRate: %s", value)
             asserts.assert_is_not_none(value, "MaxEncodedPixelRate is None")
             matter_asserts.assert_valid_uint32(value, "MaxEncodedPixelRate")
 
@@ -188,7 +188,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             videoSensorParams = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.VideoSensorParams
             )
-            log.info(f"Rx'd VideoSensorParams: {videoSensorParams}")
+            log.info("Rx'd VideoSensorParams: %s", videoSensorParams)
             asserts.assert_is_not_none(videoSensorParams, "VideoSensorParams is None")
             self.assert_video_sensor_params_struct(videoSensorParams)
 
@@ -197,7 +197,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.NightVisionUsesInfrared
             )
-            log.info(f"Rx'd NightVisionUsesInfrared: {value}")
+            log.info("Rx'd NightVisionUsesInfrared: %s", value)
             asserts.assert_is_not_none(value, "NightVisionUsesInfrared is None")
 
         self.step(6)
@@ -205,7 +205,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             minViewportResolution = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MinViewportResolution
             )
-            log.info(f"Rx'd MinViewportResolution: {minViewportResolution}")
+            log.info("Rx'd MinViewportResolution: %s", minViewportResolution)
             asserts.assert_is_not_none(minViewportResolution, "MinViewportResolution is None")
             self.assert_video_resolution_struct(minViewportResolution)
 
@@ -214,7 +214,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             rateDistortionTradeOffPoints = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.RateDistortionTradeOffPoints
             )
-            log.info(f"Rx'd RateDistortionTradeOffPoints: {rateDistortionTradeOffPoints}")
+            log.info("Rx'd RateDistortionTradeOffPoints: %s", rateDistortionTradeOffPoints)
             asserts.assert_is_not_none(rateDistortionTradeOffPoints, "RateDistortionTradeOffPoints is None")
             matter_asserts.assert_all(
                 rateDistortionTradeOffPoints,
@@ -227,7 +227,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MaxContentBufferSize
             )
-            log.info(f"Rx'd MaxContentBufferSize: {value}")
+            log.info("Rx'd MaxContentBufferSize: %s", value)
             matter_asserts.assert_valid_uint32(value, "MaxContentBufferSize")
 
         self.step(9)
@@ -235,7 +235,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             microphoneCapabilities = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneCapabilities
             )
-            log.info(f"Rx'd MicrophoneCapabilities: {microphoneCapabilities}")
+            log.info("Rx'd MicrophoneCapabilities: %s", microphoneCapabilities)
             asserts.assert_is_not_none(microphoneCapabilities, "MicrophoneCapabilities is None")
             self.assert_audio_capabilities_struct(microphoneCapabilities)
 
@@ -244,7 +244,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             speakerCapabilities = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerCapabilities
             )
-            log.info(f"Rx'd SpeakerCapabilities: {speakerCapabilities}")
+            log.info("Rx'd SpeakerCapabilities: %s", speakerCapabilities)
             asserts.assert_is_not_none(speakerCapabilities, "SpeakerCapabilities is None")
             self.assert_audio_capabilities_struct(speakerCapabilities)
 
@@ -253,7 +253,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.TwoWayTalkSupport
             )
-            log.info(f"Rx'd TwoWayTalkSupport: {value}")
+            log.info("Rx'd TwoWayTalkSupport: %s", value)
             asserts.assert_is_not_none(value, "TwoWayTalkSupport is None")
             asserts.assert_in(
                 value,
@@ -266,7 +266,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             snapshotCapabilities = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SnapshotCapabilities
             )
-            log.info(f"Rx'd SnapshotCapabilities: {snapshotCapabilities}")
+            log.info("Rx'd SnapshotCapabilities: %s", snapshotCapabilities)
             asserts.assert_is_not_none(snapshotCapabilities, "SnapshotCapabilities is None")
             matter_asserts.assert_all(
                 snapshotCapabilities,
@@ -279,7 +279,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MaxNetworkBandwidth
             )
-            log.info(f"Rx'd MaxNetworkBandwidth: {value}")
+            log.info("Rx'd MaxNetworkBandwidth: %s", value)
             matter_asserts.assert_valid_uint32(value, "MaxNetworkBandwidth")
 
         self.step(14)
@@ -287,7 +287,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.CurrentFrameRate
             )
-            log.info(f"Rx'd CurrentFrameRate: {value}")
+            log.info("Rx'd CurrentFrameRate: %s", value)
             asserts.assert_is_not_none(value, "CurrentFrameRate is None")
             matter_asserts.assert_valid_uint16(value, "CurrentFrameRate")
 
@@ -296,7 +296,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.HDRModeEnabled
             )
-            log.info(f"Rx'd HDRModeEnabled: {value}")
+            log.info("Rx'd HDRModeEnabled: %s", value)
             asserts.assert_is_not_none(value, "HDRModeEnabled is None")
 
         self.step(16)
@@ -304,7 +304,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             supportedStreamUsages = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SupportedStreamUsages
             )
-            log.info(f"Rx'd SupportedStreamUsages: {supportedStreamUsages}")
+            log.info("Rx'd SupportedStreamUsages: %s", supportedStreamUsages)
             matter_asserts.assert_all(
                 supportedStreamUsages,
                 lambda x: self.assert_enum(
@@ -318,7 +318,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
             )
-            log.info(f"Rx'd AllocatedVideoStreams: {value}")
+            log.info("Rx'd AllocatedVideoStreams: %s", value)
             asserts.assert_is_not_none(value, "AllocatedVideoStreams is None")
             # TODO assert struct fields of list - currently list is empty as nothing allocated
 
@@ -327,7 +327,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
             )
-            log.info(f"Rx'd AllocatedAudioStreams: {value}")
+            log.info("Rx'd AllocatedAudioStreams: %s", value)
             asserts.assert_is_not_none(value, "AllocatedAudioStreams is None")
             # TODO assert struct fields of list - currently list is empty as nothing allocated
 
@@ -336,7 +336,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
             )
-            log.info(f"Rx'd AllocatedSnapshotStreams: {value}")
+            log.info("Rx'd AllocatedSnapshotStreams: %s", value)
             asserts.assert_is_not_none(value, "AllocatedSnapshotStreams is None")
             # TODO assert struct fields of list - currently list is empty as nothing allocated
 
@@ -345,7 +345,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             streamUsagePriorities = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
             )
-            log.info(f"Rx'd StreamUsagePrioritiesList: {streamUsagePriorities}")
+            log.info("Rx'd StreamUsagePrioritiesList: %s", streamUsagePriorities)
             matter_asserts.assert_all(
                 streamUsagePriorities,
                 lambda x: self.assert_enum(
@@ -359,7 +359,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SoftRecordingPrivacyModeEnabled
             )
-            log.info(f"Rx'd SoftRecordingPrivacyModeEnabled: {value}")
+            log.info("Rx'd SoftRecordingPrivacyModeEnabled: %s", value)
             asserts.assert_is_not_none(value, "SoftRecordingPrivacyModeEnabled is None")
 
         self.step(22)
@@ -367,7 +367,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SoftLivestreamPrivacyModeEnabled
             )
-            log.info(f"Rx'd SoftLivestreamPrivacyModeEnabled: {value}")
+            log.info("Rx'd SoftLivestreamPrivacyModeEnabled: %s", value)
             asserts.assert_is_not_none(value, "SoftLivestreamPrivacyModeEnabled is None")
 
         self.step(23)
@@ -375,13 +375,13 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.HardPrivacyModeOn
             )
-            log.info(f"Rx'd HardPrivacyModeOn: {value}")
+            log.info("Rx'd HardPrivacyModeOn: %s", value)
             asserts.assert_is_not_none(value, "HardPrivacyModeOn is None")
 
         self.step(24)
         if await self.attribute_guard(endpoint=endpoint, attribute=attr.NightVision):
             value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.NightVision)
-            log.info(f"Rx'd NightVision: {value}")
+            log.info("Rx'd NightVision: %s", value)
             asserts.assert_is_not_none(value, "NightVision is None")
             asserts.assert_in(
                 value,
@@ -394,7 +394,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.NightVisionIllum
             )
-            log.info(f"Rx'd NightVisionIllum: {value}")
+            log.info("Rx'd NightVisionIllum: %s", value)
             asserts.assert_is_not_none(value, "NightVisionIllum is None")
             asserts.assert_in(
                 value,
@@ -405,14 +405,14 @@ class TC_AVSM_2_1(MatterBaseTest):
         self.step(26)
         if await self.attribute_guard(endpoint=endpoint, attribute=attr.Viewport):
             viewport = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.Viewport)
-            log.info(f"Rx'd Viewport: {viewport}")
+            log.info("Rx'd Viewport: %s", viewport)
             asserts.assert_is_not_none(viewport, "Viewport is None")
             self.assert_viewport_struct(viewport)
 
         self.step(27)
         if await self.attribute_guard(endpoint=endpoint, attribute=attr.SpeakerMuted):
             value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerMuted)
-            log.info(f"Rx'd SpeakerMuted: {value}")
+            log.info("Rx'd SpeakerMuted: %s", value)
             asserts.assert_is_not_none(value, "SpeakerMuted is None")
 
         self.step(28)
@@ -420,7 +420,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerVolumeLevel
             )
-            log.info(f"Rx'd SpeakerVolumeLevel: {value}")
+            log.info("Rx'd SpeakerVolumeLevel: %s", value)
             asserts.assert_is_not_none(value, "SpeakerVolumeLevel is None")
             matter_asserts.assert_valid_uint8(value, "SpeakerVolumeLevel")
             # TODO asserts depend on reading SpeakerMaxLevel and SpeakerMinLevel first
@@ -430,7 +430,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             speakerMaxLevel = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerMaxLevel
             )
-            log.info(f"Rx'd SpeakerMaxLevel: {speakerMaxLevel}")
+            log.info("Rx'd SpeakerMaxLevel: %s", speakerMaxLevel)
             asserts.assert_is_not_none(speakerMaxLevel, "SpeakerMaxLevel is None")
             matter_asserts.assert_valid_uint8(speakerMaxLevel, "SpeakerMaxLevel")
             asserts.assert_less_equal(speakerMaxLevel, 254, "SpeakerMaxLevel is > 254")
@@ -440,7 +440,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             speakerMinLevel = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerMinLevel
             )
-            log.info(f"Rx'd SpeakerMinLevel: {speakerMinLevel}")
+            log.info("Rx'd SpeakerMinLevel: %s", speakerMinLevel)
             asserts.assert_is_not_none(speakerMinLevel, "SpeakerMinLevel is None")
             matter_asserts.assert_valid_uint8(speakerMinLevel, "SpeakerMinLevel")
             asserts.assert_less_equal(speakerMinLevel, speakerMaxLevel, "SpeakerMinLevel is > SpeakerMaxLevel")
@@ -450,7 +450,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneMuted
             )
-            log.info(f"Rx'd MicrophoneMuted: {value}")
+            log.info("Rx'd MicrophoneMuted: %s", value)
             asserts.assert_is_not_none(value, "MicrophoneMuted is None")
 
         self.step(32)
@@ -458,7 +458,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneVolumeLevel
             )
-            log.info(f"Rx'd MicrophoneVolumeLevel: {value}")
+            log.info("Rx'd MicrophoneVolumeLevel: %s", value)
             asserts.assert_is_not_none(value, "MicrophoneVolumeLevel is None")
             matter_asserts.assert_valid_uint8(value, "MicrophoneVolumeLevel")
             # TODO asserts depend on reading MicrophoneMaxLevel and MicrophoneMinLevel first
@@ -468,7 +468,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             microphoneMaxLevel = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneMaxLevel
             )
-            log.info(f"Rx'd MicrophoneMaxLevel: {microphoneMaxLevel}")
+            log.info("Rx'd MicrophoneMaxLevel: %s", microphoneMaxLevel)
             asserts.assert_is_not_none(microphoneMaxLevel, "MicrophoneMaxLevel is None")
             matter_asserts.assert_valid_uint8(microphoneMaxLevel, "MicrophoneMaxLevel")
             asserts.assert_less_equal(microphoneMaxLevel, 254, "MicrophoneMaxLevel is > 254")
@@ -478,7 +478,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             microphoneMinLevel = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneMinLevel
             )
-            log.info(f"Rx'd MicrophoneMinLevel: {microphoneMinLevel}")
+            log.info("Rx'd MicrophoneMinLevel: %s", microphoneMinLevel)
             asserts.assert_is_not_none(microphoneMinLevel, "MicrophoneMinLevel is None")
             matter_asserts.assert_valid_uint8(microphoneMinLevel, "MicrophoneMinLevel")
             asserts.assert_less_equal(microphoneMinLevel, microphoneMaxLevel, "MicrophoneMinLevel is > MicrophoneMaxLevel")
@@ -488,13 +488,13 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneAGCEnabled
             )
-            log.info(f"Rx'd MicrophoneAGCEnabled: {value}")
+            log.info("Rx'd MicrophoneAGCEnabled: %s", value)
             asserts.assert_is_not_none(value, "MicrophoneAGCEnabled is None")
 
         self.step(36)
         if await self.attribute_guard(endpoint=endpoint, attribute=attr.ImageRotation):
             value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.ImageRotation)
-            log.info(f"Rx'd ImageRotation: {value}")
+            log.info("Rx'd ImageRotation: %s", value)
             asserts.assert_is_not_none(value, "ImageRotation is None")
             matter_asserts.assert_valid_uint16(value, "ImageRotation")
             asserts.assert_less_equal(value, 359, "ImageRotation is > 359")
@@ -504,7 +504,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ImageFlipHorizontal
             )
-            log.info(f"Rx'd ImageFlipHorizontal: {value}")
+            log.info("Rx'd ImageFlipHorizontal: %s", value)
             asserts.assert_is_not_none(value, "ImageFlipHorizontal is None")
 
         self.step(38)
@@ -512,7 +512,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ImageFlipVertical
             )
-            log.info(f"Rx'd ImageFlipVertical: {value}")
+            log.info("Rx'd ImageFlipVertical: %s", value)
             asserts.assert_is_not_none(value, "ImageFlipVertical is None")
 
         self.step(39)
@@ -520,7 +520,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.LocalVideoRecordingEnabled
             )
-            log.info(f"Rx'd LocalVideoRecordingEnabled: {value}")
+            log.info("Rx'd LocalVideoRecordingEnabled: %s", value)
             asserts.assert_is_not_none(value, "LocalVideoRecordingEnabled is None")
 
         self.step(40)
@@ -528,7 +528,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.LocalSnapshotRecordingEnabled
             )
-            log.info(f"Rx'd LocalSnapshotRecordingEnabled: {value}")
+            log.info("Rx'd LocalSnapshotRecordingEnabled: %s", value)
             asserts.assert_is_not_none(value, "LocalSnapshotRecordingEnabled is None")
 
         self.step(41)
@@ -536,7 +536,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.StatusLightEnabled
             )
-            log.info(f"Rx'd StatusLightEnabled: {value}")
+            log.info("Rx'd StatusLightEnabled: %s", value)
             asserts.assert_is_not_none(value, "StatusLightEnabled is None")
 
         self.step(42)
@@ -544,7 +544,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.StatusLightBrightness
             )
-            log.info(f"Rx'd StatusLightBrightness: {value}")
+            log.info("Rx'd StatusLightBrightness: %s", value)
             asserts.assert_is_not_none(value, "StatusLightBrightness is None")
             asserts.assert_in(
                 value,

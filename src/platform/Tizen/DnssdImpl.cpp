@@ -145,11 +145,13 @@ void OnBrowseRemove(chip::Dnssd::BrowseContext * context, const char * type, con
 {
     ChipLogDetail(DeviceLayer, "DNSsd %s: name: %s, type: %s, interfaceId: %u", __func__, StringOrNullMarker(name),
                   StringOrNullMarker(type), interfaceId);
-    context->mServices.erase(std::remove_if(
-        context->mServices.begin(), context->mServices.end(), [name, type, interfaceId](const chip::Dnssd::DnssdService & service) {
-            return strcmp(name, service.mName) == 0 && type == GetFullType(service.mType, service.mProtocol) &&
-                interfaceId == service.mInterface.GetPlatformInterface();
-        }));
+    context->mServices.erase(std::remove_if(context->mServices.begin(), context->mServices.end(),
+                                            [name, type, interfaceId](const chip::Dnssd::DnssdService & service) {
+                                                return strcmp(name, service.mName) == 0 &&
+                                                    type == GetFullType(service.mType, service.mProtocol) &&
+                                                    interfaceId == service.mInterface.GetPlatformInterface();
+                                            }),
+                             context->mServices.end());
 }
 
 void OnBrowse(dnssd_service_state_e state, dnssd_service_h service, void * data)
@@ -570,7 +572,7 @@ CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublis
     for (size_t i = 0; i < service.mTextEntrySize; ++i)
     {
         TextEntry entry = service.mTextEntries[i];
-        VerifyOrReturnError(chip::CanCastTo<unsigned short>(entry.mDataSize), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrExit(chip::CanCastTo<unsigned short>(entry.mDataSize), err = CHIP_ERROR_INVALID_ARGUMENT);
         ret = dnssd_service_add_txt_record(serviceHandle, entry.mKey, static_cast<unsigned short>(entry.mDataSize), entry.mData);
         VerifyOrExit(ret == DNSSD_ERROR_NONE,
                      ChipLogError(DeviceLayer, "dnssd_service_add_txt_record() failed: %s", get_error_message(ret));

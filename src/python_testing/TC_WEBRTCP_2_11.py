@@ -39,7 +39,7 @@ import logging
 import time
 
 from mobly import asserts
-from TC_WEBRTC_Utils import WebRTCTestHelper
+from TC_WEBRTCPTestBase import WEBRTCPTestBase
 from test_plan_support import commission_if_required
 
 from matter.ChipDeviceCtrl import TransportPayloadCapability
@@ -52,7 +52,7 @@ from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 log = logging.getLogger(__name__)
 
 
-class TC_WEBRTCP_2_11(MatterBaseTest, WebRTCTestHelper):
+class TC_WEBRTCP_2_11(MatterBaseTest, WEBRTCPTestBase):
     def desc_TC_WEBRTCP_2_11(self) -> str:
         return "[TC-WEBRTCP-2.11] Validate deferred Offer command timing"
 
@@ -86,6 +86,7 @@ class TC_WEBRTCP_2_11(MatterBaseTest, WebRTCTestHelper):
             "AVSM.S",
             "AVSM.S.F00",          # Audio Data Output feature
             "AVSM.S.F01",          # Video Data Output feature
+            "PS.S.F01",            # Battery feature
         ]
 
     @property
@@ -98,6 +99,13 @@ class TC_WEBRTCP_2_11(MatterBaseTest, WebRTCTestHelper):
 
     @async_test_body
     async def test_TC_WEBRTCP_2_11(self):
+
+        # Only run the test script if the camera is battery powered, and so subject to standby flows
+        if not await self.is_battery_powered():
+            self.mark_all_remaining_steps_skipped("precondition-1")
+            log.info("WebRTCP 2_11 skipped as the device is not battery powered.")
+            return
+
         self.step("precondition-1")
 
         endpoint = self.get_endpoint()
@@ -113,9 +121,13 @@ class TC_WEBRTCP_2_11(MatterBaseTest, WebRTCTestHelper):
         asserts.assert_equal(len(current_sessions), 0, "Found an existing WebRTC session")
 
         self.step(1)
-        # Allocate both Audio and Video streams
-        videoStreamID = await self.allocate_video_stream(endpoint)
-        audioStreamID = await self.allocate_audio_stream(endpoint)
+        # Allocate Audio and Video streams
+        audioStreamID = await self.allocate_one_audio_stream()
+        videoStreamID = await self.allocate_one_video_stream()
+
+        # Validate that the streams were allocated successfully
+        await self.validate_allocated_audio_stream(audioStreamID)
+        await self.validate_allocated_video_stream(videoStreamID)
 
         self.step(2)
         # Send SolicitOffer command with valid parameters, expecting deferred response
@@ -141,7 +153,7 @@ class TC_WEBRTCP_2_11(MatterBaseTest, WebRTCTestHelper):
         offer_sessionId, remote_offer_sdp = await webrtc_peer.get_remote_offer(timeout_s=30)
 
         elapsed_time = time.time() - start_time
-        log.info(f"Received Offer command after {elapsed_time:.2f} seconds")
+        log.info("Received Offer command after %.2f seconds", elapsed_time)
         asserts.assert_less(elapsed_time, 30.0, f"Offer command should be received within 30 seconds, but took {elapsed_time:.2f}s")
 
         self.step(4)
@@ -150,8 +162,8 @@ class TC_WEBRTCP_2_11(MatterBaseTest, WebRTCTestHelper):
                              f"Offer command WebRTCSessionID {offer_sessionId} should match allocated session ID {session_id}")
         asserts.assert_true(len(remote_offer_sdp) > 0, "Offer command should contain non-empty SDP string")
 
-        log.info(
-            f"Successfully validated deferred Offer command timing: received in {elapsed_time:.2f}s with correct session ID {session_id}")
+        log.info("Successfully validated deferred Offer command timing: received in %.2fs with correct session ID %s",
+                 elapsed_time, session_id)
 
         # Clean up - End the session
         await self.send_single_cmd(

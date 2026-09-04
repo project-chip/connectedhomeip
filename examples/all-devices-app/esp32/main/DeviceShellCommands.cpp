@@ -16,7 +16,7 @@
  */
 
 #include <DeviceShellCommands.h>
-#include <devices/device-factory/DeviceFactory.h>
+#include <device-factory/DeviceFactory.h>
 #include <lib/shell/streamer.h>
 
 // Forward declaration of the function defined in main.cpp

@@ -171,16 +171,18 @@ public:
     {
         static constexpr size_t kEpochKeysMax = 3;
 
-        KeySet() = default;
+        KeySet() { ClearKeys(); }
         KeySet(uint16_t id, SecurityPolicy policy_id, uint8_t num_keys) : keyset_id(id), policy(policy_id), num_keys_used(num_keys)
-        {}
+        {
+            ClearKeys();
+        }
 
         // The actual keys for the group key set
         EpochKey epoch_keys[kEpochKeysMax];
         // Logical id provided by the Administrator that configured the entry
         uint16_t keyset_id = 0;
         // Security policy to use for groups that use this keyset
-        SecurityPolicy policy = SecurityPolicy::kCacheAndSync;
+        SecurityPolicy policy = SecurityPolicy::kTrustFirst;
         // Number of keys present
         uint8_t num_keys_used = 0;
 
@@ -255,7 +257,12 @@ public:
     GroupDataProvider(const GroupDataProvider &)             = delete;
     GroupDataProvider & operator=(const GroupDataProvider &) = delete;
 
-    uint16_t GetMaxGroupsPerFabric() const { return mMaxGroupsPerFabric; }
+    // TODO(#72056): Once groupcast is enabled by default, this should just return mMaxGroupsPerFabric. See GroupDataProviderImpl()
+    // constructor.
+    uint16_t GetMaxGroupsPerFabric() const
+    {
+        return static_cast<uint16_t>(IsGroupcastEnabled() ? (getMaxMembershipCount() / 2) : mMaxGroupsPerFabric);
+    }
     uint16_t GetMaxGroupKeysPerFabric() const { return mMaxGroupKeysPerFabric; }
 
     /**
@@ -294,15 +301,17 @@ public:
     // Iterators
     /**
      *  Creates an iterator that may be used to obtain the list of groups associated with the given fabric.
-     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
+     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished;
+     *  the use of the AutoRelease wrapper (lib/support/AutoRelease.h) is recommended.
      *  Modifying the group table during the iteration is currently not supported, and may yield unexpected behaviour.
-     *  @retval An instance of EndpointIterator on success
+     *  @retval An instance of GroupInfoIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
     virtual GroupInfoIterator * IterateGroupInfo(FabricIndex fabric_index) = 0;
     /**
      *  Creates an iterator that may be used to obtain the list of (group, endpoint) pairs associated with the given fabric.
-     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
+     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished;
+     *  the use of the AutoRelease wrapper (lib/support/AutoRelease.h) is recommended.
      *  Modifying the group table during the iteration is currently not supported, and may yield unexpected behaviour.
      *  If you wish to iterate only the endpoints of a particular group id you can provide the optional `group_id` to do so.
      *  @retval An instance of EndpointIterator on success
@@ -323,7 +332,8 @@ public:
 
     /**
      *  Creates an iterator that may be used to obtain the list of (group, keyset) pairs associated with the given fabric.
-     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
+     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished;
+     *  the use of the AutoRelease wrapper (lib/support/AutoRelease.h) is recommended.
      *  Modifying the keyset mappings during the iteration is currently not supported, and may yield unexpected behaviour.
      *  @retval An instance of GroupKeyIterator on success
      *  @retval nullptr if no iterator instances are available.
@@ -354,7 +364,8 @@ public:
 
     /**
      *  Creates an iterator that may be used to obtain the list of key sets associated with the given fabric.
-     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
+     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished;
+     *  the use of the AutoRelease wrapper (lib/support/AutoRelease.h) is recommended.
      *  Modifying the key sets table during the iteration is currently not supported, and may yield unexpected behaviour.
      *
      *  @retval An instance of KeySetIterator on success
@@ -395,11 +406,11 @@ public:
 
     void SetGroupcastEnabled(bool groupcastVal) { mGroupcastEnabled = groupcastVal; }
 
-    bool IsGroupcastEnabled() { return mGroupcastEnabled; }
+    bool IsGroupcastEnabled() const { return mGroupcastEnabled; }
 
     // Groupcast
-    virtual uint16_t getMaxMembershipCount() = 0;
-    virtual uint16_t getMaxMcastAddrCount()  = 0;
+    virtual uint16_t getMaxMembershipCount() const = 0;
+    virtual uint16_t getMaxMcastAddrCount() const  = 0;
 
     /**
      * @brief Check if a notification is needed for Auxiliary ACL changes and reset the flag.

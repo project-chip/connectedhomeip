@@ -77,7 +77,7 @@ CHIP_ERROR ASN1UniversalTime::ImportFrom_ASN1_TIME_string(const CharSpan & asn1_
     VerifyOrReturnError(p[size - 1] == 'Z', ASN1_ERROR_UNSUPPORTED_ENCODING);
     for (size_t i = 0; i < size - 1; i++)
     {
-        VerifyOrReturnError(isdigit(p[i]), ASN1_ERROR_INVALID_ENCODING);
+        VerifyOrReturnError(isdigit(static_cast<unsigned char>(p[i])), ASN1_ERROR_INVALID_ENCODING);
     }
 
     if (size == kASN1GeneralizedTimeStringLength)

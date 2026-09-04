@@ -33,6 +33,7 @@
 #include <app/clusters/push-av-stream-transport-server/constants.h>
 #include <functional>
 #include <memory>
+#include <mutex>
 #include <protocols/interaction_model/StatusCode.h>
 #include <thread>
 #include <vector>
@@ -191,4 +192,7 @@ private:
     uint32_t mCurrentlyUsedBandwidthbps     = 0;
     bool mCurrentActivationByManualTrigger  = false;
     bool mPreviousActivationByManualTrigger = false;
+
+    // Mutex for synchronizing recorder access
+    std::mutex mRecorderMutex;
 };

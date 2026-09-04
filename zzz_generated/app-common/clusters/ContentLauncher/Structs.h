@@ -62,6 +62,106 @@ public:
 using DecodableType = Type;
 
 } // namespace DimensionStruct
+namespace ContentAppInfo {
+enum class Fields : uint8_t
+{
+    kContentAppVendorID  = 0,
+    kContentAppProductID = 1,
+    kData                = 2,
+};
+
+struct Type
+{
+public:
+    uint16_t contentAppVendorID  = static_cast<uint16_t>(0);
+    uint16_t contentAppProductID = static_cast<uint16_t>(0);
+    chip::CharSpan data;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ContentAppInfo
+namespace LaunchUrlInfo {
+enum class Fields : uint8_t
+{
+    kUrl             = 0,
+    kData            = 1,
+    kContentType     = 2,
+    kContentHeaders  = 3,
+    kOffsetMillisecs = 4,
+    kQueueType       = 5,
+    kNextUrl         = 6,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan url;
+    Optional<DataModel::Nullable<chip::CharSpan>> data;
+    Optional<DataModel::Nullable<chip::CharSpan>> contentType;
+    Optional<DataModel::Nullable<DataModel::List<const chip::CharSpan>>> contentHeaders;
+    Optional<DataModel::Nullable<uint32_t>> offsetMillisecs;
+    Optional<DataModel::Nullable<QueueTypeEnum>> queueType;
+    Optional<DataModel::Nullable<chip::CharSpan>> nextUrl;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    chip::CharSpan url;
+    Optional<DataModel::Nullable<chip::CharSpan>> data;
+    Optional<DataModel::Nullable<chip::CharSpan>> contentType;
+    Optional<DataModel::Nullable<DataModel::DecodableList<chip::CharSpan>>> contentHeaders;
+    Optional<DataModel::Nullable<uint32_t>> offsetMillisecs;
+    Optional<DataModel::Nullable<QueueTypeEnum>> queueType;
+    Optional<DataModel::Nullable<chip::CharSpan>> nextUrl;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace LaunchUrlInfo
+namespace ReplicationInfo {
+enum class Fields : uint8_t
+{
+    kLaunchUrlInfo  = 0,
+    kContentAppInfo = 1,
+};
+
+struct Type
+{
+public:
+    Optional<DataModel::Nullable<Structs::LaunchUrlInfo::Type>> launchUrlInfo;
+    Optional<DataModel::Nullable<Structs::ContentAppInfo::Type>> contentAppInfo;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    Optional<DataModel::Nullable<Structs::LaunchUrlInfo::DecodableType>> launchUrlInfo;
+    Optional<DataModel::Nullable<Structs::ContentAppInfo::DecodableType>> contentAppInfo;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace ReplicationInfo
 namespace TrackPreferenceStruct {
 enum class Fields : uint8_t
 {
@@ -267,6 +367,29 @@ public:
 using DecodableType = Type;
 
 } // namespace BrandingInformationStruct
+namespace ContentPresetStruct {
+enum class Fields : uint8_t
+{
+    kPresetID   = 0,
+    kPresetName = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t presetID = static_cast<uint8_t>(0);
+    chip::CharSpan presetName;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ContentPresetStruct
 } // namespace Structs
 } // namespace ContentLauncher
 } // namespace Clusters

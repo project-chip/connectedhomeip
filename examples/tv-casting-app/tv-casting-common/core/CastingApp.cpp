@@ -29,6 +29,7 @@
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <protocols/Protocols.h>
 
 namespace {
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
@@ -164,14 +165,22 @@ CHIP_ERROR CastingApp::PostStartRegistrations()
     // Register DeviceEvent Handler
     ReturnErrorOnFailure(chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(ChipDeviceEventHandler::Handle, 0));
 
+    // The BDX server serves incoming (Media-Device-initiated) BDX pulls for the
+    // AddFile / OfferFile flows, so it must be the unsolicited BDX handler.
+    ReturnErrorOnFailure(server.GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::BDX::Id,
+                                                                                                  &mMediaFileManagementBdxServer));
+
     ChipLogProgress(
         Discovery,
         "CastingApp::PostStartRegistrations() calling GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler()");
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     // Set a handler for Commissioner's CommissionerDeclaration messages. This is set in
     // connectedhomeip/src/protocols/user_directed_commissioning/UserDirectedCommissioning.h
-    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(
-        CommissionerDeclarationHandler::GetInstance());
+    auto * client = chip::Server::GetInstance().GetUserDirectedCommissioningClient();
+    if (client != nullptr)
+    {
+        client->SetCommissionerDeclarationHandler(CommissionerDeclarationHandler::GetInstance());
+    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     mState = CASTING_APP_RUNNING; // CastingApp started successfully, set state to RUNNING
@@ -185,8 +194,18 @@ CHIP_ERROR CastingApp::Stop()
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     // Remove the handler previously set for Commissioner's CommissionerDeclaration messages.
-    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(nullptr);
+    auto * client = chip::Server::GetInstance().GetUserDirectedCommissioningClient();
+    if (client != nullptr)
+    {
+        client->SetCommissionerDeclarationHandler(nullptr);
+    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
+    // Tear down the BDX byte-transfer layer before the server goes away.
+    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().GetExchangeManager().UnregisterUnsolicitedMessageHandlerForProtocol(
+        chip::Protocols::BDX::Id);
+    mMediaFileManagementBdxServer.AbortTransfer();
+    mMediaFileManagementBdxClient.AbortTransfer();
 
     // Shutdown the Matter server
     chip::Server::GetInstance().Shutdown();

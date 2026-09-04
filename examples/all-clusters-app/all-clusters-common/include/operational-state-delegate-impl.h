@@ -93,7 +93,18 @@ public:
     void HandleStopStateCallback(GenericOperationalError & err) override;
 
 protected:
-    Span<const GenericOperationalState> mOperationalStateList;
+    /// Sets the operational-state ID list from any contiguous array of single-byte state values
+    /// (e.g. an `OperationalStateEnum[]`), so callers don't have to cast each entry to uint8_t.
+    /// The IDs are stored as bytes; the spec only attaches a label to manufacturer-specific states,
+    /// and that is supplied separately when the state is reported.
+    template <typename T>
+    void SetOperationalStateList(Span<const T> states)
+    {
+        static_assert(sizeof(T) == 1, "Operational state IDs must be a single byte (uint8_t-sized).");
+        mOperationalStateIds = Span<const uint8_t>(reinterpret_cast<const uint8_t *>(states.data()), states.size());
+    }
+
+    Span<const uint8_t> mOperationalStateIds;
     Span<const CharSpan> mOperationalPhaseList;
 };
 
@@ -101,20 +112,17 @@ protected:
 class OperationalStateDelegate : public GenericOperationalStateDelegateImpl
 {
 private:
-    const GenericOperationalState opStateList[4] = {
-        GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
-        GenericOperationalState(to_underlying(OperationalStateEnum::kRunning)),
-        GenericOperationalState(to_underlying(OperationalStateEnum::kPaused)),
-        GenericOperationalState(to_underlying(OperationalStateEnum::kError)),
+    static constexpr OperationalStateEnum kOpStateIds[] = {
+        OperationalStateEnum::kStopped,
+        OperationalStateEnum::kRunning,
+        OperationalStateEnum::kPaused,
+        OperationalStateEnum::kError,
     };
 
     const uint32_t kExampleCountDown = 30;
 
 public:
-    OperationalStateDelegate()
-    {
-        GenericOperationalStateDelegateImpl::mOperationalStateList = Span<const GenericOperationalState>(opStateList);
-    }
+    OperationalStateDelegate() { SetOperationalStateList(Span<const OperationalStateEnum>(kOpStateIds)); }
 
     /**
      * Handle Command Callback in application: Start

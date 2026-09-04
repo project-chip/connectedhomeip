@@ -84,7 +84,6 @@ tests:
           via the discovery mode applicable for the DUT. If (MCORE.DD.DT_IP), TH
           device is advertising over IP Network using DNS-based Service
           Discovery (DNS-SD)"
-      PICS: MCORE.DD.DISCOVERY_IP
       verification: |
           Verify in TH (ALL-CLUSTER-APP)
           ./chip-all-clusters-app

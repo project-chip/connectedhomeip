@@ -21,7 +21,10 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libTestCommodityTariffCluster"
 
-  test_sources = [ "TestCommodityTariffBaseDataClass.cpp" ]
+  test_sources = [
+    "TestCommodityTariffBaseDataClass.cpp",
+    "TestCommodityTariffContainers.cpp",
+  ]
 
   sources = []
 

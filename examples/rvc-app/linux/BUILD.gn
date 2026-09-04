@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ config("includes") {
 executable("chip-rvc-app") {
   sources = [
     "${chip_root}/examples/rvc-app/rvc-common/src/rvc-device.cpp",
+    "${chip_root}/examples/rvc-app/rvc-common/src/rvc-mode-code-driven-callbacks.cpp",
     "${chip_root}/examples/rvc-app/rvc-common/src/rvc-mode-delegates.cpp",
     "${chip_root}/examples/rvc-app/rvc-common/src/rvc-operational-state-delegate.cpp",
     "${chip_root}/examples/rvc-app/rvc-common/src/rvc-service-area-delegate.cpp",

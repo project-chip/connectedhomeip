@@ -49,12 +49,6 @@ public:
         mServiceAreaInstance(&mStorageDelegate, &mServiceAreaDelegate, aRvcClustersEndpoint,
                              BitMask<ServiceArea::Feature>(ServiceArea::Feature::kMaps, ServiceArea::Feature::kProgressReporting))
     {
-        // set the current-mode at start-up
-        mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);
-
-        // Hypothetically, the device checks if it is physically docked or charging
-        SetDeviceToIdleState();
-
         // set callback functions
         mRunModeDelegate.SetHandleChangeToMode(&RvcDevice::HandleRvcRunChangeToMode, this);
         mCleanModeDelegate.SetHandleChangeToMode(&RvcDevice::HandleRvcCleanChangeToMode, this);

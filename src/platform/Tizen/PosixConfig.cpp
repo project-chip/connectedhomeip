@@ -28,6 +28,7 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Compiler.h>
 #include <platform/CHIPDeviceError.h>
 #include <platform/KeyValueStoreManager.h>
 
@@ -38,40 +39,66 @@ namespace Internal {
 // *** CAUTION ***: Changing the names or namespaces of these values will *break* existing devices.
 
 // NVS namespaces used to store device configuration information.
-const char PosixConfig::kConfigNamespace_ChipFactory[]  = "chip-factory";
-const char PosixConfig::kConfigNamespace_ChipConfig[]   = "chip-config";
-const char PosixConfig::kConfigNamespace_ChipCounters[] = "chip-counters";
+CHIP_CPP20(constinit) const char PosixConfig::kConfigNamespace_ChipFactory[]  = "chip-factory";
+CHIP_CPP20(constinit) const char PosixConfig::kConfigNamespace_ChipConfig[]   = "chip-config";
+CHIP_CPP20(constinit) const char PosixConfig::kConfigNamespace_ChipCounters[] = "chip-counters";
 
 // Keys stored in the Chip-factory namespace
-const PosixConfig::Key PosixConfig::kConfigKey_SerialNum             = { kConfigNamespace_ChipFactory, "serial-num" };
-const PosixConfig::Key PosixConfig::kConfigKey_MfrDeviceId           = { kConfigNamespace_ChipFactory, "device-id" };
-const PosixConfig::Key PosixConfig::kConfigKey_MfrDeviceCert         = { kConfigNamespace_ChipFactory, "device-cert" };
-const PosixConfig::Key PosixConfig::kConfigKey_MfrDeviceICACerts     = { kConfigNamespace_ChipFactory, "device-ca-certs" };
-const PosixConfig::Key PosixConfig::kConfigKey_MfrDevicePrivateKey   = { kConfigNamespace_ChipFactory, "device-key" };
-const PosixConfig::Key PosixConfig::kConfigKey_HardwareVersion       = { kConfigNamespace_ChipFactory, "hardware-ver" };
-const PosixConfig::Key PosixConfig::kConfigKey_ManufacturingDate     = { kConfigNamespace_ChipFactory, "mfg-date" };
-const PosixConfig::Key PosixConfig::kConfigKey_SetupPinCode          = { kConfigNamespace_ChipFactory, "pin-code" };
-const PosixConfig::Key PosixConfig::kConfigKey_SetupDiscriminator    = { kConfigNamespace_ChipFactory, "discriminator" };
-const PosixConfig::Key PosixConfig::kConfigKey_Spake2pIterationCount = { kConfigNamespace_ChipFactory, "iteration-count" };
-const PosixConfig::Key PosixConfig::kConfigKey_Spake2pSalt           = { kConfigNamespace_ChipFactory, "salt" };
-const PosixConfig::Key PosixConfig::kConfigKey_Spake2pVerifier       = { kConfigNamespace_ChipFactory, "verifier" };
-const PosixConfig::Key PosixConfig::kConfigKey_VendorId              = { kConfigNamespace_ChipFactory, "vendor-id" };
-const PosixConfig::Key PosixConfig::kConfigKey_ProductId             = { kConfigNamespace_ChipFactory, "product-id" };
+CHIP_CPP20(constinit)
+const PosixConfig::Key PosixConfig::kConfigKey_SerialNum = MakeConfigKey(kConfigNamespace_ChipFactory, "serial-num");
+CHIP_CPP20(constinit)
+const PosixConfig::Key PosixConfig::kConfigKey_MfrDeviceId = MakeConfigKey(kConfigNamespace_ChipFactory, "device-id");
+CHIP_CPP20(constinit)
+const PosixConfig::Key PosixConfig::kConfigKey_MfrDeviceCert = MakeConfigKey(kConfigNamespace_ChipFactory, "device-cert");
+CHIP_CPP20(constinit)
+const PosixConfig::Key PosixConfig::kConfigKey_MfrDeviceICACerts = MakeConfigKey(kConfigNamespace_ChipFactory, "device-ca-certs");
+CHIP_CPP20(constinit)
+const PosixConfig::Key PosixConfig::kConfigKey_MfrDevicePrivateKey = MakeConfigKey(kConfigNamespace_ChipFactory, "device-key");
+CHIP_CPP20(constinit)
+const PosixConfig::Key PosixConfig::kConfigKey_HardwareVersion = MakeConfigKey(kConfigNamespace_ChipFactory, "hardware-ver");
+CHIP_CPP20(constinit)
+const PosixConfig::Key PosixConfig::kConfigKey_ManufacturingDate = MakeConfigKey(kConfigNamespace_ChipFactory, "mfg-date");
+CHIP_CPP20(constinit)
+const PosixConfig::Key PosixConfig::kConfigKey_SetupPinCode = MakeConfigKey(kConfigNamespace_ChipFactory, "pin-code");
+CHIP_CPP20(constinit)
+const PosixConfig::Key PosixConfig::kConfigKey_SetupDiscriminator = MakeConfigKey(kConfigNamespace_ChipFactory, "discriminator");
+CHIP_CPP20(constinit)
+const PosixConfig::Key PosixConfig::kConfigKey_Spake2pIterationCount =
+    MakeConfigKey(kConfigNamespace_ChipFactory, "iteration-count");
+CHIP_CPP20(constinit)
+const PosixConfig::Key PosixConfig::kConfigKey_Spake2pSalt = MakeConfigKey(kConfigNamespace_ChipFactory, "salt");
+CHIP_CPP20(constinit)
+const PosixConfig::Key PosixConfig::kConfigKey_Spake2pVerifier = MakeConfigKey(kConfigNamespace_ChipFactory, "verifier");
+CHIP_CPP20(constinit)
+const PosixConfig::Key PosixConfig::kConfigKey_VendorId = MakeConfigKey(kConfigNamespace_ChipFactory, "vendor-id");
+CHIP_CPP20(constinit)
+const PosixConfig::Key PosixConfig::kConfigKey_ProductId = MakeConfigKey(kConfigNamespace_ChipFactory, "product-id");
 
 // Keys stored in the Chip-config namespace
-const PosixConfig::Key PosixConfig::kConfigKey_ServiceConfig      = { kConfigNamespace_ChipConfig, "service-config" };
-const PosixConfig::Key PosixConfig::kConfigKey_PairedAccountId    = { kConfigNamespace_ChipConfig, "account-id" };
-const PosixConfig::Key PosixConfig::kConfigKey_ServiceId          = { kConfigNamespace_ChipConfig, "service-id" };
-const PosixConfig::Key PosixConfig::kConfigKey_LastUsedEpochKeyId = { kConfigNamespace_ChipConfig, "last-ek-id" };
-const PosixConfig::Key PosixConfig::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
-const PosixConfig::Key PosixConfig::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
-const PosixConfig::Key PosixConfig::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
-const PosixConfig::Key PosixConfig::kConfigKey_UniqueId           = { kConfigNamespace_ChipConfig, "unique-id" };
+CHIP_CPP20(constinit)
+const PosixConfig::Key PosixConfig::kConfigKey_ServiceConfig = MakeConfigKey(kConfigNamespace_ChipConfig, "service-config");
+CHIP_CPP20(constinit)
+const PosixConfig::Key PosixConfig::kConfigKey_PairedAccountId = MakeConfigKey(kConfigNamespace_ChipConfig, "account-id");
+CHIP_CPP20(constinit)
+const PosixConfig::Key PosixConfig::kConfigKey_ServiceId = MakeConfigKey(kConfigNamespace_ChipConfig, "service-id");
+CHIP_CPP20(constinit)
+const PosixConfig::Key PosixConfig::kConfigKey_LastUsedEpochKeyId = MakeConfigKey(kConfigNamespace_ChipConfig, "last-ek-id");
+CHIP_CPP20(constinit)
+const PosixConfig::Key PosixConfig::kConfigKey_FailSafeArmed = MakeConfigKey(kConfigNamespace_ChipConfig, "fail-safe-armed");
+CHIP_CPP20(constinit)
+const PosixConfig::Key PosixConfig::kConfigKey_RegulatoryLocation =
+    MakeConfigKey(kConfigNamespace_ChipConfig, "regulatory-location");
+CHIP_CPP20(constinit)
+const PosixConfig::Key PosixConfig::kConfigKey_CountryCode = MakeConfigKey(kConfigNamespace_ChipConfig, "country-code");
+CHIP_CPP20(constinit)
+const PosixConfig::Key PosixConfig::kConfigKey_UniqueId = MakeConfigKey(kConfigNamespace_ChipConfig, "unique-id");
 
 // Keys stored in the Chip-counters namespace
-const PosixConfig::Key PosixConfig::kCounterKey_TotalOperationalHours = { kConfigNamespace_ChipCounters,
-                                                                          "total-operational-hours" };
-const PosixConfig::Key PosixConfig::kCounterKey_BootReason            = { kConfigNamespace_ChipCounters, "boot-reason" };
+CHIP_CPP20(constinit)
+const PosixConfig::Key PosixConfig::kCounterKey_TotalOperationalHours =
+    MakeConfigKey(kConfigNamespace_ChipCounters, "total-operational-hours");
+CHIP_CPP20(constinit)
+const PosixConfig::Key PosixConfig::kCounterKey_BootReason = MakeConfigKey(kConfigNamespace_ChipCounters, "boot-reason");
 
 namespace {
 CHIP_ERROR MapToDeviceError(CHIP_ERROR err)

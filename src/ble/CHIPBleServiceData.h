@@ -49,6 +49,7 @@ enum chipBLEServiceDataType
  * Defines the over-the-air encoded format of the device identification information block that appears
  * within chip BLE service advertisement data.
  */
+// TODO: Support Network Recovery service data block
 struct ChipBLEDeviceIdentificationInfo
 {
     constexpr static uint16_t kDiscriminatorMask            = 0xfff;
@@ -133,6 +134,72 @@ struct ChipBLEDeviceIdentificationInfo
     }
 
 } __attribute__((packed));
+
+/**
+ * chip BLE Device Proximity Ranging Identification Information Block
+ *
+ * Defines the over-the-air encoded format of the proximity ranging identification
+ * information block that appears within chip BLE service advertisement data.
+ * Total size: 21 bytes.
+ */
+struct ChipBLEProximityRangingIdentificationInfo
+{
+    /**
+     * OpCode for Proximity Ranging BLE advertisement.
+     * Note: Shares value 0x02 with kchipBLEServiceDataType_TokenIdentificationInfo.
+     * Proximity Ranging payloads are distinguished by their unique struct layout (21 bytes).
+     */
+    constexpr static uint8_t kOpCode = 0x02;
+
+    constexpr static uint8_t kAdvertisementVersionMask      = 0xf0;
+    constexpr static uint8_t kAdvertisementVersionShiftBits = 4u;
+
+    uint8_t OpCode;                    // Byte 0: 0x02 = Proximity Ranging
+    uint8_t AdvVersionAndReserved;     // Byte 1: Bits[7:4] = Adv version, Bits[3:0] = Reserved
+    uint8_t MsgCounter[2];             // Bytes 2-3: 16-bit Message Counter (big-endian)
+    uint8_t ObfuscatedBLEDeviceId[16]; // Bytes 4-19: HMAC-SHA256 obfuscated BLEDeviceId
+    int8_t TxPower;                    // Byte 20: Tx Power
+
+    void Init()
+    {
+        memset(this, 0, sizeof(*this));
+        OpCode = kOpCode;
+    }
+
+    uint8_t GetAdvVersion() const
+    {
+        return static_cast<uint8_t>((AdvVersionAndReserved & kAdvertisementVersionMask) >> kAdvertisementVersionShiftBits);
+    }
+
+    void SetAdvVersion(uint8_t version)
+    {
+        AdvVersionAndReserved = static_cast<uint8_t>((AdvVersionAndReserved & ~kAdvertisementVersionMask) |
+                                                     ((version << kAdvertisementVersionShiftBits) & kAdvertisementVersionMask));
+    }
+
+    uint16_t GetMsgCounter() const { return chip::Encoding::BigEndian::Get16(MsgCounter); }
+
+    void SetMsgCounter(uint16_t counter) { chip::Encoding::BigEndian::Put16(MsgCounter, counter); }
+
+    int8_t GetTxPower() const { return TxPower; }
+
+    void SetTxPower(int8_t txPower) { TxPower = txPower; }
+
+    const uint8_t * GetObfuscatedBLEDeviceId() const { return ObfuscatedBLEDeviceId; }
+
+    void SetObfuscatedBLEDeviceId(const uint8_t * id)
+    {
+        if (id == nullptr)
+        {
+            return;
+        }
+        memcpy(ObfuscatedBLEDeviceId, id, sizeof(ObfuscatedBLEDeviceId));
+    }
+
+} __attribute__((packed));
+
+static_assert(sizeof(ChipBLEProximityRangingIdentificationInfo) == 21,
+              "Proximity Ranging identification info must be exactly 21 bytes");
 
 } /* namespace Ble */
 } /* namespace chip */

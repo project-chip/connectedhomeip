@@ -13,10 +13,10 @@ namespace ContentLauncher {
 namespace Commands {
 
 // Total number of client to server commands supported by the cluster
-inline constexpr uint32_t kAcceptedCommandsCount = 2;
+inline constexpr uint32_t kAcceptedCommandsCount = 4;
 
 // Total number of server to client commands supported by the cluster (response commands)
-inline constexpr uint32_t kGeneratedCommandsCount = 1;
+inline constexpr uint32_t kGeneratedCommandsCount = 2;
 
 namespace LaunchContent {
 inline constexpr CommandId Id = 0x00000000;
@@ -26,9 +26,21 @@ namespace LaunchURL {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace LaunchURL
 
+namespace ContentReplicationRequest {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace ContentReplicationRequest
+
+namespace PlayPreset {
+inline constexpr CommandId Id = 0x00000005;
+} // namespace PlayPreset
+
 namespace LauncherResponse {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace LauncherResponse
+
+namespace ContentReplicationResponse {
+inline constexpr CommandId Id = 0x00000004;
+} // namespace ContentReplicationResponse
 
 } // namespace Commands
 } // namespace ContentLauncher

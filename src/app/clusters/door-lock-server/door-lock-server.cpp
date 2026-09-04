@@ -35,6 +35,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;
@@ -45,9 +46,10 @@ using namespace chip::app::Clusters::DoorLock::Attributes;
 using chip::Protocols::InteractionModel::ClusterStatusCode;
 using chip::Protocols::InteractionModel::Status;
 
-static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_HOUR     = 23;
-static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_MINUTE   = 59;
-static constexpr uint8_t DOOR_LOCK_ALIRO_CREDENTIAL_SIZE = 65;
+static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_HOUR               = 23;
+static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_MINUTE             = 59;
+static constexpr uint8_t DOOR_LOCK_ALIRO_CREDENTIAL_SIZE           = 65;
+static constexpr uint8_t DOOR_LOCK_ALIRO_UNCOMPRESSED_POINT_PREFIX = 0x04;
 
 static constexpr uint32_t DOOR_LOCK_MAX_LOCK_TIMEOUT_SEC = MAX_INT32U_VALUE / MILLISECOND_TICKS_PER_SECOND;
 
@@ -406,6 +408,11 @@ bool IsValidUserStatusForSet(const Nullable<UserStatusEnum> & userStatus)
     return userStatus.IsNull() || (userStatus.Value() == UserStatusEnum::kOccupiedEnabled) ||
         (userStatus.Value() == UserStatusEnum::kOccupiedDisabled);
 }
+
+bool CredentialDataEqualConstantTime(const ByteSpan & a, const ByteSpan & b)
+{
+    return a.size() == b.size() && (a.empty() || Crypto::IsBufferContentEqualConstantTime(a.data(), b.data(), a.size()));
+}
 } // anonymous namespace
 
 void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandObj,
@@ -723,6 +730,15 @@ void DoorLockServer::setCredentialCommandHandler(
         return;
     }
 
+    // appclusters, SetCredentialResponse Status field (DoorLock.adoc#10211-status-field): return INVALID_COMMAND if
+    // CredentialData violates the uncompressed EC public key requirement in 5.2.6.9.
+    status = aliroCredentialDataValid(credentialType, credentialData);
+    if (DlStatus::kSuccess != status)
+    {
+        sendSetCredentialResponse(commandObj, commandPath, status, 0, nextAvailableCredentialSlot);
+        return;
+    }
+
     // appclusters, 5.2.4.41.1: we should return DUPLICATE in the response if we're trying to create duplicated credential entry
     for (uint16_t i = 1; CredentialTypeEnum::kProgrammingPIN != credentialType && (i <= maxNumberOfCredentials); ++i)
     {
@@ -748,7 +764,7 @@ void DoorLockServer::setCredentialCommandHandler(
             return;
         }
         if (DlCredentialStatus::kAvailable != currentCredential.status && currentCredential.credentialType == credentialType &&
-            currentCredential.credentialData.data_equal(credentialData))
+            CredentialDataEqualConstantTime(currentCredential.credentialData, credentialData))
         {
             ChipLogProgress(Zcl,
                             "[SetCredential] Credential with the same data and type already exist "
@@ -1668,6 +1684,30 @@ DlStatus DoorLockServer::credentialLengthWithinRange(chip::EndpointId endpointId
     return DlStatus::kSuccess;
 }
 
+DlStatus DoorLockServer::aliroCredentialDataValid(CredentialTypeEnum type, const chip::ByteSpan & credentialData)
+{
+    switch (type)
+    {
+    case CredentialTypeEnum::kAliroCredentialIssuerKey:
+    case CredentialTypeEnum::kAliroEvictableEndpointKey:
+    case CredentialTypeEnum::kAliroNonEvictableEndpointKey:
+        // Aliro credentials must be an uncompressed EC P-256 public key (0x04 || X || Y).
+        if (credentialData[0] != DOOR_LOCK_ALIRO_UNCOMPRESSED_POINT_PREFIX)
+        {
+            ChipLogProgress(Zcl,
+                            "Aliro credential data must be an uncompressed EC public key "
+                            "[credentialType=%u,firstByte=0x%02x]",
+                            to_underlying(type), credentialData[0]);
+            return DlStatus::kInvalidField;
+        }
+        break;
+    default:
+        break;
+    }
+
+    return DlStatus::kSuccess;
+}
+
 bool DoorLockServer::getMaxNumberOfCredentials(chip::EndpointId endpointId, CredentialTypeEnum credentialType,
                                                uint16_t & maxNumberOfCredentials)
 {
@@ -1944,7 +1984,7 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, Cred
                 return false;
             }
 
-            if (credentialInfo.credentialData.data_equal(credentialData))
+            if (CredentialDataEqualConstantTime(credentialInfo.credentialData, credentialData))
             {
                 userIndex       = i;
                 credentialIndex = credential.credentialIndex;

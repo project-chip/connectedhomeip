@@ -98,6 +98,7 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="ThreadMetrics" type="list">
       <entry type="ThreadMetricsStruct"/>
       <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
       <optionalConform/>
       <constraint>
         <maxCount value="64"/>
@@ -105,14 +106,17 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="CurrentHeapFree" type="uint64">
       <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0002" name="CurrentHeapUsed" type="uint64">
       <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0003" name="CurrentHeapHighWatermark" type="uint64">
       <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
       <mandatoryConform>
         <feature name="WTRMRK"/>
       </mandatoryConform>

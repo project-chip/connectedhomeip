@@ -103,7 +103,15 @@ if(CONFIG_CHIP_NXP_PLATFORM_MCXW71 OR CONFIG_CHIP_NXP_PLATFORM_MCXW72)
     target_sources(app
         PRIVATE
         ${SdkRootDirPath}/middleware/multicore/mcmgr/src/mcmgr_imu_internal.c
+        ${SdkRootDirPath}/middleware/wireless/framework/services/LowPower/PWR_systicks.c
         ${SdkRootDirPath}/components/gpio/fsl_adapter_gpio.c
+    )
+endif()
+
+if(CONFIG_CHIP_NXP_PLATFORM_MCXW72 AND CONFIG_NXP_USE_LOW_POWER)
+    target_sources(app
+        PRIVATE
+        ${NXP_MATTER_SUPPORT_DIR}/examples/platform/common/low_power/freertos_lp_hooks.c
     )
 endif()
 

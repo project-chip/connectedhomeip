@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <lib/dnssd/minimal_mdns/records/Txt.h>
 #include <lib/dnssd/minimal_mdns/responders/RecordResponder.h>
+#include <lib/dnssd/wire/records/Txt.h>
 
 namespace mdns {
 namespace Minimal {
@@ -26,7 +26,9 @@ namespace Minimal {
 class TxtResponder : public RecordResponder
 {
 public:
-    TxtResponder(const TxtResourceRecord & record) : RecordResponder(QType::TXT, record.GetName()), mRecord(record) {}
+    TxtResponder(const chip::Dnssd::TxtResourceRecord & record) :
+        RecordResponder(chip::Dnssd::QType::TXT, record.GetName()), mRecord(record)
+    {}
 
     void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
                          const ResponseConfiguration & configuration) override
@@ -36,14 +38,14 @@ public:
             return;
         }
 
-        TxtResourceRecord record = mRecord;
+        chip::Dnssd::TxtResourceRecord record = mRecord;
         configuration.Adjust(record);
         delegate->AddResponse(record);
         delegate->ResponsesAdded(*this);
     }
 
 private:
-    const TxtResourceRecord mRecord;
+    const chip::Dnssd::TxtResourceRecord mRecord;
 };
 
 } // namespace Minimal

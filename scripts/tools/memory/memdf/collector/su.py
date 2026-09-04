@@ -52,7 +52,7 @@ def read_su(config: Config, infile: IO) -> StackDF:
 
 def read_file(config: Config, filename: str, method: str = None) -> DFs:
     """Read a single `.su` file."""
-    with open(filename, 'r') as fp:
+    with open(filename) as fp:
         return {StackDF.name: read_su(config, fp)}
 
 
@@ -63,7 +63,7 @@ def read_dir(config: Config, dirname: str, method: str = None) -> DFs:
     for path, dirnames, filenames in os.walk(dirname):
         for filename in filenames:
             if su_re.fullmatch(filename):
-                with open(os.path.join(path, filename), 'r') as fp:
+                with open(os.path.join(path, filename)) as fp:
                     frames.append(read_su(config, fp))
     if frames:
         df = StackDF(pd.concat(frames, ignore_index=True))

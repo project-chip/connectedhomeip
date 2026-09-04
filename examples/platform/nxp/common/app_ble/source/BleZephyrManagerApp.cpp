@@ -53,8 +53,13 @@ uint8_t manuf_data[ADV_LEN] = {
 
 bt_uuid_16 UUID16_CHIPoBLEService = BT_UUID_INIT_16(0xFFF6);
 
+void BLEApplicationManager::PreMatterStackInit(void)
+{
+    /* Nothing to do */
+}
+
 /**
- * @brief Init BLE application manager
+ * @brief Set Custom BLE advertising parameters
  *
  * In this example, the application manager is used to customize BLE advertising
  * parameters. This example is provided for platforms with Zephyr BLE manager support.
@@ -79,8 +84,9 @@ bt_uuid_16 UUID16_CHIPoBLEService = BT_UUID_INIT_16(0xFFF6);
  * could be called. If InsertRequest API is called several time, only the request with the
  * higher priority will be advertise.
  *
+ * @note This function have to be called after Matter init to be able to get correct factory data values.
  */
-void BLEApplicationManager::Init(void)
+void BLEApplicationManager::PostMatterStackInit(void)
 {
     /* Register Matter adv data + custom adv data */
     static_assert(sizeof(serviceData) == 10, "Unexpected size of BLE advertising data!");

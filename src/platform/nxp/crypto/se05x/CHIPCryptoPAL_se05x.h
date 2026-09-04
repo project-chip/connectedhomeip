@@ -31,7 +31,7 @@ typedef struct hsm_pake_context_s
 {
     uint8_t spake_context[32];
     size_t spake_context_len;
-    uint8_t spake_objId;
+    uint16_t spake_objId;
 } hsm_pake_context_t;
 #endif // #if ((ENABLE_SE05X_SPAKE_VERIFIER) || (ENABLE_SE05X_SPAKE_PROVER))
 
@@ -76,6 +76,18 @@ public:
     CHIP_ERROR KeyConfirm(const uint8_t * in, size_t in_len) override;
 
     hsm_pake_context_t hsm_pake_context;
+
+private:
+    /**
+     * @brief Tracks whether SE05X is being used for the current SPAKE2+ session
+     *
+     *   - true: Using SE05x for SPAKE2+ operations
+     *   - false: Using software implementation (base class)
+     *
+     * When false, ComputeRoundOne, ComputeRoundTwo, and KeyConfirm
+     * delegate to the base class Spake2p software implementation.
+     */
+    bool usingSE05x = true;
 };
 
 #endif // #if ((ENABLE_SE05X_SPAKE_VERIFIER) || (ENABLE_SE05X_SPAKE_PROVER))

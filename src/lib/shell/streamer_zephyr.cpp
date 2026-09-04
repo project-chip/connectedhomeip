@@ -51,7 +51,7 @@ ssize_t streamer_zephyr_write(streamer_t * streamer, const char * buffer, size_t
     if (sShellInstance)
         shell_fprintf(sShellInstance, SHELL_NORMAL, "%.*s", length, buffer);
 
-    return length;
+    return static_cast<ssize_t>(length);
 }
 
 streamer_t sStreamer = {

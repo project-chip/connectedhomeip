@@ -20,17 +20,16 @@ ESP32-C6 supports both Wi-Fi and Thread transport protocols.
 
 -   To build for Matter Over Thread, use custom configuration file
 
-
     ```
     idf.py -DSDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.defaults.esp32c6_thread" set-target esp32c6 build
     ```
 
 ### Enabling ESP-Insights:
 
--   Before building the app, enable the option: ESP_INSIGHTS_ENABLED through
-    menuconfig.
+-   Before building the app, enable the options: `ESP_INSIGHTS_ENABLED` and
+    `CHIP_ENABLE_ESP_DIAGNOSTICS` through menuconfig.
 
--   Create a file named insights_auth_key.txt in the main directory of the
+-   Create a file named `insights_auth_key.txt` in the main directory of the
     example.
 
 -   Follow the steps present

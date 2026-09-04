@@ -38,8 +38,12 @@
 #include "OTAUtil.h"
 #endif
 
-#ifdef CONFIG_NET_L2_OPENTHREAD
+#ifdef CONFIG_OPENTHREAD
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+#endif
+
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#include <inet/EndPointStateOpenThread.h>
 #endif
 
 #ifdef CONFIG_CHIP_CRYPTO_PSA
@@ -80,10 +84,23 @@ bool sHaveBLEConnections   = false;
 chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
 #endif
 
-#ifdef CONFIG_NET_L2_OPENTHREAD
+#ifdef CONFIG_OPENTHREAD
 app::Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver>
     sThreadNetworkDriver(0 /*endpointId*/);
 #endif
+
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+void LockOpenThreadTask(void)
+{
+    chip::DeviceLayer::ThreadStackMgr().LockThreadStack();
+}
+
+void UnlockOpenThreadTask(void)
+{
+    chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
+}
+#endif // CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+
 } // namespace
 
 namespace LedConsts {
@@ -187,6 +204,16 @@ CHIP_ERROR AppTask::Init()
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
+
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    // Set up OpenThread configuration when OpenThread is included
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams{};
+    nativeParams.lockCb                = LockOpenThreadTask;
+    nativeParams.unlockCb              = UnlockOpenThreadTask;
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
+#endif
+
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
     AppFabricTableDelegate::Init();
 

@@ -34,6 +34,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kLanguageCode), languageCode);
+    encoder.Encode(to_underlying(Fields::kCharacteristics), characteristics);
     encoder.Encode(to_underlying(Fields::kDisplayName), displayName);
     return encoder.Finalize();
 }
@@ -51,6 +52,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         if (__context_tag == to_underlying(Fields::kLanguageCode))
         {
             err = DataModel::Decode(reader, languageCode);
+        }
+        else if (__context_tag == to_underlying(Fields::kCharacteristics))
+        {
+            err = DataModel::Decode(reader, characteristics);
         }
         else if (__context_tag == to_underlying(Fields::kDisplayName))
         {
@@ -96,6 +101,75 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 
 } // namespace TrackStruct
+
+namespace ContentInfoStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kContentType), contentType);
+    encoder.Encode(to_underlying(Fields::kTitle), title);
+    encoder.Encode(to_underlying(Fields::kShow), show);
+    encoder.Encode(to_underlying(Fields::kSeason), season);
+    encoder.Encode(to_underlying(Fields::kEpisode), episode);
+    encoder.Encode(to_underlying(Fields::kProvider), provider);
+    encoder.Encode(to_underlying(Fields::kArtist), artist);
+    encoder.Encode(to_underlying(Fields::kAlbum), album);
+    encoder.Encode(to_underlying(Fields::kTrack), track);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kContentType))
+        {
+            err = DataModel::Decode(reader, contentType);
+        }
+        else if (__context_tag == to_underlying(Fields::kTitle))
+        {
+            err = DataModel::Decode(reader, title);
+        }
+        else if (__context_tag == to_underlying(Fields::kShow))
+        {
+            err = DataModel::Decode(reader, show);
+        }
+        else if (__context_tag == to_underlying(Fields::kSeason))
+        {
+            err = DataModel::Decode(reader, season);
+        }
+        else if (__context_tag == to_underlying(Fields::kEpisode))
+        {
+            err = DataModel::Decode(reader, episode);
+        }
+        else if (__context_tag == to_underlying(Fields::kProvider))
+        {
+            err = DataModel::Decode(reader, provider);
+        }
+        else if (__context_tag == to_underlying(Fields::kArtist))
+        {
+            err = DataModel::Decode(reader, artist);
+        }
+        else if (__context_tag == to_underlying(Fields::kAlbum))
+        {
+            err = DataModel::Decode(reader, album);
+        }
+        else if (__context_tag == to_underlying(Fields::kTrack))
+        {
+            err = DataModel::Decode(reader, track);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace ContentInfoStruct
 
 namespace PlaybackPositionStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const

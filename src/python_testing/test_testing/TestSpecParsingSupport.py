@@ -22,7 +22,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.global_attribute_ids import GlobalAttributeIds
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.problem_notices import ProblemNotice
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import (ClusterParser, DataModelLevel, PrebuiltDataModelDirectory, XmlCluster,
@@ -263,12 +263,13 @@ PROVISIONAL_CLUSTER_TEMPLATE = """
 """
 
 
-class TestSpecParsingSupport(MatterBaseTest):
+class TestSpecParsingSupport(CertificationUnitTestNoDevice):
+
     def setup_class(self):
         super().setup_class()
         # Latest fully certified build
         self.spec_xml_clusters, self.spec_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
-        self.all_spec_clusters = {(id, c.name, c.pics) for id, c in self.spec_xml_clusters.items()}
+        self.all_spec_clusters = {(_id, c.name, c.pics) for _id, c in self.spec_xml_clusters.items()}
 
     def test_build_xml_override(self):
         one_two_clusters, one_two_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_2)
@@ -279,6 +280,7 @@ class TestSpecParsingSupport(MatterBaseTest):
         one_five_xml_clusters, one_five_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
         one_five_one_xml_clusters, one_five_one_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5_1)
         one_six_xml_clusters, one_six_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_6)
+        one_six_one_xml_clusters, one_six_one_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_6_1)
 
         # We know 1.2, 1.3, 1.4 and 1.4.1, 1.4.2 are clear of errors, ensure it stays that way.
         asserts.assert_equal(len(one_two_problems), 0, "Unexpected problems found on 1.2 cluster parsing")
@@ -295,6 +297,9 @@ class TestSpecParsingSupport(MatterBaseTest):
         for p in one_six_problems:
             print(p)
         asserts.assert_equal(len(one_six_problems), 0, "Unexpected problems found on 1.6 cluster parsing")
+        for p in one_six_one_problems:
+            print(p)
+        asserts.assert_equal(len(one_six_one_problems), 0, "Unexpected problems found on 1.6.1 cluster parsing")
 
         asserts.assert_greater(len(set(one_four_two_xml_clusters.keys()) - set(one_two_clusters.keys())),
                                0, "1.2.2 dir does not contain any clusters not in 1.3")
@@ -312,6 +317,8 @@ class TestSpecParsingSupport(MatterBaseTest):
                                      0, "1.5.1 has fewer clusters than 1.5")
         asserts.assert_greater_equal(len(set(one_six_xml_clusters.keys()) - set(one_five_one_xml_clusters.keys())),
                                      0, "1.6 has fewer clusters than 1.5.1")
+        asserts.assert_greater_equal(len(set(one_six_one_xml_clusters.keys()) - set(one_six_xml_clusters.keys())),
+                                     0, "1.6.1 has fewer clusters than 1.6")
 
         # The following clusters were removed in 1.3: Scenes, Leaf Wetness Measurement, Soil Moisture Measurement
         one_two_removed = {0x0005, 0x0407, 0x0408}
@@ -461,7 +468,7 @@ class TestSpecParsingSupport(MatterBaseTest):
         asserts.assert_equal(len(pure_base_clusters), 0, "Unexpected number of pure base clusters")
         asserts.assert_equal(len(ids_by_name), 2, "Unexpected number of ids by name")
 
-        ids = [(id, c.name) for id, c in clusters.items()]
+        ids = [(_id, c.name) for _id, c in clusters.items()]
         asserts.assert_true((0xFFFE, 'Test Alias1') in ids, "Unable to find Test Alias1 cluster in parsed clusters")
         asserts.assert_true((0xFFFD, 'Test Alias2') in ids, "Unable to find Test Alias2 cluster in parsed clusters")
 
@@ -515,26 +522,26 @@ class TestSpecParsingSupport(MatterBaseTest):
         pure_base_clusters: dict[str, XmlCluster] = {}
         ids_by_name: dict[str, int] = {}
         problems: list[ProblemNotice] = []
-        id = 0x0001
+        cid = 0x0001
 
         environment = jinja2.Environment()
         template = environment.from_string(PROVISIONAL_CLUSTER_TEMPLATE)
 
-        provisional = template.render(provisional=True, id=id)
+        provisional = template.render(provisional=True, id=cid)
         cluster_xml = ElementTree.fromstring(provisional)
         add_cluster_data_from_xml(cluster_xml, clusters, pure_base_clusters, ids_by_name, problems)
 
         asserts.assert_equal(len(problems), 0, "Unexpected problems parsing provisional cluster")
-        asserts.assert_in(id, clusters.keys(), "Provisional cluster not parsed")
-        asserts.assert_true(clusters[id].is_provisional, "Provisional cluster not marked as provisional")
+        asserts.assert_in(cid, clusters.keys(), "Provisional cluster not parsed")
+        asserts.assert_true(clusters[cid].is_provisional, "Provisional cluster not marked as provisional")
 
-        non_provisional = template.render(provisional=False, id=id)
+        non_provisional = template.render(provisional=False, id=cid)
         cluster_xml = ElementTree.fromstring(non_provisional)
         add_cluster_data_from_xml(cluster_xml, clusters, pure_base_clusters, ids_by_name, problems)
 
         asserts.assert_equal(len(problems), 0, "Unexpected problems parsing non-provisional cluster")
-        asserts.assert_in(id, clusters.keys(), "Non-provisional cluster not parsed")
-        asserts.assert_false(clusters[id].is_provisional, "Non-provisional cluster marked as provisional")
+        asserts.assert_in(cid, clusters.keys(), "Non-provisional cluster not parsed")
+        asserts.assert_false(clusters[cid].is_provisional, "Non-provisional cluster marked as provisional")
 
     def test_atomic_thermostat(self):
         one_four_two_xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_2)
@@ -561,6 +568,163 @@ class TestSpecParsingSupport(MatterBaseTest):
             "Atomic Response", one_three_clusters[Clusters.Thermostat.id].command_map, "Atomic response found on thermostat command map for 1.3")
         asserts.assert_not_in(response_id, one_three_clusters[Clusters.Thermostat.id].generated_commands.keys(),
                               "Atomic request found in thermostat generated command list for 1.3")
+
+    def test_is_scene_attribute(self):
+        # Each case is (attribute XML, expected scene flag).
+        cases = [
+            ('<attribute><quality scene="true"/></attribute>', True),
+            # Case-insensitive parsing of the attribute value.
+            ('<attribute><quality scene="TRUE"/></attribute>', True),
+            ('<attribute><quality scene="false"/></attribute>', False),
+            # scene attribute absent from the quality element defaults to False.
+            ('<attribute><quality nullable="true"/></attribute>', False),
+            # No quality element at all defaults to False.
+            ('<attribute/>', False),
+        ]
+        for attribute_xml, expected in cases:
+            element = ElementTree.fromstring(attribute_xml)
+            asserts.assert_equal(ClusterParser._is_scene_attribute(element), expected,
+                                 f"Unexpected scene quality parsed from '{attribute_xml}'")
+
+    def test_command_field_parsing(self):
+        # Synthetic cluster with one command exercising the constraint vocabulary
+        # used by command fields in the spec XML: exact length via <allowed>,
+        # min/max length, between with numeric bounds, and an attribute reference.
+        command_xml = (
+            f'<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="{CLUSTER_ID}" name="{CLUSTER_NAME}" revision="1">'
+            '  <revisionHistory>'
+            '    <revision revision="1" summary="Initial version"/>'
+            '  </revisionHistory>'
+            f' <clusterIds><clusterId id="{CLUSTER_ID}" name="{CLUSTER_NAME}"/></clusterIds>'
+            '  <classification hierarchy="base" role="application" picsCode="TEST" scope="Endpoint"/>'
+            '  <commands>'
+            '    <command id="0x00" name="Cmd" direction="commandToServer" response="Y">'
+            '      <access invokePrivilege="operate"/>'
+            '      <mandatoryConform/>'
+            '      <field id="0" name="ExactLengthKey" type="octstr">'
+            '        <mandatoryConform/>'
+            '        <constraint><allowed value="16"/></constraint>'
+            '      </field>'
+            '      <field id="1" name="BoundedName" type="string">'
+            '        <optionalConform/>'
+            '        <constraint><maxLength value="32"/></constraint>'
+            '      </field>'
+            '      <field id="2" name="BoundedNumber" type="uint16">'
+            '        <mandatoryConform/>'
+            '        <quality nullable="true"/>'
+            '        <constraint><between><from value="1"/><to value="100"/></between></constraint>'
+            '      </field>'
+            '      <field id="3" name="RefBounded" type="uint8">'
+            '        <mandatoryConform/>'
+            '        <constraint><between><from value="1"/><to><attribute name="MaxThing"/></to></between></constraint>'
+            '      </field>'
+            '      <field id="4" name="Unconstrained" type="uint64">'
+            '        <mandatoryConform/>'
+            '      </field>'
+            '    </command>'
+            '  </commands>'
+            '</cluster>')
+        xml_cluster = parse_cluster(command_xml)
+        asserts.assert_in(0x00, xml_cluster.accepted_commands, "Cmd not found in accepted commands")
+        fields = xml_cluster.accepted_commands[0x00].fields
+        asserts.assert_equal(sorted(fields.keys()), [0, 1, 2, 3, 4], "Unexpected command field IDs")
+
+        exact = fields[0]
+        asserts.assert_equal(exact.name, "ExactLengthKey", "Unexpected field name")
+        asserts.assert_equal(exact.type_info, "octstr", "Unexpected field type")
+        asserts.assert_equal(exact.constraints.allowed, ["16"], "Expected exact-length allowed constraint")
+
+        bounded_name = fields[1]
+        asserts.assert_true(bounded_name.is_optional, "BoundedName should be optional")
+        asserts.assert_equal(bounded_name.constraints.max_length, 32, "Unexpected max_length")
+
+        bounded_number = fields[2]
+        asserts.assert_true(bounded_number.is_nullable, "BoundedNumber should be nullable")
+        asserts.assert_equal(bounded_number.constraints.min_value, 1, "Unexpected min_value")
+        asserts.assert_equal(bounded_number.constraints.max_value, 100, "Unexpected max_value")
+
+        ref_bounded = fields[3]
+        asserts.assert_equal(ref_bounded.constraints.min_value, 1, "Unexpected min_value")
+        asserts.assert_is_none(ref_bounded.constraints.max_value, "max_value should be unresolved (reference)")
+        asserts.assert_equal(ref_bounded.constraints.max_value_ref.attribute, "MaxThing", "Unexpected max_value_ref")
+
+        asserts.assert_is_none(fields[4].constraints, "Unconstrained field should have no constraints")
+
+    def test_command_field_sibling_constraints(self):
+        # The spec XML expresses alternatives as repeated <constraint> siblings rather
+        # than one element holding several children (e.g. AudioStreamAllocate.BitDepth,
+        # SetUser.UserType). Every alternative must survive parsing, and bounds from an
+        # earlier sibling must not be lost when an <allowed> sibling follows them
+        # (ClearWeekDaySchedule.WeekDayIndex).
+        command_xml = (
+            f'<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="{CLUSTER_ID}" name="{CLUSTER_NAME}" revision="1">'
+            '  <revisionHistory><revision revision="1" summary="Initial version"/></revisionHistory>'
+            f' <clusterIds><clusterId id="{CLUSTER_ID}" name="{CLUSTER_NAME}"/></clusterIds>'
+            '  <classification hierarchy="base" role="application" picsCode="TEST" scope="Endpoint"/>'
+            '  <commands>'
+            '    <command id="0x00" name="Cmd" direction="commandToServer" response="Y">'
+            '      <access invokePrivilege="operate"/>'
+            '      <mandatoryConform/>'
+            '      <field id="0" name="BitDepth" type="uint8">'
+            '        <mandatoryConform/>'
+            '        <constraint><allowed value="8"/></constraint>'
+            '        <constraint><allowed value="16"/></constraint>'
+            '        <constraint><allowed value="24"/></constraint>'
+            '        <constraint><allowed value="32"/></constraint>'
+            '      </field>'
+            '      <field id="1" name="UserType" type="UserTypeEnum">'
+            '        <mandatoryConform/>'
+            '        <constraint><allowed><enum value="UnrestrictedUser"/></allowed></constraint>'
+            '        <constraint><allowed><enum value="NonAccessUser"/></allowed></constraint>'
+            '      </field>'
+            '      <field id="2" name="IndexOrWildcard" type="uint8">'
+            '        <mandatoryConform/>'
+            '        <constraint><between><from value="1"/><to value="10"/></between></constraint>'
+            '        <constraint><allowed value="0xFE"/></constraint>'
+            '      </field>'
+            '    </command>'
+            '  </commands>'
+            '</cluster>')
+        fields = parse_cluster(command_xml).accepted_commands[0x00].fields
+
+        asserts.assert_equal(fields[0].constraints.allowed, ["8", "16", "24", "32"],
+                             "Every allowed value from the sibling constraints should be retained")
+        asserts.assert_equal(fields[1].constraints.allowed, ["UnrestrictedUser", "NonAccessUser"],
+                             "Every allowed enum value from the sibling constraints should be retained")
+
+        wildcard = fields[2]
+        asserts.assert_equal(wildcard.constraints.min_value, 1, "Unexpected min_value")
+        asserts.assert_equal(wildcard.constraints.max_value, 10, "Unexpected max_value")
+        asserts.assert_equal(wildcard.constraints.allowed, ["0xFE"],
+                             "Sentinel allowed value from the trailing sibling constraint should be retained")
+
+    def test_command_field_parsing_prebuilt_data_model(self):
+        # Spot-check two constraints that exist on every root node in the real
+        # data model: TestEventTrigger.EnableKey (exact length 16 octstr) and
+        # SetRegulatoryConfig.CountryCode (exact length 2 string).
+        clusters, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_6_1)
+
+        test_event_trigger = clusters[Clusters.GeneralDiagnostics.id].accepted_commands[
+            Clusters.GeneralDiagnostics.Commands.TestEventTrigger.command_id]
+        enable_key = next(f for f in test_event_trigger.fields.values() if f.name == "EnableKey")
+        asserts.assert_equal(enable_key.type_info, "octstr", "Unexpected EnableKey type")
+        asserts.assert_equal(enable_key.constraints.allowed, ["16"], "Unexpected EnableKey constraint")
+
+        set_regulatory_config = clusters[Clusters.GeneralCommissioning.id].accepted_commands[
+            Clusters.GeneralCommissioning.Commands.SetRegulatoryConfig.command_id]
+        country_code = next(f for f in set_regulatory_config.fields.values() if f.name == "CountryCode")
+        asserts.assert_equal(country_code.type_info, "string", "Unexpected CountryCode type")
+        asserts.assert_equal(country_code.constraints.allowed, ["2"], "Unexpected CountryCode constraint")
+
+    def test_scene_attribute_end_to_end(self):
+        # CurrentMode (0x0001) in the base cluster XML carries scene="true", the
+        # other attributes carry scene="false".
+        xml_cluster = parse_cluster(BASE_CLUSTER_XML_STR)
+        asserts.assert_true(xml_cluster.attributes[0x0001].scene,
+                            "CurrentMode should carry the Scene (S) quality")
+        for attribute_id in (0x0000, 0x0002, 0x0003):
+            asserts.assert_false(xml_cluster.attributes[attribute_id].scene,
+                                 f"Attribute {attribute_id:#06x} should not carry the Scene (S) quality")
 
 
 if __name__ == "__main__":

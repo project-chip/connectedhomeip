@@ -28,6 +28,7 @@
 #include <binding-handler.h>
 #include <common/CHIPDeviceManager.h>
 #include <common/CommonDeviceCallbacks.h>
+#include <lib/support/CodeUtils.h>
 
 class AppDeviceCallbacks : public CommonDeviceCallbacks
 {
@@ -38,7 +39,7 @@ public:
 private:
     void OnOnOffPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
     void OnLevelControlAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
-#if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
+#if CONFIG_LED_TYPE_RMT
     void OnColorControlAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
 #endif
     void OnIdentifyPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint16_t size,
@@ -51,5 +52,5 @@ class AppDeviceCallbacksDelegate : public DeviceCallbacksDelegate
 public:
     void OnIPv4ConnectivityEstablished(void) override;
     void OnIPv4ConnectivityLost(void) override;
-    void OnDnssdInitialized(void) override { InitBindingHandlers(); }
+    void OnDnssdInitialized(void) override { LogErrorOnFailure(InitBindingHandlers()); }
 };

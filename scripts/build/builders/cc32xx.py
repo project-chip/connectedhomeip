@@ -15,7 +15,9 @@
 import os
 from enum import Enum, auto
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
 
 
@@ -28,14 +30,14 @@ class cc32xxApp(Enum):
             return 'lock-app'
         if self == cc32xxApp.AIR_PURIFIER:
             return 'air-purifier-app'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def AppNamePrefix(self):
         if self == cc32xxApp.LOCK:
             return 'chip-CC3235SF_LAUNCHXL-lock-example'
         if self == cc32xxApp.AIR_PURIFIER:
             return 'chip-CC3235SF_LAUNCHXL-air-purifier-example'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def BuildRoot(self, root):
         return os.path.join(root, 'examples', self.ExampleName(), 'cc32xx')
@@ -44,12 +46,11 @@ class cc32xxApp(Enum):
 class cc32xxBuilder(GnBuilder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: cc32xxApp = cc32xxApp.LOCK):
-        super(cc32xxBuilder, self).__init__(
-            root=app.BuildRoot(root),
-            runner=runner)
+        super().__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
         self.code_root = root
         self.app = app
 
@@ -65,13 +66,14 @@ class cc32xxBuilder(GnBuilder):
         args.append(f'ti_sysconfig_root="{sysconfig_root}"')
         return args
 
+    @lock_output_dir
     def build_outputs(self):
         if (self.app == cc32xxApp.LOCK):
             extensions = ["out", "bin"]
         elif (self.app == cc32xxApp.AIR_PURIFIER):
             extensions = ["out", "bin"]
         else:
-            raise Exception('Unknown app type: %r' % self.app)
+            raise Exception(f'Unknown app type: {self.app!r}')
         if self.options.enable_link_map_file:
             extensions.append("out.map")
         for ext in extensions:

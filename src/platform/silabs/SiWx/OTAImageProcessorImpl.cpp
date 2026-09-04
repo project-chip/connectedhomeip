@@ -186,7 +186,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
         // Account for last bytes of the image not yet written to storage
         imageProcessor->mParams.downloadedBytes += writeBufOffset;
         status = sl_si91x_fwup_load(writeBuffer, writeBufOffset);
-        ChipLogProgress(SoftwareUpdate, "status: 0x%lX", status);
+        ChipLogProgress(SoftwareUpdate, "status: 0x%" PRIx32, static_cast<uint32_t>(status));
 
         if (status != SL_STATUS_OK)
         {
@@ -196,7 +196,8 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
             }
             else
             {
-                ChipLogError(SoftwareUpdate, "ERROR: In HandleFinalize for last chunk sl_si91x_fwup_load() error 0x%lx", status);
+                ChipLogError(SoftwareUpdate, "ERROR: In HandleFinalize for last chunk sl_si91x_fwup_load() error 0x%" PRIx32,
+                             static_cast<uint32_t>(status));
                 imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
                 return;
             }
@@ -311,7 +312,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
                     }
                     else
                     {
-                        ChipLogError(SoftwareUpdate, "ERROR: In HandleProcessBlock sl_si91x_fwup_load() error 0x%lx", status);
+                        ChipLogError(SoftwareUpdate, "ERROR: In HandleProcessBlock sl_si91x_fwup_load() error 0x%" PRIx32, status);
                         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
                         return;
                     }
@@ -336,7 +337,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
         ReturnErrorOnFailure(error);
 
         // SL TODO -- store version somewhere
-        ChipLogProgress(SoftwareUpdate, "Image Header software version: %ld payload size: %lu", header.mSoftwareVersion,
+        ChipLogProgress(SoftwareUpdate, "Image Header software version: %" PRIu32 " payload size: %lu", header.mSoftwareVersion,
                         (long unsigned int) header.mPayloadSize);
         mParams.totalFileBytes = header.mPayloadSize;
         mHeaderParser.Clear();

@@ -14,7 +14,7 @@
 #    limitations under the License.
 #
 
-from typing import Generator
+from collections.abc import Generator
 
 from matter.idl.generators.cluster_selection import server_side_clusters
 from matter.idl.matter_idl_types import Idl

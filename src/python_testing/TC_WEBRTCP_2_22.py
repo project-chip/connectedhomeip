@@ -134,7 +134,7 @@ class TC_WEBRTCP_2_22(MatterBaseTest, WEBRTCPTestBase):
         )
         session_id = provide_offer_response.webRTCSessionID
         asserts.assert_true(session_id >= 0, f"Invalid session ID: {session_id}")
-        log.info(f"Valid WebRTC session ID: {session_id} is obtained")
+        log.info("Valid WebRTC session ID: %s is obtained", session_id)
 
         # Register session with WebRTC manager
         webrtc_manager.session_id_created(session_id, self.dut_node_id)
@@ -168,7 +168,7 @@ class TC_WEBRTCP_2_22(MatterBaseTest, WEBRTCPTestBase):
             log.error("Failed to establish webrtc session")
             raise Exception("Failed to establish webrtc session")
 
-        log.info(f"WebRTC session established with session ID: {session_id}")
+        log.info("WebRTC session established with session ID: %s", session_id)
 
         self.step(3)
         # Read CurrentSessions attribute and verify the session is present
@@ -179,11 +179,11 @@ class TC_WEBRTCP_2_22(MatterBaseTest, WEBRTCPTestBase):
         )
         asserts.assert_equal(len(current_sessions), 1, "Expected exactly 1 active session")
         asserts.assert_equal(current_sessions[0].id, session_id, "Session ID in CurrentSessions does not match")
-        log.info(f"Verified session {session_id} is present in CurrentSessions")
+        log.info("Verified session %s is present in CurrentSessions", session_id)
 
         self.step(4)
         # Send EndSession command
-        log.info(f"Sending EndSession command for session {session_id}")
+        log.info("Sending EndSession command for session %s", session_id)
         await self.send_single_cmd(
             cmd=Clusters.WebRTCTransportProvider.Commands.EndSession(
                 webRTCSessionID=session_id,
@@ -192,7 +192,7 @@ class TC_WEBRTCP_2_22(MatterBaseTest, WEBRTCPTestBase):
             endpoint=endpoint,
             payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
         )
-        log.info(f"Successfully sent EndSession command for session {session_id}")
+        log.info("Successfully sent EndSession command for session %s", session_id)
 
         self.step(5)
         # Read CurrentSessions attribute and verify the session is removed
@@ -202,7 +202,7 @@ class TC_WEBRTCP_2_22(MatterBaseTest, WEBRTCPTestBase):
             attribute=Clusters.WebRTCTransportProvider.Attributes.CurrentSessions
         )
         asserts.assert_equal(len(current_sessions), 0, "Expected session to be removed from CurrentSessions")
-        log.info(f"Verified session {session_id} has been removed from CurrentSessions")
+        log.info("Verified session %s has been removed from CurrentSessions", session_id)
 
         self.step(6)
         # Deallocate the Audio and Video streams to return DUT to known state
@@ -215,7 +215,7 @@ class TC_WEBRTCP_2_22(MatterBaseTest, WEBRTCPTestBase):
             ),
             endpoint=endpoint,
         )
-        log.info(f"Successfully deallocated audio stream {audio_stream_id}")
+        log.info("Successfully deallocated audio stream %s", audio_stream_id)
 
         # Deallocate video stream
         await self.send_single_cmd(
@@ -224,7 +224,7 @@ class TC_WEBRTCP_2_22(MatterBaseTest, WEBRTCPTestBase):
             ),
             endpoint=endpoint,
         )
-        log.info(f"Successfully deallocated video stream {video_stream_id}")
+        log.info("Successfully deallocated video stream %s", video_stream_id)
 
         # Clean up
         await webrtc_manager.close_all()

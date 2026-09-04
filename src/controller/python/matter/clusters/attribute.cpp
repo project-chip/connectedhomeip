@@ -81,15 +81,17 @@ using OnReadErrorCallback               = void (*)(PyObject * appContext, PyChip
 using OnReadDoneCallback                = void (*)(PyObject * appContext);
 using OnReportBeginCallback             = void (*)(PyObject * appContext);
 using OnReportEndCallback               = void (*)(PyObject * appContext);
+using OnNotifySubscriptionStillActiveCallback = void (*)(PyObject * appContext);
 
-OnReadAttributeDataCallback gOnReadAttributeDataCallback             = nullptr;
-OnReadEventDataCallback gOnReadEventDataCallback                     = nullptr;
-OnSubscriptionEstablishedCallback gOnSubscriptionEstablishedCallback = nullptr;
-OnResubscriptionAttemptedCallback gOnResubscriptionAttemptedCallback = nullptr;
-OnReadErrorCallback gOnReadErrorCallback                             = nullptr;
-OnReadDoneCallback gOnReadDoneCallback                               = nullptr;
-OnReportBeginCallback gOnReportBeginCallback                         = nullptr;
-OnReportBeginCallback gOnReportEndCallback                           = nullptr;
+OnReadAttributeDataCallback gOnReadAttributeDataCallback                         = nullptr;
+OnReadEventDataCallback gOnReadEventDataCallback                                 = nullptr;
+OnSubscriptionEstablishedCallback gOnSubscriptionEstablishedCallback             = nullptr;
+OnResubscriptionAttemptedCallback gOnResubscriptionAttemptedCallback             = nullptr;
+OnReadErrorCallback gOnReadErrorCallback                                         = nullptr;
+OnReadDoneCallback gOnReadDoneCallback                                           = nullptr;
+OnReportBeginCallback gOnReportBeginCallback                                     = nullptr;
+OnReportBeginCallback gOnReportEndCallback                                       = nullptr;
+OnNotifySubscriptionStillActiveCallback gOnNotifySubscriptionStillActiveCallback = nullptr;
 
 void PythonResubscribePolicy(uint32_t aNumCumulativeRetries, uint32_t & aNextSubscriptionIntervalMsec, bool & aShouldResubscribe)
 {
@@ -230,6 +232,11 @@ public:
 
     void OnReportEnd() override { gOnReportEndCallback(mAppContext); }
 
+    void NotifySubscriptionStillActive(const ReadClient & apReadClient) override
+    {
+        gOnNotifySubscriptionStillActiveCallback(mAppContext);
+    }
+
     void OnDone(ReadClient *) override
     {
         gOnReadDoneCallback(mAppContext);
@@ -266,7 +273,7 @@ struct __attribute__((packed)) PyReadAttributeParams
 PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT,
                                                size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT,
                                                chip::python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength,
-                                               bool forceLegacyListEncoding);
+                                               bool forceLegacyListEncoding, bool suppressResponse);
 PyChipError pychip_WriteClient_TestOnlyWriteAttributesWithMismatchedTimedRequestField(
     void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT, bool timedRequestFieldValue,
     size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT, chip::python::PyWriteAttributeData * writeAttributesData,
@@ -380,22 +387,24 @@ void pychip_ReadClient_InitCallbacks(OnReadAttributeDataCallback onReadAttribute
                                      OnSubscriptionEstablishedCallback onSubscriptionEstablishedCallback,
                                      OnResubscriptionAttemptedCallback onResubscriptionAttemptedCallback,
                                      OnReadErrorCallback onReadErrorCallback, OnReadDoneCallback onReadDoneCallback,
-                                     OnReportBeginCallback onReportBeginCallback, OnReportEndCallback onReportEndCallback)
+                                     OnReportBeginCallback onReportBeginCallback, OnReportEndCallback onReportEndCallback,
+                                     OnNotifySubscriptionStillActiveCallback onNotifySubscriptionStillActiveCallback)
 {
-    gOnReadAttributeDataCallback       = onReadAttributeDataCallback;
-    gOnReadEventDataCallback           = onReadEventDataCallback;
-    gOnSubscriptionEstablishedCallback = onSubscriptionEstablishedCallback;
-    gOnResubscriptionAttemptedCallback = onResubscriptionAttemptedCallback;
-    gOnReadErrorCallback               = onReadErrorCallback;
-    gOnReadDoneCallback                = onReadDoneCallback;
-    gOnReportBeginCallback             = onReportBeginCallback;
-    gOnReportEndCallback               = onReportEndCallback;
+    gOnReadAttributeDataCallback             = onReadAttributeDataCallback;
+    gOnReadEventDataCallback                 = onReadEventDataCallback;
+    gOnSubscriptionEstablishedCallback       = onSubscriptionEstablishedCallback;
+    gOnResubscriptionAttemptedCallback       = onResubscriptionAttemptedCallback;
+    gOnReadErrorCallback                     = onReadErrorCallback;
+    gOnReadDoneCallback                      = onReadDoneCallback;
+    gOnReportBeginCallback                   = onReportBeginCallback;
+    gOnReportEndCallback                     = onReportEndCallback;
+    gOnNotifySubscriptionStillActiveCallback = onNotifySubscriptionStillActiveCallback;
 }
 
 PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT,
                                                size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT,
                                                python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength,
-                                               bool forceLegacyListEncoding)
+                                               bool forceLegacyListEncoding, bool suppressResponse)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -408,7 +417,7 @@ PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * 
     std::unique_ptr<WriteClientCallback> callback = std::make_unique<WriteClientCallback>(appContext);
     std::unique_ptr<WriteClient> client           = std::make_unique<WriteClient>(
         app::InteractionModelEngine::GetInstance()->GetExchangeManager(), callback->GetChunkedCallback(),
-        timedWriteTimeoutMs != 0 ? Optional<uint16_t>(timedWriteTimeoutMs) : Optional<uint16_t>::Missing());
+        timedWriteTimeoutMs != 0 ? Optional<uint16_t>(timedWriteTimeoutMs) : Optional<uint16_t>::Missing(), suppressResponse);
 
     VerifyOrExit(device != nullptr && device->GetSecureSession().HasValue(), err = CHIP_ERROR_MISSING_SECURE_SESSION);
 

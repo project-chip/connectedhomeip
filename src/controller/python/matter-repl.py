@@ -17,24 +17,7 @@
 #    limitations under the License.
 #
 
-import sys
-
-import IPython
-from traitlets.config import Config
-
-
-def main():
-    c = Config()
-    c.InteractiveShellApp.exec_lines = [
-        "import importlib.util",
-        "spec = importlib.util.find_spec('matter.ReplStartup')",
-        "%run {spec.origin} " + " ".join(sys.argv[1:])
-    ]
-
-    sys.argv = [sys.argv[0]]
-
-    IPython.start_ipython(config=c)
-
+from matter.repl_main import main
 
 if __name__ == "__main__":
     main()

@@ -27,6 +27,11 @@
 #include <platform/ESP32/ESP32CHIPCryptoPAL.h>
 #endif // CONFIG_USE_ESP32_ECDSA_PERIPHERAL
 
+#ifdef CONFIG_USE_ESP32_TEE_DAC_KEY_PBKDF2
+#include <esp_tee_sec_storage.h>
+#include <platform/ESP32/ESP32FactoryDataProvider.h>
+#endif // CONFIG_USE_ESP32_TEE_DAC_KEY_PBKDF2
+
 #define TAG "dac_provider"
 
 #ifdef CONFIG_SEC_CERT_DAC_PROVIDER
@@ -119,6 +124,43 @@ CHIP_ERROR ESP32SecureCertDACProvider ::SignWithDeviceAttestationKey(const ByteS
     VerifyOrReturnError(!outSignBuffer.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!messageToSign.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+#ifdef CONFIG_USE_ESP32_TEE_DAC_KEY_PBKDF2
+    // The DAC private key is not stored anywhere: it is derived inside ESP-TEE via
+    // PBKDF2-HMAC-SHA256 (HMAC peripheral + eFuse HMAC key) and used to sign within
+    // the secure world. The key never leaves the TEE and is never exposed to the
+    // application (REE). The PBKDF2 salt is the device's Spake2p salt; the mfg tool
+    // must derive the matching public key with the same salt to issue the DAC.
+    {
+        uint8_t salt[Crypto::kSpake2p_Max_PBKDF_Salt_Length] = { 0 };
+        MutableByteSpan saltSpan(salt);
+        ReturnErrorOnFailure(ESP32FactoryDataProvider().GetSpake2pSalt(saltSpan));
+
+        uint8_t digest[Crypto::kSHA256_Hash_Length] = { 0 };
+        ReturnErrorOnFailure(Crypto::Hash_SHA256(messageToSign.data(), messageToSign.size(), digest));
+
+        // Use the full fixed-size salt buffer (zero-padded past the actual salt) so the
+        // derivation matches the manufacturing tool, which provisions the DAC using the
+        // same fixed-length salt.
+        esp_tee_sec_storage_pbkdf2_ctx_t ctx = {
+            .salt     = salt,
+            .salt_len = sizeof(salt),
+            .key_type = ESP_SEC_STG_KEY_ECDSA_SECP256R1,
+        };
+        esp_tee_sec_storage_ecdsa_sign_t teeSign     = {};
+        esp_tee_sec_storage_ecdsa_pubkey_t teePubkey = {};
+
+        esp_err = esp_tee_sec_storage_ecdsa_sign_pbkdf2(&ctx, digest, sizeof(digest), &teeSign, &teePubkey);
+        VerifyOrReturnError(esp_err == ESP_OK, CHIP_ERROR_INTERNAL,
+                            ESP_LOGE(TAG, "TEE PBKDF2 DAC signing failed, esp_err:%d", esp_err));
+
+        memcpy(signature.Bytes(), teeSign.sign_r, Crypto::kP256_FE_Length);
+        memcpy(signature.Bytes() + Crypto::kP256_FE_Length, teeSign.sign_s, Crypto::kP256_FE_Length);
+        ReturnErrorOnFailure(signature.SetLength(Crypto::kP256_ECDSA_Signature_Length_Raw));
+
+        return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
+    }
+#endif // CONFIG_USE_ESP32_TEE_DAC_KEY_PBKDF2
 
     esp_err = esp_secure_cert_get_priv_key_type(&keyType);
     VerifyOrReturnError(esp_err == ESP_OK, CHIP_ERROR_INCORRECT_STATE,

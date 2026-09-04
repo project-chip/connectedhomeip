@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 
 yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
 
-with open("scripts/tools/build_fail_definitions.yaml", "r") as fail_defs:
+with open("scripts/tools/build_fail_definitions.yaml") as fail_defs:
     try:
         error_catalog = yaml.safe_load(fail_defs)
     except Exception:
@@ -30,7 +30,7 @@ def pass_fail_rate(workflow):
         log.info("This workflow has already been processed.")
 
 
-def process_fail(id, pr, start_time, workflow):
+def process_fail(workflow_id, pr, start_time, workflow):
     log.info("Processing failure in PR '%s', workflow '%s' that started at '%s'", pr, workflow, start_time)
 
     log.info("Building output file structure.")
@@ -38,7 +38,8 @@ def process_fail(id, pr, start_time, workflow):
     os.makedirs(output_path)
 
     log.info("Gathering raw fail logs.")
-    subprocess.run(f"gh run view -R project-chip/connectedhomeip {id} --log-failed > {output_path}/fail_log.txt", shell=True)
+    subprocess.run(
+        f"gh run view -R project-chip/connectedhomeip {workflow_id} --log-failed > {output_path}/fail_log.txt", shell=True)
 
     # Eventually turn this into a catalog of error messages per workflow
     log.info("Collecting info on likely cause of failure.")

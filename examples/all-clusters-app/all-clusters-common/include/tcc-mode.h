@@ -39,9 +39,9 @@ class TccModeDelegate : public ModeBase::Delegate
 {
 private:
     using ModeTagStructType                     = detail::Structs::ModeTagStruct::Type;
-    ModeTagStructType modeTagsTccNormal[1]      = { { .value = to_underlying(ModeBase::ModeTag::kAuto) } };
-    ModeTagStructType modeTagsTccRapidCool[1]   = { { .value = to_underlying(ModeTag::kRapidCool) } };
-    ModeTagStructType modeTagsTccRapidFreeze[1] = { { .value = to_underlying(ModeTag::kRapidFreeze) } };
+    ModeTagStructType modeTagsTccNormal[1]      = { { .mfgCode = {}, .value = to_underlying(ModeBase::ModeTag::kAuto) } };
+    ModeTagStructType modeTagsTccRapidCool[1]   = { { .mfgCode = {}, .value = to_underlying(ModeTag::kRapidCool) } };
+    ModeTagStructType modeTagsTccRapidFreeze[1] = { { .mfgCode = {}, .value = to_underlying(ModeTag::kRapidFreeze) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
         detail::Structs::ModeOptionStruct::Type{

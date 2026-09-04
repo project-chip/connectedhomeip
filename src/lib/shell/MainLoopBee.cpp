@@ -37,7 +37,13 @@ typedef otError (*cmd)(void *, uint8_t, char **);
 
 otError matter_cmd_handler(void * aContext, uint8_t argc, char * argv[])
 {
-    Engine::Root().ExecCommand(argc, argv);
+    CHIP_ERROR retval = Engine::Root().ExecCommand(argc, argv);
+
+    if (retval != CHIP_NO_ERROR)
+    {
+        return OT_ERROR_FAILED;
+    }
+
     return OT_ERROR_NONE;
 }
 

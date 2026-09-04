@@ -63,8 +63,7 @@ public:
 
     struct Config
     {
-        Config(EndpointId endpoint, TimerDelegate & timerDelegate, LevelControlDelegate & delegate) :
-            mEndpointId(endpoint), mDelegate(delegate), mTimerDelegate(timerDelegate)
+        Config(TimerDelegate & timerDelegate, LevelControlDelegate & delegate) : mDelegate(delegate), mTimerDelegate(timerDelegate)
         {}
 
         Config & WithOnOff(OnOffCluster & onOffCluster)
@@ -127,7 +126,6 @@ public:
             return *this;
         }
 
-        EndpointId mEndpointId;
         LevelControlDelegate & mDelegate;
         TimerDelegate & mTimerDelegate;
         OnOffCluster * mOnOffCluster = nullptr;
@@ -145,7 +143,7 @@ public:
         DataModel::Nullable<uint16_t> mOffTransitionTime;
     };
 
-    LevelControlCluster(const Config & config);
+    LevelControlCluster(EndpointId endpoint, const Config & config);
     ~LevelControlCluster() = default;
 
     // ServerClusterInterface Implementation

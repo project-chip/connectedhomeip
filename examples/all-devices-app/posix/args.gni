@@ -25,3 +25,7 @@ chip_project_config_include_dirs =
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 
 chip_config_enable_groupcast = true
+
+matter_enable_tracing_support = true
+matter_log_json_payload_decode_full = true
+matter_log_json_payload_hex = true

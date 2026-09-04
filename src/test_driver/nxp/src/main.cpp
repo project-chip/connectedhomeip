@@ -36,6 +36,9 @@ using namespace ::chip::DeviceLayer;
 void test_task(void * pvParameters)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    // Initialize the configuration system.
+    err = Internal::NXPConfig::Init();
+    assert(err == CHIP_NO_ERROR);
 
     err = chip::Platform::MemoryInit();
     assert(err == CHIP_NO_ERROR);

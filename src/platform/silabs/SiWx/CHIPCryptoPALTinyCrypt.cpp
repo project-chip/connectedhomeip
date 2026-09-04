@@ -879,7 +879,12 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FELoad(const uint8_t * in, size_t in_l
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     uECC_word_t tmp[2 * NUM_ECC_WORDS] = { 0 };
-    uECC_vli_bytesToNative(tmp, in, NUM_ECC_BYTES);
+
+    VerifyOrReturnError(in != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(in_len <= sizeof(tmp), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError((in_len % sizeof(uECC_word_t)) == 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+    uECC_vli_bytesToNative(tmp, in, static_cast<int>(in_len));
 
     uECC_vli_mmod((uECC_word_t *) fe, tmp, curve_n);
 
@@ -1003,14 +1008,17 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointCofactorMul(void * R)
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1sin, size_t w1sin_len)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
+    int result       = UECC_SUCCESS;
 
-    result = UECC_SUCCESS;
-    uECC_word_t tmp[2 * NUM_ECC_WORDS];
-    uECC_word_t w1_bn[NUM_ECC_WORDS];
-    uECC_word_t L_tmp[2 * NUM_ECC_WORDS];
+    uECC_word_t tmp[2 * NUM_ECC_WORDS]   = { 0 };
+    uECC_word_t w1_bn[NUM_ECC_WORDS]     = { 0 };
+    uECC_word_t L_tmp[2 * NUM_ECC_WORDS] = { 0 };
 
-    uECC_vli_bytesToNative(tmp, w1sin, NUM_ECC_BYTES);
+    VerifyOrExit(w1sin != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(w1sin_len <= sizeof(tmp), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit((w1sin_len % sizeof(uECC_word_t)) == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    uECC_vli_bytesToNative(tmp, w1sin, static_cast<int>(w1sin_len));
 
     uECC_vli_mmod(w1_bn, tmp, curve_n);
 

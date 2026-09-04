@@ -94,7 +94,7 @@ class TC_ZONEMGMT_2_2(MatterBaseTest):
         # Implicit step to get the feature map to ensure attribute operations
         # are performed on supported features
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info("Rx'd FeatureMap: %s", aFeatureMap)
         self.twoDCartSupported = aFeatureMap & cluster.Bitmaps.Feature.kTwoDimensionalCartesianZone
         self.userDefinedSupported = aFeatureMap & cluster.Bitmaps.Feature.kUserDefined
         self.focusZonesSupported = aFeatureMap & cluster.Bitmaps.Feature.kFocusZones
@@ -121,7 +121,7 @@ class TC_ZONEMGMT_2_2(MatterBaseTest):
                 zone=zoneToCreate
             )
             cmdResponse = await self.send_single_cmd(endpoint=endpoint, cmd=createTwoDCartesianCmd)
-            log.info(f"Rx'd CreateTwoDCartesianZoneResponse : {cmdResponse}")
+            log.info("Rx'd CreateTwoDCartesianZoneResponse : %s", cmdResponse)
             asserts.assert_equal(type(cmdResponse), commands.CreateTwoDCartesianZoneResponse,
                                  "Incorrect response type")
             asserts.assert_is_not_none(
@@ -137,7 +137,7 @@ class TC_ZONEMGMT_2_2(MatterBaseTest):
             zonesAfterCreate = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.Zones
             )
-            log.info(f"Rx'd Zones: {zonesAfterCreate}")
+            log.info("Rx'd Zones: %s", zonesAfterCreate)
 
             matchingZone = next(
                 (z for z in zonesAfterCreate if z.zoneID == zoneID1), None)
@@ -160,7 +160,7 @@ class TC_ZONEMGMT_2_2(MatterBaseTest):
             maxUserDefinedZones = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MaxUserDefinedZones
             )
-            log.info(f"Rx'd MaxUserDefinedZones: {maxUserDefinedZones}")
+            log.info("Rx'd MaxUserDefinedZones: %s", maxUserDefinedZones)
 
             numOfZones = 0
             zoneIDs = []
@@ -179,7 +179,7 @@ class TC_ZONEMGMT_2_2(MatterBaseTest):
                     zone=zoneToCreate
                 )
                 cmdResponse = await self.send_single_cmd(endpoint=endpoint, cmd=createTwoDCartesianCmd)
-                log.info(f"Rx'd CreateTwoDCartesianZoneResponse : {cmdResponse}")
+                log.info("Rx'd CreateTwoDCartesianZoneResponse : %s", cmdResponse)
                 asserts.assert_equal(type(cmdResponse), commands.CreateTwoDCartesianZoneResponse,
                                      "Incorrect response type")
                 zoneIDs.append(cmdResponse.zoneID)
@@ -214,7 +214,7 @@ class TC_ZONEMGMT_2_2(MatterBaseTest):
             self.step("3a")
             for createdZoneId in zoneIDs:
                 try:
-                    log.info(f"Removing Zone with ID = {createdZoneId}")
+                    log.info("Removing Zone with ID = %s", createdZoneId)
                     await self.send_single_cmd(endpoint=endpoint, cmd=commands.RemoveZone(zoneID=createdZoneId))
                 except InteractionModelError as e:
                     asserts.assert_equal(e.status, Status.Success, "Unexpected error returned when trying to remove zone")
@@ -238,7 +238,7 @@ class TC_ZONEMGMT_2_2(MatterBaseTest):
                     zone=zoneToCreate
                 )
                 cmdResponse = await self.send_single_cmd(endpoint=endpoint, cmd=createTwoDCartesianCmd)
-                log.info(f"Rx'd CreateTwoDCartesianZoneResponse : {cmdResponse}")
+                log.info("Rx'd CreateTwoDCartesianZoneResponse : %s", cmdResponse)
                 asserts.assert_equal(type(cmdResponse), commands.CreateTwoDCartesianZoneResponse,
                                      "Incorrect response type")
             else:
@@ -258,7 +258,7 @@ class TC_ZONEMGMT_2_2(MatterBaseTest):
             twoDCartesianMax = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.TwoDCartesianMax
             )
-            log.info(f"Rx'd TwoDCartesianMax: {twoDCartesianMax}")
+            log.info("Rx'd TwoDCartesianMax: %s", twoDCartesianMax)
 
             # Form the Create request with one vertex exceeding TwoDCartesianMax and send
             zoneVertices = [
@@ -298,7 +298,7 @@ class TC_ZONEMGMT_2_2(MatterBaseTest):
                 zone=zoneToCreate
             )
             cmdResponse = await self.send_single_cmd(endpoint=endpoint, cmd=createTwoDCartesianCmd)
-            log.info(f"Rx'd CreateTwoDCartesianZoneResponse : {cmdResponse}")
+            log.info("Rx'd CreateTwoDCartesianZoneResponse : %s", cmdResponse)
             asserts.assert_equal(type(cmdResponse), commands.CreateTwoDCartesianZoneResponse,
                                  "Incorrect response type")
             asserts.assert_is_not_none(
@@ -492,10 +492,10 @@ class TC_ZONEMGMT_2_2(MatterBaseTest):
         zones = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.Zones
         )
-        log.info(f"Rx'd Zones: {zones}")
+        log.info("Rx'd Zones: %s", zones)
         for zone in zones:
             try:
-                log.info(f"Removing zone with Id : {zone.zoneID}")
+                log.info("Removing zone with Id : %s", zone.zoneID)
                 await self.send_single_cmd(endpoint=endpoint, cmd=commands.RemoveZone(zoneID=zone.zoneID))
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned when trying to remove zone")

@@ -16,7 +16,7 @@
 
 # The following lines of boilerplate have to be in your project's
 # CMakeLists in this exact order for cmake to work correctly
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.20)
 
 set(PROJECT_VER "v1.0")
 set(PROJECT_VER_NUMBER 1)
@@ -27,10 +27,32 @@ include(${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/cm
 set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/config/esp32/components"
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common"
+    "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/platform/esp32/led_widget"
 )
 
 if(${IDF_TARGET} STREQUAL "esp32")
     list(APPEND EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/m5stack-tft/repo/components")
+endif()
+
+# Pull the ESP-TEE secure-storage component only for TEE-enabled builds. IDF builds
+# every discovered component, and on released IDF this component's REE wrapper compiles
+# unconditionally and requires SECURE_ENABLE_TEE -- so a non-TEE build that merely
+# discovers it fails to compile. Gate discovery on the sdkconfig defaults enabling TEE.
+# ponytail: keyed on CONFIG_SECURE_ENABLE_TEE=y in a SDKCONFIG_DEFAULTS file. If TEE is
+# enabled only via menuconfig (no defaults file), add this component dir manually.
+set(_esp_tee_secstg "$ENV{IDF_PATH}/components/esp_tee/subproject/components/tee_sec_storage")
+if(EXISTS "${_esp_tee_secstg}")
+    foreach(_sdkcfg IN LISTS SDKCONFIG_DEFAULTS)
+        if(NOT IS_ABSOLUTE "${_sdkcfg}")
+            set(_sdkcfg "${CMAKE_CURRENT_LIST_DIR}/${_sdkcfg}")
+        endif()
+        if(EXISTS "${_sdkcfg}")
+            file(READ "${_sdkcfg}" _sdkcfg_content)
+            if(_sdkcfg_content MATCHES "CONFIG_SECURE_ENABLE_TEE=y")
+                list(APPEND EXTRA_COMPONENT_DIRS "${_esp_tee_secstg}")
+            endif()
+        endif()
+    endforeach()
 endif()
 
 
@@ -54,6 +76,10 @@ idf_build_set_property(COMPILE_OPTIONS "-Wno-format-nonliteral;-Wno-format-secur
 #
 # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80635
 idf_build_set_property(COMPILE_OPTIONS "-Wno-error=maybe-uninitialized" APPEND)
+
+# GCC 15 (ESP-IDF v6.0) is stricter about designated initializers that skip
+# optional fields. Demote to warning until upstream fixes land.
+idf_build_set_property(COMPILE_OPTIONS "-Wno-error=missing-field-initializers" APPEND)
 
 #For the H2, -Werror=uninitialized will cause an error in "src/lib/support/LambdaBridge.h"
 idf_build_set_property(COMPILE_OPTIONS "-Wno-error=uninitialized" APPEND)

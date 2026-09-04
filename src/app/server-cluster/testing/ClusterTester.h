@@ -112,6 +112,13 @@ public:
     TestServerClusterContext & GetTestContext() { return mTestServerClusterContext; }
     app::ServerClusterContext & GetServerClusterContext() { return mTestServerClusterContext.Get(); }
 
+    // The handler every Invoke() runs against. Exposed so a test can inspect a response
+    // or status the cluster adds after Invoke() has already returned — an async command
+    // that retains the handle and answers from a timer or a completion callback. Note
+    // that Invoke() clears the recorded responses and statuses, so read this before
+    // invoking anything else.
+    chip::Testing::MockCommandHandler & GetCommandHandler() { return mHandler; }
+
     // Read attribute into `out` parameter.
     // The `out` parameter must be of the correct type for the attribute being read.
     // Use `app::Clusters::<ClusterName>::Attributes::<AttributeName>::TypeInfo::DecodableType` for the `out` parameter to be spec

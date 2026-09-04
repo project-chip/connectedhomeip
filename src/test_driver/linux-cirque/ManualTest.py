@@ -17,12 +17,12 @@ limitations under the License.
 
 import json
 import logging
-import os
 import sys
 import time
 from optparse import OptionParser
 
 from helper.CHIPTestBase import CHIPVirtualHome
+from helper.paths import CHIP_REPO_PATH, CHIP_REPO_STR
 
 #############################################################
 
@@ -46,8 +46,6 @@ CHIP_PORT = 5540
 #############################################################
 
 CIRQUE_URL = "http://localhost:5000"
-CHIP_REPO = os.path.join(os.path.abspath(
-    os.path.dirname(__file__)), "..", "..", "..")
 
 logger = logging.getLogger('CHIPCirqueTest')
 logger.setLevel(logging.INFO)
@@ -75,8 +73,7 @@ class TestManually(CHIPVirtualHome):
     def wait_for_interrupt(self):
         self.logger.info("Finished setting up environment.")
         for device in self.non_ap_devices:
-            self.logger.info("Device: {} (Type: {}, Container: {})".format(
-                device["type"], device["type"], device["id"][:10]))
+            self.logger.info("Device: %s (Type: %s, Container: %s)", device["type"], device["type"], device["id"][:10])
         self.logger.info("Press Ctrl-C to stop the test.")
         self.logger.info("Container will be cleaned when the test finished.")
         try:
@@ -92,8 +89,8 @@ def _parse_mount_dir(config):
             continue
         _mount_pairs = v.get("mount_pairs", [])
         for mount in _mount_pairs:
-            mount[0] = mount[0].format(chip_repo=CHIP_REPO)
-            mount[1] = mount[1].format(chip_repo=CHIP_REPO)
+            mount[0] = mount[0].format(chip_repo=CHIP_REPO_STR)
+            mount[1] = mount[1].format(chip_repo=CHIP_REPO_STR)
         v["mount_pairs"] = _mount_pairs
     return config
 
@@ -123,7 +120,7 @@ if __name__ == "__main__":
     if not options.topologyFile:
         raise Exception("Must specify a topology file!")
 
-    with open(os.path.join(CHIP_REPO, options.topologyFile), "r") as fp:
+    with open(CHIP_REPO_PATH / options.topologyFile) as fp:
         config_operations = [_parse_mount_dir]
         DEVICE_CONFIG = json.load(fp)
         for op in config_operations:

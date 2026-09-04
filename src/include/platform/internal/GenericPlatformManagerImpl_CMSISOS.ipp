@@ -338,7 +338,7 @@ CHIP_ERROR GenericPlatformManagerImpl_CMSISOS<ImplClass>::_StartChipTimer(System
 {
     mChipTimerActive        = true;
     mNextTimerBaseTime      = osKernelGetTickCount();
-    mNextTimerDurationTicks = (System::Clock::Milliseconds64(delay).count() * osKernelGetTickFreq()) / 1000;
+    mNextTimerDurationTicks = static_cast<uint32_t>((System::Clock::Milliseconds64(delay).count() * osKernelGetTickFreq()) / 1000);
 
     // If the platform timer is being updated by a thread other than the event loop thread,
     // trigger the event loop thread to recalculate its wait time by posting a no-op event

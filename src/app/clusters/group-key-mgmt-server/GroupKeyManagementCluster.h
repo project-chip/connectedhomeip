@@ -59,8 +59,6 @@ public:
 
     // TODO: Once there is MCSP support, this may need to change.
     static constexpr bool IsMCSPSupported() { return false; }
-    // TODO: Hardcode this to true for now
-    static constexpr bool IsGCASTSupported() { return true; }
 
 private:
     Context mContext;

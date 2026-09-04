@@ -984,14 +984,6 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
     state->storedLevel              = storedLevel;
     state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
 
-#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-    // The level has changed, the scene is no longer valid.
-    if (emberAfContainsServer(endpoint, ScenesManagement::Id))
-    {
-        ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpoint);
-    }
-#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-
     // The setup was successful, so mark the new state as active and return.
     scheduleTimerCallbackMs(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
 

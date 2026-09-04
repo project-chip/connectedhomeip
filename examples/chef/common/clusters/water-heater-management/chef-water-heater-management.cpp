@@ -18,10 +18,13 @@
 
 #include "chef-water-heater-management.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
+
+#include <app/clusters/thermostat-server/AttributeAccessorShim.h>
 
 using namespace chip;
 using namespace chip::app;

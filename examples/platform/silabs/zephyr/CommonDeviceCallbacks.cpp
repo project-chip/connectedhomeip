@@ -49,7 +49,6 @@ using namespace ::chip::DeviceLayer;
 
 void chip::Zephyr::App::CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
-    ChipLogDetail(DeviceLayer, "DeviceEventCallback: 0x%04x", event->Type);
     switch (event->Type)
     {
     case DeviceEventType::kWiFiConnectivityChange:
@@ -81,17 +80,22 @@ void chip::Zephyr::App::CommonDeviceCallbacks::DeviceEventCallback(const ChipDev
         break;
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     case DeviceEventType::kThreadConnectivityChange:
-        if (!ConnectivityMgr().IsWiFiStationConnected() && (event->ThreadConnectivityChange.Result == kConnectivity_Established))
+        if (event->ThreadConnectivityChange.Result == kConnectivity_Established)
         {
+            ChipLogProgress(DeviceLayer, "Restarting Dnssd server for Thread connectivity change");
             // Restart DnsSd service when operating as Matter over Thread
             chip::app::DnssdServer::Instance().StartServer();
+        }
+        else if (event->ThreadConnectivityChange.Result == kConnectivity_Lost)
+        {
+            ChipLogProgress(DeviceLayer, "Thread connection lost");
         }
         break;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 #endif // CHIP_ENABLE_OPENTHREAD
     case DeviceLayer::DeviceEventType::kDnssdInitialized:
-        ChipLogProgress(DeviceLayer, "kDnssdInitialized");
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+        ChipLogProgress(DeviceLayer, "kDnssdInitialized");
         /* Initialize OTA Requestor */
         OTARequestorInitiator::Instance().InitOTA(reinterpret_cast<intptr_t>(&OTARequestorInitiator::Instance()));
 #endif
@@ -194,9 +198,3 @@ void chip::Zephyr::App::CommonDeviceCallbacks::OnCommissioningComplete(const chi
 #endif
 }
 #endif
-
-chip::DeviceManager::CHIPDeviceManagerCallbacks & chip::Zephyr::App::GetDeviceCallbacks()
-{
-    static chip::Zephyr::App::CommonDeviceCallbacks sDeviceCallbacks;
-    return sDeviceCallbacks;
-}

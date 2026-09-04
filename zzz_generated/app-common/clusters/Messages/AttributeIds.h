@@ -14,7 +14,7 @@ namespace Messages {
 namespace Attributes {
 
 // Total number of attributes supported by the cluster, including global attributes
-inline constexpr uint32_t kAttributesCount = 7;
+inline constexpr uint32_t kAttributesCount = 9;
 
 namespace Messages {
 inline constexpr AttributeId Id = 0x00000000;
@@ -23,6 +23,14 @@ inline constexpr AttributeId Id = 0x00000000;
 namespace ActiveMessageIDs {
 inline constexpr AttributeId Id = 0x00000001;
 } // namespace ActiveMessageIDs
+
+namespace SupportedLanguageCodes {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace SupportedLanguageCodes
+
+namespace SupportedMimeTypes {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace SupportedMimeTypes
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

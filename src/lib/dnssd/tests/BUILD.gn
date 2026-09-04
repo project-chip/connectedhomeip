@@ -16,6 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${chip_root}/build/chip/fuzz_test.gni")
 
 chip_test_suite("tests") {
   output_name = "libMdnsTests"
@@ -36,9 +37,52 @@ chip_test_suite("tests") {
       "TestIncrementalResolve.cpp",
     ]
 
-    public_deps +=
-        [ "${chip_root}/src/lib/dnssd/minimal_mdns/core/tests:support" ]
+    public_deps += [ "${chip_root}/src/lib/dnssd/wire/tests:support" ]
   }
 
   cflags = [ "-Wconversion" ]
+}
+
+if (pw_enable_fuzz_test_targets) {
+  chip_pw_fuzz_target("fuzz-dnssd-txt-fields-pw") {
+    test_source = [ "FuzzTxtFieldsPW.cpp" ]
+    public_deps = [
+      "${chip_root}/src/lib/dnssd",
+      "${chip_root}/src/platform/logging:default",
+    ]
+  }
+
+  chip_pw_fuzz_target("fuzz-dnssd-service-naming-pw") {
+    test_source = [ "FuzzServiceNamingPW.cpp" ]
+    public_deps = [
+      "${chip_root}/src/lib/dnssd",
+      "${chip_root}/src/platform/logging:default",
+    ]
+  }
+
+  # ActiveResolveAttempts and IncrementalResolve are only compiled into
+  # //src/lib/dnssd when chip_mdns is "minimal", so the targets that exercise
+  # them have to follow the same condition.
+  if (chip_mdns == "minimal") {
+    chip_pw_fuzz_target("fuzz-dnssd-active-resolve-attempts-pw") {
+      test_source = [ "FuzzActiveResolveAttemptsPW.cpp" ]
+      public_deps = [
+        "${chip_root}/src/lib/dnssd",
+        "${chip_root}/src/lib/dnssd/minimal_mdns",
+        "${chip_root}/src/lib/dnssd/wire",
+        "${chip_root}/src/platform/logging:default",
+      ]
+    }
+
+    chip_pw_fuzz_target("fuzz-mdns-resolver-pw") {
+      test_source = [ "FuzzMdnsResolverPW.cpp" ]
+      public_deps = [
+        "${chip_root}/src/lib/dnssd",
+        "${chip_root}/src/lib/dnssd/minimal_mdns",
+        "${chip_root}/src/lib/dnssd/wire",
+        "${chip_root}/src/lib/dnssd/wire/records",
+        "${chip_root}/src/platform/logging:default",
+      ]
+    }
+  }
 }

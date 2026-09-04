@@ -127,6 +127,7 @@ CHIP_ERROR TimedHandler::HandleTimedRequestAction(Messaging::ExchangeContext * a
     // will send nothing and the other side will have to time out to realize
     // it's missed its window).
     auto delay = System::Clock::Milliseconds32(timeoutMs);
+    VerifyOrReturnError(aExchangeContext->HasSessionHandle(), CHIP_ERROR_MISSING_SECURE_SESSION);
     aExchangeContext->SetResponseTimeout(std::max(delay,
                                                   aExchangeContext->GetSessionHandle()->ComputeRoundTripTimeout(
                                                       app::kExpectedIMProcessingTime, false /*isFirstMessageOnExchange*/)));

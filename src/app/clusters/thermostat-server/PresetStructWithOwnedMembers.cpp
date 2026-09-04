@@ -17,10 +17,10 @@
 
 #include "PresetStructWithOwnedMembers.h"
 
-using namespace chip;
-using namespace chip::app;
-using namespace DataModel;
+#include <app/data-model/Nullable.h>
+
 using namespace chip::app::Clusters::Thermostat::Structs;
+using namespace chip::app::DataModel;
 
 namespace chip {
 namespace app {
@@ -31,6 +31,14 @@ PresetStructWithOwnedMembers::PresetStructWithOwnedMembers(const PresetStruct::T
 {
     *this = other;
 }
+
+PresetStructWithOwnedMembers::PresetStructWithOwnedMembers(const PresetStructWithOwnedMembers & other) :
+    PresetStructWithOwnedMembers(static_cast<const PresetStruct::Type &>(other))
+{}
+
+PresetStructWithOwnedMembers::PresetStructWithOwnedMembers(PresetStructWithOwnedMembers && other) :
+    PresetStructWithOwnedMembers(static_cast<const PresetStruct::Type &>(other))
+{}
 
 PresetStructWithOwnedMembers & PresetStructWithOwnedMembers::operator=(const PresetStruct::Type & other)
 {
@@ -61,6 +69,16 @@ PresetStructWithOwnedMembers & PresetStructWithOwnedMembers::operator=(const Pre
     return *this;
 }
 
+PresetStructWithOwnedMembers & PresetStructWithOwnedMembers::operator=(PresetStructWithOwnedMembers && other)
+{
+    if (this == &other)
+    {
+        return *this;
+    }
+    *this = static_cast<const PresetStruct::Type &>(other);
+    return *this;
+}
+
 void PresetStructWithOwnedMembers::SetPresetScenario(PresetScenarioEnum enumValue)
 {
     presetScenario = enumValue;
@@ -74,7 +92,7 @@ CHIP_ERROR PresetStructWithOwnedMembers::SetPresetHandle(const Nullable<ByteSpan
         if (newPresetHandleSize > kPresetHandleSize)
         {
             ChipLogError(Zcl, "Failed to set Preset handle. New preset handle size (%u) > allowed preset handle size (%u)",
-                         static_cast<unsigned>(newPresetHandleSize), static_cast<unsigned>(kPresetNameSize));
+                         static_cast<unsigned>(newPresetHandleSize), static_cast<unsigned>(kPresetHandleSize));
             return CHIP_ERROR_NO_MEMORY;
         }
         MutableByteSpan targetSpan(presetHandleData);
@@ -91,27 +109,33 @@ CHIP_ERROR PresetStructWithOwnedMembers::SetPresetHandle(const Nullable<ByteSpan
 
 CHIP_ERROR PresetStructWithOwnedMembers::SetName(const Optional<DataModel::Nullable<CharSpan>> & newName)
 {
-    if (newName.HasValue() && !newName.Value().IsNull())
-    {
-        size_t newNameSize = newName.Value().Value().size();
-        if (newNameSize > kPresetNameSize)
-        {
-            ChipLogError(Zcl, "Failed to set Preset name. New name size (%u) > allowed preset name size (%u)",
-                         static_cast<unsigned>(newNameSize), static_cast<unsigned>(kPresetNameSize));
-            return CHIP_ERROR_NO_MEMORY;
-        }
-        MutableCharSpan targetSpan(presetNameData);
-        CharSpan newNameSpan = newName.Value().Value();
-        ReturnErrorOnFailure(CopyCharSpanToMutableCharSpan(newNameSpan, targetSpan));
-
-        DataModel::Nullable<CharSpan> nullableCharSpan;
-        nullableCharSpan.SetNonNull(targetSpan);
-        name.SetValue(nullableCharSpan);
-    }
-    else
+    if (!newName.HasValue())
     {
         name.ClearValue();
+        return CHIP_NO_ERROR;
     }
+    if (newName.Value().IsNull())
+    {
+        name.SetValue(DataModel::NullNullable);
+        return CHIP_NO_ERROR;
+    }
+
+    size_t newNameSize = newName.Value().Value().size();
+    if (newNameSize > kPresetNameSize)
+    {
+        ChipLogError(Zcl, "Failed to set Preset name. New name size (%u) > allowed preset name size (%u)",
+                     static_cast<unsigned>(newNameSize), static_cast<unsigned>(kPresetNameSize));
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    MutableCharSpan targetSpan(presetNameData);
+    CharSpan newNameSpan = newName.Value().Value();
+    ReturnErrorOnFailure(CopyCharSpanToMutableCharSpan(newNameSpan, targetSpan));
+
+    DataModel::Nullable<CharSpan> nullableCharSpan;
+    nullableCharSpan.SetNonNull(targetSpan);
+    name.SetValue(nullableCharSpan);
+
     return CHIP_NO_ERROR;
 }
 

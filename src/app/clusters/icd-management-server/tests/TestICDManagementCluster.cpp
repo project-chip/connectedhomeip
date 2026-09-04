@@ -60,8 +60,8 @@ TEST_F(TestIcdManagementCluster, TestAttributes)
     FabricTable fabricTable;
     ICDConfigurationData & icdConfig = ICDConfigurationData::GetInstance();
 
-    BitMask<IcdManagement::OptionalCommands> optionalCommands =
-        BitMask<IcdManagement::OptionalCommands>(IcdManagement::OptionalCommands::kStayActive);
+    ICDManagementCluster::OptionalCommandSet optionalCommands =
+        ICDManagementCluster::OptionalCommandSet().Set<IcdManagement::Commands::StayActiveRequest::Id>();
     BitMask<IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerHint(0);
 
     // Since ICDManagementClusterWithCIP is under the #if CHIP_CONFIG_ENABLE_ICD_CIP, we need to test both cases.
@@ -115,7 +115,7 @@ TEST_F(TestIcdManagementCluster, TestAttributes)
     ASSERT_TRUE(IsAttributesListEqualTo(cluster, expectedAttributes));
 
     // Test accepted commands list
-    bool hasStayActive = optionalCommands.Has(IcdManagement::OptionalCommands::kStayActive);
+    bool hasStayActive = optionalCommands.IsSet(IcdManagement::Commands::StayActiveRequest::Id);
 
     // Build expected accepted commands list dynamically
     if (hasCIP && (hasLIT || hasStayActive))

@@ -33,6 +33,7 @@
 #include <platform/internal/NFCCommissioningManager.h>
 #include <system/SystemClock.h>
 #include <tracing/metric_event.h>
+#include <utility>
 #include <vector>
 
 constexpr uint32_t kDeviceDiscoveredTimeout = CHIP_CONFIG_SETUP_CODE_PAIRER_DISCOVERY_TIMEOUT_SECS * chip::kMillisecondsPerSecond;
@@ -146,6 +147,20 @@ CHIP_ERROR SetUpCodePairer::Connect()
             else if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Controller, "Failed to start commissionable node discovery over NFC: %" CHIP_ERROR_FORMAT,
+                             err.Format());
+            }
+        }
+        if (ShouldDiscoverUsing(RendezvousInformationFlag::kThread))
+        {
+            CHIP_ERROR err = StartDiscoveryOverThreadMeshcop();
+            if ((CHIP_ERROR_NOT_IMPLEMENTED == err) || (CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE == err))
+            {
+                ChipLogProgress(Controller,
+                                "Skipping commissionable node discovery over ThreadMeshcop since not supported by the controller!");
+            }
+            else if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Controller, "Failed to start commissionable node discovery over ThreadMeshcop: %" CHIP_ERROR_FORMAT,
                              err.Format());
             }
         }
@@ -376,6 +391,72 @@ CHIP_ERROR SetUpCodePairer::StopDiscoveryOverNFC()
     ChipLogProgress(Controller, "Stopping commissionable node discovery over NFC by removing delegate");
     readerTransport->SetDelegate(nullptr);
 #endif
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SetUpCodePairer::StartDiscoveryOverThreadMeshcop()
+{
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    if (mSetupPayloads.size() != 1)
+    {
+        ChipLogError(Controller, "Thread Meshcop commissioning does not support concatenated QR codes yet.");
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
+    if (!mThreadMeshcopCommissionProxy)
+    {
+        ChipLogError(Controller, "The meshcopCommissioningProxy is not set");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (!mThreadMeshcopCommissionParams.HasValue() ||
+        mThreadMeshcopCommissionParams.Value().mBorderAgentAddress.GetTransportType() != Transport::Type::kThreadMeshcop)
+    {
+        ChipLogError(Controller, "The meshcopCommissioningParams is not set");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    auto & payload = mSetupPayloads[0];
+
+    ChipLogProgress(Controller, "Starting commissionable node discovery over Thread Meshcop");
+    VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    const SetupDiscriminator connDiscriminator(payload.discriminator);
+    Thread::DiscoveryCode code;
+    if (connDiscriminator.IsShortDiscriminator())
+    {
+        code = Thread::DiscoveryCode(connDiscriminator.GetShortValue());
+        ChipLogProgress(Controller, "Discovery code from short discriminator: 0x%" PRIx64, code.AsUInt64());
+    }
+    else
+    {
+        code = Thread::DiscoveryCode(connDiscriminator.GetLongValue());
+        ChipLogProgress(Controller, "Discovery code from long discriminator: 0x%" PRIx64, code.AsUInt64());
+    }
+
+    ByteSpan pskc(mThreadMeshcopCommissionParams.Value().mPSKcBuffer);
+    {
+        mWaitingForDiscovery[kThreadMeshcopTransport] = true;
+        Dnssd::DiscoveredNodeData discoveredNodeData;
+
+        CHIP_ERROR err = mThreadMeshcopCommissionProxy->Discover(pskc, mThreadMeshcopCommissionParams.Value().mBorderAgentAddress,
+                                                                 code, connDiscriminator, discoveredNodeData, 30);
+
+        mWaitingForDiscovery[kThreadMeshcopTransport] = false;
+        ReturnErrorOnFailure(err);
+        mCommissioner->OnNodeDiscovered(discoveredNodeData);
+        ChipLogProgress(Controller, "Joiner discovered");
+    }
+    return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif // CHIP_SUPPORT_THREAD_MESHCOP
+}
+
+CHIP_ERROR SetUpCodePairer::StopDiscoveryOverThreadMeshcop()
+{
+    // Currently we don't have any methods to stop discovery Over Thread Meshcop.
+    // Still return no error here to prevent error logs.
     return CHIP_NO_ERROR;
 }
 
@@ -662,17 +743,34 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::CommonRe
         // If the discovery type does not want the PASE auto retry mechanism, we will just store
         // a single IP. So the discovery process is stopped as it won't be of any help anymore.
         TEMPORARY_RETURN_IGNORED StopDiscoveryOverDNSSD();
-        mDiscoveredParameters.emplace_back(resolutionData, matchedLongDiscriminator, 0);
+        EnqueueDiscoveredParametersIfNotDuplicate(SetUpCodePairerParameters(resolutionData, matchedLongDiscriminator, 0));
     }
     else
     {
         for (size_t i = 0; i < resolutionData.numIPs; i++)
         {
-            mDiscoveredParameters.emplace_back(resolutionData, matchedLongDiscriminator, i);
+            EnqueueDiscoveredParametersIfNotDuplicate(SetUpCodePairerParameters(resolutionData, matchedLongDiscriminator, i));
         }
     }
 
     ConnectToDiscoveredDevice();
+}
+
+void SetUpCodePairer::EnqueueDiscoveredParametersIfNotDuplicate(SetUpCodePairerParameters && params)
+{
+    // The same device can be advertised more than once -- most notably the same non-link-local
+    // address arriving on multiple interfaces -- producing candidates that would drive an identical
+    // PASE attempt. Retrying the same attempt just wastes it and adds latency, so drop duplicates.
+    for (const SetUpCodePairerParameters & existing : mDiscoveredParameters)
+    {
+        if (existing.CanCoalesceWith(params))
+        {
+            ChipLogDetail(Controller, "SetUpCodePairer: dropping duplicate discovered rendezvous parameters");
+            return;
+        }
+    }
+
+    mDiscoveredParameters.emplace_back(std::move(params));
 }
 
 bool SetUpCodePairer::StopPairing(NodeId remoteId)
@@ -740,6 +838,7 @@ void SetUpCodePairer::StopAllDiscoveryAttempts()
     LogErrorOnFailure(StopDiscoveryOverDNSSD());
     LogErrorOnFailure(StopDiscoveryOverWiFiPAF());
     LogErrorOnFailure(StopDiscoveryOverNFC().NoErrorIf(CHIP_ERROR_NOT_FOUND));
+    LogErrorOnFailure(StopDiscoveryOverThreadMeshcop());
 
     // Just in case any of those failed to reset the waiting state properly.
     for (auto & waiting : mWaitingForDiscovery)

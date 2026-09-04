@@ -117,26 +117,45 @@ config CHIP_TASK_STACK_SIZE
 	int "The CHIP (Matter) thread stack size"
 	default 10240 if (LTO || PSA_CRYPTO_DRIVER_CC3XX)
 	default 9216 if PSA_CRYPTO_DRIVER_CRACEN
-	default 6144
+	default 8192
 	help
 	  Configures the stack size available for the CHIP (Matter) thread.
 
-config CHIP_FACTORY_DATA
-	bool "Factory data provider"
-	select ZCBOR
+choice CHIP_FACTORY_DATA_BACKEND
+	prompt "Factory data provider implementation"
+	default CHIP_FACTORY_DATA_NRFCONNECT_BACKEND
+
+config CHIP_FACTORY_DATA_NRFCONNECT_BACKEND
+	bool "nRF Connect factory data provider"
+	select CHIP_FACTORY_DATA
 	help
 	  Enables the default nRF Connect factory data provider implementation that
+	  supports reading the factory data encoded in the CBOR format from the
+	  flash memory partition.
+
+config CHIP_FACTORY_DATA_CUSTOM_BACKEND
+	bool "Custom factory data provider"
+	select CHIP_FACTORY_DATA
+	help
+	  Enables user's custom factory data provider implementation.
+
+config CHIP_FACTORY_DATA_NONE
+	bool "No factory data provider"
+	help
+	  Disables factory data support and does not provide any factory data provider implementation.
+
+endchoice
+
+config CHIP_FACTORY_DATA
+	bool "Factory data for nRF Connect"
+	select ZCBOR
+	help
+	  Default nRF Connect factory data provider implementation that
 	  supports reading the factory data encoded in the CBOR format from the
 	  flash memory partition. This option requires the factory_data partition in
 	  Partition Manager configuration file (pm_static.yml).
 
-config CHIP_FACTORY_DATA_CUSTOM_BACKEND
-	bool "Custom factory data provider"
-	depends on !CHIP_FACTORY_DATA
-	help
-	  Enables user's custom factory data provider implementation. This option
-	  cannot be used with the CHIP_FACTORY_DATA, which enables the default nRF
-	  Connect factory data provider implementation.
+if CHIP_FACTORY_DATA_NRFCONNECT_BACKEND
 
 config CHIP_FACTORY_DATA_BUILD
 	bool "Generate factory data contents"
@@ -163,18 +182,18 @@ config CHIP_FACTORY_DATA_ROTATING_DEVICE_UID_MAX_LEN
 	  Maximum acceptable length of rotating device ID unique ID in bytes.
 
 config CHIP_FACTORY_DATA_WRITE_PROTECT
-	bool "Enable Factory Data write protection"
+	bool "Factory Data write protection"
 	select FPROTECT
-	depends on CHIP_FACTORY_DATA && !SOC_SERIES_NRF54LX
+	depends on CHIP_FACTORY_DATA && !SOC_SERIES_NRF54L
 	default y
 	help
-		Enables the write protection of the Factory Data partition in the flash memory.
-		This is a recommended feature, but it requires the Settings partition size to be
-		a multiple of FPROTECT_BLOCK_SIZE and the Factory Data partition to be placed
-		right after the application partition in the address space (the Factory Data
-		partition offset must be equal to the last address of the application partition).
-		The second requirement is valid only when the FPROTECT_BLOCK_SIZE is bigger than
-		the flash memory page size.
+	  Enables the write protection of the Factory Data partition in the flash memory.
+	  This is a recommended feature, but it requires the Settings partition size to be
+	  a multiple of FPROTECT_BLOCK_SIZE and the Factory Data partition to be placed
+	  right after the application partition in the address space (the Factory Data
+	  partition offset must be equal to the last address of the application partition).
+	  The second requirement is valid only when the FPROTECT_BLOCK_SIZE is bigger than
+	  the flash memory page size.
 
 if CHIP_FACTORY_DATA_BUILD
 
@@ -203,23 +222,23 @@ choice CHIP_FACTORY_DATA_CERT_SOURCE
 	default CHIP_FACTORY_DATA_USE_DEFAULT_CERTS
 
 	config CHIP_FACTORY_DATA_USE_DEFAULT_CERTS
-		bool "Use pre-generated development certificates"
-		help
-		  Uses pre-generated certificate files from the
-		  credentials/development/attestation/ directory that match the
-		  configured Product ID. This can be used for development purpose.
+	bool "Use pre-generated development certificates"
+	help
+	  Uses pre-generated certificate files from the
+	  credentials/development/attestation/ directory that match the
+	  configured Product ID. This can be used for development purpose.
 
 	config CHIP_FACTORY_DATA_CERT_SOURCE_GENERATED
-		bool "Auto-generate certificates"
-		help
-		  Generates new certificates instead of using pre-generated ones. The
-		  certificates are generated on every build.
+	bool "Auto-generate certificates"
+	help
+	  Generates new certificates instead of using pre-generated ones. The
+	  certificates are generated on every build.
 
 	config CHIP_FACTORY_DATA_CERT_SOURCE_USER
-		bool "Use user-provided certificate files"
-		help
-		  Uses user-provided certificate files. The user needs to specify the
-		  absolute paths to all necessary files.
+	bool "Use user-provided certificate files"
+	help
+	  Uses user-provided certificate files. The user needs to specify the
+	  absolute paths to all necessary files.
 
 endchoice
 
@@ -264,6 +283,8 @@ config CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID
 	  Enables the generation of a random Rotating device ID unique ID.
 
 endif # CHIP_FACTORY_DATA_BUILD
+
+endif # CHIP_FACTORY_DATA_NRFCONNECT_BACKEND
 
 # See config/zephyr/Kconfig for full definition
 config CHIP_FACTORY_RESET_ERASE_SETTINGS
@@ -357,13 +378,14 @@ config CHIP_SUBSCRIPTION_RESUMPTION_RETRY_MULTIPLIER
 	  and added to CHIP_SUBSCRIPTION_RESUMPTION_MIN_RETRY_INTERVAL to obtain final wait time for next retry.
 
 config CHIP_ENABLE_BDX_LOG_TRANSFER
-	bool "Enable BDX transfer for diagnostic logs"
+	bool "BDX transfer for diagnostic logs"
 	help
 	  Enables the BDX protocol for diagnostics log transfer purposes.
 
 config CHIP_USE_OPENTHREAD_ENDPOINT
 	bool "Use OpenThread TCP/UDP stack directly"
-	depends on OPENTHREAD && !WIFI
+	default y
+	depends on OPENTHREAD && !WIFI && !NETWORKING
 	help
 	  Use OpenThread TCP/UDP stack directly instead of using Zephyr's networking layer.
 	  This option is not supported when using WiFi.
@@ -373,5 +395,81 @@ config CHIP_SYSTEM_PACKETBUFFER_POOL_SIZE
 	default 15
 	help
 	  Total number of packet buffers allocated by the stack for internal pool.
+
+config CHIP_WIFI
+	bool "nRF Connect Wi-Fi support"
+	select WIFI_NRF70
+	select WIFI
+	select WIFI_NM_WPA_SUPPLICANT
+	select NETWORKING
+	imply NET_STATISTICS
+	imply NET_L2_ETHERNET
+	imply NET_PKT_TXTIME
+	imply NET_PKT_TIMESTAMP
+	imply BUILD_OUTPUT_META
+	imply USE_DT_CODE_PARTITION # might be removed when the OTA is enabled
+	imply NET_IPV6_ND # enable Neighbor Discovery to handle Router Advertisements
+	imply NET_IPV6_NBR_CACHE
+	imply NET_STATISTICS_IPV6
+	imply NET_STATISTICS_USER_API
+	imply NET_CONFIG_NEED_IPV6
+
+choice CHIP_WIFI_CRYPTO_BACKEND
+	prompt "Wi-Fi crypto backend"
+	default CHIP_WIFI_CRYPTO_BACKEND_PSA if CHIP_CRYPTO_PSA
+	default CHIP_WIFI_CRYPTO_BACKEND_MBEDTLS
+	depends on CHIP_WIFI
+
+config CHIP_WIFI_CRYPTO_BACKEND_PSA
+	bool "Matter WiFi PSA crypto backend"
+    select PSA_WANT_ALG_ECDSA
+    select PSA_WANT_ALG_ECDH
+    select PSA_WANT_ECC_SECP_R1_256
+    select PSA_WANT_ALG_HKDF
+    select PSA_INTERNAL_TRUSTED_STORAGE
+    select MBEDTLS_PSA_CRYPTO_STORAGE_C if !BUILD_WITH_TFM
+    select TRUSTED_STORAGE if !BUILD_WITH_TFM
+    select HW_UNIQUE_KEY_WRITE_ON_CRYPTO_INIT if (SOC_NRF5340_CPUAPP || SOC_SERIES_NRF54L)
+    select MBEDTLS_PSA_CRYPTO_C
+    select PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_GENERATE
+	select PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_IMPORT
+	select PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_EXPORT
+	select PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_DERIVE
+
+config CHIP_WIFI_CRYPTO_BACKEND_MBEDTLS
+	bool "Matter WiFi mbedTLS crypto backend"
+	select MBEDTLS
+	imply NORDIC_SECURITY_BACKEND
+	imply MBEDTLS_PSA_CRYPTO_C
+	imply MBEDTLS_PROMPTLESS
+
+endchoice
+
+config CHIP_IM_PRETTY_PRINT
+	bool "Enable detailed logging of Matter messages"
+	depends on !CHIP_LOG_SIZE_OPTIMIZATION
+	depends on MATTER_LOG_LEVEL_DBG
+	help
+	  Enables enhanced verbosity for logging content of Matter messages. This configuration option
+	  facilitates detailed tracking of interactions, including Cluster ID, Endpoint ID, Attribute ID,
+	  or Command ID as well as payload content for all interaction types (like Read Request or Invoke
+	  Request). This option helps in debugging and development of message exchanges within the Matter
+	  protocol.
+
+config CHIP_CHIPOBLE_SINGLE_CONNECTION
+	bool "Single Connection Mode"
+	default y
+	depends on BT
+	help
+	  Limit support for chip-over-BLE (CHIPoBLE) to a single connection.
+	  When set, CHIPoBLE advertisements will stop while a CHIPoBLE connection is active.
+
+config CHIP_QSPI_NOR_POWER_MANAGEMENT_SUPPORT
+	bool "nRF QSPI NOR power management support"
+	default y
+	depends on PM_DEVICE && NORDIC_QSPI_NOR
+	help
+	  Enables management of nRF QSPI NOR external flash power state
+	  transitions during Matter operations.
 
 endif # CHIP

@@ -119,11 +119,17 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="VideoStreamID" type="VideoStreamID">
         <quality nullable="true"/>
-        <disallowConform/>
+        <otherwiseConform>
+          <optionalConform/>
+          <deprecateConform/>
+        </otherwiseConform>
       </field>
       <field id="3" name="AudioStreamID" type="AudioStreamID">
         <quality nullable="true"/>
-        <disallowConform/>
+        <otherwiseConform>
+          <optionalConform/>
+          <deprecateConform/>
+        </otherwiseConform>
       </field>
       <field id="4" name="ICEServers" type="list">
         <entry type="ICEServerStruct"/>
@@ -152,13 +158,13 @@ Davis, CA 95616, USA
       <field id="8" name="VideoStreams" type="list">
         <entry type="VideoStreamID"/>
         <otherwiseConform>
-          <optionalConform/>
           <optionalConform choice="b" more="true" min="1">
             <greaterOrEqualTerm>
               <revision value="current"/>
               <revision value="2"/>
             </greaterOrEqualTerm>
           </optionalConform>
+          <optionalConform/>
         </otherwiseConform>
         <constraint>
           <countBetween>
@@ -170,13 +176,13 @@ Davis, CA 95616, USA
       <field id="9" name="AudioStreams" type="list">
         <entry type="AudioStreamID"/>
         <otherwiseConform>
-          <optionalConform/>
           <optionalConform choice="b" more="true" min="1">
             <greaterOrEqualTerm>
               <revision value="current"/>
               <revision value="2"/>
             </greaterOrEqualTerm>
           </optionalConform>
+          <optionalConform/>
         </otherwiseConform>
         <constraint>
           <countBetween>
@@ -197,19 +203,25 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="VideoStreamID" type="VideoStreamID">
         <quality nullable="true"/>
-        <mandatoryConform>
-          <command name="SolicitOffer">
-            <field name="VideoStreamID"/>
-          </command>
-        </mandatoryConform>
+        <otherwiseConform>
+          <mandatoryConform>
+            <command name="SolicitOffer">
+              <field name="VideoStreamID"/>
+            </command>
+          </mandatoryConform>
+          <deprecateConform/>
+        </otherwiseConform>
       </field>
       <field id="3" name="AudioStreamID" type="AudioStreamID">
         <quality nullable="true"/>
-        <mandatoryConform>
-          <command name="SolicitOffer">
-            <field name="AudioStreamID"/>
-          </command>
-        </mandatoryConform>
+        <otherwiseConform>
+          <mandatoryConform>
+            <command name="SolicitOffer">
+              <field name="AudioStreamID"/>
+            </command>
+          </mandatoryConform>
+          <deprecateConform/>
+        </otherwiseConform>
       </field>
     </command>
     <command id="0x02" name="ProvideOffer" direction="commandToServer" response="ProvideOfferResponse">
@@ -224,18 +236,40 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
       <field id="2" name="StreamUsage" type="StreamUsageEnum">
-        <mandatoryConform/>
+        <otherwiseConform>
+          <mandatoryConform>
+            <equalTerm>
+              <field name="WebRTCSessionID"/>
+              <literal value="null"/>
+            </equalTerm>
+          </mandatoryConform>
+          <optionalConform/>
+        </otherwiseConform>
       </field>
       <field id="3" name="OriginatingEndpointID" type="endpoint-no">
-        <mandatoryConform/>
+        <otherwiseConform>
+          <mandatoryConform>
+            <equalTerm>
+              <field name="WebRTCSessionID"/>
+              <literal value="null"/>
+            </equalTerm>
+          </mandatoryConform>
+          <optionalConform/>
+        </otherwiseConform>
       </field>
       <field id="4" name="VideoStreamID" type="VideoStreamID">
         <quality nullable="true"/>
-        <disallowConform/>
+        <otherwiseConform>
+          <optionalConform/>
+          <deprecateConform/>
+        </otherwiseConform>
       </field>
       <field id="5" name="AudioStreamID" type="AudioStreamID">
         <quality nullable="true"/>
-        <disallowConform/>
+        <otherwiseConform>
+          <optionalConform/>
+          <deprecateConform/>
+        </otherwiseConform>
       </field>
       <field id="6" name="ICEServers" type="list">
         <entry type="ICEServerStruct"/>
@@ -252,7 +286,13 @@ Davis, CA 95616, USA
       </field>
       <field id="8" name="MetadataEnabled" type="bool">
         <mandatoryConform>
-          <feature name="METADATA"/>
+          <andTerm>
+            <feature name="METADATA"/>
+            <equalTerm>
+              <field name="WebRTCSessionID"/>
+              <literal value="null"/>
+            </equalTerm>
+          </andTerm>
         </mandatoryConform>
       </field>
       <field id="9" name="SFrameConfig" type="SFrameStruct">
@@ -264,7 +304,6 @@ Davis, CA 95616, USA
       <field id="10" name="VideoStreams" type="list">
         <entry type="VideoStreamID"/>
         <otherwiseConform>
-          <optionalConform/>
           <optionalConform choice="d" more="true" min="1">
             <andTerm>
               <greaterOrEqualTerm>
@@ -277,6 +316,7 @@ Davis, CA 95616, USA
               </equalTerm>
             </andTerm>
           </optionalConform>
+          <optionalConform/>
         </otherwiseConform>
         <constraint>
           <countBetween>
@@ -288,7 +328,6 @@ Davis, CA 95616, USA
       <field id="11" name="AudioStreams" type="list">
         <entry type="AudioStreamID"/>
         <otherwiseConform>
-          <optionalConform/>
           <optionalConform choice="d" more="true" min="1">
             <andTerm>
               <greaterOrEqualTerm>
@@ -301,6 +340,7 @@ Davis, CA 95616, USA
               </equalTerm>
             </andTerm>
           </optionalConform>
+          <optionalConform/>
         </otherwiseConform>
         <constraint>
           <countBetween>
@@ -318,19 +358,25 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="VideoStreamID" type="VideoStreamID">
         <quality nullable="true"/>
-        <mandatoryConform>
-          <command name="ProvideOffer">
-            <field name="VideoStreamID"/>
-          </command>
-        </mandatoryConform>
+        <otherwiseConform>
+          <mandatoryConform>
+            <command name="ProvideOffer">
+              <field name="VideoStreamID"/>
+            </command>
+          </mandatoryConform>
+          <deprecateConform/>
+        </otherwiseConform>
       </field>
       <field id="2" name="AudioStreamID" type="AudioStreamID">
         <quality nullable="true"/>
-        <mandatoryConform>
-          <command name="ProvideOffer">
-            <field name="AudioStreamID"/>
-          </command>
-        </mandatoryConform>
+        <otherwiseConform>
+          <mandatoryConform>
+            <command name="ProvideOffer">
+              <field name="AudioStreamID"/>
+            </command>
+          </mandatoryConform>
+          <deprecateConform/>
+        </otherwiseConform>
       </field>
     </command>
     <command id="0x04" name="ProvideAnswer" direction="commandToServer" response="Y">

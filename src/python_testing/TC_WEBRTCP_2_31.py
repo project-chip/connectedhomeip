@@ -95,7 +95,7 @@ class TC_WebRTCP_2_31(MatterBaseTest, WEBRTCPTestBase):
             cluster=avsm_cluster,
             attribute=avsm_cluster.Attributes.StreamUsagePriorities
         )
-        log.info(f"Rx'd StreamUsagePriorities: {stream_usage_priorities}")
+        log.info("Rx'd StreamUsagePriorities: %s", stream_usage_priorities)
         asserts.assert_greater(len(stream_usage_priorities), 0, "StreamUsagePriorities must not be empty")
 
         # Step 6: a supported usage that doesn't match the kLiveView allocation
@@ -124,10 +124,10 @@ class TC_WebRTCP_2_31(MatterBaseTest, WEBRTCPTestBase):
             cluster=avsm_cluster,
             attribute=avsm_cluster.Attributes.FeatureMap
         )
-        log.info(f"Rx'd AVSM FeatureMap: {avsm_feature_map}")
+        log.info("Rx'd AVSM FeatureMap: %s", avsm_feature_map)
         video_supported = bool(avsm_feature_map & avsm_cluster.Bitmaps.Feature.kVideo)
         audio_supported = bool(avsm_feature_map & avsm_cluster.Bitmaps.Feature.kAudio)
-        log.info(f"Video supported: {video_supported}, Audio supported: {audio_supported}")
+        log.info("Video supported: %s, Audio supported: %s", video_supported, audio_supported)
 
         self.step(1)
         current_sessions = await self.read_single_attribute_check_success(
@@ -184,7 +184,7 @@ class TC_WebRTCP_2_31(MatterBaseTest, WEBRTCPTestBase):
             self.skip_step(6)
         else:
             self.step(6)
-            log.info(f"Using non-matching supported usage: {non_matching_supported_usage} for step 6")
+            log.info("Using non-matching supported usage: %s for step 6", non_matching_supported_usage)
             cmd = cluster.Commands.SolicitOffer(
                 streamUsage=non_matching_supported_usage,
                 originatingEndpointID=endpoint,
@@ -200,7 +200,7 @@ class TC_WebRTCP_2_31(MatterBaseTest, WEBRTCPTestBase):
             self.skip_step(7)
         else:
             self.step(7)
-            log.info(f"Using unsupported usage: {unsupported_usage} for step 7")
+            log.info("Using unsupported usage: %s for step 7", unsupported_usage)
             cmd = cluster.Commands.SolicitOffer(
                 streamUsage=unsupported_usage,
                 originatingEndpointID=endpoint,

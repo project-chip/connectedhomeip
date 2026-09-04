@@ -21,10 +21,25 @@
 #  you've written is kosher to CI
 #
 # Usage:
-#  restyle-diff.sh [-d] [ref]
+#  restyle-diff.sh [-d] [-p] [-c] [-u] [-h] [ref]
 #
 # if unspecified, ref defaults to upstream/master (or master)
 # -d enables debug logging for Restyle CLI
+# -p pull restyler Docker images before running (default: skip pull, reuse cached images)
+# -c explicitly pass --commit to restyle CLI to generate commits per tool
+# -u automatically push resulting commits using 'git push'
+# -h show this help message
+
+show_help() {
+    echo "Usage: restyle-diff.sh [-d] [-p] [-c] [-u] [-h] [ref]"
+    echo
+    echo "  [ref]  Base reference for restyle (defaults to upstream/master or master)"
+    echo "  -d     Enable debug logging for Restyle CLI"
+    echo "  -p     Pull restyler Docker images before running"
+    echo "  -c     Explicitly pass --commit to restyle CLI to generate commits per tool"
+    echo "  -u     Automatically push resulting commits using 'git push'"
+    echo "  -h     Show this help message"
+}
 #
 
 here=${0%/*}
@@ -39,8 +54,12 @@ cd "$CHIP_ROOT"
 restyle-paths() {
     [[ $# -eq 0 ]] && return 0
 
-    echo "[restyle-diff.sh] Please wait, Restyling files (and Pulling restyler Docker images if needed)"
-    restyle --config-file=.restyled.yaml "$@"
+    if [[ "$PULL" == "True" ]]; then
+        echo "[restyle-diff.sh] Please wait, Restyling files (and Pulling restyler Docker images if needed)"
+    else
+        echo "[restyle-diff.sh] Please wait, Restyling files (using cached images; pass -p to pull updates)"
+    fi
+    restyle --config-file=.restyled.yaml "${COMMIT_FLAG:+"$COMMIT_FLAG"}" "$@"
 
     # warn if restyle left any files owned by root (which means older restyle-CLI is being used)
     root_owned=$(find "$@" -maxdepth 0 -user 0 2>/dev/null || true)
@@ -115,11 +134,35 @@ ensure_restyle_installed() {
 
 # This was added to be able to use xargs to call the function restyle-paths
 export -f restyle-paths
+
+# Default to skipping image pulls; image tags in .restyled.yaml are pinned, so cached images stay correct until the .restyled.yaml
+# config bumps a tag. When that happens, Restyle CLI's `docker run --pull never` fails with a "No such image" error;
+# if you see that error, re-run this script with -p to fetch the new image.
+export PULL=False
+export PUSH=False
+export COMMIT_FLAG=""
+
 while [[ $# -gt 0 ]]; do
     case "$1" in
         -d)
             export DEBUG=True
             shift
+            ;;
+        -p)
+            export PULL=True
+            shift
+            ;;
+        -c)
+            export COMMIT_FLAG="--commit"
+            shift
+            ;;
+        -u)
+            export PUSH=True
+            shift
+            ;;
+        -h | --help)
+            show_help
+            exit 0
             ;;
         *)
             ref="$1"
@@ -138,3 +181,8 @@ paths=$(git diff --ignore-submodules --name-only --merge-base "$ref")
 ensure_restyle_installed
 
 echo "$paths" | xargs -n "$MAX_ARGS" "$BASH" -c 'restyle-paths "$@"' -
+
+if [[ "$PUSH" == "True" ]]; then
+    echo "[restyle-diff.sh] Pushing changes..."
+    git push
+fi

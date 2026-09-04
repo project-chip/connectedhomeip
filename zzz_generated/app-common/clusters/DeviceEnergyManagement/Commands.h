@@ -87,6 +87,16 @@ struct Type;
 struct DecodableType;
 } // namespace CancelRequest
 
+namespace PowerRangeAdjustRequest {
+struct Type;
+struct DecodableType;
+} // namespace PowerRangeAdjustRequest
+
+namespace CancelPowerRangeAdjustRequest {
+struct Type;
+struct DecodableType;
+} // namespace CancelPowerRangeAdjustRequest
+
 } // namespace Commands
 
 namespace Commands {
@@ -368,6 +378,78 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CancelRequest
+namespace PowerRangeAdjustRequest {
+enum class Fields : uint8_t
+{
+    kMinPower = 0,
+    kMaxPower = 1,
+    kDuration = 2,
+    kCause    = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::PowerRangeAdjustRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagement::Id; }
+
+    DataModel::Nullable<int64_t> minPower;
+    DataModel::Nullable<int64_t> maxPower;
+    uint32_t duration         = static_cast<uint32_t>(0);
+    AdjustmentCauseEnum cause = static_cast<AdjustmentCauseEnum>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::PowerRangeAdjustRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    DataModel::Nullable<int64_t> minPower;
+    DataModel::Nullable<int64_t> maxPower;
+    uint32_t duration         = static_cast<uint32_t>(0);
+    AdjustmentCauseEnum cause = static_cast<AdjustmentCauseEnum>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace PowerRangeAdjustRequest
+namespace CancelPowerRangeAdjustRequest {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::CancelPowerRangeAdjustRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagement::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::CancelPowerRangeAdjustRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace CancelPowerRangeAdjustRequest
 } // namespace Commands
 } // namespace DeviceEnergyManagement
 } // namespace Clusters

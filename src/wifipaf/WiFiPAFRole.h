@@ -29,12 +29,13 @@ typedef enum
 } WiFiPafRole;
 
 inline constexpr uint32_t kUndefinedWiFiPafSessionId = UINT32_MAX;
+inline constexpr size_t kMACAddressLength            = 6;
 struct WiFiPAFSession
 {
     WiFiPafRole role;
     uint32_t id;
     uint32_t peer_id;
-    uint8_t peer_addr[6];
+    uint8_t peer_addr[kMACAddressLength];
     NodeId nodeId;
     uint16_t discriminator;
 };

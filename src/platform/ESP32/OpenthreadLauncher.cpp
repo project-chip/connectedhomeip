@@ -19,12 +19,9 @@
 #include "driver/uart.h"
 #include "esp_event.h"
 #include "esp_log.h"
-#include "esp_netif.h"
-#include "esp_netif_types.h"
 #include "esp_openthread.h"
 #include "esp_openthread_cli.h"
 #include "esp_openthread_lock.h"
-#include "esp_openthread_netif_glue.h"
 #include "esp_openthread_types.h"
 #include "esp_vfs_eventfd.h"
 #include "freertos/FreeRTOS.h"
@@ -34,16 +31,20 @@
 #include "openthread/logging.h"
 #include "openthread/tasklet.h"
 #include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
 #include <memory>
 
 #ifdef CONFIG_OPENTHREAD_BORDER_ROUTER
 #include <esp_openthread_border_router.h>
 #endif
 
-static esp_netif_t * openthread_netif                       = nullptr;
 static esp_openthread_platform_config_t * s_platform_config = nullptr;
 static TaskHandle_t openthread_task                         = nullptr;
 static const char * TAG                                     = "OpenThread";
+
+esp_err_t openthread_init_netif_stack(void);
+esp_err_t openthread_init_netif_glue(const esp_openthread_platform_config_t * config);
+void openthread_deinit_netif_glue(void);
 
 #ifdef CONFIG_OPENTHREAD_CLI
 static TaskHandle_t cli_transmit_task                     = nullptr;
@@ -125,27 +126,22 @@ static void cli_command_transmit_task_delete(void)
     if (cli_transmit_task)
     {
         vTaskDelete(cli_transmit_task);
+        cli_transmit_task = nullptr;
+    }
+    if (cli_transmit_task_queue)
+    {
+        vQueueDelete(cli_transmit_task_queue);
+        cli_transmit_task_queue = nullptr;
     }
 }
 #endif
-
-static esp_netif_t * init_openthread_netif(const esp_openthread_platform_config_t * config)
-{
-    esp_netif_config_t cfg = ESP_NETIF_DEFAULT_OPENTHREAD();
-    esp_netif_t * netif    = esp_netif_new(&cfg);
-    assert(netif != NULL);
-    ESP_ERROR_CHECK(esp_netif_attach(netif, esp_openthread_netif_glue_init(config)));
-
-    return netif;
-}
 
 static void ot_task_worker(void * context)
 {
     // Run the main loop
     esp_openthread_launch_mainloop();
 
-    esp_netif_destroy(openthread_netif);
-    esp_openthread_netif_glue_deinit();
+    openthread_deinit_netif_glue();
 
     esp_vfs_eventfd_unregister();
     vTaskDelete(NULL);
@@ -175,15 +171,29 @@ esp_err_t openthread_init_stack(void)
         .max_fds = 3,
     };
 
-    ESP_ERROR_CHECK(esp_netif_init());
-    esp_err_t err = esp_vfs_eventfd_register(&eventfd_config);
+    esp_err_t err          = ESP_OK;
+    bool eventfdRegistered = false;
+    bool otInitialized     = false;
+#ifdef CONFIG_OPENTHREAD_CLI
+    bool cliTaskStarted = false;
+#endif
+
+    err = openthread_init_netif_stack();
+    VerifyOrExit(err == ESP_OK, ESP_LOGE(TAG, "Failed to initialize OpenThread netif stack: %s", esp_err_to_name(err)));
+
+    err = esp_vfs_eventfd_register(&eventfd_config);
     if (err == ESP_ERR_INVALID_STATE)
     {
         ESP_LOGW(TAG, "eventfd is already registered");
     }
     else if (err != ESP_OK)
     {
-        return err;
+        ESP_LOGE(TAG, "Failed to register eventfd: %s", esp_err_to_name(err));
+        goto exit;
+    }
+    else
+    {
+        eventfdRegistered = true;
     }
     assert(s_platform_config);
     // Initialize the OpenThread stack
@@ -192,14 +202,36 @@ esp_err_t openthread_init_stack(void)
         ESP_LOGW(TAG, "OpenThread is already initialized");
         return ESP_OK;
     }
-    ESP_ERROR_CHECK(err);
+    VerifyOrExit(err == ESP_OK, ESP_LOGE(TAG, "Failed to initialize OpenThread stack: %s", esp_err_to_name(err)));
+    otInitialized = true;
 #ifdef CONFIG_OPENTHREAD_CLI
     esp_openthread_matter_cli_init();
     cli_command_transmit_task();
+    cliTaskStarted = true;
 #endif
     // Initialize the esp_netif bindings
-    openthread_netif = init_openthread_netif(s_platform_config);
-    return ESP_OK;
+    err = openthread_init_netif_glue(s_platform_config);
+    VerifyOrExit(err == ESP_OK, ESP_LOGE(TAG, "Failed to initialize OpenThread netif glue: %s", esp_err_to_name(err)));
+
+exit:
+    if (err != ESP_OK)
+    {
+#ifdef CONFIG_OPENTHREAD_CLI
+        if (cliTaskStarted)
+        {
+            cli_command_transmit_task_delete();
+        }
+#endif
+        if (otInitialized)
+        {
+            esp_openthread_deinit();
+        }
+        if (eventfdRegistered)
+        {
+            esp_vfs_eventfd_unregister();
+        }
+    }
+    return err;
 }
 
 esp_err_t openthread_launch_task(void)
@@ -210,8 +242,7 @@ esp_err_t openthread_launch_task(void)
 
 esp_err_t openthread_deinit_stack(void)
 {
-    esp_openthread_netif_glue_deinit();
-    esp_netif_destroy(openthread_netif);
+    openthread_deinit_netif_glue();
 #ifdef CONFIG_OPENTHREAD_CLI
     cli_command_transmit_task_delete();
 #endif

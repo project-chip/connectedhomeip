@@ -336,6 +336,18 @@ enum class OperationSourceEnum : uint8_t
     kUnknownEnumValue = 11,
 };
 
+// Enum for StatusCodeEnum
+enum class StatusCodeEnum : uint8_t
+{
+    kDuplicate = 0x02,
+    kOccupied  = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
 // Enum for UserStatusEnum
 enum class UserStatusEnum : uint8_t
 {

@@ -81,6 +81,10 @@
 		3CD73F1E2A9E83C1009D82D1 /* MCCommissionableDataProvider.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3CD73F1D2A9E83C1009D82D1 /* MCCommissionableDataProvider.mm */; };
 		3CD73F202A9EA060009D82D1 /* MCDeviceAttestationCredentials.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CD73F1F2A9EA060009D82D1 /* MCDeviceAttestationCredentials.h */; };
 		3CD73F222A9EA078009D82D1 /* MCDeviceAttestationCredentials.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3CD73F212A9EA077009D82D1 /* MCDeviceAttestationCredentials.mm */; };
+		3CD73F242B1EA001009D82D1 /* MCDeviceInstanceInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CD73F232B1EA001009D82D1 /* MCDeviceInstanceInfo.h */; };
+		3CD73F262B1EA002009D82D1 /* MCDeviceInstanceInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CD73F252B1EA002009D82D1 /* MCDeviceInstanceInfo.m */; };
+		3CD73F282B1EA003009D82D1 /* MCDeviceInstanceInfoProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CD73F272B1EA003009D82D1 /* MCDeviceInstanceInfoProvider.h */; };
+		3CD73F2A2B1EA004009D82D1 /* MCDeviceInstanceInfoProvider.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3CD73F292B1EA004009D82D1 /* MCDeviceInstanceInfoProvider.mm */; };
 		3CE5ECCE2A673B30007CF331 /* CommissioningCallbackHandlers.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CE5ECCD2A673B30007CF331 /* CommissioningCallbackHandlers.h */; };
 		3CE5ECD02A673E2C007CF331 /* CommissioningCallbackHandlers.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CE5ECCF2A673E2C007CF331 /* CommissioningCallbackHandlers.m */; };
 		3CF71C0A2A992D0D003A5CE5 /* MCCastingApp.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CF71C092A992D0D003A5CE5 /* MCCastingApp.h */; };
@@ -178,6 +182,10 @@
 		3CD73F1D2A9E83C1009D82D1 /* MCCommissionableDataProvider.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MCCommissionableDataProvider.mm; sourceTree = "<group>"; };
 		3CD73F1F2A9EA060009D82D1 /* MCDeviceAttestationCredentials.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCDeviceAttestationCredentials.h; sourceTree = "<group>"; };
 		3CD73F212A9EA077009D82D1 /* MCDeviceAttestationCredentials.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MCDeviceAttestationCredentials.mm; sourceTree = "<group>"; };
+		3CD73F232B1EA001009D82D1 /* MCDeviceInstanceInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCDeviceInstanceInfo.h; sourceTree = "<group>"; };
+		3CD73F252B1EA002009D82D1 /* MCDeviceInstanceInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MCDeviceInstanceInfo.m; sourceTree = "<group>"; };
+		3CD73F272B1EA003009D82D1 /* MCDeviceInstanceInfoProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCDeviceInstanceInfoProvider.h; sourceTree = "<group>"; };
+		3CD73F292B1EA004009D82D1 /* MCDeviceInstanceInfoProvider.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MCDeviceInstanceInfoProvider.mm; sourceTree = "<group>"; };
 		3CE5ECCD2A673B30007CF331 /* CommissioningCallbackHandlers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommissioningCallbackHandlers.h; sourceTree = "<group>"; };
 		3CE5ECCF2A673E2C007CF331 /* CommissioningCallbackHandlers.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CommissioningCallbackHandlers.m; sourceTree = "<group>"; };
 		3CF71C092A992D0D003A5CE5 /* MCCastingApp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCCastingApp.h; sourceTree = "<group>"; };
@@ -321,6 +329,10 @@
 				3CD73F212A9EA077009D82D1 /* MCDeviceAttestationCredentials.mm */,
 				3C6920452AA1093300D0F613 /* MCDeviceAttestationCredentialsProvider.h */,
 				3C6920472AA1094000D0F613 /* MCDeviceAttestationCredentialsProvider.mm */,
+				3CD73F232B1EA001009D82D1 /* MCDeviceInstanceInfo.h */,
+				3CD73F252B1EA002009D82D1 /* MCDeviceInstanceInfo.m */,
+				3CD73F272B1EA003009D82D1 /* MCDeviceInstanceInfoProvider.h */,
+				3CD73F292B1EA004009D82D1 /* MCDeviceInstanceInfoProvider.mm */,
 				3C69204B2AA136BA00D0F613 /* MCCommonCaseDeviceServerInitParamsProvider.h */,
 				3CF8532528E37ED800F07B9F /* MatterError.h */,
 				3CF8532628E37F1000F07B9F /* MatterError.mm */,
@@ -370,6 +382,8 @@
 				3CF71C102A99312D003A5CE5 /* MCCommissionableData.h in Headers */,
 				3C4F522A2B51DFAE00BB8A10 /* MCCommand_Internal.h in Headers */,
 				3CD73F202A9EA060009D82D1 /* MCDeviceAttestationCredentials.h in Headers */,
+				3CD73F242B1EA001009D82D1 /* MCDeviceInstanceInfo.h in Headers */,
+				3CD73F282B1EA003009D82D1 /* MCDeviceInstanceInfoProvider.h in Headers */,
 				3CCB8740286A593700771BAD /* CastingServerBridge.h in Headers */,
 				3CE5ECCE2A673B30007CF331 /* CommissioningCallbackHandlers.h in Headers */,
 				39589F162B91556B00BE040C /* MCInteractionModelStructs.h in Headers */,
@@ -506,6 +520,8 @@
 				3CD73F1E2A9E83C1009D82D1 /* MCCommissionableDataProvider.mm in Sources */,
 				39F589E02C1781E4000AAADD /* MCCommissionerDeclaration.mm in Sources */,
 				3CD73F222A9EA078009D82D1 /* MCDeviceAttestationCredentials.mm in Sources */,
+				3CD73F262B1EA002009D82D1 /* MCDeviceInstanceInfo.m in Sources */,
+				3CD73F2A2B1EA004009D82D1 /* MCDeviceInstanceInfoProvider.mm in Sources */,
 				39BF57C72B8CFFB90081653C /* MCAttributeObjects.mm in Sources */,
 				3C2346252B362BBB00FA276E /* MCCastingPlayerDiscovery.mm in Sources */,
 				3C4F52242B507CA800BB8A10 /* MCCluster.mm in Sources */,

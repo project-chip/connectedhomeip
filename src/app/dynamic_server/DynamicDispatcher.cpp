@@ -35,6 +35,7 @@
 #include <app/WriteHandler.h>
 #include <app/clusters/ota-provider/OTAProviderCluster.h>
 #include <app/data-model/Decode.h>
+#include <app/util/attribute-storage-detail.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
 #include <app/util/endpoint-config-api.h>
@@ -351,4 +352,9 @@ const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpo
 {
     // no known attributes even for OTA
     return nullptr;
+}
+
+void emAfCallShutdowns(MatterClusterShutdownType shutdownType)
+{
+    // No-op for dynamic server: no ember-style cluster init/shutdown.
 }

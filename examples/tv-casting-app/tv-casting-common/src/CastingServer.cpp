@@ -69,7 +69,11 @@ CHIP_ERROR CastingServer::Init(AppParams * AppParams)
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(DeviceEventCallback, 0));
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(this);
+    auto * client = chip::Server::GetInstance().GetUserDirectedCommissioningClient();
+    if (client != nullptr)
+    {
+        client->SetCommissionerDeclarationHandler(this);
+    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     mInited = true;

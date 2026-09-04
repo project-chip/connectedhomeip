@@ -17,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace RadonConcentrationMeasurement {
 
-inline constexpr uint32_t kRevision = 3;
+inline constexpr uint32_t kRevision = 5;
 
 namespace Attributes {
 

@@ -35,6 +35,7 @@ CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager
     VerifyOrReturnError(handle.HasValue(), CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(mSecureSessionHolder.GrabPairingSession(handle.Value()), CHIP_ERROR_INTERNAL);
     mSessionManager = &sessionManager;
+    mSystemLayer    = sessionManager.SystemLayer();
     return CHIP_NO_ERROR;
 }
 
@@ -117,11 +118,13 @@ void PairingSession::DiscardExchange()
     }
 }
 
-CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpLocalConfig,
+CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const SessionParameters & sessionParams,
                                                    TLV::TLVWriter & tlvWriter)
 {
     TLV::TLVType mrpParamsContainer;
     ReturnErrorOnFailure(tlvWriter.StartContainer(tag, TLV::kTLVType_Structure, mrpParamsContainer));
+
+    const ReliableMessageProtocolConfig & mrpLocalConfig = sessionParams.GetMRPConfig();
     ReturnErrorOnFailure(
         tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kSessionIdleInterval), mrpLocalConfig.mIdleRetransTimeout.count()));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kSessionActiveInterval),
@@ -140,6 +143,16 @@ CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const ReliableM
 
     uint16_t maxPathsPerInvoke = CHIP_CONFIG_MAX_PATHS_PER_INVOKE;
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kMaxPathsPerInvoke), maxPathsPerInvoke));
+
+    uint16_t supportedTransports = sessionParams.GetSupportedTransports();
+    if (supportedTransports != 0)
+    {
+        ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kSupportedTransports), supportedTransports));
+
+        uint32_t maxTCPPayloadSize = sessionParams.GetMaxTCPPayloadSize();
+        ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kMaxTCPPayloadSize), maxTCPPayloadSize));
+    }
+
     return tlvWriter.EndContainer(mrpParamsContainer);
 }
 
@@ -233,6 +246,26 @@ CHIP_ERROR PairingSession::DecodeSessionParametersIfPresent(TLV::Tag expectedTag
         SuccessOrExit(err = tlvReader.Next());
     }
 
+    if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kSupportedTransports)
+    {
+        uint16_t supportedTransports;
+        ReturnErrorOnFailure(tlvReader.Get(supportedTransports));
+        outSessionParameters.SetSupportedTransports(supportedTransports);
+
+        // The next element is optional. If it's not present, return CHIP_NO_ERROR.
+        SuccessOrExit(err = tlvReader.Next());
+    }
+
+    if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kMaxTCPPayloadSize)
+    {
+        uint32_t maxTCPPayloadSize;
+        ReturnErrorOnFailure(tlvReader.Get(maxTCPPayloadSize));
+        outSessionParameters.SetMaxTCPPayloadSize(maxTCPPayloadSize);
+
+        // The next element is optional. If it's not present, return CHIP_NO_ERROR.
+        SuccessOrExit(err = tlvReader.Next());
+    }
+
     // Future proofing - Don't error out if there are other tags
 exit:
     if (err == CHIP_END_OF_TLV || err == CHIP_NO_ERROR)
@@ -296,18 +329,29 @@ void PairingSession::OnSessionReleased()
     // Send the error notification async, because our delegate is likely to want
     // to create a new session to listen for new connection attempts, and doing
     // that under an OnSessionReleased notification is not safe.
-    if (!mSessionManager)
+    //
+    // We capture the delegate by value and null mDelegate immediately, mirroring
+    // what NotifySessionEstablishmentError does on the synchronous path.  This
+    // means the lambda holds no reference to 'this' at all, so the PairingSession
+    // lifetime is irrelevant — the callback is safe even if the object is freed
+    // or recycled from a pool before the event loop drains this work item.
+    //
+    // mSystemLayer is captured from the session manager at AllocateSecureSession()
+    // and intentionally not cleared by Clear(), so it remains valid here even
+    // though mSessionManager has already been nulled.  Using it directly avoids
+    // any dependency on DeviceLayer (which may not be present on all platforms).
+    auto * delegate = mDelegate;
+    mDelegate       = nullptr;
+
+    if (delegate == nullptr || mSystemLayer == nullptr)
     {
         return;
     }
 
-    TEMPORARY_RETURN_IGNORED mSessionManager->SystemLayer()->ScheduleWork(
-        [](auto * systemLayer, auto * appState) -> void {
-            ChipLogError(Inet, "ASYNC CASE Session establishment failed");
-            auto * _this = static_cast<PairingSession *>(appState);
-            _this->NotifySessionEstablishmentError(CHIP_ERROR_CONNECTION_ABORTED);
-        },
-        this);
+    TEMPORARY_RETURN_IGNORED mSystemLayer->ScheduleLambda([delegate]() {
+        ChipLogError(Inet, "ASYNC Session establishment failed");
+        delegate->OnSessionEstablishmentError(CHIP_ERROR_CONNECTION_ABORTED, SessionEstablishmentStage::kNotInKeyExchange);
+    });
 }
 
 } // namespace chip

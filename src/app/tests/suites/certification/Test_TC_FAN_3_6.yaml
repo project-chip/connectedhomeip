@@ -15,6 +15,13 @@
 
 name: 263.2.11. [TC-FAN-3.6] Optional direction functionality with DUT as Server
 
+CI:
+    - name: "Test against all-devices/extractor-hood"
+      app: all-devices
+      args:
+          - --device
+          - extractor-hood
+
 PICS:
     - FAN.S
     - FAN.S.F05

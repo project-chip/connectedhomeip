@@ -124,14 +124,19 @@ static_library("controller") {
     public_deps += [ "${chip_root}/src/controller/webrtc:chip_webrtc" ]
   }
 
+  # ot-commissioner bundles its own mbedTLS, which collides at link time with
+  # CHIP's mbedTLS. As such, we exclude mbedtls and psa (which also links CHIP's mbedTLS) backends.
   if (chip_device_platform == "linux" && chip_crypto != "mbedtls" &&
-      chip_support_thread_meshcop && current_cpu == host_cpu &&
-      current_os == host_os) {
+      chip_crypto != "psa" && chip_support_thread_meshcop &&
+      current_cpu == host_cpu && current_os == host_os) {
     sources += [
       "ThreadMeshcopCommissionProxy.cpp",
       "ThreadMeshcopCommissionProxy.h",
     ]
-    deps += [ "${chip_root}/src/lib/dnssd/minimal_mdns:minimal_mdns" ]
+    deps += [
+      "${chip_root}/src/lib/dnssd/minimal_mdns:minimal_mdns",
+      "${chip_root}/third_party/jsoncpp",
+    ]
     public_deps += [ "${chip_root}/third_party/ot-commissioner" ]
   }
 

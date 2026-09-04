@@ -107,8 +107,8 @@ class TC_OCC_2_3(MatterBaseTest):
         has_feature_contact = (feature_map & cluster.Bitmaps.Feature.kPhysicalContact) != 0
         has_no_legacy_features = ((not has_feature_pir) and (not has_feature_ultrasonic) and (not has_feature_contact))
 
-        log.info(
-            f"Feature map: 0x{feature_map:x}. PIR: {has_feature_pir}, US:{has_feature_ultrasonic}, PHY:{has_feature_contact}")
+        log.info("Feature map: 0x%x. PIR: %s, US:%s, PHY:%s",
+                 feature_map, has_feature_pir, has_feature_ultrasonic, has_feature_contact)
 
         self.step(3)
         attribute_list = await self.read_occ_attribute_expect_success(attribute=attributes.AttributeList)

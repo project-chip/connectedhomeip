@@ -1,13 +1,14 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.20)
 
 project(chip_main)
 
-set(chip_dir "${bee_matter_root}")
+set(chip_dir "${matter_root}")
 set(chip_dir_output "${matter_output_path}/chip")
 set(chip_main chip_main)
 set(list_chip_main_sources chip_main_sources)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/includepath.cmake)
+include(${chip_dir}/examples/thermostat/thermostat-common/thermostat-common.cmake)
 
 if (matter_enable_shell)
 list(
@@ -25,7 +26,6 @@ list(
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
-    ${chip_dir}/src/app/clusters/ota-requestor/OTARequestorCluster.cpp
     ${chip_dir}/examples/platform/realtek/ota/OTAInitializer.cpp
 )
 endif (matter_enable_ota_requestor)
@@ -54,6 +54,8 @@ chip_configure_data_model(chip_main
     INCLUDE_SERVER
     ZAP_FILE ${matter_example_path}/../../thermostat-common/thermostat.zap
 )
+
+chip_add_thermostat_common(${chip_main})
 
 target_include_directories(
     ${chip_main}

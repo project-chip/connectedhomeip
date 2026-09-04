@@ -21,12 +21,13 @@
 #include <pw_unit_test/framework.h>
 
 #include <lib/core/StringBuilderAdapters.h>
-#include <lib/dnssd/minimal_mdns/records/Ptr.h>
+#include <lib/dnssd/wire/records/Ptr.h>
 
 namespace {
 
 using namespace chip;
 using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 
 const QNamePart kDnsSdname[] = { "_services", "_dns-sd", "_udp", "local" };
 

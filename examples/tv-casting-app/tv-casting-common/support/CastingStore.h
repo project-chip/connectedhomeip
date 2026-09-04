@@ -103,7 +103,7 @@ private:
         kContextTagMaxNum = UINT8_MAX
     };
 
-    constexpr static size_t kCastingStoreDataMaxBytes               = 1024 * 100; // 100 KBs
+    constexpr static size_t kCastingStoreDataMaxBytes               = static_cast<size_t>(1024) * 100; // 100 KBs
     constexpr static char * kCastingStoreDataKey                    = (char *) "com.matter.casting.CastingStore";
     constexpr static uint32_t kCurrentCastingStoreDataVersion       = 1;
     constexpr static uint32_t kSupportedCastingStoreDataVersions[1] = { 1 };

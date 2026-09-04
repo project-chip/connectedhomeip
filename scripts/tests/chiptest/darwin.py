@@ -12,13 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import IO, Any
+import contextlib
+import logging
+from typing import BinaryIO
+
+from chiptest.concurrency.worker import WorkerProcess
 
 from .runner import Executor, LogPipe, SubprocessInfo
 
+log = logging.getLogger(__name__)
+
 
 class DarwinExecutor(Executor):
-    def run(self, subproc: SubprocessInfo, stdin: IO[Any] | None = None, stdout: IO[Any] | LogPipe | None = None, stderr: IO[Any] | LogPipe | None = None):
+    def run(self, subproc: SubprocessInfo, stdin: BinaryIO | None = None, stdout: BinaryIO | LogPipe | None = None,
+            stderr: BinaryIO | LogPipe | None = None):
         # Try harder to avoid any stdout buffering in our tests
         wrapped = subproc.wrap_with('stdbuf', '-o0', '-i0')
         return super().run(wrapped, stdin, stdout, stderr)
+
+
+class DarwinWorkerProcess(WorkerProcess):
+    """Darwin implementation of the worker process."""
+
+    def _platform_init(self, exit_stack: contextlib.ExitStack) -> DarwinExecutor:
+        log.debug("Initializing Darwin test executor.")
+        return exit_stack.enter_context(DarwinExecutor())

@@ -55,6 +55,7 @@ CHIP_ERROR_CODES = {
 
 
 class TC_SC_3_4(MatterBaseTest):
+    disable_wildcard_subscription = True
 
     def desc_TC_SC_3_4(self) -> str:
         return "[TC-SC-3.4] CASE Error Handling [DUT_Responder] "

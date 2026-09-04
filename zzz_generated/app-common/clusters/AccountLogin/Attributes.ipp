@@ -32,6 +32,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
+    case Attributes::OAuthLoggedIn::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, OAuthLoggedIn);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

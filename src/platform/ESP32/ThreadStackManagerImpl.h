@@ -25,6 +25,8 @@
 
 #pragma once
 
+#include <sdkconfig.h>
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include "freertos/task.h"
@@ -37,6 +39,10 @@
 
 #include <lib/support/logging/CHIPLogging.h>
 
+#if !defined(CONFIG_CHIP_USE_OT_ENDPOINT) && defined(CONFIG_CHIP_DEVICE_ENABLE_THREAD_MESHCOP)
+#include <inet/EndPointStateLwIP.h>
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -47,6 +53,9 @@ class ThreadStackManagerImpl;
  * Concrate implementation of the ThreadStackManager singleton object for ESP32 platform.
  */
 class ThreadStackManagerImpl final : public ThreadStackManager,
+#if !defined(CONFIG_CHIP_USE_OT_ENDPOINT) && defined(CONFIG_CHIP_DEVICE_ENABLE_THREAD_MESHCOP)
+                                     public Inet::EndPointStateLwIP,
+#endif
                                      public Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>
 {
     friend class ThreadStackManager;

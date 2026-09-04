@@ -185,13 +185,20 @@ void AssertKeysEqual(SessionKeystore & keystore, HkdfKeyHandle & left, const Hkd
 } // namespace
   //
 
-#if CHIP_CRYPTO_OPENSSL || CHIP_CRYPTO_MBEDTLS
+#if CHIP_CRYPTO_MBEDTLS
 
 static uint32_t gs_test_entropy_source_called = 0;
 static int test_entropy_source(void * data, uint8_t * output, size_t len, size_t * olen)
 {
     *olen = len;
     gs_test_entropy_source_called++;
+    return 0;
+}
+#elif CHIP_CRYPTO_OPENSSL
+
+static int test_entropy_source(void * data, uint8_t * output, size_t len, size_t * olen)
+{
+    *olen = len;
     return 0;
 }
 
@@ -379,7 +386,8 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128EncryptTestVectors)
 
         if (vector->result == CHIP_NO_ERROR)
         {
-            bool areCTsEqual  = memcmp(out_ct_ptr, vector->ct, vector->ct_len) == 0;
+            // memcmp() requires non-null pointers even when length is 0; out_ct_ptr is null for zero-length vectors.
+            bool areCTsEqual  = (vector->ct_len == 0) || (memcmp(out_ct_ptr, vector->ct, vector->ct_len) == 0);
             bool areTagsEqual = memcmp(out_tag.Get(), vector->tag, vector->tag_len) == 0;
             EXPECT_TRUE(areCTsEqual);
             EXPECT_TRUE(areTagsEqual);
@@ -424,7 +432,8 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128DecryptTestVectors)
         EXPECT_EQ(err, vector->result);
         if (vector->result == CHIP_NO_ERROR)
         {
-            bool arePTsEqual = memcmp(vector->pt, out_pt_ptr, vector->pt_len) == 0;
+            // memcmp() requires non-null pointers even when length is 0; out_pt_ptr is null for zero-length vectors.
+            bool arePTsEqual = (vector->pt_len == 0) || (memcmp(vector->pt, out_pt_ptr, vector->pt_len) == 0);
             EXPECT_TRUE(arePTsEqual);
             if (!arePTsEqual)
             {
@@ -473,7 +482,8 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128InPlaceEncryption)
         EXPECT_EQ(err, vector->result);
         if (vector->result == CHIP_NO_ERROR)
         {
-            bool areCTsEqual  = memcmp(inplace_buffer_ptr, vector->ct, vector->ct_len) == 0;
+            // memcmp() requires non-null pointers even when length is 0; inplace_buffer_ptr is null for zero-length vectors.
+            bool areCTsEqual  = (vector->ct_len == 0) || (memcmp(inplace_buffer_ptr, vector->ct, vector->ct_len) == 0);
             bool areTagsEqual = memcmp(out_tag.Get(), vector->tag, vector->tag_len) == 0;
             EXPECT_TRUE(areCTsEqual);
             EXPECT_TRUE(areTagsEqual);
@@ -525,7 +535,8 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128InPlaceDecryption)
         EXPECT_EQ(err, vector->result);
         if (vector->result == CHIP_NO_ERROR)
         {
-            bool arePTsEqual = memcmp(vector->pt, inplace_buffer_ptr, vector->pt_len) == 0;
+            // memcmp() requires non-null pointers even when length is 0; inplace_buffer_ptr is null for zero-length vectors.
+            bool arePTsEqual = (vector->pt_len == 0) || (memcmp(vector->pt, inplace_buffer_ptr, vector->pt_len) == 0);
             EXPECT_TRUE(arePTsEqual);
             if (!arePTsEqual)
             {
@@ -1147,6 +1158,28 @@ TEST_F(TestChipCryptoPAL, TestHMAC_SHA256_RawKey)
     EXPECT_EQ(numOfTestsExecuted, numOfTestCases);
 }
 
+#if CHIP_CRYPTO_PSA
+// Regression test for a bug where HMAC_SHA256 returned CHIP_NO_ERROR even when the underlying PSA call failed.
+// Fault Injection: A key larger than PSA_MAX_KEY_BITS makes the PAL's internal psa_import_key() return
+// PSA_ERROR_NOT_SUPPORTED; the PAL must return a non-success CHIP_ERROR.
+TEST_F(TestChipCryptoPAL, TestHMAC_SHA256_RawKey_PsaFailurePropagates)
+{
+    constexpr size_t kOversizedKeyBytes = PSA_BITS_TO_BYTES(PSA_MAX_KEY_BITS) + 1;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> oversizedKey;
+    oversizedKey.Alloc(kOversizedKeyBytes);
+    ASSERT_TRUE(oversizedKey);
+    memset(oversizedKey.Get(), 0, kOversizedKeyBytes);
+
+    const uint8_t msg[8]                          = {};
+    uint8_t mac[PSA_HASH_LENGTH(PSA_ALG_SHA_256)] = {};
+
+    TestHMAC_sha mHMAC;
+    CHIP_ERROR err = mHMAC.HMAC_SHA256(oversizedKey.Get(), kOversizedKeyBytes, msg, sizeof(msg), mac, sizeof(mac));
+
+    EXPECT_NE(err, CHIP_NO_ERROR);
+}
+#endif
+
 #if !(CHIP_CRYPTO_KEYSTORE_APP)
 TEST_F(TestChipCryptoPAL, TestHMAC_SHA256_KeyHandle)
 {
@@ -1531,7 +1564,7 @@ TEST_F(TestChipCryptoPAL, TestAddEntropySources)
     EXPECT_EQ(DRBG_get_bytes(buffer, sizeof(buffer)), CHIP_NO_ERROR);
     for (int i = 0; i < 5000 * 2; i++)
     {
-        (void) DRBG_get_bytes(buffer, sizeof(buffer));
+        EXPECT_SUCCESS(DRBG_get_bytes(buffer, sizeof(buffer)));
     }
     EXPECT_GT(gs_test_entropy_source_called, test_entropy_source_call_count);
 }
@@ -1565,6 +1598,28 @@ TEST_F(TestChipCryptoPAL, TestPBKDF2_SHA256_TestVectors)
     }
     EXPECT_GT(numOfTestsRan, 0);
 }
+
+#if CHIP_CRYPTO_PSA
+// Regression test for a bug where pbkdf2_sha256 returned CHIP_NO_ERROR even when the underlying PSA call failed.
+// Fault Injection: A password larger than PSA_MAX_KEY_BITS makes the PAL's internal psa_import_key() return
+// PSA_ERROR_NOT_SUPPORTED; the PAL must return a non-success CHIP_ERROR.
+TEST_F(TestChipCryptoPAL, TestPBKDF2_SHA256_PsaFailurePropagates)
+{
+    constexpr size_t kOversizedPassBytes = PSA_BITS_TO_BYTES(PSA_MAX_KEY_BITS) + 1;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> oversizedPass;
+    oversizedPass.Alloc(kOversizedPassBytes);
+    ASSERT_TRUE(oversizedPass);
+    memset(oversizedPass.Get(), 0, kOversizedPassBytes);
+
+    const uint8_t salt[16] = {};
+    uint8_t outKey[32]     = {};
+
+    TestPBKDF2_sha256 pbkdf;
+    CHIP_ERROR err = pbkdf.pbkdf2_sha256(oversizedPass.Get(), kOversizedPassBytes, salt, sizeof(salt), 1, sizeof(outKey), outKey);
+
+    EXPECT_NE(err, CHIP_NO_ERROR);
+}
+#endif
 
 TEST_F(TestChipCryptoPAL, TestP256_Keygen)
 {
@@ -2999,42 +3054,42 @@ TEST_F(TestChipCryptoPAL, TestVIDPID_StringExtraction)
     // clang-format off
     const TestCase kTestCases[] = {
         // Matter VID/PID Attribute examples:
-        { DNAttrType::kMatterVID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute01), strlen(sTestMatterAttribute01)), true, false, chip::VendorId::TestVendor1, 0x0000, CHIP_NO_ERROR },
-        { DNAttrType::kMatterVID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute02), strlen(sTestMatterAttribute02)), true, false, chip::VendorId::Common, 0x0000, CHIP_NO_ERROR },
-        { DNAttrType::kMatterPID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute03), strlen(sTestMatterAttribute03)), false, true, chip::VendorId::NotSpecified, 0xABCD, CHIP_NO_ERROR },
-        { DNAttrType::kMatterPID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute04), strlen(sTestMatterAttribute04)), false, true, chip::VendorId::NotSpecified, 0xD90F, CHIP_NO_ERROR },
+        { DNAttrType::kMatterVID, ByteSpan::fromCharString(sTestMatterAttribute01), true, false, chip::VendorId::TestVendor1, 0x0000, CHIP_NO_ERROR },
+        { DNAttrType::kMatterVID, ByteSpan::fromCharString(sTestMatterAttribute02), true, false, chip::VendorId::Common, 0x0000, CHIP_NO_ERROR },
+        { DNAttrType::kMatterPID, ByteSpan::fromCharString(sTestMatterAttribute03), false, true, chip::VendorId::NotSpecified, 0xABCD, CHIP_NO_ERROR },
+        { DNAttrType::kMatterPID, ByteSpan::fromCharString(sTestMatterAttribute04), false, true, chip::VendorId::NotSpecified, 0xD90F, CHIP_NO_ERROR },
         // Matter VID/PID Attribute error cases:
-        { DNAttrType::kMatterVID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute05), strlen(sTestMatterAttribute05)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
-        { DNAttrType::kMatterPID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute06), strlen(sTestMatterAttribute06)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
-        { DNAttrType::kMatterVID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute07), strlen(sTestMatterAttribute07)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
-        { DNAttrType::kMatterPID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute08), strlen(sTestMatterAttribute08)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
-        { DNAttrType::kMatterVID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute09), strlen(sTestMatterAttribute09)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
-        { DNAttrType::kMatterPID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute10), strlen(sTestMatterAttribute10)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
-        { DNAttrType::kMatterVID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute11), strlen(sTestMatterAttribute11)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
-        { DNAttrType::kMatterPID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute12), strlen(sTestMatterAttribute12)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
-        { DNAttrType::kMatterVID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute13), strlen(sTestMatterAttribute13)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
-        { DNAttrType::kMatterPID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute14), strlen(sTestMatterAttribute14)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kMatterVID, ByteSpan::fromCharString(sTestMatterAttribute05), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kMatterPID, ByteSpan::fromCharString(sTestMatterAttribute06), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kMatterVID, ByteSpan::fromCharString(sTestMatterAttribute07), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kMatterPID, ByteSpan::fromCharString(sTestMatterAttribute08), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kMatterVID, ByteSpan::fromCharString(sTestMatterAttribute09), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kMatterPID, ByteSpan::fromCharString(sTestMatterAttribute10), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kMatterVID, ByteSpan::fromCharString(sTestMatterAttribute11), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kMatterPID, ByteSpan::fromCharString(sTestMatterAttribute12), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kMatterVID, ByteSpan::fromCharString(sTestMatterAttribute13), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kMatterPID, ByteSpan::fromCharString(sTestMatterAttribute14), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
         // Common Name (CN) VID/PID encoding examples:
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute01), strlen(sTestCNAttribute01)), true, false, chip::VendorId::TestVendor1, 0, CHIP_NO_ERROR },
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute02), strlen(sTestCNAttribute02)), true, false, static_cast<chip::VendorId>(0x002A), 0, CHIP_NO_ERROR },
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute03), strlen(sTestCNAttribute03)), false, true, chip::VendorId::NotSpecified, 0xC20A, CHIP_NO_ERROR },
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute04), strlen(sTestCNAttribute04)), false, true, chip::VendorId::NotSpecified, 0x03A5, CHIP_NO_ERROR },
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute05), strlen(sTestCNAttribute05)), true, true, chip::VendorId::TestVendor1, 0x00B1, CHIP_NO_ERROR },
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute06), strlen(sTestCNAttribute06)), true, true, chip::VendorId::TestVendor1, 0x00B1, CHIP_NO_ERROR },
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute07), strlen(sTestCNAttribute07)), true, true, chip::VendorId::TestVendor1, 0x00B1, CHIP_NO_ERROR },
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute08), strlen(sTestCNAttribute08)), true, true, chip::VendorId::TestVendor1, 0x00B1, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan::fromCharString(sTestCNAttribute01), true, false, chip::VendorId::TestVendor1, 0, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan::fromCharString(sTestCNAttribute02), true, false, static_cast<chip::VendorId>(0x002A), 0, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan::fromCharString(sTestCNAttribute03), false, true, chip::VendorId::NotSpecified, 0xC20A, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan::fromCharString(sTestCNAttribute04), false, true, chip::VendorId::NotSpecified, 0x03A5, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan::fromCharString(sTestCNAttribute05), true, true, chip::VendorId::TestVendor1, 0x00B1, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan::fromCharString(sTestCNAttribute06), true, true, chip::VendorId::TestVendor1, 0x00B1, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan::fromCharString(sTestCNAttribute07), true, true, chip::VendorId::TestVendor1, 0x00B1, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan::fromCharString(sTestCNAttribute08), true, true, chip::VendorId::TestVendor1, 0x00B1, CHIP_NO_ERROR },
         // Common Name (CN) VID/PID encoding error cases:
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute09), strlen(sTestCNAttribute09)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute10), strlen(sTestCNAttribute10)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute11), strlen(sTestCNAttribute11)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute12), strlen(sTestCNAttribute12)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kCommonName, ByteSpan::fromCharString(sTestCNAttribute09), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kCommonName, ByteSpan::fromCharString(sTestCNAttribute10), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kCommonName, ByteSpan::fromCharString(sTestCNAttribute11), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kCommonName, ByteSpan::fromCharString(sTestCNAttribute12), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
         // Common Name (CN) VID/PID encoding additional cases:
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute13), strlen(sTestCNAttribute13)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute14), strlen(sTestCNAttribute14)), true, true, chip::VendorId::TestVendor1, 0xFE67, CHIP_NO_ERROR },
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute15), strlen(sTestCNAttribute15)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute16), strlen(sTestCNAttribute16)), true, true, chip::VendorId::TestVendor1, 0xFE67, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan::fromCharString(sTestCNAttribute13), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kCommonName, ByteSpan::fromCharString(sTestCNAttribute14), true, true, chip::VendorId::TestVendor1, 0xFE67, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan::fromCharString(sTestCNAttribute15), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kCommonName, ByteSpan::fromCharString(sTestCNAttribute16), true, true, chip::VendorId::TestVendor1, 0xFE67, CHIP_NO_ERROR },
         // Other input combinations:
-        { DNAttrType::kUnspecified, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute15), strlen(sTestCNAttribute15)), false, false, chip::VendorId::NotSpecified, 0, CHIP_NO_ERROR },
+        { DNAttrType::kUnspecified, ByteSpan::fromCharString(sTestCNAttribute15), false, false, chip::VendorId::NotSpecified, 0, CHIP_NO_ERROR },
         { DNAttrType::kCommonName, ByteSpan(), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_INVALID_ARGUMENT },
     };
     // clang-format on

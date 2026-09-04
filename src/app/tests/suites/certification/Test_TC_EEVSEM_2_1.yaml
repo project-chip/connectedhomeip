@@ -82,8 +82,8 @@ tests:
           "Step 5: Manually put the device in a state from which it will FAIL to
           transition to PIXIT.EEVSEM.MODE_CHANGE_FAIL"
       PICS:
-          " EEVSEM.S.M.CAN_TEST_MODE_FAILURE &&
-          EEVSEM.S.M.CAN_MANUALLY_CONTROLLED && PICS_SKIP_SAMPLE_APP "
+          EEVSEM.S.M.CAN_TEST_MODE_FAILURE && EEVSEM.S.M.CAN_MANUALLY_CONTROLLED
+          && PICS_SKIP_SAMPLE_APP
       verification: |
           Manual operation required
       cluster: "LogCommands"
@@ -96,7 +96,8 @@ tests:
                 value: "y"
 
     - label: "Step 6: TH reads from the DUT the CurrentMode attribute"
-      PICS: EEVSEM.S.A0001 && EEVSEM.S.M.CAN_MANUALLY_CONTROLLED
+      PICS:
+          EEVSEM.S.M.CAN_TEST_MODE_FAILURE && EEVSEM.S.M.CAN_MANUALLY_CONTROLLED
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
@@ -111,8 +112,8 @@ tests:
           "Step 7: TH sends a ChangeToMode command to the DUT with NewMode set
           to PIXIT.EEVSEM.MODE_CHANGE_FAIL"
       PICS:
-          EEVSEM.S.M.CAN_TEST_MODE_FAILURE && EEVSEM.S.C00.Rsp &&
-          PICS_SKIP_SAMPLE_APP
+          EEVSEM.S.M.CAN_TEST_MODE_FAILURE && EEVSEM.S.M.CAN_MANUALLY_CONTROLLED
+          && PICS_SKIP_SAMPLE_APP
       verification: |
           Note : Please skip this step as SDK is not enabled with this failure response
 
@@ -136,7 +137,8 @@ tests:
                 value: "y"
 
     - label: "Step 8: TH reads from the DUT the CurrentMode attribute."
-      PICS: EEVSEM.S.A0001
+      PICS:
+          EEVSEM.S.M.CAN_TEST_MODE_FAILURE && EEVSEM.S.M.CAN_MANUALLY_CONTROLLED
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
@@ -160,7 +162,7 @@ tests:
                 value: "y"
 
     - label: "Step 10: TH reads from the DUT the CurrentMode attribute."
-      PICS: EEVSEM.S.A0001 && EEVSEM.S.M.CAN_MANUALLY_CONTROLLED
+      PICS: EEVSEM.S.M.CAN_MANUALLY_CONTROLLED
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
@@ -173,7 +175,7 @@ tests:
     - label:
           "Step 11: TH sends a ChangeToMode command to the DUT with NewMode set
           to PIXIT.EEVSEM.MODE_CHANGE_OK"
-      PICS: EEVSEM.S.C00.Rsp
+      PICS: EEVSEM.S.M.CAN_MANUALLY_CONTROLLED
       command: "ChangeToMode"
       arguments:
           values:
@@ -188,7 +190,7 @@ tests:
           "Step 12: TH reads from the DUT the CurrentMode attribute. Verify that
           the DUT response contains an integer value equal to
           PIXIT.EEVSEM.MODE_CHANGE_OK"
-      PICS: EEVSEM.S.A0001
+      PICS: EEVSEM.S.M.CAN_MANUALLY_CONTROLLED
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
@@ -197,7 +199,7 @@ tests:
     - label:
           "Step 13: TH sends a ChangeToMode command to the DUT with NewMode set
           to invalid_mode_th"
-      PICS: EEVSEM.S.C00.Rsp
+      PICS: EEVSEM.S.M.CAN_MANUALLY_CONTROLLED
       command: "ChangeToMode"
       arguments:
           values:
@@ -212,7 +214,7 @@ tests:
           "Step 14: TH reads from the DUT the CurrentMode attribute. Verify that
           the DUT response contains an integer value equal to
           PIXIT.EEVSEM.MODE_CHANGE_OK"
-      PICS: EEVSEM.S.A0001
+      PICS: EEVSEM.S.M.CAN_MANUALLY_CONTROLLED
       command: "readAttribute"
       attribute: "CurrentMode"
       response:

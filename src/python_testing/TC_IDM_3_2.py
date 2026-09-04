@@ -32,6 +32,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --enable-spec-errata-ci-only-disallowed-for-certification
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -42,18 +43,16 @@ from mobly import asserts
 from support_modules.idm_support import IDMBaseTest
 
 import matter.clusters as Clusters
-from matter.clusters import ClusterObjects as ClusterObjects
-# from matter.exceptions import ChipStackError
+from matter import im_capture
+from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing import global_attribute_ids
-from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_IDM_3_2(IDMBaseTest, BasicCompositionTests):
+class TC_IDM_3_2(IDMBaseTest):
     """Test case for IDM-3.2: Write Response Action from DUT to TH. [{DUT_Server}]"""
 
     def __init__(self, *args, **kwargs):
@@ -76,7 +75,7 @@ class TC_IDM_3_2(IDMBaseTest, BasicCompositionTests):
             TestStep(3, "TH sends the WriteRequestMessage to the DUT to write an unsupported attribute. DUT responds with the Write Response action",
                      "Verify on the TH that the DUT sends the status code UNSUPPORTED_ATTRIBUTE"),
             TestStep(4, "TH sends the WriteRequestMessage to the DUT to modify the value of one attribute and Set SuppressResponse to True.",
-                     "On the TH verify that the DUT does not send a Write Response message with a success back to the TH."),
+                     "Verify that the DUT modifies the attribute value. For DUTs supporting Matter release 1.7 or later: Verify that the DUT does NOT send a Write Response message back to the TH. For DUTs supporting Matter release 1.6 or earlier: Verify that the DUT does not send a Write Response message back to the TH, or if it does, it responds with a valid WriteResponse or StatusResponse."),
             TestStep(5, "TH sends a ReadRequest message to the DUT to read any attribute on any cluster. DUT returns with a report data action with the attribute values and the dataversion of the cluster. TH sends a WriteRequestMessage to the DUT to modify the value of one attribute with the DataVersion field set to the one received in the prior step.",
                      "Verify that the DUT sends a Write Response message with a success back to the TH. Verify by sending a ReadRequest that the Write Action on DUT was successful."),
             TestStep(6, "TH sends a ReadRequest message to the DUT to read any attribute on any cluster. DUT returns with a report data action with the attribute values and the dataversion of the cluster. TH sends a WriteRequestMessage to the DUT to modify the value of one attribute no DataVersion indicated. TH sends a second WriteRequestMessage to the DUT to modify the value of an attribute with the dataversion field set to the value received earlier.",
@@ -116,132 +115,34 @@ class TC_IDM_3_2(IDMBaseTest, BasicCompositionTests):
                              f"Write to unsupported endpoint should return UNSUPPORTED_ENDPOINT, got {write_status}")
 
         self.step(2)
-        '''
-        Write all attributes on an unsupported cluster to DUT
-        Find an unsupported cluster
-        '''
-        supported_cluster_ids = set()
-        for endpoint_clusters in self.endpoints.values():
-            supported_cluster_ids.update({
-                cluster.id for cluster in endpoint_clusters
-                if global_attribute_ids.cluster_id_type(cluster.id) == global_attribute_ids.ClusterIdType.kStandard
-            })
-
-        # Get all possible standard clusters
-        all_standard_cluster_ids = {
-            cluster_id for cluster_id in ClusterObjects.ALL_CLUSTERS
-            if global_attribute_ids.cluster_id_type(cluster_id) == global_attribute_ids.ClusterIdType.kStandard
-        }
-
-        # Find unsupported clusters
-        unsupported_cluster_ids = all_standard_cluster_ids - supported_cluster_ids
-
-        if not unsupported_cluster_ids:
-            self.skip_step("No unsupported standard clusters found to test")
-
-        # Use the first unsupported cluster
-        unsupported_cluster_id = next(iter(unsupported_cluster_ids))
-        cluster_attributes = ClusterObjects.ALL_ATTRIBUTES[unsupported_cluster_id]
-        test_unsupported_attribute = next(iter(cluster_attributes.values()))
-
-        write_status = await self.write_single_attribute(
-            attribute_value=test_unsupported_attribute,
-            endpoint_id=self.endpoint,
-            expect_success=False
-        )
-        # Verify we get UNSUPPORTED_CLUSTER error
-        asserts.assert_equal(write_status, Status.UnsupportedCluster,
-                             f"Write to unsupported cluster should return UNSUPPORTED_CLUSTER, got {write_status}")
+        await self.write_unsupported_cluster(endpoint_id=self.endpoint)
 
         self.step(3)
-        # Write an unsupported attribute to DUT.
-        # Build a flat list of all candidate (endpoint_id, attr_class) pairs first so we can
-        # iterate without nested-loop break complexity.
-        unsupported_candidates = []
-        for endpoint_id, endpoint in self.endpoints.items():
-            for cluster_type, cluster_data in endpoint.items():
-                if global_attribute_ids.cluster_id_type(cluster_type.id) != global_attribute_ids.ClusterIdType.kStandard:
-                    continue
+        await self.write_unsupported_attribute()
 
-                all_attrs = set(ClusterObjects.ALL_ATTRIBUTES[cluster_type.id].keys())
-                dut_attrs = set(cluster_data.get(cluster_type.Attributes.AttributeList, []))
-
-                for attr_id in all_attrs - dut_attrs:
-                    if global_attribute_ids.attribute_id_type(attr_id) == global_attribute_ids.AttributeIdType.kStandardNonGlobal:
-                        unsupported_candidates.append(
-                            (endpoint_id, cluster_type.id, ClusterObjects.ALL_ATTRIBUTES[cluster_type.id][attr_id])
-                        )
-
-        # Iterate candidates until we find one whose type can be serialized.
-        # Some attribute types cannot accept a numeric dummy value (0), so try a small
-        # fallback set that also covers string/octet-string shapes.
-        test_values = (0, "", b"")
-        write_status2 = None
-        found_unsupported_attr = False
-        for endpoint_id, cluster_id, candidate_attr in unsupported_candidates:
-            for test_value in test_values:
-                try:
-                    write_status2 = await self.write_single_attribute(
-                        attribute_value=candidate_attr(test_value),
-                        endpoint_id=endpoint_id,
-                        expect_success=False
-                    )
-                    log.info(
-                        "Testing unsupported attribute: %s, cluster_id=%s, endpoint_id=%s, test_value=%r",
-                        candidate_attr, cluster_id, endpoint_id, test_value
-                    )
-                    found_unsupported_attr = True
-                    break
-                except (TypeError, ValueError) as e:
-                    log.info(
-                        "Attribute %s not serializable with test value %r (%s): %s",
-                        candidate_attr, test_value, type(e).__name__, e
-                    )
-            if found_unsupported_attr:
-                break
-
-        if found_unsupported_attr:
-            asserts.assert_equal(write_status2, Status.UnsupportedAttribute,
-                                 f"Write to unsupported attribute should return UNSUPPORTED_ATTRIBUTE, got {write_status2}")
-
-        self.skip_step(4)
-        # Currently skipping step 4 as we have removed support in the python framework for this functionality currently.
-        # This is now contained in the SuppressResponse test module PR referenced below for TC_IDM_3_2, once this test module merges that PR can then be merged
-        # and this test step will become valid after issues with SuppressResponse mentioned in issue https://github.com/project-chip/connectedhomeip/issues/41227.
-        # SuppressResponse PR Reference: https://github.com/project-chip/connectedhomeip/pull/41590
-        # TODO: Once the SuppressResponse test module PR merges, uncomment the following code and remove the skip_step line above.
-
-        """
         self.step(4)
         # Check if NodeLabel attribute exists for step 4 (SuppressResponse tests)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):
             '''
             TH sends the WriteRequestMessage to the DUT to modify the value of one attribute and Set SuppressResponse to True.
-
-            NOTE: Per Issue #41227, the current spec does not strictly enforce that devices must suppress the response.
-            For now, we just ensure the device doesn't crash. The device MAY respond or may not - either is acceptable.
-            Future spec revisions will enforce no response behavior.
-            Reference: https://github.com/project-chip/connectedhomeip/issues/41227
             '''
 
             test_attribute = Clusters.BasicInformation.Attributes.NodeLabel
             test_value = "SuppressResponse-Test"
 
             log.info("Testing SuppressResponse functionality with NodeLabel attribute")
-            log.info("NOTE: Device may or may not respond - both behaviors are acceptable for now per Issue #41227")
+            im_capture.SetObserver(self.default_controller)
+            im_capture.Reset()
 
             # Send write request with suppressResponse=True
-            # Device may respond or not - we just ensure it doesn't crash
             try:
-                res = await self.default_controller.WriteAttribute(
-                    nodeid=self.dut_node_id,
+                await self.default_controller.WriteAttribute(
+                    nodeId=self.dut_node_id,
                     attributes=[(self.endpoint, test_attribute(test_value))],
                     suppressResponse=True
                 )
-                log.info(f"Device responded to suppressResponse=True request: {res}")
-            except Exception as e:
-                # Device didn't respond (timeout or other error) - this is also acceptable
-                log.info(f"Device did not respond or encountered error: {e}")
+            except (ChipStackError, InteractionModelError) as e:
+                log.info("WriteAttribute with suppressResponse=True raised exception: %s", e)
 
             # Verify the write operation succeeded by reading back the value
             log.info("Verifying that the write operation succeeded")
@@ -253,7 +154,9 @@ class TC_IDM_3_2(IDMBaseTest, BasicCompositionTests):
 
             asserts.assert_equal(actual_value, test_value,
                                  f"Attribute should be written. Expected {test_value}, got {actual_value}")
-        """
+
+            snapshot = im_capture.GetSnapshot()
+            await self.verify_suppress_response_message_count(snapshot, "WriteAttribute suppressResponse")
         # Check if NodeLabel attribute exists for steps 5 and 6 (DataVersion test steps)
         self.step(5)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):
@@ -274,7 +177,7 @@ class TC_IDM_3_2(IDMBaseTest, BasicCompositionTests):
 
             # Get the current DataVersion
             current_data_version = read_result[self.endpoint][test_cluster][Clusters.Attribute.DataVersion]
-            log.info(f"Current DataVersion for cluster {test_cluster.id}: {current_data_version}")
+            log.info("Current DataVersion for cluster %s: %s", test_cluster.id, current_data_version)
 
             write_result = await self.default_controller.WriteAttribute(
                 self.dut_node_id,
@@ -307,7 +210,7 @@ class TC_IDM_3_2(IDMBaseTest, BasicCompositionTests):
             )
 
             initial_data_version = initial_read[self.endpoint][test_cluster][Clusters.Attribute.DataVersion]
-            log.info(f"Initial DataVersion for step 6: {initial_data_version}")
+            log.info("Initial DataVersion for step 6: %s", initial_data_version)
 
             # Write without DataVersion (this should succeed and increment the DataVersion)
             new_value1 = "New-Label-Step6"
@@ -356,7 +259,7 @@ class TC_IDM_3_2(IDMBaseTest, BasicCompositionTests):
             '''
 
             # Test with the real timed-write attribute found on the device
-            log.info(f"Testing timed write attribute: {timed_attr}")
+            log.info("Testing timed write attribute: %s", timed_attr)
 
             # Test NEEDS_TIMED_INTERACTION - Writing timed-write-required attribute without timed transaction
             # Found below logic in /home/ubuntu/connectedhomeapi/connectedhomeip/src/controller/python/tests/scripts/cluster_objects.py and TC_IDM_1_2 test logic.

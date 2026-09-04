@@ -108,14 +108,3 @@ tests:
           [1651260350133] [18661:35147439] CHIP: [ATM]   File Designator Length: 8
           [1651260350133] [18661:35147439] CHIP: [ATM]   File Designator: test.ota
       disabled: true
-
-    - label:
-          "Step 5: During the transfer of the image to the DUT, force fail the
-          transfer before it completely transfers the image. Initiate another
-          QueryImage Command from DUT to the TH/OTA-P. Set the RC[STARTOFS] bit
-          and associated STARTOFS field in the ReceiveInit Message to indicate
-          the resumption of a transfer previously aborted."
-      PICS: MCORE.OTA.Resume
-      verification: |
-          Out of scope
-      disabled: true

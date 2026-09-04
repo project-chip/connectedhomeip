@@ -9,5 +9,13 @@ sdbus; sys_platform == "linux"
 types-PyYAML
 tabulate
 
+# Matter Python module runtime dependencies (matter.clusters / matter.core)
+aenum
+construct
+dacite
+deprecation
+ecdsa
+rich
+
 -e ${PW_PROJECT_ROOT}/scripts/py_matter_idl
 -e ${PW_PROJECT_ROOT}/scripts/py_matter_yamltests

@@ -63,6 +63,16 @@ public:
      */
     virtual CHIP_ERROR AppMatter_Register(void) override;
 
+    /**
+     * \brief This function is called at the begging of the InitServer function.
+     *
+     */
+    virtual void PreInitMatterServerInstance(void) override;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_TBR
+    chip::CharSpan GetBorderRouterName() override;
+#endif
+
 private:
     void DispatchEvent(const AppEvent & event);
 };

@@ -129,9 +129,11 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(Messaging::ExchangeManager
 {
     ChipLogProgress(Controller, "Performing vendor ID verification for vendor ID: %u", info->adminVendorId);
 
-    // Generate a 32-octet random challenge
-    uint8_t kClientChallenge[32];
-    TEMPORARY_RETURN_IGNORED Crypto::DRBG_get_bytes(kClientChallenge, sizeof(kClientChallenge));
+    // Generate a 32-octet random challenge. On entropy/DRBG failure the buffer is left untouched, so
+    // propagate the error rather than sending an indeterminate challenge that is folded into the
+    // signed TBS. The caller maps a non-NO_ERROR return to verification failure.
+    uint8_t kClientChallenge[32] = {};
+    ReturnLogErrorOnFailure(Crypto::DRBG_get_bytes(kClientChallenge, sizeof(kClientChallenge)));
     ByteSpan clientChallengeSpan{ kClientChallenge };
     chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::Type request;
 
@@ -168,16 +170,17 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(Messaging::ExchangeManager
     if (!session.HasValue())
     {
         ChipLogError(Controller, "Session is missing");
-        CHIP_ERROR err = CHIP_ERROR_INCORRECT_STATE;
-        OnVendorIdVerificationComplete(err);
-        return err;
+        return CHIP_ERROR_INCORRECT_STATE;
     }
-    CHIP_ERROR err =
-        Controller::InvokeCommandRequest(exchangeMgr, session.Value(), kRootEndpointId, request, onSuccessCb, onFailureCb);
+    // Guard the response callbacks: a FailSafe teardown can destroy this object while the invoke is in
+    // flight, and the CommandSender-owned callback would otherwise fire OnVendorIdVerificationComplete()
+    // through a freed `this`.
+    CHIP_ERROR err = Controller::InvokeCommandRequest(exchangeMgr, session.Value(), kRootEndpointId, request,
+                                                      GuardWithLiveness(onSuccessCb), GuardWithLiveness(onFailureCb));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to send SignVIDVerificationRequest: %s", ErrorStr(err));
-        this->OnVendorIdVerificationComplete(err);
+        return err;
     }
 
     return CHIP_NO_ERROR;

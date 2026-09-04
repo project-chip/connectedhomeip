@@ -36,6 +36,21 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device robotic-vacuum-cleaner --trace-to json:${TRACE_APP}.json --app-pipe /tmp/sear_1_6_fifo
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --endpoint 1
+#       --app-pipe /tmp/sear_1_6_fifo
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -65,7 +80,7 @@ class TC_SEAR_1_6(MatterBaseTest):
         self.print_step(step, "Read SupportedAreas attribute")
         supported_areas = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SupportedAreas)
-        log.info("SupportedAreas: %s" % supported_areas)
+        log.info("SupportedAreas: %s", supported_areas)
 
         return [a.areaID for a in supported_areas]
 
@@ -73,7 +88,7 @@ class TC_SEAR_1_6(MatterBaseTest):
         self.print_step(step, "Read SelectedAreas attribute")
         selected_areas = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SelectedAreas)
-        log.info(f"SelectedAreas {selected_areas}")
+        log.info("SelectedAreas %s", selected_areas)
 
         return selected_areas
 
@@ -81,7 +96,7 @@ class TC_SEAR_1_6(MatterBaseTest):
         self.print_step(step, "Read Progress attribute")
         progress = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.Progress)
-        log.info(f"Progress {progress}")
+        log.info("Progress %s", progress)
 
         return progress
 
@@ -98,7 +113,7 @@ class TC_SEAR_1_6(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe({"Name": "Reset"})
+            self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
 
         test_step = "Manually intervene to put the device in the idle state and ensure SupportedAreas and SelectedAreas are not empty"
         self.print_step("2", test_step)

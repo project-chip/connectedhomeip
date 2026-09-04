@@ -21,19 +21,19 @@
 #include <lib/dnssd/TxtFields.h>
 #include <lib/dnssd/minimal_mdns/Logging.h>
 #include <lib/dnssd/minimal_mdns/MinMdnsConfig.h>
-#include <lib/dnssd/minimal_mdns/core/RecordWriter.h>
+#include <lib/dnssd/wire/RecordWriter.h>
 #include <lib/support/CHIPMemString.h>
 #include <tracing/macros.h>
 
 namespace chip {
 namespace Dnssd {
 
-using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 using namespace mdns::Minimal::Logging;
 
 namespace {
 
-ByteSpan GetSpan(const mdns::Minimal::BytesRange & range)
+ByteSpan GetSpan(const chip::Dnssd::BytesRange & range)
 {
     return ByteSpan(range.Start(), range.Size());
 }
@@ -42,11 +42,11 @@ ByteSpan GetSpan(const mdns::Minimal::BytesRange & range)
 ///
 /// Supported records are whatever `FillNodeDataFromTxt` supports.
 template <class DataType>
-class TxtParser : public mdns::Minimal::TxtRecordDelegate
+class TxtParser : public chip::Dnssd::TxtRecordDelegate
 {
 public:
     explicit TxtParser(DataType & data) : mData(data) {}
-    void OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value) override
+    void OnRecord(const chip::Dnssd::BytesRange & name, const chip::Dnssd::BytesRange & value) override
     {
         FillNodeDataFromTxt(GetSpan(name), GetSpan(value), mData);
     }
@@ -138,8 +138,8 @@ SerializedQNameIterator StoredServerName::Get() const
     return SerializedQNameIterator(BytesRange(mNameBuffer, mNameBuffer + sizeof(mNameBuffer)), mNameBuffer);
 }
 
-CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQNameIterator name, const uint64_t ttl,
-                                                  const mdns::Minimal::SrvRecord & srv)
+CHIP_ERROR IncrementalResolver::InitializeParsing(chip::Dnssd::SerializedQNameIterator name, const uint64_t ttl,
+                                                  const chip::Dnssd::SrvRecord & srv)
 {
     AutoInactiveResetter inactiveReset(*this);
 

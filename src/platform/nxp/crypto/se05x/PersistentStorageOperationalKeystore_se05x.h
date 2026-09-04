@@ -38,6 +38,12 @@ public:
     CHIP_ERROR RemoveOpKeypairForFabric(FabricIndex fabricIndex) override;
     CHIP_ERROR SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
                                  Crypto::P256ECDSASignature & outSignature) const override;
+    CHIP_ERROR CommitOpKeypairForFabric(FabricIndex fabricIndex) override;
+
+private:
+    // Extract SE05x key ID from a serialized keypair
+    CHIP_ERROR ExtractKeyIdFromSerializedKeypair(const Crypto::P256SerializedKeypair & serializedKeypair,
+                                                 uint32_t & outKeyId) const;
 };
 
 } // namespace chip

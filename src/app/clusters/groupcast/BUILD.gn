@@ -20,6 +20,7 @@ source_set("groupcast") {
     "GroupcastCluster.h",
   ]
   public_deps = [
+    "${chip_root}/src/app/clusters/access-control-server:access-control-event-helper",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/zzz_generated/app-common/clusters/Groupcast",
