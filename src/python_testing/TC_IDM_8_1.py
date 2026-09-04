@@ -378,7 +378,13 @@ class TC_IDM_8_1(IDMBaseTest):
                 finally:
                     handler_th1.cancel()
                     handler_th2.cancel()
-                    await self.write_fabric_scoped_attribute(info, self.th1, original)
+                    try:
+                        await self.write_fabric_scoped_attribute(info, self.th1, original)
+                    except Exception as e:
+                        # Logged rather than raised: the restore asserts on the write
+                        # status, and raising from a finally would replace the isolation
+                        # failure this step found with a cleanup failure.
+                        log.warning("Could not restore %s on TH1's fabric: %s", info.path_str, e)
 
             # Keyed on the attribute's own quality rather than on whether the
             # withholding check ran: masking never applies to an attribute whose
