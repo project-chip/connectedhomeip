@@ -60,12 +60,33 @@ CHIP_ERROR AvAnalysisNodeApp::Init()
         return err;
     }
 
+    mWebRTCRequestorServer.Create(mEndpointId, mRequestorDelegate);
+    err = CodegenDataModelProvider::Instance().Registry().Register(mWebRTCRequestorServer.Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to register WebRTCTransportRequestor on endpoint %u: %" CHIP_ERROR_FORMAT, mEndpointId,
+                     err.Format());
+        mWebRTCRequestorServer.Destroy();
+        Shutdown();
+        return err;
+    }
+
     return CHIP_NO_ERROR;
 }
 
 void AvAnalysisNodeApp::Shutdown()
 {
     ChipLogProgress(AppServer, "AvAnalysisNodeApp: Shutdown");
+
+    if (mWebRTCRequestorServer.IsConstructed())
+    {
+        CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mWebRTCRequestorServer.Cluster());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "WebRTCTransportRequestor unregister error: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        mWebRTCRequestorServer.Destroy();
+    }
 
     if (mAvAnalysisServer.IsConstructed())
     {
