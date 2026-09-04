@@ -17,12 +17,15 @@ import("//build_overrides/chip.gni")
 
 source_set("root-node") {
   sources = [
+    "OOBAccessors.cpp",
+    "OOBAccessors.h",
     "RootNode.cpp",
     "RootNode.h",
   ]
 
   public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
     "${chip_root}/src/app/clusters/access-control-server",
     "${chip_root}/src/app/clusters/administrator-commissioning-server",
     "${chip_root}/src/app/clusters/basic-information",
@@ -62,5 +65,17 @@ source_set("thread") {
   public_deps = [
     ":root-node",
     "${chip_root}/src/app/clusters/network-commissioning",
+  ]
+}
+
+source_set("posix") {
+  sources = [
+    "NamedPipeTranslators.cpp",
+    "NamedPipeTranslators.h",
+  ]
+
+  public_deps = [
+    ":root-node",
+    "${chip_root}/examples/all-devices-app/posix/named_pipe",
   ]
 }

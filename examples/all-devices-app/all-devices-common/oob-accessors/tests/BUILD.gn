@@ -19,14 +19,21 @@ import("${chip_root}/build/chip/tests.gni")
 
 if (chip_build_tests) {
   chip_test_suite("tests") {
-    output_name = "TestOOBDataSerializer"
+    output_name = "TestOOBAccessors"
 
-    test_sources = [ "TestOOBDataSerializer.cpp" ]
+    test_sources = [
+      "TestOOBAccessors.cpp",
+      "TestOOBDataSerializer.cpp",
+    ]
 
     cflags = [ "-Wconversion" ]
 
     public_deps = [
       "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
+      "${chip_root}/src/app/clusters/boolean-state-server",
+      "${chip_root}/src/app/clusters/occupancy-sensor-server",
+      "${chip_root}/src/app/clusters/on-off-server",
+      "${chip_root}/src/app/server-cluster/testing",
       "${chip_root}/src/lib/support:testing",
       "${chip_root}/src/platform",
     ]

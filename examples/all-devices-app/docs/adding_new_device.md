@@ -82,7 +82,7 @@ and easy to test:
 
     - For every base device class, implement a corresponding
       "logging-by-default" mock subclass in a dedicated `impl/` subfolder (e.g.,
-      `LoggingMySensorDevice`).
+      `LoggingMySensor`).
     - Use the **self-delegate pattern** where the mock subclass inherits from
       both the base device class and the delegate interfaces, implements the
       callbacks to log to the console, and passes `*this` to the base
@@ -91,9 +91,9 @@ and easy to test:
       by `DeviceFactory` or unit tests without requiring external wiring.
 
 5. **Spec-Pure Directory Layout & Extracted Capabilities**:
-    - Keep the root of the `devices/` directory pure: it should contain _only_
-      real, spec-defined Matter Device Types (like `dimmable-light`, `fan`,
-      `air-purifier`).
+    - Keep the root of the `device/types/` directory pure: it should contain
+      _only_ real, spec-defined Matter Device Types (like `dimmable-light`,
+      `fan`, `air-purifier`).
     - **Avoid non-spec inheritance** (such as making a plug-in unit inherit from
       a light) just to reuse code.
     - If multiple device types share a common capability (like dimming or air
@@ -104,11 +104,12 @@ and easy to test:
 
 ---
 
-### The Header (`MySensorDevice.h`)
+### The Header (`MySensor.h`)
 
-Derive your class from `SingleEndpointDevice` (or `EndpointDevice` if managing
-sub-endpoints). Require all mandatory delegates as references in the constructor
-and declare public getters to expose the underlying clusters:
+Derive your class from `SingleEndpoint` (or `DeviceInterface` if managing
+composite / multi-endpoint devices). Require all mandatory delegates as
+references in the constructor and declare public getters to expose the
+underlying clusters:
 
 ```cpp
 #pragma once
@@ -116,16 +117,16 @@ and declare public getters to expose the underlying clusters:
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/my-sensor-server/MySensorServerCluster.h> // Example code-driven cluster
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
-#include <devices/interface/SingleEndpointDevice.h>
+#include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip::app {
 
-class MySensorDevice : public SingleEndpointDevice
+class MySensor : public SingleEndpoint
 {
 public:
-    MySensorDevice(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & identifyDelegate);
-    ~MySensorDevice() override = default;
+    MySensor(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & identifyDelegate);
+    ~MySensor() override = default;
 
     // DeviceInterface pure virtual lifecycle hooks
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -147,13 +148,13 @@ private:
 } // namespace chip::app
 ```
 
-### The Source (`MySensorDevice.cpp`)
+### The Source (`MySensor.cpp`)
 
 In `Register()`, wire up your mandatory delegates using the `.WithDelegate()`
 helper when creating the cluster instances:
 
 ```cpp
-#include "MySensorDevice.h"
+#include "MySensor.h"
 #include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -161,12 +162,12 @@ using namespace chip::app::Clusters;
 
 namespace chip::app {
 
-MySensorDevice::MySensorDevice(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & identifyDelegate) :
-    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kMySensor, 1)),
+MySensor::MySensor(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & identifyDelegate) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kMySensor, 1)),
     mTimerDelegate(timerDelegate), mIdentifyDelegate(identifyDelegate)
 {}
 
-CHIP_ERROR MySensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
+CHIP_ERROR MySensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);
@@ -185,7 +186,7 @@ CHIP_ERROR MySensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataMod
     return CHIP_NO_ERROR;
 }
 
-void MySensorDevice::Unregister(CodeDrivenDataModelProvider & provider)
+void MySensor::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
     if (mMySensorCluster.IsConstructed())
@@ -203,28 +204,28 @@ void MySensorDevice::Unregister(CodeDrivenDataModelProvider & provider)
 } // namespace chip::app
 ```
 
-### The Symmetrical Logging Mock (`impl/LoggingMySensorDevice.h` & `.cpp`)
+### The Symmetrical Logging Mock (`impl/LoggingMySensor.h` & `.cpp`)
 
 To provide a self-contained simulator variant ready for `DeviceFactory`,
 implement the self-delegate logging mock under the `impl/` subfolder:
 
-#### Header (`impl/LoggingMySensorDevice.h`)
+#### Header (`impl/LoggingMySensor.h`)
 
 ```cpp
 #pragma once
 
-#include <devices/my-sensor/MySensorDevice.h>
+#include <device/types/my-sensor/MySensor.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip::app {
 
-class LoggingMySensorDevice : public MySensorDevice, public Clusters::IdentifyDelegate
+class LoggingMySensor : public MySensor, public Clusters::IdentifyDelegate
 {
 public:
-    explicit LoggingMySensorDevice(TimerDelegate & timerDelegate) :
-        MySensorDevice(timerDelegate, *this)
+    explicit LoggingMySensor(TimerDelegate & timerDelegate) :
+        MySensor(timerDelegate, *this)
     {}
-    ~LoggingMySensorDevice() override = default;
+    ~LoggingMySensor() override = default;
 
     // IdentifyDelegate implementation
     void OnIdentifyStart(Clusters::IdentifyCluster & cluster) override
@@ -247,8 +248,8 @@ public:
 
 ### The GN Build (`BUILD.gn`)
 
-Create `all-devices-common/devices/my-sensor/BUILD.gn` to define your standalone
-source set:
+Create `all-devices-common/device/types/my-sensor/BUILD.gn` to define your
+standalone source set:
 
 ```text
 # Copyright (c) 2026 Project CHIP Authors
@@ -269,12 +270,12 @@ import("//build_overrides/chip.gni")
 
 source_set("my-sensor") {
   sources = [
-    "MySensorDevice.cpp",
-    "MySensorDevice.h",
+    "MySensor.cpp",
+    "MySensor.h",
   ]
 
   public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/interface:single-endpoint-device",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
     "${chip_root}/src/app/clusters/identify-server",
     # Add public_deps for your specific cluster servers here
     "${chip_root}/src/data-model-providers/codedriven",
@@ -295,22 +296,37 @@ your self-contained **logging mock** in
    alphabetically):
 
     ```cpp
-    #include <devices/my-sensor/impl/LoggingMySensorDevice.h>
+    #include <device/types/my-sensor/impl/LoggingMySensor.h>
     ```
 
 2. **Register the Creator** inside the `DeviceFactory` constructor:
+
     ```cpp
     if constexpr (ALL_DEVICES_ENABLE_MY_SENSOR)
     {
         RegisterCreator("my-sensor", [this]() {
             VerifyOrDie(mContext.has_value());
-            return std::make_unique<LoggingMySensorDevice>(mContext->timerDelegate);
+            return MakeCreatedDevice<LoggingMySensor>(mContext->timerDelegate);
         });
     }
     ```
+
     _Note: We instantiate the Logging mock version in the factory so it runs
     completely out-of-the-box with self-contained console logging, keeping the
     platform main clean._
+
+3. **(Optional) Register Out-of-Band & Named Pipe Support**:
+    - For simulated sensor triggers or external control, implement
+      `OOBAccessors.h/.cpp` (platform-neutral) and `NamedPipeTranslators.h/.cpp`
+      (POSIX-only).
+    - Include `<device/types/<name>/OOBAccessors.h>` in
+      `all-devices-common/oob-accessors/OOBAccessorHook.h` and
+      `<device/types/<name>/NamedPipeTranslators.h>` in
+      `posix/named_pipe/Hook.h` so the SFINAE detection hooks
+      (`HasOOBAccessors`, `HasNamedPipeTranslators`) discover the registration
+      overloads at compile-time.
+    - See [Out-of-Band Control Architecture](design/out_of_band_control.md) for
+      full details and examples.
 
 ---
 
@@ -353,7 +369,7 @@ Add your `.cpp` source file to `ALL_DEVICES_DEVICE_SOURCES` (keep sorted):
 set(ALL_DEVICES_DEVICE_SOURCES
     # keep-sorted: start
     ...
-    "${ALL_DEVICES_COMMON_DIR}/devices/my-sensor/MySensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/my-sensor/MySensor.cpp"
     ...
     # keep-sorted: end
 )
@@ -379,7 +395,7 @@ sorted):
 ```text
   public_deps = [
     ...
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/my-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/my-sensor",
     ...
   ]
 ```
@@ -391,7 +407,7 @@ Add the target dependency to the relevant platform executable targets where
 embedded platform builds such as Silicon Labs or ESP32):
 
 ```text
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/my-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/my-sensor",
 ```
 
 ---

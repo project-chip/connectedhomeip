@@ -50,10 +50,16 @@ graph TD
 Contains simulated device behaviors and capability management. This layer
 compiles independently of the operating system or hardware drivers. It includes:
 
--   **`devices/`**: Concrete implementations of simulated Matter devices (e.g.,
-    `OccupancySensor`, `DimmableLight`, `Speaker`).
--   **`device-factory/`**: Registry (`DeviceFactory`) responsible for mapping
-    CLI device names to creation factories.
+-   **`device/types/`**: Concrete implementations of simulated Matter devices
+    (e.g., `OccupancySensor`, `DimmableLight`, `Speaker`).
+-   **`device/api/`**: Base contracts and abstractions (`DeviceInterface`,
+    `SingleEndpoint`, `device/api/allocator/DynamicEndpointIdAllocator.h`).
+-   **`device/capabilities/`**: Reusable device loads and capabilities (e.g.,
+    `OnOffLoad`, `DimmableLoad`, `FanLoad`).
+-   **`device-factory/`**: Registry (`DeviceFactory<Hooks...>`) responsible for
+    mapping CLI device names to creation factories.
+-   **`oob-accessors/`**: Out-of-Band cluster manipulation layer (`OOBAccessor`,
+    `OOBAccessorRegistry`).
 -   **`providers/`**: SDK-level data providers (such as
     `AllDevicesExampleDeviceInfoProviderImpl`) that supply node lifecycle
     information, storage interfaces, and descriptor details.
@@ -64,7 +70,7 @@ These directories contain hardware-specific or OS-specific drivers, entrypoint
 `main()` functions, and build configurations.
 
 -   **Platform Overrides**: Platforms can replace simulated behaviors with
-    hardware drivers. For example, `DeviceFactoryPlatformOverride.cpp` can
+    hardware drivers. For example, `DeviceFactoryPlatformOverride.h` can
     register an LED driver for the `on-off-light` device instead of the
     simulated device.
 
@@ -75,63 +81,95 @@ These directories contain hardware-specific or OS-specific drivers, entrypoint
 ### The Device Interface
 
 All devices in the application implement `DeviceInterface` and its core base
-class, `SingleEndpointDevice`.
+class, `SingleEndpoint`.
 
 ```mermaid
 classDiagram
     class DeviceInterface {
         <<interface>>
-        +Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)* CHIP_ERROR
+        #mDeviceTypes: Span~const DeviceTypeEntry~
+        +Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider, EndpointComposition composition)* CHIP_ERROR
         +Unregister(CodeDrivenDataModelProvider & provider)*
-        +GetEndpointId() EndpointId
-        +GetParentEndpointId() EndpointId
     }
 
-    class SingleEndpointDevice {
+    class SingleEndpoint {
         <<abstract>>
-        -mEndpointId: EndpointId
-        -mParentEndpointId: EndpointId
-        -mDeviceTypeList: Span<DeviceTypeDescriptor>
-        +Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId) CHIP_ERROR
-        +Unregister(CodeDrivenDataModelProvider & provider)
-        +SetEndpointId(EndpointId id)
+        #mEndpointId: EndpointId
+        +Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider, EndpointComposition composition) CHIP_ERROR
+        +Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)* CHIP_ERROR
+        +Unregister(CodeDrivenDataModelProvider & provider)*
+        +GetEndpointId() EndpointId
     }
 
     class OccupancySensor {
-        -mOccupancySensingCluster: OccupancySensingCluster
-        -mBridgedDeviceBasicInformationCluster: BridgedDeviceBasicInformationCluster
-        +Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId) CHIP_ERROR
+        #mOccupancySensingCluster: LazyRegisteredServerCluster~OccupancySensingCluster~
+        #mIdentifyCluster: LazyRegisteredServerCluster~IdentifyCluster~
+        +Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition) CHIP_ERROR
+        +Unregister(CodeDrivenDataModelProvider & provider)
     }
 
-    DeviceInterface <|-- SingleEndpointDevice
-    SingleEndpointDevice <|-- OccupancySensor
+    DeviceInterface <|-- SingleEndpoint
+    SingleEndpoint <|-- OccupancySensor
 ```
 
--   **`DeviceInterface`**
-    (`all-devices-common/devices/interface/DeviceInterface.h`): Defines the pure
-    virtual lifecycle contracts (`Register`, `Unregister`, etc.) required for
-    registering a block of data model elements into the active server.
--   **`SingleEndpointDevice`**
-    (`all-devices-common/devices/interface/SingleEndpointDevice.h`):
+-   **`DeviceInterface`** (`all-devices-common/device/api/Interface.h`): Defines
+    the pure virtual lifecycle contracts (`Register`, `Unregister`, etc.)
+    required for registering a block of data model elements into the active
+    server.
+-   **`SingleEndpoint`** (`all-devices-common/device/api/SingleEndpoint.h`):
     Encapsulates endpoint state, managing its assigned `EndpointId`, its parent
     endpoint relationship (for bridges or composite devices), and a list of
-    `DeviceTypeDescriptor` structures.
+    `DeviceTypeEntry` structures.
 -   **Concrete Devices** (e.g., `OccupancySensor`): Inherit from
-    `SingleEndpointDevice`, own one or more concrete strongly-typed cluster
-    instances (`LazyRegisteredServerCluster`), and bind them to the endpoint
-    during registration.
+    `SingleEndpoint`, own one or more concrete strongly-typed cluster instances
+    (`LazyRegisteredServerCluster`), and bind them to the endpoint during
+    registration.
 
 ### The Device Factory
 
-The `DeviceFactory` singleton acts as the central device creator.
+The `DeviceFactory<typename... Hooks>` template class acts as the central device
+creator and post-registration dispatcher:
 
-1. When a particular device type is enabled during the build, its static
-   self-registering factory macro executes at startup.
-2. The factory maintains an internal map of string keys (e.g.,
-   `"occupancy-sensor"`) to creation callbacks.
-3. During boot, the application parses command-line device types and calls
-   `DeviceFactory::CreateDevice(...)` to instantiate the specified runtime
-   devices.
+```mermaid
+sequenceDiagram
+    participant App as Application / main()
+    participant Factory as DeviceFactory<Hooks...>
+    participant Device as Concrete Device
+    participant Provider as CodeDrivenDataModelProvider
+    participant Hook as Registered Hooks
+
+    App->>Factory: Create(deviceType, label)
+    Factory->>Device: new ConcreteDevice(...)
+    Factory-->>App: CreatedDevice { device, onDeviceRegistered }
+
+    App->>Device: Register(endpointIdAllocator, Provider)
+    Device->>Provider: AddEndpoint / AddCluster (assigns EndpointId)
+    Device-->>App: CHIP_NO_ERROR
+
+    App->>Factory: onDeviceRegistered()
+    Factory->>Hook: (Hooks::OnDeviceRegistered(*device), ...)
+```
+
+1. **Factory Registration**: Enabled device types register creator lambdas in
+   the `DeviceFactory` constructor.
+2. **Hook Specialization**: Platforms instantiate `DeviceFactory` with
+   target-specific static hooks:
+    - **`SimpleDeviceFactory`** (`DeviceFactory<>`): Default specialization with
+      no hooks, used by embedded targets (ESP32, SiLabs, Telink) to minimize
+      binary footprint.
+    - **`PosixDeviceFactory`**
+      (`DeviceFactory<OOBAccessorHook, NamedPipe::Hook>`): Specialized for
+      POSIX, dynamically registering OOB cluster accessors and named pipe JSON
+      translators only for instantiated devices.
+3. **Creation & Registration Lifecycle**:
+    - `factory.Create(type, label)` instantiates the device and returns a
+      `CreatedDevice` struct containing the `std::unique_ptr<DeviceInterface>`
+      and a `std::function<void()> onDeviceRegistered` callback.
+    - The application registers the endpoint with the
+      `CodeDrivenDataModelProvider`, allocating its valid runtime `EndpointId`.
+    - The application invokes `created.onDeviceRegistered()`, which expands the
+      `variadic` fold expression `(Hooks::OnDeviceRegistered(*rawDevice), ...)`
+      statically for each configured hook.
 
 ---
 

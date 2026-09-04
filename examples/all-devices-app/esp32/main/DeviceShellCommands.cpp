@@ -44,7 +44,7 @@ CHIP_ERROR DeviceCommands::SetDeviceTypeHandler(int argc, char ** argv)
 {
     if (argc != 1)
     {
-        const auto supportedDeviceTypes = chip::app::DeviceFactory::GetInstance().SupportedDeviceTypes();
+        const auto supportedDeviceTypes = chip::app::SimpleDeviceFactory::GetInstance().SupportedDeviceTypes();
         streamer_printf(streamer_get(), "Usage: devtype set <device-type>\r\n");
         streamer_printf(streamer_get(), "Example: devtype set contact-sensor\r\n");
         streamer_printf(streamer_get(), "Supported device types:\r\n");

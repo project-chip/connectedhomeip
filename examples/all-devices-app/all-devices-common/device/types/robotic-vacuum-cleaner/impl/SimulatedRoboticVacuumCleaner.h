@@ -21,8 +21,8 @@
 #include <clusters/RvcOperationalState/Enums.h>
 #include <device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.h>
 #include <device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaStorageDelegate.h>
-#include <device/types/robotic-vacuum-cleaner/impl/RvcNamedPipeSimulation.h>
 #include <lib/support/TimerDelegate.h>
+#include <oob-accessors/clusters/RvcOOBAccessor.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <string>
 
@@ -74,7 +74,7 @@ enum class PhysicalDockState : uint8_t
 class SimulatedRoboticVacuumCleaner : public RoboticVacuumCleaner,
                                       public Clusters::OperationalState::OperationalStateCluster::Delegate,
                                       public Clusters::ServiceArea::Delegate,
-                                      public RvcNamedPipeSimulation,
+                                      public RvcSimulationDelegate,
                                       public TimerContext
 {
 public:
@@ -130,7 +130,15 @@ public:
     void HandleAreaComplete() override;
     void HandleClearError() override;
     void HandleReset() override;
-    void HandleErrorEvent(const std::string & error) override;
+    bool HandleErrorEvent(const std::string & error) override;
+    void HandleEmptyingDustBin() override;
+    void HandleCleaningMop() override;
+    void HandleFillingWaterTank() override;
+    void HandleUpdatingMaps() override;
+    bool HandleAddMap(uint32_t mapId, CharSpan mapName) override;
+    bool HandleRemoveMap(uint32_t mapId) override;
+    bool HandleAddArea(uint32_t areaId, std::optional<uint32_t> mapId, std::optional<CharSpan> locationName) override;
+    bool HandleRemoveArea(uint32_t areaId) override;
 
 protected:
     // -- RoboticVacuumCleaner optional clusters --

@@ -35,7 +35,7 @@ To update or validate this list manually, follow these steps:
       `rg "LazyRegisteredServerCluster<|RegisteredServerCluster<" examples/all-devices-app/`
     - Check where these are registered. They are typically added to the endpoint
       in the device implementation files under
-      `examples/all-devices-app/all-devices-common/devices/` (e.g.
+      `examples/all-devices-app/all-devices-common/device/types/` (e.g.
       `provider.AddCluster(...)`).
     - Mark as "Yes" only if they are actively instantiated and added to an
       endpoint.
@@ -51,7 +51,7 @@ To update or validate this list manually, follow these steps:
 | 5         | Activated Carbon Filter Monitoring                         | 114 (0x0072)  | Yes                | No                  | Alias of Resource Monitoring          |
 | 6         | Administrator Commissioning                                | 60 (0x003C)   | Yes                | Yes                 |                                       |
 | 7         | Air Quality                                                | 91 (0x005B)   | Yes                | Yes                 |                                       |
-| 8         | Ambient Context Sensing                                    | 1073 (0x0431) | Yes                | No                  |                                       |
+| 8         | Ambient Context Sensing                                    | 1073 (0x0431) | Yes                | Yes                 |                                       |
 | 9         | Ambient Sensing Union                                      | 1074 (0x0432) | No                 | No                  |                                       |
 | 10        | Application Basic                                          | 1293 (0x050D) | No                 | No                  |                                       |
 | 11        | Application Launcher                                       | 1292 (0x050C) | No                 | No                  |                                       |
@@ -86,15 +86,15 @@ To update or validate this list manually, follow these steps:
 | 40        | Device Energy Management Mode                              | 159 (0x009F)  | Yes                | No                  | Instance of Mode Base                 |
 | 41        | Diagnostic Logs                                            | 50 (0x0032)   | Yes                | No                  |                                       |
 | 42        | Dishwasher Alarm                                           | 93 (0x005D)   | No                 | No                  |                                       |
-| 43        | Dishwasher Mode                                            | 89 (0x0059)   | Yes                | No                  | Instance of Mode Base                 |
+| 43        | Dishwasher Mode                                            | 89 (0x0059)   | Yes                | Yes                 | Instance of Mode Base                 |
 | 44        | Door Lock                                                  | 257 (0x0101)  | No                 | No                  |                                       |
 | 45        | Dynamic Lighting                                           | 773 (0x0305)  | No                 | No                  |                                       |
 | 46        | Ecosystem Information                                      | 1872 (0x0750) | No                 | No                  |                                       |
 | 47        | Electrical Alarm                                           | 161 (0x00A1)  | No                 | No                  |                                       |
 | 48        | Electrical Distribution                                    | 162 (0x00A2)  | No                 | No                  |                                       |
-| 49        | Electrical Energy Measurement                              | 145 (0x0091)  | Yes                | No                  |                                       |
+| 49        | Electrical Energy Measurement                              | 145 (0x0091)  | Yes                | Yes                 |                                       |
 | 50        | Electrical Grid Conditions                                 | 160 (0x00A0)  | No                 | No                  |                                       |
-| 51        | Electrical Power Measurement                               | 144 (0x0090)  | Yes                | No                  |                                       |
+| 51        | Electrical Power Measurement                               | 144 (0x0090)  | Yes                | Yes                 |                                       |
 | 52        | Electrical Protection Alarm                                | 163 (0x00A3)  | No                 | No                  |                                       |
 | 53        | Energy EVSE                                                | 153 (0x0099)  | Yes                | No                  |                                       |
 | 54        | Energy EVSE Mode                                           | 157 (0x009D)  | Yes                | No                  | Instance of Mode Base                 |
@@ -118,8 +118,8 @@ To update or validate this list manually, follow these steps:
 | 72        | Joint Fabric Datastore                                     | 1874 (0x0752) | No                 | No                  |                                       |
 | 73        | Keypad Input                                               | 1289 (0x0509) | No                 | No                  |                                       |
 | 74        | Laundry Dryer Controls                                     | 74 (0x004A)   | No                 | No                  |                                       |
-| 75        | Laundry Washer Controls                                    | 83 (0x0053)   | No                 | No                  |                                       |
-| 76        | Laundry Washer Mode                                        | 81 (0x0051)   | Yes                | No                  | Instance of Mode Base                 |
+| 75        | Laundry Washer Controls                                    | 83 (0x0053)   | Yes                | Yes                 |                                       |
+| 76        | Laundry Washer Mode                                        | 81 (0x0051)   | Yes                | Yes                 | Instance of Mode Base                 |
 | 77        | Leaf Wetness Measurement                                   | 1031 (0x0407) | No                 | No                  |                                       |
 | 78        | Level Control                                              | 8 (0x0008)    | Yes                | Yes                 |                                       |
 | 79        | Localization Configuration                                 | 43 (0x002B)   | Yes                | No                  |                                       |
@@ -129,9 +129,9 @@ To update or validate this list manually, follow these steps:
 | 83        | Media Playback                                             | 1286 (0x0506) | No                 | No                  |                                       |
 | 84        | Messages                                                   | 151 (0x0097)  | No                 | No                  |                                       |
 | 85        | Meter Identification                                       | 2822 (0x0B06) | No                 | No                  |                                       |
-| 86        | Microwave Oven Control                                     | 95 (0x005F)   | Yes                | No                  |                                       |
-| 87        | Microwave Oven Mode                                        | 94 (0x005E)   | Yes                | No                  | Instance of Mode Base                 |
-| 88        | Mode Select                                                | 80 (0x0050)   | No                 | No                  |                                       |
+| 86        | Microwave Oven Control                                     | 95 (0x005F)   | Yes                | Yes                 |                                       |
+| 87        | Microwave Oven Mode                                        | 94 (0x005E)   | Yes                | Yes                 | Instance of Mode Base                 |
+| 88        | Mode Select                                                | 80 (0x0050)   | Yes                | No                  |                                       |
 | 89        | Network Commissioning                                      | 49 (0x0031)   | Yes                | Yes                 |                                       |
 | 90        | Network Identity Management                                | 1104 (0x0450) | Yes                | No                  |                                       |
 | 91        | Nitrogen Dioxide Concentration Measurement                 | 1043 (0x0413) | Yes                | Yes                 | Instance of Concentration Measurement |
@@ -149,7 +149,7 @@ To update or validate this list manually, follow these steps:
 | 103       | PM2.5 Concentration Measurement                            | 1066 (0x042A) | Yes                | Yes                 | Instance of Concentration Measurement |
 | 104       | Power Source                                               | 47 (0x002F)   | Yes                | Yes                 |                                       |
 | 105       | Power Source Configuration                                 | 46 (0x002E)   | No                 | No                  |                                       |
-| 106       | Power Topology                                             | 156 (0x009C)  | Yes                | No                  |                                       |
+| 106       | Power Topology                                             | 156 (0x009C)  | Yes                | Yes                 |                                       |
 | 107       | Pressure Measurement                                       | 1027 (0x0403) | Yes                | Yes                 |                                       |
 | 108       | Proximity Ranging                                          | 1075 (0x0433) | Yes                | Yes                 |                                       |
 | 109       | Proxy Configuration                                        | 66 (0x0042)   | No                 | No                  |                                       |
@@ -203,4 +203,4 @@ To update or validate this list manually, follow these steps:
 | 157       | Wi-Fi Network Management                                   | 1105 (0x0451) | Yes                | Yes                 |                                       |
 | 158       | Window Covering                                            | 258 (0x0102)  | No                 | No                  |                                       |
 | 159       | Zone Management                                            | 1360 (0x0550) | Yes                | No                  |                                       |
-| **Total** | **159**                                                    |               | **103**            | **58**              |                                       |
+| **Total** | **159**                                                    |               | **104**            | **66**              |                                       |

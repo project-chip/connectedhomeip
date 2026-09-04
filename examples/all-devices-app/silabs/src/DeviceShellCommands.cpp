@@ -49,7 +49,7 @@ CHIP_ERROR DeviceCommands::SetDeviceTypeHandler(int argc, char ** argv)
 {
     if (argc != 1)
     {
-        const auto supportedDeviceTypes = chip::app::DeviceFactory::GetInstance().SupportedDeviceTypes();
+        const auto supportedDeviceTypes = chip::app::SimpleDeviceFactory::GetInstance().SupportedDeviceTypes();
         streamer_printf(streamer_get(), "Usage: devtype set <device-type>\r\n");
         streamer_printf(streamer_get(), "Supported device types:\r\n");
         for (const auto & deviceType : supportedDeviceTypes)
@@ -61,7 +61,7 @@ CHIP_ERROR DeviceCommands::SetDeviceTypeHandler(int argc, char ** argv)
 
     const char * deviceType = argv[0];
 
-    if (!chip::app::DeviceFactory::GetInstance().IsValidDevice(deviceType))
+    if (!chip::app::SimpleDeviceFactory::GetInstance().IsValidDevice(deviceType))
     {
         streamer_printf(streamer_get(), "Invalid device type: %s\r\n", deviceType);
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -94,14 +94,14 @@ CHIP_ERROR DeviceCommands::GetDeviceTypeHandler(int argc, char ** argv)
     if (err != CHIP_NO_ERROR)
     {
         streamer_printf(streamer_get(), "Failed to get stored device type: %" CHIP_ERROR_FORMAT " (using default: %s)\r\n",
-                        err.Format(), chip::app::DeviceFactory::GetInstance().GetDefaultDevice().c_str());
+                        err.Format(), chip::app::SimpleDeviceFactory::GetInstance().GetDefaultDevice().c_str());
         return CHIP_NO_ERROR;
     }
 
     if (storedLen <= 0 || storedLen > sizeof(storedDeviceType))
     {
         streamer_printf(streamer_get(), "Invalid device type length: %d (using default: %s)\r\n", storedLen,
-                        chip::app::DeviceFactory::GetInstance().GetDefaultDevice().c_str());
+                        chip::app::SimpleDeviceFactory::GetInstance().GetDefaultDevice().c_str());
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
@@ -112,7 +112,7 @@ CHIP_ERROR DeviceCommands::GetDeviceTypeHandler(int argc, char ** argv)
 
 CHIP_ERROR DeviceCommands::ListDeviceTypesHandler(int argc, char ** argv)
 {
-    const auto supportedDeviceTypes = chip::app::DeviceFactory::GetInstance().SupportedDeviceTypes();
+    const auto supportedDeviceTypes = chip::app::SimpleDeviceFactory::GetInstance().SupportedDeviceTypes();
     streamer_printf(streamer_get(), "Supported device types:\r\n");
     for (const auto & deviceType : supportedDeviceTypes)
     {

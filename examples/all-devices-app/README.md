@@ -25,7 +25,7 @@ The [`docs/`](docs/) directory contains documentation for this application:
 
 -   **[Architecture & Design Patterns](docs/architecture.md)**: Describes the
     Code-Driven Data Model, component hierarchies (`DeviceFactory`,
-    `SingleEndpointDevice`), and platform separation.
+    `SingleEndpoint`), and platform separation.
 -   **[Starting Up & CLI Reference](docs/starting_up.md)**: Describes
     application initialization, endpoint composition flags (`--device`), and
     network settings.
@@ -53,7 +53,7 @@ implementations:
 -   **`esp32/`, `posix/`**: Contain platform-specific implementations (with
     `posix/` containing `linux/` and `darwin/` subdirectories), entry points,
     and build configurations.
-    -   For example, `posix/linux/DeviceFactoryPlatformOverride.cpp` registers
+    -   For example, `posix/include/DeviceFactoryPlatformOverride.h` registers
         platform-specific overrides for devices at build-time.
 
 This separation ensures core logic remains reusable across operating systems and
@@ -67,6 +67,7 @@ The application supports the following device types (specified via the
 -   `aggregator`
 -   `air-purifier`
 -   `air-quality-sensor`
+-   `ambient-context-sensor`
 -   `bridged-node`
 -   `chime`
 -   `commissioning-proxy`
@@ -118,7 +119,7 @@ Usage: ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app
 
 PROGRAM OPTIONS
 
-  --device <aggregator|air-purifier|air-quality-sensor|bridged-node|chime|commissioning-proxy|contact-sensor|cooktop|device-energy-management|dimmable-light|dimmable-plug-in-unit|dishwasher|electrical-sensor|extractor-hood|fan|fan-no-onoff|flow-sensor|generic-switch|humidity-sensor|laundry-dryer|laundry-washer|light-sensor|microwave-oven|mounted-dimmable-load-control|mounted-on-off-control|network-infrastructure-manager|occupancy-sensor|on-off-light|on-off-light-switch|on-off-plug-in-unit|oven|power-source|pressure-sensor|proximity-ranger|rain-sensor|refrigerator|robotic-vacuum-cleaner|smoke-co-alarm|soil-sensor|speaker|temperature-sensor|water-freeze-detector|water-leak-detector|water-valve>
+  --device <aggregator|air-purifier|air-quality-sensor|ambient-context-sensor|bridged-node|chime|commissioning-proxy|contact-sensor|cooktop|device-energy-management|dimmable-light|dimmable-plug-in-unit|dishwasher|electrical-sensor|extractor-hood|fan|fan-no-onoff|flow-sensor|generic-switch|humidity-sensor|laundry-dryer|laundry-washer|light-sensor|microwave-oven|mounted-dimmable-load-control|mounted-on-off-control|network-infrastructure-manager|occupancy-sensor|on-off-light|on-off-light-switch|on-off-plug-in-unit|oven|power-source|pressure-sensor|proximity-ranger|rain-sensor|refrigerator|robotic-vacuum-cleaner|smoke-co-alarm|soil-sensor|speaker|temperature-sensor|water-freeze-detector|water-leak-detector|water-valve>
        Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'
        Can be specified multiple times for multi-endpoint devices.
        Example: --device chime:1 --device speaker:2,parent=1
