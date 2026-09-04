@@ -19,7 +19,6 @@
 #include "ScheduleStructWithOwnedMembers.h"
 #include "ThermostatCluster.h"
 
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <lib/core/Optional.h>
