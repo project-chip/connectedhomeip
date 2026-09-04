@@ -56,8 +56,8 @@ struct OptionalAttributes
     bool SetpointHoldExpiryTimestamp = false;
     bool OutdoorTemperature          = false;
 
-    bool CriticalFreezeProtection    = false;
-    bool CriticalOverheatProtection  = false;
+    bool CriticalFreezeProtection   = false;
+    bool CriticalOverheatProtection = false;
 
     OptionalAttributes() = default;
 };

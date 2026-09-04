@@ -65,7 +65,8 @@ public:
         virtual Protocols::InteractionModel::Status SetUnoccupiedCoolingSetpoint(temperature unoccupiedCoolingSetpoint,
                                                                                  bool & changed);
 
-        virtual Protocols::InteractionModel::Status GetCriticalOverheatProtection(bool & enabled) const {
+        virtual Protocols::InteractionModel::Status GetCriticalOverheatProtection(bool & enabled) const
+        {
             enabled = false;
             return Protocols::InteractionModel::Status::Success;
         }
