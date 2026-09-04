@@ -28,8 +28,6 @@ executable("all-devices-app") {
   defines = [ "ENABLE_TRACING=${matter_enable_tracing_support}" ]
 
   sources = [
-    "AppCommandDelegate.cpp",
-    "ClusterTypeMappings.cpp",
     "PosixAudioManager.cpp",
     "PosixChime.cpp",
     "PosixSpeaker.cpp",
@@ -47,6 +45,7 @@ executable("all-devices-app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/chime",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/cooktop",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/device-energy-management",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-light",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-plug-in-unit",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dishwasher",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/electrical-sensor",
@@ -63,6 +62,7 @@ executable("all-devices-app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-on-off-control",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/network-infrastructure-manager",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/occupancy-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light-switch",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/oven",
@@ -81,6 +81,7 @@ executable("all-devices-app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-info-provider",
     "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-instance-info-provider",
     "${chip_root}/examples/all-devices-app/posix/app_options:app-options",
+    "${chip_root}/examples/all-devices-app/posix/named_pipe",
     "${chip_root}/examples/common/tracing:commandline",
     "${chip_root}/examples/platform/linux:app-main-loop",
     "${chip_root}/examples/platform/linux:commissionable-init",

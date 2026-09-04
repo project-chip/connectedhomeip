@@ -21,9 +21,14 @@ source_set("dimmable-light") {
   sources = [
     "DimmableLight.cpp",
     "DimmableLight.h",
+    "OOBAccessors.cpp",
+    "OOBAccessors.h",
   ]
 
-  public_deps = [ "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/dimmable-load" ]
+  public_deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/dimmable-load",
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
+  ]
 }
 
 source_set("logging") {
@@ -37,3 +42,4 @@ source_set("logging") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/dimmable-load:logging",
   ]
 }
+

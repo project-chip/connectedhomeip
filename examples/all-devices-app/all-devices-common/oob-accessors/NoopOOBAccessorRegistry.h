@@ -16,30 +16,21 @@
 
 #pragma once
 
-#include <optional>
+#include <memory>
 
-#include <app/AttributeValueDecoder.h>
-#include <app/ConcreteAttributePath.h>
-#include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/TLV.h>
 #include <lib/support/Span.h>
 #include <oob-accessors/OOBAccessor.h>
 
 namespace chip::app {
 
-class BooleanStateSensorAccessor : public OOBAccessor
+class NoopOOBAccessorRegistry
 {
 public:
-    BooleanStateSensorAccessor(BooleanStateSensor & device) : mDevice(device) {}
-    ~BooleanStateSensorAccessor() override = default;
-
-    std::optional<CHIP_ERROR> HandleAction(CharSpan actionName, ByteSpan tlvBuffer) override;
-
-private:
-    std::optional<CHIP_ERROR> SetAttribute(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder);
-
-    BooleanStateSensor & mDevice;
+    CHIP_ERROR Register(std::unique_ptr<OOBAccessor> /* accessor */) { return CHIP_NO_ERROR; }
+    CHIP_ERROR HandleAction(CharSpan /* action */, ByteSpan /* tlvData */) { return CHIP_ERROR_NOT_FOUND; }
+    void Clear() {}
+    size_t Size() const { return 0; }
 };
 
 } // namespace chip::app

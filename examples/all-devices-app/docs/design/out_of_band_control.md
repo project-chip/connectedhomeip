@@ -65,15 +65,14 @@ flowchart LR
         (e.g., `OnOff`, `OccupancySensing`) live in
         `all-devices-common/oob-accessors/clusters/` so any device containing
         that cluster reuses the same implementation.
-    -   **Device-Specific Accessors & Integrations**: Device implementations and
-        their associated OOB hooks live together in
+    -   **Device-Specific Accessors**: Device implementations and their
+        associated OOB accessor registrations live together in
         `all-devices-common/device/types/<device-name>/`:
         -   Core logic and `OOBAccessors.h/.cpp` belong to the platform-neutral
             `:<device-name>` target.
-        -   `NamedPipes.h/.cpp` belongs to the POSIX-only `:posix` sub-target.
     -   **Platform Transport Infrastructure**: Dispatchers and base interfaces
-        (e.g., POSIX Named Pipes) live in platform directories under
-        `posix/named_pipe/`.
+        (e.g., POSIX Named Pipes and JSON translators) live in platform directories
+        under `posix/named_pipe/`.
 
 ---
 
@@ -90,8 +89,7 @@ examples/all-devices-app/
 │   │       └── <device-name>/
 │   │           ├── <DeviceName>.h/.cpp                 # Core device implementation (platform-neutral)
 │   │           ├── OOBAccessors.h/.cpp                 # Device OOB accessor registration (platform-neutral)
-│   │           ├── NamedPipes.h/.cpp                   # Device Named Pipe registration (POSIX-only)
-│   │           └── BUILD.gn                            # GN targets: :<device-name>, :posix, :logging
+│   │           └── BUILD.gn                            # GN targets: :<device-name>, :logging
 │   └── oob-accessors/
 │       ├── all_devices_config.gni                      # GN build configuration header generator
 │       ├── all_devices_config.cmake                    # CMake build configuration header generator
@@ -106,10 +104,10 @@ examples/all-devices-app/
 └── posix/
     └── named_pipe/
         ├── BUILD.gn                                    # GN rules for POSIX dispatcher & translators
-        ├── NamedPipeCommandTranslator.h                # Base interface: TranslateAndExecute(json, registry)
+        ├── NamedPipeCommandTranslator.h                # Base interface: TranslateAndExecute(endpointId, json, registry)
         ├── PosixNamedPipeDispatcher.h/.cpp             # POSIX pipe listener & JSON command router
         └── translators/
-            └── <Command>Translator.h/.cpp              # Command translators (e.g. OnOffTranslator, OccupancyTranslator)
+            └── <Command>Translator.h/.cpp              # Command-specific JSON-to-TLV translators
 ```
 
 ---
@@ -397,36 +395,15 @@ void RegisterOOBAccessors(OnOffLight & device, OOBAccessorRegistry & registry)
 
 ### Step 2: Register Named Pipe Translators (POSIX-Only)
 
-In `all-devices-common/device/types/<device-name>/NamedPipes.h`:
+In `posix/main.cpp`:
 
 ```cpp
-#pragma once
-#include <posix/named_pipe/PosixNamedPipeDispatcher.h>
-
-namespace chip::app {
-
-class OnOffLight;
-
-void RegisterNamedPipes(OnOffLight & device, PosixNamedPipeDispatcher & dispatcher);
-
-} // namespace chip::app
-```
-
-In `all-devices-common/device/types/<device-name>/NamedPipes.cpp`:
-
-```cpp
-#include "NamedPipes.h"
-#include "OnOffLight.h"
-#include <posix/named_pipe/translators/OnOffTranslator.h>
-
-namespace chip::app {
-
-void RegisterNamedPipes(OnOffLight & device, PosixNamedPipeDispatcher & dispatcher)
-{
-    dispatcher.EnsureTranslatorRegistered<OnOffTranslator>();
-}
-
-} // namespace chip::app
+mNamedPipeDispatcher.EnsureTranslatorRegistered<OnOffTranslator>();
+mNamedPipeDispatcher.EnsureTranslatorRegistered<OccupancyTranslator>();
+mNamedPipeDispatcher.EnsureTranslatorRegistered<BooleanStateTranslator>();
+mNamedPipeDispatcher.EnsureTranslatorRegistered<AmbientContextTranslator>();
+mNamedPipeDispatcher.EnsureTranslatorRegistered<BasicInformationTranslator>();
+mNamedPipeDispatcher.EnsureTranslatorRegistered<ElectricalEnergyMeasurementTranslator>();
 ```
 
 ### Step 3: Define Granular GN Sub-Targets
@@ -449,19 +426,6 @@ source_set("<device-name>") {
     "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
   ]
 }
-
-# POSIX-only named pipe integration (pulled exclusively by POSIX builds)
-source_set("posix") {
-  sources = [
-    "NamedPipes.cpp",
-    "NamedPipes.h",
-  ]
-
-  public_deps = [
-    ":<device-name>",
-    "${chip_root}/examples/all-devices-app/posix/named_pipe",
-  ]
-}
 ```
 
 ### Step 4: Factory Creation & Application Lifecycle
@@ -476,9 +440,9 @@ RegisterCreator("on-off-light", [this](const std::string & label) -> CreatedDevi
 
     return CreatedDevice{
         .device = std::move(device),
-        .postRegistrationCallback = [rawDevice](OOBAccessorRegistry & registry) {
+        .postRegistrationCallback = PostRegistrationCallback([rawDevice](OOBAccessorRegistry & registry) {
             RegisterOOBAccessors(*rawDevice, registry);
-        },
+        }),
     };
 });
 ```
@@ -516,22 +480,14 @@ mNamedPipeDispatcher.Start(kDefaultFifoPath);
 Target separation prevents platform-specific dependencies from leaking into
 embedded builds:
 
--   **POSIX GN Target (`posix/BUILD.gn`)**: Pulls both the base device target
-    and the `:posix` sub-target:
-    ```text
-    deps = [
-      "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light",
-      "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light:posix",
-    ]
-    ```
+-   **POSIX GN Target (`posix/BUILD.gn`)**: Pulls the platform-neutral device
+    targets and the `posix/named_pipe` dispatcher target.
 -   **Embedded GN Targets (`silabs/BUILD.gn`)**: Pulls only the platform-neutral
     base target `device/types/<name>` (and any `:silabs` / `:logging`
-    sub-targets). The `:posix` target is never referenced, eliminating
-    transitive POSIX headers.
+    sub-targets). POSIX dispatchers and named pipe headers are never referenced.
 -   **Embedded CMake Targets (`esp32`, `telink`)**: `enabled_devices.cmake`
     collects `${DEVICE_DIR}/<DeviceName>.cpp` and
-    `${DEVICE_DIR}/OOBAccessors.cpp`. `NamedPipes.cpp` is excluded from CMake
-    source lists.
+    `${DEVICE_DIR}/OOBAccessors.cpp`.
 
 Configuration defines are generated into `app_config/all_devices_config.h` for
 both GN and CMake:
@@ -570,75 +526,3 @@ using OOBAccessorRegistry = NoopOOBAccessorRegistry;
 } // namespace chip::app
 ```
 
----
-
-## 7. TODO / Implementation Checklist
-
-> [!NOTE] The unified Out-of-Band Control architecture is specified above and
-> tracked for implementation via the following phased checklist.
-
-### Phase 1: Core OOB Registry & Cluster Accessors
-
--   [ ] Create `all-devices-common/oob-accessors/all_devices_config.gni`,
-        `all_devices_config.cmake`, and `all_devices_config.h.in`.
--   [ ] Create `all-devices-common/oob-accessors/OOBAccessor.h`.
--   [ ] Create `all-devices-common/oob-accessors/InMemoryOOBAccessorRegistry.h`
-        and `.cpp`.
--   [ ] Create `all-devices-common/oob-accessors/NoopOOBAccessorRegistry.h`.
--   [ ] Create `all-devices-common/oob-accessors/OOBAccessorRegistry.h`
-        (aliasing header).
--   [ ] Implement shared cluster accessors in
-        `all-devices-common/oob-accessors/clusters/`:
-    -   [ ] `OnOffOOBAccessor.h/.cpp`
-    -   [ ] `OccupancyOOBAccessor.h/.cpp`
-    -   [ ] `BooleanStateOOBAccessor.h/.cpp`
-    -   [ ] `AmbientContextOOBAccessor.h/.cpp`
-    -   [ ] `BasicInformationOOBAccessor.h/.cpp`
--   [ ] Update `all-devices-common/oob-accessors/BUILD.gn` with new OOB source
-        targets.
-
-### Phase 2: Device-Type OOB Accessor Registration
-
--   [ ] Add `OOBAccessors.h` and `OOBAccessors.cpp` for all existing device
-        types:
-    -   [ ] `all-devices-common/device/types/on-off-light/`
-    -   [ ] `all-devices-common/device/types/dimmable-light/`
-    -   [ ] `all-devices-common/device/types/occupancy-sensor/`
-    -   [ ] `all-devices-common/device/types/contact-sensor/`
-    -   [ ] `all-devices-common/device/types/light-sensor/`
-    -   [ ] `all-devices-common/device/types/air-quality-sensor/`
-    -   [ ] `all-devices-common/device/types/speaker/`
-    -   [ ] `all-devices-common/device/types/on-off-plug-in-unit/`
-    -   [ ] `all-devices-common/device/types/dimmable-plug-in-unit/`
--   [ ] Hook `created.postRegistrationCallback(mOobRegistry)` after endpoint
-        registration in `main.cpp`.
-
-### Phase 3: POSIX Named Pipe Dispatcher & Translators
-
--   [ ] Create `posix/named_pipe/NamedPipeCommandTranslator.h`.
--   [ ] Create `posix/named_pipe/PosixNamedPipeDispatcher.h` and `.cpp`.
--   [ ] Implement granular translators in `posix/named_pipe/translators/`:
-    -   [ ] `OnOffTranslator.h/.cpp`
-    -   [ ] `OccupancyTranslator.h/.cpp`
-    -   [ ] `BooleanStateTranslator.h/.cpp`
-    -   [ ] `AmbientContextTranslator.h/.cpp`
-    -   [ ] `BasicInformationTranslator.h/.cpp`
-
-### Phase 4: Device-Type Named Pipe Registration & Sub-Targets
-
--   [ ] Add `NamedPipes.h` and `NamedPipes.cpp` under
-        `all-devices-common/device/types/<device-name>/` for each supported
-        device.
--   [ ] Add `source_set("posix")` to each device's `BUILD.gn`.
--   [ ] Wire `mNamedPipeDispatcher.Start(path)` in `posix/main.cpp`.
-
-### Phase 5: Legacy Cleanup & Build Verification
-
--   [ ] Remove legacy `AppCommandDelegate.h/.cpp`.
--   [ ] Remove legacy `ClusterTypeMappings.h/.cpp`.
--   [ ] Remove legacy `AllDevicesAppClusterImplementationRegistry.h`.
--   [ ] Update build files (`posix/BUILD.gn`,
-        `all-devices-common/oob-accessors/BUILD.gn`,
-        `posix/named_pipe/BUILD.gn`).
--   [ ] Build target `linux-x64-all-devices-clang` and verify with sample named
-        pipe commands.

@@ -14,6 +14,14 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
+import(
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/all_devices_config.gni")
+
+all_devices_app_buildconfig_header("all_devices_config_buildconfig") {
+  header = "all_devices_config.h"
+  header_dir = "app_config"
+}
 
 config("includes") {
   include_dirs = [ ".." ]
@@ -21,14 +29,36 @@ config("includes") {
 
 source_set("oob-accessors") {
   sources = [
+    "InMemoryOOBAccessorRegistry.cpp",
+    "InMemoryOOBAccessorRegistry.h",
+    "NoopOOBAccessorRegistry.h",
     "OOBAccessor.h",
     "OOBAccessorRegistry.h",
     "OOBDataSerializer.cpp",
     "OOBDataSerializer.h",
+    "clusters/AmbientContextOOBAccessor.cpp",
+    "clusters/AmbientContextOOBAccessor.h",
+    "clusters/BasicInformationOOBAccessor.cpp",
+    "clusters/BasicInformationOOBAccessor.h",
+    "clusters/BooleanStateOOBAccessor.cpp",
+    "clusters/BooleanStateOOBAccessor.h",
+    "clusters/ElectricalEnergyMeasurementOOBAccessor.cpp",
+    "clusters/ElectricalEnergyMeasurementOOBAccessor.h",
+    "clusters/OccupancyOOBAccessor.cpp",
+    "clusters/OccupancyOOBAccessor.h",
+    "clusters/OnOffOOBAccessor.cpp",
+    "clusters/OnOffOOBAccessor.h",
   ]
 
   public_deps = [
+    ":all_devices_config_buildconfig",
     "${chip_root}/src/app:paths",
+    "${chip_root}/src/app/clusters/ambient-context-sensing-server",
+    "${chip_root}/src/app/clusters/basic-information",
+    "${chip_root}/src/app/clusters/boolean-state-server",
+    "${chip_root}/src/app/clusters/electrical-energy-measurement-server",
+    "${chip_root}/src/app/clusters/occupancy-sensor-server",
+    "${chip_root}/src/app/clusters/on-off-server",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]

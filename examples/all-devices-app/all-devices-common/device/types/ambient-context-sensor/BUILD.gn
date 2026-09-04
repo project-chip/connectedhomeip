@@ -19,10 +19,13 @@ source_set("ambient-context-sensor") {
   sources = [
     "AmbientContextSensor.cpp",
     "AmbientContextSensor.h",
+    "OOBAccessors.cpp",
+    "OOBAccessors.h",
   ]
 
   public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
     "${chip_root}/src/app/clusters/ambient-context-sensing-server",
     "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/data-model-providers/codedriven",
@@ -40,3 +43,4 @@ source_set("logging") {
 
   public_deps = [ ":ambient-context-sensor" ]
 }
+
