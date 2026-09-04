@@ -13425,15 +13425,6 @@ class GroupKeyManagement(Cluster):
     clusterRevision: uint = 0
 
     class Enums:
-        class GroupKeyMulticastPolicyEnum(MatterIntEnum):
-            kPerGroupID = 0x00
-            kAllNodes = 0x01
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2
-
         class GroupKeySecurityPolicyEnum(MatterIntEnum):
             kTrustFirst = 0x00
             kCacheAndSync = 0x01
@@ -20676,11 +20667,12 @@ class Groupcast(Cluster):
             kFailedAuth = 0x03
             kNoAvailableKey = 0x04
             kSendFailure = 0x05
+            kUnknownGroup = 0x06
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 6
+            kUnknownEnumValue = 7
 
         class GroupcastTestingEnum(MatterIntEnum):
             kDisableTesting = 0x00
@@ -58567,15 +58559,6 @@ class JointFabricDatastore(Cluster):
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 0
-
-        class DatastoreGroupKeyMulticastPolicyEnum(MatterIntEnum):
-            kPerGroupID = 0x00
-            kAllNodes = 0x01
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2
 
         class DatastoreGroupKeySecurityPolicyEnum(MatterIntEnum):
             kTrustFirst = 0x00
