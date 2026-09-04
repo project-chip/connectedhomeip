@@ -118,19 +118,20 @@ bool SetPublicKey(const uint8_t * pubkey, uint32_t pubkeyLen, EVP_PKEY * key)
 
 bool ExtractPublicKey(EVP_PKEY * key, MutableByteSpan & pubKey)
 {
-    const EC_KEY * ecKey     = nullptr;
     const EC_GROUP * group   = nullptr;
     const EC_POINT * ecPoint = nullptr;
 
     VerifyOrReturnError(pubKey.size() >= kP256_PublicKey_Length, false);
 
-    ecKey = EVP_PKEY_get1_EC_KEY(key);
-    VerifyOrReturnError(ecKey != nullptr, false);
+    // Per the OpenSSL naming convention, the key returned by a "get1" function holds an extra reference
+    // that must be released independently of the EVP_PKEY it was obtained from.
+    std::unique_ptr<EC_KEY, void (*)(EC_KEY *)> ecKey(EVP_PKEY_get1_EC_KEY(key), &EC_KEY_free);
+    VerifyOrReturnError(ecKey.get() != nullptr, false);
 
-    group = EC_KEY_get0_group(ecKey);
+    group = EC_KEY_get0_group(ecKey.get());
     VerifyOrReturnError(group != nullptr, false);
 
-    ecPoint = EC_KEY_get0_public_key(ecKey);
+    ecPoint = EC_KEY_get0_public_key(ecKey.get());
     VerifyOrReturnError(ecPoint != nullptr, false);
 
     VerifyOrReturnError(EC_POINT_point2oct(group, ecPoint, POINT_CONVERSION_UNCOMPRESSED, Uint8::to_uchar(pubKey.data()),
@@ -156,7 +157,12 @@ bool DeserializeKeyPair(const uint8_t * keyPair, uint32_t keyPairLen, EVP_PKEY *
 
     VerifyOrReturnError(BN_bin2bn(keyPair + kP256_PublicKey_Length, kP256_PrivateKey_Length, privKeyBN.get()) != nullptr, false);
 
-    VerifyOrReturnError(EC_KEY_set_private_key(EVP_PKEY_get1_EC_KEY(key), privKeyBN.get()) == 1, false);
+    {
+        std::unique_ptr<EC_KEY, void (*)(EC_KEY *)> ecKey(EVP_PKEY_get1_EC_KEY(key), &EC_KEY_free);
+        VerifyOrReturnError(ecKey.get() != nullptr, false);
+
+        VerifyOrReturnError(EC_KEY_set_private_key(ecKey.get(), privKeyBN.get()) == 1, false);
+    }
 
     return true;
 }
@@ -165,16 +171,15 @@ bool DeserializeKeyPair(const uint8_t * keyPair, uint32_t keyPairLen, EVP_PKEY *
 
 bool SerializeKeyPair(EVP_PKEY * key, P256SerializedKeypair & serializedKeypair)
 {
-    const EC_KEY * ecKey     = nullptr;
     const BIGNUM * privKeyBN = nullptr;
     MutableByteSpan pubKey(serializedKeypair.Bytes(), kP256_PublicKey_Length);
 
     VerifyOrReturnError(ExtractPublicKey(key, pubKey), false);
 
-    ecKey = EVP_PKEY_get1_EC_KEY(key);
-    VerifyOrReturnError(ecKey != nullptr, false);
+    std::unique_ptr<EC_KEY, void (*)(EC_KEY *)> ecKey(EVP_PKEY_get1_EC_KEY(key), &EC_KEY_free);
+    VerifyOrReturnError(ecKey.get() != nullptr, false);
 
-    privKeyBN = EC_KEY_get0_private_key(ecKey);
+    privKeyBN = EC_KEY_get0_private_key(ecKey.get());
     VerifyOrReturnError(privKeyBN != nullptr, false);
 
     VerifyOrReturnError(BN_bn2binpad(privKeyBN, serializedKeypair.Bytes() + kP256_PublicKey_Length, kP256_PrivateKey_Length) ==
@@ -425,7 +430,10 @@ bool WriteKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
     case kKeyFormat_X509_PEM:
         if (EVP_PKEY_id(key) == EVP_PKEY_EC)
         {
-            if (PEM_write_ECPrivateKey(file, EVP_PKEY_get1_EC_KEY(key), nullptr, nullptr, 0, nullptr, nullptr) == 0)
+            std::unique_ptr<EC_KEY, void (*)(EC_KEY *)> ecKey(EVP_PKEY_get1_EC_KEY(key), &EC_KEY_free);
+            VerifyOrExit(ecKey.get() != nullptr, res = false);
+
+            if (PEM_write_ECPrivateKey(file, ecKey.get(), nullptr, nullptr, 0, nullptr, nullptr) == 0)
             {
                 ReportOpenSSLErrorAndExit("PEM_write_ECPrivateKey", res = false);
             }
@@ -441,7 +449,10 @@ bool WriteKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
     case kKeyFormat_X509_Pubkey_PEM:
         if (EVP_PKEY_id(key) == EVP_PKEY_EC)
         {
-            if (PEM_write_EC_PUBKEY(file, EVP_PKEY_get1_EC_KEY(key)) == 0)
+            std::unique_ptr<EC_KEY, void (*)(EC_KEY *)> ecKey(EVP_PKEY_get1_EC_KEY(key), &EC_KEY_free);
+            VerifyOrExit(ecKey.get() != nullptr, res = false);
+
+            if (PEM_write_EC_PUBKEY(file, ecKey.get()) == 0)
             {
                 ReportOpenSSLErrorAndExit("PEM_write_EC_PUBKEY", res = false);
             }
@@ -457,7 +468,10 @@ bool WriteKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
     case kKeyFormat_X509_DER:
         if (EVP_PKEY_id(key) == EVP_PKEY_EC)
         {
-            if (i2d_ECPrivateKey_fp(file, EVP_PKEY_get1_EC_KEY(key)) == 0)
+            std::unique_ptr<EC_KEY, void (*)(EC_KEY *)> ecKey(EVP_PKEY_get1_EC_KEY(key), &EC_KEY_free);
+            VerifyOrExit(ecKey.get() != nullptr, res = false);
+
+            if (i2d_ECPrivateKey_fp(file, ecKey.get()) == 0)
             {
                 ReportOpenSSLErrorAndExit("i2d_PrivateKey_fp", res = false);
             }
@@ -474,7 +488,10 @@ bool WriteKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
         int derKeyLen;
         if (EVP_PKEY_id(key) == EVP_PKEY_EC)
         {
-            derKeyLen = i2d_ECPrivateKey(EVP_PKEY_get1_EC_KEY(key), &derKey);
+            std::unique_ptr<EC_KEY, void (*)(EC_KEY *)> ecKey(EVP_PKEY_get1_EC_KEY(key), &EC_KEY_free);
+            VerifyOrExit(ecKey.get() != nullptr, res = false);
+
+            derKeyLen = i2d_ECPrivateKey(ecKey.get(), &derKey);
         }
         else
         {
