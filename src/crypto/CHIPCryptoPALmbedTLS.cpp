@@ -457,6 +457,23 @@ static inline const mbedtls_ecp_keypair * to_const_keypair(const P256KeypairCont
     return SafePointerCast<const mbedtls_ecp_keypair *>(context);
 }
 
+#if defined(MBEDTLS_ECDSA_C)
+// Concatenates r and s into the raw signature format used by CHIPCryptoPAL.
+static CHIP_ERROR encode_signature(const mbedtls_mpi & r, const mbedtls_mpi & s, P256ECDSASignature & out_signature)
+{
+    VerifyOrReturnError((mbedtls_mpi_size(&r) <= kP256_FE_Length) && (mbedtls_mpi_size(&s) <= kP256_FE_Length),
+                        CHIP_ERROR_INTERNAL);
+
+    // Sizes were checked above.
+    VerifyOrReturnError(mbedtls_mpi_write_binary(&r, out_signature.Bytes() + 0u, kP256_FE_Length) == 0, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mbedtls_mpi_write_binary(&s, out_signature.Bytes() + kP256_FE_Length, kP256_FE_Length) == 0,
+                        CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(out_signature.SetLength(kP256_ECDSA_Signature_Length_Raw) == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+
+    return CHIP_NO_ERROR;
+}
+#endif // defined(MBEDTLS_ECDSA_C)
+
 CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) const
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
@@ -486,17 +503,7 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
 
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    VerifyOrExit((mbedtls_mpi_size(&r) <= kP256_FE_Length) && (mbedtls_mpi_size(&s) <= kP256_FE_Length),
-                 error = CHIP_ERROR_INTERNAL);
-
-    // Concatenate r and s to output. Sizes were checked above.
-    result = mbedtls_mpi_write_binary(&r, out_signature.Bytes() + 0u, kP256_FE_Length);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    result = mbedtls_mpi_write_binary(&s, out_signature.Bytes() + kP256_FE_Length, kP256_FE_Length);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    VerifyOrExit(out_signature.SetLength(kP256_ECDSA_Signature_Length_Raw) == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    SuccessOrExit(error = encode_signature(r, s, out_signature));
 
 exit:
     keypair = nullptr;
@@ -509,6 +516,49 @@ exit:
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
 }
+
+// If the mbedtls configuration lacks deterministic ECDSA, the weak stub in CHIPCryptoPAL.cpp applies.
+#if defined(MBEDTLS_ECDSA_C) && defined(MBEDTLS_ECDSA_DETERMINISTIC)
+CHIP_ERROR P256Keypair::ECDSA_sign_msg_det(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) const
+{
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
+    VerifyOrReturnError((msg != nullptr) && (msg_length > 0), CHIP_ERROR_INVALID_ARGUMENT);
+
+    uint8_t digest[kSHA256_Hash_Length];
+    memset(&digest[0], 0, sizeof(digest));
+    ReturnErrorOnFailure(Hash_SHA256(msg, msg_length, &digest[0]));
+
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+    mbedtls_mpi r, s;
+    mbedtls_mpi_init(&r);
+    mbedtls_mpi_init(&s);
+
+    const mbedtls_ecp_keypair * keypair = to_const_keypair(&mKeypair);
+
+    mbedtls_ecdsa_context ecdsa_ctxt;
+    mbedtls_ecdsa_init(&ecdsa_ctxt);
+
+    result = mbedtls_ecdsa_from_keypair(&ecdsa_ctxt, keypair);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    // The nonce is derived per RFC 6979; the RNG is only used for blinding and does not affect the signature.
+    result = mbedtls_ecdsa_sign_det_ext(&ecdsa_ctxt.CHIP_CRYPTO_PAL_PRIVATE(grp), &r, &s, &ecdsa_ctxt.CHIP_CRYPTO_PAL_PRIVATE(d),
+                                        Uint8::to_const_uchar(digest), sizeof(digest), MBEDTLS_MD_SHA256, CryptoRNG, nullptr);
+
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    SuccessOrExit(error = encode_signature(r, s, out_signature));
+
+exit:
+    keypair = nullptr;
+    mbedtls_ecdsa_free(&ecdsa_ctxt);
+    mbedtls_mpi_free(&s);
+    mbedtls_mpi_free(&r);
+    _log_mbedTLS_error(result);
+    return error;
+}
+#endif // defined(MBEDTLS_ECDSA_C) && defined(MBEDTLS_ECDSA_DETERMINISTIC)
 
 CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length,
                                                        const P256ECDSASignature & signature) const
@@ -685,6 +735,58 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
                                        MBEDTLS_ECP_PF_UNCOMPRESSED, &pubkey_size, Uint8::to_uchar(mPublicKey), mPublicKey.Length());
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(pubkey_size == mPublicKey.Length(), error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    keypair      = nullptr;
+    mInitialized = true;
+
+exit:
+    if (keypair != nullptr)
+    {
+        mbedtls_ecp_keypair_free(keypair);
+        keypair = nullptr;
+    }
+
+    _log_mbedTLS_error(result);
+    return error;
+}
+
+CHIP_ERROR P256Keypair::InitializeFromBitsOrReject(FixedByteSpan<kP256_PrivateKey_Length> privateKeyBits)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+
+    size_t pubkey_size = 0;
+
+    Clear();
+
+    mbedtls_ecp_keypair * keypair = to_keypair(&mKeypair);
+    mbedtls_ecp_keypair_init(keypair);
+
+    mbedtls_ecp_group * grp = &keypair->CHIP_CRYPTO_PAL_PRIVATE(grp);
+    mbedtls_ecp_point * Q   = &keypair->CHIP_CRYPTO_PAL_PRIVATE(Q);
+    mbedtls_mpi * d         = &keypair->CHIP_CRYPTO_PAL_PRIVATE(d);
+
+    result = mbedtls_ecp_group_load(grp, MapECPGroupId(mPublicKey.Type()));
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    // Convert the private key bits to an integer x, then compute d = x + 1.
+    // Checking that d < order ensures that x was in [0, order - 2].
+    result = mbedtls_mpi_read_binary(d, privateKeyBits.data(), privateKeyBits.size());
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_mpi_add_int(d, d, 1);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    VerifyOrExit(mbedtls_mpi_cmp_mpi(d, &grp->N) < 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Compute the public key: Q = d * G
+    result = mbedtls_ecp_mul(grp, Q, d, &grp->G, CryptoRNG, nullptr);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_ecp_point_write_binary(grp, Q, MBEDTLS_ECP_PF_UNCOMPRESSED, &pubkey_size, Uint8::to_uchar(mPublicKey),
+                                            mPublicKey.Length());
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(pubkey_size == mPublicKey.Length(), error = CHIP_ERROR_INTERNAL);
 
     keypair      = nullptr;
     mInitialized = true;
