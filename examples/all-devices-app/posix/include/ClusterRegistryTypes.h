@@ -15,19 +15,20 @@
  *    limitations under the License.
  */
 
-#include "LoggingRvcOperationalStateDelegate.h"
-#include <lib/support/logging/CHIPLogging.h>
+#pragma once
 
-namespace chip::app::Clusters::OperationalState {
+#include <app/clusters/mode-base-server/ModeBaseCluster.h>
 
-void LoggingRvcOperationalStateDelegate::HandleGoHomeCommandCallback(GenericOperationalError & err)
+// Registry type tags for clusters that share the same implementation type but represent
+// distinct logical clusters on an endpoint (e.g. RVC Run Mode and RVC Clean Mode both
+// use ModeBaseCluster).
+
+struct RvcRunModeType
 {
-    ChipLogProgress(Zcl, "LoggingRvcOperationalStateDelegate: Go Home command received.");
-    if (mCluster)
-    {
-        LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(OperationalStateEnum::kStopped)));
-    }
-    err.Set(to_underlying(ErrorStateEnum::kNoError));
-}
+    using ClusterType = chip::app::Clusters::ModeBaseCluster;
+};
 
-} // namespace chip::app::Clusters::OperationalState
+struct RvcCleanModeType
+{
+    using ClusterType = chip::app::Clusters::ModeBaseCluster;
+};
