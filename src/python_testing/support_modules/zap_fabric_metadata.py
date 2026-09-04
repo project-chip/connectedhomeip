@@ -116,20 +116,22 @@ class ZapFabricMetadata:
         return self.structs.get((None, name))
 
 
-def _parse_struct(element: ElementTree.Element) -> tuple[int | None, ZapStruct] | None:
-    """Parse one <struct>, returning its (cluster_id, ZapStruct) or None if unusable."""
+def _parse_struct(element: ElementTree.Element) -> tuple[list[int | None], ZapStruct] | None:
+    """Parse one <struct>, returning its (cluster_ids, ZapStruct) or None if unusable.
+
+    A struct shared by several clusters is returned under every cluster it is
+    associated with: the lookup is cluster-keyed, so keying only the first
+    association would return None for the rest and silently skip their checks.
+    """
     name = element.attrib.get('name')
     if name is None:
         return None
 
-    # A struct is associated with a cluster by a <cluster code="0x..."/> child.
-    # Structs with no such child are global. A struct shared by several clusters
-    # carries one child per cluster; the first is enough to key it, because the
-    # markers themselves are properties of the struct, not of the association.
-    cluster_reference = element.find('cluster')
-    cluster_id = None
-    if cluster_reference is not None:
-        cluster_id = _parse_id(cluster_reference.attrib.get('code'))
+    # A struct is associated with a cluster by a <cluster code="0x..."/> child, one
+    # per cluster sharing it. A struct with no usable association is global; an
+    # unparseable code is treated as absent rather than keyed under a bogus id.
+    cluster_ids = [_parse_id(reference.attrib.get('code')) for reference in element.findall('cluster')]
+    cluster_ids = [cluster_id for cluster_id in cluster_ids if cluster_id is not None]
 
     sensitive_field_ids = set()
     field_ids = set()
@@ -141,10 +143,10 @@ def _parse_struct(element: ElementTree.Element) -> tuple[int | None, ZapStruct] 
         if _is_true(item, 'isFabricSensitive'):
             sensitive_field_ids.add(field_id)
 
-    return cluster_id, ZapStruct(name=name,
-                                 fabric_scoped=_is_true(element, 'isFabricScoped'),
-                                 sensitive_field_ids=frozenset(sensitive_field_ids),
-                                 field_ids=frozenset(field_ids))
+    return cluster_ids or [None], ZapStruct(name=name,
+                                            fabric_scoped=_is_true(element, 'isFabricScoped'),
+                                            sensitive_field_ids=frozenset(sensitive_field_ids),
+                                            field_ids=frozenset(field_ids))
 
 
 def _parse_cluster(element: ElementTree.Element) -> ZapCluster | None:
@@ -211,8 +213,9 @@ def build_zap_fabric_metadata(directory: Path = ZAP_DATA_MODEL_DIRECTORY) -> Zap
             parsed = _parse_struct(element)
             if parsed is None:
                 continue
-            cluster_id, struct = parsed
-            structs[(cluster_id, struct.name)] = struct
+            cluster_ids, struct = parsed
+            for cluster_id in cluster_ids:
+                structs[(cluster_id, struct.name)] = struct
 
         # findall rather than iter: <cluster code="0x..."/> also appears inside
         # <struct> as an association reference, and iter would match those too.
