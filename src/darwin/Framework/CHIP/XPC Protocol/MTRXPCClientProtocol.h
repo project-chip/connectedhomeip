@@ -35,7 +35,7 @@ MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2))
 // Not Supported via XPC
 //- (oneway void)controller:(NSUUID *)controller statusUpdate:(MTRCommissioningStatus)status;
 //- (oneway void)controller:(NSUUID *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error;
-//- (oneway void)controller:(NSUUID *)controller commissioningComplete:(NSError * _Nullable)error nodeID:(NSNumber * _Nullable)nodeID metrics:(MTRMetrics * _Nullable)metrics;
+//- (oneway void)controller:(NSUUID *)controller commissioningComplete:(NSError * _Nullable)error nodeID:(NSNumber * _Nullable)nodeID metrics:(MTRMetrics * _Nullable)metrics context:(NSDictionary<NSString *, id> * _Nullable)context;
 //- (oneway void)controller:(NSUUID *)controller readCommissioningInfo:(MTRProductIdentity *)info;
 @optional
 - (oneway void)controller:(NSUUID *)controller controllerConfigurationUpdated:(NSDictionary *)configuration MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));

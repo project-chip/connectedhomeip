@@ -2172,6 +2172,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 - (void)commissioning:(MTRCommissioningOperation *)commissioning
     succeededForNodeID:(NSNumber *)nodeID
                metrics:(MTRMetrics *)metrics
+               context:(NSDictionary<NSString *, id> *)context
 {
     auto * currentCommissioning = self.currentCommissioning;
     if (commissioning != currentCommissioning) {
@@ -2190,7 +2191,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         [self _commissioningDone:commissioning];
     }
 
-    [self controller:self commissioningComplete:nil nodeID:nodeID metrics:metrics];
+    [self controller:self commissioningComplete:nil nodeID:nodeID metrics:metrics context:context];
 }
 
 #pragma mark - MTRCommissioningDelegate_Internal implementation
@@ -2257,7 +2258,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         [self _commissioningDone:commissioning];
     }
 
-    [self controller:self commissioningComplete:error nodeID:deviceID metrics:metrics];
+    [self controller:self commissioningComplete:error nodeID:deviceID metrics:metrics context:@{}];
 }
 
 @end
