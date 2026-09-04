@@ -1330,18 +1330,48 @@ void DeviceCommissioner::OnSessionEstablished(const SessionHandle & session)
     }
 }
 
-CHIP_ERROR DeviceCommissioner::SendCertificateChainRequestCommand(DeviceProxy * device,
-                                                                  Credentials::CertificateType certificateType,
-                                                                  Optional<System::Clock::Timeout> timeout)
+CHIP_ERROR DeviceCommissioner::SendCertificateChainRequestCommand(
+    DeviceProxy * device, Credentials::CertificateType certificateType, Optional<System::Clock::Timeout> timeout,
+    Optional<OperationalCredentials::AttestationCryptoProfileEnum> cryptoProfile, Optional<uint16_t> segmentId)
 {
     MATTER_TRACE_SCOPE("SendCertificateChainRequestCommand", "DeviceCommissioner");
     ChipLogDetail(Controller, "Sending Certificate Chain request to %p device", device);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
+    if (!segmentId.HasValue())
+    {
+        mCertificateChainRequestState.Reset();
+        ++mCertificateChainRequestState.generation;
+        mCertificateChainRequestState.hasActiveRequest = true;
+        mCertificateChainRequestState.certificateType  = certificateType;
+        mCertificateChainRequestState.cryptoProfile    = cryptoProfile;
+    }
+
     OperationalCredentials::Commands::CertificateChainRequest::Type request;
     request.certificateType = static_cast<OperationalCredentials::CertificateChainTypeEnum>(certificateType);
+    if (cryptoProfile.HasValue())
+    {
+        request.cryptoProfile.SetValue(cryptoProfile.Value());
+        request.maxSegmentSize.SetValue(CertificateChainRequestTracker::kDefaultSegmentSize);
+    }
+    if (segmentId.HasValue())
+    {
+        request.segmentID.SetValue(segmentId.Value());
+    }
+
     return SendCommissioningCommand(device, request, OnCertificateChainResponse, OnCertificateChainFailureResponse, kRootEndpointId,
                                     timeout);
+}
+
+CHIP_ERROR DeviceCommissioner::ContinueCertificateChainRequest(Optional<System::Clock::Timeout> timeout)
+{
+    VerifyOrReturnError(mDeviceBeingCommissioned != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mCertificateChainRequestState.hasActiveRequest, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mCertificateChainRequestState.requestTracker.HasPendingSegment(), CHIP_ERROR_INCORRECT_STATE);
+
+    return SendCertificateChainRequestCommand(mDeviceBeingCommissioned, mCertificateChainRequestState.certificateType, timeout,
+                                              mCertificateChainRequestState.cryptoProfile,
+                                              mCertificateChainRequestState.requestTracker.NextSegmentId());
 }
 
 void DeviceCommissioner::OnCertificateChainFailureResponse(void * context, CHIP_ERROR error)
@@ -1350,6 +1380,7 @@ void DeviceCommissioner::OnCertificateChainFailureResponse(void * context, CHIP_
     ChipLogProgress(Controller, "Device failed to receive the Certificate Chain request Response: %" CHIP_ERROR_FORMAT,
                     error.Format());
     DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+    commissioner->mCertificateChainRequestState.Reset();
     commissioner->CommissioningStageComplete(error);
 }
 
@@ -1360,10 +1391,43 @@ void DeviceCommissioner::OnCertificateChainResponse(
     ChipLogProgress(Controller, "Received certificate chain from the device");
     DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
 
-    CommissioningDelegate::CommissioningReport report;
-    report.Set<RequestedCertificate>(RequestedCertificate(response.certificate));
+    CHIP_ERROR err = commissioner->mCertificateChainRequestState.requestTracker.HandleResponse(
+        response.certificate, response.totalDocumentSize, response.nextSegmentID);
+    if (err != CHIP_NO_ERROR)
+    {
+        commissioner->mCertificateChainRequestState.Reset();
+        commissioner->CommissioningStageComplete(err);
+        return;
+    }
 
+    if (commissioner->mCertificateChainRequestState.requestTracker.HasPendingSegment())
+    {
+        // The response callback runs before InvokeCommandRequest clears its cancel function. The next segment is a
+        // sequential continuation of the completed invoke, so release the old cancel function before starting it.
+        commissioner->mInvokeCancelFn = nullptr;
+        err                           = commissioner->ContinueCertificateChainRequest(commissioner->mCommissioningStepTimeout);
+        if (err != CHIP_NO_ERROR)
+        {
+            commissioner->mCertificateChainRequestState.Reset();
+            commissioner->CommissioningStageComplete(err);
+        }
+        return;
+    }
+
+    CommissioningDelegate::CommissioningReport report;
+    report.Set<RequestedCertificate>(
+        RequestedCertificate(commissioner->mCertificateChainRequestState.requestTracker.GetCertificate()));
+
+    const uint32_t completedRequestGeneration = commissioner->mCertificateChainRequestState.generation;
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
+    // RequestedCertificate holds a borrowed ByteSpan into the tracker storage,
+    // so the tracker must outlive the synchronous delegate callback above. The
+    // callback can also start the next certificate request, which must not be
+    // reset as part of cleaning up this completed request.
+    if (commissioner->mCertificateChainRequestState.generation == completedRequestGeneration)
+    {
+        commissioner->mCertificateChainRequestState.Reset();
+    }
 }
 
 CHIP_ERROR DeviceCommissioner::SendAttestationRequestCommand(DeviceProxy * device, const ByteSpan & attestationNonce,
@@ -2482,6 +2546,12 @@ void DeviceCommissioner::ContinueReadingCommissioningInfo(const CommissioningPar
                                                     Clusters::NetworkCommissioning::Attributes::ScanMaxTimeSeconds::Id));
         }
 
+        // OperationalCredentials: feature and device attestation capabilities
+        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::OperationalCredentials::Id,
+                                                Clusters::OperationalCredentials::Attributes::FeatureMap::Id));
+        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::OperationalCredentials::Id,
+                                                Clusters::OperationalCredentials::Attributes::PQCDeviceAttestationProfile::Id));
+
         // OperationalCredentials: existing fabrics, if necessary
         if (params.GetCheckForMatchingFabric())
         {
@@ -2532,6 +2602,58 @@ void DeviceCommissioner::ContinueReadingCommissioningInfo(const CommissioningPar
 }
 
 namespace {
+using AttestationProfileBitmap = BitMask<OperationalCredentials::AttestationCryptoProfileBitmap>;
+
+void SetLegacyAttestationInfo(ReadCommissioningInfo & info)
+{
+    using OperationalCredentials::AttestationCryptoProfileBitmap;
+
+    info.supportsPqcDeviceAttestation    = false;
+    info.paiSupportedAttestationProfiles = AttestationProfileBitmap(AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy);
+    info.dacSupportedAttestationProfiles = AttestationProfileBitmap(AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy);
+}
+
+bool HasRequiredPqcAttestationProfiles(
+    const OperationalCredentials::Structs::PQCDeviceAttestationProfileStruct::DecodableType & profileSupport)
+{
+    using OperationalCredentials::AttestationCryptoProfileBitmap;
+
+    constexpr auto kLegacyProfile = AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy;
+    constexpr auto kMlDsa44       = AttestationCryptoProfileBitmap::kSupportsMlDsa44;
+    constexpr auto kMlDsa65       = AttestationCryptoProfileBitmap::kSupportsMlDsa65;
+
+    const bool hasLegacyChain = profileSupport.PAASupportedProfiles.Has(kLegacyProfile) &&
+        profileSupport.PAISupportedProfiles.Has(kLegacyProfile) && profileSupport.DACSupportedProfiles.Has(kLegacyProfile);
+    const bool hasPqcIssuer = profileSupport.PAASupportedProfiles.Has(kMlDsa44) ||
+        profileSupport.PAASupportedProfiles.Has(kMlDsa65) || profileSupport.PAISupportedProfiles.Has(kMlDsa44) ||
+        profileSupport.PAISupportedProfiles.Has(kMlDsa65);
+
+    return hasLegacyChain && hasPqcIssuer;
+}
+
+DeviceAttestationCertProfile
+ToAttestationCertProfile(Optional<OperationalCredentials::AttestationCryptoProfileEnum> requestedProfile)
+{
+    if (!requestedProfile.HasValue())
+    {
+        return DeviceAttestationCertProfile::kEcdsaMatterLegacy;
+    }
+
+    switch (requestedProfile.Value())
+    {
+    case OperationalCredentials::AttestationCryptoProfileEnum::kEcdsaMatterLegacy:
+        return DeviceAttestationCertProfile::kEcdsaMatterLegacy;
+    case OperationalCredentials::AttestationCryptoProfileEnum::kMlDsa44:
+        return DeviceAttestationCertProfile::kMlDsa44;
+    case OperationalCredentials::AttestationCryptoProfileEnum::kMlDsa65:
+        return DeviceAttestationCertProfile::kMlDsa65;
+    case OperationalCredentials::AttestationCryptoProfileEnum::kUnknownEnumValue:
+        break;
+    }
+
+    return DeviceAttestationCertProfile::kEcdsaMatterLegacy;
+}
+
 void AccumulateErrors(CHIP_ERROR & acc, CHIP_ERROR err)
 {
     if (acc == CHIP_NO_ERROR && err != CHIP_NO_ERROR)
@@ -2552,6 +2674,7 @@ void DeviceCommissioner::FinishReadingCommissioningInfo(const CommissioningParam
     AccumulateErrors(err, ParseBasicInformation(info));
     AccumulateErrors(err, ParseNetworkCommissioningInfo(info));
     AccumulateErrors(err, ParseTimeSyncInfo(info));
+    AccumulateErrors(err, ParseOperationalCredentialsInfo(info));
     AccumulateErrors(err, ParseFabrics(info));
     AccumulateErrors(err, ParseICDInfo(info));
     AccumulateErrors(err, ParseExtraCommissioningInfo(info, params));
@@ -2728,6 +2851,56 @@ CHIP_ERROR DeviceCommissioner::ParseNetworkCommissioningTimeouts(NetworkClusterI
         // Just flag as "we don't know".
         networkInfo.maxScanTime = 0;
     }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceCommissioner::ParseOperationalCredentialsInfo(ReadCommissioningInfo & info)
+{
+    using OperationalCredentials::AttestationCryptoProfileBitmap;
+    using OperationalCredentials::AttestationCryptoProfileEnum;
+    using OperationalCredentials::Feature;
+    BitFlags<Feature> featureMap;
+    CHIP_ERROR err =
+        mAttributeCache->Get<OperationalCredentials::Attributes::FeatureMap::TypeInfo>(kRootEndpointId, *featureMap.RawStorage());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to read OperationalCredentials FeatureMap: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+
+    if (!featureMap.Has(Feature::kPQCDeviceAttestation))
+    {
+        SetLegacyAttestationInfo(info);
+        return CHIP_NO_ERROR;
+    }
+
+    info.supportsPqcDeviceAttestation = true;
+
+    OperationalCredentials::Attributes::PQCDeviceAttestationProfile::TypeInfo::DecodableType profileSupport;
+    err = mAttributeCache->Get<OperationalCredentials::Attributes::PQCDeviceAttestationProfile::TypeInfo>(kRootEndpointId,
+                                                                                                          profileSupport);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller,
+                     "Failed to read PQCDeviceAttestationProfile: %" CHIP_ERROR_FORMAT
+                     ". Falling back to Matter legacy device attestation.",
+                     err.Format());
+        SetLegacyAttestationInfo(info);
+        return CHIP_NO_ERROR;
+    }
+
+    if (!HasRequiredPqcAttestationProfiles(profileSupport))
+    {
+        ChipLogError(Controller,
+                     "OperationalCredentials advertised PQC attestation support without the required legacy chain and PQC issuer. "
+                     "Falling back to Matter legacy device attestation.");
+        SetLegacyAttestationInfo(info);
+        return CHIP_NO_ERROR;
+    }
+
+    info.paiSupportedAttestationProfiles = profileSupport.PAISupportedProfiles;
+    info.dacSupportedAttestationProfiles = profileSupport.DACSupportedProfiles;
 
     return CHIP_NO_ERROR;
 }
@@ -3517,7 +3690,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     case CommissioningStage::kSendPAICertificateRequest: {
         ChipLogProgress(Controller, "Sending request for PAI certificate");
-        CHIP_ERROR err = SendCertificateChainRequestCommand(proxy, CertificateType::kPAI, timeout);
+        CHIP_ERROR err = SendCertificateChainRequestCommand(proxy, CertificateType::kPAI, timeout,
+                                                            params.GetPAIAttestationCertificateRequestProfile());
         if (err != CHIP_NO_ERROR)
         {
             // We won't get any async callbacks here, so just complete our stage.
@@ -3530,7 +3704,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     case CommissioningStage::kSendDACCertificateRequest: {
         ChipLogProgress(Controller, "Sending request for DAC certificate");
-        CHIP_ERROR err = SendCertificateChainRequestCommand(proxy, CertificateType::kDAC, timeout);
+        CHIP_ERROR err = SendCertificateChainRequestCommand(proxy, CertificateType::kDAC, timeout,
+                                                            params.GetDACAttestationCertificateRequestProfile());
         if (err != CHIP_NO_ERROR)
         {
             // We won't get any async callbacks here, so just complete our stage.
@@ -3572,7 +3747,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             params.GetAttestationElements().Value(),
             proxy->GetSecureSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge(),
             params.GetAttestationSignature().Value(), params.GetPAI().Value(), params.GetDAC().Value(),
-            params.GetAttestationNonce().Value(), params.GetRemoteVendorId().Value(), params.GetRemoteProductId().Value());
+            params.GetAttestationNonce().Value(), params.GetRemoteVendorId().Value(), params.GetRemoteProductId().Value(),
+            ToAttestationCertProfile(params.GetPAIAttestationCertificateRequestProfile()));
 
         CHIP_ERROR err = ValidateAttestationInfo(info);
         if (err != CHIP_NO_ERROR)
@@ -3596,7 +3772,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             params.GetAttestationElements().Value(),
             proxy->GetSecureSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge(),
             params.GetAttestationSignature().Value(), params.GetPAI().Value(), params.GetDAC().Value(),
-            params.GetAttestationNonce().Value(), params.GetRemoteVendorId().Value(), params.GetRemoteProductId().Value());
+            params.GetAttestationNonce().Value(), params.GetRemoteVendorId().Value(), params.GetRemoteProductId().Value(),
+            ToAttestationCertProfile(params.GetPAIAttestationCertificateRequestProfile()));
 
         CHIP_ERROR err = CheckForRevokedDACChain(info);
 

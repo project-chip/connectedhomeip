@@ -37,6 +37,16 @@ namespace Controller {
 
 class DeviceCommissioner;
 
+namespace Internal {
+
+using AttestationProfileBitmap = BitMask<app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap>;
+
+AttestationProfileBitmap GetControllerSupportedAttestationRequestProfiles();
+Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum>
+SelectControllerSupportedAttestationRequestProfile(AttestationProfileBitmap deviceProfiles);
+
+} // namespace Internal
+
 class AutoCommissioner : public CommissioningDelegate
 {
 

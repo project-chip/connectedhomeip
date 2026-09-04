@@ -3363,6 +3363,9 @@ class ChipClusters:
                 "commandName": "CertificateChainRequest",
                 "args": {
                     "certificateType": "int",
+                    "cryptoProfile": "int",
+                    "segmentID": "int",
+                    "maxSegmentSize": "int",
                 },
             },
             0x00000004: {
@@ -3466,6 +3469,12 @@ class ChipClusters:
                 "attributeName": "CurrentFabricIndex",
                 "attributeId": 0x00000005,
                 "type": "int",
+                "reportable": True,
+            },
+            0x00000006: {
+                "attributeName": "PQCDeviceAttestationProfile",
+                "attributeId": 0x00000006,
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {

@@ -138,6 +138,64 @@ static int _compareDaysAndSeconds(const int days, const int seconds)
     return 0;
 }
 
+bool IsSupportedAttestationSignatureAlgorithm(int signatureNid)
+{
+    if (signatureNid == NID_ecdsa_with_SHA256)
+    {
+        return true;
+    }
+#if !CHIP_CRYPTO_BORINGSSL && defined(NID_ML_DSA_44)
+    if (signatureNid == NID_ML_DSA_44)
+    {
+        return IsMlDsa44Supported();
+    }
+#endif
+#if !CHIP_CRYPTO_BORINGSSL && defined(NID_ML_DSA_65)
+    if (signatureNid == NID_ML_DSA_65)
+    {
+        return IsMlDsa65Supported();
+    }
+#endif
+    return false;
+}
+
+bool IsP256AttestationPublicKey(EVP_PKEY * pkey)
+{
+    VerifyOrReturnError(pkey != nullptr, false);
+    VerifyOrReturnError(EVP_PKEY_base_id(pkey) == EVP_PKEY_EC, false);
+    VerifyOrReturnError(EVP_PKEY_bits(pkey) == 256, false);
+
+    EC_KEY * ecKey = EVP_PKEY_get1_EC_KEY(pkey);
+    VerifyOrReturnError(ecKey != nullptr, false);
+
+    const bool isP256 = (EC_GROUP_get_curve_name(EC_KEY_get0_group(ecKey)) == NID_X9_62_prime256v1);
+    EC_KEY_free(ecKey);
+    return isP256;
+}
+
+bool IsSupportedMlDsaAttestationPublicKey(EVP_PKEY * pkey)
+{
+#if !CHIP_CRYPTO_BORINGSSL && (defined(EVP_PKEY_ML_DSA_44) || defined(EVP_PKEY_ML_DSA_65))
+    VerifyOrReturnError(pkey != nullptr, false);
+#if defined(EVP_PKEY_ML_DSA_44)
+    if (IsMlDsa44Supported() && (EVP_PKEY_is_a(pkey, "ML-DSA-44") == 1 || EVP_PKEY_is_a(pkey, "MLDSA44") == 1))
+    {
+        return true;
+    }
+#endif
+#if defined(EVP_PKEY_ML_DSA_65)
+    if (IsMlDsa65Supported() && (EVP_PKEY_is_a(pkey, "ML-DSA-65") == 1 || EVP_PKEY_is_a(pkey, "MLDSA65") == 1))
+    {
+        return true;
+    }
+#endif
+    return false;
+#else
+    (void) pkey;
+    return false;
+#endif
+}
+
 CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, const uint8_t * aad, size_t aad_length,
                            const Aes128KeyHandle & key, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
                            uint8_t * tag, size_t tag_length)
@@ -1229,6 +1287,7 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
     CHIP_ERROR err          = CHIP_NO_ERROR;
     const uint8_t * certPtr = cert.data();
     X509 * x509Cert         = nullptr;
+    EVP_PKEY * publicKey    = nullptr;
     bool extBasicPresent    = false;
     bool extKeyUsagePresent = false;
     bool extSKIDPresent     = false;
@@ -1241,16 +1300,23 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
 
     VerifyOrExit(X509_get_version(x509Cert) == 2, err = CHIP_ERROR_INTERNAL);
     VerifyOrExit(X509_get_serialNumber(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(X509_get_signature_nid(x509Cert) == NID_ecdsa_with_SHA256, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(IsSupportedAttestationSignatureAlgorithm(X509_get_signature_nid(x509Cert)), err = CHIP_ERROR_INTERNAL);
     VerifyOrExit(X509_get_issuer_name(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
     VerifyOrExit(X509_getm_notBefore(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
     VerifyOrExit(X509_getm_notAfter(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
     VerifyOrExit(X509_get_subject_name(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
 
-    // Verify public key presence and format.
+    publicKey = X509_get0_pubkey(x509Cert);
+    VerifyOrExit(publicKey != nullptr, err = CHIP_ERROR_INTERNAL);
+
+    if (certType == AttestationCertType::kDAC)
     {
-        Crypto::P256PublicKey pubkey;
-        SuccessOrExit(err = ExtractPubkeyFromX509Cert(cert, pubkey));
+        VerifyOrExit(IsP256AttestationPublicKey(publicKey), err = CHIP_ERROR_INTERNAL);
+    }
+    else
+    {
+        VerifyOrExit(IsP256AttestationPublicKey(publicKey) || IsSupportedMlDsaAttestationPublicKey(publicKey),
+                     err = CHIP_ERROR_INTERNAL);
     }
 
     for (int i = 0; i < X509_get_ext_count(x509Cert); i++)

@@ -38,6 +38,7 @@
 #include <controller/AutoCommissioner.h>
 #include <controller/CHIPCluster.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
+#include <controller/CertificateChainRequestTracker.h>
 #include <controller/CommissioneeDeviceProxy.h>
 #include <controller/CommissioningDelegate.h>
 #include <controller/DevicePairingDelegate.h>
@@ -948,8 +949,10 @@ private:
     /* This function sends a Device Attestation Certificate chain request to the device.
        The function does not hold a reference to the device object.
      */
-    CHIP_ERROR SendCertificateChainRequestCommand(DeviceProxy * device, Credentials::CertificateType certificateType,
-                                                  Optional<System::Clock::Timeout> timeout);
+    CHIP_ERROR SendCertificateChainRequestCommand(
+        DeviceProxy * device, Credentials::CertificateType certificateType, Optional<System::Clock::Timeout> timeout,
+        Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum> cryptoProfile = NullOptional,
+        Optional<uint16_t> segmentId                                                                = NullOptional);
     /* This function sends an Attestation request to the device.
        The function does not hold a reference to the device object.
      */
@@ -982,6 +985,7 @@ private:
 
     void ExtendArmFailSafeForDeviceAttestation(const Credentials::DeviceAttestationVerifier::AttestationInfo & info,
                                                Credentials::AttestationVerificationResult result);
+    CHIP_ERROR ContinueCertificateChainRequest(Optional<System::Clock::Timeout> timeout);
     static void OnCertificateChainFailureResponse(void * context, CHIP_ERROR error);
     static void OnCertificateChainResponse(
         void * context, const app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & response);
@@ -1137,6 +1141,7 @@ private:
     CHIP_ERROR ParseBasicInformation(ReadCommissioningInfo & info);
     CHIP_ERROR ParseNetworkCommissioningInfo(ReadCommissioningInfo & info);
     CHIP_ERROR ParseNetworkCommissioningTimeouts(NetworkClusterInfo & networkInfo, const char * networkType);
+    CHIP_ERROR ParseOperationalCredentialsInfo(ReadCommissioningInfo & info);
     CHIP_ERROR ParseFabrics(ReadCommissioningInfo & info);
     CHIP_ERROR ParseICDInfo(ReadCommissioningInfo & info);
     CHIP_ERROR ParseTimeSyncInfo(ReadCommissioningInfo & info);
@@ -1172,7 +1177,25 @@ private:
         mDeviceAttestationInformationVerificationCallback;
 
     chip::Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
+
+    struct CertificateChainRequestState
+    {
+        void Reset()
+        {
+            requestTracker.Reset();
+            hasActiveRequest = false;
+            cryptoProfile.ClearValue();
+        }
+
+        bool hasActiveRequest                        = false;
+        uint32_t generation                          = 0;
+        Credentials::CertificateType certificateType = static_cast<Credentials::CertificateType>(0);
+        Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum> cryptoProfile;
+        CertificateChainRequestTracker requestTracker;
+    };
+
     SetUpCodePairer mSetUpCodePairer;
+    CertificateChainRequestState mCertificateChainRequestState;
     AutoCommissioner mAutoCommissioner;
     CommissioningDelegate * mDefaultCommissioner =
         &mAutoCommissioner; // Commissioning delegate to call when PairDevice / Commission functions are used

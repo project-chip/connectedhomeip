@@ -33,6 +33,10 @@ public:
     DeviceCommissionerTestAccess(Controller::DeviceCommissioner * commissioner) : mCommissioner(commissioner) {}
 
     CHIP_ERROR ParseICDInfo(Controller::ReadCommissioningInfo & info) { return mCommissioner->ParseICDInfo(info); }
+    CHIP_ERROR ParseOperationalCredentialsInfo(Controller::ReadCommissioningInfo & info)
+    {
+        return mCommissioner->ParseOperationalCredentialsInfo(info);
+    }
 
     void SetAttributeCache(Platform::UniquePtr<app::ClusterStateCache> cache) { mCommissioner->mAttributeCache = std::move(cache); }
 

@@ -62,6 +62,7 @@ static_library("controller") {
     "CHIPCommissionableNodeController.h",
     "CHIPDeviceController.h",
     "CHIPDeviceControllerSystemState.h",
+    "CertificateChainRequestTracker.h",
     "CommissioneeDeviceProxy.h",
     "CommissioningDelegate.h",
     "CommissioningWindowOpener.h",
@@ -96,6 +97,7 @@ static_library("controller") {
     if (chip_enable_read_client) {
       sources += [
         "CHIPDeviceController.cpp",
+        "CertificateChainRequestTracker.cpp",
         "CommissioningWindowOpener.cpp",
         "CurrentFabricRemover.cpp",
       ]

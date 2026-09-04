@@ -20,6 +20,7 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 
+#include <app/tests/suites/credentials/TestHarnessDACProvider.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -120,6 +121,11 @@ TEST_F(TestDeviceAttestationCredentials, TestDACProvidersExample_Providers)
     err = example_dac_provider->GetFirmwareInformation(other_data_span);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(other_data_span.size(), 0u);
+    auto profileSupport = example_dac_provider->GetDeviceAttestationProfileSupport();
+    EXPECT_EQ(profileSupport.paaSupportedProfiles.Raw(),
+              BitMask<DeviceAttestationCertProfileBitmap>(DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy).Raw());
+    EXPECT_EQ(profileSupport.paiSupportedProfiles.Raw(), profileSupport.paaSupportedProfiles.Raw());
+    EXPECT_EQ(profileSupport.dacSupportedProfiles.Raw(), profileSupport.paaSupportedProfiles.Raw());
 }
 
 TEST_F(TestDeviceAttestationCredentials, TestDACProvidersExample_Signature)
@@ -158,6 +164,94 @@ TEST_F(TestDeviceAttestationCredentials, TestDACProvidersExample_Signature)
     // Verify round trip signature
     err = dac_public_key.ECDSA_validate_msg_signature(&kExampleMessage[0], sizeof(kExampleMessage), da_signature);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+}
+
+TEST_F(TestDeviceAttestationCredentials, TestHarnessDACProviderPqcReadyGatesProfileSpecificDocuments)
+{
+    using chip::Credentials::DeviceAttestationCertProfile;
+    using chip::Credentials::DeviceAttestationDocumentType;
+    using chip::Credentials::Examples::TestHarnessDACProvider;
+    using chip::Credentials::Examples::TestHarnessDACProviderData;
+
+    constexpr uint8_t kLegacyDac[] = { 0x01, 0x02, 0x03 };
+    constexpr uint8_t kPqcDac44[]  = { 0x11, 0x12, 0x13, 0x14 };
+    constexpr uint8_t kPqcDac65[]  = { 0x21, 0x22, 0x23, 0x24, 0x25 };
+    constexpr uint8_t kLegacyPai[] = { 0x31, 0x32 };
+    constexpr uint8_t kPqcPai44[]  = { 0x41, 0x42, 0x43 };
+    constexpr uint8_t kPqcPai65[]  = { 0x51, 0x52, 0x53, 0x54 };
+    constexpr uint8_t kLegacyCd[]  = { 0x61 };
+
+    TestHarnessDACProviderData data;
+    data.dacCert.SetValue(ByteSpan(kLegacyDac, sizeof(kLegacyDac)));
+    data.pqcDacCertMlDsa44.SetValue(ByteSpan(kPqcDac44, sizeof(kPqcDac44)));
+    data.pqcDacCertMlDsa65.SetValue(ByteSpan(kPqcDac65, sizeof(kPqcDac65)));
+    data.paiCert.SetValue(ByteSpan(kLegacyPai, sizeof(kLegacyPai)));
+    data.pqcPaiCertMlDsa44.SetValue(ByteSpan(kPqcPai44, sizeof(kPqcPai44)));
+    data.pqcPaiCertMlDsa65.SetValue(ByteSpan(kPqcPai65, sizeof(kPqcPai65)));
+    data.certificationDeclaration.SetValue(ByteSpan(kLegacyCd, sizeof(kLegacyCd)));
+
+    TestHarnessDACProvider nonPqcProvider(false);
+    nonPqcProvider.Init(data);
+
+    auto nonPqcSupport = nonPqcProvider.GetDeviceAttestationProfileSupport();
+    EXPECT_EQ(nonPqcSupport.dacSupportedProfiles.Raw(),
+              BitMask<Credentials::DeviceAttestationCertProfileBitmap>(
+                  Credentials::DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy)
+                  .Raw());
+    EXPECT_EQ(nonPqcSupport.paiSupportedProfiles.Raw(), nonPqcSupport.dacSupportedProfiles.Raw());
+
+    uint8_t buffer[32];
+    MutableByteSpan span(buffer);
+    EXPECT_EQ(nonPqcProvider.GetDeviceAttestationCertForProfile(DeviceAttestationCertProfile::kMlDsa44, span),
+              CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(nonPqcProvider.GetProductAttestationIntermediateCertForProfile(DeviceAttestationCertProfile::kMlDsa65, span),
+              CHIP_ERROR_NOT_IMPLEMENTED);
+    TestHarnessDACProvider pqcProvider(true);
+    pqcProvider.Init(data);
+
+    auto pqcSupport = pqcProvider.GetDeviceAttestationProfileSupport();
+    EXPECT_EQ(pqcSupport.dacSupportedProfiles.Raw(),
+              BitMask<Credentials::DeviceAttestationCertProfileBitmap>(
+                  Credentials::DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy,
+                  Credentials::DeviceAttestationCertProfileBitmap::kSupportsMlDsa44,
+                  Credentials::DeviceAttestationCertProfileBitmap::kSupportsMlDsa65)
+                  .Raw());
+    EXPECT_EQ(pqcSupport.paiSupportedProfiles.Raw(), pqcSupport.dacSupportedProfiles.Raw());
+
+    span = MutableByteSpan(buffer);
+    ASSERT_EQ(pqcProvider.GetDeviceAttestationCertForProfile(DeviceAttestationCertProfile::kMlDsa44, span), CHIP_NO_ERROR);
+    EXPECT_EQ(span.size(), sizeof(kPqcDac44));
+    EXPECT_EQ(0, memcmp(span.data(), kPqcDac44, sizeof(kPqcDac44)));
+
+    span = MutableByteSpan(buffer);
+    ASSERT_EQ(pqcProvider.GetProductAttestationIntermediateCertForProfile(DeviceAttestationCertProfile::kMlDsa65, span),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(span.size(), sizeof(kPqcPai65));
+    EXPECT_EQ(0, memcmp(span.data(), kPqcPai65, sizeof(kPqcPai65)));
+
+    span = MutableByteSpan(buffer);
+    ASSERT_EQ(pqcProvider.GetCertificationDeclaration(span), CHIP_NO_ERROR);
+    EXPECT_EQ(span.size(), sizeof(kLegacyCd));
+    EXPECT_EQ(0, memcmp(span.data(), kLegacyCd, sizeof(kLegacyCd)));
+
+    uint8_t segmentBuffer[2];
+    MutableByteSpan segmentSpan(segmentBuffer);
+    size_t documentSize = 0;
+    ASSERT_EQ(pqcProvider.GetDeviceAttestationDocumentSegment(DeviceAttestationDocumentType::kDACCertificate,
+                                                              DeviceAttestationCertProfile::kMlDsa44, 1, segmentSpan, documentSize),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(documentSize, sizeof(kPqcDac44));
+    EXPECT_EQ(segmentSpan.size(), sizeof(segmentBuffer));
+    EXPECT_EQ(0, memcmp(segmentSpan.data(), kPqcDac44 + 1, sizeof(segmentBuffer)));
+
+    constexpr uint8_t kMessageToSign[] = { 0x01, 0x02, 0x03 };
+    uint8_t signatureBuffer[Crypto::kP256_ECDSA_Signature_Length_Raw];
+    MutableByteSpan signatureSpan(signatureBuffer);
+
+    // Retrieving a profile-specific DAC must not change the key used by the legacy signing API.
+    span = MutableByteSpan(buffer);
+    ASSERT_EQ(pqcProvider.GetDeviceAttestationCertForProfile(DeviceAttestationCertProfile::kMlDsa44, span), CHIP_NO_ERROR);
+    EXPECT_EQ(pqcProvider.SignWithDeviceAttestationKey(ByteSpan(kMessageToSign), signatureSpan), CHIP_NO_ERROR);
 }
 
 static void OnAttestationInformationVerificationCallback(void * context, const DeviceAttestationVerifier::AttestationInfo & info,
