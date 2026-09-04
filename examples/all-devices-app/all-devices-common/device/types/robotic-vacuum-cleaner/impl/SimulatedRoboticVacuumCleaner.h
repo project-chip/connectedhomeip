@@ -131,6 +131,14 @@ public:
     void HandleClearError() override;
     void HandleReset() override;
     void HandleErrorEvent(const std::string & error) override;
+    void HandleEmptyingDustBin() override;
+    void HandleCleaningMop() override;
+    void HandleFillingWaterTank() override;
+    void HandleUpdatingMaps() override;
+    bool HandleAddMap(uint32_t mapId, CharSpan mapName) override;
+    bool HandleRemoveMap(uint32_t mapId) override;
+    bool HandleAddArea(uint32_t areaId, std::optional<uint32_t> mapId, std::optional<CharSpan> locationName) override;
+    bool HandleRemoveArea(uint32_t areaId) override;
 
 protected:
     // -- RoboticVacuumCleaner optional clusters --

@@ -44,3 +44,15 @@ source_set("robotic-vacuum-cleaner") {
     "${chip_root}/zzz_generated/app-common/devices/",
   ]
 }
+
+source_set("posix") {
+  sources = [
+    "NamedPipeTranslators.cpp",
+    "NamedPipeTranslators.h",
+  ]
+
+  public_deps = [
+    ":robotic-vacuum-cleaner",
+    "${chip_root}/examples/all-devices-app/posix/named_pipe",
+  ]
+}

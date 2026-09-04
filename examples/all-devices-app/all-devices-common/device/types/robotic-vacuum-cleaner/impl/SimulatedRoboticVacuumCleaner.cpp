@@ -969,4 +969,59 @@ void SimulatedRoboticVacuumCleaner::HandleErrorEvent(const std::string & error)
     OperationalState().OnOperationalErrorDetected(err);
 }
 
+void SimulatedRoboticVacuumCleaner::HandleEmptyingDustBin()
+{
+    LogErrorOnFailure(
+        OperationalState().SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kEmptyingDustBin)));
+}
+
+void SimulatedRoboticVacuumCleaner::HandleCleaningMop()
+{
+    LogErrorOnFailure(
+        OperationalState().SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kCleaningMop)));
+}
+
+void SimulatedRoboticVacuumCleaner::HandleFillingWaterTank()
+{
+    LogErrorOnFailure(
+        OperationalState().SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kFillingWaterTank)));
+}
+
+void SimulatedRoboticVacuumCleaner::HandleUpdatingMaps()
+{
+    LogErrorOnFailure(
+        OperationalState().SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kUpdatingMaps)));
+}
+
+bool SimulatedRoboticVacuumCleaner::HandleAddMap(uint32_t mapId, CharSpan mapName)
+{
+    return GetServiceAreaCluster().AddSupportedMap(mapId, mapName);
+}
+
+bool SimulatedRoboticVacuumCleaner::HandleRemoveMap(uint32_t mapId)
+{
+    return GetServiceAreaCluster().RemoveSupportedMap(mapId);
+}
+
+bool SimulatedRoboticVacuumCleaner::HandleAddArea(uint32_t areaId, std::optional<uint32_t> mapId,
+                                                  std::optional<CharSpan> locationName)
+{
+    Clusters::ServiceArea::AreaStructureWrapper area;
+    area.SetAreaId(areaId);
+    if (mapId.has_value())
+    {
+        area.SetMapId(mapId.value());
+    }
+    if (locationName.has_value())
+    {
+        area.SetLocationInfo(locationName.value(), DataModel::NullNullable, DataModel::NullNullable);
+    }
+    return GetServiceAreaCluster().AddSupportedArea(area);
+}
+
+bool SimulatedRoboticVacuumCleaner::HandleRemoveArea(uint32_t areaId)
+{
+    return GetServiceAreaCluster().RemoveSupportedArea(areaId);
+}
+
 } // namespace chip::app

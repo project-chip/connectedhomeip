@@ -33,9 +33,12 @@ source_set("named_pipe") {
     "translators/OccupancyTranslator.h",
     "translators/OnOffTranslator.cpp",
     "translators/OnOffTranslator.h",
+    "translators/RvcTranslator.cpp",
+    "translators/RvcTranslator.h",
   ]
 
   public_deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/robotic-vacuum-cleaner",
     "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
     "${chip_root}/examples/platform/linux:named-pipes",
     "${chip_root}/src/lib/core",

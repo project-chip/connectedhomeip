@@ -83,6 +83,7 @@ executable("all-devices-app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/proximity-ranger",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/refrigerator",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/robotic-vacuum-cleaner",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/robotic-vacuum-cleaner:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:wifi",

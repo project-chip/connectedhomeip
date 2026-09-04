@@ -29,6 +29,7 @@
 #include <device/types/occupancy-sensor/NamedPipeTranslators.h>
 #include <device/types/on-off-light/NamedPipeTranslators.h>
 #include <device/types/on-off-plug-in-unit/NamedPipeTranslators.h>
+#include <device/types/robotic-vacuum-cleaner/NamedPipeTranslators.h>
 #include <device/types/root-node/NamedPipeTranslators.h>
 
 namespace chip::app::NamedPipe {

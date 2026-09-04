@@ -62,7 +62,7 @@ source_set("linux") {
     # The proxy device itself is here rather than in the unconditional list because a
     # build with no transport does not register it with the factory, and linking the
     # cluster into a binary that cannot reach it only costs flash.
-    deps += [
+    public_deps = [
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/commissioning-proxy",
       "${chip_root}/src/app/clusters/commissioning-proxy-server:ble-transport",
     ]
