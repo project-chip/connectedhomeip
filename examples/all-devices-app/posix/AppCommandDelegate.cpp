@@ -164,14 +164,18 @@ public:
 static NodeId ParseNodeId(const Json::Value & json)
 {
     if (!json.isMember("NodeId"))
+    {
         return kUndefinedNodeId;
+    }
     if (json["NodeId"].isString())
     {
         std::string s = json["NodeId"].asString();
         return static_cast<NodeId>(strtoull(s.c_str(), nullptr, 0));
     }
     if (json["NodeId"].isNumeric())
+    {
         return static_cast<NodeId>(json["NodeId"].asUInt64());
+    }
     return kUndefinedNodeId;
 }
 
