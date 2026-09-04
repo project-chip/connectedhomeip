@@ -125,12 +125,12 @@ private:
     uint16_t mOnTime      = 0;
     uint16_t mOffWaitTime = 0;
 
+    uint8_t mValueDeltaReportTrigger = 10;
+
     // controlling cluster startup - these values are only used at startup however
     // user may modify mStartUpOnOff attribute as it is writable.
     DataModel::Nullable<OnOff::StartUpOnOffEnum> mStartUpOnOff;
     StartupType mStartupType;
-
-    DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder);
 
     // Timer logic
     void UpdateTimer();
