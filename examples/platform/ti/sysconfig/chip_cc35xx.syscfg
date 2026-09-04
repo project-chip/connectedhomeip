@@ -1,0 +1,68 @@
+/**
+ * These arguments were used when this file was generated. They will be automatically applied on subsequent loads
+ * via the GUI or CLI. Run CLI with '--help' for additional information on how to override these arguments.
+ * @cliArgs --board "/ti/boards/LP_EM_CC35X1" --rtos "freertos" --product "simplelink_wifi_sdk@9.21.00.15" --product "TOOLBOX@4.0.13"
+ * @v2CliArgs --board "/ti/boards/LP_EM_CC35X1" --rtos "freertos" --product "simplelink_wifi_sdk@9.21.00.15" --product "TOOLBOX@4.0.13"
+ * @versions {"tool":"1.26.0+4407"}
+ */
+
+/**
+ * Import the modules used in this configuration.
+ */
+const FreeRTOS              = scripting.addModule("/freertos/FreeRTOS");
+const CryptoKeyKeyStore_PSA = scripting.addModule("/ti/drivers/CryptoKeyKeyStore_PSA");
+const GPIO                  = scripting.addModule("/ti/drivers/GPIO");
+const Power                 = scripting.addModule("/ti/drivers/Power");
+const UART2                 = scripting.addModule("/ti/drivers/UART2");
+const UART21                = UART2.addInstance();
+const Button                = scripting.addModule("/ti/drivers/apps/Button", {}, false);
+const Button1               = Button.addInstance();
+const Button2               = Button.addInstance();
+const LED                   = scripting.addModule("/ti/drivers/apps/LED", {}, false);
+const LED1                  = LED.addInstance();
+const LED2                  = LED.addInstance();
+const LED3                  = LED.addInstance();
+const Mem_cfg               = scripting.addModule("/ti/memoryconfig/MemoryConfigurator/Mem_cfg");
+const Settings              = scripting.addModule("/ti/posix/freertos/Settings");
+
+/**
+ * Write custom configuration values to the imported modules.
+ */
+FreeRTOS.useTimeSlicing = true;
+FreeRTOS.heapSize       = 0x00051000;
+
+UART21.$name                     = "CONFIG_UART2_0";
+UART21.$hardware                 = system.deviceData.board.components.XDS110UART;
+UART21.uart.dmaTxChannel.$assign = "DMA_CH2";
+UART21.uart.dmaRxChannel.$assign = "DMA_CH3";
+
+Button1.$name     = "CONFIG_BUTTON_0";
+Button1.$hardware = system.deviceData.board.components["BTN-1"];
+
+Button2.$name     = "CONFIG_BUTTON_1";
+Button2.$hardware = system.deviceData.board.components["BTN-2"];
+
+LED1.$name     = "CONFIG_LED_0";
+LED1.$hardware = system.deviceData.board.components.LED_RED;
+
+LED2.$name     = "CONFIG_LED_1";
+LED2.$hardware = system.deviceData.board.components.LED_GREEN;
+
+LED3.$name     = "CONFIG_LED_2";
+LED3.$hardware = system.deviceData.board.components.LED_BLUE;
+
+Mem_cfg.flash_device_type = "IS25WJ064F"
+
+/**
+ * Pinmux solution for unlocked pins/peripherals. This ensures that minor changes to the automatic solver in a future
+ * version of the tool will not impact the pinmux you originally saw.  These lines can be completely deleted in order to
+ * re-solve from scratch.
+ */
+UART21.uart.$suggestSolution       = "UART1";
+UART21.uart.txPin.$suggestSolution = "GPIO5";
+UART21.uart.rxPin.$suggestSolution = "GPIO6";
+Button1.button.$suggestSolution    = "boosterpack.19";
+Button2.button.$suggestSolution    = "boosterpack.40";
+LED1.ledPin.$suggestSolution       = "boosterpack.31";
+LED2.ledPin.$suggestSolution       = "boosterpack.17";
+LED3.ledPin.$suggestSolution       = "boosterpack.36";

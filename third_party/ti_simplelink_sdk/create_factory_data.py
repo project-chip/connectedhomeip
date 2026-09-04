@@ -17,6 +17,8 @@
 import argparse
 import json
 import subprocess
+import sys
+import re
 
 import intelhex
 from jsonschema import validate
@@ -28,6 +30,8 @@ def create_hex_file(args):
     factory_data_struct_intelhex = intelhex.IntelHex()
 
     device_family = args.device_family
+    matter_app_map_file = args.matter_app_map_file
+    factory_data_base_address = 0
 
     # there are 17 elements, each element will need 8 bytes in the struct
     # 4 for length of the element, and 4 for the pointer to the element
@@ -41,7 +45,19 @@ def create_hex_file(args):
 
     struct_idx = 0
     values_idx = 0
-    value_address = 0xFE888
+
+    # Retrieve Factory Data base address and length from Map file
+    with open(matter_app_map_file, "r") as map_file:
+        pattern = ".*\.factory_data.*(0x.*)\s*(0x.*)"
+
+        for line in map_file:
+            factoryDataResult = re.search(pattern, line)
+            if factoryDataResult:
+                factory_data_base_address = int(factoryDataResult.group(1), 16)
+                factory_data_length = int(factoryDataResult.group(2), 16)
+                break
+
+    value_address = factory_data_base_address + factory_data_length
 
     for element in factory_data:
         # get the length in hex and write to first hex file
@@ -131,11 +147,12 @@ def create_hex_file(args):
 
     # output to hex file
     factory_data_struct_intelhex.tofile(args.factory_data_hex_file, format='hex')
+    factorydata_change_address = '--change-addresses=' + f'{factory_data_base_address:#x}'
 
     # get hex file in a format that can be merged in a later step
     subprocess.call(['objcopy', args.factory_data_hex_file, '--input-target', 'ihex', '--output-target', 'binary', 'temp.bin'])
     subprocess.call(['objcopy', 'temp.bin', '--input-target', 'binary', '--output-target',
-                     'ihex', args.factory_data_hex_file, '--change-addresses=0xfe800'])
+                     'ihex', args.factory_data_hex_file, factorydata_change_address])
     subprocess.call(['rm', 'temp.bin'])
 
 
@@ -147,6 +164,7 @@ def main():
     parser.add_argument('-schema', '--factory_data_schema', required=True, nargs=1,
                         help="Factory Data Schema", type=argparse.FileType('r'))
     parser.add_argument('-o', '--factory_data_hex_file', required=True)
+    parser.add_argument('-m', '--matter_app_map_file', required=True)
     parser.add_argument('-device', '--device_family', required=True)
 
     args = parser.parse_args()
