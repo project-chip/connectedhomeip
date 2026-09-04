@@ -180,16 +180,16 @@ class TC_DD_3_24(MatterTestCommissioner):
             log.info("\n\n\tDUT Instance Name: %s\n", instance_name)
         return instance_name
 
-    def get_operational_subtype(self, log_result: bool = False) -> str:
-        """Return the operational mDNS subtype for the current fabric.
-
-        The value is "_I<compressed-fabric-id>._sub._matter._tcp.local".
-        """
-        compressed_fabric_id = self.default_controller.GetCompressedFabricId()
-        operational_subtype = f'_I{compressed_fabric_id:016X}._sub.{MdnsServiceType.OPERATIONAL.value}'
-        if log_result:
-            log.info("\n\n\tOperational Subtype: %s\n", operational_subtype)
-        return operational_subtype
+    # def get_operational_subtype(self, log_result: bool = False) -> str:
+    #     """Return the operational mDNS subtype for the current fabric.
+    #
+    #     The value is "_I<compressed-fabric-id>._sub._matter._tcp.local".
+    #     """
+    #     compressed_fabric_id = self.default_controller.GetCompressedFabricId()
+    #     operational_subtype = f'_I{compressed_fabric_id:016X}._sub.{MdnsServiceType.OPERATIONAL.value}'
+    #     if log_result:
+    #         log.info("\n\n\tOperational Subtype: %s\n", operational_subtype)
+    #     return operational_subtype
 
     async def check_operational_service_has_txt_ic(self) -> bool:
         """Check whether the DUT operational mDNS service advertises TXT key "IC" as "1".
