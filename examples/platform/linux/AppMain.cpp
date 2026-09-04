@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <filesystem>
 #include <string>
 
 #include <platform/CHIPDeviceLayer.h>
@@ -49,6 +50,7 @@
 
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/Linux/FilesystemStorageLocationProvider.h>
 #include <platform/RuntimeOptionsProvider.h>
 
 #include <AllClustersExampleDeviceInfoProviderImpl.h>
@@ -461,6 +463,19 @@ static uint16_t WiFiPAFGet_FreqList(const char * args, std::unique_ptr<uint16_t[
 }
 #endif
 
+class ExampleFilesystemStorageLocationProvider : public chip::DeviceLayer::FilesystemStorageLocationProvider
+{
+    static std::string Default() { return std::filesystem::temp_directory_path().string(); }
+    const char * LegacyKVS() const { return LinuxDeviceOptions::GetInstance().KVS; }
+    std::string GetFactoryDataLocation() const { return LinuxDeviceOptions::GetInstance().KVSFactoryDirectory.ValueOr(Default()); }
+    std::string GetConfigDataLocation() const { return LinuxDeviceOptions::GetInstance().KVSConfigDirectory.ValueOr(Default()); }
+    std::string GetCountersDataLocation() const
+    {
+        return LinuxDeviceOptions::GetInstance().KVSCountersDirectory.ValueOr(Default());
+    }
+    std::string GetKVSDataLocation() const { return LinuxDeviceOptions::GetInstance().KVSDataDirectory.ValueOr(Default()); }
+};
+
 // Wrapper for DeviceInstanceInfoProvider that allows the example app to set
 // attribute values from the command-line, provide hardcoded values, or fall
 // back to the default DeviceInstanceInfoProvider.
@@ -583,6 +598,7 @@ private:
 };
 
 ExampleDeviceInstanceInfoProvider gExampleDeviceInstanceInfoProvider;
+ExampleFilesystemStorageLocationProvider sExampleProvider;
 
 int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
                      const Optional<EndpointId> secondaryNetworkCommissioningEndpoint)
@@ -616,17 +632,10 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 
     sSecondaryNetworkCommissioningEndpoint = secondaryNetworkCommissioningEndpoint;
 
-#ifdef CHIP_CONFIG_KVS_PATH
-    if (LinuxDeviceOptions::GetInstance().KVS == nullptr)
-    {
-        err = DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
-    }
-    else
-    {
-        err = DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(LinuxDeviceOptions::GetInstance().KVS);
-    }
-    SuccessOrExit(err);
-#endif
+    SetFilesystemStorageLocationProvider(&sExampleProvider);
+
+    ChipLogProgress(NotSpecified, "Storage location provider returned %s",
+                    GetFilesystemStorageLocationProvider().GetConfigDataLocation().c_str());
 
 #if defined(ENABLE_CHIP_SHELL)
     /* Block SIGINT and SIGTERM. Other threads created by the main thread
