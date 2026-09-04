@@ -21,8 +21,8 @@
 #include <clusters/RvcOperationalState/Enums.h>
 #include <device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.h>
 #include <device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaStorageDelegate.h>
-#include <device/types/robotic-vacuum-cleaner/impl/RvcNamedPipeSimulation.h>
 #include <lib/support/TimerDelegate.h>
+#include <oob-accessors/clusters/RvcOOBAccessor.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <string>
 
@@ -74,7 +74,7 @@ enum class PhysicalDockState : uint8_t
 class SimulatedRoboticVacuumCleaner : public RoboticVacuumCleaner,
                                       public Clusters::OperationalState::OperationalStateCluster::Delegate,
                                       public Clusters::ServiceArea::Delegate,
-                                      public RvcNamedPipeSimulation,
+                                      public RvcSimulationDelegate,
                                       public TimerContext
 {
 public:

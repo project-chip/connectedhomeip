@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,19 +16,19 @@
 
 #pragma once
 
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/Span.h>
+#include <oob-accessors/OOBAccessor.h>
 #include <optional>
 #include <string>
 
 namespace chip::app {
 
-// Named-pipe simulation hooks for RVC devices. Implemented by the operational-state cluster
-// delegate when the device provides a full simulation (see SimulatedRoboticVacuumCleaner).
-class RvcNamedPipeSimulation
+// Abstract simulation delegate for RVC actions handled out-of-band.
+class RvcSimulationDelegate
 {
 public:
-    virtual ~RvcNamedPipeSimulation() = default;
+    virtual ~RvcSimulationDelegate() = default;
 
     virtual void HandleCharged()                                                                                     = 0;
     virtual void HandleCharging()                                                                                    = 0;
@@ -51,8 +50,25 @@ public:
     virtual bool HandleRemoveArea(uint32_t areaId)                                                                   = 0;
 };
 
-void RegisterRvcNamedPipeSimulation(EndpointId endpoint, RvcNamedPipeSimulation * simulation);
-void UnregisterRvcNamedPipeSimulation(EndpointId endpoint);
-RvcNamedPipeSimulation * GetRvcNamedPipeSimulation(EndpointId endpoint);
+class RvcOOBAccessor : public OOBAccessor
+{
+public:
+    RvcOOBAccessor(RvcSimulationDelegate & delegate, EndpointId endpointId) :
+        mDelegate(delegate), mEndpointId(endpointId)
+    {}
+
+    std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) override;
+
+private:
+    std::optional<CHIP_ERROR> HandleParameterlessAction(CharSpan action, ByteSpan tlvData) const;
+    std::optional<CHIP_ERROR> HandleErrorEvent(ByteSpan tlvData) const;
+    std::optional<CHIP_ERROR> HandleAddMap(ByteSpan tlvData) const;
+    std::optional<CHIP_ERROR> HandleRemoveMap(ByteSpan tlvData) const;
+    std::optional<CHIP_ERROR> HandleAddArea(ByteSpan tlvData) const;
+    std::optional<CHIP_ERROR> HandleRemoveArea(ByteSpan tlvData) const;
+
+    RvcSimulationDelegate & mDelegate;
+    EndpointId mEndpointId;
+};
 
 } // namespace chip::app

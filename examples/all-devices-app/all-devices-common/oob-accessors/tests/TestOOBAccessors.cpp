@@ -31,6 +31,7 @@
 #include <oob-accessors/clusters/ElectricalEnergyMeasurementOOBAccessor.h>
 #include <oob-accessors/clusters/OccupancyOOBAccessor.h>
 #include <oob-accessors/clusters/OnOffOOBAccessor.h>
+#include <oob-accessors/clusters/RvcOOBAccessor.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DefaultTimerDelegate.h>
@@ -419,6 +420,139 @@ TEST_F(TestOOBAccessors, BasicInformationOOBAccessor)
               CHIP_NO_ERROR);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+class MockRvcSimulation : public RvcSimulationDelegate
+{
+public:
+    void HandleCharged() override { mChargedCalled = true; }
+    void HandleCharging() override {}
+    void HandleDocked() override {}
+    void HandleChargerFound() override {}
+    void HandleLowCharge() override {}
+    void HandleActivityComplete() override {}
+    void HandleAreaComplete() override {}
+    void HandleClearError() override {}
+    void HandleReset() override {}
+    void HandleErrorEvent(const std::string & error) override { mLastError = error; }
+    void HandleEmptyingDustBin() override {}
+    void HandleCleaningMop() override {}
+    void HandleFillingWaterTank() override {}
+    void HandleUpdatingMaps() override {}
+    bool HandleAddMap(uint32_t mapId, CharSpan mapName) override
+    {
+        mLastMapId   = mapId;
+        mLastMapName = std::string(mapName.data(), mapName.size());
+        return true;
+    }
+    bool HandleRemoveMap(uint32_t mapId) override
+    {
+        mLastRemovedMapId = mapId;
+        return true;
+    }
+    bool HandleAddArea(uint32_t areaId, std::optional<uint32_t> mapId, std::optional<CharSpan> locationName) override
+    {
+        mLastAreaId = areaId;
+        mLastAreaMapId = mapId;
+        if (locationName.has_value())
+        {
+            mLastLocationName = std::string(locationName->data(), locationName->size());
+        }
+        return true;
+    }
+    bool HandleRemoveArea(uint32_t areaId) override
+    {
+        mLastRemovedAreaId = areaId;
+        return true;
+    }
+
+    bool mChargedCalled = false;
+    std::string mLastError;
+    uint32_t mLastMapId = 0;
+    std::string mLastMapName;
+    uint32_t mLastRemovedMapId = 0;
+    uint32_t mLastAreaId = 0;
+    std::optional<uint32_t> mLastAreaMapId;
+    std::optional<std::string> mLastLocationName;
+    uint32_t mLastRemovedAreaId = 0;
+};
+
+TEST_F(TestOOBAccessors, RvcOOBAccessor)
+{
+    InMemoryOOBAccessorRegistry registry;
+    MockRvcSimulation mockSimulation;
+    constexpr EndpointId kEndpointId = 1;
+
+    EXPECT_EQ(registry.Register(std::make_unique<RvcOOBAccessor>(mockSimulation, kEndpointId)), CHIP_NO_ERROR);
+
+    // Test Charged
+    {
+        uint8_t buffer[64];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType outer;
+        EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Put(TLV::ContextTag(1), kEndpointId), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+        EXPECT_EQ(registry.HandleAction("Charged"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+        EXPECT_TRUE(mockSimulation.mChargedCalled);
+    }
+
+    // Test ErrorEvent
+    {
+        uint8_t buffer[64];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType outer;
+        EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Put(TLV::ContextTag(1), kEndpointId), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.PutString(TLV::ContextTag(2), "StuckInMud"), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+        EXPECT_EQ(registry.HandleAction("ErrorEvent"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+        EXPECT_EQ(mockSimulation.mLastError, "StuckInMud");
+    }
+
+    // Test AddMap
+    {
+        uint8_t buffer[128];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType outer;
+        EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Put(TLV::ContextTag(1), kEndpointId), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Put(TLV::ContextTag(2), static_cast<uint32_t>(42)), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.PutString(TLV::ContextTag(3), "First Floor"), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+        EXPECT_EQ(registry.HandleAction("AddMap"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+        EXPECT_EQ(mockSimulation.mLastMapId, 42U);
+        EXPECT_EQ(mockSimulation.mLastMapName, "First Floor");
+    }
+
+    // Test AddArea
+    {
+        uint8_t buffer[128];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType outer;
+        EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Put(TLV::ContextTag(1), kEndpointId), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Put(TLV::ContextTag(2), static_cast<uint32_t>(7)), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Put(TLV::ContextTag(3), static_cast<uint32_t>(42)), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.PutString(TLV::ContextTag(4), "Kitchen"), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+        EXPECT_EQ(registry.HandleAction("AddArea"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+        EXPECT_EQ(mockSimulation.mLastAreaId, 7U);
+        EXPECT_EQ(mockSimulation.mLastAreaMapId, 42U);
+        EXPECT_EQ(mockSimulation.mLastLocationName, "Kitchen");
+    }
 }
 
 TEST_F(TestOOBAccessors, NoopRegistryLifecycle)

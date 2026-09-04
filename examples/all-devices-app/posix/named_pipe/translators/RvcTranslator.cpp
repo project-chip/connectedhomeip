@@ -16,7 +16,6 @@
 
 #include "RvcTranslator.h"
 
-#include <device/types/robotic-vacuum-cleaner/impl/RvcNamedPipeSimulation.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip::app::NamedPipe {
@@ -28,78 +27,13 @@ CHIP_ERROR RvcTranslator::TranslateAndExecute(EndpointId endpointId, const Json:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    std::string action                  = json["Name"].asString();
-    RvcNamedPipeSimulation * simulation = GetRvcNamedPipeSimulation(endpointId);
-    if (simulation == nullptr)
-    {
-        ChipLogError(AppServer, "RvcNamedPipeSimulation not found on endpoint %u", static_cast<unsigned>(endpointId));
-        return CHIP_ERROR_NOT_FOUND;
-    }
+    std::string action = json["Name"].asString();
 
-    if (action == "Reset")
+    if (action == "Reset" || action == "Charged" || action == "Charging" || action == "Docked" || action == "ChargerFound" ||
+        action == "LowCharge" || action == "ActivityComplete" || action == "AreaComplete" || action == "ClearError" ||
+        action == "EmptyingDustBin" || action == "CleaningMop" || action == "FillingWaterTank" || action == "UpdatingMaps")
     {
-        simulation->HandleReset();
-        return CHIP_NO_ERROR;
-    }
-    if (action == "Charged")
-    {
-        simulation->HandleCharged();
-        return CHIP_NO_ERROR;
-    }
-    if (action == "Charging")
-    {
-        simulation->HandleCharging();
-        return CHIP_NO_ERROR;
-    }
-    if (action == "Docked")
-    {
-        simulation->HandleDocked();
-        return CHIP_NO_ERROR;
-    }
-    if (action == "ChargerFound")
-    {
-        simulation->HandleChargerFound();
-        return CHIP_NO_ERROR;
-    }
-    if (action == "LowCharge")
-    {
-        simulation->HandleLowCharge();
-        return CHIP_NO_ERROR;
-    }
-    if (action == "ActivityComplete")
-    {
-        simulation->HandleActivityComplete();
-        return CHIP_NO_ERROR;
-    }
-    if (action == "AreaComplete")
-    {
-        simulation->HandleAreaComplete();
-        return CHIP_NO_ERROR;
-    }
-    if (action == "ClearError")
-    {
-        simulation->HandleClearError();
-        return CHIP_NO_ERROR;
-    }
-    if (action == "EmptyingDustBin")
-    {
-        simulation->HandleEmptyingDustBin();
-        return CHIP_NO_ERROR;
-    }
-    if (action == "CleaningMop")
-    {
-        simulation->HandleCleaningMop();
-        return CHIP_NO_ERROR;
-    }
-    if (action == "FillingWaterTank")
-    {
-        simulation->HandleFillingWaterTank();
-        return CHIP_NO_ERROR;
-    }
-    if (action == "UpdatingMaps")
-    {
-        simulation->HandleUpdatingMaps();
-        return CHIP_NO_ERROR;
+        return DispatchAction(registry, CharSpan(action.data(), action.size()), endpointId);
     }
     if (action == "ErrorEvent")
     {
@@ -107,8 +41,8 @@ CHIP_ERROR RvcTranslator::TranslateAndExecute(EndpointId endpointId, const Json:
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        simulation->HandleErrorEvent(json["Error"].asString());
-        return CHIP_NO_ERROR;
+        std::string err = json["Error"].asString();
+        return DispatchStringAction(registry, "ErrorEvent"_span, endpointId, CharSpan(err.data(), err.size()));
     }
     if (action == "AddMap")
     {
@@ -118,12 +52,20 @@ CHIP_ERROR RvcTranslator::TranslateAndExecute(EndpointId endpointId, const Json:
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         std::string mapName = json["MapName"].asString();
-        if (!simulation->HandleAddMap(mapId.value(), CharSpan::fromCharString(mapName.c_str())))
-        {
-            ChipLogError(AppServer, "AddMap: failed to add map %" PRIu32, mapId.value());
-            return CHIP_ERROR_INTERNAL;
-        }
-        return CHIP_NO_ERROR;
+
+        uint8_t buffer[128];
+        TLV::TLVWriter writer;
+        writer.Init(buffer, sizeof(buffer));
+
+        TLV::TLVType outerType;
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(1), endpointId));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(2), *mapId));
+        ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(3), CharSpan(mapName.data(), mapName.size())));
+        ReturnErrorOnFailure(writer.EndContainer(outerType));
+        ReturnErrorOnFailure(writer.Finalize());
+
+        return registry.HandleAction("AddMap"_span, ByteSpan(buffer, writer.GetLengthWritten()));
     }
     if (action == "RemoveMap")
     {
@@ -132,12 +74,7 @@ CHIP_ERROR RvcTranslator::TranslateAndExecute(EndpointId endpointId, const Json:
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        if (!simulation->HandleRemoveMap(mapId.value()))
-        {
-            ChipLogError(AppServer, "RemoveMap: failed to remove map %" PRIu32, mapId.value());
-            return CHIP_ERROR_INTERNAL;
-        }
-        return CHIP_NO_ERROR;
+        return DispatchAction(registry, "RemoveMap"_span, endpointId, *mapId);
     }
     if (action == "AddArea")
     {
@@ -146,24 +83,45 @@ CHIP_ERROR RvcTranslator::TranslateAndExecute(EndpointId endpointId, const Json:
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        auto mapId = ExtractUInt<uint32_t>(json, "MapId");
+        std::optional<uint32_t> mapId;
+        if (json.isMember("MapId"))
+        {
+            mapId = ExtractUInt<uint32_t>(json, "MapId");
+            if (!mapId.has_value())
+            {
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+        }
         std::optional<std::string> locName;
-        std::optional<CharSpan> locNameSpan;
         if (json.isMember("LocationName"))
         {
             if (!json["LocationName"].isString())
             {
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
-            locName     = json["LocationName"].asString();
-            locNameSpan = CharSpan::fromCharString(locName->c_str());
+            locName = json["LocationName"].asString();
         }
-        if (!simulation->HandleAddArea(areaId.value(), mapId, locNameSpan))
+
+        uint8_t buffer[128];
+        TLV::TLVWriter writer;
+        writer.Init(buffer, sizeof(buffer));
+
+        TLV::TLVType outerType;
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(1), endpointId));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(2), *areaId));
+        if (mapId.has_value())
         {
-            ChipLogError(AppServer, "AddArea: failed to add area %" PRIu32, areaId.value());
-            return CHIP_ERROR_INTERNAL;
+            ReturnErrorOnFailure(writer.Put(TLV::ContextTag(3), *mapId));
         }
-        return CHIP_NO_ERROR;
+        if (locName.has_value())
+        {
+            ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(4), CharSpan(locName->data(), locName->size())));
+        }
+        ReturnErrorOnFailure(writer.EndContainer(outerType));
+        ReturnErrorOnFailure(writer.Finalize());
+
+        return registry.HandleAction("AddArea"_span, ByteSpan(buffer, writer.GetLengthWritten()));
     }
     if (action == "RemoveArea")
     {
@@ -172,12 +130,7 @@ CHIP_ERROR RvcTranslator::TranslateAndExecute(EndpointId endpointId, const Json:
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        if (!simulation->HandleRemoveArea(areaId.value()))
-        {
-            ChipLogError(AppServer, "RemoveArea: failed to remove area %" PRIu32, areaId.value());
-            return CHIP_ERROR_INTERNAL;
-        }
-        return CHIP_NO_ERROR;
+        return DispatchAction(registry, "RemoveArea"_span, endpointId, *areaId);
     }
 
     return CHIP_ERROR_INVALID_ARGUMENT;

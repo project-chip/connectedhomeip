@@ -48,6 +48,8 @@ source_set("oob-accessors") {
     "clusters/OccupancyOOBAccessor.h",
     "clusters/OnOffOOBAccessor.cpp",
     "clusters/OnOffOOBAccessor.h",
+    "clusters/RvcOOBAccessor.cpp",
+    "clusters/RvcOOBAccessor.h",
   ]
 
   public_deps = [

@@ -120,6 +120,23 @@ public:
 
         return registry.HandleAction(actionName, ByteSpan(buffer, writer.GetLengthWritten()));
     }
+
+    static CHIP_ERROR DispatchStringAction(OOBAccessorRegistry & registry, CharSpan actionName, EndpointId endpointId,
+                                           CharSpan value)
+    {
+        uint8_t buffer[128];
+        TLV::TLVWriter writer;
+        writer.Init(buffer, sizeof(buffer));
+
+        TLV::TLVType outerType;
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(1), endpointId));
+        ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(2), value));
+        ReturnErrorOnFailure(writer.EndContainer(outerType));
+        ReturnErrorOnFailure(writer.Finalize());
+
+        return registry.HandleAction(actionName, ByteSpan(buffer, writer.GetLengthWritten()));
+    }
 };
 
 } // namespace chip::app::NamedPipe

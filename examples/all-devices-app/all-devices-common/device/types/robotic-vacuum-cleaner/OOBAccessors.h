@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,18 +16,13 @@
 
 #pragma once
 
-#include <app/clusters/mode-base-server/ModeBaseCluster.h>
+#include <device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.h>
+#include <device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.h>
+#include <oob-accessors/OOBAccessorRegistry.h>
 
-// Registry type tags for clusters that share the same implementation type but represent
-// distinct logical clusters on an endpoint (e.g. RVC Run Mode and RVC Clean Mode both
-// use ModeBaseCluster).
+namespace chip::app {
 
-struct RvcRunModeType
-{
-    using ClusterType = chip::app::Clusters::ModeBaseCluster;
-};
+void RegisterOOBAccessors(RoboticVacuumCleaner & device, OOBAccessorRegistry & registry);
+void RegisterOOBAccessors(SimulatedRoboticVacuumCleaner & device, OOBAccessorRegistry & registry);
 
-struct RvcCleanModeType
-{
-    using ClusterType = chip::app::Clusters::ModeBaseCluster;
-};
+} // namespace chip::app

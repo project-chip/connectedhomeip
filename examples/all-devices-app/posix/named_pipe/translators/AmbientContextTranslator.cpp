@@ -146,7 +146,7 @@ CHIP_ERROR AmbientContextTranslator::TranslateSetPredictedActivity(EndpointId en
         auto startTStampOpt = ExtractUInt<uint32_t>(item, "StartTStamp");
         auto endTStampOpt   = ExtractUInt<uint32_t>(item, "EndTStamp");
         auto confOpt        = ExtractUInt<uint8_t>(item, "Conf");
-        VerifyOrReturnError(startTStampOpt.has_value() && endTStampOpt.has_value() && confOpt.has_value(),
+        VerifyOrReturnError(startTStampOpt.has_value() && endTStampOpt.has_value() && confOpt.has_value() && *confOpt <= 100,
                             CHIP_ERROR_INVALID_ARGUMENT);
 
         TLV::TLVType itemType;

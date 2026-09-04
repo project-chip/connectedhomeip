@@ -97,7 +97,7 @@ classDiagram
         #mEndpointId: EndpointId
         +Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider, EndpointComposition composition) CHIP_ERROR
         +Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)* CHIP_ERROR
-        +Unregister(CodeDrivenDataModelProvider & provider)
+        +Unregister(CodeDrivenDataModelProvider & provider)*
         +GetEndpointId() EndpointId
     }
 
@@ -105,6 +105,7 @@ classDiagram
         #mOccupancySensingCluster: LazyRegisteredServerCluster~OccupancySensingCluster~
         #mIdentifyCluster: LazyRegisteredServerCluster~IdentifyCluster~
         +Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition) CHIP_ERROR
+        +Unregister(CodeDrivenDataModelProvider & provider)
     }
 
     DeviceInterface <|-- SingleEndpoint

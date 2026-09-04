@@ -17,12 +17,12 @@ import("//build_overrides/chip.gni")
 
 source_set("robotic-vacuum-cleaner") {
   sources = [
+    "OOBAccessors.cpp",
+    "OOBAccessors.h",
     "RoboticVacuumCleaner.cpp",
     "RoboticVacuumCleaner.h",
     "impl/LoggingServiceAreaStorageDelegate.cpp",
     "impl/LoggingServiceAreaStorageDelegate.h",
-    "impl/RvcNamedPipeSimulation.cpp",
-    "impl/RvcNamedPipeSimulation.h",
     "impl/RvcSimulationLogic.h",
     "impl/RvcSimulationTopology.h",
     "impl/SimulatedRoboticVacuumCleaner.cpp",
@@ -35,6 +35,7 @@ source_set("robotic-vacuum-cleaner") {
 
   public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
     "${chip_root}/src/app/clusters/mode-base-server",
     "${chip_root}/src/app/clusters/operational-state-server",
     "${chip_root}/src/app/clusters/service-area-server",

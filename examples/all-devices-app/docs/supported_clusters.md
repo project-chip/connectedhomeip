@@ -118,7 +118,7 @@ To update or validate this list manually, follow these steps:
 | 72        | Joint Fabric Datastore                                     | 1874 (0x0752) | No                 | No                  |                                       |
 | 73        | Keypad Input                                               | 1289 (0x0509) | No                 | No                  |                                       |
 | 74        | Laundry Dryer Controls                                     | 74 (0x004A)   | No                 | No                  |                                       |
-| 75        | Laundry Washer Controls                                    | 83 (0x0053)   | No                 | No                  |                                       |
+| 75        | Laundry Washer Controls                                    | 83 (0x0053)   | Yes                | Yes                 |                                       |
 | 76        | Laundry Washer Mode                                        | 81 (0x0051)   | Yes                | Yes                 | Instance of Mode Base                 |
 | 77        | Leaf Wetness Measurement                                   | 1031 (0x0407) | No                 | No                  |                                       |
 | 78        | Level Control                                              | 8 (0x0008)    | Yes                | Yes                 |                                       |

@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,32 +14,19 @@
  *    limitations under the License.
  */
 
-#include <device/types/robotic-vacuum-cleaner/impl/RvcNamedPipeSimulation.h>
-
-#include <map>
+#include "OOBAccessors.h"
+#include <oob-accessors/clusters/RvcOOBAccessor.h>
 
 namespace chip::app {
 
-namespace {
-
-std::map<EndpointId, RvcNamedPipeSimulation *> sRvcNamedPipeSimulations;
-
-} // namespace
-
-void RegisterRvcNamedPipeSimulation(EndpointId endpoint, RvcNamedPipeSimulation * simulation)
+void RegisterOOBAccessors(RoboticVacuumCleaner & device, OOBAccessorRegistry & registry)
 {
-    sRvcNamedPipeSimulations[endpoint] = simulation;
+    // Base RoboticVacuumCleaner does not provide simulation hooks.
 }
 
-void UnregisterRvcNamedPipeSimulation(EndpointId endpoint)
+void RegisterOOBAccessors(SimulatedRoboticVacuumCleaner & device, OOBAccessorRegistry & registry)
 {
-    sRvcNamedPipeSimulations.erase(endpoint);
-}
-
-RvcNamedPipeSimulation * GetRvcNamedPipeSimulation(EndpointId endpoint)
-{
-    auto it = sRvcNamedPipeSimulations.find(endpoint);
-    return (it != sRvcNamedPipeSimulations.end()) ? it->second : nullptr;
+    LogErrorOnFailure(registry.Register(std::make_unique<RvcOOBAccessor>(device, device.GetEndpointId())));
 }
 
 } // namespace chip::app
