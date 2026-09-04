@@ -325,6 +325,7 @@ void InitServer(intptr_t context)
             .groupDataProvider = gGroupDataProvider,
             .fabricTable       = Server::GetInstance().GetFabricTable(),
             .timerDelegate     = gTimerDelegate,
+            .identifyDelegate  = gIdentifyDelegate,
         });
     });
 #endif
