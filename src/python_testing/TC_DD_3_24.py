@@ -41,9 +41,9 @@ class TC_DD_3_24(MatterTestCommissioner):
             TestStep(1, "Detecting the NFC Tag and reading the Payload", is_commissioning=False),
             TestStep(2, "Validate the NFC bit in payload and perform the first phase of the commissioning, over NFC"),
             TestStep(3, "DUT is powered ON."),
-            TestStep(4, "Perform DNS-SD Discovery and check the presence of a mDNS service with “_IC” subtype."),
-            TestStep(5, "Commissioning is completed on the operational network."),
-            TestStep(6, "Perform DNS-SD Discovery and check that the “_IC” subtype is no more present."),
+            TestStep(4, "Perform DNS-SD discovery and verify the DUT operational TXT record advertises IC=1."),
+            TestStep(5, "Continue commissioning after network connect request and verify SendComplete is reached."),
+            TestStep(6, "Poll DNS-SD until the DUT operational TXT record no longer advertises IC=1 (up to 20 seconds)."),
         ]
 
     def setup_test(self):
