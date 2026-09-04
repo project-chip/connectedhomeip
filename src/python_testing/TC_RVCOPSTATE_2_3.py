@@ -35,6 +35,21 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device robotic-vacuum-cleaner --trace-to json:${TRACE_APP}.json --app-pipe /tmp/rvcopstate_2_3_fifo
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --endpoint 1
+#       --app-pipe /tmp/rvcopstate_2_3_fifo
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -203,7 +218,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe({"Name": "Reset"})
+            self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
 
         test_step = "Manually put the device in a state where it can receive a Pause command"
         self.print_step(2, test_step)
@@ -290,7 +305,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             test_step = "Manually put the device in the Stopped(0x00) operational state"
             self.print_step(24, test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "Reset"})
+                self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -304,7 +319,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             test_step = "Manually put the device in the Error(0x03) operational state"
             self.print_step(28, test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "Stuck"})
+                self.write_to_app_pipe({"Name": "ErrorEvent", "EndpointId": self.endpoint, "Error": "Stuck"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -318,10 +333,10 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             test_step = "Manually put the device in the Charging(0x41) operational state"
             self.print_step(32, test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "Reset"})
+                self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
                 await self.send_run_change_to_mode_cmd(1)
                 await self.send_run_change_to_mode_cmd(0)
-                self.write_to_app_pipe({"Name": "ChargerFound"})
+                self.write_to_app_pipe({"Name": "ChargerFound", "EndpointId": self.endpoint})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -341,7 +356,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             test_step = "Manually put the device in the Docked(0x42) operational state"
             self.print_step(38, test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "Charged"})
+                self.write_to_app_pipe({"Name": "Charged", "EndpointId": self.endpoint})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -373,7 +388,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             test_step = "Manually put the device in the EmptyingDustBin(0x43) operational state"
             self.print_step(46, test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "EmptyingDustBin"})
+                self.write_to_app_pipe({"Name": "EmptyingDustBin", "EndpointId": self.endpoint})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -394,7 +409,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             test_step = "Manually put the device in the CleaningMop(0x44) operational state"
             self.print_step(50, test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "CleaningMop"})
+                self.write_to_app_pipe({"Name": "CleaningMop", "EndpointId": self.endpoint})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -415,7 +430,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             test_step = "Manually put the device in the FillingWaterTank(0x45) operational state"
             self.print_step(54, test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "FillingWaterTank"})
+                self.write_to_app_pipe({"Name": "FillingWaterTank", "EndpointId": self.endpoint})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -436,7 +451,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             test_step = "Manually put the device in the UpdatingMaps(0x46) operational state"
             self.print_step(58, test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "UpdatingMaps"})
+                self.write_to_app_pipe({"Name": "UpdatingMaps", "EndpointId": self.endpoint})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
