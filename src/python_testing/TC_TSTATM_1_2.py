@@ -210,7 +210,7 @@ class TC_TSTATM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         self.step(3)
         mode_attr = self.cluster.Attributes.CurrentMode
         current_mode = await self.read_and_check_mode(endpoint=endpoint, mode=mode_attr, supported_modes=supported_modes)
-        logger.info(f"Current mode: {current_mode}")
+        logger.info("Current mode: %s", current_mode)
 
         # Step 5: StartUpMode attribute (optional)
         self.step(5)
@@ -218,7 +218,7 @@ class TC_TSTATM_1_2(MatterBaseTest, ModeBaseClusterChecks):
             startup_mode = await self.read_and_check_mode(
                 endpoint=endpoint, mode=self.cluster.Attributes.StartUpMode, supported_modes=supported_modes, is_nullable=True
             )
-            logger.info(f"StartUpMode: {startup_mode}")
+            logger.info("StartUpMode: %s", startup_mode)
 
         # Step 6: CoreModeTags attribute (CoreModes feature)
         self.step(6)
@@ -228,7 +228,7 @@ class TC_TSTATM_1_2(MatterBaseTest, ModeBaseClusterChecks):
                 cluster=self.cluster,
                 attribute=self.cluster.Attributes.CoreModeTags,
             )
-            logger.info(f"CoreModeTags: {core_mode_tags}")
+            logger.info("CoreModeTags: %s", core_mode_tags)
             asserts.assert_greater_equal(len(core_mode_tags), 1, "CoreModeTags must have at least 1 entry")
             asserts.assert_less_equal(len(core_mode_tags), 16, "CoreModeTags must have at most 16 entries")
             asserts.assert_equal(len(core_mode_tags), len(set(core_mode_tags)), "CoreModeTags contains duplicate values")
