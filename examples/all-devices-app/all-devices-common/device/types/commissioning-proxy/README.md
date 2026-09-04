@@ -363,18 +363,18 @@ and commissioning packets between chip-tool and the device:
     [--proxy-endpoint <endpoint>] [--proxy-wifi-band 2g4|5g]
 ```
 
-| Argument                | Description                                                                |
-| ----------------------- | -------------------------------------------------------------------------- |
-| `node-id`               | Node ID to assign to the new device                                        |
-| `ssid`                  | Wi-Fi network SSID to configure on the device                              |
-| `password`              | Wi-Fi network password                                                     |
-| `setup-pin-code`        | Commissionee PASE setup PIN code                                           |
-| `ed-discriminator`      | Commissionee discriminator (matches step 6)                                |
-| `proxy-node-id`         | Node ID of the already-commissioned proxy                                  |
-| `proxy-connect-timeout` | Seconds the proxy may spend connecting to the commissionee; `0` = no limit |
+| Argument                | Description                                                                 |
+| ----------------------- | --------------------------------------------------------------------------- |
+| `node-id`               | Node ID to assign to the new device                                         |
+| `ssid`                  | Wi-Fi network SSID to configure on the device                               |
+| `password`              | Wi-Fi network password                                                      |
+| `setup-pin-code`        | Commissionee PASE setup PIN code                                            |
+| `ed-discriminator`      | Commissionee discriminator (matches step 6)                                 |
+| `proxy-node-id`         | Node ID of the already-commissioned proxy                                   |
+| `proxy-connect-timeout` | Seconds the proxy may spend connecting to the commissionee; `0` = no limit  |
 | `proxy-transport`       | `wifipaf` or `ble` — the transport the proxy uses to reach the commissionee |
-| `--proxy-endpoint`      | Endpoint hosting the cluster. Defaults to `1`; this app uses `5`           |
-| `--proxy-wifi-band`     | Optional band hint, `2g4` or `5g`; accepted only with `wifipaf`            |
+| `--proxy-endpoint`      | Endpoint hosting the cluster. Defaults to `1`; this app uses `5`            |
+| `--proxy-wifi-band`     | Optional band hint, `2g4` or `5g`; accepted only with `wifipaf`             |
 
 Example — commission device node 1999 onto network "MyNetwork" via proxy 1998:
 
