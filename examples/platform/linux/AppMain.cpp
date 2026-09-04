@@ -97,6 +97,9 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER
 #include <app/clusters/boolean-state-configuration-server/BooleanStateConfigurationTestEventTriggerHandler.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_ALARM_TRIGGER
+#include <app/clusters/electrical-alarm-server/ElectricalAlarmTestEventTriggerHandler.h>
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_PROTECTION_ALARM_TRIGGER
 #include <app/clusters/electrical-protection-alarm-server/ElectricalProtectionAlarmTestEventTriggerHandler.h>
 #endif
@@ -936,6 +939,10 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
 #if CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER
     static BooleanStateConfigurationTestEventTriggerHandler sBooleanStateConfigurationTestEventTriggerHandler;
     SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sBooleanStateConfigurationTestEventTriggerHandler));
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_ALARM_TRIGGER
+    static ElectricalAlarmTestEventTriggerHandler sElectricalAlarmTestEventTriggerHandler;
+    SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sElectricalAlarmTestEventTriggerHandler));
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_PROTECTION_ALARM_TRIGGER
     static ElectricalProtectionAlarmTestEventTriggerHandler sElectricalProtectionAlarmTestEventTriggerHandler;

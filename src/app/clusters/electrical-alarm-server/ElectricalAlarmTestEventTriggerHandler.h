@@ -32,22 +32,36 @@ bool HandleElectricalAlarmTestEventTrigger(uint64_t eventTrigger);
 
 namespace chip {
 
-/// EventTrigger codes for the Electrical Alarm cluster. The top two bytes carry the cluster id
-/// (0x00A1) to namespace the trigger; the low bytes select the alarm bit to activate, or 0 to
-/// clear all active alarms.
+/// EventTrigger codes for the Electrical Alarm cluster, matching the PIXIT Variable Values table
+/// of the Electrical Alarm cluster test plan. The top two bytes carry the cluster id (0x00A1) to
+/// namespace the trigger; the low bytes select a set/clear pair per alarm, or 0 to clear every
+/// active alarm.
+///
+/// A per-alarm clear models the measured condition going away, so a latched alarm stays active
+/// until Reset. kClearAll is the test cleanup path and drops latched alarms too.
 enum class ElectricalAlarmTrigger : uint64_t
 {
-    kClearAll          = 0x00a1'0000'0000'0000,
-    kSetOverVoltage    = 0x00a1'0000'0000'0001,
-    kSetUnderVoltage   = 0x00a1'0000'0000'0002,
-    kSetOverFrequency  = 0x00a1'0000'0000'0003,
-    kSetUnderFrequency = 0x00a1'0000'0000'0004,
-    kSetOverPower      = 0x00a1'0000'0000'0005,
-    kSetUnderPower     = 0x00a1'0000'0000'0006,
-    kSetOverCurrent    = 0x00a1'0000'0000'0007,
-    kSetUnderCurrent   = 0x00a1'0000'0000'0008,
-    kSetPowerImport    = 0x00a1'0000'0000'0009,
-    kSetPowerExport    = 0x00a1'0000'0000'000a,
+    kClearAll            = 0x00a1'0000'0000'0000,
+    kSetOverVoltage      = 0x00a1'0000'0000'0001,
+    kClearOverVoltage    = 0x00a1'0000'0000'0002,
+    kSetUnderVoltage     = 0x00a1'0000'0000'0003,
+    kClearUnderVoltage   = 0x00a1'0000'0000'0004,
+    kSetOverFrequency    = 0x00a1'0000'0000'0005,
+    kClearOverFrequency  = 0x00a1'0000'0000'0006,
+    kSetUnderFrequency   = 0x00a1'0000'0000'0007,
+    kClearUnderFrequency = 0x00a1'0000'0000'0008,
+    kSetOverPower        = 0x00a1'0000'0000'0009,
+    kClearOverPower      = 0x00a1'0000'0000'000a,
+    kSetUnderPower       = 0x00a1'0000'0000'000b,
+    kClearUnderPower     = 0x00a1'0000'0000'000c,
+    kSetOverCurrent      = 0x00a1'0000'0000'000d,
+    kClearOverCurrent    = 0x00a1'0000'0000'000e,
+    kSetUnderCurrent     = 0x00a1'0000'0000'000f,
+    kClearUnderCurrent   = 0x00a1'0000'0000'0010,
+    kSetPowerImport      = 0x00a1'0000'0000'0011,
+    kClearPowerImport    = 0x00a1'0000'0000'0012,
+    kSetPowerExport      = 0x00a1'0000'0000'0013,
+    kClearPowerExport    = 0x00a1'0000'0000'0014,
 };
 
 class ElectricalAlarmTestEventTriggerHandler : public TestEventTriggerHandler
