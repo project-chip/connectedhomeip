@@ -225,8 +225,6 @@ private:
 
     bool IsModeSupported(Humidistat::ModeEnum mode) const;
     bool IsSystemStateSupported(Humidistat::SystemStateEnum systemState) const;
-    bool IsMistTypeConsistentWithMode(Humidistat::ModeEnum mode,
-                                      DataModel::Nullable<chip::BitMask<Humidistat::MistTypeBitmap>> mistType) const;
     bool ShouldTargetSetpointMatchUserSetpoint() const;
     void SyncTargetSetpointToUserSetpoint();
     bool IsMistTypeSupportable(DataModel::Nullable<chip::BitMask<Humidistat::MistTypeBitmap>> mistType) const;
