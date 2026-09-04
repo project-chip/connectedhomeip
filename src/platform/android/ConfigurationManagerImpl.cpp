@@ -192,6 +192,13 @@ CHIP_ERROR ConfigurationManagerImpl::GetUniqueId(char * buf, size_t bufSize)
 
 CHIP_ERROR ConfigurationManagerImpl::GetDeviceTypeId(uint32_t & deviceType)
 {
+    // A runtime override set via SetDeviceTypeId() takes precedence over the persisted value.
+    if (std::optional<uint32_t> deviceTypeOverride = GetDeviceTypeIdOverride(); deviceTypeOverride.has_value())
+    {
+        deviceType = deviceTypeOverride.value();
+        return CHIP_NO_ERROR;
+    }
+
     CHIP_ERROR err;
     uint32_t u32DeviceTypeId = 0;
     err                      = ReadConfigValue(AndroidConfig::kConfigKey_DeviceTypeId, u32DeviceTypeId);

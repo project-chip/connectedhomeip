@@ -29,6 +29,8 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 
+#include <optional>
+
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
 #include <lib/support/LifetimePersistedCounter.h>
 #endif
@@ -127,6 +129,20 @@ protected:
         CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
     size_t mRotatingDeviceIdUniqueIdLength = kRotatingDeviceIDUniqueIDLength;
 #endif
+
+    // Returns the runtime device-type override set via SetDeviceTypeId(), or
+    // std::nullopt if none is in effect. Platforms that provide their own
+    // GetDeviceTypeId() (reading persisted config) should honor this first so
+    // the runtime override behaves consistently across platforms.
+    static std::optional<uint32_t> GetDeviceTypeIdOverride();
+
+    // Backing storage for the runtime device-type override (see SetDeviceTypeId
+    // / GetDeviceTypeIdOverride). Not persisted across reboots. This is a static
+    // data member (single external-linkage instance per specialization) rather
+    // than a file-static, so the setter and the getter always observe the same
+    // object even when their template instantiations are emitted in different
+    // translation units.
+    static std::optional<uint32_t> sDeviceTypeIdOverride;
 
     friend GenericDeviceInstanceInfoProvider<ConfigClass>;
 
