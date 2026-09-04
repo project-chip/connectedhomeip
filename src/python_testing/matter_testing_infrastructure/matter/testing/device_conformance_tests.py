@@ -294,7 +294,11 @@ class DeviceConformanceTests(BasicCompositionTests):
 
             # This is a manually curated list of cluster revisions that are in-progress in the SDK, but have landed in the spec
             in_progress_revisions = [Clusters.BasicInformation.id, Clusters.PowerSource.id,
+<<<<<<< HEAD
                                      Clusters.NetworkCommissioning.id, Clusters.ScenesManagement.id]
+=======
+                                     Clusters.NetworkCommissioning.id, Clusters.OperationalCredentials.id]
+>>>>>>> e22ccb6 (Pqc phase1 data model and artifacts (#73913))
             ignore_revisions.extend(in_progress_revisions)
 
         for endpoint_id, endpoint in self.endpoints_tlv.items():

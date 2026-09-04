@@ -1586,6 +1586,9 @@ static BOOL AttributeIsSpecifiedInOperationalCredentialsCluster(AttributeId aAtt
     case Attributes::CurrentFabricIndex::Id: {
         return YES;
     }
+    case Attributes::PQCDeviceAttestationProfile::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

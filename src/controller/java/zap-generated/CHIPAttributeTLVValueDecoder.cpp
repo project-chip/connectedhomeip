@@ -10783,6 +10783,67 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
             return value;
         }
+        case Attributes::PQCDeviceAttestationProfile::Id: {
+            using TypeInfo = Attributes::PQCDeviceAttestationProfile::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            jobject value_PAASupportedProfiles;
+            std::string value_PAASupportedProfilesClassName     = "java/lang/Integer";
+            std::string value_PAASupportedProfilesCtorSignature = "(I)V";
+            jint jnivalue_PAASupportedProfiles                  = static_cast<jint>(cppValue.PAASupportedProfiles.Raw());
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_PAASupportedProfilesClassName.c_str(), value_PAASupportedProfilesCtorSignature.c_str(),
+                jnivalue_PAASupportedProfiles, value_PAASupportedProfiles);
+            jobject value_PAISupportedProfiles;
+            std::string value_PAISupportedProfilesClassName     = "java/lang/Integer";
+            std::string value_PAISupportedProfilesCtorSignature = "(I)V";
+            jint jnivalue_PAISupportedProfiles                  = static_cast<jint>(cppValue.PAISupportedProfiles.Raw());
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_PAISupportedProfilesClassName.c_str(), value_PAISupportedProfilesCtorSignature.c_str(),
+                jnivalue_PAISupportedProfiles, value_PAISupportedProfiles);
+            jobject value_DACSupportedProfiles;
+            std::string value_DACSupportedProfilesClassName     = "java/lang/Integer";
+            std::string value_DACSupportedProfilesCtorSignature = "(I)V";
+            jint jnivalue_DACSupportedProfiles                  = static_cast<jint>(cppValue.DACSupportedProfiles.Raw());
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_DACSupportedProfilesClassName.c_str(), value_DACSupportedProfilesCtorSignature.c_str(),
+                jnivalue_DACSupportedProfiles, value_DACSupportedProfiles);
+
+            {
+                jclass PQCDeviceAttestationProfileStructStructClass_0;
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                    env, "chip/devicecontroller/ChipStructs$OperationalCredentialsClusterPQCDeviceAttestationProfileStruct",
+                    PQCDeviceAttestationProfileStructStructClass_0);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl,
+                                 "Could not find class ChipStructs$OperationalCredentialsClusterPQCDeviceAttestationProfileStruct");
+                    return nullptr;
+                }
+
+                jmethodID PQCDeviceAttestationProfileStructStructCtor_0;
+                err = chip::JniReferences::GetInstance().FindMethod(env, PQCDeviceAttestationProfileStructStructClass_0, "<init>",
+                                                                    "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+                                                                    &PQCDeviceAttestationProfileStructStructCtor_0);
+                if (err != CHIP_NO_ERROR || PQCDeviceAttestationProfileStructStructCtor_0 == nullptr)
+                {
+                    ChipLogError(
+                        Zcl,
+                        "Could not find ChipStructs$OperationalCredentialsClusterPQCDeviceAttestationProfileStruct constructor");
+                    return nullptr;
+                }
+
+                value =
+                    env->NewObject(PQCDeviceAttestationProfileStructStructClass_0, PQCDeviceAttestationProfileStructStructCtor_0,
+                                   value_PAASupportedProfiles, value_PAISupportedProfiles, value_DACSupportedProfiles);
+            }
+            return value;
+        }
         case Attributes::GeneratedCommandList::Id: {
             using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;

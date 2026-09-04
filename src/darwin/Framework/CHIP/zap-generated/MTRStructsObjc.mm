@@ -3248,6 +3248,39 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTROperationalCredentialsClusterPQCDeviceAttestationProfileStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _paaSupportedProfiles = @(0);
+
+        _paiSupportedProfiles = @(0);
+
+        _dacSupportedProfiles = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTROperationalCredentialsClusterPQCDeviceAttestationProfileStruct alloc] init];
+
+    other.paaSupportedProfiles = self.paaSupportedProfiles;
+    other.paiSupportedProfiles = self.paiSupportedProfiles;
+    other.dacSupportedProfiles = self.dacSupportedProfiles;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: paaSupportedProfiles:%@; paiSupportedProfiles:%@; dacSupportedProfiles:%@; >", NSStringFromClass([self class]), _paaSupportedProfiles, _paiSupportedProfiles, _dacSupportedProfiles];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRGroupKeyManagementClusterGroupInfoMapStruct
 - (instancetype)init
 {

@@ -8754,6 +8754,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
 
         _certificateType = @(0);
+
+        _cryptoProfile = nil;
+
+        _segmentID = nil;
+
+        _maxSegmentSize = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -8765,6 +8771,9 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     auto other = [[MTROperationalCredentialsClusterCertificateChainRequestParams alloc] init];
 
     other.certificateType = self.certificateType;
+    other.cryptoProfile = self.cryptoProfile;
+    other.segmentID = self.segmentID;
+    other.maxSegmentSize = self.maxSegmentSize;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -8773,7 +8782,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: certificateType:%@; >", NSStringFromClass([self class]), _certificateType];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: certificateType:%@; cryptoProfile:%@; segmentID:%@; maxSegmentSize:%@; >", NSStringFromClass([self class]), _certificateType, _cryptoProfile, _segmentID, _maxSegmentSize];
     return descriptionString;
 }
 
@@ -8787,6 +8796,24 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     ListFreer listFreer;
     {
         encodableStruct.certificateType = static_cast<std::remove_reference_t<decltype(encodableStruct.certificateType)>>(self.certificateType.unsignedCharValue);
+    }
+    {
+        if (self.cryptoProfile != nil) {
+            auto & definedValue_0 = encodableStruct.cryptoProfile.Emplace();
+            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.cryptoProfile.unsignedCharValue);
+        }
+    }
+    {
+        if (self.segmentID != nil) {
+            auto & definedValue_0 = encodableStruct.segmentID.Emplace();
+            definedValue_0 = self.segmentID.unsignedShortValue;
+        }
+    }
+    {
+        if (self.maxSegmentSize != nil) {
+            auto & definedValue_0 = encodableStruct.maxSegmentSize.Emplace();
+            definedValue_0 = self.maxSegmentSize.unsignedShortValue;
+        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -8833,6 +8860,10 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
 
         _certificate = [NSData data];
+
+        _totalDocumentSize = nil;
+
+        _nextSegmentID = nil;
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -8843,6 +8874,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     auto other = [[MTROperationalCredentialsClusterCertificateChainResponseParams alloc] init];
 
     other.certificate = self.certificate;
+    other.totalDocumentSize = self.totalDocumentSize;
+    other.nextSegmentID = self.nextSegmentID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -8850,7 +8883,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: certificate:%@; >", NSStringFromClass([self class]), [_certificate base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: certificate:%@; totalDocumentSize:%@; nextSegmentID:%@; >", NSStringFromClass([self class]), [_certificate base64EncodedStringWithOptions:0], _totalDocumentSize, _nextSegmentID];
     return descriptionString;
 }
 
@@ -8912,6 +8945,20 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     {
         self.certificate = AsData(decodableStruct.certificate);
+    }
+    {
+        if (decodableStruct.totalDocumentSize.HasValue()) {
+            self.totalDocumentSize = [NSNumber numberWithUnsignedShort:decodableStruct.totalDocumentSize.Value()];
+        } else {
+            self.totalDocumentSize = nil;
+        }
+    }
+    {
+        if (decodableStruct.nextSegmentID.HasValue()) {
+            self.nextSegmentID = [NSNumber numberWithUnsignedShort:decodableStruct.nextSegmentID.Value()];
+        } else {
+            self.nextSegmentID = nil;
+        }
     }
     return CHIP_NO_ERROR;
 }

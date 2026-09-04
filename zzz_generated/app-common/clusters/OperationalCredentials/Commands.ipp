@@ -96,6 +96,9 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kCertificateType), certificateType);
+    encoder.Encode(to_underlying(Fields::kCryptoProfile), cryptoProfile);
+    encoder.Encode(to_underlying(Fields::kSegmentID), segmentID);
+    encoder.Encode(to_underlying(Fields::kMaxSegmentSize), maxSegmentSize);
     return encoder.Finalize();
 }
 
@@ -113,6 +116,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, certificateType);
         }
+        else if (__context_tag == to_underlying(Fields::kCryptoProfile))
+        {
+            err = DataModel::Decode(reader, cryptoProfile);
+        }
+        else if (__context_tag == to_underlying(Fields::kSegmentID))
+        {
+            err = DataModel::Decode(reader, segmentID);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxSegmentSize))
+        {
+            err = DataModel::Decode(reader, maxSegmentSize);
+        }
 
         ReturnErrorOnFailure(err);
     }
@@ -124,6 +139,8 @@ CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kCertificate), certificate);
+    encoder.Encode(to_underlying(Fields::kTotalDocumentSize), totalDocumentSize);
+    encoder.Encode(to_underlying(Fields::kNextSegmentID), nextSegmentID);
     return encoder.Finalize();
 }
 
@@ -140,6 +157,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         if (__context_tag == to_underlying(Fields::kCertificate))
         {
             err = DataModel::Decode(reader, certificate);
+        }
+        else if (__context_tag == to_underlying(Fields::kTotalDocumentSize))
+        {
+            err = DataModel::Decode(reader, totalDocumentSize);
+        }
+        else if (__context_tag == to_underlying(Fields::kNextSegmentID))
+        {
+            err = DataModel::Decode(reader, nextSegmentID);
         }
 
         ReturnErrorOnFailure(err);
