@@ -136,9 +136,9 @@ CHIP_ERROR OnOffCluster::SetOnOff(bool on)
     NotifyAttributeChanged(Attributes::OnOff::Id);
 
     // Persist
-    LogErrorOnFailure(
-        mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, Clusters::OnOff::Id, Attributes::OnOff::Id),
-                                              ByteSpan(reinterpret_cast<const uint8_t *>(&mOnOff), sizeof(mOnOff))));
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, Clusters::OnOff::Id, Attributes::OnOff::Id), mOnOff));
 
     for (auto & delegate : mDelegates)
     {

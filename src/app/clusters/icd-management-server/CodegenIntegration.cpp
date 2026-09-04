@@ -38,12 +38,12 @@ LazyRegisteredServerCluster<ICDManagementClusterWithCIP> gServer;
 LazyRegisteredServerCluster<ICDManagementCluster> gServer;
 #endif
 
-constexpr chip::BitMask<OptionalCommands> kEnabledCommands()
+constexpr ICDManagementCluster::OptionalCommandSet kEnabledCommands()
 {
 #if defined(ICD_MANAGEMENT_STAY_ACTIVE_REQUEST_COMMAND)
-    return chip::BitMask<OptionalCommands>(kStayActive);
+    return ICDManagementCluster::OptionalCommandSet().Set<Commands::StayActiveRequest::Id>();
 #else
-    return chip::BitMask<OptionalCommands>();
+    return ICDManagementCluster::OptionalCommandSet();
 #endif
 }
 
@@ -54,7 +54,7 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         ICDManagementCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
-        constexpr BitMask<OptionalCommands> enabledCommands = kEnabledCommands();
+        constexpr ICDManagementCluster::OptionalCommandSet enabledCommands = kEnabledCommands();
 
         // Get UserActiveModeTriggerHint
         BitMask<IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerHint(0);

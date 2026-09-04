@@ -46,13 +46,16 @@ public:
 
     chip::Encoding::BigEndian::BufferWriter & Writer() { return *mOutput; }
 
-    /// Writes  the given qname into the underlying buffer, applying
+    /// Writes the given qname into the underlying buffer, applying
     /// compression if possible
     RecordWriter & WriteQName(const FullQName & qname);
 
-    /// Writes  the given qname into the underlying buffer, applying
+    /// Writes the given qname into the underlying buffer, applying
     /// compression if possible
     RecordWriter & WriteQName(const SerializedQNameIterator & qname);
+
+    /// Writes the given qname without DNS name compression.
+    RecordWriter & WriteQNameUncompressed(const FullQName & qname);
 
     inline RecordWriter & Put8(uint8_t value)
     {

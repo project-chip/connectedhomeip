@@ -27,6 +27,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::PushAvStream
             return SupportedFormats::kMetadataEntry;
         case CurrentConnections::Id:
             return CurrentConnections::kMetadataEntry;
+        case MaxZones::Id:
+            return MaxZones::kMetadataEntry;
         default:
             return std::nullopt;
         }
@@ -53,6 +55,8 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::PushAv
             return ManuallyTriggerTransport::kMetadataEntry;
         case FindTransport::Id:
             return FindTransport::kMetadataEntry;
+        case UpdateMotionZoneOptions::Id:
+            return UpdateMotionZoneOptions::kMetadataEntry;
 
         default:
             return std::nullopt;

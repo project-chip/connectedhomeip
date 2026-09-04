@@ -50,6 +50,7 @@ pull_request_rules:
           - merged
           - base=master
           - or:
+                - label="request-backport-latest-mve-sve"
                 - label="request-backport-latest"
                 - label="request-backport-supported"
       actions:
@@ -96,18 +97,6 @@ pull_request_rules:
                   - v1.6-branch
               labels:
                   - backport-v1.6-branch
-
-    - name: Backport to v1.5-branch
-      conditions:
-          - merged
-          - base=master
-          - label="request-backport-supported"
-      actions:
-          backport:
-              branches:
-                  - v1.5-branch
-              labels:
-                  - backport-v1.5-branch
 
     - name: Backport to v1.4.2-branch
       conditions:

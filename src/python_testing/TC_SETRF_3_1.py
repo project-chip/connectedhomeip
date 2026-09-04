@@ -280,6 +280,7 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
                             - Verify that Threshold is null if BlockModeValue is 0 (NoBlock);
                             - Verify that Threshold has type int64 or null if BlockModeValue is 1 (Combined) or 2 (Individual);
                         - Verify that if Label field is presented it is null or has type string with max length 128;
+                        - Verify that if ExternalID field is presented it has type string with max length 36;
                         - Predicted field:
                             - Verify that if Predicted field is presented it has type bool;
                         - Verify that it has at least one of the fields: Price, FriendlyCredit, AuxiliaryLoad, PeakPeriod, PowerThreshold;
@@ -326,6 +327,7 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
                             - Verify that Threshold is null if BlockModeValue is 0 (NoBlock);
                             - Verify that Threshold has type int64 or null if BlockModeValue is 1 (Combined) or 2 (Individual);
                         - Verify that if Label field is presented it is null or has type string with max length 128;
+                        - Verify that if ExternalID field is presented it has type string with max length 36;
                         - Predicted field:
                             - Verify that if Predicted field is presented it has type bool;
                         - Verify that it has at least one of the fields: Price, FriendlyCredit, AuxiliaryLoad, PeakPeriod, PowerThreshold;
@@ -364,6 +366,7 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
                             - Verify that Threshold is null if BlockModeValue is 0 (NoBlock);
                             - Verify that Threshold has type int64 or null if BlockModeValue is 1 (Combined) or 2 (Individual);
                         - Verify that if Label field is presented it is null or has type string with max length 128;
+                        - Verify that if ExternalID field is presented it has type string with max length 36;
                         - Predicted field:
                             - Verify that if Predicted field is presented it has type bool;
                         - Verify that it has at least one of the fields: Price, FriendlyCredit, AuxiliaryLoad, PeakPeriod, PowerThreshold;

@@ -387,7 +387,7 @@ private:
     GstElement * CreateAudioPlaybackPipeline(CameraError & error);
 
     GstElement * CreateSnapshotPipeline(const std::string & device, int width, int height, int quality, int frameRate,
-                                        const std::string & filename, CameraError & error);
+                                        CameraError & error);
     CameraError SetV4l2Control(uint32_t controlId, int value);
 
     bool MatchClosestSnapshotParams(const VideoResolutionStruct & requested, VideoResolutionStruct & outResolution,

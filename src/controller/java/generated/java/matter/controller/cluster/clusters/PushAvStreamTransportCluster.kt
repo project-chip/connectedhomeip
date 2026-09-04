@@ -77,6 +77,16 @@ class PushAvStreamTransportCluster(
     object SubscriptionEstablished : CurrentConnectionsAttributeSubscriptionState()
   }
 
+  class MaxZonesAttribute(val value: UByte?)
+
+  sealed class MaxZonesAttributeSubscriptionState {
+    data class Success(val value: UByte?) : MaxZonesAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : MaxZonesAttributeSubscriptionState()
+
+    object SubscriptionEstablished : MaxZonesAttributeSubscriptionState()
+  }
+
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
@@ -330,6 +340,46 @@ class PushAvStreamTransportCluster(
     return FindTransportResponse(transportConfigurations_decoded)
   }
 
+  suspend fun updateMotionZoneOptions(
+    connectionID: UShort,
+    motionZones: List<PushAvStreamTransportClusterTransportZoneOptionsStruct>?,
+    motionSensitivity: UByte?,
+    timedInvokeTimeout: Duration? = null,
+  ) {
+    val commandId: UInt = 8u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_CONNECTION_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_CONNECTION_ID_REQ), connectionID)
+
+    val TAG_MOTION_ZONES_REQ: Int = 1
+    motionZones?.let {
+      tlvWriter.startArray(ContextSpecificTag(TAG_MOTION_ZONES_REQ))
+      for (item in motionZones.iterator()) {
+        item.toTlv(AnonymousTag, tlvWriter)
+      }
+      tlvWriter.endArray()
+    }
+
+    val TAG_MOTION_SENSITIVITY_REQ: Int = 2
+    motionSensitivity?.let {
+      tlvWriter.put(ContextSpecificTag(TAG_MOTION_SENSITIVITY_REQ), motionSensitivity)
+    }
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
   suspend fun readSupportedFormatsAttribute(): SupportedFormatsAttribute {
     val ATTRIBUTE_ID: UInt = 0u
 
@@ -531,6 +581,107 @@ class PushAvStreamTransportCluster(
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(CurrentConnectionsAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readMaxZonesAttribute(): MaxZonesAttribute {
+    val ATTRIBUTE_ID: UInt = 2u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Maxzones attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte? =
+      if (!tlvReader.isNull()) {
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          tlvReader.getUByte(AnonymousTag)
+        } else {
+          null
+        }
+      } else {
+        tlvReader.getNull(AnonymousTag)
+        null
+      }
+
+    return MaxZonesAttribute(decodedValue)
+  }
+
+  suspend fun subscribeMaxZonesAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<MaxZonesAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 2u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            MaxZonesAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Maxzones attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UByte? =
+            if (!tlvReader.isNull()) {
+              if (tlvReader.isNextTag(AnonymousTag)) {
+                tlvReader.getUByte(AnonymousTag)
+              } else {
+                null
+              }
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(MaxZonesAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(MaxZonesAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

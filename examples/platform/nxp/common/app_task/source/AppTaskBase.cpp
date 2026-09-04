@@ -112,8 +112,12 @@
 #endif
 
 #ifndef CONFIG_THREAD_DEVICE_TYPE
+#ifdef CONFIG_OPENTHREAD_MTD
+#define CONFIG_THREAD_DEVICE_TYPE kThreadDeviceType_MinimalEndDevice
+#else
 #define CONFIG_THREAD_DEVICE_TYPE kThreadDeviceType_Router
-#endif
+#endif // CONFIG_OPENTHREAD_MTD
+#endif // CONFIG_THREAD_DEVICE_TYPE
 
 #if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
 #include <app/reporting/SynchronizedReportSchedulerImpl.h>

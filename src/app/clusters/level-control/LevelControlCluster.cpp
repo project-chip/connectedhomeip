@@ -586,12 +586,9 @@ void LevelControlCluster::StoreCurrentLevel(DataModel::Nullable<uint8_t> value)
 {
     VerifyOrReturn(mContext != nullptr);
 
-    NumericAttributeTraits<uint8_t>::StorageType storageValue;
-    DataModel::NullableToStorage(value, storageValue);
-
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-        ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::CurrentLevel::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))));
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::CurrentLevel::Id), value));
 }
 
 CHIP_ERROR LevelControlCluster::SetStartUpCurrentLevel(DataModel::Nullable<uint8_t> startupLevel)
@@ -599,11 +596,9 @@ CHIP_ERROR LevelControlCluster::SetStartUpCurrentLevel(DataModel::Nullable<uint8
     VerifyOrReturnError(SetAttributeValue(mStartUpCurrentLevel, startupLevel, Attributes::StartUpCurrentLevel::Id), CHIP_NO_ERROR);
     VerifyOrReturnError(mContext != nullptr, CHIP_NO_ERROR);
 
-    NumericAttributeTraits<uint8_t>::StorageType storageValue;
-    DataModel::NullableToStorage(startupLevel, storageValue);
-    return mContext->attributeStorage.WriteValue(
-        ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::StartUpCurrentLevel::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue)));
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    return attributePersistence.StoreNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::StartUpCurrentLevel::Id), startupLevel);
 }
 
 void LevelControlCluster::SetOnTransitionTime(DataModel::Nullable<uint16_t> onTransitionTime)

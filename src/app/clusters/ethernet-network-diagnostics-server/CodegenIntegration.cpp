@@ -46,7 +46,7 @@ public:
         EthernetDiagnosticsServerCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
 
         // Create the cluster with all required parameters
-        gServers[clusterInstanceIndex].Create(DeviceLayer::GetDiagnosticDataProvider(), BitFlags<Feature>(featureMap),
+        gServers[clusterInstanceIndex].Create(endpointId, DeviceLayer::GetDiagnosticDataProvider(), BitFlags<Feature>(featureMap),
                                               optionalAttributeSet);
 
         return gServers[clusterInstanceIndex].Registration();

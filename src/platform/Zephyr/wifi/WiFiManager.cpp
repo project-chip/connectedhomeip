@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024-2025 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -194,6 +194,11 @@ void WiFiManager::IPv6MgmtEventHandler(net_mgmt_event_callback * cb, uint64_t mg
 void WiFiManager::IPv6MgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface)
 #endif
 {
+    if (iface != Instance().mNetIf)
+    {
+        return; // should only handle events originating from Wi-Fi interface if there are multiple interfaces available
+    }
+
     if (((mgmtEvent == NET_EVENT_IPV6_ADDR_ADD) || (mgmtEvent == NET_EVENT_IPV6_ADDR_DEL)) && cb->info)
     {
         IPv6AddressChangeHandler(cb->info);
@@ -646,7 +651,38 @@ void WiFiManager::IPv6AddressChangeHandler(const void * data)
         {
             ChipLogError(DeviceLayer, "Cannot post event: %" CHIP_ERROR_FORMAT, error.Format());
         }
+
+        UpdateIpv6InternetConnectivityState();
     }
+}
+
+void WiFiManager::UpdateIpv6InternetConnectivityState()
+{
+    net_if * iface = Instance().mNetIf;
+    VerifyOrReturn(iface != nullptr);
+
+    struct net_if * found = iface;
+    const bool hasGlobal  = (net_if_ipv6_get_global_addr(NET_ADDR_PREFERRED, &found) != nullptr);
+
+    // Report only on transition so we emit Established/Lost exactly once.
+    if (hasGlobal == Instance().mHasGlobalIPv6Address)
+    {
+        return;
+    }
+
+    ChipDeviceEvent event{};
+    event.Type                            = DeviceEventType::kInternetConnectivityChange;
+    event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
+    event.InternetConnectivityChange.IPv6 = hasGlobal ? kConnectivity_Established : kConnectivity_Lost;
+
+    CHIP_ERROR error = PlatformMgr().PostEvent(&event);
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Cannot post event: %" CHIP_ERROR_FORMAT, error.Format());
+        return; // next event will re-attempt the transition
+    }
+
+    Instance().mHasGlobalIPv6Address = hasGlobal;
 }
 
 WiFiManager::StationStatus WiFiManager::GetStationStatus() const

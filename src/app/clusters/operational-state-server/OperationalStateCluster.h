@@ -99,7 +99,7 @@ public:
      *                          The caller must ensure the delegate outlives this object.
      * @param config            Configuration including optional attributes to expose.
      */
-    OperationalStateCluster(EndpointId endpointId, Delegate * delegate, const Config & config = {});
+    OperationalStateCluster(EndpointId endpointId, Delegate & delegate, const Config & config = {});
 
     ~OperationalStateCluster() override = default;
 
@@ -143,7 +143,7 @@ public:
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
 protected:
-    OperationalStateCluster(EndpointId endpointId, ClusterId clusterId, uint16_t revision, Delegate * delegate,
+    OperationalStateCluster(EndpointId endpointId, ClusterId clusterId, uint16_t revision, Delegate & delegate,
                             const Config & config = {});
 
     virtual bool IsDerivedClusterStatePauseCompatible(uint8_t aState) { return false; }
@@ -158,10 +158,11 @@ protected:
     void UpdateCountdownTime(bool fromDelegate);
     void UpdateCountdownTimeFromClusterLogic() { UpdateCountdownTime(/* fromDelegate = */ false); }
 
-    Delegate * GetDelegate() { return mDelegate; }
+    Delegate & GetDelegate() { return mDelegate; }
+    const Delegate & GetDelegate() const { return mDelegate; }
 
 private:
-    Delegate * mDelegate;
+    Delegate & mDelegate;
     // ClusterRevision is not a fixed constant for this class: it varies by the concrete (derived)
     // cluster. OperationalState and RvcOperationalState are at revision 3, while OvenCavityOperationalState
     // is at revision 2, so each derived class passes its own value through the protected constructor.

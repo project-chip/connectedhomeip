@@ -27,6 +27,14 @@ declare_args() {
   #   subset selected      →  "example-device-app"
   # Any non-empty value is used as-is regardless of the device list.
   all_devices_app_name = ""
+
+  # Ordered list of device types to instantiate at boot on platforms that
+  # honor this arg. Each entry is registered on a
+  # consecutive endpoint starting at endpoint 1. Empty list (default) means
+  # "use the factory's default single device".
+  # Every entry must also appear in all_devices_enabled_devices (or the list
+  # must be empty, i.e. "all enabled").
+  all_devices_default_devices = []
 }
 
 # Private helper — only used within this file.
@@ -89,6 +97,10 @@ _available_devices = [
   [
     "dishwasher",
     "DISHWASHER",
+  ],
+  [
+    "electrical-sensor",
+    "ELECTRICAL_SENSOR",
   ],
   [
     "extractor-hood",
@@ -242,5 +254,47 @@ template("enabled_devices_buildconfig_header") {
       _name = _available_device[1]
       defines += [ "ALL_DEVICES_ENABLE_${_name}=${_enabled}" ]
     }
+
+    # Validate that every entry in all_devices_default_devices is a known
+    # device type, and (when a subset is enabled) also actually enabled.
+    foreach(_requested, all_devices_default_devices) {
+      _found = false
+      foreach(_available_device, _available_devices) {
+        if (_requested == _available_device[0]) {
+          _found = true
+        }
+      }
+      assert(_found,
+             "all_devices_default_devices contains unknown device type: " +
+                 "\"${_requested}\". See _available_devices in " +
+                 "enabled_devices.gni for the accepted values.")
+
+      if (!_all_devices_all_enabled) {
+        _also_enabled = false
+        foreach(_device, all_devices_enabled_devices) {
+          if (_device == _requested) {
+            _also_enabled = true
+          }
+        }
+        assert(_also_enabled,
+               "all_devices_default_devices entry \"${_requested}\" is not " +
+                   "present in all_devices_enabled_devices; it would not be " +
+                   "registered in the DeviceFactory and could not be " +
+                   "instantiated.")
+      }
+    }
+
+    # Compile-time CSV + count of the default device set, consumed by
+    # platforms that pre-select their device types at build
+    # time rather than at runtime.
+    _default_devices_csv = string_join(",", all_devices_default_devices)
+    _default_devices_count = 0
+    foreach(_d, all_devices_default_devices) {
+      _default_devices_count = _default_devices_count + 1
+    }
+    defines += [
+      "ALL_DEVICES_DEFAULT_DEVICES=\"${_default_devices_csv}\"",
+      "ALL_DEVICES_DEFAULT_DEVICES_COUNT=${_default_devices_count}",
+    ]
   }
 }

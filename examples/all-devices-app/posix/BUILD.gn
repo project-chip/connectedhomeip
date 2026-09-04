@@ -34,6 +34,7 @@ executable("all-devices-app") {
     "PosixChime.cpp",
     "PosixSpeaker.cpp",
     "include/CHIPProjectAppConfig.h",
+    "include/ClusterRegistryTypes.h",
     "main.cpp",
   ]
 
@@ -49,6 +50,7 @@ executable("all-devices-app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/device-energy-management",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-plug-in-unit",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dishwasher",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/electrical-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/extractor-hood",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/fan",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/flow-sensor",
@@ -89,6 +91,7 @@ executable("all-devices-app") {
     "${chip_root}/src/app/persistence:default",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib",
+    "${chip_root}/third_party/jsoncpp",
     "${chip_root}/third_party/miniaudio:miniaudio",
     "${chip_root}/zzz_generated/app-common/devices/",
   ]

@@ -18,11 +18,23 @@
 
 namespace chip::app {
 
-LoggingOven::LoggingOven(TimerDelegate & timerDelegate) : LoggingOven(timerDelegate, Config::Default()) {}
+LoggingOven::LoggingOven(TimerDelegate & timerDelegate) : LoggingOven(timerDelegate, Config{}) {}
 
 LoggingOven::LoggingOven(TimerDelegate & timerDelegate, Config config) :
-    Oven(timerDelegate, mLoggingSurface, mLoggingCavity, mLoggingSurface, config),
-    mLoggingCavity(timerDelegate, config.cavityConfig, "Cavity"), mLoggingSurface(timerDelegate, "Top Surface")
+    mCavity(timerDelegate, config.cavityConfig, "Cavity"), mSurface(timerDelegate, "Top Surface")
 {}
+
+CHIP_ERROR LoggingOven::RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider)
+{
+    ReturnErrorOnFailure(mCavity.Register(allocator, provider, EndpointComposition::WithParent(GetEndpointId())));
+    ReturnErrorOnFailure(mSurface.Register(allocator, provider, EndpointComposition::WithParent(GetEndpointId())));
+    return CHIP_NO_ERROR;
+}
+
+void LoggingOven::UnregisterParts(CodeDrivenDataModelProvider & provider)
+{
+    mSurface.Unregister(provider);
+    mCavity.Unregister(provider);
+}
 
 } // namespace chip::app

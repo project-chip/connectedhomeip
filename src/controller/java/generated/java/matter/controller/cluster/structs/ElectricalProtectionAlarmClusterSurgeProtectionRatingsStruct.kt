@@ -31,7 +31,7 @@ class ElectricalProtectionAlarmClusterSurgeProtectionRatingsStruct(
   val maxVoltageProtection: Optional<Long>,
   val maxTemporaryVoltage: Optional<Long>,
   val nominalDischargeCurrent: Optional<Long>,
-  val maximumDishargeCurrent: Optional<Long>,
+  val maximumDischargeCurrent: Optional<Long>,
   val ratedShortCircuitCurrent: Optional<Long>,
   val ratedShortTimeWithstandCurrent: Optional<Long>,
   val energyAbsorptionCapability: Optional<ULong>,
@@ -46,7 +46,7 @@ class ElectricalProtectionAlarmClusterSurgeProtectionRatingsStruct(
     append("\tmaxVoltageProtection : $maxVoltageProtection\n")
     append("\tmaxTemporaryVoltage : $maxTemporaryVoltage\n")
     append("\tnominalDischargeCurrent : $nominalDischargeCurrent\n")
-    append("\tmaximumDishargeCurrent : $maximumDishargeCurrent\n")
+    append("\tmaximumDischargeCurrent : $maximumDischargeCurrent\n")
     append("\tratedShortCircuitCurrent : $ratedShortCircuitCurrent\n")
     append("\tratedShortTimeWithstandCurrent : $ratedShortTimeWithstandCurrent\n")
     append("\tenergyAbsorptionCapability : $energyAbsorptionCapability\n")
@@ -88,9 +88,9 @@ class ElectricalProtectionAlarmClusterSurgeProtectionRatingsStruct(
         val optnominalDischargeCurrent = nominalDischargeCurrent.get()
         put(ContextSpecificTag(TAG_NOMINAL_DISCHARGE_CURRENT), optnominalDischargeCurrent)
       }
-      if (maximumDishargeCurrent.isPresent) {
-        val optmaximumDishargeCurrent = maximumDishargeCurrent.get()
-        put(ContextSpecificTag(TAG_MAXIMUM_DISHARGE_CURRENT), optmaximumDishargeCurrent)
+      if (maximumDischargeCurrent.isPresent) {
+        val optmaximumDischargeCurrent = maximumDischargeCurrent.get()
+        put(ContextSpecificTag(TAG_MAXIMUM_DISCHARGE_CURRENT), optmaximumDischargeCurrent)
       }
       if (ratedShortCircuitCurrent.isPresent) {
         val optratedShortCircuitCurrent = ratedShortCircuitCurrent.get()
@@ -123,7 +123,7 @@ class ElectricalProtectionAlarmClusterSurgeProtectionRatingsStruct(
     private const val TAG_MAX_VOLTAGE_PROTECTION = 4
     private const val TAG_MAX_TEMPORARY_VOLTAGE = 5
     private const val TAG_NOMINAL_DISCHARGE_CURRENT = 6
-    private const val TAG_MAXIMUM_DISHARGE_CURRENT = 7
+    private const val TAG_MAXIMUM_DISCHARGE_CURRENT = 7
     private const val TAG_RATED_SHORT_CIRCUIT_CURRENT = 8
     private const val TAG_RATED_SHORT_TIME_WITHSTAND_CURRENT = 9
     private const val TAG_ENERGY_ABSORPTION_CAPABILITY = 10
@@ -176,9 +176,9 @@ class ElectricalProtectionAlarmClusterSurgeProtectionRatingsStruct(
         } else {
           Optional.empty()
         }
-      val maximumDishargeCurrent =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAXIMUM_DISHARGE_CURRENT))) {
-          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_MAXIMUM_DISHARGE_CURRENT)))
+      val maximumDischargeCurrent =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAXIMUM_DISCHARGE_CURRENT))) {
+          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_MAXIMUM_DISCHARGE_CURRENT)))
         } else {
           Optional.empty()
         }
@@ -217,7 +217,7 @@ class ElectricalProtectionAlarmClusterSurgeProtectionRatingsStruct(
         maxVoltageProtection,
         maxTemporaryVoltage,
         nominalDischargeCurrent,
-        maximumDishargeCurrent,
+        maximumDischargeCurrent,
         ratedShortCircuitCurrent,
         ratedShortTimeWithstandCurrent,
         energyAbsorptionCapability,

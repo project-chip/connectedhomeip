@@ -27,6 +27,7 @@ chip_test_suite("tests") {
     "TestCHIPError.cpp",
     "TestCHIPErrorStr.cpp",
     "TestCHIPKeyIds.cpp",
+    "TestCancelableOperation.cpp",
     "TestGroupedCallbackList.cpp",
     "TestOTAImageHeader.cpp",
     "TestOptional.cpp",

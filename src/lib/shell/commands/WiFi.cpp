@@ -141,12 +141,12 @@ static CHIP_ERROR WiFiConnectHandler(int argc, char ** argv)
     /* Command accepts running with SSID and password (optional) as parameters */
     VerifyOrReturnError((argc == 1 || argc == 2), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ByteSpan ssidSpan = ByteSpan(Uint8::from_const_char(argv[0]), strlen(argv[0]));
+    ByteSpan ssidSpan = ByteSpan::fromCharString(argv[0]);
     VerifyOrReturnError(!ssidSpan.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     ByteSpan passwordSpan;
     if (argc == 2)
     {
-        passwordSpan = ByteSpan(Uint8::from_const_char(argv[1]), strlen(argv[1]));
+        passwordSpan = ByteSpan::fromCharString(argv[1]);
         VerifyOrReturnError(!passwordSpan.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     }
     else

@@ -39,7 +39,8 @@ target_include_directories(app PRIVATE
                            ${CHIP_ROOT}/examples/all-devices-app/all-devices-common
                            ${CHIP_ROOT}/src/data-model-providers/codedriven
                            ${CHIP_ROOT}/src/data-model-providers
-                           ${CMAKE_CURRENT_BINARY_DIR}) # for generated app_config/enabled_devices.h
+                           ${CMAKE_CURRENT_BINARY_DIR} # for generated app_config/enabled_devices.h
+                           ${ALL_DEVICES_EXTRA_INCLUDE_DIRS})
 
 target_sources(app PRIVATE
                # Code-driven data model

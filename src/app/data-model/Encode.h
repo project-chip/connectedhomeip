@@ -24,6 +24,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
+#include <lib/support/TypeTraits.h>
 #include <protocols/interaction_model/Constants.h>
 
 #include <type_traits>
@@ -64,7 +65,7 @@ CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, X x)
 template <typename X, typename std::enable_if_t<std::is_enum<X>::value && !detail::HasUnknownValue<X>, int> = 0>
 CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, X x)
 {
-    return writer.Put(tag, x);
+    return writer.Put(tag, to_underlying(x));
 }
 
 // Reusable macro for dealing with unknown enum values that we can use in
@@ -91,13 +92,13 @@ CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, X x)
 {
     CHIP_DM_ENCODING_MAYBE_FAIL_UNKNOWN_ENUM_VALUE(x);
 
-    return writer.Put(tag, x);
+    return writer.Put(tag, to_underlying(x));
 }
 
 template <typename X>
 CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, BitFlags<X> x)
 {
-    return writer.Put(tag, x);
+    return writer.Put(tag, x.Raw());
 }
 
 inline CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, ByteSpan x)

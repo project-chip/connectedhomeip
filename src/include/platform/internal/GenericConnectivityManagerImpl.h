@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include <inet/InetInterface.h>
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -47,6 +49,8 @@ public:
     uint16_t _GetUserSelectedModeTimeout();
     void _SetUserSelectedModeTimeout(uint16_t val);
     CHIP_ERROR _DisconnectNetwork();
+    Inet::InterfaceId _GetThreadInterface();
+    Inet::InterfaceId _GetExternalInterface();
 
 private:
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
@@ -76,6 +80,18 @@ template <class ImplClass>
 inline CHIP_ERROR GenericConnectivityManagerImpl<ImplClass>::_DisconnectNetwork()
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
+inline Inet::InterfaceId GenericConnectivityManagerImpl<ImplClass>::_GetThreadInterface()
+{
+    return Inet::InterfaceId::Null();
+}
+
+template <class ImplClass>
+inline Inet::InterfaceId GenericConnectivityManagerImpl<ImplClass>::_GetExternalInterface()
+{
+    return Inet::InterfaceId::Null();
 }
 
 } // namespace Internal

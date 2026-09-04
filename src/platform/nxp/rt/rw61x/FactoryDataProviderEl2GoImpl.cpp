@@ -16,6 +16,17 @@
  *    limitations under the License.
  */
 #include "FactoryDataProviderEl2GoImpl.h"
+
+// EL2GO PSA persistent key-id range.
+// For Kconfig-based builds (Zephyr / cmake-freertos) these come from
+// CONFIG_CHIP_CRYPTO_PSA_KEY_ID_EL2GO_{BASE,END} in config/nxp/cmake/Kconfig.matter.nxp.
+// For the GN build (no Kconfig), fall back to the hardcoded defaults below.
+#ifndef CONFIG_CHIP_CRYPTO_PSA_KEY_ID_EL2GO_BASE
+#define CONFIG_CHIP_CRYPTO_PSA_KEY_ID_EL2GO_BASE 0x40000
+#endif
+#ifndef CONFIG_CHIP_CRYPTO_PSA_KEY_ID_EL2GO_END
+#define CONFIG_CHIP_CRYPTO_PSA_KEY_ID_EL2GO_END 0x4FFFF
+#endif
 #include <inttypes.h>
 #include <psa/crypto.h>
 
@@ -100,17 +111,17 @@ CHIP_ERROR FactoryDataProviderImpl::Init(void)
 
     // Step 3: Validate factory data IDs are in EL2GO range
     VerifyOrExit(
-        factoryDacKeyId >= CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_BASE && factoryDacKeyId <= CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_END, {
+        factoryDacKeyId >= CONFIG_CHIP_CRYPTO_PSA_KEY_ID_EL2GO_BASE && factoryDacKeyId <= CONFIG_CHIP_CRYPTO_PSA_KEY_ID_EL2GO_END, {
             ChipLogError(DeviceLayer, "Init: Factory DAC Key ID 0x%08" PRIx32 " outside EL2GO range [0x%08X, 0x%08X]",
-                         factoryDacKeyId, CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_BASE, CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_END);
+                         factoryDacKeyId, CONFIG_CHIP_CRYPTO_PSA_KEY_ID_EL2GO_BASE, CONFIG_CHIP_CRYPTO_PSA_KEY_ID_EL2GO_END);
             err = CHIP_ERROR_INVALID_ARGUMENT;
         });
 
     VerifyOrExit(
-        factoryDacCertId >= CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_BASE && factoryDacCertId <= CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_END,
+        factoryDacCertId >= CONFIG_CHIP_CRYPTO_PSA_KEY_ID_EL2GO_BASE && factoryDacCertId <= CONFIG_CHIP_CRYPTO_PSA_KEY_ID_EL2GO_END,
         {
             ChipLogError(DeviceLayer, "Init: Factory DAC Certificate ID 0x%08" PRIx32 " outside EL2GO range [0x%08X, 0x%08X]",
-                         factoryDacCertId, CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_BASE, CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_END);
+                         factoryDacCertId, CONFIG_CHIP_CRYPTO_PSA_KEY_ID_EL2GO_BASE, CONFIG_CHIP_CRYPTO_PSA_KEY_ID_EL2GO_END);
             err = CHIP_ERROR_INVALID_ARGUMENT;
         });
 
