@@ -75,18 +75,63 @@ public:
         scanning  = false;
         mCallback = nullptr;
         mContext  = nullptr;
+        // Retires the scan, so anything it queued is stale even if a later scan
+        // re-registers a callback. Mirrors ReleaseProxyScanForwarder() on Linux.
+        mScanGeneration++;
+    }
+
+    /// A discovery result the platform has queued but not yet delivered.
+    ///
+    /// Models the Linux path: ProxyScanForwarder::OnDeviceScanned copies the result on the
+    /// GLib scan thread and posts it with PlatformMgr().ScheduleWork(), so the work item
+    /// outlives the scan that produced it. It is stamped with the scan's generation and
+    /// dropped at dispatch if that scan has since been stopped, which is the guarantee
+    /// CommissioningProxyBleAdapter::StopScan() documents and DispatchProxyScanResult
+    /// enforces on Linux.
+    class PendingResult
+    {
+    public:
+        PendingResult(FakeBleProxyAdapter & adapter, uint16_t discriminator, uint16_t vendorId, uint16_t productId,
+                      uint8_t addressTag) :
+            mAdapter(adapter),
+            mDiscriminator(discriminator), mVendorId(vendorId), mProductId(productId), mAddressTag(addressTag),
+            mGeneration(adapter.mScanGeneration)
+        {}
+
+        void Dispatch()
+        {
+            // Order mirrors Linux: DispatchProxyScanResult compares the generation, and
+            // only a surviving result reaches OnPlatformScanResult's callback check.
+            if (mAdapter.mScanGeneration != mGeneration || mAdapter.mCallback == nullptr)
+            {
+                return;
+            }
+            const uint8_t mac[6] = { 0xaa, 0xbb, 0xcc, 0xdd, 0xee, mAddressTag };
+            mAdapter.mCallback(mAdapter.mContext, ByteSpan(mac, sizeof(mac)), mDiscriminator, mVendorId, mProductId);
+        }
+
+    private:
+        FakeBleProxyAdapter & mAdapter;
+        uint16_t mDiscriminator;
+        uint16_t mVendorId;
+        uint16_t mProductId;
+        uint8_t mAddressTag;
+        uint32_t mGeneration;
+    };
+
+    /// Capture a discovery result without delivering it, so a test can choose when the
+    /// queued work item runs relative to StopScan()/StartScan().
+    PendingResult CapturePendingResult(uint16_t discriminator, uint16_t vendorId, uint16_t productId, uint8_t addressTag)
+    {
+        return PendingResult(*this, discriminator, vendorId, productId, addressTag);
     }
 
     /// Play one discovery result back to whoever is scanning. The address varies with
-    /// @p addressTag so distinct devices get distinct addresses.
+    /// @p addressTag so distinct devices get distinct addresses. Goes through
+    /// PendingResult so the immediate and the deferred path cannot drift.
     void ReportDevice(uint16_t discriminator, uint16_t vendorId, uint16_t productId, uint8_t addressTag)
     {
-        if (mCallback == nullptr)
-        {
-            return;
-        }
-        const uint8_t mac[6] = { 0xaa, 0xbb, 0xcc, 0xdd, 0xee, addressTag };
-        mCallback(mContext, ByteSpan(mac, sizeof(mac)), discriminator, vendorId, productId);
+        CapturePendingResult(discriminator, vendorId, productId, addressTag).Dispatch();
     }
 
     bool IsScanning() const { return scanning; }
@@ -101,6 +146,7 @@ private:
     DiscoveryCallback mCallback = nullptr;
     void * mContext             = nullptr;
     CHIP_ERROR mStartScanResult = CHIP_NO_ERROR;
+    uint32_t mScanGeneration    = 0;
 };
 
 struct TestCommissioningProxyBleTransport : public ::testing::Test
@@ -306,6 +352,104 @@ TEST_F(TestCommissioningProxyBleTransport, ForegroundScanTakesTheScannerFromTheB
     mockTimer.AdvanceClock(System::Clock::Seconds16(10));
     EXPECT_EQ(adapter.startScanCalls, 3u);
     EXPECT_TRUE(adapter.IsScanning());
+}
+
+// ---------------------------------------------------------------------------
+// Late discovery results: a result the platform queued before a scan stopped
+// must not be attributed to whatever runs after it.
+//
+// The transport cannot tell a stale result from a live one - it sees only the
+// callback it registered - so what these pin is the StopScan() guarantee in
+// CommissioningProxyBleAdapter.h, modelled by FakeBleProxyAdapter. They also pin
+// that the transport hands the scanner back through the adapter at every
+// transition, which is what the generation keys off: dropping PauseBgScan() from
+// Scan(), or StopHardwareScan() from the registry's OnBecameEmpty(), turns them
+// red.
+//
+// Only the two restart cases discriminate the generation. After a plain stop the
+// adapter holds no callback either, so the first test is guarded twice over and
+// stays green even with the generation removed - it pins the stop reaching the
+// adapter, not the staleness check.
+// ---------------------------------------------------------------------------
+
+TEST_F(TestCommissioningProxyBleTransport, LateBackgroundResultAfterStopIsIgnored)
+{
+    HostedTransport host{ mockTimer, transport };
+
+    ASSERT_EQ(transport.BgScanStart(System::Clock::Seconds16(30), BitMask<WiFiBandBitmap>{}, /*fabricIndex=*/1, /*nodeId=*/0x11),
+              Status::Success);
+
+    // BlueZ has discovered a device and queued it onto the Matter event loop, but the work
+    // item has not run yet.
+    auto pending = adapter.CapturePendingResult(0x123, 0xFFF1, 0x8000, 1);
+
+    ASSERT_EQ(transport.BgScanStop(BitMask<CapabilitiesBitmap>(CapabilitiesBitmap::kBle), BitMask<WiFiBandBitmap>{},
+                                   /*fabricIndex=*/1, /*nodeId=*/0x11),
+              Status::Success);
+    // Stopping the last request clears every cached result on the transport.
+    ASSERT_EQ(host.cluster.ScanCache().Count(), 0);
+
+    // Equivalent to an already-scheduled Linux work item finally executing after StopScan().
+    pending.Dispatch();
+
+    EXPECT_EQ(host.cluster.ScanCache().Count(), 0);
+}
+
+TEST_F(TestCommissioningProxyBleTransport, LateBackgroundResultDoesNotLandInARestartedScan)
+{
+    HostedTransport host{ mockTimer, transport };
+
+    ASSERT_EQ(transport.BgScanStart(System::Clock::Seconds16(30), BitMask<WiFiBandBitmap>{}, /*fabricIndex=*/1, /*nodeId=*/0x11),
+              Status::Success);
+    auto pending = adapter.CapturePendingResult(0x123, 0xFFF1, 0x8000, 1);
+
+    ASSERT_EQ(transport.BgScanStop(BitMask<CapabilitiesBitmap>(CapabilitiesBitmap::kBle), BitMask<WiFiBandBitmap>{},
+                                   /*fabricIndex=*/1, /*nodeId=*/0x11),
+              Status::Success);
+    ASSERT_EQ(host.cluster.ScanCache().Count(), 0);
+
+    // A second client starts a fresh background scan before the queued work item runs, so
+    // the adapter holds a live callback again.
+    ASSERT_EQ(transport.BgScanStart(System::Clock::Seconds16(30), BitMask<WiFiBandBitmap>{}, /*fabricIndex=*/1, /*nodeId=*/0x22),
+              Status::Success);
+
+    pending.Dispatch();
+
+    // The result belongs to a scan that has stopped and had its results cleared, so it must
+    // not reappear as a result of the new one.
+    EXPECT_EQ(host.cluster.ScanCache().Count(), 0);
+}
+
+TEST_F(TestCommissioningProxyBleTransport, LateBackgroundResultDoesNotEnterTheForegroundScan)
+{
+    HostedTransport host{ mockTimer, transport };
+    ClusterTester tester(host.cluster);
+
+    ASSERT_EQ(transport.BgScanStart(System::Clock::Seconds16(30), BitMask<WiFiBandBitmap>{}, /*fabricIndex=*/1, /*nodeId=*/0x11),
+              Status::Success);
+    auto pending = adapter.CapturePendingResult(0x123, 0xFFF1, 0x8000, 1);
+
+    // Scan() pauses the background scan and claims the single scanner for the foreground
+    // scan in one synchronous turn, so the queued item lands with the foreground handler
+    // registered.
+    ProxyScanRequest::Type request;
+    request.transport = BitMask<CapabilitiesBitmap>(CapabilitiesBitmap::kBle);
+    // Async command: the aggregator answers only when the window closes, so the InvokeResult
+    // carries a synthesised status and is deliberately ignored.
+    [[maybe_unused]] auto invoke = tester.Invoke(request);
+
+    pending.Dispatch();
+
+    // Advance exactly to the scan window, not past it - see the note in
+    // ScanResponseDedupesOnDiscriminatorVendorProduct about the aggregator's watchdog.
+    mockTimer.AdvanceClock(System::Clock::Seconds16(host.cluster.GetScanMaxTime()));
+
+    ASSERT_TRUE(tester.GetCommandHandler().HasResponse());
+    ProxyScanResponse::DecodableType response;
+    ASSERT_EQ(tester.GetCommandHandler().DecodeResponse(response), CHIP_NO_ERROR);
+    // A device the background scan discovered, before the foreground scan started, is not a
+    // foreground scan result.
+    EXPECT_EQ(response.numberOfResults, 0);
 }
 
 // ---------------------------------------------------------------------------
