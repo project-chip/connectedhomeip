@@ -21,6 +21,7 @@ import android.content.Intent
 import android.net.Uri
 import android.nfc.NdefMessage
 import android.nfc.NfcAdapter
+import android.nfc.Tag
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
@@ -140,6 +141,8 @@ class CHIPToolActivity :
   }
 
   private fun onNfcIntent(intent: Intent?) {
+
+    androidNfcTag = intent?.getParcelableExtra(NfcAdapter.EXTRA_TAG)
     // Require 1 NDEF message containing 1 NDEF record
     val messages = intent?.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
     if (messages?.size != 1) return
@@ -252,5 +255,12 @@ class CHIPToolActivity :
     private const val TAG = "CHIPToolActivity"
     private const val ADDRESS_COMMISSIONING_FRAGMENT_TAG = "address_commissioning_fragment"
     private const val ARG_PROVISION_NETWORK_TYPE = "provision_network_type"
+
+    private var androidNfcTag: Tag? = null
+
+    fun getAndroidNfcTag(): Tag? {
+      return androidNfcTag
+    }
+
   }
 }
