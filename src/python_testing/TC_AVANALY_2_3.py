@@ -63,7 +63,7 @@ class TC_AVANALY_2_3(MatterBaseTest, AVANALYTestBase):
             TestStep(3, "If the DUT has feature PerZoneDetect, TH reads the Zones attribute from the ZoneManagement cluster.",
                         "If there are no zones defined, TH creates one. Save the ZoneIDs as 'zoneIDs'."),
             TestStep(4, "TH sends an EnableContextTriggers command with `ContextTriggers` containing a context NOT in `supported_ambient_contexts`. Verify ConstraintError."),
-            TestStep(5, "If `zoneIDs` is not empty, TH sends an EnableContextTriggers command with `ContextTriggers` containing a `ZoneID` NOT in `existing_zones` Verify NotFound error."),
+            TestStep(5, "If `zoneIDs` is not empty, TH sends an EnableContextTriggers command with `ContextTriggers` containing a `ZoneID` NOT in `zoneIDs` Verify NotFound error."),
             TestStep(6, "TH sends an EnableContextTriggers command with `ContextTriggers` containing a valid subset of `supported_contexts` and valid `ZoneIDs` (or null if no 'zoneIDs'). Verify Success."),
             TestStep(7, "TH reads the ActiveAmbientContextTriggers attribute. Verify it contains the contexts provided in step 6."),
             TestStep(8, "TH sends an EnableContextTriggers command with `ContextTriggers` set to null. Verify success"),
