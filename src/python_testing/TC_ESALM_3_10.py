@@ -39,192 +39,36 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from mobly import asserts
+from TC_ESALM_TestBase import AlarmBitmap, ElectricalAlarmTestBaseHelper, cluster
 
-import matter.clusters as Clusters
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest
-from matter.testing.runner import default_matter_test_main
+from matter.testing.runner import TestStep, default_matter_test_main
 
-cluster = Clusters.ElectricalAlarm
-_F = cluster.Bitmaps.Feature
+ALARM_NAME = "PowerExport"
+ALARM_BIT = int(AlarmBitmap.kPowerExported)
 
-# TestEventTrigger codes from the PIXIT Variable Values table of the Electrical Alarm test plan.
-# The per-alarm clear removes the measured condition and leaves a latched alarm active; the
-# all-clear is the cleanup path and drops latched alarms too.
-_TRIGGER_SET = 0x00A1000000000013
-_TRIGGER_CLEAR = 0x00A1000000000014
-_TRIGGER_ALL_CLEAR = 0x00A1000000000000
-
-_ALARM_BIT = int(cluster.Bitmaps.AlarmBitmap.kPowerExported)
+# Set and clear codes for this alarm, from the PIXIT Variable Values table of the test plan.
+TRIGGER_SET = 0x00A1000000000013
+TRIGGER_CLEAR = 0x00A1000000000014
 
 
-class TC_ESALM_3_10(MatterBaseTest):
+class TC_ESALM_3_10(ElectricalAlarmTestBaseHelper):
 
-    @run_if_endpoint_matches(has_feature(cluster, _F.kPowerExport))
+    def pics_TC_ESALM_3_10(self) -> list[str]:
+        return ["ESALM.S", "ESALM.S.F30", "ESALM.S.E0000"]
+
+    def steps_TC_ESALM_3_10(self) -> list[TestStep]:
+        return self.alarm_lifecycle_steps(ALARM_NAME)
+
+    @run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kPowerExport))
     async def test_TC_ESALM_3_10(self):
-        """[TC-ESALM-3.10] PowerExport alarm lifecycle with Server as DUT"""
-        endpoint = self.get_endpoint()
-        attrs = cluster.Attributes
-        cmds = cluster.Commands
+        """[TC-ESALM-3.10] PowerExport alarm lifecycle with Server as DUT
 
-        self.step(1, "Commission DUT to TH (already done)")
-
-        self.step(2, "TH reads TestEventTriggersEnabled from General Diagnostics",
-                  expectation="Value is 1 (True). If 0, skip remaining steps.")
-        gen_diag = Clusters.GeneralDiagnostics
-        triggers_enabled = await self.read_single_attribute_check_success(
-            endpoint=0, cluster=gen_diag, attribute=gen_diag.Attributes.TestEventTriggersEnabled)
-        if not triggers_enabled:
-            self.mark_all_remaining_steps_skipped(3)
-            return
-
-        self.step(3, "TH reads Supported, Mask, Latch, and State",
-                  expectation="SUCCESS. The PowerExport bit is set in Supported and enabled in Mask.")
-        supported = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attrs.Supported)
-        mask = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attrs.Mask)
-        attribute_list = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attrs.AttributeList)
-        latch = 0
-        if attrs.Latch.attribute_id in attribute_list:
-            latch = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.Latch)
-
-        asserts.assert_true(int(supported) & _ALARM_BIT,
-                            "PowerExport is not set in Supported, so this alarm cannot be tested")
-        asserts.assert_true(int(mask) & _ALARM_BIT,
-                            "PowerExport is not enabled in Mask, so the alarm would be suppressed")
-
-        is_latched = bool(int(latch) & _ALARM_BIT)
-
-        # A trigger only reports if it changes State, so the alarm must start inactive.
-        current_state = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attrs.State)
-        asserts.assert_false(int(current_state) & _ALARM_BIT,
-                             "PowerExport is already active before the test starts")
-
-        self.step(4, "TH establishes subscription to State with MinIntervalFloor=0, MaxIntervalCeiling=30",
-                  expectation="Subscription established; initial priming report received.")
-        state_sub = AttributeSubscriptionHandler(cluster, attrs.State)
-        await state_sub.start(self.default_controller, self.dut_node_id,
-                              endpoint=endpoint, min_interval_sec=0,
-                              max_interval_sec=30, keepSubscriptions=False)
-        event_sub = EventSubscriptionHandler(expected_cluster=cluster)
-        await event_sub.start(self.default_controller, self.dut_node_id,
-                              endpoint=endpoint, min_interval_sec=0,
-                              max_interval_sec=30)
-
-        self.step(5, "TH sends TestEventTrigger to simulate the PowerExport alarm condition",
-                  expectation="SUCCESS. Subscription report received with the PowerExport bit set in State.")
-        state_sub.reset()
-        event_sub.reset()
-        await self.send_test_event_triggers(eventTrigger=_TRIGGER_SET)
-
-        def state_has_alarm(report):
-            return bool(report.value & _ALARM_BIT)
-
-        state_sub.await_all_expected_report_matches(
-            [AttributeMatcher.from_callable("State has the PowerExport bit set", state_has_alarm)],
-            timeout_sec=30)
-
-        self.step(6, "TH waits up to 30 seconds for Notify event",
-                  expectation="Notify received. Active has the PowerExport bit, Inactive does not, State does, Mask matches.")
-        notify_event = event_sub.wait_for_event_report(cluster.Events.Notify, timeout_sec=30)
-        asserts.assert_true(notify_event.active & _ALARM_BIT,
-                            "Notify event: PowerExport not set in Active")
-        asserts.assert_false(notify_event.inactive & _ALARM_BIT,
-                             "Notify event: PowerExport unexpectedly set in Inactive")
-        asserts.assert_true(notify_event.state & _ALARM_BIT,
-                            "Notify event: PowerExport not set in State")
-        current_mask = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attrs.Mask)
-        asserts.assert_equal(notify_event.mask, current_mask,
-                             "Notify event Mask does not match the Mask attribute")
-
-        self.step(7, "TH reads State",
-                  expectation="DUT returns an AlarmBitmap with the PowerExport bit set.")
-        state_val = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attrs.State)
-        asserts.assert_true(int(state_val) & _ALARM_BIT, "State does not have the PowerExport bit set")
-
-        self.step(8, "TH sends TestEventTrigger to clear the PowerExport alarm condition",
-                  expectation="SUCCESS.")
-        state_sub.reset()
-        event_sub.reset()
-        await self.send_test_event_triggers(eventTrigger=_TRIGGER_CLEAR)
-
-        if not is_latched:
-            self.step(9, "If non-latched: TH awaits subscription report with the PowerExport bit cleared",
-                      expectation="Report received with the PowerExport bit at 0.")
-
-            def state_cleared(report):
-                return not bool(report.value & _ALARM_BIT)
-
-            state_sub.await_all_expected_report_matches(
-                [AttributeMatcher.from_callable("State has the PowerExport bit cleared", state_cleared)],
-                timeout_sec=30)
-
-            self.step(10, "If non-latched: TH waits up to 30 seconds for Notify event",
-                      expectation="Notify received. Inactive has the PowerExport bit, Active does not, State does not.")
-            clear_event = event_sub.wait_for_event_report(cluster.Events.Notify, timeout_sec=30)
-            asserts.assert_true(clear_event.inactive & _ALARM_BIT,
-                                "Notify event: PowerExport not set in Inactive on clear")
-            asserts.assert_false(clear_event.active & _ALARM_BIT,
-                                 "Notify event: PowerExport unexpectedly set in Active on clear")
-            asserts.assert_false(clear_event.state & _ALARM_BIT,
-                                 "Notify event: PowerExport still set in State on clear")
-
-            self.step(11, "If latched: TH reads State",
-                      expectation="The PowerExport bit remains set until Reset.")
-            self.mark_current_step_skipped()
-
-            self.step(12, "If latched and Reset supported: TH sends Reset for the PowerExport alarm",
-                      expectation="SUCCESS. Subscription report received with the PowerExport bit cleared.")
-            self.mark_current_step_skipped()
-        else:
-            self.step(9, "If non-latched: TH awaits subscription report with the PowerExport bit cleared",
-                      expectation="Report received with the PowerExport bit at 0.")
-            self.mark_current_step_skipped()
-
-            self.step(10, "If non-latched: TH waits up to 30 seconds for Notify event",
-                      expectation="Notify received. Inactive has the PowerExport bit, Active does not, State does not.")
-            self.mark_current_step_skipped()
-
-            self.step(11, "If latched: TH reads State",
-                      expectation="The PowerExport bit remains set until Reset.")
-            state_val = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.State)
-            asserts.assert_true(int(state_val) & _ALARM_BIT,
-                                "Latched alarm: PowerExport should still be set in State after the condition clears")
-
-            self.step(12, "If latched and Reset supported: TH sends Reset for the PowerExport alarm",
-                      expectation="SUCCESS. Subscription report received with the PowerExport bit cleared.")
-            accepted_cmds = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.AcceptedCommandList)
-            if cmds.Reset.command_id in accepted_cmds:
-                state_sub.reset()
-                await self.send_single_cmd(cmd=cmds.Reset(alarms=_ALARM_BIT), endpoint=endpoint)
-
-                def state_cleared_after_reset(report):
-                    return not bool(report.value & _ALARM_BIT)
-
-                state_sub.await_all_expected_report_matches(
-                    [AttributeMatcher.from_callable("State cleared after Reset", state_cleared_after_reset)],
-                    timeout_sec=30)
-            else:
-                self.mark_current_step_skipped()
-
-        self.step(13, "TH sends the all-alarms-cleared TestEventTrigger",
-                  expectation="SUCCESS. State reads back as 0.")
-        await self.send_test_event_triggers(eventTrigger=_TRIGGER_ALL_CLEAR)
-        # Read rather than await a report: by this point State may already be 0, and a DUT does
-        # not report an unchanged value.
-        final_state = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attrs.State)
-        asserts.assert_equal(int(final_state), 0, "State should be 0 after the cleanup trigger")
+        Verifies the lifecycle of the PowerExport alarm: the condition sets its bit in State and
+        delivers a subscription report, a Notify event carries the correct fields, a latched
+        alarm persists until Reset, and a non-latched alarm clears when the condition goes away.
+        """
+        await self.run_alarm_lifecycle_test(ALARM_NAME, ALARM_BIT, TRIGGER_SET, TRIGGER_CLEAR)
 
 
 if __name__ == "__main__":
