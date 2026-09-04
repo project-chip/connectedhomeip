@@ -280,7 +280,8 @@ public:
      * @param json Parsed JSON payload from named pipe.
      * @param registry Target registry to dispatch the translated action.
      */
-    virtual CHIP_ERROR TranslateAndExecute(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry) = 0;
+    virtual CHIP_ERROR TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
+                                            OOBAccessorRegistry & registry) const = 0;
 };
 
 } // namespace chip::app::NamedPipe
@@ -304,7 +305,7 @@ public:
     CHIP_ERROR Stop();
 
     bool HasTranslator(CharSpan actionName) const;
-    CHIP_ERROR RegisterTranslator(CharSpan actionName, std::shared_ptr<CommandTranslator> translator);
+    CHIP_ERROR RegisterTranslator(CharSpan actionName, std::shared_ptr<const CommandTranslator> translator);
 
     /**
      * @brief Registers a translator if not already present, registering all action names exposed by TranslatorType.
@@ -345,7 +346,7 @@ public:
 
 private:
     OOBAccessorRegistry & mOobRegistry;
-    std::unordered_map<std::string, std::shared_ptr<CommandTranslator>> mTranslators;
+    std::unordered_map<std::string, std::shared_ptr<const CommandTranslator>> mTranslators;
 };
 
 } // namespace chip::app::NamedPipe

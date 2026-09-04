@@ -48,7 +48,7 @@ CHIP_ERROR EncodeSemanticTagList(TLV::TLVWriter & writer, TLV::Tag tag, const Js
 } // namespace
 
 CHIP_ERROR AmbientContextTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
-                                                         OOBAccessorRegistry & registry)
+                                                         OOBAccessorRegistry & registry) const
 {
     std::string actionName = json["Name"].asString();
     if (actionName == "SetAmbientContextSupport")

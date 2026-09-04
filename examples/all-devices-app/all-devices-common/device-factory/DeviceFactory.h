@@ -255,21 +255,6 @@ public:
         RegisterCreator(deviceTypeArg, [c = std::move(creator)](const std::string &) { return c(); });
     }
 
-    void RegisterCreator(const std::string & deviceTypeArg,
-                         std::function<std::unique_ptr<DeviceInterface>(const std::string &)> && creator)
-    {
-        RegisterCreator(deviceTypeArg, [c = std::move(creator)](const std::string & label) {
-            return CreatedDevice{ .device = c(label), .onDeviceRegistered = nullptr };
-        });
-    }
-
-    void RegisterCreator(const std::string & deviceTypeArg, std::function<std::unique_ptr<DeviceInterface>()> && creator)
-    {
-        RegisterCreator(deviceTypeArg, [c = std::move(creator)](const std::string &) {
-            return CreatedDevice{ .device = c(), .onDeviceRegistered = nullptr };
-        });
-    }
-
     const std::string & GetDefaultDevice() const { return mDefaultDevice; }
 
     bool IsValidDevice(const std::string & deviceTypeArg) const { return mRegistry.find(deviceTypeArg) != mRegistry.end(); }

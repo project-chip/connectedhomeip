@@ -56,7 +56,7 @@ public:
     /**
      * @brief Registers a command translator instance under the specified action name.
      */
-    CHIP_ERROR RegisterTranslator(CharSpan actionName, std::shared_ptr<CommandTranslator> translator);
+    CHIP_ERROR RegisterTranslator(CharSpan actionName, std::shared_ptr<const CommandTranslator> translator);
 
     /**
      * @brief Registers a translator if not already present, registering all action names exposed by TranslatorType.
@@ -106,7 +106,7 @@ private:
 
     OOBAccessorRegistry & mOobRegistry;
     NamedPipeCommands mNamedPipeCommands;
-    std::unordered_map<std::string, std::shared_ptr<CommandTranslator>> mTranslators;
+    std::unordered_map<std::string, std::shared_ptr<const CommandTranslator>> mTranslators;
 };
 
 } // namespace chip::app::NamedPipe

@@ -323,7 +323,7 @@ void InitServer(intptr_t context)
 #if ALL_DEVICES_ENABLE_DIMMABLE_LIGHT
     // Override dimmable-light with ESP32 hardware implementation that drives a real LED
     SimpleDeviceFactory::GetInstance().RegisterCreator("dimmable-light", [&]() {
-        return std::make_unique<ESP32DimmableLight>(ESP32DimmableLight::Context{
+        return SimpleDeviceFactory::MakeCreatedDevice<ESP32DimmableLight>(ESP32DimmableLight::Context{
             .groupDataProvider = gGroupDataProvider,
             .fabricTable       = Server::GetInstance().GetFabricTable(),
             .timerDelegate     = gTimerDelegate,

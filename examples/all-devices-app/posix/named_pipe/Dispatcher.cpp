@@ -60,7 +60,7 @@ bool Dispatcher::HasTranslator(CharSpan actionName) const
     return mTranslators.find(std::string(actionName.data(), actionName.size())) != mTranslators.end();
 }
 
-CHIP_ERROR Dispatcher::RegisterTranslator(CharSpan actionName, std::shared_ptr<CommandTranslator> translator)
+CHIP_ERROR Dispatcher::RegisterTranslator(CharSpan actionName, std::shared_ptr<const CommandTranslator> translator)
 {
     VerifyOrReturnError(translator != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mTranslators[std::string(actionName.data(), actionName.size())] = std::move(translator);

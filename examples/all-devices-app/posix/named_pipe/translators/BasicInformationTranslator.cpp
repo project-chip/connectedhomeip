@@ -19,7 +19,7 @@
 namespace chip::app::NamedPipe {
 
 CHIP_ERROR BasicInformationTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
-                                                           OOBAccessorRegistry & registry)
+                                                           OOBAccessorRegistry & registry) const
 {
     if (json.isMember("Name") && json["Name"].isString())
     {

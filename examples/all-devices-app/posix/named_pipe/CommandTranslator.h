@@ -41,7 +41,8 @@ public:
      * @param json Parsed JSON payload from named pipe.
      * @param registry Target registry to dispatch the translated action.
      */
-    virtual CHIP_ERROR TranslateAndExecute(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry) = 0;
+    virtual CHIP_ERROR TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
+                                            OOBAccessorRegistry & registry) const = 0;
 
     static std::optional<bool> ExtractBool(const Json::Value & json, const char * key)
     {

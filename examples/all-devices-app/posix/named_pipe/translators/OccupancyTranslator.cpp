@@ -18,7 +18,8 @@
 
 namespace chip::app::NamedPipe {
 
-CHIP_ERROR OccupancyTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry)
+CHIP_ERROR OccupancyTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
+                                                    OOBAccessorRegistry & registry) const
 {
     std::string actionName = json["Name"].asString();
     if (actionName == "SetOccupancy")

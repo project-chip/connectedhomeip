@@ -19,7 +19,7 @@
 namespace chip::app::NamedPipe {
 
 CHIP_ERROR ElectricalEnergyMeasurementTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
-                                                                      OOBAccessorRegistry & registry)
+                                                                      OOBAccessorRegistry & registry) const
 {
     return DispatchAction(registry, "GenerateElectricalEnergyMeasurementSnapshots"_span, endpointId);
 }

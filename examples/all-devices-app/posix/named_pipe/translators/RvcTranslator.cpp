@@ -20,7 +20,7 @@
 
 namespace chip::app::NamedPipe {
 
-CHIP_ERROR RvcTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry)
+CHIP_ERROR RvcTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry) const
 {
     if (!json.isObject() || !json.isMember("Name") || !json["Name"].isString())
     {

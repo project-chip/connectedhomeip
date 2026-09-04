@@ -19,7 +19,7 @@
 namespace chip::app::NamedPipe {
 
 CHIP_ERROR BooleanStateTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
-                                                       OOBAccessorRegistry & registry)
+                                                       OOBAccessorRegistry & registry) const
 {
     auto newState = ExtractBool(json, "StateValue");
     if (!newState.has_value())
