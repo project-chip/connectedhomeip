@@ -562,6 +562,10 @@ class MockSchedulesDelegate : public ThermostatSchedules::Delegate
 public:
     CHIP_ERROR GetScheduleTypeAtIndex(size_t index, Structs::ScheduleTypeStruct::Type & scheduleType) override
     {
+        if (mGetScheduleTypeAtIndexError.has_value())
+        {
+            return *mGetScheduleTypeAtIndexError;
+        }
         if (index >= mScheduleTypes.size())
         {
             return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
@@ -576,6 +580,10 @@ public:
 
     CHIP_ERROR GetScheduleAtIndex(size_t index, ScheduleStructWithOwnedMembers & schedule) override
     {
+        if (mGetScheduleAtIndexError.has_value())
+        {
+            return *mGetScheduleAtIndexError;
+        }
         if (index >= mSchedules.size())
         {
             return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
@@ -586,6 +594,10 @@ public:
 
     CHIP_ERROR GetPendingScheduleAtIndex(size_t index, ScheduleStructWithOwnedMembers & schedule) override
     {
+        if (mGetPendingScheduleAtIndexError.has_value())
+        {
+            return *mGetPendingScheduleAtIndexError;
+        }
         if (index >= mPendingSchedules.size())
         {
             return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
@@ -688,6 +700,12 @@ public:
     CHIP_ERROR mSetActiveScheduleHandleError                            = CHIP_NO_ERROR;
     CHIP_ERROR mCommitPendingSchedulesError                             = CHIP_NO_ERROR;
     std::optional<System::Clock::Milliseconds16> mMaxAtomicWriteTimeout = System::Clock::Milliseconds16(9000);
+
+    // When set, the corresponding Get*AtIndex() unconditionally returns this error instead of consulting the
+    // backing vector, simulating a delegate-side failure partway through a list traversal.
+    std::optional<CHIP_ERROR> mGetScheduleTypeAtIndexError;
+    std::optional<CHIP_ERROR> mGetScheduleAtIndexError;
+    std::optional<CHIP_ERROR> mGetPendingScheduleAtIndexError;
 };
 
 inline bool HasAttribute(ServerClusterInterface & cluster, AttributeId attrId)

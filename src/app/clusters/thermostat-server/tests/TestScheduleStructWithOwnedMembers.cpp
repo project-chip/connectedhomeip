@@ -120,6 +120,34 @@ TEST(TestScheduleStructWithOwnedMembers, SelfAssignmentIsNoOp)
     ASSERT_EQ(schedule.GetTransitions().size(), 1u);
 }
 
+TEST(TestScheduleStructWithOwnedMembers, MoveConstructorTransfersData)
+{
+    std::vector<ScheduleTransitionStruct::Type> storage{ MakeTransition(600) };
+    ScheduleStructWithOwnedMembers original(MakeFullSchedule(storage));
+
+    ScheduleStructWithOwnedMembers moved(std::move(original));
+
+    EXPECT_EQ(moved.GetSystemMode(), SystemModeEnum::kHeat);
+    ASSERT_FALSE(moved.GetScheduleHandle().IsNull());
+    EXPECT_TRUE(moved.GetScheduleHandle().Value().data_equal(ByteSpan(kHandleData)));
+    ASSERT_EQ(moved.GetTransitions().size(), 1u);
+    EXPECT_EQ(moved.GetTransitions()[0].transitionTime, 600);
+}
+
+TEST(TestScheduleStructWithOwnedMembers, MoveAssignmentTransfersData)
+{
+    std::vector<ScheduleTransitionStruct::Type> storage{ MakeTransition(600) };
+    ScheduleStructWithOwnedMembers original(MakeFullSchedule(storage));
+
+    ScheduleStructWithOwnedMembers target;
+    target = std::move(original);
+
+    EXPECT_EQ(target.GetSystemMode(), SystemModeEnum::kHeat);
+    ASSERT_FALSE(target.GetScheduleHandle().IsNull());
+    EXPECT_TRUE(target.GetScheduleHandle().Value().data_equal(ByteSpan(kHandleData)));
+    ASSERT_EQ(target.GetTransitions().size(), 1u);
+}
+
 TEST(TestScheduleStructWithOwnedMembers, SetScheduleHandleNullClearsHandle)
 {
     ScheduleStructWithOwnedMembers schedule;

@@ -158,8 +158,6 @@ public:
         mCluster(cluster), mAtomicWriteSession(atomicWriteSession), mDelegate(delegate)
     {}
 
-    Delegate & GetDelegate() { return mDelegate; }
-
     std::optional<DataModel::ActionReturnStatus> ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                AttributeValueEncoder & encoder);
     std::optional<DataModel::ActionReturnStatus> WriteAttribute(const DataModel::WriteAttributeRequest & request,
