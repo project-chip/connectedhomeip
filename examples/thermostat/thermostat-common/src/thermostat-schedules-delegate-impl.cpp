@@ -204,9 +204,13 @@ CHIP_ERROR ThermostatSchedulesDelegate::AppendToPendingScheduleList(const Schedu
         mPendingSchedules[mNextFreeIndexInPendingSchedulesList] = schedule;
         if (schedule.GetScheduleHandle().IsNull())
         {
-            // Since we support only one schedule of each system mode, using the octet string containing the system mode
-            // suffices as the unique schedule handle.
-            const uint8_t handle[] = { static_cast<uint8_t>(schedule.GetSystemMode()) };
+            // Assign a fresh handle from a monotonically increasing counter, rather than deriving it from
+            // SystemMode: built-in schedules are seeded with a SystemMode-derived handle (see InitializeSchedules),
+            // so reusing that scheme here could hand a brand new, non-built-in schedule the same handle as a
+            // built-in one. ThermostatClusterSchedules::PrecommitSchedules only matches schedules by handle, so
+            // that collision would let a client silently replace/remove a built-in schedule while still passing
+            // its "built-in schedules cannot be removed" check.
+            const uint8_t handle[] = { mNextHandleValue++ };
             TEMPORARY_RETURN_IGNORED mPendingSchedules[mNextFreeIndexInPendingSchedulesList].SetScheduleHandle(
                 DataModel::MakeNullable(ByteSpan(handle)));
         }

@@ -85,6 +85,10 @@ private:
     uint8_t mNextFreeIndexInPendingSchedulesList;
     uint8_t mNextFreeIndexInSchedulesList;
 
+    // Auto-assigned handle for newly-created (null-handle) schedules. Starts above the highest SystemModeEnum
+    // value so it can never collide with a built-in schedule's SystemMode-derived handle (see InitializeSchedules).
+    uint8_t mNextHandleValue = 0x10;
+
     uint8_t mActiveScheduleHandleData[kScheduleHandleSize];
     size_t mActiveScheduleHandleDataSize;
     bool mActiveScheduleHandleIsNull = true;
