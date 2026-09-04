@@ -53,11 +53,7 @@ public:
         {
             return json[key].asBool();
         }
-        if (json[key].isUInt64())
-        {
-            return json[key].asUInt64() != 0;
-        }
-        if (json[key].isInt64())
+        if (json[key].isIntegral())
         {
             return json[key].asInt64() != 0;
         }
@@ -68,16 +64,29 @@ public:
     static std::optional<T> ExtractUInt(const Json::Value & json, const char * key)
     {
         static_assert(std::is_unsigned_v<T>, "ExtractUInt requires an unsigned integer type");
-        if (!json.isObject() || !json.isMember(key) || !json[key].isUInt64())
+        if (!json.isObject() || !json.isMember(key) || !json[key].isIntegral())
         {
             return std::nullopt;
         }
-        auto val = json[key].asUInt64();
-        if (val > std::numeric_limits<T>::max())
+        if (json[key].isUInt64())
         {
-            return std::nullopt;
+            auto val = json[key].asUInt64();
+            if (val > std::numeric_limits<T>::max())
+            {
+                return std::nullopt;
+            }
+            return static_cast<T>(val);
         }
-        return static_cast<T>(val);
+        if (json[key].isInt64())
+        {
+            auto val = json[key].asInt64();
+            if (val < 0 || static_cast<uint64_t>(val) > std::numeric_limits<T>::max())
+            {
+                return std::nullopt;
+            }
+            return static_cast<T>(val);
+        }
+        return std::nullopt;
     }
 
     static CHIP_ERROR DispatchAction(OOBAccessorRegistry & registry, CharSpan actionName, EndpointId endpointId)

@@ -167,7 +167,7 @@ sequenceDiagram
     - The application registers the endpoint with the
       `CodeDrivenDataModelProvider`, allocating its valid runtime `EndpointId`.
     - The application invokes `created.onDeviceRegistered()`, which expands the
-      variadic fold expression `(Hooks::OnDeviceRegistered(*rawDevice), ...)`
+      `variadic` fold expression `(Hooks::OnDeviceRegistered(*rawDevice), ...)`
       statically for each configured hook.
 
 ---
