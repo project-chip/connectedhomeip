@@ -10349,7 +10349,8 @@ PICS:
       id: TSTATM.S.C00.Rsp
 
     - label:
-          "Does the device implement receiving the ChangeToModeByCoreTag command?"
+          "Does the device implement receiving the ChangeToModeByCoreTag
+          command?"
       id: TSTATM.S.C02.Rsp
 
     # server / Commands generated
