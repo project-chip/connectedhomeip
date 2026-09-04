@@ -258,3 +258,12 @@
 #ifndef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH
 #define CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH ((sizeof(CONFIG_CHIP_DEVICE_ROTATING_DEVICE_UID) - 1) / 2)
 #endif // CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH
+
+// WiFi PAF: after the station associates to an AP, the single radio leaves the NAN
+// channel. Hold PAF frames during the association and, once NAN traffic resumes (or a
+// timeout elapses), release them. This timeout bounds how long we wait for NAN to resume.
+#if defined(CONFIG_CHIP_WIFI_PAF) && CONFIG_CHIP_WIFI_PAF
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_NAN_RECOVERY_TIMEOUT_MS
+#define CHIP_DEVICE_CONFIG_WIFIPAF_NAN_RECOVERY_TIMEOUT_MS 1500
+#endif // CHIP_DEVICE_CONFIG_WIFIPAF_NAN_RECOVERY_TIMEOUT_MS
+#endif // CONFIG_CHIP_WIFI_PAF
