@@ -33,8 +33,14 @@
 
 - (MTRSetupPayload *)populatePayload:(NSError * __autoreleasing *)error
 {
-    MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithQRCode:_base38Representation];
-    if (!payload && error) {
+    // Pass _base38Representation through unchanged so the set of inputs this
+    // surface accepts/rejects stays identical to the prior implementation; we
+    // only route through the new -initWithQRCode:error: as a thin shim.
+    MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithQRCode:_base38Representation error:nil];
+    if (payload == nil && error != nil) {
+        // Deprecated surface: flatten to MTRErrorCodeInvalidArgument for the
+        // legacy contract. Callers wanting the fine-grained code should use
+        // -[MTRSetupPayload initWithQRCode:error:].
         *error = [MTRError errorWithCode:MTRErrorCodeInvalidArgument];
     }
     return payload;

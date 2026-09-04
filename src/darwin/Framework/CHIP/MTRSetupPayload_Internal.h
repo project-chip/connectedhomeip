@@ -28,6 +28,22 @@ MTR_DIRECT_MEMBERS
 
 - (instancetype)initWithSetupPayload:(const chip::SetupPayload &)setupPayload;
 - (nullable instancetype)initWithQRCode:(NSString *)qrCodePayload;
+/**
+ * Initializes the payload object from a "MT:"-prefixed QR Code string.
+ *
+ * Returns nil and populates `error` (if non-nil) on parse failure. The
+ * returned error is in MTRErrorDomain; per-failure codes from the underlying
+ * Base38 decode (e.g. MTRErrorCodeInvalidIntegerValue for an out-of-alphabet
+ * character, MTRErrorCodeInvalidStringLength for a malformed chunk) are
+ * preserved so callers can distinguish typo-class failures from structural
+ * rejection.
+ *
+ * @note MTRErrorCodeInvalidArgument may still be returned for structurally
+ *       valid Base38 payloads whose contents fail semantic QR Code validation
+ *       (the !isValidQRCodePayload branch). This is intentionally identical
+ *       to the corresponding branch in -initWithManualPairingCode:error:.
+ */
+- (nullable instancetype)initWithQRCode:(NSString *)qrCodePayload error:(NSError * __autoreleasing *)error;
 - (nullable instancetype)initWithManualPairingCode:(NSString *)manualCode;
 
 @end

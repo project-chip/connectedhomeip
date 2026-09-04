@@ -225,7 +225,16 @@ MTR_DIRECT_MEMBERS
 
 - (nullable instancetype)initWithPayload:(NSString *)payload
 {
-    return ([payload hasPrefix:@"MT:"]) ? [self initWithQRCode:payload] : [self initWithManualPairingCode:payload];
+    return [self initWithPayload:payload error:nil];
+}
+
+- (nullable instancetype)initWithPayload:(NSString *)payload error:(NSError * __autoreleasing *)error
+{
+    // Dispatch by the "MT:" prefix and preserve the fine-grained underlying
+    // error code (unlike +setupPayloadWithOnboardingPayload:error:, which
+    // flattens to MTRErrorCodeInvalidArgument).
+    return ([payload hasPrefix:@"MT:"]) ? [self initWithQRCode:payload error:error]
+                                        : [self initWithManualPairingCode:payload error:error];
 }
 
 - (CHIP_ERROR)initializeFromQRCode:(NSString *)qrCode validate:(BOOL)validate
@@ -270,9 +279,18 @@ MTR_DIRECT_MEMBERS
 
 - (nullable instancetype)initWithQRCode:(NSString *)qrCodePayload
 {
+    return [self initWithQRCode:qrCodePayload error:nil];
+}
+
+- (nullable instancetype)initWithQRCode:(NSString *)qrCodePayload
+                                  error:(NSError * __autoreleasing *)error
+{
     self = [super init];
     CHIP_ERROR err = [self initializeFromQRCode:qrCodePayload validate:YES];
     if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
         return nil;
     }
 
@@ -281,6 +299,12 @@ MTR_DIRECT_MEMBERS
 
 - (nullable instancetype)initWithManualPairingCode:(NSString *)manualCode
 {
+    return [self initWithManualPairingCode:manualCode error:nil];
+}
+
+- (nullable instancetype)initWithManualPairingCode:(NSString *)manualCode
+                                             error:(NSError * __autoreleasing *)error
+{
     self = [super init];
 
     std::string string([(manualCode ?: @"") UTF8String]); // handle nil gracefully
@@ -288,10 +312,16 @@ MTR_DIRECT_MEMBERS
     CHIP_ERROR err = parser.populatePayload(_payload);
     if (err != CHIP_NO_ERROR) {
         MTR_LOG_ERROR("Failed to parse Manual Pairing Code: %" CHIP_ERROR_FORMAT, err.Format());
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
         return nil;
     }
     if (!_payload.isValidManualCode(chip::PayloadContents::ValidationMode::kConsume)) {
         MTR_LOG_ERROR("Invalid Manual Pairing Code");
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
+        }
         return nil;
     }
 
@@ -678,7 +708,13 @@ static NSString * const MTRSetupPayloadCodingKeyQRCode = @"qr";
     // did not encode it. When present, it carries almost the entire state of the object.
     NSString * qrCode = [coder decodeObjectOfClass:NSString.class forKey:MTRSetupPayloadCodingKeyQRCode];
     if (qrCode != nil) {
-        [self initializeFromQRCode:qrCode validate:NO];
+        // Intentionally fault-tolerant: don't -failWithError: on parse failure
+        // (older archives may hold payloads we no longer parse cleanly). Just
+        // log a breadcrumb and fall through to the fields decoded below.
+        CHIP_ERROR err = [self initializeFromQRCode:qrCode validate:NO];
+        if (err != CHIP_NO_ERROR) {
+            MTR_LOG_ERROR("initWithCoder: failed to restore QR code from archive: %" CHIP_ERROR_FORMAT, err.Format());
+        }
     } else {
         self.version = [coder decodeObjectOfClass:NSNumber.class forKey:MTRSetupPayloadCodingKeyVersion];
         self.vendorID = [coder decodeObjectOfClass:NSNumber.class forKey:MTRSetupPayloadCodingKeyVendorID];
@@ -781,8 +817,13 @@ MTR_DIRECT_MEMBERS
 + (MTRSetupPayload * _Nullable)setupPayloadWithOnboardingPayload:(NSString *)onboardingPayload
                                                            error:(NSError * __autoreleasing *)error
 {
-    MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithPayload:onboardingPayload];
-    if (!payload && error) {
+    // Deprecated surface: flatten every parse failure to
+    // MTRErrorCodeInvalidArgument, preserving the legacy contract for callers
+    // that switch on it. Callers wanting the fine-grained code should migrate
+    // to -initWithPayload:error:. (We pass nil for the underlying error so its
+    // localized description can't contradict the flattened code we report.)
+    MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithPayload:onboardingPayload error:nil];
+    if (payload == nil && error != nil) {
         *error = [MTRError errorWithCode:MTRErrorCodeInvalidArgument];
     }
     return payload;

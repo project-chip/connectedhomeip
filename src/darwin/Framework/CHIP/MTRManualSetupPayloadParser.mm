@@ -33,8 +33,12 @@
 
 - (MTRSetupPayload *)populatePayload:(NSError * __autoreleasing *)error
 {
-    MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithManualPairingCode:_decimalStringRepresentation];
-    if (!payload && error) {
+    MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithManualPairingCode:_decimalStringRepresentation
+                                                                             error:nil];
+    if (payload == nil && error != nil) {
+        // Deprecated surface: flatten to MTRErrorCodeInvalidArgument for the
+        // legacy contract. Callers wanting the fine-grained code should use
+        // -[MTRSetupPayload initWithManualPairingCode:error:].
         *error = [MTRError errorWithCode:MTRErrorCodeInvalidArgument];
     }
     return payload;
