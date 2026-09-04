@@ -218,22 +218,32 @@ class TC_DD_3_24(MatterTestCommissioner):
             f"Operational mDNS service '{instance_qname}' was not found"
         )
 
-        if not hasattr(srv_record, "txt"):
+        txt_record = await mdns.get_txt_record(
+            service_name=instance_qname,
+            service_type=MdnsServiceType.OPERATIONAL.value,
+            log_output=True
+        )
+
+        if txt_record is None:
+            log.info("Operational mDNS service '%s' has no TXT record", instance_qname)
+            return False
+
+        if not hasattr(txt_record, "txt"):
             log.info("Operational mDNS service '%s' does not contain TXT data", instance_qname)
             return False
 
-        if srv_record.txt is None:
+        if txt_record.txt is None:
             log.info("Operational mDNS service '%s' has no TXT record", instance_qname)
             return False
 
         asserts.assert_true(
-            isinstance(srv_record.txt, dict),
-            f"Operational mDNS service '{instance_qname}' TXT data is not a dictionary: {srv_record.txt}"
+            isinstance(txt_record.txt, dict),
+            f"Operational mDNS service '{instance_qname}' TXT data is not a dictionary: {txt_record.txt}"
         )
 
-        log.info("Operational TXT record: %s", srv_record.txt)
+        log.info("Operational TXT record: %s", txt_record.txt)
 
-        return "IC" in srv_record.txt and srv_record.txt["IC"] == "1"
+        return "IC" in txt_record.txt and txt_record.txt["IC"] == "1"
 
 
 if __name__ == "__main__":
