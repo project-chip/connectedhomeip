@@ -32,6 +32,7 @@
 #include <inttypes.h>
 #include <lib/support/SafeInt.h>
 #include <limits.h>
+#include <limits>
 #include <stdarg.h>
 #include <stdint.h>
 #include <string.h>
@@ -1360,8 +1361,20 @@ static int32_t SplitArgs(char * argStr, char **& argList, char * initialArg)
         // for a NULL entry.
         if (argListSize == static_cast<size_t>(argCount + 1))
         {
+            // Guard against size_t overflow before doubling. argListSize starts at
+            // InitialArgListSize (10) and doubles, so this only trips on truly
+            // pathological input, but the bare `*= 2` would otherwise wrap silently
+            // and under-allocate.
+            if (argListSize > std::numeric_limits<size_t>::max() / (2 * sizeof(char *)))
+                return -1;
             argListSize *= 2;
-            argList = static_cast<char **>(chip::Platform::MemoryRealloc(argList, argListSize));
+            // MemoryRealloc's second argument is bytes, not element count. The
+            // original call passed `argListSize` (count), which under-allocated
+            // by a factor of sizeof(char *) (8 on 64-bit) once the arg list grew
+            // beyond InitialArgListSize -- producing out-of-bounds writes on the
+            // very next `argList[argCount++] = nextArg` and on the trailing NULL
+            // terminator. Multiply by sizeof(char *) to fix.
+            argList = static_cast<char **>(chip::Platform::MemoryRealloc(argList, argListSize * sizeof(char *)));
             if (argList == nullptr)
                 return -1;
         }

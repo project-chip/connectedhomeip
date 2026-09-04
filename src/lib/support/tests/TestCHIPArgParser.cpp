@@ -664,6 +664,126 @@ TEST_F(TestCHIPArgParser, MissingValueTest_MissingLongOptionValue)
     VerifyArgErrorContains(0, "--run");
 }
 
+// Regression test for the SplitArgs MemoryRealloc bug fixed in this PR.
+//
+// SplitArgs() starts with an argList of InitialArgListSize (10) char* slots and
+// doubles when full. Before the fix, the realloc passed `argListSize` (the
+// element count) as the *byte* size to MemoryRealloc, under-allocating by a
+// factor of sizeof(char *). With sizeof(char *) == 8 on 64-bit, requesting
+// space for 20 pointers actually shrank the buffer to 20 bytes -- enough for
+// 2 pointers -- so the very next `argList[argCount++] = nextArg` walked off
+// the end of the heap allocation. ASan in the no-shell-asan-clang CI job
+// catches the OOB write; without sanitizers it silently corrupts heap memory.
+//
+// To trip the fix path we must drive argCount past InitialArgListSize (10),
+// which means routing through ParseArgsFromString -> SplitArgs with >10
+// whitespace-separated tokens. Use non-option args so the parser counts them
+// as a single HandleNonOptionArgs callback whose Argc we can assert on.
+TEST_F(TestCHIPArgParser, SplitArgsRealloc_PastInitialBucketDoesNotOverflowHeap)
+{
+    static OptionSet * optionSets[] = { &sOptionSetA, &sOptionSetB, nullptr };
+
+    // 32 non-option tokens. SplitArgs prepends progName as argv[0], so the
+    // argList must hold 33 pointers + the trailing NULL terminator -- well
+    // past the InitialArgListSize=10 bucket, forcing at least two doublings
+    // (10 -> 20 -> 40). With the bug present, the first doubling shrinks the
+    // allocation to 20 bytes and the next write OOBs the heap.
+    static const char * argStr = "n0 n1 n2 n3 n4 n5 n6 n7 n8 n9 "
+                                 "n10 n11 n12 n13 n14 n15 n16 n17 n18 n19 "
+                                 "n20 n21 n22 n23 n24 n25 n26 n27 n28 n29 "
+                                 "n30 n31";
+
+    ClearCallbackRecords();
+    PrintArgError = HandleArgError;
+
+    bool res = ParseArgsFromString(__FUNCTION__, argStr, optionSets, HandleNonOptionArgs);
+    ASSERT_TRUE(res) << "ParseArgsFromString() returned false -- SplitArgs likely returned -1";
+
+    // Expect one HandleNonOptionArgs callback whose argc is exactly 32, followed
+    // by 32 NonOptionArg records (one per token). If SplitArgs corrupted the
+    // argList during realloc, argc would be wrong, tokens would be missing, or
+    // ASan would have already aborted the process.
+    ASSERT_EQ(sCallbackRecordCount, 1u + 32u) << "Wrong number of callback records";
+    VerifyHandleNonOptionArgsCallback(0, __FUNCTION__, 32);
+    char expectedToken[8];
+    for (int i = 0; i < 32; i++)
+    {
+        snprintf(expectedToken, sizeof(expectedToken), "n%d", i);
+        VerifyNonOptionArg(static_cast<size_t>(i + 1), expectedToken);
+    }
+}
+
+// Regression test for the SplitArgs realloc fix at the smallest possible
+// trigger: exactly 11 tokens (one past InitialArgListSize=10). Catches a
+// future off-by-one in the resize predicate `argListSize == argCount + 1` --
+// a stricter `>` comparison or wrong reserved-slot accounting would miss this
+// boundary and either under-allocate or skip the realloc entirely on the very
+// next push of the trailing NULL terminator.
+TEST_F(TestCHIPArgParser, SplitArgsRealloc_BoundaryAtInitialPlusOne)
+{
+    static OptionSet * optionSets[] = { &sOptionSetA, &sOptionSetB, nullptr };
+
+    // Exactly 11 non-option tokens => argList needs 11 + 1 (progName) + 1 (NULL
+    // terminator) = 13 slots. InitialArgListSize is 10, so one doubling to 20
+    // is required. Before the fix, this doubling under-allocated to 20 bytes.
+    static const char * argStr = "a0 a1 a2 a3 a4 a5 a6 a7 a8 a9 a10";
+
+    ClearCallbackRecords();
+    PrintArgError = HandleArgError;
+
+    bool res = ParseArgsFromString(__FUNCTION__, argStr, optionSets, HandleNonOptionArgs);
+    ASSERT_TRUE(res) << "ParseArgsFromString() returned false at the realloc boundary";
+    ASSERT_EQ(sCallbackRecordCount, 1u + 11u) << "Wrong callback record count at boundary";
+    VerifyHandleNonOptionArgsCallback(0, __FUNCTION__, 11);
+    char expectedToken[8];
+    for (int i = 0; i < 11; i++)
+    {
+        snprintf(expectedToken, sizeof(expectedToken), "a%d", i);
+        VerifyNonOptionArg(static_cast<size_t>(i + 1), expectedToken);
+    }
+}
+
+// Companion to the SplitArgs regression tests: drive SplitArgs across *two*
+// realloc doublings while interleaving short options that exercise the
+// argList growth path during a mix of HandleOption + HandleNonOptionArgs
+// callbacks. The bug was triggered purely by argCount crossing the bucket
+// boundary, regardless of whether the tokens were options or non-options,
+// but a future regression that re-introduces the byte-vs-count confusion
+// only in one branch (e.g. options-only) would be caught here and not by
+// the pure-non-option tests above.
+TEST_F(TestCHIPArgParser, SplitArgsRealloc_MixedOptionsAndArgsAcrossTwoDoublings)
+{
+    static OptionSet * optionSets[] = { &sOptionSetA, &sOptionSetB, nullptr };
+
+    // 4 short --foo options (each parsed as one option callback) followed by
+    // 22 non-option args. SplitArgs sees 1 (progName) + 4 + 22 = 27 tokens +
+    // 1 NULL = 28 slots, forcing 10 -> 20 -> 40 doublings.
+    static const char * argStr = "--foo --foo --foo --foo "
+                                 "x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 "
+                                 "x10 x11 x12 x13 x14 x15 x16 x17 x18 x19 "
+                                 "x20 x21";
+
+    ClearCallbackRecords();
+    PrintArgError = HandleArgError;
+
+    bool res = ParseArgsFromString(__FUNCTION__, argStr, optionSets, HandleNonOptionArgs);
+    ASSERT_TRUE(res) << "ParseArgsFromString() returned false across two doublings";
+
+    // 4 HandleOption + 1 HandleNonOptionArgs + 22 NonOptionArg = 27 records.
+    ASSERT_EQ(sCallbackRecordCount, 4u + 1u + 22u) << "Wrong callback record count across two doublings";
+    for (size_t i = 0; i < 4; i++)
+    {
+        VerifyHandleOptionCallback(i, __FUNCTION__, &sOptionSetA, '1', "--foo", nullptr);
+    }
+    VerifyHandleNonOptionArgsCallback(4, __FUNCTION__, 22);
+    char expectedToken[8];
+    for (int i = 0; i < 22; i++)
+    {
+        snprintf(expectedToken, sizeof(expectedToken), "x%d", i);
+        VerifyNonOptionArg(static_cast<size_t>(5 + i), expectedToken);
+    }
+}
+
 static void ClearCallbackRecords()
 {
     for (size_t i = 0; i < sCallbackRecordCount; i++)
