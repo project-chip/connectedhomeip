@@ -35,8 +35,11 @@ const uint16_t kDefaultBufferSizeInBytes = 512;
 const uint8_t kOptionalDefaultStringTag             = 0x82; // Vendor "test" tag
 inline constexpr char kOptionalDefaultStringValue[] = "myData";
 
-const uint8_t kOptionalDefaultIntTag    = 0x83; // Vendor "test" tag
-const uint32_t kOptionalDefaultIntValue = 12;
+const uint8_t kOptionalDefaultSignedIntTag   = 0x83; // Vendor "test" tag
+const int64_t kOptionalDefaultSignedIntValue = -12;
+
+const uint8_t kOptionalDefaultUnsignedIntTag    = 0x84; // Vendor "test" tag
+const uint64_t kOptionalDefaultUnsignedIntValue = 42;
 
 inline constexpr char kSerialNumberDefaultStringValue[] = "123456789";
 const uint32_t kSerialNumberDefaultUInt32Value          = 123456789;
@@ -74,7 +77,8 @@ inline SetupPayload GetDefaultPayloadWithOptionalDefaults()
     SetupPayload payload = GetDefaultPayloadWithSerialNumber();
 
     TEMPORARY_RETURN_IGNORED payload.addOptionalVendorData(kOptionalDefaultStringTag, kOptionalDefaultStringValue);
-    TEMPORARY_RETURN_IGNORED payload.addOptionalVendorData(kOptionalDefaultIntTag, kOptionalDefaultIntValue);
+    TEMPORARY_RETURN_IGNORED payload.addOptionalVendorData(kOptionalDefaultSignedIntTag, kOptionalDefaultSignedIntValue);
+    TEMPORARY_RETURN_IGNORED payload.addOptionalVendorData(kOptionalDefaultUnsignedIntTag, kOptionalDefaultUnsignedIntValue);
 
     return payload;
 }
