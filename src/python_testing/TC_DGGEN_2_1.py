@@ -37,8 +37,8 @@
 # === END CI TEST ARGUMENTS ===
 #
 
+import asyncio
 import logging
-import time
 
 from mobly import asserts
 
@@ -170,7 +170,7 @@ class TC_DGGEN_2_1(MatterBaseTest):
 
         # STEP 4b: wait, then UpTime must have advanced
         self.step("4b")
-        time.sleep(UPTIME_WAIT_SECONDS)
+        await asyncio.sleep(UPTIME_WAIT_SECONDS)
         uptime2 = await self._read_dggen_attribute_expect_success(endpoint=endpoint, attribute=attributes.UpTime)
         asserts.assert_greater(uptime2, uptime1, "UpTime did not increase after waiting.")
         logger.info("UpTime (uptime2): %s", uptime2)
