@@ -116544,10 +116544,7 @@ public:
         __auto_type * params = [[MTRWriteParams alloc] init];
         params.timedWriteTimeout = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.dataVersion = mDataVersion.HasValue() ? [NSNumber numberWithUnsignedInt:mDataVersion.Value()] : nil;
-        NSNumber * _Nullable value = nil;
-        if (!mValue.IsNull()) {
-            value = [NSNumber numberWithUnsignedChar:mValue.Value()];
-        }
+        NSNumber * _Nonnull value = [NSNumber numberWithUnsignedChar:mValue];
 
         [cluster writeAttributeMistTypeWithValue:value params:params completion:^(NSError * _Nullable error) {
             if (error != nil) {
@@ -116560,7 +116557,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<uint8_t> mValue;
+    uint8_t mValue;
 };
 
 class SubscribeAttributeHumidistatMistType : public SubscribeAttribute {

@@ -21922,7 +21922,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("TargetSetpoint", 1, value);
         }
         case Humidistat::Attributes::MistType::Id: {
-            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap>> value;
+            chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MistType", 1, value);
         }
