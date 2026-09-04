@@ -58,6 +58,8 @@ chip_configure_data_model(app
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../thermostat-common/thermostat.zap
 )
 
+chip_add_thermostat_common(app)
+
 if(CONFIG_BOOTLOADER_MCUBOOT)
   target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
 endif()

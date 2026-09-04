@@ -34,7 +34,7 @@
  * The specific contract around when or how the callee/registrar calls the callback or delivers
  * events varies between use cases, but cancellation has a very strict contract that MUST be
  * adhered to by correct implementations of this pattern: Once the caller has called Cancel() on
- * a callback that it had passed to a callee / registrar, there will be no further invocations of
+ * a callback that it had passed to a callee/registrar, there will be no further invocations of
  * the callback. This means that the callback (and possibly the caller itself) can safely be
  * deallocated at that point without creating dangling pointers / callbacks.
  *
@@ -45,20 +45,39 @@
  *
  * Refer to the documentation of Callback and Cancelable below for details.
  *
+ * Note that Callback<T>, Cancelable, and related classes are not thread-safe; they must only be
+ * used by a caller and callee that share a serial context. This is inherent to the design rather
+ * than a missing lock: neither the promise that no invocation follows Cancel() nor an accessor
+ * like IsRegistered() mean anything if the callee can concurrently be part-way through a
+ * completion. Generally the serial context will be the Matter event loop, or another thread
+ * holding the Matter stack lock.
+ *
  * While the concrete interaction patterns vary, the following are strong recommendations,
  * especially for asynchronous operations that have a single outcome:
  *
- * - Callees should accept a pointer to a single Callback<T> as the last parameter to the function,
- *   with a function signature that covers all success and failure cases. This is generally
- *   preferable to accepting e.g. separate OnSuccess and OnFailure callbacks, which would entail
- *   additional bookkeeping and memory usage for both the caller and callee, and would create
- *   separate cancellation signals. If necessary, an alternative would be to sub-class Callback<T>
- *   to hold additional function pointer(s), e.g. `void *mCallFailure(void *, CHIP_ERROR)`.
+ * - Callees should take a single Callback as the last parameter to the function, with a callback
+ *   signature that covers all success and failure cases. This is generally preferable to accepting
+ *   e.g. separate OnSuccess and OnFailure callbacks, which would entail additional bookkeeping and
+ *   memory usage for both the caller and callee, and would create separate cancellation signals.
  *
  * - If the callee has synchronously rejected the call outright (e.g. by returning a CHIP_ERROR)
  *   the callback will not be called at all. If the caller cancels the callback prior to the
  *   operation completing, the callback will not be called. Otherwise, the callback will be called
  *   exactly once.
+ *
+ * - Callback parameters should be passed by value as Callback<T>::Owned tokens (though various
+ *   existing APIs accept callbacks as plain pointers). The Owned token implicitly constructs from
+ *   a Callback<T> reference or pointer (an OwnedOrNull variant is available where a callback is
+ *   optional). This guarantees that any callbacks are always cancelled at the caller-to-callee
+ *   boundary, resulting in predictable cancellation with respect to any previous callee/registrar
+ *   that a reused callback object may have been registered with. Note that because a token takes
+ *   ownership when it is constructed, any previous callee's CancelFn runs during argument
+ *   evaluation, with unspecified order relative to sibling arguments. Owned tokens are only
+ *   intended to live for the duration of the call they are passed to. A callee that returns with
+ *   the operation still in flight must Take() the Cancelable out of the token and install a
+ *   CancelFn on it, as outlined in the general contract above; one that rejects the call outright
+ *   simply drops the token, and one that completes synchronously may bypass registration and
+ *   call Owned::Invoke().
  *
  * - Callers must be prepared for their callback to be invoked synchronously from within the
  *   function call initiating the operation. This avoids the callee having to dispatch the callback
@@ -70,8 +89,9 @@
 
 #pragma once
 
-#include <stddef.h>
-#include <stdint.h>
+#include <cstddef>
+#include <cstdint>
+#include <utility>
 
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/CodeUtils.h>
@@ -174,7 +194,80 @@ public:
     // Not copyable
     Cancelable(const Cancelable &)             = delete;
     Cancelable & operator=(const Cancelable &) = delete;
+
+    class Owned;
+
+    /**
+     * Transient move-only ownership of a Cancelable taken from a Callback, which may be null.
+     * Usually obtained via an implicit Callback<T>::OwnedOrNull constructor.
+     * A null instance can be constructed directly from a nullptr.
+     * A token is consumed at most once, by Take() or by being moved from.
+     */
+    class OwnedOrNull
+    {
+    public:
+        OwnedOrNull(std::nullptr_t) : mCancelable(nullptr) {}
+        OwnedOrNull(OwnedOrNull && other) : mCancelable(std::exchange(other.mCancelable, nullptr)) {}
+
+        /**
+         * Widens an Owned, which is a non-null Cancelable, into a nullable one. Goes through
+         * Owned::Take(), so the result of widening a live Owned is always non-null.
+         */
+        OwnedOrNull(Owned && owned);
+
+        /**
+         * Whether there is a Cancelable for Take() to return, i.e. false if no callback was
+         * supplied or the token has been consumed. This is useful for callees that treat a missing
+         * callback as a runtime error, rather than as a hard contract violation like Owned does.
+         */
+        [[nodiscard]] bool HasValue() const { return mCancelable != nullptr; }
+
+        /**
+         * Transfers ownership of the Cancelable out of the token, which may be null. This is how a
+         * callee takes on the callback it was handed.
+         *
+         * Null means no callback was supplied. Taking from a consumed token is a programming error;
+         * it currently yields null, but callers must not rely on that.
+         */
+        [[nodiscard]] Cancelable * Take() { return std::exchange(mCancelable, nullptr); }
+
+    protected:
+        explicit OwnedOrNull(Cancelable * cancelable) : mCancelable(cancelable) {}
+
+        [[nodiscard]] Cancelable * TakeNonNull()
+        {
+            Cancelable * cancelable = OwnedOrNull::Take();
+            VerifyOrDie(cancelable != nullptr);
+            return cancelable;
+        }
+
+    private:
+        // Consumed and empty tokens are indistinguishable, which is what keeps this pointer-sized.
+        // Take() is documented as single-use rather than as returning null, so that consuming twice
+        // can be made fatal later (e.g. via a sentinel) without breaking callers.
+        Cancelable * mCancelable;
+    };
+
+    /**
+     * Transient move-only ownership of a Cancelable taken from a Callback. Never null.
+     * Usually obtained via an implicit Callback<T>::Owned constructor.
+     * A token is consumed at most once, by Take() or by being moved from.
+     */
+    class Owned : private OwnedOrNull // private so the checked Take() can't be bypassed
+    {
+    public:
+        /**
+         * Transfers ownership of the Cancelable out of the token. Valid only if the token has not
+         * been consumed.
+         */
+        [[nodiscard]] Cancelable * Take() { return TakeNonNull(); }
+
+    protected:
+        explicit Owned(Cancelable * cancelable) : OwnedOrNull(cancelable) { VerifyOrDie(cancelable != nullptr); }
+    };
 };
+
+inline Cancelable::OwnedOrNull::OwnedOrNull(Owned && owned) : mCancelable(owned.Take()) {}
 
 typedef void (*CallFn)(void *);
 
@@ -234,6 +327,78 @@ public:
      * type that the Cancelable was obtained from.
      */
     static Callback * FromCancelable(Cancelable * ca) { return static_cast<Callback *>(ca); }
+
+    /**
+     * Invokes the callback, passing mContext as the first argument.
+     */
+    template <typename... Args>
+    void Invoke(Args &&... args)
+    {
+        mCall(mContext, std::forward<Args>(args)...);
+    }
+
+    /**
+     * Implicitly accepts a Callback (or pointer to one) and takes ownership of it.
+     *
+     * A null pointer aborts, since an Owned is by definition non-null. When converting an existing
+     * pointer-based API whose callers may legitimately pass null, take an OwnedOrNull instead and
+     * reject a missing callback via HasValue(); prefer a Callback reference for new APIs, so that
+     * the case cannot arise in the first place.
+     *
+     * Note that constructing a second Owned from the same Callback while the first is still alive
+     * is not diagnosed. Only a callee accepting two callbacks of the same type can realistically
+     * run into this, and diagnosing it would require marking the Cancelable for as long as a token
+     * holds it, and make Owned no longer trivially destructible. This extra cost at every call site
+     * of an API taking an Owned callback is not warranted for such a narrow corner case.
+     */
+    class Owned : public Cancelable::Owned
+    {
+    public:
+        Owned(Callback & callback) : Cancelable::Owned(callback.Cancel()) {}
+        Owned(Callback * callback) : Cancelable::Owned((callback != nullptr) ? callback->Cancel() : nullptr) {}
+        Owned(std::nullptr_t) = delete;
+
+        /**
+         * Takes the callback out of the token and invokes it, for a callee that completes an
+         * operation synchronously. Valid only if the token has not been consumed.
+         *
+         * A callee that completes asynchronously cannot use this: it must Take() the Cancelable and
+         * register it synchronously, and later unregister from its bookkeeping before recovering
+         * the Callback via FromCancelable().
+         */
+        template <typename... Args>
+        void Invoke(Args &&... args)
+        {
+            FromCancelable(Take())->Invoke(std::forward<Args>(args)...);
+        }
+    };
+
+    /**
+     * Implicitly accepts a Callback (or pointer to one, which may be null) and takes ownership of it.
+     */
+    class OwnedOrNull : public Cancelable::OwnedOrNull
+    {
+    public:
+        OwnedOrNull(Callback & callback) : Cancelable::OwnedOrNull(callback.Cancel()) {}
+        OwnedOrNull(Callback * callback) : Cancelable::OwnedOrNull((callback != nullptr) ? callback->Cancel() : nullptr) {}
+        OwnedOrNull(std::nullptr_t) : Cancelable::OwnedOrNull(nullptr) {}
+        OwnedOrNull(Owned && owned) : Cancelable::OwnedOrNull(std::move(owned)) {}
+
+        /**
+         * Takes the callback out of the token and invokes it, for a callee that completes an
+         * operation synchronously. Valid only if the token is not null and has not been consumed,
+         * i.e. if HasValue() is true.
+         *
+         * A callee that completes asynchronously cannot use this: it must Take() the Cancelable and
+         * register it synchronously, and later unregister from its bookkeeping before recovering
+         * the Callback via FromCancelable().
+         */
+        template <typename... Args>
+        void Invoke(Args &&... args)
+        {
+            FromCancelable(TakeNonNull())->Invoke(std::forward<Args>(args)...);
+        }
+    };
 };
 
 /**
