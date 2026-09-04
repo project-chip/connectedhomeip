@@ -41,7 +41,6 @@ import logging
 from mobly import asserts
 from TC_HSTAT_common import HSTATBase
 
-from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
