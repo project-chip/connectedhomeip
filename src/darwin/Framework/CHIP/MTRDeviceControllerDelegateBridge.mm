@@ -33,6 +33,7 @@
 #import "zap-generated/MTRCommandPayloads_Private.h"
 
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/TypeTraits.h>
 
 using namespace chip::Tracing::DarwinFramework;
 
@@ -46,6 +47,19 @@ MTRDeviceControllerDelegateBridge::~MTRDeviceControllerDelegateBridge(void) {}
 void MTRDeviceControllerDelegateBridge::setDelegate(
     MTRDeviceController * controller, id<MTRDeviceControllerDelegate> delegate, dispatch_queue_t queue)
 {
+    // If a prior commissioning attempt has a pending record (OnCommissioningComplete
+    // fired but the paired OnCommissioningSuccess / OnCommissioningFailure has
+    // not yet drained it), flush it to the *currently bound* delegate before
+    // we swap in the new binding. This preserves pre-PR semantics where the
+    // delegate that observed OnCommissioningComplete was the one notified.
+    // Without this flush, a rebind-without-unbind sequence would either
+    // silently drop the callback or, worse, re-target it at the new delegate.
+    // Safe on the work queue: setDelegate is invoked from _chipWorkQueue, the
+    // same thread as OnCommissioning* callbacks.
+    if (mHasPendingCommissioningComplete) {
+        DispatchPendingCommissioningComplete();
+    }
+
     if (delegate && queue) {
         mController = controller;
         mDelegate = delegate;
@@ -93,12 +107,27 @@ void MTRDeviceControllerDelegateBridge::OnStatusUpdate(chip::Controller::DeviceP
             });
         }
 
-        // If PASE session setup fails and the client implements the delegate that accepts metrics, invoke the delegate
-        // to mark end of commissioning request.
-        // Since OnPairingComplete(failure_code) might not be invoked in all cases, use this opportunity to inform of failed commissioning
-        // and default the error to timeout since that is best guess in this layer.
-        if (status == chip::Controller::DevicePairingDelegate::Status::SecurePairingFailed && [strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
+        // If PASE session setup fails and the client implements any of the
+        // commissioning-complete delegate variants, invoke the delegate to mark
+        // end of commissioning request. Since OnPairingComplete(failure_code)
+        // might not be invoked in all cases, use this opportunity to inform of
+        // failed commissioning and default the error to timeout since that is
+        // best guess in this layer.
+        // The selector guard intentionally mirrors every selector that
+        // DispatchPendingCommissioningComplete dispatches to (4-arg metrics,
+        // 3-arg nodeID, deprecated 1-arg) so PASE failures synthesize a
+        // delegate notification regardless of which variant the client adopts.
+        if (status == chip::Controller::DevicePairingDelegate::Status::SecurePairingFailed
+            && ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]
+                || [strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:)]
+                || [strongDelegate respondsToSelector:@selector(controller:commissioningComplete:)])) {
             OnCommissioningComplete(mDeviceNodeId, CHIP_ERROR_TIMEOUT);
+            // OnCommissioningComplete now defers the delegate dispatch until a
+            // subsequent OnCommissioningSuccess/Failure callback. The PASE-fail
+            // path does not produce one upstream, so synthesize an empty
+            // CompletionStatus here to flush the pending record through to the
+            // delegate; otherwise PASE failures would never reach the client.
+            OnCommissioningFailure(chip::PeerId(), chip::Controller::CompletionStatus());
         }
     }
 }
@@ -186,38 +215,156 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
     MTR_LOG("%@ DeviceControllerDelegate Commissioning complete. NodeId 0x%016llx Status %s", strongController, nodeId, chip::ErrorStr(error));
     MATTER_LOG_METRIC_END(kMetricDeviceCommissioning, error);
 
-    id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
-    if (strongDelegate && mQueue && strongController) {
+    // Defensive: if a prior commissioning attempt left a pending record (e.g.
+    // because upstream skipped the OnCommissioningSuccess/Failure callback in
+    // some error path), flush it through to its delegate before we overwrite
+    // the slot with this attempt's state. Silently dropping the prior record
+    // would leave the previous attempt's delegate callback unfired, wedging
+    // any commissioning UI waiting on it, and would also skip the metrics
+    // snapshot for that attempt -- violating the "every OnCommissioningComplete
+    // drains the metrics collector" invariant.
+    if (mHasPendingCommissioningComplete) {
+        MTR_LOG_ERROR("%@ DeviceControllerDelegate received OnCommissioningComplete (nodeId 0x%016llx) "
+                      "while a prior pending record (nodeId 0x%016llx, error %" CHIP_ERROR_FORMAT
+                      ") had not been flushed; dispatching stale record before recording new one",
+            strongController, nodeId,
+            mPendingCommissioningCompleteNodeId,
+            mPendingCommissioningCompleteError.Format());
+        // Flush the prior attempt to its delegate. DispatchPendingCommissioningComplete
+        // clears mHasPendingCommissioningComplete, after which we fall through and
+        // record the new attempt's state below.
+        DispatchPendingCommissioningComplete();
+    }
 
-        // Always collect the metrics to avoid unbounded growth of the stats in the collector
-        MTRMetrics * metrics = [[MTRMetricsCollector sharedInstance] metricSnapshotForCommissioning:YES];
-        MTR_LOG("%@ Device commissioning complete with metrics %@", strongController, metrics);
+    // Record the (nodeId, error) tuple; defer the dispatch_async until the
+    // subsequent OnCommissioningSuccess / OnCommissioningFailure call so that
+    // the NetworkCommissioning status from CompletionStatus (only available on
+    // failure) can be captured by value into the block, eliminating the
+    // cross-queue read of a member-variable stash.
+    mPendingCommissioningCompleteNodeId = nodeId;
+    mPendingCommissioningCompleteError = error;
+    mPendingNetworkCommissioningStatus = chip::NullOptional;
+    mPendingNetworkCommissioningConnectErrorValue = chip::NullOptional;
+    mPendingNetworkCommissioningDebugText.clear();
+    mHasPendingCommissioningComplete = true;
+    // Reset the idempotence guard so this attempt's pending record can be
+    // dispatched exactly once by either the upstream Success/Failure callback
+    // or the PASE-fail synthesizer (whichever fires first).
+    mDispatchedCommissioningCompleteForCurrentAttempt = false;
+}
 
-        if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:)] ||
-            [strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
-            dispatch_async(mQueue, ^{
-                NSError * nsError = [MTRError errorForCHIPErrorCode:error];
-                NSNumber * nodeID = nil;
-                if (error == CHIP_NO_ERROR) {
-                    nodeID = @(nodeId);
-                }
+void MTRDeviceControllerDelegateBridge::OnCommissioningSuccess(chip::PeerId /* peerId */)
+{
+    DispatchPendingCommissioningComplete();
+}
 
-                // If the client implements the metrics delegate, prefer that over others
-                if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
-                    [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID metrics:metrics];
-                } else {
-                    [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID];
-                }
-            });
+void MTRDeviceControllerDelegateBridge::OnCommissioningFailure(
+    chip::PeerId /* peerId */, const chip::Controller::CompletionStatus & completionStatus)
+{
+    if (completionStatus.networkCommissioningStatus.HasValue()) {
+        MTR_LOG_ERROR("%@ DeviceControllerDelegate commissioning failure carries NetworkCommissioning status %u",
+            mController,
+            static_cast<unsigned>(chip::to_underlying(completionStatus.networkCommissioningStatus.Value())));
+    }
+
+    // Stash the NC status + companion CompletionStatus fields into the pending
+    // record so the dispatcher can pick them up. This is the only place these
+    // fields are set; flush paths that did not observe a Failure callback
+    // (setDelegate rebind, defensive double-Complete drain) read whatever was
+    // previously stashed -- NullOptional / empty in those cases because
+    // OnCommissioningComplete cleared them on the initial stash.
+    mPendingNetworkCommissioningStatus = completionStatus.networkCommissioningStatus;
+    mPendingNetworkCommissioningConnectErrorValue = completionStatus.connectNetworkErrorValue;
+    mPendingNetworkCommissioningDebugText = completionStatus.networkCommissioningDebugText;
+
+    // We deliberately do not forward to the legacy 4-arg overload: this bridge
+    // does not override it, and the default 4-arg implementation in
+    // DevicePairingDelegate is empty -- forwarding would be a no-op.
+    DispatchPendingCommissioningComplete();
+}
+
+void MTRDeviceControllerDelegateBridge::DispatchPendingCommissioningComplete()
+{
+    MTRDeviceController * strongController = mController;
+
+    if (!mHasPendingCommissioningComplete) {
+        if (mDispatchedCommissioningCompleteForCurrentAttempt) {
+            // The pending record for this attempt was already dispatched
+            // (typically by OnStatusUpdate's PASE-fail synthesizer firing
+            // first). Treat the follow-up upstream Success/Failure as a
+            // benign no-op rather than an error so we don't double-fire the
+            // delegate.
             return;
         }
-        // If only the DEPRECATED function is defined
-        if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:)]) {
-            dispatch_async(mQueue, ^{
-                NSError * nsError = [MTRError errorForCHIPErrorCode:error];
-                [strongDelegate controller:strongController commissioningComplete:nsError];
-            });
-        }
+        // Upstream invoked OnCommissioningSuccess/Failure without a preceding
+        // OnCommissioningComplete. This is not expected; surface it loudly so
+        // it shows up in triage logs rather than silently dropping the event.
+        MTR_LOG_ERROR("%@ DeviceControllerDelegate commissioning success/failure with no pending commissioning-complete record; dropping", strongController);
+        return;
+    }
+
+    chip::NodeId nodeId = mPendingCommissioningCompleteNodeId;
+    CHIP_ERROR error = mPendingCommissioningCompleteError;
+    chip::Optional<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum> capturedStatus
+        = mPendingNetworkCommissioningStatus;
+    chip::Optional<int32_t> capturedConnectErrorValue = mPendingNetworkCommissioningConnectErrorValue;
+    std::string capturedDebugText = mPendingNetworkCommissioningDebugText;
+    mHasPendingCommissioningComplete = false;
+    mPendingCommissioningCompleteNodeId = chip::kUndefinedNodeId;
+    mPendingCommissioningCompleteError = CHIP_NO_ERROR;
+    mPendingNetworkCommissioningStatus = chip::NullOptional;
+    mPendingNetworkCommissioningConnectErrorValue = chip::NullOptional;
+    mPendingNetworkCommissioningDebugText.clear();
+    mDispatchedCommissioningCompleteForCurrentAttempt = true;
+
+    // Always collect the metrics to avoid unbounded growth of the stats in the
+    // collector. This must run regardless of whether a delegate is currently
+    // bound -- the metrics collector is a process-wide singleton, and skipping
+    // the drain on the (delegate == nil) branch would let it grow unbounded
+    // across commissioning attempts that race with delegate teardown.
+    MTRMetrics * metrics = [[MTRMetricsCollector sharedInstance] metricSnapshotForCommissioning:YES];
+    MTR_LOG("%@ Device commissioning complete with metrics %@", strongController, metrics);
+
+    id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
+    if (!(strongDelegate && mQueue && strongController)) {
+        return;
+    }
+
+    // Capture every input by value so the block runs purely off its closure
+    // state -- no member-variable reads on the delegate queue.
+
+    if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:)] ||
+        [strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
+        dispatch_async(mQueue, ^{
+            NSError * nsError = [MTRError errorForCHIPErrorCode:error
+                                                     logContext:nil
+                                     networkCommissioningStatus:capturedStatus
+                                       connectNetworkErrorValue:capturedConnectErrorValue
+                                  networkCommissioningDebugText:capturedDebugText];
+            NSNumber * nodeID = nil;
+            if (error == CHIP_NO_ERROR) {
+                nodeID = @(nodeId);
+            }
+
+            // If the client implements the metrics delegate, prefer that over others
+            if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
+                [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID metrics:metrics];
+            } else {
+                [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID];
+            }
+        });
+        return;
+    }
+    // If only the DEPRECATED function is defined
+    if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:)]) {
+        dispatch_async(mQueue, ^{
+            NSError * nsError = [MTRError errorForCHIPErrorCode:error
+                                                     logContext:nil
+                                     networkCommissioningStatus:capturedStatus
+                                       connectNetworkErrorValue:capturedConnectErrorValue
+                                  networkCommissioningDebugText:capturedDebugText];
+            [strongDelegate controller:strongController commissioningComplete:nsError];
+        });
     }
 }
 
