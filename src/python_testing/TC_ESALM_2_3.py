@@ -118,7 +118,8 @@ class TC_ESALM_2_3(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(7, "TH sends ModifyEnabledAlarms with Mask containing a bit not set in Supported",
-                  expectation="DUT returns INVALID_COMMAND. Mask read-back is unchanged.")
+                  expectation="DUT returns INVALID_COMMAND: a Mask bit outside Supported is a constraint "
+                              "violation, so the command must be rejected. Mask read-back is unchanged.")
         if has_modify:
             invalid_bit = None
             for bit in range(64):
@@ -152,7 +153,8 @@ class TC_ESALM_2_3(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(9, "If ModifyEnabledAlarms not in AcceptedCommandList: TH sends ModifyEnabledAlarms (0x01)",
-                  expectation="DUT returns UNSUPPORTED_COMMAND.")
+                  expectation="DUT returns UNSUPPORTED_COMMAND: a command absent from AcceptedCommandList "
+                              "must be rejected as unsupported.")
         if not has_modify:
             try:
                 await self.send_single_cmd(cmd=cmds.ModifyEnabledAlarms(mask=0), endpoint=endpoint)
@@ -219,7 +221,8 @@ class TC_ESALM_2_3(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(12, "If Reset not in AcceptedCommandList: TH sends Reset (0x00)",
-                  expectation="DUT returns UNSUPPORTED_COMMAND.")
+                  expectation="DUT returns UNSUPPORTED_COMMAND: a command absent from AcceptedCommandList "
+                              "must be rejected as unsupported.")
         if not has_reset:
             try:
                 await self.send_single_cmd(cmd=cmds.Reset(alarms=0), endpoint=endpoint)

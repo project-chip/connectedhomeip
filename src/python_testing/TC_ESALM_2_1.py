@@ -79,9 +79,9 @@ class TC_ESALM_2_1(MatterBaseTest):
         has_powerexp = bool(feature_map & _F.kPowerExport)
 
         self.step(3, "TH reads Supported attribute",
-                  expectation="DUT returns AlarmBitmap. FeatureMap and Supported are bidirectionally "
-                              "consistent: every feature bit has its Supported bit, and every Supported "
-                              "bit maps to a defined feature bit (no orphan bits).")
+                  expectation="DUT returns AlarmBitmap. Each of the ten feature-linked alarms is "
+                              "consistent with FeatureMap in both directions; the five alarms without a "
+                              "feature may appear freely, and no reserved bits (15 and up) are set.")
         supported = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.Supported)
         asserts.assert_true(isinstance(supported, int), "Supported must be an integer bitmap")
