@@ -6583,14 +6583,12 @@ PICS:
           attribute?"
       id: TSTAT.S.A0056
 
-    - label:
-          "Does the device implement the CriticalFreezeProtection attribute?"
+    - label: "Does the device implement the CriticalFreezeProtection attribute?"
       id: TSTAT.S.A0057
 
     - label:
           "Does the device implement the CriticalOverheatProtection attribute?"
       id: TSTAT.S.A0058
-
 
     #
     # server / commandsReceived

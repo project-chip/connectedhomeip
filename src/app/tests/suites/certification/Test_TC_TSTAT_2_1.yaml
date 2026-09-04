@@ -711,8 +711,7 @@ tests:
               type: int32u
 
     - label:
-          "Step 49: TH reads the CriticalFreezeProtection attribute from the
-          DUT"
+          "Step 49: TH reads the CriticalFreezeProtection attribute from the DUT"
       PICS: TSTAT.S.A0057
       command: "readAttribute"
       attribute: "CriticalFreezeProtection"
