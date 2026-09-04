@@ -228,11 +228,7 @@ void ApplicationInit()
 
     Clusters::Thermostat::ServerInit<ThermostatClusterType>(gThermostatEndpoint, gThermostatDelegate, gSetpointsDelegate,
                                                             gHoldDelegate, gPresetsDelegate, gSuggestionsDelegate);
-    CHIP_ERROR err = Clusters::ThermostatMode::Init(gThermostatEndpoint);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "Failed to initialize ThermostatMode: %" CHIP_ERROR_FORMAT, err.Format());
-    }
+
     Clusters::UnitLocalization::TempUnitEnum supportedUnits[2] = { Clusters::UnitLocalization::TempUnitEnum::kFahrenheit,
                                                                    Clusters::UnitLocalization::TempUnitEnum::kCelsius };
     DataModel::List<Clusters::UnitLocalization::TempUnitEnum> unitsList(supportedUnits);
@@ -291,7 +287,6 @@ void ApplicationShutdown()
     Clusters::OvenMode::Shutdown();
     Clusters::OvenCavityOperationalState::Shutdown();
 
-    Clusters::ThermostatMode::Shutdown();
     Clusters::Thermostat::ServerShutdown<ThermostatClusterType>(gThermostatEndpoint, MatterClusterShutdownType::kClusterShutdown);
 
     if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)

@@ -94,10 +94,6 @@ public:
 
 ModeBase::Instance * Instance();
 
-void Shutdown();
-
-CHIP_ERROR Init(EndpointId endpointId = 1);
-
 } // namespace ThermostatMode
 
 namespace Thermostat {

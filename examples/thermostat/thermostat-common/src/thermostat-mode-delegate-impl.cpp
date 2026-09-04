@@ -117,29 +117,6 @@ ModeBase::Instance * ThermostatMode::Instance()
     return gThermostatModeInstance;
 }
 
-void ThermostatMode::Shutdown()
-{
-    if (gThermostatModeInstance != nullptr)
-    {
-        delete gThermostatModeInstance;
-        gThermostatModeInstance = nullptr;
-    }
-    if (gThermostatModeDelegate != nullptr)
-    {
-        delete gThermostatModeDelegate;
-        gThermostatModeDelegate = nullptr;
-    }
-}
-
-CHIP_ERROR ThermostatMode::Init(EndpointId endpointId)
-{
-    if (gThermostatModeDelegate == nullptr && gThermostatModeInstance == nullptr)
-    {
-        MatterThermostatModeClusterInitCallback(endpointId);
-    }
-    return CHIP_NO_ERROR;
-}
-
 void MatterThermostatModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
@@ -156,6 +133,12 @@ void MatterThermostatModeClusterShutdownCallback(chip::EndpointId endpointId, Ma
     if (gThermostatModeInstance != nullptr)
     {
         gThermostatModeInstance->Shutdown();
+        delete gThermostatModeInstance;
+        gThermostatModeInstance = nullptr;
     }
-    ThermostatMode::Shutdown();
+    if (gThermostatModeDelegate != nullptr)
+    {
+        delete gThermostatModeDelegate;
+        gThermostatModeDelegate = nullptr;
+    }
 }
