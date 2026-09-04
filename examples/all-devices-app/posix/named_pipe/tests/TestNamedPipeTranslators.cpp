@@ -35,6 +35,7 @@
 
 #include <json/json.h>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -276,7 +277,30 @@ TEST_F(TestNamedPipeTranslators, AmbientContextTranslator)
             }
         ]
     })");
-    EXPECT_EQ(translator.TranslateAndExecute(1, predJson, mRegistry), CHIP_NO_ERROR);
+    // SetPredictedActivity with multiple nested semantic tags
+    Json::Value predMultiJson = ParseJson(R"({
+        "Name": "SetPredictedActivity",
+        "PredAct": [
+            {
+                "AmbientContextType": [
+                    {"TypeId": 75, "TagId": 1},
+                    {"TypeId": 75, "TagId": 2},
+                    {"TypeId": 75, "TagId": 3},
+                    {"TypeId": 75, "TagId": 4},
+                    {"TypeId": 75, "TagId": 5},
+                    {"TypeId": 75, "TagId": 6},
+                    {"TypeId": 75, "TagId": 7},
+                    {"TypeId": 75, "TagId": 8}
+                ],
+                "StartTStamp": 100,
+                "EndTStamp": 200,
+                "Conf": 90,
+                "CrowdDetect": true,
+                "CrowdCnt": 5
+            }
+        ]
+    })");
+    EXPECT_EQ(translator.TranslateAndExecute(1, predMultiJson, mRegistry), CHIP_NO_ERROR);
     EXPECT_EQ(mMockAccessor->mLastAction, "SetPredictedActivity");
 
     // Unknown action

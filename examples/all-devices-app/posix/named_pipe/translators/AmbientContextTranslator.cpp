@@ -128,9 +128,20 @@ CHIP_ERROR AmbientContextTranslator::TranslateSetPredictedActivity(EndpointId en
     VerifyOrReturnError(json.isMember("PredAct") && json["PredAct"].isArray(), CHIP_ERROR_INVALID_ARGUMENT);
     const Json::Value & predActArray = json["PredAct"];
 
-    // Sizing: Each predicted activity item is ~60 bytes in TLV (timestamps, semantic tags, confidence, flags).
-    // Sizing with 128 bytes per item provides >2x margin over the ~60 bytes requirement.
-    TlvMessageBuffer message(predActArray.size() * 128);
+    size_t totalTags = 0;
+    for (Json::ArrayIndex i = 0; i < predActArray.size(); i++)
+    {
+        if (predActArray[i].isObject() && predActArray[i].isMember("AmbientContextType") &&
+            predActArray[i]["AmbientContextType"].isArray())
+        {
+            totalTags += predActArray[i]["AmbientContextType"].size();
+        }
+    }
+
+    // Sizing: Fixed fields per activity item require ~28 bytes (timestamps, flags, confidence, struct envelope).
+    // Each semantic tag structure requires 8 bytes (2B struct wrapper + 3B TypeId + 3B TagId).
+    // Sizing with 64 bytes per item + 16 bytes per tag provides >2x margin.
+    TlvMessageBuffer message((predActArray.size() * 64) + (totalTags * 16));
 
     TLV::TLVType outerType;
     ReturnErrorOnFailure(message.Writer().StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
