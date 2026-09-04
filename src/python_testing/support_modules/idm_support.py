@@ -407,6 +407,7 @@ FABRIC_REPORT_DENIED_ATTRIBUTES: frozenset[tuple[int, int]] = frozenset({
     # requires each cluster to raise that notification itself (see the contract in
     # src/app/server-cluster/ServerClusterExtension.h), which comparable code-driven
     # clusters such as access-control-server do.
+    # Link to issue filed: https://github.com/project-chip/connectedhomeip/issues/73882
     (Clusters.Binding.id, Clusters.Binding.Attributes.Binding.attribute_id),
 })
 
