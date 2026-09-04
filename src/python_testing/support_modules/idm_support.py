@@ -1869,6 +1869,10 @@ class IDMBaseTest(BasicCompositionTests):
         written first. GroupKeyMap is on the sweep's write deny list because a
         replacing write would desynchronize the group tables; the write here
         appends to what the fabric already has and is undone in cleanup.
+
+        Each mutation records its own undo as soon as it lands, so a later step
+        failing still leaves the earlier ones removable in teardown. Cleanups
+        drain in reverse, which removes the group before the key set it needs.
         """
         groups_endpoint = self.endpoint_with_cluster(Clusters.Groups.id)
         if groups_endpoint is None:
@@ -1893,31 +1897,37 @@ class IDMBaseTest(BasicCompositionTests):
                         epochStartTime1=POPULATE_EPOCH_START_TIME + 1,
                         epochKey2=b"\x02" + POPULATE_EPOCH_KEY[1:],
                         epochStartTime2=POPULATE_EPOCH_START_TIME + 2)))
+            self.record_fabric_entry_cleanup(
+                f"group key set {POPULATE_GROUP_KEY_SET_ID} on node {dev_ctrl.nodeId}'s fabric",
+                lambda: dev_ctrl.SendCommand(
+                    self.dut_node_id, self.ROOT_NODE_ENDPOINT_ID,
+                    Clusters.GroupKeyManagement.Commands.KeySetRemove(groupKeySetID=POPULATE_GROUP_KEY_SET_ID)))
 
             updated_map = copy.deepcopy(original_map)
             updated_map.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
                 groupId=POPULATE_GROUP_ID, groupKeySetID=POPULATE_GROUP_KEY_SET_ID))
             write_result = await dev_ctrl.WriteAttribute(
                 self.dut_node_id, [(self.ROOT_NODE_ENDPOINT_ID, group_key_map(updated_map))])
+            # Recorded before the status check: a write that reports a failure may still
+            # have applied, and restoring the map the fabric started with is harmless
+            # where it did not.
+            self.record_fabric_entry_cleanup(
+                f"GroupKeyMap entry for group {POPULATE_GROUP_ID} on node {dev_ctrl.nodeId}'s fabric",
+                lambda: dev_ctrl.WriteAttribute(self.dut_node_id,
+                                                [(self.ROOT_NODE_ENDPOINT_ID, group_key_map(original_map))]))
             failures = [str(getattr(r.Status, 'name', r.Status)) for r in write_result if r.Status != Status.Success]
             asserts.assert_equal(failures, [], f"GroupKeyMap write returned {', '.join(failures)}")
 
             await dev_ctrl.SendCommand(self.dut_node_id, groups_endpoint,
                                        Clusters.Groups.Commands.AddGroup(groupID=POPULATE_GROUP_ID, groupName=""))
+            self.record_fabric_entry_cleanup(
+                f"group {POPULATE_GROUP_ID} on node {dev_ctrl.nodeId}'s fabric",
+                lambda: dev_ctrl.SendCommand(self.dut_node_id, groups_endpoint,
+                                             Clusters.Groups.Commands.RemoveGroup(groupID=POPULATE_GROUP_ID)))
         except Exception as e:
             log.info("Could not add a group on node %d's fabric: %s", dev_ctrl.nodeId, e)
             return False
 
-        async def undo() -> None:
-            await dev_ctrl.SendCommand(self.dut_node_id, groups_endpoint,
-                                       Clusters.Groups.Commands.RemoveGroup(groupID=POPULATE_GROUP_ID))
-            await dev_ctrl.WriteAttribute(self.dut_node_id,
-                                          [(self.ROOT_NODE_ENDPOINT_ID, group_key_map(original_map))])
-            await dev_ctrl.SendCommand(
-                self.dut_node_id, self.ROOT_NODE_ENDPOINT_ID,
-                Clusters.GroupKeyManagement.Commands.KeySetRemove(groupKeySetID=POPULATE_GROUP_KEY_SET_ID))
-
-        self.record_fabric_entry_cleanup(f"group {POPULATE_GROUP_ID} on node {dev_ctrl.nodeId}'s fabric", undo)
         return True
 
     def populate_message_id(self, dev_ctrl: ChipDeviceCtrl) -> bytes:
