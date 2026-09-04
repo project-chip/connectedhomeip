@@ -89,8 +89,12 @@ class TC_DGGEN_2_1(MatterBaseTest):
             TestStep("2b", "Reboot the DUT. TH reads the RebootCount attribute from the DUT and saves as boot_count2.",
                      "Verify that boot_count2 is greater than boot_count1."),
             TestStep(3, "TH reads the NetworkInterfaces attribute from the DUT.",
-                     "Verify that each entry is a NetworkInterface struct with fields of the types listed in the "
-                     "specification, and that the Type field is a value specified by the InterfaceType enum."),
+                     "Verify that the list has at most 8 entries and that each entry is a NetworkInterface struct "
+                     "whose fields match the specification: Name is a string, IsOperational is a bool, "
+                     "OffPremiseServicesReachableIPv4 and OffPremiseServicesReachableIPv6 are each a bool or null, "
+                     "HardwareAddress is an octet string, IPv4Addresses is a list of 4-byte octet strings and "
+                     "IPv6Addresses is a list of 16-byte octet strings, and Type is a value specified by the "
+                     "InterfaceType enum."),
             TestStep("4a", "TH reads the UpTime attribute from the DUT and saves as uptime1.",
                      "Verify that uptime1 is a uint64 value."),
             TestStep("4b", "Wait 10 seconds. TH reads the UpTime attribute from the DUT and saves as uptime2.",
@@ -142,11 +146,7 @@ class TC_DGGEN_2_1(MatterBaseTest):
         self.step(3)
         network_interfaces = await self._read_dggen_attribute_expect_success(
             endpoint=endpoint, attribute=attributes.NetworkInterfaces)
-        # The spec constrains NetworkInterfaces to max 8 entries, but this is not
-        # asserted here: the all-clusters reference app enumerates the host's network
-        # interfaces, and a CI/dev host commonly has more than 8, which would fail a
-        # conforming-DUT bound in an environment that is not a conforming DUT.
-        matter_asserts.assert_list(network_interfaces, "NetworkInterfaces")
+        matter_asserts.assert_list(network_interfaces, "NetworkInterfaces", max_length=8)
         for interface in network_interfaces:
             matter_asserts.assert_is_string(interface.name, "NetworkInterface.Name")
             asserts.assert_is_instance(interface.isOperational, bool, "NetworkInterface.IsOperational is not a bool")
