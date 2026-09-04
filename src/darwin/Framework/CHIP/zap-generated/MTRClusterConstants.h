@@ -2833,6 +2833,8 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterThermostatAttributeThermostatSuggestionsID MTR_PROVISIONALLY_AVAILABLE = 0x00000054,
     MTRAttributeIDTypeClusterThermostatAttributeCurrentThermostatSuggestionID MTR_PROVISIONALLY_AVAILABLE = 0x00000055,
     MTRAttributeIDTypeClusterThermostatAttributeThermostatSuggestionNotFollowingReasonID MTR_PROVISIONALLY_AVAILABLE = 0x00000056,
+    MTRAttributeIDTypeClusterThermostatAttributeCriticalFreezeProtectionID MTR_PROVISIONALLY_AVAILABLE = 0x00000057,
+    MTRAttributeIDTypeClusterThermostatAttributeCriticalOverheatProtectionID MTR_PROVISIONALLY_AVAILABLE = 0x00000058,
     MTRAttributeIDTypeClusterThermostatAttributeGeneratedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterThermostatAttributeAcceptedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterThermostatAttributeAttributeListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,

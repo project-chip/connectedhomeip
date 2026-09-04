@@ -4284,6 +4284,12 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
     case Attributes::ThermostatSuggestionNotFollowingReason::Id: {
         return YES;
     }
+    case Attributes::CriticalFreezeProtection::Id: {
+        return YES;
+    }
+    case Attributes::CriticalOverheatProtection::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

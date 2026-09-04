@@ -9363,6 +9363,18 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000057: {
+                "attributeName": "CriticalFreezeProtection",
+                "attributeId": 0x00000057,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x00000058: {
+                "attributeName": "CriticalOverheatProtection",
+                "attributeId": 0x00000058,
+                "type": "bool",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,

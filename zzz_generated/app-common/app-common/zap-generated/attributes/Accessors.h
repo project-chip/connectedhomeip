@@ -2649,6 +2649,14 @@ namespace SetpointHoldExpiryTimestamp {
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // epoch_s
 } // namespace SetpointHoldExpiryTimestamp
 
+namespace CriticalFreezeProtection {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value); // boolean
+} // namespace CriticalFreezeProtection
+
+namespace CriticalOverheatProtection {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value); // boolean
+} // namespace CriticalOverheatProtection
+
 namespace FeatureMap {
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // bitmap32
 } // namespace FeatureMap

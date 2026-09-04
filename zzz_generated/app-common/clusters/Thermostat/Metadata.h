@@ -17,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-inline constexpr uint32_t kRevision = 11;
+inline constexpr uint32_t kRevision = 12;
 
 namespace Attributes {
 
@@ -299,6 +299,16 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ThermostatSuggestionNo
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace ThermostatSuggestionNotFollowingReason
+namespace CriticalFreezeProtection {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CriticalFreezeProtection::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
+} // namespace CriticalFreezeProtection
+namespace CriticalOverheatProtection {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CriticalOverheatProtection::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
+} // namespace CriticalOverheatProtection
 constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
     LocalTemperature::kMetadataEntry,
     ControlSequenceOfOperation::kMetadataEntry,

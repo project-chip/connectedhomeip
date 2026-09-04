@@ -14,7 +14,7 @@ namespace Thermostat {
 namespace Attributes {
 
 // Total number of attributes supported by the cluster, including global attributes
-inline constexpr uint32_t kAttributesCount = 69;
+inline constexpr uint32_t kAttributesCount = 71;
 
 namespace LocalTemperature {
 inline constexpr AttributeId Id = 0x00000000;
@@ -271,6 +271,14 @@ inline constexpr AttributeId Id = 0x00000055;
 namespace ThermostatSuggestionNotFollowingReason {
 inline constexpr AttributeId Id = 0x00000056;
 } // namespace ThermostatSuggestionNotFollowingReason
+
+namespace CriticalFreezeProtection {
+inline constexpr AttributeId Id = 0x00000057;
+} // namespace CriticalFreezeProtection
+
+namespace CriticalOverheatProtection {
+inline constexpr AttributeId Id = 0x00000058;
+} // namespace CriticalOverheatProtection
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

@@ -106,6 +106,7 @@ bool ThermostatCoolingSetpoints::HandlesAttribute(AttributeId attributeId)
     case AbsMaxCoolSetpointLimit::Id:
     case MinCoolSetpointLimit::Id:
     case MaxCoolSetpointLimit::Id:
+    case CriticalOverheatProtection::Id:
         return true;
     default:
         return false;
@@ -153,7 +154,12 @@ ThermostatCoolingSetpoints::ReadAttribute(const DataModel::ReadAttributeRequest 
         VerifyOrReturnValue(status == Status::Success, status);
         return encoder.Encode(absMaxCoolSetpointLimit);
     }
-
+    case CriticalOverheatProtection::Id: {
+        bool enabled;
+        auto status = mDelegate.GetCriticalOverheatProtection(enabled);
+        VerifyOrReturnValue(status == Status::Success, status);
+        return encoder.Encode(enabled);
+    }
     default:
         return std::nullopt;
     }
@@ -354,6 +360,7 @@ CHIP_ERROR ThermostatCoolingSetpoints::Attributes(const ConcreteClusterPath & pa
         { attributes.AbsMaxCoolSetpointLimit, AbsMaxCoolSetpointLimit::kMetadataEntry },
         { attributes.MinCoolSetpointLimit, MinCoolSetpointLimit::kMetadataEntry },
         { attributes.MaxCoolSetpointLimit, MaxCoolSetpointLimit::kMetadataEntry },
+        { attributes.CriticalOverheatProtection, CriticalOverheatProtection::kMetadataEntry },
     };
 
     return AppendOptionalAttributes(builder, Span(optionalAttributes));
