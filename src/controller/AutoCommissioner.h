@@ -58,7 +58,7 @@ public:
     ByteSpan GetAttestationSignature() const { return ByteSpan(mAttestationSignature, mAttestationSignatureLen); }
     ByteSpan GetAttestationNonce() const { return ByteSpan(mAttestationNonce); }
 
-    void SetNetworkSetupNeeded(bool needed) { mNeedsNetworkSetup = needed; }
+    void SetNetworkSetupNeeded(bool needed) override { mNeedsNetworkSetup = needed; }
 
 protected:
     virtual void CleanupCommissioning();
