@@ -157,7 +157,6 @@ class TC_OO_2_8(MatterBaseTest):
         self.step(9)
         count = sub_handler.attribute_report_counts[Clusters.OnOff.Attributes.OnTime]
         reportedOnTimeValueList = sub_handler.attribute_reports[Clusters.OnOff.Attributes.OnTime]
-        log.info(f'OnTime reports: {reportedOnTimeValueList}')
         asserts.assert_equal(count, 3, "Unexpected number of OnTime reports")
 
         self.step(10)
@@ -174,7 +173,6 @@ class TC_OO_2_8(MatterBaseTest):
         self.step(13)
         count = sub_handler.attribute_report_counts[Clusters.OnOff.Attributes.OffWaitTime]
         reportedOffWaitTimeValueList = sub_handler.attribute_reports[Clusters.OnOff.Attributes.OffWaitTime]
-        log.info(f'OffWaitTime reports: {reportedOffWaitTimeValueList}')
         asserts.assert_equal(count, 3, "Unexpected number of OffWaitTime reports")
 
         self.step(14)
@@ -212,7 +210,6 @@ class TC_OO_2_8(MatterBaseTest):
         self.step(22)
         count = sub_handler.attribute_report_counts[Clusters.OnOff.Attributes.OnTime]
         reportedOnTimeValueList = sub_handler.attribute_reports[Clusters.OnOff.Attributes.OnTime]
-        log.info(f'OnTime reports: {reportedOnTimeValueList}')
         asserts.assert_equal(count, 2, "Unexpected number of OnTime reports")
 
         self.step(23)
@@ -225,7 +222,6 @@ class TC_OO_2_8(MatterBaseTest):
         self.step(25)
         count = sub_handler.attribute_report_counts[Clusters.OnOff.Attributes.OffWaitTime]
         reportedOffWaitTimeValueList = sub_handler.attribute_reports[Clusters.OnOff.Attributes.OffWaitTime]
-        log.info(f'OffWaitTime reports: {reportedOffWaitTimeValueList}')
         asserts.assert_equal(count, 2, "Unexpected number of OffWaitTime reports")
 
         self.step(26)
