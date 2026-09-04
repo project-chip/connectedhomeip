@@ -549,9 +549,18 @@ kState_CPConnected  ──► ProxyDisconnectRequest    ──► kState_CPConne
                                                       (sessions remain)
 kState_CPConnected  ──► ProxyDisconnectRequest    ──► kState_CPDisconnected
                         for the last session
+kState_CPConnected  ──► peer closes the transport ──► kState_CPDisconnected
+                        connection, last session
 ```
 
 With `MaxSessions > 1` several sessions can be open at once, so a
 `ProxyDisconnectRequest` only returns the cluster to `kState_CPDisconnected` —
 and only notifies the transports via `OnAllSessionsClosed()` — once no session
 is left.
+
+A session can also end without a `ProxyDisconnectRequest`, when the commissionee
+closes the transport connection. A transport reports that through
+`SetDisconnectedIfLastSession()` rather than setting the state itself: the
+cluster counts the sessions of every transport, plus any connect still in
+flight, so the last session on one transport is not necessarily the last session
+on the proxy.
