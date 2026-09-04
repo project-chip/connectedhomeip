@@ -73,7 +73,7 @@ To update or validate this list manually, follow these steps:
 | 27        | Closure Dimension                                          | 261 (0x0105)  | Yes                | No                  |                                       |
 | 28        | Color Control                                              | 768 (0x0300)  | No                 | No                  |                                       |
 | 29        | Commissioner Control                                       | 1873 (0x0751) | Yes                | No                  |                                       |
-| 30        | Commissioning Proxy                                        | 1109 (0x0455) | No                 | No                  |                                       |
+| 30        | Commissioning Proxy                                        | 1109 (0x0455) | Yes                | Yes                 |                                       |
 | 31        | Commodity Metering                                         | 2823 (0x0B07) | No                 | No                  |                                       |
 | 32        | Commodity Price                                            | 149 (0x0095)  | No                 | No                  |                                       |
 | 33        | Commodity Tariff                                           | 1792 (0x0700) | No                 | No                  |                                       |
@@ -203,4 +203,4 @@ To update or validate this list manually, follow these steps:
 | 157       | Wi-Fi Network Management                                   | 1105 (0x0451) | Yes                | Yes                 |                                       |
 | 158       | Window Covering                                            | 258 (0x0102)  | No                 | No                  |                                       |
 | 159       | Zone Management                                            | 1360 (0x0550) | Yes                | No                  |                                       |
-| **Total** | **159**                                                    |               | **101**            | **54**              |                                       |
+| **Total** | **159**                                                    |               | **102**            | **55**              |                                       |
