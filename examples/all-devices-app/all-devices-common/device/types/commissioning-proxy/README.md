@@ -395,7 +395,7 @@ transport methods it implements and the shared-scanner rules are documented in
 
 ### What this app has to supply
 
-Session setup and message tunnelling are portable. Discovery is not: scanning
+Session setup and message tunneling are portable. Discovery is not: scanning
 for commissionable devices, and recovering the NAN subscribe id the platform
 assigned, both need platform code. That is the `CommissioningProxyPafAdapter`
 interface, which this app implements in
