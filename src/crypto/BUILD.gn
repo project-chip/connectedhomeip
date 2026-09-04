@@ -49,6 +49,7 @@ buildconfig_header("crypto_buildconfig") {
     "CHIP_CRYPTO_BORINGSSL=${chip_crypto_boringssl}",
     "CHIP_CRYPTO_PLATFORM=${chip_crypto_platform}",
     "CHIP_OP_KEYSTORE_ELE=${chip_with_imx_ele}",
+    "CHIP_CRYPTO_USE_X509=${chip_crypto_use_x509}",
   ]
 }
 

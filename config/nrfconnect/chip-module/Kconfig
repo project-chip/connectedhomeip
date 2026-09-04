@@ -472,4 +472,14 @@ config CHIP_QSPI_NOR_POWER_MANAGEMENT_SUPPORT
 	  Enables management of nRF QSPI NOR external flash power state
 	  transitions during Matter operations.
 
+config CHIP_CRYPTO_USE_X509
+	bool "X.509 certificate support"
+	depends on MBEDTLS_X509_LIBRARY || MBEDTLS
+	default y if CHIP_BUILD_TESTS
+	default n if CHIP_CRYPTO_PSA
+	default y if MBEDTLS_X509_LIBRARY
+	help
+	  Controls compilation of X.509-related crypto functionality in Matter.
+	  Disable to reduce code footprint if your device does not need X.509 certificate parsing/validation.
+
 endif # CHIP
