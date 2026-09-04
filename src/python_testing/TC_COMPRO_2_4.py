@@ -298,6 +298,10 @@ class TC_COMPRO_2_4(COMPROBaseTest):
         # transports added to CapabilitiesBitmap in the future.
         # When valid_transports has only one bit set the loop runs once —
         # identical to the previous single-transport behaviour.
+        # TODO: NTL (CapabilitiesBitmap bit 4) is a spec-defined transport that the test
+        # plan mentions in step 2, but it is not exercised here: the SDK has no NTL
+        # transport driver, so no DUT reports the bit and no ED is reachable over it.
+        # Add kNtl to this list once such a transport lands.
         kWiFiPAF_bit = int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF)
         kBle_bit = int(cp.Bitmaps.CapabilitiesBitmap.kBle)
         all_defined_transports = sorted([kBle_bit, kWiFiPAF_bit])

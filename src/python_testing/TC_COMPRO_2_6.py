@@ -306,25 +306,38 @@ class TC_COMPRO_2_6(COMPROBaseTest):
 
         # ----------------------------------------------------------------
         # Step 9: ProxyConnectRequest with multi-bit transport — INVALID_COMMAND
-        # Use both defined transport bits so the value always has >1 bit set.
+        # The bits are taken from valid_transports in ascending bit order, so
+        # the error is multiple bits set.  Including a transport the DUT does
+        # not support would answer INVALID_TRANSPORT_TYPE, which the spec
+        # requires for an unsupportable Transport.  A DUT reporting a single
+        # transport therefore cannot be tested here.
         # ----------------------------------------------------------------
-        self.step(9)
-        multi_transport = (int(cp.Bitmaps.CapabilitiesBitmap.kBle) |
-                           int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF))
-        logger.info("Step 9: ProxyConnectRequest multi-transport=0x%02x (expect INVALID_COMMAND)",
-                    multi_transport)
-        await self.expect_command_rejected(
-            cp.Commands.ProxyConnectRequest(
-                address=NullValue,
-                transport=multi_transport,
-                discriminator=ed_discriminator,
-                vendorID=0,
-                productID=0,
-                timeout=30,
-            ),
-            Status.InvalidCommand,
-            "Step 9 ProxyConnectRequest with a multi-bit transport",
-            timeout_ms=10000)
+        supported_bits = [b for b in (int(cp.Bitmaps.CapabilitiesBitmap.kBle),
+                                      int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF),
+                                      int(cp.Bitmaps.CapabilitiesBitmap.kNtl))
+                          if valid_transports & b]
+        if len(supported_bits) < 2:
+            self.skip_step(9)
+            logger.info("Step 9 skipped: DUT supports a single transport "
+                        "(valid_transports=0x%02x), so a multi-bit value cannot be "
+                        "formed from supported transports", valid_transports)
+        else:
+            self.step(9)
+            multi_transport = supported_bits[0] | supported_bits[1]
+            logger.info("Step 9: ProxyConnectRequest multi-transport=0x%02x (expect INVALID_COMMAND)",
+                        multi_transport)
+            await self.expect_command_rejected(
+                cp.Commands.ProxyConnectRequest(
+                    address=NullValue,
+                    transport=multi_transport,
+                    discriminator=ed_discriminator,
+                    vendorID=0,
+                    productID=0,
+                    timeout=30,
+                ),
+                Status.InvalidCommand,
+                "Step 9 ProxyConnectRequest with a multi-bit transport",
+                timeout_ms=10000)
 
         # ----------------------------------------------------------------
         # Step 10: ProxyMessageRequest with non-existent SessionID — NOT_FOUND
