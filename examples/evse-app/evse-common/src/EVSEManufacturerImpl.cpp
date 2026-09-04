@@ -586,3 +586,22 @@ CHIP_ERROR EVSEManufacturer::RequestConstraintBasedForecast(
 {
     return CHIP_NO_ERROR;
 }
+
+CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementPowerRangeAdjustRequest(const DataModel::Nullable<int64_t> minPower,
+                                                                                 const DataModel::Nullable<int64_t> maxPower,
+                                                                                 const uint32_t durationS,
+                                                                                 AdjustmentCauseEnum cause)
+{
+    // Currently not implemented by our EVSE app
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementPowerRangeAdjustCompletion()
+{
+    // Currently not implemented by our EVSE app
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementCancelPowerRangeAdjustRequest(CauseEnum cause)
+{
+    // Currently not implemented by our EVSE app
+    return CHIP_NO_ERROR;
+}

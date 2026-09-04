@@ -12,20 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/chip_test_suite.gni")
 
-source_set("operational-state-delegate") {
-  sources = [
-    "impl/LoggingOperationalStateDelegate.cpp",
-    "impl/LoggingOperationalStateDelegate.h",
-    "impl/LoggingRvcOperationalStateDelegate.cpp",
-    "impl/LoggingRvcOperationalStateDelegate.h",
+chip_test_suite("tests") {
+  output_name = "TestThermostatCluster"
+
+  test_sources = [
+    "TestThermostatAtomicAndPresets.cpp",
+    "TestThermostatCluster.cpp",
+    "TestThermostatSetpoints.cpp",
+    "TestThermostatSuggestionsAndHold.cpp",
   ]
 
   public_deps = [
-    "${chip_root}/src/app/clusters/operational-state-server",
+    "${chip_root}/src/app/clusters/thermostat-server",
+    "${chip_root}/src/app/data-model-provider/tests:encode-decode",
+    "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:timer-delegate-mock",
   ]
 }

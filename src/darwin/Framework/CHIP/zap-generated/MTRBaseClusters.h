@@ -21172,11 +21172,6 @@ typedef NS_ENUM(uint8_t, MTROperationalCredentialsOperationalCertStatus) {
     MTROperationalCredentialsOperationalCertStatusInvalidFabricIndex MTR_DEPRECATED("Please use MTROperationalCredentialsNodeOperationalCertStatusInvalidFabricIndex", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x0B,
 } MTR_DEPRECATED("Please use MTROperationalCredentialsNodeOperationalCertStatus", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
-typedef NS_ENUM(uint8_t, MTRGroupKeyManagementGroupKeyMulticastPolicy) {
-    MTRGroupKeyManagementGroupKeyMulticastPolicyPerGroupID MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRGroupKeyManagementGroupKeyMulticastPolicyAllNodes MTR_PROVISIONALLY_AVAILABLE = 0x01,
-} MTR_PROVISIONALLY_AVAILABLE;
-
 typedef NS_ENUM(uint8_t, MTRGroupKeyManagementGroupKeySecurityPolicy) {
     MTRGroupKeyManagementGroupKeySecurityPolicyTrustFirst MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
     MTRGroupKeyManagementGroupKeySecurityPolicyCacheAndSync MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
@@ -21574,6 +21569,7 @@ typedef NS_ENUM(uint8_t, MTRGroupcastTestResult) {
     MTRGroupcastTestResultFailedAuth MTR_PROVISIONALLY_AVAILABLE = 0x03,
     MTRGroupcastTestResultNoAvailableKey MTR_PROVISIONALLY_AVAILABLE = 0x04,
     MTRGroupcastTestResultSendFailure MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRGroupcastTestResultUnknownGroup MTR_PROVISIONALLY_AVAILABLE = 0x06,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRGroupcastTesting) {
@@ -24790,11 +24786,6 @@ typedef NS_ENUM(uint8_t, MTRJointFabricDatastoreDatastoreAccessControlEntryPrivi
     MTRJointFabricDatastoreDatastoreAccessControlEntryPrivilegeOperate MTR_PROVISIONALLY_AVAILABLE = 0x03,
     MTRJointFabricDatastoreDatastoreAccessControlEntryPrivilegeManage MTR_PROVISIONALLY_AVAILABLE = 0x04,
     MTRJointFabricDatastoreDatastoreAccessControlEntryPrivilegeAdminister MTR_PROVISIONALLY_AVAILABLE = 0x05,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_ENUM(uint8_t, MTRJointFabricDatastoreDatastoreGroupKeyMulticastPolicy) {
-    MTRJointFabricDatastoreDatastoreGroupKeyMulticastPolicyPerGroupID MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRJointFabricDatastoreDatastoreGroupKeyMulticastPolicyAllNodes MTR_PROVISIONALLY_AVAILABLE = 0x01,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRJointFabricDatastoreDatastoreGroupKeySecurityPolicy) {

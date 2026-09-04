@@ -17,6 +17,7 @@
  */
 
 #pragma once
+#include "camera-device-interface.h"
 #include <app/clusters/av-analysis-server/AvAnalysisCluster.h>
 
 namespace chip {
@@ -74,7 +75,13 @@ public:
      */
     void OnAmbientContextTriggeredEvent(uint8_t namespaceId, uint8_t tagId, bool& triggeredContextEnabled);
 
+    /**
+     * Camera App interface
+     */
+    void SetCameraDevice(CameraDeviceInterface * aCameraDevice);
+
 private:
+    CameraDeviceInterface * mCameraDevice = nullptr;
 };
 
 } // namespace AvAnalysis
