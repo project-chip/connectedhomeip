@@ -222,6 +222,16 @@ not_automated:
       reason:
           No existing app corresponding to the test content (NFC-based
           onboarding data security requirements)
+    - name: TC_DD_1_3.py
+      reason:
+          NFC Reader needed for running this test-case and CI does not support
+          it
+    - name: TC_DD_1_4.py
+      reason:
+          Verifies a concatenated QR code against a tester-supplied expected
+          device count; no automated way to determine that count.
+    - name: onboarding_payload_checks.py
+      reason: Shared code for TC_DD_1_1/TC_DD_1_3, not a standalone test.
     - name: TC_GC_common.py
       reason: Shared code for TC_GC, not a standalone test.
     - name: TC_S_common.py
