@@ -169,6 +169,10 @@ class TC_DD_3_24(MatterTestCommissioner):
         )
 
     def get_dut_instance_name(self, log_result: bool = False) -> str:
+        """Return the operational mDNS instance name for the DUT.
+
+        The value is "<compressed-fabric-id>-<node-id>" using uppercase, zero-padded 16-hex-digit fields.
+        """
         node_id = self.dut_node_id
         compressed_fabric_id = self.default_controller.GetCompressedFabricId()
         instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
@@ -177,6 +181,10 @@ class TC_DD_3_24(MatterTestCommissioner):
         return instance_name
 
     def get_operational_subtype(self, log_result: bool = False) -> str:
+        """Return the operational mDNS subtype for the current fabric.
+
+        The value is "_I<compressed-fabric-id>._sub._matter._tcp.local".
+        """
         compressed_fabric_id = self.default_controller.GetCompressedFabricId()
         operational_subtype = f'_I{compressed_fabric_id:016X}._sub.{MdnsServiceType.OPERATIONAL.value}'
         if log_result:
@@ -184,6 +192,11 @@ class TC_DD_3_24(MatterTestCommissioner):
         return operational_subtype
 
     async def check_operational_service_has_txt_ic(self) -> bool:
+        """Check whether the DUT operational mDNS service advertises TXT key "IC" as "1".
+
+        Returns False when TXT data is missing, absent, or does not contain IC=1.
+        If the operational service lookup fails, this method asserts and fails the test.
+        """
         # TH constructs the instance name for the DUT as the 64-bit compressed Fabric identifier, and the
         # assigned 64-bit Node identifier, each expressed as a fixed-length sixteen-character hexadecimal
         # string, encoded as ASCII (UTF-8) text using capital letters, separated by a hyphen.
