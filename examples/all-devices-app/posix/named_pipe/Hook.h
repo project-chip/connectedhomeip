@@ -42,8 +42,7 @@ struct HasNamedPipeTranslators : std::false_type
 
 template <typename T>
 struct HasNamedPipeTranslators<
-    T, std::void_t<decltype(RegisterNamedPipeTranslators(std::declval<T &>(), std::declval<Dispatcher &>()))>>
-    : std::true_type
+    T, std::void_t<decltype(RegisterNamedPipeTranslators(std::declval<T &>(), std::declval<Dispatcher &>()))>> : std::true_type
 {
 };
 

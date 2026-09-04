@@ -382,8 +382,8 @@ sequenceDiagram
         "OnOff": true
     }
     ```
-2.  **Dispatch**: `NamedPipe::Dispatcher` reads pipe, parses JSON, and
-    extracts `"Name"` and `"EndpointId"`.
+2.  **Dispatch**: `NamedPipe::Dispatcher` reads pipe, parses JSON, and extracts
+    `"Name"` and `"EndpointId"`.
 3.  **Translation**: Dispatcher invokes
     `NamedPipe::OnOffTranslator::TranslateAndExecute(endpointId, json, mOobRegistry)`:
     -   Extracts `OnOff = true`.
@@ -400,8 +400,8 @@ sequenceDiagram
 >
 > **Thread Safety & Stack Synchronization**: The POSIX named pipe listener runs
 > on a background worker thread. When a command is received,
-> `NamedPipe::Dispatcher` synchronizes execution onto the Matter event loop
-> via `chip::DeviceLayer::PlatformMgr().ScheduleWork(...)` or acquires
+> `NamedPipe::Dispatcher` synchronizes execution onto the Matter event loop via
+> `chip::DeviceLayer::PlatformMgr().ScheduleWork(...)` or acquires
 > `chip::DeviceLayer::PlatformMgr().LockChipStack()` before invoking
 > `HandleAction` on `OOBAccessorRegistry`.
 

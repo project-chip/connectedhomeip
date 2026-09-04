@@ -107,8 +107,9 @@ and easy to test:
 ### The Header (`MySensor.h`)
 
 Derive your class from `SingleEndpoint` (or `DeviceInterface` if managing
-composite / multi-endpoint devices). Require all mandatory delegates as references in the constructor
-and declare public getters to expose the underlying clusters:
+composite / multi-endpoint devices). Require all mandatory delegates as
+references in the constructor and declare public getters to expose the
+underlying clusters:
 
 ```cpp
 #pragma once
