@@ -361,9 +361,7 @@
         "TEMPERATURE_CONTROL_CLUSTER": ["temperature-control-server"],
         "TEMPERATURE_MEASUREMENT_CLUSTER": ["temperature-measurement-server"],
         "THERMOSTAT_CLUSTER": ["thermostat-server"],
-        "THERMOSTAT_MODE_CLUSTER": [
-            "mode-base-server"
-        ],
+        "THERMOSTAT_MODE_CLUSTER": ["mode-base-server"],
         "THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER": [
             "thermostat-user-interface-configuration-server"
         ],
