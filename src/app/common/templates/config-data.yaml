@@ -25,6 +25,7 @@ CommandHandlerInterfaceOnlyClusters:
     # keep-sorted start
     - Camera AV Settings User Level Management
     - Commodity Tariff
+    - Electrical Alarm
     - Electrical Distribution
     - Electrical Energy Measurement
     - Joint Fabric Administrator
@@ -93,6 +94,7 @@ CodeDrivenClusters:
     - Administrator Commissioning
     - Air Quality
     - Ambient Context Sensing
+    - Audio Control
     - Basic Information
     - Binding
     - Boolean State
@@ -112,6 +114,7 @@ CodeDrivenClusters:
     - Dishwasher Alarm
     - Dishwasher Mode
     - Dynamic Lighting
+    - Electrical Alarm
     - Electrical Power Measurement
     - Electrical Protection Alarm
     - Energy EVSE

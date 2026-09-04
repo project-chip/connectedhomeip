@@ -58,7 +58,7 @@ SetpointLimits<AbsoluteSetpoint> Setpoints::GetLimits(SystemModeEnum mode)
     }
 }
 
-bool Setpoints::Valid()
+bool Setpoints::Valid() const
 {
     if (heatSupported)
     {

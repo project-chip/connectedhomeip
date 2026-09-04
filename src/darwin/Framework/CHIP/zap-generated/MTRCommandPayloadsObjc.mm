@@ -27988,8 +27988,6 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
         _bandwidth = nil;
 
-        _securityMode = @(0);
-
         _trigger = [MTRProximityRangingClusterRangingTriggerConditionStruct new];
 
         _reportingCondition = nil;
@@ -28009,7 +28007,6 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.bltChannelSoundingDeviceRoleConfig = self.bltChannelSoundingDeviceRoleConfig;
     other.frequencyBand = self.frequencyBand;
     other.bandwidth = self.bandwidth;
-    other.securityMode = self.securityMode;
     other.trigger = self.trigger;
     other.reportingCondition = self.reportingCondition;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -28020,7 +28017,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: technology:%@; wiFiRangingDeviceRoleConfig:%@; bleRangingDeviceRoleConfig:%@; bltChannelSoundingDeviceRoleConfig:%@; frequencyBand:%@; bandwidth:%@; securityMode:%@; trigger:%@; reportingCondition:%@; >", NSStringFromClass([self class]), _technology, _wiFiRangingDeviceRoleConfig, _bleRangingDeviceRoleConfig, _bltChannelSoundingDeviceRoleConfig, _frequencyBand, _bandwidth, _securityMode, _trigger, _reportingCondition];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: technology:%@; wiFiRangingDeviceRoleConfig:%@; bleRangingDeviceRoleConfig:%@; bltChannelSoundingDeviceRoleConfig:%@; frequencyBand:%@; bandwidth:%@; trigger:%@; reportingCondition:%@; >", NSStringFromClass([self class]), _technology, _wiFiRangingDeviceRoleConfig, _bleRangingDeviceRoleConfig, _bltChannelSoundingDeviceRoleConfig, _frequencyBand, _bandwidth, _trigger, _reportingCondition];
     return descriptionString;
 }
 
@@ -28040,10 +28037,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             auto & definedValue_0 = encodableStruct.wiFiRangingDeviceRoleConfig.Emplace();
             definedValue_0.role = static_cast<std::remove_reference_t<decltype(definedValue_0.role)>>(self.wiFiRangingDeviceRoleConfig.role.unsignedCharValue);
             definedValue_0.peerWiFiDevIK = AsByteSpan(self.wiFiRangingDeviceRoleConfig.peerWiFiDevIK);
-            if (self.wiFiRangingDeviceRoleConfig.pmk != nil) {
-                auto & definedValue_2 = definedValue_0.pmk.Emplace();
-                definedValue_2 = AsByteSpan(self.wiFiRangingDeviceRoleConfig.pmk);
-            }
+            definedValue_0.pmk = AsByteSpan(self.wiFiRangingDeviceRoleConfig.pmk);
         }
     }
     {
@@ -28051,6 +28045,11 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             auto & definedValue_0 = encodableStruct.BLERangingDeviceRoleConfig.Emplace();
             definedValue_0.role = static_cast<std::remove_reference_t<decltype(definedValue_0.role)>>(self.bleRangingDeviceRoleConfig.role.unsignedCharValue);
             definedValue_0.peerBLEDeviceID = self.bleRangingDeviceRoleConfig.peerBLEDeviceID.unsignedLongLongValue;
+            definedValue_0.BLERBCSecurityMode = static_cast<std::remove_reference_t<decltype(definedValue_0.BLERBCSecurityMode)>>(self.bleRangingDeviceRoleConfig.blerbcSecurityMode.unsignedCharValue);
+            if (self.bleRangingDeviceRoleConfig.sessionKey != nil) {
+                auto & definedValue_2 = definedValue_0.sessionKey.Emplace();
+                definedValue_2 = AsByteSpan(self.bleRangingDeviceRoleConfig.sessionKey);
+            }
         }
     }
     {
@@ -28062,14 +28061,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 auto & definedValue_2 = definedValue_0.BLTCSMode.Emplace();
                 definedValue_2 = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(self.bltChannelSoundingDeviceRoleConfig.bltcsMode.unsignedCharValue);
             }
-            if (self.bltChannelSoundingDeviceRoleConfig.bltcsSecurityLevel != nil) {
-                auto & definedValue_2 = definedValue_0.BLTCSSecurityLevel.Emplace();
-                definedValue_2 = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(self.bltChannelSoundingDeviceRoleConfig.bltcsSecurityLevel.unsignedCharValue);
-            }
-            if (self.bltChannelSoundingDeviceRoleConfig.ltk != nil) {
-                auto & definedValue_2 = definedValue_0.ltk.Emplace();
-                definedValue_2 = AsByteSpan(self.bltChannelSoundingDeviceRoleConfig.ltk);
-            }
+            definedValue_0.BLTCSSecurityLevel = static_cast<std::remove_reference_t<decltype(definedValue_0.BLTCSSecurityLevel)>>(self.bltChannelSoundingDeviceRoleConfig.bltcsSecurityLevel.unsignedCharValue);
+            definedValue_0.ltk = AsByteSpan(self.bltChannelSoundingDeviceRoleConfig.ltk);
         }
     }
     {
@@ -28083,9 +28076,6 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             auto & definedValue_0 = encodableStruct.bandwidth.Emplace();
             definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.bandwidth.unsignedIntValue);
         }
-    }
-    {
-        encodableStruct.securityMode = static_cast<std::remove_reference_t<decltype(encodableStruct.securityMode)>>(self.securityMode.unsignedCharValue);
     }
     {
         encodableStruct.trigger.startTime = self.trigger.startTime.unsignedIntValue;
@@ -28156,9 +28146,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     if (self = [super init]) {
 
-        _resultCode = @(0);
-
-        _sessionID = nil;
+        _sessionID = @(0);
     }
     return self;
 }
@@ -28167,7 +28155,6 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     auto other = [[MTRProximityRangingClusterStartRangingResponseParams alloc] init];
 
-    other.resultCode = self.resultCode;
     other.sessionID = self.sessionID;
 
     return other;
@@ -28175,7 +28162,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: resultCode:%@; sessionID:%@; >", NSStringFromClass([self class]), _resultCode, _sessionID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; >", NSStringFromClass([self class]), _sessionID];
     return descriptionString;
 }
 
@@ -28236,14 +28223,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ProximityRanging::Commands::StartRangingResponse::DecodableType &)decodableStruct
 {
     {
-        self.resultCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.resultCode)];
-    }
-    {
-        if (decodableStruct.sessionID.IsNull()) {
-            self.sessionID = nil;
-        } else {
-            self.sessionID = [NSNumber numberWithUnsignedChar:decodableStruct.sessionID.Value()];
-        }
+        self.sessionID = [NSNumber numberWithUnsignedChar:decodableStruct.sessionID];
     }
     return CHIP_NO_ERROR;
 }
