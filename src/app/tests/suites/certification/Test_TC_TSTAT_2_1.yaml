@@ -729,4 +729,3 @@ tests:
       response:
           constraints:
               type: boolean
-
