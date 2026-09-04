@@ -65,7 +65,7 @@ Alchemy: v1.7.10
     <attribute code="0x0000" side="server" name="UnionName" define="UNION_NAME" type="char_string" length="128" writable="true" minLength="1"/>
     <attribute code="0x0001" side="server" name="UnionHealth" define="UNION_HEALTH" type="UnionHealthEnum" max="0x02"/>
     <attribute code="0x0002" side="server" name="UnionContributorList" define="UNION_CONTRIBUTOR_LIST" type="array" entryType="UnionContributorStruct" length="128" minLength="1"/>
-    <event code="0x0000" name="UnionContributorAdded" priority="info" side="server">
+    <event code="0x0000" name="UnionContributorAdded" priority="info" side="server" isFabricSensitive="true">
       <field id="0" name="AddedContributor" type="UnionContributorStruct" array="true" length="128" minLength="1"/>
       <description>This event SHALL be generated when there is a new addition to the UnionContributorList.</description>
       <otherwiseConform>
@@ -74,7 +74,7 @@ Alchemy: v1.7.10
       </otherwiseConform>
     </event>
 
-    <event code="0x0001" name="UnionContributorRemoved" priority="info" side="server">
+    <event code="0x0001" name="UnionContributorRemoved" priority="info" side="server" isFabricSensitive="true">
       <field id="0" name="RemovedContributor" type="UnionContributorStruct" array="true" length="128" minLength="1"/>
       <description>This event SHALL be generated whenever ambient sensing union contributors are removed from the UnionContributorList.</description>
       <otherwiseConform>
@@ -83,7 +83,7 @@ Alchemy: v1.7.10
       </otherwiseConform>
     </event>
 
-    <event code="0x0002" name="UnionContributorStatusChanged" priority="info" side="server">
+    <event code="0x0002" name="UnionContributorStatusChanged" priority="info" side="server" isFabricSensitive="true">
       <field id="0" name="ContributorStatusChange" type="ContributorStatusChangeStruct" array="true" length="128" minLength="1"/>
       <description>This event SHALL be generated whenever the operational status of an ambient sensing union contributor changes.</description>
       <otherwiseConform>

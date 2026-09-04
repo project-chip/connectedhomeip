@@ -9353,16 +9353,19 @@ provisional cluster AmbientSensingUnion = 1074 {
     fabric_idx fabricIndex = 254;
   }
 
-  provisional info event UnionContributorAdded = 0 {
+  provisional fabric_sensitive info event UnionContributorAdded = 0 {
     UnionContributorStruct addedContributor[] = 0;
+    fabric_idx fabricIndex = 254;
   }
 
-  provisional info event UnionContributorRemoved = 1 {
+  provisional fabric_sensitive info event UnionContributorRemoved = 1 {
     UnionContributorStruct removedContributor[] = 0;
+    fabric_idx fabricIndex = 254;
   }
 
-  provisional info event UnionContributorStatusChanged = 2 {
+  provisional fabric_sensitive info event UnionContributorStatusChanged = 2 {
     ContributorStatusChangeStruct contributorStatusChange[] = 0;
+    fabric_idx fabricIndex = 254;
   }
 
   attribute char_string<128> unionName = 0;
