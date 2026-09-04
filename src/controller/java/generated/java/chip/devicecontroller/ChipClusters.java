@@ -40192,6 +40192,8 @@ public class ChipClusters {
     private static final long THERMOSTAT_SUGGESTIONS_ATTRIBUTE_ID = 84L;
     private static final long CURRENT_THERMOSTAT_SUGGESTION_ATTRIBUTE_ID = 85L;
     private static final long THERMOSTAT_SUGGESTION_NOT_FOLLOWING_REASON_ATTRIBUTE_ID = 86L;
+    private static final long CRITICAL_FREEZE_PROTECTION_ATTRIBUTE_ID = 87L;
+    private static final long CRITICAL_OVERHEAT_PROTECTION_ATTRIBUTE_ID = 88L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -42520,6 +42522,58 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, THERMOSTAT_SUGGESTION_NOT_FOLLOWING_REASON_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readCriticalFreezeProtectionAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CRITICAL_FREEZE_PROTECTION_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CRITICAL_FREEZE_PROTECTION_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeCriticalFreezeProtectionAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CRITICAL_FREEZE_PROTECTION_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CRITICAL_FREEZE_PROTECTION_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readCriticalOverheatProtectionAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CRITICAL_OVERHEAT_PROTECTION_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CRITICAL_OVERHEAT_PROTECTION_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeCriticalOverheatProtectionAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CRITICAL_OVERHEAT_PROTECTION_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CRITICAL_OVERHEAT_PROTECTION_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

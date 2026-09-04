@@ -75,6 +75,11 @@ OptionalAttributes BaseIntegrationDelegate::GetOptionalAttributes(EndpointId end
     optionalAttributes.SetpointHoldExpiryTimestamp =
         emberAfContainsAttribute(endpointId, Thermostat::Id, SetpointHoldExpiryTimestamp::Id);
     optionalAttributes.OutdoorTemperature = emberAfContainsAttribute(endpointId, Thermostat::Id, OutdoorTemperature::Id);
+    optionalAttributes.CriticalFreezeProtection = features.Has(Thermostat::Feature::kHeating) &&
+        emberAfContainsAttribute(endpointId, Thermostat::Id, CriticalFreezeProtection::Id);
+    optionalAttributes.CriticalOverheatProtection = features.Has(Thermostat::Feature::kCooling) &&
+        emberAfContainsAttribute(endpointId, Thermostat::Id, CriticalOverheatProtection::Id);
+
     return optionalAttributes;
 }
 

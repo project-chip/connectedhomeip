@@ -376,3 +376,15 @@ Protocols::InteractionModel::Status ThermostatSetpointsDelegate::SetUnoccupiedHe
     changed                    = true;
     return Status::Success;
 }
+
+Protocols::InteractionModel::Status ThermostatSetpointsDelegate::GetCriticalFreezeProtection(bool & enabled) const
+{
+    enabled = mCriticalFreezeProtection;
+    return Status::Success;
+}
+
+Protocols::InteractionModel::Status ThermostatSetpointsDelegate::GetCriticalOverheatProtection(bool & enabled) const
+{
+    enabled = mCriticalOverheatProtection;
+    return Status::Success;
+}

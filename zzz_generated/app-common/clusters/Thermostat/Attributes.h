@@ -828,6 +828,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ThermostatSuggestionNotFollowingReason
+namespace CriticalFreezeProtection {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CriticalFreezeProtection::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CriticalFreezeProtection
+namespace CriticalOverheatProtection {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CriticalOverheatProtection::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CriticalOverheatProtection
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -947,6 +971,8 @@ struct TypeInfo
         Attributes::ThermostatSuggestions::TypeInfo::DecodableType thermostatSuggestions;
         Attributes::CurrentThermostatSuggestion::TypeInfo::DecodableType currentThermostatSuggestion;
         Attributes::ThermostatSuggestionNotFollowingReason::TypeInfo::DecodableType thermostatSuggestionNotFollowingReason;
+        Attributes::CriticalFreezeProtection::TypeInfo::DecodableType criticalFreezeProtection     = static_cast<bool>(0);
+        Attributes::CriticalOverheatProtection::TypeInfo::DecodableType criticalOverheatProtection = static_cast<bool>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

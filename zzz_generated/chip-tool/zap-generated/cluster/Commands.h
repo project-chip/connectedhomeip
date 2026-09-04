@@ -10126,6 +10126,8 @@ private:
 | * ThermostatSuggestions                                             | 0x0054 |
 | * CurrentThermostatSuggestion                                       | 0x0055 |
 | * ThermostatSuggestionNotFollowingReason                            | 0x0056 |
+| * CriticalFreezeProtection                                          | 0x0057 |
+| * CriticalOverheatProtection                                        | 0x0058 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -29312,7 +29314,11 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, "current-thermostat-suggestion", Attributes::CurrentThermostatSuggestion::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "thermostat-suggestion-not-following-reason",
-                                   Attributes::ThermostatSuggestionNotFollowingReason::Id, credsIssuerConfig),             //
+                                   Attributes::ThermostatSuggestionNotFollowingReason::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "critical-freeze-protection", Attributes::CriticalFreezeProtection::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "critical-overheat-protection", Attributes::CriticalOverheatProtection::Id,
+                                   credsIssuerConfig),                                                                     //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -29494,6 +29500,10 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
             chip::BitMask<chip::app::Clusters::Thermostat::ThermostatSuggestionNotFollowingReasonBitmap>>>>(
             Id, "thermostat-suggestion-not-following-reason", 0, UINT16_MAX, Attributes::ThermostatSuggestionNotFollowingReason::Id,
             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "critical-freeze-protection", 0, 1, Attributes::CriticalFreezeProtection::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "critical-overheat-protection", 0, 1, Attributes::CriticalOverheatProtection::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -29593,7 +29603,11 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeAttribute>(Id, "current-thermostat-suggestion", Attributes::CurrentThermostatSuggestion::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "thermostat-suggestion-not-following-reason",
-                                        Attributes::ThermostatSuggestionNotFollowingReason::Id, credsIssuerConfig),             //
+                                        Attributes::ThermostatSuggestionNotFollowingReason::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "critical-freeze-protection", Attributes::CriticalFreezeProtection::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "critical-overheat-protection", Attributes::CriticalOverheatProtection::Id,
+                                        credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
