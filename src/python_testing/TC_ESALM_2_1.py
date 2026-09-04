@@ -133,9 +133,13 @@ class TC_ESALM_2_1(MatterBaseTest):
         if supported & 0x4000:
             asserts.assert_true(
                 has_powerexp, "PowerExported bit (0x4000) set in Supported but POWEREXP feature absent from FeatureMap")
-        defined_supported_bits = 0x1 | 0x2 | 0x4 | 0x8 | 0x10 | 0x20 | 0x40 | 0x80 | 0x2000 | 0x4000
+        # All fifteen AlarmBitmap bits (0x0-0x14 => 0x7FFF) are P, O.b+ with no feature
+        # conformance, so a DUT may declare any of them, including the five without a feature
+        # (FrequencyQuality, VoltageQuality, SwappedPolarity, LossOfMeasurement, LossOfGridPower).
+        # Only bits 15 and up are reserved.
+        defined_supported_bits = 0x7FFF
         asserts.assert_equal(int(supported) & ~defined_supported_bits, 0,
-                             "Supported has bits set outside the defined ESALM alarm positions")
+                             "Supported has reserved bits (15+) set outside the defined ESALM AlarmBitmap")
 
         self.step(4, "TH reads Mask attribute",
                   expectation="DUT returns AlarmBitmap. Every bit set in Mask is also set in Supported.")
