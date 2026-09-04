@@ -38,15 +38,45 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly, assign) BOOL isInternallyCreated;
 
+// The commissioning identifier this operation was constructed with (the
+// random "future node ID" we use to track the commissioning flow before the
+// commissionee has been assigned a real node ID).  Exposed so callers like
+// MTRDeviceController_Concrete that need to drive cancellation against this
+// commissioning have something to pass to StopPairing without reaching into
+// private ivars.
+@property (nonatomic, readonly, copy) NSNumber * commissioningID;
+
 // True if the commissioning is waiting to resume after PASE has been
 // established and the delegate chose to be notified about that.
 //
 // This is currently only true if isInternallyCreated, and is readwrite because
 // MTRDeviceController_Concrete helps maintain this state.
 //
-// This property should generally be written on client queues only, not on the
-// Matter queue.
+// Threading: reads and writes go through the property, which is internally
+// guarded by an os_unfair_lock so the value the setter just wrote is
+// observable to a synchronous reader on any queue.  The paired post-PASE
+// watchdog timer (an internal implementation detail) is owned by the
+// operation's _delegateQueue; the setter clears the flag synchronously and
+// bounces the watchdog teardown side effect onto _delegateQueue.  The
+// watchdog event_handler consults isWaitingAfterPASEEstablished as a
+// late-fire guard to avoid a spurious CHIP_ERROR_TIMEOUT when the client
+// has legitimately advanced past the post-PASE waiting state but a timer
+// block was already enqueued ahead of the cancel.
 @property (nonatomic, readwrite, assign) BOOL isWaitingAfterPASEEstablished;
+
+// Synchronously tear down the post-PASE watchdog timer.  Safe to call from
+// any queue (the helper is internally lock-guarded).  Exposed for
+// MTRDeviceController_Concrete's implicit-cancel path in
+// -setupCommissioningSessionWithPayload:newNodeID:error:, which must guarantee
+// that no leftover watchdog timer block can fire on _delegateQueue AFTER the
+// new attempt's MATTER_LOG_METRIC_BEGIN(kMetricDeviceCommissioning) -- the
+// timer's event_handler routes through -_dispatchCommissioningError, which
+// would otherwise end the NEW attempt's metric span and corrupt telemetry.
+//
+// The setter on isWaitingAfterPASEEstablished bounces the watchdog teardown
+// onto _delegateQueue via dispatch_async, so simply flipping the flag does
+// not provide a synchronous guarantee.  This helper does.
+- (void)_syncCancelPostPASEWatchdog;
 
 @end
 
