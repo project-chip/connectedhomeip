@@ -197,6 +197,7 @@ matter_structs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ProximityRangingClusterBLERangingDeviceRoleConfigStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ProximityRangingClusterRangingCapabilitiesStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ProximityRangingClusterRangingConstraintStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ProximityRangingClusterRangingMeasurementDataStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ProximityRangingClusterRangingTriggerConditionStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ProximityRangingClusterRDRStruct.kt",

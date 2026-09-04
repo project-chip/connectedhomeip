@@ -207,3 +207,24 @@ CHIP_ERROR DishwasherManager::RequestConstraintBasedForecast(
     // Currently not implemented by our dishwasher app
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
+
+CHIP_ERROR DishwasherManager::HandleDeviceEnergyManagementPowerRangeAdjustRequest(const DataModel::Nullable<int64_t> minPower,
+                                                                                  const DataModel::Nullable<int64_t> maxPower,
+                                                                                  const uint32_t durationS,
+                                                                                  AdjustmentCauseEnum cause)
+{
+    // Currently not implemented by our dishwasher app
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DishwasherManager::HandleDeviceEnergyManagementPowerRangeAdjustCompletion()
+{
+    // Currently not implemented by our dishwasher app
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR DishwasherManager::HandleDeviceEnergyManagementCancelPowerRangeAdjustRequest(CauseEnum cause)
+{
+    // Currently not implemented by our dishwasher app
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}

@@ -22,14 +22,16 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/BitMask.h>
 
 namespace chip::app::Clusters::PowerTopology {
 
-/// Create and register the Power Topology cluster on `endpointId` with the TreeTopology feature.
-/// Call from ApplicationInit().
-CHIP_ERROR PowerTopologyInit(EndpointId endpointId);
+/// Create and register the Power Topology cluster on `endpointId` with `features`.
+/// The app instantiates this cluster on more than one endpoint, and the two carry different
+/// feature sets, so the caller chooses. Call from ApplicationInit().
+CHIP_ERROR PowerTopologyInit(EndpointId endpointId, BitMask<Feature> features);
 
-/// Unregister and destroy the cluster. Call from ApplicationShutdown().
+/// Unregister and destroy every instance. Call from ApplicationShutdown().
 void PowerTopologyShutdown();
 
 } // namespace chip::app::Clusters::PowerTopology

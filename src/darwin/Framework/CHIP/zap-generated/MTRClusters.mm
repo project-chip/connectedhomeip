@@ -17577,6 +17577,11 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeProximityRangingID) attributeID:@(MTRAttributeIDTypeClusterProximityRangingAttributeSessionIDListID) params:params];
 }
 
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRangingConstraintsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeProximityRangingID) attributeID:@(MTRAttributeIDTypeClusterProximityRangingAttributeRangingConstraintsID) params:params];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeProximityRangingID) attributeID:@(MTRAttributeIDTypeClusterProximityRangingAttributeGeneratedCommandListID) params:params];
