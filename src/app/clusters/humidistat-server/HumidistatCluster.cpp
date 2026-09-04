@@ -469,9 +469,9 @@ CHIP_ERROR HumidistatCluster::SetMode(Humidistat::ModeEnum mode)
     {
         if (mContext != nullptr)
         {
-            uint8_t value = static_cast<uint8_t>(mMode);
-            LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-                ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Mode::Id), { &value, sizeof(value) }));
+            AttributePersistence attrPersistence{ mContext->attributeStorage };
+            LogErrorOnFailure(
+                attrPersistence.StoreNativeEndianValue(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Mode::Id), mMode));
         }
 
         if (mDelegate != nullptr)
@@ -493,9 +493,9 @@ CHIP_ERROR HumidistatCluster::SetSystemState(Humidistat::SystemStateEnum systemS
     VerifyOrReturnValue(SetAttributeValue(mSystemState, systemState, SystemState::Id), CHIP_NO_ERROR);
     if (mContext != nullptr)
     {
-        uint8_t value = static_cast<uint8_t>(mSystemState);
-        LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, SystemState::Id), { &value, sizeof(value) }));
+        AttributePersistence attrPersistence{ mContext->attributeStorage };
+        LogErrorOnFailure(attrPersistence.StoreNativeEndianValue(
+            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, SystemState::Id), mSystemState));
     }
 
     if (mDelegate != nullptr)
@@ -540,9 +540,9 @@ CHIP_ERROR HumidistatCluster::SetUserSetpoint(chip::Percent userSetpoint)
 
     if (mContext != nullptr)
     {
-        uint8_t value = mUserSetpoint;
-        LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, UserSetpoint::Id), { &value, sizeof(value) }));
+        AttributePersistence attrPersistence{ mContext->attributeStorage };
+        LogErrorOnFailure(attrPersistence.StoreNativeEndianValue(
+            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, UserSetpoint::Id), mUserSetpoint));
     }
 
     if (mDelegate != nullptr)

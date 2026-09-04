@@ -22,6 +22,8 @@ out/
 /scripts/setup/silabs/.install-packages-done
 /third_party/silabs/simplicity_sdk
 /third_party/silabs/wifi_sdk
+/scripts/py_matter_idl/build/
+/scripts/py_matter_yamltests/build/
 
 # Pigweed Environment
 .environment*/

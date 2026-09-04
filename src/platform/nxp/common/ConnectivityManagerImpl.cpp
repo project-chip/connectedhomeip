@@ -693,12 +693,12 @@ void ConnectivityManagerImpl::UnlockThreadStack()
     ThreadStackMgrImpl().UnlockThreadStack();
 }
 
-Inet::InterfaceId ConnectivityManagerImpl::GetThreadInterface()
+Inet::InterfaceId ConnectivityManagerImpl::_GetThreadInterface()
 {
     return sInstance.mThreadNetIf;
 }
 
-Inet::InterfaceId ConnectivityManagerImpl::GetExternalInterface()
+Inet::InterfaceId ConnectivityManagerImpl::_GetExternalInterface()
 {
     return sInstance.mExternalNetIf;
 }

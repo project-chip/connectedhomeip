@@ -101,9 +101,10 @@ void WindowCoveringCluster::SetNumberOfActuationsLift(uint16_t numOfLifts)
     VerifyOrReturn(SetAttributeValue(mNumberOfActuationsLift, numOfLifts, Attributes::NumberOfActuationsLift::Id));
     VerifyOrReturn(mContext != nullptr);
 
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
         ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::NumberOfActuationsLift::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&mNumberOfActuationsLift), sizeof(mNumberOfActuationsLift))));
+        mNumberOfActuationsLift));
 }
 
 void WindowCoveringCluster::SetNumberOfActuationsTilt(uint16_t numOfTilts)
@@ -111,9 +112,10 @@ void WindowCoveringCluster::SetNumberOfActuationsTilt(uint16_t numOfTilts)
     VerifyOrReturn(SetAttributeValue(mNumberOfActuationsTilt, numOfTilts, Attributes::NumberOfActuationsTilt::Id));
     VerifyOrReturn(mContext != nullptr);
 
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
         ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::NumberOfActuationsTilt::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&mNumberOfActuationsTilt), sizeof(mNumberOfActuationsTilt))));
+        mNumberOfActuationsTilt));
 }
 
 void WindowCoveringCluster::SetConfigStatus(chip::BitMask<ConfigStatus> status)
@@ -122,9 +124,9 @@ void WindowCoveringCluster::SetConfigStatus(chip::BitMask<ConfigStatus> status)
     VerifyOrReturn(mContext != nullptr);
 
     uint8_t rawConfigStatus = mConfigStatus.Raw();
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-        ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::ConfigStatus::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&rawConfigStatus), sizeof(rawConfigStatus))));
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::ConfigStatus::Id), rawConfigStatus));
 }
 
 NPercent WindowCoveringCluster::PercentFromPercent100ths(NPercent100ths percent100ths)
@@ -193,12 +195,10 @@ void WindowCoveringCluster::SetCurrentPositionLiftPercent100ths(NPercent100ths c
 
     VerifyOrReturn(mContext != nullptr);
 
-    NumericAttributeTraits<Percent100ths>::StorageType storageValue;
-    DataModel::NullableToStorage(curLiftPercent100ths, storageValue);
-
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
         ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::CurrentPositionLiftPercent100ths::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))));
+        curLiftPercent100ths));
 
     OperationalState opLift = static_cast<OperationalState>(mOperationalStatus.GetField(OperationalStatus::kLift));
     if ((OperationalState::Stall != opLift) && (mCurrentPositionLiftPercent100ths == mTargetPositionLiftPercent100ths))
@@ -222,12 +222,10 @@ void WindowCoveringCluster::SetCurrentPositionTiltPercent100ths(NPercent100ths c
 
     VerifyOrReturn(mContext != nullptr);
 
-    NumericAttributeTraits<Percent100ths>::StorageType storageValue;
-    DataModel::NullableToStorage(curTiltPercent100ths, storageValue);
-
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
         ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::CurrentPositionTiltPercent100ths::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))));
+        curTiltPercent100ths));
 
     OperationalState opTilt = static_cast<OperationalState>(mOperationalStatus.GetField(OperationalStatus::kTilt));
     if ((OperationalState::Stall != opTilt) && (mCurrentPositionTiltPercent100ths == mTargetPositionTiltPercent100ths))
@@ -248,9 +246,9 @@ void WindowCoveringCluster::SetMode(chip::BitMask<Mode> mode)
     if (mContext != nullptr)
     {
         uint8_t rawMode = mMode.Raw();
-        LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-            ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::Mode::Id),
-            ByteSpan(reinterpret_cast<const uint8_t *>(&rawMode), sizeof(rawMode))));
+        AttributePersistence attributePersistence(mContext->attributeStorage);
+        LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
+            ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::Mode::Id), rawMode));
     }
 
     chip::BitMask<ConfigStatus> newStatus = mConfigStatus;

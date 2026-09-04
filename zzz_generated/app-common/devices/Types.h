@@ -374,6 +374,11 @@ constexpr DataModel::DeviceTypeEntry kDoorbell = {
     .deviceTypeRevision = kDoorbellDeviceTypeRevision,
 };
 
+constexpr DataModel::DeviceTypeEntry kAvAnalysisNode = {
+    .deviceTypeId       = kAvAnalysisNodeDeviceTypeId,
+    .deviceTypeRevision = kAvAnalysisNodeDeviceTypeRevision,
+};
+
 constexpr DataModel::DeviceTypeEntry kAmbientContextSensor = {
     .deviceTypeId       = kAmbientContextSensorDeviceTypeId,
     .deviceTypeRevision = kAmbientContextSensorDeviceTypeRevision,

@@ -45,7 +45,7 @@ from support_modules.idm_support import IDMBaseTest, client_cmd, get_all_cmds_fo
 import matter.clusters as Clusters
 import matter.discovery as Discovery
 import matter.testing.matchers as matchers
-from matter import ChipUtility
+from matter import ChipUtility, im_capture
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
@@ -238,22 +238,23 @@ class TC_IDM_1_2(IDMBaseTest):
                             "Unexpected response type from ArmFailSafe")
 
         self.print_step(7, "Send a command with suppress Response")
-        # NOTE: This is out of scope currently due to https://github.com/project-chip/connectedhomeip/issues/8043
-        # We perform this step, but the DUT will likely incorrectly send a response
-        # Sending this command at least ensures the DUT doesn't crash with this flag set, even if the behvaior is not correct
+        im_capture.SetObserver(self.default_controller)
+        im_capture.Reset()
 
         # Lucky candidate ArmFailSafe is at it again - command side effect is to set breadcrumb attribute
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=2)
         try:
             await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd, suppressResponse=True)
-            # TODO: Once the above issue is resolved, this needs a check to ensure that (always) no response was received.
-        except ChipStackError:  # chipstack-ok: Using try/except to validate DUT behavior without failing the test on expected errors, assert_raises would fail the test
-            log.info("DUT correctly supressed the response")
+        except ChipStackError as e:  # chipstack-ok: Safety handler for unexpected controller errors
+            log.info("SendCommand with suppressResponse=True encountered local exception: %s", e)
 
-        # Verify that the command had the correct side effect even if a response was sent
+        # Verify that the command had the correct side effect on the DUT data model
         breadcrumb = await self.read_single_attribute_check_success(
             cluster=Clusters.GeneralCommissioning, attribute=Clusters.GeneralCommissioning.Attributes.Breadcrumb, endpoint=0)
         asserts.assert_equal(breadcrumb, 2, "Breadcrumb was not correctly set on ArmFailSafe with response suppressed")
+
+        snapshot = im_capture.GetSnapshot()
+        await self.verify_suppress_response_message_count(snapshot, "suppressResponse")
 
         # Cleanup - Unset the failsafe
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)

@@ -13,6 +13,8 @@
 # limitations under the License.
 import("//build_overrides/chip.gni")
 import("${chip_root}/config/standalone/args.gni")
+import(
+    "${chip_root}/examples/all-devices-app/all-devices-common/device-factory/enabled_devices.gni")
 import("${chip_root}/src/platform/silabs/efr32/args.gni")
 
 silabs_sdk_target = get_label_info(":sdk", "label_no_toolchain")

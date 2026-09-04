@@ -44,6 +44,7 @@ buildconfig_header("icd-server-buildconfig") {
     "ICD_REPORT_ON_ENTER_ACTIVE_MODE=${chip_icd_report_on_active_mode}",
     "ICD_MAX_NOTIFICATION_SUBSCRIBERS=${icd_max_notification_subscribers}",
     "CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT=${chip_enable_icd_checkin_on_report_timeout}",
+    "CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH=${chip_enable_icd_defer_activemode_thread_attach}",
   ]
 
   visibility = [ ":icd-server-config" ]

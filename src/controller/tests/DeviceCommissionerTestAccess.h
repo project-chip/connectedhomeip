@@ -19,6 +19,7 @@
 
 #include <app/DeviceProxy.h>
 #include <clusters/IcdManagement/Commands.h>
+#include <clusters/NetworkCommissioning/Commands.h>
 #include <controller/CHIPDeviceController.h>
 
 namespace chip {
@@ -51,6 +52,13 @@ public:
                                       const app::Clusters::IcdManagement::Commands::StayActiveResponse::DecodableType & data)
     {
         Controller::DeviceCommissioner::OnICDManagementStayActiveResponse(commissioner, data);
+    }
+
+    static void
+    OnNetworkConfigResponse(Controller::DeviceCommissioner * commissioner,
+                            const app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data)
+    {
+        Controller::DeviceCommissioner::OnNetworkConfigResponse(commissioner, data);
     }
 
 private:

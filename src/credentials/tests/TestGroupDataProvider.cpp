@@ -877,6 +877,57 @@ TEST_F(TestGroupDataProvider, TestKeySets)
     EXPECT_EQ(CHIP_ERROR_NOT_FOUND, provider->GetKeySet(kFabric2, kKeysetId0, keyset));
 }
 
+TEST_F(TestGroupDataProvider, TestKeySetLoadRejectsExcessiveKeyCount)
+{
+    GroupDataProvider * provider = GetGroupDataProvider();
+    ASSERT_TRUE(provider);
+
+    ResetProvider(provider);
+
+    // Store a well-formed keyset so the fabric's keyset list references kKeysetId3.
+    EXPECT_EQ(provider->SetKeySet(kFabric1, kCompressedFabricId1, kKeySet3), CHIP_NO_ERROR);
+
+    // Overwrite the stored keyset blob with one whose serialized key count exceeds the fixed
+    // operational_keys capacity (KeySet::kEpochKeysMax). Layout mirrors KeySetData::Serialize():
+    // an anonymous structure of { policy (ctx 1), keys_count (ctx 2), credentials array (ctx 3) of
+    // kEpochKeysMax { start_time (ctx 4), key hash (ctx 5), key value (ctx 6) }, next (ctx 7) }.
+    uint8_t blob[256];
+    TLV::TLVWriter writer;
+    writer.Init(blob);
+    {
+        uint8_t epochKey[EpochKey::kLengthBytes];
+        memset(epochKey, 0x42, sizeof(epochKey));
+
+        TLV::TLVType outer;
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(SecurityPolicy::kTrustFirst)), CHIP_NO_ERROR);
+        // Corrupted count, larger than KeySet::kEpochKeysMax.
+        ASSERT_EQ(writer.Put(TLV::ContextTag(2), static_cast<uint16_t>(0xff)), CHIP_NO_ERROR);
+        TLV::TLVType array;
+        ASSERT_EQ(writer.StartContainer(TLV::ContextTag(3), TLV::kTLVType_Array, array), CHIP_NO_ERROR);
+        for (size_t i = 0; i < KeySet::kEpochKeysMax; ++i)
+        {
+            TLV::TLVType item;
+            ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, item), CHIP_NO_ERROR);
+            ASSERT_EQ(writer.Put(TLV::ContextTag(4), static_cast<uint64_t>(0)), CHIP_NO_ERROR);
+            ASSERT_EQ(writer.Put(TLV::ContextTag(5), static_cast<uint16_t>(0)), CHIP_NO_ERROR);
+            ASSERT_EQ(writer.Put(TLV::ContextTag(6), ByteSpan(epochKey)), CHIP_NO_ERROR);
+            ASSERT_EQ(writer.EndContainer(item), CHIP_NO_ERROR);
+        }
+        ASSERT_EQ(writer.EndContainer(array), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::ContextTag(7), static_cast<uint16_t>(0xffff)), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
+    }
+
+    const auto key = DefaultStorageKeyAllocator::FabricKeyset(kFabric1, kKeysetId3);
+    ASSERT_EQ(sDelegate.SyncSetKeyValue(key.KeyName(), blob, static_cast<uint16_t>(writer.GetLengthWritten())), CHIP_NO_ERROR);
+
+    // The corrupted keyset must fail to load rather than exposing keys_count > kEpochKeysMax, which
+    // GroupSessionIteratorImpl::Count() would otherwise use to read past operational_keys.
+    KeySet out;
+    EXPECT_EQ(CHIP_ERROR_NOT_FOUND, provider->GetKeySet(kFabric1, kKeysetId3, out));
+}
+
 TEST_F(TestGroupDataProvider, TestKeySetCacheAndSyncRemap)
 {
     GroupDataProvider * provider = GetGroupDataProvider();

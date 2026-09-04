@@ -577,15 +577,14 @@ TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjects)
         attributePathParams.mClusterId   = Clusters::UnitTesting::Id;
         attributePathParams.mAttributeId = Clusters::UnitTesting::Attributes::Boolean::Id;
 
-        const uint8_t byteSpanData[]     = { 0xde, 0xad, 0xbe, 0xef };
-        static const char charSpanData[] = "a simple test string";
+        const uint8_t byteSpanData[] = { 0xde, 0xad, 0xbe, 0xef };
 
         app::Clusters::UnitTesting::Structs::SimpleStruct::Type dataTx;
         dataTx.a = 12;
         dataTx.b = true;
         dataTx.d = chip::ByteSpan(byteSpanData);
         // Spec A.11.2 strings SHALL NOT include a terminating null character to mark the end of a string.
-        dataTx.e = chip::Span<const char>(charSpanData, strlen(charSpanData));
+        dataTx.e = "a simple test string"_span;
 
         if (encoding == EncodingMethod::Standard)
         {

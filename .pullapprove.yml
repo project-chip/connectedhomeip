@@ -119,14 +119,6 @@ groups:
             teams: [reviewers-cablelabs]
         reviews:
             request: 0 # Do not auto-add
-    shared-reviewers-dyson:
-        type: optional
-        conditions:
-            - files.include('*')
-        reviewers:
-            teams: [reviewers-dyson]
-        reviews:
-            request: 0 # Do not auto-add
     shared-reviewers-espressif:
         type: optional
         conditions:
@@ -183,14 +175,6 @@ groups:
             teams: [reviewers-lg]
         reviews:
             request: 0 # Do not auto-add
-    shared-reviewers-logitech:
-        type: optional
-        conditions:
-            - files.include('*')
-        reviewers:
-            teams: [reviewers-logitech]
-        reviews:
-            request: 0 # Requested to be only on demand
     shared-reviewers-nordic:
         type: optional
         conditions:

@@ -309,6 +309,11 @@ MicrowaveOvenControlCluster::HandleSetCookingParameters(const ConcreteCommandPat
         }
     }
 
+    if (status == Status::Success)
+    {
+        VerifyOrReturnError(SetCookTimeSec(reqCookTimeSec) == CHIP_NO_ERROR, Status::Failure);
+    }
+
     return status;
 }
 
@@ -325,7 +330,12 @@ MicrowaveOvenControlCluster::HandleAddMoreTime(const Commands::AddMoreTime::Deco
                         ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookTime, cookTime value is out of range"));
 
     uint32_t finalCookTimeSec = GetCookTimeSec() + commandData.timeToAdd;
-    return mAppDelegate.HandleModifyCookTimeSecondsCallback(finalCookTimeSec);
+    Status status             = mAppDelegate.HandleModifyCookTimeSecondsCallback(finalCookTimeSec);
+    if (status == Status::Success)
+    {
+        VerifyOrReturnError(SetCookTimeSec(finalCookTimeSec) == CHIP_NO_ERROR, Status::Failure);
+    }
+    return status;
 }
 
 } // namespace chip::app::Clusters

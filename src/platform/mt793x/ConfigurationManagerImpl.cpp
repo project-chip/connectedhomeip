@@ -58,7 +58,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     err = Internal::GenericConfigurationManagerImpl<MT793XConfig>::Init();
     SuccessOrExit(err);
     // TODO: Initialize the global GroupKeyStore object here (#1626)
-    IncreaseBootCount();
+    LogErrorOnFailure(IncreaseBootCount());
 
     // It is possible to configure the possible reset sources with RMU_ResetControl
     // In this case, we keep Reset control at default setting
@@ -68,7 +68,12 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
     {
         ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot; initiating factory reset");
-        InitiateFactoryReset();
+        // Schedule directly instead of through InitiateFactoryReset(): that API returns void, so a
+        // scheduling failure would be invisible here and the pending fail-safe reset would be
+        // silently skipped. Failing Init() blocks startup while the fail-safe flag stays armed, so
+        // the reset is retried on the next boot.
+        err = PlatformMgr().ScheduleWork(DoFactoryReset);
+        SuccessOrExit(err);
     }
     err = CHIP_NO_ERROR;
 
@@ -84,7 +89,10 @@ bool ConfigurationManagerImpl::CanFactoryReset()
 
 void ConfigurationManagerImpl::InitiateFactoryReset()
 {
-    PlatformMgr().ScheduleWork(DoFactoryReset);
+    // The base-class API returns void, so the failure cannot be propagated to Init().
+    // Nothing has been erased at this point, so the fail-safe flag survives and the
+    // reset is retried on the next boot.
+    LogErrorOnFailure(PlatformMgr().ScheduleWork(DoFactoryReset));
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
@@ -97,7 +105,8 @@ CHIP_ERROR ConfigurationManagerImpl::IncreaseBootCount(void)
     uint32_t bootCount = 0;
     if (MT793XConfig::ConfigValueExists(MT793XConfig::kConfigKey_BootCount))
     {
-        GetRebootCount(bootCount);
+        // Do not overwrite a persisted count that could not be read.
+        ReturnErrorOnFailure(GetRebootCount(bootCount));
     }
     return MT793XConfig::WriteConfigValue(MT793XConfig::kConfigKey_BootCount, bootCount + 1);
 }
@@ -225,10 +234,22 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 
-    err = MT793XConfig::FactoryResetConfig();
+    // Erase the KVS (fabrics, operational credentials) before chip-config, which holds
+    // the fail-safe flag: if the erase fails, the flag survives and Init() retries the
+    // factory reset on the next boot instead of rebooting still commissioned.
+    err = PersistedStorage::KeyValueStoreMgrImpl().ErasePartition();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DeviceLayer, "ErasePartition() failed: %" CHIP_ERROR_FORMAT "; fail-safe left armed to retry on next boot",
+                     err.Format());
+    }
+    else
+    {
+        err = MT793XConfig::FactoryResetConfig();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -237,8 +258,6 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     ThreadStackMgr().ErasePersistentInfo();
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-
-    PersistedStorage::KeyValueStoreMgrImpl().ErasePartition();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
     ChipLogProgress(DeviceLayer, "Clearing WiFi provision");

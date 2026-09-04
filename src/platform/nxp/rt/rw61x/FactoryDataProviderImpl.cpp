@@ -166,10 +166,10 @@ CHIP_ERROR FactoryDataProviderImpl::SearchForId(uint8_t searchedType, uint8_t * 
 
 void FactoryDataProviderImpl::UpdateKeyAttributes(psa_key_attributes_t & attrs)
 {
-    if (psa_get_key_lifetime(&attrs) == PSA_KEY_LIFETIME_VOLATILE)
+    if (psa_get_key_lifetime(&attrs) == PSA_KEY_LIFETIME_PERSISTENT)
     {
         psa_set_key_lifetime(&attrs,
-                             PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_VOLATILE,
+                             PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_PERSISTENT,
                                                                             PSA_CRYPTO_ELS_PKC_LOCATION_S50_RFC3394_STORAGE));
     }
 }
@@ -286,6 +286,10 @@ CHIP_ERROR FactoryDataProviderImpl::Init(void)
     }
 
 #endif
+
+    // Import the DAC private key blob into PSA once so that SignWithDacKey()
+    // does not have to import/destroy the key on every signing operation.
+    ReturnErrorOnFailure(ImportDacPrivateKey());
 
     return CHIP_NO_ERROR;
 }

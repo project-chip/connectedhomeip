@@ -16,10 +16,11 @@
 
 
 import logging
+import struct
 import subprocess
 import tempfile
 from os import path
-from time import sleep
+from time import monotonic, sleep
 
 from mobly import asserts
 
@@ -29,6 +30,7 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.apps import OtaImagePath, OTAProviderSubprocess
 from matter.testing.matter_testing import MatterBaseTest
+from matter.tlv import TLVReader
 
 # Type aliases for AccessControl cluster types
 AccessControlCluster = Clusters.AccessControl
@@ -44,6 +46,38 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
     """This is the base test class for SoftwareUpdate Test Cases"""
     current_provider_app_proc: OTAProviderSubprocess | None = None
     provider_app_path: str | None = None
+    _test_budget_deadline: float | None = None
+
+    def start_test_budget_clock(self, safety_margin_sec: float = 30.0) -> None:
+        """Record the overall time budget of the running test body.
+
+        Call at the top of the test body.  The budget is the same value the framework
+        passes to ``asyncio.wait_for`` around the test body (``--timeout`` from the
+        command line, or ``default_timeout``), minus ``safety_margin_sec`` so that waits
+        sized via :meth:`remaining_test_budget_sec` fail with a clear assertion inside
+        the step instead of being cancelled opaquely by ``asyncio.wait_for``.
+
+        Together with :meth:`remaining_test_budget_sec` this lets device-dependent waits
+        (OTA download, firmware apply, BDX recovery) share a single operator-set budget
+        instead of hard-coded per-step timeouts that cannot be known for a real DUT.
+        """
+        total_sec = self.matter_test_config.timeout or self.default_timeout
+        self._test_budget_deadline = monotonic() + total_sec - safety_margin_sec
+        log.info("Test budget clock started: %.0fs total, %.0fs safety margin", total_sec, safety_margin_sec)
+
+    def remaining_test_budget_sec(self, reserve_sec: float = 0.0, minimum_sec: float = 30.0) -> float:
+        """Return the remaining test time budget available for the next wait.
+
+        Args:
+            reserve_sec: Time to keep aside for waits that are still ahead and whose
+                duration is known up front (e.g. spec-mandated minimum query intervals).
+            minimum_sec: Floor for the returned value so a wait never receives a
+                zero/negative timeout — exhausting the budget then fails inside the wait
+                with a descriptive message rather than instantly.
+        """
+        if self._test_budget_deadline is None:
+            asserts.fail("remaining_test_budget_sec() called before start_test_budget_clock()")
+        return max(minimum_sec, self._test_budget_deadline - monotonic() - reserve_sec)
 
     def start_provider(self,
                        provider_app_path: str = "",
@@ -79,8 +113,6 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
         if not path.exists(ota_image_path):
             raise FileNotFoundError(f"Ota image provided does not exists {ota_image_path}")
-
-        # Ota image
         ota_image_path = OtaImagePath(path=ota_image_path)
         # Ideally we send the logs to a fixed location to avoid conflicts
 
@@ -119,7 +151,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             log.warning("Provider process not found. Unable to terminate.")
 
     async def announce_ota_provider(self,
-                                    controller: ChipDeviceCtrl,
+                                    controller: ChipDeviceCtrl.ChipDeviceController,
                                     provider_node_id: int,
                                     requestor_node_id: int,
                                     reason: Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum = Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUpdateAvailable,
@@ -152,10 +184,10 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             node_id=requestor_node_id,
             endpoint=endpoint,
         )
-        log.info("Announce command sent %s", cmd_resp)
+        log.info("AnnounceOTA command sent")
         return cmd_resp
 
-    async def set_default_ota_providers_list(self, controller: ChipDeviceCtrl, provider_node_id: int, requestor_node_id: int, endpoint: int = 0):
+    async def set_default_ota_providers_list(self, controller: ChipDeviceCtrl.ChipDeviceController, provider_node_id: int, requestor_node_id: int, endpoint: int = 0):
         """Write the provider list in the requestor to initiate the Software Update.
 
         Args:
@@ -197,7 +229,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         )
         log.info("OTA Providers List: %s", after_otap_info)
 
-    async def verify_version_applied_basic_information(self, controller: ChipDeviceCtrl, node_id: int, target_version: int):
+    async def verify_version_applied_basic_information(self, controller: ChipDeviceCtrl.ChipDeviceController, node_id: int, target_version: int):
         """Verify the version from the BasicInformationCluster and compares against the provider target version.
 
         Args:
@@ -350,7 +382,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             except Exception as e:
                 asserts.fail(f"Requestor restart failed: {e}")
 
-    async def clear_ota_providers(self, controller: ChipDeviceCtrl, requestor_node_id: int):
+    async def clear_ota_providers(self, controller: ChipDeviceCtrl.ChipDeviceController, requestor_node_id: int):
         """
         Clears the DefaultOTAProviders attribute on the Requestor, leaving it empty.
         Args:
@@ -389,3 +421,62 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                 f"kvs_path_prefix must be an absolute path starting with /tmp/ or /private/tmp/, but was: {real_kvs_path_prefix}")
         subprocess.run(['rm', '-rf', f'{real_kvs_path_prefix}*'])
         log.info("Removed all KVS files/folders with prefix: %s", real_kvs_path_prefix)
+
+    def get_ota_image_software_version(self, ota_image_path: str) -> int:
+        """Parse the OTA image header and return the embedded software version.
+
+        Args:
+            ota_image_path (str): Path to the OTA image file to parse.
+
+        Returns:
+            int: Software version read from the OTA image header (TLV context tag 2).
+        """
+        # Format values taken from src/app/ota_image_tool.py
+        FIXED_HEADER_FORMAT = '<IQI'
+        HEADER_MAGIC = 0x1BEEF11E
+        header_tlv = None
+        version = 0
+        with open(ota_image_path, 'rb') as file:
+            fixed_header = file.read(struct.calcsize(FIXED_HEADER_FORMAT))
+            magic, total_size, header_size = struct.unpack(
+                FIXED_HEADER_FORMAT, fixed_header)
+            if magic != HEADER_MAGIC:
+                asserts.fail("Invalid Ota Image")
+            header_tlv = TLVReader(file.read(header_size)).get()['Any']
+
+        try:
+            # Version has context tag 2
+            version = header_tlv[2]
+        except KeyError:
+            asserts.fail("Unable to retrieve the Software Version from the ota image.")
+
+        return version
+
+    async def check_ota_image_version(self, controller: ChipDeviceCtrl.ChipDeviceController, requestor_node_id: int, ota_image_path: str) -> int:
+        """Verify the OTA image version against the DUT's current software version.
+
+        Reads the software version from the OTA image header and compares it to the
+        SoftwareVersion attribute reported by the DUT, confirming the update can proceed.
+        Fails the test if the OTA image version is not greater than the DUT's current version.
+
+        Args:
+            controller (ChipDeviceCtrl): Controller used to read the DUT's SoftwareVersion attribute.
+            requestor_node_id (int): Node ID of the requestor (DUT) to check the version against.
+            ota_image_path (str): Path to the OTA image file to verify.
+
+        Returns:
+            int: Software version contained in the OTA image, to use as the target update version.
+        """
+
+        ota_version = self.get_ota_image_software_version(ota_image_path=ota_image_path)
+        basicinfo_softwareversion = await self.read_single_attribute_check_success(
+            dev_ctrl=controller,
+            cluster=Clusters.BasicInformation,
+            attribute=Clusters.BasicInformation.Attributes.SoftwareVersion,
+            node_id=requestor_node_id)
+        if ota_version <= basicinfo_softwareversion:
+            asserts.fail(
+                f"Invalid OTA Image with version: {ota_version} to update Device running with version {basicinfo_softwareversion}.")
+
+        log.info("OTA Image version is %s to install on Device with version %s", ota_version, basicinfo_softwareversion)
+        return ota_version

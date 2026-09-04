@@ -54,8 +54,6 @@ static_library("stm32wba") {
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
     "Logging.cpp",
-    "OTAImageProcessorImpl.cpp",
-    "OTAImageProcessorImpl.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "STM32Config.cpp",
@@ -95,6 +93,13 @@ static_library("stm32wba") {
     deps += [
       "${chip_root}/src/app:app_config",
       "${chip_root}/src/lib/dnssd:platform_header",
+    ]
+  }
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.h",
     ]
   }
 

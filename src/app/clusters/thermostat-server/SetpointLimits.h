@@ -19,8 +19,6 @@
 
 #include <algorithm>
 
-#include <app/ConcreteAttributePath.h>
-#include <app/util/attribute-storage.h>
 #include <protocols/interaction_model/Constants.h>
 
 #include "Setpoint.h"

@@ -49,7 +49,7 @@ TEST_F(TestEvseClusterBackwardsCompatibility, TestInstanceLifecycle)
         BitMask<Feature> allFeatures(Feature::kChargingPreferences, Feature::kSoCReporting, Feature::kPlugAndCharge, Feature::kRfid,
                                      Feature::kV2x);
         BitMask<OptionalAttributes> optionalAttrs;
-        BitMask<OptionalCommands> optionalCmds;
+        EnergyEvseCluster::OptionalCommandSet optionalCmds;
 
         Instance instance(kTestEndpointId, mockDelegate, allFeatures, optionalAttrs, optionalCmds);
 
@@ -82,7 +82,7 @@ TEST_F(TestEvseClusterBackwardsCompatibility, TestInstanceLifecycle)
         MockEvseDelegate mockDelegate;
         BitMask<Feature> noFeatures;
         BitMask<OptionalAttributes> optionalAttrs;
-        BitMask<OptionalCommands> optionalCmds;
+        EnergyEvseCluster::OptionalCommandSet optionalCmds;
 
         Instance instance(kTestEndpointId, mockDelegate, noFeatures, optionalAttrs, optionalCmds);
 

@@ -223,13 +223,10 @@ ResourceMonitoringCluster::UpdateLastChangedTime(DataModel::Nullable<uint32_t> a
     static_assert(kAttributeId == HepaFilterMonitoring::Attributes::LastChangedTime::Id);
     static_assert(kAttributeId == ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id);
 
-    NumericAttributeTraits<uint32_t>::StorageType storageValue;
-    DataModel::NullableToStorage(mLastChangedTime, storageValue);
-
-    ReturnValueOnFailure(
-        mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, kAttributeId),
-                                              { reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue) }),
-        Status::Failure);
+    AttributePersistence attrPersistence{ mContext->attributeStorage };
+    ReturnValueOnFailure(attrPersistence.StoreNativeEndianValue(
+                             ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, kAttributeId), mLastChangedTime),
+                         Status::Failure);
     NotifyAttributeChanged(kAttributeId);
 
     return Protocols::InteractionModel::Status::Success;

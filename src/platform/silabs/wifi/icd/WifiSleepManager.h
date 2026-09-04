@@ -59,30 +59,6 @@ public:
      */
     CHIP_ERROR Init(PowerSaveInterface * platformInterface, WifiStateProvider * wifiStateProvider);
 
-    inline void HandleCommissioningSessionStarted()
-    {
-        bool wasCommissioningInProgress = mIsCommissioningInProgress;
-        mIsCommissioningInProgress      = true;
-
-        if (!wasCommissioningInProgress)
-        {
-            // TODO: Remove High Performance Req during commissioning when sleep issues are resolved
-            TEMPORARY_RETURN_IGNORED WifiSleepManager::GetInstance().RequestHighPerformanceWithTransition();
-        }
-    }
-
-    inline void HandleCommissioningSessionStopped()
-    {
-        bool wasCommissioningInProgress = mIsCommissioningInProgress;
-        mIsCommissioningInProgress      = false;
-
-        if (wasCommissioningInProgress)
-        {
-            // TODO: Remove High Performance Req during commissioning when sleep issues are resolved
-            TEMPORARY_RETURN_IGNORED WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
-        }
-    }
-
     /**
      * @brief Public API to request the Wi-Fi chip to transition to High Performance.
      *        Function increases the HighPerformance request counter to prevent the chip from going to sleep
@@ -131,8 +107,8 @@ public:
      *
      *        State machine logic:
      *        1. If there are high performance requests, configure high performance mode.
-     *        2. If commissioning is in progress, configure DTIM based sleep.
-     *        3. If no commissioning is in progress and the device is unprovisioned, configure deep sleep.
+     *        2. If the device is unprovisioned, configure deep sleep.
+     *        3. Otherwise, configure DTIM based sleep.
      *
      * @param event PowerEvent triggering the Verify and transition to low power mode processing
      *
@@ -199,7 +175,6 @@ private:
 
     PowerSaveInterface * mPowerSaveInterface = nullptr;
     WifiStateProvider * mWifiStateProvider   = nullptr;
-    bool mIsCommissioningInProgress          = false;
     uint8_t mHighPerformanceRequestCounter   = 0;
 };
 

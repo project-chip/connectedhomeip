@@ -2805,6 +2805,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRPushAVStreamTransportClusterUpdateMotionZoneOptionsParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRChimeClusterPlayChimeSoundParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;

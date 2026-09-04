@@ -23,6 +23,7 @@
 
 #include "app/server/Server.h"
 #include "platform/CHIPDeviceLayer.h"
+#include <clusters/RefrigeratorAlarm/Events.h>
 #include <lib/support/CodeUtils.h>
 
 constexpr chip::EndpointId kRefEndpointId = REFRIGERATOR_ENDPOINT;
@@ -30,6 +31,7 @@ constexpr chip::EndpointId kRefEndpointId = REFRIGERATOR_ENDPOINT;
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::RefrigeratorAlarm;
 using Shell::Engine;
 using Shell::shell_command_t;
 using Shell::streamer_get;
@@ -150,6 +152,9 @@ CHIP_ERROR RefrigeratorDoorEventHandler(int argc, char ** argv)
 
 CHIP_ERROR RegisterRefrigeratorEvents()
 {
+    // Supported is a fixed attribute: it is loaded from the ZAP default (kDoorOpen) when the
+    // code-driven RefrigeratorAlarm cluster is created. No runtime SetSupportedValue here.
+
     static const shell_command_t sRefrigeratorSubCommands[] = {
         { &RefrigeratorHelpHandler, "help", "Usage: refrigeratoralarm <subcommand>" },
         { &EventRefrigeratorCommandHandler, "event", " Usage: refrigeratoralarm event <subcommand>" },
@@ -187,15 +192,40 @@ void EventWorkerFunction(intptr_t context)
 
     switch (data->eventState)
     {
+    // "suppress" clears the Mask attribute (disables all enabled alarms). AlarmBase also trims
+    // State when Mask shrinks.
     case RefrigeratorAlarm::Events::Notify::Fields::kMask: {
         RefrigeratorAlarmEventData * alarmData = reinterpret_cast<RefrigeratorAlarmEventData *>(context);
-        RefrigeratorAlarmServer::Instance().SetMaskValue(kRefEndpointId, alarmData->doorState);
+        BitMask<AlarmMap> mask(alarmData->doorState);
+        if (RefrigeratorAlarmServer::Instance().SetMaskValue(kRefEndpointId, mask) != Status::Success)
+        {
+            ChipLogError(Zcl, "Failed to set refrigerator alarm mask value");
+        }
         break;
     }
 
+    // "door-state-change" simulates a State update. AlarmBase requires every set bit in State to
+    // be enabled in Mask and Supported, so a door-open (non-zero) update sets Mask first. This
+    // also re-enables monitoring after "suppress" left Mask at zero. A door-close (zero) update
+    // only clears State so Mask stays enabled, unlike "suppress".
     case RefrigeratorAlarm::Events::Notify::Fields::kState: {
         RefrigeratorAlarmEventData * alarmData = reinterpret_cast<RefrigeratorAlarmEventData *>(context);
-        RefrigeratorAlarmServer::Instance().SetStateValue(kRefEndpointId, alarmData->doorState);
+        BitMask<AlarmMap> doorState(alarmData->doorState);
+        if (doorState.Raw() != 0)
+        {
+            if (RefrigeratorAlarmServer::Instance().SetMaskValue(kRefEndpointId, doorState) != Status::Success)
+            {
+                ChipLogError(Zcl, "Failed to set refrigerator alarm mask value");
+            }
+            else if (RefrigeratorAlarmServer::Instance().SetStateValue(kRefEndpointId, doorState) != Status::Success)
+            {
+                ChipLogError(Zcl, "Failed to set refrigerator alarm state value");
+            }
+        }
+        else if (RefrigeratorAlarmServer::Instance().SetStateValue(kRefEndpointId, doorState) != Status::Success)
+        {
+            ChipLogError(Zcl, "Failed to set refrigerator alarm state value");
+        }
         break;
     }
 

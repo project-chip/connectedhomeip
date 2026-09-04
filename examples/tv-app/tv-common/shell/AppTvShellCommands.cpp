@@ -89,7 +89,7 @@ static CHIP_ERROR pairApp(bool printHeader, size_t index)
         TEMPORARY_RETURN_IGNORED Encoding::BytesToUppercaseHexString(state->GetRotatingId(), state->GetRotatingIdLength(),
                                                                      rotatingIdString, sizeof(rotatingIdString));
 
-        CharSpan rotatingIdSpan = CharSpan(rotatingIdString, strlen(rotatingIdString));
+        CharSpan rotatingIdSpan = CharSpan::fromCharString(rotatingIdString);
 
         static const size_t kSetupPinSize = 12;
         char setupPin[kSetupPinSize];
