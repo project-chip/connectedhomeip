@@ -409,23 +409,21 @@ ColorControlCluster::SerializeAdd(EndpointId endpoint,
     }
     ReturnErrorOnFailure(it.GetStatus());
 
-    // The conditions are gated on EnhancedColorMode's value; with no declared mode there is nothing to
-    // enforce here (per-pair type/range is still checked by the validator in the base call below).
     if (mode.has_value())
     {
         switch (static_cast<EnhancedColorModeEnum>(*mode))
         {
         case EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation:
-            VerifyOrReturnError(sawCurrentHue && sawSaturation, CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(sawCurrentHue | sawSaturation, CHIP_ERROR_INVALID_ARGUMENT);
             break;
         case EnhancedColorModeEnum::kCurrentXAndCurrentY:
-            VerifyOrReturnError(sawX && sawY, CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(sawX | sawY, CHIP_ERROR_INVALID_ARGUMENT);
             break;
         case EnhancedColorModeEnum::kColorTemperatureMireds:
             VerifyOrReturnError(sawMireds, CHIP_ERROR_INVALID_ARGUMENT);
             break;
         case EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation:
-            VerifyOrReturnError(sawEnhancedHue && sawSaturation, CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(sawEnhancedHue | sawSaturation, CHIP_ERROR_INVALID_ARGUMENT);
             break;
         default:
             break; // an out-of-range mode value is rejected per-pair by the validator
