@@ -20,7 +20,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${ELECTRICAL_PROTECTION_APP}
 #     app-args: >
 #       --discriminator 1234
 #       --KVS kvs1
@@ -31,8 +31,11 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --endpoint 1
+#       --endpoint 2
 #       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
+#       --string-arg PIXIT.ESALM.TEST_EVENT_TRIGGER_ACTIVE:0x00a1000000000001
+#       --string-arg PIXIT.ESALM.TEST_EVENT_TRIGGER_CLEAR:0x00a1000000000002
+#       --string-arg PIXIT.ESALM.TRIGGERED_BIT:0x1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -239,15 +242,14 @@ class TC_ESALM_3_1(MatterBaseTest):
                 self.mark_current_step_skipped()
 
         self.step(13, "TH sends TestEventTrigger for all-alarms-cleared (0x00A1_0000_0000_0000)",
-                  expectation="SUCCESS. Subscription report received with State = 0 (cleanup).")
-        state_sub.reset()
+                  expectation="SUCCESS. State reads back 0 (cleanup).")
+        # Step 12's Reset has already driven State to 0, so the all-clear trigger changes nothing
+        # and a DUT is not required to report an unchanged value. Read the attribute instead of
+        # waiting on a subscription report that will not arrive.
         await self.send_test_event_triggers(eventTrigger=_TRIGGER_ALL_CLEAR)
-
-        def state_is_zero(report):
-            return report.value == 0
-        state_sub.await_all_expected_report_matches(
-            [AttributeMatcher.from_callable("State = 0 after cleanup trigger", state_is_zero)],
-            timeout_sec=30)
+        final_state = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attrs.State)
+        asserts.assert_equal(int(final_state), 0, "State should be 0 after the cleanup trigger")
 
 
 if __name__ == "__main__":
