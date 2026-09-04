@@ -16,6 +16,7 @@
 
 #include "OOBAccessors.h"
 #include "MountedDimmableLoadControl.h"
+#include <lib/support/CodeUtils.h>
 #include <oob-accessors/clusters/OnOffOOBAccessor.h>
 
 namespace chip::app {

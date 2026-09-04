@@ -22,11 +22,6 @@ namespace chip::app::NamedPipe {
 
 CHIP_ERROR RvcTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry) const
 {
-    if (!json.isObject() || !json.isMember("Name") || !json["Name"].isString())
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
     std::string action = json["Name"].asString();
 
     if (action == "Reset" || action == "Charged" || action == "Charging" || action == "Docked" || action == "ChargerFound" ||
@@ -133,7 +128,7 @@ CHIP_ERROR RvcTranslator::TranslateAndExecute(EndpointId endpointId, const Json:
         return DispatchAction(registry, "RemoveArea"_span, endpointId, *areaId);
     }
 
-    return CHIP_ERROR_INVALID_ARGUMENT;
+    return CHIP_ERROR_NOT_FOUND;
 }
 
 } // namespace chip::app::NamedPipe

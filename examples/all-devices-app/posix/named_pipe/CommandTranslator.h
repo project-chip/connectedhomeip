@@ -125,7 +125,7 @@ public:
     static CHIP_ERROR DispatchStringAction(OOBAccessorRegistry & registry, CharSpan actionName, EndpointId endpointId,
                                            CharSpan value)
     {
-        uint8_t buffer[128];
+        uint8_t buffer[256];
         TLV::TLVWriter writer;
         writer.Init(buffer, sizeof(buffer));
 

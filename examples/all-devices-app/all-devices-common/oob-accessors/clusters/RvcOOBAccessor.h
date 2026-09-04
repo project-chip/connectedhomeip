@@ -39,7 +39,7 @@ public:
     virtual void HandleAreaComplete()                                                                                = 0;
     virtual void HandleClearError()                                                                                  = 0;
     virtual void HandleReset()                                                                                       = 0;
-    virtual void HandleErrorEvent(const std::string & error)                                                         = 0;
+    virtual bool HandleErrorEvent(const std::string & error)                                                         = 0;
     virtual void HandleEmptyingDustBin()                                                                             = 0;
     virtual void HandleCleaningMop()                                                                                 = 0;
     virtual void HandleFillingWaterTank()                                                                            = 0;

@@ -130,7 +130,7 @@ public:
     void HandleAreaComplete() override;
     void HandleClearError() override;
     void HandleReset() override;
-    void HandleErrorEvent(const std::string & error) override;
+    bool HandleErrorEvent(const std::string & error) override;
     void HandleEmptyingDustBin() override;
     void HandleCleaningMop() override;
     void HandleFillingWaterTank() override;

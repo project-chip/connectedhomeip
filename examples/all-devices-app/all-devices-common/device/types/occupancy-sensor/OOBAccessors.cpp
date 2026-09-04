@@ -16,6 +16,7 @@
 
 #include "OOBAccessors.h"
 #include "OccupancySensor.h"
+#include <lib/support/CodeUtils.h>
 #include <oob-accessors/clusters/OccupancyOOBAccessor.h>
 
 namespace chip::app {

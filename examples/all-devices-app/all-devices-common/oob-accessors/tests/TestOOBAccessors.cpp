@@ -434,7 +434,11 @@ public:
     void HandleAreaComplete() override {}
     void HandleClearError() override {}
     void HandleReset() override {}
-    void HandleErrorEvent(const std::string & error) override { mLastError = error; }
+    bool HandleErrorEvent(const std::string & error) override
+    {
+        mLastError = error;
+        return true;
+    }
     void HandleEmptyingDustBin() override {}
     void HandleCleaningMop() override {}
     void HandleFillingWaterTank() override {}

@@ -16,6 +16,7 @@
 
 #include "OOBAccessors.h"
 #include "BooleanStateSensor.h"
+#include <lib/support/CodeUtils.h>
 #include <oob-accessors/clusters/BooleanStateOOBAccessor.h>
 
 namespace chip::app {

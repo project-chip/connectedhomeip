@@ -16,6 +16,7 @@
 
 #include "OOBAccessors.h"
 #include "RootNode.h"
+#include <lib/support/CodeUtils.h>
 #include <oob-accessors/clusters/BasicInformationOOBAccessor.h>
 
 namespace chip::app {

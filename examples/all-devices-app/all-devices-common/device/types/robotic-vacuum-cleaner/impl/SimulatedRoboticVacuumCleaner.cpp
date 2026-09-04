@@ -878,7 +878,7 @@ void SimulatedRoboticVacuumCleaner::HandleReset()
     ResetRvcSimulation(RunMode(), OperationalState(), CleanMode(), GetServiceAreaCluster());
 }
 
-void SimulatedRoboticVacuumCleaner::HandleErrorEvent(const std::string & error)
+bool SimulatedRoboticVacuumCleaner::HandleErrorEvent(const std::string & error)
 {
     uint8_t errorStateId;
 
@@ -957,13 +957,14 @@ void SimulatedRoboticVacuumCleaner::HandleErrorEvent(const std::string & error)
     else
     {
         ChipLogError(Zcl, "Unhandled ErrorEvent 'Error' value: %s", error.c_str());
-        return;
+        return false;
     }
 
     CancelTimer();
     OperationalState::Structs::ErrorStateStruct::Type err;
     err.errorStateID = errorStateId;
     OperationalState().OnOperationalErrorDetected(err);
+    return true;
 }
 
 void SimulatedRoboticVacuumCleaner::HandleEmptyingDustBin()

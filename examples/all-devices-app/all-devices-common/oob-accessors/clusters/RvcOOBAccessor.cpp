@@ -183,7 +183,7 @@ std::optional<CHIP_ERROR> RvcOOBAccessor::HandleErrorEvent(ByteSpan tlvData) con
         return std::nullopt;
     }
 
-    mDelegate.HandleErrorEvent(std::string(error.data(), error.size()));
+    VerifyOrReturnError(mDelegate.HandleErrorEvent(std::string(error.data(), error.size())), CHIP_ERROR_INVALID_ARGUMENT);
     return CHIP_NO_ERROR;
 }
 

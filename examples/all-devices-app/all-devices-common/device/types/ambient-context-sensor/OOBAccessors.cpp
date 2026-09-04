@@ -16,6 +16,7 @@
 
 #include "OOBAccessors.h"
 #include "AmbientContextSensor.h"
+#include <lib/support/CodeUtils.h>
 #include <oob-accessors/clusters/AmbientContextOOBAccessor.h>
 
 namespace chip::app {

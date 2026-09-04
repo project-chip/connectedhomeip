@@ -15,6 +15,7 @@
  */
 
 #include "OOBAccessors.h"
+#include <lib/support/CodeUtils.h>
 #include <oob-accessors/clusters/RvcOOBAccessor.h>
 
 namespace chip::app {

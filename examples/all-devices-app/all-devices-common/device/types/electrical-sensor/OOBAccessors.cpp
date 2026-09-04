@@ -16,6 +16,7 @@
 
 #include "OOBAccessors.h"
 #include "ElectricalSensor.h"
+#include <lib/support/CodeUtils.h>
 #include <oob-accessors/clusters/ElectricalEnergyMeasurementOOBAccessor.h>
 
 namespace chip::app {
