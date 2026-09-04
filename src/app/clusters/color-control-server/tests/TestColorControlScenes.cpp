@@ -295,28 +295,69 @@ CHIP_ERROR MakeDecodableEfs(chip::Span<const AttributeValuePair> pairs, MutableB
     return out.Decode(reader);
 }
 
-// §3.2.7.1.1: at AddScene, an EFS whose declared EnhancedColorMode is missing a companion attribute the mode
-// requires is rejected (a presence check across the whole EFS, done before delegating to the base handler).
-TEST_F(TestColorControlScenes, SerializeAddRejectsModeMissingRequiredAttributes)
+// §3.2.7.1.1: at AddScene, an EFS whose declared EnhancedColorMode carries NONE of that mode's companion
+// attributes is rejected (a presence check across the whole EFS, done before delegating to the base
+// handler). A caller is free to write only some of a mode's companions — see
+// SerializeAddAcceptsModeWithPartialAttributes — CT is the one mode without a partial case: it has exactly
+// one companion, so omitting it means omitting all of them.
+TEST_F(TestColorControlScenes, SerializeAddRejectsModeMissingAllRequiredAttributes)
 {
     ColorControlCluster::Config config(delegate, mockTimer);
     config.mFeatures.Set(Feature::kColorTemperature).Set(Feature::kXy).Set(Feature::kHueAndSaturation).Set(Feature::kEnhancedHue);
     ColorControlCluster cluster(kTestEndpointId, config);
 
-    // Each case declares a mode but omits one attribute that mode requires → CHIP_ERROR_INVALID_ARGUMENT.
+    // Each case declares a mode and supplies none of that mode's own companions → CHIP_ERROR_INVALID_ARGUMENT.
+    const EnhancedColorModeEnum modes[] = {
+        EnhancedColorModeEnum::kColorTemperatureMireds,
+        EnhancedColorModeEnum::kCurrentXAndCurrentY,
+        EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation,
+        EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation,
+    };
+
+    for (auto mode : modes)
+    {
+        AttributeValuePair pairs[1];
+        pairs[0].attributeID = Attributes::EnhancedColorMode::Id;
+        pairs[0].valueUnsigned8.SetValue(to_underlying(mode));
+
+        uint8_t backing[128];
+        MutableByteSpan backingSpan(backing);
+        ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType efs;
+        ASSERT_EQ(MakeDecodableEfs(chip::Span<const AttributeValuePair>(pairs), backingSpan, efs), CHIP_NO_ERROR)
+            << to_underlying(mode);
+
+        uint8_t out[128];
+        MutableByteSpan outSpan(out);
+        EXPECT_EQ(cluster.SerializeAdd(kTestEndpointId, efs, outSpan), CHIP_ERROR_INVALID_ARGUMENT) << to_underlying(mode);
+    }
+}
+
+// §3.2.7.1.1: a caller that only wants to override, say, Saturation need not also supply Hue — an EFS
+// declaring a multi-attribute mode is accepted as long as AT LEAST ONE of that mode's companions is
+// present; the one left out is simply absent from the stored scene. (CT has no partial case: its one
+// companion is unconditionally required, covered above.)
+TEST_F(TestColorControlScenes, SerializeAddAcceptsModeWithPartialAttributes)
+{
+    ColorControlCluster::Config config(delegate, mockTimer);
+    config.mFeatures.Set(Feature::kColorTemperature).Set(Feature::kXy).Set(Feature::kHueAndSaturation).Set(Feature::kEnhancedHue);
+    ColorControlCluster cluster(kTestEndpointId, config);
+
     struct Case
     {
         const char * name;
         EnhancedColorModeEnum mode;
-        AttributeId presentButInsufficient; // the lone companion supplied (the other required one is missing)
-        bool present16;                     // the supplied companion is uint16 (else uint8)
+        AttributeId onlyAttributePresent;
+        bool present16; // the supplied companion is uint16 (else uint8)
     };
     const Case cases[] = {
-        { "CT without ColorTemperatureMireds", EnhancedColorModeEnum::kColorTemperatureMireds, Attributes::CurrentX::Id, true },
-        { "XY with X but no Y", EnhancedColorModeEnum::kCurrentXAndCurrentY, Attributes::CurrentX::Id, true },
-        { "HS with hue but no saturation", EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation, Attributes::CurrentHue::Id,
+        { "XY with only X", EnhancedColorModeEnum::kCurrentXAndCurrentY, Attributes::CurrentX::Id, true },
+        { "XY with only Y", EnhancedColorModeEnum::kCurrentXAndCurrentY, Attributes::CurrentY::Id, true },
+        { "HS with only hue", EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation, Attributes::CurrentHue::Id, false },
+        { "HS with only saturation", EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation, Attributes::CurrentSaturation::Id,
           false },
-        { "EnhancedHS with saturation but no EnhancedCurrentHue", EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation,
+        { "EnhancedHS with only EnhancedCurrentHue", EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation,
+          Attributes::EnhancedCurrentHue::Id, true },
+        { "EnhancedHS with only saturation", EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation,
           Attributes::CurrentSaturation::Id, false },
     };
 
@@ -325,7 +366,7 @@ TEST_F(TestColorControlScenes, SerializeAddRejectsModeMissingRequiredAttributes)
         AttributeValuePair pairs[2];
         pairs[0].attributeID = Attributes::EnhancedColorMode::Id;
         pairs[0].valueUnsigned8.SetValue(to_underlying(c.mode));
-        pairs[1].attributeID = c.presentButInsufficient;
+        pairs[1].attributeID = c.onlyAttributePresent;
         if (c.present16)
         {
             pairs[1].valueUnsigned16.SetValue(1);
@@ -342,7 +383,7 @@ TEST_F(TestColorControlScenes, SerializeAddRejectsModeMissingRequiredAttributes)
 
         uint8_t out[128];
         MutableByteSpan outSpan(out);
-        EXPECT_EQ(cluster.SerializeAdd(kTestEndpointId, efs, outSpan), CHIP_ERROR_INVALID_ARGUMENT) << c.name;
+        EXPECT_EQ(cluster.SerializeAdd(kTestEndpointId, efs, outSpan), CHIP_NO_ERROR) << c.name;
     }
 }
 

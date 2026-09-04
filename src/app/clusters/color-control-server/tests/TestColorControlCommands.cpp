@@ -437,6 +437,32 @@ TEST_F(TestColorControlCommands, MoveColorTemperature)
     EXPECT_EQ(c.ColorTempMireds(), 100);
 }
 
+// A rate move must arrive at the instant its rate implies, not on the next tick boundary after it. The
+// tick period is re-armed once each tick has done its work, so without shortening the last one a
+// transition ending between two periods is applied late by up to a full period plus accumulated drift.
+// TC-CC-6.2 step 8b is the case that catches it: with the widest physical range, MoveColorTemperature at
+// the maximum rate sweeps 65278 mireds at 65535/s == 996ms, and the test reads the endpoint 1s later.
+TEST_F(TestColorControlCommands, MoveColorTemperatureArrivesOnItsDeadline)
+{
+    ColorControlCluster::Config cfg(delegate, mockTimer);
+    cfg.mFeatures.Set(Feature::kColorTemperature);
+    cfg.mColorValue                         = CTColor{ 1 };
+    cfg.ctConfig.colorTempPhysicalMinMireds = 1;
+    cfg.ctConfig.colorTempPhysicalMaxMireds = kMaxColorTempMireds;
+    ColorControlCluster c(kEp, cfg);
+
+    EXPECT_EQ(c.MoveColorTemp(MoveModeEnum::kUp, 65535, 0, 0), Status::Success);
+
+    for (int i = 0; i < 9; i++) // nine full periods -> t = 900ms, still 96ms short of the end
+    {
+        Tick(ColorControlCluster::kTickMs);
+    }
+    EXPECT_LT(c.ColorTempMireds(), kMaxColorTempMireds);
+
+    Tick(96); // t = 996ms: the deadline itself, not the 1000ms period boundary after it
+    EXPECT_EQ(c.ColorTempMireds(), kMaxColorTempMireds);
+}
+
 TEST_F(TestColorControlCommands, StepColorTemperature)
 {
     ColorControlCluster c(kEp, CtConfig()); // start 250

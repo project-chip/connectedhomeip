@@ -12,6 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+CI:
+    - name: "Test against all clusters app"
+      app: all-clusters
+    - name: "Test against all-devices/extended-color-light"
+      app: all-devices
+      args:
+          - --device
+          - extended-color-light
+
 name: 25.3.2. [TC-CC-3.2] Hue Move functionality with server as DUT
 
 PICS:
