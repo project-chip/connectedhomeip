@@ -46,6 +46,7 @@ from matter.testing.runner import default_matter_test_main
 
 cluster = Clusters.ElectricalAlarm
 _F = cluster.Bitmaps.Feature
+_A = cluster.Bitmaps.AlarmBitmap
 
 
 class TC_ESALM_2_1(MatterBaseTest):
@@ -86,60 +87,62 @@ class TC_ESALM_2_1(MatterBaseTest):
             endpoint=endpoint, cluster=cluster, attribute=attrs.Supported)
         asserts.assert_true(isinstance(supported, int), "Supported must be an integer bitmap")
         if has_overvolt:
-            asserts.assert_true(supported & 0x1, "OVERVOLT feature set but OverVoltage bit (0x1) missing from Supported")
+            asserts.assert_true(supported & _A.kOverVoltage, "OVERVOLT feature set but OverVoltage bit missing from Supported")
         if has_undervolt:
-            asserts.assert_true(supported & 0x2, "UNDERVOLT feature set but UnderVoltage bit (0x2) missing from Supported")
+            asserts.assert_true(supported & _A.kUnderVoltage, "UNDERVOLT feature set but UnderVoltage bit missing from Supported")
         if has_overfreq:
-            asserts.assert_true(supported & 0x4, "OVERFREQ feature set but OverFrequency bit (0x4) missing from Supported")
+            asserts.assert_true(supported & _A.kOverFrequency, "OVERFREQ feature set but OverFrequency bit missing from Supported")
         if has_underfreq:
-            asserts.assert_true(supported & 0x8, "UNDERFREQ feature set but UnderFrequency bit (0x8) missing from Supported")
+            asserts.assert_true(supported & _A.kUnderFrequency, "UNDERFREQ feature set but UnderFrequency bit missing from Supported")
         if has_overpower:
-            asserts.assert_true(supported & 0x10, "OVERPOWER feature set but OverPower bit (0x10) missing from Supported")
+            asserts.assert_true(supported & _A.kOverPower, "OVERPOWER feature set but OverPower bit missing from Supported")
         if has_underpower:
-            asserts.assert_true(supported & 0x20, "UNDERPOWER feature set but UnderPower bit (0x20) missing from Supported")
+            asserts.assert_true(supported & _A.kUnderPower, "UNDERPOWER feature set but UnderPower bit missing from Supported")
         if has_overcur:
-            asserts.assert_true(supported & 0x40, "OVERCUR feature set but OverCurrent bit (0x40) missing from Supported")
+            asserts.assert_true(supported & _A.kOverCurrent, "OVERCUR feature set but OverCurrent bit missing from Supported")
         if has_undercur:
-            asserts.assert_true(supported & 0x80, "UNDERCUR feature set but UnderCurrent bit (0x80) missing from Supported")
+            asserts.assert_true(supported & _A.kUnderCurrent, "UNDERCUR feature set but UnderCurrent bit missing from Supported")
         if has_powerimp:
-            asserts.assert_true(supported & 0x2000, "POWERIMP feature set but PowerImported bit (0x2000) missing from Supported")
+            asserts.assert_true(supported & _A.kPowerImported, "POWERIMP feature set but PowerImported bit missing from Supported")
         if has_powerexp:
-            asserts.assert_true(supported & 0x4000, "POWEREXP feature set but PowerExported bit (0x4000) missing from Supported")
+            asserts.assert_true(supported & _A.kPowerExported, "POWEREXP feature set but PowerExported bit missing from Supported")
         # Reverse direction: every bit set in Supported must map to a set feature bit, and there
         # must be no bits outside the defined alarm positions. Together with the checks above this
         # verifies the bidirectional FeatureMap<->Supported consistency the test plan calls for.
-        if supported & 0x1:
-            asserts.assert_true(has_overvolt, "OverVoltage bit (0x1) set in Supported but OVERVOLT feature absent from FeatureMap")
-        if supported & 0x2:
+        if supported & _A.kOverVoltage:
+            asserts.assert_true(has_overvolt, "OverVoltage bit set in Supported but OVERVOLT feature absent from FeatureMap")
+        if supported & _A.kUnderVoltage:
             asserts.assert_true(
-                has_undervolt, "UnderVoltage bit (0x2) set in Supported but UNDERVOLT feature absent from FeatureMap")
-        if supported & 0x4:
-            asserts.assert_true(has_overfreq, "OverFrequency bit (0x4) set in Supported but OVERFREQ feature absent from FeatureMap")
-        if supported & 0x8:
+                has_undervolt, "UnderVoltage bit set in Supported but UNDERVOLT feature absent from FeatureMap")
+        if supported & _A.kOverFrequency:
+            asserts.assert_true(has_overfreq, "OverFrequency bit set in Supported but OVERFREQ feature absent from FeatureMap")
+        if supported & _A.kUnderFrequency:
             asserts.assert_true(
-                has_underfreq, "UnderFrequency bit (0x8) set in Supported but UNDERFREQ feature absent from FeatureMap")
-        if supported & 0x10:
-            asserts.assert_true(has_overpower, "OverPower bit (0x10) set in Supported but OVERPOWER feature absent from FeatureMap")
-        if supported & 0x20:
+                has_underfreq, "UnderFrequency bit set in Supported but UNDERFREQ feature absent from FeatureMap")
+        if supported & _A.kOverPower:
+            asserts.assert_true(has_overpower, "OverPower bit set in Supported but OVERPOWER feature absent from FeatureMap")
+        if supported & _A.kUnderPower:
             asserts.assert_true(
-                has_underpower, "UnderPower bit (0x20) set in Supported but UNDERPOWER feature absent from FeatureMap")
-        if supported & 0x40:
-            asserts.assert_true(has_overcur, "OverCurrent bit (0x40) set in Supported but OVERCUR feature absent from FeatureMap")
-        if supported & 0x80:
-            asserts.assert_true(has_undercur, "UnderCurrent bit (0x80) set in Supported but UNDERCUR feature absent from FeatureMap")
-        if supported & 0x2000:
+                has_underpower, "UnderPower bit set in Supported but UNDERPOWER feature absent from FeatureMap")
+        if supported & _A.kOverCurrent:
+            asserts.assert_true(has_overcur, "OverCurrent bit set in Supported but OVERCUR feature absent from FeatureMap")
+        if supported & _A.kUnderCurrent:
+            asserts.assert_true(has_undercur, "UnderCurrent bit set in Supported but UNDERCUR feature absent from FeatureMap")
+        if supported & _A.kPowerImported:
             asserts.assert_true(
-                has_powerimp, "PowerImported bit (0x2000) set in Supported but POWERIMP feature absent from FeatureMap")
-        if supported & 0x4000:
+                has_powerimp, "PowerImported bit set in Supported but POWERIMP feature absent from FeatureMap")
+        if supported & _A.kPowerExported:
             asserts.assert_true(
-                has_powerexp, "PowerExported bit (0x4000) set in Supported but POWEREXP feature absent from FeatureMap")
-        # All fifteen AlarmBitmap bits (0x0-0x14 => 0x7FFF) are P, O.b+ with no feature
-        # conformance, so a DUT may declare any of them, including the five without a feature
-        # (FrequencyQuality, VoltageQuality, SwappedPolarity, LossOfMeasurement, LossOfGridPower).
-        # Only bits 15 and up are reserved.
-        defined_supported_bits = 0x7FFF
-        asserts.assert_equal(int(supported) & ~defined_supported_bits, 0,
-                             "Supported has reserved bits (15+) set outside the defined ESALM AlarmBitmap")
+                has_powerexp, "PowerExported bit set in Supported but POWEREXP feature absent from FeatureMap")
+        # Every AlarmBitmap bit is P, O.b+ with no feature conformance, so a DUT may declare any
+        # of them, including the five without a feature (FrequencyQuality, VoltageQuality,
+        # SwappedPolarity, LossOfMeasurement, LossOfGridPower). Any bit outside the defined
+        # AlarmBitmap is reserved. The mask is derived from the cluster enum rather than hardcoded.
+        defined_supported_bits = 0
+        for _alarm_bit in _A:
+            defined_supported_bits |= _alarm_bit
+        asserts.assert_equal(int(supported) & ~int(defined_supported_bits), 0,
+                             "Supported has reserved bits set outside the defined ESALM AlarmBitmap")
 
         self.step(4, "TH reads Mask attribute",
                   expectation="DUT returns AlarmBitmap. Every bit set in Mask is also set in Supported.")
