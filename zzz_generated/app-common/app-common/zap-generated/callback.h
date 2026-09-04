@@ -7777,24 +7777,6 @@ bool emberAfMessagesClusterCancelMessagesRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Messages::Commands::CancelMessagesRequest::DecodableType & commandData);
 /**
- * @brief Electrical Alarm Cluster Reset Command callback (from client)
- */
-bool emberAfElectricalAlarmClusterResetCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ElectricalAlarm::Commands::Reset::DecodableType & commandData);
-/**
- * @brief Electrical Alarm Cluster ModifyEnabledAlarms Command callback (from client)
- */
-bool emberAfElectricalAlarmClusterModifyEnabledAlarmsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ElectricalAlarm::Commands::ModifyEnabledAlarms::DecodableType & commandData);
-/**
- * @brief Electrical Alarm Cluster SetElectricalAlarmThresholds Command callback (from client)
- */
-bool emberAfElectricalAlarmClusterSetElectricalAlarmThresholdsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ElectricalAlarm::Commands::SetElectricalAlarmThresholds::DecodableType & commandData);
-/**
  * @brief Door Lock Cluster LockDoor Command callback (from client)
  */
 bool emberAfDoorLockClusterLockDoorCallback(chip::app::CommandHandler * commandObj,
