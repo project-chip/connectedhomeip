@@ -52,8 +52,4 @@ PyChipError pychip_case_capture_set_observer(chip::Controller::DeviceCommissione
 PyChipError pychip_case_capture_reset(void);
 PyChipError pychip_case_capture_get_snapshot(PychipCaseCaptureSnapshot * out);
 
-PyChipError pychip_case_capture_set_observer(chip::Controller::DeviceCommissioner * devCtrl);
-PyChipError pychip_case_capture_reset(void);
-PyChipError pychip_case_capture_get_snapshot(PychipCaseCaptureSnapshot * out);
-
 } // extern "C"

@@ -18,6 +18,8 @@
 
 #include <pw_unit_test/framework.h>
 
+#include <chrono>
+#include <thread>
 #include <type_traits>
 #include <vector>
 
@@ -385,6 +387,43 @@ TEST_F(TestCASEHandshakeMetricsBackend, HandshakesThatNeverConcludeAreCountedOnc
 
     EXPECT_EQ(mBackend.AbandonedCASEHandshakeCount(), 1u);
     EXPECT_TRUE(Drain().empty()) << "a handshake that never concluded must not be published";
+}
+
+TEST_F(TestCASEHandshakeMetricsBackend, ASecondSigma1ForTheSameExchangeDoesNotStartASecondHandshake)
+{
+    // The send hook fires once per message preparation rather than once per transmission, so an
+    // MRP retransmission does not reach here a second time. Nothing in this file can enforce that,
+    // and if it ever changed a second record would take the later timestamp, the first would never
+    // conclude, and it would be counted as abandoned. So a Sigma1 for an exchange already being
+    // timed is ignored.
+    constexpr auto kGapBetweenSends = std::chrono::milliseconds(20);
+    const StatusReportBody success(kGeneralCodeSuccess, kProtocolCodeSuccess);
+
+    SendSigma(MsgType::CASE_Sigma1);
+    std::this_thread::sleep_for(kGapBetweenSends);
+    SendSigma(MsgType::CASE_Sigma1);
+
+    ReceiveSigma(MsgType::CASE_Sigma2, Address("fd11::1"));
+    SendSigma(MsgType::CASE_Sigma3);
+    ReceiveSigma(MsgType::StatusReport, Address("fd11::1"), kExchange, kLocalNodeId, success.Span());
+
+    const auto records = Drain();
+    ASSERT_EQ(records.size(), 1u) << "the second Sigma1 must not open a handshake of its own";
+
+    // The first send is what the measurement runs from, so the gap between the two is inside the
+    // reported span rather than being discarded with the original record.
+    const uint64_t spanUs = records[0].statusReportReceivedTimestampUs - records[0].sigma1SentTimestampUs;
+    EXPECT_GE(spanUs, static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(kGapBetweenSends).count()));
+
+    // A slot taken by the second Sigma1 would never conclude, and the damage only shows much
+    // later: as a slot missing from the pool, and eventually as a handshake wrongly reported
+    // abandoned. Filling the pool exactly is what makes that leak visible now rather than in a
+    // minute's time, since the concluded handshake should have given its slot back.
+    for (uint16_t i = 0; i < chip::python::kCASEHandshakeMetricsMaxInFlight; i++)
+    {
+        SendSigma(MsgType::CASE_Sigma1, static_cast<uint16_t>(0x6000 + i));
+    }
+    EXPECT_EQ(mBackend.AbandonedCASEHandshakeCount(), 0u) << "a slot was leaked by the second Sigma1";
 }
 
 TEST_F(TestCASEHandshakeMetricsBackend, ResetForgetsWhatWasInFlight)

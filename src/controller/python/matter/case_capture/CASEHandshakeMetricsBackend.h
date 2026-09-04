@@ -59,7 +59,16 @@ public:
 
         if (opcode == MsgType::CASE_Sigma1)
         {
-            // A Sigma1 leaving the node begins a new handshake.
+            // A Sigma1 leaving the node begins a new handshake, unless one is already being timed
+            // for this exchange.
+            //
+            // Today the hook cannot fire twice for one Sigma1: it is emitted from
+            // SessionManager::PrepareMessage, and an MRP retransmission re-sends the retained
+            // buffer through SendPreparedMessage without preparing it again. The guard is here
+            // because nothing in this file can enforce that, and if it ever changed the damage
+            // would be silent: a second record would take the later timestamp, the first would
+            // never conclude, and it would eventually be reported as an abandoned handshake.
+            VerifyOrReturn(FindCASEHandshakeRecord(exchangeId, localId) == nullptr);
             BeginCASEHandshakeRecord(now, exchangeId, localId);
             return;
         }

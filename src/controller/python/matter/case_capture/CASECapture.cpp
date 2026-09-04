@@ -49,7 +49,7 @@ PychipCaseCapturedHeaders MakeHeaders(const chip::PacketHeader & packetHeader, c
     headers.isInitiator = payloadHeader.IsInitiator() ? 1u : 0u;
     headers.present     = 1u;
     return headers;
-} // namespace
+}
 
 // Captures inbound Sigma2 / Sigma2_Resume / StatusReport for Python tests.
 class CaseReceivedMessageObserver : public chip::Messaging::TestOnlyReceivedMessageObserver
