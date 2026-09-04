@@ -37,6 +37,7 @@
 #   run2:
 #     app: ${ALL_DEVICES_APP}
 #     app-args: --device color-temperature-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-ready-pattern: "Server initialization complete"
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -51,6 +52,7 @@
 #   run3:
 #     app: ${ALL_DEVICES_APP}
 #     app-args: --device extended-color-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-ready-pattern: "Server initialization complete"
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
