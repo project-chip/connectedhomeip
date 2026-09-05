@@ -2359,12 +2359,16 @@ class MatterBaseTest(base_test.BaseTestClass):
         self._dut_confirmed_available = self._dut_confirmed_available or bool(result)
         return result
 
-    async def commission_ntl_device(self, setup_payload: SetupPayload) -> bool:
+    async def commission_ntl_device(self, setup_payload: SetupPayload, *, expected_failure: bool = False) -> bool:
         """Commission a single DUT devices over NTL.
         The discovery_cap_bitmask is patched to keep only the NTL bit ON.
 
         Uses the default controller to commission a device over NTL based on setup payload
         and commissioning configuration.
+
+        Args:
+            setup_payload: Parsed setup payload read from onboarding data.
+            expected_failure: If True, expected commissioning failure is logged without traceback.
 
         Returns:
             True if commissioning succeeded, False otherwise.
@@ -2423,7 +2427,13 @@ class MatterBaseTest(base_test.BaseTestClass):
             thread_ba_port=self.matter_test_config.thread_ba_port,
         )
 
-        pairing_status = await commission_device(dev_ctrl, dut_node_id, ntl_setup_payload_info, commissioning_info)
+        pairing_status = await commission_device(
+            dev_ctrl,
+            dut_node_id,
+            ntl_setup_payload_info,
+            commissioning_info,
+            expected_failure=expected_failure,
+        )
         result = bool(pairing_status)
         # Only ever moves from False to True, see commission_devices.
         self._dut_confirmed_available = self._dut_confirmed_available or result
