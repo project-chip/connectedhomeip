@@ -184389,10 +184389,18 @@ public:
         params.sdp = [[NSString alloc] initWithBytes:mRequest.sdp.data() length:mRequest.sdp.size() encoding:NSUTF8StringEncoding];
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        params.streamUsage = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.streamUsage)];
+        if (mRequest.streamUsage.HasValue()) {
+            params.streamUsage = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.streamUsage.Value())];
+        } else {
+            params.streamUsage = nil;
+        }
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        params.originatingEndpointID = [NSNumber numberWithUnsignedShort:mRequest.originatingEndpointID];
+        if (mRequest.originatingEndpointID.HasValue()) {
+            params.originatingEndpointID = [NSNumber numberWithUnsignedShort:mRequest.originatingEndpointID.Value()];
+        } else {
+            params.originatingEndpointID = nil;
+        }
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
         if (mRequest.videoStreamID.HasValue()) {
