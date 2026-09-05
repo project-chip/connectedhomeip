@@ -178,6 +178,11 @@ class BarcodeFragment : Fragment() {
   }
 
   private fun handleInputCode(code: String, isLIT: Boolean) {
+    val context = context
+    if (!isAdded || context == null) {
+      Log.d(TAG, "Fragment is not added or context is null")
+      return
+    }
     try {
       val payload =
         if (code.startsWith("MT:")) {
@@ -190,10 +195,10 @@ class BarcodeFragment : Fragment() {
         ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload, isLIT))
     } catch (ex: UnrecognizedQrCodeException) {
       Log.e(TAG, "Unrecognized Code", ex)
-      Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
+      Toast.makeText(context, "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
     } catch (ex: Exception) {
       Log.e(TAG, "Exception, $ex")
-      Toast.makeText(requireContext(), "Occur Exception, $ex", Toast.LENGTH_SHORT).show()
+      Toast.makeText(context, "Occur Exception, $ex", Toast.LENGTH_SHORT).show()
     }
   }
 
@@ -204,16 +209,26 @@ class BarcodeFragment : Fragment() {
     }
     val isLIT = binding.enableLITCommissioningSwitchInBarcode.isChecked
     Handler(Looper.getMainLooper()).post {
+      val context = context
+      if (!isAdded || context == null) {
+        Log.d(TAG, "Fragment is not added or context is null")
+        return@post
+      }
       try {
-        val payload =
-          barcode.displayValue?.let { OnboardingPayloadParser().parseQrCode(it) } ?: return@post
+        val displayValue = barcode.displayValue
+        if (displayValue == null) {
+          return@post
+        }
+        val payload = OnboardingPayloadParser().parseQrCode(displayValue)
 
         FragmentUtil.getHost(this@BarcodeFragment, Callback::class.java)
           ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload, isLIT))
       } catch (ex: UnrecognizedQrCodeException) {
         Log.e(TAG, "Unrecognized QR Code", ex)
-        Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
-        return@post
+        Toast.makeText(context, "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
+      } catch (ex: Exception) {
+        Log.e(TAG, "Exception, $ex")
+        Toast.makeText(context, "Occur Exception, $ex", Toast.LENGTH_SHORT).show()
       }
     }
   }
