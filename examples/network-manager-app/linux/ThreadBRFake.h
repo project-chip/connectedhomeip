@@ -87,12 +87,44 @@ class FakeBorderRouterDelegate final : public app::Clusters::ThreadBorderRouterM
 
         mActivateDatasetCallback = callback;
         mActivateDatasetSequence = sequenceNum;
-        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(1000), ActivateActiveDataset,
-                                                                       this);
+        mActivationPending       = true;
+        VerifyOrReturn(DeviceLayer::SystemLayer()
+                           .StartTimer(System::Clock::Milliseconds32(1000), ActivateActiveDataset, this)
+                           .Handle([&](CHIP_ERROR error) {
+                               // Without the timer nothing would ever complete this activation;
+                               // undo the state so the next attempt is not refused as Busy.
+                               mActivateDatasetCallback = nullptr;
+                               mActivationPending       = false;
+                               mActiveDataset.Clear();
+                               callback->OnActivateDatasetComplete(sequenceNum, error);
+                           }));
     }
 
-    CHIP_ERROR CommitActiveDataset() override { return CHIP_NO_ERROR; }
-    CHIP_ERROR RevertActiveDataset() override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR CommitActiveDataset() override
+    {
+        mActivationPending = false;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR RevertActiveDataset() override
+    {
+        // Parity with the ubus delegate: the fail-safe handler calls this for
+        // every expiry, and only an activation that was not committed reverts.
+        VerifyOrReturnError(mActivationPending, CHIP_NO_ERROR);
+        mActivationPending = false;
+
+        // The activation timer may still be armed. A reverted activation must
+        // neither report success nor block the next attempt.
+        DeviceLayer::SystemLayer().CancelTimer(ActivateActiveDataset, this);
+        mActivateDatasetCallback = nullptr;
+
+        // SetActiveDataset is only accepted when no dataset is configured, so
+        // reverting it means returning to the unconfigured state.
+        mActiveDataset.Clear();
+        mAttributeChangeCallback->ReportAttributeChanged(
+            app::Clusters::ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
+        return CHIP_NO_ERROR;
+    }
 
     CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) override
     {
@@ -130,6 +162,7 @@ private:
 
     ActivateDatasetCallback * mActivateDatasetCallback = nullptr;
     uint32_t mActivateDatasetSequence;
+    bool mActivationPending = false;
 };
 
 } // namespace chip
