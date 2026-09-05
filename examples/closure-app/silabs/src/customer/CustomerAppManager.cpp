@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2025 Project CHIP Authors
- *    Copyright (c) 2025 Nest Labs, Inc.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,22 +16,22 @@
  *    limitations under the License.
  */
 
-#pragma once
+/**
+ * @file
+ * @brief Customer-facing ClosureManager definition site.
+ *
+ * Add `*Impl()` overrides here to customize individual ClosureManager behaviors.
+ * Any `*Impl()` you do not override keeps the default ClosureManager behavior.
+ *
+ * See the app README ("Override API Reference") for the full list of
+ * overridable methods.
+ */
 
-#include "BaseAppEvent.h"
+#include "CustomerAppManager.h"
 
-struct AppEvent : public BaseAppEvent
+CustomerAppManager CustomerAppManager::sInstance;
+
+ClosureManager & ClosureManager::GetInstance()
 {
-    enum AppEventTypes
-    {
-        kEventType_Closure = BaseAppEvent::kEventType_Max + 1,
-        kEventType_UpdateUI,
-    };
-
-    struct
-    {
-        uint8_t Action;
-        uint16_t EndpointId;
-        uint32_t Generation;
-    } ClosureEvent;
-};
+    return CustomerAppManager::GetInstance();
+}

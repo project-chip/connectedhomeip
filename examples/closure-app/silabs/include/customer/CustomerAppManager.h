@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2025 Project CHIP Authors
- *    Copyright (c) 2025 Nest Labs, Inc.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,20 +18,24 @@
 
 #pragma once
 
-#include "BaseAppEvent.h"
+#include "ClosureManagerImpl.h"
 
-struct AppEvent : public BaseAppEvent
+/**
+ * @brief Minimal ClosureManagerImpl-derived class.
+ *
+ * Any *Impl() method you do not override keeps the default ClosureManager behavior.
+ * Override *Impl() methods here to customize individual behaviors.
+ *
+ * See the app README ("Override API Reference") for the full list of
+ * overridable methods.
+ */
+class CustomerAppManager : public ClosureManagerImpl<CustomerAppManager>
 {
-    enum AppEventTypes
-    {
-        kEventType_Closure = BaseAppEvent::kEventType_Max + 1,
-        kEventType_UpdateUI,
-    };
+public:
+    static CustomerAppManager & GetInstance() { return sInstance; }
 
-    struct
-    {
-        uint8_t Action;
-        uint16_t EndpointId;
-        uint32_t Generation;
-    } ClosureEvent;
+private:
+    friend class ClosureManagerImpl<CustomerAppManager>;
+
+    static CustomerAppManager sInstance;
 };
