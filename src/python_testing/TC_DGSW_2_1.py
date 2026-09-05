@@ -43,14 +43,14 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing import matter_asserts
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-class TC_DGSW_2_1(MatterBaseTest):
+class TC_DGSW_2_1(MatterTestCommissionedDevice):
 
     async def read_dgsw_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.SoftwareDiagnostics
@@ -65,7 +65,7 @@ class TC_DGSW_2_1(MatterBaseTest):
 
     def steps_TC_DGSW_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read the ThreadMetrics attribute",
                      "The data type in each field of the struct must match the value listed in the specification(s) Table in 11.12.6.1"
                      "ThreadMetrics Struct. The Id field of the list is mandatory and shall match with Node assigned ID unique-per-thread."

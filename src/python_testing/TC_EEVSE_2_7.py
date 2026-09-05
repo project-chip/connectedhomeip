@@ -48,14 +48,14 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 cluster = Clusters.EnergyEvse
 
 
-class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
+class TC_EEVSE_2_7(MatterTestCommissionedDevice, EEVSEBaseTestHelper):
 
     """This test case verifies the primary functionality of the Energy EVSE Cluster server
      with the optional SoCReporting feature supported. This test case can also verify the
@@ -73,8 +73,7 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
 
     def steps_TC_EEVSE_2_7(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
-                     is_commissioning=True),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep("2", "TH reads from the DUT the FeatureMap",
                      "Verify that the DUT response contains the FeatureMap attribute. Store the value as FeatureMap."),
             TestStep("3", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",

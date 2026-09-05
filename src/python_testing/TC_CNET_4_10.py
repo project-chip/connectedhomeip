@@ -23,7 +23,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -81,7 +81,7 @@ def parse_openthread_dataset_stream(dataset_hex: str) -> dict[str, str] | None:
     return tlvs
 
 
-class TC_CNET_4_10(MatterBaseTest):
+class TC_CNET_4_10(MatterTestCommissionedDevice):
     """
     [TC-CNET-4.10] [Thread] Verification for RemoveNetwork Command [DUT-Server]
 
@@ -119,7 +119,7 @@ class TC_CNET_4_10(MatterBaseTest):
     def steps_TC_CNET_4_10(self):
         return [
             TestStep(1, test_plan_support.commission_if_required(),
-                     "DUT is commissioned, TH can communicate with the DUT on thread dataset provided in --thread-dataset-hex parameter.", is_commissioning=True),
+                     "DUT is commissioned, TH can communicate with the DUT on thread dataset provided in --thread-dataset-hex parameter."),
             TestStep(2, "TH reads the Networks attribute list from the DUT on all endpoints (all network commissioning clusters).",
                      "Verify that there is a single connected network across ALL network commissioning clusters. "),
             TestStep(3, "Skip remaining steps if the connected network is NOT on the cluster currently being verified."),

@@ -50,6 +50,7 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.testing.commissioning import CommissioningInfo, commission_device, get_setup_payload_info_config
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissioner
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -85,7 +86,7 @@ commands = cluster.Commands
 ONE_HOUR_S = 3600
 
 
-class TC_ICDB_2_4(ICDBaseTest):
+class TC_ICDB_2_4(MatterTestCommissioner, ICDBaseTest):
 
     # ICD state machine transitions between subscribed and check-in states are validated
     # explicitly; background wildcard subscription interferes with quiet-device assertions.

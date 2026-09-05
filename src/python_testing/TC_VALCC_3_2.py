@@ -40,11 +40,11 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeValue, MatterBaseTest
+from matter.testing.matter_testing import AttributeValue, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_VALCC_3_2(MatterBaseTest):
+class TC_VALCC_3_2(MatterTestCommissionedDevice):
     async def read_valcc_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ValveConfigurationAndControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -54,7 +54,7 @@ class TC_VALCC_3_2(MatterBaseTest):
 
     def steps_TC_VALCC_3_2(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT if required", is_commissioning=True),
+            TestStep(1, "Commission DUT if required"),
             TestStep(2, "Set up a subscription to all attributes on the DUT"),
             TestStep(3, "Send a close command to the DUT and wait until the CurrentState is closed", "DUT returns SUCCESS"),
             TestStep(4, "TH sends command Open command with TargetLevel field set to 100 and the remaining fields not populated.",

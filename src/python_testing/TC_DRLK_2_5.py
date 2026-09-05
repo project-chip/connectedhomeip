@@ -42,7 +42,7 @@ import matter.clusters as Clusters
 import matter.testing.matchers as matchers
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -50,7 +50,7 @@ log = logging.getLogger(__name__)
 drlkcluster = Clusters.DoorLock
 
 
-class TC_DRLK_2_5(MatterBaseTest):
+class TC_DRLK_2_5(MatterTestCommissionedDevice):
 
     @property
     def default_endpoint(self) -> int:
@@ -58,7 +58,7 @@ class TC_DRLK_2_5(MatterBaseTest):
 
     def steps_TC_DRLK_2_5(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning already done.", is_commissioning=True),
+            TestStep("precondition", "Commissioning already done."),
             TestStep("1", "TH reads NumberOfWeekDaySchedulesSupportedPerUser attribute.",
                      "Verify that TH is able to read the attribute successfully."),
             TestStep("2a", "TH sends SetUser Command to DUT.", "Verify that the DUT sends SUCCESS response."),

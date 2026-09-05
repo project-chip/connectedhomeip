@@ -53,13 +53,13 @@ from TC_DEMTestBase import DEMTestBase
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
+class TC_DEM_2_1(MatterTestCommissionedDevice, DEMTestBase):
     """Implementation of test case TC_DEM_2_1."""
 
     def desc_TC_DEM_2_1(self) -> str:
@@ -75,8 +75,7 @@ class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
     def steps_TC_DEM_2_1(self) -> list[TestStep]:
         """Execute the test steps."""
         return [
-            TestStep("1", "Commissioning, already done",
-                     is_commissioning=True),
+            TestStep("1", "Commissioning, already done"),
             TestStep("2", "TH reads from the DUT FeatureMap attribute.",
                      "Store the value as FeatureMap."),
             TestStep("3", "TH reads from the DUT ESAType attribute.",

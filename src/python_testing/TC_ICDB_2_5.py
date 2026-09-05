@@ -51,6 +51,7 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.testing.commissioning import get_setup_payload_info_config
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissioner
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -86,8 +87,7 @@ MAX_INTERVAL_CEILING_S = 60
 ONE_HOUR_S = 3600
 
 
-class TC_ICDB_2_5(ICDBaseTest):
-
+class TC_ICDB_2_5(MatterTestCommissioner, ICDBaseTest):
     @async_test_body
     async def setup_class(self):
         # *** PRECONDITION ***

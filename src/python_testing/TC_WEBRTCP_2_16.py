@@ -46,20 +46,20 @@ from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
+class TC_WEBRTCP_2_16(MatterTestCommissionedDevice, WEBRTCPTestBase):
     def desc_TC_WEBRTCP_2_16(self) -> str:
         """Returns a description of this test"""
         return "[TC-WEBRTCP-2.16] Validate ProvideOffer resource exhaustion - PROVISIONAL"
 
     def steps_TC_WEBRTCP_2_16(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "DUT commissioned", is_commissioning=True),
+            TestStep("precondition", "DUT commissioned"),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success and provides stream IDs"),
             TestStep(2, "TH sends multiple ProvideOffer commands to exhaust DUT's session capacity (DUT-specific limit)",

@@ -51,7 +51,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -85,7 +85,7 @@ kStep2MonitoredSubjectStep2 = 1001
 kStep2Key = b"\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
 
 
-class TC_ICDM_3_1(MatterBaseTest):
+class TC_ICDM_3_1(MatterTestCommissionedDevice):
 
     #
     # Class Helper functions
@@ -105,7 +105,7 @@ class TC_ICDM_3_1(MatterBaseTest):
 
     def steps_TC_ICDM_3_1(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(1, "TH reads from the DUT the FeatureMap. If the CIP feature is not supported on the cluster, skip all remaining steps"),
             TestStep("2a", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster."),
             TestStep("2b", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.ICDM.S.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.ICDM.S.TEST_EVENT_TRIGGER for the Active Mode requirement."),

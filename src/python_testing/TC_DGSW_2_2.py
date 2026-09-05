@@ -44,11 +44,11 @@ import matter.clusters as Clusters
 from matter.testing import matter_asserts
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_DGSW_2_2(MatterBaseTest):
+class TC_DGSW_2_2(MatterTestCommissionedDevice):
 
     async def send_software_fault_test_event_trigger(self):
         await self.send_test_event_triggers(eventTrigger=0x0034000000000000)
@@ -80,7 +80,7 @@ class TC_DGSW_2_2(MatterBaseTest):
 
     def steps_TC_DGSW_2_2(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH subscribes to the SoftwareDiagnostics cluster in the DUT to receive SoftwareFault events. "
                      "The DUT is triggered to emit a SoftwareFault event. Wait for the SoftwareFault event to arrive.",
                      "Validate the SoftwareFault event fields."

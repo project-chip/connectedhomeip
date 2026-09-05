@@ -46,7 +46,7 @@ from matter.clusters import ClusterObjects as ClusterObjects
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
 from matter.testing.decorators import async_test_body, has_attribute
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -61,7 +61,7 @@ class ValueTypesEnum(Enum):
     ENUM = 5
 
 
-class TC_CC_2_1(MatterBaseTest):
+class TC_CC_2_1(MatterTestCommissionedDevice):
 
     def desc_TC_CC_2_1(self) -> str:
         return "25.2.1. [TC-CC-2.1] Attributes with server as DUT"
@@ -75,7 +75,7 @@ class TC_CC_2_1(MatterBaseTest):
     def steps_TC_CC_2_1(self) -> list[TestStep]:
         """Execute the test steps."""
         return [
-            TestStep(1, 'Wait for the commissioned device to be retrieved', is_commissioning=True),
+            TestStep(1, 'Wait for the commissioned device to be retrieved'),
             TestStep(2, 'TH reads from the DUT the (0x0000) CurrentHue attribute'),
             TestStep(3, 'TH reads from the DUT the (0x0001) CurrentSaturation attribute'),
             TestStep(4, 'TH reads from the DUT the (0x0002) RemainingTime attribute'),

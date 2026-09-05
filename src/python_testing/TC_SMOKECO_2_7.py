@@ -44,13 +44,13 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_SMOKECO_2_7(MatterBaseTest):
+class TC_SMOKECO_2_7(MatterTestCommissionedDevice):
     def setup_test(self):
         super().setup_test()
         self.is_ci = self.matter_test_config.global_test_params.get('simulate_mounting', False)
@@ -65,7 +65,7 @@ class TC_SMOKECO_2_7(MatterBaseTest):
 
     def steps_TC_SMOKECO_2_7(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT to TH.", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH."),
             TestStep(2, "TH reads from the DUT the BatteryAlert attribute."),
             TestStep(3, "TH reads from the DUT the HardwareFaultAlert attribute."),
             TestStep(4, "TH subscribes to Unmounted attribute with  min interval 0s and max interval 30s."),

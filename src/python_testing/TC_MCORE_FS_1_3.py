@@ -73,7 +73,7 @@ from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -81,7 +81,7 @@ log = logging.getLogger(__name__)
 _DEVICE_TYPE_AGGREGATOR = 0x000E
 
 
-class TC_MCORE_FS_1_3(MatterBaseTest):
+class TC_MCORE_FS_1_3(MatterTestCommissionedDevice):
 
     @property
     def default_timeout(self) -> int:
@@ -139,7 +139,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
 
     def steps_TC_MCORE_FS_1_3(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commission DUT if not done", is_commissioning=True),
+            TestStep(0, "Commission DUT if not done"),
             TestStep(1, "TH commissions TH_SERVER_NO_UID to TH's fabric"),
             TestStep(2, "DUT_FSA commissions TH_SERVER_NO_UID to DUT_FSA's fabric and generates a UniqueID.",
                      "TH verifies a value is visible for the UniqueID from the DUT_FSA's Bridged Device Basic Information Cluster."),

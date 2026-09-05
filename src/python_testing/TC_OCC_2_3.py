@@ -56,13 +56,13 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_OCC_2_3(MatterBaseTest):
+class TC_OCC_2_3(MatterTestCommissionedDevice):
     async def read_occ_attribute_expect_success(self, attribute):
         cluster = Clusters.Objects.OccupancySensing
         endpoint_id = self.get_endpoint()
@@ -73,7 +73,7 @@ class TC_OCC_2_3(MatterBaseTest):
 
     def steps_TC_OCC_2_3(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT to TH", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH"),
             TestStep(2, "TH reads the FeatureMap attribute on the endpoint for use in later steps."),
             TestStep(3, "TH checks DUT HoldTime attribute support in the AttributeList attribute. If DUT doesn't support HoldTime attribute, skip the rest of this test case."),
             TestStep(4, "TH writes DUT HoldTime attribute with HoldTimeMin and afterwards reads the attribute."),

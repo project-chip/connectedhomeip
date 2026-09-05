@@ -55,13 +55,13 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
+class TC_DEM_2_2(MatterTestCommissionedDevice, DEMTestBase):
     """Implementation of test case TC_DEM_2_2."""
 
     def desc_TC_DEM_2_2(self) -> str:
@@ -77,8 +77,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
     def steps_TC_DEM_2_2(self) -> list[TestStep]:
         """Execute the test steps."""
         return [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
-                     is_commissioning=True),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep("2", "TH reads from the DUT the _FeatureMap_ attribute",
                      "Verify that the DUT response contains the _FeatureMap_ attribute. Verify PowerAdjustment is supported."),
             TestStep("3", "Set up a subscription to all DeviceEnergyManagement cluster events"),

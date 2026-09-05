@@ -45,19 +45,19 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_GC_2_8(MatterBaseTest):
+class TC_GC_2_8(MatterTestCommissionedDevice):
     def desc_TC_GC_2_8(self):
         return "[TC-GC-2.8] GroupcastTesting command effect with DUT as Server - PROVISIONAL"
 
     def steps_TC_GC_2_8(self):
         return [
-            TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
+            TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep("1b", "TH subscribes to FabricUnderTest attribute with min interval 0s and max interval 30s"),
             TestStep("1c", "TH reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute (stored as F1)"),
             TestStep("1d", "TH subscribes to the GroupcastTesting event with min interval 0s and max interval 30s"),

@@ -65,13 +65,13 @@ from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import AttributeValue
+from matter.testing.matter_testing import AttributeValue, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_SU_2_7(SoftwareUpdateBaseTest):
+class TC_SU_2_7(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
     """This test case verifies that the DUT behaves according to the spec when events are generated."""
     # Reference variable for the OTA Software Update Provider cluster.
     provider_port = None
@@ -175,7 +175,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
 
     def steps_TC_SU_2_7(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(1, "Perform a software update on the DUT."
                      "DUT successfully finishes applying a software update, and the new software image version is being executed on the DUT. OTA-Subscriber sends a read request to read the VersionApplied event from the DUT.",
                      "Verify that the OTA-Subscriber receives a StateTransition event notification for all the state changes i.e. Querying, Downloading, Applying, Idle (optional)."

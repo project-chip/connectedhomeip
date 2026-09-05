@@ -40,11 +40,11 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_COLORCONTROL(MatterBaseTest):
+class TC_COLORCONTROL(MatterTestCommissionedDevice):
     """Tests for colorcontrol cluster app server code."""
 
     _COLORCONTROL_ENDPOINT = 1
@@ -57,7 +57,7 @@ class TC_COLORCONTROL(MatterBaseTest):
         return "[TC_COLORCONTROL] chef colortemperaturelight functionality test."
 
     def steps_TC_COLORCONTROL(self):
-        return [TestStep(1, "[TC_COLORCONTROL] Commissioning already done.", is_commissioning=True),
+        return [TestStep(1, "[TC_COLORCONTROL] Commissioning already done."),
                 TestStep(2, "[TC_COLORCONTROL] Test move-color-temperature command.")]
 
     @async_test_body

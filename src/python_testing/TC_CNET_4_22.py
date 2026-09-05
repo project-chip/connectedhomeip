@@ -26,13 +26,13 @@ from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.matter_asserts import (assert_int_in_range, assert_string_length, assert_valid_uint8, assert_valid_uint16,
                                            assert_valid_uint64)
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_CNET_4_22(MatterBaseTest):
+class TC_CNET_4_22(MatterTestCommissionedDevice):
     """
     [TC-CNET-4.22] [Thread] Verification for ScanNetworks command [DUT-Server].
     Example Usage:
@@ -49,7 +49,7 @@ class TC_CNET_4_22(MatterBaseTest):
 
     def steps_TC_CNET_4_22(self):
         return [
-            TestStep('Precondition', 'TH is commissioned', is_commissioning=True),
+            TestStep('Precondition', 'TH is commissioned'),
             TestStep(1, 'TH sends ScanNetworks command to the DUT with the SSID field omitted and the Breadcrumb field set to 1'),
             TestStep(2, 'TH reads Breadcrumb attribute from the General Commissioning Cluster'),
             TestStep(3, 'TH sends ScanNetworks command to the DUT with the SSID field set to null and the Breadcrumb field set to 2'),

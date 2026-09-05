@@ -45,7 +45,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 # This test requires several additional command line arguments
@@ -62,7 +62,7 @@ def str_to_attribute(cluster, s):
     return getattr(cluster.Attributes, s)
 
 
-class TC_ACE_1_4(MatterBaseTest):
+class TC_ACE_1_4(MatterTestCommissionedDevice):
 
     async def write_acl(self, acl):
         # This returns an attribute status

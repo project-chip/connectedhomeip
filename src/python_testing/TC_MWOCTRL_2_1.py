@@ -58,7 +58,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 # This test requires several additional command line arguments
@@ -66,7 +66,7 @@ from matter.testing.runner import TestStep, default_matter_test_main
 # --endpoint endpoint
 
 
-class TC_MWOCTRL_2_1(MatterBaseTest):
+class TC_MWOCTRL_2_1(MatterTestCommissionedDevice):
 
     async def read_mwoctrl_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.MicrowaveOvenControl
@@ -97,7 +97,7 @@ class TC_MWOCTRL_2_1(MatterBaseTest):
 
     def steps_TC_MWOCTRL_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read the MaxCookTime attribute and check limits",
                      "Verify that the DUT response contains an elapsed-s value between 1 and 86400 inclusive. Save value as MaxCookTime."
                      ),

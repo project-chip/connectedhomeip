@@ -47,12 +47,13 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissioner
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_WebRTCR_2_7(WEBRTCRTestBase):
+class TC_WebRTCR_2_7(MatterTestCommissioner, WEBRTCRTestBase):
     def setup_class(self):
         super().setup_class()
 

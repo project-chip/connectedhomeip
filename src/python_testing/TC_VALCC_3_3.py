@@ -38,11 +38,11 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeValue, MatterBaseTest
+from matter.testing.matter_testing import AttributeValue, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_VALCC_3_3(MatterBaseTest):
+class TC_VALCC_3_3(MatterTestCommissionedDevice):
     async def read_valcc_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ValveConfigurationAndControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -52,7 +52,7 @@ class TC_VALCC_3_3(MatterBaseTest):
 
     def steps_TC_VALCC_3_3(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT if required", is_commissioning=True),
+            TestStep(1, "Commission DUT if required"),
             TestStep(2, "Read AttributeList attribute", "Verify that the DUT response contains the AttributeList attribute."),
             TestStep(3, "If the DefaultOpenLevel is not supported, skip all remaining steps in this test"),
             TestStep(4, "TH reads from the DUT the DefaultOpenLevel attribute. Store the value as defaultOpenLevel."),

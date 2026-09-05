@@ -50,14 +50,14 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 cluster = Clusters.EnergyEvse
 
 
-class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
+class TC_EEVSE_2_10(MatterTestCommissionedDevice, EEVSEBaseTestHelper):
     """This test case verifies the primary functionality of the Energy EVSE Cluster server
     with the optional V2X feature supported."""
 
@@ -71,7 +71,7 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
 
     def steps_TC_EEVSE_2_10(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
+            TestStep("1", "Commissioning, already done"),
             TestStep("1a", "Set up a subscription to all EnergyEVSE cluster events"),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),

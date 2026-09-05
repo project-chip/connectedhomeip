@@ -43,16 +43,17 @@ from support_modules.cadmin_support import CADMINBaseTest
 import matter.clusters as Clusters
 from matter.exceptions import ChipStackError
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_CADMIN_1_10(CADMINBaseTest):
+class TC_CADMIN_1_10(MatterTestCommissionedDevice, CADMINBaseTest):
 
     def steps_TC_CADMIN_1_10(self) -> list[TestStep]:
         return [
-            TestStep("precondition-1", "Commissioning, already done", is_commissioning=True),
+            TestStep("precondition-1", "Commissioning, already done"),
             TestStep("precondition-2", "TH1 reads SpecificationVersion attribute from Basic Information cluster on DUT, to check if Matter version is 1.5.1 or above. If not, skip the test"),
             TestStep(1, "TH1 sends an OpenCommissioningWindow command, to allow TH2 to establish a PASE session with the DUT"),
             TestStep(2, "TH2 establishes a PASE session with DUT"),

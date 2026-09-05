@@ -37,17 +37,17 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import has_attribute, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class Test_TC_FLABEL_2_1(MatterBaseTest):
+class Test_TC_FLABEL_2_1(MatterTestCommissionedDevice):
     def pics_TC_FLABEL_2_1(self) -> list[str]:
         return ["FLABEL.S"]
 
     def steps_TC_FLABEL_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT to TH", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH"),
             TestStep(2, "TH reads LabelList from the DUT", "Read is successful"),
             TestStep(3, "TH tries to write LabelList attribute", "Write fails with UNSUPPORTED_WRITE"),
             TestStep(4, "Verify LabelList hasn't changed", "LabelList matches initial read")

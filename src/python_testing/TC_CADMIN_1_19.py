@@ -40,11 +40,11 @@ from matter import ChipDeviceCtrl
 from matter.exceptions import ChipStackError
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeValue
+from matter.testing.matter_testing import AttributeValue, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_CADMIN_1_19(CADMINBaseTest):
+class TC_CADMIN_1_19(MatterTestCommissionedDevice, CADMINBaseTest):
     # This test can take a long time to run especially in highly congested lab networks since it creates a lot of fabrics and commissions those to the DUT so we need to increase the timeout to run this test.
     @property
     def default_timeout(self) -> int:
@@ -52,7 +52,7 @@ class TC_CADMIN_1_19(CADMINBaseTest):
 
     def steps_TC_CADMIN_1_19(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH_CR1 reads the BasicCommissioningInfo attribute from the General Commissioning cluster and saves the MaxCumulativeFailsafeSeconds field as max_window_duration."),
             TestStep(3, "TH_CR1 reads the Fabrics attribute from the Node Operational Credentials cluster using a non-fabric-filtered read. Save the number of fabrics in the list as initial_number_of_fabrics"),
             TestStep(4, "TH_CR1 reads the SupportedFabrics attribute from the Node Operational Credentials cluster. Save max_fabrics",

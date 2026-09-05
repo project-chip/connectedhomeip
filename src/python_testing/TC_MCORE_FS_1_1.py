@@ -69,7 +69,7 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -77,7 +77,7 @@ log = logging.getLogger(__name__)
 _DEVICE_TYPE_AGGREGATOR = 0x000E
 
 
-class TC_MCORE_FS_1_1(MatterBaseTest):
+class TC_MCORE_FS_1_1(MatterTestCommissionedDevice):
 
     @async_test_body
     async def setup_class(self):
@@ -134,7 +134,7 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
 
     def steps_TC_MCORE_FS_1_1(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning already done.", is_commissioning=True),
+            TestStep("precondition", "Commissioning already done."),
             TestStep(1, "Enable Fabric Synchronization on DUT_FSA using the manufacturer specified mechanism."),
             TestStep(2, "Commission DUT_FSA onto TH_FSA fabric."),
             TestStep("3a", "TH_FSA sends RequestCommissioningApproval"),

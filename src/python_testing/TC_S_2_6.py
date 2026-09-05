@@ -76,7 +76,7 @@ from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body, pics
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -99,7 +99,7 @@ _GROUP_ID = 0x0000
 _TRANSITION_TIME_MS = 20000
 
 
-class TC_S_2_6(MatterBaseTest):
+class TC_S_2_6(MatterTestCommissionedDevice):
     def teardown_test(self):
         self._shutdown_subscriptions()
 
@@ -290,7 +290,7 @@ class TC_S_2_6(MatterBaseTest):
         self.th1 = self.default_controller
         self._fabrics_to_remove: list[int] = []
 
-        self.step(0, "Commission DUT to TH1, TH2 and TH3 on distinct fabrics.", is_commissioning=True)
+        self.step(0, "Commission DUT to TH1, TH2 and TH3 on distinct fabrics.")
         self._th1_fabric = typing.cast(
             int,
             await self.read_single_attribute_check_success(
