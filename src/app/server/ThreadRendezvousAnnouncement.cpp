@@ -125,8 +125,7 @@ CHIP_ERROR BuildThreadRendezvousAnnouncement(const Dnssd::CommissionAdvertisingP
         static const char * matterc_udp_local[] = { "_matterc", "_udp", "local" };
         chip::Dnssd::FullQName serviceName(matterc_udp_local);
 
-        static const char * root[] = { "" };
-        chip::Dnssd::FullQName targetName(root);
+        chip::Dnssd::FullQName targetName;
         chip::Dnssd::SrvResourceRecord srvRecord(serviceName, targetName, params.GetPort());
         builder.AddRecord(chip::Dnssd::ResourceType::kAnswer, srvRecord);
 
