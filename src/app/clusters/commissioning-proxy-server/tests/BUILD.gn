@@ -18,6 +18,7 @@ import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 import("${chip_root}/src/ble/ble.gni")
+import("${chip_root}/src/platform/device.gni")
 
 chip_test_suite("tests") {
   output_name = "TestCommissioningProxyCluster"
@@ -63,6 +64,16 @@ chip_test_suite("tests") {
     # so the driver is compiled once.
     public_deps += [
       "${chip_root}/src/app/clusters/commissioning-proxy-server:ble-transport",
+    ]
+  }
+
+  # Same for Wi-Fi PAF: the driver and the tests that drive it only exist when the PAF
+  # stack is enabled.
+  if (chip_device_config_enable_wifipaf) {
+    test_sources += [ "TestCommissioningProxyPafTransport.cpp" ]
+
+    public_deps += [
+      "${chip_root}/src/app/clusters/commissioning-proxy-server:paf-transport",
     ]
   }
 }

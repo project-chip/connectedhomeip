@@ -23,6 +23,7 @@
 #include "WiFiPAFRole.h"
 #include <lib/core/CHIPError.h>
 #include <lib/support/DLLUtil.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -201,6 +202,12 @@ public:
     CHIP_ERROR AddPafSession(PafInfoAccess accType, WiFiPAFSession & SessionInfo);
     CHIP_ERROR RmPafSession(PafInfoAccess accType, WiFiPAFSession & SessionInfo);
     WiFiPAFSession * GetPAFInfo(PafInfoAccess accType, WiFiPAFSession & SessionInfo);
+
+    /** Close the PAFTP endpoint for a session, cancelling all pending timers.
+     *  Matches by session id, peer_id and peer_addr.  Safe to call after
+     *  RmPafSession since it uses the endpoint's own mSessionInfo, not
+     *  mPafInfoVect. */
+    void CloseEndPoint(WiFiPAFSession & SessionInfo);
 
 private:
     void InitialPafInfo();

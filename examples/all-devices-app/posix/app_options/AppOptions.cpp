@@ -59,6 +59,9 @@ constexpr uint16_t kOptionAppPipe       = 0xffdb;
 constexpr uint16_t kOptionTraceTo       = 0xffdc;
 constexpr uint16_t kOptionDacProvider   = 0xffdd;
 constexpr uint16_t kOptionEnableKey     = 0xffde;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+constexpr uint16_t kOptionWiFiPAF = 0xffdf;
+#endif
 
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
@@ -190,6 +193,11 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         ChipLogProgress(AppServer, "TestEventTrigger enable key configured");
         return true;
     }
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    case kOptionWiFiPAF:
+        mConfig.wifipafExtCmds = value ? value : "";
+        return true;
+#endif
     default:
         ChipLogError(Support, "%s: INTERNAL ERROR: Unhandled option: %s\n", program, name);
         return false;
@@ -219,6 +227,9 @@ OptionSet * AppOptions::GetOptions()
         { "trace-to", kArgumentRequired, kOptionTraceTo },
         { "dac_provider", kArgumentRequired, kOptionDacProvider },
         { "enable-key", kArgumentRequired, kOptionEnableKey },
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        { "wifipaf", kArgumentRequired, kOptionWiFiPAF },
+#endif
         {}, // need empty terminator
     };
 
@@ -286,6 +297,12 @@ OptionSet * AppOptions::GetOptions()
 
         result += "  --enable-key <key>\n";
         result += "       A 16-byte, hex-encoded key, used to validate TestEventTrigger command of General Diagnostics cluster\n\n";
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        result += "  --wifipaf freq_list=<freq_1>,<freq_2>...\n";
+        result += "       Enable Wi-Fi PAF via wpa_supplicant.\n";
+        result += "       Give an empty string if not setting freq_list: \"\"\n\n";
+#endif
 
         return result;
     }();
