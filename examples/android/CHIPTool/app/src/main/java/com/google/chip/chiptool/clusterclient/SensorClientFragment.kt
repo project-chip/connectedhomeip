@@ -155,21 +155,16 @@ class SensorClientFragment : Fragment() {
       val clusterName = binding.clusterNameSpinner.selectedItem.toString()
       val clusterId = CLUSTERS[clusterName]!!["clusterId"] as Long
       val attributeId = CLUSTERS[clusterName]!!["attributeId"] as Long
-      val device =
-        try {
-          ChipClient.getConnectedDevicePointer(requireContext(), deviceId)
-        } catch (e: IllegalStateException) {
-          Log.d(TAG, "getConnectedDevicePointer exception", e)
-          return
-        }
       val callback = makeReadCallback(clusterName, false)
 
-      deviceController.readAttributePath(
-        callback,
-        device,
-        listOf(ChipAttributePath.newInstance(endpointId, clusterId, attributeId)),
-        0
-      )
+      ChipClient.withConnectedDevice(requireContext(), deviceId) { device ->
+        deviceController.readAttributePath(
+          callback,
+          device,
+          listOf(ChipAttributePath.newInstance(endpointId, clusterId, attributeId)),
+          0
+        )
+      }
     } catch (ex: Exception) {
       Log.d(TAG, "Failed to read the sensor : ", ex)
       showMessage(R.string.sensor_client_read_error_text, ex.toString())
