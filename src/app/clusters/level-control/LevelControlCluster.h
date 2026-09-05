@@ -172,6 +172,20 @@ public:
     void SetOffTransitionTime(DataModel::Nullable<uint16_t> offTransitionTime);
     void SetOnOffTransitionTime(uint16_t onOffTransitionTime);
 
+    // Sets CurrentLevel immediately, bypassing ExecuteIfOff and transition timing, stopping any
+    // in-flight transition first.
+    CHIP_ERROR ForceCurrentLevel(uint8_t level);
+
+    // Commits OnOff on the underlying OnOffCluster, suppressing this cluster's own On/Off-coupled
+    // reaction to it.
+    CHIP_ERROR SetOnOff(bool on);
+
+    // Same as SetOnOff(bool), but stops any in-flight transition first.
+    CHIP_ERROR ForceOnOff(bool on);
+
+    // Records the level a later On/MoveToLevelWithOnOff should restore to.
+    void SetLevelBeforeTurnedOff(uint8_t level);
+
     // Command APIs
     DataModel::ActionReturnStatus MoveToLevel(uint8_t level, DataModel::Nullable<uint16_t> transitionTime,
                                               BitMask<LevelControl::OptionsBitmap> optionsMask,
@@ -290,7 +304,6 @@ private:
 
     // Helpers
     bool IsValidLevel(uint8_t level);
-    CHIP_ERROR SetOnOff(bool on);
     bool GetOnOff();
     bool ShouldExecuteIfOff(BitMask<LevelControl::OptionsBitmap> optionsMask, BitMask<LevelControl::OptionsBitmap> optionsOverride);
 
