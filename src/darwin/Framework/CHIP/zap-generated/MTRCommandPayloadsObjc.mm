@@ -18188,19 +18188,15 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     chip::app::Clusters::DeviceEnergyManagement::Commands::PowerRangeAdjustRequest::Type encodableStruct;
     ListFreer listFreer;
     {
-        if (self.minPower == nil) {
-            encodableStruct.minPower.SetNull();
-        } else {
-            auto & nonNullValue_0 = encodableStruct.minPower.SetNonNull();
-            nonNullValue_0 = self.minPower.longLongValue;
+        if (self.minPower != nil) {
+            auto & definedValue_0 = encodableStruct.minPower.Emplace();
+            definedValue_0 = self.minPower.longLongValue;
         }
     }
     {
-        if (self.maxPower == nil) {
-            encodableStruct.maxPower.SetNull();
-        } else {
-            auto & nonNullValue_0 = encodableStruct.maxPower.SetNonNull();
-            nonNullValue_0 = self.maxPower.longLongValue;
+        if (self.maxPower != nil) {
+            auto & definedValue_0 = encodableStruct.maxPower.Emplace();
+            definedValue_0 = self.maxPower.longLongValue;
         }
     }
     {
