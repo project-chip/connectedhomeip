@@ -34,6 +34,30 @@ extern void CHIPPlatformMemoryShutdown()
     return chip::Platform::MemoryShutdown();
 }
 
+// Note that we either define the typed malloc wrappers (if
+// CHIP_SYSTEM_CONFIG_TYPED_MALLOC is enabled), or the untyped malloc wrappers.
+// This ensures that the automatic replacement of calls to the untyped wrappers
+// is working, since if the replacement wasn't always done then it would lead
+// to linker issues due to the missing definition of the untyped wrappers.
+#if CHIP_SYSTEM_CONFIG_TYPED_MALLOC
+
+extern void * CHIPPlatformMemoryAllocTyped(size_t size, malloc_type_id_t typeId)
+{
+    return chip::Platform::MemoryAllocTyped(size, typeId);
+}
+
+extern void * CHIPPlatformMemoryCallocTyped(size_t num, size_t size, malloc_type_id_t typeId)
+{
+    return chip::Platform::MemoryCallocTyped(num, size, typeId);
+}
+
+extern void * CHIPPlatformMemoryReallocTyped(void * p, size_t size, malloc_type_id_t typeId)
+{
+    return chip::Platform::MemoryReallocTyped(p, size, typeId);
+}
+
+#else
+
 extern void * CHIPPlatformMemoryAlloc(size_t size)
 {
     return chip::Platform::MemoryAlloc(size);
@@ -48,6 +72,8 @@ extern void * CHIPPlatformMemoryRealloc(void * p, size_t size)
 {
     return chip::Platform::MemoryRealloc(p, size);
 }
+
+#endif
 
 extern void CHIPPlatformMemoryFree(void * p)
 {
