@@ -20,6 +20,7 @@
 #include <app/clusters/power-topology-server/power-topology-server.h>
 
 #include <app/util/af-types.h>
+#include <credentials/FabricTable.h>
 #include <lib/core/CHIPError.h>
 
 namespace chip {
@@ -39,8 +40,9 @@ public:
 class PowerTopologyInstance : public Instance
 {
 public:
-    PowerTopologyInstance(EndpointId aEndpointId, PowerTopologyDelegate & aDelegate, BitMask<Feature> aFeature) :
-        PowerTopology::Instance(aEndpointId, aDelegate, aFeature)
+    PowerTopologyInstance(EndpointId aEndpointId, PowerTopologyDelegate & aDelegate, BitMask<Feature> aFeature,
+                          FabricTable * aFabricTable = nullptr) :
+        PowerTopology::Instance(aEndpointId, aDelegate, aFeature, aFabricTable)
     {
         mDelegate = &aDelegate;
     }
@@ -70,7 +72,8 @@ private:
  * @return CHIP_NO_ERROR if the PowerTopology cluster is initialized successfully, otherwise an error code
  */
 CHIP_ERROR PowerTopologyInit(chip::EndpointId endpointId, std::unique_ptr<PowerTopologyDelegate> & aDelegate,
-                             std::unique_ptr<PowerTopologyInstance> & aInstance, BitMask<Feature> aFeature);
+                             std::unique_ptr<PowerTopologyInstance> & aInstance, BitMask<Feature> aFeature,
+                             FabricTable * aFabricTable = nullptr);
 
 CHIP_ERROR PowerTopologyShutdown(std::unique_ptr<PowerTopologyInstance> & aInstance,
                                  std::unique_ptr<PowerTopologyDelegate> & aDelegate);

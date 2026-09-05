@@ -26,6 +26,25 @@ namespace chip::app::Clusters {
 using namespace AmbientContextSensing;
 using namespace AmbientContextSensing::Attributes;
 
+namespace {
+
+// Span deliberately has no operator== (see Span.h), so the Optional/Nullable comparison chain has
+// to be spelled out down to data_equal.
+bool IsLabelEqual(const Optional<DataModel::Nullable<CharSpan>> & a, const Optional<DataModel::Nullable<CharSpan>> & b)
+{
+    VerifyOrReturnValue(a.HasValue() == b.HasValue(), false);
+    VerifyOrReturnValue(a.HasValue(), true);
+    VerifyOrReturnValue(a.Value().IsNull() == b.Value().IsNull(), false);
+    return a.Value().IsNull() || a.Value().Value().data_equal(b.Value().Value());
+}
+
+bool IsSemanticTagEqual(const SemanticTagType & a, const SemanticTagType & b)
+{
+    return a.mfgCode == b.mfgCode && a.namespaceID == b.namespaceID && a.tag == b.tag && IsLabelEqual(a.label, b.label);
+}
+
+} // namespace
+
 AmbientContextSensingCluster::AmbientContextSensingCluster(EndpointId endpointId, const Config & config) :
     DefaultServerCluster({ endpointId, AmbientContextSensing::Id }), mFeatureMap(config.mFeatureMap),
     mOptionalAttributeSet(config.mOptionalAttributeBits), mHoldTimeDelegate(config.mHoldTimeDelegate)
@@ -305,11 +324,34 @@ DataModel::ActionReturnStatus AmbientContextSensingCluster::SetObjectCountConfig
         VerifyOrReturnError(inList, Protocols::InteractionModel::Status::ConstraintError);
     }
 
-    if (newObjectCountConfig.countingObject.namespaceID != mObjectCountConfig.countingObject.namespaceID ||
-        newObjectCountConfig.countingObject.tag != mObjectCountConfig.countingObject.tag ||
+    // The spec makes Label mandatory when the tag comes from a manufacturer namespace:
+    // SemanticTagStruct Label conformance is "MfgCode != NULL, O".
+    const auto & newLabelField = newObjectCountConfig.countingObject.label;
+    VerifyOrReturnError(newObjectCountConfig.countingObject.mfgCode.IsNull() || newLabelField.HasValue(),
+                        Protocols::InteractionModel::Status::ConstraintError);
+
+    const bool hasLabel = newLabelField.HasValue() && !newLabelField.Value().IsNull();
+    CharSpan newLabel;
+    if (hasLabel)
+    {
+        newLabel = newLabelField.Value().Value();
+        VerifyOrReturnError(newLabel.size() <= kMaxSemanticTagLabelLength, Protocols::InteractionModel::Status::ConstraintError);
+    }
+
+    if (!IsSemanticTagEqual(newObjectCountConfig.countingObject, mObjectCountConfig.countingObject) ||
         newObjectCountConfig.objectCountThreshold != mObjectCountConfig.objectCountThreshold)
     {
         mObjectCountConfig = newObjectCountConfig;
+
+        // Re-point the retained label at storage this cluster owns, so it stays valid once the
+        // write request payload is released.
+        if (hasLabel)
+        {
+            MutableCharSpan labelStorage(mObjectCountConfigLabel);
+            ReturnErrorOnFailure(CopyCharSpanToMutableCharSpan(newLabel, labelStorage));
+            mObjectCountConfig.countingObject.label = MakeOptional(DataModel::MakeNullable(CharSpan(labelStorage)));
+        }
+
         NotifyAttributeChanged(Attributes::ObjectCountConfig::Id);
 
         // Save the value to persistence

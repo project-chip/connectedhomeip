@@ -28,11 +28,7 @@
 #include <system/SystemError.h>
 
 #include <zephyr/settings/settings.h>
-#if defined(CONFIG_ZEPHYR_VERSION_3_3)
-#include <version.h>
-#else
 #include <zephyr/version.h>
-#endif
 
 #if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
 #include <ncs_version.h>

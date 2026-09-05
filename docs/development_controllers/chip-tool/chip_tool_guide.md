@@ -399,6 +399,121 @@ until it runs out of pairing possibilities. In this command:
     `MT:Y.K9042C00KA0648G00`, or a manual pairing code like
     `749701123365521327694`.
 
+#### Commissioning through a Commissioning Proxy
+
+This option is available when the CHIP Tool has no radio on which it can reach
+the Matter end device — for example a host with no Bluetooth LE adapter, or a
+device reachable only over Wi-Fi Public Action Frame (PAF).
+
+A Commissioning Proxy (CP) is a Matter device that implements the Commissioning
+Proxy cluster. It opens a transport (e.g. Bluetooth LE, Wi-Fi PAF) connection to
+the commissionee on the CHIP Tool's behalf. The PASE handshake and the
+commissioning flow are tunneled using `ProxyMessageRequest` and
+`ProxyMessageResponse`.
+
+The CP is an ordinary Matter node, it must already be commissioned onto the
+fabric before it can tunnel anything as it requires a CASE session for the
+tunnel. The `all-devices-app` example provides a CP, run this with
+`--device commissioning-proxy:<endpoint_id>`. See
+[Getting Started: Wi-Fi PAF for the Commissioning Proxy](../../../examples/all-devices-app/all-devices-common/device/types/commissioning-proxy/README.md)
+for how to build and run it.
+
+##### Asking the CP to scan
+
+The CP can scan on the CHIP Tool's behalf, to discover commissionable devices.
+Use the following command pattern:
+
+```
+$ ./chip-tool commissioningproxy proxy-scan-request <transport> <proxy_node_id> <proxy_endpoint_id> --WiFiBands <bands> --allow-large-payload true --timeout <seconds>
+```
+
+In this command:
+
+-   _<transport\>_ is the transport bitmap the proxy should scan on: `0x02` for
+    Bluetooth LE, `0x08` for Wi-Fi PAF, or `0x0A` for both in a single scan.
+-   _<proxy_node_id\>_ is the node ID of the already-commissioned proxy.
+-   _<proxy_endpoint_id\>_ is the endpoint on the proxy that hosts the
+    Commissioning Proxy cluster.
+-   _<bands\>_ is the Wi-Fi band bitmap: `0x01` for 2.4 GHz, `0x04` for 5 GHz.
+-   _<seconds\>_ is how long the CHIP Tool waits for the response. Size it from
+    the proxy's `ScanMaxTime` attribute, which you can read with the following
+    command pattern:
+
+```
+$ ./chip-tool commissioningproxy read scan-max-time <proxy_node_id> <proxy_endpoint_id>
+```
+
+> **Note:** `ProxyScanRequest` carries the large-message quality, so
+> `--allow-large-payload true` is required to place the invoke on a TCP session.
+> Without it the invoke goes over UDP with MRP, whose round-trip budget expires
+> before a scan running its full `ScanMaxTime` can answer — which the CHIP Tool
+> reports as a bare `Timeout` rather than as a rejected request.
+
+A background scan allows the CP to scan continuously and cache what it finds, so
+the results can be read or subscribed to at any time:
+
+```
+$ ./chip-tool commissioningproxy proxy-back-ground-scan-start-request <transport> <scan_seconds> <proxy_node_id> <proxy_endpoint_id> --WiFiBands <bands>
+$ ./chip-tool commissioningproxy read cached-results <proxy_node_id> <proxy_endpoint_id>
+$ ./chip-tool commissioningproxy proxy-back-ground-scan-stop-request <transport> <proxy_node_id> <proxy_endpoint_id> --WiFiBands <bands>
+```
+
+Here _<scan_seconds\>_ is how long the background scan runs. Stopping every
+transport the scan was started on erases the fabric's scan record, so a repeated
+identical stop is answered `NOT_FOUND` rather than `SUCCESS`. Neither
+background-scan command carries the large-message quality, so neither needs
+`--allow-large-payload`.
+
+##### Commissioning the device through the CP
+
+To commission the device through the CP, use the following:
+
+```
+$ ./chip-tool pairing proxy <node_id> <ssid> <password> <pin_code> <discriminator> <proxy_node_id> <proxy_connect_timeout> <proxy_transport>
+```
+
+In this command:
+
+-   _<node_id\>_ is the user-defined ID of the node being commissioned.
+-   _<ssid\>_ and _<password\>_ are the required credentials to configure the
+    network to join, not the link the proxy tunnels over.
+-   _<pin_code\>_ and _<discriminator\>_ are device-specific keys determined in
+    the
+    [step 5](#step-5-determine-matter-devices-discriminator-and-setup-pin-code),
+    or from a proxy scan above.
+-   _<proxy_node_id\>_ is the node ID of the already-commissioned proxy.
+-   _<proxy_connect_timeout\>_ is how many seconds the proxy may spend
+    establishing the transport connection to the commissionee. `0` means no
+    timeout, so the proxy keeps trying until it is cancelled.
+-   _<proxy_transport\>_ is `ble` or `wifipaf` — the transport the proxy should
+    use to reach the commissionee.
+
+The following optional flags are also accepted:
+
+-   `--proxy-endpoint` — the endpoint on the proxy that hosts the Commissioning
+    Proxy cluster. Defaults to `1`.
+-   `--proxy-wifi-band` — a band hint for the proxy's Wi-Fi PAF connection,
+    either `2g4` or `5g`. Only accepted with `<proxy_transport>` set to
+    `wifipaf`.
+
+The following command commissions the device with the node ID `1999` onto the
+Wi-Fi network `MyNetwork` through the proxy commissioned as node `1998`, which
+hosts the cluster on endpoint `5`, telling the proxy to reach the device over
+Wi-Fi PAF on the 2.4 GHz band:
+
+```
+$ ./chip-tool pairing proxy 1999 MyNetwork MyPassword 20202021 3840 1998 0 wifipaf --proxy-endpoint 5 --proxy-wifi-band 2g4
+```
+
+The equivalent over Bluetooth LE:
+
+```
+$ ./chip-tool pairing proxy 1999 MyNetwork MyPassword 20202021 3840 1998 0 ble --proxy-endpoint 5
+```
+
+The CHIP Tool disconnects the proxy session using `ProxyDisconnectRequest` once
+the flow finishes, whether it succeeded or failed.
+
 #### Forgetting the already-commissioned device
 
 In case commissioning needs to be retested, the following command removes the
@@ -928,6 +1043,9 @@ section:
 -   `onnetwork` - For commissioning the device when it is already present in an
     IP network; described under
     [Commissioning with setup PIN code](#commissioning-with-setup-pin-code)
+-   `proxy` - For commissioning the device through a Commissioning Proxy when
+    the CHIP Tool cannot reach it directly; described under
+    [Commissioning through a Commissioning Proxy](#commissioning-through-a-commissioning-proxy)
 
 To list all `pairing` sub-commands and commissioning methods, run the following
 command:

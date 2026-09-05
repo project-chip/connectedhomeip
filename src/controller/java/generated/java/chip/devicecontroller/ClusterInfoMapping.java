@@ -4717,11 +4717,15 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(byte[] certificate) {
+    public void onSuccess(byte[] certificate, Optional<Integer> totalDocumentSize, Optional<Integer> nextSegmentID) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo certificateResponseValue = new CommandResponseInfo("certificate", "byte[]");
       responseValues.put(certificateResponseValue, certificate);
+      CommandResponseInfo totalDocumentSizeResponseValue = new CommandResponseInfo("totalDocumentSize", "Optional<Integer>");
+      responseValues.put(totalDocumentSizeResponseValue, totalDocumentSize);
+      CommandResponseInfo nextSegmentIDResponseValue = new CommandResponseInfo("nextSegmentID", "Optional<Integer>");
+      responseValues.put(nextSegmentIDResponseValue, nextSegmentID);
       callback.onSuccess(responseValues);
     }
 
@@ -4860,6 +4864,27 @@ public class ClusterInfoMapping {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<byte[]>");
       responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedOperationalCredentialsClusterPQCDeviceAttestationProfileAttributeCallback implements ChipClusters.OperationalCredentialsCluster.PQCDeviceAttestationProfileAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.OperationalCredentialsClusterPQCDeviceAttestationProfileStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.OperationalCredentialsClusterPQCDeviceAttestationProfileStruct");
+      responseValues.put(commandResponseInfo, value);
       callback.onSuccess(responseValues);
     }
 
@@ -17445,11 +17470,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer resultCode, @Nullable Integer sessionID) {
+    public void onSuccess(Integer sessionID) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
-      CommandResponseInfo resultCodeResponseValue = new CommandResponseInfo("resultCode", "Integer");
-      responseValues.put(resultCodeResponseValue, resultCode);
       CommandResponseInfo sessionIDResponseValue = new CommandResponseInfo("sessionID", "Integer");
       responseValues.put(sessionIDResponseValue, sessionID);
       callback.onSuccess(responseValues);
@@ -17489,9 +17512,30 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(@Nullable List<Integer> valueList) {
+    public void onSuccess(List<Integer> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedProximityRangingClusterRangingConstraintsAttributeCallback implements ChipClusters.ProximityRangingCluster.RangingConstraintsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.ProximityRangingClusterRangingConstraintStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ProximityRangingClusterRangingConstraintStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -27727,12 +27771,30 @@ public class ClusterInfoMapping {
 
     CommandParameterInfo operationalCredentialscertificateChainRequestcertificateTypeCommandParameterInfo = new CommandParameterInfo("certificateType", Integer.class, Integer.class);
     operationalCredentialscertificateChainRequestCommandParams.put("certificateType",operationalCredentialscertificateChainRequestcertificateTypeCommandParameterInfo);
+
+    CommandParameterInfo operationalCredentialscertificateChainRequestcryptoProfileCommandParameterInfo = new CommandParameterInfo("cryptoProfile", Optional.class, Integer.class);
+    operationalCredentialscertificateChainRequestCommandParams.put("cryptoProfile",operationalCredentialscertificateChainRequestcryptoProfileCommandParameterInfo);
+
+    CommandParameterInfo operationalCredentialscertificateChainRequestsegmentIDCommandParameterInfo = new CommandParameterInfo("segmentID", Optional.class, Integer.class);
+    operationalCredentialscertificateChainRequestCommandParams.put("segmentID",operationalCredentialscertificateChainRequestsegmentIDCommandParameterInfo);
+
+    CommandParameterInfo operationalCredentialscertificateChainRequestmaxSegmentSizeCommandParameterInfo = new CommandParameterInfo("maxSegmentSize", Optional.class, Integer.class);
+    operationalCredentialscertificateChainRequestCommandParams.put("maxSegmentSize",operationalCredentialscertificateChainRequestmaxSegmentSizeCommandParameterInfo);
     InteractionInfo operationalCredentialscertificateChainRequestInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.OperationalCredentialsCluster) cluster)
           .certificateChainRequest((ChipClusters.OperationalCredentialsCluster.CertificateChainResponseCallback) callback
            , (Integer)
              commandArguments.get("certificateType")
+
+           , (Optional<Integer>)
+             commandArguments.get("cryptoProfile")
+
+           , (Optional<Integer>)
+             commandArguments.get("segmentID")
+
+           , (Optional<Integer>)
+             commandArguments.get("maxSegmentSize")
 
             );
         },
@@ -31690,9 +31752,6 @@ public class ClusterInfoMapping {
     CommandParameterInfo proximityRangingstartRangingRequestbandwidthCommandParameterInfo = new CommandParameterInfo("bandwidth", Optional.class, Long.class);
     proximityRangingstartRangingRequestCommandParams.put("bandwidth",proximityRangingstartRangingRequestbandwidthCommandParameterInfo);
 
-    CommandParameterInfo proximityRangingstartRangingRequestsecurityModeCommandParameterInfo = new CommandParameterInfo("securityMode", Integer.class, Integer.class);
-    proximityRangingstartRangingRequestCommandParams.put("securityMode",proximityRangingstartRangingRequestsecurityModeCommandParameterInfo);
-
 
     InteractionInfo proximityRangingstartRangingRequestInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
@@ -31715,9 +31774,6 @@ public class ClusterInfoMapping {
 
            , (Optional<Long>)
              commandArguments.get("bandwidth")
-
-           , (Integer)
-             commandArguments.get("securityMode")
 
            , (ChipStructs.ProximityRangingClusterRangingTriggerConditionStruct)
              commandArguments.get("trigger")

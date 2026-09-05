@@ -5458,6 +5458,11 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOperationalCredentialsID) attributeID:@(MTRAttributeIDTypeClusterOperationalCredentialsAttributeCurrentFabricIndexID) params:params];
 }
 
+- (NSDictionary<NSString *, id> * _Nullable)readAttributePQCDeviceAttestationProfileWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOperationalCredentialsID) attributeID:@(MTRAttributeIDTypeClusterOperationalCredentialsAttributePQCDeviceAttestationProfileID) params:params];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOperationalCredentialsID) attributeID:@(MTRAttributeIDTypeClusterOperationalCredentialsAttributeGeneratedCommandListID) params:params];
@@ -17575,6 +17580,11 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSessionIDListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeProximityRangingID) attributeID:@(MTRAttributeIDTypeClusterProximityRangingAttributeSessionIDListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRangingConstraintsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeProximityRangingID) attributeID:@(MTRAttributeIDTypeClusterProximityRangingAttributeRangingConstraintsID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params

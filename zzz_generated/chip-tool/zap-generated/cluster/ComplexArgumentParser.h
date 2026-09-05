@@ -305,6 +305,12 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::OperationalCred
 
 static void Finalize(chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::OperationalCredentials::Structs::PQCDeviceAttestationProfileStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::OperationalCredentials::Structs::PQCDeviceAttestationProfileStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::Type & request,
                         Json::Value & value);
 
@@ -714,6 +720,11 @@ static CHIP_ERROR Setup(const char * label,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ProximityRanging::Structs::RangingCapabilitiesStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ProximityRanging::Structs::RangingConstraintStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ProximityRanging::Structs::RangingConstraintStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::ProximityRanging::Structs::RangingTriggerConditionStruct::Type & request,

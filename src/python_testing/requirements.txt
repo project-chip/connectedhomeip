@@ -8,3 +8,4 @@ requests
 pycountry
 validators
 nest-asyncio
+pyserial

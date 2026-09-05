@@ -82,7 +82,7 @@ bool IsWithinRange(const int64_t power, const uint32_t duration,
 }
 
 // Helper function to validate that the ESA is in the expected state before processing a command
-DataModel::ActionReturnStatus ValidateESAState(const DataModel::InvokeRequest & request, CommandHandler * handler,
+DataModel::ActionReturnStatus ValidateESAState(const DataModel::InvokeRequest & request,
                                                DeviceEnergyManagement::Delegate & delegate,
                                                DeviceEnergyManagement::ESAStateEnum expectedState)
 {
@@ -108,6 +108,14 @@ CHIP_ERROR DeviceEnergyManagementCluster::Startup(ServerClusterContext & context
                      mPath.mEndpointId);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+
+    // Validate that PowerAdjustment and PowerRangeAdjustment features are mutually exclusive
+    if (mFeatureFlags.Has(Feature::kPowerAdjustment) && mFeatureFlags.Has(Feature::kPowerRangeAdjustment))
+    {
+        ChipLogError(Zcl, "DEM: PowerAdjustment and PowerRangeAdjustment features are mutually exclusive");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     return DefaultServerCluster::Startup(context);
 }
 
@@ -146,6 +154,9 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::ReadAttribute(const
     case OptOutState::Id:
         return encoder.Encode(mDelegate.GetOptOutState());
 
+    case PowerRangeAdjustment::Id:
+        return encoder.Encode(mDelegate.GetPowerRangeAdjustment());
+
     default:
         return Status::UnsupportedAttribute;
     }
@@ -160,28 +171,34 @@ std::optional<DataModel::ActionReturnStatus> DeviceEnergyManagementCluster::Invo
     switch (request.path.mCommandId)
     {
     case PowerAdjustRequest::Id:
-        return HandlePowerAdjustRequest(request, input_arguments, handler);
+        return HandlePowerAdjustRequest(request, input_arguments);
 
     case CancelPowerAdjustRequest::Id:
-        return HandleCancelPowerAdjustRequest(request, input_arguments, handler);
+        return HandleCancelPowerAdjustRequest(request, input_arguments);
 
     case StartTimeAdjustRequest::Id:
-        return HandleStartTimeAdjustRequest(request, input_arguments, handler);
+        return HandleStartTimeAdjustRequest(request, input_arguments);
 
     case PauseRequest::Id:
-        return HandlePauseRequest(request, input_arguments, handler);
+        return HandlePauseRequest(request, input_arguments);
 
     case ResumeRequest::Id:
-        return HandleResumeRequest(request, input_arguments, handler);
+        return HandleResumeRequest(request, input_arguments);
 
     case ModifyForecastRequest::Id:
-        return HandleModifyForecastRequest(request, input_arguments, handler);
+        return HandleModifyForecastRequest(request, input_arguments);
 
     case RequestConstraintBasedForecast::Id:
-        return HandleRequestConstraintBasedForecast(request, input_arguments, handler);
+        return HandleRequestConstraintBasedForecast(request, input_arguments);
 
     case CancelRequest::Id:
-        return HandleCancelRequest(request, input_arguments, handler);
+        return HandleCancelRequest(request, input_arguments);
+
+    case PowerRangeAdjustRequest::Id:
+        return HandlePowerRangeAdjustRequest(request, input_arguments);
+
+    case CancelPowerRangeAdjustRequest::Id:
+        return HandleCancelPowerRangeAdjustRequest(request, input_arguments);
 
     default:
         return Status::UnsupportedCommand;
@@ -195,6 +212,7 @@ CHIP_ERROR DeviceEnergyManagementCluster::Attributes(const ConcreteClusterPath &
         PowerAdjustmentCapability::kMetadataEntry,
         Forecast::kMetadataEntry,
         OptOutState::kMetadataEntry,
+        PowerRangeAdjustment::kMetadataEntry,
     };
 
     AttributeListBuilder listBuilder(builder);
@@ -241,6 +259,14 @@ CHIP_ERROR DeviceEnergyManagementCluster::AcceptedCommands(const ConcreteCluster
     if (mFeatureFlags.HasAny(Feature::kStartTimeAdjustment, Feature::kForecastAdjustment, Feature::kConstraintBasedAdjustment))
     {
         ReturnErrorOnFailure(builder.AppendElements({ CancelRequest::kMetadataEntry }));
+    }
+
+    if (mFeatureFlags.Has(Feature::kPowerRangeAdjustment))
+    {
+        ReturnErrorOnFailure(builder.AppendElements({
+            PowerRangeAdjustRequest::kMetadataEntry,
+            CancelPowerRangeAdjustRequest::kMetadataEntry,
+        }));
     }
 
     return CHIP_NO_ERROR;
@@ -296,8 +322,7 @@ DeviceEnergyManagementCluster::CheckOptOutAllowsRequest(DeviceEnergyManagement::
 }
 
 DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePowerAdjustRequest(const DataModel::InvokeRequest & request,
-                                                                                      TLV::TLVReader & input_arguments,
-                                                                                      CommandHandler * handler)
+                                                                                      TLV::TLVReader & input_arguments)
 {
     using namespace Commands;
 
@@ -355,14 +380,14 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePowerAdjustRe
 
 DataModel::ActionReturnStatus
 DeviceEnergyManagementCluster::HandleCancelPowerAdjustRequest(const DataModel::InvokeRequest & request,
-                                                              TLV::TLVReader & input_arguments, CommandHandler * handler)
+                                                              TLV::TLVReader & input_arguments)
 {
     using namespace Commands;
 
     CancelPowerAdjustRequest::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
 
-    ReturnErrorOnFailure(ValidateESAState(request, handler, mDelegate, ESAStateEnum::kPowerAdjustActive).GetUnderlyingError());
+    ReturnErrorOnFailure(ValidateESAState(request, mDelegate, ESAStateEnum::kPowerAdjustActive).GetUnderlyingError());
 
     ReturnErrorOnFailure(DataModel::ActionReturnStatus(mDelegate.CancelPowerAdjustRequest()).GetUnderlyingError());
 
@@ -389,8 +414,7 @@ DeviceEnergyManagementCluster::HandleCancelPowerAdjustRequest(const DataModel::I
 }
 
 DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleStartTimeAdjustRequest(const DataModel::InvokeRequest & request,
-                                                                                          TLV::TLVReader & input_arguments,
-                                                                                          CommandHandler * handler)
+                                                                                          TLV::TLVReader & input_arguments)
 {
     using namespace Commands;
 
@@ -496,8 +520,7 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleStartTimeAdju
 }
 
 DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePauseRequest(const DataModel::InvokeRequest & request,
-                                                                                TLV::TLVReader & input_arguments,
-                                                                                CommandHandler * handler)
+                                                                                TLV::TLVReader & input_arguments)
 {
     using namespace Commands;
 
@@ -571,15 +594,14 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePauseRequest(
 }
 
 DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleResumeRequest(const DataModel::InvokeRequest & request,
-                                                                                 TLV::TLVReader & input_arguments,
-                                                                                 CommandHandler * handler)
+                                                                                 TLV::TLVReader & input_arguments)
 {
     using namespace Commands;
 
     ResumeRequest::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
 
-    ReturnErrorOnFailure(ValidateESAState(request, handler, mDelegate, ESAStateEnum::kPaused).GetUnderlyingError());
+    ReturnErrorOnFailure(ValidateESAState(request, mDelegate, ESAStateEnum::kPaused).GetUnderlyingError());
 
     ReturnErrorOnFailure(DataModel::ActionReturnStatus(mDelegate.ResumeRequest()).GetUnderlyingError());
 
@@ -594,8 +616,7 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleResumeRequest
 }
 
 DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleModifyForecastRequest(const DataModel::InvokeRequest & request,
-                                                                                         TLV::TLVReader & input_arguments,
-                                                                                         CommandHandler * handler)
+                                                                                         TLV::TLVReader & input_arguments)
 {
     using namespace Commands;
 
@@ -664,7 +685,7 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleModifyForecas
 
 DataModel::ActionReturnStatus
 DeviceEnergyManagementCluster::HandleRequestConstraintBasedForecast(const DataModel::InvokeRequest & request,
-                                                                    TLV::TLVReader & input_arguments, CommandHandler * handler)
+                                                                    TLV::TLVReader & input_arguments)
 {
     using namespace Commands;
 
@@ -775,8 +796,7 @@ DeviceEnergyManagementCluster::HandleRequestConstraintBasedForecast(const DataMo
 }
 
 DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleCancelRequest(const DataModel::InvokeRequest & request,
-                                                                                 TLV::TLVReader & input_arguments,
-                                                                                 CommandHandler * handler)
+                                                                                 TLV::TLVReader & input_arguments)
 {
     using namespace Commands;
 
@@ -801,6 +821,103 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleCancelRequest
     VerifyOrReturnError(!mDelegate.GetForecast().IsNull(), Status::InvalidInState);
     VerifyOrReturnError(mDelegate.GetForecast().Value().forecastUpdateReason == ForecastUpdateReasonEnum::kInternalOptimization,
                         Status::InvalidInState);
+
+    return Status::Success;
+}
+
+DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePowerRangeAdjustRequest(const DataModel::InvokeRequest & request,
+                                                                                           TLV::TLVReader & input_arguments)
+{
+    using namespace Commands;
+
+    static constexpr uint32_t kDayInSeconds = 86400;
+
+    PowerRangeAdjustRequest::DecodableType commandData;
+    ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
+
+    ReturnErrorOnFailure(CheckOptOutAllowsRequest(commandData.cause).GetUnderlyingError());
+
+    ESAStateEnum ESAState = mDelegate.GetESAState();
+    if ((ESAState != ESAStateEnum::kOnline) && (ESAState != ESAStateEnum::kPowerAdjustActive))
+    {
+        ChipLogError(Zcl, "DEM: ESAState must be Online or PowerAdjustActive for PowerRangeAdjustRequest");
+        return Status::InvalidInState;
+    }
+
+    // Check that Duration > 0 && <= 86400 (24 hours)
+    if ((commandData.duration == 0) || (commandData.duration > kDayInSeconds))
+    {
+        ChipLogError(Zcl, "DEM: Duration must be >0 and <= 86400 for PowerRangeAdjustRequest");
+        return Status::ConstraintError;
+    }
+
+    // Check that we have one of MinPower or MaxPower
+    if (commandData.minPower.IsNull() && commandData.maxPower.IsNull())
+    {
+        ChipLogError(Zcl, "DEM: Must provide at least one of MinPower or MaxPower for PowerRangeAdjustRequest");
+        return Status::ConstraintError;
+    }
+
+    // Check that the MinPower >= AbsMinPower and MaxPower <= AbsMaxPower
+    if (!commandData.minPower.IsNull() &&
+        (commandData.minPower.Value() < mDelegate.GetAbsMinPower() || commandData.minPower.Value() > mDelegate.GetAbsMaxPower()))
+    {
+        ChipLogError(Zcl, "DEM: MinPower is outside the absolute power range");
+        return Status::ConstraintError;
+    }
+
+    if (!commandData.maxPower.IsNull() &&
+        (commandData.maxPower.Value() < mDelegate.GetAbsMinPower() || commandData.maxPower.Value() > mDelegate.GetAbsMaxPower()))
+    {
+        ChipLogError(Zcl, "DEM: MaxPower is outside the absolute power range");
+        return Status::ConstraintError;
+    }
+
+    if (!commandData.minPower.IsNull() && !commandData.maxPower.IsNull() &&
+        commandData.minPower.Value() > commandData.maxPower.Value())
+    {
+        ChipLogError(Zcl, "DEM: MinPower is greater than MaxPower");
+        return Status::ConstraintError;
+    }
+
+    // Call delegate to start the power range adjustment
+    // The delegate is responsible for validating the power range and updating the PowerRangeAdjustment attribute
+    ReturnErrorOnFailure(DataModel::ActionReturnStatus(mDelegate.PowerRangeAdjustRequest(commandData.minPower, commandData.maxPower,
+                                                                                         commandData.duration, commandData.cause))
+                             .GetUnderlyingError());
+
+    // Verify the delegate updated the PowerRangeAdjustment attribute
+    DataModel::Nullable<Structs::PowerRangeAdjustStruct::Type> powerRangeAdjustment = mDelegate.GetPowerRangeAdjustment();
+    if (powerRangeAdjustment.IsNull())
+    {
+        ChipLogError(Zcl, "DEM: PowerRangeAdjustment is Null after successful PowerRangeAdjustRequest");
+        return Status::ConstraintError;
+    }
+
+    return Status::Success;
+}
+
+DataModel::ActionReturnStatus
+DeviceEnergyManagementCluster::HandleCancelPowerRangeAdjustRequest(const DataModel::InvokeRequest & request,
+                                                                   TLV::TLVReader & input_arguments)
+{
+    using namespace Commands;
+
+    CancelPowerRangeAdjustRequest::DecodableType commandData;
+    ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
+
+    ReturnErrorOnFailure(ValidateESAState(request, mDelegate, ESAStateEnum::kPowerAdjustActive).GetUnderlyingError());
+
+    // Call delegate to cancel the power range adjustment
+    ReturnErrorOnFailure(DataModel::ActionReturnStatus(mDelegate.CancelPowerRangeAdjustRequest()).GetUnderlyingError());
+
+    // Verify the delegate cleared the PowerRangeAdjustment attribute
+    DataModel::Nullable<Structs::PowerRangeAdjustStruct::Type> powerRangeAdjustment = mDelegate.GetPowerRangeAdjustment();
+    if (!powerRangeAdjustment.IsNull())
+    {
+        ChipLogError(Zcl, "DEM: PowerRangeAdjustment should be Null after CancelPowerRangeAdjustRequest");
+        return Status::ConstraintError;
+    }
 
     return Status::Success;
 }

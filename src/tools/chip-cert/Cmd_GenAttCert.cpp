@@ -57,6 +57,7 @@ OptionDef gCmdOptionDefs[] =
     { "lifetime",           kArgumentRequired, 'l' },
     { "cdp-uri",            kArgumentRequired, 'x' },
     { "crl-issuer-cert",    kArgumentRequired, 'L' },
+    { "key-type",           kArgumentRequired, 'A' },
  #if CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES
     { "ignore-error",       kNoArgument,       'I' },
     { "error-type",         kArgumentRequired, 'E' },
@@ -135,6 +136,13 @@ const char * const gCmdOptionHelp =
     "       File or string containing the CRL Issuer certificate (in an X.509 PEM format).\n"
     "       The Subject name will be extracted from this certificate to be included in the\n"
     "       cRLIssuer field of the CRL Distribution Point (CDP) extension.\n"
+    "\n"
+    "   -A, --key-type <algorithm>\n"
+    "\n"
+    "       Key algorithm to use for generating the new key pair. Supported values are:\n"
+    "           p256       - EC prime256v1 / secp256r1 (default)\n"
+    "           ml-dsa-44  - ML-DSA-44 (FIPS 204, post-quantum)\n"
+    "           ml-dsa-65  - ML-DSA-65 (FIPS 204, post-quantum)\n"
     "\n"
 #if CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES
     "   -I, --ignore-error\n"
@@ -229,6 +237,7 @@ const char * gOutKeyFileName        = nullptr;
 uint32_t gValidDays                 = kCertValidDays_Undefined;
 const char * gCDPURI                = nullptr;
 const char * gCRLIssuerCertFileName = nullptr;
+const char * gKeyTypeName           = nullptr;
 struct tm gValidFrom;
 CertStructConfig gCertConfig;
 
@@ -313,6 +322,14 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         break;
     case 'L':
         gCRLIssuerCertFileName = arg;
+        break;
+    case 'A':
+        if (strcmp(arg, "p256") != 0 && strcmp(arg, "ml-dsa-44") != 0 && strcmp(arg, "ml-dsa-65") != 0)
+        {
+            PrintArgError("%s: Invalid value specified for key type: %s\n", progName, arg);
+            return false;
+        }
+        gKeyTypeName = arg;
         break;
 #if CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES
     case 'I':
@@ -595,11 +612,32 @@ bool Cmd_GenAttCert(int argc, char * argv[])
             res = GenerateKeyPair_Secp256k1(newKey.get());
             VerifyTrueOrExit(res);
         }
+        else if (gKeyTypeName != nullptr && strncmp(gKeyTypeName, "ml-dsa-", 7) == 0)
+        {
+            const char * opensslAlgo = nullptr;
+            if (strcmp(gKeyTypeName, "ml-dsa-44") == 0)
+            {
+                opensslAlgo = "ML-DSA-44";
+            }
+            else if (strcmp(gKeyTypeName, "ml-dsa-65") == 0)
+            {
+                opensslAlgo = "ML-DSA-65";
+            }
+
+            res = GenerateKeyPair_MLDSA(newKey, opensslAlgo);
+            VerifyTrueOrExit(res);
+        }
         else
         {
             res = GenerateKeyPair(newKey.get());
             VerifyTrueOrExit(res);
         }
+    }
+
+    if (gAttCertType == kAttCertType_DAC && IsMLDSAKey(newKey.get()) && !gCertConfig.IsErrorTestCaseEnabled())
+    {
+        fprintf(stderr, "DAC certificates require a P-256 key\n");
+        ExitNow(res = false);
     }
 
     if (gCRLIssuerCertFileName != nullptr || gCDPURI != nullptr)
@@ -690,6 +728,14 @@ bool Cmd_GenAttCert(int argc, char * argv[])
 
         res = ReadKey(gCAKeyFileNameOrStr, caKey, gCertConfig.IsErrorTestCaseEnabled());
         VerifyTrueOrExit(res);
+
+        // Attestation validation rejects a certificate whose key is stronger than the algorithm
+        // that signed it, so refuse to issue one unless invalid certificates were asked for.
+        if (!gCertConfig.IsErrorTestCaseEnabled() && GetKeyStrength(newKey.get()) > GetKeyStrength(caKey.get()))
+        {
+            fprintf(stderr, "The new key algorithm is stronger than the CA key signing it\n");
+            ExitNow(res = false);
+        }
 
         res = MakeAttCert(gAttCertType, gSubjectCN, gSubjectVID, gSubjectPID, gEncodeVIDandPIDasCN, caCert.get(), caKey.get(),
                           gValidFrom, gValidDays, newCert.get(), newKey.get(), gCertConfig, cdpExtension.get());

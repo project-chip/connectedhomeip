@@ -100,6 +100,8 @@ bool sIsNetworkEnabled     = false;
 bool sIsNetworkAttached    = false;
 bool sHaveBLEConnections   = false;
 
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
 #if CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
 void EnablePostCommissioningBle(intptr_t)
 {
@@ -109,10 +111,6 @@ void EnablePostCommissioningBle(intptr_t)
         ChipLogError(DeviceLayer, "Failed to enable post-commissioning BLE advertising: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
-#endif
-
-#if APP_SET_DEVICE_INFO_PROVIDER
-chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif
 
 #ifndef IDENTIFY_CLUSTER_DISABLED
@@ -317,10 +315,10 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
 #endif
     LogErrorOnFailure(initParams.InitializeStaticResourcesBeforeServerInit());
-#if APP_SET_DEVICE_INFO_PROVIDER
+
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
-#endif
+
     initParams.appDelegate              = &sCallbacks;
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
