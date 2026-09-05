@@ -30,6 +30,7 @@
 #include "commands/payload/Commands.h"
 #include "commands/session-management/Commands.h"
 #include "commands/storage/Commands.h"
+#include "commands/verify/Commands.h"
 
 #include <zap-generated/cluster/Commands.h>
 
@@ -47,6 +48,7 @@ int main(int argc, char * argv[])
     registerCommandsInteractive(commands, &credIssuerCommands);
     registerCommandsPayload(commands);
     registerCommandsPairing(commands, &credIssuerCommands);
+    registerCommandsVerify(commands, &credIssuerCommands);
     registerCommandsGroup(commands, &credIssuerCommands);
     registerClusters(commands, &credIssuerCommands);
     registerCommandsSubscriptions(commands, &credIssuerCommands);
