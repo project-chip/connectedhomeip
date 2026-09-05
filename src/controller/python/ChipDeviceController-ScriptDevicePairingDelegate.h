@@ -49,6 +49,7 @@ typedef void (*DevicePairingDelegate_OnCommissioningStatusUpdateFunct)(PeerId pe
                                                                        CHIP_ERROR err);
 typedef void (*DevicePairingDelegate_OnCommissioningStageStartFunct)(NodeId nodeId, const char * stage);
 typedef void (*DevicePairingDelegate_OnFabricCheckFunct)(NodeId nodeId);
+typedef void (*DevicePairingDelegate_OnInitialPhaseCompleteFunct)(NodeId nodeId, const char * transportType, bool isUnpowered);
 }
 
 class ScriptDevicePairingDelegate final : public Controller::DevicePairingDelegate
@@ -64,6 +65,7 @@ public:
     void SetCommissioningFailureCallback(DevicePairingDelegate_OnCommissioningFailureFunct callback);
     void SetCommissioningWindowOpenCallback(DevicePairingDelegate_OnWindowOpenCompleteFunct callback);
     void SetFabricCheckCallback(DevicePairingDelegate_OnFabricCheckFunct callback);
+    void SetInitialPhaseCompleteCallback(DevicePairingDelegate_OnInitialPhaseCompleteFunct callback);
     void OnStatusUpdate(Controller::DevicePairingDelegate::Status status) override;
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err) override;
@@ -75,6 +77,7 @@ public:
     void OnICDRegistrationComplete(ScopedNodeId deviceId, uint32_t icdCounter) override;
     void OnICDStayActiveComplete(ScopedNodeId deviceId, uint32_t promisedActiveDuration) override;
     void OnFabricCheck(NodeId matchingNodeId) override;
+    void OnInitialPhaseComplete(PeerId peerId, Transport::Type transportType, bool isUnpowered) override;
     Callback::Callback<Controller::OnOpenCommissioningWindow> *
     GetOpenWindowCallback(Controller::CommissioningWindowOpener * context);
     void OnOpenCommissioningWindow(NodeId deviceId, CHIP_ERROR status, SetupPayload payload);
@@ -90,6 +93,7 @@ private:
     DevicePairingDelegate_OnCommissioningStatusUpdateFunct mOnCommissioningStatusUpdateCallback = nullptr;
     DevicePairingDelegate_OnCommissioningStageStartFunct mOnCommissioningStageStartCallback     = nullptr;
     DevicePairingDelegate_OnFabricCheckFunct mOnFabricCheckCallback                             = nullptr;
+    DevicePairingDelegate_OnInitialPhaseCompleteFunct mOnInitialPhaseCompleteCallback           = nullptr;
     Callback::Callback<Controller::OnOpenCommissioningWindow> mOpenWindowCallback;
     Controller::CommissioningWindowOpener * mWindowOpener = nullptr;
 

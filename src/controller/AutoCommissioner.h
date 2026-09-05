@@ -60,6 +60,8 @@ public:
 
     void SetNetworkSetupNeeded(bool needed) { mNeedsNetworkSetup = needed; }
 
+    bool IsCommissioningWithoutPower() const { return mDeviceCommissioningInfo.general.isCommissioningWithoutPower; }
+
 protected:
     virtual void CleanupCommissioning();
     CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr);

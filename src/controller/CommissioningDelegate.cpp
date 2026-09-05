@@ -151,13 +151,11 @@ const char * StageToString(CommissioningStage stage)
     case kRequestThreadCredentials:
         return "RequestThreadCredentials";
 
+    case kInitialPhaseComplete:
+        return "InitialPhaseComplete";
+
     case kCleanup:
         return "Cleanup";
-
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
-    case kUnpoweredPhaseComplete:
-        return "UnpoweredPhaseComplete";
-#endif
     }
 
     return "???";
@@ -294,13 +292,11 @@ const char * MetricKeyForCommissioningStage(CommissioningStage stage)
     case kRequestThreadCredentials:
         return "core_commissioning_stage_request_thread_credentials";
 
+    case kInitialPhaseComplete:
+        return "core_commissioning_stage_initial_phase";
+
     case kCleanup:
         return "core_commissioning_stage_cleanup";
-
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
-    case kUnpoweredPhaseComplete:
-        return "core_commissioning_stage_unpowered_phase";
-#endif
     }
 
     return "core_commissioning_stage_unknown";
