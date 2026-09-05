@@ -21,7 +21,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CAMERA_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/avanaly_2_8_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -31,6 +31,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
+#       --app-pipe /tmp/avanaly_2_8_fifo
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -102,14 +103,22 @@ class TC_AVANALY_2_8(MatterBaseTest, AVANALYTestBase):
         await event_callback.start(self.default_controller, self.dut_node_id, endpoint)
 
         self.step(3)
-        if not self.is_ci:
+        context_to_detect = supported_contexts[0]
+        if self.matter_test_config.pipe_name:
+            self.write_to_app_pipe({
+                "Name": "AvAnalysisPerceivedContext",
+                "NewContexts": [
+                    {"NamespaceId": context_to_detect.namespaceID, "Tag": context_to_detect.tag, "IdentifiedContextId": 42}
+                ]
+            })
+        elif not self.is_ci:
             self.wait_for_user_input(
                 prompt_msg="Simulate detection of a tracked entity (e.g., Person) on the DUT. Press Enter once detected."
             )
 
         self.step(4)
         id1 = None
-        if not self.is_ci:
+        if self.matter_test_config.pipe_name or not self.is_ci:
             event1 = event_callback.wait_for_event_report(cluster.Events.PerceivedContext, timeout_sec=30)
             log.info("PerceivedContext event 1: %s", event1)
             asserts.assert_is_not_none(event1, "Expected PerceivedContext event")
@@ -120,16 +129,23 @@ class TC_AVANALY_2_8(MatterBaseTest, AVANALYTestBase):
             asserts.assert_is_not_none(id1, "IdentifiedContextID must not be None")
         else:
             log.info("CI mode: skipping blocking event wait in Step 4")
-            id1 = 1
+            id1 = 42
 
         self.step(5)
-        if not self.is_ci:
+        if self.matter_test_config.pipe_name:
+            self.write_to_app_pipe({
+                "Name": "AvAnalysisPerceivedContext",
+                "NewContexts": [
+                    {"NamespaceId": context_to_detect.namespaceID, "Tag": context_to_detect.tag, "IdentifiedContextId": id1}
+                ]
+            })
+        elif not self.is_ci:
             self.wait_for_user_input(
                 prompt_msg="Simulate the entity moving and being detected again (e.g., across zones). Press Enter once detected."
             )
 
         self.step(6)
-        if not self.is_ci:
+        if self.matter_test_config.pipe_name or not self.is_ci:
             event2 = event_callback.wait_for_event_report(cluster.Events.PerceivedContext, timeout_sec=30)
             log.info("PerceivedContext event 2: %s", event2)
             asserts.assert_is_not_none(event2, "Expected PerceivedContext event")
@@ -141,7 +157,9 @@ class TC_AVANALY_2_8(MatterBaseTest, AVANALYTestBase):
         else:
             log.info("CI mode: skipping blocking event wait in Step 6")
 
-        # Cleanup: reset TrackingEnabled and disable context triggers
+        # Cleanup: reset TrackingEnabled, end session, and disable context triggers
+        if self.matter_test_config.pipe_name:
+            self.write_to_app_pipe({"Name": "AvAnalysisSessionEnd"})
         await self.write_single_attribute(attributes.TrackingEnabled(False), endpoint_id=endpoint)
         await self.send_disable_context_triggers_cmd(endpoint, context_triggers=NullValue)
 

@@ -21,7 +21,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CAMERA_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/avanaly_2_9_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -31,6 +31,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
+#       --app-pipe /tmp/avanaly_2_9_fifo
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -119,13 +120,27 @@ class TC_AVANALY_2_9(MatterBaseTest, AVANALYTestBase):
         await event_callback.start(self.default_controller, self.dut_node_id, endpoint)
 
         self.step(2)
-        if not self.is_ci:
+        context_to_detect = supported_contexts[0]
+        if self.matter_test_config.pipe_name:
+            self.write_to_app_pipe({
+                "Name": "AvAnalysisPerceivedContext",
+                "NewContexts": [
+                    {
+                        "NamespaceId": context_to_detect.namespaceID,
+                        "Tag": context_to_detect.tag,
+                        "IdentifiedContextId": 10,
+                        "CurrentZone": zone_1_id,
+                        "PreviousZone": None,
+                    }
+                ]
+            })
+        elif not self.is_ci:
             self.wait_for_user_input(
                 prompt_msg=f"Simulate entity detection in Zone 1 (zoneID={zone_1_id}) on the DUT. Press Enter once initiated."
             )
 
         self.step(3)
-        if not self.is_ci:
+        if self.matter_test_config.pipe_name or not self.is_ci:
             event1 = event_callback.wait_for_event_report(cluster.Events.PerceivedContext, timeout_sec=30)
             log.info("PerceivedContext event 1: %s", event1)
             asserts.assert_is_not_none(event1, "Expected PerceivedContext event")
@@ -138,13 +153,26 @@ class TC_AVANALY_2_9(MatterBaseTest, AVANALYTestBase):
             log.info("CI mode: skipping blocking event wait in Step 3")
 
         self.step(4)
-        if not self.is_ci:
+        if self.matter_test_config.pipe_name:
+            self.write_to_app_pipe({
+                "Name": "AvAnalysisPerceivedContext",
+                "NewContexts": [
+                    {
+                        "NamespaceId": context_to_detect.namespaceID,
+                        "Tag": context_to_detect.tag,
+                        "IdentifiedContextId": 10,
+                        "CurrentZone": zone_2_id,
+                        "PreviousZone": zone_1_id,
+                    }
+                ]
+            })
+        elif not self.is_ci:
             self.wait_for_user_input(
                 prompt_msg=f"Simulate entity moving from Zone 1 (zoneID={zone_1_id}) to Zone 2 (zoneID={zone_2_id}) on the DUT. Press Enter once initiated."
             )
 
         self.step(5)
-        if not self.is_ci:
+        if self.matter_test_config.pipe_name or not self.is_ci:
             event2 = event_callback.wait_for_event_report(cluster.Events.PerceivedContext, timeout_sec=30)
             log.info("PerceivedContext event 2: %s", event2)
             asserts.assert_is_not_none(event2, "Expected PerceivedContext event")
@@ -157,6 +185,8 @@ class TC_AVANALY_2_9(MatterBaseTest, AVANALYTestBase):
             log.info("CI mode: skipping blocking event wait in Step 5")
 
         # Cleanup
+        if self.matter_test_config.pipe_name:
+            self.write_to_app_pipe({"Name": "AvAnalysisSessionEnd"})
         await self.write_single_attribute(attributes.TrackingEnabled(False), endpoint_id=endpoint)
         await self.send_disable_context_triggers_cmd(endpoint, context_triggers=NullValue)
 

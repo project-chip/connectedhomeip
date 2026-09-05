@@ -21,7 +21,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CAMERA_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --camera-remote-analysis --trace-to json:${TRACE_APP}.json --app-pipe /tmp/avanaly_2_14_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -31,6 +31,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
+#       --app-pipe /tmp/avanaly_2_14_fifo
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -41,6 +42,7 @@ from mobly import asserts
 from TC_AVANALYTestBase import AVANALYTestBase
 
 import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
@@ -113,18 +115,28 @@ class TC_AVANALY_2_14(MatterBaseTest, AVANALYTestBase):
         resp = await self.send_establish_analysis_stream_cmd(endpoint, node_id=remote_node_id)
         log.info("EstablishAnalysisStreamResponse: %s", resp)
 
+        supported_contexts = await self.read_avanaly_attribute_expect_success(endpoint, cluster.Attributes.SupportedAmbientContexts)
+        if supported_contexts:
+            await self.send_enable_context_triggers_cmd(endpoint, context_triggers=NullValue)
+
         # Set up event subscription handler
         event_callback = EventSubscriptionHandler(expected_cluster=cluster)
         await event_callback.start(self.default_controller, self.dut_node_id, endpoint)
 
         self.step(4)
-        if not self.is_ci:
+        if self.matter_test_config.pipe_name:
+            self.write_to_app_pipe({
+                "Name": "AvAnalysisSessionStart",
+                "ZoneIds": [remote_zone_id],
+                "SourceNodeId": remote_node_id,
+            })
+        elif not self.is_ci:
             self.wait_for_user_input(
                 prompt_msg=f"Simulate detection of an ambient context in remote zone {remote_zone_id} for node {remote_node_id}. Press Enter once initiated."
             )
 
         self.step(5)
-        if not self.is_ci:
+        if self.matter_test_config.pipe_name or not self.is_ci:
             start_event = event_callback.wait_for_event_report(cluster.Events.AnalysisSessionStart, timeout_sec=30)
             log.info("AnalysisSessionStart event: %s", start_event)
             asserts.assert_is_not_none(start_event, "Expected AnalysisSessionStart event")
@@ -140,7 +152,21 @@ class TC_AVANALY_2_14(MatterBaseTest, AVANALYTestBase):
             self.step(6)
 
         self.step(7)
-        if not self.is_ci:
+        if self.matter_test_config.pipe_name:
+            context_to_send = supported_contexts[0] if supported_contexts else None
+            if context_to_send is not None:
+                self.write_to_app_pipe({
+                    "Name": "AvAnalysisPerceivedContext",
+                    "NewContexts": [
+                        {
+                            "NamespaceId": context_to_send.namespaceID,
+                            "Tag": context_to_send.tag,
+                            "IdentifiedContextId": 1,
+                        }
+                    ],
+                    "SourceNodeId": remote_node_id,
+                })
+        if self.matter_test_config.pipe_name or not self.is_ci:
             perceived_event = event_callback.wait_for_event_report(cluster.Events.PerceivedContext, timeout_sec=30)
             log.info("PerceivedContext event: %s", perceived_event)
             asserts.assert_is_not_none(perceived_event, "Expected PerceivedContext event")
@@ -150,7 +176,12 @@ class TC_AVANALY_2_14(MatterBaseTest, AVANALYTestBase):
             log.info("CI mode: skipping blocking event wait in Step 7")
 
         self.step(8)
-        if not self.is_ci:
+        if self.matter_test_config.pipe_name:
+            self.write_to_app_pipe({
+                "Name": "AvAnalysisSessionEnd",
+                "SourceNodeId": remote_node_id,
+            })
+        if self.matter_test_config.pipe_name or not self.is_ci:
             end_event = event_callback.wait_for_event_report(cluster.Events.AnalysisSessionEnd, timeout_sec=30)
             log.info("AnalysisSessionEnd event: %s", end_event)
             asserts.assert_is_not_none(end_event, "Expected AnalysisSessionEnd event")
@@ -158,6 +189,9 @@ class TC_AVANALY_2_14(MatterBaseTest, AVANALYTestBase):
                 asserts.assert_equal(end_event.sourceNodeId, remote_node_id, "SourceNodeId mismatch in AnalysisSessionEnd")
         else:
             log.info("CI mode: skipping blocking event wait in Step 8")
+
+        # Cleanup
+        await self.send_disable_context_triggers_cmd(endpoint, context_triggers=NullValue)
 
 
 if __name__ == "__main__":

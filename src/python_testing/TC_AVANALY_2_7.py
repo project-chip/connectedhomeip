@@ -21,7 +21,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CAMERA_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/avanaly_2_7_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -31,6 +31,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
+#       --app-pipe /tmp/avanaly_2_7_fifo
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -108,13 +109,20 @@ class TC_AVANALY_2_7(MatterBaseTest, AVANALYTestBase):
         await event_callback.start(self.default_controller, self.dut_node_id, endpoint)
 
         self.step(3)
-        if not self.is_ci:
+        if self.matter_test_config.pipe_name:
+            self.write_to_app_pipe({
+                "Name": "AvAnalysisPerceivedContext",
+                "NewContexts": [
+                    {"NamespaceId": context_a.namespaceID, "Tag": context_a.tag, "IdentifiedContextId": 1}
+                ]
+            })
+        elif not self.is_ci:
             self.wait_for_user_input(
                 prompt_msg=f"Simulate detection of Context A (namespace=0x{context_a.namespaceID:02X}, tag=0x{context_a.tag:04X}) on the DUT. Press Enter once detected."
             )
 
         self.step(4)
-        if not self.is_ci:
+        if self.matter_test_config.pipe_name or not self.is_ci:
             event1 = event_callback.wait_for_event_report(cluster.Events.PerceivedContext, timeout_sec=30)
             log.info("PerceivedContext event 1: %s", event1)
             asserts.assert_is_not_none(event1, "Expected PerceivedContext event")
@@ -126,13 +134,20 @@ class TC_AVANALY_2_7(MatterBaseTest, AVANALYTestBase):
             log.info("CI mode: skipping blocking event wait in Step 4")
 
         self.step(5)
-        if not self.is_ci:
+        if self.matter_test_config.pipe_name:
+            self.write_to_app_pipe({
+                "Name": "AvAnalysisPerceivedContext",
+                "NewContexts": [
+                    {"NamespaceId": context_b.namespaceID, "Tag": context_b.tag, "IdentifiedContextId": 2}
+                ]
+            })
+        elif not self.is_ci:
             self.wait_for_user_input(
                 prompt_msg=f"Simulate detection of Context B (namespace=0x{context_b.namespaceID:02X}, tag=0x{context_b.tag:04X}) on the DUT while Context A remains present. Press Enter once detected."
             )
 
         self.step(6)
-        if not self.is_ci:
+        if self.matter_test_config.pipe_name or not self.is_ci:
             event2 = event_callback.wait_for_event_report(cluster.Events.PerceivedContext, timeout_sec=30)
             log.info("PerceivedContext event 2: %s", event2)
             asserts.assert_is_not_none(event2, "Expected PerceivedContext event")
@@ -149,13 +164,20 @@ class TC_AVANALY_2_7(MatterBaseTest, AVANALYTestBase):
             log.info("CI mode: skipping blocking event wait in Step 6")
 
         self.step(7)
-        if not self.is_ci:
+        if self.matter_test_config.pipe_name:
+            self.write_to_app_pipe({
+                "Name": "AvAnalysisPerceivedContext",
+                "ExpiredContexts": [
+                    {"NamespaceId": context_a.namespaceID, "Tag": context_a.tag, "IdentifiedContextId": 1}
+                ]
+            })
+        elif not self.is_ci:
             self.wait_for_user_input(
                 prompt_msg=f"Simulate Context A (namespace=0x{context_a.namespaceID:02X}, tag=0x{context_a.tag:04X}) leaving/expiring while Context B remains. Press Enter once expired."
             )
 
         self.step(8)
-        if not self.is_ci:
+        if self.matter_test_config.pipe_name or not self.is_ci:
             event3 = event_callback.wait_for_event_report(cluster.Events.PerceivedContext, timeout_sec=30)
             log.info("PerceivedContext event 3: %s", event3)
             asserts.assert_is_not_none(event3, "Expected PerceivedContext event")
@@ -171,7 +193,9 @@ class TC_AVANALY_2_7(MatterBaseTest, AVANALYTestBase):
         else:
             log.info("CI mode: skipping blocking event wait in Step 8")
 
-        # Cleanup: disable all context triggers
+        # Cleanup: end analysis session and disable all context triggers
+        if self.matter_test_config.pipe_name:
+            self.write_to_app_pipe({"Name": "AvAnalysisSessionEnd"})
         await self.send_disable_context_triggers_cmd(endpoint, context_triggers=NullValue)
 
 

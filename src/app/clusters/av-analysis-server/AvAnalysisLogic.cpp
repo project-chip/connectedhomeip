@@ -42,9 +42,8 @@ AvAnalysisServerLogic::AvAnalysisServerLogic(
     EndpointId aEndpointId, BitFlags<Feature> aFeatures,
     const std::vector<Descriptor::Structs::SemanticTagStruct::Type> & aSupportedAmbientContexts,
     DataModel::Nullable<uint8_t> aMaxZones, uint8_t aMaxAnalysisStreamCount) :
-    mEndpointId(aEndpointId),
-    mFeatures(aFeatures), mSupportedAmbientContexts(aSupportedAmbientContexts), mMaxAnalysisStreamCount(aMaxAnalysisStreamCount),
-    mMaxZones(aMaxZones)
+    mEndpointId(aEndpointId), mFeatures(aFeatures), mSupportedAmbientContexts(aSupportedAmbientContexts),
+    mMaxAnalysisStreamCount(aMaxAnalysisStreamCount), mMaxZones(aMaxZones)
 {}
 
 AvAnalysisServerLogic::~AvAnalysisServerLogic()
@@ -598,12 +597,9 @@ AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, con
 /**
  * Handler for EnableContextTriggers when the local detect feature is set.
  */
-std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalEnableContextTriggers(
-    CommandHandler & handler, const ConcreteCommandPath & commandPath,
-    const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData)
+std::optional<DataModel::ActionReturnStatus>
+AvAnalysisServerLogic::ProcessEnableContextTriggers(const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData)
 {
-    ChipLogProgress(Zcl, "AvAnalysis[ep=%d]: Enabling Context Triggers command handler entry.", mEndpointId);
-
     // Verify spec constraints, provided list is 50 entries or less if not null
     //
     if (!commandData.contextTriggers.IsNull())
@@ -635,8 +631,8 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalE
 
             VerifyOrReturnError(it != mSupportedAmbientContexts.end(), Status::ConstraintError);
 
-            // The trigger context is valid, now check the ZoneIDs, which can only be present of PERZONEDETECT is set, likewise,
-            // if we have the feature, then ZoneIDs have to be present (note, they could be Null)
+            // The trigger context is valid, now check the ZoneIDs, which can only be present if PERZONEDETECT is set, likewise,
+            // if we have the feature, then ZoneIDs have to be present
             //
             bool hasZoneIDs        = contextTrigger.zoneIDs.HasValue();
             bool hasNonNullZoneIDs = false;
@@ -669,15 +665,21 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalE
                     {
                         zoneIDs.push_back(zone_iter.GetValue());
                     }
-                    err = mDelegate->VerifyZoneIDsAreValid(zoneIDs);
-                    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::NotFound);
+                    if (mDelegate != nullptr)
+                    {
+                        err = mDelegate->VerifyZoneIDsAreValid(zoneIDs);
+                        VerifyOrReturnError(err == CHIP_NO_ERROR, Status::NotFound);
+                    }
                     hasNonNullZoneIDs = true;
                 }
             }
 
             // Check with the delegate that additional contexts can be added
             //
-            VerifyOrReturnError(mDelegate->CanAddContextTriggers(), Status::ResourceExhausted);
+            if (mDelegate != nullptr)
+            {
+                VerifyOrReturnError(mDelegate->CanAddContextTriggers(), Status::ResourceExhausted);
+            }
 
             // Update our active trigger set with this new context.
             // If the context exists, update the zone IDs, otherwise add a new entry
@@ -734,7 +736,10 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalE
         // Provided set is null, meaning all known context triggers should be activated
         // First check with the delegate that additional contexts can be added
         //
-        VerifyOrReturnError(mDelegate->CanAddContextTriggers(), Status::ResourceExhausted);
+        if (mDelegate != nullptr)
+        {
+            VerifyOrReturnError(mDelegate->CanAddContextTriggers(), Status::ResourceExhausted);
+        }
 
         // Set the active triggers to be the supported triggers
         mActiveAmbientContextTriggers.clear();
@@ -756,21 +761,31 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalE
     // Inform the delegate of the new active context set. The delegate will read the updated contents
     // of the attribute
     //
-    mDelegate->ActiveAmbientContextTriggersUpdated();
+    if (mDelegate != nullptr)
+    {
+        mDelegate->ActiveAmbientContextTriggersUpdated();
+    }
     MarkDirty(AvAnalysis::Attributes::ActiveAmbientContextTriggers::Id);
     LogErrorOnFailure(StoreActiveAmbientContextTriggers());
 
     return Status::Success;
 }
 
-/**
- * Placeholder method for when the functionality for remote context detection is implemented
- */
+std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalEnableContextTriggers(
+    CommandHandler & handler, const ConcreteCommandPath & commandPath,
+    const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData)
+{
+    return ProcessEnableContextTriggers(commandData);
+}
+
 std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleRemoteEnableContextTriggers(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData)
 {
-    return Status::Success;
+    // Remote context detection requires at least one analysis stream to be established
+    VerifyOrReturnValue(mStreamTable.Count() > 0, Status::InvalidInState);
+
+    return ProcessEnableContextTriggers(commandData);
 }
 
 /**
@@ -948,28 +963,45 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleEstabl
     return std::nullopt;
 }
 
-/**
- * TODO: implement WebRTC session activation (stream state machine beyond PendingInitiation).
- * Streams cannot be activated yet, so INVALID_IN_STATE is sent as response.
- */
 std::optional<DataModel::ActionReturnStatus>
 AvAnalysisServerLogic::HandleActivateAnalysisStream(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                                     const AvAnalysis::Commands::ActivateAnalysisStream::DecodableType & commandData)
 {
-    VerifyOrReturnValue(mStreamTable.Find(commandData.analysisStreamID) != nullptr, Status::NotFound);
-    return Status::InvalidInState;
+    AnalysisStreamEntry * entry = mStreamTable.Find(commandData.analysisStreamID);
+    VerifyOrReturnValue(entry != nullptr, Status::NotFound);
+
+    // Spec 11.9.8.5.2: Stream must be in PendingInitiation state to be activated
+    VerifyOrReturnValue(entry->state == AnalysisStreamStateEnum::kPendingInitiation, Status::InvalidInState);
+
+    if (!entry->pushAVEndpointID.IsNull())
+    {
+        SetStreamState(*entry, AnalysisStreamStateEnum::kPushAVActive);
+    }
+    else
+    {
+        SetStreamState(*entry, AnalysisStreamStateEnum::kWebRTCActive);
+    }
+
+    LogErrorOnFailure(StoreAnalysisStreams());
+    return Status::Success;
 }
 
-/**
- * TODO: implement WebRTC session deactivation. No stream can be in an active state yet,
- * so INVALID_IN_STATE is sent as response.
- */
 std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleDeactivateAnalysisStream(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const AvAnalysis::Commands::DeactivateAnalysisStream::DecodableType & commandData)
 {
-    VerifyOrReturnValue(mStreamTable.Find(commandData.analysisStreamID) != nullptr, Status::NotFound);
-    return Status::InvalidInState;
+    AnalysisStreamEntry * entry = mStreamTable.Find(commandData.analysisStreamID);
+    VerifyOrReturnValue(entry != nullptr, Status::NotFound);
+
+    // Spec 11.9.8.6.2: Stream must be in an active state to be deactivated
+    VerifyOrReturnValue(entry->state == AnalysisStreamStateEnum::kWebRTCActive ||
+                            entry->state == AnalysisStreamStateEnum::kPushAVActive,
+                        Status::InvalidInState);
+
+    SetStreamState(*entry, AnalysisStreamStateEnum::kPendingInitiation);
+
+    LogErrorOnFailure(StoreAnalysisStreams());
+    return Status::Success;
 }
 
 std::optional<DataModel::ActionReturnStatus>
@@ -1023,9 +1055,38 @@ bool AvAnalysisServerLogic::ZoneIDListContains(const DataModel::DecodableList<ui
     return false;
 }
 
+CHIP_ERROR AvAnalysisServerLogic::CreateActiveSession(uint16_t & aSessionId, Optional<NodeId> aSourceNodeId,
+                                                      bool aUseSpecificSessionId)
+{
+    if (!aUseSpecificSessionId)
+    {
+        aSessionId = mNextAnalysisSessionID++;
+    }
+
+    auto session_it =
+        std::find_if(mActiveSessions.begin(), mActiveSessions.end(),
+                     [aSessionId](const ActiveAmbientContextSession & session) { return session.GetSessionId() == aSessionId; });
+
+    if (session_it != mActiveSessions.end())
+    {
+        if (aSourceNodeId.HasValue())
+        {
+            session_it->SetSourceNodeId(aSourceNodeId);
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    AvAnalysis::ActiveAmbientContextSession newSession;
+    newSession.SetSessionId(aSessionId);
+    newSession.SetSourceNodeId(aSourceNodeId);
+    mActiveSessions.push_back(newSession);
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionStart(uint16_t & aSessionId,
                                                        const DataModel::Nullable<std::vector<uint16_t>> & aZoneList,
-                                                       ServerClusterContext * aContext)
+                                                       ServerClusterContext * aContext, Optional<NodeId> aSourceNodeId)
 {
     VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -1041,12 +1102,17 @@ CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionStart(uint16_t & aSessionId,
     // Capture our new active session information
     AvAnalysis::ActiveAmbientContextSession newSession;
     newSession.SetSessionId(aSessionId);
+    newSession.SetSourceNodeId(aSourceNodeId);
     mActiveSessions.push_back(newSession);
 
     // Create the Initial Event
     Events::AnalysisSessionStart::Type startEvent;
 
     startEvent.sessionID = aSessionId;
+    if (aSourceNodeId.HasValue())
+    {
+        startEvent.sourceNodeId.SetValue(aSourceNodeId.Value());
+    }
 
     // The zones could be null, meaning that no zone information is available
     if (aZoneList.IsNull())
@@ -1067,7 +1133,7 @@ CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionStart(uint16_t & aSessionId,
 
 CHIP_ERROR AvAnalysisServerLogic::InitialTriggeringContextDetected(
     uint16_t aSessionId, const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aTriggeringContext,
-    ServerClusterContext * aContext)
+    ServerClusterContext * aContext, Optional<NodeId> aSourceNodeId)
 {
     VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -1093,7 +1159,16 @@ CHIP_ERROR AvAnalysisServerLogic::InitialTriggeringContextDetected(
     // Now create the first Perceived Context Event with the tiggering context
     Events::PerceivedContext::Type perceivedEvent;
 
-    perceivedEvent.sessionID             = aSessionId;
+    perceivedEvent.sessionID = aSessionId;
+    if (aSourceNodeId.HasValue())
+    {
+        perceivedEvent.sourceNodeId.SetValue(aSourceNodeId.Value());
+    }
+    else if (session_it->GetSourceNodeId().HasValue())
+    {
+        perceivedEvent.sourceNodeId.SetValue(session_it->GetSourceNodeId().Value());
+    }
+
     perceivedEvent.newIdentifiedContexts = chip::MakeOptional(
         DataModel::List<const Structs::TrackedContext::Type>(aTriggeringContext.data(), aTriggeringContext.size()));
 
@@ -1105,7 +1180,7 @@ CHIP_ERROR AvAnalysisServerLogic::InitialTriggeringContextDetected(
 
 CHIP_ERROR AvAnalysisServerLogic::NewContextDetected(uint16_t aSessionId,
                                                      const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aNewContext,
-                                                     ServerClusterContext * aContext)
+                                                     ServerClusterContext * aContext, Optional<NodeId> aSourceNodeId)
 {
     VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -1130,6 +1205,15 @@ CHIP_ERROR AvAnalysisServerLogic::NewContextDetected(uint16_t aSessionId,
     Events::PerceivedContext::Type perceivedEvent;
 
     perceivedEvent.sessionID = aSessionId;
+    if (aSourceNodeId.HasValue())
+    {
+        perceivedEvent.sourceNodeId.SetValue(aSourceNodeId.Value());
+    }
+    else if (it->GetSourceNodeId().HasValue())
+    {
+        perceivedEvent.sourceNodeId.SetValue(it->GetSourceNodeId().Value());
+    }
+
     perceivedEvent.newIdentifiedContexts =
         chip::MakeOptional(DataModel::List<const Structs::TrackedContext::Type>(aNewContext.data(), aNewContext.size()));
     perceivedEvent.currentIdentifiedContexts = chip::MakeOptional(
@@ -1147,7 +1231,7 @@ CHIP_ERROR AvAnalysisServerLogic::NewContextDetected(uint16_t aSessionId,
 CHIP_ERROR
 AvAnalysisServerLogic::ContextNoLongerDetected(uint16_t aSessionId,
                                                const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aOldContext,
-                                               ServerClusterContext * aContext)
+                                               ServerClusterContext * aContext, Optional<NodeId> aSourceNodeId)
 {
     VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -1185,7 +1269,16 @@ AvAnalysisServerLogic::ContextNoLongerDetected(uint16_t aSessionId,
     // Now create the Perceived Context Event with newly removed context
     Events::PerceivedContext::Type perceivedEvent;
 
-    perceivedEvent.sessionID                 = aSessionId;
+    perceivedEvent.sessionID = aSessionId;
+    if (aSourceNodeId.HasValue())
+    {
+        perceivedEvent.sourceNodeId.SetValue(aSourceNodeId.Value());
+    }
+    else if (it->GetSourceNodeId().HasValue())
+    {
+        perceivedEvent.sourceNodeId.SetValue(it->GetSourceNodeId().Value());
+    }
+
     perceivedEvent.currentIdentifiedContexts = chip::MakeOptional(
         DataModel::List<const Structs::TrackedContext::Type>(it->GetTrackedContexts().data(), it->GetTrackedContexts().size()));
     perceivedEvent.expiredContexts =
@@ -1197,7 +1290,8 @@ AvAnalysisServerLogic::ContextNoLongerDetected(uint16_t aSessionId,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionEnd(uint16_t aSessionId, ServerClusterContext * aContext)
+CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionEnd(uint16_t aSessionId, ServerClusterContext * aContext,
+                                                     Optional<NodeId> aSourceNodeId)
 {
     VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -1215,6 +1309,14 @@ CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionEnd(uint16_t aSessionId, Server
     // Now create the End Session Event
     Events::AnalysisSessionEnd::Type endSessionEvent;
     endSessionEvent.sessionID = aSessionId;
+    if (aSourceNodeId.HasValue())
+    {
+        endSessionEvent.sourceNodeId.SetValue(aSourceNodeId.Value());
+    }
+    else if (it->GetSourceNodeId().HasValue())
+    {
+        endSessionEvent.sourceNodeId.SetValue(it->GetSourceNodeId().Value());
+    }
 
     VerifyOrReturnError(aContext->interactionContext.eventsGenerator.GenerateEvent(endSessionEvent, mEndpointId).has_value(),
                         CHIP_ERROR_INTERNAL, ChipLogError(Zcl, "Unable to generate EndSession event"));
