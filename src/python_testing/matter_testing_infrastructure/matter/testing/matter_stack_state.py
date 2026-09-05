@@ -49,7 +49,8 @@ class MatterStackState:
             matter.native.Init(bluetoothAdapter=config.ble_controller)
             if config.storage_path is None:
                 raise ValueError("Must have configured a MatterTestConfig.storage_path")
-            self._init_stack(already_initialized=False, persistentStorage=PersistentStorageJSON(config.storage_path))
+            self._init_stack(already_initialized=False, persistentStorage=PersistentStorageJSON(config.storage_path),
+                             enableServerInteractions=config.enable_server_interactions)
             self._we_initialized_the_stack = True
         else:
             self._init_stack(already_initialized=True)
