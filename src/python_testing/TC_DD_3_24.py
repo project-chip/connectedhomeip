@@ -14,8 +14,10 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import asyncio
 import logging
 
+from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mobly import asserts
 
 import matter.testing.nfc
@@ -39,7 +41,9 @@ class TC_DD_3_24(MatterTestCommissioner):
             TestStep(1, "Detecting the NFC Tag and reading the Payload", is_commissioning=False),
             TestStep(2, "Validate the NFC bit in payload and perform the first phase of the commissioning, over NFC"),
             TestStep(3, "DUT is powered ON."),
-            TestStep(4, "Commissioning is completed on the operational network."),
+            TestStep(4, "Perform DNS-SD Discovery and check the presence of a mDNS service with “_IC” subtype."),
+            TestStep(5, "Commissioning is completed on the operational network."),
+            TestStep(6, "Perform DNS-SD Discovery and check that the “_IC” subtype is no more present."),
         ]
 
     def setup_test(self):
@@ -116,11 +120,17 @@ class TC_DD_3_24(MatterTestCommissioner):
         asserts.assert_true(commissioning_success, "Device Commissioning using nfc transport has failed")
         asserts.assert_true(self.unpowered_phase_complete_seen, "Stage 'UnpoweredPhaseComplete' was not seen!")
 
-        self.step(3)
-
+        self.step(3)    # Power ON the DUT
         self.wait_for_user_input(prompt_msg="Power ON the device")
 
-        self.step(4)
+        self.step(4)    # Perform DNS-SD Discovery and check the presence of a mDNS service with “_IC” subtype.
+
+        asserts.assert_true(
+            await self.check_operational_service_has_txt_ic(),
+            'TXT key "IC" was not found!'
+        )
+
+        self.step(5)    # Complete commissioning
 
         asserts.assert_not_equal(
             self.commissionee_node_id, 0,
@@ -141,6 +151,99 @@ class TC_DD_3_24(MatterTestCommissioner):
         )
 
         asserts.assert_true(self.send_complete_seen, "Stage 'send_complete_seen' was not seen!")
+
+        self.step(6)    # Perform DNS-SD Discovery and check that the “_IC” subtype is no more present.
+
+        txt_ic_still_present = True
+        for attempt in range(20):
+            txt_ic_still_present = await self.check_operational_service_has_txt_ic()
+            if not txt_ic_still_present:
+                break
+
+            log.info('Attempt %d/20: TXT key "IC" still present, retrying in 1 second', attempt + 1)
+            await asyncio.sleep(1)
+
+        asserts.assert_false(
+            txt_ic_still_present,
+            'TXT key "IC" is still present after 20 attempts!'
+        )
+
+    def get_dut_instance_name(self, log_result: bool = False) -> str:
+        """Return the operational mDNS instance name for the DUT.
+
+        The value is "<compressed-fabric-id>-<node-id>" using uppercase, zero-padded 16-hex-digit fields.
+        """
+        node_id = self.dut_node_id
+        compressed_fabric_id = self.default_controller.GetCompressedFabricId()
+        instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
+        if log_result:
+            log.info("\n\n\tDUT Instance Name: %s\n", instance_name)
+        return instance_name
+
+    # def get_operational_subtype(self, log_result: bool = False) -> str:
+    #     """Return the operational mDNS subtype for the current fabric.
+    #
+    #     The value is "_I<compressed-fabric-id>._sub._matter._tcp.local".
+    #     """
+    #     compressed_fabric_id = self.default_controller.GetCompressedFabricId()
+    #     operational_subtype = f'_I{compressed_fabric_id:016X}._sub.{MdnsServiceType.OPERATIONAL.value}'
+    #     if log_result:
+    #         log.info("\n\n\tOperational Subtype: %s\n", operational_subtype)
+    #     return operational_subtype
+
+    async def check_operational_service_has_txt_ic(self) -> bool:
+        """Check whether the DUT operational mDNS service advertises TXT key "IC" as "1".
+
+        Returns False when TXT data is missing, absent, or does not contain IC=1.
+        If the operational service lookup fails, this method asserts and fails the test.
+        """
+        # TH constructs the instance name for the DUT as the 64-bit compressed Fabric identifier, and the
+        # assigned 64-bit Node identifier, each expressed as a fixed-length sixteen-character hexadecimal
+        # string, encoded as ASCII (UTF-8) text using capital letters, separated by a hyphen.
+        instance_name = self.get_dut_instance_name(log_result=True)
+        log.info("instance_name: %s", instance_name)
+
+        instance_qname = f"{instance_name}.{MdnsServiceType.OPERATIONAL.value}"
+        log.info("instance_qname: %s", instance_qname)
+
+        mdns = MdnsDiscovery()
+        srv_record = await mdns.get_srv_record(
+            service_name=instance_qname,
+            service_type=MdnsServiceType.OPERATIONAL.value,
+            log_output=True
+        )
+
+        asserts.assert_true(
+            srv_record is not None,
+            f"Operational mDNS service '{instance_qname}' was not found"
+        )
+
+        txt_record = await mdns.get_txt_record(
+            service_name=instance_qname,
+            service_type=MdnsServiceType.OPERATIONAL.value,
+            log_output=True
+        )
+
+        if txt_record is None:
+            log.info("Operational mDNS service '%s' has no TXT record", instance_qname)
+            return False
+
+        if not hasattr(txt_record, "txt"):
+            log.info("Operational mDNS service '%s' does not contain TXT data", instance_qname)
+            return False
+
+        if txt_record.txt is None:
+            log.info("Operational mDNS service '%s' has no TXT record", instance_qname)
+            return False
+
+        asserts.assert_true(
+            isinstance(txt_record.txt, dict),
+            f"Operational mDNS service '{instance_qname}' TXT data is not a dictionary: {txt_record.txt}"
+        )
+
+        log.info("Operational TXT record: %s", txt_record.txt)
+
+        return "IC" in txt_record.txt and txt_record.txt["IC"] == "1"
 
 
 if __name__ == "__main__":
