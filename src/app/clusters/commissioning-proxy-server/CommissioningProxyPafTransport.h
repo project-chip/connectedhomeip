@@ -111,8 +111,11 @@ private:
 
     /// Taken from the cache rather than restated, so a result the transport accepts is by
     /// construction one the cache can also hold.
-    static constexpr size_t kMaxAddressBytes      = CommissioningProxyScanCache::kMaxAddressBytes;
-    static constexpr size_t kMaxExtendedDataBytes = CommissioningProxyScanCache::kMaxExtendedDataBytes;
+    // ScanResultStruct constrains Address to 100 bytes and ExtendedData to 128, so a
+    // scan record holds both inline. Stated here as CommissioningProxyScanAggregator
+    // states them, rather than reaching into another component's bounds.
+    static constexpr size_t kMaxAddressBytes      = 100;
+    static constexpr size_t kMaxExtendedDataBytes = 128;
 
     /// One live proxy session and the PAF session carrying it. `inUse` false marks a free
     /// slot, matching the fixed-slot idiom the cluster's own subsystems use.

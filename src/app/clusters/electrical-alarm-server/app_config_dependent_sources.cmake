@@ -12,20 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
-import("//build_overrides/chip.gni")
-
-source_set("operational-state-delegate") {
-  sources = [
-    "impl/LoggingOperationalStateDelegate.cpp",
-    "impl/LoggingOperationalStateDelegate.h",
-    "impl/LoggingRvcOperationalStateDelegate.cpp",
-    "impl/LoggingRvcOperationalStateDelegate.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/app/clusters/operational-state-server",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
-  ]
-}
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/CodegenIntegration.h"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/ElectricalAlarmTestEventTriggerHandler.h"
+    "${CLUSTER_DIR}/electrical-alarm-delegate.h"
+)

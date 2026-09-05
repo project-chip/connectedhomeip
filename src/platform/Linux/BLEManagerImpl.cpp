@@ -65,11 +65,52 @@ static constexpr System::Clock::Timeout kConnectTimeout           = System::Cloc
 // BlueZ-internal ChipDeviceScannerDelegate events into the public
 // BleScanResultCallback shape that the commissioning-proxy app expects.
 
+class ProxyScanForwarder;
+
+// Single in-flight proxy-scan forwarder.  Owned across StartProxyScan ->
+// StopProxyScan; destroyed and recreated each cycle so the scanner's
+// delegate pointer is never stale.
+static ProxyScanForwarder * sProxyScanForwarder = nullptr;
+
+// Id of the scan sProxyScanForwarder serves, stamped onto every result it
+// queues.  A result is copied on the GLib thread and delivered later on the
+// Matter event loop, so it outlives the scan that found it; releasing the
+// forwarder bumps this, which is what makes such a result recognisably stale.
+// Without it the result is handed to whatever scan started next -- a
+// background result entering a foreground scan's results, or landing in a
+// cache the background-scan registry has just cleared.
+static uint32_t sProxyScanGeneration = 0;
+
+// A device is re-reported on every RSSI change, so one device in range costs a report per
+// advertisement. Only the background scan needs the repeats, to reset a cached result's
+// timer; a device's first report is never suppressed.
+//
+// The bound is the 1 second minimum CacheTimeout. A repeat waits for the first
+// advertisement after the interval, so a device advertising just under it refreshes at
+// twice the interval - which has to stay inside that second.
+constexpr System::Clock::Timeout kProxyScanCoalesceInterval = System::Clock::Milliseconds32(400);
+
+// One slot per device the proxy can hold a result for.
+constexpr size_t kProxyScanCoalesceSlots = CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS;
+
+// Ordered and sized to pack: a 32-bit stamp first leaves no padding, and 3 x uint16 plus
+// the flag fill the rest. Milliseconds64 would cost 13 bytes of padding out of 24.
+struct ProxyScanReportRecord
+{
+    System::Clock::Milliseconds32 lastReported;
+    uint16_t discriminator;
+    uint16_t vendorId;
+    uint16_t productId;
+    bool inUse;
+};
+static_assert(sizeof(ProxyScanReportRecord) == 12, "ProxyScanReportRecord has grown padding");
+
 // Work item carried from the GLib scan thread onto the Matter event loop.
 struct ProxyScanWorkCtx
 {
     BLEManagerImpl::BleScanResultCallback cb;
     void * ctx;
+    uint32_t generation;
     uint8_t bdAddr[6]; // little-endian (reversed from BlueZ MSB-first)
     uint16_t discriminator;
     uint16_t vendorId;
@@ -79,14 +120,25 @@ struct ProxyScanWorkCtx
 static void DispatchProxyScanResult(intptr_t arg)
 {
     auto * r = reinterpret_cast<ProxyScanWorkCtx *>(arg);
-    r->cb(r->ctx, r->bdAddr, r->discriminator, r->vendorId, r->productId);
+    // Runs on the Matter event loop, the only thread that writes
+    // sProxyScanGeneration, so this comparison needs no lock.
+    if (r->generation == sProxyScanGeneration)
+    {
+        r->cb(r->ctx, r->bdAddr, r->discriminator, r->vendorId, r->productId);
+    }
+    else
+    {
+        ChipLogDetail(DeviceLayer, "ProxyScan: dropping result from scan %u (current %u)", r->generation, sProxyScanGeneration);
+    }
     delete r;
 }
 
 class ProxyScanForwarder : public ChipDeviceScannerDelegate
 {
 public:
-    ProxyScanForwarder(BLEManagerImpl::BleScanResultCallback cb, void * ctx) : mCb(cb), mCtx(ctx) {}
+    ProxyScanForwarder(BLEManagerImpl::BleScanResultCallback cb, void * ctx, uint32_t generation) :
+        mCb(cb), mCtx(ctx), mGeneration(generation)
+    {}
 
     void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override
     {
@@ -101,6 +153,10 @@ public:
             ChipLogDetail(DeviceLayer, "ProxyScanForwarder: malformed BD_ADDR '%s', skipping", addrStr);
             return;
         }
+
+        // Drop a repeat before it costs an allocation and a work item.
+        VerifyOrReturn(ShouldForward(info));
+
         // Schedule the callback onto the Matter event loop so the consumer can
         // safely touch SystemLayer timers and the data model.  Dispatching via
         // ScheduleWork avoids acquiring the CHIP stack lock from this GLib
@@ -113,6 +169,7 @@ public:
         auto * work         = new ProxyScanWorkCtx{};
         work->cb            = mCb;
         work->ctx           = mCtx;
+        work->generation    = mGeneration;
         work->discriminator = info.GetDeviceDiscriminator();
         work->vendorId      = info.GetVendorId();
         work->productId     = info.GetProductId();
@@ -130,15 +187,73 @@ public:
     void OnScanComplete() override {}
     void OnScanError(CHIP_ERROR) override {}
 
+    ~ProxyScanForwarder() override
+    {
+        // One line per scan, rather than one per report.
+        ChipLogDetail(DeviceLayer, "ProxyScanForwarder: scan %u forwarded %u report(s), coalesced %u", mGeneration, mForwarded,
+                      mCoalesced);
+    }
+
 private:
+    /// False when this device was already forwarded inside kProxyScanCoalesceInterval.
+    /// Called only from OnDeviceScanned, so the records need no locking.
+    bool ShouldForward(const chip::Ble::ChipBLEDeviceIdentificationInfo & info)
+    {
+        const auto now = std::chrono::duration_cast<System::Clock::Milliseconds32>(System::SystemClock().GetMonotonicTimestamp());
+        const uint16_t discriminator = info.GetDeviceDiscriminator();
+        const uint16_t vendorId      = info.GetVendorId();
+        const uint16_t productId     = info.GetProductId();
+
+        ProxyScanReportRecord * freeSlot = nullptr;
+        for (auto & record : mReported)
+        {
+            if (record.inUse && record.discriminator == discriminator && record.vendorId == vendorId &&
+                record.productId == productId)
+            {
+                if (now - record.lastReported < kProxyScanCoalesceInterval)
+                {
+                    mCoalesced++;
+                    return false;
+                }
+                record.lastReported = now;
+                mForwarded++;
+                return true;
+            }
+            if (freeSlot == nullptr && !record.inUse)
+            {
+                freeSlot = &record;
+            }
+        }
+
+        // No slot left: forward unrecorded, so only the coalescing is lost.
+        if (freeSlot != nullptr)
+        {
+            *freeSlot = ProxyScanReportRecord{ now, discriminator, vendorId, productId, true };
+        }
+        mForwarded++;
+        return true;
+    }
+
     BLEManagerImpl::BleScanResultCallback mCb;
     void * mCtx;
+    // Immutable once constructed, so the GLib thread can read it unsynchronised.
+    const uint32_t mGeneration;
+
+    ProxyScanReportRecord mReported[kProxyScanCoalesceSlots] = {};
+    uint32_t mForwarded                                      = 0;
+    uint32_t mCoalesced                                      = 0;
 };
 
-// Single in-flight proxy-scan forwarder.  Owned across StartProxyScan ->
-// StopProxyScan; destroyed and recreated each cycle so the scanner's
-// delegate pointer is never stale.
-static ProxyScanForwarder * sProxyScanForwarder = nullptr;
+/// Tear down the current forwarder and invalidate every result it has queued.
+/// The generation bump is what makes an already-scheduled work item stale, so it
+/// belongs wherever the forwarder goes away -- the failed-start rollbacks as much
+/// as StopProxyScan.
+static void ReleaseProxyScanForwarder()
+{
+    delete sProxyScanForwarder;
+    sProxyScanForwarder = nullptr;
+    sProxyScanGeneration++;
+}
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 static constexpr System::Clock::Timeout kFastAdvertiseTimeout =
     System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
@@ -920,12 +1035,11 @@ CHIP_ERROR BLEManagerImpl::StartProxyScan(BleScanResultCallback cb, void * conte
     VerifyOrReturnError(!mDeviceScanner.IsScanning(), CHIP_ERROR_BUSY);
     VerifyOrReturnError(mFlags.Has(Flags::kBluezAdapterAvailable), BLE_ERROR_ADAPTER_UNAVAILABLE);
 
-    sProxyScanForwarder = new ProxyScanForwarder(cb, context);
+    sProxyScanForwarder = new ProxyScanForwarder(cb, context, sProxyScanGeneration);
     CHIP_ERROR err      = mDeviceScanner.Init(mAdapter.get(), sProxyScanForwarder);
     if (err != CHIP_NO_ERROR)
     {
-        delete sProxyScanForwarder;
-        sProxyScanForwarder = nullptr;
+        ReleaseProxyScanForwarder();
         return err;
     }
     err = mDeviceScanner.StartScan();
@@ -938,8 +1052,7 @@ CHIP_ERROR BLEManagerImpl::StartProxyScan(BleScanResultCallback cb, void * conte
         CHIP_ERROR restoreErr = mDeviceScanner.Init(mAdapter.get(), this);
         VerifyOrDieWithMsg(restoreErr == CHIP_NO_ERROR, DeviceLayer, "ProxyScan rollback: scanner Init failed: %" CHIP_ERROR_FORMAT,
                            restoreErr.Format());
-        delete sProxyScanForwarder;
-        sProxyScanForwarder = nullptr;
+        ReleaseProxyScanForwarder();
     }
     return err;
 }
@@ -966,8 +1079,9 @@ CHIP_ERROR BLEManagerImpl::StopProxyScan()
         VerifyOrDieWithMsg(restoreErr == CHIP_NO_ERROR, DeviceLayer, "StopProxyScan: scanner Init failed: %" CHIP_ERROR_FORMAT,
                            restoreErr.Format());
     }
-    delete sProxyScanForwarder;
-    sProxyScanForwarder = nullptr;
+    // Also invalidates any result this scan has already queued onto the event
+    // loop, so it cannot be delivered to the next scan.
+    ReleaseProxyScanForwarder();
     return err;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY

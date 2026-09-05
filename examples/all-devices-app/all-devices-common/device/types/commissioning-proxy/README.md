@@ -213,16 +213,29 @@ when `chip_device_config_enable_wifipaf` is set; a build with it off drops the
 The binary is at `out/linux-x64-all-devices-boringssl/all-devices-app` (or the
 `arm64` equivalent).
 
-**Cross-compile a Wi-Fi-PAF-only binary for a Raspberry Pi:**
+**Select the transports at build time:**
+
+The targets above compile every transport the platform supports. To build a
+single-transport binary, configure the application's own gn root and pass the
+flag that disables the other transport:
 
 ```bash
-~/scripts/build-cp-all-devices-rpi.sh paf
+./scripts/run_in_build_env.sh "cd examples/all-devices-app/posix && \
+  gn gen out/paf-only --args='chip_config_network_layer_ble=false' && \
+  ninja -C out/paf-only all-devices-app"
 ```
 
-This passes `chip_config_network_layer_ble=false` (Wi-Fi PAF stays on, BLE is
-disabled) and lands the binary at
-`examples/all-devices-app/posix/out/rpi-paf-only/all-devices-app`. Use `both`
-(or no argument) for a combined BLE + Wi-Fi PAF build.
+| gn argument                               | Transports compiled in |
+| ----------------------------------------- | ---------------------- |
+| _(none of the below)_                     | BLE and Wi-Fi PAF      |
+| `chip_config_network_layer_ble=false`     | Wi-Fi PAF only         |
+| `chip_device_config_enable_wifipaf=false` | BLE only               |
+
+The binary lands at `out/<name>/all-devices-app` under
+`examples/all-devices-app/posix`. Cross-compiling for a Raspberry Pi adds the
+usual aarch64 arguments to the same `gn gen` line — `target_os="linux"`,
+`target_cpu="arm64"`, and a `sysroot=` and `system_libdir=` pointing at your
+aarch64 sysroot.
 
 <hr>
 
@@ -324,14 +337,16 @@ carries a large payload, so TCP must be forced:
 subscribers via attribute reporting. `Timeout 0` means no expiry:
 
 ```bash
-# start (Transport, Timeout, WiFiBands, proxy-node-id, endpoint)
-./chip-tool commissioningproxy proxy-back-ground-scan-start-request 8 0 5 1998 5
+# start
+./chip-tool commissioningproxy proxy-back-ground-scan-start-request 8 0 1998 5 \
+    --WiFiBands 5
 
 # read the cache
 ./chip-tool commissioningproxy read cached-results 1998 5
 
-# stop (Transport, WiFiBands, proxy-node-id, endpoint)
-./chip-tool commissioningproxy proxy-back-ground-scan-stop-request 8 5 1998 5
+# stop
+./chip-tool commissioningproxy proxy-back-ground-scan-stop-request 8 1998 5 \
+    --WiFiBands 5
 ```
 
 <hr>
@@ -344,54 +359,46 @@ and commissioning packets between chip-tool and the device:
 
 ```bash
 ./chip-tool pairing proxy <node-id> <ssid> <password> <setup-pin-code> \
-    <ed-discriminator> <proxy-node-id> [<proxy-connect-timeout>]
+    <ed-discriminator> <proxy-node-id> <proxy-connect-timeout> <proxy-transport> \
+    [--proxy-endpoint <endpoint>] [--proxy-wifi-band 2g4|5g]
 ```
 
-| Argument                | Description                                                  |
-| ----------------------- | ------------------------------------------------------------ |
-| `node-id`               | Node ID to assign to the new device                          |
-| `ssid`                  | Wi-Fi network SSID to configure on the device                |
-| `password`              | Wi-Fi network password                                       |
-| `setup-pin-code`        | Commissionee PASE setup PIN code                             |
-| `ed-discriminator`      | Commissionee discriminator (matches step 6)                  |
-| `proxy-node-id`         | Node ID of the already-commissioned proxy                    |
-| `proxy-connect-timeout` | Timeout in seconds for `ProxyConnectRequest` (default: 30 s) |
+| Argument                | Description                                                                 |
+| ----------------------- | --------------------------------------------------------------------------- |
+| `node-id`               | Node ID to assign to the new device                                         |
+| `ssid`                  | Wi-Fi network SSID to configure on the device                               |
+| `password`              | Wi-Fi network password                                                      |
+| `setup-pin-code`        | Commissionee PASE setup PIN code                                            |
+| `ed-discriminator`      | Commissionee discriminator (matches step 6)                                 |
+| `proxy-node-id`         | Node ID of the already-commissioned proxy                                   |
+| `proxy-connect-timeout` | Seconds the proxy may spend connecting to the commissionee; `0` = no limit  |
+| `proxy-transport`       | `wifipaf` or `ble` — the transport the proxy uses to reach the commissionee |
+| `--proxy-endpoint`      | Endpoint hosting the cluster. Defaults to `1`; this app uses `5`            |
+| `--proxy-wifi-band`     | Optional band hint, `2g4` or `5g`; accepted only with `wifipaf`             |
 
 Example — commission device node 1999 onto network "MyNetwork" via proxy 1998:
 
 ```bash
-./chip-tool pairing proxy 1999 "MyNetwork" "MyPassword" 20202021 3840 1998
+./chip-tool pairing proxy 1999 "MyNetwork" "MyPassword" 20202021 3840 1998 0 wifipaf \
+    --proxy-endpoint 5 --proxy-wifi-band 2g4
 ```
 
 <hr>
 
 ## 9. How Wi-Fi PAF is wired into the CP device
 
-The transport-agnostic session, scan, and message bookkeeping lives in the
-`commissioning-proxy-server` cluster, and so does the Wi-Fi PAF driver itself:
-`CommissioningProxyPafTransport` ships with the cluster as the separate
-`paf-transport` target, so a build that proxies over BLE only — or a platform
-with no Wi-Fi PAF stack — can leave it out. See
-[`src/app/clusters/commissioning-proxy-server/README.md`](../../../../../../src/app/clusters/commissioning-proxy-server/README.md)
-for the full design.
-
-The driver (`GetTransportType()` returns `kWiFiPAF`) bridges the cluster to the
-portable Wi-Fi PAF layer:
-
--   `Connect()` → `ConnectivityMgr().WiFiPAFSubscribe()` to open a NAN session
-    to the discriminator of the commissionee.
--   `SendMessage()` → `WiFiPAFLayer::SendMessage()` to tunnel a commissioning
-    packet over PAFTP (the PAFTP endpoint, not the raw NAN transmit).
--   `Disconnect()` / `CancelPendingConnect()` → `RmPafSession()` and
-    `WiFiPAFCancelSubscribe()` / `WiFiPAFCancelIncompleteSubscribe()` to release
-    the session.
+The Wi-Fi PAF driver, `CommissioningProxyPafTransport`, ships with the cluster
+as the separate `paf-transport` target, so a build that proxies over BLE only —
+or a platform with no Wi-Fi PAF stack — can leave it out. Its design, the
+transport methods it implements and the shared-scanner rules are documented in
+[`src/app/clusters/commissioning-proxy-server/README.md`](../../../../../../src/app/clusters/commissioning-proxy-server/README.md).
 
 ### What this app has to supply
 
-Everything above is portable. Discovery is not: scanning for commissionable
-devices, and recovering the NAN subscribe id the platform assigned, both need
-the platform implementation. Those operations are the
-`CommissioningProxyPafAdapter` interface, and this app implements it in
+Session setup and message tunneling are portable. Discovery is not: scanning for
+commissionable devices, and recovering the NAN subscribe id the platform
+assigned, both need platform code. That is the `CommissioningProxyPafAdapter`
+interface, which this app implements in
 [`posix/linux/CommissioningProxyPafAdapter.cpp`](../../../../posix/linux/CommissioningProxyPafAdapter.cpp):
 
 | Adapter method                      | Linux implementation                                             |
@@ -407,34 +414,14 @@ The adapter is also where the platform's peer descriptor is unpacked.
 adapter reports each peer as plain scalars and that type never reaches the
 cluster.
 
-Two details worth knowing when reading the code:
-
--   **The platform owns the scan window.** `WiFiPAFScan()` takes the duration
-    and reports the whole result set when it expires, so the PAF driver arms no
-    scan timer of its own — it waits for the adapter's completion callback. (The
-    BLE driver is the other way round: it times its own window.)
--   **One NAN subscribe slot** is shared by the foreground scan, the background
-    scan and connect. The driver pauses the background scan before a foreground
-    scan or a connect and resumes it afterwards; `StartHardwareScan()` also
-    reports `CHIP_ERROR_BUSY` while a connect is pending, which the shared
-    background-scan registry treats as "defer and retry".
-
-The adapter is constructed in `posix/linux/DeviceFactoryPlatformOverride.cpp`,
-which is also where the advertised `WiFiBand` is derived from
-`--wifipaf freq_list=` and passed to the device — the device itself reads no
-command line.
-
-The driver is owned by the same override, which composes it onto the single
-`CommissioningProxyDevice` with `AddTransport()`. There is no per-transport
-device type: a build with BLE as well adds the BLE driver the same way, so
-supporting another technology is one more transport driver and one more
-`AddTransport()` call rather than a new class per combination of technologies.
-
-The proxy's own publish lifecycle belongs to the driver, not the device.
-`CommissioningProxyPafTransport` takes the `FabricTable` and calls
-`DisconnectPublishReceiveHandler()` once the proxy is on a fabric. This app
-registers its transports before `Server::Init()`, so the fabric table is always
-empty at that point and the call happens on the commissioning-complete event.
+Adapter and driver are both constructed in
+`posix/linux/DeviceFactoryPlatformOverride.cpp`, which composes the driver onto
+the single `CommissioningProxyDevice` with `AddTransport()` — a build with BLE
+adds that driver the same way — and derives the advertised `WiFiBand` from
+`--wifipaf freq_list=`, since the device itself reads no command line.
+Transports are registered before `Server::Init()`, so the fabric table is empty
+at that point and the driver's `DisconnectPublishReceiveHandler()` call lands on
+the commissioning-complete event instead.
 
 <hr>
 
@@ -478,13 +465,3 @@ for this step.
 
 You are running a chip-tool build without the Commissioning Proxy support. Build
 chip-tool from this repository.
-
-### Key log strings
-
-| String                           | Where | Meaning                                            |
-| -------------------------------- | ----- | -------------------------------------------------- |
-| `WiFi-PAF: Starting NAN publish` | ED    | End Device is advertising via NAN                  |
-| `WiFiPAFSubscribe`               | Proxy | Proxy opened a NAN subscribe to the commissionee   |
-| `WiFiPAFMessageReceived`         | Proxy | Received a PAF frame from the End Device           |
-| `WiFiPAFCloseSession`            | Proxy | PAF session closed — check for an ack-timer nearby |
-| `Cluster=0x0031 Command=0x0006`  | ED    | `ConnectNetwork` command received                  |
