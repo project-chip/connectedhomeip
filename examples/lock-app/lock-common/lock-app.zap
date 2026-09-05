@@ -6034,6 +6034,22 @@
               "reportableChange": 0
             },
             {
+              "name": "ExpiringUserTimeout",
+              "code": 53,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "AliroReaderVerificationKey",
               "code": 128,
               "mfgCode": null,
