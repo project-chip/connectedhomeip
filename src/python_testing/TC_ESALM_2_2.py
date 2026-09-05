@@ -85,9 +85,23 @@ def _kwarg(attribute_name: str) -> str:
     return attribute_name[0].lower() + attribute_name[1:]
 
 
+# The plan's name for each stored original value, used verbatim in the step text.
+_ORIG_NAMES = {
+    "OverVoltageThreshold": "ORIG_OVT",
+    "UnderVoltageThreshold": "ORIG_UVT",
+    "OverFrequencyThreshold": "ORIG_OFT",
+    "UnderFrequencyThreshold": "ORIG_UFT",
+    "OverPowerThreshold": "ORIG_OPT",
+    "UnderPowerThreshold": "ORIG_UPT",
+    "OverCurrentThreshold": "ORIG_OCT",
+    "UnderCurrentThreshold": "ORIG_UCT",
+    "PowerImportThreshold": "ORIG_PIMT",
+    "PowerExportThreshold": "ORIG_PEXT",
+}
+
+
 def _orig(attribute_name: str) -> str:
-    """The plan's name for the stored original value, e.g. OverVoltageThreshold -> ORIG_OVT."""
-    return "ORIG_" + attribute_name.replace("Threshold", "")
+    return _ORIG_NAMES[attribute_name]
 
 
 class TC_ESALM_2_2(MatterBaseTest):
@@ -142,7 +156,7 @@ class TC_ESALM_2_2(MatterBaseTest):
         steps = [
             TestStep(1, "Commission DUT to TH", is_commissioning=True),
             TestStep(2, "TH reads from the DUT the FeatureMap attribute.",
-                     "Verify that the DUT response contains a map32 value."),
+                     "Verify that the DUT response contains a uint32 value. Store the value as FeatureMap."),
         ]
         for i, (name, _feature) in enumerate(ALL_THRESHOLDS):
             steps.append(TestStep(3 + i, f"TH reads from the DUT the {name}.",
@@ -235,18 +249,34 @@ class TC_ESALM_2_2(MatterBaseTest):
             self.mark_current_step_skipped()
 
     async def _pair_block(self, endpoint: int, base: int, over: str, under: str,
-                          orig_over: int, orig_under: int) -> None:
-        """Execute the fourteen steps declared by _pair_steps for one over/under pair."""
+                          orig_over, orig_under) -> None:
+        """Execute the fourteen steps declared by _pair_steps for one over/under pair.
+
+        The plan gates steps 1 and 2 of the block on the Over feature, steps 3 and 4 on the Under
+        feature, and the remaining ten on both, so orig_over or orig_under may be None.
+        """
         ko, ku = _kwarg(over), _kwarg(under)
-        new_over, new_under = orig_over + 1000, orig_under - 1000
+        has_over, has_under = orig_over is not None, orig_under is not None
 
-        self.step(base)
-        await self._set(endpoint, **{ko: new_over})
-        await self._read_step(base + 1, endpoint, over, new_over)
+        if has_over:
+            new_over = orig_over + 1000
+            self.step(base)
+            await self._set(endpoint, **{ko: new_over})
+            await self._read_step(base + 1, endpoint, over, new_over)
+        else:
+            self._skip(base, 2)
 
-        self.step(base + 2)
-        await self._set(endpoint, **{ku: new_under})
-        await self._read_step(base + 3, endpoint, under, new_under)
+        if has_under:
+            new_under = orig_under - 1000
+            self.step(base + 2)
+            await self._set(endpoint, **{ku: new_under})
+            await self._read_step(base + 3, endpoint, under, new_under)
+        else:
+            self._skip(base + 2, 2)
+
+        if not (has_over and has_under):
+            self._skip(base + 4, 10)
+            return
 
         self.step(base + 4)
         await self._set_expect_constraint_error(endpoint, **{ko: new_under})
@@ -288,9 +318,9 @@ class TC_ESALM_2_2(MatterBaseTest):
 
         for i, (over, under, feat_over, feat_under) in enumerate(PAIRS):
             base = 13 + 14 * i
-            if over in originals and under in originals:
+            if over in originals or under in originals:
                 await self._pair_block(endpoint, base, over, under,
-                                       originals[over], originals[under])
+                                       originals.get(over), originals.get(under))
             else:
                 self._skip(base, 14)
 

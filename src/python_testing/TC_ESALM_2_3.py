@@ -95,16 +95,16 @@ class TC_ESALM_2_3(MatterBaseTest):
         has_modify = cmds.ModifyEnabledAlarms.command_id in accepted_cmds
         has_reset = cmds.Reset.command_id in accepted_cmds
 
-        self.step("2a", "TH reads Supported.", expectation="DUT returns a map32 AlarmBitmap.")
+        self.step("2a", "TH reads Supported.", expectation="DUT returns a map64 AlarmBitmap.")
         supported = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.Supported)
 
         self.step("2b", "TH reads Mask. Store value as InitialMask.",
-                  expectation="DUT returns a map32 AlarmBitmap.")
+                  expectation="DUT returns a map64 AlarmBitmap.")
         initial_mask = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.Mask)
 
-        self.step("2c", "TH reads State.", expectation="DUT returns a map32 AlarmBitmap.")
+        self.step("2c", "TH reads State.", expectation="DUT returns a map64 AlarmBitmap.")
         initial_state = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.State)
 
@@ -196,7 +196,7 @@ class TC_ESALM_2_3(MatterBaseTest):
 
         target_bit = None
         self.step(10, "TH reads Latch. Store value as LatchBits and identify the lowest-numbered bit set.",
-                  expectation="DUT returns a map32 AlarmBitmap.")
+                  expectation="DUT returns a map64 AlarmBitmap.")
         if has_latch:
             latch = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.Latch)
