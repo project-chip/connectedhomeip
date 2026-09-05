@@ -415,6 +415,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 #ifdef DEBUG
     NSUInteger _unitTestAttributesReportedSinceLastCheck;
     NSUInteger _unitTestEventsReportedSinceLastCheck;
+    NSUInteger _unitTestReadThroughsSinceLastCheck;
 #endif
 
     // _deviceCachePrimed is true if we have the data that comes from an initial
@@ -3324,6 +3325,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     _unitTestEventsReportedSinceLastCheck = 0;
     return eventsReportedSinceLastCheck;
 }
+
+- (NSUInteger)unitTestReadThroughsSinceLastCheck
+{
+    std::lock_guard lock(_lock);
+
+    NSUInteger readThroughsSinceLastCheck = _unitTestReadThroughsSinceLastCheck;
+    _unitTestReadThroughsSinceLastCheck = 0;
+    return readThroughsSinceLastCheck;
+}
 #endif
 
 #pragma mark Device Interactions
@@ -3454,6 +3464,159 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 }
 
+// Helper function to determine whether an attribute has "Quieter Reporting" quality (Q), which indicates that
+// the server only reports it under the conditions named in its own description, so a working subscription is
+// no guarantee that the cached value is current
+//   * TODO: xml+codegen version to replace this hardcoded list.  Unlike Changes Omitted, Q is not expressed
+//     in the data model XML yet, so that needs a spec-side change first.
+// Omitted: ProximityRanging's RangingConstraints (0x0007), which has no generated attribute ID in this SDK.
+static BOOL AttributeHasQuieterReportingQuality(MTRAttributePath * attributePath)
+{
+    switch (attributePath.cluster.unsignedLongValue) {
+    case MTRClusterIDTypeClosureControlID:
+        return attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterClosureControlAttributeCountdownTimeID;
+    case MTRClusterIDTypeClosureDimensionID:
+        return attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterClosureDimensionAttributeCurrentStateID;
+    case MTRClusterIDTypeColorControlID:
+        switch (attributePath.attribute.unsignedLongValue) {
+        case MTRAttributeIDTypeClusterColorControlAttributeCurrentHueID:
+        case MTRAttributeIDTypeClusterColorControlAttributeCurrentSaturationID:
+        case MTRAttributeIDTypeClusterColorControlAttributeRemainingTimeID:
+        case MTRAttributeIDTypeClusterColorControlAttributeCurrentXID:
+        case MTRAttributeIDTypeClusterColorControlAttributeCurrentYID:
+        case MTRAttributeIDTypeClusterColorControlAttributeColorTemperatureMiredsID:
+        case MTRAttributeIDTypeClusterColorControlAttributeEnhancedCurrentHueID:
+            return YES;
+        default:
+            return NO;
+        }
+    case MTRClusterIDTypeDeviceEnergyManagementID:
+        switch (attributePath.attribute.unsignedLongValue) {
+        case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributePowerAdjustmentCapabilityID:
+        case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeForecastID:
+            return YES;
+        default:
+            return NO;
+        }
+    case MTRClusterIDTypeElectricalEnergyMeasurementID:
+        switch (attributePath.attribute.unsignedLongValue) {
+        case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeCumulativeEnergyImportedID:
+        case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeCumulativeEnergyExportedID:
+        case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributePeriodicEnergyImportedID:
+        case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributePeriodicEnergyExportedID:
+            return YES;
+        default:
+            return NO;
+        }
+    case MTRClusterIDTypeElectricalPowerMeasurementID:
+        switch (attributePath.attribute.unsignedLongValue) {
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeRangesID:
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeVoltageID:
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeActiveCurrentID:
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeReactiveCurrentID:
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeApparentCurrentID:
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeActivePowerID:
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeReactivePowerID:
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeApparentPowerID:
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeRMSVoltageID:
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeRMSCurrentID:
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeRMSPowerID:
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeFrequencyID:
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeHarmonicCurrentsID:
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeHarmonicPhasesID:
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributePowerFactorID:
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeNeutralCurrentID:
+            return YES;
+        default:
+            return NO;
+        }
+    case MTRClusterIDTypeEnergyEVSEID:
+        switch (attributePath.attribute.unsignedLongValue) {
+        case MTRAttributeIDTypeClusterEnergyEVSEAttributeSessionDurationID:
+        case MTRAttributeIDTypeClusterEnergyEVSEAttributeSessionEnergyChargedID:
+        case MTRAttributeIDTypeClusterEnergyEVSEAttributeSessionEnergyDischargedID:
+            return YES;
+        default:
+            return NO;
+        }
+    case MTRClusterIDTypeFanControlID:
+        switch (attributePath.attribute.unsignedLongValue) {
+        case MTRAttributeIDTypeClusterFanControlAttributePercentCurrentID:
+        case MTRAttributeIDTypeClusterFanControlAttributeSpeedCurrentID:
+            return YES;
+        default:
+            return NO;
+        }
+    case MTRClusterIDTypeIdentifyID:
+        return attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterIdentifyAttributeIdentifyTimeID;
+    case MTRClusterIDTypeLevelControlID:
+        switch (attributePath.attribute.unsignedLongValue) {
+        case MTRAttributeIDTypeClusterLevelControlAttributeCurrentLevelID:
+        case MTRAttributeIDTypeClusterLevelControlAttributeRemainingTimeID:
+        case MTRAttributeIDTypeClusterLevelControlAttributeCurrentFrequencyID:
+            return YES;
+        default:
+            return NO;
+        }
+    case MTRClusterIDTypeMediaFileManagementID:
+        switch (attributePath.attribute.unsignedLongValue) {
+        case MTRAttributeIDTypeClusterMediaFileManagementAttributeAvailableStorageID:
+        case MTRAttributeIDTypeClusterMediaFileManagementAttributeAvailableFilesID:
+            return YES;
+        default:
+            return NO;
+        }
+    case MTRClusterIDTypeNetworkIdentityManagementID:
+        return attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeClientsID;
+    case MTRClusterIDTypeOnOffID:
+        switch (attributePath.attribute.unsignedLongValue) {
+        case MTRAttributeIDTypeClusterOnOffAttributeOnTimeID:
+        case MTRAttributeIDTypeClusterOnOffAttributeOffWaitTimeID:
+            return YES;
+        default:
+            return NO;
+        }
+    // CountdownTime is defined by the base Operational State cluster and inherited by each derived
+    // cluster at the same attribute ID.
+    case MTRClusterIDTypeOperationalStateID:
+        return attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterOperationalStateAttributeCountdownTimeID;
+    case MTRClusterIDTypeOvenCavityOperationalStateID:
+        return attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeCountdownTimeID;
+    case MTRClusterIDTypeRVCOperationalStateID:
+        return attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterRVCOperationalStateAttributeCountdownTimeID;
+    case MTRClusterIDTypePowerSourceID:
+        switch (attributePath.attribute.unsignedLongValue) {
+        case MTRAttributeIDTypeClusterPowerSourceAttributeBatPercentRemainingID:
+        case MTRAttributeIDTypeClusterPowerSourceAttributeBatTimeRemainingID:
+        case MTRAttributeIDTypeClusterPowerSourceAttributeBatTimeToFullChargeID:
+            return YES;
+        default:
+            return NO;
+        }
+    case MTRClusterIDTypePumpConfigurationAndControlID:
+        switch (attributePath.attribute.unsignedLongValue) {
+        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeCapacityID:
+        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeSpeedID:
+        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributePowerID:
+            return YES;
+        default:
+            return NO;
+        }
+    case MTRClusterIDTypeServiceAreaID:
+        return attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterServiceAreaAttributeEstimatedEndTimeID;
+    case MTRClusterIDTypeValveConfigurationAndControlID:
+        switch (attributePath.attribute.unsignedLongValue) {
+        case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeRemainingDurationID:
+        case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeCurrentLevelID:
+            return YES;
+        default:
+            return NO;
+        }
+    default:
+        return NO;
+    }
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeWithEndpointID:(NSNumber *)endpointID
                                                               clusterID:(NSNumber *)clusterID
                                                             attributeID:(NSNumber *)attributeID
@@ -3483,6 +3646,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // 2. The attribute has the Changes Omitted quality, so we won't get reports for it.
     // 3. The attribute is not in the spec, and the read params asks to assume
     //    an unknown attribute has the Changes Omitted quality.
+    // 4. The attribute has the Quieter Reporting quality, so we won't get reports for all its changes.
     //
     // But all this only happens if this device is not suspended.  If it's suspended, read-throughs will fail
     // anyway, so we should not bother trying.
@@ -3491,7 +3655,14 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         std::lock_guard lock(_lock);
         readThroughsAllowed = !self.suspended;
     }
-    if (readThroughsAllowed && (![self _subscriptionAbleToReport] || hasChangesOmittedQuality)) {
+    BOOL hasQuieterReportingQuality = attributeIsSpecified && AttributeHasQuieterReportingQuality(attributePath);
+    if (readThroughsAllowed && (![self _subscriptionAbleToReport] || hasChangesOmittedQuality || hasQuieterReportingQuality)) {
+#ifdef DEBUG
+        {
+            std::lock_guard lock(_lock);
+            _unitTestReadThroughsSinceLastCheck++;
+        }
+#endif
         // Read requests container will be a mutable array of items, each being an array containing:
         //   [attribute request path, params]
         // Batching handler should only coalesce when params are equal.
