@@ -18,7 +18,8 @@
 
 #pragma once
 
-#include "analysis-delegate.h"
+#include "av-analysis-delegate.h"
+#include "webrtc-peer-controller.h"
 #include "webrtc-requestor-delegate.h"
 
 #include <app/clusters/av-analysis-server/AvAnalysisCluster.h>
@@ -36,17 +37,23 @@ class AvAnalysisNodeApp
 public:
     explicit AvAnalysisNodeApp(EndpointId aEndpointId) : mEndpointId(aEndpointId) {}
 
-    CHIP_ERROR Init();
+    /**
+     * @param aPeerController The platform's WebRTC peer connections
+     */
+    CHIP_ERROR Init(WebRTCPeerController * aPeerController);
 
     void Shutdown();
 
 private:
-    // Maximum number of concurrently established analysis streams (MaxAnalysisStreamCount, Fixed)
+    // Maximum number of concurrently established analysis streams
     static constexpr uint8_t kMaxAnalysisStreams = 2;
 
     EndpointId mEndpointId = kInvalidEndpointId;
 
-    AnalysisDelegate mAnalysisDelegate;
+    // Supplied by the platform main, provides the SDP offers and owns the peer connections
+    WebRTCPeerController * mPeerController = nullptr;
+
+    AvAnalysisNodeDelegate mAvAnalysisDelegate;
     Clusters::DefaultAvAnalysisCameraClient mCameraClient;
     WebRTCRequestorDelegate mRequestorDelegate;
     LazyRegisteredServerCluster<Clusters::AvAnalysisCluster> mAvAnalysisServer;

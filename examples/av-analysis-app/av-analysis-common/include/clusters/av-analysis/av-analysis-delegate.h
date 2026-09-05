@@ -27,11 +27,9 @@ namespace chip {
 namespace app {
 
 /**
- * Application delegate of the AV Analysis cluster for this example. The example has no Zone
- * Management cluster (PerZoneContextDetection is not enabled), so zone validation never triggers,
- * and context trigger bookkeeping needs no application-side resources.
+ * Application delegate of the AV Analysis cluster
  */
-class AnalysisDelegate : public Clusters::AvAnalysisDelegate
+class AvAnalysisNodeDelegate : public Clusters::AvAnalysisDelegate
 {
 public:
     void ShutdownApp() override {}

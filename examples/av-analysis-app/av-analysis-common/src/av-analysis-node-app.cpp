@@ -29,7 +29,7 @@ namespace app {
 
 namespace {
 
-// Ambient contexts this example claims to detect (SupportedAmbientContexts, Fixed)
+// Ambient contexts this example claims to detect
 const std::vector<Descriptor::Structs::SemanticTagStruct::Type> kSupportedAmbientContexts = {
     { std::nullopt, static_cast<uint8_t>(0x49), static_cast<uint8_t>(0x0B),
       MakeOptional(DataModel::Nullable<CharSpan>("Object.Package"_span)) },
@@ -39,9 +39,12 @@ const std::vector<Descriptor::Structs::SemanticTagStruct::Type> kSupportedAmbien
 
 } // namespace
 
-CHIP_ERROR AvAnalysisNodeApp::Init()
+CHIP_ERROR AvAnalysisNodeApp::Init(WebRTCPeerController * aPeerController)
 {
     ChipLogProgress(AppServer, "AvAnalysisNodeApp: Init on endpoint %u", mEndpointId);
+
+    VerifyOrReturnError(aPeerController != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    mPeerController = aPeerController;
 
     // The camera's AVSM endpoint, features and stream constraints are discovered from the camera
     ReturnErrorOnFailure(mCameraClient.Init(Server::GetInstance().GetCASESessionManager()));
@@ -49,7 +52,7 @@ CHIP_ERROR AvAnalysisNodeApp::Init()
     // No Zone Management cluster on this endpoint: PerZoneContextDetection is off and MaxZones is Null
     mAvAnalysisServer.Create(mEndpointId, BitFlags<AvAnalysis::Feature>(AvAnalysis::Feature::kRemoteContextDetection),
                              kSupportedAmbientContexts, DataModel::Nullable<uint8_t>(), kMaxAnalysisStreams);
-    mAvAnalysisServer.Cluster().SetDelegate(&mAnalysisDelegate);
+    mAvAnalysisServer.Cluster().SetDelegate(&mAvAnalysisDelegate);
     mAvAnalysisServer.Cluster().SetCameraClient(&mCameraClient);
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mAvAnalysisServer.Registration());
