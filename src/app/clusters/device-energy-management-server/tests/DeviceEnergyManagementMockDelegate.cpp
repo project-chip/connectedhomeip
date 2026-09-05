@@ -173,14 +173,28 @@ Protocols::InteractionModel::Status DeviceEnergyManagementMockDelegate::CancelRe
 }
 
 Protocols::InteractionModel::Status
-DeviceEnergyManagementMockDelegate::PowerRangeAdjustRequest(const DataModel::Nullable<int64_t> minPower,
-                                                            const DataModel::Nullable<int64_t> maxPower, const uint32_t duration,
+DeviceEnergyManagementMockDelegate::PowerRangeAdjustRequest(const Optional<int64_t> minPower,
+                                                            const Optional<int64_t> maxPower, const uint32_t duration,
                                                             AdjustmentCauseEnum cause)
 {
     // Create and set the PowerRangeAdjustment attribute
     Structs::PowerRangeAdjustStruct::Type powerRangeAdjustment;
-    powerRangeAdjustment.minPower = minPower;
-    powerRangeAdjustment.maxPower = maxPower;
+    if (minPower.HasValue())
+    {
+        powerRangeAdjustment.minPower.SetNonNull(minPower.Value());
+    }
+    else
+    {
+        powerRangeAdjustment.minPower.SetNull();
+    }
+    if (maxPower.HasValue())
+    {
+        powerRangeAdjustment.maxPower.SetNonNull(maxPower.Value());
+    }
+    else
+    {
+        powerRangeAdjustment.maxPower.SetNull();
+    }
 
     // Map cause to PowerAdjustReasonEnum
     switch (cause)

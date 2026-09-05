@@ -90,8 +90,8 @@ public:
     /**
      * @brief Handle PowerRangeAdjustRequest command
      */
-    Protocols::InteractionModel::Status PowerRangeAdjustRequest(const DataModel::Nullable<int64_t> minPower,
-                                                                const DataModel::Nullable<int64_t> maxPower,
+    Protocols::InteractionModel::Status PowerRangeAdjustRequest(const Optional<int64_t> minPower,
+                                                                const Optional<int64_t> maxPower,
                                                                 const uint32_t duration, AdjustmentCauseEnum cause) override;
 
     /**

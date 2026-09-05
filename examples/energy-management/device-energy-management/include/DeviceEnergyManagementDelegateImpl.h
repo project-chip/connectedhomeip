@@ -180,8 +180,8 @@ public:
      * @param cause Who (Grid/local) is triggering this change.
      * @return  Success if the power range adjustment is accepted; otherwise the command SHALL be rejected with appropriate error.
      */
-    chip::Protocols::InteractionModel::Status PowerRangeAdjustRequest(const DataModel::Nullable<int64_t> minPower,
-                                                                      const DataModel::Nullable<int64_t> maxPower,
+    chip::Protocols::InteractionModel::Status PowerRangeAdjustRequest(const Optional<int64_t> minPower,
+                                                                      const Optional<int64_t> maxPower,
                                                                       uint32_t duration, AdjustmentCauseEnum cause) override;
 
     /**

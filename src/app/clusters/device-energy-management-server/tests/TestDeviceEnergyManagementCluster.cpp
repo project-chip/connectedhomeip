@@ -469,8 +469,8 @@ TEST_F(TestDeviceEnergyManagementCluster, TestPowerRangeAdjustRequest)
 
     ClusterTester tester(cluster);
     Commands::PowerRangeAdjustRequest::Type command;
-    command.minPower = 500;
-    command.maxPower = 1500;
+    command.minPower = MakeOptional<int64_t>(500);
+    command.maxPower = MakeOptional<int64_t>(1500);
     command.duration = 60;
     command.cause    = AdjustmentCauseEnum::kLocalOptimization;
 
@@ -491,14 +491,14 @@ TEST_F(TestDeviceEnergyManagementCluster, TestPowerRangeAdjustRequest)
     EXPECT_EQ(mockDelegate.GetESAState(), ESAStateEnum::kOnline);
 
     // Both MinPower and MaxPower null - rejected
-    command.minPower.SetNull();
-    command.maxPower.SetNull();
+    command.minPower.ClearValue();
+    command.maxPower.ClearValue();
     EXPECT_FALSE(tester.Invoke(Commands::PowerRangeAdjustRequest::Id, command).IsSuccess());
     EXPECT_EQ(mockDelegate.GetESAState(), ESAStateEnum::kOnline);
 
     // OptOut rejects LocalOptimization - rejected, state remains Online
-    command.minPower = 500;
-    command.maxPower = 1500;
+    command.minPower = MakeOptional<int64_t>(500);
+    command.maxPower = MakeOptional<int64_t>(1500);
     command.duration = 60;
     command.cause    = AdjustmentCauseEnum::kLocalOptimization;
 
@@ -508,24 +508,24 @@ TEST_F(TestDeviceEnergyManagementCluster, TestPowerRangeAdjustRequest)
     mockDelegate.SetOptOutState(OptOutStateEnum::kNoOptOut);
 
     // MinPower < AbsMinPower - rejected
-    command.minPower = DeviceEnergyManagementMockDelegate::kAbsMinPower - 100;
+    command.minPower = MakeOptional(DeviceEnergyManagementMockDelegate::kAbsMinPower - 100);
     EXPECT_FALSE(tester.Invoke(Commands::PowerRangeAdjustRequest::Id, command).IsSuccess());
     EXPECT_EQ(mockDelegate.GetESAState(), ESAStateEnum::kOnline);
-    command.minPower = 500;
+    command.minPower = MakeOptional<int64_t>(500);
 
     // MaxPower > AbsMaxPower - rejected
-    command.maxPower = DeviceEnergyManagementMockDelegate::kAbsMaxPower + 100;
+    command.maxPower = MakeOptional(DeviceEnergyManagementMockDelegate::kAbsMaxPower + 100);
     EXPECT_FALSE(tester.Invoke(Commands::PowerRangeAdjustRequest::Id, command).IsSuccess());
     EXPECT_EQ(mockDelegate.GetESAState(), ESAStateEnum::kOnline);
-    command.maxPower = 1500;
+    command.maxPower = MakeOptional<int64_t>(1500);
 
     // MinPower > MaxPower - rejected
-    command.minPower = 2000;
-    command.maxPower = 1000;
+    command.minPower = MakeOptional<int64_t>(2000);
+    command.maxPower = MakeOptional<int64_t>(1000);
     EXPECT_FALSE(tester.Invoke(Commands::PowerRangeAdjustRequest::Id, command).IsSuccess());
     EXPECT_EQ(mockDelegate.GetESAState(), ESAStateEnum::kOnline);
-    command.minPower = 500;
-    command.maxPower = 1500;
+    command.minPower = MakeOptional<int64_t>(500);
+    command.maxPower = MakeOptional<int64_t>(1500);
 
     // Valid request with GridOptimization cause - succeeds and state changes to PowerAdjustActive
     command.cause       = AdjustmentCauseEnum::kGridOptimization;
@@ -549,6 +549,23 @@ TEST_F(TestDeviceEnergyManagementCluster, TestPowerRangeAdjustRequest)
         EXPECT_LE(powerRangeAdjustment.Value().endTime, beforeCall + 61);
     }
 
+    // A request may specify only the upper bound.
+    command.minPower.ClearValue();
+    EXPECT_TRUE(tester.Invoke(Commands::PowerRangeAdjustRequest::Id, command).IsSuccess());
+    ASSERT_EQ(tester.ReadAttribute(Attributes::PowerRangeAdjustment::Id, powerRangeAdjustment), CHIP_NO_ERROR);
+    EXPECT_FALSE(powerRangeAdjustment.IsNull());
+    EXPECT_TRUE(powerRangeAdjustment.Value().minPower.IsNull());
+    EXPECT_EQ(powerRangeAdjustment.Value().maxPower.Value(), 1500);
+
+    // A request may specify only the lower bound.
+    command.minPower = MakeOptional<int64_t>(500);
+    command.maxPower.ClearValue();
+    EXPECT_TRUE(tester.Invoke(Commands::PowerRangeAdjustRequest::Id, command).IsSuccess());
+    ASSERT_EQ(tester.ReadAttribute(Attributes::PowerRangeAdjustment::Id, powerRangeAdjustment), CHIP_NO_ERROR);
+    EXPECT_FALSE(powerRangeAdjustment.IsNull());
+    EXPECT_EQ(powerRangeAdjustment.Value().minPower.Value(), 500);
+    EXPECT_TRUE(powerRangeAdjustment.Value().maxPower.IsNull());
+
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
@@ -563,8 +580,8 @@ TEST_F(TestDeviceEnergyManagementCluster, TestPowerRangeAdjustRequestWithDiffere
 
     ClusterTester tester(cluster);
     Commands::PowerRangeAdjustRequest::Type command;
-    command.minPower = 500;
-    command.maxPower = 1500;
+    command.minPower = MakeOptional<int64_t>(500);
+    command.maxPower = MakeOptional<int64_t>(1500);
     command.cause    = AdjustmentCauseEnum::kGridOptimization;
 
     // Get current time for endTime validation (endTime = current_time + duration)
@@ -614,8 +631,8 @@ TEST_F(TestDeviceEnergyManagementCluster, TestPowerRangeAdjustRequestESAStateVal
 
     ClusterTester tester(cluster);
     Commands::PowerRangeAdjustRequest::Type command;
-    command.minPower = 500;
-    command.maxPower = 1500;
+    command.minPower = MakeOptional<int64_t>(500);
+    command.maxPower = MakeOptional<int64_t>(1500);
     command.duration = 60;
     command.cause    = AdjustmentCauseEnum::kLocalOptimization;
 
@@ -664,8 +681,8 @@ TEST_F(TestDeviceEnergyManagementCluster, TestCancelPowerRangeAdjustRequest)
 
     // Start a power range adjustment first
     Commands::PowerRangeAdjustRequest::Type powerRangeCommand;
-    powerRangeCommand.minPower = 500;
-    powerRangeCommand.maxPower = 1500;
+    powerRangeCommand.minPower = MakeOptional<int64_t>(500);
+    powerRangeCommand.maxPower = MakeOptional<int64_t>(1500);
     powerRangeCommand.duration = 120;
     powerRangeCommand.cause    = AdjustmentCauseEnum::kLocalOptimization;
     EXPECT_TRUE(tester.Invoke(Commands::PowerRangeAdjustRequest::Id, powerRangeCommand).IsSuccess());
