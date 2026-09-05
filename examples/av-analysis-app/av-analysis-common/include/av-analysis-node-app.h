@@ -55,6 +55,7 @@ private:
 
     AvAnalysisNodeDelegate mAvAnalysisDelegate;
     Clusters::DefaultAvAnalysisCameraClient mCameraClient;
+    Clusters::DefaultAvAnalysisWebRTCClient mWebRTCClient;
     WebRTCRequestorDelegate mRequestorDelegate;
     LazyRegisteredServerCluster<Clusters::AvAnalysisCluster> mAvAnalysisServer;
     // The receiving end of the WebRTC sessions the AV Analysis cluster initiates

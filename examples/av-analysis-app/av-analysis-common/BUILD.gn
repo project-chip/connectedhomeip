@@ -38,6 +38,7 @@ source_set("av-analysis-node-lib") {
     "include/clusters/webrtc-requestor/webrtc-requestor-delegate.h",
     "include/webrtc-peer-controller/webrtc-peer-controller.h",
     "src/av-analysis-node-app.cpp",
+    "src/clusters/webrtc-requestor/webrtc-requestor-delegate.cpp",
   ]
 
   deps = [
