@@ -33,6 +33,8 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
+#include "MockAvAnalysisDelegate.h"
+
 namespace {
 
 using namespace chip;
@@ -76,6 +78,7 @@ const std::vector<uint16_t> testZoneIDDisableList = { static_cast<uint16_t>(0x03
 
 const std::vector<uint16_t> testZoneIDRemainingList = { static_cast<uint16_t>(0x01), static_cast<uint16_t>(0x02) };
 
+<<<<<<< HEAD
 // Minimal mock delegate for testing
 class MockAvAnalysisDelegate : public AvAnalysisDelegate
 {
@@ -103,6 +106,8 @@ public:
     CHIP_ERROR PersistentAttributesLoadedCallback() { return CHIP_NO_ERROR; }
 };
 
+=======
+>>>>>>> e054bb8 ([AVAnalysis] Server Implementation with Remote Context Detection (#73360))
 struct TestLocalAvAnalysisCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -250,7 +255,7 @@ TEST_F(TestLocalAvAnalysisCluster, ReadAllAttributesWithClusterTesterTest)
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::SupportedAmbientContexts::Id, aSupportedAmbientContexts), CHIP_NO_ERROR);
 
     // Verify that the entries in the DecodableList match the entries used in construction of the instance by
-    // creating a vactor of the values then comparing the two vectors
+    // creating a vector of the values then comparing the two vectors
     std::vector<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> readContexts;
     auto aContextIterator = aSupportedAmbientContexts.begin();
     while (aContextIterator.Next())
