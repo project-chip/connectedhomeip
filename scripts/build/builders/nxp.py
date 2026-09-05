@@ -179,6 +179,7 @@ class NxpBuilder(GnBuilder):
                  enable_factory_data_build: bool = False,
                  enable_mtd: bool = False,
                  disable_pairing_autostart: bool = False,
+                 build_only_no_blobs: bool = False,
                  iw416_transceiver: bool = False,
                  w8801_transceiver: bool = False,
                  iwx12_transceiver: bool = False,
@@ -214,6 +215,7 @@ class NxpBuilder(GnBuilder):
         self.enable_factory_data_build = enable_factory_data_build
         self.enable_mtd = enable_mtd
         self.disable_pairing_autostart = disable_pairing_autostart
+        self.build_only_no_blobs = build_only_no_blobs
         self.board_variant = board_variant
         self.iw416_transceiver = iw416_transceiver
         self.w8801_transceiver = w8801_transceiver
@@ -340,6 +342,9 @@ class NxpBuilder(GnBuilder):
 
         if self.enable_thread and self.os_env == NxpOsUsed.ZEPHYR:
             flags.append('-DEXTRA_CONF_FILE="prj_thread_ftd.conf"')
+
+        if self.build_only_no_blobs and self.os_env == NxpOsUsed.ZEPHYR:
+            flags.append("-DCONFIG_BUILD_ONLY_NO_BLOBS=y")
 
         if self.has_sw_version_2:
             flags.append("-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2")
