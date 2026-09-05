@@ -17,6 +17,7 @@
 #pragma once
 
 #include <app/clusters/ambient-context-sensing-server/AmbientContextSensingCluster.h>
+#include <app/clusters/ambient-sensing-union-server/AmbientSensingUnionCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
@@ -39,6 +40,7 @@ public:
 
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
     Clusters::AmbientContextSensingCluster & AmbientContextSensingCluster() { return mAmbientContextSensingCluster.Cluster(); }
+    Clusters::AmbientSensingUnionCluster & AmbientSensingUnionCluster() { return mAmbientSensingUnionCluster.Cluster(); }
 
 protected:
     AmbientContextSensingConfig mConfig;
@@ -46,6 +48,7 @@ protected:
     Clusters::AmbientContextSensing::AmbientContextSensingDelegate & mDelegate;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::AmbientContextSensingCluster> mAmbientContextSensingCluster;
+    LazyRegisteredServerCluster<Clusters::AmbientSensingUnionCluster> mAmbientSensingUnionCluster;
 };
 
 } // namespace chip::app
