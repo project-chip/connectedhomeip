@@ -25,6 +25,8 @@ source_set("zone-geometry") {
 
 source_set("zone-management-server") {
   sources = [
+    "MigrateZoneManagementServerStorage.cpp",
+    "MigrateZoneManagementServerStorage.h",
     "ZoneManagementCluster.cpp",
     "ZoneManagementCluster.h",
     "zone-geometry.h",
@@ -37,6 +39,7 @@ source_set("zone-management-server") {
 
   public_deps = [
     "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/persistence:migration",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/zzz_generated/app-common/clusters/ZoneManagement",
   ]
