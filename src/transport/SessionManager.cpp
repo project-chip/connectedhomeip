@@ -963,13 +963,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
         return;
     }
 
-    Transport::SecureSession * secureSession  = session.Value()->AsSecureSession();
-    Transport::PeerAddress mutablePeerAddress = peerAddress;
-    CorrectPeerAddressInterfaceID(mutablePeerAddress);
-    if (secureSession->GetPeerAddress() != mutablePeerAddress)
-    {
-        secureSession->SetPeerAddress(mutablePeerAddress);
-    }
+    Transport::SecureSession * secureSession = session.Value()->AsSecureSession();
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // Associate the secure session with the connection, if not done already.
@@ -1070,6 +1064,15 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
     if (isDuplicate == SessionMessageDelegate::DuplicateMessage::No)
     {
         secureSession->GetSessionMessageCounter().GetPeerMessageCounter().CommitEncryptedUnicast(packetHeader.GetMessageCounter());
+
+        // Only update the cached peer address for a message that is both authentic
+        // and not a replay of one already received.
+        Transport::PeerAddress mutablePeerAddress = peerAddress;
+        CorrectPeerAddressInterfaceID(mutablePeerAddress);
+        if (secureSession->GetPeerAddress() != mutablePeerAddress)
+        {
+            secureSession->SetPeerAddress(mutablePeerAddress);
+        }
     }
 
     if (mCB != nullptr)
