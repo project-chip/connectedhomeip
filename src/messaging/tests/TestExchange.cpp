@@ -24,6 +24,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Pool.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
@@ -222,6 +223,30 @@ TEST_F(TestExchange, CheckBasicExchangeMessageDispatch)
                 EXPECT_EQ(delegate2.mReceivedMessageCount, 1u);
             });
     }
+}
+
+// An exchange that is still waiting for a response when the ExchangeManager has already been
+// shut down must not dereference the now-cleared SessionManager. SessionManager::Shutdown()
+// expires any remaining secure sessions, which notifies their exchanges, so this ordering is
+// reachable whenever a consumer tears down the ExchangeManager while a session is still alive.
+TEST_F(TestExchange, OnSessionReleasedAfterExchangeManagerShutdown)
+{
+    MockExchangeDelegate delegate;
+
+    ExchangeContext * ec = NewExchangeToBob(&delegate);
+    ASSERT_NE(ec, nullptr);
+
+    ec->SetResponseTimeout(System::Clock::Seconds16(1));
+    ASSERT_SUCCESS(ec->SendMessage(Protocols::SecureChannel::Id, kMsgType_TEST1,
+                                   System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
+                                   SendFlags(Messaging::SendMessageFlags::kExpectResponse)));
+    DrainAndServiceIO();
+
+    // ExchangeManager::Shutdown() clears its SessionManager pointer.
+    GetExchangeManager().Shutdown();
+
+    // The exchange is still expecting a response, so this reaches CancelResponseTimer().
+    ec->OnSessionReleased();
 }
 
 // A crude test to exercise VerifyOrDieWithObject() in ObjectPool and

@@ -435,7 +435,12 @@ void ExchangeContext::OnSessionReleased()
 
 CHIP_ERROR ExchangeContext::StartResponseTimer()
 {
-    System::Layer * lSystemLayer = mExchangeMgr->GetSessionManager()->SystemLayer();
+    // ExchangeManager::Shutdown() clears its SessionManager, so an exchange that outlives it
+    // can reach here with nothing to get the System::Layer from.
+    SessionManager * sessionManager = mExchangeMgr->GetSessionManager();
+    VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    System::Layer * lSystemLayer = sessionManager->SystemLayer();
     if (lSystemLayer == nullptr)
     {
         // this is an assertion error, which shall never happen
@@ -447,7 +452,12 @@ CHIP_ERROR ExchangeContext::StartResponseTimer()
 
 void ExchangeContext::CancelResponseTimer()
 {
-    System::Layer * lSystemLayer = mExchangeMgr->GetSessionManager()->SystemLayer();
+    // SessionManager::Shutdown() expires any remaining sessions, which notifies their exchanges.
+    // By then ExchangeManager::Shutdown() may already have cleared its SessionManager.
+    SessionManager * sessionManager = mExchangeMgr->GetSessionManager();
+    VerifyOrReturn(sessionManager != nullptr);
+
+    System::Layer * lSystemLayer = sessionManager->SystemLayer();
     if (lSystemLayer == nullptr)
     {
         // this is an assertion error, which shall never happen
@@ -664,7 +674,10 @@ void ExchangeContext::AbortAllOtherCommunicationOnFabric()
 
     SetIgnoreSessionRelease(true);
 
-    GetExchangeMgr()->GetSessionManager()->ExpireAllSessionsForFabric(mSession->GetFabricIndex());
+    SessionManager * sessionManager = GetExchangeMgr()->GetSessionManager();
+    VerifyOrReturn(sessionManager != nullptr);
+
+    sessionManager->ExpireAllSessionsForFabric(mSession->GetFabricIndex());
 
     mSession.GrabExpiredSession(session.Value());
 
