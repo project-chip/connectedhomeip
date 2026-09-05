@@ -646,8 +646,8 @@ inline constexpr uint16_t kMaxFooterSize = kMaxTagLen;
  */
 inline System::PacketBufferHandle New(size_t aAvailableSize)
 {
-    static_assert(System::PacketBuffer::kMaxSize > kMaxFooterSize, "inadequate capacity");
-    if (aAvailableSize > System::PacketBuffer::kMaxSize - kMaxFooterSize)
+    static_assert(System::PacketBuffer::kBufMaxSize > kMaxFooterSize, "inadequate capacity");
+    if (aAvailableSize > System::PacketBuffer::kBufMaxSize - kMaxFooterSize)
     {
         return System::PacketBufferHandle();
     }
