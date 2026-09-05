@@ -16,7 +16,12 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
 
 config("config") {
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "include/clusters/av-analysis",
+    "include/clusters/webrtc-requestor",
+    "include/webrtc-peer-controller",
+  ]
 }
 
 chip_data_model("av-analysis-common") {
@@ -28,8 +33,10 @@ source_set("av-analysis-node-lib") {
   public_configs = [ ":config" ]
 
   sources = [
-    "include/analysis-delegate.h",
     "include/av-analysis-node-app.h",
+    "include/clusters/av-analysis/av-analysis-delegate.h",
+    "include/clusters/webrtc-requestor/webrtc-requestor-delegate.h",
+    "include/webrtc-peer-controller/webrtc-peer-controller.h",
     "src/av-analysis-node-app.cpp",
   ]
 
