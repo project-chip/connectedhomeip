@@ -40,284 +40,312 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import default_matter_test_main
+from matter.testing.runner import TestStep, default_matter_test_main
 
 cluster = Clusters.ElectricalAlarm
+attrs = cluster.Attributes
 _F = cluster.Bitmaps.Feature
+
+# The over/under threshold pairs, in the order the test plan exercises them. Each contributes a
+# fourteen-step block (esalm_threshold_testcase.adoc) and the step counter runs continuously, so
+# the blocks start at 13, 27, 41 and 55.
+PAIRS = [
+    ("OverVoltageThreshold", "UnderVoltageThreshold", _F.kOverVoltage, _F.kUnderVoltage),
+    ("OverFrequencyThreshold", "UnderFrequencyThreshold", _F.kOverFrequency, _F.kUnderFrequency),
+    ("OverPowerThreshold", "UnderPowerThreshold", _F.kOverPower, _F.kUnderPower),
+    ("OverCurrentThreshold", "UnderCurrentThreshold", _F.kOverCurrent, _F.kUnderCurrent),
+]
+
+# Every threshold attribute, in the order steps 3-12 read them and steps 86-105 restore them.
+ALL_THRESHOLDS = [
+    ("OverVoltageThreshold", _F.kOverVoltage),
+    ("UnderVoltageThreshold", _F.kUnderVoltage),
+    ("OverFrequencyThreshold", _F.kOverFrequency),
+    ("UnderFrequencyThreshold", _F.kUnderFrequency),
+    ("OverPowerThreshold", _F.kOverPower),
+    ("UnderPowerThreshold", _F.kUnderPower),
+    ("OverCurrentThreshold", _F.kOverCurrent),
+    ("UnderCurrentThreshold", _F.kUnderCurrent),
+    ("PowerImportThreshold", _F.kPowerImport),
+    ("PowerExportThreshold", _F.kPowerExport),
+]
+
+_SUCCESS = "Verify DUT responds w/ status SUCCESS(0x00)."
+_CONSTRAINT = "Verify that the DUT response contains CONSTRAINT_ERROR."
+
+
+def _kwarg(attribute_name: str) -> str:
+    return attribute_name[0].lower() + attribute_name[1:]
+
+
+def _orig(attribute_name: str) -> str:
+    """The plan's name for the stored original value, e.g. OverVoltageThreshold -> ORIG_OVT."""
+    return "ORIG_" + attribute_name.replace("Threshold", "")
 
 
 class TC_ESALM_2_2(MatterBaseTest):
 
-    async def _send_set_thresholds(self, endpoint, **kwargs):
-        cmd = cluster.Commands.SetElectricalAlarmThresholds(**kwargs)
-        await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+    def desc_TC_ESALM_2_2(self) -> str:
+        return "[TC-ESALM-2.2] AdjustableThresholds feature functionality with Server as DUT"
 
-    async def _send_set_thresholds_expect_error(self, endpoint, expected_status, **kwargs):
-        cmd = cluster.Commands.SetElectricalAlarmThresholds(**kwargs)
+    def pics_TC_ESALM_2_2(self) -> list[str]:
+        return ["ESALM.S", "ESALM.S.F20"]
+
+    def _pair_steps(self, base: int, over: str, under: str) -> list[TestStep]:
+        """The fourteen steps of esalm_threshold_testcase.adoc, starting at `base`."""
+        o, u = _orig(over), _orig(under)
+        return [
+            TestStep(base, f"TH sends command SetElectricalAlarmThresholds with {over} set to {o} + 1000.",
+                     _SUCCESS),
+            TestStep(base + 1, f"TH reads from the DUT the {over}.",
+                     f"Verify that the DUT response contains {o} + 1000."),
+            TestStep(base + 2, f"TH sends command SetElectricalAlarmThresholds with {under} set to {u} - 1000.",
+                     _SUCCESS),
+            TestStep(base + 3, f"TH reads from the DUT the {under}.",
+                     f"Verify that the DUT response contains {u} - 1000."),
+            TestStep(base + 4, f"TH sends command SetElectricalAlarmThresholds with {over} set to the current "
+                     f"{under} value (violates constraint min = {under} + 1).", _CONSTRAINT),
+            TestStep(base + 5, f"TH reads from the DUT the {over}.",
+                     f"Verify that the DUT response contains {o} + 1000 (constraint violation did not modify "
+                     "the attribute)."),
+            TestStep(base + 6, f"TH sends command SetElectricalAlarmThresholds with {under} set to the current "
+                     f"{over} value (violates constraint max = {over} - 1).", _CONSTRAINT),
+            TestStep(base + 7, f"TH reads from the DUT the {under}.",
+                     f"Verify that the DUT response contains {u} - 1000 (constraint violation did not modify "
+                     "the attribute)."),
+            TestStep(base + 8, f"TH sends command SetElectricalAlarmThresholds with {over} set to {u} - 3000 "
+                     f"and {under} set to {u} - 4000 in a single command (new values are mutually valid but "
+                     f"would violate the current {over} if applied sequentially).",
+                     _SUCCESS + " DUT evaluates constraints atomically on the final state."),
+            TestStep(base + 9, f"TH reads from the DUT the {over}.",
+                     f"Verify that the DUT response contains {u} - 3000."),
+            TestStep(base + 10, f"TH reads from the DUT the {under}.",
+                     f"Verify that the DUT response contains {u} - 4000."),
+            TestStep(base + 11, f"TH sends command SetElectricalAlarmThresholds with {over} and {under} both "
+                     f"set to {u} - 3000 (equal values violate constraint {over} >= {under} + 1).", _CONSTRAINT),
+            TestStep(base + 12, f"TH reads from the DUT the {over}.",
+                     f"Verify that the DUT response contains {u} - 3000 (constraint violation did not modify "
+                     "the attribute)."),
+            TestStep(base + 13, f"TH reads from the DUT the {under}.",
+                     f"Verify that the DUT response contains {u} - 4000 (constraint violation did not modify "
+                     "the attribute)."),
+        ]
+
+    def steps_TC_ESALM_2_2(self) -> list[TestStep]:
+        steps = [
+            TestStep(1, "Commission DUT to TH", is_commissioning=True),
+            TestStep(2, "TH reads from the DUT the FeatureMap attribute.",
+                     "Verify that the DUT response contains a map32 value."),
+        ]
+        for i, (name, _feature) in enumerate(ALL_THRESHOLDS):
+            steps.append(TestStep(3 + i, f"TH reads from the DUT the {name}.",
+                                  "Verify that the DUT response contains an int64 value. Store the value as "
+                                  f"{_orig(name)}."))
+        for i, (over, under, _fo, _fu) in enumerate(PAIRS):
+            steps.extend(self._pair_steps(13 + 14 * i, over, under))
+
+        steps += [
+            TestStep(69, "TH sends command SetElectricalAlarmThresholds with PowerImportThreshold set to 1000 "
+                     "(absolute value; PowerImportThreshold is constrained to min 0 so relative-delta approach "
+                     "is not used).", _SUCCESS),
+            TestStep(70, "TH reads from the DUT the PowerImportThreshold.",
+                     "Verify that the DUT response contains 1000."),
+            TestStep(71, "TH sends command SetElectricalAlarmThresholds with PowerImportThreshold set to -1 "
+                     "(violates min 0).", _CONSTRAINT),
+            TestStep(72, "TH reads from the DUT the PowerImportThreshold.",
+                     "Verify that the DUT response contains 1000 (constraint violation did not modify the "
+                     "attribute)."),
+            TestStep(73, "TH sends command SetElectricalAlarmThresholds with PowerExportThreshold set to -1000 "
+                     "(absolute value; PowerExportThreshold is constrained to max 0).", _SUCCESS),
+            TestStep(74, "TH reads from the DUT the PowerExportThreshold.",
+                     "Verify that the DUT response contains -1000."),
+            TestStep(75, "TH sends command SetElectricalAlarmThresholds with PowerExportThreshold set to 1 "
+                     "(violates max 0).", _CONSTRAINT),
+            TestStep(76, "TH reads from the DUT the PowerExportThreshold.",
+                     "Verify that the DUT response contains -1000 (constraint violation did not modify the "
+                     "attribute)."),
+            TestStep(77, "TH sends command SetElectricalAlarmThresholds with PowerImportThreshold set to 2000 "
+                     "and PowerExportThreshold set to 1 in a single command (PowerExportThreshold violates "
+                     "max 0).", _CONSTRAINT),
+            TestStep(78, "TH reads from the DUT the PowerImportThreshold.",
+                     "Verify that the DUT response contains 1000 (constraint violation did not modify the "
+                     "attribute)."),
+            TestStep(79, "TH reads from the DUT the PowerExportThreshold.",
+                     "Verify that the DUT response contains -1000 (constraint violation did not modify the "
+                     "attribute)."),
+            TestStep(80, "TH sends command SetElectricalAlarmThresholds with PowerImportThreshold set to 2000 "
+                     "and PowerExportThreshold set to -2000 in a single command (new values satisfy all "
+                     "constraints: PowerImportThreshold >= 0, PowerExportThreshold <= 0, PowerImportThreshold "
+                     ">= PowerExportThreshold + 1).",
+                     _SUCCESS + " DUT evaluates constraints atomically on the final state."),
+            TestStep(81, "TH reads from the DUT the PowerImportThreshold.",
+                     "Verify that the DUT response contains 2000."),
+            TestStep(82, "TH reads from the DUT the PowerExportThreshold.",
+                     "Verify that the DUT response contains -2000."),
+            TestStep(83, "TH sends command SetElectricalAlarmThresholds with PowerImportThreshold set to 0 and "
+                     "PowerExportThreshold set to 0 in a single command (equal values violate constraint "
+                     "PowerImportThreshold >= PowerExportThreshold + 1).", _CONSTRAINT),
+            TestStep(84, "TH reads from the DUT the PowerImportThreshold.",
+                     "Verify that the DUT response contains 2000 (constraint violation did not modify the "
+                     "attribute)."),
+            TestStep(85, "TH reads from the DUT the PowerExportThreshold.",
+                     "Verify that the DUT response contains -2000 (constraint violation did not modify the "
+                     "attribute)."),
+        ]
+        for i, (name, _feature) in enumerate(ALL_THRESHOLDS):
+            o = _orig(name)
+            steps.append(TestStep(86 + 2 * i,
+                                  f"TH sends command SetElectricalAlarmThresholds with {name} set to {o}.",
+                                  _SUCCESS))
+            steps.append(TestStep(87 + 2 * i, f"TH reads from the DUT the {name}.",
+                                  f"Verify that the DUT response contains {o}."))
+        return steps
+
+    async def _set(self, endpoint: int, **kwargs) -> None:
+        await self.send_single_cmd(cmd=cluster.Commands.SetElectricalAlarmThresholds(**kwargs),
+                                   endpoint=endpoint)
+
+    async def _set_expect_constraint_error(self, endpoint: int, **kwargs) -> None:
         try:
-            await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
-            asserts.fail(f"Expected {expected_status} but command succeeded")
+            await self.send_single_cmd(cmd=cluster.Commands.SetElectricalAlarmThresholds(**kwargs),
+                                       endpoint=endpoint)
+            asserts.fail(f"Expected CONSTRAINT_ERROR for {kwargs} but the command succeeded")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, expected_status,
-                                 f"Expected {expected_status}, got {e.status}")
+            asserts.assert_equal(e.status, Status.ConstraintError,
+                                 f"Expected CONSTRAINT_ERROR for {kwargs}, got {e.status}")
+
+    async def _read(self, endpoint: int, name: str) -> int:
+        return await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=getattr(attrs, name))
+
+    async def _read_step(self, step, endpoint: int, name: str, expected: int) -> None:
+        self.step(step)
+        asserts.assert_equal(await self._read(endpoint, name), expected, f"{name} mismatch")
+
+    def _skip(self, first: int, count: int) -> None:
+        for offset in range(count):
+            self.step(first + offset)
+            self.mark_current_step_skipped()
+
+    async def _pair_block(self, endpoint: int, base: int, over: str, under: str,
+                          orig_over: int, orig_under: int) -> None:
+        """Execute the fourteen steps declared by _pair_steps for one over/under pair."""
+        ko, ku = _kwarg(over), _kwarg(under)
+        new_over, new_under = orig_over + 1000, orig_under - 1000
+
+        self.step(base)
+        await self._set(endpoint, **{ko: new_over})
+        await self._read_step(base + 1, endpoint, over, new_over)
+
+        self.step(base + 2)
+        await self._set(endpoint, **{ku: new_under})
+        await self._read_step(base + 3, endpoint, under, new_under)
+
+        self.step(base + 4)
+        await self._set_expect_constraint_error(endpoint, **{ko: new_under})
+        await self._read_step(base + 5, endpoint, over, new_over)
+
+        self.step(base + 6)
+        await self._set_expect_constraint_error(endpoint, **{ku: new_over})
+        await self._read_step(base + 7, endpoint, under, new_under)
+
+        # Mutually valid values that would violate the constraint if applied one at a time.
+        both_over, both_under = orig_under - 3000, orig_under - 4000
+        self.step(base + 8)
+        await self._set(endpoint, **{ko: both_over, ku: both_under})
+        await self._read_step(base + 9, endpoint, over, both_over)
+        await self._read_step(base + 10, endpoint, under, both_under)
+
+        self.step(base + 11)
+        await self._set_expect_constraint_error(endpoint, **{ko: both_over, ku: both_over})
+        await self._read_step(base + 12, endpoint, over, both_over)
+        await self._read_step(base + 13, endpoint, under, both_under)
 
     @run_if_endpoint_matches(has_feature(cluster, _F.kAdjustableThresholds))
     async def test_TC_ESALM_2_2(self):
-        """[TC-ESALM-2.2] SetElectricalAlarmThresholds Command with Server as DUT
-
-        Verify that the SetElectricalAlarmThresholds command correctly sets threshold
-        attributes and enforces cross-field constraints. The threshold attributes carry
-        no Non-Volatile quality in the spec, so persistence across reboot is not tested.
-        """
         endpoint = self.get_endpoint()
-        attrs = cluster.Attributes
 
-        self.step(1, "Commission DUT to TH", is_commissioning=True)
+        self.step(1)
 
-        self.step(2, "TH reads FeatureMap; reads all supported threshold attributes and stores originals",
-                  expectation="SUCCESS for each read.")
+        self.step(2)
         feature_map = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.FeatureMap)
-        has_overvolt = bool(feature_map & _F.kOverVoltage)
-        has_undervolt = bool(feature_map & _F.kUnderVoltage)
-        has_overfreq = bool(feature_map & _F.kOverFrequency)
-        has_underfreq = bool(feature_map & _F.kUnderFrequency)
-        has_overpower = bool(feature_map & _F.kOverPower)
-        has_underpower = bool(feature_map & _F.kUnderPower)
-        has_overcur = bool(feature_map & _F.kOverCurrent)
-        has_undercur = bool(feature_map & _F.kUnderCurrent)
-        has_powerimp = bool(feature_map & _F.kPowerImport)
-        has_powerexp = bool(feature_map & _F.kPowerExport)
 
-        orig_over_voltage = None
-        orig_under_voltage = None
-        orig_over_frequency = None
-        orig_under_frequency = None
-        orig_over_power = None
-        orig_under_power = None
-        orig_over_current = None
-        orig_under_current = None
-        orig_power_import = None
-        orig_power_export = None
+        originals: dict[str, int] = {}
+        for i, (name, feature) in enumerate(ALL_THRESHOLDS):
+            self.step(3 + i)
+            if not feature_map & feature:
+                self.mark_current_step_skipped()
+                continue
+            originals[name] = await self._read(endpoint, name)
 
-        if has_overvolt:
-            orig_over_voltage = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.OverVoltageThreshold)
-        if has_undervolt:
-            orig_under_voltage = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.UnderVoltageThreshold)
-        if has_overfreq:
-            orig_over_frequency = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.OverFrequencyThreshold)
-        if has_underfreq:
-            orig_under_frequency = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.UnderFrequencyThreshold)
-        if has_overpower:
-            orig_over_power = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.OverPowerThreshold)
-        if has_underpower:
-            orig_under_power = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.UnderPowerThreshold)
-        if has_overcur:
-            orig_over_current = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.OverCurrentThreshold)
-        if has_undercur:
-            orig_under_current = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.UnderCurrentThreshold)
-        if has_powerimp:
-            orig_power_import = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.PowerImportThreshold)
-        if has_powerexp:
-            orig_power_export = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.PowerExportThreshold)
+        for i, (over, under, feat_over, feat_under) in enumerate(PAIRS):
+            base = 13 + 14 * i
+            if over in originals and under in originals:
+                await self._pair_block(endpoint, base, over, under,
+                                       originals[over], originals[under])
+            else:
+                self._skip(base, 14)
 
-        new_over_voltage = None
-        new_under_voltage = None
+        has_import = "PowerImportThreshold" in originals
+        has_export = "PowerExportThreshold" in originals
 
-        self.step(3, "TH sends SetElectricalAlarmThresholds with OverVoltageThreshold = ORIG + 1000; reads back",
-                  expectation="SUCCESS. Read-back equals ORIG + 1000.")
-        if has_overvolt:
-            base_val = orig_over_voltage if isinstance(orig_over_voltage, int) else 230000
-            new_over_voltage = base_val + 1000
-            await self._send_set_thresholds(endpoint, overVoltageThreshold=new_over_voltage)
-            readback = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.OverVoltageThreshold)
-            asserts.assert_equal(readback, new_over_voltage, "OverVoltageThreshold read-back mismatch after write")
+        if has_import:
+            self.step(69)
+            await self._set(endpoint, powerImportThreshold=1000)
+            await self._read_step(70, endpoint, "PowerImportThreshold", 1000)
+            self.step(71)
+            await self._set_expect_constraint_error(endpoint, powerImportThreshold=-1)
+            await self._read_step(72, endpoint, "PowerImportThreshold", 1000)
         else:
-            self.mark_current_step_skipped()
+            self._skip(69, 4)
 
-        self.step(4, "TH sends SetElectricalAlarmThresholds with UnderVoltageThreshold = ORIG - 1000; reads back",
-                  expectation="SUCCESS. Read-back equals ORIG - 1000.")
-        if has_undervolt:
-            base_val = orig_under_voltage if isinstance(orig_under_voltage, int) else 110000
-            new_under_voltage = base_val - 1000
-            await self._send_set_thresholds(endpoint, underVoltageThreshold=new_under_voltage)
-            readback = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.UnderVoltageThreshold)
-            asserts.assert_equal(readback, new_under_voltage, "UnderVoltageThreshold read-back mismatch after write")
+        if has_export:
+            self.step(73)
+            await self._set(endpoint, powerExportThreshold=-1000)
+            await self._read_step(74, endpoint, "PowerExportThreshold", -1000)
+            self.step(75)
+            await self._set_expect_constraint_error(endpoint, powerExportThreshold=1)
+            await self._read_step(76, endpoint, "PowerExportThreshold", -1000)
         else:
-            self.mark_current_step_skipped()
+            self._skip(73, 4)
 
-        self.step(5, "TH sends SetElectricalAlarmThresholds with OverVoltageThreshold = current UnderVoltageThreshold (constraint violation)",
-                  expectation="DUT returns CONSTRAINT_ERROR. OverVoltageThreshold unchanged from step 3.")
-        if has_overvolt and has_undervolt:
-            current_under = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.UnderVoltageThreshold)
-            await self._send_set_thresholds_expect_error(
-                endpoint, Status.ConstraintError, overVoltageThreshold=current_under)
-            readback = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.OverVoltageThreshold)
-            asserts.assert_equal(readback, new_over_voltage, "OverVoltageThreshold changed after CONSTRAINT_ERROR")
+        if has_import and has_export:
+            self.step(77)
+            await self._set_expect_constraint_error(endpoint, powerImportThreshold=2000,
+                                                    powerExportThreshold=1)
+            await self._read_step(78, endpoint, "PowerImportThreshold", 1000)
+            await self._read_step(79, endpoint, "PowerExportThreshold", -1000)
+
+            self.step(80)
+            await self._set(endpoint, powerImportThreshold=2000, powerExportThreshold=-2000)
+            await self._read_step(81, endpoint, "PowerImportThreshold", 2000)
+            await self._read_step(82, endpoint, "PowerExportThreshold", -2000)
+
+            self.step(83)
+            await self._set_expect_constraint_error(endpoint, powerImportThreshold=0,
+                                                    powerExportThreshold=0)
+            await self._read_step(84, endpoint, "PowerImportThreshold", 2000)
+            await self._read_step(85, endpoint, "PowerExportThreshold", -2000)
         else:
-            self.mark_current_step_skipped()
+            self._skip(77, 9)
 
-        self.step(6, "TH sends SetElectricalAlarmThresholds with OverFrequencyThreshold = ORIG + 1000; reads back",
-                  expectation="SUCCESS. Read-back equals ORIG + 1000.")
-        if has_overfreq:
-            base_val = orig_over_frequency if isinstance(orig_over_frequency, int) else 50000
-            new_over_freq = base_val + 1000
-            await self._send_set_thresholds(endpoint, overFrequencyThreshold=new_over_freq)
-            readback = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.OverFrequencyThreshold)
-            asserts.assert_equal(readback, new_over_freq, "OverFrequencyThreshold read-back mismatch after write")
-        else:
-            self.mark_current_step_skipped()
-
-        self.step(7, "TH sends SetElectricalAlarmThresholds with UnderFrequencyThreshold = ORIG - 1000; reads back",
-                  expectation="SUCCESS. Read-back equals ORIG - 1000.")
-        if has_underfreq:
-            base_val = orig_under_frequency if isinstance(orig_under_frequency, int) else 50000
-            new_under_freq = base_val - 1000
-            await self._send_set_thresholds(endpoint, underFrequencyThreshold=new_under_freq)
-            readback = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.UnderFrequencyThreshold)
-            asserts.assert_equal(readback, new_under_freq, "UnderFrequencyThreshold read-back mismatch after write")
-        else:
-            self.mark_current_step_skipped()
-
-        self.step(8, "TH sends SetElectricalAlarmThresholds with OverPowerThreshold = ORIG + 1000; reads back",
-                  expectation="SUCCESS. Read-back equals ORIG + 1000.")
-        if has_overpower:
-            base_val = orig_over_power if isinstance(orig_over_power, int) else 10000
-            new_over_power = base_val + 1000
-            await self._send_set_thresholds(endpoint, overPowerThreshold=new_over_power)
-            readback = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.OverPowerThreshold)
-            asserts.assert_equal(readback, new_over_power, "OverPowerThreshold read-back mismatch after write")
-        else:
-            self.mark_current_step_skipped()
-
-        self.step(9, "TH sends SetElectricalAlarmThresholds with UnderPowerThreshold = ORIG - 1000; reads back",
-                  expectation="SUCCESS. Read-back equals ORIG - 1000.")
-        if has_underpower:
-            base_val = orig_under_power if isinstance(orig_under_power, int) else 1000
-            new_under_power = base_val - 1000
-            await self._send_set_thresholds(endpoint, underPowerThreshold=new_under_power)
-            readback = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.UnderPowerThreshold)
-            asserts.assert_equal(readback, new_under_power, "UnderPowerThreshold read-back mismatch after write")
-        else:
-            self.mark_current_step_skipped()
-
-        self.step(10, "TH sends SetElectricalAlarmThresholds with OverCurrentThreshold = ORIG + 1000; reads back",
-                  expectation="SUCCESS. Read-back equals ORIG + 1000.")
-        if has_overcur:
-            base_val = orig_over_current if isinstance(orig_over_current, int) else 16000
-            new_over_current = base_val + 1000
-            await self._send_set_thresholds(endpoint, overCurrentThreshold=new_over_current)
-            readback = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.OverCurrentThreshold)
-            asserts.assert_equal(readback, new_over_current, "OverCurrentThreshold read-back mismatch after write")
-        else:
-            self.mark_current_step_skipped()
-
-        self.step(11, "TH sends SetElectricalAlarmThresholds with UnderCurrentThreshold = ORIG - 1000; reads back",
-                  expectation="SUCCESS. Read-back equals ORIG - 1000.")
-        if has_undercur:
-            base_val = orig_under_current if isinstance(orig_under_current, int) else 1000
-            new_under_current = base_val - 1000
-            await self._send_set_thresholds(endpoint, underCurrentThreshold=new_under_current)
-            readback = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.UnderCurrentThreshold)
-            asserts.assert_equal(readback, new_under_current, "UnderCurrentThreshold read-back mismatch after write")
-        else:
-            self.mark_current_step_skipped()
-
-        new_power_import = None
-        self.step(12, "TH sends SetElectricalAlarmThresholds with PowerImportThreshold = 1000; reads back",
-                  expectation="SUCCESS. Read-back equals 1000.")
-        if has_powerimp:
-            new_power_import = 1000
-            await self._send_set_thresholds(endpoint, powerImportThreshold=new_power_import)
-            readback = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.PowerImportThreshold)
-            asserts.assert_equal(readback, new_power_import, "PowerImportThreshold read-back mismatch after write")
-        else:
-            self.mark_current_step_skipped()
-
-        self.step(13, "TH sends SetElectricalAlarmThresholds with PowerImportThreshold = -1 (violates min 0)",
-                  expectation="DUT returns CONSTRAINT_ERROR. PowerImportThreshold unchanged from step 12.")
-        if has_powerimp:
-            await self._send_set_thresholds_expect_error(endpoint, Status.ConstraintError, powerImportThreshold=-1)
-            readback = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.PowerImportThreshold)
-            asserts.assert_equal(readback, new_power_import, "PowerImportThreshold changed after CONSTRAINT_ERROR")
-        else:
-            self.mark_current_step_skipped()
-
-        new_power_export = None
-        self.step(14, "TH sends SetElectricalAlarmThresholds with PowerExportThreshold = -1000; reads back",
-                  expectation="SUCCESS. Read-back equals -1000.")
-        if has_powerexp:
-            new_power_export = -1000
-            await self._send_set_thresholds(endpoint, powerExportThreshold=new_power_export)
-            readback = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.PowerExportThreshold)
-            asserts.assert_equal(readback, new_power_export, "PowerExportThreshold read-back mismatch after write")
-        else:
-            self.mark_current_step_skipped()
-
-        self.step(15, "TH sends SetElectricalAlarmThresholds with PowerExportThreshold = 1 (violates max 0)",
-                  expectation="DUT returns CONSTRAINT_ERROR. PowerExportThreshold unchanged from step 14.")
-        if has_powerexp:
-            await self._send_set_thresholds_expect_error(endpoint, Status.ConstraintError, powerExportThreshold=1)
-            readback = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.PowerExportThreshold)
-            asserts.assert_equal(readback, new_power_export, "PowerExportThreshold changed after CONSTRAINT_ERROR")
-        else:
-            self.mark_current_step_skipped()
-
-        self.step(16, "TH sends SetElectricalAlarmThresholds to restore all attributes to original values",
-                  expectation="SUCCESS for each restore.")
-        restore_kwargs = {}
-        if has_overvolt:
-            restore_kwargs['overVoltageThreshold'] = orig_over_voltage
-        if has_undervolt:
-            restore_kwargs['underVoltageThreshold'] = orig_under_voltage
-        if has_overfreq:
-            restore_kwargs['overFrequencyThreshold'] = orig_over_frequency
-        if has_underfreq:
-            restore_kwargs['underFrequencyThreshold'] = orig_under_frequency
-        if has_overpower:
-            restore_kwargs['overPowerThreshold'] = orig_over_power
-        if has_underpower:
-            restore_kwargs['underPowerThreshold'] = orig_under_power
-        if has_overcur:
-            restore_kwargs['overCurrentThreshold'] = orig_over_current
-        if has_undercur:
-            restore_kwargs['underCurrentThreshold'] = orig_under_current
-        if has_powerimp:
-            restore_kwargs['powerImportThreshold'] = orig_power_import
-        if has_powerexp:
-            restore_kwargs['powerExportThreshold'] = orig_power_export
-        if restore_kwargs:
-            await self._send_set_thresholds(endpoint, **restore_kwargs)
+        # Restore every threshold the DUT supports to the value read in steps 3-12.
+        for i, (name, _feature) in enumerate(ALL_THRESHOLDS):
+            first = 86 + 2 * i
+            if name not in originals:
+                self._skip(first, 2)
+                continue
+            self.step(first)
+            await self._set(endpoint, **{_kwarg(name): originals[name]})
+            await self._read_step(first + 1, endpoint, name, originals[name])
 
 
 if __name__ == "__main__":
