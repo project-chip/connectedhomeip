@@ -23,6 +23,7 @@ config("config") {
   include_dirs = [
     "include",
     "${chip_root}/examples/av-analysis-app/av-analysis-common/include",
+    "${chip_root}/third_party/libdatachannel/repo/include",
   ]
 }
 
@@ -31,7 +32,9 @@ executable("chip-av-analysis-app") {
 
   sources = [
     "include/CHIPProjectAppConfig.h",
+    "include/webrtc-peer-manager.h",
     "main.cpp",
+    "src/webrtc-peer-manager.cpp",
   ]
 
   deps = [
@@ -39,6 +42,7 @@ executable("chip-av-analysis-app") {
     "${chip_root}/examples/av-analysis-app/av-analysis-common:av-analysis-node-lib",
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/lib",
+    "${chip_root}/third_party/libdatachannel:libdatachannel",
   ]
 
   output_dir = root_out_dir
