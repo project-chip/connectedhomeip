@@ -239,9 +239,9 @@ constexpr DataModel::DeviceTypeEntry kLaundryDryer = {
     .deviceTypeRevision = kLaundryDryerDeviceTypeRevision,
 };
 
-constexpr DataModel::DeviceTypeEntry kHumidifierDehumidifier = {
-    .deviceTypeId       = kHumidifierDehumidifierDeviceTypeId,
-    .deviceTypeRevision = kHumidifierDehumidifierDeviceTypeRevision,
+constexpr DataModel::DeviceTypeEntry kHumidityConditioner = {
+    .deviceTypeId       = kHumidityConditionerDeviceTypeId,
+    .deviceTypeRevision = kHumidityConditionerDeviceTypeRevision,
 };
 
 constexpr DataModel::DeviceTypeEntry kNetworkInfrastructureManager = {
