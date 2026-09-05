@@ -21,6 +21,7 @@
 
 #include <array>
 #include <cstdint>
+#include <vector>
 
 #include <lib/support/CodeUtils.h>
 
