@@ -150,6 +150,8 @@ class ElectricalAlarmTestBaseHelper(MatterBaseTest):
         attrs = cluster.Attributes
         cmds = cluster.Commands
 
+        # Commissioning; declared as is_commissioning=True in alarm_lifecycle_steps, so the
+        # framework performs it and this call only advances to it.
         self.step(1)
 
         self.step(2)
