@@ -33,6 +33,13 @@
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
+#
+# CI does not run this test through run_python_test.py: that runner models one
+# application and cannot set up the mocked BLE/Wi-Fi transports. It is run by
+# scripts/tests/run_compro_test.py, which takes the commissioning method,
+# discriminator, passcode, endpoint and end device identifiers from the block
+# above, and supplies the proxy, the end device and the mocked transports
+# itself. The block's app, app-args and factory-reset are not used there.
 
 """TC-COMPRO-2.4 — Commissioning Proxy cluster: Proxy Connect, Message and Disconnect.
 

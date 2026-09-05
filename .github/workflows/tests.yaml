@@ -316,6 +316,8 @@ jobs:
                         --target linux-x64-network-manager-${BUILD_VARIANT} \
                         --target linux-x64-energy-gateway-${BUILD_VARIANT} \
                         --target linux-x64-all-devices-${BUILD_VARIANT} \
+                        --target linux-x64-all-devices-no-wifipaf-${BUILD_VARIANT} \
+                        --target linux-x64-light-${BUILD_VARIANT} \
                         --target linux-x64-evse-${BUILD_VARIANT} \
                         --target linux-x64-water-heater-${BUILD_VARIANT} \
                         --pw-command-launcher=ccache \
@@ -509,6 +511,32 @@ jobs:
                      --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                      --commissioning-method wifipaf-wifi \
                   "
+
+            - name: Run Commissioning Proxy certification tests over mocked BLE
+              timeout-minutes: 25
+              env:
+                # Disable TSAN bug reporting, as it reports tons of (hopefully) false positives.
+                # The reason for that is BlueZ integration which involves GIO globals (glib
+                # internals) that TSAN does not understand...
+                TSAN_OPTIONS: report_bugs=0
+              run: |
+                  # These drive three actors (test harness, proxy, end device) rather than
+                  # the single app run_test_suite.py models, so they have their own runner.
+                  # They share /tmp and the mock system bus, so they run one at a time.
+                  fail=0
+                  for test in 2_1 2_2 2_3 2_4 2_5 2_6 2_7 2_8 2_9; do
+                      echo "::group::TC_COMPRO_${test}"
+                      PATH=$PWD/out/venv/bin:$PATH out/venv/bin/python3 \
+                          scripts/tests/run_compro_test.py \
+                          --proxy-app ./objdir-clone/linux-x64-all-devices-no-wifipaf-${BUILD_VARIANT}/all-devices-app \
+                          --ed-app ./objdir-clone/linux-x64-light-${BUILD_VARIANT}/chip-lighting-app \
+                          --script src/python_testing/TC_COMPRO_${test}.py \
+                          --script-args "--tests test_TC_COMPRO_${test}" \
+                          --proxy-transport ble \
+                          || { echo "TC_COMPRO_${test} FAILED"; fail=1; }
+                      echo "::endgroup::"
+                  done
+                  exit $fail
 
             - name: Print test run summaries
               if: always()

@@ -36,6 +36,19 @@ The proxy's own commissioning uses the framework's `--discriminator` /
 does, so the same test script runs unchanged against real devices. Everything
 specific to the mocked topology is supplied by this script.
 
+Each test's `CI TEST ARGUMENTS` block is the authority for how the test harness
+reaches the proxy: the commissioning method (whether the framework commissions
+the proxy before the test body or the test does it itself, as 2.6 does), the
+discriminator, passcode and endpoint, and the end device identifiers. Reading
+them keeps a mocked run and a hardware run of the same test on one set of values.
+A command-line option overrides the block; a value the block does not name falls
+back to a default here.
+
+The block's `app`, `app-args` and `factory-reset` are for `run_python_test.py`
+and are not used: this script launches two applications and builds their
+arguments itself. The tests are listed in `test_metadata.yaml` under
+`not_automated` for the same reason.
+
 Must run as root, so that the namespaces and the mock D-Bus bus can be created.
 When invoked as a normal user it re-executes itself under `unshare
 --map-root-user`; where a host forbids that (`kernel.apparmor_restrict_
@@ -77,9 +90,13 @@ DEFAULT_CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(
 MOCK_AP_SSID = "MatterAP"
 MOCK_AP_PASSWORD = "MatterAPPassword"
 
-# The CP device type is instantiated on this endpoint by all-devices-app; the
-# test script reads the same value from --endpoint.
+# Used only for a test whose CI arguments block does not name them; the block is
+# the first source, so that a mocked run and a hardware run of the same test
+# reach the proxy with the same discriminator, passcode and endpoint.
 DEFAULT_CP_ENDPOINT = 5
+DEFAULT_PROXY_DISCRIMINATOR = 3840
+DEFAULT_ED_DISCRIMINATOR = 3841
+DEFAULT_ED_PASSCODE = 20202021
 
 # NAN operating frequency: channel 6, the default Matter PAF channel.
 PAF_FREQ_LIST = "2437"
@@ -244,6 +261,32 @@ def check_transport_matches_build(proxy_app: str, transport: str, proxy_ble: boo
     return Transport.BLE in built and proxy_ble
 
 
+def declared_test_params(script: str) -> dict[str, int]:
+    """Parameters the test declares in its CI arguments block for reaching the proxy.
+
+    The test file is the authority for the discriminator, passcode and endpoint it
+    expects, and for the end device identifiers it passes as string arguments: a
+    hardware run through `run_python_test.py` takes them from the same block, so
+    reading them here keeps the two kinds of run on one set of values instead of
+    two that have to be kept in step by hand. Anything the block does not name
+    falls back to this script's defaults, and an explicit command-line option
+    overrides both.
+    """
+    params: dict[str, int] = {}
+    flags = {"--discriminator": "discriminator", "--passcode": "passcode", "--endpoint": "endpoint"}
+    prefixes = {"ed_discriminator:": "ed_discriminator", "ed_passcode:": "ed_passcode"}
+    for run in extract_runs_args(script).values():
+        args = shlex.split(run.get("script-args", ""))
+        for flag, key in flags.items():
+            if flag in args:
+                params.setdefault(key, int(args[args.index(flag) + 1]))
+        for arg in args:
+            for prefix, key in prefixes.items():
+                if arg.startswith(prefix):
+                    params.setdefault(key, int(arg[len(prefix):]))
+    return params
+
+
 def declared_commissioning_args(script: str) -> list[str]:
     """The commissioning-method arguments the test itself declares.
 
@@ -289,14 +332,18 @@ def ed_app_args(transport: str) -> str:
 @click.option('--proxy-transport', 'transport', type=click.Choice(Transport, case_sensitive=False),  # type: ignore[arg-type]
               default=Transport.WIFIPAF,
               show_default=True, help='Transport the proxy uses to reach the end device.')
-@click.option('--endpoint', default=DEFAULT_CP_ENDPOINT, show_default=True,
-              help='Endpoint hosting the CommissioningProxy cluster.')
-@click.option('--discriminator', default=3840, show_default=True, help='Discriminator of the proxy.')
-@click.option('--passcode', default=PROXY_PASSCODE, show_default=True,
+@click.option('--endpoint', default=None, type=int,
+              help='Endpoint hosting the CommissioningProxy cluster. Defaults to the value the '
+                   'test declares in its CI arguments block.')
+@click.option('--discriminator', default=None, type=int,
+              help='Discriminator of the proxy. Defaults to the value the test declares.')
+@click.option('--passcode', default=None, type=int,
               help='Passcode of the proxy. all-devices-app cannot be given one, so this only tells '
                    'the test script which passcode to use and must match the built-in default.')
-@click.option('--ed-discriminator', default=3841, show_default=True, help='Discriminator of the end device.')
-@click.option('--ed-passcode', default=20202021, show_default=True, help='Passcode of the end device.')
+@click.option('--ed-discriminator', default=None, type=int,
+              help='Discriminator of the end device. Defaults to the value the test declares.')
+@click.option('--ed-passcode', default=None, type=int,
+              help='Passcode of the end device. Defaults to the value the test declares.')
 @click.option('--proxy-ble/--no-proxy-ble', default=True, show_default=True,
               help='Whether the proxy application was built with BLE. Clear it for a PAF-only build, '
                    'which does not accept --ble-controller.')
@@ -309,7 +356,8 @@ def ed_app_args(transport: str) -> str:
 @click.option('--internal-inside-unshare', hidden=True, is_flag=True, default=False,
               help='Internal flag for running inside an unshared environment.')
 def main(proxy_app: str, proxy_args: str, ed_app: str | None, script: str, script_args: str, transport: str,
-         endpoint: int, discriminator: int, passcode: int, ed_discriminator: int, ed_passcode: int,
+         endpoint: int | None, discriminator: int | None, passcode: int | None,
+         ed_discriminator: int | None, ed_passcode: int | None,
          proxy_ble: bool, ns_index: int, log_level: str, mock_log_level: str | None,
          internal_inside_unshare: bool) -> None:
 
@@ -325,10 +373,23 @@ def main(proxy_app: str, proxy_args: str, ed_app: str | None, script: str, scrip
             handler.setLevel(min(run_level, mock_level))
             handler.addFilter(MockRecordsOnly(run_level, mock_level))
 
+    declared = declared_test_params(script)
+
+    def resolve(given: int | None, key: str, fallback: int) -> int:
+        return given if given is not None else declared.get(key, fallback)
+
+    endpoint = resolve(endpoint, "endpoint", DEFAULT_CP_ENDPOINT)
+    discriminator = resolve(discriminator, "discriminator", DEFAULT_PROXY_DISCRIMINATOR)
+    passcode = resolve(passcode, "passcode", PROXY_PASSCODE)
+    ed_discriminator = resolve(ed_discriminator, "ed_discriminator", DEFAULT_ED_DISCRIMINATOR)
+    ed_passcode = resolve(ed_passcode, "ed_passcode", DEFAULT_ED_PASSCODE)
+    log.info("Proxy discriminator %d passcode %d on endpoint %d; end device discriminator %d passcode %d",
+             discriminator, passcode, endpoint, ed_discriminator, ed_passcode)
+
     if passcode != PROXY_PASSCODE:
         raise click.BadOptionUsage(
             "passcode", f"The proxy application has no --passcode option, so its passcode is always "
-            f"{PROXY_PASSCODE} and --passcode cannot change it.")
+            f"{PROXY_PASSCODE}; --passcode and the test's CI arguments block cannot change it.")
 
     proxy_ble = check_transport_matches_build(proxy_app, transport, proxy_ble)
 
