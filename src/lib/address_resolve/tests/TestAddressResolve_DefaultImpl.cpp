@@ -559,7 +559,7 @@ public:
     {
     public:
         // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method)
-        CriticalFailure StartTimer(System::Clock::Timeout aDelay, System::TimerCompleteCallback aComplete,
+        CriticalFailure StartTimer(System::Clock::Milliseconds64 aDelay, System::TimerCompleteCallback aComplete,
                                    void * aAppState) override
         {
             return mStartTimerCallback ? mStartTimerCallback.value()(aDelay, aComplete, aAppState) : CHIP_NO_ERROR;

@@ -176,7 +176,7 @@ namespace System {
         return StartTimer(delay, TimerCompleteBlockCallback, ctx);
     }
 
-    CriticalFailure LayerImplDispatch::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
+    CriticalFailure LayerImplDispatch::StartTimer(Clock::Milliseconds64 delay, TimerCompleteCallback onComplete, void * appState)
     {
 #if SYSTEM_LAYER_IMPL_DISPATCH_DEBUG
         ChipLogError(Inet, "%s (onComplete: %p - appState: %p)", __func__, onComplete, appState);
@@ -184,7 +184,7 @@ namespace System {
         return StartTimer(delay, onComplete, appState, true /* shouldCancel */);
     }
 
-    CriticalFailure LayerImplDispatch::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState, bool shouldCancel)
+    CriticalFailure LayerImplDispatch::StartTimer(Clock::Milliseconds64 delay, TimerCompleteCallback onComplete, void * appState, bool shouldCancel)
     {
         assertChipStackLockedByCurrentThread();
 

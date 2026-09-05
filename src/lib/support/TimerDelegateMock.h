@@ -26,7 +26,7 @@ namespace chip {
 class TimerDelegateMock : public TimerDelegate
 {
 public:
-    CriticalFailure StartTimer(TimerContext * context, chip::System::Clock::Timeout aTimeout) override
+    CriticalFailure StartTimer(TimerContext * context, chip::System::Clock::Milliseconds64 aTimeout) override
     {
         mTimerContext = context;
         mTimerTimeout = mMockSystemTimestamp + aTimeout;
@@ -43,7 +43,7 @@ public:
 
     chip::System::Clock::Timestamp GetCurrentMonotonicTimestamp() override { return mMockSystemTimestamp; }
 
-    void AdvanceClock(chip::System::Clock::Timeout aTimeout)
+    void AdvanceClock(chip::System::Clock::Milliseconds64 aTimeout)
     {
         mMockSystemTimestamp += aTimeout;
         if (mTimerContext && mMockSystemTimestamp >= mTimerTimeout)
