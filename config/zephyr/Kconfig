@@ -16,7 +16,21 @@
 
 rsource "../common/cmake/Kconfig"
 
-# See config/common/cmake/Kconfig for full definition
+# Workaround to pass the nRF compliance check
+config CHIP_NXP_PLATFORM
+	bool
+	help
+	  States that the configuration uses Matter NXP platform,
+	  what can be used to conditionally deviate from Zephyr generic configuration
+	  for NXP platform related purposes.
+
+config CHIP_TELINK_PLATFORM
+	bool
+	help
+	  States that the configuration uses Matter Telink platform,
+	  what can be used to conditionally deviate from Zephyr generic configuration
+	  for Telink platform related purposes.
+
 config CHIP
 	select CPP
 	imply REQUIRES_FULL_LIBCPP
@@ -64,7 +78,6 @@ config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
 # See config/common/cmake/Kconfig for full definition
 config CHIP_LIB_SHELL
 	imply SHELL
-	imply OPENTHREAD_SHELL if OPENTHREAD
 
 if OPENTHREAD
 
@@ -85,11 +98,9 @@ endif # OPENTHREAD
 
 config CHIP_CRYPTO_PSA
 	imply MBEDTLS_PSA_CRYPTO_C
-	imply MBEDTLS_USE_PSA_CRYPTO
 	imply PSA_WANT_KEY_TYPE_AES
 	imply PSA_WANT_ALG_CCM
 	imply PSA_WANT_ALG_SHA_256
-	imply PSA_WANT_KEY_TYPE_ECC_KEY_PAIR
 	imply PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY
 	imply PSA_WANT_ECC_SECP_R1_256
 	imply PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_BASIC
@@ -132,6 +143,13 @@ config CHIP_MALLOC_SYS_HEAP_WATERMARKS_SUPPORT
 	help
 	  Enables support for getting current heap high watermark and resetting 
 	  watermarks. 
+
+config CHIP_MALLOC_SYS_HEAP_DEBUG
+	bool "Log every allocated or freed memory block"
+	help
+	  Enables debug logs printed whenever a heap memory block is allocated or
+	  freed. The logs can be used to trace the source of memory leaks in the
+	  application.
 
 endif # CHIP_MALLOC_SYS_HEAP
 

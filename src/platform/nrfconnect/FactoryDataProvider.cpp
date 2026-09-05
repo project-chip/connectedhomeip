@@ -24,7 +24,19 @@
 #include <platform/Zephyr/ZephyrConfig.h>
 #endif
 
-#include <zephyr/logging/log.h>
+#include <lib/support/logging/CHIPLogging.h>
+
+#ifdef CONFIG_CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU
+#include <cracen_psa_kmu.h>
+#endif
+
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+#include <lib/support/ScopedMemoryBuffer.h>
+#include <psa/crypto.h>
+#ifdef CONFIG_CHIP_CRYPTO_PSA_MIGRATE_DAC_PRIV_KEY
+#include <zephyr/drivers/flash.h>
+#endif // CONFIG_CHIP_CRYPTO_PSA_MIGRATE_DAC_PRIV_KEY
+#endif // CONFIG_CHIP_CRYPTO_PSA
 
 namespace chip {
 namespace {
@@ -50,21 +62,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::Init()
     uint8_t * factoryData = nullptr;
     size_t factoryDataSize;
 
-    CHIP_ERROR error = mFlashFactoryData.ProtectFactoryDataPartitionAgainstWrite();
-
-    // Protection against write for external storage is not supported.
-    if (error == CHIP_ERROR_NOT_IMPLEMENTED)
-    {
-        ChipLogProgress(DeviceLayer, "The device does not support hardware protection against write.");
-        error = CHIP_NO_ERROR;
-    }
-    else if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to protect the factory data partition.");
-        return error;
-    }
-
-    error = mFlashFactoryData.GetFactoryDataPartition(factoryData, factoryDataSize);
+    CHIP_ERROR error = mFlashFactoryData.GetFactoryDataPartition(factoryData, factoryDataSize);
 
     if (error != CHIP_NO_ERROR)
     {
@@ -86,8 +84,150 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::Init()
         return CHIP_ERROR_VERSION_MISMATCH;
     }
 
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+    // From security point of view, if this fails, the device may be compromised, so we should stop execution here.
+    VerifyOrDie(MoveDACPrivateKeyToSecureStorage(factoryData, factoryDataSize) == CHIP_NO_ERROR);
+#endif
+
+    error = mFlashFactoryData.ProtectFactoryDataPartitionAgainstWrite();
+
+    // Protection against write for external storage is not supported.
+    if (error == CHIP_ERROR_NOT_IMPLEMENTED)
+    {
+        ChipLogProgress(DeviceLayer, "The device does not support hardware protection against write.");
+        error = CHIP_NO_ERROR;
+    }
+    else if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to protect the factory data partition.");
+        return error;
+    }
+
+    return error;
+}
+
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+template <class FlashFactoryData>
+CHIP_ERROR FactoryDataProvider<FlashFactoryData>::MoveDACPrivateKeyToSecureStorage(uint8_t * factoryDataPartition,
+                                                                                   size_t factoryDataSize)
+{
+
+    if (!factoryDataPartition || factoryDataSize == 0)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (mFactoryData.dac_priv_key.len != kDACPrivateKeyLength)
+    {
+        return CHIP_ERROR_INVALID_LIST_LENGTH;
+    }
+
+    uint8_t clearedDACPrivKey[kDACPrivateKeyLength];
+    memset(clearedDACPrivKey, 0x00, sizeof(clearedDACPrivKey));
+
+// If key should be migrated to KMU save the KMU key slot to keyId.
+#ifdef CONFIG_CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU
+    mDACPrivKeyId = static_cast<psa_key_id_t>(PSA_KEY_ID_FROM_CRACEN_KMU_SLOT(
+#ifdef CONFIG_CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU_ENCRYPTED
+        CRACEN_KMU_KEY_USAGE_SCHEME_ENCRYPTED,
+#else
+        CRACEN_KMU_KEY_USAGE_SCHEME_RAW,
+#endif // CONFIG_CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU_ENCRYPTED
+        CONFIG_CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU_SLOT_ID));
+#endif // CONFIG_CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU
+
+    // Check if factory data contains DAC private key
+    if (memcmp(mFactoryData.dac_priv_key.data, clearedDACPrivKey, kDACPrivateKeyLength) != 0)
+    {
+        psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+        // If there is the new DAC private key present in the factory data set and also there is
+        // the existing one in ITS NVM storage, then skip saving it again.
+        const psa_status_t status = psa_get_key_attributes(mDACPrivKeyId, &attributes);
+        VerifyOrReturnError(status == PSA_SUCCESS || status == PSA_ERROR_DOES_NOT_EXIST || status == PSA_ERROR_INVALID_HANDLE,
+                            CHIP_ERROR_INTERNAL);
+        if (status != PSA_SUCCESS)
+        {
+            ChipLogProgress(DeviceLayer, "Found DAC Private Key in factory data set. Copying to secure storage...");
+
+            // Remove the key if any exists and can be corrupted.
+            psa_destroy_key(mDACPrivKeyId);
+
+            psa_reset_key_attributes(&attributes);
+            psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
+            psa_set_key_bits(&attributes, kDACPrivateKeyLength * 8);
+            psa_set_key_algorithm(&attributes, PSA_ALG_ECDSA(PSA_ALG_ANY_HASH));
+            psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_SIGN_MESSAGE);
+            psa_set_key_id(&attributes, mDACPrivKeyId);
+#ifdef CONFIG_CHIP_CRYPTO_PSA_MIGRATE_DAC_PRIV_KEY
+#if defined(CONFIG_CHIP_CRYPTO_PSA_DAC_PRIV_KEY_ITS)
+            psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_PERSISTENT);
+#elif defined(CONFIG_CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU)
+            psa_set_key_lifetime(
+                &attributes,
+                PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_PERSISTENCE_DEFAULT, PSA_KEY_LOCATION_CRACEN_KMU));
+#endif // CONFIG_CHIP_CRYPTO_PSA_DAC_PRIV_KEY_ITS || CONFIG_CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU
+#else
+            psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_VOLATILE);
+#endif // CONFIG_CHIP_CRYPTO_PSA_MIGRATE_DAC_PRIV_KEY
+            VerifyOrReturnError(psa_import_key(&attributes, reinterpret_cast<uint8_t *>(mFactoryData.dac_priv_key.data),
+                                               mFactoryData.dac_priv_key.len, &mDACPrivKeyId) == PSA_SUCCESS,
+                                CHIP_ERROR_INTERNAL);
+        }
+
+#ifdef CONFIG_CHIP_CRYPTO_PSA_MIGRATE_DAC_PRIV_KEY
+#if defined(CONFIG_CHIP_FACTORY_RESET_ERASE_SETTINGS) && defined(CONFIG_CHIP_CRYPTO_PSA_DAC_PRIV_KEY_ITS) &&                       \
+    !defined(CONFIG_BUILD_WITH_TFM)
+#error "Do not use both CONFIG_CHIP_FACTORY_RESET_ERASE_SETTINGS and CONFIG_CHIP_CRYPTO_PSA_MIGRATE_DAC_PRIV_KEY kconfig options " \
+       "while saving the DAC private key to ITS because you will permanently lose the DAC private key from the device."
+#endif
+        // Check once again if the saved key has attributes set before removing it from the factory data set.
+        VerifyOrReturnError(psa_get_key_attributes(mDACPrivKeyId, &attributes) == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+
+        const struct device * flashDev = mFlashFactoryData.GetFlashDevice();
+        VerifyOrReturnError(flashDev != nullptr && device_is_ready(flashDev), CHIP_ERROR_INTERNAL);
+
+        // Get the actual block size.
+        const flash_parameters * flashParameters = flash_get_parameters(flashDev);
+        VerifyOrReturnError(flashParameters != nullptr, CHIP_ERROR_INTERNAL);
+
+        // To write zeros directly to the Flash memory without erasing whole page the start address must be aligned to the
+        // write_block_size value (alignedDacPrivKeyOffset), then we need align the required buffer size to the write_block_size as
+        // well (requiredFlashSpaceSize) to meet Flash write requirements, and we need to calculate how many bytes of the factory
+        // data set must be copied to the additional buffer space created after the alignments (bytesToLeftBefore, and
+        // bytesToLeftAfter)
+        size_t alignedDacPrivKeyOffset = ROUND_DOWN(mFactoryData.dacPrivateKeyOffset, flashParameters->write_block_size);
+        size_t bytesToLeftBefore       = mFactoryData.dacPrivateKeyOffset % flashParameters->write_block_size;
+        size_t requiredFlashSpaceSize  = ROUND_UP(kDACPrivateKeyLength + bytesToLeftBefore, flashParameters->write_block_size);
+        size_t bytesToLeftAfter        = requiredFlashSpaceSize - bytesToLeftBefore - kDACPrivateKeyLength;
+
+        // Allocate the memory buffer for removing DAC private key.
+        chip::Platform::ScopedMemoryBuffer<uint8_t> removedPrivKeyBuffer;
+        VerifyOrReturnError(removedPrivKeyBuffer.Calloc(requiredFlashSpaceSize), CHIP_ERROR_NO_MEMORY);
+
+        // Copy the existing parts of the aligned memory space to before and after the DAC private key space.
+        memcpy(removedPrivKeyBuffer.Get(), factoryDataPartition + alignedDacPrivKeyOffset, bytesToLeftBefore);
+        memcpy(removedPrivKeyBuffer.Get() + bytesToLeftBefore + kDACPrivateKeyLength,
+               factoryDataPartition + mFactoryData.dacPrivateKeyOffset + kDACPrivateKeyLength, bytesToLeftAfter);
+
+        // Write aligned buffer directly to the Flash without erasing.
+        VerifyOrReturnError(0 ==
+                                flash_write(flashDev, kFactoryDataPartitionAddress + alignedDacPrivKeyOffset,
+                                            removedPrivKeyBuffer.Get(), requiredFlashSpaceSize),
+                            CHIP_ERROR_INTERNAL);
+
+        // Parse the factory data again and verify if the procedure finished successfully
+        VerifyOrReturnError(ParseFactoryData(factoryDataPartition, static_cast<uint16_t>(factoryDataSize), &mFactoryData),
+                            CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+
+        // Verify if the factory data does not contain the DAC private key anymore.
+        VerifyOrReturnError(memcmp(mFactoryData.dac_priv_key.data, clearedDACPrivKey, kDACPrivateKeyLength) == 0,
+                            CHIP_ERROR_INTERNAL);
+#endif // CONFIG_CHIP_CRYPTO_PSA_MIGRATE_DAC_PRIV_KEY
+    }
+
     return CHIP_NO_ERROR;
 }
+#endif // CONFIG_CHIP_CRYPTO_PSA
 
 template <class FlashFactoryData>
 CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetCertificationDeclaration(MutableByteSpan & outBuffer)
@@ -148,62 +288,31 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::SignWithDeviceAttestationKey(c
 {
     Crypto::P256ECDSASignature signature;
     Crypto::P256Keypair keypair;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-#ifdef CONFIG_CHIP_CRYPTO_PSA
-    psa_key_id_t keyId = 0;
-#endif
 
-    VerifyOrExit(outSignBuffer.size() >= signature.Capacity(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
-    VerifyOrExit(mFactoryData.dac_cert.data, err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-    VerifyOrExit(mFactoryData.dac_priv_key.data, err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(mFactoryData.dac_cert.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
 #ifdef CONFIG_CHIP_CRYPTO_PSA
-    {
-        psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
-        psa_reset_key_attributes(&attributes);
-        psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
-        psa_set_key_bits(&attributes, kDACPrivateKeyLength * 8);
-        psa_set_key_algorithm(&attributes, PSA_ALG_ECDSA(PSA_ALG_SHA_256));
-        psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_SIGN_MESSAGE);
-        VerifyOrExit(psa_import_key(&attributes, reinterpret_cast<uint8_t *>(mFactoryData.dac_priv_key.data), kDACPrivateKeyLength,
-                                    &keyId) == PSA_SUCCESS,
-                     err = CHIP_ERROR_INTERNAL);
+    size_t outputLen = 0;
 
-        size_t outputLen    = 0;
-        psa_status_t status = psa_sign_message(keyId, PSA_ALG_ECDSA(PSA_ALG_SHA_256), messageToSign.data(), messageToSign.size(),
-                                               signature.Bytes(), signature.Capacity(), &outputLen);
-        VerifyOrExit(!status, err = CHIP_ERROR_INTERNAL);
-        VerifyOrExit(outputLen == chip::Crypto::kP256_ECDSA_Signature_Length_Raw, err = CHIP_ERROR_INTERNAL);
-        err = signature.SetLength(outputLen);
-        VerifyOrExit(err == CHIP_NO_ERROR, );
-    }
+    psa_status_t err = psa_sign_message(mDACPrivKeyId, PSA_ALG_ECDSA(PSA_ALG_SHA_256), messageToSign.data(), messageToSign.size(),
+                                        signature.Bytes(), signature.Capacity(), &outputLen);
+
+    VerifyOrReturnError(!err, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(outputLen == chip::Crypto::kP256_ECDSA_Signature_Length_Raw, CHIP_ERROR_INTERNAL);
+    ReturnErrorOnFailure(signature.SetLength(outputLen));
 #else
-    {
-        // Extract public key from DAC cert.
-        ByteSpan dacCertSpan{ reinterpret_cast<uint8_t *>(mFactoryData.dac_cert.data), mFactoryData.dac_cert.len };
-        chip::Crypto::P256PublicKey dacPublicKey;
+    VerifyOrReturnError(mFactoryData.dac_priv_key.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    // Extract public key from DAC cert.
+    ByteSpan dacCertSpan{ reinterpret_cast<uint8_t *>(mFactoryData.dac_cert.data), mFactoryData.dac_cert.len };
+    chip::Crypto::P256PublicKey dacPublicKey;
 
-        err = chip::Crypto::ExtractPubkeyFromX509Cert(dacCertSpan, dacPublicKey);
-        VerifyOrExit(err == CHIP_NO_ERROR, );
-        err = keypair.HazardousOperationLoadKeypairFromRaw(
-            ByteSpan(reinterpret_cast<uint8_t *>(mFactoryData.dac_priv_key.data), mFactoryData.dac_priv_key.len),
-            ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length()));
-        VerifyOrExit(err == CHIP_NO_ERROR, );
-        err = keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature);
-        VerifyOrExit(err == CHIP_NO_ERROR, );
-    }
-#endif
-
-exit:
-
-#ifdef CONFIG_CHIP_CRYPTO_PSA
-    psa_destroy_key(keyId);
-#endif
-
-    if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
+    ReturnErrorOnFailure(chip::Crypto::ExtractPubkeyFromX509Cert(dacCertSpan, dacPublicKey));
+    ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(
+        ByteSpan(reinterpret_cast<uint8_t *>(mFactoryData.dac_priv_key.data), mFactoryData.dac_priv_key.len),
+        ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length())));
+    ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
+#endif // CONFIG_CHIP_CRYPTO_PSA
 
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
 }

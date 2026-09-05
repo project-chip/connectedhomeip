@@ -146,6 +146,21 @@ constexpr uint8_t kMatterBleIdentity = 1;
 constexpr uint8_t kMatterBleIdentity = 0;
 #endif // CONFIG_BT_BONDABLE
 
+#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+
+bool IsMatterIdentity(const bt_conn * conn)
+{
+    VerifyOrReturnValue(conn, false);
+
+    bt_conn_info info{};
+    const int err = bt_conn_get_info(conn, &info);
+    VerifyOrReturnValue(err == 0, false);
+
+    return info.id == kMatterBleIdentity;
+}
+
+#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+
 int InitRandomStaticAddress(bool idPresent, int & id)
 {
     // Generate a random static address for the default identity.
@@ -977,6 +992,10 @@ bool BLEManagerImpl::UnsetSubscribed(bt_conn * conn)
 ssize_t BLEManagerImpl::HandleRXWrite(struct bt_conn * conId, const struct bt_gatt_attr * attr, const void * buf, uint16_t len,
                                       uint16_t offset, uint8_t flags)
 {
+#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+    VerifyOrReturnValue(IsMatterIdentity(conId), BT_GATT_ERR(BT_ATT_ERR_VALUE_NOT_ALLOWED));
+#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+
     ChipDeviceEvent event;
     PacketBufferHandle packetBuf = PacketBufferHandle::NewWithData(buf, len);
 
@@ -1001,6 +1020,10 @@ ssize_t BLEManagerImpl::HandleRXWrite(struct bt_conn * conId, const struct bt_ga
 
 ssize_t BLEManagerImpl::HandleTXCCCWrite(struct bt_conn * conId, const struct bt_gatt_attr * attr, uint16_t value)
 {
+#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+    VerifyOrReturnValue(IsMatterIdentity(conId), BT_GATT_ERR(BT_ATT_ERR_VALUE_NOT_ALLOWED));
+#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+
     ChipDeviceEvent event;
 
     if (value != BT_GATT_CCC_INDICATE && value != 0)
@@ -1019,6 +1042,10 @@ ssize_t BLEManagerImpl::HandleTXCCCWrite(struct bt_conn * conId, const struct bt
 
 void BLEManagerImpl::HandleTXIndicated(struct bt_conn * conId, bt_gatt_indicate_params *, uint8_t err)
 {
+#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+    VerifyOrReturn(IsMatterIdentity(conId));
+#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+
     ChipDeviceEvent event;
 
     event.Type                              = DeviceEventType::kPlatformZephyrBleC2IndDoneEvent;
@@ -1039,6 +1066,10 @@ void BLEManagerImpl::HandleConnect(struct bt_conn * conId, uint8_t err)
     ChipLogProgress(DeviceLayer, "Current number of connections: %u/%u", sInstance.mTotalConnNum, CONFIG_BT_MAX_CONN);
 
     VerifyOrExit(bt_conn_get_info(conId, &bt_info) == 0, );
+#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+    // Drop all callbacks incoming for the identity other than the one used for advertising
+    VerifyOrExit(bt_info.id == kMatterBleIdentity, );
+#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
     // Drop all callbacks incoming for the role other than peripheral, required by the Matter accessory
     VerifyOrExit(bt_info.role == BT_CONN_ROLE_PERIPHERAL, );
     // Don't handle BLE connecting events when it is not related to CHIPoBLE
@@ -1069,6 +1100,10 @@ void BLEManagerImpl::HandleDisconnect(struct bt_conn * conId, uint8_t reason)
     ChipLogProgress(DeviceLayer, "Current number of connections: %u/%u", sInstance.mTotalConnNum, CONFIG_BT_MAX_CONN);
 
     VerifyOrExit(bt_conn_get_info(conId, &bt_info) == 0, );
+#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+    // Drop all callbacks incoming for the identity other than the one used for advertising
+    VerifyOrExit(bt_info.id == kMatterBleIdentity, );
+#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
     // Drop all callbacks incoming for the role other than peripheral, required by the Matter accessory
     VerifyOrExit(bt_info.role == BT_CONN_ROLE_PERIPHERAL, );
     // Don't handle BLE disconnecting events when it is not related to CHIPoBLE
@@ -1088,6 +1123,10 @@ exit:
 ssize_t BLEManagerImpl::HandleC3Read(struct bt_conn * conId, const struct bt_gatt_attr * attr, void * buf, uint16_t len,
                                      uint16_t offset)
 {
+#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+    VerifyOrReturnValue(IsMatterIdentity(conId), BT_GATT_ERR(BT_ATT_ERR_VALUE_NOT_ALLOWED));
+#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+
     ChipLogDetail(DeviceLayer, "Read request received for CHIPoBLE C3 (ConnId 0x%02x)", bt_conn_index(conId));
 
     if (sInstance.c3CharDataBufferHandle.IsNull())

@@ -254,6 +254,7 @@ chip_test_suite("tests") {
     public_deps += [
       "${chip_root}/src/app/clusters/administrator-commissioning-server:administrator-commissioning-server",
       "${chip_root}/src/app/server",
+      "${chip_root}/src/lib/shell:shell",
       "${chip_root}/src/messaging/tests/echo:common",
     ]
   }

@@ -28,7 +28,6 @@
 if (CONFIG_CHIP)
 
 include(ExternalProject)
-include(../../zephyr/ota-image.cmake)
 include(../../zephyr/zephyr-util.cmake)
 include(generate_factory_data.cmake)
 
@@ -42,7 +41,10 @@ if (NOT CHIP_ROOT)
     get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../.. REALPATH)
 endif()
 
-if (NOT CHIP_APP_ZAP_DIR)
+if (CONFIG_CHIP_APP_ZAP_DIR)
+    string(CONFIGURE "${CONFIG_CHIP_APP_ZAP_DIR}" app_zap_dir)
+    get_filename_component(CHIP_APP_ZAP_DIR ${app_zap_dir} REALPATH)
+elseif (NOT CHIP_APP_ZAP_DIR)
     get_filename_component(CHIP_APP_ZAP_DIR ${CHIP_ROOT}/zzz_generated/app-common REALPATH)
 endif()
 
@@ -59,10 +61,6 @@ if (CHIP_CFLAGS)
     matter_add_flags("${CHIP_CFLAGS}")
 endif()
 
-if (CONFIG_ARM)
-    matter_add_cflags(--specs=nosys.specs)
-endif()
-
 if (CONFIG_NRF_SECURITY)
     zephyr_include_directories($<TARGET_PROPERTY:mbedtls_external,INTERFACE_INCLUDE_DIRECTORIES>)
 
@@ -70,15 +68,14 @@ if (CONFIG_NRF_SECURITY)
         zephyr_include_directories($<TARGET_PROPERTY:psa_crypto_config,INTERFACE_INCLUDE_DIRECTORIES>)
     else()
         zephyr_include_directories($<TARGET_PROPERTY:psa_crypto_library_config,INTERFACE_INCLUDE_DIRECTORIES>)
-        matter_add_flags(-DMBEDTLS_PSA_CRYPTO_USER_CONFIG_FILE=<nrf-psa-crypto-user-config.h>)
+        matter_add_flags(-DTF_PSA_CRYPTO_USER_CONFIG_FILE=<nrf-psa-crypto-user-config.h>)
     endif()
 
     zephyr_include_directories($<TARGET_PROPERTY:psa_interface,INTERFACE_INCLUDE_DIRECTORIES>)
     if(TARGET platform_cc3xx)
         zephyr_include_directories($<TARGET_PROPERTY:platform_cc3xx,INTERFACE_INCLUDE_DIRECTORIES>)
     endif()
-    matter_add_flags(-DMBEDTLS_CONFIG_FILE=<nrf-config.h>)
-    matter_add_flags(-DMBEDTLS_PSA_CRYPTO_CONFIG_FILE=<nrf-psa-crypto-config.h>)
+    matter_add_flags(-DTF_PSA_CRYPTO_CONFIG_FILE=<nrf-psa-crypto-config.h>)
 elseif(CONFIG_MBEDTLS)
     zephyr_include_directories($<TARGET_PROPERTY:mbedTLS,INTERFACE_INCLUDE_DIRECTORIES>)
     zephyr_compile_definitions($<TARGET_PROPERTY:mbedTLS,INTERFACE_COMPILE_DEFINITIONS>)
@@ -94,8 +91,15 @@ if (CONFIG_CHIP_LOG_FILE_NAME)
 endif()
 
 zephyr_get_compile_flags(ZEPHYR_CFLAGS_C C)
+
+# Zephyr may emit unqualified TARGET_PROPERTY genex (e.g. $<TARGET_PROPERTY:LTO>)
+# that cannot be evaluated by file(GENERATE) in matter_generate_args_tmp_file().
+set(ZEPHYR_CFLAGS_C "${ZEPHYR_CFLAGS_C}")
+string(REPLACE "$<TARGET_PROPERTY:LTO>" "$<TARGET_PROPERTY:zephyr_interface,LTO>" ZEPHYR_CFLAGS_C "${ZEPHYR_CFLAGS_C}")
 matter_add_cflags("${ZEPHYR_CFLAGS_C}")
 zephyr_get_compile_flags(ZEPHYR_CFLAGS_CC CXX)
+set(ZEPHYR_CFLAGS_CC "${ZEPHYR_CFLAGS_CC}")
+string(REPLACE "$<TARGET_PROPERTY:LTO>" "$<TARGET_PROPERTY:zephyr_interface,LTO>" ZEPHYR_CFLAGS_CC "${ZEPHYR_CFLAGS_CC}")
 matter_add_cxxflags("${ZEPHYR_CFLAGS_CC}")
 zephyr_get_gnu_cpp_standard(ZEPHYR_GNU_CPP_STD)
 matter_add_cxxflags(${ZEPHYR_GNU_CPP_STD})
@@ -282,14 +286,6 @@ if (CONFIG_CHIP_LIB_SHELL)
     target_link_options(chip INTERFACE
         -Wl,-u,_ZN4chip5Shell6Engine11RunMainLoopEv
     )
-endif()
-
-# ==============================================================================
-# Define 'factory_data' target for generating a factory data partition
-# ==============================================================================
-
-if(CONFIG_CHIP_FACTORY_DATA_BUILD AND (NOT SYSBUILD OR NOT CONFIG_PARTITION_MANAGER_ENABLED))
-    nrfconnect_generate_factory_data()
 endif()
 
 endif() # CONFIG_CHIP
