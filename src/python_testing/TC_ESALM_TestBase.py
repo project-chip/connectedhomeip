@@ -85,16 +85,16 @@ class ElectricalAlarmTestBaseHelper(MatterBaseTest):
             TestStep(2, "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.",
                      "Value has to be 1 (True). If 0, skip the remaining steps and end the test case."),
             TestStep(3, "TH reads from the DUT the Supported. Store the value as Supported.",
-                     f"Verify that the DUT response contains a map32 AlarmBitmap with bit {bit} set "
+                     f"Verify that the DUT response contains a map64 AlarmBitmap with bit {bit} set "
                      "(alarm is supported)."),
             TestStep("3a", "TH reads from the DUT the Mask. Store the value as Mask.",
-                     f"Verify that the DUT response contains a map32 AlarmBitmap with bit {bit} set "
+                     f"Verify that the DUT response contains a map64 AlarmBitmap with bit {bit} set "
                      "(alarm is enabled in Mask)."),
             TestStep("3b", "TH reads from the DUT the Latch. Store the value as Latch.",
-                     "Verify that the DUT response contains a map32 AlarmBitmap. Record whether bit "
+                     "Verify that the DUT response contains a map64 AlarmBitmap. Record whether bit "
                      f"{bit} is 0 or 1 as Latch for use in steps 9-12b."),
             TestStep("3c", "TH reads from the DUT the State. Store the value as InitialState.",
-                     "Verify that the DUT response contains a map32 AlarmBitmap. Bit "
+                     "Verify that the DUT response contains a map64 AlarmBitmap. Bit "
                      f"{bit} is 0 (alarm not yet active before test begins)."),
             TestStep(4, "TH establishes a subscription to State with MinIntervalFloor=0 and "
                      "MaxIntervalCeiling=30.",
@@ -111,29 +111,32 @@ class ElectricalAlarmTestBaseHelper(MatterBaseTest):
                      f"not have bit {bit} set. The State field has bit {bit} set. The Mask field equals "
                      "the current Mask attribute value."),
             TestStep(7, "TH reads from the DUT the State.",
-                     f"Verify that the DUT response contains a map32 AlarmBitmap with bit {bit} set."),
+                     f"Verify that the DUT response contains a map64 AlarmBitmap with bit {bit} set."),
             TestStep(8, f"{trigger_cmd} with EventTrigger set to {trig_clear} to clear the "
                      f"{alarm_name} alarm condition.",
                      "Verify DUT responds w/ status SUCCESS(0x00)."),
             TestStep(9, f"IF bit {bit} of Latch is 0 (non-latched): TH awaits subscription report of a "
-                     f"State value with bit {bit} cleared.",
+                     f"State value with bit {bit} cleared. Otherwise skip this step.",
                      report_cleared),
             TestStep(10, f"IF bit {bit} of Latch is 0 (non-latched): TH waits up to 30 seconds for a "
-                     "Notify event.",
+                     "Notify event. Otherwise skip this step.",
                      notify_cleared),
-            TestStep(11, f"IF bit {bit} of Latch is 1 (latched): TH reads from the DUT the State.",
+            TestStep(11, f"IF bit {bit} of Latch is 1 (latched): TH reads from the DUT the State. "
+                     "Otherwise skip this step.",
                      f"Bit {bit} remains set in State (latched alarm persists until Reset)."),
             TestStep(12, f"IF bit {bit} is latched and Reset is supported: TH sends command Reset with "
-                     f"bit {bit} set in the Alarms field.",
+                     f"bit {bit} set in the Alarms field. Otherwise skip this step.",
                      "Verify DUT responds w/ status SUCCESS(0x00)."),
             TestStep("12a", f"IF bit {bit} is latched and Reset is supported: TH awaits subscription "
-                     f"report of a State value with bit {bit} cleared.",
+                     f"report of a State value with bit {bit} cleared. Otherwise skip this step.",
                      report_cleared),
-            TestStep("12b", f"IF bit {bit} of Latch is 1 (latched): TH waits up to 30 seconds for a "
-                     "Notify event.",
+            TestStep("12b", f"IF bit {bit} is latched and Reset is supported: TH waits up to 30 seconds "
+                     "for a Notify event. Otherwise skip this step.",
                      notify_cleared),
-            TestStep("12c", "TH reads from the DUT the State.",
-                     f"Verify that the DUT response contains a map32 AlarmBitmap with bit {bit} = 0."),
+            TestStep("12c", f"IF bit {bit} is non-latched, or is latched and Reset is supported: TH reads "
+                     "from the DUT the State. Otherwise skip this step (a latched alarm cannot be cleared "
+                     "without Reset).",
+                     f"Verify that the DUT response contains a map64 AlarmBitmap with bit {bit} = 0."),
             TestStep(13, f"{trigger_cmd} for All Alarms Test Event Clear "
                      "(PIXIT.ESALM.TEST_EVENT_TRIGGER = 0x00A1_0000_0000_0000).",
                      "Verify DUT responds w/ status SUCCESS(0x00)."),
@@ -244,6 +247,8 @@ class ElectricalAlarmTestBaseHelper(MatterBaseTest):
                                  f"Notify: {alarm_name} set in Active on clear")
             asserts.assert_false(clear_event.state & alarm_bit,
                                  f"Notify: {alarm_name} still set in State on clear")
+            asserts.assert_equal(clear_event.mask, current_mask,
+                                 "Notify event Mask does not match the Mask attribute")
 
             for skipped in (11, 12, "12a", "12b"):
                 self.step(skipped)
@@ -284,6 +289,8 @@ class ElectricalAlarmTestBaseHelper(MatterBaseTest):
                                      f"Notify: {alarm_name} set in Active on Reset")
                 asserts.assert_false(reset_event.state & alarm_bit,
                                      f"Notify: {alarm_name} still set in State on Reset")
+                asserts.assert_equal(reset_event.mask, current_mask,
+                                     "Notify event Mask does not match the Mask attribute")
             else:
                 self.mark_current_step_skipped()
 
