@@ -87,15 +87,71 @@ bool Delegate::HasFeature(chip::EndpointId endpoint, Feature feature)
     return (featureMap & chip::to_underlying(feature));
 }
 
-CHIP_ERROR LogMessageNotPresentedEvent(chip::EndpointId endpoint, const ByteSpan & messageId, bool removedFromQueue)
+CHIP_ERROR LogMessageNotPresentedEvent(chip::EndpointId endpoint, const ByteSpan & messageId, bool removedFromQueue,
+                                       chip::FabricIndex fabricIndex)
 {
-    Events::MessageNotPresented::Type event{ .messageID = messageId, .removedFromQueue = removedFromQueue };
+    Events::MessageNotPresented::Type event;
+    event.messageID        = messageId;
+    event.removedFromQueue = removedFromQueue;
+    event.fabricIndex      = fabricIndex;
 
     EventNumber eventNumber;
     CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "LogMessageNotPresentedEvent: unable to send event: %s [endpointId=%d]", err.AsString(), endpoint);
+        ChipLogError(Zcl, "LogMessageNotPresentedEvent: unable to send event: %" CHIP_ERROR_FORMAT " [endpointId=%d]", err.Format(),
+                     endpoint);
+    }
+    return err;
+}
+
+CHIP_ERROR LogMessageQueuedEvent(chip::EndpointId endpoint, const ByteSpan & messageId)
+{
+    Events::MessageQueued::Type event;
+    event.messageID = messageId;
+
+    EventNumber eventNumber;
+    CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "LogMessageQueuedEvent: unable to send event: %" CHIP_ERROR_FORMAT " [endpointId=%d]", err.Format(),
+                     endpoint);
+    }
+    return err;
+}
+
+CHIP_ERROR LogMessagePresentedEvent(chip::EndpointId endpoint, const ByteSpan & messageId)
+{
+    Events::MessagePresented::Type event;
+    event.messageID = messageId;
+
+    EventNumber eventNumber;
+    CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "LogMessagePresentedEvent: unable to send event: %" CHIP_ERROR_FORMAT " [endpointId=%d]", err.Format(),
+                     endpoint);
+    }
+    return err;
+}
+
+CHIP_ERROR LogMessageCompleteEvent(chip::EndpointId endpoint, const ByteSpan & messageId,
+                                   const chip::Optional<DataModel::Nullable<uint32_t>> & responseId,
+                                   const chip::Optional<DataModel::Nullable<CharSpan>> & reply,
+                                   const DataModel::Nullable<FutureMessagePreferenceEnum> & futureMessagesPreference)
+{
+    Events::MessageComplete::Type event;
+    event.messageID                = messageId;
+    event.responseID               = responseId;
+    event.reply                    = reply;
+    event.futureMessagesPreference = futureMessagesPreference;
+
+    EventNumber eventNumber;
+    CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "LogMessageCompleteEvent: unable to send event: %" CHIP_ERROR_FORMAT " [endpointId=%d]", err.Format(),
+                     endpoint);
     }
     return err;
 }
@@ -334,7 +390,7 @@ bool emberAfMessagesClusterPresentMessagesRequestCallback(
     }
 
     err = delegate->HandlePresentMessagesRequest(messageId, priority, messageControl, startTime, duration, messageText, responses,
-                                                 languageCode, messageUri);
+                                                 languageCode, messageUri, commandObj->GetAccessingFabricIndex());
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -369,7 +425,7 @@ bool emberAfMessagesClusterCancelMessagesRequestCallback(
         while (iter.Next())
         {
             auto & id = iter.GetValue();
-            VerifyOrExit(id.size() >= kMessageIdLength,
+            VerifyOrExit(id.size() == kMessageIdLength,
                          ChipLogProgress(Zcl, "emberAfMessagesClusterCancelMessagesRequestCallback message id size check failed");
                          status = Status::ConstraintError);
         }
