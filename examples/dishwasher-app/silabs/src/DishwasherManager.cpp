@@ -208,8 +208,8 @@ CHIP_ERROR DishwasherManager::RequestConstraintBasedForecast(
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR DishwasherManager::HandleDeviceEnergyManagementPowerRangeAdjustRequest(const DataModel::Nullable<int64_t> minPower,
-                                                                                  const DataModel::Nullable<int64_t> maxPower,
+CHIP_ERROR DishwasherManager::HandleDeviceEnergyManagementPowerRangeAdjustRequest(const Optional<int64_t> minPower,
+                                                                                  const Optional<int64_t> maxPower,
                                                                                   const uint32_t durationS,
                                                                                   AdjustmentCauseEnum cause)
 {

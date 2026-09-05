@@ -159,15 +159,15 @@ public:
      * @brief Delegate should implement a handler to adjust the power range (min/max) that the ESA can operate within
      *        for a specified duration.
      *
-     * @param minPower  Minimum power in milli-Watts the ESA can operate within (nullable).
-     * @param maxPower  Maximum power in milli-Watts the ESA can operate within (nullable).
+     * @param minPower  Optional minimum power in milli-Watts the ESA can operate within.
+     * @param maxPower  Optional maximum power in milli-Watts the ESA can operate within.
      * @param duration  The duration in seconds that the ESA SHALL maintain the requested power range for.
      * @param cause     Who (Grid/local) is triggering this change.
      * @return  Success if the adjustment is accepted; otherwise the command SHALL be rejected with appropriate error.
      */
-    virtual Protocols::InteractionModel::Status PowerRangeAdjustRequest(const DataModel::Nullable<int64_t> minPower,
-                                                                        const DataModel::Nullable<int64_t> maxPower,
-                                                                        const uint32_t duration, AdjustmentCauseEnum cause) = 0;
+    virtual Protocols::InteractionModel::Status PowerRangeAdjustRequest(const Optional<int64_t> minPower,
+                                                                        const Optional<int64_t> maxPower, const uint32_t duration,
+                                                                        AdjustmentCauseEnum cause) = 0;
 
     /**
      * @brief Delegate SHALL make the ESA end the active power range adjustment session and return to normal operation.

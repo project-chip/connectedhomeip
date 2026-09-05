@@ -30016,20 +30016,20 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void powerRangeAdjustRequest(DefaultClusterCallback callback, @Nullable Long minPower, @Nullable Long maxPower, Long duration, Integer cause) {
+    public void powerRangeAdjustRequest(DefaultClusterCallback callback, Optional<Long> minPower, Optional<Long> maxPower, Long duration, Integer cause) {
       powerRangeAdjustRequest(callback, minPower, maxPower, duration, cause, 0);
     }
 
-    public void powerRangeAdjustRequest(DefaultClusterCallback callback, @Nullable Long minPower, @Nullable Long maxPower, Long duration, Integer cause, int timedInvokeTimeoutMs) {
+    public void powerRangeAdjustRequest(DefaultClusterCallback callback, Optional<Long> minPower, Optional<Long> maxPower, Long duration, Integer cause, int timedInvokeTimeoutMs) {
       final long commandId = 8L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long minPowerFieldID = 0L;
-      BaseTLVType minPowertlvValue = minPower != null ? new IntType(minPower) : new NullType();
+      BaseTLVType minPowertlvValue = minPower.<BaseTLVType>map((nonOptionalminPower) -> new IntType(nonOptionalminPower)).orElse(new EmptyType());
       elements.add(new StructElement(minPowerFieldID, minPowertlvValue));
 
       final long maxPowerFieldID = 1L;
-      BaseTLVType maxPowertlvValue = maxPower != null ? new IntType(maxPower) : new NullType();
+      BaseTLVType maxPowertlvValue = maxPower.<BaseTLVType>map((nonOptionalmaxPower) -> new IntType(nonOptionalmaxPower)).orElse(new EmptyType());
       elements.add(new StructElement(maxPowerFieldID, maxPowertlvValue));
 
       final long durationFieldID = 2L;

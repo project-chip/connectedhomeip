@@ -394,8 +394,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::PowerRangeAdjustRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagement::Id; }
 
-    DataModel::Nullable<int64_t> minPower;
-    DataModel::Nullable<int64_t> maxPower;
+    Optional<int64_t> minPower;
+    Optional<int64_t> maxPower;
     uint32_t duration         = static_cast<uint32_t>(0);
     AdjustmentCauseEnum cause = static_cast<AdjustmentCauseEnum>(0);
 
@@ -413,8 +413,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagement::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    DataModel::Nullable<int64_t> minPower;
-    DataModel::Nullable<int64_t> maxPower;
+    Optional<int64_t> minPower;
+    Optional<int64_t> maxPower;
     uint32_t duration         = static_cast<uint32_t>(0);
     AdjustmentCauseEnum cause = static_cast<AdjustmentCauseEnum>(0);
 
