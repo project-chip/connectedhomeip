@@ -233,43 +233,55 @@ device types. When an endpoint is specified, it represents the starting number.
 
 ## Commissioning Proxy
 
-This example can act as a Commissioning Proxy. The `commissioning-proxy` device
-type implements the Commissioning By Proxy device type
-(`MA-commissioning-by-proxy`, 0x0092) with a Commissioning Proxy cluster server.
-It is available on the Linux (posix) platform only — the device is registered
-from `posix/linux/DeviceFactoryPlatformOverride.cpp`.
+This example can act as a Commissioning Proxy over WiFi-PAF and/or BLE. The
+`commissioning-proxy` device type implements the Commissioning By Proxy device
+type (`MA-commissioning-by-proxy`, 0x0092) with a Commissioning Proxy cluster
+server. It is available on the Linux (posix) platform only — the device is
+registered from `posix/linux/DeviceFactoryPlatformOverride.cpp`.
 
-Supported for: `ProxyScanRequest`, the `ProxyConnectRequest` /
+Supported commands: `ProxyScanRequest`, the `ProxyConnectRequest` /
 `ProxyMessageRequest` / `ProxyDisconnectRequest` flow, and the BackgroundScan
-feature (`ProxyBackGroundScanStartRequest` / `ProxyBackGroundScanStopRequest`).
-The proxy serves one commissioning session at a time across all transports
-(`MaxSessions` = 1) and caches up to 10 background-scan results.
+feature (`ProxyBackGroundScanStartRequest` / `ProxyBackGroundScanStopRequest`),
+over whichever transport(s) are compiled in. The proxy serves one commissioning
+session at a time across all transports (`MaxSessions` = 1) and caches up to 10
+background-scan results.
 
 The BLE transport performs a one-way peripheral→central role switch on the CP's
 first `ProxyConnectRequest(BLE)`. After that the CP no longer advertises over
 BLE for its own (re-)commissioning; restart the process to regain peripheral
 mode. An already-commissioned node must announce over DNS-SD rather than BLE, so
 `OpenCommissioningWindow` still works — but it is worth planning around when
-setting a CP device up.
+setting a CP device up. The Wi-Fi PAF transport is unaffected.
 
-Two build switches are involved:
+Two build switches gate the device itself:
 
 -   `commissioning-proxy` must be in the device-factory enable list. All devices
     are enabled by default; `all_devices_enabled_devices` in
     `all-devices-common/device-factory/enabled_devices.gni` selects a subset.
 -   `CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY`, set for this app in
-    `posix/include/CHIPProjectAppConfig.h`, enables the Linux `BLEManagerImpl`
-    proxy-scan and peripheral→central role-switch support that the BLE transport
-    calls.
+    `posix/include/CHIPProjectAppConfig.h`, enables the Linux platform support
+    the transports call: the `BLEManagerImpl` proxy scan and peripheral→central
+    role switch, and the `ConnectivityManagerImpl` WiFi-PAF proxy entry points.
 
-The BLE transport is compiled when `chip_config_network_layer_ble` is true, so
-build variants that disable BLE — `-no-ble` and `-nodeps` — omit it. With no
-transport compiled in the device is not registered with the factory at all, so
-`--device commissioning-proxy` reports an invalid device type there rather than
+The compiled-in transport(s) follow this build configuration:
+
+-   **WiFi-PAF** is included when `chip_device_config_enable_wifipaf` is true
+    (the default for Linux builds with WiFi enabled). When WiFi-PAF is compiled
+    in, the cluster advertises the `WiFiNetworkInterface` feature and the
+    `WiFiBand` attribute; the supported bands are derived from the `freq_list`
+    passed via `--wifipaf`. Note that WiFi-PAF scanning does not work on a stock
+    host: it needs a `wpa_supplicant` built with `CONFIG_NAN_USD` and the
+    `discovery_only` patch. See
+    [wpa_supplicant with the Matter NAN patch](all-devices-common/device/types/commissioning-proxy/README.md#2-wpa_supplicant-with-the-matter-nan-patch-proxy-device).
+-   **BLE** is included when `chip_config_network_layer_ble` is true.
+
+The `-no-ble` build variants disable the BLE transport. With no transport
+compiled in the device is not registered with the factory at all, so
+`--device commissioning-proxy` reports an invalid device type rather than
 starting a proxy whose every command fails. Darwin behaves the same way, as
 `src/platform/Darwin` has no proxy-capable `BLEManagerImpl`.
 
-To build on Linux x86-64 run:
+To build with both BLE and WiFi-PAF on Linux x86-64 run:
 
 ```bash
 ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-x64-all-devices-boringssl build"
@@ -289,10 +301,10 @@ docker run -it --user "$(id -u):$(id -g)" -v "$PWD":"$PWD" -w "$PWD" \
 ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-arm64-all-devices-boringssl-clang build"
 ```
 
-To start the app as a proxy on endpoint 5:
+To start the app as a proxy over WiFi-PAF on channel 6 (2437 MHz) on endpoint 5:
 
 ```bash
-./out/linux-x64-all-devices-boringssl/all-devices-app --device commissioning-proxy:5
+./out/linux-x64-all-devices-boringssl/all-devices-app --device commissioning-proxy:5 --wifi --wifipaf freq_list=2437
 ```
 
 The cluster's attributes and commands can then be exercised on endpoint 5.

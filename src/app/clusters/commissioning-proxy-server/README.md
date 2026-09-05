@@ -65,15 +65,15 @@ device advertises on uses the proxy as a tunnel. The flow is:
    by `SessionID`; the proxy forwards it over the transport and returns the
    device's reply in the `ProxyMessageResponse`. The proxy is a dumb relay — the
    PASE session is end-to-end between the Commissioner and the device.
-4. **Disconnect** — the Commissioner sends `ProxyDisconnectRequest` to cancel an
-   in-flight connect; the proxy tears the transport connection down.
+4. **Disconnect** — the Commissioner sends `ProxyDisconnectRequest` with the
+   `SessionID` to close an established session, or with a null `SessionID` to
+   cancel an in-flight connect; the proxy tears the transport connection down.
 
 The cluster server itself is **transport-agnostic**: it validates the requested
 transport against the set it advertises, then dispatches the work to the
 registered `CommissioningProxyTransport` driver whose `GetTransportType()`
-matches the request's transport bit. A **BLE** (BTP) driver ships today; the
-**Wi-Fi PAF** (PAFTP) driver follows in a later PR. See the transport
-integration sections below.
+matches the request's transport bit. Today drivers exist for **BLE** (BTP) and
+**Wi-Fi PAF** (PAFTP) — see the transport integration sections below.
 
 ## Features
 
@@ -241,8 +241,8 @@ void ApplicationInit()
 For a complete working example of the device wiring, see
 `examples/all-devices-app/all-devices-common/device/types/commissioning-proxy/`.
 It registers the cluster's `CommissioningProxyBleTransport` and supplies the
-platform adapter from `examples/all-devices-app/posix/linux/`. The Wi-Fi PAF
-driver joins it in a later PR.
+platform adapters for both transports from
+`examples/all-devices-app/posix/linux/`.
 
 ## Transport driver methods
 
@@ -381,11 +381,13 @@ the "radio freed" path could otherwise re-enter the driver.
 transport callback once the operation completes.
 
 To keep the exchange alive across the async operation, store a
-`CommandHandler::Handle` and extend the exchange response timeout:
+`CommandHandler::Handle` in the driver's pending-operation state — not on the
+stack, which unwinds when `InvokeCommand` returns — and extend the exchange
+response timeout:
 
 ```cpp
-// Store the handle before returning nullopt
-CommandHandler::Handle handle(commandObj);
+// mPending outlives InvokeCommand; the handle must live there, not here
+mPending.handle = CommandHandler::Handle(commandObj);
 if (auto * ec = commandObj->GetExchangeContext())
 {
     ec->SetResponseTimeout(chip::System::Clock::Seconds16(responseTimeout + 10));
@@ -393,7 +395,7 @@ if (auto * ec = commandObj->GetExchangeContext())
 // … return std::nullopt from InvokeCommand …
 
 // Later, in your transport callback:
-auto * handler = handle.Get();
+auto * handler = mPending.handle.Get();
 if (handler != nullptr)
 {
     handler->AddResponse(commandPath, response);
@@ -444,28 +446,60 @@ CommissioningProxyBleTransport gBleTransport(gBleAdapter, gTimerDelegate);
 worked implementation over `BLEManagerImpl`, wired up in that app's
 `posix/linux/DeviceFactoryPlatformOverride.cpp`.
 
-## Wi-Fi PAF Transport Integration (planned)
+## Wi-Fi PAF Transport Integration
 
-No Wi-Fi PAF driver ships yet; this section describes the shape the one landing
-in a later PR takes, and is the reference for anyone writing a PAF driver
-against this cluster in the meantime.
+`CommissioningProxyPafTransport` ships with the cluster as the separate
+`paf-transport` target, on the same terms as `ble-transport`: an application
+that proxies over BLE only — or a platform with no Wi-Fi PAF stack — can depend
+on `commissioning-proxy-server` without pulling in `src/wifipaf`. It drives NAN
+and PAFTP sessions through `chip::WiFiPAF::WiFiPAFLayer`:
 
-When the build enables Wi-Fi PAF (`CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF`) the
-driver (`CommissioningProxyPafTransport`) interacts with
-`chip::WiFiPAF::WiFiPAFLayer` to open, send over, receive from, and close PAF
-(NAN) sessions:
-
--   `Connect()` — calls `WiFiPAFLayer::WiFiPAFSubscribe()` to open a PAF session
-    identified by the commissionee discriminator and peer address.
+-   `Connect()` — calls `ConnectivityMgr().WiFiPAFSubscribe()` to open a PAF
+    session to the commissionee discriminator.
 -   `SendMessage()` — calls `WiFiPAFLayer::SendMessage()` to send the tunneled
-    commissioning packet over PAFTP.
--   `Disconnect()` — calls `WiFiPAFLayer::RmPafSession()` to release the PAF
-    session.
+    commissioning packet over PAFTP (the PAFTP endpoint, not the raw NAN
+    transmit, which would bypass framing).
+-   `Disconnect()` — calls `WiFiPAFLayer::RmPafSession()`, closes the PAFTP
+    endpoint, and cancels the NAN subscribe that backed the session.
 
-Incoming PAF messages are routed back to the cluster via a
-`WiFiPAFLayerDelegate` subclass that intercepts `WiFiPAFMessageReceived`,
-matches the peer against the active session map, and calls
+Incoming PAF messages are routed back to the cluster via a `ProxyPafDelegate`
+(`chip::WiFiPAF::WiFiPAFLayerDelegate`) that wraps the original transport,
+matches the peer against the active session slots, and calls
 `host->Sessions().DispatchMessageResponse()`.
+
+### The platform adapter
+
+Session setup and teardown above are portable — they go through the generic
+`ConnectivityManager` facade. Discovery is not, so it is not in the transport:
+scanning for commissionable devices, and recovering the subscribe id the
+platform assigned to a request, both need the platform implementation. The
+application supplies them by implementing `CommissioningProxyPafAdapter`:
+
+```cpp
+class MyPafProxyAdapter : public CommissioningProxyPafAdapter
+{
+    CHIP_ERROR StartForegroundScan(System::Clock::Seconds16 window, DiscoveryCallback onDevice,
+                                   ScanCompleteCallback onDone, void * context) override;
+    CHIP_ERROR StartBackgroundScan(DiscoveryCallback cb, void * context) override;
+    void StopBackgroundScan() override;
+    uint32_t PendingConnectSubscribeId() const override;
+    void DisconnectPublishReceiveHandler() override;
+};
+
+MyPafProxyAdapter gPafAdapter;
+CommissioningProxyPafTransport gPafTransport(gPafAdapter, gTimerDelegate);
+```
+
+Unlike BLE, the platform owns the scan window: `StartForegroundScan()` takes the
+duration and the adapter signals completion, so the transport arms no scan timer
+of its own. `DisconnectPublishReceiveHandler()` is the one non-discovery hook: a
+proxy publishes over NAN so it can be commissioned itself, and that handler has
+to be torn down once it is on a fabric, or a later subscribe leaves the platform
+with two handlers for the same traffic.
+`examples/all-devices-app/posix/linux/CommissioningProxyPafAdapter.cpp` is a
+worked implementation over `ConnectivityManagerImpl`, and is also where the
+platform's peer descriptor is unpacked into the interface's scalars so no
+platform type reaches the cluster.
 
 ## Driving the Proxy from a Commissioner
 
@@ -511,5 +545,22 @@ State transitions:
 
 ```text
 ProxyConnectRequest ──► transport connect success ──► kState_CPConnected
+kState_CPConnected  ──► ProxyDisconnectRequest    ──► kState_CPConnected
+                                                      (sessions remain)
 kState_CPConnected  ──► ProxyDisconnectRequest    ──► kState_CPDisconnected
+                        for the last session
+kState_CPConnected  ──► peer closes the transport ──► kState_CPDisconnected
+                        connection, last session
 ```
+
+With `MaxSessions > 1` several sessions can be open at once, so a
+`ProxyDisconnectRequest` only returns the cluster to `kState_CPDisconnected` —
+and only notifies the transports via `OnAllSessionsClosed()` — once no session
+is left.
+
+A session can also end without a `ProxyDisconnectRequest`, when the commissionee
+closes the transport connection. A transport reports that through
+`SetDisconnectedIfLastSession()` rather than setting the state itself: the
+cluster counts the sessions of every transport, plus any connect still in
+flight, so the last session on one transport is not necessarily the last session
+on the proxy.
