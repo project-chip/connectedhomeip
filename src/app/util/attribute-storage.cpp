@@ -16,6 +16,7 @@
  */
 #include <app/util/attribute-storage.h>
 
+#include <access/SubjectDescriptor.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
@@ -86,6 +87,8 @@ static bool emberAfEndpointIsEnabled(EndpointId endpoint);
 static void emberAfIncreaseDataVersion(const chip::app::ConcreteClusterPath & aConcreteClusterPath);
 
 namespace {
+
+const Access::SubjectDescriptor * gCurrentSubjectDescriptor = nullptr;
 
 uint16_t emberEndpointCount = 0;
 
@@ -1543,6 +1546,16 @@ EndpointComposition GetCompositionForEndpointIndex(uint16_t endpointIndex)
         return EndpointComposition::kFullFamily;
     }
     return EndpointComposition::kTree;
+}
+
+const Access::SubjectDescriptor * GetCurrentSubjectDescriptor()
+{
+    return gCurrentSubjectDescriptor;
+}
+
+void SetCurrentSubjectDescriptor(const Access::SubjectDescriptor * subjectDescriptor)
+{
+    gCurrentSubjectDescriptor = subjectDescriptor;
 }
 
 } // namespace app
