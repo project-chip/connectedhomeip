@@ -32,6 +32,7 @@
 #include <device/api/Interface.h>
 #include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
 #include <device/api/allocator/EndpointIdAllocator.h>
+#include <device/capabilities/identify/LoggingIdentifyDelegate.h>
 #include <device/types/root-node/RootNode.h>
 #include <platform/DeviceControlServer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -71,6 +72,7 @@ bool gServerStarted = false;
 DefaultAttributePersistenceProvider gAttributePersistenceProvider;
 DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
+LoggingIdentifyDelegate gIdentifyDelegate;
 DefaultTimerDelegate gTimerDelegate;
 
 std::unique_ptr<CodeDrivenDataModelProvider> gDataModelProvider;
@@ -166,6 +168,7 @@ CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams 
         .bindingTable             = Clusters::Binding::Table::GetInstance(),
         .bindingManager           = Clusters::Binding::Manager::GetInstance(),
         .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,
+        .identifyDelegate         = gIdentifyDelegate,
     });
 
     VerifyOrReturnError(!gDeviceType.empty(), CHIP_ERROR_INVALID_ARGUMENT);

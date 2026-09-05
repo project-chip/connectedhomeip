@@ -61,6 +61,7 @@ public:
         Credentials::GroupDataProvider & groupDataProvider;
         FabricTable & fabricTable;
         TimerDelegate & timerDelegate;
+        Clusters::IdentifyDelegate & identifyDelegate;
     };
 
     OnOffLoad(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::OnOffDelegate & onOffDelegate,

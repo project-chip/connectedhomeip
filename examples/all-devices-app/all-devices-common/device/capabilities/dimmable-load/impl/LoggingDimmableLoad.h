@@ -33,8 +33,7 @@ namespace app {
 class LoggingDimmableLoad : public DimmableLoad,
                             public Clusters::OnOffDelegate,
                             public Clusters::LevelControlDelegate,
-                            public Clusters::OnOffEffectDelegate,
-                            public Clusters::IdentifyDelegate
+                            public Clusters::OnOffEffectDelegate
 {
 public:
     LoggingDimmableLoad(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context, const Config & config = {});
@@ -54,12 +53,6 @@ protected:
     // OnOffEffectDelegate
     DataModel::ActionReturnStatus TriggerDelayedAllOff(Clusters::OnOff::DelayedAllOffEffectVariantEnum e) override;
     DataModel::ActionReturnStatus TriggerDyingLight(Clusters::OnOff::DyingLightEffectVariantEnum e) override;
-
-    // IdentifyDelegate
-    void OnIdentifyStart(Clusters::IdentifyCluster & cluster) override;
-    void OnIdentifyStop(Clusters::IdentifyCluster & cluster) override;
-    void OnTriggerEffect(Clusters::IdentifyCluster & cluster) override;
-    bool IsTriggerEffectEnabled() const override;
 };
 
 } // namespace app

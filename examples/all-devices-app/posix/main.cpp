@@ -63,6 +63,7 @@
 #include <pigweed/rpc_services/AccessInterceptorRegistry.h>
 #endif // PW_RPC_ENABLED
 #include <device/api/SingleEndpoint.h>
+#include <device/capabilities/identify/LoggingIdentifyDelegate.h>
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/types/occupancy-sensor/OccupancySensor.h>
 #include <device/types/on-off-light/impl/LoggingOnOffLight.h>
@@ -83,6 +84,7 @@ AppMainLoopImplementation * gMainLoopImplementation = nullptr;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
 chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 DefaultTimerDelegate gTimerDelegate;
+LoggingIdentifyDelegate gIdentifyDelegate;
 chip::app::PosixAudioManager gAudioManager;
 
 // To hold SPAKE2+ verifier, discriminator, passcode
@@ -349,6 +351,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         .bindingTable             = Binding::Table::GetInstance(),
         .bindingManager           = Binding::Manager::GetInstance(),
         .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,
+        .identifyDelegate         = gIdentifyDelegate,
     });
 
     RegisterDeviceFactoryOverrides(gTimerDelegate, Server::GetInstance().GetFabricTable(), initParams.persistentStorageDelegate,
