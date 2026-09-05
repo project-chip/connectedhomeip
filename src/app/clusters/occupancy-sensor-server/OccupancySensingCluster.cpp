@@ -155,6 +155,27 @@ DataModel::ActionReturnStatus OccupancySensingCluster::ReadAttribute(const DataM
         return encoder.Encode(mHoldTime);
     case Attributes::HoldTimeLimits::Id:
         return encoder.Encode(mHoldTimeLimits);
+    case Attributes::PredictedOccupancy::Id: {
+        VerifyOrReturnError(mFeatureMap.Has(Feature::kPrediction), Protocols::InteractionModel::Status::UnsupportedAttribute);
+        auto * delegate = mDelegate;
+        if (delegate == nullptr)
+        {
+            return encoder.EncodeEmptyList();
+        }
+        return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
+            for (size_t i = 0; true; i++)
+            {
+                OccupancySensing::Structs::PredictedOccupancyStruct::Type prediction;
+                CHIP_ERROR err = delegate->GetPredictedOccupancyAtIndex(i, prediction);
+                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                ReturnErrorOnFailure(err);
+                ReturnErrorOnFailure(enc.Encode(prediction));
+            }
+        });
+    }
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
@@ -192,6 +213,7 @@ CHIP_ERROR OccupancySensingCluster::Attributes(const ConcreteClusterPath & clust
     const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
         { IsHoldTimeEnabled(), Attributes::HoldTime::kMetadataEntry },
         { IsHoldTimeEnabled(), Attributes::HoldTimeLimits::kMetadataEntry },
+        { mFeatureMap.Has(Feature::kPrediction), Attributes::PredictedOccupancy::kMetadataEntry },
         { IsHoldTimeEnabled() && mShowDeprecatedAttributes && mFeatureMap.Has(Feature::kPassiveInfrared),
           Attributes::PIROccupiedToUnoccupiedDelay::kMetadataEntry },
         { IsHoldTimeEnabled() && mShowDeprecatedAttributes && mFeatureMap.Has(Feature::kUltrasonic),
@@ -359,6 +381,16 @@ uint16_t OccupancySensingCluster::GetHoldTime() const
 const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & OccupancySensingCluster::GetHoldTimeLimits() const
 {
     return mHoldTimeLimits;
+}
+
+bool OccupancySensingCluster::IsPredictionEnabled() const
+{
+    return mFeatureMap.Has(OccupancySensing::Feature::kPrediction);
+}
+
+void OccupancySensingCluster::NotifyPredictedOccupancyChanged()
+{
+    NotifyAttributeChanged(Attributes::PredictedOccupancy::Id);
 }
 
 BitFlags<OccupancySensing::Feature> OccupancySensingCluster::GetFeatureMap() const
