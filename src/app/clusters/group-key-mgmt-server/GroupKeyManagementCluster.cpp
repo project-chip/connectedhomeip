@@ -238,6 +238,10 @@ CHIP_ERROR ReadGroupTable(FabricTable & fabricTable, GroupDataProvider & provide
 
 CHIP_ERROR ReadMaxGroupsPerFabric(GroupDataProvider & provider, AttributeValueEncoder & aEncoder)
 {
+    if (provider.IsGroupcastEnabled())
+    {
+        return aEncoder.Encode(static_cast<uint16_t>(0));
+    }
     return aEncoder.Encode(provider.GetMaxGroupsPerFabric());
 }
 

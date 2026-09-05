@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <app/AppConfig.h>
 #include <app/icd/server/ICDServerConfig.h>
 
@@ -186,6 +188,10 @@ struct ServerInitParams
     // Group data provider: MUST be injected. Used to maintain critical keys such as the Identity
     // Protection Key (IPK) for CASE. Must be initialized before being provided.
     Credentials::GroupDataProvider * groupDataProvider = nullptr;
+#if CHIP_CONFIG_ENABLE_GROUPCAST
+    // Groupcast enabled override: Optional. If set, overrides default CHIP_CONFIG_ENABLE_GROUPCAST setting in Server::Init.
+    std::optional<bool> groupcastEnabledOverride;
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
     // Session keystore: MUST be injected. Used to derive and manage lifecycle of symmetric keys.
     Crypto::SessionKeystore * sessionKeystore = nullptr;
     // Access control delegate: MUST be injected. Used to look up access control rules. Must be
