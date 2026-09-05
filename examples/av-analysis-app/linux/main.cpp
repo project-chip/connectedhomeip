@@ -16,6 +16,7 @@
  */
 
 #include "av-analysis-node-app.h"
+#include "webrtc-peer-manager.h"
 
 #include <AppMain.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -27,6 +28,7 @@ namespace {
 
 constexpr EndpointId kAvAnalysisNodeEndpointId = 1;
 
+WebRTCPeerManager gWebRTCPeerManager;
 AvAnalysisNodeApp gAvAnalysisNodeApp(kAvAnalysisNodeEndpointId);
 
 } // namespace
@@ -35,7 +37,7 @@ void ApplicationInit()
 {
     ChipLogProgress(AppServer, "Matter AV Analysis Node Linux App: ApplicationInit()");
 
-    VerifyOrDie(gAvAnalysisNodeApp.Init() == CHIP_NO_ERROR);
+    VerifyOrDie(gAvAnalysisNodeApp.Init(&gWebRTCPeerManager) == CHIP_NO_ERROR);
 }
 
 void ApplicationShutdown()
