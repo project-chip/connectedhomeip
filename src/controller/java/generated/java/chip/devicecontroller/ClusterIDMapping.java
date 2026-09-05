@@ -4720,6 +4720,7 @@ public class ClusterIDMapping {
             CommissionedFabrics(3L),
             TrustedRootCertificates(4L),
             CurrentFabricIndex(5L),
+            PQCDeviceAttestationProfile(6L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -4809,7 +4810,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum CertificateChainRequestCommandField {CertificateType(0),;
+                }public enum CertificateChainRequestCommandField {CertificateType(0),CryptoProfile(1),SegmentID(2),MaxSegmentSize(3),;
                     private final int id;
                     CertificateChainRequestCommandField(int id) {
                         this.id = id;

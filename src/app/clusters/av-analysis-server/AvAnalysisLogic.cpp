@@ -41,12 +41,19 @@ namespace Clusters {
 AvAnalysisServerLogic::AvAnalysisServerLogic(
     EndpointId aEndpointId, BitFlags<Feature> aFeatures,
     const std::vector<Descriptor::Structs::SemanticTagStruct::Type> & aSupportedAmbientContexts,
-    DataModel::Nullable<uint8_t> aMaxZones) :
+    DataModel::Nullable<uint8_t> aMaxZones, uint8_t aMaxAnalysisStreamCount) :
     mEndpointId(aEndpointId),
-    mFeatures(aFeatures), mSupportedAmbientContexts(aSupportedAmbientContexts), mMaxZones(aMaxZones)
+    mFeatures(aFeatures), mSupportedAmbientContexts(aSupportedAmbientContexts), mMaxAnalysisStreamCount(aMaxAnalysisStreamCount),
+    mMaxZones(aMaxZones)
 {}
 
-AvAnalysisServerLogic::~AvAnalysisServerLogic() {}
+AvAnalysisServerLogic::~AvAnalysisServerLogic()
+{
+    if (mCameraClient != nullptr && mCameraInteraction.InFlight())
+    {
+        mCameraClient->Cancel();
+    }
+}
 
 CHIP_ERROR AvAnalysisServerLogic::Startup(AttributePersistenceProvider & aAttributePersistenceProvider)
 {
@@ -65,6 +72,18 @@ CHIP_ERROR AvAnalysisServerLogic::Startup(AttributePersistenceProvider & aAttrib
     VerifyOrReturnError(!(HasFeature(Feature::kPerZoneContextDetection) ^ !mMaxZones.IsNull()), CHIP_ERROR_INVALID_ARGUMENT,
                         ChipLogError(Zcl, "AvAnalysis: If Per Zone Sensitivity is set, Zones must be present, and vice versa"));
 
+    // With Remote Context Detection the MaxAnalysisStreamCount fixed attribute has to be non-zero, and backing
+    // storage for the AnalysisStreams attribute is needed.
+    if (HasFeature(Feature::kRemoteContextDetection))
+    {
+        VerifyOrReturnError(mMaxAnalysisStreamCount > 0, CHIP_ERROR_INVALID_ARGUMENT,
+                            ChipLogError(Zcl, "AvAnalysis: MaxAnalysisStreamCount must be non-zero with Remote Detection"));
+        if (mStreamTable.Capacity() == 0)
+        {
+            ReturnErrorOnFailure(mStreamTable.Init(mMaxAnalysisStreamCount));
+        }
+    }
+
     LoadPersistentAttributes();
 
     ChipLogProgress(Zcl, "AvAnalysis Cluster: Startup completed ");
@@ -73,12 +92,116 @@ CHIP_ERROR AvAnalysisServerLogic::Startup(AttributePersistenceProvider & aAttrib
 
 void AvAnalysisServerLogic::Shutdown()
 {
-    mDelegate->ShutdownApp();
+    if (mCameraClient != nullptr && mCameraInteraction.InFlight())
+    {
+        mCameraClient->Cancel();
+    }
+
+    // A command still waiting on a camera interaction can no longer be completed.
+    ConcreteCommandPath commandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
+    auto handleRef = mCameraInteraction.Complete(commandPath);
+    if (auto * handler = handleRef.Get(); handler != nullptr)
+    {
+        handler->AddStatus(commandPath, Status::Failure);
+    }
+
+    if (mDelegate != nullptr)
+    {
+        mDelegate->ShutdownApp();
+    }
 }
 
 bool AvAnalysisServerLogic::HasFeature(Feature aFeature) const
 {
     return mFeatures.Has(aFeature);
+}
+
+void AvAnalysisServerLogic::SetStreamState(AnalysisStreamEntry & aEntry, AnalysisStreamStateEnum aState)
+{
+    VerifyOrReturn(aEntry.state != aState);
+    aEntry.state = aState;
+    MarkDirty(Attributes::AnalysisStreams::Id);
+}
+
+void AvAnalysisServerLogic::OnVideoStreamAllocated(Status aStatus, uint16_t aVideoStreamId)
+{
+    VerifyOrReturn(mCameraInteraction.GetState() == AvAnalysis::CameraInteraction::State::kEstablishing,
+                   ChipLogError(Zcl, "AvAnalysis[ep=%d]: unexpected allocation completion", mEndpointId));
+
+    ScopedNodeId cameraNode = mCameraInteraction.CameraNode();
+    ConcreteCommandPath commandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
+    // The client exchange may have died while the camera round-trip was in flight; the camera's
+    // answer is ground truth and is recorded regardless, only the response needs a live handler.
+    auto handleRef = mCameraInteraction.Complete(commandPath);
+    auto * handler = handleRef.Get();
+
+    // a non-SUCCESS camera response is propagated as the command status, no side-effects.
+    if (aStatus != Status::Success)
+    {
+        VerifyOrReturn(handler != nullptr);
+        handler->AddStatus(commandPath, aStatus);
+        return;
+    }
+
+    // The camera answers a matching allocate with the existing VideoStreamID, so
+    // a camera stream this table already tracks means the analysis stream already exists: respond
+    // with its id rather than creating a second entry over the same stream.
+    AnalysisStreamEntry * entry = mStreamTable.FindByCameraStream(cameraNode, aVideoStreamId);
+    if (entry == nullptr)
+    {
+        entry = mStreamTable.Add(aVideoStreamId, cameraNode);
+        if (entry == nullptr)
+        {
+            ChipLogError(Zcl, "AvAnalysis[ep=%d]: stream table rejected entry", mEndpointId);
+            VerifyOrReturn(handler != nullptr);
+            handler->AddStatus(commandPath, Status::ResourceExhausted);
+            return;
+        }
+
+        MarkDirty(Attributes::CurrentAnalysisStreamCount::Id);
+        MarkDirty(Attributes::AnalysisStreams::Id);
+        LogErrorOnFailure(StoreAnalysisStreams());
+    }
+
+    VerifyOrReturn(handler != nullptr);
+    Commands::EstablishAnalysisStreamResponse::Type response;
+    response.analysisStreamID = entry->analysisStreamID;
+    handler->AddResponse(commandPath, response);
+}
+
+void AvAnalysisServerLogic::OnVideoStreamDeallocated(Status aStatus, uint16_t aVideoStreamId)
+{
+    VerifyOrReturn(mCameraInteraction.GetState() == AvAnalysis::CameraInteraction::State::kRemoving,
+                   ChipLogError(Zcl, "AvAnalysis[ep=%d]: unexpected deallocation completion", mEndpointId));
+
+    // The camera client reports the camera's VideoStreamID; the table entry is keyed by the
+    // AnalysisStreamID recorded when the interaction began
+    uint16_t analysisStreamId = mCameraInteraction.AnalysisStreamId();
+    ConcreteCommandPath commandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
+    // The camera has completed the deallocation, so the table is reconciled even if the
+    // client exchange died; only the response needs a live handler.
+    auto handleRef = mCameraInteraction.Complete(commandPath);
+    auto * handler = handleRef.Get();
+
+    // NOT_FOUND means the camera no longer has the stream, so the removal this
+    // command asked for is already true on both sides: retaining it would leave
+    // an entry occupying capacity that no retry could ever remove.
+    if (aStatus != Status::Success && aStatus != Status::NotFound)
+    {
+        VerifyOrReturn(handler != nullptr);
+        handler->AddStatus(commandPath, aStatus);
+        return;
+    }
+
+    if (mStreamTable.Remove(analysisStreamId))
+    {
+        MarkDirty(Attributes::CurrentAnalysisStreamCount::Id);
+        MarkDirty(Attributes::AnalysisStreams::Id);
+        LogErrorOnFailure(StoreAnalysisStreams());
+    }
+
+    VerifyOrReturn(handler != nullptr);
+    handler->AddStatus(commandPath, aStatus);
 }
 
 CHIP_ERROR
@@ -98,11 +221,21 @@ AvAnalysisServerLogic::AcceptedCommands(ReadOnlyBufferBuilder<DataModel::Accepte
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR AvAnalysisServerLogic::GeneratedCommands(ReadOnlyBufferBuilder<CommandId> & builder)
+{
+    if (HasFeature(Feature::kRemoteContextDetection))
+    {
+        ReturnErrorOnFailure(builder.AppendElements({ Commands::EstablishAnalysisStreamResponse::Id }));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR AvAnalysisServerLogic::Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
 
-    // Attributes tat are set dependent on the Feature Flags
+    // Attributes that are set dependent on the Feature Flags
     AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
         { HasFeature(Feature::kRemoteContextDetection), MaxAnalysisStreamCount::kMetadataEntry },
         { HasFeature(Feature::kRemoteContextDetection), CurrentAnalysisStreamCount::kMetadataEntry },
@@ -151,9 +284,9 @@ CHIP_ERROR AvAnalysisServerLogic::ReadAndEncodeActiveAmbientContextTriggers(Attr
 CHIP_ERROR AvAnalysisServerLogic::ReadAndEncodeAnalysisStreams(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
-        for (const auto & analysisStream : mAnalysisStreams)
+        for (const auto & analysisStream : mStreamTable)
         {
-            ReturnErrorOnFailure(encoder.Encode(analysisStream));
+            ReturnErrorOnFailure(encoder.Encode(analysisStream.ToEncodableStruct()));
         }
 
         return CHIP_NO_ERROR;
@@ -161,22 +294,23 @@ CHIP_ERROR AvAnalysisServerLogic::ReadAndEncodeAnalysisStreams(AttributeValueEnc
 }
 
 // Attribute mutators
-CHIP_ERROR AvAnalysisServerLogic::SetMaxAnalysisStreamCount(uint8_t aMaxAnalysisStreamCount)
-{
-    VerifyOrReturnError(HasFeature(Feature::kRemoteContextDetection), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
-    mMaxAnalysisStreamCount = aMaxAnalysisStreamCount;
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR AvAnalysisServerLogic::SetTrackingEnabled(bool aTrackingEnabled)
 {
+    VerifyOrReturnValue(mTrackingEnabled != aTrackingEnabled, CHIP_NO_ERROR);
+
     mTrackingEnabled = aTrackingEnabled;
+    CHIP_ERROR err   = StoreTrackingEnabled();
+    if (err != CHIP_NO_ERROR)
+    {
+        mTrackingEnabled = !aTrackingEnabled;
+        return err;
+    }
     MarkDirty(AvAnalysis::Attributes::TrackingEnabled::Id);
     return CHIP_NO_ERROR;
 }
 
 /**
- * Persistence handling helper, stores the current value of the ActiveAmbientContextTriggers attribiute in the KVS
+ * Persistence handling helper, stores the current value of the ActiveAmbientContextTriggers attribute in the KVS
  */
 CHIP_ERROR AvAnalysisServerLogic::StoreActiveAmbientContextTriggers()
 {
@@ -228,7 +362,7 @@ CHIP_ERROR AvAnalysisServerLogic::StoreActiveAmbientContextTriggers()
 }
 
 /**
- * Persistence handling helper, reads the current value of the ActiveAmbientContextTriggers attribiute from the KVS
+ * Persistence handling helper, reads the current value of the ActiveAmbientContextTriggers attribute from the KVS
  */
 CHIP_ERROR AvAnalysisServerLogic::LoadActiveAmbientContextTriggers()
 {
@@ -324,6 +458,88 @@ CHIP_ERROR AvAnalysisServerLogic::LoadActiveAmbientContextTriggers()
 }
 
 /**
+ * Persistence handling helper, stores the current contents of the analysis stream table in the KVS
+ */
+CHIP_ERROR AvAnalysisServerLogic::StoreAnalysisStreams()
+{
+    VerifyOrReturnError(mAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    size_t maxBufferSize =
+        AnalysisStreamTable::kEntrySerializedSize * mStreamTable.Capacity() + AnalysisStreamTable::kArraySerializedOverhead;
+    Platform::ScopedMemoryBuffer<uint8_t> buffer;
+    VerifyOrReturnError(buffer.Alloc(maxBufferSize), CHIP_ERROR_NO_MEMORY);
+
+    TLV::TLVWriter writer;
+    writer.Init(buffer.Get(), maxBufferSize);
+    ReturnErrorOnFailure(mStreamTable.Encode(writer));
+
+    auto path = ConcreteAttributePath(mEndpointId, AvAnalysis::Id, Attributes::AnalysisStreams::Id);
+    return mAttributePersistenceProvider->WriteValue(path, ByteSpan(buffer.Get(), writer.GetLengthWritten()));
+}
+
+/**
+ * Persistence handling helper, restores the analysis stream table from the KVS. Restored entries restart
+ * from PendingInitiation as sessions do not survive a reboot.
+ */
+CHIP_ERROR AvAnalysisServerLogic::LoadAnalysisStreams()
+{
+    VerifyOrReturnError(mAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    size_t maxBufferSize =
+        AnalysisStreamTable::kEntrySerializedSize * mStreamTable.Capacity() + AnalysisStreamTable::kArraySerializedOverhead;
+    Platform::ScopedMemoryBuffer<uint8_t> buffer;
+    VerifyOrReturnError(buffer.Alloc(maxBufferSize), CHIP_ERROR_NO_MEMORY);
+    MutableByteSpan bufferSpan(buffer.Get(), maxBufferSize);
+
+    auto path      = ConcreteAttributePath(mEndpointId, AvAnalysis::Id, Attributes::AnalysisStreams::Id);
+    CHIP_ERROR err = mAttributePersistenceProvider->ReadValue(path, bufferSpan);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        ChipLogDetail(Zcl, "AvAnalysis[ep=%d]: No persisted AnalysisStreams.", mEndpointId);
+        return CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
+    TLV::TLVReader reader;
+    reader.Init(bufferSpan);
+    return mStreamTable.Decode(reader);
+}
+
+/**
+ * Persistence handling helper, stores the TrackingEnabled attribute in the KVS
+ */
+CHIP_ERROR AvAnalysisServerLogic::StoreTrackingEnabled()
+{
+    VerifyOrReturnError(mAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    uint8_t value = mTrackingEnabled ? 1 : 0;
+    auto path     = ConcreteAttributePath(mEndpointId, AvAnalysis::Id, Attributes::TrackingEnabled::Id);
+    return mAttributePersistenceProvider->WriteValue(path, ByteSpan(&value, sizeof(value)));
+}
+
+/**
+ * Persistence handling helper, restores the TrackingEnabled attribute from the KVS
+ */
+CHIP_ERROR AvAnalysisServerLogic::LoadTrackingEnabled()
+{
+    VerifyOrReturnError(mAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    uint8_t value = 0;
+    MutableByteSpan valueSpan(&value, sizeof(value));
+    auto path      = ConcreteAttributePath(mEndpointId, AvAnalysis::Id, Attributes::TrackingEnabled::Id);
+    CHIP_ERROR err = mAttributePersistenceProvider->ReadValue(path, valueSpan);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        return CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
+    VerifyOrReturnError(valueSpan.size() == sizeof(value), CHIP_ERROR_INVALID_TLV_ELEMENT);
+    mTrackingEnabled = (value != 0);
+    return CHIP_NO_ERROR;
+}
+
+/**
  * Persistence handling helper, loads all non-volatile attributes from the KVS
  */
 void AvAnalysisServerLogic::LoadPersistentAttributes()
@@ -343,8 +559,22 @@ void AvAnalysisServerLogic::LoadPersistentAttributes()
         ChipLogDetail(Zcl, "AvAnalysis[ep=%d]: Loaded ActiveAmbientContexts", mEndpointId);
     }
 
+    if (LoadTrackingEnabled() != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Zcl, "AvAnalysis[ep=%d]: Unable to load TrackingEnabled from the KVS.", mEndpointId);
+        mTrackingEnabled = false;
+    }
+
+    if (HasFeature(Feature::kRemoteContextDetection) && LoadAnalysisStreams() != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "AvAnalysis[ep=%d]: Unable to load AnalysisStreams from the KVS.", mEndpointId);
+    }
+
     // Signal delegate that all persistent configuration attributes have been loaded.
-    TEMPORARY_RETURN_IGNORED mDelegate->PersistentAttributesLoadedCallback();
+    if (mDelegate != nullptr)
+    {
+        TEMPORARY_RETURN_IGNORED mDelegate->PersistentAttributesLoadedCallback();
+    }
 }
 
 /**
@@ -372,6 +602,8 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalE
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData)
 {
+    ChipLogProgress(Zcl, "AvAnalysis[ep=%d]: Enabling Context Triggers command handler entry.", mEndpointId);
+
     // Verify spec constraints, provided list is 50 entries or less if not null
     //
     if (!commandData.contextTriggers.IsNull())
@@ -404,7 +636,7 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalE
             VerifyOrReturnError(it != mSupportedAmbientContexts.end(), Status::ConstraintError);
 
             // The trigger context is valid, now check the ZoneIDs, which can only be present of PERZONEDETECT is set, likewise,
-            // if we have the feature, then ZoneIDs have to be present
+            // if we have the feature, then ZoneIDs have to be present (note, they could be Null)
             //
             bool hasZoneIDs        = contextTrigger.zoneIDs.HasValue();
             bool hasNonNullZoneIDs = false;
@@ -448,7 +680,7 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalE
             VerifyOrReturnError(mDelegate->CanAddContextTriggers(), Status::ResourceExhausted);
 
             // Update our active trigger set with this new context.
-            // If the context exists, update the zone IDs, otherise add a new entry
+            // If the context exists, update the zone IDs, otherwise add a new entry
             //
             auto it2 = std::find_if(mActiveAmbientContextTriggers.begin(), mActiveAmbientContextTriggers.end(),
                                     [&contextTrigger](AvAnalysis::AmbientContextStorage acs) {
@@ -583,7 +815,7 @@ AvAnalysisServerLogic::HandleDisableContextTriggers(CommandHandler & handler, co
                 return Status::DynamicConstraintError;
             }
 
-            // The trigger context is valid, now check the ZoneIDs, which can only be present of PERZONEDETECT is set, likewise,
+            // The trigger context is valid, now check the ZoneIDs, which can only be present if PERZONEDETECT is set, likewise,
             // if we have the feature, then ZoneIDs have to be present
             //
             bool hasZoneIDs = contextTrigger.zoneIDs.HasValue();
@@ -687,44 +919,87 @@ AvAnalysisServerLogic::HandleDisableContextTriggers(CommandHandler & handler, co
     return Status::Success;
 }
 
-/**
- * Placeholder method for when the functionality for remote context detection is implemented
- */
 std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleEstablishAnalysisStream(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const AvAnalysis::Commands::EstablishAnalysisStream::DecodableType & commandData)
 {
-    return Status::Success;
+    VerifyOrReturnValue(!mStreamTable.IsFull(), Status::ResourceExhausted);
+
+    // Without a camera client no camera interaction can be started
+    VerifyOrReturnValue(mCameraClient != nullptr, Status::Failure,
+                        ChipLogError(Zcl, "AvAnalysis[ep=%d]: no camera client configured", mEndpointId));
+
+    // One camera-bound command at a time; the response of this one depends on the camera's answer
+    VerifyOrReturnValue(!mCameraInteraction.InFlight(), Status::Busy);
+
+    // The camera SHALL be on the same fabric as the Analysis Node: reach it on the invoking client's fabric
+    ScopedNodeId cameraNode(commandData.nodeID, handler.GetAccessingFabricIndex());
+
+    mCameraInteraction.Begin(AvAnalysis::CameraInteraction::State::kEstablishing, handler, commandPath, cameraNode);
+    CHIP_ERROR err = mCameraClient->RequestVideoStreamAllocation(cameraNode, *this);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "AvAnalysis[ep=%d]: failed to start stream allocation: %" CHIP_ERROR_FORMAT, mEndpointId, err.Format());
+        mCameraInteraction.Abort();
+        return (err == CHIP_ERROR_BUSY) ? Status::Busy : Status::Failure;
+    }
+
+    // Response is produced in OnVideoStreamAllocated once the camera answers
+    return std::nullopt;
 }
 
 /**
- * Placeholder method for when the functionality for remote context detection is implemented
+ * TODO: implement WebRTC session activation (stream state machine beyond PendingInitiation).
+ * Streams cannot be activated yet, so INVALID_IN_STATE is sent as response.
  */
 std::optional<DataModel::ActionReturnStatus>
 AvAnalysisServerLogic::HandleActivateAnalysisStream(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                                     const AvAnalysis::Commands::ActivateAnalysisStream::DecodableType & commandData)
 {
-    return Status::Success;
+    VerifyOrReturnValue(mStreamTable.Find(commandData.analysisStreamID) != nullptr, Status::NotFound);
+    return Status::InvalidInState;
 }
 
 /**
- * Placeholder method for when the functionality for remote context detection is implemented
+ * TODO: implement WebRTC session deactivation. No stream can be in an active state yet,
+ * so INVALID_IN_STATE is sent as response.
  */
 std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleDeactivateAnalysisStream(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const AvAnalysis::Commands::DeactivateAnalysisStream::DecodableType & commandData)
 {
-    return Status::Success;
+    VerifyOrReturnValue(mStreamTable.Find(commandData.analysisStreamID) != nullptr, Status::NotFound);
+    return Status::InvalidInState;
 }
 
-/**
- * Placeholder method for when the functionality for remote context detection is implemented
- */
 std::optional<DataModel::ActionReturnStatus>
 AvAnalysisServerLogic::HandleRemoveAnalysisStream(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                                   const AvAnalysis::Commands::RemoveAnalysisStream::DecodableType & commandData)
 {
-    return Status::Success;
+    AnalysisStreamEntry * entry = mStreamTable.Find(commandData.analysisStreamID);
+    VerifyOrReturnValue(entry != nullptr, Status::NotFound);
+
+    // only a stream in PendingInitiation may be removed
+    VerifyOrReturnValue(entry->state == AnalysisStreamStateEnum::kPendingInitiation, Status::InvalidInState);
+
+    VerifyOrReturnValue(mCameraClient != nullptr, Status::Failure,
+                        ChipLogError(Zcl, "AvAnalysis[ep=%d]: no camera client configured", mEndpointId));
+
+    // One camera-bound command at a time; the response of this one depends on the camera's answer
+    VerifyOrReturnValue(!mCameraInteraction.InFlight(), Status::Busy);
+
+    mCameraInteraction.Begin(AvAnalysis::CameraInteraction::State::kRemoving, handler, commandPath, entry->cameraNode,
+                             entry->analysisStreamID);
+    CHIP_ERROR err = mCameraClient->RequestVideoStreamDeallocation(entry->cameraNode, entry->videoStreamID, *this);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "AvAnalysis[ep=%d]: failed to start stream deallocation: %" CHIP_ERROR_FORMAT, mEndpointId, err.Format());
+        mCameraInteraction.Abort();
+        return (err == CHIP_ERROR_BUSY) ? Status::Busy : Status::Failure;
+    }
+
+    // Response is produced in OnVideoStreamDeallocated once the camera answers
+    return std::nullopt;
 }
 
 /**

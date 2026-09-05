@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,19 +13,28 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
-#include "LoggingOperationalStateDelegate.h"
+#include <app/clusters/av-analysis-server/AvAnalysisCluster.h>
 
-namespace chip::app::Clusters::OperationalState {
+namespace chip {
+namespace app {
+namespace Clusters {
 
-class LoggingRvcOperationalStateDelegate : public LoggingOperationalStateDelegate
+class MockAvAnalysisDelegate : public AvAnalysisDelegate
 {
 public:
-    LoggingRvcOperationalStateDelegate() = default;
+    void ShutdownApp() override {}
 
-    void HandleGoHomeCommandCallback(GenericOperationalError & err) override;
+    CHIP_ERROR VerifyZoneIDsAreValid(const std::vector<uint16_t> & aZoneIDs) override { return CHIP_NO_ERROR; }
+
+    bool CanAddContextTriggers() override { return true; }
+
+    void ActiveAmbientContextTriggersUpdated() override {}
+
+    CHIP_ERROR PersistentAttributesLoadedCallback() override { return CHIP_NO_ERROR; }
 };
 
-} // namespace chip::app::Clusters::OperationalState
+} // namespace Clusters
+} // namespace app
+} // namespace chip
