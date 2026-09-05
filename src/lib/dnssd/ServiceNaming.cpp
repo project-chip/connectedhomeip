@@ -89,6 +89,8 @@ CHIP_ERROR ExtractIdFromInstanceName(const char * name, PeerId * peerId)
 CHIP_ERROR MakeHostName(char * buffer, size_t bufferLen, const chip::ByteSpan & macOrEui64)
 {
     VerifyOrReturnError(bufferLen >= macOrEui64.size() * 2 + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
+    // An empty input would otherwise leave the destination untouched and still report success.
+    VerifyOrReturnError(!macOrEui64.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
     int idx = 0;
     for (size_t i = 0; i < macOrEui64.size(); ++i)
@@ -100,6 +102,9 @@ CHIP_ERROR MakeHostName(char * buffer, size_t bufferLen, const chip::ByteSpan & 
 
 CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter subtype)
 {
+    // Checked up front: the kNone case below writes a terminator without consulting bufferLen.
+    VerifyOrReturnError(bufferLen > 0, CHIP_ERROR_BUFFER_TOO_SMALL);
+
     int requiredSize;
     switch (subtype.type)
     {
@@ -153,25 +158,33 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
         buffer[0]    = '\0';
         break;
     }
-    return (static_cast<size_t>(requiredSize) <= (bufferLen - 1)) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
+    return (static_cast<size_t>(requiredSize) < bufferLen) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
 
 CHIP_ERROR MakeServiceTypeName(char * buffer, size_t bufferLen, DiscoveryFilter nameDesc, DiscoveryType type)
 {
+    // Checked up front: the subtype branch below relies on the buffer being terminated by
+    // MakeServiceSubtype.
+    VerifyOrReturnError(bufferLen > 0, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    // Space available at the offset the service type is written to. The subtype branch writes
+    // past a subtype already in the buffer, so this is not always the whole destination, and
+    // requiredSize below is measured against it rather than against bufferLen.
+    size_t availableLen = bufferLen;
     int requiredSize;
     if (nameDesc.type == DiscoveryFilterType::kNone)
     {
         if (type == DiscoveryType::kCommissionableNode)
         {
-            requiredSize = snprintf(buffer, bufferLen, kCommissionableServiceName);
+            requiredSize = snprintf(buffer, availableLen, kCommissionableServiceName);
         }
         else if (type == DiscoveryType::kCommissionerNode)
         {
-            requiredSize = snprintf(buffer, bufferLen, kCommissionerServiceName);
+            requiredSize = snprintf(buffer, availableLen, kCommissionerServiceName);
         }
         else if (type == DiscoveryType::kOperational)
         {
-            requiredSize = snprintf(buffer, bufferLen, kOperationalServiceName);
+            requiredSize = snprintf(buffer, availableLen, kOperationalServiceName);
         }
         else
         {
@@ -182,20 +195,19 @@ CHIP_ERROR MakeServiceTypeName(char * buffer, size_t bufferLen, DiscoveryFilter 
     {
         ReturnErrorOnFailure(MakeServiceSubtype(buffer, bufferLen, nameDesc));
         size_t subtypeLen = strlen(buffer);
+        availableLen      = bufferLen - subtypeLen;
         if (type == DiscoveryType::kCommissionableNode)
         {
-            requiredSize = snprintf(buffer + subtypeLen, bufferLen - subtypeLen, ".%s.%s", kSubtypeServiceNamePart,
-                                    kCommissionableServiceName);
+            requiredSize =
+                snprintf(buffer + subtypeLen, availableLen, ".%s.%s", kSubtypeServiceNamePart, kCommissionableServiceName);
         }
         else if (type == DiscoveryType::kCommissionerNode)
         {
-            requiredSize =
-                snprintf(buffer + subtypeLen, bufferLen - subtypeLen, ".%s.%s", kSubtypeServiceNamePart, kCommissionerServiceName);
+            requiredSize = snprintf(buffer + subtypeLen, availableLen, ".%s.%s", kSubtypeServiceNamePart, kCommissionerServiceName);
         }
         else if (type == DiscoveryType::kOperational)
         {
-            requiredSize =
-                snprintf(buffer + subtypeLen, bufferLen - subtypeLen, ".%s.%s", kSubtypeServiceNamePart, kOperationalServiceName);
+            requiredSize = snprintf(buffer + subtypeLen, availableLen, ".%s.%s", kSubtypeServiceNamePart, kOperationalServiceName);
         }
         else
         {
@@ -203,7 +215,7 @@ CHIP_ERROR MakeServiceTypeName(char * buffer, size_t bufferLen, DiscoveryFilter 
         }
     }
 
-    return (static_cast<size_t>(requiredSize) <= (bufferLen - 1)) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
+    return (static_cast<size_t>(requiredSize) < availableLen) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
 
 } // namespace Dnssd

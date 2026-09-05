@@ -180,7 +180,9 @@ TEST_F(TestDnssdPlatform, TestStub)
     // without an expected event.
     ChipLogError(Discovery, "Test platform returns error correctly");
     DiscoveryImplPlatform & mdnsPlatform = DiscoveryImplPlatform::GetInstance();
-    OperationalAdvertisingParameters params;
+    // A MAC is required to build the host name, so set one here: this case is about the
+    // platform's reaction to an unexpected start, not about the advertising parameters.
+    OperationalAdvertisingParameters params = OperationalAdvertisingParameters().SetMac(ByteSpan(kMac));
     EXPECT_EQ(mdnsPlatform.Advertise(params), CHIP_ERROR_UNEXPECTED_EVENT);
 }
 
