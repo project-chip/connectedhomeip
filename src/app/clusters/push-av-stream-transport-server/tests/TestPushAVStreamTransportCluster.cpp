@@ -1646,6 +1646,259 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
     mServer.GetLogic().HandleManuallyTriggerTransport(triggerCommandHandler, kTriggerCommandPath, triggerCommandData);
 }
 
+TEST_F(MockEventLogging, Test_AllocateTransport_UpdateMotionZoneOptions)
+{
+    CMAFContainerOptionsStruct cmafContainerOptions;
+    ContainerOptionsStruct containerOptions;
+    TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
+    TransportTriggerOptionsDecodableStruct triggerOptions;
+    TransportOptionsDecodableStruct transportOptions;
+
+    std::string url = "https://192.168.1.100:554/stream/";
+
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    std::string trackName                = "video";
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
+    cmafContainerOptions.metadataEnabled.ClearValue();
+
+    containerOptions.containerType = ContainerFormatEnum::kCmaf;
+    containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+
+    motionTimeControl.initialDuration      = 5000;
+    motionTimeControl.augmentationDuration = 2000;
+    motionTimeControl.maxDuration          = 30000;
+    motionTimeControl.blindDuration        = 1000;
+
+    triggerOptions.triggerType = TransportTriggerTypeEnum::kMotion;
+
+    uint8_t tlvBuffer[512];
+    Structs::TransportZoneOptionsStruct::Type zone1;
+    Structs::TransportZoneOptionsStruct::Type zone2;
+    DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> decodedList;
+
+    zone1.zone.SetNonNull(1);
+    zone1.sensitivity.SetValue(5);
+
+    zone2.zone.SetNonNull(2);
+    zone2.sensitivity.SetValue(10);
+
+    TLV::TLVWriter writer;
+    writer.Init(tlvBuffer, sizeof(tlvBuffer));
+
+    TLV::TLVWriter containerWriter;
+    CHIP_ERROR err = writer.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, containerWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = DataModel::Encode(containerWriter, TLV::AnonymousTag(), zone1);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = DataModel::Encode(containerWriter, TLV::AnonymousTag(), zone2);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = writer.CloseContainer(containerWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    size_t encodedLen = writer.GetLengthWritten();
+
+    TLV::TLVReader motionZonesReader;
+    motionZonesReader.Init(tlvBuffer, static_cast<uint32_t>(encodedLen));
+    err = motionZonesReader.Next();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = decodedList.Decode(motionZonesReader);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    triggerOptions.motionZones.SetValue(DataModel::MakeNullable(decodedList));
+    triggerOptions.motionSensitivity.ClearValue();
+    triggerOptions.motionTimeControl.SetValue(motionTimeControl);
+    triggerOptions.maxPreRollLen.SetValue(1000);
+
+    transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
+    transportOptions.videoStreamID.SetValue(1);
+    transportOptions.audioStreamID.SetValue(2);
+    transportOptions.TLSEndpointID    = 1;
+    transportOptions.url              = Span(url.data(), url.size());
+    transportOptions.triggerOptions   = triggerOptions;
+    transportOptions.containerOptions = containerOptions;
+    transportOptions.expiryTime.ClearValue();
+
+    TestPushAVStreamTransportDelegateImpl mockDelegate;
+    TestTLSClientManagementDelegate tlsClientManagementDelegate;
+
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+    ConcreteCommandPath kCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
+    Commands::AllocatePushTransport::DecodableType commandData;
+    commandData.transportOptions = transportOptions;
+
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    mServer.GetLogic().SetDelegate(&mockDelegate);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+
+    EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 1);
+
+    uint16_t allocatedConnectionID = mServer.GetLogic().mCurrentConnections[0].connectionID;
+
+    /*
+     * Test UpdateMotionZoneOptions: NotFound for invalid connectionID
+     */
+    {
+        Testing::MockCommandHandler updateHandler;
+        updateHandler.SetFabricIndex(1);
+        ConcreteCommandPath kUpdatePath{ 1, Clusters::PushAvStreamTransport::Id, Commands::UpdateMotionZoneOptions::Id };
+        Commands::UpdateMotionZoneOptions::DecodableType updateData;
+        updateData.connectionID = 9999;
+        mServer.GetLogic().HandleUpdateMotionZoneOptions(updateHandler, kUpdatePath, updateData);
+        EXPECT_TRUE(updateHandler.HasStatus());
+        EXPECT_EQ(updateHandler.GetLastStatus().status.GetStatus(), Protocols::InteractionModel::Status::NotFound);
+    }
+
+    /*
+     * Test UpdateMotionZoneOptions: NotFound for different fabric
+     */
+    {
+        Testing::MockCommandHandler updateHandler;
+        updateHandler.SetFabricIndex(2);
+        ConcreteCommandPath kUpdatePath{ 1, Clusters::PushAvStreamTransport::Id, Commands::UpdateMotionZoneOptions::Id };
+        Commands::UpdateMotionZoneOptions::DecodableType updateData;
+        updateData.connectionID = allocatedConnectionID;
+        mServer.GetLogic().HandleUpdateMotionZoneOptions(updateHandler, kUpdatePath, updateData);
+        EXPECT_TRUE(updateHandler.HasStatus());
+        EXPECT_EQ(updateHandler.GetLastStatus().status.GetStatus(), Protocols::InteractionModel::Status::NotFound);
+    }
+
+    /*
+     * Test UpdateMotionZoneOptions: Success with empty motion zones list
+     */
+    {
+        Testing::MockCommandHandler updateHandler;
+        updateHandler.SetFabricIndex(1);
+        ConcreteCommandPath kUpdatePath{ 1, Clusters::PushAvStreamTransport::Id, Commands::UpdateMotionZoneOptions::Id };
+        Commands::UpdateMotionZoneOptions::DecodableType updateData;
+        updateData.connectionID = allocatedConnectionID;
+        DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> zonesList;
+        updateData.motionZones.SetValue(DataModel::MakeNullable(zonesList));
+
+        mServer.GetLogic().HandleUpdateMotionZoneOptions(updateHandler, kUpdatePath, updateData);
+        EXPECT_TRUE(updateHandler.HasStatus());
+        EXPECT_TRUE(updateHandler.GetLastStatus().status.IsSuccess());
+
+        EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 1);
+        auto currentConnection = mServer.GetLogic().mCurrentConnections[0];
+        EXPECT_EQ(currentConnection.connectionID, allocatedConnectionID);
+        EXPECT_TRUE(currentConnection.transportOptions.HasValue());
+        auto lTransportOptions = currentConnection.transportOptions.Value();
+        auto lTriggerOptions   = lTransportOptions.triggerOptions;
+        EXPECT_TRUE(lTriggerOptions.motionZones.HasValue());
+        EXPECT_FALSE(lTriggerOptions.motionZones.Value().IsNull());
+        EXPECT_EQ(lTriggerOptions.motionZones.Value().Value().size(), (size_t) 0);
+    }
+
+    /*
+     * Test UpdateMotionZoneOptions: Success with updated non-empty motion zones list and sensitivity
+     */
+    {
+        uint8_t updateTlvBuffer[256];
+        Structs::TransportZoneOptionsStruct::Type updateZone;
+        DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> updateDecodedList;
+
+        updateZone.zone.SetNonNull(3);
+        updateZone.sensitivity.SetValue(8);
+
+        TLV::TLVWriter updateWriter;
+        updateWriter.Init(updateTlvBuffer, sizeof(updateTlvBuffer));
+
+        TLV::TLVWriter updateContainerWriter;
+        CHIP_ERROR errUpdate = updateWriter.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, updateContainerWriter);
+        EXPECT_EQ(errUpdate, CHIP_NO_ERROR);
+
+        errUpdate = DataModel::Encode(updateContainerWriter, TLV::AnonymousTag(), updateZone);
+        EXPECT_EQ(errUpdate, CHIP_NO_ERROR);
+
+        errUpdate = updateWriter.CloseContainer(updateContainerWriter);
+        EXPECT_EQ(errUpdate, CHIP_NO_ERROR);
+
+        TLV::TLVReader updateReader;
+        updateReader.Init(updateTlvBuffer, static_cast<uint32_t>(updateWriter.GetLengthWritten()));
+        errUpdate = updateReader.Next();
+        EXPECT_EQ(errUpdate, CHIP_NO_ERROR);
+
+        errUpdate = updateDecodedList.Decode(updateReader);
+        EXPECT_EQ(errUpdate, CHIP_NO_ERROR);
+
+        Testing::MockCommandHandler updateHandler;
+        updateHandler.SetFabricIndex(1);
+        ConcreteCommandPath kUpdatePath{ 1, Clusters::PushAvStreamTransport::Id, Commands::UpdateMotionZoneOptions::Id };
+        Commands::UpdateMotionZoneOptions::DecodableType updateData;
+        updateData.connectionID = allocatedConnectionID;
+        updateData.motionZones.SetValue(DataModel::MakeNullable(updateDecodedList));
+
+        mServer.GetLogic().HandleUpdateMotionZoneOptions(updateHandler, kUpdatePath, updateData);
+        EXPECT_TRUE(updateHandler.HasStatus());
+        EXPECT_TRUE(updateHandler.GetLastStatus().status.IsSuccess());
+
+        auto currentConnection = mServer.GetLogic().mCurrentConnections[0];
+        EXPECT_EQ(currentConnection.connectionID, allocatedConnectionID);
+        EXPECT_TRUE(currentConnection.transportOptions.HasValue());
+        auto lTransportOptions = currentConnection.transportOptions.Value();
+        auto lTriggerOptions   = lTransportOptions.triggerOptions;
+
+        EXPECT_TRUE(lTriggerOptions.motionZones.HasValue());
+        EXPECT_FALSE(lTriggerOptions.motionZones.Value().IsNull());
+        const auto & updatedZonesList = lTriggerOptions.motionZones.Value().Value();
+        EXPECT_EQ(updatedZonesList.size(), (size_t) 1);
+        EXPECT_FALSE(updatedZonesList[0].zone.IsNull());
+        EXPECT_EQ(updatedZonesList[0].zone.Value(), 3);
+        EXPECT_TRUE(updatedZonesList[0].sensitivity.HasValue());
+        EXPECT_EQ(updatedZonesList[0].sensitivity.Value(), 8);
+    }
+
+    /*
+     * Test UpdateMotionZoneOptions: InvalidCommand when motionSensitivity provided with PerZoneSensitivity feature
+     */
+    {
+        Testing::MockCommandHandler updateHandler;
+        updateHandler.SetFabricIndex(1);
+        ConcreteCommandPath kUpdatePath{ 1, Clusters::PushAvStreamTransport::Id, Commands::UpdateMotionZoneOptions::Id };
+        Commands::UpdateMotionZoneOptions::DecodableType updateData;
+        updateData.connectionID = allocatedConnectionID;
+        updateData.motionSensitivity.SetValue(DataModel::MakeNullable(static_cast<uint8_t>(7)));
+
+        mServer.GetLogic().HandleUpdateMotionZoneOptions(updateHandler, kUpdatePath, updateData);
+        EXPECT_TRUE(updateHandler.HasStatus());
+        EXPECT_EQ(updateHandler.GetLastStatus().status.GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    }
+
+    /*
+     * Test UpdateMotionZoneOptions: Success with null motion zones list
+     */
+    {
+        Testing::MockCommandHandler updateHandler;
+        updateHandler.SetFabricIndex(1);
+        ConcreteCommandPath kUpdatePath{ 1, Clusters::PushAvStreamTransport::Id, Commands::UpdateMotionZoneOptions::Id };
+        Commands::UpdateMotionZoneOptions::DecodableType updateData;
+        updateData.connectionID = allocatedConnectionID;
+        updateData.motionZones.SetValue(DataModel::NullNullable);
+
+        mServer.GetLogic().HandleUpdateMotionZoneOptions(updateHandler, kUpdatePath, updateData);
+        EXPECT_TRUE(updateHandler.HasStatus());
+        EXPECT_TRUE(updateHandler.GetLastStatus().status.IsSuccess());
+
+        auto currentConnection = mServer.GetLogic().mCurrentConnections[0];
+        EXPECT_EQ(currentConnection.connectionID, allocatedConnectionID);
+        EXPECT_TRUE(currentConnection.transportOptions.HasValue());
+        auto lTransportOptions = currentConnection.transportOptions.Value();
+        auto lTriggerOptions   = lTransportOptions.triggerOptions;
+
+        EXPECT_TRUE(lTriggerOptions.motionZones.HasValue());
+        EXPECT_TRUE(lTriggerOptions.motionZones.Value().IsNull());
+    }
+}
+
 } // namespace PushAvStreamTransport
 } // namespace Clusters
 } // namespace app

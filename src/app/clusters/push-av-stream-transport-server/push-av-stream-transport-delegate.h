@@ -91,6 +91,22 @@ public:
     ModifyPushTransport(const uint16_t connectionID, const PushAvStreamTransport::TransportOptionsStorage transportOptions) = 0;
 
     /**
+     * @brief Handles updating motion zone options for a push transport.
+     *
+     * @param connectionID The connectionID of the stream transport to update
+     * @param transportOptions The updated Transport Options
+     * @return Success if motion zone options update is successful;
+     *         Failure if modification fails
+     *
+     * Default implementation delegates to ModifyPushTransport.
+     */
+    virtual Protocols::InteractionModel::Status
+    UpdateMotionZoneOptions(const uint16_t connectionID, const PushAvStreamTransport::TransportOptionsStorage & transportOptions)
+    {
+        return ModifyPushTransport(connectionID, transportOptions);
+    }
+
+    /**
      * @brief Handles stream transport status modification.
      *
      * @param connectionIDList List of connectionIDs for which new transport status to apply
