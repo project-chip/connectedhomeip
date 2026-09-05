@@ -554,7 +554,7 @@ class MockTestRunner:
     """
 
     def __init__(self, abs_filename: str, classname: str, test: str, endpoint: int | None = None,
-                 pics: dict[str, bool] | None = None, paa_trust_store_path=None):
+                 pics: dict[int, dict[str, bool]] | None = None, paa_trust_store_path=None):
 
         from matter.testing.matter_stack_state import MatterStackState
         from matter.testing.matter_test_config import MatterTestConfig
@@ -798,7 +798,10 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     if args.PICS is None:
         config.pics = {}
     else:
-        config.pics = read_pics_from_file(args.PICS, endpoint=args.endpoint)
+        # A PICS input with no endpoint structure (CI-format text file, or a
+        # directory of XMLs for a single endpoint) carries no endpoint labels,
+        # so its codes are attributed to the endpoint under test.
+        config.pics = read_pics_from_file(args.PICS, default_endpoint=args.endpoint if args.endpoint is not None else 0)
     config.tests = list(chain.from_iterable(args.tests or []))
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
