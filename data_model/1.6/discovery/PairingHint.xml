@@ -1,0 +1,132 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2026). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<discovery>
+  <bitmap name="PairingHintBitmap">
+    <bitfield name="PowerCycle" bit="0" summary="The Device will automatically enter the target state upon power cycle (unplug/re-plug, remove/re-insert batteries). When used with the target state of Commissioning Mode for a device that is in a factory reset state, this bit SHALL be set to 1 for devices using Standard Commissioning Flow, and set to 0 otherwise." instructionDependency="no">
+      <mandatoryConform/>
+    </bitfield>
+    <bitfield name="DeviceManufacturerUrLApp" bit="1" summary="To put the device into the desired state, the user can be sent to the URL specified in the `CommissioningCustomFlowUrl` of the DeviceModel schema entry indexed by the Vendor ID and Product ID (e.g., as found in the announcement) in the Distributed Compliance Ledger. This URL could lead to a page with instructions, or to an app with instructions. When used with the target state of Commissioning Mode for a device that is in a factory reset state, this bit SHALL be set to 1 for devices requiring Custom Commissioning Flow before they can be available for Commissioning by any Commissioner." instructionDependency="no">
+      <mandatoryConform/>
+    </bitfield>
+    <bitfield name="Administrator" bit="2" summary="The Device has been commissioned. Any Administrator that commissioned the device provides a user interface that may be used to put the device into Commissioning Mode." instructionDependency="no">
+      <mandatoryConform/>
+    </bitfield>
+    <bitfield name="SettingsMenuOnTheNode" bit="3" summary="The settings menu on the Device provides instructions to put it into the desired state." instructionDependency="no">
+      <mandatoryConform/>
+    </bitfield>
+    <bitfield name="CustomInstruction" bit="4" summary="The PI key/value pair SHALL describe a custom way to put the Device into the target state. This Custom Instruction option is NOT recommended for use by a Device that does not have knowledge of the user&apos;s language preference." instructionDependency="M">
+      <mandatoryConform/>
+    </bitfield>
+    <bitfield name="DeviceManual" bit="5" summary="The Device Manual provides special instructions to put the Device into the target state (see xrefstyle=full). This is a catch-all option to capture user interactions that are not codified by other options in this table." instructionDependency="no">
+      <mandatoryConform/>
+    </bitfield>
+    <bitfield name="PressResetButton" bit="6" summary="The Device will enter the target state when reset button is pressed." instructionDependency="no">
+      <mandatoryConform/>
+    </bitfield>
+    <bitfield name="PressResetButtonWithApplicationOfPower" bit="7" summary="The Device will enter the target state when reset button is pressed when applying power to it." instructionDependency="no">
+      <mandatoryConform/>
+    </bitfield>
+    <bitfield name="PressResetButtonForNSeconds" bit="8" summary="The Device will enter the target state when reset button is pressed for N seconds. The exact value of N SHALL be made available via PI key." instructionDependency="M">
+      <mandatoryConform/>
+    </bitfield>
+    <bitfield name="PressResetButtonUntilLightBlinks" bit="9" summary="The Device will enter the target state when reset button is pressed until associated light blinks. Information on color of light MAY be made available via PI key (see Note 1)." instructionDependency="O">
+      <mandatoryConform/>
+    </bitfield>
+    <bitfield name="PressResetButtonForNSecondsWithApplicationOfPower" bit="10" summary="The Device will enter the target state when reset button is pressed for N seconds when applying power to it. The exact value of N SHALL be made available via PI key." instructionDependency="M">
+      <mandatoryConform/>
+    </bitfield>
+    <bitfield name="PressResetButtonUntilLightBlinksWithApplicationOfPower" bit="11" summary="The Device will enter the target state when reset button is pressed until associated light blinks when applying power to the Device. Information on color of light MAY be made available via PI key (see Note 1)." instructionDependency="O">
+      <mandatoryConform/>
+    </bitfield>
+    <bitfield name="PressResetButtonNTimes" bit="12" summary="The Device will enter the target state when reset button is pressed N times with maximum 1 second between each press. The exact value of N SHALL be made available via PI key." instructionDependency="M">
+      <mandatoryConform/>
+    </bitfield>
+    <bitfield name="PressSetupButton" bit="13" summary="The Device will enter the target state when setup button is pressed." instructionDependency="no">
+      <mandatoryConform/>
+    </bitfield>
+    <bitfield name="PressSetupButtonWithApplicationOfPower" bit="14" summary="The Device will enter the target state when setup button is pressed when applying power to it." instructionDependency="no">
+      <mandatoryConform/>
+    </bitfield>
+    <bitfield name="PressSetupButtonForNSeconds" bit="15" summary="The Device will enter the target state when setup button is pressed for N seconds. The exact value of N SHALL be made available via PI key." instructionDependency="M">
+      <mandatoryConform/>
+    </bitfield>
+    <bitfield name="PressSetupButtonUntilLightBlinks" bit="16" summary="The Device will enter the target state when setup button is pressed until associated light blinks. Information on color of light MAY be made available via PI key (see Note 1)." instructionDependency="O">
+      <mandatoryConform/>
+    </bitfield>
+    <bitfield name="PressSetupButtonForNSecondsWithApplicationOfPower" bit="17" summary="The Device will enter the target state when setup button is pressed for N seconds when applying power to it. The exact value of N SHALL be made available via PI key." instructionDependency="M">
+      <mandatoryConform/>
+    </bitfield>
+    <bitfield name="PressSetupButtonUntilLightBlinksWithApplicationOfPower" bit="18" summary="The Device will enter the target state when setup button is pressed until associated light blinks when applying power to the Device. Information on color of light MAY be made available via PI key (see Note 1)." instructionDependency="O">
+      <mandatoryConform/>
+    </bitfield>
+    <bitfield name="PressSetupButtonNTimes" bit="19" summary="The Device will enter the target state when setup button is pressed N times with maximum 1 second between each press. The exact value of N SHALL be made available via PI key." instructionDependency="M">
+      <mandatoryConform/>
+    </bitfield>
+    <bitfield name="PowerCycleNTimes" bit="20" summary="The Device will automatically enter the target state after exactly N power OFF/ON sequences (unplug/re-plug, remove/re-insert batteries) starting from the powered ON state. A non-zero X value provides the minimum number of seconds to keep the device in the ON state before the next iteration. A non-zero Y value specifies the total elapsed time during which exactly N power cycles must be detected in order to enter the desired state. A non-zero Z value means that the device will blink Z times to indicate that the sequence was detected, before entering the desired state. If a variable (X, Y, or Z) is set to 0, then the corresponding aspect of the instruction is not specified. The format of the PI key&apos;s value SHALL be N,X,Y,Z where N,X,Y and Z are variable length decimal values (no leading zeros) and there are no spaces or other characters present in the value. For example, 5,1,10,3 indicates that within 10 seconds the device must be powered OFF then ON 5 times, remaining in the ON state each time for at least 1 second, and the device will blink 3 times to indicate success before entering the target state. Alternatively, 8,0,20,0 indicates that within 20 seconds the device must be powered OFF then ON 8 times in order to enter the target state." instructionDependency="M">
+      <mandatoryConform/>
+    </bitfield>
+    <bitfield name="PressButtonForNSecondsWithIndication" bit="21" summary="The Device will enter the target state when the button is pressed for N seconds. A non-zero Z value means that the device will blink Z times to indicate that the action was detected, before entering the desired state. A present and non-blank A value can be used to specify the button(s) where buttons are indicated using HDMI CEC Key Codes (see ) in hexadecimal notation separated by operators &apos;&amp;&apos; and &apos;\|&apos; to indicate &apos;and&apos; (both buttons) and &apos;or&apos; (any of the buttons) respectively. The format of the PI key&apos;s value SHALL be N,Z or N,Z,A, where N and Z are variable length decimal values (no leading zeros), A is blank or a combination of CEC Key Codes separated by &apos;&amp;&apos; or &apos;\|&apos;, and there are no spaces or other characters present in the value. For example, 10,3 indicates that any button can be held for 10 seconds, and the device will blink 3 times before entering the target state. Additional examples: 5,,0x46 indicates that the pause button (CEC Key Code 0x46) must be held for 5 seconds, 5,,0x01&amp;0x02 indicates that the up and down buttons (CEC Key Codes 0x01 and 0x02) must be held 5 secs, and 5,,0x01\|0x02 indicates that either the up or down buttons must be held 5 secs." instructionDependency="M">
+      <mandatoryConform/>
+    </bitfield>
+    <bitfield name="PowerCycleUntilIndication" bit="22" summary="The Device will automatically enter the target state after a variable number of power OFF/ON sequences (unplug/re-plug, remove/re-insert batteries) starting from the powered ON state. A non-zero X value provides the number of seconds to keep the device in the ON state before moving to the OFF state. A non-zero Y value provides the number of seconds to keep the device in the OFF state before moving to the ON state. A non-zero Z value means that the device will blink Z times to indicate that the sequence was detected, before entering the desired state. An M value can be used to indicate the color name of the light blink, where the color name may be one of: white, red, green, blue, orange, yellow, purple, cool white, warm white, sequence (for rainbow sequence). An N value can be used to indicate the initial state (OFF or ON), where the default when missing or left blank is ON. If the variable X, Y, Z, M or N is blank or set to 0, then the corresponding aspect of the instruction is not specified. The format of the PI key&apos;s value SHALL be X,Y,Z,M,N where X, Y and Z are variable length decimal values (no leading zeros) and there are no spaces or other characters present in the value, while M is a single color name, and N, when present, is one of either ON or OFF. For example, 1,2,3,yellow,ON indicates that the device must be powered OFF then ON repeatedly, starting in the ON state, remaining in the ON state each time for 1 second, remaining in the OFF state each time for 2 seconds, and the device will blink in yellow 3 times to indicate success before entering the target state. Alternatively, 0,0,0,sequence indicates that the device must be powered OFF then ON repeatedly until it blinks in a sequence of colors to indicate it has entered the target state." instructionDependency="M">
+      <mandatoryConform/>
+    </bitfield>
+  </bitmap>
+</discovery>
