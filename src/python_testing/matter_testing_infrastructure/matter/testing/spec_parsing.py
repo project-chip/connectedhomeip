@@ -182,6 +182,9 @@ class XmlDataTypeComponent:
     is_optional: bool = False  # Whether field is optional
     is_nullable: bool = False  # Whether field can be null
     constraints: Constraints | None = None  # For min/max values, lists, etc.
+    # F quality on the field's <access> element: the field's value is only visible to
+    # clients on the associated fabric. Cross-fabric reads report the default value.
+    fabric_sensitive: bool = False
 
 
 @dataclass
@@ -195,6 +198,11 @@ class XmlDataType:
     components: dict[uint, XmlDataTypeComponent]
     # if this is None, this is a global struct
     cluster_ids: list[uint] | None
+    # Struct-level fabric scoping: the struct carries a FabricIndex field and entries
+    # belong to a single fabric. Some attributes of fabric-scoped struct types do not
+    # repeat the marker on their own <access> element, so this is the more reliable
+    # signal of the two for identifying fabric-scoped list attributes.
+    fabric_scoped: bool = False
 
 
 @dataclass
@@ -221,6 +229,14 @@ class XmlAttribute:
     scene: bool = False   # S quality: attribute value is stored/restored by the Scenes cluster
     atomic_write: bool = False  # Atomic Write quality: written via atomic transaction; staged values not reported until commit
     constraints: Constraints | None = None
+    # F quality on the attribute's <access> element: the attribute is a list whose
+    # entries each belong to a single fabric. Reads honour the request's fabric filter.
+    fabric_scoped: bool = False
+    # S quality on the attribute's <access> element. Where a struct field carries this
+    # quality only that field is sensitive, but here the whole entry is: an entry
+    # belonging to another fabric carries no readable data, rather than a subset of
+    # fields that read back as defaults.
+    fabric_sensitive: bool = False
 
     def access_string(self):
         read_marker = "R" if self.read_access is not ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue else ""
@@ -244,6 +260,9 @@ class XmlCommand:
     # XmlDataTypeComponent is reused here because command fields carry the same
     # shape as struct fields in the data model XML (id/name/type/quality/constraint).
     fields: dict[uint, XmlDataTypeComponent] = field(default_factory=dict)
+    # F quality on the command's <access> element: the command acts on data associated
+    # with the accessing fabric and cannot be invoked over PASE.
+    fabric_scoped: bool = False
 
     def __str__(self):
         return f'{self.name} id:0x{self.id:02X} {self.id} conformance: {str(self.conformance)} privilege: {str(self.privilege)}'
@@ -253,6 +272,9 @@ class XmlCommand:
 class XmlEvent:
     name: str
     conformance: ConformanceCallable
+    # S quality on the event's <access> element: the event is only reported to clients
+    # on the fabric it is associated with.
+    fabric_sensitive: bool = False
 
 
 @dataclass
@@ -624,6 +646,20 @@ class ClusterParser:
 
         return (read_access, write_access, invoke_access)
 
+    @staticmethod
+    def parse_fabric_flags(access_xml: ElementTree.Element | None) -> tuple[bool, bool]:
+        '''Returns a tuple of (fabricScoped, fabricSensitive) from an <access> element.
+
+        Elements with no <access> element, or one that carries only privileges, are
+        neither fabric scoped nor fabric sensitive. A missing marker is reported as
+        False rather than as a problem notice: the vast majority of elements in the
+        data model legitimately carry neither.
+        '''
+        if access_xml is None:
+            return (False, False)
+        return (access_xml.attrib.get('fabricScoped') == 'true',
+                access_xml.attrib.get('fabricSensitive') == 'true')
+
     def _parse_basic_field_attributes(self, xml_field: ElementTree.Element, component_type: DataTypeEnum, component_tags: dict) -> tuple[str, uint] | None:
         """
         Extract basic field attributes (name and ID) from XML element.
@@ -880,6 +916,9 @@ class ClusterParser:
             is_nullable = self._isNullableField(xml_field)
             constraints = self._parse_field_constraints(xml_field)
             conformance = self._parse_field_conformance(xml_field)
+            # Only struct fields carry an <access> element; enum items and bitmap
+            # bitfields don't.
+            _, fabric_sensitive = self.parse_fabric_flags(xml_field.find('access'))
 
             # Create component with all extracted attributes
             components[aid] = XmlDataTypeComponent(
@@ -890,7 +929,8 @@ class ClusterParser:
                 type_info=type_info,
                 is_optional=is_optional,
                 is_nullable=is_nullable,
-                constraints=constraints
+                constraints=constraints,
+                fabric_sensitive=fabric_sensitive
             )
         return components
 
@@ -919,11 +959,14 @@ class ClusterParser:
                 # Ensure we're using a valid cluster ID list, never [None]
                 cluster_ids = [self._cluster_id] if self._cluster_id is not None else []
 
+                fabric_scoped, _ = self.parse_fabric_flags(element.find('access'))
+
                 data_types[name] = XmlDataType(
                     data_type=data_type,
                     name=name,
                     components=self._parse_components(element, data_type),
-                    cluster_ids=cluster_ids
+                    cluster_ids=cluster_ids,
+                    fabric_scoped=fabric_scoped
                 )
         return data_types
 
@@ -1144,6 +1187,7 @@ class ClusterParser:
                 write_optional = self.parse_write_optional(element, access_xml)
             # Parse constraints for this attribute
             constraints = self.parse_attribute_constraints(element)
+            fabric_scoped, fabric_sensitive = self.parse_fabric_flags(access_xml)
             attributes[code] = XmlAttribute(name=element.attrib['name'], datatype=datatype,
                                             conformance=conformance,
                                             read_access=get_access_privilege_or_unknown(read_access),
@@ -1153,7 +1197,9 @@ class ClusterParser:
                                             quieter_reporting=self._is_quieter_reporting_attribute(element),
                                             scene=self._is_scene_attribute(element),
                                             atomic_write=self._is_atomic_write_attribute(element),
-                                            constraints=constraints)
+                                            constraints=constraints,
+                                            fabric_scoped=fabric_scoped,
+                                            fabric_sensitive=fabric_sensitive)
         # Add in the global attributes for the base class
         for aid in GlobalAttributeIds:
             # TODO: Add data type here. Right now it's unused. We should parse this from the spec.
@@ -1185,8 +1231,10 @@ class ClusterParser:
 
             if conformance is not None:
                 _, _, privilege = self.parse_access(element, access_xml, conformance)
+                fabric_scoped, _ = self.parse_fabric_flags(access_xml)
                 commands.append(XmlCommand(id=code, name=element.attrib['name'], conformance=conformance,
-                                           privilege=get_access_privilege_or_unknown(privilege)))
+                                           privilege=get_access_privilege_or_unknown(privilege),
+                                           fabric_scoped=fabric_scoped))
         return commands
 
     def parse_command_fields(self, element: ElementTree.Element) -> dict[uint, XmlDataTypeComponent]:
@@ -1207,6 +1255,8 @@ class ClusterParser:
                     problem=f"Field in command {element.attrib.get('name', '?')} with no id or name"))
                 continue
             fid = uint(int(xml_field.attrib['id'], 0))
+            _, fabric_sensitive = self.parse_fabric_flags(xml_field.find('access'))
+
             fields[fid] = XmlDataTypeComponent(
                 value=fid,
                 name=xml_field.attrib['name'],
@@ -1216,6 +1266,7 @@ class ClusterParser:
                 is_optional=self._isOptionalField(xml_field),
                 is_nullable=self._isNullableField(xml_field),
                 constraints=self.parse_attribute_constraints(xml_field),
+                fabric_sensitive=fabric_sensitive,
             )
         return fields
 
@@ -1232,9 +1283,11 @@ class ClusterParser:
                 conformance = or_operation([conformance, commands[code].conformance])
 
             _, _, privilege = self.parse_access(element, access_xml, conformance)
+            fabric_scoped, _ = self.parse_fabric_flags(access_xml)
             commands[uint(code)] = XmlCommand(id=code, name=element.attrib['name'], conformance=conformance,
                                               privilege=get_access_privilege_or_unknown(privilege),
-                                              fields=self.parse_command_fields(element))
+                                              fields=self.parse_command_fields(element),
+                                              fabric_scoped=fabric_scoped)
         return commands
 
     def parse_events(self) -> dict[uint, XmlEvent]:
@@ -1246,7 +1299,9 @@ class ClusterParser:
                 continue
             if code in events:
                 conformance = or_operation([conformance, events[code].conformance])
-            events[code] = XmlEvent(name=element.attrib['name'], conformance=conformance)
+            _, fabric_sensitive = self.parse_fabric_flags(access_xml)
+            events[code] = XmlEvent(name=element.attrib['name'], conformance=conformance,
+                                    fabric_sensitive=fabric_sensitive)
         return events
 
     def create_cluster(self) -> XmlCluster:
@@ -1564,6 +1619,12 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
                 ret[_id].read_access = override.read_access
             if override.write_access:
                 ret[_id].write_access = override.write_access
+            # Fabric qualities are never removed by a derived cluster, so OR them:
+            # either side may declare one and the other omit the <access> element.
+            if override.fabric_scoped:
+                ret[_id].fabric_scoped = True
+            if override.fabric_sensitive:
+                ret[_id].fabric_sensitive = True
 
         for attr_id, attribute in ret.items():
             if attribute.read_access == ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue and attribute.write_access == ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue:
@@ -2056,11 +2117,14 @@ def build_xml_global_data_types(data_model_directory: PrebuiltDataModelDirectory
                 problems.extend(filtered_problems)
 
                 # Global data types have no cluster IDs - they're truly global
+                fabric_scoped, _ = ClusterParser.parse_fabric_flags(element.find('access'))
+
                 global_data_types[category][name] = XmlDataType(
                     data_type=data_type_enum,
                     name=name,
                     components=components,
-                    cluster_ids=None  # Global types have no specific cluster IDs
+                    cluster_ids=None,  # Global types have no specific cluster IDs
+                    fabric_scoped=fabric_scoped
                 )
 
     # For now we assume we should have at least 3 global data type XMLs to parse

@@ -716,6 +716,122 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
         asserts.assert_equal(country_code.type_info, "string", "Unexpected CountryCode type")
         asserts.assert_equal(country_code.constraints.allowed, ["2"], "Unexpected CountryCode constraint")
 
+    def test_fabric_flag_parsing(self):
+        # fabricScoped / fabricSensitive live on the <access> element of attributes,
+        # commands, events, structs and individual struct fields. Elements whose
+        # <access> element carries only privileges must come back as not fabric
+        # scoped and not fabric sensitive rather than as a parsing problem.
+        fabric_xml = (
+            f'<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="{CLUSTER_ID}" name="{CLUSTER_NAME}" revision="1">'
+            '  <revisionHistory><revision revision="1" summary="Initial version"/></revisionHistory>'
+            f' <clusterIds><clusterId id="{CLUSTER_ID}" name="{CLUSTER_NAME}"/></clusterIds>'
+            '  <classification hierarchy="base" role="application" picsCode="TEST" scope="Endpoint"/>'
+            '  <attributes>'
+            '    <attribute id="0x0000" name="ScopedList" type="list">'
+            '      <entry type="ScopedStruct"/>'
+            '      <access read="true" write="true" readPrivilege="view" writePrivilege="admin" fabricScoped="true"/>'
+            '      <mandatoryConform/>'
+            '    </attribute>'
+            '    <attribute id="0x0001" name="PlainAttribute" type="uint16">'
+            '      <access read="true" readPrivilege="view"/>'
+            '      <mandatoryConform/>'
+            '    </attribute>'
+            '  </attributes>'
+            '  <commands>'
+            '    <command id="0x00" name="ScopedCmd" direction="commandToServer" response="Y">'
+            '      <access invokePrivilege="operate" fabricScoped="true"/>'
+            '      <mandatoryConform/>'
+            '    </command>'
+            '    <command id="0x01" name="PlainCmd" direction="commandToServer" response="Y">'
+            '      <access invokePrivilege="operate"/>'
+            '      <mandatoryConform/>'
+            '    </command>'
+            '  </commands>'
+            '  <events>'
+            '    <event id="0x00" name="SensitiveEvent" priority="info">'
+            '      <access readPrivilege="admin" fabricSensitive="true"/>'
+            '      <mandatoryConform/>'
+            '    </event>'
+            '    <event id="0x01" name="PlainEvent" priority="info">'
+            '      <access readPrivilege="view"/>'
+            '      <mandatoryConform/>'
+            '    </event>'
+            '  </events>'
+            '  <dataTypes>'
+            '    <struct name="ScopedStruct">'
+            '      <access fabricScoped="true"/>'
+            '      <field id="0" name="SensitiveField" type="uint8">'
+            '        <access fabricSensitive="true"/>'
+            '        <mandatoryConform/>'
+            '      </field>'
+            '      <field id="1" name="VisibleField" type="uint8">'
+            '        <mandatoryConform/>'
+            '      </field>'
+            '    </struct>'
+            '    <struct name="PlainStruct">'
+            '      <field id="0" name="Whatever" type="uint8">'
+            '        <mandatoryConform/>'
+            '      </field>'
+            '    </struct>'
+            '  </dataTypes>'
+            '</cluster>')
+        xml_cluster = parse_cluster(fabric_xml)
+
+        asserts.assert_true(xml_cluster.attributes[0x0000].fabric_scoped,
+                            "ScopedList should be marked fabric scoped")
+        asserts.assert_false(xml_cluster.attributes[0x0001].fabric_scoped,
+                             "PlainAttribute should not be marked fabric scoped")
+
+        asserts.assert_true(xml_cluster.accepted_commands[0x00].fabric_scoped,
+                            "ScopedCmd should be marked fabric scoped")
+        asserts.assert_false(xml_cluster.accepted_commands[0x01].fabric_scoped,
+                             "PlainCmd should not be marked fabric scoped")
+
+        asserts.assert_true(xml_cluster.events[0x00].fabric_sensitive,
+                            "SensitiveEvent should be marked fabric sensitive")
+        asserts.assert_false(xml_cluster.events[0x01].fabric_sensitive,
+                             "PlainEvent should not be marked fabric sensitive")
+
+        scoped_struct = xml_cluster.structs["ScopedStruct"]
+        asserts.assert_true(scoped_struct.fabric_scoped, "ScopedStruct should be marked fabric scoped")
+        asserts.assert_true(scoped_struct.components[0].fabric_sensitive,
+                            "SensitiveField should be marked fabric sensitive")
+        asserts.assert_false(scoped_struct.components[1].fabric_sensitive,
+                             "VisibleField should not be marked fabric sensitive")
+        asserts.assert_false(xml_cluster.structs["PlainStruct"].fabric_scoped,
+                             "PlainStruct should not be marked fabric scoped")
+        asserts.assert_false(xml_cluster.structs["PlainStruct"].components[0].fabric_sensitive,
+                             "Field of a non-fabric-scoped struct should not be fabric sensitive")
+
+    def test_fabric_flags_prebuilt_data_model(self):
+        # Spot-check the real data model: the ACL attribute is fabric scoped, its
+        # struct's Privilege field is fabric sensitive while FabricIndex is not,
+        # AccessControlEntryChanged is fabric sensitive, and a plain attribute on the
+        # same cluster (SubjectsPerAccessControlEntry) is neither.
+        clusters, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_6_1)
+        access_control = clusters[Clusters.AccessControl.id]
+
+        asserts.assert_true(access_control.attributes[Clusters.AccessControl.Attributes.Acl.attribute_id].fabric_scoped,
+                            "ACL should be marked fabric scoped")
+        asserts.assert_false(
+            access_control.attributes[Clusters.AccessControl.Attributes.SubjectsPerAccessControlEntry.attribute_id].fabric_scoped,
+            "SubjectsPerAccessControlEntry should not be marked fabric scoped")
+
+        entry_struct = access_control.structs["AccessControlEntryStruct"]
+        asserts.assert_true(entry_struct.fabric_scoped, "AccessControlEntryStruct should be marked fabric scoped")
+        sensitive_names = [f.name for f in entry_struct.components.values() if f.fabric_sensitive]
+        asserts.assert_in("Privilege", sensitive_names, "Privilege should be marked fabric sensitive")
+        asserts.assert_not_in("FabricIndex", sensitive_names, "FabricIndex is not fabric sensitive")
+
+        entry_changed = access_control.events[
+            Clusters.AccessControl.Events.AccessControlEntryChanged.event_id]
+        asserts.assert_true(entry_changed.fabric_sensitive,
+                            "AccessControlEntryChanged should be marked fabric sensitive")
+
+        update_fabric_label = clusters[Clusters.OperationalCredentials.id].accepted_commands[
+            Clusters.OperationalCredentials.Commands.UpdateFabricLabel.command_id]
+        asserts.assert_true(update_fabric_label.fabric_scoped, "UpdateFabricLabel should be marked fabric scoped")
+
     def test_scene_attribute_end_to_end(self):
         # CurrentMode (0x0001) in the base cluster XML carries scene="true", the
         # other attributes carry scene="false".
