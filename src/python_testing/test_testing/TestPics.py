@@ -24,7 +24,7 @@ import matter.clusters as Clusters
 from matter.clusters.Attribute import AsyncReadTransaction
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.matter_testing import CertificationUnitTestNoDevice
-from matter.testing.pics import (BASE_PICS_CODES_DERIVED, BasePicsFacts, base_pics_facts_to_pics_codes,
+from matter.testing.pics import (BASE_PICS_CODES_DERIVED, BasePicsFacts, apply_pics_overrides, base_pics_facts_to_pics_codes,
                                  derive_base_pics_facts_from_device_wildcard, generate_device_element_pics_from_device_wildcard,
                                  read_pics_from_file)
 from matter.testing.runner import default_matter_test_main
@@ -313,6 +313,34 @@ class TestPicsHelpers(CertificationUnitTestNoDevice):
         asserts.assert_true(
             len(acl_mandatory) > 0,
             "AccessControl spec-mandatory events must be derived for any DUT with AccessControl on EP0")
+
+    def test_apply_pics_overrides(self):
+        """Overrides use the PICS file line format and win over file values."""
+        pics = {'TEST.S': True, 'TEST.S.E00': True, 'TEST.S.E01': False}
+
+        added = apply_pics_overrides(pics, ['TEST.S.E00=0', 'TEST.S.E02=1'])
+        asserts.assert_false(pics['TEST.S.E00'], 'Override did not flip an existing PICS item')
+        asserts.assert_true(pics['TEST.S.E02'], 'Override did not add a new PICS item')
+        asserts.assert_true(pics['TEST.S'], 'Override touched an unrelated PICS item')
+        asserts.assert_false(pics['TEST.S.E01'], 'Override touched an unrelated PICS item')
+        asserts.assert_equal(added, ['TEST.S.E02'], 'Added keys must report items absent from the PICS set')
+
+        # Empty override list is a no-op
+        before = dict(pics)
+        added = apply_pics_overrides(pics, [])
+        asserts.assert_equal(pics, before, 'Empty override list modified the PICS set')
+        asserts.assert_equal(added, [], 'Empty override list must report no added keys')
+
+        # Entries without a 0 or 1 value are rejected
+        for bad_entry in ['TEST.S.E00', 'TEST.S.E00=', 'TEST.S.E00=true', 'TEST.S.E00:1']:
+            with asserts.assert_raises(ValueError):
+                apply_pics_overrides(pics, [bad_entry])
+
+        # A rejected list applies nothing, even its valid entries
+        before = dict(pics)
+        with asserts.assert_raises(ValueError):
+            apply_pics_overrides(pics, ['TEST.S.E03=1', 'TEST.S.E00=bad'])
+        asserts.assert_equal(pics, before, 'A rejected override list must not be partially applied')
 
     def test_read_pics_from_file_endpoint_naming_variants(self):
         """Endpoint subdir matching tolerates common naming conventions."""
