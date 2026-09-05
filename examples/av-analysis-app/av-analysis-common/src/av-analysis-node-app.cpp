@@ -49,27 +49,39 @@ CHIP_ERROR AvAnalysisNodeApp::Init(WebRTCPeerController * aPeerController)
     // The camera's AVSM endpoint, features and stream constraints are discovered from the camera
     ReturnErrorOnFailure(mCameraClient.Init(Server::GetInstance().GetCASESessionManager()));
 
-    // No Zone Management cluster on this endpoint: PerZoneContextDetection is off and MaxZones is Null
-    mAvAnalysisServer.Create(mEndpointId, BitFlags<AvAnalysis::Feature>(AvAnalysis::Feature::kRemoteContextDetection),
-                             kSupportedAmbientContexts, DataModel::Nullable<uint8_t>(), kMaxAnalysisStreams);
-    mAvAnalysisServer.Cluster().SetDelegate(&mAvAnalysisDelegate);
-    mAvAnalysisServer.Cluster().SetCameraClient(&mCameraClient);
-
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mAvAnalysisServer.Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to register AVAnalysis on endpoint %u: %" CHIP_ERROR_FORMAT, mEndpointId, err.Format());
-        mAvAnalysisServer.Destroy();
-        return err;
-    }
-
+    // The requestor cluster comes first: the WebRTC client records its sessions there, and the AV
+    // Analysis cluster requires the client at Startup
     mWebRTCRequestorServer.Create(mEndpointId, mRequestorDelegate);
-    err = CodegenDataModelProvider::Instance().Registry().Register(mWebRTCRequestorServer.Registration());
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mWebRTCRequestorServer.Registration());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to register WebRTCTransportRequestor on endpoint %u: %" CHIP_ERROR_FORMAT, mEndpointId,
                      err.Format());
         mWebRTCRequestorServer.Destroy();
+        return err;
+    }
+
+    err = mWebRTCClient.Init(Server::GetInstance().GetCASESessionManager(), mPeerController, &mWebRTCRequestorServer.Cluster(),
+                             kMaxAnalysisStreams);
+    if (err != CHIP_NO_ERROR)
+    {
+        Shutdown();
+        return err;
+    }
+    mRequestorDelegate.Init(mPeerController, &mWebRTCClient);
+
+    // No Zone Management cluster on this endpoint: PerZoneContextDetection is off and MaxZones is Null
+    mAvAnalysisServer.Create(mEndpointId, BitFlags<AvAnalysis::Feature>(AvAnalysis::Feature::kRemoteContextDetection),
+                             kSupportedAmbientContexts, DataModel::Nullable<uint8_t>(), kMaxAnalysisStreams);
+    mAvAnalysisServer.Cluster().SetDelegate(&mAvAnalysisDelegate);
+    mAvAnalysisServer.Cluster().SetCameraClient(&mCameraClient);
+    mAvAnalysisServer.Cluster().SetWebRTCClient(&mWebRTCClient);
+
+    err = CodegenDataModelProvider::Instance().Registry().Register(mAvAnalysisServer.Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to register AVAnalysis on endpoint %u: %" CHIP_ERROR_FORMAT, mEndpointId, err.Format());
+        mAvAnalysisServer.Destroy();
         Shutdown();
         return err;
     }
@@ -80,6 +92,9 @@ CHIP_ERROR AvAnalysisNodeApp::Init(WebRTCPeerController * aPeerController)
 void AvAnalysisNodeApp::Shutdown()
 {
     ChipLogProgress(AppServer, "AvAnalysisNodeApp: Shutdown");
+
+    // Abandon any signaling exchange still in flight
+    mWebRTCClient.Cancel();
 
     if (mWebRTCRequestorServer.IsConstructed())
     {
