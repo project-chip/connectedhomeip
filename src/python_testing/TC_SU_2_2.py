@@ -57,6 +57,7 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeMatcher, AttributeSubscriptionHandler, EventSubscriptionHandler
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 # Create a logger
@@ -118,7 +119,7 @@ SUBSCRIPTION_START_TIMEOUT_SEC = 60
 SUBSCRIPTION_PROBE_TIMEOUT_MS = 5000
 
 
-class TC_SU_2_2(SoftwareUpdateBaseTest):
+class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
     # The DUT reboots mid-test in Step 5. The framework's background wildcard
     # subscription (autoResubscribe=False) would silently die there with a stale value

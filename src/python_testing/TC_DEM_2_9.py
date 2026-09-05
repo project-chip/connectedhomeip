@@ -51,13 +51,13 @@ from TC_DEMTestBase import DEMTestBase
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_DEM_2_9(MatterBaseTest, DEMTestBase):
+class TC_DEM_2_9(MatterTestCommissionedDevice, DEMTestBase):
     """Implementation of test case TC_DEM_2_9."""
 
     def desc_TC_DEM_2_9(self) -> str:

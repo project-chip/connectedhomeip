@@ -39,14 +39,14 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_asserts import assert_valid_map8, assert_valid_uint16
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import uint
 
 log = logging.getLogger(__name__)
 
 
-class TC_CLDIM_2_1(MatterBaseTest):
+class TC_CLDIM_2_1(MatterTestCommissionedDevice):
     async def read_cldim_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ClosureDimension
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)

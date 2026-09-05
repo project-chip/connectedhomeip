@@ -42,7 +42,7 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
 from matter.testing.decorators import has_attribute, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -51,7 +51,7 @@ MIN_STARTUP_COLOR_TEMP = 1
 MAX_STARTUP_COLOR_TEMP = 0xFEFF
 
 
-class TC_CC_6_5(MatterBaseTest):
+class TC_CC_6_5(MatterTestCommissionedDevice):
     def desc_TC_CC_6_5(self) -> str:
         return (
             "4.2.18.[TC_CC_6_5] This test case verifies Color Temperature "

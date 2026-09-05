@@ -46,7 +46,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -64,7 +64,7 @@ kValidEventTrigger = 0xFFFF_FFFF_FFF1_0000
 kInvalidEventTrigger = 0  # Per TC-DGEN-2.3
 
 
-class TestEventTrigger(MatterBaseTest):
+class TestEventTrigger(MatterTestCommissionedDevice):
     @async_test_body
     async def test_all_zeros_key(self):
         dev_ctrl = self.default_controller

@@ -74,7 +74,7 @@ from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.testing.tasks import Subprocess
 
@@ -123,7 +123,7 @@ class FabricSyncApp(Subprocess):
         self.send(f"pairing onnetwork {node_id} {setup_pin_code}")
 
 
-class TC_MCORE_FS_1_4(MatterBaseTest):
+class TC_MCORE_FS_1_4(MatterTestCommissionedDevice):
 
     @property
     def default_timeout(self) -> int:

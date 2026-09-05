@@ -76,7 +76,7 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -90,7 +90,7 @@ _USE_IANA_ADDR = 0
 _USE_PER_GROUP_ADDR = 2
 
 
-class TC_S_2_3(MatterBaseTest):
+class TC_S_2_3(MatterTestCommissionedDevice):
     def desc_TC_S_2_3(self) -> str:
         return "[TC-S-2.3] Secondary functionality with DUT as Server"
 

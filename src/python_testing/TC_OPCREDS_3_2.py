@@ -41,7 +41,7 @@ from test_plan_support import (commission_from_existing, commission_if_required,
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import TLVReader
 from matter.utils import CommissioningBuildingBlocks
@@ -54,7 +54,7 @@ def verify_fabric(controller: str) -> str:
             f"- Verify the FabricID matches the fabricID for {controller}")
 
 
-class TC_OPCREDS_3_2(MatterBaseTest):
+class TC_OPCREDS_3_2(MatterTestCommissionedDevice):
     def desc_TC_OPCREDS_3_2(self):
         return " Attribute-CurrentFabricIndex validation [DUTServer]"
 

@@ -24,7 +24,7 @@ from mobly import asserts
 from matter.clusters.ClusterObjects import Cluster
 from matter.testing.conformance import ConformanceException
 from matter.testing.decorators import _has_attribute
-from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.matter_testing import MatterTestCommissionedDevice, TestStep
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, dm_from_spec_version
 
 # Expected Basic Information DataModelRevision for each Matter specification version.
@@ -48,7 +48,7 @@ _DATA_MODEL_REVISION_BY_SPEC = {
 }
 
 
-class BasicInformationAttributesVerificationBase(MatterBaseTest):
+class BasicInformationAttributesVerificationBase(MatterTestCommissionedDevice):
     def steps(self) -> list[TestStep]:
         return [
             TestStep(0, "DUT commissioned if not already done", is_commissioning=True),

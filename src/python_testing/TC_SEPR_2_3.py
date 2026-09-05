@@ -51,7 +51,7 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.exceptions import ChipStackError
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -59,7 +59,7 @@ log = logging.getLogger(__name__)
 cluster = Clusters.CommodityPrice
 
 
-class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
+class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterTestCommissionedDevice):
     """Implementation of test case TC_SEPR_2_3."""
 
     def desc_TC_SEPR_2_3(self) -> str:

@@ -60,13 +60,13 @@ from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher
+from matter.testing.matter_testing import AttributeMatcher, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_SU_2_5(SoftwareUpdateBaseTest):
+class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
     "This test case verifies that the DUT behaves according to the spec when it is applying the software update."
     provider_kvs_path = None
     provider_log = None

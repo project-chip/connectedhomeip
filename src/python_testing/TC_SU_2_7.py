@@ -65,13 +65,13 @@ from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import AttributeValue
+from matter.testing.matter_testing import AttributeValue, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_SU_2_7(SoftwareUpdateBaseTest):
+class TC_SU_2_7(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
     """This test case verifies that the DUT behaves according to the spec when events are generated."""
     # Reference variable for the OTA Software Update Provider cluster.
     provider_port = None

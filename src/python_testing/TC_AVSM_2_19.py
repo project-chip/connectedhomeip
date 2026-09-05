@@ -43,13 +43,13 @@ from TC_AVSMTestBase import AVSMTestBase
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_AVSM_2_19(MatterBaseTest, AVSMTestBase):
+class TC_AVSM_2_19(MatterTestCommissionedDevice, AVSMTestBase):
     disable_wildcard_subscription = True
 
     def desc_TC_AVSM_2_19(self) -> str:

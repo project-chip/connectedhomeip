@@ -58,11 +58,11 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.matter_asserts import assert_valid_map8
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_FAN_2_4(MatterBaseTest):
+class TC_FAN_2_4(MatterTestCommissionedDevice):
     def desc_TC_FAN_2_4(self) -> str:
         return "[TC-FAN-2.4] Optional wind attributes with DUT as Server"
 

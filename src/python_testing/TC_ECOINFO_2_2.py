@@ -69,7 +69,7 @@ from matter.interaction_model import Status
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.commissioning import SetupParameters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -77,7 +77,7 @@ log = logging.getLogger(__name__)
 _DEVICE_TYPE_AGGREGATOR = 0x000E
 
 
-class TC_ECOINFO_2_2(MatterBaseTest):
+class TC_ECOINFO_2_2(MatterTestCommissionedDevice):
 
     def setup_class(self):
         super().setup_class()

@@ -41,7 +41,7 @@ from modebase_cluster_check import ModeBaseClusterChecks
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterBaseTest, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -49,7 +49,7 @@ log = logging.getLogger(__name__)
 cluster_demm_mode = Clusters.DeviceEnergyManagementMode
 
 
-class TC_DEMM_1_2(MatterBaseTest, ModeBaseClusterChecks):
+class TC_DEMM_1_2(MatterTestCommissionedDevice, ModeBaseClusterChecks):
 
     def __init__(self, *args):
         MatterBaseTest.__init__(self, *args)
