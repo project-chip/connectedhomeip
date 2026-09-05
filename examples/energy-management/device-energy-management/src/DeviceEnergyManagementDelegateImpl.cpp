@@ -811,9 +811,8 @@ Status DeviceEnergyManagementDelegate::CancelRequest()
  *   5) Clear the PowerRangeAdjustment attribute (set to Null)
  *   6) generate a PowerRangeAdjustEnd event with cause NormalCompletion
  */
-Status DeviceEnergyManagementDelegate::PowerRangeAdjustRequest(const Optional<int64_t> minPower,
-                                                               const Optional<int64_t> maxPower, uint32_t duration,
-                                                               AdjustmentCauseEnum cause)
+Status DeviceEnergyManagementDelegate::PowerRangeAdjustRequest(const Optional<int64_t> minPower, const Optional<int64_t> maxPower,
+                                                               uint32_t duration, AdjustmentCauseEnum cause)
 {
     ChipLogDetail(AppServer, "PowerRangeAdjustRequest: minPower=%lld, maxPower=%lld, duration=%u, cause=%d",
                   static_cast<long long>(minPower.HasValue() ? minPower.Value() : 0),
@@ -912,8 +911,8 @@ Status DeviceEnergyManagementDelegate::PowerRangeAdjustRequest(const Optional<in
     {
         powerRangeAdjustment.maxPower.SetNull();
     }
-    powerRangeAdjustment.cause    = mappedCause;
-    powerRangeAdjustment.endTime  = endTimeUtc;
+    powerRangeAdjustment.cause   = mappedCause;
+    powerRangeAdjustment.endTime = endTimeUtc;
 
     mPowerRangeAdjustment.SetNonNull(powerRangeAdjustment);
 

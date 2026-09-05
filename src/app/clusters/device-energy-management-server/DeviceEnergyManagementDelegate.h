@@ -166,8 +166,8 @@ public:
      * @return  Success if the adjustment is accepted; otherwise the command SHALL be rejected with appropriate error.
      */
     virtual Protocols::InteractionModel::Status PowerRangeAdjustRequest(const Optional<int64_t> minPower,
-                                                                        const Optional<int64_t> maxPower,
-                                                                        const uint32_t duration, AdjustmentCauseEnum cause) = 0;
+                                                                        const Optional<int64_t> maxPower, const uint32_t duration,
+                                                                        AdjustmentCauseEnum cause) = 0;
 
     /**
      * @brief Delegate SHALL make the ESA end the active power range adjustment session and return to normal operation.

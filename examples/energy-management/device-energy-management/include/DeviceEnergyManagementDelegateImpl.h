@@ -181,8 +181,8 @@ public:
      * @return  Success if the power range adjustment is accepted; otherwise the command SHALL be rejected with appropriate error.
      */
     chip::Protocols::InteractionModel::Status PowerRangeAdjustRequest(const Optional<int64_t> minPower,
-                                                                      const Optional<int64_t> maxPower,
-                                                                      uint32_t duration, AdjustmentCauseEnum cause) override;
+                                                                      const Optional<int64_t> maxPower, uint32_t duration,
+                                                                      AdjustmentCauseEnum cause) override;
 
     /**
      * @brief Handler for CancelPowerRangeAdjustRequest
