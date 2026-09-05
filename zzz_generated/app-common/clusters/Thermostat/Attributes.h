@@ -828,6 +828,70 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ThermostatSuggestionNotFollowingReason
+namespace Sensors {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::Thermostat::Structs::ThermostatSensorStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::Thermostat::Structs::ThermostatSensorStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::Thermostat::Structs::ThermostatSensorStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Sensors::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Sensors
+namespace AvailableSensors {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::ByteSpan>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::ByteSpan>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::ByteSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AvailableSensors::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AvailableSensors
+namespace EnabledSensors {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::ByteSpan>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::ByteSpan>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::ByteSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EnabledSensors::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace EnabledSensors
+namespace NumberOfSensorScheduleTransitions {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfSensorScheduleTransitions::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NumberOfSensorScheduleTransitions
+namespace SensorSchedule {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::Thermostat::Structs::SensorScheduleTransitionStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::Thermostat::Structs::SensorScheduleTransitionStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::Thermostat::Structs::SensorScheduleTransitionStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SensorSchedule::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SensorSchedule
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -947,6 +1011,12 @@ struct TypeInfo
         Attributes::ThermostatSuggestions::TypeInfo::DecodableType thermostatSuggestions;
         Attributes::CurrentThermostatSuggestion::TypeInfo::DecodableType currentThermostatSuggestion;
         Attributes::ThermostatSuggestionNotFollowingReason::TypeInfo::DecodableType thermostatSuggestionNotFollowingReason;
+        Attributes::Sensors::TypeInfo::DecodableType sensors;
+        Attributes::AvailableSensors::TypeInfo::DecodableType availableSensors;
+        Attributes::EnabledSensors::TypeInfo::DecodableType enabledSensors;
+        Attributes::NumberOfSensorScheduleTransitions::TypeInfo::DecodableType numberOfSensorScheduleTransitions =
+            static_cast<uint8_t>(0);
+        Attributes::SensorSchedule::TypeInfo::DecodableType sensorSchedule;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
