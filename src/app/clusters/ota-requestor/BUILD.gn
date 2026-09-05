@@ -44,3 +44,44 @@ source_set("interface") {
     "OTARequestorUserConsentDelegate.h",
   ]
 }
+
+# Default implementations of OTARequestor + Driver. Separated from the cluster
+# itself so test targets can depend on them without pulling examples-only paths.
+#
+# BDXDownloader.cpp IS included here because DefaultOTARequestor.cpp calls
+# non-inline BDXDownloader methods (e.g. SetBDXParams, BeginPrepareDownload);
+# any consumer of this source_set would otherwise fail to link. Today the only
+# consumer is the OTA requestor test target, which previously had to repeat
+# BDXDownloader.cpp in its own sources to compensate for the missing producer.
+# Examples build BDXDownloader.cpp via app_config_dependent_sources / their own
+# example BUILD rules and do NOT depend on this source_set, so there is no
+# duplicate-symbol path through it.
+#
+# DefaultOTARequestorStorage.cpp is intentionally NOT included here: it is
+# already compiled into nRF/Zephyr native-sim test builds via legacy paths
+# (app_config_dependent_sources), so adding it to a source_set causes
+# duplicate-symbol link errors. Tests that need the storage class can either
+# pull it in directly via test sources or rely on the existing legacy-path
+# compilation.
+source_set("default-ota-requestor") {
+  sources = [
+    "BDXDownloader.cpp",
+    "BDXDownloader.h",
+    "DefaultOTARequestor.cpp",
+    "DefaultOTARequestor.h",
+    "DefaultOTARequestorDriver.cpp",
+    "DefaultOTARequestorDriver.h",
+    "DefaultOTARequestorUserConsent.h",
+  ]
+
+  public_deps = [
+    ":interface",
+    ":ota-requestor",
+    "${chip_root}/src/app",
+    "${chip_root}/src/app:user-consent",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/controller:interactions",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/protocols/bdx",
+  ]
+}
