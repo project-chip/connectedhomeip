@@ -156,7 +156,7 @@ protected:
     }
 
     /**
-     * One signaling request, from the first CASE attempt to the command's answer. The phase says
+     * One signaling request, from the first CASE attempt to the command's response. The phase says
      * which step is outstanding and therefore which callback is legitimate; exactly one request
      * exists at a time.
      */
@@ -169,7 +169,8 @@ protected:
             kConnecting,       // Awaiting a CASE session with the camera
             kCheckingProvider, // Reading the provided endpoint's ServerList for WebRTCTransportProvider
             kCreatingOffer,    // Awaiting the application's SDP offer
-            kInvoking,         // Command sent, awaiting the camera's answer
+            kInvoking,         // Command sent, awaiting the camera's response
+            kResponded,        // Camera responded successfully; completion awaits the exchange closing (OnDone)
         };
 
         enum class CommandType : uint8_t
@@ -209,16 +210,13 @@ protected:
 
         /**
          * Records the decoded ProvideOfferResponse: the camera-assigned session id and the video
-         * stream the camera selected. HasOfferResponse() separates "command answered" from every
-         * way the exchange can end without one.
+         * stream the camera selected.
          */
         void SetOfferResponse(uint16_t aWebRTCSessionId, const DataModel::Nullable<uint16_t> & aVideoStreamId)
         {
             mWebRTCSessionId       = aWebRTCSessionId;
             mResponseVideoStreamId = aVideoStreamId;
-            mHasOfferResponse      = true;
         }
-        bool HasOfferResponse() const { return mHasOfferResponse; }
         const DataModel::Nullable<uint16_t> & ResponseVideoStreamId() const { return mResponseVideoStreamId; }
 
         /**
@@ -277,7 +275,6 @@ protected:
         AvAnalysisWebRTCClient::Callback * mCallback = nullptr;
         CommandSender * mInvokedSender               = nullptr;
         bool mProviderFound                          = false;
-        bool mHasOfferResponse                       = false;
 
         // Sending the command
         SessionHolder mSessionHolder;
@@ -310,10 +307,17 @@ protected:
     CHIP_ERROR BuildProvideOffer(WebRTCTransportProvider::Commands::ProvideOffer::Type & aRequest) const;
 
     /**
-     * Sends the built ProvideOffer on the held session. The default body is the expected behavior;
+     * Fills an EndSession request for the session this request is about, with the Reason the
+     * AV Analysis cluster prescribes for DeactivateAnalysisStream: UserHangup.
+     */
+    CHIP_ERROR BuildEndSession(WebRTCTransportProvider::Commands::EndSession::Type & aRequest) const;
+
+    /**
+     * Send the built command on the held session. The default bodies are the expected behavior;
      * virtual only so unit tests can intercept the network boundary.
      */
     virtual CHIP_ERROR SendProvideOffer();
+    virtual CHIP_ERROR SendEndSession();
 
 private:
     // A session the camera assigned, tracked until it ends: routes its late signals to the
@@ -335,8 +339,52 @@ private:
     // Tracks the camera-assigned session, records it on the requestor cluster, and hands it to the
     // peer delegate; the offer request's success completion.
     CHIP_ERROR RegisterSession(uint16_t aWebRTCSessionId);
+    // The session is over on both nodes, so it leaves the requestor cluster, the peer
+    // delegate releases its connection, and the slot is free again.
+    void ReleaseSession(TrackedSession & aSession);
     void FinishRequest(Protocols::InteractionModel::Status aStatus, uint16_t aWebRTCSessionId);
     TrackedSession * FindTrackedSession(uint16_t aWebRTCSessionId);
+
+    /**
+     * Invokes aRequest on the held session with a fresh CommandSender, recording it as the
+     * request's sender and advancing to kInvoking; the command's outcome arrives through the
+     * CommandSender callbacks. A send that never left reclaims the sender, since its OnDone will
+     * never come.
+     */
+    template <typename RequestType>
+    CHIP_ERROR InvokeOnHeldSession(const RequestType & aRequest)
+    {
+        VerifyOrReturnError(mRequest.HasSession(), CHIP_ERROR_INCORRECT_STATE);
+
+        // A CommandSender may only be destroyed from its own OnDone, so it must not be replaced
+        // while a previous one's callbacks can still fire.
+        VerifyOrReturnError(!mCommandSender, CHIP_ERROR_INCORRECT_STATE);
+
+        auto session = mRequest.Session();
+        mCommandSender =
+            Platform::MakeUnique<CommandSender>(this, &mRequest.ExchangeManager(), /* aIsTimedRequest = */ false,
+                                                /* aSuppressResponse = */ false, session.Value()->AllowsLargePayload());
+        VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+        // Recorded before sending: a send can dispatch the interaction's completion synchronously,
+        // and that callback must already recognise this sender as ours.
+        mRequest.SetInvokedSender(mCommandSender.get());
+        mRequest.Advance(Request::Phase::kInvoking);
+
+        CommandPathParams commandPath{ mRequest.WebRTCEndpoint(), WebRTCTransportProvider::Id, RequestType::GetCommandId(),
+                                       CommandPathFlags::kEndpointIdValid };
+        CHIP_ERROR err = mCommandSender->AddRequestData(commandPath, aRequest);
+        if (err == CHIP_NO_ERROR)
+        {
+            err = mCommandSender->SendCommandRequest(session.Value());
+        }
+        if (err != CHIP_NO_ERROR)
+        {
+            mRequest.SetInvokedSender(nullptr);
+            mCommandSender.reset();
+        }
+        return err;
+    }
 
     static void OnDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     static void OnDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);

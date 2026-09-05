@@ -58,6 +58,14 @@ public:
     bool mSentAudioAbsent;
     bool mSentIceAbsent;
 
+    // The EndSession payload the client would have sent
+    int mEndSendAttempts = 0;
+    uint16_t mSentEndSessionId;
+    Globals::WebRTCEndReasonEnum mSentEndReason;
+
+    // Drives a pending EndSession request past CASE, as OnDeviceConnected would
+    CHIP_ERROR SendPendingEndSession() { return SendEndSession(); }
+
 protected:
     void EstablishSession(const ScopedNodeId & aCameraNode) override
     {
@@ -80,6 +88,19 @@ protected:
         mSentIceAbsent           = !request.ICEServers.HasValue() && !request.ICETransportPolicy.HasValue();
 
         // camera's answer arrives via the sender callbacks
+        CurrentRequest().Advance(Request::Phase::kInvoking);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR SendEndSession() override
+    {
+        mEndSendAttempts++;
+
+        WebRTCTransportProvider::Commands::EndSession::Type request;
+        ReturnErrorOnFailure(BuildEndSession(request));
+        mSentEndSessionId = request.webRTCSessionID;
+        mSentEndReason    = request.reason;
+
         CurrentRequest().Advance(Request::Phase::kInvoking);
         return CHIP_NO_ERROR;
     }
@@ -249,6 +270,21 @@ struct TestDefaultAvAnalysisWebRTCClient : public ::testing::Test
         mPeerDelegate.mLastOfferCallback->OnOfferReady(CHIP_NO_ERROR, "v=0 test offer"_span);
         FeedOfferResponse(aWebRTCSessionId);
         mClient.OnDone(static_cast<CommandSender *>(nullptr));
+    }
+
+    // Requests the end of a tracked session and sends the command, up to the camera's answer
+    void DriveToEndSessionSent(uint16_t aWebRTCSessionId)
+    {
+        ASSERT_EQ(mClient.EndSession(kCameraNode, kProviderEndpoint, aWebRTCSessionId, mCallback), CHIP_NO_ERROR);
+        ASSERT_EQ(mClient.SendPendingEndSession(), CHIP_NO_ERROR);
+    }
+
+    // Feeds the camera's status-only answer to EndSession into the client
+    void FeedEndSessionStatus(Status aStatus)
+    {
+        ConcreteCommandPath responsePath(kProviderEndpoint, WebRTCTransportProvider::Id,
+                                         WebRTCTransportProvider::Commands::EndSession::Id);
+        mClient.OnResponse(nullptr, responsePath, StatusIB(aStatus), nullptr);
     }
 
     // InterceptingWebRTCClient overrides EstablishSession.
@@ -461,6 +497,71 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, SessionSlotExhaustionIsResourceExhaust
     EXPECT_EQ(mCallback.mLastStatus, Status::ResourceExhausted);
     EXPECT_EQ(mPeerDelegate.mSessionsAssigned, kMaxSessions);
     EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), static_cast<size_t>(kMaxSessions));
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, EndSessionPayloadNamesTheSessionWithUserHangup)
+{
+    EstablishSessionWithId(55);
+    DriveToEndSessionSent(55);
+
+    ASSERT_EQ(mClient.mEndSendAttempts, 1);
+    EXPECT_EQ(mClient.mSentEndSessionId, 55);
+    EXPECT_EQ(mClient.mSentEndReason, Globals::WebRTCEndReasonEnum::kUserHangup); 
+    EXPECT_EQ(mCallback.mEndedCount, 0);                                          
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, ConfirmedEndReleasesTheSessionEverywhere)
+{
+    EstablishSessionWithId(55);
+    DriveToEndSessionSent(55);
+
+    FeedEndSessionStatus(Status::Success);
+    mClient.OnDone(static_cast<CommandSender *>(nullptr));
+
+    EXPECT_EQ(mCallback.mEndedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Success);
+    EXPECT_EQ(mCallback.mLastSession, 55);
+
+    // Gone from the requestor cluster, released by the application, no longer tracked
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 0u);
+    EXPECT_EQ(mPeerDelegate.mSessionsClosed, 1);
+    EXPECT_EQ(mPeerDelegate.mLastClosed, 55);
+    EXPECT_EQ(mClient.EndSession(kCameraNode, kProviderEndpoint, 55, mCallback), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // The slot is reusable
+    EstablishSessionWithId(56);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Success);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, CameraErrorOnEndSessionIsPropagatedAndKeepsTheSession)
+{
+    EstablishSessionWithId(55);
+    DriveToEndSessionSent(55);
+
+    // The camera refuses
+    mClient.OnError(static_cast<CommandSender *>(nullptr), StatusIB(Status::NotFound).ToChipError());
+    mClient.OnDone(static_cast<CommandSender *>(nullptr));
+
+    EXPECT_EQ(mCallback.mEndedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::NotFound);
+
+    // Nothing released: the session is still tracked and still recorded
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 1u);
+    EXPECT_EQ(mPeerDelegate.mSessionsClosed, 0);
+    EXPECT_EQ(mClient.EndSession(kCameraNode, kProviderEndpoint, 55, mCallback), CHIP_NO_ERROR);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AnUnansweredEndSessionExchangeFailsAndKeepsTheSession)
+{
+    EstablishSessionWithId(55);
+    DriveToEndSessionSent(55);
+
+    mClient.OnDone(static_cast<CommandSender *>(nullptr));
+
+    EXPECT_EQ(mCallback.mEndedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 1u);
+    EXPECT_EQ(mPeerDelegate.mSessionsClosed, 0);
 }
 
 } // namespace
