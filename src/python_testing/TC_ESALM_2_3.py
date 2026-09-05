@@ -56,6 +56,22 @@ _ALL_DEFINED_ALARM_BITS = 0
 for _alarm_bit in _A:
     _ALL_DEFINED_ALARM_BITS |= _alarm_bit
 
+# Simulate-trigger code per alarm, from the PIXIT Variable Values table of the test plan.
+# Step 10a selects the code corresponding to the latched bit under test.
+_BASE_TRIGGER = 0x00A1000000000000
+_SIMULATE_TRIGGER = {
+    _A.kOverVoltage: _BASE_TRIGGER | 0x01,
+    _A.kUnderVoltage: _BASE_TRIGGER | 0x03,
+    _A.kOverFrequency: _BASE_TRIGGER | 0x05,
+    _A.kUnderFrequency: _BASE_TRIGGER | 0x07,
+    _A.kOverPower: _BASE_TRIGGER | 0x09,
+    _A.kUnderPower: _BASE_TRIGGER | 0x0B,
+    _A.kOverCurrent: _BASE_TRIGGER | 0x0D,
+    _A.kUnderCurrent: _BASE_TRIGGER | 0x0F,
+    _A.kPowerImported: _BASE_TRIGGER | 0x11,
+    _A.kPowerExported: _BASE_TRIGGER | 0x13,
+}
+
 
 class TC_ESALM_2_3(MatterBaseTest):
 
@@ -73,29 +89,36 @@ class TC_ESALM_2_3(MatterBaseTest):
 
         self.step(1, "Commission DUT to TH", is_commissioning=True)
 
-        self.step(2, "TH reads AcceptedCommandList, Supported, and Mask", expectation="SUCCESS for each read.")
+        self.step(2, "TH reads AcceptedCommandList.", expectation="SUCCESS.")
         accepted_cmds = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.AcceptedCommandList)
+        has_modify = cmds.ModifyEnabledAlarms.command_id in accepted_cmds
+        has_reset = cmds.Reset.command_id in accepted_cmds
+
+        self.step("2a", "TH reads Supported.", expectation="DUT returns a map32 AlarmBitmap.")
         supported = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.Supported)
+
+        self.step("2b", "TH reads Mask. Store value as InitialMask.",
+                  expectation="DUT returns a map32 AlarmBitmap.")
         initial_mask = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.Mask)
 
-        has_modify = cmds.ModifyEnabledAlarms.command_id in accepted_cmds
-        has_reset = cmds.Reset.command_id in accepted_cmds
+        self.step("2c", "TH reads State.", expectation="DUT returns a map32 AlarmBitmap.")
+        initial_state = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attrs.State)
 
         attribute_list = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.AttributeList)
         has_latch = attrs.Latch.attribute_id in attribute_list
 
-        self.step(3, "TH sends ModifyEnabledAlarms with Mask = Supported (all supported alarms enabled)",
-                  expectation="SUCCESS.")
+        self.step(3, "TH sends ModifyEnabledAlarms with Mask set to Supported.", expectation="SUCCESS.")
         if has_modify:
             await self.send_single_cmd(cmd=cmds.ModifyEnabledAlarms(mask=supported), endpoint=endpoint)
         else:
             self.mark_current_step_skipped()
 
-        self.step(4, "TH reads Mask", expectation="DUT returns value equal to Supported.")
+        self.step(4, "TH reads Mask.", expectation="DUT returns a value equal to Supported.")
         if has_modify:
             mask_val = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.Mask)
@@ -103,13 +126,13 @@ class TC_ESALM_2_3(MatterBaseTest):
         else:
             self.mark_current_step_skipped()
 
-        self.step(5, "TH sends ModifyEnabledAlarms with Mask = 0 (all alarms disabled)", expectation="SUCCESS.")
+        self.step(5, "TH sends ModifyEnabledAlarms with Mask set to 0.", expectation="SUCCESS.")
         if has_modify:
             await self.send_single_cmd(cmd=cmds.ModifyEnabledAlarms(mask=0), endpoint=endpoint)
         else:
             self.mark_current_step_skipped()
 
-        self.step(6, "TH reads Mask", expectation="DUT returns 0.")
+        self.step(6, "TH reads Mask.", expectation="DUT returns 0.")
         if has_modify:
             mask_val = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.Mask)
@@ -117,45 +140,50 @@ class TC_ESALM_2_3(MatterBaseTest):
         else:
             self.mark_current_step_skipped()
 
-        self.step(7, "TH sends ModifyEnabledAlarms with Mask containing a bit not set in Supported",
-                  expectation="DUT returns INVALID_COMMAND: a Mask bit outside Supported is a constraint "
-                              "violation, so the command must be rejected. Mask read-back is unchanged.")
-        if has_modify:
-            invalid_bit = None
-            for alarm_bit in _A:
-                if not (supported & alarm_bit):
-                    invalid_bit = alarm_bit
-                    break
-            if invalid_bit is None:
-                # Every defined alarm bit is supported; fall back to the first reserved bit
-                # above the defined range, which is likewise outside Supported.
-                invalid_bit = 1 << _ALL_DEFINED_ALARM_BITS.bit_length()
+        unsupported_bit = None
+        for _bit in range(32):
+            _candidate = 1 << _bit
+            if (_candidate & _ALL_DEFINED_ALARM_BITS) and not (int(supported) & _candidate):
+                unsupported_bit = _candidate
+                break
+
+        self.step(7, "TH sends ModifyEnabledAlarms with Mask containing a bit not set in Supported.",
+                  expectation="DUT returns CONSTRAINT_ERROR or INVALID_COMMAND.")
+        if has_modify and unsupported_bit is not None:
             try:
                 await self.send_single_cmd(
-                    cmd=cmds.ModifyEnabledAlarms(mask=invalid_bit), endpoint=endpoint)
+                    cmd=cmds.ModifyEnabledAlarms(mask=unsupported_bit), endpoint=endpoint)
                 asserts.fail("Expected INVALID_COMMAND but command succeeded")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.InvalidCommand,
                                      f"Expected INVALID_COMMAND, got {e.status}")
-            mask_val = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.Mask)
-            asserts.assert_equal(mask_val, 0, "Mask changed after INVALID_COMMAND rejection")
         else:
             self.mark_current_step_skipped()
 
-        self.step(8, "TH sends ModifyEnabledAlarms with Mask = InitialMask (restore)",
-                  expectation="SUCCESS. Mask read-back equals InitialMask.")
+        self.step("7a", "TH reads Mask.", expectation="Mask is unchanged by the rejected command.")
+        if has_modify and unsupported_bit is not None:
+            mask_val = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attrs.Mask)
+            asserts.assert_equal(mask_val, 0, "Mask changed after a rejected ModifyEnabledAlarms")
+        else:
+            self.mark_current_step_skipped()
+
+        self.step(8, "TH sends ModifyEnabledAlarms with Mask set to InitialMask.", expectation="SUCCESS.")
         if has_modify:
             await self.send_single_cmd(cmd=cmds.ModifyEnabledAlarms(mask=initial_mask), endpoint=endpoint)
+        else:
+            self.mark_current_step_skipped()
+
+        self.step("8a", "TH reads Mask.", expectation="DUT returns a value equal to InitialMask.")
+        if has_modify:
             mask_val = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.Mask)
             asserts.assert_equal(mask_val, initial_mask, "Mask should equal InitialMask after restore")
         else:
             self.mark_current_step_skipped()
 
-        self.step(9, "If ModifyEnabledAlarms not in AcceptedCommandList: TH sends ModifyEnabledAlarms (0x01)",
-                  expectation="DUT returns UNSUPPORTED_COMMAND: a command absent from AcceptedCommandList "
-                              "must be rejected as unsupported.")
+        self.step(9, "IF ModifyEnabledAlarms is not in AcceptedCommandList: TH sends ModifyEnabledAlarms.",
+                  expectation="DUT returns UNSUPPORTED_COMMAND.")
         if not has_modify:
             try:
                 await self.send_single_cmd(cmd=cmds.ModifyEnabledAlarms(mask=0), endpoint=endpoint)
@@ -166,64 +194,80 @@ class TC_ESALM_2_3(MatterBaseTest):
         else:
             self.mark_current_step_skipped()
 
-        self.step(10, "If Reset supported and Latch supported: trigger latched alarm via TestEventTrigger; send Reset with that alarm bit",
-                  expectation="SUCCESS. State read-back has alarm bit cleared.")
-        if has_reset and has_latch:
-            await self.check_test_event_triggers_enabled()
-            trigger_code = self.user_params.get("PIXIT.ESALM.TEST_EVENT_TRIGGER", None)
-            if trigger_code is not None:
-                trigger_val = int(trigger_code, 0) if isinstance(trigger_code, str) else int(trigger_code)
-                await self.send_test_event_triggers(eventTrigger=trigger_val)
-                state = await self.read_single_attribute_check_success(
-                    endpoint=endpoint, cluster=cluster, attribute=attrs.State)
-                latch = await self.read_single_attribute_check_success(
-                    endpoint=endpoint, cluster=cluster, attribute=attrs.Latch)
-                triggered_bit = None
-                for bit in range(64):
-                    candidate = 1 << bit
-                    if (state & candidate) and (latch & candidate):
-                        triggered_bit = candidate
-                        break
-                if triggered_bit is not None:
-                    await self.send_single_cmd(cmd=cmds.Reset(alarms=triggered_bit), endpoint=endpoint)
-                    state_after = await self.read_single_attribute_check_success(
-                        endpoint=endpoint, cluster=cluster, attribute=attrs.State)
-                    asserts.assert_equal(state_after & triggered_bit, 0,
-                                         "Alarm bit still set in State after Reset")
-                else:
-                    self.mark_current_step_skipped()
-            else:
-                self.mark_current_step_skipped()
+        target_bit = None
+        self.step(10, "TH reads Latch. Store value as LatchBits and identify the lowest-numbered bit set.",
+                  expectation="DUT returns a map32 AlarmBitmap.")
+        if has_latch:
+            latch = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attrs.Latch)
+            for _bit in range(32):
+                _candidate = 1 << _bit
+                if int(latch) & _candidate & int(supported):
+                    target_bit = _candidate
+                    break
         else:
             self.mark_current_step_skipped()
 
-        self.step(11, "If Reset supported: send Reset with a bit not active in State",
-                  expectation="SUCCESS. State read-back unchanged.")
-        if has_reset:
+        can_latch_test = target_bit is not None and target_bit in _SIMULATE_TRIGGER and has_reset
+
+        self.step("10a", "TH sends the TestEventTrigger corresponding to TargetBit.", expectation="SUCCESS.")
+        if can_latch_test:
+            await self.send_test_event_triggers(eventTrigger=_SIMULATE_TRIGGER[target_bit])
+        else:
+            self.mark_current_step_skipped()
+
+        self.step("10b", "TH reads State.", expectation="TargetBit is set in State.")
+        if can_latch_test:
             state = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.State)
-            inactive_bit = None
-            supported_now = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.Supported)
-            for bit in range(64):
-                candidate = 1 << bit
-                if (supported_now & candidate) and not (state & candidate):
-                    inactive_bit = candidate
+            asserts.assert_true(int(state) & target_bit, "TargetBit should be set in State after the trigger")
+        else:
+            self.mark_current_step_skipped()
+
+        self.step("10c", "TH sends Reset with TargetBit set in the Alarms field.", expectation="SUCCESS.")
+        if can_latch_test:
+            await self.send_single_cmd(cmd=cmds.Reset(alarms=target_bit), endpoint=endpoint)
+        else:
+            self.mark_current_step_skipped()
+
+        self.step("10d", "TH reads State.", expectation="TargetBit is cleared in State.")
+        if can_latch_test:
+            state_after = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attrs.State)
+            asserts.assert_equal(int(state_after) & target_bit, 0,
+                                 "TargetBit should be cleared in State after Reset")
+        else:
+            self.mark_current_step_skipped()
+
+        inactive_bit = None
+        self.step(11, "TH sends Reset with a bit that is not active in State.", expectation="SUCCESS.")
+        state_before_11 = initial_state
+        if has_reset:
+            state_before_11 = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attrs.State)
+            for _bit in range(32):
+                _candidate = 1 << _bit
+                if (int(supported) & _candidate) and not (int(state_before_11) & _candidate):
+                    inactive_bit = _candidate
                     break
             if inactive_bit is not None:
                 await self.send_single_cmd(cmd=cmds.Reset(alarms=inactive_bit), endpoint=endpoint)
-                state_after = await self.read_single_attribute_check_success(
-                    endpoint=endpoint, cluster=cluster, attribute=attrs.State)
-                asserts.assert_equal(state_after, state,
-                                     "State must be unchanged after Reset with an inactive alarm bit")
             else:
                 self.mark_current_step_skipped()
         else:
             self.mark_current_step_skipped()
 
-        self.step(12, "If Reset not in AcceptedCommandList: TH sends Reset (0x00)",
-                  expectation="DUT returns UNSUPPORTED_COMMAND: a command absent from AcceptedCommandList "
-                              "must be rejected as unsupported.")
+        self.step("11a", "TH reads State.", expectation="State is unchanged.")
+        if has_reset and inactive_bit is not None:
+            state_after = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attrs.State)
+            asserts.assert_equal(state_after, state_before_11,
+                                 "State must be unchanged after Reset with an inactive alarm bit")
+        else:
+            self.mark_current_step_skipped()
+
+        self.step(12, "IF Reset is not in AcceptedCommandList: TH sends Reset (0x00).",
+                  expectation="DUT returns UNSUPPORTED_COMMAND.")
         if not has_reset:
             try:
                 await self.send_single_cmd(cmd=cmds.Reset(alarms=0), endpoint=endpoint)
