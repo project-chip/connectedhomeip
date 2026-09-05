@@ -29,7 +29,7 @@ from typing import Literal, Self
 from python_path import PythonPath
 
 with PythonPath("../../../../src/python_testing/matter_testing_infrastructure", relative_to=__file__):
-    from matter.testing.concurrency.context import TerminablePopen, TerminableResource, TerminableThread
+    from matter.testing.concurrency.context import TerminablePopen, TerminableResource, TerminableThread, with_annotated_exception
 
 log = logging.getLogger(__name__)
 
@@ -125,4 +125,5 @@ __all__ = [
     "TerminablePopen",
     "TerminableResource",
     "TerminableThread",
+    "with_annotated_exception",
 ]

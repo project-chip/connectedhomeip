@@ -78,7 +78,7 @@ class LinuxWorkerProcess(WorkerProcess):
 
         # Create a virtual /tmp.
         tmp_dir_default = self._config.tmp_dir_default
-        tmp_dir = self._config.tmp_dir_worker_base / str(self._config.id)
+        tmp_dir = self._config.tmp_dir_worker_base / str(self._config.process_id)
 
         if self._config.tmp_dir_clear:
             with contextlib.suppress(FileNotFoundError):
@@ -99,7 +99,7 @@ class LinuxWorkerProcess(WorkerProcess):
         commissioning_method = self._config.commissioning_method
 
         self.net_ns: IsolatedNetworkNamespace = exit_stack.enter_context(IsolatedNetworkNamespace(
-            index=self._config.id,
+            index=self._config.process_id,
             # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
             app_link_up=not commissioning_method.wifi_required,
             add_ula=not commissioning_method.thread_required,
