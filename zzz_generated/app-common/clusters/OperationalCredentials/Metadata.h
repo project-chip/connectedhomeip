@@ -17,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace OperationalCredentials {
 
-inline constexpr uint32_t kRevision = 2;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
 
@@ -49,6 +49,11 @@ namespace CurrentFabricIndex {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentFabricIndex::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace CurrentFabricIndex
+namespace PQCDeviceAttestationProfile {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(PQCDeviceAttestationProfile::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
+} // namespace PQCDeviceAttestationProfile
 constexpr std::array<DataModel::AttributeEntry, 6> kMandatoryMetadata = {
     NOCs::kMetadataEntry,
     Fabrics::kMetadataEntry,

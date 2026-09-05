@@ -17,6 +17,7 @@
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
 
 
 class AVANALYTestBase:
@@ -46,3 +47,84 @@ class AVANALYTestBase:
         value = await self.read_avanaly_attribute_expect_success(endpoint=endpoint, attribute=attribute)
         asserts.assert_equal(value, expected_value,
                              f"Unexpected '{attribute}' value - expected {expected_value}, was {value}")
+
+    async def send_enable_context_triggers_command(self, endpoint, context_triggers, expected_status: Status = Status.Success):
+        """Generate an EnableContextTriggers command executed on the cluster instance on the provided endpoint
+
+        Args:
+            context_triggers: The value of the ContextTriggers field that is sent
+            expected_status:  The status response to be matched, defaults to Success if a value is not provided.
+        """
+        try:
+            await self.send_single_cmd(cmd=Clusters.AvAnalysis.Commands.EnableContextTriggers(
+                contextTriggers=context_triggers),
+                endpoint=endpoint)
+
+            asserts.assert_equal(expected_status, Status.Success)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned on enabling context triggers")
+
+    async def send_disable_context_triggers_command(self, endpoint, context_triggers, expected_status: Status = Status.Success):
+        """Generate a DisableContextTriggers command executed on the cluster instance on the provided endpoint
+
+        Args:
+            context_triggers: The value of the ContextTriggers field that is sent
+            expected_status:  The status response to be matched, defaults to Success if a value is not provided.
+        """
+        try:
+            await self.send_single_cmd(cmd=Clusters.AvAnalysis.Commands.DisableContextTriggers(
+                contextTriggers=context_triggers),
+                endpoint=endpoint)
+
+            asserts.assert_equal(expected_status, Status.Success)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned on disabling context triggers")
+
+    async def get_zoneids_from_zone_management(self, endpoint) -> list[int]:
+        """Returns a list of ZoneIDs that are available from the ZoneManagament cluster on the target endpoint. If none are
+        present it will attempt to create one.
+
+        Returns:
+            list[int]:  the list of ZoneIDs that are found.  Will be empty if there are none.
+        """
+        zones = []
+        zoneIDs = []
+
+        # pull zone ids from Zone Management, if none, try to create
+        clusterZM = Clusters.Objects.ZoneManagement
+        attributesZM = clusterZM.Attributes
+        aFeatureMapZM = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=clusterZM, attribute=attributesZM.FeatureMap)
+        twoDCartSupported = aFeatureMapZM & clusterZM.Bitmaps.Feature.kTwoDimensionalCartesianZone
+        userDefinedSupported = aFeatureMapZM & clusterZM.Bitmaps.Feature.kUserDefined
+
+        zones = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=clusterZM, attribute=attributesZM.Zones)
+
+        if len(zones) >= 1:
+            for zone in zones:
+                zoneIDs.append(zone.zoneID)
+        else:
+            # None on the DUT, create one, but only if possible
+            if twoDCartSupported and userDefinedSupported:
+                # Form the Create request and send
+                zoneVertices = [
+                    clusterZM.Structs.TwoDCartesianVertexStruct(10, 10),
+                    clusterZM.Structs.TwoDCartesianVertexStruct(20, 10),
+                    clusterZM.Structs.TwoDCartesianVertexStruct(20, 20),
+                    clusterZM.Structs.TwoDCartesianVertexStruct(10, 20)
+                ]
+                zoneToCreate = clusterZM.Structs.TwoDCartesianZoneStruct(
+                    name="Zone1", use=clusterZM.Enums.ZoneUseEnum.kMotion, vertices=zoneVertices,
+                    color="#00FFFF")
+                createTwoDCartesianCmd = clusterZM.Commands.CreateTwoDCartesianZone(
+                    zone=zoneToCreate
+                )
+                cmdResponse = await self.send_single_cmd(endpoint=endpoint, cmd=createTwoDCartesianCmd)
+                asserts.assert_equal(type(cmdResponse), clusterZM.Commands.CreateTwoDCartesianZoneResponse,
+                                     "Incorrect response type")
+                asserts.assert_is_not_none(
+                    cmdResponse.zoneID, "CreateTwoDCartesianCmdResponse does not contain ZoneID")
+                zoneIDs.append(cmdResponse.zoneID)
+
+        return zoneIDs
