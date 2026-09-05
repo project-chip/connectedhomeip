@@ -61,6 +61,7 @@ class TC_SMOKECO_2_6(SmokeCoBaseTest):
 
     @async_test_body
     async def setup_test(self):
+        await self.smokeco_cluster_checks()
         super().setup_test()
         # ALARM PRIORITY
         # These PIXIT values might change depending of the manufacturer or also if one or both of the
