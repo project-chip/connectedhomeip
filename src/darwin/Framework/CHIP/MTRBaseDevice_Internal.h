@@ -34,6 +34,7 @@
 #include <system/SystemPacketBuffer.h>
 
 @class MTRDeviceController;
+@class MTRCommandWithRequiredResponse;
 
 // An AttestationResponse command needs to have an attestationChallenge
 // to make sense of the results.  Encode that with a profile-specific tag under
@@ -131,6 +132,21 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
                              logCall:(BOOL)logCall
                                queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion;
+
+/**
+ * Invoke commands as one batched Invoke Request Message. commands.count must be in
+ * [1, peer MaxPathsPerInvoke]. On success the completion gets one response per command in request
+ * order; on overall failure it is called once with nil values and an error.
+ */
+- (void)_invokeCommandBatch:(NSArray<MTRCommandWithRequiredResponse *> *)commands
+             timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+    serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                        logCall:(BOOL)logCall
+                          queue:(dispatch_queue_t)queue
+                     completion:(MTRDeviceResponseHandler)completion;
+
+- (void)_getRemoteMaxPathsPerInvokeWithQueue:(dispatch_queue_t)queue
+                                  completion:(void (^)(uint16_t maxPathsPerInvoke, NSError * _Nullable error))completion;
 
 /**
  * Like the public invokeCommandWithEndpointID but:

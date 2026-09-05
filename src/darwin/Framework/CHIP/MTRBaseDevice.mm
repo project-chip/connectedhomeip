@@ -23,6 +23,7 @@
 #import "MTRCluster.h"
 #import "MTRClusterStateCacheContainer_Internal.h"
 #import "MTRCluster_Internal.h"
+#import "MTRCommandWithRequiredResponse.h"
 #import "MTRDeviceDataValidation.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
@@ -1422,6 +1423,112 @@ exit:
     }
 }
 
+class NSObjectCommandBatchCallback final : public app::CommandSender::ExtendableCallback {
+public:
+    using OnResultsCallbackType = std::function<void(NSArray<MTRDeviceResponseValueDictionary> * results)>;
+    using OnErrorCallbackType = std::function<void(CHIP_ERROR aError)>;
+    using OnDoneCallbackType = std::function<void(app::CommandSender * commandSender)>;
+
+    NSObjectCommandBatchCallback(NSArray<MTRCommandPath *> * commandPaths, OnResultsCallbackType aOnResults,
+        OnErrorCallbackType aOnError)
+        : mCommandPaths(commandPaths)
+        , mResults([[NSMutableArray alloc] initWithCapacity:commandPaths.count])
+        , mOnResults(aOnResults)
+        , mOnError(aOnError)
+    {
+        for (NSUInteger i = 0; i < commandPaths.count; i++) {
+            [mResults addObject:[NSNull null]];
+        }
+    }
+
+    void SetOnDoneCallback(OnDoneCallbackType callback) { mOnDone = callback; }
+
+private:
+    void PlaceResult(Optional<uint16_t> commandRef, MTRDeviceResponseValueDictionary result)
+    {
+        NSUInteger index = commandRef.HasValue() ? commandRef.Value() : mFallbackIndex++;
+        if (index < mResults.count) {
+            mResults[index] = result;
+        } else {
+            MTR_LOG_ERROR("Batch invoke response references command index %llu but only %llu commands were sent; dropping it",
+                static_cast<unsigned long long>(index), static_cast<unsigned long long>(mResults.count));
+        }
+    }
+
+    void OnResponse(app::CommandSender * apCommandSender, const app::CommandSender::ResponseData & aResponseData) override
+    {
+        auto * path = [[MTRCommandPath alloc] initWithPath:aResponseData.path];
+        if (aResponseData.data != nullptr) {
+            MTRDataValueDictionaryDecodableType response;
+            CHIP_ERROR err = app::DataModel::Decode(*aResponseData.data, response);
+            if (err != CHIP_NO_ERROR) {
+                mError = err;
+                return;
+            }
+            NSDictionary<NSString *, id> * decoded = response.GetDecodedObject();
+            if (decoded != nil) {
+                PlaceResult(aResponseData.commandRef, @ { MTRCommandPathKey : path, MTRDataKey : decoded });
+            } else {
+                PlaceResult(aResponseData.commandRef, @ { MTRCommandPathKey : path });
+            }
+        } else if (aResponseData.statusIB.IsFailure()) {
+            PlaceResult(aResponseData.commandRef, @ {
+                MTRCommandPathKey : path,
+                MTRErrorKey : [MTRError errorForIMStatus:aResponseData.statusIB],
+            });
+        } else {
+            PlaceResult(aResponseData.commandRef, @ { MTRCommandPathKey : path });
+        }
+    }
+
+    void OnNoResponse(app::CommandSender * apCommandSender, const app::CommandSender::NoResponseData & aNoResponseData) override
+    {
+        uint16_t ref = aNoResponseData.commandRef;
+        auto * result = [[NSMutableDictionary alloc] init];
+        if (ref < mCommandPaths.count) {
+            result[MTRCommandPathKey] = mCommandPaths[ref];
+        }
+        result[MTRErrorKey] = [MTRError errorForCHIPErrorCode:CHIP_ERROR_TIMEOUT];
+        PlaceResult(MakeOptional(ref), result);
+    }
+
+    void OnError(const app::CommandSender * apCommandSender, const app::CommandSender::ErrorData & aErrorData) override
+    {
+        if (mError == CHIP_NO_ERROR) {
+            mError = aErrorData.error;
+        } else {
+            MTR_LOG_ERROR("Batch invoke got another error (%s) after (%s); keeping the first",
+                chip::ErrorStr(aErrorData.error), chip::ErrorStr(mError));
+        }
+    }
+
+    void OnDone(app::CommandSender * apCommandSender) override
+    {
+        if (mError != CHIP_NO_ERROR) {
+            mOnError(mError);
+        } else {
+            for (NSUInteger i = 0; i < mResults.count; i++) {
+                if (mResults[i] == [NSNull null]) {
+                    mResults[i] = @ {
+                        MTRCommandPathKey : mCommandPaths[i],
+                        MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE],
+                    };
+                }
+            }
+            mOnResults(mResults);
+        }
+        mOnDone(apCommandSender);
+    }
+
+    NSArray<MTRCommandPath *> * mCommandPaths;
+    NSMutableArray * mResults;
+    OnResultsCallbackType mOnResults;
+    OnErrorCallbackType mOnError;
+    OnDoneCallbackType mOnDone;
+    CHIP_ERROR mError = CHIP_NO_ERROR;
+    NSUInteger mFallbackIndex = 0;
+};
+
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
                           clusterID:(NSNumber *)clusterID
                           commandID:(NSNumber *)commandID
@@ -1562,6 +1669,131 @@ exit:
             return CHIP_NO_ERROR;
         });
     std::move(*bridge).DispatchAction(self, CommandHasLargePayload(static_cast<ClusterId>(clusterID.unsignedLongLongValue), static_cast<CommandId>(commandID.unsignedLongLongValue)));
+}
+
+- (void)_invokeCommandBatch:(NSArray<MTRCommandWithRequiredResponse *> *)commands
+             timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+    serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                        logCall:(BOOL)logCall
+                          queue:(dispatch_queue_t)queue
+                     completion:(MTRDeviceResponseHandler)completion
+{
+    commands = [[NSArray alloc] initWithArray:commands copyItems:YES];
+
+    serverSideProcessingTimeout = [serverSideProcessingTimeout copy];
+    if (serverSideProcessingTimeout != nil) {
+        serverSideProcessingTimeout = MTRClampedNumber(serverSideProcessingTimeout, @(0), @(UINT16_MAX));
+    }
+
+    timeoutMs = [timeoutMs copy];
+    if (timeoutMs != nil) {
+        timeoutMs = MTRClampedNumber(timeoutMs, @(1), @(UINT16_MAX));
+    }
+
+    if (logCall) {
+        MTR_LOG("%@ invoke batch of %llu commands: %@", self, static_cast<unsigned long long>(commands.count), commands);
+    }
+
+    auto * bridge = new MTRDataValueDictionaryCallbackBridge(queue, completion,
+        ^(ExchangeManager & exchangeManager, const SessionHandle & session, MTRDataValueDictionaryCallback successCb,
+            MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
+            uint16_t remoteMaxPaths = session->GetRemoteSessionParameters().GetMaxPathsPerInvoke();
+            VerifyOrReturnError(commands.count >= 1, CHIP_ERROR_INVALID_ARGUMENT,
+                MTR_LOG_ERROR("Batch invoke requires at least one command"));
+            VerifyOrReturnError(commands.count <= remoteMaxPaths, CHIP_ERROR_INVALID_ARGUMENT,
+                MTR_LOG_ERROR("Batch invoke of %llu commands exceeds peer MaxPathsPerInvoke %u",
+                    static_cast<unsigned long long>(commands.count), remoteMaxPaths));
+
+            auto * commandPaths = [[NSMutableArray alloc] initWithCapacity:commands.count];
+            for (MTRCommandWithRequiredResponse * command in commands) {
+                [commandPaths addObject:command.path];
+            }
+
+            auto onResultsCb = [successCb, bridge](NSArray<MTRDeviceResponseValueDictionary> * results) {
+                successCb(bridge, results);
+            };
+            auto onErrorCb = [failureCb, bridge](CHIP_ERROR aError) { failureCb(bridge, aError); };
+
+            auto decoder = chip::Platform::MakeUnique<NSObjectCommandBatchCallback>(commandPaths, onResultsCb, onErrorCb);
+            VerifyOrReturnError(decoder != nullptr, CHIP_ERROR_NO_MEMORY);
+
+            auto rawDecoderPtr = decoder.get();
+            auto onDoneCb = [rawDecoderPtr](app::CommandSender * commandSender) {
+                chip::Platform::Delete(commandSender);
+                chip::Platform::Delete(rawDecoderPtr);
+            };
+            decoder->SetOnDoneCallback(onDoneCb);
+
+            bool isTimedRequest = (timeoutMs != nil);
+            auto commandSender = chip::Platform::MakeUnique<app::CommandSender>(decoder.get(), &exchangeManager, isTimedRequest);
+            VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+            app::CommandSender::ConfigParameters configParams;
+            configParams.SetRemoteMaxPathsPerInvoke(remoteMaxPaths);
+            ReturnErrorOnFailure(commandSender->SetCommandSenderConfig(configParams));
+
+            uint16_t commandRef = 0;
+            for (MTRCommandWithRequiredResponse * command in commands) {
+                app::CommandPathParams commandPath = { static_cast<chip::EndpointId>([command.path.endpoint unsignedShortValue]), 0,
+                    static_cast<chip::ClusterId>([command.path.cluster unsignedLongValue]),
+                    static_cast<chip::CommandId>([command.path.command unsignedLongValue]), (app::CommandPathFlags::kEndpointIdValid) };
+
+                app::CommandSender::AddRequestDataParameters addRequestDataParams(
+                    (timeoutMs == nil) ? NullOptional : Optional<uint16_t>([timeoutMs unsignedShortValue]));
+                addRequestDataParams.SetCommandRef(commandRef);
+                id commandFields = command.commandFields ?: @{MTRTypeKey : MTRStructureValueType,
+                    MTRValueKey : @[]};
+                ReturnErrorOnFailure(commandSender->AddRequestData(
+                    commandPath, MTRDataValueDictionaryDecodableType(commandFields), addRequestDataParams));
+                ++commandRef;
+            }
+
+            Optional<System::Clock::Timeout> invokeTimeout;
+            if (serverSideProcessingTimeout != nil) {
+                auto serverTimeoutInSeconds = System::Clock::Seconds16(serverSideProcessingTimeout.unsignedShortValue);
+                invokeTimeout.SetValue(session->ComputeRoundTripTimeout(serverTimeoutInSeconds, true /*isFirstMessageOnExchange*/));
+            }
+            ReturnErrorOnFailure(commandSender->SendCommandRequest(session, invokeTimeout));
+
+            decoder.release();
+            commandSender.release();
+            return CHIP_NO_ERROR;
+        });
+    BOOL needsLargePayload = NO;
+    for (MTRCommandWithRequiredResponse * command in commands) {
+        if (CommandHasLargePayload(static_cast<ClusterId>([command.path.cluster unsignedLongLongValue]),
+                static_cast<CommandId>([command.path.command unsignedLongLongValue]))) {
+            needsLargePayload = YES;
+            break;
+        }
+    }
+    std::move(*bridge).DispatchAction(self, needsLargePayload);
+}
+
+- (void)_getRemoteMaxPathsPerInvokeWithQueue:(dispatch_queue_t)queue
+                                  completion:(void (^)(uint16_t maxPathsPerInvoke, NSError * _Nullable error))completion
+{
+    auto responseHandler = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+        if (error != nil) {
+            completion(1, error);
+            return;
+        }
+        NSNumber * maxPaths = values.firstObject[MTRValueKey];
+        completion(maxPaths.unsignedShortValue, nil);
+    };
+
+    auto * bridge = new MTRDataValueDictionaryCallbackBridge(queue, responseHandler,
+        ^(ExchangeManager & exchangeManager, const SessionHandle & session, MTRDataValueDictionaryCallback successCb,
+            MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
+            uint16_t maxPaths = session->GetRemoteSessionParameters().GetMaxPathsPerInvoke();
+            NSDictionary<NSString *, id> * maxPathsValue = @{
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @(maxPaths),
+            };
+            successCb(bridge, @[ maxPathsValue ]);
+            return CHIP_NO_ERROR;
+        });
+    std::move(*bridge).DispatchAction(self);
 }
 
 - (void)_invokeKnownCommandWithEndpointID:(NSNumber *)endpointID
