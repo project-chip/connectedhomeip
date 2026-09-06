@@ -282,6 +282,13 @@ class TC_ESALM_2_1(MatterBaseTest):
         else:
             self.mark_current_step_skipped()
 
+        # PowerImportThreshold is constrained to min maxOf(0, PowerExportThreshold + 1) and
+        # PowerExportThreshold to max minOf(0, PowerImportThreshold - 1), so import must exceed
+        # export, exactly as the over/under pairs above do.
+        if has_powerimp and has_powerexp and isinstance(power_import, int) and isinstance(power_export, int):
+            asserts.assert_greater_equal(power_import, power_export + 1,
+                                         "PowerImportThreshold must be >= PowerExportThreshold + 1")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
