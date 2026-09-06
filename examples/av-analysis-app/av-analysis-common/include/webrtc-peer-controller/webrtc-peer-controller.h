@@ -40,12 +40,17 @@ public:
     };
 
     /**
-     * Learns of peer connections that failed after their session was assigned
+     * Learns the status of peer connections after their session was assigned
      */
-    class FailureObserver
+    class PeerConnectionObserver
     {
     public:
-        virtual ~FailureObserver() = default;
+        virtual ~PeerConnectionObserver() = default;
+
+        /**
+         * The session's peer connection reached the Connected state
+         */
+        virtual void OnPeerConnectionConnected(uint16_t aWebRTCSessionId) = 0;
 
         /**
          * The session's peer connection reached the Failed or Closed state
@@ -53,7 +58,7 @@ public:
         virtual void OnPeerConnectionFailed(uint16_t aWebRTCSessionId) = 0;
     };
 
-    void SetFailureObserver(FailureObserver * aObserver) { mFailureObserver = aObserver; }
+    void SetPeerConnectionObserver(PeerConnectionObserver * aObserver) { mPeerConnectionObserver = aObserver; }
 
     /**
      * Applies the camera's SDP answer to the session's peer connection.
@@ -72,7 +77,7 @@ public:
     virtual std::vector<LocalICECandidate> TakeLocalCandidates(uint16_t aWebRTCSessionId) = 0;
 
 protected:
-    FailureObserver * mFailureObserver = nullptr;
+    PeerConnectionObserver * mPeerConnectionObserver = nullptr;
 };
 
 } // namespace app
