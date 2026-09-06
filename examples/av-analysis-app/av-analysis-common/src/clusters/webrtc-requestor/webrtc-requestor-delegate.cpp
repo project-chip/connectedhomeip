@@ -19,6 +19,8 @@
 #include "webrtc-requestor-delegate.h"
 
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <system/SystemLayer.h>
 
 namespace chip {
 namespace app {
@@ -39,7 +41,49 @@ CHIP_ERROR WebRTCRequestorDelegate::HandleAnswer(const Clusters::WebRTCTransport
     ChipLogProgress(AppServer, "AvAnalysisNode: Answer received for WebRTC session %u", aSession.id);
     ReturnErrorOnFailure(mPeerController->ApplyAnswer(aSession.id, aSdpAnswer));
     mWebRTCClient->NotifyAnswered(aSession.id);
+
+    // Our candidates go out on the next event-loop turn, so this command's status response reaches
+    // the camera before the ProvideICECandidates that follows it
+    const uint16_t sessionId = aSession.id;
+    CHIP_ERROR err           = DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() { SendLocalCandidates(sessionId); });
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "AvAnalysisNode: ICE candidate send not scheduled for WebRTC session %u: %" CHIP_ERROR_FORMAT,
+                     sessionId, err.Format());
+    }
     return CHIP_NO_ERROR;
+}
+
+void WebRTCRequestorDelegate::SendLocalCandidates(uint16_t aWebRTCSessionId)
+{
+    std::vector<WebRTCPeerController::LocalICECandidate> localCandidates = mPeerController->TakeLocalCandidates(aWebRTCSessionId);
+    VerifyOrReturn(!localCandidates.empty(),
+                   ChipLogError(AppServer, "AvAnalysisNode: no ICE candidates gathered for WebRTC session %u", aWebRTCSessionId));
+
+    // The structs reference the strings above, which outlive the send: the client copies them
+    std::vector<Clusters::Globals::Structs::ICECandidateStruct::Type> candidates;
+    candidates.reserve(localCandidates.size());
+    for (const auto & local : localCandidates)
+    {
+        auto & candidate    = candidates.emplace_back();
+        candidate.candidate = CharSpan(local.candidate.data(), local.candidate.size());
+        if (!local.sdpMid.empty())
+        {
+            candidate.SDPMid.SetNonNull(CharSpan(local.sdpMid.data(), local.sdpMid.size()));
+        }
+        // libdatachannel does not report the m-line index
+    }
+
+    ChipLogProgress(AppServer, "AvAnalysisNode: sending %u ICE candidates for WebRTC session %u",
+                    static_cast<unsigned>(candidates.size()), aWebRTCSessionId);
+    CHIP_ERROR err = mWebRTCClient->SendICECandidates(
+        aWebRTCSessionId, Span<const Clusters::Globals::Structs::ICECandidateStruct::Type>(candidates.data(), candidates.size()));
+    if (err != CHIP_NO_ERROR)
+    {
+        // Without our candidates the camera cannot connect; the failure surfaces through the media layer
+        ChipLogError(AppServer, "AvAnalysisNode: ICE candidates not sent for WebRTC session %u: %" CHIP_ERROR_FORMAT,
+                     aWebRTCSessionId, err.Format());
+    }
 }
 
 CHIP_ERROR
