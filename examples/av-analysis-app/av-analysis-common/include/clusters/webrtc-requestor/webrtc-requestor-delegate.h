@@ -50,6 +50,9 @@ public:
                          Clusters::WebRTCTransportRequestor::WebRTCEndReasonEnum aReason) override;
 
 private:
+    // Sends the candidates gathered for the session to its camera, the trickle phase after the Answer
+    void SendLocalCandidates(uint16_t aWebRTCSessionId);
+
     WebRTCPeerController * mPeerController                  = nullptr;
     Clusters::DefaultAvAnalysisWebRTCClient * mWebRTCClient = nullptr;
 };
