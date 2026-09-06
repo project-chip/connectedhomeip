@@ -256,9 +256,16 @@ def check_transport_matches_build(proxy_app: str, transport: str, proxy_ble: boo
                     "(TC_COMPRO_2_8 step 10), so use a %s-only build to test that leg alone.",
                     proxy_app, ", ".join(sorted(extra)), transport)
 
-    # --ble-controller exists only in a build with BLE, and passing an option the
-    # application does not know is fatal to it.
-    return Transport.BLE in built and proxy_ble
+    if Transport.BLE not in built:
+        # --ble-controller does not exist in a build without BLE, and passing an
+        # option the application does not know is fatal to it.
+        return False
+    if not proxy_ble:
+        raise click.BadOptionUsage(
+            "no-proxy-ble",
+            f"{proxy_app} was built with BLE, so --no-proxy-ble is wrong: without "
+            "--ble-controller the proxy would share the end device's adapter.")
+    return True
 
 
 def declared_test_params(script: str) -> dict[str, int]:

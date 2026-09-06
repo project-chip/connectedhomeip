@@ -23,6 +23,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import threading
+import time
 from typing import TYPE_CHECKING, Any, TypeAlias
 
 import sdbus
@@ -66,6 +67,10 @@ class NANSimulator:
         # this a pair that appears at both moments is reported twice and the
         # same device turns up twice in one scan.
         self.announced: set[tuple[int, int]] = set()
+        # When each subscriber registered, so announce_publisher can leave a
+        # just-started one to its own discovery pass.
+        self.subscribed_at: dict[int, float] = {}
+        self._tasks: set[asyncio.Task] = set()
         self._lock = threading.Lock()
 
     def register_interface(self, name: str, interface: WpaSupplicantMock.WpaInterface):
@@ -82,6 +87,16 @@ class NANSimulator:
             self.publishers[publish_id] = (iface_name, args)
             log.debug("NANSimulator: Publisher started - iface=%s, pub_id=%d",
                       iface_name, publish_id)
+
+    def track_task(self, task: asyncio.Task) -> None:
+        """Hold a reference until the task finishes; the loop keeps only a weak one."""
+        self._tasks.add(task)
+        task.add_done_callback(self._tasks.discard)
+
+    def _subscriber_is_armed(self, subscribe_id: int) -> bool:
+        """Whether a subscriber has been running for at least the discovery delay."""
+        started = self.subscribed_at.get(subscribe_id)
+        return started is not None and (time.monotonic() - started) >= DISCOVERY_DELAY_S
 
     def on_publish_cancelled(self, publish_id: int):
         """Called when a publish session is cancelled."""
@@ -112,6 +127,10 @@ class NANSimulator:
             sub_iface = interfaces_copy.get(sub_iface_name)
             if sub_iface is None:
                 continue
+            # A subscriber that has just registered has not reached its own
+            # discovery pass yet; that pass will report this publisher.
+            if not self._subscriber_is_armed(sub_id):
+                continue
             self._match(sub_iface, sub_id, sub_args, sub_iface_name,
                         pub_iface, pub_id, pub_args, pub_iface_name)
 
@@ -119,6 +138,7 @@ class NANSimulator:
         """Called when an interface starts subscribing. Triggers discovery after delay."""
         with self._lock:
             self.subscribers[subscribe_id] = (iface_name, args)
+            self.subscribed_at[subscribe_id] = time.monotonic()
             log.debug("NANSimulator: Subscriber started - iface=%s, sub_id=%d",
                       iface_name, subscribe_id)
 
@@ -128,6 +148,7 @@ class NANSimulator:
     def on_subscribe_cancelled(self, subscribe_id: int):
         """Called when a subscribe session is cancelled."""
         if self.subscribers.pop(subscribe_id, None):
+            self.subscribed_at.pop(subscribe_id, None)
             self.announced = {pair for pair in self.announced if pair[0] != subscribe_id}
             log.debug("NANSimulator: Subscriber cancelled - sub_id=%d", subscribe_id)
 
@@ -349,12 +370,9 @@ class WpaSupplicantMock(TerminableThread):
         async def _note_caller(self) -> None:
             """Reset the association when a different application takes over.
 
-            A restarted application is a new client on the bus, and the interface
-            it inherits must look like a radio that has just come up: an
-            application that has forgotten its credentials must not still be
-            reachable over IP from the previous association. The alternative --
-            waiting for the old owner to say goodbye -- does not work, because a
-            process that is killed says nothing.
+            A restarted application must not still be reachable over IP from the
+            previous association. Waiting for the old owner to say goodbye does not
+            work: a killed process says nothing.
             """
             sender = self._current_sender()
             if sender is None or sender == self.owner:
@@ -369,15 +387,10 @@ class WpaSupplicantMock(TerminableThread):
         def _cancel_nan_sessions(self, current_owner: str) -> None:
             """Forget the NAN sessions of applications that have gone away.
 
-            A killed application cancels nothing, so its publish and subscribe
-            registrations would otherwise keep being matched: the restarted
-            application publishes under a new id and the same device is then
-            reported once per stale id in a single scan.
-
-            Only sessions belonging to another application are dropped. The
-            interface is not evidence of ownership: an application publishes
-            before it ever scans, so by the time a change of owner is noticed
-            the new owner's own sessions are already recorded here.
+            A killed application cancels nothing, so its stale registrations would
+            keep being matched and the device reported once per stale id. Only
+            another application's sessions are dropped: an application publishes
+            before it scans, so its own are already recorded here.
             """
             simulator = self.mock.nan_simulator
             stale = [session_id for session_id, session in self.nan_sessions.items()
@@ -451,10 +464,8 @@ class WpaSupplicantMock(TerminableThread):
         async def _leave_network(self) -> None:
             """Drop the association: report disconnected and take the link down.
 
-            Real wpa_supplicant loses the interface's addresses when it leaves a
-            network. Keeping them would let a device that believes it is not
-            provisioned still be reached over IP, which is exactly the path a
-            commissioning test needs closed.
+            Real wpa_supplicant loses the interface's addresses on leaving a network;
+            keeping them would leave an unprovisioned device reachable over IP.
             """
             if self.link is not None and self.associated:
                 self.link.down()
@@ -513,9 +524,9 @@ class WpaSupplicantMock(TerminableThread):
             if self.mock.nan_simulator and self.interface_name_in_sim:
                 self.mock.nan_simulator.on_publish_started(
                     self.interface_name_in_sim, publish_id, args_dict)
-                asyncio.create_task(
+                self.mock.nan_simulator.track_task(asyncio.create_task(
                     self.mock.nan_simulator.announce_publisher(
-                        self.interface_name_in_sim, publish_id, args_dict))
+                        self.interface_name_in_sim, publish_id, args_dict)))
 
             return publish_id
 

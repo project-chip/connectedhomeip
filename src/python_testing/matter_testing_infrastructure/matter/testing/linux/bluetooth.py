@@ -31,26 +31,11 @@ BLUEZ_SERVICE = "org.bluez"
 class BluetoothMock(TerminablePopen[str]):
     """Run a BlueZ mock server in a subprocess.
 
-    The mock exports a peer adapter as a discovered device the first time its
-    discovery sweep sees it advertising, and then keeps that device object for
-    the lifetime of the run: nothing removes it when the peer stops
-    advertising, and its RSSI never changes.  The SDK reports an already known
-    device again only when RSSI changes -- "the device is still in range", see
-    `ChipDeviceScanner::OnDevicePropertyChanged` -- so a device that stops
-    advertising and later comes back is never reported a second time, and a
-    scan in progress across a device restart misses it entirely.
-
-    To model BlueZ ageing a device out of its cache, each adapter's advertising
-    state is watched here, and a peer that starts advertising again after being
-    silent has its stale device object removed from the other adapters with
-    `org.bluez.Adapter1.RemoveDevice`.  The next discovery sweep then exports a
-    fresh object, which reaches the SDK as `InterfacesAdded`.  This is the same
-    call, for the same purpose, that `ChipDeviceScanner::StartScanImpl` makes
-    over every known device before it starts discovery.
-
-    A connected device is left alone: `RemoveDevice` disconnects it first,
-    which would tear down a live CHIPoBLE link at the point a peripheral stops
-    advertising to serve a connection.
+    The mock never re-reports a device: it exports one the first time it sees a
+    peer advertising and keeps it, and its RSSI never changes, so the SDK -- which
+    re-reports only on an RSSI change -- misses a peer that stops advertising and
+    comes back.  Advertising state is therefore watched here and stale device
+    objects evicted, so the next sweep exports a fresh one.
     """
 
     # The MAC addresses of the virtual Bluetooth adapters.
@@ -109,7 +94,12 @@ class BluetoothMock(TerminablePopen[str]):
         return f"/org/bluez/hci{adapter_index}/dev_" + self.ADAPTERS[peer_index].replace(":", "_")
 
     async def _forget_peer(self, peer_index: int) -> None:
-        """Remove cached device objects for a peer from every other adapter."""
+        """Remove cached device objects for a peer from every other adapter.
+
+        The same call `ChipDeviceScanner::StartScanImpl` makes to force fresh
+        reports. Connected devices are skipped: RemoveDevice disconnects first,
+        which would drop a live CHIPoBLE link.
+        """
         for adapter_index in range(len(self.ADAPTERS)):
             if adapter_index == peer_index:
                 continue

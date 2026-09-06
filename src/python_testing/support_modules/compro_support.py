@@ -577,13 +577,14 @@ class EDFixture:
         await asyncio.to_thread(self._process.start,
                                 expected_output=ready_pattern,
                                 timeout=self.APP_READY_TIMEOUT_S)
-        logger.info("ED fixture started locally (PID=%d, discriminator=%d)",
-                    self._process.p.pid, self._discriminator)
+        logger.info("ED fixture started locally (PID=%s, discriminator=%d)",
+                    self._process.p.pid if self._process.p else "unknown", self._discriminator)
 
     async def _stop_local(self):
         if self._process is None:
             return
-        logger.info("Stopping local ED fixture (PID=%d)", self._process.p.pid)
+        logger.info("Stopping local ED fixture (PID=%s)",
+                    self._process.p.pid if self._process.p else "unknown")
         await asyncio.to_thread(self._process.terminate)
         self._process = None
         await asyncio.sleep(1)
