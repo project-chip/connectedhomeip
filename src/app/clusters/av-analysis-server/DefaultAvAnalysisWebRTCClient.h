@@ -133,7 +133,7 @@ public:
      * Inbound session signals, forwarded by the application when the camera's Answer or End
      * arrives on its WebRTCTransportRequestor cluster, or its media layer observes a failure.
      */
-    void NotifyAnswered(uint16_t aWebRTCSessionId);
+    void NotifyConnected(uint16_t aWebRTCSessionId);
     void NotifyFailed(uint16_t aWebRTCSessionId);
     void NotifyEnded(uint16_t aWebRTCSessionId);
 

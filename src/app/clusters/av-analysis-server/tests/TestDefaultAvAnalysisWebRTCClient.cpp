@@ -633,11 +633,11 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, AnUnansweredEndSessionExchangeFailsAnd
     EXPECT_EQ(mPeerDelegate.mSessionsClosed, 1);
 }
 
-TEST_F(TestDefaultAvAnalysisWebRTCClient, AnsweredSessionIsReportedActiveAndStaysTracked)
+TEST_F(TestDefaultAvAnalysisWebRTCClient, ConnectedSessionIsReportedActiveAndStaysTracked)
 {
     EstablishSessionWithId(55);
 
-    mClient.NotifyAnswered(55);
+    mClient.NotifyConnected(55);
 
     EXPECT_EQ(mCallback.mActiveCount, 1);
     EXPECT_EQ(mCallback.mLastSession, 55);
@@ -687,7 +687,7 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, SignalsForUntrackedSessionsAreIgnored)
 {
     EstablishSessionWithId(55);
 
-    mClient.NotifyAnswered(99);
+    mClient.NotifyConnected(99);
     mClient.NotifyFailed(99);
     mClient.NotifyEnded(99);
 
@@ -704,7 +704,7 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, SignalsRouteToTheCallbackThatInitiated
     EstablishSessionWithId(56, otherCallback);
     ASSERT_EQ(otherCallback.mInitiatedCount, 1);
 
-    mClient.NotifyAnswered(56);
+    mClient.NotifyConnected(56);
     mClient.NotifyEnded(55);
 
     EXPECT_EQ(otherCallback.mActiveCount, 1);
@@ -803,7 +803,7 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, CancelReleasesEveryTrackedSessionSilen
     EXPECT_EQ(mClient.EndSession(kCameraNode, kProviderEndpoint, 55, mCallback), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Late signals for the forgotten sessions are ignored
-    mClient.NotifyAnswered(55);
+    mClient.NotifyConnected(55);
     mClient.NotifyEnded(56);
     EXPECT_EQ(mCallback.mActiveCount, 0);
     EXPECT_EQ(mCallback.mFailedCount, 0);

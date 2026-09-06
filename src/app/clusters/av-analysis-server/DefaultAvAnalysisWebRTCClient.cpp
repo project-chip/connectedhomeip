@@ -519,13 +519,12 @@ void DefaultAvAnalysisWebRTCClient::ReleaseSession(TrackedSession & aSession)
     aSession = TrackedSession{};
 }
 
-void DefaultAvAnalysisWebRTCClient::NotifyAnswered(uint16_t aWebRTCSessionId)
+void DefaultAvAnalysisWebRTCClient::NotifyConnected(uint16_t aWebRTCSessionId)
 {
     TrackedSession * session = FindTrackedSession(aWebRTCSessionId);
     VerifyOrReturn(session != nullptr,
-                   ChipLogProgress(Zcl, "AvAnalysisWebRTCClient: answer for untracked session %u ignored", aWebRTCSessionId));
+                   ChipLogProgress(Zcl, "AvAnalysisWebRTCClient: connection of untracked session %u ignored", aWebRTCSessionId));
 
-    // The Answer completes the signaling flow; the session stays tracked until it ends
     session->mCallback->OnSessionActive(aWebRTCSessionId);
 }
 
