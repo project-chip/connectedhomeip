@@ -48,6 +48,7 @@ public:
     // AvAnalysisWebRTCPeerDelegate
     CHIP_ERROR CreateOffer(OfferCallback & aCallback) override;
     void OnSessionAssigned(uint16_t aWebRTCSessionId) override;
+    void OnOfferAbandoned() override;
     void OnSessionClosed(uint16_t aWebRTCSessionId) override;
 
     // WebRTCPeerController inbound signaling
@@ -68,6 +69,8 @@ private:
 
     // A pending session always has a connection
     bool HasPendingSession() const { return mPendingSession.peerConnection != nullptr; }
+    // Closes the pending connection, if any, and clears the pending session
+    void ReleasePendingSession();
 
     // Created by CreateOffer; moves into mSessions once the camera assigns the id
     PeerSession mPendingSession;
