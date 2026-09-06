@@ -228,6 +228,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ExecuteEnableContextTriggersCommandTest)
     // Initially with no streams established, EnableContextTriggers must return InvalidInState
     auto response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, kCommandPath, commandData);
     ASSERT_TRUE(response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     ASSERT_EQ(response->GetStatusCode(), Protocols::InteractionModel::ClusterStatusCode(Status::InvalidInState));
 
     // Establish an analysis stream
@@ -238,6 +239,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ExecuteEnableContextTriggersCommandTest)
     // With a stream established, EnableContextTriggers should succeed
     response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, kCommandPath, commandData);
     ASSERT_TRUE(response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     ASSERT_TRUE(response.value().IsSuccess());
 }
 
@@ -398,6 +400,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ExecuteActivateAnalysisStreamCommandTest)
     commandData.analysisStreamID = 77;
     auto response                = mServer.GetLogic().HandleActivateAnalysisStream(commandHandler, kCommandPath, commandData);
     ASSERT_TRUE(response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     ASSERT_EQ(response->GetStatusCode(), Protocols::InteractionModel::ClusterStatusCode(Status::NotFound));
 
     Testing::MockCommandHandler establishHandler;
@@ -408,6 +411,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ExecuteActivateAnalysisStreamCommandTest)
     // Activating a PendingInitiation stream succeeds
     response = mServer.GetLogic().HandleActivateAnalysisStream(commandHandler, kCommandPath, commandData);
     ASSERT_TRUE(response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     ASSERT_TRUE(response.value().IsSuccess());
 
     // Stream state is now WebRTCActive
@@ -421,6 +425,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ExecuteActivateAnalysisStreamCommandTest)
     // Activating an already active stream returns InvalidInState
     response = mServer.GetLogic().HandleActivateAnalysisStream(commandHandler, kCommandPath, commandData);
     ASSERT_TRUE(response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     ASSERT_EQ(response->GetStatusCode(), Protocols::InteractionModel::ClusterStatusCode(Status::InvalidInState));
 }
 
@@ -435,6 +440,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ExecuteDeactivateAnalysisStreamCommandTest)
     commandData.analysisStreamID = 77;
     auto response                = mServer.GetLogic().HandleDeactivateAnalysisStream(commandHandler, kCommandPath, commandData);
     ASSERT_TRUE(response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     ASSERT_EQ(response->GetStatusCode(), Protocols::InteractionModel::ClusterStatusCode(Status::NotFound));
 
     Testing::MockCommandHandler establishHandler;
@@ -445,6 +451,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ExecuteDeactivateAnalysisStreamCommandTest)
     // Stream is in PendingInitiation: deactivating returns InvalidInState
     response = mServer.GetLogic().HandleDeactivateAnalysisStream(commandHandler, kCommandPath, commandData);
     ASSERT_TRUE(response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     ASSERT_EQ(response->GetStatusCode(), Protocols::InteractionModel::ClusterStatusCode(Status::InvalidInState));
 
     // Activate the stream first
@@ -453,11 +460,13 @@ TEST_F(TestRemoteAvAnalysisCluster, ExecuteDeactivateAnalysisStreamCommandTest)
     activateData.analysisStreamID = 0;
     auto activateResponse         = mServer.GetLogic().HandleActivateAnalysisStream(commandHandler, kActivatePath, activateData);
     ASSERT_TRUE(activateResponse.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     ASSERT_TRUE(activateResponse.value().IsSuccess());
 
     // Now deactivating the active stream succeeds and transitions back to PendingInitiation
     response = mServer.GetLogic().HandleDeactivateAnalysisStream(commandHandler, kCommandPath, commandData);
     ASSERT_TRUE(response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     ASSERT_TRUE(response.value().IsSuccess());
 
     Attributes::AnalysisStreams::TypeInfo::DecodableType streams;
@@ -470,6 +479,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ExecuteDeactivateAnalysisStreamCommandTest)
     // Deactivating again returns InvalidInState
     response = mServer.GetLogic().HandleDeactivateAnalysisStream(commandHandler, kCommandPath, commandData);
     ASSERT_TRUE(response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     ASSERT_EQ(response->GetStatusCode(), Protocols::InteractionModel::ClusterStatusCode(Status::InvalidInState));
 }
 
