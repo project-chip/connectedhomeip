@@ -28,6 +28,26 @@ namespace {
 
 constexpr int kVideoH264PayloadType = 96;
 
+const char * PeerConnectionStateName(rtc::PeerConnection::State aState)
+{
+    switch (aState)
+    {
+    case rtc::PeerConnection::State::New:
+        return "New";
+    case rtc::PeerConnection::State::Connecting:
+        return "Connecting";
+    case rtc::PeerConnection::State::Connected:
+        return "Connected";
+    case rtc::PeerConnection::State::Disconnected:
+        return "Disconnected";
+    case rtc::PeerConnection::State::Failed:
+        return "Failed";
+    case rtc::PeerConnection::State::Closed:
+        return "Closed";
+    }
+    return "Unknown";
+}
+
 // libdatachannel invokes its callbacks on its own threads; Matter state may only be touched on the
 // Matter thread. The peer connection is held weakly so a callback racing a teardown lapses.
 void ScheduleOnMatterThread(const std::weak_ptr<rtc::PeerConnection> & aWeakPeerConnection,
@@ -119,10 +139,9 @@ CHIP_ERROR WebRTCPeerManager::CreateOffer(OfferCallback & aCallback)
         });
     });
 
-    peerConnection->onStateChange([weakPeerConnection](rtc::PeerConnection::State aState) {
-        ScheduleOnMatterThread(weakPeerConnection, [aState](const std::shared_ptr<rtc::PeerConnection> &) {
-            // TODO: report Failed/Closed to the WebRTC client once it routes media-layer failures
-            ChipLogProgress(AppServer, "AvAnalysisNode: peer connection state %d", static_cast<int>(aState));
+    peerConnection->onStateChange([this, weakPeerConnection](rtc::PeerConnection::State aState) {
+        ScheduleOnMatterThread(weakPeerConnection, [this, aState](const std::shared_ptr<rtc::PeerConnection> & aConnection) {
+            OnPeerConnectionStateChanged(aConnection, aState);
         });
     });
 
@@ -224,20 +243,46 @@ std::vector<WebRTCPeerController::LocalICECandidate> WebRTCPeerManager::TakeLoca
     return candidates;
 }
 
+void WebRTCPeerManager::OnPeerConnectionStateChanged(const std::shared_ptr<rtc::PeerConnection> & aPeerConnection,
+                                                     rtc::PeerConnection::State aState)
+{
+    ChipLogProgress(AppServer, "AvAnalysisNode: peer connection state %s", PeerConnectionStateName(aState));
+
+    // Disconnected is left alone: it may recover, and libdatachannel moves on to Failed if it does not
+    VerifyOrReturn(aState == rtc::PeerConnection::State::Failed || aState == rtc::PeerConnection::State::Closed);
+    VerifyOrReturn(mFailureObserver != nullptr);
+
+    auto it = FindAssignedSession(aPeerConnection);
+    VerifyOrReturn(it != mSessions.end());
+
+    mFailureObserver->OnPeerConnectionFailed(it->first);
+}
+
+std::map<uint16_t, WebRTCPeerManager::PeerSession>::iterator
+WebRTCPeerManager::FindAssignedSession(const std::shared_ptr<rtc::PeerConnection> & aPeerConnection)
+{
+    for (auto it = mSessions.begin(); it != mSessions.end(); ++it)
+    {
+        if (it->second.peerConnection == aPeerConnection)
+        {
+            return it;
+        }
+    }
+    return mSessions.end();
+}
+
 WebRTCPeerManager::PeerSession * WebRTCPeerManager::FindSession(const std::shared_ptr<rtc::PeerConnection> & aPeerConnection)
 {
     if (mPendingSession.peerConnection == aPeerConnection)
     {
         return &mPendingSession;
     }
-    for (auto & entry : mSessions)
+    auto it = FindAssignedSession(aPeerConnection);
+    if (it == mSessions.end())
     {
-        if (entry.second.peerConnection == aPeerConnection)
-        {
-            return &entry.second;
-        }
+        return nullptr;
     }
-    return nullptr;
+    return &it->second;
 }
 
 } // namespace app

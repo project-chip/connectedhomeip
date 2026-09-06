@@ -27,17 +27,25 @@ namespace chip {
 namespace app {
 
 /**
- * Receives the camera's inbound WebRTC signaling commands (Answer, ICECandidates, End) for the
- * sessions this node initiates through the AV Analysis cluster's WebRTC client.
+ * Receives the camera's inbound WebRTC signaling commands (Answer, ICECandidates, End) and the peer
+ * connections' failures for the sessions this node initiates through the AV Analysis cluster's
+ * WebRTC client
  */
-class WebRTCRequestorDelegate : public Clusters::WebRTCTransportRequestor::Delegate
+class WebRTCRequestorDelegate : public Clusters::WebRTCTransportRequestor::Delegate, public WebRTCPeerController::FailureObserver
 {
 public:
     void Init(WebRTCPeerController * aPeerController, Clusters::DefaultAvAnalysisWebRTCClient * aWebRTCClient)
     {
         mPeerController = aPeerController;
         mWebRTCClient   = aWebRTCClient;
+        if (mPeerController != nullptr)
+        {
+            mPeerController->SetFailureObserver(this);
+        }
     }
+
+    // WebRTCPeerController::FailureObserver
+    void OnPeerConnectionFailed(uint16_t aWebRTCSessionId) override;
 
     CHIP_ERROR HandleOffer(const Clusters::WebRTCTransportRequestor::WebRTCSessionStruct & aSession,
                            const OfferArgs & aArgs) override;
