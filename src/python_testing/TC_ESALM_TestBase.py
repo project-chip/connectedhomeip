@@ -133,9 +133,7 @@ class ElectricalAlarmTestBaseHelper(MatterBaseTest):
             TestStep("12b", f"IF bit {bit} is latched and Reset is supported: TH waits up to 30 seconds "
                      "for a Notify event. Otherwise skip this step.",
                      notify_cleared),
-            TestStep("12c", f"IF bit {bit} is non-latched, or is latched and Reset is supported: TH reads "
-                     "from the DUT the State. Otherwise skip this step (a latched alarm cannot be cleared "
-                     "without Reset).",
+            TestStep("12c", "TH reads from the DUT the State.",
                      f"Verify that the DUT response contains a map32 AlarmBitmap with bit {bit} = 0."),
             TestStep(13, f"{trigger_cmd} for All Alarms Test Event Clear "
                      "(PIXIT.ESALM.TEST_EVENT_TRIGGER = 0x00A1_0000_0000_0000).",
@@ -296,14 +294,12 @@ class ElectricalAlarmTestBaseHelper(MatterBaseTest):
             else:
                 self.mark_current_step_skipped()
 
+        # Latch and the Reset command share the RESET feature as their conformance, so an alarm can
+        # only be latched on a DUT that also offers Reset. The alarm has therefore been cleared by
+        # one path or the other by now, and a DUT that still reports it set is not conformant.
         self.step("12c")
-        if is_latched and not has_reset:
-            # Nothing has cleared it: the condition went away but the latch holds and there
-            # is no Reset command to release it.
-            self.mark_current_step_skipped()
-        else:
-            asserts.assert_false(await self.read_state(endpoint) & alarm_bit,
-                                 f"{alarm_name} should be 0 in State by this point")
+        asserts.assert_false(await self.read_state(endpoint) & alarm_bit,
+                             f"{alarm_name} should be 0 in State by this point")
 
         self.step(13)
         await self.send_test_event_trigger(TRIGGER_ALL_CLEAR)
