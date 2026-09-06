@@ -126,17 +126,35 @@ class TC_ESALM_2_3(MatterBaseTest):
         else:
             self.mark_current_step_skipped()
 
-        self.step(5, "TH sends ModifyEnabledAlarms with Mask set to 0.", expectation="SUCCESS.")
+        # Alarm Base: "A server that is unable to enable a currently suppressed alarm, or is unable
+        # to suppress a currently enabled alarm SHALL respond with a status code of FAILURE". A
+        # server with a non-suppressible alarm is therefore conformant when it refuses this, and
+        # leaves Mask alone.
+        self.step(5, "TH sends ModifyEnabledAlarms with Mask set to 0.",
+                  expectation="SUCCESS, or FAILURE if the server cannot suppress a currently enabled alarm.")
+        suppressed = False
         if has_modify:
-            await self.send_single_cmd(cmd=cmds.ModifyEnabledAlarms(mask=0), endpoint=endpoint)
+            try:
+                await self.send_single_cmd(cmd=cmds.ModifyEnabledAlarms(mask=0), endpoint=endpoint)
+                suppressed = True
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Failure,
+                                     f"Expected SUCCESS or FAILURE for suppress-all, got {e.status}")
         else:
             self.mark_current_step_skipped()
 
-        self.step(6, "TH reads Mask.", expectation="DUT returns 0.")
+        self.step(6, "TH reads Mask. Store the value as MaskAfterDisable.",
+                  expectation="DUT returns 0 if step 5 succeeded, otherwise the value is unchanged.")
+        mask_after_disable = 0
         if has_modify:
-            mask_val = await self.read_single_attribute_check_success(
+            mask_after_disable = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.Mask)
-            asserts.assert_equal(mask_val, 0, "Mask should be 0 after ModifyEnabledAlarms(0)")
+            if suppressed:
+                asserts.assert_equal(mask_after_disable, 0,
+                                     "Mask should be 0 after ModifyEnabledAlarms(0)")
+            else:
+                asserts.assert_equal(mask_after_disable, supported,
+                                     "A refused ModifyEnabledAlarms must not change Mask")
         else:
             self.mark_current_step_skipped()
 
@@ -164,7 +182,8 @@ class TC_ESALM_2_3(MatterBaseTest):
         if has_modify and unsupported_bit is not None:
             mask_val = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.Mask)
-            asserts.assert_equal(mask_val, 0, "Mask changed after a rejected ModifyEnabledAlarms")
+            asserts.assert_equal(mask_val, mask_after_disable,
+                                 "Mask changed after a rejected ModifyEnabledAlarms")
         else:
             self.mark_current_step_skipped()
 
