@@ -372,20 +372,9 @@ void DefaultAvAnalysisWebRTCClient::OnDone(CommandSender * apCommandSender)
 
     if (mRequest.GetCommandType() == Request::CommandType::kEndSession)
     {
-        // Confirmed: the camera has released the session too, so it leaves this node entirely
-        if (mRequest.InPhase(Request::Phase::kResponded))
-        {
-            TrackedSession * session = FindTrackedSession(webRTCSessionId);
-            if (session != nullptr)
-            {
-                ReleaseSession(*session);
-            }
-            FinishRequest(Status::Success, webRTCSessionId);
-            return;
-        }
         // Unanswered (OnError already finished the request, making this a no-op, or the exchange
-        // timed out): the session stays tracked; the camera may still hold it
-        FinishRequest(Status::Failure, webRTCSessionId);
+        // timed out) is a failure
+        FinishRequest(mRequest.InPhase(Request::Phase::kResponded) ? Status::Success : Status::Failure, webRTCSessionId);
         return;
     }
 
@@ -507,11 +496,19 @@ void DefaultAvAnalysisWebRTCClient::FinishRequest(Status aStatus, uint16_t aWebR
     if (completed == Request::CommandType::kProvideOffer)
     {
         callback->OnSessionInitiated(aStatus, aWebRTCSessionId);
+        return;
     }
-    else
+
+    // Whatever became of the EndSession, this node is done with the session: a stream whose
+    // EndSession failed goes to Failure, whose only exit is a new session, so nothing could ever
+    // end this one again. Its peer connection closes with it; a camera that still holds the
+    // session ends it on its side once the peer is gone.
+    TrackedSession * session = FindTrackedSession(aWebRTCSessionId);
+    if (session != nullptr)
     {
-        callback->OnSessionEnded(aStatus, aWebRTCSessionId);
+        ReleaseSession(*session);
     }
+    callback->OnSessionEnded(aStatus, aWebRTCSessionId);
 }
 
 DefaultAvAnalysisWebRTCClient::TrackedSession * DefaultAvAnalysisWebRTCClient::FindTrackedSession(uint16_t aWebRTCSessionId)

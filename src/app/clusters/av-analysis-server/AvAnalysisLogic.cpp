@@ -1179,6 +1179,9 @@ void AvAnalysisServerLogic::OnSessionEnded(Status aStatus, uint16_t aWebRTCSessi
     }
     else
     {
+        // The client no longer tracks a session whose EndSession failed, so the entry refers to
+        // none; the endpoint stays populated until a deactivation or re-activation
+        entry->webRTCSessionID.SetNull();
         SetStreamState(*entry, AnalysisStreamStateEnum::kFailure);
     }
 

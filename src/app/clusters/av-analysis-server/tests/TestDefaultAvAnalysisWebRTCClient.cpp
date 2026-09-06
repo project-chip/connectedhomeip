@@ -537,7 +537,7 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, ConfirmedEndReleasesTheSessionEverywhe
     EXPECT_EQ(mCallback.mLastStatus, Status::Success);
 }
 
-TEST_F(TestDefaultAvAnalysisWebRTCClient, CameraErrorOnEndSessionIsPropagatedAndKeepsTheSession)
+TEST_F(TestDefaultAvAnalysisWebRTCClient, CameraErrorOnEndSessionIsPropagatedAndTheSessionIsStillReleased)
 {
     EstablishSessionWithId(55);
     DriveToEndSessionSent(55);
@@ -549,13 +549,19 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, CameraErrorOnEndSessionIsPropagatedAnd
     EXPECT_EQ(mCallback.mEndedCount, 1);
     EXPECT_EQ(mCallback.mLastStatus, Status::NotFound);
 
-    // Nothing released: the session is still tracked and still recorded
-    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 1u);
-    EXPECT_EQ(mPeerDelegate.mSessionsClosed, 0);
-    EXPECT_EQ(mClient.EndSession(kCameraNode, kProviderEndpoint, 55, mCallback), CHIP_NO_ERROR);
+    // The stream goes to Failure, from which nothing could end this session again: released
+    // everywhere rather than left occupying a slot
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 0u);
+    EXPECT_EQ(mPeerDelegate.mSessionsClosed, 1);
+    EXPECT_EQ(mPeerDelegate.mLastClosed, 55);
+    EXPECT_EQ(mClient.EndSession(kCameraNode, kProviderEndpoint, 55, mCallback), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // The slot is reusable by the re-activation that follows
+    EstablishSessionWithId(56);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Success);
 }
 
-TEST_F(TestDefaultAvAnalysisWebRTCClient, AnUnansweredEndSessionExchangeFailsAndKeepsTheSession)
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AnUnansweredEndSessionExchangeFailsAndStillReleasesTheSession)
 {
     EstablishSessionWithId(55);
     DriveToEndSessionSent(55);
@@ -564,8 +570,8 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, AnUnansweredEndSessionExchangeFailsAnd
 
     EXPECT_EQ(mCallback.mEndedCount, 1);
     EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
-    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 1u);
-    EXPECT_EQ(mPeerDelegate.mSessionsClosed, 0);
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 0u);
+    EXPECT_EQ(mPeerDelegate.mSessionsClosed, 1);
 }
 
 TEST_F(TestDefaultAvAnalysisWebRTCClient, AnsweredSessionIsReportedActiveAndStaysTracked)

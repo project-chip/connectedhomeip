@@ -1023,6 +1023,15 @@ TEST_F(TestRemoteAvAnalysisCluster, DeactivateFailureMarksTheStreamFailed)
     ASSERT_TRUE(iter.Next());
     ASSERT_EQ(iter.GetValue().analysisStreamState, AnalysisStreamStateEnum::kFailure);
 
+    // The client is done with session 55, so the stream no longer refers to it: late signals for
+    // it change nothing
+    mFakeWebRTCClient.mLastCallback->OnSessionActive(55);
+    mFakeWebRTCClient.mLastCallback->OnSessionFailed(55);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::AnalysisStreams::Id, streams), CHIP_NO_ERROR);
+    iter = streams.begin();
+    ASSERT_TRUE(iter.Next());
+    ASSERT_EQ(iter.GetValue().analysisStreamState, AnalysisStreamStateEnum::kFailure);
+
     // Failure is an activatable state: the stream can be re-initiated
     ActivateStream(0, 2, 77);
     ASSERT_EQ(mFakeWebRTCClient.mSessionRequests, 2);
