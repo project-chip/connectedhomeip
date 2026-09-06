@@ -64,10 +64,7 @@ WebRTCPeerManager::WebRTCPeerManager()
 
 WebRTCPeerManager::~WebRTCPeerManager()
 {
-    if (HasPendingSession())
-    {
-        mPendingSession.peerConnection->close();
-    }
+    ReleasePendingSession();
     for (auto & entry : mSessions)
     {
         if (entry.second.peerConnection)
@@ -81,9 +78,8 @@ CHIP_ERROR WebRTCPeerManager::CreateOffer(OfferCallback & aCallback)
 {
     if (HasPendingSession())
     {
-        ChipLogProgress(AppServer, "AvAnalysisNode: releasing the peer connection of an abandoned offer");
-        mPendingSession.peerConnection->close();
-        mPendingSession = PeerSession{};
+        ChipLogError(AppServer, "AvAnalysisNode: an offer was still pending when the next was asked for");
+        ReleasePendingSession();
     }
 
     rtc::Configuration config;
@@ -153,6 +149,24 @@ void WebRTCPeerManager::OnSessionAssigned(uint16_t aWebRTCSessionId)
     ChipLogProgress(AppServer, "AvAnalysisNode: peer connection bound to WebRTC session %u", aWebRTCSessionId);
     mSessions[aWebRTCSessionId] = std::move(mPendingSession);
     mPendingSession             = PeerSession{}; // the move already nulled the connection; this flushes the rest
+}
+
+void WebRTCPeerManager::OnOfferAbandoned()
+{
+    // Nothing pending after a CreateOffer that failed before creating the connection
+    VerifyOrReturn(HasPendingSession());
+
+    ChipLogProgress(AppServer, "AvAnalysisNode: releasing the peer connection of an abandoned offer");
+    ReleasePendingSession();
+}
+
+void WebRTCPeerManager::ReleasePendingSession()
+{
+    if (HasPendingSession())
+    {
+        mPendingSession.peerConnection->close();
+    }
+    mPendingSession = PeerSession{};
 }
 
 void WebRTCPeerManager::OnSessionClosed(uint16_t aWebRTCSessionId)
