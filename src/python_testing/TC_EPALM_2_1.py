@@ -201,7 +201,10 @@ def _check_short_circuit_ratings_struct(s) -> None:
             matter_asserts.assert_valid_int64(value, f'{name} must be an int64')
             matter_asserts.assert_int_in_range(value, -MEASUREMENT_MAX - 1, MEASUREMENT_MAX, name)
     if s.tripMechanism is not None:
-        _check_current_trip_mechanism(s.tripMechanism)
+        # ShortCircuitRatingsStruct constrains TripMechanism to "all", unlike the same field on
+        # OverLoadRatingsStruct and ResidualCurrentFaultRatingsStruct, which are "min 1". A server
+        # reporting no bits set is conformant here, so the shared min-one-bit helper is not used.
+        _check_bitmap(s.tripMechanism, 'TripMechanism', cluster.Bitmaps.CurrentTripMechanismBitmap)
     if s.tripCurve is not None:
         _check_trip_curve(s.tripCurve)
 
