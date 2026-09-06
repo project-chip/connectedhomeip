@@ -88,11 +88,9 @@ CHIP_ERROR DefaultAvAnalysisCameraClient::StartRequest(Request::CommandType aCom
 
     mRequest.Begin(aCommandType, aVideoStreamId, aCallback);
 
-    const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(aCameraNode.GetFabricIndex());
-    if (fabricInfo != nullptr && fabricInfo->GetNodeId() == aCameraNode.GetNodeId())
-    {
         CHIP_ERROR err = DeviceLayer::SystemLayer().ScheduleLambda([this, aCommandType, aVideoStreamId]() {
-            uint16_t streamId = (aCommandType == Request::CommandType::kVideoStreamAllocate) ? 1 : aVideoStreamId;
+            static uint16_t sNextSelfAllocatedStreamId = 1;
+            uint16_t streamId = (aCommandType == Request::CommandType::kVideoStreamAllocate) ? sNextSelfAllocatedStreamId++ : aVideoStreamId;
             FinishRequest(Status::Success, streamId);
         });
         if (err != CHIP_NO_ERROR)
