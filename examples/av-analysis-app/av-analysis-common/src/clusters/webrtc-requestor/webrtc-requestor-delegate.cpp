@@ -39,8 +39,8 @@ CHIP_ERROR WebRTCRequestorDelegate::HandleAnswer(const Clusters::WebRTCTransport
     VerifyOrReturnError(mPeerController != nullptr && mWebRTCClient != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     ChipLogProgress(AppServer, "AvAnalysisNode: Answer received for WebRTC session %u", aSession.id);
+
     ReturnErrorOnFailure(mPeerController->ApplyAnswer(aSession.id, aSdpAnswer));
-    mWebRTCClient->NotifyAnswered(aSession.id);
 
     // Our candidates go out on the next event-loop turn, so this command's status response reaches
     // the camera before the ProvideICECandidates that follows it
@@ -113,6 +113,15 @@ CHIP_ERROR WebRTCRequestorDelegate::HandleEnd(const Clusters::WebRTCTransportReq
     // The client settles the stream state and releases the peer connection through OnSessionClosed
     mWebRTCClient->NotifyEnded(aSession.id);
     return CHIP_NO_ERROR;
+}
+
+void WebRTCRequestorDelegate::OnPeerConnectionConnected(uint16_t aWebRTCSessionId)
+{
+    VerifyOrReturn(mWebRTCClient != nullptr);
+
+    ChipLogProgress(AppServer, "AvAnalysisNode: peer connection of WebRTC session %u established", aWebRTCSessionId);
+    // The signaling flow is complete: the client marks the stream WebRTCActive
+    mWebRTCClient->NotifyConnected(aWebRTCSessionId);
 }
 
 void WebRTCRequestorDelegate::OnPeerConnectionFailed(uint16_t aWebRTCSessionId)

@@ -247,15 +247,22 @@ void WebRTCPeerManager::OnPeerConnectionStateChanged(const std::shared_ptr<rtc::
                                                      rtc::PeerConnection::State aState)
 {
     ChipLogProgress(AppServer, "AvAnalysisNode: peer connection state %s", PeerConnectionStateName(aState));
-
-    // Disconnected is left alone: it may recover, and libdatachannel moves on to Failed if it does not
-    VerifyOrReturn(aState == rtc::PeerConnection::State::Failed || aState == rtc::PeerConnection::State::Closed);
-    VerifyOrReturn(mFailureObserver != nullptr);
+    VerifyOrReturn(mPeerConnectionObserver != nullptr);
 
     auto it = FindAssignedSession(aPeerConnection);
     VerifyOrReturn(it != mSessions.end());
 
-    mFailureObserver->OnPeerConnectionFailed(it->first);
+    if (aState == rtc::PeerConnection::State::Connected)
+    {
+        mPeerConnectionObserver->OnPeerConnectionConnected(it->first);
+        return;
+    }
+
+    // Disconnected is left alone: it may recover, and libdatachannel moves on to Failed if it does not
+    if (aState == rtc::PeerConnection::State::Failed || aState == rtc::PeerConnection::State::Closed)
+    {
+        mPeerConnectionObserver->OnPeerConnectionFailed(it->first);
+    }
 }
 
 std::map<uint16_t, WebRTCPeerManager::PeerSession>::iterator
