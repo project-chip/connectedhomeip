@@ -75,6 +75,34 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::EndSession(const ScopedNodeId & aCamer
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DefaultAvAnalysisWebRTCClient::SendICECandidates(uint16_t aWebRTCSessionId,
+                                                            Span<const Globals::Structs::ICECandidateStruct::Type> aCandidates)
+{
+    // Candidates for a session this client tracks, routed to the camera that assigned it
+    TrackedSession * session = FindTrackedSession(aWebRTCSessionId);
+    VerifyOrReturnError(session != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!aCandidates.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(CanStartRequest());
+
+    mICECandidates.clear();
+    mICECandidates.reserve(aCandidates.size());
+    for (const auto & candidate : aCandidates)
+    {
+        BufferedICECandidate & buffered = mICECandidates.emplace_back();
+        buffered.candidate.assign(candidate.candidate.data(), candidate.candidate.size());
+        if (!candidate.SDPMid.IsNull())
+        {
+            buffered.sdpMid.emplace(candidate.SDPMid.Value().data(), candidate.SDPMid.Value().size());
+        }
+        buffered.sdpMLineIndex = candidate.SDPMLineIndex;
+    }
+
+    mRequest.BeginProvideICECandidates(session->cameraNode, session->providerEndpoint, aWebRTCSessionId);
+
+    EstablishSession(session->cameraNode);
+    return CHIP_NO_ERROR;
+}
+
 void DefaultAvAnalysisWebRTCClient::Cancel()
 {
     if (mRequest.InFlight())
@@ -92,6 +120,7 @@ void DefaultAvAnalysisWebRTCClient::Cancel()
         const bool offerRequested = mRequest.OfferRequested();
         mRequest.Reset();
         mOfferSdp.clear();
+        mICECandidates.clear();
         if (offerRequested)
         {
             mPeerDelegate->OnOfferAbandoned();
@@ -130,6 +159,17 @@ void DefaultAvAnalysisWebRTCClient::OnDeviceConnected(void * context, Messaging:
         if (endErr != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "AvAnalysisWebRTCClient: EndSession not sent: %" CHIP_ERROR_FORMAT, endErr.Format());
+            self->FinishRequest(Status::Failure, self->mRequest.WebRTCSessionId());
+        }
+        return;
+    }
+
+    if (self->mRequest.GetCommandType() == Request::CommandType::kProvideICECandidates)
+    {
+        CHIP_ERROR iceErr = self->SendProvideICECandidates();
+        if (iceErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "AvAnalysisWebRTCClient: ProvideICECandidates not sent: %" CHIP_ERROR_FORMAT, iceErr.Format());
             self->FinishRequest(Status::Failure, self->mRequest.WebRTCSessionId());
         }
         return;
@@ -310,6 +350,40 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::SendEndSession()
     return InvokeOnHeldSession(request);
 }
 
+CHIP_ERROR DefaultAvAnalysisWebRTCClient::BuildProvideICECandidates(
+    WebRTCTransportProvider::Commands::ProvideICECandidates::Type & aRequest,
+    std::vector<Globals::Structs::ICECandidateStruct::Type> & aCandidates) const
+{
+    VerifyOrReturnError(!mICECandidates.empty(), CHIP_ERROR_INCORRECT_STATE);
+
+    aCandidates.clear();
+    aCandidates.reserve(mICECandidates.size());
+    for (const BufferedICECandidate & buffered : mICECandidates)
+    {
+        Globals::Structs::ICECandidateStruct::Type & candidate = aCandidates.emplace_back();
+        candidate.candidate                                    = CharSpan(buffered.candidate.data(), buffered.candidate.size());
+        if (buffered.sdpMid.has_value())
+        {
+            candidate.SDPMid.SetNonNull(CharSpan(buffered.sdpMid->data(), buffered.sdpMid->size()));
+        }
+        candidate.SDPMLineIndex = buffered.sdpMLineIndex;
+    }
+
+    aRequest.webRTCSessionID = mRequest.WebRTCSessionId();
+    aRequest.ICECandidates =
+        DataModel::List<const Globals::Structs::ICECandidateStruct::Type>(aCandidates.data(), aCandidates.size());
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DefaultAvAnalysisWebRTCClient::SendProvideICECandidates()
+{
+    // Encoded by AddRequestData within InvokeOnHeldSession, so the list storage need only live this long
+    std::vector<Globals::Structs::ICECandidateStruct::Type> candidates;
+    WebRTCTransportProvider::Commands::ProvideICECandidates::Type request;
+    ReturnErrorOnFailure(BuildProvideICECandidates(request, candidates));
+    return InvokeOnHeldSession(request);
+}
+
 void DefaultAvAnalysisWebRTCClient::OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath,
                                                const StatusIB & aStatusIB, TLV::TLVReader * apData)
 {
@@ -318,9 +392,11 @@ void DefaultAvAnalysisWebRTCClient::OnResponse(CommandSender * apCommandSender, 
     VerifyOrReturn(mRequest.InPhase(Request::Phase::kInvoking),
                    ChipLogError(Zcl, "AvAnalysisWebRTCClient: a second response for a command already responded to"));
 
-    if (mRequest.GetCommandType() == Request::CommandType::kEndSession)
+    if (mRequest.GetCommandType() == Request::CommandType::kProvideICECandidates ||
+        mRequest.GetCommandType() == Request::CommandType::kEndSession)
     {
-        // EndSession is answered with a status alone; anything but SUCCESS arrives through OnError
+        // Answered with a status alone. Only a SUCCESS status reaches OnResponse; the CommandSender
+        // delivers every error status through OnError instead.
         VerifyOrReturn(aStatusIB.IsSuccess());
         mRequest.Advance(Request::Phase::kResponded);
         return;
@@ -370,10 +446,11 @@ void DefaultAvAnalysisWebRTCClient::OnDone(CommandSender * apCommandSender)
 
     const uint16_t webRTCSessionId = mRequest.WebRTCSessionId();
 
-    if (mRequest.GetCommandType() == Request::CommandType::kEndSession)
+    if (mRequest.GetCommandType() == Request::CommandType::kProvideICECandidates ||
+        mRequest.GetCommandType() == Request::CommandType::kEndSession)
     {
-        // Unanswered (OnError already finished the request, making this a no-op, or the exchange
-        // timed out) is a failure
+        // Status-only commands: unanswered (OnError already finished the request, making this a
+        // no-op, or the exchange timed out) is a failure
         FinishRequest(mRequest.InPhase(Request::Phase::kResponded) ? Status::Success : Status::Failure, webRTCSessionId);
         return;
     }
@@ -477,21 +554,35 @@ void DefaultAvAnalysisWebRTCClient::FailTrackedSession(uint16_t aWebRTCSessionId
 
 void DefaultAvAnalysisWebRTCClient::FinishRequest(Status aStatus, uint16_t aWebRTCSessionId)
 {
-    // TakeCallback() nulls the callback, so a second completion for the same request is a no-op
-    AvAnalysisWebRTCClient::Callback * callback = mRequest.TakeCallback();
-    VerifyOrReturn(callback != nullptr);
+    VerifyOrReturn(mRequest.InFlight());
 
-    const Request::CommandType completed = mRequest.GetCommandType();
+    const Request::CommandType completed        = mRequest.GetCommandType();
+    AvAnalysisWebRTCClient::Callback * callback = mRequest.TakeCallback();
     // An offer request failing after asking for the offer leaves the application a peer connection
     // that will never get a session
     const bool offerAbandoned = mRequest.OfferRequested() && aStatus != Status::Success;
     mRequest.Reset();
     mOfferSdp.clear();
+    mICECandidates.clear();
 
     if (offerAbandoned)
     {
         mPeerDelegate->OnOfferAbandoned();
     }
+
+    if (completed == Request::CommandType::kProvideICECandidates)
+    {
+        // Nobody awaits this outcome; a camera left without our candidates fails the connection,
+        // which the application reports through NotifyFailed
+        if (aStatus != Status::Success)
+        {
+            ChipLogError(Zcl, "AvAnalysisWebRTCClient: ProvideICECandidates for session %u failed with status 0x%02x",
+                         aWebRTCSessionId, to_underlying(aStatus));
+        }
+        return;
+    }
+
+    VerifyOrReturn(callback != nullptr);
 
     if (completed == Request::CommandType::kProvideOffer)
     {

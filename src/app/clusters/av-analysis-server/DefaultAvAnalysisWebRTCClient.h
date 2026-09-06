@@ -29,7 +29,9 @@
 #include <lib/support/ScopedMemoryBuffer.h>
 #include <transport/SessionHolder.h>
 
+#include <optional>
 #include <string>
+#include <vector>
 
 namespace chip {
 namespace app {
@@ -135,6 +137,11 @@ public:
     void NotifyFailed(uint16_t aWebRTCSessionId);
     void NotifyEnded(uint16_t aWebRTCSessionId);
 
+    /**
+     * Sends this node's ICE candidates for a tracked session to its camera with ProvideICECandidates
+     */
+    CHIP_ERROR SendICECandidates(uint16_t aWebRTCSessionId, Span<const Globals::Structs::ICECandidateStruct::Type> aCandidates);
+
     // CommandSender::Callback
     void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const StatusIB & aStatusIB,
                     TLV::TLVReader * apData) override;
@@ -182,6 +189,7 @@ protected:
         enum class CommandType : uint8_t
         {
             kProvideOffer,
+            kProvideICECandidates,
             kEndSession,
         };
 
@@ -209,14 +217,21 @@ protected:
         void BeginProvideOffer(const ScopedNodeId & aCameraNode, EndpointId aWebRTCEndpoint, uint16_t aVideoStreamId,
                                AvAnalysisWebRTCClient::Callback & aCallback)
         {
-            Begin(CommandType::kProvideOffer, aCameraNode, aWebRTCEndpoint, aCallback);
+            Begin(CommandType::kProvideOffer, aCameraNode, aWebRTCEndpoint, &aCallback);
             mVideoStreamId = aVideoStreamId;
+        }
+
+        // No callback, the outcome of a candidate send is logged only
+        void BeginProvideICECandidates(const ScopedNodeId & aCameraNode, EndpointId aWebRTCEndpoint, uint16_t aWebRTCSessionId)
+        {
+            Begin(CommandType::kProvideICECandidates, aCameraNode, aWebRTCEndpoint, nullptr);
+            mWebRTCSessionId = aWebRTCSessionId;
         }
 
         void BeginEndSession(const ScopedNodeId & aCameraNode, EndpointId aWebRTCEndpoint, uint16_t aWebRTCSessionId,
                              AvAnalysisWebRTCClient::Callback & aCallback)
         {
-            Begin(CommandType::kEndSession, aCameraNode, aWebRTCEndpoint, aCallback);
+            Begin(CommandType::kEndSession, aCameraNode, aWebRTCEndpoint, &aCallback);
             mWebRTCSessionId = aWebRTCSessionId;
         }
 
@@ -271,14 +286,14 @@ protected:
 
     private:
         void Begin(CommandType aCommandType, const ScopedNodeId & aCameraNode, EndpointId aWebRTCEndpoint,
-                   AvAnalysisWebRTCClient::Callback & aCallback)
+                   AvAnalysisWebRTCClient::Callback * aCallback)
         {
             Reset();
             mPhase          = Phase::kConnecting;
             mCommandType    = aCommandType;
             mCameraNode     = aCameraNode;
             mWebRTCEndpoint = aWebRTCEndpoint;
-            mCallback       = &aCallback;
+            mCallback       = aCallback;
         }
 
         // Request machinery
@@ -319,6 +334,14 @@ protected:
     CHIP_ERROR BuildProvideOffer(WebRTCTransportProvider::Commands::ProvideOffer::Type & aRequest) const;
 
     /**
+     * Fills a ProvideICECandidates request for the session this request is about, from the
+     * buffered candidates. The list references aCandidates, which the caller keeps alive until the
+     * request is encoded.
+     */
+    CHIP_ERROR BuildProvideICECandidates(WebRTCTransportProvider::Commands::ProvideICECandidates::Type & aRequest,
+                                         std::vector<Globals::Structs::ICECandidateStruct::Type> & aCandidates) const;
+
+    /**
      * Fills an EndSession request for the session this request is about, with the Reason the
      * AV Analysis cluster prescribes for DeactivateAnalysisStream: UserHangup.
      */
@@ -329,6 +352,7 @@ protected:
      * virtual only so unit tests can intercept the network boundary.
      */
     virtual CHIP_ERROR SendProvideOffer();
+    virtual CHIP_ERROR SendProvideICECandidates();
     virtual CHIP_ERROR SendEndSession();
 
 private:
@@ -411,7 +435,15 @@ private:
 
     Request mRequest;
 
+    // The payload of the request in flight, buffered for the asynchronous send
     std::string mOfferSdp;
+    struct BufferedICECandidate
+    {
+        std::string candidate;
+        std::optional<std::string> sdpMid; // absent encodes a null SDPMid
+        DataModel::Nullable<uint16_t> sdpMLineIndex;
+    };
+    std::vector<BufferedICECandidate> mICECandidates;
 
     // mReadCallback is declared before mReadClient on purpose: the ReadClient holds the callback by
     // reference, and members are destroyed in reverse declaration order, so the callback outlives it.

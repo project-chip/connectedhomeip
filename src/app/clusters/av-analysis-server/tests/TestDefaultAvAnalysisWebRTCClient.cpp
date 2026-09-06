@@ -66,6 +66,16 @@ public:
     // Drives a pending EndSession request past CASE, as OnDeviceConnected would
     CHIP_ERROR SendPendingEndSession() { return SendEndSession(); }
 
+    // The ProvideICECandidates payload the client would have sent
+    int mIceSendAttempts = 0;
+    uint16_t mSentIceSessionId;
+    std::vector<std::string> mSentCandidates;
+    std::vector<std::optional<std::string>> mSentMids;
+    std::vector<DataModel::Nullable<uint16_t>> mSentMLineIndexes;
+
+    // Drives a pending ProvideICECandidates request past CASE, as OnDeviceConnected would
+    CHIP_ERROR SendPendingICECandidates() { return SendProvideICECandidates(); }
+
 protected:
     void EstablishSession(const ScopedNodeId & aCameraNode) override
     {
@@ -100,6 +110,31 @@ protected:
         ReturnErrorOnFailure(BuildEndSession(request));
         mSentEndSessionId = request.webRTCSessionID;
         mSentEndReason    = request.reason;
+
+        CurrentRequest().Advance(Request::Phase::kInvoking);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR SendProvideICECandidates() override
+    {
+        mIceSendAttempts++;
+
+        std::vector<Globals::Structs::ICECandidateStruct::Type> storage;
+        WebRTCTransportProvider::Commands::ProvideICECandidates::Type request;
+        ReturnErrorOnFailure(BuildProvideICECandidates(request, storage));
+        mSentIceSessionId = request.webRTCSessionID;
+        mSentCandidates.clear();
+        mSentMids.clear();
+        mSentMLineIndexes.clear();
+        for (const auto & candidate : request.ICECandidates)
+        {
+            mSentCandidates.emplace_back(candidate.candidate.data(), candidate.candidate.size());
+            mSentMids.emplace_back(
+                candidate.SDPMid.IsNull()
+                    ? std::nullopt
+                    : std::optional<std::string>(std::string(candidate.SDPMid.Value().data(), candidate.SDPMid.Value().size())));
+            mSentMLineIndexes.push_back(candidate.SDPMLineIndex);
+        }
 
         CurrentRequest().Advance(Request::Phase::kInvoking);
         return CHIP_NO_ERROR;
@@ -289,6 +324,30 @@ struct TestDefaultAvAnalysisWebRTCClient : public ::testing::Test
         ConcreteCommandPath responsePath(kProviderEndpoint, WebRTCTransportProvider::Id,
                                          WebRTCTransportProvider::Commands::EndSession::Id);
         mClient.OnResponse(nullptr, responsePath, StatusIB(aStatus), nullptr);
+    }
+
+    // Two candidates as the application would hand them over: one with a mid, one without
+    static std::vector<Globals::Structs::ICECandidateStruct::Type> TwoCandidates()
+    {
+        std::vector<Globals::Structs::ICECandidateStruct::Type> candidates(2);
+        candidates[0].candidate = "candidate:1 1 UDP 2122252543 192.168.1.10 5000 typ host"_span;
+        candidates[0].SDPMid.SetNonNull("video"_span);
+        candidates[0].SDPMLineIndex.SetNonNull(static_cast<uint16_t>(0));
+        candidates[1].candidate = "candidate:2 1 UDP 1686052607 203.0.113.5 5000 typ srflx"_span;
+        candidates[1].SDPMid.SetNull();
+        candidates[1].SDPMLineIndex.SetNull();
+        return candidates;
+    }
+
+    // Requests a candidate send for a tracked session and sends the command, up to the camera's answer
+    void DriveToICECandidatesSent(uint16_t aWebRTCSessionId)
+    {
+        auto candidates = TwoCandidates();
+        ASSERT_EQ(
+            mClient.SendICECandidates(aWebRTCSessionId,
+                                      Span<const Globals::Structs::ICECandidateStruct::Type>(candidates.data(), candidates.size())),
+            CHIP_NO_ERROR);
+        ASSERT_EQ(mClient.SendPendingICECandidates(), CHIP_NO_ERROR);
     }
 
     // InterceptingWebRTCClient overrides EstablishSession.
@@ -752,6 +811,101 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, CancelReleasesEveryTrackedSessionSilen
     // The client is fully reusable
     EstablishSessionWithId(57);
     EXPECT_EQ(mCallback.mLastStatus, Status::Success);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, ICECandidatesForAnUntrackedSessionAreRejected)
+{
+    auto candidates = TwoCandidates();
+    EXPECT_EQ(
+        mClient.SendICECandidates(99, Span<const Globals::Structs::ICECandidateStruct::Type>(candidates.data(), candidates.size())),
+        CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(mClient.mConnectRequests, 0);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AnEmptyCandidateListIsRejected)
+{
+    EstablishSessionWithId(55);
+
+    EXPECT_EQ(mClient.SendICECandidates(55, Span<const Globals::Structs::ICECandidateStruct::Type>()), CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, ICECandidatesAreCopiedAndSentToTheSessionsCamera)
+{
+    EstablishSessionWithId(55);
+    const int connectsBefore = mClient.mConnectRequests;
+
+    {
+        // The caller's list dies before the send; the client must have copied it
+        auto candidates = TwoCandidates();
+        ASSERT_EQ(mClient.SendICECandidates(
+                      55, Span<const Globals::Structs::ICECandidateStruct::Type>(candidates.data(), candidates.size())),
+                  CHIP_NO_ERROR);
+    }
+    ASSERT_EQ(mClient.SendPendingICECandidates(), CHIP_NO_ERROR);
+
+    // Routed through the tracked session's camera
+    EXPECT_EQ(mClient.mConnectRequests, connectsBefore + 1);
+    EXPECT_EQ(mClient.mLastPeer, kCameraNode);
+
+    ASSERT_EQ(mClient.mIceSendAttempts, 1);
+    EXPECT_EQ(mClient.mSentIceSessionId, 55);
+    ASSERT_EQ(mClient.mSentCandidates.size(), 2u);
+    EXPECT_EQ(mClient.mSentCandidates[0], "candidate:1 1 UDP 2122252543 192.168.1.10 5000 typ host");
+    ASSERT_TRUE(mClient.mSentMids[0].has_value());
+    EXPECT_EQ(*mClient.mSentMids[0], "video");
+    ASSERT_FALSE(mClient.mSentMLineIndexes[0].IsNull());
+    EXPECT_EQ(mClient.mSentMLineIndexes[0].Value(), 0);
+    EXPECT_EQ(mClient.mSentCandidates[1], "candidate:2 1 UDP 1686052607 203.0.113.5 5000 typ srflx");
+    EXPECT_FALSE(mClient.mSentMids[1].has_value());
+    EXPECT_TRUE(mClient.mSentMLineIndexes[1].IsNull());
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AConfirmedCandidateSendCompletesSilentlyAndFreesTheClient)
+{
+    EstablishSessionWithId(55);
+    DriveToICECandidatesSent(55);
+    const int initiatedBefore = mCallback.mInitiatedCount;
+
+    ConcreteCommandPath responsePath(kProviderEndpoint, WebRTCTransportProvider::Id,
+                                     WebRTCTransportProvider::Commands::ProvideICECandidates::Id);
+    mClient.OnResponse(nullptr, responsePath, StatusIB(), nullptr);
+    mClient.OnDone(static_cast<CommandSender *>(nullptr));
+
+    // No callback is owed for candidates
+    EXPECT_EQ(mCallback.mInitiatedCount, initiatedBefore);
+    EXPECT_EQ(mCallback.mEndedCount, 0);
+    EXPECT_EQ(mCallback.mFailedCount, 0);
+
+    // The session is untouched and the client accepts the next request
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 1u);
+    EXPECT_EQ(mPeerDelegate.mSessionsClosed, 0);
+    EXPECT_EQ(mClient.EndSession(kCameraNode, kProviderEndpoint, 55, mCallback), CHIP_NO_ERROR);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, ACameraErrorOnCandidatesIsLoggedOnlyAndKeepsTheSession)
+{
+    EstablishSessionWithId(55);
+    DriveToICECandidatesSent(55);
+
+    mClient.OnError(static_cast<CommandSender *>(nullptr), StatusIB(Status::NotFound).ToChipError());
+    mClient.OnDone(static_cast<CommandSender *>(nullptr));
+
+    EXPECT_EQ(mCallback.mEndedCount, 0);
+    EXPECT_EQ(mCallback.mFailedCount, 0);
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 1u);
+    EXPECT_EQ(mPeerDelegate.mSessionsClosed, 0);
+    EXPECT_EQ(mClient.EndSession(kCameraNode, kProviderEndpoint, 55, mCallback), CHIP_NO_ERROR);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, CandidatesWhileAnotherRequestIsInFlightAreBusy)
+{
+    EstablishSessionWithId(55);
+    ASSERT_EQ(mClient.EndSession(kCameraNode, kProviderEndpoint, 55, mCallback), CHIP_NO_ERROR);
+
+    auto candidates = TwoCandidates();
+    EXPECT_EQ(
+        mClient.SendICECandidates(55, Span<const Globals::Structs::ICECandidateStruct::Type>(candidates.data(), candidates.size())),
+        CHIP_ERROR_BUSY);
 }
 
 } // namespace
