@@ -65,8 +65,13 @@ private:
         std::vector<LocalICECandidate> localCandidates;
     };
 
+    // The assigned session a given connection belongs to
+    std::map<uint16_t, PeerSession>::iterator FindAssignedSession(const std::shared_ptr<rtc::PeerConnection> & aPeerConnection);
     // The session a given connection belongs to: the pending one, or an assigned entry
     PeerSession * FindSession(const std::shared_ptr<rtc::PeerConnection> & aPeerConnection);
+    // A connection's state change, on the Matter thread
+    void OnPeerConnectionStateChanged(const std::shared_ptr<rtc::PeerConnection> & aPeerConnection,
+                                      rtc::PeerConnection::State aState);
 
     // A pending session always has a connection
     bool HasPendingSession() const { return mPendingSession.peerConnection != nullptr; }

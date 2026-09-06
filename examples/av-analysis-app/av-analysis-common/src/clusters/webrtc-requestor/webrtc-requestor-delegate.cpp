@@ -115,5 +115,14 @@ CHIP_ERROR WebRTCRequestorDelegate::HandleEnd(const Clusters::WebRTCTransportReq
     return CHIP_NO_ERROR;
 }
 
+void WebRTCRequestorDelegate::OnPeerConnectionFailed(uint16_t aWebRTCSessionId)
+{
+    VerifyOrReturn(mWebRTCClient != nullptr);
+
+    ChipLogError(AppServer, "AvAnalysisNode: peer connection of WebRTC session %u failed", aWebRTCSessionId);
+    // The client marks the stream Failure and releases the session, closing the peer connection
+    mWebRTCClient->NotifyFailed(aWebRTCSessionId);
+}
+
 } // namespace app
 } // namespace chip
