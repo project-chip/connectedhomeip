@@ -122,20 +122,16 @@ class ElectricalAlarmTestBaseHelper(MatterBaseTest):
             TestStep(9, f"IF bit {bit} of Latch is 0 (non-latched): TH awaits subscription report of a "
                      f"State value with bit {bit} cleared. Otherwise skip to step 11.",
                      report_cleared),
-            TestStep(10, f"IF bit {bit} of Latch is 0 (non-latched): TH waits up to 30 seconds for a "
-                     "Notify event. Otherwise skip to step 11.",
+            TestStep(10, "TH waits up to 30 seconds for a Notify event.",
                      notify_cleared),
             TestStep(11, f"IF bit {bit} of Latch is 1 (latched): TH reads from the DUT the State. "
                      "Otherwise skip to step 12c.",
                      f"Bit {bit} remains set in State (latched alarm persists until Reset)."),
-            TestStep(12, f"IF bit {bit} is latched and Reset is supported: TH sends command Reset with "
-                     f"bit {bit} set in the Alarms field. Otherwise skip to step 12c.",
+            TestStep(12, f"TH sends command Reset with bit {bit} set in the Alarms field.",
                      "Verify DUT responds w/ status SUCCESS(0x00)."),
-            TestStep("12a", f"IF bit {bit} is latched and Reset is supported: TH awaits subscription "
-                     f"report of a State value with bit {bit} cleared. Otherwise skip to step 12c.",
+            TestStep("12a", f"TH awaits subscription report of a State value with bit {bit} cleared.",
                      report_cleared),
-            TestStep("12b", f"IF bit {bit} is latched and Reset is supported: TH waits up to 30 seconds "
-                     "for a Notify event. Otherwise skip to step 12c.",
+            TestStep("12b", "TH waits up to 30 seconds for a Notify event.",
                      notify_cleared),
             TestStep("12c", "TH reads from the DUT the State.",
                      f"Verify that the DUT response contains a map32 AlarmBitmap with bit {bit} = 0."),
