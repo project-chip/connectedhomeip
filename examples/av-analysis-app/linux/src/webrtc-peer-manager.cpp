@@ -91,19 +91,30 @@ CHIP_ERROR WebRTCPeerManager::CreateOffer(OfferCallback & aCallback)
     OfferCallback * callback = &aCallback;
     peerConnection->onLocalDescription([this, weakPeerConnection, callback](rtc::Description aDescription) {
         std::string sdp(aDescription);
-        ScheduleOnMatterThread(weakPeerConnection, [this, callback, sdp](const std::shared_ptr<rtc::PeerConnection> & aConnection) {
-            // Only the pending connection's offer is awaited; a stale description is dropped
-            VerifyOrReturn(mPendingSession.peerConnection == aConnection);
-            callback->OnOfferReady(CHIP_NO_ERROR, CharSpan(sdp.data(), sdp.size()));
-        });
+        // Candidates gathered before the description was produced are embedded in it
+        std::vector<LocalICECandidate> embeddedCandidates;
+        for (const rtc::Candidate & candidate : aDescription.candidates())
+        {
+            embeddedCandidates.push_back({ std::string(candidate), candidate.mid() });
+        }
+        ScheduleOnMatterThread(weakPeerConnection,
+                               [this, callback, sdp, embeddedCandidates](const std::shared_ptr<rtc::PeerConnection> & aConnection) {
+                                   // Only the pending connection's offer is awaited; a stale description is dropped
+                                   VerifyOrReturn(mPendingSession.peerConnection == aConnection);
+                                   auto & localCandidates = mPendingSession.localCandidates;
+                                   localCandidates.insert(localCandidates.end(), embeddedCandidates.begin(),
+                                                          embeddedCandidates.end());
+                                   callback->OnOfferReady(CHIP_NO_ERROR, CharSpan(sdp.data(), sdp.size()));
+                               });
     });
 
     peerConnection->onLocalCandidate([this, weakPeerConnection](rtc::Candidate aCandidate) {
-        std::string candidate(aCandidate);
+        LocalICECandidate candidate{ std::string(aCandidate), aCandidate.mid() };
         ScheduleOnMatterThread(weakPeerConnection, [this, candidate](const std::shared_ptr<rtc::PeerConnection> & aConnection) {
             PeerSession * session = FindSession(aConnection);
             VerifyOrReturn(session != nullptr);
-            // TODO: trickle to the camera once the client supports sending ICE candidates
+            // Sent to the camera as one batch once its Answer has arrived; candidates gathered
+            // after that batch stay here, as the camera already has enough to connect
             session->localCandidates.push_back(candidate);
         });
     });
@@ -198,6 +209,19 @@ CHIP_ERROR WebRTCPeerManager::AddRemoteCandidate(uint16_t aWebRTCSessionId, cons
 
     it->second.peerConnection->addRemoteCandidate(rtc::Candidate(aCandidate));
     return CHIP_NO_ERROR;
+}
+
+std::vector<WebRTCPeerController::LocalICECandidate> WebRTCPeerManager::TakeLocalCandidates(uint16_t aWebRTCSessionId)
+{
+    auto it = mSessions.find(aWebRTCSessionId);
+    if (it == mSessions.end())
+    {
+        return {};
+    }
+
+    std::vector<LocalICECandidate> candidates = std::move(it->second.localCandidates);
+    it->second.localCandidates.clear();
+    return candidates;
 }
 
 WebRTCPeerManager::PeerSession * WebRTCPeerManager::FindSession(const std::shared_ptr<rtc::PeerConnection> & aPeerConnection)

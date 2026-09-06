@@ -19,6 +19,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include <app/clusters/av-analysis-server/DefaultAvAnalysisWebRTCClient.h>
 
@@ -31,6 +32,13 @@ namespace app {
 class WebRTCPeerController : public Clusters::AvAnalysisWebRTCPeerDelegate
 {
 public:
+    // An ICE candidate this node gathered, with the media section it belongs to
+    struct LocalICECandidate
+    {
+        std::string candidate;
+        std::string sdpMid;
+    };
+
     /**
      * Applies the camera's SDP answer to the session's peer connection.
      */
@@ -40,6 +48,12 @@ public:
      * Adds a remote ICE candidate trickled by the camera to the session's peer connection.
      */
     virtual CHIP_ERROR AddRemoteCandidate(uint16_t aWebRTCSessionId, const std::string & aCandidate) = 0;
+
+    /**
+     * Hands over the candidates the session's peer connection has gathered so far and forgets them,
+     * so each is sent to the camera once.
+     */
+    virtual std::vector<LocalICECandidate> TakeLocalCandidates(uint16_t aWebRTCSessionId) = 0;
 };
 
 } // namespace app
