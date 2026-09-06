@@ -42,8 +42,9 @@ AvAnalysisServerLogic::AvAnalysisServerLogic(
     EndpointId aEndpointId, BitFlags<Feature> aFeatures,
     const std::vector<Descriptor::Structs::SemanticTagStruct::Type> & aSupportedAmbientContexts,
     DataModel::Nullable<uint8_t> aMaxZones, uint8_t aMaxAnalysisStreamCount) :
-    mEndpointId(aEndpointId), mFeatures(aFeatures), mSupportedAmbientContexts(aSupportedAmbientContexts),
-    mMaxAnalysisStreamCount(aMaxAnalysisStreamCount), mMaxZones(aMaxZones)
+    mEndpointId(aEndpointId),
+    mFeatures(aFeatures), mSupportedAmbientContexts(aSupportedAmbientContexts), mMaxAnalysisStreamCount(aMaxAnalysisStreamCount),
+    mMaxZones(aMaxZones)
 {}
 
 AvAnalysisServerLogic::~AvAnalysisServerLogic()
