@@ -73,8 +73,15 @@ public:
     virtual void OnSessionAssigned(uint16_t aWebRTCSessionId) = 0;
 
     /**
-     * The session is over (deactivated, failed, or cancelled): the application releases the peer
-     * connection bound to this id.
+     * The offer most recently asked for will not become a session (the camera refused it, the
+     * exchange failed, the session could not be tracked, or the request was cancelled): the
+     * application releases the peer connection it created for it. Also follows a CreateOffer that
+     * returned an error, when there is nothing to release.
+     */
+    virtual void OnOfferAbandoned() = 0;
+
+    /**
+     * The session is over, the application releases the peer connection bound to this id.
      */
     virtual void OnSessionClosed(uint16_t aWebRTCSessionId) = 0;
 };
@@ -123,7 +130,6 @@ public:
     /**
      * Inbound session signals, forwarded by the application when the camera's Answer or End
      * arrives on its WebRTCTransportRequestor cluster, or its media layer observes a failure.
-     * A signal for a session this client does not track is ignored.
      */
     void NotifyAnswered(uint16_t aWebRTCSessionId);
     void NotifyFailed(uint16_t aWebRTCSessionId);
@@ -185,6 +191,12 @@ protected:
         void Advance(Phase aPhase) { mPhase = aPhase; }
 
         CommandType GetCommandType() const { return mCommandType; }
+        // True once an offer request has asked the application for an offer
+        bool OfferRequested() const
+        {
+            return mCommandType == CommandType::kProvideOffer &&
+                (mPhase == Phase::kCreatingOffer || mPhase == Phase::kInvoking || mPhase == Phase::kResponded);
+        }
         const ScopedNodeId & CameraNode() const { return mCameraNode; }
         EndpointId WebRTCEndpoint() const { return mWebRTCEndpoint; }
         uint16_t VideoStreamId() const { return mVideoStreamId; }
@@ -342,6 +354,8 @@ private:
     // The session is over on both nodes, so it leaves the requestor cluster, the peer
     // delegate releases its connection, and the slot is free again.
     void ReleaseSession(TrackedSession & aSession);
+    // Routes NotifyFailed/NotifyEnded,the tracked session is released
+    void FailTrackedSession(uint16_t aWebRTCSessionId);
     void FinishRequest(Protocols::InteractionModel::Status aStatus, uint16_t aWebRTCSessionId);
     TrackedSession * FindTrackedSession(uint16_t aWebRTCSessionId);
 

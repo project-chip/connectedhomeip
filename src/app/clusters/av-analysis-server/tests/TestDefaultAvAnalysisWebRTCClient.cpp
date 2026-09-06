@@ -147,6 +147,7 @@ class FakePeerDelegate : public AvAnalysisWebRTCPeerDelegate
 {
 public:
     int mOffersRequested   = 0;
+    int mOffersAbandoned   = 0;
     int mSessionsAssigned  = 0;
     int mSessionsClosed    = 0;
     uint16_t mLastAssigned = 0;
@@ -165,6 +166,7 @@ public:
         mSessionsAssigned++;
         mLastAssigned = aWebRTCSessionId;
     }
+    void OnOfferAbandoned() override { mOffersAbandoned++; }
     void OnSessionClosed(uint16_t aWebRTCSessionId) override
     {
         mSessionsClosed++;
@@ -230,9 +232,10 @@ struct TestDefaultAvAnalysisWebRTCClient : public ::testing::Test
     }
 
     // Drives a request up to the application's turn: CASE up, provider present, offer asked for
-    void DriveToOffer()
+    void DriveToOffer() { DriveToOffer(mCallback); }
+    void DriveToOffer(RecordingCallback & aCallback)
     {
-        ASSERT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, kVideoStreamId, mCallback), CHIP_NO_ERROR);
+        ASSERT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, kVideoStreamId, aCallback), CHIP_NO_ERROR);
         mClient.EnterProviderCheck();
         const ClusterId kProviderList[] = { WebRTCTransportProvider::Id };
         FeedServerList(mClient, kProviderEndpoint, Span<const ClusterId>(kProviderList));
@@ -263,9 +266,10 @@ struct TestDefaultAvAnalysisWebRTCClient : public ::testing::Test
     }
 
     // The full successful offer exchange, ending with the session tracked under aWebRTCSessionId
-    void EstablishSessionWithId(uint16_t aWebRTCSessionId)
+    void EstablishSessionWithId(uint16_t aWebRTCSessionId) { EstablishSessionWithId(aWebRTCSessionId, mCallback); }
+    void EstablishSessionWithId(uint16_t aWebRTCSessionId, RecordingCallback & aCallback)
     {
-        DriveToOffer();
+        DriveToOffer(aCallback);
         ASSERT_NE(mPeerDelegate.mLastOfferCallback, nullptr);
         mPeerDelegate.mLastOfferCallback->OnOfferReady(CHIP_NO_ERROR, "v=0 test offer"_span);
         FeedOfferResponse(aWebRTCSessionId);
@@ -506,8 +510,8 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, EndSessionPayloadNamesTheSessionWithUs
 
     ASSERT_EQ(mClient.mEndSendAttempts, 1);
     EXPECT_EQ(mClient.mSentEndSessionId, 55);
-    EXPECT_EQ(mClient.mSentEndReason, Globals::WebRTCEndReasonEnum::kUserHangup); 
-    EXPECT_EQ(mCallback.mEndedCount, 0);                                          
+    EXPECT_EQ(mClient.mSentEndReason, Globals::WebRTCEndReasonEnum::kUserHangup);
+    EXPECT_EQ(mCallback.mEndedCount, 0);
 }
 
 TEST_F(TestDefaultAvAnalysisWebRTCClient, ConfirmedEndReleasesTheSessionEverywhere)
@@ -562,6 +566,186 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, AnUnansweredEndSessionExchangeFailsAnd
     EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
     EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 1u);
     EXPECT_EQ(mPeerDelegate.mSessionsClosed, 0);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AnsweredSessionIsReportedActiveAndStaysTracked)
+{
+    EstablishSessionWithId(55);
+
+    mClient.NotifyAnswered(55);
+
+    EXPECT_EQ(mCallback.mActiveCount, 1);
+    EXPECT_EQ(mCallback.mLastSession, 55);
+    EXPECT_EQ(mCallback.mFailedCount, 0);
+
+    // Active is not over: still recorded, still held by the application, still endable
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 1u);
+    EXPECT_EQ(mPeerDelegate.mSessionsClosed, 0);
+    EXPECT_EQ(mClient.EndSession(kCameraNode, kProviderEndpoint, 55, mCallback), CHIP_NO_ERROR);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, CameraEndedSessionIsReportedFailedAndReleased)
+{
+    EstablishSessionWithId(55);
+
+    // The camera's End arrives on the requestor cluster, not as the outcome of our EndSession
+    mClient.NotifyEnded(55);
+
+    EXPECT_EQ(mCallback.mFailedCount, 1);
+    EXPECT_EQ(mCallback.mLastSession, 55);
+    EXPECT_EQ(mCallback.mEndedCount, 0);
+
+    // Released everywhere: no record, no peer connection, no longer endable
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 0u);
+    EXPECT_EQ(mPeerDelegate.mSessionsClosed, 1);
+    EXPECT_EQ(mPeerDelegate.mLastClosed, 55);
+    EXPECT_EQ(mClient.EndSession(kCameraNode, kProviderEndpoint, 55, mCallback), CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, MediaFailureIsReportedFailedAndReleased)
+{
+    EstablishSessionWithId(55);
+
+    mClient.NotifyFailed(55);
+
+    EXPECT_EQ(mCallback.mFailedCount, 1);
+    EXPECT_EQ(mCallback.mLastSession, 55);
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 0u);
+    EXPECT_EQ(mPeerDelegate.mSessionsClosed, 1);
+
+    // The slot is reusable
+    EstablishSessionWithId(56);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Success);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, SignalsForUntrackedSessionsAreIgnored)
+{
+    EstablishSessionWithId(55);
+
+    mClient.NotifyAnswered(99);
+    mClient.NotifyFailed(99);
+    mClient.NotifyEnded(99);
+
+    EXPECT_EQ(mCallback.mActiveCount, 0);
+    EXPECT_EQ(mCallback.mFailedCount, 0);
+    EXPECT_EQ(mPeerDelegate.mSessionsClosed, 0);
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 1u);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, SignalsRouteToTheCallbackThatInitiatedTheSession)
+{
+    RecordingCallback otherCallback;
+    EstablishSessionWithId(55);
+    EstablishSessionWithId(56, otherCallback);
+    ASSERT_EQ(otherCallback.mInitiatedCount, 1);
+
+    mClient.NotifyAnswered(56);
+    mClient.NotifyEnded(55);
+
+    EXPECT_EQ(otherCallback.mActiveCount, 1);
+    EXPECT_EQ(otherCallback.mFailedCount, 0);
+    EXPECT_EQ(mCallback.mActiveCount, 0);
+    EXPECT_EQ(mCallback.mFailedCount, 1);
+    EXPECT_EQ(mCallback.mLastSession, 55);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AnEstablishedSessionIsNotAnAbandonedOffer)
+{
+    EstablishSessionWithId(55);
+
+    EXPECT_EQ(mPeerDelegate.mOffersAbandoned, 0);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AnOfferTheCameraRefusesIsAbandoned)
+{
+    DriveToOffer();
+    ASSERT_NE(mPeerDelegate.mLastOfferCallback, nullptr);
+    mPeerDelegate.mLastOfferCallback->OnOfferReady(CHIP_NO_ERROR, "v=0 test offer"_span);
+    mClient.OnError(static_cast<CommandSender *>(nullptr), StatusIB(Status::ResourceExhausted).ToChipError());
+    mClient.OnDone(static_cast<CommandSender *>(nullptr));
+
+    EXPECT_EQ(mPeerDelegate.mOffersAbandoned, 1);
+    EXPECT_EQ(mCallback.mInitiatedCount, 1);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AnOfferLeftUnansweredIsAbandoned)
+{
+    DriveToOffer();
+    ASSERT_NE(mPeerDelegate.mLastOfferCallback, nullptr);
+    mPeerDelegate.mLastOfferCallback->OnOfferReady(CHIP_NO_ERROR, "v=0 test offer"_span);
+    mClient.OnDone(static_cast<CommandSender *>(nullptr));
+
+    EXPECT_EQ(mPeerDelegate.mOffersAbandoned, 1);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AnOfferTheApplicationCouldNotProduceIsAbandoned)
+{
+    DriveToOffer();
+    ASSERT_NE(mPeerDelegate.mLastOfferCallback, nullptr);
+    mPeerDelegate.mLastOfferCallback->OnOfferReady(CHIP_ERROR_INTERNAL, CharSpan());
+
+    // The application may have created the peer connection before failing to describe it
+    EXPECT_EQ(mPeerDelegate.mOffersAbandoned, 1);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AnUntrackableSessionAbandonsItsOffer)
+{
+    for (uint16_t id = 101; id < 101 + kMaxSessions; id++)
+    {
+        EstablishSessionWithId(id);
+    }
+    EstablishSessionWithId(200);
+
+    EXPECT_EQ(mCallback.mLastStatus, Status::ResourceExhausted);
+    EXPECT_EQ(mPeerDelegate.mOffersAbandoned, 1);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, ARequestFailingBeforeTheOfferAbandonsNothing)
+{
+    // No WebRTCTransportProvider on the endpoint: the application was never asked for an offer
+    ASSERT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, kVideoStreamId, mCallback), CHIP_NO_ERROR);
+    mClient.EnterProviderCheck();
+    mClient.OnDone(static_cast<ReadClient *>(nullptr));
+
+    EXPECT_EQ(mCallback.mLastStatus, Status::NotFound);
+    EXPECT_EQ(mPeerDelegate.mOffersRequested, 0);
+    EXPECT_EQ(mPeerDelegate.mOffersAbandoned, 0);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, CancelAbandonsThePendingOffer)
+{
+    DriveToOffer();
+    ASSERT_EQ(mPeerDelegate.mOffersRequested, 1);
+
+    mClient.Cancel();
+
+    EXPECT_EQ(mPeerDelegate.mOffersAbandoned, 1);
+    EXPECT_EQ(mCallback.mInitiatedCount, 0);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, CancelReleasesEveryTrackedSessionSilently)
+{
+    EstablishSessionWithId(55);
+    EstablishSessionWithId(56);
+
+    mClient.Cancel();
+
+    // Released everywhere, with no outcome delivered
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 0u);
+    EXPECT_EQ(mPeerDelegate.mSessionsClosed, 2);
+    EXPECT_EQ(mCallback.mFailedCount, 0);
+    EXPECT_EQ(mCallback.mEndedCount, 0);
+    EXPECT_EQ(mClient.EndSession(kCameraNode, kProviderEndpoint, 55, mCallback), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Late signals for the forgotten sessions are ignored
+    mClient.NotifyAnswered(55);
+    mClient.NotifyEnded(56);
+    EXPECT_EQ(mCallback.mActiveCount, 0);
+    EXPECT_EQ(mCallback.mFailedCount, 0);
+
+    // The client is fully reusable
+    EstablishSessionWithId(57);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Success);
 }
 
 } // namespace

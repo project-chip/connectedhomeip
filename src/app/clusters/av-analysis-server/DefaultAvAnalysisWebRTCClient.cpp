@@ -77,19 +77,35 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::EndSession(const ScopedNodeId & aCamer
 
 void DefaultAvAnalysisWebRTCClient::Cancel()
 {
-    VerifyOrReturn(mRequest.InFlight());
+    if (mRequest.InFlight())
+    {
+        // Deregister from a session establishment still in progress
+        mOnConnectedCallback.Cancel();
+        mOnConnectionFailureCallback.Cancel();
 
-    // Deregister from a session establishment still in progress
-    mOnConnectedCallback.Cancel();
-    mOnConnectionFailureCallback.Cancel();
+        // Abort a provider check or command exchange still in progress; callbacks die with them
+        ResetReadClient();
+        mCommandSender.reset();
 
-    // Abort a provider check or command exchange still in progress; callbacks die with them
-    ResetReadClient();
-    mCommandSender.reset();
+        // Forget the request without delivering a completion; the application drops the peer
+        // connection it may have created for it
+        const bool offerRequested = mRequest.OfferRequested();
+        mRequest.Reset();
+        mOfferSdp.clear();
+        if (offerRequested)
+        {
+            mPeerDelegate->OnOfferAbandoned();
+        }
+    }
 
-    // Forget the request without delivering a completion
-    mRequest.Reset();
-    mOfferSdp.clear();
+    // Forget the initiated sessions without delivering their outcomes
+    for (uint8_t i = 0; i < mMaxSessions; i++)
+    {
+        if (mSessions[i].inUse)
+        {
+            ReleaseSession(mSessions[i]);
+        }
+    }
 }
 
 CHIP_ERROR DefaultAvAnalysisWebRTCClient::CanStartRequest() const
@@ -437,10 +453,38 @@ void DefaultAvAnalysisWebRTCClient::ReleaseSession(TrackedSession & aSession)
     aSession = TrackedSession{};
 }
 
-// TODO: route the signal to the tracked session's callback
-void DefaultAvAnalysisWebRTCClient::NotifyAnswered(uint16_t aWebRTCSessionId) {}
-void DefaultAvAnalysisWebRTCClient::NotifyFailed(uint16_t aWebRTCSessionId) {}
-void DefaultAvAnalysisWebRTCClient::NotifyEnded(uint16_t aWebRTCSessionId) {}
+void DefaultAvAnalysisWebRTCClient::NotifyAnswered(uint16_t aWebRTCSessionId)
+{
+    TrackedSession * session = FindTrackedSession(aWebRTCSessionId);
+    VerifyOrReturn(session != nullptr,
+                   ChipLogProgress(Zcl, "AvAnalysisWebRTCClient: answer for untracked session %u ignored", aWebRTCSessionId));
+
+    // The Answer completes the signaling flow; the session stays tracked until it ends
+    session->mCallback->OnSessionActive(aWebRTCSessionId);
+}
+
+void DefaultAvAnalysisWebRTCClient::NotifyFailed(uint16_t aWebRTCSessionId)
+{
+    FailTrackedSession(aWebRTCSessionId);
+}
+
+void DefaultAvAnalysisWebRTCClient::NotifyEnded(uint16_t aWebRTCSessionId)
+{
+    // An End this node did not ask for: to the AV Analysis cluster the session has failed
+    FailTrackedSession(aWebRTCSessionId);
+}
+
+void DefaultAvAnalysisWebRTCClient::FailTrackedSession(uint16_t aWebRTCSessionId)
+{
+    TrackedSession * session = FindTrackedSession(aWebRTCSessionId);
+    VerifyOrReturn(session != nullptr,
+                   ChipLogProgress(Zcl, "AvAnalysisWebRTCClient: end of untracked session %u ignored", aWebRTCSessionId));
+
+    // Released before the callback learns of it, so the callback finds the session already gone
+    AvAnalysisWebRTCClient::Callback * callback = session->mCallback;
+    ReleaseSession(*session);
+    callback->OnSessionFailed(aWebRTCSessionId);
+}
 
 void DefaultAvAnalysisWebRTCClient::FinishRequest(Status aStatus, uint16_t aWebRTCSessionId)
 {
@@ -449,8 +493,16 @@ void DefaultAvAnalysisWebRTCClient::FinishRequest(Status aStatus, uint16_t aWebR
     VerifyOrReturn(callback != nullptr);
 
     const Request::CommandType completed = mRequest.GetCommandType();
+    // An offer request failing after asking for the offer leaves the application a peer connection
+    // that will never get a session
+    const bool offerAbandoned = mRequest.OfferRequested() && aStatus != Status::Success;
     mRequest.Reset();
     mOfferSdp.clear();
+
+    if (offerAbandoned)
+    {
+        mPeerDelegate->OnOfferAbandoned();
+    }
 
     if (completed == Request::CommandType::kProvideOffer)
     {
