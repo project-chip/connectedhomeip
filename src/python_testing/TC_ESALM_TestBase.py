@@ -15,12 +15,16 @@
 #    limitations under the License.
 #
 
+import logging
+
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
 from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest
 from matter.testing.runner import TestStep
+
+log = logging.getLogger(__name__)
 
 cluster = Clusters.ElectricalAlarm
 AlarmBitmap = cluster.Bitmaps.AlarmBitmap
@@ -159,17 +163,25 @@ class ElectricalAlarmTestBaseHelper(MatterBaseTest):
             self.mark_all_remaining_steps_skipped(3)
             return
 
+        # The plan makes the case not applicable, rather than failed, when the alarm is absent from
+        # Supported or disabled in Mask: "Steps 3 and 3a verify that bit {ALARM_BIT} is set in
+        # Supported and enabled in Mask before proceeding. If not, the test case is not applicable."
+        # Mask is writable server state, so a server may legitimately ship with an alarm disabled.
         self.step(3)
         supported = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.Supported)
-        asserts.assert_true(int(supported) & alarm_bit,
-                            f"{alarm_name} is not set in Supported, so this alarm cannot be tested")
+        if not int(supported) & alarm_bit:
+            log.info("%s is not set in Supported; the test case is not applicable", alarm_name)
+            self.mark_all_remaining_steps_skipped("3a")
+            return
 
         self.step("3a")
         mask = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.Mask)
-        asserts.assert_true(int(mask) & alarm_bit,
-                            f"{alarm_name} is not enabled in Mask, so the alarm would be suppressed")
+        if not int(mask) & alarm_bit:
+            log.info("%s is not enabled in Mask; the test case is not applicable", alarm_name)
+            self.mark_all_remaining_steps_skipped("3b")
+            return
 
         self.step("3b")
         attribute_list = await self.read_single_attribute_check_success(
