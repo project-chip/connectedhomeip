@@ -40,6 +40,22 @@ public:
     };
 
     /**
+     * Learns of peer connections that failed after their session was assigned
+     */
+    class FailureObserver
+    {
+    public:
+        virtual ~FailureObserver() = default;
+
+        /**
+         * The session's peer connection reached the Failed or Closed state
+         */
+        virtual void OnPeerConnectionFailed(uint16_t aWebRTCSessionId) = 0;
+    };
+
+    void SetFailureObserver(FailureObserver * aObserver) { mFailureObserver = aObserver; }
+
+    /**
      * Applies the camera's SDP answer to the session's peer connection.
      */
     virtual CHIP_ERROR ApplyAnswer(uint16_t aWebRTCSessionId, const std::string & aSdp) = 0;
@@ -54,6 +70,9 @@ public:
      * so each is sent to the camera once.
      */
     virtual std::vector<LocalICECandidate> TakeLocalCandidates(uint16_t aWebRTCSessionId) = 0;
+
+protected:
+    FailureObserver * mFailureObserver = nullptr;
 };
 
 } // namespace app
