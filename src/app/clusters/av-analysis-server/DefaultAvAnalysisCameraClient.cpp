@@ -88,21 +88,22 @@ CHIP_ERROR DefaultAvAnalysisCameraClient::StartRequest(Request::CommandType aCom
 
     mRequest.Begin(aCommandType, aVideoStreamId, aCallback);
 
-        CHIP_ERROR err = DeviceLayer::SystemLayer().ScheduleLambda([this, aCommandType, aVideoStreamId]() {
-            static uint16_t sNextSelfAllocatedStreamId = 1;
-            uint16_t streamId = (aCommandType == Request::CommandType::kVideoStreamAllocate) ? sNextSelfAllocatedStreamId++ : aVideoStreamId;
-            FinishRequest(Status::Success, streamId);
-        });
-        if (err != CHIP_NO_ERROR)
-        {
-            mRequest.Reset();
-            return err;
-        }
-        return CHIP_NO_ERROR;
+    CHIP_ERROR err = DeviceLayer::SystemLayer().ScheduleLambda([this, aCommandType, aVideoStreamId]() {
+        static uint16_t sNextSelfAllocatedStreamId = 1;
+        uint16_t streamId =
+            (aCommandType == Request::CommandType::kVideoStreamAllocate) ? sNextSelfAllocatedStreamId++ : aVideoStreamId;
+        FinishRequest(Status::Success, streamId);
+    });
+    if (err != CHIP_NO_ERROR)
+    {
+        mRequest.Reset();
+        return err;
     }
-
-    EstablishSession(aCameraNode);
     return CHIP_NO_ERROR;
+}
+
+EstablishSession(aCameraNode);
+return CHIP_NO_ERROR;
 }
 
 void DefaultAvAnalysisCameraClient::StartProfileDiscovery()
