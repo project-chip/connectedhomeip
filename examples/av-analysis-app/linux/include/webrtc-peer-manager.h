@@ -54,14 +54,15 @@ public:
     // WebRTCPeerController inbound signaling
     CHIP_ERROR ApplyAnswer(uint16_t aWebRTCSessionId, const std::string & aSdp) override;
     CHIP_ERROR AddRemoteCandidate(uint16_t aWebRTCSessionId, const std::string & aCandidate) override;
+    std::vector<LocalICECandidate> TakeLocalCandidates(uint16_t aWebRTCSessionId) override;
 
 private:
     struct PeerSession
     {
         std::shared_ptr<rtc::PeerConnection> peerConnection;
         std::shared_ptr<rtc::Track> videoTrack;
-        // Gathered local candidates, buffered until the client can trickle them to the camera
-        std::vector<std::string> localCandidates;
+        // Gathered local candidates, buffered until they are taken for sending to the camera
+        std::vector<LocalICECandidate> localCandidates;
     };
 
     // The session a given connection belongs to: the pending one, or an assigned entry
